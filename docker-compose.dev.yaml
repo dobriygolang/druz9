@@ -1,21 +1,21 @@
-version: '0.1'
+version: "3.9"
 
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: postgres-dev
+    container_name: friends-postgres-dev
     restart: unless-stopped
     environment:
       POSTGRES_PORT: ${DB_PORT:-5432}
-      POSTGRES_USER: ${DB_USER:-vacatalog}
-      POSTGRES_PASSWORD: ${DB_PASSWORD:-vacatalog}
-      POSTGRES_DB: ${DB_NAME:-vacatalog_db}
+      POSTGRES_USER: ${DB_USER:-friends}
+      POSTGRES_PASSWORD: ${DB_PASS:-friends}
+      POSTGRES_DB: ${DB_NAME:-friends_db}
     ports:
       - "${DB_PORT:-5454}:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ${DB_USER} -d ${DB_NAME}"]
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-friends} -d ${DB_NAME:-friends_db}"]
       interval: 5s
       timeout: 5s
       retries: 5
@@ -24,7 +24,7 @@ services:
 
   redis:
     image: redis:7-alpine
-    container_name: redis-dev
+    container_name: friends-redis-dev
     restart: unless-stopped
     ports:
       - "${REDIS_PORT:-6379}:6379"

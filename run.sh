@@ -47,14 +47,35 @@ deps(){
 # Собрать исполняемый файл
 build(){
   deps
-  go build ./cmd/order
+  go build -o friends ./cmd/service/main.go
 }
 
 # Собрать docker образ
 build_docker() {
   build
-  docker build -t "$REPO_NAME:local" .
-  rm ./"$REPO_NAME"
+  docker build -t "${REPO_NAME:-friends}:local" .
+  rm -f ./friends
+}
+
+# Команды для миграций
+migrate_create(){
+  migrate create -ext sql -dir internal/migrations "$name"
+}
+
+migrate_up(){
+  migrate -path internal/migrations -database "$DATABASE_URL" up
+}
+
+migrate_down(){
+  migrate -path internal/migrations -database "$DATABASE_URL" down
+}
+
+migrate_status(){
+  migrate -path internal/migrations -database "$DATABASE_URL" version
+}
+
+migrate_force(){
+  migrate -path internal/migrations -database "$DATABASE_URL" force "$version"
 }
 
 # Добавьте сюда список команд
@@ -70,6 +91,11 @@ using(){
   echo "  build_docker - собрать локальный docker образ"
   echo "  fmt - форматирование кода при помощи 'go fmt'"
   echo "  vet - проверка правильности форматирования кода"
+  echo "  migrate_create - создать новую миграцию (используйте name=имя_миграции)"
+  echo "  migrate_up - применить все миграции"
+  echo "  migrate_down - откатить последнюю миграцию"
+  echo "  migrate_status - показать статус миграций"
+  echo "  migrate_force - принудительно установить версию миграции (используйте version=номер)"
 }
 
 

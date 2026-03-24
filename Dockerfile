@@ -9,6 +9,9 @@ RUN mkdir /friends
 # Set the working directory for all subsequent commands
 WORKDIR /friends
 
+# Install runtime tools needed for healthchecks
+RUN apk add --no-cache curl
+
 # First copy go.mod and go.sum files
 # This allows Docker to cache these layers and rebuild them
 # only when dependencies change, which speeds up builds
@@ -22,10 +25,13 @@ RUN go mod download
 # Copy the rest of the application code
 COPY . .
 
+# Copy Docker-specific environment configuration
+COPY cmd/config/.env.docker cmd/config/.env
+
 # Expose the port that the application will run on
 EXPOSE 8000
 
 # Build the Go application from the cmd directory
 # The -o flag specifies the output filename
-RUN cd cmd && go build -o ../vacatalog
+RUN go build -o /friends/friends cmd/service/main.go
 CMD ["./friends"]

@@ -15,6 +15,8 @@ import (
 	"github.com/joho/godotenv"
 	"github.com/redis/go-redis/v9"
 	"go.uber.org/zap"
+
+	"some_app/pkg/migrator"
 )
 
 var signalToName = map[os.Signal]string{
@@ -25,18 +27,25 @@ var signalToName = map[os.Signal]string{
 
 func main() {
 	ctx, cancelFunc := context.WithCancel(context.Background())
-	err := godotenv.Overload("cmd/config/.env")
-	if err != nil {
+	if err := godotenv.Overload("cmd/config/.env"); err != nil {
 		cancelFunc()
+		fmt.Fprintln(os.Stderr, "failed to load env:", err)
+		return
 	}
 
 	logger, err := initLogger()
 	if err != nil {
 		cancelFunc()
+		fmt.Fprintln(os.Stderr, "failed to init logger:", err)
+		return
 	}
 
 	db := initPgDb(logger)
 	rdb := initRedis(ctx, logger)
+
+	if err := migrator.RunMigrationsFromEnv(os.Getenv("MIGRATION_PATH")); err != nil {
+		logger.Fatal("Failed to run migrations", zap.Error(err))
+	}
 
 	osSigCh := make(chan os.Signal, 1)
 	signal.Notify(osSigCh, syscall.SIGINT, syscall.SIGTERM, syscall.SIGQUIT)
@@ -86,6 +95,7 @@ func main() {
 
 	wg.Add(1)
 	go func() {
+		defer wg.Done()
 		<-ctx.Done()
 		rdb.Close()
 		db.Close()
@@ -105,7 +115,7 @@ func initLogger() (*zap.SugaredLogger, error) {
 func initPgDb(logger *zap.SugaredLogger) *pgxpool.Pool {
 	dbpool, err := pgxpool.New(context.Background(), os.Getenv("DATABASE_URL"))
 	if err != nil {
-		logger.Fatal("can't init redis client", zap.Error(err))
+		logger.Fatal("can't init postgres client", zap.Error(err))
 	}
 	return dbpool
 

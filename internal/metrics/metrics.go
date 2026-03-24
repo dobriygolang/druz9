@@ -15,7 +15,7 @@ type Hitter interface {
 }
 
 func New() *Metrics {
-	prefix := "citilink_order"
+	prefix := "friends"
 	metrics := &Metrics{
 		ReqTotal: prometheus.NewCounterVec(
 			prometheus.CounterOpts{
