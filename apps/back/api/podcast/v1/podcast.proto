@@ -1,0 +1,47 @@
+syntax = "proto3";
+
+package podcast.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "back/pkg/api/podcast/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.podcast.v1";
+option java_outer_classname = "PodcastProtoV1";
+
+// The podcast service definition.
+service Podcast {
+  // Get podcast by ID
+  rpc GetPodcast (GetPodcastRequest) returns (PodcastReply) {
+    option (google.api.http) = {
+      get: "/api/v1/podcasts/{id}"
+    };
+  }
+  // Upload/create podcast
+  rpc CreatePodcast (CreatePodcastRequest) returns (PodcastReply) {
+    option (google.api.http) = {
+      post: "/api/v1/podcasts"
+      body: "*"
+    };
+  }
+}
+
+// The request message to get a podcast.
+message GetPodcastRequest {
+  string id = 1;
+}
+
+// The request message to create a podcast.
+message CreatePodcastRequest {
+  string title = 1;
+  string description = 2;
+  string audio_url = 3;
+}
+
+// The reply message containing the podcast.
+message PodcastReply {
+  string id = 1;
+  string title = 2;
+  string description = 3;
+  string audio_url = 4;
+}

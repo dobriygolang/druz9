@@ -1,0 +1,6 @@
+search_performance_cpo_bids_workers_number:
+  usage: "Number of goroutines to process bids"
+  group: "app"
+  value: "2"
+  type: "uint"
+  writable: true

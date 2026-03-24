@@ -1,0 +1,78 @@
+syntax = "proto3";
+
+package profile.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "back/pkg/api/profile/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.profile.v1";
+option java_outer_classname = "ProfileProtoV1";
+
+// The profile service definition.
+service ProfileService {
+  // Get profile by ID
+  rpc GetProfile (GetProfileRequest) returns (Profile) {
+    option (google.api.http) = { get: "/api/v1/profiles/{id}" };
+  }
+  // Create a new profile
+  rpc CreateProfile (CreateProfileRequest) returns (Profile) {
+    option (google.api.http) = { 
+      post: "/api/v1/profiles"
+      body: "*"
+    };
+  }
+  // Update user location
+  rpc UpdateLocation (UpdateLocationRequest) returns (Profile) {
+    option (google.api.http) = { 
+      post: "/api/v1/profiles/{id}/location"
+      body: "*"
+    };
+  }
+  // Link Telegram account
+  rpc LinkTelegram (LinkTelegramRequest) returns (Profile) {
+    option (google.api.http) = { 
+      post: "/api/v1/profiles/{id}/telegram"
+      body: "*"
+    };
+  }
+}
+
+// Profile information
+message Profile {
+  string id = 1;
+  string telegram_id = 2;
+  double latitude = 3;
+  double longitude = 4;
+  string photo_url = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp updated_at = 7;
+}
+
+// Request message to get a profile
+message GetProfileRequest {
+  string id = 1;
+}
+
+// Request message to create a profile
+message CreateProfileRequest {
+  string telegram_id = 1;
+  double latitude = 2;
+  double longitude = 3;
+  string photo_url = 4;
+}
+
+// Request message to update location
+message UpdateLocationRequest {
+  string id = 1;
+  double latitude = 2;
+  double longitude = 3;
+}
+
+// Request message to link Telegram account
+message LinkTelegramRequest {
+  string id = 1;
+  string telegram_id = 2;
+  string verification_code = 3;
+}
