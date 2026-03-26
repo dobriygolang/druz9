@@ -98,7 +98,6 @@ func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, str
 	if opts.CreatorID != nil {
 		conditions = append(conditions, fmt.Sprintf("e.creator_id = $%d", argNum))
 		args = append(args, *opts.CreatorID)
-		argNum++
 	}
 
 	whereClause := ""
@@ -350,11 +349,4 @@ WHERE e.id = $1
 
 type eventQueryer interface {
 	Query(context.Context, string, ...any) (pgx.Rows, error)
-}
-
-func valueOrEmpty(value *string) string {
-	if value == nil {
-		return ""
-	}
-	return *value
 }

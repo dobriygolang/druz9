@@ -38,7 +38,7 @@ jobs:
       - name: Lint (golangci-lint)
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.64.8
+          version: latest
           install-mode: goinstall
           working-directory: apps/api
           args: --timeout=5m
@@ -77,7 +77,7 @@ jobs:
       - name: Lint (golangci-lint)
         uses: golangci/golangci-lint-action@v6
         with:
-          version: v1.64.8
+          version: latest
           install-mode: goinstall
           working-directory: apps/notification-service
           args: --timeout=5m
@@ -98,12 +98,12 @@ jobs:
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: 22
+          node-version: 20
           cache: npm
           cache-dependency-path: apps/front/package-lock.json
 
       - name: Install
-        run: npm ci --legacy-peer-deps
+        run: npm install --legacy-peer-deps
 
       - name: Type check
         run: npx tsc --noEmit

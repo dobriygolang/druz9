@@ -3,7 +3,10 @@ package main
 import (
 	"context"
 	"net/http"
+
+	// #nosec G108 -- pprof is intentionally exposed on dedicated metrics endpoint in non-public ops context.
 	_ "net/http/pprof"
+	"time"
 
 	admindomainservice "api/internal/admin/service"
 	adminservice "api/internal/api/admin"
@@ -225,8 +228,9 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 		mux.HandleFunc("/debug/pprof/symbol", http.DefaultServeMux.ServeHTTP)
 
 		metricsServer := &http.Server{
-			Addr:    cfg.Metrics.Addr,
-			Handler: mux,
+			Addr:              cfg.Metrics.Addr,
+			Handler:           mux,
+			ReadHeaderTimeout: 5 * time.Second,
 		}
 
 		go func() {

@@ -14,6 +14,8 @@ import (
 	"github.com/prometheus/client_golang/prometheus"
 )
 
+const unknownLabel = "unknown"
+
 var (
 	httpRequestsTotal = prometheus.NewCounterVec(
 		prometheus.CounterOpts{
@@ -93,7 +95,7 @@ func MetricsMiddleware() middleware.Middleware {
 					path = operation
 				}
 				if path == "" {
-					path = "unknown"
+					path = unknownLabel
 				}
 				if method == "" {
 					method = "UNKNOWN"
@@ -120,12 +122,12 @@ func MetricsMiddleware() middleware.Middleware {
 func splitGRPCOperation(operation string) (string, string) {
 	trimmed := strings.TrimSpace(operation)
 	if trimmed == "" {
-		return "unknown", "unknown"
+		return unknownLabel, unknownLabel
 	}
 	trimmed = strings.TrimPrefix(trimmed, "/")
 	parts := strings.Split(trimmed, "/")
 	if len(parts) != 2 {
-		return "unknown", trimmed
+		return unknownLabel, trimmed
 	}
 	return parts[0], parts[1]
 }

@@ -48,7 +48,7 @@ WHERE (r.is_private = FALSE OR r.creator_id = $1 OR $2 = TRUE
 `
 	countArgs := []any{currentUserID, isAdmin}
 	if opts.Kind != "" {
-		countQuery += fmt.Sprintf(" AND r.kind = $3")
+		countQuery += " AND r.kind = $3"
 		countArgs = append(countArgs, opts.Kind)
 	}
 	if err := r.data.DB.QueryRow(ctx, countQuery, countArgs...).Scan(&totalCount); err != nil {
