@@ -8,7 +8,7 @@ on:
 jobs:
   deploy:
     name: Deploy to Oracle VM
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    if: ${{ github.event.workflow_run.conclusion == 'success' && contains(fromJson('["main","master"]'), github.event.workflow_run.head_branch) }}
     runs-on: ubuntu-latest
     env:
       ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
@@ -47,7 +47,7 @@ jobs:
             --exclude "front/node_modules" \
             --exclude "front/dist" \
             --exclude "api/bin" \
-            ./ "${ORACLE_USER}@${ORACLE_HOST}:${APP_DIR}/"
+            ./apps/ "${ORACLE_USER}@${ORACLE_HOST}:${APP_DIR}/"
 
       - name: Run remote deploy
         run: |

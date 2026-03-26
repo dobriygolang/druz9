@@ -1,0 +1,36 @@
+.DS_Store
+Thumbs.db
+
+# IDE/editor
+.idea/
+.vscode/
+*.swp
+
+# Local env/secrets
+**/.env
+**/.env.*
+!**/.env.example
+**/.secrets/
+
+# Frontend
+apps/front/node_modules/
+apps/front/dist/
+apps/front/.vite/
+apps/front/coverage/
+
+# Go services
+apps/api/bin/
+apps/api/dist/
+apps/api/tmp/
+apps/api/vendor/
+apps/api/*.out
+apps/api/*.test
+apps/api/*.prof
+
+apps/notification-service/bin/
+apps/notification-service/dist/
+apps/notification-service/tmp/
+apps/notification-service/vendor/
+apps/notification-service/*.out
+apps/notification-service/*.test
+apps/notification-service/*.prof

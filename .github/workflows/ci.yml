@@ -12,7 +12,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: api
+        working-directory: apps/api
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: api/go.mod
+          go-version-file: apps/api/go.mod
           cache: true
 
       - name: Check formatting (gofmt)
@@ -39,7 +39,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.64.8
-          working-directory: api
+          working-directory: apps/api
           args: --timeout=5m
 
       - name: Test
@@ -50,7 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: notification-service
+        working-directory: apps/notification-service
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -58,7 +58,7 @@ jobs:
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version-file: notification-service/go.mod
+          go-version-file: apps/notification-service/go.mod
           cache: true
 
       - name: Check formatting (gofmt)
@@ -77,7 +77,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.64.8
-          working-directory: notification-service
+          working-directory: apps/notification-service
           args: --timeout=5m
 
       - name: Test
@@ -88,7 +88,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: front
+        working-directory: apps/front
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -98,7 +98,7 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: front/package-lock.json
+          cache-dependency-path: apps/front/package-lock.json
 
       - name: Install
         run: npm ci
