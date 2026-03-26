@@ -1,0 +1,117 @@
+syntax = "proto3";
+
+package profile.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/profile/v1;v1";
+
+service ProfileService {
+  rpc TelegramAuth(TelegramAuthRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/auth/telegram"
+      body: "*"
+    };
+  }
+
+  rpc CompleteRegistration(CompleteRegistrationRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/auth/complete-registration"
+      body: "*"
+    };
+  }
+
+  rpc GetProfile(GetProfileRequest) returns (ProfileResponse) {
+    option (google.api.http) = { get: "/api/v1/profile" };
+  }
+
+  rpc GetProfileByID(GetProfileByIDRequest) returns (ProfileResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}" };
+  }
+
+  rpc UpdateLocation(UpdateLocationRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/location"
+      body: "*"
+    };
+  }
+
+  rpc UpdateProfile(UpdateProfileRequest) returns (ProfileResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/update"
+      body: "*"
+    };
+  }
+
+  rpc Logout(LogoutRequest) returns (LogoutResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/auth/logout"
+      body: "*"
+    };
+  }
+}
+
+message TelegramAuthRequest {
+  int64 id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string username = 4;
+  string photo_url = 5;
+  int64 auth_date = 6;
+  string hash = 7;
+}
+
+message CompleteRegistrationRequest {
+  string region = 2;
+  string country = 3;
+  string city = 4;
+  double latitude = 5;
+  double longitude = 6;
+}
+
+message GetProfileRequest {}
+
+message GetProfileByIDRequest {
+  string user_id = 1;
+}
+
+message UpdateLocationRequest {
+  string region = 2;
+  string country = 3;
+  string city = 4;
+  double latitude = 5;
+  double longitude = 6;
+}
+
+message LogoutRequest {}
+
+message UpdateProfileRequest {
+  string current_workplace = 1;
+}
+
+message ProfileResponse {
+  User user = 1;
+  bool needs_profile_complete = 2;
+}
+
+message LogoutResponse {
+  string status = 1;
+}
+
+message User {
+  string id = 1;
+  int64 telegram_id = 2;
+  string telegram_username = 3;
+  string first_name = 4;
+  string last_name = 5;
+  string avatar_url = 6;
+  string region = 7;
+  google.protobuf.Timestamp created_at = 8;
+  google.protobuf.Timestamp updated_at = 9;
+  double latitude = 10;
+  double longitude = 11;
+  string activity_status = 12;
+  string current_workplace = 13;
+  bool is_admin = 14;
+}

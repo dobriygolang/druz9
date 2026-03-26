@@ -1,0 +1,6 @@
+notification_delivery_workers:
+  usage: "Number of notification delivery workers"
+  group: "app"
+  value: "2"
+  type: "uint"
+  writable: true

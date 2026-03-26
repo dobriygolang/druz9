@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package admin.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "api/pkg/api/admin/v1;v1";
+
+service AdminService {
+  rpc DeleteUser(DeleteUserRequest) returns (AdminStatusResponse) {
+    option (google.api.http) = { delete: "/api/admin/users/{user_id}" };
+  }
+}
+
+message DeleteUserRequest {
+  string user_id = 1;
+}
+
+message AdminStatusResponse {
+  string status = 1;
+}

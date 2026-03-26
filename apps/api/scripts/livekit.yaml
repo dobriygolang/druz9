@@ -1,0 +1,10 @@
+port: 7880
+rtc:
+  tcp_port: 7881
+  port_range_start: 50000
+  port_range_end: 50100
+  use_external_ip: false
+keys:
+  devkey: secret
+log_level: info
+prometheus_port: 6789

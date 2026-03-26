@@ -1,0 +1,59 @@
+name: CD Oracle
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  deploy:
+    name: Deploy to Oracle VM
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    env:
+      ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+      ORACLE_USER: ${{ secrets.ORACLE_USER }}
+      ORACLE_SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+      ORACLE_SSH_PORT: ${{ secrets.ORACLE_SSH_PORT }}
+      ORACLE_APP_DIR: ${{ secrets.ORACLE_APP_DIR }}
+      ORACLE_API_SERVICE_NAME: ${{ secrets.ORACLE_API_SERVICE_NAME }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Validate required secrets
+        run: |
+          test -n "$ORACLE_HOST"
+          test -n "$ORACLE_USER"
+          test -n "$ORACLE_SSH_KEY"
+
+      - name: Setup SSH
+        run: |
+          set -euo pipefail
+          PORT="${ORACLE_SSH_PORT:-22}"
+          mkdir -p ~/.ssh
+          chmod 700 ~/.ssh
+          printf '%s\n' "$ORACLE_SSH_KEY" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -p "$PORT" -H "$ORACLE_HOST" >> ~/.ssh/known_hosts
+
+      - name: Sync repository to server
+        run: |
+          set -euo pipefail
+          PORT="${ORACLE_SSH_PORT:-22}"
+          APP_DIR="${ORACLE_APP_DIR:-/opt/druz9/apps}"
+          rsync -az --delete \
+            --exclude ".git" \
+            --exclude "front/node_modules" \
+            --exclude "front/dist" \
+            --exclude "api/bin" \
+            ./ "${ORACLE_USER}@${ORACLE_HOST}:${APP_DIR}/"
+
+      - name: Run remote deploy
+        run: |
+          set -euo pipefail
+          PORT="${ORACLE_SSH_PORT:-22}"
+          APP_DIR="${ORACLE_APP_DIR:-/opt/druz9/apps}"
+          API_SERVICE_NAME="${ORACLE_API_SERVICE_NAME:-druz9-api}"
+          ssh -p "$PORT" "${ORACLE_USER}@${ORACLE_HOST}" \
+            "APP_DIR='$APP_DIR' API_SERVICE_NAME='$API_SERVICE_NAME' bash '$APP_DIR/deploy/oracle/deploy.sh'"

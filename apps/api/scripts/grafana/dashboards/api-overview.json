@@ -1,0 +1,405 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "title": "HTTP RPS by endpoint (all active)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_requests_seconds_count[5m])) by (method, path)",
+          "legendFormat": "{{method}} {{path}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 2,
+      "title": "HTTP Errors RPS by endpoint/code (all active)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_requests_seconds_count{code=~\"4..|5..\"}[5m])) by (method, path, code)",
+          "legendFormat": "{{code}} {{method}} {{path}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 3,
+      "title": "HTTP Latency p95/p99 by endpoint (all active)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le, method, path))",
+          "legendFormat": "p95 {{method}} {{path}}"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket[5m])) by (le, method, path))",
+          "legendFormat": "p99 {{method}} {{path}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 4,
+      "title": "gRPC RPS by method (all active)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(grpc_server_handled_total[5m])) by (grpc_method)",
+          "legendFormat": "{{grpc_method}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 5,
+      "title": "gRPC Non-OK RPS by method/code (all active)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(grpc_server_handled_total{grpc_code!=\"OK\"}[5m])) by (grpc_method, grpc_code)",
+          "legendFormat": "{{grpc_code}} {{grpc_method}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 6,
+      "title": "gRPC Latency p95 by method (all active)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.95, sum(rate(grpc_server_handling_seconds_bucket[5m])) by (le, grpc_method))",
+          "legendFormat": "p95 {{grpc_method}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 7,
+      "title": "HTTP 5xx Error %",
+      "type": "gauge",
+      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_requests_seconds_count{code=~\"5..\"}[5m])) / clamp_min(sum(rate(http_server_requests_seconds_count[5m])), 0.0001) * 100"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 8,
+      "title": "gRPC Non-OK %",
+      "type": "gauge",
+      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(grpc_server_handled_total{grpc_code!=\"OK\"}[5m])) / clamp_min(sum(rate(grpc_server_handled_total[5m])), 0.0001) * 100"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 9,
+      "title": "Go Goroutines",
+      "type": "stat",
+      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "refId": "A", "expr": "go_goroutines" }],
+      "fieldConfig": { "defaults": { "unit": "none" }, "overrides": [] },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 10,
+      "title": "API CPU (cores)",
+      "type": "stat",
+      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "refId": "A", "expr": "rate(process_cpu_seconds_total[5m])" }],
+      "fieldConfig": { "defaults": { "unit": "none" }, "overrides": [] },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 11,
+      "title": "Heap Alloc",
+      "type": "stat",
+      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [{ "refId": "A", "expr": "go_memstats_heap_alloc_bytes" }],
+      "fieldConfig": { "defaults": { "unit": "bytes" }, "overrides": [] },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 12,
+      "title": "GC p99 pause",
+      "type": "stat",
+      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.99, sum(rate(go_gc_duration_seconds_bucket[5m])) by (le))"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto"
+      }
+    },
+    {
+      "id": 13,
+      "title": "Targets UP by job",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 29 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(up) by (job)",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 14,
+      "title": "Scrape samples by job",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 29 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(scrape_samples_scraped) by (job)",
+          "legendFormat": "{{job}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 15,
+      "title": "PostgreSQL active connections",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 37 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(pg_stat_database_numbackends) by (datname)",
+          "legendFormat": "{{datname}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 16,
+      "title": "PostgreSQL transactions/s",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 37 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(pg_stat_database_xact_commit[5m]) + rate(pg_stat_database_xact_rollback[5m])) by (datname)",
+          "legendFormat": "{{datname}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 17,
+      "title": "MinIO S3 requests/s (if exported)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 37 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(minio_s3_requests_total[5m])) by (api) or on() vector(0)",
+          "legendFormat": "{{api}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 18,
+      "title": "MinIO/LiveKit/Postgres target status",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 45 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{job=~\"postgres|minio|livekit\"}",
+          "legendFormat": "{{job}} {{instance}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "max": 1 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 19,
+      "title": "Cache hit ratio % (if exported)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 45 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "(sum(rate(cache_hits_total[5m])) / clamp_min(sum(rate(cache_hits_total[5m])) + sum(rate(cache_misses_total[5m])), 0.0001) * 100) or on() vector(0)",
+          "legendFormat": "cache hit ratio"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "list", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 20,
+      "title": "HTTP Endpoints Activity (all, $__range)",
+      "type": "table",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 53 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(http_server_requests_seconds_count[$__range])) by (method, path, code)",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "options": {
+        "showHeader": true
+      }
+    },
+    {
+      "id": 21,
+      "title": "gRPC Methods Activity (all, $__range)",
+      "type": "table",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 53 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(increase(grpc_server_handled_total[$__range])) by (grpc_method, grpc_code)",
+          "instant": true,
+          "format": "table"
+        }
+      ],
+      "fieldConfig": { "defaults": {}, "overrides": [] },
+      "options": {
+        "showHeader": true
+      }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["api", "ops"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "API Overview",
+  "uid": "api-overview",
+  "version": 4,
+  "weekStart": ""
+}

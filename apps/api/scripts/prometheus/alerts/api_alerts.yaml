@@ -1,0 +1,174 @@
+groups:
+  - name: api_alerts
+    rules:
+      # Service Availability
+      - alert: APIServiceDown
+        expr: up{job="api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "API service is down"
+          description: "API service has been down for more than 1 minute"
+
+      # HTTP Errors
+      - alert: HighHTTPErrorRate
+        expr: sum(rate(http_server_requests_seconds_total{code=~"5.."}[5m])) / sum(rate(http_server_requests_seconds_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP 5xx error rate"
+          description: "More than 5% of HTTP requests are returning 5xx errors"
+
+      - alert: CriticalHTTPErrorRate
+        expr: sum(rate(http_server_requests_seconds_total{code=~"5.."}[5m])) / sum(rate(http_server_requests_seconds_total[5m])) > 0.15
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical HTTP 5xx error rate"
+          description: "More than 15% of HTTP requests are returning 5xx errors"
+
+      # gRPC Errors
+      - alert: HighGRPCErrorRate
+        expr: sum(rate(grpc_server_handled_total{grpc_code=~"Unknown|Internal|Aborted|DataLoss"}[5m])) / sum(rate(grpc_server_handled_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High gRPC error rate"
+          description: "More than 5% of gRPC requests are failing"
+
+      # Latency
+      - alert: HighHTTPLatency
+        expr: histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le)) > 2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High HTTP latency"
+          description: "95th percentile HTTP latency is above 2 seconds"
+
+      - alert: CriticalHTTPLatency
+        expr: histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket[5m])) by (le)) > 5
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical HTTP latency"
+          description: "99th percentile HTTP latency is above 5 seconds"
+
+      - alert: HighGRPCLatency
+        expr: histogram_quantile(0.95, sum(rate(grpc_server_handling_seconds_bucket[5m])) by (le)) > 1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High gRPC latency"
+          description: "95th percentile gRPC latency is above 1 second"
+
+      # Database Connections
+      - alert: HighDBConnectionUsage
+        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High database connection usage"
+          description: "Database is using more than 80% of max connections"
+
+      - alert: CriticalDBConnectionUsage
+        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical database connection usage"
+          description: "Database is using more than 95% of max connections"
+
+      # Database Slow Queries
+      - alert: HighDBSlowQueries
+        expr: sum(rate(pg_stat_database_calls{datname="api", call="SELECT"}[5m])) > 100
+        for: 5m
+        labels:
+          severity: info
+        annotations:
+          summary: "High number of database queries"
+          description: "Database is handling high query load"
+
+      # Memory
+      - alert: HighMemoryUsage
+        expr: (process_resident_memory_bytes / process_max_memory_bytes) > 0.85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High memory usage"
+          description: "Process memory usage is above 85%"
+
+      - alert: CriticalMemoryUsage
+        expr: (process_resident_memory_bytes / process_max_memory_bytes) > 0.95
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical memory usage"
+          description: "Process memory usage is above 95%"
+
+      # CPU
+      - alert: HighCPUUsage
+        expr: process_cpu_seconds_total > 0.8
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High CPU usage"
+          description: "Process CPU usage is high"
+
+      # Go-specific metrics
+      - alert: HighGoroutineCount
+        expr: go_goroutines > 1000
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High number of goroutines"
+          description: "There are more than 1000 goroutines running"
+
+      - alert: CriticalGoroutineCount
+        expr: go_goroutines > 5000
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Critical number of goroutines"
+          description: "There are more than 5000 goroutines running"
+
+      - alert: HighGCRate
+        expr: rate(go_gc_duration_seconds_sum[5m]) / rate(go_gc_duration_seconds_count[5m]) > 0.5
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High GC pause time"
+          description: "Garbage collection is taking significant time"
+
+      # Request rate
+      - alert: LowRequestRate
+        expr: sum(rate(http_server_requests_seconds_total[5m])) < 1
+        for: 10m
+        labels:
+          severity: info
+        annotations:
+          summary: "Low request rate"
+          description: "Very low request rate detected"
+
+      - alert: HighRequestRate
+        expr: sum(rate(http_server_requests_seconds_total[5m])) > 1000
+        for: 5m
+        labels:
+          severity: info
+        annotations:
+          summary: "High request rate"
+          description: "High request rate detected"

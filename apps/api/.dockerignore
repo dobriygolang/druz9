@@ -1,0 +1,12 @@
+.git
+.gitignore
+.env
+.env.local
+.env.prod
+.vscode
+.idea
+*.md
+bin/
+Makefile
+docker-compose.yaml
+docker-compose.prod.yaml

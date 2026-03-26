@@ -1,0 +1,1444 @@
+# Generated with protoc-gen-openapi
+# https://github.com/google/gnostic/tree/master/cmd/protoc-gen-openapi
+
+openapi: 3.0.3
+info:
+    title: ""
+    version: 0.0.1
+paths:
+    /api/admin/podcasts:
+        post:
+            tags:
+                - PodcastService
+            operationId: PodcastService_CreatePodcast
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/podcast.v1.CreatePodcastRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PodcastResponse'
+    /api/admin/podcasts/{podcastId}:
+        delete:
+            tags:
+                - PodcastService
+            operationId: PodcastService_DeletePodcast
+            parameters:
+                - name: podcastId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PodcastStatusResponse'
+    /api/admin/podcasts/{podcastId}/upload:
+        post:
+            tags:
+                - PodcastService
+            operationId: PodcastService_UploadPodcast
+            parameters:
+                - name: podcastId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/podcast.v1.UploadPodcastRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PodcastResponse'
+    /api/admin/podcasts/{podcastId}/upload/complete:
+        post:
+            tags:
+                - PodcastService
+            operationId: PodcastService_CompletePodcastUpload
+            parameters:
+                - name: podcastId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/podcast.v1.CompletePodcastUploadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PodcastResponse'
+    /api/admin/podcasts/{podcastId}/upload/prepare:
+        post:
+            tags:
+                - PodcastService
+            operationId: PodcastService_PreparePodcastUpload
+            parameters:
+                - name: podcastId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/podcast.v1.PreparePodcastUploadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PreparePodcastUploadResponse'
+    /api/admin/users/{userId}:
+        delete:
+            tags:
+                - AdminService
+            operationId: AdminService_DeleteUser
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.AdminStatusResponse'
+    /api/v1/events:
+        get:
+            tags:
+                - EventService
+            operationId: EventService_ListEvents
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+                - name: creatorId
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/event.v1.ListEventsResponse'
+        post:
+            tags:
+                - EventService
+            operationId: EventService_CreateEvent
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/event.v1.CreateEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/event.v1.EventResponse'
+    /api/v1/events/{eventId}:
+        put:
+            tags:
+                - EventService
+            operationId: EventService_UpdateEvent
+            parameters:
+                - name: eventId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/event.v1.UpdateEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/event.v1.EventResponse'
+        delete:
+            tags:
+                - EventService
+            operationId: EventService_DeleteEvent
+            parameters:
+                - name: eventId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/event.v1.DeleteEventResponse'
+    /api/v1/events/{eventId}/join:
+        post:
+            tags:
+                - EventService
+            operationId: EventService_JoinEvent
+            parameters:
+                - name: eventId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/event.v1.JoinEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/event.v1.EventResponse'
+    /api/v1/events/{eventId}/leave:
+        post:
+            tags:
+                - EventService
+            operationId: EventService_LeaveEvent
+            parameters:
+                - name: eventId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/event.v1.LeaveEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/event.v1.LeaveEventResponse'
+    /api/v1/geo/community:
+        get:
+            tags:
+                - GeoService
+            operationId: GeoService_CommunityMap
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/geo.v1.CommunityMapResponse'
+    /api/v1/geo/resolve:
+        post:
+            tags:
+                - GeoService
+            operationId: GeoService_Resolve
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/geo.v1.ResolveRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/geo.v1.ResolveResponse'
+    /api/v1/podcasts:
+        get:
+            tags:
+                - PodcastService
+            operationId: PodcastService_ListPodcasts
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.ListPodcastsResponse'
+    /api/v1/podcasts/{podcastId}:
+        get:
+            tags:
+                - PodcastService
+            operationId: PodcastService_GetPodcast
+            parameters:
+                - name: podcastId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PodcastResponse'
+    /api/v1/podcasts/{podcastId}/play:
+        get:
+            tags:
+                - PodcastService
+            operationId: PodcastService_PlayPodcast
+            parameters:
+                - name: podcastId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/podcast.v1.PlayPodcastResponse'
+    /api/v1/profile:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetProfile
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/auth/complete-registration:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_CompleteRegistration
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.CompleteRegistrationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/auth/logout:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_Logout
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.LogoutRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.LogoutResponse'
+    /api/v1/profile/auth/telegram:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_TelegramAuth
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.TelegramAuthRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/location:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_UpdateLocation
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.UpdateLocationRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/update:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_UpdateProfile
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.UpdateProfileRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/{userId}:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetProfileByID
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/referrals:
+        get:
+            tags:
+                - ReferralService
+            operationId: ReferralService_ListReferrals
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/referral.v1.ListReferralsResponse'
+        post:
+            tags:
+                - ReferralService
+            operationId: ReferralService_CreateReferral
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/referral.v1.CreateReferralRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/referral.v1.ReferralResponse'
+    /api/v1/referrals/{referralId}:
+        put:
+            tags:
+                - ReferralService
+            operationId: ReferralService_UpdateReferral
+            parameters:
+                - name: referralId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/referral.v1.UpdateReferralRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/referral.v1.ReferralResponse'
+        delete:
+            tags:
+                - ReferralService
+            operationId: ReferralService_DeleteReferral
+            parameters:
+                - name: referralId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/referral.v1.ReferralStatusResponse'
+    /api/v1/rooms:
+        get:
+            tags:
+                - RoomService
+            operationId: RoomService_ListRooms
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: kind
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/room.v1.ListRoomsResponse'
+        post:
+            tags:
+                - RoomService
+            operationId: RoomService_CreateRoom
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/room.v1.CreateRoomRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/room.v1.RoomResponse'
+    /api/v1/rooms/{roomId}:
+        get:
+            tags:
+                - RoomService
+            operationId: RoomService_GetRoom
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/room.v1.RoomResponse'
+        delete:
+            tags:
+                - RoomService
+            operationId: RoomService_DeleteRoom
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/room.v1.RoomStatusResponse'
+        patch:
+            tags:
+                - RoomService
+            operationId: RoomService_UpdateRoom
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/room.v1.UpdateRoomRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/room.v1.RoomResponse'
+    /api/v1/rooms/{roomId}/join-token:
+        get:
+            tags:
+                - RoomService
+            operationId: RoomService_JoinRoomToken
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/room.v1.JoinRoomTokenResponse'
+    /api/v1/rooms/{roomId}/media-state:
+        get:
+            tags:
+                - RoomService
+            operationId: RoomService_GetRoomMediaState
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/room.v1.RoomMediaStateResponse'
+        put:
+            tags:
+                - RoomService
+            operationId: RoomService_UpsertRoomMediaState
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/room.v1.UpsertRoomMediaStateRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/room.v1.RoomMediaStateResponse'
+components:
+    schemas:
+        admin.v1.AdminStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        event.v1.CreateEventRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+                placeLabel:
+                    type: string
+                region:
+                    type: string
+                country:
+                    type: string
+                city:
+                    type: string
+                latitude:
+                    type: number
+                    format: double
+                longitude:
+                    type: number
+                    format: double
+                scheduledAt:
+                    type: string
+                    format: date-time
+                invitedUserIds:
+                    type: array
+                    items:
+                        type: string
+                description:
+                    type: string
+                meetingLink:
+                    type: string
+        event.v1.DeleteEventResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        event.v1.Event:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                placeLabel:
+                    type: string
+                region:
+                    type: string
+                country:
+                    type: string
+                city:
+                    type: string
+                latitude:
+                    type: number
+                    format: double
+                longitude:
+                    type: number
+                    format: double
+                scheduledAt:
+                    type: string
+                    format: date-time
+                createdAt:
+                    type: string
+                    format: date-time
+                creatorId:
+                    type: string
+                creatorName:
+                    type: string
+                isCreator:
+                    type: boolean
+                isJoined:
+                    type: boolean
+                participantCount:
+                    type: integer
+                    format: uint32
+                participants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/event.v1.EventParticipant'
+                description:
+                    type: string
+                meetingLink:
+                    type: string
+        event.v1.EventParticipant:
+            type: object
+            properties:
+                userId:
+                    type: string
+                title:
+                    type: string
+                avatarUrl:
+                    type: string
+                telegramUsername:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                status:
+                    type: string
+        event.v1.EventResponse:
+            type: object
+            properties:
+                event:
+                    $ref: '#/components/schemas/event.v1.Event'
+        event.v1.JoinEventRequest:
+            type: object
+            properties:
+                eventId:
+                    type: string
+        event.v1.LeaveEventRequest:
+            type: object
+            properties:
+                eventId:
+                    type: string
+        event.v1.LeaveEventResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        event.v1.ListEventsResponse:
+            type: object
+            properties:
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/event.v1.Event'
+                limit:
+                    type: integer
+                    format: int32
+                offset:
+                    type: integer
+                    format: int32
+                totalCount:
+                    type: integer
+                    format: int32
+                hasNextPage:
+                    type: boolean
+        event.v1.UpdateEventRequest:
+            type: object
+            properties:
+                eventId:
+                    type: string
+                title:
+                    type: string
+                placeLabel:
+                    type: string
+                region:
+                    type: string
+                country:
+                    type: string
+                city:
+                    type: string
+                latitude:
+                    type: number
+                    format: double
+                longitude:
+                    type: number
+                    format: double
+                scheduledAt:
+                    type: string
+                    format: date-time
+                invitedUserIds:
+                    type: array
+                    items:
+                        type: string
+                description:
+                    type: string
+                meetingLink:
+                    type: string
+        geo.v1.CommunityMapPoint:
+            type: object
+            properties:
+                userId:
+                    type: string
+                title:
+                    type: string
+                region:
+                    type: string
+                latitude:
+                    type: number
+                    format: double
+                longitude:
+                    type: number
+                    format: double
+                isCurrentUser:
+                    type: boolean
+                avatarUrl:
+                    type: string
+                telegramUsername:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                activityStatus:
+                    type: string
+        geo.v1.CommunityMapResponse:
+            type: object
+            properties:
+                points:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/geo.v1.CommunityMapPoint'
+        geo.v1.GeoCandidate:
+            type: object
+            properties:
+                region:
+                    type: string
+                country:
+                    type: string
+                city:
+                    type: string
+                latitude:
+                    type: number
+                    format: double
+                longitude:
+                    type: number
+                    format: double
+                displayName:
+                    type: string
+        geo.v1.ResolveRequest:
+            type: object
+            properties:
+                query:
+                    type: string
+        geo.v1.ResolveResponse:
+            type: object
+            properties:
+                candidates:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/geo.v1.GeoCandidate'
+        podcast.v1.CompletePodcastUploadRequest:
+            type: object
+            properties:
+                podcastId:
+                    type: string
+                fileName:
+                    type: string
+                contentType:
+                    type: string
+                durationSeconds:
+                    type: integer
+                    format: uint32
+                objectKey:
+                    type: string
+        podcast.v1.CreatePodcastRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+        podcast.v1.ListPodcastsResponse:
+            type: object
+            properties:
+                podcasts:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/podcast.v1.Podcast'
+                limit:
+                    type: integer
+                    format: int32
+                offset:
+                    type: integer
+                    format: int32
+                totalCount:
+                    type: integer
+                    format: int32
+                hasNextPage:
+                    type: boolean
+        podcast.v1.PlayPodcastResponse:
+            type: object
+            properties:
+                podcast:
+                    $ref: '#/components/schemas/podcast.v1.Podcast'
+                streamUrl:
+                    type: string
+        podcast.v1.Podcast:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                authorId:
+                    type: string
+                authorName:
+                    type: string
+                durationSeconds:
+                    type: integer
+                    format: uint32
+                listensCount:
+                    type: string
+                fileName:
+                    type: string
+                contentType:
+                    type: string
+                isUploaded:
+                    type: boolean
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+        podcast.v1.PodcastResponse:
+            type: object
+            properties:
+                podcast:
+                    $ref: '#/components/schemas/podcast.v1.Podcast'
+        podcast.v1.PodcastStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        podcast.v1.PreparePodcastUploadRequest:
+            type: object
+            properties:
+                podcastId:
+                    type: string
+                fileName:
+                    type: string
+                contentType:
+                    type: string
+                durationSeconds:
+                    type: integer
+                    format: uint32
+        podcast.v1.PreparePodcastUploadResponse:
+            type: object
+            properties:
+                uploadUrl:
+                    type: string
+                objectKey:
+                    type: string
+                podcast:
+                    $ref: '#/components/schemas/podcast.v1.Podcast'
+        podcast.v1.UploadPodcastRequest:
+            type: object
+            properties:
+                podcastId:
+                    type: string
+                fileName:
+                    type: string
+                contentType:
+                    type: string
+                content:
+                    type: string
+                    format: bytes
+                durationSeconds:
+                    type: integer
+                    format: uint32
+        profile.v1.CompleteRegistrationRequest:
+            type: object
+            properties:
+                region:
+                    type: string
+                country:
+                    type: string
+                city:
+                    type: string
+                latitude:
+                    type: number
+                    format: double
+                longitude:
+                    type: number
+                    format: double
+        profile.v1.LogoutRequest:
+            type: object
+            properties: {}
+        profile.v1.LogoutResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        profile.v1.ProfileResponse:
+            type: object
+            properties:
+                user:
+                    $ref: '#/components/schemas/profile.v1.User'
+                needsProfileComplete:
+                    type: boolean
+        profile.v1.TelegramAuthRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                username:
+                    type: string
+                photoUrl:
+                    type: string
+                authDate:
+                    type: string
+                hash:
+                    type: string
+        profile.v1.UpdateLocationRequest:
+            type: object
+            properties:
+                region:
+                    type: string
+                country:
+                    type: string
+                city:
+                    type: string
+                latitude:
+                    type: number
+                    format: double
+                longitude:
+                    type: number
+                    format: double
+        profile.v1.UpdateProfileRequest:
+            type: object
+            properties:
+                currentWorkplace:
+                    type: string
+        profile.v1.User:
+            type: object
+            properties:
+                id:
+                    type: string
+                telegramId:
+                    type: string
+                telegramUsername:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                avatarUrl:
+                    type: string
+                region:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                latitude:
+                    type: number
+                    format: double
+                longitude:
+                    type: number
+                    format: double
+                activityStatus:
+                    type: string
+                currentWorkplace:
+                    type: string
+                isAdmin:
+                    type: boolean
+        referral.v1.CreateReferralRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+                company:
+                    type: string
+                vacancyUrl:
+                    type: string
+                description:
+                    type: string
+                experience:
+                    type: string
+                location:
+                    type: string
+                employmentType:
+                    type: string
+        referral.v1.ListReferralsResponse:
+            type: object
+            properties:
+                referrals:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/referral.v1.Referral'
+                limit:
+                    type: integer
+                    format: int32
+                offset:
+                    type: integer
+                    format: int32
+                totalCount:
+                    type: integer
+                    format: int32
+                hasNextPage:
+                    type: boolean
+        referral.v1.Referral:
+            type: object
+            properties:
+                id:
+                    type: string
+                userId:
+                    type: string
+                authorName:
+                    type: string
+                authorTelegramUsername:
+                    type: string
+                authorTelegramProfileUrl:
+                    type: string
+                title:
+                    type: string
+                company:
+                    type: string
+                vacancyUrl:
+                    type: string
+                description:
+                    type: string
+                experience:
+                    type: string
+                location:
+                    type: string
+                employmentType:
+                    type: string
+                isOwner:
+                    type: boolean
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+        referral.v1.ReferralResponse:
+            type: object
+            properties:
+                referral:
+                    $ref: '#/components/schemas/referral.v1.Referral'
+        referral.v1.ReferralStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        referral.v1.UpdateReferralRequest:
+            type: object
+            properties:
+                referralId:
+                    type: string
+                title:
+                    type: string
+                company:
+                    type: string
+                vacancyUrl:
+                    type: string
+                description:
+                    type: string
+                experience:
+                    type: string
+                location:
+                    type: string
+                employmentType:
+                    type: string
+        room.v1.CreateRoomRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+                kind:
+                    type: string
+                description:
+                    type: string
+                isPrivate:
+                    type: boolean
+                mediaUrl:
+                    type: string
+        room.v1.JoinRoomTokenResponse:
+            type: object
+            properties:
+                accessToken:
+                    type: string
+                provider:
+                    type: string
+                room:
+                    $ref: '#/components/schemas/room.v1.Room'
+                serverUrl:
+                    type: string
+        room.v1.ListRoomsResponse:
+            type: object
+            properties:
+                rooms:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/room.v1.Room'
+                limit:
+                    type: integer
+                    format: int32
+                offset:
+                    type: integer
+                    format: int32
+                totalCount:
+                    type: integer
+                    format: int32
+                hasNextPage:
+                    type: boolean
+        room.v1.Room:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                kind:
+                    type: string
+                description:
+                    type: string
+                isPrivate:
+                    type: boolean
+                creatorId:
+                    type: string
+                creatorName:
+                    type: string
+                memberCount:
+                    type: integer
+                    format: int32
+                isJoined:
+                    type: boolean
+                isOwner:
+                    type: boolean
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                participants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/room.v1.RoomParticipant'
+                mediaState:
+                    $ref: '#/components/schemas/room.v1.RoomMediaState'
+        room.v1.RoomMediaState:
+            type: object
+            properties:
+                roomId:
+                    type: string
+                mediaUrl:
+                    type: string
+                paused:
+                    type: boolean
+                currentTimeSeconds:
+                    type: integer
+                    format: int32
+                updatedBy:
+                    type: string
+                updatedByName:
+                    type: string
+                updatedAt:
+                    type: string
+                    format: date-time
+        room.v1.RoomMediaStateResponse:
+            type: object
+            properties:
+                mediaState:
+                    $ref: '#/components/schemas/room.v1.RoomMediaState'
+        room.v1.RoomParticipant:
+            type: object
+            properties:
+                userId:
+                    type: string
+                title:
+                    type: string
+                avatarUrl:
+                    type: string
+                telegramUsername:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                isCurrentUser:
+                    type: boolean
+                joinedAt:
+                    type: string
+                    format: date-time
+        room.v1.RoomResponse:
+            type: object
+            properties:
+                room:
+                    $ref: '#/components/schemas/room.v1.Room'
+        room.v1.RoomStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        room.v1.UpdateRoomRequest:
+            type: object
+            properties:
+                roomId:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                isPrivate:
+                    type: boolean
+                mediaUrl:
+                    type: string
+        room.v1.UpsertRoomMediaStateRequest:
+            type: object
+            properties:
+                roomId:
+                    type: string
+                mediaUrl:
+                    type: string
+                paused:
+                    type: boolean
+                currentTimeSeconds:
+                    type: integer
+                    format: int32
+tags:
+    - name: AdminService
+    - name: EventService
+    - name: GeoService
+    - name: PodcastService
+    - name: ProfileService
+    - name: ReferralService
+    - name: RoomService

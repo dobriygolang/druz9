@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package geo.v1;
+
+import "google/api/annotations.proto";
+option go_package = "api/pkg/api/geo/v1;v1";
+
+service GeoService {
+  rpc Resolve(ResolveRequest) returns (ResolveResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/geo/resolve"
+      body: "*"
+    };
+  }
+
+  rpc CommunityMap(CommunityMapRequest) returns (CommunityMapResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/geo/community"
+    };
+  }
+}
+
+message ResolveRequest {
+  string query = 1;
+}
+
+message ResolveResponse {
+  repeated GeoCandidate candidates = 1;
+}
+
+message GeoCandidate {
+  string region = 1;
+  string country = 2;
+  string city = 3;
+  double latitude = 4;
+  double longitude = 5;
+  string display_name = 6;
+}
+
+message CommunityMapRequest {}
+
+message CommunityMapResponse {
+  repeated CommunityMapPoint points = 1;
+}
+
+message CommunityMapPoint {
+  string user_id = 1;
+  string title = 2;
+  string region = 3;
+  double latitude = 4;
+  double longitude = 5;
+  bool is_current_user = 6;
+  string avatar_url = 7;
+  string telegram_username = 8;
+  string first_name = 9;
+  string last_name = 10;
+  string activity_status = 11;
+}

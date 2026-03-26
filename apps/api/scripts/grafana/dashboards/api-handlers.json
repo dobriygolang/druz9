@@ -1,0 +1,318 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "title": "RPS by handler",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_requests_seconds_count[5m])) by (path)",
+          "legendFormat": "{{path}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "stacking": { "mode": "normal", "group": "A" },
+            "fillOpacity": 25
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "lastNotNull", "max"]
+        }
+      }
+    },
+    {
+      "id": 2,
+      "title": "Response time by handler (0.5q)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.5, sum(rate(http_server_requests_seconds_bucket[5m])) by (le, path))",
+          "legendFormat": "{{path}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "lastNotNull", "max", "min"]
+        }
+      }
+    },
+    {
+      "id": 3,
+      "title": "OK response time by handler (0.9q)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.9, sum(rate(http_server_requests_seconds_bucket{code=~\"2..\"}[5m])) by (le, path))",
+          "legendFormat": "{{path}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "s"
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "lastNotNull", "max", "min"]
+        }
+      }
+    },
+    {
+      "id": 4,
+      "title": "Error rate by handler (only errors)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_requests_seconds_count{code=~\"5..\"}[5m])) by (path)",
+          "legendFormat": "{{path}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "lastNotNull", "max", "min"]
+        }
+      }
+    },
+    {
+      "id": 5,
+      "title": "Error rate by handler (only client errors)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 32 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_requests_seconds_count{code=~\"4..\"}[5m])) by (path)",
+          "legendFormat": "{{path}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "lastNotNull", "max", "min"]
+        }
+      }
+    },
+    {
+      "id": 6,
+      "title": "Canceled requests rate by handler",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 40 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(grpc_server_handled_total{grpc_code=\"Canceled\"}[5m])) by (grpc_method)",
+          "legendFormat": "{{grpc_method}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "lastNotNull", "max", "min"]
+        }
+      }
+    },
+    {
+      "id": 7,
+      "title": "Service response time",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 48 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "histogram_quantile(0.5, sum(rate(http_server_requests_seconds_bucket[5m])) by (le))",
+          "legendFormat": "0.5q"
+        },
+        {
+          "refId": "B",
+          "expr": "histogram_quantile(0.9, sum(rate(http_server_requests_seconds_bucket[5m])) by (le))",
+          "legendFormat": "0.9q"
+        },
+        {
+          "refId": "C",
+          "expr": "histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket[5m])) by (le))",
+          "legendFormat": "0.99q"
+        },
+        {
+          "refId": "D",
+          "expr": "sum(rate(http_server_requests_seconds_count[5m]))",
+          "legendFormat": "RPS"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": { "unit": "s" },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "RPS"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "reqps"
+              }
+            ]
+          }
+        ]
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "lastNotNull", "max", "min"]
+        }
+      }
+    },
+    {
+      "id": 8,
+      "title": "Response codes ratio",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 56 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_requests_seconds_count{code=~\"2..\"}[5m])) / clamp_min(sum(rate(http_server_requests_seconds_count[5m])), 0.0001) * 100",
+          "legendFormat": "ok"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(http_server_requests_seconds_count{code=~\"4..\"}[5m])) / clamp_min(sum(rate(http_server_requests_seconds_count[5m])), 0.0001) * 100",
+          "legendFormat": "client_error"
+        },
+        {
+          "refId": "C",
+          "expr": "sum(rate(http_server_requests_seconds_count{code=~\"5..\"}[5m])) / clamp_min(sum(rate(http_server_requests_seconds_count[5m])), 0.0001) * 100",
+          "legendFormat": "error"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "stacking": { "mode": "percent", "group": "A" },
+            "fillOpacity": 20
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "lastNotNull", "max", "min"]
+        }
+      }
+    },
+    {
+      "id": 9,
+      "title": "Incoming traffic",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 64 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_requests_seconds_count[5m])) by (method)",
+          "legendFormat": "{{method}}"
+        },
+        {
+          "refId": "B",
+          "expr": "sum(rate(grpc_server_handled_total[5m]))",
+          "legendFormat": "grpc"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "reqps",
+          "custom": {
+            "stacking": { "mode": "normal", "group": "A" },
+            "fillOpacity": 25
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "right",
+          "calcs": ["mean", "lastNotNull", "max"]
+        }
+      }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["api", "handlers", "ops"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timezone": "browser",
+  "title": "API Handlers",
+  "uid": "api-handlers",
+  "version": 1,
+  "weekStart": ""
+}

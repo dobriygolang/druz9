@@ -1,0 +1,173 @@
+{
+  "annotations": {
+    "list": []
+  },
+  "editable": true,
+  "fiscalYearStartMonth": 0,
+  "graphTooltip": 0,
+  "id": null,
+  "links": [],
+  "panels": [
+    {
+      "id": 1,
+      "title": "HTTP Errors RPS by endpoint/code (top 20)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(20, sum(rate(http_server_requests_seconds_count{code=~\"4..|5..\"}[5m])) by (method, path, code))",
+          "legendFormat": "{{code}} {{method}} {{path}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 2,
+      "title": "HTTP Error % by endpoint (top 15)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 0 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(15, (sum(rate(http_server_requests_seconds_count{code=~\"4..|5..\"}[5m])) by (method, path) / clamp_min(sum(rate(http_server_requests_seconds_count[5m])) by (method, path), 0.0001)) * 100)",
+          "legendFormat": "{{method}} {{path}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 3,
+      "title": "HTTP p99 latency by endpoint (top 15)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(15, histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket[5m])) by (le, method, path)))",
+          "legendFormat": "{{method}} {{path}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 4,
+      "title": "gRPC Non-OK RPS by method/code (top 20)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(20, sum(rate(grpc_server_handled_total{grpc_code!=\"OK\"}[5m])) by (grpc_method, grpc_code))",
+          "legendFormat": "{{grpc_code}} {{grpc_method}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "reqps" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 5,
+      "title": "gRPC Non-OK % by method (top 15)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(15, (sum(rate(grpc_server_handled_total{grpc_code!=\"OK\"}[5m])) by (grpc_method) / clamp_min(sum(rate(grpc_server_handled_total[5m])) by (grpc_method), 0.0001)) * 100)",
+          "legendFormat": "{{grpc_method}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "percent" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 6,
+      "title": "gRPC p99 latency by method (top 15)",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 16 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "topk(15, histogram_quantile(0.99, sum(rate(grpc_server_handling_seconds_bucket[5m])) by (le, grpc_method)))",
+          "legendFormat": "{{grpc_method}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "s" }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    },
+    {
+      "id": 7,
+      "title": "HTTP 5xx Error %",
+      "type": "gauge",
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "sum(rate(http_server_requests_seconds_count{code=~\"5..\"}[5m])) / clamp_min(sum(rate(http_server_requests_seconds_count[5m])), 0.0001) * 100"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "showThresholdLabels": false,
+        "showThresholdMarkers": true
+      }
+    },
+    {
+      "id": 8,
+      "title": "Dependencies UP (postgres/minio/livekit)",
+      "type": "timeseries",
+      "gridPos": { "h": 5, "w": 18, "x": 6, "y": 24 },
+      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
+      "targets": [
+        {
+          "refId": "A",
+          "expr": "up{job=~\"postgres|minio|livekit\"}",
+          "legendFormat": "{{job}} {{instance}}"
+        }
+      ],
+      "fieldConfig": { "defaults": { "unit": "short", "min": 0, "max": 1 }, "overrides": [] },
+      "options": { "legend": { "displayMode": "table", "placement": "bottom", "showLegend": true } }
+    }
+  ],
+  "refresh": "5s",
+  "schemaVersion": 39,
+  "style": "dark",
+  "tags": ["api", "errors", "ops"],
+  "templating": {
+    "list": []
+  },
+  "time": {
+    "from": "now-30m",
+    "to": "now"
+  },
+  "timepicker": {},
+  "timezone": "browser",
+  "title": "API Errors",
+  "uid": "api-errors",
+  "version": 1,
+  "weekStart": ""
+}

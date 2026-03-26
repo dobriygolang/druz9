@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package profile.v1;
+
+option go_package = "api/pkg/api/profile/v1;v1";
+option java_multiple_files = true;
+option java_package = "dev.kratos.api.profile.v1";
+option java_outer_classname = "ProfileErrorReasonProtoV1";
+
+enum ErrorReason {
+  ERROR_REASON_UNSPECIFIED = 0;
+  UNAUTHORIZED = 1;
+  USER_NOT_FOUND = 2;
+  INVALID_PAYLOAD = 3;
+}
