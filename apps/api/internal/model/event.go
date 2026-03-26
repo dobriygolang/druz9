@@ -58,11 +58,11 @@ const (
 )
 
 type ListEventsResponse struct {
-	Events       []*Event `json:"events"`
-	Limit        int32    `json:"limit"`
-	Offset       int32    `json:"offset"`
-	TotalCount   int32    `json:"total_count"`
-	HasNextPage  bool     `json:"has_next_page"`
+	Events      []*Event `json:"events"`
+	Limit       int32    `json:"limit"`
+	Offset      int32    `json:"offset"`
+	TotalCount  int32    `json:"total_count"`
+	HasNextPage bool     `json:"has_next_page"`
 }
 
 type CreateEventRequest struct {

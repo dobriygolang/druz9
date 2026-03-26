@@ -39,6 +39,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.64.8
+          install-mode: goinstall
           working-directory: apps/api
           args: --timeout=5m
 
@@ -77,6 +78,7 @@ jobs:
         uses: golangci/golangci-lint-action@v6
         with:
           version: v1.64.8
+          install-mode: goinstall
           working-directory: apps/notification-service
           args: --timeout=5m
 
@@ -101,7 +103,7 @@ jobs:
           cache-dependency-path: apps/front/package-lock.json
 
       - name: Install
-        run: npm ci
+        run: npm ci --legacy-peer-deps
 
       - name: Type check
         run: npx tsc --noEmit

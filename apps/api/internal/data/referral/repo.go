@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	referraldomain "api/internal/referral/service"
 	"api/internal/model"
+	referraldomain "api/internal/referral/service"
 	"api/internal/storage/postgres"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
