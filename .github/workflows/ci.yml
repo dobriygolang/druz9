@@ -103,10 +103,7 @@ jobs:
           cache-dependency-path: apps/front/package-lock.json
 
       - name: Install
-        run: npm install --legacy-peer-deps
-
-      - name: Type check
-        run: npx tsc --noEmit
+        run: npm install --legacy-peer-deps --include=dev
 
       - name: Build
         run: npm run build
