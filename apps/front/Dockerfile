@@ -1,9 +1,10 @@
 FROM node:20-alpine AS builder
 
 WORKDIR /app
+ENV NODE_ENV=development
 
 COPY package*.json ./
-RUN npm ci
+RUN npm ci --include=dev
 
 COPY . .
 
