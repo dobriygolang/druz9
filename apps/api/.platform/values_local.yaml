@@ -239,7 +239,7 @@ s3_secret_key:
 dev_auth_bypass:
   usage: "Allow local auth bypass"
   group: "dev"
-  value: "true"
+  value: "false"
   type: "bool"
   writable: false
 

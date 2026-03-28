@@ -25,15 +25,12 @@ type CodeEditorRealtimeMessage struct {
 
 type CodeEditorRealtimeRoom struct {
 	ID              string                           `json:"id"`
-	Title           string                           `json:"title"`
 	Mode            string                           `json:"mode"`
-	Language        string                           `json:"language"`
 	InviteCode      string                           `json:"inviteCode"`
 	CreatorID       string                           `json:"creatorId"`
 	Code            string                           `json:"code"`
 	CodeRevision    int64                            `json:"codeRevision"`
 	Status          string                           `json:"status"`
-	Task            string                           `json:"task,omitempty"`
 	TaskID          string                           `json:"taskId,omitempty"`
 	MaxParticipants int32                            `json:"maxParticipants"`
 	Participants    []*CodeEditorRealtimeParticipant `json:"participants"`
@@ -46,10 +43,8 @@ type CodeEditorRealtimeParticipant struct {
 	UserID      string `json:"userId,omitempty"`
 	DisplayName string `json:"displayName"`
 	IsGuest     bool   `json:"isGuest"`
-	Role        string `json:"role"`
 	IsReady     bool   `json:"isReady"`
 	JoinedAt    string `json:"joinedAt"`
-	Score       int32  `json:"score,omitempty"`
 }
 
 type CodeEditorSubmissionEvent struct {

@@ -50,14 +50,9 @@ func mapRealtimeRoom(room *codeeditordomain.Room) *dto.CodeEditorRealtimeRoom {
 	}
 
 	participants := make([]*dto.CodeEditorRealtimeParticipant, 0, len(room.Participants))
-	for index, participant := range room.Participants {
+	for _, participant := range room.Participants {
 		if participant == nil {
 			continue
-		}
-
-		role := "member"
-		if index == 0 || (!participant.IsGuest && room.CreatorID != uuid.Nil && participant.UserID != nil && *participant.UserID == room.CreatorID) {
-			role = "creator"
 		}
 
 		participants = append(participants, &dto.CodeEditorRealtimeParticipant{
@@ -65,7 +60,6 @@ func mapRealtimeRoom(room *codeeditordomain.Room) *dto.CodeEditorRealtimeRoom {
 			UserID:      userIDToString(participant.UserID),
 			DisplayName: participant.Name,
 			IsGuest:     participant.IsGuest,
-			Role:        role,
 			IsReady:     participant.IsReady,
 			JoinedAt:    participant.JoinedAt.Format(time.RFC3339),
 		})
@@ -78,15 +72,12 @@ func mapRealtimeRoom(room *codeeditordomain.Room) *dto.CodeEditorRealtimeRoom {
 
 	return &dto.CodeEditorRealtimeRoom{
 		ID:              room.ID.String(),
-		Title:           roomTitle(room),
 		Mode:            room.Mode,
-		Language:        "go",
 		InviteCode:      room.InviteCode,
 		CreatorID:       room.CreatorID.String(),
 		Code:            room.Code,
 		CodeRevision:    room.CodeRevision,
 		Status:          room.Status,
-		Task:            room.Task,
 		TaskID:          userIDToString(room.TaskID),
 		MaxParticipants: maxParticipants,
 		Participants:    participants,
