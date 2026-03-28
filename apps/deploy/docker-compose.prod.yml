@@ -8,6 +8,7 @@ services:
       - "80:80"
       - "443:443"
     environment:
+      APP_EMAIL: ${APP_EMAIL}
       APP_HOST: ${APP_HOST}
       API_HOST: ${API_HOST}
       S3_HOST: ${S3_HOST}
