@@ -1,3 +1,7 @@
+{
+  auto_https off
+}
+
 :80 {
   @api host {$API_HOST}
   handle @api {
