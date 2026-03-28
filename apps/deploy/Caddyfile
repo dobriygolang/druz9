@@ -1,8 +1,18 @@
 {
   email {$APP_EMAIL}
+  acme_ca https://acme-v02.api.letsencrypt.org/directory
+}
+
+(http01_only) {
+  tls {
+    issuer acme {
+      disable_tlsalpn_challenge
+    }
+  }
 }
 
 {$API_HOST} {
+  import http01_only
   encode gzip zstd
 
   handle {
@@ -11,6 +21,7 @@
 }
 
 {$APP_HOST} {
+  import http01_only
   encode gzip zstd
 
   handle {
@@ -19,11 +30,13 @@
 }
 
 {$S3_HOST} {
+  import http01_only
   reverse_proxy minio:9000
 }
 
 {$MINIO_CONSOLE_HOST} {
-  basicauth {
+  import http01_only
+  basic_auth {
     {$MINIO_CONSOLE_BASIC_AUTH}
   }
   reverse_proxy minio:9001
