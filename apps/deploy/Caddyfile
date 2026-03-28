@@ -1,43 +1,30 @@
-{
-  email {$APP_EMAIL}
-  acme_ca https://acme-v02.api.letsencrypt.org/directory
-}
-
-(http01_only) {
-  tls {
-    issuer acme {
-      disable_tlsalpn_challenge
-    }
-  }
-}
-
-{$API_HOST} {
-  import http01_only
-  encode gzip zstd
-
-  handle {
+:80 {
+  @api host {$API_HOST}
+  handle @api {
+    encode gzip zstd
     reverse_proxy backend:8080
   }
-}
 
-{$APP_HOST} {
-  import http01_only
-  encode gzip zstd
-
-  handle {
+  @app host {$APP_HOST}
+  handle @app {
+    encode gzip zstd
     reverse_proxy frontend:80
   }
-}
 
-{$S3_HOST} {
-  import http01_only
-  reverse_proxy minio:9000
-}
-
-{$MINIO_CONSOLE_HOST} {
-  import http01_only
-  basic_auth {
-    {$MINIO_CONSOLE_BASIC_AUTH}
+  @s3 host {$S3_HOST}
+  handle @s3 {
+    reverse_proxy minio:9000
   }
-  reverse_proxy minio:9001
+
+  @minio host {$MINIO_CONSOLE_HOST}
+  handle @minio {
+    basic_auth {
+      {$MINIO_CONSOLE_BASIC_AUTH}
+    }
+    reverse_proxy minio:9001
+  }
+
+  handle {
+    respond "not found" 404
+  }
 }
