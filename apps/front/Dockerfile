@@ -5,6 +5,7 @@ ENV NODE_ENV=development
 
 COPY package*.json ./
 RUN npm ci --include=dev
+RUN npm install -g typescript vite
 
 COPY . .
 
