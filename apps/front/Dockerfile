@@ -4,7 +4,7 @@ WORKDIR /app
 ENV NODE_ENV=development
 
 COPY package*.json ./
-RUN npm ci --include=dev
+RUN npm install
 RUN npm install -g typescript@5.2.2 vite@5.4.0
 
 COPY . .
