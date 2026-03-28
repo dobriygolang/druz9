@@ -1,11 +1,11 @@
 {
   auto_https off
+  debug
 }
 
 :80 {
   @api host {$API_HOST}
   handle @api {
-    encode gzip zstd
     reverse_proxy backend:8080
   }
 
