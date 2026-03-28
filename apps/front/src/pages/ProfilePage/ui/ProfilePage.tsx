@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, MapPin, Pencil, Briefcase, Shield, X } from 'lucide-react';
+import { ArrowLeft, CheckCircle, MapPin, Pencil, Briefcase, Shield, X, Navigation, Trophy, Crown, Medal, Zap, Diamond } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { User } from '@/entities/User/model/types';
@@ -8,10 +8,7 @@ import { authApi } from '@/features/Auth/api/authApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
 import { LocationPicker } from '@/features/Geo/ui/LocationPicker';
-import { useIsMobile } from '@/shared/hooks/useIsMobile';
-
 export const ProfilePage: React.FC = () => {
-  const isMobile = useIsMobile();
   const { user: currentUser, updateLocation } = useAuth();
   const { userId } = useParams();
   const [user, setUser] = useState<User | null>(currentUser);
@@ -80,6 +77,20 @@ export const ProfilePage: React.FC = () => {
 
   const isOwnProfile = !userId || currentUser?.id === user.id;
 
+  const getLeagueInfo = (league: string) => {
+    const leagues: Record<string, { name: string; icon: React.ReactNode; className: string }> = {
+      novice: { name: 'Novice', icon: <Zap size={28} />, className: 'novice' },
+      rookie: { name: 'Rookie', icon: <Zap size={28} />, className: 'rookie' },
+      bronze: { name: 'Bronze', icon: <Medal size={28} color="#CD7F32" />, className: 'bronze' },
+      silver: { name: 'Silver', icon: <Medal size={28} color="#C0C0C0" />, className: 'silver' },
+      gold: { name: 'Gold', icon: <Trophy size={28} color="#FFD700" />, className: 'gold' },
+      platinum: { name: 'Platinum', icon: <Medal size={28} color="#E5E4E2" />, className: 'platinum' },
+      diamond: { name: 'Diamond', icon: <Diamond size={28} color="#00C7E3" />, className: 'diamond' },
+      master: { name: 'Master', icon: <Crown size={28} />, className: 'master' },
+    };
+    return leagues[league?.toLowerCase()] || leagues.novice;
+  };
+
   const handleUpdateWorkplace = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
@@ -96,7 +107,7 @@ export const ProfilePage: React.FC = () => {
   };
 
   return (
-    <div className="fade-in">
+    <div className="fade-in profile-page">
       {!isOwnProfile && (
         <Link
           to="/map"
@@ -113,196 +124,84 @@ export const ProfilePage: React.FC = () => {
         </Link>
       )}
 
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: isMobile ? '16px' : 0, marginBottom: '32px' }}>
-        <h1 style={{ fontSize: '28px', margin: 0, fontWeight: '600' }}>
-          Профиль
-        </h1>
+      <div className="profile-header">
+        <h1>Профиль</h1>
         {isOwnProfile && (
           <button
-            className="btn"
+            className="btn profile-edit-btn"
             onClick={() => setIsEditModalOpen(true)}
-            style={{
-              padding: '10px 20px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-              background: 'var(--accent-color)',
-              width: isMobile ? '100%' : 'auto',
-              justifyContent: 'center',
-            }}
           >
             <Pencil size={18} /> Редактировать профиль
           </button>
         )}
       </div>
 
+      {/* League Banner */}
       {arenaStats && (
-        <div
-          className="card"
-          style={{
-            marginBottom: '24px',
-            display: 'grid',
-            gap: '14px',
-          }}
-        >
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
-            <h3 style={{ margin: 0 }}>Arena рейтинг</h3>
-            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
-              <span style={{ padding: '8px 12px', borderRadius: '999px', background: 'rgba(245, 158, 11, 0.12)', color: '#F59E0B', fontWeight: 700 }}>
-                {arenaStats.rating} ELO
-              </span>
-              <span style={{ padding: '8px 12px', borderRadius: '999px', background: 'rgba(79, 70, 229, 0.12)', color: 'var(--accent-color)', fontWeight: 700 }}>
-                {arenaStats.league}
-              </span>
+        <div className={`profile-league-banner profile-league-banner--${getLeagueInfo(arenaStats.league).className}`}>
+          <div className="profile-league-banner__glow" />
+          <div className="profile-league-banner__content">
+            <div className="profile-league-banner__title">
+              {getLeagueInfo(arenaStats.league).icon}
+              <h3 className={`profile-league-banner__title--${getLeagueInfo(arenaStats.league).className}`}>
+                {getLeagueInfo(arenaStats.league).name} Лига
+              </h3>
+              <span className="arena-elo-badge" style={{ marginLeft: 8 }}>{arenaStats.rating} ELO</span>
             </div>
-          </div>
-          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', color: 'var(--text-secondary)' }}>
-            <span>{arenaStats.matches} матчей</span>
-            <span>{arenaStats.wins} побед</span>
-            <span>{arenaStats.losses} поражений</span>
-            <span>{Math.round(arenaStats.winRate * 100)}% win rate</span>
-            <span>best {arenaStats.bestRuntime > 0 ? `${Math.round(arenaStats.bestRuntime / 1000)}с` : '—'}</span>
+            <div className="profile-league-banner__stats">
+              <span className="profile-league-banner__stat">{arenaStats.matches} матчей</span>
+              <span className="profile-league-banner__stat">{arenaStats.wins} побед</span>
+            </div>
           </div>
         </div>
       )}
 
       {/* Profile Header Card */}
-      <div
-        className="card"
-        style={{
-          display: 'flex',
-          gap: '24px',
-          alignItems: isMobile ? 'flex-start' : 'center',
-          flexDirection: isMobile ? 'column' : 'row',
-          marginBottom: '24px',
-          flexWrap: 'wrap',
-        }}
-      >
+      <div className="card profile-main-card">
         <div
+          className="profile-avatar"
           style={{
-            width: '80px',
-            height: '80px',
-            borderRadius: '50%',
-            backgroundColor: 'var(--bg-color)',
-            backgroundImage: user.avatarUrl ? `url(${user.avatarUrl})` : 'none',
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            fontSize: '24px',
-            color: 'var(--text-secondary)',
-            border: '1px solid var(--border-color)',
-          }}
+            '--avatar-url': user.avatarUrl ? `url(${user.avatarUrl})` : 'none',
+          } as React.CSSProperties}
         >
           {!user.avatarUrl && user.telegramUsername?.charAt(0).toUpperCase()}
         </div>
 
-        <div style={{ flex: 1, width: '100%' }}>
-          <h2
-            style={{
-              fontSize: '20px',
-              marginBottom: '4px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-          >
+        <div className="profile-info">
+          <h2 className="profile-name">
             {user.firstName || ''} {user.lastName || ''}
             {!user.firstName && !user.lastName ? user.telegramUsername : ''}
           </h2>
-          <div
-            style={{
-              color: 'var(--accent-color)',
-              marginBottom: '8px',
-              fontSize: '14px',
-            }}
-          >
+          <div className="profile-username">
             @{user.telegramUsername}
           </div>
-          <div
-            style={{
-              color: 'var(--text-secondary)',
-              display: 'flex',
-              alignItems: 'flex-start',
-              flexWrap: 'wrap',
-              gap: '12px',
-              fontSize: '14px',
-            }}
-          >
-            <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+          <div className="profile-details">
+            <div className="profile-detail-item">
               <MapPin size={16} /> {user.region}
             </div>
 
             {user.currentWorkplace && (
-              <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+              <div className="profile-detail-item">
                 <Briefcase size={16} /> {user.currentWorkplace}
               </div>
             )}
 
-            <div style={{ 
-              display: 'flex', 
-              alignItems: 'center', 
-              gap: '6px',
-              padding: '4px 8px',
-              borderRadius: '8px',
-              background: user.activityStatus === 'online' ? 'rgba(16, 185, 129, 0.1)' : 
-                          user.activityStatus === 'recently_active' ? 'rgba(245, 158, 11, 0.1)' : 
-                          'rgba(156, 163, 175, 0.1)',
-              color: user.activityStatus === 'online' ? '#10B981' : 
-                     user.activityStatus === 'recently_active' ? '#F59E0B' : 
-                     '#9CA3AF',
-              fontSize: '11px',
-              fontWeight: 600,
-              textTransform: 'uppercase'
-            }}>
-              <div style={{ 
-                width: '6px', 
-                height: '6px', 
-                borderRadius: '50%', 
-                background: 'currentColor',
-                animation: user.activityStatus === 'online' ? 'pulse 2s infinite' : 'none'
-              }} />
-              {user.activityStatus === 'online' ? 'В сети' : 
+            <div className={`profile-status ${user.activityStatus === 'online' ? 'profile-status--online' : user.activityStatus === 'recently_active' ? 'profile-status--recently' : 'profile-status--offline'}`}>
+              <div className="profile-status-dot" />
+              {user.activityStatus === 'online' ? 'В сети' :
                user.activityStatus === 'recently_active' ? 'Был недавно' : 'Не в сети'}
             </div>
           </div>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', width: isMobile ? '100%' : 'auto' }}>
-          <span
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '6px',
-              backgroundColor: 'rgba(79, 70, 229, 0.1)',
-              color: 'var(--accent-color)',
-              padding: '6px 12px',
-              borderRadius: '16px',
-              fontSize: '12px',
-              fontWeight: '500',
-              textTransform: 'uppercase',
-            }}
-          >
+        <div className="profile-badges">
+          <span className="profile-badge profile-badge--account">
             <CheckCircle size={14} />
             Аккаунт
           </span>
 
           {user.isAdmin && (
-            <span
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '6px',
-                backgroundColor: 'rgba(245, 158, 11, 0.1)',
-                color: '#F59E0B',
-                padding: '6px 12px',
-                borderRadius: '16px',
-                fontSize: '11px',
-                fontWeight: '600',
-                textTransform: 'uppercase',
-              }}
-            >
+            <span className="profile-badge profile-badge--admin">
               <Shield size={14} />
               Админ
             </span>
@@ -311,97 +210,42 @@ export const ProfilePage: React.FC = () => {
       </div>
 
       {/* Info Grid */}
-      <h2
-        style={{
-          fontSize: '20px',
-          marginTop: '40px',
-          marginBottom: '16px',
-          fontWeight: '500',
-        }}
-      >
-        Данные профиля
-      </h2>
-      <div
-        style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(250px, 1fr))',
-          gap: '16px',
-        }}
-      >
-        <div className="card" style={{ padding: '20px' }}>
-          <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--text-secondary)' }}>
-            Локация
-          </h3>
-          <p style={{ fontSize: '14px', marginBottom: '6px' }}>{user.region || 'Не указано'}</p>
-        </div>
+      <div className="profile-info-section">
+        <h2>Данные профиля</h2>
+        <div className="profile-info-grid">
+          <div className="profile-info-card">
+            <h3><MapPin size={14} /> Локация</h3>
+            <p>{user.region || 'Не указано'}</p>
+          </div>
 
-        <div className="card" style={{ padding: '20px' }}>
-          <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--text-secondary)' }}>
-            Работа
-          </h3>
-          <p style={{ fontSize: '14px' }}>
-            {user.currentWorkplace || 'Не указано'}
-          </p>
-        </div>
+          <div className="profile-info-card">
+            <h3><Briefcase size={14} /> Работа</h3>
+            <p>{user.currentWorkplace || 'Не указано'}</p>
+          </div>
 
-        <div className="card" style={{ padding: '20px' }}>
-          <h3 style={{ fontSize: '16px', marginBottom: '8px', color: 'var(--text-secondary)' }}>
-            Координаты
-          </h3>
-          <p style={{ fontSize: '14px' }}>
-            {user.latitude.toFixed(5)}, {user.longitude.toFixed(5)}
-          </p>
+          <div className="profile-info-card">
+            <h3><Navigation size={14} /> Координаты</h3>
+            <p>{user.latitude.toFixed(5)}, {user.longitude.toFixed(5)}</p>
+          </div>
         </div>
       </div>
 
       {/* Edit Profile Modal */}
       {isEditModalOpen && (
-        <div className="modal-overlay" style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          right: 0,
-          bottom: 0,
-          backgroundColor: 'rgba(0,0,0,0.8)',
-          backdropFilter: 'blur(10px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '20px'
-        }}>
-          <div className="card fade-in" style={{
-            width: '100%',
-            maxWidth: '600px',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            position: 'relative',
-            padding: '32px'
-          }}>
+        <div className="profile-modal-overlay">
+          <div className="profile-modal fade-in">
             <button
+              className="profile-modal-close"
               onClick={() => setIsEditModalOpen(false)}
-              style={{
-                position: 'absolute',
-                top: '20px',
-                right: '20px',
-                background: 'transparent',
-                border: 'none',
-                color: 'var(--text-secondary)',
-                cursor: 'pointer'
-              }}
             >
               <X size={24} />
             </button>
 
-            <h2 style={{ fontSize: '24px', marginBottom: '24px', fontWeight: 600 }}>
-              Редактировать профиль
-            </h2>
+            <h2>Редактировать профиль</h2>
 
             {/* Workplace Section */}
-            <div style={{ marginBottom: '32px' }}>
-              <h3 style={{ fontSize: '18px', marginBottom: '12px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Briefcase size={18} /> Место работы
-              </h3>
+            <div className="profile-modal-section">
+              <h3><Briefcase size={18} /> Место работы</h3>
               <form onSubmit={handleUpdateWorkplace} style={{ display: 'flex', gap: '12px' }}>
                 <input
                   className="input"
@@ -411,10 +255,9 @@ export const ProfilePage: React.FC = () => {
                   onChange={e => setNewWorkplace(e.target.value)}
                   style={{ flex: 1 }}
                 />
-                <button 
+                <button
                   disabled={isSubmitting}
-                  className="btn" 
-                  style={{ background: 'var(--accent-color)', whiteSpace: 'nowrap' }}
+                  className="btn profile-edit-btn"
                 >
                   {isSubmitting ? 'Сохранение...' : 'Обновить'}
                 </button>
@@ -422,13 +265,9 @@ export const ProfilePage: React.FC = () => {
             </div>
 
             {/* Location Section */}
-            <div>
-              <h3 style={{ fontSize: '18px', marginBottom: '12px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <MapPin size={18} /> Позиция на карте
-              </h3>
-              <p style={{ color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '16px', lineHeight: 1.5 }}>
-                Выберите вашу текущую локацию. Это обновит вашу точку на главной карте.
-              </p>
+            <div className="profile-modal-section">
+              <h3><MapPin size={18} /> Позиция на карте</h3>
+              <p>Выберите вашу текущую локацию. Это обновит вашу точку на главной карте.</p>
               <LocationPicker
                 inputPlaceholder={user.region || 'Например: Электросталь, Россия'}
                 showPreviewMap={false}
@@ -446,12 +285,11 @@ export const ProfilePage: React.FC = () => {
                 }}
               />
             </div>
-            
-            <div style={{ marginTop: '32px', display: 'flex', justifyContent: 'flex-end' }}>
-              <button 
-                className="btn" 
+
+            <div className="profile-modal-actions">
+              <button
+                className="btn profile-modal-done-btn"
                 onClick={() => setIsEditModalOpen(false)}
-                style={{ background: 'rgba(255,255,255,0.1)' }}
               >
                 Готово
               </button>

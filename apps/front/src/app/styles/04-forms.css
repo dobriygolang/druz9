@@ -1,0 +1,164 @@
+/* ===========================================
+   FORM ELEMENTS
+   =========================================== */
+
+.input {
+  width: 100%;
+  padding: 14px 16px;
+  background-color: var(--bg-color);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 15px;
+  outline: none;
+  transition: all 0.2s;
+}
+
+.input::placeholder {
+  color: rgba(255, 255, 255, 0.3);
+}
+
+.input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.input:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.input-minimal {
+  background: transparent;
+  border: none;
+  padding: 8px 0;
+  font-size: inherit;
+  color: inherit;
+  outline: none;
+}
+
+.textarea {
+  min-height: 110px;
+  resize: vertical;
+  font-family: inherit;
+}
+
+.code-textarea {
+  min-height: 220px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+}
+
+/* ===========================================
+   FORM GROUPS
+   =========================================== */
+
+.form-group {
+  margin-bottom: 24px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.toggle-field {
+  margin-top: 18px;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--text-secondary);
+}
+
+/* ===========================================
+   FANCY SELECT
+   =========================================== */
+
+.fancy-select {
+  position: relative;
+}
+
+.fancy-select__trigger {
+  width: 100%;
+  min-height: 48px;
+  padding: 0 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  background: var(--bg-color);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 12px;
+  color: var(--text-primary);
+  font-size: 15px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.fancy-select__trigger:hover {
+  border-color: rgba(255, 255, 255, 0.18);
+}
+
+.fancy-select__trigger.open {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+.fancy-select__value {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.fancy-select__icon {
+  flex-shrink: 0;
+  color: var(--text-secondary);
+}
+
+.fancy-select__menu {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  right: 0;
+  z-index: 40;
+  padding: 8px;
+  border-radius: 16px;
+  background:
+    radial-gradient(circle at top, rgba(79, 70, 229, 0.12), transparent 42%),
+    linear-gradient(180deg, rgba(36, 36, 36, 0.98), rgba(22, 22, 22, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.34);
+  max-height: 320px;
+  overflow: auto;
+}
+
+.fancy-select__option {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: var(--text-primary);
+  min-height: 42px;
+  padding: 0 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 14px;
+  text-align: left;
+  transition: background 0.18s ease, color 0.18s ease, transform 0.18s ease;
+}
+
+.fancy-select__option:hover {
+  background: rgba(79, 70, 229, 0.16);
+  color: #f2f1ff;
+}
+
+.fancy-select__option.selected {
+  background: rgba(79, 70, 229, 0.22);
+  color: #fff;
+}

@@ -1,0 +1,111 @@
+/* ===========================================
+   BADGES & CHIPS
+   =========================================== */
+
+.badge {
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 6px;
+  font-weight: 500;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+}
+
+.guest-badge {
+  font-size: 10px;
+  background: rgba(245, 158, 11, 0.4);
+  color: #FCD34D;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(245, 158, 11, 0.3);
+}
+
+.creator-badge {
+  font-size: 10px;
+  background: rgba(79, 70, 229, 0.4);
+  color: #A5B4FC;
+  padding: 2px 6px;
+  border-radius: 4px;
+  border: 1px solid rgba(79, 70, 229, 0.3);
+}
+
+.topic-chip,
+.task-inactive {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: var(--text-secondary);
+}
+
+.language-badge {
+  font-size: 11px;
+  background: rgba(0, 173, 216, 0.2);
+  color: #00ADD8;
+  padding: 2px 8px;
+  border-radius: 4px;
+}
+
+.score-badge {
+  font-size: 10px;
+  background: rgba(16, 185, 129, 0.2);
+  color: #10B981;
+  padding: 2px 6px;
+  border-radius: 4px;
+  margin-left: 8px;
+}
+
+/* ===========================================
+   PARTICIPANT STATE
+   =========================================== */
+
+.participant-state {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.participant-state.active {
+  color: #86efac;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.participant-state.inactive {
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.12);
+}
+
+/* Task difficulty */
+.task-difficulty {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.task-difficulty-easy {
+  background: rgba(34, 197, 94, 0.12);
+  color: #7ee0a0;
+}
+
+.task-difficulty-medium {
+  background: rgba(245, 158, 11, 0.12);
+  color: #ffcb66;
+}
+
+.task-difficulty-hard {
+  background: rgba(239, 68, 68, 0.12);
+  color: #ff8d8d;
+}
+
+/* ===========================================
+   ICONS
+   =========================================== */
+
+.icon-success {
+  color: #10B981;
+}
+
+.icon-error {
+  color: #EF4444;
+}

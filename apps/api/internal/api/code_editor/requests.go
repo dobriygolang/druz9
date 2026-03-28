@@ -2,6 +2,7 @@ package code_editor
 
 import (
 	codeeditordomain "api/internal/domain/codeeditor"
+	"api/internal/model"
 	v1 "api/pkg/api/code_editor/v1"
 
 	"github.com/google/uuid"
@@ -13,12 +14,13 @@ func taskFromCreateRequest(req *v1.CreateTaskRequest) *codeeditordomain.Task {
 		Title:            req.Title,
 		Slug:             req.Slug,
 		Statement:        req.Statement,
-		Difficulty:       req.Difficulty,
+		Difficulty:       protoDifficultyToModel(req.Difficulty),
 		Topics:           req.Topics,
 		StarterCode:      req.StarterCode,
-		Language:         req.Language,
-		TaskType:         req.TaskType,
-		ExecutionProfile: req.ExecutionProfile,
+		Language:         protoLanguageToModel(req.Language),
+		TaskType:         protoTaskTypeToModel(req.TaskType),
+		ExecutionProfile: model.ExecutionProfileFromString(req.ExecutionProfile),
+		RunnerMode:       model.RunnerModeFromString(req.RunnerMode),
 		FixtureFiles:     req.FixtureFiles,
 		ReadablePaths:    req.ReadablePaths,
 		WritablePaths:    req.WritablePaths,
@@ -38,12 +40,13 @@ func taskFromUpdateRequest(taskID uuid.UUID, req *v1.UpdateTaskRequest) *codeedi
 		Title:            req.Title,
 		Slug:             req.Slug,
 		Statement:        req.Statement,
-		Difficulty:       req.Difficulty,
+		Difficulty:       protoDifficultyToModel(req.Difficulty),
 		Topics:           req.Topics,
 		StarterCode:      req.StarterCode,
-		Language:         req.Language,
-		TaskType:         req.TaskType,
-		ExecutionProfile: req.ExecutionProfile,
+		Language:         protoLanguageToModel(req.Language),
+		TaskType:         protoTaskTypeToModel(req.TaskType),
+		ExecutionProfile: model.ExecutionProfileFromString(req.ExecutionProfile),
+		RunnerMode:       model.RunnerModeFromString(req.RunnerMode),
 		FixtureFiles:     req.FixtureFiles,
 		ReadablePaths:    req.ReadablePaths,
 		WritablePaths:    req.WritablePaths,

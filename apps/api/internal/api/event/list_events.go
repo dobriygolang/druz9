@@ -19,7 +19,7 @@ func (i *Implementation) ListEvents(ctx context.Context, req *v1.ListEventsReque
 	opts := model.ListEventsOptions{
 		Limit:  req.Limit,
 		Offset: req.Offset,
-		Status: req.Status,
+		Status: mapEventListFilter(req.Status),
 	}
 
 	if req.CreatorId != "" {

@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
 	ListPodcasts(context.Context, model.ListPodcastsOptions) (*model.ListPodcastsResponse, error)
 	GetPodcast(context.Context, uuid.UUID) (*model.Podcast, error)

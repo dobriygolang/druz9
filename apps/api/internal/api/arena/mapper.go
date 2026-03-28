@@ -4,11 +4,87 @@ import (
 	"time"
 
 	domain "api/internal/domain/arena"
-	"api/internal/dto"
+	"api/internal/model"
+	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/arena/v1"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
+func mapDifficulty(difficulty model.ArenaDifficulty) v1.Difficulty {
+	switch difficulty {
+	case model.ArenaDifficultyEasy:
+		return v1.Difficulty_DIFFICULTY_EASY
+	case model.ArenaDifficultyMedium:
+		return v1.Difficulty_DIFFICULTY_MEDIUM
+	case model.ArenaDifficultyHard:
+		return v1.Difficulty_DIFFICULTY_HARD
+	default:
+		return v1.Difficulty_DIFFICULTY_UNSPECIFIED
+	}
+}
+
+func unmapDifficulty(difficulty v1.Difficulty) model.ArenaDifficulty {
+	switch difficulty {
+	case v1.Difficulty_DIFFICULTY_EASY:
+		return model.ArenaDifficultyEasy
+	case v1.Difficulty_DIFFICULTY_MEDIUM:
+		return model.ArenaDifficultyMedium
+	case v1.Difficulty_DIFFICULTY_HARD:
+		return model.ArenaDifficultyHard
+	default:
+		return model.ArenaDifficultyUnknown
+	}
+}
+
+func mapWinnerReason(reason model.ArenaWinnerReason) v1.WinnerReason {
+	switch reason {
+	case model.ArenaWinnerReasonAcceptedTime:
+		return v1.WinnerReason_WINNER_REASON_ACCEPTED_TIME
+	case model.ArenaWinnerReasonRuntime:
+		return v1.WinnerReason_WINNER_REASON_RUNTIME
+	case model.ArenaWinnerReasonTimeout:
+		return v1.WinnerReason_WINNER_REASON_TIMEOUT
+	case model.ArenaWinnerReasonSingleAC:
+		return v1.WinnerReason_WINNER_REASON_SINGLE_AC
+	case model.ArenaWinnerReasonNone:
+		return v1.WinnerReason_WINNER_REASON_NONE
+	default:
+		return v1.WinnerReason_WINNER_REASON_UNSPECIFIED
+	}
+}
+
+func mapPlayerSide(side model.ArenaPlayerSide) v1.ArenaPlayerSide {
+	switch side {
+	case model.ArenaPlayerSideLeft:
+		return v1.ArenaPlayerSide_ARENA_PLAYER_SIDE_LEFT
+	case model.ArenaPlayerSideRight:
+		return v1.ArenaPlayerSide_ARENA_PLAYER_SIDE_RIGHT
+	default:
+		return v1.ArenaPlayerSide_ARENA_PLAYER_SIDE_UNSPECIFIED
+	}
+}
+
+func mapArenaLeague(league model.ArenaLeague) v1.ArenaLeague {
+	switch league {
+	case model.ArenaLeagueBronze:
+		return v1.ArenaLeague_ARENA_LEAGUE_BRONZE
+	case model.ArenaLeagueSilver:
+		return v1.ArenaLeague_ARENA_LEAGUE_SILVER
+	case model.ArenaLeagueGold:
+		return v1.ArenaLeague_ARENA_LEAGUE_GOLD
+	case model.ArenaLeaguePlatinum:
+		return v1.ArenaLeague_ARENA_LEAGUE_PLATINUM
+	case model.ArenaLeagueDiamond:
+		return v1.ArenaLeague_ARENA_LEAGUE_DIAMOND
+	case model.ArenaLeagueMaster:
+		return v1.ArenaLeague_ARENA_LEAGUE_MASTER
+	case model.ArenaLeagueLegend:
+		return v1.ArenaLeague_ARENA_LEAGUE_LEGEND
+	default:
+		return v1.ArenaLeague_ARENA_LEAGUE_UNSPECIFIED
+	}
+}
 
 func mapArenaMatch(match *domain.Match) *v1.ArenaMatch {
 	if match == nil {
@@ -22,14 +98,14 @@ func mapArenaMatch(match *domain.Match) *v1.ArenaMatch {
 		TaskStatement:     arenaTaskStatement(match),
 		StarterCode:       arenaStarterCode(match),
 		Topic:             match.Topic,
-		Difficulty:        match.Difficulty,
+		Difficulty:        mapDifficulty(match.Difficulty),
 		Status:            mapArenaStatus(match.Status),
 		DurationSeconds:   match.DurationSeconds,
 		ObfuscateOpponent: match.ObfuscateOpponent,
 		IsRated:           match.IsRated,
 		UnratedReason:     match.UnratedReason,
 		AntiCheatEnabled:  match.AntiCheatEnabled,
-		WinnerReason:      match.WinnerReason,
+		WinnerReason:      mapWinnerReason(match.WinnerReason),
 		Players:           make([]*v1.ArenaPlayer, 0, len(match.Players)),
 	}
 
@@ -63,7 +139,7 @@ func mapArenaPlayer(player *domain.Player) *v1.ArenaPlayer {
 	result := &v1.ArenaPlayer{
 		UserId:        player.UserID.String(),
 		DisplayName:   player.DisplayName,
-		Side:          player.Side,
+		Side:          mapPlayerSide(player.Side),
 		IsCreator:     player.IsCreator,
 		BestRuntimeMs: player.BestRuntimeMs,
 		IsWinner:      player.IsWinner,
@@ -81,13 +157,13 @@ func mapArenaPlayer(player *domain.Player) *v1.ArenaPlayer {
 	return result
 }
 
-func mapArenaStatus(status string) v1.ArenaMatchStatus {
+func mapArenaStatus(status model.ArenaMatchStatus) v1.ArenaMatchStatus {
 	switch status {
-	case domain.MatchStatusWaiting:
+	case model.ArenaMatchStatusWaiting:
 		return v1.ArenaMatchStatus_ARENA_MATCH_STATUS_WAITING
-	case domain.MatchStatusActive:
+	case model.ArenaMatchStatusActive:
 		return v1.ArenaMatchStatus_ARENA_MATCH_STATUS_ACTIVE
-	case domain.MatchStatusFinished:
+	case model.ArenaMatchStatusFinished:
 		return v1.ArenaMatchStatus_ARENA_MATCH_STATUS_FINISHED
 	default:
 		return v1.ArenaMatchStatus_ARENA_MATCH_STATUS_UNSPECIFIED
@@ -104,7 +180,7 @@ func mapArenaLeaderboard(entries []*domain.LeaderboardEntry) []*v1.ArenaLeaderbo
 			UserId:      entry.UserID,
 			DisplayName: entry.DisplayName,
 			Rating:      entry.Rating,
-			League:      entry.League,
+			League:      mapArenaLeague(entry.League),
 			Wins:        entry.Wins,
 			Losses:      entry.Losses,
 			Matches:     entry.Matches,
@@ -115,27 +191,27 @@ func mapArenaLeaderboard(entries []*domain.LeaderboardEntry) []*v1.ArenaLeaderbo
 	return result
 }
 
-func mapArenaRealtimeMatch(match *domain.Match) *dto.ArenaRealtimeMatch {
+func mapArenaRealtimeMatch(match *domain.Match) *realtime.ArenaMatch {
 	if match == nil {
 		return nil
 	}
 
-	result := &dto.ArenaRealtimeMatch{
+	result := &realtime.ArenaMatch{
 		ID:                match.ID.String(),
 		TaskID:            match.TaskID.String(),
 		TaskTitle:         arenaTaskTitle(match),
 		TaskStatement:     arenaTaskStatement(match),
 		StarterCode:       arenaStarterCode(match),
 		Topic:             match.Topic,
-		Difficulty:        match.Difficulty,
-		Status:            match.Status,
+		Difficulty:        match.Difficulty.String(),
+		Status:            match.Status.String(),
 		DurationSeconds:   match.DurationSeconds,
 		ObfuscateOpponent: match.ObfuscateOpponent,
 		IsRated:           match.IsRated,
 		UnratedReason:     match.UnratedReason,
 		AntiCheatEnabled:  match.AntiCheatEnabled,
-		WinnerReason:      match.WinnerReason,
-		Players:           make([]*dto.ArenaRealtimePlayer, 0, len(match.Players)),
+		WinnerReason:      match.WinnerReason.String(),
+		Players:           make([]*realtime.ArenaPlayer, 0, len(match.Players)),
 	}
 
 	if match.WinnerUserID != nil {
@@ -149,10 +225,10 @@ func mapArenaRealtimeMatch(match *domain.Match) *dto.ArenaRealtimeMatch {
 		if player == nil {
 			continue
 		}
-		result.Players = append(result.Players, &dto.ArenaRealtimePlayer{
+		result.Players = append(result.Players, &realtime.ArenaPlayer{
 			UserID:        player.UserID.String(),
 			DisplayName:   player.DisplayName,
-			Side:          player.Side,
+			Side:          player.Side.String(),
 			IsCreator:     player.IsCreator,
 			FreezeUntil:   formatArenaTimePtr(player.FreezeUntil),
 			AcceptedAt:    formatArenaTimePtr(player.AcceptedAt),
@@ -186,16 +262,16 @@ func arenaStarterCode(match *domain.Match) string {
 	return match.Task.StarterCode
 }
 
-func mapArenaRealtimeCodes(match *domain.Match) []*dto.ArenaRealtimeCode {
+func mapArenaRealtimeCodes(match *domain.Match) []*realtime.ArenaPlayerCode {
 	if match == nil {
 		return nil
 	}
-	result := make([]*dto.ArenaRealtimeCode, 0, len(match.Players))
+	result := make([]*realtime.ArenaPlayerCode, 0, len(match.Players))
 	for _, player := range match.Players {
 		if player == nil {
 			continue
 		}
-		result = append(result, &dto.ArenaRealtimeCode{
+		result = append(result, &realtime.ArenaPlayerCode{
 			UserID:      player.UserID.String(),
 			DisplayName: player.DisplayName,
 			Code:        player.CurrentCode,

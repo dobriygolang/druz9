@@ -9,6 +9,7 @@ import (
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -23,11 +24,12 @@ const (
 type Service struct{}
 
 type ExecutionRequest struct {
-	Code     string
-	Input    string
-	Task     policy.TaskSpec
-	Files    map[string]string
-	Language policy.Language
+	Code       string
+	Input      string
+	Task       policy.TaskSpec
+	Files      map[string]string
+	Language   policy.Language
+	RunnerMode string
 }
 
 type ExecutionResult struct {
@@ -92,10 +94,9 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 		return "", false, err
 	}
 
-	// Write code to main.go
-	mainFile := filepath.Join(tmpDir, "main.go")
-	if err := os.WriteFile(mainFile, []byte(req.Code), 0644); err != nil {
-		return "", false, fmt.Errorf("write code file: %w", err)
+	runArgs, err := prepareGoSources(tmpDir, req)
+	if err != nil {
+		return "", false, err
 	}
 
 	execEnv, err := buildExecutionEnv(tmpDir, cfg.MinimalEnv)
@@ -103,7 +104,7 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 		return "", false, err
 	}
 
-	cmd := exec.CommandContext(execCtx, "go", "run", mainFile)
+	cmd := exec.CommandContext(execCtx, "go", append([]string{"run"}, runArgs...)...)
 	cmd.Dir = tmpDir
 	cmd.Env = execEnv
 	cmd.Stdin = bytes.NewBufferString(req.Input)
@@ -126,6 +127,51 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 	}
 
 	return outputStr, false, nil
+}
+
+func prepareGoSources(root string, req ExecutionRequest) ([]string, error) {
+	mode := strings.TrimSpace(req.RunnerMode)
+	if mode == "" {
+		mode = "program"
+	}
+
+	switch mode {
+	case "function_io":
+		solutionFile := filepath.Join(root, "solution.go")
+		if err := os.WriteFile(solutionFile, []byte(req.Code), 0644); err != nil {
+			return nil, fmt.Errorf("write solution file: %w", err)
+		}
+		wrapperFile := filepath.Join(root, "main.go")
+		if err := os.WriteFile(wrapperFile, []byte(goFunctionIOWrapper()), 0644); err != nil {
+			return nil, fmt.Errorf("write wrapper file: %w", err)
+		}
+		return []string{"."}, nil
+	default:
+		mainFile := filepath.Join(root, "main.go")
+		if err := os.WriteFile(mainFile, []byte(req.Code), 0644); err != nil {
+			return nil, fmt.Errorf("write code file: %w", err)
+		}
+		return []string{mainFile}, nil
+	}
+}
+
+func goFunctionIOWrapper() string {
+	return `package main
+
+import (
+	"fmt"
+	"io"
+	"os"
+)
+
+func main() {
+	input, err := io.ReadAll(os.Stdin)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Print(solve(string(input)))
+}
+`
 }
 
 func effectiveExecutionTimeout(ctx context.Context, requested time.Duration) (time.Duration, error) {
@@ -244,4 +290,10 @@ func validateMaterializedPath(path string, fs policy.RunnerFilesystemConfig) err
 		return fmt.Errorf("fixture path %q escapes workspace", path)
 	}
 	return nil
+}
+
+// NormalizeOutput normalizes judge output for comparison.
+// Trims whitespace and normalizes line endings.
+func NormalizeOutput(value string) string {
+	return strings.TrimSpace(value)
 }

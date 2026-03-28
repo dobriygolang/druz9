@@ -8,6 +8,22 @@ const (
 	RoomStatusWaiting  = model.RoomStatusWaiting
 	RoomStatusActive   = model.RoomStatusActive
 	RoomStatusFinished = model.RoomStatusFinished
+
+	TaskDifficultyEasy   = model.TaskDifficultyEasy
+	TaskDifficultyMedium = model.TaskDifficultyMedium
+	TaskDifficultyHard   = model.TaskDifficultyHard
+
+	ProgrammingLanguageJavaScript = model.ProgrammingLanguageJavaScript
+	ProgrammingLanguageTypeScript = model.ProgrammingLanguageTypeScript
+	ProgrammingLanguagePython     = model.ProgrammingLanguagePython
+	ProgrammingLanguageGo         = model.ProgrammingLanguageGo
+	ProgrammingLanguageRust       = model.ProgrammingLanguageRust
+	ProgrammingLanguageCpp        = model.ProgrammingLanguageCpp
+	ProgrammingLanguageJava       = model.ProgrammingLanguageJava
+
+	TaskTypeAlgorithm   = model.TaskTypeAlgorithm
+	TaskTypeDebugging   = model.TaskTypeDebugging
+	TaskTypeRefactoring = model.TaskTypeRefactoring
 )
 
 type Room = model.Room

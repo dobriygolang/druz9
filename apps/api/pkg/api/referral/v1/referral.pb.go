@@ -23,6 +23,64 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type EmploymentType int32
+
+const (
+	EmploymentType_EMPLOYMENT_TYPE_UNSPECIFIED EmploymentType = 0
+	EmploymentType_EMPLOYMENT_TYPE_FULL_TIME   EmploymentType = 1
+	EmploymentType_EMPLOYMENT_TYPE_PART_TIME   EmploymentType = 2
+	EmploymentType_EMPLOYMENT_TYPE_CONTRACT    EmploymentType = 3
+	EmploymentType_EMPLOYMENT_TYPE_INTERNSHIP  EmploymentType = 4
+	EmploymentType_EMPLOYMENT_TYPE_REMOTE      EmploymentType = 5
+)
+
+// Enum value maps for EmploymentType.
+var (
+	EmploymentType_name = map[int32]string{
+		0: "EMPLOYMENT_TYPE_UNSPECIFIED",
+		1: "EMPLOYMENT_TYPE_FULL_TIME",
+		2: "EMPLOYMENT_TYPE_PART_TIME",
+		3: "EMPLOYMENT_TYPE_CONTRACT",
+		4: "EMPLOYMENT_TYPE_INTERNSHIP",
+		5: "EMPLOYMENT_TYPE_REMOTE",
+	}
+	EmploymentType_value = map[string]int32{
+		"EMPLOYMENT_TYPE_UNSPECIFIED": 0,
+		"EMPLOYMENT_TYPE_FULL_TIME":   1,
+		"EMPLOYMENT_TYPE_PART_TIME":   2,
+		"EMPLOYMENT_TYPE_CONTRACT":    3,
+		"EMPLOYMENT_TYPE_INTERNSHIP":  4,
+		"EMPLOYMENT_TYPE_REMOTE":      5,
+	}
+)
+
+func (x EmploymentType) Enum() *EmploymentType {
+	p := new(EmploymentType)
+	*p = x
+	return p
+}
+
+func (x EmploymentType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (EmploymentType) Descriptor() protoreflect.EnumDescriptor {
+	return file_referral_v1_referral_proto_enumTypes[0].Descriptor()
+}
+
+func (EmploymentType) Type() protoreflect.EnumType {
+	return &file_referral_v1_referral_proto_enumTypes[0]
+}
+
+func (x EmploymentType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use EmploymentType.Descriptor instead.
+func (EmploymentType) EnumDescriptor() ([]byte, []int) {
+	return file_referral_v1_referral_proto_rawDescGZIP(), []int{0}
+}
+
 type ListReferralsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
@@ -83,7 +141,7 @@ type CreateReferralRequest struct {
 	Description    string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
 	Experience     string                 `protobuf:"bytes,5,opt,name=experience,proto3" json:"experience,omitempty"`
 	Location       string                 `protobuf:"bytes,6,opt,name=location,proto3" json:"location,omitempty"`
-	EmploymentType string                 `protobuf:"bytes,7,opt,name=employment_type,json=employmentType,proto3" json:"employment_type,omitempty"`
+	EmploymentType EmploymentType         `protobuf:"varint,7,opt,name=employment_type,json=employmentType,proto3,enum=referral.v1.EmploymentType" json:"employment_type,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -160,11 +218,11 @@ func (x *CreateReferralRequest) GetLocation() string {
 	return ""
 }
 
-func (x *CreateReferralRequest) GetEmploymentType() string {
+func (x *CreateReferralRequest) GetEmploymentType() EmploymentType {
 	if x != nil {
 		return x.EmploymentType
 	}
-	return ""
+	return EmploymentType_EMPLOYMENT_TYPE_UNSPECIFIED
 }
 
 type UpdateReferralRequest struct {
@@ -176,7 +234,7 @@ type UpdateReferralRequest struct {
 	Description    string                 `protobuf:"bytes,5,opt,name=description,proto3" json:"description,omitempty"`
 	Experience     string                 `protobuf:"bytes,6,opt,name=experience,proto3" json:"experience,omitempty"`
 	Location       string                 `protobuf:"bytes,7,opt,name=location,proto3" json:"location,omitempty"`
-	EmploymentType string                 `protobuf:"bytes,8,opt,name=employment_type,json=employmentType,proto3" json:"employment_type,omitempty"`
+	EmploymentType EmploymentType         `protobuf:"varint,8,opt,name=employment_type,json=employmentType,proto3,enum=referral.v1.EmploymentType" json:"employment_type,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -260,11 +318,11 @@ func (x *UpdateReferralRequest) GetLocation() string {
 	return ""
 }
 
-func (x *UpdateReferralRequest) GetEmploymentType() string {
+func (x *UpdateReferralRequest) GetEmploymentType() EmploymentType {
 	if x != nil {
 		return x.EmploymentType
 	}
-	return ""
+	return EmploymentType_EMPLOYMENT_TYPE_UNSPECIFIED
 }
 
 type DeleteReferralRequest struct {
@@ -488,7 +546,7 @@ type Referral struct {
 	Description              string                 `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
 	Experience               string                 `protobuf:"bytes,10,opt,name=experience,proto3" json:"experience,omitempty"`
 	Location                 string                 `protobuf:"bytes,11,opt,name=location,proto3" json:"location,omitempty"`
-	EmploymentType           string                 `protobuf:"bytes,12,opt,name=employment_type,json=employmentType,proto3" json:"employment_type,omitempty"`
+	EmploymentType           EmploymentType         `protobuf:"varint,12,opt,name=employment_type,json=employmentType,proto3,enum=referral.v1.EmploymentType" json:"employment_type,omitempty"`
 	IsOwner                  bool                   `protobuf:"varint,13,opt,name=is_owner,json=isOwner,proto3" json:"is_owner,omitempty"`
 	CreatedAt                *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt                *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
@@ -603,11 +661,11 @@ func (x *Referral) GetLocation() string {
 	return ""
 }
 
-func (x *Referral) GetEmploymentType() string {
+func (x *Referral) GetEmploymentType() EmploymentType {
 	if x != nil {
 		return x.EmploymentType
 	}
-	return ""
+	return EmploymentType_EMPLOYMENT_TYPE_UNSPECIFIED
 }
 
 func (x *Referral) GetIsOwner() bool {
@@ -638,7 +696,7 @@ const file_referral_v1_referral_proto_rawDesc = "" +
 	"\x1areferral/v1/referral.proto\x12\vreferral.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"D\n" +
 	"\x14ListReferralsRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\xef\x01\n" +
+	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\x8c\x02\n" +
 	"\x15CreateReferralRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x18\n" +
 	"\acompany\x18\x02 \x01(\tR\acompany\x12\x1f\n" +
@@ -648,8 +706,8 @@ const file_referral_v1_referral_proto_rawDesc = "" +
 	"\n" +
 	"experience\x18\x05 \x01(\tR\n" +
 	"experience\x12\x1a\n" +
-	"\blocation\x18\x06 \x01(\tR\blocation\x12'\n" +
-	"\x0femployment_type\x18\a \x01(\tR\x0eemploymentType\"\x90\x02\n" +
+	"\blocation\x18\x06 \x01(\tR\blocation\x12D\n" +
+	"\x0femployment_type\x18\a \x01(\x0e2\x1b.referral.v1.EmploymentTypeR\x0eemploymentType\"\xad\x02\n" +
 	"\x15UpdateReferralRequest\x12\x1f\n" +
 	"\vreferral_id\x18\x01 \x01(\tR\n" +
 	"referralId\x12\x14\n" +
@@ -661,8 +719,8 @@ const file_referral_v1_referral_proto_rawDesc = "" +
 	"\n" +
 	"experience\x18\x06 \x01(\tR\n" +
 	"experience\x12\x1a\n" +
-	"\blocation\x18\a \x01(\tR\blocation\x12'\n" +
-	"\x0femployment_type\x18\b \x01(\tR\x0eemploymentType\"8\n" +
+	"\blocation\x18\a \x01(\tR\blocation\x12D\n" +
+	"\x0femployment_type\x18\b \x01(\x0e2\x1b.referral.v1.EmploymentTypeR\x0eemploymentType\"8\n" +
 	"\x15DeleteReferralRequest\x12\x1f\n" +
 	"\vreferral_id\x18\x01 \x01(\tR\n" +
 	"referralId\"\xbf\x01\n" +
@@ -676,7 +734,7 @@ const file_referral_v1_referral_proto_rawDesc = "" +
 	"\x10ReferralResponse\x121\n" +
 	"\breferral\x18\x01 \x01(\v2\x15.referral.v1.ReferralR\breferral\"0\n" +
 	"\x16ReferralStatusResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"\xb6\x04\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"\xd3\x04\n" +
 	"\bReferral\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1f\n" +
@@ -693,13 +751,20 @@ const file_referral_v1_referral_proto_rawDesc = "" +
 	"experience\x18\n" +
 	" \x01(\tR\n" +
 	"experience\x12\x1a\n" +
-	"\blocation\x18\v \x01(\tR\blocation\x12'\n" +
-	"\x0femployment_type\x18\f \x01(\tR\x0eemploymentType\x12\x19\n" +
+	"\blocation\x18\v \x01(\tR\blocation\x12D\n" +
+	"\x0femployment_type\x18\f \x01(\x0e2\x1b.referral.v1.EmploymentTypeR\x0eemploymentType\x12\x19\n" +
 	"\bis_owner\x18\r \x01(\bR\aisOwner\x129\n" +
 	"\n" +
 	"created_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt2\xfd\x03\n" +
+	"updated_at\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt*\xc9\x01\n" +
+	"\x0eEmploymentType\x12\x1f\n" +
+	"\x1bEMPLOYMENT_TYPE_UNSPECIFIED\x10\x00\x12\x1d\n" +
+	"\x19EMPLOYMENT_TYPE_FULL_TIME\x10\x01\x12\x1d\n" +
+	"\x19EMPLOYMENT_TYPE_PART_TIME\x10\x02\x12\x1c\n" +
+	"\x18EMPLOYMENT_TYPE_CONTRACT\x10\x03\x12\x1e\n" +
+	"\x1aEMPLOYMENT_TYPE_INTERNSHIP\x10\x04\x12\x1a\n" +
+	"\x16EMPLOYMENT_TYPE_REMOTE\x10\x052\xfd\x03\n" +
 	"\x0fReferralService\x12q\n" +
 	"\rListReferrals\x12!.referral.v1.ListReferralsRequest\x1a\".referral.v1.ListReferralsResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/v1/referrals\x12q\n" +
 	"\x0eCreateReferral\x12\".referral.v1.CreateReferralRequest\x1a\x1d.referral.v1.ReferralResponse\"\x1c\x82\xd3\xe4\x93\x02\x16:\x01*\"\x11/api/v1/referrals\x12\x7f\n" +
@@ -718,36 +783,41 @@ func file_referral_v1_referral_proto_rawDescGZIP() []byte {
 	return file_referral_v1_referral_proto_rawDescData
 }
 
+var file_referral_v1_referral_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_referral_v1_referral_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
 var file_referral_v1_referral_proto_goTypes = []any{
-	(*ListReferralsRequest)(nil),   // 0: referral.v1.ListReferralsRequest
-	(*CreateReferralRequest)(nil),  // 1: referral.v1.CreateReferralRequest
-	(*UpdateReferralRequest)(nil),  // 2: referral.v1.UpdateReferralRequest
-	(*DeleteReferralRequest)(nil),  // 3: referral.v1.DeleteReferralRequest
-	(*ListReferralsResponse)(nil),  // 4: referral.v1.ListReferralsResponse
-	(*ReferralResponse)(nil),       // 5: referral.v1.ReferralResponse
-	(*ReferralStatusResponse)(nil), // 6: referral.v1.ReferralStatusResponse
-	(*Referral)(nil),               // 7: referral.v1.Referral
-	(*timestamppb.Timestamp)(nil),  // 8: google.protobuf.Timestamp
+	(EmploymentType)(0),            // 0: referral.v1.EmploymentType
+	(*ListReferralsRequest)(nil),   // 1: referral.v1.ListReferralsRequest
+	(*CreateReferralRequest)(nil),  // 2: referral.v1.CreateReferralRequest
+	(*UpdateReferralRequest)(nil),  // 3: referral.v1.UpdateReferralRequest
+	(*DeleteReferralRequest)(nil),  // 4: referral.v1.DeleteReferralRequest
+	(*ListReferralsResponse)(nil),  // 5: referral.v1.ListReferralsResponse
+	(*ReferralResponse)(nil),       // 6: referral.v1.ReferralResponse
+	(*ReferralStatusResponse)(nil), // 7: referral.v1.ReferralStatusResponse
+	(*Referral)(nil),               // 8: referral.v1.Referral
+	(*timestamppb.Timestamp)(nil),  // 9: google.protobuf.Timestamp
 }
 var file_referral_v1_referral_proto_depIdxs = []int32{
-	7, // 0: referral.v1.ListReferralsResponse.referrals:type_name -> referral.v1.Referral
-	7, // 1: referral.v1.ReferralResponse.referral:type_name -> referral.v1.Referral
-	8, // 2: referral.v1.Referral.created_at:type_name -> google.protobuf.Timestamp
-	8, // 3: referral.v1.Referral.updated_at:type_name -> google.protobuf.Timestamp
-	0, // 4: referral.v1.ReferralService.ListReferrals:input_type -> referral.v1.ListReferralsRequest
-	1, // 5: referral.v1.ReferralService.CreateReferral:input_type -> referral.v1.CreateReferralRequest
-	2, // 6: referral.v1.ReferralService.UpdateReferral:input_type -> referral.v1.UpdateReferralRequest
-	3, // 7: referral.v1.ReferralService.DeleteReferral:input_type -> referral.v1.DeleteReferralRequest
-	4, // 8: referral.v1.ReferralService.ListReferrals:output_type -> referral.v1.ListReferralsResponse
-	5, // 9: referral.v1.ReferralService.CreateReferral:output_type -> referral.v1.ReferralResponse
-	5, // 10: referral.v1.ReferralService.UpdateReferral:output_type -> referral.v1.ReferralResponse
-	6, // 11: referral.v1.ReferralService.DeleteReferral:output_type -> referral.v1.ReferralStatusResponse
-	8, // [8:12] is the sub-list for method output_type
-	4, // [4:8] is the sub-list for method input_type
-	4, // [4:4] is the sub-list for extension type_name
-	4, // [4:4] is the sub-list for extension extendee
-	0, // [0:4] is the sub-list for field type_name
+	0,  // 0: referral.v1.CreateReferralRequest.employment_type:type_name -> referral.v1.EmploymentType
+	0,  // 1: referral.v1.UpdateReferralRequest.employment_type:type_name -> referral.v1.EmploymentType
+	8,  // 2: referral.v1.ListReferralsResponse.referrals:type_name -> referral.v1.Referral
+	8,  // 3: referral.v1.ReferralResponse.referral:type_name -> referral.v1.Referral
+	0,  // 4: referral.v1.Referral.employment_type:type_name -> referral.v1.EmploymentType
+	9,  // 5: referral.v1.Referral.created_at:type_name -> google.protobuf.Timestamp
+	9,  // 6: referral.v1.Referral.updated_at:type_name -> google.protobuf.Timestamp
+	1,  // 7: referral.v1.ReferralService.ListReferrals:input_type -> referral.v1.ListReferralsRequest
+	2,  // 8: referral.v1.ReferralService.CreateReferral:input_type -> referral.v1.CreateReferralRequest
+	3,  // 9: referral.v1.ReferralService.UpdateReferral:input_type -> referral.v1.UpdateReferralRequest
+	4,  // 10: referral.v1.ReferralService.DeleteReferral:input_type -> referral.v1.DeleteReferralRequest
+	5,  // 11: referral.v1.ReferralService.ListReferrals:output_type -> referral.v1.ListReferralsResponse
+	6,  // 12: referral.v1.ReferralService.CreateReferral:output_type -> referral.v1.ReferralResponse
+	6,  // 13: referral.v1.ReferralService.UpdateReferral:output_type -> referral.v1.ReferralResponse
+	7,  // 14: referral.v1.ReferralService.DeleteReferral:output_type -> referral.v1.ReferralStatusResponse
+	11, // [11:15] is the sub-list for method output_type
+	7,  // [7:11] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_referral_v1_referral_proto_init() }
@@ -760,13 +830,14 @@ func file_referral_v1_referral_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_referral_v1_referral_proto_rawDesc), len(file_referral_v1_referral_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_referral_v1_referral_proto_goTypes,
 		DependencyIndexes: file_referral_v1_referral_proto_depIdxs,
+		EnumInfos:         file_referral_v1_referral_proto_enumTypes,
 		MessageInfos:      file_referral_v1_referral_proto_msgTypes,
 	}.Build()
 	File_referral_v1_referral_proto = out.File

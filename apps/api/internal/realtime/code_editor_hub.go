@@ -8,7 +8,7 @@ import (
 	"time"
 
 	codeeditordomain "api/internal/domain/codeeditor"
-	"api/internal/dto"
+	schema "api/internal/realtime/schema"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -28,7 +28,7 @@ type CodeEditorHub struct {
 type codeEditorRoom struct {
 	clients         map[*codeEditorClient]struct{}
 	lastPlainText   string
-	awarenessByID   map[uint64]dto.CodeEditorRealtimeMessage
+	awarenessByID   map[uint64]schema.CodeEditorMessage
 	dirty           bool
 	initializedFrom bool
 }
@@ -38,7 +38,7 @@ type codeEditorClient struct {
 	clientID    string
 	awarenessID uint64
 	ws          *websocket.Conn
-	send        chan dto.CodeEditorRealtimeMessage
+	send        chan schema.CodeEditorMessage
 }
 
 var codeEditorUpgrader = websocket.Upgrader{
@@ -68,7 +68,7 @@ func (h *CodeEditorHub) Handler(roomID string) http.Handler {
 		client := &codeEditorClient{
 			roomID: roomID,
 			ws:     ws,
-			send:   make(chan dto.CodeEditorRealtimeMessage, 128),
+			send:   make(chan schema.CodeEditorMessage, 128),
 		}
 
 		h.addClient(client)
@@ -96,28 +96,28 @@ func (c *codeEditorClient) readLoop(h *CodeEditorHub) {
 	})
 
 	for {
-		var msg dto.CodeEditorRealtimeMessage
+		var msg schema.CodeEditorMessage
 		if err := c.ws.ReadJSON(&msg); err != nil {
 			return
 		}
 
 		switch msg.Type {
-		case dto.CodeEditorRealtimeTypeHello:
+		case schema.CodeEditorTypeHello:
 			c.clientID = msg.ClientID
 			c.awarenessID = msg.AwarenessID
 			h.sendSnapshot(c)
 			h.sendAwarenessSnapshot(c)
-		case dto.CodeEditorRealtimeTypeUpdate:
+		case schema.CodeEditorTypeUpdate:
 			h.handleUpdate(c, msg)
-		case dto.CodeEditorRealtimeTypeAwareness:
+		case schema.CodeEditorTypeAwareness:
 			h.handleAwareness(c, msg)
-		case dto.CodeEditorRealtimeTypePing:
-			c.enqueue(dto.CodeEditorRealtimeMessage{Type: dto.CodeEditorRealtimeTypePong})
+		case schema.CodeEditorTypePing:
+			c.enqueue(schema.CodeEditorMessage{Type: schema.CodeEditorTypePong})
 		}
 	}
 }
 
-func (c *codeEditorClient) enqueue(msg dto.CodeEditorRealtimeMessage) {
+func (c *codeEditorClient) enqueue(msg schema.CodeEditorMessage) {
 	select {
 	case c.send <- msg:
 	default:
@@ -130,7 +130,7 @@ func (h *CodeEditorHub) addClient(client *codeEditorClient) {
 	if room == nil {
 		room = &codeEditorRoom{
 			clients:       make(map[*codeEditorClient]struct{}),
-			awarenessByID: make(map[uint64]dto.CodeEditorRealtimeMessage),
+			awarenessByID: make(map[uint64]schema.CodeEditorMessage),
 		}
 		h.rooms[client.roomID] = room
 	}
@@ -166,8 +166,8 @@ func (h *CodeEditorHub) removeClient(client *codeEditorClient) {
 	_ = client.ws.Close()
 
 	if client.awarenessID != 0 {
-		h.broadcast(client.roomID, dto.CodeEditorRealtimeMessage{
-			Type:         dto.CodeEditorRealtimeTypeAwarenessRemove,
+		h.broadcast(client.roomID, schema.CodeEditorMessage{
+			Type:         schema.CodeEditorTypeAwarenessRemove,
 			AwarenessIDs: []uint64{client.awarenessID},
 		}, client)
 	}
@@ -203,8 +203,8 @@ func (h *CodeEditorHub) sendSnapshot(client *codeEditorClient) {
 		return
 	}
 
-	client.enqueue(dto.CodeEditorRealtimeMessage{
-		Type:      dto.CodeEditorRealtimeTypeSnapshot,
+	client.enqueue(schema.CodeEditorMessage{
+		Type:      schema.CodeEditorTypeSnapshot,
 		PlainText: room.lastPlainText,
 	})
 }
@@ -226,7 +226,7 @@ func (h *CodeEditorHub) sendAwarenessSnapshot(client *codeEditorClient) {
 	}
 }
 
-func (h *CodeEditorHub) handleUpdate(client *codeEditorClient, msg dto.CodeEditorRealtimeMessage) {
+func (h *CodeEditorHub) handleUpdate(client *codeEditorClient, msg schema.CodeEditorMessage) {
 	h.mu.Lock()
 	room := h.rooms[client.roomID]
 	if room != nil {
@@ -238,7 +238,7 @@ func (h *CodeEditorHub) handleUpdate(client *codeEditorClient, msg dto.CodeEdito
 	h.broadcast(client.roomID, msg, client)
 }
 
-func (h *CodeEditorHub) handleAwareness(client *codeEditorClient, msg dto.CodeEditorRealtimeMessage) {
+func (h *CodeEditorHub) handleAwareness(client *codeEditorClient, msg schema.CodeEditorMessage) {
 	if msg.AwarenessID != 0 {
 		client.awarenessID = msg.AwarenessID
 	}
@@ -253,7 +253,7 @@ func (h *CodeEditorHub) handleAwareness(client *codeEditorClient, msg dto.CodeEd
 	h.broadcast(client.roomID, msg, client)
 }
 
-func (h *CodeEditorHub) broadcast(roomID string, msg dto.CodeEditorRealtimeMessage, sender *codeEditorClient) {
+func (h *CodeEditorHub) broadcast(roomID string, msg schema.CodeEditorMessage, sender *codeEditorClient) {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -306,27 +306,27 @@ func (h *CodeEditorHub) flushSnapshot(roomID, code string) {
 	_ = h.store.SaveCodeSnapshot(context.Background(), parsedRoomID, code)
 }
 
-func (h *CodeEditorHub) PublishRoomUpdate(room *dto.CodeEditorRealtimeRoom) {
+func (h *CodeEditorHub) PublishRoomUpdate(room *schema.CodeEditorRoom) {
 	if room == nil || room.ID == "" {
 		return
 	}
-	h.broadcast(room.ID, dto.CodeEditorRealtimeMessage{
-		Type: dto.CodeEditorRealtimeTypeRoomUpdate,
+	h.broadcast(room.ID, schema.CodeEditorMessage{
+		Type: schema.CodeEditorTypeRoomUpdate,
 		Room: room,
 	}, nil)
 }
 
-func (h *CodeEditorHub) PublishSubmission(roomID string, submission *dto.CodeEditorSubmissionEvent) {
+func (h *CodeEditorHub) PublishSubmission(roomID string, submission *schema.CodeEditorSubmissionEvent) {
 	if roomID == "" || submission == nil {
 		return
 	}
-	h.broadcast(roomID, dto.CodeEditorRealtimeMessage{
-		Type:       dto.CodeEditorRealtimeTypeSubmission,
+	h.broadcast(roomID, schema.CodeEditorMessage{
+		Type:       schema.CodeEditorTypeSubmission,
 		Submission: submission,
 	}, nil)
 }
 
-func EncodeMessage(msg dto.CodeEditorRealtimeMessage) []byte {
+func EncodeMessage(msg schema.CodeEditorMessage) []byte {
 	payload, _ := json.Marshal(msg)
 	return payload
 }

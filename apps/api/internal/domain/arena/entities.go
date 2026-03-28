@@ -18,6 +18,18 @@ const (
 	WinnerReasonTimeout      = model.ArenaWinnerReasonTimeout
 	WinnerReasonSingleAC     = model.ArenaWinnerReasonSingleAC
 	WinnerReasonNone         = model.ArenaWinnerReasonNone
+
+	ArenaDifficultyEasy   = model.ArenaDifficultyEasy
+	ArenaDifficultyMedium = model.ArenaDifficultyMedium
+	ArenaDifficultyHard   = model.ArenaDifficultyHard
+
+	ArenaLeagueBronze   = model.ArenaLeagueBronze
+	ArenaLeagueSilver   = model.ArenaLeagueSilver
+	ArenaLeagueGold     = model.ArenaLeagueGold
+	ArenaLeaguePlatinum = model.ArenaLeaguePlatinum
+	ArenaLeagueDiamond  = model.ArenaLeagueDiamond
+	ArenaLeagueMaster   = model.ArenaLeagueMaster
+	ArenaLeagueLegend   = model.ArenaLeagueLegend
 )
 
 type Match = model.ArenaMatch

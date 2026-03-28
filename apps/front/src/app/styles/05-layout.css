@@ -1,0 +1,201 @@
+/* ===========================================
+   MAP CONTROLS
+   =========================================== */
+
+.maplibregl-ctrl-group {
+  background: var(--surface-color) !important;
+  border: 1px solid var(--border-color) !important;
+  border-radius: 8px !important;
+  overflow: hidden;
+}
+
+.maplibregl-ctrl-group button {
+  background: var(--surface-color) !important;
+  border: none !important;
+  border-bottom: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  width: 36px !important;
+  height: 36px !important;
+}
+
+.maplibregl-ctrl-group button:last-child {
+  border-bottom: none !important;
+}
+
+.maplibregl-ctrl-group button:hover {
+  background: var(--bg-color) !important;
+}
+
+.maplibregl-ctrl-group button .maplibregl-ctrl-icon {
+  filter: invert(1);
+}
+
+.maplibregl-ctrl-scale {
+  background: var(--surface-color) !important;
+  border: 1px solid var(--border-color) !important;
+  color: var(--text-primary) !important;
+  font-size: 11px !important;
+}
+
+/* ===========================================
+   CARDS & LAYOUT
+   =========================================== */
+
+.card {
+  background-color: var(--surface-color);
+  border-radius: 16px;
+  padding: 24px;
+  border: 1px solid var(--border-color);
+}
+
+.compact {
+  padding: 18px;
+}
+
+.app-container {
+  display: flex;
+  min-height: 100vh;
+  background-color: var(--bg-color);
+}
+
+.main-content {
+  flex: 1;
+  padding: 40px;
+  overflow-y: auto;
+  padding-bottom: 40px;
+  background-color: var(--bg-color);
+  min-width: 0;
+}
+
+.main-content-code-room {
+  padding: 18px 22px 26px;
+  overflow: auto;
+}
+
+.content-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  width: 100%;
+  min-width: 0;
+}
+
+.content-wrapper-wide {
+  max-width: min(1720px, calc(100vw - 64px));
+}
+
+.content-wrapper-code-room {
+  max-width: none;
+  width: 100%;
+  min-height: 100%;
+}
+
+.sidebar-desktop {
+  display: flex;
+  width: 240px;
+  border-right: 1px solid var(--border-color);
+  padding: 24px 16px;
+  flex-direction: column;
+  background-color: var(--bg-color);
+}
+
+.bottom-nav-mobile {
+  display: none;
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 72px;
+  background-color: var(--surface-color);
+  border-top: 1px solid var(--border-color);
+  justify-content: space-between;
+  align-items: center;
+  gap: 0;
+  padding: 0 6px;
+  overflow-x: hidden;
+  z-index: 1000;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+/* ===========================================
+   MODALS
+   =========================================== */
+
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.2s ease-out;
+}
+
+.modal {
+  background: var(--surface-color);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 24px;
+  padding: 32px;
+  width: 100%;
+  max-width: 480px;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+}
+
+.modal-wide {
+  max-width: 680px;
+}
+
+.modal-xl {
+  max-width: 1100px;
+}
+
+.modal h2 {
+  margin-bottom: 24px;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.modal-actions .btn {
+  flex: 1;
+  height: 48px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+/* ===========================================
+   EMPTY STATE & ERRORS
+   =========================================== */
+
+.empty-state {
+  text-align: center;
+  padding: 48px;
+  color: var(--text-secondary);
+}
+
+.error-text {
+  color: var(--danger-color);
+  font-size: 13px;
+  margin-top: 8px;
+}
+
+.error-banner {
+  margin-top: 12px;
+  padding: 12px 16px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 8px;
+  color: var(--danger-color);
+  font-size: 13px;
+}

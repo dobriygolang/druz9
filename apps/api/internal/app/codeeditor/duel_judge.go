@@ -2,7 +2,6 @@ package codeeditor
 
 import (
 	"context"
-	"strings"
 
 	domain "api/internal/domain/codeeditor"
 	"api/internal/policy"
@@ -27,17 +26,18 @@ func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID 
 
 	for _, tc := range testCases {
 		result, runErr := s.sandbox.Execute(ctx, sandbox.ExecutionRequest{
-			Code:     code,
-			Input:    tc.Input,
-			Task:     taskSpec,
-			Language: policy.LanguageGo,
+			Code:       code,
+			Input:      tc.Input,
+			Task:       taskSpec,
+			Language:   policy.LanguageGo,
+			RunnerMode: task.RunnerMode.String(),
 		})
 		if runErr != nil {
 			lastError = runErr.Error()
 			break
 		}
 		lastOutput = result.Output
-		if normalizeJudgeOutput(result.Output) == normalizeJudgeOutput(tc.ExpectedOutput) {
+		if sandbox.NormalizeOutput(result.Output) == sandbox.NormalizeOutput(tc.ExpectedOutput) {
 			passedCount++
 			continue
 		}
@@ -78,8 +78,4 @@ func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID 
 	}
 
 	return created, nil
-}
-
-func normalizeJudgeOutput(value string) string {
-	return strings.TrimSpace(value)
 }

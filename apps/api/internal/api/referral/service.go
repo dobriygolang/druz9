@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
 	ListReferrals(context.Context, *model.User, model.ListReferralsOptions) (*model.ListReferralsResponse, error)
 	CreateReferral(context.Context, *model.User, model.CreateReferralRequest) (*model.Referral, error)

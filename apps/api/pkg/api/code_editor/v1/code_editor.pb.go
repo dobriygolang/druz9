@@ -124,13 +124,181 @@ func (RoomStatus) EnumDescriptor() ([]byte, []int) {
 	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{1}
 }
 
+type TaskDifficulty int32
+
+const (
+	TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED TaskDifficulty = 0
+	TaskDifficulty_TASK_DIFFICULTY_EASY        TaskDifficulty = 1
+	TaskDifficulty_TASK_DIFFICULTY_MEDIUM      TaskDifficulty = 2
+	TaskDifficulty_TASK_DIFFICULTY_HARD        TaskDifficulty = 3
+)
+
+// Enum value maps for TaskDifficulty.
+var (
+	TaskDifficulty_name = map[int32]string{
+		0: "TASK_DIFFICULTY_UNSPECIFIED",
+		1: "TASK_DIFFICULTY_EASY",
+		2: "TASK_DIFFICULTY_MEDIUM",
+		3: "TASK_DIFFICULTY_HARD",
+	}
+	TaskDifficulty_value = map[string]int32{
+		"TASK_DIFFICULTY_UNSPECIFIED": 0,
+		"TASK_DIFFICULTY_EASY":        1,
+		"TASK_DIFFICULTY_MEDIUM":      2,
+		"TASK_DIFFICULTY_HARD":        3,
+	}
+)
+
+func (x TaskDifficulty) Enum() *TaskDifficulty {
+	p := new(TaskDifficulty)
+	*p = x
+	return p
+}
+
+func (x TaskDifficulty) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TaskDifficulty) Descriptor() protoreflect.EnumDescriptor {
+	return file_code_editor_v1_code_editor_proto_enumTypes[2].Descriptor()
+}
+
+func (TaskDifficulty) Type() protoreflect.EnumType {
+	return &file_code_editor_v1_code_editor_proto_enumTypes[2]
+}
+
+func (x TaskDifficulty) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TaskDifficulty.Descriptor instead.
+func (TaskDifficulty) EnumDescriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{2}
+}
+
+type ProgrammingLanguage int32
+
+const (
+	ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED ProgrammingLanguage = 0
+	ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVASCRIPT  ProgrammingLanguage = 1
+	ProgrammingLanguage_PROGRAMMING_LANGUAGE_TYPESCRIPT  ProgrammingLanguage = 2
+	ProgrammingLanguage_PROGRAMMING_LANGUAGE_PYTHON      ProgrammingLanguage = 3
+	ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO          ProgrammingLanguage = 4
+	ProgrammingLanguage_PROGRAMMING_LANGUAGE_RUST        ProgrammingLanguage = 5
+	ProgrammingLanguage_PROGRAMMING_LANGUAGE_CPP         ProgrammingLanguage = 6
+	ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVA        ProgrammingLanguage = 7
+)
+
+// Enum value maps for ProgrammingLanguage.
+var (
+	ProgrammingLanguage_name = map[int32]string{
+		0: "PROGRAMMING_LANGUAGE_UNSPECIFIED",
+		1: "PROGRAMMING_LANGUAGE_JAVASCRIPT",
+		2: "PROGRAMMING_LANGUAGE_TYPESCRIPT",
+		3: "PROGRAMMING_LANGUAGE_PYTHON",
+		4: "PROGRAMMING_LANGUAGE_GO",
+		5: "PROGRAMMING_LANGUAGE_RUST",
+		6: "PROGRAMMING_LANGUAGE_CPP",
+		7: "PROGRAMMING_LANGUAGE_JAVA",
+	}
+	ProgrammingLanguage_value = map[string]int32{
+		"PROGRAMMING_LANGUAGE_UNSPECIFIED": 0,
+		"PROGRAMMING_LANGUAGE_JAVASCRIPT":  1,
+		"PROGRAMMING_LANGUAGE_TYPESCRIPT":  2,
+		"PROGRAMMING_LANGUAGE_PYTHON":      3,
+		"PROGRAMMING_LANGUAGE_GO":          4,
+		"PROGRAMMING_LANGUAGE_RUST":        5,
+		"PROGRAMMING_LANGUAGE_CPP":         6,
+		"PROGRAMMING_LANGUAGE_JAVA":        7,
+	}
+)
+
+func (x ProgrammingLanguage) Enum() *ProgrammingLanguage {
+	p := new(ProgrammingLanguage)
+	*p = x
+	return p
+}
+
+func (x ProgrammingLanguage) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ProgrammingLanguage) Descriptor() protoreflect.EnumDescriptor {
+	return file_code_editor_v1_code_editor_proto_enumTypes[3].Descriptor()
+}
+
+func (ProgrammingLanguage) Type() protoreflect.EnumType {
+	return &file_code_editor_v1_code_editor_proto_enumTypes[3]
+}
+
+func (x ProgrammingLanguage) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ProgrammingLanguage.Descriptor instead.
+func (ProgrammingLanguage) EnumDescriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{3}
+}
+
+type TaskType int32
+
+const (
+	TaskType_TASK_TYPE_UNSPECIFIED TaskType = 0
+	TaskType_TASK_TYPE_ALGORITHM   TaskType = 1
+	TaskType_TASK_TYPE_DEBUGGING   TaskType = 2
+	TaskType_TASK_TYPE_REFACTORING TaskType = 3
+)
+
+// Enum value maps for TaskType.
+var (
+	TaskType_name = map[int32]string{
+		0: "TASK_TYPE_UNSPECIFIED",
+		1: "TASK_TYPE_ALGORITHM",
+		2: "TASK_TYPE_DEBUGGING",
+		3: "TASK_TYPE_REFACTORING",
+	}
+	TaskType_value = map[string]int32{
+		"TASK_TYPE_UNSPECIFIED": 0,
+		"TASK_TYPE_ALGORITHM":   1,
+		"TASK_TYPE_DEBUGGING":   2,
+		"TASK_TYPE_REFACTORING": 3,
+	}
+)
+
+func (x TaskType) Enum() *TaskType {
+	p := new(TaskType)
+	*p = x
+	return p
+}
+
+func (x TaskType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TaskType) Descriptor() protoreflect.EnumDescriptor {
+	return file_code_editor_v1_code_editor_proto_enumTypes[4].Descriptor()
+}
+
+func (TaskType) Type() protoreflect.EnumType {
+	return &file_code_editor_v1_code_editor_proto_enumTypes[4]
+}
+
+func (x TaskType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TaskType.Descriptor instead.
+func (TaskType) EnumDescriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{4}
+}
+
 type CreateRoomRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Mode          RoomMode               `protobuf:"varint,1,opt,name=mode,proto3,enum=code_editor.v1.RoomMode" json:"mode,omitempty"`
-	Task          string                 `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`             // task description for duel
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`             // creator name
-	Topic         string                 `protobuf:"bytes,4,opt,name=topic,proto3" json:"topic,omitempty"`           // preferred duel topic
-	Difficulty    string                 `protobuf:"bytes,5,opt,name=difficulty,proto3" json:"difficulty,omitempty"` // preferred duel difficulty
+	Task          string                 `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`                                                 // task description for duel
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`                                                 // creator name
+	Topic         string                 `protobuf:"bytes,4,opt,name=topic,proto3" json:"topic,omitempty"`                                               // preferred duel topic
+	Difficulty    TaskDifficulty         `protobuf:"varint,5,opt,name=difficulty,proto3,enum=code_editor.v1.TaskDifficulty" json:"difficulty,omitempty"` // preferred duel difficulty
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -193,11 +361,11 @@ func (x *CreateRoomRequest) GetTopic() string {
 	return ""
 }
 
-func (x *CreateRoomRequest) GetDifficulty() string {
+func (x *CreateRoomRequest) GetDifficulty() TaskDifficulty {
 	if x != nil {
 		return x.Difficulty
 	}
-	return ""
+	return TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED
 }
 
 type CreateRoomResponse struct {
@@ -1286,17 +1454,17 @@ type Task struct {
 	Title            string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Slug             string                 `protobuf:"bytes,3,opt,name=slug,proto3" json:"slug,omitempty"`
 	Statement        string                 `protobuf:"bytes,4,opt,name=statement,proto3" json:"statement,omitempty"`
-	Difficulty       string                 `protobuf:"bytes,5,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
+	Difficulty       TaskDifficulty         `protobuf:"varint,5,opt,name=difficulty,proto3,enum=code_editor.v1.TaskDifficulty" json:"difficulty,omitempty"`
 	Topics           []string               `protobuf:"bytes,6,rep,name=topics,proto3" json:"topics,omitempty"`
 	StarterCode      string                 `protobuf:"bytes,7,opt,name=starter_code,json=starterCode,proto3" json:"starter_code,omitempty"`
-	Language         string                 `protobuf:"bytes,8,opt,name=language,proto3" json:"language,omitempty"`
+	Language         ProgrammingLanguage    `protobuf:"varint,8,opt,name=language,proto3,enum=code_editor.v1.ProgrammingLanguage" json:"language,omitempty"`
 	IsActive         bool                   `protobuf:"varint,9,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
 	PublicTestCases  []*TaskTestCase        `protobuf:"bytes,10,rep,name=public_test_cases,json=publicTestCases,proto3" json:"public_test_cases,omitempty"`
 	HiddenTestCases  []*TaskTestCase        `protobuf:"bytes,11,rep,name=hidden_test_cases,json=hiddenTestCases,proto3" json:"hidden_test_cases,omitempty"`
 	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt        *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	TaskType         string                 `protobuf:"bytes,14,opt,name=task_type,json=taskType,proto3" json:"task_type,omitempty"`
-	ExecutionProfile string                 `protobuf:"bytes,15,opt,name=execution_profile,json=executionProfile,proto3" json:"execution_profile,omitempty"`
+	TaskType         TaskType               `protobuf:"varint,14,opt,name=task_type,json=taskType,proto3,enum=code_editor.v1.TaskType" json:"task_type,omitempty"` // semantic task kind for authoring/UI
+	ExecutionProfile string                 `protobuf:"bytes,15,opt,name=execution_profile,json=executionProfile,proto3" json:"execution_profile,omitempty"`       // runtime sandbox profile: pure/file_io/http_client/interview_realistic
 	FixtureFiles     []string               `protobuf:"bytes,16,rep,name=fixture_files,json=fixtureFiles,proto3" json:"fixture_files,omitempty"`
 	ReadablePaths    []string               `protobuf:"bytes,17,rep,name=readable_paths,json=readablePaths,proto3" json:"readable_paths,omitempty"`
 	WritablePaths    []string               `protobuf:"bytes,18,rep,name=writable_paths,json=writablePaths,proto3" json:"writable_paths,omitempty"`
@@ -1304,6 +1472,7 @@ type Task struct {
 	AllowedPorts     []int32                `protobuf:"varint,20,rep,packed,name=allowed_ports,json=allowedPorts,proto3" json:"allowed_ports,omitempty"`
 	MockEndpoints    []string               `protobuf:"bytes,21,rep,name=mock_endpoints,json=mockEndpoints,proto3" json:"mock_endpoints,omitempty"`
 	WritableTempDir  bool                   `protobuf:"varint,22,opt,name=writable_temp_dir,json=writableTempDir,proto3" json:"writable_temp_dir,omitempty"`
+	RunnerMode       string                 `protobuf:"bytes,23,opt,name=runner_mode,json=runnerMode,proto3" json:"runner_mode,omitempty"` // program or function_io
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -1366,11 +1535,11 @@ func (x *Task) GetStatement() string {
 	return ""
 }
 
-func (x *Task) GetDifficulty() string {
+func (x *Task) GetDifficulty() TaskDifficulty {
 	if x != nil {
 		return x.Difficulty
 	}
-	return ""
+	return TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED
 }
 
 func (x *Task) GetTopics() []string {
@@ -1387,11 +1556,11 @@ func (x *Task) GetStarterCode() string {
 	return ""
 }
 
-func (x *Task) GetLanguage() string {
+func (x *Task) GetLanguage() ProgrammingLanguage {
 	if x != nil {
 		return x.Language
 	}
-	return ""
+	return ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED
 }
 
 func (x *Task) GetIsActive() bool {
@@ -1429,11 +1598,11 @@ func (x *Task) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *Task) GetTaskType() string {
+func (x *Task) GetTaskType() TaskType {
 	if x != nil {
 		return x.TaskType
 	}
-	return ""
+	return TaskType_TASK_TYPE_UNSPECIFIED
 }
 
 func (x *Task) GetExecutionProfile() string {
@@ -1492,10 +1661,17 @@ func (x *Task) GetWritableTempDir() bool {
 	return false
 }
 
+func (x *Task) GetRunnerMode() string {
+	if x != nil {
+		return x.RunnerMode
+	}
+	return ""
+}
+
 type ListTasksRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Topic           string                 `protobuf:"bytes,1,opt,name=topic,proto3" json:"topic,omitempty"`
-	Difficulty      string                 `protobuf:"bytes,2,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
+	Difficulty      TaskDifficulty         `protobuf:"varint,2,opt,name=difficulty,proto3,enum=code_editor.v1.TaskDifficulty" json:"difficulty,omitempty"`
 	IncludeInactive bool                   `protobuf:"varint,3,opt,name=include_inactive,json=includeInactive,proto3" json:"include_inactive,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
@@ -1538,11 +1714,11 @@ func (x *ListTasksRequest) GetTopic() string {
 	return ""
 }
 
-func (x *ListTasksRequest) GetDifficulty() string {
+func (x *ListTasksRequest) GetDifficulty() TaskDifficulty {
 	if x != nil {
 		return x.Difficulty
 	}
-	return ""
+	return TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED
 }
 
 func (x *ListTasksRequest) GetIncludeInactive() bool {
@@ -1601,15 +1777,15 @@ type CreateTaskRequest struct {
 	Title            string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Slug             string                 `protobuf:"bytes,2,opt,name=slug,proto3" json:"slug,omitempty"`
 	Statement        string                 `protobuf:"bytes,3,opt,name=statement,proto3" json:"statement,omitempty"`
-	Difficulty       string                 `protobuf:"bytes,4,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
+	Difficulty       TaskDifficulty         `protobuf:"varint,4,opt,name=difficulty,proto3,enum=code_editor.v1.TaskDifficulty" json:"difficulty,omitempty"`
 	Topics           []string               `protobuf:"bytes,5,rep,name=topics,proto3" json:"topics,omitempty"`
 	StarterCode      string                 `protobuf:"bytes,6,opt,name=starter_code,json=starterCode,proto3" json:"starter_code,omitempty"`
-	Language         string                 `protobuf:"bytes,7,opt,name=language,proto3" json:"language,omitempty"`
+	Language         ProgrammingLanguage    `protobuf:"varint,7,opt,name=language,proto3,enum=code_editor.v1.ProgrammingLanguage" json:"language,omitempty"`
 	IsActive         bool                   `protobuf:"varint,8,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
 	PublicTestCases  []*TaskTestCase        `protobuf:"bytes,9,rep,name=public_test_cases,json=publicTestCases,proto3" json:"public_test_cases,omitempty"`
 	HiddenTestCases  []*TaskTestCase        `protobuf:"bytes,10,rep,name=hidden_test_cases,json=hiddenTestCases,proto3" json:"hidden_test_cases,omitempty"`
-	TaskType         string                 `protobuf:"bytes,11,opt,name=task_type,json=taskType,proto3" json:"task_type,omitempty"`
-	ExecutionProfile string                 `protobuf:"bytes,12,opt,name=execution_profile,json=executionProfile,proto3" json:"execution_profile,omitempty"`
+	TaskType         TaskType               `protobuf:"varint,11,opt,name=task_type,json=taskType,proto3,enum=code_editor.v1.TaskType" json:"task_type,omitempty"` // semantic task kind for authoring/UI
+	ExecutionProfile string                 `protobuf:"bytes,12,opt,name=execution_profile,json=executionProfile,proto3" json:"execution_profile,omitempty"`       // runtime sandbox profile
 	FixtureFiles     []string               `protobuf:"bytes,13,rep,name=fixture_files,json=fixtureFiles,proto3" json:"fixture_files,omitempty"`
 	ReadablePaths    []string               `protobuf:"bytes,14,rep,name=readable_paths,json=readablePaths,proto3" json:"readable_paths,omitempty"`
 	WritablePaths    []string               `protobuf:"bytes,15,rep,name=writable_paths,json=writablePaths,proto3" json:"writable_paths,omitempty"`
@@ -1617,6 +1793,7 @@ type CreateTaskRequest struct {
 	AllowedPorts     []int32                `protobuf:"varint,17,rep,packed,name=allowed_ports,json=allowedPorts,proto3" json:"allowed_ports,omitempty"`
 	MockEndpoints    []string               `protobuf:"bytes,18,rep,name=mock_endpoints,json=mockEndpoints,proto3" json:"mock_endpoints,omitempty"`
 	WritableTempDir  bool                   `protobuf:"varint,19,opt,name=writable_temp_dir,json=writableTempDir,proto3" json:"writable_temp_dir,omitempty"`
+	RunnerMode       string                 `protobuf:"bytes,20,opt,name=runner_mode,json=runnerMode,proto3" json:"runner_mode,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -1672,11 +1849,11 @@ func (x *CreateTaskRequest) GetStatement() string {
 	return ""
 }
 
-func (x *CreateTaskRequest) GetDifficulty() string {
+func (x *CreateTaskRequest) GetDifficulty() TaskDifficulty {
 	if x != nil {
 		return x.Difficulty
 	}
-	return ""
+	return TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED
 }
 
 func (x *CreateTaskRequest) GetTopics() []string {
@@ -1693,11 +1870,11 @@ func (x *CreateTaskRequest) GetStarterCode() string {
 	return ""
 }
 
-func (x *CreateTaskRequest) GetLanguage() string {
+func (x *CreateTaskRequest) GetLanguage() ProgrammingLanguage {
 	if x != nil {
 		return x.Language
 	}
-	return ""
+	return ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED
 }
 
 func (x *CreateTaskRequest) GetIsActive() bool {
@@ -1721,11 +1898,11 @@ func (x *CreateTaskRequest) GetHiddenTestCases() []*TaskTestCase {
 	return nil
 }
 
-func (x *CreateTaskRequest) GetTaskType() string {
+func (x *CreateTaskRequest) GetTaskType() TaskType {
 	if x != nil {
 		return x.TaskType
 	}
-	return ""
+	return TaskType_TASK_TYPE_UNSPECIFIED
 }
 
 func (x *CreateTaskRequest) GetExecutionProfile() string {
@@ -1784,21 +1961,28 @@ func (x *CreateTaskRequest) GetWritableTempDir() bool {
 	return false
 }
 
+func (x *CreateTaskRequest) GetRunnerMode() string {
+	if x != nil {
+		return x.RunnerMode
+	}
+	return ""
+}
+
 type UpdateTaskRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	TaskId           string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
 	Title            string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
 	Slug             string                 `protobuf:"bytes,3,opt,name=slug,proto3" json:"slug,omitempty"`
 	Statement        string                 `protobuf:"bytes,4,opt,name=statement,proto3" json:"statement,omitempty"`
-	Difficulty       string                 `protobuf:"bytes,5,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
+	Difficulty       TaskDifficulty         `protobuf:"varint,5,opt,name=difficulty,proto3,enum=code_editor.v1.TaskDifficulty" json:"difficulty,omitempty"`
 	Topics           []string               `protobuf:"bytes,6,rep,name=topics,proto3" json:"topics,omitempty"`
 	StarterCode      string                 `protobuf:"bytes,7,opt,name=starter_code,json=starterCode,proto3" json:"starter_code,omitempty"`
-	Language         string                 `protobuf:"bytes,8,opt,name=language,proto3" json:"language,omitempty"`
+	Language         ProgrammingLanguage    `protobuf:"varint,8,opt,name=language,proto3,enum=code_editor.v1.ProgrammingLanguage" json:"language,omitempty"`
 	IsActive         bool                   `protobuf:"varint,9,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
 	PublicTestCases  []*TaskTestCase        `protobuf:"bytes,10,rep,name=public_test_cases,json=publicTestCases,proto3" json:"public_test_cases,omitempty"`
 	HiddenTestCases  []*TaskTestCase        `protobuf:"bytes,11,rep,name=hidden_test_cases,json=hiddenTestCases,proto3" json:"hidden_test_cases,omitempty"`
-	TaskType         string                 `protobuf:"bytes,12,opt,name=task_type,json=taskType,proto3" json:"task_type,omitempty"`
-	ExecutionProfile string                 `protobuf:"bytes,13,opt,name=execution_profile,json=executionProfile,proto3" json:"execution_profile,omitempty"`
+	TaskType         TaskType               `protobuf:"varint,12,opt,name=task_type,json=taskType,proto3,enum=code_editor.v1.TaskType" json:"task_type,omitempty"` // semantic task kind for authoring/UI
+	ExecutionProfile string                 `protobuf:"bytes,13,opt,name=execution_profile,json=executionProfile,proto3" json:"execution_profile,omitempty"`       // runtime sandbox profile
 	FixtureFiles     []string               `protobuf:"bytes,14,rep,name=fixture_files,json=fixtureFiles,proto3" json:"fixture_files,omitempty"`
 	ReadablePaths    []string               `protobuf:"bytes,15,rep,name=readable_paths,json=readablePaths,proto3" json:"readable_paths,omitempty"`
 	WritablePaths    []string               `protobuf:"bytes,16,rep,name=writable_paths,json=writablePaths,proto3" json:"writable_paths,omitempty"`
@@ -1806,6 +1990,7 @@ type UpdateTaskRequest struct {
 	AllowedPorts     []int32                `protobuf:"varint,18,rep,packed,name=allowed_ports,json=allowedPorts,proto3" json:"allowed_ports,omitempty"`
 	MockEndpoints    []string               `protobuf:"bytes,19,rep,name=mock_endpoints,json=mockEndpoints,proto3" json:"mock_endpoints,omitempty"`
 	WritableTempDir  bool                   `protobuf:"varint,20,opt,name=writable_temp_dir,json=writableTempDir,proto3" json:"writable_temp_dir,omitempty"`
+	RunnerMode       string                 `protobuf:"bytes,21,opt,name=runner_mode,json=runnerMode,proto3" json:"runner_mode,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -1868,11 +2053,11 @@ func (x *UpdateTaskRequest) GetStatement() string {
 	return ""
 }
 
-func (x *UpdateTaskRequest) GetDifficulty() string {
+func (x *UpdateTaskRequest) GetDifficulty() TaskDifficulty {
 	if x != nil {
 		return x.Difficulty
 	}
-	return ""
+	return TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED
 }
 
 func (x *UpdateTaskRequest) GetTopics() []string {
@@ -1889,11 +2074,11 @@ func (x *UpdateTaskRequest) GetStarterCode() string {
 	return ""
 }
 
-func (x *UpdateTaskRequest) GetLanguage() string {
+func (x *UpdateTaskRequest) GetLanguage() ProgrammingLanguage {
 	if x != nil {
 		return x.Language
 	}
-	return ""
+	return ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED
 }
 
 func (x *UpdateTaskRequest) GetIsActive() bool {
@@ -1917,11 +2102,11 @@ func (x *UpdateTaskRequest) GetHiddenTestCases() []*TaskTestCase {
 	return nil
 }
 
-func (x *UpdateTaskRequest) GetTaskType() string {
+func (x *UpdateTaskRequest) GetTaskType() TaskType {
 	if x != nil {
 		return x.TaskType
 	}
-	return ""
+	return TaskType_TASK_TYPE_UNSPECIFIED
 }
 
 func (x *UpdateTaskRequest) GetExecutionProfile() string {
@@ -1978,6 +2163,13 @@ func (x *UpdateTaskRequest) GetWritableTempDir() bool {
 		return x.WritableTempDir
 	}
 	return false
+}
+
+func (x *UpdateTaskRequest) GetRunnerMode() string {
+	if x != nil {
+		return x.RunnerMode
+	}
+	return ""
 }
 
 type TaskResponse struct {
@@ -2288,14 +2480,14 @@ var File_code_editor_v1_code_editor_proto protoreflect.FileDescriptor
 
 const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\n" +
-	" code_editor/v1/code_editor.proto\x12\x0ecode_editor.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x9f\x01\n" +
+	" code_editor/v1/code_editor.proto\x12\x0ecode_editor.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbf\x01\n" +
 	"\x11CreateRoomRequest\x12,\n" +
 	"\x04mode\x18\x01 \x01(\x0e2\x18.code_editor.v1.RoomModeR\x04mode\x12\x12\n" +
 	"\x04task\x18\x02 \x01(\tR\x04task\x12\x12\n" +
 	"\x04name\x18\x03 \x01(\tR\x04name\x12\x14\n" +
-	"\x05topic\x18\x04 \x01(\tR\x05topic\x12\x1e\n" +
+	"\x05topic\x18\x04 \x01(\tR\x05topic\x12>\n" +
 	"\n" +
-	"difficulty\x18\x05 \x01(\tR\n" +
+	"difficulty\x18\x05 \x01(\x0e2\x1e.code_editor.v1.TaskDifficultyR\n" +
 	"difficulty\"_\n" +
 	"\x12CreateRoomResponse\x12(\n" +
 	"\x04room\x18\x01 \x01(\v2\x14.code_editor.v1.RoomR\x04room\x12\x1f\n" +
@@ -2380,18 +2572,18 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x0fexpected_output\x18\x03 \x01(\tR\x0eexpectedOutput\x12\x1b\n" +
 	"\tis_public\x18\x04 \x01(\bR\bisPublic\x12\x16\n" +
 	"\x06weight\x18\x05 \x01(\x05R\x06weight\x12\x14\n" +
-	"\x05order\x18\x06 \x01(\x05R\x05order\"\xd6\x06\n" +
+	"\x05order\x18\x06 \x01(\x05R\x05order\"\xd6\a\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x12\n" +
 	"\x04slug\x18\x03 \x01(\tR\x04slug\x12\x1c\n" +
-	"\tstatement\x18\x04 \x01(\tR\tstatement\x12\x1e\n" +
+	"\tstatement\x18\x04 \x01(\tR\tstatement\x12>\n" +
 	"\n" +
-	"difficulty\x18\x05 \x01(\tR\n" +
+	"difficulty\x18\x05 \x01(\x0e2\x1e.code_editor.v1.TaskDifficultyR\n" +
 	"difficulty\x12\x16\n" +
 	"\x06topics\x18\x06 \x03(\tR\x06topics\x12!\n" +
-	"\fstarter_code\x18\a \x01(\tR\vstarterCode\x12\x1a\n" +
-	"\blanguage\x18\b \x01(\tR\blanguage\x12\x1b\n" +
+	"\fstarter_code\x18\a \x01(\tR\vstarterCode\x12?\n" +
+	"\blanguage\x18\b \x01(\x0e2#.code_editor.v1.ProgrammingLanguageR\blanguage\x12\x1b\n" +
 	"\tis_active\x18\t \x01(\bR\bisActive\x12H\n" +
 	"\x11public_test_cases\x18\n" +
 	" \x03(\v2\x1c.code_editor.v1.TaskTestCaseR\x0fpublicTestCases\x12H\n" +
@@ -2399,8 +2591,8 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x1b\n" +
-	"\ttask_type\x18\x0e \x01(\tR\btaskType\x12+\n" +
+	"updated_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x125\n" +
+	"\ttask_type\x18\x0e \x01(\x0e2\x18.code_editor.v1.TaskTypeR\btaskType\x12+\n" +
 	"\x11execution_profile\x18\x0f \x01(\tR\x10executionProfile\x12#\n" +
 	"\rfixture_files\x18\x10 \x03(\tR\ffixtureFiles\x12%\n" +
 	"\x0ereadable_paths\x18\x11 \x03(\tR\rreadablePaths\x12%\n" +
@@ -2408,30 +2600,32 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\rallowed_hosts\x18\x13 \x03(\tR\fallowedHosts\x12#\n" +
 	"\rallowed_ports\x18\x14 \x03(\x05R\fallowedPorts\x12%\n" +
 	"\x0emock_endpoints\x18\x15 \x03(\tR\rmockEndpoints\x12*\n" +
-	"\x11writable_temp_dir\x18\x16 \x01(\bR\x0fwritableTempDir\"s\n" +
+	"\x11writable_temp_dir\x18\x16 \x01(\bR\x0fwritableTempDir\x12\x1f\n" +
+	"\vrunner_mode\x18\x17 \x01(\tR\n" +
+	"runnerMode\"\x93\x01\n" +
 	"\x10ListTasksRequest\x12\x14\n" +
-	"\x05topic\x18\x01 \x01(\tR\x05topic\x12\x1e\n" +
+	"\x05topic\x18\x01 \x01(\tR\x05topic\x12>\n" +
 	"\n" +
-	"difficulty\x18\x02 \x01(\tR\n" +
+	"difficulty\x18\x02 \x01(\x0e2\x1e.code_editor.v1.TaskDifficultyR\n" +
 	"difficulty\x12)\n" +
 	"\x10include_inactive\x18\x03 \x01(\bR\x0fincludeInactive\"?\n" +
 	"\x11ListTasksResponse\x12*\n" +
-	"\x05tasks\x18\x01 \x03(\v2\x14.code_editor.v1.TaskR\x05tasks\"\xdd\x05\n" +
+	"\x05tasks\x18\x01 \x03(\v2\x14.code_editor.v1.TaskR\x05tasks\"\xdd\x06\n" +
 	"\x11CreateTaskRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x12\n" +
 	"\x04slug\x18\x02 \x01(\tR\x04slug\x12\x1c\n" +
-	"\tstatement\x18\x03 \x01(\tR\tstatement\x12\x1e\n" +
+	"\tstatement\x18\x03 \x01(\tR\tstatement\x12>\n" +
 	"\n" +
-	"difficulty\x18\x04 \x01(\tR\n" +
+	"difficulty\x18\x04 \x01(\x0e2\x1e.code_editor.v1.TaskDifficultyR\n" +
 	"difficulty\x12\x16\n" +
 	"\x06topics\x18\x05 \x03(\tR\x06topics\x12!\n" +
-	"\fstarter_code\x18\x06 \x01(\tR\vstarterCode\x12\x1a\n" +
-	"\blanguage\x18\a \x01(\tR\blanguage\x12\x1b\n" +
+	"\fstarter_code\x18\x06 \x01(\tR\vstarterCode\x12?\n" +
+	"\blanguage\x18\a \x01(\x0e2#.code_editor.v1.ProgrammingLanguageR\blanguage\x12\x1b\n" +
 	"\tis_active\x18\b \x01(\bR\bisActive\x12H\n" +
 	"\x11public_test_cases\x18\t \x03(\v2\x1c.code_editor.v1.TaskTestCaseR\x0fpublicTestCases\x12H\n" +
 	"\x11hidden_test_cases\x18\n" +
-	" \x03(\v2\x1c.code_editor.v1.TaskTestCaseR\x0fhiddenTestCases\x12\x1b\n" +
-	"\ttask_type\x18\v \x01(\tR\btaskType\x12+\n" +
+	" \x03(\v2\x1c.code_editor.v1.TaskTestCaseR\x0fhiddenTestCases\x125\n" +
+	"\ttask_type\x18\v \x01(\x0e2\x18.code_editor.v1.TaskTypeR\btaskType\x12+\n" +
 	"\x11execution_profile\x18\f \x01(\tR\x10executionProfile\x12#\n" +
 	"\rfixture_files\x18\r \x03(\tR\ffixtureFiles\x12%\n" +
 	"\x0ereadable_paths\x18\x0e \x03(\tR\rreadablePaths\x12%\n" +
@@ -2439,23 +2633,25 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\rallowed_hosts\x18\x10 \x03(\tR\fallowedHosts\x12#\n" +
 	"\rallowed_ports\x18\x11 \x03(\x05R\fallowedPorts\x12%\n" +
 	"\x0emock_endpoints\x18\x12 \x03(\tR\rmockEndpoints\x12*\n" +
-	"\x11writable_temp_dir\x18\x13 \x01(\bR\x0fwritableTempDir\"\xf6\x05\n" +
+	"\x11writable_temp_dir\x18\x13 \x01(\bR\x0fwritableTempDir\x12\x1f\n" +
+	"\vrunner_mode\x18\x14 \x01(\tR\n" +
+	"runnerMode\"\xf6\x06\n" +
 	"\x11UpdateTaskRequest\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x12\n" +
 	"\x04slug\x18\x03 \x01(\tR\x04slug\x12\x1c\n" +
-	"\tstatement\x18\x04 \x01(\tR\tstatement\x12\x1e\n" +
+	"\tstatement\x18\x04 \x01(\tR\tstatement\x12>\n" +
 	"\n" +
-	"difficulty\x18\x05 \x01(\tR\n" +
+	"difficulty\x18\x05 \x01(\x0e2\x1e.code_editor.v1.TaskDifficultyR\n" +
 	"difficulty\x12\x16\n" +
 	"\x06topics\x18\x06 \x03(\tR\x06topics\x12!\n" +
-	"\fstarter_code\x18\a \x01(\tR\vstarterCode\x12\x1a\n" +
-	"\blanguage\x18\b \x01(\tR\blanguage\x12\x1b\n" +
+	"\fstarter_code\x18\a \x01(\tR\vstarterCode\x12?\n" +
+	"\blanguage\x18\b \x01(\x0e2#.code_editor.v1.ProgrammingLanguageR\blanguage\x12\x1b\n" +
 	"\tis_active\x18\t \x01(\bR\bisActive\x12H\n" +
 	"\x11public_test_cases\x18\n" +
 	" \x03(\v2\x1c.code_editor.v1.TaskTestCaseR\x0fpublicTestCases\x12H\n" +
-	"\x11hidden_test_cases\x18\v \x03(\v2\x1c.code_editor.v1.TaskTestCaseR\x0fhiddenTestCases\x12\x1b\n" +
-	"\ttask_type\x18\f \x01(\tR\btaskType\x12+\n" +
+	"\x11hidden_test_cases\x18\v \x03(\v2\x1c.code_editor.v1.TaskTestCaseR\x0fhiddenTestCases\x125\n" +
+	"\ttask_type\x18\f \x01(\x0e2\x18.code_editor.v1.TaskTypeR\btaskType\x12+\n" +
 	"\x11execution_profile\x18\r \x01(\tR\x10executionProfile\x12#\n" +
 	"\rfixture_files\x18\x0e \x03(\tR\ffixtureFiles\x12%\n" +
 	"\x0ereadable_paths\x18\x0f \x03(\tR\rreadablePaths\x12%\n" +
@@ -2463,7 +2659,9 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\rallowed_hosts\x18\x11 \x03(\tR\fallowedHosts\x12#\n" +
 	"\rallowed_ports\x18\x12 \x03(\x05R\fallowedPorts\x12%\n" +
 	"\x0emock_endpoints\x18\x13 \x03(\tR\rmockEndpoints\x12*\n" +
-	"\x11writable_temp_dir\x18\x14 \x01(\bR\x0fwritableTempDir\"8\n" +
+	"\x11writable_temp_dir\x18\x14 \x01(\bR\x0fwritableTempDir\x12\x1f\n" +
+	"\vrunner_mode\x18\x15 \x01(\tR\n" +
+	"runnerMode\"8\n" +
 	"\fTaskResponse\x12(\n" +
 	"\x04task\x18\x01 \x01(\v2\x14.code_editor.v1.TaskR\x04task\",\n" +
 	"\x11DeleteTaskRequest\x12\x17\n" +
@@ -2490,7 +2688,26 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x17ROOM_STATUS_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13ROOM_STATUS_WAITING\x10\x01\x12\x16\n" +
 	"\x12ROOM_STATUS_ACTIVE\x10\x02\x12\x18\n" +
-	"\x14ROOM_STATUS_FINISHED\x10\x032\xd1\r\n" +
+	"\x14ROOM_STATUS_FINISHED\x10\x03*\x81\x01\n" +
+	"\x0eTaskDifficulty\x12\x1f\n" +
+	"\x1bTASK_DIFFICULTY_UNSPECIFIED\x10\x00\x12\x18\n" +
+	"\x14TASK_DIFFICULTY_EASY\x10\x01\x12\x1a\n" +
+	"\x16TASK_DIFFICULTY_MEDIUM\x10\x02\x12\x18\n" +
+	"\x14TASK_DIFFICULTY_HARD\x10\x03*\x9f\x02\n" +
+	"\x13ProgrammingLanguage\x12$\n" +
+	" PROGRAMMING_LANGUAGE_UNSPECIFIED\x10\x00\x12#\n" +
+	"\x1fPROGRAMMING_LANGUAGE_JAVASCRIPT\x10\x01\x12#\n" +
+	"\x1fPROGRAMMING_LANGUAGE_TYPESCRIPT\x10\x02\x12\x1f\n" +
+	"\x1bPROGRAMMING_LANGUAGE_PYTHON\x10\x03\x12\x1b\n" +
+	"\x17PROGRAMMING_LANGUAGE_GO\x10\x04\x12\x1d\n" +
+	"\x19PROGRAMMING_LANGUAGE_RUST\x10\x05\x12\x1c\n" +
+	"\x18PROGRAMMING_LANGUAGE_CPP\x10\x06\x12\x1d\n" +
+	"\x19PROGRAMMING_LANGUAGE_JAVA\x10\a*r\n" +
+	"\bTaskType\x12\x19\n" +
+	"\x15TASK_TYPE_UNSPECIFIED\x10\x00\x12\x17\n" +
+	"\x13TASK_TYPE_ALGORITHM\x10\x01\x12\x17\n" +
+	"\x13TASK_TYPE_DEBUGGING\x10\x02\x12\x19\n" +
+	"\x15TASK_TYPE_REFACTORING\x10\x032\xd1\r\n" +
 	"\x11CodeEditorService\x12y\n" +
 	"\n" +
 	"CreateRoom\x12!.code_editor.v1.CreateRoomRequest\x1a\".code_editor.v1.CreateRoomResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/code-editor/rooms\x12w\n" +
@@ -2523,97 +2740,111 @@ func file_code_editor_v1_code_editor_proto_rawDescGZIP() []byte {
 	return file_code_editor_v1_code_editor_proto_rawDescData
 }
 
-var file_code_editor_v1_code_editor_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_code_editor_v1_code_editor_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
 var file_code_editor_v1_code_editor_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
 var file_code_editor_v1_code_editor_proto_goTypes = []any{
 	(RoomMode)(0),                       // 0: code_editor.v1.RoomMode
 	(RoomStatus)(0),                     // 1: code_editor.v1.RoomStatus
-	(*CreateRoomRequest)(nil),           // 2: code_editor.v1.CreateRoomRequest
-	(*CreateRoomResponse)(nil),          // 3: code_editor.v1.CreateRoomResponse
-	(*GetRoomRequest)(nil),              // 4: code_editor.v1.GetRoomRequest
-	(*GetRoomResponse)(nil),             // 5: code_editor.v1.GetRoomResponse
-	(*JoinRoomRequest)(nil),             // 6: code_editor.v1.JoinRoomRequest
-	(*JoinRoomByInviteCodeRequest)(nil), // 7: code_editor.v1.JoinRoomByInviteCodeRequest
-	(*JoinRoomResponse)(nil),            // 8: code_editor.v1.JoinRoomResponse
-	(*LeaveRoomRequest)(nil),            // 9: code_editor.v1.LeaveRoomRequest
-	(*LeaveRoomResponse)(nil),           // 10: code_editor.v1.LeaveRoomResponse
-	(*SubmitCodeRequest)(nil),           // 11: code_editor.v1.SubmitCodeRequest
-	(*SubmitCodeResponse)(nil),          // 12: code_editor.v1.SubmitCodeResponse
-	(*SetReadyRequest)(nil),             // 13: code_editor.v1.SetReadyRequest
-	(*SetReadyResponse)(nil),            // 14: code_editor.v1.SetReadyResponse
-	(*GetSubmissionsRequest)(nil),       // 15: code_editor.v1.GetSubmissionsRequest
-	(*GetSubmissionsResponse)(nil),      // 16: code_editor.v1.GetSubmissionsResponse
-	(*Room)(nil),                        // 17: code_editor.v1.Room
-	(*Participant)(nil),                 // 18: code_editor.v1.Participant
-	(*Submission)(nil),                  // 19: code_editor.v1.Submission
-	(*TaskTestCase)(nil),                // 20: code_editor.v1.TaskTestCase
-	(*Task)(nil),                        // 21: code_editor.v1.Task
-	(*ListTasksRequest)(nil),            // 22: code_editor.v1.ListTasksRequest
-	(*ListTasksResponse)(nil),           // 23: code_editor.v1.ListTasksResponse
-	(*CreateTaskRequest)(nil),           // 24: code_editor.v1.CreateTaskRequest
-	(*UpdateTaskRequest)(nil),           // 25: code_editor.v1.UpdateTaskRequest
-	(*TaskResponse)(nil),                // 26: code_editor.v1.TaskResponse
-	(*DeleteTaskRequest)(nil),           // 27: code_editor.v1.DeleteTaskRequest
-	(*DeleteTaskResponse)(nil),          // 28: code_editor.v1.DeleteTaskResponse
-	(*GetLeaderboardRequest)(nil),       // 29: code_editor.v1.GetLeaderboardRequest
-	(*LeaderboardEntry)(nil),            // 30: code_editor.v1.LeaderboardEntry
-	(*GetLeaderboardResponse)(nil),      // 31: code_editor.v1.GetLeaderboardResponse
-	(*timestamppb.Timestamp)(nil),       // 32: google.protobuf.Timestamp
+	(TaskDifficulty)(0),                 // 2: code_editor.v1.TaskDifficulty
+	(ProgrammingLanguage)(0),            // 3: code_editor.v1.ProgrammingLanguage
+	(TaskType)(0),                       // 4: code_editor.v1.TaskType
+	(*CreateRoomRequest)(nil),           // 5: code_editor.v1.CreateRoomRequest
+	(*CreateRoomResponse)(nil),          // 6: code_editor.v1.CreateRoomResponse
+	(*GetRoomRequest)(nil),              // 7: code_editor.v1.GetRoomRequest
+	(*GetRoomResponse)(nil),             // 8: code_editor.v1.GetRoomResponse
+	(*JoinRoomRequest)(nil),             // 9: code_editor.v1.JoinRoomRequest
+	(*JoinRoomByInviteCodeRequest)(nil), // 10: code_editor.v1.JoinRoomByInviteCodeRequest
+	(*JoinRoomResponse)(nil),            // 11: code_editor.v1.JoinRoomResponse
+	(*LeaveRoomRequest)(nil),            // 12: code_editor.v1.LeaveRoomRequest
+	(*LeaveRoomResponse)(nil),           // 13: code_editor.v1.LeaveRoomResponse
+	(*SubmitCodeRequest)(nil),           // 14: code_editor.v1.SubmitCodeRequest
+	(*SubmitCodeResponse)(nil),          // 15: code_editor.v1.SubmitCodeResponse
+	(*SetReadyRequest)(nil),             // 16: code_editor.v1.SetReadyRequest
+	(*SetReadyResponse)(nil),            // 17: code_editor.v1.SetReadyResponse
+	(*GetSubmissionsRequest)(nil),       // 18: code_editor.v1.GetSubmissionsRequest
+	(*GetSubmissionsResponse)(nil),      // 19: code_editor.v1.GetSubmissionsResponse
+	(*Room)(nil),                        // 20: code_editor.v1.Room
+	(*Participant)(nil),                 // 21: code_editor.v1.Participant
+	(*Submission)(nil),                  // 22: code_editor.v1.Submission
+	(*TaskTestCase)(nil),                // 23: code_editor.v1.TaskTestCase
+	(*Task)(nil),                        // 24: code_editor.v1.Task
+	(*ListTasksRequest)(nil),            // 25: code_editor.v1.ListTasksRequest
+	(*ListTasksResponse)(nil),           // 26: code_editor.v1.ListTasksResponse
+	(*CreateTaskRequest)(nil),           // 27: code_editor.v1.CreateTaskRequest
+	(*UpdateTaskRequest)(nil),           // 28: code_editor.v1.UpdateTaskRequest
+	(*TaskResponse)(nil),                // 29: code_editor.v1.TaskResponse
+	(*DeleteTaskRequest)(nil),           // 30: code_editor.v1.DeleteTaskRequest
+	(*DeleteTaskResponse)(nil),          // 31: code_editor.v1.DeleteTaskResponse
+	(*GetLeaderboardRequest)(nil),       // 32: code_editor.v1.GetLeaderboardRequest
+	(*LeaderboardEntry)(nil),            // 33: code_editor.v1.LeaderboardEntry
+	(*GetLeaderboardResponse)(nil),      // 34: code_editor.v1.GetLeaderboardResponse
+	(*timestamppb.Timestamp)(nil),       // 35: google.protobuf.Timestamp
 }
 var file_code_editor_v1_code_editor_proto_depIdxs = []int32{
 	0,  // 0: code_editor.v1.CreateRoomRequest.mode:type_name -> code_editor.v1.RoomMode
-	17, // 1: code_editor.v1.CreateRoomResponse.room:type_name -> code_editor.v1.Room
-	17, // 2: code_editor.v1.GetRoomResponse.room:type_name -> code_editor.v1.Room
-	17, // 3: code_editor.v1.JoinRoomResponse.room:type_name -> code_editor.v1.Room
-	19, // 4: code_editor.v1.GetSubmissionsResponse.submissions:type_name -> code_editor.v1.Submission
-	0,  // 5: code_editor.v1.Room.mode:type_name -> code_editor.v1.RoomMode
-	1,  // 6: code_editor.v1.Room.status:type_name -> code_editor.v1.RoomStatus
-	32, // 7: code_editor.v1.Room.created_at:type_name -> google.protobuf.Timestamp
-	18, // 8: code_editor.v1.Room.participants:type_name -> code_editor.v1.Participant
-	32, // 9: code_editor.v1.Participant.joined_at:type_name -> google.protobuf.Timestamp
-	32, // 10: code_editor.v1.Submission.submitted_at:type_name -> google.protobuf.Timestamp
-	20, // 11: code_editor.v1.Task.public_test_cases:type_name -> code_editor.v1.TaskTestCase
-	20, // 12: code_editor.v1.Task.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
-	32, // 13: code_editor.v1.Task.created_at:type_name -> google.protobuf.Timestamp
-	32, // 14: code_editor.v1.Task.updated_at:type_name -> google.protobuf.Timestamp
-	21, // 15: code_editor.v1.ListTasksResponse.tasks:type_name -> code_editor.v1.Task
-	20, // 16: code_editor.v1.CreateTaskRequest.public_test_cases:type_name -> code_editor.v1.TaskTestCase
-	20, // 17: code_editor.v1.CreateTaskRequest.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
-	20, // 18: code_editor.v1.UpdateTaskRequest.public_test_cases:type_name -> code_editor.v1.TaskTestCase
-	20, // 19: code_editor.v1.UpdateTaskRequest.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
-	21, // 20: code_editor.v1.TaskResponse.task:type_name -> code_editor.v1.Task
-	30, // 21: code_editor.v1.GetLeaderboardResponse.entries:type_name -> code_editor.v1.LeaderboardEntry
-	2,  // 22: code_editor.v1.CodeEditorService.CreateRoom:input_type -> code_editor.v1.CreateRoomRequest
-	4,  // 23: code_editor.v1.CodeEditorService.GetRoom:input_type -> code_editor.v1.GetRoomRequest
-	6,  // 24: code_editor.v1.CodeEditorService.JoinRoom:input_type -> code_editor.v1.JoinRoomRequest
-	7,  // 25: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:input_type -> code_editor.v1.JoinRoomByInviteCodeRequest
-	9,  // 26: code_editor.v1.CodeEditorService.LeaveRoom:input_type -> code_editor.v1.LeaveRoomRequest
-	11, // 27: code_editor.v1.CodeEditorService.SubmitCode:input_type -> code_editor.v1.SubmitCodeRequest
-	13, // 28: code_editor.v1.CodeEditorService.SetReady:input_type -> code_editor.v1.SetReadyRequest
-	15, // 29: code_editor.v1.CodeEditorService.GetSubmissions:input_type -> code_editor.v1.GetSubmissionsRequest
-	22, // 30: code_editor.v1.CodeEditorService.ListTasks:input_type -> code_editor.v1.ListTasksRequest
-	24, // 31: code_editor.v1.CodeEditorService.CreateTask:input_type -> code_editor.v1.CreateTaskRequest
-	25, // 32: code_editor.v1.CodeEditorService.UpdateTask:input_type -> code_editor.v1.UpdateTaskRequest
-	27, // 33: code_editor.v1.CodeEditorService.DeleteTask:input_type -> code_editor.v1.DeleteTaskRequest
-	29, // 34: code_editor.v1.CodeEditorService.GetLeaderboard:input_type -> code_editor.v1.GetLeaderboardRequest
-	3,  // 35: code_editor.v1.CodeEditorService.CreateRoom:output_type -> code_editor.v1.CreateRoomResponse
-	5,  // 36: code_editor.v1.CodeEditorService.GetRoom:output_type -> code_editor.v1.GetRoomResponse
-	8,  // 37: code_editor.v1.CodeEditorService.JoinRoom:output_type -> code_editor.v1.JoinRoomResponse
-	8,  // 38: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:output_type -> code_editor.v1.JoinRoomResponse
-	10, // 39: code_editor.v1.CodeEditorService.LeaveRoom:output_type -> code_editor.v1.LeaveRoomResponse
-	12, // 40: code_editor.v1.CodeEditorService.SubmitCode:output_type -> code_editor.v1.SubmitCodeResponse
-	14, // 41: code_editor.v1.CodeEditorService.SetReady:output_type -> code_editor.v1.SetReadyResponse
-	16, // 42: code_editor.v1.CodeEditorService.GetSubmissions:output_type -> code_editor.v1.GetSubmissionsResponse
-	23, // 43: code_editor.v1.CodeEditorService.ListTasks:output_type -> code_editor.v1.ListTasksResponse
-	26, // 44: code_editor.v1.CodeEditorService.CreateTask:output_type -> code_editor.v1.TaskResponse
-	26, // 45: code_editor.v1.CodeEditorService.UpdateTask:output_type -> code_editor.v1.TaskResponse
-	28, // 46: code_editor.v1.CodeEditorService.DeleteTask:output_type -> code_editor.v1.DeleteTaskResponse
-	31, // 47: code_editor.v1.CodeEditorService.GetLeaderboard:output_type -> code_editor.v1.GetLeaderboardResponse
-	35, // [35:48] is the sub-list for method output_type
-	22, // [22:35] is the sub-list for method input_type
-	22, // [22:22] is the sub-list for extension type_name
-	22, // [22:22] is the sub-list for extension extendee
-	0,  // [0:22] is the sub-list for field type_name
+	2,  // 1: code_editor.v1.CreateRoomRequest.difficulty:type_name -> code_editor.v1.TaskDifficulty
+	20, // 2: code_editor.v1.CreateRoomResponse.room:type_name -> code_editor.v1.Room
+	20, // 3: code_editor.v1.GetRoomResponse.room:type_name -> code_editor.v1.Room
+	20, // 4: code_editor.v1.JoinRoomResponse.room:type_name -> code_editor.v1.Room
+	22, // 5: code_editor.v1.GetSubmissionsResponse.submissions:type_name -> code_editor.v1.Submission
+	0,  // 6: code_editor.v1.Room.mode:type_name -> code_editor.v1.RoomMode
+	1,  // 7: code_editor.v1.Room.status:type_name -> code_editor.v1.RoomStatus
+	35, // 8: code_editor.v1.Room.created_at:type_name -> google.protobuf.Timestamp
+	21, // 9: code_editor.v1.Room.participants:type_name -> code_editor.v1.Participant
+	35, // 10: code_editor.v1.Participant.joined_at:type_name -> google.protobuf.Timestamp
+	35, // 11: code_editor.v1.Submission.submitted_at:type_name -> google.protobuf.Timestamp
+	2,  // 12: code_editor.v1.Task.difficulty:type_name -> code_editor.v1.TaskDifficulty
+	3,  // 13: code_editor.v1.Task.language:type_name -> code_editor.v1.ProgrammingLanguage
+	23, // 14: code_editor.v1.Task.public_test_cases:type_name -> code_editor.v1.TaskTestCase
+	23, // 15: code_editor.v1.Task.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
+	35, // 16: code_editor.v1.Task.created_at:type_name -> google.protobuf.Timestamp
+	35, // 17: code_editor.v1.Task.updated_at:type_name -> google.protobuf.Timestamp
+	4,  // 18: code_editor.v1.Task.task_type:type_name -> code_editor.v1.TaskType
+	2,  // 19: code_editor.v1.ListTasksRequest.difficulty:type_name -> code_editor.v1.TaskDifficulty
+	24, // 20: code_editor.v1.ListTasksResponse.tasks:type_name -> code_editor.v1.Task
+	2,  // 21: code_editor.v1.CreateTaskRequest.difficulty:type_name -> code_editor.v1.TaskDifficulty
+	3,  // 22: code_editor.v1.CreateTaskRequest.language:type_name -> code_editor.v1.ProgrammingLanguage
+	23, // 23: code_editor.v1.CreateTaskRequest.public_test_cases:type_name -> code_editor.v1.TaskTestCase
+	23, // 24: code_editor.v1.CreateTaskRequest.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
+	4,  // 25: code_editor.v1.CreateTaskRequest.task_type:type_name -> code_editor.v1.TaskType
+	2,  // 26: code_editor.v1.UpdateTaskRequest.difficulty:type_name -> code_editor.v1.TaskDifficulty
+	3,  // 27: code_editor.v1.UpdateTaskRequest.language:type_name -> code_editor.v1.ProgrammingLanguage
+	23, // 28: code_editor.v1.UpdateTaskRequest.public_test_cases:type_name -> code_editor.v1.TaskTestCase
+	23, // 29: code_editor.v1.UpdateTaskRequest.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
+	4,  // 30: code_editor.v1.UpdateTaskRequest.task_type:type_name -> code_editor.v1.TaskType
+	24, // 31: code_editor.v1.TaskResponse.task:type_name -> code_editor.v1.Task
+	33, // 32: code_editor.v1.GetLeaderboardResponse.entries:type_name -> code_editor.v1.LeaderboardEntry
+	5,  // 33: code_editor.v1.CodeEditorService.CreateRoom:input_type -> code_editor.v1.CreateRoomRequest
+	7,  // 34: code_editor.v1.CodeEditorService.GetRoom:input_type -> code_editor.v1.GetRoomRequest
+	9,  // 35: code_editor.v1.CodeEditorService.JoinRoom:input_type -> code_editor.v1.JoinRoomRequest
+	10, // 36: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:input_type -> code_editor.v1.JoinRoomByInviteCodeRequest
+	12, // 37: code_editor.v1.CodeEditorService.LeaveRoom:input_type -> code_editor.v1.LeaveRoomRequest
+	14, // 38: code_editor.v1.CodeEditorService.SubmitCode:input_type -> code_editor.v1.SubmitCodeRequest
+	16, // 39: code_editor.v1.CodeEditorService.SetReady:input_type -> code_editor.v1.SetReadyRequest
+	18, // 40: code_editor.v1.CodeEditorService.GetSubmissions:input_type -> code_editor.v1.GetSubmissionsRequest
+	25, // 41: code_editor.v1.CodeEditorService.ListTasks:input_type -> code_editor.v1.ListTasksRequest
+	27, // 42: code_editor.v1.CodeEditorService.CreateTask:input_type -> code_editor.v1.CreateTaskRequest
+	28, // 43: code_editor.v1.CodeEditorService.UpdateTask:input_type -> code_editor.v1.UpdateTaskRequest
+	30, // 44: code_editor.v1.CodeEditorService.DeleteTask:input_type -> code_editor.v1.DeleteTaskRequest
+	32, // 45: code_editor.v1.CodeEditorService.GetLeaderboard:input_type -> code_editor.v1.GetLeaderboardRequest
+	6,  // 46: code_editor.v1.CodeEditorService.CreateRoom:output_type -> code_editor.v1.CreateRoomResponse
+	8,  // 47: code_editor.v1.CodeEditorService.GetRoom:output_type -> code_editor.v1.GetRoomResponse
+	11, // 48: code_editor.v1.CodeEditorService.JoinRoom:output_type -> code_editor.v1.JoinRoomResponse
+	11, // 49: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:output_type -> code_editor.v1.JoinRoomResponse
+	13, // 50: code_editor.v1.CodeEditorService.LeaveRoom:output_type -> code_editor.v1.LeaveRoomResponse
+	15, // 51: code_editor.v1.CodeEditorService.SubmitCode:output_type -> code_editor.v1.SubmitCodeResponse
+	17, // 52: code_editor.v1.CodeEditorService.SetReady:output_type -> code_editor.v1.SetReadyResponse
+	19, // 53: code_editor.v1.CodeEditorService.GetSubmissions:output_type -> code_editor.v1.GetSubmissionsResponse
+	26, // 54: code_editor.v1.CodeEditorService.ListTasks:output_type -> code_editor.v1.ListTasksResponse
+	29, // 55: code_editor.v1.CodeEditorService.CreateTask:output_type -> code_editor.v1.TaskResponse
+	29, // 56: code_editor.v1.CodeEditorService.UpdateTask:output_type -> code_editor.v1.TaskResponse
+	31, // 57: code_editor.v1.CodeEditorService.DeleteTask:output_type -> code_editor.v1.DeleteTaskResponse
+	34, // 58: code_editor.v1.CodeEditorService.GetLeaderboard:output_type -> code_editor.v1.GetLeaderboardResponse
+	46, // [46:59] is the sub-list for method output_type
+	33, // [33:46] is the sub-list for method input_type
+	33, // [33:33] is the sub-list for extension type_name
+	33, // [33:33] is the sub-list for extension extendee
+	0,  // [0:33] is the sub-list for field type_name
 }
 
 func init() { file_code_editor_v1_code_editor_proto_init() }
@@ -2626,7 +2857,7 @@ func file_code_editor_v1_code_editor_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_code_editor_v1_code_editor_proto_rawDesc), len(file_code_editor_v1_code_editor_proto_rawDesc)),
-			NumEnums:      2,
+			NumEnums:      5,
 			NumMessages:   30,
 			NumExtensions: 0,
 			NumServices:   1,

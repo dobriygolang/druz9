@@ -3,7 +3,7 @@ package code_editor
 import (
 	"context"
 
-	"api/internal/dto"
+	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/code_editor/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -30,7 +30,7 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 	if submission.UserID != nil {
 		submittedBy = submission.UserID.String()
 	}
-	i.realtime.PublishSubmission(roomID.String(), &dto.CodeEditorSubmissionEvent{
+	i.realtime.PublishSubmission(roomID.String(), &realtime.CodeEditorSubmissionEvent{
 		Output:      submission.Output,
 		Error:       submission.Error,
 		ExitCode:    int32(exitCode),

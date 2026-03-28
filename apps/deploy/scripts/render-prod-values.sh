@@ -1,0 +1,283 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
+TARGET_DIR="${ROOT_DIR}/deploy/runtime"
+TARGET_FILE="${TARGET_DIR}/values_prod.yaml"
+
+required_vars=(
+  COOKIE_DOMAIN
+  DATABASE_URL
+  TELEGRAM_BOT_TOKEN
+  S3_BUCKET
+  S3_REGION
+  S3_ENDPOINT
+  S3_PUBLIC_ENDPOINT
+  S3_ACCESS_KEY
+  S3_SECRET_KEY
+)
+
+for var_name in "${required_vars[@]}"; do
+  if [[ -z "${!var_name:-}" ]]; then
+    echo "Missing required env: ${var_name}" >&2
+    exit 1
+  fi
+done
+
+mkdir -p "${TARGET_DIR}"
+
+cat > "${TARGET_FILE}" <<EOF
+server_http_addr:
+  usage: "HTTP server listen address"
+  group: "server"
+  value: ":8080"
+  type: "string"
+  writable: false
+
+server_http_timeout:
+  usage: "HTTP server request timeout"
+  group: "server"
+  value: "10s"
+  type: "duration"
+  writable: false
+
+server_grpc_addr:
+  usage: "gRPC server listen address"
+  group: "server"
+  value: ":9000"
+  type: "string"
+  writable: false
+
+server_grpc_timeout:
+  usage: "gRPC server request timeout"
+  group: "server"
+  value: "10s"
+  type: "duration"
+  writable: false
+
+server_rate_limit_max_calls:
+  usage: "Maximum requests per rate limit window"
+  group: "server"
+  value: "1000"
+  type: "int"
+  writable: false
+
+server_rate_limit_window:
+  usage: "Rate limit time window"
+  group: "server"
+  value: "1s"
+  type: "duration"
+  writable: false
+
+server_rate_limit_block_for:
+  usage: "Block duration after rate limit is exceeded"
+  group: "server"
+  value: "500ms"
+  type: "duration"
+  writable: false
+
+server_rate_limit_max_wait_time:
+  usage: "Maximum time to wait before failing a rate-limited request"
+  group: "server"
+  value: "0s"
+  type: "duration"
+  writable: false
+
+server_circuit_breaker_request:
+  usage: "Minimum requests before circuit breaker starts tripping"
+  group: "server"
+  value: "100"
+  type: "int"
+  writable: false
+
+server_circuit_breaker_success:
+  usage: "Required success ratio before the circuit opens"
+  group: "server"
+  value: "0.6"
+  type: "float"
+  writable: false
+
+metrics_addr:
+  usage: "Metrics and pprof listen address"
+  group: "server"
+  value: ":8081"
+  type: "string"
+  writable: false
+
+arena_require_auth:
+  usage: "Require authentication for arena endpoints"
+  group: "arena"
+  value: "${ARENA_REQUIRE_AUTH:-false}"
+  type: "bool"
+  writable: true
+
+database_url:
+  usage: "Primary PostgreSQL DSN"
+  group: "data"
+  value: "${DATABASE_URL}"
+  type: "string"
+  writable: false
+
+data_pool_min_conns:
+  usage: "Minimum PostgreSQL pool connections"
+  group: "data"
+  value: "20"
+  type: "int"
+  writable: false
+
+data_pool_max_conns:
+  usage: "Maximum PostgreSQL pool connections"
+  group: "data"
+  value: "200"
+  type: "int"
+  writable: false
+
+data_pool_max_conn_lifetime:
+  usage: "Maximum PostgreSQL connection lifetime"
+  group: "data"
+  value: "1h"
+  type: "duration"
+  writable: false
+
+data_pool_max_conn_idle_time:
+  usage: "Maximum PostgreSQL connection idle time"
+  group: "data"
+  value: "30m"
+  type: "duration"
+  writable: false
+
+data_pool_health_check_period:
+  usage: "PostgreSQL pool health check period"
+  group: "data"
+  value: "1m"
+  type: "duration"
+  writable: false
+
+session_cookie_name:
+  usage: "Session cookie name"
+  group: "auth"
+  value: "session_token"
+  type: "string"
+  writable: false
+
+cookie_domain:
+  usage: "Session cookie domain"
+  group: "auth"
+  value: "${COOKIE_DOMAIN}"
+  type: "string"
+  writable: false
+
+cookie_secure:
+  usage: "Use secure cookies"
+  group: "auth"
+  value: "true"
+  type: "bool"
+  writable: false
+
+cookie_same_site:
+  usage: "Session cookie same-site policy"
+  group: "auth"
+  value: "None"
+  type: "string"
+  writable: false
+
+session_ttl:
+  usage: "Session lifetime"
+  group: "auth"
+  value: "720h"
+  type: "duration"
+  writable: false
+
+session_refresh_after:
+  usage: "Session refresh interval"
+  group: "auth"
+  value: "12h"
+  type: "duration"
+  writable: false
+
+telegram_auth_max_age:
+  usage: "Telegram login payload max age"
+  group: "auth"
+  value: "15m"
+  type: "duration"
+  writable: false
+
+telegram_bot_token:
+  usage: "Telegram bot token"
+  group: "external"
+  value: "${TELEGRAM_BOT_TOKEN}"
+  type: "string"
+  writable: false
+
+geocoder_base_url:
+  usage: "Geocoder base URL"
+  group: "external"
+  value: "https://nominatim.openstreetmap.org/search"
+  type: "string"
+  writable: false
+
+geocoder_user_agent:
+  usage: "Geocoder user-agent"
+  group: "external"
+  value: "druz9-api/1.0"
+  type: "string"
+  writable: false
+
+geocoder_language:
+  usage: "Preferred geocoder languages"
+  group: "external"
+  value: "ru,en"
+  type: "string"
+  writable: false
+
+s3_endpoint:
+  usage: "S3 endpoint"
+  group: "external"
+  value: "${S3_ENDPOINT}"
+  type: "string"
+  writable: false
+
+s3_public_endpoint:
+  usage: "Public S3 endpoint for signed URLs"
+  group: "external"
+  value: "${S3_PUBLIC_ENDPOINT}"
+  type: "string"
+  writable: false
+
+s3_bucket:
+  usage: "S3 bucket name"
+  group: "external"
+  value: "${S3_BUCKET}"
+  type: "string"
+  writable: false
+
+s3_access_key:
+  usage: "S3 access key"
+  group: "external"
+  value: "${S3_ACCESS_KEY}"
+  type: "string"
+  writable: false
+
+s3_secret_key:
+  usage: "S3 secret key"
+  group: "external"
+  value: "${S3_SECRET_KEY}"
+  type: "string"
+  writable: false
+
+dev_auth_bypass:
+  usage: "Allow local auth bypass"
+  group: "dev"
+  value: "false"
+  type: "bool"
+  writable: false
+
+dev_user_id:
+  usage: "Dev user ID for bypass mode"
+  group: "dev"
+  value: ""
+  type: "string"
+  writable: false
+EOF
+
+echo "Rendered ${TARGET_FILE}"

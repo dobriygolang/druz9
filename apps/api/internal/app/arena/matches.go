@@ -4,17 +4,18 @@ import (
 	"context"
 	"time"
 
+	"api/internal/model"
 	domain "api/internal/domain/arena"
 
 	"github.com/google/uuid"
 )
 
-func (s *Service) CreateMatch(ctx context.Context, creator *domain.User, topic, difficulty string, obfuscateOpponent bool) (*domain.Match, error) {
+func (s *Service) CreateMatch(ctx context.Context, creator *domain.User, topic string, difficulty model.ArenaDifficulty, obfuscateOpponent bool) (*domain.Match, error) {
 	if creator == nil || (isGuestUser(creator) && !s.allowGuestAccess()) {
 		return nil, domain.ErrGuestsNotSupported
 	}
 
-	task, err := s.repo.PickRandomTask(ctx, topic, difficulty)
+	task, err := s.repo.PickRandomTask(ctx, topic, difficulty.String())
 	if err != nil {
 		return nil, err
 	}

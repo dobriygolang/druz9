@@ -1,0 +1,30 @@
+{
+  email {$APP_EMAIL}
+}
+
+{$API_HOST} {
+  encode gzip zstd
+
+  handle {
+    reverse_proxy backend:8080
+  }
+}
+
+{$APP_HOST} {
+  encode gzip zstd
+
+  handle {
+    reverse_proxy frontend:80
+  }
+}
+
+{$S3_HOST} {
+  reverse_proxy minio:9000
+}
+
+{$MINIO_CONSOLE_HOST} {
+  basicauth {
+    {$MINIO_CONSOLE_BASIC_AUTH}
+  }
+  reverse_proxy minio:9001
+}

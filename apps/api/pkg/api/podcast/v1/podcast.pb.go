@@ -23,6 +23,61 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type MediaContentType int32
+
+const (
+	MediaContentType_MEDIA_CONTENT_TYPE_UNSPECIFIED MediaContentType = 0
+	MediaContentType_MEDIA_CONTENT_TYPE_AUDIO_MPEG  MediaContentType = 1 // audio/mpeg
+	MediaContentType_MEDIA_CONTENT_TYPE_AUDIO_WAV   MediaContentType = 2 // audio/wav
+	MediaContentType_MEDIA_CONTENT_TYPE_AUDIO_OGG   MediaContentType = 3 // audio/ogg
+	MediaContentType_MEDIA_CONTENT_TYPE_AUDIO_MP4   MediaContentType = 4 // audio/mp4
+)
+
+// Enum value maps for MediaContentType.
+var (
+	MediaContentType_name = map[int32]string{
+		0: "MEDIA_CONTENT_TYPE_UNSPECIFIED",
+		1: "MEDIA_CONTENT_TYPE_AUDIO_MPEG",
+		2: "MEDIA_CONTENT_TYPE_AUDIO_WAV",
+		3: "MEDIA_CONTENT_TYPE_AUDIO_OGG",
+		4: "MEDIA_CONTENT_TYPE_AUDIO_MP4",
+	}
+	MediaContentType_value = map[string]int32{
+		"MEDIA_CONTENT_TYPE_UNSPECIFIED": 0,
+		"MEDIA_CONTENT_TYPE_AUDIO_MPEG":  1,
+		"MEDIA_CONTENT_TYPE_AUDIO_WAV":   2,
+		"MEDIA_CONTENT_TYPE_AUDIO_OGG":   3,
+		"MEDIA_CONTENT_TYPE_AUDIO_MP4":   4,
+	}
+)
+
+func (x MediaContentType) Enum() *MediaContentType {
+	p := new(MediaContentType)
+	*p = x
+	return p
+}
+
+func (x MediaContentType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (MediaContentType) Descriptor() protoreflect.EnumDescriptor {
+	return file_podcast_v1_podcast_proto_enumTypes[0].Descriptor()
+}
+
+func (MediaContentType) Type() protoreflect.EnumType {
+	return &file_podcast_v1_podcast_proto_enumTypes[0]
+}
+
+func (x MediaContentType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use MediaContentType.Descriptor instead.
+func (MediaContentType) EnumDescriptor() ([]byte, []int) {
+	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{0}
+}
+
 type ListPodcastsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
@@ -756,7 +811,7 @@ type Podcast struct {
 	DurationSeconds uint32                 `protobuf:"varint,5,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
 	ListensCount    uint64                 `protobuf:"varint,6,opt,name=listens_count,json=listensCount,proto3" json:"listens_count,omitempty"`
 	FileName        string                 `protobuf:"bytes,7,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"`
-	ContentType     string                 `protobuf:"bytes,8,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"`
+	ContentType     MediaContentType       `protobuf:"varint,8,opt,name=content_type,json=contentType,proto3,enum=podcast.v1.MediaContentType" json:"content_type,omitempty"`
 	IsUploaded      bool                   `protobuf:"varint,9,opt,name=is_uploaded,json=isUploaded,proto3" json:"is_uploaded,omitempty"`
 	CreatedAt       *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	UpdatedAt       *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
@@ -843,11 +898,11 @@ func (x *Podcast) GetFileName() string {
 	return ""
 }
 
-func (x *Podcast) GetContentType() string {
+func (x *Podcast) GetContentType() MediaContentType {
 	if x != nil {
 		return x.ContentType
 	}
-	return ""
+	return MediaContentType_MEDIA_CONTENT_TYPE_UNSPECIFIED
 }
 
 func (x *Podcast) GetIsUploaded() bool {
@@ -932,7 +987,7 @@ const file_podcast_v1_podcast_proto_rawDesc = "" +
 	"\x13PlayPodcastResponse\x12-\n" +
 	"\apodcast\x18\x01 \x01(\v2\x13.podcast.v1.PodcastR\apodcast\x12\x1d\n" +
 	"\n" +
-	"stream_url\x18\x02 \x01(\tR\tstreamUrl\"\x94\x03\n" +
+	"stream_url\x18\x02 \x01(\tR\tstreamUrl\"\xb2\x03\n" +
 	"\aPodcast\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1b\n" +
@@ -941,15 +996,21 @@ const file_podcast_v1_podcast_proto_rawDesc = "" +
 	"authorName\x12)\n" +
 	"\x10duration_seconds\x18\x05 \x01(\rR\x0fdurationSeconds\x12#\n" +
 	"\rlistens_count\x18\x06 \x01(\x04R\flistensCount\x12\x1b\n" +
-	"\tfile_name\x18\a \x01(\tR\bfileName\x12!\n" +
-	"\fcontent_type\x18\b \x01(\tR\vcontentType\x12\x1f\n" +
+	"\tfile_name\x18\a \x01(\tR\bfileName\x12?\n" +
+	"\fcontent_type\x18\b \x01(\x0e2\x1c.podcast.v1.MediaContentTypeR\vcontentType\x12\x1f\n" +
 	"\vis_uploaded\x18\t \x01(\bR\n" +
 	"isUploaded\x129\n" +
 	"\n" +
 	"created_at\x18\n" +
 	" \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt2\xa5\b\n" +
+	"updated_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt*\xbf\x01\n" +
+	"\x10MediaContentType\x12\"\n" +
+	"\x1eMEDIA_CONTENT_TYPE_UNSPECIFIED\x10\x00\x12!\n" +
+	"\x1dMEDIA_CONTENT_TYPE_AUDIO_MPEG\x10\x01\x12 \n" +
+	"\x1cMEDIA_CONTENT_TYPE_AUDIO_WAV\x10\x02\x12 \n" +
+	"\x1cMEDIA_CONTENT_TYPE_AUDIO_OGG\x10\x03\x12 \n" +
+	"\x1cMEDIA_CONTENT_TYPE_AUDIO_MP4\x10\x042\xa5\b\n" +
 	"\x0ePodcastService\x12k\n" +
 	"\fListPodcasts\x12\x1f.podcast.v1.ListPodcastsRequest\x1a .podcast.v1.ListPodcastsResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/v1/podcasts\x12o\n" +
 	"\n" +
@@ -973,52 +1034,55 @@ func file_podcast_v1_podcast_proto_rawDescGZIP() []byte {
 	return file_podcast_v1_podcast_proto_rawDescData
 }
 
+var file_podcast_v1_podcast_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_podcast_v1_podcast_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_podcast_v1_podcast_proto_goTypes = []any{
-	(*ListPodcastsRequest)(nil),          // 0: podcast.v1.ListPodcastsRequest
-	(*GetPodcastRequest)(nil),            // 1: podcast.v1.GetPodcastRequest
-	(*CreatePodcastRequest)(nil),         // 2: podcast.v1.CreatePodcastRequest
-	(*UploadPodcastRequest)(nil),         // 3: podcast.v1.UploadPodcastRequest
-	(*PreparePodcastUploadRequest)(nil),  // 4: podcast.v1.PreparePodcastUploadRequest
-	(*PreparePodcastUploadResponse)(nil), // 5: podcast.v1.PreparePodcastUploadResponse
-	(*CompletePodcastUploadRequest)(nil), // 6: podcast.v1.CompletePodcastUploadRequest
-	(*DeletePodcastRequest)(nil),         // 7: podcast.v1.DeletePodcastRequest
-	(*PlayPodcastRequest)(nil),           // 8: podcast.v1.PlayPodcastRequest
-	(*ListPodcastsResponse)(nil),         // 9: podcast.v1.ListPodcastsResponse
-	(*PodcastResponse)(nil),              // 10: podcast.v1.PodcastResponse
-	(*PodcastStatusResponse)(nil),        // 11: podcast.v1.PodcastStatusResponse
-	(*PlayPodcastResponse)(nil),          // 12: podcast.v1.PlayPodcastResponse
-	(*Podcast)(nil),                      // 13: podcast.v1.Podcast
-	(*timestamppb.Timestamp)(nil),        // 14: google.protobuf.Timestamp
+	(MediaContentType)(0),                // 0: podcast.v1.MediaContentType
+	(*ListPodcastsRequest)(nil),          // 1: podcast.v1.ListPodcastsRequest
+	(*GetPodcastRequest)(nil),            // 2: podcast.v1.GetPodcastRequest
+	(*CreatePodcastRequest)(nil),         // 3: podcast.v1.CreatePodcastRequest
+	(*UploadPodcastRequest)(nil),         // 4: podcast.v1.UploadPodcastRequest
+	(*PreparePodcastUploadRequest)(nil),  // 5: podcast.v1.PreparePodcastUploadRequest
+	(*PreparePodcastUploadResponse)(nil), // 6: podcast.v1.PreparePodcastUploadResponse
+	(*CompletePodcastUploadRequest)(nil), // 7: podcast.v1.CompletePodcastUploadRequest
+	(*DeletePodcastRequest)(nil),         // 8: podcast.v1.DeletePodcastRequest
+	(*PlayPodcastRequest)(nil),           // 9: podcast.v1.PlayPodcastRequest
+	(*ListPodcastsResponse)(nil),         // 10: podcast.v1.ListPodcastsResponse
+	(*PodcastResponse)(nil),              // 11: podcast.v1.PodcastResponse
+	(*PodcastStatusResponse)(nil),        // 12: podcast.v1.PodcastStatusResponse
+	(*PlayPodcastResponse)(nil),          // 13: podcast.v1.PlayPodcastResponse
+	(*Podcast)(nil),                      // 14: podcast.v1.Podcast
+	(*timestamppb.Timestamp)(nil),        // 15: google.protobuf.Timestamp
 }
 var file_podcast_v1_podcast_proto_depIdxs = []int32{
-	13, // 0: podcast.v1.PreparePodcastUploadResponse.podcast:type_name -> podcast.v1.Podcast
-	13, // 1: podcast.v1.ListPodcastsResponse.podcasts:type_name -> podcast.v1.Podcast
-	13, // 2: podcast.v1.PodcastResponse.podcast:type_name -> podcast.v1.Podcast
-	13, // 3: podcast.v1.PlayPodcastResponse.podcast:type_name -> podcast.v1.Podcast
-	14, // 4: podcast.v1.Podcast.created_at:type_name -> google.protobuf.Timestamp
-	14, // 5: podcast.v1.Podcast.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 6: podcast.v1.PodcastService.ListPodcasts:input_type -> podcast.v1.ListPodcastsRequest
-	1,  // 7: podcast.v1.PodcastService.GetPodcast:input_type -> podcast.v1.GetPodcastRequest
-	2,  // 8: podcast.v1.PodcastService.CreatePodcast:input_type -> podcast.v1.CreatePodcastRequest
-	3,  // 9: podcast.v1.PodcastService.UploadPodcast:input_type -> podcast.v1.UploadPodcastRequest
-	4,  // 10: podcast.v1.PodcastService.PreparePodcastUpload:input_type -> podcast.v1.PreparePodcastUploadRequest
-	6,  // 11: podcast.v1.PodcastService.CompletePodcastUpload:input_type -> podcast.v1.CompletePodcastUploadRequest
-	7,  // 12: podcast.v1.PodcastService.DeletePodcast:input_type -> podcast.v1.DeletePodcastRequest
-	8,  // 13: podcast.v1.PodcastService.PlayPodcast:input_type -> podcast.v1.PlayPodcastRequest
-	9,  // 14: podcast.v1.PodcastService.ListPodcasts:output_type -> podcast.v1.ListPodcastsResponse
-	10, // 15: podcast.v1.PodcastService.GetPodcast:output_type -> podcast.v1.PodcastResponse
-	10, // 16: podcast.v1.PodcastService.CreatePodcast:output_type -> podcast.v1.PodcastResponse
-	10, // 17: podcast.v1.PodcastService.UploadPodcast:output_type -> podcast.v1.PodcastResponse
-	5,  // 18: podcast.v1.PodcastService.PreparePodcastUpload:output_type -> podcast.v1.PreparePodcastUploadResponse
-	10, // 19: podcast.v1.PodcastService.CompletePodcastUpload:output_type -> podcast.v1.PodcastResponse
-	11, // 20: podcast.v1.PodcastService.DeletePodcast:output_type -> podcast.v1.PodcastStatusResponse
-	12, // 21: podcast.v1.PodcastService.PlayPodcast:output_type -> podcast.v1.PlayPodcastResponse
-	14, // [14:22] is the sub-list for method output_type
-	6,  // [6:14] is the sub-list for method input_type
-	6,  // [6:6] is the sub-list for extension type_name
-	6,  // [6:6] is the sub-list for extension extendee
-	0,  // [0:6] is the sub-list for field type_name
+	14, // 0: podcast.v1.PreparePodcastUploadResponse.podcast:type_name -> podcast.v1.Podcast
+	14, // 1: podcast.v1.ListPodcastsResponse.podcasts:type_name -> podcast.v1.Podcast
+	14, // 2: podcast.v1.PodcastResponse.podcast:type_name -> podcast.v1.Podcast
+	14, // 3: podcast.v1.PlayPodcastResponse.podcast:type_name -> podcast.v1.Podcast
+	0,  // 4: podcast.v1.Podcast.content_type:type_name -> podcast.v1.MediaContentType
+	15, // 5: podcast.v1.Podcast.created_at:type_name -> google.protobuf.Timestamp
+	15, // 6: podcast.v1.Podcast.updated_at:type_name -> google.protobuf.Timestamp
+	1,  // 7: podcast.v1.PodcastService.ListPodcasts:input_type -> podcast.v1.ListPodcastsRequest
+	2,  // 8: podcast.v1.PodcastService.GetPodcast:input_type -> podcast.v1.GetPodcastRequest
+	3,  // 9: podcast.v1.PodcastService.CreatePodcast:input_type -> podcast.v1.CreatePodcastRequest
+	4,  // 10: podcast.v1.PodcastService.UploadPodcast:input_type -> podcast.v1.UploadPodcastRequest
+	5,  // 11: podcast.v1.PodcastService.PreparePodcastUpload:input_type -> podcast.v1.PreparePodcastUploadRequest
+	7,  // 12: podcast.v1.PodcastService.CompletePodcastUpload:input_type -> podcast.v1.CompletePodcastUploadRequest
+	8,  // 13: podcast.v1.PodcastService.DeletePodcast:input_type -> podcast.v1.DeletePodcastRequest
+	9,  // 14: podcast.v1.PodcastService.PlayPodcast:input_type -> podcast.v1.PlayPodcastRequest
+	10, // 15: podcast.v1.PodcastService.ListPodcasts:output_type -> podcast.v1.ListPodcastsResponse
+	11, // 16: podcast.v1.PodcastService.GetPodcast:output_type -> podcast.v1.PodcastResponse
+	11, // 17: podcast.v1.PodcastService.CreatePodcast:output_type -> podcast.v1.PodcastResponse
+	11, // 18: podcast.v1.PodcastService.UploadPodcast:output_type -> podcast.v1.PodcastResponse
+	6,  // 19: podcast.v1.PodcastService.PreparePodcastUpload:output_type -> podcast.v1.PreparePodcastUploadResponse
+	11, // 20: podcast.v1.PodcastService.CompletePodcastUpload:output_type -> podcast.v1.PodcastResponse
+	12, // 21: podcast.v1.PodcastService.DeletePodcast:output_type -> podcast.v1.PodcastStatusResponse
+	13, // 22: podcast.v1.PodcastService.PlayPodcast:output_type -> podcast.v1.PlayPodcastResponse
+	15, // [15:23] is the sub-list for method output_type
+	7,  // [7:15] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_podcast_v1_podcast_proto_init() }
@@ -1031,13 +1095,14 @@ func file_podcast_v1_podcast_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_podcast_v1_podcast_proto_rawDesc), len(file_podcast_v1_podcast_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_podcast_v1_podcast_proto_goTypes,
 		DependencyIndexes: file_podcast_v1_podcast_proto_depIdxs,
+		EnumInfos:         file_podcast_v1_podcast_proto_enumTypes,
 		MessageInfos:      file_podcast_v1_podcast_proto_msgTypes,
 	}.Build()
 	File_podcast_v1_podcast_proto = out.File

@@ -23,6 +23,58 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type UserActivityStatus int32
+
+const (
+	UserActivityStatus_USER_ACTIVITY_STATUS_UNSPECIFIED     UserActivityStatus = 0
+	UserActivityStatus_USER_ACTIVITY_STATUS_ONLINE          UserActivityStatus = 1
+	UserActivityStatus_USER_ACTIVITY_STATUS_RECENTLY_ACTIVE UserActivityStatus = 2
+	UserActivityStatus_USER_ACTIVITY_STATUS_OFFLINE         UserActivityStatus = 3
+)
+
+// Enum value maps for UserActivityStatus.
+var (
+	UserActivityStatus_name = map[int32]string{
+		0: "USER_ACTIVITY_STATUS_UNSPECIFIED",
+		1: "USER_ACTIVITY_STATUS_ONLINE",
+		2: "USER_ACTIVITY_STATUS_RECENTLY_ACTIVE",
+		3: "USER_ACTIVITY_STATUS_OFFLINE",
+	}
+	UserActivityStatus_value = map[string]int32{
+		"USER_ACTIVITY_STATUS_UNSPECIFIED":     0,
+		"USER_ACTIVITY_STATUS_ONLINE":          1,
+		"USER_ACTIVITY_STATUS_RECENTLY_ACTIVE": 2,
+		"USER_ACTIVITY_STATUS_OFFLINE":         3,
+	}
+)
+
+func (x UserActivityStatus) Enum() *UserActivityStatus {
+	p := new(UserActivityStatus)
+	*p = x
+	return p
+}
+
+func (x UserActivityStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (UserActivityStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_profile_v1_profile_proto_enumTypes[0].Descriptor()
+}
+
+func (UserActivityStatus) Type() protoreflect.EnumType {
+	return &file_profile_v1_profile_proto_enumTypes[0]
+}
+
+func (x UserActivityStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use UserActivityStatus.Descriptor instead.
+func (UserActivityStatus) EnumDescriptor() ([]byte, []int) {
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{0}
+}
+
 type TelegramAuthRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            int64                  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -536,7 +588,7 @@ type User struct {
 	UpdatedAt        *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	Latitude         float64                `protobuf:"fixed64,10,opt,name=latitude,proto3" json:"latitude,omitempty"`
 	Longitude        float64                `protobuf:"fixed64,11,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	ActivityStatus   string                 `protobuf:"bytes,12,opt,name=activity_status,json=activityStatus,proto3" json:"activity_status,omitempty"`
+	ActivityStatus   UserActivityStatus     `protobuf:"varint,12,opt,name=activity_status,json=activityStatus,proto3,enum=profile.v1.UserActivityStatus" json:"activity_status,omitempty"`
 	CurrentWorkplace string                 `protobuf:"bytes,13,opt,name=current_workplace,json=currentWorkplace,proto3" json:"current_workplace,omitempty"`
 	IsAdmin          bool                   `protobuf:"varint,14,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
 	unknownFields    protoimpl.UnknownFields
@@ -650,11 +702,11 @@ func (x *User) GetLongitude() float64 {
 	return 0
 }
 
-func (x *User) GetActivityStatus() string {
+func (x *User) GetActivityStatus() UserActivityStatus {
 	if x != nil {
 		return x.ActivityStatus
 	}
-	return ""
+	return UserActivityStatus_USER_ACTIVITY_STATUS_UNSPECIFIED
 }
 
 func (x *User) GetCurrentWorkplace() string {
@@ -708,7 +760,7 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\x04user\x18\x01 \x01(\v2\x10.profile.v1.UserR\x04user\x124\n" +
 	"\x16needs_profile_complete\x18\x02 \x01(\bR\x14needsProfileComplete\"(\n" +
 	"\x0eLogoutResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"\xf8\x03\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"\x98\x04\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vtelegram_id\x18\x02 \x01(\x03R\n" +
@@ -726,10 +778,15 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x1a\n" +
 	"\blatitude\x18\n" +
 	" \x01(\x01R\blatitude\x12\x1c\n" +
-	"\tlongitude\x18\v \x01(\x01R\tlongitude\x12'\n" +
-	"\x0factivity_status\x18\f \x01(\tR\x0eactivityStatus\x12+\n" +
+	"\tlongitude\x18\v \x01(\x01R\tlongitude\x12G\n" +
+	"\x0factivity_status\x18\f \x01(\x0e2\x1e.profile.v1.UserActivityStatusR\x0eactivityStatus\x12+\n" +
 	"\x11current_workplace\x18\r \x01(\tR\x10currentWorkplace\x12\x19\n" +
-	"\bis_admin\x18\x0e \x01(\bR\aisAdmin2\xc9\x06\n" +
+	"\bis_admin\x18\x0e \x01(\bR\aisAdmin*\xa7\x01\n" +
+	"\x12UserActivityStatus\x12$\n" +
+	" USER_ACTIVITY_STATUS_UNSPECIFIED\x10\x00\x12\x1f\n" +
+	"\x1bUSER_ACTIVITY_STATUS_ONLINE\x10\x01\x12(\n" +
+	"$USER_ACTIVITY_STATUS_RECENTLY_ACTIVE\x10\x02\x12 \n" +
+	"\x1cUSER_ACTIVITY_STATUS_OFFLINE\x10\x032\xc9\x06\n" +
 	"\x0eProfileService\x12v\n" +
 	"\fTelegramAuth\x12\x1f.profile.v1.TelegramAuthRequest\x1a\x1b.profile.v1.ProfileResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/profile/auth/telegram\x12\x93\x01\n" +
 	"\x14CompleteRegistration\x12'.profile.v1.CompleteRegistrationRequest\x1a\x1b.profile.v1.ProfileResponse\"5\x82\xd3\xe4\x93\x02/:\x01*\"*/api/v1/profile/auth/complete-registration\x12a\n" +
@@ -752,43 +809,46 @@ func file_profile_v1_profile_proto_rawDescGZIP() []byte {
 	return file_profile_v1_profile_proto_rawDescData
 }
 
+var file_profile_v1_profile_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_profile_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_profile_v1_profile_proto_goTypes = []any{
-	(*TelegramAuthRequest)(nil),         // 0: profile.v1.TelegramAuthRequest
-	(*CompleteRegistrationRequest)(nil), // 1: profile.v1.CompleteRegistrationRequest
-	(*GetProfileRequest)(nil),           // 2: profile.v1.GetProfileRequest
-	(*GetProfileByIDRequest)(nil),       // 3: profile.v1.GetProfileByIDRequest
-	(*UpdateLocationRequest)(nil),       // 4: profile.v1.UpdateLocationRequest
-	(*LogoutRequest)(nil),               // 5: profile.v1.LogoutRequest
-	(*UpdateProfileRequest)(nil),        // 6: profile.v1.UpdateProfileRequest
-	(*ProfileResponse)(nil),             // 7: profile.v1.ProfileResponse
-	(*LogoutResponse)(nil),              // 8: profile.v1.LogoutResponse
-	(*User)(nil),                        // 9: profile.v1.User
-	(*timestamppb.Timestamp)(nil),       // 10: google.protobuf.Timestamp
+	(UserActivityStatus)(0),             // 0: profile.v1.UserActivityStatus
+	(*TelegramAuthRequest)(nil),         // 1: profile.v1.TelegramAuthRequest
+	(*CompleteRegistrationRequest)(nil), // 2: profile.v1.CompleteRegistrationRequest
+	(*GetProfileRequest)(nil),           // 3: profile.v1.GetProfileRequest
+	(*GetProfileByIDRequest)(nil),       // 4: profile.v1.GetProfileByIDRequest
+	(*UpdateLocationRequest)(nil),       // 5: profile.v1.UpdateLocationRequest
+	(*LogoutRequest)(nil),               // 6: profile.v1.LogoutRequest
+	(*UpdateProfileRequest)(nil),        // 7: profile.v1.UpdateProfileRequest
+	(*ProfileResponse)(nil),             // 8: profile.v1.ProfileResponse
+	(*LogoutResponse)(nil),              // 9: profile.v1.LogoutResponse
+	(*User)(nil),                        // 10: profile.v1.User
+	(*timestamppb.Timestamp)(nil),       // 11: google.protobuf.Timestamp
 }
 var file_profile_v1_profile_proto_depIdxs = []int32{
-	9,  // 0: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
-	10, // 1: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	10, // 2: profile.v1.User.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 3: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
-	1,  // 4: profile.v1.ProfileService.CompleteRegistration:input_type -> profile.v1.CompleteRegistrationRequest
-	2,  // 5: profile.v1.ProfileService.GetProfile:input_type -> profile.v1.GetProfileRequest
-	3,  // 6: profile.v1.ProfileService.GetProfileByID:input_type -> profile.v1.GetProfileByIDRequest
-	4,  // 7: profile.v1.ProfileService.UpdateLocation:input_type -> profile.v1.UpdateLocationRequest
-	6,  // 8: profile.v1.ProfileService.UpdateProfile:input_type -> profile.v1.UpdateProfileRequest
-	5,  // 9: profile.v1.ProfileService.Logout:input_type -> profile.v1.LogoutRequest
-	7,  // 10: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
-	7,  // 11: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
-	7,  // 12: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
-	7,  // 13: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
-	7,  // 14: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
-	7,  // 15: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
-	8,  // 16: profile.v1.ProfileService.Logout:output_type -> profile.v1.LogoutResponse
-	10, // [10:17] is the sub-list for method output_type
-	3,  // [3:10] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	10, // 0: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
+	11, // 1: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	11, // 2: profile.v1.User.updated_at:type_name -> google.protobuf.Timestamp
+	0,  // 3: profile.v1.User.activity_status:type_name -> profile.v1.UserActivityStatus
+	1,  // 4: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
+	2,  // 5: profile.v1.ProfileService.CompleteRegistration:input_type -> profile.v1.CompleteRegistrationRequest
+	3,  // 6: profile.v1.ProfileService.GetProfile:input_type -> profile.v1.GetProfileRequest
+	4,  // 7: profile.v1.ProfileService.GetProfileByID:input_type -> profile.v1.GetProfileByIDRequest
+	5,  // 8: profile.v1.ProfileService.UpdateLocation:input_type -> profile.v1.UpdateLocationRequest
+	7,  // 9: profile.v1.ProfileService.UpdateProfile:input_type -> profile.v1.UpdateProfileRequest
+	6,  // 10: profile.v1.ProfileService.Logout:input_type -> profile.v1.LogoutRequest
+	8,  // 11: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
+	8,  // 12: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
+	8,  // 13: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
+	8,  // 14: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
+	8,  // 15: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
+	8,  // 16: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
+	9,  // 17: profile.v1.ProfileService.Logout:output_type -> profile.v1.LogoutResponse
+	11, // [11:18] is the sub-list for method output_type
+	4,  // [4:11] is the sub-list for method input_type
+	4,  // [4:4] is the sub-list for extension type_name
+	4,  // [4:4] is the sub-list for extension extendee
+	0,  // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_profile_v1_profile_proto_init() }
@@ -801,13 +861,14 @@ func file_profile_v1_profile_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_profile_v1_profile_proto_rawDesc), len(file_profile_v1_profile_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_profile_v1_profile_proto_goTypes,
 		DependencyIndexes: file_profile_v1_profile_proto_depIdxs,
+		EnumInfos:         file_profile_v1_profile_proto_enumTypes,
 		MessageInfos:      file_profile_v1_profile_proto_msgTypes,
 	}.Build()
 	File_profile_v1_profile_proto = out.File

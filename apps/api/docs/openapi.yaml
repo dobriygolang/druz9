@@ -492,7 +492,8 @@ paths:
                 - name: difficulty
                   in: query
                   schema:
-                    type: string
+                    type: integer
+                    format: enum
                 - name: includeInactive
                   in: query
                   schema:
@@ -523,7 +524,8 @@ paths:
                 - name: status
                   in: query
                   schema:
-                    type: string
+                    type: integer
+                    format: enum
                 - name: creatorId
                   in: query
                   schema:
@@ -960,7 +962,8 @@ components:
                     type: integer
                     format: int32
                 league:
-                    type: string
+                    type: integer
+                    format: enum
                 losses:
                     type: integer
                     format: int32
@@ -980,7 +983,8 @@ components:
                 topic:
                     type: string
                 difficulty:
-                    type: string
+                    type: integer
+                    format: enum
                 status:
                     type: integer
                     format: enum
@@ -992,7 +996,8 @@ components:
                 winnerUserId:
                     type: string
                 winnerReason:
-                    type: string
+                    type: integer
+                    format: enum
                 startedAt:
                     type: string
                     format: date-time
@@ -1025,7 +1030,8 @@ components:
                 displayName:
                     type: string
                 side:
-                    type: string
+                    type: integer
+                    format: enum
                 isCreator:
                     type: boolean
                 freezeUntil:
@@ -1049,7 +1055,8 @@ components:
                 topic:
                     type: string
                 difficulty:
-                    type: string
+                    type: integer
+                    format: enum
                 obfuscateOpponent:
                     type: boolean
         arena.v1.GetLeaderboardResponse:
@@ -1106,7 +1113,8 @@ components:
                 topic:
                     type: string
                 difficulty:
-                    type: string
+                    type: integer
+                    format: enum
         code_editor.v1.CreateRoomResponse:
             type: object
             properties:
@@ -1124,7 +1132,8 @@ components:
                 statement:
                     type: string
                 difficulty:
-                    type: string
+                    type: integer
+                    format: enum
                 topics:
                     type: array
                     items:
@@ -1132,7 +1141,8 @@ components:
                 starterCode:
                     type: string
                 language:
-                    type: string
+                    type: integer
+                    format: enum
                 isActive:
                     type: boolean
                 publicTestCases:
@@ -1144,7 +1154,8 @@ components:
                     items:
                         $ref: '#/components/schemas/code_editor.v1.TaskTestCase'
                 taskType:
-                    type: string
+                    type: integer
+                    format: enum
                 executionProfile:
                     type: string
                 fixtureFiles:
@@ -1174,6 +1185,8 @@ components:
                         type: string
                 writableTempDir:
                     type: boolean
+                runnerMode:
+                    type: string
         code_editor.v1.DeleteTaskResponse:
             type: object
             properties:
@@ -1364,7 +1377,8 @@ components:
                 statement:
                     type: string
                 difficulty:
-                    type: string
+                    type: integer
+                    format: enum
                 topics:
                     type: array
                     items:
@@ -1372,7 +1386,8 @@ components:
                 starterCode:
                     type: string
                 language:
-                    type: string
+                    type: integer
+                    format: enum
                 isActive:
                     type: boolean
                 publicTestCases:
@@ -1390,7 +1405,8 @@ components:
                     type: string
                     format: date-time
                 taskType:
-                    type: string
+                    type: integer
+                    format: enum
                 executionProfile:
                     type: string
                 fixtureFiles:
@@ -1420,6 +1436,8 @@ components:
                         type: string
                 writableTempDir:
                     type: boolean
+                runnerMode:
+                    type: string
         code_editor.v1.TaskResponse:
             type: object
             properties:
@@ -1454,7 +1472,8 @@ components:
                 statement:
                     type: string
                 difficulty:
-                    type: string
+                    type: integer
+                    format: enum
                 topics:
                     type: array
                     items:
@@ -1462,7 +1481,8 @@ components:
                 starterCode:
                     type: string
                 language:
-                    type: string
+                    type: integer
+                    format: enum
                 isActive:
                     type: boolean
                 publicTestCases:
@@ -1474,7 +1494,8 @@ components:
                     items:
                         $ref: '#/components/schemas/code_editor.v1.TaskTestCase'
                 taskType:
-                    type: string
+                    type: integer
+                    format: enum
                 executionProfile:
                     type: string
                 fixtureFiles:
@@ -1504,6 +1525,8 @@ components:
                         type: string
                 writableTempDir:
                     type: boolean
+                runnerMode:
+                    type: string
         event.v1.CreateEventRequest:
             type: object
             properties:
@@ -1601,7 +1624,8 @@ components:
                 lastName:
                     type: string
                 status:
-                    type: string
+                    type: integer
+                    format: enum
         event.v1.EventResponse:
             type: object
             properties:
@@ -1698,7 +1722,8 @@ components:
                 lastName:
                     type: string
                 activityStatus:
-                    type: string
+                    type: integer
+                    format: enum
         geo.v1.CommunityMapResponse:
             type: object
             properties:
@@ -1798,7 +1823,8 @@ components:
                 fileName:
                     type: string
                 contentType:
-                    type: string
+                    type: integer
+                    format: enum
                 isUploaded:
                     type: boolean
                 createdAt:
@@ -1950,7 +1976,8 @@ components:
                     type: number
                     format: double
                 activityStatus:
-                    type: string
+                    type: integer
+                    format: enum
                 currentWorkplace:
                     type: string
                 isAdmin:
@@ -1971,7 +1998,8 @@ components:
                 location:
                     type: string
                 employmentType:
-                    type: string
+                    type: integer
+                    format: enum
         referral.v1.ListReferralsResponse:
             type: object
             properties:
@@ -2016,7 +2044,8 @@ components:
                 location:
                     type: string
                 employmentType:
-                    type: string
+                    type: integer
+                    format: enum
                 isOwner:
                     type: boolean
                 createdAt:
@@ -2053,7 +2082,8 @@ components:
                 location:
                     type: string
                 employmentType:
-                    type: string
+                    type: integer
+                    format: enum
 tags:
     - name: AdminService
     - name: ArenaService

@@ -38,6 +38,12 @@ type BackendProfileResponse = {
   needsProfileComplete?: boolean;
 };
 
+function normalizeActivityStatus(value: unknown): User['activityStatus'] {
+  if (value === 1 || value === 'USER_ACTIVITY_STATUS_ONLINE' || value === 'online') return 'online';
+  if (value === 2 || value === 'USER_ACTIVITY_STATUS_RECENTLY_ACTIVE' || value === 'recently_active') return 'recently_active';
+  return 'offline';
+}
+
 function normalizeUser(user: BackendUser): User {
   return {
     id: user.id,
@@ -49,7 +55,7 @@ function normalizeUser(user: BackendUser): User {
     region: user.region ?? '',
     latitude: user.latitude ?? 0,
     longitude: user.longitude ?? 0,
-    activityStatus: user.activity_status ?? user.activityStatus ?? 'offline',
+    activityStatus: normalizeActivityStatus(user.activity_status ?? user.activityStatus),
     isAdmin: user.is_admin ?? user.isAdmin ?? false,
     currentWorkplace: user.current_workplace ?? user.currentWorkplace ?? '',
     createdAt: user.created_at ?? user.createdAt ?? '',

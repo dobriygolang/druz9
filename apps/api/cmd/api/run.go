@@ -6,7 +6,6 @@ import (
 	// #nosec G108 -- pprof is intentionally exposed on dedicated metrics endpoint in non-public ops context.
 	_ "net/http/pprof"
 
-	admindomainservice "api/internal/admin/service"
 	adminservice "api/internal/api/admin"
 	arenaservice "api/internal/api/arena"
 	codeeditorservice "api/internal/api/code_editor"
@@ -26,13 +25,14 @@ import (
 	podcastdata "api/internal/data/podcast"
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
-	eventdomainservice "api/internal/event/service"
-	geodomainservice "api/internal/geo/service"
+	admindomainservice "api/internal/domain/admin"
+	eventdomainservice "api/internal/domain/event"
+	geodomainservice "api/internal/domain/geo"
+	podcastdomainservice "api/internal/domain/podcast"
+	profiledomainservice "api/internal/domain/profile"
+	referraldomainservice "api/internal/domain/referral"
 	appLogger "api/internal/logger"
-	podcastdomainservice "api/internal/podcast/service"
-	profiledomainservice "api/internal/profile/service"
 	"api/internal/realtime"
-	referraldomainservice "api/internal/referral/service"
 	"api/internal/rtc"
 	"api/internal/sandbox"
 	server "api/internal/server"
@@ -140,13 +140,13 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 			TelegramAuthMaxAge:  cfg.Auth.Session.TelegramAuthMaxAge,
 		},
 	})
-	adminServiceDomain := admindomainservice.NewAdminService(admindomainservice.Config{
+	adminServiceDomain := admindomainservice.NewService(admindomainservice.Config{
 		ProfileRepository: profileRepo,
 	})
 	geoServiceDomain := geodomainservice.NewGeoService(geodomainservice.Config{
 		Resolver: geoClient,
 	})
-	eventServiceDomain := eventdomainservice.NewEventService(eventdomainservice.Config{
+	eventServiceDomain := eventdomainservice.NewService(eventdomainservice.Config{
 		Repository: eventRepo,
 	})
 	podcastServiceDomain := podcastdomainservice.NewPodcastService(podcastdomainservice.Config{

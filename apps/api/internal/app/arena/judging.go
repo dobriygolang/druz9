@@ -2,7 +2,6 @@ package arena
 
 import (
 	"context"
-	"strings"
 	"time"
 
 	domain "api/internal/domain/arena"
@@ -57,17 +56,18 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 	taskSpec := policy.TaskSpecForArenaTask(task)
 	for _, tc := range testCases {
 		result, runErr := s.sandbox.Execute(ctx, sandbox.ExecutionRequest{
-			Code:     code,
-			Input:    tc.Input,
-			Task:     taskSpec,
-			Language: policy.LanguageGo,
+			Code:       code,
+			Input:      tc.Input,
+			Task:       taskSpec,
+			Language:   policy.LanguageGo,
+			RunnerMode: task.RunnerMode.String(),
 		})
 		if runErr != nil {
 			lastError = runErr.Error()
 			break
 		}
 		lastOutput = result.Output
-		if normalizeJudgeOutput(result.Output) == normalizeJudgeOutput(tc.ExpectedOutput) {
+		if sandbox.NormalizeOutput(result.Output) == sandbox.NormalizeOutput(tc.ExpectedOutput) {
 			submission.PassedCount++
 			continue
 		}
@@ -112,8 +112,4 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 	}
 
 	return created, match, nil
-}
-
-func normalizeJudgeOutput(value string) string {
-	return strings.TrimSpace(value)
 }

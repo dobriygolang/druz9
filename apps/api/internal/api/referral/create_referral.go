@@ -21,7 +21,7 @@ func (i *Implementation) CreateReferral(ctx context.Context, req *v1.CreateRefer
 		Description:    req.Description,
 		Experience:     req.Experience,
 		Location:       req.Location,
-		EmploymentType: req.EmploymentType,
+		EmploymentType: unmapEmploymentType(req.EmploymentType),
 	})
 	if err != nil {
 		return nil, err

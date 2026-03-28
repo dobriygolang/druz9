@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	referraldomain "api/internal/domain/referral"
 	"api/internal/model"
-	referraldomain "api/internal/referral/service"
 	"api/internal/storage/postgres"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
@@ -28,7 +28,7 @@ func NewRepo(dataLayer *postgres.Store, logger log.Logger) referraldomain.Reposi
 	}
 }
 
-const referralColumns = `r.id, r.user_id::text, COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.telegram_username, ''), 'user'), COALESCE(u.telegram_username, ''), r.title, r.company, COALESCE(r.vacancy_url, ''), r.description, COALESCE(r.experience, ''), COALESCE(r.location, ''), COALESCE(r.employment_type, ''), r.created_at, r.updated_at`
+const referralColumns = `r.id, r.user_id::text, COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.telegram_username, ''), 'user'), COALESCE(u.telegram_username, ''), r.title, r.company, COALESCE(r.vacancy_url, ''), r.description, COALESCE(r.experience, ''), COALESCE(r.location, ''), r.employment_type, r.created_at, r.updated_at`
 
 func (r *Repo) ListReferrals(ctx context.Context, currentUser *model.User, opts model.ListReferralsOptions) (*model.ListReferralsResponse, error) {
 	// Apply defaults
@@ -81,8 +81,8 @@ LIMIT $1 OFFSET $2
 func (r *Repo) CreateReferral(ctx context.Context, user *model.User, req model.CreateReferralRequest) (*model.Referral, error) {
 	return scanReferral(r.data.DB.QueryRow(ctx, `
 INSERT INTO referrals (id, user_id, title, company, vacancy_url, description, experience, location, employment_type, created_at, updated_at)
-VALUES ($1, $2, $3, $4, NULLIF($5, ''), $6, NULLIF($7, ''), NULLIF($8, ''), NULLIF($9, ''), NOW(), NOW())
-RETURNING id, user_id::text, $10, $11, title, company, COALESCE(vacancy_url, ''), description, COALESCE(experience, ''), COALESCE(location, ''), COALESCE(employment_type, ''), created_at, updated_at`,
+VALUES ($1, $2, $3, $4, NULLIF($5, ''), $6, NULLIF($7, ''), NULLIF($8, ''), $9, NOW(), NOW())
+RETURNING id, user_id::text, $10, $11, title, company, COALESCE(vacancy_url, ''), description, COALESCE(experience, ''), COALESCE(location, ''), employment_type, created_at, updated_at`,
 		uuid.New(), user.ID, req.Title, req.Company, req.VacancyURL, req.Description, req.Experience, req.Location, req.EmploymentType,
 		referralAuthorName(user), user.TelegramUsername,
 	), user)
@@ -102,7 +102,7 @@ WITH updated AS (
       description = $5,
       experience = NULLIF($6, ''),
       location = NULLIF($7, ''),
-      employment_type = NULLIF($8, ''),
+      employment_type = $8,
       updated_at = NOW()
   WHERE id = $1
     AND ($10 = TRUE OR user_id = $9)
@@ -119,7 +119,7 @@ SELECT
   updated.description,
   COALESCE(updated.experience, ''),
   COALESCE(updated.location, ''),
-  COALESCE(updated.employment_type, ''),
+  updated.employment_type,
   updated.created_at,
   updated.updated_at
 FROM updated
@@ -175,6 +175,7 @@ type referralScanner interface {
 
 func scanReferral(scanner referralScanner, currentUser *model.User) (*model.Referral, error) {
 	var item model.Referral
+	var employmentTypeInt int
 	if err := scanner.Scan(
 		&item.ID,
 		&item.UserID,
@@ -186,7 +187,7 @@ func scanReferral(scanner referralScanner, currentUser *model.User) (*model.Refe
 		&item.Description,
 		&item.Experience,
 		&item.Location,
-		&item.EmploymentType,
+		&employmentTypeInt,
 		&item.CreatedAt,
 		&item.UpdatedAt,
 	); err != nil {
@@ -195,6 +196,7 @@ func scanReferral(scanner referralScanner, currentUser *model.User) (*model.Refe
 		}
 		return nil, fmt.Errorf("scan referral: %w", err)
 	}
+	item.EmploymentType = model.EmploymentType(employmentTypeInt)
 	item.AuthorTelegramProfileURL = telegramProfileURL(item.AuthorTelegramUsername)
 	item.IsOwner = currentUser != nil && currentUser.ID.String() == item.UserID
 	return &item, nil

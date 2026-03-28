@@ -11,6 +11,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
 	TelegramAuth(context.Context, model.TelegramAuthPayload) (*model.ProfileResponse, string, time.Time, error)
 	CompleteRegistration(context.Context, uuid.UUID, model.CompleteRegistrationRequest) (*model.ProfileResponse, string, time.Time, error)
@@ -22,6 +23,7 @@ type Service interface {
 	DevUserID() string
 }
 
+//go:generate mockery --case underscore --name SessionCookieManager --with-expecter --output mocks
 type SessionCookieManager interface {
 	SetSessionCookie(context.Context, string, time.Time)
 	ClearSessionCookie(context.Context)

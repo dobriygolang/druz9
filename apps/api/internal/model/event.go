@@ -6,50 +6,80 @@ import (
 	"github.com/google/uuid"
 )
 
+type EventParticipantStatus int
+
 const (
-	EventParticipantStatusInvited = "invited"
-	EventParticipantStatusJoined  = "joined"
+	EventParticipantStatusUnknown EventParticipantStatus = iota
+	EventParticipantStatusPending
+	EventParticipantStatusConfirmed
+	EventParticipantStatusDeclined
 )
 
+func (s EventParticipantStatus) String() string {
+	switch s {
+	case EventParticipantStatusPending:
+		return "pending"
+	case EventParticipantStatusConfirmed:
+		return "confirmed"
+	case EventParticipantStatusDeclined:
+		return "declined"
+	default:
+		return ""
+	}
+}
+
+func EventParticipantStatusFromString(s string) EventParticipantStatus {
+	switch s {
+	case "pending":
+		return EventParticipantStatusPending
+	case "confirmed":
+		return EventParticipantStatusConfirmed
+	case "declined":
+		return EventParticipantStatusDeclined
+	default:
+		return EventParticipantStatusUnknown
+	}
+}
+
 type EventParticipant struct {
-	UserID           string `json:"user_id"`
-	Title            string `json:"title"`
-	AvatarURL        string `json:"avatar_url"`
-	TelegramUsername string `json:"telegram_username"`
-	FirstName        string `json:"first_name"`
-	LastName         string `json:"last_name"`
-	Status           string `json:"status"`
+	UserID           string
+	Title            string
+	AvatarURL        string
+	TelegramUsername string
+	FirstName        string
+	LastName         string
+	Status           EventParticipantStatus
 }
 
 type Event struct {
-	ID               uuid.UUID           `json:"id"`
-	Title            string              `json:"title"`
-	PlaceLabel       string              `json:"place_label"`
-	Description      string              `json:"description"`
-	MeetingLink      string              `json:"meeting_link"`
-	Region           string              `json:"region"`
-	Country          string              `json:"country"`
-	City             string              `json:"city"`
-	Latitude         float64             `json:"latitude"`
-	Longitude        float64             `json:"longitude"`
-	ScheduledAt      time.Time           `json:"scheduled_at"`
-	CreatedAt        time.Time           `json:"created_at"`
-	CreatorID        string              `json:"creator_id"`
-	CreatorName      string              `json:"creator_name"`
-	IsCreator        bool                `json:"is_creator"`
-	IsJoined         bool                `json:"is_joined"`
-	ParticipantCount int                 `json:"participant_count"`
-	Participants     []*EventParticipant `json:"participants"`
+	ID               uuid.UUID
+	Title            string
+	PlaceLabel       string
+	Description      string
+	MeetingLink      string
+	Region           string
+	Country          string
+	City             string
+	Latitude         float64
+	Longitude        float64
+	ScheduledAt      time.Time
+	CreatedAt        time.Time
+	CreatorID        string
+	CreatorName      string
+	IsCreator        bool
+	IsJoined         bool
+	ParticipantCount int
+	Participants     []*EventParticipant
 }
 
 // ListEventsOptions defines filters and pagination for event listing.
 type ListEventsOptions struct {
-	Limit     int32      // Number of events to return (default 20, max 100)
-	Offset    int32      // Number of events to skip
-	From      *time.Time // Filter events scheduled from this time
-	To        *time.Time // Filter events scheduled to this time
-	CreatorID *uuid.UUID // Filter by creator
-	Status    string     // "upcoming" or "past"
+	Limit     int32
+	Offset    int32
+	From      *time.Time
+	To        *time.Time
+	CreatorID *uuid.UUID
+	Status    string
 }
 
 const (
@@ -58,37 +88,37 @@ const (
 )
 
 type ListEventsResponse struct {
-	Events      []*Event `json:"events"`
-	Limit       int32    `json:"limit"`
-	Offset      int32    `json:"offset"`
-	TotalCount  int32    `json:"total_count"`
-	HasNextPage bool     `json:"has_next_page"`
+	Events      []*Event
+	Limit       int32
+	Offset      int32
+	TotalCount  int32
+	HasNextPage bool
 }
 
 type CreateEventRequest struct {
-	Title          string    `json:"title"`
-	PlaceLabel     string    `json:"place_label"`
-	Description    string    `json:"description"`
-	MeetingLink    string    `json:"meeting_link"`
-	Region         string    `json:"region"`
-	Country        string    `json:"country"`
-	City           string    `json:"city"`
-	Latitude       float64   `json:"latitude"`
-	Longitude      float64   `json:"longitude"`
-	ScheduledAt    time.Time `json:"scheduled_at"`
-	InvitedUserIDs []string  `json:"invited_user_ids"`
+	Title          string
+	PlaceLabel     string
+	Description    string
+	MeetingLink    string
+	Region         string
+	Country        string
+	City           string
+	Latitude       float64
+	Longitude      float64
+	ScheduledAt    time.Time
+	InvitedUserIDs []string
 }
 
 type UpdateEventRequest struct {
-	Title          string    `json:"title"`
-	PlaceLabel     string    `json:"place_label"`
-	Description    string    `json:"description"`
-	MeetingLink    string    `json:"meeting_link"`
-	Region         string    `json:"region"`
-	Country        string    `json:"country"`
-	City           string    `json:"city"`
-	Latitude       float64   `json:"latitude"`
-	Longitude      float64   `json:"longitude"`
-	ScheduledAt    time.Time `json:"scheduled_at"`
-	InvitedUserIDs []string  `json:"invited_user_ids"`
+	Title          string
+	PlaceLabel     string
+	Description    string
+	MeetingLink    string
+	Region         string
+	Country        string
+	City           string
+	Latitude       float64
+	Longitude      float64
+	ScheduledAt    time.Time
+	InvitedUserIDs []string
 }

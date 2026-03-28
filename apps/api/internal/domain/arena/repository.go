@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"api/internal/model"
+
 	"github.com/google/uuid"
 )
 
@@ -23,7 +25,7 @@ type Repository interface {
 	SavePlayerCode(ctx context.Context, matchID, userID uuid.UUID, code string) error
 	SetPlayerFreeze(ctx context.Context, matchID, userID uuid.UUID, freezeUntil *time.Time) error
 	SetPlayerAccepted(ctx context.Context, matchID, userID uuid.UUID, acceptedAt time.Time, runtimeMs int64) error
-	FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID *uuid.UUID, winnerReason string, finishedAt time.Time) error
+	FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID *uuid.UUID, winnerReason model.ArenaWinnerReason, finishedAt time.Time) error
 	CreateSubmission(ctx context.Context, submission *Submission) (*Submission, error)
 	GetLeaderboard(ctx context.Context, limit int32) ([]*LeaderboardEntry, error)
 	GetPlayerStats(ctx context.Context, userID uuid.UUID) (*PlayerStats, error)

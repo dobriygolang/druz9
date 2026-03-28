@@ -1,0 +1,103 @@
+/* ===========================================
+   GUEST NAME MODAL
+   =========================================== */
+
+.guest-name-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at top, rgba(79, 70, 229, 0.16), transparent 36%),
+    rgba(7, 7, 10, 0.78);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  z-index: 2000;
+}
+
+.guest-name-modal {
+  width: min(520px, 100%);
+  background:
+    radial-gradient(circle at top left, rgba(99, 102, 241, 0.14), transparent 34%),
+    linear-gradient(180deg, rgba(36, 36, 36, 0.98), rgba(22, 22, 22, 0.98));
+  color: var(--text-primary);
+  border-radius: 22px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 30px 30px 24px;
+  box-shadow: 0 28px 80px rgba(0, 0, 0, 0.42);
+}
+
+.guest-name-modal__header h2 {
+  font-size: clamp(1.7rem, 2vw, 2.4rem);
+  line-height: 1.05;
+  margin-bottom: 12px;
+  font-weight: 700;
+}
+
+.guest-name-modal__header p {
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.55;
+  margin-bottom: 18px;
+}
+
+.guest-name-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.guest-name-modal__input {
+  width: 100%;
+  height: 58px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  background: rgba(18, 18, 18, 0.92);
+  padding: 0 18px;
+  font-size: 18px;
+  color: var(--text-primary);
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+.guest-name-modal__input:hover {
+  border-color: rgba(255, 255, 255, 0.16);
+}
+
+.guest-name-modal__input::placeholder {
+  color: rgba(255, 255, 255, 0.32);
+}
+
+.guest-name-modal__input:focus {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.16);
+}
+
+.guest-name-modal__actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.guest-name-modal__submit {
+  min-width: 148px;
+  min-height: 48px;
+  border-radius: 14px;
+  font-size: 15px;
+  font-weight: 600;
+  background: linear-gradient(180deg, var(--accent-color), var(--accent-hover));
+  color: #fff;
+  box-shadow: none;
+}
+
+.guest-name-modal__submit:disabled {
+  opacity: 0.5;
+}
+
+.guest-name-modal__submit:hover:not(:disabled) {
+  background: linear-gradient(180deg, #5b53f0, #4338ca);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 24px rgba(79, 70, 229, 0.24);
+}

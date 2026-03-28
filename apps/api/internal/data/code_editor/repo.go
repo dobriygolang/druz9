@@ -6,13 +6,25 @@ import (
 	"fmt"
 	"time"
 
+	"api/internal/data/codetasks"
 	codeeditordomain "api/internal/domain/codeeditor"
+	"api/internal/model"
 	"api/internal/storage/postgres"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
+
+const roomColumns = `
+	id, mode, code, code_revision, status, creator_id, invite_code,
+	COALESCE(task, ''), task_id, COALESCE(duel_topic, ''),
+	winner_user_id, COALESCE(winner_guest_name, ''), started_at, finished_at, created_at, updated_at
+`
+
+type scanner interface {
+	Scan(dest ...any) error
+}
 
 type Repo struct {
 	data *postgres.Store
@@ -66,13 +78,11 @@ func (r *Repo) CreateRoom(ctx context.Context, room *codeeditordomain.Room) (*co
 
 func (r *Repo) GetRoom(ctx context.Context, roomID uuid.UUID) (*codeeditordomain.Room, error) {
 	var room codeeditordomain.Room
-	err := r.data.DB.QueryRow(ctx, `
-		SELECT id, mode, code, code_revision, status, creator_id, invite_code, COALESCE(task, ''), task_id, COALESCE(duel_topic, ''), winner_user_id, COALESCE(winner_guest_name, ''), started_at, finished_at, created_at, updated_at
+	err := scanRoom(r.data.DB.QueryRow(ctx, `
+		SELECT `+roomColumns+`
 		FROM code_rooms
 		WHERE id = $1
-	`, roomID).Scan(
-		&room.ID, &room.Mode, &room.Code, &room.CodeRevision, &room.Status, &room.CreatorID, &room.InviteCode, &room.Task, &room.TaskID, &room.DuelTopic, &room.WinnerUserID, &room.WinnerGuest, &room.StartedAt, &room.FinishedAt, &room.CreatedAt, &room.UpdatedAt,
-	)
+	`, roomID), &room)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, codeeditordomain.ErrRoomNotFound
@@ -89,13 +99,11 @@ func (r *Repo) GetRoom(ctx context.Context, roomID uuid.UUID) (*codeeditordomain
 
 func (r *Repo) GetRoomByInviteCode(ctx context.Context, inviteCode string) (*codeeditordomain.Room, error) {
 	var room codeeditordomain.Room
-	err := r.data.DB.QueryRow(ctx, `
-		SELECT id, mode, code, code_revision, status, creator_id, invite_code, COALESCE(task, ''), task_id, COALESCE(duel_topic, ''), winner_user_id, COALESCE(winner_guest_name, ''), started_at, finished_at, created_at, updated_at
+	err := scanRoom(r.data.DB.QueryRow(ctx, `
+		SELECT `+roomColumns+`
 		FROM code_rooms
 		WHERE invite_code = $1
-	`, inviteCode).Scan(
-		&room.ID, &room.Mode, &room.Code, &room.CodeRevision, &room.Status, &room.CreatorID, &room.InviteCode, &room.Task, &room.TaskID, &room.DuelTopic, &room.WinnerUserID, &room.WinnerGuest, &room.StartedAt, &room.FinishedAt, &room.CreatedAt, &room.UpdatedAt,
-	)
+	`, inviteCode), &room)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, codeeditordomain.ErrRoomNotFound
@@ -120,7 +128,7 @@ func (r *Repo) getParticipants(ctx context.Context, roomID uuid.UUID) ([]*codeed
 	var participants []*codeeditordomain.Participant
 	for rows.Next() {
 		var p codeeditordomain.Participant
-		if err := rows.Scan(&p.UserID, &p.Name, &p.IsGuest, &p.IsReady, &p.IsWinner, &p.JoinedAt); err != nil {
+		if err := scanParticipant(rows, &p); err != nil {
 			return nil, fmt.Errorf("scan participant: %w", err)
 		}
 		participants = append(participants, &p)
@@ -142,7 +150,7 @@ func (r *Repo) SaveCodeSnapshot(ctx context.Context, roomID uuid.UUID, code stri
 	return nil
 }
 
-func (r *Repo) UpdateRoomStatus(ctx context.Context, roomID uuid.UUID, status string) error {
+func (r *Repo) UpdateRoomStatus(ctx context.Context, roomID uuid.UUID, status model.RoomStatus) error {
 	_, err := r.data.DB.Exec(ctx, `UPDATE code_rooms SET status = $2, updated_at = NOW() WHERE id = $1`, roomID, status)
 	if err != nil {
 		return fmt.Errorf("update room status: %w", err)
@@ -275,7 +283,7 @@ func (r *Repo) GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*codeedi
 	var submissions []*codeeditordomain.Submission
 	for rows.Next() {
 		var s codeeditordomain.Submission
-		if err := rows.Scan(&s.ID, &s.RoomID, &s.UserID, &s.GuestName, &s.Code, &s.Output, &s.Error, &s.SubmittedAt, &s.DurationMs, &s.IsCorrect, &s.PassedCount, &s.TotalCount); err != nil {
+		if err := scanSubmission(rows, &s); err != nil {
 			return nil, fmt.Errorf("scan submission: %w", err)
 		}
 		submissions = append(submissions, &s)
@@ -304,15 +312,16 @@ func (r *Repo) FinishDuel(ctx context.Context, roomID uuid.UUID, winnerUserID *u
 }
 
 func (r *Repo) ListTasks(ctx context.Context, filter codeeditordomain.TaskFilter) ([]*codeeditordomain.Task, error) {
+	difficulty := difficultyFilterValue(filter.Difficulty)
 	query := `
-		SELECT id, title, slug, statement, difficulty, topics, starter_code, language, task_type, execution_profile, fixture_files, readable_paths, writable_paths, allowed_hosts, allowed_ports, mock_endpoints, writable_temp_dir, is_active, created_at, updated_at
+		SELECT ` + codetasks.SelectColumns + `
 		FROM code_tasks
 		WHERE ($1 = '' OR $1 = ANY(topics))
-		  AND ($2 = '' OR difficulty = $2)
+		  AND ($2 = 0 OR difficulty = $2)
 		  AND ($3 OR is_active = TRUE)
 		ORDER BY created_at DESC
 	`
-	rows, err := r.data.DB.Query(ctx, query, filter.Topic, filter.Difficulty, filter.IncludeInactive)
+	rows, err := r.data.DB.Query(ctx, query, filter.Topic, difficulty, filter.IncludeInactive)
 	if err != nil {
 		return nil, fmt.Errorf("list tasks: %w", err)
 	}
@@ -321,10 +330,10 @@ func (r *Repo) ListTasks(ctx context.Context, filter codeeditordomain.TaskFilter
 	var tasks []*codeeditordomain.Task
 	for rows.Next() {
 		var task codeeditordomain.Task
-		if err := rows.Scan(&task.ID, &task.Title, &task.Slug, &task.Statement, &task.Difficulty, &task.Topics, &task.StarterCode, &task.Language, &task.TaskType, &task.ExecutionProfile, &task.FixtureFiles, &task.ReadablePaths, &task.WritablePaths, &task.AllowedHosts, &task.AllowedPorts, &task.MockEndpoints, &task.WritableTempDir, &task.IsActive, &task.CreatedAt, &task.UpdatedAt); err != nil {
+		if err := codetasks.ScanTask(rows, &task); err != nil {
 			return nil, fmt.Errorf("scan task: %w", err)
 		}
-		if err := r.loadTaskCases(ctx, &task); err != nil {
+		if err := codetasks.LoadCases(ctx, r.data.DB, &task); err != nil {
 			return nil, err
 		}
 		tasks = append(tasks, &task)
@@ -340,9 +349,9 @@ func (r *Repo) CreateTask(ctx context.Context, task *codeeditordomain.Task) (*co
 	defer func() { _ = tx.Rollback(ctx) }()
 
 	_, err = tx.Exec(ctx, `
-		INSERT INTO code_tasks (id, title, slug, statement, difficulty, topics, starter_code, language, task_type, execution_profile, fixture_files, readable_paths, writable_paths, allowed_hosts, allowed_ports, mock_endpoints, writable_temp_dir, is_active, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, NOW(), NOW())
-	`, task.ID, task.Title, task.Slug, task.Statement, task.Difficulty, task.Topics, task.StarterCode, task.Language, task.TaskType, task.ExecutionProfile, task.FixtureFiles, task.ReadablePaths, task.WritablePaths, task.AllowedHosts, task.AllowedPorts, task.MockEndpoints, task.WritableTempDir, task.IsActive)
+		INSERT INTO code_tasks (id, title, slug, statement, difficulty, topics, starter_code, language, task_type, execution_profile, runner_mode, fixture_files, readable_paths, writable_paths, allowed_hosts, allowed_ports, mock_endpoints, writable_temp_dir, is_active, created_at, updated_at)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, $15, $16, $17, $18, $19, NOW(), NOW())
+	`, task.ID, task.Title, task.Slug, task.Statement, task.Difficulty, task.Topics, task.StarterCode, task.Language, task.TaskType, task.ExecutionProfile.String(), task.RunnerMode, task.FixtureFiles, task.ReadablePaths, task.WritablePaths, task.AllowedHosts, task.AllowedPorts, task.MockEndpoints, task.WritableTempDir, task.IsActive)
 	if err != nil {
 		return nil, fmt.Errorf("insert task: %w", err)
 	}
@@ -364,9 +373,9 @@ func (r *Repo) UpdateTask(ctx context.Context, task *codeeditordomain.Task) (*co
 
 	_, err = tx.Exec(ctx, `
 		UPDATE code_tasks
-		SET title = $2, slug = $3, statement = $4, difficulty = $5, topics = $6, starter_code = $7, language = $8, task_type = $9, execution_profile = $10, fixture_files = $11, readable_paths = $12, writable_paths = $13, allowed_hosts = $14, allowed_ports = $15, mock_endpoints = $16, writable_temp_dir = $17, is_active = $18, updated_at = NOW()
+		SET title = $2, slug = $3, statement = $4, difficulty = $5, topics = $6, starter_code = $7, language = $8, task_type = $9, execution_profile = $10, runner_mode = $11, fixture_files = $12, readable_paths = $13, writable_paths = $14, allowed_hosts = $15, allowed_ports = $16, mock_endpoints = $17, writable_temp_dir = $18, is_active = $19, updated_at = NOW()
 		WHERE id = $1
-	`, task.ID, task.Title, task.Slug, task.Statement, task.Difficulty, task.Topics, task.StarterCode, task.Language, task.TaskType, task.ExecutionProfile, task.FixtureFiles, task.ReadablePaths, task.WritablePaths, task.AllowedHosts, task.AllowedPorts, task.MockEndpoints, task.WritableTempDir, task.IsActive)
+	`, task.ID, task.Title, task.Slug, task.Statement, task.Difficulty, task.Topics, task.StarterCode, task.Language, task.TaskType, task.ExecutionProfile.String(), task.RunnerMode, task.FixtureFiles, task.ReadablePaths, task.WritablePaths, task.AllowedHosts, task.AllowedPorts, task.MockEndpoints, task.WritableTempDir, task.IsActive)
 	if err != nil {
 		return nil, fmt.Errorf("update task: %w", err)
 	}
@@ -392,43 +401,42 @@ func (r *Repo) DeleteTask(ctx context.Context, taskID uuid.UUID) error {
 
 func (r *Repo) GetTask(ctx context.Context, taskID uuid.UUID) (*codeeditordomain.Task, error) {
 	var task codeeditordomain.Task
-	err := r.data.DB.QueryRow(ctx, `
-		SELECT id, title, slug, statement, difficulty, topics, starter_code, language, task_type, execution_profile, fixture_files, readable_paths, writable_paths, allowed_hosts, allowed_ports, mock_endpoints, writable_temp_dir, is_active, created_at, updated_at
+	err := codetasks.ScanTask(r.data.DB.QueryRow(ctx, `
+		SELECT `+codetasks.SelectColumns+`
 		FROM code_tasks
 		WHERE id = $1
-	`, taskID).Scan(&task.ID, &task.Title, &task.Slug, &task.Statement, &task.Difficulty, &task.Topics, &task.StarterCode, &task.Language, &task.TaskType, &task.ExecutionProfile, &task.FixtureFiles, &task.ReadablePaths, &task.WritablePaths, &task.AllowedHosts, &task.AllowedPorts, &task.MockEndpoints, &task.WritableTempDir, &task.IsActive, &task.CreatedAt, &task.UpdatedAt)
+	`, taskID), &task)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, codeeditordomain.ErrTaskNotFound
 		}
 		return nil, fmt.Errorf("get task: %w", err)
 	}
-	if err := r.loadTaskCases(ctx, &task); err != nil {
+	if err := codetasks.LoadCases(ctx, r.data.DB, &task); err != nil {
 		return nil, err
 	}
 	return &task, nil
 }
 
 func (r *Repo) PickRandomTask(ctx context.Context, topic, difficulty string) (*codeeditordomain.Task, error) {
+	difficultyValue := difficultyFilterValue(difficulty)
 	var task codeeditordomain.Task
-	err := r.data.DB.QueryRow(ctx, `
-		SELECT id, title, slug, statement, difficulty, topics, starter_code, language, task_type, execution_profile, fixture_files, readable_paths, writable_paths, allowed_hosts, allowed_ports, mock_endpoints, writable_temp_dir, is_active, created_at, updated_at
+	err := codetasks.ScanTask(r.data.DB.QueryRow(ctx, `
+		SELECT `+codetasks.SelectColumns+`
 		FROM code_tasks
 		WHERE is_active = TRUE
 		  AND ($1 = '' OR $1 = ANY(topics))
-		  AND ($2 = '' OR difficulty = $2)
+		  AND ($2 = 0 OR difficulty = $2)
 		ORDER BY random()
 		LIMIT 1
-	`, topic, difficulty).Scan(
-		&task.ID, &task.Title, &task.Slug, &task.Statement, &task.Difficulty, &task.Topics, &task.StarterCode, &task.Language, &task.TaskType, &task.ExecutionProfile, &task.FixtureFiles, &task.ReadablePaths, &task.WritablePaths, &task.AllowedHosts, &task.AllowedPorts, &task.MockEndpoints, &task.WritableTempDir, &task.IsActive, &task.CreatedAt, &task.UpdatedAt,
-	)
+	`, topic, difficultyValue), &task)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, codeeditordomain.ErrNoAvailableTasks
 		}
 		return nil, fmt.Errorf("pick random task: %w", err)
 	}
-	if err := r.loadTaskCases(ctx, &task); err != nil {
+	if err := codetasks.LoadCases(ctx, r.data.DB, &task); err != nil {
 		return nil, err
 	}
 	return &task, nil
@@ -443,7 +451,7 @@ func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*codeeditordo
 		WITH duel_rooms AS (
 			SELECT id, winner_user_id, winner_guest_name
 			FROM code_rooms
-			WHERE mode = 'duel' AND status = 'finished'
+			WHERE mode = $1 AND status = $2
 		),
 		match_participants AS (
 			SELECT
@@ -476,8 +484,8 @@ func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*codeeditordo
 		LEFT JOIN best_times bt ON bt.actor_id = mp.actor_id
 		GROUP BY mp.actor_id, mp.display_name, bt.best_solve_ms
 		ORDER BY wins DESC, win_rate DESC, best_solve_ms ASC
-		LIMIT $1
-	`, limit)
+		LIMIT $3
+	`, model.RoomModeDuel, model.RoomStatusFinished, limit)
 	if err != nil {
 		return nil, fmt.Errorf("get leaderboard: %w", err)
 	}
@@ -492,35 +500,6 @@ func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*codeeditordo
 		entries = append(entries, &entry)
 	}
 	return entries, nil
-}
-
-func (r *Repo) loadTaskCases(ctx context.Context, task *codeeditordomain.Task) error {
-	rows, err := r.data.DB.Query(ctx, `
-		SELECT id, task_id, input, expected_output, is_public, weight, "order"
-		FROM code_task_test_cases
-		WHERE task_id = $1
-		ORDER BY "order" ASC, is_public DESC
-	`, task.ID)
-	if err != nil {
-		return fmt.Errorf("load task cases: %w", err)
-	}
-	defer rows.Close()
-
-	task.PublicTestCases = nil
-	task.HiddenTestCases = nil
-	for rows.Next() {
-		var tc codeeditordomain.TestCase
-		if err := rows.Scan(&tc.ID, &tc.TaskID, &tc.Input, &tc.ExpectedOutput, &tc.IsPublic, &tc.Weight, &tc.Order); err != nil {
-			return fmt.Errorf("scan task case: %w", err)
-		}
-		copyCase := tc
-		if tc.IsPublic {
-			task.PublicTestCases = append(task.PublicTestCases, &copyCase)
-		} else {
-			task.HiddenTestCases = append(task.HiddenTestCases, &copyCase)
-		}
-	}
-	return nil
 }
 
 func (r *Repo) insertTaskCases(ctx context.Context, tx pgx.Tx, task *codeeditordomain.Task) error {
@@ -558,11 +537,65 @@ func (r *Repo) insertTaskCases(ctx context.Context, tx pgx.Tx, task *codeeditord
 func (r *Repo) CleanupInactiveRooms(ctx context.Context, idleFor time.Duration) (int64, error) {
 	tag, err := r.data.DB.Exec(ctx, `
 		DELETE FROM code_rooms cr
-		WHERE cr.status IN ('waiting', 'finished')
-		  AND cr.updated_at < NOW() - $1::interval
-	`, idleFor.String())
+		WHERE cr.status IN ($1, $2)
+		  AND cr.mode IN ($3, $4)
+		  AND cr.updated_at < NOW() - $5::interval
+	`, model.RoomStatusWaiting, model.RoomStatusFinished, model.RoomModeAll, model.RoomModeDuel, idleFor.String())
 	if err != nil {
 		return 0, fmt.Errorf("cleanup inactive rooms: %w", err)
 	}
 	return tag.RowsAffected(), nil
+}
+
+func difficultyFilterValue(raw string) model.TaskDifficulty {
+	return model.TaskDifficultyFromString(raw)
+}
+
+func scanRoom(row scanner, room *codeeditordomain.Room) error {
+	return row.Scan(
+		&room.ID,
+		&room.Mode,
+		&room.Code,
+		&room.CodeRevision,
+		&room.Status,
+		&room.CreatorID,
+		&room.InviteCode,
+		&room.Task,
+		&room.TaskID,
+		&room.DuelTopic,
+		&room.WinnerUserID,
+		&room.WinnerGuest,
+		&room.StartedAt,
+		&room.FinishedAt,
+		&room.CreatedAt,
+		&room.UpdatedAt,
+	)
+}
+
+func scanParticipant(row scanner, participant *codeeditordomain.Participant) error {
+	return row.Scan(
+		&participant.UserID,
+		&participant.Name,
+		&participant.IsGuest,
+		&participant.IsReady,
+		&participant.IsWinner,
+		&participant.JoinedAt,
+	)
+}
+
+func scanSubmission(row scanner, submission *codeeditordomain.Submission) error {
+	return row.Scan(
+		&submission.ID,
+		&submission.RoomID,
+		&submission.UserID,
+		&submission.GuestName,
+		&submission.Code,
+		&submission.Output,
+		&submission.Error,
+		&submission.SubmittedAt,
+		&submission.DurationMs,
+		&submission.IsCorrect,
+		&submission.PassedCount,
+		&submission.TotalCount,
+	)
 }

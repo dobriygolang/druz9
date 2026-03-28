@@ -7,43 +7,43 @@ import (
 )
 
 type Podcast struct {
-	ID              uuid.UUID `json:"id"`
-	Title           string    `json:"title"`
-	AuthorID        string    `json:"author_id"`
-	AuthorName      string    `json:"author_name"`
-	DurationSeconds uint32    `json:"duration_seconds"`
-	ListensCount    uint64    `json:"listens_count"`
-	FileName        string    `json:"file_name"`
-	ContentType     string    `json:"content_type"`
-	ObjectKey       string    `json:"object_key"`
-	IsUploaded      bool      `json:"is_uploaded"`
-	CreatedAt       time.Time `json:"created_at"`
-	UpdatedAt       time.Time `json:"updated_at"`
+	ID              uuid.UUID
+	Title           string
+	AuthorID        string
+	AuthorName      string
+	DurationSeconds uint32
+	ListensCount    uint64
+	FileName        string
+	ContentType     PodcastContentType
+	ObjectKey       string
+	IsUploaded      bool
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }
 
 type CreatePodcastRequest struct {
-	Title string `json:"title"`
+	Title string
 }
 
 type UploadPodcastRequest struct {
-	FileName        string `json:"file_name"`
-	ContentType     string `json:"content_type"`
-	Content         []byte `json:"content"`
-	ContentLength   int64  `json:"content_length"`
-	DurationSeconds uint32 `json:"duration_seconds"`
+	FileName        string
+	ContentType     string
+	Content         []byte
+	ContentLength   int64
+	DurationSeconds uint32
 }
 
 type PreparePodcastUploadRequest struct {
-	FileName        string `json:"file_name"`
-	ContentType     string `json:"content_type"`
-	DurationSeconds uint32 `json:"duration_seconds"`
+	FileName        string
+	ContentType     string
+	DurationSeconds uint32
 }
 
 type CompletePodcastUploadRequest struct {
-	FileName        string `json:"file_name"`
-	ContentType     string `json:"content_type"`
-	DurationSeconds uint32 `json:"duration_seconds"`
-	ObjectKey       string `json:"object_key"`
+	FileName        string
+	ContentType     string
+	DurationSeconds uint32
+	ObjectKey       string
 }
 
 type ListPodcastsOptions struct {
@@ -55,6 +55,46 @@ const (
 	DefaultPodcastsLimit = 20
 	MaxPodcastsLimit     = 100
 )
+
+type PodcastContentType int
+
+const (
+	PodcastContentTypeUnknown PodcastContentType = iota
+	PodcastContentTypeAudioMpeg
+	PodcastContentTypeAudioWav
+	PodcastContentTypeAudioOgg
+	PodcastContentTypeAudioMp4
+)
+
+func (c PodcastContentType) String() string {
+	switch c {
+	case PodcastContentTypeAudioMpeg:
+		return "audio/mpeg"
+	case PodcastContentTypeAudioWav:
+		return "audio/wav"
+	case PodcastContentTypeAudioOgg:
+		return "audio/ogg"
+	case PodcastContentTypeAudioMp4:
+		return "audio/mp4"
+	default:
+		return ""
+	}
+}
+
+func PodcastContentTypeFromString(s string) PodcastContentType {
+	switch s {
+	case "audio/mpeg":
+		return PodcastContentTypeAudioMpeg
+	case "audio/wav":
+		return PodcastContentTypeAudioWav
+	case "audio/ogg":
+		return PodcastContentTypeAudioOgg
+	case "audio/mp4":
+		return PodcastContentTypeAudioMp4
+	default:
+		return PodcastContentTypeUnknown
+	}
+}
 
 type ListPodcastsResponse struct {
 	Podcasts    []*Podcast

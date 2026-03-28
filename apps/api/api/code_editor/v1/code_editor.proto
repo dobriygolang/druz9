@@ -100,7 +100,7 @@ message CreateRoomRequest {
   string task = 2; // task description for duel
   string name = 3; // creator name
   string topic = 4; // preferred duel topic
-  string difficulty = 5; // preferred duel difficulty
+  TaskDifficulty difficulty = 5; // preferred duel difficulty
 }
 
 message CreateRoomResponse {
@@ -216,17 +216,17 @@ message Task {
   string title = 2;
   string slug = 3;
   string statement = 4;
-  string difficulty = 5;
+  TaskDifficulty difficulty = 5;
   repeated string topics = 6;
   string starter_code = 7;
-  string language = 8;
+  ProgrammingLanguage language = 8;
   bool is_active = 9;
   repeated TaskTestCase public_test_cases = 10;
   repeated TaskTestCase hidden_test_cases = 11;
   google.protobuf.Timestamp created_at = 12;
   google.protobuf.Timestamp updated_at = 13;
-  string task_type = 14;
-  string execution_profile = 15;
+  TaskType task_type = 14;  // semantic task kind for authoring/UI
+  string execution_profile = 15;  // runtime sandbox profile: pure/file_io/http_client/interview_realistic
   repeated string fixture_files = 16;
   repeated string readable_paths = 17;
   repeated string writable_paths = 18;
@@ -234,11 +234,12 @@ message Task {
   repeated int32 allowed_ports = 20;
   repeated string mock_endpoints = 21;
   bool writable_temp_dir = 22;
+  string runner_mode = 23;  // program or function_io
 }
 
 message ListTasksRequest {
   string topic = 1;
-  string difficulty = 2;
+  TaskDifficulty difficulty = 2;
   bool include_inactive = 3;
 }
 
@@ -250,15 +251,15 @@ message CreateTaskRequest {
   string title = 1;
   string slug = 2;
   string statement = 3;
-  string difficulty = 4;
+  TaskDifficulty difficulty = 4;
   repeated string topics = 5;
   string starter_code = 6;
-  string language = 7;
+  ProgrammingLanguage language = 7;
   bool is_active = 8;
   repeated TaskTestCase public_test_cases = 9;
   repeated TaskTestCase hidden_test_cases = 10;
-  string task_type = 11;
-  string execution_profile = 12;
+  TaskType task_type = 11;  // semantic task kind for authoring/UI
+  string execution_profile = 12;  // runtime sandbox profile
   repeated string fixture_files = 13;
   repeated string readable_paths = 14;
   repeated string writable_paths = 15;
@@ -266,6 +267,7 @@ message CreateTaskRequest {
   repeated int32 allowed_ports = 17;
   repeated string mock_endpoints = 18;
   bool writable_temp_dir = 19;
+  string runner_mode = 20;
 }
 
 message UpdateTaskRequest {
@@ -273,15 +275,15 @@ message UpdateTaskRequest {
   string title = 2;
   string slug = 3;
   string statement = 4;
-  string difficulty = 5;
+  TaskDifficulty difficulty = 5;
   repeated string topics = 6;
   string starter_code = 7;
-  string language = 8;
+  ProgrammingLanguage language = 8;
   bool is_active = 9;
   repeated TaskTestCase public_test_cases = 10;
   repeated TaskTestCase hidden_test_cases = 11;
-  string task_type = 12;
-  string execution_profile = 13;
+  TaskType task_type = 12;  // semantic task kind for authoring/UI
+  string execution_profile = 13;  // runtime sandbox profile
   repeated string fixture_files = 14;
   repeated string readable_paths = 15;
   repeated string writable_paths = 16;
@@ -289,6 +291,7 @@ message UpdateTaskRequest {
   repeated int32 allowed_ports = 18;
   repeated string mock_endpoints = 19;
   bool writable_temp_dir = 20;
+  string runner_mode = 21;
 }
 
 message TaskResponse {
@@ -331,4 +334,29 @@ enum RoomStatus {
   ROOM_STATUS_WAITING = 1;   // waiting for participants
   ROOM_STATUS_ACTIVE = 2;    // room is active
   ROOM_STATUS_FINISHED = 3;  // duel finished
+}
+
+enum TaskDifficulty {
+  TASK_DIFFICULTY_UNSPECIFIED = 0;
+  TASK_DIFFICULTY_EASY = 1;
+  TASK_DIFFICULTY_MEDIUM = 2;
+  TASK_DIFFICULTY_HARD = 3;
+}
+
+enum ProgrammingLanguage {
+  PROGRAMMING_LANGUAGE_UNSPECIFIED = 0;
+  PROGRAMMING_LANGUAGE_JAVASCRIPT = 1;
+  PROGRAMMING_LANGUAGE_TYPESCRIPT = 2;
+  PROGRAMMING_LANGUAGE_PYTHON = 3;
+  PROGRAMMING_LANGUAGE_GO = 4;
+  PROGRAMMING_LANGUAGE_RUST = 5;
+  PROGRAMMING_LANGUAGE_CPP = 6;
+  PROGRAMMING_LANGUAGE_JAVA = 7;
+}
+
+enum TaskType {
+  TASK_TYPE_UNSPECIFIED = 0;
+  TASK_TYPE_ALGORITHM = 1;
+  TASK_TYPE_DEBUGGING = 2;
+  TASK_TYPE_REFACTORING = 3;
 }

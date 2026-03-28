@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
+	podcastdomain "api/internal/domain/podcast"
 	"api/internal/model"
-	podcastdomain "api/internal/podcast/service"
 	"api/internal/storage/postgres"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
@@ -28,7 +28,7 @@ func NewRepo(dataLayer *postgres.Store, logger log.Logger) podcastdomain.Reposit
 	}
 }
 
-const podcastColumns = `id, title, COALESCE(author_id::text, ''), author_name, duration_seconds, listens_count, COALESCE(file_name, ''), COALESCE(content_type, ''), COALESCE(object_key, ''), created_at, updated_at`
+const podcastColumns = `id, title, COALESCE(author_id::text, ''), author_name, duration_seconds, listens_count, COALESCE(file_name, ''), COALESCE(content_type, 0), COALESCE(object_key, ''), created_at, updated_at`
 
 func (r *Repo) ListPodcasts(ctx context.Context, opts model.ListPodcastsOptions) (*model.ListPodcastsResponse, error) {
 	// Apply defaults
@@ -105,10 +105,10 @@ SET file_name = $2,
     duration_seconds = $5,
     updated_at = NOW()
 WHERE id = $1
-RETURNING %s`, podcastColumns),
+	RETURNING %s`, podcastColumns),
 		podcastID,
 		req.FileName,
-		req.ContentType,
+		model.PodcastContentTypeFromString(req.ContentType),
 		objectKey,
 		req.DurationSeconds,
 	))
@@ -145,6 +145,7 @@ func scanPodcast(scanner podcastScanner) (*model.Podcast, error) {
 		item            model.Podcast
 		durationSeconds int32
 		listensCount    int64
+		contentType     int32
 	)
 	if err := scanner.Scan(
 		&item.ID,
@@ -154,7 +155,7 @@ func scanPodcast(scanner podcastScanner) (*model.Podcast, error) {
 		&durationSeconds,
 		&listensCount,
 		&item.FileName,
-		&item.ContentType,
+		&contentType,
 		&item.ObjectKey,
 		&item.CreatedAt,
 		&item.UpdatedAt,
@@ -170,6 +171,7 @@ func scanPodcast(scanner podcastScanner) (*model.Podcast, error) {
 	if listensCount > 0 {
 		item.ListensCount = uint64(listensCount)
 	}
+	item.ContentType = model.PodcastContentType(contentType)
 	item.IsUploaded = item.ObjectKey != ""
 	return &item, nil
 }

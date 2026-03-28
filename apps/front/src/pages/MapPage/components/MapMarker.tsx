@@ -32,10 +32,23 @@ export const PinMarker: React.FC<PinMarkerProps> = ({
         width: '48px',
         height: '64px',
         transform: 'translate(-50%, -100%)',
-        filter: 'drop-shadow(0 12px 24px rgba(0, 0, 0, 0.5))',
+        filter: `drop-shadow(0 12px 24px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 18px ${markerColor}55)`,
         cursor: 'pointer',
       }}
     >
+      <div
+        style={{
+          position: 'absolute',
+          top: '8px',
+          left: '8px',
+          width: '32px',
+          height: '32px',
+          borderRadius: '999px',
+          background: `${markerColor}22`,
+          boxShadow: `0 0 0 1px ${markerColor}33, 0 0 24px ${markerColor}44`,
+          zIndex: 1,
+        }}
+      />
       {/* Pin SVG Background - Balanced for stroke */}
       <svg
         viewBox="0 0 48 64"
@@ -132,7 +145,7 @@ export const ClusterMarker: React.FC<{ cluster: UserCluster }> = ({ cluster }) =
       avatarUrl={cluster.sample.avatarUrl}
       label={label}
       count={cluster.count}
-      color="#888"
+      color="#38bdf8"
     />
   );
 };
@@ -141,7 +154,7 @@ export const EventMarker: React.FC<{ event: DisplayEvent }> = ({ event }) => {
   return (
     <PinMarker
       label="Event"
-      color={event.is_joined ? '#fff' : '#666'}
+      color={event.is_joined ? '#f59e0b' : '#94a3b8'}
       count={event.participants.length}
       icon={Calendar}
     />

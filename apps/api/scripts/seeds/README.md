@@ -12,6 +12,12 @@
 - `test_users.sql`
 - `catalogs/blind75.json`
 
+Важно:
+
+- сначала `make migrate-up`
+- потом `make seed-up`
+- `seed_runs` больше не создается fallback-ом из кода, это часть схемы БД
+
 Команды:
 
 - `make seed-up`

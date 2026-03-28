@@ -58,6 +58,12 @@ type BackendEventResponse = {
   event?: BackendEvent;
 };
 
+function normalizeParticipantStatus(value: unknown): EventParticipant['status'] {
+  if (value === 2 || value === 'PARTICIPANT_STATUS_CONFIRMED' || value === 'confirmed' || value === 'joined') return 'joined';
+  if (value === 3 || value === 'PARTICIPANT_STATUS_DECLINED' || value === 'declined') return 'declined';
+  return 'invited';
+}
+
 function normalizeParticipant(
   participant: BackendEventParticipant,
 ): EventParticipant {
@@ -69,7 +75,7 @@ function normalizeParticipant(
       participant.telegram_username ?? participant.telegramUsername ?? '',
     first_name: participant.first_name ?? participant.firstName ?? '',
     last_name: participant.last_name ?? participant.lastName ?? '',
-    status: participant.status ?? 'joined',
+    status: normalizeParticipantStatus(participant.status),
   };
 }
 

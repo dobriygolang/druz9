@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"api/internal/model"
-	"api/internal/policy"
 
 	"github.com/google/uuid"
 )
@@ -85,12 +84,13 @@ func buildBlind75Task(def CatalogTask) *model.CodeTask {
 		Title:            def.Title,
 		Slug:             def.Slug,
 		Statement:        def.Statement,
-		Difficulty:       def.Difficulty,
+		Difficulty:       model.TaskDifficultyFromString(def.Difficulty),
 		Topics:           append([]string{"blind75"}, def.Topics...),
-		StarterCode:      goStarterCode("прочитать входные данные из stdin и вывести ответ в stdout"),
-		Language:         string(policy.LanguageGo),
-		TaskType:         string(policy.TaskTypeAlgorithmPractice),
-		ExecutionProfile: string(policy.ProfilePure),
+		StarterCode:      goFunctionStarterCode(),
+		Language:         model.ProgrammingLanguageGo,
+		TaskType:         model.TaskTypeAlgorithm,
+		ExecutionProfile: model.ExecutionProfilePure,
+		RunnerMode:       model.RunnerModeFunctionIO,
 		IsActive:         true,
 	}
 
@@ -126,6 +126,13 @@ func normalizeSeedText(value string) string {
 	return trimmed + "\n"
 }
 
-func goStarterCode(comment string) string {
-	return "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\treader := bufio.NewReader(os.Stdin)\n\t_ = reader\n\t// TODO: " + comment + "\n\tfmt.Println(\"implement me\")\n}\n"
+func goFunctionStarterCode() string {
+	return `package main
+
+func solve(input string) string {
+	_ = input
+	// TODO: parse input and return the answer as a string.
+	return "implement me"
+}
+`
 }

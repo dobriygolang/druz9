@@ -26,7 +26,7 @@ func (i *Implementation) UpdateReferral(ctx context.Context, req *v1.UpdateRefer
 		Description:    req.Description,
 		Experience:     req.Experience,
 		Location:       req.Location,
-		EmploymentType: req.EmploymentType,
+		EmploymentType: unmapEmploymentType(req.EmploymentType),
 	})
 	if err != nil {
 		return nil, err

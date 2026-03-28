@@ -47,6 +47,29 @@ type PrepareUploadResponse = {
   podcast: BackendPodcast;
 };
 
+function normalizeContentType(value: unknown): string {
+  switch (value) {
+    case 1:
+    case 'MEDIA_CONTENT_TYPE_AUDIO_MPEG':
+    case 'audio/mpeg':
+      return 'audio/mpeg';
+    case 2:
+    case 'MEDIA_CONTENT_TYPE_AUDIO_WAV':
+    case 'audio/wav':
+      return 'audio/wav';
+    case 3:
+    case 'MEDIA_CONTENT_TYPE_AUDIO_OGG':
+    case 'audio/ogg':
+      return 'audio/ogg';
+    case 4:
+    case 'MEDIA_CONTENT_TYPE_AUDIO_MP4':
+    case 'audio/mp4':
+      return 'audio/mp4';
+    default:
+      return '';
+  }
+}
+
 function normalizePodcast(p: BackendPodcast): Podcast {
   return {
     id: p.id,
@@ -56,7 +79,7 @@ function normalizePodcast(p: BackendPodcast): Podcast {
     duration_seconds: p.duration_seconds ?? p.durationSeconds ?? 0,
     listens_count: p.listens_count ?? p.listensCount ?? '0',
     file_name: p.file_name ?? p.fileName ?? '',
-    content_type: p.content_type ?? p.contentType ?? '',
+    content_type: normalizeContentType(p.content_type ?? p.contentType),
     is_uploaded: p.is_uploaded ?? p.isUploaded ?? false,
     created_at: p.created_at ?? p.createdAt ?? '',
     updated_at: p.updated_at ?? p.updatedAt ?? '',

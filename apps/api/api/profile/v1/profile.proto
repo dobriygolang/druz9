@@ -111,7 +111,14 @@ message User {
   google.protobuf.Timestamp updated_at = 9;
   double latitude = 10;
   double longitude = 11;
-  string activity_status = 12;
+  UserActivityStatus activity_status = 12;
   string current_workplace = 13;
   bool is_admin = 14;
+}
+
+enum UserActivityStatus {
+  USER_ACTIVITY_STATUS_UNSPECIFIED = 0;
+  USER_ACTIVITY_STATUS_ONLINE = 1;
+  USER_ACTIVITY_STATUS_RECENTLY_ACTIVE = 2;
+  USER_ACTIVITY_STATUS_OFFLINE = 3;
 }

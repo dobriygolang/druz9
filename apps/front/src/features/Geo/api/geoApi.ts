@@ -43,6 +43,12 @@ type BackendCommunityMapResponse = {
   points?: BackendCommunityMapPoint[];
 };
 
+function normalizeActivityStatus(value: unknown): CommunityMapPoint['activityStatus'] {
+  if (value === 1 || value === 'USER_ACTIVITY_STATUS_ONLINE' || value === 'online') return 'online';
+  if (value === 2 || value === 'USER_ACTIVITY_STATUS_RECENTLY_ACTIVE' || value === 'recently_active') return 'recently_active';
+  return 'offline';
+}
+
 function normalizeCandidate(candidate: BackendCandidate): LocationCandidate {
   return {
     region: candidate.region ?? '',
@@ -69,7 +75,7 @@ function normalizeCommunityMapPoint(
       point.telegram_username ?? point.telegramUsername ?? '',
     firstName: point.first_name ?? point.firstName ?? '',
     lastName: point.last_name ?? point.lastName ?? '',
-    activityStatus: point.activity_status ?? point.activityStatus ?? 'offline',
+    activityStatus: normalizeActivityStatus(point.activity_status ?? point.activityStatus),
   };
 }
 

@@ -23,6 +23,229 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Difficulty int32
+
+const (
+	Difficulty_DIFFICULTY_UNSPECIFIED Difficulty = 0
+	Difficulty_DIFFICULTY_EASY        Difficulty = 1
+	Difficulty_DIFFICULTY_MEDIUM      Difficulty = 2
+	Difficulty_DIFFICULTY_HARD        Difficulty = 3
+)
+
+// Enum value maps for Difficulty.
+var (
+	Difficulty_name = map[int32]string{
+		0: "DIFFICULTY_UNSPECIFIED",
+		1: "DIFFICULTY_EASY",
+		2: "DIFFICULTY_MEDIUM",
+		3: "DIFFICULTY_HARD",
+	}
+	Difficulty_value = map[string]int32{
+		"DIFFICULTY_UNSPECIFIED": 0,
+		"DIFFICULTY_EASY":        1,
+		"DIFFICULTY_MEDIUM":      2,
+		"DIFFICULTY_HARD":        3,
+	}
+)
+
+func (x Difficulty) Enum() *Difficulty {
+	p := new(Difficulty)
+	*p = x
+	return p
+}
+
+func (x Difficulty) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (Difficulty) Descriptor() protoreflect.EnumDescriptor {
+	return file_arena_v1_arena_proto_enumTypes[0].Descriptor()
+}
+
+func (Difficulty) Type() protoreflect.EnumType {
+	return &file_arena_v1_arena_proto_enumTypes[0]
+}
+
+func (x Difficulty) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use Difficulty.Descriptor instead.
+func (Difficulty) EnumDescriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{0}
+}
+
+type WinnerReason int32
+
+const (
+	WinnerReason_WINNER_REASON_UNSPECIFIED   WinnerReason = 0
+	WinnerReason_WINNER_REASON_ACCEPTED_TIME WinnerReason = 1
+	WinnerReason_WINNER_REASON_RUNTIME       WinnerReason = 2
+	WinnerReason_WINNER_REASON_TIMEOUT       WinnerReason = 3
+	WinnerReason_WINNER_REASON_SINGLE_AC     WinnerReason = 4
+	WinnerReason_WINNER_REASON_NONE          WinnerReason = 5
+)
+
+// Enum value maps for WinnerReason.
+var (
+	WinnerReason_name = map[int32]string{
+		0: "WINNER_REASON_UNSPECIFIED",
+		1: "WINNER_REASON_ACCEPTED_TIME",
+		2: "WINNER_REASON_RUNTIME",
+		3: "WINNER_REASON_TIMEOUT",
+		4: "WINNER_REASON_SINGLE_AC",
+		5: "WINNER_REASON_NONE",
+	}
+	WinnerReason_value = map[string]int32{
+		"WINNER_REASON_UNSPECIFIED":   0,
+		"WINNER_REASON_ACCEPTED_TIME": 1,
+		"WINNER_REASON_RUNTIME":       2,
+		"WINNER_REASON_TIMEOUT":       3,
+		"WINNER_REASON_SINGLE_AC":     4,
+		"WINNER_REASON_NONE":          5,
+	}
+)
+
+func (x WinnerReason) Enum() *WinnerReason {
+	p := new(WinnerReason)
+	*p = x
+	return p
+}
+
+func (x WinnerReason) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (WinnerReason) Descriptor() protoreflect.EnumDescriptor {
+	return file_arena_v1_arena_proto_enumTypes[1].Descriptor()
+}
+
+func (WinnerReason) Type() protoreflect.EnumType {
+	return &file_arena_v1_arena_proto_enumTypes[1]
+}
+
+func (x WinnerReason) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use WinnerReason.Descriptor instead.
+func (WinnerReason) EnumDescriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{1}
+}
+
+type ArenaPlayerSide int32
+
+const (
+	ArenaPlayerSide_ARENA_PLAYER_SIDE_UNSPECIFIED ArenaPlayerSide = 0
+	ArenaPlayerSide_ARENA_PLAYER_SIDE_LEFT        ArenaPlayerSide = 1
+	ArenaPlayerSide_ARENA_PLAYER_SIDE_RIGHT       ArenaPlayerSide = 2
+)
+
+// Enum value maps for ArenaPlayerSide.
+var (
+	ArenaPlayerSide_name = map[int32]string{
+		0: "ARENA_PLAYER_SIDE_UNSPECIFIED",
+		1: "ARENA_PLAYER_SIDE_LEFT",
+		2: "ARENA_PLAYER_SIDE_RIGHT",
+	}
+	ArenaPlayerSide_value = map[string]int32{
+		"ARENA_PLAYER_SIDE_UNSPECIFIED": 0,
+		"ARENA_PLAYER_SIDE_LEFT":        1,
+		"ARENA_PLAYER_SIDE_RIGHT":       2,
+	}
+)
+
+func (x ArenaPlayerSide) Enum() *ArenaPlayerSide {
+	p := new(ArenaPlayerSide)
+	*p = x
+	return p
+}
+
+func (x ArenaPlayerSide) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ArenaPlayerSide) Descriptor() protoreflect.EnumDescriptor {
+	return file_arena_v1_arena_proto_enumTypes[2].Descriptor()
+}
+
+func (ArenaPlayerSide) Type() protoreflect.EnumType {
+	return &file_arena_v1_arena_proto_enumTypes[2]
+}
+
+func (x ArenaPlayerSide) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ArenaPlayerSide.Descriptor instead.
+func (ArenaPlayerSide) EnumDescriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{2}
+}
+
+type ArenaLeague int32
+
+const (
+	ArenaLeague_ARENA_LEAGUE_UNSPECIFIED ArenaLeague = 0
+	ArenaLeague_ARENA_LEAGUE_BRONZE      ArenaLeague = 1
+	ArenaLeague_ARENA_LEAGUE_SILVER      ArenaLeague = 2
+	ArenaLeague_ARENA_LEAGUE_GOLD        ArenaLeague = 3
+	ArenaLeague_ARENA_LEAGUE_PLATINUM    ArenaLeague = 4
+	ArenaLeague_ARENA_LEAGUE_DIAMOND     ArenaLeague = 5
+	ArenaLeague_ARENA_LEAGUE_MASTER      ArenaLeague = 6
+	ArenaLeague_ARENA_LEAGUE_LEGEND      ArenaLeague = 7
+)
+
+// Enum value maps for ArenaLeague.
+var (
+	ArenaLeague_name = map[int32]string{
+		0: "ARENA_LEAGUE_UNSPECIFIED",
+		1: "ARENA_LEAGUE_BRONZE",
+		2: "ARENA_LEAGUE_SILVER",
+		3: "ARENA_LEAGUE_GOLD",
+		4: "ARENA_LEAGUE_PLATINUM",
+		5: "ARENA_LEAGUE_DIAMOND",
+		6: "ARENA_LEAGUE_MASTER",
+		7: "ARENA_LEAGUE_LEGEND",
+	}
+	ArenaLeague_value = map[string]int32{
+		"ARENA_LEAGUE_UNSPECIFIED": 0,
+		"ARENA_LEAGUE_BRONZE":      1,
+		"ARENA_LEAGUE_SILVER":      2,
+		"ARENA_LEAGUE_GOLD":        3,
+		"ARENA_LEAGUE_PLATINUM":    4,
+		"ARENA_LEAGUE_DIAMOND":     5,
+		"ARENA_LEAGUE_MASTER":      6,
+		"ARENA_LEAGUE_LEGEND":      7,
+	}
+)
+
+func (x ArenaLeague) Enum() *ArenaLeague {
+	p := new(ArenaLeague)
+	*p = x
+	return p
+}
+
+func (x ArenaLeague) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ArenaLeague) Descriptor() protoreflect.EnumDescriptor {
+	return file_arena_v1_arena_proto_enumTypes[3].Descriptor()
+}
+
+func (ArenaLeague) Type() protoreflect.EnumType {
+	return &file_arena_v1_arena_proto_enumTypes[3]
+}
+
+func (x ArenaLeague) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ArenaLeague.Descriptor instead.
+func (ArenaLeague) EnumDescriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{3}
+}
+
 type ArenaMatchStatus int32
 
 const (
@@ -59,11 +282,11 @@ func (x ArenaMatchStatus) String() string {
 }
 
 func (ArenaMatchStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_arena_v1_arena_proto_enumTypes[0].Descriptor()
+	return file_arena_v1_arena_proto_enumTypes[4].Descriptor()
 }
 
 func (ArenaMatchStatus) Type() protoreflect.EnumType {
-	return &file_arena_v1_arena_proto_enumTypes[0]
+	return &file_arena_v1_arena_proto_enumTypes[4]
 }
 
 func (x ArenaMatchStatus) Number() protoreflect.EnumNumber {
@@ -72,13 +295,13 @@ func (x ArenaMatchStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ArenaMatchStatus.Descriptor instead.
 func (ArenaMatchStatus) EnumDescriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{0}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{4}
 }
 
 type CreateMatchRequest struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Topic             string                 `protobuf:"bytes,1,opt,name=topic,proto3" json:"topic,omitempty"`
-	Difficulty        string                 `protobuf:"bytes,2,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
+	Difficulty        Difficulty             `protobuf:"varint,2,opt,name=difficulty,proto3,enum=arena.v1.Difficulty" json:"difficulty,omitempty"`
 	ObfuscateOpponent bool                   `protobuf:"varint,3,opt,name=obfuscate_opponent,json=obfuscateOpponent,proto3" json:"obfuscate_opponent,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
@@ -121,11 +344,11 @@ func (x *CreateMatchRequest) GetTopic() string {
 	return ""
 }
 
-func (x *CreateMatchRequest) GetDifficulty() string {
+func (x *CreateMatchRequest) GetDifficulty() Difficulty {
 	if x != nil {
 		return x.Difficulty
 	}
-	return ""
+	return Difficulty_DIFFICULTY_UNSPECIFIED
 }
 
 func (x *CreateMatchRequest) GetObfuscateOpponent() bool {
@@ -515,12 +738,12 @@ type ArenaMatch struct {
 	TaskStatement     string                 `protobuf:"bytes,4,opt,name=task_statement,json=taskStatement,proto3" json:"task_statement,omitempty"`
 	StarterCode       string                 `protobuf:"bytes,5,opt,name=starter_code,json=starterCode,proto3" json:"starter_code,omitempty"`
 	Topic             string                 `protobuf:"bytes,6,opt,name=topic,proto3" json:"topic,omitempty"`
-	Difficulty        string                 `protobuf:"bytes,7,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
+	Difficulty        Difficulty             `protobuf:"varint,7,opt,name=difficulty,proto3,enum=arena.v1.Difficulty" json:"difficulty,omitempty"`
 	Status            ArenaMatchStatus       `protobuf:"varint,8,opt,name=status,proto3,enum=arena.v1.ArenaMatchStatus" json:"status,omitempty"`
 	DurationSeconds   int32                  `protobuf:"varint,9,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
 	ObfuscateOpponent bool                   `protobuf:"varint,10,opt,name=obfuscate_opponent,json=obfuscateOpponent,proto3" json:"obfuscate_opponent,omitempty"`
 	WinnerUserId      string                 `protobuf:"bytes,11,opt,name=winner_user_id,json=winnerUserId,proto3" json:"winner_user_id,omitempty"`
-	WinnerReason      string                 `protobuf:"bytes,12,opt,name=winner_reason,json=winnerReason,proto3" json:"winner_reason,omitempty"`
+	WinnerReason      WinnerReason           `protobuf:"varint,12,opt,name=winner_reason,json=winnerReason,proto3,enum=arena.v1.WinnerReason" json:"winner_reason,omitempty"`
 	StartedAt         *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
 	FinishedAt        *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=finished_at,json=finishedAt,proto3" json:"finished_at,omitempty"`
 	CreatedAt         *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
@@ -604,11 +827,11 @@ func (x *ArenaMatch) GetTopic() string {
 	return ""
 }
 
-func (x *ArenaMatch) GetDifficulty() string {
+func (x *ArenaMatch) GetDifficulty() Difficulty {
 	if x != nil {
 		return x.Difficulty
 	}
-	return ""
+	return Difficulty_DIFFICULTY_UNSPECIFIED
 }
 
 func (x *ArenaMatch) GetStatus() ArenaMatchStatus {
@@ -639,11 +862,11 @@ func (x *ArenaMatch) GetWinnerUserId() string {
 	return ""
 }
 
-func (x *ArenaMatch) GetWinnerReason() string {
+func (x *ArenaMatch) GetWinnerReason() WinnerReason {
 	if x != nil {
 		return x.WinnerReason
 	}
-	return ""
+	return WinnerReason_WINNER_REASON_UNSPECIFIED
 }
 
 func (x *ArenaMatch) GetStartedAt() *timestamppb.Timestamp {
@@ -699,7 +922,7 @@ type ArenaPlayer struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	DisplayName   string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
-	Side          string                 `protobuf:"bytes,3,opt,name=side,proto3" json:"side,omitempty"`
+	Side          ArenaPlayerSide        `protobuf:"varint,3,opt,name=side,proto3,enum=arena.v1.ArenaPlayerSide" json:"side,omitempty"`
 	IsCreator     bool                   `protobuf:"varint,4,opt,name=is_creator,json=isCreator,proto3" json:"is_creator,omitempty"`
 	FreezeUntil   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=freeze_until,json=freezeUntil,proto3" json:"freeze_until,omitempty"`
 	AcceptedAt    *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=accepted_at,json=acceptedAt,proto3" json:"accepted_at,omitempty"`
@@ -755,11 +978,11 @@ func (x *ArenaPlayer) GetDisplayName() string {
 	return ""
 }
 
-func (x *ArenaPlayer) GetSide() string {
+func (x *ArenaPlayer) GetSide() ArenaPlayerSide {
 	if x != nil {
 		return x.Side
 	}
-	return ""
+	return ArenaPlayerSide_ARENA_PLAYER_SIDE_UNSPECIFIED
 }
 
 func (x *ArenaPlayer) GetIsCreator() bool {
@@ -820,7 +1043,7 @@ type ArenaLeaderboardEntry struct {
 	WinRate       float64                `protobuf:"fixed64,5,opt,name=win_rate,json=winRate,proto3" json:"win_rate,omitempty"`
 	BestRuntime   int64                  `protobuf:"varint,6,opt,name=best_runtime,json=bestRuntime,proto3" json:"best_runtime,omitempty"`
 	Rating        int32                  `protobuf:"varint,7,opt,name=rating,proto3" json:"rating,omitempty"`
-	League        string                 `protobuf:"bytes,8,opt,name=league,proto3" json:"league,omitempty"`
+	League        ArenaLeague            `protobuf:"varint,8,opt,name=league,proto3,enum=arena.v1.ArenaLeague" json:"league,omitempty"`
 	Losses        int32                  `protobuf:"varint,9,opt,name=losses,proto3" json:"losses,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -905,11 +1128,11 @@ func (x *ArenaLeaderboardEntry) GetRating() int32 {
 	return 0
 }
 
-func (x *ArenaLeaderboardEntry) GetLeague() string {
+func (x *ArenaLeaderboardEntry) GetLeague() ArenaLeague {
 	if x != nil {
 		return x.League
 	}
-	return ""
+	return ArenaLeague_ARENA_LEAGUE_UNSPECIFIED
 }
 
 func (x *ArenaLeaderboardEntry) GetLosses() int32 {
@@ -923,11 +1146,11 @@ var File_arena_v1_arena_proto protoreflect.FileDescriptor
 
 const file_arena_v1_arena_proto_rawDesc = "" +
 	"\n" +
-	"\x14arena/v1/arena.proto\x12\barena.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"y\n" +
+	"\x14arena/v1/arena.proto\x12\barena.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8f\x01\n" +
 	"\x12CreateMatchRequest\x12\x14\n" +
-	"\x05topic\x18\x01 \x01(\tR\x05topic\x12\x1e\n" +
+	"\x05topic\x18\x01 \x01(\tR\x05topic\x124\n" +
 	"\n" +
-	"difficulty\x18\x02 \x01(\tR\n" +
+	"difficulty\x18\x02 \x01(\x0e2\x14.arena.v1.DifficultyR\n" +
 	"difficulty\x12-\n" +
 	"\x12obfuscate_opponent\x18\x03 \x01(\bR\x11obfuscateOpponent\",\n" +
 	"\x0fGetMatchRequest\x12\x19\n" +
@@ -954,7 +1177,7 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x15GetLeaderboardRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\"S\n" +
 	"\x16GetLeaderboardResponse\x129\n" +
-	"\aentries\x18\x01 \x03(\v2\x1f.arena.v1.ArenaLeaderboardEntryR\aentries\"\x81\x06\n" +
+	"\aentries\x18\x01 \x03(\v2\x1f.arena.v1.ArenaLeaderboardEntryR\aentries\"\xaf\x06\n" +
 	"\n" +
 	"ArenaMatch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
@@ -963,16 +1186,16 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"task_title\x18\x03 \x01(\tR\ttaskTitle\x12%\n" +
 	"\x0etask_statement\x18\x04 \x01(\tR\rtaskStatement\x12!\n" +
 	"\fstarter_code\x18\x05 \x01(\tR\vstarterCode\x12\x14\n" +
-	"\x05topic\x18\x06 \x01(\tR\x05topic\x12\x1e\n" +
+	"\x05topic\x18\x06 \x01(\tR\x05topic\x124\n" +
 	"\n" +
-	"difficulty\x18\a \x01(\tR\n" +
+	"difficulty\x18\a \x01(\x0e2\x14.arena.v1.DifficultyR\n" +
 	"difficulty\x122\n" +
 	"\x06status\x18\b \x01(\x0e2\x1a.arena.v1.ArenaMatchStatusR\x06status\x12)\n" +
 	"\x10duration_seconds\x18\t \x01(\x05R\x0fdurationSeconds\x12-\n" +
 	"\x12obfuscate_opponent\x18\n" +
 	" \x01(\bR\x11obfuscateOpponent\x12$\n" +
-	"\x0ewinner_user_id\x18\v \x01(\tR\fwinnerUserId\x12#\n" +
-	"\rwinner_reason\x18\f \x01(\tR\fwinnerReason\x129\n" +
+	"\x0ewinner_user_id\x18\v \x01(\tR\fwinnerUserId\x12;\n" +
+	"\rwinner_reason\x18\f \x01(\x0e2\x16.arena.v1.WinnerReasonR\fwinnerReason\x129\n" +
 	"\n" +
 	"started_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x12;\n" +
 	"\vfinished_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\n" +
@@ -982,11 +1205,11 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\aplayers\x18\x10 \x03(\v2\x15.arena.v1.ArenaPlayerR\aplayers\x12\x19\n" +
 	"\bis_rated\x18\x11 \x01(\bR\aisRated\x12%\n" +
 	"\x0eunrated_reason\x18\x12 \x01(\tR\runratedReason\x12,\n" +
-	"\x12anti_cheat_enabled\x18\x13 \x01(\bR\x10antiCheatEnabled\"\x99\x03\n" +
+	"\x12anti_cheat_enabled\x18\x13 \x01(\bR\x10antiCheatEnabled\"\xb4\x03\n" +
 	"\vArenaPlayer\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
-	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x12\n" +
-	"\x04side\x18\x03 \x01(\tR\x04side\x12\x1d\n" +
+	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12-\n" +
+	"\x04side\x18\x03 \x01(\x0e2\x19.arena.v1.ArenaPlayerSideR\x04side\x12\x1d\n" +
 	"\n" +
 	"is_creator\x18\x04 \x01(\bR\tisCreator\x12=\n" +
 	"\ffreeze_until\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\vfreezeUntil\x12;\n" +
@@ -996,7 +1219,7 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\tis_winner\x18\b \x01(\bR\bisWinner\x127\n" +
 	"\tjoined_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\bjoinedAt\x12!\n" +
 	"\fcurrent_code\x18\n" +
-	" \x01(\tR\vcurrentCode\"\x87\x02\n" +
+	" \x01(\tR\vcurrentCode\"\x9e\x02\n" +
 	"\x15ArenaLeaderboardEntry\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x12\n" +
@@ -1004,9 +1227,35 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\amatches\x18\x04 \x01(\x05R\amatches\x12\x19\n" +
 	"\bwin_rate\x18\x05 \x01(\x01R\awinRate\x12!\n" +
 	"\fbest_runtime\x18\x06 \x01(\x03R\vbestRuntime\x12\x16\n" +
-	"\x06rating\x18\a \x01(\x05R\x06rating\x12\x16\n" +
-	"\x06league\x18\b \x01(\tR\x06league\x12\x16\n" +
-	"\x06losses\x18\t \x01(\x05R\x06losses*\x96\x01\n" +
+	"\x06rating\x18\a \x01(\x05R\x06rating\x12-\n" +
+	"\x06league\x18\b \x01(\x0e2\x15.arena.v1.ArenaLeagueR\x06league\x12\x16\n" +
+	"\x06losses\x18\t \x01(\x05R\x06losses*i\n" +
+	"\n" +
+	"Difficulty\x12\x1a\n" +
+	"\x16DIFFICULTY_UNSPECIFIED\x10\x00\x12\x13\n" +
+	"\x0fDIFFICULTY_EASY\x10\x01\x12\x15\n" +
+	"\x11DIFFICULTY_MEDIUM\x10\x02\x12\x13\n" +
+	"\x0fDIFFICULTY_HARD\x10\x03*\xb9\x01\n" +
+	"\fWinnerReason\x12\x1d\n" +
+	"\x19WINNER_REASON_UNSPECIFIED\x10\x00\x12\x1f\n" +
+	"\x1bWINNER_REASON_ACCEPTED_TIME\x10\x01\x12\x19\n" +
+	"\x15WINNER_REASON_RUNTIME\x10\x02\x12\x19\n" +
+	"\x15WINNER_REASON_TIMEOUT\x10\x03\x12\x1b\n" +
+	"\x17WINNER_REASON_SINGLE_AC\x10\x04\x12\x16\n" +
+	"\x12WINNER_REASON_NONE\x10\x05*m\n" +
+	"\x0fArenaPlayerSide\x12!\n" +
+	"\x1dARENA_PLAYER_SIDE_UNSPECIFIED\x10\x00\x12\x1a\n" +
+	"\x16ARENA_PLAYER_SIDE_LEFT\x10\x01\x12\x1b\n" +
+	"\x17ARENA_PLAYER_SIDE_RIGHT\x10\x02*\xdb\x01\n" +
+	"\vArenaLeague\x12\x1c\n" +
+	"\x18ARENA_LEAGUE_UNSPECIFIED\x10\x00\x12\x17\n" +
+	"\x13ARENA_LEAGUE_BRONZE\x10\x01\x12\x17\n" +
+	"\x13ARENA_LEAGUE_SILVER\x10\x02\x12\x15\n" +
+	"\x11ARENA_LEAGUE_GOLD\x10\x03\x12\x19\n" +
+	"\x15ARENA_LEAGUE_PLATINUM\x10\x04\x12\x18\n" +
+	"\x14ARENA_LEAGUE_DIAMOND\x10\x05\x12\x17\n" +
+	"\x13ARENA_LEAGUE_MASTER\x10\x06\x12\x17\n" +
+	"\x13ARENA_LEAGUE_LEGEND\x10\a*\x96\x01\n" +
 	"\x10ArenaMatchStatus\x12\"\n" +
 	"\x1eARENA_MATCH_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aARENA_MATCH_STATUS_WAITING\x10\x01\x12\x1d\n" +
@@ -1032,51 +1281,60 @@ func file_arena_v1_arena_proto_rawDescGZIP() []byte {
 	return file_arena_v1_arena_proto_rawDescData
 }
 
-var file_arena_v1_arena_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_arena_v1_arena_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
 var file_arena_v1_arena_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_arena_v1_arena_proto_goTypes = []any{
-	(ArenaMatchStatus)(0),          // 0: arena.v1.ArenaMatchStatus
-	(*CreateMatchRequest)(nil),     // 1: arena.v1.CreateMatchRequest
-	(*GetMatchRequest)(nil),        // 2: arena.v1.GetMatchRequest
-	(*JoinMatchRequest)(nil),       // 3: arena.v1.JoinMatchRequest
-	(*SubmitCodeRequest)(nil),      // 4: arena.v1.SubmitCodeRequest
-	(*SubmitCodeResponse)(nil),     // 5: arena.v1.SubmitCodeResponse
-	(*ArenaMatchResponse)(nil),     // 6: arena.v1.ArenaMatchResponse
-	(*GetLeaderboardRequest)(nil),  // 7: arena.v1.GetLeaderboardRequest
-	(*GetLeaderboardResponse)(nil), // 8: arena.v1.GetLeaderboardResponse
-	(*ArenaMatch)(nil),             // 9: arena.v1.ArenaMatch
-	(*ArenaPlayer)(nil),            // 10: arena.v1.ArenaPlayer
-	(*ArenaLeaderboardEntry)(nil),  // 11: arena.v1.ArenaLeaderboardEntry
-	(*timestamppb.Timestamp)(nil),  // 12: google.protobuf.Timestamp
+	(Difficulty)(0),                // 0: arena.v1.Difficulty
+	(WinnerReason)(0),              // 1: arena.v1.WinnerReason
+	(ArenaPlayerSide)(0),           // 2: arena.v1.ArenaPlayerSide
+	(ArenaLeague)(0),               // 3: arena.v1.ArenaLeague
+	(ArenaMatchStatus)(0),          // 4: arena.v1.ArenaMatchStatus
+	(*CreateMatchRequest)(nil),     // 5: arena.v1.CreateMatchRequest
+	(*GetMatchRequest)(nil),        // 6: arena.v1.GetMatchRequest
+	(*JoinMatchRequest)(nil),       // 7: arena.v1.JoinMatchRequest
+	(*SubmitCodeRequest)(nil),      // 8: arena.v1.SubmitCodeRequest
+	(*SubmitCodeResponse)(nil),     // 9: arena.v1.SubmitCodeResponse
+	(*ArenaMatchResponse)(nil),     // 10: arena.v1.ArenaMatchResponse
+	(*GetLeaderboardRequest)(nil),  // 11: arena.v1.GetLeaderboardRequest
+	(*GetLeaderboardResponse)(nil), // 12: arena.v1.GetLeaderboardResponse
+	(*ArenaMatch)(nil),             // 13: arena.v1.ArenaMatch
+	(*ArenaPlayer)(nil),            // 14: arena.v1.ArenaPlayer
+	(*ArenaLeaderboardEntry)(nil),  // 15: arena.v1.ArenaLeaderboardEntry
+	(*timestamppb.Timestamp)(nil),  // 16: google.protobuf.Timestamp
 }
 var file_arena_v1_arena_proto_depIdxs = []int32{
-	12, // 0: arena.v1.SubmitCodeResponse.freeze_until:type_name -> google.protobuf.Timestamp
-	9,  // 1: arena.v1.SubmitCodeResponse.match:type_name -> arena.v1.ArenaMatch
-	9,  // 2: arena.v1.ArenaMatchResponse.match:type_name -> arena.v1.ArenaMatch
-	11, // 3: arena.v1.GetLeaderboardResponse.entries:type_name -> arena.v1.ArenaLeaderboardEntry
-	0,  // 4: arena.v1.ArenaMatch.status:type_name -> arena.v1.ArenaMatchStatus
-	12, // 5: arena.v1.ArenaMatch.started_at:type_name -> google.protobuf.Timestamp
-	12, // 6: arena.v1.ArenaMatch.finished_at:type_name -> google.protobuf.Timestamp
-	12, // 7: arena.v1.ArenaMatch.created_at:type_name -> google.protobuf.Timestamp
-	10, // 8: arena.v1.ArenaMatch.players:type_name -> arena.v1.ArenaPlayer
-	12, // 9: arena.v1.ArenaPlayer.freeze_until:type_name -> google.protobuf.Timestamp
-	12, // 10: arena.v1.ArenaPlayer.accepted_at:type_name -> google.protobuf.Timestamp
-	12, // 11: arena.v1.ArenaPlayer.joined_at:type_name -> google.protobuf.Timestamp
-	1,  // 12: arena.v1.ArenaService.CreateMatch:input_type -> arena.v1.CreateMatchRequest
-	2,  // 13: arena.v1.ArenaService.GetMatch:input_type -> arena.v1.GetMatchRequest
-	3,  // 14: arena.v1.ArenaService.JoinMatch:input_type -> arena.v1.JoinMatchRequest
-	4,  // 15: arena.v1.ArenaService.SubmitCode:input_type -> arena.v1.SubmitCodeRequest
-	7,  // 16: arena.v1.ArenaService.GetLeaderboard:input_type -> arena.v1.GetLeaderboardRequest
-	6,  // 17: arena.v1.ArenaService.CreateMatch:output_type -> arena.v1.ArenaMatchResponse
-	6,  // 18: arena.v1.ArenaService.GetMatch:output_type -> arena.v1.ArenaMatchResponse
-	6,  // 19: arena.v1.ArenaService.JoinMatch:output_type -> arena.v1.ArenaMatchResponse
-	5,  // 20: arena.v1.ArenaService.SubmitCode:output_type -> arena.v1.SubmitCodeResponse
-	8,  // 21: arena.v1.ArenaService.GetLeaderboard:output_type -> arena.v1.GetLeaderboardResponse
-	17, // [17:22] is the sub-list for method output_type
-	12, // [12:17] is the sub-list for method input_type
-	12, // [12:12] is the sub-list for extension type_name
-	12, // [12:12] is the sub-list for extension extendee
-	0,  // [0:12] is the sub-list for field type_name
+	0,  // 0: arena.v1.CreateMatchRequest.difficulty:type_name -> arena.v1.Difficulty
+	16, // 1: arena.v1.SubmitCodeResponse.freeze_until:type_name -> google.protobuf.Timestamp
+	13, // 2: arena.v1.SubmitCodeResponse.match:type_name -> arena.v1.ArenaMatch
+	13, // 3: arena.v1.ArenaMatchResponse.match:type_name -> arena.v1.ArenaMatch
+	15, // 4: arena.v1.GetLeaderboardResponse.entries:type_name -> arena.v1.ArenaLeaderboardEntry
+	0,  // 5: arena.v1.ArenaMatch.difficulty:type_name -> arena.v1.Difficulty
+	4,  // 6: arena.v1.ArenaMatch.status:type_name -> arena.v1.ArenaMatchStatus
+	1,  // 7: arena.v1.ArenaMatch.winner_reason:type_name -> arena.v1.WinnerReason
+	16, // 8: arena.v1.ArenaMatch.started_at:type_name -> google.protobuf.Timestamp
+	16, // 9: arena.v1.ArenaMatch.finished_at:type_name -> google.protobuf.Timestamp
+	16, // 10: arena.v1.ArenaMatch.created_at:type_name -> google.protobuf.Timestamp
+	14, // 11: arena.v1.ArenaMatch.players:type_name -> arena.v1.ArenaPlayer
+	2,  // 12: arena.v1.ArenaPlayer.side:type_name -> arena.v1.ArenaPlayerSide
+	16, // 13: arena.v1.ArenaPlayer.freeze_until:type_name -> google.protobuf.Timestamp
+	16, // 14: arena.v1.ArenaPlayer.accepted_at:type_name -> google.protobuf.Timestamp
+	16, // 15: arena.v1.ArenaPlayer.joined_at:type_name -> google.protobuf.Timestamp
+	3,  // 16: arena.v1.ArenaLeaderboardEntry.league:type_name -> arena.v1.ArenaLeague
+	5,  // 17: arena.v1.ArenaService.CreateMatch:input_type -> arena.v1.CreateMatchRequest
+	6,  // 18: arena.v1.ArenaService.GetMatch:input_type -> arena.v1.GetMatchRequest
+	7,  // 19: arena.v1.ArenaService.JoinMatch:input_type -> arena.v1.JoinMatchRequest
+	8,  // 20: arena.v1.ArenaService.SubmitCode:input_type -> arena.v1.SubmitCodeRequest
+	11, // 21: arena.v1.ArenaService.GetLeaderboard:input_type -> arena.v1.GetLeaderboardRequest
+	10, // 22: arena.v1.ArenaService.CreateMatch:output_type -> arena.v1.ArenaMatchResponse
+	10, // 23: arena.v1.ArenaService.GetMatch:output_type -> arena.v1.ArenaMatchResponse
+	10, // 24: arena.v1.ArenaService.JoinMatch:output_type -> arena.v1.ArenaMatchResponse
+	9,  // 25: arena.v1.ArenaService.SubmitCode:output_type -> arena.v1.SubmitCodeResponse
+	12, // 26: arena.v1.ArenaService.GetLeaderboard:output_type -> arena.v1.GetLeaderboardResponse
+	22, // [22:27] is the sub-list for method output_type
+	17, // [17:22] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_arena_v1_arena_proto_init() }
@@ -1089,7 +1347,7 @@ func file_arena_v1_arena_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_arena_v1_arena_proto_rawDesc), len(file_arena_v1_arena_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      5,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,

@@ -1,0 +1,126 @@
+/* ===========================================
+   RESPONSIVE STYLES
+   =========================================== */
+
+@media (max-width: 768px) {
+  .app-container {
+    flex-direction: column;
+  }
+
+  .sidebar-desktop {
+    display: none;
+  }
+
+  .bottom-nav-mobile {
+    display: flex;
+  }
+
+  .main-content {
+    padding: 24px 16px 100px 16px;
+  }
+
+  .main-content-code-room {
+    padding: 18px 12px 92px;
+  }
+
+  .content-wrapper {
+    max-width: 100%;
+  }
+
+  .content-wrapper-wide {
+    max-width: 100%;
+  }
+
+  .card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .btn {
+    min-height: 48px;
+    border-radius: 14px;
+  }
+
+  .input {
+    min-height: 48px;
+    border-radius: 14px;
+  }
+
+  h1 {
+    font-size: 2rem !important;
+    line-height: 1.1;
+  }
+
+  h2 {
+    line-height: 1.15;
+  }
+
+  .hover-scale:hover {
+    transform: none;
+  }
+
+  .code-room-page {
+    min-height: calc(100vh - 120px);
+  }
+
+  .interview-ide-page {
+    height: auto;
+    min-height: calc(100vh - 120px);
+  }
+
+  .interview-ide-shell {
+    height: auto;
+  }
+
+  .interview-ide-main {
+    overflow: visible;
+  }
+
+  .timelapse-toolbar {
+    flex-wrap: wrap;
+    align-items: stretch;
+  }
+
+  .timelapse-toolbar__meta {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .editor-container {
+    flex-direction: column;
+    min-height: 0;
+  }
+
+  .code-rooms-dashboard-grid,
+  .task-editor-grid,
+  .task-cases-grid,
+  .task-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .editor-panel,
+  .output-panel {
+    min-width: 0;
+    min-height: 360px;
+  }
+
+  .editor-resize-handle {
+    display: none;
+  }
+
+  .output-panel {
+    width: 100%;
+    height: auto;
+    position: static;
+  }
+
+  .page-header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .code-rooms-hero {
+    padding: 22px 20px;
+  }
+}

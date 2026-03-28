@@ -1,9 +1,8 @@
 package codeeditor
 
 import (
-	"strings"
-
 	domain "api/internal/domain/codeeditor"
+	"api/internal/model"
 	"api/internal/policy"
 )
 
@@ -12,27 +11,27 @@ func normalizeTaskPolicy(task *domain.Task) error {
 		return domain.ErrTaskNotFound
 	}
 
-	task.Language = strings.TrimSpace(task.Language)
-	if task.Language == "" {
-		task.Language = string(policy.LanguageGo)
+	if task.Language.String() == "" {
+		task.Language = model.ProgrammingLanguageGo
 	}
 
-	task.TaskType = strings.TrimSpace(task.TaskType)
-	if task.TaskType == "" {
-		task.TaskType = string(policy.TaskTypeAlgorithmPractice)
+	if task.TaskType.String() == "" {
+		task.TaskType = model.TaskTypeAlgorithm
 	}
 
-	task.ExecutionProfile = strings.TrimSpace(task.ExecutionProfile)
-	if task.ExecutionProfile == "" {
-		task.ExecutionProfile = string(policy.ProfilePure)
+	if task.ExecutionProfile.String() == "" {
+		task.ExecutionProfile = model.ExecutionProfilePure
+	}
+	if task.RunnerMode.String() == "" {
+		task.RunnerMode = model.RunnerModeProgram
 	}
 
 	spec := policy.TaskSpec{
-		Type:            policy.TaskType(task.TaskType),
-		Profile:         policy.ExecutionProfile(task.ExecutionProfile),
+		Type:            policyTaskTypeForTask(task, policy.TaskTypeAlgorithmPractice),
+		Profile:         policy.ExecutionProfile(task.ExecutionProfile.String()),
 		Name:            task.Title,
 		Purpose:         task.Slug,
-		Language:        policy.Language(task.Language),
+		Language:        policyLanguageForTask(task.Language),
 		FixtureFiles:    cloneStrings(task.FixtureFiles),
 		ReadablePaths:   cloneStrings(task.ReadablePaths),
 		WritablePaths:   cloneStrings(task.WritablePaths),
@@ -62,8 +61,7 @@ func normalizeTaskPolicy(task *domain.Task) error {
 		return err
 	}
 
-	task.TaskType = string(spec.Type)
-	task.ExecutionProfile = string(resolved.Profile)
+	task.ExecutionProfile = model.ExecutionProfileFromString(string(resolved.Profile))
 	task.FixtureFiles = normalizeStringSlice(spec.FixtureFiles)
 	task.ReadablePaths = normalizeStringSlice(spec.ReadablePaths)
 	task.WritablePaths = normalizeStringSlice(spec.WritablePaths)
@@ -76,6 +74,34 @@ func normalizeTaskPolicy(task *domain.Task) error {
 	}
 
 	return nil
+}
+
+func policyTaskTypeForTask(task *domain.Task, fallback policy.TaskType) policy.TaskType {
+	if task == nil {
+		return fallback
+	}
+
+	switch task.ExecutionProfile {
+	case model.ExecutionProfileFileIO:
+		return policy.TaskTypeFileParsing
+	case model.ExecutionProfileHTTPClient:
+		return policy.TaskTypeAPIJSON
+	case model.ExecutionProfileInterviewRealistic:
+		return policy.TaskTypeInterviewPractice
+	case model.ExecutionProfilePure:
+		return fallback
+	default:
+		return fallback
+	}
+}
+
+func policyLanguageForTask(language model.ProgrammingLanguage) policy.Language {
+	switch language {
+	case model.ProgrammingLanguageGo:
+		return policy.LanguageGo
+	default:
+		return policy.LanguageGo
+	}
 }
 
 func cloneStrings(values []string) []string {

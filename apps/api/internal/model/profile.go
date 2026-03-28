@@ -6,77 +6,138 @@ import (
 	"github.com/google/uuid"
 )
 
-const (
-	UserStatusPendingProfile = "pending_profile"
-	UserStatusActive         = "active"
+type UserActivityStatus int
 
-	UserActivityOnline         = "online"
-	UserActivityRecentlyActive = "recently_active"
-	UserActivityOffline        = "offline"
+const (
+	UserActivityStatusUnknown UserActivityStatus = iota
+	UserActivityStatusOnline
+	UserActivityStatusRecentlyActive
+	UserActivityStatusOffline
 )
 
+func (s UserActivityStatus) String() string {
+	switch s {
+	case UserActivityStatusOnline:
+		return "online"
+	case UserActivityStatusRecentlyActive:
+		return "recently_active"
+	case UserActivityStatusOffline:
+		return "offline"
+	default:
+		return ""
+	}
+}
+
+func UserActivityStatusFromString(s string) UserActivityStatus {
+	switch s {
+	case "online":
+		return UserActivityStatusOnline
+	case "recently_active":
+		return UserActivityStatusRecentlyActive
+	case "offline":
+		return UserActivityStatusOffline
+	default:
+		return UserActivityStatusUnknown
+	}
+}
+
+type UserStatus int
+
+const (
+	UserStatusUnknown UserStatus = iota
+	UserStatusPendingProfile
+	UserStatusActive
+	UserStatusGuest
+)
+
+func (s UserStatus) String() string {
+	switch s {
+	case UserStatusPendingProfile:
+		return "pending_profile"
+	case UserStatusActive:
+		return "active"
+	case UserStatusGuest:
+		return "guest"
+	default:
+		return ""
+	}
+}
+
+func UserStatusFromString(str string) UserStatus {
+	switch str {
+	case "pending_profile":
+		return UserStatusPendingProfile
+	case "active":
+		return UserStatusActive
+	case "guest":
+		return UserStatusGuest
+	default:
+		return UserStatusUnknown
+	}
+}
+
 type User struct {
-	ID               uuid.UUID `json:"id"`
-	TelegramID       int64     `json:"telegram_id"`
-	TelegramUsername string    `json:"telegram_username,omitempty"`
-	FirstName        string    `json:"first_name,omitempty"`
-	LastName         string    `json:"last_name,omitempty"`
-	AvatarURL        string    `json:"avatar_url,omitempty"`
-	CurrentWorkplace string    `json:"current_workplace,omitempty"`
-	Region           string    `json:"region,omitempty"`
-	Geo              UserGeo   `json:"geo"`
-	Status           string    `json:"status"`
-	ActivityStatus   string    `json:"activity_status"`
-	IsAdmin          bool      `json:"is_admin"`
-	LastActiveAt     time.Time `json:"last_active_at"`
-	CreatedAt        time.Time `json:"created_at"`
-	UpdatedAt        time.Time `json:"updated_at"`
+	ID               uuid.UUID
+	TelegramID       int64
+	TelegramUsername string
+	FirstName        string
+	LastName         string
+	AvatarURL        string
+	CurrentWorkplace string
+	Region           string
+	Geo              UserGeo
+	Status           UserStatus
+	ActivityStatus   UserActivityStatus
+	IsAdmin          bool
+	LastActiveAt     time.Time
+	CreatedAt        time.Time
+	UpdatedAt        time.Time
 }
 
 type UserGeo struct {
-	Region    string  `json:"region,omitempty"`
-	Country   string  `json:"country,omitempty"`
-	City      string  `json:"city,omitempty"`
-	Latitude  float64 `json:"latitude,omitempty"`
-	Longitude float64 `json:"longitude,omitempty"`
+	Region    string
+	Country   string
+	City      string
+	Latitude  float64
+	Longitude float64
 }
 
 type TelegramAuthPayload struct {
-	ID        int64  `json:"id"`
-	FirstName string `json:"first_name"`
-	LastName  string `json:"last_name"`
-	Username  string `json:"username"`
-	PhotoURL  string `json:"photo_url"`
-	AuthDate  int64  `json:"auth_date"`
-	Hash      string `json:"hash"`
+	ID        int64
+	FirstName string
+	LastName  string
+	Username  string
+	PhotoURL  string
+	AuthDate  int64
+	Hash      string
 }
 
 type CompleteRegistrationRequest struct {
-	Name      string  `json:"name"`
-	Region    string  `json:"region"`
-	Country   string  `json:"country"`
-	City      string  `json:"city"`
-	Latitude  float64 `json:"latitude"`
-	Longitude float64 `json:"longitude"`
+	Name      string
+	Region    string
+	Country   string
+	City      string
+	Latitude  float64
+	Longitude float64
 }
 
 type ProfileResponse struct {
-	User                 *User `json:"user"`
-	NeedsProfileComplete bool  `json:"needs_profile_complete"`
+	User                 *User
+	NeedsProfileComplete bool
 }
 
-func ResolveActivityStatus(lastActiveAt, now time.Time) string {
+func ResolveActivityStatus(lastActiveAt, now time.Time) UserActivityStatus {
 	if lastActiveAt.IsZero() {
-		return UserActivityOffline
+		return UserActivityStatusOffline
 	}
 
 	diff := now.Sub(lastActiveAt)
 	switch {
 	case diff <= 2*time.Minute:
-		return UserActivityOnline
+		return UserActivityStatusOnline
 	case diff <= 15*time.Minute:
-		return UserActivityRecentlyActive
+		return UserActivityStatusRecentlyActive
 	default:
-		return UserActivityOffline
+		return UserActivityStatusOffline
 	}
 }

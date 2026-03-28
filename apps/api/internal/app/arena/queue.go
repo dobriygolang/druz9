@@ -4,6 +4,7 @@ import (
 	"context"
 	"strings"
 
+	"api/internal/model"
 	domain "api/internal/domain/arena"
 
 	"github.com/google/uuid"
@@ -28,9 +29,9 @@ func (s *Service) EnqueueMatchmaking(ctx context.Context, user *domain.User, top
 	}
 	if matched && match != nil {
 		return &domain.QueueState{
-			Status:     "matched",
+			Status:     model.ArenaMatchStatusActive,
 			Topic:      topic,
-			Difficulty: difficulty,
+			Difficulty: model.ArenaDifficultyFromString(difficulty),
 			Match:      match,
 		}, nil
 	}
@@ -44,9 +45,9 @@ func (s *Service) EnqueueMatchmaking(ctx context.Context, user *domain.User, top
 		return nil, err
 	}
 	state := &domain.QueueState{
-		Status:     "queued",
+		Status:     model.ArenaMatchStatusWaiting,
 		Topic:      topic,
-		Difficulty: difficulty,
+		Difficulty: model.ArenaDifficultyFromString(difficulty),
 		QueueSize:  queueSize,
 	}
 	if entry != nil {
@@ -70,7 +71,7 @@ func (s *Service) GetQueueStatus(ctx context.Context, user *domain.User) (*domai
 		return nil, err
 	}
 	if user == nil {
-		return &domain.QueueState{Status: "idle", QueueSize: queueSize}, nil
+		return &domain.QueueState{Status: model.ArenaMatchStatusUnknown, QueueSize: queueSize}, nil
 	}
 
 	match, err := s.repo.FindOpenMatchByUser(ctx, user.ID)
@@ -79,7 +80,7 @@ func (s *Service) GetQueueStatus(ctx context.Context, user *domain.User) (*domai
 	}
 	if match != nil {
 		return &domain.QueueState{
-			Status:    "matched",
+			Status:    model.ArenaMatchStatusActive,
 			QueueSize: queueSize,
 			Match:     match,
 		}, nil
@@ -90,10 +91,10 @@ func (s *Service) GetQueueStatus(ctx context.Context, user *domain.User) (*domai
 		return nil, err
 	}
 	if entry == nil {
-		return &domain.QueueState{Status: "idle", QueueSize: queueSize}, nil
+		return &domain.QueueState{Status: model.ArenaMatchStatusUnknown, QueueSize: queueSize}, nil
 	}
 	return &domain.QueueState{
-		Status:     "queued",
+		Status:     model.ArenaMatchStatusWaiting,
 		Topic:      entry.Topic,
 		Difficulty: entry.Difficulty,
 		QueuedAt:   &entry.QueuedAt,

@@ -43,7 +43,16 @@ message CreateReferralRequest {
   string description = 4;
   string experience = 5;
   string location = 6;
-  string employment_type = 7;
+  EmploymentType employment_type = 7;
+}
+
+enum EmploymentType {
+  EMPLOYMENT_TYPE_UNSPECIFIED = 0;
+  EMPLOYMENT_TYPE_FULL_TIME = 1;
+  EMPLOYMENT_TYPE_PART_TIME = 2;
+  EMPLOYMENT_TYPE_CONTRACT = 3;
+  EMPLOYMENT_TYPE_INTERNSHIP = 4;
+  EMPLOYMENT_TYPE_REMOTE = 5;
 }
 
 message UpdateReferralRequest {
@@ -54,7 +63,7 @@ message UpdateReferralRequest {
   string description = 5;
   string experience = 6;
   string location = 7;
-  string employment_type = 8;
+  EmploymentType employment_type = 8;
 }
 
 message DeleteReferralRequest {
@@ -89,7 +98,7 @@ message Referral {
   string description = 9;
   string experience = 10;
   string location = 11;
-  string employment_type = 12;
+  EmploymentType employment_type = 12;
   bool is_owner = 13;
   google.protobuf.Timestamp created_at = 14;
   google.protobuf.Timestamp updated_at = 15;

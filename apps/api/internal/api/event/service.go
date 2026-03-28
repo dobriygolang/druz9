@@ -10,6 +10,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
 	ListEvents(context.Context, uuid.UUID, model.ListEventsOptions) (*model.ListEventsResponse, error)
 	CreateEvent(context.Context, uuid.UUID, model.CreateEventRequest) (*model.Event, error)

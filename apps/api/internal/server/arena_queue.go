@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"strconv"
 	"strings"
 	"time"
 
@@ -60,13 +61,14 @@ func arenaQueueHandler(service arenaQueueService, authorizer arenaQueueAuthorize
 			return
 		}
 		var req struct {
-			Topic             string `json:"topic"`
-			Difficulty        string `json:"difficulty"`
-			ObfuscateOpponent bool   `json:"obfuscateOpponent"`
+			Topic             string          `json:"topic"`
+			Difficulty        json.RawMessage `json:"difficulty"`
+			ObfuscateOpponent bool            `json:"obfuscateOpponent"`
 		}
 		_ = json.NewDecoder(r.Body).Decode(&req)
+		difficulty := normalizeArenaDifficultyInput(req.Difficulty)
 
-		state, err := service.EnqueueMatchmaking(r.Context(), user, req.Topic, req.Difficulty, req.ObfuscateOpponent)
+		state, err := service.EnqueueMatchmaking(r.Context(), user, req.Topic, difficulty, req.ObfuscateOpponent)
 		if err != nil {
 			writeArenaJSON(w, http.StatusBadRequest, map[string]any{"message": err.Error()})
 			return
@@ -183,7 +185,7 @@ func arenaActorFromRequest(r *http.Request, authorizer arenaQueueAuthorizer) (*m
 	return &model.User{
 		ID:        parsedID,
 		FirstName: displayName,
-		Status:    "guest",
+		Status:    model.UserStatusGuest,
 	}, true
 }
 
@@ -209,9 +211,9 @@ func arenaQueueStateJSON(state *model.ArenaQueueState) map[string]any {
 		return map[string]any{"status": "idle", "queueSize": 0}
 	}
 	item := map[string]any{
-		"status":     state.Status,
+		"status":     arenaQueueStatusValue(state),
 		"topic":      state.Topic,
-		"difficulty": state.Difficulty,
+		"difficulty": state.Difficulty.String(),
 		"queueSize":  state.QueueSize,
 	}
 	if state.QueuedAt != nil && !state.QueuedAt.IsZero() {
@@ -221,6 +223,48 @@ func arenaQueueStateJSON(state *model.ArenaQueueState) map[string]any {
 		item["match"] = arenaMatchJSON(state.Match)
 	}
 	return item
+}
+
+func normalizeArenaDifficultyInput(raw json.RawMessage) string {
+	value := strings.TrimSpace(string(raw))
+	value = strings.Trim(value, `"`)
+	switch value {
+	case "", "0", "DIFFICULTY_UNSPECIFIED":
+		return ""
+	case "1", "DIFFICULTY_EASY", "easy":
+		return "easy"
+	case "2", "DIFFICULTY_MEDIUM", "medium":
+		return "medium"
+	case "3", "DIFFICULTY_HARD", "hard":
+		return "hard"
+	default:
+		if parsed, err := strconv.Atoi(value); err == nil {
+			switch parsed {
+			case 1:
+				return "easy"
+			case 2:
+				return "medium"
+			case 3:
+				return "hard"
+			default:
+				return ""
+			}
+		}
+		return value
+	}
+}
+
+func arenaQueueStatusValue(state *model.ArenaQueueState) string {
+	if state == nil {
+		return "idle"
+	}
+	if state.Match != nil || state.Status == model.ArenaMatchStatusActive {
+		return "matched"
+	}
+	if state.Status == model.ArenaMatchStatusWaiting {
+		return "queued"
+	}
+	return "idle"
 }
 
 func arenaStatsJSON(stats *model.ArenaPlayerStats) map[string]any {

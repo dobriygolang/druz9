@@ -14,9 +14,9 @@ export const PageLayout: React.FC = () => {
   const isCodeTasksAdmin = location.pathname === '/admin/code-tasks';
   const isGuestCodeRoomsSurface = !isAuthenticated && isCodeRoomsDashboard;
   const showShell = !isCodeRoom && !isArenaMatch && !isGuestCodeRoomsSurface;
-  const contentClassName = isCodeRoom || isArenaMatch
+  const contentClassName = isArenaMatch
     ? 'content-wrapper content-wrapper-code-room'
-    : isCodeRoomsDashboard || isCodeTasksAdmin
+    : isCodeTasksAdmin || isCodeRoom
       ? 'content-wrapper content-wrapper-wide'
       : 'content-wrapper';
 

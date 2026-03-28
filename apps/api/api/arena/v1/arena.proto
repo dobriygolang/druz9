@@ -44,8 +44,15 @@ service ArenaService {
 
 message CreateMatchRequest {
   string topic = 1;
-  string difficulty = 2;
+  Difficulty difficulty = 2;
   bool obfuscate_opponent = 3;
+}
+
+enum Difficulty {
+  DIFFICULTY_UNSPECIFIED = 0;
+  DIFFICULTY_EASY = 1;
+  DIFFICULTY_MEDIUM = 2;
+  DIFFICULTY_HARD = 3;
 }
 
 message GetMatchRequest {
@@ -91,12 +98,12 @@ message ArenaMatch {
   string task_statement = 4;
   string starter_code = 5;
   string topic = 6;
-  string difficulty = 7;
+  Difficulty difficulty = 7;
   ArenaMatchStatus status = 8;
   int32 duration_seconds = 9;
   bool obfuscate_opponent = 10;
   string winner_user_id = 11;
-  string winner_reason = 12;
+  WinnerReason winner_reason = 12;
   google.protobuf.Timestamp started_at = 13;
   google.protobuf.Timestamp finished_at = 14;
   google.protobuf.Timestamp created_at = 15;
@@ -106,10 +113,19 @@ message ArenaMatch {
   bool anti_cheat_enabled = 19;
 }
 
+enum WinnerReason {
+  WINNER_REASON_UNSPECIFIED = 0;
+  WINNER_REASON_ACCEPTED_TIME = 1;
+  WINNER_REASON_RUNTIME = 2;
+  WINNER_REASON_TIMEOUT = 3;
+  WINNER_REASON_SINGLE_AC = 4;
+  WINNER_REASON_NONE = 5;
+}
+
 message ArenaPlayer {
   string user_id = 1;
   string display_name = 2;
-  string side = 3;
+  ArenaPlayerSide side = 3;
   bool is_creator = 4;
   google.protobuf.Timestamp freeze_until = 5;
   google.protobuf.Timestamp accepted_at = 6;
@@ -117,6 +133,12 @@ message ArenaPlayer {
   bool is_winner = 8;
   google.protobuf.Timestamp joined_at = 9;
   string current_code = 10;
+}
+
+enum ArenaPlayerSide {
+  ARENA_PLAYER_SIDE_UNSPECIFIED = 0;
+  ARENA_PLAYER_SIDE_LEFT = 1;
+  ARENA_PLAYER_SIDE_RIGHT = 2;
 }
 
 message ArenaLeaderboardEntry {
@@ -127,8 +149,19 @@ message ArenaLeaderboardEntry {
   double win_rate = 5;
   int64 best_runtime = 6;
   int32 rating = 7;
-  string league = 8;
+  ArenaLeague league = 8;
   int32 losses = 9;
+}
+
+enum ArenaLeague {
+  ARENA_LEAGUE_UNSPECIFIED = 0;
+  ARENA_LEAGUE_BRONZE = 1;
+  ARENA_LEAGUE_SILVER = 2;
+  ARENA_LEAGUE_GOLD = 3;
+  ARENA_LEAGUE_PLATINUM = 4;
+  ARENA_LEAGUE_DIAMOND = 5;
+  ARENA_LEAGUE_MASTER = 6;
+  ARENA_LEAGUE_LEGEND = 7;
 }
 
 enum ArenaMatchStatus {

@@ -12,7 +12,7 @@ import (
 func (i *Implementation) ListTasks(ctx context.Context, req *v1.ListTasksRequest) (*v1.ListTasksResponse, error) {
 	tasks, err := i.service.ListTasks(ctx, codeeditordomain.TaskFilter{
 		Topic:           req.Topic,
-		Difficulty:      req.Difficulty,
+		Difficulty:      protoDifficultyToModel(req.Difficulty).String(),
 		IncludeInactive: req.IncludeInactive,
 	})
 	if err != nil {

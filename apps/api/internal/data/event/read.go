@@ -231,6 +231,7 @@ ORDER BY ep.event_id, ep.created_at ASC
 	for rows.Next() {
 		var eventIDStr string
 		var participant model.EventParticipant
+		var statusInt int
 
 		if err := rows.Scan(
 			&eventIDStr,
@@ -240,10 +241,11 @@ ORDER BY ep.event_id, ep.created_at ASC
 			&participant.TelegramUsername,
 			&participant.FirstName,
 			&participant.LastName,
-			&participant.Status,
+			&statusInt,
 		); err != nil {
 			return fmt.Errorf("scan participant: %w", err)
 		}
+		participant.Status = model.EventParticipantStatus(statusInt)
 
 		eventID, err := uuid.Parse(eventIDStr)
 		if err != nil {
@@ -256,7 +258,7 @@ ORDER BY ep.event_id, ep.created_at ASC
 		}
 
 		event.Participants = append(event.Participants, &participant)
-		if participant.Status == model.EventParticipantStatusJoined {
+		if participant.Status == model.EventParticipantStatusConfirmed {
 			event.ParticipantCount++
 			if participant.UserID == currentUserID.String() {
 				event.IsJoined = true

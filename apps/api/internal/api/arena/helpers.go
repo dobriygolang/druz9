@@ -42,7 +42,7 @@ func resolveArenaActor(ctx context.Context, requireIdentity bool) (*model.User, 
 	return &model.User{
 		ID:        parsedID,
 		FirstName: guestName,
-		Status:    "guest",
+		Status:    model.UserStatusGuest,
 	}, nil
 }
 

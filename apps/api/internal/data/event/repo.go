@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"strings"
 
-	eventdomain "api/internal/event/service"
+	eventdomain "api/internal/domain/event"
 	"api/internal/model"
 	"api/internal/storage/postgres"
 	slicestools "api/internal/tools/slices"
@@ -50,7 +50,7 @@ func (r *Repo) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.C
 	if _, err := tx.Exec(
 		ctx,
 		`INSERT INTO event_participants (event_id, user_id, status) VALUES ($1, $2, $3)`,
-		eventID, creatorID, model.EventParticipantStatusJoined,
+		eventID, creatorID, model.EventParticipantStatusConfirmed,
 	); err != nil {
 		return nil, fmt.Errorf("insert creator participant: %w", err)
 	}
@@ -76,7 +76,7 @@ func (r *Repo) JoinEvent(ctx context.Context, eventID, userID uuid.UUID) (*model
 		ctx,
 		`INSERT INTO event_participants (event_id, user_id, status) VALUES ($1, $2, $3)
 		 ON CONFLICT (event_id, user_id) DO UPDATE SET status = EXCLUDED.status`,
-		eventID, userID, model.EventParticipantStatusJoined,
+		eventID, userID, model.EventParticipantStatusConfirmed,
 	); err != nil {
 		return nil, fmt.Errorf("join event: %w", err)
 	}
@@ -141,7 +141,7 @@ WHERE id = $1`,
 		return nil, fmt.Errorf("update event: %w", err)
 	}
 
-	if _, err := tx.Exec(ctx, `DELETE FROM event_participants WHERE event_id = $1 AND status = $2`, eventID, model.EventParticipantStatusInvited); err != nil {
+	if _, err := tx.Exec(ctx, `DELETE FROM event_participants WHERE event_id = $1 AND status = $2`, eventID, model.EventParticipantStatusPending); err != nil {
 		return nil, fmt.Errorf("clear invited participants: %w", err)
 	}
 
@@ -263,7 +263,7 @@ INSERT INTO event_participants (event_id, user_id, status)
 SELECT $1, invited_user_id::uuid, $3
 FROM unnest($2::text[]) AS invited_user_id
 ON CONFLICT (event_id, user_id) DO NOTHING
-`, eventID, invitedUserIDs, model.EventParticipantStatusInvited); err != nil {
+`, eventID, invitedUserIDs, model.EventParticipantStatusPending); err != nil {
 		return fmt.Errorf("insert invited participants: %w", err)
 	}
 	return nil

@@ -6,6 +6,18 @@ import { useAuth } from '@/app/providers/AuthProvider';
 import { Vacancy, CreateVacancyPayload } from '@/entities/User/model/types';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal/ConfirmModal';
 
+const EMPLOYMENT_TYPE_OPTIONS = [
+  { value: 'full_time', label: 'Полный день' },
+  { value: 'part_time', label: 'Частичная занятость' },
+  { value: 'contract', label: 'Контракт' },
+  { value: 'remote', label: 'Удаленно / фриланс' },
+  { value: 'internship', label: 'Стажировка' },
+] as const;
+
+function employmentTypeLabel(value: string): string {
+  return EMPLOYMENT_TYPE_OPTIONS.find((option) => option.value === value)?.label || 'Не указано';
+}
+
 export const VacanciesPage: React.FC = () => {
   const { user: currentUser } = useAuth();
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
@@ -23,7 +35,7 @@ export const VacanciesPage: React.FC = () => {
     description: '',
     experience: '',
     location: '',
-    employment_type: 'Full-time',
+    employment_type: 'full_time',
   });
 
   const loadVacancies = async () => {
@@ -60,7 +72,7 @@ export const VacanciesPage: React.FC = () => {
         description: '',
         experience: '',
         location: '',
-        employment_type: 'Full-time',
+        employment_type: 'full_time',
       });
       void loadVacancies();
     } catch (err) {
@@ -97,7 +109,7 @@ export const VacanciesPage: React.FC = () => {
       description: v.description,
       experience: v.experience,
       location: v.location,
-      employment_type: v.employment_type,
+      employment_type: v.employment_type || 'full_time',
     });
     setIsModalOpen(true);
   };
@@ -131,7 +143,7 @@ export const VacanciesPage: React.FC = () => {
               description: '',
               experience: '',
               location: '',
-              employment_type: 'Full-time',
+              employment_type: 'full_time',
             });
             setIsModalOpen(true);
           }}
@@ -260,7 +272,7 @@ export const VacanciesPage: React.FC = () => {
                     {v.experience}
                   </span>
                   <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '6px', fontWeight: 500 }}>
-                    {v.employment_type}
+                    {employmentTypeLabel(v.employment_type)}
                   </span>
                   <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '6px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
                     <MapPin size={10} /> {v.location}
@@ -424,11 +436,9 @@ export const VacanciesPage: React.FC = () => {
                   value={formData.employment_type}
                   onChange={e => setFormData({ ...formData, employment_type: e.target.value })}
                 >
-                  <option value="Full-time">Полный день</option>
-                  <option value="Part-time">Частичная занятость</option>
-                  <option value="Contract">Контракт</option>
-                  <option value="Freelance">Фриланс</option>
-                  <option value="Internship">Стажировка</option>
+                  {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
+                    <option key={option.value} value={option.value}>{option.label}</option>
+                  ))}
                 </select>
               </div>
 

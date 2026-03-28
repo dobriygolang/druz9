@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 )
 
+//go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
 	DeleteUser(context.Context, uuid.UUID) error
 }

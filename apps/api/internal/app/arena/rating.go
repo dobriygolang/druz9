@@ -6,6 +6,7 @@ import (
 	"time"
 
 	arenarating "api/internal/arena/rating"
+	"api/internal/model"
 	domain "api/internal/domain/arena"
 
 	"github.com/google/uuid"
@@ -74,7 +75,7 @@ func (s *Service) refreshMatchState(ctx context.Context, match *domain.Match) er
 
 type winnerCandidate struct {
 	domain.Player
-	reason string
+	reason model.ArenaWinnerReason
 }
 
 func pickWinner(a, b *domain.Player) winnerCandidate {
@@ -116,9 +117,9 @@ func findPlayer(match *domain.Match, userID uuid.UUID) *domain.Player {
 }
 
 func isGuestUser(user *domain.User) bool {
-	return user != nil && user.Status == "guest"
+	return user != nil && user.Status == model.UserStatusGuest
 }
 
-func leagueName(rating int32) string {
-	return arenarating.LeagueName(rating)
+func leagueName(rating int32) model.ArenaLeague {
+	return model.ArenaLeagueFromString(arenarating.LeagueName(rating))
 }

@@ -27,6 +27,50 @@ type ReferralResponse = {
   referral: BackendReferral;
 };
 
+function normalizeEmploymentType(value: unknown): string {
+  switch (value) {
+    case 1:
+    case 'EMPLOYMENT_TYPE_FULL_TIME':
+    case 'full_time':
+    case 'Full-time':
+      return 'full_time';
+    case 2:
+    case 'EMPLOYMENT_TYPE_PART_TIME':
+    case 'part_time':
+    case 'Part-time':
+      return 'part_time';
+    case 3:
+    case 'EMPLOYMENT_TYPE_CONTRACT':
+    case 'contract':
+    case 'Contract':
+      return 'contract';
+    case 4:
+    case 'EMPLOYMENT_TYPE_INTERNSHIP':
+    case 'internship':
+    case 'Internship':
+      return 'internship';
+    case 5:
+    case 'EMPLOYMENT_TYPE_REMOTE':
+    case 'remote':
+    case 'Remote':
+    case 'Freelance':
+      return 'remote';
+    default:
+      return '';
+  }
+}
+
+function toEmploymentTypeEnum(value?: string): number {
+  switch (value) {
+    case 'full_time': return 1;
+    case 'part_time': return 2;
+    case 'contract': return 3;
+    case 'internship': return 4;
+    case 'remote': return 5;
+    default: return 0;
+  }
+}
+
 function normalizeVacancy(r: BackendReferral): Vacancy {
   return {
     id: r.id,
@@ -40,7 +84,7 @@ function normalizeVacancy(r: BackendReferral): Vacancy {
     description: r.description,
     experience: r.experience,
     location: r.location,
-    employment_type: r.employmentType,
+    employment_type: normalizeEmploymentType(r.employmentType),
     is_owner: r.isOwner ?? false,
     created_at: r.createdAt ?? '',
     updated_at: r.updatedAt ?? '',
@@ -63,7 +107,7 @@ export const vacancyApi = {
       description: payload.description,
       experience: payload.experience,
       location: payload.location,
-      employmentType: payload.employment_type,
+      employmentType: toEmploymentTypeEnum(payload.employment_type),
     });
     return normalizeVacancy(response.data.referral);
   },
@@ -77,7 +121,7 @@ export const vacancyApi = {
       description: payload.description,
       experience: payload.experience,
       location: payload.location,
-      employmentType: payload.employment_type,
+      employmentType: toEmploymentTypeEnum(payload.employment_type),
     });
     return normalizeVacancy(response.data.referral);
   },

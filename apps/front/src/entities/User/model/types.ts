@@ -70,7 +70,7 @@ export interface EventParticipant {
   telegram_username: string;
   first_name: string;
   last_name: string;
-  status: 'invited' | 'joined';
+  status: 'invited' | 'joined' | 'declined';
 }
 
 export interface CommunityEvent {

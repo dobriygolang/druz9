@@ -4,13 +4,14 @@ import (
 	"context"
 
 	codeeditordomain "api/internal/domain/codeeditor"
-	"api/internal/dto"
+	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/code_editor/v1"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 )
 
+//go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
 	CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string) (*codeeditordomain.Room, error)
 	GetRoom(ctx context.Context, roomID uuid.UUID) (*codeeditordomain.Room, error)
@@ -27,9 +28,10 @@ type Service interface {
 	GetLeaderboard(ctx context.Context, limit int32) ([]*codeeditordomain.LeaderboardEntry, error)
 }
 
+//go:generate mockery --case underscore --name RealtimePublisher --with-expecter --output mocks
 type RealtimePublisher interface {
-	PublishRoomUpdate(room *dto.CodeEditorRealtimeRoom)
-	PublishSubmission(roomID string, submission *dto.CodeEditorSubmissionEvent)
+	PublishRoomUpdate(room *realtime.CodeEditorRoom)
+	PublishSubmission(roomID string, submission *realtime.CodeEditorSubmissionEvent)
 }
 
 // Implementation of code editor service.

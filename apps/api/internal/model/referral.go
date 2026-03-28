@@ -7,31 +7,31 @@ import (
 )
 
 type Referral struct {
-	ID                       uuid.UUID `json:"id"`
-	UserID                   string    `json:"user_id"`
-	AuthorName               string    `json:"author_name"`
-	AuthorTelegramUsername   string    `json:"author_telegram_username"`
-	AuthorTelegramProfileURL string    `json:"author_telegram_profile_url"`
-	Title                    string    `json:"title"`
-	Company                  string    `json:"company"`
-	VacancyURL               string    `json:"vacancy_url"`
-	Description              string    `json:"description"`
-	Experience               string    `json:"experience"`
-	Location                 string    `json:"location"`
-	EmploymentType           string    `json:"employment_type"`
-	IsOwner                  bool      `json:"is_owner"`
-	CreatedAt                time.Time `json:"created_at"`
-	UpdatedAt                time.Time `json:"updated_at"`
+	ID                       uuid.UUID
+	UserID                   string
+	AuthorName               string
+	AuthorTelegramUsername   string
+	AuthorTelegramProfileURL string
+	Title                    string
+	Company                  string
+	VacancyURL               string
+	Description              string
+	Experience               string
+	Location                 string
+	EmploymentType           EmploymentType
+	IsOwner                  bool
+	CreatedAt                time.Time
+	UpdatedAt                time.Time
 }
 
 type CreateReferralRequest struct {
-	Title          string `json:"title"`
-	Company        string `json:"company"`
-	VacancyURL     string `json:"vacancy_url"`
-	Description    string `json:"description"`
-	Experience     string `json:"experience"`
-	Location       string `json:"location"`
-	EmploymentType string `json:"employment_type"`
+	Title          string
+	Company        string
+	VacancyURL     string
+	Description    string
+	Experience     string
+	Location       string
+	EmploymentType EmploymentType
 }
 
 type UpdateReferralRequest = CreateReferralRequest
@@ -45,6 +45,51 @@ const (
 	DefaultReferralsLimit = 20
 	MaxReferralsLimit     = 100
 )
+
+type EmploymentType int
+
+const (
+	EmploymentTypeUnknown EmploymentType = iota
+	EmploymentTypeFullTime
+	EmploymentTypePartTime
+	EmploymentTypeContract
+	EmploymentTypeInternship
+	EmploymentTypeRemote
+)
+
+func (e EmploymentType) String() string {
+	switch e {
+	case EmploymentTypeFullTime:
+		return "full_time"
+	case EmploymentTypePartTime:
+		return "part_time"
+	case EmploymentTypeContract:
+		return "contract"
+	case EmploymentTypeInternship:
+		return "internship"
+	case EmploymentTypeRemote:
+		return "remote"
+	default:
+		return ""
+	}
+}
+
+func EmploymentTypeFromString(s string) EmploymentType {
+	switch s {
+	case "full_time":
+		return EmploymentTypeFullTime
+	case "part_time":
+		return EmploymentTypePartTime
+	case "contract":
+		return EmploymentTypeContract
+	case "internship":
+		return EmploymentTypeInternship
+	case "remote":
+		return EmploymentTypeRemote
+	default:
+		return EmploymentTypeUnknown
+	}
+}
 
 type ListReferralsResponse struct {
 	Referrals   []*Referral

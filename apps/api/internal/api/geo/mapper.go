@@ -28,6 +28,19 @@ func mapResolveResponse(resp *model.GeoResolveResponse) *v1.ResolveResponse {
 	return &v1.ResolveResponse{Candidates: candidates}
 }
 
+func mapActivityStatus(status string) v1.UserActivityStatus {
+	switch model.UserActivityStatusFromString(status) {
+	case model.UserActivityStatusOnline:
+		return v1.UserActivityStatus_USER_ACTIVITY_STATUS_ONLINE
+	case model.UserActivityStatusRecentlyActive:
+		return v1.UserActivityStatus_USER_ACTIVITY_STATUS_RECENTLY_ACTIVE
+	case model.UserActivityStatusOffline:
+		return v1.UserActivityStatus_USER_ACTIVITY_STATUS_OFFLINE
+	default:
+		return v1.UserActivityStatus_USER_ACTIVITY_STATUS_UNSPECIFIED
+	}
+}
+
 func mapCommunityMapResponse(resp *model.CommunityMapResponse) *v1.CommunityMapResponse {
 	if resp == nil {
 		return nil
@@ -49,7 +62,7 @@ func mapCommunityMapResponse(resp *model.CommunityMapResponse) *v1.CommunityMapR
 			TelegramUsername: point.TelegramUsername,
 			FirstName:        point.FirstName,
 			LastName:         point.LastName,
-			ActivityStatus:   point.ActivityStatus,
+			ActivityStatus:   mapActivityStatus(point.ActivityStatus),
 		})
 	}
 

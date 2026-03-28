@@ -48,8 +48,14 @@ service EventService {
 message ListEventsRequest {
   int32 limit = 1;
   int32 offset = 2;
-  string status = 3; // "upcoming" or "past"
+  EventListFilter status = 3;
   string creator_id = 4;
+}
+
+enum EventListFilter {
+  EVENT_LIST_FILTER_UNSPECIFIED = 0;
+  EVENT_LIST_FILTER_UPCOMING = 1;
+  EVENT_LIST_FILTER_PAST = 2;
 }
 
 message CreateEventRequest {
@@ -141,5 +147,12 @@ message EventParticipant {
   string telegram_username = 4;
   string first_name = 5;
   string last_name = 6;
-  string status = 7;
+  ParticipantStatus status = 7;
+}
+
+enum ParticipantStatus {
+  PARTICIPANT_STATUS_UNSPECIFIED = 0;
+  PARTICIPANT_STATUS_PENDING = 1;
+  PARTICIPANT_STATUS_CONFIRMED = 2;
+  PARTICIPANT_STATUS_DECLINED = 3;
 }

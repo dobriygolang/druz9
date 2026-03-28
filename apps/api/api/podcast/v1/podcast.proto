@@ -132,8 +132,16 @@ message Podcast {
   uint32 duration_seconds = 5;
   uint64 listens_count = 6;
   string file_name = 7;
-  string content_type = 8;
+  MediaContentType content_type = 8;
   bool is_uploaded = 9;
   google.protobuf.Timestamp created_at = 10;
   google.protobuf.Timestamp updated_at = 11;
+}
+
+enum MediaContentType {
+  MEDIA_CONTENT_TYPE_UNSPECIFIED = 0;
+  MEDIA_CONTENT_TYPE_AUDIO_MPEG = 1;   // audio/mpeg
+  MEDIA_CONTENT_TYPE_AUDIO_WAV = 2;    // audio/wav
+  MEDIA_CONTENT_TYPE_AUDIO_OGG = 3;    // audio/ogg
+  MEDIA_CONTENT_TYPE_AUDIO_MP4 = 4;    // audio/mp4
 }

@@ -2,13 +2,61 @@ package code_editor
 
 import (
 	codeeditordomain "api/internal/domain/codeeditor"
-	"api/internal/dto"
+	"api/internal/model"
+	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/code_editor/v1"
 	"time"
 
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
+
+func modelDifficultyToProto(difficulty model.TaskDifficulty) v1.TaskDifficulty {
+	switch difficulty {
+	case model.TaskDifficultyEasy:
+		return v1.TaskDifficulty_TASK_DIFFICULTY_EASY
+	case model.TaskDifficultyMedium:
+		return v1.TaskDifficulty_TASK_DIFFICULTY_MEDIUM
+	case model.TaskDifficultyHard:
+		return v1.TaskDifficulty_TASK_DIFFICULTY_HARD
+	default:
+		return v1.TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED
+	}
+}
+
+func modelLanguageToProto(language model.ProgrammingLanguage) v1.ProgrammingLanguage {
+	switch language {
+	case model.ProgrammingLanguageJavaScript:
+		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVASCRIPT
+	case model.ProgrammingLanguageTypeScript:
+		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_TYPESCRIPT
+	case model.ProgrammingLanguagePython:
+		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_PYTHON
+	case model.ProgrammingLanguageGo:
+		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO
+	case model.ProgrammingLanguageRust:
+		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_RUST
+	case model.ProgrammingLanguageCpp:
+		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_CPP
+	case model.ProgrammingLanguageJava:
+		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVA
+	default:
+		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED
+	}
+}
+
+func modelTaskTypeToProto(taskType model.TaskType) v1.TaskType {
+	switch taskType {
+	case model.TaskTypeAlgorithm:
+		return v1.TaskType_TASK_TYPE_ALGORITHM
+	case model.TaskTypeDebugging:
+		return v1.TaskType_TASK_TYPE_DEBUGGING
+	case model.TaskTypeRefactoring:
+		return v1.TaskType_TASK_TYPE_REFACTORING
+	default:
+		return v1.TaskType_TASK_TYPE_UNSPECIFIED
+	}
+}
 
 func mapRoom(room *codeeditordomain.Room) *v1.Room {
 	if room == nil {
@@ -44,18 +92,18 @@ func mapRoom(room *codeeditordomain.Room) *v1.Room {
 	}
 }
 
-func mapRealtimeRoom(room *codeeditordomain.Room) *dto.CodeEditorRealtimeRoom {
+func mapRealtimeRoom(room *codeeditordomain.Room) *realtime.CodeEditorRoom {
 	if room == nil {
 		return nil
 	}
 
-	participants := make([]*dto.CodeEditorRealtimeParticipant, 0, len(room.Participants))
+	participants := make([]*realtime.CodeEditorParticipant, 0, len(room.Participants))
 	for _, participant := range room.Participants {
 		if participant == nil {
 			continue
 		}
 
-		participants = append(participants, &dto.CodeEditorRealtimeParticipant{
+		participants = append(participants, &realtime.CodeEditorParticipant{
 			ID:          participantIdentity(participant),
 			UserID:      userIDToString(participant.UserID),
 			DisplayName: participant.Name,
@@ -70,14 +118,14 @@ func mapRealtimeRoom(room *codeeditordomain.Room) *dto.CodeEditorRealtimeRoom {
 		maxParticipants = 2
 	}
 
-	return &dto.CodeEditorRealtimeRoom{
+	return &realtime.CodeEditorRoom{
 		ID:              room.ID.String(),
-		Mode:            room.Mode,
+		Mode:            room.Mode.String(),
 		InviteCode:      room.InviteCode,
 		CreatorID:       room.CreatorID.String(),
 		Code:            room.Code,
 		CodeRevision:    room.CodeRevision,
-		Status:          room.Status,
+		Status:          room.Status.String(),
 		TaskID:          userIDToString(room.TaskID),
 		MaxParticipants: maxParticipants,
 		Participants:    participants,
@@ -119,12 +167,13 @@ func mapTask(task *codeeditordomain.Task) *v1.Task {
 		Title:            task.Title,
 		Slug:             task.Slug,
 		Statement:        task.Statement,
-		Difficulty:       task.Difficulty,
+		Difficulty:       modelDifficultyToProto(task.Difficulty),
 		Topics:           task.Topics,
 		StarterCode:      task.StarterCode,
-		Language:         task.Language,
-		TaskType:         task.TaskType,
-		ExecutionProfile: task.ExecutionProfile,
+		Language:         modelLanguageToProto(task.Language),
+		TaskType:         modelTaskTypeToProto(task.TaskType),
+		ExecutionProfile: task.ExecutionProfile.String(),
+		RunnerMode:       task.RunnerMode.String(),
 		FixtureFiles:     task.FixtureFiles,
 		ReadablePaths:    task.ReadablePaths,
 		WritablePaths:    task.WritablePaths,
@@ -200,24 +249,24 @@ func roomTitle(room *codeeditordomain.Room) string {
 	return "Комната " + room.ID.String()[:8]
 }
 
-func roomModeToProto(mode string) v1.RoomMode {
+func roomModeToProto(mode model.RoomMode) v1.RoomMode {
 	switch mode {
-	case codeeditordomain.RoomModeAll:
+	case model.RoomModeAll:
 		return v1.RoomMode_ROOM_MODE_ALL
-	case codeeditordomain.RoomModeDuel:
+	case model.RoomModeDuel:
 		return v1.RoomMode_ROOM_MODE_DUEL
 	default:
 		return v1.RoomMode_ROOM_MODE_UNSPECIFIED
 	}
 }
 
-func roomStatusToProto(status string) v1.RoomStatus {
+func roomStatusToProto(status model.RoomStatus) v1.RoomStatus {
 	switch status {
-	case codeeditordomain.RoomStatusWaiting:
+	case model.RoomStatusWaiting:
 		return v1.RoomStatus_ROOM_STATUS_WAITING
-	case codeeditordomain.RoomStatusActive:
+	case model.RoomStatusActive:
 		return v1.RoomStatus_ROOM_STATUS_ACTIVE
-	case codeeditordomain.RoomStatusFinished:
+	case model.RoomStatusFinished:
 		return v1.RoomStatus_ROOM_STATUS_FINISHED
 	default:
 		return v1.RoomStatus_ROOM_STATUS_UNSPECIFIED

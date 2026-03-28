@@ -8,13 +8,33 @@ import (
 	"time"
 
 	arenarating "api/internal/arena/rating"
+	"api/internal/data/codetasks"
 	domain "api/internal/domain/arena"
+	"api/internal/model"
 	"api/internal/storage/postgres"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 )
+
+const leaderboardSelect = `
+	SELECT
+		aps.user_id::text,
+		COALESCE(NULLIF(trim(concat_ws(' ', u.first_name, u.last_name)), ''), NULLIF(u.telegram_username, ''), aps.display_name),
+		aps.rating,
+		aps.wins,
+		aps.losses,
+		aps.matches,
+		CASE WHEN aps.matches = 0 THEN 0 ELSE aps.wins::float8 / aps.matches::float8 END AS win_rate,
+		COALESCE(aps.best_runtime_ms, 0)::bigint
+	FROM arena_player_stats aps
+	LEFT JOIN users u ON u.id = aps.user_id
+`
+
+type scanner interface {
+	Scan(dest ...any) error
+}
 
 type Repo struct {
 	data *postgres.Store
@@ -29,72 +49,44 @@ func NewRepo(dataLayer *postgres.Store, logger log.Logger) *Repo {
 }
 
 func (r *Repo) PickRandomTask(ctx context.Context, topic, difficulty string) (*domain.Task, error) {
+	difficultyValue := model.TaskDifficultyFromString(difficulty)
 	var task domain.Task
-	err := r.data.DB.QueryRow(ctx, `
-		SELECT id, title, slug, statement, difficulty, topics, starter_code, language, is_active, created_at, updated_at
+	err := codetasks.ScanTask(r.data.DB.QueryRow(ctx, `
+		SELECT `+codetasks.SelectColumns+`
 		FROM code_tasks
 		WHERE is_active = TRUE
 		  AND ($1 = '' OR $1 = ANY(topics))
-		  AND ($2 = '' OR difficulty = $2)
+		  AND ($2 = 0 OR difficulty = $2)
 		ORDER BY random()
 		LIMIT 1
-	`, topic, difficulty).Scan(
-		&task.ID, &task.Title, &task.Slug, &task.Statement, &task.Difficulty, &task.Topics, &task.StarterCode, &task.Language, &task.IsActive, &task.CreatedAt, &task.UpdatedAt,
-	)
+	`, topic, difficultyValue), &task)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("pick random task: %w", err)
 	}
-	// Load test cases
-	taskCases, err := r.getTaskTestCases(ctx, task.ID)
-	if err != nil {
+	if err := codetasks.LoadCases(ctx, r.data.DB, &task); err != nil {
 		return nil, err
 	}
-	task.PublicTestCases = taskCases.public
-	task.HiddenTestCases = taskCases.hidden
 	return &task, nil
 }
 
 func (r *Repo) GetTask(ctx context.Context, taskID uuid.UUID) (*domain.Task, error) {
 	var task domain.Task
-	err := r.data.DB.QueryRow(ctx, `
-		SELECT id, title, slug, statement, difficulty, topics, starter_code, language, is_active, created_at, updated_at
+	err := codetasks.ScanTask(r.data.DB.QueryRow(ctx, `
+		SELECT `+codetasks.SelectColumns+`
 		FROM code_tasks
 		WHERE id = $1
-	`, taskID).Scan(
-		&task.ID, &task.Title, &task.Slug, &task.Statement, &task.Difficulty, &task.Topics, &task.StarterCode, &task.Language, &task.IsActive, &task.CreatedAt, &task.UpdatedAt,
-	)
+	`, taskID), &task)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("get arena task: %w", err)
 	}
-
-	rows, err := r.data.DB.Query(ctx, `
-		SELECT id, task_id, input, expected_output, is_public, weight, "order"
-		FROM code_task_test_cases
-		WHERE task_id = $1
-		ORDER BY "order" ASC, is_public DESC
-	`, task.ID)
-	if err != nil {
-		return nil, fmt.Errorf("load arena task cases: %w", err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		var tc domain.TestCase
-		if err := rows.Scan(&tc.ID, &tc.TaskID, &tc.Input, &tc.ExpectedOutput, &tc.IsPublic, &tc.Weight, &tc.Order); err != nil {
-			return nil, fmt.Errorf("scan arena task case: %w", err)
-		}
-		copyCase := tc
-		if tc.IsPublic {
-			task.PublicTestCases = append(task.PublicTestCases, &copyCase)
-		} else {
-			task.HiddenTestCases = append(task.HiddenTestCases, &copyCase)
-		}
+	if err := codetasks.LoadCases(ctx, r.data.DB, &task); err != nil {
+		return nil, err
 	}
 
 	return &task, nil
@@ -141,35 +133,35 @@ func (r *Repo) CreateMatch(ctx context.Context, match *domain.Match, creator *do
 func (r *Repo) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, error) {
 	var match domain.Match
 	var task domain.Task
+	var executionProfile string
+	var runnerMode int
 
-	err := r.data.DB.QueryRow(ctx, `
+	err := scanMatchWithTask(r.data.DB.QueryRow(ctx, `
 		SELECT
 			m.id, m.creator_user_id, m.task_id, m.topic, m.difficulty, m.source, m.status, m.duration_seconds, m.obfuscate_opponent, m.is_rated, m.unrated_reason,
 			m.winner_user_id, m.winner_reason, m.started_at, m.finished_at, m.created_at, m.updated_at,
-			t.id, t.title, t.slug, t.statement, t.difficulty, t.topics, t.starter_code, t.language, t.is_active, t.created_at, t.updated_at
+			`+codetasks.SelectColumnsWithAlias("t")+`
 		FROM arena_matches m
 		JOIN code_tasks t ON t.id = m.task_id
 		WHERE m.id = $1
-	`, matchID).Scan(
-		&match.ID, &match.CreatorUserID, &match.TaskID, &match.Topic, &match.Difficulty, &match.Source, &match.Status, &match.DurationSeconds, &match.ObfuscateOpponent, &match.IsRated, &match.UnratedReason,
-		&match.WinnerUserID, &match.WinnerReason, &match.StartedAt, &match.FinishedAt, &match.CreatedAt, &match.UpdatedAt,
-		&task.ID, &task.Title, &task.Slug, &task.Statement, &task.Difficulty, &task.Topics, &task.StarterCode, &task.Language, &task.IsActive, &task.CreatedAt, &task.UpdatedAt,
-	)
+	`, matchID), &match, &task, &executionProfile, &runnerMode)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("get arena match: %w", err)
 	}
+	task.ExecutionProfile = model.ExecutionProfileFromString(executionProfile)
+	task.RunnerMode = model.RunnerMode(runnerMode)
+	if task.RunnerMode.String() == "" {
+		task.RunnerMode = model.RunnerModeProgram
+	}
 	match.Task = &task
 
 	// Load test cases for the task
-	taskCases, err := r.getTaskTestCases(ctx, task.ID)
-	if err != nil {
+	if err := codetasks.LoadCases(ctx, r.data.DB, match.Task); err != nil {
 		return nil, err
 	}
-	match.Task.PublicTestCases = taskCases.public
-	match.Task.HiddenTestCases = taskCases.hidden
 
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT p.match_id, p.user_id, p.display_name, p.side, p.is_creator, p.freeze_until, p.accepted_at, p.best_runtime_ms, p.is_winner, p.suspicion_count, p.joined_at, p.updated_at,
@@ -177,8 +169,8 @@ func (r *Repo) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, 
 		FROM arena_match_players p
 		LEFT JOIN arena_editor_states es ON es.match_id = p.match_id AND es.user_id = p.user_id
 		WHERE p.match_id = $1
-		ORDER BY CASE WHEN p.side = 'left' THEN 0 ELSE 1 END
-	`, matchID)
+		ORDER BY CASE WHEN p.side = $2 THEN 0 ELSE 1 END
+	`, matchID, model.ArenaPlayerSideLeft)
 	if err != nil {
 		return nil, fmt.Errorf("list arena players: %w", err)
 	}
@@ -186,10 +178,7 @@ func (r *Repo) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, 
 
 	for rows.Next() {
 		var player domain.Player
-		if err := rows.Scan(
-			&player.MatchID, &player.UserID, &player.DisplayName, &player.Side, &player.IsCreator, &player.FreezeUntil,
-			&player.AcceptedAt, &player.BestRuntimeMs, &player.IsWinner, &player.SuspicionCount, &player.JoinedAt, &player.UpdatedAt, &player.CurrentCode,
-		); err != nil {
+		if err := scanPlayerWithCode(rows, &player); err != nil {
 			return nil, fmt.Errorf("scan arena player: %w", err)
 		}
 		copyPlayer := player
@@ -207,10 +196,10 @@ func (r *Repo) ListOpenMatchIDs(ctx context.Context, limit int32) ([]uuid.UUID, 
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT id
 		FROM arena_matches
-		WHERE status IN ('waiting', 'active')
+		WHERE status IN ($1, $2)
 		ORDER BY updated_at DESC
-		LIMIT $1
-	`, limit)
+		LIMIT $3
+	`, model.ArenaMatchStatusWaiting, model.ArenaMatchStatusActive, limit)
 	if err != nil {
 		return nil, fmt.Errorf("list open arena match ids: %w", err)
 	}
@@ -230,10 +219,10 @@ func (r *Repo) ListOpenMatchIDs(ctx context.Context, limit int32) ([]uuid.UUID, 
 func (r *Repo) CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error) {
 	tag, err := r.data.DB.Exec(ctx, `
 		DELETE FROM arena_matches am
-		WHERE am.status = 'waiting'
-		  AND am.source = 'invite'
-		  AND am.updated_at < NOW() - $1::interval
-	`, idleFor.String())
+		WHERE am.status = $1
+		  AND am.source = $2
+		  AND am.updated_at < NOW() - $3::interval
+	`, model.ArenaMatchStatusWaiting, model.ArenaMatchSourceInvite, idleFor.String())
 	if err != nil {
 		return 0, fmt.Errorf("cleanup inactive arena matches: %w", err)
 	}
@@ -261,7 +250,7 @@ func (r *Repo) MatchmakeOrEnqueue(ctx context.Context, user *domain.User, task *
 		ORDER BY queued_at ASC
 		FOR UPDATE SKIP LOCKED
 		LIMIT 1
-	`, user.ID, topic, difficulty).Scan(
+	`, user.ID, topic, model.ArenaDifficultyFromString(difficulty)).Scan(
 		&opponent.UserID, &opponent.DisplayName, &opponent.Topic, &opponent.Difficulty, &opponent.QueuedAt, &opponent.UpdatedAt,
 	)
 
@@ -271,7 +260,7 @@ func (r *Repo) MatchmakeOrEnqueue(ctx context.Context, user *domain.User, task *
 			VALUES ($1, $2, $3, $4, NOW(), NOW())
 			ON CONFLICT (user_id)
 			DO UPDATE SET display_name = EXCLUDED.display_name, topic = EXCLUDED.topic, difficulty = EXCLUDED.difficulty, updated_at = NOW()
-		`, user.ID, resolveArenaDisplayName(user), topic, difficulty)
+		`, user.ID, resolveArenaDisplayName(user), topic, model.ArenaDifficultyFromString(difficulty))
 		if err != nil {
 			return nil, false, fmt.Errorf("enqueue arena player: %w", err)
 		}
@@ -292,7 +281,7 @@ func (r *Repo) MatchmakeOrEnqueue(ctx context.Context, user *domain.User, task *
 		CreatorUserID:     opponent.UserID,
 		TaskID:            task.ID,
 		Topic:             topic,
-		Difficulty:        difficulty,
+		Difficulty:        model.ArenaDifficultyFromString(difficulty),
 		Source:            domain.MatchSourceMatchmaking,
 		Status:            domain.MatchStatusActive,
 		DurationSeconds:   600,
@@ -309,17 +298,17 @@ func (r *Repo) MatchmakeOrEnqueue(ctx context.Context, user *domain.User, task *
 
 	if _, err := tx.Exec(ctx, `
 		INSERT INTO arena_matches (id, creator_user_id, task_id, topic, difficulty, source, status, duration_seconds, obfuscate_opponent, is_rated, unrated_reason, winner_reason, started_at, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, 'active', $7, $8, $9, $10, $11, $12, $12, $12)
-	`, matchID, opponent.UserID, task.ID, topic, difficulty, match.Source, match.DurationSeconds, obfuscateOpponent, true, "", match.WinnerReason, nowTime); err != nil {
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13, $13)
+	`, matchID, opponent.UserID, task.ID, topic, match.Difficulty, match.Source, model.ArenaMatchStatusActive, match.DurationSeconds, obfuscateOpponent, true, "", match.WinnerReason, nowTime); err != nil {
 		return nil, false, fmt.Errorf("insert matched arena match: %w", err)
 	}
 
 	if _, err := tx.Exec(ctx, `
 		INSERT INTO arena_match_players (match_id, user_id, display_name, side, is_creator, joined_at, updated_at)
 		VALUES
-		  ($1, $2, $3, 'left', TRUE, $4, $4),
-		  ($1, $5, $6, 'right', FALSE, $4, $4)
-	`, matchID, opponent.UserID, opponent.DisplayName, nowTime, user.ID, currentDisplayName); err != nil {
+		  ($1, $2, $3, $5, TRUE, $4, $4),
+		  ($1, $6, $7, $8, FALSE, $4, $4)
+	`, matchID, opponent.UserID, opponent.DisplayName, nowTime, model.ArenaPlayerSideLeft, user.ID, currentDisplayName, model.ArenaPlayerSideRight); err != nil {
 		return nil, false, fmt.Errorf("insert matched arena players: %w", err)
 	}
 
@@ -380,11 +369,11 @@ func (r *Repo) FindOpenMatchByUser(ctx context.Context, userID uuid.UUID) (*doma
 		FROM arena_matches m
 		JOIN arena_match_players p ON p.match_id = m.id
 		WHERE p.user_id = $1
-		  AND m.status IN ('waiting', 'active')
-		  AND m.source = 'matchmaking'
+		  AND m.status IN ($2, $3)
+		  AND m.source = $4
 		ORDER BY m.updated_at DESC
 		LIMIT 1
-	`, userID).Scan(&matchID)
+	`, userID, model.ArenaMatchStatusWaiting, model.ArenaMatchStatusActive, model.ArenaMatchSourceMatchmaking).Scan(&matchID)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
@@ -434,9 +423,9 @@ func (r *Repo) JoinMatch(ctx context.Context, matchID uuid.UUID, player *domain.
 	if playersCount >= 2 {
 		_, err = tx.Exec(ctx, `
 			UPDATE arena_matches
-			SET status = 'active', started_at = COALESCE(started_at, NOW()), updated_at = NOW()
+			SET status = $2, started_at = COALESCE(started_at, NOW()), updated_at = NOW()
 			WHERE id = $1
-		`, matchID)
+		`, matchID, model.ArenaMatchStatusActive)
 		if err != nil {
 			return nil, fmt.Errorf("activate arena match: %w", err)
 		}
@@ -522,7 +511,7 @@ func (r *Repo) SetMatchRatingState(ctx context.Context, matchID uuid.UUID, isRat
 	return nil
 }
 
-func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID *uuid.UUID, winnerReason string, finishedAt time.Time) error {
+func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID *uuid.UUID, winnerReason model.ArenaWinnerReason, finishedAt time.Time) error {
 	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return fmt.Errorf("begin finish arena match tx: %w", err)
@@ -531,7 +520,7 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 
 	var isRated bool
 	var unratedReason string
-	var difficulty string
+	var difficulty model.ArenaDifficulty
 	if err := tx.QueryRow(ctx, `
 		SELECT is_rated, unrated_reason, difficulty
 		FROM arena_matches
@@ -557,9 +546,9 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 
 	if _, err := tx.Exec(ctx, `
 		UPDATE arena_matches
-		SET status = 'finished', winner_user_id = $2, winner_reason = $3, finished_at = $4, is_rated = $5, unrated_reason = $6, updated_at = NOW()
+		SET status = $2, winner_user_id = $3, winner_reason = $4, finished_at = $5, is_rated = $6, unrated_reason = $7, updated_at = NOW()
 		WHERE id = $1
-	`, matchID, winnerUserID, winnerReason, finishedAt, isRated, unratedReason); err != nil {
+	`, matchID, model.ArenaMatchStatusFinished, winnerUserID, winnerReason, finishedAt, isRated, unratedReason); err != nil {
 		return fmt.Errorf("update arena match finish: %w", err)
 	}
 
@@ -623,7 +612,7 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 				score = 1
 			}
 
-			nextRating := arenaNextRating(self.rating, opponentRating, score, difficulty)
+			nextRating := arenaNextRating(self.rating, opponentRating, score, difficulty.String())
 			wins := 0
 			losses := 0
 			if score == 1 {
@@ -696,59 +685,13 @@ func (r *Repo) ReportPlayerSuspicion(ctx context.Context, matchID, userID uuid.U
 	return nil
 }
 
-type taskTestCases struct {
-	public []*domain.TestCase
-	hidden []*domain.TestCase
-}
-
-func (r *Repo) getTaskTestCases(ctx context.Context, taskID uuid.UUID) (*taskTestCases, error) {
-	rows, err := r.data.DB.Query(ctx, `
-		SELECT id, task_id, input, expected_output, is_public, weight, "order"
-		FROM code_task_test_cases
-		WHERE task_id = $1
-		ORDER BY "order" ASC, is_public DESC
-	`, taskID)
-	if err != nil {
-		return nil, fmt.Errorf("load arena task cases: %w", err)
-	}
-	defer rows.Close()
-
-	result := &taskTestCases{
-		public: make([]*domain.TestCase, 0),
-		hidden: make([]*domain.TestCase, 0),
-	}
-	for rows.Next() {
-		var tc domain.TestCase
-		if err := rows.Scan(&tc.ID, &tc.TaskID, &tc.Input, &tc.ExpectedOutput, &tc.IsPublic, &tc.Weight, &tc.Order); err != nil {
-			return nil, fmt.Errorf("scan arena task case: %w", err)
-		}
-		copyCase := tc
-		if tc.IsPublic {
-			result.public = append(result.public, &copyCase)
-		} else {
-			result.hidden = append(result.hidden, &copyCase)
-		}
-	}
-	return result, nil
-}
-
 func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.LeaderboardEntry, error) {
 	if limit <= 0 {
 		limit = 20
 	}
 
 	rows, err := r.data.DB.Query(ctx, `
-		SELECT
-			aps.user_id::text,
-			COALESCE(NULLIF(trim(concat_ws(' ', u.first_name, u.last_name)), ''), NULLIF(u.telegram_username, ''), aps.display_name),
-			aps.rating,
-			aps.wins,
-			aps.losses,
-			aps.matches,
-			CASE WHEN aps.matches = 0 THEN 0 ELSE aps.wins::float8 / aps.matches::float8 END AS win_rate,
-			COALESCE(aps.best_runtime_ms, 0)::bigint
-		FROM arena_player_stats aps
-		JOIN users u ON u.id = aps.user_id
+		`+leaderboardSelect+`
 		ORDER BY aps.rating DESC, aps.wins DESC, aps.best_runtime_ms ASC
 		LIMIT $1
 	`, limit)
@@ -760,7 +703,7 @@ func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.Leade
 	var entries []*domain.LeaderboardEntry
 	for rows.Next() {
 		var item domain.LeaderboardEntry
-		if err := rows.Scan(&item.UserID, &item.DisplayName, &item.Rating, &item.Wins, &item.Losses, &item.Matches, &item.WinRate, &item.BestRuntime); err != nil {
+		if err := scanLeaderboardEntry(rows, &item); err != nil {
 			return nil, fmt.Errorf("scan arena leaderboard: %w", err)
 		}
 		item.League = arenaLeague(item.Rating)
@@ -772,20 +715,9 @@ func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.Leade
 
 func (r *Repo) GetPlayerStats(ctx context.Context, userID uuid.UUID) (*domain.PlayerStats, error) {
 	var item domain.PlayerStats
-	err := r.data.DB.QueryRow(ctx, `
-		SELECT
-			aps.user_id::text,
-			COALESCE(NULLIF(trim(concat_ws(' ', u.first_name, u.last_name)), ''), NULLIF(u.telegram_username, ''), aps.display_name),
-			aps.rating,
-			aps.wins,
-			aps.losses,
-			aps.matches,
-			CASE WHEN aps.matches = 0 THEN 0 ELSE aps.wins::float8 / aps.matches::float8 END AS win_rate,
-			COALESCE(aps.best_runtime_ms, 0)::bigint
-		FROM arena_player_stats aps
-		LEFT JOIN users u ON u.id = aps.user_id
+	err := scanPlayerStats(r.data.DB.QueryRow(ctx, leaderboardSelect+`
 		WHERE aps.user_id = $1
-	`, userID).Scan(&item.UserID, &item.DisplayName, &item.Rating, &item.Wins, &item.Losses, &item.Matches, &item.WinRate, &item.BestRuntime)
+	`, userID), &item)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
@@ -821,6 +753,93 @@ func arenaNextRating(self, opponent int32, score float64, difficulty string) int
 	return arenarating.NextRating(self, opponent, score, difficulty)
 }
 
-func arenaLeague(rating int32) string {
-	return arenarating.LeagueName(rating)
+func arenaLeague(rating int32) model.ArenaLeague {
+	return model.ArenaLeagueFromString(arenarating.LeagueName(rating))
+}
+
+func scanMatchWithTask(row scanner, match *domain.Match, task *domain.Task, executionProfile *string, runnerMode *int) error {
+	return row.Scan(
+		&match.ID,
+		&match.CreatorUserID,
+		&match.TaskID,
+		&match.Topic,
+		&match.Difficulty,
+		&match.Source,
+		&match.Status,
+		&match.DurationSeconds,
+		&match.ObfuscateOpponent,
+		&match.IsRated,
+		&match.UnratedReason,
+		&match.WinnerUserID,
+		&match.WinnerReason,
+		&match.StartedAt,
+		&match.FinishedAt,
+		&match.CreatedAt,
+		&match.UpdatedAt,
+		&task.ID,
+		&task.Title,
+		&task.Slug,
+		&task.Statement,
+		&task.Difficulty,
+		&task.Topics,
+		&task.StarterCode,
+		&task.Language,
+		&task.TaskType,
+		executionProfile,
+		runnerMode,
+		&task.FixtureFiles,
+		&task.ReadablePaths,
+		&task.WritablePaths,
+		&task.AllowedHosts,
+		&task.AllowedPorts,
+		&task.MockEndpoints,
+		&task.WritableTempDir,
+		&task.IsActive,
+		&task.CreatedAt,
+		&task.UpdatedAt,
+	)
+}
+
+func scanPlayerWithCode(row scanner, player *domain.Player) error {
+	return row.Scan(
+		&player.MatchID,
+		&player.UserID,
+		&player.DisplayName,
+		&player.Side,
+		&player.IsCreator,
+		&player.FreezeUntil,
+		&player.AcceptedAt,
+		&player.BestRuntimeMs,
+		&player.IsWinner,
+		&player.SuspicionCount,
+		&player.JoinedAt,
+		&player.UpdatedAt,
+		&player.CurrentCode,
+	)
+}
+
+func scanLeaderboardEntry(row scanner, item *domain.LeaderboardEntry) error {
+	return row.Scan(
+		&item.UserID,
+		&item.DisplayName,
+		&item.Rating,
+		&item.Wins,
+		&item.Losses,
+		&item.Matches,
+		&item.WinRate,
+		&item.BestRuntime,
+	)
+}
+
+func scanPlayerStats(row scanner, item *domain.PlayerStats) error {
+	return row.Scan(
+		&item.UserID,
+		&item.DisplayName,
+		&item.Rating,
+		&item.Wins,
+		&item.Losses,
+		&item.Matches,
+		&item.WinRate,
+		&item.BestRuntime,
+	)
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	domain "api/internal/domain/codeeditor"
+	"api/internal/model"
 	"api/internal/policy"
 	"api/internal/sandbox"
 
@@ -13,7 +14,8 @@ import (
 )
 
 func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string) (*domain.Room, error) {
-	if mode != domain.RoomModeAll && mode != domain.RoomModeDuel {
+	modeEnum := model.RoomModeFromString(mode)
+	if modeEnum != model.RoomModeAll && modeEnum != model.RoomModeDuel {
 		return nil, domain.ErrInvalidMode
 	}
 
@@ -23,7 +25,7 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 	var taskID *uuid.UUID
 	nowTime := now()
 
-	if mode == domain.RoomModeDuel {
+	if modeEnum == model.RoomModeDuel {
 		task, err := s.repo.PickRandomTask(ctx, topic, difficulty)
 		if err != nil {
 			return nil, err
@@ -38,9 +40,9 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 
 	room := &domain.Room{
 		ID:         uuid.New(),
-		Mode:       mode,
+		Mode:       modeEnum,
 		Code:       code,
-		Status:     domain.RoomStatusWaiting,
+		Status:     model.RoomStatusWaiting,
 		CreatorID:  uuid.Nil,
 		InviteCode: inviteCode,
 		Task:       taskDescription,
@@ -104,7 +106,7 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 		return nil, err
 	}
 
-	if updatedRoom.Mode == domain.RoomModeDuel && len(updatedRoom.Participants) == 2 && updatedRoom.Status == domain.RoomStatusWaiting {
+	if updatedRoom.Mode == model.RoomModeDuel && len(updatedRoom.Participants) == 2 && updatedRoom.Status == model.RoomStatusWaiting {
 		startedAt := now()
 		if err := s.repo.StartDuel(ctx, roomID, startedAt); err != nil {
 			return nil, err
@@ -133,7 +135,7 @@ func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid
 		return nil, err
 	}
 
-	if room.Mode == domain.RoomModeDuel && room.Status == domain.RoomStatusFinished {
+	if room.Mode == model.RoomModeDuel && room.Status == model.RoomStatusFinished {
 		return nil, domain.ErrRoomAlreadyClosed
 	}
 
@@ -142,9 +144,10 @@ func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid
 	}
 
 	result, err := s.sandbox.Execute(ctx, sandbox.ExecutionRequest{
-		Code:     code,
-		Task:     policy.TaskSpecForCodeEditorRun(),
-		Language: policy.LanguageGo,
+		Code:       code,
+		Task:       policy.TaskSpecForCodeEditorRun(),
+		Language:   policy.LanguageGo,
+		RunnerMode: model.RunnerModeProgram.String(),
 	})
 	if err != nil {
 		submission := &domain.Submission{
@@ -180,8 +183,8 @@ func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid
 				break
 			}
 		}
-		if allReady && room.Status == domain.RoomStatusWaiting {
-			_ = s.repo.UpdateRoomStatus(ctx, roomID, domain.RoomStatusActive)
+		if allReady && room.Status == model.RoomStatusWaiting {
+			_ = s.repo.UpdateRoomStatus(ctx, roomID, model.RoomStatusActive)
 		}
 	}
 

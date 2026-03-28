@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Map, { Marker, MapRef } from 'react-map-gl/maplibre';
+import Map, { Marker, MapRef, NavigationControl, ScaleControl } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import {
@@ -9,7 +9,7 @@ import {
 } from '@/entities/User/model/types';
 import { eventApi } from '@/features/Event/api/eventApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
-import { DARK_MAP_STYLE } from '@/shared/config/mapStyle';
+import { COMMUNITY_MAP_STYLE } from '@/shared/config/mapStyle';
 
 import { UserCluster, EventDraft } from '../components/types';
 import { UserMarker, ClusterMarker, EventMarker } from '../components/MapMarker';
@@ -23,14 +23,14 @@ type ViewState = {
   zoom: number;
 };
 
-const CLUSTER_BREAK_ZOOM = 10.5;
+const CLUSTER_BREAK_ZOOM = 9.75;
 const CLUSTER_MIN_CELL_SIZE = 0.02;
 const CLUSTER_CELL_SIZE_FACTOR = 20;
 
 function buildViewState(points: CommunityMapPoint[], events: CommunityEvent[]): ViewState {
   const currentUserPoint = points.find((point) => point.isCurrentUser);
   if (currentUserPoint) {
-    return { longitude: currentUserPoint.longitude, latitude: currentUserPoint.latitude, zoom: 9 };
+    return { longitude: currentUserPoint.longitude, latitude: currentUserPoint.latitude, zoom: 10.5 };
   }
   const allCoordinates = [
     ...points.map(p => ({ lng: p.longitude, lat: p.latitude })),
@@ -140,7 +140,7 @@ export const MapPage: React.FC = () => {
   const selectedUser = useMemo(() => visibleUserPoints.find(p => p.userId === selectedUserId), [visibleUserPoints, selectedUserId]);
   const selectedEvent = useMemo(() => events.find(e => e.id === selectedEventId), [events, selectedEventId]);
 
-  const focusMap = (longitude: number, latitude: number, zoom = 9.5) => {
+  const focusMap = (longitude: number, latitude: number, zoom = 10.5) => {
     const nextZoom = Math.max(viewState.zoom, zoom);
     setViewState((current) => ({
       ...current,
@@ -296,11 +296,15 @@ export const MapPage: React.FC = () => {
           {...viewState}
           onMove={(e) => setViewState(e.viewState)}
           onClick={handleMapClick}
-          mapStyle={DARK_MAP_STYLE}
+          mapStyle={COMMUNITY_MAP_STYLE}
           attributionControl={false}
+          minZoom={2.5}
+          maxZoom={18.5}
           reuseMaps
           style={{ width: '100%', height: '620px' }}
         >
+          <NavigationControl position="top-right" showCompass={false} visualizePitch={false} />
+          <ScaleControl position="bottom-right" unit="metric" />
           {userClusters.map((cluster) => (
             <Marker key={cluster.id} longitude={cluster.longitude} latitude={cluster.latitude} anchor="bottom">
               <button type="button" onClick={(e) => { e.stopPropagation(); focusMap(cluster.longitude, cluster.latitude, viewState.zoom + 2); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
@@ -310,7 +314,7 @@ export const MapPage: React.FC = () => {
           ))}
           {visibleUserPoints.map((p) => (
             <Marker key={p.userId} longitude={p.displayLongitude} latitude={p.displayLatitude} anchor="bottom">
-              <button type="button" onClick={(e) => { e.stopPropagation(); setSelectedUserId(p.userId); setSelectedEventId(null); setDraftEvent(null); setIsEditingEvent(false); focusMap(p.longitude, p.latitude); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
+              <button type="button" onClick={(e) => { e.stopPropagation(); setSelectedUserId(p.userId); setSelectedEventId(null); setDraftEvent(null); setIsEditingEvent(false); focusMap(p.longitude, p.latitude, 15.25); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
                 <UserMarker point={p} />
               </button>
             </Marker>

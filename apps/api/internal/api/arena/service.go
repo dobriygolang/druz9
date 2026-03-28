@@ -5,15 +5,17 @@ import (
 
 	apparena "api/internal/app/arena"
 	domain "api/internal/domain/arena"
-	"api/internal/dto"
+	"api/internal/model"
+	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/arena/v1"
 
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 )
 
+//go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
-	CreateMatch(ctx context.Context, creator *domain.User, topic, difficulty string, obfuscateOpponent bool) (*domain.Match, error)
+	CreateMatch(ctx context.Context, creator *domain.User, topic string, difficulty model.ArenaDifficulty, obfuscateOpponent bool) (*domain.Match, error)
 	GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, error)
 	JoinMatch(ctx context.Context, matchID uuid.UUID, user *domain.User) (*domain.Match, error)
 	SavePlayerCode(ctx context.Context, matchID uuid.UUID, user *domain.User, code string) error
@@ -21,8 +23,9 @@ type Service interface {
 	GetLeaderboard(ctx context.Context, limit int32) ([]*domain.LeaderboardEntry, error)
 }
 
+//go:generate mockery --case underscore --name RealtimePublisher --with-expecter --output mocks
 type RealtimePublisher interface {
-	PublishMatch(match *dto.ArenaRealtimeMatch, codes []*dto.ArenaRealtimeCode)
+	PublishMatch(match *realtime.ArenaMatch, codes []*realtime.ArenaPlayerCode)
 }
 
 type Implementation struct {

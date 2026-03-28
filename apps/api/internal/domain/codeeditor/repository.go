@@ -4,6 +4,8 @@ import (
 	"context"
 	"time"
 
+	"api/internal/model"
+
 	"github.com/google/uuid"
 )
 
@@ -12,7 +14,7 @@ type Repository interface {
 	GetRoom(ctx context.Context, roomID uuid.UUID) (*Room, error)
 	GetRoomByInviteCode(ctx context.Context, inviteCode string) (*Room, error)
 	SaveCodeSnapshot(ctx context.Context, roomID uuid.UUID, code string) error
-	UpdateRoomStatus(ctx context.Context, roomID uuid.UUID, status string) error
+	UpdateRoomStatus(ctx context.Context, roomID uuid.UUID, status model.RoomStatus) error
 	AddParticipant(ctx context.Context, roomID uuid.UUID, participant *Participant) (*Room, error)
 	RemoveParticipant(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string) error
 	SetParticipantReady(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, ready bool) error

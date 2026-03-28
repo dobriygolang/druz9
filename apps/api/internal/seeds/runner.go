@@ -4,15 +4,16 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
 	"sort"
-	"strings"
 	"time"
 
 	appcodeeditor "api/internal/app/codeeditor"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
@@ -56,10 +57,6 @@ func NewRunner(db *pgxpool.Pool, codeEditor *appcodeeditor.Service, sqlDir strin
 }
 
 func (r *Runner) Run(ctx context.Context, opts Options) ([]Result, error) {
-	if err := r.ensureTable(ctx); err != nil {
-		return nil, err
-	}
-
 	var results []Result
 	if opts.RunSQL {
 		sqlResults, err := r.runSQLSeeds(ctx)
@@ -79,10 +76,6 @@ func (r *Runner) Run(ctx context.Context, opts Options) ([]Result, error) {
 }
 
 func (r *Runner) List(ctx context.Context) ([]Record, error) {
-	if err := r.ensureTable(ctx); err != nil {
-		return nil, err
-	}
-
 	rows, err := r.db.Query(ctx, `
 		SELECT name, kind, checksum, applied_at
 		FROM seed_runs
@@ -161,21 +154,6 @@ func (r *Runner) runSQLSeeds(ctx context.Context) ([]Result, error) {
 	return results, nil
 }
 
-func (r *Runner) ensureTable(ctx context.Context) error {
-	_, err := r.db.Exec(ctx, `
-		CREATE TABLE IF NOT EXISTS seed_runs (
-			name TEXT PRIMARY KEY,
-			kind TEXT NOT NULL,
-			checksum TEXT NOT NULL,
-			applied_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-		)
-	`)
-	if err != nil {
-		return fmt.Errorf("ensure seed_runs table: %w", err)
-	}
-	return nil
-}
-
 func (r *Runner) shouldApply(ctx context.Context, name string, kind string, checksum string) (bool, time.Time, error) {
 	var record Record
 	err := r.db.QueryRow(ctx, `
@@ -184,7 +162,7 @@ func (r *Runner) shouldApply(ctx context.Context, name string, kind string, chec
 		WHERE name = $1
 	`, name).Scan(&record.Name, &record.Kind, &record.Checksum, &record.AppliedAt)
 	if err != nil {
-		if strings.Contains(err.Error(), "no rows") {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return true, time.Time{}, nil
 		}
 		return false, time.Time{}, fmt.Errorf("load seed record %s: %w", name, err)

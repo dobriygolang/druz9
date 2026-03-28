@@ -30,8 +30,8 @@ func TaskSpecFromCodeTask(task *model.CodeTask, fallback TaskType) TaskSpec {
 
 	spec.Name = task.Title
 	spec.Purpose = task.Slug
-	spec.Type = TaskType(task.TaskType)
-	spec.Profile = ExecutionProfile(task.ExecutionProfile)
+	spec.Type = taskPolicyTypeFromCodeTask(task, fallback)
+	spec.Profile = ExecutionProfile(task.ExecutionProfile.String())
 	spec.FixtureFiles = append([]string(nil), task.FixtureFiles...)
 	spec.ReadablePaths = append([]string(nil), task.ReadablePaths...)
 	spec.WritablePaths = append([]string(nil), task.WritablePaths...)
@@ -39,7 +39,7 @@ func TaskSpecFromCodeTask(task *model.CodeTask, fallback TaskType) TaskSpec {
 	spec.MockEndpoints = append([]string(nil), task.MockEndpoints...)
 	spec.WritableTempDir = task.WritableTempDir
 
-	if task.Language == string(LanguageGo) {
+	if task.Language == model.ProgrammingLanguageGo {
 		spec.Language = LanguageGo
 	}
 	for _, port := range task.AllowedPorts {
@@ -81,4 +81,23 @@ func TaskSpecFromCodeTask(task *model.CodeTask, fallback TaskType) TaskSpec {
 	}
 
 	return spec
+}
+
+func taskPolicyTypeFromCodeTask(task *model.CodeTask, fallback TaskType) TaskType {
+	if task == nil {
+		return fallback
+	}
+
+	switch task.ExecutionProfile {
+	case model.ExecutionProfileFileIO:
+		return TaskTypeFileParsing
+	case model.ExecutionProfileHTTPClient:
+		return TaskTypeAPIJSON
+	case model.ExecutionProfileInterviewRealistic:
+		return TaskTypeInterviewPractice
+	case model.ExecutionProfilePure:
+		return fallback
+	default:
+		return fallback
+	}
 }

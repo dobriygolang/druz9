@@ -15,7 +15,7 @@ func (i *Implementation) CreateMatch(ctx context.Context, req *v1.CreateMatchReq
 		return nil, err
 	}
 
-	match, err := i.service.CreateMatch(ctx, user, req.Topic, req.Difficulty, req.ObfuscateOpponent)
+	match, err := i.service.CreateMatch(ctx, user, req.Topic, unmapDifficulty(req.Difficulty), req.ObfuscateOpponent)
 	if err != nil {
 		switch {
 		case errors.Is(err, arenadomain.ErrNoAvailableTasks):

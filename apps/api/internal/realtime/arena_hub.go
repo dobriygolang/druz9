@@ -7,8 +7,8 @@ import (
 	"time"
 
 	domain "api/internal/domain/arena"
-	"api/internal/dto"
 	"api/internal/model"
+	schema "api/internal/realtime/schema"
 
 	"github.com/google/uuid"
 	"github.com/gorilla/websocket"
@@ -29,8 +29,8 @@ type arenaStateService interface {
 
 type arenaMatchRoom struct {
 	clients map[*arenaClient]struct{}
-	codes   map[string]*dto.ArenaRealtimeCode
-	match   *dto.ArenaRealtimeMatch
+	codes   map[string]*schema.ArenaPlayerCode
+	match   *schema.ArenaMatch
 	dirty   bool
 }
 
@@ -39,7 +39,7 @@ type arenaClient struct {
 	userID    string
 	spectator bool
 	ws        *websocket.Conn
-	send      chan dto.ArenaRealtimeMessage
+	send      chan schema.ArenaMessage
 }
 
 var arenaUpgrader = websocket.Upgrader{
@@ -69,7 +69,7 @@ func (h *ArenaHub) Handler(matchID string) http.Handler {
 		client := &arenaClient{
 			matchID: matchID,
 			ws:      ws,
-			send:    make(chan dto.ArenaRealtimeMessage, 64),
+			send:    make(chan schema.ArenaMessage, 64),
 		}
 
 		h.addClient(client)
@@ -97,31 +97,31 @@ func (c *arenaClient) readLoop(h *ArenaHub) {
 	})
 
 	for {
-		var msg dto.ArenaRealtimeMessage
+		var msg schema.ArenaMessage
 		if err := c.ws.ReadJSON(&msg); err != nil {
 			return
 		}
 
 		switch msg.Type {
-		case dto.ArenaRealtimeTypeHello:
+		case schema.ArenaTypeHello:
 			c.userID = msg.UserID
 			c.spectator = msg.Spectator
 			if msg.DisplayName != "" {
 				h.bindDisplayName(c.matchID, c.userID, msg.DisplayName)
 			}
 			h.sendSnapshot(c)
-		case dto.ArenaRealtimeTypeCodeUpdate:
+		case schema.ArenaTypeCodeUpdate:
 			if c.userID == "" {
 				continue
 			}
 			h.handleCodeUpdate(c, msg)
-		case dto.ArenaRealtimeTypePing:
-			c.enqueue(dto.ArenaRealtimeMessage{Type: dto.ArenaRealtimeTypePong})
+		case schema.ArenaTypePing:
+			c.enqueue(schema.ArenaMessage{Type: schema.ArenaTypePong})
 		}
 	}
 }
 
-func (c *arenaClient) enqueue(msg dto.ArenaRealtimeMessage) {
+func (c *arenaClient) enqueue(msg schema.ArenaMessage) {
 	select {
 	case c.send <- msg:
 	default:
@@ -136,7 +136,7 @@ func (h *ArenaHub) addClient(client *arenaClient) {
 	if room == nil {
 		room = &arenaMatchRoom{
 			clients: make(map[*arenaClient]struct{}),
-			codes:   make(map[string]*dto.ArenaRealtimeCode),
+			codes:   make(map[string]*schema.ArenaPlayerCode),
 		}
 		h.matches[client.matchID] = room
 	}
@@ -144,7 +144,7 @@ func (h *ArenaHub) addClient(client *arenaClient) {
 }
 
 func (h *ArenaHub) removeClient(client *arenaClient) {
-	var pending map[string]*dto.ArenaRealtimeCode
+	var pending map[string]*schema.ArenaPlayerCode
 
 	h.mu.Lock()
 	room := h.matches[client.matchID]
@@ -179,14 +179,14 @@ func (h *ArenaHub) sendSnapshot(client *arenaClient) {
 		return
 	}
 
-	client.enqueue(dto.ArenaRealtimeMessage{
-		Type:    dto.ArenaRealtimeTypeSnapshot,
+	client.enqueue(schema.ArenaMessage{
+		Type:    schema.ArenaTypeSnapshot,
 		Match:   room.match,
 		Players: h.viewerCodesLocked(room, client.userID, client.spectator),
 	})
 }
 
-func (h *ArenaHub) handleCodeUpdate(client *arenaClient, msg dto.ArenaRealtimeMessage) {
+func (h *ArenaHub) handleCodeUpdate(client *arenaClient, msg schema.ArenaMessage) {
 	h.mu.Lock()
 	room := h.matches[client.matchID]
 	if room == nil {
@@ -194,7 +194,7 @@ func (h *ArenaHub) handleCodeUpdate(client *arenaClient, msg dto.ArenaRealtimeMe
 		return
 	}
 
-	code := dto.ArenaRealtimeCode{
+	code := schema.ArenaPlayerCode{
 		UserID: client.userID,
 		Code:   msg.Code,
 		IsSelf: true,
@@ -213,8 +213,8 @@ func (h *ArenaHub) handleCodeUpdate(client *arenaClient, msg dto.ArenaRealtimeMe
 	h.mu.Unlock()
 
 	for _, other := range targets {
-		other.enqueue(dto.ArenaRealtimeMessage{
-			Type:      dto.ArenaRealtimeTypeCodeUpdate,
+		other.enqueue(schema.ArenaMessage{
+			Type:      schema.ArenaTypeCodeUpdate,
 			UserID:    client.userID,
 			Code:      h.viewerCode(match, &code, other.userID, other.spectator),
 			UpdatedAt: time.Now().UTC().Format(time.RFC3339Nano),
@@ -222,7 +222,7 @@ func (h *ArenaHub) handleCodeUpdate(client *arenaClient, msg dto.ArenaRealtimeMe
 	}
 }
 
-func (h *ArenaHub) PublishMatch(match *dto.ArenaRealtimeMatch, codes []*dto.ArenaRealtimeCode) {
+func (h *ArenaHub) PublishMatch(match *schema.ArenaMatch, codes []*schema.ArenaPlayerCode) {
 	if match == nil || match.ID == "" {
 		return
 	}
@@ -232,7 +232,7 @@ func (h *ArenaHub) PublishMatch(match *dto.ArenaRealtimeMatch, codes []*dto.Aren
 	if room == nil {
 		room = &arenaMatchRoom{
 			clients: make(map[*arenaClient]struct{}),
-			codes:   make(map[string]*dto.ArenaRealtimeCode),
+			codes:   make(map[string]*schema.ArenaPlayerCode),
 		}
 		h.matches[match.ID] = room
 	}
@@ -253,15 +253,15 @@ func (h *ArenaHub) PublishMatch(match *dto.ArenaRealtimeMatch, codes []*dto.Aren
 	h.mu.Unlock()
 
 	for _, client := range targets {
-		client.enqueue(dto.ArenaRealtimeMessage{
-			Type:    dto.ArenaRealtimeTypeMatch,
+		client.enqueue(schema.ArenaMessage{
+			Type:    schema.ArenaTypeMatch,
 			Match:   match,
 			Players: h.viewerCodes(match, match.ID, client.userID, client.spectator),
 		})
 	}
 }
 
-func (h *ArenaHub) viewerCodes(match *dto.ArenaRealtimeMatch, matchID, viewerUserID string, spectator bool) []*dto.ArenaRealtimeCode {
+func (h *ArenaHub) viewerCodes(match *schema.ArenaMatch, matchID, viewerUserID string, spectator bool) []*schema.ArenaPlayerCode {
 	h.mu.Lock()
 	defer h.mu.Unlock()
 
@@ -272,13 +272,13 @@ func (h *ArenaHub) viewerCodes(match *dto.ArenaRealtimeMatch, matchID, viewerUse
 	return h.viewerCodesLocked(room, viewerUserID, spectator)
 }
 
-func (h *ArenaHub) viewerCodesLocked(room *arenaMatchRoom, viewerUserID string, spectator bool) []*dto.ArenaRealtimeCode {
-	result := make([]*dto.ArenaRealtimeCode, 0, len(room.codes))
+func (h *ArenaHub) viewerCodesLocked(room *arenaMatchRoom, viewerUserID string, spectator bool) []*schema.ArenaPlayerCode {
+	result := make([]*schema.ArenaPlayerCode, 0, len(room.codes))
 	for _, item := range room.codes {
 		if item == nil {
 			continue
 		}
-		result = append(result, &dto.ArenaRealtimeCode{
+		result = append(result, &schema.ArenaPlayerCode{
 			UserID:      item.UserID,
 			DisplayName: item.DisplayName,
 			Code:        h.viewerCode(room.match, item, viewerUserID, spectator),
@@ -288,14 +288,14 @@ func (h *ArenaHub) viewerCodesLocked(room *arenaMatchRoom, viewerUserID string, 
 	return result
 }
 
-func (h *ArenaHub) viewerCode(match *dto.ArenaRealtimeMatch, item *dto.ArenaRealtimeCode, viewerUserID string, spectator bool) string {
+func (h *ArenaHub) viewerCode(match *schema.ArenaMatch, item *schema.ArenaPlayerCode, viewerUserID string, spectator bool) string {
 	if item == nil {
 		return ""
 	}
 	if item.UserID == viewerUserID {
 		return item.Code
 	}
-	if match != nil && match.Status == model.ArenaMatchStatusFinished {
+	if match != nil && match.Status == model.ArenaMatchStatusFinished.String() {
 		return item.Code
 	}
 	if spectator {
@@ -355,24 +355,24 @@ func (h *ArenaHub) ensureMatchLoaded(matchID string) {
 	h.PublishMatch(dtoFromArenaMatch(match), dtoCodesFromArenaMatch(match))
 }
 
-func dtoFromArenaMatch(match *model.ArenaMatch) *dto.ArenaRealtimeMatch {
+func dtoFromArenaMatch(match *model.ArenaMatch) *schema.ArenaMatch {
 	if match == nil {
 		return nil
 	}
-	item := &dto.ArenaRealtimeMatch{
+	item := &schema.ArenaMatch{
 		ID:                match.ID.String(),
 		TaskID:            match.TaskID.String(),
 		TaskTitle:         arenaTaskTitle(match),
 		TaskStatement:     arenaTaskStatement(match),
 		StarterCode:       arenaStarterCode(match),
 		Topic:             match.Topic,
-		Difficulty:        match.Difficulty,
-		Status:            match.Status,
+		Difficulty:        match.Difficulty.String(),
+		Status:            match.Status.String(),
 		DurationSeconds:   match.DurationSeconds,
 		ObfuscateOpponent: match.ObfuscateOpponent,
-		WinnerReason:      match.WinnerReason,
+		WinnerReason:      match.WinnerReason.String(),
 		CreatedAt:         match.CreatedAt.UTC().Format(time.RFC3339Nano),
-		Players:           make([]*dto.ArenaRealtimePlayer, 0, len(match.Players)),
+		Players:           make([]*schema.ArenaPlayer, 0, len(match.Players)),
 	}
 	if match.WinnerUserID != nil {
 		item.WinnerUserID = match.WinnerUserID.String()
@@ -387,10 +387,10 @@ func dtoFromArenaMatch(match *model.ArenaMatch) *dto.ArenaRealtimeMatch {
 		if player == nil {
 			continue
 		}
-		realtimePlayer := &dto.ArenaRealtimePlayer{
+		realtimePlayer := &schema.ArenaPlayer{
 			UserID:        player.UserID.String(),
 			DisplayName:   player.DisplayName,
-			Side:          player.Side,
+			Side:          player.Side.String(),
 			IsCreator:     player.IsCreator,
 			BestRuntimeMs: player.BestRuntimeMs,
 			IsWinner:      player.IsWinner,
@@ -428,16 +428,16 @@ func arenaStarterCode(match *model.ArenaMatch) string {
 	return match.Task.StarterCode
 }
 
-func dtoCodesFromArenaMatch(match *model.ArenaMatch) []*dto.ArenaRealtimeCode {
+func dtoCodesFromArenaMatch(match *model.ArenaMatch) []*schema.ArenaPlayerCode {
 	if match == nil {
 		return nil
 	}
-	result := make([]*dto.ArenaRealtimeCode, 0, len(match.Players))
+	result := make([]*schema.ArenaPlayerCode, 0, len(match.Players))
 	for _, player := range match.Players {
 		if player == nil {
 			continue
 		}
-		result = append(result, &dto.ArenaRealtimeCode{
+		result = append(result, &schema.ArenaPlayerCode{
 			UserID:      player.UserID.String(),
 			DisplayName: player.DisplayName,
 			Code:        player.CurrentCode,
@@ -446,8 +446,8 @@ func dtoCodesFromArenaMatch(match *model.ArenaMatch) []*dto.ArenaRealtimeCode {
 	return result
 }
 
-func cloneArenaCodes(source map[string]*dto.ArenaRealtimeCode) map[string]*dto.ArenaRealtimeCode {
-	result := make(map[string]*dto.ArenaRealtimeCode, len(source))
+func cloneArenaCodes(source map[string]*schema.ArenaPlayerCode) map[string]*schema.ArenaPlayerCode {
+	result := make(map[string]*schema.ArenaPlayerCode, len(source))
 	for userID, code := range source {
 		if code == nil {
 			continue
@@ -465,7 +465,7 @@ func (h *ArenaHub) snapshotLoop() {
 	for range ticker.C {
 		type snapshot struct {
 			matchID string
-			codes   map[string]*dto.ArenaRealtimeCode
+			codes   map[string]*schema.ArenaPlayerCode
 		}
 
 		var pending []snapshot
@@ -489,7 +489,7 @@ func (h *ArenaHub) snapshotLoop() {
 	}
 }
 
-func (h *ArenaHub) flushSnapshot(matchID string, codes map[string]*dto.ArenaRealtimeCode) {
+func (h *ArenaHub) flushSnapshot(matchID string, codes map[string]*schema.ArenaPlayerCode) {
 	if h.service == nil {
 		return
 	}
@@ -508,7 +508,7 @@ func (h *ArenaHub) flushSnapshot(matchID string, codes map[string]*dto.ArenaReal
 		_ = h.service.SavePlayerCode(context.Background(), parsedMatchID, &model.User{
 			ID:        parsedUserID,
 			FirstName: code.DisplayName,
-			Status:    "guest",
+			Status:    model.UserStatusGuest,
 		}, code.Code)
 	}
 }
