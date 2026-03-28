@@ -2,10 +2,12 @@ FROM node:20-alpine AS builder
 
 WORKDIR /app
 ENV NODE_ENV=development
+ENV NPM_CONFIG_PRODUCTION=false
 
 COPY package*.json ./
-RUN npm install
-RUN npm install -g typescript@5.2.2 vite@5.4.0
+RUN npm install --include=dev \
+  && test -f node_modules/typescript/bin/tsc \
+  && test -f node_modules/vite/client.d.ts
 
 COPY . .
 
@@ -21,7 +23,7 @@ ENV VITE_WS_URL=${VITE_WS_URL}
 ENV VITE_TELEGRAM_BOT_NAME=${VITE_TELEGRAM_BOT_NAME}
 ENV VITE_ARENA_REQUIRE_AUTH=${VITE_ARENA_REQUIRE_AUTH}
 
-RUN npm run build
+RUN npx tsc && npx vite build
 
 FROM nginx:1.27-alpine
 
