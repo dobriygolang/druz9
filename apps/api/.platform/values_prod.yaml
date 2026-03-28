@@ -75,6 +75,13 @@ metrics_addr:
   type: "string"
   writable: false
 
+arena_require_auth:
+  usage: "Require authentication for arena endpoints"
+  group: "arena"
+  value: "false"
+  type: "bool"
+  writable: true
+
 database_url:
   usage: "Primary PostgreSQL DSN"
   group: "data"
@@ -229,37 +236,16 @@ s3_secret_key:
   type: "string"
   writable: false
 
-livekit_url:
-  usage: "Internal LiveKit URL"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
-
-livekit_public_url:
-  usage: "Public LiveKit URL override"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
-
-livekit_api_key:
-  usage: "LiveKit API key"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
-
-livekit_api_secret:
-  usage: "LiveKit API secret"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
-
 dev_auth_bypass:
   usage: "Allow local auth bypass"
   group: "dev"
   value: "false"
   type: "bool"
+  writable: false
+
+dev_user_id:
+  usage: "Dev user ID for bypass mode"
+  group: "dev"
+  value: "f0f6633b-a390-4e4d-b200-ef2dff513490"
+  type: "string"
   writable: false

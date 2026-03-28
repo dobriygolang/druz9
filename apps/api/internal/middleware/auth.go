@@ -4,6 +4,7 @@ import (
 	"context"
 	stdErrors "errors"
 	"net/http"
+	"strings"
 	"time"
 
 	profileerrors "api/internal/errors/profile"
@@ -14,11 +15,22 @@ import (
 	"github.com/go-kratos/kratos/v2/transport"
 	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
+
+	"github.com/google/uuid"
+)
+
+const (
+	codeEditorGuestNameHeader = "X-Code-Editor-Guest-Name"
+	arenaGuestIDHeader        = "X-Arena-Guest-Id"
+	arenaGuestNameHeader      = "X-Arena-Guest-Name"
 )
 
 type ProfileAuthorizer interface {
 	AuthenticateByToken(context.Context, string) (*model.AuthState, error)
 	CookieName() string
+	DevBypass() bool
+	DevUserID() string
+	FindUserByID(context.Context, uuid.UUID) (*model.User, error)
 }
 
 type SessionCookieManager interface {
@@ -29,6 +41,22 @@ type SessionCookieManager interface {
 func RequireAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
+			// DevBypass: use dev user in development
+			if authorizer.DevBypass() {
+				devUserID := authorizer.DevUserID()
+				if devUserID != "" {
+					userID, err := uuid.Parse(devUserID)
+					if err == nil {
+						user, findErr := authorizer.FindUserByID(ctx, userID)
+						if findErr == nil && user != nil {
+							authState := &model.AuthState{User: user}
+							ctx = model.ContextWithAuth(ctx, authState)
+						}
+					}
+				}
+				return handler(ctx, req)
+			}
+
 			if tr, ok := transport.FromServerContext(ctx); ok {
 				rawToken, err := extractSessionToken(tr, authorizer.CookieName())
 				if err != nil {
@@ -50,6 +78,58 @@ func RequireAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager) mid
 
 				ctx = model.ContextWithAuth(ctx, authState)
 			}
+			return handler(ctx, req)
+		}
+	}
+}
+
+func OptionalAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager) middleware.Middleware {
+	return func(handler middleware.Handler) middleware.Handler {
+		return func(ctx context.Context, req interface{}) (interface{}, error) {
+			if hasExplicitGuestOverride(ctx) {
+				return handler(ctx, req)
+			}
+
+			// DevBypass: use dev user in development.
+			if authorizer.DevBypass() {
+				devUserID := authorizer.DevUserID()
+				if devUserID != "" {
+					userID, err := uuid.Parse(devUserID)
+					if err == nil {
+						user, findErr := authorizer.FindUserByID(ctx, userID)
+						if findErr == nil && user != nil {
+							authState := &model.AuthState{User: user}
+							ctx = model.ContextWithAuth(ctx, authState)
+						}
+					}
+				}
+				return handler(ctx, req)
+			}
+
+			tr, ok := transport.FromServerContext(ctx)
+			if !ok {
+				return handler(ctx, req)
+			}
+
+			rawToken, err := extractSessionToken(tr, authorizer.CookieName())
+			if err != nil {
+				return handler(ctx, req)
+			}
+
+			authState, err := authorizer.AuthenticateByToken(ctx, rawToken)
+			if err != nil {
+				if stdErrors.Is(err, profileerrors.ErrUnauthorized) {
+					cookies.ClearSessionCookie(ctx)
+					return handler(ctx, req)
+				}
+				return nil, errors.InternalServer("INTERNAL", "internal server error")
+			}
+
+			if authState.SessionExtended {
+				cookies.SetSessionCookie(ctx, authState.RawToken, authState.Session.ExpiresAt)
+			}
+
+			ctx = model.ContextWithAuth(ctx, authState)
 			return handler(ctx, req)
 		}
 	}
@@ -93,4 +173,21 @@ func extractSessionToken(tr transport.Transporter, cookieName string) (string, e
 	}
 
 	return "", http.ErrNoCookie
+}
+
+func hasExplicitGuestOverride(ctx context.Context) bool {
+	tr, ok := transport.FromServerContext(ctx)
+	if !ok {
+		return false
+	}
+
+	ht, ok := tr.(*kratoshttp.Transport)
+	if !ok || ht.Request() == nil {
+		return false
+	}
+
+	headers := ht.Request().Header
+	return strings.TrimSpace(headers.Get(codeEditorGuestNameHeader)) != "" ||
+		strings.TrimSpace(headers.Get(arenaGuestIDHeader)) != "" ||
+		strings.TrimSpace(headers.Get(arenaGuestNameHeader)) != ""
 }

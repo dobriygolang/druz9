@@ -92,6 +92,7 @@ export const EventForm: React.FC<EventFormProps> = ({
         <button
           type="button"
           onClick={onClose}
+          aria-label="Закрыть"
           style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '6px', borderRadius: '8px' }}
         >
           <X size={18} />

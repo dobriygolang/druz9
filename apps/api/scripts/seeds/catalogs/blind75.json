@@ -1,0 +1,2753 @@
+{
+  "version": "blind75-v1-75",
+  "tasks": [
+    {
+      "slug": "blind75-two-sum",
+      "title": "Blind75: Two Sum",
+      "difficulty": "easy",
+      "statement": "Даны n, массив nums и target. Выведите индексы пары i j (i < j), сумма которой равна target. Если пары нет, выведите -1 -1.",
+      "topics": [
+        "arrays",
+        "hash-map"
+      ],
+      "cases": [
+        {
+          "input": "4\n2 7 11 15\n9",
+          "output": "0 1",
+          "is_public": true
+        },
+        {
+          "input": "3\n3 2 4\n6",
+          "output": "1 2",
+          "is_public": true
+        },
+        {
+          "input": "2\n3 3\n6",
+          "output": "0 1",
+          "is_public": false
+        },
+        {
+          "input": "4\n1 2 3 4\n8",
+          "output": "-1 -1",
+          "is_public": false
+        },
+        {
+          "input": "5\n-3 4 3 90 1\n0",
+          "output": "0 2",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-best-time-to-buy-and-sell-stock",
+      "title": "Blind75: Best Time to Buy and Sell Stock",
+      "difficulty": "easy",
+      "statement": "Даны n и массив цен. Нужно выбрать один день покупки и один более поздний день продажи. Выведите максимальную прибыль.",
+      "topics": [
+        "arrays"
+      ],
+      "cases": [
+        {
+          "input": "6\n7 1 5 3 6 4",
+          "output": "5",
+          "is_public": true
+        },
+        {
+          "input": "5\n7 6 4 3 1",
+          "output": "0",
+          "is_public": true
+        },
+        {
+          "input": "6\n2 4 1 7 5 3",
+          "output": "6",
+          "is_public": false
+        },
+        {
+          "input": "1\n5",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "6\n3 8 2 5 1 4",
+          "output": "5",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-contains-duplicate",
+      "title": "Blind75: Contains Duplicate",
+      "difficulty": "easy",
+      "statement": "Даны n и массив nums. Выведите true, если в массиве есть повторяющееся число, иначе false.",
+      "topics": [
+        "arrays",
+        "hash-set"
+      ],
+      "cases": [
+        {
+          "input": "4\n1 2 3 1",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "4\n1 2 3 4",
+          "output": "false",
+          "is_public": true
+        },
+        {
+          "input": "6\n1 1 1 3 3 4",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "1\n42",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "5\n-1 0 1 2 -1",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-product-of-array-except-self",
+      "title": "Blind75: Product of Array Except Self",
+      "difficulty": "medium",
+      "statement": "Даны n и массив nums. Для каждого индекса выведите произведение всех остальных элементов. Деление использовать нельзя.",
+      "topics": [
+        "arrays",
+        "prefix-suffix"
+      ],
+      "cases": [
+        {
+          "input": "4\n1 2 3 4",
+          "output": "24 12 8 6",
+          "is_public": true
+        },
+        {
+          "input": "5\n-1 1 0 -3 3",
+          "output": "0 0 9 0 0",
+          "is_public": true
+        },
+        {
+          "input": "2\n2 3",
+          "output": "3 2",
+          "is_public": false
+        },
+        {
+          "input": "3\n5 1 2",
+          "output": "2 10 5",
+          "is_public": false
+        },
+        {
+          "input": "4\n0 4 0 2",
+          "output": "0 0 0 0",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-maximum-subarray",
+      "title": "Blind75: Maximum Subarray",
+      "difficulty": "medium",
+      "statement": "Даны n и массив nums. Выведите максимальную сумму непрерывного подмассива.",
+      "topics": [
+        "arrays",
+        "kadane"
+      ],
+      "cases": [
+        {
+          "input": "9\n-2 1 -3 4 -1 2 1 -5 4",
+          "output": "6",
+          "is_public": true
+        },
+        {
+          "input": "1\n1",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "5\n5 4 -1 7 8",
+          "output": "23",
+          "is_public": false
+        },
+        {
+          "input": "4\n-2 -3 -1 -5",
+          "output": "-1",
+          "is_public": false
+        },
+        {
+          "input": "4\n2 -1 2 3",
+          "output": "6",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-maximum-product-subarray",
+      "title": "Blind75: Maximum Product Subarray",
+      "difficulty": "medium",
+      "statement": "Даны n и массив nums. Выведите максимальное произведение непрерывного подмассива.",
+      "topics": [
+        "arrays",
+        "dp"
+      ],
+      "cases": [
+        {
+          "input": "4\n2 3 -2 4",
+          "output": "6",
+          "is_public": true
+        },
+        {
+          "input": "3\n-2 0 -1",
+          "output": "0",
+          "is_public": true
+        },
+        {
+          "input": "4\n-2 3 -4 1",
+          "output": "24",
+          "is_public": false
+        },
+        {
+          "input": "5\n-1 -3 -10 0 60",
+          "output": "60",
+          "is_public": false
+        },
+        {
+          "input": "3\n-2 -3 4",
+          "output": "24",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-find-minimum-in-rotated-sorted-array",
+      "title": "Blind75: Find Minimum in Rotated Sorted Array",
+      "difficulty": "medium",
+      "statement": "Даны n и отсортированный по возрастанию массив, который циклически сдвинули. Выведите минимальный элемент.",
+      "topics": [
+        "arrays",
+        "binary-search"
+      ],
+      "cases": [
+        {
+          "input": "5\n3 4 5 1 2",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "7\n4 5 6 7 0 1 2",
+          "output": "0",
+          "is_public": true
+        },
+        {
+          "input": "5\n11 13 15 17 2",
+          "output": "2",
+          "is_public": false
+        },
+        {
+          "input": "5\n1 2 3 4 5",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "2\n2 1",
+          "output": "1",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-search-in-rotated-sorted-array",
+      "title": "Blind75: Search in Rotated Sorted Array",
+      "difficulty": "medium",
+      "statement": "Даны n, циклически сдвинутый отсортированный массив nums и target. Выведите индекс target либо -1.",
+      "topics": [
+        "arrays",
+        "binary-search"
+      ],
+      "cases": [
+        {
+          "input": "7\n4 5 6 7 0 1 2\n0",
+          "output": "4",
+          "is_public": true
+        },
+        {
+          "input": "7\n4 5 6 7 0 1 2\n3",
+          "output": "-1",
+          "is_public": true
+        },
+        {
+          "input": "1\n1\n0",
+          "output": "-1",
+          "is_public": false
+        },
+        {
+          "input": "6\n6 7 1 2 3 4\n3",
+          "output": "4",
+          "is_public": false
+        },
+        {
+          "input": "5\n1 3 5 7 9\n7",
+          "output": "3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-three-sum",
+      "title": "Blind75: 3Sum",
+      "difficulty": "medium",
+      "statement": "Даны n и массив nums. Выведите все уникальные тройки a b c, сумма которых равна 0. Внутри тройки числа по возрастанию, строки отсортированы лексикографически. Если решений нет, выведите EMPTY.",
+      "topics": [
+        "arrays",
+        "two-pointers"
+      ],
+      "cases": [
+        {
+          "input": "6\n-1 0 1 2 -1 -4",
+          "output": "-1 -1 2\n-1 0 1",
+          "is_public": true
+        },
+        {
+          "input": "3\n0 1 1",
+          "output": "EMPTY",
+          "is_public": true
+        },
+        {
+          "input": "3\n0 0 0",
+          "output": "0 0 0",
+          "is_public": false
+        },
+        {
+          "input": "4\n-2 0 0 2",
+          "output": "-2 0 2",
+          "is_public": false
+        },
+        {
+          "input": "5\n-2 -1 1 2 3",
+          "output": "-2 -1 3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-container-with-most-water",
+      "title": "Blind75: Container With Most Water",
+      "difficulty": "medium",
+      "statement": "Даны n и массив высот. Выведите максимальную площадь контейнера, образованного двумя линиями.",
+      "topics": [
+        "arrays",
+        "two-pointers"
+      ],
+      "cases": [
+        {
+          "input": "9\n1 8 6 2 5 4 8 3 7",
+          "output": "49",
+          "is_public": true
+        },
+        {
+          "input": "2\n1 1",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "6\n4 3 2 1 4 5",
+          "output": "20",
+          "is_public": false
+        },
+        {
+          "input": "5\n1 2 1 3 4",
+          "output": "6",
+          "is_public": false
+        },
+        {
+          "input": "4\n1 3 2 5",
+          "output": "6",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-sum-of-two-integers",
+      "title": "Blind75: Sum of Two Integers",
+      "difficulty": "medium",
+      "statement": "Даны два целых числа a и b. Выведите их сумму.",
+      "topics": [
+        "bit-manipulation"
+      ],
+      "cases": [
+        {
+          "input": "1 2",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "2 3",
+          "output": "5",
+          "is_public": true
+        },
+        {
+          "input": "-2 3",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "-5 -7",
+          "output": "-12",
+          "is_public": false
+        },
+        {
+          "input": "123 456",
+          "output": "579",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-number-of-1-bits",
+      "title": "Blind75: Number of 1 Bits",
+      "difficulty": "easy",
+      "statement": "Дано беззнаковое 32-битное число n. Выведите количество установленных битов.",
+      "topics": [
+        "bit-manipulation"
+      ],
+      "cases": [
+        {
+          "input": "11",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "128",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "4294967293",
+          "output": "31",
+          "is_public": false
+        },
+        {
+          "input": "0",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "7",
+          "output": "3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-counting-bits",
+      "title": "Blind75: Counting Bits",
+      "difficulty": "easy",
+      "statement": "Дано число n. Для всех чисел от 0 до n выведите количество единичных битов.",
+      "topics": [
+        "bit-manipulation",
+        "dp"
+      ],
+      "cases": [
+        {
+          "input": "2",
+          "output": "0 1 1",
+          "is_public": true
+        },
+        {
+          "input": "5",
+          "output": "0 1 1 2 1 2",
+          "is_public": true
+        },
+        {
+          "input": "0",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "1",
+          "output": "0 1",
+          "is_public": false
+        },
+        {
+          "input": "7",
+          "output": "0 1 1 2 1 2 2 3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-missing-number",
+      "title": "Blind75: Missing Number",
+      "difficulty": "easy",
+      "statement": "Даны n и массив из n различных чисел диапазона [0, n]. Одно число пропущено. Выведите его.",
+      "topics": [
+        "arrays",
+        "bit-manipulation"
+      ],
+      "cases": [
+        {
+          "input": "3\n3 0 1",
+          "output": "2",
+          "is_public": true
+        },
+        {
+          "input": "2\n0 1",
+          "output": "2",
+          "is_public": true
+        },
+        {
+          "input": "9\n9 6 4 2 3 5 7 0 1",
+          "output": "8",
+          "is_public": false
+        },
+        {
+          "input": "1\n1",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "4\n4 2 1 0",
+          "output": "3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-reverse-bits",
+      "title": "Blind75: Reverse Bits",
+      "difficulty": "easy",
+      "statement": "Дано беззнаковое 32-битное число n. Разверните его биты и выведите получившееся число.",
+      "topics": [
+        "bit-manipulation"
+      ],
+      "cases": [
+        {
+          "input": "43261596",
+          "output": "964176192",
+          "is_public": true
+        },
+        {
+          "input": "0",
+          "output": "0",
+          "is_public": true
+        },
+        {
+          "input": "1",
+          "output": "2147483648",
+          "is_public": false
+        },
+        {
+          "input": "2",
+          "output": "1073741824",
+          "is_public": false
+        },
+        {
+          "input": "3",
+          "output": "3221225472",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-top-k-frequent-elements",
+      "title": "Blind75: Top K Frequent Elements",
+      "difficulty": "medium",
+      "statement": "Даны n, массив nums и k. Выведите k самых частых элементов. При равной частоте раньше идет меньшее число.",
+      "topics": [
+        "heap",
+        "arrays"
+      ],
+      "cases": [
+        {
+          "input": "6\n1 1 1 2 2 3\n2",
+          "output": "1 2",
+          "is_public": true
+        },
+        {
+          "input": "1\n1\n1",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "6\n4 4 4 6 6 7\n1",
+          "output": "4",
+          "is_public": false
+        },
+        {
+          "input": "8\n1 2 2 3 3 3 4 4\n2",
+          "output": "3 2",
+          "is_public": false
+        },
+        {
+          "input": "7\n5 5 6 6 7 7 7\n2",
+          "output": "7 5",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-longest-consecutive-sequence",
+      "title": "Blind75: Longest Consecutive Sequence",
+      "difficulty": "medium",
+      "statement": "Даны n и массив nums. Выведите длину самой длинной последовательности подряд идущих целых чисел.",
+      "topics": [
+        "arrays",
+        "hash-set"
+      ],
+      "cases": [
+        {
+          "input": "6\n100 4 200 1 3 2",
+          "output": "4",
+          "is_public": true
+        },
+        {
+          "input": "10\n0 3 7 2 5 8 4 6 0 1",
+          "output": "9",
+          "is_public": true
+        },
+        {
+          "input": "1\n42",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "5\n9 1 4 7 3",
+          "output": "2",
+          "is_public": false
+        },
+        {
+          "input": "8\n-1 0 1 2 10 11 12 13",
+          "output": "4",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-jump-game",
+      "title": "Blind75: Jump Game",
+      "difficulty": "medium",
+      "statement": "Даны n и массив nums, где nums[i] — максимальная длина прыжка из i. Выведите true, если можно добраться до конца, иначе false.",
+      "topics": [
+        "arrays",
+        "greedy"
+      ],
+      "cases": [
+        {
+          "input": "5\n2 3 1 1 4",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "5\n3 2 1 0 4",
+          "output": "false",
+          "is_public": true
+        },
+        {
+          "input": "1\n0",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "6\n2 0 0 0 1 4",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "5\n2 5 0 0 1",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-climbing-stairs",
+      "title": "Blind75: Climbing Stairs",
+      "difficulty": "easy",
+      "statement": "Дано n. Можно шагать на 1 или 2 ступени. Выведите число способов добраться до n-й ступени.",
+      "topics": [
+        "dp"
+      ],
+      "cases": [
+        {
+          "input": "2",
+          "output": "2",
+          "is_public": true
+        },
+        {
+          "input": "3",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "4",
+          "output": "5",
+          "is_public": false
+        },
+        {
+          "input": "5",
+          "output": "8",
+          "is_public": false
+        },
+        {
+          "input": "7",
+          "output": "21",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-coin-change",
+      "title": "Blind75: Coin Change",
+      "difficulty": "medium",
+      "statement": "Даны m, номиналы монет и сумма amount. Выведите минимальное количество монет для набора суммы либо -1.",
+      "topics": [
+        "dp"
+      ],
+      "cases": [
+        {
+          "input": "3\n1 2 5\n11",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "1\n2\n3",
+          "output": "-1",
+          "is_public": true
+        },
+        {
+          "input": "1\n1\n0",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "4\n2 4 6 10\n8",
+          "output": "2",
+          "is_public": false
+        },
+        {
+          "input": "3\n1 3 4\n6",
+          "output": "2",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-longest-increasing-subsequence",
+      "title": "Blind75: Longest Increasing Subsequence",
+      "difficulty": "medium",
+      "statement": "Даны n и массив nums. Выведите длину самой длинной строго возрастающей подпоследовательности.",
+      "topics": [
+        "dp",
+        "binary-search"
+      ],
+      "cases": [
+        {
+          "input": "8\n10 9 2 5 3 7 101 18",
+          "output": "4",
+          "is_public": true
+        },
+        {
+          "input": "6\n0 1 0 3 2 3",
+          "output": "4",
+          "is_public": true
+        },
+        {
+          "input": "7\n7 7 7 7 7 7 7",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "5\n1 3 6 7 9",
+          "output": "5",
+          "is_public": false
+        },
+        {
+          "input": "5\n4 10 4 3 8 9",
+          "output": "3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-longest-common-subsequence",
+      "title": "Blind75: Longest Common Subsequence",
+      "difficulty": "medium",
+      "statement": "Даны две строки. Выведите длину их наибольшей общей подпоследовательности.",
+      "topics": [
+        "dp",
+        "strings"
+      ],
+      "cases": [
+        {
+          "input": "abcde\nace",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "abc\nabc",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "abc\ndef",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "bl\nybyl",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "pmjghexybyrgzczy\nhafcdqbgncrcbihkd",
+          "output": "4",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-word-break",
+      "title": "Blind75: Word Break",
+      "difficulty": "medium",
+      "statement": "Даны строка s, число m и словарь из m слов. Выведите true, если строку можно разбить на слова из словаря.",
+      "topics": [
+        "dp",
+        "strings"
+      ],
+      "cases": [
+        {
+          "input": "leetcode\n2\nleet\ncode",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "applepenapple\n2\napple\npen",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "catsandog\n5\ncats\ndog\nsand\nand\ncat",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "aaaaaaa\n2\naaa\naaaa",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "cars\n4\ncar\nca\nrs\ns",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-combination-sum",
+      "title": "Blind75: Combination Sum",
+      "difficulty": "medium",
+      "statement": "Даны n, массив кандидатов и target. Выведите все уникальные комбинации чисел с неограниченным повторением, дающие target. Каждая комбинация отсортирована, строки идут лексикографически. Если решений нет, выведите EMPTY.",
+      "topics": [
+        "backtracking",
+        "dp"
+      ],
+      "cases": [
+        {
+          "input": "4\n2 3 6 7\n7",
+          "output": "2 2 3\n7",
+          "is_public": true
+        },
+        {
+          "input": "3\n2 3 5\n8",
+          "output": "2 2 2 2\n2 3 3\n3 5",
+          "is_public": true
+        },
+        {
+          "input": "1\n2\n1",
+          "output": "EMPTY",
+          "is_public": false
+        },
+        {
+          "input": "1\n1\n2",
+          "output": "1 1",
+          "is_public": false
+        },
+        {
+          "input": "2\n4 5\n3",
+          "output": "EMPTY",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-house-robber",
+      "title": "Blind75: House Robber",
+      "difficulty": "medium",
+      "statement": "Даны n и массив денег в домах на улице. Нельзя брать соседние дома. Выведите максимальную сумму.",
+      "topics": [
+        "dp"
+      ],
+      "cases": [
+        {
+          "input": "4\n1 2 3 1",
+          "output": "4",
+          "is_public": true
+        },
+        {
+          "input": "5\n2 7 9 3 1",
+          "output": "12",
+          "is_public": true
+        },
+        {
+          "input": "1\n5",
+          "output": "5",
+          "is_public": false
+        },
+        {
+          "input": "6\n2 1 1 2 5 1",
+          "output": "8",
+          "is_public": false
+        },
+        {
+          "input": "5\n10 1 1 10 1",
+          "output": "20",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-house-robber-ii",
+      "title": "Blind75: House Robber II",
+      "difficulty": "medium",
+      "statement": "Как в House Robber, но дома расположены по кругу. Выведите максимальную сумму.",
+      "topics": [
+        "dp"
+      ],
+      "cases": [
+        {
+          "input": "3\n2 3 2",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "4\n1 2 3 1",
+          "output": "4",
+          "is_public": true
+        },
+        {
+          "input": "1\n1",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "5\n1 2 3 4 5",
+          "output": "8",
+          "is_public": false
+        },
+        {
+          "input": "4\n200 3 140 20",
+          "output": "340",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-decode-ways",
+      "title": "Blind75: Decode Ways",
+      "difficulty": "medium",
+      "statement": "Дана строка цифр. Каждое число 1..26 соответствует букве A..Z. Выведите количество способов декодирования.",
+      "topics": [
+        "dp",
+        "strings"
+      ],
+      "cases": [
+        {
+          "input": "12",
+          "output": "2",
+          "is_public": true
+        },
+        {
+          "input": "226",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "06",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "11106",
+          "output": "2",
+          "is_public": false
+        },
+        {
+          "input": "27",
+          "output": "1",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-unique-paths",
+      "title": "Blind75: Unique Paths",
+      "difficulty": "medium",
+      "statement": "Даны m и n. Робот идет из левого верхнего угла в правый нижний, двигаясь только вниз или вправо. Выведите число путей.",
+      "topics": [
+        "dp"
+      ],
+      "cases": [
+        {
+          "input": "3 7",
+          "output": "28",
+          "is_public": true
+        },
+        {
+          "input": "3 2",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "7 3",
+          "output": "28",
+          "is_public": false
+        },
+        {
+          "input": "3 3",
+          "output": "6",
+          "is_public": false
+        },
+        {
+          "input": "1 5",
+          "output": "1",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-clone-graph",
+      "title": "Blind75: Clone Graph",
+      "difficulty": "medium",
+      "statement": "Дан неориентированный граф: n, затем для каждой вершины i строка с количеством соседей и списком соседей. Склонируйте граф и выведите adjacency list клона в том же формате.",
+      "topics": [
+        "graph"
+      ],
+      "cases": [
+        {
+          "input": "4\n2 2 4\n2 1 3\n2 2 4\n2 1 3",
+          "output": "2 2 4\n2 1 3\n2 2 4\n2 1 3",
+          "is_public": true
+        },
+        {
+          "input": "1\n0",
+          "output": "0",
+          "is_public": true
+        },
+        {
+          "input": "2\n1 2\n1 1",
+          "output": "1 2\n1 1",
+          "is_public": false
+        },
+        {
+          "input": "3\n2 2 3\n1 1\n1 1",
+          "output": "2 2 3\n1 1\n1 1",
+          "is_public": false
+        },
+        {
+          "input": "4\n1 2\n2 1 3\n2 2 4\n1 3",
+          "output": "1 2\n2 1 3\n2 2 4\n1 3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-course-schedule",
+      "title": "Blind75: Course Schedule",
+      "difficulty": "medium",
+      "statement": "Даны numCourses и список prerequisites в формате a b, где для курса a нужен b. Выведите true, если можно закончить все курсы.",
+      "topics": [
+        "graph",
+        "topological-sort"
+      ],
+      "cases": [
+        {
+          "input": "2\n1\n1 0",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "2\n2\n1 0\n0 1",
+          "output": "false",
+          "is_public": true
+        },
+        {
+          "input": "4\n3\n1 0\n2 1\n3 2",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "3\n3\n0 1\n1 2\n2 0",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "5\n0",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-pacific-atlantic-water-flow",
+      "title": "Blind75: Pacific Atlantic Water Flow",
+      "difficulty": "medium",
+      "statement": "Даны r и c, затем матрица высот. Выведите клетки, из которых вода может течь и к Тихому, и к Атлантическому океану. Формат вывода: пары row,col по возрастанию, разделенные пробелом.",
+      "topics": [
+        "graph",
+        "matrix"
+      ],
+      "cases": [
+        {
+          "input": "5 5\n1 2 2 3 5\n3 2 3 4 4\n2 4 5 3 1\n6 7 1 4 5\n5 1 1 2 4",
+          "output": "0,4 1,3 1,4 2,2 3,0 3,1 4,0",
+          "is_public": true
+        },
+        {
+          "input": "1 1\n7",
+          "output": "0,0",
+          "is_public": true
+        },
+        {
+          "input": "2 2\n1 2\n4 3",
+          "output": "0,1 1,0 1,1",
+          "is_public": false
+        },
+        {
+          "input": "2 3\n3 3 3\n3 1 3",
+          "output": "0,0 0,1 0,2 1,0 1,2",
+          "is_public": false
+        },
+        {
+          "input": "3 3\n10 10 10\n10 1 10\n10 10 10",
+          "output": "0,0 0,1 0,2 1,0 1,2 2,0 2,1 2,2",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-number-of-islands",
+      "title": "Blind75: Number of Islands",
+      "difficulty": "medium",
+      "statement": "Даны r и c, затем карта из символов 0 и 1. Выведите число островов.",
+      "topics": [
+        "graph",
+        "matrix"
+      ],
+      "cases": [
+        {
+          "input": "4 5\n11110\n11010\n11000\n00000",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "4 5\n11000\n11000\n00100\n00011",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "1 1\n1",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "2 2\n00\n00",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "3 3\n101\n010\n101",
+          "output": "5",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-number-of-connected-components-in-an-undirected-graph",
+      "title": "Blind75: Number of Connected Components in an Undirected Graph",
+      "difficulty": "medium",
+      "statement": "Даны n и m ребер неориентированного графа. Выведите количество компонент связности.",
+      "topics": [
+        "graph",
+        "union-find"
+      ],
+      "cases": [
+        {
+          "input": "5 2\n0 1\n1 2",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "5 4\n0 1\n1 2\n2 3\n3 4",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "4 0",
+          "output": "4",
+          "is_public": false
+        },
+        {
+          "input": "6 3\n0 1\n2 3\n4 5",
+          "output": "3",
+          "is_public": false
+        },
+        {
+          "input": "3 2\n0 1\n1 2",
+          "output": "1",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-graph-valid-tree",
+      "title": "Blind75: Graph Valid Tree",
+      "difficulty": "medium",
+      "statement": "Даны n и m ребер неориентированного графа. Выведите true, если граф является деревом.",
+      "topics": [
+        "graph",
+        "union-find"
+      ],
+      "cases": [
+        {
+          "input": "5 4\n0 1\n0 2\n0 3\n1 4",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "5 5\n0 1\n1 2\n2 3\n1 3\n1 4",
+          "output": "false",
+          "is_public": true
+        },
+        {
+          "input": "1 0",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "4 2\n0 1\n2 3",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "4 3\n0 1\n1 2\n2 3",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-alien-dictionary",
+      "title": "Blind75: Alien Dictionary",
+      "difficulty": "hard",
+      "statement": "Даны n слов в лексикографическом порядке неизвестного алфавита. Выведите один корректный порядок букв. Если он невозможен, выведите EMPTY. Во всех тестах корректный порядок единственный.",
+      "topics": [
+        "graph",
+        "topological-sort",
+        "strings"
+      ],
+      "cases": [
+        {
+          "input": "5\nwrt\nwrf\ner\nett\nrftt",
+          "output": "wertf",
+          "is_public": true
+        },
+        {
+          "input": "2\nz\nx",
+          "output": "zx",
+          "is_public": true
+        },
+        {
+          "input": "2\nz\nz",
+          "output": "z",
+          "is_public": false
+        },
+        {
+          "input": "2\nabc\nab",
+          "output": "EMPTY",
+          "is_public": false
+        },
+        {
+          "input": "3\nba\nbc\nac",
+          "output": "bac",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-insert-interval",
+      "title": "Blind75: Insert Interval",
+      "difficulty": "medium",
+      "statement": "Даны n непересекающихся интервалов, отсортированных по началу, и новый интервал. Вставьте его и выведите результат. Формат вывода: один интервал на строку.",
+      "topics": [
+        "intervals"
+      ],
+      "cases": [
+        {
+          "input": "2\n1 3\n6 9\n2 5",
+          "output": "1 5\n6 9",
+          "is_public": true
+        },
+        {
+          "input": "5\n1 2\n3 5\n6 7\n8 10\n12 16\n4 8",
+          "output": "1 2\n3 10\n12 16",
+          "is_public": true
+        },
+        {
+          "input": "0\n5 7",
+          "output": "5 7",
+          "is_public": false
+        },
+        {
+          "input": "1\n1 5\n2 3",
+          "output": "1 5",
+          "is_public": false
+        },
+        {
+          "input": "2\n1 2\n3 4\n5 6",
+          "output": "1 2\n3 4\n5 6",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-merge-intervals",
+      "title": "Blind75: Merge Intervals",
+      "difficulty": "medium",
+      "statement": "Даны n интервалов. Объедините все пересекающиеся интервалы и выведите результат по одному интервалу на строку.",
+      "topics": [
+        "intervals"
+      ],
+      "cases": [
+        {
+          "input": "4\n1 3\n2 6\n8 10\n15 18",
+          "output": "1 6\n8 10\n15 18",
+          "is_public": true
+        },
+        {
+          "input": "2\n1 4\n4 5",
+          "output": "1 5",
+          "is_public": true
+        },
+        {
+          "input": "3\n1 4\n0 2\n3 5",
+          "output": "0 5",
+          "is_public": false
+        },
+        {
+          "input": "1\n5 7",
+          "output": "5 7",
+          "is_public": false
+        },
+        {
+          "input": "4\n1 2\n3 4\n5 6\n7 8",
+          "output": "1 2\n3 4\n5 6\n7 8",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-non-overlapping-intervals",
+      "title": "Blind75: Non-overlapping Intervals",
+      "difficulty": "medium",
+      "statement": "Даны n интервалов. Выведите минимальное число интервалов, которые нужно удалить, чтобы оставшиеся не пересекались.",
+      "topics": [
+        "intervals",
+        "greedy"
+      ],
+      "cases": [
+        {
+          "input": "4\n1 2\n2 3\n3 4\n1 3",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "3\n1 2\n1 2\n1 2",
+          "output": "2",
+          "is_public": true
+        },
+        {
+          "input": "2\n1 2\n2 3",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "4\n1 100\n11 22\n1 11\n2 12",
+          "output": "2",
+          "is_public": false
+        },
+        {
+          "input": "5\n0 2\n1 3\n2 4\n3 5\n4 6",
+          "output": "2",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-meeting-rooms",
+      "title": "Blind75: Meeting Rooms",
+      "difficulty": "easy",
+      "statement": "Даны n интервалов встреч. Выведите true, если человек может посетить все встречи.",
+      "topics": [
+        "intervals"
+      ],
+      "cases": [
+        {
+          "input": "2\n0 30\n5 10",
+          "output": "false",
+          "is_public": true
+        },
+        {
+          "input": "2\n7 10\n2 4",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "3\n1 5\n5 10\n10 15",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "3\n1 4\n2 3\n4 5",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "1\n0 1",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-meeting-rooms-ii",
+      "title": "Blind75: Meeting Rooms II",
+      "difficulty": "medium",
+      "statement": "Даны n интервалов встреч. Выведите минимальное количество переговорок, нужных для всех встреч.",
+      "topics": [
+        "intervals",
+        "heap"
+      ],
+      "cases": [
+        {
+          "input": "3\n0 30\n5 10\n15 20",
+          "output": "2",
+          "is_public": true
+        },
+        {
+          "input": "2\n7 10\n2 4",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "4\n1 5\n8 9\n8 9\n2 6",
+          "output": "3",
+          "is_public": false
+        },
+        {
+          "input": "4\n1 10\n2 7\n3 19\n8 12",
+          "output": "3",
+          "is_public": false
+        },
+        {
+          "input": "1\n1 2",
+          "output": "1",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-reverse-linked-list",
+      "title": "Blind75: Reverse Linked List",
+      "difficulty": "easy",
+      "statement": "Дан связный список: n и его значения. Разверните список и выведите элементы.",
+      "topics": [
+        "linked-list"
+      ],
+      "cases": [
+        {
+          "input": "5\n1 2 3 4 5",
+          "output": "5 4 3 2 1",
+          "is_public": true
+        },
+        {
+          "input": "2\n1 2",
+          "output": "2 1",
+          "is_public": true
+        },
+        {
+          "input": "0",
+          "output": "EMPTY",
+          "is_public": false
+        },
+        {
+          "input": "1\n7",
+          "output": "7",
+          "is_public": false
+        },
+        {
+          "input": "4\n9 8 7 6",
+          "output": "6 7 8 9",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-linked-list-cycle",
+      "title": "Blind75: Linked List Cycle",
+      "difficulty": "easy",
+      "statement": "Даны n, значения списка и pos. Если pos >= 0, хвост указывает на узел с индексом pos. Выведите true, если в списке есть цикл.",
+      "topics": [
+        "linked-list",
+        "two-pointers"
+      ],
+      "cases": [
+        {
+          "input": "4\n3 2 0 -4\n1",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "2\n1 2\n0",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "1\n1\n-1",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "5\n1 2 3 4 5\n2",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "3\n1 2 3\n-1",
+          "output": "false",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-merge-two-sorted-lists",
+      "title": "Blind75: Merge Two Sorted Lists",
+      "difficulty": "easy",
+      "statement": "Даны два отсортированных списка. Выведите их слияние.",
+      "topics": [
+        "linked-list"
+      ],
+      "cases": [
+        {
+          "input": "3\n1 2 4\n3\n1 3 4",
+          "output": "1 1 2 3 4 4",
+          "is_public": true
+        },
+        {
+          "input": "0\n0",
+          "output": "EMPTY",
+          "is_public": true
+        },
+        {
+          "input": "0\n1\n0",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "2\n5 7\n3\n1 2 3",
+          "output": "1 2 3 5 7",
+          "is_public": false
+        },
+        {
+          "input": "1\n2\n1\n1",
+          "output": "1 2",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-merge-k-sorted-lists",
+      "title": "Blind75: Merge K Sorted Lists",
+      "difficulty": "hard",
+      "statement": "Дано k списков. Для каждого списка сначала идет длина, затем элементы. Выведите одно отсортированное слияние.",
+      "topics": [
+        "linked-list",
+        "heap"
+      ],
+      "cases": [
+        {
+          "input": "3\n3\n1 4 5\n3\n1 3 4\n2\n2 6",
+          "output": "1 1 2 3 4 4 5 6",
+          "is_public": true
+        },
+        {
+          "input": "0",
+          "output": "EMPTY",
+          "is_public": true
+        },
+        {
+          "input": "1\n0",
+          "output": "EMPTY",
+          "is_public": false
+        },
+        {
+          "input": "2\n2\n1 2\n2\n3 4",
+          "output": "1 2 3 4",
+          "is_public": false
+        },
+        {
+          "input": "3\n1\n-1\n2\n0 2\n2\n1 3",
+          "output": "-1 0 1 2 3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-remove-nth-node-from-end-of-list",
+      "title": "Blind75: Remove Nth Node From End of List",
+      "difficulty": "medium",
+      "statement": "Даны n, список и k. Удалите k-й узел с конца и выведите результат.",
+      "topics": [
+        "linked-list",
+        "two-pointers"
+      ],
+      "cases": [
+        {
+          "input": "5\n1 2 3 4 5\n2",
+          "output": "1 2 3 5",
+          "is_public": true
+        },
+        {
+          "input": "1\n1\n1",
+          "output": "EMPTY",
+          "is_public": true
+        },
+        {
+          "input": "2\n1 2\n1",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "3\n1 2 3\n3",
+          "output": "2 3",
+          "is_public": false
+        },
+        {
+          "input": "4\n10 20 30 40\n4",
+          "output": "20 30 40",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-reorder-list",
+      "title": "Blind75: Reorder List",
+      "difficulty": "medium",
+      "statement": "Даны n и список. Перестройте его как L0, Ln, L1, Ln-1, ... и выведите результат.",
+      "topics": [
+        "linked-list"
+      ],
+      "cases": [
+        {
+          "input": "4\n1 2 3 4",
+          "output": "1 4 2 3",
+          "is_public": true
+        },
+        {
+          "input": "5\n1 2 3 4 5",
+          "output": "1 5 2 4 3",
+          "is_public": true
+        },
+        {
+          "input": "1\n1",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "2\n1 2",
+          "output": "1 2",
+          "is_public": false
+        },
+        {
+          "input": "6\n1 2 3 4 5 6",
+          "output": "1 6 2 5 3 4",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-set-matrix-zeroes",
+      "title": "Blind75: Set Matrix Zeroes",
+      "difficulty": "medium",
+      "statement": "Даны r, c и матрица. Если элемент равен 0, занулите всю его строку и столбец. Выведите матрицу.",
+      "topics": [
+        "matrix"
+      ],
+      "cases": [
+        {
+          "input": "3 3\n1 1 1\n1 0 1\n1 1 1",
+          "output": "1 0 1\n0 0 0\n1 0 1",
+          "is_public": true
+        },
+        {
+          "input": "3 4\n0 1 2 0\n3 4 5 2\n1 3 1 5",
+          "output": "0 0 0 0\n0 4 5 0\n0 3 1 0",
+          "is_public": true
+        },
+        {
+          "input": "1 1\n0",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "2 2\n1 2\n3 4",
+          "output": "1 2\n3 4",
+          "is_public": false
+        },
+        {
+          "input": "2 3\n1 0 3\n4 5 6",
+          "output": "0 0 0\n4 0 6",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-spiral-matrix",
+      "title": "Blind75: Spiral Matrix",
+      "difficulty": "medium",
+      "statement": "Даны r, c и матрица. Выведите элементы по спирали.",
+      "topics": [
+        "matrix"
+      ],
+      "cases": [
+        {
+          "input": "3 3\n1 2 3\n4 5 6\n7 8 9",
+          "output": "1 2 3 6 9 8 7 4 5",
+          "is_public": true
+        },
+        {
+          "input": "3 4\n1 2 3 4\n5 6 7 8\n9 10 11 12",
+          "output": "1 2 3 4 8 12 11 10 9 5 6 7",
+          "is_public": true
+        },
+        {
+          "input": "1 4\n1 2 3 4",
+          "output": "1 2 3 4",
+          "is_public": false
+        },
+        {
+          "input": "4 1\n1\n2\n3\n4",
+          "output": "1 2 3 4",
+          "is_public": false
+        },
+        {
+          "input": "2 2\n1 2\n3 4",
+          "output": "1 2 4 3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-rotate-image",
+      "title": "Blind75: Rotate Image",
+      "difficulty": "medium",
+      "statement": "Дано n и квадратная матрица. Поверните ее на 90 градусов по часовой стрелке и выведите результат.",
+      "topics": [
+        "matrix"
+      ],
+      "cases": [
+        {
+          "input": "3\n1 2 3\n4 5 6\n7 8 9",
+          "output": "7 4 1\n8 5 2\n9 6 3",
+          "is_public": true
+        },
+        {
+          "input": "4\n5 1 9 11\n2 4 8 10\n13 3 6 7\n15 14 12 16",
+          "output": "15 13 2 5\n14 3 4 1\n12 6 8 9\n16 7 10 11",
+          "is_public": true
+        },
+        {
+          "input": "1\n1",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "2\n1 2\n3 4",
+          "output": "3 1\n4 2",
+          "is_public": false
+        },
+        {
+          "input": "3\n2 0 1\n3 4 5\n6 7 8",
+          "output": "6 3 2\n7 4 0\n8 5 1",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-word-search",
+      "title": "Blind75: Word Search",
+      "difficulty": "medium",
+      "statement": "Даны r, c, поле символов и слово. Выведите true, если слово можно собрать соседними по стороне клетками без повторного использования клетки.",
+      "topics": [
+        "matrix",
+        "backtracking"
+      ],
+      "cases": [
+        {
+          "input": "3 4\nABCE\nSFCS\nADEE\nABCCED",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "3 4\nABCE\nSFCS\nADEE\nSEE",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "3 4\nABCE\nSFCS\nADEE\nABCB",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "1 1\nA\nA",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "2 2\nAB\nCD\nACDB",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-longest-substring-without-repeating-characters",
+      "title": "Blind75: Longest Substring Without Repeating Characters",
+      "difficulty": "medium",
+      "statement": "Дана строка. Выведите длину самой длинной подстроки без повторяющихся символов.",
+      "topics": [
+        "strings",
+        "sliding-window"
+      ],
+      "cases": [
+        {
+          "input": "abcabcbb",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "bbbbb",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "pwwkew",
+          "output": "3",
+          "is_public": false
+        },
+        {
+          "input": "",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "dvdf",
+          "output": "3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-longest-repeating-character-replacement",
+      "title": "Blind75: Longest Repeating Character Replacement",
+      "difficulty": "medium",
+      "statement": "Даны строка s и число k. Можно заменить не более k символов. Выведите длину самой длинной подстроки, которую можно сделать из одинаковых букв.",
+      "topics": [
+        "strings",
+        "sliding-window"
+      ],
+      "cases": [
+        {
+          "input": "ABAB\n2",
+          "output": "4",
+          "is_public": true
+        },
+        {
+          "input": "AABABBA\n1",
+          "output": "4",
+          "is_public": true
+        },
+        {
+          "input": "AAAA\n2",
+          "output": "4",
+          "is_public": false
+        },
+        {
+          "input": "ABCDE\n1",
+          "output": "2",
+          "is_public": false
+        },
+        {
+          "input": "BAAAB\n2",
+          "output": "5",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-minimum-window-substring",
+      "title": "Blind75: Minimum Window Substring",
+      "difficulty": "hard",
+      "statement": "Даны строки s и t. Выведите минимальную подстроку s, содержащую все символы t с учетом кратности. Если окна нет, выведите EMPTY.",
+      "topics": [
+        "strings",
+        "sliding-window"
+      ],
+      "cases": [
+        {
+          "input": "ADOBECODEBANC\nABC",
+          "output": "BANC",
+          "is_public": true
+        },
+        {
+          "input": "a\na",
+          "output": "a",
+          "is_public": true
+        },
+        {
+          "input": "a\naa",
+          "output": "EMPTY",
+          "is_public": false
+        },
+        {
+          "input": "aa\nab",
+          "output": "EMPTY",
+          "is_public": false
+        },
+        {
+          "input": "abdbca\nabc",
+          "output": "bca",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-valid-anagram",
+      "title": "Blind75: Valid Anagram",
+      "difficulty": "easy",
+      "statement": "Даны две строки. Выведите true, если они являются анаграммами.",
+      "topics": [
+        "strings"
+      ],
+      "cases": [
+        {
+          "input": "anagram\nnagaram",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "rat\ncar",
+          "output": "false",
+          "is_public": true
+        },
+        {
+          "input": "listen\nsilent",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "a\nab",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "evil\nvile",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-group-anagrams",
+      "title": "Blind75: Group Anagrams",
+      "difficulty": "medium",
+      "statement": "Даны n строк. Сгруппируйте анаграммы. Внутри группы слова отсортированы, группы выводятся как строки через символ | в лексикографическом порядке по первой строке группы.",
+      "topics": [
+        "strings",
+        "hash-map"
+      ],
+      "cases": [
+        {
+          "input": "6\neat\ntea\ntan\nate\nnat\nbat",
+          "output": "ate,eat,tea|bat|nat,tan",
+          "is_public": true
+        },
+        {
+          "input": "1\n",
+          "output": "",
+          "is_public": true
+        },
+        {
+          "input": "1\na",
+          "output": "a",
+          "is_public": false
+        },
+        {
+          "input": "2\nab\nba",
+          "output": "ab,ba",
+          "is_public": false
+        },
+        {
+          "input": "4\nabc\nbca\nxyz\nzyx",
+          "output": "abc,bca|xyz,zyx",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-valid-parentheses",
+      "title": "Blind75: Valid Parentheses",
+      "difficulty": "easy",
+      "statement": "Дана строка из скобок ().[]{}. Выведите true, если скобочная последовательность корректна.",
+      "topics": [
+        "strings",
+        "stack"
+      ],
+      "cases": [
+        {
+          "input": "()",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "()[]{}",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "(]",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "([)]",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "{[]}",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-valid-palindrome",
+      "title": "Blind75: Valid Palindrome",
+      "difficulty": "easy",
+      "statement": "Дана строка. Игнорируйте все небуквенно-цифровые символы и регистр. Выведите true, если строка является палиндромом.",
+      "topics": [
+        "strings",
+        "two-pointers"
+      ],
+      "cases": [
+        {
+          "input": "A man, a plan, a canal: Panama",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "race a car",
+          "output": "false",
+          "is_public": true
+        },
+        {
+          "input": " ",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "No lemon, no melon",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "0P",
+          "output": "false",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-longest-palindromic-substring",
+      "title": "Blind75: Longest Palindromic Substring",
+      "difficulty": "medium",
+      "statement": "Дана строка. Выведите самую длинную палиндромную подстроку. Если вариантов несколько, выберите ту, что начинается раньше.",
+      "topics": [
+        "strings",
+        "dp"
+      ],
+      "cases": [
+        {
+          "input": "babad",
+          "output": "bab",
+          "is_public": true
+        },
+        {
+          "input": "cbbd",
+          "output": "bb",
+          "is_public": true
+        },
+        {
+          "input": "a",
+          "output": "a",
+          "is_public": false
+        },
+        {
+          "input": "forgeeksskeegfor",
+          "output": "geeksskeeg",
+          "is_public": false
+        },
+        {
+          "input": "abba",
+          "output": "abba",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-palindromic-substrings",
+      "title": "Blind75: Palindromic Substrings",
+      "difficulty": "medium",
+      "statement": "Дана строка. Выведите количество палиндромных подстрок.",
+      "topics": [
+        "strings"
+      ],
+      "cases": [
+        {
+          "input": "abc",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "aaa",
+          "output": "6",
+          "is_public": true
+        },
+        {
+          "input": "aba",
+          "output": "4",
+          "is_public": false
+        },
+        {
+          "input": "abba",
+          "output": "6",
+          "is_public": false
+        },
+        {
+          "input": "a",
+          "output": "1",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-encode-and-decode-strings",
+      "title": "Blind75: Encode and Decode Strings",
+      "difficulty": "medium",
+      "statement": "Даны n строк. Закодируйте их в одну строку и декодируйте обратно. В выводе напечатайте восстановленные строки через | в исходном порядке.",
+      "topics": [
+        "strings",
+        "design"
+      ],
+      "cases": [
+        {
+          "input": "3\nlint\ncode\nlove",
+          "output": "lint|code|love",
+          "is_public": true
+        },
+        {
+          "input": "2\n\n",
+          "output": "|",
+          "is_public": true
+        },
+        {
+          "input": "1\nhello",
+          "output": "hello",
+          "is_public": false
+        },
+        {
+          "input": "3\na:b\nc#d\ne",
+          "output": "a:b|c#d|e",
+          "is_public": false
+        },
+        {
+          "input": "4\nab\n\ncd\nef",
+          "output": "ab||cd|ef",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-maximum-depth-of-binary-tree",
+      "title": "Blind75: Maximum Depth of Binary Tree",
+      "difficulty": "easy",
+      "statement": "Дано бинарное дерево в level-order, null для отсутствующих узлов. Выведите его максимальную глубину.",
+      "topics": [
+        "tree"
+      ],
+      "cases": [
+        {
+          "input": "3 9 20 null null 15 7",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "1 null 2",
+          "output": "2",
+          "is_public": true
+        },
+        {
+          "input": "",
+          "output": "0",
+          "is_public": false
+        },
+        {
+          "input": "1",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "1 2 3 4 5 null null",
+          "output": "3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-same-tree",
+      "title": "Blind75: Same Tree",
+      "difficulty": "easy",
+      "statement": "Даны два бинарных дерева в level-order. Выведите true, если они идентичны.",
+      "topics": [
+        "tree"
+      ],
+      "cases": [
+        {
+          "input": "1 2 3\n1 2 3",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "1 2\n1 null 2",
+          "output": "false",
+          "is_public": true
+        },
+        {
+          "input": "1 2 1\n1 1 2",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "\n",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "5 3 7\n5 3 7",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-invert-binary-tree",
+      "title": "Blind75: Invert Binary Tree",
+      "difficulty": "easy",
+      "statement": "Дано бинарное дерево в level-order. Инвертируйте его и выведите level-order без хвостовых null.",
+      "topics": [
+        "tree"
+      ],
+      "cases": [
+        {
+          "input": "4 2 7 1 3 6 9",
+          "output": "4 7 2 9 6 3 1",
+          "is_public": true
+        },
+        {
+          "input": "2 1 3",
+          "output": "2 3 1",
+          "is_public": true
+        },
+        {
+          "input": "",
+          "output": "",
+          "is_public": false
+        },
+        {
+          "input": "1",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "1 2 null 3",
+          "output": "1 null 2 null 3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-binary-tree-maximum-path-sum",
+      "title": "Blind75: Binary Tree Maximum Path Sum",
+      "difficulty": "hard",
+      "statement": "Дано бинарное дерево в level-order. Выведите максимальную сумму пути.",
+      "topics": [
+        "tree",
+        "dp"
+      ],
+      "cases": [
+        {
+          "input": "1 2 3",
+          "output": "6",
+          "is_public": true
+        },
+        {
+          "input": "-10 9 20 null null 15 7",
+          "output": "42",
+          "is_public": true
+        },
+        {
+          "input": "2 -1",
+          "output": "2",
+          "is_public": false
+        },
+        {
+          "input": "-3",
+          "output": "-3",
+          "is_public": false
+        },
+        {
+          "input": "5 4 8 11 null 13 4 7 2 null null null 1",
+          "output": "48",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-binary-tree-level-order-traversal",
+      "title": "Blind75: Binary Tree Level Order Traversal",
+      "difficulty": "medium",
+      "statement": "Дано бинарное дерево в level-order. Выведите уровни дерева, разделяя уровни символом |.",
+      "topics": [
+        "tree",
+        "bfs"
+      ],
+      "cases": [
+        {
+          "input": "3 9 20 null null 15 7",
+          "output": "3|9 20|15 7",
+          "is_public": true
+        },
+        {
+          "input": "1",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "",
+          "output": "",
+          "is_public": false
+        },
+        {
+          "input": "1 2 3 4 null null 5",
+          "output": "1|2 3|4 5",
+          "is_public": false
+        },
+        {
+          "input": "5 3 6 2 4 null 7",
+          "output": "5|3 6|2 4 7",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-serialize-and-deserialize-binary-tree",
+      "title": "Blind75: Serialize and Deserialize Binary Tree",
+      "difficulty": "hard",
+      "statement": "Дано бинарное дерево в level-order. Сериализуйте, затем десериализуйте его и выведите канонический level-order без хвостовых null.",
+      "topics": [
+        "tree",
+        "design"
+      ],
+      "cases": [
+        {
+          "input": "1 2 3 null null 4 5",
+          "output": "1 2 3 null null 4 5",
+          "is_public": true
+        },
+        {
+          "input": "",
+          "output": "",
+          "is_public": true
+        },
+        {
+          "input": "1",
+          "output": "1",
+          "is_public": false
+        },
+        {
+          "input": "2 1 3",
+          "output": "2 1 3",
+          "is_public": false
+        },
+        {
+          "input": "1 null 2 null 3",
+          "output": "1 null 2 null 3",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-subtree-of-another-tree",
+      "title": "Blind75: Subtree of Another Tree",
+      "difficulty": "easy",
+      "statement": "Даны два дерева в level-order: root и subRoot. Выведите true, если subRoot является поддеревом root.",
+      "topics": [
+        "tree"
+      ],
+      "cases": [
+        {
+          "input": "3 4 5 1 2\n4 1 2",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "3 4 5 1 2 null null null null 0\n4 1 2",
+          "output": "false",
+          "is_public": true
+        },
+        {
+          "input": "1 1\n1",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "\n1",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "5 4 6 3 null null null\n4 3",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-construct-binary-tree-from-preorder-and-inorder-traversal",
+      "title": "Blind75: Construct Binary Tree from Preorder and Inorder Traversal",
+      "difficulty": "medium",
+      "statement": "Даны preorder и inorder обходы бинарного дерева. Постройте дерево и выведите его в level-order без хвостовых null.",
+      "topics": [
+        "tree"
+      ],
+      "cases": [
+        {
+          "input": "5\n3 9 20 15 7\n5\n9 3 15 20 7",
+          "output": "3 9 20 null null 15 7",
+          "is_public": true
+        },
+        {
+          "input": "1\n-1\n1\n-1",
+          "output": "-1",
+          "is_public": true
+        },
+        {
+          "input": "3\n1 2 3\n3\n2 1 3",
+          "output": "1 2 3",
+          "is_public": false
+        },
+        {
+          "input": "4\n1 2 4 5\n4\n4 2 5 1",
+          "output": "1 2 null 4 5",
+          "is_public": false
+        },
+        {
+          "input": "2\n2 1\n2\n1 2",
+          "output": "2 1",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-validate-binary-search-tree",
+      "title": "Blind75: Validate Binary Search Tree",
+      "difficulty": "medium",
+      "statement": "Дано бинарное дерево в level-order. Выведите true, если это корректное BST.",
+      "topics": [
+        "tree"
+      ],
+      "cases": [
+        {
+          "input": "2 1 3",
+          "output": "true",
+          "is_public": true
+        },
+        {
+          "input": "5 1 4 null null 3 6",
+          "output": "false",
+          "is_public": true
+        },
+        {
+          "input": "1 1",
+          "output": "false",
+          "is_public": false
+        },
+        {
+          "input": "10 5 15 null null 11 20",
+          "output": "true",
+          "is_public": false
+        },
+        {
+          "input": "",
+          "output": "true",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-kth-smallest-element-in-a-bst",
+      "title": "Blind75: Kth Smallest Element in a BST",
+      "difficulty": "medium",
+      "statement": "Даны BST в level-order и число k. Выведите k-й по возрастанию элемент.",
+      "topics": [
+        "tree"
+      ],
+      "cases": [
+        {
+          "input": "3 1 4 null 2\n1",
+          "output": "1",
+          "is_public": true
+        },
+        {
+          "input": "5 3 6 2 4 null null 1\n3",
+          "output": "3",
+          "is_public": true
+        },
+        {
+          "input": "2 1 3\n2",
+          "output": "2",
+          "is_public": false
+        },
+        {
+          "input": "7 3 9 1 5 8 10\n5",
+          "output": "8",
+          "is_public": false
+        },
+        {
+          "input": "1\n1",
+          "output": "1",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-lowest-common-ancestor-of-a-binary-search-tree",
+      "title": "Blind75: Lowest Common Ancestor of a Binary Search Tree",
+      "difficulty": "medium",
+      "statement": "Даны BST в level-order и два значения p и q. Выведите значение их LCA.",
+      "topics": [
+        "tree"
+      ],
+      "cases": [
+        {
+          "input": "6 2 8 0 4 7 9 null null 3 5\n2 8",
+          "output": "6",
+          "is_public": true
+        },
+        {
+          "input": "6 2 8 0 4 7 9 null null 3 5\n2 4",
+          "output": "2",
+          "is_public": true
+        },
+        {
+          "input": "2 1\n2 1",
+          "output": "2",
+          "is_public": false
+        },
+        {
+          "input": "5 3 6 2 4 null 7\n2 4",
+          "output": "3",
+          "is_public": false
+        },
+        {
+          "input": "10 5 15 3 7 12 18\n12 18",
+          "output": "15",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-find-median-from-data-stream",
+      "title": "Blind75: Find Median from Data Stream",
+      "difficulty": "hard",
+      "statement": "Дано q операций add x и median. После каждой операции median выведите текущую медиану. Для .5 используйте одну цифру после точки.",
+      "topics": [
+        "heap",
+        "design"
+      ],
+      "cases": [
+        {
+          "input": "6\nadd 1\nadd 2\nmedian\nadd 3\nmedian\nmedian",
+          "output": "1.5\n2.0\n2.0",
+          "is_public": true
+        },
+        {
+          "input": "4\nadd 5\nmedian\nadd 7\nmedian",
+          "output": "5.0\n6.0",
+          "is_public": true
+        },
+        {
+          "input": "5\nadd -1\nadd -2\nadd -3\nmedian\nadd 0",
+          "output": "-2.0",
+          "is_public": false
+        },
+        {
+          "input": "3\nadd 10\nadd 20\nmedian",
+          "output": "15.0",
+          "is_public": false
+        },
+        {
+          "input": "7\nadd 1\nadd 1\nadd 1\nmedian\nadd 2\nadd 2\nmedian",
+          "output": "1.0\n1.0",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-implement-trie-prefix-tree",
+      "title": "Blind75: Implement Trie (Prefix Tree)",
+      "difficulty": "medium",
+      "statement": "Дано q операций insert word, search word, prefix word. Для операций search и prefix выводите true/false по одной строке.",
+      "topics": [
+        "trie",
+        "design"
+      ],
+      "cases": [
+        {
+          "input": "6\ninsert apple\nsearch apple\nsearch app\nprefix app\ninsert app\nsearch app",
+          "output": "true\nfalse\ntrue\ntrue",
+          "is_public": true
+        },
+        {
+          "input": "4\ninsert cat\nprefix ca\nsearch cat\nsearch car",
+          "output": "true\ntrue\nfalse",
+          "is_public": true
+        },
+        {
+          "input": "3\ninsert a\nsearch a\nprefix a",
+          "output": "true\ntrue",
+          "is_public": false
+        },
+        {
+          "input": "4\ninsert dog\nprefix do\nprefix da\nsearch dog",
+          "output": "true\nfalse\ntrue",
+          "is_public": false
+        },
+        {
+          "input": "5\ninsert trie\nsearch trie\nsearch tr\nprefix tri\nprefix z",
+          "output": "true\nfalse\ntrue\nfalse",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-design-add-and-search-words-data-structure",
+      "title": "Blind75: Design Add and Search Words Data Structure",
+      "difficulty": "medium",
+      "statement": "Дано q операций add word и search pattern. В pattern символ . совпадает с любой одной буквой. Для search выводите true/false.",
+      "topics": [
+        "trie",
+        "design"
+      ],
+      "cases": [
+        {
+          "input": "6\nadd bad\nadd dad\nadd mad\nsearch pad\nsearch bad\nsearch .ad",
+          "output": "false\ntrue\ntrue",
+          "is_public": true
+        },
+        {
+          "input": "4\nadd a\nsearch .\nsearch a\nsearch aa",
+          "output": "true\ntrue\nfalse",
+          "is_public": true
+        },
+        {
+          "input": "5\nadd code\nadd cope\nsearch co.e\nsearch c..e\nsearch ....",
+          "output": "true\ntrue\ntrue",
+          "is_public": false
+        },
+        {
+          "input": "3\nadd test\nsearch t.st\nsearch te..t",
+          "output": "true\nfalse",
+          "is_public": false
+        },
+        {
+          "input": "4\nadd hello\nsearch h.llo\nsearch he..o\nsearch .....",
+          "output": "true\ntrue\ntrue",
+          "is_public": false
+        }
+      ]
+    },
+    {
+      "slug": "blind75-word-search-ii",
+      "title": "Blind75: Word Search II",
+      "difficulty": "hard",
+      "statement": "Даны r, c, поле символов, число m и список слов. Выведите все найденные слова в лексикографическом порядке через пробел. Если ничего нет, выведите EMPTY.",
+      "topics": [
+        "trie",
+        "matrix",
+        "backtracking"
+      ],
+      "cases": [
+        {
+          "input": "4 4\noaan\netae\nihkr\niflv\n4\noath\npea\neat\nrain",
+          "output": "eat oath",
+          "is_public": true
+        },
+        {
+          "input": "2 2\nab\ncd\n2\nabcb\nabcd",
+          "output": "EMPTY",
+          "is_public": true
+        },
+        {
+          "input": "1 1\na\n2\na\nb",
+          "output": "a",
+          "is_public": false
+        },
+        {
+          "input": "2 2\nab\ncd\n3\nab\nac\ndb",
+          "output": "ab ac",
+          "is_public": false
+        },
+        {
+          "input": "3 3\nsea\nrat\nton\n4\nsea\nrat\nton\nstone",
+          "output": "rat sea ton",
+          "is_public": false
+        }
+      ]
+    }
+  ]
+}

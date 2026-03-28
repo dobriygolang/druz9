@@ -1,9 +1,16 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { createContext, useContext, useEffect, useState, useRef, useCallback } from 'react';
 import {
   CompleteProfilePayload,
   ProfileResponse,
 } from '@/entities/User/model/types';
 import { authApi } from '@/features/Auth/api/authApi';
+import {
+  clearForcedGuestMode,
+  clearGuestCodeRoomSession,
+  hasGuestCodeRoomSession,
+  isGuestModeForced,
+  syncForcedGuestModeFromUrl,
+} from '@/features/CodeRoom/lib/guestIdentity';
 
 interface AuthContextType {
   user: ProfileResponse['user'] | null;
@@ -18,48 +25,118 @@ interface AuthContextType {
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
+const KNOWN_AUTH_SESSION_KEY = 'known_auth_session';
 
-let cachedProfile: ProfileResponse | null = null;
-let bootstrapPromise: Promise<ProfileResponse | null> | null = null;
-
-async function loadProfile(force = false): Promise<ProfileResponse | null> {
-  if (!force && cachedProfile) {
-    return cachedProfile;
+function hasKnownAuthSession() {
+  if (typeof window === 'undefined') {
+    return false;
   }
-
-  if (!force && bootstrapPromise) {
-    return bootstrapPromise;
-  }
-
-  bootstrapPromise = authApi
-    .getProfile()
-    .then((data) => {
-      cachedProfile = data;
-      return data;
-    })
-    .catch(() => {
-      cachedProfile = null;
-      return null;
-    })
-    .finally(() => {
-      bootstrapPromise = null;
-    });
-
-  return bootstrapPromise;
+  return window.localStorage.getItem(KNOWN_AUTH_SESSION_KEY) === 'true';
 }
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
-  children,
-}) => {
+function markKnownAuthSession() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.localStorage.setItem(KNOWN_AUTH_SESSION_KEY, 'true');
+}
+
+function clearKnownAuthSession() {
+  if (typeof window === 'undefined') {
+    return;
+  }
+  window.localStorage.removeItem(KNOWN_AUTH_SESSION_KEY);
+}
+
+function shouldSkipProfileBootstrap() {
+  if (typeof window === 'undefined') {
+    return false;
+  }
+
+  const { pathname, search } = window.location;
+  const searchParams = new URLSearchParams(search);
+  const isCodeRoomsRoute = /^\/code-rooms(?:\/[^/]+)?\/?$/.test(pathname);
+  const isArenaRoute = /^\/arena\/[^/]+\/?$/.test(pathname);
+  const isGuestRealtimeRoute = (isCodeRoomsRoute || isArenaRoute) && hasGuestCodeRoomSession();
+  const isForcedGuestRoute = (isCodeRoomsRoute || isArenaRoute) && isGuestModeForced();
+
+  if (isForcedGuestRoute) {
+    return true;
+  }
+
+  if (isCodeRoomsRoute && searchParams.has('invite') && !hasKnownAuthSession()) {
+    return true;
+  }
+
+  if (isGuestRealtimeRoute && !hasKnownAuthSession()) {
+    return true;
+  }
+
+  return false;
+}
+
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const guestModeForced = syncForcedGuestModeFromUrl();
+  const cachedProfileRef = useRef<ProfileResponse | null>(null);
+  const bootstrapPromiseRef = useRef<Promise<ProfileResponse | null> | null>(null);
+
+  const loadProfile = useCallback(async (force = false): Promise<ProfileResponse | null> => {
+    if (!force && isGuestModeForced()) {
+      return null;
+    }
+
+    if (!force && shouldSkipProfileBootstrap()) {
+      return null;
+    }
+
+    if (!force && cachedProfileRef.current) {
+      return cachedProfileRef.current;
+    }
+
+    if (!force && bootstrapPromiseRef.current) {
+      return bootstrapPromiseRef.current;
+    }
+
+    bootstrapPromiseRef.current = authApi
+      .getProfile()
+      .then((data) => {
+        cachedProfileRef.current = data;
+        if (data?.user) {
+          markKnownAuthSession();
+        }
+        if (data?.user && hasGuestCodeRoomSession()) {
+          clearGuestCodeRoomSession();
+        }
+        return data;
+      })
+      .catch(() => {
+        cachedProfileRef.current = null;
+        clearKnownAuthSession();
+        return null;
+      })
+      .finally(() => {
+        bootstrapPromiseRef.current = null;
+      });
+
+    return bootstrapPromiseRef.current;
+  }, []);
+
   const [user, setUser] = useState<ProfileResponse['user'] | null>(
-    cachedProfile?.user ?? null,
+    null,
   );
   const [needsProfileComplete, setNeedsProfileComplete] = useState(
-    cachedProfile?.needsProfileComplete ?? false,
+    false,
   );
-  const [isLoading, setIsLoading] = useState(!cachedProfile);
+  const [isLoading, setIsLoading] = useState(!guestModeForced);
 
-  const refreshProfile = async (force = false) => {
+  const refreshProfile = useCallback(async (force = false) => {
+    if (!force && isGuestModeForced()) {
+      setUser(null);
+      setNeedsProfileComplete(false);
+      setIsLoading(false);
+      return;
+    }
+
     try {
       setIsLoading(true);
       const data = await loadProfile(force);
@@ -68,20 +145,23 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [loadProfile]);
 
   useEffect(() => {
     void refreshProfile();
-  }, []);
+  }, [refreshProfile]);
 
-  const login = async (payload: unknown) => {
+  const login = useCallback(async (payload: unknown) => {
     const data = await authApi.telegramLogin(payload);
-    cachedProfile = data;
+    cachedProfileRef.current = data;
+    clearForcedGuestMode();
+    markKnownAuthSession();
+    clearGuestCodeRoomSession();
     setUser(data.user);
     setNeedsProfileComplete(data.needsProfileComplete);
-  };
+  }, []);
 
-  const completeProfile = async (payload: CompleteProfilePayload) => {
+  const completeProfile = useCallback(async (payload: CompleteProfilePayload) => {
     let data = await authApi.completeRegistration(payload);
     const currentWorkplace = payload.currentWorkplace?.trim();
 
@@ -91,24 +171,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       });
     }
 
-    cachedProfile = data;
+    cachedProfileRef.current = data;
+    clearForcedGuestMode();
+    markKnownAuthSession();
     setUser(data.user);
     setNeedsProfileComplete(data.needsProfileComplete);
-  };
+  }, []);
 
-  const updateLocation = async (payload: CompleteProfilePayload) => {
+  const updateLocation = useCallback(async (payload: CompleteProfilePayload) => {
     const data = await authApi.updateLocation(payload);
-    cachedProfile = data;
+    cachedProfileRef.current = data;
+    clearForcedGuestMode();
+    markKnownAuthSession();
     setUser(data.user);
     setNeedsProfileComplete(data.needsProfileComplete);
-  };
+  }, []);
 
-  const logout = async () => {
+  const logout = useCallback(async () => {
     await authApi.logout();
-    cachedProfile = null;
+    cachedProfileRef.current = null;
+    clearForcedGuestMode();
+    clearKnownAuthSession();
+    clearGuestCodeRoomSession();
     setUser(null);
     setNeedsProfileComplete(false);
-  };
+  }, []);
 
   return (
     <AuthContext.Provider

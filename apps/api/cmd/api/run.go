@@ -2,50 +2,52 @@ package main
 
 import (
 	"context"
-	"net/http"
 
 	// #nosec G108 -- pprof is intentionally exposed on dedicated metrics endpoint in non-public ops context.
 	_ "net/http/pprof"
-	"time"
 
 	admindomainservice "api/internal/admin/service"
 	adminservice "api/internal/api/admin"
+	arenaservice "api/internal/api/arena"
+	codeeditorservice "api/internal/api/code_editor"
 	eventservice "api/internal/api/event"
 	geoservice "api/internal/api/geo"
 	podcastservice "api/internal/api/podcast"
 	profileservice "api/internal/api/profile"
 	referralservice "api/internal/api/referral"
-	roomservice "api/internal/api/room"
+	apparenа "api/internal/app/arena"
+	appcodeeditor "api/internal/app/codeeditor"
 	"api/internal/closer"
 	"api/internal/config"
+	arenadata "api/internal/data/arena"
+	codeeditordata "api/internal/data/code_editor"
 	eventdata "api/internal/data/event"
 	geodata "api/internal/data/geo"
 	podcastdata "api/internal/data/podcast"
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
-	roomdata "api/internal/data/room"
 	eventdomainservice "api/internal/event/service"
 	geodomainservice "api/internal/geo/service"
 	appLogger "api/internal/logger"
 	podcastdomainservice "api/internal/podcast/service"
 	profiledomainservice "api/internal/profile/service"
+	"api/internal/realtime"
 	referraldomainservice "api/internal/referral/service"
-	roomdomainservice "api/internal/room/service"
 	"api/internal/rtc"
+	"api/internal/sandbox"
 	server "api/internal/server"
-	livekitstorage "api/internal/storage/livekit"
 	"api/internal/storage/postgres"
 	s3storage "api/internal/storage/s3"
 	adminv1 "api/pkg/api/admin/v1"
+	arenav1 "api/pkg/api/arena/v1"
+	codeeditorv1 "api/pkg/api/code_editor/v1"
 	eventv1 "api/pkg/api/event/v1"
 	geov1 "api/pkg/api/geo/v1"
 	podcastv1 "api/pkg/api/podcast/v1"
 	referralv1 "api/pkg/api/referral/v1"
-	roomv1 "api/pkg/api/room/v1"
 
 	"github.com/go-kratos/kratos/v2"
 	klog "github.com/go-kratos/kratos/v2/log"
-	"github.com/prometheus/client_golang/prometheus/promhttp"
 )
 
 // Run starts the API server.
@@ -56,18 +58,13 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 	}
 	closer.AddSync(logger.Sync)
 
-	cfg, err := config.Load()
-	if err != nil {
-		return nil, nil, err
-	}
-
 	kratosLogger := klog.With(logger,
 		"ts", klog.DefaultTimestamp,
 		"caller", klog.DefaultCaller,
 	)
 
 	rtcPath := config.ResolveRTCValuesPath()
-	_, rtcCleanup, err := rtc.NewManager(rtcPath, kratosLogger)
+	rtcManager, rtcCleanup, err := rtc.NewManager(rtcPath, kratosLogger)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -75,6 +72,11 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 		rtcCleanup()
 		return nil
 	})
+
+	cfg, err := config.Load(rtcManager)
+	if err != nil {
+		return nil, nil, err
+	}
 
 	poolCfg := postgres.DefaultPoolConfig()
 	if cfg.Data.Pool != nil {
@@ -107,7 +109,13 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 	eventRepo := eventdata.NewRepo(store, kratosLogger)
 	podcastRepo := podcastdata.NewRepo(store, kratosLogger)
 	referralRepo := referraldata.NewRepo(store, kratosLogger)
-	roomRepo := roomdata.NewRepo(store, kratosLogger)
+	codeEditorRepo := codeeditordata.NewRepo(store, kratosLogger)
+	arenaRepo := arenadata.NewRepo(store, kratosLogger)
+
+	realtimeHub := realtime.NewCodeEditorHub(codeEditorRepo)
+
+	// Create sandbox service for code execution
+	sandboxService := sandbox.New()
 
 	storageClient, err := s3storage.New(cfg.External.S3)
 	if err != nil {
@@ -117,7 +125,6 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 		return nil, nil, err
 	}
 
-	livekitClient := livekitstorage.New(cfg.External.LiveKit)
 	geoClient := geodata.NewClient(cfg, store, kratosLogger)
 
 	profileServiceDomain := profiledomainservice.NewProfileService(profiledomainservice.Config{
@@ -126,6 +133,7 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 		Settings: profiledomainservice.Settings{
 			BotToken:            cfg.External.Telegram.BotToken,
 			DevBypass:           cfg.Dev.AuthBypass,
+			DevUserID:           cfg.Dev.DevUserID,
 			CookieName:          cfg.Auth.Session.CookieName,
 			SessionTTL:          cfg.Auth.Session.TTL,
 			SessionRefreshAfter: cfg.Auth.Session.RefreshAfter,
@@ -148,10 +156,23 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 	referralServiceDomain := referraldomainservice.NewReferralService(referraldomainservice.Config{
 		Repository: referralRepo,
 	})
-	roomServiceDomain := roomdomainservice.NewRoomService(roomdomainservice.Config{
-		Repository:  roomRepo,
-		TokenIssuer: livekitClient,
+	codeEditorServiceDomain := appcodeeditor.New(appcodeeditor.Config{
+		Repository: codeEditorRepo,
+		Sandbox:    sandboxService,
 	})
+	arenaServiceDomain := apparenа.New(apparenа.Config{
+		Repository: arenaRepo,
+		Sandbox:    sandboxService,
+		AllowGuestAccess: func() bool {
+			return cfg.Arena != nil && !cfg.Arena.RequireAuth
+		},
+		AntiCheatEnabled: func() bool {
+			return true
+		},
+	})
+	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
+	closer.AddSync(startCodeRoomCleanupWorker(kratosLogger, codeEditorServiceDomain))
+	closer.AddSync(startArenaCleanupWorker(kratosLogger, arenaServiceDomain))
 
 	cookies := server.NewSessionCookieManager(cfg.Auth.Session)
 	adminService := adminservice.New(adminServiceDomain)
@@ -160,7 +181,10 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 	eventService := eventservice.New(eventServiceDomain)
 	podcastService := podcastservice.New(podcastServiceDomain)
 	referralService := referralservice.New(referralServiceDomain)
-	roomService := roomservice.New(roomServiceDomain)
+	codeEditorService := codeeditorservice.New(codeEditorServiceDomain, realtimeHub)
+	arenaService := arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
+		return cfg.Arena != nil && !cfg.Arena.RequireAuth
+	})
 
 	httpServer := server.NewHTTPServer(
 		cfg.Server.HTTP.Addr,
@@ -183,16 +207,15 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 		cfg.Server.CircuitBreaker,
 	)
 
-	if err := server.RegisterHTTPProxy(
-		httpServer,
-		cfg.External.LiveKit,
-		kratosLogger,
-	); err != nil {
-		return nil, nil, err
-	}
+	server.RegisterCodeEditorRealtime(httpServer, realtimeHub)
+	server.RegisterArenaRealtime(httpServer, arenaRealtimeHub)
+	server.RegisterArenaOpenMatches(httpServer, arenaServiceDomain)
+	server.RegisterArenaQueue(httpServer, arenaServiceDomain, profileServiceDomain)
 
 	adminv1.RegisterAdminServiceHTTPServer(httpServer, adminService)
 	adminv1.RegisterAdminServiceServer(grpcServer, adminService)
+	arenav1.RegisterArenaServiceHTTPServer(httpServer, arenaService)
+	arenav1.RegisterArenaServiceServer(grpcServer, arenaService)
 	geov1.RegisterGeoServiceHTTPServer(httpServer, geoService)
 	geov1.RegisterGeoServiceServer(grpcServer, geoService)
 	eventv1.RegisterEventServiceHTTPServer(httpServer, eventService)
@@ -201,8 +224,8 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 	podcastv1.RegisterPodcastServiceServer(grpcServer, podcastService)
 	referralv1.RegisterReferralServiceHTTPServer(httpServer, referralService)
 	referralv1.RegisterReferralServiceServer(grpcServer, referralService)
-	roomv1.RegisterRoomServiceHTTPServer(httpServer, roomService)
-	roomv1.RegisterRoomServiceServer(grpcServer, roomService)
+	codeeditorv1.RegisterCodeEditorServiceHTTPServer(httpServer, codeEditorService)
+	codeeditorv1.RegisterCodeEditorServiceServer(grpcServer, codeEditorService)
 
 	app := kratos.New(
 		kratos.Name("api"),
@@ -210,37 +233,11 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 		kratos.Logger(kratosLogger),
 	)
 
-	// Start metrics and pprof server
-	if cfg.Metrics != nil && cfg.Metrics.Addr != "" {
-		mux := http.NewServeMux()
-		mux.Handle("/metrics", promhttp.Handler())
-
-		// pprof handlers
-		mux.HandleFunc("/debug/pprof/", http.DefaultServeMux.ServeHTTP)
-		mux.HandleFunc("/debug/pprof/heap", http.DefaultServeMux.ServeHTTP)
-		mux.HandleFunc("/debug/pprof/goroutine", http.DefaultServeMux.ServeHTTP)
-		mux.HandleFunc("/debug/pprof/block", http.DefaultServeMux.ServeHTTP)
-		mux.HandleFunc("/debug/pprof/mutex", http.DefaultServeMux.ServeHTTP)
-		mux.HandleFunc("/debug/pprof/threadcreate", http.DefaultServeMux.ServeHTTP)
-		mux.HandleFunc("/debug/pprof/trace", http.DefaultServeMux.ServeHTTP)
-		mux.HandleFunc("/debug/pprof/cmdline", http.DefaultServeMux.ServeHTTP)
-		mux.HandleFunc("/debug/pprof/profile", http.DefaultServeMux.ServeHTTP)
-		mux.HandleFunc("/debug/pprof/symbol", http.DefaultServeMux.ServeHTTP)
-
-		metricsServer := &http.Server{
-			Addr:              cfg.Metrics.Addr,
-			Handler:           mux,
-			ReadHeaderTimeout: 5 * time.Second,
-		}
-
-		go func() {
-			if err := metricsServer.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-				klog.Errorf("metrics server error: %v", err)
-			}
-		}()
-
+	opsServer := server.NewOpsServer(cfg.Metrics)
+	if opsServer != nil {
+		server.StartOpsServer(kratosLogger, opsServer)
 		closer.AddSync(func() error {
-			return metricsServer.Close()
+			return opsServer.Close()
 		})
 	}
 

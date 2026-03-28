@@ -8,12 +8,13 @@ import (
 	"api/internal/config"
 	authmiddleware "api/internal/middleware"
 	adminv1 "api/pkg/api/admin/v1"
+	arenav1 "api/pkg/api/arena/v1"
+	codeeditorv1 "api/pkg/api/code_editor/v1"
 	eventv1 "api/pkg/api/event/v1"
 	geov1 "api/pkg/api/geo/v1"
 	podcastv1 "api/pkg/api/podcast/v1"
 	v1 "api/pkg/api/profile/v1"
 	referralv1 "api/pkg/api/referral/v1"
-	roomv1 "api/pkg/api/room/v1"
 
 	"github.com/go-kratos/aegis/circuitbreaker"
 	"github.com/go-kratos/aegis/circuitbreaker/sre"
@@ -26,10 +27,12 @@ import (
 	"github.com/go-kratos/kratos/v2/middleware/selector"
 	"github.com/go-kratos/kratos/v2/transport"
 	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/gorilla/handlers"
 )
 
 // serverCircuitBreaker returns a server-side circuit breaker middleware backed by the
 // Google SRE adaptive throttling algorithm (aegis/sre).
+
 func serverCircuitBreaker(breaker circuitbreaker.CircuitBreaker) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (any, error) {
@@ -90,21 +93,35 @@ func NewHTTPServer(
 			operation == referralv1.OperationReferralServiceListReferrals ||
 			operation == referralv1.OperationReferralServiceCreateReferral ||
 			operation == referralv1.OperationReferralServiceUpdateReferral ||
-			operation == referralv1.OperationReferralServiceDeleteReferral ||
-			operation == roomv1.OperationRoomServiceListRooms ||
-			operation == roomv1.OperationRoomServiceGetRoom ||
-			operation == roomv1.OperationRoomServiceCreateRoom ||
-			operation == roomv1.OperationRoomServiceUpdateRoom ||
-			operation == roomv1.OperationRoomServiceDeleteRoom ||
-			operation == roomv1.OperationRoomServiceJoinRoomToken ||
-			operation == roomv1.OperationRoomServiceGetRoomMediaState ||
-			operation == roomv1.OperationRoomServiceUpsertRoomMediaState
+			operation == referralv1.OperationReferralServiceDeleteReferral
+	}).Build()
+
+	optionalAuthMw := selector.Server(
+		authmiddleware.OptionalAuth(authorizer, cookies),
+	).Match(func(_ context.Context, operation string) bool {
+		return operation == codeeditorv1.OperationCodeEditorServiceCreateRoom ||
+			operation == codeeditorv1.OperationCodeEditorServiceListTasks ||
+			operation == codeeditorv1.OperationCodeEditorServiceGetLeaderboard ||
+			operation == codeeditorv1.OperationCodeEditorServiceGetRoom ||
+			operation == codeeditorv1.OperationCodeEditorServiceGetSubmissions ||
+			operation == codeeditorv1.OperationCodeEditorServiceJoinRoom ||
+			operation == codeeditorv1.OperationCodeEditorServiceJoinRoomByInviteCode ||
+			operation == codeeditorv1.OperationCodeEditorServiceLeaveRoom ||
+			operation == codeeditorv1.OperationCodeEditorServiceSetReady ||
+			operation == codeeditorv1.OperationCodeEditorServiceSubmitCode ||
+			operation == arenav1.OperationArenaServiceCreateMatch ||
+			operation == arenav1.OperationArenaServiceGetMatch ||
+			operation == arenav1.OperationArenaServiceJoinMatch ||
+			operation == arenav1.OperationArenaServiceSubmitCode
 	}).Build()
 
 	adminMw := selector.Server(
 		authmiddleware.RequireAdmin(),
 	).Match(func(_ context.Context, operation string) bool {
 		return operation == adminv1.OperationAdminServiceDeleteUser ||
+			operation == codeeditorv1.OperationCodeEditorServiceCreateTask ||
+			operation == codeeditorv1.OperationCodeEditorServiceUpdateTask ||
+			operation == codeeditorv1.OperationCodeEditorServiceDeleteTask ||
 			operation == podcastv1.OperationPodcastServiceCreatePodcast ||
 			operation == podcastv1.OperationPodcastServiceUploadPodcast ||
 			operation == podcastv1.OperationPodcastServicePreparePodcastUpload ||
@@ -136,19 +153,33 @@ func NewHTTPServer(
 		rateLimiter = ratelimit.Server()
 	}
 
-	srv := kratoshttp.NewServer(
+	// Reflect the concrete Origin so credentialed browser requests stay valid.
+	corsFilter := handlers.CORS(
+		handlers.AllowedOriginValidator(func(origin string) bool {
+			return origin != ""
+		}),
+		handlers.AllowedMethods([]string{"GET", "POST", "OPTIONS", "PUT", "PATCH", "DELETE"}),
+		handlers.AllowedHeaders([]string{"Content-Type", "Accept", "Authorization", "X-Requested-With", "X-Code-Editor-Guest-Name", "X-Arena-Guest-Id", "X-Arena-Guest-Name"}),
+		handlers.AllowCredentials(),
+	)
+
+	opts := []kratoshttp.ServerOption{
 		kratoshttp.Address(addr),
 		kratoshttp.Timeout(timeout),
+		kratoshttp.Filter(corsFilter),
 		kratoshttp.Middleware(
 			recovery.Recovery(),
 			logging.Server(kLogger),
 			MetricsMiddleware(),
 			rateLimiter,
 			cb,
+			optionalAuthMw,
 			authMw,
 			adminMw,
 		),
-	)
+	}
+
+	srv := kratoshttp.NewServer(opts...)
 
 	v1.RegisterProfileServiceHTTPServer(srv, profileService)
 	return srv

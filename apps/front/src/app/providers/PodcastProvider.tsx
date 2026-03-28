@@ -53,6 +53,8 @@ export const PodcastProvider: React.FC<{ children: React.ReactNode }> = ({ child
       audio.removeEventListener('durationchange', handleDurationChange);
       audio.removeEventListener('ended', handleEnded);
       audio.removeEventListener('error', handleError);
+      audio.pause();
+      audio.src = '';
     };
   }, []);
 

@@ -36,17 +36,20 @@ run:
 .PHONY: migrate-up
 # apply goose migrations to local database
 migrate-up:
-	set -a && . ./.env && set +a && GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations postgres "$$DATABASE_URL" up
+	DATABASE_URL="$$(GOCACHE=$(GOCACHE_DIR) go run ./cmd/configvalue database_url)" && \
+	GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations postgres "$$DATABASE_URL" up
 
 .PHONY: migrate-down
 # rollback latest goose migration from local database
 migrate-down:
-	set -a && . ./.env && set +a && GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations postgres "$$DATABASE_URL" down
+	DATABASE_URL="$$(GOCACHE=$(GOCACHE_DIR) go run ./cmd/configvalue database_url)" && \
+	GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations postgres "$$DATABASE_URL" down
 
 .PHONY: migrate-status
 # show goose migration status for local database
 migrate-status:
-	set -a && . ./.env && set +a && GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations postgres "$$DATABASE_URL" status
+	DATABASE_URL="$$(GOCACHE=$(GOCACHE_DIR) go run ./cmd/configvalue database_url)" && \
+	GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations postgres "$$DATABASE_URL" status
 
 .PHONY: docker-migrate-up
 # apply goose migrations through docker network
@@ -88,6 +91,26 @@ generate:
 	$(MAKE) proto-stubs
 	GOCACHE=$(GOCACHE_DIR) go generate ./...
 	GOCACHE=$(GOCACHE_DIR) go mod tidy
+
+.PHONY: seed-up
+# apply SQL and Go seeds from scripts/seeds and internal seed packs
+seed-up:
+	GOCACHE=$(GOCACHE_DIR) go run ./cmd/seed -only all
+
+.PHONY: seed-sql
+# apply only SQL seeds from scripts/seeds
+seed-sql:
+	GOCACHE=$(GOCACHE_DIR) go run ./cmd/seed -only sql
+
+.PHONY: seed-blind75
+# apply only Blind 75 task pack
+seed-blind75:
+	GOCACHE=$(GOCACHE_DIR) go run ./cmd/seed -only blind75
+
+.PHONY: seed-status
+# show applied seed records
+seed-status:
+	GOCACHE=$(GOCACHE_DIR) go run ./cmd/seed -status
 
 .PHONY: lint
 # run golangci-lint with repository config

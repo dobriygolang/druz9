@@ -58,6 +58,7 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
       >
         <button
           onClick={onCancel}
+          aria-label="Закрыть"
           style={{
             position: 'absolute',
             top: '16px',

@@ -1,31 +1,74 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Search, User as UserIcon, MapPin, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { geoApi } from '@/features/Geo/api/geoApi';
+import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { CommunityMapPoint } from '@/entities/User/model/types';
+import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
 
 export const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<CommunityMapPoint[]>([]);
+  const [arenaStatsByUserId, setArenaStatsByUserId] = useState<Record<string, ArenaPlayerStats>>({});
   const [isLoading, setIsLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const loadUsersRef = useRef<{ (initial?: boolean): Promise<void> } | null>(null);
+
+  const loadUsers = async (initial = false) => {
+    try {
+      if (initial) setIsLoading(true);
+      const data = await geoApi.communityMap();
+      setUsers(data);
+    } catch (err) {
+      console.error('Failed to load users', err);
+    } finally {
+      if (initial) setIsLoading(false);
+    }
+  };
+
+  loadUsersRef.current = loadUsers;
 
   useEffect(() => {
-    const loadUsers = async (initial = false) => {
-      try {
-        if (initial) setIsLoading(true);
-        const data = await geoApi.communityMap();
-        setUsers(data);
-      } catch (err) {
-        console.error('Failed to load users', err);
-      } finally {
-        if (initial) setIsLoading(false);
-      }
-    };
-    
     void loadUsers(true);
-    const interval = setInterval(() => void loadUsers(false), 30000);
+    const interval = setInterval(() => loadUsersRef.current?.(false), 30000);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    if (users.length === 0) {
+      setArenaStatsByUserId({});
+      return;
+    }
+
+    let cancelled = false;
+
+    const loadArenaStats = async () => {
+      const results = await Promise.allSettled(
+        users.map(async (user) => {
+          const stats = await codeRoomApi.getArenaStats(user.userId);
+          return [user.userId, stats] as const;
+        }),
+      );
+
+      if (cancelled) {
+        return;
+      }
+
+      const nextStats: Record<string, ArenaPlayerStats> = {};
+      results.forEach((result) => {
+        if (result.status === 'fulfilled') {
+          const [userId, stats] = result.value;
+          nextStats[userId] = stats;
+        }
+      });
+      setArenaStatsByUserId(nextStats);
+    };
+
+    void loadArenaStats();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [users]);
 
   const filteredUsers = users.filter(user => {
     const searchLower = searchQuery.toLowerCase();
@@ -53,6 +96,7 @@ export const UsersPage: React.FC = () => {
           type="text"
           className="input"
           placeholder="Поиск по имени, тегу или городу..."
+          aria-label="Поиск пользователей"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
           style={{ paddingLeft: '48px', height: '52px', fontSize: '16px', backgroundColor: '#1E1E1E', border: 'none', borderRadius: '16px' }}
@@ -99,7 +143,7 @@ export const UsersPage: React.FC = () => {
                   border: '2px solid rgba(255,255,255,0.1)'
                 }}>
                   {user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt={user.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                    <img src={user.avatarUrl} alt={`${user.firstName} ${user.lastName}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
                     <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#333' }}>
                       <UserIcon size={24} color="#888" />
@@ -118,6 +162,9 @@ export const UsersPage: React.FC = () => {
                     <span style={{ fontSize: '13px', color: 'var(--accent-color)' }}>@{user.telegramUsername}</span>
                     <span style={{ fontSize: '13px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <MapPin size={12} /> {user.region}
+                    </span>
+                    <span style={{ fontSize: '13px', color: 'var(--warning-color, #f4c95d)' }}>
+                      {arenaStatsByUserId[user.userId]?.rating ?? 1000} ELO
                     </span>
                   </div>
                 </div>

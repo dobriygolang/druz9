@@ -18,11 +18,6 @@ func (s *Service) FindUserByID(ctx context.Context, userID uuid.UUID) (*model.Us
 	return s.repo.FindUserByID(ctx, userID)
 }
 
-// DeleteUser deletes a user.
-func (s *Service) DeleteUser(ctx context.Context, userID uuid.UUID) error {
-	return s.repo.DeleteUser(ctx, userID)
-}
-
 // UpdateLocation updates user location.
 func (s *Service) UpdateLocation(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.ProfileResponse, error) {
 	user, err := s.repo.UpdateLocation(ctx, userID, req)

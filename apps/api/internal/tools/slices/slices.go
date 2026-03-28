@@ -88,6 +88,7 @@ func Unique[T comparable](s []T) []T {
 }
 
 // Contains reports whether v is present in s.
+// Uses O(n) linear search - for frequent lookups, consider using a map instead.
 func Contains[T comparable](s []T, v T) bool {
 	for _, elem := range s {
 		if elem == v {
@@ -95,4 +96,20 @@ func Contains[T comparable](s []T, v T) bool {
 		}
 	}
 	return false
+}
+
+// ContainsSet reports whether v is present in set.
+// Uses O(1) lookup - preferred for frequent lookups with pre-built set.
+func ContainsSet[T comparable](set map[T]struct{}, v T) bool {
+	_, ok := set[v]
+	return ok
+}
+
+// NewSet creates a set from slice for O(1) lookups.
+func NewSet[T comparable](s []T) map[T]struct{} {
+	set := make(map[T]struct{}, len(s))
+	for _, v := range s {
+		set[v] = struct{}{}
+	}
+	return set
 }

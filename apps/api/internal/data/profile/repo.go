@@ -184,6 +184,7 @@ func (r *Repo) UpdateLocation(ctx context.Context, userID uuid.UUID, req model.C
 }
 
 func (r *Repo) DeleteUser(ctx context.Context, userID uuid.UUID) error {
+	// Admin only - not used from frontend
 	tag, err := r.data.DB.Exec(ctx, `DELETE FROM users WHERE id = $1`, userID)
 	if err != nil {
 		return fmt.Errorf("delete user: %w", err)
@@ -340,7 +341,6 @@ func scanUser(scanner userScanner) (*model.User, error) {
 	user.LastName = valueOrEmpty(lastName)
 	user.AvatarURL = valueOrEmpty(avatarURL)
 	user.CurrentWorkplace = valueOrEmpty(currentWorkplace)
-	user.Region = valueOrEmpty(region)
 	user.Geo = scanGeo(region, country, city, latitude, longitude)
 	user.ActivityStatus = model.ResolveActivityStatus(user.LastActiveAt, time.Now().UTC())
 	return &user, nil

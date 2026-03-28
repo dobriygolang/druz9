@@ -7,8 +7,6 @@ import (
 
 	profileerrors "api/internal/errors/profile"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 // TelegramAuth authenticates user via Telegram payload.
@@ -30,24 +28,6 @@ func (s *Service) TelegramAuth(ctx context.Context, payload model.TelegramAuthPa
 	return &model.ProfileResponse{
 		User:                 user,
 		NeedsProfileComplete: user.Status == model.UserStatusPendingProfile,
-	}, rawToken, session.ExpiresAt, nil
-}
-
-// CompleteRegistrationWithSession completes registration and creates a session.
-func (s *Service) CompleteRegistrationWithSession(ctx context.Context, userID uuid.UUID, name string, req model.CompleteRegistrationRequest) (*model.ProfileResponse, string, time.Time, error) {
-	user, err := s.repo.CompleteRegistration(ctx, userID, req)
-	if err != nil {
-		return nil, "", time.Time{}, err
-	}
-
-	rawToken, session, err := s.NewSession(ctx, user.ID)
-	if err != nil {
-		return nil, "", time.Time{}, err
-	}
-
-	return &model.ProfileResponse{
-		User:                 user,
-		NeedsProfileComplete: false,
 	}, rawToken, session.ExpiresAt, nil
 }
 

@@ -30,6 +30,7 @@ type Config struct {
 type Settings struct {
 	BotToken            string
 	DevBypass           bool
+	DevUserID           string
 	CookieName          string
 	SessionTTL          time.Duration
 	SessionRefreshAfter time.Duration
@@ -50,7 +51,6 @@ type Repository interface {
 	UpdateProfile(ctx context.Context, userID uuid.UUID, name string) (*model.User, error)
 	CompleteRegistration(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error)
 	UpdateLocation(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error)
-	DeleteUser(ctx context.Context, userID uuid.UUID) error
 }
 
 // SessionStorage handles session management.
@@ -79,6 +79,11 @@ func (s *Service) CookieName() string {
 // DevBypass returns whether dev bypass is enabled.
 func (s *Service) DevBypass() bool {
 	return s.settings.DevBypass
+}
+
+// DevUserID returns the dev user ID for bypass mode.
+func (s *Service) DevUserID() string {
+	return s.settings.DevUserID
 }
 
 // BotToken returns the Telegram bot token.

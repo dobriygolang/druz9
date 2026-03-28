@@ -154,6 +154,10 @@ export const authApi = {
     const response = await apiClient.post('/api/v1/profile/auth/logout');
     profileByIdCache.clear();
     profileByIdPromises.clear();
+    // Clear auth token from localStorage on logout
+    if (typeof window !== 'undefined') {
+      localStorage.removeItem('authToken');
+    }
     return response.data;
   },
 };

@@ -108,6 +108,7 @@ export const CompleteRegistrationPage: React.FC = () => {
         <input
           className="input"
           placeholder="Например: Yandex, VK, freelance"
+          aria-label="Название компании"
           value={currentWorkplace}
           onChange={(event) => setCurrentWorkplace(event.target.value)}
           disabled={employmentMode !== 'working'}

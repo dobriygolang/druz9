@@ -7,8 +7,13 @@ type Bootstrap struct {
 	Data     *Data     `json:"data"`
 	Auth     *Auth     `json:"auth"`
 	Dev      *Dev      `json:"dev"`
+	Arena    *Arena    `json:"arena"`
 	External *External `json:"external"`
 	Metrics  *Metrics  `json:"metrics"`
+}
+
+type Arena struct {
+	RequireAuth bool `json:"require_auth"`
 }
 
 type Metrics struct {
@@ -30,6 +35,7 @@ type RateLimit struct {
 type Server struct {
 	HTTP           *HTTP           `json:"http"`
 	GRPC           *GRPC           `json:"grpc"`
+	SSE            *SSE            `json:"sse"`
 	RateLimit      *RateLimit      `json:"rate_limit"`
 	CircuitBreaker *CircuitBreaker `json:"circuit_breaker"`
 }
@@ -42,6 +48,10 @@ type HTTP struct {
 type GRPC struct {
 	Addr    string        `json:"addr"`
 	Timeout time.Duration `json:"timeout"`
+}
+
+type SSE struct {
+	Addr string `json:"addr"`
 }
 
 type Data struct {
@@ -66,7 +76,8 @@ type Auth struct {
 }
 
 type Dev struct {
-	AuthBypass bool `json:"auth_bypass"`
+	AuthBypass bool   `json:"auth_bypass"`
+	DevUserID  string `json:"dev_user_id"`
 }
 
 type Session struct {
@@ -83,7 +94,6 @@ type External struct {
 	Telegram *Telegram `json:"telegram"`
 	Geocoder *Geocoder `json:"geocoder"`
 	S3       *S3       `json:"s3"`
-	LiveKit  *LiveKit  `json:"livekit"`
 }
 
 type Telegram struct {
@@ -102,11 +112,4 @@ type S3 struct {
 	Bucket         string `json:"bucket"`
 	AccessKey      string `json:"access_key"`
 	SecretKey      string `json:"secret_key"`
-}
-
-type LiveKit struct {
-	URL       string `json:"url"`
-	PublicURL string `json:"public_url"`
-	APIKey    string `json:"api_key"`
-	APISecret string `json:"api_secret"`
 }

@@ -138,14 +138,14 @@
     },
     {
       "id": 8,
-      "title": "Dependencies UP (postgres/minio/livekit)",
+      "title": "Dependencies UP (postgres/minio)",
       "type": "timeseries",
       "gridPos": { "h": 5, "w": 18, "x": 6, "y": 24 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "up{job=~\"postgres|minio|livekit\"}",
+          "expr": "up{job=~\"postgres|minio\"}",
           "legendFormat": "{{job}} {{instance}}"
         }
       ],

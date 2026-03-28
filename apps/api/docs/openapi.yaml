@@ -6,6 +6,65 @@ info:
     title: ""
     version: 0.0.1
 paths:
+    /api/admin/code-editor/tasks:
+        post:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_CreateTask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.CreateTaskRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.TaskResponse'
+    /api/admin/code-editor/tasks/{taskId}:
+        put:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_UpdateTask
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.UpdateTaskRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.TaskResponse'
+        delete:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_DeleteTask
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.DeleteTaskResponse'
     /api/admin/podcasts:
         post:
             tags:
@@ -132,6 +191,319 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/admin.v1.AdminStatusResponse'
+    /api/v1/arena/leaderboard:
+        get:
+            tags:
+                - ArenaService
+            operationId: ArenaService_GetLeaderboard
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.GetLeaderboardResponse'
+    /api/v1/arena/matches:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_CreateMatch
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.CreateMatchRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaMatchResponse'
+    /api/v1/arena/matches/{matchId}:
+        get:
+            tags:
+                - ArenaService
+            operationId: ArenaService_GetMatch
+            parameters:
+                - name: matchId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaMatchResponse'
+    /api/v1/arena/matches/{matchId}/join:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_JoinMatch
+            parameters:
+                - name: matchId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.JoinMatchRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaMatchResponse'
+    /api/v1/arena/matches/{matchId}/submit:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_SubmitCode
+            parameters:
+                - name: matchId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.SubmitCodeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.SubmitCodeResponse'
+    /api/v1/code-editor/join:
+        post:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_JoinRoomByInviteCode
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.JoinRoomByInviteCodeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.JoinRoomResponse'
+    /api/v1/code-editor/leaderboard:
+        get:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_GetLeaderboard
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.GetLeaderboardResponse'
+    /api/v1/code-editor/rooms:
+        post:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_CreateRoom
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.CreateRoomRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.CreateRoomResponse'
+    /api/v1/code-editor/rooms/{roomId}:
+        get:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_GetRoom
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.GetRoomResponse'
+    /api/v1/code-editor/rooms/{roomId}/join:
+        post:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_JoinRoom
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.JoinRoomRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.JoinRoomResponse'
+    /api/v1/code-editor/rooms/{roomId}/leave:
+        post:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_LeaveRoom
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.LeaveRoomRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.LeaveRoomResponse'
+    /api/v1/code-editor/rooms/{roomId}/ready:
+        post:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_SetReady
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.SetReadyRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.SetReadyResponse'
+    /api/v1/code-editor/rooms/{roomId}/submissions:
+        get:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_GetSubmissions
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.GetSubmissionsResponse'
+    /api/v1/code-editor/rooms/{roomId}/submit:
+        post:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_SubmitCode
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.SubmitCodeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.SubmitCodeResponse'
+    /api/v1/code-editor/tasks:
+        get:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_ListTasks
+            parameters:
+                - name: topic
+                  in: query
+                  schema:
+                    type: string
+                - name: difficulty
+                  in: query
+                  schema:
+                    type: string
+                - name: includeInactive
+                  in: query
+                  schema:
+                    type: boolean
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.ListTasksResponse'
     /api/v1/events:
         get:
             tags:
@@ -559,167 +931,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/referral.v1.ReferralStatusResponse'
-    /api/v1/rooms:
-        get:
-            tags:
-                - RoomService
-            operationId: RoomService_ListRooms
-            parameters:
-                - name: limit
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-                - name: offset
-                  in: query
-                  schema:
-                    type: integer
-                    format: int32
-                - name: kind
-                  in: query
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/room.v1.ListRoomsResponse'
-        post:
-            tags:
-                - RoomService
-            operationId: RoomService_CreateRoom
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/room.v1.CreateRoomRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/room.v1.RoomResponse'
-    /api/v1/rooms/{roomId}:
-        get:
-            tags:
-                - RoomService
-            operationId: RoomService_GetRoom
-            parameters:
-                - name: roomId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/room.v1.RoomResponse'
-        delete:
-            tags:
-                - RoomService
-            operationId: RoomService_DeleteRoom
-            parameters:
-                - name: roomId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/room.v1.RoomStatusResponse'
-        patch:
-            tags:
-                - RoomService
-            operationId: RoomService_UpdateRoom
-            parameters:
-                - name: roomId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/room.v1.UpdateRoomRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/room.v1.RoomResponse'
-    /api/v1/rooms/{roomId}/join-token:
-        get:
-            tags:
-                - RoomService
-            operationId: RoomService_JoinRoomToken
-            parameters:
-                - name: roomId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/room.v1.JoinRoomTokenResponse'
-    /api/v1/rooms/{roomId}/media-state:
-        get:
-            tags:
-                - RoomService
-            operationId: RoomService_GetRoomMediaState
-            parameters:
-                - name: roomId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/room.v1.RoomMediaStateResponse'
-        put:
-            tags:
-                - RoomService
-            operationId: RoomService_UpsertRoomMediaState
-            parameters:
-                - name: roomId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/room.v1.UpsertRoomMediaStateRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/room.v1.RoomMediaStateResponse'
 components:
     schemas:
         admin.v1.AdminStatusResponse:
@@ -727,6 +938,572 @@ components:
             properties:
                 status:
                     type: string
+        arena.v1.ArenaLeaderboardEntry:
+            type: object
+            properties:
+                userId:
+                    type: string
+                displayName:
+                    type: string
+                wins:
+                    type: integer
+                    format: int32
+                matches:
+                    type: integer
+                    format: int32
+                winRate:
+                    type: number
+                    format: double
+                bestRuntime:
+                    type: string
+                rating:
+                    type: integer
+                    format: int32
+                league:
+                    type: string
+                losses:
+                    type: integer
+                    format: int32
+        arena.v1.ArenaMatch:
+            type: object
+            properties:
+                id:
+                    type: string
+                taskId:
+                    type: string
+                taskTitle:
+                    type: string
+                taskStatement:
+                    type: string
+                starterCode:
+                    type: string
+                topic:
+                    type: string
+                difficulty:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                durationSeconds:
+                    type: integer
+                    format: int32
+                obfuscateOpponent:
+                    type: boolean
+                winnerUserId:
+                    type: string
+                winnerReason:
+                    type: string
+                startedAt:
+                    type: string
+                    format: date-time
+                finishedAt:
+                    type: string
+                    format: date-time
+                createdAt:
+                    type: string
+                    format: date-time
+                players:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/arena.v1.ArenaPlayer'
+                isRated:
+                    type: boolean
+                unratedReason:
+                    type: string
+                antiCheatEnabled:
+                    type: boolean
+        arena.v1.ArenaMatchResponse:
+            type: object
+            properties:
+                match:
+                    $ref: '#/components/schemas/arena.v1.ArenaMatch'
+        arena.v1.ArenaPlayer:
+            type: object
+            properties:
+                userId:
+                    type: string
+                displayName:
+                    type: string
+                side:
+                    type: string
+                isCreator:
+                    type: boolean
+                freezeUntil:
+                    type: string
+                    format: date-time
+                acceptedAt:
+                    type: string
+                    format: date-time
+                bestRuntimeMs:
+                    type: string
+                isWinner:
+                    type: boolean
+                joinedAt:
+                    type: string
+                    format: date-time
+                currentCode:
+                    type: string
+        arena.v1.CreateMatchRequest:
+            type: object
+            properties:
+                topic:
+                    type: string
+                difficulty:
+                    type: string
+                obfuscateOpponent:
+                    type: boolean
+        arena.v1.GetLeaderboardResponse:
+            type: object
+            properties:
+                entries:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/arena.v1.ArenaLeaderboardEntry'
+        arena.v1.JoinMatchRequest:
+            type: object
+            properties:
+                matchId:
+                    type: string
+        arena.v1.SubmitCodeRequest:
+            type: object
+            properties:
+                matchId:
+                    type: string
+                code:
+                    type: string
+        arena.v1.SubmitCodeResponse:
+            type: object
+            properties:
+                output:
+                    type: string
+                error:
+                    type: string
+                isCorrect:
+                    type: boolean
+                passedCount:
+                    type: integer
+                    format: int32
+                totalCount:
+                    type: integer
+                    format: int32
+                runtimeMs:
+                    type: string
+                freezeUntil:
+                    type: string
+                    format: date-time
+                match:
+                    $ref: '#/components/schemas/arena.v1.ArenaMatch'
+        code_editor.v1.CreateRoomRequest:
+            type: object
+            properties:
+                mode:
+                    type: integer
+                    format: enum
+                task:
+                    type: string
+                name:
+                    type: string
+                topic:
+                    type: string
+                difficulty:
+                    type: string
+        code_editor.v1.CreateRoomResponse:
+            type: object
+            properties:
+                room:
+                    $ref: '#/components/schemas/code_editor.v1.Room'
+                inviteCode:
+                    type: string
+        code_editor.v1.CreateTaskRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+                slug:
+                    type: string
+                statement:
+                    type: string
+                difficulty:
+                    type: string
+                topics:
+                    type: array
+                    items:
+                        type: string
+                starterCode:
+                    type: string
+                language:
+                    type: string
+                isActive:
+                    type: boolean
+                publicTestCases:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.TaskTestCase'
+                hiddenTestCases:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.TaskTestCase'
+                taskType:
+                    type: string
+                executionProfile:
+                    type: string
+                fixtureFiles:
+                    type: array
+                    items:
+                        type: string
+                readablePaths:
+                    type: array
+                    items:
+                        type: string
+                writablePaths:
+                    type: array
+                    items:
+                        type: string
+                allowedHosts:
+                    type: array
+                    items:
+                        type: string
+                allowedPorts:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                mockEndpoints:
+                    type: array
+                    items:
+                        type: string
+                writableTempDir:
+                    type: boolean
+        code_editor.v1.DeleteTaskResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        code_editor.v1.GetLeaderboardResponse:
+            type: object
+            properties:
+                entries:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.LeaderboardEntry'
+        code_editor.v1.GetRoomResponse:
+            type: object
+            properties:
+                room:
+                    $ref: '#/components/schemas/code_editor.v1.Room'
+        code_editor.v1.GetSubmissionsResponse:
+            type: object
+            properties:
+                submissions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.Submission'
+        code_editor.v1.JoinRoomByInviteCodeRequest:
+            type: object
+            properties:
+                inviteCode:
+                    type: string
+                name:
+                    type: string
+        code_editor.v1.JoinRoomRequest:
+            type: object
+            properties:
+                roomId:
+                    type: string
+                name:
+                    type: string
+        code_editor.v1.JoinRoomResponse:
+            type: object
+            properties:
+                room:
+                    $ref: '#/components/schemas/code_editor.v1.Room'
+        code_editor.v1.LeaderboardEntry:
+            type: object
+            properties:
+                userId:
+                    type: string
+                displayName:
+                    type: string
+                wins:
+                    type: integer
+                    format: int32
+                matches:
+                    type: integer
+                    format: int32
+                winRate:
+                    type: number
+                    format: double
+                bestSolveMs:
+                    type: string
+        code_editor.v1.LeaveRoomRequest:
+            type: object
+            properties:
+                roomId:
+                    type: string
+        code_editor.v1.LeaveRoomResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        code_editor.v1.ListTasksResponse:
+            type: object
+            properties:
+                tasks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.Task'
+        code_editor.v1.Participant:
+            type: object
+            properties:
+                userId:
+                    type: string
+                name:
+                    type: string
+                isGuest:
+                    type: boolean
+                isReady:
+                    type: boolean
+                isWinner:
+                    type: boolean
+                joinedAt:
+                    type: string
+                    format: date-time
+        code_editor.v1.Room:
+            type: object
+            properties:
+                id:
+                    type: string
+                mode:
+                    type: integer
+                    format: enum
+                code:
+                    type: string
+                status:
+                    type: integer
+                    format: enum
+                inviteCode:
+                    type: string
+                task:
+                    type: string
+                createdAt:
+                    type: string
+                    format: date-time
+                participants:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.Participant'
+                taskId:
+                    type: string
+                codeRevision:
+                    type: string
+        code_editor.v1.SetReadyRequest:
+            type: object
+            properties:
+                roomId:
+                    type: string
+                ready:
+                    type: boolean
+        code_editor.v1.SetReadyResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        code_editor.v1.Submission:
+            type: object
+            properties:
+                id:
+                    type: string
+                userId:
+                    type: string
+                guestName:
+                    type: string
+                code:
+                    type: string
+                output:
+                    type: string
+                error:
+                    type: string
+                submittedAt:
+                    type: string
+                    format: date-time
+                durationMs:
+                    type: string
+                isCorrect:
+                    type: boolean
+                passedCount:
+                    type: integer
+                    format: int32
+                totalCount:
+                    type: integer
+                    format: int32
+        code_editor.v1.SubmitCodeRequest:
+            type: object
+            properties:
+                roomId:
+                    type: string
+                code:
+                    type: string
+        code_editor.v1.SubmitCodeResponse:
+            type: object
+            properties:
+                output:
+                    type: string
+                error:
+                    type: string
+                isCorrect:
+                    type: boolean
+        code_editor.v1.Task:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                slug:
+                    type: string
+                statement:
+                    type: string
+                difficulty:
+                    type: string
+                topics:
+                    type: array
+                    items:
+                        type: string
+                starterCode:
+                    type: string
+                language:
+                    type: string
+                isActive:
+                    type: boolean
+                publicTestCases:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.TaskTestCase'
+                hiddenTestCases:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.TaskTestCase'
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+                taskType:
+                    type: string
+                executionProfile:
+                    type: string
+                fixtureFiles:
+                    type: array
+                    items:
+                        type: string
+                readablePaths:
+                    type: array
+                    items:
+                        type: string
+                writablePaths:
+                    type: array
+                    items:
+                        type: string
+                allowedHosts:
+                    type: array
+                    items:
+                        type: string
+                allowedPorts:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                mockEndpoints:
+                    type: array
+                    items:
+                        type: string
+                writableTempDir:
+                    type: boolean
+        code_editor.v1.TaskResponse:
+            type: object
+            properties:
+                task:
+                    $ref: '#/components/schemas/code_editor.v1.Task'
+        code_editor.v1.TaskTestCase:
+            type: object
+            properties:
+                id:
+                    type: string
+                input:
+                    type: string
+                expectedOutput:
+                    type: string
+                isPublic:
+                    type: boolean
+                weight:
+                    type: integer
+                    format: int32
+                order:
+                    type: integer
+                    format: int32
+        code_editor.v1.UpdateTaskRequest:
+            type: object
+            properties:
+                taskId:
+                    type: string
+                title:
+                    type: string
+                slug:
+                    type: string
+                statement:
+                    type: string
+                difficulty:
+                    type: string
+                topics:
+                    type: array
+                    items:
+                        type: string
+                starterCode:
+                    type: string
+                language:
+                    type: string
+                isActive:
+                    type: boolean
+                publicTestCases:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.TaskTestCase'
+                hiddenTestCases:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.TaskTestCase'
+                taskType:
+                    type: string
+                executionProfile:
+                    type: string
+                fixtureFiles:
+                    type: array
+                    items:
+                        type: string
+                readablePaths:
+                    type: array
+                    items:
+                        type: string
+                writablePaths:
+                    type: array
+                    items:
+                        type: string
+                allowedHosts:
+                    type: array
+                    items:
+                        type: string
+                allowedPorts:
+                    type: array
+                    items:
+                        type: integer
+                        format: int32
+                mockEndpoints:
+                    type: array
+                    items:
+                        type: string
+                writableTempDir:
+                    type: boolean
         event.v1.CreateEventRequest:
             type: object
             properties:
@@ -1277,168 +2054,12 @@ components:
                     type: string
                 employmentType:
                     type: string
-        room.v1.CreateRoomRequest:
-            type: object
-            properties:
-                title:
-                    type: string
-                kind:
-                    type: string
-                description:
-                    type: string
-                isPrivate:
-                    type: boolean
-                mediaUrl:
-                    type: string
-        room.v1.JoinRoomTokenResponse:
-            type: object
-            properties:
-                accessToken:
-                    type: string
-                provider:
-                    type: string
-                room:
-                    $ref: '#/components/schemas/room.v1.Room'
-                serverUrl:
-                    type: string
-        room.v1.ListRoomsResponse:
-            type: object
-            properties:
-                rooms:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/room.v1.Room'
-                limit:
-                    type: integer
-                    format: int32
-                offset:
-                    type: integer
-                    format: int32
-                totalCount:
-                    type: integer
-                    format: int32
-                hasNextPage:
-                    type: boolean
-        room.v1.Room:
-            type: object
-            properties:
-                id:
-                    type: string
-                title:
-                    type: string
-                kind:
-                    type: string
-                description:
-                    type: string
-                isPrivate:
-                    type: boolean
-                creatorId:
-                    type: string
-                creatorName:
-                    type: string
-                memberCount:
-                    type: integer
-                    format: int32
-                isJoined:
-                    type: boolean
-                isOwner:
-                    type: boolean
-                createdAt:
-                    type: string
-                    format: date-time
-                updatedAt:
-                    type: string
-                    format: date-time
-                participants:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/room.v1.RoomParticipant'
-                mediaState:
-                    $ref: '#/components/schemas/room.v1.RoomMediaState'
-        room.v1.RoomMediaState:
-            type: object
-            properties:
-                roomId:
-                    type: string
-                mediaUrl:
-                    type: string
-                paused:
-                    type: boolean
-                currentTimeSeconds:
-                    type: integer
-                    format: int32
-                updatedBy:
-                    type: string
-                updatedByName:
-                    type: string
-                updatedAt:
-                    type: string
-                    format: date-time
-        room.v1.RoomMediaStateResponse:
-            type: object
-            properties:
-                mediaState:
-                    $ref: '#/components/schemas/room.v1.RoomMediaState'
-        room.v1.RoomParticipant:
-            type: object
-            properties:
-                userId:
-                    type: string
-                title:
-                    type: string
-                avatarUrl:
-                    type: string
-                telegramUsername:
-                    type: string
-                firstName:
-                    type: string
-                lastName:
-                    type: string
-                isCurrentUser:
-                    type: boolean
-                joinedAt:
-                    type: string
-                    format: date-time
-        room.v1.RoomResponse:
-            type: object
-            properties:
-                room:
-                    $ref: '#/components/schemas/room.v1.Room'
-        room.v1.RoomStatusResponse:
-            type: object
-            properties:
-                status:
-                    type: string
-        room.v1.UpdateRoomRequest:
-            type: object
-            properties:
-                roomId:
-                    type: string
-                title:
-                    type: string
-                description:
-                    type: string
-                isPrivate:
-                    type: boolean
-                mediaUrl:
-                    type: string
-        room.v1.UpsertRoomMediaStateRequest:
-            type: object
-            properties:
-                roomId:
-                    type: string
-                mediaUrl:
-                    type: string
-                paused:
-                    type: boolean
-                currentTimeSeconds:
-                    type: integer
-                    format: int32
 tags:
     - name: AdminService
+    - name: ArenaService
+    - name: CodeEditorService
     - name: EventService
     - name: GeoService
     - name: PodcastService
     - name: ProfileService
     - name: ReferralService
-    - name: RoomService

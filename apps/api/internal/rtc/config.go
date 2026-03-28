@@ -3,6 +3,8 @@
 package rtc
 
 const (
+	// Require authentication for arena endpoints
+	ArenaRequireAuth Key = "arena_require_auth"
 	// Session cookie domain
 	CookieDomain Key = "cookie_domain"
 	// Session cookie same-site policy
@@ -23,20 +25,14 @@ const (
 	DatabaseUrl Key = "database_url"
 	// Allow local auth bypass
 	DevAuthBypass Key = "dev_auth_bypass"
+	// Dev user ID for bypass mode
+	DevUserId Key = "dev_user_id"
 	// Geocoder base URL
 	GeocoderBaseUrl Key = "geocoder_base_url"
 	// Preferred geocoder languages
 	GeocoderLanguage Key = "geocoder_language"
 	// Geocoder user-agent
 	GeocoderUserAgent Key = "geocoder_user_agent"
-	// LiveKit API key
-	LivekitApiKey Key = "livekit_api_key"
-	// LiveKit API secret
-	LivekitApiSecret Key = "livekit_api_secret"
-	// Public LiveKit URL override
-	LivekitPublicUrl Key = "livekit_public_url"
-	// Internal LiveKit URL
-	LivekitUrl Key = "livekit_url"
 	// Metrics and pprof listen address
 	MetricsAddr Key = "metrics_addr"
 	// S3 access key

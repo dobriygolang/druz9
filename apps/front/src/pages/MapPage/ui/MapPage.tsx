@@ -1,10 +1,11 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import Map, { Marker } from 'react-map-gl/maplibre';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import Map, { Marker, MapRef } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
 
 import {
   CommunityEvent,
   CommunityMapPoint,
+  CreateEventPayload,
 } from '@/entities/User/model/types';
 import { eventApi } from '@/features/Event/api/eventApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
@@ -14,7 +15,6 @@ import { UserCluster, EventDraft } from '../components/types';
 import { UserMarker, ClusterMarker, EventMarker } from '../components/MapMarker';
 import { UserDetailCard, EventDetailCard } from '../components/MapOverlayCards';
 import { FullEventOverlay } from '@/shared/ui/FullEventOverlay/FullEventOverlay';
-import { EventForm } from '@/shared/ui/EventForm/EventForm';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 type ViewState = {
@@ -83,18 +83,9 @@ function buildUserClusters(points: CommunityMapPoint[], zoom: number): UserClust
   });
 }
 
-function buildDefaultScheduledAt() {
-  const date = new Date(Date.now() + 60 * 60 * 1000);
-  const year = date.getFullYear();
-  const month = String(date.getMonth() + 1).padStart(2, '0');
-  const day = String(date.getDate()).padStart(2, '0');
-  const hours = String(date.getHours()).padStart(2, '0');
-  const minutes = String(date.getMinutes()).padStart(2, '0');
-  return `${year}-${month}-${day}T${hours}:${minutes}`;
-}
-
 export const MapPage: React.FC = () => {
   const isMobile = useIsMobile();
+  const mapRef = useRef<MapRef | null>(null);
   const [points, setPoints] = useState<CommunityMapPoint[]>([]);
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -114,27 +105,32 @@ export const MapPage: React.FC = () => {
   const [fullEventId, setFullEventId] = useState<string | null>(null);
   const [inviteSearchQuery, setInviteSearchQuery] = useState('');
 
+  // Use ref to avoid stale closure in interval
+  const loadDataRef = useRef<{ (initial?: boolean): Promise<void> } | null>(null);
+
+  const loadData = async (initial = false) => {
+    try {
+      if (initial) setIsLoading(true);
+      const [p, e] = await Promise.all([
+        geoApi.communityMap(),
+        eventApi.list(),
+      ]);
+      setPoints(p);
+      setEvents(e);
+      if (initial) setViewState(buildViewState(p, e));
+    } catch (err) {
+      if (initial) setError('Не удалось загрузить данные сообщества');
+      console.error(err);
+    } finally {
+      if (initial) setIsLoading(false);
+    }
+  };
+
+  loadDataRef.current = loadData;
+
   useEffect(() => {
-    const load = async (initial = false) => {
-      try {
-        if (initial) setIsLoading(true);
-        const [p, e] = await Promise.all([
-          geoApi.communityMap(),
-          eventApi.list(),
-        ]);
-        setPoints(p);
-        setEvents(e);
-        if (initial) setViewState(buildViewState(p, e));
-      } catch (err) {
-        if (initial) setError('Не удалось загрузить данные сообщества');
-        console.error(err);
-      } finally {
-        if (initial) setIsLoading(false);
-      }
-    };
-    
-    void load(true);
-    const interval = setInterval(() => void load(false), 30000);
+    void loadData(true);
+    const interval = setInterval(() => loadDataRef.current?.(false), 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -144,79 +140,46 @@ export const MapPage: React.FC = () => {
   const selectedUser = useMemo(() => visibleUserPoints.find(p => p.userId === selectedUserId), [visibleUserPoints, selectedUserId]);
   const selectedEvent = useMemo(() => events.find(e => e.id === selectedEventId), [events, selectedEventId]);
 
-  const handleMapClick = (event: { lngLat: { lng: number; lat: number } }) => {
+  const focusMap = (longitude: number, latitude: number, zoom = 9.5) => {
+    const nextZoom = Math.max(viewState.zoom, zoom);
+    setViewState((current) => ({
+      ...current,
+      longitude,
+      latitude,
+      zoom: nextZoom,
+    }));
+    mapRef.current?.flyTo({
+      center: [longitude, latitude],
+      zoom: nextZoom,
+      duration: 900,
+      essential: true,
+    });
+  };
+
+  const handleMapClick = () => {
     setSelectedUserId(null);
     setSelectedEventId(null);
+    setDraftEvent(null);
     setIsEditingEvent(false);
     setFullEventId(null);
     setEventError('');
     setEventFieldErrors({});
     setInviteSearchQuery('');
-
-    const lat = Number(event.lngLat.lat.toFixed(6));
-    const lng = Number(event.lngLat.lng.toFixed(6));
-
-    setDraftEvent({
-      latitude: lat,
-      longitude: lng,
-      title: '',
-      description: '',
-      meeting_link: '',
-      place_label: `Точка на карте • ${lat.toFixed(4)}, ${lng.toFixed(4)}`,
-      region: '',
-      country: '',
-      city: '',
-      scheduled_at: buildDefaultScheduledAt(),
-      invited_user_ids: [],
-    });
   };
 
-  const handleCreateEvent = async () => {
-    if (!draftEvent) {
-      return;
-    }
-
-    const nextFieldErrors: {
-      title?: string;
-      scheduledAt?: string;
-      meetingLink?: string;
-    } = {};
-
-    if (!draftEvent.title.trim()) {
-      nextFieldErrors.title = 'Введите название';
-    }
-    if (!draftEvent.scheduled_at) {
-      nextFieldErrors.scheduledAt = 'Укажите дату и время';
-    }
-    if (
-      draftEvent.meeting_link.trim() &&
-      !/^https?:\/\//i.test(draftEvent.meeting_link.trim())
-    ) {
-      nextFieldErrors.meetingLink =
-        'Ссылка должна начинаться с http:// или https://';
-    }
-
-    if (Object.keys(nextFieldErrors).length > 0) {
-      setEventFieldErrors(nextFieldErrors);
-      setEventError('');
-      return;
-    }
-
-    setIsSavingEvent(true);
-    setEventError('');
-    setEventFieldErrors({});
-    try {
-      const created = await eventApi.create({ ...draftEvent, title: draftEvent.title.trim() } as any);
-      setEvents(curr => [...curr, created]);
-      setDraftEvent(null);
-      setSelectedEventId(created.id);
-    } catch (err) {
-      setEventError('Не удалось создать событие');
-      console.error(err);
-    } finally {
-      setIsSavingEvent(false);
-    }
-  };
+  const toEventPayload = (draft: EventDraft): CreateEventPayload => ({
+    title: draft.title,
+    description: draft.description,
+    meeting_link: draft.meeting_link,
+    place_label: draft.place_label,
+    region: draft.region,
+    country: draft.country,
+    city: draft.city,
+    latitude: draft.latitude ?? 0,
+    longitude: draft.longitude ?? 0,
+    scheduled_at: draft.scheduled_at,
+    invited_user_ids: draft.invited_user_ids,
+  });
 
   const handleUpdateEvent = async (updatedDraft: EventDraft) => {
     if (!selectedEvent) return;
@@ -251,7 +214,7 @@ export const MapPage: React.FC = () => {
     setEventError('');
     setEventFieldErrors({});
     try {
-      const updated = await eventApi.update(selectedEvent.id, { ...updatedDraft, title: updatedDraft.title.trim() } as any);
+      const updated = await eventApi.update(selectedEvent.id, toEventPayload({ ...updatedDraft, title: updatedDraft.title.trim() }));
       setEvents(curr => curr.map(e => e.id === updated.id ? updated : e));
       setIsEditingEvent(false);
     } catch (err) {
@@ -291,7 +254,7 @@ export const MapPage: React.FC = () => {
       <div>
         <h1 style={{ fontSize: '28px', marginBottom: '12px', fontWeight: '600' }}>Карта сообщества</h1>
         <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-          Находите пользователей и события по всему миру. Создание событий доступно кликом по карте или во вкладке «События».
+          Находите пользователей и события по всему миру. Создавать новые события можно во вкладке «События».
         </p>
       </div>
 
@@ -305,34 +268,6 @@ export const MapPage: React.FC = () => {
             <div style={{ fontWeight: 600 }}>{events.length}</div>
           </div>
         </div>
-
-        {draftEvent && !selectedEventId && (
-          <div style={{
-            position: 'absolute',
-            top: '88px',
-            right: '16px',
-            zIndex: 10,
-            width: 'min(380px, calc(100% - 32px))',
-            maxHeight: 'calc(100% - 104px)',
-            overflowY: 'auto',
-            borderRadius: '16px',
-            scrollbarWidth: 'none',
-          }} className="hide-scrollbar">
-            <EventForm
-              title="Новое событие"
-              draft={draftEvent}
-              setDraft={setDraftEvent}
-              onClose={() => setDraftEvent(null)}
-              onSubmit={handleCreateEvent}
-              isSaving={isSavingEvent}
-              error={eventError}
-              fieldErrors={eventFieldErrors}
-              users={points}
-              inviteSearchQuery={inviteSearchQuery}
-              setInviteSearchQuery={setInviteSearchQuery}
-            />
-          </div>
-        )}
 
         {selectedUser && <UserDetailCard user={selectedUser} onClose={() => setSelectedUserId(null)} />}
         {selectedEvent && (
@@ -349,6 +284,7 @@ export const MapPage: React.FC = () => {
             onJoinToggle={handleJoinToggle}
             isSaving={isSavingEvent}
             error={eventError}
+            fieldErrors={eventFieldErrors}
             users={points}
             inviteSearchQuery={inviteSearchQuery}
             setInviteSearchQuery={setInviteSearchQuery}
@@ -356,6 +292,7 @@ export const MapPage: React.FC = () => {
         )}
 
         <Map
+          ref={mapRef}
           {...viewState}
           onMove={(e) => setViewState(e.viewState)}
           onClick={handleMapClick}
@@ -366,21 +303,21 @@ export const MapPage: React.FC = () => {
         >
           {userClusters.map((cluster) => (
             <Marker key={cluster.id} longitude={cluster.longitude} latitude={cluster.latitude} anchor="bottom">
-              <button type="button" onClick={(e) => { e.stopPropagation(); setViewState({ ...viewState, zoom: viewState.zoom + 2, longitude: cluster.longitude, latitude: cluster.latitude }); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
+              <button type="button" onClick={(e) => { e.stopPropagation(); focusMap(cluster.longitude, cluster.latitude, viewState.zoom + 2); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
                 <ClusterMarker cluster={cluster} />
               </button>
             </Marker>
           ))}
           {visibleUserPoints.map((p) => (
             <Marker key={p.userId} longitude={p.displayLongitude} latitude={p.displayLatitude} anchor="bottom">
-              <button type="button" onClick={(e) => { e.stopPropagation(); setSelectedUserId(p.userId); setSelectedEventId(null); setDraftEvent(null); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
+              <button type="button" onClick={(e) => { e.stopPropagation(); setSelectedUserId(p.userId); setSelectedEventId(null); setDraftEvent(null); setIsEditingEvent(false); focusMap(p.longitude, p.latitude); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
                 <UserMarker point={p} />
               </button>
             </Marker>
           ))}
           {displayEvents.map((e) => (
             <Marker key={e.id} longitude={e.displayLongitude} latitude={e.displayLatitude} anchor="bottom">
-              <button type="button" onClick={(ev) => { ev.stopPropagation(); setSelectedEventId(e.id); setSelectedUserId(null); setDraftEvent(null); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
+              <button type="button" onClick={(ev) => { ev.stopPropagation(); setSelectedEventId(e.id); setSelectedUserId(null); setIsEditingEvent(false); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
                 <EventMarker event={e} />
               </button>
             </Marker>

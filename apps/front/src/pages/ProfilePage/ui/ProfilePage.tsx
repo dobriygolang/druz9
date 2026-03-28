@@ -5,6 +5,8 @@ import { ArrowLeft, CheckCircle, MapPin, Pencil, Briefcase, Shield, X } from 'lu
 import { useAuth } from '@/app/providers/AuthProvider';
 import { User } from '@/entities/User/model/types';
 import { authApi } from '@/features/Auth/api/authApi';
+import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
+import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
 import { LocationPicker } from '@/features/Geo/ui/LocationPicker';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
@@ -18,6 +20,7 @@ export const ProfilePage: React.FC = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [newWorkplace, setNewWorkplace] = useState(currentUser?.currentWorkplace || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [arenaStats, setArenaStats] = useState<ArenaPlayerStats | null>(null);
 
   useEffect(() => {
     if (!userId) {
@@ -50,6 +53,18 @@ export const ProfilePage: React.FC = () => {
 
     void loadProfile();
   }, [currentUser, userId]);
+
+  useEffect(() => {
+    const targetUserId = userId || currentUser?.id;
+    if (!targetUserId) {
+      return;
+    }
+    codeRoomApi.getArenaStats(targetUserId)
+      .then(setArenaStats)
+      .catch((statsError) => {
+        console.error('Failed to load arena stats', statsError);
+      });
+  }, [currentUser?.id, userId]);
 
   if (isLoading) {
     return <div className="fade-in">Загрузка профиля...</div>;
@@ -120,6 +135,36 @@ export const ProfilePage: React.FC = () => {
           </button>
         )}
       </div>
+
+      {arenaStats && (
+        <div
+          className="card"
+          style={{
+            marginBottom: '24px',
+            display: 'grid',
+            gap: '14px',
+          }}
+        >
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: '12px', flexWrap: 'wrap' }}>
+            <h3 style={{ margin: 0 }}>Arena рейтинг</h3>
+            <div style={{ display: 'flex', gap: '10px', flexWrap: 'wrap' }}>
+              <span style={{ padding: '8px 12px', borderRadius: '999px', background: 'rgba(245, 158, 11, 0.12)', color: '#F59E0B', fontWeight: 700 }}>
+                {arenaStats.rating} ELO
+              </span>
+              <span style={{ padding: '8px 12px', borderRadius: '999px', background: 'rgba(79, 70, 229, 0.12)', color: 'var(--accent-color)', fontWeight: 700 }}>
+                {arenaStats.league}
+              </span>
+            </div>
+          </div>
+          <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap', color: 'var(--text-secondary)' }}>
+            <span>{arenaStats.matches} матчей</span>
+            <span>{arenaStats.wins} побед</span>
+            <span>{arenaStats.losses} поражений</span>
+            <span>{Math.round(arenaStats.winRate * 100)}% win rate</span>
+            <span>best {arenaStats.bestRuntime > 0 ? `${Math.round(arenaStats.bestRuntime / 1000)}с` : '—'}</span>
+          </div>
+        </div>
+      )}
 
       {/* Profile Header Card */}
       <div
@@ -358,9 +403,10 @@ export const ProfilePage: React.FC = () => {
                 <Briefcase size={18} /> Место работы
               </h3>
               <form onSubmit={handleUpdateWorkplace} style={{ display: 'flex', gap: '12px' }}>
-                <input 
+                <input
                   className="input"
                   placeholder="Компания или проект..."
+                  aria-label="Название компании"
                   value={newWorkplace}
                   onChange={e => setNewWorkplace(e.target.value)}
                   style={{ flex: 1 }}

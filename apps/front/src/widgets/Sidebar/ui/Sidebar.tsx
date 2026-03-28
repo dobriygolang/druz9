@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Video } from 'lucide-react';
+import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Code2, ArrowRight } from 'lucide-react';
 import { geoApi } from '@/features/Geo/api/geoApi';
+import { CommunityMapPoint } from '@/entities/User/model/types';
 
 export const Sidebar: React.FC = () => {
-  const { logout } = useAuth();
+  const { logout, isAuthenticated } = useAuth();
   const [userCount, setUserCount] = useState<number | null>(null);
-  const [points, setPoints] = useState<any[]>([]);
+  const [points, setPoints] = useState<CommunityMapPoint[]>([]);
+
+  const fetchPointsRef = useRef<() => void>(() => {});
 
   useEffect(() => {
     const fetchPoints = () => {
@@ -19,8 +22,9 @@ export const Sidebar: React.FC = () => {
         .catch(err => console.error('Failed to fetch user count', err));
     };
 
+    fetchPointsRef.current = fetchPoints;
     fetchPoints();
-    const interval = setInterval(fetchPoints, 30000);
+    const interval = setInterval(() => fetchPointsRef.current(), 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -47,54 +51,105 @@ export const Sidebar: React.FC = () => {
       </div>
 
       <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
-        <NavItem to="/feed" icon={<Compass size={20} />} label="Подкаст" />
-        <NavItem to="/users" icon={<Users size={20} />} label="Пользователи" />
-        <NavItem to="/events" icon={<Calendar size={20} />} label="Ивент" />
-        <NavItem to="/vacancies" icon={<Briefcase size={20} />} label="Вакансии" />
-        <NavItem to="/rooms" icon={<Video size={20} />} label="Комнаты" />
-        <NavItem to="/map" icon={<MapPin size={20} />} label="Карта" />
-        <div style={{ height: '32px' }} />
-        <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" />
+        <NavItem to="/code-rooms" icon={<Code2 size={20} />} label="Код" />
+        {isAuthenticated ? (
+          <>
+            <NavItem to="/feed" icon={<Compass size={20} />} label="Подкаст" />
+            <NavItem to="/users" icon={<Users size={20} />} label="Пользователи" />
+            <NavItem to="/events" icon={<Calendar size={20} />} label="Ивент" />
+            <NavItem to="/vacancies" icon={<Briefcase size={20} />} label="Вакансии" />
+            <NavItem to="/map" icon={<MapPin size={20} />} label="Карта" />
+            <div style={{ height: '32px' }} />
+            <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" />
+          </>
+        ) : (
+          <>
+            <div
+              style={{
+                marginTop: '12px',
+                padding: '16px',
+                borderRadius: '18px',
+                border: '1px solid rgba(255,255,255,0.08)',
+                background: 'linear-gradient(180deg, rgba(93, 76, 229, 0.16) 0%, rgba(255,255,255,0.04) 100%)',
+                display: 'flex',
+                flexDirection: 'column',
+                gap: '12px',
+              }}
+            >
+              <div style={{ fontSize: '16px', fontWeight: 700, color: 'var(--text-primary)', lineHeight: 1.3 }}>
+                Зарегистрируйся и попади в рейтинг arena
+              </div>
+              <div style={{ fontSize: '13px', color: 'var(--text-secondary)', lineHeight: 1.5 }}>
+                Сохраняй ELO, попадай в лидерборд, открывай профиль и играй без гостевых ограничений.
+              </div>
+              <NavLink
+                to="/login"
+                style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  gap: '8px',
+                  minHeight: '44px',
+                  padding: '0 14px',
+                  borderRadius: '12px',
+                  textDecoration: 'none',
+                  background: 'var(--accent-color)',
+                  color: '#fff',
+                  fontWeight: 600,
+                  fontSize: '14px',
+                }}
+              >
+                <span>Войти и зарегистрироваться</span>
+                <ArrowRight size={16} />
+              </NavLink>
+            </div>
+            <div style={{ height: '20px' }} />
+            <NavItem to="/login" icon={<UserIcon size={20} />} label="Войти" />
+          </>
+        )}
       </nav>
 
-      <div style={{ marginTop: 'auto', paddingTop: '24px' }}>
-        <button
-          onClick={logout}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'flex-start',
-            gap: '12px',
-            color: 'var(--text-secondary)',
-            background: 'transparent',
-            border: 'none',
-            padding: '12px',
-            cursor: 'pointer',
-            width: '100%',
-            minHeight: '44px',
-            borderRadius: '12px',
-            textAlign: 'left',
-            fontSize: '14px',
-            fontWeight: '500',
-            lineHeight: 1.2,
-            transition: 'transform 0.2s, background-color 0.2s, color 0.2s',
-            appearance: 'none',
-          }}
-          onMouseOver={(e) => {
-            e.currentTarget.style.backgroundColor = 'var(--surface-color)';
-            e.currentTarget.style.color = 'var(--text-primary)';
-            e.currentTarget.style.transform = 'translateY(-1px)';
-          }}
-          onMouseOut={(e) => {
-            e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = 'var(--text-secondary)';
-            e.currentTarget.style.transform = 'translateY(0)';
-          }}
-        >
-          <LogOut size={20} style={{ flexShrink: 0 }} />
-          <span style={{ display: 'block' }}>Выйти</span>
-        </button>
-      </div>
+      {isAuthenticated && (
+        <div style={{ marginTop: 'auto', paddingTop: '24px' }}>
+          <button
+            onClick={logout}
+            aria-label="Выйти"
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'flex-start',
+              gap: '12px',
+              color: 'var(--text-secondary)',
+              background: 'transparent',
+              border: 'none',
+              padding: '12px',
+              cursor: 'pointer',
+              width: '100%',
+              minHeight: '44px',
+              borderRadius: '12px',
+              textAlign: 'left',
+              fontSize: '14px',
+              fontWeight: '500',
+              lineHeight: 1.2,
+              transition: 'transform 0.2s, background-color 0.2s, color 0.2s',
+              appearance: 'none',
+            }}
+            onMouseOver={(e) => {
+              e.currentTarget.style.backgroundColor = 'var(--surface-color)';
+              e.currentTarget.style.color = 'var(--text-primary)';
+              e.currentTarget.style.transform = 'translateY(-1px)';
+            }}
+            onMouseOut={(e) => {
+              e.currentTarget.style.backgroundColor = 'transparent';
+              e.currentTarget.style.color = 'var(--text-secondary)';
+              e.currentTarget.style.transform = 'translateY(0)';
+            }}
+          >
+            <LogOut size={20} style={{ flexShrink: 0 }} />
+            <span style={{ display: 'block' }}>Выйти</span>
+          </button>
+        </div>
+      )}
     </aside>
   );
 };

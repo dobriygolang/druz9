@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package arena.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/arena/v1;v1";
+
+service ArenaService {
+  rpc CreateMatch(CreateMatchRequest) returns (ArenaMatchResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/matches"
+      body: "*"
+    };
+  }
+
+  rpc GetMatch(GetMatchRequest) returns (ArenaMatchResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/arena/matches/{match_id}"
+    };
+  }
+
+  rpc JoinMatch(JoinMatchRequest) returns (ArenaMatchResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/matches/{match_id}/join"
+      body: "*"
+    };
+  }
+
+  rpc SubmitCode(SubmitCodeRequest) returns (SubmitCodeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/matches/{match_id}/submit"
+      body: "*"
+    };
+  }
+
+  rpc GetLeaderboard(GetLeaderboardRequest) returns (GetLeaderboardResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/arena/leaderboard"
+    };
+  }
+}
+
+message CreateMatchRequest {
+  string topic = 1;
+  string difficulty = 2;
+  bool obfuscate_opponent = 3;
+}
+
+message GetMatchRequest {
+  string match_id = 1;
+}
+
+message JoinMatchRequest {
+  string match_id = 1;
+}
+
+message SubmitCodeRequest {
+  string match_id = 1;
+  string code = 2;
+}
+
+message SubmitCodeResponse {
+  string output = 1;
+  string error = 2;
+  bool is_correct = 3;
+  int32 passed_count = 4;
+  int32 total_count = 5;
+  int64 runtime_ms = 6;
+  google.protobuf.Timestamp freeze_until = 7;
+  ArenaMatch match = 8;
+}
+
+message ArenaMatchResponse {
+  ArenaMatch match = 1;
+}
+
+message GetLeaderboardRequest {
+  int32 limit = 1;
+}
+
+message GetLeaderboardResponse {
+  repeated ArenaLeaderboardEntry entries = 1;
+}
+
+message ArenaMatch {
+  string id = 1;
+  string task_id = 2;
+  string task_title = 3;
+  string task_statement = 4;
+  string starter_code = 5;
+  string topic = 6;
+  string difficulty = 7;
+  ArenaMatchStatus status = 8;
+  int32 duration_seconds = 9;
+  bool obfuscate_opponent = 10;
+  string winner_user_id = 11;
+  string winner_reason = 12;
+  google.protobuf.Timestamp started_at = 13;
+  google.protobuf.Timestamp finished_at = 14;
+  google.protobuf.Timestamp created_at = 15;
+  repeated ArenaPlayer players = 16;
+  bool is_rated = 17;
+  string unrated_reason = 18;
+  bool anti_cheat_enabled = 19;
+}
+
+message ArenaPlayer {
+  string user_id = 1;
+  string display_name = 2;
+  string side = 3;
+  bool is_creator = 4;
+  google.protobuf.Timestamp freeze_until = 5;
+  google.protobuf.Timestamp accepted_at = 6;
+  int64 best_runtime_ms = 7;
+  bool is_winner = 8;
+  google.protobuf.Timestamp joined_at = 9;
+  string current_code = 10;
+}
+
+message ArenaLeaderboardEntry {
+  string user_id = 1;
+  string display_name = 2;
+  int32 wins = 3;
+  int32 matches = 4;
+  double win_rate = 5;
+  int64 best_runtime = 6;
+  int32 rating = 7;
+  string league = 8;
+  int32 losses = 9;
+}
+
+enum ArenaMatchStatus {
+  ARENA_MATCH_STATUS_UNSPECIFIED = 0;
+  ARENA_MATCH_STATUS_WAITING = 1;
+  ARENA_MATCH_STATUS_ACTIVE = 2;
+  ARENA_MATCH_STATUS_FINISHED = 3;
+}

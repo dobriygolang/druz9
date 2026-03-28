@@ -162,6 +162,7 @@ export const VacanciesPage: React.FC = () => {
         <Search size={20} color="var(--text-secondary)" />
         <input
           placeholder="Поиск по названию, компании или описанию..."
+          aria-label="Поиск вакансий"
           value={searchQuery}
           onChange={e => setSearchQuery(e.target.value)}
           style={{

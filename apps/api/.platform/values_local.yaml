@@ -75,6 +75,13 @@ metrics_addr:
   type: "string"
   writable: false
 
+arena_require_auth:
+  usage: "Require authentication for arena endpoints"
+  group: "arena"
+  value: "false"
+  type: "bool"
+  writable: true
+
 database_url:
   usage: "Primary PostgreSQL DSN"
   group: "data"
@@ -169,7 +176,7 @@ telegram_auth_max_age:
 telegram_bot_token:
   usage: "Telegram bot token"
   group: "external"
-  value: ""
+  value: "8787036914:AAHXHe5apr8vK7lY6qjQJyxkB_GUOfTBDIE"
   type: "string"
   writable: false
 
@@ -229,37 +236,16 @@ s3_secret_key:
   type: "string"
   writable: false
 
-livekit_url:
-  usage: "Internal LiveKit URL"
-  group: "external"
-  value: "ws://localhost:7880"
-  type: "string"
-  writable: false
-
-livekit_public_url:
-  usage: "Public LiveKit URL override"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
-
-livekit_api_key:
-  usage: "LiveKit API key"
-  group: "external"
-  value: "devkey"
-  type: "string"
-  writable: false
-
-livekit_api_secret:
-  usage: "LiveKit API secret"
-  group: "external"
-  value: "secret"
-  type: "string"
-  writable: false
-
 dev_auth_bypass:
   usage: "Allow local auth bypass"
   group: "dev"
   value: "true"
   type: "bool"
+  writable: false
+
+dev_user_id:
+  usage: "Dev user ID for bypass mode"
+  group: "dev"
+  value: "bc4d1f5c-ffc5-4ade-89c3-fdd179132502"
+  type: "string"
   writable: false

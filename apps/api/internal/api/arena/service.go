@@ -1,0 +1,48 @@
+package arena
+
+import (
+	"context"
+
+	apparena "api/internal/app/arena"
+	domain "api/internal/domain/arena"
+	"api/internal/dto"
+	v1 "api/pkg/api/arena/v1"
+
+	"github.com/google/uuid"
+	"google.golang.org/grpc"
+)
+
+type Service interface {
+	CreateMatch(ctx context.Context, creator *domain.User, topic, difficulty string, obfuscateOpponent bool) (*domain.Match, error)
+	GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, error)
+	JoinMatch(ctx context.Context, matchID uuid.UUID, user *domain.User) (*domain.Match, error)
+	SavePlayerCode(ctx context.Context, matchID uuid.UUID, user *domain.User, code string) error
+	SubmitCode(ctx context.Context, matchID uuid.UUID, user *domain.User, code string) (*domain.Submission, *domain.Match, error)
+	GetLeaderboard(ctx context.Context, limit int32) ([]*domain.LeaderboardEntry, error)
+}
+
+type RealtimePublisher interface {
+	PublishMatch(match *dto.ArenaRealtimeMatch, codes []*dto.ArenaRealtimeCode)
+}
+
+type Implementation struct {
+	v1.UnimplementedArenaServiceServer
+	service          Service
+	realtime         RealtimePublisher
+	allowGuestAccess func() bool
+}
+
+func New(service *apparena.Service, realtime RealtimePublisher, allowGuestAccess func() bool) *Implementation {
+	if allowGuestAccess == nil {
+		allowGuestAccess = func() bool { return false }
+	}
+	return &Implementation{
+		service:          service,
+		realtime:         realtime,
+		allowGuestAccess: allowGuestAccess,
+	}
+}
+
+func (i *Implementation) GetDescription() grpc.ServiceDesc {
+	return v1.ArenaService_ServiceDesc
+}

@@ -176,7 +176,7 @@ func (r *Repo) fetchEvents(
 		event.ScheduledAt = scheduledAt
 		event.CreatedAt = createdAt
 		event.IsCreator = event.CreatorID == currentUserID.String()
-		event.Participants = make([]*model.EventParticipant, 0)
+		event.Participants = make([]*model.EventParticipant, 0, 4)
 
 		events = append(events, &event)
 	}

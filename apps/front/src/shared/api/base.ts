@@ -1,5 +1,13 @@
-import axios from 'axios';
+import axios, { AxiosError } from 'axios';
 import { ENV } from '../config/env';
+
+export { AxiosError };
+
+// Токен для авторизации (можно положить в localStorage.setItem('authToken', 'xxx'))
+const getAuthToken = () => {
+  if (typeof window === 'undefined') return null;
+  return localStorage.getItem('authToken');
+};
 
 export const apiClient = axios.create({
   baseURL: ENV.API_URL,
@@ -8,6 +16,35 @@ export const apiClient = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Add auth token dynamically on each request
+apiClient.interceptors.request.use((config) => {
+  const token = getAuthToken();
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
+
+export function withGuestArenaHeaders(actorId?: string, guestName?: string) {
+  const headers: Record<string, string> = {};
+  if (actorId) {
+    headers['X-Arena-Guest-Id'] = actorId;
+  }
+  if (guestName) {
+    headers['X-Arena-Guest-Name'] = guestName;
+  }
+  return headers;
+}
+
+export function withGuestCodeRoomHeaders(guestName?: string) {
+  if (!guestName) {
+    return {};
+  }
+  return {
+    'X-Code-Editor-Guest-Name': guestName,
+  };
+}
 
 export interface ListQueryParams {
   limit?: number;

@@ -22,12 +22,14 @@ export const PodcastPlayer: React.FC = () => {
     seek(Number(e.target.value));
   };
 
+  const progressPercent = duration > 0 ? (progress / duration) * 100 : 0;
+
   return (
     <div
       className="fade-in"
       style={{
         position: 'fixed',
-        bottom: '80px', 
+        bottom: '80px',
         left: '20px',
         right: '20px',
         zIndex: 50,
@@ -43,19 +45,21 @@ export const PodcastPlayer: React.FC = () => {
       }}
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', minWidth: '200px' }}>
-        <div 
+        <button
           onClick={togglePlay}
-          style={{ 
-            width: '48px', 
-            height: '48px', 
-            borderRadius: '12px', 
-            background: 'linear-gradient(135deg, var(--accent-color), #818cf8)', 
-            display: 'flex', 
-            alignItems: 'center', 
+          aria-label={isPlaying ? 'Пауза' : 'Воспроизвести'}
+          style={{
+            width: '48px',
+            height: '48px',
+            borderRadius: '12px',
+            background: 'linear-gradient(135deg, var(--accent-color), #818cf8)',
+            display: 'flex',
+            alignItems: 'center',
             justifyContent: 'center',
             boxShadow: '0 8px 16px rgba(79, 70, 229, 0.3)',
             cursor: 'pointer',
             transition: 'transform 0.2s',
+            border: 'none',
           }}
           className="hover-scale"
         >
@@ -64,7 +68,7 @@ export const PodcastPlayer: React.FC = () => {
           ) : (
             <Play size={20} color="white" fill="white" />
           )}
-        </div>
+        </button>
         <div style={{ overflow: 'hidden' }}>
           <div style={{ fontWeight: 600, fontSize: '14px', whiteSpace: 'nowrap', textOverflow: 'ellipsis' }}>
             {currentPodcast.title}
@@ -81,7 +85,7 @@ export const PodcastPlayer: React.FC = () => {
           <input
             type="range"
             min="0"
-            max={duration || 0}
+            max={duration || 100}
             value={progress}
             onChange={handleSeek}
             style={{
@@ -89,7 +93,7 @@ export const PodcastPlayer: React.FC = () => {
               height: '4px',
               borderRadius: '2px',
               appearance: 'none',
-              background: `linear-gradient(to right, var(--accent-color) ${(progress / duration) * 100 || 0}%, rgba(255,255,255,0.1) ${(progress / duration) * 100 || 0}%)`,
+              background: `linear-gradient(to right, var(--accent-color) ${progressPercent}%, rgba(255,255,255,0.1) ${progressPercent}%)`,
               cursor: 'pointer',
               outline: 'none',
             }}
@@ -163,8 +167,9 @@ export const PodcastPlayer: React.FC = () => {
           </div>
         </div>
 
-        <button 
+        <button
           onClick={closePlayer}
+          aria-label="Закрыть плеер"
           style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}
         >
           <X size={20} />

@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { TelegramAuthWidget } from '@/features/Auth/ui/TelegramAuthWidget';
 import { useAuth } from '@/app/providers/AuthProvider';
+import { TelegramUser } from '@/entities/User/model/types';
 
 export const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const [error, setError] = useState('');
 
-  const handleTelegramAuth = async (user: any) => {
+  const handleTelegramAuth = async (user: TelegramUser) => {
     try {
       setError('');
       await login(user);

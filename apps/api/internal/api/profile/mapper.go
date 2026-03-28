@@ -21,7 +21,7 @@ func mapProfileResponse(resp *model.ProfileResponse) *v1.ProfileResponse {
 			LastName:         u.LastName,
 			AvatarUrl:        u.AvatarURL,
 			CurrentWorkplace: u.CurrentWorkplace,
-			Region:           u.Region,
+			Region:           u.Geo.Region,
 			Latitude:         u.Geo.Latitude,
 			Longitude:        u.Geo.Longitude,
 			ActivityStatus:   u.ActivityStatus,

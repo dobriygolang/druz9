@@ -8,12 +8,13 @@ import (
 	"api/internal/config"
 	authmiddleware "api/internal/middleware"
 	adminv1 "api/pkg/api/admin/v1"
+	arenav1 "api/pkg/api/arena/v1"
+	codeeditorv1 "api/pkg/api/code_editor/v1"
 	eventv1 "api/pkg/api/event/v1"
 	geov1 "api/pkg/api/geo/v1"
 	podcastv1 "api/pkg/api/podcast/v1"
 	v1 "api/pkg/api/profile/v1"
 	referralv1 "api/pkg/api/referral/v1"
-	roomv1 "api/pkg/api/room/v1"
 
 	"github.com/go-kratos/aegis/circuitbreaker"
 	"github.com/go-kratos/aegis/circuitbreaker/sre"
@@ -89,21 +90,35 @@ func NewGRPCServer(
 			operation == referralv1.ReferralService_ListReferrals_FullMethodName ||
 			operation == referralv1.ReferralService_CreateReferral_FullMethodName ||
 			operation == referralv1.ReferralService_UpdateReferral_FullMethodName ||
-			operation == referralv1.ReferralService_DeleteReferral_FullMethodName ||
-			operation == roomv1.RoomService_ListRooms_FullMethodName ||
-			operation == roomv1.RoomService_GetRoom_FullMethodName ||
-			operation == roomv1.RoomService_CreateRoom_FullMethodName ||
-			operation == roomv1.RoomService_UpdateRoom_FullMethodName ||
-			operation == roomv1.RoomService_DeleteRoom_FullMethodName ||
-			operation == roomv1.RoomService_JoinRoomToken_FullMethodName ||
-			operation == roomv1.RoomService_GetRoomMediaState_FullMethodName ||
-			operation == roomv1.RoomService_UpsertRoomMediaState_FullMethodName
+			operation == referralv1.ReferralService_DeleteReferral_FullMethodName
+	}).Build()
+
+	optionalAuthMw := selector.Server(
+		authmiddleware.OptionalAuth(authorizer, cookies),
+	).Match(func(_ context.Context, operation string) bool {
+		return operation == codeeditorv1.CodeEditorService_CreateRoom_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_ListTasks_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_GetLeaderboard_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_GetRoom_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_GetSubmissions_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_JoinRoom_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_JoinRoomByInviteCode_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_LeaveRoom_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_SetReady_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_SubmitCode_FullMethodName ||
+			operation == arenav1.ArenaService_CreateMatch_FullMethodName ||
+			operation == arenav1.ArenaService_GetMatch_FullMethodName ||
+			operation == arenav1.ArenaService_JoinMatch_FullMethodName ||
+			operation == arenav1.ArenaService_SubmitCode_FullMethodName
 	}).Build()
 
 	adminMw := selector.Server(
 		authmiddleware.RequireAdmin(),
 	).Match(func(_ context.Context, operation string) bool {
 		return operation == adminv1.AdminService_DeleteUser_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_CreateTask_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_UpdateTask_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_DeleteTask_FullMethodName ||
 			operation == podcastv1.PodcastService_CreatePodcast_FullMethodName ||
 			operation == podcastv1.PodcastService_UploadPodcast_FullMethodName ||
 			operation == podcastv1.PodcastService_PreparePodcastUpload_FullMethodName ||
@@ -143,6 +158,7 @@ func NewGRPCServer(
 			MetricsMiddleware(),
 			rateLimiter,
 			grpcCB,
+			optionalAuthMw,
 			authMw,
 			adminMw,
 		),

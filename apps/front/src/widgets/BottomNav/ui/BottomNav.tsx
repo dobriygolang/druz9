@@ -1,13 +1,13 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { Compass, Calendar, MapPin, User as UserIcon, Video } from 'lucide-react';
+import { Compass, Calendar, MapPin, User as UserIcon, Code2 } from 'lucide-react';
 
 export const BottomNav: React.FC = () => {
   return (
     <nav className="bottom-nav-mobile">
       <BottomNavItem to="/feed" icon={<Compass size={20} />} label="Лента" />
       <BottomNavItem to="/events" icon={<Calendar size={20} />} label="Ивенты" />
-      <BottomNavItem to="/rooms" icon={<Video size={20} />} label="Комнаты" />
+      <BottomNavItem to="/code-rooms" icon={<Code2 size={20} />} label="Код" />
       <BottomNavItem to="/map" icon={<MapPin size={20} />} label="Карта" />
       <BottomNavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" />
     </nav>

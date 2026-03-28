@@ -1,8 +1,9 @@
 import React, { useEffect, useRef } from 'react';
 import { ENV } from '@/shared/config/env';
+import { TelegramUser } from '@/entities/User/model/types';
 
 interface TelegramAuthWidgetProps {
-  onAuth: (user: any) => void;
+  onAuth: (user: TelegramUser) => void;
   buttonSize?: 'large' | 'medium' | 'small';
   cornerRadius?: number;
   requestAccess?: 'write';
@@ -17,9 +18,10 @@ export const TelegramAuthWidget: React.FC<TelegramAuthWidgetProps> = ({
   const containerRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    (window as any).onTelegramAuth = (user: any) => {
+    const handleAuth = (user: TelegramUser) => {
       onAuth(user);
     };
+    (window as unknown as { onTelegramAuth?: (user: TelegramUser) => void }).onTelegramAuth = handleAuth;
 
     const script = document.createElement('script');
     script.src = 'https://telegram.org/js/telegram-widget.js?22';
@@ -38,7 +40,7 @@ export const TelegramAuthWidget: React.FC<TelegramAuthWidgetProps> = ({
       if (containerRef.current) {
         containerRef.current.innerHTML = '';
       }
-      delete (window as any).onTelegramAuth;
+      delete (window as unknown as { onTelegramAuth?: (user: TelegramUser) => void }).onTelegramAuth;
     };
   }, [onAuth, buttonSize, cornerRadius, requestAccess]);
 

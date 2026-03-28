@@ -316,14 +316,14 @@
     },
     {
       "id": 18,
-      "title": "MinIO/LiveKit/Postgres target status",
+      "title": "MinIO/Postgres target status",
       "type": "timeseries",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 45 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "up{job=~\"postgres|minio|livekit\"}",
+          "expr": "up{job=~\"postgres|minio\"}",
           "legendFormat": "{{job}} {{instance}}"
         }
       ],

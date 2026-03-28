@@ -57,15 +57,25 @@ export const FeedPage: React.FC = () => {
     return new Promise((resolve) => {
       const audio = new Audio();
       const url = URL.createObjectURL(file);
-      audio.src = url;
+      let resolved = false;
+
+      const cleanup = () => {
+        if (resolved) return;
+        resolved = true;
+        URL.revokeObjectURL(url);
+        audio.src = '';
+        audio.remove();
+      };
+
       audio.onloadedmetadata = () => {
         resolve(audio.duration);
-        URL.revokeObjectURL(url);
+        cleanup();
       };
       audio.onerror = () => {
         resolve(0);
-        URL.revokeObjectURL(url);
+        cleanup();
       };
+      audio.src = url;
     });
   };
 

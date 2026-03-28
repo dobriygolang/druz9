@@ -25,10 +25,6 @@ scrape_configs:
       - targets: ['minio:9000']
     metrics_path: /minio/v2/metrics/cluster
 
-  - job_name: 'livekit'
-    static_configs:
-      - targets: ['livekit:6789']
-
   - job_name: 'prometheus'
     static_configs:
       - targets: ['localhost:9090']

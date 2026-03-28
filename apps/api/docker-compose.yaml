@@ -60,22 +60,6 @@ services:
     networks:
       - api_network
 
-  livekit:
-    image: livekit/livekit-server:latest
-    container_name: api-livekit
-    command: ["--config", "/etc/livekit/livekit.yaml"]
-    environment:
-      LIVEKIT_PROMETHEUS_PORT: "6789"
-    ports:
-      - "7880:7880"
-      - "7881:7881/tcp"
-      - "6789:6789"
-      - "50010-50100:50010-50100/udp"
-    volumes:
-      - ./scripts/livekit.yaml:/etc/livekit/livekit.yaml:ro
-    networks:
-      - api_network
-
   postgres-exporter:
     image: prometheuscommunity/postgres-exporter:latest
     container_name: api-postgres-exporter
@@ -131,7 +115,7 @@ services:
   # backend intentionally omitted from local compose;
   # run it separately via `make run`.
   #
-  # This compose file is for local infra only: postgres + s3 + livekit.
+  # This compose file is for local infra only: postgres + s3.
 
 volumes:
   postgres_data:

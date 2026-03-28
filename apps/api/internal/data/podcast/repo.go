@@ -28,6 +28,8 @@ func NewRepo(dataLayer *postgres.Store, logger log.Logger) podcastdomain.Reposit
 	}
 }
 
+const podcastColumns = `id, title, COALESCE(author_id::text, ''), author_name, duration_seconds, listens_count, COALESCE(file_name, ''), COALESCE(content_type, ''), COALESCE(object_key, ''), created_at, updated_at`
+
 func (r *Repo) ListPodcasts(ctx context.Context, opts model.ListPodcastsOptions) (*model.ListPodcastsResponse, error) {
 	// Apply defaults
 	if opts.Limit <= 0 || opts.Limit > model.MaxPodcastsLimit {
@@ -40,12 +42,12 @@ func (r *Repo) ListPodcasts(ctx context.Context, opts model.ListPodcastsOptions)
 		return nil, fmt.Errorf("count podcasts: %w", err)
 	}
 
-	query := `
-SELECT id, title, COALESCE(author_id::text, ''), author_name, duration_seconds, listens_count, COALESCE(file_name, ''), COALESCE(content_type, ''), COALESCE(object_key, ''), created_at, updated_at
+	query := fmt.Sprintf(`
+SELECT %s
 FROM podcasts
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
-`
+`, podcastColumns)
 	rows, err := r.data.DB.Query(ctx, query, opts.Limit, opts.Offset)
 	if err != nil {
 		return nil, fmt.Errorf("query podcasts: %w", err)
@@ -76,17 +78,17 @@ LIMIT $1 OFFSET $2
 }
 
 func (r *Repo) GetPodcast(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, error) {
-	return scanPodcast(r.data.DB.QueryRow(ctx, `
-SELECT id, title, COALESCE(author_id::text, ''), author_name, duration_seconds, listens_count, COALESCE(file_name, ''), COALESCE(content_type, ''), COALESCE(object_key, ''), created_at, updated_at
+	return scanPodcast(r.data.DB.QueryRow(ctx, fmt.Sprintf(`
+SELECT %s
 FROM podcasts
-WHERE id = $1`, podcastID))
+WHERE id = $1`, podcastColumns), podcastID))
 }
 
 func (r *Repo) CreatePodcast(ctx context.Context, user *model.User, req model.CreatePodcastRequest) (*model.Podcast, error) {
-	return scanPodcast(r.data.DB.QueryRow(ctx, `
+	return scanPodcast(r.data.DB.QueryRow(ctx, fmt.Sprintf(`
 INSERT INTO podcasts (id, title, author_id, author_name, duration_seconds, listens_count, created_at, updated_at)
 VALUES ($1, $2, $3, $4, 0, 0, NOW(), NOW())
-RETURNING id, title, COALESCE(author_id::text, ''), author_name, duration_seconds, listens_count, COALESCE(file_name, ''), COALESCE(content_type, ''), COALESCE(object_key, ''), created_at, updated_at`,
+RETURNING %s`, podcastColumns),
 		uuid.New(),
 		req.Title,
 		user.ID,
@@ -95,7 +97,7 @@ RETURNING id, title, COALESCE(author_id::text, ''), author_name, duration_second
 }
 
 func (r *Repo) AttachUpload(ctx context.Context, podcastID uuid.UUID, req model.UploadPodcastRequest, objectKey string) (*model.Podcast, error) {
-	return scanPodcast(r.data.DB.QueryRow(ctx, `
+	return scanPodcast(r.data.DB.QueryRow(ctx, fmt.Sprintf(`
 UPDATE podcasts
 SET file_name = $2,
     content_type = $3,
@@ -103,7 +105,7 @@ SET file_name = $2,
     duration_seconds = $5,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, title, COALESCE(author_id::text, ''), author_name, duration_seconds, listens_count, COALESCE(file_name, ''), COALESCE(content_type, ''), COALESCE(object_key, ''), created_at, updated_at`,
+RETURNING %s`, podcastColumns),
 		podcastID,
 		req.FileName,
 		req.ContentType,
@@ -124,12 +126,12 @@ func (r *Repo) DeletePodcast(ctx context.Context, podcastID uuid.UUID) (string, 
 }
 
 func (r *Repo) IncrementListens(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, error) {
-	return scanPodcast(r.data.DB.QueryRow(ctx, `
+	return scanPodcast(r.data.DB.QueryRow(ctx, fmt.Sprintf(`
 UPDATE podcasts
 SET listens_count = listens_count + 1,
     updated_at = NOW()
 WHERE id = $1
-RETURNING id, title, COALESCE(author_id::text, ''), author_name, duration_seconds, listens_count, COALESCE(file_name, ''), COALESCE(content_type, ''), COALESCE(object_key, ''), created_at, updated_at`,
+RETURNING %s`, podcastColumns),
 		podcastID,
 	))
 }

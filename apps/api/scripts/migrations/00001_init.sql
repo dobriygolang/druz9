@@ -104,44 +104,10 @@ CREATE TABLE IF NOT EXISTS referrals (
 CREATE INDEX IF NOT EXISTS idx_referrals_user_id ON referrals(user_id);
 CREATE INDEX IF NOT EXISTS idx_referrals_created_at ON referrals(created_at DESC);
 
-CREATE TABLE IF NOT EXISTS rooms (
-  id UUID PRIMARY KEY,
-  title TEXT NOT NULL,
-  kind TEXT NOT NULL,
-  description TEXT,
-  is_private BOOLEAN NOT NULL DEFAULT FALSE,
-  creator_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
-
-CREATE INDEX IF NOT EXISTS idx_rooms_created_at ON rooms(created_at DESC);
-CREATE INDEX IF NOT EXISTS idx_rooms_kind ON rooms(kind);
-
-CREATE TABLE IF NOT EXISTS room_members (
-  room_id UUID NOT NULL REFERENCES rooms(id) ON DELETE CASCADE,
-  user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
-  joined_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  PRIMARY KEY (room_id, user_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_room_members_user_id ON room_members(user_id);
-
-CREATE TABLE IF NOT EXISTS room_media_state (
-  room_id UUID PRIMARY KEY REFERENCES rooms(id) ON DELETE CASCADE,
-  media_url TEXT,
-  paused BOOLEAN NOT NULL DEFAULT TRUE,
-  current_time_seconds INTEGER NOT NULL DEFAULT 0,
-  updated_by UUID REFERENCES users(id) ON DELETE SET NULL,
-  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
-);
 -- +goose StatementEnd
 
 -- +goose Down
 -- +goose StatementBegin
-DROP TABLE IF EXISTS room_media_state;
-DROP TABLE IF EXISTS room_members;
-DROP TABLE IF EXISTS rooms;
 DROP TABLE IF EXISTS referrals;
 DROP TABLE IF EXISTS podcasts;
 DROP TABLE IF EXISTS event_participants;

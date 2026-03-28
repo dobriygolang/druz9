@@ -31,7 +31,7 @@ export const UserDetailCard: React.FC<UserDetailCardProps> = ({ user, onClose })
       <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
         <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', background: '#1f2937', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
           {user.avatarUrl ? (
-            <img src={user.avatarUrl} alt={user.title} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+            <img src={user.avatarUrl} alt={`Аватар пользователя ${user.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             <UserRound size={20} />
           )}
@@ -93,6 +93,11 @@ interface EventDetailCardProps {
   onJoinToggle: (event: CommunityEvent) => Promise<void>;
   isSaving: boolean;
   error?: string;
+  fieldErrors?: {
+    title?: string;
+    scheduledAt?: string;
+    meetingLink?: string;
+  };
   users: CommunityMapPoint[];
   inviteSearchQuery: string;
   setInviteSearchQuery: (q: string) => void;
@@ -122,6 +127,7 @@ export const EventDetailCard: React.FC<EventDetailCardProps> = ({
   onJoinToggle,
   isSaving,
   error,
+  fieldErrors,
   users,
   inviteSearchQuery,
   setInviteSearchQuery,
@@ -146,6 +152,7 @@ export const EventDetailCard: React.FC<EventDetailCardProps> = ({
           onSubmit={() => onSave(draft)}
           isSaving={isSaving}
           error={error}
+          fieldErrors={fieldErrors}
           users={users}
           inviteSearchQuery={inviteSearchQuery}
           setInviteSearchQuery={setInviteSearchQuery}

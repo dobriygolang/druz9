@@ -28,6 +28,8 @@ func NewRepo(dataLayer *postgres.Store, logger log.Logger) referraldomain.Reposi
 	}
 }
 
+const referralColumns = `r.id, r.user_id::text, COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.telegram_username, ''), 'user'), COALESCE(u.telegram_username, ''), r.title, r.company, COALESCE(r.vacancy_url, ''), r.description, COALESCE(r.experience, ''), COALESCE(r.location, ''), COALESCE(r.employment_type, ''), r.created_at, r.updated_at`
+
 func (r *Repo) ListReferrals(ctx context.Context, currentUser *model.User, opts model.ListReferralsOptions) (*model.ListReferralsResponse, error) {
 	// Apply defaults
 	if opts.Limit <= 0 || opts.Limit > model.MaxReferralsLimit {
@@ -40,26 +42,13 @@ func (r *Repo) ListReferrals(ctx context.Context, currentUser *model.User, opts 
 		return nil, fmt.Errorf("count referrals: %w", err)
 	}
 
-	query := `
-SELECT
-  r.id,
-  r.user_id::text,
-  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.telegram_username, ''), 'user'),
-  COALESCE(u.telegram_username, ''),
-  r.title,
-  r.company,
-  COALESCE(r.vacancy_url, ''),
-  r.description,
-  COALESCE(r.experience, ''),
-  COALESCE(r.location, ''),
-  COALESCE(r.employment_type, ''),
-  r.created_at,
-  r.updated_at
+	query := fmt.Sprintf(`
+SELECT %s
 FROM referrals r
 JOIN users u ON u.id = r.user_id
 ORDER BY r.created_at DESC
 LIMIT $1 OFFSET $2
-`
+`, referralColumns)
 	rows, err := r.data.DB.Query(ctx, query, opts.Limit, opts.Offset)
 	if err != nil {
 		return nil, fmt.Errorf("query referrals: %w", err)

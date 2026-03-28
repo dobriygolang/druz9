@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { 
   Plus, 
@@ -6,7 +6,7 @@ import {
   ChevronRight,
 } from 'lucide-react';
 
-import { CommunityEvent, CommunityMapPoint } from '@/entities/User/model/types';
+import { CommunityEvent, CommunityMapPoint, CreateEventPayload } from '@/entities/User/model/types';
 import { eventApi } from '@/features/Event/api/eventApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
 import { FullEventOverlay } from '@/shared/ui/FullEventOverlay/FullEventOverlay';
@@ -14,6 +14,7 @@ import { EventForm } from '@/shared/ui/EventForm/EventForm';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal/ConfirmModal';
 import { EventDraft } from '@/pages/MapPage/components/types';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
+import { AxiosError } from '@/shared/api/base';
 
 const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 const MONTHS = [
@@ -47,6 +48,7 @@ export const EventsPage: React.FC = () => {
   const [points, setPoints] = useState<CommunityMapPoint[]>([]);
   
   const [viewDate, setViewDate] = useState(new Date());
+  const today = useMemo(() => new Date().toDateString(), [viewDate]);
   const [isCreating, setIsCreating] = useState(false);
   const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [draft, setDraft] = useState<EventDraft | null>(null);
@@ -61,6 +63,8 @@ export const EventsPage: React.FC = () => {
   const [inviteSearchQuery, setInviteSearchQuery] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
 
+  const loadRef = useRef<{ (): Promise<void> } | null>(null);
+
   const load = async () => {
     try {
       const [e, p] = await Promise.all([
@@ -74,9 +78,11 @@ export const EventsPage: React.FC = () => {
     }
   };
 
+  loadRef.current = load;
+
   useEffect(() => {
     void load();
-    const interval = setInterval(() => void load(), 30000);
+    const interval = setInterval(() => loadRef.current?.(), 30000);
     return () => clearInterval(interval);
   }, []);
 
@@ -96,6 +102,20 @@ export const EventsPage: React.FC = () => {
     setEventError('');
     setEventFieldErrors({});
   };
+
+  const toEventPayload = (draft: EventDraft): CreateEventPayload => ({
+    title: draft.title,
+    description: draft.description,
+    meeting_link: draft.meeting_link,
+    place_label: draft.place_label,
+    region: draft.region,
+    country: draft.country,
+    city: draft.city,
+    latitude: draft.latitude ?? 0,
+    longitude: draft.longitude ?? 0,
+    scheduled_at: draft.scheduled_at,
+    invited_user_ids: draft.invited_user_ids,
+  });
 
   const handleSave = async () => {
     if (!draft) return;
@@ -129,17 +149,18 @@ export const EventsPage: React.FC = () => {
     setEventFieldErrors({});
     try {
       if (editingEventId) {
-        const updated = await eventApi.update(editingEventId, draft as any);
+        const updated = await eventApi.update(editingEventId, toEventPayload(draft));
         setEvents((curr: CommunityEvent[]) => curr.map((e: CommunityEvent) => e.id === updated.id ? updated : e));
       } else {
-        const created = await eventApi.create(draft as any);
+        const created = await eventApi.create(toEventPayload(draft));
         setEvents((curr: CommunityEvent[]) => [created, ...curr]);
       }
       setIsCreating(false);
       setEditingEventId(null);
       setDraft(null);
-    } catch (err: any) {
-      if (err.response?.data?.message?.includes('scheduled_at must be in the future')) {
+    } catch (err) {
+      const axiosErr = err as AxiosError<{ message?: string }>;
+      if (axiosErr.response?.data?.message?.includes('scheduled_at must be in the future')) {
         setEventError('Дата события должна быть в будущем');
       } else {
         setEventError('Ошибка сохранения');
@@ -193,9 +214,9 @@ export const EventsPage: React.FC = () => {
         <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: '20px' }}>
           <h1 style={{ fontSize: '24px', fontWeight: '700' }}>{MONTHS[month]} {year}</h1>
           <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '4px', width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'space-between' : 'flex-start' }}>
-            <button onClick={() => changeMonth(-1)} className="hover-opacity" style={{ background: 'none', border: 'none', color: 'white', padding: '6px', cursor: 'pointer' }}><ChevronLeft size={20}/></button>
-            <button onClick={() => setViewDate(new Date())} className="hover-opacity" style={{ background: 'none', border: 'none', color: 'white', fontSize: '13px', fontWeight: '500', padding: '0 12px', cursor: 'pointer' }}>Сегодня</button>
-            <button onClick={() => changeMonth(1)} className="hover-opacity" style={{ background: 'none', border: 'none', color: 'white', padding: '6px', cursor: 'pointer' }}><ChevronRight size={20}/></button>
+            <button onClick={() => changeMonth(-1)} aria-label="Предыдущий месяц" className="hover-opacity" style={{ background: 'none', border: 'none', color: 'white', padding: '6px', cursor: 'pointer' }}><ChevronLeft size={20}/></button>
+            <button onClick={() => setViewDate(new Date())} aria-label="Перейти к сегодня" className="hover-opacity" style={{ background: 'none', border: 'none', color: 'white', fontSize: '13px', fontWeight: '500', padding: '0 12px', cursor: 'pointer' }}>Сегодня</button>
+            <button onClick={() => changeMonth(1)} aria-label="Следующий месяц" className="hover-opacity" style={{ background: 'none', border: 'none', color: 'white', padding: '6px', cursor: 'pointer' }}><ChevronRight size={20}/></button>
           </div>
         </div>
         <button className="btn" onClick={() => handleCreateClick()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderRadius: '12px', width: isMobile ? '100%' : 'auto' }}>
@@ -214,7 +235,7 @@ export const EventsPage: React.FC = () => {
         <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridTemplateRows: 'repeat(6, 1fr)' }}>
           {days.map((date, idx) => {
             const isCurrentMonth = date.getMonth() === month;
-            const isToday = date.toDateString() === new Date().toDateString();
+            const isToday = date.toDateString() === today;
             const dateStr = getLocalDateKey(date);
             const dayEvents = events.filter(
               (e) => getLocalDateKey(e.scheduled_at) === dateStr,

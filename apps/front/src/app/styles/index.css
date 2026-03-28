@@ -1,246 +1,36 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+/* ===========================================
+   MAIN CSS ENTRY POINT
+   =========================================== */
 
-:root {
-  --bg-color: #121212;
-  --surface-color: #242424;
-  --text-primary: #FFFFFF;
-  --text-secondary: #AAAAAA;
-  --border-color: #333333;
-  --accent-color: #4F46E5;
-  --accent-hover: #4338CA;
-  --danger-color: #EF4444;
-}
+/* 01 - Variables, fonts, base styles (includes Google Fonts import) */
+@import './01-variables.css';
 
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  min-width: 0;
-}
+/* 02 - Utility classes and animations */
+@import './02-utilities.css';
 
-html,
-body {
-  font-family: 'Inter', sans-serif;
-  background-color: var(--bg-color);
-  color: var(--text-primary);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
-  overflow-x: hidden;
-}
+/* 03 - Buttons */
+@import './03-buttons.css';
 
-.flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+/* 04 - Form elements */
+@import './04-forms.css';
 
-.full-height {
-  min-height: 100vh;
-}
+/* 05 - Layout, cards, modals */
+@import './05-layout.css';
 
-.btn {
-  background-color: var(--accent-color);
-  color: white;
-  border: none;
-  padding: 12px 20px;
-  border-radius: 8px;
-  font-weight: 500;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  font-size: 14px;
-}
+/* 06 - Badges, chips, icons */
+@import './06-badges.css';
 
-.btn:hover:not(:disabled) {
-  background-color: var(--accent-hover);
-}
+/* 07 - Code rooms page */
+@import './07-code-rooms.css';
 
-.btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
+/* 08 - Code room IDE/Editor */
+@import './08-code-room-ide.css';
 
-.input {
-  width: 100%;
-  padding: 12px 16px;
-  background-color: var(--bg-color);
-  border: 1px solid var(--border-color);
-  border-radius: 8px;
-  color: var(--text-primary);
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
+/* 09 - Guest name modal */
+@import './09-guest-modal.css';
 
-.input:focus {
-  border-color: var(--accent-color);
-}
+/* 10 - Responsive styles */
+@import './10-responsive.css';
 
-.card {
-  background-color: var(--surface-color);
-  border-radius: 16px;
-  padding: 24px;
-  border: 1px solid var(--border-color);
-}
-
-.fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.spin {
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(10px); }
-  to { opacity: 1; transform: translateY(0); }
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
-}
-
-/* Responsive Layout */
-.app-container {
-  display: flex;
-  min-height: 100vh;
-  background-color: var(--bg-color);
-}
-
-.main-content {
-  flex: 1;
-  padding: 40px;
-  overflow-y: auto;
-  padding-bottom: 40px;
-  background-color: var(--bg-color);
-  min-width: 0;
-}
-
-.hide-scrollbar {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-
-.hide-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-
-.hover-opacity:hover {
-  opacity: 0.8;
-}
-
-.content-wrapper {
-  max-width: 800px;
-  margin: 0 auto;
-  width: 100%;
-  min-width: 0;
-}
-
-.content-wrapper-wide {
-  max-width: min(1680px, calc(100vw - 320px));
-}
-
-.sidebar-desktop {
-  display: flex;
-  width: 240px;
-  border-right: 1px solid var(--border-color);
-  padding: 24px 16px;
-  flex-direction: column;
-  background-color: var(--bg-color);
-}
-
-.bottom-nav-mobile {
-  display: none;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  right: 0;
-  height: 72px;
-  background-color: var(--surface-color);
-  border-top: 1px solid var(--border-color);
-  justify-content: space-between;
-  align-items: center;
-  gap: 0;
-  padding: 0 6px;
-  overflow-x: hidden;
-  z-index: 1000;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-@media (max-width: 768px) {
-  .app-container {
-    flex-direction: column;
-  }
-
-  .sidebar-desktop {
-    display: none;
-  }
-
-  .bottom-nav-mobile {
-    display: flex; /* Only show on mobile */
-  }
-
-  .main-content {
-    padding: 24px 16px 100px 16px; /* Extra padding for bottom nav */
-  }
-
-  .content-wrapper {
-    max-width: 100%;
-  }
-
-  .content-wrapper-wide {
-    max-width: 100%;
-  }
-
-  .card {
-    padding: 18px;
-    border-radius: 20px;
-  }
-
-  .btn {
-    min-height: 48px;
-    border-radius: 14px;
-  }
-
-  .input {
-    min-height: 48px;
-    border-radius: 14px;
-  }
-
-  h1 {
-    font-size: 2rem !important;
-    line-height: 1.1;
-  }
-
-  h2 {
-    line-height: 1.15;
-  }
-
-  .hover-scale:hover {
-    transform: none;
-  }
-}
-
-@keyframes musicBar {
-  0%, 100% { height: 4px; }
-  50% { height: 20px; }
-}
-
-.hover-scale {
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-.hover-scale:hover {
-  transform: scale(1.05);
-}
-
-.hover-scale:active {
-  transform: scale(0.95);
-}
+/* 11 - Arena duel */
+@import './11-arena.css';
