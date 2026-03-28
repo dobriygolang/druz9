@@ -1,11 +1,12 @@
-FROM node:20-alpine AS builder
+FROM node:20-bookworm-slim AS builder
 
 WORKDIR /app
 ENV NODE_ENV=development
 ENV NPM_CONFIG_PRODUCTION=false
 
 COPY package*.json ./
-RUN npm install --include=dev \
+RUN npm install -g npm@11.12.1 \
+  && npm ci --include=dev --no-audit --no-fund \
   && test -f node_modules/typescript/bin/tsc \
   && test -f node_modules/vite/client.d.ts
 
