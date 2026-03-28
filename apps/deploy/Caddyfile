@@ -1,34 +1,24 @@
 {
-  auto_https off
-  debug
+	email {$APP_EMAIL}
+	debug
 }
 
-:80 {
-  @api host {$API_HOST}
-  handle @api {
-    reverse_proxy backend:8080
-  }
+{$API_HOST} {
+	reverse_proxy backend:8080
+}
 
-  @app host {$APP_HOST}
-  handle @app {
-    encode gzip zstd
-    reverse_proxy frontend:80
-  }
+{$APP_HOST} {
+	encode gzip zstd
+	reverse_proxy frontend:80
+}
 
-  @s3 host {$S3_HOST}
-  handle @s3 {
-    reverse_proxy minio:9000
-  }
+{$S3_HOST} {
+	reverse_proxy minio:9000
+}
 
-  @minio host {$MINIO_CONSOLE_HOST}
-  handle @minio {
-    basic_auth {
-      {$MINIO_CONSOLE_BASIC_AUTH}
-    }
-    reverse_proxy minio:9001
-  }
-
-  handle {
-    respond "not found" 404
-  }
+{$MINIO_CONSOLE_HOST} {
+	basic_auth {
+		{$MINIO_CONSOLE_BASIC_AUTH}
+	}
+	reverse_proxy minio:9001
 }
