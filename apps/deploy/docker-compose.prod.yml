@@ -111,6 +111,12 @@ services:
       CONFIG_PROFILE: prod
       RTC_VALUES_PATH: /app/.platform/values_prod.yaml
       RUN_DB_MIGRATIONS: "true"
+      POSTGRES_HOST: postgres
+      POSTGRES_PORT: "5432"
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      DATABASE_URL_FILE: /run/secrets/database_url
     depends_on:
       postgres:
         condition: service_healthy
