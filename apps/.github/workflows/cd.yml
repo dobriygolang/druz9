@@ -14,17 +14,30 @@ jobs:
        (github.event.workflow_run.head_branch == 'main' ||
         github.event.workflow_run.head_branch == 'master'))
     runs-on: ubuntu-latest
+    env:
+      DEPLOY_HOST: ${{ secrets.DEPLOY_HOST != '' && secrets.DEPLOY_HOST || secrets.ORACLE_HOST }}
+      DEPLOY_USER: ${{ secrets.DEPLOY_USER != '' && secrets.DEPLOY_USER || secrets.ORACLE_USER }}
+      DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY != '' && secrets.DEPLOY_SSH_KEY || secrets.ORACLE_SSH_KEY }}
+      DEPLOY_SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT != '' && secrets.DEPLOY_SSH_PORT || secrets.ORACLE_SSH_PORT || '22' }}
+      DEPLOY_APP_DIR: ${{ secrets.DEPLOY_APP_DIR != '' && secrets.DEPLOY_APP_DIR || secrets.ORACLE_APP_DIR || '~/apps/druz9' }}
     steps:
       - uses: actions/checkout@v4
+
+      - name: Validate deploy secrets
+        run: |
+          test -n "$DEPLOY_HOST"
+          test -n "$DEPLOY_USER"
+          test -n "$DEPLOY_SSH_KEY"
 
       - name: Copy project to server
         uses: appleboy/scp-action@v0.1.7
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_SSH_KEY }}
+          port: ${{ env.DEPLOY_SSH_PORT }}
           source: "api,front,deploy"
-          target: "~/apps/druz9"
+          target: ${{ env.DEPLOY_APP_DIR }}
           strip_components: 0
           overwrite: true
           rm: true
@@ -54,13 +67,14 @@ jobs:
           S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
         with:
-          host: ${{ secrets.DEPLOY_HOST }}
-          username: ${{ secrets.DEPLOY_USER }}
-          key: ${{ secrets.DEPLOY_SSH_KEY }}
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_SSH_KEY }}
+          port: ${{ env.DEPLOY_SSH_PORT }}
           envs: APP_HOST,API_HOST,APP_EMAIL,TELEGRAM_BOT_NAME,ARENA_REQUIRE_AUTH,POSTGRES_DB,POSTGRES_USER,S3_BUCKET,S3_REGION,COOKIE_DOMAIN,S3_PUBLIC_ENDPOINT,S3_HOST,MINIO_CONSOLE_HOST,MINIO_CONSOLE_BASIC_AUTH,DATABASE_URL,POSTGRES_PASSWORD,MINIO_ROOT_USER,MINIO_ROOT_PASSWORD,S3_ACCESS_KEY,S3_SECRET_KEY,TELEGRAM_BOT_TOKEN
           script: |
             set -euo pipefail
-            cd ~/apps/druz9
+            cd "${{ env.DEPLOY_APP_DIR }}"
             mkdir -p deploy/runtime/secrets/prod
 
             cat > deploy/.env.prod <<EOF

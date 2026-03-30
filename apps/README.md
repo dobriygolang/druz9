@@ -72,6 +72,8 @@ Production контур теперь находится в [`deploy`](./deploy):
 - `DEPLOY_HOST`
 - `DEPLOY_USER`
 - `DEPLOY_SSH_KEY`
+- `DEPLOY_SSH_PORT`
+- `DEPLOY_APP_DIR`
 - `APP_HOST`
 - `API_HOST`
 - `APP_EMAIL`
@@ -93,3 +95,7 @@ Production контур теперь находится в [`deploy`](./deploy):
 - `S3_ACCESS_KEY`
 - `S3_SECRET_KEY`
 - `TELEGRAM_BOT_TOKEN`
+
+Совместимость:
+- workflow также умеет читать старые `ORACLE_*` secrets как fallback, но это только временный мост
+- для нового контура лучше хранить только `DEPLOY_*` и не привязывать названия переменных к конкретному хостингу
