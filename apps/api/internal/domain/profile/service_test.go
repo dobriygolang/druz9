@@ -341,9 +341,12 @@ func TestTelegramAuthChallenge(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = svc.ConfirmTelegramAuth(context.Background(), "bot-secret", challenge.Token, model.TelegramAuthPayload{ID: 123})
+		code, err := svc.ConfirmTelegramAuth(context.Background(), "bot-secret", challenge.Token, model.TelegramAuthPayload{ID: 123})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
+		}
+		if len(code) != telegramLoginCodeLength {
+			t.Fatalf("expected %d-digit code, got %q", telegramLoginCodeLength, code)
 		}
 	})
 
@@ -362,7 +365,7 @@ func TestTelegramAuthChallenge(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		err = svc.ConfirmTelegramAuth(context.Background(), "wrong-secret", challenge.Token, model.TelegramAuthPayload{ID: 123})
+		_, err = svc.ConfirmTelegramAuth(context.Background(), "wrong-secret", challenge.Token, model.TelegramAuthPayload{ID: 123})
 		if err == nil {
 			t.Fatal("expected error for invalid bot secret")
 		}
@@ -397,11 +400,15 @@ func TestTelegramAuth(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if err := svc.ConfirmTelegramAuth(context.Background(), "", challenge.Token, payload); err != nil {
+		code, err := svc.ConfirmTelegramAuth(context.Background(), "", challenge.Token, payload)
+		if err != nil {
 			t.Fatalf("unexpected confirm error: %v", err)
 		}
+		if code == "" {
+			t.Fatal("expected website code")
+		}
 
-		profile, token, expiresAt, err := svc.TelegramAuth(context.Background(), challenge.Token)
+		profile, token, expiresAt, err := svc.TelegramAuth(context.Background(), challenge.Token, code)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -429,7 +436,7 @@ func TestTelegramAuth(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		_, _, _, err = svc.TelegramAuth(context.Background(), challenge.Token)
+		_, _, _, err = svc.TelegramAuth(context.Background(), challenge.Token, "")
 		if err == nil {
 			t.Error("expected error for unconfirmed challenge")
 		}
@@ -453,11 +460,15 @@ func TestTelegramAuth(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if err := svc.ConfirmTelegramAuth(context.Background(), "", challenge.Token, model.TelegramAuthPayload{ID: 123}); err != nil {
+		code, err := svc.ConfirmTelegramAuth(context.Background(), "", challenge.Token, model.TelegramAuthPayload{ID: 123})
+		if err != nil {
 			t.Fatalf("unexpected confirm error: %v", err)
 		}
+		if code == "" {
+			t.Fatal("expected website code")
+		}
 
-		_, _, _, err = svc.TelegramAuth(context.Background(), challenge.Token)
+		_, _, _, err = svc.TelegramAuth(context.Background(), challenge.Token, code)
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}

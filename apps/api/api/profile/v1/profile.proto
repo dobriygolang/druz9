@@ -86,10 +86,12 @@ message ConfirmTelegramAuthRequest {
 
 message ConfirmTelegramAuthResponse {
   string status = 1;
+  string code = 2;
 }
 
 message TelegramAuthRequest {
   string token = 1;
+  string code = 2;
 }
 
 message CompleteRegistrationRequest {

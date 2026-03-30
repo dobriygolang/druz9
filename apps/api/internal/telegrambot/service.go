@@ -84,7 +84,7 @@ func (s *Service) handleUpdate(ctx context.Context, update telegramUpdate) {
 		return
 	}
 
-	err := s.profile.ConfirmTelegramAuth(ctx, s.profile.BotToken(), token, model.TelegramAuthPayload{
+	code, err := s.profile.ConfirmTelegramAuth(ctx, s.profile.BotToken(), token, model.TelegramAuthPayload{
 		ID:        update.Message.From.ID,
 		FirstName: update.Message.From.FirstName,
 		LastName:  update.Message.From.LastName,
@@ -97,7 +97,7 @@ func (s *Service) handleUpdate(ctx context.Context, update telegramUpdate) {
 		return
 	}
 
-	s.sendMessage(ctx, update.Message.Chat.ID, "Вход подтверждён. Вернись в приложение, авторизация завершится автоматически.")
+	s.sendMessage(ctx, update.Message.Chat.ID, fmt.Sprintf("Код входа: %s\n\nВернись на сайт и введи его в форму авторизации.", code))
 }
 
 func parseStartCommand(text string) (string, string) {

@@ -99,10 +99,10 @@ export const authApi = {
       expiresAt: response.data.expires_at ?? response.data.expiresAt ?? '',
     };
   },
-  telegramLogin: async (token: string): Promise<ProfileResponse> => {
+  telegramLogin: async (token: string, code: string): Promise<ProfileResponse> => {
     const response = await apiClient.post<BackendProfileResponse>(
       '/api/v1/profile/auth/telegram',
-      { token },
+      { token, code },
     );
     return normalizeProfileResponse(response.data);
   },

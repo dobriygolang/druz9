@@ -52,6 +52,7 @@ type telegramAuthChallengeState struct {
 	payload   model.TelegramAuthPayload
 	expiresAt time.Time
 	confirmed bool
+	loginCode string
 }
 
 // Repository is a data-layer interface for profile queries.

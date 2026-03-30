@@ -1952,6 +1952,8 @@ components:
             properties:
                 status:
                     type: string
+                code:
+                    type: string
         profile.v1.CreateTelegramAuthChallengeRequest:
             type: object
             properties: {}
@@ -1984,6 +1986,8 @@ components:
             type: object
             properties:
                 token:
+                    type: string
+                code:
                     type: string
         profile.v1.UpdateLocationRequest:
             type: object

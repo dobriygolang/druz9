@@ -266,6 +266,7 @@ func (x *ConfirmTelegramAuthRequest) GetPhotoUrl() string {
 type ConfirmTelegramAuthResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -307,9 +308,17 @@ func (x *ConfirmTelegramAuthResponse) GetStatus() string {
 	return ""
 }
 
+func (x *ConfirmTelegramAuthResponse) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
 type TelegramAuthRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -347,6 +356,13 @@ func (*TelegramAuthRequest) Descriptor() ([]byte, []int) {
 func (x *TelegramAuthRequest) GetToken() string {
 	if x != nil {
 		return x.Token
+	}
+	return ""
+}
+
+func (x *TelegramAuthRequest) GetCode() string {
+	if x != nil {
+		return x.Code
 	}
 	return ""
 }
@@ -928,11 +944,13 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"first_name\x18\x04 \x01(\tR\tfirstName\x12\x1b\n" +
 	"\tlast_name\x18\x05 \x01(\tR\blastName\x12\x1a\n" +
 	"\busername\x18\x06 \x01(\tR\busername\x12\x1b\n" +
-	"\tphoto_url\x18\a \x01(\tR\bphotoUrl\"5\n" +
+	"\tphoto_url\x18\a \x01(\tR\bphotoUrl\"I\n" +
 	"\x1bConfirmTelegramAuthResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"+\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\"?\n" +
 	"\x13TelegramAuthRequest\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\"\x9d\x01\n" +
+	"\x05token\x18\x01 \x01(\tR\x05token\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\"\x9d\x01\n" +
 	"\x1bCompleteRegistrationRequest\x12\x16\n" +
 	"\x06region\x18\x02 \x01(\tR\x06region\x12\x18\n" +
 	"\acountry\x18\x03 \x01(\tR\acountry\x12\x12\n" +

@@ -23,7 +23,7 @@ func (i *Implementation) CreateTelegramAuthChallenge(ctx context.Context, _ *v1.
 }
 
 func (i *Implementation) ConfirmTelegramAuth(ctx context.Context, req *v1.ConfirmTelegramAuthRequest) (*v1.ConfirmTelegramAuthResponse, error) {
-	err := i.service.ConfirmTelegramAuth(ctx, req.BotToken, req.Token, model.TelegramAuthPayload{
+	code, err := i.service.ConfirmTelegramAuth(ctx, req.BotToken, req.Token, model.TelegramAuthPayload{
 		ID:        req.TelegramId,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
@@ -34,11 +34,11 @@ func (i *Implementation) ConfirmTelegramAuth(ctx context.Context, req *v1.Confir
 		return nil, err
 	}
 
-	return &v1.ConfirmTelegramAuthResponse{Status: "ok"}, nil
+	return &v1.ConfirmTelegramAuthResponse{Status: "ok", Code: code}, nil
 }
 
 func (i *Implementation) TelegramAuth(ctx context.Context, req *v1.TelegramAuthRequest) (*v1.ProfileResponse, error) {
-	response, rawToken, expiresAt, err := i.service.TelegramAuth(ctx, req.Token)
+	response, rawToken, expiresAt, err := i.service.TelegramAuth(ctx, req.Token, req.Code)
 	if err != nil {
 		return nil, err
 	}

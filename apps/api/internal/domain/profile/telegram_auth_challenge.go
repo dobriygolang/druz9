@@ -2,6 +2,8 @@ package profile
 
 import (
 	"context"
+	"crypto/rand"
+	"fmt"
 	"strings"
 
 	profileerrors "api/internal/errors/profile"
@@ -30,18 +32,20 @@ func (s *Service) CreateTelegramAuthChallenge(_ context.Context) (*model.Telegra
 	}, nil
 }
 
-// ConfirmTelegramAuth stores Telegram user data for the one-time challenge.
-func (s *Service) ConfirmTelegramAuth(_ context.Context, botToken, challengeToken string, payload model.TelegramAuthPayload) error {
+const telegramLoginCodeLength = 6
+
+// ConfirmTelegramAuth stores Telegram user data for the one-time challenge and returns a one-time website code.
+func (s *Service) ConfirmTelegramAuth(_ context.Context, botToken, challengeToken string, payload model.TelegramAuthPayload) (string, error) {
 	if !s.settings.DevBypass && strings.TrimSpace(botToken) != s.settings.BotToken {
-		return profileerrors.ErrUnauthorized
+		return "", profileerrors.ErrUnauthorized
 	}
 	if payload.ID == 0 {
-		return profileerrors.ErrUnauthorized
+		return "", profileerrors.ErrUnauthorized
 	}
 
 	challengeToken = strings.TrimSpace(challengeToken)
 	if challengeToken == "" {
-		return profileerrors.ErrUnauthorized
+		return "", profileerrors.ErrUnauthorized
 	}
 
 	now := s.Now()
@@ -51,23 +55,30 @@ func (s *Service) ConfirmTelegramAuth(_ context.Context, botToken, challengeToke
 
 	state, ok := s.auth.byToken[challengeToken]
 	if !ok {
-		return profileerrors.ErrUnauthorized
+		return "", profileerrors.ErrUnauthorized
 	}
 	if !state.expiresAt.After(now) {
 		delete(s.auth.byToken, challengeToken)
-		return profileerrors.ErrUnauthorized
+		return "", profileerrors.ErrUnauthorized
+	}
+
+	loginCode, err := generateTelegramLoginCode()
+	if err != nil {
+		return "", err
 	}
 
 	state.payload = payload
-	state.confirmed = true
-	return nil
+	state.loginCode = loginCode
+	state.confirmed = false
+	return loginCode, nil
 }
 
-func (s *Service) consumeConfirmedTelegramAuthChallenge(challengeToken string) (model.TelegramAuthPayload, error) {
+func (s *Service) consumeConfirmedTelegramAuthChallenge(challengeToken, loginCode string) (model.TelegramAuthPayload, error) {
 	challengeToken = strings.TrimSpace(challengeToken)
 	if challengeToken == "" {
 		return model.TelegramAuthPayload{}, profileerrors.ErrUnauthorized
 	}
+	loginCode = normalizeTelegramLoginCode(loginCode)
 
 	now := s.Now()
 
@@ -82,10 +93,35 @@ func (s *Service) consumeConfirmedTelegramAuthChallenge(challengeToken string) (
 		delete(s.auth.byToken, challengeToken)
 		return model.TelegramAuthPayload{}, profileerrors.ErrUnauthorized
 	}
-	if !state.confirmed || state.payload.ID == 0 {
+	if state.payload.ID == 0 {
+		return model.TelegramAuthPayload{}, profileerrors.ErrUnauthorized
+	}
+	switch {
+	case state.loginCode != "":
+		if loginCode == "" || loginCode != state.loginCode {
+			return model.TelegramAuthPayload{}, profileerrors.ErrUnauthorized
+		}
+	case !state.confirmed:
 		return model.TelegramAuthPayload{}, profileerrors.ErrUnauthorized
 	}
 
 	delete(s.auth.byToken, challengeToken)
 	return state.payload, nil
+}
+
+func generateTelegramLoginCode() (string, error) {
+	bytes := make([]byte, telegramLoginCodeLength)
+	if _, err := rand.Read(bytes); err != nil {
+		return "", fmt.Errorf("generate telegram login code: %w", err)
+	}
+
+	for index, value := range bytes {
+		bytes[index] = '0' + (value % 10)
+	}
+
+	return string(bytes), nil
+}
+
+func normalizeTelegramLoginCode(value string) string {
+	return strings.TrimSpace(value)
 }

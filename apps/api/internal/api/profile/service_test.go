@@ -23,6 +23,7 @@ func TestTelegramAuth(t *testing.T) {
 		userID := uuid.New()
 		req := &v1.TelegramAuthRequest{
 			Token: "challenge-token",
+			Code:  "123456",
 		}
 		expectedResponse := &model.ProfileResponse{
 			User: &model.User{ID: userID, FirstName: "John"},
@@ -31,7 +32,7 @@ func TestTelegramAuth(t *testing.T) {
 		expiresAt := time.Now().Add(time.Hour)
 
 		mockService := mocks.NewService(t)
-		mockService.On("TelegramAuth", mock.Anything, mock.Anything).Return(expectedResponse, rawToken, expiresAt, nil).Once()
+		mockService.On("TelegramAuth", mock.Anything, "challenge-token", "123456").Return(expectedResponse, rawToken, expiresAt, nil).Once()
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 		mockCookie.On("SetSessionCookie", mock.Anything, rawToken, expiresAt).Once()
@@ -55,7 +56,7 @@ func TestTelegramAuth(t *testing.T) {
 
 		expectedErr := errors.New("auth failed")
 		mockService := mocks.NewService(t)
-		mockService.On("TelegramAuth", mock.Anything, mock.Anything).Return(nil, "", time.Time{}, expectedErr).Once()
+		mockService.On("TelegramAuth", mock.Anything, "challenge-token", "").Return(nil, "", time.Time{}, expectedErr).Once()
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 
@@ -99,7 +100,7 @@ func TestConfirmTelegramAuth(t *testing.T) {
 		LastName:  "Doe",
 		Username:  "johndoe",
 		PhotoURL:  "https://example.com/avatar.jpg",
-	}).Return(nil).Once()
+	}).Return("123456", nil).Once()
 
 	impl := New(mockService, mocks.NewSessionCookieManager(t))
 
@@ -117,6 +118,9 @@ func TestConfirmTelegramAuth(t *testing.T) {
 	}
 	if resp.Status != "ok" {
 		t.Fatalf("expected ok status, got %q", resp.Status)
+	}
+	if resp.Code != "123456" {
+		t.Fatalf("expected code 123456, got %q", resp.Code)
 	}
 }
 

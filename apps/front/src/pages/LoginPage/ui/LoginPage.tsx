@@ -6,10 +6,10 @@ export const LoginPage: React.FC = () => {
   const { login } = useAuth();
   const [error, setError] = useState('');
 
-  const handleTelegramAuth = async (token: string) => {
+  const handleTelegramAuth = async (token: string, code: string) => {
     try {
       setError('');
-      await login(token);
+      await login(token, code);
     } catch (err) {
       setError('Ошибка авторизации через Telegram');
       console.error(err);
