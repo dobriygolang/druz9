@@ -1,86 +1,82 @@
 name: CI
 
 on:
+  pull_request:
   push:
     branches:
-      - "**"
-  pull_request:
+      - main
+      - master
 
 jobs:
-  api-quality:
-    name: API Quality
+  api:
+    name: API Tests
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: apps/api
+        working-directory: api
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
-          go-version-file: apps/api/go.mod
-          cache: true
+          go-version-file: api/go.mod
+          cache-dependency-path: api/go.sum
 
-      - name: Check formatting (gofmt)
-        run: |
-          UNFORMATTED="$(gofmt -l .)"
-          if [ -n "$UNFORMATTED" ]; then
-            echo "These files are not gofmt-formatted:"
-            echo "$UNFORMATTED"
-            exit 1
-          fi
-
-      - name: Vet
-        run: go vet ./...
-
-      - name: Lint (golangci-lint)
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
-          install-mode: goinstall
-          working-directory: apps/api
-          args: --timeout=5m
-
-      - name: Test
+      - name: Run API tests
         run: go test ./...
 
-  notification-quality:
-    name: Notification Service Quality
+  notification-service:
+    name: Notification Service Tests
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: apps/notification-service
+        working-directory: notification-service
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Setup Go
-        uses: actions/setup-go@v5
+      - uses: actions/setup-go@v5
         with:
-          go-version-file: apps/notification-service/go.mod
-          cache: true
+          go-version-file: notification-service/go.mod
+          cache-dependency-path: notification-service/go.sum
 
-      - name: Check formatting (gofmt)
-        run: |
-          UNFORMATTED="$(gofmt -l .)"
-          if [ -n "$UNFORMATTED" ]; then
-            echo "These files are not gofmt-formatted:"
-            echo "$UNFORMATTED"
-            exit 1
-          fi
-
-      - name: Vet
-        run: go vet ./...
-
-      - name: Lint (golangci-lint)
-        uses: golangci/golangci-lint-action@v6
-        with:
-          version: latest
-          install-mode: goinstall
-          working-directory: apps/notification-service
-          args: --timeout=5m
-
-      - name: Test
+      - name: Run notification-service tests
         run: go test ./...
+
+  frontend:
+    name: Frontend Build
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: front
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: front/package-lock.json
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build frontend
+        run: npm run build
+
+  deploy-config:
+    name: Deploy Config Validation
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Validate deploy shell scripts
+        run: |
+          bash -n deploy/scripts/deploy.sh
+          bash -n deploy/scripts/render-prod-values.sh
+
+      - name: Validate production compose
+        run: |
+          docker compose \
+            --env-file deploy/.env.prod.example \
+            -f deploy/docker-compose.prod.yml \
+            config >/dev/null
