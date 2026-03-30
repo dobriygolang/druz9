@@ -1,6 +1,0 @@
-apps/deploy/.env.prod
-apps/deploy/runtime/*
-!apps/deploy/runtime/
-!apps/deploy/runtime/values_prod.yaml.example
-apps/deploy/runtime/values_prod.yaml
-apps/deploy/runtime/secrets/
