@@ -173,13 +173,6 @@ telegram_auth_max_age:
   type: "duration"
   writable: false
 
-telegram_bot_token:
-  usage: "Deprecated: use env TELEGRAM_BOT_TOKEN"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
-
 telegram_bot_username:
   usage: "Telegram bot username without @; env TELEGRAM_BOT_USERNAME overrides"
   group: "external"
@@ -246,13 +239,13 @@ s3_secret_key:
 dev_auth_bypass:
   usage: "Allow local auth bypass"
   group: "dev"
-  value: "true"
+  value: "false"
   type: "bool"
   writable: false
 
 dev_user_id:
   usage: "Dev user ID for bypass mode"
   group: "dev"
-  value: "bc4d1f5c-ffc5-4ade-89c3-fdd179132502"
+  value: ""
   type: "string"
   writable: false

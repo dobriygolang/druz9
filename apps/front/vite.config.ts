@@ -12,7 +12,7 @@ export default defineConfig({
   server: {
     port: 3000,
     host: true,
-    allowedHosts: ['b98ce7beae0d52.lhr.life'],
+    allowedHosts: ['localhost'],
     proxy: {
       '/api': {
         target: 'http://localhost:8080',

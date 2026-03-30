@@ -12,11 +12,24 @@ import (
 
 // CreateTelegramAuthChallenge generates a one-time token for Telegram login.
 func (s *Service) CreateTelegramAuthChallenge(_ context.Context) (*model.TelegramAuthChallenge, error) {
+	bytes := make([]byte, 32)
+	if _, err := rand.Read(bytes); err != nil {
+		return nil, fmt.Errorf("generate challenge token: %w", err)
+	}
+	
+	token := fmt.Sprintf("%x", bytes)
 	expiresAt := s.Now().Add(s.settings.TelegramAuthMaxAge)
+	
+	s.auth.mu.Lock()
+	s.auth.byToken[token] = &telegramAuthChallengeState{
+		expiresAt: expiresAt,
+		confirmed: false,
+	}
+	s.auth.mu.Unlock()
 
 	return &model.TelegramAuthChallenge{
-		Token:       "",
-		BotStartURL: s.buildBotStartURL(""),
+		Token:       token,
+		BotStartURL: s.buildBotStartURL(token),
 		ExpiresAt:   expiresAt,
 	}, nil
 }

@@ -31,7 +31,7 @@ build:
 .PHONY: run
 # run application with runtime config from .platform/values_<profile>.yaml
 run:
-	GOCACHE=$(GOCACHE_DIR) go run ./cmd/api
+	set -a && . ./.env && set +a && GOCACHE=$(GOCACHE_DIR) go run ./cmd/api
 
 .PHONY: migrate-up
 # apply goose migrations to local database
