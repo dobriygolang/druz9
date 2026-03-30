@@ -31,7 +31,7 @@ export const TelegramAuthWidget: React.FC<TelegramAuthWidgetProps> = ({
         window.open(challenge.botStartUrl, '_blank', 'noopener,noreferrer');
       }
 
-      setHint('Открой бота в Telegram, нажми Start и введи код из сообщения ниже.');
+      setHint('Открой бота в Telegram, нажми Start и введи код из сообщения ниже. Если бот уже открыт, просто отправь /start.');
       setIsStarting(false);
     } catch (error) {
       setIsStarting(false);
@@ -40,7 +40,7 @@ export const TelegramAuthWidget: React.FC<TelegramAuthWidgetProps> = ({
   };
 
   const handleSubmit = async () => {
-    if (!challengeToken || !code.trim()) {
+    if (!code.trim()) {
       setHint('Сначала открой Telegram-бота и получи код.');
       return;
     }
@@ -104,7 +104,7 @@ export const TelegramAuthWidget: React.FC<TelegramAuthWidgetProps> = ({
           type="button"
           className="btn btn-secondary"
           onClick={handleSubmit}
-          disabled={isSubmitting || !challengeToken || code.trim().length < 4}
+          disabled={isSubmitting || code.trim().length < 4}
           style={{ width: '100%', minHeight: '44px' }}
         >
           {isSubmitting ? 'Проверяем код...' : 'Войти по коду'}

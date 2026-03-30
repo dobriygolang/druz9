@@ -22,7 +22,7 @@ func TestTelegramAuth(t *testing.T) {
 
 		userID := uuid.New()
 		req := &v1.TelegramAuthRequest{
-			Token: "challenge-token",
+			Token: "",
 			Code:  "123456",
 		}
 		expectedResponse := &model.ProfileResponse{
@@ -32,7 +32,7 @@ func TestTelegramAuth(t *testing.T) {
 		expiresAt := time.Now().Add(time.Hour)
 
 		mockService := mocks.NewService(t)
-		mockService.On("TelegramAuth", mock.Anything, "challenge-token", "123456").Return(expectedResponse, rawToken, expiresAt, nil).Once()
+		mockService.On("TelegramAuth", mock.Anything, "", "123456").Return(expectedResponse, rawToken, expiresAt, nil).Once()
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 		mockCookie.On("SetSessionCookie", mock.Anything, rawToken, expiresAt).Once()
@@ -74,8 +74,8 @@ func TestCreateTelegramAuthChallenge(t *testing.T) {
 
 	mockService := mocks.NewService(t)
 	mockService.On("CreateTelegramAuthChallenge", mock.Anything).Return(&model.TelegramAuthChallenge{
-		Token:       "challenge-token",
-		BotStartURL: "https://t.me/druz9_bot?start=challenge-token",
+		Token:       "",
+		BotStartURL: "https://t.me/druz9_bot",
 		ExpiresAt:   time.Now().Add(time.Minute),
 	}, nil).Once()
 
@@ -85,7 +85,7 @@ func TestCreateTelegramAuthChallenge(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.Token == "" || resp.BotStartUrl == "" || resp.ExpiresAt == nil {
+	if resp.BotStartUrl == "" || resp.ExpiresAt == nil {
 		t.Fatalf("expected filled challenge response, got %+v", resp)
 	}
 }

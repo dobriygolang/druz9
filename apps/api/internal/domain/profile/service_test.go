@@ -315,9 +315,6 @@ func TestTelegramAuthChallenge(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if challenge.Token == "" {
-			t.Fatal("expected token to be set")
-		}
 		if challenge.BotStartURL == "" {
 			t.Fatal("expected start url to be set")
 		}
@@ -336,12 +333,7 @@ func TestTelegramAuthChallenge(t *testing.T) {
 			},
 		})
 
-		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-
-		code, err := svc.ConfirmTelegramAuth(context.Background(), "bot-secret", challenge.Token, model.TelegramAuthPayload{ID: 123})
+		code, err := svc.ConfirmTelegramAuth(context.Background(), "bot-secret", "", model.TelegramAuthPayload{ID: 123})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -360,12 +352,7 @@ func TestTelegramAuthChallenge(t *testing.T) {
 			},
 		})
 
-		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-
-		_, err = svc.ConfirmTelegramAuth(context.Background(), "wrong-secret", challenge.Token, model.TelegramAuthPayload{ID: 123})
+		_, err := svc.ConfirmTelegramAuth(context.Background(), "wrong-secret", "", model.TelegramAuthPayload{ID: 123})
 		if err == nil {
 			t.Fatal("expected error for invalid bot secret")
 		}
@@ -408,7 +395,7 @@ func TestTelegramAuth(t *testing.T) {
 			t.Fatal("expected website code")
 		}
 
-		profile, token, expiresAt, err := svc.TelegramAuth(context.Background(), challenge.Token, code)
+		profile, token, expiresAt, err := svc.TelegramAuth(context.Background(), "", code)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -456,11 +443,7 @@ func TestTelegramAuth(t *testing.T) {
 			},
 		})
 
-		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
-		if err != nil {
-			t.Fatalf("unexpected error: %v", err)
-		}
-		code, err := svc.ConfirmTelegramAuth(context.Background(), "", challenge.Token, model.TelegramAuthPayload{ID: 123})
+		code, err := svc.ConfirmTelegramAuth(context.Background(), "", "", model.TelegramAuthPayload{ID: 123})
 		if err != nil {
 			t.Fatalf("unexpected confirm error: %v", err)
 		}
@@ -468,7 +451,7 @@ func TestTelegramAuth(t *testing.T) {
 			t.Fatal("expected website code")
 		}
 
-		_, _, _, err = svc.TelegramAuth(context.Background(), challenge.Token, code)
+		_, _, _, err = svc.TelegramAuth(context.Background(), "", code)
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}

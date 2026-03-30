@@ -46,6 +46,7 @@ type Service struct {
 type telegramAuthChallenges struct {
 	mu      sync.Mutex
 	byToken map[string]*telegramAuthChallengeState
+	byCode  map[string]*telegramAuthChallengeState
 }
 
 type telegramAuthChallengeState struct {
@@ -85,6 +86,7 @@ func NewProfileService(c Config) *Service {
 		settings: c.Settings,
 		auth: &telegramAuthChallenges{
 			byToken: make(map[string]*telegramAuthChallengeState),
+			byCode:  make(map[string]*telegramAuthChallengeState),
 		},
 	}
 }
@@ -150,6 +152,9 @@ func (s *Service) BotUsername() string {
 func (s *Service) buildBotStartURL(token string) string {
 	if s.settings.BotUsername == "" {
 		return ""
+	}
+	if token == "" {
+		return fmt.Sprintf("https://t.me/%s", url.PathEscape(s.settings.BotUsername))
 	}
 	return fmt.Sprintf("https://t.me/%s?start=%s", url.PathEscape(s.settings.BotUsername), url.QueryEscape(token))
 }

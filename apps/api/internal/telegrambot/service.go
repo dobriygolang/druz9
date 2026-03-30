@@ -79,11 +79,6 @@ func (s *Service) handleUpdate(ctx context.Context, update telegramUpdate) {
 		return
 	}
 
-	if token == "" {
-		s.sendMessage(ctx, update.Message.Chat.ID, "Открой ссылку авторизации заново из приложения.")
-		return
-	}
-
 	code, err := s.profile.ConfirmTelegramAuth(ctx, s.profile.BotToken(), token, model.TelegramAuthPayload{
 		ID:        update.Message.From.ID,
 		FirstName: update.Message.From.FirstName,
