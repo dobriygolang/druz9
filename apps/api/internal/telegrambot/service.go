@@ -39,6 +39,9 @@ func (s *Service) Run(ctx context.Context) error {
 	if !s.Enabled() {
 		return nil
 	}
+	if err := s.deleteWebhook(ctx); err != nil {
+		klog.Errorf("telegram bot deleteWebhook error: %v", err)
+	}
 
 	var offset int64
 	for {
@@ -136,6 +139,13 @@ func (s *Service) sendMessage(ctx context.Context, chatID int64, text string) {
 	if err := s.call(ctx, "sendMessage", reqBody, nil); err != nil {
 		klog.Errorf("telegram bot sendMessage error: %v", err)
 	}
+}
+
+func (s *Service) deleteWebhook(ctx context.Context) error {
+	reqBody := map[string]any{
+		"drop_pending_updates": false,
+	}
+	return s.call(ctx, "deleteWebhook", reqBody, nil)
 }
 
 func (s *Service) call(ctx context.Context, method string, requestBody any, out any) error {
