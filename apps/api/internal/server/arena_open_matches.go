@@ -26,7 +26,7 @@ func arenaOpenMatchesHandler(service interface {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		limit := int32(8)
 		if raw := r.URL.Query().Get("limit"); raw != "" {
-			if parsed, err := strconv.Atoi(raw); err == nil {
+			if parsed, err := strconv.ParseInt(raw, 10, 32); err == nil {
 				switch {
 				case parsed < 1:
 					limit = 1

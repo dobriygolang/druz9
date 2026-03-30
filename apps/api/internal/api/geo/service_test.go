@@ -36,7 +36,7 @@ func TestResolve(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if len(resp.Candidates) != 1 {
 			t.Errorf("expected 1 candidate, got %d", len(resp.Candidates))

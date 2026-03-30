@@ -70,7 +70,11 @@ func normalizeTaskPolicy(task *domain.Task) error {
 	task.WritableTempDir = spec.WritableTempDir
 	task.AllowedPorts = make([]int32, 0, len(spec.AllowedPorts))
 	for _, port := range spec.AllowedPorts {
-		task.AllowedPorts = append(task.AllowedPorts, int32(port))
+		normalizedPort, err := safePortInt32(port)
+		if err != nil {
+			return err
+		}
+		task.AllowedPorts = append(task.AllowedPorts, normalizedPort)
 	}
 
 	return nil

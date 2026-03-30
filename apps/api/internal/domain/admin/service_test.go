@@ -5,8 +5,9 @@ import (
 	"errors"
 	"testing"
 
-	"api/internal/domain/admin/mocks"
 	"github.com/google/uuid"
+
+	"api/internal/domain/admin/mocks"
 )
 
 func TestDeleteUser(t *testing.T) {

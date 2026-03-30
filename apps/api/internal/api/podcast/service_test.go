@@ -41,7 +41,7 @@ func TestListPodcasts(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if len(resp.Podcasts) != 1 {
 			t.Errorf("expected 1 podcast, got %d", len(resp.Podcasts))
@@ -298,7 +298,7 @@ func TestPlayPodcast(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if resp.StreamUrl != signedURL {
 			t.Errorf("expected URL %s, got %s", signedURL, resp.StreamUrl)

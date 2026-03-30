@@ -13,6 +13,8 @@ import (
 	"github.com/stretchr/testify/mock"
 )
 
+const testSessionHash = "test-hash"
+
 func TestGetProfileByID(t *testing.T) {
 	t.Parallel()
 
@@ -147,7 +149,7 @@ func TestDeleteSessionByHash(t *testing.T) {
 	t.Run("delegates to session storage", func(t *testing.T) {
 		t.Parallel()
 
-		hash := "test-hash"
+		hash := testSessionHash
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
 		mockSessionStorage.On("DeleteSessionByHash", context.Background(), hash).Return(nil).Once()
@@ -172,7 +174,7 @@ func TestFindSessionByHash(t *testing.T) {
 	t.Run("delegates to session storage", func(t *testing.T) {
 		t.Parallel()
 
-		hash := "test-hash"
+		hash := testSessionHash
 		expectedUser := &model.User{ID: uuid.New()}
 		expectedAuthState := &model.AuthState{User: expectedUser}
 
@@ -202,7 +204,7 @@ func TestLogout(t *testing.T) {
 	t.Run("delegates to session storage", func(t *testing.T) {
 		t.Parallel()
 
-		hash := "test-hash"
+		hash := testSessionHash
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
 		mockSessionStorage.On("DeleteSessionByHash", context.Background(), hash).Return(nil).Once()
@@ -404,7 +406,7 @@ func TestTelegramAuth(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if profile == nil {
-			t.Error("expected profile, got nil")
+			t.Fatal("expected profile, got nil")
 		}
 		if token == "" {
 			t.Error("expected token, got empty string")
@@ -598,7 +600,7 @@ func TestCompleteRegistration(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if profile == nil {
-			t.Error("expected profile, got nil")
+			t.Fatal("expected profile, got nil")
 		}
 		if token == "" {
 			t.Error("expected token, got empty string")
@@ -656,7 +658,7 @@ func TestNewSession(t *testing.T) {
 			t.Error("expected raw token, got empty string")
 		}
 		if session == nil {
-			t.Error("expected session, got nil")
+			t.Fatal("expected session, got nil")
 		}
 		if session.UserID != userID {
 			t.Errorf("expected userID %s, got %s", userID, session.UserID)

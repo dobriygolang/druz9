@@ -18,6 +18,7 @@ const (
 	maxOutputSize   = 64 * 1024 // 64KB max output
 	requestHeadroom = 500 * time.Millisecond
 	minExecBudget   = 100 * time.Millisecond
+	privateFileMode = 0o600
 )
 
 // Service executes Go code in isolated environment.
@@ -104,6 +105,7 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 		return "", false, err
 	}
 
+	// #nosec G204 -- arguments are constrained to generated local Go sources inside the sandbox temp dir.
 	cmd := exec.CommandContext(execCtx, "go", append([]string{"run"}, runArgs...)...)
 	cmd.Dir = tmpDir
 	cmd.Env = execEnv
@@ -138,17 +140,17 @@ func prepareGoSources(root string, req ExecutionRequest) ([]string, error) {
 	switch mode {
 	case "function_io":
 		solutionFile := filepath.Join(root, "solution.go")
-		if err := os.WriteFile(solutionFile, []byte(req.Code), 0644); err != nil {
+		if err := os.WriteFile(solutionFile, []byte(req.Code), privateFileMode); err != nil {
 			return nil, fmt.Errorf("write solution file: %w", err)
 		}
 		wrapperFile := filepath.Join(root, "main.go")
-		if err := os.WriteFile(wrapperFile, []byte(goFunctionIOWrapper()), 0644); err != nil {
+		if err := os.WriteFile(wrapperFile, []byte(goFunctionIOWrapper()), privateFileMode); err != nil {
 			return nil, fmt.Errorf("write wrapper file: %w", err)
 		}
 		return []string{"."}, nil
 	default:
 		mainFile := filepath.Join(root, "main.go")
-		if err := os.WriteFile(mainFile, []byte(req.Code), 0644); err != nil {
+		if err := os.WriteFile(mainFile, []byte(req.Code), privateFileMode); err != nil {
 			return nil, fmt.Errorf("write code file: %w", err)
 		}
 		return []string{mainFile}, nil
@@ -267,7 +269,7 @@ func materializeFiles(root string, files map[string]string, fs policy.RunnerFile
 		if fs.MaxFileSizeBytes > 0 && int64(len(content)) > fs.MaxFileSizeBytes {
 			return fmt.Errorf("fixture file %q exceeds max size", path)
 		}
-		if err := os.WriteFile(target, []byte(content), 0644); err != nil {
+		if err := os.WriteFile(target, []byte(content), privateFileMode); err != nil {
 			return fmt.Errorf("write fixture file: %w", err)
 		}
 	}

@@ -47,7 +47,7 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 		UserID:      user.ID,
 		Code:        code,
 		SubmittedAt: time.Now(),
-		TotalCount:  int32(len(testCases)),
+		TotalCount:  safeArenaInt32(len(testCases)),
 	}
 
 	var lastOutput string
@@ -112,4 +112,14 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 	}
 
 	return created, match, nil
+}
+
+func safeArenaInt32(value int) int32 {
+	if value > int(^uint32(0)>>1) {
+		return int32(^uint32(0) >> 1)
+	}
+	if value < -int(^uint32(0)>>1)-1 {
+		return -int32(^uint32(0)>>1) - 1
+	}
+	return int32(value)
 }

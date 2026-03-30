@@ -22,7 +22,7 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
 	}
 
-	exitCode := 0
+	var exitCode int32
 	if submission.Error != "" {
 		exitCode = 1
 	}
@@ -33,7 +33,7 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 	i.realtime.PublishSubmission(roomID.String(), &realtime.CodeEditorSubmissionEvent{
 		Output:      submission.Output,
 		Error:       submission.Error,
-		ExitCode:    int32(exitCode),
+		ExitCode:    exitCode,
 		SubmittedBy: submittedBy,
 	})
 

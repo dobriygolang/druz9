@@ -242,13 +242,6 @@ func participantIdentity(participant *codeeditordomain.Participant) string {
 	return participant.Name
 }
 
-func roomTitle(room *codeeditordomain.Room) string {
-	if room == nil {
-		return ""
-	}
-	return "Комната " + room.ID.String()[:8]
-}
-
 func roomModeToProto(mode model.RoomMode) v1.RoomMode {
 	switch mode {
 	case model.RoomModeAll:

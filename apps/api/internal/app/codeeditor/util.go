@@ -6,8 +6,6 @@ import (
 	"time"
 )
 
-var cryptoRand = rand.Reader
-
 func generateInviteCode() string {
 	const chars = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789"
 	b := make([]byte, 8)

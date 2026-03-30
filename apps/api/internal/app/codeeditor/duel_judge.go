@@ -2,6 +2,8 @@ package codeeditor
 
 import (
 	"context"
+	"fmt"
+	"math"
 
 	domain "api/internal/domain/codeeditor"
 	"api/internal/policy"
@@ -54,8 +56,8 @@ func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID 
 		Error:       lastError,
 		SubmittedAt: now(),
 		IsCorrect:   totalCount > 0 && passedCount == totalCount,
-		PassedCount: int32(passedCount),
-		TotalCount:  int32(totalCount),
+		PassedCount: safeInt32(passedCount),
+		TotalCount:  safeInt32(totalCount),
 	}
 
 	if room.StartedAt != nil {
@@ -78,4 +80,22 @@ func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID 
 	}
 
 	return created, nil
+}
+
+func safeInt32(value int) int32 {
+	switch {
+	case value > math.MaxInt32:
+		return math.MaxInt32
+	case value < math.MinInt32:
+		return math.MinInt32
+	default:
+		return int32(value)
+	}
+}
+
+func safePortInt32(value int) (int32, error) {
+	if value < 0 || value > math.MaxInt32 {
+		return 0, fmt.Errorf("port %d is out of int32 range", value)
+	}
+	return int32(value), nil
 }

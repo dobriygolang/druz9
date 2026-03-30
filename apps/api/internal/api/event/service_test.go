@@ -44,7 +44,7 @@ func TestListEvents(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if len(resp.Events) != 1 {
 			t.Errorf("expected 1 event, got %d", len(resp.Events))
@@ -117,10 +117,10 @@ func TestCreateEvent(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if resp.Event == nil {
-			t.Error("expected event, got nil")
+			t.Fatal("expected event, got nil")
 		}
 
 		mockService.AssertExpectations(t)
@@ -335,7 +335,7 @@ func TestDeleteEvent(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if resp.Status != "ok" {
 			t.Errorf("expected status 'ok', got %s", resp.Status)

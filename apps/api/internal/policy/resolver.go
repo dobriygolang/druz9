@@ -110,7 +110,7 @@ func isSupportedTaskType(taskType TaskType) bool {
 	}
 }
 
-func applyOverride(p *SandboxPolicy, override PolicyOverride) error {
+func applyOverride(p *SandboxPolicy, override Override) error {
 	if override.TimeLimitMs != nil {
 		if *override.TimeLimitMs > p.Limits.TimeLimitMs {
 			return fmt.Errorf("%w: time limit cannot exceed profile default", ErrUnsafeOverride)

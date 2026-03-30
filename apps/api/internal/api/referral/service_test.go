@@ -43,7 +43,7 @@ func TestListReferrals(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if len(resp.Referrals) != 1 {
 			t.Errorf("expected 1 referral, got %d", len(resp.Referrals))
@@ -103,10 +103,10 @@ func TestCreateReferral(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if resp.Referral == nil {
-			t.Error("expected referral, got nil")
+			t.Fatal("expected referral, got nil")
 		}
 
 		mockService.AssertExpectations(t)
@@ -227,7 +227,7 @@ func TestDeleteReferral(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if resp.Status != "ok" {
 			t.Errorf("expected status 'ok', got %s", resp.Status)

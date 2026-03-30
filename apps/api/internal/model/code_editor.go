@@ -50,11 +50,11 @@ const (
 func (s RoomStatus) String() string {
 	switch s {
 	case RoomStatusWaiting:
-		return "waiting"
+		return arenaMatchStatusWaiting
 	case RoomStatusActive:
-		return "active"
+		return arenaMatchStatusActive
 	case RoomStatusFinished:
-		return "finished"
+		return arenaMatchStatusFinished
 	default:
 		return ""
 	}
@@ -62,11 +62,11 @@ func (s RoomStatus) String() string {
 
 func RoomStatusFromString(str string) RoomStatus {
 	switch str {
-	case "waiting":
+	case arenaMatchStatusWaiting:
 		return RoomStatusWaiting
-	case "active":
+	case arenaMatchStatusActive:
 		return RoomStatusActive
-	case "finished":
+	case arenaMatchStatusFinished:
 		return RoomStatusFinished
 	default:
 		return RoomStatusUnknown
@@ -86,11 +86,11 @@ const (
 func (d TaskDifficulty) String() string {
 	switch d {
 	case TaskDifficultyEasy:
-		return "easy"
+		return arenaDifficultyEasyValue
 	case TaskDifficultyMedium:
-		return "medium"
+		return arenaDifficultyMediumValue
 	case TaskDifficultyHard:
-		return "hard"
+		return arenaDifficultyHardValue
 	default:
 		return ""
 	}
@@ -98,11 +98,11 @@ func (d TaskDifficulty) String() string {
 
 func TaskDifficultyFromString(s string) TaskDifficulty {
 	switch s {
-	case "easy":
+	case arenaDifficultyEasyValue:
 		return TaskDifficultyEasy
-	case "medium":
+	case arenaDifficultyMediumValue:
 		return TaskDifficultyMedium
-	case "hard":
+	case arenaDifficultyHardValue:
 		return TaskDifficultyHard
 	default:
 		return TaskDifficultyUnknown

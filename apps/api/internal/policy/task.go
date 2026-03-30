@@ -33,10 +33,10 @@ type TaskSpec struct {
 	MockEndpoints   []string
 	AllowedHosts    []string
 	AllowedPorts    []int
-	Override        *PolicyOverride
+	Override        *Override
 }
 
-type PolicyOverride struct {
+type Override struct {
 	TimeLimitMs      *int
 	MemoryLimitMB    *int
 	OutputLimitBytes *int

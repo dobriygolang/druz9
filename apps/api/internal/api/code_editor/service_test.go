@@ -49,7 +49,7 @@ func TestCreateRoom(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if resp.InviteCode != "ABC123" {
 			t.Errorf("expected invite code ABC123, got %s", resp.InviteCode)
@@ -140,10 +140,10 @@ func TestGetRoom(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if resp.Room == nil {
-			t.Error("expected room, got nil")
+			t.Fatal("expected room, got nil")
 		}
 
 		mockService.AssertExpectations(t)
@@ -361,7 +361,7 @@ func TestGetSubmissions(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if len(resp.Submissions) != 1 {
 			t.Errorf("expected 1 submission, got %d", len(resp.Submissions))
@@ -403,7 +403,7 @@ func TestListTasks(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if len(resp.Tasks) != 1 {
 			t.Errorf("expected 1 task, got %d", len(resp.Tasks))
@@ -446,10 +446,10 @@ func TestCreateTask(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if resp.Task == nil {
-			t.Error("expected task, got nil")
+			t.Fatal("expected task, got nil")
 		}
 
 		mockService.AssertExpectations(t)
@@ -567,7 +567,7 @@ func TestGetLeaderboard(t *testing.T) {
 			t.Errorf("unexpected error: %v", err)
 		}
 		if resp == nil {
-			t.Error("expected response, got nil")
+			t.Fatal("expected response, got nil")
 		}
 		if len(resp.Entries) != 1 {
 			t.Errorf("expected 1 entry, got %d", len(resp.Entries))

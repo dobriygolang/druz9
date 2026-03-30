@@ -228,24 +228,27 @@ func arenaQueueStateJSON(state *model.ArenaQueueState) map[string]any {
 func normalizeArenaDifficultyInput(raw json.RawMessage) string {
 	value := strings.TrimSpace(string(raw))
 	value = strings.Trim(value, `"`)
+	easy := model.ArenaDifficultyEasy.String()
+	medium := model.ArenaDifficultyMedium.String()
+	hard := model.ArenaDifficultyHard.String()
 	switch value {
 	case "", "0", "DIFFICULTY_UNSPECIFIED":
 		return ""
-	case "1", "DIFFICULTY_EASY", "easy":
-		return "easy"
-	case "2", "DIFFICULTY_MEDIUM", "medium":
-		return "medium"
-	case "3", "DIFFICULTY_HARD", "hard":
-		return "hard"
+	case "1", "DIFFICULTY_EASY", easy:
+		return easy
+	case "2", "DIFFICULTY_MEDIUM", medium:
+		return medium
+	case "3", "DIFFICULTY_HARD", hard:
+		return hard
 	default:
 		if parsed, err := strconv.Atoi(value); err == nil {
 			switch parsed {
 			case 1:
-				return "easy"
+				return easy
 			case 2:
-				return "medium"
+				return medium
 			case 3:
-				return "hard"
+				return hard
 			default:
 				return ""
 			}

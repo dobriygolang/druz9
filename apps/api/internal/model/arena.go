@@ -10,6 +10,10 @@ import (
 type ArenaMatchStatus int
 
 const (
+	arenaMatchStatusWaiting  = "waiting"
+	arenaMatchStatusActive   = "active"
+	arenaMatchStatusFinished = "finished"
+
 	ArenaMatchStatusUnknown ArenaMatchStatus = iota
 	ArenaMatchStatusWaiting
 	ArenaMatchStatusActive
@@ -19,11 +23,11 @@ const (
 func (s ArenaMatchStatus) String() string {
 	switch s {
 	case ArenaMatchStatusWaiting:
-		return "waiting"
+		return arenaMatchStatusWaiting
 	case ArenaMatchStatusActive:
-		return "active"
+		return arenaMatchStatusActive
 	case ArenaMatchStatusFinished:
-		return "finished"
+		return arenaMatchStatusFinished
 	default:
 		return ""
 	}
@@ -31,11 +35,11 @@ func (s ArenaMatchStatus) String() string {
 
 func ArenaMatchStatusFromString(s string) ArenaMatchStatus {
 	switch s {
-	case "waiting":
+	case arenaMatchStatusWaiting:
 		return ArenaMatchStatusWaiting
-	case "active":
+	case arenaMatchStatusActive:
 		return ArenaMatchStatusActive
-	case "finished":
+	case arenaMatchStatusFinished:
 		return ArenaMatchStatusFinished
 	default:
 		return ArenaMatchStatusUnknown
@@ -150,6 +154,10 @@ func ArenaWinnerReasonFromString(s string) ArenaWinnerReason {
 type ArenaDifficulty int
 
 const (
+	arenaDifficultyEasyValue   = "easy"
+	arenaDifficultyMediumValue = "medium"
+	arenaDifficultyHardValue   = "hard"
+
 	ArenaDifficultyUnknown ArenaDifficulty = iota
 	ArenaDifficultyEasy
 	ArenaDifficultyMedium
@@ -159,11 +167,11 @@ const (
 func (d ArenaDifficulty) String() string {
 	switch d {
 	case ArenaDifficultyEasy:
-		return "easy"
+		return arenaDifficultyEasyValue
 	case ArenaDifficultyMedium:
-		return "medium"
+		return arenaDifficultyMediumValue
 	case ArenaDifficultyHard:
-		return "hard"
+		return arenaDifficultyHardValue
 	default:
 		return ""
 	}
@@ -171,11 +179,11 @@ func (d ArenaDifficulty) String() string {
 
 func ArenaDifficultyFromString(s string) ArenaDifficulty {
 	switch s {
-	case "easy":
+	case arenaDifficultyEasyValue:
 		return ArenaDifficultyEasy
-	case "medium":
+	case arenaDifficultyMediumValue:
 		return ArenaDifficultyMedium
-	case "hard":
+	case arenaDifficultyHardValue:
 		return ArenaDifficultyHard
 	default:
 		return ArenaDifficultyUnknown

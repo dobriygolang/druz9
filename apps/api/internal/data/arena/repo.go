@@ -745,10 +745,6 @@ func resolveArenaDisplayName(user *domain.User) string {
 	return "Игрок"
 }
 
-func arenaExpectedScore(self, opponent int32) float64 {
-	return arenarating.ExpectedScore(self, opponent)
-}
-
 func arenaNextRating(self, opponent int32, score float64, difficulty string) int32 {
 	return arenarating.NextRating(self, opponent, score, difficulty)
 }

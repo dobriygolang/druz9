@@ -297,15 +297,19 @@ func registerConfigWatchers(manager *rtc.Manager, cfg *Bootstrap) error {
 	ctx := context.Background()
 
 	// Watch Dev.AuthBypass for hot reloading
-	manager.WatchValue(ctx, rtc.DevAuthBypass, func(oldVar, newVar rtc.Variable) {
+	if err := manager.WatchValue(ctx, rtc.DevAuthBypass, func(oldVar, newVar rtc.Variable) {
 		cfg.Dev.AuthBypass = newVar.Value().Bool()
-	})
-	manager.WatchValue(ctx, rtc.Key("arena_require_auth"), func(oldVar, newVar rtc.Variable) {
+	}); err != nil {
+		return err
+	}
+	if err := manager.WatchValue(ctx, rtc.Key("arena_require_auth"), func(oldVar, newVar rtc.Variable) {
 		if cfg.Arena == nil {
 			cfg.Arena = &Arena{}
 		}
 		cfg.Arena.RequireAuth = newVar.Value().Bool()
-	})
+	}); err != nil {
+		return err
+	}
 	return nil
 }
 
