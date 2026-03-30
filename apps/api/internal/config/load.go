@@ -3,6 +3,7 @@ package config
 import (
 	"context"
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -101,10 +102,6 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 		}
 		cfg.Metrics.Addr = v.String()
 	}
-
-	if v := manager.GetValue(ctx, rtc.DatabaseUrl); v.String() != "" {
-		cfg.Data.Database.Source = v.String()
-	}
 	if v := manager.GetValue(ctx, rtc.DataPoolMinConns); v.String() != "" {
 		parsed, parseErr := strconv.ParseInt(v.String(), 10, 32)
 		if parseErr != nil {
@@ -195,10 +192,6 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 		}
 		cfg.Auth.Session.TelegramAuthMaxAge = d
 	}
-
-	if v := manager.GetValue(ctx, rtc.TelegramBotToken); v.String() != "" {
-		cfg.External.Telegram.BotToken = v.String()
-	}
 	if v := manager.GetValue(ctx, rtc.GeocoderBaseUrl); v.String() != "" {
 		cfg.External.Geocoder.BaseURL = v.String()
 	}
@@ -217,12 +210,6 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 	if v := manager.GetValue(ctx, rtc.S3Bucket); v.String() != "" {
 		cfg.External.S3.Bucket = v.String()
 	}
-	if v := manager.GetValue(ctx, rtc.S3AccessKey); v.String() != "" {
-		cfg.External.S3.AccessKey = v.String()
-	}
-	if v := manager.GetValue(ctx, rtc.S3SecretKey); v.String() != "" {
-		cfg.External.S3.SecretKey = v.String()
-	}
 	if v := manager.GetValue(ctx, rtc.DevAuthBypass); v.String() != "" {
 		cfg.Dev.AuthBypass = strings.EqualFold(v.String(), "true") || v.String() == "1"
 	}
@@ -235,6 +222,8 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 		}
 		cfg.Arena.RequireAuth = strings.EqualFold(v.String(), "true") || v.String() == "1"
 	}
+
+	overrideSecretConfigFromEnv(cfg)
 
 	if cfg.Data.Database.Source == "" {
 		return nil, fmt.Errorf("DATABASE_URL is required")
@@ -253,6 +242,55 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 	}
 
 	return cfg, nil
+}
+
+func overrideSecretConfigFromEnv(cfg *Bootstrap) {
+	if cfg == nil {
+		return
+	}
+
+	if value, ok := lookupEnvValue("DATABASE_URL"); ok {
+		cfg.Data.Database.Source = value
+	}
+	if value, ok := lookupEnvValue("TELEGRAM_BOT_TOKEN"); ok {
+		cfg.External.Telegram.BotToken = value
+	}
+	if value, ok := lookupEnvValue("TELEGRAM_BOT_USERNAME"); ok {
+		cfg.External.Telegram.BotUsername = strings.TrimPrefix(value, "@")
+	}
+	if value, ok := lookupEnvValue("S3_ENDPOINT"); ok {
+		cfg.External.S3.Endpoint = value
+	}
+	if value, ok := lookupEnvValue("S3_PUBLIC_ENDPOINT"); ok {
+		cfg.External.S3.PublicEndpoint = value
+	}
+	if value, ok := lookupEnvValue("S3_BUCKET"); ok {
+		cfg.External.S3.Bucket = value
+	}
+	if value, ok := lookupEnvValue("S3_ACCESS_KEY"); ok {
+		cfg.External.S3.AccessKey = value
+	}
+	if value, ok := lookupEnvValue("S3_SECRET_KEY"); ok {
+		cfg.External.S3.SecretKey = value
+	}
+}
+
+func lookupEnvValue(key string) (string, bool) {
+	if value, ok := os.LookupEnv(key); ok {
+		return strings.TrimSpace(value), true
+	}
+
+	fileKey := key + "_FILE"
+	path, ok := os.LookupEnv(fileKey)
+	if !ok || strings.TrimSpace(path) == "" {
+		return "", false
+	}
+
+	content, err := os.ReadFile(strings.TrimSpace(path))
+	if err != nil {
+		return "", false
+	}
+	return strings.TrimSpace(string(content)), true
 }
 
 func registerConfigWatchers(manager *rtc.Manager, cfg *Bootstrap) error {

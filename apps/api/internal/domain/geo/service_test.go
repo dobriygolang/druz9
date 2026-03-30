@@ -5,8 +5,8 @@ import (
 	"errors"
 	"testing"
 
-	"api/internal/model"
 	"api/internal/domain/geo/mocks"
+	"api/internal/model"
 
 	"github.com/google/uuid"
 )

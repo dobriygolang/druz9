@@ -5,20 +5,40 @@ import (
 
 	"api/internal/model"
 	v1 "api/pkg/api/profile/v1"
+
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func (i *Implementation) TelegramAuth(ctx context.Context, req *v1.TelegramAuthRequest) (*v1.ProfileResponse, error) {
-	payload := model.TelegramAuthPayload{
-		ID:        req.Id,
+func (i *Implementation) CreateTelegramAuthChallenge(ctx context.Context, _ *v1.CreateTelegramAuthChallengeRequest) (*v1.CreateTelegramAuthChallengeResponse, error) {
+	challenge, err := i.service.CreateTelegramAuthChallenge(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.CreateTelegramAuthChallengeResponse{
+		Token:       challenge.Token,
+		BotStartUrl: challenge.BotStartURL,
+		ExpiresAt:   timestamppb.New(challenge.ExpiresAt),
+	}, nil
+}
+
+func (i *Implementation) ConfirmTelegramAuth(ctx context.Context, req *v1.ConfirmTelegramAuthRequest) (*v1.ConfirmTelegramAuthResponse, error) {
+	err := i.service.ConfirmTelegramAuth(ctx, req.BotToken, req.Token, model.TelegramAuthPayload{
+		ID:        req.TelegramId,
 		FirstName: req.FirstName,
 		LastName:  req.LastName,
 		Username:  req.Username,
 		PhotoURL:  req.PhotoUrl,
-		AuthDate:  req.AuthDate,
-		Hash:      req.Hash,
+	})
+	if err != nil {
+		return nil, err
 	}
 
-	response, rawToken, expiresAt, err := i.service.TelegramAuth(ctx, payload)
+	return &v1.ConfirmTelegramAuthResponse{Status: "ok"}, nil
+}
+
+func (i *Implementation) TelegramAuth(ctx context.Context, req *v1.TelegramAuthRequest) (*v1.ProfileResponse, error) {
+	response, rawToken, expiresAt, err := i.service.TelegramAuth(ctx, req.Token)
 	if err != nil {
 		return nil, err
 	}

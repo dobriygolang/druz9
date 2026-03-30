@@ -22,12 +22,7 @@ func TestTelegramAuth(t *testing.T) {
 
 		userID := uuid.New()
 		req := &v1.TelegramAuthRequest{
-			Id:        123,
-			FirstName: "John",
-			LastName:  "Doe",
-			Username:  "johndoe",
-			AuthDate:  time.Now().Unix(),
-			Hash:      "somehash",
+			Token: "challenge-token",
 		}
 		expectedResponse := &model.ProfileResponse{
 			User: &model.User{ID: userID, FirstName: "John"},
@@ -66,11 +61,63 @@ func TestTelegramAuth(t *testing.T) {
 
 		impl := New(mockService, mockCookie)
 
-		_, err := impl.TelegramAuth(context.Background(), &v1.TelegramAuthRequest{Id: 123})
+		_, err := impl.TelegramAuth(context.Background(), &v1.TelegramAuthRequest{Token: "challenge-token"})
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
 	})
+}
+
+func TestCreateTelegramAuthChallenge(t *testing.T) {
+	t.Parallel()
+
+	mockService := mocks.NewService(t)
+	mockService.On("CreateTelegramAuthChallenge", mock.Anything).Return(&model.TelegramAuthChallenge{
+		Token:       "challenge-token",
+		BotStartURL: "https://t.me/druz9_bot?start=challenge-token",
+		ExpiresAt:   time.Now().Add(time.Minute),
+	}, nil).Once()
+
+	impl := New(mockService, mocks.NewSessionCookieManager(t))
+
+	resp, err := impl.CreateTelegramAuthChallenge(context.Background(), &v1.CreateTelegramAuthChallengeRequest{})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Token == "" || resp.BotStartUrl == "" || resp.ExpiresAt == nil {
+		t.Fatalf("expected filled challenge response, got %+v", resp)
+	}
+}
+
+func TestConfirmTelegramAuth(t *testing.T) {
+	t.Parallel()
+
+	mockService := mocks.NewService(t)
+	mockService.On("ConfirmTelegramAuth", mock.Anything, "bot-secret", "challenge-token", model.TelegramAuthPayload{
+		ID:        123,
+		FirstName: "John",
+		LastName:  "Doe",
+		Username:  "johndoe",
+		PhotoURL:  "https://example.com/avatar.jpg",
+	}).Return(nil).Once()
+
+	impl := New(mockService, mocks.NewSessionCookieManager(t))
+
+	resp, err := impl.ConfirmTelegramAuth(context.Background(), &v1.ConfirmTelegramAuthRequest{
+		Token:      "challenge-token",
+		BotToken:   "bot-secret",
+		TelegramId: 123,
+		FirstName:  "John",
+		LastName:   "Doe",
+		Username:   "johndoe",
+		PhotoUrl:   "https://example.com/avatar.jpg",
+	})
+	if err != nil {
+		t.Fatalf("unexpected error: %v", err)
+	}
+	if resp.Status != "ok" {
+		t.Fatalf("expected ok status, got %q", resp.Status)
+	}
 }
 
 func TestGetProfileByID(t *testing.T) {

@@ -83,7 +83,7 @@ arena_require_auth:
   writable: true
 
 database_url:
-  usage: "Primary PostgreSQL DSN"
+  usage: "Deprecated: use env DATABASE_URL"
   group: "data"
   value: ""
   type: "string"
@@ -174,9 +174,16 @@ telegram_auth_max_age:
   writable: false
 
 telegram_bot_token:
-  usage: "Telegram bot token"
+  usage: "Deprecated: use env TELEGRAM_BOT_TOKEN"
   group: "external"
   value: ""
+  type: "string"
+  writable: false
+
+telegram_bot_username:
+  usage: "Telegram bot username without @; env TELEGRAM_BOT_USERNAME overrides"
+  group: "external"
+  value: "druz9_bot"
   type: "string"
   writable: false
 
@@ -223,14 +230,14 @@ s3_bucket:
   writable: false
 
 s3_access_key:
-  usage: "S3 access key"
+  usage: "Deprecated: use env S3_ACCESS_KEY"
   group: "external"
   value: ""
   type: "string"
   writable: false
 
 s3_secret_key:
-  usage: "S3 secret key"
+  usage: "Deprecated: use env S3_SECRET_KEY"
   group: "external"
   value: ""
   type: "string"
@@ -246,6 +253,6 @@ dev_auth_bypass:
 dev_user_id:
   usage: "Dev user ID for bypass mode"
   group: "dev"
-  value: "f0f6633b-a390-4e4d-b200-ef2dff513490"
+  value: ""
   type: "string"
   writable: false

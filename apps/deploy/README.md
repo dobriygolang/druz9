@@ -1,23 +1,24 @@
 # Production Deploy
 
-Production контур проекта:
+Deploy теперь идёт через `docker compose` плюс внешний `nginx` на хосте.
 
-- `deploy/docker-compose.prod.yml` — весь стек: `caddy + frontend + backend + postgres + minio`
-- `deploy/Caddyfile` — reverse proxy и TLS
-- `deploy/scripts/render-prod-values.sh` — генерирует `deploy/runtime/values_prod.yaml`
-- `deploy/scripts/deploy.sh` — запускает production deploy
+- `deploy/docker-compose.prod.yml` поднимает `frontend + backend + postgres + minio`
+- `frontend`, `backend` и `minio` публикуются только в `localhost` ports
+- SSL делается на хосте через `nginx + certbot`
+- reverse proxy тоже на хосте: один домен, маршрутизация по путям
 
-Минимальный порядок:
+Что нужно подготовить:
 
 1. Создать `deploy/.env.prod` по примеру `deploy/.env.prod.example`
-2. Положить секреты в `deploy/runtime/secrets/prod/*`
-3. Запустить:
+2. Создать `deploy/runtime/values_prod.yaml` на основе `deploy/runtime/values_prod.yaml.example`
+3. Положить секреты в `deploy/runtime/secrets/prod/*`
+4. Запустить:
 
 ```bash
 bash deploy/scripts/deploy.sh
 ```
 
-Секреты-файлы:
+Обязательные secret files:
 
 - `database_url`
 - `postgres_password`
@@ -27,11 +28,9 @@ bash deploy/scripts/deploy.sh
 - `s3_secret_key`
 - `telegram_bot_token`
 
-Нужны DNS записи:
+Важно:
 
-- `${APP_HOST}` -> сервер
-- `${API_HOST}` -> сервер
-- `${S3_HOST}` -> сервер
-- `${MINIO_CONSOLE_HOST}` -> сервер
-
-Если `minio` console не нужен снаружи, можно удалить блок `{$MINIO_CONSOLE_HOST}` из `deploy/Caddyfile`.
+- `deploy/.env.prod` не коммитится
+- `deploy/runtime/secrets/prod/*` не коммитятся
+- `deploy/runtime/values_prod.yaml` должен быть заполнен корректно для backend
+- в репозитории хранится только шаблон `deploy/runtime/values_prod.yaml.example`

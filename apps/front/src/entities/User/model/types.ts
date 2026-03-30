@@ -1,14 +1,6 @@
 export type UserStatus = 'pending_profile' | 'active';
 export type ActivityStatus = 'online' | 'recently_active' | 'offline';
 
-export interface TelegramUser {
-  id: string;
-  first_name: string;
-  last_name?: string;
-  username?: string;
-  photo_url?: string;
-}
-
 export interface User {
   id: string;
   telegramId: string;

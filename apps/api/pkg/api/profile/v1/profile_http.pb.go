@@ -20,6 +20,8 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationProfileServiceCompleteRegistration = "/profile.v1.ProfileService/CompleteRegistration"
+const OperationProfileServiceConfirmTelegramAuth = "/profile.v1.ProfileService/ConfirmTelegramAuth"
+const OperationProfileServiceCreateTelegramAuthChallenge = "/profile.v1.ProfileService/CreateTelegramAuthChallenge"
 const OperationProfileServiceGetProfile = "/profile.v1.ProfileService/GetProfile"
 const OperationProfileServiceGetProfileByID = "/profile.v1.ProfileService/GetProfileByID"
 const OperationProfileServiceLogout = "/profile.v1.ProfileService/Logout"
@@ -29,6 +31,8 @@ const OperationProfileServiceUpdateProfile = "/profile.v1.ProfileService/UpdateP
 
 type ProfileServiceHTTPServer interface {
 	CompleteRegistration(context.Context, *CompleteRegistrationRequest) (*ProfileResponse, error)
+	ConfirmTelegramAuth(context.Context, *ConfirmTelegramAuthRequest) (*ConfirmTelegramAuthResponse, error)
+	CreateTelegramAuthChallenge(context.Context, *CreateTelegramAuthChallengeRequest) (*CreateTelegramAuthChallengeResponse, error)
 	GetProfile(context.Context, *GetProfileRequest) (*ProfileResponse, error)
 	GetProfileByID(context.Context, *GetProfileByIDRequest) (*ProfileResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
@@ -39,6 +43,8 @@ type ProfileServiceHTTPServer interface {
 
 func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServer) {
 	r := s.Route("/")
+	r.POST("/api/v1/profile/auth/telegram/challenge", _ProfileService_CreateTelegramAuthChallenge0_HTTP_Handler(srv))
+	r.POST("/api/v1/profile/auth/telegram/confirm", _ProfileService_ConfirmTelegramAuth0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/auth/telegram", _ProfileService_TelegramAuth0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/auth/complete-registration", _ProfileService_CompleteRegistration0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile", _ProfileService_GetProfile0_HTTP_Handler(srv))
@@ -46,6 +52,50 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.POST("/api/v1/profile/location", _ProfileService_UpdateLocation0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/update", _ProfileService_UpdateProfile0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/auth/logout", _ProfileService_Logout0_HTTP_Handler(srv))
+}
+
+func _ProfileService_CreateTelegramAuthChallenge0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateTelegramAuthChallengeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceCreateTelegramAuthChallenge)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateTelegramAuthChallenge(ctx, req.(*CreateTelegramAuthChallengeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateTelegramAuthChallengeResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_ConfirmTelegramAuth0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ConfirmTelegramAuthRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceConfirmTelegramAuth)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ConfirmTelegramAuth(ctx, req.(*ConfirmTelegramAuthRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ConfirmTelegramAuthResponse)
+		return ctx.Result(200, reply)
+	}
 }
 
 func _ProfileService_TelegramAuth0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
@@ -201,6 +251,8 @@ func _ProfileService_Logout0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx
 
 type ProfileServiceHTTPClient interface {
 	CompleteRegistration(ctx context.Context, req *CompleteRegistrationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
+	ConfirmTelegramAuth(ctx context.Context, req *ConfirmTelegramAuthRequest, opts ...http.CallOption) (rsp *ConfirmTelegramAuthResponse, err error)
+	CreateTelegramAuthChallenge(ctx context.Context, req *CreateTelegramAuthChallengeRequest, opts ...http.CallOption) (rsp *CreateTelegramAuthChallengeResponse, err error)
 	GetProfile(ctx context.Context, req *GetProfileRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	GetProfileByID(ctx context.Context, req *GetProfileByIDRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutResponse, err error)
@@ -222,6 +274,32 @@ func (c *ProfileServiceHTTPClientImpl) CompleteRegistration(ctx context.Context,
 	pattern := "/api/v1/profile/auth/complete-registration"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationProfileServiceCompleteRegistration))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) ConfirmTelegramAuth(ctx context.Context, in *ConfirmTelegramAuthRequest, opts ...http.CallOption) (*ConfirmTelegramAuthResponse, error) {
+	var out ConfirmTelegramAuthResponse
+	pattern := "/api/v1/profile/auth/telegram/confirm"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProfileServiceConfirmTelegramAuth))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) CreateTelegramAuthChallenge(ctx context.Context, in *CreateTelegramAuthChallengeRequest, opts ...http.CallOption) (*CreateTelegramAuthChallengeResponse, error) {
+	var out CreateTelegramAuthChallengeResponse
+	pattern := "/api/v1/profile/auth/telegram/challenge"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProfileServiceCreateTelegramAuthChallenge))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

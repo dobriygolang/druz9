@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"api/internal/model"
 	geoerrors "api/internal/errors/geo"
+	"api/internal/model"
 )
 
 // Resolve implements internal/api/geo service interface.

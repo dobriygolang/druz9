@@ -85,9 +85,9 @@ Recommended approach on `mac-mini`:
 - keep the compose file in the repo
 - inject secrets from GitHub Actions into files on the host
 - use Docker `secrets` and `*_FILE` variables for runtime reads
-- expose only the ports you actually need through a reverse proxy such as `Caddy` or `Traefik`
+- expose only the localhost ports you actually need through a host reverse proxy such as `nginx`
 
-Production deploy details live in `./deploy.md`.
+Production deploy details live in [`../deploy/README.md`](../deploy/README.md).
 
 ## Runtime Config
 

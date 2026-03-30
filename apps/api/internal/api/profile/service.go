@@ -13,7 +13,9 @@ import (
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
-	TelegramAuth(context.Context, model.TelegramAuthPayload) (*model.ProfileResponse, string, time.Time, error)
+	CreateTelegramAuthChallenge(context.Context) (*model.TelegramAuthChallenge, error)
+	ConfirmTelegramAuth(context.Context, string, string, model.TelegramAuthPayload) error
+	TelegramAuth(context.Context, string) (*model.ProfileResponse, string, time.Time, error)
 	CompleteRegistration(context.Context, uuid.UUID, model.CompleteRegistrationRequest) (*model.ProfileResponse, string, time.Time, error)
 	GetProfileByID(context.Context, uuid.UUID) (*model.ProfileResponse, error)
 	UpdateLocation(context.Context, uuid.UUID, model.CompleteRegistrationRequest) (*model.ProfileResponse, error)

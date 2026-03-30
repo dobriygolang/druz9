@@ -88,7 +88,9 @@ func TestGroupBy(t *testing.T) {
 	result := GroupBy(s, func(v struct {
 		Name string
 		Age  int
-	}) int { return v.Age })
+	}) int {
+		return v.Age
+	})
 
 	assert.Len(t, result, 2)
 	assert.Len(t, result[25], 2)

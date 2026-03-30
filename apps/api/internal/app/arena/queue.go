@@ -4,8 +4,8 @@ import (
 	"context"
 	"strings"
 
-	"api/internal/model"
 	domain "api/internal/domain/arena"
+	"api/internal/model"
 
 	"github.com/google/uuid"
 )

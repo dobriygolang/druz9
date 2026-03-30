@@ -9,9 +9,10 @@ import (
 	"api/internal/model"
 )
 
-// TelegramAuth authenticates user via Telegram payload.
-func (s *Service) TelegramAuth(ctx context.Context, payload model.TelegramAuthPayload) (*model.ProfileResponse, string, time.Time, error) {
-	if err := s.validateTelegramPayload(payload); err != nil {
+// TelegramAuth authenticates user via confirmed Telegram start token.
+func (s *Service) TelegramAuth(ctx context.Context, challengeToken string) (*model.ProfileResponse, string, time.Time, error) {
+	payload, err := s.consumeConfirmedTelegramAuthChallenge(challengeToken)
+	if err != nil {
 		return nil, "", time.Time{}, err
 	}
 

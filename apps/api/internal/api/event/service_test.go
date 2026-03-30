@@ -100,10 +100,10 @@ func TestCreateEvent(t *testing.T) {
 			ScheduledAt: timestamppb.Now(),
 		}
 		expectedEvent := &model.Event{
-			ID:          uuid.New(),
-			Title:       req.Title,
-			CreatorID:   user.ID.String(),
-			IsCreator:   true,
+			ID:        uuid.New(),
+			Title:     req.Title,
+			CreatorID: user.ID.String(),
+			IsCreator: true,
 		}
 
 		mockService := mocks.NewService(t)
@@ -251,9 +251,9 @@ func TestUpdateEvent(t *testing.T) {
 			ScheduledAt: timestamppb.Now(),
 		}
 		expectedEvent := &model.Event{
-			ID:         eventID,
-			Title:      req.Title,
-			IsCreator:  true,
+			ID:        eventID,
+			Title:     req.Title,
+			IsCreator: true,
 		}
 
 		mockService := mocks.NewService(t)
@@ -427,4 +427,3 @@ func (m *MockService) UpdateEvent(ctx context.Context, eventID uuid.UUID, user *
 	}
 	return args.Get(0).(*model.Event), args.Error(1)
 }
-

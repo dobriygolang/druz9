@@ -132,6 +132,7 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 		SessionStorage: profileRepo,
 		Settings: profiledomainservice.Settings{
 			BotToken:            cfg.External.Telegram.BotToken,
+			BotUsername:         cfg.External.Telegram.BotUsername,
 			DevBypass:           cfg.Dev.AuthBypass,
 			DevUserID:           cfg.Dev.DevUserID,
 			CookieName:          cfg.Auth.Session.CookieName,
@@ -173,6 +174,7 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
 	closer.AddSync(startCodeRoomCleanupWorker(kratosLogger, codeEditorServiceDomain))
 	closer.AddSync(startArenaCleanupWorker(kratosLogger, arenaServiceDomain))
+	closer.AddSync(startTelegramBotWorker(profileServiceDomain))
 
 	cookies := server.NewSessionCookieManager(cfg.Auth.Session)
 	adminService := adminservice.New(adminServiceDomain)

@@ -108,8 +108,12 @@ type TelegramAuthPayload struct {
 	LastName  string
 	Username  string
 	PhotoURL  string
-	AuthDate  int64
-	Hash      string
+}
+
+type TelegramAuthChallenge struct {
+	Token       string
+	BotStartURL string
+	ExpiresAt   time.Time
 }
 
 type CompleteRegistrationRequest struct {

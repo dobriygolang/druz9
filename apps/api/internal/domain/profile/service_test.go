@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"api/internal/model"
 	"api/internal/domain/profile/mocks"
+	"api/internal/model"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -296,74 +296,73 @@ func TestDevBypass(t *testing.T) {
 	})
 }
 
-func TestValidateTelegramPayload(t *testing.T) {
+func TestTelegramAuthChallenge(t *testing.T) {
 	t.Parallel()
 
-	t.Run("returns error for empty payload in dev mode", func(t *testing.T) {
+	t.Run("creates challenge with start url", func(t *testing.T) {
 		t.Parallel()
 
 		svc := NewProfileService(Config{
 			Settings: Settings{
-				DevBypass: true,
-			},
-		})
-
-		err := svc.validateTelegramPayload(model.TelegramAuthPayload{})
-		if err == nil {
-			t.Error("expected error for empty payload")
-		}
-	})
-
-	t.Run("succeeds for valid payload in dev mode", func(t *testing.T) {
-		t.Parallel()
-
-		svc := NewProfileService(Config{
-			Settings: Settings{
-				DevBypass: true,
-			},
-		})
-
-		err := svc.validateTelegramPayload(model.TelegramAuthPayload{ID: 123})
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-	})
-
-	t.Run("returns error for empty payload in production", func(t *testing.T) {
-		t.Parallel()
-
-		svc := NewProfileService(Config{
-			Settings: Settings{
-				DevBypass:           false,
-				TelegramAuthMaxAge:  5 * time.Minute,
-			},
-		})
-
-		err := svc.validateTelegramPayload(model.TelegramAuthPayload{})
-		if err == nil {
-			t.Error("expected error for empty payload")
-		}
-	})
-
-	t.Run("returns error for expired auth date", func(t *testing.T) {
-		t.Parallel()
-
-		svc := NewProfileService(Config{
-			Settings: Settings{
-				DevBypass:          false,
-				BotToken:           "test-token",
+				BotUsername:        "druz9_bot",
 				TelegramAuthMaxAge: 5 * time.Minute,
 			},
 		})
 
-		expiredTime := time.Now().Add(-10 * time.Minute).Unix()
-		err := svc.validateTelegramPayload(model.TelegramAuthPayload{
-			ID:         123,
-			AuthDate:   expiredTime,
-			Hash:       "somehash",
+		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if challenge.Token == "" {
+			t.Fatal("expected token to be set")
+		}
+		if challenge.BotStartURL == "" {
+			t.Fatal("expected start url to be set")
+		}
+		if challenge.ExpiresAt.IsZero() {
+			t.Fatal("expected expiresAt to be set")
+		}
+	})
+
+	t.Run("confirms challenge with matching bot secret", func(t *testing.T) {
+		t.Parallel()
+
+		svc := NewProfileService(Config{
+			Settings: Settings{
+				BotToken:           "bot-secret",
+				TelegramAuthMaxAge: 5 * time.Minute,
+			},
 		})
+
+		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		err = svc.ConfirmTelegramAuth(context.Background(), "bot-secret", challenge.Token, model.TelegramAuthPayload{ID: 123})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+	})
+
+	t.Run("rejects confirm with wrong bot secret", func(t *testing.T) {
+		t.Parallel()
+
+		svc := NewProfileService(Config{
+			Settings: Settings{
+				BotToken:           "bot-secret",
+				TelegramAuthMaxAge: 5 * time.Minute,
+			},
+		})
+
+		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		err = svc.ConfirmTelegramAuth(context.Background(), "wrong-secret", challenge.Token, model.TelegramAuthPayload{ID: 123})
 		if err == nil {
-			t.Error("expected error for expired auth date")
+			t.Fatal("expected error for invalid bot secret")
 		}
 	})
 }
@@ -387,12 +386,20 @@ func TestTelegramAuth(t *testing.T) {
 			Repository:     mockRepo,
 			SessionStorage: mockSessionStorage,
 			Settings: Settings{
-				DevBypass:  true,
-				SessionTTL: time.Hour,
+				SessionTTL:         time.Hour,
+				TelegramAuthMaxAge: time.Minute,
 			},
 		})
 
-		profile, token, expiresAt, err := svc.TelegramAuth(context.Background(), payload)
+		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if err := svc.ConfirmTelegramAuth(context.Background(), "", challenge.Token, payload); err != nil {
+			t.Fatalf("unexpected confirm error: %v", err)
+		}
+
+		profile, token, expiresAt, err := svc.TelegramAuth(context.Background(), challenge.Token)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -410,18 +417,19 @@ func TestTelegramAuth(t *testing.T) {
 		mockSessionStorage.AssertExpectations(t)
 	})
 
-	t.Run("returns error when validation fails", func(t *testing.T) {
+	t.Run("returns error when challenge was not confirmed", func(t *testing.T) {
 		t.Parallel()
 
-		svc := NewProfileService(Config{
-			Settings: Settings{
-				DevBypass: false,
-			},
-		})
+		svc := NewProfileService(Config{Settings: Settings{TelegramAuthMaxAge: time.Minute}})
 
-		_, _, _, err := svc.TelegramAuth(context.Background(), model.TelegramAuthPayload{})
+		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+
+		_, _, _, err = svc.TelegramAuth(context.Background(), challenge.Token)
 		if err == nil {
-			t.Error("expected error for invalid payload")
+			t.Error("expected error for unconfirmed challenge")
 		}
 	})
 
@@ -435,11 +443,19 @@ func TestTelegramAuth(t *testing.T) {
 		svc := NewProfileService(Config{
 			Repository: mockRepo,
 			Settings: Settings{
-				DevBypass: true,
+				TelegramAuthMaxAge: time.Minute,
 			},
 		})
 
-		_, _, _, err := svc.TelegramAuth(context.Background(), model.TelegramAuthPayload{ID: 123})
+		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if err := svc.ConfirmTelegramAuth(context.Background(), "", challenge.Token, model.TelegramAuthPayload{ID: 123}); err != nil {
+			t.Fatalf("unexpected confirm error: %v", err)
+		}
+
+		_, _, _, err = svc.TelegramAuth(context.Background(), challenge.Token)
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}

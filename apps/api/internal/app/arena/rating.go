@@ -6,8 +6,8 @@ import (
 	"time"
 
 	arenarating "api/internal/arena/rating"
-	"api/internal/model"
 	domain "api/internal/domain/arena"
+	"api/internal/model"
 
 	"github.com/google/uuid"
 )

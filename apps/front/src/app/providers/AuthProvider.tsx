@@ -17,7 +17,7 @@ interface AuthContextType {
   needsProfileComplete: boolean;
   isLoading: boolean;
   isAuthenticated: boolean;
-  login: (payload: unknown) => Promise<void>;
+  login: (token: string) => Promise<void>;
   completeProfile: (payload: CompleteProfilePayload) => Promise<void>;
   updateLocation: (payload: CompleteProfilePayload) => Promise<void>;
   logout: () => Promise<void>;
@@ -151,8 +151,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     void refreshProfile();
   }, [refreshProfile]);
 
-  const login = useCallback(async (payload: unknown) => {
-    const data = await authApi.telegramLogin(payload);
+  const login = useCallback(async (token: string) => {
+    const data = await authApi.telegramLogin(token);
     cachedProfileRef.current = data;
     clearForcedGuestMode();
     markKnownAuthSession();

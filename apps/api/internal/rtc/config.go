@@ -21,7 +21,7 @@ const (
 	DataPoolMaxConns Key = "data_pool_max_conns"
 	// Minimum PostgreSQL pool connections
 	DataPoolMinConns Key = "data_pool_min_conns"
-	// Primary PostgreSQL DSN
+	// Deprecated: use env DATABASE_URL
 	DatabaseUrl Key = "database_url"
 	// Allow local auth bypass
 	DevAuthBypass Key = "dev_auth_bypass"
@@ -35,7 +35,7 @@ const (
 	GeocoderUserAgent Key = "geocoder_user_agent"
 	// Metrics and pprof listen address
 	MetricsAddr Key = "metrics_addr"
-	// S3 access key
+	// Deprecated: use env S3_ACCESS_KEY
 	S3AccessKey Key = "s3_access_key"
 	// S3 bucket name
 	S3Bucket Key = "s3_bucket"
@@ -43,7 +43,7 @@ const (
 	S3Endpoint Key = "s3_endpoint"
 	// Public S3 endpoint for signed URLs
 	S3PublicEndpoint Key = "s3_public_endpoint"
-	// S3 secret key
+	// Deprecated: use env S3_SECRET_KEY
 	S3SecretKey Key = "s3_secret_key"
 	// Minimum requests before circuit breaker starts tripping
 	ServerCircuitBreakerRequest Key = "server_circuit_breaker_request"
@@ -73,6 +73,8 @@ const (
 	SessionTtl Key = "session_ttl"
 	// Telegram login payload max age
 	TelegramAuthMaxAge Key = "telegram_auth_max_age"
-	// Telegram bot token
+	// Deprecated: use env TELEGRAM_BOT_TOKEN
 	TelegramBotToken Key = "telegram_bot_token"
+	// Telegram bot username without @; env TELEGRAM_BOT_USERNAME overrides
+	TelegramBotUsername Key = "telegram_bot_username"
 )

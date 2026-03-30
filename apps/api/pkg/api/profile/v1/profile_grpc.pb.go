@@ -19,19 +19,23 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ProfileService_TelegramAuth_FullMethodName         = "/profile.v1.ProfileService/TelegramAuth"
-	ProfileService_CompleteRegistration_FullMethodName = "/profile.v1.ProfileService/CompleteRegistration"
-	ProfileService_GetProfile_FullMethodName           = "/profile.v1.ProfileService/GetProfile"
-	ProfileService_GetProfileByID_FullMethodName       = "/profile.v1.ProfileService/GetProfileByID"
-	ProfileService_UpdateLocation_FullMethodName       = "/profile.v1.ProfileService/UpdateLocation"
-	ProfileService_UpdateProfile_FullMethodName        = "/profile.v1.ProfileService/UpdateProfile"
-	ProfileService_Logout_FullMethodName               = "/profile.v1.ProfileService/Logout"
+	ProfileService_CreateTelegramAuthChallenge_FullMethodName = "/profile.v1.ProfileService/CreateTelegramAuthChallenge"
+	ProfileService_ConfirmTelegramAuth_FullMethodName         = "/profile.v1.ProfileService/ConfirmTelegramAuth"
+	ProfileService_TelegramAuth_FullMethodName                = "/profile.v1.ProfileService/TelegramAuth"
+	ProfileService_CompleteRegistration_FullMethodName        = "/profile.v1.ProfileService/CompleteRegistration"
+	ProfileService_GetProfile_FullMethodName                  = "/profile.v1.ProfileService/GetProfile"
+	ProfileService_GetProfileByID_FullMethodName              = "/profile.v1.ProfileService/GetProfileByID"
+	ProfileService_UpdateLocation_FullMethodName              = "/profile.v1.ProfileService/UpdateLocation"
+	ProfileService_UpdateProfile_FullMethodName               = "/profile.v1.ProfileService/UpdateProfile"
+	ProfileService_Logout_FullMethodName                      = "/profile.v1.ProfileService/Logout"
 )
 
 // ProfileServiceClient is the client API for ProfileService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProfileServiceClient interface {
+	CreateTelegramAuthChallenge(ctx context.Context, in *CreateTelegramAuthChallengeRequest, opts ...grpc.CallOption) (*CreateTelegramAuthChallengeResponse, error)
+	ConfirmTelegramAuth(ctx context.Context, in *ConfirmTelegramAuthRequest, opts ...grpc.CallOption) (*ConfirmTelegramAuthResponse, error)
 	TelegramAuth(ctx context.Context, in *TelegramAuthRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
 	CompleteRegistration(ctx context.Context, in *CompleteRegistrationRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
 	GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
@@ -47,6 +51,26 @@ type profileServiceClient struct {
 
 func NewProfileServiceClient(cc grpc.ClientConnInterface) ProfileServiceClient {
 	return &profileServiceClient{cc}
+}
+
+func (c *profileServiceClient) CreateTelegramAuthChallenge(ctx context.Context, in *CreateTelegramAuthChallengeRequest, opts ...grpc.CallOption) (*CreateTelegramAuthChallengeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateTelegramAuthChallengeResponse)
+	err := c.cc.Invoke(ctx, ProfileService_CreateTelegramAuthChallenge_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profileServiceClient) ConfirmTelegramAuth(ctx context.Context, in *ConfirmTelegramAuthRequest, opts ...grpc.CallOption) (*ConfirmTelegramAuthResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ConfirmTelegramAuthResponse)
+	err := c.cc.Invoke(ctx, ProfileService_ConfirmTelegramAuth_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *profileServiceClient) TelegramAuth(ctx context.Context, in *TelegramAuthRequest, opts ...grpc.CallOption) (*ProfileResponse, error) {
@@ -123,6 +147,8 @@ func (c *profileServiceClient) Logout(ctx context.Context, in *LogoutRequest, op
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility.
 type ProfileServiceServer interface {
+	CreateTelegramAuthChallenge(context.Context, *CreateTelegramAuthChallengeRequest) (*CreateTelegramAuthChallengeResponse, error)
+	ConfirmTelegramAuth(context.Context, *ConfirmTelegramAuthRequest) (*ConfirmTelegramAuthResponse, error)
 	TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error)
 	CompleteRegistration(context.Context, *CompleteRegistrationRequest) (*ProfileResponse, error)
 	GetProfile(context.Context, *GetProfileRequest) (*ProfileResponse, error)
@@ -140,6 +166,12 @@ type ProfileServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedProfileServiceServer struct{}
 
+func (UnimplementedProfileServiceServer) CreateTelegramAuthChallenge(context.Context, *CreateTelegramAuthChallengeRequest) (*CreateTelegramAuthChallengeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateTelegramAuthChallenge not implemented")
+}
+func (UnimplementedProfileServiceServer) ConfirmTelegramAuth(context.Context, *ConfirmTelegramAuthRequest) (*ConfirmTelegramAuthResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ConfirmTelegramAuth not implemented")
+}
 func (UnimplementedProfileServiceServer) TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method TelegramAuth not implemented")
 }
@@ -180,6 +212,42 @@ func RegisterProfileServiceServer(s grpc.ServiceRegistrar, srv ProfileServiceSer
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&ProfileService_ServiceDesc, srv)
+}
+
+func _ProfileService_CreateTelegramAuthChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateTelegramAuthChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).CreateTelegramAuthChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_CreateTelegramAuthChallenge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).CreateTelegramAuthChallenge(ctx, req.(*CreateTelegramAuthChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfileService_ConfirmTelegramAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ConfirmTelegramAuthRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).ConfirmTelegramAuth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_ConfirmTelegramAuth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).ConfirmTelegramAuth(ctx, req.(*ConfirmTelegramAuthRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _ProfileService_TelegramAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -315,6 +383,14 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "profile.v1.ProfileService",
 	HandlerType: (*ProfileServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "CreateTelegramAuthChallenge",
+			Handler:    _ProfileService_CreateTelegramAuthChallenge_Handler,
+		},
+		{
+			MethodName: "ConfirmTelegramAuth",
+			Handler:    _ProfileService_ConfirmTelegramAuth_Handler,
+		},
 		{
 			MethodName: "TelegramAuth",
 			Handler:    _ProfileService_TelegramAuth_Handler,

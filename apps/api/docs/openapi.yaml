@@ -798,6 +798,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/auth/telegram/challenge:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_CreateTelegramAuthChallenge
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.CreateTelegramAuthChallengeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.CreateTelegramAuthChallengeResponse'
+    /api/v1/profile/auth/telegram/confirm:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_ConfirmTelegramAuth
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.ConfirmTelegramAuthRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ConfirmTelegramAuthResponse'
     /api/v1/profile/location:
         post:
             tags:
@@ -1894,6 +1930,41 @@ components:
                 longitude:
                     type: number
                     format: double
+        profile.v1.ConfirmTelegramAuthRequest:
+            type: object
+            properties:
+                token:
+                    type: string
+                botToken:
+                    type: string
+                telegramId:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                username:
+                    type: string
+                photoUrl:
+                    type: string
+        profile.v1.ConfirmTelegramAuthResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        profile.v1.CreateTelegramAuthChallengeRequest:
+            type: object
+            properties: {}
+        profile.v1.CreateTelegramAuthChallengeResponse:
+            type: object
+            properties:
+                token:
+                    type: string
+                botStartUrl:
+                    type: string
+                expiresAt:
+                    type: string
+                    format: date-time
         profile.v1.LogoutRequest:
             type: object
             properties: {}
@@ -1912,19 +1983,7 @@ components:
         profile.v1.TelegramAuthRequest:
             type: object
             properties:
-                id:
-                    type: string
-                firstName:
-                    type: string
-                lastName:
-                    type: string
-                username:
-                    type: string
-                photoUrl:
-                    type: string
-                authDate:
-                    type: string
-                hash:
+                token:
                     type: string
         profile.v1.UpdateLocationRequest:
             type: object

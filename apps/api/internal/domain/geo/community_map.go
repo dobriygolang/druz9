@@ -3,8 +3,8 @@ package geo
 import (
 	"context"
 
-	"api/internal/model"
 	geoerrors "api/internal/errors/geo"
+	"api/internal/model"
 )
 
 // CommunityMap implements internal/api/geo service interface.

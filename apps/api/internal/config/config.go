@@ -97,7 +97,8 @@ type External struct {
 }
 
 type Telegram struct {
-	BotToken string `json:"bot_token"`
+	BotToken    string `json:"bot_token"`
+	BotUsername string `json:"bot_username"`
 }
 
 type Geocoder struct {

@@ -21,6 +21,4 @@ export const ENV = {
   SSE_URL: (import.meta.env.VITE_SSE_URL || apiUrl || '').replace(/\/$/, ''),
   WS_URL: wsUrl,
   ARENA_REQUIRE_AUTH: parseBoolean(import.meta.env.VITE_ARENA_REQUIRE_AUTH, false),
-  // Убираем @ если пользователь случайно его написал
-  TELEGRAM_BOT_NAME: (import.meta.env.VITE_TELEGRAM_BOT_NAME || 'samplebot').replace(/^@/, ''),
 };

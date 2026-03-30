@@ -6,8 +6,8 @@ import (
 	"testing"
 	"time"
 
-	"api/internal/model"
 	"api/internal/domain/podcast/mocks"
+	"api/internal/model"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"

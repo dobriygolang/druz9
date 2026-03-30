@@ -1,2 +1,6 @@
 deploy/.env.prod
 deploy/runtime/
+!deploy/runtime/
+deploy/runtime/*
+!deploy/runtime/values_prod.yaml.example
+deploy/runtime/secrets/

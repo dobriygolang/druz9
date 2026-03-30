@@ -38,6 +38,14 @@ type BackendProfileResponse = {
   needsProfileComplete?: boolean;
 };
 
+type TelegramAuthChallengeResponse = {
+  token: string;
+  bot_start_url?: string;
+  botStartUrl?: string;
+  expires_at?: string;
+  expiresAt?: string;
+};
+
 function normalizeActivityStatus(value: unknown): User['activityStatus'] {
   if (value === 1 || value === 'USER_ACTIVITY_STATUS_ONLINE' || value === 'online') return 'online';
   if (value === 2 || value === 'USER_ACTIVITY_STATUS_RECENTLY_ACTIVE' || value === 'recently_active') return 'recently_active';
@@ -75,10 +83,26 @@ const profileByIdCache = new Map<string, ProfileResponse>();
 const profileByIdPromises = new Map<string, Promise<ProfileResponse>>();
 
 export const authApi = {
-  telegramLogin: async (payload: unknown): Promise<ProfileResponse> => {
+  createTelegramAuthChallenge: async (): Promise<{
+    token: string;
+    botStartUrl: string;
+    expiresAt: string;
+  }> => {
+    const response = await apiClient.post<TelegramAuthChallengeResponse>(
+      '/api/v1/profile/auth/telegram/challenge',
+      {},
+    );
+
+    return {
+      token: response.data.token,
+      botStartUrl: response.data.bot_start_url ?? response.data.botStartUrl ?? '',
+      expiresAt: response.data.expires_at ?? response.data.expiresAt ?? '',
+    };
+  },
+  telegramLogin: async (token: string): Promise<ProfileResponse> => {
     const response = await apiClient.post<BackendProfileResponse>(
       '/api/v1/profile/auth/telegram',
-      payload,
+      { token },
     );
     return normalizeProfileResponse(response.data);
   },

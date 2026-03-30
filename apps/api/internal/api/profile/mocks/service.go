@@ -100,6 +100,113 @@ func (_c *Service_CompleteRegistration_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
+// ConfirmTelegramAuth provides a mock function with given fields: _a0, _a1, _a2, _a3
+func (_m *Service) ConfirmTelegramAuth(_a0 context.Context, _a1 string, _a2 string, _a3 model.TelegramAuthPayload) error {
+	ret := _m.Called(_a0, _a1, _a2, _a3)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ConfirmTelegramAuth")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, model.TelegramAuthPayload) error); ok {
+		r0 = rf(_a0, _a1, _a2, _a3)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Service_ConfirmTelegramAuth_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ConfirmTelegramAuth'
+type Service_ConfirmTelegramAuth_Call struct {
+	*mock.Call
+}
+
+// ConfirmTelegramAuth is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 string
+//   - _a2 string
+//   - _a3 model.TelegramAuthPayload
+func (_e *Service_Expecter) ConfirmTelegramAuth(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}) *Service_ConfirmTelegramAuth_Call {
+	return &Service_ConfirmTelegramAuth_Call{Call: _e.mock.On("ConfirmTelegramAuth", _a0, _a1, _a2, _a3)}
+}
+
+func (_c *Service_ConfirmTelegramAuth_Call) Run(run func(_a0 context.Context, _a1 string, _a2 string, _a3 model.TelegramAuthPayload)) *Service_ConfirmTelegramAuth_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(model.TelegramAuthPayload))
+	})
+	return _c
+}
+
+func (_c *Service_ConfirmTelegramAuth_Call) Return(_a0 error) *Service_ConfirmTelegramAuth_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Service_ConfirmTelegramAuth_Call) RunAndReturn(run func(context.Context, string, string, model.TelegramAuthPayload) error) *Service_ConfirmTelegramAuth_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CreateTelegramAuthChallenge provides a mock function with given fields: _a0
+func (_m *Service) CreateTelegramAuthChallenge(_a0 context.Context) (*model.TelegramAuthChallenge, error) {
+	ret := _m.Called(_a0)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateTelegramAuthChallenge")
+	}
+
+	var r0 *model.TelegramAuthChallenge
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (*model.TelegramAuthChallenge, error)); ok {
+		return rf(_a0)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context) *model.TelegramAuthChallenge); ok {
+		r0 = rf(_a0)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.TelegramAuthChallenge)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(_a0)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_CreateTelegramAuthChallenge_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateTelegramAuthChallenge'
+type Service_CreateTelegramAuthChallenge_Call struct {
+	*mock.Call
+}
+
+// CreateTelegramAuthChallenge is a helper method to define mock.On call
+//   - _a0 context.Context
+func (_e *Service_Expecter) CreateTelegramAuthChallenge(_a0 interface{}) *Service_CreateTelegramAuthChallenge_Call {
+	return &Service_CreateTelegramAuthChallenge_Call{Call: _e.mock.On("CreateTelegramAuthChallenge", _a0)}
+}
+
+func (_c *Service_CreateTelegramAuthChallenge_Call) Run(run func(_a0 context.Context)) *Service_CreateTelegramAuthChallenge_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context))
+	})
+	return _c
+}
+
+func (_c *Service_CreateTelegramAuthChallenge_Call) Return(_a0 *model.TelegramAuthChallenge, _a1 error) *Service_CreateTelegramAuthChallenge_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_CreateTelegramAuthChallenge_Call) RunAndReturn(run func(context.Context) (*model.TelegramAuthChallenge, error)) *Service_CreateTelegramAuthChallenge_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // DevBypass provides a mock function with no fields
 func (_m *Service) DevBypass() bool {
 	ret := _m.Called()
@@ -297,7 +404,7 @@ func (_c *Service_Logout_Call) RunAndReturn(run func(context.Context, string) er
 }
 
 // TelegramAuth provides a mock function with given fields: _a0, _a1
-func (_m *Service) TelegramAuth(_a0 context.Context, _a1 model.TelegramAuthPayload) (*model.ProfileResponse, string, time.Time, error) {
+func (_m *Service) TelegramAuth(_a0 context.Context, _a1 string) (*model.ProfileResponse, string, time.Time, error) {
 	ret := _m.Called(_a0, _a1)
 
 	if len(ret) == 0 {
@@ -308,10 +415,10 @@ func (_m *Service) TelegramAuth(_a0 context.Context, _a1 model.TelegramAuthPaylo
 	var r1 string
 	var r2 time.Time
 	var r3 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.TelegramAuthPayload) (*model.ProfileResponse, string, time.Time, error)); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*model.ProfileResponse, string, time.Time, error)); ok {
 		return rf(_a0, _a1)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.TelegramAuthPayload) *model.ProfileResponse); ok {
+	if rf, ok := ret.Get(0).(func(context.Context, string) *model.ProfileResponse); ok {
 		r0 = rf(_a0, _a1)
 	} else {
 		if ret.Get(0) != nil {
@@ -319,19 +426,19 @@ func (_m *Service) TelegramAuth(_a0 context.Context, _a1 model.TelegramAuthPaylo
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, model.TelegramAuthPayload) string); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, string) string); ok {
 		r1 = rf(_a0, _a1)
 	} else {
 		r1 = ret.Get(1).(string)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context, model.TelegramAuthPayload) time.Time); ok {
+	if rf, ok := ret.Get(2).(func(context.Context, string) time.Time); ok {
 		r2 = rf(_a0, _a1)
 	} else {
 		r2 = ret.Get(2).(time.Time)
 	}
 
-	if rf, ok := ret.Get(3).(func(context.Context, model.TelegramAuthPayload) error); ok {
+	if rf, ok := ret.Get(3).(func(context.Context, string) error); ok {
 		r3 = rf(_a0, _a1)
 	} else {
 		r3 = ret.Error(3)
@@ -347,14 +454,14 @@ type Service_TelegramAuth_Call struct {
 
 // TelegramAuth is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 model.TelegramAuthPayload
+//   - _a1 string
 func (_e *Service_Expecter) TelegramAuth(_a0 interface{}, _a1 interface{}) *Service_TelegramAuth_Call {
 	return &Service_TelegramAuth_Call{Call: _e.mock.On("TelegramAuth", _a0, _a1)}
 }
 
-func (_c *Service_TelegramAuth_Call) Run(run func(_a0 context.Context, _a1 model.TelegramAuthPayload)) *Service_TelegramAuth_Call {
+func (_c *Service_TelegramAuth_Call) Run(run func(_a0 context.Context, _a1 string)) *Service_TelegramAuth_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.TelegramAuthPayload))
+		run(args[0].(context.Context), args[1].(string))
 	})
 	return _c
 }
@@ -364,7 +471,7 @@ func (_c *Service_TelegramAuth_Call) Return(_a0 *model.ProfileResponse, _a1 stri
 	return _c
 }
 
-func (_c *Service_TelegramAuth_Call) RunAndReturn(run func(context.Context, model.TelegramAuthPayload) (*model.ProfileResponse, string, time.Time, error)) *Service_TelegramAuth_Call {
+func (_c *Service_TelegramAuth_Call) RunAndReturn(run func(context.Context, string) (*model.ProfileResponse, string, time.Time, error)) *Service_TelegramAuth_Call {
 	_c.Call.Return(run)
 	return _c
 }

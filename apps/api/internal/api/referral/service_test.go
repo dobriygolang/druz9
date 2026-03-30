@@ -86,10 +86,10 @@ func TestCreateReferral(t *testing.T) {
 			EmploymentType: v1.EmploymentType_EMPLOYMENT_TYPE_FULL_TIME,
 		}
 		expectedReferral := &model.Referral{
-			ID:        uuid.New(),
-			Title:     req.Title,
-			Company:   req.Company,
-			IsOwner:   true,
+			ID:      uuid.New(),
+			Title:   req.Title,
+			Company: req.Company,
+			IsOwner: true,
 		}
 
 		mockService := mocks.NewService(t)
@@ -150,13 +150,13 @@ func TestUpdateReferral(t *testing.T) {
 		user := &model.User{ID: uuid.New()}
 		referralID := uuid.New()
 		req := &v1.UpdateReferralRequest{
-			ReferralId:    referralID.String(),
-			Title:         "Senior Engineer",
-			Company:       "New Corp",
-			VacancyUrl:    "https://example.com/new",
-			Description:   "Better opportunity",
-			Experience:    "5+ years",
-			Location:      "On-site",
+			ReferralId:     referralID.String(),
+			Title:          "Senior Engineer",
+			Company:        "New Corp",
+			VacancyUrl:     "https://example.com/new",
+			Description:    "Better opportunity",
+			Experience:     "5+ years",
+			Location:       "On-site",
 			EmploymentType: v1.EmploymentType_EMPLOYMENT_TYPE_CONTRACT,
 		}
 		expectedReferral := &model.Referral{
