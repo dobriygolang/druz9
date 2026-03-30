@@ -85,6 +85,8 @@ jobs:
 
             mkdir -p apps/deploy/runtime/secrets/prod
 
+            SAFE_MINIO_CONSOLE_BASIC_AUTH="${MINIO_CONSOLE_BASIC_AUTH//$/\$\$}"
+
             cat > apps/deploy/.env.prod <<EOF
             APP_HOST=${APP_HOST}
             API_HOST=${API_HOST}
@@ -99,7 +101,7 @@ jobs:
             S3_PUBLIC_ENDPOINT=${S3_PUBLIC_ENDPOINT}
             S3_HOST=${S3_HOST}
             MINIO_CONSOLE_HOST=${MINIO_CONSOLE_HOST}
-            MINIO_CONSOLE_BASIC_AUTH=${MINIO_CONSOLE_BASIC_AUTH}
+            MINIO_CONSOLE_BASIC_AUTH=${SAFE_MINIO_CONSOLE_BASIC_AUTH}
             DATABASE_URL=${DATABASE_URL}
             EOF
 
