@@ -20,6 +20,7 @@ jobs:
       DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY != '' && secrets.DEPLOY_SSH_KEY || secrets.ORACLE_SSH_KEY }}
       DEPLOY_SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT != '' && secrets.DEPLOY_SSH_PORT || secrets.ORACLE_SSH_PORT || '22' }}
       DEPLOY_APP_DIR: ${{ secrets.DEPLOY_APP_DIR != '' && secrets.DEPLOY_APP_DIR || secrets.ORACLE_APP_DIR || '/root/druz9' }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -33,7 +34,7 @@ jobs:
         run: |
           pwd
           ls -la
-          find . -maxdepth 2 -type d | sort
+          find . -maxdepth 3 -type d | sort
 
       - name: Copy project to server
         uses: appleboy/scp-action@v0.1.7
@@ -42,11 +43,11 @@ jobs:
           username: ${{ env.DEPLOY_USER }}
           key: ${{ env.DEPLOY_SSH_KEY }}
           port: ${{ env.DEPLOY_SSH_PORT }}
-          source: "api/**,front/**,deploy/**"
+          source: "apps/api/**,apps/front/**,apps/deploy/**"
           target: ${{ env.DEPLOY_APP_DIR }}
           strip_components: 0
           overwrite: true
-          rm: true
+          rm: false
 
       - name: Deploy on server
         uses: appleboy/ssh-action@v1.2.0
@@ -81,9 +82,10 @@ jobs:
           script: |
             set -euo pipefail
             cd "${{ env.DEPLOY_APP_DIR }}"
-            mkdir -p deploy/runtime/secrets/prod
 
-            cat > deploy/.env.prod <<EOF
+            mkdir -p apps/deploy/runtime/secrets/prod
+
+            cat > apps/deploy/.env.prod <<EOF
             APP_HOST=${APP_HOST}
             API_HOST=${API_HOST}
             APP_EMAIL=${APP_EMAIL}
@@ -101,7 +103,7 @@ jobs:
             DATABASE_URL=${DATABASE_URL}
             EOF
 
-            cat > deploy/runtime/values_prod.yaml <<EOF
+            cat > apps/deploy/runtime/values_prod.yaml <<EOF
             server_http_addr:
               usage: "HTTP server listen address"
               group: "server"
@@ -208,13 +210,13 @@ jobs:
               writable: false
             EOF
 
-            printf '%s' "${DATABASE_URL}" > deploy/runtime/secrets/prod/database_url
-            printf '%s' "${POSTGRES_PASSWORD}" > deploy/runtime/secrets/prod/postgres_password
-            printf '%s' "${MINIO_ROOT_USER}" > deploy/runtime/secrets/prod/minio_root_user
-            printf '%s' "${MINIO_ROOT_PASSWORD}" > deploy/runtime/secrets/prod/minio_root_password
-            printf '%s' "${S3_ACCESS_KEY}" > deploy/runtime/secrets/prod/s3_access_key
-            printf '%s' "${S3_SECRET_KEY}" > deploy/runtime/secrets/prod/s3_secret_key
-            printf '%s' "${TELEGRAM_BOT_TOKEN}" > deploy/runtime/secrets/prod/telegram_bot_token
+            printf '%s' "${DATABASE_URL}" > apps/deploy/runtime/secrets/prod/database_url
+            printf '%s' "${POSTGRES_PASSWORD}" > apps/deploy/runtime/secrets/prod/postgres_password
+            printf '%s' "${MINIO_ROOT_USER}" > apps/deploy/runtime/secrets/prod/minio_root_user
+            printf '%s' "${MINIO_ROOT_PASSWORD}" > apps/deploy/runtime/secrets/prod/minio_root_password
+            printf '%s' "${S3_ACCESS_KEY}" > apps/deploy/runtime/secrets/prod/s3_access_key
+            printf '%s' "${S3_SECRET_KEY}" > apps/deploy/runtime/secrets/prod/s3_secret_key
+            printf '%s' "${TELEGRAM_BOT_TOKEN}" > apps/deploy/runtime/secrets/prod/telegram_bot_token
 
-            chmod 600 deploy/.env.prod deploy/runtime/secrets/prod/*
-            bash deploy/scripts/deploy.sh
+            chmod 600 apps/deploy/.env.prod apps/deploy/runtime/secrets/prod/*
+            bash apps/deploy/scripts/deploy.sh
