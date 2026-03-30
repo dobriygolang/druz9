@@ -13,14 +13,14 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: api
+        working-directory: apps/api
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-go@v5
         with:
-          go-version-file: api/go.mod
-          cache-dependency-path: api/go.sum
+          go-version-file: apps/api/go.mod
+          cache-dependency-path: apps/api/go.sum
 
       - name: Run API tests
         run: go test ./...
@@ -47,7 +47,7 @@ jobs:
     runs-on: ubuntu-latest
     defaults:
       run:
-        working-directory: front
+        working-directory: apps/front
     steps:
       - uses: actions/checkout@v4
 
@@ -55,7 +55,7 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: front/package-lock.json
+          cache-dependency-path: apps/front/package-lock.json
 
       - name: Install dependencies
         run: npm ci
@@ -71,12 +71,12 @@ jobs:
 
       - name: Validate deploy shell scripts
         run: |
-          bash -n deploy/scripts/deploy.sh
-          bash -n deploy/scripts/render-prod-values.sh
+          bash -n apps/deploy/scripts/deploy.sh
+          bash -n apps/deploy/scripts/render-prod-values.sh
 
       - name: Validate production compose
         run: |
           docker compose \
-            --env-file deploy/.env.prod.example \
-            -f deploy/docker-compose.prod.yml \
+            --env-file apps/deploy/.env.prod.example \
+            -f apps/deploy/docker-compose.prod.yml \
             config >/dev/null
