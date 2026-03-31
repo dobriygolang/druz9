@@ -93,44 +93,84 @@ const getSelectionOffsets = (editor: any) => {
   };
 };
 
+const clampOffset = (value: number, min: number, max: number) => Math.max(min, Math.min(max, value));
+
+const remapOffsetAfterTextChange = (
+  offset: number,
+  prevText: string,
+  nextText: string,
+) => {
+  if (prevText === nextText) {
+    return offset;
+  }
+
+  let prefix = 0;
+  const minLength = Math.min(prevText.length, nextText.length);
+
+  while (prefix < minLength && prevText.charCodeAt(prefix) === nextText.charCodeAt(prefix)) {
+    prefix += 1;
+  }
+
+  let prevSuffix = prevText.length;
+  let nextSuffix = nextText.length;
+
+  while (
+    prevSuffix > prefix &&
+    nextSuffix > prefix &&
+    prevText.charCodeAt(prevSuffix - 1) === nextText.charCodeAt(nextSuffix - 1)
+  ) {
+    prevSuffix -= 1;
+    nextSuffix -= 1;
+  }
+
+  const changedStart = prefix;
+  const changedEndPrev = prevSuffix;
+  const changedEndNext = nextSuffix;
+  const delta = (changedEndNext - changedStart) - (changedEndPrev - changedStart);
+
+  const safeOffset = clampOffset(offset, 0, prevText.length);
+
+  if (safeOffset <= changedStart) {
+    return safeOffset;
+  }
+
+  if (safeOffset >= changedEndPrev) {
+    return clampOffset(safeOffset + delta, 0, nextText.length);
+  }
+
+  return clampOffset(changedEndNext, 0, nextText.length);
+};
+
+const remapSelectionAfterTextChange = (
+  selection: { anchor?: number; head?: number } | undefined,
+  prevText: string,
+  nextText: string,
+) => {
+  if (
+    !selection ||
+    typeof selection.anchor !== 'number' ||
+    typeof selection.head !== 'number'
+  ) {
+    return selection;
+  }
+
+  return {
+    anchor: remapOffsetAfterTextChange(selection.anchor, prevText, nextText),
+    head: remapOffsetAfterTextChange(selection.head, prevText, nextText),
+  };
+};
+
 const syncEditorModelPreservingSelection = (editor: any, nextCode: string) => {
   const model = editor?.getModel?.();
-  const selection = editor?.getSelection?.();
-  if (!model) {
+  if (!editor || !model || model.getValue() === nextCode) {
     return;
   }
-
-  if (model.getValue() === nextCode) {
-    return;
-  }
-
-  const previousSelection = selection ? {
-    startOffset: model.getOffsetAt(selection.getStartPosition()),
-    endOffset: model.getOffsetAt(selection.getEndPosition()),
-    direction: selection.getDirection?.() ?? 0,
-  } : null;
 
   syncEditorModelFromYText(editor, nextCode);
 
-  if (!previousSelection) {
-    return;
-  }
-
-  const maxOffset = model.getValueLength();
-  const startOffset = Math.min(previousSelection.startOffset, maxOffset);
-  const endOffset = Math.min(previousSelection.endOffset, maxOffset);
-  const startPosition = model.getPositionAt(startOffset);
-  const endPosition = model.getPositionAt(endOffset);
-
-  editor.setSelection({
-    selectionStartLineNumber: startPosition.lineNumber,
-    selectionStartColumn: startPosition.column,
-    positionLineNumber: endPosition.lineNumber,
-    positionColumn: endPosition.column,
-  });
-
-  if (typeof editor.revealPositionInCenterIfOutsideViewport === 'function') {
-    editor.revealPositionInCenterIfOutsideViewport(endPosition);
+  const selection = editor.getSelection?.();
+  if (selection && typeof editor.revealPositionInCenterIfOutsideViewport === 'function') {
+    editor.revealPositionInCenterIfOutsideViewport(selection.getPosition());
   }
 };
 
@@ -249,6 +289,27 @@ export const useCodeRoomRealtime = ({
     setParticipants(nextParticipants);
   };
 
+  const remapRemoteAwarenessSelections = (prevText: string, nextText: string) => {
+    if (prevText === nextText) {
+      return;
+    }
+
+    const nextStates = new Map<number, AwarenessState>();
+
+    remoteAwarenessStatesRef.current.forEach((state, remoteAwarenessId) => {
+      nextStates.set(remoteAwarenessId, {
+        ...state,
+        selection: remapSelectionAfterTextChange(
+          state?.selection as { anchor?: number; head?: number } | undefined,
+          prevText,
+          nextText,
+        ),
+      });
+    });
+
+    remoteAwarenessStatesRef.current = nextStates;
+  };
+
   const updateRemoteDecorations = () => {
     const currentEditor = editorRef.current;
     if (!currentEditor) {
@@ -347,6 +408,30 @@ export const useCodeRoomRealtime = ({
     remoteDecorationIdsRef.current = currentEditor.deltaDecorations(remoteDecorationIdsRef.current, decorations);
   };
 
+  const layoutRemoteWidgets = () => {
+    const currentEditor = editorRef.current;
+    const model = currentEditor?.getModel?.();
+    if (!currentEditor || !model) {
+      return;
+    }
+
+    remoteAwarenessStatesRef.current.forEach((state, remoteAwarenessId) => {
+      const selection = state?.selection as { head?: number } | undefined;
+      const widget = remoteWidgetsRef.current.get(remoteAwarenessId);
+
+      if (!widget || typeof selection?.head !== 'number') {
+        return;
+      }
+
+      const safeHead = Math.max(0, Math.min(selection.head, model.getValueLength()));
+      widget.position = {
+        position: model.getPositionAt(safeHead),
+        preference: [2],
+      };
+      currentEditor.layoutContentWidget(widget);
+    });
+  };
+
   const send = (message: WSMessage) => {
     const ws = wsRef.current;
     if (!ws || ws.readyState !== WebSocket.OPEN) {
@@ -436,7 +521,21 @@ export const useCodeRoomRealtime = ({
           awarenessId,
           userId: participantId,
         });
-        publishLocalAwareness({ active: true });
+
+        const currentSelection = getSelectionOffsets(editorRef.current);
+        publishLocalAwareness({
+          active: true,
+          selection: currentSelection || undefined,
+        });
+
+        queueMicrotask(() => {
+          const nextSelection = getSelectionOffsets(editorRef.current);
+          publishLocalAwareness({
+            active: true,
+            selection: nextSelection || undefined,
+          });
+        });
+
         keepAliveTimerRef.current = window.setInterval(() => {
           send({ type: 'ping', clientId });
         }, keepAliveIntervalMs);
@@ -454,11 +553,20 @@ export const useCodeRoomRealtime = ({
         switch (message.type) {
           case 'snapshot':
             if (typeof message.plainText === 'string') {
-              debugCodeRoom('snapshot:receive', { roomId, length: message.plainText.length });
+              const currentEditor = editorRef.current;
+              const prevText = currentEditor?.getModel?.()?.getValue?.() ?? code;
+              const nextText = message.plainText;
+
+              debugCodeRoom('snapshot:receive', { roomId, length: nextText.length });
+
               applyingRemoteChangesRef.current = true;
-              syncEditorModelPreservingSelection(editorRef.current, message.plainText);
+              syncEditorModelPreservingSelection(currentEditor, nextText);
+              remapRemoteAwarenessSelections(prevText, nextText);
               applyingRemoteChangesRef.current = false;
-              setCode(message.plainText);
+
+              updateRemoteDecorations();
+              layoutRemoteWidgets();
+              setCode(nextText);
             }
             break;
           case 'update':
@@ -466,15 +574,24 @@ export const useCodeRoomRealtime = ({
               return;
             }
             if (typeof message.plainText === 'string') {
+              const currentEditor = editorRef.current;
+              const prevText = currentEditor?.getModel?.()?.getValue?.() ?? code;
+              const nextText = message.plainText;
+
               debugCodeRoom('update:receive', {
                 roomId,
                 fromClientId: message.clientId,
-                length: message.plainText.length,
+                length: nextText.length,
               });
+
               applyingRemoteChangesRef.current = true;
-              syncEditorModelPreservingSelection(editorRef.current, message.plainText);
+              syncEditorModelPreservingSelection(currentEditor, nextText);
+              remapRemoteAwarenessSelections(prevText, nextText);
               applyingRemoteChangesRef.current = false;
-              setCode(message.plainText);
+
+              updateRemoteDecorations();
+              layoutRemoteWidgets();
+              setCode(nextText);
             }
             break;
           case 'awareness':
@@ -560,8 +677,6 @@ export const useCodeRoomRealtime = ({
     return () => {
       isUnmountedRef.current = true;
       clearTimers();
-      selectionSubscriptionRef.current?.dispose();
-      selectionSubscriptionRef.current = null;
       wsRef.current?.close();
       wsRef.current = null;
       remoteAwarenessStatesRef.current.clear();
@@ -577,7 +692,7 @@ export const useCodeRoomRealtime = ({
         remoteWidgetsRef.current.clear();
       }
     };
-  }, [awarenessColorSeed, awarenessId, clientId, creatorId, onRoomUpdate, onSubmission, participantId, roomId, userName]);
+  }, [awarenessColorSeed, awarenessId, clientId, onRoomUpdate, onSubmission, participantId, roomId, userName]);
 
   useEffect(() => {
     const nextColor = colorFor(awarenessColorSeed);
@@ -605,7 +720,7 @@ export const useCodeRoomRealtime = ({
     }
 
     if (model.getValue() !== code) {
-      model.setValue(code);
+      syncEditorModelPreservingSelection(editor, code);
     }
 
     const publishEditorSelection = () => {
@@ -617,6 +732,8 @@ export const useCodeRoomRealtime = ({
     };
 
     const contentSubscription = model.onDidChangeContent(() => {
+      layoutRemoteWidgets();
+
       if (applyingRemoteChangesRef.current) {
         return;
       }
@@ -637,19 +754,14 @@ export const useCodeRoomRealtime = ({
     publishEditorSelection();
 
     const handleVisibilityChange = () => {
-      // Don't change active status when switching tabs - keep cursor visible
-      // Only update selection when page becomes visible again
-      if (!document.hidden) {
+      if (document.hidden) {
+        publishLocalAwareness({ active: false });
+      } else {
         publishLocalAwareness({ active: true });
       }
     };
 
     const handlePageLeave = () => {
-      // Only mark as inactive when actually closing the page
-      const isCreator = participantId && creatorIdRef.current && participantId === creatorIdRef.current;
-      if (isCreator) {
-        return;
-      }
       publishLocalAwareness({ active: false });
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);

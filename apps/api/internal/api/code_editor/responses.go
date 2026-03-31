@@ -69,12 +69,13 @@ func mapRoom(room *codeeditordomain.Room) *v1.Room {
 			continue
 		}
 		participants = append(participants, &v1.Participant{
-			UserId:   userIDToString(p.UserID),
-			Name:     p.Name,
-			IsGuest:  p.IsGuest,
-			IsReady:  p.IsReady,
-			IsWinner: p.IsWinner,
-			JoinedAt: timestamppb.New(p.JoinedAt),
+			UserId:    userIDToString(p.UserID),
+			Name:      p.Name,
+			IsGuest:   p.IsGuest,
+			IsReady:   p.IsReady,
+			IsWinner:  p.IsWinner,
+			JoinedAt:  timestamppb.New(p.JoinedAt),
+			IsCreator: p.UserID != nil && *p.UserID == room.CreatorID,
 		})
 	}
 
@@ -89,6 +90,7 @@ func mapRoom(room *codeeditordomain.Room) *v1.Room {
 		Participants: participants,
 		TaskId:       userIDToString(room.TaskID),
 		CodeRevision: room.CodeRevision,
+		CreatorId:    room.CreatorID.String(),
 	}
 }
 

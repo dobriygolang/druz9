@@ -24,17 +24,24 @@ const normalizeRoomStatus = (value: unknown): CodeRoomStatus => {
   return 'waiting';
 };
 
-export function normalizeParticipant(participant: any): Participant {
+const isCreatorParticipant = (participant: any) => (
+  participant?.role === 'creator'
+  || participant?.isCreator === true
+  || participant?.is_creator === true
+);
+
+export function normalizeParticipant(participant: any, index?: number): Participant {
   const userId = participant?.userId ?? participant?.user_id ?? null;
   const displayName = participant?.displayName ?? participant?.name ?? 'Гость';
   const joinedAt = participant?.joinedAt ?? participant?.joined_at ?? new Date().toISOString();
+  const role = isCreatorParticipant(participant) ? 'creator' : 'member';
 
   return {
     id: participant?.id || userId || `${displayName}:${joinedAt}`,
     userId,
     displayName,
     isGuest: Boolean(participant?.isGuest ?? participant?.is_guest ?? !userId),
-    role: participant?.role === 'creator' ? 'creator' : 'member',
+    role,
     isReady: Boolean(participant?.isReady ?? participant?.is_ready),
     joinedAt,
     score: participant?.score,
@@ -47,6 +54,18 @@ export function normalizeRoom(room: any): CodeRoom {
   }
 
   const mode = normalizeRoomMode(room.mode ?? RoomMode.ROOM_MODE_ALL);
+  const participants = (room.participants || []).map((participant: any, index: number) => normalizeParticipant(participant, index));
+
+  const creatorParticipant = participants.find((participant: Participant) => participant.role === 'creator');
+
+  const creatorId =
+    room.creatorId
+    || room.creator_id
+    || room.creatorUserId
+    || room.creator_user_id
+    || creatorParticipant?.userId
+    || creatorParticipant?.id
+    || '';
 
   return {
     ...room,
@@ -54,8 +73,8 @@ export function normalizeRoom(room: any): CodeRoom {
     mode,
     status: normalizeRoomStatus(room.status ?? RoomStatus.ROOM_STATUS_WAITING),
     inviteCode: room.inviteCode || room.invite_code || '',
-    creatorId: room.creatorId || room.creator_id || '',
-    participants: (room.participants || []).map(normalizeParticipant),
+    creatorId,
+    participants,
     code: room.code || '',
     codeRevision: Number(room.codeRevision ?? room.code_revision ?? 0),
     task: room.task || '',

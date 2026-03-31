@@ -177,6 +177,7 @@ message Room {
   repeated Participant participants = 8;
   string task_id = 9;
   int64 code_revision = 10;
+  string creator_id = 11;
 }
 
 message Participant {
@@ -186,6 +187,7 @@ message Participant {
   bool is_ready = 4;
   bool is_winner = 5;
   google.protobuf.Timestamp joined_at = 6;
+  bool is_creator = 7;
 }
 
 message Submission {

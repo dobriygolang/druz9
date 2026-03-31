@@ -426,8 +426,7 @@ export const codeRoomApi = {
     if (data.guestName) {
       markGuestCodeRoomSession();
     }
-    const room = normalizeRoom(response.data.room);
-    return room;
+    return normalizeRoom(response.data.room);
   },
 
   // Получить комнату по ID

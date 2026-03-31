@@ -28,6 +28,29 @@ type LeaveToast = {
 
 const normalizeParticipantIdentity = (value?: string | null) => (value || '').trim().toLowerCase();
 
+const matchesCreator = (
+  participant: Pick<Participant, 'id' | 'userId' | 'role'> | null | undefined,
+  creatorId?: string | null,
+) => {
+  if (!participant) {
+    return false;
+  }
+
+  if (participant.role === 'creator') {
+    return true;
+  }
+
+  const normalizedCreatorId = normalizeParticipantIdentity(creatorId);
+  if (!normalizedCreatorId) {
+    return false;
+  }
+
+  return (
+    normalizeParticipantIdentity(participant.userId) === normalizedCreatorId
+    || normalizeParticipantIdentity(participant.id) === normalizedCreatorId
+  );
+};
+
 export const CodeRoomPage: React.FC = () => {
   const { roomId } = useParams<{ roomId: string }>();
   const navigate = useNavigate();
@@ -425,11 +448,10 @@ export const CodeRoomPage: React.FC = () => {
       }
       const key = participant.id || participant.userId || `${participant.displayName}:${participant.joinedAt}`;
       // Check if this participant is the room creator
-      const isCreator = participant.role === 'creator'
-        || (participant.userId && room?.creatorId && participant.userId === room.creatorId);
+      const isCreator = matchesCreator(participant, room?.creatorId);
       const nextParticipant = {
         ...participant,
-        role: isCreator ? 'creator' : 'member',
+        role: isCreator ? 'creator' : participant.role,
       } as Participant;
       if (!seen.has(key)) {
         seen.set(key, nextParticipant);
@@ -714,7 +736,7 @@ export const CodeRoomPage: React.FC = () => {
               <span className="participant-name">
                 {p.displayName}
                 {p.isGuest && <span className="guest-badge">Гость</span>}
-                {p.role === 'creator' && <span className="creator-badge">Создатель</span>}
+                {matchesCreator(p, room?.creatorId) && <span className="creator-badge">Создатель</span>}
                 <span className={`participant-state ${isParticipantInRoom(p) ? 'active' : 'inactive'}`}>
                   {isParticipantInRoom(p) ? 'В комнате' : 'Неактивен'}
                 </span>

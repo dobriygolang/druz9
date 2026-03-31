@@ -1052,6 +1052,7 @@ type Room struct {
 	Participants  []*Participant         `protobuf:"bytes,8,rep,name=participants,proto3" json:"participants,omitempty"`
 	TaskId        string                 `protobuf:"bytes,9,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
 	CodeRevision  int64                  `protobuf:"varint,10,opt,name=code_revision,json=codeRevision,proto3" json:"code_revision,omitempty"`
+	CreatorId     string                 `protobuf:"bytes,11,opt,name=creator_id,json=creatorId,proto3" json:"creator_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1156,6 +1157,13 @@ func (x *Room) GetCodeRevision() int64 {
 	return 0
 }
 
+func (x *Room) GetCreatorId() string {
+	if x != nil {
+		return x.CreatorId
+	}
+	return ""
+}
+
 type Participant struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -1164,6 +1172,7 @@ type Participant struct {
 	IsReady       bool                   `protobuf:"varint,4,opt,name=is_ready,json=isReady,proto3" json:"is_ready,omitempty"`
 	IsWinner      bool                   `protobuf:"varint,5,opt,name=is_winner,json=isWinner,proto3" json:"is_winner,omitempty"`
 	JoinedAt      *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=joined_at,json=joinedAt,proto3" json:"joined_at,omitempty"`
+	IsCreator     bool                   `protobuf:"varint,7,opt,name=is_creator,json=isCreator,proto3" json:"is_creator,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1238,6 +1247,13 @@ func (x *Participant) GetJoinedAt() *timestamppb.Timestamp {
 		return x.JoinedAt
 	}
 	return nil
+}
+
+func (x *Participant) GetIsCreator() bool {
+	if x != nil {
+		return x.IsCreator
+	}
+	return false
 }
 
 type Submission struct {
@@ -2550,7 +2566,7 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x15GetSubmissionsRequest\x12\x17\n" +
 	"\aroom_id\x18\x01 \x01(\tR\x06roomId\"V\n" +
 	"\x16GetSubmissionsResponse\x12<\n" +
-	"\vsubmissions\x18\x01 \x03(\v2\x1a.code_editor.v1.SubmissionR\vsubmissions\"\xfb\x02\n" +
+	"\vsubmissions\x18\x01 \x03(\v2\x1a.code_editor.v1.SubmissionR\vsubmissions\"\x9a\x03\n" +
 	"\x04Room\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12,\n" +
 	"\x04mode\x18\x02 \x01(\x0e2\x18.code_editor.v1.RoomModeR\x04mode\x12\x12\n" +
@@ -2564,14 +2580,18 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\fparticipants\x18\b \x03(\v2\x1b.code_editor.v1.ParticipantR\fparticipants\x12\x17\n" +
 	"\atask_id\x18\t \x01(\tR\x06taskId\x12#\n" +
 	"\rcode_revision\x18\n" +
-	" \x01(\x03R\fcodeRevision\"\xc6\x01\n" +
+	" \x01(\x03R\fcodeRevision\x12\x1d\n" +
+	"\n" +
+	"creator_id\x18\v \x01(\tR\tcreatorId\"\xe5\x01\n" +
 	"\vParticipant\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x19\n" +
 	"\bis_guest\x18\x03 \x01(\bR\aisGuest\x12\x19\n" +
 	"\bis_ready\x18\x04 \x01(\bR\aisReady\x12\x1b\n" +
 	"\tis_winner\x18\x05 \x01(\bR\bisWinner\x127\n" +
-	"\tjoined_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\bjoinedAt\"\xd9\x02\n" +
+	"\tjoined_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\bjoinedAt\x12\x1d\n" +
+	"\n" +
+	"is_creator\x18\a \x01(\bR\tisCreator\"\xd9\x02\n" +
 	"\n" +
 	"Submission\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +

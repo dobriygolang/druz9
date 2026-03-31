@@ -233,8 +233,48 @@ export const publishCurrentSelection = (editor: any, awareness: Awareness, yText
 
 export const syncEditorModelFromYText = (editor: any, nextCode: string) => {
   const model = editor?.getModel?.();
-  if (!model || model.getValue() === nextCode) {
+  if (!editor || !model) {
     return;
   }
-  model.setValue(nextCode);
+
+  const prevCode = model.getValue();
+  if (prevCode === nextCode) {
+    return;
+  }
+
+  let start = 0;
+  const minLength = Math.min(prevCode.length, nextCode.length);
+
+  while (start < minLength && prevCode.charCodeAt(start) === nextCode.charCodeAt(start)) {
+    start += 1;
+  }
+
+  let prevEnd = prevCode.length;
+  let nextEnd = nextCode.length;
+
+  while (
+    prevEnd > start &&
+    nextEnd > start &&
+    prevCode.charCodeAt(prevEnd - 1) === nextCode.charCodeAt(nextEnd - 1)
+  ) {
+    prevEnd -= 1;
+    nextEnd -= 1;
+  }
+
+  const range = {
+    startLineNumber: model.getPositionAt(start).lineNumber,
+    startColumn: model.getPositionAt(start).column,
+    endLineNumber: model.getPositionAt(prevEnd).lineNumber,
+    endColumn: model.getPositionAt(prevEnd).column,
+  };
+
+  const text = nextCode.slice(start, nextEnd);
+
+  editor.executeEdits('code-room-remote', [
+    {
+      range,
+      text,
+      forceMoveMarkers: true,
+    },
+  ]);
 };

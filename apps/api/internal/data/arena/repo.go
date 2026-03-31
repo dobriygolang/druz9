@@ -1006,6 +1006,7 @@ func scanMatchWithTask(row scanner, match *domain.Match, task *domain.Task, exec
 		&task.TaskType,
 		executionProfile,
 		runnerMode,
+		&task.DurationSeconds,
 		&task.FixtureFiles,
 		&task.ReadablePaths,
 		&task.WritablePaths,

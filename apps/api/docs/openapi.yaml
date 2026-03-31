@@ -1516,6 +1516,8 @@ components:
                 joinedAt:
                     type: string
                     format: date-time
+                isCreator:
+                    type: boolean
         code_editor.v1.Room:
             type: object
             properties:
@@ -1543,6 +1545,8 @@ components:
                 taskId:
                     type: string
                 codeRevision:
+                    type: string
+                creatorId:
                     type: string
         code_editor.v1.SetReadyRequest:
             type: object
