@@ -71,7 +71,7 @@ telegram_bot_token:
 s3_endpoint:
   usage: "S3 endpoint"
   group: "external"
-  value: "http://minio:9000"
+  value: "https://druz9.duckdns.org"
   type: "string"
   writable: false
 

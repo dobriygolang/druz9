@@ -112,6 +112,7 @@ WITH created_user AS (
     first_name,
     last_name,
     avatar_url,
+    telegram_avatar_url,
     current_workplace,
     status,
     is_admin,
@@ -217,7 +218,7 @@ WITH updated_user AS (
   SET current_workplace = $2,
       updated_at = NOW()
   WHERE id = $1
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
 )
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
@@ -302,7 +303,7 @@ WITH updated_user AS (
   SET avatar_url = $2,
       updated_at = NOW()
   WHERE id = $1
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
 )
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
@@ -325,7 +326,7 @@ WITH updated_user AS (
       last_name = COALESCE(NULLIF($6, ''), last_name),
       updated_at = NOW()
   WHERE id = $1 AND telegram_id IS NULL
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
 )
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
