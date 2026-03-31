@@ -98,7 +98,6 @@ services:
       DATABASE_URL_FILE: /run/secrets/database_url
       S3_ACCESS_KEY_FILE: /run/secrets/s3_access_key
       S3_SECRET_KEY_FILE: /run/secrets/s3_secret_key
-      TELEGRAM_BOT_TOKEN_FILE: /run/secrets/telegram_bot_token
     volumes:
       - ./runtime/values_prod.yaml:/app/.platform/values_prod.yaml:ro
     command: ["/app/bin/seed", "-only", "all"]
@@ -106,7 +105,6 @@ services:
       - database_url
       - s3_access_key
       - s3_secret_key
-      - telegram_bot_token
     networks:
       - app_network
 
