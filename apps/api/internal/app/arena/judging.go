@@ -83,6 +83,9 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 				strings.Contains(lowerErr, "compile"):
 				failureKind = model.ArenaSubmissionFailureKindCompileError
 				failedTestIndex = 0
+			case strings.Contains(lowerErr, "timeout"),
+				strings.Contains(lowerErr, "timed out"):
+				failureKind = model.ArenaSubmissionFailureKindTimeout
 			default:
 				failureKind = model.ArenaSubmissionFailureKindRuntimeError
 			}

@@ -120,8 +120,11 @@ const buildArenaSubmitError = (result: {
   error?: string;
 }) => {
   const parts: string[] = ['❌ Решение не прошло проверку.'];
+  const errorText = (result.error || '').toLowerCase();
 
-  if (result.failureKind === 'compile_error') {
+  if (result.failureKind === 'timeout' || errorText.includes('timeout') || errorText.includes('timed out')) {
+    parts.push('Превышен лимит времени.');
+  } else if (result.failureKind === 'compile_error') {
     parts.push('Ошибка компиляции.');
   } else if (result.failureKind === 'runtime_error') {
     parts.push('Runtime error.');
@@ -129,7 +132,7 @@ const buildArenaSubmitError = (result: {
     parts.push('Wrong answer.');
   }
 
-  if (result.error && result.failureKind !== 'wrong_answer') {
+  if (result.error && result.failureKind !== 'wrong_answer' && result.failureKind !== 'timeout') {
     // Обрезаем длинные ошибки
     const shortError = result.error.length > 200 ? result.error.slice(0, 200) + '...' : result.error;
     parts.push(shortError);

@@ -82,6 +82,7 @@ const (
 	SubmitFailureKind_SUBMIT_FAILURE_KIND_COMPILE_ERROR SubmitFailureKind = 1
 	SubmitFailureKind_SUBMIT_FAILURE_KIND_RUNTIME_ERROR SubmitFailureKind = 2
 	SubmitFailureKind_SUBMIT_FAILURE_KIND_WRONG_ANSWER  SubmitFailureKind = 3
+	SubmitFailureKind_SUBMIT_FAILURE_KIND_TIMEOUT       SubmitFailureKind = 4
 )
 
 // Enum value maps for SubmitFailureKind.
@@ -91,12 +92,14 @@ var (
 		1: "SUBMIT_FAILURE_KIND_COMPILE_ERROR",
 		2: "SUBMIT_FAILURE_KIND_RUNTIME_ERROR",
 		3: "SUBMIT_FAILURE_KIND_WRONG_ANSWER",
+		4: "SUBMIT_FAILURE_KIND_TIMEOUT",
 	}
 	SubmitFailureKind_value = map[string]int32{
 		"SUBMIT_FAILURE_KIND_UNSPECIFIED":   0,
 		"SUBMIT_FAILURE_KIND_COMPILE_ERROR": 1,
 		"SUBMIT_FAILURE_KIND_RUNTIME_ERROR": 2,
 		"SUBMIT_FAILURE_KIND_WRONG_ANSWER":  3,
+		"SUBMIT_FAILURE_KIND_TIMEOUT":       4,
 	}
 )
 

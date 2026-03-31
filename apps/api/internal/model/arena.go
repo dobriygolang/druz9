@@ -121,6 +121,7 @@ const (
 	ArenaSubmissionFailureKindCompileError
 	ArenaSubmissionFailureKindRuntimeError
 	ArenaSubmissionFailureKindWrongAnswer
+	ArenaSubmissionFailureKindTimeout
 )
 
 func (r ArenaWinnerReason) String() string {

@@ -650,6 +650,12 @@ export const codeRoomApi = {
       rawFailureKind === 'wrong_answer'
     ) {
       failureKind = 'wrong_answer';
+    } else if (
+      rawFailureKind === 4 ||
+      rawFailureKind === 'SUBMIT_FAILURE_KIND_TIMEOUT' ||
+      rawFailureKind === 'timeout'
+    ) {
+      failureKind = 'timeout';
     }
 
     return {

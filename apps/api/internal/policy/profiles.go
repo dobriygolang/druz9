@@ -12,7 +12,7 @@ func DefaultPolicies() map[ExecutionProfile]SandboxPolicy {
 			AllowStdout:   true,
 			AllowStderr:   true,
 			Limits: ResourceLimits{
-				TimeLimitMs:      5000,
+				TimeLimitMs:      15000,
 				MemoryLimitMB:    128,
 				CPULimitMilli:    1000,
 				ProcessLimit:     16,
@@ -85,7 +85,7 @@ func DefaultPolicies() map[ExecutionProfile]SandboxPolicy {
 			AllowStdout:   true,
 			AllowStderr:   true,
 			Limits: ResourceLimits{
-				TimeLimitMs:      5000,
+				TimeLimitMs:      15000,
 				MemoryLimitMB:    192,
 				CPULimitMilli:    1000,
 				ProcessLimit:     24,

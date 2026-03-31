@@ -309,6 +309,8 @@ func mapSubmitFailureKind(kind model.ArenaSubmissionFailureKind) v1.SubmitFailur
 		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_RUNTIME_ERROR
 	case model.ArenaSubmissionFailureKindWrongAnswer:
 		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_WRONG_ANSWER
+	case model.ArenaSubmissionFailureKindTimeout:
+		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_TIMEOUT
 	default:
 		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_UNSPECIFIED
 	}
