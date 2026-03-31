@@ -133,6 +133,7 @@ services:
       S3_SECRET_KEY_FILE: /run/secrets/s3_secret_key
     volumes:
       - ./runtime/values_prod.yaml:/app/.platform/values_prod.yaml:ro
+    command: ["/app/bin/api"]
     ports:
       - "127.0.0.1:8080:8080"
     secrets:

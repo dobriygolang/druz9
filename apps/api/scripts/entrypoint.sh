@@ -35,4 +35,4 @@ if [[ "$RUN_DB_MIGRATIONS" == "true" ]]; then
 fi
 
 echo "Starting application..."
-exec /app/bin/api
+exec "$@"
