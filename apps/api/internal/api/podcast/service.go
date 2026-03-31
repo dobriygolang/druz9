@@ -19,7 +19,7 @@ type Service interface {
 	UploadPodcast(context.Context, uuid.UUID, model.UploadPodcastRequest) (*model.Podcast, error)
 	PreparePodcastUpload(context.Context, uuid.UUID, model.PreparePodcastUploadRequest) (*model.Podcast, string, string, error)
 	CompletePodcastUpload(context.Context, uuid.UUID, model.CompletePodcastUploadRequest) (*model.Podcast, error)
-	DeletePodcast(context.Context, uuid.UUID) (string, error)
+	DeletePodcast(context.Context, uuid.UUID, *model.User) (string, error)
 	PlayPodcast(context.Context, uuid.UUID) (*model.Podcast, string, error)
 }
 
@@ -40,12 +40,20 @@ func (i *Implementation) GetDescription() grpc.ServiceDesc {
 }
 
 func requireAdmin(ctx context.Context) (*model.User, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
+	user, err := requireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 	if !user.IsAdmin {
 		return nil, errors.Forbidden("FORBIDDEN", "admin access required")
+	}
+	return user, nil
+}
+
+func requireUser(ctx context.Context) (*model.User, error) {
+	user, ok := model.UserFromContext(ctx)
+	if !ok {
+		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
 	}
 	return user, nil
 }

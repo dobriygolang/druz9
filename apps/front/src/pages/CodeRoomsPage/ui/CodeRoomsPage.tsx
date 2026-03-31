@@ -607,7 +607,23 @@ export const CodeRoomsPage: React.FC = () => {
         }}>
           <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
             <>
-              <h2>Новая комната</h2>
+              <div className="modal-header">
+                <h2>Новая комната</h2>
+                <button
+                  type="button"
+                  className="modal-close"
+                  onClick={() => {
+                    if (newRoomMode === 'queue' && queueState?.status === 'queued') {
+                      setShowCreateModal(false);
+                    } else {
+                      resetCreateModal();
+                    }
+                  }}
+                  aria-label="Закрыть"
+                >
+                  ✕
+                </button>
+              </div>
                 <p className="dashboard-card__subtitle" style={{ marginBottom: '20px' }}>
                   Выберите режим. Для пригласительной дуэли можно отправить ссылку, для онлайн-дуэли включится поиск соперника.
                 </p>

@@ -10,7 +10,8 @@ import (
 )
 
 func (i *Implementation) DeletePodcast(ctx context.Context, req *v1.DeletePodcastRequest) (*v1.PodcastStatusResponse, error) {
-	if _, err := requireAdmin(ctx); err != nil {
+	user, err := requireUser(ctx)
+	if err != nil {
 		return nil, err
 	}
 
@@ -18,7 +19,7 @@ func (i *Implementation) DeletePodcast(ctx context.Context, req *v1.DeletePodcas
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_PODCAST_ID", "invalid podcast id")
 	}
-	if _, err := i.service.DeletePodcast(ctx, podcastID); err != nil {
+	if _, err := i.service.DeletePodcast(ctx, podcastID, user); err != nil {
 		return nil, err
 	}
 	return &v1.PodcastStatusResponse{Status: "ok"}, nil

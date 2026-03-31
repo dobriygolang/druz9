@@ -658,6 +658,17 @@ export const codeRoomApi = {
     return normalizeArenaPlayerStats(response.data.stats);
   },
 
+  getArenaStatsBatch: async (userIds: string[]): Promise<Record<string, ArenaPlayerStats>> => {
+    const response = await apiClient.post<{ stats: Record<string, any> }>('/api/v1/arena/stats/batch', {
+      userIds,
+    });
+    const statsMap: Record<string, ArenaPlayerStats> = {};
+    for (const [userId, stats] of Object.entries(response.data.stats || {})) {
+      statsMap[userId] = normalizeArenaPlayerStats(stats);
+    }
+    return statsMap;
+  },
+
   reportArenaSuspicion: async (matchId: string, reason: string, actorId?: string, guestName?: string): Promise<void> => {
     await apiClient.post('/api/v1/arena/anti-cheat/event', {
       matchId,

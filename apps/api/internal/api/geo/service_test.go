@@ -77,6 +77,7 @@ func TestCommunityMap(t *testing.T) {
 
 		mockService := mocks.NewService(t)
 		mockService.On("CommunityMap", mock.Anything, userID.String()).Return(expectedResp, nil).Once()
+		mockService.On("EnrichCommunityMapWithAvatarURLs", mock.Anything, mock.Anything).Return(nil).Once()
 
 		impl := New(mockService)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})

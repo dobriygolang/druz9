@@ -36,6 +36,7 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 		taskID = &task.ID
 		taskDescription = task.Statement
 		code = task.StarterCode
+		s.taskCache.Set(task.ID.String(), *task, 0)
 	}
 
 	room := &domain.Room{
@@ -111,7 +112,9 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 		if err := s.repo.StartDuel(ctx, roomID, startedAt); err != nil {
 			return nil, err
 		}
-		return s.repo.GetRoom(ctx, roomID)
+		updatedRoom.Status = model.RoomStatusActive
+		updatedRoom.StartedAt = &startedAt
+		return updatedRoom, nil
 	}
 
 	return updatedRoom, nil

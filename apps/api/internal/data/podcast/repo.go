@@ -114,11 +114,19 @@ WHERE id = $1
 	))
 }
 
-func (r *Repo) DeletePodcast(ctx context.Context, podcastID uuid.UUID) (string, error) {
+func (r *Repo) DeletePodcast(ctx context.Context, podcastID uuid.UUID, actor *model.User) (string, error) {
+	if actor == nil {
+		return "", kratoserrors.Unauthorized("UNAUTHORIZED", "unauthorized")
+	}
 	var objectKey string
-	if err := r.data.DB.QueryRow(ctx, `DELETE FROM podcasts WHERE id = $1 RETURNING COALESCE(object_key, '')`, podcastID).Scan(&objectKey); err != nil {
+	if err := r.data.DB.QueryRow(ctx, `
+DELETE FROM podcasts
+WHERE id = $1
+  AND ($2 = TRUE OR author_id = $3)
+RETURNING COALESCE(object_key, '')
+`, podcastID, actor.IsAdmin, actor.ID).Scan(&objectKey); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return "", kratoserrors.NotFound("PODCAST_NOT_FOUND", "podcast not found")
+			return "", kratoserrors.Forbidden("FORBIDDEN", "podcast can be deleted only by author or admin")
 		}
 		return "", fmt.Errorf("delete podcast: %w", err)
 	}

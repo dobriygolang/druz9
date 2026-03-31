@@ -762,6 +762,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/auth/login-password:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_LoginWithPassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.LoginWithPasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.LoginWithPasswordResponse'
     /api/v1/profile/auth/logout:
         post:
             tags:
@@ -780,6 +798,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.LogoutResponse'
+    /api/v1/profile/auth/register-password:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_RegisterWithPassword
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.RegisterWithPasswordRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.RegisterWithPasswordResponse'
     /api/v1/profile/auth/telegram:
         post:
             tags:
@@ -834,6 +870,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ConfirmTelegramAuthResponse'
+    /api/v1/profile/bind-telegram:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_BindTelegram
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.BindTelegramRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.BindTelegramResponse'
     /api/v1/profile/location:
         post:
             tags:
@@ -852,6 +906,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/photo/complete:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_CompletePhotoUpload
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.CompletePhotoUploadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.CompletePhotoUploadResponse'
+    /api/v1/profile/photo/upload-url:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetPhotoUploadURL
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.GetPhotoUploadURLRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.GetPhotoUploadURLResponse'
     /api/v1/profile/update:
         post:
             tags:
@@ -1653,6 +1743,8 @@ components:
                     type: string
                 avatarUrl:
                     type: string
+                telegramAvatarUrl:
+                    type: string
                 telegramUsername:
                     type: string
                 firstName:
@@ -1750,6 +1842,8 @@ components:
                 isCurrentUser:
                     type: boolean
                 avatarUrl:
+                    type: string
+                telegramAvatarUrl:
                     type: string
                 telegramUsername:
                     type: string
@@ -1915,6 +2009,32 @@ components:
                 durationSeconds:
                     type: integer
                     format: uint32
+        profile.v1.BindTelegramRequest:
+            type: object
+            properties:
+                token:
+                    type: string
+                code:
+                    type: string
+            description: BindTelegram binds user's Telegram account
+        profile.v1.BindTelegramResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        profile.v1.CompletePhotoUploadRequest:
+            type: object
+            properties:
+                objectKey:
+                    type: string
+            description: CompletePhotoUpload finalizes photo upload
+        profile.v1.CompletePhotoUploadResponse:
+            type: object
+            properties:
+                user:
+                    $ref: '#/components/schemas/profile.v1.User'
+                needsProfileComplete:
+                    type: boolean
         profile.v1.CompleteRegistrationRequest:
             type: object
             properties:
@@ -1967,6 +2087,41 @@ components:
                 expiresAt:
                     type: string
                     format: date-time
+        profile.v1.GetPhotoUploadURLRequest:
+            type: object
+            properties:
+                fileName:
+                    type: string
+                contentType:
+                    type: string
+            description: GetPhotoUploadURL generates presigned URL for photo upload
+        profile.v1.GetPhotoUploadURLResponse:
+            type: object
+            properties:
+                uploadUrl:
+                    type: string
+                objectKey:
+                    type: string
+                expiresInSeconds:
+                    type: integer
+                    format: int32
+        profile.v1.LoginWithPasswordRequest:
+            type: object
+            properties:
+                login:
+                    type: string
+                password:
+                    type: string
+            description: LoginWithPassword authenticates user with password
+        profile.v1.LoginWithPasswordResponse:
+            type: object
+            properties:
+                accessToken:
+                    type: string
+                refreshToken:
+                    type: string
+                user:
+                    $ref: '#/components/schemas/profile.v1.User'
         profile.v1.LogoutRequest:
             type: object
             properties: {}
@@ -1982,6 +2137,27 @@ components:
                     $ref: '#/components/schemas/profile.v1.User'
                 needsProfileComplete:
                     type: boolean
+        profile.v1.RegisterWithPasswordRequest:
+            type: object
+            properties:
+                login:
+                    type: string
+                password:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+            description: RegisterWithPassword registers new user with password
+        profile.v1.RegisterWithPasswordResponse:
+            type: object
+            properties:
+                accessToken:
+                    type: string
+                refreshToken:
+                    type: string
+                user:
+                    $ref: '#/components/schemas/profile.v1.User'
         profile.v1.TelegramAuthRequest:
             type: object
             properties:
@@ -2023,6 +2199,8 @@ components:
                 lastName:
                     type: string
                 avatarUrl:
+                    type: string
+                telegramAvatarUrl:
                     type: string
                 region:
                     type: string

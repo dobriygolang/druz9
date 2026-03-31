@@ -31,6 +31,7 @@ type ProfileAuthorizer interface {
 	DevBypass() bool
 	DevUserID() string
 	FindUserByID(context.Context, uuid.UUID) (*model.User, error)
+	SetUserActivity(userID uuid.UUID, at time.Time)
 }
 
 type SessionCookieManager interface {
@@ -49,6 +50,8 @@ func RequireAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager) mid
 					if err == nil {
 						user, findErr := authorizer.FindUserByID(ctx, userID)
 						if findErr == nil && user != nil {
+							// Update activity in cache
+							authorizer.SetUserActivity(userID, time.Now().UTC())
 							authState := &model.AuthState{User: user}
 							ctx = model.ContextWithAuth(ctx, authState)
 						}
@@ -76,6 +79,9 @@ func RequireAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager) mid
 					cookies.SetSessionCookie(ctx, authState.RawToken, authState.Session.ExpiresAt)
 				}
 
+				// Update activity in cache
+				authorizer.SetUserActivity(authState.User.ID, time.Now().UTC())
+
 				ctx = model.ContextWithAuth(ctx, authState)
 			}
 			return handler(ctx, req)
@@ -98,6 +104,8 @@ func OptionalAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager) mi
 					if err == nil {
 						user, findErr := authorizer.FindUserByID(ctx, userID)
 						if findErr == nil && user != nil {
+							// Update activity in cache
+							authorizer.SetUserActivity(userID, time.Now().UTC())
 							authState := &model.AuthState{User: user}
 							ctx = model.ContextWithAuth(ctx, authState)
 						}
@@ -128,6 +136,9 @@ func OptionalAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager) mi
 			if authState.SessionExtended {
 				cookies.SetSessionCookie(ctx, authState.RawToken, authState.Session.ExpiresAt)
 			}
+
+			// Update activity in cache
+			authorizer.SetUserActivity(authState.User.ID, time.Now().UTC())
 
 			ctx = model.ContextWithAuth(ctx, authState)
 			return handler(ctx, req)

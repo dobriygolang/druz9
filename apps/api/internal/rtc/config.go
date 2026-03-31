@@ -73,8 +73,6 @@ const (
 	SessionTtl Key = "session_ttl"
 	// Telegram login payload max age
 	TelegramAuthMaxAge Key = "telegram_auth_max_age"
-	// Deprecated: use env TELEGRAM_BOT_TOKEN
-	TelegramBotToken Key = "telegram_bot_token"
 	// Telegram bot username without @; env TELEGRAM_BOT_USERNAME overrides
 	TelegramBotUsername Key = "telegram_bot_username"
 )

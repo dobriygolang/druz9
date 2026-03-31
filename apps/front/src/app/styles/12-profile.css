@@ -22,16 +22,34 @@
 }
 
 .profile-edit-btn {
-  background: rgba(79, 70, 229, 0.15) !important;
-  border: 1px solid rgba(79, 70, 229, 0.3) !important;
-  color: #c7c2ff !important;
-  transition: all 0.2s ease;
+  background: var(--bg-color) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: var(--text-primary) !important;
+  padding: 10px 16px;
 }
 
 .profile-edit-btn:hover {
-  background: rgba(79, 70, 229, 0.25) !important;
-  border-color: rgba(79, 70, 229, 0.5) !important;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+/* Telegram bind button */
+.profile-telegram-btn {
+  background: white !important;
+  border: 1px solid rgba(0, 136, 204, 0.3) !important;
+  color: var(--bg-color) !important;
+  font-size: 12px;
+  padding: 6px 12px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+}
+
+.profile-telegram-btn.btn:hover {
+  background: black !important;
+  border-color: white !important;
+  color: white !important;
   transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
 }
 
 /* Arena Stats Card */
@@ -606,5 +624,275 @@
   100% {
     box-shadow: 0 0 8px rgba(139, 0, 255, 0.1);
     border-color: rgba(139, 0, 255, 0.15);
+  }
+}
+
+/* Photo Crop */
+.photo-crop-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.photo-crop-container .ReactCrop {
+  max-width: 300px;
+  margin: 0 auto;
+  border-radius: 8px;
+  overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+
+.photo-crop-container .ReactCrop__crop-selection {
+  border: 2px solid var(--primary-color) !important;
+  border-radius: 50% !important;
+  box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5) !important;
+}
+
+.crop-hint {
+  font-size: 13px;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
+.photo-crop-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.photo-crop-actions .btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Profile Photo Edit */
+.profile-photo-edit {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+}
+
+.profile-photo-preview {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  overflow: hidden;
+  border: 2px solid var(--border-color);
+  cursor: pointer;
+  transition: border-color 0.2s ease;
+}
+
+.profile-photo-preview:hover {
+  border-color: var(--accent-color);
+}
+
+.profile-photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.profile-photo-placeholder {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--bg-color);
+  color: var(--text-secondary);
+}
+
+.profile-photo-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  color: white;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.profile-photo-preview:hover .profile-photo-overlay {
+  opacity: 1;
+}
+
+.profile-photo-hint {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.profile-photo-edit__main {
+  display: flex;
+  align-items: flex-start;
+  gap: 24px;
+}
+
+.profile-photo-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-photo-upload-btn {
+  background: var(--accent-color) !important;
+  border: none !important;
+  color: white !important;
+  font-size: 14px;
+  padding: 10px 16px;
+}
+
+.profile-photo-upload-btn:hover {
+  opacity: 0.9;
+}
+
+.profile-photo-remove-btn {
+  background: transparent !important;
+  border: 1px solid rgba(239, 68, 68, 0.5) !important;
+  color: #EF4444 !important;
+  font-size: 14px;
+  padding: 10px 16px;
+}
+
+.profile-photo-remove-btn:hover {
+  background: rgba(239, 68, 68, 0.1) !important;
+}
+
+.profile-photo-hints {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-top: 12px;
+  text-align: center;
+  width: 100%;
+}
+
+.profile-photo-hints p {
+  margin: 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.profile-photo-requirements {
+  font-size: 12px !important;
+  color: var(--text-secondary) !important;
+  opacity: 0.7;
+}
+
+.profile-photo-edit--dragging {
+  background: rgba(139, 124, 255, 0.1);
+  border: 2px dashed var(--accent-color);
+  border-radius: 12px;
+  padding: 20px;
+}
+
+.profile-workplace-form {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.profile-workplace-form .input {
+  flex: 1;
+}
+
+.profile-workplace-current {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-top: 8px;
+}
+
+.profile-workplace-message {
+  font-size: 13px;
+  margin-top: 8px;
+  padding: 8px 12px;
+  border-radius: 8px;
+}
+
+.profile-workplace-message--success {
+  background: rgba(16, 185, 129, 0.1);
+  color: #10B981;
+}
+
+.profile-workplace-message--error {
+  background: rgba(239, 68, 68, 0.1);
+  color: #EF4444;
+}
+
+/* Toast notifications */
+.profile-toasts {
+  position: fixed;
+  right: 24px;
+  top: 24px;
+  z-index: 1001;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.profile-toast {
+  min-width: 280px;
+  max-width: 360px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(17, 17, 17, 0.92);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.28);
+  color: var(--text-primary);
+  animation: toast-in 0.3s ease;
+}
+
+.profile-toast--success {
+  border-color: rgba(16, 185, 129, 0.3);
+}
+
+.profile-toast--error {
+  border-color: rgba(239, 68, 68, 0.3);
+}
+
+.profile-toast--info {
+  border-color: rgba(139, 124, 255, 0.3);
+}
+
+.profile-toast__close {
+  background: transparent;
+  border: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+}
+
+.profile-toast__close:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text-primary);
+}
+
+@keyframes toast-in {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
   }
 }

@@ -83,15 +83,26 @@ func (s *Service) ListOpenMatches(ctx context.Context, limit int32) ([]*domain.M
 		return nil, err
 	}
 
-	matches := make([]*domain.Match, 0, len(ids))
-	for _, matchID := range ids {
-		match, getErr := s.GetMatch(ctx, matchID)
-		if getErr != nil || match == nil || match.Status == domain.MatchStatusFinished {
+	if len(ids) == 0 {
+		return nil, nil
+	}
+
+	// Batch load all matches in single query (instead of N+1)
+	matches, err := s.repo.ListMatchesByIDs(ctx, ids)
+	if err != nil {
+		return nil, err
+	}
+
+	// Filter out finished matches and apply anti-cheat setting
+	result := make([]*domain.Match, 0, len(matches))
+	for _, match := range matches {
+		if match == nil || match.Status == domain.MatchStatusFinished {
 			continue
 		}
-		matches = append(matches, match)
+		match.AntiCheatEnabled = s.antiCheatEnabled()
+		result = append(result, match)
 	}
-	return matches, nil
+	return result, nil
 }
 
 func (s *Service) JoinMatch(ctx context.Context, matchID uuid.UUID, user *domain.User) (*domain.Match, error) {
@@ -138,6 +149,13 @@ func (s *Service) SavePlayerCode(ctx context.Context, matchID uuid.UUID, user *d
 		return domain.ErrGuestsNotSupported
 	}
 	return s.repo.SavePlayerCode(ctx, matchID, user.ID, code)
+}
+
+func (s *Service) SavePlayerCodes(ctx context.Context, matchID uuid.UUID, codes map[uuid.UUID]string) error {
+	if len(codes) == 0 {
+		return nil
+	}
+	return s.repo.SavePlayerCodes(ctx, matchID, codes)
 }
 
 func (s *Service) CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error) {

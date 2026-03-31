@@ -146,15 +146,16 @@ func TestDeletePodcast(t *testing.T) {
 		t.Parallel()
 
 		podcastID := uuid.New()
+		actor := &model.User{ID: uuid.New()}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("DeletePodcast", context.Background(), podcastID).Return("", nil).Once()
+		mockRepo.On("DeletePodcast", context.Background(), podcastID, actor).Return("", nil).Once()
 
 		svc := NewPodcastService(Config{
 			Repository: mockRepo,
 		})
 
-		_, err := svc.DeletePodcast(context.Background(), podcastID)
+		_, err := svc.DeletePodcast(context.Background(), podcastID, actor)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}

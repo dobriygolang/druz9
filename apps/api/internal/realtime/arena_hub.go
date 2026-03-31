@@ -25,6 +25,7 @@ type ArenaHub struct {
 type arenaStateService interface {
 	GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, error)
 	SavePlayerCode(ctx context.Context, matchID uuid.UUID, user *model.User, code string) error
+	SavePlayerCodes(ctx context.Context, matchID uuid.UUID, codes map[uuid.UUID]string) error
 }
 
 type arenaMatchRoom struct {
@@ -497,6 +498,9 @@ func (h *ArenaHub) flushSnapshot(matchID string, codes map[string]*schema.ArenaP
 	if err != nil {
 		return
 	}
+
+	// Batch all codes in single DB call (O(1) instead of N calls)
+	codesMap := make(map[uuid.UUID]string, len(codes))
 	for userID, code := range codes {
 		if code == nil {
 			continue
@@ -505,11 +509,11 @@ func (h *ArenaHub) flushSnapshot(matchID string, codes map[string]*schema.ArenaP
 		if parseErr != nil {
 			continue
 		}
-		_ = h.service.SavePlayerCode(context.Background(), parsedMatchID, &model.User{
-			ID:        parsedUserID,
-			FirstName: code.DisplayName,
-			Status:    model.UserStatusGuest,
-		}, code.Code)
+		codesMap[parsedUserID] = code.Code
+	}
+
+	if len(codesMap) > 0 {
+		_ = h.service.SavePlayerCodes(context.Background(), parsedMatchID, codesMap)
 	}
 }
 

@@ -11,7 +11,7 @@ import (
 )
 
 func (i *Implementation) CompletePodcastUpload(ctx context.Context, req *v1.CompletePodcastUploadRequest) (*v1.PodcastResponse, error) {
-	if _, err := requireAdmin(ctx); err != nil {
+	if _, err := requireUser(ctx); err != nil {
 		return nil, err
 	}
 

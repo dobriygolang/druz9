@@ -35,6 +35,7 @@ func TestListEvents(t *testing.T) {
 			Limit:  req.Limit,
 			Offset: req.Offset,
 		}).Return(expectedResp, nil).Once()
+		mockService.On("EnrichEventsWithAvatarURLs", mock.Anything, mock.Anything).Return(nil).Once()
 
 		impl := New(mockService)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})

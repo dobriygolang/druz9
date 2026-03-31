@@ -42,25 +42,13 @@ export const UsersPage: React.FC = () => {
     let cancelled = false;
 
     const loadArenaStats = async () => {
-      const results = await Promise.allSettled(
-        users.map(async (user) => {
-          const stats = await codeRoomApi.getArenaStats(user.userId);
-          return [user.userId, stats] as const;
-        }),
-      );
+      // Use batch endpoint to fetch all stats in a single request (O(1) instead of O(n))
+      const userIds = users.map(u => u.userId);
+      const statsMap = await codeRoomApi.getArenaStatsBatch(userIds);
 
-      if (cancelled) {
-        return;
+      if (!cancelled) {
+        setArenaStatsByUserId(statsMap);
       }
-
-      const nextStats: Record<string, ArenaPlayerStats> = {};
-      results.forEach((result) => {
-        if (result.status === 'fulfilled') {
-          const [userId, stats] = result.value;
-          nextStats[userId] = stats;
-        }
-      });
-      setArenaStatsByUserId(nextStats);
     };
 
     void loadArenaStats();

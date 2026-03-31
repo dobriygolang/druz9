@@ -28,7 +28,7 @@ type Repository interface {
 	GetPodcast(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, error)
 	CreatePodcast(ctx context.Context, user *model.User, req model.CreatePodcastRequest) (*model.Podcast, error)
 	AttachUpload(ctx context.Context, podcastID uuid.UUID, req model.UploadPodcastRequest, objectKey string) (*model.Podcast, error)
-	DeletePodcast(ctx context.Context, podcastID uuid.UUID) (string, error)
+	DeletePodcast(ctx context.Context, podcastID uuid.UUID, actor *model.User) (string, error)
 	IncrementListens(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, error)
 }
 

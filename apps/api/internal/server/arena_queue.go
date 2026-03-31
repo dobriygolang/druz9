@@ -20,6 +20,7 @@ const (
 	arenaQueueStatusPath    = "/api/v1/arena/queue/status"
 	arenaAntiCheatEventPath = "/api/v1/arena/anti-cheat/event"
 	arenaStatsPrefix        = "/api/v1/arena/stats/"
+	arenaStatsBatchPath     = "/api/v1/arena/stats/batch"
 	arenaGuestIDHeader      = "X-Arena-Guest-Id"
 	arenaGuestNameHeader    = "X-Arena-Guest-Name"
 )
@@ -29,6 +30,7 @@ type arenaQueueService interface {
 	LeaveQueue(ctx context.Context, user *model.User) error
 	GetQueueStatus(ctx context.Context, user *model.User) (*model.ArenaQueueState, error)
 	GetPlayerStats(ctx context.Context, userID uuid.UUID) (*model.ArenaPlayerStats, error)
+	GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID]*model.ArenaPlayerStats, error)
 	ReportPlayerSuspicion(ctx context.Context, matchID uuid.UUID, user *model.User, reason string) error
 }
 
@@ -44,6 +46,7 @@ func RegisterArenaQueue(srv *kratoshttp.Server, service arenaQueueService, autho
 	srv.HandlePrefix(arenaQueueLeavePath, arenaQueueHandler(service, authorizer))
 	srv.HandlePrefix(arenaQueueStatusPath, arenaQueueHandler(service, authorizer))
 	srv.HandlePrefix(arenaStatsPrefix, arenaQueueHandler(service, authorizer))
+	srv.HandlePrefix(arenaStatsBatchPath, arenaQueueHandler(service, authorizer))
 	srv.HandlePrefix(arenaAntiCheatEventPath, arenaQueueHandler(service, authorizer))
 }
 
@@ -120,6 +123,43 @@ func arenaQueueHandler(service arenaQueueService, authorizer arenaQueueAuthorize
 			return
 		}
 		writeArenaJSON(w, http.StatusOK, map[string]any{"stats": arenaStatsJSON(stats)})
+	})
+
+	mux.HandleFunc(arenaStatsBatchPath, func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.NotFound(w, r)
+			return
+		}
+		var req struct {
+			UserIDs []string `json:"userIds"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			writeArenaJSON(w, http.StatusBadRequest, map[string]any{"message": "invalid request"})
+			return
+		}
+		if len(req.UserIDs) == 0 || len(req.UserIDs) > 100 {
+			writeArenaJSON(w, http.StatusBadRequest, map[string]any{"message": "userIds must contain 1-100 items"})
+			return
+		}
+
+		userIDs := make([]uuid.UUID, 0, len(req.UserIDs))
+		for _, idStr := range req.UserIDs {
+			if parsedID, err := uuid.Parse(strings.TrimSpace(idStr)); err == nil {
+				userIDs = append(userIDs, parsedID)
+			}
+		}
+
+		statsMap, err := service.GetPlayerStatsBatch(r.Context(), userIDs)
+		if err != nil {
+			writeArenaJSON(w, http.StatusInternalServerError, map[string]any{"message": err.Error()})
+			return
+		}
+
+		result := make(map[string]any, len(statsMap))
+		for userID, stats := range statsMap {
+			result[userID.String()] = arenaStatsJSON(stats)
+		}
+		writeArenaJSON(w, http.StatusOK, map[string]any{"stats": result})
 	})
 
 	mux.HandleFunc(arenaAntiCheatEventPath, func(w http.ResponseWriter, r *http.Request) {

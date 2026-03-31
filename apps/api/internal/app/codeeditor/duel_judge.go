@@ -13,10 +13,18 @@ import (
 )
 
 func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID *uuid.UUID, guestName string, code string) (*domain.Submission, error) {
-	task, err := s.repo.GetTask(ctx, *room.TaskID)
-	if err != nil {
-		return nil, err
+	taskIDStr := room.TaskID.String()
+	taskPtr, ok := s.taskCache.Get(taskIDStr)
+	if !ok {
+		task, err := s.repo.GetTask(ctx, *room.TaskID)
+		if err != nil {
+			return nil, err
+		}
+		s.taskCache.Set(taskIDStr, *task, 0)
+		taskPtr = *task
 	}
+
+	task := &taskPtr
 
 	testCases := append([]*domain.TestCase{}, task.PublicTestCases...)
 	testCases = append(testCases, task.HiddenTestCases...)

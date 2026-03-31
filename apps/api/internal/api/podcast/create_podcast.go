@@ -8,7 +8,7 @@ import (
 )
 
 func (i *Implementation) CreatePodcast(ctx context.Context, req *v1.CreatePodcastRequest) (*v1.PodcastResponse, error) {
-	user, err := requireAdmin(ctx)
+	user, err := requireUser(ctx)
 	if err != nil {
 		return nil, err
 	}

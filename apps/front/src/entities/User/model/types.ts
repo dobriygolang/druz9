@@ -8,6 +8,7 @@ export interface User {
   firstName: string;
   lastName: string;
   avatarUrl: string;
+  telegramAvatarUrl: string;
   region: string;
   latitude: number;
   longitude: number;
@@ -49,6 +50,7 @@ export interface CommunityMapPoint {
   longitude: number;
   isCurrentUser: boolean;
   avatarUrl: string;
+  telegramAvatarUrl: string;
   telegramUsername: string;
   firstName: string;
   lastName: string;
@@ -59,6 +61,7 @@ export interface EventParticipant {
   user_id: string;
   title: string;
   avatar_url: string;
+  telegram_avatar_url: string;
   telegram_username: string;
   first_name: string;
   last_name: string;

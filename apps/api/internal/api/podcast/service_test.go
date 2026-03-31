@@ -158,7 +158,7 @@ func TestDeletePodcast(t *testing.T) {
 		podcastID := uuid.New()
 
 		mockService := mocks.NewService(t)
-		mockService.On("DeletePodcast", mock.Anything, podcastID).Return("", nil).Once()
+		mockService.On("DeletePodcast", mock.Anything, podcastID, user).Return("", nil).Once()
 
 		impl := New(mockService)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})

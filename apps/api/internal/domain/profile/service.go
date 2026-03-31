@@ -11,6 +11,7 @@ import (
 	"sync"
 	"time"
 
+	"api/internal/cache"
 	"api/internal/model"
 
 	"github.com/google/uuid"
@@ -21,6 +22,7 @@ type Config struct {
 	Repository     Repository
 	SessionStorage SessionStorage
 	Settings       Settings
+	Storage        ObjectStorage
 }
 
 // Settings holds profile service settings.
@@ -37,10 +39,14 @@ type Settings struct {
 
 // Service implements profile domain logic.
 type Service struct {
-	repo     Repository
-	sessions SessionStorage
-	settings Settings
-	auth     *telegramAuthChallenges
+	repo          Repository
+	sessions      SessionStorage
+	settings      Settings
+	auth          *telegramAuthChallenges
+	storage       ObjectStorage
+	activityCache *cache.TTLCache[time.Time]
+	profileCache  *cache.TTLCache[*model.User]
+	sessionCache  *cache.TTLCache[*model.Session]
 }
 
 type telegramAuthChallenges struct {
@@ -61,10 +67,20 @@ type telegramAuthChallengeState struct {
 //go:generate mockery --case underscore --name Repository --with-expecter --output mocks
 type Repository interface {
 	UpsertTelegramUser(ctx context.Context, payload model.TelegramAuthPayload) (*model.User, error)
+	CreatePasswordUser(ctx context.Context, req model.PasswordRegistrationRequest, passwordHash string) (*model.User, error)
+	FindPasswordUserByLogin(ctx context.Context, login string) (*model.User, string, error)
 	FindUserByID(ctx context.Context, userID uuid.UUID) (*model.User, error)
+	FindUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error)
 	UpdateProfile(ctx context.Context, userID uuid.UUID, name string) (*model.User, error)
 	CompleteRegistration(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error)
 	UpdateLocation(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error)
+	UpdateAvatarURL(ctx context.Context, userID uuid.UUID, avatarURL string) (*model.User, error)
+	BindTelegram(ctx context.Context, userID uuid.UUID, payload model.TelegramAuthPayload) (*model.User, error)
+}
+
+type ObjectStorage interface {
+	PresignPutObject(ctx context.Context, key string, opts model.PresignOptions) (string, error)
+	PresignGetObject(ctx context.Context, key string, opts model.PresignOptions) (string, error)
 }
 
 // SessionStorage handles session management.
@@ -84,10 +100,14 @@ func NewProfileService(c Config) *Service {
 		repo:     c.Repository,
 		sessions: c.SessionStorage,
 		settings: c.Settings,
+		storage:  c.Storage,
 		auth: &telegramAuthChallenges{
 			byToken: make(map[string]*telegramAuthChallengeState),
 			byCode:  make(map[string]*telegramAuthChallengeState),
 		},
+		activityCache: cache.NewTTLCache[time.Time](10000, 15*time.Minute),
+		profileCache:  cache.NewTTLCache[*model.User](1000, 5*time.Minute),
+		sessionCache:  cache.NewTTLCache[*model.Session](5000, 30*time.Minute),
 	}
 }
 
@@ -157,4 +177,49 @@ func (s *Service) buildBotStartURL(token string) string {
 		return fmt.Sprintf("https://t.me/%s", url.PathEscape(s.settings.BotUsername))
 	}
 	return fmt.Sprintf("https://t.me/%s?start=%s", url.PathEscape(s.settings.BotUsername), url.QueryEscape(token))
+}
+
+// SetUserActivity updates user activity timestamp in cache.
+func (s *Service) SetUserActivity(userID uuid.UUID, at time.Time) {
+	s.activityCache.Set(userID.String(), at, 0)
+}
+
+// GetUserActivity returns user activity timestamp from cache.
+func (s *Service) GetUserActivity(userID uuid.UUID) (time.Time, bool) {
+	return s.activityCache.Get(userID.String())
+}
+
+// ActivityCache returns the activity cache for sharing with other services.
+func (s *Service) ActivityCache() *cache.TTLCache[time.Time] {
+	return s.activityCache
+}
+
+// InvalidateProfileCache removes user profile from cache.
+func (s *Service) InvalidateProfileCache(userID uuid.UUID) {
+	s.profileCache.Delete(userID.String())
+}
+
+// CacheProfile caches user profile.
+func (s *Service) CacheProfile(userID uuid.UUID, user *model.User) {
+	s.profileCache.Set(userID.String(), user, 0)
+}
+
+// GetCachedProfile returns cached user profile.
+func (s *Service) GetCachedProfile(userID uuid.UUID) (*model.User, bool) {
+	return s.profileCache.Get(userID.String())
+}
+
+// CacheSession caches user session.
+func (s *Service) CacheSession(sessionID uuid.UUID, session *model.Session) {
+	s.sessionCache.Set(sessionID.String(), session, 0)
+}
+
+// GetCachedSession returns cached user session.
+func (s *Service) GetCachedSession(sessionID uuid.UUID) (*model.Session, bool) {
+	return s.sessionCache.Get(sessionID.String())
+}
+
+// InvalidateSession removes session from cache.
+func (s *Service) InvalidateSession(sessionID uuid.UUID) {
+	s.sessionCache.Delete(sessionID.String())
 }

@@ -42,13 +42,14 @@ func EventParticipantStatusFromString(s string) EventParticipantStatus {
 }
 
 type EventParticipant struct {
-	UserID           string
-	Title            string
-	AvatarURL        string
-	TelegramUsername string
-	FirstName        string
-	LastName         string
-	Status           EventParticipantStatus
+	UserID            string
+	Title             string
+	AvatarURL         string
+	TelegramAvatarURL string
+	TelegramUsername  string
+	FirstName         string
+	LastName          string
+	Status            EventParticipantStatus
 }
 
 type Event struct {

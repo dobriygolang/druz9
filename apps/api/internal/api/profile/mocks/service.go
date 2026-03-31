@@ -3,10 +3,12 @@
 package mocks
 
 import (
-	model "api/internal/model"
+	domainprofile "api/internal/domain/profile"
 	context "context"
 
 	mock "github.com/stretchr/testify/mock"
+
+	model "api/internal/model"
 
 	time "time"
 
@@ -24,6 +26,127 @@ type Service_Expecter struct {
 
 func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
+}
+
+// BindTelegram provides a mock function with given fields: _a0, _a1, _a2, _a3
+func (_m *Service) BindTelegram(_a0 context.Context, _a1 uuid.UUID, _a2 string, _a3 string) (*model.ProfileResponse, error) {
+	ret := _m.Called(_a0, _a1, _a2, _a3)
+
+	if len(ret) == 0 {
+		panic("no return value specified for BindTelegram")
+	}
+
+	var r0 *model.ProfileResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, string) (*model.ProfileResponse, error)); ok {
+		return rf(_a0, _a1, _a2, _a3)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, string) *model.ProfileResponse); ok {
+		r0 = rf(_a0, _a1, _a2, _a3)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.ProfileResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string, string) error); ok {
+		r1 = rf(_a0, _a1, _a2, _a3)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_BindTelegram_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'BindTelegram'
+type Service_BindTelegram_Call struct {
+	*mock.Call
+}
+
+// BindTelegram is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 uuid.UUID
+//   - _a2 string
+//   - _a3 string
+func (_e *Service_Expecter) BindTelegram(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}) *Service_BindTelegram_Call {
+	return &Service_BindTelegram_Call{Call: _e.mock.On("BindTelegram", _a0, _a1, _a2, _a3)}
+}
+
+func (_c *Service_BindTelegram_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 string, _a3 string)) *Service_BindTelegram_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string), args[3].(string))
+	})
+	return _c
+}
+
+func (_c *Service_BindTelegram_Call) Return(_a0 *model.ProfileResponse, _a1 error) *Service_BindTelegram_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_BindTelegram_Call) RunAndReturn(run func(context.Context, uuid.UUID, string, string) (*model.ProfileResponse, error)) *Service_BindTelegram_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// CompletePhotoUpload provides a mock function with given fields: _a0, _a1, _a2
+func (_m *Service) CompletePhotoUpload(_a0 context.Context, _a1 uuid.UUID, _a2 string) (*model.ProfileResponse, error) {
+	ret := _m.Called(_a0, _a1, _a2)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CompletePhotoUpload")
+	}
+
+	var r0 *model.ProfileResponse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) (*model.ProfileResponse, error)); ok {
+		return rf(_a0, _a1, _a2)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) *model.ProfileResponse); ok {
+		r0 = rf(_a0, _a1, _a2)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.ProfileResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string) error); ok {
+		r1 = rf(_a0, _a1, _a2)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_CompletePhotoUpload_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CompletePhotoUpload'
+type Service_CompletePhotoUpload_Call struct {
+	*mock.Call
+}
+
+// CompletePhotoUpload is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 uuid.UUID
+//   - _a2 string
+func (_e *Service_Expecter) CompletePhotoUpload(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_CompletePhotoUpload_Call {
+	return &Service_CompletePhotoUpload_Call{Call: _e.mock.On("CompletePhotoUpload", _a0, _a1, _a2)}
+}
+
+func (_c *Service_CompletePhotoUpload_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 string)) *Service_CompletePhotoUpload_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Service_CompletePhotoUpload_Call) Return(_a0 *model.ProfileResponse, _a1 error) *Service_CompletePhotoUpload_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_CompletePhotoUpload_Call) RunAndReturn(run func(context.Context, uuid.UUID, string) (*model.ProfileResponse, error)) *Service_CompletePhotoUpload_Call {
+	_c.Call.Return(run)
+	return _c
 }
 
 // CompleteRegistration provides a mock function with given fields: _a0, _a1, _a2
@@ -307,6 +430,63 @@ func (_c *Service_DevUserID_Call) RunAndReturn(run func() string) *Service_DevUs
 	return _c
 }
 
+// GetAvatarURL provides a mock function with given fields: _a0, _a1
+func (_m *Service) GetAvatarURL(_a0 context.Context, _a1 string) (string, error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetAvatarURL")
+	}
+
+	var r0 string
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (string, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) string); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		r0 = ret.Get(0).(string)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_GetAvatarURL_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetAvatarURL'
+type Service_GetAvatarURL_Call struct {
+	*mock.Call
+}
+
+// GetAvatarURL is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 string
+func (_e *Service_Expecter) GetAvatarURL(_a0 interface{}, _a1 interface{}) *Service_GetAvatarURL_Call {
+	return &Service_GetAvatarURL_Call{Call: _e.mock.On("GetAvatarURL", _a0, _a1)}
+}
+
+func (_c *Service_GetAvatarURL_Call) Run(run func(_a0 context.Context, _a1 string)) *Service_GetAvatarURL_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Service_GetAvatarURL_Call) Return(_a0 string, _a1 error) *Service_GetAvatarURL_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_GetAvatarURL_Call) RunAndReturn(run func(context.Context, string) (string, error)) *Service_GetAvatarURL_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetProfileByID provides a mock function with given fields: _a0, _a1
 func (_m *Service) GetProfileByID(_a0 context.Context, _a1 uuid.UUID) (*model.ProfileResponse, error) {
 	ret := _m.Called(_a0, _a1)
@@ -366,6 +546,79 @@ func (_c *Service_GetProfileByID_Call) RunAndReturn(run func(context.Context, uu
 	return _c
 }
 
+// LoginWithPassword provides a mock function with given fields: _a0, _a1
+func (_m *Service) LoginWithPassword(_a0 context.Context, _a1 model.PasswordLoginRequest) (*model.ProfileResponse, string, time.Time, error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LoginWithPassword")
+	}
+
+	var r0 *model.ProfileResponse
+	var r1 string
+	var r2 time.Time
+	var r3 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.PasswordLoginRequest) (*model.ProfileResponse, string, time.Time, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, model.PasswordLoginRequest) *model.ProfileResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.ProfileResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, model.PasswordLoginRequest) string); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Get(1).(string)
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, model.PasswordLoginRequest) time.Time); ok {
+		r2 = rf(_a0, _a1)
+	} else {
+		r2 = ret.Get(2).(time.Time)
+	}
+
+	if rf, ok := ret.Get(3).(func(context.Context, model.PasswordLoginRequest) error); ok {
+		r3 = rf(_a0, _a1)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
+}
+
+// Service_LoginWithPassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LoginWithPassword'
+type Service_LoginWithPassword_Call struct {
+	*mock.Call
+}
+
+// LoginWithPassword is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 model.PasswordLoginRequest
+func (_e *Service_Expecter) LoginWithPassword(_a0 interface{}, _a1 interface{}) *Service_LoginWithPassword_Call {
+	return &Service_LoginWithPassword_Call{Call: _e.mock.On("LoginWithPassword", _a0, _a1)}
+}
+
+func (_c *Service_LoginWithPassword_Call) Run(run func(_a0 context.Context, _a1 model.PasswordLoginRequest)) *Service_LoginWithPassword_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.PasswordLoginRequest))
+	})
+	return _c
+}
+
+func (_c *Service_LoginWithPassword_Call) Return(_a0 *model.ProfileResponse, _a1 string, _a2 time.Time, _a3 error) *Service_LoginWithPassword_Call {
+	_c.Call.Return(_a0, _a1, _a2, _a3)
+	return _c
+}
+
+func (_c *Service_LoginWithPassword_Call) RunAndReturn(run func(context.Context, model.PasswordLoginRequest) (*model.ProfileResponse, string, time.Time, error)) *Service_LoginWithPassword_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // Logout provides a mock function with given fields: _a0, _a1
 func (_m *Service) Logout(_a0 context.Context, _a1 string) error {
 	ret := _m.Called(_a0, _a1)
@@ -409,6 +662,140 @@ func (_c *Service_Logout_Call) Return(_a0 error) *Service_Logout_Call {
 }
 
 func (_c *Service_Logout_Call) RunAndReturn(run func(context.Context, string) error) *Service_Logout_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// PreparePhotoUpload provides a mock function with given fields: _a0, _a1, _a2, _a3
+func (_m *Service) PreparePhotoUpload(_a0 context.Context, _a1 string, _a2 string, _a3 string) (*domainprofile.PhotoUploadTarget, error) {
+	ret := _m.Called(_a0, _a1, _a2, _a3)
+
+	if len(ret) == 0 {
+		panic("no return value specified for PreparePhotoUpload")
+	}
+
+	var r0 *domainprofile.PhotoUploadTarget
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) (*domainprofile.PhotoUploadTarget, error)); ok {
+		return rf(_a0, _a1, _a2, _a3)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, string, string) *domainprofile.PhotoUploadTarget); ok {
+		r0 = rf(_a0, _a1, _a2, _a3)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*domainprofile.PhotoUploadTarget)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, string, string) error); ok {
+		r1 = rf(_a0, _a1, _a2, _a3)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_PreparePhotoUpload_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'PreparePhotoUpload'
+type Service_PreparePhotoUpload_Call struct {
+	*mock.Call
+}
+
+// PreparePhotoUpload is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 string
+//   - _a2 string
+//   - _a3 string
+func (_e *Service_Expecter) PreparePhotoUpload(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}) *Service_PreparePhotoUpload_Call {
+	return &Service_PreparePhotoUpload_Call{Call: _e.mock.On("PreparePhotoUpload", _a0, _a1, _a2, _a3)}
+}
+
+func (_c *Service_PreparePhotoUpload_Call) Run(run func(_a0 context.Context, _a1 string, _a2 string, _a3 string)) *Service_PreparePhotoUpload_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string), args[3].(string))
+	})
+	return _c
+}
+
+func (_c *Service_PreparePhotoUpload_Call) Return(_a0 *domainprofile.PhotoUploadTarget, _a1 error) *Service_PreparePhotoUpload_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_PreparePhotoUpload_Call) RunAndReturn(run func(context.Context, string, string, string) (*domainprofile.PhotoUploadTarget, error)) *Service_PreparePhotoUpload_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// RegisterWithPassword provides a mock function with given fields: _a0, _a1
+func (_m *Service) RegisterWithPassword(_a0 context.Context, _a1 model.PasswordRegistrationRequest) (*model.ProfileResponse, string, time.Time, error) {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for RegisterWithPassword")
+	}
+
+	var r0 *model.ProfileResponse
+	var r1 string
+	var r2 time.Time
+	var r3 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.PasswordRegistrationRequest) (*model.ProfileResponse, string, time.Time, error)); ok {
+		return rf(_a0, _a1)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, model.PasswordRegistrationRequest) *model.ProfileResponse); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.ProfileResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, model.PasswordRegistrationRequest) string); ok {
+		r1 = rf(_a0, _a1)
+	} else {
+		r1 = ret.Get(1).(string)
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, model.PasswordRegistrationRequest) time.Time); ok {
+		r2 = rf(_a0, _a1)
+	} else {
+		r2 = ret.Get(2).(time.Time)
+	}
+
+	if rf, ok := ret.Get(3).(func(context.Context, model.PasswordRegistrationRequest) error); ok {
+		r3 = rf(_a0, _a1)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
+}
+
+// Service_RegisterWithPassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RegisterWithPassword'
+type Service_RegisterWithPassword_Call struct {
+	*mock.Call
+}
+
+// RegisterWithPassword is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 model.PasswordRegistrationRequest
+func (_e *Service_Expecter) RegisterWithPassword(_a0 interface{}, _a1 interface{}) *Service_RegisterWithPassword_Call {
+	return &Service_RegisterWithPassword_Call{Call: _e.mock.On("RegisterWithPassword", _a0, _a1)}
+}
+
+func (_c *Service_RegisterWithPassword_Call) Run(run func(_a0 context.Context, _a1 model.PasswordRegistrationRequest)) *Service_RegisterWithPassword_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.PasswordRegistrationRequest))
+	})
+	return _c
+}
+
+func (_c *Service_RegisterWithPassword_Call) Return(_a0 *model.ProfileResponse, _a1 string, _a2 time.Time, _a3 error) *Service_RegisterWithPassword_Call {
+	_c.Call.Return(_a0, _a1, _a2, _a3)
+	return _c
+}
+
+func (_c *Service_RegisterWithPassword_Call) RunAndReturn(run func(context.Context, model.PasswordRegistrationRequest) (*model.ProfileResponse, string, time.Time, error)) *Service_RegisterWithPassword_Call {
 	_c.Call.Return(run)
 	return _c
 }

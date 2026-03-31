@@ -25,6 +25,10 @@ func (s *Service) UpdateLocation(ctx context.Context, userID uuid.UUID, req mode
 		return nil, err
 	}
 
+	// Invalidate and update cache
+	s.InvalidateProfileCache(userID)
+	s.CacheProfile(userID, user)
+
 	return &model.ProfileResponse{
 		User:                 user,
 		NeedsProfileComplete: false,

@@ -77,21 +77,22 @@ func UserStatusFromString(str string) UserStatus {
 }
 
 type User struct {
-	ID               uuid.UUID
-	TelegramID       int64
-	TelegramUsername string
-	FirstName        string
-	LastName         string
-	AvatarURL        string
-	CurrentWorkplace string
-	Region           string
-	Geo              UserGeo
-	Status           UserStatus
-	ActivityStatus   UserActivityStatus
-	IsAdmin          bool
-	LastActiveAt     time.Time
-	CreatedAt        time.Time
-	UpdatedAt        time.Time
+	ID                uuid.UUID
+	TelegramID        int64
+	TelegramUsername  string
+	FirstName         string
+	LastName          string
+	AvatarURL         string
+	TelegramAvatarURL string
+	CurrentWorkplace  string
+	Region            string
+	Geo               UserGeo
+	Status            UserStatus
+	ActivityStatus    UserActivityStatus
+	IsAdmin           bool
+	LastActiveAt      time.Time
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
 }
 
 type UserGeo struct {
@@ -114,6 +115,18 @@ type TelegramAuthChallenge struct {
 	Token       string
 	BotStartURL string
 	ExpiresAt   time.Time
+}
+
+type PasswordRegistrationRequest struct {
+	Login     string
+	Password  string
+	FirstName string
+	LastName  string
+}
+
+type PasswordLoginRequest struct {
+	Login    string
+	Password string
 }
 
 type CompleteRegistrationRequest struct {

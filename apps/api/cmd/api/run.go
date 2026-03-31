@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"time"
 
 	// #nosec G108 -- pprof is intentionally exposed on dedicated metrics endpoint in non-public ops context.
 	_ "net/http/pprof"
@@ -16,6 +17,7 @@ import (
 	referralservice "api/internal/api/referral"
 	apparenа "api/internal/app/arena"
 	appcodeeditor "api/internal/app/codeeditor"
+	"api/internal/cache"
 	"api/internal/closer"
 	"api/internal/config"
 	arenadata "api/internal/data/arena"
@@ -127,9 +129,13 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 
 	geoClient := geodata.NewClient(cfg, store, kratosLogger)
 
+	// Create avatar URL cache with LRU and TTL
+	avatarURLCache := cache.NewTTLCache[string](1000, 1*time.Hour)
+
 	profileServiceDomain := profiledomainservice.NewProfileService(profiledomainservice.Config{
 		Repository:     profileRepo,
 		SessionStorage: profileRepo,
+		Storage:        storageClient,
 		Settings: profiledomainservice.Settings{
 			BotToken:            cfg.External.Telegram.BotToken,
 			BotUsername:         cfg.External.Telegram.BotUsername,
@@ -145,10 +151,15 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 		ProfileRepository: profileRepo,
 	})
 	geoServiceDomain := geodomainservice.NewGeoService(geodomainservice.Config{
-		Resolver: geoClient,
+		Resolver:      geoClient,
+		Storage:       storageClient,
+		AvatarCache:   avatarURLCache,
+		ActivityCache: profileServiceDomain.ActivityCache(),
 	})
 	eventServiceDomain := eventdomainservice.NewService(eventdomainservice.Config{
-		Repository: eventRepo,
+		Repository:  eventRepo,
+		Storage:     storageClient,
+		AvatarCache: avatarURLCache,
 	})
 	podcastServiceDomain := podcastdomainservice.NewPodcastService(podcastdomainservice.Config{
 		Repository: podcastRepo,

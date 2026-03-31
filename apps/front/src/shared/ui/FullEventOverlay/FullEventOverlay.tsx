@@ -246,13 +246,16 @@ export const FullEventOverlay: React.FC<FullEventOverlayProps> = ({
                   }}
                 >
                   <div style={{ width: '36px', height: '36px', borderRadius: '12px', overflow: 'hidden', background: '#333', border: '1px solid rgba(255,255,255,0.1)' }}>
-                    {p.avatar_url ? (
-                      <img src={p.avatar_url} alt={`Аватар пользователя ${p.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                    ) : (
+                    {(() => {
+                      const avatarUrl = p.avatar_url || p.telegram_avatar_url || '';
+                      return avatarUrl ? (
+                        <img src={avatarUrl} alt={`Аватар пользователя ${p.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+                      ) : (
                       <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '12px', fontWeight: 600, color: 'var(--text-secondary)' }}>
                         {getInitials(p.title)}
                       </div>
-                    )}
+                      );
+                    })()}
                   </div>
                   <div style={{ fontSize: '14px', fontWeight: 500, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
                     {p.title}

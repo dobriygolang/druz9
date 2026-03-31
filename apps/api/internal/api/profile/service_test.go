@@ -8,6 +8,7 @@ import (
 
 	"api/internal/api/profile/mocks"
 	"api/internal/model"
+	profiledomain "api/internal/domain/profile"
 	v1 "api/pkg/api/profile/v1"
 
 	"github.com/google/uuid"
@@ -137,6 +138,7 @@ func TestGetProfileByID(t *testing.T) {
 
 		mockService := mocks.NewService(t)
 		mockService.On("GetProfileByID", mock.Anything, userID).Return(expectedResponse, nil).Once()
+		mockService.On("GetAvatarURL", mock.Anything, "").Return("", nil).Once()
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 
@@ -275,5 +277,339 @@ func TestUpdateProfile(t *testing.T) {
 		}
 
 		mockService.AssertExpectations(t)
+	})
+}
+
+func TestLoginWithPassword(t *testing.T) {
+	t.Parallel()
+
+	t.Run("authenticates and sets cookie", func(t *testing.T) {
+		t.Parallel()
+
+		userID := uuid.New()
+		req := &v1.LoginWithPasswordRequest{
+			Login:    "testuser",
+			Password: "password123",
+		}
+		expectedResponse := &model.ProfileResponse{
+			User: &model.User{ID: userID, FirstName: "John"},
+		}
+		rawToken := "test-token"
+		expiresAt := time.Now().Add(time.Hour)
+
+		mockService := mocks.NewService(t)
+		mockService.On("LoginWithPassword", mock.Anything, model.PasswordLoginRequest{
+			Login:    "testuser",
+			Password: "password123",
+		}).Return(expectedResponse, rawToken, expiresAt, nil).Once()
+
+		mockCookie := mocks.NewSessionCookieManager(t)
+		mockCookie.On("SetSessionCookie", mock.Anything, rawToken, expiresAt).Once()
+
+		impl := New(mockService, mockCookie)
+
+		resp, err := impl.LoginWithPassword(context.Background(), req)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+		if resp == nil {
+			t.Error("expected response, got nil")
+		}
+
+		mockService.AssertExpectations(t)
+		mockCookie.AssertExpectations(t)
+	})
+
+	t.Run("propagates service error", func(t *testing.T) {
+		t.Parallel()
+
+		expectedErr := errors.New("invalid credentials")
+		mockService := mocks.NewService(t)
+		mockService.On("LoginWithPassword", mock.Anything, mock.Anything).Return(nil, "", time.Time{}, expectedErr).Once()
+
+		mockCookie := mocks.NewSessionCookieManager(t)
+
+		impl := New(mockService, mockCookie)
+
+		_, err := impl.LoginWithPassword(context.Background(), &v1.LoginWithPasswordRequest{
+			Login:    "testuser",
+			Password: "wrongpassword",
+		})
+		if !errors.Is(err, expectedErr) {
+			t.Errorf("expected error %v, got %v", expectedErr, err)
+		}
+	})
+}
+
+func TestRegisterWithPassword(t *testing.T) {
+	t.Parallel()
+
+	t.Run("registers and sets cookie", func(t *testing.T) {
+		t.Parallel()
+
+		userID := uuid.New()
+		req := &v1.RegisterWithPasswordRequest{
+			Login:     "newuser",
+			Password:  "password123",
+			FirstName: "John",
+			LastName:  "Doe",
+		}
+		expectedResponse := &model.ProfileResponse{
+			User: &model.User{ID: userID, FirstName: "John", LastName: "Doe"},
+		}
+		rawToken := "test-token"
+		expiresAt := time.Now().Add(time.Hour)
+
+		mockService := mocks.NewService(t)
+		mockService.On("RegisterWithPassword", mock.Anything, model.PasswordRegistrationRequest{
+			Login:     "newuser",
+			Password:  "password123",
+			FirstName: "John",
+			LastName:  "Doe",
+		}).Return(expectedResponse, rawToken, expiresAt, nil).Once()
+
+		mockCookie := mocks.NewSessionCookieManager(t)
+		mockCookie.On("SetSessionCookie", mock.Anything, rawToken, expiresAt).Once()
+
+		impl := New(mockService, mockCookie)
+
+		resp, err := impl.RegisterWithPassword(context.Background(), req)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+		if resp == nil {
+			t.Error("expected response, got nil")
+		}
+
+		mockService.AssertExpectations(t)
+		mockCookie.AssertExpectations(t)
+	})
+
+	t.Run("propagates service error", func(t *testing.T) {
+		t.Parallel()
+
+		expectedErr := errors.New("user already exists")
+		mockService := mocks.NewService(t)
+		mockService.On("RegisterWithPassword", mock.Anything, mock.Anything).Return(nil, "", time.Time{}, expectedErr).Once()
+
+		mockCookie := mocks.NewSessionCookieManager(t)
+
+		impl := New(mockService, mockCookie)
+
+		_, err := impl.RegisterWithPassword(context.Background(), &v1.RegisterWithPasswordRequest{
+			Login:     "existinguser",
+			Password:  "password123",
+			FirstName: "John",
+		})
+		if !errors.Is(err, expectedErr) {
+			t.Errorf("expected error %v, got %v", expectedErr, err)
+		}
+	})
+}
+
+func TestUpdateLocation(t *testing.T) {
+	t.Parallel()
+
+	t.Run("delegates to service", func(t *testing.T) {
+		t.Parallel()
+
+		userID := uuid.New()
+		req := &v1.UpdateLocationRequest{
+			Region: "EU",
+			City:   "Berlin",
+		}
+		expectedResponse := &model.ProfileResponse{
+			User: &model.User{ID: userID, Status: model.UserStatusActive},
+		}
+
+		mockService := mocks.NewService(t)
+		mockService.On("UpdateLocation", mock.Anything, userID, model.CompleteRegistrationRequest{
+			Region: "EU",
+			City:   "Berlin",
+		}).Return(expectedResponse, nil).Once()
+
+		mockCookie := mocks.NewSessionCookieManager(t)
+
+		impl := New(mockService, mockCookie)
+
+		user := &model.User{ID: userID}
+		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+
+		resp, err := impl.UpdateLocation(ctx, req)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+		if resp == nil {
+			t.Error("expected response, got nil")
+		}
+
+		mockService.AssertExpectations(t)
+	})
+
+	t.Run("returns error when no user in context", func(t *testing.T) {
+		t.Parallel()
+
+		mockService := mocks.NewService(t)
+		mockCookie := mocks.NewSessionCookieManager(t)
+
+		impl := New(mockService, mockCookie)
+
+		_, err := impl.UpdateLocation(context.Background(), &v1.UpdateLocationRequest{})
+		if err == nil {
+			t.Error("expected error when no user in context")
+		}
+	})
+}
+
+func TestGetPhotoUploadURL(t *testing.T) {
+	t.Parallel()
+
+	t.Run("gets photo upload URL", func(t *testing.T) {
+		t.Parallel()
+
+		userID := uuid.New()
+		req := &v1.GetPhotoUploadURLRequest{
+			ContentType: "image/jpeg",
+			FileName:    "photo.jpg",
+		}
+		expectedTarget := &profiledomain.PhotoUploadTarget{
+			UploadURL: "https://s3.example.com/upload/photo.jpg",
+			ObjectKey: "photos/photo.jpg",
+		}
+
+		mockService := mocks.NewService(t)
+		mockService.On("PreparePhotoUpload", mock.Anything, userID.String(), "photo.jpg", "image/jpeg").Return(expectedTarget, nil).Once()
+
+		mockCookie := mocks.NewSessionCookieManager(t)
+
+		impl := New(mockService, mockCookie)
+
+		user := &model.User{ID: userID}
+		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+
+		resp, err := impl.GetPhotoUploadURL(ctx, req)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+		if resp == nil {
+			t.Error("expected response, got nil")
+		}
+
+		mockService.AssertExpectations(t)
+	})
+
+	t.Run("returns error when no user in context", func(t *testing.T) {
+		t.Parallel()
+
+		mockService := mocks.NewService(t)
+		mockCookie := mocks.NewSessionCookieManager(t)
+
+		impl := New(mockService, mockCookie)
+
+		_, err := impl.GetPhotoUploadURL(context.Background(), &v1.GetPhotoUploadURLRequest{})
+		if err == nil {
+			t.Error("expected error when no user in context")
+		}
+	})
+}
+
+func TestCompletePhotoUpload(t *testing.T) {
+	t.Parallel()
+
+	t.Run("completes photo upload", func(t *testing.T) {
+		t.Parallel()
+
+		userID := uuid.New()
+		req := &v1.CompletePhotoUploadRequest{
+			ObjectKey: "photos/photo.jpg",
+		}
+		expectedResponse := &model.ProfileResponse{
+			User: &model.User{ID: userID, AvatarURL: "https://s3.example.com/files/photo.jpg"},
+		}
+
+		mockService := mocks.NewService(t)
+		mockService.On("CompletePhotoUpload", mock.Anything, userID, "photos/photo.jpg").Return(expectedResponse, nil).Once()
+
+		mockCookie := mocks.NewSessionCookieManager(t)
+
+		impl := New(mockService, mockCookie)
+
+		user := &model.User{ID: userID}
+		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+
+		resp, err := impl.CompletePhotoUpload(ctx, req)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+		if resp == nil {
+			t.Error("expected response, got nil")
+		}
+
+		mockService.AssertExpectations(t)
+	})
+
+	t.Run("returns error when no user in context", func(t *testing.T) {
+		t.Parallel()
+
+		mockService := mocks.NewService(t)
+		mockCookie := mocks.NewSessionCookieManager(t)
+
+		impl := New(mockService, mockCookie)
+
+		_, err := impl.CompletePhotoUpload(context.Background(), &v1.CompletePhotoUploadRequest{})
+		if err == nil {
+			t.Error("expected error when no user in context")
+		}
+	})
+}
+
+func TestBindTelegram(t *testing.T) {
+	t.Parallel()
+
+	t.Run("binds telegram successfully", func(t *testing.T) {
+		t.Parallel()
+
+		userID := uuid.New()
+		req := &v1.BindTelegramRequest{
+			Token: "challenge-token",
+			Code:  "123456",
+		}
+		expectedResponse := &model.ProfileResponse{
+			User: &model.User{ID: userID, TelegramID: 123},
+		}
+
+		mockService := mocks.NewService(t)
+		mockService.On("BindTelegram", mock.Anything, userID, "challenge-token", "123456").Return(expectedResponse, nil).Once()
+
+		mockCookie := mocks.NewSessionCookieManager(t)
+
+		impl := New(mockService, mockCookie)
+
+		user := &model.User{ID: userID}
+		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+
+		resp, err := impl.BindTelegram(ctx, req)
+		if err != nil {
+			t.Errorf("unexpected error: %v", err)
+		}
+		if resp == nil {
+			t.Error("expected response, got nil")
+		}
+
+		mockService.AssertExpectations(t)
+	})
+
+	t.Run("returns error when no user in context", func(t *testing.T) {
+		t.Parallel()
+
+		mockService := mocks.NewService(t)
+		mockCookie := mocks.NewSessionCookieManager(t)
+
+		impl := New(mockService, mockCookie)
+
+		_, err := impl.BindTelegram(context.Background(), &v1.BindTelegramRequest{})
+		if err == nil {
+			t.Error("expected error when no user in context")
+		}
 	})
 }

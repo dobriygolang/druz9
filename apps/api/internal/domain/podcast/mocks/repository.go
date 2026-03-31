@@ -145,9 +145,9 @@ func (_c *Repository_CreatePodcast_Call) RunAndReturn(run func(context.Context, 
 	return _c
 }
 
-// DeletePodcast provides a mock function with given fields: ctx, podcastID
-func (_m *Repository) DeletePodcast(ctx context.Context, podcastID uuid.UUID) (string, error) {
-	ret := _m.Called(ctx, podcastID)
+// DeletePodcast provides a mock function with given fields: ctx, podcastID, actor
+func (_m *Repository) DeletePodcast(ctx context.Context, podcastID uuid.UUID, actor *model.User) (string, error) {
+	ret := _m.Called(ctx, podcastID, actor)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeletePodcast")
@@ -155,17 +155,17 @@ func (_m *Repository) DeletePodcast(ctx context.Context, podcastID uuid.UUID) (s
 
 	var r0 string
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (string, error)); ok {
-		return rf(ctx, podcastID)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User) (string, error)); ok {
+		return rf(ctx, podcastID, actor)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) string); ok {
-		r0 = rf(ctx, podcastID)
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User) string); ok {
+		r0 = rf(ctx, podcastID, actor)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
-		r1 = rf(ctx, podcastID)
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, *model.User) error); ok {
+		r1 = rf(ctx, podcastID, actor)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -181,13 +181,14 @@ type Repository_DeletePodcast_Call struct {
 // DeletePodcast is a helper method to define mock.On call
 //   - ctx context.Context
 //   - podcastID uuid.UUID
-func (_e *Repository_Expecter) DeletePodcast(ctx interface{}, podcastID interface{}) *Repository_DeletePodcast_Call {
-	return &Repository_DeletePodcast_Call{Call: _e.mock.On("DeletePodcast", ctx, podcastID)}
+//   - actor *model.User
+func (_e *Repository_Expecter) DeletePodcast(ctx interface{}, podcastID interface{}, actor interface{}) *Repository_DeletePodcast_Call {
+	return &Repository_DeletePodcast_Call{Call: _e.mock.On("DeletePodcast", ctx, podcastID, actor)}
 }
 
-func (_c *Repository_DeletePodcast_Call) Run(run func(ctx context.Context, podcastID uuid.UUID)) *Repository_DeletePodcast_Call {
+func (_c *Repository_DeletePodcast_Call) Run(run func(ctx context.Context, podcastID uuid.UUID, actor *model.User)) *Repository_DeletePodcast_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID))
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*model.User))
 	})
 	return _c
 }
@@ -197,7 +198,7 @@ func (_c *Repository_DeletePodcast_Call) Return(_a0 string, _a1 error) *Reposito
 	return _c
 }
 
-func (_c *Repository_DeletePodcast_Call) RunAndReturn(run func(context.Context, uuid.UUID) (string, error)) *Repository_DeletePodcast_Call {
+func (_c *Repository_DeletePodcast_Call) RunAndReturn(run func(context.Context, uuid.UUID, *model.User) (string, error)) *Repository_DeletePodcast_Call {
 	_c.Call.Return(run)
 	return _c
 }

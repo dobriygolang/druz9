@@ -18,17 +18,18 @@ type GeoResolveResponse struct {
 }
 
 type CommunityMapPoint struct {
-	UserID           string
-	Title            string
-	Region           string
-	Latitude         float64
-	Longitude        float64
-	IsCurrentUser    bool
-	AvatarURL        string
-	TelegramUsername string
-	FirstName        string
-	LastName         string
-	ActivityStatus   string
+	UserID            string
+	Title             string
+	Region            string
+	Latitude          float64
+	Longitude         float64
+	IsCurrentUser     bool
+	AvatarURL         string
+	TelegramAvatarURL string
+	TelegramUsername  string
+	FirstName         string
+	LastName          string
+	ActivityStatus    string
 }
 
 type CommunityMapResponse struct {

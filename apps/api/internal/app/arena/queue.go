@@ -119,6 +119,30 @@ func (s *Service) GetPlayerStats(ctx context.Context, userID uuid.UUID) (*domain
 	return stats, nil
 }
 
+func (s *Service) GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID]*domain.PlayerStats, error) {
+	statsMap, err := s.repo.GetPlayerStatsBatch(ctx, userIDs)
+	if err != nil {
+		return nil, err
+	}
+
+	// Fill in defaults for missing users
+	result := make(map[uuid.UUID]*domain.PlayerStats, len(userIDs))
+	for _, userID := range userIDs {
+		if stats, ok := statsMap[userID]; ok && stats != nil {
+			stats.League = leagueName(stats.Rating)
+			result[userID] = stats
+		} else {
+			result[userID] = &domain.PlayerStats{
+				UserID:  userID.String(),
+				Rating:  defaultRating,
+				League:  leagueName(defaultRating),
+				Matches: 0,
+			}
+		}
+	}
+	return result, nil
+}
+
 func (s *Service) ReportPlayerSuspicion(ctx context.Context, matchID uuid.UUID, user *domain.User, reason string) error {
 	if !s.antiCheatEnabled() {
 		return nil

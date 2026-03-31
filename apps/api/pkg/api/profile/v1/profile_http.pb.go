@@ -19,23 +19,33 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationProfileServiceBindTelegram = "/profile.v1.ProfileService/BindTelegram"
+const OperationProfileServiceCompletePhotoUpload = "/profile.v1.ProfileService/CompletePhotoUpload"
 const OperationProfileServiceCompleteRegistration = "/profile.v1.ProfileService/CompleteRegistration"
 const OperationProfileServiceConfirmTelegramAuth = "/profile.v1.ProfileService/ConfirmTelegramAuth"
 const OperationProfileServiceCreateTelegramAuthChallenge = "/profile.v1.ProfileService/CreateTelegramAuthChallenge"
+const OperationProfileServiceGetPhotoUploadURL = "/profile.v1.ProfileService/GetPhotoUploadURL"
 const OperationProfileServiceGetProfile = "/profile.v1.ProfileService/GetProfile"
 const OperationProfileServiceGetProfileByID = "/profile.v1.ProfileService/GetProfileByID"
+const OperationProfileServiceLoginWithPassword = "/profile.v1.ProfileService/LoginWithPassword"
 const OperationProfileServiceLogout = "/profile.v1.ProfileService/Logout"
+const OperationProfileServiceRegisterWithPassword = "/profile.v1.ProfileService/RegisterWithPassword"
 const OperationProfileServiceTelegramAuth = "/profile.v1.ProfileService/TelegramAuth"
 const OperationProfileServiceUpdateLocation = "/profile.v1.ProfileService/UpdateLocation"
 const OperationProfileServiceUpdateProfile = "/profile.v1.ProfileService/UpdateProfile"
 
 type ProfileServiceHTTPServer interface {
+	BindTelegram(context.Context, *BindTelegramRequest) (*BindTelegramResponse, error)
+	CompletePhotoUpload(context.Context, *CompletePhotoUploadRequest) (*CompletePhotoUploadResponse, error)
 	CompleteRegistration(context.Context, *CompleteRegistrationRequest) (*ProfileResponse, error)
 	ConfirmTelegramAuth(context.Context, *ConfirmTelegramAuthRequest) (*ConfirmTelegramAuthResponse, error)
 	CreateTelegramAuthChallenge(context.Context, *CreateTelegramAuthChallengeRequest) (*CreateTelegramAuthChallengeResponse, error)
+	GetPhotoUploadURL(context.Context, *GetPhotoUploadURLRequest) (*GetPhotoUploadURLResponse, error)
 	GetProfile(context.Context, *GetProfileRequest) (*ProfileResponse, error)
 	GetProfileByID(context.Context, *GetProfileByIDRequest) (*ProfileResponse, error)
+	LoginWithPassword(context.Context, *LoginWithPasswordRequest) (*LoginWithPasswordResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
+	RegisterWithPassword(context.Context, *RegisterWithPasswordRequest) (*RegisterWithPasswordResponse, error)
 	TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error)
 	UpdateLocation(context.Context, *UpdateLocationRequest) (*ProfileResponse, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*ProfileResponse, error)
@@ -52,6 +62,11 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.POST("/api/v1/profile/location", _ProfileService_UpdateLocation0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/update", _ProfileService_UpdateProfile0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/auth/logout", _ProfileService_Logout0_HTTP_Handler(srv))
+	r.POST("/api/v1/profile/bind-telegram", _ProfileService_BindTelegram0_HTTP_Handler(srv))
+	r.POST("/api/v1/profile/photo/upload-url", _ProfileService_GetPhotoUploadURL0_HTTP_Handler(srv))
+	r.POST("/api/v1/profile/photo/complete", _ProfileService_CompletePhotoUpload0_HTTP_Handler(srv))
+	r.POST("/api/v1/profile/auth/login-password", _ProfileService_LoginWithPassword0_HTTP_Handler(srv))
+	r.POST("/api/v1/profile/auth/register-password", _ProfileService_RegisterWithPassword0_HTTP_Handler(srv))
 }
 
 func _ProfileService_CreateTelegramAuthChallenge0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
@@ -249,13 +264,128 @@ func _ProfileService_Logout0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx
 	}
 }
 
+func _ProfileService_BindTelegram0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in BindTelegramRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceBindTelegram)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.BindTelegram(ctx, req.(*BindTelegramRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*BindTelegramResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_GetPhotoUploadURL0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetPhotoUploadURLRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceGetPhotoUploadURL)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetPhotoUploadURL(ctx, req.(*GetPhotoUploadURLRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetPhotoUploadURLResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_CompletePhotoUpload0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CompletePhotoUploadRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceCompletePhotoUpload)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CompletePhotoUpload(ctx, req.(*CompletePhotoUploadRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CompletePhotoUploadResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_LoginWithPassword0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LoginWithPasswordRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceLoginWithPassword)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.LoginWithPassword(ctx, req.(*LoginWithPasswordRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*LoginWithPasswordResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_RegisterWithPassword0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in RegisterWithPasswordRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceRegisterWithPassword)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.RegisterWithPassword(ctx, req.(*RegisterWithPasswordRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*RegisterWithPasswordResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ProfileServiceHTTPClient interface {
+	BindTelegram(ctx context.Context, req *BindTelegramRequest, opts ...http.CallOption) (rsp *BindTelegramResponse, err error)
+	CompletePhotoUpload(ctx context.Context, req *CompletePhotoUploadRequest, opts ...http.CallOption) (rsp *CompletePhotoUploadResponse, err error)
 	CompleteRegistration(ctx context.Context, req *CompleteRegistrationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	ConfirmTelegramAuth(ctx context.Context, req *ConfirmTelegramAuthRequest, opts ...http.CallOption) (rsp *ConfirmTelegramAuthResponse, err error)
 	CreateTelegramAuthChallenge(ctx context.Context, req *CreateTelegramAuthChallengeRequest, opts ...http.CallOption) (rsp *CreateTelegramAuthChallengeResponse, err error)
+	GetPhotoUploadURL(ctx context.Context, req *GetPhotoUploadURLRequest, opts ...http.CallOption) (rsp *GetPhotoUploadURLResponse, err error)
 	GetProfile(ctx context.Context, req *GetProfileRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	GetProfileByID(ctx context.Context, req *GetProfileByIDRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
+	LoginWithPassword(ctx context.Context, req *LoginWithPasswordRequest, opts ...http.CallOption) (rsp *LoginWithPasswordResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutResponse, err error)
+	RegisterWithPassword(ctx context.Context, req *RegisterWithPasswordRequest, opts ...http.CallOption) (rsp *RegisterWithPasswordResponse, err error)
 	TelegramAuth(ctx context.Context, req *TelegramAuthRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	UpdateLocation(ctx context.Context, req *UpdateLocationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	UpdateProfile(ctx context.Context, req *UpdateProfileRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
@@ -267,6 +397,32 @@ type ProfileServiceHTTPClientImpl struct {
 
 func NewProfileServiceHTTPClient(client *http.Client) ProfileServiceHTTPClient {
 	return &ProfileServiceHTTPClientImpl{client}
+}
+
+func (c *ProfileServiceHTTPClientImpl) BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...http.CallOption) (*BindTelegramResponse, error) {
+	var out BindTelegramResponse
+	pattern := "/api/v1/profile/bind-telegram"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProfileServiceBindTelegram))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) CompletePhotoUpload(ctx context.Context, in *CompletePhotoUploadRequest, opts ...http.CallOption) (*CompletePhotoUploadResponse, error) {
+	var out CompletePhotoUploadResponse
+	pattern := "/api/v1/profile/photo/complete"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProfileServiceCompletePhotoUpload))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *ProfileServiceHTTPClientImpl) CompleteRegistration(ctx context.Context, in *CompleteRegistrationRequest, opts ...http.CallOption) (*ProfileResponse, error) {
@@ -308,6 +464,19 @@ func (c *ProfileServiceHTTPClientImpl) CreateTelegramAuthChallenge(ctx context.C
 	return &out, nil
 }
 
+func (c *ProfileServiceHTTPClientImpl) GetPhotoUploadURL(ctx context.Context, in *GetPhotoUploadURLRequest, opts ...http.CallOption) (*GetPhotoUploadURLResponse, error) {
+	var out GetPhotoUploadURLResponse
+	pattern := "/api/v1/profile/photo/upload-url"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProfileServiceGetPhotoUploadURL))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *ProfileServiceHTTPClientImpl) GetProfile(ctx context.Context, in *GetProfileRequest, opts ...http.CallOption) (*ProfileResponse, error) {
 	var out ProfileResponse
 	pattern := "/api/v1/profile"
@@ -334,11 +503,37 @@ func (c *ProfileServiceHTTPClientImpl) GetProfileByID(ctx context.Context, in *G
 	return &out, nil
 }
 
+func (c *ProfileServiceHTTPClientImpl) LoginWithPassword(ctx context.Context, in *LoginWithPasswordRequest, opts ...http.CallOption) (*LoginWithPasswordResponse, error) {
+	var out LoginWithPasswordResponse
+	pattern := "/api/v1/profile/auth/login-password"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProfileServiceLoginWithPassword))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *ProfileServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts ...http.CallOption) (*LogoutResponse, error) {
 	var out LogoutResponse
 	pattern := "/api/v1/profile/auth/logout"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationProfileServiceLogout))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) RegisterWithPassword(ctx context.Context, in *RegisterWithPasswordRequest, opts ...http.CallOption) (*RegisterWithPasswordResponse, error) {
+	var out RegisterWithPasswordResponse
+	pattern := "/api/v1/profile/auth/register-password"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationProfileServiceRegisterWithPassword))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

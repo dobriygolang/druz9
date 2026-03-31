@@ -82,11 +82,46 @@ services:
     networks:
       - app_network
 
+  seed:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+    restart: "no"
+    depends_on:
+      postgres:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
+    environment:
+      CONFIG_PROFILE: prod
+      RTC_VALUES_PATH: /app/.platform/values_prod.yaml
+      DATABASE_URL_FILE: /run/secrets/database_url
+      S3_ACCESS_KEY_FILE: /run/secrets/s3_access_key
+      S3_SECRET_KEY_FILE: /run/secrets/s3_secret_key
+    volumes:
+      - ./runtime/values_prod.yaml:/app/.platform/values_prod.yaml:ro
+    command: ["/app/bin/seed", "-only", "all"]
+    secrets:
+      - database_url
+      - s3_access_key
+      - s3_secret_key
+    networks:
+      - app_network
+
   backend:
     build:
       context: ../api
       dockerfile: Dockerfile
     restart: unless-stopped
+    depends_on:
+      seed:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      minio-init:
+        condition: service_completed_successfully
     environment:
       CONFIG_PROFILE: prod
       RTC_VALUES_PATH: /app/.platform/values_prod.yaml
@@ -96,13 +131,6 @@ services:
       TELEGRAM_BOT_USERNAME: ${TELEGRAM_BOT_NAME}
       S3_ACCESS_KEY_FILE: /run/secrets/s3_access_key
       S3_SECRET_KEY_FILE: /run/secrets/s3_secret_key
-    depends_on:
-      postgres:
-        condition: service_healthy
-      minio:
-        condition: service_healthy
-      minio-init:
-        condition: service_completed_successfully
     volumes:
       - ./runtime/values_prod.yaml:/app/.platform/values_prod.yaml:ro
     ports:

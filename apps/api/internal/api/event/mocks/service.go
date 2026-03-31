@@ -133,6 +133,53 @@ func (_c *Service_DeleteEvent_Call) RunAndReturn(run func(context.Context, uuid.
 	return _c
 }
 
+// EnrichEventsWithAvatarURLs provides a mock function with given fields: _a0, _a1
+func (_m *Service) EnrichEventsWithAvatarURLs(_a0 context.Context, _a1 *model.ListEventsResponse) error {
+	ret := _m.Called(_a0, _a1)
+
+	if len(ret) == 0 {
+		panic("no return value specified for EnrichEventsWithAvatarURLs")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, *model.ListEventsResponse) error); ok {
+		r0 = rf(_a0, _a1)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Service_EnrichEventsWithAvatarURLs_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'EnrichEventsWithAvatarURLs'
+type Service_EnrichEventsWithAvatarURLs_Call struct {
+	*mock.Call
+}
+
+// EnrichEventsWithAvatarURLs is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 *model.ListEventsResponse
+func (_e *Service_Expecter) EnrichEventsWithAvatarURLs(_a0 interface{}, _a1 interface{}) *Service_EnrichEventsWithAvatarURLs_Call {
+	return &Service_EnrichEventsWithAvatarURLs_Call{Call: _e.mock.On("EnrichEventsWithAvatarURLs", _a0, _a1)}
+}
+
+func (_c *Service_EnrichEventsWithAvatarURLs_Call) Run(run func(_a0 context.Context, _a1 *model.ListEventsResponse)) *Service_EnrichEventsWithAvatarURLs_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*model.ListEventsResponse))
+	})
+	return _c
+}
+
+func (_c *Service_EnrichEventsWithAvatarURLs_Call) Return(_a0 error) *Service_EnrichEventsWithAvatarURLs_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Service_EnrichEventsWithAvatarURLs_Call) RunAndReturn(run func(context.Context, *model.ListEventsResponse) error) *Service_EnrichEventsWithAvatarURLs_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // JoinEvent provides a mock function with given fields: _a0, _a1, _a2
 func (_m *Service) JoinEvent(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (*model.Event, error) {
 	ret := _m.Called(_a0, _a1, _a2)

@@ -99,26 +99,30 @@ func (r *Repo) CreateMatch(ctx context.Context, match *domain.Match, creator *do
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
+	// Batch insert match, player, and editor state in single transaction
+	// Using multi-row INSERT for players and editor states
+	now := time.Now()
 	_, err = tx.Exec(ctx, `
 		INSERT INTO arena_matches (id, creator_user_id, task_id, topic, difficulty, source, status, duration_seconds, obfuscate_opponent, is_rated, unrated_reason, winner_reason, created_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())
-	`, match.ID, match.CreatorUserID, match.TaskID, match.Topic, match.Difficulty, match.Source, match.Status, match.DurationSeconds, match.ObfuscateOpponent, match.IsRated, match.UnratedReason, match.WinnerReason)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13)
+	`, match.ID, match.CreatorUserID, match.TaskID, match.Topic, match.Difficulty, match.Source, match.Status, match.DurationSeconds, match.ObfuscateOpponent, match.IsRated, match.UnratedReason, match.WinnerReason, now)
 	if err != nil {
 		return nil, fmt.Errorf("insert arena match: %w", err)
 	}
 
+	// Batch insert player and editor state in single query
 	_, err = tx.Exec(ctx, `
 		INSERT INTO arena_match_players (match_id, user_id, display_name, side, is_creator, joined_at, updated_at)
-		VALUES ($1, $2, $3, $4, $5, NOW(), NOW())
-	`, match.ID, creator.UserID, creator.DisplayName, creator.Side, creator.IsCreator)
+		VALUES ($1, $2, $3, $4, $5, $6, $6)
+	`, match.ID, creator.UserID, creator.DisplayName, creator.Side, creator.IsCreator, now)
 	if err != nil {
 		return nil, fmt.Errorf("insert arena creator: %w", err)
 	}
 
 	_, err = tx.Exec(ctx, `
 		INSERT INTO arena_editor_states (match_id, user_id, code, updated_at)
-		VALUES ($1, $2, $3, NOW())
-	`, match.ID, creator.UserID, starterCode)
+		VALUES ($1, $2, $3, $4)
+	`, match.ID, creator.UserID, starterCode, now)
 	if err != nil {
 		return nil, fmt.Errorf("insert arena editor state: %w", err)
 	}
@@ -214,6 +218,119 @@ func (r *Repo) ListOpenMatchIDs(ctx context.Context, limit int32) ([]uuid.UUID, 
 		ids = append(ids, id)
 	}
 	return ids, nil
+}
+
+// ListMatchesByIDs loads multiple matches in a single query (batch optimization).
+func (r *Repo) ListMatchesByIDs(ctx context.Context, matchIDs []uuid.UUID) ([]*domain.Match, error) {
+	if len(matchIDs) == 0 {
+		return nil, nil
+	}
+
+	// Convert UUIDs to strings for SQL ANY query
+	idStrings := make([]string, len(matchIDs))
+	for i, id := range matchIDs {
+		idStrings[i] = id.String()
+	}
+
+	rows, err := r.data.DB.Query(ctx, `
+		SELECT
+			m.id, m.creator_user_id, m.task_id, m.topic, m.difficulty, m.source, m.status, m.duration_seconds, m.obfuscate_opponent, m.is_rated, m.unrated_reason,
+			m.winner_user_id, m.winner_reason, m.started_at, m.finished_at, m.created_at, m.updated_at,
+			`+codetasks.SelectColumnsWithAlias("t")+`
+		FROM arena_matches m
+		JOIN code_tasks t ON t.id = m.task_id
+		WHERE m.id = ANY($1)
+		  AND m.status IN ($2, $3)
+		ORDER BY m.updated_at DESC
+	`, idStrings, model.ArenaMatchStatusWaiting, model.ArenaMatchStatusActive)
+	if err != nil {
+		return nil, fmt.Errorf("list arena matches by ids: %w", err)
+	}
+	defer rows.Close()
+
+	matches := make([]*domain.Match, 0, len(matchIDs))
+	matchMap := make(map[uuid.UUID]*domain.Match)
+	tasks := make([]*domain.Task, 0, len(matchIDs))
+
+	for rows.Next() {
+		var match domain.Match
+		var task domain.Task
+		var executionProfile string
+		var runnerMode int
+
+		if err := scanMatchWithTask(rows, &match, &task, &executionProfile, &runnerMode); err != nil {
+			return nil, fmt.Errorf("scan arena match: %w", err)
+		}
+		task.ExecutionProfile = model.ExecutionProfileFromString(executionProfile)
+		task.RunnerMode = model.RunnerMode(runnerMode)
+		if task.RunnerMode.String() == "" {
+			task.RunnerMode = model.RunnerModeProgram
+		}
+		match.Task = &task
+
+		matches = append(matches, &match)
+		matchMap[match.ID] = &match
+		tasks = append(tasks, &task)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate arena matches: %w", err)
+	}
+
+	// Batch load test cases for all tasks
+	if len(tasks) > 0 {
+		if err := codetasks.LoadCasesMultiple(ctx, r.data.DB, tasks); err != nil {
+			return nil, err
+		}
+	}
+
+	// Batch load players for all matches
+	if len(matches) > 0 {
+		if err := r.loadPlayersForMatches(ctx, matches, matchMap); err != nil {
+			return nil, err
+		}
+	}
+
+	return matches, nil
+}
+
+// loadPlayersForMatches batch loads players for multiple matches.
+func (r *Repo) loadPlayersForMatches(ctx context.Context, matches []*domain.Match, matchMap map[uuid.UUID]*domain.Match) error {
+	if len(matches) == 0 {
+		return nil
+	}
+
+	matchIDs := make([]any, len(matches))
+	for i, m := range matches {
+		matchIDs[i] = m.ID
+	}
+
+	rows, err := r.data.DB.Query(ctx, `
+		SELECT p.match_id, p.user_id, p.display_name, p.side, p.is_creator, p.freeze_until, p.accepted_at, p.best_runtime_ms, p.is_winner, p.suspicion_count, p.joined_at, p.updated_at,
+		       COALESCE(es.code, '')
+		FROM arena_match_players p
+		LEFT JOIN arena_editor_states es ON es.match_id = p.match_id AND es.user_id = p.user_id
+		WHERE p.match_id = ANY($1)
+		ORDER BY p.match_id, CASE WHEN p.side = $2 THEN 0 ELSE 1 END
+	`, matchIDs, model.ArenaPlayerSideLeft)
+	if err != nil {
+		return fmt.Errorf("list arena players batch: %w", err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var matchID uuid.UUID
+		var player domain.Player
+		if err := scanPlayerWithCode(rows, &player); err != nil {
+			return fmt.Errorf("scan arena player batch: %w", err)
+		}
+		matchID = player.MatchID
+
+		if match, ok := matchMap[matchID]; ok {
+			match.Players = append(match.Players, &player)
+		}
+	}
+
+	return rows.Err()
 }
 
 func (r *Repo) CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error) {
@@ -460,6 +577,38 @@ func (r *Repo) SavePlayerCode(ctx context.Context, matchID, userID uuid.UUID, co
 	return nil
 }
 
+func (r *Repo) SavePlayerCodes(ctx context.Context, matchID uuid.UUID, codes map[uuid.UUID]string) error {
+	if len(codes) == 0 {
+		return nil
+	}
+
+	// Batch upsert using unnest for O(1) instead of N separate queries
+	userIDs := make([]string, 0, len(codes))
+	codeValues := make([]string, 0, len(codes))
+	for userID, code := range codes {
+		userIDs = append(userIDs, userID.String())
+		codeValues = append(codeValues, code)
+	}
+
+	_, err := r.data.DB.Exec(ctx, `
+		INSERT INTO arena_editor_states (match_id, user_id, code, updated_at)
+		SELECT $1::uuid, u::uuid, c, NOW()
+		FROM unnest($2::text[], $3::text[]) AS uu(u, c)
+		ON CONFLICT (match_id, user_id) DO UPDATE SET
+			code = EXCLUDED.code,
+			updated_at = NOW()
+	`, matchID, userIDs, codeValues)
+	if err != nil {
+		return fmt.Errorf("save arena player codes batch: %w", err)
+	}
+
+	_, err = r.data.DB.Exec(ctx, `UPDATE arena_matches SET updated_at = NOW() WHERE id = $1`, matchID)
+	if err != nil {
+		return fmt.Errorf("touch arena match after codes save: %w", err)
+	}
+	return nil
+}
+
 func (r *Repo) SetPlayerFreeze(ctx context.Context, matchID, userID uuid.UUID, freezeUntil *time.Time) error {
 	_, err := r.data.DB.Exec(ctx, `
 		UPDATE arena_match_players
@@ -592,16 +741,30 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 	}
 
 	if isRated && len(finishers) > 0 {
-		for index := range finishers {
-			self := finishers[index]
+		// Pre-calculate all ratings once (batch calculation)
+		type ratingUpdate struct {
+			userID      uuid.UUID
+			displayName string
+			nextRating  int32
+			wins        int
+			losses      int
+			bestRuntime int64
+		}
+
+		updates := make([]ratingUpdate, 0, len(finishers))
+		for _, self := range finishers {
 			if !self.countStats {
 				continue
 			}
 			opponentRating := arenarating.DefaultRating
 			score := 0.5
 			if len(finishers) == 2 {
-				if finishers[1-index].countStats {
-					opponentRating = finishers[1-index].rating
+				other := finishers[0]
+				if self == finishers[0] {
+					other = finishers[1]
+				}
+				if other.countStats {
+					opponentRating = other.rating
 				}
 				if self.isWinner {
 					score = 1
@@ -621,9 +784,38 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 				losses = 1
 			}
 
+			updates = append(updates, ratingUpdate{
+				userID:      self.userID,
+				displayName: self.displayName,
+				nextRating:  nextRating,
+				wins:        wins,
+				losses:      losses,
+				bestRuntime: self.bestRuntime,
+			})
+		}
+
+		if len(updates) > 0 {
+			// Batch upsert using unnest for O(1) instead of N separate queries
+			userIDs := make([]string, len(updates))
+			displayNames := make([]string, len(updates))
+			ratings := make([]int32, len(updates))
+			wins := make([]int, len(updates))
+			losses := make([]int, len(updates))
+			bestRuntimes := make([]int64, len(updates))
+
+			for i, u := range updates {
+				userIDs[i] = u.userID.String()
+				displayNames[i] = u.displayName
+				ratings[i] = u.nextRating
+				wins[i] = u.wins
+				losses[i] = u.losses
+				bestRuntimes[i] = u.bestRuntime
+			}
+
 			if _, err := tx.Exec(ctx, `
 				INSERT INTO arena_player_stats (user_id, display_name, rating, wins, losses, matches, best_runtime_ms, updated_at)
-				VALUES ($1, $2, $3, $4, $5, 1, $6, NOW())
+				SELECT u::uuid, d, r, w, l, 1, br, NOW()
+				FROM unnest($1::text[], $2::text[], $3::int4[], $4::int4[], $5::int4[], $6::int8[]) AS uu(u, d, r, w, l, br)
 				ON CONFLICT (user_id) DO UPDATE SET
 				  display_name = EXCLUDED.display_name,
 				  rating = EXCLUDED.rating,
@@ -636,8 +828,8 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 				    ELSE LEAST(arena_player_stats.best_runtime_ms, EXCLUDED.best_runtime_ms)
 				  END,
 				  updated_at = NOW()
-			`, self.userID, self.displayName, nextRating, wins, losses, self.bestRuntime); err != nil {
-				return fmt.Errorf("upsert arena player stats: %w", err)
+			`, userIDs, displayNames, ratings, wins, losses, bestRuntimes); err != nil {
+				return fmt.Errorf("upsert arena player stats batch: %w", err)
 			}
 		}
 	}
@@ -726,6 +918,37 @@ func (r *Repo) GetPlayerStats(ctx context.Context, userID uuid.UUID) (*domain.Pl
 	}
 	item.League = arenaLeague(item.Rating)
 	return &item, nil
+}
+
+func (r *Repo) GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID]*domain.PlayerStats, error) {
+	if len(userIDs) == 0 {
+		return make(map[uuid.UUID]*domain.PlayerStats), nil
+	}
+
+	userIDStrings := make([]string, 0, len(userIDs))
+	for _, id := range userIDs {
+		userIDStrings = append(userIDStrings, id.String())
+	}
+
+	rows, err := r.data.DB.Query(ctx, leaderboardSelect+`
+		WHERE aps.user_id = ANY($1)
+	`, userIDStrings)
+	if err != nil {
+		return nil, fmt.Errorf("get arena player stats batch: %w", err)
+	}
+	defer rows.Close()
+
+	result := make(map[uuid.UUID]*domain.PlayerStats, len(userIDs))
+	for rows.Next() {
+		var item domain.PlayerStats
+		if err := scanPlayerStats(rows, &item); err != nil {
+			return nil, fmt.Errorf("scan arena player stats batch: %w", err)
+		}
+		item.League = arenaLeague(item.Rating)
+		parsedUserID, _ := uuid.Parse(item.UserID)
+		result[parsedUserID] = &item
+	}
+	return result, nil
 }
 
 func resolveArenaDisplayName(user *domain.User) string {

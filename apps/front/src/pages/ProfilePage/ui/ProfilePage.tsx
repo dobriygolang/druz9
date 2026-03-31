@@ -1,6 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, MapPin, Pencil, Briefcase, Shield, X, Navigation, Trophy, Crown, Medal, Zap, Diamond } from 'lucide-react';
+import { ArrowLeft, CheckCircle, MapPin, Pencil, Briefcase, Shield, X, Navigation, Trophy, Crown, Medal, Zap, Diamond, Send, Upload, User as UserIcon, Camera } from 'lucide-react';
+import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
+import 'react-image-crop/dist/ReactCrop.css';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { User } from '@/entities/User/model/types';
@@ -8,6 +10,27 @@ import { authApi } from '@/features/Auth/api/authApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
 import { LocationPicker } from '@/features/Geo/ui/LocationPicker';
+
+// Helper to create aspect-crop centered
+function centerAspectCrop(
+  mediaWidth: number,
+  mediaHeight: number,
+  aspect: number,
+) {
+  return centerCrop(
+    makeAspectCrop(
+      {
+        unit: '%',
+        width: 90,
+      },
+      aspect,
+      mediaWidth,
+      mediaHeight,
+    ),
+    mediaWidth,
+    mediaHeight,
+  )
+}
 export const ProfilePage: React.FC = () => {
   const { user: currentUser, updateLocation } = useAuth();
   const { userId } = useParams();
@@ -18,6 +41,73 @@ export const ProfilePage: React.FC = () => {
   const [newWorkplace, setNewWorkplace] = useState(currentUser?.currentWorkplace || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [arenaStats, setArenaStats] = useState<ArenaPlayerStats | null>(null);
+  const [isPhotoUploading, setIsPhotoUploading] = useState(false);
+  const [isBindTelegramModalOpen, setIsBindTelegramModalOpen] = useState(false);
+  const [telegramChallenge, setTelegramChallenge] = useState<{ token: string; botStartUrl: string } | null>(null);
+  const [telegramCode, setTelegramCode] = useState('');
+  const [isBindingTelegram, setIsBindingTelegram] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+
+  // Crop state
+  const [srcImage, setSrcImage] = useState<string | null>(null);
+  const [crop, setCrop] = useState<Crop>();
+  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
+  const [isCropping, setIsCropping] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'error' | 'info' }[]>([]);
+
+  // Toast helpers
+  const showToast = (message: string, type: 'success' | 'error' | 'info' = 'info') => {
+    const id = `toast-${Date.now()}`;
+    setToasts((prev) => [...prev.slice(-2), { id, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 3000);
+  };
+
+  const removeToast = (id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  };
+  const imgRef = useRef<HTMLImageElement | null>(null);
+
+  // Generate cropped image as blob
+  const getCroppedImage = async (): Promise<Blob | null> => {
+    if (!imgRef.current || !completedCrop) return null;
+
+    const canvas = document.createElement('canvas');
+    const scaleX = imgRef.current.naturalWidth / imgRef.current.width;
+    const scaleY = imgRef.current.naturalHeight / imgRef.current.height;
+
+    canvas.width = completedCrop.width * scaleX;
+    canvas.height = completedCrop.height * scaleY;
+
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return null;
+
+    ctx.drawImage(
+      imgRef.current,
+      completedCrop.x * scaleX,
+      completedCrop.y * scaleY,
+      completedCrop.width * scaleX,
+      completedCrop.height * scaleY,
+      0,
+      0,
+      canvas.width,
+      canvas.height,
+    );
+
+    return new Promise((resolve) => {
+      canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.95);
+    });
+  };
+
+  // Reset crop state
+  const resetCrop = () => {
+    setSrcImage(null);
+    setCrop(undefined);
+    setCompletedCrop(undefined);
+    setIsCropping(false);
+  };
 
   useEffect(() => {
     if (!userId) {
@@ -91,23 +181,222 @@ export const ProfilePage: React.FC = () => {
     return leagues[league?.toLowerCase()] || leagues.novice;
   };
 
-  const handleUpdateWorkplace = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [workplaceMessage, setWorkplaceMessage] = useState<{ type: 'success' | 'error'; text: string } | null>(null);
+
+  const handleUpdateWorkplace = async () => {
+    if (!newWorkplace.trim()) return;
     try {
       setIsSubmitting(true);
+      setWorkplaceMessage(null);
       const resp = await authApi.updateProfile({ currentWorkplace: newWorkplace });
       setUser(resp.user);
-      // We don't close the modal here because the user might want to change location too
-      alert('Место работы обновлено');
+      setWorkplaceMessage({ type: 'success', text: 'Место работы обновлено' });
+      setTimeout(() => setWorkplaceMessage(null), 3000);
     } catch (err) {
-      alert('Ошибка при сохранении');
+      setWorkplaceMessage({ type: 'error', text: 'Ошибка при сохранении' });
     } finally {
       setIsSubmitting(false);
     }
   };
 
+  const handlePhotoSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file || !currentUser || !isOwnProfile) {
+      return;
+    }
+    if (!file.type.startsWith('image/')) {
+      showToast('Можно загрузить только изображение', 'error');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('Максимальный размер изображения 10MB', 'error');
+      return;
+    }
+
+    // Create object URL for cropping preview
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSrcImage(reader.result as string);
+      setIsCropping(true);
+      setCrop(undefined);
+      setCompletedCrop(undefined);
+    };
+    reader.readAsDataURL(file);
+
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Process file - shared logic for click and drag & drop
+  const processFile = (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      showToast('Можно загрузить только изображение', 'error');
+      return;
+    }
+    if (file.size > 10 * 1024 * 1024) {
+      showToast('Максимальный размер изображения 10MB', 'error');
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      setSrcImage(reader.result as string);
+      setIsCropping(true);
+      setCrop(undefined);
+      setCompletedCrop(undefined);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  // Drag & drop handlers
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setIsDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) {
+      processFile(file);
+    }
+  };
+
+  // Handle cropped image upload
+  const handleCropUpload = async () => {
+    if (!srcImage) return;
+
+    try {
+      setIsPhotoUploading(true);
+
+      // Get cropped blob
+      const blob = await getCroppedImage();
+      if (!blob) {
+        throw new Error('Failed to create cropped image');
+      }
+
+      // Create file from blob
+      const file = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
+
+      // Get presigned URL
+      const resp = await authApi.getPhotoUploadURL(file.name, file.type);
+      const upload_url = (resp as any).uploadUrl || (resp as any).upload_url;
+      const object_key = (resp as any).objectKey || (resp as any).object_key;
+
+      if (!upload_url) {
+        throw new Error('upload_url is empty');
+      }
+
+      // Upload
+      const uploadResponse = await fetch(upload_url, {
+        method: 'PUT',
+        body: file,
+        headers: {
+          'Content-Type': file.type,
+        },
+      });
+      if (!uploadResponse.ok) {
+        throw new Error(`upload failed: ${uploadResponse.status}`);
+      }
+
+      // Complete upload
+      const response = await authApi.completePhotoUpload(object_key);
+      setUser(response.user);
+      resetCrop();
+      showToast('Фото профиля обновлено!', 'success');
+    } catch (err) {
+      console.error('Failed to upload profile photo', err);
+      showToast('Не удалось обновить фото профиля', 'error');
+    } finally {
+      setIsPhotoUploading(false);
+    }
+  };
+
+  // Handle remove avatar
+  const handleRemoveAvatar = async () => {
+    if (!confirm('Вы уверены, что хотите удалить фото профиля?')) {
+      return;
+    }
+
+    try {
+      setIsPhotoUploading(true);
+      // TODO: Add API call to remove avatar when backend supports it
+      // For now, just show a message
+      showToast('Функция удаления аватара временно недоступна', 'info');
+    } catch (err) {
+      console.error('Failed to remove avatar', err);
+      showToast('Не удалось удалить фото профиля', 'error');
+    } finally {
+      setIsPhotoUploading(false);
+    }
+  };
+
+  const handleOpenBindTelegram = async () => {
+    try {
+      const challenge = await authApi.createTelegramAuthChallenge();
+      setTelegramChallenge(challenge);
+      setIsBindTelegramModalOpen(true);
+    } catch (err) {
+      console.error('Failed to create telegram challenge', err);
+      showToast('Не удалось начать привязку Telegram', 'error');
+    }
+  };
+
+  const handleBindTelegram = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!telegramChallenge?.token || !telegramCode) {
+      showToast('Введите код из Telegram', 'error');
+      return;
+    }
+    try {
+      setIsBindingTelegram(true);
+      await authApi.bindTelegram(telegramChallenge.token, telegramCode);
+      // Refresh user profile after binding
+      const profile = await authApi.getProfile();
+      setUser(profile.user);
+      setIsBindTelegramModalOpen(false);
+      setTelegramCode('');
+      showToast('Telegram успешно привязан!', 'success');
+    } catch (err: any) {
+      console.error('Failed to bind telegram', err);
+      const msg = err?.response?.data?.message || err?.message || '';
+      if (msg.includes('already bound') || msg.includes('conflict')) {
+        showToast('Этот Telegram уже привязан к другому аккаунту', 'error');
+      } else {
+        showToast('Не удалось привязать Telegram. Проверьте код.', 'error');
+      }
+    } finally {
+      setIsBindingTelegram(false);
+    }
+  };
+
   return (
     <div className="fade-in profile-page">
+      {/* Toast notifications */}
+      {toasts.length > 0 && (
+        <div className="profile-toasts">
+          {toasts.map((toast) => (
+            <div key={toast.id} className={`profile-toast profile-toast--${toast.type}`}>
+              <span>{toast.message}</span>
+              <button
+                type="button"
+                className="profile-toast__close"
+                onClick={() => removeToast(toast.id)}
+              >
+                <X size={14} />
+              </button>
+            </div>
+          ))}
+        </div>
+      )}
+
       {!isOwnProfile && (
         <Link
           to="/map"
@@ -128,7 +417,7 @@ export const ProfilePage: React.FC = () => {
         <h1>Профиль</h1>
         {isOwnProfile && (
           <button
-            className="btn profile-edit-btn"
+            className="btn"
             onClick={() => setIsEditModalOpen(true)}
           >
             <Pencil size={18} /> Редактировать профиль
@@ -206,6 +495,21 @@ export const ProfilePage: React.FC = () => {
               Админ
             </span>
           )}
+
+          {isOwnProfile && user.telegramId && user.telegramId !== '0' ? (
+            <span className="profile-badge" style={{ background: 'var(--success)', color: 'white' }}>
+              <CheckCircle size={14} />
+              Telegram привязан
+            </span>
+          ) : (
+            <button
+              className="btn profile-telegram-btn"
+              onClick={handleOpenBindTelegram}
+            >
+              <Send size={12} />
+              Привязать Telegram
+            </button>
+          )}
         </div>
       </div>
 
@@ -236,38 +540,160 @@ export const ProfilePage: React.FC = () => {
           <div className="profile-modal fade-in">
             <button
               className="profile-modal-close"
-              onClick={() => setIsEditModalOpen(false)}
+              onClick={() => { setIsEditModalOpen(false); resetCrop(); }}
             >
               <X size={24} />
             </button>
 
             <h2>Редактировать профиль</h2>
 
+            <div className="profile-modal-section">
+              <h3>Фотография профиля</h3>
+
+              {/* Avatar preview with edit hint - drag & drop enabled */}
+              {!isCropping && (
+                <div
+                  className={`profile-photo-edit ${isDragging ? 'profile-photo-edit--dragging' : ''}`}
+                  onDragOver={handleDragOver}
+                  onDragLeave={handleDragLeave}
+                  onDrop={handleDrop}
+                >
+                  <div className="profile-photo-edit__main">
+                    <div className="profile-photo-preview">
+                      {user.avatarUrl ? (
+                        <img src={user.avatarUrl} alt="Текущий аватар" />
+                      ) : (
+                        <div className="profile-photo-placeholder">
+                          <UserIcon size={32} />
+                        </div>
+                      )}
+                      <div className="profile-photo-overlay" onClick={() => fileInputRef.current?.click()}>
+                        <Camera size={20} />
+                        <span>Сменить</span>
+                      </div>
+                    </div>
+                    <div className="profile-photo-actions">
+                      <button
+                        type="button"
+                        className="btn profile-photo-upload-btn"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload size={16} /> Загрузить фото
+                      </button>
+                      {user.avatarUrl && (
+                        <button
+                          type="button"
+                          className="btn profile-photo-remove-btn"
+                          onClick={handleRemoveAvatar}
+                        >
+                          <X size={16} /> Удалить
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                  <div className="profile-photo-hints">
+                    <p>Нажмите на фото или кнопку для загрузки</p>
+                    <p className="profile-photo-requirements">JPG, PNG или WebP. Макс. 10MB. Рекомендуется квадратное фото.</p>
+                  </div>
+                </div>
+              )}
+
+              {isCropping && srcImage && (
+                <div className="photo-crop-container">
+                  <ReactCrop
+                    crop={crop}
+                    onChange={(_, percentCrop) => setCrop(percentCrop)}
+                    onComplete={(c) => setCompletedCrop(c)}
+                    onImageLoaded={(img) => {
+                      imgRef.current = img;
+                      const { width, height } = img;
+                      const minDim = Math.min(width, height);
+                      setCrop(centerAspectCrop(width, height, 1));
+                    }}
+                    aspect={1}
+                    circularCrop
+                  >
+                    <img
+                      ref={imgRef}
+                      src={srcImage}
+                      alt="Crop preview"
+                      style={{ maxHeight: '300px', maxWidth: '100%' }}
+                    />
+                  </ReactCrop>
+                  <p className="crop-hint">
+                    Перемещайте и масштабируйте область, чтобы выбрать нужную часть фото
+                  </p>
+                  <div className="photo-crop-actions">
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={resetCrop}
+                      disabled={isPhotoUploading}
+                    >
+                      <X size={16} /> Отмена
+                    </button>
+                    <button
+                      type="button"
+                      className="btn"
+                      onClick={handleCropUpload}
+                      disabled={isPhotoUploading}
+                    >
+                      {isPhotoUploading ? (
+                        'Загрузка...'
+                      ) : (
+                        <>
+                          <Upload size={16} /> Загрузить
+                        </>
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Hidden file input - triggered by avatar click */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoSelect}
+                style={{ display: 'none' }}
+              />
+            </div>
+
             {/* Workplace Section */}
             <div className="profile-modal-section">
               <h3><Briefcase size={18} /> Место работы</h3>
-              <form onSubmit={handleUpdateWorkplace} style={{ display: 'flex', gap: '12px' }}>
+              <div className="profile-workplace-form">
                 <input
                   className="input"
                   placeholder="Компания или проект..."
                   aria-label="Название компании"
                   value={newWorkplace}
                   onChange={e => setNewWorkplace(e.target.value)}
-                  style={{ flex: 1 }}
                 />
                 <button
-                  disabled={isSubmitting}
-                  className="btn profile-edit-btn"
+                  type="submit"
+                  disabled={isSubmitting || !newWorkplace.trim()}
+                  className="btn"
+                  onClick={handleUpdateWorkplace}
                 >
                   {isSubmitting ? 'Сохранение...' : 'Обновить'}
                 </button>
-              </form>
+              </div>
+              {workplaceMessage && (
+                <p className={`profile-workplace-message profile-workplace-message--${workplaceMessage.type}`}>
+                  {workplaceMessage.text}
+                </p>
+              )}
+              {!user.currentWorkplace && !newWorkplace && (
+                <p className="profile-workplace-current">Укажите ваше место работы</p>
+              )}
             </div>
 
             {/* Location Section */}
             <div className="profile-modal-section">
-              <h3><MapPin size={18} /> Позиция на карте</h3>
-              <p>Выберите вашу текущую локацию. Это обновит вашу точку на главной карте.</p>
+              <h3><MapPin size={18} /> Локация</h3>
+              <p>Отметьте вашу позицию на карте</p>
               <LocationPicker
                 inputPlaceholder={user.region || 'Например: Электросталь, Россия'}
                 showPreviewMap={false}
@@ -278,9 +704,9 @@ export const ProfilePage: React.FC = () => {
                     await updateLocation(payload);
                     const response = await authApi.getProfile();
                     setUser(response.user);
-                    alert('Локация обновлена');
+                    showToast('Локация обновлена', 'success');
                   } catch (err) {
-                    alert('Ошибка при обновлении локации');
+                    showToast('Ошибка при обновлении локации', 'error');
                   }
                 }}
               />
@@ -288,11 +714,62 @@ export const ProfilePage: React.FC = () => {
 
             <div className="profile-modal-actions">
               <button
-                className="btn profile-modal-done-btn"
-                onClick={() => setIsEditModalOpen(false)}
+                className="btn"
+                onClick={() => { setIsEditModalOpen(false); resetCrop(); }}
               >
                 Готово
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Bind Telegram Modal */}
+      {isBindTelegramModalOpen && telegramChallenge && (
+        <div className="profile-modal-overlay">
+          <div className="profile-modal fade-in">
+            <button
+              className="profile-modal-close"
+              onClick={() => setIsBindTelegramModalOpen(false)}
+            >
+              <X size={24} />
+            </button>
+
+            <h2>Привязать Telegram</h2>
+
+            <div className="profile-modal-section">
+              <p>Нажмите на кнопку ниже, чтобы открыть Telegram-бот и получить код подтверждения.</p>
+              <a
+                href={telegramChallenge.botStartUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="btn"
+                style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}
+              >
+                <Send size={18} />
+                Открыть Telegram
+              </a>
+            </div>
+
+            <div className="profile-modal-section">
+              <h3>Код подтверждения</h3>
+              <form onSubmit={handleBindTelegram} style={{ display: 'flex', gap: '12px' }}>
+                <input
+                  className="input"
+                  placeholder="Введите код из Telegram"
+                  aria-label="Код из Telegram"
+                  value={telegramCode}
+                  onChange={e => setTelegramCode(e.target.value)}
+                  style={{ flex: 1 }}
+                />
+                <button
+                  type="submit"
+                  disabled={isBindingTelegram || !telegramCode}
+                  className="btn"
+                >
+                  {isBindingTelegram ? 'Привязываем...' : 'Привязать'}
+                </button>
+              </form>
             </div>
           </div>
         </div>

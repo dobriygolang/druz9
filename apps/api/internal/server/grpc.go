@@ -66,7 +66,6 @@ func NewGRPCServer(
 	).Match(func(_ context.Context, operation string) bool {
 		return operation == v1.ProfileService_CompleteRegistration_FullMethodName ||
 			operation == v1.ProfileService_GetProfile_FullMethodName ||
-			operation == v1.ProfileService_GetProfileByID_FullMethodName ||
 			operation == v1.ProfileService_UpdateProfile_FullMethodName ||
 			operation == v1.ProfileService_UpdateLocation_FullMethodName ||
 			operation == v1.ProfileService_Logout_FullMethodName ||
@@ -96,7 +95,8 @@ func NewGRPCServer(
 	optionalAuthMw := selector.Server(
 		authmiddleware.OptionalAuth(authorizer, cookies),
 	).Match(func(_ context.Context, operation string) bool {
-		return operation == codeeditorv1.CodeEditorService_CreateRoom_FullMethodName ||
+		return operation == v1.ProfileService_GetProfileByID_FullMethodName ||
+			operation == codeeditorv1.CodeEditorService_CreateRoom_FullMethodName ||
 			operation == codeeditorv1.CodeEditorService_ListTasks_FullMethodName ||
 			operation == codeeditorv1.CodeEditorService_GetLeaderboard_FullMethodName ||
 			operation == codeeditorv1.CodeEditorService_GetRoom_FullMethodName ||

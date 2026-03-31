@@ -16,10 +16,10 @@ func (s *Service) CreateTelegramAuthChallenge(_ context.Context) (*model.Telegra
 	if _, err := rand.Read(bytes); err != nil {
 		return nil, fmt.Errorf("generate challenge token: %w", err)
 	}
-	
+
 	token := fmt.Sprintf("%x", bytes)
 	expiresAt := s.Now().Add(s.settings.TelegramAuthMaxAge)
-	
+
 	s.auth.mu.Lock()
 	s.auth.byToken[token] = &telegramAuthChallengeState{
 		expiresAt: expiresAt,

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"api/internal/data/codetasks"
@@ -333,10 +334,14 @@ func (r *Repo) ListTasks(ctx context.Context, filter codeeditordomain.TaskFilter
 		if err := codetasks.ScanTask(rows, &task); err != nil {
 			return nil, fmt.Errorf("scan task: %w", err)
 		}
-		if err := codetasks.LoadCases(ctx, r.data.DB, &task); err != nil {
+		tasks = append(tasks, &task)
+	}
+
+	// Batch load test cases in single query (O(1) instead of O(n) queries)
+	if len(tasks) > 0 {
+		if err := codetasks.LoadCasesMultiple(ctx, r.data.DB, tasks); err != nil {
 			return nil, err
 		}
-		tasks = append(tasks, &task)
 	}
 	return tasks, nil
 }
@@ -412,7 +417,7 @@ func (r *Repo) GetTask(ctx context.Context, taskID uuid.UUID) (*codeeditordomain
 		}
 		return nil, fmt.Errorf("get task: %w", err)
 	}
-	if err := codetasks.LoadCases(ctx, r.data.DB, &task); err != nil {
+	if err := codetasks.LoadCasesMultiple(ctx, r.data.DB, []*codeeditordomain.Task{&task}); err != nil {
 		return nil, err
 	}
 	return &task, nil
@@ -436,7 +441,7 @@ func (r *Repo) PickRandomTask(ctx context.Context, topic, difficulty string) (*c
 		}
 		return nil, fmt.Errorf("pick random task: %w", err)
 	}
-	if err := codetasks.LoadCases(ctx, r.data.DB, &task); err != nil {
+	if err := codetasks.LoadCasesMultiple(ctx, r.data.DB, []*codeeditordomain.Task{&task}); err != nil {
 		return nil, err
 	}
 	return &task, nil
@@ -503,33 +508,48 @@ func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*codeeditordo
 }
 
 func (r *Repo) insertTaskCases(ctx context.Context, tx pgx.Tx, task *codeeditordomain.Task) error {
-	insertOne := func(tc *codeeditordomain.TestCase) error {
-		if tc.ID == uuid.Nil {
-			tc.ID = uuid.New()
-		}
-		_, err := tx.Exec(ctx, `
-			INSERT INTO code_task_test_cases (id, task_id, input, expected_output, is_public, weight, "order")
-			VALUES ($1, $2, $3, $4, $5, $6, $7)
-		`, tc.ID, task.ID, tc.Input, tc.ExpectedOutput, tc.IsPublic, tc.Weight, tc.Order)
-		if err != nil {
-			return fmt.Errorf("insert task case: %w", err)
-		}
-		return nil
-	}
-
+	// Collect all test cases
+	var allCases []*codeeditordomain.TestCase
 	for _, tc := range task.PublicTestCases {
 		tc.TaskID = task.ID
 		tc.IsPublic = true
-		if err := insertOne(tc); err != nil {
-			return err
+		if tc.ID == uuid.Nil {
+			tc.ID = uuid.New()
 		}
+		allCases = append(allCases, tc)
 	}
 	for _, tc := range task.HiddenTestCases {
 		tc.TaskID = task.ID
 		tc.IsPublic = false
-		if err := insertOne(tc); err != nil {
-			return err
+		if tc.ID == uuid.Nil {
+			tc.ID = uuid.New()
 		}
+		allCases = append(allCases, tc)
+	}
+
+	if len(allCases) == 0 {
+		return nil
+	}
+
+	// Batch insert using single query with multiple value sets
+	// Build the query dynamically based on number of cases
+	values := make([]string, 0, len(allCases))
+	args := make([]any, 0, len(allCases)*7)
+	for i, tc := range allCases {
+		offset := i * 7
+		values = append(values, fmt.Sprintf("($%d, $%d, $%d, $%d, $%d, $%d, $%d)",
+			offset+1, offset+2, offset+3, offset+4, offset+5, offset+6, offset+7))
+		args = append(args, tc.ID, tc.TaskID, tc.Input, tc.ExpectedOutput, tc.IsPublic, tc.Weight, tc.Order)
+	}
+
+	query := fmt.Sprintf(`
+		INSERT INTO code_task_test_cases (id, task_id, input, expected_output, is_public, weight, "order")
+		VALUES %s
+	`, strings.Join(values, ", "))
+
+	_, err := tx.Exec(ctx, query, args...)
+	if err != nil {
+		return fmt.Errorf("insert task cases batch: %w", err)
 	}
 	return nil
 }

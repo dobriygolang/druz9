@@ -3,11 +3,13 @@ import { PlayCircle, Clock, Plus, Trash2, Upload, Music, Radio, ShieldCheck } fr
 import { podcastApi } from '@/features/Podcast/api/podcastApi';
 import { Podcast } from '@/entities/User/model/types';
 import { usePodcast } from '@/app/providers/PodcastProvider';
+import { useAuth } from '@/app/providers/AuthProvider';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal/ConfirmModal';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 export const FeedPage: React.FC = () => {
   const isMobile = useIsMobile();
+  const { user: currentUser, isAuthenticated } = useAuth();
   const { currentPodcast, isPlaying, playPodcast } = usePodcast();
   const [podcasts, setPodcasts] = useState<Podcast[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -144,27 +146,29 @@ export const FeedPage: React.FC = () => {
           <h1 style={{ fontSize: isMobile ? '48px' : '36px', fontWeight: '800', letterSpacing: '-0.02em' }}>Подкасты</h1>
         </div>
 
-        <button
-          className="btn hover-scale"
-          onClick={() => setIsAdminPanelOpen(!isAdminPanelOpen)}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '10px',
-            justifyContent: 'center',
-            width: isMobile ? '100%' : 'auto',
-            padding: '12px 24px',
-            borderRadius: '16px',
-            background: isAdminPanelOpen ? 'rgba(255,255,255,0.05)' : 'var(--accent-color)',
-            border: '1px solid rgba(255,255,255,0.1)',
-            boxShadow: isAdminPanelOpen ? 'none' : '0 10px 25px rgba(79, 70, 229, 0.3)'
-          }}
-        >
-          {isAdminPanelOpen ? 'Закрыть панель' : <><Plus size={20} /> Добавить выпуск</>}
-        </button>
+        {isAuthenticated && currentUser?.isAdmin && (
+          <button
+            className="btn hover-scale"
+            onClick={() => setIsAdminPanelOpen(!isAdminPanelOpen)}
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px',
+              justifyContent: 'center',
+              width: isMobile ? '100%' : 'auto',
+              padding: '12px 24px',
+              borderRadius: '16px',
+              background: isAdminPanelOpen ? 'rgba(255,255,255,0.05)' : 'var(--accent-color)',
+              border: '1px solid rgba(255,255,255,0.1)',
+              boxShadow: isAdminPanelOpen ? 'none' : '0 10px 25px rgba(79, 70, 229, 0.3)'
+            }}
+          >
+            {isAdminPanelOpen ? 'Закрыть форму' : <><Plus size={20} /> Добавить выпуск</>}
+          </button>
+        )}
       </div>
 
-      {isAdminPanelOpen && (
+      {isAuthenticated && currentUser?.isAdmin && isAdminPanelOpen && (
         <div className="card fade-in" style={{
           marginBottom: '40px',
           padding: isMobile ? '20px' : '32px',
@@ -174,7 +178,7 @@ export const FeedPage: React.FC = () => {
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px', color: 'var(--accent-color)' }}>
             <ShieldCheck size={20} />
-            <h3 style={{ fontSize: '20px', fontWeight: 700 }}>Admin: Публикация подкаста</h3>
+            <h3 style={{ fontSize: '20px', fontWeight: 700 }}>Публикация подкаста</h3>
           </div>
 
           <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
@@ -315,22 +319,24 @@ export const FeedPage: React.FC = () => {
                     </div>
                   </div>
 
-                  <button
-                    onClick={() => handleDelete(p.id)}
-                    style={{
-                      color: 'rgba(239, 68, 68, 0.4)',
-                      background: 'transparent',
-                      border: 'none',
-                      padding: '12px',
-                      borderRadius: '14px',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s'
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
-                    onMouseLeave={e => e.currentTarget.style.color = 'rgba(239, 68, 68, 0.4)'}
-                  >
-                    <Trash2 size={20} />
-                  </button>
+                  {(currentUser?.isAdmin || currentUser?.id === p.author_id) && (
+                    <button
+                      onClick={() => handleDelete(p.id)}
+                      style={{
+                        color: 'rgba(239, 68, 68, 0.4)',
+                        background: 'transparent',
+                        border: 'none',
+                        padding: '12px',
+                        borderRadius: '14px',
+                        cursor: 'pointer',
+                        transition: 'all 0.2s'
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.color = '#ef4444'}
+                      onMouseLeave={e => e.currentTarget.style.color = 'rgba(239, 68, 68, 0.4)'}
+                    >
+                      <Trash2 size={20} />
+                    </button>
+                  )}
                 </div>
               );
             })

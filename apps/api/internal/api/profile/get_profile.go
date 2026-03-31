@@ -10,10 +10,25 @@ import (
 )
 
 func (i *Implementation) GetProfile(ctx context.Context, _ *v1.GetProfileRequest) (*v1.ProfileResponse, error) {
-	user, ok := model.UserFromContext(ctx)
+	userFromCtx, ok := model.UserFromContext(ctx)
 	if !ok {
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
 	}
+
+	// Get fresh user from DB to get actual AvatarURL
+	resp, err := i.service.GetProfileByID(ctx, userFromCtx.ID)
+	if err != nil {
+		return nil, err
+	}
+	user := resp.User
+
+	// Generate presigned URL for avatar
+	avatarURL, err := i.service.GetAvatarURL(ctx, user.AvatarURL)
+	if err != nil {
+		return nil, err
+	}
+	user.AvatarURL = avatarURL
+
 	return mapProfileResponse(&model.ProfileResponse{
 		User:                 user,
 		NeedsProfileComplete: user.Status == model.UserStatusPendingProfile,

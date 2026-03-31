@@ -36,7 +36,7 @@ WITH upserted_user AS (
     telegram_username,
     first_name,
     last_name,
-    avatar_url,
+    telegram_avatar_url,
     current_workplace,
     status,
     last_active_at,
@@ -48,7 +48,7 @@ WITH upserted_user AS (
     telegram_username = EXCLUDED.telegram_username,
     first_name = EXCLUDED.first_name,
     last_name = EXCLUDED.last_name,
-    avatar_url = EXCLUDED.avatar_url,
+    telegram_avatar_url = EXCLUDED.telegram_avatar_url,
     last_active_at = NOW(),
     updated_at = NOW()
   RETURNING
@@ -58,6 +58,7 @@ WITH upserted_user AS (
     first_name,
     last_name,
     avatar_url,
+    telegram_avatar_url,
     current_workplace,
     status,
     is_admin,
@@ -66,7 +67,7 @@ WITH upserted_user AS (
     updated_at
 )
 SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.current_workplace,
+  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
   u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
 FROM upserted_user u
@@ -85,10 +86,108 @@ LEFT JOIN geo g ON g.user_id = u.id
 	))
 }
 
+func (r *Repo) CreatePasswordUser(ctx context.Context, req model.PasswordRegistrationRequest, passwordHash string) (*model.User, error) {
+	const query = `
+WITH created_user AS (
+  INSERT INTO users (
+    id,
+    telegram_id,
+    telegram_username,
+    first_name,
+    last_name,
+    avatar_url,
+    current_workplace,
+    status,
+    login,
+    password_hash,
+    last_active_at,
+    created_at,
+    updated_at
+  )
+  VALUES ($1, NULL, NULL, $2, $3, '', '', $4, $5, $6, NOW(), NOW(), NOW())
+  RETURNING
+    id,
+    telegram_id,
+    telegram_username,
+    first_name,
+    last_name,
+    avatar_url,
+    current_workplace,
+    status,
+    is_admin,
+    last_active_at,
+    created_at,
+    updated_at
+)
+SELECT
+  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
+  g.region, g.country, g.city, g.latitude, g.longitude,
+  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+FROM created_user u
+LEFT JOIN geo g ON g.user_id = u.id
+`
+	return scanUser(r.data.DB.QueryRow(
+		ctx,
+		query,
+		uuid.New(),
+		req.FirstName,
+		nullIfEmpty(req.LastName),
+		model.UserStatusPendingProfile,
+		req.Login,
+		passwordHash,
+	))
+}
+
+func (r *Repo) FindPasswordUserByLogin(ctx context.Context, login string) (*model.User, string, error) {
+	const query = `
+SELECT
+  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
+  g.region, g.country, g.city, g.latitude, g.longitude,
+  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at,
+  COALESCE(u.password_hash, '')
+FROM users u
+LEFT JOIN geo g ON g.user_id = u.id
+WHERE LOWER(u.login) = LOWER($1)
+`
+
+	var (
+		user              model.User
+		passwordHash      string
+		username          *string
+		firstName         *string
+		lastName          *string
+		avatarURL         *string
+		telegramAvatarURL *string
+		currentWorkplace  *string
+		region            *string
+		country           *string
+		city              *string
+		latitude          *float64
+		longitude         *float64
+		telegramID        *int64
+	)
+
+	err := r.data.DB.QueryRow(ctx, query, login).Scan(
+		&user.ID, &telegramID, &username, &firstName, &lastName, &avatarURL, &telegramAvatarURL, &currentWorkplace,
+		&region, &country, &city, &latitude, &longitude,
+		&user.Status, &user.IsAdmin, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
+		&passwordHash,
+	)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, "", profileerrors.ErrUnauthorized
+		}
+		return nil, "", fmt.Errorf("find user by login: %w", err)
+	}
+
+	fillUserFields(&user, telegramID, username, firstName, lastName, avatarURL, telegramAvatarURL, currentWorkplace, region, country, city, latitude, longitude)
+	return &user, passwordHash, nil
+}
+
 func (r *Repo) FindUserByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
 	const query = `
 SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.current_workplace,
+  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
   u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
 FROM users u
@@ -96,6 +195,19 @@ LEFT JOIN geo g ON g.user_id = u.id
 WHERE id = $1
 `
 	return scanUser(r.data.DB.QueryRow(ctx, query, id))
+}
+
+func (r *Repo) FindUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error) {
+	const query = `
+SELECT
+  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
+  g.region, g.country, g.city, g.latitude, g.longitude,
+  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+FROM users u
+LEFT JOIN geo g ON g.user_id = u.id
+WHERE telegram_id = $1
+`
+	return scanUser(r.data.DB.QueryRow(ctx, query, telegramID))
 }
 
 func (r *Repo) UpdateProfile(ctx context.Context, userID uuid.UUID, currentWorkplace string) (*model.User, error) {
@@ -108,7 +220,7 @@ WITH updated_user AS (
   RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
 )
 SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.current_workplace,
+  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
   u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
 FROM updated_user u
@@ -162,7 +274,7 @@ ON CONFLICT (user_id) DO UPDATE SET
 
 	const query = `
 SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.current_workplace,
+  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
   u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
 FROM users u
@@ -181,6 +293,48 @@ WHERE u.id = $1
 
 func (r *Repo) UpdateLocation(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error) {
 	return r.CompleteRegistration(ctx, userID, req)
+}
+
+func (r *Repo) UpdateAvatarURL(ctx context.Context, userID uuid.UUID, avatarURL string) (*model.User, error) {
+	const query = `
+WITH updated_user AS (
+  UPDATE users
+  SET avatar_url = $2,
+      updated_at = NOW()
+  WHERE id = $1
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
+)
+SELECT
+  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
+  g.region, g.country, g.city, g.latitude, g.longitude,
+  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+FROM updated_user u
+LEFT JOIN geo g ON g.user_id = u.id
+`
+	return scanUser(r.data.DB.QueryRow(ctx, query, userID, nullIfEmpty(avatarURL)))
+}
+
+func (r *Repo) BindTelegram(ctx context.Context, userID uuid.UUID, payload model.TelegramAuthPayload) (*model.User, error) {
+	const query = `
+WITH updated_user AS (
+  UPDATE users
+  SET telegram_id = $2,
+      telegram_username = $3,
+      avatar_url = COALESCE(NULLIF($4, ''), avatar_url),
+      first_name = COALESCE(NULLIF($5, ''), first_name),
+      last_name = COALESCE(NULLIF($6, ''), last_name),
+      updated_at = NOW()
+  WHERE id = $1 AND telegram_id IS NULL
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
+)
+SELECT
+  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
+  g.region, g.country, g.city, g.latitude, g.longitude,
+  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+FROM updated_user u
+LEFT JOIN geo g ON g.user_id = u.id
+`
+	return scanUser(r.data.DB.QueryRow(ctx, query, userID, payload.ID, nullIfEmpty(payload.Username), nullIfEmpty(payload.PhotoURL), nullIfEmpty(payload.FirstName), nullIfEmpty(payload.LastName)))
 }
 
 func (r *Repo) DeleteUser(ctx context.Context, userID uuid.UUID) error {
@@ -249,7 +403,7 @@ func (r *Repo) FindSessionByHash(ctx context.Context, tokenHash string) (*model.
 	const query = `
 SELECT
   s.id, s.user_id, s.token_hash, s.last_seen_at, s.expires_at,
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.current_workplace,
+  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
   u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
 FROM sessions s
@@ -260,12 +414,13 @@ WHERE s.token_hash = $1
 
 	var session model.Session
 	var user model.User
-	var username, firstName, lastName, avatarURL, currentWorkplace, region, country, city *string
+	var username, firstName, lastName, avatarURL, telegramAvatarURL, currentWorkplace, region, country, city *string
 	var latitude, longitude *float64
+	var telegramID *int64
 
 	err := r.data.DB.QueryRow(ctx, query, tokenHash).Scan(
 		&session.ID, &session.UserID, &session.TokenHash, &session.LastSeenAt, &session.ExpiresAt,
-		&user.ID, &user.TelegramID, &username, &firstName, &lastName, &avatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &telegramID, &username, &firstName, &lastName, &avatarURL, &telegramAvatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -274,13 +429,7 @@ WHERE s.token_hash = $1
 		return nil, fmt.Errorf("find session by hash: %w", err)
 	}
 
-	user.TelegramUsername = valueOrEmpty(username)
-	user.FirstName = valueOrEmpty(firstName)
-	user.LastName = valueOrEmpty(lastName)
-	user.AvatarURL = valueOrEmpty(avatarURL)
-	user.CurrentWorkplace = valueOrEmpty(currentWorkplace)
-	user.Region = valueOrEmpty(region)
-	user.Geo = scanGeo(region, country, city, latitude, longitude)
+	fillUserFields(&user, telegramID, username, firstName, lastName, avatarURL, telegramAvatarURL, currentWorkplace, region, country, city, latitude, longitude)
 	user.ActivityStatus = model.ResolveActivityStatus(user.LastActiveAt, time.Now().UTC())
 
 	return &model.AuthState{User: &user, Session: &session}, nil
@@ -305,13 +454,6 @@ WHERE id = $1
 	if tag.RowsAffected() == 0 {
 		return profileerrors.ErrUnauthorized
 	}
-	if _, err := tx.Exec(ctx, `
-UPDATE users
-SET last_active_at = GREATEST(last_active_at, $2)
-WHERE id = $1
-`, userID, lastActive); err != nil {
-		return fmt.Errorf("touch user activity: %w", err)
-	}
 	if err := tx.Commit(ctx); err != nil {
 		return fmt.Errorf("commit touch session: %w", err)
 	}
@@ -324,11 +466,12 @@ type userScanner interface {
 
 func scanUser(scanner userScanner) (*model.User, error) {
 	var user model.User
-	var username, firstName, lastName, avatarURL, currentWorkplace, region, country, city *string
+	var username, firstName, lastName, avatarURL, telegramAvatarURL, currentWorkplace, region, country, city *string
 	var latitude, longitude *float64
+	var telegramID *int64
 
 	if err := scanner.Scan(
-		&user.ID, &user.TelegramID, &username, &firstName, &lastName, &avatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &telegramID, &username, &firstName, &lastName, &avatarURL, &telegramAvatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
 	); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, profileerrors.ErrUserNotFound
@@ -336,14 +479,26 @@ func scanUser(scanner userScanner) (*model.User, error) {
 		return nil, fmt.Errorf("scan user: %w", err)
 	}
 
+	fillUserFields(&user, telegramID, username, firstName, lastName, avatarURL, telegramAvatarURL, currentWorkplace, region, country, city, latitude, longitude)
+	user.ActivityStatus = model.ResolveActivityStatus(user.LastActiveAt, time.Now().UTC())
+	return &user, nil
+}
+
+func fillUserFields(user *model.User, telegramID *int64, username, firstName, lastName, avatarURL, telegramAvatarURL, currentWorkplace, region, country, city *string, latitude, longitude *float64) {
+	if user == nil {
+		return
+	}
+	if telegramID != nil {
+		user.TelegramID = *telegramID
+	}
 	user.TelegramUsername = valueOrEmpty(username)
 	user.FirstName = valueOrEmpty(firstName)
 	user.LastName = valueOrEmpty(lastName)
 	user.AvatarURL = valueOrEmpty(avatarURL)
+	user.TelegramAvatarURL = valueOrEmpty(telegramAvatarURL)
 	user.CurrentWorkplace = valueOrEmpty(currentWorkplace)
+	user.Region = valueOrEmpty(region)
 	user.Geo = scanGeo(region, country, city, latitude, longitude)
-	user.ActivityStatus = model.ResolveActivityStatus(user.LastActiveAt, time.Now().UTC())
-	return &user, nil
 }
 
 func scanGeo(region, country, city *string, latitude, longitude *float64) model.UserGeo {

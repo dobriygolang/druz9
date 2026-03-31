@@ -34,5 +34,9 @@ func (i *Implementation) ListEvents(ctx context.Context, req *v1.ListEventsReque
 		return nil, err
 	}
 
+	if err := i.service.EnrichEventsWithAvatarURLs(ctx, resp); err != nil {
+		return nil, err
+	}
+
 	return mapListEventsResponse(resp), nil
 }

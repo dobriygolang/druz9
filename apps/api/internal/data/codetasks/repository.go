@@ -127,31 +127,65 @@ func LoadCases(ctx context.Context, db Queryer, task *model.CodeTask) error {
 	if task == nil {
 		return fmt.Errorf("load code task cases: nil task")
 	}
+	return LoadCasesMultiple(ctx, db, []*model.CodeTask{task})
+}
+
+// LoadCasesMultiple loads test cases for multiple tasks in a single query (batch optimization).
+func LoadCasesMultiple(ctx context.Context, db Queryer, tasks []*model.CodeTask) error {
+	if len(tasks) == 0 {
+		return nil
+	}
+
+	// Collect all task IDs
+	taskIDs := make([]string, 0, len(tasks))
+	for _, task := range tasks {
+		if task != nil {
+			taskIDs = append(taskIDs, task.ID.String())
+		}
+	}
+	if len(taskIDs) == 0 {
+		return nil
+	}
 
 	rows, err := db.Query(ctx, `
 		SELECT id, task_id, input, expected_output, is_public, weight, "order"
 		FROM code_task_test_cases
-		WHERE task_id = $1
-		ORDER BY "order" ASC, is_public DESC
-	`, task.ID)
+		WHERE task_id = ANY($1)
+		ORDER BY task_id, "order" ASC, is_public DESC
+	`, taskIDs)
 	if err != nil {
-		return fmt.Errorf("load code task cases: %w", err)
+		return fmt.Errorf("load code task cases batch: %w", err)
 	}
 	defer rows.Close()
 
-	task.PublicTestCases = nil
-	task.HiddenTestCases = nil
+	// Build lookup map
+	casesByTaskID := make(map[string][]*model.CodeTestCase)
 	for rows.Next() {
 		var testCase model.CodeTestCase
 		if err := rows.Scan(&testCase.ID, &testCase.TaskID, &testCase.Input, &testCase.ExpectedOutput, &testCase.IsPublic, &testCase.Weight, &testCase.Order); err != nil {
 			return fmt.Errorf("scan code task case: %w", err)
 		}
 		copyCase := testCase
-		if testCase.IsPublic {
-			task.PublicTestCases = append(task.PublicTestCases, &copyCase)
+		casesByTaskID[testCase.TaskID.String()] = append(casesByTaskID[testCase.TaskID.String()], &copyCase)
+	}
+
+	// Assign cases to tasks
+	for _, task := range tasks {
+		if task == nil {
 			continue
 		}
-		task.HiddenTestCases = append(task.HiddenTestCases, &copyCase)
+		task.PublicTestCases = nil
+		task.HiddenTestCases = nil
+		taskID := task.ID.String()
+		if cases, ok := casesByTaskID[taskID]; ok {
+			for _, tc := range cases {
+				if tc.IsPublic {
+					task.PublicTestCases = append(task.PublicTestCases, tc)
+				} else {
+					task.HiddenTestCases = append(task.HiddenTestCases, tc)
+				}
+			}
+		}
 	}
 	return nil
 }

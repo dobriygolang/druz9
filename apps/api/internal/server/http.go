@@ -69,10 +69,12 @@ func NewHTTPServer(
 	).Match(func(_ context.Context, operation string) bool {
 		return operation == v1.OperationProfileServiceCompleteRegistration ||
 			operation == v1.OperationProfileServiceGetProfile ||
-			operation == v1.OperationProfileServiceGetProfileByID ||
 			operation == v1.OperationProfileServiceUpdateProfile ||
 			operation == v1.OperationProfileServiceUpdateLocation ||
 			operation == v1.OperationProfileServiceLogout ||
+			operation == v1.OperationProfileServiceGetPhotoUploadURL ||
+			operation == v1.OperationProfileServiceCompletePhotoUpload ||
+			operation == v1.OperationProfileServiceBindTelegram ||
 			operation == adminv1.OperationAdminServiceDeleteUser ||
 			operation == geov1.OperationGeoServiceResolve ||
 			operation == geov1.OperationGeoServiceCommunityMap ||
@@ -99,7 +101,8 @@ func NewHTTPServer(
 	optionalAuthMw := selector.Server(
 		authmiddleware.OptionalAuth(authorizer, cookies),
 	).Match(func(_ context.Context, operation string) bool {
-		return operation == codeeditorv1.OperationCodeEditorServiceCreateRoom ||
+		return operation == v1.OperationProfileServiceGetProfileByID ||
+			operation == codeeditorv1.OperationCodeEditorServiceCreateRoom ||
 			operation == codeeditorv1.OperationCodeEditorServiceListTasks ||
 			operation == codeeditorv1.OperationCodeEditorServiceGetLeaderboard ||
 			operation == codeeditorv1.OperationCodeEditorServiceGetRoom ||

@@ -17,6 +17,8 @@ type BackendUser = {
   lastName?: string;
   avatar_url?: string;
   avatarUrl?: string;
+  telegram_avatar_url?: string;
+  telegramAvatarUrl?: string;
   region?: string;
   latitude?: number;
   longitude?: number;
@@ -38,6 +40,36 @@ type BackendProfileResponse = {
   needsProfileComplete?: boolean;
 };
 
+// New response types for login/register
+type LoginWithPasswordResponse = {
+  access_token: string;
+  accessToken?: string;
+  refresh_token?: string;
+  refreshToken?: string;
+  user: BackendUser;
+};
+
+type RegisterWithPasswordResponse = LoginWithPasswordResponse;
+
+type BindTelegramResponse = {
+  status: string;
+};
+
+type GetPhotoUploadURLResponse = {
+  upload_url: string;
+  uploadUrl?: string;
+  object_key: string;
+  objectKey?: string;
+  expires_in_seconds: number;
+  expiresInSeconds?: number;
+};
+
+type CompletePhotoUploadResponse = {
+  user: BackendUser;
+  needs_profile_complete?: boolean;
+  needsProfileComplete?: boolean;
+};
+
 type TelegramAuthChallengeResponse = {
   token: string;
   bot_start_url?: string;
@@ -49,17 +81,23 @@ type TelegramAuthChallengeResponse = {
 function normalizeActivityStatus(value: unknown): User['activityStatus'] {
   if (value === 1 || value === 'USER_ACTIVITY_STATUS_ONLINE' || value === 'online') return 'online';
   if (value === 2 || value === 'USER_ACTIVITY_STATUS_RECENTLY_ACTIVE' || value === 'recently_active') return 'recently_active';
+  if (value === 3 || value === 'USER_ACTIVITY_STATUS_OFFLINE' || value === 'offline') return 'offline';
   return 'offline';
 }
 
 function normalizeUser(user: BackendUser): User {
+  // S3 avatar has priority, fallback to Telegram avatar
+  const s3Avatar = user.avatar_url ?? user.avatarUrl ?? '';
+  const telegramAvatar = user.telegram_avatar_url ?? user.telegramAvatarUrl ?? '';
+
   return {
     id: user.id,
     telegramId: String(user.telegram_id ?? user.telegramId ?? ''),
     telegramUsername: user.telegram_username ?? user.telegramUsername ?? '',
     firstName: user.first_name ?? user.firstName ?? '',
     lastName: user.last_name ?? user.lastName ?? '',
-    avatarUrl: user.avatar_url ?? user.avatarUrl ?? '',
+    avatarUrl: s3Avatar || telegramAvatar,
+    telegramAvatarUrl: telegramAvatar,
     region: user.region ?? '',
     latitude: user.latitude ?? 0,
     longitude: user.longitude ?? 0,
@@ -105,6 +143,45 @@ export const authApi = {
       { token, code },
     );
     return normalizeProfileResponse(response.data);
+  },
+  bindTelegram: async (token: string, code: string): Promise<void> => {
+    await apiClient.post<BindTelegramResponse>(
+      '/api/v1/profile/bind-telegram',
+      { token, code },
+    );
+  },
+  registerWithPassword: async (payload: {
+    login: string;
+    password: string;
+    firstName: string;
+    lastName?: string;
+  }): Promise<ProfileResponse> => {
+    const response = await apiClient.post<RegisterWithPasswordResponse>(
+      '/api/v1/profile/auth/register-password',
+      {
+        login: payload.login,
+        password: payload.password,
+        first_name: payload.firstName,
+        last_name: payload.lastName ?? '',
+      },
+    );
+    return normalizeProfileResponse({
+      user: response.data.user,
+      needs_profile_complete: false,
+    });
+  },
+  loginWithPassword: async (payload: {
+    login: string;
+    password: string;
+  }): Promise<ProfileResponse> => {
+    const response = await apiClient.post<LoginWithPasswordResponse>(
+      '/api/v1/profile/auth/login-password',
+      { login: payload.login, password: payload.password },
+    );
+    return normalizeProfileResponse({
+      user: response.data.user,
+      needs_profile_complete: false,
+    });
   },
   completeRegistration: async (
     payload: CompleteProfilePayload,
@@ -189,5 +266,26 @@ export const authApi = {
       localStorage.removeItem('authToken');
     }
     return response.data;
+  },
+  getPhotoUploadURL: async (fileName: string, contentType: string) => {
+    const response = await apiClient.post<GetPhotoUploadURLResponse>(
+      '/api/v1/profile/photo/upload-url',
+      { file_name: fileName, content_type: contentType },
+    );
+    return {
+      uploadUrl: response.data.upload_url ?? response.data.uploadUrl ?? '',
+      objectKey: response.data.object_key ?? response.data.objectKey ?? '',
+      expiresInSeconds: response.data.expires_in_seconds ?? response.data.expiresInSeconds ?? 900,
+    };
+  },
+  completePhotoUpload: async (objectKey: string): Promise<ProfileResponse> => {
+    const response = await apiClient.post<CompletePhotoUploadResponse>(
+      '/api/v1/profile/photo/complete',
+      { object_key: objectKey },
+    );
+    return normalizeProfileResponse({
+      user: response.data.user,
+      needs_profile_complete: response.data.needs_profile_complete ?? response.data.needsProfileComplete ?? false,
+    });
   },
 };

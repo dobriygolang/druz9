@@ -24,6 +24,66 @@ func (_m *Repository) EXPECT() *Repository_Expecter {
 	return &Repository_Expecter{mock: &_m.Mock}
 }
 
+// BindTelegram provides a mock function with given fields: ctx, userID, payload
+func (_m *Repository) BindTelegram(ctx context.Context, userID uuid.UUID, payload model.TelegramAuthPayload) (*model.User, error) {
+	ret := _m.Called(ctx, userID, payload)
+
+	if len(ret) == 0 {
+		panic("no return value specified for BindTelegram")
+	}
+
+	var r0 *model.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.TelegramAuthPayload) (*model.User, error)); ok {
+		return rf(ctx, userID, payload)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.TelegramAuthPayload) *model.User); ok {
+		r0 = rf(ctx, userID, payload)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, model.TelegramAuthPayload) error); ok {
+		r1 = rf(ctx, userID, payload)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_BindTelegram_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'BindTelegram'
+type Repository_BindTelegram_Call struct {
+	*mock.Call
+}
+
+// BindTelegram is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - payload model.TelegramAuthPayload
+func (_e *Repository_Expecter) BindTelegram(ctx interface{}, userID interface{}, payload interface{}) *Repository_BindTelegram_Call {
+	return &Repository_BindTelegram_Call{Call: _e.mock.On("BindTelegram", ctx, userID, payload)}
+}
+
+func (_c *Repository_BindTelegram_Call) Run(run func(ctx context.Context, userID uuid.UUID, payload model.TelegramAuthPayload)) *Repository_BindTelegram_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(model.TelegramAuthPayload))
+	})
+	return _c
+}
+
+func (_c *Repository_BindTelegram_Call) Return(_a0 *model.User, _a1 error) *Repository_BindTelegram_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_BindTelegram_Call) RunAndReturn(run func(context.Context, uuid.UUID, model.TelegramAuthPayload) (*model.User, error)) *Repository_BindTelegram_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CompleteRegistration provides a mock function with given fields: ctx, userID, req
 func (_m *Repository) CompleteRegistration(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error) {
 	ret := _m.Called(ctx, userID, req)
@@ -84,6 +144,132 @@ func (_c *Repository_CompleteRegistration_Call) RunAndReturn(run func(context.Co
 	return _c
 }
 
+// CreatePasswordUser provides a mock function with given fields: ctx, req, passwordHash
+func (_m *Repository) CreatePasswordUser(ctx context.Context, req model.PasswordRegistrationRequest, passwordHash string) (*model.User, error) {
+	ret := _m.Called(ctx, req, passwordHash)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreatePasswordUser")
+	}
+
+	var r0 *model.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, model.PasswordRegistrationRequest, string) (*model.User, error)); ok {
+		return rf(ctx, req, passwordHash)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, model.PasswordRegistrationRequest, string) *model.User); ok {
+		r0 = rf(ctx, req, passwordHash)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, model.PasswordRegistrationRequest, string) error); ok {
+		r1 = rf(ctx, req, passwordHash)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_CreatePasswordUser_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreatePasswordUser'
+type Repository_CreatePasswordUser_Call struct {
+	*mock.Call
+}
+
+// CreatePasswordUser is a helper method to define mock.On call
+//   - ctx context.Context
+//   - req model.PasswordRegistrationRequest
+//   - passwordHash string
+func (_e *Repository_Expecter) CreatePasswordUser(ctx interface{}, req interface{}, passwordHash interface{}) *Repository_CreatePasswordUser_Call {
+	return &Repository_CreatePasswordUser_Call{Call: _e.mock.On("CreatePasswordUser", ctx, req, passwordHash)}
+}
+
+func (_c *Repository_CreatePasswordUser_Call) Run(run func(ctx context.Context, req model.PasswordRegistrationRequest, passwordHash string)) *Repository_CreatePasswordUser_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(model.PasswordRegistrationRequest), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Repository_CreatePasswordUser_Call) Return(_a0 *model.User, _a1 error) *Repository_CreatePasswordUser_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_CreatePasswordUser_Call) RunAndReturn(run func(context.Context, model.PasswordRegistrationRequest, string) (*model.User, error)) *Repository_CreatePasswordUser_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// FindPasswordUserByLogin provides a mock function with given fields: ctx, login
+func (_m *Repository) FindPasswordUserByLogin(ctx context.Context, login string) (*model.User, string, error) {
+	ret := _m.Called(ctx, login)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindPasswordUserByLogin")
+	}
+
+	var r0 *model.User
+	var r1 string
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, string) (*model.User, string, error)); ok {
+		return rf(ctx, login)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string) *model.User); ok {
+		r0 = rf(ctx, login)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string) string); ok {
+		r1 = rf(ctx, login)
+	} else {
+		r1 = ret.Get(1).(string)
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, string) error); ok {
+		r2 = rf(ctx, login)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
+}
+
+// Repository_FindPasswordUserByLogin_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindPasswordUserByLogin'
+type Repository_FindPasswordUserByLogin_Call struct {
+	*mock.Call
+}
+
+// FindPasswordUserByLogin is a helper method to define mock.On call
+//   - ctx context.Context
+//   - login string
+func (_e *Repository_Expecter) FindPasswordUserByLogin(ctx interface{}, login interface{}) *Repository_FindPasswordUserByLogin_Call {
+	return &Repository_FindPasswordUserByLogin_Call{Call: _e.mock.On("FindPasswordUserByLogin", ctx, login)}
+}
+
+func (_c *Repository_FindPasswordUserByLogin_Call) Run(run func(ctx context.Context, login string)) *Repository_FindPasswordUserByLogin_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string))
+	})
+	return _c
+}
+
+func (_c *Repository_FindPasswordUserByLogin_Call) Return(_a0 *model.User, _a1 string, _a2 error) *Repository_FindPasswordUserByLogin_Call {
+	_c.Call.Return(_a0, _a1, _a2)
+	return _c
+}
+
+func (_c *Repository_FindPasswordUserByLogin_Call) RunAndReturn(run func(context.Context, string) (*model.User, string, error)) *Repository_FindPasswordUserByLogin_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // FindUserByID provides a mock function with given fields: ctx, userID
 func (_m *Repository) FindUserByID(ctx context.Context, userID uuid.UUID) (*model.User, error) {
 	ret := _m.Called(ctx, userID)
@@ -139,6 +325,125 @@ func (_c *Repository_FindUserByID_Call) Return(_a0 *model.User, _a1 error) *Repo
 }
 
 func (_c *Repository_FindUserByID_Call) RunAndReturn(run func(context.Context, uuid.UUID) (*model.User, error)) *Repository_FindUserByID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// FindUserByTelegramID provides a mock function with given fields: ctx, telegramID
+func (_m *Repository) FindUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error) {
+	ret := _m.Called(ctx, telegramID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for FindUserByTelegramID")
+	}
+
+	var r0 *model.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, int64) (*model.User, error)); ok {
+		return rf(ctx, telegramID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, int64) *model.User); ok {
+		r0 = rf(ctx, telegramID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, int64) error); ok {
+		r1 = rf(ctx, telegramID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_FindUserByTelegramID_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'FindUserByTelegramID'
+type Repository_FindUserByTelegramID_Call struct {
+	*mock.Call
+}
+
+// FindUserByTelegramID is a helper method to define mock.On call
+//   - ctx context.Context
+//   - telegramID int64
+func (_e *Repository_Expecter) FindUserByTelegramID(ctx interface{}, telegramID interface{}) *Repository_FindUserByTelegramID_Call {
+	return &Repository_FindUserByTelegramID_Call{Call: _e.mock.On("FindUserByTelegramID", ctx, telegramID)}
+}
+
+func (_c *Repository_FindUserByTelegramID_Call) Run(run func(ctx context.Context, telegramID int64)) *Repository_FindUserByTelegramID_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(int64))
+	})
+	return _c
+}
+
+func (_c *Repository_FindUserByTelegramID_Call) Return(_a0 *model.User, _a1 error) *Repository_FindUserByTelegramID_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_FindUserByTelegramID_Call) RunAndReturn(run func(context.Context, int64) (*model.User, error)) *Repository_FindUserByTelegramID_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// UpdateAvatarURL provides a mock function with given fields: ctx, userID, avatarURL
+func (_m *Repository) UpdateAvatarURL(ctx context.Context, userID uuid.UUID, avatarURL string) (*model.User, error) {
+	ret := _m.Called(ctx, userID, avatarURL)
+
+	if len(ret) == 0 {
+		panic("no return value specified for UpdateAvatarURL")
+	}
+
+	var r0 *model.User
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) (*model.User, error)); ok {
+		return rf(ctx, userID, avatarURL)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) *model.User); ok {
+		r0 = rf(ctx, userID, avatarURL)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.User)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string) error); ok {
+		r1 = rf(ctx, userID, avatarURL)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_UpdateAvatarURL_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateAvatarURL'
+type Repository_UpdateAvatarURL_Call struct {
+	*mock.Call
+}
+
+// UpdateAvatarURL is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - avatarURL string
+func (_e *Repository_Expecter) UpdateAvatarURL(ctx interface{}, userID interface{}, avatarURL interface{}) *Repository_UpdateAvatarURL_Call {
+	return &Repository_UpdateAvatarURL_Call{Call: _e.mock.On("UpdateAvatarURL", ctx, userID, avatarURL)}
+}
+
+func (_c *Repository_UpdateAvatarURL_Call) Run(run func(ctx context.Context, userID uuid.UUID, avatarURL string)) *Repository_UpdateAvatarURL_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Repository_UpdateAvatarURL_Call) Return(_a0 *model.User, _a1 error) *Repository_UpdateAvatarURL_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_UpdateAvatarURL_Call) RunAndReturn(run func(context.Context, uuid.UUID, string) (*model.User, error)) *Repository_UpdateAvatarURL_Call {
 	_c.Call.Return(run)
 	return _c
 }

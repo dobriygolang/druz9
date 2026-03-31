@@ -18,6 +18,8 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (token: string, code: string) => Promise<void>;
+  loginWithPassword: (email: string, password: string) => Promise<void>;
+  registerWithPassword: (payload: { email: string; password: string; firstName: string; lastName?: string }) => Promise<void>;
   completeProfile: (payload: CompleteProfilePayload) => Promise<void>;
   updateLocation: (payload: CompleteProfilePayload) => Promise<void>;
   logout: () => Promise<void>;
@@ -161,6 +163,26 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setNeedsProfileComplete(data.needsProfileComplete);
   }, []);
 
+  const loginWithPassword = useCallback(async (login: string, password: string) => {
+    const data = await authApi.loginWithPassword({ login, password });
+    cachedProfileRef.current = data;
+    clearForcedGuestMode();
+    markKnownAuthSession();
+    clearGuestCodeRoomSession();
+    setUser(data.user);
+    setNeedsProfileComplete(data.needsProfileComplete);
+  }, []);
+
+  const registerWithPassword = useCallback(async (payload: { login: string; password: string; firstName: string; lastName?: string }) => {
+    const data = await authApi.registerWithPassword(payload);
+    cachedProfileRef.current = data;
+    clearForcedGuestMode();
+    markKnownAuthSession();
+    clearGuestCodeRoomSession();
+    setUser(data.user);
+    setNeedsProfileComplete(data.needsProfileComplete);
+  }, []);
+
   const completeProfile = useCallback(async (payload: CompleteProfilePayload) => {
     let data = await authApi.completeRegistration(payload);
     const currentWorkplace = payload.currentWorkplace?.trim();
@@ -205,6 +227,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         isAuthenticated: !!user,
         login,
+        loginWithPassword,
+        registerWithPassword,
         completeProfile,
         updateLocation,
         logout,

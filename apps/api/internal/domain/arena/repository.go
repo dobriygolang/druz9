@@ -14,6 +14,7 @@ type Repository interface {
 	GetTask(ctx context.Context, taskID uuid.UUID) (*Task, error)
 	CreateMatch(ctx context.Context, match *Match, creator *Player, starterCode string) (*Match, error)
 	GetMatch(ctx context.Context, matchID uuid.UUID) (*Match, error)
+	ListMatchesByIDs(ctx context.Context, matchIDs []uuid.UUID) ([]*Match, error)
 	ListOpenMatchIDs(ctx context.Context, limit int32) ([]uuid.UUID, error)
 	CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error)
 	MatchmakeOrEnqueue(ctx context.Context, user *User, task *Task, topic, difficulty string, obfuscateOpponent bool) (*Match, bool, error)
@@ -23,12 +24,14 @@ type Repository interface {
 	FindOpenMatchByUser(ctx context.Context, userID uuid.UUID) (*Match, error)
 	JoinMatch(ctx context.Context, matchID uuid.UUID, player *Player, starterCode string) (*Match, error)
 	SavePlayerCode(ctx context.Context, matchID, userID uuid.UUID, code string) error
+	SavePlayerCodes(ctx context.Context, matchID uuid.UUID, codes map[uuid.UUID]string) error
 	SetPlayerFreeze(ctx context.Context, matchID, userID uuid.UUID, freezeUntil *time.Time) error
 	SetPlayerAccepted(ctx context.Context, matchID, userID uuid.UUID, acceptedAt time.Time, runtimeMs int64) error
 	FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID *uuid.UUID, winnerReason model.ArenaWinnerReason, finishedAt time.Time) error
 	CreateSubmission(ctx context.Context, submission *Submission) (*Submission, error)
 	GetLeaderboard(ctx context.Context, limit int32) ([]*LeaderboardEntry, error)
 	GetPlayerStats(ctx context.Context, userID uuid.UUID) (*PlayerStats, error)
+	GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID]*PlayerStats, error)
 	ReportPlayerSuspicion(ctx context.Context, matchID, userID uuid.UUID, reason string) error
 	SetMatchRatingState(ctx context.Context, matchID uuid.UUID, isRated bool, unratedReason string) error
 }

@@ -21,7 +21,11 @@ func (s *Service) ReplaceSession(ctx context.Context, hash string, session *mode
 
 // DeleteSessionByHash deletes a session by its hash.
 func (s *Service) DeleteSessionByHash(ctx context.Context, hash string) error {
-	return s.sessions.DeleteSessionByHash(ctx, hash)
+	err := s.sessions.DeleteSessionByHash(ctx, hash)
+	if err == nil {
+		// Note: we don't have sessionID here, would need to store hash->sessionID mapping
+	}
+	return err
 }
 
 // FindSessionByHash retrieves session and auth state by hash.
@@ -31,7 +35,16 @@ func (s *Service) FindSessionByHash(ctx context.Context, hash string) (*model.Au
 
 // TouchSession updates session activity timestamps.
 func (s *Service) TouchSession(ctx context.Context, userID uuid.UUID, sessionID uuid.UUID, expiresAt time.Time, lastActive time.Time) error {
-	return s.sessions.TouchSession(ctx, userID, sessionID, expiresAt, lastActive)
+	err := s.sessions.TouchSession(ctx, userID, sessionID, expiresAt, lastActive)
+	if err == nil {
+		// Update session cache
+		if session, ok := s.GetCachedSession(sessionID); ok {
+			session.ExpiresAt = expiresAt
+			session.LastSeenAt = lastActive
+			s.CacheSession(sessionID, session)
+		}
+	}
+	return err
 }
 
 // NewSession creates a new session for a user.

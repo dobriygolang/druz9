@@ -53,6 +53,7 @@ func (s *Service) AuthenticateByToken(ctx context.Context, rawToken string) (*mo
 	shouldRefresh := s.ShouldRefresh(authState.Session.LastSeenAt)
 	authState.Session.LastSeenAt = now
 	authState.Session.ExpiresAt = now.Add(s.settings.SessionTTL)
+	s.SetUserActivity(authState.User.ID, now)
 	authState.User.LastActiveAt = now
 	authState.User.ActivityStatus = model.ResolveActivityStatus(authState.User.LastActiveAt, now)
 	if shouldRefresh {

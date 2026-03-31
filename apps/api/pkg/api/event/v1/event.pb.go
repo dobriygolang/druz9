@@ -969,16 +969,17 @@ func (x *Event) GetMeetingLink() string {
 }
 
 type EventParticipant struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	UserId           string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Title            string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	AvatarUrl        string                 `protobuf:"bytes,3,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
-	TelegramUsername string                 `protobuf:"bytes,4,opt,name=telegram_username,json=telegramUsername,proto3" json:"telegram_username,omitempty"`
-	FirstName        string                 `protobuf:"bytes,5,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName         string                 `protobuf:"bytes,6,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	Status           ParticipantStatus      `protobuf:"varint,7,opt,name=status,proto3,enum=event.v1.ParticipantStatus" json:"status,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	UserId            string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Title             string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	AvatarUrl         string                 `protobuf:"bytes,3,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	TelegramAvatarUrl string                 `protobuf:"bytes,8,opt,name=telegram_avatar_url,json=telegramAvatarUrl,proto3" json:"telegram_avatar_url,omitempty"`
+	TelegramUsername  string                 `protobuf:"bytes,4,opt,name=telegram_username,json=telegramUsername,proto3" json:"telegram_username,omitempty"`
+	FirstName         string                 `protobuf:"bytes,5,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName          string                 `protobuf:"bytes,6,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	Status            ParticipantStatus      `protobuf:"varint,7,opt,name=status,proto3,enum=event.v1.ParticipantStatus" json:"status,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
 }
 
 func (x *EventParticipant) Reset() {
@@ -1028,6 +1029,13 @@ func (x *EventParticipant) GetTitle() string {
 func (x *EventParticipant) GetAvatarUrl() string {
 	if x != nil {
 		return x.AvatarUrl
+	}
+	return ""
+}
+
+func (x *EventParticipant) GetTelegramAvatarUrl() string {
+	if x != nil {
+		return x.TelegramAvatarUrl
 	}
 	return ""
 }
@@ -1142,12 +1150,13 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\x11participant_count\x18\x0f \x01(\rR\x10participantCount\x12>\n" +
 	"\fparticipants\x18\x10 \x03(\v2\x1a.event.v1.EventParticipantR\fparticipants\x12 \n" +
 	"\vdescription\x18\x11 \x01(\tR\vdescription\x12!\n" +
-	"\fmeeting_link\x18\x12 \x01(\tR\vmeetingLink\"\xfe\x01\n" +
+	"\fmeeting_link\x18\x12 \x01(\tR\vmeetingLink\"\xae\x02\n" +
 	"\x10EventParticipant\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1d\n" +
 	"\n" +
-	"avatar_url\x18\x03 \x01(\tR\tavatarUrl\x12+\n" +
+	"avatar_url\x18\x03 \x01(\tR\tavatarUrl\x12.\n" +
+	"\x13telegram_avatar_url\x18\b \x01(\tR\x11telegramAvatarUrl\x12+\n" +
 	"\x11telegram_username\x18\x04 \x01(\tR\x10telegramUsername\x12\x1d\n" +
 	"\n" +
 	"first_name\x18\x05 \x01(\tR\tfirstName\x12\x1b\n" +

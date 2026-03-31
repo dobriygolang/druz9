@@ -2,7 +2,9 @@ package codeeditor
 
 import (
 	"context"
+	"time"
 
+	"api/internal/cache"
 	domain "api/internal/domain/codeeditor"
 	"api/internal/sandbox"
 )
@@ -17,13 +19,15 @@ type Sandbox interface {
 }
 
 type Service struct {
-	repo    domain.Repository
-	sandbox Sandbox
+	repo        domain.Repository
+	sandbox     Sandbox
+	taskCache   *cache.TTLCache[domain.Task]
 }
 
 func New(c Config) *Service {
 	return &Service{
-		repo:    c.Repository,
-		sandbox: c.Sandbox,
+		repo:        c.Repository,
+		sandbox:     c.Sandbox,
+		taskCache:   cache.NewTTLCache[domain.Task](100, 5*time.Minute),
 	}
 }
