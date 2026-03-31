@@ -25,7 +25,7 @@ services:
       POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U $$POSTGRES_USER -d $$POSTGRES_DB"]
-      interval: 30s
+      interval: 10s
       timeout: 5s
       retries: 10
     volumes:
@@ -76,6 +76,20 @@ services:
       - "127.0.0.1:9187:9187"
     secrets:
       - postgres_password
+    networks:
+      - app_network
+
+  node-exporter:
+    image: prom/node-exporter:latest
+    restart: unless-stopped
+    command:
+      - '--path.rootfs=/host'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($|/)'
+    pid: host
+    volumes:
+      - '/:/host:ro,rslave'
+    ports:
+      - "127.0.0.1:9100:9100"
     networks:
       - app_network
 
@@ -206,20 +220,6 @@ services:
       - postgres_password
       - minio_root_user
       - minio_root_password
-    networks:
-      - app_network
-
-  node-exporter:
-    image: prom/node-exporter:latest
-    restart: unless-stopped
-    command:
-      - '--path.rootfs=/host'
-      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($|/)'
-    pid: host
-    volumes:
-      - '/:/host:ro,rslave'
-    ports:
-      - "127.0.0.1:9100:9100"
     networks:
       - app_network
 
