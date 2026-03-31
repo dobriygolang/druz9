@@ -30,7 +30,7 @@ const isCreatorParticipant = (participant: any) => (
   || participant?.is_creator === true
 );
 
-export function normalizeParticipant(participant: any, index?: number): Participant {
+export function normalizeParticipant(participant: any): Participant {
   const userId = participant?.userId ?? participant?.user_id ?? null;
   const displayName = participant?.displayName ?? participant?.name ?? 'Гость';
   const joinedAt = participant?.joinedAt ?? participant?.joined_at ?? new Date().toISOString();
@@ -54,7 +54,7 @@ export function normalizeRoom(room: any): CodeRoom {
   }
 
   const mode = normalizeRoomMode(room.mode ?? RoomMode.ROOM_MODE_ALL);
-  const participants = (room.participants || []).map((participant: any, index: number) => normalizeParticipant(participant, index));
+  const participants = (room.participants || []).map((participant: any) => normalizeParticipant(participant));
 
   const creatorParticipant = participants.find((participant: Participant) => participant.role === 'creator');
 
