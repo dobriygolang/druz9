@@ -19,6 +19,8 @@ type VariableChangeCallback func(oldVariable, newVariable Variable)
 type RealtimeConfig interface {
 	GetValue(context.Context, Key) Value
 	WatchValue(context.Context, Key, VariableChangeCallback) error
+	SetValue(context.Context, Key, string) error
+	ListVariables(context.Context) map[Key]Variable
 }
 
 type Manager struct {
@@ -84,6 +86,57 @@ func (m *Manager) WatchValue(_ context.Context, key Key, callback VariableChange
 
 	m.callbacks[key] = append(m.callbacks[key], callback)
 	return nil
+}
+
+// SetValue updates a config variable value in memory and triggers callbacks.
+func (m *Manager) SetValue(_ context.Context, key Key, value string) error {
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	oldVariable, exists := m.variables[key]
+	if !exists {
+		return fmt.Errorf("config key not found: %s", key)
+	}
+
+	if !oldVariable.Writable {
+		return fmt.Errorf("config key is not writable: %s", key)
+	}
+
+	newVariable := Variable{
+		Key: key,
+		Definition: Definition{
+			Usage:    oldVariable.Usage,
+			Group:    oldVariable.Group,
+			Value:    value,
+			Type:     oldVariable.Type,
+			Writable: oldVariable.Writable,
+		},
+	}
+
+	m.variables[key] = newVariable
+
+	// Trigger callbacks
+	callbacks := append([]VariableChangeCallback(nil), m.callbacks[key]...)
+	m.mu.Unlock()
+	for _, callback := range callbacks {
+		callback(oldVariable, newVariable)
+	}
+	m.mu.Lock()
+
+	m.log.Infof("config updated: %s = %s", key, value)
+	return nil
+}
+
+// ListVariables returns all config variables.
+func (m *Manager) ListVariables(_ context.Context) map[Key]Variable {
+	m.mu.RLock()
+	defer m.mu.RUnlock()
+
+	result := make(map[Key]Variable, len(m.variables))
+	for k, v := range m.variables {
+		result[k] = v
+	}
+	return result
 }
 
 func (m *Manager) watchLoop(fileName string) {

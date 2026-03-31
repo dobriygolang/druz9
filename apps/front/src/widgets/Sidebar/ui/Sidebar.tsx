@@ -1,12 +1,12 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Code2, ArrowRight } from 'lucide-react';
+import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Code2, ArrowRight, Settings, Shield } from 'lucide-react';
 import { geoApi } from '@/features/Geo/api/geoApi';
 import { CommunityMapPoint } from '@/entities/User/model/types';
 
 export const Sidebar: React.FC = () => {
-  const { logout, isAuthenticated } = useAuth();
+  const { logout, isAuthenticated, user } = useAuth();
   const [userCount, setUserCount] = useState<number | null>(null);
   const [points, setPoints] = useState<CommunityMapPoint[]>([]);
 
@@ -60,6 +60,16 @@ export const Sidebar: React.FC = () => {
             <NavItem to="/vacancies" icon={<Briefcase size={20} />} label="Вакансии" />
             <NavItem to="/map" icon={<MapPin size={20} />} label="Карта" />
             <div style={{ height: '32px' }} />
+            {user?.isAdmin && (
+              <>
+                <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', padding: '0 12px', marginBottom: '4px' }}>
+                  Админ
+                </div>
+                <NavItem to="/admin/config" icon={<Settings size={20} />} label="Конфиг" />
+                <NavItem to="/admin/code-tasks" icon={<Shield size={20} />} label="Задачи" />
+                <div style={{ height: '16px' }} />
+              </>
+            )}
             <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" />
           </>
         ) : (

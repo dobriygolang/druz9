@@ -20,14 +20,23 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationAdminServiceDeleteUser = "/admin.v1.AdminService/DeleteUser"
+const OperationAdminServiceGetConfig = "/admin.v1.AdminService/GetConfig"
+const OperationAdminServiceListConfig = "/admin.v1.AdminService/ListConfig"
+const OperationAdminServiceUpdateConfig = "/admin.v1.AdminService/UpdateConfig"
 
 type AdminServiceHTTPServer interface {
 	DeleteUser(context.Context, *DeleteUserRequest) (*AdminStatusResponse, error)
+	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
+	ListConfig(context.Context, *ListConfigRequest) (*ListConfigResponse, error)
+	UpdateConfig(context.Context, *UpdateConfigRequest) (*UpdateConfigResponse, error)
 }
 
 func RegisterAdminServiceHTTPServer(s *http.Server, srv AdminServiceHTTPServer) {
 	r := s.Route("/")
 	r.DELETE("/api/admin/users/{user_id}", _AdminService_DeleteUser0_HTTP_Handler(srv))
+	r.GET("/api/admin/config/{key}", _AdminService_GetConfig0_HTTP_Handler(srv))
+	r.GET("/api/admin/config", _AdminService_ListConfig0_HTTP_Handler(srv))
+	r.PUT("/api/admin/config/{key}", _AdminService_UpdateConfig0_HTTP_Handler(srv))
 }
 
 func _AdminService_DeleteUser0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
@@ -52,8 +61,77 @@ func _AdminService_DeleteUser0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx
 	}
 }
 
+func _AdminService_GetConfig0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetConfigRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceGetConfig)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetConfig(ctx, req.(*GetConfigRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetConfigResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AdminService_ListConfig0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListConfigRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceListConfig)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListConfig(ctx, req.(*ListConfigRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListConfigResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AdminService_UpdateConfig0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateConfigRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceUpdateConfig)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateConfig(ctx, req.(*UpdateConfigRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateConfigResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AdminServiceHTTPClient interface {
 	DeleteUser(ctx context.Context, req *DeleteUserRequest, opts ...http.CallOption) (rsp *AdminStatusResponse, err error)
+	GetConfig(ctx context.Context, req *GetConfigRequest, opts ...http.CallOption) (rsp *GetConfigResponse, err error)
+	ListConfig(ctx context.Context, req *ListConfigRequest, opts ...http.CallOption) (rsp *ListConfigResponse, err error)
+	UpdateConfig(ctx context.Context, req *UpdateConfigRequest, opts ...http.CallOption) (rsp *UpdateConfigResponse, err error)
 }
 
 type AdminServiceHTTPClientImpl struct {
@@ -71,6 +149,45 @@ func (c *AdminServiceHTTPClientImpl) DeleteUser(ctx context.Context, in *DeleteU
 	opts = append(opts, http.Operation(OperationAdminServiceDeleteUser))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AdminServiceHTTPClientImpl) GetConfig(ctx context.Context, in *GetConfigRequest, opts ...http.CallOption) (*GetConfigResponse, error) {
+	var out GetConfigResponse
+	pattern := "/api/admin/config/{key}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAdminServiceGetConfig))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AdminServiceHTTPClientImpl) ListConfig(ctx context.Context, in *ListConfigRequest, opts ...http.CallOption) (*ListConfigResponse, error) {
+	var out ListConfigResponse
+	pattern := "/api/admin/config"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAdminServiceListConfig))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AdminServiceHTTPClientImpl) UpdateConfig(ctx context.Context, in *UpdateConfigRequest, opts ...http.CallOption) (*UpdateConfigResponse, error) {
+	var out UpdateConfigResponse
+	pattern := "/api/admin/config/{key}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAdminServiceUpdateConfig))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

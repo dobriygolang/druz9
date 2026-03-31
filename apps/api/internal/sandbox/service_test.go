@@ -3,6 +3,7 @@ package sandbox
 import (
 	"context"
 	"os"
+	"os/exec"
 	"path/filepath"
 	"strings"
 	"testing"
@@ -47,6 +48,11 @@ func TestBuildExecutionEnvProvidesGoCacheAndHome(t *testing.T) {
 
 func TestExecuteHelloWorld(t *testing.T) {
 	t.Parallel()
+
+	// Skip if Go is not installed (common in CI/minimal environments)
+	if _, err := exec.LookPath("go"); err != nil {
+		t.Skip("go not installed, skipping execution test")
+	}
 
 	service := New()
 	output, truncated, err := service.runWithConfig(t.Context(), ExecutionRequest{
@@ -305,6 +311,11 @@ func TestEffectiveExecutionTimeoutNoDeadline(t *testing.T) {
 
 func TestExecuteResolvesPolicy(t *testing.T) {
 	t.Parallel()
+
+	// Skip if Go is not installed (common in CI/minimal environments)
+	if _, err := exec.LookPath("go"); err != nil {
+		t.Skip("go not installed, skipping execution test")
+	}
 
 	service := New()
 	_, _, err := service.runWithConfig(t.Context(), ExecutionRequest{

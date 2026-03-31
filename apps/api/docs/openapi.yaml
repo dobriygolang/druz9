@@ -65,6 +65,59 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/code_editor.v1.DeleteTaskResponse'
+    /api/admin/config:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_ListConfig
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.ListConfigResponse'
+    /api/admin/config/{key}:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_GetConfig
+            parameters:
+                - name: key
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.GetConfigResponse'
+        put:
+            tags:
+                - AdminService
+            operationId: AdminService_UpdateConfig
+            parameters:
+                - name: key
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/admin.v1.UpdateConfigRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.UpdateConfigResponse'
     /api/admin/podcasts:
         post:
             tags:
@@ -1066,6 +1119,59 @@ components:
             properties:
                 status:
                     type: string
+        admin.v1.ConfigItem:
+            type: object
+            properties:
+                key:
+                    type: string
+                value:
+                    type: string
+                type:
+                    type: string
+                writable:
+                    type: boolean
+                usage:
+                    type: string
+                group:
+                    type: string
+        admin.v1.GetConfigResponse:
+            type: object
+            properties:
+                key:
+                    type: string
+                value:
+                    type: string
+                type:
+                    type: string
+                writable:
+                    type: boolean
+                usage:
+                    type: string
+                group:
+                    type: string
+        admin.v1.ListConfigResponse:
+            type: object
+            properties:
+                configs:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/admin.v1.ConfigItem'
+        admin.v1.UpdateConfigRequest:
+            type: object
+            properties:
+                key:
+                    type: string
+                value:
+                    type: string
+        admin.v1.UpdateConfigResponse:
+            type: object
+            properties:
+                key:
+                    type: string
+                value:
+                    type: string
+                success:
+                    type: boolean
         arena.v1.ArenaLeaderboardEntry:
             type: object
             properties:

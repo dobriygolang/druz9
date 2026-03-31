@@ -224,6 +224,7 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 	server.RegisterArenaRealtime(httpServer, arenaRealtimeHub)
 	server.RegisterArenaOpenMatches(httpServer, arenaServiceDomain)
 	server.RegisterArenaQueue(httpServer, arenaServiceDomain, profileServiceDomain)
+	server.RegisterRTConfig(httpServer, rtcManager, profileServiceDomain)
 
 	adminv1.RegisterAdminServiceHTTPServer(httpServer, adminService)
 	adminv1.RegisterAdminServiceServer(grpcServer, adminService)

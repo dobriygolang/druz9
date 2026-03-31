@@ -31,7 +31,7 @@ server_rate_limit_max_calls:
   group: "server"
   value: "1000"
   type: "int"
-  writable: false
+  writable: true
 
 server_rate_limit_window:
   usage: "Rate limit time window"
@@ -199,7 +199,7 @@ geocoder_language:
   group: "external"
   value: "ru,en"
   type: "string"
-  writable: false
+  writable: true
 
 s3_endpoint:
   usage: "S3 endpoint"

@@ -10,6 +10,15 @@ service AdminService {
   rpc DeleteUser(DeleteUserRequest) returns (AdminStatusResponse) {
     option (google.api.http) = { delete: "/api/admin/users/{user_id}" };
   }
+  rpc GetConfig(GetConfigRequest) returns (GetConfigResponse) {
+    option (google.api.http) = { get: "/api/admin/config/{key}" };
+  }
+  rpc ListConfig(ListConfigRequest) returns (ListConfigResponse) {
+    option (google.api.http) = { get: "/api/admin/config" };
+  }
+  rpc UpdateConfig(UpdateConfigRequest) returns (UpdateConfigResponse) {
+    option (google.api.http) = { put: "/api/admin/config/{key}", body: "*" };
+  }
 }
 
 message DeleteUserRequest {
@@ -18,4 +27,43 @@ message DeleteUserRequest {
 
 message AdminStatusResponse {
   string status = 1;
+}
+
+message GetConfigRequest {
+  string key = 1;
+}
+
+message GetConfigResponse {
+  string key = 1;
+  string value = 2;
+  string type = 3;
+  bool writable = 4;
+  string usage = 5;
+  string group = 6;
+}
+
+message ListConfigRequest {}
+
+message ListConfigResponse {
+  repeated ConfigItem configs = 1;
+}
+
+message ConfigItem {
+  string key = 1;
+  string value = 2;
+  string type = 3;
+  bool writable = 4;
+  string usage = 5;
+  string group = 6;
+}
+
+message UpdateConfigRequest {
+  string key = 1;
+  string value = 2;
+}
+
+message UpdateConfigResponse {
+  string key = 1;
+  string value = 2;
+  bool success = 3;
 }
