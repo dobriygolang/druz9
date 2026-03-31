@@ -249,3 +249,31 @@ dev_user_id:
   value: ""
   type: "string"
   writable: false
+
+code_room_idle_ttl:
+  usage: "Code room idle TTL before cleanup"
+  group: "codeeditor"
+  value: "60m"
+  type: "duration"
+  writable: true
+
+code_room_cleanup_interval:
+  usage: "Code room cleanup check interval"
+  group: "codeeditor"
+  value: "15m"
+  type: "duration"
+  writable: true
+
+arena_idle_ttl:
+  usage: "Arena match idle TTL before cleanup"
+  group: "arena"
+  value: "10m"
+  type: "duration"
+  writable: true
+
+arena_cleanup_interval:
+  usage: "Arena cleanup check interval"
+  group: "arena"
+  value: "5m"
+  type: "duration"
+  writable: true

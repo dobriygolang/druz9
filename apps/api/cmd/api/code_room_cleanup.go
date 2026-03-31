@@ -11,7 +11,7 @@ import (
 
 const (
 	codeRoomCleanupInterval = 15 * time.Minute
-	codeRoomIdleTTL         = 10 * time.Minute
+	codeRoomIdleTTL         = 60 * time.Minute
 )
 
 func startCodeRoomCleanupWorker(logger klog.Logger, service *appcodeeditor.Service) func() error {

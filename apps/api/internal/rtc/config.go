@@ -3,8 +3,16 @@
 package rtc
 
 const (
+	// Arena cleanup check interval
+	ArenaCleanupInterval Key = "arena_cleanup_interval"
+	// Arena match idle TTL before cleanup
+	ArenaIdleTtl Key = "arena_idle_ttl"
 	// Require authentication for arena endpoints
 	ArenaRequireAuth Key = "arena_require_auth"
+	// Code room cleanup check interval
+	CodeRoomCleanupInterval Key = "code_room_cleanup_interval"
+	// Code room idle TTL before cleanup
+	CodeRoomIdleTtl Key = "code_room_idle_ttl"
 	// Session cookie domain
 	CookieDomain Key = "cookie_domain"
 	// Session cookie same-site policy
