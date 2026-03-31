@@ -155,7 +155,7 @@ func prepareGoSources(root string, req ExecutionRequest) ([]string, error) {
 		}
 
 		goModFile := filepath.Join(workDir, "go.mod")
-		if err := os.WriteFile(goModFile, []byte("module sandbox\n\ngo 1.22\n"), privateFileMode); err != nil {
+		if err := os.WriteFile(goModFile, []byte("module sandbox\n\ngo 1.20\n"), privateFileMode); err != nil {
 			return nil, fmt.Errorf("write go.mod file: %w", err)
 		}
 
