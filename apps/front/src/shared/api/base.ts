@@ -32,7 +32,8 @@ export function withGuestArenaHeaders(actorId?: string, guestName?: string) {
     headers['X-Arena-Guest-Id'] = actorId;
   }
   if (guestName) {
-    headers['X-Arena-Guest-Name'] = guestName;
+    // Base64 encode to support Unicode characters in HTTP header
+    headers['X-Arena-Guest-Name'] = btoa(unescape(encodeURIComponent(guestName)));
   }
   return headers;
 }
@@ -41,8 +42,10 @@ export function withGuestCodeRoomHeaders(guestName?: string) {
   if (!guestName) {
     return {};
   }
+  // Base64 encode to support Unicode characters in HTTP header
+  const encoded = btoa(unescape(encodeURIComponent(guestName)));
   return {
-    'X-Code-Editor-Guest-Name': guestName,
+    'X-Code-Editor-Guest-Name': encoded,
   };
 }
 

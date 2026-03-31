@@ -2,6 +2,7 @@ package code_editor
 
 import (
 	"context"
+	"encoding/base64"
 	"strings"
 
 	"api/internal/model"
@@ -56,5 +57,16 @@ func codeEditorGuestName(ctx context.Context) string {
 		return ""
 	}
 
-	return strings.TrimSpace(httpTransport.Request().Header.Get(codeEditorGuestNameHeader))
+	encoded := strings.TrimSpace(httpTransport.Request().Header.Get(codeEditorGuestNameHeader))
+	if encoded == "" {
+		return ""
+	}
+
+	// Decode Base64 to support Unicode characters
+	decoded, err := base64.StdEncoding.DecodeString(encoded)
+	if err != nil {
+		// If decoding fails, try raw value (for backward compatibility)
+		return encoded
+	}
+	return string(decoded)
 }

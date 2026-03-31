@@ -3,11 +3,12 @@ import { useParams, useNavigate } from 'react-router-dom';
 import Editor, { OnMount } from '@monaco-editor/react';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
-import { getStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
+import { getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { useCodeRoomRealtime } from '@/features/CodeRoom/api/useCodeRoomRealtime';
 import { CodeRoom, Participant, Submission } from '@/entities/CodeRoom/model/types';
 import { Copy, Play, ArrowLeft, Loader2, Clock, CheckCircle, XCircle, Pause, SkipBack, Bell, BellOff, X, History } from 'lucide-react';
 import { AxiosError } from '@/shared/api/base';
+import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 
 const DEFAULT_CODE = `package main
 
@@ -49,6 +50,7 @@ export const CodeRoomPage: React.FC = () => {
   const [timelapseIndex, setTimelapseIndex] = useState(0);
   const [leaveToasts, setLeaveToasts] = useState<LeaveToast[]>([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
+  const [needsGuestName, setNeedsGuestName] = useState(false);
 
   const editorRef = useRef<any>(null);
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
@@ -189,6 +191,43 @@ export const CodeRoomPage: React.FC = () => {
       setIsRoomLoading(true);
       setRoomLoadError('');
 
+      // Check if user is authenticated
+      if (!user) {
+        const guestName = getStoredGuestName();
+        if (!guestName) {
+          // Need to get guest name first
+          setNeedsGuestName(true);
+          setIsRoomLoading(false);
+          return;
+        }
+
+        // Join as guest
+        for (let attempt = 0; attempt < 3; attempt += 1) {
+          try {
+            const nextRoom = await codeRoomApi.joinRoom(roomId, { guestName });
+            if (cancelled) {
+              return;
+            }
+            setRoom(nextRoom);
+            if (nextRoom.code) {
+              setCode(nextRoom.code);
+              codeRef.current = nextRoom.code;
+            }
+            setIsRoomLoading(false);
+            return;
+          } catch (e) {
+            if (cancelled) {
+              return;
+            }
+            console.error('Failed to join room:', e);
+            if (attempt < 2) {
+              await new Promise((resolve) => window.setTimeout(resolve, 500 * (attempt + 1)));
+            }
+          }
+        }
+      }
+
+      // Get room (for authenticated users or as fallback)
       for (let attempt = 0; attempt < 3; attempt += 1) {
         try {
           const nextRoom = await codeRoomApi.getRoom(roomId);
@@ -224,7 +263,7 @@ export const CodeRoomPage: React.FC = () => {
     return () => {
       cancelled = true;
     };
-  }, [roomId, navigate]);
+  }, [roomId, navigate, user]);
 
   const currentUserName = useMemo(() => {
     const authName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim()
@@ -519,6 +558,23 @@ export const CodeRoomPage: React.FC = () => {
           <Loader2 className="animate-spin" size={28} />
           <span>Загружаем комнату...</span>
         </div>
+      </div>
+    );
+  }
+
+  if (needsGuestName) {
+    return (
+      <div className="code-room-page">
+        <GuestNameModal
+          open
+          initialValue={getStoredGuestName()}
+          onConfirm={(name) => {
+            setStoredGuestName(name);
+            setNeedsGuestName(false);
+            // Trigger room reload by clearing roomId dependency (we'll use a separate effect)
+            window.location.reload();
+          }}
+        />
       </div>
     );
   }
