@@ -35,7 +35,18 @@ jobs:
           pwd
           ls -la
           find . -maxdepth 3 -type d | sort
-
+      - name: Clean app directories on server
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ env.DEPLOY_HOST }}
+          username: ${{ env.DEPLOY_USER }}
+          key: ${{ env.DEPLOY_SSH_KEY }}
+          port: ${{ env.DEPLOY_SSH_PORT }}
+          script: |
+            set -e
+            cd "${{ env.DEPLOY_APP_DIR }}"
+            rm -rf apps/api apps/front apps/deploy
+            mkdir -p apps
       - name: Copy project to server
         uses: appleboy/scp-action@v0.1.7
         with:
