@@ -393,6 +393,7 @@ func dtoFromArenaMatch(match *model.ArenaMatch) *schema.ArenaMatch {
 			DisplayName:   player.DisplayName,
 			Side:          player.Side.String(),
 			IsCreator:     player.IsCreator,
+			CurrentCode:   player.CurrentCode,
 			BestRuntimeMs: player.BestRuntimeMs,
 			IsWinner:      player.IsWinner,
 			JoinedAt:      player.JoinedAt.UTC().Format(time.RFC3339Nano),

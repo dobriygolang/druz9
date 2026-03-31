@@ -230,6 +230,7 @@ func mapArenaRealtimeMatch(match *domain.Match) *realtime.ArenaMatch {
 			DisplayName:   player.DisplayName,
 			Side:          player.Side.String(),
 			IsCreator:     player.IsCreator,
+			CurrentCode:   player.CurrentCode,
 			FreezeUntil:   formatArenaTimePtr(player.FreezeUntil),
 			AcceptedAt:    formatArenaTimePtr(player.AcceptedAt),
 			BestRuntimeMs: player.BestRuntimeMs,

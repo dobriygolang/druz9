@@ -54,6 +54,7 @@ type ArenaPlayer struct {
 	DisplayName   string `json:"displayName"`
 	Side          string `json:"side"`
 	IsCreator     bool   `json:"isCreator"`
+	CurrentCode   string `json:"currentCode,omitempty"`
 	FreezeUntil   string `json:"freezeUntil,omitempty"`
 	AcceptedAt    string `json:"acceptedAt,omitempty"`
 	BestRuntimeMs int64  `json:"bestRuntimeMs,omitempty"`
