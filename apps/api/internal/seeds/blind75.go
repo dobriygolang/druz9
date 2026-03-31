@@ -13,6 +13,7 @@ import (
 
 const blind75SeedName = "blind75_pack"
 const blind75CatalogPath = "scripts/seeds/catalogs/blind75.json"
+const blind75SeedVersion = "v2-function-io"
 
 func (r *Runner) runBlind75(ctx context.Context) (Result, error) {
 	catalog, rawCatalog, err := loadCatalog(blind75CatalogPath)
@@ -20,7 +21,7 @@ func (r *Runner) runBlind75(ctx context.Context) (Result, error) {
 		return Result{}, err
 	}
 
-	checksum := digest(rawCatalog)
+	checksum := digest(append(rawCatalog, []byte("|"+blind75SeedVersion)...))
 	shouldApply, appliedAt, err := r.shouldApply(ctx, blind75SeedName, seedKindCatalog, checksum)
 	if err != nil {
 		return Result{}, err

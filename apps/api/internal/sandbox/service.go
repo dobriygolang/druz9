@@ -116,7 +116,12 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 		if errors.Is(execCtx.Err(), context.DeadlineExceeded) {
 			return "", false, fmt.Errorf("execution timed out after %s", timeout)
 		}
-		return "", false, fmt.Errorf("%s", string(output))
+
+		outputStr := strings.TrimSpace(string(output))
+		if outputStr == "" {
+			return "", false, fmt.Errorf("go run failed: %v", err)
+		}
+		return "", false, fmt.Errorf("%s", outputStr)
 	}
 
 	outputStr := string(output)

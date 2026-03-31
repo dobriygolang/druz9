@@ -904,16 +904,24 @@ func (r *Repo) ApplyAntiCheatPenalty(ctx context.Context, matchID, userID uuid.U
 	defer func() { _ = tx.Rollback(ctx) }()
 
 	var alreadyPenalized bool
-	var isRegistered bool
-
 	if err := tx.QueryRow(ctx, `
-		SELECT p.anti_cheat_penalized, (u.id IS NOT NULL) AS is_registered
-		FROM arena_match_players p
-		LEFT JOIN users u ON u.id = p.user_id
-		WHERE p.match_id = $1 AND p.user_id = $2
+		SELECT anti_cheat_penalized
+		FROM arena_match_players
+		WHERE match_id = $1 AND user_id = $2
 		FOR UPDATE
-	`, matchID, userID).Scan(&alreadyPenalized, &isRegistered); err != nil {
+	`, matchID, userID).Scan(&alreadyPenalized); err != nil {
 		return fmt.Errorf("load anti-cheat penalty state: %w", err)
+	}
+
+	var isRegistered bool
+	if err := tx.QueryRow(ctx, `
+		SELECT EXISTS (
+			SELECT 1
+			FROM users
+			WHERE id = $1
+		)
+	`, userID).Scan(&isRegistered); err != nil {
+		return fmt.Errorf("load anti-cheat registration state: %w", err)
 	}
 
 	if alreadyPenalized {
