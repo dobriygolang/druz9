@@ -35,7 +35,7 @@ func startArenaCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, servic
 			return
 		}
 		if deleted > 0 {
-			klog.Infof("arena cleanup deleted %d inactive invite matches", deleted)
+			klog.Infof("arena cleanup processed %d inactive arena matches", deleted)
 		}
 	}
 

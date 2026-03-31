@@ -339,16 +339,79 @@ func (r *Repo) loadPlayersForMatches(ctx context.Context, matches []*domain.Matc
 }
 
 func (r *Repo) CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error) {
-	tag, err := r.data.DB.Exec(ctx, `
+	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return 0, fmt.Errorf("begin cleanup inactive arena matches tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	var totalAffected int64
+
+	// 1) delete stale waiting invite matches
+	deleteTag, err := tx.Exec(ctx, `
 		DELETE FROM arena_matches am
 		WHERE am.status = $1
 		  AND am.source = $2
 		  AND am.updated_at < NOW() - $3::interval
-	`, model.ArenaMatchStatusWaiting, model.ArenaMatchSourceInvite, idleFor.String())
+	`,
+		model.ArenaMatchStatusWaiting,
+		model.ArenaMatchSourceInvite,
+		idleFor.String(),
+	)
 	if err != nil {
-		return 0, fmt.Errorf("cleanup inactive arena matches: %w", err)
+		return 0, fmt.Errorf("cleanup waiting arena matches: %w", err)
 	}
-	return tag.RowsAffected(), nil
+	totalAffected += deleteTag.RowsAffected()
+
+	// 2) finish stale active matches
+	finishTag, err := tx.Exec(ctx, `
+		UPDATE arena_matches
+		SET status = $2,
+		    winner_user_id = NULL,
+		    winner_reason = $3,
+		    finished_at = NOW(),
+		    updated_at = NOW()
+		WHERE status = $1
+		  AND updated_at < NOW() - $4::interval
+	`,
+		model.ArenaMatchStatusActive,
+		model.ArenaMatchStatusFinished,
+		model.ArenaWinnerReasonNone,
+		idleFor.String(),
+	)
+	if err != nil {
+		return 0, fmt.Errorf("finish stale active arena matches: %w", err)
+	}
+	totalAffected += finishTag.RowsAffected()
+
+	// reset winners for newly finished stale matches
+	if finishTag.RowsAffected() > 0 {
+		if _, err := tx.Exec(ctx, `
+			UPDATE arena_match_players p
+			SET is_winner = FALSE
+			WHERE EXISTS (
+				SELECT 1
+				FROM arena_matches am
+				WHERE am.id = p.match_id
+				  AND am.status = $1
+				  AND am.winner_user_id IS NULL
+				  AND am.winner_reason = $2
+				  AND am.finished_at IS NOT NULL
+				  AND am.updated_at >= NOW() - INTERVAL '5 seconds'
+			)
+		`,
+			model.ArenaMatchStatusFinished,
+			model.ArenaWinnerReasonNone,
+		); err != nil {
+			return 0, fmt.Errorf("reset stale arena winners: %w", err)
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return 0, fmt.Errorf("commit cleanup inactive arena matches tx: %w", err)
+	}
+
+	return totalAffected, nil
 }
 
 func (r *Repo) MatchmakeOrEnqueue(ctx context.Context, user *domain.User, task *domain.Task, topic, difficulty string, obfuscateOpponent bool) (*domain.Match, bool, error) {
