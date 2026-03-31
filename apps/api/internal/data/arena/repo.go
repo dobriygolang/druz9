@@ -1005,8 +1005,10 @@ func (r *Repo) GetPlayer(ctx context.Context, matchID, userID uuid.UUID) (*domai
 	row := r.data.DB.QueryRow(ctx, `
 		SELECT p.match_id, p.user_id, p.display_name, p.side, p.is_creator,
 		       p.freeze_until, p.accepted_at, p.best_runtime_ms, p.is_winner,
-		       p.suspicion_count, p.anti_cheat_penalized, p.joined_at, p.updated_at, p.current_code
+		       p.suspicion_count, p.anti_cheat_penalized, p.joined_at, p.updated_at,
+		       COALESCE(es.code, '')
 		FROM arena_match_players p
+		LEFT JOIN arena_editor_states es ON es.match_id = p.match_id AND es.user_id = p.user_id
 		WHERE p.match_id = $1 AND p.user_id = $2
 	`, matchID, userID)
 
