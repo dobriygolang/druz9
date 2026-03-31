@@ -852,9 +852,36 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 
 func (r *Repo) CreateSubmission(ctx context.Context, submission *domain.Submission) (*domain.Submission, error) {
 	_, err := r.data.DB.Exec(ctx, `
-		INSERT INTO arena_submissions (id, match_id, user_id, code, output, error, runtime_ms, is_correct, passed_count, total_count, submitted_at)
-		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW())
-	`, submission.ID, submission.MatchID, submission.UserID, submission.Code, submission.Output, submission.Error, submission.RuntimeMs, submission.IsCorrect, submission.PassedCount, submission.TotalCount)
+		INSERT INTO arena_submissions (
+			id,
+			match_id,
+			user_id,
+			code,
+			output,
+			error,
+			runtime_ms,
+			is_correct,
+			passed_count,
+			total_count,
+			failed_test_index,
+			failure_kind,
+			submitted_at
+		)
+		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())
+	`,
+		submission.ID,
+		submission.MatchID,
+		submission.UserID,
+		submission.Code,
+		submission.Output,
+		submission.Error,
+		submission.RuntimeMs,
+		submission.IsCorrect,
+		submission.PassedCount,
+		submission.TotalCount,
+		submission.FailedTestIndex,
+		submission.FailureKind,
+	)
 	if err != nil {
 		return nil, fmt.Errorf("create arena submission: %w", err)
 	}

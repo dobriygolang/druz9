@@ -22,9 +22,6 @@ func normalizeTaskPolicy(task *domain.Task) error {
 	if task.ExecutionProfile.String() == "" {
 		task.ExecutionProfile = model.ExecutionProfilePure
 	}
-	if task.RunnerMode.String() == "" {
-		task.RunnerMode = model.RunnerModeProgram
-	}
 
 	spec := policy.TaskSpec{
 		Type:            policyTaskTypeForTask(task, policy.TaskTypeAlgorithmPractice),

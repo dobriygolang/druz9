@@ -76,16 +76,23 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 
 			lowerErr := strings.ToLower(lastError)
 			switch {
-			case strings.Contains(lowerErr, "undefined: main"),
+			case strings.Contains(lowerErr, "timed out"),
+				strings.Contains(lowerErr, "timeout"):
+				failureKind = model.ArenaSubmissionFailureKindTimeout
+
+			case strings.Contains(lowerErr, "compile"),
 				strings.Contains(lowerErr, "syntax error"),
-				strings.Contains(lowerErr, "cannot use"),
+				strings.Contains(lowerErr, "undefined:"),
 				strings.Contains(lowerErr, "undeclared"),
-				strings.Contains(lowerErr, "compile"):
+				strings.Contains(lowerErr, "cannot use"),
+				strings.Contains(lowerErr, "declared and not used"),
+				strings.Contains(lowerErr, "imported and not used"),
+				strings.Contains(lowerErr, "missing return"),
+				strings.Contains(lowerErr, "too many arguments in call"),
+				strings.Contains(lowerErr, "not enough arguments in call"):
 				failureKind = model.ArenaSubmissionFailureKindCompileError
 				failedTestIndex = 0
-			case strings.Contains(lowerErr, "timeout"),
-				strings.Contains(lowerErr, "timed out"):
-				failureKind = model.ArenaSubmissionFailureKindTimeout
+
 			default:
 				failureKind = model.ArenaSubmissionFailureKindRuntimeError
 			}

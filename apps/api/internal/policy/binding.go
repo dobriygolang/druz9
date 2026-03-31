@@ -14,7 +14,6 @@ func TaskSpecForCodeEditorRun() TaskSpec {
 func TaskSpecForArenaTask(task *model.CodeTask) TaskSpec {
 	spec := TaskSpecFromCodeTask(task, TaskTypeArenaDuel)
 	spec.Type = TaskTypeArenaDuel
-	spec.Profile = ProfilePure
 	spec.Capabilities.Deterministic = true
 	return spec
 }
