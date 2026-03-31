@@ -144,6 +144,11 @@ func prepareGoSources(root string, req ExecutionRequest) ([]string, error) {
 
 	switch mode {
 	case "function_io":
+		goModFile := filepath.Join(root, "go.mod")
+		if err := os.WriteFile(goModFile, []byte("module sandbox\n\ngo 1.25\n"), privateFileMode); err != nil {
+			return nil, fmt.Errorf("write go.mod file: %w", err)
+		}
+
 		solutionFile := filepath.Join(root, "solution.go")
 		if err := os.WriteFile(solutionFile, []byte(req.Code), privateFileMode); err != nil {
 			return nil, fmt.Errorf("write solution file: %w", err)

@@ -85,8 +85,8 @@ services:
     ports:
       - "127.0.0.1:9091:9090"
     volumes:
-      - ./scripts/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
-      - ./scripts/prometheus/alerts:/etc/prometheus/alerts:ro
+      - ../api/scripts/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - ../api/scripts/prometheus/alerts:/etc/prometheus/alerts:ro
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
