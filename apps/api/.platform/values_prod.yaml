@@ -127,7 +127,7 @@ session_cookie_name:
 cookie_domain:
   usage: "Session cookie domain"
   group: "auth"
-  value: ""
+  value: "REPLACE_ME"
   type: "string"
   writable: false
 
@@ -212,10 +212,23 @@ s3_public_endpoint:
 s3_bucket:
   usage: "S3 bucket name"
   group: "external"
+  value: "REPLACE_ME"
+  type: "string"
+  writable: false
+
+s3_access_key:
+  usage: "S3 access key"
+  group: "external"
   value: ""
   type: "string"
   writable: false
 
+s3_secret_key:
+  usage: "S3 secret key"
+  group: "external"
+  value: ""
+  type: "string"
+  writable: false
 
 dev_auth_bypass:
   usage: "Allow local auth bypass"
