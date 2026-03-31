@@ -95,6 +95,11 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 		return "", false, err
 	}
 
+	runDir := tmpDir
+	if strings.TrimSpace(req.RunnerMode) == "function_io" {
+		runDir = filepath.Join(tmpDir, "work")
+	}
+
 	runArgs, err := prepareGoSources(tmpDir, req)
 	if err != nil {
 		return "", false, err
@@ -107,7 +112,7 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 
 	// #nosec G204 -- arguments are constrained to generated local Go sources inside the sandbox temp dir.
 	cmd := exec.CommandContext(execCtx, "go", append([]string{"run"}, runArgs...)...)
-	cmd.Dir = tmpDir
+	cmd.Dir = runDir
 	cmd.Env = execEnv
 	cmd.Stdin = bytes.NewBufferString(req.Input)
 
@@ -144,16 +149,21 @@ func prepareGoSources(root string, req ExecutionRequest) ([]string, error) {
 
 	switch mode {
 	case "function_io":
-		goModFile := filepath.Join(root, "go.mod")
+		workDir := filepath.Join(root, "work")
+		if err := os.MkdirAll(workDir, 0o755); err != nil {
+			return nil, fmt.Errorf("create work dir: %w", err)
+		}
+
+		goModFile := filepath.Join(workDir, "go.mod")
 		if err := os.WriteFile(goModFile, []byte("module sandbox\n\ngo 1.25\n"), privateFileMode); err != nil {
 			return nil, fmt.Errorf("write go.mod file: %w", err)
 		}
 
-		solutionFile := filepath.Join(root, "solution.go")
+		solutionFile := filepath.Join(workDir, "solution.go")
 		if err := os.WriteFile(solutionFile, []byte(req.Code), privateFileMode); err != nil {
 			return nil, fmt.Errorf("write solution file: %w", err)
 		}
-		wrapperFile := filepath.Join(root, "main.go")
+		wrapperFile := filepath.Join(workDir, "main.go")
 		if err := os.WriteFile(wrapperFile, []byte(goFunctionIOWrapper()), privateFileMode); err != nil {
 			return nil, fmt.Errorf("write wrapper file: %w", err)
 		}
