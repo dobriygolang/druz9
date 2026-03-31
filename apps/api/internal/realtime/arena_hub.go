@@ -296,10 +296,11 @@ func (h *ArenaHub) viewerCode(match *schema.ArenaMatch, item *schema.ArenaPlayer
 	if item.UserID == viewerUserID {
 		return item.Code
 	}
-	if match != nil && match.Status == model.ArenaMatchStatusFinished.String() {
-		return item.Code
+	// Не раскрывать код spectators до завершения матча
+	if spectator && (match == nil || match.Status != model.ArenaMatchStatusFinished.String()) {
+		return ""
 	}
-	if spectator {
+	if match != nil && match.Status == model.ArenaMatchStatusFinished.String() {
 		return item.Code
 	}
 	if match == nil || !match.ObfuscateOpponent {
@@ -389,14 +390,15 @@ func dtoFromArenaMatch(match *model.ArenaMatch) *schema.ArenaMatch {
 			continue
 		}
 		realtimePlayer := &schema.ArenaPlayer{
-			UserID:        player.UserID.String(),
-			DisplayName:   player.DisplayName,
-			Side:          player.Side.String(),
-			IsCreator:     player.IsCreator,
-			CurrentCode:   player.CurrentCode,
-			BestRuntimeMs: player.BestRuntimeMs,
-			IsWinner:      player.IsWinner,
-			JoinedAt:      player.JoinedAt.UTC().Format(time.RFC3339Nano),
+			UserID:         player.UserID.String(),
+			DisplayName:    player.DisplayName,
+			Side:           player.Side.String(),
+			IsCreator:      player.IsCreator,
+			CurrentCode:    player.CurrentCode,
+			SuspicionCount: player.SuspicionCount,
+			BestRuntimeMs:  player.BestRuntimeMs,
+			IsWinner:       player.IsWinner,
+			JoinedAt:       player.JoinedAt.UTC().Format(time.RFC3339Nano),
 		}
 		if player.FreezeUntil != nil && !player.FreezeUntil.IsZero() {
 			realtimePlayer.FreezeUntil = player.FreezeUntil.UTC().Format(time.RFC3339Nano)

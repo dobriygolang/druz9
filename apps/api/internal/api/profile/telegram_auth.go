@@ -3,6 +3,7 @@ package profile
 import (
 	"context"
 
+	"api/internal/metrics"
 	"api/internal/model"
 	v1 "api/pkg/api/profile/v1"
 
@@ -44,5 +45,11 @@ func (i *Implementation) TelegramAuth(ctx context.Context, req *v1.TelegramAuthR
 	}
 
 	i.cookie.SetSessionCookie(ctx, rawToken, expiresAt)
+
+	// Track new user registration (NeedsProfileComplete is true for new users)
+	if response.NeedsProfileComplete {
+		metrics.IncUsers()
+	}
+
 	return mapProfileResponse(response), nil
 }

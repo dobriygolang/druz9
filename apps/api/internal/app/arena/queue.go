@@ -150,9 +150,31 @@ func (s *Service) ReportPlayerSuspicion(ctx context.Context, matchID uuid.UUID, 
 	if user == nil {
 		return domain.ErrGuestsNotSupported
 	}
+
 	reason = strings.TrimSpace(reason)
 	if reason == "" {
 		return nil
 	}
-	return s.repo.ReportPlayerSuspicion(ctx, matchID, user.ID, reason)
+
+	if err := s.repo.ReportPlayerSuspicion(ctx, matchID, user.ID, reason); err != nil {
+		return err
+	}
+
+	player, err := s.repo.GetPlayer(ctx, matchID, user.ID)
+	if err != nil {
+		return err
+	}
+	if player == nil {
+		return nil
+	}
+
+	// On 2nd strike: apply personal penalty only once
+	// Match continues - winner is determined only by accepted or timeout
+	if player.SuspicionCount >= 2 && !player.AntiCheatPenalized {
+		if err := s.repo.ApplyAntiCheatPenalty(ctx, matchID, user.ID, -25, "anti_cheat"); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

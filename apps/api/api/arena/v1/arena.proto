@@ -119,6 +119,7 @@ enum WinnerReason {
   WINNER_REASON_RUNTIME = 2;
   WINNER_REASON_TIMEOUT = 3;
   WINNER_REASON_SINGLE_AC = 4;
+  WINNER_REASON_ANTI_CHEAT = 6;
   WINNER_REASON_NONE = 5;
 }
 
@@ -133,6 +134,8 @@ message ArenaPlayer {
   bool is_winner = 8;
   google.protobuf.Timestamp joined_at = 9;
   string current_code = 10;
+  int32 suspicion_count = 11;
+  bool anti_cheat_penalized = 12;
 }
 
 enum ArenaPlayerSide {

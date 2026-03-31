@@ -3,6 +3,7 @@ package podcast
 import (
 	"context"
 
+	"api/internal/metrics"
 	"api/internal/model"
 	v1 "api/pkg/api/podcast/v1"
 )
@@ -17,5 +18,8 @@ func (i *Implementation) CreatePodcast(ctx context.Context, req *v1.CreatePodcas
 	if err != nil {
 		return nil, err
 	}
+
+	metrics.IncPodcastCreated()
+
 	return &v1.PodcastResponse{Podcast: mapPodcast(item)}, nil
 }

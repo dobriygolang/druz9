@@ -159,6 +159,10 @@ function normalizeArenaWinnerReason(value: any): string {
     case 'WINNER_REASON_SINGLE_AC':
     case 'single_ac':
       return 'single_ac';
+    case 6:
+    case 'WINNER_REASON_ANTI_CHEAT':
+    case 'anti_cheat':
+      return 'anti_cheat';
     case 5:
     case 'WINNER_REASON_NONE':
     case 'none':
@@ -270,6 +274,8 @@ function normalizeArenaPlayer(player: any): ArenaPlayer {
     currentCode: player?.currentCode || player?.current_code || '',
     freezeUntil: player?.freezeUntil || player?.freeze_until || '',
     acceptedAt: player?.acceptedAt || player?.accepted_at || '',
+    suspicionCount: Number(player?.suspicionCount ?? player?.suspicion_count ?? 0),
+    antiCheatPenalized: Boolean(player?.antiCheatPenalized ?? player?.anti_cheat_penalized),
     bestRuntimeMs: Number(player?.bestRuntimeMs ?? player?.best_runtime_ms ?? 0),
     isWinner: Boolean(player?.isWinner ?? player?.is_winner),
     joinedAt: player?.joinedAt || player?.joined_at || '',

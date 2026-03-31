@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { AlertTriangle, ArrowLeft, Clock3, Copy, Eye, Pause, Play, ShieldAlert, SkipBack, Square, Swords, TimerReset, Trophy } from 'lucide-react';
+import { AlertTriangle, ArrowLeft, Clock3, Copy, Eye, Pause, Play, ShieldAlert, SkipBack, Square, Swords, TimerReset, Trophy, X } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { ArenaMatch, ArenaPlayer } from '@/entities/CodeRoom/model/types';
@@ -73,6 +73,7 @@ const WIN_REASON_LABELS: Record<string, string> = {
   accepted_time: 'раньше по времени',
   runtime: 'быстрее по runtime',
   timeout: 'победа к концу таймера',
+  anti_cheat: 'нарушение правил',
   none: 'без победителя',
 };
 
@@ -130,6 +131,7 @@ export const ArenaMatchPage: React.FC = () => {
   const [isTimelapsePlaying, setIsTimelapsePlaying] = useState(false);
   const [timelapseIndex, setTimelapseIndex] = useState(0);
   const [antiCheatNotice, setAntiCheatNotice] = useState('');
+  const [antiCheatWasEnabled, setAntiCheatWasEnabled] = useState(false);
   const [showAntiCheatBanner, setShowAntiCheatBanner] = useState(false);
 
   const hasJoinedRef = useRef(false);
@@ -138,6 +140,7 @@ export const ArenaMatchPage: React.FC = () => {
   const timelineStartedAtRef = useRef(Date.now());
   const timelineSnapshotsRef = useRef<Array<{ timestamp: number; leftCode: string; rightCode: string }>>([]);
   const finalOpponentCodeRef = useRef('');
+  const antiCheatCooldownsRef = useRef<Map<string, number>>(new Map());
 
   const myUserId = user?.id || getStoredGuestId();
   const myDisplayName = user
@@ -256,6 +259,31 @@ export const ArenaMatchPage: React.FC = () => {
     }
     return WIN_REASON_LABELS[match.winnerReason] || match.winnerReason;
   }, [match?.winnerReason]);
+
+  const myAntiCheatStrikes = me?.suspicionCount ?? 0;
+  const opponentAntiCheatStrikes = opponent?.suspicionCount ?? 0;
+
+  const antiCheatStatusText = useMemo(() => {
+    if (!match) {
+      return '';
+    }
+
+    if (match.status === 'finished') {
+      if (me?.antiCheatPenalized) {
+        return 'Anti-cheat penalty applied';
+      }
+      if (opponent?.antiCheatPenalized) {
+        return 'У соперника anti-cheat penalty';
+      }
+      return '';
+    }
+
+    if (!isSpectator && myAntiCheatStrikes > 0) {
+      return `Anti-cheat: ${Math.min(myAntiCheatStrikes, 2)}/2`;
+    }
+
+    return '';
+  }, [match, me?.antiCheatPenalized, opponent?.antiCheatPenalized, myAntiCheatStrikes, isSpectator]);
 
   const freezeLeft = useMemo(() => {
     if (!me?.freezeUntil) {
@@ -414,6 +442,13 @@ export const ArenaMatchPage: React.FC = () => {
   const displayedLeftCode = showTimelapse ? (displayedTimelineSnapshot?.leftCode || leftCode) : leftCode;
   const displayedRightCode = showTimelapse ? (displayedTimelineSnapshot?.rightCode || rightCode) : rightCode;
 
+  // Track when anti-cheat was enabled once
+  useEffect(() => {
+    if (match?.antiCheatEnabled) {
+      setAntiCheatWasEnabled(true);
+    }
+  }, [match?.antiCheatEnabled]);
+
   // Show banner when match becomes active (show for everyone when anti-cheat is active)
   useEffect(() => {
     if (!isSpectator && match?.status === 'active' && match?.startedAt && match?.antiCheatEnabled) {
@@ -431,25 +466,43 @@ export const ArenaMatchPage: React.FC = () => {
   }, [showAntiCheatBanner, match?.status]);
 
   useEffect(() => {
-    const bothPlayersConnected = Boolean(match?.players && match.players.length >= 2);
-    const antiCheatActive = Boolean(match?.antiCheatEnabled && match?.status === 'active');
+    const bothPlayersConnectedNow = Boolean(match?.players && match.players.length >= 2);
 
-    if (isSpectator || !match || !matchId || !bothPlayersConnected || !antiCheatActive) {
+    if (
+      isSpectator ||
+      !match ||
+      !matchId ||
+      match.status === 'finished' ||
+      !bothPlayersConnectedNow ||
+      !antiCheatWasEnabled
+    ) {
       return;
     }
 
-    const cooldowns = new Map<string, number>();
-
     const report = async (reason: string, message: string) => {
       const now = Date.now();
-      const last = cooldowns.get(reason) || 0;
+      const last = antiCheatCooldownsRef.current.get(reason) || 0;
+
       if (now - last < 5000) {
         return;
       }
-      cooldowns.set(reason, now);
-      setAntiCheatNotice(message);
+
+      antiCheatCooldownsRef.current.set(reason, now);
+
       try {
-        await codeRoomApi.reportArenaSuspicion(matchId, reason, myUserId, user ? undefined : myDisplayName);
+        await codeRoomApi.reportArenaSuspicion(
+          matchId,
+          reason,
+          myUserId,
+          user ? undefined : myDisplayName,
+        );
+
+        const nextStrikes = Math.min(myAntiCheatStrikes + 1, 2);
+        const suffix = nextStrikes >= 2
+          ? ' Матч будет завершён из-за повторного нарушения.'
+          : ` (${nextStrikes}/2)`;
+
+        setAntiCheatNotice(`${message}${suffix}`);
       } catch (e) {
         console.error('Failed to report arena suspicion:', e);
       }
@@ -457,19 +510,19 @@ export const ArenaMatchPage: React.FC = () => {
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
-        void report('tab_hidden', 'Выход из вкладки зафиксирован anti-cheat системой.');
+        void report('tab_hidden', 'Выход из вкладки зафиксирован anti-cheat системой');
       }
     };
 
     const handleBlur = () => {
-      if (document.visibilityState !== 'hidden') {
-        void report('window_blur', 'Переключение окна зафиксировано anti-cheat системой.');
+      if (document.visibilityState === 'visible') {
+        void report('window_blur', 'Переключение окна зафиксировано anti-cheat системой');
       }
     };
 
     const handlePaste = (event: ClipboardEvent) => {
       event.preventDefault();
-      void report('paste_attempt', 'Вставка кода отключена в arena-матче.');
+      void report('paste_attempt', 'Попытка вставки зафиксирована anti-cheat системой');
     };
 
     document.addEventListener('visibilitychange', handleVisibilityChange);
@@ -481,7 +534,7 @@ export const ArenaMatchPage: React.FC = () => {
       window.removeEventListener('blur', handleBlur);
       window.removeEventListener('paste', handlePaste);
     };
-  }, [isSpectator, match, matchId, myDisplayName, myUserId, user]);
+  }, [isSpectator, match, matchId, myDisplayName, myUserId, user, antiCheatWasEnabled, myAntiCheatStrikes]);
 
   const handleCopyLink = async () => {
     if (!matchId) {
@@ -617,10 +670,25 @@ export const ArenaMatchPage: React.FC = () => {
                 {winnerReasonLabel}
               </div>
             )}
-            {!isSpectator && match.startedAt && match.status !== 'finished' && <div className="arena-chip" onClick={() => setShowAntiCheatBanner(true)}>Anti-cheat активен</div>}
-            {match.status === 'finished' && match.isRated === false && (
+            {match.status === 'finished' && me?.antiCheatPenalized && (
               <div className="arena-chip arena-chip--winner-reason">
-                unrated{match.unratedReason ? ` • ${match.unratedReason}` : ''}
+                У тебя anti-cheat penalty
+              </div>
+            )}
+            {match.status === 'finished' && opponent?.antiCheatPenalized && (
+              <div className="arena-chip arena-chip--winner-reason">
+                У соперника anti-cheat penalty
+              </div>
+            )}
+            {antiCheatStatusText && (
+              <div className="arena-chip arena-chip--winner-reason">
+                {antiCheatStatusText}
+              </div>
+            )}
+            {!isSpectator && match.startedAt && match.status !== 'finished' && <div className="arena-chip" onClick={() => setShowAntiCheatBanner(true)}>Anti-cheat активен</div>}
+            {match.status === 'finished' && match.isRated === false && match.unratedReason && match.unratedReason !== 'anti_cheat' && (
+              <div className="arena-chip arena-chip--winner-reason">
+                unrated • {match.unratedReason}
               </div>
             )}
             {isSpectator && <div className="arena-chip arena-chip--spectator"><Eye size={14} /> Режим зрителя</div>}
@@ -666,7 +734,7 @@ export const ArenaMatchPage: React.FC = () => {
         {!isSpectator && showAntiCheatBanner && match.status === 'active' && (
           <div className="arena-anti-cheat-notice arena-anti-cheat-notice--live">
             <ShieldAlert size={16} />
-            <span>Anti-cheat активен: уход со вкладки, переключение окна и paste фиксируются во время матча.</span>
+            <span>Anti-cheat активен: уход со вкладки, переключение окна и paste фиксируются. При 2 нарушениях применяется penalty.</span>
             <AntiCheatCountdown onComplete={() => setShowAntiCheatBanner(false)} />
           </div>
         )}
@@ -711,8 +779,22 @@ export const ArenaMatchPage: React.FC = () => {
         {antiCheatNotice && (
           <div className="arena-anti-cheat-notice">
             <ShieldAlert size={16} />
-            <span>{antiCheatNotice}</span>
-            <AntiCheatCountdown onComplete={() => setAntiCheatNotice('')} />
+            <span>
+              {antiCheatNotice}
+              {match?.status !== 'finished' && myAntiCheatStrikes > 0 ? ` (${Math.min(myAntiCheatStrikes, 2)}/2)` : ''}
+            </span>
+            {match?.status !== 'finished' ? (
+              <AntiCheatCountdown onComplete={() => setAntiCheatNotice('')} />
+            ) : (
+              <button
+                type="button"
+                className="btn-icon"
+                onClick={() => setAntiCheatNotice('')}
+                aria-label="Закрыть уведомление"
+              >
+                <X size={14} />
+              </button>
+            )}
           </div>
         )}
 

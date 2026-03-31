@@ -1281,6 +1281,11 @@ components:
                     format: date-time
                 currentCode:
                     type: string
+                suspicionCount:
+                    type: integer
+                    format: int32
+                antiCheatPenalized:
+                    type: boolean
         arena.v1.CreateMatchRequest:
             type: object
             properties:

@@ -10,14 +10,14 @@
   "panels": [
     {
       "id": 1,
-      "title": "Rooms Created / min",
+      "title": "Total Users",
       "type": "stat",
-      "gridPos": { "h": 5, "w": 4, "x": 0, "y": 0 },
+      "gridPos": { "h": 5, "w": 6, "x": 0, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(business_rooms_created_total[5m])) * 60"
+          "expr": "sum(max_over_time(business_users_total[$__range]))"
         }
       ],
       "fieldConfig": {
@@ -32,14 +32,14 @@
     },
     {
       "id": 2,
-      "title": "Room Joins / min",
+      "title": "Total Podcasts",
       "type": "stat",
-      "gridPos": { "h": 5, "w": 4, "x": 4, "y": 0 },
+      "gridPos": { "h": 5, "w": 6, "x": 6, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(business_rooms_joined_total[5m])) * 60"
+          "expr": "sum(max_over_time(business_podcasts_total[$__range]))"
         }
       ],
       "fieldConfig": {
@@ -54,14 +54,14 @@
     },
     {
       "id": 3,
-      "title": "Matches Started / min",
+      "title": "Total Listens",
       "type": "stat",
-      "gridPos": { "h": 5, "w": 4, "x": 8, "y": 0 },
+      "gridPos": { "h": 5, "w": 6, "x": 12, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(business_matches_started_total[5m])) * 60"
+          "expr": "sum(max_over_time(business_listens_total[$__range]))"
         }
       ],
       "fieldConfig": {
@@ -76,14 +76,14 @@
     },
     {
       "id": 4,
-      "title": "Matches Finished / min",
+      "title": "Listens per Minute",
       "type": "stat",
-      "gridPos": { "h": 5, "w": 4, "x": 12, "y": 0 },
+      "gridPos": { "h": 5, "w": 6, "x": 18, "y": 0 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(business_matches_finished_total[5m])) * 60"
+          "expr": "sum(rate(business_podcast_listen_total[5m])) * 60"
         }
       ],
       "fieldConfig": {
@@ -98,74 +98,67 @@
     },
     {
       "id": 5,
-      "title": "Active Rooms",
-      "type": "stat",
-      "gridPos": { "h": 5, "w": 4, "x": 16, "y": 0 },
+      "title": "New Users",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 0, "y": 5 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(business_active_rooms)"
+          "expr": "sum(rate(business_user_registered_total[5m]))",
+          "legendFormat": "users"
         }
       ],
       "fieldConfig": {
-        "defaults": { "unit": "short" },
+        "defaults": { "unit": "reqps" },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "orientation": "auto",
-        "textMode": "auto"
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "mean", "max"]
+        }
       }
     },
     {
       "id": 6,
-      "title": "Active Matches",
-      "type": "stat",
-      "gridPos": { "h": 5, "w": 4, "x": 20, "y": 0 },
+      "title": "New Podcasts",
+      "type": "timeseries",
+      "gridPos": { "h": 8, "w": 8, "x": 8, "y": 5 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(business_active_matches)"
+          "expr": "sum(rate(business_podcast_created_total[5m]))",
+          "legendFormat": "podcasts"
         }
       ],
       "fieldConfig": {
-        "defaults": { "unit": "short" },
+        "defaults": { "unit": "reqps" },
         "overrides": []
       },
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "orientation": "auto",
-        "textMode": "auto"
+        "legend": {
+          "showLegend": true,
+          "displayMode": "table",
+          "placement": "bottom",
+          "calcs": ["lastNotNull", "mean", "max"]
+        }
       }
     },
     {
       "id": 7,
-      "title": "Rooms Funnel",
+      "title": "Listens Over Time",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 5 },
+      "gridPos": { "h": 8, "w": 8, "x": 16, "y": 5 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(business_rooms_created_total[5m]))",
-          "legendFormat": "rooms created"
-        },
-        {
-          "refId": "B",
-          "expr": "sum(rate(business_rooms_joined_total[5m]))",
-          "legendFormat": "room joins"
-        },
-        {
-          "refId": "C",
-          "expr": "sum(rate(business_matches_started_total[5m]))",
-          "legendFormat": "matches started"
-        },
-        {
-          "refId": "D",
-          "expr": "sum(rate(business_matches_finished_total[5m]))",
-          "legendFormat": "matches finished"
+          "expr": "sum(rate(business_podcast_listen_total[5m]))",
+          "legendFormat": "listens/s"
         }
       ],
       "fieldConfig": {
@@ -183,25 +176,15 @@
     },
     {
       "id": 8,
-      "title": "Submissions Flow",
+      "title": "Top Podcasts by Listens",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 5 },
+      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 13 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(business_submissions_total[5m]))",
-          "legendFormat": "submitted"
-        },
-        {
-          "refId": "B",
-          "expr": "sum(rate(business_submissions_accepted_total[5m]))",
-          "legendFormat": "accepted"
-        },
-        {
-          "refId": "C",
-          "expr": "sum(rate(business_submissions_rejected_total[5m]))",
-          "legendFormat": "rejected"
+          "expr": "topk(10, sum(rate(business_podcast_listen_total[5m])) by (podcast_title))",
+          "legendFormat": "{{podcast_title}}"
         }
       ],
       "fieldConfig": {
@@ -219,82 +202,18 @@
     },
     {
       "id": 9,
-      "title": "Submission Acceptance %",
-      "type": "gauge",
-      "gridPos": { "h": 8, "w": 6, "x": 0, "y": 13 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum(rate(business_submissions_accepted_total[5m])) / clamp_min(sum(rate(business_submissions_total[5m])), 0.0001) * 100"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 40 },
-              { "color": "green", "value": 70 }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      }
-    },
-    {
-      "id": 10,
-      "title": "Match Completion %",
-      "type": "gauge",
-      "gridPos": { "h": 8, "w": 6, "x": 6, "y": 13 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum(rate(business_matches_finished_total[5m])) / clamp_min(sum(rate(business_matches_started_total[5m])), 0.0001) * 100"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": {
-          "unit": "percent",
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 50 },
-              { "color": "green", "value": 80 }
-            ]
-          }
-        },
-        "overrides": []
-      },
-      "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
-        "showThresholdLabels": false,
-        "showThresholdMarkers": true
-      }
-    },
-    {
-      "id": 11,
-      "title": "Avg Players per Room",
+      "title": "Average Listens per Podcast",
       "type": "stat",
       "gridPos": { "h": 8, "w": 6, "x": 12, "y": 13 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(business_rooms_joined_total[5m])) / clamp_min(sum(rate(business_rooms_created_total[5m])), 0.0001)"
+          "expr": "sum(max_over_time(business_listens_total[$__range])) / clamp_min(sum(max_over_time(business_podcasts_total[$__range])), 1)"
         }
       ],
       "fieldConfig": {
-        "defaults": { "unit": "none" },
+        "defaults": { "unit": "short" },
         "overrides": []
       },
       "options": {
@@ -304,82 +223,48 @@
       }
     },
     {
-      "id": 12,
-      "title": "Match Duration p50/p95",
-      "type": "timeseries",
+      "id": 10,
+      "title": "Average Listens per User",
+      "type": "stat",
       "gridPos": { "h": 8, "w": 6, "x": 18, "y": 13 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "histogram_quantile(0.5, sum(rate(business_match_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "p50"
-        },
-        {
-          "refId": "B",
-          "expr": "histogram_quantile(0.95, sum(rate(business_match_duration_seconds_bucket[5m])) by (le))",
-          "legendFormat": "p95"
+          "expr": "sum(max_over_time(business_listens_total[$__range])) / clamp_min(sum(max_over_time(business_users_total[$__range])), 1)"
         }
       ],
       "fieldConfig": {
-        "defaults": { "unit": "s" },
+        "defaults": { "unit": "short" },
         "overrides": []
       },
       "options": {
-        "legend": {
-          "showLegend": true,
-          "displayMode": "table",
-          "placement": "bottom",
-          "calcs": ["lastNotNull", "max"]
-        }
+        "reduceOptions": { "calcs": ["lastNotNull"], "fields": "", "values": false },
+        "orientation": "auto",
+        "textMode": "auto"
       }
     },
     {
-      "id": 13,
-      "title": "Events by Match Type",
+      "id": 11,
+      "title": "Podcast Listen Share",
       "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 0, "y": 21 },
+      "gridPos": { "h": 8, "w": 24, "x": 0, "y": 21 },
       "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
       "targets": [
         {
           "refId": "A",
-          "expr": "sum(rate(business_matches_started_total[5m])) by (match_type)",
-          "legendFormat": "started {{match_type}}"
+          "expr": "topk(10, sum(rate(business_podcast_listen_total[5m])) by (podcast_title)) / clamp_min(sum(rate(business_podcast_listen_total[5m])), 0.0001) * 100",
+          "legendFormat": "{{podcast_title}}"
+        }
+      ],
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "custom": {
+            "stacking": { "mode": "percent", "group": "A" },
+            "fillOpacity": 20
+          }
         },
-        {
-          "refId": "B",
-          "expr": "sum(rate(business_matches_finished_total[5m])) by (match_type)",
-          "legendFormat": "finished {{match_type}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": { "unit": "reqps" },
-        "overrides": []
-      },
-      "options": {
-        "legend": {
-          "showLegend": true,
-          "displayMode": "table",
-          "placement": "bottom",
-          "calcs": ["lastNotNull", "mean", "max"]
-        }
-      }
-    },
-    {
-      "id": 14,
-      "title": "Submissions by Language",
-      "type": "timeseries",
-      "gridPos": { "h": 8, "w": 12, "x": 12, "y": 21 },
-      "datasource": { "type": "prometheus", "uid": "PBFA97CFB590B2093" },
-      "targets": [
-        {
-          "refId": "A",
-          "expr": "sum(rate(business_submissions_total[5m])) by (language)",
-          "legendFormat": "{{language}}"
-        }
-      ],
-      "fieldConfig": {
-        "defaults": { "unit": "reqps" },
         "overrides": []
       },
       "options": {
@@ -392,10 +277,10 @@
       }
     }
   ],
-  "refresh": "5s",
+  "refresh": "10s",
   "schemaVersion": 39,
   "style": "dark",
-  "tags": ["business", "product", "ops"],
+  "tags": ["business", "podcasts", "product"],
   "templating": {
     "list": []
   },
@@ -405,8 +290,8 @@
   },
   "timepicker": {},
   "timezone": "browser",
-  "title": "API Business Metrics",
-  "uid": "api-business-metrics",
+  "title": "Podcast Business Metrics",
+  "uid": "podcast-business-metrics",
   "version": 1,
   "weekStart": ""
 }

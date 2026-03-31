@@ -5,6 +5,7 @@ import (
 
 	codeeditordomain "api/internal/domain/codeeditor"
 	"api/internal/model"
+	"api/internal/server"
 	v1 "api/pkg/api/code_editor/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -25,6 +26,8 @@ func (i *Implementation) CreateRoom(ctx context.Context, req *v1.CreateRoomReque
 		}
 		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
 	}
+
+	server.IncRoomsCreated()
 
 	return &v1.CreateRoomResponse{
 		Room:       mapRoom(room),

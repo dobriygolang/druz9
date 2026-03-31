@@ -110,6 +110,7 @@ const (
 	ArenaWinnerReasonRuntime
 	ArenaWinnerReasonTimeout
 	ArenaWinnerReasonSingleAC
+	ArenaWinnerReasonAntiCheat
 	ArenaWinnerReasonNone
 )
 
@@ -123,6 +124,8 @@ func (r ArenaWinnerReason) String() string {
 		return "timeout"
 	case ArenaWinnerReasonSingleAC:
 		return "single_ac"
+	case ArenaWinnerReasonAntiCheat:
+		return "anti_cheat"
 	case ArenaWinnerReasonNone:
 		return "none"
 	default:
@@ -140,6 +143,8 @@ func ArenaWinnerReasonFromString(s string) ArenaWinnerReason {
 		return ArenaWinnerReasonTimeout
 	case "single_ac":
 		return ArenaWinnerReasonSingleAC
+	case "anti_cheat":
+		return ArenaWinnerReasonAntiCheat
 	case "none":
 		return ArenaWinnerReasonNone
 	default:
@@ -261,19 +266,20 @@ type ArenaMatch struct {
 }
 
 type ArenaPlayer struct {
-	MatchID        uuid.UUID
-	UserID         uuid.UUID
-	DisplayName    string
-	Side           ArenaPlayerSide
-	IsCreator      bool
-	FreezeUntil    *time.Time
-	AcceptedAt     *time.Time
-	BestRuntimeMs  int64
-	IsWinner       bool
-	SuspicionCount int32
-	JoinedAt       time.Time
-	UpdatedAt      time.Time
-	CurrentCode    string
+	MatchID            uuid.UUID
+	UserID             uuid.UUID
+	DisplayName        string
+	Side               ArenaPlayerSide
+	IsCreator          bool
+	FreezeUntil        *time.Time
+	AcceptedAt         *time.Time
+	BestRuntimeMs      int64
+	IsWinner           bool
+	SuspicionCount     int32
+	AntiCheatPenalized bool
+	JoinedAt           time.Time
+	UpdatedAt          time.Time
+	CurrentCode        string
 }
 
 type ArenaSubmission struct {
@@ -331,4 +337,13 @@ type ArenaPlayerStats struct {
 	Matches     int32
 	WinRate     float64
 	BestRuntime int64
+}
+
+type ArenaRatingPenalty struct {
+	ID          uuid.UUID
+	MatchID     uuid.UUID
+	UserID      uuid.UUID
+	Reason      string
+	DeltaRating int32
+	CreatedAt   time.Time
 }

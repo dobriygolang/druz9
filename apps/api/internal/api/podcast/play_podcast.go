@@ -3,6 +3,7 @@ package podcast
 import (
 	"context"
 
+	"api/internal/metrics"
 	v1 "api/pkg/api/podcast/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -19,6 +20,10 @@ func (i *Implementation) PlayPodcast(ctx context.Context, req *v1.PlayPodcastReq
 	if err != nil {
 		return nil, err
 	}
+
+	metrics.IncListens()
+	metrics.IncPodcastListen(item.ID.String(), item.Title)
+
 	return &v1.PlayPodcastResponse{
 		Podcast:   mapPodcast(item),
 		StreamUrl: streamURL,

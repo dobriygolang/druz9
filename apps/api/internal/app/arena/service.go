@@ -4,6 +4,7 @@ import (
 	"context"
 
 	domain "api/internal/domain/arena"
+	"api/internal/realtime/schema"
 	"api/internal/sandbox"
 )
 
@@ -11,9 +12,15 @@ type Sandbox interface {
 	Execute(ctx context.Context, req sandbox.ExecutionRequest) (sandbox.ExecutionResult, error)
 }
 
+// RealtimePublisher interface for publishing match updates via WebSocket.
+type RealtimePublisher interface {
+	PublishMatch(match *schema.ArenaMatch, codes []*schema.ArenaPlayerCode)
+}
+
 type Config struct {
 	Repository       domain.Repository
 	Sandbox          Sandbox
+	Realtime         RealtimePublisher
 	AllowGuestAccess func() bool
 	AntiCheatEnabled func() bool
 }
@@ -21,6 +28,7 @@ type Config struct {
 type Service struct {
 	repo             domain.Repository
 	sandbox          Sandbox
+	realtime         RealtimePublisher
 	allowGuestAccess func() bool
 	antiCheatEnabled func() bool
 }
@@ -37,6 +45,7 @@ func New(c Config) *Service {
 	return &Service{
 		repo:             c.Repository,
 		sandbox:          c.Sandbox,
+		realtime:         c.Realtime,
 		allowGuestAccess: allowGuestAccess,
 		antiCheatEnabled: antiCheatEnabled,
 	}

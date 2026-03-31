@@ -4,6 +4,7 @@ import (
 	"context"
 
 	codeeditordomain "api/internal/domain/codeeditor"
+	"api/internal/server"
 	v1 "api/pkg/api/code_editor/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -30,6 +31,7 @@ func (i *Implementation) JoinRoom(ctx context.Context, req *v1.JoinRoomRequest) 
 	}
 
 	i.realtime.PublishRoomUpdate(mapRealtimeRoom(room))
+	server.IncRoomsJoined()
 
 	return &v1.JoinRoomResponse{
 		Room: mapRoom(room),

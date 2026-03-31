@@ -3,6 +3,7 @@ package code_editor
 import (
 	"context"
 
+	"api/internal/server"
 	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/code_editor/v1"
 
@@ -39,6 +40,13 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 
 	if room, getErr := i.service.GetRoom(ctx, roomID); getErr == nil {
 		i.realtime.PublishRoomUpdate(mapRealtimeRoom(room))
+	}
+
+	server.IncSubmissions("code_editor", "total")
+	if submission.IsCorrect {
+		server.IncSubmissionsAccepted()
+	} else {
+		server.IncSubmissionsRejected()
 	}
 
 	return &v1.SubmitCodeResponse{

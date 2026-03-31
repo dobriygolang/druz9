@@ -151,6 +151,8 @@ export interface ArenaPlayer {
   currentCode?: string;
   freezeUntil?: string;
   acceptedAt?: string;
+  suspicionCount?: number;
+  antiCheatPenalized?: boolean;
   bestRuntimeMs: number;
   isWinner: boolean;
   joinedAt: string;

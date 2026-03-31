@@ -33,7 +33,7 @@ func unmapDifficulty(difficulty v1.Difficulty) model.ArenaDifficulty {
 	case v1.Difficulty_DIFFICULTY_HARD:
 		return model.ArenaDifficultyHard
 	default:
-		return model.ArenaDifficultyEasy
+		return model.ArenaDifficultyUnknown
 	}
 }
 
@@ -47,6 +47,8 @@ func mapWinnerReason(reason model.ArenaWinnerReason) v1.WinnerReason {
 		return v1.WinnerReason_WINNER_REASON_TIMEOUT
 	case model.ArenaWinnerReasonSingleAC:
 		return v1.WinnerReason_WINNER_REASON_SINGLE_AC
+	case model.ArenaWinnerReasonAntiCheat:
+		return v1.WinnerReason_WINNER_REASON_ANTI_CHEAT
 	case model.ArenaWinnerReasonNone:
 		return v1.WinnerReason_WINNER_REASON_NONE
 	default:
@@ -137,13 +139,15 @@ func mapArenaPlayer(player *domain.Player) *v1.ArenaPlayer {
 		return nil
 	}
 	result := &v1.ArenaPlayer{
-		UserId:        player.UserID.String(),
-		DisplayName:   player.DisplayName,
-		Side:          mapPlayerSide(player.Side),
-		IsCreator:     player.IsCreator,
-		BestRuntimeMs: player.BestRuntimeMs,
-		IsWinner:      player.IsWinner,
-		CurrentCode:   player.CurrentCode,
+		UserId:             player.UserID.String(),
+		DisplayName:        player.DisplayName,
+		Side:               mapPlayerSide(player.Side),
+		IsCreator:          player.IsCreator,
+		BestRuntimeMs:      player.BestRuntimeMs,
+		IsWinner:           player.IsWinner,
+		CurrentCode:        player.CurrentCode,
+		SuspicionCount:     player.SuspicionCount,
+		AntiCheatPenalized: player.AntiCheatPenalized,
 	}
 	if player.FreezeUntil != nil && !player.FreezeUntil.IsZero() {
 		result.FreezeUntil = timestamppb.New(*player.FreezeUntil)
@@ -226,16 +230,18 @@ func mapArenaRealtimeMatch(match *domain.Match) *realtime.ArenaMatch {
 			continue
 		}
 		result.Players = append(result.Players, &realtime.ArenaPlayer{
-			UserID:        player.UserID.String(),
-			DisplayName:   player.DisplayName,
-			Side:          player.Side.String(),
-			IsCreator:     player.IsCreator,
-			CurrentCode:   player.CurrentCode,
-			FreezeUntil:   formatArenaTimePtr(player.FreezeUntil),
-			AcceptedAt:    formatArenaTimePtr(player.AcceptedAt),
-			BestRuntimeMs: player.BestRuntimeMs,
-			IsWinner:      player.IsWinner,
-			JoinedAt:      formatArenaTime(player.JoinedAt),
+			UserID:             player.UserID.String(),
+			DisplayName:        player.DisplayName,
+			Side:               player.Side.String(),
+			IsCreator:          player.IsCreator,
+			CurrentCode:        player.CurrentCode,
+			FreezeUntil:        formatArenaTimePtr(player.FreezeUntil),
+			AcceptedAt:         formatArenaTimePtr(player.AcceptedAt),
+			SuspicionCount:     player.SuspicionCount,
+			AntiCheatPenalized: player.AntiCheatPenalized,
+			BestRuntimeMs:      player.BestRuntimeMs,
+			IsWinner:           player.IsWinner,
+			JoinedAt:           formatArenaTime(player.JoinedAt),
 		})
 	}
 

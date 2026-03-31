@@ -50,14 +50,16 @@ type ArenaMatch struct {
 }
 
 type ArenaPlayer struct {
-	UserID        string `json:"userId"`
-	DisplayName   string `json:"displayName"`
-	Side          string `json:"side"`
-	IsCreator     bool   `json:"isCreator"`
-	CurrentCode   string `json:"currentCode,omitempty"`
-	FreezeUntil   string `json:"freezeUntil,omitempty"`
-	AcceptedAt    string `json:"acceptedAt,omitempty"`
-	BestRuntimeMs int64  `json:"bestRuntimeMs,omitempty"`
-	IsWinner      bool   `json:"isWinner"`
-	JoinedAt      string `json:"joinedAt,omitempty"`
+	UserID             string `json:"userId"`
+	DisplayName        string `json:"displayName"`
+	Side               string `json:"side"`
+	IsCreator          bool   `json:"isCreator"`
+	CurrentCode        string `json:"currentCode,omitempty"`
+	FreezeUntil        string `json:"freezeUntil,omitempty"`
+	AcceptedAt         string `json:"acceptedAt,omitempty"`
+	SuspicionCount     int32  `json:"suspicionCount,omitempty"`
+	AntiCheatPenalized bool   `json:"antiCheatPenalized,omitempty"`
+	BestRuntimeMs      int64  `json:"bestRuntimeMs,omitempty"`
+	IsWinner           bool   `json:"isWinner"`
+	JoinedAt           string `json:"joinedAt,omitempty"`
 }

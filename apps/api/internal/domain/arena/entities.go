@@ -17,6 +17,7 @@ const (
 	WinnerReasonRuntime      = model.ArenaWinnerReasonRuntime
 	WinnerReasonTimeout      = model.ArenaWinnerReasonTimeout
 	WinnerReasonSingleAC     = model.ArenaWinnerReasonSingleAC
+	WinnerReasonAntiCheat    = model.ArenaWinnerReasonAntiCheat
 	WinnerReasonNone         = model.ArenaWinnerReasonNone
 
 	ArenaDifficultyEasy   = model.ArenaDifficultyEasy
@@ -42,3 +43,4 @@ type PlayerStats = model.ArenaPlayerStats
 type Task = model.CodeTask
 type TestCase = model.CodeTestCase
 type User = model.User
+type RatingPenalty = model.ArenaRatingPenalty

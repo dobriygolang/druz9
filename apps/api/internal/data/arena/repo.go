@@ -16,6 +16,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgtype"
 )
 
 const leaderboardSelect = `
@@ -143,6 +144,7 @@ func (r *Repo) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, 
 	err := scanMatchWithTask(r.data.DB.QueryRow(ctx, `
 		SELECT
 			m.id, m.creator_user_id, m.task_id, m.topic, m.difficulty, m.source, m.status, m.duration_seconds, m.obfuscate_opponent, m.is_rated, m.unrated_reason,
+			m.anti_cheat_enabled,
 			m.winner_user_id, m.winner_reason, m.started_at, m.finished_at, m.created_at, m.updated_at,
 			`+codetasks.SelectColumnsWithAlias("t")+`
 		FROM arena_matches m
@@ -168,7 +170,7 @@ func (r *Repo) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, 
 	}
 
 	rows, err := r.data.DB.Query(ctx, `
-		SELECT p.match_id, p.user_id, p.display_name, p.side, p.is_creator, p.freeze_until, p.accepted_at, p.best_runtime_ms, p.is_winner, p.suspicion_count, p.joined_at, p.updated_at,
+		SELECT p.match_id, p.user_id, p.display_name, p.side, p.is_creator, p.freeze_until, p.accepted_at, p.best_runtime_ms, p.is_winner, p.suspicion_count, p.anti_cheat_penalized, p.joined_at, p.updated_at,
 		       COALESCE(es.code, '')
 		FROM arena_match_players p
 		LEFT JOIN arena_editor_states es ON es.match_id = p.match_id AND es.user_id = p.user_id
@@ -235,6 +237,7 @@ func (r *Repo) ListMatchesByIDs(ctx context.Context, matchIDs []uuid.UUID) ([]*d
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT
 			m.id, m.creator_user_id, m.task_id, m.topic, m.difficulty, m.source, m.status, m.duration_seconds, m.obfuscate_opponent, m.is_rated, m.unrated_reason,
+			m.anti_cheat_enabled,
 			m.winner_user_id, m.winner_reason, m.started_at, m.finished_at, m.created_at, m.updated_at,
 			`+codetasks.SelectColumnsWithAlias("t")+`
 		FROM arena_matches m
@@ -305,7 +308,9 @@ func (r *Repo) loadPlayersForMatches(ctx context.Context, matches []*domain.Matc
 	}
 
 	rows, err := r.data.DB.Query(ctx, `
-		SELECT p.match_id, p.user_id, p.display_name, p.side, p.is_creator, p.freeze_until, p.accepted_at, p.best_runtime_ms, p.is_winner, p.suspicion_count, p.joined_at, p.updated_at,
+		SELECT p.match_id, p.user_id, p.display_name, p.side, p.is_creator,
+		       p.freeze_until, p.accepted_at, p.best_runtime_ms, p.is_winner,
+		       p.suspicion_count, p.anti_cheat_penalized, p.joined_at, p.updated_at,
 		       COALESCE(es.code, '')
 		FROM arena_match_players p
 		LEFT JOIN arena_editor_states es ON es.match_id = p.match_id AND es.user_id = p.user_id
@@ -752,17 +757,21 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 		}
 
 		updates := make([]ratingUpdate, 0, len(finishers))
-		for _, self := range finishers {
+		for i, self := range finishers {
 			if !self.countStats {
 				continue
 			}
+
 			opponentRating := arenarating.DefaultRating
 			score := 0.5
+
 			if len(finishers) == 2 {
-				other := finishers[0]
-				if self == finishers[0] {
-					other = finishers[1]
+				otherIdx := 0
+				if i == 0 {
+					otherIdx = 1
 				}
+				other := finishers[otherIdx]
+
 				if other.countStats {
 					opponentRating = other.rating
 				}
@@ -778,9 +787,10 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 			nextRating := arenaNextRating(self.rating, opponentRating, score, difficulty.String())
 			wins := 0
 			losses := 0
-			if score == 1 {
+			switch score {
+			case 1:
 				wins = 1
-			} else if score == 0 {
+			case 0:
 				losses = 1
 			}
 
@@ -855,24 +865,110 @@ func (r *Repo) CreateSubmission(ctx context.Context, submission *domain.Submissi
 }
 
 func (r *Repo) ReportPlayerSuspicion(ctx context.Context, matchID, userID uuid.UUID, reason string) error {
-	if _, err := r.data.DB.Exec(ctx, `
+	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return fmt.Errorf("begin report arena suspicion tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	res, err := tx.Exec(ctx, `
 		UPDATE arena_match_players
 		SET suspicion_count = suspicion_count + 1,
 		    last_suspicion_reason = $3,
 		    last_suspicion_at = NOW(),
 		    updated_at = NOW()
 		WHERE match_id = $1 AND user_id = $2
-	`, matchID, userID, reason); err != nil {
+	`, matchID, userID, reason)
+	if err != nil {
 		return fmt.Errorf("report arena suspicion: %w", err)
 	}
-	if _, err := r.data.DB.Exec(ctx, `
-		UPDATE arena_matches
-		SET is_rated = FALSE,
-		    unrated_reason = 'anti_cheat',
+
+	if res.RowsAffected() == 0 {
+		return fmt.Errorf("report arena suspicion: player %s is not in match %s", userID, matchID)
+	}
+
+	// Just update suspicion count, don't mark match unrated here
+	// Service layer will handle 2-strike logic
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit report arena suspicion tx: %w", err)
+	}
+
+	return nil
+}
+
+func (r *Repo) ApplyAntiCheatPenalty(ctx context.Context, matchID, userID uuid.UUID, delta int32, reason string) error {
+	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return fmt.Errorf("begin anti-cheat penalty tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	var alreadyPenalized bool
+	var isRegistered bool
+
+	if err := tx.QueryRow(ctx, `
+		SELECT p.anti_cheat_penalized, (u.id IS NOT NULL) AS is_registered
+		FROM arena_match_players p
+		LEFT JOIN users u ON u.id = p.user_id
+		WHERE p.match_id = $1 AND p.user_id = $2
+		FOR UPDATE
+	`, matchID, userID).Scan(&alreadyPenalized, &isRegistered); err != nil {
+		return fmt.Errorf("load anti-cheat penalty state: %w", err)
+	}
+
+	if alreadyPenalized {
+		if err := tx.Commit(ctx); err != nil {
+			return fmt.Errorf("commit anti-cheat penalty noop: %w", err)
+		}
+		return nil
+	}
+
+	if _, err := tx.Exec(ctx, `
+		UPDATE arena_match_players
+		SET anti_cheat_penalized = TRUE,
 		    updated_at = NOW()
-		WHERE id = $1
-	`, matchID); err != nil {
-		return fmt.Errorf("mark arena match unrated after suspicion: %w", err)
+		WHERE match_id = $1 AND user_id = $2
+	`, matchID, userID); err != nil {
+		return fmt.Errorf("mark anti-cheat penalized: %w", err)
+	}
+
+	if isRegistered {
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO arena_player_stats (user_id, display_name, rating, wins, losses, matches, best_runtime_ms, updated_at)
+			SELECT p.user_id, p.display_name, GREATEST(100, $3), 0, 0, 0, 0, NOW()
+			FROM arena_match_players p
+			WHERE p.match_id = $1 AND p.user_id = $2
+			ON CONFLICT (user_id) DO UPDATE SET
+			  rating = GREATEST(100, arena_player_stats.rating + $3),
+			  updated_at = NOW()
+		`, matchID, userID, delta); err != nil {
+			return fmt.Errorf("apply arena anti-cheat rating penalty: %w", err)
+		}
+
+		if _, err := tx.Exec(ctx, `
+			INSERT INTO arena_rating_penalties (id, match_id, user_id, reason, delta_rating, created_at)
+			VALUES ($1, $2, $3, $4, $5, NOW())
+			ON CONFLICT DO NOTHING
+		`, uuid.New(), matchID, userID, reason, delta); err != nil {
+			return fmt.Errorf("create arena rating penalty history: %w", err)
+		}
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit anti-cheat penalty: %w", err)
+	}
+
+	return nil
+}
+
+func (r *Repo) CreateRatingPenalty(ctx context.Context, penalty *domain.RatingPenalty) error {
+	_, err := r.data.DB.Exec(ctx, `
+		INSERT INTO arena_rating_penalties (id, match_id, user_id, reason, delta_rating, created_at)
+		VALUES ($1, $2, $3, $4, $5, $6)
+		ON CONFLICT DO NOTHING
+	`, penalty.ID, penalty.MatchID, penalty.UserID, penalty.Reason, penalty.DeltaRating, penalty.CreatedAt)
+	if err != nil {
+		return fmt.Errorf("create arena rating penalty: %w", err)
 	}
 	return nil
 }
@@ -903,6 +999,53 @@ func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.Leade
 		entries = append(entries, &copyItem)
 	}
 	return entries, nil
+}
+
+func (r *Repo) GetPlayer(ctx context.Context, matchID, userID uuid.UUID) (*domain.Player, error) {
+	row := r.data.DB.QueryRow(ctx, `
+		SELECT p.match_id, p.user_id, p.display_name, p.side, p.is_creator,
+		       p.freeze_until, p.accepted_at, p.best_runtime_ms, p.is_winner,
+		       p.suspicion_count, p.anti_cheat_penalized, p.joined_at, p.updated_at, p.current_code
+		FROM arena_match_players p
+		WHERE p.match_id = $1 AND p.user_id = $2
+	`, matchID, userID)
+
+	var player domain.Player
+	var freezeUntil, acceptedAt pgtype.Timestamptz
+	var updatedAt, joinedAt pgtype.Timestamptz
+	err := row.Scan(
+		&player.MatchID,
+		&player.UserID,
+		&player.DisplayName,
+		&player.Side,
+		&player.IsCreator,
+		&freezeUntil,
+		&acceptedAt,
+		&player.BestRuntimeMs,
+		&player.IsWinner,
+		&player.SuspicionCount,
+		&player.AntiCheatPenalized,
+		&joinedAt,
+		&updatedAt,
+		&player.CurrentCode,
+	)
+	if err == pgx.ErrNoRows {
+		return nil, nil
+	}
+	if err != nil {
+		return nil, fmt.Errorf("get arena player: %w", err)
+	}
+
+	if freezeUntil.Valid {
+		player.FreezeUntil = &freezeUntil.Time
+	}
+	if acceptedAt.Valid {
+		player.AcceptedAt = &acceptedAt.Time
+	}
+	player.JoinedAt = joinedAt.Time
+	player.UpdatedAt = updatedAt.Time
+
+	return &player, nil
 }
 
 func (r *Repo) GetPlayerStats(ctx context.Context, userID uuid.UUID) (*domain.PlayerStats, error) {
@@ -945,7 +1088,10 @@ func (r *Repo) GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (ma
 			return nil, fmt.Errorf("scan arena player stats batch: %w", err)
 		}
 		item.League = arenaLeague(item.Rating)
-		parsedUserID, _ := uuid.Parse(item.UserID)
+		parsedUserID, err := uuid.Parse(item.UserID)
+		if err != nil {
+			return nil, fmt.Errorf("parse arena player stats user id %q: %w", item.UserID, err)
+		}
 		result[parsedUserID] = &item
 	}
 	return result, nil
@@ -989,6 +1135,7 @@ func scanMatchWithTask(row scanner, match *domain.Match, task *domain.Task, exec
 		&match.ObfuscateOpponent,
 		&match.IsRated,
 		&match.UnratedReason,
+		&match.AntiCheatEnabled,
 		&match.WinnerUserID,
 		&match.WinnerReason,
 		&match.StartedAt,
@@ -1032,6 +1179,7 @@ func scanPlayerWithCode(row scanner, player *domain.Player) error {
 		&player.BestRuntimeMs,
 		&player.IsWinner,
 		&player.SuspicionCount,
+		&player.AntiCheatPenalized,
 		&player.JoinedAt,
 		&player.UpdatedAt,
 		&player.CurrentCode,

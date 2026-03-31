@@ -14,6 +14,7 @@ type Repository interface {
 	GetTask(ctx context.Context, taskID uuid.UUID) (*Task, error)
 	CreateMatch(ctx context.Context, match *Match, creator *Player, starterCode string) (*Match, error)
 	GetMatch(ctx context.Context, matchID uuid.UUID) (*Match, error)
+	GetPlayer(ctx context.Context, matchID, userID uuid.UUID) (*Player, error)
 	ListMatchesByIDs(ctx context.Context, matchIDs []uuid.UUID) ([]*Match, error)
 	ListOpenMatchIDs(ctx context.Context, limit int32) ([]uuid.UUID, error)
 	CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error)
@@ -34,4 +35,6 @@ type Repository interface {
 	GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID]*PlayerStats, error)
 	ReportPlayerSuspicion(ctx context.Context, matchID, userID uuid.UUID, reason string) error
 	SetMatchRatingState(ctx context.Context, matchID uuid.UUID, isRated bool, unratedReason string) error
+	ApplyAntiCheatPenalty(ctx context.Context, matchID, userID uuid.UUID, delta int32, reason string) error
+	CreateRatingPenalty(ctx context.Context, penalty *RatingPenalty) error
 }

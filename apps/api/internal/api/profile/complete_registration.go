@@ -4,6 +4,7 @@ import (
 	"context"
 
 	profileerrors "api/internal/errors/profile"
+	"api/internal/metrics"
 	"api/internal/model"
 	v1 "api/pkg/api/profile/v1"
 
@@ -37,5 +38,8 @@ func (i *Implementation) CompleteRegistration(ctx context.Context, req *v1.Compl
 	}
 
 	i.cookie.SetSessionCookie(ctx, rawToken, expiresAt)
+
+	metrics.IncUserRegistered()
+
 	return mapProfileResponse(response), nil
 }

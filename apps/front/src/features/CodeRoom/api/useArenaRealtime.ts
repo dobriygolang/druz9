@@ -120,22 +120,26 @@ export const useArenaRealtime = ({
             if (message.match) {
               setMatch(message.match);
             }
+
             const players = message.players || [];
-            const self = players.find((item) => item.userId === userId);
-            const opponent = players.find((item) => item.userId !== userId);
             const nextCodes: Record<string, string> = {};
             for (const player of players) {
-              if (!player.userId) {
-                continue;
-              }
+              if (!player.userId) continue;
               nextCodes[player.userId] = player.code || '';
             }
             setPlayerCodes(nextCodes);
-            if (self && self.code && self.code !== latestCodeRef.current) {
-              setSelfCode(self.code);
-              latestCodeRef.current = self.code;
+
+            if (!spectator) {
+              const self = players.find((item) => item.userId === userId);
+              const opponent = players.find((item) => item.userId !== userId);
+
+              if (self && self.code && self.code !== latestCodeRef.current) {
+                setSelfCode(self.code);
+                latestCodeRef.current = self.code;
+              }
+              setOpponentCode(opponent?.code || '');
             }
-            setOpponentCode(opponent?.code || '');
+
             return;
           }
 
@@ -146,10 +150,12 @@ export const useArenaRealtime = ({
             if (message.userId) {
               setPlayerCodes((prev) => ({
                 ...prev,
-                [message.userId as string]: message.code || '',
+                [message.userId]: message.code || '',
               }));
             }
-            setOpponentCode(message.code || '');
+            if (!spectator) {
+              setOpponentCode(message.code || '');
+            }
           }
         } catch (error) {
           console.error('Failed to parse arena realtime message', error);

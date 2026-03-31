@@ -83,6 +83,7 @@ const (
 	WinnerReason_WINNER_REASON_RUNTIME       WinnerReason = 2
 	WinnerReason_WINNER_REASON_TIMEOUT       WinnerReason = 3
 	WinnerReason_WINNER_REASON_SINGLE_AC     WinnerReason = 4
+	WinnerReason_WINNER_REASON_ANTI_CHEAT    WinnerReason = 6
 	WinnerReason_WINNER_REASON_NONE          WinnerReason = 5
 )
 
@@ -94,6 +95,7 @@ var (
 		2: "WINNER_REASON_RUNTIME",
 		3: "WINNER_REASON_TIMEOUT",
 		4: "WINNER_REASON_SINGLE_AC",
+		6: "WINNER_REASON_ANTI_CHEAT",
 		5: "WINNER_REASON_NONE",
 	}
 	WinnerReason_value = map[string]int32{
@@ -102,6 +104,7 @@ var (
 		"WINNER_REASON_RUNTIME":       2,
 		"WINNER_REASON_TIMEOUT":       3,
 		"WINNER_REASON_SINGLE_AC":     4,
+		"WINNER_REASON_ANTI_CHEAT":    6,
 		"WINNER_REASON_NONE":          5,
 	}
 )
@@ -919,19 +922,21 @@ func (x *ArenaMatch) GetAntiCheatEnabled() bool {
 }
 
 type ArenaPlayer struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	DisplayName   string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
-	Side          ArenaPlayerSide        `protobuf:"varint,3,opt,name=side,proto3,enum=arena.v1.ArenaPlayerSide" json:"side,omitempty"`
-	IsCreator     bool                   `protobuf:"varint,4,opt,name=is_creator,json=isCreator,proto3" json:"is_creator,omitempty"`
-	FreezeUntil   *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=freeze_until,json=freezeUntil,proto3" json:"freeze_until,omitempty"`
-	AcceptedAt    *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=accepted_at,json=acceptedAt,proto3" json:"accepted_at,omitempty"`
-	BestRuntimeMs int64                  `protobuf:"varint,7,opt,name=best_runtime_ms,json=bestRuntimeMs,proto3" json:"best_runtime_ms,omitempty"`
-	IsWinner      bool                   `protobuf:"varint,8,opt,name=is_winner,json=isWinner,proto3" json:"is_winner,omitempty"`
-	JoinedAt      *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=joined_at,json=joinedAt,proto3" json:"joined_at,omitempty"`
-	CurrentCode   string                 `protobuf:"bytes,10,opt,name=current_code,json=currentCode,proto3" json:"current_code,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	UserId             string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	DisplayName        string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	Side               ArenaPlayerSide        `protobuf:"varint,3,opt,name=side,proto3,enum=arena.v1.ArenaPlayerSide" json:"side,omitempty"`
+	IsCreator          bool                   `protobuf:"varint,4,opt,name=is_creator,json=isCreator,proto3" json:"is_creator,omitempty"`
+	FreezeUntil        *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=freeze_until,json=freezeUntil,proto3" json:"freeze_until,omitempty"`
+	AcceptedAt         *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=accepted_at,json=acceptedAt,proto3" json:"accepted_at,omitempty"`
+	BestRuntimeMs      int64                  `protobuf:"varint,7,opt,name=best_runtime_ms,json=bestRuntimeMs,proto3" json:"best_runtime_ms,omitempty"`
+	IsWinner           bool                   `protobuf:"varint,8,opt,name=is_winner,json=isWinner,proto3" json:"is_winner,omitempty"`
+	JoinedAt           *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=joined_at,json=joinedAt,proto3" json:"joined_at,omitempty"`
+	CurrentCode        string                 `protobuf:"bytes,10,opt,name=current_code,json=currentCode,proto3" json:"current_code,omitempty"`
+	SuspicionCount     int32                  `protobuf:"varint,11,opt,name=suspicion_count,json=suspicionCount,proto3" json:"suspicion_count,omitempty"`
+	AntiCheatPenalized bool                   `protobuf:"varint,12,opt,name=anti_cheat_penalized,json=antiCheatPenalized,proto3" json:"anti_cheat_penalized,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *ArenaPlayer) Reset() {
@@ -1032,6 +1037,20 @@ func (x *ArenaPlayer) GetCurrentCode() string {
 		return x.CurrentCode
 	}
 	return ""
+}
+
+func (x *ArenaPlayer) GetSuspicionCount() int32 {
+	if x != nil {
+		return x.SuspicionCount
+	}
+	return 0
+}
+
+func (x *ArenaPlayer) GetAntiCheatPenalized() bool {
+	if x != nil {
+		return x.AntiCheatPenalized
+	}
+	return false
 }
 
 type ArenaLeaderboardEntry struct {
@@ -1205,7 +1224,7 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\aplayers\x18\x10 \x03(\v2\x15.arena.v1.ArenaPlayerR\aplayers\x12\x19\n" +
 	"\bis_rated\x18\x11 \x01(\bR\aisRated\x12%\n" +
 	"\x0eunrated_reason\x18\x12 \x01(\tR\runratedReason\x12,\n" +
-	"\x12anti_cheat_enabled\x18\x13 \x01(\bR\x10antiCheatEnabled\"\xb4\x03\n" +
+	"\x12anti_cheat_enabled\x18\x13 \x01(\bR\x10antiCheatEnabled\"\x8f\x04\n" +
 	"\vArenaPlayer\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12-\n" +
@@ -1219,7 +1238,9 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\tis_winner\x18\b \x01(\bR\bisWinner\x127\n" +
 	"\tjoined_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\bjoinedAt\x12!\n" +
 	"\fcurrent_code\x18\n" +
-	" \x01(\tR\vcurrentCode\"\x9e\x02\n" +
+	" \x01(\tR\vcurrentCode\x12'\n" +
+	"\x0fsuspicion_count\x18\v \x01(\x05R\x0esuspicionCount\x120\n" +
+	"\x14anti_cheat_penalized\x18\f \x01(\bR\x12antiCheatPenalized\"\x9e\x02\n" +
 	"\x15ArenaLeaderboardEntry\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x12\n" +
@@ -1235,13 +1256,14 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x16DIFFICULTY_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fDIFFICULTY_EASY\x10\x01\x12\x15\n" +
 	"\x11DIFFICULTY_MEDIUM\x10\x02\x12\x13\n" +
-	"\x0fDIFFICULTY_HARD\x10\x03*\xb9\x01\n" +
+	"\x0fDIFFICULTY_HARD\x10\x03*\xd7\x01\n" +
 	"\fWinnerReason\x12\x1d\n" +
 	"\x19WINNER_REASON_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bWINNER_REASON_ACCEPTED_TIME\x10\x01\x12\x19\n" +
 	"\x15WINNER_REASON_RUNTIME\x10\x02\x12\x19\n" +
 	"\x15WINNER_REASON_TIMEOUT\x10\x03\x12\x1b\n" +
-	"\x17WINNER_REASON_SINGLE_AC\x10\x04\x12\x16\n" +
+	"\x17WINNER_REASON_SINGLE_AC\x10\x04\x12\x1c\n" +
+	"\x18WINNER_REASON_ANTI_CHEAT\x10\x06\x12\x16\n" +
 	"\x12WINNER_REASON_NONE\x10\x05*m\n" +
 	"\x0fArenaPlayerSide\x12!\n" +
 	"\x1dARENA_PLAYER_SIDE_UNSPECIFIED\x10\x00\x12\x1a\n" +

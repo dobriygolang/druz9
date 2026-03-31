@@ -3,6 +3,7 @@ package profile
 import (
 	"context"
 
+	"api/internal/metrics"
 	"api/internal/model"
 	v1 "api/pkg/api/profile/v1"
 )
@@ -19,6 +20,9 @@ func (i *Implementation) RegisterWithPassword(ctx context.Context, req *v1.Regis
 	}
 
 	i.cookie.SetSessionCookie(ctx, rawToken, expiresAt)
+
+	metrics.IncUsers()
+
 	return &v1.RegisterWithPasswordResponse{
 		AccessToken:  rawToken,
 		RefreshToken: "",
