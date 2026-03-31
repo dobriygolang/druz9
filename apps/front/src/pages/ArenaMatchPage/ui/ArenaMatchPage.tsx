@@ -261,7 +261,6 @@ export const ArenaMatchPage: React.FC = () => {
   }, [match?.winnerReason]);
 
   const myAntiCheatStrikes = me?.suspicionCount ?? 0;
-  const opponentAntiCheatStrikes = opponent?.suspicionCount ?? 0;
 
   const antiCheatStatusText = useMemo(() => {
     if (!match) {

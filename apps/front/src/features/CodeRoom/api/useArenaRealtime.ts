@@ -148,9 +148,10 @@ export const useArenaRealtime = ({
               return;
             }
             if (message.userId) {
+              const uid = message.userId;
               setPlayerCodes((prev) => ({
                 ...prev,
-                [message.userId]: message.code || '',
+                [uid]: message.code || '',
               }));
             }
             if (!spectator) {
