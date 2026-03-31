@@ -1337,6 +1337,12 @@ components:
                     format: date-time
                 match:
                     $ref: '#/components/schemas/arena.v1.ArenaMatch'
+                failedTestIndex:
+                    type: integer
+                    format: int32
+                failureKind:
+                    type: integer
+                    format: enum
         code_editor.v1.CreateRoomRequest:
             type: object
             properties:

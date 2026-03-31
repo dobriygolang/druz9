@@ -48,13 +48,15 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 	}
 
 	resp := &v1.SubmitCodeResponse{
-		Output:      submission.Output,
-		Error:       submission.Error,
-		IsCorrect:   submission.IsCorrect,
-		PassedCount: submission.PassedCount,
-		TotalCount:  submission.TotalCount,
-		RuntimeMs:   submission.RuntimeMs,
-		Match:       mapArenaMatch(match),
+		Output:          submission.Output,
+		Error:           submission.Error,
+		IsCorrect:       submission.IsCorrect,
+		PassedCount:     submission.PassedCount,
+		TotalCount:      submission.TotalCount,
+		RuntimeMs:       submission.RuntimeMs,
+		Match:           mapArenaMatch(match),
+		FailedTestIndex: submission.FailedTestIndex,
+		FailureKind:     mapSubmitFailureKind(submission.FailureKind),
 	}
 	if submission.FreezeUntil != nil && !submission.FreezeUntil.IsZero() {
 		resp.FreezeUntil = timestamppb.New(*submission.FreezeUntil)

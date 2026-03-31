@@ -612,12 +612,51 @@ export const codeRoomApi = {
   },
 
   submitArenaCode: async (matchId: string, code: string, actorId?: string, guestName?: string) => {
-    const response = await apiClient.post<{ match?: any; output: string; error?: string; isCorrect: boolean; passedCount: number; totalCount: number; runtimeMs: number; freezeUntil?: string }>(`/api/v1/arena/matches/${matchId}/submit`, { code }, {
+    const response = await apiClient.post<{
+      match?: any;
+      output: string;
+      error?: string;
+      isCorrect: boolean;
+      passedCount: number;
+      totalCount: number;
+      runtimeMs: number;
+      freezeUntil?: string;
+      failedTestIndex?: number;
+      failed_test_index?: number;
+      failureKind?: number | string;
+      failure_kind?: number | string;
+    }>(`/api/v1/arena/matches/${matchId}/submit`, { code }, {
       headers: withGuestArenaHeaders(actorId, guestName),
     });
+
+    const rawFailureKind = response.data.failureKind ?? response.data.failure_kind;
+
+    let failureKind = '';
+    if (
+      rawFailureKind === 1 ||
+      rawFailureKind === 'SUBMIT_FAILURE_KIND_COMPILE_ERROR' ||
+      rawFailureKind === 'compile_error'
+    ) {
+      failureKind = 'compile_error';
+    } else if (
+      rawFailureKind === 2 ||
+      rawFailureKind === 'SUBMIT_FAILURE_KIND_RUNTIME_ERROR' ||
+      rawFailureKind === 'runtime_error'
+    ) {
+      failureKind = 'runtime_error';
+    } else if (
+      rawFailureKind === 3 ||
+      rawFailureKind === 'SUBMIT_FAILURE_KIND_WRONG_ANSWER' ||
+      rawFailureKind === 'wrong_answer'
+    ) {
+      failureKind = 'wrong_answer';
+    }
+
     return {
       ...response.data,
       match: response.data.match ? normalizeArenaMatch(response.data.match) : undefined,
+      failedTestIndex: Number(response.data.failedTestIndex ?? response.data.failed_test_index ?? 0),
+      failureKind,
     };
   },
 

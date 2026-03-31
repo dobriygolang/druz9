@@ -2,9 +2,11 @@ package arena
 
 import (
 	"context"
+	"strings"
 	"time"
 
 	domain "api/internal/domain/arena"
+	"api/internal/model"
 	"api/internal/policy"
 	"api/internal/sandbox"
 
@@ -52,9 +54,11 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 
 	var lastOutput string
 	var lastError string
+	failedTestIndex := int32(0)
+	failureKind := model.ArenaSubmissionFailureKindUnknown
 	startedAt := time.Now()
 	taskSpec := policy.TaskSpecForArenaTask(task)
-	for _, tc := range testCases {
+	for i, tc := range testCases {
 		result, runErr := s.sandbox.Execute(ctx, sandbox.ExecutionRequest{
 			Code:       code,
 			Input:      tc.Input,
@@ -64,6 +68,16 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 		})
 		if runErr != nil {
 			lastError = runErr.Error()
+			failedTestIndex = int32(i + 1)
+
+			lowerErr := strings.ToLower(lastError)
+			if strings.Contains(lowerErr, "compile") {
+				failureKind = model.ArenaSubmissionFailureKindCompileError
+				failedTestIndex = 0
+			} else {
+				failureKind = model.ArenaSubmissionFailureKindRuntimeError
+			}
+
 			break
 		}
 		lastOutput = result.Output
@@ -72,12 +86,16 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 			continue
 		}
 		lastError = "wrong answer"
+		failedTestIndex = int32(i + 1)
+		failureKind = model.ArenaSubmissionFailureKindWrongAnswer
 		break
 	}
 	submission.Output = lastOutput
 	submission.Error = lastError
 	submission.RuntimeMs = time.Since(startedAt).Milliseconds()
 	submission.IsCorrect = submission.TotalCount > 0 && submission.PassedCount == submission.TotalCount
+	submission.FailedTestIndex = failedTestIndex
+	submission.FailureKind = failureKind
 
 	if !submission.IsCorrect {
 		freezeUntil := time.Now().Add(time.Duration(freezePenaltySeconds) * time.Second)

@@ -300,3 +300,16 @@ func formatArenaTimePtr(value *time.Time) string {
 	}
 	return formatArenaTime(*value)
 }
+
+func mapSubmitFailureKind(kind model.ArenaSubmissionFailureKind) v1.SubmitFailureKind {
+	switch kind {
+	case model.ArenaSubmissionFailureKindCompileError:
+		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_COMPILE_ERROR
+	case model.ArenaSubmissionFailureKindRuntimeError:
+		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_RUNTIME_ERROR
+	case model.ArenaSubmissionFailureKindWrongAnswer:
+		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_WRONG_ANSWER
+	default:
+		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_UNSPECIFIED
+	}
+}

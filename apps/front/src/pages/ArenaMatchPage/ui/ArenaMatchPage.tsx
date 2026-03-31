@@ -56,7 +56,8 @@ const AntiCheatCountdown: React.FC<{ onComplete: () => void }> = ({ onComplete }
 };
 
 const ARENA_RULES = [
-  'Первый accepted submit сразу завершает матч и фиксирует победителя.',
+  'Матч завершается, когда оба игрока получили accepted, либо когда истёк таймер.',
+  'Если только один игрок получил accepted к концу таймера, побеждает он.',
   'После wrong answer или runtime error включается freeze на 30 секунд.',
   'Рейтинг начисляется только авторизованным пользователям.',
   'Изменение ELO не фиксированное: максимум +50 или -50, точное число зависит от разницы рейтингов.',
@@ -108,6 +109,43 @@ const buildArenaEditorTemplate = (match: ArenaMatch | null, code: string) => {
   ].join('\n');
 
   return `${commentBlock}\n${baseCode}`.trim();
+};
+
+const buildArenaSubmitError = (result: {
+  passedCount: number;
+  totalCount: number;
+  failedTestIndex?: number;
+  failureKind?: string;
+  freezeUntil?: string;
+  error?: string;
+}) => {
+  const parts: string[] = ['❌ Решение не прошло проверку.'];
+
+  if (result.failureKind === 'compile_error') {
+    parts.push('Ошибка компиляции.');
+  } else if (result.failureKind === 'runtime_error') {
+    parts.push('Runtime error.');
+  } else if (result.failureKind === 'wrong_answer') {
+    parts.push('Wrong answer.');
+  }
+
+  if (result.error && result.failureKind !== 'wrong_answer') {
+    // Обрезаем длинные ошибки
+    const shortError = result.error.length > 200 ? result.error.slice(0, 200) + '...' : result.error;
+    parts.push(shortError);
+  }
+
+  parts.push(`Тесты: ${result.passedCount}/${result.totalCount}.`);
+
+  if (result.failedTestIndex && result.failureKind !== 'compile_error') {
+    parts.push(`Упал на тесте ${result.failedTestIndex}/${result.totalCount}.`);
+  }
+
+  if (result.freezeUntil) {
+    parts.push('Следующая отправка через 30 сек.');
+  }
+
+  return parts.join(' ');
 };
 
 export const ArenaMatchPage: React.FC = () => {
@@ -560,23 +598,33 @@ export const ArenaMatchPage: React.FC = () => {
       } else if (response.isCorrect) {
         lines.push('✅ Решение принято');
       } else {
-        lines.push('❌ Решение не прошло проверку');
+        // Используем детальное сообщение об ошибке
+        if (response.passedCount !== undefined && response.totalCount !== undefined) {
+          setSubmitError(buildArenaSubmitError({
+            passedCount: response.passedCount,
+            totalCount: response.totalCount,
+            failedTestIndex: response.failedTestIndex,
+            failureKind: response.failureKind,
+            freezeUntil: response.freezeUntil,
+            error: response.error,
+          }));
+        } else {
+          lines.push('❌ Решение не прошло проверку');
+        }
       }
 
-      if (typeof response.passedCount === 'number' && typeof response.totalCount === 'number' && response.totalCount > 0) {
-        lines.push(`Тесты: ${response.passedCount}/${response.totalCount}`);
-      }
-
-      if (typeof response.runtimeMs === 'number' && response.runtimeMs > 0) {
+      if (response.isCorrect && typeof response.runtimeMs === 'number' && response.runtimeMs > 0) {
         lines.push(`Runtime: ${response.runtimeMs} ms`);
       }
 
-      if (response.output) {
+      if (response.output && !response.isCorrect) {
         lines.push('');
         lines.push(response.output);
       }
 
-      if (response.freezeUntil) {
+      if (!response.isCorrect && response.freezeUntil) {
+        // freeze info already in submitError
+      } else if (response.freezeUntil && response.isCorrect) {
         const freezeLeftSec = Math.max(
           0,
           Math.ceil((new Date(response.freezeUntil).getTime() - Date.now()) / 1000),

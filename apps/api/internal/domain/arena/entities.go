@@ -20,6 +20,10 @@ const (
 	WinnerReasonAntiCheat    = model.ArenaWinnerReasonAntiCheat
 	WinnerReasonNone         = model.ArenaWinnerReasonNone
 
+	SubmissionFailureKindCompileError = model.ArenaSubmissionFailureKindCompileError
+	SubmissionFailureKindRuntimeError = model.ArenaSubmissionFailureKindRuntimeError
+	SubmissionFailureKindWrongAnswer  = model.ArenaSubmissionFailureKindWrongAnswer
+
 	ArenaDifficultyEasy   = model.ArenaDifficultyEasy
 	ArenaDifficultyMedium = model.ArenaDifficultyMedium
 	ArenaDifficultyHard   = model.ArenaDifficultyHard

@@ -114,6 +114,15 @@ const (
 	ArenaWinnerReasonNone
 )
 
+type ArenaSubmissionFailureKind int
+
+const (
+	ArenaSubmissionFailureKindUnknown ArenaSubmissionFailureKind = iota
+	ArenaSubmissionFailureKindCompileError
+	ArenaSubmissionFailureKindRuntimeError
+	ArenaSubmissionFailureKindWrongAnswer
+)
+
 func (r ArenaWinnerReason) String() string {
 	switch r {
 	case ArenaWinnerReasonAcceptedTime:
@@ -283,18 +292,20 @@ type ArenaPlayer struct {
 }
 
 type ArenaSubmission struct {
-	ID          uuid.UUID
-	MatchID     uuid.UUID
-	UserID      uuid.UUID
-	Code        string
-	Output      string
-	Error       string
-	RuntimeMs   int64
-	IsCorrect   bool
-	PassedCount int32
-	TotalCount  int32
-	SubmittedAt time.Time
-	FreezeUntil *time.Time
+	ID              uuid.UUID
+	MatchID         uuid.UUID
+	UserID          uuid.UUID
+	Code            string
+	Output          string
+	Error           string
+	RuntimeMs       int64
+	IsCorrect       bool
+	PassedCount     int32
+	TotalCount      int32
+	FailedTestIndex int32
+	FailureKind     ArenaSubmissionFailureKind
+	SubmittedAt     time.Time
+	FreezeUntil     *time.Time
 }
 
 type ArenaLeaderboardEntry struct {
