@@ -82,13 +82,6 @@ arena_require_auth:
   type: "bool"
   writable: true
 
-database_url:
-  usage: "Deprecated: use env DATABASE_URL"
-  group: "data"
-  value: ""
-  type: "string"
-  writable: false
-
 data_pool_min_conns:
   usage: "Minimum PostgreSQL pool connections"
   group: "data"
@@ -173,12 +166,6 @@ telegram_auth_max_age:
   type: "duration"
   writable: false
 
-telegram_bot_token:
-  usage: "Deprecated: use env TELEGRAM_BOT_TOKEN"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
 
 telegram_bot_username:
   usage: "Telegram bot username without @; env TELEGRAM_BOT_USERNAME overrides"
@@ -211,14 +198,14 @@ geocoder_language:
 s3_endpoint:
   usage: "S3 endpoint"
   group: "external"
-  value: ""
+  value: "http://minio:9000"
   type: "string"
   writable: false
 
 s3_public_endpoint:
   usage: "Public S3 endpoint for signed URLs"
   group: "external"
-  value: ""
+  value: "https://druz9.duckdns.org"
   type: "string"
   writable: false
 
@@ -229,19 +216,6 @@ s3_bucket:
   type: "string"
   writable: false
 
-s3_access_key:
-  usage: "Deprecated: use env S3_ACCESS_KEY"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
-
-s3_secret_key:
-  usage: "Deprecated: use env S3_SECRET_KEY"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
 
 dev_auth_bypass:
   usage: "Allow local auth bypass"

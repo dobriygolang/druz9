@@ -44,7 +44,7 @@ export const CodeRoomPage: React.FC = () => {
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [editorWidth, setEditorWidth] = useState(50);
   const [editorInstance, setEditorInstance] = useState<any | null>(null);
-  const [activeRightTab, setActiveRightTab] = useState<'output' | 'description'>('output');
+  const [activeRightTab, setActiveRightTab] = useState<'output' | 'history' | 'description'>('output');
   const [showTimelapse, setShowTimelapse] = useState(false);
   const [isTimelapsePlaying, setIsTimelapsePlaying] = useState(false);
   const [timelapseIndex, setTimelapseIndex] = useState(0);
@@ -167,19 +167,31 @@ export const CodeRoomPage: React.FC = () => {
       setError('');
     }
 
-    // Добавляем в историю
-    const newSubmission: Submission = {
-      id: Date.now().toString(),
-      code: codeRef.current,
-      output: sub.output,
-      error: sub.error,
-      exitCode: sub.exitCode,
-      executionTimeMs: 0,
-      submittedBy: sub.submittedBy,
-      submittedByName: 'Участник',
-      submittedAt: new Date().toISOString(),
-    };
-    setSubmissions((prev) => [...prev, newSubmission]);
+    // Проверяем на дубликаты по output за последние 2 секунды
+    const now = Date.now();
+    setSubmissions((prev) => {
+      const recentDuplicate = prev.find((s) => {
+        const timeDiff = now - new Date(s.submittedAt).getTime();
+        return timeDiff < 2000 && s.output === sub.output;
+      });
+      if (recentDuplicate) {
+        return prev;
+      }
+
+      // Добавляем в историю с уникальным ID
+      const newSubmission: Submission = {
+        id: `${now}-${Math.random().toString(36).slice(2, 9)}`,
+        code: codeRef.current,
+        output: sub.output,
+        error: sub.error,
+        exitCode: sub.exitCode,
+        executionTimeMs: 0,
+        submittedBy: sub.submittedBy,
+        submittedByName: 'Участник',
+        submittedAt: new Date().toISOString(),
+      };
+      return [...prev, newSubmission];
+    });
   }, []);
 
   // Загрузка начального состояния комнаты
@@ -412,12 +424,12 @@ export const CodeRoomPage: React.FC = () => {
         continue;
       }
       const key = participant.id || participant.userId || `${participant.displayName}:${participant.joinedAt}`;
+      // Check if this participant is the room creator
+      const isCreator = participant.role === 'creator'
+        || (participant.userId && room?.creatorId && participant.userId === room.creatorId);
       const nextParticipant = {
         ...participant,
-        role: participant.role === 'creator'
-          || (participant.userId && room?.creatorId && participant.userId === room.creatorId)
-          ? 'creator'
-          : participant.role,
+        role: isCreator ? 'creator' : 'member',
       } as Participant;
       if (!seen.has(key)) {
         seen.set(key, nextParticipant);
@@ -813,6 +825,13 @@ export const CodeRoomPage: React.FC = () => {
                   </button>
                   <button
                     type="button"
+                    className={`panel-tab ${activeRightTab === 'history' ? 'active' : ''}`}
+                    onClick={() => setActiveRightTab('history')}
+                  >
+                    История {submissions.length > 0 && `(${submissions.length})`}
+                  </button>
+                  <button
+                    type="button"
                     className={`panel-tab ${activeRightTab === 'description' ? 'active' : ''}`}
                     onClick={() => setActiveRightTab('description')}
                   >
@@ -826,6 +845,30 @@ export const CodeRoomPage: React.FC = () => {
                   <pre className={`output-content ${error ? 'error' : ''}`}>
                     {output || 'Нажмите "Запустить" для выполнения кода'}
                   </pre>
+                ) : activeRightTab === 'history' ? (
+                  <div className="submissions-list">
+                    {submissions.length === 0 ? (
+                      <div className="empty-history">История пуста</div>
+                    ) : (
+                      submissions.slice().reverse().map((sub) => (
+                        <div key={sub.id} className="submission-item">
+                          <div className="submission-header">
+                            <span className="submission-user">{sub.submittedByName}</span>
+                            <span className="submission-time">
+                              <Clock size={12} />
+                              {new Date(sub.submittedAt).toLocaleTimeString('ru')}
+                            </span>
+                            {sub.exitCode === 0 ? (
+                              <CheckCircle size={14} className="icon-success" />
+                            ) : (
+                              <XCircle size={14} className="icon-error" />
+                            )}
+                          </div>
+                          <pre className="submission-output">{sub.error || sub.output}</pre>
+                        </div>
+                      ))
+                    )}
+                  </div>
                 ) : (
                   <div className="task-description-panel">
                     <div className="task-description-panel__label">
@@ -840,33 +883,6 @@ export const CodeRoomPage: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {submissions.length > 0 && (
-          <div className="submissions-panel">
-            <div className="panel-header">
-              <span>История ({submissions.length})</span>
-            </div>
-            <div className="submissions-list">
-              {submissions.slice().reverse().map((sub) => (
-                <div key={sub.id} className="submission-item">
-                  <div className="submission-header">
-                    <span className="submission-user">{sub.submittedByName}</span>
-                    <span className="submission-time">
-                      <Clock size={12} />
-                      {new Date(sub.submittedAt).toLocaleTimeString('ru')}
-                    </span>
-                    {sub.exitCode === 0 ? (
-                      <CheckCircle size={14} className="icon-success" />
-                    ) : (
-                      <XCircle size={14} className="icon-error" />
-                    )}
-                  </div>
-                  <pre className="submission-output">{sub.error || sub.output}</pre>
-                </div>
-              ))}
-            </div>
-          </div>
-        )}
 
         {error && (
           <div className="error-banner">

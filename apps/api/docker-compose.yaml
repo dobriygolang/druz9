@@ -126,6 +126,7 @@ services:
     command: ["/app/bin/seed", "-only", "all"]                                                                                                
     networks:
       - api_network
+
   # backend intentionally omitted from local compose;
   # run it separately via `make run`.
   #

@@ -443,8 +443,14 @@
 }
 
 .submissions-list {
-  max-height: 200px;
+  max-height: 100%;
   overflow-y: auto;
+}
+
+.empty-history {
+  padding: 20px;
+  text-align: center;
+  color: var(--text-muted);
 }
 
 .submission-item {

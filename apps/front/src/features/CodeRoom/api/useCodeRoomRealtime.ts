@@ -402,7 +402,7 @@ export const useCodeRoomRealtime = ({
         name: userName || 'Гость',
         ...colorFor(awarenessColorSeed),
       },
-      active: !document.hidden,
+      active: true,
     };
 
     if (!styleElementRef.current) {
@@ -436,7 +436,7 @@ export const useCodeRoomRealtime = ({
           awarenessId,
           userId: participantId,
         });
-        publishLocalAwareness({ active: !document.hidden });
+        publishLocalAwareness({ active: true });
         keepAliveTimerRef.current = window.setInterval(() => {
           send({ type: 'ping', clientId });
         }, keepAliveIntervalMs);
@@ -588,7 +588,7 @@ export const useCodeRoomRealtime = ({
         color: nextColor.color,
         colorLight: nextColor.colorLight,
       },
-      active: !document.hidden,
+      active: true,
     });
   }, [awarenessColorSeed, clientId, participantId, userName]);
 
@@ -611,7 +611,7 @@ export const useCodeRoomRealtime = ({
     const publishEditorSelection = () => {
       const selection = getSelectionOffsets(editor);
       publishLocalAwareness({
-        active: !document.hidden,
+        active: true,
         selection: selection || undefined,
       });
     };
@@ -637,16 +637,15 @@ export const useCodeRoomRealtime = ({
     publishEditorSelection();
 
     const handleVisibilityChange = () => {
-      // Creator doesn't broadcast that they left the page
-      const isCreator = participantId && creatorIdRef.current && participantId === creatorIdRef.current;
-      if (isCreator && document.hidden) {
-        return;
+      // Don't change active status when switching tabs - keep cursor visible
+      // Only update selection when page becomes visible again
+      if (!document.hidden) {
+        publishLocalAwareness({ active: true });
       }
-      publishLocalAwareness({ active: !document.hidden });
     };
 
     const handlePageLeave = () => {
-      // Creator doesn't broadcast that they left the page
+      // Only mark as inactive when actually closing the page
       const isCreator = participantId && creatorIdRef.current && participantId === creatorIdRef.current;
       if (isCreator) {
         return;
