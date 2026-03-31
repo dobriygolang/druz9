@@ -112,6 +112,20 @@ services:
     networks:
       - api_network
 
+  seed:                                                                                                                                       
+    build:                                        
+      context: .                                                                                                                              
+      dockerfile: Dockerfile                                                             
+    restart: "no"                                                                                                                             
+    depends_on:                                                                          
+      postgres:                                                                                                                               
+        condition: service_healthy                                                                                                            
+    environment:
+      CONFIG_PROFILE: local
+      DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-api}
+    command: ["/app/bin/seed", "-only", "all"]                                                                                                
+    networks:
+      - api_network
   # backend intentionally omitted from local compose;
   # run it separately via `make run`.
   #

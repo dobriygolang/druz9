@@ -5,17 +5,25 @@ import (
 	"time"
 
 	appcodeeditor "api/internal/app/codeeditor"
+	"api/internal/rtc"
 
 	klog "github.com/go-kratos/kratos/v2/log"
 )
 
-const (
-	codeRoomCleanupInterval = 15 * time.Minute
-	codeRoomIdleTTL         = 60 * time.Minute
-)
-
-func startCodeRoomCleanupWorker(logger klog.Logger, service *appcodeeditor.Service) func() error {
+func startCodeRoomCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, service *appcodeeditor.Service) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
+
+	// Get initial values
+	codeRoomIdleTTL := rtcManager.GetValue(ctx, rtc.CodeRoomIdleTtl).Duration()
+	codeRoomCleanupInterval := rtcManager.GetValue(ctx, rtc.CodeRoomCleanupInterval).Duration()
+
+	// Set defaults if not configured
+	if codeRoomIdleTTL <= 0 {
+		codeRoomIdleTTL = 60 * time.Minute
+	}
+	if codeRoomCleanupInterval <= 0 {
+		codeRoomCleanupInterval = 15 * time.Minute
+	}
 
 	runCleanup := func() {
 		cleanupCtx, cleanupCancel := context.WithTimeout(ctx, 30*time.Second)
@@ -31,6 +39,16 @@ func startCodeRoomCleanupWorker(logger klog.Logger, service *appcodeeditor.Servi
 		}
 	}
 
+	// Subscribe to config changes
+	_ = rtcManager.WatchValue(ctx, rtc.CodeRoomIdleTtl, func(oldVar, newVar rtc.Variable) {
+		codeRoomIdleTTL = newVar.Value().Duration()
+		klog.Infof("code room idle TTL updated to %v", codeRoomIdleTTL)
+	})
+	_ = rtcManager.WatchValue(ctx, rtc.CodeRoomCleanupInterval, func(oldVar, newVar rtc.Variable) {
+		codeRoomCleanupInterval = newVar.Value().Duration()
+		klog.Infof("code room cleanup interval updated to %v", codeRoomCleanupInterval)
+	})
+
 	go func() {
 		ticker := time.NewTicker(codeRoomCleanupInterval)
 		defer ticker.Stop()
@@ -44,6 +62,9 @@ func startCodeRoomCleanupWorker(logger klog.Logger, service *appcodeeditor.Servi
 			}
 		}
 	}()
+
+	// Run initial cleanup
+	runCleanup()
 
 	return func() error {
 		cancel()

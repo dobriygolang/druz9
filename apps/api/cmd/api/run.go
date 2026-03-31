@@ -183,8 +183,8 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 		},
 	})
 	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
-	closer.AddSync(startCodeRoomCleanupWorker(kratosLogger, codeEditorServiceDomain))
-	closer.AddSync(startArenaCleanupWorker(kratosLogger, arenaServiceDomain))
+	closer.AddSync(startCodeRoomCleanupWorker(kratosLogger, rtcManager, codeEditorServiceDomain))
+	closer.AddSync(startArenaCleanupWorker(kratosLogger, rtcManager, arenaServiceDomain))
 	closer.AddSync(startTelegramBotWorker(profileServiceDomain))
 
 	cookies := server.NewSessionCookieManager(cfg.Auth.Session)

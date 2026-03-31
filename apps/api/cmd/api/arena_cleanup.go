@@ -5,17 +5,25 @@ import (
 	"time"
 
 	apparena "api/internal/app/arena"
+	"api/internal/rtc"
 
 	klog "github.com/go-kratos/kratos/v2/log"
 )
 
-const (
-	arenaCleanupInterval = 5 * time.Minute
-	arenaIdleTTL         = 10 * time.Minute
-)
-
-func startArenaCleanupWorker(logger klog.Logger, service *apparena.Service) func() error {
+func startArenaCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, service *apparena.Service) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
+
+	// Get initial values
+	arenaIdleTTL := rtcManager.GetValue(ctx, rtc.ArenaIdleTtl).Duration()
+	arenaCleanupInterval := rtcManager.GetValue(ctx, rtc.ArenaCleanupInterval).Duration()
+
+	// Set defaults if not configured
+	if arenaIdleTTL <= 0 {
+		arenaIdleTTL = 10 * time.Minute
+	}
+	if arenaCleanupInterval <= 0 {
+		arenaCleanupInterval = 5 * time.Minute
+	}
 
 	runCleanup := func() {
 		cleanupCtx, cleanupCancel := context.WithTimeout(ctx, 30*time.Second)
@@ -31,6 +39,16 @@ func startArenaCleanupWorker(logger klog.Logger, service *apparena.Service) func
 		}
 	}
 
+	// Subscribe to config changes
+	_ = rtcManager.WatchValue(ctx, rtc.ArenaIdleTtl, func(oldVar, newVar rtc.Variable) {
+		arenaIdleTTL = newVar.Value().Duration()
+		klog.Infof("arena idle TTL updated to %v", arenaIdleTTL)
+	})
+	_ = rtcManager.WatchValue(ctx, rtc.ArenaCleanupInterval, func(oldVar, newVar rtc.Variable) {
+		arenaCleanupInterval = newVar.Value().Duration()
+		klog.Infof("arena cleanup interval updated to %v", arenaCleanupInterval)
+	})
+
 	go func() {
 		ticker := time.NewTicker(arenaCleanupInterval)
 		defer ticker.Stop()
@@ -44,6 +62,9 @@ func startArenaCleanupWorker(logger klog.Logger, service *apparena.Service) func
 			}
 		}
 	}()
+
+	// Run initial cleanup
+	runCleanup()
 
 	return func() error {
 		cancel()
