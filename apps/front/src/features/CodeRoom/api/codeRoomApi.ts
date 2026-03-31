@@ -234,6 +234,7 @@ function normalizeTask(task: any): CodeTask {
     taskType: normalizePolicyTaskType(task?.taskType || task?.task_type, executionProfile),
     executionProfile,
     runnerMode: task?.runnerMode || task?.runner_mode || 'program',
+    durationSeconds: Number(task?.durationSeconds ?? task?.duration_seconds ?? 900),
     fixtureFiles: Array.isArray(task?.fixtureFiles || task?.fixture_files) ? (task?.fixtureFiles || task?.fixture_files) : [],
     readablePaths: Array.isArray(task?.readablePaths || task?.readable_paths) ? (task?.readablePaths || task?.readable_paths) : [],
     writablePaths: Array.isArray(task?.writablePaths || task?.writable_paths) ? (task?.writablePaths || task?.writable_paths) : [],

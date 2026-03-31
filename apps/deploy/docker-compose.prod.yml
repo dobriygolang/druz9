@@ -166,6 +166,7 @@ networks:
 volumes:
   postgres_data:
   minio_data:
+  grafana_data:
 
 secrets:
   database_url:
