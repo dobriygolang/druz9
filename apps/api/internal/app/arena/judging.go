@@ -67,14 +67,23 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 			RunnerMode: task.RunnerMode.String(),
 		})
 		if runErr != nil {
-			lastError = runErr.Error()
+			lastError = strings.TrimSpace(runErr.Error())
+			if lastError == "" {
+				lastError = "sandbox execution failed"
+			}
+
 			failedTestIndex = int32(i + 1)
 
 			lowerErr := strings.ToLower(lastError)
-			if strings.Contains(lowerErr, "compile") {
+			switch {
+			case strings.Contains(lowerErr, "undefined: main"),
+				strings.Contains(lowerErr, "syntax error"),
+				strings.Contains(lowerErr, "cannot use"),
+				strings.Contains(lowerErr, "undeclared"),
+				strings.Contains(lowerErr, "compile"):
 				failureKind = model.ArenaSubmissionFailureKindCompileError
 				failedTestIndex = 0
-			} else {
+			default:
 				failureKind = model.ArenaSubmissionFailureKindRuntimeError
 			}
 

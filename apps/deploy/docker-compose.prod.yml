@@ -112,8 +112,7 @@ services:
       GF_USERS_ALLOW_SIGN_UP: "false"
     volumes:
       - ./scripts/grafana/datasources:/etc/grafana/provisioning/datasources:ro
-      - ./scripts/grafana/provisioning/dashboards:/etc/grafana/provisioning/dashboards:ro
-      - ./scripts/grafana/json:/var/lib/grafana/dashboards:ro
+      - ./scripts/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro
       - grafana_data:/var/lib/grafana
     depends_on:
       - prometheus
