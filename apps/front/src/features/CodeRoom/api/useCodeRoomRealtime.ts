@@ -171,6 +171,11 @@ export const useCodeRoomRealtime = ({
   const initialRoomRef = useRef<CodeRoom | null>(normalizedInitialRoom);
   const roomParticipantsRef = useRef<Participant[]>(normalizedInitialRoom?.participants || []);
   const remoteAwarenessStatesRef = useRef<Map<number, AwarenessState>>(new Map());
+
+  // Track current creator for reactive check
+  const creatorIdRef = useRef(creatorId);
+  creatorIdRef.current = creatorId;
+
   const localAwarenessStateRef = useRef<AwarenessState>({
     user: {
       participantId,
@@ -428,6 +433,7 @@ export const useCodeRoomRealtime = ({
           type: 'hello',
           clientId,
           awarenessId,
+          userId: participantId,
         });
         publishLocalAwareness({ active: !document.hidden });
         keepAliveTimerRef.current = window.setInterval(() => {
@@ -629,11 +635,10 @@ export const useCodeRoomRealtime = ({
     selectionSubscriptionRef.current = editor.onDidChangeCursorSelection(publishEditorSelection);
     publishEditorSelection();
 
-    const isCurrentUserCreator = participantId && creatorId && participantId === creatorId;
-
     const handleVisibilityChange = () => {
       // Creator doesn't broadcast that they left the page
-      if (isCurrentUserCreator && document.hidden) {
+      const isCreator = participantId && creatorIdRef.current && participantId === creatorIdRef.current;
+      if (isCreator && document.hidden) {
         return;
       }
       publishLocalAwareness({ active: !document.hidden });
@@ -641,7 +646,8 @@ export const useCodeRoomRealtime = ({
 
     const handlePageLeave = () => {
       // Creator doesn't broadcast that they left the page
-      if (isCurrentUserCreator) {
+      const isCreator = participantId && creatorIdRef.current && participantId === creatorIdRef.current;
+      if (isCreator) {
         return;
       }
       publishLocalAwareness({ active: false });

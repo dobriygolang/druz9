@@ -31,12 +31,14 @@ type codeEditorRoom struct {
 	awarenessByID   map[uint64]schema.CodeEditorMessage
 	dirty           bool
 	initializedFrom bool
+	creatorID       string
 }
 
 type codeEditorClient struct {
 	roomID      string
 	clientID    string
 	awarenessID uint64
+	userID      string
 	ws          *websocket.Conn
 	send        chan schema.CodeEditorMessage
 }
@@ -105,6 +107,7 @@ func (c *codeEditorClient) readLoop(h *CodeEditorHub) {
 		case schema.CodeEditorTypeHello:
 			c.clientID = msg.ClientID
 			c.awarenessID = msg.AwarenessID
+			c.userID = msg.UserID
 			h.sendSnapshot(c)
 			h.sendAwarenessSnapshot(c)
 		case schema.CodeEditorTypeUpdate:
@@ -147,6 +150,7 @@ func (h *CodeEditorHub) addClient(client *codeEditorClient) {
 func (h *CodeEditorHub) removeClient(client *codeEditorClient) {
 	h.mu.Lock()
 	room := h.rooms[client.roomID]
+	isCreator := room != nil && room.creatorID != "" && client.userID == room.creatorID
 	if room != nil {
 		if room.dirty {
 			h.flushSnapshot(client.roomID, room.lastPlainText)
@@ -165,7 +169,8 @@ func (h *CodeEditorHub) removeClient(client *codeEditorClient) {
 	close(client.send)
 	_ = client.ws.Close()
 
-	if client.awarenessID != 0 {
+	// Don't broadcast awareness remove for the room creator
+	if client.awarenessID != 0 && !isCreator {
 		h.broadcast(client.roomID, schema.CodeEditorMessage{
 			Type:         schema.CodeEditorTypeAwarenessRemove,
 			AwarenessIDs: []uint64{client.awarenessID},
@@ -192,6 +197,7 @@ func (h *CodeEditorHub) loadRoomSnapshot(roomID string) {
 		return
 	}
 	state.lastPlainText = room.Code
+	state.creatorID = room.CreatorID.String()
 }
 
 func (h *CodeEditorHub) sendSnapshot(client *codeEditorClient) {

@@ -51,11 +51,13 @@ export const CodeRoomPage: React.FC = () => {
   const [leaveToasts, setLeaveToasts] = useState<LeaveToast[]>([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
   const [needsGuestName, setNeedsGuestName] = useState(false);
+  const [isTimelapseTransitioning, setIsTimelapseTransitioning] = useState(false);
 
   const editorRef = useRef<any>(null);
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
   const codeRef = useRef(code);
   const isResizing = useRef(false);
+  const timelapseButtonRef = useRef<HTMLButtonElement>(null);
   const timelineStartedAtRef = useRef(Date.now());
   const timelineSnapshotsRef = useRef<Array<{ timestamp: number; code: string }>>([]);
   const previousParticipantsRef = useRef<Participant[]>([]);
@@ -426,6 +428,10 @@ export const CodeRoomPage: React.FC = () => {
   }, [displayedParticipants, room?.creatorId]);
 
   const isParticipantInRoom = useCallback((participant: Participant) => {
+    // Room creator is always considered in the room
+    if (participant.role === 'creator') {
+      return true;
+    }
     if (normalizeParticipantIdentity(participant.id) === normalizeParticipantIdentity(currentParticipantId)) {
       return true;
     }
@@ -442,6 +448,20 @@ export const CodeRoomPage: React.FC = () => {
     () => uniqueParticipants.filter((participant) => isParticipantInRoom(participant)).length,
     [isParticipantInRoom, uniqueParticipants],
   );
+
+  const isRoomCreator = useMemo(() => {
+    // Only show notification toggle for authenticated room creator
+    // Both user and room must be loaded (not loading states)
+    if (isRoomLoading) {
+      return false;
+    }
+    const userId = user?.id;
+    const creatorId = room?.creatorId;
+    if (!userId || !creatorId) {
+      return false;
+    }
+    return userId === creatorId;
+  }, [user?.id, room?.creatorId, isRoomLoading]);
 
   useEffect(() => {
     const previous = previousParticipantsRef.current;
@@ -631,17 +651,28 @@ export const CodeRoomPage: React.FC = () => {
                 <span>{isRealtimeConnected ? 'Подключено' : 'Подключение...'}</span>
               </div>
               <div className="arena-chip">Активных {activeParticipantsCount}</div>
+              {isRoomCreator && (
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setNotificationsEnabled((current) => !current)}
+                  title={notificationsEnabled ? 'Отключить уведомления комнаты' : 'Включить уведомления комнаты'}
+                >
+                  {notificationsEnabled ? <Bell size={14} /> : <BellOff size={14} />}
+                  {notificationsEnabled ? 'Уведомления вкл' : 'Уведомления выкл'}
+                </button>
+              )}
               <button
-                className="btn btn-secondary"
-                onClick={() => setNotificationsEnabled((current) => !current)}
-                title={notificationsEnabled ? 'Отключить уведомления комнаты' : 'Включить уведомления комнаты'}
-              >
-                {notificationsEnabled ? <Bell size={14} /> : <BellOff size={14} />}
-                {notificationsEnabled ? 'Уведомления вкл' : 'Уведомления выкл'}
-              </button>
-              <button
+                ref={timelapseButtonRef}
                 className="btn btn-secondary"
                 onClick={() => {
+                  if (timelapseButtonRef.current?.disabled) {
+                    return;
+                  }
+                  timelapseButtonRef.current.disabled = true;
+                  setTimeout(() => {
+                    timelapseButtonRef.current!.disabled = false;
+                  }, 300);
+
                   if (!showTimelapse) {
                     setShowTimelapse(true);
                     setTimelapseIndex(Math.max(0, timelineSnapshots.length - 1));

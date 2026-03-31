@@ -17,6 +17,7 @@ type CodeEditorMessage struct {
 	ClientID     string                     `json:"clientId,omitempty"`
 	AwarenessID  uint64                     `json:"awarenessId,omitempty"`
 	AwarenessIDs []uint64                   `json:"awarenessIds,omitempty"`
+	UserID       string                     `json:"userId,omitempty"`
 	Data         string                     `json:"data,omitempty"`
 	PlainText    string                     `json:"plainText,omitempty"`
 	Room         *CodeEditorRoom            `json:"room,omitempty"`

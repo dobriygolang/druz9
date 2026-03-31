@@ -83,7 +83,19 @@ export const createStyleElement = () => {
 export const dedupeParticipants = (items: Participant[]) => {
   const unique = new Map<string, Participant>();
   for (const item of items) {
-    unique.set(item.id, item);
+    // For guests, use displayName as key to avoid duplicates from WS reconnections
+    const key = item.isGuest && item.displayName
+      ? `guest:${item.displayName.toLowerCase().trim()}`
+      : item.id || item.userId;
+    if (key) {
+      // Only set if not already present (keep first occurrence)
+      if (!unique.has(key)) {
+        unique.set(key, item);
+      }
+    } else {
+      // Fallback to id if available
+      unique.set(item.id, item);
+    }
   }
   return Array.from(unique.values());
 };

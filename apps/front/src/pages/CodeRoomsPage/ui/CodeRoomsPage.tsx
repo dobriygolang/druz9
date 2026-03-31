@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
@@ -6,6 +6,44 @@ import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/feat
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 import { ArenaLeaderboardEntry, ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode } from '@/entities/CodeRoom/model/types';
 import { ArrowRight, Eye, FileCode, Plus, ShieldCheck, Swords, TimerReset, Trophy, Users } from 'lucide-react';
+
+const MOTIVATIONAL_QUOTES = [
+  'Код — это поэзия логики',
+  'Каждый баг — это возможность научиться',
+  'Компилятор не прощает ошибок, но учит дисциплине',
+  'Решение рождается в процессе написания',
+  'Чем сложнее задача, тем интереснее победа',
+  'Твой код изменит мир',
+  'Ошибки — это ступени к мастерству',
+  'Делай сегодня то, что другие не хотят',
+  'Завтра будешь благодарен себе за практику',
+  'Каждая строка кода — это шаг вперёд',
+  'Сложные задачи — просто возможности',
+  'Программист — это творец цифрового мира',
+  'Практика ведёт к совершенству',
+  'Кодь смело — ошибки покажут путь',
+  'Будущее принадлежит тем, кто пишет код',
+  'Решай, чтобы побеждать',
+  'Каждый коммит — это достижение',
+  'Обучение — это инвестиция в себя',
+  'Кто много кодит — тот много умеет',
+  'Сила в практике, сила в коде',
+  'Каждый эксперт когда-то был новичком',
+  'Код пишут люди, а не машины',
+  'Лучший код — это рабочий код',
+  'Отладка учит терпению',
+  'Читай код — пиши код',
+  'Программирование — это искусство',
+  'Сомневаешься — пиши тесты',
+  'Кто не рискует — тот не коммитит',
+  'Баги временны, а код вечен',
+  'Каждая функция должна делать одно дело',
+  'Простота — сложность для гениев',
+  'Рефакторинг — это не признак ошибки',
+  'Успех — это 1% вдохновения и 99% отладки',
+  'Код живёт, пока его поддерживают',
+  'Вдохновение приходит к пишущим',
+];
 
 const DUEL_TOPICS = [
   { value: '', label: 'Любая тема' },
@@ -78,6 +116,12 @@ export const CodeRoomsPage: React.FC = () => {
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [guestNameModalMode, setGuestNameModalMode] = useState<'create' | null>(null);
   const [creating, setCreating] = useState(false);
+
+  // Random motivational quote on each page load
+  const [motivationalQuote] = useState(() => {
+    const index = Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length);
+    return MOTIVATIONAL_QUOTES[index];
+  });
 
   const [newRoomMode, setNewRoomMode] = useState<LaunchMode>(() => {
     const saved = localStorage.getItem('arenaNewRoomMode');
@@ -383,7 +427,7 @@ export const CodeRoomsPage: React.FC = () => {
         <div className="page-header code-rooms-hero">
           <div className="code-rooms-hero__copy">
             <span className="code-rooms-kicker">Duel</span>
-            <h1>Выживает сильнейший</h1>
+            <h1>{motivationalQuote}</h1>
           </div>
           <div className="code-rooms-hero__actions">
             {isAdmin && (
