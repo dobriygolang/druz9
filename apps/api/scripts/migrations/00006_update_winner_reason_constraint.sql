@@ -5,16 +5,7 @@ DROP CONSTRAINT IF EXISTS arena_matches_winner_reason_check;
 
 ALTER TABLE arena_matches
 ADD CONSTRAINT arena_matches_winner_reason_check
-CHECK (
-  winner_reason IN (
-    'accepted_time',
-    'runtime',
-    'timeout',
-    'single_ac',
-    'anti_cheat',
-    'none'
-  )
-);
+CHECK (winner_reason BETWEEN 0 AND 6);
 -- +goose StatementEnd
 
 -- +goose Down
@@ -24,11 +15,5 @@ DROP CONSTRAINT IF EXISTS arena_matches_winner_reason_check;
 
 ALTER TABLE arena_matches
 ADD CONSTRAINT arena_matches_winner_reason_check
-CHECK (
-  winner_reason IN (
-    'accepted_time',
-    'runtime',
-    'timeout'
-  )
-);
+CHECK (winner_reason BETWEEN 0 AND 5);
 -- +goose StatementEnd
