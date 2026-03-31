@@ -121,7 +121,7 @@ jobs:
             server_http_timeout:
               usage: "HTTP server request timeout"
               group: "server"
-              value: "10s"
+              value: "30s"
               type: "duration"
               writable: false
 
@@ -135,7 +135,7 @@ jobs:
             server_grpc_timeout:
               usage: "gRPC server request timeout"
               group: "server"
-              value: "10s"
+              value: "30s"
               type: "duration"
               writable: false
 

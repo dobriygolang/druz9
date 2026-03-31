@@ -31,7 +31,7 @@ server_http_addr:
 server_http_timeout:
   usage: "HTTP server request timeout"
   group: "server"
-  value: "10s"
+  value: "30s"
   type: "duration"
   writable: false
 
@@ -45,7 +45,7 @@ server_grpc_addr:
 server_grpc_timeout:
   usage: "gRPC server request timeout"
   group: "server"
-  value: "10s"
+  value: "30s"
   type: "duration"
   writable: false
 
