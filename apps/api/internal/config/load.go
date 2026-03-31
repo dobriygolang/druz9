@@ -228,10 +228,7 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 	if cfg.Data.Database.Source == "" {
 		return nil, fmt.Errorf("DATABASE_URL is required")
 	}
-	// Telegram token required unless dev auth bypass is enabled
-	if cfg.External.Telegram.BotToken == "" && (cfg.Dev == nil || !cfg.Dev.AuthBypass) {
-		return nil, fmt.Errorf("TELEGRAM_BOT_TOKEN is required")
-	}
+	// Telegram token is optional - bot will not start if empty
 	if cfg.External.S3.Endpoint == "" || cfg.External.S3.Bucket == "" || cfg.External.S3.AccessKey == "" || cfg.External.S3.SecretKey == "" {
 		return nil, fmt.Errorf("S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY and S3_SECRET_KEY are required")
 	}
