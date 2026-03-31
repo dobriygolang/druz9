@@ -13,7 +13,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o bin/seed ./cmd/seed
 # Runtime image
 FROM alpine:3.18
 
-RUN apk add --no-cache bash ca-certificates postgresql-client
+RUN apk add --no-cache bash ca-certificates postgresql-client go
 
 WORKDIR /app
 COPY --from=builder /app/bin/api bin/
