@@ -604,11 +604,6 @@ export const ProfilePage: React.FC = () => {
                     crop={crop}
                     onChange={(_, percentCrop) => setCrop(percentCrop)}
                     onComplete={(c) => setCompletedCrop(c)}
-                    onLoad={(img: HTMLImageElement) => {
-                      imgRef.current = img;
-                      const { width, height } = img;
-                      setCrop(centerAspectCrop(width, height, 1));
-                    }}
                     aspect={1}
                     circularCrop
                   >
@@ -617,6 +612,12 @@ export const ProfilePage: React.FC = () => {
                       src={srcImage}
                       alt="Crop preview"
                       style={{ maxHeight: '300px', maxWidth: '100%' }}
+                      onLoad={(e) => {
+                        const img = e.currentTarget;
+                        imgRef.current = img;
+                        const { width, height } = img;
+                        setCrop(centerAspectCrop(width, height, 1));
+                      }}
                     />
                   </ReactCrop>
                   <p className="crop-hint">
