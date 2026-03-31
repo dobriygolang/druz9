@@ -102,6 +102,7 @@ func (r *Repo) CreateMatch(ctx context.Context, match *domain.Match, creator *do
 	// Batch insert match, player, and editor state in single transaction
 	// Using multi-row INSERT for players and editor states
 	now := time.Now()
+	r.log.Infof("CreateMatch values: status=%v(%d) source=%v(%d) difficulty=%v(%d) winner_reason=%v(%d)", match.Status, match.Status, match.Source, match.Source, match.Difficulty, match.Difficulty, match.WinnerReason, match.WinnerReason)
 	_, err = tx.Exec(ctx, `
 		INSERT INTO arena_matches (id, creator_user_id, task_id, topic, difficulty, source, status, duration_seconds, obfuscate_opponent, is_rated, unrated_reason, winner_reason, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13)

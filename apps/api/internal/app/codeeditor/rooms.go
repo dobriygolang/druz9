@@ -71,7 +71,61 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 }
 
 func (s *Service) GetRoom(ctx context.Context, roomID uuid.UUID) (*domain.Room, error) {
-	return s.repo.GetRoom(ctx, roomID)
+	room, err := s.repo.GetRoom(ctx, roomID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Добавляем гостей из кэша в список участников
+	room.Participants = s.addCachedGuestsToRoom(room.Participants, roomID)
+
+	return room, nil
+}
+
+// addCachedGuestsToRoom добавляет гостей из кэша в список участников
+func (s *Service) addCachedGuestsToRoom(participants []*domain.Participant, roomID uuid.UUID) []*domain.Participant {
+	// Создаем map существующих участников для избежания дубликатов
+	existingGuests := make(map[string]bool)
+	for _, p := range participants {
+		if p.IsGuest && p.Name != "" {
+			existingGuests[strings.ToLower(strings.TrimSpace(p.Name))] = true
+		}
+	}
+
+	// Добавляем гостей из кэша
+	result := make([]*domain.Participant, len(participants))
+	copy(result, participants)
+
+	// Получаем все ключи из кэша и фильтруем по roomID
+	keys := s.guestCache.Keys()
+	for _, key := range keys {
+		guest, ok := s.guestCache.Get(key)
+		if !ok {
+			continue
+		}
+		// Проверяем, относится ли гость к этой комнате
+		if guest.RoomID != roomID {
+			continue
+		}
+		// Проверяем, не добавляли ли мы уже этого гостя
+		guestKey := strings.ToLower(strings.TrimSpace(guest.Name))
+		if existingGuests[guestKey] {
+			continue
+		}
+		// Добавляем гостя из кэша
+		participant := &domain.Participant{
+			UserID:   nil,
+			Name:     guest.Name,
+			IsGuest:  true,
+			IsReady:  guest.IsReady,
+			IsWinner: false,
+			JoinedAt: guest.JoinedAt,
+		}
+		result = append(result, participant)
+		existingGuests[guestKey] = true
+	}
+
+	return result
 }
 
 func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, name string, isGuest bool) (*domain.Room, error) {
@@ -80,6 +134,19 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 		return nil, err
 	}
 
+	// Для гостей проверяем кэш
+	if isGuest {
+		key := guestRoomKey(roomID, name)
+		if cachedGuest, ok := s.guestCache.Get(key); ok {
+			// Гость уже в кэше - обновляем ему время (refresh TTL)
+			cachedGuest.IsReady = false
+			s.guestCache.Set(key, cachedGuest, 0)
+			room.Participants = s.addCachedGuestsToRoom(room.Participants, roomID)
+			return room, nil
+		}
+	}
+
+	// Проверяем существующих участников
 	for _, participant := range room.Participants {
 		if userID != nil && participant.UserID != nil && *participant.UserID == *userID {
 			return room, nil
@@ -93,31 +160,48 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 		return nil, domain.ErrRoomFull
 	}
 
-	participant := &domain.Participant{
-		UserID:   userID,
-		Name:     name,
-		IsGuest:  isGuest,
-		IsReady:  false,
-		IsWinner: false,
-		JoinedAt: now(),
+	nowTime := now()
+
+	if isGuest {
+		// Гости добавляются в кэш, а не в БД
+		guest := GuestParticipant{
+			RoomID:   roomID,
+			Name:     name,
+			IsGuest:  true,
+			IsReady:  false,
+			JoinedAt: nowTime,
+		}
+		s.guestCache.Set(guestRoomKey(roomID, name), guest, 0)
+	} else {
+		// Авторизованные пользователи добавляются в БД
+		participant := &domain.Participant{
+			UserID:   userID,
+			Name:     name,
+			IsGuest:  isGuest,
+			IsReady:  false,
+			IsWinner: false,
+			JoinedAt: nowTime,
+		}
+
+		room, err = s.repo.AddParticipant(ctx, roomID, participant)
+		if err != nil {
+			return nil, err
+		}
 	}
 
-	updatedRoom, err := s.repo.AddParticipant(ctx, roomID, participant)
-	if err != nil {
-		return nil, err
-	}
+	room.Participants = s.addCachedGuestsToRoom(room.Participants, roomID)
 
-	if updatedRoom.Mode == model.RoomModeDuel && len(updatedRoom.Participants) == 2 && updatedRoom.Status == model.RoomStatusWaiting {
+	if room.Mode == model.RoomModeDuel && len(room.Participants) == 2 && room.Status == model.RoomStatusWaiting {
 		startedAt := now()
 		if err := s.repo.StartDuel(ctx, roomID, startedAt); err != nil {
 			return nil, err
 		}
-		updatedRoom.Status = model.RoomStatusActive
-		updatedRoom.StartedAt = &startedAt
-		return updatedRoom, nil
+		room.Status = model.RoomStatusActive
+		room.StartedAt = &startedAt
+		return room, nil
 	}
 
-	return updatedRoom, nil
+	return room, nil
 }
 
 func (s *Service) JoinRoomByInviteCode(ctx context.Context, inviteCode string, userID *uuid.UUID, name string, isGuest bool) (*domain.Room, error) {
@@ -129,6 +213,12 @@ func (s *Service) JoinRoomByInviteCode(ctx context.Context, inviteCode string, u
 }
 
 func (s *Service) LeaveRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string) error {
+	// Если это гость - удаляем из кэша
+	if guestName != "" {
+		s.guestCache.Delete(guestRoomKey(roomID, guestName))
+		return nil
+	}
+	// Для авторизованных пользователей - удаляем из БД
 	return s.repo.RemoveParticipant(ctx, roomID, userID, guestName)
 }
 
@@ -195,6 +285,17 @@ func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid
 }
 
 func (s *Service) SetReady(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, ready bool) error {
+	// Для гостей обновляем кэш
+	if guestName != "" {
+		key := guestRoomKey(roomID, guestName)
+		if guest, ok := s.guestCache.Get(key); ok {
+			guest.IsReady = ready
+			s.guestCache.Set(key, guest, 0)
+			return nil
+		}
+		return nil // Гость не найден в кэше -可能已经离开
+	}
+	// Для авторизованных пользователей - обновляем БД
 	return s.repo.SetParticipantReady(ctx, roomID, userID, guestName, ready)
 }
 

@@ -33,7 +33,7 @@ func unmapDifficulty(difficulty v1.Difficulty) model.ArenaDifficulty {
 	case v1.Difficulty_DIFFICULTY_HARD:
 		return model.ArenaDifficultyHard
 	default:
-		return model.ArenaDifficultyUnknown
+		return model.ArenaDifficultyEasy
 	}
 }
 

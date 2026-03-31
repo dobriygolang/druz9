@@ -7,6 +7,8 @@ import (
 	"api/internal/cache"
 	domain "api/internal/domain/codeeditor"
 	"api/internal/sandbox"
+
+	"github.com/google/uuid"
 )
 
 type Config struct {
@@ -18,16 +20,35 @@ type Sandbox interface {
 	Execute(ctx context.Context, req sandbox.ExecutionRequest) (sandbox.ExecutionResult, error)
 }
 
-type Service struct {
-	repo        domain.Repository
-	sandbox     Sandbox
-	taskCache   *cache.TTLCache[domain.Task]
+// GuestParticipant представляет гостя в комнате, хранимого в кэше
+type GuestParticipant struct {
+	RoomID   uuid.UUID
+	Name     string
+	IsGuest  bool
+	IsReady  bool
+	JoinedAt time.Time
 }
+
+// guestRoomKey генерирует ключ для хранения гостя в кэше
+func guestRoomKey(roomID uuid.UUID, guestName string) string {
+	return roomID.String() + ":" + guestName
+}
+
+type Service struct {
+	repo       domain.Repository
+	sandbox    Sandbox
+	taskCache  *cache.TTLCache[domain.Task]
+	guestCache *cache.TTLCache[GuestParticipant]
+}
+
+const guestTTL = 10 * time.Minute
+const guestCacheMaxEntries = 1000
 
 func New(c Config) *Service {
 	return &Service{
-		repo:        c.Repository,
-		sandbox:     c.Sandbox,
-		taskCache:   cache.NewTTLCache[domain.Task](100, 5*time.Minute),
+		repo:       c.Repository,
+		sandbox:    c.Sandbox,
+		taskCache:  cache.NewTTLCache[domain.Task](100, 5*time.Minute),
+		guestCache: cache.NewTTLCache[GuestParticipant](guestCacheMaxEntries, guestTTL),
 	}
 }

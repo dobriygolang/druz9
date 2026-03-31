@@ -78,7 +78,7 @@ s3_endpoint:
 s3_public_endpoint:
   usage: "Public S3 endpoint for signed URLs"
   group: "external"
-  value: "REPLACE_ME"
+  value: "https://druz9.duckdns.org"
   type: "string"
   writable: false
 

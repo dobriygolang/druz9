@@ -68,3 +68,8 @@ func (c *TTLCache[V]) SetMultiple(values map[string]V, ttl time.Duration) {
 		_ = c.cache.Add(key, value)
 	}
 }
+
+// Keys returns all keys currently in the cache.
+func (c *TTLCache[V]) Keys() []string {
+	return c.cache.Keys()
+}
