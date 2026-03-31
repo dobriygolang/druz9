@@ -53,6 +53,7 @@ type WSMessage = {
   plainText?: string;
   room?: CodeRoom;
   submission?: SubmissionEvent;
+  userId?: string;
 };
 
 const debugCodeRoom = (...args: unknown[]) => {

@@ -57,7 +57,6 @@ export const CodeRoomPage: React.FC = () => {
   const editorContainerRef = useRef<HTMLDivElement | null>(null);
   const codeRef = useRef(code);
   const isResizing = useRef(false);
-  const timelapseButtonRef = useRef<HTMLButtonElement>(null);
   const timelineStartedAtRef = useRef(Date.now());
   const timelineSnapshotsRef = useRef<Array<{ timestamp: number; code: string }>>([]);
   const previousParticipantsRef = useRef<Participant[]>([]);
@@ -428,8 +427,12 @@ export const CodeRoomPage: React.FC = () => {
   }, [displayedParticipants, room?.creatorId]);
 
   const isParticipantInRoom = useCallback((participant: Participant) => {
-    // Room creator is always considered in the room
+    // Room creator is always considered in the room (check both role and creatorId)
     if (participant.role === 'creator') {
+      return true;
+    }
+    // Also check if participant is the creator by userId
+    if (participant.userId && room?.creatorId && participant.userId === room.creatorId) {
       return true;
     }
     if (normalizeParticipantIdentity(participant.id) === normalizeParticipantIdentity(currentParticipantId)) {
@@ -442,7 +445,7 @@ export const CodeRoomPage: React.FC = () => {
       return true;
     }
     return participant.isActive !== false;
-  }, [currentParticipantId, currentUserName, user?.id]);
+  }, [currentParticipantId, currentUserName, user?.id, room?.creatorId]);
 
   const activeParticipantsCount = useMemo(
     () => uniqueParticipants.filter((participant) => isParticipantInRoom(participant)).length,
@@ -662,25 +665,24 @@ export const CodeRoomPage: React.FC = () => {
                 </button>
               )}
               <button
-                ref={timelapseButtonRef}
                 className="btn btn-secondary"
+                disabled={isTimelapseTransitioning}
                 onClick={() => {
-                  if (timelapseButtonRef.current?.disabled) {
+                  if (isTimelapseTransitioning) {
                     return;
                   }
-                  timelapseButtonRef.current.disabled = true;
-                  setTimeout(() => {
-                    timelapseButtonRef.current!.disabled = false;
-                  }, 300);
+                  setIsTimelapseTransitioning(true);
 
                   if (!showTimelapse) {
                     setShowTimelapse(true);
                     setTimelapseIndex(Math.max(0, timelineSnapshots.length - 1));
                     setIsTimelapsePlaying(false);
-                    return;
+                  } else {
+                    setShowTimelapse(false);
+                    setIsTimelapsePlaying(false);
                   }
-                  setShowTimelapse(false);
-                  setIsTimelapsePlaying(false);
+
+                  setTimeout(() => setIsTimelapseTransitioning(false), 300);
                 }}
               >
                 <History size={14} />
