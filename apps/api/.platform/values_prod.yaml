@@ -212,7 +212,7 @@ s3_public_endpoint:
 s3_bucket:
   usage: "S3 bucket name"
   group: "external"
-  value: "REPLACE_ME"
+  value: "druz9-assets"
   type: "string"
   writable: false
 
