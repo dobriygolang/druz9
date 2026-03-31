@@ -1472,7 +1472,8 @@ type Task struct {
 	AllowedPorts     []int32                `protobuf:"varint,20,rep,packed,name=allowed_ports,json=allowedPorts,proto3" json:"allowed_ports,omitempty"`
 	MockEndpoints    []string               `protobuf:"bytes,21,rep,name=mock_endpoints,json=mockEndpoints,proto3" json:"mock_endpoints,omitempty"`
 	WritableTempDir  bool                   `protobuf:"varint,22,opt,name=writable_temp_dir,json=writableTempDir,proto3" json:"writable_temp_dir,omitempty"`
-	RunnerMode       string                 `protobuf:"bytes,23,opt,name=runner_mode,json=runnerMode,proto3" json:"runner_mode,omitempty"` // program or function_io
+	RunnerMode       string                 `protobuf:"bytes,23,opt,name=runner_mode,json=runnerMode,proto3" json:"runner_mode,omitempty"`                 // program or function_io
+	DurationSeconds  int32                  `protobuf:"varint,24,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"` // duration in seconds for arena matches (default 15 minutes)
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -1668,6 +1669,13 @@ func (x *Task) GetRunnerMode() string {
 	return ""
 }
 
+func (x *Task) GetDurationSeconds() int32 {
+	if x != nil {
+		return x.DurationSeconds
+	}
+	return 0
+}
+
 type ListTasksRequest struct {
 	state           protoimpl.MessageState `protogen:"open.v1"`
 	Topic           string                 `protobuf:"bytes,1,opt,name=topic,proto3" json:"topic,omitempty"`
@@ -1794,6 +1802,7 @@ type CreateTaskRequest struct {
 	MockEndpoints    []string               `protobuf:"bytes,18,rep,name=mock_endpoints,json=mockEndpoints,proto3" json:"mock_endpoints,omitempty"`
 	WritableTempDir  bool                   `protobuf:"varint,19,opt,name=writable_temp_dir,json=writableTempDir,proto3" json:"writable_temp_dir,omitempty"`
 	RunnerMode       string                 `protobuf:"bytes,20,opt,name=runner_mode,json=runnerMode,proto3" json:"runner_mode,omitempty"`
+	DurationSeconds  int32                  `protobuf:"varint,21,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"` // duration in seconds for arena matches
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -1968,6 +1977,13 @@ func (x *CreateTaskRequest) GetRunnerMode() string {
 	return ""
 }
 
+func (x *CreateTaskRequest) GetDurationSeconds() int32 {
+	if x != nil {
+		return x.DurationSeconds
+	}
+	return 0
+}
+
 type UpdateTaskRequest struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	TaskId           string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
@@ -1991,6 +2007,7 @@ type UpdateTaskRequest struct {
 	MockEndpoints    []string               `protobuf:"bytes,19,rep,name=mock_endpoints,json=mockEndpoints,proto3" json:"mock_endpoints,omitempty"`
 	WritableTempDir  bool                   `protobuf:"varint,20,opt,name=writable_temp_dir,json=writableTempDir,proto3" json:"writable_temp_dir,omitempty"`
 	RunnerMode       string                 `protobuf:"bytes,21,opt,name=runner_mode,json=runnerMode,proto3" json:"runner_mode,omitempty"`
+	DurationSeconds  int32                  `protobuf:"varint,22,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"` // duration in seconds for arena matches
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -2170,6 +2187,13 @@ func (x *UpdateTaskRequest) GetRunnerMode() string {
 		return x.RunnerMode
 	}
 	return ""
+}
+
+func (x *UpdateTaskRequest) GetDurationSeconds() int32 {
+	if x != nil {
+		return x.DurationSeconds
+	}
+	return 0
 }
 
 type TaskResponse struct {
@@ -2572,7 +2596,7 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x0fexpected_output\x18\x03 \x01(\tR\x0eexpectedOutput\x12\x1b\n" +
 	"\tis_public\x18\x04 \x01(\bR\bisPublic\x12\x16\n" +
 	"\x06weight\x18\x05 \x01(\x05R\x06weight\x12\x14\n" +
-	"\x05order\x18\x06 \x01(\x05R\x05order\"\xd6\a\n" +
+	"\x05order\x18\x06 \x01(\x05R\x05order\"\x81\b\n" +
 	"\x04Task\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x12\n" +
@@ -2602,7 +2626,8 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x0emock_endpoints\x18\x15 \x03(\tR\rmockEndpoints\x12*\n" +
 	"\x11writable_temp_dir\x18\x16 \x01(\bR\x0fwritableTempDir\x12\x1f\n" +
 	"\vrunner_mode\x18\x17 \x01(\tR\n" +
-	"runnerMode\"\x93\x01\n" +
+	"runnerMode\x12)\n" +
+	"\x10duration_seconds\x18\x18 \x01(\x05R\x0fdurationSeconds\"\x93\x01\n" +
 	"\x10ListTasksRequest\x12\x14\n" +
 	"\x05topic\x18\x01 \x01(\tR\x05topic\x12>\n" +
 	"\n" +
@@ -2610,7 +2635,7 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"difficulty\x12)\n" +
 	"\x10include_inactive\x18\x03 \x01(\bR\x0fincludeInactive\"?\n" +
 	"\x11ListTasksResponse\x12*\n" +
-	"\x05tasks\x18\x01 \x03(\v2\x14.code_editor.v1.TaskR\x05tasks\"\xdd\x06\n" +
+	"\x05tasks\x18\x01 \x03(\v2\x14.code_editor.v1.TaskR\x05tasks\"\x88\a\n" +
 	"\x11CreateTaskRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x12\n" +
 	"\x04slug\x18\x02 \x01(\tR\x04slug\x12\x1c\n" +
@@ -2635,7 +2660,8 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x0emock_endpoints\x18\x12 \x03(\tR\rmockEndpoints\x12*\n" +
 	"\x11writable_temp_dir\x18\x13 \x01(\bR\x0fwritableTempDir\x12\x1f\n" +
 	"\vrunner_mode\x18\x14 \x01(\tR\n" +
-	"runnerMode\"\xf6\x06\n" +
+	"runnerMode\x12)\n" +
+	"\x10duration_seconds\x18\x15 \x01(\x05R\x0fdurationSeconds\"\xa1\a\n" +
 	"\x11UpdateTaskRequest\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x12\n" +
@@ -2661,7 +2687,8 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x0emock_endpoints\x18\x13 \x03(\tR\rmockEndpoints\x12*\n" +
 	"\x11writable_temp_dir\x18\x14 \x01(\bR\x0fwritableTempDir\x12\x1f\n" +
 	"\vrunner_mode\x18\x15 \x01(\tR\n" +
-	"runnerMode\"8\n" +
+	"runnerMode\x12)\n" +
+	"\x10duration_seconds\x18\x16 \x01(\x05R\x0fdurationSeconds\"8\n" +
 	"\fTaskResponse\x12(\n" +
 	"\x04task\x18\x01 \x01(\v2\x14.code_editor.v1.TaskR\x04task\",\n" +
 	"\x11DeleteTaskRequest\x12\x17\n" +

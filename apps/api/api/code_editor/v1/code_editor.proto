@@ -235,6 +235,7 @@ message Task {
   repeated string mock_endpoints = 21;
   bool writable_temp_dir = 22;
   string runner_mode = 23;  // program or function_io
+  int32 duration_seconds = 24;  // duration in seconds for arena matches (default 15 minutes)
 }
 
 message ListTasksRequest {
@@ -268,6 +269,7 @@ message CreateTaskRequest {
   repeated string mock_endpoints = 18;
   bool writable_temp_dir = 19;
   string runner_mode = 20;
+  int32 duration_seconds = 21;  // duration in seconds for arena matches
 }
 
 message UpdateTaskRequest {
@@ -292,6 +294,7 @@ message UpdateTaskRequest {
   repeated string mock_endpoints = 19;
   bool writable_temp_dir = 20;
   string runner_mode = 21;
+  int32 duration_seconds = 22;  // duration in seconds for arena matches
 }
 
 message TaskResponse {

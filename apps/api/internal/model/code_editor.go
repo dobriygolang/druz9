@@ -327,6 +327,7 @@ type CodeTask struct {
 	TaskType         TaskType
 	ExecutionProfile ExecutionProfile
 	RunnerMode       RunnerMode
+	DurationSeconds  int32  // Duration in seconds for arena matches (default 15 minutes)
 	FixtureFiles     []string
 	ReadablePaths    []string
 	WritablePaths    []string

@@ -30,6 +30,7 @@ type UseCodeRoomRealtimeParams = {
   initialRoom: CodeRoom | null;
   userName: string;
   participantId: string;
+  creatorId?: string;
   onRoomUpdate?: (room: CodeRoom) => void;
   onSubmission?: (submission: SubmissionEvent) => void;
 };
@@ -138,6 +139,7 @@ export const useCodeRoomRealtime = ({
   initialRoom,
   userName,
   participantId,
+  creatorId,
   onRoomUpdate,
   onSubmission,
 }: UseCodeRoomRealtimeParams) => {
@@ -568,7 +570,7 @@ export const useCodeRoomRealtime = ({
         remoteWidgetsRef.current.clear();
       }
     };
-  }, [awarenessColorSeed, awarenessId, clientId, onRoomUpdate, onSubmission, participantId, roomId, userName]);
+  }, [awarenessColorSeed, awarenessId, clientId, creatorId, onRoomUpdate, onSubmission, participantId, roomId, userName]);
 
   useEffect(() => {
     const nextColor = colorFor(awarenessColorSeed);
@@ -627,11 +629,21 @@ export const useCodeRoomRealtime = ({
     selectionSubscriptionRef.current = editor.onDidChangeCursorSelection(publishEditorSelection);
     publishEditorSelection();
 
+    const isCurrentUserCreator = participantId && creatorId && participantId === creatorId;
+
     const handleVisibilityChange = () => {
+      // Creator doesn't broadcast that they left the page
+      if (isCurrentUserCreator && document.hidden) {
+        return;
+      }
       publishLocalAwareness({ active: !document.hidden });
     };
 
     const handlePageLeave = () => {
+      // Creator doesn't broadcast that they left the page
+      if (isCurrentUserCreator) {
+        return;
+      }
       publishLocalAwareness({ active: false });
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);

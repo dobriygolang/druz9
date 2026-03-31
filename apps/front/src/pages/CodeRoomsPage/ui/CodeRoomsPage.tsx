@@ -369,6 +369,16 @@ export const CodeRoomsPage: React.FC = () => {
 
   return (
     <>
+      {isGuest && (
+        <div className="guest-cta-banner" style={{ marginBottom: '20px' }}>
+          <div className="guest-cta-banner__copy">
+            <span className="guest-cta-banner__kicker">Регистрация</span>
+            <strong>Зарегистрируйся, чтобы сохранить рейтинг и историю матчей</strong>
+            <span>Гости могут играть, но прогресс не сохраняется.</span>
+          </div>
+          <button className="btn btn-primary" onClick={() => navigate('/login')}>Войти / Регистрация</button>
+        </div>
+      )}
       <div className="code-rooms-page">
         <div className="page-header code-rooms-hero">
           <div className="code-rooms-hero__copy">

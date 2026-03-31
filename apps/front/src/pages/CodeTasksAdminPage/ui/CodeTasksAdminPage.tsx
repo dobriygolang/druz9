@@ -198,6 +198,7 @@ type TaskFormState = {
   taskType: string;
   executionProfile: string;
   runnerMode: string;
+  durationSeconds: string;
   fixtureFiles: string;
   readablePaths: string;
   writablePaths: string;
@@ -222,6 +223,7 @@ const createEmptyTaskForm = (): TaskFormState => ({
   taskType: 'algorithm_practice',
   executionProfile: 'pure',
   runnerMode: 'function_io',
+  durationSeconds: '900', // 15 minutes default
   fixtureFiles: '',
   readablePaths: '',
   writablePaths: '',
@@ -253,6 +255,7 @@ const taskToForm = (task: CodeTask): TaskFormState => ({
   taskType: task.taskType || 'algorithm_practice',
   executionProfile: task.executionProfile || 'pure',
   runnerMode: task.runnerMode || 'program',
+  durationSeconds: task.durationSeconds ? String(task.durationSeconds) : '900',
   fixtureFiles: task.fixtureFiles.join(', '),
   readablePaths: task.readablePaths.join(', '),
   writablePaths: task.writablePaths.join(', '),
@@ -276,6 +279,7 @@ const buildTaskPayload = (form: TaskFormState): CreateTaskRequest => ({
   taskType: form.taskType,
   executionProfile: form.executionProfile,
   runnerMode: form.runnerMode,
+  durationSeconds: Number(form.durationSeconds) || 900,
   fixtureFiles: form.fixtureFiles.split(',').map((item) => item.trim()).filter(Boolean),
   readablePaths: form.readablePaths.split(',').map((item) => item.trim()).filter(Boolean),
   writablePaths: form.writablePaths.split(',').map((item) => item.trim()).filter(Boolean),
@@ -663,6 +667,18 @@ export const CodeTasksAdminPage: React.FC = () => {
                     value={taskForm.runnerMode}
                     options={RUNNER_MODE_OPTIONS}
                     onChange={(runnerMode) => setTaskForm((prev) => normalizeRunnerMode({ ...prev, runnerMode }))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Duration (seconds) for arena</label>
+                  <input
+                    className="input"
+                    type="number"
+                    min="60"
+                    max="3600"
+                    value={taskForm.durationSeconds}
+                    onChange={(e) => setTaskForm((prev) => ({ ...prev, durationSeconds: e.target.value }))}
+                    placeholder="900"
                   />
                 </div>
                 <div className="form-group">

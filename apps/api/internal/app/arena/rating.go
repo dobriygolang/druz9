@@ -13,7 +13,7 @@ import (
 )
 
 const (
-	defaultMatchDurationSeconds = int32(600)
+	defaultMatchDurationSeconds = int32(900) // 15 minutes
 	freezePenaltySeconds        = int32(30)
 	defaultRating               = arenarating.DefaultRating
 )

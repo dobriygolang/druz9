@@ -30,6 +30,8 @@ services:
       retries: 10
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5432:5432"
     secrets:
       - postgres_password
     networks:
@@ -43,8 +45,8 @@ services:
       MINIO_ROOT_PASSWORD_FILE: /run/secrets/minio_root_password
     command: ["server", "/data", "--console-address", ":9001"]
     ports:
-      - "127.0.0.1:9000:9000"
-      - "127.0.0.1:9001:9001"
+      - "9000:9000"
+      - "9001:9001"
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
       interval: 30s
@@ -144,6 +146,16 @@ services:
       - postgres_password
       - minio_root_user
       - minio_root_password
+    networks:
+      - app_network
+ 
+  grafana:
+    image: grafana/grafana:latest
+    restart: unless-stopped
+    ports:
+      - "3001:3000"
+    volumes:
+      - grafana_data:/var/lib/grafana
     networks:
       - app_network
 

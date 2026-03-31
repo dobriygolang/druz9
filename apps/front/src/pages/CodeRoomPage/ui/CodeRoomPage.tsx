@@ -288,6 +288,7 @@ export const CodeRoomPage: React.FC = () => {
     initialRoom: room,
     userName: currentUserName,
     participantId: currentParticipantId,
+    creatorId: room?.creatorId,
     onRoomUpdate: handleRoomUpdate,
     onSubmission: handleSubmission,
   });
@@ -343,8 +344,8 @@ export const CodeRoomPage: React.FC = () => {
       if (result.error) {
         setOutput(result.error);
         setError('Ошибка');
-      } else if (result.output) {
-        setOutput(result.output);
+      } else {
+        setOutput(result.output || '(нет вывода)');
       }
       setIsRunning(false);
     } catch (e) {
@@ -513,8 +514,8 @@ export const CodeRoomPage: React.FC = () => {
         return;
       }
 
-      const minEditor = 35;
-      const maxEditor = 65;
+      const minEditor = 10;
+      const maxEditor = 90;
       const container = editorContainerRef.current;
       if (!container) {
         return;

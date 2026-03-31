@@ -1419,6 +1419,9 @@ components:
                     type: boolean
                 runnerMode:
                     type: string
+                durationSeconds:
+                    type: integer
+                    format: int32
         code_editor.v1.DeleteTaskResponse:
             type: object
             properties:
@@ -1670,6 +1673,9 @@ components:
                     type: boolean
                 runnerMode:
                     type: string
+                durationSeconds:
+                    type: integer
+                    format: int32
         code_editor.v1.TaskResponse:
             type: object
             properties:
@@ -1759,6 +1765,9 @@ components:
                     type: boolean
                 runnerMode:
                     type: string
+                durationSeconds:
+                    type: integer
+                    format: int32
         event.v1.CreateEventRequest:
             type: object
             properties:

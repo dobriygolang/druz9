@@ -24,6 +24,11 @@ func (s *Service) CreateMatch(ctx context.Context, creator *domain.User, topic s
 	}
 
 	nowTime := time.Now()
+	// Use task-specific duration, or default (15 minutes) if not set
+	durationSeconds := task.DurationSeconds
+	if durationSeconds <= 0 {
+		durationSeconds = defaultMatchDurationSeconds
+	}
 	match := &domain.Match{
 		ID:                uuid.New(),
 		CreatorUserID:     creator.ID,
@@ -32,7 +37,7 @@ func (s *Service) CreateMatch(ctx context.Context, creator *domain.User, topic s
 		Difficulty:        difficulty,
 		Source:            domain.MatchSourceInvite,
 		Status:            domain.MatchStatusWaiting,
-		DurationSeconds:   defaultMatchDurationSeconds,
+		DurationSeconds:   durationSeconds,
 		ObfuscateOpponent: obfuscateOpponent,
 		IsRated:           true,
 		WinnerReason:      domain.WinnerReasonNone,

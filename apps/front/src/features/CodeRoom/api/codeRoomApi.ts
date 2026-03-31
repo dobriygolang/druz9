@@ -378,6 +378,7 @@ export interface CreateTaskRequest {
   taskType: string;
   executionProfile: string;
   runnerMode: string;
+  durationSeconds: number;
   fixtureFiles: string[];
   readablePaths: string[];
   writablePaths: string[];
@@ -526,6 +527,7 @@ export const codeRoomApi = {
       taskType: toTaskTypeEnum(payload.taskType),
       executionProfile: payload.executionProfile,
       runnerMode: payload.runnerMode,
+      durationSeconds: payload.durationSeconds,
       fixtureFiles: payload.fixtureFiles,
       readablePaths: payload.readablePaths,
       writablePaths: payload.writablePaths,
@@ -553,6 +555,7 @@ export const codeRoomApi = {
       taskType: toTaskTypeEnum(payload.taskType),
       executionProfile: payload.executionProfile,
       runnerMode: payload.runnerMode,
+      durationSeconds: payload.durationSeconds,
       fixtureFiles: payload.fixtureFiles,
       readablePaths: payload.readablePaths,
       writablePaths: payload.writablePaths,

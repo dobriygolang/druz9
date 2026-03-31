@@ -98,6 +98,7 @@ export interface CodeTask {
   taskType: string;
   executionProfile: string;
   runnerMode: string;
+  durationSeconds: number;
   fixtureFiles: string[];
   readablePaths: string[];
   writablePaths: string[];
