@@ -329,11 +329,12 @@ export const ArenaMatchPage: React.FC = () => {
     }
   }, [match, opponent, playerCodes]);
 
-  const outputStateClass = submitError || /wrong answer|runtime error|compile/i.test(`${output} ${submitError}`)
-    ? 'arena-output arena-output--error'
-    : output
-      ? 'arena-output arena-output--filled'
-      : 'arena-output';
+  const outputStateClass =
+    submitError || /wrong answer|runtime error|compile|не прошло проверку|ошибка:/i.test(`${output} ${submitError}`)
+      ? 'arena-output arena-output--error'
+      : output
+        ? 'arena-output arena-output--filled'
+        : 'arena-output';
 
   useEffect(() => {
     if (showTimelapse) {
@@ -499,7 +500,42 @@ export const ArenaMatchPage: React.FC = () => {
     setSubmitError('');
     try {
       const response = await codeRoomApi.submitArenaCode(matchId, leftCode, myUserId, user ? undefined : myDisplayName);
-      setOutput(response.error || response.output || 'Проверка завершена');
+
+      const lines: string[] = [];
+
+      if (response.error) {
+        lines.push(`Ошибка: ${response.error}`);
+      } else if (response.isCorrect) {
+        lines.push('✅ Решение принято');
+      } else {
+        lines.push('❌ Решение не прошло проверку');
+      }
+
+      if (typeof response.passedCount === 'number' && typeof response.totalCount === 'number' && response.totalCount > 0) {
+        lines.push(`Тесты: ${response.passedCount}/${response.totalCount}`);
+      }
+
+      if (typeof response.runtimeMs === 'number' && response.runtimeMs > 0) {
+        lines.push(`Runtime: ${response.runtimeMs} ms`);
+      }
+
+      if (response.output) {
+        lines.push('');
+        lines.push(response.output);
+      }
+
+      if (response.freezeUntil) {
+        const freezeLeftSec = Math.max(
+          0,
+          Math.ceil((new Date(response.freezeUntil).getTime() - Date.now()) / 1000),
+        );
+        if (freezeLeftSec > 0) {
+          lines.push('');
+          lines.push(`Следующая отправка через ${freezeLeftSec} сек.`);
+        }
+      }
+
+      setOutput(lines.join('\n'));
 
       if (response.match) {
         setMatch(response.match);
