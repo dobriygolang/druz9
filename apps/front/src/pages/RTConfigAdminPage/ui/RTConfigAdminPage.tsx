@@ -132,9 +132,9 @@ export const RTConfigAdminPage: React.FC = () => {
                   <div style={{ display: 'flex', alignItems: 'center', gap: '8px', marginBottom: '4px' }}>
                     <code style={{ fontWeight: '600', color: 'var(--accent-color)' }}>{config.key}</code>
                     {config.writable ? (
-                      <Unlock size={14} color="#10B981" title="Можно изменять" />
+                      <span title="Можно изменять"><Unlock size={14} color="#10B981" /></span>
                     ) : (
-                      <Lock size={14} color="#f59e0b" title="Только чтение" />
+                      <span title="Только чтение"><Lock size={14} color="#f59e0b" /></span>
                     )}
                   </div>
                   <div style={{ fontSize: '13px', color: 'var(--text-secondary)', marginBottom: '8px' }}>

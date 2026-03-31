@@ -604,10 +604,9 @@ export const ProfilePage: React.FC = () => {
                     crop={crop}
                     onChange={(_, percentCrop) => setCrop(percentCrop)}
                     onComplete={(c) => setCompletedCrop(c)}
-                    onImageLoaded={(img) => {
+                    onLoad={(img: HTMLImageElement) => {
                       imgRef.current = img;
                       const { width, height } = img;
-                      const minDim = Math.min(width, height);
                       setCrop(centerAspectCrop(width, height, 1));
                     }}
                     aspect={1}

@@ -19,7 +19,7 @@ interface AuthContextType {
   isAuthenticated: boolean;
   login: (token: string, code: string) => Promise<void>;
   loginWithPassword: (email: string, password: string) => Promise<void>;
-  registerWithPassword: (payload: { email: string; password: string; firstName: string; lastName?: string }) => Promise<void>;
+  registerWithPassword: (payload: { login: string; password: string; firstName: string; lastName?: string }) => Promise<void>;
   completeProfile: (payload: CompleteProfilePayload) => Promise<void>;
   updateLocation: (payload: CompleteProfilePayload) => Promise<void>;
   logout: () => Promise<void>;
