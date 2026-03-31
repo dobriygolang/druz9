@@ -23,6 +23,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Validate deploy secrets
         run: |
@@ -30,12 +32,7 @@ jobs:
           test -n "$DEPLOY_USER"
           test -n "$DEPLOY_SSH_KEY"
 
-      - name: Debug workspace
-        run: |
-          pwd
-          ls -la
-          find . -maxdepth 3 -type d | sort
-      - name: Clean app directories on server
+      - name: Sync code on server
         uses: appleboy/ssh-action@v1.2.0
         with:
           host: ${{ env.DEPLOY_HOST }}
@@ -43,22 +40,19 @@ jobs:
           key: ${{ env.DEPLOY_SSH_KEY }}
           port: ${{ env.DEPLOY_SSH_PORT }}
           script: |
-            set -e
+            set -euo pipefail
+
+            if [ ! -d "${{ env.DEPLOY_APP_DIR }}/.git" ]; then
+              echo "Repository not found on server: ${{ env.DEPLOY_APP_DIR }}"
+              echo "Create/clone it once manually, then rerun CD."
+              exit 1
+            fi
+
             cd "${{ env.DEPLOY_APP_DIR }}"
-            rm -rf apps/api apps/front apps/deploy
-            mkdir -p apps
-      - name: Copy project to server
-        uses: appleboy/scp-action@v0.1.7
-        with:
-          host: ${{ env.DEPLOY_HOST }}
-          username: ${{ env.DEPLOY_USER }}
-          key: ${{ env.DEPLOY_SSH_KEY }}
-          port: ${{ env.DEPLOY_SSH_PORT }}
-          source: "apps/api/**,apps/front/**,apps/deploy/**"
-          target: ${{ env.DEPLOY_APP_DIR }}
-          strip_components: 0
-          overwrite: true
-          rm: false
+            git fetch origin
+            git checkout master || git checkout main
+            git reset --hard "${{ github.event.workflow_run.head_sha || github.sha }}"
+            git clean -fd
 
       - name: Deploy on server
         uses: appleboy/ssh-action@v1.2.0
@@ -232,4 +226,19 @@ jobs:
             printf '%s' "${TELEGRAM_BOT_TOKEN}" > apps/deploy/runtime/secrets/prod/telegram_bot_token
 
             chmod 600 apps/deploy/.env.prod apps/deploy/runtime/secrets/prod/*
-            bash apps/deploy/scripts/deploy.sh
+
+            if ! bash apps/deploy/scripts/deploy.sh; then
+              echo "=== docker compose ps ==="
+              docker compose --env-file apps/deploy/.env.prod -f apps/deploy/docker-compose.prod.yml ps -a || true
+
+              echo "=== minio-init logs ==="
+              docker compose --env-file apps/deploy/.env.prod -f apps/deploy/docker-compose.prod.yml logs --tail=200 minio-init || true
+
+              echo "=== seed logs ==="
+              docker compose --env-file apps/deploy/.env.prod -f apps/deploy/docker-compose.prod.yml logs --tail=200 seed || true
+
+              echo "=== backend logs ==="
+              docker compose --env-file apps/deploy/.env.prod -f apps/deploy/docker-compose.prod.yml logs --tail=200 backend || true
+
+              exit 1
+            fi

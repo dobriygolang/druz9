@@ -53,6 +53,10 @@ func (s *Service) Run(ctx context.Context) error {
 
 		updates, err := s.getUpdates(ctx, offset)
 		if err != nil {
+			// Skip logging for context cancellation (normal during shutdown)
+			if ctx.Err() != nil {
+				return nil
+			}
 			klog.Errorf("telegram bot getUpdates error: %v", err)
 			select {
 			case <-ctx.Done():
