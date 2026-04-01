@@ -37,14 +37,6 @@ export interface InterviewPrepQuestion {
   updatedAt: string;
 }
 
-export interface InterviewPrepQuestionResult {
-  id: string;
-  sessionId: string;
-  questionId: string;
-  selfAssessment: InterviewPrepSelfAssessment;
-  answeredAt: string;
-}
-
 export interface InterviewPrepSession {
   id: string;
   userId: string;
@@ -92,14 +84,6 @@ const normalizeQuestion = (question: any): InterviewPrepQuestion => ({
   answer: question.answer ?? '',
   createdAt: question.createdAt ?? question.created_at,
   updatedAt: question.updatedAt ?? question.updated_at,
-});
-
-const normalizeQuestionResult = (result: any): InterviewPrepQuestionResult => ({
-  id: result.id,
-  sessionId: result.sessionId ?? result.session_id,
-  questionId: result.questionId ?? result.question_id,
-  selfAssessment: result.selfAssessment ?? result.self_assessment,
-  answeredAt: result.answeredAt ?? result.answered_at,
 });
 
 const normalizeSession = (session: any): InterviewPrepSession => ({
