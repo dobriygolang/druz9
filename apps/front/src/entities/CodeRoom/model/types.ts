@@ -131,7 +131,6 @@ export interface RunCodeResponse {
 
 export interface Submission {
   id: string;
-  code: string;
   output: string;
   error?: string;
   exitCode: number;

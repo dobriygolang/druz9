@@ -349,3 +349,19 @@ func (r *Repo) UpdateUserTrusted(ctx context.Context, userID uuid.UUID, isTruste
 	}
 	return nil
 }
+
+func (r *Repo) UpdateUserAdmin(ctx context.Context, userID uuid.UUID, isAdmin bool) error {
+	tag, err := r.data.DB.Exec(ctx, `
+		UPDATE users
+		SET is_admin = $2,
+		    updated_at = NOW()
+		WHERE id = $1
+	`, userID, isAdmin)
+	if err != nil {
+		return fmt.Errorf("update user admin: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return profileerrors.ErrUserNotFound
+	}
+	return nil
+}

@@ -82,7 +82,6 @@ function normalizePodcast(p: BackendPodcast): Podcast {
     content_type: normalizeContentType(p.content_type ?? p.contentType),
     is_uploaded: p.is_uploaded ?? p.isUploaded ?? false,
     created_at: p.created_at ?? p.createdAt ?? '',
-    updated_at: p.updated_at ?? p.updatedAt ?? '',
   };
 }
 

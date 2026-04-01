@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Search, UserRound, MapPin, Calendar } from 'lucide-react';
 import { CommunityMapPoint } from '@/entities/User/model/types';
 import { EventDraft } from '@/pages/MapPage/components/types';
+import { EVENT_COLOR_OPTIONS } from '@/features/Event/lib/eventMetadata';
 
 type EventFieldErrors = {
   title?: string;
@@ -130,6 +131,32 @@ export const EventForm: React.FC<EventFormProps> = ({
           onChange={(e) => setDraft(curr => curr ? { ...curr, description: e.target.value } : null)}
           style={{ minHeight: '80px', resize: 'vertical', background: 'rgba(0,0,0,0.2)', padding: '12px' }}
         />
+        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr 1fr', gap: '10px' }}>
+          <input
+            className="input"
+            placeholder="Группа / клуб"
+            value={draft.event_group ?? ''}
+            onChange={(e) => setDraft(curr => curr ? { ...curr, event_group: e.target.value } : null)}
+            style={{ background: 'rgba(0,0,0,0.2)', height: '44px' }}
+          />
+          <input
+            className="input"
+            placeholder="Тип ивента"
+            value={draft.event_type ?? ''}
+            onChange={(e) => setDraft(curr => curr ? { ...curr, event_type: e.target.value } : null)}
+            style={{ background: 'rgba(0,0,0,0.2)', height: '44px' }}
+          />
+          <select
+            className="input"
+            value={draft.event_color ?? 'violet'}
+            onChange={(e) => setDraft(curr => curr ? { ...curr, event_color: e.target.value as EventDraft['event_color'] } : null)}
+            style={{ background: 'rgba(0,0,0,0.2)', height: '44px' }}
+          >
+            {EVENT_COLOR_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>{option.label}</option>
+            ))}
+          </select>
+        </div>
           <input
             className="input"
             placeholder="Ссылка на созвон (опционально)"

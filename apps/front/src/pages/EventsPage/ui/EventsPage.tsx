@@ -15,6 +15,7 @@ import { ConfirmModal } from '@/shared/ui/ConfirmModal/ConfirmModal';
 import { EventDraft } from '@/pages/MapPage/components/types';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { AxiosError } from '@/shared/api/base';
+import { getEventColorSpec } from '@/features/Event/lib/eventMetadata';
 
 const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 const MONTHS = [
@@ -62,6 +63,8 @@ export const EventsPage: React.FC = () => {
   }>({});
   const [inviteSearchQuery, setInviteSearchQuery] = useState('');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
+  const [groupFilter, setGroupFilter] = useState('all');
+  const [typeFilter, setTypeFilter] = useState('all');
 
   const loadRef = useRef<{ (): Promise<void> } | null>(null);
 
@@ -82,14 +85,29 @@ export const EventsPage: React.FC = () => {
 
   useEffect(() => {
     void load();
-    const interval = setInterval(() => loadRef.current?.(), 30000);
-    return () => clearInterval(interval);
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        void loadRef.current?.();
+      }
+    };
+    const handleFocus = () => {
+      void loadRef.current?.();
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleFocus);
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleFocus);
+    };
   }, []);
 
   const handleCreateClick = (date?: Date) => {
     setDraft({
       title: '',
       description: '',
+      event_color: 'violet',
+      event_group: '',
+      event_type: '',
       meeting_link: '',
       place_label: '',
       region: '',
@@ -106,6 +124,9 @@ export const EventsPage: React.FC = () => {
   const toEventPayload = (draft: EventDraft): CreateEventPayload => ({
     title: draft.title,
     description: draft.description,
+    event_color: draft.event_color,
+    event_group: draft.event_group,
+    event_type: draft.event_type,
     meeting_link: draft.meeting_link,
     place_label: draft.place_label,
     region: draft.region,
@@ -174,6 +195,24 @@ export const EventsPage: React.FC = () => {
     setConfirmDeleteId(id);
   };
 
+  const eventGroups = useMemo(
+    () => Array.from(new Set(events.map((event) => event.event_group.trim()).filter(Boolean))).sort(),
+    [events],
+  );
+  const eventTypes = useMemo(
+    () => Array.from(new Set(events.map((event) => event.event_type.trim()).filter(Boolean))).sort(),
+    [events],
+  );
+  const filteredEvents = useMemo(
+    () =>
+      events.filter(
+        (event) =>
+          (groupFilter === 'all' || event.event_group === groupFilter) &&
+          (typeFilter === 'all' || event.event_type === typeFilter),
+      ),
+    [events, groupFilter, typeFilter],
+  );
+
   const confirmDelete = async () => {
     if (!confirmDeleteId) return;
     try {
@@ -224,6 +263,34 @@ export const EventsPage: React.FC = () => {
         </button>
       </div>
 
+      <div className="card" style={{ marginBottom: '20px', padding: '18px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr 1fr', gap: '12px', alignItems: 'end' }}>
+        <div>
+          <div style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)', marginBottom: '8px' }}>Группа</div>
+          <select className="input" value={groupFilter} onChange={(e) => setGroupFilter(e.target.value)}>
+            <option value="all">Все группы</option>
+            {eventGroups.map((group) => (
+              <option key={group} value={group}>
+                {group}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div>
+          <div style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)', marginBottom: '8px' }}>Тип</div>
+          <select className="input" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+            <option value="all">Все типы</option>
+            {eventTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
+        </div>
+        <button className="btn btn-secondary" onClick={() => { setGroupFilter('all'); setTypeFilter('all'); }} style={{ minHeight: '44px' }}>
+          Сбросить фильтры
+        </button>
+      </div>
+
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden' }}>
         <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', flex: 1 }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
@@ -237,7 +304,7 @@ export const EventsPage: React.FC = () => {
             const isCurrentMonth = date.getMonth() === month;
             const isToday = date.toDateString() === today;
             const dateStr = getLocalDateKey(date);
-            const dayEvents = events.filter(
+            const dayEvents = filteredEvents.filter(
               (e) => getLocalDateKey(e.scheduled_at) === dateStr,
             );
 
@@ -274,25 +341,28 @@ export const EventsPage: React.FC = () => {
                 </div>
                 
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
-                  {dayEvents.map(e => (
-                    <div 
-                      key={e.id}
-                      onClick={(ev) => { ev.stopPropagation(); setFullEventId(e.id); }}
-                      style={{ 
-                        fontSize: isMobile ? '9px' : '11px', 
-                        padding: isMobile ? '3px 4px' : '4px 8px', 
-                        borderRadius: '4px', 
-                        background: e.is_joined ? 'var(--accent-color)' : 'rgba(255,255,255,0.08)',
-                        color: 'white',
-                        whiteSpace: 'nowrap',
-                        overflow: 'hidden',
-                        textOverflow: 'ellipsis',
-                        borderLeft: e.is_creator ? '3px solid #FDA4AF' : 'none'
-                      }}
-                    >
-                      {e.title}
-                    </div>
-                  ))}
+                  {dayEvents.map((e) => {
+                    const styleAccent = getEventColorSpec(e.event_color);
+                    return (
+                      <div 
+                        key={e.id}
+                        onClick={(ev) => { ev.stopPropagation(); setFullEventId(e.id); }}
+                        style={{ 
+                          fontSize: isMobile ? '9px' : '11px', 
+                          padding: isMobile ? '3px 4px' : '4px 8px', 
+                          borderRadius: '4px', 
+                          background: e.is_joined ? styleAccent.solid : styleAccent.soft,
+                          color: 'white',
+                          whiteSpace: 'nowrap',
+                          overflow: 'hidden',
+                          textOverflow: 'ellipsis',
+                          borderLeft: `3px solid ${styleAccent.solid}`
+                        }}
+                      >
+                        {e.title}
+                      </div>
+                    );
+                  })}
                 </div>
               </div>
             );
@@ -323,7 +393,7 @@ export const EventsPage: React.FC = () => {
 
       <FullEventOverlay 
         eventId={fullEventId} 
-        events={events} 
+        events={filteredEvents} 
         onClose={() => setFullEventId(null)} 
         isAdmin={currentUser?.isAdmin}
         onDelete={handleDelete}

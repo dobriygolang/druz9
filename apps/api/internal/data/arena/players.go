@@ -104,6 +104,23 @@ func (r *Repo) SavePlayerCodes(ctx context.Context, matchID uuid.UUID, codes map
 	return nil
 }
 
+func (r *Repo) CleanupFinishedEditorStates(ctx context.Context, idleFor time.Duration) (int64, error) {
+	tag, err := r.data.DB.Exec(ctx, `
+		DELETE FROM arena_editor_states es
+		WHERE es.updated_at < NOW() - $1::interval
+		  AND EXISTS (
+		    SELECT 1
+		    FROM arena_matches m
+		    WHERE m.id = es.match_id
+		      AND m.status = $2
+		  )
+	`, idleFor.String(), model.ArenaMatchStatusFinished)
+	if err != nil {
+		return 0, fmt.Errorf("cleanup finished arena editor states: %w", err)
+	}
+	return tag.RowsAffected(), nil
+}
+
 func (r *Repo) SetPlayerFreeze(ctx context.Context, matchID, userID uuid.UUID, freezeUntil *time.Time) error {
 	_, err := r.data.DB.Exec(ctx, `
 		UPDATE arena_match_players

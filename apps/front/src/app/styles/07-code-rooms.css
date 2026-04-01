@@ -1030,6 +1030,10 @@
     rgba(255, 255, 255, 0.03);
 }
 
+.code-room-prep-launch--page {
+  margin-bottom: 20px;
+}
+
 .code-room-prep-launch__head,
 .code-room-prep-launch__actions {
   display: flex;
@@ -1088,6 +1092,23 @@
 
 .code-room-prep-launch__actions .btn {
   flex: 1 1 0;
+}
+
+.code-room-prep-launch--page .code-room-prep-launch__body {
+  grid-template-columns: minmax(0, 1.35fr) auto;
+}
+
+.code-room-prep-launch--page .code-room-prep-launch__controls {
+  grid-template-columns: minmax(260px, 1fr) minmax(220px, 0.9fr);
+}
+
+.code-room-prep-launch--page .code-room-prep-launch__actions {
+  align-self: end;
+  min-width: 320px;
+}
+
+.code-room-prep-launch--page .code-room-prep-launch__actions .btn {
+  min-width: 0;
 }
 
 /* ===========================================
@@ -1154,6 +1175,11 @@
   .code-room-prep-launch__body,
   .code-room-prep-launch__controls {
     grid-template-columns: 1fr;
+  }
+
+  .code-room-prep-launch--page .code-room-prep-launch__actions {
+    min-width: 0;
+    width: 100%;
   }
 }
 

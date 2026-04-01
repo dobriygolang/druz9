@@ -18,6 +18,8 @@ type Repository interface {
 	ListMatchesByIDs(ctx context.Context, matchIDs []uuid.UUID) ([]*Match, error)
 	ListOpenMatchIDs(ctx context.Context, limit int32) ([]uuid.UUID, error)
 	CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error)
+	CleanupOldSubmissions(ctx context.Context, idleFor time.Duration) (int64, error)
+	CleanupFinishedEditorStates(ctx context.Context, idleFor time.Duration) (int64, error)
 	MatchmakeOrEnqueue(ctx context.Context, user *User, task *Task, topic, difficulty string, obfuscateOpponent bool) (*Match, bool, error)
 	GetQueueEntry(ctx context.Context, userID uuid.UUID) (*QueueEntry, error)
 	CountQueueEntries(ctx context.Context) (int32, error)

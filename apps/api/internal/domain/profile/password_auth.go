@@ -77,13 +77,13 @@ func normalizePasswordRegistration(req model.PasswordRegistrationRequest) (model
 	req.LastName = strings.TrimSpace(req.LastName)
 
 	if req.Login == "" || req.Password == "" {
-		return model.PasswordRegistrationRequest{}, profileerrors.ErrUnauthorized
+		return model.PasswordRegistrationRequest{}, profileerrors.ErrInvalidPayload
 	}
 	if len(req.Password) < minPasswordLength {
-		return model.PasswordRegistrationRequest{}, profileerrors.ErrUnauthorized
+		return model.PasswordRegistrationRequest{}, profileerrors.ErrInvalidPayload
 	}
 	if req.FirstName == "" {
-		return model.PasswordRegistrationRequest{}, profileerrors.ErrUnauthorized
+		return model.PasswordRegistrationRequest{}, profileerrors.ErrInvalidPayload
 	}
 
 	return req, nil

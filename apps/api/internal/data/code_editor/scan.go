@@ -40,7 +40,6 @@ func scanSubmission(row scanner, submission *codeeditordomain.Submission) error 
 		&submission.RoomID,
 		&submission.UserID,
 		&submission.GuestName,
-		&submission.Code,
 		&submission.Output,
 		&submission.Error,
 		&submission.SubmittedAt,

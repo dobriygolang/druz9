@@ -14,9 +14,6 @@ import (
 	podcastdata "api/internal/data/podcast"
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
-	codeeditordomain "api/internal/domain/codeeditor"
-	eventdomainservice "api/internal/domain/event"
-	podcastdomainservice "api/internal/domain/podcast"
 	referraldomainservice "api/internal/domain/referral"
 	"api/internal/storage/postgres"
 	s3storage "api/internal/storage/s3"
@@ -28,10 +25,10 @@ type storageContext struct {
 	geoClient      *geodata.Client
 	avatarURLCache *cache.TTLCache[string]
 	profileRepo    *profiledata.Repo
-	eventRepo      eventdomainservice.Repository
-	podcastRepo    podcastdomainservice.Repository
+	eventRepo      *eventdata.Repo
+	podcastRepo    *podcastdata.Repo
 	referralRepo   referraldomainservice.Repository
-	codeEditorRepo codeeditordomain.Repository
+	codeEditorRepo *codeeditordata.Repo
 	arenaRepo      *arenadata.Repo
 	interviewRepo  *interviewprepdata.Repo
 }

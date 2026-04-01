@@ -38,6 +38,15 @@ type Config struct {
 	MaxImageBytes int64
 }
 
+type SystemDesignReviewInput struct {
+	Notes          string
+	Components     string
+	APIs           string
+	DatabaseSchema string
+	Traffic        string
+	Reliability    string
+}
+
 type Sandbox interface {
 	Execute(ctx context.Context, req sandbox.ExecutionRequest) (sandbox.ExecutionResult, error)
 }
@@ -350,7 +359,7 @@ func (s *Service) ReviewSystemDesign(
 	fileName string,
 	contentType string,
 	imageBytes []byte,
-	notes string,
+	req SystemDesignReviewInput,
 ) (*SystemDesignReviewResult, error) {
 	if err := ensureTrusted(user); err != nil {
 		return nil, err
@@ -382,12 +391,17 @@ func (s *Service) ReviewSystemDesign(
 	}
 
 	return s.reviewer.ReviewSystemDesign(ctx, aireview.SystemDesignReviewRequest{
-		TaskTitle:  session.Task.Title,
-		Statement:  session.Task.Statement,
-		Notes:      notes,
-		ImageBytes: imageBytes,
-		ImageMIME:  normalizedType,
-		ImageName:  fileName,
+		TaskTitle:      session.Task.Title,
+		Statement:      session.Task.Statement,
+		Notes:          req.Notes,
+		Components:     req.Components,
+		APIs:           req.APIs,
+		DatabaseSchema: req.DatabaseSchema,
+		Traffic:        req.Traffic,
+		Reliability:    req.Reliability,
+		ImageBytes:     imageBytes,
+		ImageMIME:      normalizedType,
+		ImageName:      fileName,
 	})
 }
 

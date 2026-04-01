@@ -37,6 +37,20 @@ func startArenaCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, servic
 		if deleted > 0 {
 			klog.Infof("arena cleanup processed %d inactive arena matches", deleted)
 		}
+
+		submissionsDeleted, err := service.CleanupOldSubmissions(cleanupCtx, 14*24*time.Hour)
+		if err != nil {
+			klog.Errorf("arena submissions cleanup error: %v", err)
+		} else if submissionsDeleted > 0 {
+			klog.Infof("arena cleanup deleted %d old submissions", submissionsDeleted)
+		}
+
+		statesDeleted, err := service.CleanupFinishedEditorStates(cleanupCtx, 24*time.Hour)
+		if err != nil {
+			klog.Errorf("arena editor states cleanup error: %v", err)
+		} else if statesDeleted > 0 {
+			klog.Infof("arena cleanup deleted %d finished editor states", statesDeleted)
+		}
 	}
 
 	// Subscribe to config changes

@@ -24,6 +24,7 @@ type Repository interface {
 	CreateSubmission(ctx context.Context, submission *Submission) (*Submission, error)
 	GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*Submission, error)
 	CleanupInactiveRooms(ctx context.Context, idleFor time.Duration) (int64, error)
+	CleanupOldSubmissions(ctx context.Context, idleFor time.Duration) (int64, error)
 	ListTasks(ctx context.Context, filter TaskFilter) ([]*Task, error)
 	CreateTask(ctx context.Context, task *Task) (*Task, error)
 	UpdateTask(ctx context.Context, task *Task) (*Task, error)

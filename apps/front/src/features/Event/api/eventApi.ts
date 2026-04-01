@@ -4,6 +4,7 @@ import {
   EventParticipant,
 } from '@/entities/User/model/types';
 import { apiClient, ListQueryParams, withDefaultListQuery } from '@/shared/api/base';
+import { encodeEventDescription, parseEventDescription } from '@/features/Event/lib/eventMetadata';
 
 const defaultEventsCache = {
   data: null as CommunityEvent[] | null,
@@ -83,20 +84,18 @@ function normalizeParticipant(
     user_id: participant.user_id ?? participant.userId ?? '',
     title: participant.title ?? '',
     avatar_url: s3Avatar || telegramAvatar,
-    telegram_avatar_url: telegramAvatar,
-    telegram_username:
-      participant.telegram_username ?? participant.telegramUsername ?? '',
-    first_name: participant.first_name ?? participant.firstName ?? '',
-    last_name: participant.last_name ?? participant.lastName ?? '',
     status: normalizeParticipantStatus(participant.status),
   };
 }
 
 function normalizeEvent(event: BackendEvent): CommunityEvent {
+  const rawDescription = event.description ?? '';
+  const parsed = parseEventDescription(rawDescription);
   return {
     id: event.id ?? '',
     title: event.title ?? '',
-    description: event.description ?? '',
+    description: parsed.description,
+    raw_description: rawDescription,
     meeting_link: event.meeting_link ?? event.meetingLink ?? '',
     place_label: event.place_label ?? event.placeLabel ?? '',
     region: event.region ?? '',
@@ -111,6 +110,9 @@ function normalizeEvent(event: BackendEvent): CommunityEvent {
     is_creator: event.is_creator ?? event.isCreator ?? false,
     is_joined: event.is_joined ?? event.isJoined ?? false,
     participant_count: event.participant_count ?? event.participantCount ?? 0,
+    event_color: parsed.meta.color,
+    event_group: parsed.meta.group,
+    event_type: parsed.meta.type,
     participants: (event.participants ?? []).map(normalizeParticipant),
   };
 }
@@ -157,7 +159,11 @@ export const eventApi = {
   create: async (payload: CreateEventPayload): Promise<CommunityEvent> => {
     const response = await apiClient.post<BackendEventResponse>('/api/v1/events', {
       title: payload.title,
-      description: payload.description,
+      description: encodeEventDescription(payload.description, {
+        color: payload.event_color,
+        group: payload.event_group,
+        type: payload.event_type,
+      }),
       meetingLink: payload.meeting_link,
       placeLabel: payload.place_label,
       region: payload.region,
@@ -180,7 +186,11 @@ export const eventApi = {
       `/api/v1/events/${eventId}`,
       {
         title: payload.title,
-        description: payload.description,
+        description: encodeEventDescription(payload.description ?? '', {
+          color: payload.event_color,
+          group: payload.event_group,
+          type: payload.event_type,
+        }),
         meetingLink: payload.meeting_link,
         placeLabel: payload.place_label,
         scheduledAt: payload.scheduled_at

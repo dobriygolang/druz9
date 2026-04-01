@@ -123,3 +123,17 @@ WHERE id = $1
 	}
 	return nil
 }
+
+func (r *Repo) CountActiveUsers(ctx context.Context, activeSince time.Time) (int, error) {
+	var count int
+	err := r.data.DB.QueryRow(ctx, `
+		SELECT COUNT(DISTINCT user_id)
+		FROM sessions
+		WHERE expires_at > NOW()
+		  AND last_seen_at >= $1
+	`, activeSince).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("count active users: %w", err)
+	}
+	return count, nil
+}

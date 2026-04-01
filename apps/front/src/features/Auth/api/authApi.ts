@@ -99,7 +99,6 @@ function normalizeUser(user: BackendUser): User {
     firstName: user.first_name ?? user.firstName ?? '',
     lastName: user.last_name ?? user.lastName ?? '',
     avatarUrl: s3Avatar || telegramAvatar,
-    telegramAvatarUrl: telegramAvatar,
     region: user.region ?? '',
     latitude: user.latitude ?? 0,
     longitude: user.longitude ?? 0,
@@ -108,7 +107,6 @@ function normalizeUser(user: BackendUser): User {
     isTrusted: user.is_trusted ?? user.isTrusted ?? false,
     currentWorkplace: user.current_workplace ?? user.currentWorkplace ?? '',
     createdAt: user.created_at ?? user.createdAt ?? '',
-    updatedAt: user.updated_at ?? user.updatedAt ?? '',
   };
 }
 

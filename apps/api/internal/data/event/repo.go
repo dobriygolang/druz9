@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
-	eventdomain "api/internal/domain/event"
 	"api/internal/model"
 	"api/internal/storage/postgres"
 	slicestools "api/internal/tools/slices"
@@ -22,11 +22,25 @@ type Repo struct {
 	log  *log.Helper
 }
 
-func NewRepo(dataLayer *postgres.Store, logger log.Logger) eventdomain.Repository {
+func NewRepo(dataLayer *postgres.Store, logger log.Logger) *Repo {
 	return &Repo{
 		data: dataLayer,
 		log:  log.NewHelper(logger),
 	}
+}
+
+func (r *Repo) CleanupExpiredEvents(ctx context.Context, olderThan time.Duration) (int64, error) {
+	if olderThan <= 0 {
+		return 0, nil
+	}
+	tag, err := r.data.DB.Exec(ctx, `
+DELETE FROM events
+WHERE scheduled_at < NOW() - $1::interval
+`, olderThan.String())
+	if err != nil {
+		return 0, fmt.Errorf("cleanup expired events: %w", err)
+	}
+	return tag.RowsAffected(), nil
 }
 
 func (r *Repo) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.CreateEventRequest) (*model.Event, error) {

@@ -78,7 +78,6 @@ function normalizeCommunityMapPoint(
     longitude: point.longitude ?? 0,
     isCurrentUser: point.is_current_user ?? point.isCurrentUser ?? false,
     avatarUrl: s3Avatar || telegramAvatar,
-    telegramAvatarUrl: telegramAvatar,
     telegramUsername:
       point.telegram_username ?? point.telegramUsername ?? '',
     firstName: point.first_name ?? point.firstName ?? '',

@@ -154,18 +154,18 @@ docker-down:
 .PHONY: docker-logs
 # tail local infra logs
 docker-logs:
-	docker compose logs -f postgres minio minio-init livekit prometheus grafana
+	docker compose logs -f postgres minio minio-init prometheus alertmanager grafana
 
 .PHONY: docker-up-with-monitoring
 # start docker-compose with monitoring (prometheus + grafana)
 docker-up-with-monitoring:
 	cp -n .env.example .env || true
-	docker compose --env-file .env up -d prometheus grafana
+	docker compose --env-file .env up -d prometheus alertmanager grafana
 	$(MAKE) docker-migrate-up
 
 .PHONY: docker-logs-monitoring
 # tail monitoring logs
 docker-logs-monitoring:
-	docker compose logs -f prometheus grafana
+	docker compose logs -f prometheus alertmanager grafana
 
 .DEFAULT_GOAL := help

@@ -213,3 +213,11 @@ func (s *Service) LeaveMatch(ctx context.Context, matchID uuid.UUID, user *domai
 func (s *Service) CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error) {
 	return s.repo.CleanupInactiveMatches(ctx, idleFor)
 }
+
+func (s *Service) CleanupOldSubmissions(ctx context.Context, idleFor time.Duration) (int64, error) {
+	return s.repo.CleanupOldSubmissions(ctx, idleFor)
+}
+
+func (s *Service) CleanupFinishedEditorStates(ctx context.Context, idleFor time.Duration) (int64, error) {
+	return s.repo.CleanupFinishedEditorStates(ctx, idleFor)
+}

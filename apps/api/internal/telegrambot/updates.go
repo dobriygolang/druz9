@@ -25,7 +25,7 @@ func (s *Service) handleUpdate(ctx context.Context, update telegramUpdate) {
 		FirstName: update.Message.From.FirstName,
 		LastName:  update.Message.From.LastName,
 		Username:  update.Message.From.Username,
-		PhotoURL:  "",
+		PhotoURL:  s.getUserPhotoURL(ctx, update.Message.From.ID),
 	})
 	if err != nil {
 		klog.Errorf("telegram bot confirm auth error: %v", err)

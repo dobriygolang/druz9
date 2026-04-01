@@ -23,6 +23,15 @@ export interface InterviewPrepSystemDesignReview {
   disclaimer?: string;
 }
 
+export interface InterviewPrepSystemDesignReviewInput {
+  notes: string;
+  components: string;
+  apis: string;
+  databaseSchema: string;
+  traffic: string;
+  reliability: string;
+}
+
 export interface InterviewPrepTask {
   id: string;
   slug: string;
@@ -181,10 +190,15 @@ export const interviewPrepApi = {
   },
 
 
-  reviewSystemDesign: async (sessionId: string, image: File, notes: string): Promise<InterviewPrepSystemDesignReview> => {
+  reviewSystemDesign: async (sessionId: string, image: File, input: InterviewPrepSystemDesignReviewInput): Promise<InterviewPrepSystemDesignReview> => {
     const formData = new FormData();
     formData.append('image', image);
-    formData.append('notes', notes);
+    formData.append('notes', input.notes);
+    formData.append('components', input.components);
+    formData.append('apis', input.apis);
+    formData.append('databaseSchema', input.databaseSchema);
+    formData.append('traffic', input.traffic);
+    formData.append('reliability', input.reliability);
 
     const response = await apiClient.post<{ review: InterviewPrepSystemDesignReview }>(
       `/api/v1/interview-prep/sessions/${sessionId}/system-design-review`,

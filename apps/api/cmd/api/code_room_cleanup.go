@@ -37,6 +37,15 @@ func startCodeRoomCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, ser
 		if deleted > 0 {
 			klog.Infof("code room cleanup deleted %d inactive rooms", deleted)
 		}
+
+		deletedSubmissions, err := service.CleanupOldSubmissions(cleanupCtx, codeRoomIdleTTL)
+		if err != nil {
+			klog.Errorf("code room submissions cleanup error: %v", err)
+			return
+		}
+		if deletedSubmissions > 0 {
+			klog.Infof("code room cleanup deleted %d old submissions", deletedSubmissions)
+		}
 	}
 
 	// Subscribe to config changes

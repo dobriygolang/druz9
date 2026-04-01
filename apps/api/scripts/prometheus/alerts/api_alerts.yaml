@@ -1,174 +1,235 @@
 groups:
-  - name: api_alerts
+  - name: druz9_alerts
     rules:
-      # Service Availability
-      - alert: APIServiceDown
-        expr: up{job="api"} == 0
+      - alert: BackendDown
+        expr: up{job="backend"} == 0
         for: 1m
         labels:
           severity: critical
         annotations:
-          summary: "API service is down"
-          description: "API service has been down for more than 1 minute"
+          summary: "Backend недоступен"
+          description: "Prometheus не может собрать метрики с backend больше 1 минуты."
 
-      # HTTP Errors
-      - alert: HighHTTPErrorRate
-        expr: sum(rate(http_server_requests_seconds_total{code=~"5.."}[5m])) / sum(rate(http_server_requests_seconds_total[5m])) > 0.05
+      - alert: PostgresExporterDown
+        expr: up{job="postgres"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Postgres exporter недоступен"
+          description: "Prometheus не может собрать метрики с postgres-exporter больше 2 минут."
+
+      - alert: MinioDown
+        expr: up{job="minio"} == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "MinIO недоступен"
+          description: "Prometheus не может собрать метрики с MinIO больше 2 минут."
+
+      - alert: NodeExporterDown
+        expr: up{job="node"} == 0
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "High HTTP 5xx error rate"
-          description: "More than 5% of HTTP requests are returning 5xx errors"
+          summary: "Node exporter недоступен"
+          description: "Нет host-метрик больше 5 минут."
+
+      - alert: HighHTTPErrorRate
+        expr: |
+          (
+            sum(rate(http_server_requests_seconds_total{code=~"5.."}[5m]))
+            /
+            clamp_min(sum(rate(http_server_requests_seconds_total[5m])), 0.1)
+          ) > 0.05
+          and
+          sum(rate(http_server_requests_seconds_total[5m])) > 0.2
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокая доля HTTP 5xx"
+          description: "Больше 5% HTTP-запросов завершаются 5xx дольше 5 минут."
 
       - alert: CriticalHTTPErrorRate
-        expr: sum(rate(http_server_requests_seconds_total{code=~"5.."}[5m])) / sum(rate(http_server_requests_seconds_total[5m])) > 0.15
+        expr: |
+          (
+            sum(rate(http_server_requests_seconds_total{code=~"5.."}[5m]))
+            /
+            clamp_min(sum(rate(http_server_requests_seconds_total[5m])), 0.1)
+          ) > 0.15
+          and
+          sum(rate(http_server_requests_seconds_total[5m])) > 0.2
         for: 2m
         labels:
           severity: critical
         annotations:
-          summary: "Critical HTTP 5xx error rate"
-          description: "More than 15% of HTTP requests are returning 5xx errors"
+          summary: "Критическая доля HTTP 5xx"
+          description: "Больше 15% HTTP-запросов завершаются 5xx."
 
-      # gRPC Errors
       - alert: HighGRPCErrorRate
-        expr: sum(rate(grpc_server_handled_total{grpc_code=~"Unknown|Internal|Aborted|DataLoss"}[5m])) / sum(rate(grpc_server_handled_total[5m])) > 0.05
+        expr: |
+          (
+            sum(rate(grpc_server_handled_total{grpc_code=~"Unknown|Internal|Aborted|DataLoss|Unavailable"}[5m]))
+            /
+            clamp_min(sum(rate(grpc_server_handled_total[5m])), 0.1)
+          ) > 0.05
+          and
+          sum(rate(grpc_server_handled_total[5m])) > 0.1
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "High gRPC error rate"
-          description: "More than 5% of gRPC requests are failing"
+          summary: "Высокая доля ошибок gRPC"
+          description: "Больше 5% gRPC-запросов завершаются ошибкой."
 
-      # Latency
       - alert: HighHTTPLatency
-        expr: histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le)) > 2
-        for: 5m
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le)) > 1.5
+          and
+          sum(rate(http_server_requests_seconds_total[5m])) > 0.2
+        for: 10m
         labels:
           severity: warning
         annotations:
-          summary: "High HTTP latency"
-          description: "95th percentile HTTP latency is above 2 seconds"
+          summary: "Высокая HTTP latency"
+          description: "p95 HTTP latency выше 1.5s дольше 10 минут."
 
       - alert: CriticalHTTPLatency
-        expr: histogram_quantile(0.99, sum(rate(http_server_requests_seconds_bucket[5m])) by (le)) > 5
-        for: 2m
+        expr: |
+          histogram_quantile(0.95, sum(rate(http_server_requests_seconds_bucket[5m])) by (le)) > 3
+          and
+          sum(rate(http_server_requests_seconds_total[5m])) > 0.2
+        for: 5m
         labels:
           severity: critical
         annotations:
-          summary: "Critical HTTP latency"
-          description: "99th percentile HTTP latency is above 5 seconds"
+          summary: "Критическая HTTP latency"
+          description: "p95 HTTP latency выше 3s."
 
       - alert: HighGRPCLatency
-        expr: histogram_quantile(0.95, sum(rate(grpc_server_handling_seconds_bucket[5m])) by (le)) > 1
+        expr: |
+          histogram_quantile(0.95, sum(rate(grpc_server_handling_seconds_bucket[5m])) by (le)) > 1
+          and
+          sum(rate(grpc_server_handled_total[5m])) > 0.1
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "High gRPC latency"
-          description: "95th percentile gRPC latency is above 1 second"
+          summary: "Высокая gRPC latency"
+          description: "p95 gRPC latency выше 1 секунды."
 
-      # Database Connections
-      - alert: HighDBConnectionUsage
-        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.8
+      - alert: HostHighCPU
+        expr: |
+          100 * (1 - avg by(instance) (rate(node_cpu_seconds_total{job="node", mode="idle"}[5m]))) > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокая загрузка CPU"
+          description: "CPU на сервере выше 85% больше 10 минут."
+
+      - alert: HostCriticalCPU
+        expr: |
+          100 * (1 - avg by(instance) (rate(node_cpu_seconds_total{job="node", mode="idle"}[5m]))) > 95
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Критическая загрузка CPU"
+          description: "CPU на сервере выше 95% больше 5 минут."
+
+      - alert: HostHighMemory
+        expr: |
+          100 * (1 - (node_memory_MemAvailable_bytes{job="node"} / node_memory_MemTotal_bytes{job="node"})) > 90
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "High database connection usage"
-          description: "Database is using more than 80% of max connections"
+          summary: "Высокое потребление RAM"
+          description: "Использование RAM на сервере выше 90%."
 
-      - alert: CriticalDBConnectionUsage
-        expr: pg_stat_database_numbackends / pg_settings_max_connections > 0.95
+      - alert: HostCriticalMemory
+        expr: |
+          100 * (1 - (node_memory_MemAvailable_bytes{job="node"} / node_memory_MemTotal_bytes{job="node"})) > 96
         for: 2m
         labels:
           severity: critical
         annotations:
-          summary: "Critical database connection usage"
-          description: "Database is using more than 95% of max connections"
+          summary: "Критическое потребление RAM"
+          description: "Использование RAM на сервере выше 96%."
 
-      # Database Slow Queries
-      - alert: HighDBSlowQueries
-        expr: sum(rate(pg_stat_database_calls{datname="api", call="SELECT"}[5m])) > 100
-        for: 5m
-        labels:
-          severity: info
-        annotations:
-          summary: "High number of database queries"
-          description: "Database is handling high query load"
-
-      # Memory
-      - alert: HighMemoryUsage
-        expr: (process_resident_memory_bytes / process_max_memory_bytes) > 0.85
-        for: 5m
+      - alert: HostDiskLow
+        expr: |
+          100 * (
+            node_filesystem_avail_bytes{job="node", mountpoint="/", fstype!~"tmpfs|overlay"}
+            /
+            node_filesystem_size_bytes{job="node", mountpoint="/", fstype!~"tmpfs|overlay"}
+          ) < 15
+        for: 15m
         labels:
           severity: warning
         annotations:
-          summary: "High memory usage"
-          description: "Process memory usage is above 85%"
+          summary: "Мало свободного места на диске"
+          description: "На корневом диске осталось меньше 15% свободного места."
 
-      - alert: CriticalMemoryUsage
-        expr: (process_resident_memory_bytes / process_max_memory_bytes) > 0.95
-        for: 2m
+      - alert: HostDiskCritical
+        expr: |
+          100 * (
+            node_filesystem_avail_bytes{job="node", mountpoint="/", fstype!~"tmpfs|overlay"}
+            /
+            node_filesystem_size_bytes{job="node", mountpoint="/", fstype!~"tmpfs|overlay"}
+          ) < 8
+        for: 10m
         labels:
           severity: critical
         annotations:
-          summary: "Critical memory usage"
-          description: "Process memory usage is above 95%"
+          summary: "Критически мало места на диске"
+          description: "На корневом диске осталось меньше 8% свободного места."
 
-      # CPU
-      - alert: HighCPUUsage
-        expr: process_cpu_seconds_total > 0.8
-        for: 5m
-        labels:
-          severity: warning
-        annotations:
-          summary: "High CPU usage"
-          description: "Process CPU usage is high"
-
-      # Go-specific metrics
       - alert: HighGoroutineCount
-        expr: go_goroutines > 1000
-        for: 5m
+        expr: go_goroutines{job="backend"} > 1500
+        for: 10m
         labels:
           severity: warning
         annotations:
-          summary: "High number of goroutines"
-          description: "There are more than 1000 goroutines running"
+          summary: "Слишком много goroutines"
+          description: "На backend больше 1500 goroutines дольше 10 минут."
 
       - alert: CriticalGoroutineCount
-        expr: go_goroutines > 5000
-        for: 2m
+        expr: go_goroutines{job="backend"} > 3000
+        for: 5m
         labels:
           severity: critical
         annotations:
-          summary: "Critical number of goroutines"
-          description: "There are more than 5000 goroutines running"
+          summary: "Критически много goroutines"
+          description: "На backend больше 3000 goroutines."
 
-      - alert: HighGCRate
+      - alert: HighGCPause
         expr: rate(go_gc_duration_seconds_sum[5m]) / rate(go_gc_duration_seconds_count[5m]) > 0.5
         for: 5m
         labels:
           severity: warning
         annotations:
-          summary: "High GC pause time"
-          description: "Garbage collection is taking significant time"
+          summary: "Долгие GC pause"
+          description: "Средняя GC pause на backend выше 500ms."
 
-      # Request rate
-      - alert: LowRequestRate
-        expr: sum(rate(http_server_requests_seconds_total[5m])) < 1
+      - alert: BusinessActiveRoomsSpike
+        expr: business_active_rooms > 25
         for: 10m
         labels:
-          severity: info
+          severity: warning
         annotations:
-          summary: "Low request rate"
-          description: "Very low request rate detected"
+          summary: "Слишком много активных комнат"
+          description: "Количество активных code rooms выше 25 дольше 10 минут."
 
-      - alert: HighRequestRate
-        expr: sum(rate(http_server_requests_seconds_total[5m])) > 1000
+      - alert: BusinessActiveMatchesSpike
+        expr: business_active_matches > 20
         for: 5m
         labels:
-          severity: info
+          severity: warning
         annotations:
-          summary: "High request rate"
-          description: "High request rate detected"
+          summary: "Слишком много активных матчей"
+          description: "Количество активных arena matches выше 20."

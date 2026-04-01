@@ -113,6 +113,31 @@ services:
       - minio
       - backend
       - node-exporter
+      - alertmanager
+    networks:
+      - app_network
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:9093:9093"
+    volumes:
+      - ../api/scripts/prometheus/alertmanager.yml.tmpl:/etc/alertmanager/alertmanager.yml.tmpl:ro
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        BOT_TOKEN="$$(cat /run/secrets/telegram_bot_token)";
+        CHAT_ID="$$(cat /run/secrets/telegram_alert_chat_id)";
+        sed \
+          -e "s|__BOT_TOKEN__|$$BOT_TOKEN|g" \
+          -e "s|__CHAT_ID__|$$CHAT_ID|g" \
+          /etc/alertmanager/alertmanager.yml.tmpl > /tmp/alertmanager.yml;
+        exec /bin/alertmanager --config.file=/tmp/alertmanager.yml --storage.path=/alertmanager
+    secrets:
+      - telegram_bot_token
+      - telegram_alert_chat_id
     networks:
       - app_network
 
@@ -243,6 +268,8 @@ secrets:
     file: ./runtime/secrets/prod/database_url
   telegram_bot_token:
     file: ./runtime/secrets/prod/telegram_bot_token
+  telegram_alert_chat_id:
+    file: ./runtime/secrets/prod/telegram_alert_chat_id
   s3_access_key:
     file: ./runtime/secrets/prod/s3_access_key
   s3_secret_key:

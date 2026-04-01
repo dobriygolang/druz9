@@ -22,7 +22,7 @@ func handleUsers(repo Repo, authorizer Authorizer, cacheInvalidator CacheInvalid
 			return
 		}
 
-		userID, ok := parseTrustUserID(r.URL.Path)
+		userID, field, ok := parseUserPatchPath(r.URL.Path)
 		if !ok {
 			http.Error(w, "not found", http.StatusNotFound)
 			return
@@ -30,13 +30,27 @@ func handleUsers(repo Repo, authorizer Authorizer, cacheInvalidator CacheInvalid
 
 		var req struct {
 			IsTrusted bool `json:"isTrusted"`
+			IsAdmin   bool `json:"isAdmin"`
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			http.Error(w, "bad request", http.StatusBadRequest)
 			return
 		}
 
-		if err := repo.UpdateUserTrusted(r.Context(), userID, req.IsTrusted); err != nil {
+		payload := map[string]any{"status": "ok"}
+		var err error
+		switch field {
+		case "trust":
+			err = repo.UpdateUserTrusted(r.Context(), userID, req.IsTrusted)
+			payload["isTrusted"] = req.IsTrusted
+		case "admin":
+			err = repo.UpdateUserAdmin(r.Context(), userID, req.IsAdmin)
+			payload["isAdmin"] = req.IsAdmin
+		default:
+			http.Error(w, "not found", http.StatusNotFound)
+			return
+		}
+		if err != nil {
 			if errors.Is(err, profileerrors.ErrUserNotFound) {
 				http.Error(w, "user not found", http.StatusNotFound)
 				return
@@ -46,25 +60,32 @@ func handleUsers(repo Repo, authorizer Authorizer, cacheInvalidator CacheInvalid
 		}
 
 		cacheInvalidator.InvalidateProfileCache(userID)
-		writeJSON(w, http.StatusOK, map[string]any{
-			"status":    "ok",
-			"isTrusted": req.IsTrusted,
-		})
+		writeJSON(w, http.StatusOK, payload)
 	}
 }
 
-func parseTrustUserID(path string) (uuid.UUID, bool) {
+func parseUserPatchPath(path string) (uuid.UUID, string, bool) {
 	trimmed := strings.TrimPrefix(path, Prefix)
-	if !strings.HasSuffix(trimmed, "/trust") {
-		return uuid.Nil, false
+	switch {
+	case strings.HasSuffix(trimmed, "/trust"):
+		userIDRaw := strings.TrimSuffix(trimmed, "/trust")
+		userIDRaw = strings.TrimSuffix(userIDRaw, "/")
+		userID, err := uuid.Parse(userIDRaw)
+		if err != nil {
+			return uuid.Nil, "", false
+		}
+		return userID, "trust", true
+	case strings.HasSuffix(trimmed, "/admin"):
+		userIDRaw := strings.TrimSuffix(trimmed, "/admin")
+		userIDRaw = strings.TrimSuffix(userIDRaw, "/")
+		userID, err := uuid.Parse(userIDRaw)
+		if err != nil {
+			return uuid.Nil, "", false
+		}
+		return userID, "admin", true
+	default:
+		return uuid.Nil, "", false
 	}
-	userIDRaw := strings.TrimSuffix(trimmed, "/trust")
-	userIDRaw = strings.TrimSuffix(userIDRaw, "/")
-	userID, err := uuid.Parse(userIDRaw)
-	if err != nil {
-		return uuid.Nil, false
-	}
-	return userID, true
 }
 
 func writeJSON(w http.ResponseWriter, status int, payload any) {

@@ -17,7 +17,7 @@ func mapSubmissions(submissions []*codeeditordomain.Submission) []*v1.Submission
 			Id:          submission.ID.String(),
 			UserId:      userIDToString(submission.UserID),
 			GuestName:   submission.GuestName,
-			Code:        submission.Code,
+			Code:        "",
 			Output:      submission.Output,
 			Error:       submission.Error,
 			SubmittedAt: timestamppb.New(submission.SubmittedAt),

@@ -28,12 +28,17 @@ type Config struct {
 }
 
 type SystemDesignReviewRequest struct {
-	TaskTitle  string
-	Statement  string
-	Notes      string
-	ImageBytes []byte
-	ImageMIME  string
-	ImageName  string
+	TaskTitle      string
+	Statement      string
+	Notes          string
+	Components     string
+	APIs           string
+	DatabaseSchema string
+	Traffic        string
+	Reliability    string
+	ImageBytes     []byte
+	ImageMIME      string
+	ImageName      string
 }
 
 type SystemDesignReview struct {
@@ -274,21 +279,51 @@ func (o *openAICompatibleReviewer) ReviewSystemDesign(ctx context.Context, req S
 
 func buildSystemDesignPrompt(req SystemDesignReviewRequest) string {
 	var b strings.Builder
-	b.WriteString("You are reviewing a system design interview diagram from a candidate. ")
-	b.WriteString("Return only valid JSON with fields: score, summary, strengths, issues, missingTopics, followUpQuestions, disclaimer. ")
-	b.WriteString("Score must be an integer from 1 to 10. ")
-	b.WriteString("Be strict, concise, and focus on architecture quality rather than drawing aesthetics. ")
-	b.WriteString("Assume the uploaded image is the architecture diagram.\n\n")
-	b.WriteString("Task title: ")
+	b.WriteString("You are reviewing a system design interview solution.\n")
+	b.WriteString("You receive an architecture diagram image plus structured candidate notes.\n")
+	b.WriteString("Return only valid JSON with fields: score, summary, strengths, issues, missingTopics, followUpQuestions, disclaimer.\n")
+	b.WriteString("Score must be an integer from 1 to 10.\n")
+	b.WriteString("Be strict, concrete, and evaluate architecture quality rather than drawing aesthetics.\n")
+	b.WriteString("If a claim is not supported by the diagram or notes, call that out explicitly.\n")
+	b.WriteString("If some information is missing, mention it in issues or missingTopics instead of inventing details.\n\n")
+	b.WriteString("Task title:\n")
 	b.WriteString(strings.TrimSpace(req.TaskTitle))
-	b.WriteString("\nTask statement:\n")
+	b.WriteString("\n\nTask statement:\n")
 	b.WriteString(strings.TrimSpace(req.Statement))
 	if notes := strings.TrimSpace(req.Notes); notes != "" {
-		b.WriteString("\nCandidate notes:\n")
+		b.WriteString("\n\nCandidate notes:\n")
 		b.WriteString(notes)
 	}
-	b.WriteString("\n\nRubric: requirements coverage, components, data flow, scaling, reliability, storage choices, caching, async processing, security, observability, and trade-offs. ")
-	b.WriteString("If some parts are not visible, say so explicitly in summary or issues. ")
+	if components := strings.TrimSpace(req.Components); components != "" {
+		b.WriteString("\n\nDeclared components and responsibilities:\n")
+		b.WriteString(components)
+	}
+	if apis := strings.TrimSpace(req.APIs); apis != "" {
+		b.WriteString("\n\nDeclared APIs, handlers, queues or contracts:\n")
+		b.WriteString(apis)
+	}
+	if db := strings.TrimSpace(req.DatabaseSchema); db != "" {
+		b.WriteString("\n\nDeclared databases, tables, indexes and storage notes:\n")
+		b.WriteString(db)
+	}
+	if traffic := strings.TrimSpace(req.Traffic); traffic != "" {
+		b.WriteString("\n\nTraffic and load assumptions:\n")
+		b.WriteString(traffic)
+	}
+	if reliability := strings.TrimSpace(req.Reliability); reliability != "" {
+		b.WriteString("\n\nReliability, scaling and failure-handling notes:\n")
+		b.WriteString(reliability)
+	}
+	b.WriteString("\n\nReview rubric:\n")
+	b.WriteString("1. Requirements coverage and whether the design actually solves the asked problem.\n")
+	b.WriteString("2. Correctness of major components and data flow.\n")
+	b.WriteString("3. Storage choices: tables, indexes, partitioning, caching, consistency, retention.\n")
+	b.WriteString("4. Scalability: bottlenecks, fan-out, backpressure, hot keys, queues, horizontal scaling.\n")
+	b.WriteString("5. Reliability: timeouts, retries, idempotency, replication, failover, disaster recovery.\n")
+	b.WriteString("6. Security: auth, authz, secrets, PII, network boundaries.\n")
+	b.WriteString("7. Observability and operations: metrics, logs, tracing, alerts, rollouts.\n")
+	b.WriteString("8. Trade-offs and missing assumptions.\n")
+	b.WriteString("Use the image as primary architectural evidence and the candidate notes as supporting context. ")
 	b.WriteString("Disclaimer should clearly say this is a preliminary AI review, not a final interviewer verdict.")
 	return b.String()
 }

@@ -8,7 +8,6 @@ export interface User {
   firstName: string;
   lastName: string;
   avatarUrl: string;
-  telegramAvatarUrl: string;
   region: string;
   latitude: number;
   longitude: number;
@@ -17,7 +16,6 @@ export interface User {
   isTrusted: boolean;
   currentWorkplace: string;
   createdAt: string;
-  updatedAt: string;
 }
 
 export interface ProfileResponse {
@@ -51,7 +49,6 @@ export interface CommunityMapPoint {
   longitude: number;
   isCurrentUser: boolean;
   avatarUrl: string;
-  telegramAvatarUrl: string;
   telegramUsername: string;
   firstName: string;
   lastName: string;
@@ -62,10 +59,6 @@ export interface EventParticipant {
   user_id: string;
   title: string;
   avatar_url: string;
-  telegram_avatar_url: string;
-  telegram_username: string;
-  first_name: string;
-  last_name: string;
   status: 'invited' | 'joined' | 'declined';
 }
 
@@ -73,6 +66,7 @@ export interface CommunityEvent {
   id: string;
   title: string;
   description: string;
+  raw_description?: string;
   meeting_link: string;
   place_label: string;
   region: string;
@@ -87,12 +81,18 @@ export interface CommunityEvent {
   is_creator: boolean;
   is_joined: boolean;
   participant_count: number;
+  event_color: 'violet' | 'emerald' | 'amber' | 'rose' | 'sky';
+  event_group: string;
+  event_type: string;
   participants: EventParticipant[];
 }
 
 export interface CreateEventPayload {
   title: string;
   description: string;
+  event_color?: 'violet' | 'emerald' | 'amber' | 'rose' | 'sky';
+  event_group?: string;
+  event_type?: string;
   meeting_link: string;
   place_label: string;
   region: string;
@@ -115,15 +115,12 @@ export interface Podcast {
   content_type: string;
   is_uploaded: boolean;
   created_at: string;
-  updated_at: string;
 }
 
 export interface Vacancy {
   id: string;
   user_id: string;
   author_name: string;
-  author_telegram_username: string;
-  author_telegram_profile_url: string;
   title: string;
   company: string;
   vacancy_url: string;
@@ -133,7 +130,6 @@ export interface Vacancy {
   employment_type: string;
   is_owner: boolean;
   created_at: string;
-  updated_at: string;
 }
 
 export interface CreateVacancyPayload {

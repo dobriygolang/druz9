@@ -1,21 +1,46 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { MapPin, Building2, ExternalLink, Plus, Trash2, Pencil, Search, Loader2 } from 'lucide-react';
-import { vacancyApi } from '@/features/Vacancy/api/vacancyApi';
+import {
+  Briefcase,
+  Building2,
+  ExternalLink,
+  Loader2,
+  MapPin,
+  Pencil,
+  Plus,
+  Search,
+  Trash2,
+} from 'lucide-react';
+
 import { useAuth } from '@/app/providers/AuthProvider';
 import { Vacancy, CreateVacancyPayload } from '@/entities/User/model/types';
+import { vacancyApi } from '@/features/Vacancy/api/vacancyApi';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal/ConfirmModal';
 
 const EMPLOYMENT_TYPE_OPTIONS = [
   { value: 'full_time', label: 'Полный день' },
   { value: 'part_time', label: 'Частичная занятость' },
   { value: 'contract', label: 'Контракт' },
-  { value: 'remote', label: 'Удаленно / фриланс' },
+  { value: 'remote', label: 'Удалённо / фриланс' },
   { value: 'internship', label: 'Стажировка' },
 ] as const;
 
+const EMPTY_FORM: CreateVacancyPayload = {
+  title: '',
+  company: '',
+  vacancy_url: '',
+  description: '',
+  experience: '',
+  location: '',
+  employment_type: 'full_time',
+};
+
 function employmentTypeLabel(value: string): string {
-  return EMPLOYMENT_TYPE_OPTIONS.find((option) => option.value === value)?.label || 'Не указано';
+  return EMPLOYMENT_TYPE_OPTIONS.find((option) => option.value === value)?.label || 'Формат не указан';
+}
+
+function authorInitial(value: string): string {
+  return value.trim().charAt(0).toUpperCase() || 'V';
 }
 
 export const VacanciesPage: React.FC = () => {
@@ -26,17 +51,10 @@ export const VacanciesPage: React.FC = () => {
   const [editingVacancy, setEditingVacancy] = useState<Vacancy | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [employmentFilter, setEmploymentFilter] = useState('all');
+  const [locationFilter, setLocationFilter] = useState('all');
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
-
-  const [formData, setFormData] = useState<CreateVacancyPayload>({
-    title: '',
-    company: '',
-    vacancy_url: '',
-    description: '',
-    experience: '',
-    location: '',
-    employment_type: 'full_time',
-  });
+  const [formData, setFormData] = useState<CreateVacancyPayload>(EMPTY_FORM);
 
   const loadVacancies = async () => {
     try {
@@ -54,8 +72,68 @@ export const VacanciesPage: React.FC = () => {
     void loadVacancies();
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const locations = useMemo(() => {
+    return Array.from(new Set(vacancies.map((item) => item.location.trim()).filter(Boolean))).sort((a, b) =>
+      a.localeCompare(b, 'ru'),
+    );
+  }, [vacancies]);
+
+  const filteredVacancies = useMemo(() => {
+    const searchLower = searchQuery.trim().toLowerCase();
+    return vacancies.filter((vacancy) => {
+      const matchesSearch =
+        !searchLower ||
+        vacancy.title.toLowerCase().includes(searchLower) ||
+        vacancy.company.toLowerCase().includes(searchLower) ||
+        vacancy.description.toLowerCase().includes(searchLower);
+
+      const matchesEmployment =
+        employmentFilter === 'all' || vacancy.employment_type === employmentFilter;
+
+      const matchesLocation =
+        locationFilter === 'all' || vacancy.location === locationFilter;
+
+      return matchesSearch && matchesEmployment && matchesLocation;
+    });
+  }, [employmentFilter, locationFilter, searchQuery, vacancies]);
+
+  const stats = useMemo(() => {
+    return {
+      total: vacancies.length,
+      companies: new Set(vacancies.map((item) => item.company)).size,
+      remote: vacancies.filter((item) => item.employment_type === 'remote').length,
+      authors: new Set(vacancies.map((item) => item.user_id).filter(Boolean)).size,
+    };
+  }, [vacancies]);
+
+  const openCreate = () => {
+    setEditingVacancy(null);
+    setFormData(EMPTY_FORM);
+    setIsModalOpen(true);
+  };
+
+  const openEdit = (vacancy: Vacancy) => {
+    setEditingVacancy(vacancy);
+    setFormData({
+      title: vacancy.title,
+      company: vacancy.company,
+      vacancy_url: vacancy.vacancy_url,
+      description: vacancy.description,
+      experience: vacancy.experience,
+      location: vacancy.location,
+      employment_type: vacancy.employment_type || 'full_time',
+    });
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setEditingVacancy(null);
+    setFormData(EMPTY_FORM);
+  };
+
+  const handleSubmit = async (event: React.FormEvent) => {
+    event.preventDefault();
     try {
       setIsSubmitting(true);
       if (editingVacancy) {
@@ -63,17 +141,7 @@ export const VacanciesPage: React.FC = () => {
       } else {
         await vacancyApi.create(formData);
       }
-      setIsModalOpen(false);
-      setEditingVacancy(null);
-      setFormData({
-        title: '',
-        company: '',
-        vacancy_url: '',
-        description: '',
-        experience: '',
-        location: '',
-        employment_type: 'full_time',
-      });
+      closeModal();
       void loadVacancies();
     } catch (err) {
       console.error('Failed to save vacancy', err);
@@ -83,167 +151,157 @@ export const VacanciesPage: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: string) => {
-    setConfirmDeleteId(id);
-  };
-
   const confirmDelete = async () => {
     if (!confirmDeleteId) return;
     try {
       await vacancyApi.delete(confirmDeleteId);
-      void loadVacancies();
+      setVacancies((current) => current.filter((item) => item.id !== confirmDeleteId));
     } catch (err) {
       console.error('Delete failed', err);
-      alert('Ошибка при удалении');
+      alert('Ошибка при удалении вакансии');
     } finally {
       setConfirmDeleteId(null);
     }
   };
 
-  const openEdit = (v: Vacancy) => {
-    setEditingVacancy(v);
-    setFormData({
-      title: v.title,
-      company: v.company,
-      vacancy_url: v.vacancy_url,
-      description: v.description,
-      experience: v.experience,
-      location: v.location,
-      employment_type: v.employment_type || 'full_time',
-    });
-    setIsModalOpen(true);
-  };
-
-  const filteredVacancies = vacancies.filter(v => 
-    v.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    v.company.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    v.description.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
   return (
-    <div className="fade-in" style={{ paddingBottom: '60px' }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '32px'
-      }}>
-        <div>
-          <h1 style={{ fontSize: '32px', fontWeight: '800', marginBottom: '8px' }}>Вакансии</h1>
-          <p style={{ color: 'var(--text-secondary)' }}>Помогайте своим найти достойную работу</p>
-        </div>
-        <button
-          className="btn hover-scale"
-          onClick={() => {
-            setEditingVacancy(null);
-            setFormData({
-              title: '',
-              company: '',
-              vacancy_url: '',
-              description: '',
-              experience: '',
-              location: '',
-              employment_type: 'full_time',
-            });
-            setIsModalOpen(true);
-          }}
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            gap: '8px',
-            padding: '12px 24px',
-            borderRadius: '16px',
-            background: 'var(--accent-color)',
-            boxShadow: '0 10px 20px rgba(79, 70, 229, 0.2)'
-          }}
-        >
-          <Plus size={20} /> Добавить вакансию
-        </button>
-      </div>
+    <div className="vacancies-page fade-in">
+      <section className="vacancies-hero">
+        <div className="vacancies-hero__intro">
+          <div>
+            <div className="vacancies-hero__eyebrow">
+              <Briefcase size={14} />
+              Referral board
+            </div>
+            <h1 className="vacancies-hero__title">Вакансии</h1>
+            <p className="vacancies-hero__description">
+              Лента реальных вакансий от сообщества. Быстро фильтруй по формату и локации,
+              открывай интересные позиции и публикуй свои реферальные объявления в одном месте.
+            </p>
+          </div>
 
-      <div className="card" style={{
-        marginBottom: '32px',
-        padding: '8px 16px',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '12px',
-        background: 'rgba(255,255,255,0.03)',
-        borderRadius: '16px',
-        border: '1px solid rgba(255,255,255,0.05)'
-      }}>
-        <Search size={20} color="var(--text-secondary)" />
-        <input
-          placeholder="Поиск по названию, компании или описанию..."
-          aria-label="Поиск вакансий"
-          value={searchQuery}
-          onChange={e => setSearchQuery(e.target.value)}
-          style={{
-            flex: 1,
-            background: 'transparent',
-            border: 'none',
-            outline: 'none',
-            color: 'white',
-            padding: '12px 0',
-            fontSize: '15px'
-          }}
-        />
-      </div>
+          <div className="vacancies-hero__meta">
+            <span className="badge">Без лишнего шума</span>
+            <span className="badge">Рефералки и прямые контакты</span>
+            <span className="badge">Нормальный поиск</span>
+          </div>
+        </div>
+
+        <aside className="vacancies-hero__panel">
+          <div className="vacancies-stat-grid">
+            <div className="vacancies-stat">
+              <span className="vacancies-stat__label">В ленте</span>
+              <strong className="vacancies-stat__value">{stats.total}</strong>
+            </div>
+            <div className="vacancies-stat">
+              <span className="vacancies-stat__label">Компаний</span>
+              <strong className="vacancies-stat__value">{stats.companies}</strong>
+            </div>
+            <div className="vacancies-stat">
+              <span className="vacancies-stat__label">Remote</span>
+              <strong className="vacancies-stat__value">{stats.remote}</strong>
+            </div>
+            <div className="vacancies-stat">
+              <span className="vacancies-stat__label">Авторов</span>
+              <strong className="vacancies-stat__value">{stats.authors}</strong>
+            </div>
+          </div>
+
+          <div className="vacancies-actions">
+            <button className="btn" onClick={openCreate}>
+              <Plus size={18} />
+              Добавить вакансию
+            </button>
+          </div>
+        </aside>
+      </section>
+
+      <section className="vacancies-search">
+        <div className="vacancies-search__row">
+          <div className="vacancies-search__field">
+            <Search size={18} />
+            <input
+              type="text"
+              className="input"
+              placeholder="Поиск по названию, компании или описанию"
+              aria-label="Поиск вакансий"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+
+          <select
+            className="input"
+            aria-label="Фильтр по занятости"
+            value={employmentFilter}
+            onChange={(e) => setEmploymentFilter(e.target.value)}
+          >
+            <option value="all">Любая занятость</option>
+            {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </select>
+
+          <select
+            className="input"
+            aria-label="Фильтр по локации"
+            value={locationFilter}
+            onChange={(e) => setLocationFilter(e.target.value)}
+          >
+            <option value="all">Любая локация</option>
+            {locations.map((location) => (
+              <option key={location} value={location}>
+                {location}
+              </option>
+            ))}
+          </select>
+        </div>
+      </section>
 
       {isLoading ? (
-        <div style={{ display: 'flex', justifyContent: 'center', padding: '60px' }}>
+        <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>
           <Loader2 className="spin" size={32} color="var(--accent-color)" />
         </div>
       ) : (
-        <div style={{
-          display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fill, minmax(350px, 1fr))',
-          gap: '24px'
-        }}>
+        <section className="vacancies-list">
           {filteredVacancies.length === 0 ? (
-            <div style={{ gridColumn: '1/-1', textAlign: 'center', padding: '60px', opacity: 0.5 }}>
-              Ничего не найдено
+            <div className="vacancies-empty">
+              <h3 style={{ margin: 0, fontSize: '22px' }}>Подходящих вакансий пока нет</h3>
+              <p style={{ margin: '10px 0 0' }}>
+                Попробуй сбросить фильтры или опубликуй новую позицию для сообщества.
+              </p>
             </div>
           ) : (
-            filteredVacancies.map(v => (
-              <div
-                key={v.id}
-                className="card"
-                style={{
-                  padding: '24px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: '16px',
-                  background: 'rgba(255,255,255,0.02)',
-                  border: '1px solid rgba(255,255,255,0.05)',
-                  borderRadius: '24px',
-                  transition: 'transform 0.2s, background-color 0.2s, border-color 0.2s'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.05)';
-                  e.currentTarget.style.borderColor = 'rgba(79, 70, 229, 0.35)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.02)';
-                  e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '4px' }}>
-                  <h3 style={{ fontSize: '18px', fontWeight: '700', lineHeight: '1.2' }}>{v.title}</h3>
-                  {(v.is_owner || currentUser?.isAdmin) && (
-                    <div style={{ display: 'flex', gap: '4px', marginTop: '-4px', marginRight: '-8px' }}>
-                      <button 
-                        onClick={() => openEdit(v)}
-                        style={{ background: 'none', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '8px', borderRadius: '50%' }}
-                        className="hover-opacity"
+            filteredVacancies.map((vacancy) => (
+              <article key={vacancy.id} className="vacancies-card">
+                <div className="vacancies-card__top">
+                  <div>
+                    <div className="vacancies-card__company">
+                      <Building2 size={15} />
+                      {vacancy.company}
+                    </div>
+                    <h3 className="vacancies-card__title">{vacancy.title}</h3>
+                  </div>
+
+                  {(vacancy.is_owner || currentUser?.isAdmin) && (
+                    <div style={{ display: 'inline-flex', gap: 6 }}>
+                      <button
+                        className="btn btn-ghost"
+                        type="button"
+                        aria-label="Редактировать вакансию"
+                        onClick={() => openEdit(vacancy)}
+                        style={{ minHeight: 40, minWidth: 40, padding: 0 }}
                       >
                         <Pencil size={16} />
                       </button>
-                      <button 
-                        onClick={() => handleDelete(v.id)}
-                        style={{ background: 'none', border: 'none', color: 'rgba(239, 68, 68, 0.4)', cursor: 'pointer', padding: '8px', borderRadius: '50%' }}
-                        className="hover-opacity"
+                      <button
+                        className="btn btn-ghost"
+                        type="button"
+                        aria-label="Удалить вакансию"
+                        onClick={() => setConfirmDeleteId(vacancy.id)}
+                        style={{ minHeight: 40, minWidth: 40, padding: 0, color: '#f28b82' }}
                       >
                         <Trash2 size={16} />
                       </button>
@@ -251,212 +309,155 @@ export const VacanciesPage: React.FC = () => {
                   )}
                 </div>
 
-                <div style={{ display: 'flex', alignItems: 'center', gap: '6px', color: 'var(--accent-color)', fontSize: '14px', fontWeight: 600, marginBottom: '12px' }}>
-                  <Building2 size={14} /> {v.company}
-                </div>
-                <p style={{ 
-                  fontSize: '13px', 
-                  color: 'rgba(255,255,255,0.5)', 
-                  lineHeight: '1.5',
-                  marginBottom: '16px',
-                  display: '-webkit-box',
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: 'vertical',
-                  overflow: 'hidden'
-                }}>
-                  {v.description}
-                </p>
+                <p className="vacancies-card__description">{vacancy.description}</p>
 
-                <div style={{ display: 'flex', flexWrap: 'wrap', gap: '6px', marginBottom: '20px' }}>
-                  <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '6px', fontWeight: 500 }}>
-                    {v.experience}
-                  </span>
-                  <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '6px', fontWeight: 500 }}>
-                    {employmentTypeLabel(v.employment_type)}
-                  </span>
-                  <span style={{ fontSize: '11px', background: 'rgba(255,255,255,0.05)', color: 'var(--text-secondary)', padding: '4px 10px', borderRadius: '6px', fontWeight: 500, display: 'flex', alignItems: 'center', gap: '4px' }}>
-                    <MapPin size={10} /> {v.location}
-                  </span>
-                </div>
-
-                <div style={{ 
-                  display: 'flex', 
-                  justifyContent: 'space-between', 
-                  alignItems: 'center',
-                  marginTop: 'auto',
-                  paddingTop: '16px',
-                  borderTop: '1px solid rgba(255,255,255,0.03)'
-                }}>
-                  <Link 
-                    to={`/profile/${v.user_id}`}
-                    style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '8px', 
-                      textDecoration: 'none',
-                      color: 'inherit'
-                    }}
-                  >
-                    <div style={{ 
-                      width: '24px', 
-                      height: '24px', 
-                      borderRadius: '6px', 
-                      background: 'rgba(255,255,255,0.1)',
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '10px',
-                      fontWeight: 700,
-                      color: 'white'
-                    }}>
-                      {v.author_name.charAt(0).toUpperCase()}
-                    </div>
-                    <span style={{ fontSize: '12px', color: 'var(--text-secondary)', fontWeight: 500 }}>
-                      {v.author_name}
+                <div className="vacancies-card__chips">
+                  {!!vacancy.experience && (
+                    <span className="vacancies-card__chip">{vacancy.experience}</span>
+                  )}
+                  <span className="vacancies-card__chip">{employmentTypeLabel(vacancy.employment_type)}</span>
+                  {!!vacancy.location && (
+                    <span className="vacancies-card__chip">
+                      <MapPin size={12} />
+                      {vacancy.location}
                     </span>
+                  )}
+                </div>
+
+                <div className="vacancies-card__footer">
+                  <Link to={`/profile/${vacancy.user_id}`} className="vacancies-author">
+                    <span className="vacancies-author__avatar">{authorInitial(vacancy.author_name)}</span>
+                    <span className="vacancies-author__name">{vacancy.author_name}</span>
                   </Link>
-                  
-                  <a 
-                    href={v.vacancy_url} 
-                    target="_blank" 
+
+                  <a
+                    href={vacancy.vacancy_url}
+                    target="_blank"
                     rel="noreferrer"
-                    style={{ 
-                      display: 'flex', 
-                      alignItems: 'center', 
-                      gap: '4px', 
-                      color: 'var(--accent-color)', 
-                      fontSize: '13px',
-                      fontWeight: '700',
-                      textDecoration: 'none'
-                    }}
+                    className="vacancies-card__cta"
                   >
-                    Подробнее <ExternalLink size={12} />
+                    Открыть вакансию
+                    <ExternalLink size={14} />
                   </a>
                 </div>
-              </div>
+              </article>
             ))
           )}
-        </div>
+        </section>
       )}
 
       {isModalOpen && (
-        <div className="fade-in" style={{
-          position: 'fixed',
-          inset: 0,
-          background: 'rgba(0,0,0,0.8)',
-          backdropFilter: 'blur(8px)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          zIndex: 1000,
-          padding: '20px'
-        }}>
-          <div className="card" style={{
-            width: '100%',
-            maxWidth: '600px',
-            maxHeight: '90vh',
-            overflowY: 'auto',
-            padding: '32px',
-            borderRadius: '24px',
-            border: '1px solid rgba(255,255,255,0.1)'
-          }}>
-            <h2 style={{ fontSize: '24px', fontWeight: '800', marginBottom: '24px' }}>
-              {editingVacancy ? 'Редактировать вакансию' : 'Новая вакансия'}
-            </h2>
+        <div className="vacancies-modal fade-in">
+          <div className="vacancies-modal__panel">
+            <div className="vacancies-modal__header">
+              <div>
+                <h2 className="vacancies-modal__title">
+                  {editingVacancy ? 'Редактирование вакансии' : 'Новая вакансия'}
+                </h2>
+                <p className="vacancies-modal__subtitle">
+                  Пиши кратко и по делу: роль, компания, ссылка, контекст и формат работы.
+                </p>
+              </div>
+            </div>
 
-            <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Должность</label>
+            <form className="vacancies-form" onSubmit={handleSubmit}>
+              <div className="vacancies-form__grid">
+                <div className="vacancies-form__section">
+                  <label htmlFor="vacancy-title">Роль</label>
                   <input
+                    id="vacancy-title"
                     required
                     className="input"
+                    placeholder="Senior Backend Engineer"
                     value={formData.title}
-                    onChange={e => setFormData({ ...formData, title: e.target.value })}
+                    onChange={(e) => setFormData((current) => ({ ...current, title: e.target.value }))}
                   />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Компания</label>
+
+                <div className="vacancies-form__section">
+                  <label htmlFor="vacancy-company">Компания</label>
                   <input
+                    id="vacancy-company"
                     required
                     className="input"
+                    placeholder="Ozon"
                     value={formData.company}
-                    onChange={e => setFormData({ ...formData, company: e.target.value })}
+                    onChange={(e) => setFormData((current) => ({ ...current, company: e.target.value }))}
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Ссылка на вакансию (HH.ru, LinkedIn и т.д.)</label>
+              <div className="vacancies-form__section">
+                <label htmlFor="vacancy-url">Ссылка на вакансию</label>
                 <input
+                  id="vacancy-url"
                   required
                   type="url"
                   className="input"
+                  placeholder="https://..."
                   value={formData.vacancy_url}
-                  onChange={e => setFormData({ ...formData, vacancy_url: e.target.value })}
+                  onChange={(e) => setFormData((current) => ({ ...current, vacancy_url: e.target.value }))}
                 />
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Описание</label>
+              <div className="vacancies-form__section">
+                <label htmlFor="vacancy-description">Что важно знать</label>
                 <textarea
+                  id="vacancy-description"
                   required
                   className="input"
-                  style={{ minHeight: '120px', padding: '12px' }}
+                  placeholder="Коротко распиши стек, команду, домен, важные ожидания и почему вакансия worth it."
                   value={formData.description}
-                  onChange={e => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) => setFormData((current) => ({ ...current, description: e.target.value }))}
                 />
               </div>
 
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Опыт</label>
+              <div className="vacancies-form__grid">
+                <div className="vacancies-form__section">
+                  <label htmlFor="vacancy-experience">Опыт</label>
                   <input
-                    placeholder="Напр. 3-6 лет"
+                    id="vacancy-experience"
                     className="input"
+                    placeholder="3-6 лет"
                     value={formData.experience}
-                    onChange={e => setFormData({ ...formData, experience: e.target.value })}
+                    onChange={(e) => setFormData((current) => ({ ...current, experience: e.target.value }))}
                   />
                 </div>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                  <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Локация</label>
+
+                <div className="vacancies-form__section">
+                  <label htmlFor="vacancy-location">Локация</label>
                   <input
-                    placeholder="Город или Удаленка"
+                    id="vacancy-location"
                     className="input"
+                    placeholder="Москва / Remote / СПб"
                     value={formData.location}
-                    onChange={e => setFormData({ ...formData, location: e.target.value })}
+                    onChange={(e) => setFormData((current) => ({ ...current, location: e.target.value }))}
                   />
                 </div>
               </div>
 
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
-                <label style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Тип занятости</label>
+              <div className="vacancies-form__section">
+                <label htmlFor="vacancy-employment">Занятость</label>
                 <select
+                  id="vacancy-employment"
                   className="input"
                   value={formData.employment_type}
-                  onChange={e => setFormData({ ...formData, employment_type: e.target.value })}
+                  onChange={(e) => setFormData((current) => ({ ...current, employment_type: e.target.value }))}
                 >
                   {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>{option.label}</option>
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
                   ))}
                 </select>
               </div>
 
-              <div style={{ display: 'flex', gap: '12px', marginTop: '24px' }}>
-                <button
-                  type="button"
-                  className="btn"
-                  onClick={() => setIsModalOpen(false)}
-                  style={{ background: 'rgba(255,255,255,0.05)', flex: 1 }}
-                >
+              <div className="vacancies-form__footer">
+                <button type="button" className="btn btn-ghost" onClick={closeModal}>
                   Отмена
                 </button>
-                <button
-                  disabled={isSubmitting}
-                  className="btn"
-                  style={{ background: 'var(--accent-color)', flex: 2 }}
-                >
-                  {isSubmitting ? 'Сохранение...' : 'Опубликовать'}
+                <button type="submit" className="btn" disabled={isSubmitting}>
+                  {isSubmitting ? 'Сохраняю…' : editingVacancy ? 'Сохранить изменения' : 'Опубликовать вакансию'}
                 </button>
               </div>
             </form>
@@ -467,10 +468,10 @@ export const VacanciesPage: React.FC = () => {
       <ConfirmModal
         isOpen={!!confirmDeleteId}
         title="Удалить вакансию?"
-        message="Вы уверены, что хотите удалить эту вакансию? Это действие нельзя отменить."
+        message="Это действие нельзя отменить. Запись исчезнет из общей ленты."
         confirmText="Удалить"
         cancelText="Отмена"
-        isDangerous={true}
+        isDangerous
         onConfirm={confirmDelete}
         onCancel={() => setConfirmDeleteId(null)}
       />

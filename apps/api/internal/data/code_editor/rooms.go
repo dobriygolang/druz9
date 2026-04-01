@@ -22,9 +22,9 @@ func (r *Repo) CreateRoom(ctx context.Context, room *codeeditordomain.Room) (*co
 
 	_, err = tx.Exec(
 		ctx,
-		`INSERT INTO code_rooms (id, mode, code, code_revision, status, creator_id, invite_code, task, task_id, duel_topic, created_at, updated_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())`,
-		room.ID, room.Mode, room.Code, room.CodeRevision, room.Status, room.CreatorID, room.InviteCode, room.Task, room.TaskID, room.DuelTopic,
+		`INSERT INTO code_rooms (id, mode, code, code_revision, status, creator_id, invite_code, task_id, duel_topic, created_at, updated_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,
+		room.ID, room.Mode, room.Code, room.CodeRevision, room.Status, room.CreatorID, room.InviteCode, room.TaskID, room.DuelTopic,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("insert room: %w", err)
@@ -53,9 +53,10 @@ func (r *Repo) CreateRoom(ctx context.Context, room *codeeditordomain.Room) (*co
 func (r *Repo) GetRoom(ctx context.Context, roomID uuid.UUID) (*codeeditordomain.Room, error) {
 	var room codeeditordomain.Room
 	err := scanRoom(r.data.DB.QueryRow(ctx, `
-		SELECT `+roomColumns+`
-		FROM code_rooms
-		WHERE id = $1
+		SELECT `+roomSelectColumns+`
+		FROM code_rooms cr
+		LEFT JOIN code_tasks ct ON ct.id = cr.task_id
+		WHERE cr.id = $1
 	`, roomID), &room)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -73,9 +74,10 @@ func (r *Repo) GetRoom(ctx context.Context, roomID uuid.UUID) (*codeeditordomain
 func (r *Repo) GetRoomByInviteCode(ctx context.Context, inviteCode string) (*codeeditordomain.Room, error) {
 	var room codeeditordomain.Room
 	err := scanRoom(r.data.DB.QueryRow(ctx, `
-		SELECT `+roomColumns+`
-		FROM code_rooms
-		WHERE invite_code = $1
+		SELECT `+roomSelectColumns+`
+		FROM code_rooms cr
+		LEFT JOIN code_tasks ct ON ct.id = cr.task_id
+		WHERE cr.invite_code = $1
 	`, inviteCode), &room)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -143,4 +145,18 @@ func (r *Repo) CleanupInactiveRooms(ctx context.Context, idleFor time.Duration) 
 		return 0, fmt.Errorf("cleanup inactive rooms: %w", err)
 	}
 	return tag.RowsAffected(), nil
+}
+
+func (r *Repo) CountOpenRooms(ctx context.Context, activeSince time.Time) (int, error) {
+	var count int
+	err := r.data.DB.QueryRow(ctx, `
+		SELECT COUNT(*)
+		FROM code_rooms
+		WHERE status IN ($1, $2)
+		  AND updated_at >= $3
+	`, model.RoomStatusWaiting, model.RoomStatusActive, activeSince).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("count open rooms: %w", err)
+	}
+	return count, nil
 }

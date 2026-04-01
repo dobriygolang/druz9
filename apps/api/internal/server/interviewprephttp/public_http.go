@@ -216,7 +216,14 @@ func handleSystemDesignReview(
 		header.Filename,
 		header.Header.Get("Content-Type"),
 		imageBytes,
-		r.FormValue("notes"),
+		appinterviewprep.SystemDesignReviewInput{
+			Notes:          r.FormValue("notes"),
+			Components:     r.FormValue("components"),
+			APIs:           r.FormValue("apis"),
+			DatabaseSchema: r.FormValue("databaseSchema"),
+			Traffic:        r.FormValue("traffic"),
+			Reliability:    r.FormValue("reliability"),
+		},
 	)
 	if err != nil {
 		writeError(w, err)

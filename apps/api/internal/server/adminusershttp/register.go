@@ -18,6 +18,7 @@ type Authorizer interface {
 
 type Repo interface {
 	UpdateUserTrusted(ctx context.Context, userID uuid.UUID, isTrusted bool) error
+	UpdateUserAdmin(ctx context.Context, userID uuid.UUID, isAdmin bool) error
 }
 
 type CacheInvalidator interface {

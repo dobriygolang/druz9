@@ -48,6 +48,7 @@ export const ProfilePage: React.FC = () => {
   const [telegramCode, setTelegramCode] = useState('');
   const [isBindingTelegram, setIsBindingTelegram] = useState(false);
   const [trustedUpdating, setTrustedUpdating] = useState(false);
+  const [adminUpdating, setAdminUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Crop state
@@ -521,6 +522,31 @@ export const ProfilePage: React.FC = () => {
               }}
             >
               {trustedUpdating ? 'Сохраняем...' : user.isTrusted ? 'Снять trusted' : 'Сделать trusted'}
+            </button>
+          )}
+
+          {currentUser?.isAdmin && user?.id && (
+            <button
+              className="btn"
+              style={{ padding: '4px 8px', fontSize: '12px' }}
+              disabled={adminUpdating}
+              onClick={async () => {
+                try {
+                  setAdminUpdating(true);
+                  await adminApi.setUserAdmin(user.id, !user.isAdmin);
+                  clearProfileByIdCache(user.id);
+                  const profile = await authApi.getProfileById(user.id);
+                  setUser(profile.user);
+                  showToast(user.isAdmin ? 'Права администратора сняты' : 'Пользователь стал админом', 'success');
+                } catch (e) {
+                  console.error('Failed to update admin flag:', e);
+                  showToast('Ошибка при обновлении прав администратора', 'error');
+                } finally {
+                  setAdminUpdating(false);
+                }
+              }}
+            >
+              {adminUpdating ? 'Сохраняем...' : user.isAdmin ? 'Снять админа' : 'Сделать админом'}
             </button>
           )}
 

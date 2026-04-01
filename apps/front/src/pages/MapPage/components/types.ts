@@ -24,6 +24,9 @@ export type EventDraft = {
   longitude?: number;
   title: string;
   description: string;
+  event_color?: 'violet' | 'emerald' | 'amber' | 'rose' | 'sky';
+  event_group?: string;
+  event_type?: string;
   meeting_link: string;
   place_label: string;
   region: string;

@@ -216,20 +216,6 @@ s3_bucket:
   type: "string"
   writable: false
 
-s3_access_key:
-  usage: "S3 access key"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
-
-s3_secret_key:
-  usage: "S3 secret key"
-  group: "external"
-  value: ""
-  type: "string"
-  writable: false
-
 ai_review_provider:
   usage: "AI review provider key, for example gemini or openai_compatible"
   group: "external"

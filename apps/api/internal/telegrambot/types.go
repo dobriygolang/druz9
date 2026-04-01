@@ -28,3 +28,16 @@ type telegramUser struct {
 	LastName  string `json:"last_name"`
 	Username  string `json:"username"`
 }
+
+type telegramUserProfilePhotos struct {
+	TotalCount int                   `json:"total_count"`
+	Photos     [][]telegramPhotoSize `json:"photos"`
+}
+
+type telegramPhotoSize struct {
+	FileID string `json:"file_id"`
+}
+
+type telegramFile struct {
+	FilePath string `json:"file_path"`
+}

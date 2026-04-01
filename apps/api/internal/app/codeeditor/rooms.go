@@ -20,7 +20,6 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 	}
 
 	inviteCode := generateInviteCode()
-	taskDescription := ""
 	code := defaultCode()
 	var taskID *uuid.UUID
 	nowTime := now()
@@ -34,7 +33,6 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 			return nil, domain.ErrNoAvailableTasks
 		}
 		taskID = &task.ID
-		taskDescription = task.Statement
 		code = task.StarterCode
 		s.taskCache.Set(task.ID.String(), *task, 0)
 	}
@@ -46,7 +44,6 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 		Status:     model.RoomStatusWaiting,
 		CreatorID:  uuid.Nil,
 		InviteCode: inviteCode,
-		Task:       taskDescription,
 		TaskID:     taskID,
 		DuelTopic:  topic,
 		CreatedAt:  nowTime,
@@ -305,4 +302,8 @@ func (s *Service) GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*doma
 
 func (s *Service) CleanupInactiveRooms(ctx context.Context, idleFor time.Duration) (int64, error) {
 	return s.repo.CleanupInactiveRooms(ctx, idleFor)
+}
+
+func (s *Service) CleanupOldSubmissions(ctx context.Context, idleFor time.Duration) (int64, error) {
+	return s.repo.CleanupOldSubmissions(ctx, idleFor)
 }

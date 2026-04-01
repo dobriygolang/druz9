@@ -79,7 +79,7 @@ services:
     ports:
       - "9091:9090"
     volumes:
-      - ./scripts/prometheus.yaml:/etc/prometheus/prometheus.yml:ro
+      - ./scripts/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - ./scripts/prometheus/alerts:/etc/prometheus/alerts:ro
       - prometheus_data:/prometheus
     command:
@@ -90,6 +90,29 @@ services:
       - '--web.enable-remote-write-receiver'
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    depends_on:
+      - alertmanager
+    networks:
+      - api_network
+
+  alertmanager:
+    image: prom/alertmanager:latest
+    container_name: api-alertmanager
+    ports:
+      - "9093:9093"
+    volumes:
+      - ./scripts/prometheus/alertmanager.yml.tmpl:/etc/alertmanager/alertmanager.yml.tmpl:ro
+    command:
+      - /bin/sh
+      - -ec
+      - |
+        BOT_TOKEN="$${ALERT_TELEGRAM_BOT_TOKEN:-disabled}";
+        CHAT_ID="$${ALERT_TELEGRAM_CHAT_ID:-0}";
+        sed \
+          -e "s|__BOT_TOKEN__|$$BOT_TOKEN|g" \
+          -e "s|__CHAT_ID__|$$CHAT_ID|g" \
+          /etc/alertmanager/alertmanager.yml.tmpl > /tmp/alertmanager.yml;
+        exec /bin/alertmanager --config.file=/tmp/alertmanager.yml --storage.path=/alertmanager
     networks:
       - api_network
 

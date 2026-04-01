@@ -1,0 +1,57 @@
+global:
+  resolve_timeout: 5m
+
+route:
+  receiver: telegram-warning
+  group_by: ['alertname', 'job']
+  group_wait: 20s
+  group_interval: 5m
+  repeat_interval: 4h
+  routes:
+    - matchers:
+        - severity="critical"
+      receiver: telegram-critical
+      group_wait: 10s
+      repeat_interval: 30m
+    - matchers:
+        - severity="warning"
+      receiver: telegram-warning
+      repeat_interval: 2h
+
+inhibit_rules:
+  - source_matchers:
+      - severity="critical"
+    target_matchers:
+      - severity="warning"
+    equal: ['alertname', 'job', 'instance']
+
+receivers:
+  - name: telegram-warning
+    telegram_configs:
+      - bot_token: '__BOT_TOKEN__'
+        chat_id: __CHAT_ID__
+        parse_mode: HTML
+        send_resolved: true
+        message: |
+          {{ if eq .Status "firing" }}⚠️{{ else }}✅{{ end }} <b>{{ .CommonLabels.alertname }}</b>
+          Severity: <b>{{ .CommonLabels.severity }}</b>
+          {{ range .Alerts -}}
+          • {{ .Annotations.summary }}
+          {{ if .Annotations.description }}{{ .Annotations.description }}{{ end }}
+          {{ if .Labels.job }}job=<code>{{ .Labels.job }}</code>{{ end }}{{ if .Labels.instance }} instance=<code>{{ .Labels.instance }}</code>{{ end }}
+          {{ end }}
+
+  - name: telegram-critical
+    telegram_configs:
+      - bot_token: '__BOT_TOKEN__'
+        chat_id: __CHAT_ID__
+        parse_mode: HTML
+        send_resolved: true
+        message: |
+          {{ if eq .Status "firing" }}🚨{{ else }}✅{{ end }} <b>{{ .CommonLabels.alertname }}</b>
+          Severity: <b>{{ .CommonLabels.severity }}</b>
+          {{ range .Alerts -}}
+          • {{ .Annotations.summary }}
+          {{ if .Annotations.description }}{{ .Annotations.description }}{{ end }}
+          {{ if .Labels.job }}job=<code>{{ .Labels.job }}</code>{{ end }}{{ if .Labels.instance }} instance=<code>{{ .Labels.instance }}</code>{{ end }}
+          {{ end }}

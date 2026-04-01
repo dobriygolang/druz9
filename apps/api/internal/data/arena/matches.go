@@ -283,6 +283,20 @@ func (r *Repo) CleanupInactiveMatches(ctx context.Context, idleFor time.Duration
 	return totalAffected, nil
 }
 
+func (r *Repo) CountOpenMatches(ctx context.Context, activeSince time.Time) (int, error) {
+	var count int
+	err := r.data.DB.QueryRow(ctx, `
+		SELECT COUNT(*)
+		FROM arena_matches
+		WHERE status IN ($1, $2)
+		  AND updated_at >= $3
+	`, model.ArenaMatchStatusWaiting, model.ArenaMatchStatusActive, activeSince).Scan(&count)
+	if err != nil {
+		return 0, fmt.Errorf("count open arena matches: %w", err)
+	}
+	return count, nil
+}
+
 func (r *Repo) JoinMatch(ctx context.Context, matchID uuid.UUID, player *domain.Player, starterCode string) (*domain.Match, error) {
 	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {

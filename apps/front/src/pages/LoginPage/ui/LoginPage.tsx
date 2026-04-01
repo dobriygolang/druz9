@@ -30,6 +30,14 @@ export const LoginPage: React.FC = () => {
       setIsSubmitting(true);
       setError('');
       if (mode === 'register') {
+        if (form.password.trim().length < 8) {
+          setError('Для регистрации нужен пароль минимум 8 символов');
+          return;
+        }
+        if (!form.firstName.trim()) {
+          setError('Укажите имя');
+          return;
+        }
         await registerWithPassword(form);
         return;
       }
@@ -101,7 +109,7 @@ export const LoginPage: React.FC = () => {
               <input
                 className="input"
                 type="password"
-                placeholder="Пароль"
+                placeholder={mode === 'register' ? 'Пароль, минимум 8 символов' : 'Пароль'}
                 value={form.password}
                 onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
               />

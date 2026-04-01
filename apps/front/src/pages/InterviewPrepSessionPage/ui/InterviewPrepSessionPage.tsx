@@ -8,6 +8,7 @@ import {
   InterviewPrepQuestion,
   InterviewPrepSession,
   InterviewPrepSystemDesignReview,
+  InterviewPrepSystemDesignReviewInput,
   InterviewPrepSelfAssessment,
 } from '@/features/InterviewPrep/api/interviewPrepApi';
 import { displayLanguageLabel, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
@@ -119,7 +120,14 @@ export function InterviewPrepSessionPage() {
   const [code, setCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [reviewingDesign, setReviewingDesign] = useState(false);
-  const [designNotes, setDesignNotes] = useState('');
+  const [designReviewInput, setDesignReviewInput] = useState<InterviewPrepSystemDesignReviewInput>({
+    notes: '',
+    components: '',
+    apis: '',
+    databaseSchema: '',
+    traffic: '',
+    reliability: '',
+  });
   const [designImage, setDesignImage] = useState<File | null>(null);
   const [designReview, setDesignReview] = useState<InterviewPrepSystemDesignReview | null>(null);
   const [editorHeight, setEditorHeight] = useState(560);
@@ -264,7 +272,7 @@ export function InterviewPrepSessionPage() {
     setReviewingDesign(true);
     setError(null);
     try {
-      const result = await interviewPrepApi.reviewSystemDesign(sessionId, designImage, designNotes);
+      const result = await interviewPrepApi.reviewSystemDesign(sessionId, designImage, designReviewInput);
       setDesignReview(result);
     } catch (e: any) {
       console.error('Failed to review system design:', e);
@@ -545,10 +553,67 @@ export function InterviewPrepSessionPage() {
               <span className="interview-prep-block-title">Контекст для модели</span>
               <textarea
                 className="input interview-prep-notes-input"
-                placeholder="Например: assumed 20k RPS, multi-region не делал, auth и billing опустил специально"
-                value={designNotes}
-                onChange={(event) => setDesignNotes(event.target.value)}
+                placeholder={"Опиши задачу своими словами.\nЧто за сервис или продукт?\nКакие части на схеме намеренно упрощены?\nКакие trade-off ты выбрал сознательно?"}
+                value={designReviewInput.notes}
+                onChange={(event) => setDesignReviewInput((prev) => ({ ...prev, notes: event.target.value }))}
                 rows={5}
+              />
+            </label>
+          </div>
+
+          <div className="interview-prep-design-review-grid">
+            <label className="interview-prep-notes-field">
+              <span className="interview-prep-block-title">Компоненты</span>
+              <textarea
+                className="input interview-prep-notes-input"
+                placeholder={"Например:\n- API Gateway\n- Auth Service\n- Order Service\n- Worker pool\n- Redis cache\n- Kafka / queue"}
+                value={designReviewInput.components}
+                onChange={(event) => setDesignReviewInput((prev) => ({ ...prev, components: event.target.value }))}
+                rows={4}
+              />
+            </label>
+
+            <label className="interview-prep-notes-field">
+              <span className="interview-prep-block-title">Ручки и контракты</span>
+              <textarea
+                className="input interview-prep-notes-input"
+                placeholder={"Например:\nPOST /orders\nGET /feed\norder.created event\ngrpc UserService/GetProfile"}
+                value={designReviewInput.apis}
+                onChange={(event) => setDesignReviewInput((prev) => ({ ...prev, apis: event.target.value }))}
+                rows={4}
+              />
+            </label>
+
+            <label className="interview-prep-notes-field">
+              <span className="interview-prep-block-title">Базы данных и таблицы</span>
+              <textarea
+                className="input interview-prep-notes-input"
+                placeholder={"Например:\nusers(id, ...)\norders(id, user_id, status)\npayments(order_id, state)\nИндексы, shard key, Redis keys, TTL"}
+                value={designReviewInput.databaseSchema}
+                onChange={(event) => setDesignReviewInput((prev) => ({ ...prev, databaseSchema: event.target.value }))}
+                rows={4}
+              />
+            </label>
+
+            <label className="interview-prep-notes-field">
+              <span className="interview-prep-block-title">Нагрузка</span>
+              <textarea
+                className="input interview-prep-notes-input"
+                placeholder={"Например:\n20k RPS reads\n2k RPS writes\n5M DAU\np95 < 200ms\nпик в 5x во время акции"}
+                value={designReviewInput.traffic}
+                onChange={(event) => setDesignReviewInput((prev) => ({ ...prev, traffic: event.target.value }))}
+                rows={4}
+              />
+            </label>
+
+            <label className="interview-prep-notes-field">
+              <span className="interview-prep-block-title">Надёжность и scaling</span>
+              <textarea
+                className="input interview-prep-notes-input"
+                placeholder={"Например:\nretries + idempotency\nreplication/failover\nbackpressure\nrate limit\nSLO/alerts/tracing"}
+                value={designReviewInput.reliability}
+                onChange={(event) => setDesignReviewInput((prev) => ({ ...prev, reliability: event.target.value }))}
+                rows={4}
               />
             </label>
           </div>

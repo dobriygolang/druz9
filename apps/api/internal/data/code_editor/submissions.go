@@ -3,18 +3,24 @@ package code_editor
 import (
 	"context"
 	"fmt"
+	"time"
 
 	codeeditordomain "api/internal/domain/codeeditor"
 
 	"github.com/google/uuid"
 )
 
+const maxStoredSubmissionTextBytes = 16 * 1024
+
 func (r *Repo) CreateSubmission(ctx context.Context, submission *codeeditordomain.Submission) (*codeeditordomain.Submission, error) {
+	submission.Output = trimSubmissionText(submission.Output)
+	submission.Error = trimSubmissionText(submission.Error)
+
 	_, err := r.data.DB.Exec(
 		ctx,
-		`INSERT INTO code_submissions (id, room_id, user_id, guest_name, code, output, error, submitted_at, duration_ms, is_correct, passed_count, total_count)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, NOW(), $8, $9, $10, $11)`,
-		submission.ID, submission.RoomID, submission.UserID, submission.GuestName, submission.Code, submission.Output, submission.Error, submission.DurationMs, submission.IsCorrect, submission.PassedCount, submission.TotalCount,
+		`INSERT INTO code_submissions (id, room_id, user_id, guest_name, output, error, submitted_at, duration_ms, is_correct, passed_count, total_count)
+		 VALUES ($1, $2, $3, $4, $5, $6, NOW(), $7, $8, $9, $10)`,
+		submission.ID, submission.RoomID, submission.UserID, submission.GuestName, submission.Output, submission.Error, submission.DurationMs, submission.IsCorrect, submission.PassedCount, submission.TotalCount,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("create submission: %w", err)
@@ -26,7 +32,7 @@ func (r *Repo) CreateSubmission(ctx context.Context, submission *codeeditordomai
 }
 
 func (r *Repo) GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*codeeditordomain.Submission, error) {
-	rows, err := r.data.DB.Query(ctx, `SELECT id, room_id, user_id, guest_name, code, output, error, submitted_at, duration_ms, is_correct, passed_count, total_count FROM code_submissions WHERE room_id = $1 ORDER BY submitted_at ASC`, roomID)
+	rows, err := r.data.DB.Query(ctx, `SELECT id, room_id, user_id, guest_name, output, error, submitted_at, duration_ms, is_correct, passed_count, total_count FROM code_submissions WHERE room_id = $1 ORDER BY submitted_at ASC`, roomID)
 	if err != nil {
 		return nil, fmt.Errorf("get submissions: %w", err)
 	}
@@ -41,4 +47,33 @@ func (r *Repo) GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*codeedi
 		submissions = append(submissions, &s)
 	}
 	return submissions, nil
+}
+
+func (r *Repo) CleanupOldSubmissions(ctx context.Context, idleFor time.Duration) (int64, error) {
+	tag, err := r.data.DB.Exec(ctx, `
+		DELETE FROM code_submissions cs
+		WHERE cs.submitted_at < NOW() - $1::interval
+		  AND EXISTS (
+		    SELECT 1
+		    FROM code_rooms cr
+		    WHERE cr.id = cs.room_id
+		      AND cr.status IN ($2, $3)
+		  )
+	`, idleFor.String(), codeeditordomain.RoomStatusWaiting, codeeditordomain.RoomStatusFinished)
+	if err != nil {
+		return 0, fmt.Errorf("cleanup old submissions: %w", err)
+	}
+	return tag.RowsAffected(), nil
+}
+
+func trimSubmissionText(value string) string {
+	if len(value) <= maxStoredSubmissionTextBytes {
+		return value
+	}
+	const suffix = "\n...[truncated]"
+	limit := maxStoredSubmissionTextBytes - len(suffix)
+	if limit < 0 {
+		limit = 0
+	}
+	return value[:limit] + suffix
 }

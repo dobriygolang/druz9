@@ -204,7 +204,6 @@ export const CodeRoomPage: React.FC = () => {
       // Добавляем в историю с уникальным ID
       const newSubmission: Submission = {
         id: `${now}-${Math.random().toString(36).slice(2, 9)}`,
-        code: codeRef.current,
         output: sub.output,
         error: sub.error,
         exitCode: sub.exitCode,

@@ -5,8 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"strings"
+	"time"
 
-	podcastdomain "api/internal/domain/podcast"
 	"api/internal/model"
 	"api/internal/storage/postgres"
 
@@ -21,7 +21,7 @@ type Repo struct {
 	log  *log.Helper
 }
 
-func NewRepo(dataLayer *postgres.Store, logger log.Logger) podcastdomain.Repository {
+func NewRepo(dataLayer *postgres.Store, logger log.Logger) *Repo {
 	return &Repo{
 		data: dataLayer,
 		log:  log.NewHelper(logger),
@@ -38,13 +38,14 @@ func (r *Repo) ListPodcasts(ctx context.Context, opts model.ListPodcastsOptions)
 
 	// Get total count
 	var totalCount int32
-	if err := r.data.DB.QueryRow(ctx, `SELECT COUNT(*) FROM podcasts`).Scan(&totalCount); err != nil {
+	if err := r.data.DB.QueryRow(ctx, `SELECT COUNT(*) FROM podcasts WHERE COALESCE(object_key, '') <> ''`).Scan(&totalCount); err != nil {
 		return nil, fmt.Errorf("count podcasts: %w", err)
 	}
 
 	query := fmt.Sprintf(`
 SELECT %s
 FROM podcasts
+WHERE COALESCE(object_key, '') <> ''
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `, podcastColumns)
@@ -75,6 +76,21 @@ LIMIT $1 OFFSET $2
 		TotalCount:  totalCount,
 		HasNextPage: hasNextPage,
 	}, nil
+}
+
+func (r *Repo) CleanupStaleDrafts(ctx context.Context, olderThan time.Duration) (int64, error) {
+	if olderThan <= 0 {
+		return 0, nil
+	}
+	tag, err := r.data.DB.Exec(ctx, `
+DELETE FROM podcasts
+WHERE COALESCE(object_key, '') = ''
+  AND created_at < NOW() - $1::interval
+`, olderThan.String())
+	if err != nil {
+		return 0, fmt.Errorf("cleanup stale podcast drafts: %w", err)
+	}
+	return tag.RowsAffected(), nil
 }
 
 func (r *Repo) GetPodcast(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, error) {

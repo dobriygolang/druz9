@@ -76,8 +76,6 @@ function normalizeVacancy(r: BackendReferral): Vacancy {
     id: r.id,
     user_id: r.userId ?? '',
     author_name: r.authorName ?? 'Anonymous',
-    author_telegram_username: r.authorTelegramUsername ?? '',
-    author_telegram_profile_url: r.authorTelegramProfileUrl ?? '',
     title: r.title,
     company: r.company,
     vacancy_url: r.vacancyUrl,
@@ -87,7 +85,6 @@ function normalizeVacancy(r: BackendReferral): Vacancy {
     employment_type: normalizeEmploymentType(r.employmentType),
     is_owner: r.isOwner ?? false,
     created_at: r.createdAt ?? '',
-    updated_at: r.updatedAt ?? '',
   };
 }
 

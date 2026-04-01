@@ -41,6 +41,36 @@ func (s *Service) deleteWebhook(ctx context.Context) error {
 	return s.call(ctx, "deleteWebhook", reqBody, nil)
 }
 
+func (s *Service) getUserPhotoURL(ctx context.Context, userID int64) string {
+	var photosResp telegramAPIResponse[telegramUserProfilePhotos]
+	if err := s.call(ctx, "getUserProfilePhotos", map[string]any{
+		"user_id": userID,
+		"limit":   1,
+	}, &photosResp); err != nil {
+		klog.Errorf("telegram bot getUserProfilePhotos error: %v", err)
+		return ""
+	}
+	if len(photosResp.Result.Photos) == 0 {
+		return ""
+	}
+	sizes := photosResp.Result.Photos[0]
+	if len(sizes) == 0 {
+		return ""
+	}
+
+	var fileResp telegramAPIResponse[telegramFile]
+	if err := s.call(ctx, "getFile", map[string]any{
+		"file_id": sizes[len(sizes)-1].FileID,
+	}, &fileResp); err != nil {
+		klog.Errorf("telegram bot getFile error: %v", err)
+		return ""
+	}
+	if fileResp.Result.FilePath == "" {
+		return ""
+	}
+	return fmt.Sprintf("%s/file/bot%s/%s", telegramAPIBase, s.token, fileResp.Result.FilePath)
+}
+
 func (s *Service) call(ctx context.Context, method string, requestBody any, out any) error {
 	body, err := json.Marshal(requestBody)
 	if err != nil {

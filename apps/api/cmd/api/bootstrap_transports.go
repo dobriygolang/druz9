@@ -21,7 +21,7 @@ func initializeTransports(
 	storage *storageContext,
 	services *serviceContext,
 ) (*kratos.App, error) {
-	registerBackgroundWorkers(bootstrap, services)
+	registerBackgroundWorkers(bootstrap, storage, services)
 
 	httpServer := server.NewHTTPServer(
 		bootstrap.cfg.Server.HTTP.Addr,
@@ -64,9 +64,11 @@ func initializeTransports(
 	return app, nil
 }
 
-func registerBackgroundWorkers(bootstrap *bootstrapContext, services *serviceContext) {
+func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageContext, services *serviceContext) {
 	closer.AddSync(startCodeRoomCleanupWorker(bootstrap.kratosLogger, bootstrap.rtcManager, services.codeEditorServiceDomain))
 	closer.AddSync(startArenaCleanupWorker(bootstrap.kratosLogger, bootstrap.rtcManager, services.arenaServiceDomain))
+	closer.AddSync(startContentCleanupWorker(bootstrap.kratosLogger, storage))
+	closer.AddSync(startBusinessMetricsWorker(bootstrap.kratosLogger, bootstrap.rtcManager, storage))
 	closer.AddSync(startTelegramBotWorker(services.profileServiceDomain))
 }
 
