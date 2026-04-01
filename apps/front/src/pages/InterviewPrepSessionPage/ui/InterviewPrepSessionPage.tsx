@@ -13,12 +13,8 @@ import {
 import { displayLanguageLabel, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
 
 const DEFAULT_CODE_BY_LANGUAGE: Record<string, string> = {
-  go: `package main
-
-import "fmt"
-
-func main() {
-\tfmt.Println("implement me")
+  go: `func solve(input string) string {
+\treturn ""
 }
 `,
   python: `def solve(input: str) -> str:
@@ -29,8 +25,21 @@ SELECT 1;
 `,
 };
 
-function starterForLanguage(taskLanguage: string | undefined, solveLanguage: string, starterCode: string | undefined) {
-  if (starterCode && solveLanguage === taskLanguage) {
+function looksLikeGoProgramStarter(starterCode: string | undefined) {
+  return Boolean(starterCode && starterCode.includes('func main()'));
+}
+
+function starterForLanguage(
+  taskLanguage: string | undefined,
+  solveLanguage: string,
+  starterCode: string | undefined,
+  runnerMode?: string,
+) {
+  if (
+    starterCode &&
+    solveLanguage === taskLanguage &&
+    !(solveLanguage === 'go' && runnerMode === 'function_io' && looksLikeGoProgramStarter(starterCode))
+  ) {
     return starterCode;
   }
   return DEFAULT_CODE_BY_LANGUAGE[solveLanguage] ?? starterCode ?? '';
@@ -87,8 +96,8 @@ export function InterviewPrepSessionPage() {
 
   useEffect(() => {
     const fallbackLanguage = session?.solveLanguage || session?.task?.supportedLanguages?.[0] || session?.task?.language || 'go';
-    setCode(session?.code ?? starterForLanguage(session?.task?.language, fallbackLanguage, session?.task?.starterCode));
-  }, [session?.id, session?.code, session?.solveLanguage, session?.task?.language, session?.task?.supportedLanguages, session?.task?.starterCode]);
+    setCode(session?.code ?? starterForLanguage(session?.task?.language, fallbackLanguage, session?.task?.starterCode, session?.task?.runnerMode));
+  }, [session?.id, session?.code, session?.solveLanguage, session?.task?.language, session?.task?.supportedLanguages, session?.task?.starterCode, session?.task?.runnerMode]);
 
   useEffect(() => {
     if (!isResizingEditor) {
@@ -130,8 +139,8 @@ export function InterviewPrepSessionPage() {
 
   const switchSolveLanguage = (nextLanguage: string) => {
     setSolveLanguage(nextLanguage);
-    const nextStarter = starterForLanguage(session?.task?.language, nextLanguage, session?.task?.starterCode);
-    const currentStarter = starterForLanguage(session?.task?.language, solveLanguage, session?.task?.starterCode);
+    const nextStarter = starterForLanguage(session?.task?.language, nextLanguage, session?.task?.starterCode, session?.task?.runnerMode);
+    const currentStarter = starterForLanguage(session?.task?.language, solveLanguage, session?.task?.starterCode, session?.task?.runnerMode);
     setCode((currentCode) => {
       if (!currentCode.trim() || currentCode === currentStarter) {
         return nextStarter;

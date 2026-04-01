@@ -249,6 +249,18 @@ export const useCodeRoomRealtime = ({
         return;
       }
       const identity = normalizeIdentity(user.participantId) || normalizeIdentity(user.name) || String(remoteAwarenessId);
+      const existing = deduped.get(identity);
+      if (!existing) {
+        deduped.set(identity, [remoteAwarenessId, state]);
+        return;
+      }
+      if (existing[1]?.active !== false && state?.active === false) {
+        deduped.set(identity, [remoteAwarenessId, state]);
+        return;
+      }
+      if (existing[1]?.active === false && state?.active !== false) {
+        return;
+      }
       deduped.set(identity, [remoteAwarenessId, state]);
     });
     return Array.from(deduped.values());
@@ -349,25 +361,22 @@ export const useCodeRoomRealtime = ({
       const headPosition = model.getPositionAt(selection.head);
       activeWidgetIds.add(remoteAwarenessId);
 
-      const offlineSuffix = state?.active === false ? ' code-room-remote-caret-offline' : '';
-      decorations.push({
-        range: {
-          startLineNumber: headPosition.lineNumber,
-          startColumn: headPosition.column,
-          endLineNumber: headPosition.lineNumber,
-          endColumn: headPosition.column,
-        },
-        options: {
-          afterContentClassName: `code-room-remote-caret code-room-remote-caret-${remoteAwarenessId}${offlineSuffix}`,
-          stickiness: 1,
-        },
-      });
-
       let widget = remoteWidgetsRef.current.get(remoteAwarenessId);
       if (!widget) {
         const domNode = document.createElement('div');
-        domNode.className = `code-room-remote-label-pill code-room-remote-label-pill-${remoteAwarenessId}`;
-        domNode.textContent = state?.active === false ? `${user.name || 'Гость'} offline` : (user.name || 'Гость');
+        const caretNode = document.createElement('div');
+        caretNode.className = 'code-room-remote-anchor__caret';
+        const labelNode = document.createElement('div');
+        const textNode = document.createElement('span');
+        const statusNode = document.createElement('span');
+        labelNode.className = `code-room-remote-label-pill code-room-remote-label-pill-${remoteAwarenessId}`;
+        textNode.textContent = user.name || 'Гость';
+        statusNode.className = `code-room-remote-label-pill__status-dot${state?.active === false ? ' offline' : ''}`;
+        labelNode.appendChild(textNode);
+        labelNode.appendChild(statusNode);
+        domNode.className = `code-room-remote-anchor code-room-remote-anchor-${remoteAwarenessId}${state?.active === false ? ' code-room-remote-anchor-offline' : ''}`;
+        domNode.appendChild(caretNode);
+        domNode.appendChild(labelNode);
         const nextWidget: any = {
           position: {
             position: headPosition,
@@ -385,20 +394,25 @@ export const useCodeRoomRealtime = ({
         remoteWidgetsRef.current.set(remoteAwarenessId, widget);
         currentEditor.addContentWidget(widget);
       } else {
-        widget.getDomNode().textContent = state?.active === false ? `${user.name || 'Гость'} offline` : (user.name || 'Гость');
-        widget.getDomNode().className = `code-room-remote-label-pill code-room-remote-label-pill-${remoteAwarenessId}${state?.active === false ? ' code-room-remote-label-pill-offline' : ''}`;
+        const domNode = widget.getDomNode();
+        const labelNode = domNode.querySelector('.code-room-remote-label-pill') as HTMLDivElement | null;
+        if (labelNode) {
+          labelNode.className = `code-room-remote-label-pill code-room-remote-label-pill-${remoteAwarenessId}${state?.active === false ? ' code-room-remote-label-pill-offline' : ''}`;
+          const textNode = labelNode.querySelector('span:first-child') as HTMLSpanElement | null;
+          const statusNode = labelNode.querySelector('.code-room-remote-label-pill__status-dot') as HTMLSpanElement | null;
+          if (textNode) {
+            textNode.textContent = user.name || 'Гость';
+          }
+          if (statusNode) {
+            statusNode.className = `code-room-remote-label-pill__status-dot${state?.active === false ? ' offline' : ''}`;
+          }
+        }
+        domNode.className = `code-room-remote-anchor code-room-remote-anchor-${remoteAwarenessId}${state?.active === false ? ' code-room-remote-anchor-offline' : ''}`;
         widget.position = {
           position: headPosition,
           preference: [0],
         };
         currentEditor.layoutContentWidget(widget);
-      }
-
-      if (!widget.getDomNode().className.includes('code-room-remote-label-pill-offline') && state?.active === false) {
-        widget.getDomNode().className = `code-room-remote-label-pill code-room-remote-label-pill-${remoteAwarenessId} code-room-remote-label-pill-offline`;
-      }
-      if (state?.active !== false) {
-        widget.getDomNode().className = `code-room-remote-label-pill code-room-remote-label-pill-${remoteAwarenessId}`;
       }
 
       if (end > start) {

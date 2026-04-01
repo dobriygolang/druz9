@@ -83,7 +83,7 @@ func (r *Repo) MatchmakeOrEnqueue(ctx context.Context, user *domain.User, task *
 	if _, err := tx.Exec(ctx, `
 		INSERT INTO arena_matches (id, creator_user_id, task_id, topic, difficulty, source, status, duration_seconds, obfuscate_opponent, is_rated, unrated_reason, winner_reason, started_at, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13, $13)
-	`, matchID, opponent.UserID, task.ID, topic, match.Difficulty, match.Source, model.ArenaMatchStatusActive, match.DurationSeconds, obfuscateOpponent, true, "", match.WinnerReason, nowTime); err != nil {
+	`, matchID, opponent.UserID, task.ID, topic, match.Difficulty, match.Source, model.ArenaMatchStatusActive, match.DurationSeconds, obfuscateOpponent, true, "", model.ArenaWinnerReasonUnknown, nowTime); err != nil {
 		return nil, false, fmt.Errorf("insert matched arena match: %w", err)
 	}
 

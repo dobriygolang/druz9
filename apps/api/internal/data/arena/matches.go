@@ -26,7 +26,7 @@ func (r *Repo) CreateMatch(ctx context.Context, match *domain.Match, creator *do
 	_, err = tx.Exec(ctx, `
 		INSERT INTO arena_matches (id, creator_user_id, task_id, topic, difficulty, source, status, duration_seconds, obfuscate_opponent, is_rated, unrated_reason, winner_reason, created_at, updated_at)
 		VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $13)
-	`, match.ID, match.CreatorUserID, match.TaskID, match.Topic, match.Difficulty, match.Source, match.Status, match.DurationSeconds, match.ObfuscateOpponent, match.IsRated, match.UnratedReason, match.WinnerReason, now)
+	`, match.ID, match.CreatorUserID, match.TaskID, match.Topic, match.Difficulty, match.Source, match.Status, match.DurationSeconds, match.ObfuscateOpponent, match.IsRated, match.UnratedReason, model.ArenaWinnerReasonUnknown, now)
 	if err != nil {
 		return nil, fmt.Errorf("insert arena match: %w", err)
 	}

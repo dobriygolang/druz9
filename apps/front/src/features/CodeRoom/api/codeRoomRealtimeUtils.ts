@@ -156,33 +156,40 @@ export const buildAwarenessStyles = (
       text-shadow: none !important;
     }
 
-    .code-room-remote-caret {
+    .code-room-remote-anchor {
       position: relative;
-    }
-
-    .code-room-remote-caret::after {
-      content: '';
-      position: absolute;
-      left: -1px;
-      top: 0;
-      height: 1.15em;
-      border-left: 1px solid currentColor;
-      z-index: 12;
+      width: 0;
+      height: 0;
+      overflow: visible;
       pointer-events: none;
     }
 
+    .code-room-remote-anchor__caret {
+      position: absolute;
+      left: -1px;
+      top: -2px;
+      width: 1px;
+      height: 20px;
+      border-radius: 999px;
+      background: currentColor;
+      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.04);
+    }
+
     .code-room-remote-label-pill {
+      position: absolute;
+      left: -1px;
+      top: -22px;
       display: inline-flex;
       align-items: center;
+      gap: 4px;
       min-height: 16px;
-      padding: 0 4px;
+      padding: 0 5px;
       border-radius: 4px;
       border: 1px solid transparent;
       font-size: 10px;
       font-weight: 500;
       line-height: 16px;
       white-space: nowrap;
-      transform: translateY(-100%);
       pointer-events: none;
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
     }
@@ -191,13 +198,26 @@ export const buildAwarenessStyles = (
       opacity: 0.45;
     }
 
-    .code-room-remote-caret-offline::after {
+    .code-room-remote-anchor-offline .code-room-remote-anchor__caret {
       opacity: 0.5;
     }
 
     .code-room-remote-label-pill-offline {
       opacity: 0.72;
       filter: saturate(0.75);
+    }
+
+    .code-room-remote-label-pill__status-dot {
+      width: 5px;
+      height: 5px;
+      border-radius: 999px;
+      background: currentColor;
+      opacity: 0.9;
+      flex: 0 0 auto;
+    }
+
+    .code-room-remote-label-pill__status-dot.offline {
+      opacity: 0.42;
     }
   `;
 
@@ -221,8 +241,8 @@ export const buildAwarenessStyles = (
         background: ${hexToRgba(user.color, selectionAlpha)};
       }
 
-      .code-room-remote-caret-${awarenessID}::after {
-        border-left-color: ${user.color};
+      .code-room-remote-anchor-${awarenessID} {
+        color: ${user.color};
       }
 
       .code-room-remote-label-pill-${awarenessID} {
