@@ -315,6 +315,19 @@
   font-size: 12px;
 }
 
+.panel-header--editor {
+  position: sticky;
+  top: 0;
+  z-index: 3;
+}
+
+.panel-header__group {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+}
+
 .language-badge {
   display: inline-flex;
   align-items: center;
@@ -359,20 +372,8 @@
   color: #c7c2ff;
 }
 
-/* Editor Footer */
-.editor-footer {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 12px;
-  flex-shrink: 0;
-  padding: 8px 12px 10px;
-  border-top: 1px solid var(--border-color);
-  background: #171717;
-}
-
 .editor-run-button {
-  min-width: 138px;
+  min-width: 144px;
   justify-content: center;
   display: inline-flex;
   align-items: center;

@@ -792,9 +792,25 @@ export const CodeRoomPage: React.FC = () => {
             style={{ gridTemplateColumns: `minmax(0, ${editorWidth}fr) 6px minmax(0, ${100 - editorWidth}fr)` }}
           >
             <div className="editor-panel interview-ide-editor-panel">
-              <div className="panel-header">
-                <span>main.go</span>
-                <span className="language-badge">Go</span>
+              <div className="panel-header panel-header--editor">
+                <div className="panel-header__group">
+                  <span>main.go</span>
+                  <span className="language-badge">Go</span>
+                </div>
+                <div className="panel-header__group">
+                  <button
+                    className="btn btn-primary editor-run-button"
+                    onClick={handleSubmitCode}
+                    disabled={isRunning || room.status === 'finished'}
+                  >
+                    {isRunning ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <Play size={16} />
+                    )}
+                    Запустить код
+                  </button>
+                </div>
               </div>
               <div className="interview-ide-editor-scroll">
                 {showTimelapse ? (
@@ -811,20 +827,6 @@ export const CodeRoomPage: React.FC = () => {
                     options={editorOptions}
                   />
                 )}
-              </div>
-              <div className="editor-footer">
-                <button
-                  className="btn btn-primary editor-run-button"
-                  onClick={handleSubmitCode}
-                  disabled={isRunning || room.status === 'finished'}
-                >
-                  {isRunning ? (
-                    <Loader2 size={16} className="animate-spin" />
-                  ) : (
-                    <Play size={16} />
-                  )}
-                  Запустить код
-                </button>
               </div>
             </div>
 
@@ -905,13 +907,6 @@ export const CodeRoomPage: React.FC = () => {
             </div>
           </div>
         </div>
-
-        {error && (
-          <div className="error-banner">
-            {error}
-          </div>
-        )}
-
         {leaveToasts.length > 0 && (
           <div className="room-leave-toasts">
             {leaveToasts.map((toast) => (

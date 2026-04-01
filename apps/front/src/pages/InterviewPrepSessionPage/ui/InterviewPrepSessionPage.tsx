@@ -72,11 +72,11 @@ const resultLabel: Record<InterviewPrepSelfAssessment, string> = {
   skipped: 'Пропустил',
 };
 
-type SqlStarterTab = 'schema' | 'examples' | 'query';
+type SqlStarterTab = 'schema' | 'examples';
 
 function parseSqlStarterSections(source: string) {
   const lines = source.split('\n');
-  const sections: Record<SqlStarterTab, string[]> = {
+  const sections: Record<'schema' | 'examples' | 'query', string[]> = {
     schema: [],
     examples: [],
     query: [],
@@ -96,7 +96,7 @@ function parseSqlStarterSections(source: string) {
       continue;
     }
     if (normalized.includes('стартовый запрос')) {
-      current = 'query';
+      current = 'examples';
       sections.query.push(line);
       continue;
     }
@@ -106,7 +106,6 @@ function parseSqlStarterSections(source: string) {
   return {
     schema: sections.schema.join('\n').trim(),
     examples: sections.examples.join('\n').trim(),
-    query: sections.query.join('\n').trim(),
   };
 }
 
@@ -210,9 +209,7 @@ export function InterviewPrepSessionPage() {
   const sqlStarterSections = useMemo(() => parseSqlStarterSections(starterCodePreview), [starterCodePreview]);
   const sqlStarterValue = sqlStarterTab === 'schema'
     ? sqlStarterSections.schema
-    : sqlStarterTab === 'examples'
-      ? sqlStarterSections.examples
-      : sqlStarterSections.query;
+    : sqlStarterSections.examples;
 
   const switchSolveLanguage = (nextLanguage: string) => {
     setSolveLanguage(nextLanguage);
@@ -405,6 +402,24 @@ export function InterviewPrepSessionPage() {
                 ))}
               </div>
             )}
+            {task.language === 'sql' && task.starterCode && (
+              <div className="interview-prep-language-switcher">
+                <button
+                  type="button"
+                  className={`pill-selector__pill ${sqlStarterTab === 'schema' ? 'active' : ''}`}
+                  onClick={() => setSqlStarterTab('schema')}
+                >
+                  Схема
+                </button>
+                <button
+                  type="button"
+                  className={`pill-selector__pill ${sqlStarterTab === 'examples' ? 'active' : ''}`}
+                  onClick={() => setSqlStarterTab('examples')}
+                >
+                  Примеры
+                </button>
+              </div>
+            )}
             <span className={`badge interview-prep-badge ${session.lastSubmissionPassed ? 'badge-success' : 'badge-secondary'}`}>
               {canSubmitExecutable
                 ? (session.lastSubmissionPassed ? 'Проверка пройдена' : 'Ожидается accepted')
@@ -430,63 +445,15 @@ export function InterviewPrepSessionPage() {
               </button>
             </div>
           </div>
-          {task.language === 'sql' && task.starterCode && (
-            <div className="interview-prep-sql-context">
-              <div className="interview-prep-sql-context__head">
-                <div>
-                  <div className="interview-prep-block-title">Схема БД и стартовый запрос</div>
-                  <p className="interview-prep-muted">
-                    Держим таблицы, примеры строк и стартовый SQL прямо над editor, чтобы не прыгать между блоками.
-                  </p>
-                </div>
-                <div className="interview-prep-sql-tabs">
-                  <button
-                    type="button"
-                    className={`pill-selector__pill ${sqlStarterTab === 'schema' ? 'active' : ''}`}
-                    onClick={() => setSqlStarterTab('schema')}
-                  >
-                    Схема
-                  </button>
-                  <button
-                    type="button"
-                    className={`pill-selector__pill ${sqlStarterTab === 'examples' ? 'active' : ''}`}
-                    onClick={() => setSqlStarterTab('examples')}
-                  >
-                    Примеры
-                  </button>
-                  <button
-                    type="button"
-                    className={`pill-selector__pill ${sqlStarterTab === 'query' ? 'active' : ''}`}
-                    onClick={() => setSqlStarterTab('query')}
-                  >
-                    Стартовый запрос
-                  </button>
-                </div>
-              </div>
-              <div className="interview-prep-code-editor interview-prep-code-editor--sql interview-prep-code-editor--sql-inline">
-                <Editor
-                  height="260px"
-                  defaultLanguage={monacoLanguageFor(task.language)}
-                  language={monacoLanguageFor(task.language)}
-                  value={sqlStarterValue}
-                  theme="vs-dark"
-                  options={{
-                    readOnly: true,
-                    minimap: { enabled: false },
-                    lineNumbers: 'on',
-                    fontSize: 13,
-                    automaticLayout: true,
-                    scrollBeyondLastLine: false,
-                    wordWrap: 'off',
-                    tabSize: 2,
-                    padding: { top: 16, bottom: 16 },
-                    renderLineHighlight: 'none',
-                  }}
-                />
-              </div>
-            </div>
-          )}
           <div className="interview-prep-live-editor" style={{ height: `${editorHeight}px` }}>
+            {task.language === 'sql' && task.starterCode && (
+              <div className="interview-prep-live-editor__context">
+                <div className="interview-prep-live-editor__context-label">
+                  {sqlStarterTab === 'schema' ? 'Схема БД' : 'Примеры данных'}
+                </div>
+                <pre className="interview-prep-live-editor__context-text">{sqlStarterValue}</pre>
+              </div>
+            )}
             <Editor
               key={`${task.id}-${solveLanguage}`}
               height={`${editorHeight}px`}
