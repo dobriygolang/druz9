@@ -237,45 +237,46 @@
   justify-content: center;
   padding: 24px;
   background:
-    radial-gradient(circle at top right, rgba(93, 87, 255, 0.16), transparent 32%),
-    radial-gradient(circle at bottom left, rgba(32, 201, 151, 0.12), transparent 28%),
-    rgba(8, 8, 10, 0.86);
-  backdrop-filter: blur(22px);
+    radial-gradient(circle at top right, rgba(93, 87, 255, 0.08), transparent 32%),
+    radial-gradient(circle at bottom left, rgba(32, 201, 151, 0.06), transparent 28%),
+    rgba(8, 8, 10, 0.34);
+  backdrop-filter: blur(10px);
 }
 
 .event-overlay__dialog {
   position: relative;
-  width: min(760px, 100%);
-  max-height: min(90vh, 920px);
+  width: min(420px, 100%);
+  max-height: min(78vh, 620px);
   overflow-y: auto;
-  padding: 28px;
-  border-radius: 32px;
+  padding: 20px;
+  border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.09);
   background:
-    linear-gradient(180deg, rgba(34, 34, 38, 0.98), rgba(24, 24, 28, 0.98));
-  box-shadow: 0 40px 110px rgba(0, 0, 0, 0.58);
+    linear-gradient(180deg, rgba(36, 36, 42, 0.9), rgba(25, 25, 31, 0.88));
+  box-shadow: 0 22px 64px rgba(0, 0, 0, 0.34);
+  backdrop-filter: blur(22px);
 }
 
 .event-overlay__dialog--mobile {
-  padding: 22px 18px 20px;
-  border-radius: 24px;
+  padding: 18px 16px;
+  border-radius: 22px;
 }
 
 .event-overlay__topbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 20px;
+  margin-bottom: 14px;
 }
 
 .event-overlay__danger,
 .event-overlay__close {
-  width: 48px;
-  height: 48px;
+  width: 40px;
+  height: 40px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 16px;
+  border-radius: 14px;
   cursor: pointer;
   transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
 }
@@ -311,18 +312,18 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
-  padding: 4px 0 8px;
+  gap: 10px;
+  padding: 0 0 4px;
   text-align: center;
 }
 
 .event-overlay__icon-shell {
-  width: 88px;
-  height: 88px;
+  width: 66px;
+  height: 66px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  border-radius: 28px;
+  border-radius: 22px;
   color: #d8d7ff;
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03)),
@@ -335,12 +336,12 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  padding: 8px 12px;
+  padding: 6px 10px;
   border-radius: 999px;
   color: #c9c6ff;
   background: rgba(93, 87, 255, 0.12);
   border: 1px solid rgba(93, 87, 255, 0.18);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.04em;
   text-transform: uppercase;
@@ -348,15 +349,15 @@
 
 .event-overlay__title {
   margin: 0;
-  font-size: clamp(32px, 5vw, 48px);
-  line-height: 1.02;
+  font-size: clamp(24px, 4vw, 34px);
+  line-height: 1.04;
   letter-spacing: -0.04em;
 }
 
 .event-overlay__organizer {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 16px;
+  font-size: 14px;
 }
 
 .event-overlay__organizer span {
@@ -366,14 +367,14 @@
 
 .event-overlay__meta-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 16px;
-  margin-top: 28px;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  margin-top: 18px;
 }
 
 .event-overlay__meta-card,
 .event-overlay__section {
-  border-radius: 24px;
+  border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.07);
   background: rgba(255, 255, 255, 0.03);
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
@@ -382,14 +383,14 @@
 .event-overlay__meta-card {
   display: flex;
   align-items: center;
-  gap: 14px;
-  padding: 18px;
+  gap: 12px;
+  padding: 14px;
 }
 
 .event-overlay__meta-icon {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -407,13 +408,13 @@
 .event-overlay__meta-value {
   margin-top: 4px;
   color: var(--text-primary);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
 }
 
 .event-overlay__section {
-  margin-top: 18px;
-  padding: 22px;
+  margin-top: 12px;
+  padding: 16px;
 }
 
 .event-overlay__section-head {
@@ -425,7 +426,7 @@
 }
 
 .event-overlay__section-title {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
 }
 
@@ -445,19 +446,20 @@
 
 .event-overlay__description {
   color: var(--text-secondary);
-  line-height: 1.75;
+  line-height: 1.62;
   white-space: pre-wrap;
+  font-size: 14px;
 }
 
 .event-overlay__join {
-  margin-top: 18px;
+  margin-top: 14px;
   display: inline-flex;
   width: 100%;
   align-items: center;
   justify-content: center;
   gap: 10px;
-  min-height: 58px;
-  border-radius: 20px;
+  min-height: 50px;
+  border-radius: 16px;
   background: linear-gradient(135deg, #5d57ff, #7767ff);
   color: white;
   text-decoration: none;
@@ -467,8 +469,8 @@
 
 .event-overlay__participants {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-  gap: 12px;
+  grid-template-columns: 1fr;
+  gap: 10px;
 }
 
 .event-overlay__participant {
@@ -476,17 +478,17 @@
   align-items: center;
   gap: 12px;
   min-width: 0;
-  padding: 12px;
-  border-radius: 18px;
+  padding: 10px;
+  border-radius: 16px;
   background: rgba(255, 255, 255, 0.035);
   border: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .event-overlay__avatar {
   flex: 0 0 auto;
-  width: 42px;
-  height: 42px;
-  border-radius: 14px;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
   overflow: hidden;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.07);
@@ -518,12 +520,13 @@
   text-overflow: ellipsis;
   white-space: nowrap;
   font-weight: 600;
+  font-size: 14px;
 }
 
 .event-overlay__participant-role {
   margin-top: 3px;
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 11px;
 }
 
 @media (max-width: 720px) {
@@ -648,6 +651,8 @@
 .interview-prep-category-card strong {
   font-size: 30px;
   line-height: 1;
+  color: #f4f2ff;
+  text-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
 }
 
 .interview-prep-category-card__label {

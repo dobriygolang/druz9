@@ -31,7 +31,13 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 20px;
+  gap: 28px;
+}
+
+.vacancies-hero__intro > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .vacancies-hero__eyebrow {
@@ -114,6 +120,20 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+}
+
+.vacancies-search .input,
+.vacancies-search select.input {
+  min-height: 54px;
+}
+
+.vacancies-search select.input {
+  color: rgba(245, 244, 255, 0.92);
+}
+
+.vacancies-search select.input:invalid,
+.vacancies-search select.input option[value=""] {
+  color: rgba(255, 255, 255, 0.42);
 }
 
 .vacancies-search__row {
