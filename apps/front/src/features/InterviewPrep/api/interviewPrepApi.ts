@@ -151,7 +151,7 @@ export const interviewPrepApi = {
   },
 
   submit: async (sessionId: string, code: string, solveLanguage?: string): Promise<InterviewPrepSubmitResult> => {
-    const response = await apiClient.post<any>(`/api/v1/interview-prep/sessions/${sessionId}/submit`, { code, solveLanguage });
+    const response = await apiClient.post<any>(`/api/v1/interview-prep/sessions/${sessionId}/submit`, { code, language: solveLanguage });
     const result = response.data.result;
     return {
       passed: Boolean(result?.passed ?? false),

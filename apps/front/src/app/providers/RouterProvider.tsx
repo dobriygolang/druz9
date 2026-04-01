@@ -32,6 +32,38 @@ const LoadingFallback: React.FC = () => (
   </div>
 );
 
+
+class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean, error: Error | null }> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false, error: null };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true, error };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      const msg = this.state.error?.message || '';
+      const isChunkLoadFailed = /Failed to fetch dynamically imported module/i.test(msg) || /Importing a module script failed/i.test(msg);
+      if (isChunkLoadFailed) {
+         window.location.reload();
+         return null;
+      }
+      return (
+        <div style={{ padding: '20px', color: 'var(--text-primary)', backgroundColor: 'var(--bg-color)', height: '100vh' }}>
+          <h2>Что-то пошло не так</h2>
+          <p>{msg}</p>
+          <button className="btn btn-primary" onClick={() => window.location.reload()}>Перезагрузить страницу</button>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+
 export const RouterProvider: React.FC = () => {
   const { isLoading, isAuthenticated, needsProfileComplete, user } = useAuth();
 
@@ -47,6 +79,7 @@ export const RouterProvider: React.FC = () => {
 
   return (
     <Suspense fallback={<LoadingFallback />}>
+      <ErrorBoundary>
       <Routes>
         {/* Public routes */}
         <Route
@@ -163,6 +196,7 @@ export const RouterProvider: React.FC = () => {
           element={<RootPageWithInvite />}
         />
       </Routes>
+      </ErrorBoundary>
     </Suspense>
   );
 };

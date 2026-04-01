@@ -178,10 +178,10 @@
       ],
       "is_executable": true,
       "execution_profile": "pure",
-      "runner_mode": "program",
+      "runner_mode": "function_io",
       "duration_seconds": 1800,
       "statement": "Реализуй token bucket rate limiter. На вход приходят capacity, refill_per_second и последовательность запросов с timestamp и cost. Для каждого запроса верни `allow` или `deny`. После решения ответь на вопросы про burst, time source и thread safety.",
-      "starter_code": "import sys\n\ndef main():\n    lines = [line.strip() for line in sys.stdin.read().strip().splitlines() if line.strip()]\n    if not lines:\n        return\n    # TODO: implement token bucket simulation.\n    print(\"\\n\".join(\"deny\" for _ in lines[2:]))\n\nif __name__ == '__main__':\n    main()\n",
+      "starter_code": "def solve(input: str) -> str:\n    # TODO: implement token bucket simulation\n    return ''\n",
       "reference_solution": "Нужно хранить текущее число токенов и timestamp последнего обновления. Перед каждым запросом пополняем бак на `delta_seconds * refill_rate`, ограничиваем capacity, затем либо списываем cost и возвращаем allow, либо deny. Для многопоточного варианта понадобятся атомарность/lock или single owner actor.",
       "code_task": {
         "slug": "interview-prep-python-token-bucket",
@@ -193,10 +193,10 @@
           "simulation"
         ],
         "statement": "Реализуй token bucket simulator. Формат входа: первая строка `capacity refill_per_second`, вторая строка `n`, затем `timestamp cost`. Для каждого запроса выведи `allow` или `deny` на новой строке.",
-        "starter_code": "import sys\n\ndef main():\n    lines = [line.strip() for line in sys.stdin.read().strip().splitlines() if line.strip()]\n    if not lines:\n        return\n    # TODO: implement token bucket simulation.\n    print(\"\\n\".join(\"deny\" for _ in lines[2:]))\n\nif __name__ == '__main__':\n    main()\n",
+        "starter_code": "def solve(input: str) -> str:\n    # TODO: implement token bucket simulation\n    return ''\n",
         "language": "python",
         "execution_profile": "pure",
-        "runner_mode": "program",
+        "runner_mode": "function_io",
         "duration_seconds": 1800,
         "cases": [
           {
@@ -282,10 +282,10 @@
       ],
       "is_executable": true,
       "execution_profile": "pure",
-      "runner_mode": "program",
+      "runner_mode": "function_io",
       "duration_seconds": 2700,
       "statement": "Реализуй LRU Cache с поддержкой Time-To-Live (TTL). На вход подается capacity кэша, затем набор операций: SET key value ttl_ms, GET key, TICK ms (продвигает виртуальное время на ms). При переполнении удаляется наименее недавно использованный эдемент. При GET ключа, чей TTL уже вышел, должно считаться что его нет. Обновление существующего ключа обновляет и его значение, и TTL, и статус 'недавно использован'.",
-      "starter_code": "import sys\n\ndef main():\n    lines = sys.stdin.read().splitlines()\n    if not lines:\n        return\n    capacity = int(lines[0].strip())\n    \n    # TODO: implement LRU with TTL\n    \n    for line in lines[1:]:\n        parts = line.split()\n        if not parts:\n            continue\n        cmd = parts[0]\n        if cmd == 'SET':\n            pass\n        elif cmd == 'GET':\n            print('MISS')\n        elif cmd == 'TICK':\n            pass\n\nif __name__ == '__main__':\n    main()\n",
+      "starter_code": "def solve(input: str) -> str:\n    # TODO: implement LRU with TTL\n    return ''\n",
       "reference_solution": "Используется OrderedDict или комбинация dict + двусвязный список для O(1). TICK увеличивает глобальный счетчик времени. При GET проверяем: если now >= expire_time[key], удаляем элемент и возвращаем MISS. Иначе обновляем позицию.",
       "code_task": {
         "slug": "interview-prep-lru-ttl",
@@ -297,10 +297,10 @@
           "data-structures"
         ],
         "statement": "Реализуй LRU Cache с TTL. Операции:\n`SET <key> <value> <ttl>`\n`GET <key>` (выводит `<value>` или `MISS`)\n`TICK <ms>` (сдвигает глобальное время)\nПервая строка — `capacity`.",
-        "starter_code": "import sys\n\ndef main():\n    lines = sys.stdin.read().splitlines()\n    if not lines:\n        return\n    capacity = int(lines[0].strip())\n    for line in lines[1:]:\n        parts = line.split()\n        if not parts:\n            continue\n        cmd = parts[0]\n        if cmd == 'GET':\n            print('MISS')\n\nif __name__ == '__main__':\n    main()\n",
+        "starter_code": "def solve(input: str) -> str:\n    # TODO: implement LRU with TTL\n    return ''\n",
         "language": "python",
         "execution_profile": "pure",
-        "runner_mode": "program",
+        "runner_mode": "function_io",
         "duration_seconds": 2700,
         "cases": [
           {
