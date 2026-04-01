@@ -341,6 +341,15 @@ func interviewPrepActorFromRequest(r *http.Request, authorizer interviewPrepAuth
 }
 
 func interviewPrepSessionToken(r *http.Request, cookieName string) string {
+	if r == nil {
+		return ""
+	}
+	if header := strings.TrimSpace(r.Header.Get("Authorization")); strings.HasPrefix(header, "Bearer ") {
+		return strings.TrimSpace(strings.TrimPrefix(header, "Bearer "))
+	}
+	if cookieName == "" {
+		return ""
+	}
 	cookie, err := r.Cookie(cookieName)
 	if err != nil {
 		return ""

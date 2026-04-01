@@ -123,6 +123,14 @@ function normalizeProfileResponse(data: BackendProfileResponse): ProfileResponse
 const profileByIdCache = new Map<string, ProfileResponse>();
 const profileByIdPromises = new Map<string, Promise<ProfileResponse>>();
 
+export function clearProfileByIdCache(userId?: string) {
+  if (userId) {
+    profileByIdCache.delete(userId);
+  } else {
+    profileByIdCache.clear();
+  }
+}
+
 export const authApi = {
   createTelegramAuthChallenge: async (): Promise<{
     token: string;

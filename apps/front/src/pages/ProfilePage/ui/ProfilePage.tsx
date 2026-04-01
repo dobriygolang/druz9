@@ -7,7 +7,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { User } from '@/entities/User/model/types';
 import { adminApi } from '@/features/Admin/api/adminApi';
-import { authApi } from '@/features/Auth/api/authApi';
+import { authApi, clearProfileByIdCache } from '@/features/Auth/api/authApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
 import { LocationPicker } from '@/features/Geo/ui/LocationPicker';
@@ -507,7 +507,8 @@ export const ProfilePage: React.FC = () => {
                 try {
                   setTrustedUpdating(true);
                   await adminApi.setUserTrusted(user.id, !user.isTrusted);
-                  // Refresh user profile
+                  // Clear cache and refresh user profile
+                  clearProfileByIdCache(user.id);
                   const profile = await authApi.getProfileById(user.id);
                   setUser(profile.user);
                   showToast(user.isTrusted ? 'Trusted снят' : 'Пользователь стал trusted', 'success');
