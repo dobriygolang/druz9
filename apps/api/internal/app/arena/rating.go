@@ -45,15 +45,15 @@ func (s *Service) refreshMatchState(ctx context.Context, match *domain.Match) er
 		return err
 	}
 
-	if len(accepted) == 1 {
-		err := s.repo.FinishMatch(ctx, match.ID, &accepted[0].UserID, domain.WinnerReasonSingleAC, nowTime)
-		if err == nil {
-			s.observeMatchFinished(match, nowTime)
-		}
-		return err
-	}
-
 	if match.StartedAt != nil && nowTime.After(match.StartedAt.Add(time.Duration(match.DurationSeconds)*time.Second)) {
+		if len(accepted) == 1 {
+			err := s.repo.FinishMatch(ctx, match.ID, &accepted[0].UserID, domain.WinnerReasonSingleAC, nowTime)
+			if err == nil {
+				s.observeMatchFinished(match, nowTime)
+			}
+			return err
+		}
+
 		err := s.repo.FinishMatch(ctx, match.ID, nil, domain.WinnerReasonNone, nowTime)
 		if err == nil {
 			s.observeMatchFinished(match, nowTime)

@@ -79,11 +79,21 @@ func (s *Service) GetQueueStatus(ctx context.Context, user *domain.User) (*domai
 		return nil, err
 	}
 	if match != nil {
-		return &domain.QueueState{
-			Status:    model.ArenaMatchStatusActive,
-			QueueSize: queueSize,
-			Match:     match,
-		}, nil
+		if err := s.refreshMatchState(ctx, match); err != nil {
+			return nil, err
+		}
+
+		refreshed, err := s.repo.GetMatch(ctx, match.ID)
+		if err != nil {
+			return nil, err
+		}
+		if refreshed != nil && refreshed.Status != domain.MatchStatusFinished {
+			return &domain.QueueState{
+				Status:    model.ArenaMatchStatusActive,
+				QueueSize: queueSize,
+				Match:     refreshed,
+			}, nil
+		}
 	}
 
 	entry, err := s.repo.GetQueueEntry(ctx, user.ID)

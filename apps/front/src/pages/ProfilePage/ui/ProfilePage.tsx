@@ -6,6 +6,7 @@ import 'react-image-crop/dist/ReactCrop.css';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { User } from '@/entities/User/model/types';
+import { adminApi } from '@/features/Admin/api/adminApi';
 import { authApi } from '@/features/Auth/api/authApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
@@ -46,6 +47,7 @@ export const ProfilePage: React.FC = () => {
   const [telegramChallenge, setTelegramChallenge] = useState<{ token: string; botStartUrl: string } | null>(null);
   const [telegramCode, setTelegramCode] = useState('');
   const [isBindingTelegram, setIsBindingTelegram] = useState(false);
+  const [trustedUpdating, setTrustedUpdating] = useState(false);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Crop state
@@ -494,6 +496,31 @@ export const ProfilePage: React.FC = () => {
               <Shield size={14} />
               Админ
             </span>
+          )}
+
+          {currentUser?.isAdmin && user?.id && (
+            <button
+              className="btn"
+              style={{ padding: '4px 8px', fontSize: '12px' }}
+              disabled={trustedUpdating}
+              onClick={async () => {
+                try {
+                  setTrustedUpdating(true);
+                  await adminApi.setUserTrusted(user.id, !user.isTrusted);
+                  // Refresh user profile
+                  const profile = await authApi.getProfileById(user.id);
+                  setUser(profile.user);
+                  showToast(user.isTrusted ? 'Trusted снят' : 'Пользователь стал trusted', 'success');
+                } catch (e) {
+                  console.error('Failed to update trusted flag:', e);
+                  showToast('Ошибка при обновлении', 'error');
+                } finally {
+                  setTrustedUpdating(false);
+                }
+              }}
+            >
+              {trustedUpdating ? 'Сохраняем...' : user.isTrusted ? 'Снять trusted' : 'Сделать trusted'}
+            </button>
           )}
 
           {isOwnProfile && user.telegramId && user.telegramId !== '0' ? (

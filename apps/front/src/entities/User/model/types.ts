@@ -14,6 +14,7 @@ export interface User {
   longitude: number;
   activityStatus: ActivityStatus;
   isAdmin: boolean;
+  isTrusted: boolean;
   currentWorkplace: string;
   createdAt: string;
   updatedAt: string;

@@ -195,7 +195,7 @@ func (s *Service) LeaveMatch(ctx context.Context, matchID uuid.UUID, user *domai
 		}
 	}
 
-	if err := s.repo.FinishMatch(ctx, match.ID, winnerUserID, domain.WinnerReasonNone, time.Now()); err != nil {
+	if err := s.repo.FinishMatch(ctx, match.ID, winnerUserID, domain.WinnerReasonOpponentLeft, time.Now()); err != nil {
 		return nil, err
 	}
 

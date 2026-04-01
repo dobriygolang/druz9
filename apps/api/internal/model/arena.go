@@ -111,6 +111,7 @@ const (
 	ArenaWinnerReasonTimeout
 	ArenaWinnerReasonSingleAC
 	ArenaWinnerReasonAntiCheat
+	ArenaWinnerReasonOpponentLeft
 	ArenaWinnerReasonNone
 )
 
@@ -136,6 +137,8 @@ func (r ArenaWinnerReason) String() string {
 		return "single_ac"
 	case ArenaWinnerReasonAntiCheat:
 		return "anti_cheat"
+	case ArenaWinnerReasonOpponentLeft:
+		return "opponent_left"
 	case ArenaWinnerReasonNone:
 		return "none"
 	default:
@@ -155,6 +158,8 @@ func ArenaWinnerReasonFromString(s string) ArenaWinnerReason {
 		return ArenaWinnerReasonSingleAC
 	case "anti_cheat":
 		return ArenaWinnerReasonAntiCheat
+	case "opponent_left":
+		return ArenaWinnerReasonOpponentLeft
 	case "none":
 		return ArenaWinnerReasonNone
 	default:

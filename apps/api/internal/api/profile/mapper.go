@@ -41,6 +41,7 @@ func mapUser(u *model.User) *profilev1.User {
 		Longitude:         u.Geo.Longitude,
 		ActivityStatus:    mapActivityStatus(u.ActivityStatus),
 		IsAdmin:           u.IsAdmin,
+		IsTrusted:         u.IsTrusted,
 		CreatedAt:         timestamppb.New(u.CreatedAt),
 		UpdatedAt:         timestamppb.New(u.UpdatedAt),
 	}

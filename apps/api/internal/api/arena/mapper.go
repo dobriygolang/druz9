@@ -49,6 +49,8 @@ func mapWinnerReason(reason model.ArenaWinnerReason) v1.WinnerReason {
 		return v1.WinnerReason_WINNER_REASON_SINGLE_AC
 	case model.ArenaWinnerReasonAntiCheat:
 		return v1.WinnerReason_WINNER_REASON_ANTI_CHEAT
+	case model.ArenaWinnerReasonOpponentLeft:
+		return v1.WinnerReason_WINNER_REASON_OPPONENT_LEFT
 	case model.ArenaWinnerReasonNone:
 		return v1.WinnerReason_WINNER_REASON_NONE
 	default:

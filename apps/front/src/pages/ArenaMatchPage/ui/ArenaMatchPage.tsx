@@ -585,6 +585,20 @@ export const ArenaMatchPage: React.FC = () => {
     window.setTimeout(() => setCopied(false), 1800);
   };
 
+  const handleBack = async () => {
+    try {
+      await codeRoomApi.leaveArenaMatch(
+        matchId,
+        user?.id || getStoredGuestId(),
+        user ? undefined : getStoredGuestName(),
+      );
+    } catch (e) {
+      console.error('Failed to leave arena match:', e);
+    } finally {
+      navigate('/code-rooms', { state: { skipArenaResume: true } });
+    }
+  };
+
   const handleSubmit = async () => {
     if (!matchId || !me || isSpectator) {
       return;
@@ -670,7 +684,7 @@ export const ArenaMatchPage: React.FC = () => {
     return (
       <div className="arena-page-state">
         <div>{error || 'Матч не найден'}</div>
-        <button className="btn btn-secondary" onClick={() => navigate('/code-rooms')}>Назад</button>
+        <button className="btn btn-secondary" onClick={handleBack}>Назад</button>
       </div>
     );
   }
@@ -699,7 +713,7 @@ export const ArenaMatchPage: React.FC = () => {
       <div className="arena-page">
         <div className="arena-page__header">
           <div className="arena-page__header-left">
-            <button className="btn btn-secondary arena-back-btn" onClick={() => navigate('/code-rooms', { state: { skipArenaResume: true } })}>
+            <button className="btn btn-secondary arena-back-btn" onClick={handleBack}>
               <ArrowLeft size={16} />
             </button>
             <span className="code-rooms-kicker">Arena duel</span>

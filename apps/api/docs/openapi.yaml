@@ -2382,6 +2382,8 @@ components:
                     type: string
                 isAdmin:
                     type: boolean
+                isTrusted:
+                    type: boolean
         referral.v1.CreateReferralRequest:
             type: object
             properties:

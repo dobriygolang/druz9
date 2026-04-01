@@ -21,6 +21,8 @@ const CodeRoomPage = lazy(() => import('@/pages/CodeRoomPage/ui/CodeRoomPage').t
 const CodeTasksAdminPage = lazy(() => import('@/pages/CodeTasksAdminPage/ui/CodeTasksAdminPage').then(m => ({ default: m.CodeTasksAdminPage })));
 const RTConfigAdminPage = lazy(() => import('@/pages/RTConfigAdminPage/ui/RTConfigAdminPage').then(m => ({ default: m.RTConfigAdminPage })));
 const ArenaMatchPage = lazy(() => import('@/pages/ArenaMatchPage/ui/ArenaMatchPage').then(m => ({ default: m.ArenaMatchPage })));
+const InterviewPrepPage = lazy(() => import('@/pages/InterviewPrepPage/ui/InterviewPrepPage').then(m => ({ default: m.InterviewPrepPage })));
+const InterviewPrepSessionPage = lazy(() => import('@/pages/InterviewPrepSessionPage/ui/InterviewPrepSessionPage').then(m => ({ default: m.InterviewPrepSessionPage })));
 
 // Shared loading fallback
 const LoadingFallback: React.FC = () => (
@@ -116,6 +118,28 @@ export const RouterProvider: React.FC = () => {
                 ? (!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <ArenaMatchPage />)
                 : <ArenaMatchPage />
             }
+          />
+
+          <Route
+            path="/interview-prep"
+            element={!isAuthenticated || needsProfileComplete ? (
+              <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
+            ) : !user?.isTrusted ? (
+              <Navigate to="/" replace />
+            ) : (
+              <InterviewPrepPage />
+            )}
+          />
+
+          <Route
+            path="/interview-prep/:sessionId"
+            element={!isAuthenticated || needsProfileComplete ? (
+              <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
+            ) : !user?.isTrusted ? (
+              <Navigate to="/" replace />
+            ) : (
+              <InterviewPrepSessionPage />
+            )}
           />
 
           <Route

@@ -264,6 +264,66 @@ func (_c *Service_JoinMatch_Call) RunAndReturn(run func(context.Context, uuid.UU
 	return _c
 }
 
+// LeaveMatch provides a mock function with given fields: ctx, matchID, user
+func (_m *Service) LeaveMatch(ctx context.Context, matchID uuid.UUID, user *model.User) (*model.ArenaMatch, error) {
+	ret := _m.Called(ctx, matchID, user)
+
+	if len(ret) == 0 {
+		panic("no return value specified for LeaveMatch")
+	}
+
+	var r0 *model.ArenaMatch
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User) (*model.ArenaMatch, error)); ok {
+		return rf(ctx, matchID, user)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User) *model.ArenaMatch); ok {
+		r0 = rf(ctx, matchID, user)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.ArenaMatch)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, *model.User) error); ok {
+		r1 = rf(ctx, matchID, user)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_LeaveMatch_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LeaveMatch'
+type Service_LeaveMatch_Call struct {
+	*mock.Call
+}
+
+// LeaveMatch is a helper method to define mock.On call
+//   - ctx context.Context
+//   - matchID uuid.UUID
+//   - user *model.User
+func (_e *Service_Expecter) LeaveMatch(ctx interface{}, matchID interface{}, user interface{}) *Service_LeaveMatch_Call {
+	return &Service_LeaveMatch_Call{Call: _e.mock.On("LeaveMatch", ctx, matchID, user)}
+}
+
+func (_c *Service_LeaveMatch_Call) Run(run func(ctx context.Context, matchID uuid.UUID, user *model.User)) *Service_LeaveMatch_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*model.User))
+	})
+	return _c
+}
+
+func (_c *Service_LeaveMatch_Call) Return(_a0 *model.ArenaMatch, _a1 error) *Service_LeaveMatch_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_LeaveMatch_Call) RunAndReturn(run func(context.Context, uuid.UUID, *model.User) (*model.ArenaMatch, error)) *Service_LeaveMatch_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SavePlayerCode provides a mock function with given fields: ctx, matchID, user, code
 func (_m *Service) SavePlayerCode(ctx context.Context, matchID uuid.UUID, user *model.User, code string) error {
 	ret := _m.Called(ctx, matchID, user, code)

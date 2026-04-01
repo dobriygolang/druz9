@@ -41,4 +41,8 @@ export const adminApi = {
     );
     return response.data;
   },
+
+  setUserTrusted: async (userId: string, isTrusted: boolean): Promise<void> => {
+    await apiClient.patch(`/api/admin/users/${userId}/trust`, { isTrusted });
+  },
 };

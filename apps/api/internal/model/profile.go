@@ -90,6 +90,7 @@ type User struct {
 	Status            UserStatus
 	ActivityStatus    UserActivityStatus
 	IsAdmin           bool
+	IsTrusted         bool
 	LastActiveAt      time.Time
 	CreatedAt         time.Time
 	UpdatedAt         time.Time

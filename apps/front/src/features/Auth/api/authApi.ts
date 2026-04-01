@@ -26,6 +26,8 @@ type BackendUser = {
   activityStatus?: User['activityStatus'];
   is_admin?: boolean;
   isAdmin?: boolean;
+  is_trusted?: boolean;
+  isTrusted?: boolean;
   created_at?: string;
   createdAt?: string;
   updated_at?: string;
@@ -103,6 +105,7 @@ function normalizeUser(user: BackendUser): User {
     longitude: user.longitude ?? 0,
     activityStatus: normalizeActivityStatus(user.activity_status ?? user.activityStatus),
     isAdmin: user.is_admin ?? user.isAdmin ?? false,
+    isTrusted: user.is_trusted ?? user.isTrusted ?? false,
     currentWorkplace: user.current_workplace ?? user.currentWorkplace ?? '',
     createdAt: user.created_at ?? user.createdAt ?? '',
     updatedAt: user.updated_at ?? user.updatedAt ?? '',

@@ -69,7 +69,7 @@ WITH upserted_user AS (
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
 FROM upserted_user u
 LEFT JOIN geo g ON g.user_id = u.id
 `
@@ -123,7 +123,7 @@ WITH created_user AS (
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
 FROM created_user u
 LEFT JOIN geo g ON g.user_id = u.id
 `
@@ -144,7 +144,7 @@ func (r *Repo) FindPasswordUserByLogin(ctx context.Context, login string) (*mode
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at,
+  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at,
   COALESCE(u.password_hash, '')
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
@@ -171,7 +171,7 @@ WHERE LOWER(u.login) = LOWER($1)
 	err := r.data.DB.QueryRow(ctx, query, login).Scan(
 		&user.ID, &telegramID, &username, &firstName, &lastName, &avatarURL, &telegramAvatarURL, &currentWorkplace,
 		&region, &country, &city, &latitude, &longitude,
-		&user.Status, &user.IsAdmin, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
+		&user.Status, &user.IsAdmin, &user.IsTrusted, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
 		&passwordHash,
 	)
 	if err != nil {
@@ -190,7 +190,7 @@ func (r *Repo) FindUserByID(ctx context.Context, id uuid.UUID) (*model.User, err
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE id = $1
@@ -203,7 +203,7 @@ func (r *Repo) FindUserByTelegramID(ctx context.Context, telegramID int64) (*mod
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE telegram_id = $1
@@ -218,12 +218,12 @@ WITH updated_user AS (
   SET current_workplace = $2,
       updated_at = NOW()
   WHERE id = $1
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, is_trusted, last_active_at, created_at, updated_at
 )
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
 FROM updated_user u
 LEFT JOIN geo g ON g.user_id = u.id
 `
@@ -277,7 +277,7 @@ ON CONFLICT (user_id) DO UPDATE SET
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE u.id = $1
@@ -303,12 +303,12 @@ WITH updated_user AS (
   SET avatar_url = $2,
       updated_at = NOW()
   WHERE id = $1
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, is_trusted, last_active_at, created_at, updated_at
 )
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
 FROM updated_user u
 LEFT JOIN geo g ON g.user_id = u.id
 `
@@ -326,12 +326,12 @@ WITH updated_user AS (
       last_name = COALESCE(NULLIF($6, ''), last_name),
       updated_at = NOW()
   WHERE id = $1 AND telegram_id IS NULL
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, last_active_at, created_at, updated_at
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, is_trusted, last_active_at, created_at, updated_at
 )
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
 FROM updated_user u
 LEFT JOIN geo g ON g.user_id = u.id
 `
@@ -406,7 +406,7 @@ SELECT
   s.id, s.user_id, s.token_hash, s.last_seen_at, s.expires_at,
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
 FROM sessions s
 JOIN users u ON u.id = s.user_id
 LEFT JOIN geo g ON g.user_id = u.id
@@ -421,7 +421,7 @@ WHERE s.token_hash = $1
 
 	err := r.data.DB.QueryRow(ctx, query, tokenHash).Scan(
 		&session.ID, &session.UserID, &session.TokenHash, &session.LastSeenAt, &session.ExpiresAt,
-		&user.ID, &telegramID, &username, &firstName, &lastName, &avatarURL, &telegramAvatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &telegramID, &username, &firstName, &lastName, &avatarURL, &telegramAvatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.IsTrusted, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -461,6 +461,22 @@ WHERE id = $1
 	return nil
 }
 
+func (r *Repo) UpdateUserTrusted(ctx context.Context, userID uuid.UUID, isTrusted bool) error {
+	tag, err := r.data.DB.Exec(ctx, `
+		UPDATE users
+		SET is_trusted = $2,
+		    updated_at = NOW()
+		WHERE id = $1
+	`, userID, isTrusted)
+	if err != nil {
+		return fmt.Errorf("update user trusted: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return profileerrors.ErrUserNotFound
+	}
+	return nil
+}
+
 type userScanner interface {
 	Scan(dest ...any) error
 }
@@ -472,7 +488,7 @@ func scanUser(scanner userScanner) (*model.User, error) {
 	var telegramID *int64
 
 	if err := scanner.Scan(
-		&user.ID, &telegramID, &username, &firstName, &lastName, &avatarURL, &telegramAvatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &telegramID, &username, &firstName, &lastName, &avatarURL, &telegramAvatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.IsTrusted, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
 	); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, profileerrors.ErrUserNotFound

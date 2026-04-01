@@ -17,6 +17,7 @@ import (
 	referralservice "api/internal/api/referral"
 	apparenа "api/internal/app/arena"
 	appcodeeditor "api/internal/app/codeeditor"
+	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/cache"
 	"api/internal/closer"
 	"api/internal/config"
@@ -27,6 +28,7 @@ import (
 	podcastdata "api/internal/data/podcast"
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
+	interviewprepdata "api/internal/data/interviewprep"
 	admindomainservice "api/internal/domain/admin"
 	eventdomainservice "api/internal/domain/event"
 	geodomainservice "api/internal/domain/geo"
@@ -113,6 +115,7 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 	referralRepo := referraldata.NewRepo(store, kratosLogger)
 	codeEditorRepo := codeeditordata.NewRepo(store, kratosLogger)
 	arenaRepo := arenadata.NewRepo(store, kratosLogger)
+	interviewPrepRepo := interviewprepdata.New(store, kratosLogger)
 
 	realtimeHub := realtime.NewCodeEditorHub(codeEditorRepo)
 
@@ -182,6 +185,9 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 			return true
 		},
 	})
+	interviewPrepServiceDomain := appinterviewprep.New(appinterviewprep.Config{
+		Repository: interviewPrepRepo,
+	})
 	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
 	closer.AddSync(startCodeRoomCleanupWorker(kratosLogger, rtcManager, codeEditorServiceDomain))
 	closer.AddSync(startArenaCleanupWorker(kratosLogger, rtcManager, arenaServiceDomain))
@@ -225,6 +231,8 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 	server.RegisterArenaOpenMatches(httpServer, arenaServiceDomain)
 	server.RegisterArenaQueue(httpServer, arenaServiceDomain, profileServiceDomain)
 	server.RegisterRTConfig(httpServer, rtcManager, profileServiceDomain)
+	server.RegisterInterviewPrepRoutes(httpServer, interviewPrepServiceDomain, profileServiceDomain)
+	server.RegisterAdminUsersRoutes(httpServer, profileRepo, profileServiceDomain)
 
 	adminv1.RegisterAdminServiceHTTPServer(httpServer, adminService)
 	adminv1.RegisterAdminServiceServer(grpcServer, adminService)

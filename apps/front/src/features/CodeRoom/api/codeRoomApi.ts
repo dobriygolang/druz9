@@ -693,6 +693,13 @@ export const codeRoomApi = {
     });
   },
 
+  leaveArenaMatch: async (matchId: string, actorId?: string, guestName?: string): Promise<ArenaMatch> => {
+    const response = await apiClient.post<{ match: any }>(`/api/v1/arena/matches/${matchId}/leave`, {}, {
+      headers: withGuestArenaHeaders(actorId, guestName),
+    });
+    return normalizeArenaMatch(response.data.match);
+  },
+
   getArenaQueueStatus: async (actorId?: string, guestName?: string): Promise<ArenaQueueState> => {
     const response = await apiClient.get('/api/v1/arena/queue/status', {
       headers: withGuestArenaHeaders(actorId, guestName),

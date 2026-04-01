@@ -139,6 +139,7 @@ const (
 	WinnerReason_WINNER_REASON_TIMEOUT       WinnerReason = 3
 	WinnerReason_WINNER_REASON_SINGLE_AC     WinnerReason = 4
 	WinnerReason_WINNER_REASON_ANTI_CHEAT    WinnerReason = 6
+	WinnerReason_WINNER_REASON_OPPONENT_LEFT WinnerReason = 7
 	WinnerReason_WINNER_REASON_NONE          WinnerReason = 5
 )
 
@@ -151,6 +152,7 @@ var (
 		3: "WINNER_REASON_TIMEOUT",
 		4: "WINNER_REASON_SINGLE_AC",
 		6: "WINNER_REASON_ANTI_CHEAT",
+		7: "WINNER_REASON_OPPONENT_LEFT",
 		5: "WINNER_REASON_NONE",
 	}
 	WinnerReason_value = map[string]int32{
@@ -160,6 +162,7 @@ var (
 		"WINNER_REASON_TIMEOUT":       3,
 		"WINNER_REASON_SINGLE_AC":     4,
 		"WINNER_REASON_ANTI_CHEAT":    6,
+		"WINNER_REASON_OPPONENT_LEFT": 7,
 		"WINNER_REASON_NONE":          5,
 	}
 )
@@ -1382,14 +1385,15 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"!SUBMIT_FAILURE_KIND_COMPILE_ERROR\x10\x01\x12%\n" +
 	"!SUBMIT_FAILURE_KIND_RUNTIME_ERROR\x10\x02\x12$\n" +
 	" SUBMIT_FAILURE_KIND_WRONG_ANSWER\x10\x03\x12\x1f\n" +
-	"\x1bSUBMIT_FAILURE_KIND_TIMEOUT\x10\x04*\xd7\x01\n" +
+	"\x1bSUBMIT_FAILURE_KIND_TIMEOUT\x10\x04*\xf8\x01\n" +
 	"\fWinnerReason\x12\x1d\n" +
 	"\x19WINNER_REASON_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bWINNER_REASON_ACCEPTED_TIME\x10\x01\x12\x19\n" +
 	"\x15WINNER_REASON_RUNTIME\x10\x02\x12\x19\n" +
 	"\x15WINNER_REASON_TIMEOUT\x10\x03\x12\x1b\n" +
 	"\x17WINNER_REASON_SINGLE_AC\x10\x04\x12\x1c\n" +
-	"\x18WINNER_REASON_ANTI_CHEAT\x10\x06\x12\x16\n" +
+	"\x18WINNER_REASON_ANTI_CHEAT\x10\x06\x12\x1f\n" +
+	"\x1bWINNER_REASON_OPPONENT_LEFT\x10\a\x12\x16\n" +
 	"\x12WINNER_REASON_NONE\x10\x05*m\n" +
 	"\x0fArenaPlayerSide\x12!\n" +
 	"\x1dARENA_PLAYER_SIDE_UNSPECIFIED\x10\x00\x12\x1a\n" +

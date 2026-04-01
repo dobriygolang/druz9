@@ -1341,6 +1341,7 @@ type User struct {
 	ActivityStatus    UserActivityStatus     `protobuf:"varint,12,opt,name=activity_status,json=activityStatus,proto3,enum=profile.v1.UserActivityStatus" json:"activity_status,omitempty"`
 	CurrentWorkplace  string                 `protobuf:"bytes,13,opt,name=current_workplace,json=currentWorkplace,proto3" json:"current_workplace,omitempty"`
 	IsAdmin           bool                   `protobuf:"varint,14,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
+	IsTrusted         bool                   `protobuf:"varint,16,opt,name=is_trusted,json=isTrusted,proto3" json:"is_trusted,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -1480,6 +1481,13 @@ func (x *User) GetIsAdmin() bool {
 	return false
 }
 
+func (x *User) GetIsTrusted() bool {
+	if x != nil {
+		return x.IsTrusted
+	}
+	return false
+}
+
 var File_profile_v1_profile_proto protoreflect.FileDescriptor
 
 const file_profile_v1_profile_proto_rawDesc = "" +
@@ -1567,7 +1575,7 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\x04user\x18\x01 \x01(\v2\x10.profile.v1.UserR\x04user\x124\n" +
 	"\x16needs_profile_complete\x18\x02 \x01(\bR\x14needsProfileComplete\"(\n" +
 	"\x0eLogoutResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"\xc8\x04\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"\xe7\x04\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vtelegram_id\x18\x02 \x01(\x03R\n" +
@@ -1589,7 +1597,9 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\tlongitude\x18\v \x01(\x01R\tlongitude\x12G\n" +
 	"\x0factivity_status\x18\f \x01(\x0e2\x1e.profile.v1.UserActivityStatusR\x0eactivityStatus\x12+\n" +
 	"\x11current_workplace\x18\r \x01(\tR\x10currentWorkplace\x12\x19\n" +
-	"\bis_admin\x18\x0e \x01(\bR\aisAdmin*\xa7\x01\n" +
+	"\bis_admin\x18\x0e \x01(\bR\aisAdmin\x12\x1d\n" +
+	"\n" +
+	"is_trusted\x18\x10 \x01(\bR\tisTrusted*\xa7\x01\n" +
 	"\x12UserActivityStatus\x12$\n" +
 	" USER_ACTIVITY_STATUS_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bUSER_ACTIVITY_STATUS_ONLINE\x10\x01\x12(\n" +

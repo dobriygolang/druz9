@@ -18,6 +18,7 @@ const (
 	WinnerReasonTimeout      = model.ArenaWinnerReasonTimeout
 	WinnerReasonSingleAC     = model.ArenaWinnerReasonSingleAC
 	WinnerReasonAntiCheat    = model.ArenaWinnerReasonAntiCheat
+	WinnerReasonOpponentLeft = model.ArenaWinnerReasonOpponentLeft
 	WinnerReasonNone         = model.ArenaWinnerReasonNone
 
 	SubmissionFailureKindCompileError = model.ArenaSubmissionFailureKindCompileError

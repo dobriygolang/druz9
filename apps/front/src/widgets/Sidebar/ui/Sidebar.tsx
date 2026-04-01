@@ -59,6 +59,7 @@ export const Sidebar: React.FC = () => {
             <NavItem to="/events" icon={<Calendar size={20} />} label="Ивент" />
             <NavItem to="/vacancies" icon={<Briefcase size={20} />} label="Вакансии" />
             <NavItem to="/map" icon={<MapPin size={20} />} label="Карта" />
+            {user?.isTrusted && <NavItem to="/interview-prep" icon={<Briefcase size={20} />} label="Prep" />}
             <div style={{ height: '32px' }} />
             {user?.isAdmin && (
               <>

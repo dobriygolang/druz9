@@ -240,6 +240,7 @@ message User {
   UserActivityStatus activity_status = 12;
   string current_workplace = 13;
   bool is_admin = 14;
+  bool is_trusted = 16;
 }
 
 enum UserActivityStatus {
