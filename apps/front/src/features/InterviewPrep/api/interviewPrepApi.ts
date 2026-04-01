@@ -118,7 +118,6 @@ const normalizeSession = (session: any): InterviewPrepSession => ({
   currentQuestion: session.currentQuestion || session.current_question
     ? normalizeQuestion(session.currentQuestion ?? session.current_question)
     : undefined,
-  results: Array.isArray(session.results) ? session.results.map(normalizeQuestionResult) : [],
 });
 
 export const interviewPrepApi = {
