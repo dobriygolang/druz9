@@ -966,6 +966,34 @@
   transition: color 0.2s;
 }
 
+.code-room-prep-launch {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 18px;
+  padding: 18px;
+  border-radius: 18px;
+  border: 1px solid rgba(34, 197, 94, 0.18);
+  background:
+    radial-gradient(circle at top right, rgba(34, 197, 94, 0.12), transparent 34%),
+    rgba(255, 255, 255, 0.03);
+}
+
+.code-room-prep-launch__head,
+.code-room-prep-launch__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.code-room-prep-launch__title {
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
 /* ===========================================
    GUEST CTA BANNER
    =========================================== */
@@ -1019,6 +1047,12 @@
 
   .mode-selector {
     flex-direction: column;
+  }
+
+  .code-room-prep-launch__head,
+  .code-room-prep-launch__actions {
+    flex-direction: column;
+    align-items: stretch;
   }
 }
 

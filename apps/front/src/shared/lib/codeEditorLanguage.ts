@@ -1,4 +1,4 @@
-export type AppCodeLanguage = 'go' | 'python' | 'sql';
+export type AppCodeLanguage = 'go' | 'python' | 'sql' | 'system_design';
 
 export function normalizeAppLanguage(value?: string | null): AppCodeLanguage {
   switch ((value || '').trim().toLowerCase()) {
@@ -6,6 +6,8 @@ export function normalizeAppLanguage(value?: string | null): AppCodeLanguage {
       return 'python';
     case 'sql':
       return 'sql';
+    case 'system_design':
+      return 'system_design';
     case 'go':
     default:
       return 'go';
@@ -22,6 +24,8 @@ export function displayLanguageLabel(value?: string | null): string {
       return 'Python';
     case 'sql':
       return 'SQL';
+    case 'system_design':
+      return 'System Design';
     case 'go':
     default:
       return 'Go';

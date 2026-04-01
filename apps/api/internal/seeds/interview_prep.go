@@ -2,6 +2,7 @@ package seeds
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -14,15 +15,23 @@ import (
 
 const interviewPrepSeedName = "interview_prep_pack"
 const interviewPrepCatalogPath = "scripts/seeds/catalogs/interview_prep.json"
-const interviewPrepSeedVersion = "v2-executable-code-tasks"
+const interviewPrepSeedVersion = "v3-generated-categories"
 
 func (r *Runner) runInterviewPrep(ctx context.Context) (Result, error) {
 	catalog, rawCatalog, err := loadInterviewPrepCatalog(interviewPrepCatalogPath)
 	if err != nil {
 		return Result{}, err
 	}
+	catalog.Tasks = append(catalog.Tasks, generatedInterviewPrepTasks()...)
 
-	checksum := digest(append(rawCatalog, []byte("|"+interviewPrepSeedVersion)...))
+	generatedCatalog, err := json.Marshal(catalog.Tasks)
+	if err != nil {
+		return Result{}, fmt.Errorf("marshal generated interview prep catalog: %w", err)
+	}
+	checksumPayload := append([]byte{}, rawCatalog...)
+	checksumPayload = append(checksumPayload, []byte("|"+interviewPrepSeedVersion+"|")...)
+	checksumPayload = append(checksumPayload, generatedCatalog...)
+	checksum := digest(checksumPayload)
 	shouldApply, appliedAt, err := r.shouldApply(ctx, interviewPrepSeedName, seedKindCatalog, checksum)
 	if err != nil {
 		return Result{}, err

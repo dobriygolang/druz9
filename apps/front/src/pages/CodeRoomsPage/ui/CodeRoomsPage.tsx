@@ -66,6 +66,13 @@ const DIFFICULTY_OPTIONS = [
   { value: 'hard', label: 'hard' },
 ];
 
+const INTERVIEW_PREP_CATEGORY_OPTIONS = [
+  { value: 'go', label: 'Go' },
+  { value: 'python', label: 'Python' },
+  { value: 'sql', label: 'SQL' },
+  { value: 'system_design', label: 'System Design' },
+];
+
 const LEAGUES = [
   { name: 'Bronze', minRating: 300 },
   { name: 'Silver', minRating: 500 },
@@ -134,6 +141,7 @@ export const CodeRoomsPage: React.FC = () => {
   });
   const [newRoomTopic, setNewRoomTopic] = useState('');
   const [newRoomDifficulty, setNewRoomDifficulty] = useState('');
+  const [prepLaunchCategory, setPrepLaunchCategory] = useState('go');
 
   // Initialize queueState from localStorage to persist across page refreshes
   const [queueState, setQueueState] = useState<ArenaQueueState | null>(() => {
@@ -741,6 +749,48 @@ export const CodeRoomsPage: React.FC = () => {
                     </button>
                   </div>
                 </div>
+
+                {user?.isTrusted && (
+                  <div className="code-room-prep-launch">
+                    <div className="code-room-prep-launch__head">
+                      <div>
+                        <div className="code-room-prep-launch__title">Solo practice</div>
+                        <div className="mode-desc">
+                          Если сейчас нужен не room, а персональная подготовка, можно сразу открыть Interview Prep по категории или взять случайную задачу.
+                        </div>
+                      </div>
+                      <BookOpen size={18} />
+                    </div>
+                    <div className="pill-selector">
+                      {INTERVIEW_PREP_CATEGORY_OPTIONS.map((option) => (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className={`pill-selector__pill ${prepLaunchCategory === option.value ? 'active' : ''}`}
+                          onClick={() => setPrepLaunchCategory(option.value)}
+                        >
+                          {option.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="code-room-prep-launch__actions">
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}`)}
+                      >
+                        Открыть каталог
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&pick=random`)}
+                      >
+                        Случайная задача
+                      </button>
+                    </div>
+                  </div>
+                )}
 
                 {(newRoomMode === 'duel' || newRoomMode === 'queue') && (
                   <div className="task-filters code-room-create-filters">

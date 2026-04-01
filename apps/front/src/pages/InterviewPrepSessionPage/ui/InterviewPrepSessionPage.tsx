@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
 import { CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Play, RotateCcw, TerminalSquare, XCircle } from 'lucide-react';
@@ -31,6 +31,9 @@ export function InterviewPrepSessionPage() {
   const [designImage, setDesignImage] = useState<File | null>(null);
   const [designReview, setDesignReview] = useState<InterviewPrepSystemDesignReview | null>(null);
   const [editorHeight, setEditorHeight] = useState(560);
+  const resizeStartYRef = useRef(0);
+  const resizeStartHeightRef = useRef(560);
+  const [isResizingEditor, setIsResizingEditor] = useState(false);
   const [submitResult, setSubmitResult] = useState<{
     passed: boolean;
     lastError: string;
@@ -55,6 +58,29 @@ export function InterviewPrepSessionPage() {
   useEffect(() => {
     setCode(session?.code ?? session?.task?.starterCode ?? '');
   }, [session?.id, session?.code, session?.task?.starterCode]);
+
+  useEffect(() => {
+    if (!isResizingEditor) {
+      return undefined;
+    }
+
+    const handleMouseMove = (event: MouseEvent) => {
+      const delta = event.clientY - resizeStartYRef.current;
+      setEditorHeight(Math.max(360, Math.min(1080, resizeStartHeightRef.current + delta)));
+    };
+
+    const handleMouseUp = () => {
+      setIsResizingEditor(false);
+    };
+
+    window.addEventListener('mousemove', handleMouseMove);
+    window.addEventListener('mouseup', handleMouseUp);
+
+    return () => {
+      window.removeEventListener('mousemove', handleMouseMove);
+      window.removeEventListener('mouseup', handleMouseUp);
+    };
+  }, [isResizingEditor]);
 
   const progress = useMemo(() => {
     const answeredCount = session?.results?.length ?? 0;
@@ -313,6 +339,17 @@ export function InterviewPrepSessionPage() {
               }}
             />
           </div>
+          <div
+            className={`interview-prep-live-resize-handle ${isResizingEditor ? 'is-active' : ''}`}
+            onMouseDown={(event) => {
+              resizeStartYRef.current = event.clientY;
+              resizeStartHeightRef.current = editorHeight;
+              setIsResizingEditor(true);
+            }}
+            role="separator"
+            aria-orientation="horizontal"
+            aria-label="Изменить высоту live coding editor"
+          />
           <div className="interview-prep-live-actions">
             <button
               className="btn btn-primary"

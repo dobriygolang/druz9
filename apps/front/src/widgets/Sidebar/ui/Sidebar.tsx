@@ -32,7 +32,7 @@ export const Sidebar: React.FC = () => {
 
   return (
     <aside className="sidebar-desktop">
-      <div style={{ marginBottom: '40px', paddingLeft: '12px', display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <div className="sidebar-desktop__brand">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ fontWeight: '700', fontSize: '20px', letterSpacing: '1px' }}>Друзья</div>
           <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '500', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '6px' }}>v1.0</span>
@@ -50,7 +50,7 @@ export const Sidebar: React.FC = () => {
         )}
       </div>
 
-      <nav style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: '4px' }}>
+      <nav className="sidebar-desktop__nav">
         <NavItem to="/code-rooms" icon={<Code2 size={20} />} label="Код" />
         {isAuthenticated ? (
           <>
@@ -122,30 +122,11 @@ export const Sidebar: React.FC = () => {
       </nav>
 
       {isAuthenticated && (
-        <div style={{ marginTop: 'auto', paddingTop: '24px' }}>
+        <div className="sidebar-desktop__footer">
           <button
             onClick={logout}
             aria-label="Выйти"
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'flex-start',
-              gap: '12px',
-              color: 'var(--text-secondary)',
-              background: 'transparent',
-              border: 'none',
-              padding: '12px',
-              cursor: 'pointer',
-              width: '100%',
-              minHeight: '44px',
-              borderRadius: '12px',
-              textAlign: 'left',
-              fontSize: '14px',
-              fontWeight: '500',
-              lineHeight: 1.2,
-              transition: 'transform 0.2s, background-color 0.2s, color 0.2s',
-              appearance: 'none',
-            }}
+            className="sidebar-desktop__logout"
             onMouseOver={(e) => {
               e.currentTarget.style.backgroundColor = 'var(--surface-color)';
               e.currentTarget.style.color = 'var(--text-primary)';
@@ -167,11 +148,10 @@ export const Sidebar: React.FC = () => {
 };
 
 const NavItem: React.FC<{ icon: React.ReactNode; label: string; to: string }> = ({ icon, label, to }) => (
-  <NavLink to={to} style={({ isActive }) => ({
-    display: 'flex', alignItems: 'center', gap: '12px', padding: '12px', borderRadius: '12px',
+  <NavLink to={to} className="sidebar-desktop__nav-item" style={({ isActive }) => ({
     color: isActive ? 'var(--accent-color)' : 'var(--text-secondary)',
     backgroundColor: isActive ? 'var(--surface-color)' : 'transparent',
-    textDecoration: 'none', transition: 'background 0.2s', fontSize: '14px', fontWeight: isActive ? '600' : '500'
+    fontWeight: isActive ? '600' : '500'
   })}>
     {icon} <span>{label}</span>
   </NavLink>
