@@ -23,6 +23,7 @@ const RTConfigAdminPage = lazy(() => import('@/pages/RTConfigAdminPage/ui/RTConf
 const ArenaMatchPage = lazy(() => import('@/pages/ArenaMatchPage/ui/ArenaMatchPage').then(m => ({ default: m.ArenaMatchPage })));
 const InterviewPrepPage = lazy(() => import('@/pages/InterviewPrepPage/ui/InterviewPrepPage').then(m => ({ default: m.InterviewPrepPage })));
 const InterviewPrepSessionPage = lazy(() => import('@/pages/InterviewPrepSessionPage/ui/InterviewPrepSessionPage').then(m => ({ default: m.InterviewPrepSessionPage })));
+const InterviewPrepAdminPage = lazy(() => import('@/pages/InterviewPrepAdminPage/ui/InterviewPrepAdminPage').then(m => ({ default: m.InterviewPrepAdminPage })));
 
 // Shared loading fallback
 const LoadingFallback: React.FC = () => (
@@ -149,6 +150,10 @@ export const RouterProvider: React.FC = () => {
           <Route
             path="/admin/config"
             element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <RTConfigAdminPage />}
+          />
+          <Route
+            path="/admin/interview-prep"
+            element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <InterviewPrepAdminPage />}
           />
         </Route>
 

@@ -141,4 +141,82 @@ export const interviewPrepApi = {
     );
     return normalizeSession(response.data.session);
   },
+
+  // Admin methods
+  adminListTasks: async (): Promise<InterviewPrepTask[]> => {
+    const response = await apiClient.get<{ tasks: any[] }>('/api/admin/interview-prep/tasks');
+    return (response.data.tasks || []).map(normalizeTask);
+  },
+
+  adminCreateTask: async (task: {
+    slug: string;
+    title: string;
+    statement: string;
+    prepType: string;
+    language: string;
+    isExecutable: boolean;
+    executionProfile: string;
+    runnerMode: string;
+    durationSeconds: number;
+    starterCode: string;
+    referenceSolution: string;
+    isActive: boolean;
+  }): Promise<InterviewPrepTask> => {
+    const response = await apiClient.post<{ task: any }>('/api/admin/interview-prep/tasks', task);
+    return normalizeTask(response.data.task);
+  },
+
+  adminUpdateTask: async (taskId: string, task: {
+    slug: string;
+    title: string;
+    statement: string;
+    prepType: string;
+    language: string;
+    isExecutable: boolean;
+    executionProfile: string;
+    runnerMode: string;
+    durationSeconds: number;
+    starterCode: string;
+    referenceSolution: string;
+    isActive: boolean;
+  }): Promise<InterviewPrepTask> => {
+    const response = await apiClient.put<{ task: any }>(`/api/admin/interview-prep/tasks/${taskId}`, task);
+    return normalizeTask(response.data.task);
+  },
+
+  adminDeleteTask: async (taskId: string): Promise<void> => {
+    await apiClient.delete(`/api/admin/interview-prep/tasks/${taskId}`);
+  },
+
+  adminGetTask: async (taskId: string): Promise<InterviewPrepTask> => {
+    const response = await apiClient.get<{ task: any }>(`/api/admin/interview-prep/tasks/${taskId}`);
+    return normalizeTask(response.data.task);
+  },
+
+  adminListQuestions: async (taskId: string): Promise<InterviewPrepQuestion[]> => {
+    const response = await apiClient.get<{ questions: any[] }>(`/api/admin/interview-prep/tasks/${taskId}/questions`);
+    return (response.data.questions || []).map(normalizeQuestion);
+  },
+
+  adminCreateQuestion: async (taskId: string, question: {
+    position: number;
+    prompt: string;
+    answer: string;
+  }): Promise<InterviewPrepQuestion> => {
+    const response = await apiClient.post<{ question: any }>(`/api/admin/interview-prep/tasks/${taskId}/questions`, question);
+    return normalizeQuestion(response.data.question);
+  },
+
+  adminUpdateQuestion: async (taskId: string, questionId: string, question: {
+    position: number;
+    prompt: string;
+    answer: string;
+  }): Promise<InterviewPrepQuestion> => {
+    const response = await apiClient.put<{ question: any }>(`/api/admin/interview-prep/tasks/${taskId}/questions/${questionId}`, question);
+    return normalizeQuestion(response.data.question);
+  },
+
+  adminDeleteQuestion: async (taskId: string, questionId: string): Promise<void> => {
+    await apiClient.delete(`/api/admin/interview-prep/tasks/${taskId}/questions/${questionId}`);
+  },
 };

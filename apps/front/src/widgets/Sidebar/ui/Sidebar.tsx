@@ -68,6 +68,7 @@ export const Sidebar: React.FC = () => {
                 </div>
                 <NavItem to="/admin/config" icon={<Settings size={20} />} label="Конфиг" />
                 <NavItem to="/admin/code-tasks" icon={<Shield size={20} />} label="Задачи" />
+                <NavItem to="/admin/interview-prep" icon={<Shield size={20} />} label="Interview Prep" />
                 <div style={{ height: '16px' }} />
               </>
             )}
