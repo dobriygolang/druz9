@@ -80,6 +80,18 @@ export interface InterviewPrepAnswerResult {
   session: InterviewPrepSession;
 }
 
+export interface InterviewPrepSystemDesignReview {
+  provider: string;
+  model: string;
+  score: number;
+  summary: string;
+  strengths: string[];
+  issues: string[];
+  missingTopics: string[];
+  followUpQuestions: string[];
+  disclaimer: string;
+}
+
 const normalizeTask = (task: any): InterviewPrepTask => ({
   id: task.id,
   slug: task.slug,
@@ -181,6 +193,28 @@ export const interviewPrepApi = {
         : undefined,
       session: normalizeSession(response.data.session),
     };
+  },
+
+  reviewSystemDesign: async (
+    sessionId: string,
+    image: File,
+    notes: string,
+  ): Promise<InterviewPrepSystemDesignReview> => {
+    const formData = new FormData();
+    formData.append('image', image);
+    formData.append('notes', notes);
+
+    const response = await apiClient.post<{ review: InterviewPrepSystemDesignReview }>(
+      `/api/v1/interview-prep/sessions/${sessionId}/system-design-review`,
+      formData,
+      {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      },
+    );
+
+    return response.data.review;
   },
 
   // Admin methods

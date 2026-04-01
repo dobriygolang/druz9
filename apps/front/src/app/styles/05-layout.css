@@ -356,8 +356,10 @@
   gap: 6px;
   padding: 18px;
   border-radius: 18px;
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-color);
+  background:
+    radial-gradient(circle at top left, rgba(34, 197, 94, 0.12), transparent 42%),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(34, 197, 94, 0.18);
 }
 
 .interview-prep-progress strong {
@@ -377,6 +379,23 @@
   padding: 18px;
   border-radius: 16px;
   background: rgba(255, 255, 255, 0.03);
+}
+
+.interview-prep-statement {
+  background:
+    linear-gradient(180deg, rgba(56, 189, 248, 0.08), rgba(255, 255, 255, 0.02)),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(56, 189, 248, 0.12);
+}
+
+.interview-prep-code-editor {
+  border-radius: 18px;
+  overflow: hidden;
+  border: 1px solid rgba(245, 158, 11, 0.18);
+  background:
+    linear-gradient(180deg, rgba(245, 158, 11, 0.1), rgba(15, 17, 23, 0.96) 22%),
+    #0f1117;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
 .interview-prep-block-title {
@@ -414,6 +433,18 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.14), transparent 30%),
+    radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.12), transparent 28%),
+    var(--surface-color);
+}
+
+.interview-prep-design-review-card,
+.interview-prep-design-review-result,
+.interview-prep-design-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
 .interview-prep-live-toolbar,
@@ -424,12 +455,26 @@
   flex-wrap: wrap;
 }
 
+.interview-prep-live-spacer {
+  flex: 1 1 auto;
+}
+
+.interview-prep-live-size-controls {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .interview-prep-live-editor {
-  min-height: 420px;
   border-radius: 16px;
   overflow: hidden;
-  border: 1px solid var(--border-color);
-  background: #0f1117;
+  border: 1px solid rgba(99, 102, 241, 0.18);
+  background:
+    linear-gradient(180deg, rgba(99, 102, 241, 0.12), rgba(15, 17, 23, 0.98) 14%),
+    #0f1117;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.04),
+    0 16px 32px rgba(0, 0, 0, 0.18);
 }
 
 .interview-prep-live-result {
@@ -443,6 +488,12 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
+.interview-prep-badge--language {
+  background: rgba(56, 189, 248, 0.12);
+  border-color: rgba(56, 189, 248, 0.22);
+  color: #d8f3ff;
+}
+
 .interview-prep-live-result.is-success {
   border-color: rgba(34, 197, 94, 0.3);
   background: rgba(34, 197, 94, 0.08);
@@ -451,6 +502,51 @@
 .interview-prep-live-result.is-error {
   border-color: rgba(239, 68, 68, 0.24);
   background: rgba(239, 68, 68, 0.08);
+}
+
+.interview-prep-design-review-grid {
+  display: grid;
+  grid-template-columns: minmax(280px, 1fr) minmax(320px, 1.2fr);
+  gap: 16px;
+}
+
+.interview-prep-upload-field,
+.interview-prep-notes-field {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.interview-prep-upload-field input[type="file"] {
+  width: 100%;
+  padding: 14px;
+  border-radius: 14px;
+  border: 1px dashed var(--border-color);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text-primary);
+}
+
+.interview-prep-upload-name {
+  font-size: 14px;
+  color: var(--text-primary);
+  word-break: break-word;
+}
+
+.interview-prep-notes-input {
+  min-height: 124px;
+  resize: vertical;
+}
+
+.interview-prep-design-review-score {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.interview-prep-design-review-score strong {
+  font-size: 28px;
+  line-height: 1;
 }
 
 .interview-prep-question-prompt {
@@ -511,6 +607,10 @@
 }
 
 @media (max-width: 720px) {
+  .interview-prep-design-review-grid {
+    grid-template-columns: 1fr;
+  }
+
   .interview-prep-card__footer,
   .interview-prep-live-actions,
   .interview-prep-question-actions,

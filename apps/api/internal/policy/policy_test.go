@@ -384,7 +384,7 @@ func TestValidatePolicy_Valid(t *testing.T) {
 	t.Parallel()
 
 	policy := SandboxPolicy{
-		Profile:      ProfilePure,
+		Profile:       ProfilePure,
 		Deterministic: true,
 		Language: LanguagePolicy{
 			Language:    LanguageGo,
@@ -465,7 +465,7 @@ func TestValidatePolicy_InvalidTimeLimit(t *testing.T) {
 				ProcessLimit:     16,
 				OutputLimitBytes: 64 * 1024,
 			},
-			Network: NetworkPolicy{Enabled: false, Mode: NetworkDisabled},
+			Network:    NetworkPolicy{Enabled: false, Mode: NetworkDisabled},
 			Filesystem: FilesystemPolicy{Mode: FilesystemNone},
 		}
 
@@ -493,7 +493,7 @@ func TestValidatePolicy_InvalidTimeLimit(t *testing.T) {
 				ProcessLimit:     16,
 				OutputLimitBytes: 64 * 1024,
 			},
-			Network: NetworkPolicy{Enabled: false, Mode: NetworkDisabled},
+			Network:    NetworkPolicy{Enabled: false, Mode: NetworkDisabled},
 			Filesystem: FilesystemPolicy{Mode: FilesystemNone},
 		}
 
@@ -522,7 +522,7 @@ func TestValidatePolicy_InvalidMemoryLimit(t *testing.T) {
 			ProcessLimit:     16,
 			OutputLimitBytes: 64 * 1024,
 		},
-		Network: NetworkPolicy{Enabled: false, Mode: NetworkDisabled},
+		Network:    NetworkPolicy{Enabled: false, Mode: NetworkDisabled},
 		Filesystem: FilesystemPolicy{Mode: FilesystemNone},
 	}
 
@@ -589,8 +589,8 @@ func TestValidatePolicy_NetworkConflict(t *testing.T) {
 				OutputLimitBytes: 64 * 1024,
 			},
 			Network: NetworkPolicy{
-				Enabled: false,
-				Mode:    NetworkMockOnly,
+				Enabled:      false,
+				Mode:         NetworkMockOnly,
 				AllowedHosts: []string{"localhost"},
 			},
 			Filesystem: FilesystemPolicy{Mode: FilesystemNone},
@@ -622,8 +622,8 @@ func TestValidatePolicy_PureProfileCannotHaveNetwork(t *testing.T) {
 			OutputLimitBytes: 64 * 1024,
 		},
 		Network: NetworkPolicy{
-			Enabled: true,
-			Mode:    NetworkMockOnly,
+			Enabled:      true,
+			Mode:         NetworkMockOnly,
 			AllowedHosts: []string{"localhost"},
 		},
 		Filesystem: FilesystemPolicy{Mode: FilesystemNone},
@@ -719,7 +719,7 @@ func TestValidatePolicy_ImportConflict(t *testing.T) {
 			ProcessLimit:     16,
 			OutputLimitBytes: 64 * 1024,
 		},
-		Network: NetworkPolicy{Enabled: true, Mode: NetworkMockOnly, AllowedHosts: []string{"localhost"}},
+		Network:    NetworkPolicy{Enabled: true, Mode: NetworkMockOnly, AllowedHosts: []string{"localhost"}},
 		Filesystem: FilesystemPolicy{Mode: FilesystemNone},
 	}
 
@@ -748,7 +748,7 @@ func TestValidatePolicy_RequireUnsafeBlocklist(t *testing.T) {
 			ProcessLimit:     16,
 			OutputLimitBytes: 64 * 1024,
 		},
-		Network: NetworkPolicy{Enabled: true, Mode: NetworkMockOnly, AllowedHosts: []string{"localhost"}},
+		Network:    NetworkPolicy{Enabled: true, Mode: NetworkMockOnly, AllowedHosts: []string{"localhost"}},
 		Filesystem: FilesystemPolicy{Mode: FilesystemNone},
 	}
 
@@ -789,7 +789,7 @@ func TestBuildRunnerConfig(t *testing.T) {
 				ProcessLimit:     16,
 				OutputLimitBytes: 64 * 1024,
 			},
-			Network: NetworkPolicy{Enabled: false, Mode: NetworkDisabled},
+			Network:    NetworkPolicy{Enabled: false, Mode: NetworkDisabled},
 			Filesystem: FilesystemPolicy{Mode: FilesystemNone},
 		}
 		task := TaskSpec{

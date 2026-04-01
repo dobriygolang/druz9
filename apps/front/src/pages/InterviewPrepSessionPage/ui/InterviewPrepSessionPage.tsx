@@ -1,13 +1,14 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { CheckCircle2, CircleDashed, Clock3, Play, RotateCcw, TerminalSquare, XCircle } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Play, RotateCcw, TerminalSquare, XCircle } from 'lucide-react';
 
 import {
   interviewPrepApi,
   InterviewPrepQuestion,
   InterviewPrepQuestionResult,
   InterviewPrepSession,
+  InterviewPrepSystemDesignReview,
 } from '@/features/InterviewPrep/api/interviewPrepApi';
 import { displayLanguageLabel, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
 
@@ -25,6 +26,11 @@ export function InterviewPrepSessionPage() {
   const [revealedQuestion, setRevealedQuestion] = useState<InterviewPrepQuestion | null>(null);
   const [code, setCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [reviewingDesign, setReviewingDesign] = useState(false);
+  const [designNotes, setDesignNotes] = useState('');
+  const [designImage, setDesignImage] = useState<File | null>(null);
+  const [designReview, setDesignReview] = useState<InterviewPrepSystemDesignReview | null>(null);
+  const [editorHeight, setEditorHeight] = useState(560);
   const [submitResult, setSubmitResult] = useState<{
     passed: boolean;
     lastError: string;
@@ -60,6 +66,7 @@ export function InterviewPrepSessionPage() {
   );
   const showLiveCoding = Boolean(session?.task?.starterCode);
   const canSubmitExecutable = Boolean(session?.task?.isExecutable);
+  const showSystemDesignReview = session?.task?.prepType === 'system_design';
 
   const handleSubmitCode = async () => {
     if (!sessionId || !session?.task?.isExecutable) return;
@@ -102,6 +109,21 @@ export function InterviewPrepSessionPage() {
     }
   };
 
+  const handleReviewSystemDesign = async () => {
+    if (!sessionId || !designImage) return;
+    setReviewingDesign(true);
+    setError(null);
+    try {
+      const result = await interviewPrepApi.reviewSystemDesign(sessionId, designImage, designNotes);
+      setDesignReview(result);
+    } catch (e: any) {
+      console.error('Failed to review system design:', e);
+      setError(e.response?.data?.error || 'Не удалось получить AI-ревью схемы');
+    } finally {
+      setReviewingDesign(false);
+    }
+  };
+
   if (loading) {
     return <div className="empty-state compact">Загрузка interview prep session...</div>;
   }
@@ -115,6 +137,7 @@ export function InterviewPrepSessionPage() {
   }
 
   const task = session.task;
+  const starterCodePreview = task?.starterCode ?? '';
 
   return (
     <div className="interview-prep-session-page">
@@ -163,7 +186,27 @@ export function InterviewPrepSessionPage() {
           {task?.starterCode && (
             <>
               <div className="interview-prep-block-title">Starter code</div>
-              <pre className="interview-prep-code">{task.starterCode}</pre>
+              <div className="interview-prep-code-editor">
+                <Editor
+                  height="320px"
+                  defaultLanguage={monacoLanguageFor(task.language)}
+                  language={monacoLanguageFor(task.language)}
+                  value={starterCodePreview}
+                  theme="vs-dark"
+                  options={{
+                    readOnly: true,
+                    minimap: { enabled: false },
+                    lineNumbers: 'on',
+                    fontSize: 14,
+                    automaticLayout: true,
+                    scrollBeyondLastLine: false,
+                    wordWrap: 'on',
+                    tabSize: 2,
+                    padding: { top: 16, bottom: 16 },
+                    renderLineHighlight: 'none',
+                  }}
+                />
+              </div>
             </>
           )}
         </article>
@@ -225,16 +268,35 @@ export function InterviewPrepSessionPage() {
             <TerminalSquare size={18} />
           </div>
           <div className="interview-prep-live-toolbar">
-            <span className="badge">{displayLanguageLabel(task.language)}</span>
-            <span className={`badge ${session.lastSubmissionPassed ? 'badge-success' : 'badge-secondary'}`}>
+            <span className="badge interview-prep-badge interview-prep-badge--language">{displayLanguageLabel(task.language)}</span>
+            <span className={`badge interview-prep-badge ${session.lastSubmissionPassed ? 'badge-success' : 'badge-secondary'}`}>
               {canSubmitExecutable
                 ? (session.lastSubmissionPassed ? 'Проверка пройдена' : 'Ожидается accepted')
                 : 'Черновик для live-coding'}
             </span>
+            <div className="interview-prep-live-spacer" />
+            <div className="interview-prep-live-size-controls">
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setEditorHeight((value) => Math.max(360, value - 120))}
+              >
+                <ChevronUp size={16} />
+                <span>Компактнее</span>
+              </button>
+              <button
+                type="button"
+                className="btn btn-secondary"
+                onClick={() => setEditorHeight((value) => Math.min(1080, value + 120))}
+              >
+                <ChevronDown size={16} />
+                <span>Выше</span>
+              </button>
+            </div>
           </div>
-          <div className="interview-prep-live-editor">
+          <div className="interview-prep-live-editor" style={{ height: `${editorHeight}px` }}>
             <Editor
-              height="100%"
+              height={`${editorHeight}px`}
               defaultLanguage={monacoLanguageFor(task.language)}
               language={monacoLanguageFor(task.language)}
               value={code}
@@ -245,7 +307,9 @@ export function InterviewPrepSessionPage() {
                 fontSize: 14,
                 automaticLayout: true,
                 scrollBeyondLastLine: false,
+                lineNumbers: 'on',
                 tabSize: 2,
+                padding: { top: 16, bottom: 20 },
               }}
             />
           </div>
@@ -280,6 +344,125 @@ export function InterviewPrepSessionPage() {
               </div>
             )}
           </div>
+        </section>
+      )}
+
+      {showSystemDesignReview && task && (
+        <section className="card dashboard-card interview-prep-design-review-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>AI review схемы</h2>
+              <p className="interview-prep-muted">
+                Загрузи скриншот архитектуры. Файл не сохраняется у нас: backend отправляет его провайдеру и держит только текстовый review.
+              </p>
+            </div>
+            <TerminalSquare size={18} />
+          </div>
+
+          <div className="interview-prep-design-review-grid">
+            <label className="interview-prep-upload-field">
+              <span className="interview-prep-block-title">Скриншот архитектуры</span>
+              <input
+                type="file"
+                accept="image/png,image/jpeg,image/webp"
+                onChange={(event) => {
+                  const file = event.target.files?.[0] ?? null;
+                  setDesignImage(file);
+                  setDesignReview(null);
+                }}
+              />
+              <span className="interview-prep-muted">
+                PNG, JPG или WEBP, до 5 MB. Подходит скриншот из Excalidraw, Figma или Miro.
+              </span>
+              {designImage && <strong className="interview-prep-upload-name">{designImage.name}</strong>}
+            </label>
+
+            <label className="interview-prep-notes-field">
+              <span className="interview-prep-block-title">Контекст для модели</span>
+              <textarea
+                className="input interview-prep-notes-input"
+                placeholder="Например: assumed 20k RPS, multi-region не делал, auth и billing опустил специально"
+                value={designNotes}
+                onChange={(event) => setDesignNotes(event.target.value)}
+                rows={5}
+              />
+            </label>
+          </div>
+
+          <div className="interview-prep-live-actions">
+            <button
+              className="btn btn-primary"
+              onClick={() => void handleReviewSystemDesign()}
+              disabled={reviewingDesign || !designImage}
+            >
+              <Play size={16} />
+              <span>{reviewingDesign ? 'Анализирую...' : 'Попросить AI оценить схему'}</span>
+            </button>
+          </div>
+
+          {designReview && (
+            <div className="interview-prep-design-review-result">
+              <div className="interview-prep-design-review-score">
+                <span className="interview-prep-muted">Оценка</span>
+                <strong>{designReview.score}/10</strong>
+                <span className="badge">
+                  {designReview.provider}
+                  {designReview.model ? ` · ${designReview.model}` : ''}
+                </span>
+              </div>
+
+              <div className="interview-prep-live-result">
+                <strong>Summary</strong>
+                <span>{designReview.summary}</span>
+              </div>
+
+              {designReview.strengths?.length > 0 && (
+                <div className="interview-prep-design-review-list">
+                  <div className="interview-prep-block-title">Сильные стороны</div>
+                  {designReview.strengths.map((item, index) => (
+                    <div key={`strength-${index}`} className="interview-prep-result-row">
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {designReview.issues?.length > 0 && (
+                <div className="interview-prep-design-review-list">
+                  <div className="interview-prep-block-title">Замечания</div>
+                  {designReview.issues.map((item, index) => (
+                    <div key={`issue-${index}`} className="interview-prep-result-row">
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {designReview.missingTopics?.length > 0 && (
+                <div className="interview-prep-design-review-list">
+                  <div className="interview-prep-block-title">Что не покрыто</div>
+                  {designReview.missingTopics.map((item, index) => (
+                    <div key={`missing-${index}`} className="interview-prep-result-row">
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {designReview.followUpQuestions?.length > 0 && (
+                <div className="interview-prep-design-review-list">
+                  <div className="interview-prep-block-title">Follow-up от AI</div>
+                  {designReview.followUpQuestions.map((item, index) => (
+                    <div key={`follow-up-${index}`} className="interview-prep-result-row">
+                      <span>{item}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              <div className="interview-prep-muted">{designReview.disclaimer}</div>
+            </div>
+          )}
         </section>
       )}
 

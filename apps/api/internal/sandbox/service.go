@@ -147,13 +147,46 @@ func prepareExecution(root string, req ExecutionRequest) (string, []string, stri
 	switch req.Language {
 	case policy.LanguagePython:
 		args, stdin, err := preparePythonSources(root, req)
-		return "python3", args, stdin, err
+		if err != nil {
+			return "", nil, "", err
+		}
+		command, lookupErr := resolveRuntimeBinary("python3", []string{
+			"/usr/bin/python3",
+			"/opt/homebrew/bin/python3",
+			"/usr/local/bin/python3",
+		})
+		if lookupErr != nil {
+			return "", nil, "", lookupErr
+		}
+		return command, args, stdin, nil
 	case policy.LanguageSQL:
 		args, stdin, err := prepareSQLSources(root, req)
-		return "sqlite3", args, stdin, err
+		if err != nil {
+			return "", nil, "", err
+		}
+		command, lookupErr := resolveRuntimeBinary("sqlite3", []string{
+			"/usr/bin/sqlite3",
+			"/opt/homebrew/bin/sqlite3",
+			"/usr/local/bin/sqlite3",
+		})
+		if lookupErr != nil {
+			return "", nil, "", lookupErr
+		}
+		return command, args, stdin, nil
 	case policy.LanguageGo, "":
 		args, stdin, err := prepareGoSources(root, req)
-		return "go", args, stdin, err
+		if err != nil {
+			return "", nil, "", err
+		}
+		command, lookupErr := resolveRuntimeBinary("go", []string{
+			"/usr/local/go/bin/go",
+			"/opt/homebrew/bin/go",
+			"/usr/local/bin/go",
+		})
+		if lookupErr != nil {
+			return "", nil, "", lookupErr
+		}
+		return command, args, stdin, nil
 	default:
 		return "", nil, "", fmt.Errorf("unsupported sandbox language: %s", req.Language)
 	}
@@ -166,11 +199,11 @@ func prepareGoSources(root string, req ExecutionRequest) ([]string, string, erro
 	}
 
 	switch mode {
-		case "function_io":
-			workDir := filepath.Join(root, "work")
-			if err := os.MkdirAll(workDir, 0o755); err != nil {
-				return nil, "", fmt.Errorf("create work dir: %w", err)
-			}
+	case "function_io":
+		workDir := filepath.Join(root, "work")
+		if err := os.MkdirAll(workDir, 0o755); err != nil {
+			return nil, "", fmt.Errorf("create work dir: %w", err)
+		}
 
 		goModFile := filepath.Join(workDir, "go.mod")
 		if err := os.WriteFile(goModFile, []byte("module sandbox\n\ngo 1.20\n"), privateFileMode); err != nil {
@@ -399,4 +432,22 @@ func validateMaterializedPath(path string, fs policy.RunnerFilesystemConfig) err
 // Trims whitespace and normalizes line endings.
 func NormalizeOutput(value string) string {
 	return strings.TrimSpace(value)
+}
+
+func resolveRuntimeBinary(name string, absoluteFallbacks []string) (string, error) {
+	if resolved, err := exec.LookPath(name); err == nil && resolved != "" {
+		return resolved, nil
+	}
+
+	for _, candidate := range absoluteFallbacks {
+		if candidate == "" {
+			continue
+		}
+		info, err := os.Stat(candidate)
+		if err == nil && !info.IsDir() {
+			return candidate, nil
+		}
+	}
+
+	return "", fmt.Errorf("required runtime %q was not found in PATH", name)
 }

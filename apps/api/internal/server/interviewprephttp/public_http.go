@@ -3,9 +3,11 @@ package interviewprephttp
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strings"
 
+	"api/internal/aireview"
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/model"
 
@@ -121,6 +123,11 @@ func handleSessionResource(service Service, authorizer Authorizer) http.HandlerF
 			return
 		}
 
+		if len(parts) == 2 && parts[1] == "system-design-review" && r.Method == http.MethodPost {
+			handleSystemDesignReview(w, r, service, user, sessionID)
+			return
+		}
+
 		if len(parts) == 4 && parts[1] == "questions" && parts[3] == "answer" && r.Method == http.MethodPost {
 			handleQuestionAnswer(w, r, service, user, sessionID, parts[2])
 			return
@@ -175,6 +182,49 @@ func handleQuestionAnswer(
 	})
 }
 
+func handleSystemDesignReview(
+	w http.ResponseWriter,
+	r *http.Request,
+	service Service,
+	user *model.User,
+	sessionID uuid.UUID,
+) {
+	r.Body = http.MaxBytesReader(w, r.Body, 6*1024*1024)
+	if err := r.ParseMultipartForm(6 * 1024 * 1024); err != nil {
+		http.Error(w, "bad multipart request", http.StatusBadRequest)
+		return
+	}
+
+	file, header, err := r.FormFile("image")
+	if err != nil {
+		http.Error(w, "image is required", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	imageBytes, err := io.ReadAll(file)
+	if err != nil {
+		http.Error(w, "failed to read image", http.StatusBadRequest)
+		return
+	}
+
+	review, err := service.ReviewSystemDesign(
+		r.Context(),
+		user,
+		sessionID,
+		header.Filename,
+		header.Header.Get("Content-Type"),
+		imageBytes,
+		r.FormValue("notes"),
+	)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{"review": mapSystemDesignReview(review)})
+}
+
 func writeError(w http.ResponseWriter, err error) {
 	if errors.Is(err, appinterviewprep.ErrForbidden) {
 		http.Error(w, err.Error(), http.StatusForbidden)
@@ -189,8 +239,15 @@ func writeError(w http.ResponseWriter, err error) {
 		errors.Is(err, appinterviewprep.ErrQuestionLocked) ||
 		errors.Is(err, appinterviewprep.ErrInvalidAssessment) ||
 		errors.Is(err, appinterviewprep.ErrUnsupportedLanguage) ||
-		errors.Is(err, appinterviewprep.ErrExecutableTaskNotConfigured) {
+		errors.Is(err, appinterviewprep.ErrExecutableTaskNotConfigured) ||
+		errors.Is(err, appinterviewprep.ErrSystemDesignOnly) ||
+		errors.Is(err, appinterviewprep.ErrInvalidReviewImage) ||
+		errors.Is(err, appinterviewprep.ErrReviewImageTooLarge) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	if errors.Is(err, aireview.ErrNotConfigured) || errors.Is(err, aireview.ErrUnsupportedProvider) || errors.Is(err, aireview.ErrInvalidResponse) {
+		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
 	}
 	http.Error(w, err.Error(), http.StatusInternalServerError)

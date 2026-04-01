@@ -79,6 +79,18 @@ type answerResponse struct {
 	Session          *sessionResponse  `json:"session,omitempty"`
 }
 
+type systemDesignReviewResponse struct {
+	Provider          string   `json:"provider"`
+	Model             string   `json:"model"`
+	Score             int      `json:"score"`
+	Summary           string   `json:"summary"`
+	Strengths         []string `json:"strengths"`
+	Issues            []string `json:"issues"`
+	MissingTopics     []string `json:"missingTopics"`
+	FollowUpQuestions []string `json:"followUpQuestions"`
+	Disclaimer        string   `json:"disclaimer"`
+}
+
 func mapResult(result *model.InterviewPrepQuestionResult) *resultResponse {
 	if result == nil {
 		return nil
@@ -175,6 +187,23 @@ func mapSubmitResult(result *appinterviewprep.SubmitResult) *submitResponse {
 		FailedTestIndex: result.FailedTestIndex,
 		FailureKind:     result.FailureKind,
 		Session:         mapSession(result.Session, false),
+	}
+}
+
+func mapSystemDesignReview(result *appinterviewprep.SystemDesignReviewResult) *systemDesignReviewResponse {
+	if result == nil {
+		return nil
+	}
+	return &systemDesignReviewResponse{
+		Provider:          result.Provider,
+		Model:             result.Model,
+		Score:             result.Score,
+		Summary:           result.Summary,
+		Strengths:         result.Strengths,
+		Issues:            result.Issues,
+		MissingTopics:     result.MissingTopics,
+		FollowUpQuestions: result.FollowUpQuestions,
+		Disclaimer:        result.Disclaimer,
 	}
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"api/internal/aireview"
 	adminservice "api/internal/api/admin"
 	arenaservice "api/internal/api/arena"
 	codeeditorservice "api/internal/api/code_editor"
@@ -49,6 +50,13 @@ type serviceContext struct {
 func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*serviceContext, error) {
 	realtimeHub := realtime.NewCodeEditorHub(storage.codeEditorRepo)
 	sandboxService := sandbox.New()
+	aiReviewService := aireview.New(aireview.Config{
+		Provider: bootstrap.cfg.External.AIReview.Provider,
+		BaseURL:  bootstrap.cfg.External.AIReview.BaseURL,
+		APIKey:   bootstrap.cfg.External.AIReview.APIKey,
+		Model:    bootstrap.cfg.External.AIReview.Model,
+		Timeout:  bootstrap.cfg.External.AIReview.Timeout,
+	})
 
 	profileServiceDomain := profiledomainservice.NewProfileService(profiledomainservice.Config{
 		Repository:     storage.profileRepo,
@@ -101,8 +109,10 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		},
 	})
 	interviewPrepDomain := appinterviewprep.New(appinterviewprep.Config{
-		Repository: storage.interviewRepo,
-		Sandbox:    sandboxService,
+		Repository:    storage.interviewRepo,
+		Sandbox:       sandboxService,
+		Reviewer:      aiReviewService,
+		MaxImageBytes: bootstrap.cfg.External.AIReview.MaxImageBytes,
 	})
 	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
 

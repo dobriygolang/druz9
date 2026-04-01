@@ -3,6 +3,16 @@
 package rtc
 
 const (
+	// Optional AI review base URL override
+	AiReviewBaseUrl Key = "ai_review_base_url"
+	// Maximum uploaded screenshot size for AI review
+	AiReviewMaxImageBytes Key = "ai_review_max_image_bytes"
+	// Default AI review model name
+	AiReviewModel Key = "ai_review_model"
+	// AI review provider key, for example gemini or openai_compatible
+	AiReviewProvider Key = "ai_review_provider"
+	// Timeout for AI review provider requests
+	AiReviewTimeout Key = "ai_review_timeout"
 	// Arena cleanup check interval
 	ArenaCleanupInterval Key = "arena_cleanup_interval"
 	// Arena match idle TTL before cleanup

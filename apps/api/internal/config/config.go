@@ -94,6 +94,7 @@ type External struct {
 	Telegram *Telegram `json:"telegram"`
 	Geocoder *Geocoder `json:"geocoder"`
 	S3       *S3       `json:"s3"`
+	AIReview *AIReview `json:"ai_review"`
 }
 
 type Telegram struct {
@@ -113,4 +114,13 @@ type S3 struct {
 	Bucket         string `json:"bucket"`
 	AccessKey      string `json:"access_key"`
 	SecretKey      string `json:"secret_key"`
+}
+
+type AIReview struct {
+	Provider      string        `json:"provider"`
+	BaseURL       string        `json:"base_url"`
+	APIKey        string        `json:"api_key"`
+	Model         string        `json:"model"`
+	Timeout       time.Duration `json:"timeout"`
+	MaxImageBytes int64         `json:"max_image_bytes"`
 }

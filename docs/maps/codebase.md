@@ -13,6 +13,8 @@
 - `apps/api/internal/data/` — доступ к данным и репозитории.
 - `apps/api/internal/api/` — protobuf/gRPC/HTTP adapter layer по feature-папкам.
 - `apps/api/internal/seeds/` — seed runner и data-pack loaders.
+- `apps/api/internal/realtime/` — websocket hubs and realtime publishing, split by hub/client/rooms/snapshot.
+- `apps/api/internal/policy/` — sandbox policy defaults, binding, resolving, validation, runner mapping.
 - `apps/api/internal/telegrambot/` — Telegram bot worker, split by client/update/types.
 - `apps/api/scripts/migrations/` — миграции БД.
 - `apps/api/scripts/seeds/catalogs/` — data-driven seed catalogs.
@@ -44,5 +46,7 @@
 - Seed runner держим тонким: orchestration отдельно, SQL runner отдельно, seed records отдельно.
 - Крупные ручные HTTP feature handlers выносим в `internal/server/<feature>http/`, а корень `internal/server/` держим тонким.
 - В `internal/api/<feature>/` большие mapper/response файлы режем по смыслу: `mapping_enums`, `mapping_room`, `mapping_task`, `mapping_realtime` и т.д.
+- В `internal/realtime/` hub-файлы режем минимум на `hub`, `client`, `rooms`, `snapshot`.
+- В `internal/policy/` defaults, overrides, slice helpers и validation не смешиваем в одном файле.
 - Служебные интеграции вроде Telegram bot тоже режем по ролям: `service`, `client`, `updates`, `types`.
 - Новые feature summary и архитектурные заметки кладем в `docs/features/` или `docs/maps/`, а не в корень репозитория.

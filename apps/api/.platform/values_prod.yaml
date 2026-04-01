@@ -230,6 +230,41 @@ s3_secret_key:
   type: "string"
   writable: false
 
+ai_review_provider:
+  usage: "AI review provider key, for example gemini or openai_compatible"
+  group: "external"
+  value: "gemini"
+  type: "string"
+  writable: true
+
+ai_review_base_url:
+  usage: "Optional AI review base URL override"
+  group: "external"
+  value: "https://generativelanguage.googleapis.com"
+  type: "string"
+  writable: true
+
+ai_review_model:
+  usage: "Default AI review model name"
+  group: "external"
+  value: "gemini-2.5-flash"
+  type: "string"
+  writable: true
+
+ai_review_timeout:
+  usage: "Timeout for AI review provider requests"
+  group: "external"
+  value: "30s"
+  type: "duration"
+  writable: true
+
+ai_review_max_image_bytes:
+  usage: "Maximum uploaded screenshot size for AI review"
+  group: "external"
+  value: "5242880"
+  type: "int"
+  writable: true
+
 dev_auth_bypass:
   usage: "Allow local auth bypass"
   group: "dev"

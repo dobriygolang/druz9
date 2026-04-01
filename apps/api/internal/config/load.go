@@ -210,6 +210,29 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 	if v := manager.GetValue(ctx, rtc.S3Bucket); v.String() != "" {
 		cfg.External.S3.Bucket = v.String()
 	}
+	if v := manager.GetValue(ctx, rtc.AiReviewProvider); v.String() != "" {
+		cfg.External.AIReview.Provider = v.String()
+	}
+	if v := manager.GetValue(ctx, rtc.AiReviewBaseUrl); v.String() != "" {
+		cfg.External.AIReview.BaseURL = v.String()
+	}
+	if v := manager.GetValue(ctx, rtc.AiReviewModel); v.String() != "" {
+		cfg.External.AIReview.Model = v.String()
+	}
+	if v := manager.GetValue(ctx, rtc.AiReviewTimeout); v.String() != "" {
+		d, parseErr := time.ParseDuration(v.String())
+		if parseErr != nil {
+			return nil, fmt.Errorf("parse AI_REVIEW_TIMEOUT: %w", parseErr)
+		}
+		cfg.External.AIReview.Timeout = d
+	}
+	if v := manager.GetValue(ctx, rtc.AiReviewMaxImageBytes); v.String() != "" {
+		parsed, parseErr := strconv.ParseInt(v.String(), 10, 64)
+		if parseErr != nil {
+			return nil, fmt.Errorf("parse AI_REVIEW_MAX_IMAGE_BYTES: %w", parseErr)
+		}
+		cfg.External.AIReview.MaxImageBytes = parsed
+	}
 	if v := manager.GetValue(ctx, rtc.DevAuthBypass); v.String() != "" {
 		cfg.Dev.AuthBypass = strings.EqualFold(v.String(), "true") || v.String() == "1"
 	}
@@ -269,6 +292,28 @@ func overrideSecretConfigFromEnv(cfg *Bootstrap) {
 	}
 	if value, ok := lookupEnvValue("S3_SECRET_KEY"); ok {
 		cfg.External.S3.SecretKey = value
+	}
+	if value, ok := lookupEnvValue("AI_REVIEW_PROVIDER"); ok {
+		cfg.External.AIReview.Provider = value
+	}
+	if value, ok := lookupEnvValue("AI_REVIEW_BASE_URL"); ok {
+		cfg.External.AIReview.BaseURL = value
+	}
+	if value, ok := lookupEnvValue("AI_REVIEW_API_KEY"); ok {
+		cfg.External.AIReview.APIKey = value
+	}
+	if value, ok := lookupEnvValue("AI_REVIEW_MODEL"); ok {
+		cfg.External.AIReview.Model = value
+	}
+	if value, ok := lookupEnvValue("AI_REVIEW_TIMEOUT"); ok {
+		if parsed, err := time.ParseDuration(value); err == nil {
+			cfg.External.AIReview.Timeout = parsed
+		}
+	}
+	if value, ok := lookupEnvValue("AI_REVIEW_MAX_IMAGE_BYTES"); ok {
+		if parsed, err := strconv.ParseInt(value, 10, 64); err == nil {
+			cfg.External.AIReview.MaxImageBytes = parsed
+		}
 	}
 }
 
@@ -348,6 +393,10 @@ func defaultBootstrap() *Bootstrap {
 				Language:  "ru,en",
 			},
 			S3: &S3{},
+			AIReview: &AIReview{
+				Timeout:       30 * time.Second,
+				MaxImageBytes: 5 * 1024 * 1024,
+			},
 		},
 	}
 }

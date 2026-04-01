@@ -10,6 +10,8 @@
 - `internal/api/<feature>/` — gRPC/HTTP service adapters, если фича живет в protobuf/API service слое.
 - `internal/server/` — shared transport wiring, metrics, cookies, ops и thin wrappers.
 - `internal/server/<feature>http/` — ручные feature-specific HTTP handlers, пока фича еще не переехала в `internal/api` или отдельный сервис.
+- `internal/realtime/` — websocket hubs и realtime publishers; внутри делим на `hub`, `client`, `rooms`, `snapshot`, `schema`.
+- `internal/policy/` — sandbox policy resolution; defaults, overrides, validation и runner mapping держим в отдельных файлах.
 - `internal/<integration>/` — внешние интеграции и background workers; внутри тоже избегаем монолитных файлов и режем по `service`, `client`, `updates`, `types`, `auth`.
 
 ## Практики разбиения
@@ -21,6 +23,8 @@
 - Если ручной HTTP feature разрастается, выносим его в подпакет `internal/server/<feature>http/`.
 - В корне `internal/server/` оставляем только `Register...` wrappers и cross-feature инфраструктуру.
 - В `internal/api/<feature>/` крупные adapter-файлы режем минимум на `service`, `helpers`, `mapping_*`, `requests`, `responses`.
+- В `internal/realtime/` не держим websocket handler, room state, flush loop и DTO conversion в одном файле.
+- В `internal/policy/` default profiles и override logic не смешиваем с resolver orchestration.
 - В integration/worker пакетах не держим transport loop, HTTP client и payload types в одном файле.
 - Неиспользуемые зависимости в repo/service struct удаляем сразу, не держим "на будущее".
 
@@ -47,4 +51,6 @@
 - `internal/server/adminusershttp/` — admin user trust management HTTP.
 - `internal/api/arena/` — mapping вынесен в `mapping_enums`, `mapping_match`, `mapping_realtime`.
 - `internal/api/code_editor/` — mapping вынесен в `mapping_enums`, `mapping_room`, `mapping_task`, `mapping_submission`.
+- `internal/realtime/` — arena/code editor hubs split на `hub`, `client`, `rooms`, `snapshot`.
+- `internal/policy/` — default profiles, overrides и shared slice helpers split from resolver.
 - `internal/telegrambot/` — bot split на `service`, `client`, `updates`, `types`.
