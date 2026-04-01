@@ -10,12 +10,14 @@ import {
   Plus,
   Search,
   Trash2,
+  X,
 } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { Vacancy, CreateVacancyPayload } from '@/entities/User/model/types';
 import { vacancyApi } from '@/features/Vacancy/api/vacancyApi';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal/ConfirmModal';
+import { FancySelect } from '@/shared/ui/FancySelect';
 
 const EMPLOYMENT_TYPE_OPTIONS = [
   { value: 'full_time', label: 'Полный день' },
@@ -230,19 +232,14 @@ export const VacanciesPage: React.FC = () => {
             />
           </div>
 
-          <select
-            className="input"
-            aria-label="Фильтр по занятости"
+          <FancySelect
             value={employmentFilter}
-            onChange={(e) => setEmploymentFilter(e.target.value)}
-          >
-            <option value="all">Любая занятость</option>
-            {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
+            onChange={setEmploymentFilter}
+            options={[
+              { value: 'all', label: 'Любая занятость' },
+              ...EMPLOYMENT_TYPE_OPTIONS.map((option) => ({ value: option.value, label: option.label })),
+            ]}
+          />
 
           <select
             className="input"
@@ -347,8 +344,8 @@ export const VacanciesPage: React.FC = () => {
       )}
 
       {isModalOpen && (
-        <div className="vacancies-modal fade-in">
-          <div className="vacancies-modal__panel">
+        <div className="vacancies-modal fade-in" onClick={closeModal}>
+          <div className="vacancies-modal__panel" onClick={(event) => event.stopPropagation()}>
             <div className="vacancies-modal__header">
               <div>
                 <h2 className="vacancies-modal__title">
@@ -358,6 +355,9 @@ export const VacanciesPage: React.FC = () => {
                   Пиши кратко и по делу: роль, компания, ссылка, контекст и формат работы.
                 </p>
               </div>
+              <button type="button" className="vacancies-modal__close" onClick={closeModal} aria-label="Закрыть">
+                <X size={18} />
+              </button>
             </div>
 
             <form className="vacancies-form" onSubmit={handleSubmit}>
@@ -438,18 +438,18 @@ export const VacanciesPage: React.FC = () => {
 
               <div className="vacancies-form__section">
                 <label htmlFor="vacancy-employment">Занятость</label>
-                <select
+                <input
                   id="vacancy-employment"
-                  className="input"
+                  hidden
+                  readOnly
                   value={formData.employment_type}
-                  onChange={(e) => setFormData((current) => ({ ...current, employment_type: e.target.value }))}
-                >
-                  {EMPLOYMENT_TYPE_OPTIONS.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
+                  aria-hidden="true"
+                />
+                <FancySelect
+                  value={formData.employment_type}
+                  onChange={(value) => setFormData((current) => ({ ...current, employment_type: value }))}
+                  options={EMPLOYMENT_TYPE_OPTIONS.map((option) => ({ value: option.value, label: option.label }))}
+                />
               </div>
 
               <div className="vacancies-form__footer">

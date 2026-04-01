@@ -4,6 +4,10 @@ import {
   Plus, 
   ChevronLeft, 
   ChevronRight,
+  Calendar,
+  Sparkles,
+  MapPin,
+  SlidersHorizontal,
 } from 'lucide-react';
 
 import { CommunityEvent, CommunityMapPoint, CreateEventPayload } from '@/entities/User/model/types';
@@ -248,58 +252,89 @@ export const EventsPage: React.FC = () => {
   };
 
   return (
-    <div className="fade-in" style={{ height: isMobile ? 'auto' : 'calc(100vh - 120px)', display: 'flex', flexDirection: 'column' }}>
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: isMobile ? 'stretch' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: '16px', marginBottom: '24px' }}>
-        <div style={{ display: 'flex', alignItems: isMobile ? 'stretch' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: '20px' }}>
-          <h1 style={{ fontSize: '24px', fontWeight: '700' }}>{MONTHS[month]} {year}</h1>
-          <div style={{ display: 'flex', background: 'rgba(255,255,255,0.05)', borderRadius: '12px', padding: '4px', width: isMobile ? '100%' : 'auto', justifyContent: isMobile ? 'space-between' : 'flex-start' }}>
-            <button onClick={() => changeMonth(-1)} aria-label="Предыдущий месяц" className="hover-opacity" style={{ background: 'none', border: 'none', color: 'white', padding: '6px', cursor: 'pointer' }}><ChevronLeft size={20}/></button>
-            <button onClick={() => setViewDate(new Date())} aria-label="Перейти к сегодня" className="hover-opacity" style={{ background: 'none', border: 'none', color: 'white', fontSize: '13px', fontWeight: '500', padding: '0 12px', cursor: 'pointer' }}>Сегодня</button>
-            <button onClick={() => changeMonth(1)} aria-label="Следующий месяц" className="hover-opacity" style={{ background: 'none', border: 'none', color: 'white', padding: '6px', cursor: 'pointer' }}><ChevronRight size={20}/></button>
+    <div className="events-page fade-in">
+      <section className="page-header code-rooms-hero events-hero">
+        <div className="code-rooms-hero__copy">
+          <span className="code-rooms-kicker">Community Calendar</span>
+          <h1>Ивенты</h1>
+          <p className="code-rooms-subtitle">
+            Общий календарь сообщества: встречи, алгоритмы, клубы и созвоны. Фильтруй по группе и типу, быстро листай месяцы и держи весь ритм комьюнити в одном месте.
+          </p>
+          <div className="events-hero__meta">
+            <span className="badge"><Calendar size={12} /> {events.length} событий</span>
+            <span className="badge"><Sparkles size={12} /> {eventGroups.length || 1} групп</span>
+            <span className="badge"><MapPin size={12} /> {eventTypes.length || 1} форматов</span>
           </div>
         </div>
-        <button className="btn" onClick={() => handleCreateClick()} style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '8px', borderRadius: '12px', width: isMobile ? '100%' : 'auto' }}>
-          <Plus size={18} /> Создать
-        </button>
-      </div>
 
-      <div className="card" style={{ marginBottom: '20px', padding: '18px', display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.2fr 1fr 1fr', gap: '12px', alignItems: 'end' }}>
-        <div>
-          <div style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)', marginBottom: '8px' }}>Группа</div>
-          <select className="input" value={groupFilter} onChange={(e) => setGroupFilter(e.target.value)}>
+        <div className="events-hero__tools">
+          <div className="events-month-switcher">
+            <button type="button" className="events-month-switcher__icon" onClick={() => changeMonth(-1)} aria-label="Предыдущий месяц">
+              <ChevronLeft size={18} />
+            </button>
+            <button type="button" className="events-month-switcher__label" onClick={() => setViewDate(new Date())} aria-label="Перейти к сегодня">
+              {MONTHS[month]} {year}
+            </button>
+            <button type="button" className="events-month-switcher__icon" onClick={() => changeMonth(1)} aria-label="Следующий месяц">
+              <ChevronRight size={18} />
+            </button>
+          </div>
+
+          <button className="btn events-hero__create" onClick={() => handleCreateClick()}>
+            <Plus size={18} />
+            <span>Создать событие</span>
+          </button>
+        </div>
+      </section>
+
+      <section className="card dashboard-card events-filter-card">
+        <div className="dashboard-card__header">
+          <div>
+            <h2>Фильтры календаря</h2>
+            <p className="interview-prep-muted">Оставь только нужные группы и типы, чтобы календарь не шумел.</p>
+          </div>
+          <div className="events-filter-card__icon">
+            <SlidersHorizontal size={16} />
+          </div>
+        </div>
+
+        <div className="events-filter-grid" style={{ gridTemplateColumns: isMobile ? '1fr' : undefined }}>
+          <div className="events-filter-field">
+            <label>Группа</label>
+            <select className="input" value={groupFilter} onChange={(e) => setGroupFilter(e.target.value)}>
             <option value="all">Все группы</option>
             {eventGroups.map((group) => (
               <option key={group} value={group}>
                 {group}
               </option>
             ))}
-          </select>
-        </div>
-        <div>
-          <div style={{ fontSize: '12px', textTransform: 'uppercase', letterSpacing: '0.06em', color: 'var(--text-secondary)', marginBottom: '8px' }}>Тип</div>
-          <select className="input" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
+            </select>
+          </div>
+          <div className="events-filter-field">
+            <label>Тип</label>
+            <select className="input" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
             <option value="all">Все типы</option>
             {eventTypes.map((type) => (
               <option key={type} value={type}>
                 {type}
               </option>
             ))}
-          </select>
+            </select>
+          </div>
+          <button className="btn btn-secondary events-filter-reset" onClick={() => { setGroupFilter('all'); setTypeFilter('all'); }}>
+            Сбросить фильтры
+          </button>
         </div>
-        <button className="btn btn-secondary" onClick={() => { setGroupFilter('all'); setTypeFilter('all'); }} style={{ minHeight: '44px' }}>
-          Сбросить фильтры
-        </button>
-      </div>
+      </section>
 
-      <div style={{ flex: 1, display: 'flex', flexDirection: 'column', background: 'rgba(255,255,255,0.02)', borderRadius: '20px', border: '1px solid rgba(255,255,255,0.05)', overflow: 'hidden' }}>
-        <div style={{ minWidth: 0, display: 'flex', flexDirection: 'column', flex: 1 }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+      <section className="events-calendar-shell">
+        <div className="events-calendar-grid-head">
           {WEEKDAYS.map(d => (
-            <div key={d} style={{ padding: isMobile ? '10px 4px' : '12px', textAlign: 'center', fontSize: isMobile ? '10px' : '12px', fontWeight: '600', color: 'var(--text-secondary)', textTransform: 'uppercase' }}>{d}</div>
+            <div key={d} className="events-calendar-weekday">{d}</div>
           ))}
         </div>
         
-        <div style={{ flex: 1, display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gridTemplateRows: 'repeat(6, 1fr)' }}>
+        <div className="events-calendar-grid">
           {days.map((date, idx) => {
             const isCurrentMonth = date.getMonth() === month;
             const isToday = date.toDateString() === today;
@@ -312,51 +347,23 @@ export const EventsPage: React.FC = () => {
               <div 
                 key={idx} 
                 onClick={() => !dayEvents.length && handleCreateClick(date)}
-                style={{ 
-                  borderRight: '1px solid rgba(255,255,255,0.03)', 
-                  borderBottom: '1px solid rgba(255,255,255,0.03)',
-                  padding: isMobile ? '4px' : '8px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                  gap: isMobile ? '2px' : '4px',
-                  opacity: isCurrentMonth ? 1 : 0.3,
-                  background: isToday ? 'rgba(79, 70, 229, 0.03)' : 'transparent',
-                  cursor: 'pointer'
-                }}
+                className={`events-calendar-day ${isCurrentMonth ? '' : 'is-outside'} ${isToday ? 'is-today' : ''}`}
               >
-                <div style={{ 
-                  fontSize: isMobile ? '10px' : '12px', 
-                  fontWeight: isToday ? '700' : '400', 
-                  width: isMobile ? '20px' : '24px', 
-                  height: isMobile ? '20px' : '24px', 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  justifyContent: 'center',
-                  borderRadius: '50%',
-                  background: isToday ? 'var(--accent-color)' : 'transparent',
-                  color: isToday ? 'white' : 'var(--text-secondary)',
-                  marginBottom: '4px'
-                }}>
+                <div className={`events-calendar-day__date ${isToday ? 'is-today' : ''}`}>
                   {date.getDate()}
                 </div>
                 
-                <div style={{ display: 'flex', flexDirection: 'column', gap: '2px', overflow: 'hidden' }}>
+                <div className="events-calendar-day__events">
                   {dayEvents.map((e) => {
                     const styleAccent = getEventColorSpec(e.event_color);
                     return (
                       <div 
                         key={e.id}
                         onClick={(ev) => { ev.stopPropagation(); setFullEventId(e.id); }}
-                        style={{ 
-                          fontSize: isMobile ? '9px' : '11px', 
-                          padding: isMobile ? '3px 4px' : '4px 8px', 
-                          borderRadius: '4px', 
+                        className="events-calendar-pill"
+                        style={{
                           background: e.is_joined ? styleAccent.solid : styleAccent.soft,
-                          color: 'white',
-                          whiteSpace: 'nowrap',
-                          overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          borderLeft: `3px solid ${styleAccent.solid}`
+                          borderLeft: `3px solid ${styleAccent.solid}`,
                         }}
                       >
                         {e.title}
@@ -368,12 +375,11 @@ export const EventsPage: React.FC = () => {
             );
           })}
         </div>
-        </div>
-      </div>
+      </section>
 
       {(isCreating || editingEventId) && draft && (
-        <div style={{ position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.8)', backdropFilter: 'blur(8px)', zIndex: 100, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '20px' }}>
-          <div style={{ width: '100%', maxWidth: '500px', maxHeight: '90vh', overflowY: 'auto', borderRadius: '24px' }} className="hide-scrollbar">
+        <div className="events-form-overlay" onClick={() => { setIsCreating(false); setEditingEventId(null); }}>
+          <div className="events-form-overlay__panel hide-scrollbar" onClick={(event) => event.stopPropagation()}>
             <EventForm
               title={editingEventId ? "Ред. событие" : "Новое событие"}
               draft={draft}

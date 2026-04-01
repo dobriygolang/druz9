@@ -3,6 +3,7 @@ import { X, Search, UserRound, MapPin, Calendar } from 'lucide-react';
 import { CommunityMapPoint } from '@/entities/User/model/types';
 import { EventDraft } from '@/pages/MapPage/components/types';
 import { EVENT_COLOR_OPTIONS } from '@/features/Event/lib/eventMetadata';
+import { FancySelect } from '@/shared/ui/FancySelect';
 
 type EventFieldErrors = {
   title?: string;
@@ -61,7 +62,7 @@ export const EventForm: React.FC<EventFormProps> = ({
 
   return (
     <div
-      className="card fade-in"
+      className="card fade-in event-form-panel"
       style={{
         zIndex: 10,
         backgroundColor: 'rgba(24, 24, 27, 0.98)',
@@ -94,7 +95,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           type="button"
           onClick={onClose}
           aria-label="Закрыть"
-          style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '6px', borderRadius: '8px' }}
+          className="event-form-panel__close"
         >
           <X size={18} />
         </button>
@@ -146,16 +147,11 @@ export const EventForm: React.FC<EventFormProps> = ({
             onChange={(e) => setDraft(curr => curr ? { ...curr, event_type: e.target.value } : null)}
             style={{ background: 'rgba(0,0,0,0.2)', height: '44px' }}
           />
-          <select
-            className="input"
+          <FancySelect
             value={draft.event_color ?? 'violet'}
-            onChange={(e) => setDraft(curr => curr ? { ...curr, event_color: e.target.value as EventDraft['event_color'] } : null)}
-            style={{ background: 'rgba(0,0,0,0.2)', height: '44px' }}
-          >
-            {EVENT_COLOR_OPTIONS.map((option) => (
-              <option key={option.value} value={option.value}>{option.label}</option>
-            ))}
-          </select>
+            onChange={(value) => setDraft(curr => curr ? { ...curr, event_color: value as EventDraft['event_color'] } : null)}
+            options={EVENT_COLOR_OPTIONS.map((option) => ({ value: option.value, label: option.label }))}
+          />
         </div>
           <input
             className="input"

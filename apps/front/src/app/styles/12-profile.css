@@ -13,6 +13,13 @@
   flex-wrap: wrap;
   gap: 16px;
   margin-bottom: 32px;
+  padding: 20px 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(93, 87, 255, 0.12), transparent 36%),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
 }
 
 .profile-header h1 {
@@ -22,22 +29,26 @@
 }
 
 .profile-edit-btn {
-  background: var(--bg-color) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
-  color: var(--text-primary) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035)),
+    radial-gradient(circle at top left, rgba(93, 87, 255, 0.12), transparent 58%) !important;
+  border: 1px solid rgba(130, 124, 255, 0.18) !important;
+  color: #f3f2ff !important;
   padding: 10px 16px;
 }
 
 .profile-edit-btn:hover {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.045)),
+    radial-gradient(circle at top left, rgba(93, 87, 255, 0.16), transparent 58%) !important;
+  border-color: rgba(145, 139, 255, 0.3) !important;
 }
 
 /* Telegram bind button */
 .profile-telegram-btn {
-  background: white !important;
-  border: 1px solid rgba(0, 136, 204, 0.3) !important;
-  color: var(--bg-color) !important;
+  background: rgba(255, 255, 255, 0.96) !important;
+  border: 1px solid rgba(0, 136, 204, 0.22) !important;
+  color: #0f172a !important;
   font-size: 12px;
   padding: 6px 12px;
   font-weight: 500;
@@ -45,8 +56,8 @@
 }
 
 .profile-telegram-btn.btn:hover {
-  background: black !important;
-  border-color: white !important;
+  background: #1f2937 !important;
+  border-color: rgba(255, 255, 255, 0.2) !important;
   color: white !important;
   transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
@@ -57,9 +68,11 @@
   margin-bottom: 24px;
   display: grid;
   gap: 14px;
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  background:
+    radial-gradient(circle at top right, rgba(93, 87, 255, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
   padding: 20px;
 }
 
@@ -126,9 +139,11 @@
   align-items: flex-start;
   margin-bottom: 24px;
   flex-wrap: wrap;
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
+  background:
+    radial-gradient(circle at top right, rgba(93, 87, 255, 0.08), transparent 34%),
+    rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 20px;
   padding: 24px;
 }
 
