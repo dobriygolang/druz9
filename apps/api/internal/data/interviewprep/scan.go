@@ -1,10 +1,6 @@
 package interviewprep
 
-import (
-	"api/internal/model"
-
-	"github.com/google/uuid"
-)
+import "api/internal/model"
 
 func scanTask(s scanner) (*model.InterviewPrepTask, error) {
 	var item model.InterviewPrepTask
@@ -85,5 +81,3 @@ func scanQuestionResult(s scanner) (*model.InterviewPrepQuestionResult, error) {
 	item.SelfAssessment = model.InterviewPrepSelfAssessmentFromString(assessment)
 	return &item, nil
 }
-
-var _ uuid.UUID

@@ -1,0 +1,160 @@
+{
+  "version": "interview-prep-v1",
+  "tasks": [
+    {
+      "slug": "go-two-sum-hash-map",
+      "title": "Two Sum и follow-up по Go",
+      "prep_type": "algorithm",
+      "language": "go",
+      "is_executable": false,
+      "execution_profile": "pure",
+      "runner_mode": "function_io",
+      "duration_seconds": 1800,
+      "statement": "Дан массив чисел и target. Верни индексы двух чисел, сумма которых равна target. После решения ответь на follow-up вопросы по сложности и Go map.",
+      "starter_code": "package main\n\nfunc solve(input string) string {\n\t_ = input\n\t// TODO: parse input and return the answer as a string.\n\treturn \"implement me\"\n}\n",
+      "reference_solution": "func twoSum(nums []int, target int) []int {\n\tseen := make(map[int]int, len(nums))\n\tfor i, v := range nums {\n\t\tif j, ok := seen[target-v]; ok {\n\t\t\treturn []int{j, i}\n\t\t}\n\t\tseen[v] = i\n\t}\n\treturn nil\n}\n",
+      "is_active": true,
+      "questions": [
+        {
+          "position": 1,
+          "prompt": "Какая асимптотика у решения через hash map?",
+          "answer": "По времени O(n), по памяти O(n). Для каждого элемента делается один lookup и одна запись в map, что амортизированно O(1)."
+        },
+        {
+          "position": 2,
+          "prompt": "Почему в Go нельзя брать адрес значения элемента map?",
+          "answer": "Потому что map может перераспределить bucket-ы при росте. Элемент может переехать в памяти, поэтому адрес был бы нестабилен."
+        },
+        {
+          "position": 3,
+          "prompt": "Какой альтернативный подход здесь возможен без map и в чем его компромисс?",
+          "answer": "Можно отсортировать массив и пройти двумя указателями. Это даст O(n log n) по времени и O(1) дополнительной памяти, но потеряются исходные индексы без отдельного хранения."
+        }
+      ]
+    },
+    {
+      "slug": "go-worker-pool-backpressure",
+      "title": "Worker Pool с backpressure",
+      "prep_type": "coding",
+      "language": "go",
+      "is_executable": false,
+      "execution_profile": "pure",
+      "runner_mode": "function_io",
+      "duration_seconds": 2400,
+      "statement": "Нужно спроектировать и написать worker pool на Go: ограничение по числу воркеров, graceful shutdown, cancel через context.Context и защита от бесконечного роста очереди. После решения ответь на вопросы по backpressure и goroutine leaks.",
+      "starter_code": "package workerpool\n\nimport \"context\"\n\ntype Job func(context.Context) error\n\ntype Pool interface {\n\tSubmit(Job) error\n\tClose() error\n}\n",
+      "reference_solution": "Ключевая идея: ограниченная buffered queue, фиксированный набор воркеров, Close() прекращает прием новых задач, а Submit возвращает ошибку при переполнении/закрытии. Все goroutine слушают ctx.Done() и завершаются через sync.WaitGroup.\n",
+      "is_active": true,
+      "questions": [
+        {
+          "position": 1,
+          "prompt": "Что такое backpressure и почему он обязателен для worker pool?",
+          "answer": "Backpressure заставляет producer замедляться или получать ошибку, когда consumers не успевают. Без него очередь может расти без ограничений и съесть память."
+        },
+        {
+          "position": 2,
+          "prompt": "Как избежать goroutine leak при остановке пула?",
+          "answer": "Нужно иметь явный shutdown path: закрытие очереди, context cancellation, ожидание завершения воркеров через WaitGroup и запрет новых Submit после Close."
+        },
+        {
+          "position": 3,
+          "prompt": "Когда buffered channel плох как единственный механизм очереди?",
+          "answer": "Когда нужны приоритеты, retry policy, дедупликация, persistence или точный контроль отказов. Тогда одного channel мало, нужна более явная очередь и состояние."
+        }
+      ]
+    },
+    {
+      "slug": "service-discovery-chat-system",
+      "title": "System Design: discovery для чат-сервиса",
+      "prep_type": "system_design",
+      "language": "go",
+      "is_executable": false,
+      "execution_profile": "pure",
+      "runner_mode": "function_io",
+      "duration_seconds": 2700,
+      "statement": "Спроектируй backend для корпоративного чат-сервиса на 1 млн DAU: presence, delivery acknowledgements, fan-out, хранение истории, поиск по сообщениям. Отдельно обсуди, как бы ты разделил sync и async пути.",
+      "starter_code": "",
+      "reference_solution": "Хороший ответ обычно разделяет write path и read path, использует WebSocket gateway, очередь событий для fan-out, отдельное durable storage для истории, presence в быстром key-value store и observability вокруг задержек доставки.\n",
+      "is_active": true,
+      "questions": [
+        {
+          "position": 1,
+          "prompt": "Какой путь запроса должен быть синхронным, а что лучше вынести в async?",
+          "answer": "Синхронно: прием сообщения, валидация, авторизация, запись в durable log/store и быстрый ack клиенту. Async: fan-out, push notifications, индексация поиска, аналитика."
+        },
+        {
+          "position": 2,
+          "prompt": "Где хранить presence и почему не в основной SQL базе?",
+          "answer": "Presence лучше держать в быстром in-memory/key-value storage с TTL, потому что это горячее, часто меняющееся состояние. SQL будет дороже по latency и write amplification."
+        },
+        {
+          "position": 3,
+          "prompt": "Как уменьшить fan-out cost для больших чатов?",
+          "answer": "Нужны partitioning по room/user, batching, pull model для части клиентов, отдельные consumer groups и, при необходимости, hybrid fan-out: маленькие чаты push, большие частично pull."
+        }
+      ]
+    },
+    {
+      "slug": "sql-retention-cohorts",
+      "title": "SQL: retention cohorts",
+      "prep_type": "sql",
+      "language": "go",
+      "is_executable": false,
+      "execution_profile": "pure",
+      "runner_mode": "function_io",
+      "duration_seconds": 1800,
+      "statement": "Есть таблицы users(id, created_at) и sessions(user_id, started_at). Нужно написать SQL, который считает retention по неделям: cohort_week, active_week, users_count, retention_rate. Затем обсуди индексы и типичные ошибки.",
+      "starter_code": "-- Write SQL here\n",
+      "reference_solution": "Обычно решение строится через first_seen/cohort CTE, затем join с сессиями, date_trunc('week', ...), distinct user_id и деление на размер когорты. Нужны индексы по users(created_at) и sessions(user_id, started_at).\n",
+      "is_active": true,
+      "questions": [
+        {
+          "position": 1,
+          "prompt": "Почему retention нельзя считать простым count(*) по сессиям?",
+          "answer": "Потому что retention считается по уникальным пользователям, а не по числу событий. Один активный пользователь может создать много сессий и исказить метрику."
+        },
+        {
+          "position": 2,
+          "prompt": "Какие индексы здесь наиболее полезны?",
+          "answer": "На users(created_at) для cohort extraction и на sessions(user_id, started_at) для соединения и фильтрации по неделям. Иногда полезен покрывающий индекс под конкретный план."
+        },
+        {
+          "position": 3,
+          "prompt": "Почему важно явно договориться о timezone для week buckets?",
+          "answer": "Иначе границы недели будут гулять между UTC и локальным временем, и один и тот же пользователь может попасть в разные недели в разных отчетах."
+        }
+      ]
+    },
+    {
+      "slug": "code-review-race-cache",
+      "title": "Code Review: race condition в кэше",
+      "prep_type": "code_review",
+      "language": "go",
+      "is_executable": false,
+      "execution_profile": "pure",
+      "runner_mode": "function_io",
+      "duration_seconds": 1500,
+      "statement": "Проведи код-ревью фрагмента кода, который кэширует данные в map и обновляется из нескольких goroutine. Нужно найти гонки, проблемы консистентности, ошибки API и предложить план исправления.",
+      "starter_code": "type Cache struct {\n\titems map[string]string\n}\n\nfunc (c *Cache) Get(key string) string {\n\treturn c.items[key]\n}\n\nfunc (c *Cache) Set(key, value string) {\n\tgo func() {\n\t\tc.items[key] = value\n\t}()\n}\n",
+      "reference_solution": "Минимум нужно заметить data race на map, отсутствие синхронизации жизненного цикла goroutine, неявный async API в Set и отсутствие стратегии invalidation/visibility ошибок.\n",
+      "is_active": true,
+      "questions": [
+        {
+          "position": 1,
+          "prompt": "Какая самая критичная проблема в этом коде?",
+          "answer": "Data race на map: чтение и запись происходят конкурентно без mutex/RWMutex или другой синхронизации. Это может привести к panic или повреждению данных."
+        },
+        {
+          "position": 2,
+          "prompt": "Почему `Set` через анонимную goroutine делает API плохим?",
+          "answer": "Потому что вызов выглядит синхронным, а по факту становится fire-and-forget. Вызывающий код не понимает, когда запись завершилась и как обработать ошибку или отмену."
+        },
+        {
+          "position": 3,
+          "prompt": "Как бы ты исправил это минимально и как архитектурно?",
+          "answer": "Минимально: добавить mutex и сделать Set синхронным. Архитектурно: определить контракт согласованности, ownership модели, invalidation policy и, если нужен async path, вынести его в явную очередь/worker."
+        }
+      ]
+    }
+  ]
+}

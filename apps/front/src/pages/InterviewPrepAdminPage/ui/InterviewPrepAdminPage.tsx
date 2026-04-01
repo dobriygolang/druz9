@@ -1,9 +1,14 @@
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
-import { Plus, Pencil, Trash2, ShieldCheck } from 'lucide-react';
+import { ListChecks, Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
-import { interviewPrepApi, InterviewPrepTask, InterviewPrepQuestion, InterviewPrepType } from '@/features/InterviewPrep/api/interviewPrepApi';
+import {
+  interviewPrepApi,
+  InterviewPrepQuestion,
+  InterviewPrepTask,
+  InterviewPrepType,
+} from '@/features/InterviewPrep/api/interviewPrepApi';
 
 const PREP_TYPES: { value: InterviewPrepType; label: string }[] = [
   { value: 'coding', label: 'Coding' },
@@ -16,9 +21,9 @@ const PREP_TYPES: { value: InterviewPrepType; label: string }[] = [
 const DEFAULT_STARTER_CODE = `package main
 
 func solve(input string) string {
-	_ = input
-	// TODO: parse input and return the answer as a string.
-	return "implement me"
+\t_ = input
+\t// TODO: parse input and return the answer as a string.
+\treturn "implement me"
 }
 `;
 
@@ -38,6 +43,13 @@ type TaskFormState = {
   isActive: boolean;
 };
 
+type QuestionFormState = {
+  id: string | null;
+  position: number;
+  prompt: string;
+  answer: string;
+};
+
 const createEmptyTaskForm = (): TaskFormState => ({
   id: null,
   slug: '',
@@ -54,6 +66,20 @@ const createEmptyTaskForm = (): TaskFormState => ({
   isActive: true,
 });
 
+const createEmptyQuestionForm = (position = 1): QuestionFormState => ({
+  id: null,
+  position,
+  prompt: '',
+  answer: '',
+});
+
+const toSlug = (value: string) =>
+  value
+    .trim()
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')
+    .replace(/^-+|-+$/g, '');
+
 const taskToForm = (task: InterviewPrepTask): TaskFormState => ({
   id: task.id,
   slug: task.slug,
@@ -65,127 +91,153 @@ const taskToForm = (task: InterviewPrepTask): TaskFormState => ({
   executionProfile: task.executionProfile,
   runnerMode: task.runnerMode,
   durationSeconds: task.durationSeconds,
-  starterCode: task.starterCode,
-  referenceSolution: '',
+  starterCode: task.starterCode || DEFAULT_STARTER_CODE,
+  referenceSolution: task.referenceSolution ?? '',
   isActive: task.isActive,
 });
 
-type QuestionFormState = {
-  id: string | null;
-  position: number;
-  prompt: string;
-  answer: string;
-};
-
-const createEmptyQuestionForm = (position: number): QuestionFormState => ({
-  id: null,
-  position,
-  prompt: '',
-  answer: '',
-});
-
-const questionToForm = (q: InterviewPrepQuestion): QuestionFormState => ({
-  id: q.id,
-  position: q.position,
-  prompt: q.prompt,
-  answer: q.answer,
+const questionToForm = (question: InterviewPrepQuestion): QuestionFormState => ({
+  id: question.id,
+  position: question.position,
+  prompt: question.prompt,
+  answer: question.answer,
 });
 
 export const InterviewPrepAdminPage: React.FC = () => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<InterviewPrepTask[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [search, setSearch] = useState('');
-  const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showQuestionModal, setShowQuestionModal] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<InterviewPrepQuestion[]>([]);
-  const [taskForm, setTaskForm] = useState<TaskFormState>(createEmptyTaskForm());
-  const [questionForm, setQuestionForm] = useState<QuestionFormState>(createEmptyQuestionForm(1));
+  const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [taskModalOpen, setTaskModalOpen] = useState(false);
+  const [questionModalOpen, setQuestionModalOpen] = useState(false);
+  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [search, setSearch] = useState('');
+  const [error, setError] = useState('');
+  const [status, setStatus] = useState('');
+  const [taskForm, setTaskForm] = useState<TaskFormState>(createEmptyTaskForm());
+  const [questionForm, setQuestionForm] = useState<QuestionFormState>(createEmptyQuestionForm());
 
   const isAdmin = Boolean(user?.isAdmin);
+  const selectedTask = useMemo(
+    () => tasks.find((task) => task.id === selectedTaskId) ?? null,
+    [selectedTaskId, tasks],
+  );
 
-  const loadTasks = useCallback(async () => {
+  const filteredTasks = useMemo(() => {
+    const query = search.trim().toLowerCase();
+    if (!query) return tasks;
+    return tasks.filter((task) =>
+      [task.title, task.slug, task.statement, task.prepType].some((value) =>
+        value.toLowerCase().includes(query),
+      ));
+  }, [search, tasks]);
+
+  const sortedQuestions = useMemo(
+    () => [...questions].sort((left, right) => left.position - right.position),
+    [questions],
+  );
+
+  const loadTasks = async () => {
     setLoading(true);
     setError('');
     try {
       const data = await interviewPrepApi.adminListTasks();
       setTasks(data);
     } catch (e: any) {
-      setError(e.response?.data?.message || 'Не удалось загрузить задачи');
+      console.error('Failed to load interview prep tasks:', e);
+      setError(e.response?.data?.error || 'Не удалось загрузить задачи');
     } finally {
       setLoading(false);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    void loadTasks();
-  }, [loadTasks]);
-
-  const loadQuestions = useCallback(async (taskId: string) => {
+  const loadQuestions = async (taskId: string) => {
     try {
       const data = await interviewPrepApi.adminListQuestions(taskId);
       setQuestions(data);
+      return data;
     } catch (e: any) {
-      console.error('Failed to load questions:', e);
+      console.error('Failed to load interview prep questions:', e);
+      setError(e.response?.data?.error || 'Не удалось загрузить вопросы');
+      return [];
     }
-  }, []);
+  };
 
-  const filteredTasks = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    if (!query) return tasks;
-    return tasks.filter(
-      (task) =>
-        task.title.toLowerCase().includes(query) ||
-        task.slug.toLowerCase().includes(query) ||
-        task.statement.toLowerCase().includes(query),
-    );
-  }, [search, tasks]);
+  useEffect(() => {
+    void loadTasks();
+  }, []);
 
   if (!isAdmin) {
     return <Navigate to="/feed" replace />;
   }
 
+  const openCreateTaskModal = (task?: InterviewPrepTask) => {
+    setStatus('');
+    setError('');
+    setTaskForm(task ? taskToForm(task) : createEmptyTaskForm());
+    setTaskModalOpen(true);
+  };
+
   const closeTaskModal = () => {
-    setShowTaskModal(false);
+    setTaskModalOpen(false);
     setTaskForm(createEmptyTaskForm());
   };
 
-  const openCreateTaskModal = (task?: InterviewPrepTask) => {
-    setTaskForm(task ? taskToForm(task) : createEmptyTaskForm());
-    setShowTaskModal(true);
-  };
-
-  const openQuestionsModal = async (taskId: string) => {
-    setSelectedTaskId(taskId);
-    await loadQuestions(taskId);
-    setShowQuestionModal(true);
+  const openQuestionModal = async (task: InterviewPrepTask) => {
+    setStatus('');
+    setError('');
+    setSelectedTaskId(task.id);
+    const items = await loadQuestions(task.id);
+    setQuestionForm(createEmptyQuestionForm(items.length + 1));
+    setQuestionModalOpen(true);
   };
 
   const closeQuestionModal = () => {
-    setShowQuestionModal(false);
+    setQuestionModalOpen(false);
     setSelectedTaskId(null);
     setQuestions([]);
-    setQuestionForm(createEmptyQuestionForm(1));
+    setQuestionForm(createEmptyQuestionForm());
+  };
+
+  const handleTaskTitleChange = (title: string) => {
+    setTaskForm((prev) => ({
+      ...prev,
+      title,
+      slug: prev.id || prev.slug ? prev.slug : toSlug(title),
+    }));
   };
 
   const handleSaveTask = async () => {
-    if (!taskForm.title.trim() || !taskForm.statement.trim()) return;
+    if (!taskForm.title.trim() || !taskForm.statement.trim()) {
+      setError('Заполни название и условие задачи.');
+      return;
+    }
 
     setSaving(true);
+    setError('');
+    setStatus('');
     try {
+      const payload = {
+        ...taskForm,
+        slug: toSlug(taskForm.slug || taskForm.title),
+        language: 'go',
+        executionProfile: taskForm.executionProfile || 'pure',
+        runnerMode: taskForm.runnerMode || 'function_io',
+      };
       if (taskForm.id) {
-        await interviewPrepApi.adminUpdateTask(taskForm.id, taskForm);
+        await interviewPrepApi.adminUpdateTask(taskForm.id, payload);
+        setStatus('Задача обновлена.');
       } else {
-        await interviewPrepApi.adminCreateTask(taskForm);
+        await interviewPrepApi.adminCreateTask(payload);
+        setStatus('Задача создана.');
       }
       closeTaskModal();
       await loadTasks();
-    } catch (e) {
-      console.error('Failed to save task:', e);
+    } catch (e: any) {
+      console.error('Failed to save interview prep task:', e);
+      setError(e.response?.data?.error || 'Не удалось сохранить задачу');
     } finally {
       setSaving(false);
     }
@@ -193,30 +245,47 @@ export const InterviewPrepAdminPage: React.FC = () => {
 
   const handleDeleteTask = async (taskId: string) => {
     setDeletingId(taskId);
+    setError('');
+    setStatus('');
     try {
       await interviewPrepApi.adminDeleteTask(taskId);
+      setStatus('Задача удалена.');
       await loadTasks();
-    } catch (e) {
-      console.error('Failed to delete task:', e);
+    } catch (e: any) {
+      console.error('Failed to delete interview prep task:', e);
+      setError(e.response?.data?.error || 'Не удалось удалить задачу');
     } finally {
       setDeletingId(null);
     }
   };
 
   const handleSaveQuestion = async () => {
-    if (!selectedTaskId || !questionForm.prompt.trim()) return;
+    if (!selectedTaskId) return;
+    if (!questionForm.prompt.trim() || !questionForm.answer.trim()) {
+      setError('Для вопроса нужны и prompt, и answer.');
+      return;
+    }
+    if (questionForm.position < 1) {
+      setError('Позиция вопроса должна быть больше нуля.');
+      return;
+    }
 
     setSaving(true);
+    setError('');
+    setStatus('');
     try {
       if (questionForm.id) {
         await interviewPrepApi.adminUpdateQuestion(selectedTaskId, questionForm.id, questionForm);
+        setStatus('Вопрос обновлен.');
       } else {
         await interviewPrepApi.adminCreateQuestion(selectedTaskId, questionForm);
+        setStatus('Вопрос добавлен.');
       }
-      await loadQuestions(selectedTaskId);
-      setQuestionForm(createEmptyQuestionForm(questions.length + 1));
-    } catch (e) {
-      console.error('Failed to save question:', e);
+      const data = await loadQuestions(selectedTaskId);
+      setQuestionForm(createEmptyQuestionForm(data.length + 1));
+    } catch (e: any) {
+      console.error('Failed to save interview prep question:', e);
+      setError(e.response?.data?.error || 'Не удалось сохранить вопрос');
     } finally {
       setSaving(false);
     }
@@ -225,18 +294,19 @@ export const InterviewPrepAdminPage: React.FC = () => {
   const handleDeleteQuestion = async (questionId: string) => {
     if (!selectedTaskId) return;
     setDeletingId(questionId);
+    setError('');
+    setStatus('');
     try {
       await interviewPrepApi.adminDeleteQuestion(selectedTaskId, questionId);
-      await loadQuestions(selectedTaskId);
-    } catch (e) {
-      console.error('Failed to delete question:', e);
+      setStatus('Вопрос удален.');
+      const data = await loadQuestions(selectedTaskId);
+      setQuestionForm(createEmptyQuestionForm(data.length + 1));
+    } catch (e: any) {
+      console.error('Failed to delete interview prep question:', e);
+      setError(e.response?.data?.error || 'Не удалось удалить вопрос');
     } finally {
       setDeletingId(null);
     }
-  };
-
-  const openEditQuestion = (q: InterviewPrepQuestion) => {
-    setQuestionForm(questionToForm(q));
   };
 
   return (
@@ -247,7 +317,7 @@ export const InterviewPrepAdminPage: React.FC = () => {
             <span className="code-rooms-kicker">Admin</span>
             <h1>Interview Prep задачи</h1>
             <p className="code-rooms-subtitle">
-              Управление задачами для подготовки к интервью.
+              Управление сценариями подготовки: задача, attached questions, порядок и доступность для trusted-пользователей.
             </p>
           </div>
           <div className="code-rooms-hero__actions">
@@ -258,11 +328,18 @@ export const InterviewPrepAdminPage: React.FC = () => {
           </div>
         </div>
 
+        {(error || status) && (
+          <section className="card dashboard-card">
+            {error && <div className="error-text">{error}</div>}
+            {!error && status && <div className="success-text">{status}</div>}
+          </section>
+        )}
+
         <section className="card dashboard-card">
           <div className="task-filters code-admin-filters">
             <input
               className="input"
-              placeholder="Поиск по title / slug / statement"
+              placeholder="Поиск по title / slug / type"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
@@ -270,27 +347,26 @@ export const InterviewPrepAdminPage: React.FC = () => {
 
           {loading ? (
             <div className="empty-state compact">Загрузка...</div>
-          ) : error ? (
-            <div className="error-text">{error}</div>
           ) : filteredTasks.length === 0 ? (
             <div className="empty-state compact">Задач пока нет.</div>
           ) : (
             <div className="task-list">
               {filteredTasks.map((task) => (
-                <div key={task.id} className="task-item">
+                <div key={task.id} className="task-item interview-prep-admin-task">
                   <div className="task-item__header">
                     <div>
                       <div className="task-item__title">{task.title}</div>
                       <div className="task-item__meta">
                         <span className="badge">{task.prepType}</span>
                         <span className="badge">{task.language}</span>
-                        <span className="badge">{task.executionProfile}</span>
+                        <span className="badge">{Math.round(task.durationSeconds / 60)} мин</span>
                         {!task.isActive && <span className="badge task-inactive">Неактивна</span>}
                       </div>
                     </div>
                     <div className="task-item__actions">
-                      <button className="btn btn-secondary btn-sm" onClick={() => openQuestionsModal(task.id)}>
-                        Вопросы
+                      <button className="btn btn-secondary btn-sm" onClick={() => void openQuestionModal(task)}>
+                        <ListChecks size={16} />
+                        <span>Вопросы</span>
                       </button>
                       <button className="btn-icon" onClick={() => openCreateTaskModal(task)}>
                         <Pencil size={16} />
@@ -304,6 +380,11 @@ export const InterviewPrepAdminPage: React.FC = () => {
                       </button>
                     </div>
                   </div>
+                  <div className="interview-prep-admin-task__meta">
+                    <span><strong>Slug:</strong> {task.slug}</span>
+                    <span><strong>Profile:</strong> {task.executionProfile}</span>
+                    <span><strong>Runner:</strong> {task.runnerMode}</span>
+                  </div>
                   <p className="task-item__statement">{task.statement}</p>
                 </div>
               ))}
@@ -312,81 +393,107 @@ export const InterviewPrepAdminPage: React.FC = () => {
         </section>
       </div>
 
-      {/* Task Modal */}
-      {showTaskModal && (
+      {taskModalOpen && (
         <div className="modal-overlay" onClick={closeTaskModal}>
-          <div className="modal modal-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="modal modal-xl interview-prep-modal" onClick={(e) => e.stopPropagation()}>
             <div className="dashboard-card__header">
               <div>
                 <h2>{taskForm.id ? 'Редактировать задачу' : 'Новая задача'}</h2>
+                <p className="interview-prep-muted">
+                  Один сценарий = задача + прикрепленная серия follow-up вопросов.
+                </p>
               </div>
               <ShieldCheck size={18} />
             </div>
 
-            <div className="task-editor-grid">
+            <div className="modal-scroll-content">
+              <div className="task-editor-grid">
+                <div className="form-group">
+                  <label>Название</label>
+                  <input
+                    className="input"
+                    value={taskForm.title}
+                    onChange={(e) => handleTaskTitleChange(e.target.value)}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Slug</label>
+                  <input
+                    className="input"
+                    value={taskForm.slug}
+                    onChange={(e) => setTaskForm((prev) => ({ ...prev, slug: toSlug(e.target.value) }))}
+                    placeholder="go-two-sum-hash-map"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Тип</label>
+                  <select
+                    className="input"
+                    value={taskForm.prepType}
+                    onChange={(e) => setTaskForm((prev) => ({ ...prev, prepType: e.target.value as InterviewPrepType }))}
+                  >
+                    {PREP_TYPES.map((item) => (
+                      <option key={item.value} value={item.value}>{item.label}</option>
+                    ))}
+                  </select>
+                </div>
+                <div className="form-group">
+                  <label>Длительность, сек</label>
+                  <input
+                    className="input"
+                    type="number"
+                    min={300}
+                    step={60}
+                    value={taskForm.durationSeconds}
+                    onChange={(e) => setTaskForm((prev) => ({ ...prev, durationSeconds: Number(e.target.value) || 0 }))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Execution Profile</label>
+                  <input
+                    className="input"
+                    value={taskForm.executionProfile}
+                    onChange={(e) => setTaskForm((prev) => ({ ...prev, executionProfile: e.target.value }))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Runner Mode</label>
+                  <input
+                    className="input"
+                    value={taskForm.runnerMode}
+                    onChange={(e) => setTaskForm((prev) => ({ ...prev, runnerMode: e.target.value }))}
+                  />
+                </div>
+              </div>
+
               <div className="form-group">
-                <label>Название</label>
-                <input
-                  className="input"
-                  value={taskForm.title}
-                  onChange={(e) => setTaskForm((prev) => ({ ...prev, title: e.target.value }))}
+                <label>Условие</label>
+                <textarea
+                  className="input textarea"
+                  value={taskForm.statement}
+                  onChange={(e) => setTaskForm((prev) => ({ ...prev, statement: e.target.value }))}
                 />
               </div>
+
               <div className="form-group">
-                <label>Slug</label>
-                <input
-                  className="input"
-                  value={taskForm.slug}
-                  onChange={(e) => setTaskForm((prev) => ({ ...prev, slug: e.target.value }))}
-                  placeholder="auto-generated from title"
+                <label>Starter Code</label>
+                <textarea
+                  className="input textarea code-textarea"
+                  value={taskForm.starterCode}
+                  onChange={(e) => setTaskForm((prev) => ({ ...prev, starterCode: e.target.value }))}
                 />
               </div>
+
               <div className="form-group">
-                <label>Тип</label>
-                <select
-                  className="input"
-                  value={taskForm.prepType}
-                  onChange={(e) => setTaskForm((prev) => ({ ...prev, prepType: e.target.value as InterviewPrepType }))}
-                >
-                  {PREP_TYPES.map((t) => (
-                    <option key={t.value} value={t.value}>{t.label}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Language</label>
-                <input
-                  className="input"
-                  value={taskForm.language}
-                  onChange={(e) => setTaskForm((prev) => ({ ...prev, language: e.target.value }))}
+                <label>Reference Solution</label>
+                <textarea
+                  className="input textarea code-textarea"
+                  value={taskForm.referenceSolution}
+                  onChange={(e) => setTaskForm((prev) => ({ ...prev, referenceSolution: e.target.value }))}
                 />
               </div>
-              <div className="form-group">
-                <label>Execution Profile</label>
-                <input
-                  className="input"
-                  value={taskForm.executionProfile}
-                  onChange={(e) => setTaskForm((prev) => ({ ...prev, executionProfile: e.target.value }))}
-                />
-              </div>
-              <div className="form-group">
-                <label>Runner Mode</label>
-                <input
-                  className="input"
-                  value={taskForm.runnerMode}
-                  onChange={(e) => setTaskForm((prev) => ({ ...prev, runnerMode: e.target.value }))}
-                />
-              </div>
-              <div className="form-group">
-                <label>Duration (seconds)</label>
-                <input
-                  className="input"
-                  type="number"
-                  value={taskForm.durationSeconds}
-                  onChange={(e) => setTaskForm((prev) => ({ ...prev, durationSeconds: Number(e.target.value) }))}
-                />
-              </div>
-              <div className="form-group">
+
+              <div className="interview-prep-toggle-row">
                 <label className="toggle-field">
                   <input
                     type="checkbox"
@@ -395,52 +502,20 @@ export const InterviewPrepAdminPage: React.FC = () => {
                   />
                   Executable
                 </label>
+                <label className="toggle-field">
+                  <input
+                    type="checkbox"
+                    checked={taskForm.isActive}
+                    onChange={(e) => setTaskForm((prev) => ({ ...prev, isActive: e.target.checked }))}
+                  />
+                  Активна
+                </label>
               </div>
             </div>
 
-            <div className="form-group">
-              <label>Условие</label>
-              <textarea
-                className="input textarea"
-                value={taskForm.statement}
-                onChange={(e) => setTaskForm((prev) => ({ ...prev, statement: e.target.value }))}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Starter Code</label>
-              <textarea
-                className="input textarea code-textarea"
-                value={taskForm.starterCode}
-                onChange={(e) => setTaskForm((prev) => ({ ...prev, starterCode: e.target.value }))}
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Reference Solution</label>
-              <textarea
-                className="input textarea code-textarea"
-                value={taskForm.referenceSolution}
-                onChange={(e) => setTaskForm((prev) => ({ ...prev, referenceSolution: e.target.value }))}
-              />
-            </div>
-
-            <label className="toggle-field">
-              <input
-                type="checkbox"
-                checked={taskForm.isActive}
-                onChange={(e) => setTaskForm((prev) => ({ ...prev, isActive: e.target.checked }))}
-              />
-              Активна
-            </label>
-
             <div className="modal-actions">
               <button className="btn btn-secondary" onClick={closeTaskModal}>Отмена</button>
-              <button
-                className="btn btn-primary"
-                onClick={handleSaveTask}
-                disabled={saving || !taskForm.title.trim()}
-              >
+              <button className="btn btn-primary" onClick={() => void handleSaveTask()} disabled={saving}>
                 {saving ? 'Сохранение...' : taskForm.id ? 'Сохранить' : 'Создать'}
               </button>
             </div>
@@ -448,83 +523,103 @@ export const InterviewPrepAdminPage: React.FC = () => {
         </div>
       )}
 
-      {/* Questions Modal */}
-      {showQuestionModal && (
+      {questionModalOpen && selectedTask && (
         <div className="modal-overlay" onClick={closeQuestionModal}>
-          <div className="modal modal-xl" onClick={(e) => e.stopPropagation()}>
+          <div className="modal modal-xl interview-prep-modal" onClick={(e) => e.stopPropagation()}>
             <div className="dashboard-card__header">
               <div>
-                <h2>Вопросы задачи</h2>
+                <h2>Вопросы: {selectedTask.title}</h2>
+                <p className="interview-prep-muted">
+                  Порядок важен: вопросы идут последовательно, а не рандомно.
+                </p>
               </div>
             </div>
 
-            <div className="form-group">
-              <label>Позиция</label>
-              <input
-                className="input"
-                type="number"
-                value={questionForm.position}
-                onChange={(e) => setQuestionForm((prev) => ({ ...prev, position: Number(e.target.value) }))}
-              />
-            </div>
+            <div className="modal-scroll-content">
+              <div className="task-editor-grid">
+                <div className="form-group">
+                  <label>Позиция</label>
+                  <input
+                    className="input"
+                    type="number"
+                    min={1}
+                    value={questionForm.position}
+                    onChange={(e) => setQuestionForm((prev) => ({ ...prev, position: Number(e.target.value) || 1 }))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Режим</label>
+                  <input
+                    className="input"
+                    value={questionForm.id ? 'Редактирование вопроса' : 'Добавление нового вопроса'}
+                    readOnly
+                  />
+                </div>
+              </div>
 
-            <div className="form-group">
-              <label>Prompt (вопрос)</label>
-              <textarea
-                className="input textarea"
-                value={questionForm.prompt}
-                onChange={(e) => setQuestionForm((prev) => ({ ...prev, prompt: e.target.value }))}
-              />
-            </div>
+              <div className="form-group">
+                <label>Prompt</label>
+                <textarea
+                  className="input textarea"
+                  value={questionForm.prompt}
+                  onChange={(e) => setQuestionForm((prev) => ({ ...prev, prompt: e.target.value }))}
+                />
+              </div>
 
-            <div className="form-group">
-              <label>Answer (ответ)</label>
-              <textarea
-                className="input textarea"
-                value={questionForm.answer}
-                onChange={(e) => setQuestionForm((prev) => ({ ...prev, answer: e.target.value }))}
-              />
-            </div>
+              <div className="form-group">
+                <label>Answer</label>
+                <textarea
+                  className="input textarea"
+                  value={questionForm.answer}
+                  onChange={(e) => setQuestionForm((prev) => ({ ...prev, answer: e.target.value }))}
+                />
+              </div>
 
-            <button
-              className="btn btn-primary"
-              onClick={handleSaveQuestion}
-              disabled={saving || !questionForm.prompt.trim()}
-            >
-              {saving ? 'Сохранение...' : questionForm.id ? 'Сохранить вопрос' : 'Добавить вопрос'}
-            </button>
+              <div className="interview-prep-question-toolbar">
+                <button className="btn btn-primary" onClick={() => void handleSaveQuestion()} disabled={saving}>
+                  {saving ? 'Сохранение...' : questionForm.id ? 'Сохранить вопрос' : 'Добавить вопрос'}
+                </button>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setQuestionForm(createEmptyQuestionForm(sortedQuestions.length + 1))}
+                >
+                  Очистить форму
+                </button>
+              </div>
 
-            <h3 style={{ marginTop: '24px' }}>Список вопросов</h3>
-            {questions.length === 0 ? (
-              <div className="empty-state compact">Вопросов пока нет</div>
-            ) : (
-              <div className="task-list" style={{ marginTop: '12px' }}>
-                {questions.map((q) => (
-                  <div key={q.id} className="task-item">
-                    <div className="task-item__header">
-                      <div>
-                        <div className="task-item__title">#{q.position}</div>
+              <div className="interview-prep-question-list">
+                {sortedQuestions.length === 0 ? (
+                  <div className="empty-state compact">У этой задачи пока нет вопросов.</div>
+                ) : (
+                  sortedQuestions.map((question) => (
+                    <div key={question.id} className="task-item">
+                      <div className="task-item__header">
+                        <div>
+                          <div className="task-item__title">#{question.position}</div>
+                          <div className="interview-prep-muted">Следующий вопрос откроется только после ответа на этот.</div>
+                        </div>
+                        <div className="task-item__actions">
+                          <button className="btn-icon" onClick={() => setQuestionForm(questionToForm(question))}>
+                            <Pencil size={16} />
+                          </button>
+                          <button
+                            className="btn-icon danger"
+                            onClick={() => void handleDeleteQuestion(question.id)}
+                            disabled={deletingId === question.id}
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </div>
                       </div>
-                      <div className="task-item__actions">
-                        <button className="btn-icon" onClick={() => openEditQuestion(q)}>
-                          <Pencil size={16} />
-                        </button>
-                        <button
-                          className="btn-icon danger"
-                          onClick={() => void handleDeleteQuestion(q.id)}
-                          disabled={deletingId === q.id}
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      </div>
+                      <p className="task-item__statement">{question.prompt}</p>
+                      <div className="interview-prep-answer-preview">{question.answer}</div>
                     </div>
-                    <p className="task-item__statement">{q.prompt}</p>
-                  </div>
-                ))}
+                  ))
+                )}
               </div>
-            )}
+            </div>
 
-            <div className="modal-actions" style={{ marginTop: '24px' }}>
+            <div className="modal-actions">
               <button className="btn btn-secondary" onClick={closeQuestionModal}>Закрыть</button>
             </div>
           </div>

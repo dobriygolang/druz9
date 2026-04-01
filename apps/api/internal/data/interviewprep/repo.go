@@ -367,16 +367,7 @@ func (r *Repo) UpdateTask(ctx context.Context, task *model.InterviewPrepTask) er
 }
 
 func (r *Repo) DeleteTask(ctx context.Context, taskID uuid.UUID) error {
-	// First delete all questions for this task
 	_, err := r.data.DB.Exec(ctx, `
-		DELETE FROM interview_prep_questions WHERE task_id = $1
-	`, taskID)
-	if err != nil {
-		return fmt.Errorf("delete interview prep questions: %w", err)
-	}
-
-	// Then delete the task
-	_, err = r.data.DB.Exec(ctx, `
 		DELETE FROM interview_prep_tasks WHERE id = $1
 	`, taskID)
 	if err != nil {

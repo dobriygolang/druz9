@@ -5,7 +5,7 @@ import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 import { ArenaLeaderboardEntry, ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode } from '@/entities/CodeRoom/model/types';
-import { ArrowRight, Eye, FileCode, Plus, ShieldCheck, Swords, TimerReset, Trophy, Users } from 'lucide-react';
+import { ArrowRight, BookOpen, Eye, FileCode, Plus, ShieldCheck, Swords, TimerReset, Trophy, Users } from 'lucide-react';
 
 const MOTIVATIONAL_QUOTES = [
   'Код — это поэзия логики',
@@ -529,6 +529,23 @@ export const CodeRoomsPage: React.FC = () => {
                 </div>
                 <ArrowRight size={16} />
               </button>
+
+              {user?.isTrusted && (
+                <button
+                  type="button"
+                  className="code-rooms-mode-card"
+                  onClick={() => navigate('/interview-prep')}
+                >
+                  <div className="code-rooms-mode-card__icon"><BookOpen size={18} /></div>
+                  <div>
+                    <div className="code-rooms-mode-card__title">Interview Prep</div>
+                    <div className="code-rooms-mode-card__text">
+                      Trusted-only режим: задача, затем прикрепленные follow-up вопросы по очереди без случайного пула.
+                    </div>
+                  </div>
+                  <ArrowRight size={16} />
+                </button>
+              )}
             </div>
           </section>
 

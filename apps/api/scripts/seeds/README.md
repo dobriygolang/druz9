@@ -5,12 +5,13 @@
 Структура:
 
 - `*.sql` — SQL сиды, которые применяются runner'ом напрямую.
-- `catalogs/*.json` / `catalogs/*.yaml` — каталоги задач для Go seed packs.
+- `catalogs/*.json` / `catalogs/*.yaml` — каталоги задач и interview-prep packs.
 
 Сейчас используется:
 
 - `test_users.sql`
 - `catalogs/blind75.json`
+- `catalogs/interview_prep.json`
 
 Важно:
 
@@ -23,6 +24,7 @@
 - `make seed-up`
 - `make seed-sql`
 - `make seed-blind75`
+- `make seed-interview-prep`
 - `make seed-status`
 
 Формат каталога задач:

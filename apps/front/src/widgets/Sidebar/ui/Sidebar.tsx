@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Code2, ArrowRight, Settings, Shield } from 'lucide-react';
+import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Code2, ArrowRight, Settings, Shield, BookOpen } from 'lucide-react';
 import { geoApi } from '@/features/Geo/api/geoApi';
 import { CommunityMapPoint } from '@/entities/User/model/types';
 
@@ -59,7 +59,7 @@ export const Sidebar: React.FC = () => {
             <NavItem to="/events" icon={<Calendar size={20} />} label="Ивент" />
             <NavItem to="/vacancies" icon={<Briefcase size={20} />} label="Вакансии" />
             <NavItem to="/map" icon={<MapPin size={20} />} label="Карта" />
-            {user?.isTrusted && <NavItem to="/interview-prep" icon={<Briefcase size={20} />} label="Prep" />}
+            {user?.isTrusted && <NavItem to="/interview-prep" icon={<BookOpen size={20} />} label="Go Prep" />}
             <div style={{ height: '32px' }} />
             {user?.isAdmin && (
               <>

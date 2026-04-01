@@ -22,6 +22,8 @@ export interface InterviewPrepTask {
   runnerMode: string;
   durationSeconds: number;
   starterCode: string;
+  /** Only populated in admin context */
+  referenceSolution?: string;
   isActive: boolean;
   createdAt: string;
   updatedAt: string;
@@ -51,12 +53,26 @@ export interface InterviewPrepSession {
   updatedAt: string;
   task?: InterviewPrepTask;
   currentQuestion?: InterviewPrepQuestion;
+  results?: InterviewPrepQuestionResult[];
 }
 
 export interface InterviewPrepSubmitResult {
   passed: boolean;
   lastError: string;
   session?: InterviewPrepSession;
+}
+
+export interface InterviewPrepQuestionResult {
+  id: string;
+  sessionId: string;
+  questionId: string;
+  selfAssessment: InterviewPrepSelfAssessment;
+  answeredAt: string;
+}
+
+export interface InterviewPrepAnswerResult {
+  answeredQuestion?: InterviewPrepQuestion;
+  session: InterviewPrepSession;
 }
 
 const normalizeTask = (task: any): InterviewPrepTask => ({
@@ -71,6 +87,7 @@ const normalizeTask = (task: any): InterviewPrepTask => ({
   runnerMode: task.runnerMode ?? task.runner_mode ?? 'function_io',
   durationSeconds: Number(task.durationSeconds ?? task.duration_seconds ?? 1800),
   starterCode: task.starterCode ?? task.starter_code ?? '',
+  referenceSolution: task.referenceSolution ?? task.reference_solution ?? '',
   isActive: Boolean(task.isActive ?? task.is_active),
   createdAt: task.createdAt ?? task.created_at,
   updatedAt: task.updatedAt ?? task.updated_at,
@@ -84,6 +101,14 @@ const normalizeQuestion = (question: any): InterviewPrepQuestion => ({
   answer: question.answer ?? '',
   createdAt: question.createdAt ?? question.created_at,
   updatedAt: question.updatedAt ?? question.updated_at,
+});
+
+const normalizeQuestionResult = (result: any): InterviewPrepQuestionResult => ({
+  id: result.id,
+  sessionId: result.sessionId ?? result.session_id,
+  questionId: result.questionId ?? result.question_id,
+  selfAssessment: result.selfAssessment ?? result.self_assessment,
+  answeredAt: result.answeredAt ?? result.answered_at,
 });
 
 const normalizeSession = (session: any): InterviewPrepSession => ({
@@ -102,6 +127,7 @@ const normalizeSession = (session: any): InterviewPrepSession => ({
   currentQuestion: session.currentQuestion || session.current_question
     ? normalizeQuestion(session.currentQuestion ?? session.current_question)
     : undefined,
+  results: Array.isArray(session.results) ? session.results.map(normalizeQuestionResult) : [],
 });
 
 export const interviewPrepApi = {
@@ -134,12 +160,17 @@ export const interviewPrepApi = {
     sessionId: string,
     questionId: string,
     selfAssessment: InterviewPrepSelfAssessment,
-  ): Promise<InterviewPrepSession> => {
-    const response = await apiClient.post<{ session: any }>(
+  ): Promise<InterviewPrepAnswerResult> => {
+    const response = await apiClient.post<{ answeredQuestion?: any; session: any }>(
       `/api/v1/interview-prep/sessions/${sessionId}/questions/${questionId}/answer`,
       { selfAssessment },
     );
-    return normalizeSession(response.data.session);
+    return {
+      answeredQuestion: response.data.answeredQuestion
+        ? normalizeQuestion(response.data.answeredQuestion)
+        : undefined,
+      session: normalizeSession(response.data.session),
+    };
   },
 
   // Admin methods

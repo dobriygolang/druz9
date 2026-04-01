@@ -38,8 +38,9 @@ type Record struct {
 }
 
 type Options struct {
-	RunSQL     bool
-	RunBlind75 bool
+	RunSQL           bool
+	RunBlind75       bool
+	RunInterviewPrep bool
 }
 
 type Runner struct {
@@ -71,6 +72,13 @@ func (r *Runner) Run(ctx context.Context, opts Options) ([]Result, error) {
 			return nil, err
 		}
 		results = append(results, blindResult)
+	}
+	if opts.RunInterviewPrep {
+		interviewPrepResult, err := r.runInterviewPrep(ctx)
+		if err != nil {
+			return nil, err
+		}
+		results = append(results, interviewPrepResult)
 	}
 	return results, nil
 }

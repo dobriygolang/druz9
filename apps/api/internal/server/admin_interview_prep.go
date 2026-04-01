@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"regexp"
 	"strings"
 	"time"
 
@@ -13,6 +14,8 @@ import (
 )
 
 const adminInterviewPrepPrefix = "/api/admin/interview-prep/"
+
+var interviewPrepSlugPattern = regexp.MustCompile(`[^a-z0-9]+`)
 
 type adminInterviewPrepAuthorizer interface {
 	AuthenticateByToken(context.Context, string) (*model.AuthState, error)
@@ -31,8 +34,25 @@ type adminInterviewPrepRepo interface {
 	DeleteQuestion(ctx context.Context, questionID uuid.UUID) error
 }
 
+type adminInterviewPrepTaskRequest struct {
+	Slug              string `json:"slug"`
+	Title             string `json:"title"`
+	Statement         string `json:"statement"`
+	PrepType          string `json:"prepType"`
+	Language          string `json:"language"`
+	IsExecutable      bool   `json:"isExecutable"`
+	ExecutionProfile  string `json:"executionProfile"`
+	RunnerMode        string `json:"runnerMode"`
+	DurationSeconds   int32  `json:"durationSeconds"`
+	StarterCode       string `json:"starterCode"`
+	ReferenceSolution string `json:"referenceSolution"`
+	IsActive          bool   `json:"isActive"`
+}
+
 func RegisterAdminInterviewPrepRoutes(
-	srv interface{ HandlePrefix(prefix string, handler http.Handler) },
+	srv interface {
+		HandlePrefix(prefix string, handler http.Handler)
+	},
 	repo adminInterviewPrepRepo,
 	authorizer adminInterviewPrepAuthorizer,
 ) {
@@ -42,7 +62,6 @@ func RegisterAdminInterviewPrepRoutes(
 func adminInterviewPrepHandler(repo adminInterviewPrepRepo, authorizer adminInterviewPrepAuthorizer) http.Handler {
 	mux := http.NewServeMux()
 
-	// Main handler for all admin interview-prep routes
 	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		user, authErr := adminCheckAuth(r, authorizer)
 		if authErr != nil {
@@ -54,8 +73,11 @@ func adminInterviewPrepHandler(repo adminInterviewPrepRepo, authorizer adminInte
 			return
 		}
 
-		// Remove the prefix to get the relative path
-		path := strings.TrimPrefix(r.URL.Path, adminInterviewPrepPrefix)
+		path := strings.Trim(strings.TrimPrefix(r.URL.Path, adminInterviewPrepPrefix), "/")
+		if path == "" {
+			http.Error(w, "not found", http.StatusNotFound)
+			return
+		}
 		parts := strings.Split(path, "/")
 
 		// /tasks - list all or create
@@ -122,28 +144,16 @@ func handleCreateTask(w http.ResponseWriter, r *http.Request, repo adminIntervie
 		return
 	}
 
-	var req struct {
-		Slug              string `json:"slug"`
-		Title             string `json:"title"`
-		Statement         string `json:"statement"`
-		PrepType          string `json:"prepType"`
-		Language          string `json:"language"`
-		IsExecutable      bool   `json:"isExecutable"`
-		ExecutionProfile  string `json:"executionProfile"`
-		RunnerMode        string `json:"runnerMode"`
-		DurationSeconds   int32  `json:"durationSeconds"`
-		StarterCode       string `json:"starterCode"`
-		ReferenceSolution string `json:"referenceSolution"`
-		IsActive          bool   `json:"isActive"`
-	}
+	var req adminInterviewPrepTaskRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
 		return
 	}
 
-	prepType := model.InterviewPrepTypeFromString(req.PrepType)
-	if prepType == "" {
-		prepType = model.InterviewPrepTypeAlgorithm
+	req = normalizeTaskRequest(req)
+	if validationErr := validateTaskRequest(req); validationErr != "" {
+		writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": validationErr})
+		return
 	}
 
 	task := &model.InterviewPrepTask{
@@ -151,7 +161,7 @@ func handleCreateTask(w http.ResponseWriter, r *http.Request, repo adminIntervie
 		Slug:              req.Slug,
 		Title:             req.Title,
 		Statement:         req.Statement,
-		PrepType:          prepType,
+		PrepType:          model.InterviewPrepTypeFromString(req.PrepType),
 		Language:          req.Language,
 		IsExecutable:      req.IsExecutable,
 		ExecutionProfile:  req.ExecutionProfile,
@@ -187,28 +197,16 @@ func handleTaskByID(w http.ResponseWriter, r *http.Request, taskID uuid.UUID, re
 		writeAdminJSON(w, http.StatusOK, map[string]any{"task": task})
 
 	case http.MethodPut:
-		var req struct {
-			Slug              string `json:"slug"`
-			Title             string `json:"title"`
-			Statement         string `json:"statement"`
-			PrepType          string `json:"prepType"`
-			Language          string `json:"language"`
-			IsExecutable      bool   `json:"isExecutable"`
-			ExecutionProfile  string `json:"executionProfile"`
-			RunnerMode        string `json:"runnerMode"`
-			DurationSeconds   int32  `json:"durationSeconds"`
-			StarterCode       string `json:"starterCode"`
-			ReferenceSolution string `json:"referenceSolution"`
-			IsActive          bool   `json:"isActive"`
-		}
+		var req adminInterviewPrepTaskRequest
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
 			return
 		}
 
-		prepType := model.InterviewPrepType(req.PrepType)
-		if prepType == "" {
-			prepType = model.InterviewPrepTypeCoding
+		req = normalizeTaskRequest(req)
+		if validationErr := validateTaskRequest(req); validationErr != "" {
+			writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": validationErr})
+			return
 		}
 
 		task := &model.InterviewPrepTask{
@@ -216,7 +214,7 @@ func handleTaskByID(w http.ResponseWriter, r *http.Request, taskID uuid.UUID, re
 			Slug:              req.Slug,
 			Title:             req.Title,
 			Statement:         req.Statement,
-			PrepType:          prepType,
+			PrepType:          model.InterviewPrepTypeFromString(req.PrepType),
 			Language:          req.Language,
 			IsExecutable:      req.IsExecutable,
 			ExecutionProfile:  req.ExecutionProfile,
@@ -267,6 +265,16 @@ func handleQuestions(w http.ResponseWriter, r *http.Request, taskID uuid.UUID, r
 			writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
 			return
 		}
+		req.Prompt = strings.TrimSpace(req.Prompt)
+		req.Answer = strings.TrimSpace(req.Answer)
+		if req.Position < 1 {
+			writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "position must be >= 1"})
+			return
+		}
+		if req.Prompt == "" || req.Answer == "" {
+			writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "prompt and answer are required"})
+			return
+		}
 
 		question := &model.InterviewPrepQuestion{
 			ID:        uuid.New(),
@@ -300,6 +308,16 @@ func handleQuestionByID(w http.ResponseWriter, r *http.Request, taskID, question
 		}
 		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 			writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
+			return
+		}
+		req.Prompt = strings.TrimSpace(req.Prompt)
+		req.Answer = strings.TrimSpace(req.Answer)
+		if req.Position < 1 {
+			writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "position must be >= 1"})
+			return
+		}
+		if req.Prompt == "" || req.Answer == "" {
+			writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "prompt and answer are required"})
 			return
 		}
 
@@ -362,12 +380,68 @@ func adminCheckAuth(r *http.Request, authorizer adminInterviewPrepAuthorizer) (*
 }
 
 type adminAuthError struct {
-	status    int
-	response  map[string]any
+	status   int
+	response map[string]any
 }
 
 func writeAdminJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(payload)
+}
+
+func normalizeTaskRequest(req adminInterviewPrepTaskRequest) adminInterviewPrepTaskRequest {
+	req.Title = strings.TrimSpace(req.Title)
+	req.Statement = strings.TrimSpace(req.Statement)
+	req.PrepType = strings.TrimSpace(req.PrepType)
+	req.Language = strings.TrimSpace(req.Language)
+	req.ExecutionProfile = strings.TrimSpace(req.ExecutionProfile)
+	req.RunnerMode = strings.TrimSpace(req.RunnerMode)
+	req.StarterCode = strings.TrimSpace(req.StarterCode)
+	req.ReferenceSolution = strings.TrimSpace(req.ReferenceSolution)
+	req.Slug = normalizeInterviewPrepSlug(req.Slug, req.Title)
+	if req.PrepType == "" {
+		req.PrepType = model.InterviewPrepTypeAlgorithm.String()
+	}
+	if req.Language == "" {
+		req.Language = "go"
+	}
+	if req.ExecutionProfile == "" {
+		req.ExecutionProfile = "pure"
+	}
+	if req.RunnerMode == "" {
+		req.RunnerMode = "function_io"
+	}
+	if req.DurationSeconds <= 0 {
+		req.DurationSeconds = 1800
+	}
+	return req
+}
+
+func validateTaskRequest(req adminInterviewPrepTaskRequest) string {
+	if req.Title == "" {
+		return "title is required"
+	}
+	if req.Slug == "" {
+		return "slug is required"
+	}
+	if req.Statement == "" {
+		return "statement is required"
+	}
+	if model.InterviewPrepTypeFromString(req.PrepType) == model.InterviewPrepTypeUnknown {
+		return "invalid prep type"
+	}
+	if req.Language != "go" {
+		return "only go language is supported for now"
+	}
+	return ""
+}
+
+func normalizeInterviewPrepSlug(rawSlug string, title string) string {
+	value := strings.TrimSpace(strings.ToLower(rawSlug))
+	if value == "" {
+		value = strings.TrimSpace(strings.ToLower(title))
+	}
+	value = interviewPrepSlugPattern.ReplaceAllString(value, "-")
+	return strings.Trim(value, "-")
 }

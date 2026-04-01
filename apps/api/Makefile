@@ -107,6 +107,11 @@ seed-sql:
 seed-blind75:
 	GOCACHE=$(GOCACHE_DIR) go run ./cmd/seed -only blind75
 
+.PHONY: seed-interview-prep
+# apply only interview prep catalog pack
+seed-interview-prep:
+	GOCACHE=$(GOCACHE_DIR) go run ./cmd/seed -only interview-prep
+
 .PHONY: seed-status
 # show applied seed records
 seed-status:

@@ -8,8 +8,8 @@ import (
 	"strings"
 	"time"
 
-	"api/internal/model"
 	appinterviewprep "api/internal/app/interviewprep"
+	"api/internal/model"
 
 	"github.com/google/uuid"
 )
@@ -45,13 +45,13 @@ type interviewPrepTaskResponse struct {
 }
 
 type interviewPrepQuestionResponse struct {
-	ID          uuid.UUID `json:"id"`
-	TaskID      uuid.UUID `json:"taskId"`
-	Position    int32     `json:"position"`
-	Prompt      string    `json:"prompt"`
-	Answer      string    `json:"answer,omitempty"` // only included when revealed
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	ID        uuid.UUID `json:"id"`
+	TaskID    uuid.UUID `json:"taskId"`
+	Position  int32     `json:"position"`
+	Prompt    string    `json:"prompt"`
+	Answer    string    `json:"answer,omitempty"` // only included when revealed
+	CreatedAt time.Time `json:"createdAt"`
+	UpdatedAt time.Time `json:"updatedAt"`
 }
 
 type interviewPrepSessionResponse struct {
@@ -63,10 +63,33 @@ type interviewPrepSessionResponse struct {
 	Code                    string                         `json:"code"`
 	LastSubmissionPassed    bool                           `json:"lastSubmissionPassed"`
 	StartedAt               time.Time                      `json:"startedAt"`
+	FinishedAt              *time.Time                     `json:"finishedAt,omitempty"`
 	CreatedAt               time.Time                      `json:"createdAt"`
 	UpdatedAt               time.Time                      `json:"updatedAt"`
 	Task                    *interviewPrepTaskResponse     `json:"task,omitempty"`
 	CurrentQuestion         *interviewPrepQuestionResponse `json:"currentQuestion,omitempty"`
+	Results                 []*interviewPrepResultResponse `json:"results,omitempty"`
+}
+
+type interviewPrepResultResponse struct {
+	ID             uuid.UUID `json:"id"`
+	SessionID      uuid.UUID `json:"sessionId"`
+	QuestionID     uuid.UUID `json:"questionId"`
+	SelfAssessment string    `json:"selfAssessment"`
+	AnsweredAt     time.Time `json:"answeredAt"`
+}
+
+func mapInterviewPrepResult(result *model.InterviewPrepQuestionResult) *interviewPrepResultResponse {
+	if result == nil {
+		return nil
+	}
+	return &interviewPrepResultResponse{
+		ID:             result.ID,
+		SessionID:      result.SessionID,
+		QuestionID:     result.QuestionID,
+		SelfAssessment: result.SelfAssessment.String(),
+		AnsweredAt:     result.AnsweredAt,
+	}
 }
 
 func mapInterviewPrepTask(task *model.InterviewPrepTask) *interviewPrepTaskResponse {
@@ -122,6 +145,7 @@ func mapInterviewPrepSession(session *model.InterviewPrepSession, includeAnswer 
 		Code:                    session.Code,
 		LastSubmissionPassed:    session.LastSubmissionPassed,
 		StartedAt:               session.StartedAt,
+		FinishedAt:              session.FinishedAt,
 		CreatedAt:               session.CreatedAt,
 		UpdatedAt:               session.UpdatedAt,
 		Task:                    mapInterviewPrepTask(session.Task),
@@ -129,12 +153,18 @@ func mapInterviewPrepSession(session *model.InterviewPrepSession, includeAnswer 
 	if session.CurrentQuestion != nil {
 		resp.CurrentQuestion = mapInterviewPrepQuestion(session.CurrentQuestion, includeAnswer)
 	}
+	if len(session.Results) > 0 {
+		resp.Results = make([]*interviewPrepResultResponse, 0, len(session.Results))
+		for _, result := range session.Results {
+			resp.Results = append(resp.Results, mapInterviewPrepResult(result))
+		}
+	}
 	return resp
 }
 
 type interviewPrepSubmitResponse struct {
-	Passed    bool                         `json:"passed"`
-	LastError string                       `json:"lastError"`
+	Passed    bool                          `json:"passed"`
+	LastError string                        `json:"lastError"`
 	Session   *interviewPrepSessionResponse `json:"session,omitempty"`
 }
 
@@ -162,7 +192,9 @@ type InterviewPrepService interface {
 	AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string) (*model.InterviewPrepSession, error)
 }
 
-func RegisterInterviewPrepRoutes(srv interface{ HandlePrefix(prefix string, handler http.Handler) }, service InterviewPrepService, authorizer interviewPrepAuthorizer) {
+func RegisterInterviewPrepRoutes(srv interface {
+	HandlePrefix(prefix string, handler http.Handler)
+}, service InterviewPrepService, authorizer interviewPrepAuthorizer) {
 	handler := interviewPrepHandler(service, authorizer)
 	srv.HandlePrefix(interviewPrepTasksPath, handler)
 	srv.HandlePrefix(interviewPrepSessionsPath, handler)

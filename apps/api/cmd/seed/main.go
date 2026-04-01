@@ -22,7 +22,7 @@ import (
 func main() {
 	var only string
 	var status bool
-	flag.StringVar(&only, "only", "all", "which seeds to run: all, sql, blind75")
+	flag.StringVar(&only, "only", "all", "which seeds to run: all, sql, blind75, interview-prep")
 	flag.BoolVar(&status, "status", false, "print applied seed records and exit")
 	flag.Parse()
 
@@ -88,10 +88,13 @@ func parseOptions(value string) (seeds.Options, error) {
 	case "", "all":
 		opts.RunSQL = true
 		opts.RunBlind75 = true
+		opts.RunInterviewPrep = true
 	case "sql":
 		opts.RunSQL = true
 	case "blind75":
 		opts.RunBlind75 = true
+	case "interview-prep":
+		opts.RunInterviewPrep = true
 	default:
 		return seeds.Options{}, fmt.Errorf("unsupported -only value %q", value)
 	}
