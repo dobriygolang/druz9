@@ -23,6 +23,7 @@ const OperationArenaServiceCreateMatch = "/arena.v1.ArenaService/CreateMatch"
 const OperationArenaServiceGetLeaderboard = "/arena.v1.ArenaService/GetLeaderboard"
 const OperationArenaServiceGetMatch = "/arena.v1.ArenaService/GetMatch"
 const OperationArenaServiceJoinMatch = "/arena.v1.ArenaService/JoinMatch"
+const OperationArenaServiceLeaveMatch = "/arena.v1.ArenaService/LeaveMatch"
 const OperationArenaServiceSubmitCode = "/arena.v1.ArenaService/SubmitCode"
 
 type ArenaServiceHTTPServer interface {
@@ -30,6 +31,7 @@ type ArenaServiceHTTPServer interface {
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
 	GetMatch(context.Context, *GetMatchRequest) (*ArenaMatchResponse, error)
 	JoinMatch(context.Context, *JoinMatchRequest) (*ArenaMatchResponse, error)
+	LeaveMatch(context.Context, *LeaveMatchRequest) (*ArenaMatchResponse, error)
 	SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error)
 }
 
@@ -40,6 +42,7 @@ func RegisterArenaServiceHTTPServer(s *http.Server, srv ArenaServiceHTTPServer) 
 	r.POST("/api/v1/arena/matches/{match_id}/join", _ArenaService_JoinMatch0_HTTP_Handler(srv))
 	r.POST("/api/v1/arena/matches/{match_id}/submit", _ArenaService_SubmitCode1_HTTP_Handler(srv))
 	r.GET("/api/v1/arena/leaderboard", _ArenaService_GetLeaderboard1_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/matches/{match_id}/leave", _ArenaService_LeaveMatch0_HTTP_Handler(srv))
 }
 
 func _ArenaService_CreateMatch0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
@@ -155,11 +158,37 @@ func _ArenaService_GetLeaderboard1_HTTP_Handler(srv ArenaServiceHTTPServer) func
 	}
 }
 
+func _ArenaService_LeaveMatch0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LeaveMatchRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceLeaveMatch)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.LeaveMatch(ctx, req.(*LeaveMatchRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ArenaMatchResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ArenaServiceHTTPClient interface {
 	CreateMatch(ctx context.Context, req *CreateMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	GetLeaderboard(ctx context.Context, req *GetLeaderboardRequest, opts ...http.CallOption) (rsp *GetLeaderboardResponse, err error)
 	GetMatch(ctx context.Context, req *GetMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	JoinMatch(ctx context.Context, req *JoinMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
+	LeaveMatch(ctx context.Context, req *LeaveMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	SubmitCode(ctx context.Context, req *SubmitCodeRequest, opts ...http.CallOption) (rsp *SubmitCodeResponse, err error)
 }
 
@@ -215,6 +244,19 @@ func (c *ArenaServiceHTTPClientImpl) JoinMatch(ctx context.Context, in *JoinMatc
 	pattern := "/api/v1/arena/matches/{match_id}/join"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationArenaServiceJoinMatch))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ArenaServiceHTTPClientImpl) LeaveMatch(ctx context.Context, in *LeaveMatchRequest, opts ...http.CallOption) (*ArenaMatchResponse, error) {
+	var out ArenaMatchResponse
+	pattern := "/api/v1/arena/matches/{match_id}/leave"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceLeaveMatch))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

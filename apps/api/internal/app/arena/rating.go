@@ -28,9 +28,6 @@ func (s *Service) refreshMatchState(ctx context.Context, match *domain.Match) er
 		return nil
 	}
 
-	// Anti-cheat no longer affects match rating state
-	// Personal penalties are applied separately in ReportPlayerSuspicion
-
 	nowTime := time.Now()
 	var accepted []*domain.Player
 	for _, player := range match.Players {
@@ -48,22 +45,15 @@ func (s *Service) refreshMatchState(ctx context.Context, match *domain.Match) er
 		return err
 	}
 
+	if len(accepted) == 1 {
+		err := s.repo.FinishMatch(ctx, match.ID, &accepted[0].UserID, domain.WinnerReasonSingleAC, nowTime)
+		if err == nil {
+			s.observeMatchFinished(match, nowTime)
+		}
+		return err
+	}
+
 	if match.StartedAt != nil && nowTime.After(match.StartedAt.Add(time.Duration(match.DurationSeconds)*time.Second)) {
-		if len(accepted) == 1 {
-			err := s.repo.FinishMatch(ctx, match.ID, &accepted[0].UserID, domain.WinnerReasonSingleAC, nowTime)
-			if err == nil {
-				s.observeMatchFinished(match, nowTime)
-			}
-			return err
-		}
-		if len(accepted) == 2 {
-			winner := pickWinner(accepted[0], accepted[1])
-			err := s.repo.FinishMatch(ctx, match.ID, &winner.UserID, winner.reason, nowTime)
-			if err == nil {
-				s.observeMatchFinished(match, nowTime)
-			}
-			return err
-		}
 		err := s.repo.FinishMatch(ctx, match.ID, nil, domain.WinnerReasonNone, nowTime)
 		if err == nil {
 			s.observeMatchFinished(match, nowTime)

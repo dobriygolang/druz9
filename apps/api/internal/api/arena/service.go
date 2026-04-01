@@ -18,6 +18,7 @@ type Service interface {
 	CreateMatch(ctx context.Context, creator *domain.User, topic string, difficulty model.ArenaDifficulty, obfuscateOpponent bool) (*domain.Match, error)
 	GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, error)
 	JoinMatch(ctx context.Context, matchID uuid.UUID, user *domain.User) (*domain.Match, error)
+	LeaveMatch(ctx context.Context, matchID uuid.UUID, user *domain.User) (*domain.Match, error)
 	SavePlayerCode(ctx context.Context, matchID uuid.UUID, user *domain.User, code string) error
 	SubmitCode(ctx context.Context, matchID uuid.UUID, user *domain.User, code string) (*domain.Submission, *domain.Match, error)
 	GetLeaderboard(ctx context.Context, limit int32) ([]*domain.LeaderboardEntry, error)

@@ -163,6 +163,53 @@ func (s *Service) SavePlayerCodes(ctx context.Context, matchID uuid.UUID, codes 
 	return s.repo.SavePlayerCodes(ctx, matchID, codes)
 }
 
+func (s *Service) LeaveMatch(ctx context.Context, matchID uuid.UUID, user *domain.User) (*domain.Match, error) {
+	if user == nil || (isGuestUser(user) && !s.allowGuestAccess()) {
+		return nil, domain.ErrGuestsNotSupported
+	}
+
+	match, err := s.repo.GetMatch(ctx, matchID)
+	if err != nil {
+		return nil, err
+	}
+	if match == nil {
+		return nil, domain.ErrMatchNotFound
+	}
+	if match.Status != domain.MatchStatusActive && match.Status != domain.MatchStatusWaiting {
+		return nil, domain.ErrMatchNotActive
+	}
+
+	player := findPlayer(match, user.ID)
+	if player == nil {
+		return nil, domain.ErrPlayerNotInMatch
+	}
+
+	var winnerUserID *uuid.UUID
+	if match.Status == domain.MatchStatusActive {
+		for _, p := range match.Players {
+			if p.UserID != user.ID {
+				id := p.UserID
+				winnerUserID = &id
+				break
+			}
+		}
+	}
+
+	if err := s.repo.FinishMatch(ctx, match.ID, winnerUserID, domain.WinnerReasonNone, time.Now()); err != nil {
+		return nil, err
+	}
+
+	refreshed, err := s.repo.GetMatch(ctx, matchID)
+	if err != nil {
+		return nil, err
+	}
+	if refreshed == nil {
+		return nil, domain.ErrMatchNotFound
+	}
+	refreshed.AntiCheatEnabled = s.antiCheatEnabled()
+	return refreshed, nil
+}
+
 func (s *Service) CleanupInactiveMatches(ctx context.Context, idleFor time.Duration) (int64, error) {
 	return s.repo.CleanupInactiveMatches(ctx, idleFor)
 }

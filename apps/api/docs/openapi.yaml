@@ -322,6 +322,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/arena.v1.ArenaMatchResponse'
+    /api/v1/arena/matches/{matchId}/leave:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_LeaveMatch
+            parameters:
+                - name: matchId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.LeaveMatchRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaMatchResponse'
     /api/v1/arena/matches/{matchId}/submit:
         post:
             tags:
@@ -1304,6 +1328,11 @@ components:
                     items:
                         $ref: '#/components/schemas/arena.v1.ArenaLeaderboardEntry'
         arena.v1.JoinMatchRequest:
+            type: object
+            properties:
+                matchId:
+                    type: string
+        arena.v1.LeaveMatchRequest:
             type: object
             properties:
                 matchId:

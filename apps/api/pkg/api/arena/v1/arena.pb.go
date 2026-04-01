@@ -804,6 +804,50 @@ func (x *GetLeaderboardResponse) GetEntries() []*ArenaLeaderboardEntry {
 	return nil
 }
 
+type LeaveMatchRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MatchId       string                 `protobuf:"bytes,1,opt,name=match_id,json=matchId,proto3" json:"match_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LeaveMatchRequest) Reset() {
+	*x = LeaveMatchRequest{}
+	mi := &file_arena_v1_arena_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LeaveMatchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LeaveMatchRequest) ProtoMessage() {}
+
+func (x *LeaveMatchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LeaveMatchRequest.ProtoReflect.Descriptor instead.
+func (*LeaveMatchRequest) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *LeaveMatchRequest) GetMatchId() string {
+	if x != nil {
+		return x.MatchId
+	}
+	return ""
+}
+
 type ArenaMatch struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -831,7 +875,7 @@ type ArenaMatch struct {
 
 func (x *ArenaMatch) Reset() {
 	*x = ArenaMatch{}
-	mi := &file_arena_v1_arena_proto_msgTypes[8]
+	mi := &file_arena_v1_arena_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -843,7 +887,7 @@ func (x *ArenaMatch) String() string {
 func (*ArenaMatch) ProtoMessage() {}
 
 func (x *ArenaMatch) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[8]
+	mi := &file_arena_v1_arena_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -856,7 +900,7 @@ func (x *ArenaMatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaMatch.ProtoReflect.Descriptor instead.
 func (*ArenaMatch) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{8}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ArenaMatch) GetId() string {
@@ -1012,7 +1056,7 @@ type ArenaPlayer struct {
 
 func (x *ArenaPlayer) Reset() {
 	*x = ArenaPlayer{}
-	mi := &file_arena_v1_arena_proto_msgTypes[9]
+	mi := &file_arena_v1_arena_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1024,7 +1068,7 @@ func (x *ArenaPlayer) String() string {
 func (*ArenaPlayer) ProtoMessage() {}
 
 func (x *ArenaPlayer) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[9]
+	mi := &file_arena_v1_arena_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1037,7 +1081,7 @@ func (x *ArenaPlayer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaPlayer.ProtoReflect.Descriptor instead.
 func (*ArenaPlayer) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{9}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ArenaPlayer) GetUserId() string {
@@ -1141,7 +1185,7 @@ type ArenaLeaderboardEntry struct {
 
 func (x *ArenaLeaderboardEntry) Reset() {
 	*x = ArenaLeaderboardEntry{}
-	mi := &file_arena_v1_arena_proto_msgTypes[10]
+	mi := &file_arena_v1_arena_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1153,7 +1197,7 @@ func (x *ArenaLeaderboardEntry) String() string {
 func (*ArenaLeaderboardEntry) ProtoMessage() {}
 
 func (x *ArenaLeaderboardEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[10]
+	mi := &file_arena_v1_arena_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1166,7 +1210,7 @@ func (x *ArenaLeaderboardEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaLeaderboardEntry.ProtoReflect.Descriptor instead.
 func (*ArenaLeaderboardEntry) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{10}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ArenaLeaderboardEntry) GetUserId() string {
@@ -1270,7 +1314,9 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x15GetLeaderboardRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\"S\n" +
 	"\x16GetLeaderboardResponse\x129\n" +
-	"\aentries\x18\x01 \x03(\v2\x1f.arena.v1.ArenaLeaderboardEntryR\aentries\"\xaf\x06\n" +
+	"\aentries\x18\x01 \x03(\v2\x1f.arena.v1.ArenaLeaderboardEntryR\aentries\".\n" +
+	"\x11LeaveMatchRequest\x12\x19\n" +
+	"\bmatch_id\x18\x01 \x01(\tR\amatchId\"\xaf\x06\n" +
 	"\n" +
 	"ArenaMatch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
@@ -1330,12 +1376,13 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x16DIFFICULTY_UNSPECIFIED\x10\x00\x12\x13\n" +
 	"\x0fDIFFICULTY_EASY\x10\x01\x12\x15\n" +
 	"\x11DIFFICULTY_MEDIUM\x10\x02\x12\x13\n" +
-	"\x0fDIFFICULTY_HARD\x10\x03*\xac\x01\n" +
+	"\x0fDIFFICULTY_HARD\x10\x03*\xcd\x01\n" +
 	"\x11SubmitFailureKind\x12#\n" +
 	"\x1fSUBMIT_FAILURE_KIND_UNSPECIFIED\x10\x00\x12%\n" +
 	"!SUBMIT_FAILURE_KIND_COMPILE_ERROR\x10\x01\x12%\n" +
 	"!SUBMIT_FAILURE_KIND_RUNTIME_ERROR\x10\x02\x12$\n" +
-	" SUBMIT_FAILURE_KIND_WRONG_ANSWER\x10\x03*\xd7\x01\n" +
+	" SUBMIT_FAILURE_KIND_WRONG_ANSWER\x10\x03\x12\x1f\n" +
+	"\x1bSUBMIT_FAILURE_KIND_TIMEOUT\x10\x04*\xd7\x01\n" +
 	"\fWinnerReason\x12\x1d\n" +
 	"\x19WINNER_REASON_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bWINNER_REASON_ACCEPTED_TIME\x10\x01\x12\x19\n" +
@@ -1361,14 +1408,16 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x1eARENA_MATCH_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aARENA_MATCH_STATUS_WAITING\x10\x01\x12\x1d\n" +
 	"\x19ARENA_MATCH_STATUS_ACTIVE\x10\x02\x12\x1f\n" +
-	"\x1bARENA_MATCH_STATUS_FINISHED\x10\x032\xd8\x04\n" +
+	"\x1bARENA_MATCH_STATUS_FINISHED\x10\x032\xd4\x05\n" +
 	"\fArenaService\x12k\n" +
 	"\vCreateMatch\x12\x1c.arena.v1.CreateMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/arena/matches\x12m\n" +
 	"\bGetMatch\x12\x19.arena.v1.GetMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /api/v1/arena/matches/{match_id}\x12w\n" +
 	"\tJoinMatch\x12\x1a.arena.v1.JoinMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/arena/matches/{match_id}/join\x12{\n" +
 	"\n" +
 	"SubmitCode\x12\x1b.arena.v1.SubmitCodeRequest\x1a\x1c.arena.v1.SubmitCodeResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/arena/matches/{match_id}/submit\x12v\n" +
-	"\x0eGetLeaderboard\x12\x1f.arena.v1.GetLeaderboardRequest\x1a .arena.v1.GetLeaderboardResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/arena/leaderboardB\x19Z\x17api/pkg/api/arena/v1;v1b\x06proto3"
+	"\x0eGetLeaderboard\x12\x1f.arena.v1.GetLeaderboardRequest\x1a .arena.v1.GetLeaderboardResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/arena/leaderboard\x12z\n" +
+	"\n" +
+	"LeaveMatch\x12\x1b.arena.v1.LeaveMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/api/v1/arena/matches/{match_id}/leaveB\x19Z\x17api/pkg/api/arena/v1;v1b\x06proto3"
 
 var (
 	file_arena_v1_arena_proto_rawDescOnce sync.Once
@@ -1383,7 +1432,7 @@ func file_arena_v1_arena_proto_rawDescGZIP() []byte {
 }
 
 var file_arena_v1_arena_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_arena_v1_arena_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_arena_v1_arena_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
 var file_arena_v1_arena_proto_goTypes = []any{
 	(Difficulty)(0),                // 0: arena.v1.Difficulty
 	(SubmitFailureKind)(0),         // 1: arena.v1.SubmitFailureKind
@@ -1399,42 +1448,45 @@ var file_arena_v1_arena_proto_goTypes = []any{
 	(*ArenaMatchResponse)(nil),     // 11: arena.v1.ArenaMatchResponse
 	(*GetLeaderboardRequest)(nil),  // 12: arena.v1.GetLeaderboardRequest
 	(*GetLeaderboardResponse)(nil), // 13: arena.v1.GetLeaderboardResponse
-	(*ArenaMatch)(nil),             // 14: arena.v1.ArenaMatch
-	(*ArenaPlayer)(nil),            // 15: arena.v1.ArenaPlayer
-	(*ArenaLeaderboardEntry)(nil),  // 16: arena.v1.ArenaLeaderboardEntry
-	(*timestamppb.Timestamp)(nil),  // 17: google.protobuf.Timestamp
+	(*LeaveMatchRequest)(nil),      // 14: arena.v1.LeaveMatchRequest
+	(*ArenaMatch)(nil),             // 15: arena.v1.ArenaMatch
+	(*ArenaPlayer)(nil),            // 16: arena.v1.ArenaPlayer
+	(*ArenaLeaderboardEntry)(nil),  // 17: arena.v1.ArenaLeaderboardEntry
+	(*timestamppb.Timestamp)(nil),  // 18: google.protobuf.Timestamp
 }
 var file_arena_v1_arena_proto_depIdxs = []int32{
 	0,  // 0: arena.v1.CreateMatchRequest.difficulty:type_name -> arena.v1.Difficulty
-	17, // 1: arena.v1.SubmitCodeResponse.freeze_until:type_name -> google.protobuf.Timestamp
-	14, // 2: arena.v1.SubmitCodeResponse.match:type_name -> arena.v1.ArenaMatch
+	18, // 1: arena.v1.SubmitCodeResponse.freeze_until:type_name -> google.protobuf.Timestamp
+	15, // 2: arena.v1.SubmitCodeResponse.match:type_name -> arena.v1.ArenaMatch
 	1,  // 3: arena.v1.SubmitCodeResponse.failure_kind:type_name -> arena.v1.SubmitFailureKind
-	14, // 4: arena.v1.ArenaMatchResponse.match:type_name -> arena.v1.ArenaMatch
-	16, // 5: arena.v1.GetLeaderboardResponse.entries:type_name -> arena.v1.ArenaLeaderboardEntry
+	15, // 4: arena.v1.ArenaMatchResponse.match:type_name -> arena.v1.ArenaMatch
+	17, // 5: arena.v1.GetLeaderboardResponse.entries:type_name -> arena.v1.ArenaLeaderboardEntry
 	0,  // 6: arena.v1.ArenaMatch.difficulty:type_name -> arena.v1.Difficulty
 	5,  // 7: arena.v1.ArenaMatch.status:type_name -> arena.v1.ArenaMatchStatus
 	2,  // 8: arena.v1.ArenaMatch.winner_reason:type_name -> arena.v1.WinnerReason
-	17, // 9: arena.v1.ArenaMatch.started_at:type_name -> google.protobuf.Timestamp
-	17, // 10: arena.v1.ArenaMatch.finished_at:type_name -> google.protobuf.Timestamp
-	17, // 11: arena.v1.ArenaMatch.created_at:type_name -> google.protobuf.Timestamp
-	15, // 12: arena.v1.ArenaMatch.players:type_name -> arena.v1.ArenaPlayer
+	18, // 9: arena.v1.ArenaMatch.started_at:type_name -> google.protobuf.Timestamp
+	18, // 10: arena.v1.ArenaMatch.finished_at:type_name -> google.protobuf.Timestamp
+	18, // 11: arena.v1.ArenaMatch.created_at:type_name -> google.protobuf.Timestamp
+	16, // 12: arena.v1.ArenaMatch.players:type_name -> arena.v1.ArenaPlayer
 	3,  // 13: arena.v1.ArenaPlayer.side:type_name -> arena.v1.ArenaPlayerSide
-	17, // 14: arena.v1.ArenaPlayer.freeze_until:type_name -> google.protobuf.Timestamp
-	17, // 15: arena.v1.ArenaPlayer.accepted_at:type_name -> google.protobuf.Timestamp
-	17, // 16: arena.v1.ArenaPlayer.joined_at:type_name -> google.protobuf.Timestamp
+	18, // 14: arena.v1.ArenaPlayer.freeze_until:type_name -> google.protobuf.Timestamp
+	18, // 15: arena.v1.ArenaPlayer.accepted_at:type_name -> google.protobuf.Timestamp
+	18, // 16: arena.v1.ArenaPlayer.joined_at:type_name -> google.protobuf.Timestamp
 	4,  // 17: arena.v1.ArenaLeaderboardEntry.league:type_name -> arena.v1.ArenaLeague
 	6,  // 18: arena.v1.ArenaService.CreateMatch:input_type -> arena.v1.CreateMatchRequest
 	7,  // 19: arena.v1.ArenaService.GetMatch:input_type -> arena.v1.GetMatchRequest
 	8,  // 20: arena.v1.ArenaService.JoinMatch:input_type -> arena.v1.JoinMatchRequest
 	9,  // 21: arena.v1.ArenaService.SubmitCode:input_type -> arena.v1.SubmitCodeRequest
 	12, // 22: arena.v1.ArenaService.GetLeaderboard:input_type -> arena.v1.GetLeaderboardRequest
-	11, // 23: arena.v1.ArenaService.CreateMatch:output_type -> arena.v1.ArenaMatchResponse
-	11, // 24: arena.v1.ArenaService.GetMatch:output_type -> arena.v1.ArenaMatchResponse
-	11, // 25: arena.v1.ArenaService.JoinMatch:output_type -> arena.v1.ArenaMatchResponse
-	10, // 26: arena.v1.ArenaService.SubmitCode:output_type -> arena.v1.SubmitCodeResponse
-	13, // 27: arena.v1.ArenaService.GetLeaderboard:output_type -> arena.v1.GetLeaderboardResponse
-	23, // [23:28] is the sub-list for method output_type
-	18, // [18:23] is the sub-list for method input_type
+	14, // 23: arena.v1.ArenaService.LeaveMatch:input_type -> arena.v1.LeaveMatchRequest
+	11, // 24: arena.v1.ArenaService.CreateMatch:output_type -> arena.v1.ArenaMatchResponse
+	11, // 25: arena.v1.ArenaService.GetMatch:output_type -> arena.v1.ArenaMatchResponse
+	11, // 26: arena.v1.ArenaService.JoinMatch:output_type -> arena.v1.ArenaMatchResponse
+	10, // 27: arena.v1.ArenaService.SubmitCode:output_type -> arena.v1.SubmitCodeResponse
+	13, // 28: arena.v1.ArenaService.GetLeaderboard:output_type -> arena.v1.GetLeaderboardResponse
+	11, // 29: arena.v1.ArenaService.LeaveMatch:output_type -> arena.v1.ArenaMatchResponse
+	24, // [24:30] is the sub-list for method output_type
+	18, // [18:24] is the sub-list for method input_type
 	18, // [18:18] is the sub-list for extension type_name
 	18, // [18:18] is the sub-list for extension extendee
 	0,  // [0:18] is the sub-list for field type_name
@@ -1451,7 +1503,7 @@ func file_arena_v1_arena_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_arena_v1_arena_proto_rawDesc), len(file_arena_v1_arena_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   11,
+			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

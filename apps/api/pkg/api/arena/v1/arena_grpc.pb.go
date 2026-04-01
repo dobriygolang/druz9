@@ -24,6 +24,7 @@ const (
 	ArenaService_JoinMatch_FullMethodName      = "/arena.v1.ArenaService/JoinMatch"
 	ArenaService_SubmitCode_FullMethodName     = "/arena.v1.ArenaService/SubmitCode"
 	ArenaService_GetLeaderboard_FullMethodName = "/arena.v1.ArenaService/GetLeaderboard"
+	ArenaService_LeaveMatch_FullMethodName     = "/arena.v1.ArenaService/LeaveMatch"
 )
 
 // ArenaServiceClient is the client API for ArenaService service.
@@ -35,6 +36,7 @@ type ArenaServiceClient interface {
 	JoinMatch(ctx context.Context, in *JoinMatchRequest, opts ...grpc.CallOption) (*ArenaMatchResponse, error)
 	SubmitCode(ctx context.Context, in *SubmitCodeRequest, opts ...grpc.CallOption) (*SubmitCodeResponse, error)
 	GetLeaderboard(ctx context.Context, in *GetLeaderboardRequest, opts ...grpc.CallOption) (*GetLeaderboardResponse, error)
+	LeaveMatch(ctx context.Context, in *LeaveMatchRequest, opts ...grpc.CallOption) (*ArenaMatchResponse, error)
 }
 
 type arenaServiceClient struct {
@@ -95,6 +97,16 @@ func (c *arenaServiceClient) GetLeaderboard(ctx context.Context, in *GetLeaderbo
 	return out, nil
 }
 
+func (c *arenaServiceClient) LeaveMatch(ctx context.Context, in *LeaveMatchRequest, opts ...grpc.CallOption) (*ArenaMatchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArenaMatchResponse)
+	err := c.cc.Invoke(ctx, ArenaService_LeaveMatch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArenaServiceServer is the server API for ArenaService service.
 // All implementations must embed UnimplementedArenaServiceServer
 // for forward compatibility.
@@ -104,6 +116,7 @@ type ArenaServiceServer interface {
 	JoinMatch(context.Context, *JoinMatchRequest) (*ArenaMatchResponse, error)
 	SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error)
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
+	LeaveMatch(context.Context, *LeaveMatchRequest) (*ArenaMatchResponse, error)
 	mustEmbedUnimplementedArenaServiceServer()
 }
 
@@ -128,6 +141,9 @@ func (UnimplementedArenaServiceServer) SubmitCode(context.Context, *SubmitCodeRe
 }
 func (UnimplementedArenaServiceServer) GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetLeaderboard not implemented")
+}
+func (UnimplementedArenaServiceServer) LeaveMatch(context.Context, *LeaveMatchRequest) (*ArenaMatchResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LeaveMatch not implemented")
 }
 func (UnimplementedArenaServiceServer) mustEmbedUnimplementedArenaServiceServer() {}
 func (UnimplementedArenaServiceServer) testEmbeddedByValue()                      {}
@@ -240,6 +256,24 @@ func _ArenaService_GetLeaderboard_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArenaService_LeaveMatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaveMatchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).LeaveMatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_LeaveMatch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).LeaveMatch(ctx, req.(*LeaveMatchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArenaService_ServiceDesc is the grpc.ServiceDesc for ArenaService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +300,10 @@ var ArenaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetLeaderboard",
 			Handler:    _ArenaService_GetLeaderboard_Handler,
+		},
+		{
+			MethodName: "LeaveMatch",
+			Handler:    _ArenaService_LeaveMatch_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -40,6 +40,13 @@ service ArenaService {
       get: "/api/v1/arena/leaderboard"
     };
   }
+
+  rpc LeaveMatch(LeaveMatchRequest) returns (ArenaMatchResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/matches/{match_id}/leave"
+      body: "*"
+    };
+  }
 }
 
 message CreateMatchRequest {
@@ -99,6 +106,10 @@ message GetLeaderboardRequest {
 
 message GetLeaderboardResponse {
   repeated ArenaLeaderboardEntry entries = 1;
+}
+
+message LeaveMatchRequest {
+  string match_id = 1;
 }
 
 message ArenaMatch {
