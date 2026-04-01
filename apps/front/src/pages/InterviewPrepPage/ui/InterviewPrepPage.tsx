@@ -30,11 +30,9 @@ export function InterviewPrepPage() {
   }, []);
 
   const summary = useMemo(() => {
-    const executableCount = tasks.filter((task) => task.isExecutable).length;
     return {
       total: tasks.length,
-      executableCount,
-      guidedCount: tasks.length - executableCount,
+      guidedCount: tasks.filter((task) => !task.isExecutable).length,
     };
   }, [tasks]);
 
@@ -61,7 +59,7 @@ export function InterviewPrepPage() {
       <div className="page-header code-rooms-hero">
         <div className="code-rooms-hero__copy">
           <span className="code-rooms-kicker">Trusted Only</span>
-          <h1>Подготовка к Go собеседованиям</h1>
+          <h1>Подготовка к техническим собеседованиям</h1>
           <p className="code-rooms-subtitle">
             Выбираешь формат, решаешь задачу как в песочнице и проходишь прикрепленные follow-up вопросы по очереди.
           </p>

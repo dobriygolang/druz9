@@ -75,6 +75,8 @@ func protoLanguageToModel(language v1.ProgrammingLanguage) model.ProgrammingLang
 		return model.ProgrammingLanguageCpp
 	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVA:
 		return model.ProgrammingLanguageJava
+	case v1.ProgrammingLanguage(8):
+		return model.ProgrammingLanguageSQL
 	default:
 		return model.ProgrammingLanguageUnknown
 	}

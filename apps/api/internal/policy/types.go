@@ -31,7 +31,9 @@ const (
 type Language string
 
 const (
-	LanguageGo Language = "go"
+	LanguageGo     Language = "go"
+	LanguagePython Language = "python"
+	LanguageSQL    Language = "sql"
 )
 
 type SandboxPolicy struct {

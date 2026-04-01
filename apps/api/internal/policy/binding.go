@@ -11,6 +11,19 @@ func TaskSpecForCodeEditorRun() TaskSpec {
 	}
 }
 
+func LanguageForProgrammingLanguage(language model.ProgrammingLanguage) Language {
+	switch language {
+	case model.ProgrammingLanguagePython:
+		return LanguagePython
+	case model.ProgrammingLanguageSQL:
+		return LanguageSQL
+	case model.ProgrammingLanguageGo:
+		fallthrough
+	default:
+		return LanguageGo
+	}
+}
+
 func TaskSpecForArenaTask(task *model.CodeTask) TaskSpec {
 	spec := TaskSpecFromCodeTask(task, TaskTypeArenaDuel)
 	spec.Type = TaskTypeArenaDuel
@@ -38,9 +51,7 @@ func TaskSpecFromCodeTask(task *model.CodeTask, fallback TaskType) TaskSpec {
 	spec.MockEndpoints = append([]string(nil), task.MockEndpoints...)
 	spec.WritableTempDir = task.WritableTempDir
 
-	if task.Language == model.ProgrammingLanguageGo {
-		spec.Language = LanguageGo
-	}
+	spec.Language = LanguageForProgrammingLanguage(task.Language)
 	for _, port := range task.AllowedPorts {
 		spec.AllowedPorts = append(spec.AllowedPorts, int(port))
 	}

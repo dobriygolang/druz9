@@ -22,6 +22,7 @@ export interface InterviewPrepTask {
   runnerMode: string;
   durationSeconds: number;
   starterCode: string;
+  codeTaskId?: string;
   /** Only populated in admin context */
   referenceSolution?: string;
   isActive: boolean;
@@ -59,6 +60,10 @@ export interface InterviewPrepSession {
 export interface InterviewPrepSubmitResult {
   passed: boolean;
   lastError: string;
+  passedCount: number;
+  totalCount: number;
+  failedTestIndex: number;
+  failureKind: string;
   session?: InterviewPrepSession;
 }
 
@@ -87,6 +92,7 @@ const normalizeTask = (task: any): InterviewPrepTask => ({
   runnerMode: task.runnerMode ?? task.runner_mode ?? 'function_io',
   durationSeconds: Number(task.durationSeconds ?? task.duration_seconds ?? 1800),
   starterCode: task.starterCode ?? task.starter_code ?? '',
+  codeTaskId: task.codeTaskId ?? task.code_task_id ?? '',
   referenceSolution: task.referenceSolution ?? task.reference_solution ?? '',
   isActive: Boolean(task.isActive ?? task.is_active),
   createdAt: task.createdAt ?? task.created_at,
@@ -152,6 +158,10 @@ export const interviewPrepApi = {
     return {
       passed: Boolean(result?.passed ?? false),
       lastError: result?.lastError ?? '',
+      passedCount: Number(result?.passedCount ?? result?.passed_count ?? 0),
+      totalCount: Number(result?.totalCount ?? result?.total_count ?? 0),
+      failedTestIndex: Number(result?.failedTestIndex ?? result?.failed_test_index ?? 0),
+      failureKind: result?.failureKind ?? result?.failure_kind ?? '',
       session: result?.session ? normalizeSession(result.session) : undefined,
     };
   },
@@ -190,6 +200,7 @@ export const interviewPrepApi = {
     runnerMode: string;
     durationSeconds: number;
     starterCode: string;
+    codeTaskId?: string;
     referenceSolution: string;
     isActive: boolean;
   }): Promise<InterviewPrepTask> => {
@@ -208,6 +219,7 @@ export const interviewPrepApi = {
     runnerMode: string;
     durationSeconds: number;
     starterCode: string;
+    codeTaskId?: string;
     referenceSolution: string;
     isActive: boolean;
   }): Promise<InterviewPrepTask> => {

@@ -239,7 +239,7 @@ func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid
 	result, err := s.sandbox.Execute(ctx, sandbox.ExecutionRequest{
 		Code:       code,
 		Task:       policy.TaskSpecForCodeEditorRun(),
-		Language:   policy.LanguageGo,
+		Language:   policy.LanguageForProgrammingLanguage(model.ProgrammingLanguageGo),
 		RunnerMode: model.RunnerModeProgram.String(),
 	})
 	if err != nil {

@@ -3,8 +3,8 @@ package code_editor
 import (
 	"context"
 
-	"api/internal/server"
 	realtime "api/internal/realtime/schema"
+	"api/internal/server"
 	v1 "api/pkg/api/code_editor/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"

@@ -121,6 +121,7 @@ const (
 	ProgrammingLanguageRust
 	ProgrammingLanguageCpp
 	ProgrammingLanguageJava
+	ProgrammingLanguageSQL
 )
 
 func (l ProgrammingLanguage) String() string {
@@ -139,6 +140,8 @@ func (l ProgrammingLanguage) String() string {
 		return "cpp"
 	case ProgrammingLanguageJava:
 		return "java"
+	case ProgrammingLanguageSQL:
+		return "sql"
 	default:
 		return ""
 	}
@@ -160,6 +163,8 @@ func ProgrammingLanguageFromString(s string) ProgrammingLanguage {
 		return ProgrammingLanguageCpp
 	case "java":
 		return ProgrammingLanguageJava
+	case "sql":
+		return ProgrammingLanguageSQL
 	default:
 		return ProgrammingLanguageUnknown
 	}

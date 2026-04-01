@@ -41,6 +41,11 @@ const RUNNER_MODE_OPTIONS = [
   { value: 'program', label: 'program (main/stdin/stdout)' },
   { value: 'function_io', label: 'function_io (solve(input string) string)' },
 ];
+const LANGUAGE_OPTIONS = [
+  { value: 'go', label: 'Go' },
+  { value: 'python', label: 'Python' },
+  { value: 'sql', label: 'SQL' },
+];
 const POLICY_PRESET_BY_TASK_TYPE: Record<string, string> = {
   algorithm_practice: 'pure',
   arena_duel: 'pure',
@@ -638,6 +643,14 @@ export const CodeTasksAdminPage: React.FC = () => {
                 <div className="form-group">
                   <label>Topics через запятую</label>
                   <input className="input" value={taskForm.topics} onChange={(e) => setTaskForm((prev) => ({ ...prev, topics: e.target.value }))} placeholder="two-pointers, linked-list" />
+                </div>
+                <div className="form-group">
+                  <label>Language</label>
+                  <FancySelect
+                    value={taskForm.language}
+                    options={LANGUAGE_OPTIONS}
+                    onChange={(language) => setTaskForm((prev) => ({ ...prev, language }))}
+                  />
                 </div>
                 <div className="form-group">
                   <label>Task type</label>

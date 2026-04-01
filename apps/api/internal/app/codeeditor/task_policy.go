@@ -97,12 +97,7 @@ func policyTaskTypeForTask(task *domain.Task, fallback policy.TaskType) policy.T
 }
 
 func policyLanguageForTask(language model.ProgrammingLanguage) policy.Language {
-	switch language {
-	case model.ProgrammingLanguageGo:
-		return policy.LanguageGo
-	default:
-		return policy.LanguageGo
-	}
+	return policy.LanguageForProgrammingLanguage(language)
 }
 
 func cloneStrings(values []string) []string {

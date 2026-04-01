@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { CheckCircle2, CircleDashed, Clock3, RotateCcw, XCircle } from 'lucide-react';
+import Editor from '@monaco-editor/react';
+import { CheckCircle2, CircleDashed, Clock3, Play, RotateCcw, TerminalSquare, XCircle } from 'lucide-react';
 
 import {
   interviewPrepApi,
@@ -8,6 +9,7 @@ import {
   InterviewPrepQuestionResult,
   InterviewPrepSession,
 } from '@/features/InterviewPrep/api/interviewPrepApi';
+import { displayLanguageLabel, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
 
 const resultLabel: Record<InterviewPrepQuestionResult['selfAssessment'], string> = {
   answered: 'Ответил сам',
@@ -21,6 +23,16 @@ export function InterviewPrepSessionPage() {
   const [error, setError] = useState<string | null>(null);
   const [answering, setAnswering] = useState(false);
   const [revealedQuestion, setRevealedQuestion] = useState<InterviewPrepQuestion | null>(null);
+  const [code, setCode] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+  const [submitResult, setSubmitResult] = useState<{
+    passed: boolean;
+    lastError: string;
+    passedCount: number;
+    totalCount: number;
+    failedTestIndex: number;
+    failureKind: string;
+  } | null>(null);
 
   useEffect(() => {
     if (!sessionId) return;
@@ -34,11 +46,43 @@ export function InterviewPrepSessionPage() {
       .finally(() => setLoading(false));
   }, [sessionId]);
 
+  useEffect(() => {
+    setCode(session?.code ?? session?.task?.starterCode ?? '');
+  }, [session?.id, session?.code, session?.task?.starterCode]);
+
   const progress = useMemo(() => {
     const answeredCount = session?.results?.length ?? 0;
-    const currentPosition = session?.currentQuestion?.position ?? answeredCount;
-    return { answeredCount, currentPosition };
+    return { answeredCount };
   }, [session]);
+
+  const canShowQuestions = Boolean(
+    session?.currentQuestion && (!session?.task?.isExecutable || session?.lastSubmissionPassed),
+  );
+
+  const handleSubmitCode = async () => {
+    if (!sessionId || !session?.task?.isExecutable) return;
+    setSubmitting(true);
+    setError(null);
+    try {
+      const result = await interviewPrepApi.submit(sessionId, code);
+      setSubmitResult({
+        passed: result.passed,
+        lastError: result.lastError,
+        passedCount: result.passedCount,
+        totalCount: result.totalCount,
+        failedTestIndex: result.failedTestIndex,
+        failureKind: result.failureKind,
+      });
+      if (result.session) {
+        setSession(result.session);
+      }
+    } catch (e: any) {
+      console.error('Failed to submit code:', e);
+      setError(e.response?.data?.error || 'Не удалось проверить решение');
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
   const handleAnswer = async (selfAssessment: 'answered' | 'skipped') => {
     if (!sessionId || !session?.currentQuestion) return;
@@ -74,7 +118,7 @@ export function InterviewPrepSessionPage() {
         <div>
           <div className="task-item__meta">
             <span className="badge">{session.task?.prepType}</span>
-            <span className="badge">{session.task?.language}</span>
+            <span className="badge">{displayLanguageLabel(session.task?.language)}</span>
             <span className="badge">
               <Clock3 size={12} />
               {session.task ? Math.round(session.task.durationSeconds / 60) : 0} мин
@@ -165,12 +209,65 @@ export function InterviewPrepSessionPage() {
         </aside>
       </section>
 
+      {session.task?.isExecutable && (
+        <section className="card dashboard-card interview-prep-live-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>Live coding</h2>
+              <p className="interview-prep-muted">
+                У каждого пользователя свой editor и свой `session_id`, поэтому решения одной и той же задачи не пересекаются.
+              </p>
+            </div>
+            <TerminalSquare size={18} />
+          </div>
+          <div className="interview-prep-live-toolbar">
+            <span className="badge">{displayLanguageLabel(session.task.language)}</span>
+            <span className={`badge ${session.lastSubmissionPassed ? 'badge-success' : 'badge-secondary'}`}>
+              {session.lastSubmissionPassed ? 'Проверка пройдена' : 'Ожидается accepted'}
+            </span>
+          </div>
+          <div className="interview-prep-live-editor">
+            <Editor
+              height="100%"
+              defaultLanguage={monacoLanguageFor(session.task.language)}
+              language={monacoLanguageFor(session.task.language)}
+              value={code}
+              onChange={(value) => setCode(value ?? '')}
+              theme="vs-dark"
+              options={{
+                minimap: { enabled: false },
+                fontSize: 14,
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                tabSize: 2,
+              }}
+            />
+          </div>
+          <div className="interview-prep-live-actions">
+            <button className="btn btn-primary" onClick={() => void handleSubmitCode()} disabled={submitting}>
+              <Play size={16} />
+              <span>{submitting ? 'Проверяю...' : 'Отправить на проверку'}</span>
+            </button>
+            {submitResult && (
+              <div className={`interview-prep-live-result ${submitResult.passed ? 'is-success' : 'is-error'}`}>
+                <strong>{submitResult.passed ? 'Accepted' : `Тесты ${submitResult.passedCount}/${submitResult.totalCount}`}</strong>
+                <span>
+                  {submitResult.passed
+                    ? 'Решение прошло автопроверку, можно переходить к follow-up.'
+                    : submitResult.lastError || 'Решение не прошло автопроверку.'}
+                </span>
+              </div>
+            )}
+          </div>
+        </section>
+      )}
+
       {session.status === 'finished' ? (
         <section className="card dashboard-card interview-prep-finished">
           <CheckCircle2 size={18} />
           <span>Сессия завершена. Можешь взять следующую задачу или пройти эту заново позже.</span>
         </section>
-      ) : session.currentQuestion ? (
+      ) : canShowQuestions && session.currentQuestion ? (
         <section className="card dashboard-card interview-prep-question-card">
           <div className="dashboard-card__header">
             <div>

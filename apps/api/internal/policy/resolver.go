@@ -9,7 +9,7 @@ func ResolvePolicy(task TaskSpec) (SandboxPolicy, error) {
 	if task.Language == "" {
 		task.Language = LanguageGo
 	}
-	if task.Language != LanguageGo {
+	if task.Language != LanguageGo && task.Language != LanguagePython && task.Language != LanguageSQL {
 		return SandboxPolicy{}, fmt.Errorf("%w: %s", ErrUnsupportedLang, task.Language)
 	}
 	if !isSupportedTaskType(task.Type) {

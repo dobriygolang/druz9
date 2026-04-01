@@ -18,6 +18,7 @@ func scanTask(s scanner) (*model.InterviewPrepTask, error) {
 		&item.DurationSeconds,
 		&item.StarterCode,
 		&item.ReferenceSolution,
+		&item.CodeTaskID,
 		&item.IsActive,
 		&item.CreatedAt,
 		&item.UpdatedAt,

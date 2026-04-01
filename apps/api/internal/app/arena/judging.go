@@ -2,13 +2,10 @@ package arena
 
 import (
 	"context"
-	"strings"
 	"time"
 
+	"api/internal/app/taskjudge"
 	domain "api/internal/domain/arena"
-	"api/internal/model"
-	"api/internal/policy"
-	"api/internal/sandbox"
 
 	"github.com/google/uuid"
 )
@@ -37,9 +34,12 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 	if task == nil {
 		return nil, nil, domain.ErrTaskNotFound
 	}
-	testCases := append([]*domain.TestCase{}, task.PublicTestCases...)
-	testCases = append(testCases, task.HiddenTestCases...)
 	if err := s.repo.SavePlayerCode(ctx, matchID, user.ID, code); err != nil {
+		return nil, nil, err
+	}
+
+	judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, task, code)
+	if err != nil {
 		return nil, nil, err
 	}
 
@@ -49,72 +49,15 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 		UserID:      user.ID,
 		Code:        code,
 		SubmittedAt: time.Now(),
-		TotalCount:  safeArenaInt32(len(testCases)),
+		TotalCount:  judgeResult.TotalCount,
 	}
-
-	var lastOutput string
-	var lastError string
-	failedTestIndex := int32(0)
-	failureKind := model.ArenaSubmissionFailureKindUnknown
-	startedAt := time.Now()
-	taskSpec := policy.TaskSpecForArenaTask(task)
-	for i, tc := range testCases {
-		result, runErr := s.sandbox.Execute(ctx, sandbox.ExecutionRequest{
-			Code:       code,
-			Input:      tc.Input,
-			Task:       taskSpec,
-			Language:   policy.LanguageGo,
-			RunnerMode: task.RunnerMode.String(),
-		})
-		if runErr != nil {
-			lastError = strings.TrimSpace(runErr.Error())
-			if lastError == "" {
-				lastError = "sandbox execution failed"
-			}
-
-			failedTestIndex = int32(i + 1)
-
-			lowerErr := strings.ToLower(lastError)
-			switch {
-			case strings.Contains(lowerErr, "timed out"),
-				strings.Contains(lowerErr, "timeout"):
-				failureKind = model.ArenaSubmissionFailureKindTimeout
-
-			case strings.Contains(lowerErr, "compile"),
-				strings.Contains(lowerErr, "syntax error"),
-				strings.Contains(lowerErr, "undefined:"),
-				strings.Contains(lowerErr, "undeclared"),
-				strings.Contains(lowerErr, "cannot use"),
-				strings.Contains(lowerErr, "declared and not used"),
-				strings.Contains(lowerErr, "imported and not used"),
-				strings.Contains(lowerErr, "missing return"),
-				strings.Contains(lowerErr, "too many arguments in call"),
-				strings.Contains(lowerErr, "not enough arguments in call"):
-				failureKind = model.ArenaSubmissionFailureKindCompileError
-				failedTestIndex = 0
-
-			default:
-				failureKind = model.ArenaSubmissionFailureKindRuntimeError
-			}
-
-			break
-		}
-		lastOutput = result.Output
-		if sandbox.NormalizeOutput(result.Output) == sandbox.NormalizeOutput(tc.ExpectedOutput) {
-			submission.PassedCount++
-			continue
-		}
-		lastError = "wrong answer"
-		failedTestIndex = int32(i + 1)
-		failureKind = model.ArenaSubmissionFailureKindWrongAnswer
-		break
-	}
-	submission.Output = lastOutput
-	submission.Error = lastError
-	submission.RuntimeMs = time.Since(startedAt).Milliseconds()
-	submission.IsCorrect = submission.TotalCount > 0 && submission.PassedCount == submission.TotalCount
-	submission.FailedTestIndex = failedTestIndex
-	submission.FailureKind = failureKind
+	submission.PassedCount = judgeResult.PassedCount
+	submission.Output = judgeResult.LastOutput
+	submission.Error = judgeResult.LastError
+	submission.RuntimeMs = judgeResult.RuntimeMs
+	submission.IsCorrect = judgeResult.Passed
+	submission.FailedTestIndex = judgeResult.FailedTestIndex
+	submission.FailureKind = judgeResult.FailureKind
 
 	if !submission.IsCorrect {
 		freezeUntil := time.Now().Add(time.Duration(freezePenaltySeconds) * time.Second)
@@ -149,14 +92,4 @@ func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domai
 	}
 
 	return created, match, nil
-}
-
-func safeArenaInt32(value int) int32 {
-	if value > int(^uint32(0)>>1) {
-		return int32(^uint32(0) >> 1)
-	}
-	if value < -int(^uint32(0)>>1)-1 {
-		return -int32(^uint32(0)>>1) - 1
-	}
-	return int32(value)
 }

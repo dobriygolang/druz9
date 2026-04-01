@@ -63,6 +63,10 @@ function normalizeProgrammingLanguage(value: any): string {
     case 'PROGRAMMING_LANGUAGE_JAVA':
     case 'java':
       return 'java';
+    case 8:
+    case 'PROGRAMMING_LANGUAGE_SQL':
+    case 'sql':
+      return 'sql';
     default:
       return 'go';
   }
@@ -77,6 +81,7 @@ function toProgrammingLanguageEnum(value?: string): number {
     case 'rust': return 5;
     case 'cpp': return 6;
     case 'java': return 7;
+    case 'sql': return 8;
     default: return 4;
   }
 }

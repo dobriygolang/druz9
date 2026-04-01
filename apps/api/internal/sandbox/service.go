@@ -21,7 +21,9 @@ const (
 	privateFileMode = 0o600
 )
 
-// Service executes Go code in isolated environment.
+const sqliteBootstrap = ".mode list\n.headers off\n.nullvalue NULL\n"
+
+// Service executes code in an isolated temporary environment.
 type Service struct{}
 
 type ExecutionRequest struct {
@@ -100,7 +102,7 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 		runDir = filepath.Join(tmpDir, "work")
 	}
 
-	runArgs, err := prepareGoSources(tmpDir, req)
+	command, runArgs, stdin, err := prepareExecution(tmpDir, req)
 	if err != nil {
 		return "", false, err
 	}
@@ -110,11 +112,11 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 		return "", false, err
 	}
 
-	// #nosec G204 -- arguments are constrained to generated local Go sources inside the sandbox temp dir.
-	cmd := exec.CommandContext(execCtx, "go", append([]string{"run"}, runArgs...)...)
+	// #nosec G204 -- command/args are selected from a small fixed allowlist and point to local temp files.
+	cmd := exec.CommandContext(execCtx, command, runArgs...)
 	cmd.Dir = runDir
 	cmd.Env = execEnv
-	cmd.Stdin = bytes.NewBufferString(req.Input)
+	cmd.Stdin = bytes.NewBufferString(stdin)
 
 	output, err := cmd.CombinedOutput()
 	if err != nil {
@@ -141,7 +143,59 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 	return outputStr, false, nil
 }
 
-func prepareGoSources(root string, req ExecutionRequest) ([]string, error) {
+func prepareExecution(root string, req ExecutionRequest) (string, []string, string, error) {
+	switch req.Language {
+	case policy.LanguagePython:
+		args, stdin, err := preparePythonSources(root, req)
+		return "python3", args, stdin, err
+	case policy.LanguageSQL:
+		args, stdin, err := prepareSQLSources(root, req)
+		return "sqlite3", args, stdin, err
+	case policy.LanguageGo, "":
+		args, stdin, err := prepareGoSources(root, req)
+		return "go", args, stdin, err
+	default:
+		return "", nil, "", fmt.Errorf("unsupported sandbox language: %s", req.Language)
+	}
+}
+
+func prepareGoSources(root string, req ExecutionRequest) ([]string, string, error) {
+	mode := strings.TrimSpace(req.RunnerMode)
+	if mode == "" {
+		mode = "program"
+	}
+
+	switch mode {
+		case "function_io":
+			workDir := filepath.Join(root, "work")
+			if err := os.MkdirAll(workDir, 0o755); err != nil {
+				return nil, "", fmt.Errorf("create work dir: %w", err)
+			}
+
+		goModFile := filepath.Join(workDir, "go.mod")
+		if err := os.WriteFile(goModFile, []byte("module sandbox\n\ngo 1.20\n"), privateFileMode); err != nil {
+			return nil, "", fmt.Errorf("write go.mod file: %w", err)
+		}
+
+		solutionFile := filepath.Join(workDir, "solution.go")
+		if err := os.WriteFile(solutionFile, []byte(req.Code), privateFileMode); err != nil {
+			return nil, "", fmt.Errorf("write solution file: %w", err)
+		}
+		wrapperFile := filepath.Join(workDir, "main.go")
+		if err := os.WriteFile(wrapperFile, []byte(goFunctionIOWrapper()), privateFileMode); err != nil {
+			return nil, "", fmt.Errorf("write wrapper file: %w", err)
+		}
+		return []string{"run", "."}, req.Input, nil
+	default:
+		mainFile := filepath.Join(root, "main.go")
+		if err := os.WriteFile(mainFile, []byte(req.Code), privateFileMode); err != nil {
+			return nil, "", fmt.Errorf("write code file: %w", err)
+		}
+		return []string{"run", mainFile}, req.Input, nil
+	}
+}
+
+func preparePythonSources(root string, req ExecutionRequest) ([]string, string, error) {
 	mode := strings.TrimSpace(req.RunnerMode)
 	if mode == "" {
 		mode = "program"
@@ -151,30 +205,39 @@ func prepareGoSources(root string, req ExecutionRequest) ([]string, error) {
 	case "function_io":
 		workDir := filepath.Join(root, "work")
 		if err := os.MkdirAll(workDir, 0o755); err != nil {
-			return nil, fmt.Errorf("create work dir: %w", err)
+			return nil, "", fmt.Errorf("create work dir: %w", err)
 		}
 
-		goModFile := filepath.Join(workDir, "go.mod")
-		if err := os.WriteFile(goModFile, []byte("module sandbox\n\ngo 1.20\n"), privateFileMode); err != nil {
-			return nil, fmt.Errorf("write go.mod file: %w", err)
-		}
-
-		solutionFile := filepath.Join(workDir, "solution.go")
+		solutionFile := filepath.Join(workDir, "solution.py")
 		if err := os.WriteFile(solutionFile, []byte(req.Code), privateFileMode); err != nil {
-			return nil, fmt.Errorf("write solution file: %w", err)
+			return nil, "", fmt.Errorf("write solution file: %w", err)
 		}
-		wrapperFile := filepath.Join(workDir, "main.go")
-		if err := os.WriteFile(wrapperFile, []byte(goFunctionIOWrapper()), privateFileMode); err != nil {
-			return nil, fmt.Errorf("write wrapper file: %w", err)
+		wrapperFile := filepath.Join(workDir, "main.py")
+		if err := os.WriteFile(wrapperFile, []byte(pythonFunctionIOWrapper()), privateFileMode); err != nil {
+			return nil, "", fmt.Errorf("write wrapper file: %w", err)
 		}
-		return []string{"."}, nil
+		return []string{"main.py"}, req.Input, nil
 	default:
-		mainFile := filepath.Join(root, "main.go")
+		mainFile := filepath.Join(root, "main.py")
 		if err := os.WriteFile(mainFile, []byte(req.Code), privateFileMode); err != nil {
-			return nil, fmt.Errorf("write code file: %w", err)
+			return nil, "", fmt.Errorf("write code file: %w", err)
 		}
-		return []string{mainFile}, nil
+		return []string{mainFile}, req.Input, nil
 	}
+}
+
+func prepareSQLSources(root string, req ExecutionRequest) ([]string, string, error) {
+	dbFile := filepath.Join(root, "sandbox.db")
+	setupScript := sqliteBootstrap + req.Input + "\n.read query.sql\n"
+	scriptFile := filepath.Join(root, "setup.sql")
+	if err := os.WriteFile(scriptFile, []byte(setupScript), privateFileMode); err != nil {
+		return nil, "", fmt.Errorf("write setup script: %w", err)
+	}
+	queryFile := filepath.Join(root, "query.sql")
+	if err := os.WriteFile(queryFile, []byte(req.Code), privateFileMode); err != nil {
+		return nil, "", fmt.Errorf("write query file: %w", err)
+	}
+	return []string{dbFile}, sqliteBootstrap + ".read setup.sql\n", nil
 }
 
 func goFunctionIOWrapper() string {
@@ -193,6 +256,22 @@ func main() {
 	}
 	fmt.Print(solve(string(input)))
 }
+`
+}
+
+func pythonFunctionIOWrapper() string {
+	return `from solution import solve
+import sys
+
+def main():
+    data = sys.stdin.read()
+    result = solve(data)
+    if result is None:
+        return
+    sys.stdout.write(str(result))
+
+if __name__ == "__main__":
+    main()
 `
 }
 
@@ -238,6 +317,8 @@ func buildExecutionEnv(root string, base []string) ([]string, error) {
 	env = append(env,
 		"HOME="+homeDir,
 		"GOCACHE="+cacheDir,
+		"PYTHONDONTWRITEBYTECODE=1",
+		"PYTHONUNBUFFERED=1",
 		"XDG_CACHE_HOME="+xdgCacheDir,
 		"TMPDIR="+root,
 	)

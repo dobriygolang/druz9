@@ -125,6 +125,21 @@ const (
 	ArenaSubmissionFailureKindTimeout
 )
 
+func (k ArenaSubmissionFailureKind) String() string {
+	switch k {
+	case ArenaSubmissionFailureKindCompileError:
+		return "compile_error"
+	case ArenaSubmissionFailureKindRuntimeError:
+		return "runtime_error"
+	case ArenaSubmissionFailureKindWrongAnswer:
+		return "wrong_answer"
+	case ArenaSubmissionFailureKindTimeout:
+		return "timeout"
+	default:
+		return ""
+	}
+}
+
 func (r ArenaWinnerReason) String() string {
 	switch r {
 	case ArenaWinnerReasonAcceptedTime:

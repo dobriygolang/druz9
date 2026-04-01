@@ -9,6 +9,7 @@ import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { useArenaRealtime } from '@/features/CodeRoom/api/useArenaRealtime';
 import { getStoredGuestId, getStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { AxiosError } from '@/shared/api/base';
+import { inferLanguageFromSource, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
 
 // Anti-cheat countdown timer component
 const AntiCheatCountdown: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
@@ -174,6 +175,7 @@ export const ArenaMatchPage: React.FC = () => {
   const [antiCheatNotice, setAntiCheatNotice] = useState('');
   const [antiCheatWasEnabled, setAntiCheatWasEnabled] = useState(false);
   const [showAntiCheatBanner, setShowAntiCheatBanner] = useState(false);
+  const arenaLanguage = monacoLanguageFor(inferLanguageFromSource(match?.starterCode));
 
   const hasJoinedRef = useRef(false);
   const isResizingRef = useRef(false);
@@ -892,8 +894,8 @@ export const ArenaMatchPage: React.FC = () => {
               ) : (
                 <Editor
                   height="100%"
-                  defaultLanguage="go"
-                  language="go"
+                  defaultLanguage={arenaLanguage}
+                  language={arenaLanguage}
                   value={leftCode}
                   onChange={(value) => {
                     if (!isSpectator) {

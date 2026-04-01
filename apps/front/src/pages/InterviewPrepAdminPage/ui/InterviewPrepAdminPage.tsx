@@ -9,6 +9,9 @@ import {
   InterviewPrepTask,
   InterviewPrepType,
 } from '@/features/InterviewPrep/api/interviewPrepApi';
+import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
+import { CodeTask } from '@/entities/CodeRoom/model/types';
+import { FancySelect } from '@/shared/ui/FancySelect';
 
 const PREP_TYPES: { value: InterviewPrepType; label: string }[] = [
   { value: 'coding', label: 'Coding' },
@@ -16,6 +19,12 @@ const PREP_TYPES: { value: InterviewPrepType; label: string }[] = [
   { value: 'system_design', label: 'System Design' },
   { value: 'sql', label: 'SQL' },
   { value: 'code_review', label: 'Code Review' },
+];
+
+const LANGUAGE_OPTIONS = [
+  { value: 'go', label: 'Go' },
+  { value: 'python', label: 'Python' },
+  { value: 'sql', label: 'SQL' },
 ];
 
 const DEFAULT_STARTER_CODE = `package main
@@ -39,6 +48,7 @@ type TaskFormState = {
   runnerMode: string;
   durationSeconds: number;
   starterCode: string;
+  codeTaskId: string;
   referenceSolution: string;
   isActive: boolean;
 };
@@ -62,6 +72,7 @@ const createEmptyTaskForm = (): TaskFormState => ({
   runnerMode: 'function_io',
   durationSeconds: 1800,
   starterCode: DEFAULT_STARTER_CODE,
+  codeTaskId: '',
   referenceSolution: '',
   isActive: true,
 });
@@ -92,6 +103,7 @@ const taskToForm = (task: InterviewPrepTask): TaskFormState => ({
   runnerMode: task.runnerMode,
   durationSeconds: task.durationSeconds,
   starterCode: task.starterCode || DEFAULT_STARTER_CODE,
+  codeTaskId: task.codeTaskId || '',
   referenceSolution: task.referenceSolution ?? '',
   isActive: task.isActive,
 });
@@ -106,6 +118,7 @@ const questionToForm = (question: InterviewPrepQuestion): QuestionFormState => (
 export const InterviewPrepAdminPage: React.FC = () => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<InterviewPrepTask[]>([]);
+  const [codeTasks, setCodeTasks] = useState<CodeTask[]>([]);
   const [questions, setQuestions] = useState<InterviewPrepQuestion[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -145,6 +158,8 @@ export const InterviewPrepAdminPage: React.FC = () => {
     try {
       const data = await interviewPrepApi.adminListTasks();
       setTasks(data);
+      const availableCodeTasks = await codeRoomApi.listTasks({ includeInactive: true });
+      setCodeTasks(availableCodeTasks);
     } catch (e: any) {
       console.error('Failed to load interview prep tasks:', e);
       setError(e.response?.data?.error || 'Не удалось загрузить задачи');
@@ -222,9 +237,9 @@ export const InterviewPrepAdminPage: React.FC = () => {
       const payload = {
         ...taskForm,
         slug: toSlug(taskForm.slug || taskForm.title),
-        language: 'go',
         executionProfile: taskForm.executionProfile || 'pure',
         runnerMode: taskForm.runnerMode || 'function_io',
+        codeTaskId: taskForm.codeTaskId || undefined,
       };
       if (taskForm.id) {
         await interviewPrepApi.adminUpdateTask(taskForm.id, payload);
@@ -438,6 +453,14 @@ export const InterviewPrepAdminPage: React.FC = () => {
                   </select>
                 </div>
                 <div className="form-group">
+                  <label>Язык</label>
+                  <FancySelect
+                    value={taskForm.language}
+                    options={LANGUAGE_OPTIONS}
+                    onChange={(language) => setTaskForm((prev) => ({ ...prev, language }))}
+                  />
+                </div>
+                <div className="form-group">
                   <label>Длительность, сек</label>
                   <input
                     className="input"
@@ -462,6 +485,23 @@ export const InterviewPrepAdminPage: React.FC = () => {
                     className="input"
                     value={taskForm.runnerMode}
                     onChange={(e) => setTaskForm((prev) => ({ ...prev, runnerMode: e.target.value }))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Code task для автопроверки</label>
+                  <FancySelect
+                    value={taskForm.codeTaskId || '__none__'}
+                    options={[
+                      { value: '__none__', label: 'Не привязано' },
+                      ...codeTasks.map((task) => ({
+                        value: task.id,
+                        label: `${task.title} (${task.language})`,
+                      })),
+                    ]}
+                    onChange={(codeTaskId) => setTaskForm((prev) => ({
+                      ...prev,
+                      codeTaskId: codeTaskId === '__none__' ? '' : codeTaskId,
+                    }))}
                   />
                 </div>
               </div>

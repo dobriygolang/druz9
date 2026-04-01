@@ -21,8 +21,8 @@ func ValidatePolicy(p SandboxPolicy) error {
 	if p.Profile == "" {
 		problems = append(problems, "profile is required")
 	}
-	if p.Language.Language != LanguageGo {
-		problems = append(problems, "only go language is currently supported")
+	if p.Language.Language != LanguageGo && p.Language.Language != LanguagePython && p.Language.Language != LanguageSQL {
+		problems = append(problems, "unsupported language")
 	}
 	if p.Limits.TimeLimitMs < minTimeLimitMs || p.Limits.TimeLimitMs > maxTimeLimitMs {
 		problems = append(problems, fmt.Sprintf("time_limit_ms must be within [%d,%d]", minTimeLimitMs, maxTimeLimitMs))
@@ -124,6 +124,10 @@ func validateFilesystem(p SandboxPolicy) []string {
 
 func validateImports(p SandboxPolicy) []string {
 	var problems []string
+
+	if p.Language.Language != LanguageGo {
+		return problems
+	}
 
 	if !p.Language.AllowUnsafe {
 		for _, blocked := range p.Language.Imports.Blocklist {

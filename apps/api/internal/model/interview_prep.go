@@ -94,6 +94,7 @@ type InterviewPrepTask struct {
 	DurationSeconds   int32
 	StarterCode       string
 	ReferenceSolution string
+	CodeTaskID        *uuid.UUID
 	IsActive          bool
 	CreatedAt         time.Time
 	UpdatedAt         time.Time

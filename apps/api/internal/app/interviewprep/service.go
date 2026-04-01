@@ -5,7 +5,9 @@ import (
 	"errors"
 	"time"
 
+	"api/internal/app/taskjudge"
 	"api/internal/model"
+	"api/internal/sandbox"
 
 	"github.com/google/uuid"
 )
@@ -19,11 +21,16 @@ var (
 	ErrQuestionLocked           = errors.New("question is locked or not current")
 	ErrInvalidAssessment        = errors.New("invalid self assessment")
 	ErrUnsupportedLanguage      = errors.New("unsupported interview prep language")
-	ErrExecutableTasksNotSupported = errors.New("executable interview prep tasks are not yet supported")
+	ErrExecutableTaskNotConfigured = errors.New("executable interview prep task is not linked to a code task")
 )
 
 type Config struct {
 	Repository Repository
+	Sandbox    Sandbox
+}
+
+type Sandbox interface {
+	Execute(ctx context.Context, req sandbox.ExecutionRequest) (sandbox.ExecutionResult, error)
 }
 
 type Repository interface {
@@ -42,15 +49,18 @@ type Repository interface {
 
 	UpsertQuestionResult(ctx context.Context, result *model.InterviewPrepQuestionResult) error
 	ListQuestionResults(ctx context.Context, sessionID uuid.UUID) ([]*model.InterviewPrepQuestionResult, error)
+	GetCodeTask(ctx context.Context, taskID uuid.UUID) (*model.CodeTask, error)
 }
 
 type Service struct {
-	repo Repository
+	repo    Repository
+	sandbox Sandbox
 }
 
 func New(c Config) *Service {
 	return &Service{
-		repo: c.Repository,
+		repo:    c.Repository,
+		sandbox: c.Sandbox,
 	}
 }
 
@@ -165,9 +175,13 @@ func (s *Service) GetSession(ctx context.Context, user *model.User, sessionID uu
 }
 
 type SubmitResult struct {
-	Passed    bool                          `json:"passed"`
-	LastError string                        `json:"lastError"`
-	Session   *model.InterviewPrepSession  `json:"session,omitempty"`
+	Passed          bool                         `json:"passed"`
+	LastError       string                       `json:"lastError"`
+	PassedCount     int32                        `json:"passedCount"`
+	TotalCount      int32                        `json:"totalCount"`
+	FailedTestIndex int32                        `json:"failedTestIndex"`
+	FailureKind     string                       `json:"failureKind"`
+	Session         *model.InterviewPrepSession  `json:"session,omitempty"`
 }
 
 func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string) (*SubmitResult, error) {
@@ -187,13 +201,55 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 	}
 
 	// Проверка: поддерживаемый язык
-	if session.Task.Language != "" && session.Task.Language != "go" {
+	if session.Task.Language != "" && session.Task.Language != "go" && session.Task.Language != "python" && session.Task.Language != "sql" {
 		return nil, ErrUnsupportedLanguage
 	}
 
-	// Executable tasks не поддержаны - нет test cases для валидации
 	if session.Task.IsExecutable {
-		return nil, ErrExecutableTasksNotSupported
+		if session.Task.CodeTaskID == nil {
+			return nil, ErrExecutableTaskNotConfigured
+		}
+
+		codeTask, err := s.repo.GetCodeTask(ctx, *session.Task.CodeTaskID)
+		if err != nil {
+			return nil, err
+		}
+		judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, codeTask, code)
+		if err != nil {
+			return nil, err
+		}
+
+		if err := s.repo.UpdateSessionCode(ctx, session.ID, code, judgeResult.Passed); err != nil {
+			return nil, err
+		}
+
+		if judgeResult.Passed && session.CurrentQuestionPosition == 0 {
+			nextQuestion, err := s.repo.GetQuestionByTaskAndPosition(ctx, session.TaskID, 1)
+			if err != nil {
+				return nil, err
+			}
+			if nextQuestion == nil {
+				if err := s.repo.FinishSession(ctx, session.ID); err != nil {
+					return nil, err
+				}
+			} else if err := s.repo.AdvanceSessionQuestion(ctx, session.ID, 1); err != nil {
+				return nil, err
+			}
+		}
+
+		nextSession, err := s.GetSession(ctx, user, session.ID)
+		if err != nil {
+			return nil, err
+		}
+		return &SubmitResult{
+			Passed:          judgeResult.Passed,
+			LastError:       judgeResult.LastError,
+			PassedCount:     judgeResult.PassedCount,
+			TotalCount:      judgeResult.TotalCount,
+			FailedTestIndex: judgeResult.FailedTestIndex,
+			FailureKind:     judgeResult.FailureKind.String(),
+			Session:         nextSession,
+		}, nil
 	}
 
 	// Non-executable задачи - пока только question-based flow

@@ -5,9 +5,8 @@ import (
 	"fmt"
 	"math"
 
+	"api/internal/app/taskjudge"
 	domain "api/internal/domain/codeeditor"
-	"api/internal/policy"
-	"api/internal/sandbox"
 
 	"github.com/google/uuid"
 )
@@ -26,32 +25,9 @@ func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID 
 
 	task := &taskPtr
 
-	testCases := append([]*domain.TestCase{}, task.PublicTestCases...)
-	testCases = append(testCases, task.HiddenTestCases...)
-	totalCount := len(testCases)
-	passedCount := 0
-	var lastOutput string
-	var lastError string
-	taskSpec := policy.TaskSpecFromCodeTask(task, policy.TaskTypeAlgorithmPractice)
-
-	for _, tc := range testCases {
-		result, runErr := s.sandbox.Execute(ctx, sandbox.ExecutionRequest{
-			Code:       code,
-			Input:      tc.Input,
-			Task:       taskSpec,
-			Language:   policy.LanguageGo,
-			RunnerMode: task.RunnerMode.String(),
-		})
-		if runErr != nil {
-			lastError = runErr.Error()
-			break
-		}
-		lastOutput = result.Output
-		if sandbox.NormalizeOutput(result.Output) == sandbox.NormalizeOutput(tc.ExpectedOutput) {
-			passedCount++
-			continue
-		}
-		lastError = "wrong answer"
+	judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, task, code)
+	if err != nil {
+		return nil, err
 	}
 
 	submission := &domain.Submission{
@@ -60,12 +36,12 @@ func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID 
 		UserID:      userID,
 		GuestName:   guestName,
 		Code:        code,
-		Output:      lastOutput,
-		Error:       lastError,
+		Output:      judgeResult.LastOutput,
+		Error:       judgeResult.LastError,
 		SubmittedAt: now(),
-		IsCorrect:   totalCount > 0 && passedCount == totalCount,
-		PassedCount: safeInt32(passedCount),
-		TotalCount:  safeInt32(totalCount),
+		IsCorrect:   judgeResult.Passed,
+		PassedCount: judgeResult.PassedCount,
+		TotalCount:  judgeResult.TotalCount,
 	}
 
 	if room.StartedAt != nil {
