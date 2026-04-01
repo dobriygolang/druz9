@@ -34,7 +34,6 @@ func mapUser(user *model.User) *profilev1.User {
 		FirstName:         user.FirstName,
 		LastName:          user.LastName,
 		AvatarUrl:         avatarURL,
-		TelegramAvatarUrl: user.TelegramAvatarURL,
 		CurrentWorkplace:  user.CurrentWorkplace,
 		Region:            user.Geo.Region,
 		Latitude:          user.Geo.Latitude,
@@ -43,6 +42,5 @@ func mapUser(user *model.User) *profilev1.User {
 		IsAdmin:           user.IsAdmin,
 		IsTrusted:         user.IsTrusted,
 		CreatedAt:         timestamppb.New(user.CreatedAt),
-		UpdatedAt:         timestamppb.New(user.UpdatedAt),
 	}
 }

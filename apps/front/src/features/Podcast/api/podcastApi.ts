@@ -21,8 +21,6 @@ type BackendPodcast = {
   isUploaded?: boolean;
   created_at?: string;
   createdAt?: string;
-  updated_at?: string;
-  updatedAt?: string;
 };
 
 type ListPodcastsResponse = {

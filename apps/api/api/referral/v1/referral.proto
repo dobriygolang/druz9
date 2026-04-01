@@ -90,8 +90,6 @@ message Referral {
   string id = 1;
   string user_id = 2;
   string author_name = 3;
-  string author_telegram_username = 4;
-  string author_telegram_profile_url = 5;
   string title = 6;
   string company = 7;
   string vacancy_url = 8;
@@ -101,5 +99,4 @@ message Referral {
   EmploymentType employment_type = 12;
   bool is_owner = 13;
   google.protobuf.Timestamp created_at = 14;
-  google.protobuf.Timestamp updated_at = 15;
 }

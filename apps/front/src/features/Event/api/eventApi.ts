@@ -18,14 +18,6 @@ type BackendEventParticipant = {
   title?: string;
   avatar_url?: string;
   avatarUrl?: string;
-  telegram_avatar_url?: string;
-  telegramAvatarUrl?: string;
-  telegram_username?: string;
-  telegramUsername?: string;
-  first_name?: string;
-  firstName?: string;
-  last_name?: string;
-  lastName?: string;
   status?: EventParticipant['status'];
 };
 
@@ -76,14 +68,10 @@ function normalizeParticipantStatus(value: unknown): EventParticipant['status'] 
 function normalizeParticipant(
   participant: BackendEventParticipant,
 ): EventParticipant {
-  // S3 avatar has priority, fallback to Telegram avatar
-  const s3Avatar = participant.avatar_url ?? participant.avatarUrl ?? '';
-  const telegramAvatar = participant.telegram_avatar_url ?? participant.telegramAvatarUrl ?? '';
-
   return {
     user_id: participant.user_id ?? participant.userId ?? '',
     title: participant.title ?? '',
-    avatar_url: s3Avatar || telegramAvatar,
+    avatar_url: participant.avatar_url ?? participant.avatarUrl ?? '',
     status: normalizeParticipantStatus(participant.status),
   };
 }

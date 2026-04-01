@@ -135,7 +135,6 @@ message Podcast {
   MediaContentType content_type = 8;
   bool is_uploaded = 9;
   google.protobuf.Timestamp created_at = 10;
-  google.protobuf.Timestamp updated_at = 11;
 }
 
 enum MediaContentType {

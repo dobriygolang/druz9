@@ -24,14 +24,10 @@ func mapEvent(item *model.Event) *v1.Event {
 			avatarURL = participant.TelegramAvatarURL
 		}
 		participants = append(participants, &v1.EventParticipant{
-			UserId:            participant.UserID,
-			Title:             participant.Title,
-			AvatarUrl:         avatarURL,
-			TelegramAvatarUrl: participant.TelegramAvatarURL,
-			TelegramUsername:  participant.TelegramUsername,
-			FirstName:         participant.FirstName,
-			LastName:          participant.LastName,
-			Status:            mapParticipantStatus(participant.Status),
+			UserId:    participant.UserID,
+			Title:     participant.Title,
+			AvatarUrl: avatarURL,
+			Status:    mapParticipantStatus(participant.Status),
 		})
 	}
 

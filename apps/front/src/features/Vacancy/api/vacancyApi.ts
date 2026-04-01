@@ -5,8 +5,6 @@ type BackendReferral = {
   id: string;
   userId?: string;
   authorName?: string;
-  authorTelegramUsername?: string;
-  authorTelegramProfileUrl?: string;
   title: string;
   company: string;
   vacancyUrl: string;
@@ -16,7 +14,6 @@ type BackendReferral = {
   employmentType: string;
   isOwner?: boolean;
   createdAt?: string;
-  updatedAt?: string;
 };
 
 type ListReferralsResponse = {

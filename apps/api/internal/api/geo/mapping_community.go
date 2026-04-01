@@ -17,22 +17,18 @@ func mapCommunityMapResponse(resp *model.CommunityMapResponse) *v1.CommunityMapR
 		}
 
 		avatarURL := point.AvatarURL
-		if avatarURL == "" {
-			avatarURL = point.TelegramAvatarURL
-		}
 		points = append(points, &v1.CommunityMapPoint{
-			UserId:            point.UserID,
-			Title:             point.Title,
-			Region:            point.Region,
-			Latitude:          point.Latitude,
-			Longitude:         point.Longitude,
-			IsCurrentUser:     point.IsCurrentUser,
-			AvatarUrl:         avatarURL,
-			TelegramAvatarUrl: point.TelegramAvatarURL,
-			TelegramUsername:  point.TelegramUsername,
-			FirstName:         point.FirstName,
-			LastName:          point.LastName,
-			ActivityStatus:    mapActivityStatus(point.ActivityStatus),
+			UserId:           point.UserID,
+			Title:            point.Title,
+			Region:           point.Region,
+			Latitude:         point.Latitude,
+			Longitude:        point.Longitude,
+			IsCurrentUser:    point.IsCurrentUser,
+			AvatarUrl:        avatarURL,
+			TelegramUsername: point.TelegramUsername,
+			FirstName:        point.FirstName,
+			LastName:         point.LastName,
+			ActivityStatus:   mapActivityStatus(point.ActivityStatus),
 		})
 	}
 

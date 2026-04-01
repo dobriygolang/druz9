@@ -29,8 +29,6 @@ type BackendCommunityMapPoint = {
   isCurrentUser?: boolean;
   avatar_url?: string;
   avatarUrl?: string;
-  telegram_avatar_url?: string;
-  telegramAvatarUrl?: string;
   telegram_username?: string;
   telegramUsername?: string;
   first_name?: string;
@@ -66,10 +64,6 @@ function normalizeCandidate(candidate: BackendCandidate): LocationCandidate {
 function normalizeCommunityMapPoint(
   point: BackendCommunityMapPoint,
 ): CommunityMapPoint {
-  // S3 avatar has priority, fallback to Telegram avatar
-  const s3Avatar = point.avatar_url ?? point.avatarUrl ?? '';
-  const telegramAvatar = point.telegram_avatar_url ?? point.telegramAvatarUrl ?? '';
-
   return {
     userId: point.user_id ?? point.userId ?? '',
     title: point.title ?? '',
@@ -77,7 +71,7 @@ function normalizeCommunityMapPoint(
     latitude: point.latitude ?? 0,
     longitude: point.longitude ?? 0,
     isCurrentUser: point.is_current_user ?? point.isCurrentUser ?? false,
-    avatarUrl: s3Avatar || telegramAvatar,
+    avatarUrl: point.avatar_url ?? point.avatarUrl ?? '',
     telegramUsername:
       point.telegram_username ?? point.telegramUsername ?? '',
     firstName: point.first_name ?? point.firstName ?? '',

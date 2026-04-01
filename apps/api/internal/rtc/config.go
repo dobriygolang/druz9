@@ -39,8 +39,6 @@ const (
 	DataPoolMaxConns Key = "data_pool_max_conns"
 	// Minimum PostgreSQL pool connections
 	DataPoolMinConns Key = "data_pool_min_conns"
-	// Deprecated: use env DATABASE_URL
-	DatabaseUrl Key = "database_url"
 	// Allow local auth bypass
 	DevAuthBypass Key = "dev_auth_bypass"
 	// Dev user ID for bypass mode
@@ -53,16 +51,12 @@ const (
 	GeocoderUserAgent Key = "geocoder_user_agent"
 	// Metrics and pprof listen address
 	MetricsAddr Key = "metrics_addr"
-	// Deprecated: use env S3_ACCESS_KEY
-	S3AccessKey Key = "s3_access_key"
 	// S3 bucket name
 	S3Bucket Key = "s3_bucket"
 	// S3 endpoint
 	S3Endpoint Key = "s3_endpoint"
 	// Public S3 endpoint for signed URLs
 	S3PublicEndpoint Key = "s3_public_endpoint"
-	// Deprecated: use env S3_SECRET_KEY
-	S3SecretKey Key = "s3_secret_key"
 	// Minimum requests before circuit breaker starts tripping
 	ServerCircuitBreakerRequest Key = "server_circuit_breaker_request"
 	// Required success ratio before the circuit opens

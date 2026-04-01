@@ -1325,25 +1325,23 @@ func (x *LogoutResponse) GetStatus() string {
 }
 
 type User struct {
-	state             protoimpl.MessageState `protogen:"open.v1"`
-	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	TelegramId        int64                  `protobuf:"varint,2,opt,name=telegram_id,json=telegramId,proto3" json:"telegram_id,omitempty"`
-	TelegramUsername  string                 `protobuf:"bytes,3,opt,name=telegram_username,json=telegramUsername,proto3" json:"telegram_username,omitempty"`
-	FirstName         string                 `protobuf:"bytes,4,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName          string                 `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	AvatarUrl         string                 `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
-	TelegramAvatarUrl string                 `protobuf:"bytes,15,opt,name=telegram_avatar_url,json=telegramAvatarUrl,proto3" json:"telegram_avatar_url,omitempty"`
-	Region            string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`
-	CreatedAt         *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt         *timestamppb.Timestamp `protobuf:"bytes,9,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	Latitude          float64                `protobuf:"fixed64,10,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude         float64                `protobuf:"fixed64,11,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	ActivityStatus    UserActivityStatus     `protobuf:"varint,12,opt,name=activity_status,json=activityStatus,proto3,enum=profile.v1.UserActivityStatus" json:"activity_status,omitempty"`
-	CurrentWorkplace  string                 `protobuf:"bytes,13,opt,name=current_workplace,json=currentWorkplace,proto3" json:"current_workplace,omitempty"`
-	IsAdmin           bool                   `protobuf:"varint,14,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
-	IsTrusted         bool                   `protobuf:"varint,16,opt,name=is_trusted,json=isTrusted,proto3" json:"is_trusted,omitempty"`
-	unknownFields     protoimpl.UnknownFields
-	sizeCache         protoimpl.SizeCache
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	TelegramId       int64                  `protobuf:"varint,2,opt,name=telegram_id,json=telegramId,proto3" json:"telegram_id,omitempty"`
+	TelegramUsername string                 `protobuf:"bytes,3,opt,name=telegram_username,json=telegramUsername,proto3" json:"telegram_username,omitempty"`
+	FirstName        string                 `protobuf:"bytes,4,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName         string                 `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	AvatarUrl        string                 `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	Region           string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`
+	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Latitude         float64                `protobuf:"fixed64,10,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude        float64                `protobuf:"fixed64,11,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	ActivityStatus   UserActivityStatus     `protobuf:"varint,12,opt,name=activity_status,json=activityStatus,proto3,enum=profile.v1.UserActivityStatus" json:"activity_status,omitempty"`
+	CurrentWorkplace string                 `protobuf:"bytes,13,opt,name=current_workplace,json=currentWorkplace,proto3" json:"current_workplace,omitempty"`
+	IsAdmin          bool                   `protobuf:"varint,14,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
+	IsTrusted        bool                   `protobuf:"varint,16,opt,name=is_trusted,json=isTrusted,proto3" json:"is_trusted,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *User) Reset() {
@@ -1418,13 +1416,6 @@ func (x *User) GetAvatarUrl() string {
 	return ""
 }
 
-func (x *User) GetTelegramAvatarUrl() string {
-	if x != nil {
-		return x.TelegramAvatarUrl
-	}
-	return ""
-}
-
 func (x *User) GetRegion() string {
 	if x != nil {
 		return x.Region
@@ -1435,13 +1426,6 @@ func (x *User) GetRegion() string {
 func (x *User) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
-	}
-	return nil
-}
-
-func (x *User) GetUpdatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.UpdatedAt
 	}
 	return nil
 }
@@ -1575,7 +1559,7 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\x04user\x18\x01 \x01(\v2\x10.profile.v1.UserR\x04user\x124\n" +
 	"\x16needs_profile_complete\x18\x02 \x01(\bR\x14needsProfileComplete\"(\n" +
 	"\x0eLogoutResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"\xe7\x04\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"\xfc\x03\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
 	"\vtelegram_id\x18\x02 \x01(\x03R\n" +
@@ -1585,13 +1569,10 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"first_name\x18\x04 \x01(\tR\tfirstName\x12\x1b\n" +
 	"\tlast_name\x18\x05 \x01(\tR\blastName\x12\x1d\n" +
 	"\n" +
-	"avatar_url\x18\x06 \x01(\tR\tavatarUrl\x12.\n" +
-	"\x13telegram_avatar_url\x18\x0f \x01(\tR\x11telegramAvatarUrl\x12\x16\n" +
+	"avatar_url\x18\x06 \x01(\tR\tavatarUrl\x12\x16\n" +
 	"\x06region\x18\a \x01(\tR\x06region\x129\n" +
 	"\n" +
-	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
-	"\n" +
-	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\x12\x1a\n" +
+	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x1a\n" +
 	"\blatitude\x18\n" +
 	" \x01(\x01R\blatitude\x12\x1c\n" +
 	"\tlongitude\x18\v \x01(\x01R\tlongitude\x12G\n" +
@@ -1671,41 +1652,40 @@ var file_profile_v1_profile_proto_depIdxs = []int32{
 	24, // 3: profile.v1.RegisterWithPasswordResponse.user:type_name -> profile.v1.User
 	24, // 4: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
 	25, // 5: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	25, // 6: profile.v1.User.updated_at:type_name -> google.protobuf.Timestamp
-	0,  // 7: profile.v1.User.activity_status:type_name -> profile.v1.UserActivityStatus
-	1,  // 8: profile.v1.ProfileService.CreateTelegramAuthChallenge:input_type -> profile.v1.CreateTelegramAuthChallengeRequest
-	3,  // 9: profile.v1.ProfileService.ConfirmTelegramAuth:input_type -> profile.v1.ConfirmTelegramAuthRequest
-	5,  // 10: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
-	6,  // 11: profile.v1.ProfileService.CompleteRegistration:input_type -> profile.v1.CompleteRegistrationRequest
-	7,  // 12: profile.v1.ProfileService.GetProfile:input_type -> profile.v1.GetProfileRequest
-	8,  // 13: profile.v1.ProfileService.GetProfileByID:input_type -> profile.v1.GetProfileByIDRequest
-	9,  // 14: profile.v1.ProfileService.UpdateLocation:input_type -> profile.v1.UpdateLocationRequest
-	11, // 15: profile.v1.ProfileService.UpdateProfile:input_type -> profile.v1.UpdateProfileRequest
-	10, // 16: profile.v1.ProfileService.Logout:input_type -> profile.v1.LogoutRequest
-	12, // 17: profile.v1.ProfileService.BindTelegram:input_type -> profile.v1.BindTelegramRequest
-	14, // 18: profile.v1.ProfileService.GetPhotoUploadURL:input_type -> profile.v1.GetPhotoUploadURLRequest
-	16, // 19: profile.v1.ProfileService.CompletePhotoUpload:input_type -> profile.v1.CompletePhotoUploadRequest
-	18, // 20: profile.v1.ProfileService.LoginWithPassword:input_type -> profile.v1.LoginWithPasswordRequest
-	20, // 21: profile.v1.ProfileService.RegisterWithPassword:input_type -> profile.v1.RegisterWithPasswordRequest
-	2,  // 22: profile.v1.ProfileService.CreateTelegramAuthChallenge:output_type -> profile.v1.CreateTelegramAuthChallengeResponse
-	4,  // 23: profile.v1.ProfileService.ConfirmTelegramAuth:output_type -> profile.v1.ConfirmTelegramAuthResponse
-	22, // 24: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
-	22, // 25: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
-	22, // 26: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
-	22, // 27: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
-	22, // 28: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
-	22, // 29: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
-	23, // 30: profile.v1.ProfileService.Logout:output_type -> profile.v1.LogoutResponse
-	13, // 31: profile.v1.ProfileService.BindTelegram:output_type -> profile.v1.BindTelegramResponse
-	15, // 32: profile.v1.ProfileService.GetPhotoUploadURL:output_type -> profile.v1.GetPhotoUploadURLResponse
-	17, // 33: profile.v1.ProfileService.CompletePhotoUpload:output_type -> profile.v1.CompletePhotoUploadResponse
-	19, // 34: profile.v1.ProfileService.LoginWithPassword:output_type -> profile.v1.LoginWithPasswordResponse
-	21, // 35: profile.v1.ProfileService.RegisterWithPassword:output_type -> profile.v1.RegisterWithPasswordResponse
-	22, // [22:36] is the sub-list for method output_type
-	8,  // [8:22] is the sub-list for method input_type
-	8,  // [8:8] is the sub-list for extension type_name
-	8,  // [8:8] is the sub-list for extension extendee
-	0,  // [0:8] is the sub-list for field type_name
+	0,  // 6: profile.v1.User.activity_status:type_name -> profile.v1.UserActivityStatus
+	1,  // 7: profile.v1.ProfileService.CreateTelegramAuthChallenge:input_type -> profile.v1.CreateTelegramAuthChallengeRequest
+	3,  // 8: profile.v1.ProfileService.ConfirmTelegramAuth:input_type -> profile.v1.ConfirmTelegramAuthRequest
+	5,  // 9: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
+	6,  // 10: profile.v1.ProfileService.CompleteRegistration:input_type -> profile.v1.CompleteRegistrationRequest
+	7,  // 11: profile.v1.ProfileService.GetProfile:input_type -> profile.v1.GetProfileRequest
+	8,  // 12: profile.v1.ProfileService.GetProfileByID:input_type -> profile.v1.GetProfileByIDRequest
+	9,  // 13: profile.v1.ProfileService.UpdateLocation:input_type -> profile.v1.UpdateLocationRequest
+	11, // 14: profile.v1.ProfileService.UpdateProfile:input_type -> profile.v1.UpdateProfileRequest
+	10, // 15: profile.v1.ProfileService.Logout:input_type -> profile.v1.LogoutRequest
+	12, // 16: profile.v1.ProfileService.BindTelegram:input_type -> profile.v1.BindTelegramRequest
+	14, // 17: profile.v1.ProfileService.GetPhotoUploadURL:input_type -> profile.v1.GetPhotoUploadURLRequest
+	16, // 18: profile.v1.ProfileService.CompletePhotoUpload:input_type -> profile.v1.CompletePhotoUploadRequest
+	18, // 19: profile.v1.ProfileService.LoginWithPassword:input_type -> profile.v1.LoginWithPasswordRequest
+	20, // 20: profile.v1.ProfileService.RegisterWithPassword:input_type -> profile.v1.RegisterWithPasswordRequest
+	2,  // 21: profile.v1.ProfileService.CreateTelegramAuthChallenge:output_type -> profile.v1.CreateTelegramAuthChallengeResponse
+	4,  // 22: profile.v1.ProfileService.ConfirmTelegramAuth:output_type -> profile.v1.ConfirmTelegramAuthResponse
+	22, // 23: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
+	22, // 24: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
+	22, // 25: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
+	22, // 26: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
+	22, // 27: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
+	22, // 28: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
+	23, // 29: profile.v1.ProfileService.Logout:output_type -> profile.v1.LogoutResponse
+	13, // 30: profile.v1.ProfileService.BindTelegram:output_type -> profile.v1.BindTelegramResponse
+	15, // 31: profile.v1.ProfileService.GetPhotoUploadURL:output_type -> profile.v1.GetPhotoUploadURLResponse
+	17, // 32: profile.v1.ProfileService.CompletePhotoUpload:output_type -> profile.v1.CompletePhotoUploadResponse
+	19, // 33: profile.v1.ProfileService.LoginWithPassword:output_type -> profile.v1.LoginWithPasswordResponse
+	21, // 34: profile.v1.ProfileService.RegisterWithPassword:output_type -> profile.v1.RegisterWithPasswordResponse
+	21, // [21:35] is the sub-list for method output_type
+	7,  // [7:21] is the sub-list for method input_type
+	7,  // [7:7] is the sub-list for extension type_name
+	7,  // [7:7] is the sub-list for extension extendee
+	0,  // [0:7] is the sub-list for field type_name
 }
 
 func init() { file_profile_v1_profile_proto_init() }

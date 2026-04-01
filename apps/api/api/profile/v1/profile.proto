@@ -231,10 +231,8 @@ message User {
   string first_name = 4;
   string last_name = 5;
   string avatar_url = 6;
-  string telegram_avatar_url = 15;
   string region = 7;
   google.protobuf.Timestamp created_at = 8;
-  google.protobuf.Timestamp updated_at = 9;
   double latitude = 10;
   double longitude = 11;
   UserActivityStatus activity_status = 12;

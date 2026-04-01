@@ -144,10 +144,6 @@ message EventParticipant {
   string user_id = 1;
   string title = 2;
   string avatar_url = 3;
-  string telegram_avatar_url = 8;
-  string telegram_username = 4;
-  string first_name = 5;
-  string last_name = 6;
   ParticipantStatus status = 7;
 }
 

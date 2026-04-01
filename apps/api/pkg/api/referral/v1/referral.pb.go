@@ -534,24 +534,21 @@ func (x *ReferralStatusResponse) GetStatus() string {
 }
 
 type Referral struct {
-	state                    protoimpl.MessageState `protogen:"open.v1"`
-	Id                       string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	UserId                   string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	AuthorName               string                 `protobuf:"bytes,3,opt,name=author_name,json=authorName,proto3" json:"author_name,omitempty"`
-	AuthorTelegramUsername   string                 `protobuf:"bytes,4,opt,name=author_telegram_username,json=authorTelegramUsername,proto3" json:"author_telegram_username,omitempty"`
-	AuthorTelegramProfileUrl string                 `protobuf:"bytes,5,opt,name=author_telegram_profile_url,json=authorTelegramProfileUrl,proto3" json:"author_telegram_profile_url,omitempty"`
-	Title                    string                 `protobuf:"bytes,6,opt,name=title,proto3" json:"title,omitempty"`
-	Company                  string                 `protobuf:"bytes,7,opt,name=company,proto3" json:"company,omitempty"`
-	VacancyUrl               string                 `protobuf:"bytes,8,opt,name=vacancy_url,json=vacancyUrl,proto3" json:"vacancy_url,omitempty"`
-	Description              string                 `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
-	Experience               string                 `protobuf:"bytes,10,opt,name=experience,proto3" json:"experience,omitempty"`
-	Location                 string                 `protobuf:"bytes,11,opt,name=location,proto3" json:"location,omitempty"`
-	EmploymentType           EmploymentType         `protobuf:"varint,12,opt,name=employment_type,json=employmentType,proto3,enum=referral.v1.EmploymentType" json:"employment_type,omitempty"`
-	IsOwner                  bool                   `protobuf:"varint,13,opt,name=is_owner,json=isOwner,proto3" json:"is_owner,omitempty"`
-	CreatedAt                *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt                *timestamppb.Timestamp `protobuf:"bytes,15,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
-	unknownFields            protoimpl.UnknownFields
-	sizeCache                protoimpl.SizeCache
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Id             string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId         string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	AuthorName     string                 `protobuf:"bytes,3,opt,name=author_name,json=authorName,proto3" json:"author_name,omitempty"`
+	Title          string                 `protobuf:"bytes,6,opt,name=title,proto3" json:"title,omitempty"`
+	Company        string                 `protobuf:"bytes,7,opt,name=company,proto3" json:"company,omitempty"`
+	VacancyUrl     string                 `protobuf:"bytes,8,opt,name=vacancy_url,json=vacancyUrl,proto3" json:"vacancy_url,omitempty"`
+	Description    string                 `protobuf:"bytes,9,opt,name=description,proto3" json:"description,omitempty"`
+	Experience     string                 `protobuf:"bytes,10,opt,name=experience,proto3" json:"experience,omitempty"`
+	Location       string                 `protobuf:"bytes,11,opt,name=location,proto3" json:"location,omitempty"`
+	EmploymentType EmploymentType         `protobuf:"varint,12,opt,name=employment_type,json=employmentType,proto3,enum=referral.v1.EmploymentType" json:"employment_type,omitempty"`
+	IsOwner        bool                   `protobuf:"varint,13,opt,name=is_owner,json=isOwner,proto3" json:"is_owner,omitempty"`
+	CreatedAt      *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
 }
 
 func (x *Referral) Reset() {
@@ -601,20 +598,6 @@ func (x *Referral) GetUserId() string {
 func (x *Referral) GetAuthorName() string {
 	if x != nil {
 		return x.AuthorName
-	}
-	return ""
-}
-
-func (x *Referral) GetAuthorTelegramUsername() string {
-	if x != nil {
-		return x.AuthorTelegramUsername
-	}
-	return ""
-}
-
-func (x *Referral) GetAuthorTelegramProfileUrl() string {
-	if x != nil {
-		return x.AuthorTelegramProfileUrl
 	}
 	return ""
 }
@@ -682,13 +665,6 @@ func (x *Referral) GetCreatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *Referral) GetUpdatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return nil
-}
-
 var File_referral_v1_referral_proto protoreflect.FileDescriptor
 
 const file_referral_v1_referral_proto_rawDesc = "" +
@@ -734,14 +710,12 @@ const file_referral_v1_referral_proto_rawDesc = "" +
 	"\x10ReferralResponse\x121\n" +
 	"\breferral\x18\x01 \x01(\v2\x15.referral.v1.ReferralR\breferral\"0\n" +
 	"\x16ReferralStatusResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"\xd3\x04\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"\x9f\x03\n" +
 	"\bReferral\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1f\n" +
 	"\vauthor_name\x18\x03 \x01(\tR\n" +
-	"authorName\x128\n" +
-	"\x18author_telegram_username\x18\x04 \x01(\tR\x16authorTelegramUsername\x12=\n" +
-	"\x1bauthor_telegram_profile_url\x18\x05 \x01(\tR\x18authorTelegramProfileUrl\x12\x14\n" +
+	"authorName\x12\x14\n" +
 	"\x05title\x18\x06 \x01(\tR\x05title\x12\x18\n" +
 	"\acompany\x18\a \x01(\tR\acompany\x12\x1f\n" +
 	"\vvacancy_url\x18\b \x01(\tR\n" +
@@ -755,9 +729,7 @@ const file_referral_v1_referral_proto_rawDesc = "" +
 	"\x0femployment_type\x18\f \x01(\x0e2\x1b.referral.v1.EmploymentTypeR\x0eemploymentType\x12\x19\n" +
 	"\bis_owner\x18\r \x01(\bR\aisOwner\x129\n" +
 	"\n" +
-	"created_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
-	"\n" +
-	"updated_at\x18\x0f \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt*\xc9\x01\n" +
+	"created_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt*\xc9\x01\n" +
 	"\x0eEmploymentType\x12\x1f\n" +
 	"\x1bEMPLOYMENT_TYPE_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19EMPLOYMENT_TYPE_FULL_TIME\x10\x01\x12\x1d\n" +
@@ -804,20 +776,19 @@ var file_referral_v1_referral_proto_depIdxs = []int32{
 	8,  // 3: referral.v1.ReferralResponse.referral:type_name -> referral.v1.Referral
 	0,  // 4: referral.v1.Referral.employment_type:type_name -> referral.v1.EmploymentType
 	9,  // 5: referral.v1.Referral.created_at:type_name -> google.protobuf.Timestamp
-	9,  // 6: referral.v1.Referral.updated_at:type_name -> google.protobuf.Timestamp
-	1,  // 7: referral.v1.ReferralService.ListReferrals:input_type -> referral.v1.ListReferralsRequest
-	2,  // 8: referral.v1.ReferralService.CreateReferral:input_type -> referral.v1.CreateReferralRequest
-	3,  // 9: referral.v1.ReferralService.UpdateReferral:input_type -> referral.v1.UpdateReferralRequest
-	4,  // 10: referral.v1.ReferralService.DeleteReferral:input_type -> referral.v1.DeleteReferralRequest
-	5,  // 11: referral.v1.ReferralService.ListReferrals:output_type -> referral.v1.ListReferralsResponse
-	6,  // 12: referral.v1.ReferralService.CreateReferral:output_type -> referral.v1.ReferralResponse
-	6,  // 13: referral.v1.ReferralService.UpdateReferral:output_type -> referral.v1.ReferralResponse
-	7,  // 14: referral.v1.ReferralService.DeleteReferral:output_type -> referral.v1.ReferralStatusResponse
-	11, // [11:15] is the sub-list for method output_type
-	7,  // [7:11] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	1,  // 6: referral.v1.ReferralService.ListReferrals:input_type -> referral.v1.ListReferralsRequest
+	2,  // 7: referral.v1.ReferralService.CreateReferral:input_type -> referral.v1.CreateReferralRequest
+	3,  // 8: referral.v1.ReferralService.UpdateReferral:input_type -> referral.v1.UpdateReferralRequest
+	4,  // 9: referral.v1.ReferralService.DeleteReferral:input_type -> referral.v1.DeleteReferralRequest
+	5,  // 10: referral.v1.ReferralService.ListReferrals:output_type -> referral.v1.ListReferralsResponse
+	6,  // 11: referral.v1.ReferralService.CreateReferral:output_type -> referral.v1.ReferralResponse
+	6,  // 12: referral.v1.ReferralService.UpdateReferral:output_type -> referral.v1.ReferralResponse
+	7,  // 13: referral.v1.ReferralService.DeleteReferral:output_type -> referral.v1.ReferralStatusResponse
+	10, // [10:14] is the sub-list for method output_type
+	6,  // [6:10] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_referral_v1_referral_proto_init() }

@@ -12,20 +12,17 @@ func mapReferral(item *model.Referral) *v1.Referral {
 		return nil
 	}
 	return &v1.Referral{
-		Id:                       item.ID.String(),
-		UserId:                   item.UserID,
-		AuthorName:               item.AuthorName,
-		AuthorTelegramUsername:   item.AuthorTelegramUsername,
-		AuthorTelegramProfileUrl: item.AuthorTelegramProfileURL,
-		Title:                    item.Title,
-		Company:                  item.Company,
-		VacancyUrl:               item.VacancyURL,
-		Description:              item.Description,
-		Experience:               item.Experience,
-		Location:                 item.Location,
-		EmploymentType:           mapEmploymentType(item.EmploymentType),
-		IsOwner:                  item.IsOwner,
-		CreatedAt:                timestamppb.New(item.CreatedAt),
-		UpdatedAt:                timestamppb.New(item.UpdatedAt),
+		Id:             item.ID.String(),
+		UserId:         item.UserID,
+		AuthorName:     item.AuthorName,
+		Title:          item.Title,
+		Company:        item.Company,
+		VacancyUrl:     item.VacancyURL,
+		Description:    item.Description,
+		Experience:     item.Experience,
+		Location:       item.Location,
+		EmploymentType: mapEmploymentType(item.EmploymentType),
+		IsOwner:        item.IsOwner,
+		CreatedAt:      timestamppb.New(item.CreatedAt),
 	}
 }

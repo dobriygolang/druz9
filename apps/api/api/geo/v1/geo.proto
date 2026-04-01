@@ -51,7 +51,6 @@ message CommunityMapPoint {
   double longitude = 5;
   bool is_current_user = 6;
   string avatar_url = 7;
-  string telegram_avatar_url = 12;
   string telegram_username = 8;
   string first_name = 9;
   string last_name = 10;

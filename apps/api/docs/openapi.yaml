@@ -1902,14 +1902,6 @@ components:
                     type: string
                 avatarUrl:
                     type: string
-                telegramAvatarUrl:
-                    type: string
-                telegramUsername:
-                    type: string
-                firstName:
-                    type: string
-                lastName:
-                    type: string
                 status:
                     type: integer
                     format: enum
@@ -2001,8 +1993,6 @@ components:
                 isCurrentUser:
                     type: boolean
                 avatarUrl:
-                    type: string
-                telegramAvatarUrl:
                     type: string
                 telegramUsername:
                     type: string
@@ -2117,9 +2107,6 @@ components:
                 isUploaded:
                     type: boolean
                 createdAt:
-                    type: string
-                    format: date-time
-                updatedAt:
                     type: string
                     format: date-time
         podcast.v1.PodcastResponse:
@@ -2359,14 +2346,9 @@ components:
                     type: string
                 avatarUrl:
                     type: string
-                telegramAvatarUrl:
-                    type: string
                 region:
                     type: string
                 createdAt:
-                    type: string
-                    format: date-time
-                updatedAt:
                     type: string
                     format: date-time
                 latitude:
@@ -2429,10 +2411,6 @@ components:
                     type: string
                 authorName:
                     type: string
-                authorTelegramUsername:
-                    type: string
-                authorTelegramProfileUrl:
-                    type: string
                 title:
                     type: string
                 company:
@@ -2451,9 +2429,6 @@ components:
                 isOwner:
                     type: boolean
                 createdAt:
-                    type: string
-                    format: date-time
-                updatedAt:
                     type: string
                     format: date-time
         referral.v1.ReferralResponse:

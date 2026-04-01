@@ -23,6 +23,5 @@ func mapPodcast(item *model.Podcast) *v1.Podcast {
 		ContentType:     mapContentType(item.ContentType),
 		IsUploaded:      item.IsUploaded,
 		CreatedAt:       timestamppb.New(item.CreatedAt),
-		UpdatedAt:       timestamppb.New(item.UpdatedAt),
 	}
 }

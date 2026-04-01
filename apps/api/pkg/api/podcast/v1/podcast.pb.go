@@ -814,7 +814,6 @@ type Podcast struct {
 	ContentType     MediaContentType       `protobuf:"varint,8,opt,name=content_type,json=contentType,proto3,enum=podcast.v1.MediaContentType" json:"content_type,omitempty"`
 	IsUploaded      bool                   `protobuf:"varint,9,opt,name=is_uploaded,json=isUploaded,proto3" json:"is_uploaded,omitempty"`
 	CreatedAt       *timestamppb.Timestamp `protobuf:"bytes,10,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	UpdatedAt       *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -919,13 +918,6 @@ func (x *Podcast) GetCreatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-func (x *Podcast) GetUpdatedAt() *timestamppb.Timestamp {
-	if x != nil {
-		return x.UpdatedAt
-	}
-	return nil
-}
-
 var File_podcast_v1_podcast_proto protoreflect.FileDescriptor
 
 const file_podcast_v1_podcast_proto_rawDesc = "" +
@@ -987,7 +979,7 @@ const file_podcast_v1_podcast_proto_rawDesc = "" +
 	"\x13PlayPodcastResponse\x12-\n" +
 	"\apodcast\x18\x01 \x01(\v2\x13.podcast.v1.PodcastR\apodcast\x12\x1d\n" +
 	"\n" +
-	"stream_url\x18\x02 \x01(\tR\tstreamUrl\"\xb2\x03\n" +
+	"stream_url\x18\x02 \x01(\tR\tstreamUrl\"\xf7\x02\n" +
 	"\aPodcast\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1b\n" +
@@ -1002,9 +994,7 @@ const file_podcast_v1_podcast_proto_rawDesc = "" +
 	"isUploaded\x129\n" +
 	"\n" +
 	"created_at\x18\n" +
-	" \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
-	"\n" +
-	"updated_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt*\xbf\x01\n" +
+	" \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt*\xbf\x01\n" +
 	"\x10MediaContentType\x12\"\n" +
 	"\x1eMEDIA_CONTENT_TYPE_UNSPECIFIED\x10\x00\x12!\n" +
 	"\x1dMEDIA_CONTENT_TYPE_AUDIO_MPEG\x10\x01\x12 \n" +
@@ -1061,28 +1051,27 @@ var file_podcast_v1_podcast_proto_depIdxs = []int32{
 	14, // 3: podcast.v1.PlayPodcastResponse.podcast:type_name -> podcast.v1.Podcast
 	0,  // 4: podcast.v1.Podcast.content_type:type_name -> podcast.v1.MediaContentType
 	15, // 5: podcast.v1.Podcast.created_at:type_name -> google.protobuf.Timestamp
-	15, // 6: podcast.v1.Podcast.updated_at:type_name -> google.protobuf.Timestamp
-	1,  // 7: podcast.v1.PodcastService.ListPodcasts:input_type -> podcast.v1.ListPodcastsRequest
-	2,  // 8: podcast.v1.PodcastService.GetPodcast:input_type -> podcast.v1.GetPodcastRequest
-	3,  // 9: podcast.v1.PodcastService.CreatePodcast:input_type -> podcast.v1.CreatePodcastRequest
-	4,  // 10: podcast.v1.PodcastService.UploadPodcast:input_type -> podcast.v1.UploadPodcastRequest
-	5,  // 11: podcast.v1.PodcastService.PreparePodcastUpload:input_type -> podcast.v1.PreparePodcastUploadRequest
-	7,  // 12: podcast.v1.PodcastService.CompletePodcastUpload:input_type -> podcast.v1.CompletePodcastUploadRequest
-	8,  // 13: podcast.v1.PodcastService.DeletePodcast:input_type -> podcast.v1.DeletePodcastRequest
-	9,  // 14: podcast.v1.PodcastService.PlayPodcast:input_type -> podcast.v1.PlayPodcastRequest
-	10, // 15: podcast.v1.PodcastService.ListPodcasts:output_type -> podcast.v1.ListPodcastsResponse
-	11, // 16: podcast.v1.PodcastService.GetPodcast:output_type -> podcast.v1.PodcastResponse
-	11, // 17: podcast.v1.PodcastService.CreatePodcast:output_type -> podcast.v1.PodcastResponse
-	11, // 18: podcast.v1.PodcastService.UploadPodcast:output_type -> podcast.v1.PodcastResponse
-	6,  // 19: podcast.v1.PodcastService.PreparePodcastUpload:output_type -> podcast.v1.PreparePodcastUploadResponse
-	11, // 20: podcast.v1.PodcastService.CompletePodcastUpload:output_type -> podcast.v1.PodcastResponse
-	12, // 21: podcast.v1.PodcastService.DeletePodcast:output_type -> podcast.v1.PodcastStatusResponse
-	13, // 22: podcast.v1.PodcastService.PlayPodcast:output_type -> podcast.v1.PlayPodcastResponse
-	15, // [15:23] is the sub-list for method output_type
-	7,  // [7:15] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	1,  // 6: podcast.v1.PodcastService.ListPodcasts:input_type -> podcast.v1.ListPodcastsRequest
+	2,  // 7: podcast.v1.PodcastService.GetPodcast:input_type -> podcast.v1.GetPodcastRequest
+	3,  // 8: podcast.v1.PodcastService.CreatePodcast:input_type -> podcast.v1.CreatePodcastRequest
+	4,  // 9: podcast.v1.PodcastService.UploadPodcast:input_type -> podcast.v1.UploadPodcastRequest
+	5,  // 10: podcast.v1.PodcastService.PreparePodcastUpload:input_type -> podcast.v1.PreparePodcastUploadRequest
+	7,  // 11: podcast.v1.PodcastService.CompletePodcastUpload:input_type -> podcast.v1.CompletePodcastUploadRequest
+	8,  // 12: podcast.v1.PodcastService.DeletePodcast:input_type -> podcast.v1.DeletePodcastRequest
+	9,  // 13: podcast.v1.PodcastService.PlayPodcast:input_type -> podcast.v1.PlayPodcastRequest
+	10, // 14: podcast.v1.PodcastService.ListPodcasts:output_type -> podcast.v1.ListPodcastsResponse
+	11, // 15: podcast.v1.PodcastService.GetPodcast:output_type -> podcast.v1.PodcastResponse
+	11, // 16: podcast.v1.PodcastService.CreatePodcast:output_type -> podcast.v1.PodcastResponse
+	11, // 17: podcast.v1.PodcastService.UploadPodcast:output_type -> podcast.v1.PodcastResponse
+	6,  // 18: podcast.v1.PodcastService.PreparePodcastUpload:output_type -> podcast.v1.PreparePodcastUploadResponse
+	11, // 19: podcast.v1.PodcastService.CompletePodcastUpload:output_type -> podcast.v1.PodcastResponse
+	12, // 20: podcast.v1.PodcastService.DeletePodcast:output_type -> podcast.v1.PodcastStatusResponse
+	13, // 21: podcast.v1.PodcastService.PlayPodcast:output_type -> podcast.v1.PlayPodcastResponse
+	14, // [14:22] is the sub-list for method output_type
+	6,  // [6:14] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_podcast_v1_podcast_proto_init() }

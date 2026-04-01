@@ -17,8 +17,6 @@ type BackendUser = {
   lastName?: string;
   avatar_url?: string;
   avatarUrl?: string;
-  telegram_avatar_url?: string;
-  telegramAvatarUrl?: string;
   region?: string;
   latitude?: number;
   longitude?: number;
@@ -30,8 +28,6 @@ type BackendUser = {
   isTrusted?: boolean;
   created_at?: string;
   createdAt?: string;
-  updated_at?: string;
-  updatedAt?: string;
   current_workplace?: string;
   currentWorkplace?: string;
 };
@@ -88,17 +84,13 @@ function normalizeActivityStatus(value: unknown): User['activityStatus'] {
 }
 
 function normalizeUser(user: BackendUser): User {
-  // S3 avatar has priority, fallback to Telegram avatar
-  const s3Avatar = user.avatar_url ?? user.avatarUrl ?? '';
-  const telegramAvatar = user.telegram_avatar_url ?? user.telegramAvatarUrl ?? '';
-
   return {
     id: user.id,
     telegramId: String(user.telegram_id ?? user.telegramId ?? ''),
     telegramUsername: user.telegram_username ?? user.telegramUsername ?? '',
     firstName: user.first_name ?? user.firstName ?? '',
     lastName: user.last_name ?? user.lastName ?? '',
-    avatarUrl: s3Avatar || telegramAvatar,
+    avatarUrl: user.avatar_url ?? user.avatarUrl ?? '',
     region: user.region ?? '',
     latitude: user.latitude ?? 0,
     longitude: user.longitude ?? 0,
