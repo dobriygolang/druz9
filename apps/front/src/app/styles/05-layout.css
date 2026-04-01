@@ -553,6 +553,10 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
 }
 
+.interview-prep-code-editor--sql {
+  border-color: rgba(245, 158, 11, 0.24);
+}
+
 .interview-prep-block-title {
   margin: 16px 0 8px;
   font-size: 13px;
@@ -591,6 +595,16 @@
   background:
     radial-gradient(circle at top right, rgba(99, 102, 241, 0.14), transparent 30%),
     radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.12), transparent 28%),
+    var(--surface-color);
+}
+
+.interview-prep-sql-card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  background:
+    radial-gradient(circle at top right, rgba(245, 158, 11, 0.1), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(34, 197, 94, 0.08), transparent 24%),
     var(--surface-color);
 }
 

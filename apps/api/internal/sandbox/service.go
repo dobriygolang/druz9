@@ -222,7 +222,7 @@ func prepareGoSources(root string, req ExecutionRequest) ([]string, string, erro
 		return []string{"run", "."}, req.Input, nil
 	default:
 		mainFile := filepath.Join(root, "main.go")
-		if err := os.WriteFile(mainFile, []byte(req.Code), privateFileMode); err != nil {
+		if err := os.WriteFile(mainFile, []byte(normalizeGoPackageSource(req.Code)), privateFileMode); err != nil {
 			return nil, "", fmt.Errorf("write code file: %w", err)
 		}
 		return []string{"run", mainFile}, req.Input, nil
@@ -232,6 +232,10 @@ func prepareGoSources(root string, req ExecutionRequest) ([]string, string, erro
 var goPackagePattern = regexp.MustCompile(`(?m)^package\s+\w+`)
 
 func normalizeGoFunctionIOSource(code string) string {
+	return normalizeGoPackageSource(code)
+}
+
+func normalizeGoPackageSource(code string) string {
 	trimmed := strings.TrimSpace(code)
 	if trimmed == "" {
 		return code

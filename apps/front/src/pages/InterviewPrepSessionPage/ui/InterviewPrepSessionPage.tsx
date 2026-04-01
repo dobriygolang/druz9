@@ -265,32 +265,6 @@ export function InterviewPrepSessionPage() {
             </div>
           </div>
           <pre className="interview-prep-statement">{task?.statement ?? ''}</pre>
-          {task?.starterCode && task?.language === 'sql' && (
-            <>
-              <div className="interview-prep-block-title">Схема БД и стартовый запрос</div>
-              <div className="interview-prep-code-editor">
-                <Editor
-                  height="320px"
-                  defaultLanguage={monacoLanguageFor(task.language)}
-                  language={monacoLanguageFor(task.language)}
-                  value={starterCodePreview}
-                  theme="vs-dark"
-                  options={{
-                    readOnly: true,
-                    minimap: { enabled: false },
-                    lineNumbers: 'on',
-                    fontSize: 14,
-                    automaticLayout: true,
-                    scrollBeyondLastLine: false,
-                    wordWrap: 'on',
-                    tabSize: 2,
-                    padding: { top: 16, bottom: 16 },
-                    renderLineHighlight: 'none',
-                  }}
-                />
-              </div>
-            </>
-          )}
         </article>
 
         <aside className="interview-prep-session-sidebar">
@@ -337,6 +311,40 @@ export function InterviewPrepSessionPage() {
           )}
         </aside>
       </section>
+
+      {task?.starterCode && task?.language === 'sql' && (
+        <section className="card dashboard-card interview-prep-sql-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>Схема БД и стартовый запрос</h2>
+              <p className="interview-prep-muted">
+                База, примеры строк и стартовый SQL вынесены в отдельный блок, чтобы ими было удобно пользоваться во время решения.
+              </p>
+            </div>
+          </div>
+          <div className="interview-prep-code-editor interview-prep-code-editor--sql">
+            <Editor
+              height="440px"
+              defaultLanguage={monacoLanguageFor(task.language)}
+              language={monacoLanguageFor(task.language)}
+              value={starterCodePreview}
+              theme="vs-dark"
+              options={{
+                readOnly: true,
+                minimap: { enabled: false },
+                lineNumbers: 'on',
+                fontSize: 13,
+                automaticLayout: true,
+                scrollBeyondLastLine: false,
+                wordWrap: 'off',
+                tabSize: 2,
+                padding: { top: 18, bottom: 18 },
+                renderLineHighlight: 'none',
+              }}
+            />
+          </div>
+        </section>
+      )}
 
       {showLiveCoding && task && (
         <section className="card dashboard-card interview-prep-live-card">

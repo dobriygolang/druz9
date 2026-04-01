@@ -167,9 +167,9 @@ export const buildAwarenessStyles = (
     .code-room-remote-anchor__caret {
       position: absolute;
       left: -1px;
-      top: -2px;
+      top: -1px;
       width: 1px;
-      height: 20px;
+      height: 16px;
       border-radius: 999px;
       background: currentColor;
       box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.04);
@@ -178,20 +178,20 @@ export const buildAwarenessStyles = (
     .code-room-remote-label-pill {
       position: absolute;
       left: -1px;
-      top: -22px;
+      top: -17px;
       display: inline-flex;
       align-items: center;
-      gap: 4px;
-      min-height: 16px;
-      padding: 0 5px;
-      border-radius: 4px;
+      gap: 3px;
+      min-height: 13px;
+      padding: 0 4px;
+      border-radius: 3px;
       border: 1px solid transparent;
-      font-size: 10px;
+      font-size: 8px;
       font-weight: 500;
-      line-height: 16px;
+      line-height: 13px;
       white-space: nowrap;
       pointer-events: none;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
     }
 
     .code-room-remote-selection-offline {
@@ -208,8 +208,8 @@ export const buildAwarenessStyles = (
     }
 
     .code-room-remote-label-pill__status-dot {
-      width: 5px;
-      height: 5px;
+      width: 4px;
+      height: 4px;
       border-radius: 999px;
       background: currentColor;
       opacity: 0.9;

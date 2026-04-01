@@ -790,9 +790,7 @@ export const useCodeRoomRealtime = ({
     publishEditorSelection();
 
     const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        publishLocalAwareness({ active: true });
-      }
+      publishLocalAwareness({ active: !document.hidden });
     };
     document.addEventListener('visibilitychange', handleVisibilityChange);
 

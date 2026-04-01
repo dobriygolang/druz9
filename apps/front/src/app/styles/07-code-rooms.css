@@ -18,6 +18,7 @@
 .modal.modal-wide,
 .code-room-leagues-modal {
   max-height: calc(100vh - 40px);
+  width: min(calc(100vw - 32px), 860px);
   overflow: auto;
 }
 
@@ -931,7 +932,7 @@
 
 .mode-selector {
   display: flex;
-  gap: 12px;
+  gap: 14px;
 }
 
 .mode-btn {
@@ -941,6 +942,7 @@
   align-items: center;
   gap: 12px;
   padding: 24px 16px;
+  min-height: 176px;
   background: var(--bg-color);
   border: 2px solid rgba(255, 255, 255, 0.08);
   border-radius: 16px;
@@ -1005,9 +1007,9 @@
 .code-room-prep-launch {
   display: flex;
   flex-direction: column;
-  gap: 16px;
+  gap: 14px;
   margin-bottom: 18px;
-  padding: 20px;
+  padding: 18px;
   border-radius: 18px;
   border: 1px solid rgba(79, 70, 229, 0.18);
   background:
@@ -1032,8 +1034,8 @@
 
 .code-room-prep-launch__controls {
   display: grid;
-  grid-template-columns: minmax(0, 1.5fr) minmax(220px, 0.8fr);
-  gap: 14px;
+  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.9fr);
+  gap: 16px;
 }
 
 .code-room-prep-launch__group {
@@ -1048,6 +1050,14 @@
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: var(--text-secondary);
+}
+
+.code-room-prep-launch__actions {
+  margin-top: 4px;
+}
+
+.code-room-prep-launch__actions .btn {
+  flex: 1 1 0;
 }
 
 /* ===========================================
