@@ -206,6 +206,7 @@ export const useCodeRoomRealtime = ({
   const remoteWidgetsRef = useRef<Map<number, any>>(new Map());
   const reconnectTimerRef = useRef<number | null>(null);
   const keepAliveTimerRef = useRef<number | null>(null);
+  const selectionFrameRef = useRef<number | null>(null);
   const styleElementRef = useRef<HTMLStyleElement | null>(null);
   const isUnmountedRef = useRef(false);
   const applyingRemoteChangesRef = useRef(false);
@@ -713,6 +714,10 @@ export const useCodeRoomRealtime = ({
     return () => {
       isUnmountedRef.current = true;
       clearTimers();
+      if (selectionFrameRef.current !== null) {
+        window.cancelAnimationFrame(selectionFrameRef.current);
+        selectionFrameRef.current = null;
+      }
       wsRef.current?.close();
       wsRef.current = null;
       remoteAwarenessStatesRef.current.clear();
@@ -767,6 +772,16 @@ export const useCodeRoomRealtime = ({
       });
     };
 
+    const scheduleEditorSelectionPublish = () => {
+      if (selectionFrameRef.current !== null) {
+        return;
+      }
+      selectionFrameRef.current = window.requestAnimationFrame(() => {
+        selectionFrameRef.current = null;
+        publishEditorSelection();
+      });
+    };
+
     const contentSubscription = model.onDidChangeContent(() => {
       layoutRemoteWidgets();
 
@@ -776,17 +791,17 @@ export const useCodeRoomRealtime = ({
 
       const nextCode = model.getValue();
       setCode(nextCode);
+      publishEditorSelection();
       debugCodeRoom('update:send', { roomId, length: nextCode.length });
       send({
         type: 'update',
         clientId,
         plainText: nextCode,
       });
-      publishEditorSelection();
     });
 
     selectionSubscriptionRef.current?.dispose();
-    selectionSubscriptionRef.current = editor.onDidChangeCursorSelection(publishEditorSelection);
+    selectionSubscriptionRef.current = editor.onDidChangeCursorSelection(scheduleEditorSelectionPublish);
     publishEditorSelection();
 
     const handleVisibilityChange = () => {
@@ -796,6 +811,10 @@ export const useCodeRoomRealtime = ({
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
+      if (selectionFrameRef.current !== null) {
+        window.cancelAnimationFrame(selectionFrameRef.current);
+        selectionFrameRef.current = null;
+      }
       contentSubscription.dispose();
       selectionSubscriptionRef.current?.dispose();
       selectionSubscriptionRef.current = null;

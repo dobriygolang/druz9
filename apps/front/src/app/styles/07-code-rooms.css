@@ -935,6 +935,18 @@
   gap: 14px;
 }
 
+.code-room-create-section {
+  margin: 4px 0 18px;
+  padding-top: 18px;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.code-room-create-section__head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .mode-btn {
   flex: 1;
   display: flex;
@@ -1007,13 +1019,13 @@
 .code-room-prep-launch {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
   margin-bottom: 18px;
-  padding: 18px;
+  padding: 16px 18px;
   border-radius: 18px;
-  border: 1px solid rgba(79, 70, 229, 0.18);
+  border: 1px solid rgba(79, 70, 229, 0.12);
   background:
-    radial-gradient(circle at top right, rgba(79, 70, 229, 0.14), transparent 34%),
+    radial-gradient(circle at top right, rgba(79, 70, 229, 0.1), transparent 34%),
     rgba(255, 255, 255, 0.03);
 }
 
@@ -1025,8 +1037,22 @@
   gap: 12px;
 }
 
+.code-room-prep-pretitle {
+  font-size: 11px;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-secondary);
+}
+
+.code-room-prep-launch__body {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
 .code-room-prep-launch__title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: var(--text-primary);
   margin-bottom: 4px;
@@ -1034,8 +1060,8 @@
 
 .code-room-prep-launch__controls {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(240px, 0.9fr);
-  gap: 16px;
+  grid-template-columns: minmax(0, 1.2fr) minmax(220px, 0.8fr);
+  gap: 14px;
 }
 
 .code-room-prep-launch__group {
@@ -1053,7 +1079,7 @@
 }
 
 .code-room-prep-launch__actions {
-  margin-top: 4px;
+  margin-top: 2px;
 }
 
 .code-room-prep-launch__actions .btn {

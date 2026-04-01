@@ -598,14 +598,31 @@
     var(--surface-color);
 }
 
-.interview-prep-sql-card {
+.interview-prep-sql-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.interview-prep-sql-context {
   display: flex;
   flex-direction: column;
-  gap: 14px;
+  gap: 12px;
+  padding: 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(245, 158, 11, 0.18);
   background:
     radial-gradient(circle at top right, rgba(245, 158, 11, 0.1), transparent 28%),
     radial-gradient(circle at bottom left, rgba(34, 197, 94, 0.08), transparent 24%),
-    var(--surface-color);
+    rgba(255, 255, 255, 0.02);
+}
+
+.interview-prep-sql-context__head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
 }
 
 .interview-prep-design-review-card,
@@ -650,6 +667,10 @@
   box-shadow:
     inset 0 1px 0 rgba(255, 255, 255, 0.04),
     0 16px 32px rgba(0, 0, 0, 0.18);
+}
+
+.interview-prep-code-editor--sql-inline {
+  border-radius: 14px;
 }
 
 .interview-prep-live-resize-handle {
@@ -752,6 +773,17 @@
   align-items: center;
   gap: 12px;
   flex-wrap: wrap;
+}
+
+@media (max-width: 720px) {
+  .interview-prep-sql-context {
+    padding: 14px;
+  }
+
+  .interview-prep-sql-context__head {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .interview-prep-design-review-score strong {

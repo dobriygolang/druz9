@@ -747,64 +747,76 @@ export const CodeRoomsPage: React.FC = () => {
                 </p>
 
                 {user?.isTrusted && (
-                  <div className="code-room-prep-launch">
+                  <section className="code-room-prep-launch">
                     <div className="code-room-prep-launch__head">
+                      <div className="code-room-prep-pretitle">Без комнаты</div>
+                      <BookOpen size={18} />
+                    </div>
+                    <div className="code-room-prep-launch__body">
                       <div>
                         <div className="code-room-prep-launch__title">Solo practice</div>
                         <div className="mode-desc">
-                          Открой executable interview-prep каталог или сразу возьми случайную задачу по нужной группе.
+                          Отдельный сценарий подготовки. Эти кнопки не создают room и не влияют на форму ниже.
                         </div>
                       </div>
-                      <BookOpen size={18} />
-                    </div>
-                    <div className="code-room-prep-launch__controls">
-                      <div className="code-room-prep-launch__group">
-                        <span className="code-room-prep-launch__label">Категория</span>
-                        <div className="pill-selector">
-                          {INTERVIEW_PREP_CATEGORY_OPTIONS.map((option) => (
-                            <button
-                              key={option.value}
-                              type="button"
-                              className={`pill-selector__pill ${prepLaunchCategory === option.value ? 'active' : ''}`}
-                              onClick={() => setPrepLaunchCategory(option.value)}
-                            >
-                              {option.label}
-                            </button>
-                          ))}
+                      <div className="code-room-prep-launch__controls">
+                        <div className="code-room-prep-launch__group">
+                          <span className="code-room-prep-launch__label">Категория</span>
+                          <div className="pill-selector">
+                            {INTERVIEW_PREP_CATEGORY_OPTIONS.map((option) => (
+                              <button
+                                key={option.value}
+                                type="button"
+                                className={`pill-selector__pill ${prepLaunchCategory === option.value ? 'active' : ''}`}
+                                onClick={() => setPrepLaunchCategory(option.value)}
+                              >
+                                {option.label}
+                              </button>
+                            ))}
+                          </div>
+                        </div>
+                        <div className="code-room-prep-launch__group">
+                          <span className="code-room-prep-launch__label">Группа</span>
+                          <FancySelect
+                            value={prepLaunchCompany}
+                            options={[
+                              { value: 'all', label: 'Все группы' },
+                              { value: 'ozon', label: 'ozon' },
+                              { value: 'avito', label: 'avito' },
+                              { value: 'general', label: 'general' },
+                            ]}
+                            onChange={setPrepLaunchCompany}
+                          />
                         </div>
                       </div>
-                      <div className="code-room-prep-launch__group">
-                        <span className="code-room-prep-launch__label">Группа</span>
-                        <FancySelect
-                          value={prepLaunchCompany}
-                          options={[
-                            { value: 'all', label: 'Все группы' },
-                            { value: 'ozon', label: 'ozon' },
-                            { value: 'avito', label: 'avito' },
-                            { value: 'general', label: 'general' },
-                          ]}
-                          onChange={setPrepLaunchCompany}
-                        />
+                      <div className="code-room-prep-launch__actions">
+                        <button
+                          type="button"
+                          className="btn btn-secondary"
+                          onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&mode=executable${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
+                        >
+                          Открыть каталог
+                        </button>
+                        <button
+                          type="button"
+                          className="btn btn-primary"
+                          onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&mode=executable${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
+                        >
+                          Случайная задача
+                        </button>
                       </div>
                     </div>
-                    <div className="code-room-prep-launch__actions">
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&mode=executable${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
-                      >
-                        Открыть каталог
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&mode=executable${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
-                      >
-                        Случайная задача
-                      </button>
-                    </div>
-                  </div>
+                  </section>
                 )}
+
+                <div className="code-room-create-section">
+                  <div className="code-room-create-section__head">
+                    <div className="code-room-prep-pretitle">Создание комнаты</div>
+                    <p className="mode-desc">
+                      Кнопка `Создать комнату` ниже относится только к выбранному режиму комнаты.
+                    </p>
+                  </div>
+                </div>
 
                 <div className="form-group">
                   <label>Режим</label>
@@ -899,7 +911,7 @@ export const CodeRoomsPage: React.FC = () => {
                   <div className="modal-actions">
                     <button className="btn btn-secondary" onClick={() => resetCreateModal()}>Отмена</button>
                     <button className="btn btn-primary" onClick={() => void handleCreateRoom()} disabled={creating}>
-                      {creating ? 'Создание...' : (newRoomMode === 'queue' ? 'Играть' : 'Создать')}
+                      {creating ? 'Создание...' : (newRoomMode === 'queue' ? 'Играть' : 'Создать комнату')}
                     </button>
                   </div>
                 )}

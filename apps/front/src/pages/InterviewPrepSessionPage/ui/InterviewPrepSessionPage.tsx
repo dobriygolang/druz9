@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { Link, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Play, RotateCcw, TerminalSquare, XCircle } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Play, TerminalSquare, XCircle } from 'lucide-react';
 
 import {
   interviewPrepApi,
@@ -45,10 +45,70 @@ function starterForLanguage(
   return DEFAULT_CODE_BY_LANGUAGE[solveLanguage] ?? starterCode ?? '';
 }
 
+function sanitizeLiveCodingDraft(
+  draft: string | undefined,
+  taskLanguage: string | undefined,
+  solveLanguage: string,
+  starterCode: string | undefined,
+  runnerMode?: string,
+) {
+  const fallback = starterForLanguage(taskLanguage, solveLanguage, starterCode, runnerMode);
+  const value = draft ?? '';
+  if (!value.trim()) {
+    return fallback;
+  }
+  if (
+    solveLanguage === 'go' &&
+    runnerMode === 'function_io' &&
+    (looksLikeGoProgramStarter(value) || !value.includes('func solve('))
+  ) {
+    return fallback;
+  }
+  return value;
+}
+
 const resultLabel: Record<InterviewPrepSelfAssessment, string> = {
   answered: 'Ответил сам',
   skipped: 'Пропустил',
 };
+
+type SqlStarterTab = 'schema' | 'examples' | 'query';
+
+function parseSqlStarterSections(source: string) {
+  const lines = source.split('\n');
+  const sections: Record<SqlStarterTab, string[]> = {
+    schema: [],
+    examples: [],
+    query: [],
+  };
+  let current: SqlStarterTab = 'schema';
+
+  for (const line of lines) {
+    const normalized = line.trim().toLowerCase();
+    if (normalized.includes('схема бд')) {
+      current = 'schema';
+      sections.schema.push(line);
+      continue;
+    }
+    if (normalized.includes('пример данных')) {
+      current = 'examples';
+      sections.examples.push(line);
+      continue;
+    }
+    if (normalized.includes('стартовый запрос')) {
+      current = 'query';
+      sections.query.push(line);
+      continue;
+    }
+    sections[current].push(line);
+  }
+
+  return {
+    schema: sections.schema.join('\n').trim(),
+    examples: sections.examples.join('\n').trim(),
+    query: sections.query.join('\n').trim(),
+  };
+}
 
 export function InterviewPrepSessionPage() {
   const { sessionId = '' } = useParams();
@@ -65,6 +125,8 @@ export function InterviewPrepSessionPage() {
   const [designReview, setDesignReview] = useState<InterviewPrepSystemDesignReview | null>(null);
   const [editorHeight, setEditorHeight] = useState(560);
   const [solveLanguage, setSolveLanguage] = useState('go');
+  const [codeDrafts, setCodeDrafts] = useState<Record<string, string>>({});
+  const [sqlStarterTab, setSqlStarterTab] = useState<SqlStarterTab>('schema');
   const resizeStartYRef = useRef(0);
   const resizeStartHeightRef = useRef(560);
   const [isResizingEditor, setIsResizingEditor] = useState(false);
@@ -96,7 +158,15 @@ export function InterviewPrepSessionPage() {
 
   useEffect(() => {
     const fallbackLanguage = session?.solveLanguage || session?.task?.supportedLanguages?.[0] || session?.task?.language || 'go';
-    setCode(session?.code ?? starterForLanguage(session?.task?.language, fallbackLanguage, session?.task?.starterCode, session?.task?.runnerMode));
+    const nextDraft = sanitizeLiveCodingDraft(
+      session?.code,
+      session?.task?.language,
+      fallbackLanguage,
+      session?.task?.starterCode,
+      session?.task?.runnerMode,
+    );
+    setCodeDrafts({ [fallbackLanguage]: nextDraft });
+    setCode(nextDraft);
   }, [session?.id, session?.code, session?.solveLanguage, session?.task?.language, session?.task?.supportedLanguages, session?.task?.starterCode, session?.task?.runnerMode]);
 
   useEffect(() => {
@@ -139,14 +209,8 @@ export function InterviewPrepSessionPage() {
 
   const switchSolveLanguage = (nextLanguage: string) => {
     setSolveLanguage(nextLanguage);
-    const nextStarter = starterForLanguage(session?.task?.language, nextLanguage, session?.task?.starterCode, session?.task?.runnerMode);
-    const currentStarter = starterForLanguage(session?.task?.language, solveLanguage, session?.task?.starterCode, session?.task?.runnerMode);
-    setCode((currentCode) => {
-      if (!currentCode.trim() || currentCode === currentStarter) {
-        return nextStarter;
-      }
-      return currentCode;
-    });
+    const nextDraft = codeDrafts[nextLanguage] ?? starterForLanguage(session?.task?.language, nextLanguage, session?.task?.starterCode, session?.task?.runnerMode);
+    setCode(nextDraft);
     setSubmitResult(null);
   };
 
@@ -220,6 +284,12 @@ export function InterviewPrepSessionPage() {
 
   const task = session.task;
   const starterCodePreview = task?.starterCode ?? '';
+  const sqlStarterSections = useMemo(() => parseSqlStarterSections(starterCodePreview), [starterCodePreview]);
+  const sqlStarterValue = sqlStarterTab === 'schema'
+    ? sqlStarterSections.schema
+    : sqlStarterTab === 'examples'
+      ? sqlStarterSections.examples
+      : sqlStarterSections.query;
 
   return (
     <div className="interview-prep-session-page">
@@ -243,10 +313,6 @@ export function InterviewPrepSessionPage() {
             <span>Пройдено вопросов</span>
             <strong>{progress.answeredCount}</strong>
           </div>
-          <Link className="btn btn-secondary" to="/interview-prep">
-            <RotateCcw size={16} />
-            <span>К списку задач</span>
-          </Link>
         </div>
       </section>
 
@@ -312,40 +378,6 @@ export function InterviewPrepSessionPage() {
         </aside>
       </section>
 
-      {task?.starterCode && task?.language === 'sql' && (
-        <section className="card dashboard-card interview-prep-sql-card">
-          <div className="dashboard-card__header">
-            <div>
-              <h2>Схема БД и стартовый запрос</h2>
-              <p className="interview-prep-muted">
-                База, примеры строк и стартовый SQL вынесены в отдельный блок, чтобы ими было удобно пользоваться во время решения.
-              </p>
-            </div>
-          </div>
-          <div className="interview-prep-code-editor interview-prep-code-editor--sql">
-            <Editor
-              height="440px"
-              defaultLanguage={monacoLanguageFor(task.language)}
-              language={monacoLanguageFor(task.language)}
-              value={starterCodePreview}
-              theme="vs-dark"
-              options={{
-                readOnly: true,
-                minimap: { enabled: false },
-                lineNumbers: 'on',
-                fontSize: 13,
-                automaticLayout: true,
-                scrollBeyondLastLine: false,
-                wordWrap: 'off',
-                tabSize: 2,
-                padding: { top: 18, bottom: 18 },
-                renderLineHighlight: 'none',
-              }}
-            />
-          </div>
-        </section>
-      )}
-
       {showLiveCoding && task && (
         <section className="card dashboard-card interview-prep-live-card">
           <div className="dashboard-card__header">
@@ -358,7 +390,7 @@ export function InterviewPrepSessionPage() {
             <TerminalSquare size={18} />
           </div>
           <div className="interview-prep-live-toolbar">
-            <span className="badge interview-prep-badge interview-prep-badge--language">{displayLanguageLabel(task.language)}</span>
+            <span className="badge interview-prep-badge interview-prep-badge--language">{displayLanguageLabel(solveLanguage)}</span>
             {solveLanguageOptions.length > 1 && (
               <div className="interview-prep-language-switcher">
                 {solveLanguageOptions.map((language) => (
@@ -398,13 +430,74 @@ export function InterviewPrepSessionPage() {
               </button>
             </div>
           </div>
+          {task.language === 'sql' && task.starterCode && (
+            <div className="interview-prep-sql-context">
+              <div className="interview-prep-sql-context__head">
+                <div>
+                  <div className="interview-prep-block-title">Схема БД и стартовый запрос</div>
+                  <p className="interview-prep-muted">
+                    Держим таблицы, примеры строк и стартовый SQL прямо над editor, чтобы не прыгать между блоками.
+                  </p>
+                </div>
+                <div className="interview-prep-sql-tabs">
+                  <button
+                    type="button"
+                    className={`pill-selector__pill ${sqlStarterTab === 'schema' ? 'active' : ''}`}
+                    onClick={() => setSqlStarterTab('schema')}
+                  >
+                    Схема
+                  </button>
+                  <button
+                    type="button"
+                    className={`pill-selector__pill ${sqlStarterTab === 'examples' ? 'active' : ''}`}
+                    onClick={() => setSqlStarterTab('examples')}
+                  >
+                    Примеры
+                  </button>
+                  <button
+                    type="button"
+                    className={`pill-selector__pill ${sqlStarterTab === 'query' ? 'active' : ''}`}
+                    onClick={() => setSqlStarterTab('query')}
+                  >
+                    Стартовый запрос
+                  </button>
+                </div>
+              </div>
+              <div className="interview-prep-code-editor interview-prep-code-editor--sql interview-prep-code-editor--sql-inline">
+                <Editor
+                  height="260px"
+                  defaultLanguage={monacoLanguageFor(task.language)}
+                  language={monacoLanguageFor(task.language)}
+                  value={sqlStarterValue}
+                  theme="vs-dark"
+                  options={{
+                    readOnly: true,
+                    minimap: { enabled: false },
+                    lineNumbers: 'on',
+                    fontSize: 13,
+                    automaticLayout: true,
+                    scrollBeyondLastLine: false,
+                    wordWrap: 'off',
+                    tabSize: 2,
+                    padding: { top: 16, bottom: 16 },
+                    renderLineHighlight: 'none',
+                  }}
+                />
+              </div>
+            </div>
+          )}
           <div className="interview-prep-live-editor" style={{ height: `${editorHeight}px` }}>
             <Editor
+              key={`${task.id}-${solveLanguage}`}
               height={`${editorHeight}px`}
               defaultLanguage={monacoLanguageFor(solveLanguage)}
               language={monacoLanguageFor(solveLanguage)}
               value={code}
-              onChange={(value) => setCode(value ?? '')}
+              onChange={(value) => {
+                const nextCode = value ?? '';
+                setCode(nextCode);
+                setCodeDrafts((prev) => ({ ...prev, [solveLanguage]: nextCode }));
+              }}
               theme="vs-dark"
               options={{
                 minimap: { enabled: false },
@@ -602,6 +695,29 @@ export function InterviewPrepSessionPage() {
               <XCircle size={16} />
               <span>{answering ? 'Сохраняю...' : 'Не ответил'}</span>
             </button>
+          </div>
+        </section>
+      ) : session.task?.isExecutable && !session.lastSubmissionPassed ? (
+        <section className="card dashboard-card interview-prep-question-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>Follow-up вопросы</h2>
+              <p className="interview-prep-muted">Откроются сразу после `accepted` по live-coding части.</p>
+            </div>
+            <CircleDashed size={18} />
+          </div>
+          <div className="interview-prep-muted">
+            Сейчас follow-up скрыты, потому что автопроверка ещё не пройдена.
+          </div>
+        </section>
+      ) : !session.currentQuestion ? (
+        <section className="card dashboard-card interview-prep-question-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>Follow-up вопросы</h2>
+              <p className="interview-prep-muted">Для этой задачи пока не найдено ни одного привязанного follow-up вопроса.</p>
+            </div>
+            <CircleDashed size={18} />
           </div>
         </section>
       ) : null}
