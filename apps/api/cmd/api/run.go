@@ -233,6 +233,7 @@ func Run() (*kratos.App, *appLogger.Logger, error) {
 	server.RegisterRTConfig(httpServer, rtcManager, profileServiceDomain)
 	server.RegisterInterviewPrepRoutes(httpServer, interviewPrepServiceDomain, profileServiceDomain)
 	server.RegisterAdminUsersRoutes(httpServer, profileRepo, profileServiceDomain, profileServiceDomain)
+	server.RegisterAdminInterviewPrepRoutes(httpServer, interviewPrepRepo, profileServiceDomain)
 
 	adminv1.RegisterAdminServiceHTTPServer(httpServer, adminService)
 	adminv1.RegisterAdminServiceServer(grpcServer, adminService)
