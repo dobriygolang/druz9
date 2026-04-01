@@ -586,6 +586,7 @@ export const ArenaMatchPage: React.FC = () => {
   };
 
   const handleBack = async () => {
+    if (!matchId) return;
     try {
       await codeRoomApi.leaveArenaMatch(
         matchId,

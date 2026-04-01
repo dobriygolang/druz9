@@ -115,7 +115,6 @@ const normalizeSession = (session: any): InterviewPrepSession => ({
   createdAt: session.createdAt ?? session.created_at,
   updatedAt: session.updatedAt ?? session.updated_at,
   task: session.task ? normalizeTask(session.task) : undefined,
-  questions: Array.isArray(session.questions) ? session.questions.map(normalizeQuestion) : [],
   currentQuestion: session.currentQuestion || session.current_question
     ? normalizeQuestion(session.currentQuestion ?? session.current_question)
     : undefined,

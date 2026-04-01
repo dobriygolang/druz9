@@ -32,7 +32,7 @@ const LoadingFallback: React.FC = () => (
 );
 
 export const RouterProvider: React.FC = () => {
-  const { isLoading, isAuthenticated, needsProfileComplete } = useAuth();
+  const { isLoading, isAuthenticated, needsProfileComplete, user } = useAuth();
 
   // Show global loading only on initial load
   if (isLoading) {
