@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
@@ -110,6 +110,8 @@ const ARENA_RULE_SECTIONS = [
 export const CodeRoomsPage: React.FC = () => {
   type LaunchMode = CodeRoomMode | 'queue';
   const navigate = useNavigate();
+  const location = useLocation();
+  const skipArenaResume = Boolean(location.state?.skipArenaResume);
   const { user, isLoading: authLoading } = useAuth();
   const isAdmin = Boolean(user?.isAdmin);
   const isGuest = !user;
@@ -167,7 +169,7 @@ export const CodeRoomsPage: React.FC = () => {
           const actorId = user?.id || getStoredGuestId();
           const guestName = user ? undefined : getStoredGuestName();
           const serverState = await codeRoomApi.getArenaQueueStatus(actorId, guestName);
-          if (serverState.status === 'matched' && serverState.match?.id) {
+          if (!skipArenaResume && serverState.status === 'matched' && serverState.match?.id) {
             // Queue matched while we were away
             navigate(`/arena/${serverState.match.id}`);
           } else if (serverState.status !== 'queued') {
@@ -326,7 +328,7 @@ export const CodeRoomsPage: React.FC = () => {
       try {
         const next = await codeRoomApi.getArenaQueueStatus(actorId, guestName);
         setQueueState(next);
-        if (next.status === 'matched' && next.match?.id) {
+        if (!skipArenaResume && next.status === 'matched' && next.match?.id) {
           setShowCreateModal(false);
           navigate(`/arena/${next.match.id}`);
         }

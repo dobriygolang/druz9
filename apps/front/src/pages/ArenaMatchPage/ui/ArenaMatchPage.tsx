@@ -699,7 +699,7 @@ export const ArenaMatchPage: React.FC = () => {
       <div className="arena-page">
         <div className="arena-page__header">
           <div className="arena-page__header-left">
-            <button className="btn btn-secondary arena-back-btn" onClick={() => navigate('/code-rooms')}>
+            <button className="btn btn-secondary arena-back-btn" onClick={() => navigate('/code-rooms', { state: { skipArenaResume: true } })}>
               <ArrowLeft size={16} />
             </button>
             <span className="code-rooms-kicker">Arena duel</span>
