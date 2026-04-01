@@ -16,6 +16,7 @@ func normalizeTaskRequest(req adminTaskRequest) adminTaskRequest {
 	req.Statement = strings.TrimSpace(req.Statement)
 	req.PrepType = strings.TrimSpace(req.PrepType)
 	req.Language = strings.TrimSpace(req.Language)
+	req.CompanyTag = strings.TrimSpace(strings.ToLower(req.CompanyTag))
 	req.ExecutionProfile = strings.TrimSpace(req.ExecutionProfile)
 	req.RunnerMode = strings.TrimSpace(req.RunnerMode)
 	req.StarterCode = strings.TrimSpace(req.StarterCode)
@@ -27,6 +28,12 @@ func normalizeTaskRequest(req adminTaskRequest) adminTaskRequest {
 	}
 	if req.Language == "" {
 		req.Language = "go"
+	}
+	if len(req.SupportedLanguages) == 0 {
+		req.SupportedLanguages = []string{req.Language}
+	}
+	for i := range req.SupportedLanguages {
+		req.SupportedLanguages[i] = strings.TrimSpace(strings.ToLower(req.SupportedLanguages[i]))
 	}
 	if req.ExecutionProfile == "" {
 		req.ExecutionProfile = "pure"
@@ -57,6 +64,13 @@ func validateTaskRequest(req adminTaskRequest) string {
 	case "go", "python", "sql":
 	default:
 		return "unsupported language"
+	}
+	for _, language := range req.SupportedLanguages {
+		switch language {
+		case "go", "python", "sql":
+		default:
+			return "unsupported supported language"
+		}
 	}
 	if req.IsExecutable && req.CodeTaskID == "" {
 		return "codeTaskId is required for executable tasks"

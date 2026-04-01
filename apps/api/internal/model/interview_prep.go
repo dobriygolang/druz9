@@ -9,12 +9,12 @@ import (
 type InterviewPrepType string
 
 const (
-	InterviewPrepTypeUnknown    InterviewPrepType = ""
-	InterviewPrepTypeCoding     InterviewPrepType = "coding"
-	InterviewPrepTypeAlgorithm  InterviewPrepType = "algorithm"
+	InterviewPrepTypeUnknown      InterviewPrepType = ""
+	InterviewPrepTypeCoding       InterviewPrepType = "coding"
+	InterviewPrepTypeAlgorithm    InterviewPrepType = "algorithm"
 	InterviewPrepTypeSystemDesign InterviewPrepType = "system_design"
-	InterviewPrepTypeSQL        InterviewPrepType = "sql"
-	InterviewPrepTypeCodeReview InterviewPrepType = "code_review"
+	InterviewPrepTypeSQL          InterviewPrepType = "sql"
+	InterviewPrepTypeCodeReview   InterviewPrepType = "code_review"
 )
 
 func (t InterviewPrepType) String() string {
@@ -82,22 +82,24 @@ func InterviewPrepSelfAssessmentFromString(v string) InterviewPrepSelfAssessment
 }
 
 type InterviewPrepTask struct {
-	ID                uuid.UUID
-	Slug              string
-	Title             string
-	Statement         string
-	PrepType          InterviewPrepType
-	Language          string
-	IsExecutable      bool
-	ExecutionProfile  string
-	RunnerMode        string
-	DurationSeconds   int32
-	StarterCode       string
-	ReferenceSolution string
-	CodeTaskID        *uuid.UUID
-	IsActive          bool
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
+	ID                 uuid.UUID
+	Slug               string
+	Title              string
+	Statement          string
+	PrepType           InterviewPrepType
+	Language           string
+	CompanyTag         string
+	SupportedLanguages []string
+	IsExecutable       bool
+	ExecutionProfile   string
+	RunnerMode         string
+	DurationSeconds    int32
+	StarterCode        string
+	ReferenceSolution  string
+	CodeTaskID         *uuid.UUID
+	IsActive           bool
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
 }
 
 type InterviewPrepQuestion struct {
@@ -124,6 +126,7 @@ type InterviewPrepSession struct {
 	TaskID                  uuid.UUID
 	Status                  InterviewPrepSessionStatus
 	CurrentQuestionPosition int32
+	SolveLanguage           string
 	Code                    string
 	LastSubmissionPassed    bool
 	StartedAt               time.Time

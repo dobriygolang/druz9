@@ -55,7 +55,7 @@ type Repository interface {
 	CreateSession(ctx context.Context, session *model.InterviewPrepSession) error
 	GetSession(ctx context.Context, sessionID uuid.UUID) (*model.InterviewPrepSession, error)
 	GetActiveSessionByUserAndTask(ctx context.Context, userID, taskID uuid.UUID) (*model.InterviewPrepSession, error)
-	UpdateSessionCode(ctx context.Context, sessionID uuid.UUID, code string, passed bool) error
+	UpdateSessionCode(ctx context.Context, sessionID uuid.UUID, solveLanguage string, code string, passed bool) error
 	AdvanceSessionQuestion(ctx context.Context, sessionID uuid.UUID, nextPosition int32) error
 	FinishSession(ctx context.Context, sessionID uuid.UUID) error
 
@@ -122,6 +122,7 @@ func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uui
 		TaskID:                  taskID,
 		Status:                  model.InterviewPrepSessionStatusActive,
 		CurrentQuestionPosition: 0,
+		SolveLanguage:           normalizeSolveLanguage(task.Language),
 		Code:                    task.StarterCode,
 		LastSubmissionPassed:    !task.IsExecutable,
 		StartedAt:               nowTime,
@@ -202,7 +203,45 @@ type SubmitResult struct {
 
 type SystemDesignReviewResult = aireview.SystemDesignReview
 
-func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string) (*SubmitResult, error) {
+func normalizeSolveLanguage(language string) string {
+	return strings.TrimSpace(strings.ToLower(language))
+}
+
+func isSupportedInterviewPrepLanguage(language string) bool {
+	switch normalizeSolveLanguage(language) {
+	case "go", "python", "sql":
+		return true
+	default:
+		return false
+	}
+}
+
+func taskSupportsLanguage(task *model.InterviewPrepTask, language string) bool {
+	if task == nil {
+		return false
+	}
+	language = normalizeSolveLanguage(language)
+	if len(task.SupportedLanguages) == 0 {
+		return normalizeSolveLanguage(task.Language) == language
+	}
+	for _, candidate := range task.SupportedLanguages {
+		if normalizeSolveLanguage(candidate) == language {
+			return true
+		}
+	}
+	return false
+}
+
+func firstNonEmptyLanguage(values ...string) string {
+	for _, value := range values {
+		if trimmed := normalizeSolveLanguage(value); trimmed != "" {
+			return trimmed
+		}
+	}
+	return ""
+}
+
+func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string) (*SubmitResult, error) {
 	if err := ensureTrusted(user); err != nil {
 		return nil, err
 	}
@@ -218,8 +257,11 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 		return nil, ErrTaskNotFound
 	}
 
-	// Проверка: поддерживаемый язык
-	if session.Task.Language != "" && session.Task.Language != "go" && session.Task.Language != "python" && session.Task.Language != "sql" {
+	solveLanguage = normalizeSolveLanguage(firstNonEmptyLanguage(solveLanguage, session.SolveLanguage, session.Task.Language))
+	if !isSupportedInterviewPrepLanguage(solveLanguage) {
+		return nil, ErrUnsupportedLanguage
+	}
+	if !taskSupportsLanguage(session.Task, solveLanguage) {
 		return nil, ErrUnsupportedLanguage
 	}
 
@@ -232,12 +274,12 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 		if err != nil {
 			return nil, err
 		}
-		judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, codeTask, code)
+		judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, codeTask, code, solveLanguage)
 		if err != nil {
 			return nil, err
 		}
 
-		if err := s.repo.UpdateSessionCode(ctx, session.ID, code, judgeResult.Passed); err != nil {
+		if err := s.repo.UpdateSessionCode(ctx, session.ID, solveLanguage, code, judgeResult.Passed); err != nil {
 			return nil, err
 		}
 

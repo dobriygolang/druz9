@@ -626,6 +626,12 @@
   flex-wrap: wrap;
 }
 
+.interview-prep-language-switcher {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
 .interview-prep-live-editor {
   border-radius: 16px;
   overflow: hidden;
@@ -694,6 +700,10 @@
 .interview-prep-live-result.is-error {
   border-color: rgba(239, 68, 68, 0.24);
   background: rgba(239, 68, 68, 0.08);
+}
+
+.interview-prep-filter-card .pill-selector {
+  flex-wrap: wrap;
 }
 
 .interview-prep-design-review-grid {

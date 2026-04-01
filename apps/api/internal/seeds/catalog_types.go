@@ -29,20 +29,22 @@ type InterviewPrepCatalog struct {
 }
 
 type InterviewPrepCatalogTask struct {
-	Slug              string                         `json:"slug" yaml:"slug"`
-	Title             string                         `json:"title" yaml:"title"`
-	PrepType          string                         `json:"prep_type" yaml:"prep_type"`
-	Language          string                         `json:"language" yaml:"language"`
-	IsExecutable      bool                           `json:"is_executable" yaml:"is_executable"`
-	ExecutionProfile  string                         `json:"execution_profile" yaml:"execution_profile"`
-	RunnerMode        string                         `json:"runner_mode" yaml:"runner_mode"`
-	DurationSeconds   int32                          `json:"duration_seconds" yaml:"duration_seconds"`
-	Statement         string                         `json:"statement" yaml:"statement"`
-	StarterCode       string                         `json:"starter_code" yaml:"starter_code"`
-	ReferenceSolution string                         `json:"reference_solution" yaml:"reference_solution"`
-	CodeTask          *InterviewPrepCatalogCodeTask  `json:"code_task" yaml:"code_task"`
-	IsActive          bool                           `json:"is_active" yaml:"is_active"`
-	Questions         []InterviewPrepCatalogQuestion `json:"questions" yaml:"questions"`
+	Slug               string                         `json:"slug" yaml:"slug"`
+	Title              string                         `json:"title" yaml:"title"`
+	PrepType           string                         `json:"prep_type" yaml:"prep_type"`
+	Language           string                         `json:"language" yaml:"language"`
+	CompanyTag         string                         `json:"company_tag" yaml:"company_tag"`
+	SupportedLanguages []string                       `json:"supported_languages" yaml:"supported_languages"`
+	IsExecutable       bool                           `json:"is_executable" yaml:"is_executable"`
+	ExecutionProfile   string                         `json:"execution_profile" yaml:"execution_profile"`
+	RunnerMode         string                         `json:"runner_mode" yaml:"runner_mode"`
+	DurationSeconds    int32                          `json:"duration_seconds" yaml:"duration_seconds"`
+	Statement          string                         `json:"statement" yaml:"statement"`
+	StarterCode        string                         `json:"starter_code" yaml:"starter_code"`
+	ReferenceSolution  string                         `json:"reference_solution" yaml:"reference_solution"`
+	CodeTask           *InterviewPrepCatalogCodeTask  `json:"code_task" yaml:"code_task"`
+	IsActive           bool                           `json:"is_active" yaml:"is_active"`
+	Questions          []InterviewPrepCatalogQuestion `json:"questions" yaml:"questions"`
 }
 
 type InterviewPrepCatalogQuestion struct {

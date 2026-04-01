@@ -25,7 +25,7 @@ type Result struct {
 	RuntimeMs       int64
 }
 
-func EvaluateCodeTask(ctx context.Context, executor Executor, task *model.CodeTask, code string) (Result, error) {
+func EvaluateCodeTask(ctx context.Context, executor Executor, task *model.CodeTask, code string, overrideLanguage ...string) (Result, error) {
 	result := Result{}
 	if task == nil {
 		return result, nil
@@ -38,6 +38,18 @@ func EvaluateCodeTask(ctx context.Context, executor Executor, task *model.CodeTa
 	startedAt := time.Now()
 	taskSpec := policy.TaskSpecFromCodeTask(task, policy.TaskTypeAlgorithmPractice)
 	taskLanguage := policy.LanguageForProgrammingLanguage(task.Language)
+	selectedLanguage := ""
+	if len(overrideLanguage) > 0 {
+		selectedLanguage = overrideLanguage[0]
+	}
+	switch strings.TrimSpace(strings.ToLower(selectedLanguage)) {
+	case "go":
+		taskLanguage = policy.LanguageGo
+	case "python":
+		taskLanguage = policy.LanguagePython
+	case "sql":
+		taskLanguage = policy.LanguageSQL
+	}
 
 	for i, tc := range testCases {
 		execResult, runErr := executor.Execute(ctx, sandbox.ExecutionRequest{

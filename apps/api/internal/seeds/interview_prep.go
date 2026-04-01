@@ -15,7 +15,7 @@ import (
 
 const interviewPrepSeedName = "interview_prep_pack"
 const interviewPrepCatalogPath = "scripts/seeds/catalogs/interview_prep.json"
-const interviewPrepSeedVersion = "v3-generated-categories"
+const interviewPrepSeedVersion = "v4-groups-and-languages"
 
 func (r *Runner) runInterviewPrep(ctx context.Context) (Result, error) {
 	catalog, rawCatalog, err := loadInterviewPrepCatalog(interviewPrepCatalogPath)
@@ -123,16 +123,18 @@ func upsertInterviewPrepTask(ctx context.Context, tx pgx.Tx, def InterviewPrepCa
 
 	_, err = tx.Exec(ctx, `
 		INSERT INTO interview_prep_tasks (
-			id, slug, title, statement, prep_type, language, is_executable,
+			id, slug, title, statement, prep_type, language, company_tag, supported_languages, is_executable,
 			execution_profile, runner_mode, duration_seconds, starter_code,
 			reference_solution, code_task_id, is_active, created_at, updated_at
 		)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
 		ON CONFLICT (slug) DO UPDATE SET
 			title = EXCLUDED.title,
 			statement = EXCLUDED.statement,
 			prep_type = EXCLUDED.prep_type,
 			language = EXCLUDED.language,
+			company_tag = EXCLUDED.company_tag,
+			supported_languages = EXCLUDED.supported_languages,
 			is_executable = EXCLUDED.is_executable,
 			execution_profile = EXCLUDED.execution_profile,
 			runner_mode = EXCLUDED.runner_mode,
@@ -149,6 +151,8 @@ func upsertInterviewPrepTask(ctx context.Context, tx pgx.Tx, def InterviewPrepCa
 		strings.TrimSpace(def.Statement),
 		normalizeInterviewPrepCatalogType(def.PrepType).String(),
 		normalizeInterviewPrepCatalogLanguage(def.Language),
+		normalizeInterviewPrepCompanyTag(def.CompanyTag),
+		normalizeInterviewPrepSupportedLanguages(def),
 		def.IsExecutable,
 		normalizeInterviewPrepExecutionProfile(def.ExecutionProfile),
 		normalizeInterviewPrepRunnerMode(def.RunnerMode),
@@ -164,6 +168,33 @@ func upsertInterviewPrepTask(ctx context.Context, tx pgx.Tx, def InterviewPrepCa
 		return uuid.Nil, false, fmt.Errorf("upsert interview prep task %s: %w", slug, err)
 	}
 	return taskID, created, nil
+}
+
+func normalizeInterviewPrepCompanyTag(value string) string {
+	return strings.TrimSpace(strings.ToLower(value))
+}
+
+func normalizeInterviewPrepSupportedLanguages(def InterviewPrepCatalogTask) []string {
+	if len(def.SupportedLanguages) == 0 {
+		return []string{normalizeInterviewPrepCatalogLanguage(def.Language)}
+	}
+	result := make([]string, 0, len(def.SupportedLanguages))
+	seen := make(map[string]struct{}, len(def.SupportedLanguages))
+	for _, language := range def.SupportedLanguages {
+		normalized := normalizeInterviewPrepCatalogLanguage(language)
+		if normalized == "" {
+			continue
+		}
+		if _, ok := seen[normalized]; ok {
+			continue
+		}
+		seen[normalized] = struct{}{}
+		result = append(result, normalized)
+	}
+	if len(result) == 0 {
+		return []string{normalizeInterviewPrepCatalogLanguage(def.Language)}
+	}
+	return result
 }
 
 func upsertInterviewPrepCodeTask(

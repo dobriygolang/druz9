@@ -31,7 +31,7 @@ type Service interface {
 	ListTasks(ctx context.Context, user *model.User) ([]*model.InterviewPrepTask, error)
 	StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error)
 	GetSession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepSession, error)
-	Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string) (*appinterviewprep.SubmitResult, error)
+	Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string) (*appinterviewprep.SubmitResult, error)
 	ReviewSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, notes string) (*appinterviewprep.SystemDesignReviewResult, error)
 	AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string) (*model.InterviewPrepSession, error)
 }

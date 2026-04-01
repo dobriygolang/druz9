@@ -108,13 +108,14 @@ func handleSessionResource(service Service, authorizer Authorizer) http.HandlerF
 
 		if len(parts) == 2 && parts[1] == "submit" && r.Method == http.MethodPost {
 			var req struct {
-				Code string `json:"code"`
+				Code     string `json:"code"`
+				Language string `json:"language"`
 			}
 			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 				http.Error(w, "bad request", http.StatusBadRequest)
 				return
 			}
-			result, err := service.Submit(r.Context(), user, sessionID, req.Code)
+			result, err := service.Submit(r.Context(), user, sessionID, req.Code, req.Language)
 			if err != nil {
 				writeError(w, err)
 				return

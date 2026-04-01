@@ -63,6 +63,7 @@ export function InterviewPrepPage() {
   const [search, setSearch] = useState(searchParams.get('q') ?? '');
   const [modeFilter, setModeFilter] = useState<TaskModeFilter>((searchParams.get('mode') as TaskModeFilter) || 'all');
   const [category, setCategory] = useState<TaskCategory>((searchParams.get('category') as TaskCategory) || 'all');
+  const [company, setCompany] = useState(searchParams.get('company') ?? 'all');
   const randomLaunchTriggered = useRef(false);
 
   useEffect(() => {
@@ -78,13 +79,14 @@ export function InterviewPrepPage() {
   useEffect(() => {
     const next = new URLSearchParams();
     category === 'all' ? next.delete('category') : next.set('category', category);
+    company === 'all' ? next.delete('company') : next.set('company', company);
     modeFilter === 'all' ? next.delete('mode') : next.set('mode', modeFilter);
     search.trim() ? next.set('q', search.trim()) : next.delete('q');
     if (searchParams.get('pick') === 'random') {
       next.set('pick', 'random');
     }
     setSearchParams(next, { replace: true });
-  }, [category, modeFilter, search, searchParams, setSearchParams]);
+  }, [category, company, modeFilter, search, searchParams, setSearchParams]);
 
   const summary = useMemo(() => {
     return {
@@ -102,10 +104,18 @@ export function InterviewPrepPage() {
     }));
   }, [tasks]);
 
+  const companyOptions = useMemo(() => {
+    const tags = Array.from(new Set(tasks.map((task) => task.companyTag).filter(Boolean))).sort();
+    return ['all', ...tags];
+  }, [tasks]);
+
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
       const taskCategory = categoryForTask(task);
       if (category !== 'all' && taskCategory !== category) {
+        return false;
+      }
+      if (company !== 'all' && (task.companyTag || 'general') !== company) {
         return false;
       }
       if (modeFilter === 'executable' && !task.isExecutable) {
@@ -117,10 +127,10 @@ export function InterviewPrepPage() {
       if (!search.trim()) {
         return true;
       }
-      const haystack = `${task.title} ${task.statement} ${task.language} ${task.prepType}`.toLowerCase();
+      const haystack = `${task.title} ${task.statement} ${task.language} ${task.prepType} ${task.companyTag}`.toLowerCase();
       return haystack.includes(search.trim().toLowerCase());
     });
-  }, [tasks, category, modeFilter, search]);
+  }, [tasks, category, company, modeFilter, search]);
 
   const groupedTasks = useMemo(() => {
     const groups = new Map<TaskCategory, InterviewPrepTask[]>();
@@ -189,6 +199,7 @@ export function InterviewPrepPage() {
               className="btn btn-secondary"
               onClick={() => {
                 setCategory('all');
+                setCompany('all');
                 setModeFilter('all');
                 setSearch('');
               }}
@@ -273,6 +284,22 @@ export function InterviewPrepPage() {
           </div>
 
           <div className="form-group">
+            <label>Компания / группа</label>
+            <div className="pill-selector">
+              {companyOptions.map((item) => (
+                <button
+                  key={item}
+                  type="button"
+                  className={`pill-selector__pill ${company === item ? 'active' : ''}`}
+                  onClick={() => setCompany(item)}
+                >
+                  {item === 'all' ? 'Все' : item}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          <div className="form-group">
             <label>Поиск</label>
             <input
               className="input"
@@ -318,6 +345,7 @@ export function InterviewPrepPage() {
                         <div className="task-item__meta">
                           <span className="badge">{CATEGORY_LABELS[taskCategory]}</span>
                           <span className="badge">{PREP_TYPE_LABELS[task.prepType] ?? task.prepType}</span>
+                          {task.companyTag && <span className="badge">{task.companyTag}</span>}
                           <span className="badge">{task.language}</span>
                           <span className="badge">
                             <Clock3 size={12} />

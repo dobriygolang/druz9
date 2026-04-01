@@ -12,21 +12,23 @@ import (
 )
 
 type taskResponse struct {
-	ID               uuid.UUID  `json:"id"`
-	Slug             string     `json:"slug"`
-	Title            string     `json:"title"`
-	Statement        string     `json:"statement"`
-	PrepType         string     `json:"prepType"`
-	Language         string     `json:"language"`
-	IsExecutable     bool       `json:"isExecutable"`
-	ExecutionProfile string     `json:"executionProfile"`
-	RunnerMode       string     `json:"runnerMode"`
-	DurationSeconds  int32      `json:"durationSeconds"`
-	StarterCode      string     `json:"starterCode"`
-	CodeTaskID       *uuid.UUID `json:"codeTaskId,omitempty"`
-	IsActive         bool       `json:"isActive"`
-	CreatedAt        time.Time  `json:"createdAt"`
-	UpdatedAt        time.Time  `json:"updatedAt"`
+	ID                 uuid.UUID  `json:"id"`
+	Slug               string     `json:"slug"`
+	Title              string     `json:"title"`
+	Statement          string     `json:"statement"`
+	PrepType           string     `json:"prepType"`
+	Language           string     `json:"language"`
+	CompanyTag         string     `json:"companyTag"`
+	SupportedLanguages []string   `json:"supportedLanguages"`
+	IsExecutable       bool       `json:"isExecutable"`
+	ExecutionProfile   string     `json:"executionProfile"`
+	RunnerMode         string     `json:"runnerMode"`
+	DurationSeconds    int32      `json:"durationSeconds"`
+	StarterCode        string     `json:"starterCode"`
+	CodeTaskID         *uuid.UUID `json:"codeTaskId,omitempty"`
+	IsActive           bool       `json:"isActive"`
+	CreatedAt          time.Time  `json:"createdAt"`
+	UpdatedAt          time.Time  `json:"updatedAt"`
 }
 
 type questionResponse struct {
@@ -45,6 +47,7 @@ type sessionResponse struct {
 	TaskID                  uuid.UUID         `json:"taskId"`
 	Status                  string            `json:"status"`
 	CurrentQuestionPosition int32             `json:"currentQuestionPosition"`
+	SolveLanguage           string            `json:"solveLanguage"`
 	Code                    string            `json:"code"`
 	LastSubmissionPassed    bool              `json:"lastSubmissionPassed"`
 	StartedAt               time.Time         `json:"startedAt"`
@@ -109,21 +112,23 @@ func mapTask(task *model.InterviewPrepTask) *taskResponse {
 		return nil
 	}
 	return &taskResponse{
-		ID:               task.ID,
-		Slug:             task.Slug,
-		Title:            task.Title,
-		Statement:        task.Statement,
-		PrepType:         task.PrepType.String(),
-		Language:         task.Language,
-		IsExecutable:     task.IsExecutable,
-		ExecutionProfile: task.ExecutionProfile,
-		RunnerMode:       task.RunnerMode,
-		DurationSeconds:  task.DurationSeconds,
-		StarterCode:      task.StarterCode,
-		CodeTaskID:       task.CodeTaskID,
-		IsActive:         task.IsActive,
-		CreatedAt:        task.CreatedAt,
-		UpdatedAt:        task.UpdatedAt,
+		ID:                 task.ID,
+		Slug:               task.Slug,
+		Title:              task.Title,
+		Statement:          task.Statement,
+		PrepType:           task.PrepType.String(),
+		Language:           task.Language,
+		CompanyTag:         task.CompanyTag,
+		SupportedLanguages: append([]string{}, task.SupportedLanguages...),
+		IsExecutable:       task.IsExecutable,
+		ExecutionProfile:   task.ExecutionProfile,
+		RunnerMode:         task.RunnerMode,
+		DurationSeconds:    task.DurationSeconds,
+		StarterCode:        task.StarterCode,
+		CodeTaskID:         task.CodeTaskID,
+		IsActive:           task.IsActive,
+		CreatedAt:          task.CreatedAt,
+		UpdatedAt:          task.UpdatedAt,
 	}
 }
 
@@ -155,6 +160,7 @@ func mapSession(session *model.InterviewPrepSession, includeAnswer bool) *sessio
 		TaskID:                  session.TaskID,
 		Status:                  session.Status.String(),
 		CurrentQuestionPosition: session.CurrentQuestionPosition,
+		SolveLanguage:           session.SolveLanguage,
 		Code:                    session.Code,
 		LastSubmissionPassed:    session.LastSubmissionPassed,
 		StartedAt:               session.StartedAt,

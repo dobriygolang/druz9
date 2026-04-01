@@ -1,7 +1,16 @@
 package seeds
 
 func generatedInterviewPrepTasks() []InterviewPrepCatalogTask {
-	return append(append(append(goInterviewPrepTasks(), pythonInterviewPrepTasks()...), sqlInterviewPrepTasks()...), systemDesignInterviewPrepTasks()...)
+	return append(
+		append(
+			append(
+				assignCompanyTags(goInterviewPrepTasks(), "ozon", "avito"),
+				assignCompanyTags(pythonInterviewPrepTasks(), "avito", "ozon")...,
+			),
+			assignCompanyTags(sqlInterviewPrepTasks(), "ozon", "avito")...,
+		),
+		assignCompanyTags(systemDesignInterviewPrepTasks(), "avito", "ozon")...,
+	)
 }
 
 func goInterviewPrepTasks() []InterviewPrepCatalogTask {
@@ -61,38 +70,45 @@ func systemDesignInterviewPrepTasks() []InterviewPrepCatalogTask {
 }
 
 func guidedCodingTask(slug string, title string, language string, statement string, starter string, reference string, questions ...InterviewPrepCatalogQuestion) InterviewPrepCatalogTask {
+	supportedLanguages := []string{language}
+	if language == "go" || language == "python" {
+		supportedLanguages = []string{"go", "python"}
+	}
 	return InterviewPrepCatalogTask{
-		Slug:              slug,
-		Title:             title,
-		PrepType:          "coding",
-		Language:          language,
-		IsExecutable:      false,
-		ExecutionProfile:  "pure",
-		RunnerMode:        "function_io",
-		DurationSeconds:   1800,
-		Statement:         statement,
-		StarterCode:       starter,
-		ReferenceSolution: reference,
-		IsActive:          true,
-		Questions:         questions,
+		Slug:               slug,
+		Title:              title,
+		PrepType:           "coding",
+		Language:           language,
+		SupportedLanguages: supportedLanguages,
+		IsExecutable:       false,
+		ExecutionProfile:   "pure",
+		RunnerMode:         "function_io",
+		DurationSeconds:    1800,
+		Statement:          statement,
+		StarterCode:        starter,
+		ReferenceSolution:  reference,
+		IsActive:           true,
+		Questions:          questions,
 	}
 }
 
 func systemDesignTask(slug string, title string, statement string, reference string, questions ...InterviewPrepCatalogQuestion) InterviewPrepCatalogTask {
 	return InterviewPrepCatalogTask{
-		Slug:              slug,
-		Title:             title,
-		PrepType:          "system_design",
-		Language:          "system_design",
-		IsExecutable:      false,
-		ExecutionProfile:  "pure",
-		RunnerMode:        "function_io",
-		DurationSeconds:   2700,
-		Statement:         statement,
-		StarterCode:       "",
-		ReferenceSolution: reference,
-		IsActive:          true,
-		Questions:         questions,
+		Slug:               slug,
+		Title:              title,
+		PrepType:           "system_design",
+		Language:           "system_design",
+		CompanyTag:         "",
+		SupportedLanguages: []string{},
+		IsExecutable:       false,
+		ExecutionProfile:   "pure",
+		RunnerMode:         "function_io",
+		DurationSeconds:    2700,
+		Statement:          statement,
+		StarterCode:        "",
+		ReferenceSolution:  reference,
+		IsActive:           true,
+		Questions:          questions,
 	}
 }
 
@@ -113,5 +129,22 @@ func pythonStarter(body string) string {
 }
 
 func sqlStarter(body string) string {
-	return body
+	return "-- tables\n" +
+		"-- users(id, firstname, lastname, birth)\n" +
+		"-- purchase(sku, price, user_id, date)\n" +
+		"-- ban_list(user_id, date_from)\n\n" +
+		body
+}
+
+func assignCompanyTags(tasks []InterviewPrepCatalogTask, primary string, secondary string) []InterviewPrepCatalogTask {
+	result := make([]InterviewPrepCatalogTask, len(tasks))
+	copy(result, tasks)
+	for index := range result {
+		if index%2 == 0 {
+			result[index].CompanyTag = primary
+		} else {
+			result[index].CompanyTag = secondary
+		}
+	}
+	return result
 }

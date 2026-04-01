@@ -11,19 +11,21 @@ import (
 )
 
 type adminTaskRequest struct {
-	Slug              string `json:"slug"`
-	Title             string `json:"title"`
-	Statement         string `json:"statement"`
-	PrepType          string `json:"prepType"`
-	Language          string `json:"language"`
-	IsExecutable      bool   `json:"isExecutable"`
-	ExecutionProfile  string `json:"executionProfile"`
-	RunnerMode        string `json:"runnerMode"`
-	DurationSeconds   int32  `json:"durationSeconds"`
-	StarterCode       string `json:"starterCode"`
-	ReferenceSolution string `json:"referenceSolution"`
-	CodeTaskID        string `json:"codeTaskId"`
-	IsActive          bool   `json:"isActive"`
+	Slug               string   `json:"slug"`
+	Title              string   `json:"title"`
+	Statement          string   `json:"statement"`
+	PrepType           string   `json:"prepType"`
+	Language           string   `json:"language"`
+	CompanyTag         string   `json:"companyTag"`
+	SupportedLanguages []string `json:"supportedLanguages"`
+	IsExecutable       bool     `json:"isExecutable"`
+	ExecutionProfile   string   `json:"executionProfile"`
+	RunnerMode         string   `json:"runnerMode"`
+	DurationSeconds    int32    `json:"durationSeconds"`
+	StarterCode        string   `json:"starterCode"`
+	ReferenceSolution  string   `json:"referenceSolution"`
+	CodeTaskID         string   `json:"codeTaskId"`
+	IsActive           bool     `json:"isActive"`
 }
 
 type adminQuestionRequest struct {
@@ -228,19 +230,21 @@ func handleQuestionByID(w http.ResponseWriter, r *http.Request, taskID, question
 
 func buildTask(req adminTaskRequest, taskID uuid.UUID) *model.InterviewPrepTask {
 	return &model.InterviewPrepTask{
-		ID:                taskID,
-		Slug:              req.Slug,
-		Title:             req.Title,
-		Statement:         req.Statement,
-		PrepType:          model.InterviewPrepTypeFromString(req.PrepType),
-		Language:          req.Language,
-		IsExecutable:      req.IsExecutable,
-		ExecutionProfile:  req.ExecutionProfile,
-		RunnerMode:        req.RunnerMode,
-		DurationSeconds:   req.DurationSeconds,
-		StarterCode:       req.StarterCode,
-		ReferenceSolution: req.ReferenceSolution,
-		CodeTaskID:        parseOptionalUUID(req.CodeTaskID),
-		IsActive:          req.IsActive,
+		ID:                 taskID,
+		Slug:               req.Slug,
+		Title:              req.Title,
+		Statement:          req.Statement,
+		PrepType:           model.InterviewPrepTypeFromString(req.PrepType),
+		Language:           req.Language,
+		CompanyTag:         req.CompanyTag,
+		SupportedLanguages: append([]string{}, req.SupportedLanguages...),
+		IsExecutable:       req.IsExecutable,
+		ExecutionProfile:   req.ExecutionProfile,
+		RunnerMode:         req.RunnerMode,
+		DurationSeconds:    req.DurationSeconds,
+		StarterCode:        req.StarterCode,
+		ReferenceSolution:  req.ReferenceSolution,
+		CodeTaskID:         parseOptionalUUID(req.CodeTaskID),
+		IsActive:           req.IsActive,
 	}
 }

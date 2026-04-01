@@ -12,6 +12,30 @@ import {
 } from '@/features/InterviewPrep/api/interviewPrepApi';
 import { displayLanguageLabel, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
 
+const DEFAULT_CODE_BY_LANGUAGE: Record<string, string> = {
+  go: `package main
+
+import "fmt"
+
+func main() {
+\tfmt.Println("implement me")
+}
+`,
+  python: `def solve(input: str) -> str:
+    return ""
+`,
+  sql: `-- Write a single SQL query.
+SELECT 1;
+`,
+};
+
+function starterForLanguage(taskLanguage: string | undefined, solveLanguage: string, starterCode: string | undefined) {
+  if (starterCode && solveLanguage === taskLanguage) {
+    return starterCode;
+  }
+  return DEFAULT_CODE_BY_LANGUAGE[solveLanguage] ?? starterCode ?? '';
+}
+
 const resultLabel: Record<InterviewPrepQuestionResult['selfAssessment'], string> = {
   answered: 'Ответил сам',
   skipped: 'Пропустил',
@@ -31,6 +55,7 @@ export function InterviewPrepSessionPage() {
   const [designImage, setDesignImage] = useState<File | null>(null);
   const [designReview, setDesignReview] = useState<InterviewPrepSystemDesignReview | null>(null);
   const [editorHeight, setEditorHeight] = useState(560);
+  const [solveLanguage, setSolveLanguage] = useState('go');
   const resizeStartYRef = useRef(0);
   const resizeStartHeightRef = useRef(560);
   const [isResizingEditor, setIsResizingEditor] = useState(false);
@@ -58,6 +83,11 @@ export function InterviewPrepSessionPage() {
   useEffect(() => {
     setCode(session?.code ?? session?.task?.starterCode ?? '');
   }, [session?.id, session?.code, session?.task?.starterCode]);
+
+  useEffect(() => {
+    const fallbackLanguage = session?.solveLanguage || session?.task?.supportedLanguages?.[0] || session?.task?.language || 'go';
+    setSolveLanguage(fallbackLanguage);
+  }, [session?.id, session?.solveLanguage, session?.task?.language, session?.task?.supportedLanguages]);
 
   useEffect(() => {
     if (!isResizingEditor) {
@@ -93,13 +123,29 @@ export function InterviewPrepSessionPage() {
   const showLiveCoding = Boolean(session?.task?.starterCode);
   const canSubmitExecutable = Boolean(session?.task?.isExecutable);
   const showSystemDesignReview = session?.task?.prepType === 'system_design';
+  const solveLanguageOptions = session?.task?.supportedLanguages?.length
+    ? session.task.supportedLanguages
+    : (session?.task?.language ? [session.task.language] : []);
+
+  const switchSolveLanguage = (nextLanguage: string) => {
+    setSolveLanguage(nextLanguage);
+    const nextStarter = starterForLanguage(session?.task?.language, nextLanguage, session?.task?.starterCode);
+    const currentStarter = starterForLanguage(session?.task?.language, solveLanguage, session?.task?.starterCode);
+    setCode((currentCode) => {
+      if (!currentCode.trim() || currentCode === currentStarter) {
+        return nextStarter;
+      }
+      return currentCode;
+    });
+    setSubmitResult(null);
+  };
 
   const handleSubmitCode = async () => {
     if (!sessionId || !session?.task?.isExecutable) return;
     setSubmitting(true);
     setError(null);
     try {
-      const result = await interviewPrepApi.submit(sessionId, code);
+      const result = await interviewPrepApi.submit(sessionId, code, solveLanguage);
       setSubmitResult({
         passed: result.passed,
         lastError: result.lastError,
@@ -295,6 +341,20 @@ export function InterviewPrepSessionPage() {
           </div>
           <div className="interview-prep-live-toolbar">
             <span className="badge interview-prep-badge interview-prep-badge--language">{displayLanguageLabel(task.language)}</span>
+            {solveLanguageOptions.length > 1 && (
+              <div className="interview-prep-language-switcher">
+                {solveLanguageOptions.map((language) => (
+                  <button
+                    key={language}
+                    type="button"
+                    className={`pill-selector__pill ${solveLanguage === language ? 'active' : ''}`}
+                    onClick={() => switchSolveLanguage(language)}
+                  >
+                    {displayLanguageLabel(language)}
+                  </button>
+                ))}
+              </div>
+            )}
             <span className={`badge interview-prep-badge ${session.lastSubmissionPassed ? 'badge-success' : 'badge-secondary'}`}>
               {canSubmitExecutable
                 ? (session.lastSubmissionPassed ? 'Проверка пройдена' : 'Ожидается accepted')
@@ -323,8 +383,8 @@ export function InterviewPrepSessionPage() {
           <div className="interview-prep-live-editor" style={{ height: `${editorHeight}px` }}>
             <Editor
               height={`${editorHeight}px`}
-              defaultLanguage={monacoLanguageFor(task.language)}
-              language={monacoLanguageFor(task.language)}
+              defaultLanguage={monacoLanguageFor(solveLanguage)}
+              language={monacoLanguageFor(solveLanguage)}
               value={code}
               onChange={(value) => setCode(value ?? '')}
               theme="vs-dark"
@@ -366,8 +426,8 @@ export function InterviewPrepSessionPage() {
             </button>
             {!canSubmitExecutable && (
               <div className="interview-prep-live-result">
-                <strong>Live-coding доступен</strong>
-                <span>Для этой задачи есть editor, но backend ещё не считает её executable-задачей с автопроверкой.</span>
+                <strong>Practice draft</strong>
+                <span>Здесь можно писать решение и прогонять мысль руками, а follow-up уже доступны без judge.</span>
               </div>
             )}
             {submitResult && (

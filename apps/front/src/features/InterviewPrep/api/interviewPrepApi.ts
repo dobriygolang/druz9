@@ -17,6 +17,8 @@ export interface InterviewPrepTask {
   statement: string;
   prepType: InterviewPrepType;
   language: string;
+  companyTag: string;
+  supportedLanguages: string[];
   isExecutable: boolean;
   executionProfile: string;
   runnerMode: string;
@@ -46,6 +48,7 @@ export interface InterviewPrepSession {
   taskId: string;
   status: InterviewPrepSessionStatus;
   currentQuestionPosition: number;
+  solveLanguage: string;
   code: string;
   lastSubmissionPassed: boolean;
   startedAt: string;
@@ -99,6 +102,12 @@ const normalizeTask = (task: any): InterviewPrepTask => ({
   statement: task.statement,
   prepType: task.prepType ?? task.prep_type,
   language: task.language,
+  companyTag: task.companyTag ?? task.company_tag ?? '',
+  supportedLanguages: Array.isArray(task.supportedLanguages ?? task.supported_languages)
+    ? ((task.supportedLanguages ?? task.supported_languages).length
+      ? (task.supportedLanguages ?? task.supported_languages)
+      : [task.language])
+    : [task.language],
   isExecutable: Boolean(task.isExecutable ?? task.is_executable),
   executionProfile: task.executionProfile ?? task.execution_profile ?? 'pure',
   runnerMode: task.runnerMode ?? task.runner_mode ?? 'function_io',
@@ -135,6 +144,7 @@ const normalizeSession = (session: any): InterviewPrepSession => ({
   taskId: session.taskId ?? session.task_id,
   status: session.status,
   currentQuestionPosition: Number(session.currentQuestionPosition ?? session.current_question_position ?? 0),
+  solveLanguage: session.solveLanguage ?? session.solve_language ?? '',
   code: session.code ?? '',
   lastSubmissionPassed: Boolean(session.lastSubmissionPassed ?? session.last_submission_passed),
   startedAt: session.startedAt ?? session.started_at,
@@ -164,8 +174,8 @@ export const interviewPrepApi = {
     return normalizeSession(response.data.session);
   },
 
-  submit: async (sessionId: string, code: string): Promise<InterviewPrepSubmitResult> => {
-    const response = await apiClient.post<any>(`/api/v1/interview-prep/sessions/${sessionId}/submit`, { code });
+  submit: async (sessionId: string, code: string, language: string): Promise<InterviewPrepSubmitResult> => {
+    const response = await apiClient.post<any>(`/api/v1/interview-prep/sessions/${sessionId}/submit`, { code, language });
     const result = response.data.result;
     return {
       passed: Boolean(result?.passed ?? false),
@@ -229,6 +239,8 @@ export const interviewPrepApi = {
     statement: string;
     prepType: string;
     language: string;
+    companyTag?: string;
+    supportedLanguages?: string[];
     isExecutable: boolean;
     executionProfile: string;
     runnerMode: string;
@@ -248,6 +260,8 @@ export const interviewPrepApi = {
     statement: string;
     prepType: string;
     language: string;
+    companyTag?: string;
+    supportedLanguages?: string[];
     isExecutable: boolean;
     executionProfile: string;
     runnerMode: string;

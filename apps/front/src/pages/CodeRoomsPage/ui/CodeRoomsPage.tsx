@@ -1,6 +1,7 @@
 import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
+import { authApi } from '@/features/Auth/api/authApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
@@ -142,6 +143,7 @@ export const CodeRoomsPage: React.FC = () => {
   const [newRoomTopic, setNewRoomTopic] = useState('');
   const [newRoomDifficulty, setNewRoomDifficulty] = useState('');
   const [prepLaunchCategory, setPrepLaunchCategory] = useState('go');
+  const [prepLaunchCompany, setPrepLaunchCompany] = useState('all');
 
   // Initialize queueState from localStorage to persist across page refreshes
   const [queueState, setQueueState] = useState<ArenaQueueState | null>(() => {
@@ -195,6 +197,7 @@ export const CodeRoomsPage: React.FC = () => {
   }, []);
 
   const [leaderboard, setLeaderboard] = useState<ArenaLeaderboardEntry[]>([]);
+  const [leaderboardAvatars, setLeaderboardAvatars] = useState<Record<string, string>>({});
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [openMatches, setOpenMatches] = useState<ArenaMatch[]>([]);
   const [openMatchesLoading, setOpenMatchesLoading] = useState(true);
@@ -218,6 +221,32 @@ export const CodeRoomsPage: React.FC = () => {
   useEffect(() => {
     void loadLeaderboard();
   }, [loadLeaderboard]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const loadLeaderboardAvatars = async () => {
+      if (leaderboard.length === 0) {
+        setLeaderboardAvatars({});
+        return;
+      }
+      const entries = await Promise.all(leaderboard.map(async (entry) => {
+        try {
+          const profile = await authApi.getProfileById(entry.userId);
+          return [entry.userId, profile.user.avatarUrl] as const;
+        } catch (error) {
+          console.error('Failed to load leaderboard avatar:', error);
+          return [entry.userId, ''] as const;
+        }
+      }));
+      if (!cancelled) {
+        setLeaderboardAvatars(Object.fromEntries(entries));
+      }
+    };
+    void loadLeaderboardAvatars();
+    return () => {
+      cancelled = true;
+    };
+  }, [leaderboard]);
 
   useEffect(() => {
     let cancelled = false;
@@ -542,7 +571,7 @@ export const CodeRoomsPage: React.FC = () => {
                 <button
                   type="button"
                   className="code-rooms-mode-card"
-                  onClick={() => navigate('/interview-prep')}
+                  onClick={() => setShowCreateModal(true)}
                 >
                   <div className="code-rooms-mode-card__icon"><BookOpen size={18} /></div>
                   <div>
@@ -573,9 +602,17 @@ export const CodeRoomsPage: React.FC = () => {
             <div className="leaderboard-list">
               {leaderboard.map((entry, index) => {
                 const rankClass = index === 0 ? 'rank-gold' : index === 1 ? 'rank-silver' : index === 2 ? 'rank-bronze' : '';
+                const avatarUrl = leaderboardAvatars[entry.userId] || '';
                 return (
                   <div key={`${entry.userId}-${index}`} className="leaderboard-item">
-                    <div className={`leaderboard-rank ${rankClass}`}>{index + 1}</div>
+                    <div className={`leaderboard-rank ${rankClass}`}>
+                      {avatarUrl ? (
+                        <img src={avatarUrl} alt={entry.displayName} className="leaderboard-rank__avatar" />
+                      ) : (
+                        <span>{entry.displayName.charAt(0).toUpperCase()}</span>
+                      )}
+                      <span className="leaderboard-rank__place">{index + 1}</span>
+                    </div>
                     <div className="leaderboard-main">
                       <div className="leaderboard-name">{entry.displayName}</div>
                       <div className="leaderboard-meta">
@@ -777,17 +814,29 @@ export const CodeRoomsPage: React.FC = () => {
                       <button
                         type="button"
                         className="btn btn-secondary"
-                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}`)}
+                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
                       >
                         Открыть каталог
                       </button>
                       <button
                         type="button"
                         className="btn btn-primary"
-                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&pick=random`)}
+                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
                       >
                         Случайная задача
                       </button>
+                    </div>
+                    <div className="pill-selector">
+                      {['all', 'ozon', 'avito', 'general'].map((option) => (
+                        <button
+                          key={option}
+                          type="button"
+                          className={`pill-selector__pill ${prepLaunchCompany === option ? 'active' : ''}`}
+                          onClick={() => setPrepLaunchCompany(option)}
+                        >
+                          {option === 'all' ? 'Все группы' : option}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 )}

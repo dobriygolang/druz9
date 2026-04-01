@@ -43,6 +43,8 @@ type TaskFormState = {
   statement: string;
   prepType: InterviewPrepType;
   language: string;
+  companyTag: string;
+  supportedLanguages: string[];
   isExecutable: boolean;
   executionProfile: string;
   runnerMode: string;
@@ -67,6 +69,8 @@ const createEmptyTaskForm = (): TaskFormState => ({
   statement: '',
   prepType: 'algorithm',
   language: 'go',
+  companyTag: 'general',
+  supportedLanguages: ['go'],
   isExecutable: false,
   executionProfile: 'pure',
   runnerMode: 'function_io',
@@ -98,6 +102,8 @@ const taskToForm = (task: InterviewPrepTask): TaskFormState => ({
   statement: task.statement,
   prepType: task.prepType,
   language: task.language,
+  companyTag: task.companyTag || 'general',
+  supportedLanguages: task.supportedLanguages?.length ? task.supportedLanguages : [task.language],
   isExecutable: task.isExecutable,
   executionProfile: task.executionProfile,
   runnerMode: task.runnerMode,
@@ -127,6 +133,8 @@ export const InterviewPrepAdminPage: React.FC = () => {
   const [questionModalOpen, setQuestionModalOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
   const [search, setSearch] = useState('');
+  const [prepTypeFilter, setPrepTypeFilter] = useState<'all' | InterviewPrepType>('all');
+  const [companyFilter, setCompanyFilter] = useState('all');
   const [error, setError] = useState('');
   const [status, setStatus] = useState('');
   const [taskForm, setTaskForm] = useState<TaskFormState>(createEmptyTaskForm());
@@ -140,12 +148,22 @@ export const InterviewPrepAdminPage: React.FC = () => {
 
   const filteredTasks = useMemo(() => {
     const query = search.trim().toLowerCase();
-    if (!query) return tasks;
-    return tasks.filter((task) =>
-      [task.title, task.slug, task.statement, task.prepType].some((value) =>
-        value.toLowerCase().includes(query),
-      ));
-  }, [search, tasks]);
+    return tasks.filter((task) => {
+      if (prepTypeFilter !== 'all' && task.prepType !== prepTypeFilter) {
+        return false;
+      }
+      if (companyFilter !== 'all' && (task.companyTag || 'general') !== companyFilter) {
+        return false;
+      }
+      if (!query) return true;
+      return [task.title, task.slug, task.statement, task.prepType, task.companyTag, ...(task.supportedLanguages || [])]
+        .join(' ')
+        .toLowerCase()
+        .includes(query);
+    });
+  }, [companyFilter, prepTypeFilter, search, tasks]);
+
+  const companyOptions = useMemo(() => ['all', ...Array.from(new Set(tasks.map((task) => task.companyTag || 'general'))).sort()], [tasks]);
 
   const sortedQuestions = useMemo(
     () => [...questions].sort((left, right) => left.position - right.position),
@@ -237,6 +255,8 @@ export const InterviewPrepAdminPage: React.FC = () => {
       const payload = {
         ...taskForm,
         slug: toSlug(taskForm.slug || taskForm.title),
+        companyTag: taskForm.companyTag || 'general',
+        supportedLanguages: taskForm.supportedLanguages.length ? taskForm.supportedLanguages : [taskForm.language],
         executionProfile: taskForm.executionProfile || 'pure',
         runnerMode: taskForm.runnerMode || 'function_io',
         codeTaskId: taskForm.codeTaskId || undefined,
@@ -358,6 +378,19 @@ export const InterviewPrepAdminPage: React.FC = () => {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
             />
+            <FancySelect
+              value={prepTypeFilter}
+              options={[
+                { value: 'all', label: 'Все типы' },
+                ...PREP_TYPES,
+              ]}
+              onChange={(value) => setPrepTypeFilter(value as 'all' | InterviewPrepType)}
+            />
+            <FancySelect
+              value={companyFilter}
+              options={companyOptions.map((value) => ({ value, label: value === 'all' ? 'Все группы' : value }))}
+              onChange={setCompanyFilter}
+            />
           </div>
 
           {loading ? (
@@ -374,6 +407,7 @@ export const InterviewPrepAdminPage: React.FC = () => {
                       <div className="task-item__meta">
                         <span className="badge">{task.prepType}</span>
                         <span className="badge">{task.language}</span>
+                        <span className="badge">{task.companyTag || 'general'}</span>
                         <span className="badge">{Math.round(task.durationSeconds / 60)} мин</span>
                         {!task.isActive && <span className="badge task-inactive">Неактивна</span>}
                       </div>
@@ -397,6 +431,7 @@ export const InterviewPrepAdminPage: React.FC = () => {
                   </div>
                   <div className="interview-prep-admin-task__meta">
                     <span><strong>Slug:</strong> {task.slug}</span>
+                    <span><strong>Solve:</strong> {(task.supportedLanguages || []).join(', ') || task.language}</span>
                     <span><strong>Profile:</strong> {task.executionProfile}</span>
                     <span><strong>Runner:</strong> {task.runnerMode}</span>
                   </div>
@@ -461,6 +496,15 @@ export const InterviewPrepAdminPage: React.FC = () => {
                   />
                 </div>
                 <div className="form-group">
+                  <label>Группа / компания</label>
+                  <input
+                    className="input"
+                    value={taskForm.companyTag}
+                    onChange={(e) => setTaskForm((prev) => ({ ...prev, companyTag: e.target.value.trim().toLowerCase() }))}
+                    placeholder="ozon / avito / general"
+                  />
+                </div>
+                <div className="form-group">
                   <label>Длительность, сек</label>
                   <input
                     className="input"
@@ -503,6 +547,29 @@ export const InterviewPrepAdminPage: React.FC = () => {
                       codeTaskId: codeTaskId === '__none__' ? '' : codeTaskId,
                     }))}
                   />
+                </div>
+                <div className="form-group">
+                  <label>Языки решения</label>
+                  <div className="pill-selector">
+                    {LANGUAGE_OPTIONS.map((option) => {
+                      const active = taskForm.supportedLanguages.includes(option.value);
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className={`pill-selector__pill ${active ? 'active' : ''}`}
+                          onClick={() => setTaskForm((prev) => ({
+                            ...prev,
+                            supportedLanguages: active
+                              ? prev.supportedLanguages.filter((value) => value !== option.value)
+                              : [...prev.supportedLanguages, option.value],
+                          }))}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
 

@@ -14,16 +14,17 @@ import (
 func (r *Repo) CreateSession(ctx context.Context, session *model.InterviewPrepSession) error {
 	_, err := r.data.DB.Exec(ctx, `
 		INSERT INTO interview_prep_sessions (
-			id, user_id, task_id, status, current_question_position, code,
+			id, user_id, task_id, status, current_question_position, solve_language, code,
 			last_submission_passed, started_at, finished_at, created_at, updated_at
 		)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12)
 	`,
 		session.ID,
 		session.UserID,
 		session.TaskID,
 		session.Status.String(),
 		session.CurrentQuestionPosition,
+		session.SolveLanguage,
 		session.Code,
 		session.LastSubmissionPassed,
 		session.StartedAt,
@@ -39,7 +40,7 @@ func (r *Repo) CreateSession(ctx context.Context, session *model.InterviewPrepSe
 
 func (r *Repo) GetSession(ctx context.Context, sessionID uuid.UUID) (*model.InterviewPrepSession, error) {
 	row := r.data.DB.QueryRow(ctx, `
-		SELECT id, user_id, task_id, status, current_question_position, code,
+		SELECT id, user_id, task_id, status, current_question_position, solve_language, code,
 		       last_submission_passed, started_at, finished_at, created_at, updated_at
 		FROM interview_prep_sessions
 		WHERE id = $1
@@ -57,7 +58,7 @@ func (r *Repo) GetSession(ctx context.Context, sessionID uuid.UUID) (*model.Inte
 
 func (r *Repo) GetActiveSessionByUserAndTask(ctx context.Context, userID, taskID uuid.UUID) (*model.InterviewPrepSession, error) {
 	row := r.data.DB.QueryRow(ctx, `
-		SELECT id, user_id, task_id, status, current_question_position, code,
+		SELECT id, user_id, task_id, status, current_question_position, solve_language, code,
 		       last_submission_passed, started_at, finished_at, created_at, updated_at
 		FROM interview_prep_sessions
 		WHERE user_id = $1 AND task_id = $2 AND status = $3
@@ -75,14 +76,15 @@ func (r *Repo) GetActiveSessionByUserAndTask(ctx context.Context, userID, taskID
 	return item, nil
 }
 
-func (r *Repo) UpdateSessionCode(ctx context.Context, sessionID uuid.UUID, code string, passed bool) error {
+func (r *Repo) UpdateSessionCode(ctx context.Context, sessionID uuid.UUID, solveLanguage string, code string, passed bool) error {
 	_, err := r.data.DB.Exec(ctx, `
 		UPDATE interview_prep_sessions
-		SET code = $2,
-		    last_submission_passed = $3,
+		SET solve_language = $2,
+		    code = $3,
+		    last_submission_passed = $4,
 		    updated_at = NOW()
 		WHERE id = $1
-	`, sessionID, code, passed)
+	`, sessionID, solveLanguage, code, passed)
 	if err != nil {
 		return fmt.Errorf("update interview prep session code: %w", err)
 	}
