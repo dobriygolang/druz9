@@ -236,16 +236,29 @@ export const useCodeRoomRealtime = ({
     }
 
     styleElement.textContent = buildAwarenessStyles(
-      remoteAwarenessStatesRef.current.entries(),
+      getRenderableRemoteAwarenessEntries(),
       awarenessId,
     );
+  };
+
+  const getRenderableRemoteAwarenessEntries = () => {
+    const deduped = new Map<string, [number, AwarenessState]>();
+    remoteAwarenessStatesRef.current.forEach((state, remoteAwarenessId) => {
+      const user = state?.user;
+      if (!user) {
+        return;
+      }
+      const identity = normalizeIdentity(user.participantId) || normalizeIdentity(user.name) || String(remoteAwarenessId);
+      deduped.set(identity, [remoteAwarenessId, state]);
+    });
+    return Array.from(deduped.values());
   };
 
   const syncParticipants = (baseParticipants?: Participant[]) => {
     const source = baseParticipants || roomParticipantsRef.current || [];
     const awarenessStates = [
       localAwarenessStateRef.current,
-      ...Array.from(remoteAwarenessStatesRef.current.values()),
+      ...getRenderableRemoteAwarenessEntries().map(([, state]) => state),
     ];
 
     const localIdentityKeys = [
@@ -324,10 +337,10 @@ export const useCodeRoomRealtime = ({
     const decorations: any[] = [];
     const activeWidgetIds = new Set<number>();
 
-    remoteAwarenessStatesRef.current.forEach((state, remoteAwarenessId) => {
+    getRenderableRemoteAwarenessEntries().forEach(([remoteAwarenessId, state]) => {
       const user = state?.user;
       const selection = state?.selection as { anchor?: number; head?: number } | undefined;
-      if (!user || state?.active === false || typeof selection?.anchor !== 'number' || typeof selection?.head !== 'number') {
+      if (!user || typeof selection?.anchor !== 'number' || typeof selection?.head !== 'number') {
         return;
       }
 
@@ -336,6 +349,7 @@ export const useCodeRoomRealtime = ({
       const headPosition = model.getPositionAt(selection.head);
       activeWidgetIds.add(remoteAwarenessId);
 
+      const offlineSuffix = state?.active === false ? ' code-room-remote-caret-offline' : '';
       decorations.push({
         range: {
           startLineNumber: headPosition.lineNumber,
@@ -344,7 +358,7 @@ export const useCodeRoomRealtime = ({
           endColumn: headPosition.column,
         },
         options: {
-          afterContentClassName: `code-room-remote-caret code-room-remote-caret-${remoteAwarenessId}`,
+          afterContentClassName: `code-room-remote-caret code-room-remote-caret-${remoteAwarenessId}${offlineSuffix}`,
           stickiness: 1,
         },
       });
@@ -353,7 +367,7 @@ export const useCodeRoomRealtime = ({
       if (!widget) {
         const domNode = document.createElement('div');
         domNode.className = `code-room-remote-label-pill code-room-remote-label-pill-${remoteAwarenessId}`;
-        domNode.textContent = user.name || 'Гость';
+        domNode.textContent = state?.active === false ? `${user.name || 'Гость'} offline` : (user.name || 'Гость');
         const nextWidget: any = {
           position: {
             position: headPosition,
@@ -371,12 +385,20 @@ export const useCodeRoomRealtime = ({
         remoteWidgetsRef.current.set(remoteAwarenessId, widget);
         currentEditor.addContentWidget(widget);
       } else {
-        widget.getDomNode().textContent = user.name || 'Гость';
+        widget.getDomNode().textContent = state?.active === false ? `${user.name || 'Гость'} offline` : (user.name || 'Гость');
+        widget.getDomNode().className = `code-room-remote-label-pill code-room-remote-label-pill-${remoteAwarenessId}${state?.active === false ? ' code-room-remote-label-pill-offline' : ''}`;
         widget.position = {
           position: headPosition,
           preference: [0],
         };
         currentEditor.layoutContentWidget(widget);
+      }
+
+      if (!widget.getDomNode().className.includes('code-room-remote-label-pill-offline') && state?.active === false) {
+        widget.getDomNode().className = `code-room-remote-label-pill code-room-remote-label-pill-${remoteAwarenessId} code-room-remote-label-pill-offline`;
+      }
+      if (state?.active !== false) {
+        widget.getDomNode().className = `code-room-remote-label-pill code-room-remote-label-pill-${remoteAwarenessId}`;
       }
 
       if (end > start) {
@@ -390,7 +412,7 @@ export const useCodeRoomRealtime = ({
             endColumn: endPosition.column,
           },
           options: {
-            inlineClassName: `code-room-remote-selection code-room-remote-selection-${remoteAwarenessId}`,
+            inlineClassName: `code-room-remote-selection code-room-remote-selection-${remoteAwarenessId}${state?.active === false ? ' code-room-remote-selection-offline' : ''}`,
             stickiness: 1,
           },
         });
@@ -415,7 +437,7 @@ export const useCodeRoomRealtime = ({
       return;
     }
 
-    remoteAwarenessStatesRef.current.forEach((state, remoteAwarenessId) => {
+    getRenderableRemoteAwarenessEntries().forEach(([remoteAwarenessId, state]) => {
       const selection = state?.selection as { head?: number } | undefined;
       const widget = remoteWidgetsRef.current.get(remoteAwarenessId);
 
@@ -754,24 +776,14 @@ export const useCodeRoomRealtime = ({
     publishEditorSelection();
 
     const handleVisibilityChange = () => {
-      if (document.hidden) {
-        publishLocalAwareness({ active: false });
-      } else {
+      if (!document.hidden) {
         publishLocalAwareness({ active: true });
       }
     };
-
-    const handlePageLeave = () => {
-      publishLocalAwareness({ active: false });
-    };
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    window.addEventListener('pagehide', handlePageLeave);
-    window.addEventListener('beforeunload', handlePageLeave);
 
     return () => {
       document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('pagehide', handlePageLeave);
-      window.removeEventListener('beforeunload', handlePageLeave);
       contentSubscription.dispose();
       selectionSubscriptionRef.current?.dispose();
       selectionSubscriptionRef.current = null;

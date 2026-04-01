@@ -2,6 +2,7 @@ package realtime
 
 import (
 	schema "api/internal/realtime/schema"
+	"encoding/json"
 )
 
 func (h *CodeEditorHub) addClient(client *codeEditorClient) {
@@ -27,18 +28,28 @@ func (h *CodeEditorHub) addClient(client *codeEditorClient) {
 func (h *CodeEditorHub) removeClient(client *codeEditorClient) {
 	h.mu.Lock()
 	room := h.rooms[client.roomID]
-	isCreator := room != nil && room.creatorID != "" && client.userID == room.creatorID
 	if room != nil {
 		if room.dirty {
 			h.flushSnapshot(client.roomID, room.lastPlainText)
 			room.dirty = false
 		}
 		delete(room.clients, client)
-		if client.awarenessID != 0 {
-			delete(room.awarenessByID, client.awarenessID)
-		}
 		if len(room.clients) == 0 {
 			delete(h.rooms, client.roomID)
+		}
+	}
+	var offlineAwareness *schema.CodeEditorMessage
+	if room != nil && client.awarenessID != 0 {
+		if current := room.awarenessByID[client.awarenessID]; current.Data != "" {
+			var payload map[string]any
+			if err := json.Unmarshal([]byte(current.Data), &payload); err == nil {
+				payload["active"] = false
+				if raw, err := json.Marshal(payload); err == nil {
+					current.Data = string(raw)
+					room.awarenessByID[client.awarenessID] = current
+					offlineAwareness = &current
+				}
+			}
 		}
 	}
 	h.mu.Unlock()
@@ -46,11 +57,8 @@ func (h *CodeEditorHub) removeClient(client *codeEditorClient) {
 	close(client.send)
 	_ = client.ws.Close()
 
-	if client.awarenessID != 0 && !isCreator {
-		h.broadcast(client.roomID, schema.CodeEditorMessage{
-			Type:         schema.CodeEditorTypeAwarenessRemove,
-			AwarenessIDs: []uint64{client.awarenessID},
-		}, client)
+	if offlineAwareness != nil {
+		h.broadcast(client.roomID, *offlineAwareness, client)
 	}
 }
 

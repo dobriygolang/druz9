@@ -81,13 +81,14 @@ export function InterviewPrepSessionPage() {
   }, [sessionId]);
 
   useEffect(() => {
-    setCode(session?.code ?? session?.task?.starterCode ?? '');
-  }, [session?.id, session?.code, session?.task?.starterCode]);
-
-  useEffect(() => {
     const fallbackLanguage = session?.solveLanguage || session?.task?.supportedLanguages?.[0] || session?.task?.language || 'go';
     setSolveLanguage(fallbackLanguage);
   }, [session?.id, session?.solveLanguage, session?.task?.language, session?.task?.supportedLanguages]);
+
+  useEffect(() => {
+    const fallbackLanguage = session?.solveLanguage || session?.task?.supportedLanguages?.[0] || session?.task?.language || 'go';
+    setCode(session?.code ?? starterForLanguage(session?.task?.language, fallbackLanguage, session?.task?.starterCode));
+  }, [session?.id, session?.code, session?.solveLanguage, session?.task?.language, session?.task?.supportedLanguages, session?.task?.starterCode]);
 
   useEffect(() => {
     if (!isResizingEditor) {

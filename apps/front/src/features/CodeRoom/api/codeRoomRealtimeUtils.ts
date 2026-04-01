@@ -166,7 +166,7 @@ export const buildAwarenessStyles = (
       left: -1px;
       top: 0;
       height: 1.15em;
-      border-left: 2px solid currentColor;
+      border-left: 1px solid currentColor;
       z-index: 12;
       pointer-events: none;
     }
@@ -174,16 +174,30 @@ export const buildAwarenessStyles = (
     .code-room-remote-label-pill {
       display: inline-flex;
       align-items: center;
-      min-height: 18px;
+      min-height: 16px;
       padding: 0 4px;
-      border-radius: 3px;
-      font-size: 11px;
+      border-radius: 4px;
+      border: 1px solid transparent;
+      font-size: 10px;
       font-weight: 500;
-      line-height: 18px;
-      color: rgba(255, 255, 255, 0.95);
+      line-height: 16px;
       white-space: nowrap;
       transform: translateY(-100%);
       pointer-events: none;
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.12);
+    }
+
+    .code-room-remote-selection-offline {
+      opacity: 0.45;
+    }
+
+    .code-room-remote-caret-offline::after {
+      opacity: 0.5;
+    }
+
+    .code-room-remote-label-pill-offline {
+      opacity: 0.72;
+      filter: saturate(0.75);
     }
   `;
 
@@ -197,10 +211,14 @@ export const buildAwarenessStyles = (
     if (!user) {
       continue;
     }
+    const isOffline = typedState?.active === false;
+    const selectionAlpha = isOffline ? 0.16 : 0.3;
+    const borderAlpha = isOffline ? 0.12 : 0.2;
+    const backgroundAlpha = isOffline ? 0.82 : 0.96;
 
     css += `
       .code-room-remote-selection-${awarenessID} {
-        background: ${hexToRgba(user.color, 0.3)};
+        background: ${hexToRgba(user.color, selectionAlpha)};
       }
 
       .code-room-remote-caret-${awarenessID}::after {
@@ -208,7 +226,9 @@ export const buildAwarenessStyles = (
       }
 
       .code-room-remote-label-pill-${awarenessID} {
-        background: ${hexToRgba(user.color, 0.9)};
+        background: ${hexToRgba(user.colorLight, backgroundAlpha)};
+        border-color: ${hexToRgba(user.color, borderAlpha)};
+        color: ${user.color};
       }
     `;
   }
