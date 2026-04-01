@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import Map, { Marker, MapRef, NavigationControl, ScaleControl } from 'react-map-gl/maplibre';
 import 'maplibre-gl/dist/maplibre-gl.css';
+import { Compass, Sparkles, CalendarDays } from 'lucide-react';
 
 import {
   CommunityEvent,
@@ -260,15 +261,32 @@ export const MapPage: React.FC = () => {
   };
 
   return (
-    <div className="fade-in" style={{ display: 'flex', flexDirection: 'column', gap: '24px' }}>
-      <div>
-        <h1 style={{ fontSize: '28px', marginBottom: '12px', fontWeight: '600' }}>Карта сообщества</h1>
-        <p style={{ color: 'var(--text-secondary)', lineHeight: 1.6 }}>
-          Находите пользователей и события по всему миру. Создавать новые события можно во вкладке «События».
-        </p>
-      </div>
+    <div className="fade-in map-page">
+      <section className="page-header code-rooms-hero map-hero">
+        <div className="code-rooms-hero__copy">
+          <span className="code-rooms-kicker">Community Map</span>
+          <h1>Карта сообщества</h1>
+          <p className="code-rooms-subtitle">
+            Смотри, где находятся участники и события. Это живая география сообщества, а не просто список точек.
+          </p>
+        </div>
+        <div className="map-hero__stats">
+          <div className="map-hero__stat">
+            <Compass size={16} />
+            <span>{points.length} участников</span>
+          </div>
+          <div className="map-hero__stat">
+            <CalendarDays size={16} />
+            <span>{events.length} событий</span>
+          </div>
+          <div className="map-hero__stat">
+            <Sparkles size={16} />
+            <span>live карта</span>
+          </div>
+        </div>
+      </section>
 
-      <div className="card" style={{ padding: 0, overflow: 'hidden', minHeight: isMobile ? 'calc(100vh - 220px)' : '620px', position: 'relative', background: '#111827' }}>
+      <div className="card map-shell" style={{ minHeight: isMobile ? 'calc(100vh - 220px)' : '620px' }}>
         {isLoading && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, background: 'rgba(17, 24, 39, 0.72)', color: 'white' }}>Загружаем карту...</div>}
         {error && !isLoading && <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 5, background: 'rgba(239, 68, 68, 0.14)', color: '#fecaca', border: '1px solid rgba(239, 68, 68, 0.35)', borderRadius: '12px', padding: '12px 14px' }}>{error}</div>}
 

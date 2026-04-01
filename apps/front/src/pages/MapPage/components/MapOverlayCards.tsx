@@ -14,32 +14,20 @@ export const UserDetailCard: React.FC<UserDetailCardProps> = ({ user, onClose })
   const navigate = useNavigate();
   return (
     <div
-      className="card fade-in"
-      style={{
-        position: 'absolute',
-        left: '16px',
-        bottom: '16px',
-        zIndex: 4,
-        width: 'min(320px, calc(100% - 32px))',
-        backgroundColor: 'rgba(24, 24, 27, 0.95)',
-        backdropFilter: 'blur(16px)',
-        padding: '24px',
-        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-      }}
+      className="card fade-in map-overlay-card map-overlay-card--user"
     >
-      <div style={{ display: 'flex', alignItems: 'center', gap: '16px', marginBottom: '20px' }}>
-        <div style={{ width: '48px', height: '48px', borderRadius: '50%', overflow: 'hidden', background: '#1f2937', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+      <div className="map-overlay-card__header">
+        <div className="map-overlay-card__avatar">
           {user.avatarUrl ? (
             <img src={user.avatarUrl} alt={`Аватар пользователя ${user.title}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
           ) : (
             <UserRound size={20} />
           )}
         </div>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '18px', fontWeight: 600, display: 'flex', alignItems: 'center', gap: '8px' }}>
+        <div className="map-overlay-card__meta">
+          <div className="map-overlay-card__title">
             {user.title}
-            <div style={{ 
+            <div style={{
               width: '8px', 
               height: '8px', 
               borderRadius: '50%', 
@@ -49,7 +37,7 @@ export const UserDetailCard: React.FC<UserDetailCardProps> = ({ user, onClose })
               boxShadow: user.activityStatus === 'online' ? '0 0 8px rgba(16, 185, 129, 0.4)' : 'none'
             }} />
           </div>
-          <div style={{ color: 'var(--text-secondary)', fontSize: '13px', display: 'flex', alignItems: 'center', gap: '4px' }}>
+          <div className="map-overlay-card__subtitle">
             @{user.telegramUsername || 'user'}
             <span style={{ opacity: 0.3 }}>•</span>
             <span style={{ fontSize: '11px' }}>
@@ -58,12 +46,12 @@ export const UserDetailCard: React.FC<UserDetailCardProps> = ({ user, onClose })
             </span>
           </div>
         </div>
-        <button type="button" onClick={onClose} style={{ background: 'transparent', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer' }}>
+        <button type="button" onClick={onClose} className="map-overlay-card__icon-btn">
           <X size={18} />
         </button>
       </div>
-      <div style={{ display: 'grid', gap: '10px', marginBottom: '16px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--text-secondary)', fontSize: '14px' }}>
+      <div className="map-overlay-card__stack">
+        <div className="map-overlay-card__row">
           <MapPin size={15} />
           {user.region}
         </div>
@@ -134,16 +122,7 @@ export const EventDetailCard: React.FC<EventDetailCardProps> = ({
 }) => {
   if (isEditing && draft) {
     return (
-      <div className="hide-scrollbar" style={{
-        position: 'absolute',
-        left: '16px',
-        bottom: '16px',
-        zIndex: 5,
-        width: 'min(400px, calc(100% - 32px))',
-        maxHeight: 'calc(100% - 32px)',
-        overflowY: 'auto',
-        borderRadius: '16px',
-      }}>
+      <div className="hide-scrollbar map-overlay-card map-overlay-card--editor">
         <EventForm
           title="Редактировать событие"
           draft={draft}
@@ -163,30 +142,16 @@ export const EventDetailCard: React.FC<EventDetailCardProps> = ({
 
   return (
     <div
-      className="card fade-in hide-scrollbar"
-      style={{
-        position: 'absolute',
-        left: '16px',
-        bottom: '16px',
-        zIndex: 4,
-        width: 'min(380px, calc(100% - 32px))',
-        maxHeight: 'calc(100% - 32px)',
-        overflowY: 'auto',
-        backgroundColor: 'rgba(24, 24, 27, 0.95)',
-        backdropFilter: 'blur(16px)',
-        padding: '24px',
-        boxShadow: '0 20px 40px rgba(0, 0, 0, 0.6)',
-        border: '1px solid rgba(255, 255, 255, 0.08)',
-      }}
+      className="card fade-in hide-scrollbar map-overlay-card map-overlay-card--event"
     >
-      <div style={{ display: 'flex', justifyContent: 'space-between', gap: '16px', marginBottom: '20px' }}>
-        <div style={{ flex: 1 }}>
-          <div style={{ fontSize: '20px', fontWeight: 700, marginBottom: '6px' }}>{event.title}</div>
-          <div style={{ color: 'var(--text-secondary)', fontSize: '13px' }}>
+      <div className="map-overlay-card__header map-overlay-card__header--event">
+        <div className="map-overlay-card__meta">
+          <div className="map-overlay-card__title map-overlay-card__title--event">{event.title}</div>
+          <div className="map-overlay-card__subtitle">
             Организатор: <span style={{ color: 'var(--text-primary)' }}>{event.creator_name}</span>
           </div>
         </div>
-        <div style={{ display: 'flex', gap: '4px' }}>
+        <div className="map-overlay-card__actions">
           {event.is_creator && (
             <button
               onClick={() => {
@@ -194,26 +159,25 @@ export const EventDetailCard: React.FC<EventDetailCardProps> = ({
                   void onDelete(event.id);
                 }
               }}
-              style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: '#ef4444', cursor: 'pointer', padding: '8px', borderRadius: '10px' }}
-              className="hover-opacity"
+              className="map-overlay-card__icon-btn map-overlay-card__icon-btn--danger"
               title="Удалить"
             >
               <Trash2 size={16} />
             </button>
           )}
-          <button onClick={onClose} style={{ background: 'rgba(255,255,255,0.05)', border: 'none', color: 'var(--text-secondary)', cursor: 'pointer', padding: '8px', borderRadius: '10px' }} className="hover-opacity">
+          <button onClick={onClose} className="map-overlay-card__icon-btn">
             <X size={16} />
           </button>
         </div>
       </div>
 
-      <div style={{ display: 'grid', gap: '14px', marginBottom: '20px' }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '14px' }}>
+      <div className="map-overlay-card__stack">
+        <div className="map-overlay-card__row">
           <Calendar size={16} color="#aaa" />
           {formatEventDate(event.scheduled_at)}
         </div>
         {event.latitude !== undefined && event.latitude !== null && (
-          <div style={{ display: 'flex', alignItems: 'center', gap: '12px', color: 'var(--text-secondary)', fontSize: '14px' }}>
+          <div className="map-overlay-card__row">
             <MapPin size={16} color="#aaa" />
             <span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{event.place_label}</span>
           </div>
@@ -221,7 +185,7 @@ export const EventDetailCard: React.FC<EventDetailCardProps> = ({
       </div>
 
       {event.description && (
-        <div style={{ fontSize: '14px', color: 'var(--text-secondary)', marginBottom: '20px', lineHeight: 1.6, background: 'rgba(255,255,255,0.03)', padding: '12px', borderRadius: '12px' }}>
+        <div className="map-overlay-card__description">
           {event.description}
         </div>
       )}
@@ -237,7 +201,7 @@ export const EventDetailCard: React.FC<EventDetailCardProps> = ({
         </a>
       )}
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', color: 'var(--text-secondary)', fontSize: '14px', marginBottom: '20px' }}>
+      <div className="map-overlay-card__row" style={{ marginBottom: '20px' }}>
         <Users size={16} color="#888" />
         <span><strong style={{ color: 'var(--text-primary)' }}>{event.participants.length}</strong> участников</span>
       </div>

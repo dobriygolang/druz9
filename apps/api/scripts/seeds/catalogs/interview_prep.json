@@ -1,5 +1,5 @@
 {
-  "version": "interview-prep-v4-clean-starters",
+  "version": "interview-prep-v5-system-design-review",
   "tasks": [
     {
       "slug": "go-worker-pool-backpressure",
@@ -100,6 +100,39 @@
           "position": 3,
           "prompt": "Как уменьшить fan-out cost для больших чатов?",
           "answer": "Нужны partitioning по room/user, batching, pull model для части клиентов, отдельные consumer groups и, при необходимости, hybrid fan-out: маленькие чаты push, большие частично pull."
+        }
+      ]
+    },
+    {
+      "slug": "system-design-realtime-collab-platform",
+      "title": "System Design: realtime coding/interview platform",
+      "prep_type": "system_design",
+      "language": "go",
+      "company_tag": "general",
+      "supported_languages": [],
+      "is_executable": false,
+      "execution_profile": "pure",
+      "runner_mode": "function_io",
+      "duration_seconds": 3000,
+      "statement": "Спроектируй платформу для realtime coding и interview prep.\n\nНужно поддержать:\n- общие code rooms с 10 участниками\n- presence, cursor awareness и live-editing\n- запуск кода и автопроверку задач\n- interview prep сценарий с личной сессией, live-coding и AI review для system design\n- leaderboard, события и базовую observability\n\nОпиши:\n- основные сервисы и границы ответственности\n- как хранить ephemeral realtime state и что писать в durable storage\n- как изолировать code execution и AI review\n- как избежать перегруза при пиках: 5-10 активных комнат, до 20 одновременных проверок\n- как организовать cleanup, retention и метрики\n\nЕсли на схеме есть компромиссы, явно опиши trade-offs.",
+      "starter_code": "",
+      "reference_solution": "Сильный ответ отделяет control plane и realtime/data plane: API/backend, realtime room state, sandbox/judge workers, async review pipeline, object/media storage, durable БД и monitoring. Важно не класть ephemeral cursor/presence state в основную SQL как hot path, а держать его в памяти/быстром store с TTL. Code execution и AI review должны быть изолированы по ресурсам, с очередями, timeouts, rate limits и отдельной observability. Cleanup и retention обязаны быть частью дизайна, а не постфактум скриптом.",
+      "is_active": true,
+      "questions": [
+        {
+          "position": 1,
+          "prompt": "Что здесь точно не должно лежать в основной SQL базе как hot path?",
+          "answer": "Cursor awareness, presence heartbeat и частые editor updates. Это горячее, краткоживущее состояние с высоким update rate; его лучше держать в памяти или быстром ephemeral store с TTL."
+        },
+        {
+          "position": 2,
+          "prompt": "Как бы ты изолировал code execution и AI review друг от друга?",
+          "answer": "Через отдельные очереди/воркеры, resource quotas, timeout/circuit breaker и раздельные concurrency limits. Тогда всплеск AI review не будет душить автопроверку задач, и наоборот."
+        },
+        {
+          "position": 3,
+          "prompt": "Какие метрики и алерты были бы обязательны в такой системе?",
+          "answer": "Active rooms/users, queue depth judge/review, sandbox run latency, error rate, WS reconnect/disconnect rate, DB latency, storage usage, cleanup lag и saturation по CPU/RAM/disk. Плюс боевые алерты на рост 5xx, недоступность сервисов и исчерпание ресурсов."
         }
       ]
     },

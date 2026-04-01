@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { PlayCircle, Clock, Plus, Trash2, Upload, Music, Radio, ShieldCheck } from 'lucide-react';
+import { PlayCircle, Clock, Plus, Trash2, Upload, Music, ShieldCheck } from 'lucide-react';
 import { podcastApi } from '@/features/Podcast/api/podcastApi';
 import { Podcast } from '@/entities/User/model/types';
 import { usePodcast } from '@/app/providers/PodcastProvider';
@@ -129,53 +129,28 @@ export const FeedPage: React.FC = () => {
   };
 
   return (
-    <div className="fade-in" style={{ paddingBottom: isMobile ? '24px' : '40px' }}>
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: isMobile ? 'stretch' : 'flex-end',
-        flexDirection: isMobile ? 'column' : 'row',
-        gap: isMobile ? '20px' : '16px',
-        marginBottom: isMobile ? '28px' : '40px',
-        padding: isMobile ? 0 : '0 8px'
-      }}>
-        <div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px', color: 'var(--accent-color)', marginBottom: '8px', fontWeight: 600, fontSize: '14px', textTransform: 'uppercase', letterSpacing: '1px' }}>
-            <Radio size={16} /> Community Broadcasts
-          </div>
-          <h1 style={{ fontSize: isMobile ? '48px' : '36px', fontWeight: '800', letterSpacing: '-0.02em' }}>Подкасты</h1>
+    <div className="fade-in feed-page" style={{ paddingBottom: isMobile ? '24px' : '40px' }}>
+      <section className="page-header code-rooms-hero feed-hero">
+        <div className="code-rooms-hero__copy">
+          <span className="code-rooms-kicker">Community Broadcasts</span>
+          <h1>Подкасты</h1>
+          <p className="code-rooms-subtitle">
+            Голос сообщества: короткие выпуски, локальные новости и внутренние эфиры в одной аудиоленте.
+          </p>
         </div>
 
         {isAuthenticated && currentUser?.isAdmin && (
           <button
-            className="btn hover-scale"
+            className="btn feed-hero__admin-btn"
             onClick={() => setIsAdminPanelOpen(!isAdminPanelOpen)}
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              gap: '10px',
-              justifyContent: 'center',
-              width: isMobile ? '100%' : 'auto',
-              padding: '12px 24px',
-              borderRadius: '16px',
-              background: isAdminPanelOpen ? 'rgba(255,255,255,0.05)' : 'var(--accent-color)',
-              border: '1px solid rgba(255,255,255,0.1)',
-              boxShadow: isAdminPanelOpen ? 'none' : '0 10px 25px rgba(79, 70, 229, 0.3)'
-            }}
           >
             {isAdminPanelOpen ? 'Закрыть форму' : <><Plus size={20} /> Добавить выпуск</>}
           </button>
         )}
-      </div>
+      </section>
 
       {isAuthenticated && currentUser?.isAdmin && isAdminPanelOpen && (
-        <div className="card fade-in" style={{
-          marginBottom: '40px',
-          padding: isMobile ? '20px' : '32px',
-          background: 'rgba(79, 70, 229, 0.03)',
-          border: '1px dashed var(--accent-color)',
-          borderRadius: '24px'
-        }}>
+        <div className="card fade-in feed-admin-panel" style={{ padding: isMobile ? '20px' : '32px' }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px', color: 'var(--accent-color)' }}>
             <ShieldCheck size={20} />
             <h3 style={{ fontSize: '20px', fontWeight: 700 }}>Публикация подкаста</h3>
@@ -248,9 +223,9 @@ export const FeedPage: React.FC = () => {
           ))}
         </div>
       ) : (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
+        <div className="feed-list">
           {podcasts.length === 0 ? (
-            <div className="card" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)', border: '1px dashed rgba(255,255,255,0.05)', background: 'transparent' }}>
+            <div className="card feed-empty-state" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
               <Music size={64} style={{ opacity: 0.1, marginBottom: '20px' }} />
               <p style={{ fontSize: '18px' }}>Пока никто не опубликовал подкастов.</p>
               <p style={{ fontSize: '14px', marginTop: '8px' }}>Будьте первыми, кто поделится голосом!</p>
@@ -260,21 +235,7 @@ export const FeedPage: React.FC = () => {
               const isActive = currentPodcast?.id === p.id;
 
               return (
-                <div
-                  key={p.id}
-                  className="card fade-in"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: isMobile ? '16px' : '24px',
-                    padding: isMobile ? '18px' : '24px',
-                    flexWrap: isMobile ? 'wrap' : 'nowrap',
-                    background: isActive ? 'rgba(79, 70, 229, 0.08)' : 'rgba(255,255,255,0.02)',
-                    border: isActive ? '1px solid var(--accent-color)' : '1px solid rgba(255,255,255,0.05)',
-                    borderRadius: '24px',
-                    transition: 'all 0.3s'
-                  }}
-                >
+                <div key={p.id} className={`card fade-in feed-podcast-card ${isActive ? 'is-active' : ''}`}>
                   <button
                     onClick={() => handlePlay(p)}
                     style={{
@@ -344,15 +305,9 @@ export const FeedPage: React.FC = () => {
         </div>
       )}
 
-      <div style={{ marginTop: '64px' }}>
-        <h2 style={{ fontSize: isMobile ? '20px' : '24px', marginBottom: '24px', fontWeight: '700' }}>Посты сообщества</h2>
-        <div className="card" style={{
-          padding: isMobile ? '32px 24px' : '48px',
-          textAlign: 'center',
-          background: 'rgba(255,255,255,0.01)',
-          border: '1px dashed rgba(255,255,255,0.08)',
-          borderRadius: '32px'
-        }}>
+      <div className="feed-notes-section">
+        <h2 className="feed-notes-section__title">Посты сообщества</h2>
+        <div className="card feed-notes-placeholder" style={{ padding: isMobile ? '32px 24px' : '48px', textAlign: 'center' }}>
           <p style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
             Скоро здесь появятся текстовые заметки и фотографии от ваших соседей.
           </p>
