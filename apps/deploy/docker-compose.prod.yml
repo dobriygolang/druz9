@@ -120,11 +120,16 @@ services:
     image: grafana/grafana:latest
     restart: unless-stopped
     ports:
-      - "3001:3000"
+      - "127.0.0.1:3001:3000"
     environment:
       GF_SECURITY_ADMIN_USER: admin
       GF_SECURITY_ADMIN_PASSWORD: admin
       GF_USERS_ALLOW_SIGN_UP: "false"
+      GF_SERVER_DOMAIN: druz9.duckdns.org
+      GF_SERVER_ROOT_URL: https://druz9.duckdns.org/metrics/grafana/
+      GF_SERVER_SERVE_FROM_SUB_PATH: "true"
+      GF_SERVER_PROTOCOL: http
+      GF_SERVER_HTTP_PORT: 3000
     volumes:
       - ../api/scripts/grafana/datasources:/etc/grafana/provisioning/datasources:ro
       - ../api/scripts/grafana/dashboards:/etc/grafana/provisioning/dashboards:ro

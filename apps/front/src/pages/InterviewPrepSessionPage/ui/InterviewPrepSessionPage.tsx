@@ -255,9 +255,9 @@ export function InterviewPrepSessionPage() {
             </div>
           </div>
           <pre className="interview-prep-statement">{task?.statement ?? ''}</pre>
-          {task?.starterCode && (
+          {task?.starterCode && task?.language === 'sql' && (
             <>
-              <div className="interview-prep-block-title">Starter code</div>
+              <div className="interview-prep-block-title">Схема БД и стартовый запрос</div>
               <div className="interview-prep-code-editor">
                 <Editor
                   height="320px"
