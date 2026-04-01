@@ -206,6 +206,13 @@ export function InterviewPrepSessionPage() {
   const solveLanguageOptions = session?.task?.supportedLanguages?.length
     ? session.task.supportedLanguages
     : (session?.task?.language ? [session.task.language] : []);
+  const starterCodePreview = session?.task?.starterCode ?? '';
+  const sqlStarterSections = useMemo(() => parseSqlStarterSections(starterCodePreview), [starterCodePreview]);
+  const sqlStarterValue = sqlStarterTab === 'schema'
+    ? sqlStarterSections.schema
+    : sqlStarterTab === 'examples'
+      ? sqlStarterSections.examples
+      : sqlStarterSections.query;
 
   const switchSolveLanguage = (nextLanguage: string) => {
     setSolveLanguage(nextLanguage);
@@ -283,13 +290,6 @@ export function InterviewPrepSessionPage() {
   }
 
   const task = session.task;
-  const starterCodePreview = task?.starterCode ?? '';
-  const sqlStarterSections = useMemo(() => parseSqlStarterSections(starterCodePreview), [starterCodePreview]);
-  const sqlStarterValue = sqlStarterTab === 'schema'
-    ? sqlStarterSections.schema
-    : sqlStarterTab === 'examples'
-      ? sqlStarterSections.examples
-      : sqlStarterSections.query;
 
   return (
     <div className="interview-prep-session-page">

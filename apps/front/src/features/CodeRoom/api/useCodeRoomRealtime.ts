@@ -190,6 +190,7 @@ export const useCodeRoomRealtime = ({
   );
   const [isConnected, setIsConnected] = useState(false);
   const [code, setCode] = useState(normalizedInitialRoom?.code || '');
+  const codeRef = useRef(normalizedInitialRoom?.code || '');
   const [room, setRoom] = useState<CodeRoom | null>(normalizedInitialRoom);
   const [participants, setParticipants] = useState<Participant[]>(normalizedInitialRoom?.participants || []);
 
@@ -229,6 +230,7 @@ export const useCodeRoomRealtime = ({
 
   initialRoomRef.current = normalizedInitialRoom;
   editorRef.current = editor;
+  codeRef.current = code;
 
   const updateAwarenessStyles = () => {
     const styleElement = styleElementRef.current;
@@ -603,6 +605,7 @@ export const useCodeRoomRealtime = ({
 
               updateRemoteDecorations();
               layoutRemoteWidgets();
+              codeRef.current = nextText;
               setCode(nextText);
             }
             break;
@@ -789,7 +792,12 @@ export const useCodeRoomRealtime = ({
         return;
       }
 
+      const prevText = codeRef.current;
       const nextCode = model.getValue();
+      remapRemoteAwarenessSelections(prevText, nextCode);
+      updateRemoteDecorations();
+      layoutRemoteWidgets();
+      codeRef.current = nextCode;
       setCode(nextCode);
       publishEditorSelection();
       debugCodeRoom('update:send', { roomId, length: nextCode.length });

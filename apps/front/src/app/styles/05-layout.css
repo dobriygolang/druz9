@@ -291,6 +291,7 @@
 
 .interview-prep-hero {
   align-items: stretch;
+  max-width: none;
 }
 
 .interview-prep-hero__actions {
@@ -307,7 +308,7 @@
 
 .interview-prep-category-strip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 16px;
 }
 
@@ -316,6 +317,8 @@
   flex-direction: column;
   align-items: flex-start;
   gap: 8px;
+  min-height: 104px;
+  padding: 18px;
   cursor: pointer;
   text-align: left;
   transition: transform 0.2s, border-color 0.2s, background-color 0.2s;
@@ -372,9 +375,18 @@
   gap: 18px;
 }
 
+.interview-prep-filter-card {
+  padding: 20px;
+  border-radius: 22px;
+  background:
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
+    var(--surface-color);
+}
+
 .interview-prep-filters {
   display: grid;
-  grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr) minmax(260px, 1fr);
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 16px;
   align-items: start;
 }
@@ -391,6 +403,9 @@
   flex-direction: column;
   gap: 16px;
   min-height: 280px;
+  padding: 20px;
+  border-radius: 22px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
 }
 
 .interview-prep-card__head,
@@ -435,6 +450,13 @@
   color: var(--text-secondary);
   line-height: 1.6;
   white-space: pre-wrap;
+}
+
+.interview-prep-card__statement {
+  display: -webkit-box;
+  -webkit-line-clamp: 7;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
 .interview-prep-card__footer {
@@ -592,6 +614,8 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 20px;
+  border-radius: 22px;
   background:
     radial-gradient(circle at top right, rgba(99, 102, 241, 0.14), transparent 30%),
     radial-gradient(circle at bottom left, rgba(16, 185, 129, 0.12), transparent 28%),
