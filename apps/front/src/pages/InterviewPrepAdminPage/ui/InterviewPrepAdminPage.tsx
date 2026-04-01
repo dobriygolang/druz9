@@ -403,10 +403,10 @@ export const InterviewPrepAdminPage: React.FC = () => {
                 <div key={task.id} className="task-item interview-prep-admin-task">
                   <div className="task-item__header">
                     <div>
-                      <div className="task-item__title">{task.title}</div>
+                      <div className="task-item__title">{task.title || task.slug || 'Без названия'}</div>
                       <div className="task-item__meta">
-                        <span className="badge">{task.prepType}</span>
-                        <span className="badge">{task.language}</span>
+                        {task.prepType && <span className="badge">{task.prepType}</span>}
+                        {task.language && <span className="badge">{task.language}</span>}
                         <span className="badge">{task.companyTag || 'general'}</span>
                         <span className="badge">{Math.round(task.durationSeconds / 60)} мин</span>
                         {!task.isActive && <span className="badge task-inactive">Неактивна</span>}
@@ -430,12 +430,12 @@ export const InterviewPrepAdminPage: React.FC = () => {
                     </div>
                   </div>
                   <div className="interview-prep-admin-task__meta">
-                    <span><strong>Slug:</strong> {task.slug}</span>
-                    <span><strong>Solve:</strong> {(task.supportedLanguages || []).join(', ') || task.language}</span>
-                    <span><strong>Profile:</strong> {task.executionProfile}</span>
-                    <span><strong>Runner:</strong> {task.runnerMode}</span>
+                    <span><strong>Slug:</strong> {task.slug || 'n/a'}</span>
+                    <span><strong>Solve:</strong> {(task.supportedLanguages || []).join(', ') || task.language || 'n/a'}</span>
+                    <span><strong>Profile:</strong> {task.executionProfile || 'n/a'}</span>
+                    <span><strong>Runner:</strong> {task.runnerMode || 'n/a'}</span>
                   </div>
-                  <p className="task-item__statement">{task.statement}</p>
+                  <p className="task-item__statement">{task.statement || 'Описание ещё не заполнено.'}</p>
                 </div>
               ))}
             </div>

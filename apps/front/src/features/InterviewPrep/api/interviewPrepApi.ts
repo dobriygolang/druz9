@@ -1,5 +1,11 @@
 import { apiClient } from '@/shared/api/base';
 
+const interviewPrepTasksCache = {
+  data: null as InterviewPrepTask[] | null,
+  timestamp: 0,
+  ttlMs: 60_000,
+};
+
 export type InterviewPrepType =
   | 'coding'
   | 'algorithm'
@@ -160,8 +166,15 @@ const normalizeSession = (session: any): InterviewPrepSession => ({
 
 export const interviewPrepApi = {
   listTasks: async (): Promise<InterviewPrepTask[]> => {
+    const now = Date.now();
+    if (interviewPrepTasksCache.data && now - interviewPrepTasksCache.timestamp < interviewPrepTasksCache.ttlMs) {
+      return interviewPrepTasksCache.data;
+    }
     const response = await apiClient.get<{ tasks: any[] }>('/api/v1/interview-prep/tasks');
-    return (response.data.tasks || []).map(normalizeTask);
+    const tasks = (response.data.tasks || []).map(normalizeTask);
+    interviewPrepTasksCache.data = tasks;
+    interviewPrepTasksCache.timestamp = now;
+    return tasks;
   },
 
   startSession: async (taskId: string): Promise<InterviewPrepSession> => {
@@ -251,6 +264,8 @@ export const interviewPrepApi = {
     isActive: boolean;
   }): Promise<InterviewPrepTask> => {
     const response = await apiClient.post<{ task: any }>('/api/admin/interview-prep/tasks', task);
+    interviewPrepTasksCache.data = null;
+    interviewPrepTasksCache.timestamp = 0;
     return normalizeTask(response.data.task);
   },
 
@@ -272,11 +287,15 @@ export const interviewPrepApi = {
     isActive: boolean;
   }): Promise<InterviewPrepTask> => {
     const response = await apiClient.put<{ task: any }>(`/api/admin/interview-prep/tasks/${taskId}`, task);
+    interviewPrepTasksCache.data = null;
+    interviewPrepTasksCache.timestamp = 0;
     return normalizeTask(response.data.task);
   },
 
   adminDeleteTask: async (taskId: string): Promise<void> => {
     await apiClient.delete(`/api/admin/interview-prep/tasks/${taskId}`);
+    interviewPrepTasksCache.data = null;
+    interviewPrepTasksCache.timestamp = 0;
   },
 
   adminGetTask: async (taskId: string): Promise<InterviewPrepTask> => {

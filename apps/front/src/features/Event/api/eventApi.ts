@@ -5,6 +5,12 @@ import {
 } from '@/entities/User/model/types';
 import { apiClient, ListQueryParams, withDefaultListQuery } from '@/shared/api/base';
 
+const defaultEventsCache = {
+  data: null as CommunityEvent[] | null,
+  timestamp: 0,
+  ttlMs: 60_000,
+};
+
 type BackendEventParticipant = {
   user_id?: string;
   userId?: string;
@@ -133,10 +139,20 @@ function toProtoTimestamp(value: string): string {
 
 export const eventApi = {
   list: async (params?: ListQueryParams): Promise<CommunityEvent[]> => {
+    const useCache = !params || Object.keys(params).length === 0;
+    const now = Date.now();
+    if (useCache && defaultEventsCache.data && now - defaultEventsCache.timestamp < defaultEventsCache.ttlMs) {
+      return defaultEventsCache.data;
+    }
     const response = await apiClient.get<BackendListEventsResponse>('/api/v1/events', {
       params: withDefaultListQuery(params),
     });
-    return (response.data.events ?? []).map(normalizeEvent);
+    const events = (response.data.events ?? []).map(normalizeEvent);
+    if (useCache) {
+      defaultEventsCache.data = events;
+      defaultEventsCache.timestamp = now;
+    }
+    return events;
   },
   create: async (payload: CreateEventPayload): Promise<CommunityEvent> => {
     const response = await apiClient.post<BackendEventResponse>('/api/v1/events', {
@@ -152,6 +168,8 @@ export const eventApi = {
       scheduledAt: toProtoTimestamp(payload.scheduled_at),
       invitedUserIds: payload.invited_user_ids,
     });
+    defaultEventsCache.data = null;
+    defaultEventsCache.timestamp = 0;
     return normalizeEvent(response.data.event ?? {});
   },
   update: async (
@@ -170,6 +188,8 @@ export const eventApi = {
           : undefined,
       },
     );
+    defaultEventsCache.data = null;
+    defaultEventsCache.timestamp = 0;
     return normalizeEvent(response.data.event ?? {});
   },
   join: async (eventId: string): Promise<CommunityEvent> => {
@@ -177,12 +197,18 @@ export const eventApi = {
       `/api/v1/events/${eventId}/join`,
       { eventId },
     );
+    defaultEventsCache.data = null;
+    defaultEventsCache.timestamp = 0;
     return normalizeEvent(response.data.event ?? {});
   },
   leave: async (eventId: string): Promise<void> => {
     await apiClient.post(`/api/v1/events/${eventId}/leave`, { eventId });
+    defaultEventsCache.data = null;
+    defaultEventsCache.timestamp = 0;
   },
   delete: async (eventId: string): Promise<void> => {
     await apiClient.delete(`/api/v1/events/${eventId}`);
+    defaultEventsCache.data = null;
+    defaultEventsCache.timestamp = 0;
   },
 };

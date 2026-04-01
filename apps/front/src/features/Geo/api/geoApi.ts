@@ -91,7 +91,7 @@ function normalizeCommunityMapPoint(
 const communityMapCache = {
   data: null as CommunityMapPoint[] | null,
   timestamp: 0,
-  ttl: 30000, // 30 seconds
+  ttl: 60000, // 60 seconds
 };
 
 export const geoApi = {
@@ -102,9 +102,9 @@ export const geoApi = {
     );
     return (response.data.candidates ?? []).map(normalizeCandidate);
   },
-  communityMap: async (): Promise<CommunityMapPoint[]> => {
+  communityMap: async (force = false): Promise<CommunityMapPoint[]> => {
     const now = Date.now();
-    if (communityMapCache.data && now - communityMapCache.timestamp < communityMapCache.ttl) {
+    if (!force && communityMapCache.data && now - communityMapCache.timestamp < communityMapCache.ttl) {
       return communityMapCache.data;
     }
     const response = await apiClient.get<BackendCommunityMapResponse>(

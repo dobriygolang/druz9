@@ -68,8 +68,7 @@ const DIFFICULTY_OPTIONS = [
 ];
 
 const INTERVIEW_PREP_CATEGORY_OPTIONS = [
-  { value: 'go', label: 'Go' },
-  { value: 'python', label: 'Python' },
+  { value: 'coding', label: 'Coding' },
   { value: 'sql', label: 'SQL' },
   { value: 'system_design', label: 'System Design' },
 ];
@@ -142,7 +141,7 @@ export const CodeRoomsPage: React.FC = () => {
   });
   const [newRoomTopic, setNewRoomTopic] = useState('');
   const [newRoomDifficulty, setNewRoomDifficulty] = useState('');
-  const [prepLaunchCategory, setPrepLaunchCategory] = useState('go');
+  const [prepLaunchCategory, setPrepLaunchCategory] = useState('coding');
   const [prepLaunchCompany, setPrepLaunchCompany] = useState('all');
 
   // Initialize queueState from localStorage to persist across page refreshes
@@ -746,6 +745,68 @@ export const CodeRoomsPage: React.FC = () => {
                   Выберите режим. Для пригласительной дуэли можно отправить ссылку, для онлайн-дуэли включится поиск соперника.
                 </p>
 
+                {user?.isTrusted && (
+                  <div className="code-room-prep-launch">
+                    <div className="code-room-prep-launch__head">
+                      <div>
+                        <div className="code-room-prep-launch__title">Solo practice</div>
+                        <div className="mode-desc">
+                          Открой executable interview-prep каталог или сразу возьми случайную задачу по нужной группе.
+                        </div>
+                      </div>
+                      <BookOpen size={18} />
+                    </div>
+                    <div className="code-room-prep-launch__controls">
+                      <div className="code-room-prep-launch__group">
+                        <span className="code-room-prep-launch__label">Категория</span>
+                        <div className="pill-selector">
+                          {INTERVIEW_PREP_CATEGORY_OPTIONS.map((option) => (
+                            <button
+                              key={option.value}
+                              type="button"
+                              className={`pill-selector__pill ${prepLaunchCategory === option.value ? 'active' : ''}`}
+                              onClick={() => setPrepLaunchCategory(option.value)}
+                            >
+                              {option.label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="code-room-prep-launch__group">
+                        <span className="code-room-prep-launch__label">Группа</span>
+                        <div className="pill-selector">
+                          {['all', 'ozon', 'avito', 'general'].map((option) => (
+                            <button
+                              key={option}
+                              type="button"
+                              className={`pill-selector__pill ${prepLaunchCompany === option ? 'active' : ''}`}
+                              onClick={() => setPrepLaunchCompany(option)}
+                            >
+                              {option === 'all' ? 'Все группы' : option}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    </div>
+                    <div className="code-room-prep-launch__actions">
+                      <button
+                        type="button"
+                        className="btn btn-secondary"
+                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&mode=executable${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
+                      >
+                        Открыть каталог
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-primary"
+                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&mode=executable${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
+                      >
+                        Случайная задача
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 <div className="form-group">
                   <label>Режим</label>
                   <div className="mode-selector">
@@ -786,60 +847,6 @@ export const CodeRoomsPage: React.FC = () => {
                     </button>
                   </div>
                 </div>
-
-                {user?.isTrusted && (
-                  <div className="code-room-prep-launch">
-                    <div className="code-room-prep-launch__head">
-                      <div>
-                        <div className="code-room-prep-launch__title">Solo practice</div>
-                        <div className="mode-desc">
-                          Если сейчас нужен не room, а персональная подготовка, можно сразу открыть Interview Prep по категории или взять случайную задачу.
-                        </div>
-                      </div>
-                      <BookOpen size={18} />
-                    </div>
-                    <div className="pill-selector">
-                      {INTERVIEW_PREP_CATEGORY_OPTIONS.map((option) => (
-                        <button
-                          key={option.value}
-                          type="button"
-                          className={`pill-selector__pill ${prepLaunchCategory === option.value ? 'active' : ''}`}
-                          onClick={() => setPrepLaunchCategory(option.value)}
-                        >
-                          {option.label}
-                        </button>
-                      ))}
-                    </div>
-                    <div className="code-room-prep-launch__actions">
-                      <button
-                        type="button"
-                        className="btn btn-secondary"
-                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
-                      >
-                        Открыть каталог
-                      </button>
-                      <button
-                        type="button"
-                        className="btn btn-primary"
-                        onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
-                      >
-                        Случайная задача
-                      </button>
-                    </div>
-                    <div className="pill-selector">
-                      {['all', 'ozon', 'avito', 'general'].map((option) => (
-                        <button
-                          key={option}
-                          type="button"
-                          className={`pill-selector__pill ${prepLaunchCompany === option ? 'active' : ''}`}
-                          onClick={() => setPrepLaunchCompany(option)}
-                        >
-                          {option === 'all' ? 'Все группы' : option}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
 
                 {(newRoomMode === 'duel' || newRoomMode === 'queue') && (
                   <div className="task-filters code-room-create-filters">

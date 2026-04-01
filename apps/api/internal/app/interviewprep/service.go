@@ -1,6 +1,7 @@
 package interviewprep
 
 import (
+	"api/internal/cache"
 	"context"
 	"errors"
 	"fmt"
@@ -69,6 +70,8 @@ type Service struct {
 	sandbox       Sandbox
 	reviewer      Reviewer
 	maxImageBytes int64
+	taskListCache *cache.TTLCache[[]*model.InterviewPrepTask]
+	codeTaskCache *cache.TTLCache[*model.CodeTask]
 }
 
 func New(c Config) *Service {
@@ -77,6 +80,8 @@ func New(c Config) *Service {
 		sandbox:       c.Sandbox,
 		reviewer:      c.Reviewer,
 		maxImageBytes: maxImageBytesOrDefault(c.MaxImageBytes),
+		taskListCache: cache.NewTTLCache[[]*model.InterviewPrepTask](8, time.Minute),
+		codeTaskCache: cache.NewTTLCache[*model.CodeTask](64, 5*time.Minute),
 	}
 }
 
@@ -91,7 +96,19 @@ func (s *Service) ListTasks(ctx context.Context, user *model.User) ([]*model.Int
 	if err := ensureTrusted(user); err != nil {
 		return nil, err
 	}
-	return s.repo.ListActiveTasks(ctx)
+	if s.taskListCache != nil {
+		if items, ok := s.taskListCache.Get("active"); ok && len(items) > 0 {
+			return items, nil
+		}
+	}
+	items, err := s.repo.ListActiveTasks(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if s.taskListCache != nil {
+		s.taskListCache.Set("active", items, time.Minute)
+	}
+	return items, nil
 }
 
 func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error) {
@@ -270,9 +287,19 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 			return nil, ErrExecutableTaskNotConfigured
 		}
 
-		codeTask, err := s.repo.GetCodeTask(ctx, *session.Task.CodeTaskID)
-		if err != nil {
-			return nil, err
+		codeTaskID := session.Task.CodeTaskID.String()
+		var codeTask *model.CodeTask
+		if s.codeTaskCache != nil {
+			codeTask, _ = s.codeTaskCache.Get(codeTaskID)
+		}
+		if codeTask == nil {
+			codeTask, err = s.repo.GetCodeTask(ctx, *session.Task.CodeTaskID)
+			if err != nil {
+				return nil, err
+			}
+			if s.codeTaskCache != nil && codeTask != nil {
+				s.codeTaskCache.Set(codeTaskID, codeTask, 5*time.Minute)
+			}
 		}
 		judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, codeTask, code, solveLanguage)
 		if err != nil {

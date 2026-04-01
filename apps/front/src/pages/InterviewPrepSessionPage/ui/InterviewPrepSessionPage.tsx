@@ -120,7 +120,7 @@ export function InterviewPrepSessionPage() {
   const canShowQuestions = Boolean(
     session?.currentQuestion && (!session?.task?.isExecutable || session?.lastSubmissionPassed),
   );
-  const showLiveCoding = Boolean(session?.task?.starterCode);
+  const showLiveCoding = Boolean(session?.task?.starterCode && session?.task?.isExecutable);
   const canSubmitExecutable = Boolean(session?.task?.isExecutable);
   const showSystemDesignReview = session?.task?.prepType === 'system_design';
   const solveLanguageOptions = session?.task?.supportedLanguages?.length
@@ -415,21 +415,10 @@ export function InterviewPrepSessionPage() {
               className="btn btn-primary"
               onClick={() => void handleSubmitCode()}
               disabled={submitting || !canSubmitExecutable}
-              title={canSubmitExecutable ? undefined : 'Для этой задачи автопроверка ещё не привязана'}
             >
               <Play size={16} />
-              <span>
-                {canSubmitExecutable
-                  ? (submitting ? 'Проверяю...' : 'Отправить на проверку')
-                  : 'Автопроверка недоступна'}
-              </span>
+              <span>{submitting ? 'Проверяю...' : 'Отправить на проверку'}</span>
             </button>
-            {!canSubmitExecutable && (
-              <div className="interview-prep-live-result">
-                <strong>Practice draft</strong>
-                <span>Здесь можно писать решение и прогонять мысль руками, а follow-up уже доступны без judge.</span>
-              </div>
-            )}
             {submitResult && (
               <div className={`interview-prep-live-result ${submitResult.passed ? 'is-success' : 'is-error'}`}>
                 <strong>{submitResult.passed ? 'Accepted' : `Тесты ${submitResult.passedCount}/${submitResult.totalCount}`}</strong>

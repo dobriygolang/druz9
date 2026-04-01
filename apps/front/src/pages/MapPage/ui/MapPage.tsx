@@ -104,20 +104,19 @@ export const MapPage: React.FC = () => {
   }>({});
   const [fullEventId, setFullEventId] = useState<string | null>(null);
   const [inviteSearchQuery, setInviteSearchQuery] = useState('');
+  const lastLoadedAtRef = useRef(0);
 
-  // Use ref to avoid stale closure in interval
-  const loadDataRef = useRef<{ (initial?: boolean): Promise<void> } | null>(null);
-
-  const loadData = async (initial = false) => {
+  const loadData = async (initial = false, force = false) => {
     try {
       if (initial) setIsLoading(true);
       const [p, e] = await Promise.all([
-        geoApi.communityMap(),
+        geoApi.communityMap(force),
         eventApi.list(),
       ]);
       setPoints(p);
       setEvents(e);
       if (initial) setViewState(buildViewState(p, e));
+      lastLoadedAtRef.current = Date.now();
     } catch (err) {
       if (initial) setError('Не удалось загрузить данные сообщества');
       console.error(err);
@@ -126,12 +125,23 @@ export const MapPage: React.FC = () => {
     }
   };
 
-  loadDataRef.current = loadData;
-
   useEffect(() => {
     void loadData(true);
-    const interval = setInterval(() => loadDataRef.current?.(false), 30000);
-    return () => clearInterval(interval);
+    const handleVisibilityChange = () => {
+      if (document.visibilityState !== 'visible') {
+        return;
+      }
+      if (Date.now() - lastLoadedAtRef.current < 60_000) {
+        return;
+      }
+      void loadData(false, true);
+    };
+    window.addEventListener('focus', handleVisibilityChange);
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    return () => {
+      window.removeEventListener('focus', handleVisibilityChange);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
   }, []);
 
   const visibleUserPoints = useMemo(() => distributeByCoordinates(points), [points]);

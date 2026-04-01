@@ -4,7 +4,7 @@ import { ArrowRight, Clock3, Filter, Shuffle, ShieldCheck, Sparkles, TerminalSqu
 
 import { interviewPrepApi, InterviewPrepTask, InterviewPrepType } from '@/features/InterviewPrep/api/interviewPrepApi';
 
-type TaskCategory = 'all' | 'go' | 'python' | 'sql' | 'system_design';
+type TaskCategory = 'all' | 'coding' | 'sql' | 'system_design';
 type TaskModeFilter = 'all' | 'executable' | 'guided';
 
 const PREP_TYPE_LABELS: Record<InterviewPrepType, string> = {
@@ -17,33 +17,27 @@ const PREP_TYPE_LABELS: Record<InterviewPrepType, string> = {
 
 const CATEGORY_LABELS: Record<TaskCategory, string> = {
   all: 'Все категории',
-  go: 'Go',
-  python: 'Python',
+  coding: 'Coding',
   sql: 'SQL',
   system_design: 'System Design',
 };
 
-const CATEGORY_ORDER: TaskCategory[] = ['go', 'python', 'sql', 'system_design'];
+const CATEGORY_ORDER: TaskCategory[] = ['coding', 'sql', 'system_design'];
 
 function categoryForTask(task: InterviewPrepTask): TaskCategory {
   if (task.prepType === 'system_design') {
     return 'system_design';
   }
-  if (task.language === 'python') {
-    return 'python';
-  }
   if (task.language === 'sql') {
     return 'sql';
   }
-  return 'go';
+  return 'coding';
 }
 
 function categoryAccentClass(category: TaskCategory) {
   switch (category) {
-    case 'go':
-      return 'is-go';
-    case 'python':
-      return 'is-python';
+    case 'coding':
+      return 'is-coding';
     case 'sql':
       return 'is-sql';
     case 'system_design':
@@ -61,7 +55,7 @@ export function InterviewPrepPage() {
   const [error, setError] = useState<string | null>(null);
   const [startingTaskId, setStartingTaskId] = useState<string | null>(null);
   const [search, setSearch] = useState(searchParams.get('q') ?? '');
-  const [modeFilter, setModeFilter] = useState<TaskModeFilter>((searchParams.get('mode') as TaskModeFilter) || 'all');
+  const [modeFilter, setModeFilter] = useState<TaskModeFilter>((searchParams.get('mode') as TaskModeFilter) || 'executable');
   const [category, setCategory] = useState<TaskCategory>((searchParams.get('category') as TaskCategory) || 'all');
   const [company, setCompany] = useState(searchParams.get('company') ?? 'all');
   const randomLaunchTriggered = useRef(false);
@@ -188,7 +182,7 @@ export function InterviewPrepPage() {
           <span className="code-rooms-kicker">Trusted Only</span>
           <h1>Interview Prep Arena</h1>
           <p className="code-rooms-subtitle">
-            Выбирай категорию, бери случайную задачу или фильтруй каталог вручную. Для system design доступен AI review, для Go/Python/SQL есть live-coding flow.
+            Выбирай категорию, бери случайную executable-задачу или фильтруй каталог вручную. Coding можно решать на Go или Python, system design поддерживает AI review.
           </p>
           <div className="interview-prep-hero__actions">
             <button className="btn btn-primary" onClick={() => void handleRandomStart(filteredTasks)}>
@@ -200,7 +194,7 @@ export function InterviewPrepPage() {
               onClick={() => {
                 setCategory('all');
                 setCompany('all');
-                setModeFilter('all');
+                setModeFilter('executable');
                 setSearch('');
               }}
             >

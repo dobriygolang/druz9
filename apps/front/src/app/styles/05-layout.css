@@ -337,17 +337,11 @@
   letter-spacing: 0.04em;
 }
 
-.interview-prep-category-card.is-go,
-.interview-prep-card--category.is-go {
+.interview-prep-category-card.is-coding,
+.interview-prep-card--category.is-coding {
   background:
-    radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 36%),
-    var(--surface-color);
-}
-
-.interview-prep-category-card.is-python,
-.interview-prep-card--category.is-python {
-  background:
-    radial-gradient(circle at top right, rgba(245, 158, 11, 0.12), transparent 36%),
+    radial-gradient(circle at top right, rgba(56, 189, 248, 0.12), transparent 20%),
+    radial-gradient(circle at bottom left, rgba(245, 158, 11, 0.12), transparent 28%),
     var(--surface-color);
 }
 
