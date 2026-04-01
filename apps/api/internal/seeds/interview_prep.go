@@ -14,7 +14,7 @@ import (
 
 const interviewPrepSeedName = "interview_prep_pack"
 const interviewPrepCatalogPath = "scripts/seeds/catalogs/interview_prep.json"
-const interviewPrepSeedVersion = "v1"
+const interviewPrepSeedVersion = "v2-executable-code-tasks"
 
 func (r *Runner) runInterviewPrep(ctx context.Context) (Result, error) {
 	catalog, rawCatalog, err := loadInterviewPrepCatalog(interviewPrepCatalogPath)
@@ -37,6 +37,15 @@ func (r *Runner) runInterviewPrep(ctx context.Context) (Result, error) {
 		}, nil
 	}
 
+	existingCodeTasks, err := r.codeEditor.ListTasks(ctx, model.CodeTaskFilter{IncludeInactive: true})
+	if err != nil {
+		return Result{}, fmt.Errorf("list existing code tasks for interview prep: %w", err)
+	}
+	codeTasksBySlug := make(map[string]*model.CodeTask, len(existingCodeTasks))
+	for _, task := range existingCodeTasks {
+		codeTasksBySlug[task.Slug] = task
+	}
+
 	tx, err := r.db.Begin(ctx)
 	if err != nil {
 		return Result{}, fmt.Errorf("begin interview prep seed tx: %w", err)
@@ -47,7 +56,16 @@ func (r *Runner) runInterviewPrep(ctx context.Context) (Result, error) {
 	updated := 0
 	totalQuestions := 0
 	for _, taskDef := range catalog.Tasks {
-		taskID, wasCreated, err := upsertInterviewPrepTask(ctx, tx, taskDef)
+		var codeTaskID *uuid.UUID
+		if taskDef.CodeTask != nil {
+			codeTask, err := upsertInterviewPrepCodeTask(ctx, r, codeTasksBySlug, taskDef)
+			if err != nil {
+				return Result{}, err
+			}
+			codeTaskID = &codeTask.ID
+		}
+
+		taskID, wasCreated, err := upsertInterviewPrepTask(ctx, tx, taskDef, codeTaskID)
 		if err != nil {
 			return Result{}, err
 		}
@@ -79,7 +97,7 @@ func (r *Runner) runInterviewPrep(ctx context.Context) (Result, error) {
 	}, nil
 }
 
-func upsertInterviewPrepTask(ctx context.Context, tx pgx.Tx, def InterviewPrepCatalogTask) (uuid.UUID, bool, error) {
+func upsertInterviewPrepTask(ctx context.Context, tx pgx.Tx, def InterviewPrepCatalogTask, codeTaskID *uuid.UUID) (uuid.UUID, bool, error) {
 	now := time.Now().UTC()
 	slug := strings.TrimSpace(def.Slug)
 	taskID := uuid.NewSHA1(uuid.NameSpaceURL, []byte("interview-prep:"+slug))
@@ -98,9 +116,9 @@ func upsertInterviewPrepTask(ctx context.Context, tx pgx.Tx, def InterviewPrepCa
 		INSERT INTO interview_prep_tasks (
 			id, slug, title, statement, prep_type, language, is_executable,
 			execution_profile, runner_mode, duration_seconds, starter_code,
-			reference_solution, is_active, created_at, updated_at
+			reference_solution, code_task_id, is_active, created_at, updated_at
 		)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16)
 		ON CONFLICT (slug) DO UPDATE SET
 			title = EXCLUDED.title,
 			statement = EXCLUDED.statement,
@@ -112,6 +130,7 @@ func upsertInterviewPrepTask(ctx context.Context, tx pgx.Tx, def InterviewPrepCa
 			duration_seconds = EXCLUDED.duration_seconds,
 			starter_code = EXCLUDED.starter_code,
 			reference_solution = EXCLUDED.reference_solution,
+			code_task_id = EXCLUDED.code_task_id,
 			is_active = EXCLUDED.is_active,
 			updated_at = EXCLUDED.updated_at
 	`,
@@ -127,6 +146,7 @@ func upsertInterviewPrepTask(ctx context.Context, tx pgx.Tx, def InterviewPrepCa
 		normalizeInterviewPrepDuration(def.DurationSeconds),
 		strings.TrimSpace(def.StarterCode),
 		strings.TrimSpace(def.ReferenceSolution),
+		codeTaskID,
 		def.IsActive,
 		now,
 		now,
@@ -135,6 +155,113 @@ func upsertInterviewPrepTask(ctx context.Context, tx pgx.Tx, def InterviewPrepCa
 		return uuid.Nil, false, fmt.Errorf("upsert interview prep task %s: %w", slug, err)
 	}
 	return taskID, created, nil
+}
+
+func upsertInterviewPrepCodeTask(
+	ctx context.Context,
+	r *Runner,
+	existing map[string]*model.CodeTask,
+	def InterviewPrepCatalogTask,
+) (*model.CodeTask, error) {
+	spec := def.CodeTask
+	if spec == nil {
+		return nil, nil
+	}
+
+	task := buildInterviewPrepCodeTask(def, *spec)
+	if current := existing[task.Slug]; current != nil {
+		task.ID = current.ID
+		updated, err := r.codeEditor.UpdateTask(ctx, task)
+		if err != nil {
+			return nil, fmt.Errorf("update interview prep code task %s: %w", task.Slug, err)
+		}
+		existing[task.Slug] = updated
+		return updated, nil
+	}
+
+	created, err := r.codeEditor.CreateTask(ctx, task)
+	if err != nil {
+		return nil, fmt.Errorf("create interview prep code task %s: %w", task.Slug, err)
+	}
+	existing[task.Slug] = created
+	return created, nil
+}
+
+func buildInterviewPrepCodeTask(def InterviewPrepCatalogTask, spec InterviewPrepCatalogCodeTask) *model.CodeTask {
+	slug := strings.TrimSpace(spec.Slug)
+	if slug == "" {
+		slug = strings.TrimSpace(def.Slug) + "-exec"
+	}
+	taskID := uuid.NewSHA1(uuid.NameSpaceURL, []byte("interview-prep-code-task:"+slug))
+
+	task := &model.CodeTask{
+		ID:               taskID,
+		Title:            firstNonEmpty(spec.Title, def.Title+" [Executable]"),
+		Slug:             slug,
+		Statement:        firstNonEmpty(spec.Statement, def.Statement),
+		Difficulty:       model.TaskDifficultyFromString(firstNonEmpty(spec.Difficulty, "medium")),
+		Topics:           append([]string{"interview-prep"}, spec.Topics...),
+		StarterCode:      strings.TrimSpace(spec.StarterCode),
+		Language:         model.ProgrammingLanguageFromString(firstNonEmpty(spec.Language, def.Language)),
+		TaskType:         model.TaskTypeAlgorithm,
+		ExecutionProfile: model.ExecutionProfileFromString(firstNonEmpty(spec.ExecutionProfile, def.ExecutionProfile)),
+		RunnerMode:       model.RunnerModeFromString(firstNonEmpty(spec.RunnerMode, def.RunnerMode)),
+		DurationSeconds:  normalizeInterviewPrepDuration(firstPositive(spec.DurationSeconds, def.DurationSeconds)),
+		IsActive:         def.IsActive,
+	}
+
+	if task.ExecutionProfile.String() == "" {
+		task.ExecutionProfile = model.ExecutionProfilePure
+	}
+	if task.RunnerMode.String() == "" {
+		task.RunnerMode = model.RunnerModeFunctionIO
+	}
+	if task.Language.String() == "" {
+		task.Language = model.ProgrammingLanguageGo
+	}
+
+	publicOrder := int32(1)
+	hiddenOrder := int32(1)
+	for index, c := range spec.Cases {
+		testCase := &model.CodeTestCase{
+			ID:             uuid.NewSHA1(taskID, []byte(fmt.Sprintf("case:%d", index))),
+			TaskID:         taskID,
+			Input:          normalizeSeedText(c.Input),
+			ExpectedOutput: normalizeSeedText(c.Output),
+			IsPublic:       c.IsPublic,
+			Weight:         1,
+		}
+		if c.IsPublic {
+			testCase.Order = publicOrder
+			publicOrder++
+			task.PublicTestCases = append(task.PublicTestCases, testCase)
+		} else {
+			testCase.Order = hiddenOrder
+			hiddenOrder++
+			task.HiddenTestCases = append(task.HiddenTestCases, testCase)
+		}
+	}
+
+	return task
+}
+
+func firstNonEmpty(values ...string) string {
+	for _, value := range values {
+		trimmed := strings.TrimSpace(value)
+		if trimmed != "" {
+			return trimmed
+		}
+	}
+	return ""
+}
+
+func firstPositive(values ...int32) int32 {
+	for _, value := range values {
+		if value > 0 {
+			return value
+		}
+	}
+	return 0
 }
 
 func syncInterviewPrepQuestions(ctx context.Context, tx pgx.Tx, taskID uuid.UUID, def InterviewPrepCatalogTask) error {

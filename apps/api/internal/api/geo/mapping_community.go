@@ -1,0 +1,40 @@
+package geo
+
+import (
+	"api/internal/model"
+	v1 "api/pkg/api/geo/v1"
+)
+
+func mapCommunityMapResponse(resp *model.CommunityMapResponse) *v1.CommunityMapResponse {
+	if resp == nil {
+		return nil
+	}
+
+	points := make([]*v1.CommunityMapPoint, 0, len(resp.Points))
+	for _, point := range resp.Points {
+		if point == nil {
+			continue
+		}
+
+		avatarURL := point.AvatarURL
+		if avatarURL == "" {
+			avatarURL = point.TelegramAvatarURL
+		}
+		points = append(points, &v1.CommunityMapPoint{
+			UserId:            point.UserID,
+			Title:             point.Title,
+			Region:            point.Region,
+			Latitude:          point.Latitude,
+			Longitude:         point.Longitude,
+			IsCurrentUser:     point.IsCurrentUser,
+			AvatarUrl:         avatarURL,
+			TelegramAvatarUrl: point.TelegramAvatarURL,
+			TelegramUsername:  point.TelegramUsername,
+			FirstName:         point.FirstName,
+			LastName:          point.LastName,
+			ActivityStatus:    mapActivityStatus(point.ActivityStatus),
+		})
+	}
+
+	return &v1.CommunityMapResponse{Points: points}
+}

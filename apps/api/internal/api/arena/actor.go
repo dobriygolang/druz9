@@ -60,23 +60,13 @@ func arenaGuestHeaders(ctx context.Context) (string, string) {
 	guestID := strings.TrimSpace(httpTransport.Request().Header.Get(arenaGuestIDHeader))
 	encodedName := strings.TrimSpace(httpTransport.Request().Header.Get(arenaGuestNameHeader))
 
-	// Decode Base64 to support Unicode characters
 	guestName := encodedName
 	if encodedName != "" {
 		decoded, err := base64.StdEncoding.DecodeString(encodedName)
 		if err == nil {
 			guestName = string(decoded)
 		}
-		// If decoding fails, use raw value (backward compatibility)
 	}
 
 	return guestID, guestName
-}
-
-func parseArenaMatchID(raw string) (uuid.UUID, error) {
-	matchID, err := uuid.Parse(raw)
-	if err != nil {
-		return uuid.Nil, errors.BadRequest("INVALID_MATCH_ID", "invalid match id")
-	}
-	return matchID, nil
 }

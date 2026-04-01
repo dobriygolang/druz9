@@ -3,8 +3,8 @@ package code_editor
 import (
 	"context"
 
+	"api/internal/metrics"
 	realtime "api/internal/realtime/schema"
-	"api/internal/server"
 	v1 "api/pkg/api/code_editor/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -42,11 +42,11 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 		i.realtime.PublishRoomUpdate(mapRealtimeRoom(room))
 	}
 
-	server.IncSubmissions("code_editor", "total")
+	metrics.IncSubmissions("code_editor", "total")
 	if submission.IsCorrect {
-		server.IncSubmissionsAccepted()
+		metrics.IncSubmissionsAccepted()
 	} else {
-		server.IncSubmissionsRejected()
+		metrics.IncSubmissionsRejected()
 	}
 
 	return &v1.SubmitCodeResponse{

@@ -7,8 +7,8 @@ import (
 
 	arenarating "api/internal/arena/rating"
 	domain "api/internal/domain/arena"
+	"api/internal/metrics"
 	"api/internal/model"
-	"api/internal/server"
 
 	"github.com/google/uuid"
 )
@@ -120,5 +120,5 @@ func (s *Service) observeMatchFinished(match *domain.Match, finishedAt time.Time
 	if match.StartedAt != nil {
 		durationSeconds = finishedAt.Sub(*match.StartedAt).Seconds()
 	}
-	server.IncMatchesFinished(durationSeconds)
+	metrics.IncMatchesFinished(durationSeconds)
 }

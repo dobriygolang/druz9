@@ -7,8 +7,8 @@ import (
 	"time"
 
 	"api/internal/api/profile/mocks"
-	"api/internal/model"
 	profiledomain "api/internal/domain/profile"
+	"api/internal/model"
 	v1 "api/pkg/api/profile/v1"
 
 	"github.com/google/uuid"

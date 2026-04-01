@@ -303,6 +303,18 @@
   gap: 6px;
 }
 
+.task-item__meta .badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1;
+}
+
+.task-item__meta .badge svg {
+  flex: 0 0 auto;
+  vertical-align: middle;
+}
+
 .interview-prep-card__head .task-item__meta,
 .interview-prep-card__hint {
   min-width: 0;

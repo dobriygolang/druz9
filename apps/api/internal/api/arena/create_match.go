@@ -4,7 +4,7 @@ import (
 	"context"
 
 	arenadomain "api/internal/domain/arena"
-	"api/internal/server"
+	"api/internal/metrics"
 	v1 "api/pkg/api/arena/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -29,7 +29,7 @@ func (i *Implementation) CreateMatch(ctx context.Context, req *v1.CreateMatchReq
 	}
 
 	i.realtime.PublishMatch(mapArenaRealtimeMatch(match), mapArenaRealtimeCodes(match))
-	server.IncMatchesStarted()
+	metrics.IncMatchesStarted()
 
 	return &v1.ArenaMatchResponse{Match: mapArenaMatch(match)}, nil
 }

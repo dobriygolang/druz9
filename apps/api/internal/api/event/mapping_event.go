@@ -1,36 +1,13 @@
 package event
 
 import (
+	"math"
+
 	"api/internal/model"
 	v1 "api/pkg/api/event/v1"
-	"math"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
-
-func mapParticipantStatus(status model.EventParticipantStatus) v1.ParticipantStatus {
-	switch status {
-	case model.EventParticipantStatusPending:
-		return v1.ParticipantStatus_PARTICIPANT_STATUS_PENDING
-	case model.EventParticipantStatusConfirmed:
-		return v1.ParticipantStatus_PARTICIPANT_STATUS_CONFIRMED
-	case model.EventParticipantStatusDeclined:
-		return v1.ParticipantStatus_PARTICIPANT_STATUS_DECLINED
-	default:
-		return v1.ParticipantStatus_PARTICIPANT_STATUS_UNSPECIFIED
-	}
-}
-
-func mapEventListFilter(filter v1.EventListFilter) string {
-	switch filter {
-	case v1.EventListFilter_EVENT_LIST_FILTER_UPCOMING:
-		return "upcoming"
-	case v1.EventListFilter_EVENT_LIST_FILTER_PAST:
-		return "past"
-	default:
-		return ""
-	}
-}
 
 func mapEvent(item *model.Event) *v1.Event {
 	if item == nil {
@@ -42,7 +19,6 @@ func mapEvent(item *model.Event) *v1.Event {
 		if participant == nil {
 			continue
 		}
-		// S3 avatar has priority, fallback to Telegram avatar
 		avatarURL := participant.AvatarURL
 		if avatarURL == "" {
 			avatarURL = participant.TelegramAvatarURL
@@ -102,6 +78,7 @@ func mapListEventsResponse(resp *model.ListEventsResponse) *v1.ListEventsRespons
 		}
 		events = append(events, mapEvent(item))
 	}
+
 	return &v1.ListEventsResponse{
 		Events:      events,
 		Limit:       resp.Limit,

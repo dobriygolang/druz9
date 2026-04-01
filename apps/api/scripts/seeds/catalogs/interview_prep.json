@@ -37,13 +37,42 @@
       "title": "Worker Pool с backpressure",
       "prep_type": "coding",
       "language": "go",
-      "is_executable": false,
+      "is_executable": true,
       "execution_profile": "pure",
       "runner_mode": "function_io",
       "duration_seconds": 2400,
-      "statement": "Нужно спроектировать и написать worker pool на Go: ограничение по числу воркеров, graceful shutdown, cancel через context.Context и защита от бесконечного роста очереди. После решения ответь на вопросы по backpressure и goroutine leaks.",
-      "starter_code": "package workerpool\n\nimport \"context\"\n\ntype Job func(context.Context) error\n\ntype Pool interface {\n\tSubmit(Job) error\n\tClose() error\n}\n",
+      "statement": "Нужно реализовать симулятор bounded worker pool. На вход приходит число воркеров, размер очереди и поток событий. Если все воркеры заняты, новые задачи должны вставать в очередь, а при переполнении — отклоняться. После решения ответь на вопросы по backpressure и goroutine leaks.",
+      "starter_code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n\t\"strconv\"\n\t\"strings\"\n)\n\ntype job struct {\n\tremaining int\n}\n\nfunc main() {\n\tin := bufio.NewScanner(os.Stdin)\n\tin.Buffer(make([]byte, 0, 1024), 1024*1024)\n\n\tif !in.Scan() {\n\t\treturn\n\t}\n\theader := strings.Fields(in.Text())\n\tif len(header) < 3 {\n\t\tfmt.Println(\"completed=0 rejected=0 running=0 queued=0\")\n\t\treturn\n\t}\n\n\tworkers, _ := strconv.Atoi(header[0])\n\tqueueCap, _ := strconv.Atoi(header[1])\n\tevents, _ := strconv.Atoi(header[2])\n\n\trunning := make([]job, 0, workers)\n\tqueue := make([]job, 0, queueCap)\n\tcompleted := 0\n\trejected := 0\n\tclosed := false\n\n\tfor i := 0; i < events && in.Scan(); i++ {\n\t\tparts := strings.Fields(in.Text())\n\t\tif len(parts) == 0 {\n\t\t\tcontinue\n\t\t}\n\n\t\tswitch parts[0] {\n\t\tcase \"submit\":\n\t\t\tif closed || len(parts) < 2 {\n\t\t\t\tcontinue\n\t\t\t}\n\t\t\tduration, _ := strconv.Atoi(parts[1])\n\t\t\tj := job{remaining: duration}\n\t\t\tif len(running) < workers {\n\t\t\t\trunning = append(running, j)\n\t\t\t} else if len(queue) < queueCap {\n\t\t\t\tqueue = append(queue, j)\n\t\t\t} else {\n\t\t\t\trejected++\n\t\t\t}\n\t\tcase \"tick\":\n\t\t\tnextRunning := make([]job, 0, workers)\n\t\t\tfor _, current := range running {\n\t\t\t\tcurrent.remaining--\n\t\t\t\tif current.remaining <= 0 {\n\t\t\t\t\tcompleted++\n\t\t\t\t\tcontinue\n\t\t\t\t}\n\t\t\t\tnextRunning = append(nextRunning, current)\n\t\t\t}\n\t\t\trunning = nextRunning\n\t\t\tfor len(running) < workers && len(queue) > 0 {\n\t\t\t\trunning = append(running, queue[0])\n\t\t\t\tqueue = queue[1:]\n\t\t\t}\n\t\tcase \"close\":\n\t\t\tclosed = true\n\t\t}\n\t}\n\n\tfmt.Printf(\"completed=%d rejected=%d running=%d queued=%d\\n\", completed, rejected, len(running), len(queue))\n}\n",
       "reference_solution": "Ключевая идея: ограниченная buffered queue, фиксированный набор воркеров, Close() прекращает прием новых задач, а Submit возвращает ошибку при переполнении/закрытии. Все goroutine слушают ctx.Done() и завершаются через sync.WaitGroup.\n",
+      "code_task": {
+        "slug": "interview-prep-worker-pool-backpressure",
+        "title": "Interview Prep: Worker Pool с backpressure",
+        "difficulty": "medium",
+        "topics": ["concurrency", "queue", "backpressure"],
+        "statement": "Реализуй симулятор bounded worker pool. Формат входа: `workers queue_capacity events`, затем строки `submit duration`, `tick`, `close`. На `submit` задача уходит либо сразу в running, либо в bounded queue, либо увеличивает rejected. На `tick` у всех running задач уменьшается remaining, завершившиеся считаются completed, а свободные воркеры забирают задачи из очереди. После всех событий выведи `completed=<n> rejected=<n> running=<n> queued=<n>`.",
+        "starter_code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\t_ = bufio.NewScanner(os.Stdin)\n\t// TODO: implement bounded worker pool simulator.\n\tfmt.Println(\"completed=0 rejected=0 running=0 queued=0\")\n}\n",
+        "language": "go",
+        "execution_profile": "pure",
+        "runner_mode": "program",
+        "duration_seconds": 2400,
+        "cases": [
+          {
+            "input": "2 2 8\nsubmit 3\nsubmit 1\nsubmit 2\ntick\ntick\nsubmit 4\ntick\ntick",
+            "output": "completed=2 rejected=0 running=2 queued=0",
+            "is_public": true
+          },
+          {
+            "input": "1 1 6\nsubmit 5\nsubmit 4\nsubmit 2\nclose\ntick\ntick",
+            "output": "completed=0 rejected=1 running=1 queued=1",
+            "is_public": true
+          },
+          {
+            "input": "2 1 9\nsubmit 1\nsubmit 1\nsubmit 3\nsubmit 2\ntick\nsubmit 2\ntick\ntick\ntick",
+            "output": "completed=4 rejected=1 running=0 queued=0",
+            "is_public": false
+          }
+        ]
+      },
       "is_active": true,
       "questions": [
         {
@@ -98,14 +127,38 @@
       "slug": "sql-retention-cohorts",
       "title": "SQL: retention cohorts",
       "prep_type": "sql",
-      "language": "go",
-      "is_executable": false,
+      "language": "sql",
+      "is_executable": true,
       "execution_profile": "pure",
-      "runner_mode": "function_io",
+      "runner_mode": "program",
       "duration_seconds": 1800,
       "statement": "Есть таблицы users(id, created_at) и sessions(user_id, started_at). Нужно написать SQL, который считает retention по неделям: cohort_week, active_week, users_count, retention_rate. Затем обсуди индексы и типичные ошибки.",
-      "starter_code": "-- Write SQL here\n",
+      "starter_code": "WITH cohort AS (\n  SELECT id AS user_id,\n         date(created_at, '-' || ((strftime('%w', created_at) + 6) % 7) || ' days') AS cohort_week\n  FROM users\n),\nactivity AS (\n  SELECT c.cohort_week,\n         date(s.started_at, '-' || ((strftime('%w', s.started_at) + 6) % 7) || ' days') AS active_week,\n         c.user_id\n  FROM cohort c\n  JOIN sessions s ON s.user_id = c.user_id\n),\ncohort_size AS (\n  SELECT cohort_week, COUNT(*) AS cohort_users\n  FROM cohort\n  GROUP BY cohort_week\n)\nSELECT a.cohort_week,\n       a.active_week,\n       COUNT(DISTINCT a.user_id) AS users_count,\n       ROUND(COUNT(DISTINCT a.user_id) * 1.0 / cs.cohort_users, 2) AS retention_rate\nFROM activity a\nJOIN cohort_size cs ON cs.cohort_week = a.cohort_week\nGROUP BY a.cohort_week, a.active_week, cs.cohort_users\nORDER BY a.cohort_week, a.active_week;\n",
       "reference_solution": "Обычно решение строится через first_seen/cohort CTE, затем join с сессиями, date_trunc('week', ...), distinct user_id и деление на размер когорты. Нужны индексы по users(created_at) и sessions(user_id, started_at).\n",
+      "code_task": {
+        "slug": "interview-prep-sql-retention-cohorts",
+        "title": "Interview Prep: SQL retention cohorts",
+        "difficulty": "medium",
+        "topics": ["sql", "analytics", "retention"],
+        "statement": "Напиши SQL-запрос, который считает retention по неделям. Для каждой когорты нужно вернуть `cohort_week|active_week|users_count|retention_rate`.",
+        "starter_code": "WITH cohort AS (\n  SELECT id AS user_id,\n         date(created_at) AS cohort_week\n  FROM users\n)\nSELECT cohort_week, cohort_week AS active_week, COUNT(*) AS users_count, 1.0 AS retention_rate\nFROM cohort\nGROUP BY cohort_week;\n",
+        "language": "sql",
+        "execution_profile": "pure",
+        "runner_mode": "program",
+        "duration_seconds": 1800,
+        "cases": [
+          {
+            "input": "CREATE TABLE users (id INTEGER PRIMARY KEY, created_at TEXT NOT NULL);\nCREATE TABLE sessions (user_id INTEGER NOT NULL, started_at TEXT NOT NULL);\nINSERT INTO users(id, created_at) VALUES (1, '2026-01-05'), (2, '2026-01-06'), (3, '2026-01-13');\nINSERT INTO sessions(user_id, started_at) VALUES (1, '2026-01-05'), (1, '2026-01-12'), (2, '2026-01-06'), (3, '2026-01-13');",
+            "output": "2026-01-05|2026-01-05|2|1.0\n2026-01-05|2026-01-12|1|0.5\n2026-01-12|2026-01-12|1|1.0",
+            "is_public": true
+          },
+          {
+            "input": "CREATE TABLE users (id INTEGER PRIMARY KEY, created_at TEXT NOT NULL);\nCREATE TABLE sessions (user_id INTEGER NOT NULL, started_at TEXT NOT NULL);\nINSERT INTO users(id, created_at) VALUES (10, '2026-02-02'), (11, '2026-02-03'), (12, '2026-02-10'), (13, '2026-02-11');\nINSERT INTO sessions(user_id, started_at) VALUES (10, '2026-02-02'), (10, '2026-02-09'), (10, '2026-02-16'), (11, '2026-02-04'), (12, '2026-02-10'), (13, '2026-02-17');",
+            "output": "2026-02-02|2026-02-02|2|1.0\n2026-02-02|2026-02-09|1|0.5\n2026-02-02|2026-02-16|1|0.5\n2026-02-09|2026-02-09|1|1.0\n2026-02-09|2026-02-16|1|1.0",
+            "is_public": false
+          }
+        ]
+      },
       "is_active": true,
       "questions": [
         {
@@ -122,6 +175,66 @@
           "position": 3,
           "prompt": "Почему важно явно договориться о timezone для week buckets?",
           "answer": "Иначе границы недели будут гулять между UTC и локальным временем, и один и тот же пользователь может попасть в разные недели в разных отчетах."
+        }
+      ]
+    },
+    {
+      "slug": "python-token-bucket-rate-limiter",
+      "title": "Python: token bucket rate limiter",
+      "prep_type": "coding",
+      "language": "python",
+      "is_executable": true,
+      "execution_profile": "pure",
+      "runner_mode": "function_io",
+      "duration_seconds": 1800,
+      "statement": "Реализуй token bucket rate limiter. На вход приходят capacity, refill_per_second и последовательность запросов с timestamp и cost. Для каждого запроса верни `allow` или `deny`. После решения ответь на вопросы про burst, time source и thread safety.",
+      "starter_code": "def solve(input: str) -> str:\n    lines = [line.strip() for line in input.strip().splitlines() if line.strip()]\n    if not lines:\n        return \"\"\n    # TODO: implement token bucket simulation.\n    return \"\\n\".join(\"deny\" for _ in lines[1:])\n",
+      "reference_solution": "Нужно хранить текущее число токенов и timestamp последнего обновления. Перед каждым запросом пополняем бак на `delta_seconds * refill_rate`, ограничиваем capacity, затем либо списываем cost и возвращаем allow, либо deny. Для многопоточного варианта понадобятся атомарность/lock или single owner actor.",
+      "code_task": {
+        "slug": "interview-prep-python-token-bucket",
+        "title": "Interview Prep: Python token bucket",
+        "difficulty": "medium",
+        "topics": ["python", "rate-limiter", "simulation"],
+        "statement": "Реализуй token bucket simulator. Формат входа: первая строка `capacity refill_per_second`, вторая строка `n`, затем `timestamp cost`. Для каждого запроса выведи `allow` или `deny` на новой строке.",
+        "starter_code": "def solve(input: str) -> str:\n    lines = [line.strip() for line in input.strip().splitlines() if line.strip()]\n    if not lines:\n        return \"\"\n    return \"\\n\".join(\"deny\" for _ in lines[2:])\n",
+        "language": "python",
+        "execution_profile": "pure",
+        "runner_mode": "function_io",
+        "duration_seconds": 1800,
+        "cases": [
+          {
+            "input": "5 1\n5\n0 3\n1 2\n2 2\n5 3\n6 3",
+            "output": "allow\nallow\ndeny\nallow\ndeny",
+            "is_public": true
+          },
+          {
+            "input": "10 2\n4\n0 5\n1 6\n3 4\n4 5",
+            "output": "allow\nallow\nallow\ndeny",
+            "is_public": true
+          },
+          {
+            "input": "3 0.5\n6\n0 1\n1 1\n2 2\n4 1\n8 2\n9 1",
+            "output": "allow\nallow\ndeny\nallow\nallow\ndeny",
+            "is_public": false
+          }
+        ]
+      },
+      "is_active": true,
+      "questions": [
+        {
+          "position": 1,
+          "prompt": "Чем token bucket отличается от leaky bucket на burst traffic?",
+          "answer": "Token bucket позволяет накапливать токены и обслуживать короткие bursts, пока есть накопленный запас. Leaky bucket сглаживает поток сильнее и обычно выдаёт более ровный rate."
+        },
+        {
+          "position": 2,
+          "prompt": "Почему важно использовать monotonic clock, а не wall clock?",
+          "answer": "Wall clock может прыгать из-за NTP/ручной коррекции времени. Для rate limiter нужен стабильный delta time, поэтому лучше monotonic source."
+        },
+        {
+          "position": 3,
+          "prompt": "Что меняется, если limiter используется из нескольких потоков?",
+          "answer": "Нужно гарантировать атомарность обновления токенов и списания cost. Иначе два параллельных запроса могут одновременно увидеть один и тот же остаток и пропустить лишний трафик."
         }
       ]
     },

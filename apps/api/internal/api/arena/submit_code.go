@@ -4,7 +4,7 @@ import (
 	"context"
 
 	arenadomain "api/internal/domain/arena"
-	"api/internal/server"
+	"api/internal/metrics"
 	v1 "api/pkg/api/arena/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -40,11 +40,11 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 
 	i.realtime.PublishMatch(mapArenaRealtimeMatch(match), mapArenaRealtimeCodes(match))
 
-	server.IncSubmissions("arena", "total")
+	metrics.IncSubmissions("arena", "total")
 	if submission.IsCorrect {
-		server.IncSubmissionsAccepted()
+		metrics.IncSubmissionsAccepted()
 	} else {
-		server.IncSubmissionsRejected()
+		metrics.IncSubmissionsRejected()
 	}
 
 	resp := &v1.SubmitCodeResponse{

@@ -9,8 +9,16 @@ import (
 )
 
 func taskFromCreateRequest(req *v1.CreateTaskRequest) *codeeditordomain.Task {
+	return buildTaskFromRequest(uuid.New(), req)
+}
+
+func taskFromUpdateRequest(taskID uuid.UUID, req *v1.UpdateTaskRequest) *codeeditordomain.Task {
+	return buildTaskFromUpdateRequest(taskID, req)
+}
+
+func buildTaskFromRequest(taskID uuid.UUID, req *v1.CreateTaskRequest) *codeeditordomain.Task {
 	return &codeeditordomain.Task{
-		ID:               uuid.New(),
+		ID:               taskID,
 		Title:            req.Title,
 		Slug:             req.Slug,
 		Statement:        req.Statement,
@@ -35,7 +43,7 @@ func taskFromCreateRequest(req *v1.CreateTaskRequest) *codeeditordomain.Task {
 	}
 }
 
-func taskFromUpdateRequest(taskID uuid.UUID, req *v1.UpdateTaskRequest) *codeeditordomain.Task {
+func buildTaskFromUpdateRequest(taskID uuid.UUID, req *v1.UpdateTaskRequest) *codeeditordomain.Task {
 	return &codeeditordomain.Task{
 		ID:               taskID,
 		Title:            req.Title,
@@ -64,25 +72,25 @@ func taskFromUpdateRequest(taskID uuid.UUID, req *v1.UpdateTaskRequest) *codeedi
 
 func taskCasesFromProto(cases []*v1.TaskTestCase) []*codeeditordomain.TestCase {
 	result := make([]*codeeditordomain.TestCase, 0, len(cases))
-	for _, tc := range cases {
-		if tc == nil {
+	for _, testCase := range cases {
+		if testCase == nil {
 			continue
 		}
 
 		id := uuid.Nil
-		if tc.Id != "" {
-			if parsedID, err := uuid.Parse(tc.Id); err == nil {
+		if testCase.Id != "" {
+			if parsedID, err := uuid.Parse(testCase.Id); err == nil {
 				id = parsedID
 			}
 		}
 
 		result = append(result, &codeeditordomain.TestCase{
 			ID:             id,
-			Input:          tc.Input,
-			ExpectedOutput: tc.ExpectedOutput,
-			IsPublic:       tc.IsPublic,
-			Weight:         tc.Weight,
-			Order:          tc.Order,
+			Input:          testCase.Input,
+			ExpectedOutput: testCase.ExpectedOutput,
+			IsPublic:       testCase.IsPublic,
+			Weight:         testCase.Weight,
+			Order:          testCase.Order,
 		})
 	}
 	return result

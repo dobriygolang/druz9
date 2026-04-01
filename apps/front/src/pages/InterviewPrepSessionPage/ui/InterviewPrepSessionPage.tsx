@@ -58,6 +58,8 @@ export function InterviewPrepSessionPage() {
   const canShowQuestions = Boolean(
     session?.currentQuestion && (!session?.task?.isExecutable || session?.lastSubmissionPassed),
   );
+  const showLiveCoding = Boolean(session?.task?.starterCode);
+  const canSubmitExecutable = Boolean(session?.task?.isExecutable);
 
   const handleSubmitCode = async () => {
     if (!sessionId || !session?.task?.isExecutable) return;
@@ -112,19 +114,21 @@ export function InterviewPrepSessionPage() {
     );
   }
 
+  const task = session.task;
+
   return (
     <div className="interview-prep-session-page">
       <section className="card dashboard-card interview-prep-session-hero">
         <div>
           <div className="task-item__meta">
-            <span className="badge">{session.task?.prepType}</span>
-            <span className="badge">{displayLanguageLabel(session.task?.language)}</span>
+            <span className="badge">{task?.prepType}</span>
+            <span className="badge">{displayLanguageLabel(task?.language)}</span>
             <span className="badge">
               <Clock3 size={12} />
-              {session.task ? Math.round(session.task.durationSeconds / 60) : 0} мин
+              {task ? Math.round(task.durationSeconds / 60) : 0} мин
             </span>
           </div>
-          <h1>{session.task?.title ?? 'Interview Prep'}</h1>
+          <h1>{task?.title ?? 'Interview Prep'}</h1>
           <p className="code-rooms-subtitle">
             Сначала решаешь задачу, затем честно отмечаешь, на какие follow-up вопросы смог ответить без подсказки.
           </p>
@@ -155,11 +159,11 @@ export function InterviewPrepSessionPage() {
               <p className="interview-prep-muted">Базовый контекст, от которого идут follow-up вопросы.</p>
             </div>
           </div>
-          <pre className="interview-prep-statement">{session.task?.statement ?? ''}</pre>
-          {session.task?.starterCode && (
+          <pre className="interview-prep-statement">{task?.statement ?? ''}</pre>
+          {task?.starterCode && (
             <>
               <div className="interview-prep-block-title">Starter code</div>
-              <pre className="interview-prep-code">{session.task.starterCode}</pre>
+              <pre className="interview-prep-code">{task.starterCode}</pre>
             </>
           )}
         </article>
@@ -209,7 +213,7 @@ export function InterviewPrepSessionPage() {
         </aside>
       </section>
 
-      {session.task?.isExecutable && (
+      {showLiveCoding && task && (
         <section className="card dashboard-card interview-prep-live-card">
           <div className="dashboard-card__header">
             <div>
@@ -221,16 +225,18 @@ export function InterviewPrepSessionPage() {
             <TerminalSquare size={18} />
           </div>
           <div className="interview-prep-live-toolbar">
-            <span className="badge">{displayLanguageLabel(session.task.language)}</span>
+            <span className="badge">{displayLanguageLabel(task.language)}</span>
             <span className={`badge ${session.lastSubmissionPassed ? 'badge-success' : 'badge-secondary'}`}>
-              {session.lastSubmissionPassed ? 'Проверка пройдена' : 'Ожидается accepted'}
+              {canSubmitExecutable
+                ? (session.lastSubmissionPassed ? 'Проверка пройдена' : 'Ожидается accepted')
+                : 'Черновик для live-coding'}
             </span>
           </div>
           <div className="interview-prep-live-editor">
             <Editor
               height="100%"
-              defaultLanguage={monacoLanguageFor(session.task.language)}
-              language={monacoLanguageFor(session.task.language)}
+              defaultLanguage={monacoLanguageFor(task.language)}
+              language={monacoLanguageFor(task.language)}
               value={code}
               onChange={(value) => setCode(value ?? '')}
               theme="vs-dark"
@@ -244,10 +250,25 @@ export function InterviewPrepSessionPage() {
             />
           </div>
           <div className="interview-prep-live-actions">
-            <button className="btn btn-primary" onClick={() => void handleSubmitCode()} disabled={submitting}>
+            <button
+              className="btn btn-primary"
+              onClick={() => void handleSubmitCode()}
+              disabled={submitting || !canSubmitExecutable}
+              title={canSubmitExecutable ? undefined : 'Для этой задачи автопроверка ещё не привязана'}
+            >
               <Play size={16} />
-              <span>{submitting ? 'Проверяю...' : 'Отправить на проверку'}</span>
+              <span>
+                {canSubmitExecutable
+                  ? (submitting ? 'Проверяю...' : 'Отправить на проверку')
+                  : 'Автопроверка недоступна'}
+              </span>
             </button>
+            {!canSubmitExecutable && (
+              <div className="interview-prep-live-result">
+                <strong>Live-coding доступен</strong>
+                <span>Для этой задачи есть editor, но backend ещё не считает её executable-задачей с автопроверкой.</span>
+              </div>
+            )}
             {submitResult && (
               <div className={`interview-prep-live-result ${submitResult.passed ? 'is-success' : 'is-error'}`}>
                 <strong>{submitResult.passed ? 'Accepted' : `Тесты ${submitResult.passedCount}/${submitResult.totalCount}`}</strong>
