@@ -218,21 +218,21 @@ s3_bucket:
 ai_review_provider:
   usage: "AI review provider key, for example gemini or openai_compatible"
   group: "external"
-  value: "gemini"
+  value: "openai_compatible"
   type: "string"
   writable: true
 
 ai_review_base_url:
   usage: "Optional AI review base URL override"
   group: "external"
-  value: "https://generativelanguage.googleapis.com"
+  value: "https://openrouter.ai/api/v1"
   type: "string"
   writable: true
 
 ai_review_model:
   usage: "Default AI review model name"
   group: "external"
-  value: "gemini-2.5-flash"
+  value: "qwen/qwen3.6-plus-preview:free"
   type: "string"
   writable: true
 

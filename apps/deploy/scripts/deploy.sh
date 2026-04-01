@@ -19,7 +19,8 @@ for secret_name in \
   minio_root_password \
   s3_access_key \
   s3_secret_key \
-  telegram_bot_token
+  telegram_bot_token \
+  ai_review_api_key
 do
   if [[ ! -s "${SECRETS_DIR}/${secret_name}" ]]; then
     echo "Missing secret file: ${SECRETS_DIR}/${secret_name}" >&2
