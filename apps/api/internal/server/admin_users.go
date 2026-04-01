@@ -24,15 +24,20 @@ type adminUsersRepo interface {
 	UpdateUserTrusted(ctx context.Context, userID uuid.UUID, isTrusted bool) error
 }
 
+type profileCacheInvalidator interface {
+	InvalidateProfileCache(userID uuid.UUID)
+}
+
 func RegisterAdminUsersRoutes(
 	srv interface{ HandlePrefix(prefix string, handler http.Handler) },
 	repo adminUsersRepo,
 	authorizer adminUsersAuthorizer,
+	cacheInvalidator profileCacheInvalidator,
 ) {
-	srv.HandlePrefix(adminUsersPrefix, adminUsersHandler(repo, authorizer))
+	srv.HandlePrefix(adminUsersPrefix, adminUsersHandler(repo, authorizer, cacheInvalidator))
 }
 
-func adminUsersHandler(repo adminUsersRepo, authorizer adminUsersAuthorizer) http.Handler {
+func adminUsersHandler(repo adminUsersRepo, authorizer adminUsersAuthorizer, cacheInvalidator profileCacheInvalidator) http.Handler {
 	mux := http.NewServeMux()
 
 	mux.HandleFunc(adminUsersPrefix, func(w http.ResponseWriter, r *http.Request) {
@@ -88,6 +93,9 @@ func adminUsersHandler(repo adminUsersRepo, authorizer adminUsersAuthorizer) htt
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
+
+		// Invalidate profile cache so updated trusted status is reflected immediately
+		cacheInvalidator.InvalidateProfileCache(userID)
 
 		w.Header().Set("Content-Type", "application/json")
 		_ = json.NewEncoder(w).Encode(map[string]any{
