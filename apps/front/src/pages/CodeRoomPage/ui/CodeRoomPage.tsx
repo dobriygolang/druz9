@@ -478,7 +478,7 @@ export const CodeRoomPage: React.FC = () => {
     if (participant.isGuest && normalizeParticipantIdentity(participant.displayName) === normalizeParticipantIdentity(currentUserName)) {
       return true;
     }
-    return participant.isActive !== false;
+    return participant.isActive === true;
   }, [currentParticipantId, currentUserName, user?.id, room?.creatorId]);
 
   const activeParticipantsCount = useMemo(
@@ -734,7 +734,7 @@ export const CodeRoomPage: React.FC = () => {
           {uniqueParticipants.map((p) => (
             <div key={p.id || p.userId || `${p.displayName}:${p.joinedAt}`} className="code-room-participant-pill">
               <span className="participant-name">
-                {p.displayName}
+                <span className="participant-name__text">{p.displayName}</span>
                 {p.isGuest && <span className="guest-badge">Гость</span>}
                 {matchesCreator(p, room?.creatorId) && <span className="creator-badge">Создатель</span>}
                 <span className={`participant-state ${isParticipantInRoom(p) ? 'active' : 'inactive'}`}>

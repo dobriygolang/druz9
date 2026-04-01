@@ -105,6 +105,9 @@ export function InterviewPrepPage() {
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
+      if (task.prepType !== 'system_design' && !task.isExecutable) {
+        return false;
+      }
       const taskCategory = categoryForTask(task);
       if (category !== 'all' && taskCategory !== category) {
         return false;
@@ -285,7 +288,7 @@ export function InterviewPrepPage() {
                   key={item}
                   type="button"
                   className={`pill-selector__pill ${company === item ? 'active' : ''}`}
-                  onClick={() => setCompany(item)}
+                  onClick={() => setCompany(item || '')}
                 >
                   {item === 'all' ? 'Все' : item}
                 </button>

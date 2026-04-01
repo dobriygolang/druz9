@@ -167,7 +167,6 @@ export const buildAwarenessStyles = (
       top: 0;
       height: 1.15em;
       border-left: 2px solid currentColor;
-      animation: codeRoomCaretBlink 1s steps(2, start) infinite;
       z-index: 12;
       pointer-events: none;
     }
@@ -176,12 +175,12 @@ export const buildAwarenessStyles = (
       display: inline-flex;
       align-items: center;
       min-height: 18px;
-      padding: 0 6px;
-      border-radius: 999px;
+      padding: 0 4px;
+      border-radius: 3px;
       font-size: 11px;
-      font-weight: 700;
+      font-weight: 500;
       line-height: 18px;
-      color: #fff;
+      color: rgba(255, 255, 255, 0.95);
       white-space: nowrap;
       transform: translateY(-100%);
       pointer-events: none;
@@ -209,8 +208,7 @@ export const buildAwarenessStyles = (
       }
 
       .code-room-remote-label-pill-${awarenessID} {
-        background: ${user.color};
-        box-shadow: 0 10px 30px ${hexToRgba(user.color, 0.28)};
+        background: ${hexToRgba(user.color, 0.9)};
       }
     `;
   }

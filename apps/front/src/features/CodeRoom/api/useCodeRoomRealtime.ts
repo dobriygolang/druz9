@@ -357,7 +357,7 @@ export const useCodeRoomRealtime = ({
         const nextWidget: any = {
           position: {
             position: headPosition,
-            preference: [2],
+            preference: [0],
           },
           getId: () => `code-room-remote-label-${remoteAwarenessId}`,
           getDomNode: () => domNode,
@@ -374,7 +374,7 @@ export const useCodeRoomRealtime = ({
         widget.getDomNode().textContent = user.name || 'Гость';
         widget.position = {
           position: headPosition,
-          preference: [2],
+          preference: [0],
         };
         currentEditor.layoutContentWidget(widget);
       }
@@ -426,7 +426,7 @@ export const useCodeRoomRealtime = ({
       const safeHead = Math.max(0, Math.min(selection.head, model.getValueLength()));
       widget.position = {
         position: model.getPositionAt(safeHead),
-        preference: [2],
+        preference: [0],
       };
       currentEditor.layoutContentWidget(widget);
     });

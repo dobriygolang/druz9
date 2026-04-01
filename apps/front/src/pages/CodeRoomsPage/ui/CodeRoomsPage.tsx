@@ -7,6 +7,7 @@ import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/feat
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 import { ArenaLeaderboardEntry, ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode } from '@/entities/CodeRoom/model/types';
 import { ArrowRight, BookOpen, Eye, FileCode, Plus, ShieldCheck, Swords, TimerReset, Trophy, Users } from 'lucide-react';
+import { FancySelect } from '@/shared/ui/FancySelect';
 
 const MOTIVATIONAL_QUOTES = [
   'Код — это поэзия логики',
@@ -774,18 +775,16 @@ export const CodeRoomsPage: React.FC = () => {
                       </div>
                       <div className="code-room-prep-launch__group">
                         <span className="code-room-prep-launch__label">Группа</span>
-                        <div className="pill-selector">
-                          {['all', 'ozon', 'avito', 'general'].map((option) => (
-                            <button
-                              key={option}
-                              type="button"
-                              className={`pill-selector__pill ${prepLaunchCompany === option ? 'active' : ''}`}
-                              onClick={() => setPrepLaunchCompany(option)}
-                            >
-                              {option === 'all' ? 'Все группы' : option}
-                            </button>
-                          ))}
-                        </div>
+                        <FancySelect
+                          value={prepLaunchCompany}
+                          options={[
+                            { value: 'all', label: 'Все группы' },
+                            { value: 'ozon', label: 'ozon' },
+                            { value: 'avito', label: 'avito' },
+                            { value: 'general', label: 'general' },
+                          ]}
+                          onChange={setPrepLaunchCompany}
+                        />
                       </div>
                     </div>
                     <div className="code-room-prep-launch__actions">

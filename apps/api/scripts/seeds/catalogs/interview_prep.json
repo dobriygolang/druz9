@@ -1,46 +1,16 @@
 {
-  "version": "interview-prep-v1",
+  "version": "interview-prep-v3-advanced",
   "tasks": [
-    {
-      "slug": "go-two-sum-hash-map",
-      "title": "Two Sum и follow-up по Go",
-      "prep_type": "algorithm",
-      "language": "go",
-      "company_tag": "general",
-      "supported_languages": ["go", "python"],
-      "is_executable": false,
-      "execution_profile": "pure",
-      "runner_mode": "function_io",
-      "duration_seconds": 1800,
-      "statement": "Дан массив чисел и target. Верни индексы двух чисел, сумма которых равна target. После решения ответь на follow-up вопросы по сложности и Go map.",
-      "starter_code": "package main\n\nfunc solve(input string) string {\n\t_ = input\n\t// TODO: parse input and return the answer as a string.\n\treturn \"implement me\"\n}\n",
-      "reference_solution": "func twoSum(nums []int, target int) []int {\n\tseen := make(map[int]int, len(nums))\n\tfor i, v := range nums {\n\t\tif j, ok := seen[target-v]; ok {\n\t\t\treturn []int{j, i}\n\t\t}\n\t\tseen[v] = i\n\t}\n\treturn nil\n}\n",
-      "is_active": true,
-      "questions": [
-        {
-          "position": 1,
-          "prompt": "Какая асимптотика у решения через hash map?",
-          "answer": "По времени O(n), по памяти O(n). Для каждого элемента делается один lookup и одна запись в map, что амортизированно O(1)."
-        },
-        {
-          "position": 2,
-          "prompt": "Почему в Go нельзя брать адрес значения элемента map?",
-          "answer": "Потому что map может перераспределить bucket-ы при росте. Элемент может переехать в памяти, поэтому адрес был бы нестабилен."
-        },
-        {
-          "position": 3,
-          "prompt": "Какой альтернативный подход здесь возможен без map и в чем его компромисс?",
-          "answer": "Можно отсортировать массив и пройти двумя указателями. Это даст O(n log n) по времени и O(1) дополнительной памяти, но потеряются исходные индексы без отдельного хранения."
-        }
-      ]
-    },
     {
       "slug": "go-worker-pool-backpressure",
       "title": "Worker Pool с backpressure",
       "prep_type": "coding",
       "language": "go",
       "company_tag": "ozon",
-      "supported_languages": ["go", "python"],
+      "supported_languages": [
+        "go",
+        "python"
+      ],
       "is_executable": true,
       "execution_profile": "pure",
       "runner_mode": "function_io",
@@ -52,7 +22,11 @@
         "slug": "interview-prep-worker-pool-backpressure",
         "title": "Interview Prep: Worker Pool с backpressure",
         "difficulty": "medium",
-        "topics": ["concurrency", "queue", "backpressure"],
+        "topics": [
+          "concurrency",
+          "queue",
+          "backpressure"
+        ],
         "statement": "Реализуй симулятор bounded worker pool. Формат входа: `workers queue_capacity events`, затем строки `submit duration`, `tick`, `close`. На `submit` задача уходит либо сразу в running, либо в bounded queue, либо увеличивает rejected. На `tick` у всех running задач уменьшается remaining, завершившиеся считаются completed, а свободные воркеры забирают задачи из очереди. После всех событий выведи `completed=<n> rejected=<n> running=<n> queued=<n>`.",
         "starter_code": "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n)\n\nfunc main() {\n\t_ = bufio.NewScanner(os.Stdin)\n\t// TODO: implement bounded worker pool simulator.\n\tfmt.Println(\"completed=0 rejected=0 running=0 queued=0\")\n}\n",
         "language": "go",
@@ -135,7 +109,9 @@
       "prep_type": "sql",
       "language": "sql",
       "company_tag": "ozon",
-      "supported_languages": ["sql"],
+      "supported_languages": [
+        "sql"
+      ],
       "is_executable": true,
       "execution_profile": "pure",
       "runner_mode": "program",
@@ -147,7 +123,11 @@
         "slug": "interview-prep-sql-retention-cohorts",
         "title": "Interview Prep: SQL purchases before ban",
         "difficulty": "medium",
-        "topics": ["sql", "joins", "filtering"],
+        "topics": [
+          "sql",
+          "joins",
+          "filtering"
+        ],
         "statement": "Напиши SQL-запрос, который выводит уникальные комбинации `firstname|lastname|sku` для покупок, совершённых до бана пользователя. Если пользователя нет в `ban_list`, его покупки тоже нужно вернуть. Ответ должен быть чистым SQL query.",
         "starter_code": "-- users(id, firstname, lastname, birth)\n-- purchase(sku, price, user_id, date)\n-- ban_list(user_id, date_from)\n\nSELECT DISTINCT\n  u.firstname,\n  u.lastname,\n  p.sku\nFROM users u\nJOIN purchase p ON p.user_id = u.id\nLEFT JOIN ban_list b ON b.user_id = u.id\nWHERE b.user_id IS NULL\nORDER BY u.firstname, u.lastname, p.sku;\n",
         "language": "sql",
@@ -192,24 +172,31 @@
       "prep_type": "coding",
       "language": "python",
       "company_tag": "avito",
-      "supported_languages": ["go", "python"],
+      "supported_languages": [
+        "go",
+        "python"
+      ],
       "is_executable": true,
       "execution_profile": "pure",
-      "runner_mode": "function_io",
+      "runner_mode": "program",
       "duration_seconds": 1800,
       "statement": "Реализуй token bucket rate limiter. На вход приходят capacity, refill_per_second и последовательность запросов с timestamp и cost. Для каждого запроса верни `allow` или `deny`. После решения ответь на вопросы про burst, time source и thread safety.",
-      "starter_code": "def solve(input: str) -> str:\n    lines = [line.strip() for line in input.strip().splitlines() if line.strip()]\n    if not lines:\n        return \"\"\n    # TODO: implement token bucket simulation.\n    return \"\\n\".join(\"deny\" for _ in lines[1:])\n",
+      "starter_code": "import sys\n\ndef main():\n    lines = [line.strip() for line in sys.stdin.read().strip().splitlines() if line.strip()]\n    if not lines:\n        return\n    # TODO: implement token bucket simulation.\n    print(\"\\n\".join(\"deny\" for _ in lines[2:]))\n\nif __name__ == '__main__':\n    main()\n",
       "reference_solution": "Нужно хранить текущее число токенов и timestamp последнего обновления. Перед каждым запросом пополняем бак на `delta_seconds * refill_rate`, ограничиваем capacity, затем либо списываем cost и возвращаем allow, либо deny. Для многопоточного варианта понадобятся атомарность/lock или single owner actor.",
       "code_task": {
         "slug": "interview-prep-python-token-bucket",
         "title": "Interview Prep: Python token bucket",
         "difficulty": "medium",
-        "topics": ["python", "rate-limiter", "simulation"],
+        "topics": [
+          "python",
+          "rate-limiter",
+          "simulation"
+        ],
         "statement": "Реализуй token bucket simulator. Формат входа: первая строка `capacity refill_per_second`, вторая строка `n`, затем `timestamp cost`. Для каждого запроса выведи `allow` или `deny` на новой строке.",
-        "starter_code": "def solve(input: str) -> str:\n    lines = [line.strip() for line in input.strip().splitlines() if line.strip()]\n    if not lines:\n        return \"\"\n    return \"\\n\".join(\"deny\" for _ in lines[2:])\n",
+        "starter_code": "import sys\n\ndef main():\n    lines = [line.strip() for line in sys.stdin.read().strip().splitlines() if line.strip()]\n    if not lines:\n        return\n    # TODO: implement token bucket simulation.\n    print(\"\\n\".join(\"deny\" for _ in lines[2:]))\n\nif __name__ == '__main__':\n    main()\n",
         "language": "python",
         "execution_profile": "pure",
-        "runner_mode": "function_io",
+        "runner_mode": "program",
         "duration_seconds": 1800,
         "cases": [
           {
@@ -254,7 +241,9 @@
       "prep_type": "code_review",
       "language": "go",
       "company_tag": "general",
-      "supported_languages": ["go"],
+      "supported_languages": [
+        "go"
+      ],
       "is_executable": false,
       "execution_profile": "pure",
       "runner_mode": "function_io",
@@ -278,6 +267,128 @@
           "position": 3,
           "prompt": "Как бы ты исправил это минимально и как архитектурно?",
           "answer": "Минимально: добавить mutex и сделать Set синхронным. Архитектурно: определить контракт согласованности, ownership модели, invalidation policy и, если нужен async path, вынести его в явную очередь/worker."
+        }
+      ]
+    },
+    {
+      "slug": "python-lru-cache-ttl",
+      "title": "LRU Cache с TTL",
+      "prep_type": "coding",
+      "language": "python",
+      "company_tag": "yandex",
+      "supported_languages": [
+        "python",
+        "go"
+      ],
+      "is_executable": true,
+      "execution_profile": "pure",
+      "runner_mode": "program",
+      "duration_seconds": 2700,
+      "statement": "Реализуй LRU Cache с поддержкой Time-To-Live (TTL). На вход подается capacity кэша, затем набор операций: SET key value ttl_ms, GET key, TICK ms (продвигает виртуальное время на ms). При переполнении удаляется наименее недавно использованный эдемент. При GET ключа, чей TTL уже вышел, должно считаться что его нет. Обновление существующего ключа обновляет и его значение, и TTL, и статус 'недавно использован'.",
+      "starter_code": "import sys\n\ndef main():\n    lines = sys.stdin.read().splitlines()\n    if not lines:\n        return\n    capacity = int(lines[0].strip())\n    \n    # TODO: implement LRU with TTL\n    \n    for line in lines[1:]:\n        parts = line.split()\n        if not parts:\n            continue\n        cmd = parts[0]\n        if cmd == 'SET':\n            pass\n        elif cmd == 'GET':\n            print('MISS')\n        elif cmd == 'TICK':\n            pass\n\nif __name__ == '__main__':\n    main()\n",
+      "reference_solution": "Используется OrderedDict или комбинация dict + двусвязный список для O(1). TICK увеличивает глобальный счетчик времени. При GET проверяем: если now >= expire_time[key], удаляем элемент и возвращаем MISS. Иначе обновляем позицию.",
+      "code_task": {
+        "slug": "interview-prep-lru-ttl",
+        "title": "Interview Prep: LRU Cache with TTL",
+        "difficulty": "hard",
+        "topics": [
+          "system-design",
+          "caching",
+          "data-structures"
+        ],
+        "statement": "Реализуй LRU Cache с TTL. Операции:\n`SET <key> <value> <ttl>`\n`GET <key>` (выводит `<value>` или `MISS`)\n`TICK <ms>` (сдвигает глобальное время)\nПервая строка — `capacity`.",
+        "starter_code": "import sys\n\ndef main():\n    lines = sys.stdin.read().splitlines()\n    if not lines:\n        return\n    capacity = int(lines[0].strip())\n    for line in lines[1:]:\n        parts = line.split()\n        if not parts:\n            continue\n        cmd = parts[0]\n        if cmd == 'GET':\n            print('MISS')\n\nif __name__ == '__main__':\n    main()\n",
+        "language": "python",
+        "execution_profile": "pure",
+        "runner_mode": "program",
+        "duration_seconds": 2700,
+        "cases": [
+          {
+            "input": "2\nSET a 1 10\nGET a\nTICK 5\nGET a\nTICK 6\nGET a",
+            "output": "1\n1\nMISS",
+            "is_public": true
+          },
+          {
+            "input": "2\nSET a 1 10\nSET b 2 10\nSET c 3 10\nGET a\nGET b\nGET c",
+            "output": "MISS\n2\n3",
+            "is_public": true
+          },
+          {
+            "input": "2\nSET a 1 20\nSET b 2 20\nGET a\nSET c 3 15\nGET a\nGET b\nGET c",
+            "output": "1\n1\nMISS\n3",
+            "is_public": false
+          }
+        ]
+      },
+      "is_active": true,
+      "questions": [
+        {
+          "position": 1,
+          "prompt": "Как эффективно очищать просроченные ключи, если память ограничена, а TICK вызывается редко?",
+          "answer": "Можно держать Min-Heap (priority queue) просрочек. Либо использовать lazy-eviction: очищать просроченный элемент только при обращении к нему (GET/SET) или при эвикции старого по capacity."
+        },
+        {
+          "position": 2,
+          "prompt": "Что будет, если TTL для ключа выставляется очень большим?",
+          "answer": "Он может занимать место, если к нему часто обращаются, вытесняя другие ключи. LRU учитывает 'частоту', а не время жизни, поэтому 'вечный' ключ может забить кэш."
+        }
+      ]
+    },
+    {
+      "slug": "sql-sessionization-gaps",
+      "title": "SQL: Сессионизация аналитики (30min gap)",
+      "prep_type": "sql",
+      "language": "sql",
+      "company_tag": "avito",
+      "supported_languages": [
+        "sql"
+      ],
+      "is_executable": true,
+      "execution_profile": "pure",
+      "runner_mode": "program",
+      "duration_seconds": 1800,
+      "statement": "Имеется таблица `events` (user_id INT, event_time TIMESTAMP, action VARCHAR). Напиши запрос, который разбивает события пользователя на сессии. Сессия считается завершенной, если между двумя соседними событиями одного пользователя прошло более 30 минут. Необходимо вывести список сессий: `user_id`, `session_start`, `session_end`, `event_count`.",
+      "starter_code": "-- Таблица: events(user_id, event_time, action)\n\nSELECT *\nFROM events;\n",
+      "reference_solution": "Используется `LAG(event_time) OVER (PARTITION BY user_id ORDER BY event_time)`. Создается флаг `is_new_session` (если разница > 30 мин), затем `SUM(is_new_session) OVER (...)` формирует ID сессии, и в конце группировка по user_id + session_id.",
+      "code_task": {
+        "slug": "interview-prep-sql-sessionization",
+        "title": "SQL: Sessionization",
+        "difficulty": "hard",
+        "topics": [
+          "sql",
+          "window-functions",
+          "analytics"
+        ],
+        "statement": "-- Инициализация (СУБД SQLite):\n-- CREATE TABLE events (user_id INTEGER, event_time DATETIME, action TEXT);\n-- Разбей события на сессии по 30 минутному гэпу. \n-- Выведи: user_id, min(event_time) as session_start, max(event_time) as session_end, count(*) as event_count.",
+        "starter_code": "-- напиши селект. Таблица: events(user_id, event_time, action)\n",
+        "language": "sql",
+        "execution_profile": "pure",
+        "runner_mode": "program",
+        "duration_seconds": 1800,
+        "cases": [
+          {
+            "input": "CREATE TABLE events (user_id INTEGER, event_time DATETIME, action TEXT);\nINSERT INTO events VALUES (1, '2025-01-01 10:00:00', 'login'), (1, '2025-01-01 10:15:00', 'click'), (1, '2025-01-01 11:00:00', 'view'), (2, '2025-01-01 10:00:00', 'login');\n",
+            "output": "1|2025-01-01 10:00:00|2025-01-01 10:15:00|2\n1|2025-01-01 11:00:00|2025-01-01 11:00:00|1\n2|2025-01-01 10:00:00|2025-01-01 10:00:00|1",
+            "is_public": true
+          },
+          {
+            "input": "CREATE TABLE events (user_id INTEGER, event_time DATETIME, action TEXT);\nINSERT INTO events VALUES (1, '2025-01-01 09:00:00', 'login'), (1, '2025-01-01 09:30:00', 'click'), (1, '2025-01-01 10:00:00', 'view');\n",
+            "output": "1|2025-01-01 09:00:00|2025-01-01 10:00:00|3",
+            "is_public": false
+          }
+        ]
+      },
+      "is_active": true,
+      "questions": [
+        {
+          "position": 1,
+          "prompt": "Что делать, если событие пользователя пришло 'из будущего' или произошло искажение порядка в логах?",
+          "answer": "В DWH данные обычно чистятся и сортируются по event_time. При stream-процессинге используются watermarks для обработки late arrival data."
+        },
+        {
+          "position": 2,
+          "prompt": "Как этот запрос будет масштабироваться на миллиарды строк?",
+          "answer": "На Spark SQL или ClickHouse window функции по user_id (распределенные по шардам) отработают масштабируемо. Главное — partition key и сортировка."
         }
       ]
     }

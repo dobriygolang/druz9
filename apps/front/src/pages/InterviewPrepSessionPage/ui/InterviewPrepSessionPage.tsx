@@ -6,9 +6,9 @@ import { CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Play, Rotat
 import {
   interviewPrepApi,
   InterviewPrepQuestion,
-  InterviewPrepQuestionResult,
   InterviewPrepSession,
   InterviewPrepSystemDesignReview,
+  InterviewPrepSelfAssessment,
 } from '@/features/InterviewPrep/api/interviewPrepApi';
 import { displayLanguageLabel, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
 
@@ -36,7 +36,7 @@ function starterForLanguage(taskLanguage: string | undefined, solveLanguage: str
   return DEFAULT_CODE_BY_LANGUAGE[solveLanguage] ?? starterCode ?? '';
 }
 
-const resultLabel: Record<InterviewPrepQuestionResult['selfAssessment'], string> = {
+const resultLabel: Record<InterviewPrepSelfAssessment, string> = {
   answered: 'Ответил сам',
   skipped: 'Пропустил',
 };
@@ -72,7 +72,7 @@ export function InterviewPrepSessionPage() {
     if (!sessionId) return;
     setLoading(true);
     interviewPrepApi.getSession(sessionId)
-      .then(setSession)
+      .then((res) => { setSession(res); })
       .catch((e: any) => {
         console.error('Failed to load session:', e);
         setError(e.response?.data?.error || 'Не удалось загрузить сессию');
@@ -304,7 +304,7 @@ export function InterviewPrepSessionPage() {
                 session.results?.map((result, index) => (
                   <div key={result.id} className="interview-prep-result-row">
                     <span>Вопрос #{index + 1}</span>
-                    <strong>{resultLabel[result.selfAssessment]}</strong>
+                    <strong>{resultLabel[result.selfAssessment as InterviewPrepSelfAssessment]}</strong>
                   </div>
                 ))
               )}
