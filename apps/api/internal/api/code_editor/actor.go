@@ -35,7 +35,7 @@ func resolveUserDisplayName(user *model.User) string {
 	if fullName != "" {
 		return fullName
 	}
-	if username := strings.TrimSpace(user.TelegramUsername); username != "" {
+	if username := strings.TrimSpace(user.Username); username != "" {
 		return username
 	}
 	return "User"

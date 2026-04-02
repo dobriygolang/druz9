@@ -192,6 +192,12 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 		}
 		cfg.Auth.Session.TelegramAuthMaxAge = d
 	}
+	if v := manager.GetValue(ctx, rtc.YandexOauthClientId); v.String() != "" {
+		cfg.External.Yandex.ClientID = v.String()
+	}
+	if v := manager.GetValue(ctx, rtc.YandexOauthRedirectUrl); v.String() != "" {
+		cfg.External.Yandex.RedirectURL = v.String()
+	}
 	if v := manager.GetValue(ctx, rtc.GeocoderBaseUrl); v.String() != "" {
 		cfg.External.Geocoder.BaseURL = v.String()
 	}
@@ -289,6 +295,15 @@ func overrideSecretConfigFromEnv(cfg *Bootstrap) {
 	}
 	if value, ok := lookupEnvValue("TELEGRAM_BOT_USERNAME"); ok {
 		cfg.External.Telegram.BotUsername = strings.TrimPrefix(value, "@")
+	}
+	if value, ok := lookupEnvValue("YANDEX_OAUTH_CLIENT_ID"); ok {
+		cfg.External.Yandex.ClientID = value
+	}
+	if value, ok := lookupEnvValue("YANDEX_OAUTH_CLIENT_SECRET"); ok {
+		cfg.External.Yandex.ClientSecret = value
+	}
+	if value, ok := lookupEnvValue("YANDEX_OAUTH_REDIRECT_URL"); ok {
+		cfg.External.Yandex.RedirectURL = value
 	}
 	if value, ok := lookupEnvValue("S3_ENDPOINT"); ok {
 		cfg.External.S3.Endpoint = value
@@ -411,6 +426,7 @@ func defaultBootstrap() *Bootstrap {
 		Metrics: &Metrics{},
 		External: &External{
 			Telegram: &Telegram{},
+			Yandex:   &Yandex{},
 			Geocoder: &Geocoder{
 				BaseURL:   "https://nominatim.openstreetmap.org/search",
 				UserAgent: "druz9-api/1.0",

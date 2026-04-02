@@ -67,9 +67,7 @@ func (r *Repo) FindSessionByHash(ctx context.Context, tokenHash string) (*model.
 	query := fmt.Sprintf(`
 SELECT
   s.id, s.user_id, s.token_hash, s.last_seen_at, s.expires_at,
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
-  g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
+  `+userSelectColumns+`
 FROM sessions s
 JOIN users u ON u.id = s.user_id
 LEFT JOIN geo g ON g.user_id = u.id
@@ -78,13 +76,13 @@ WHERE s.token_hash = $1
 
 	var session model.Session
 	var user model.User
-	var username, firstName, lastName, avatarURL, telegramAvatarURL, currentWorkplace, region, country, city *string
+	var username, firstName, lastName, avatarURL, currentWorkplace, region, country, city, primaryProvider *string
 	var latitude, longitude *float64
-	var telegramID *int64
+	var connectedProviders []string
 
 	err := r.data.DB.QueryRow(ctx, query, tokenHash).Scan(
 		&session.ID, &session.UserID, &session.TokenHash, &session.LastSeenAt, &session.ExpiresAt,
-		&user.ID, &telegramID, &username, &firstName, &lastName, &avatarURL, &telegramAvatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.IsTrusted, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &username, &firstName, &lastName, &avatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.IsTrusted, &connectedProviders, &primaryProvider, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -93,7 +91,9 @@ WHERE s.token_hash = $1
 		return nil, fmt.Errorf("find session by hash: %w", err)
 	}
 
-	fillUserFields(&user, telegramID, username, firstName, lastName, avatarURL, telegramAvatarURL, currentWorkplace, region, country, city, latitude, longitude)
+	fillUserFields(&user, username, firstName, lastName, avatarURL, currentWorkplace, region, country, city, latitude, longitude)
+	user.ConnectedProviders = connectedProviders
+	user.PrimaryProvider = valueOrEmpty(primaryProvider)
 	user.ActivityStatus = model.ResolveActivityStatus(user.LastActiveAt, time.Now().UTC())
 
 	return &model.AuthState{User: &user, Session: &session}, nil

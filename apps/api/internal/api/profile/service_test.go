@@ -280,133 +280,6 @@ func TestUpdateProfile(t *testing.T) {
 	})
 }
 
-func TestLoginWithPassword(t *testing.T) {
-	t.Parallel()
-
-	t.Run("authenticates and sets cookie", func(t *testing.T) {
-		t.Parallel()
-
-		userID := uuid.New()
-		req := &v1.LoginWithPasswordRequest{
-			Login:    "testuser",
-			Password: "password123",
-		}
-		expectedResponse := &model.ProfileResponse{
-			User: &model.User{ID: userID, FirstName: "John"},
-		}
-		rawToken := "test-token"
-		expiresAt := time.Now().Add(time.Hour)
-
-		mockService := mocks.NewService(t)
-		mockService.On("LoginWithPassword", mock.Anything, model.PasswordLoginRequest{
-			Login:    "testuser",
-			Password: "password123",
-		}).Return(expectedResponse, rawToken, expiresAt, nil).Once()
-
-		mockCookie := mocks.NewSessionCookieManager(t)
-		mockCookie.On("SetSessionCookie", mock.Anything, rawToken, expiresAt).Once()
-
-		impl := New(mockService, mockCookie)
-
-		resp, err := impl.LoginWithPassword(context.Background(), req)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-		if resp == nil {
-			t.Error("expected response, got nil")
-		}
-
-		mockService.AssertExpectations(t)
-		mockCookie.AssertExpectations(t)
-	})
-
-	t.Run("propagates service error", func(t *testing.T) {
-		t.Parallel()
-
-		expectedErr := errors.New("invalid credentials")
-		mockService := mocks.NewService(t)
-		mockService.On("LoginWithPassword", mock.Anything, mock.Anything).Return(nil, "", time.Time{}, expectedErr).Once()
-
-		mockCookie := mocks.NewSessionCookieManager(t)
-
-		impl := New(mockService, mockCookie)
-
-		_, err := impl.LoginWithPassword(context.Background(), &v1.LoginWithPasswordRequest{
-			Login:    "testuser",
-			Password: "wrongpassword",
-		})
-		if !errors.Is(err, expectedErr) {
-			t.Errorf("expected error %v, got %v", expectedErr, err)
-		}
-	})
-}
-
-func TestRegisterWithPassword(t *testing.T) {
-	t.Parallel()
-
-	t.Run("registers and sets cookie", func(t *testing.T) {
-		t.Parallel()
-
-		userID := uuid.New()
-		req := &v1.RegisterWithPasswordRequest{
-			Login:     "newuser",
-			Password:  "password123",
-			FirstName: "John",
-			LastName:  "Doe",
-		}
-		expectedResponse := &model.ProfileResponse{
-			User: &model.User{ID: userID, FirstName: "John", LastName: "Doe"},
-		}
-		rawToken := "test-token"
-		expiresAt := time.Now().Add(time.Hour)
-
-		mockService := mocks.NewService(t)
-		mockService.On("RegisterWithPassword", mock.Anything, model.PasswordRegistrationRequest{
-			Login:     "newuser",
-			Password:  "password123",
-			FirstName: "John",
-			LastName:  "Doe",
-		}).Return(expectedResponse, rawToken, expiresAt, nil).Once()
-
-		mockCookie := mocks.NewSessionCookieManager(t)
-		mockCookie.On("SetSessionCookie", mock.Anything, rawToken, expiresAt).Once()
-
-		impl := New(mockService, mockCookie)
-
-		resp, err := impl.RegisterWithPassword(context.Background(), req)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-		if resp == nil {
-			t.Error("expected response, got nil")
-		}
-
-		mockService.AssertExpectations(t)
-		mockCookie.AssertExpectations(t)
-	})
-
-	t.Run("propagates service error", func(t *testing.T) {
-		t.Parallel()
-
-		expectedErr := errors.New("user already exists")
-		mockService := mocks.NewService(t)
-		mockService.On("RegisterWithPassword", mock.Anything, mock.Anything).Return(nil, "", time.Time{}, expectedErr).Once()
-
-		mockCookie := mocks.NewSessionCookieManager(t)
-
-		impl := New(mockService, mockCookie)
-
-		_, err := impl.RegisterWithPassword(context.Background(), &v1.RegisterWithPasswordRequest{
-			Login:     "existinguser",
-			Password:  "password123",
-			FirstName: "John",
-		})
-		if !errors.Is(err, expectedErr) {
-			t.Errorf("expected error %v, got %v", expectedErr, err)
-		}
-	})
-}
-
 func TestUpdateLocation(t *testing.T) {
 	t.Parallel()
 
@@ -575,7 +448,7 @@ func TestBindTelegram(t *testing.T) {
 			Code:  "123456",
 		}
 		expectedResponse := &model.ProfileResponse{
-			User: &model.User{ID: userID, TelegramID: 123},
+			User: &model.User{ID: userID, Username: "sergey"},
 		}
 
 		mockService := mocks.NewService(t)

@@ -107,9 +107,6 @@ func (s *Service) EnrichCommunityMapWithAvatarURLs(ctx context.Context, response
 		}
 
 		if point.AvatarURL == "" {
-			if point.TelegramAvatarURL != "" {
-				point.AvatarURL = point.TelegramAvatarURL
-			}
 			continue
 		}
 

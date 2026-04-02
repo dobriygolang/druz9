@@ -63,7 +63,7 @@ export const UsersPage: React.FC = () => {
     const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
     return (
       fullName.includes(searchLower) ||
-      user.telegramUsername.toLowerCase().includes(searchLower) ||
+      user.username.toLowerCase().includes(searchLower) ||
       user.region.toLowerCase().includes(searchLower) ||
       user.title.toLowerCase().includes(searchLower)
     );
@@ -147,7 +147,7 @@ export const UsersPage: React.FC = () => {
                     )}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '13px', color: 'var(--accent-color)' }}>@{user.telegramUsername}</span>
+                    <span style={{ fontSize: '13px', color: 'var(--accent-color)' }}>@{user.username}</span>
                     <span style={{ fontSize: '13px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <MapPin size={12} /> {user.region}
                     </span>

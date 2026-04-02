@@ -84,7 +84,7 @@ INSERT INTO referrals (id, user_id, title, company, vacancy_url, description, ex
 VALUES ($1, $2, $3, $4, NULLIF($5, ''), $6, NULLIF($7, ''), NULLIF($8, ''), $9, NOW(), NOW())
 RETURNING id, user_id::text, $10, $11, title, company, COALESCE(vacancy_url, ''), description, COALESCE(experience, ''), COALESCE(location, ''), employment_type, created_at, updated_at`,
 		uuid.New(), user.ID, req.Title, req.Company, req.VacancyURL, req.Description, req.Experience, req.Location, req.EmploymentType,
-		referralAuthorName(user), user.TelegramUsername,
+		referralAuthorName(user), user.Username,
 	), user)
 }
 
@@ -219,8 +219,8 @@ func referralAuthorName(user *model.User) string {
 	if name != "" {
 		return name
 	}
-	if strings.TrimSpace(user.TelegramUsername) != "" {
-		return user.TelegramUsername
+	if strings.TrimSpace(user.Username) != "" {
+		return user.Username
 	}
 	return "user"
 }

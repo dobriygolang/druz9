@@ -22,25 +22,21 @@ func mapUser(user *model.User) *profilev1.User {
 		return nil
 	}
 
-	avatarURL := user.AvatarURL
-	if avatarURL == "" {
-		avatarURL = user.TelegramAvatarURL
-	}
-
 	return &profilev1.User{
-		Id:                user.ID.String(),
-		TelegramId:        user.TelegramID,
-		TelegramUsername:  user.TelegramUsername,
-		FirstName:         user.FirstName,
-		LastName:          user.LastName,
-		AvatarUrl:         avatarURL,
-		CurrentWorkplace:  user.CurrentWorkplace,
-		Region:            user.Geo.Region,
-		Latitude:          user.Geo.Latitude,
-		Longitude:         user.Geo.Longitude,
-		ActivityStatus:    mapActivityStatus(user.ActivityStatus),
-		IsAdmin:           user.IsAdmin,
-		IsTrusted:         user.IsTrusted,
-		CreatedAt:         timestamppb.New(user.CreatedAt),
+		Id:                 user.ID.String(),
+		Username:           user.Username,
+		FirstName:          user.FirstName,
+		LastName:           user.LastName,
+		AvatarUrl:          user.AvatarURL,
+		CurrentWorkplace:   user.CurrentWorkplace,
+		Region:             user.Geo.Region,
+		Latitude:           user.Geo.Latitude,
+		Longitude:          user.Geo.Longitude,
+		ActivityStatus:     mapActivityStatus(user.ActivityStatus),
+		IsAdmin:            user.IsAdmin,
+		IsTrusted:          user.IsTrusted,
+		ConnectedProviders: user.ConnectedProviders,
+		PrimaryProvider:    user.PrimaryProvider,
+		CreatedAt:          timestamppb.New(user.CreatedAt),
 	}
 }

@@ -546,79 +546,6 @@ func (_c *Service_GetProfileByID_Call) RunAndReturn(run func(context.Context, uu
 	return _c
 }
 
-// LoginWithPassword provides a mock function with given fields: _a0, _a1
-func (_m *Service) LoginWithPassword(_a0 context.Context, _a1 model.PasswordLoginRequest) (*model.ProfileResponse, string, time.Time, error) {
-	ret := _m.Called(_a0, _a1)
-
-	if len(ret) == 0 {
-		panic("no return value specified for LoginWithPassword")
-	}
-
-	var r0 *model.ProfileResponse
-	var r1 string
-	var r2 time.Time
-	var r3 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.PasswordLoginRequest) (*model.ProfileResponse, string, time.Time, error)); ok {
-		return rf(_a0, _a1)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.PasswordLoginRequest) *model.ProfileResponse); ok {
-		r0 = rf(_a0, _a1)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.ProfileResponse)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, model.PasswordLoginRequest) string); ok {
-		r1 = rf(_a0, _a1)
-	} else {
-		r1 = ret.Get(1).(string)
-	}
-
-	if rf, ok := ret.Get(2).(func(context.Context, model.PasswordLoginRequest) time.Time); ok {
-		r2 = rf(_a0, _a1)
-	} else {
-		r2 = ret.Get(2).(time.Time)
-	}
-
-	if rf, ok := ret.Get(3).(func(context.Context, model.PasswordLoginRequest) error); ok {
-		r3 = rf(_a0, _a1)
-	} else {
-		r3 = ret.Error(3)
-	}
-
-	return r0, r1, r2, r3
-}
-
-// Service_LoginWithPassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'LoginWithPassword'
-type Service_LoginWithPassword_Call struct {
-	*mock.Call
-}
-
-// LoginWithPassword is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 model.PasswordLoginRequest
-func (_e *Service_Expecter) LoginWithPassword(_a0 interface{}, _a1 interface{}) *Service_LoginWithPassword_Call {
-	return &Service_LoginWithPassword_Call{Call: _e.mock.On("LoginWithPassword", _a0, _a1)}
-}
-
-func (_c *Service_LoginWithPassword_Call) Run(run func(_a0 context.Context, _a1 model.PasswordLoginRequest)) *Service_LoginWithPassword_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.PasswordLoginRequest))
-	})
-	return _c
-}
-
-func (_c *Service_LoginWithPassword_Call) Return(_a0 *model.ProfileResponse, _a1 string, _a2 time.Time, _a3 error) *Service_LoginWithPassword_Call {
-	_c.Call.Return(_a0, _a1, _a2, _a3)
-	return _c
-}
-
-func (_c *Service_LoginWithPassword_Call) RunAndReturn(run func(context.Context, model.PasswordLoginRequest) (*model.ProfileResponse, string, time.Time, error)) *Service_LoginWithPassword_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // Logout provides a mock function with given fields: _a0, _a1
 func (_m *Service) Logout(_a0 context.Context, _a1 string) error {
 	ret := _m.Called(_a0, _a1)
@@ -727,75 +654,60 @@ func (_c *Service_PreparePhotoUpload_Call) RunAndReturn(run func(context.Context
 	return _c
 }
 
-// RegisterWithPassword provides a mock function with given fields: _a0, _a1
-func (_m *Service) RegisterWithPassword(_a0 context.Context, _a1 model.PasswordRegistrationRequest) (*model.ProfileResponse, string, time.Time, error) {
-	ret := _m.Called(_a0, _a1)
+// StartYandexAuth provides a mock function with given fields: _a0
+func (_m *Service) StartYandexAuth(_a0 context.Context) (*model.YandexAuthStart, error) {
+	ret := _m.Called(_a0)
 
 	if len(ret) == 0 {
-		panic("no return value specified for RegisterWithPassword")
+		panic("no return value specified for StartYandexAuth")
 	}
 
-	var r0 *model.ProfileResponse
-	var r1 string
-	var r2 time.Time
-	var r3 error
-	if rf, ok := ret.Get(0).(func(context.Context, model.PasswordRegistrationRequest) (*model.ProfileResponse, string, time.Time, error)); ok {
-		return rf(_a0, _a1)
+	var r0 *model.YandexAuthStart
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context) (*model.YandexAuthStart, error)); ok {
+		return rf(_a0)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, model.PasswordRegistrationRequest) *model.ProfileResponse); ok {
-		r0 = rf(_a0, _a1)
+	if rf, ok := ret.Get(0).(func(context.Context) *model.YandexAuthStart); ok {
+		r0 = rf(_a0)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.ProfileResponse)
+			r0 = ret.Get(0).(*model.YandexAuthStart)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, model.PasswordRegistrationRequest) string); ok {
-		r1 = rf(_a0, _a1)
+	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
+		r1 = rf(_a0)
 	} else {
-		r1 = ret.Get(1).(string)
+		r1 = ret.Error(1)
 	}
 
-	if rf, ok := ret.Get(2).(func(context.Context, model.PasswordRegistrationRequest) time.Time); ok {
-		r2 = rf(_a0, _a1)
-	} else {
-		r2 = ret.Get(2).(time.Time)
-	}
-
-	if rf, ok := ret.Get(3).(func(context.Context, model.PasswordRegistrationRequest) error); ok {
-		r3 = rf(_a0, _a1)
-	} else {
-		r3 = ret.Error(3)
-	}
-
-	return r0, r1, r2, r3
+	return r0, r1
 }
 
-// Service_RegisterWithPassword_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'RegisterWithPassword'
-type Service_RegisterWithPassword_Call struct {
+// Service_StartYandexAuth_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'StartYandexAuth'
+type Service_StartYandexAuth_Call struct {
 	*mock.Call
 }
 
-// RegisterWithPassword is a helper method to define mock.On call
+// StartYandexAuth is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 model.PasswordRegistrationRequest
-func (_e *Service_Expecter) RegisterWithPassword(_a0 interface{}, _a1 interface{}) *Service_RegisterWithPassword_Call {
-	return &Service_RegisterWithPassword_Call{Call: _e.mock.On("RegisterWithPassword", _a0, _a1)}
+func (_e *Service_Expecter) StartYandexAuth(_a0 interface{}) *Service_StartYandexAuth_Call {
+	return &Service_StartYandexAuth_Call{Call: _e.mock.On("StartYandexAuth", _a0)}
 }
 
-func (_c *Service_RegisterWithPassword_Call) Run(run func(_a0 context.Context, _a1 model.PasswordRegistrationRequest)) *Service_RegisterWithPassword_Call {
+func (_c *Service_StartYandexAuth_Call) Run(run func(_a0 context.Context)) *Service_StartYandexAuth_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(model.PasswordRegistrationRequest))
+		run(args[0].(context.Context))
 	})
 	return _c
 }
 
-func (_c *Service_RegisterWithPassword_Call) Return(_a0 *model.ProfileResponse, _a1 string, _a2 time.Time, _a3 error) *Service_RegisterWithPassword_Call {
-	_c.Call.Return(_a0, _a1, _a2, _a3)
+func (_c *Service_StartYandexAuth_Call) Return(_a0 *model.YandexAuthStart, _a1 error) *Service_StartYandexAuth_Call {
+	_c.Call.Return(_a0, _a1)
 	return _c
 }
 
-func (_c *Service_RegisterWithPassword_Call) RunAndReturn(run func(context.Context, model.PasswordRegistrationRequest) (*model.ProfileResponse, string, time.Time, error)) *Service_RegisterWithPassword_Call {
+func (_c *Service_StartYandexAuth_Call) RunAndReturn(run func(context.Context) (*model.YandexAuthStart, error)) *Service_StartYandexAuth_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -990,6 +902,80 @@ func (_c *Service_UpdateProfile_Call) Return(_a0 *model.ProfileResponse, _a1 err
 }
 
 func (_c *Service_UpdateProfile_Call) RunAndReturn(run func(context.Context, uuid.UUID, string) (*model.ProfileResponse, error)) *Service_UpdateProfile_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// YandexAuth provides a mock function with given fields: _a0, _a1, _a2
+func (_m *Service) YandexAuth(_a0 context.Context, _a1 string, _a2 string) (*model.ProfileResponse, string, time.Time, error) {
+	ret := _m.Called(_a0, _a1, _a2)
+
+	if len(ret) == 0 {
+		panic("no return value specified for YandexAuth")
+	}
+
+	var r0 *model.ProfileResponse
+	var r1 string
+	var r2 time.Time
+	var r3 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*model.ProfileResponse, string, time.Time, error)); ok {
+		return rf(_a0, _a1, _a2)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) *model.ProfileResponse); ok {
+		r0 = rf(_a0, _a1, _a2)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.ProfileResponse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, string, string) string); ok {
+		r1 = rf(_a0, _a1, _a2)
+	} else {
+		r1 = ret.Get(1).(string)
+	}
+
+	if rf, ok := ret.Get(2).(func(context.Context, string, string) time.Time); ok {
+		r2 = rf(_a0, _a1, _a2)
+	} else {
+		r2 = ret.Get(2).(time.Time)
+	}
+
+	if rf, ok := ret.Get(3).(func(context.Context, string, string) error); ok {
+		r3 = rf(_a0, _a1, _a2)
+	} else {
+		r3 = ret.Error(3)
+	}
+
+	return r0, r1, r2, r3
+}
+
+// Service_YandexAuth_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'YandexAuth'
+type Service_YandexAuth_Call struct {
+	*mock.Call
+}
+
+// YandexAuth is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 string
+//   - _a2 string
+func (_e *Service_Expecter) YandexAuth(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_YandexAuth_Call {
+	return &Service_YandexAuth_Call{Call: _e.mock.On("YandexAuth", _a0, _a1, _a2)}
+}
+
+func (_c *Service_YandexAuth_Call) Run(run func(_a0 context.Context, _a1 string, _a2 string)) *Service_YandexAuth_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(string), args[2].(string))
+	})
+	return _c
+}
+
+func (_c *Service_YandexAuth_Call) Return(_a0 *model.ProfileResponse, _a1 string, _a2 time.Time, _a3 error) *Service_YandexAuth_Call {
+	_c.Call.Return(_a0, _a1, _a2, _a3)
+	return _c
+}
+
+func (_c *Service_YandexAuth_Call) RunAndReturn(run func(context.Context, string, string) (*model.ProfileResponse, string, time.Time, error)) *Service_YandexAuth_Call {
 	_c.Call.Return(run)
 	return _c
 }

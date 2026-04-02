@@ -34,3 +34,10 @@ func NewRepo(dataLayer *postgres.Store, _ log.Logger) *Repo {
 type userScanner interface {
 	Scan(dest ...any) error
 }
+
+func (r *Repo) trustedSelect(columnRef string) string {
+	if r != nil && r.hasTrustedFlag {
+		return columnRef
+	}
+	return "FALSE AS is_trusted"
+}

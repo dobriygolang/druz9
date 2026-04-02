@@ -366,10 +366,17 @@ func TestTelegramAuth(t *testing.T) {
 		t.Parallel()
 
 		payload := model.TelegramAuthPayload{ID: 123, FirstName: "John"}
-		user := &model.User{ID: uuid.New(), TelegramID: 123}
+		user := &model.User{ID: uuid.New(), Username: "sergey"}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("UpsertTelegramUser", context.Background(), payload).Return(user, nil).Once()
+		mockRepo.On("UpsertUserByIdentity", context.Background(), model.IdentityAuthPayload{
+			Provider:       model.AuthProviderTelegram,
+			ProviderUserID: "123",
+			Username:       "",
+			FirstName:      "John",
+			LastName:       "",
+			AvatarURL:      "",
+		}).Return(user, nil).Once()
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
 		mockSessionStorage.On("CreateSession", mock.Anything, mock.Anything).Return(nil).Once()
@@ -434,7 +441,14 @@ func TestTelegramAuth(t *testing.T) {
 
 		expectedErr := errors.New("database error")
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("UpsertTelegramUser", context.Background(), model.TelegramAuthPayload{ID: 123}).Return(nil, expectedErr).Once()
+		mockRepo.On("UpsertUserByIdentity", context.Background(), model.IdentityAuthPayload{
+			Provider:       model.AuthProviderTelegram,
+			ProviderUserID: "123",
+			Username:       "",
+			FirstName:      "",
+			LastName:       "",
+			AvatarURL:      "",
+		}).Return(nil, expectedErr).Once()
 
 		svc := NewProfileService(Config{
 			Repository: mockRepo,
@@ -714,245 +728,5 @@ func TestRotateSession(t *testing.T) {
 		}
 
 		mockSessionStorage.AssertExpectations(t)
-	})
-}
-
-func TestRegisterWithPassword(t *testing.T) {
-	t.Parallel()
-
-	t.Run("registers user and creates session", func(t *testing.T) {
-		t.Parallel()
-
-		req := model.PasswordRegistrationRequest{
-			Login:     "test@example.com",
-			Password:  "password123",
-			FirstName: "John",
-			LastName:  "Doe",
-		}
-		user := &model.User{ID: uuid.New(), Status: model.UserStatusActive}
-
-		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("CreatePasswordUser", context.Background(), mock.AnythingOfType("model.PasswordRegistrationRequest"), mock.AnythingOfType("string")).Return(user, nil).Once()
-
-		mockSessionStorage := mocks.NewSessionStorage(t)
-		mockSessionStorage.On("CreateSession", mock.Anything, mock.Anything).Return(nil).Once()
-
-		svc := NewProfileService(Config{
-			Repository:     mockRepo,
-			SessionStorage: mockSessionStorage,
-			Settings: Settings{
-				SessionTTL: time.Hour,
-			},
-		})
-
-		profile, token, expiresAt, err := svc.RegisterWithPassword(context.Background(), req)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-		if profile == nil {
-			t.Fatal("expected profile, got nil")
-		}
-		if token == "" {
-			t.Error("expected token, got empty string")
-		}
-		if expiresAt.IsZero() {
-			t.Error("expected expiresAt, got zero time")
-		}
-
-		mockRepo.AssertExpectations(t)
-		mockSessionStorage.AssertExpectations(t)
-	})
-
-	t.Run("returns error for invalid login", func(t *testing.T) {
-		t.Parallel()
-
-		req := model.PasswordRegistrationRequest{
-			Login:     "",
-			Password:  "password123",
-			FirstName: "John",
-		}
-
-		svc := NewProfileService(Config{
-			Settings: Settings{},
-		})
-
-		_, _, _, err := svc.RegisterWithPassword(context.Background(), req)
-		if err == nil {
-			t.Error("expected error for empty login")
-		}
-	})
-
-	t.Run("returns error for short password", func(t *testing.T) {
-		t.Parallel()
-
-		req := model.PasswordRegistrationRequest{
-			Login:     "test@example.com",
-			Password:  "short",
-			FirstName: "John",
-		}
-
-		svc := NewProfileService(Config{
-			Settings: Settings{},
-		})
-
-		_, _, _, err := svc.RegisterWithPassword(context.Background(), req)
-		if err == nil {
-			t.Error("expected error for short password")
-		}
-	})
-
-	t.Run("returns error for missing first name", func(t *testing.T) {
-		t.Parallel()
-
-		req := model.PasswordRegistrationRequest{
-			Login:     "test@example.com",
-			Password:  "password123",
-			FirstName: "",
-		}
-
-		svc := NewProfileService(Config{
-			Settings: Settings{},
-		})
-
-		_, _, _, err := svc.RegisterWithPassword(context.Background(), req)
-		if err == nil {
-			t.Error("expected error for missing first name")
-		}
-	})
-
-	t.Run("propagates repository error", func(t *testing.T) {
-		t.Parallel()
-
-		expectedErr := errors.New("database error")
-		mockRepo := mocks.NewRepository(t)
-		req := model.PasswordRegistrationRequest{
-			Login:     "test@example.com",
-			Password:  "password123",
-			FirstName: "John",
-		}
-
-		mockRepo.On("CreatePasswordUser", context.Background(), mock.AnythingOfType("model.PasswordRegistrationRequest"), mock.AnythingOfType("string")).Return(nil, expectedErr).Once()
-
-		svc := NewProfileService(Config{
-			Repository: mockRepo,
-			Settings:   Settings{},
-		})
-
-		_, _, _, err := svc.RegisterWithPassword(context.Background(), req)
-		if !errors.Is(err, expectedErr) {
-			t.Errorf("expected error %v, got %v", expectedErr, err)
-		}
-	})
-}
-
-func TestLoginWithPassword(t *testing.T) {
-	t.Parallel()
-
-	t.Run("authenticates user and creates session", func(t *testing.T) {
-		t.Parallel()
-
-		login := "test@example.com"
-		password := "password123"
-		user := &model.User{ID: uuid.New(), Status: model.UserStatusActive}
-		passwordHash := "$2a$10$vrSeAbTkVTDUA5jE.8vQeetN5W5.QvbN1EWXvmB8PFwAOXwgPPpBK"
-
-		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("FindPasswordUserByLogin", context.Background(), login).Return(user, passwordHash, nil).Once()
-
-		mockSessionStorage := mocks.NewSessionStorage(t)
-		mockSessionStorage.On("CreateSession", mock.Anything, mock.Anything).Return(nil).Once()
-
-		svc := NewProfileService(Config{
-			Repository:     mockRepo,
-			SessionStorage: mockSessionStorage,
-			Settings: Settings{
-				SessionTTL: time.Hour,
-			},
-		})
-
-		profile, token, expiresAt, err := svc.LoginWithPassword(context.Background(), model.PasswordLoginRequest{Login: login, Password: password})
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-		if profile == nil {
-			t.Fatal("expected profile, got nil")
-		}
-		if token == "" {
-			t.Error("expected token, got empty string")
-		}
-		if expiresAt.IsZero() {
-			t.Error("expected expiresAt, got zero time")
-		}
-
-		mockRepo.AssertExpectations(t)
-		mockSessionStorage.AssertExpectations(t)
-	})
-
-	t.Run("returns error for empty credentials", func(t *testing.T) {
-		t.Parallel()
-
-		svc := NewProfileService(Config{
-			Settings: Settings{},
-		})
-
-		_, _, _, err := svc.LoginWithPassword(context.Background(), model.PasswordLoginRequest{Login: "", Password: ""})
-		if err == nil {
-			t.Error("expected error for empty credentials")
-		}
-	})
-
-	t.Run("returns error for invalid password", func(t *testing.T) {
-		t.Parallel()
-
-		login := "test@example.com"
-		passwordHash := "$2a$10$vrSeAbTkVTDUA5jE.8vQeetN5W5.QvbN1EWXvmB8PFwAOXwgPPpBK"
-
-		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("FindPasswordUserByLogin", context.Background(), login).Return(&model.User{ID: uuid.New()}, passwordHash, nil).Once()
-
-		svc := NewProfileService(Config{
-			Repository: mockRepo,
-			Settings:   Settings{},
-		})
-
-		_, _, _, err := svc.LoginWithPassword(context.Background(), model.PasswordLoginRequest{Login: login, Password: "wrongpassword"})
-		if err == nil {
-			t.Error("expected error for invalid password")
-		}
-	})
-
-	t.Run("returns error when user not found", func(t *testing.T) {
-		t.Parallel()
-
-		expectedErr := errors.New("user not found")
-		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("FindPasswordUserByLogin", context.Background(), "notfound@example.com").Return(nil, "", expectedErr).Once()
-
-		svc := NewProfileService(Config{
-			Repository: mockRepo,
-			Settings:   Settings{},
-		})
-
-		_, _, _, err := svc.LoginWithPassword(context.Background(), model.PasswordLoginRequest{Login: "notfound@example.com", Password: "password123"})
-		if !errors.Is(err, expectedErr) {
-			t.Errorf("expected error %v, got %v", expectedErr, err)
-		}
-	})
-
-	t.Run("returns error when password hash is empty", func(t *testing.T) {
-		t.Parallel()
-
-		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("FindPasswordUserByLogin", context.Background(), "test@example.com").Return(&model.User{ID: uuid.New()}, "", nil).Once()
-
-		svc := NewProfileService(Config{
-			Repository: mockRepo,
-			Settings:   Settings{},
-		})
-
-		_, _, _, err := svc.LoginWithPassword(context.Background(), model.PasswordLoginRequest{Login: "test@example.com", Password: "password123"})
-		if err == nil {
-			t.Error("expected error for empty password hash")
-		}
 	})
 }

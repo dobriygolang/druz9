@@ -8,11 +8,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// UpsertTelegramUser creates or updates a user from Telegram auth payload.
-func (s *Service) UpsertTelegramUser(ctx context.Context, payload model.TelegramAuthPayload) (*model.User, error) {
-	return s.repo.UpsertTelegramUser(ctx, payload)
-}
-
 // FindUserByID retrieves a user by ID.
 func (s *Service) FindUserByID(ctx context.Context, userID uuid.UUID) (*model.User, error) {
 	return s.repo.FindUserByID(ctx, userID)

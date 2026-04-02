@@ -302,13 +302,13 @@ export const CodeRoomPage: React.FC = () => {
 
   const currentUserName = useMemo(() => {
     const authName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim()
-      || user?.telegramUsername
+      || user?.username
       || '';
     if (authName) {
       return authName;
     }
     return getStoredGuestName() || 'Гость';
-  }, [user?.firstName, user?.lastName, user?.telegramUsername]);
+  }, [user?.firstName, user?.lastName, user?.username]);
 
   const currentParticipantId = useMemo(() => {
     if (user?.id) {

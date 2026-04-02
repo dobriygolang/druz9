@@ -29,6 +29,14 @@ service ProfileService {
     };
   }
 
+  rpc StartYandexAuth(StartYandexAuthRequest) returns (StartYandexAuthResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/auth/yandex/start" };
+  }
+
+  rpc YandexAuth(YandexAuthRequest) returns (ProfileResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/auth/yandex/callback" };
+  }
+
   rpc CompleteRegistration(CompleteRegistrationRequest) returns (ProfileResponse) {
     option (google.api.http) = {
       post: "/api/v1/profile/auth/complete-registration"
@@ -86,19 +94,6 @@ service ProfileService {
     };
   }
 
-  rpc LoginWithPassword(LoginWithPasswordRequest) returns (LoginWithPasswordResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/profile/auth/login-password"
-      body: "*"
-    };
-  }
-
-  rpc RegisterWithPassword(RegisterWithPasswordRequest) returns (RegisterWithPasswordResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/profile/auth/register-password"
-      body: "*"
-    };
-  }
 }
 
 message CreateTelegramAuthChallengeRequest {}
@@ -126,6 +121,19 @@ message ConfirmTelegramAuthResponse {
 
 message TelegramAuthRequest {
   string token = 1;
+  string code = 2;
+}
+
+message StartYandexAuthRequest {}
+
+message StartYandexAuthResponse {
+  string state = 1;
+  string auth_url = 2;
+  google.protobuf.Timestamp expires_at = 3;
+}
+
+message YandexAuthRequest {
+  string state = 1;
   string code = 2;
 }
 
@@ -189,32 +197,6 @@ message CompletePhotoUploadResponse {
   bool needs_profile_complete = 2;
 }
 
-// LoginWithPassword authenticates user with password
-message LoginWithPasswordRequest {
-  string login = 1;
-  string password = 2;
-}
-
-message LoginWithPasswordResponse {
-  string access_token = 1;
-  string refresh_token = 2;
-  User user = 3;
-}
-
-// RegisterWithPassword registers new user with password
-message RegisterWithPasswordRequest {
-  string login = 1;
-  string password = 2;
-  string first_name = 3;
-  string last_name = 4;
-}
-
-message RegisterWithPasswordResponse {
-  string access_token = 1;
-  string refresh_token = 2;
-  User user = 3;
-}
-
 message ProfileResponse {
   User user = 1;
   bool needs_profile_complete = 2;
@@ -226,8 +208,7 @@ message LogoutResponse {
 
 message User {
   string id = 1;
-  int64 telegram_id = 2;
-  string telegram_username = 3;
+  string username = 2;
   string first_name = 4;
   string last_name = 5;
   string avatar_url = 6;
@@ -239,6 +220,8 @@ message User {
   string current_workplace = 13;
   bool is_admin = 14;
   bool is_trusted = 16;
+  repeated string connected_providers = 17;
+  string primary_provider = 18;
 }
 
 enum UserActivityStatus {

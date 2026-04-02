@@ -12,204 +12,188 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *Repo) trustedSelect(columnRef string) string {
-	if r != nil && r.hasTrustedFlag {
-		return columnRef
-	}
-	return "FALSE AS is_trusted"
-}
+const userSelectColumns = `
+  u.id,
+  NULLIF(u.username, ''),
+  NULLIF(u.first_name, ''),
+  NULLIF(u.last_name, ''),
+  COALESCE(
+    NULLIF(u.avatar_url, ''),
+    (
+      SELECT NULLIF(ui.avatar_url, '')
+      FROM user_identities ui
+      WHERE ui.user_id = u.id
+      ORDER BY CASE WHEN ui.is_primary THEN 0 ELSE 1 END, ui.created_at
+      LIMIT 1
+    ),
+    ''
+  ),
+  NULLIF(u.current_workplace, ''),
+  g.region,
+  g.country,
+  g.city,
+  g.latitude,
+  g.longitude,
+  u.status,
+  u.is_admin,
+  %s,
+  COALESCE((
+    SELECT array_agg(ui.provider ORDER BY ui.provider)
+    FROM user_identities ui
+    WHERE ui.user_id = u.id
+  ), ARRAY[]::text[]),
+  COALESCE((
+    SELECT ui.provider
+    FROM user_identities ui
+    WHERE ui.user_id = u.id
+    ORDER BY CASE WHEN ui.is_primary THEN 0 ELSE 1 END, ui.created_at
+    LIMIT 1
+  ), ''),
+  u.last_active_at,
+  u.created_at,
+  u.updated_at
+`
 
-func (r *Repo) trustedReturning() string {
-	if r != nil && r.hasTrustedFlag {
-		return "is_trusted"
-	}
-	return "FALSE AS is_trusted"
-}
-
-func (r *Repo) UpsertTelegramUser(ctx context.Context, payload model.TelegramAuthPayload) (*model.User, error) {
+func (r *Repo) upsertUserIdentityTx(ctx context.Context, tx pgx.Tx, payload model.IdentityAuthPayload) (*model.User, error) {
 	query := fmt.Sprintf(`
-WITH upserted_user AS (
+WITH existing_identity AS (
+  SELECT user_id
+  FROM user_identities
+  WHERE provider = $1 AND provider_user_id = $2
+),
+created_user AS (
   INSERT INTO users (
     id,
-    telegram_id,
-    telegram_username,
+    username,
     first_name,
     last_name,
-    telegram_avatar_url,
+    avatar_url,
     current_workplace,
     status,
     last_active_at,
     created_at,
     updated_at
   )
-  VALUES ($1, $2, $3, $4, $5, $6, '', $7, NOW(), NOW(), NOW())
-  ON CONFLICT (telegram_id) DO UPDATE SET
-    telegram_username = EXCLUDED.telegram_username,
-    first_name = EXCLUDED.first_name,
-    last_name = EXCLUDED.last_name,
-    telegram_avatar_url = EXCLUDED.telegram_avatar_url,
+  SELECT
+    gen_random_uuid(),
+    COALESCE(NULLIF($3, ''), ''),
+    COALESCE(NULLIF($4, ''), ''),
+    COALESCE(NULLIF($5, ''), ''),
+    COALESCE(NULLIF($6, ''), ''),
+    '',
+    $7,
+    NOW(),
+    NOW(),
+    NOW()
+  WHERE NOT EXISTS (SELECT 1 FROM existing_identity)
+  RETURNING id
+),
+target_user AS (
+  SELECT user_id AS id FROM existing_identity
+  UNION ALL
+  SELECT id FROM created_user
+),
+upserted_identity AS (
+  INSERT INTO user_identities (
+    id,
+    user_id,
+    provider,
+    provider_user_id,
+    username,
+    email,
+    avatar_url,
+    is_primary,
+    created_at,
+    updated_at
+  )
+  SELECT
+    gen_random_uuid(),
+    tu.id,
+    $1,
+    $2,
+    COALESCE(NULLIF($3, ''), ''),
+    COALESCE(NULLIF($8, ''), ''),
+    COALESCE(NULLIF($6, ''), ''),
+    TRUE,
+    NOW(),
+    NOW()
+  FROM target_user tu
+  ON CONFLICT (provider, provider_user_id) DO UPDATE SET
+    username = EXCLUDED.username,
+    email = EXCLUDED.email,
+    avatar_url = EXCLUDED.avatar_url,
+    updated_at = NOW()
+  RETURNING user_id
+),
+updated_user AS (
+  UPDATE users u
+  SET
+    username = COALESCE(NULLIF(u.username, ''), NULLIF($3, ''), ''),
+    first_name = COALESCE(NULLIF($4, ''), u.first_name),
+    last_name = COALESCE(NULLIF($5, ''), u.last_name),
+    avatar_url = COALESCE(NULLIF(u.avatar_url, ''), NULLIF($6, ''), ''),
     last_active_at = NOW(),
     updated_at = NOW()
-  RETURNING
-    id,
-    telegram_id,
-    telegram_username,
-    first_name,
-    last_name,
-    avatar_url,
-    telegram_avatar_url,
-    current_workplace,
-    status,
-    is_admin,
-    %s,
-    last_active_at,
-    created_at,
-    updated_at
+  WHERE u.id = (SELECT user_id FROM upserted_identity LIMIT 1)
+  RETURNING u.id
 )
-SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
-  g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
-FROM upserted_user u
-LEFT JOIN geo g ON g.user_id = u.id
-`, r.trustedReturning(), r.trustedSelect("u.is_trusted"))
-	return scanUser(r.data.DB.QueryRow(
-		ctx,
-		query,
-		uuid.New(),
-		payload.ID,
-		nullIfEmpty(payload.Username),
-		nullIfEmpty(payload.FirstName),
-		nullIfEmpty(payload.LastName),
-		nullIfEmpty(payload.PhotoURL),
-		model.UserStatusPendingProfile,
-	))
-}
-
-func (r *Repo) CreatePasswordUser(ctx context.Context, req model.PasswordRegistrationRequest, passwordHash string) (*model.User, error) {
-	query := fmt.Sprintf(`
-WITH created_user AS (
-  INSERT INTO users (
-    id,
-    telegram_id,
-    telegram_username,
-    first_name,
-    last_name,
-    avatar_url,
-    current_workplace,
-    status,
-    login,
-    password_hash,
-    last_active_at,
-    created_at,
-    updated_at
-  )
-  VALUES ($1, NULL, NULL, $2, $3, '', '', $4, $5, $6, NOW(), NOW(), NOW())
-  RETURNING
-    id,
-    telegram_id,
-    telegram_username,
-    first_name,
-    last_name,
-    avatar_url,
-    telegram_avatar_url,
-    current_workplace,
-    status,
-    is_admin,
-    %s,
-    last_active_at,
-    created_at,
-    updated_at
-)
-SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
-  g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
-FROM created_user u
-LEFT JOIN geo g ON g.user_id = u.id
-`, r.trustedReturning(), r.trustedSelect("u.is_trusted"))
-	return scanUser(r.data.DB.QueryRow(
-		ctx,
-		query,
-		uuid.New(),
-		req.FirstName,
-		nullIfEmpty(req.LastName),
-		model.UserStatusPendingProfile,
-		req.Login,
-		passwordHash,
-	))
-}
-
-func (r *Repo) FindPasswordUserByLogin(ctx context.Context, login string) (*model.User, string, error) {
-	query := fmt.Sprintf(`
-SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
-  g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at,
-  COALESCE(u.password_hash, '')
+SELECT `+userSelectColumns+`
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
-WHERE LOWER(u.login) = LOWER($1)
+WHERE u.id = (SELECT id FROM updated_user LIMIT 1)
 `, r.trustedSelect("u.is_trusted"))
 
-	var (
-		user              model.User
-		passwordHash      string
-		username          *string
-		firstName         *string
-		lastName          *string
-		avatarURL         *string
-		telegramAvatarURL *string
-		currentWorkplace  *string
-		region            *string
-		country           *string
-		city              *string
-		latitude          *float64
-		longitude         *float64
-		telegramID        *int64
-	)
+	return scanUser(tx.QueryRow(
+		ctx,
+		query,
+		string(payload.Provider),
+		payload.ProviderUserID,
+		payload.Username,
+		payload.FirstName,
+		payload.LastName,
+		payload.AvatarURL,
+		model.UserStatusPendingProfile,
+		payload.Email,
+	))
+}
 
-	err := r.data.DB.QueryRow(ctx, query, login).Scan(
-		&user.ID, &telegramID, &username, &firstName, &lastName, &avatarURL, &telegramAvatarURL, &currentWorkplace,
-		&region, &country, &city, &latitude, &longitude,
-		&user.Status, &user.IsAdmin, &user.IsTrusted, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
-		&passwordHash,
-	)
+func (r *Repo) UpsertUserByIdentity(ctx context.Context, payload model.IdentityAuthPayload) (*model.User, error) {
+	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
-		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, "", profileerrors.ErrUnauthorized
-		}
-		return nil, "", fmt.Errorf("find user by login: %w", err)
+		return nil, fmt.Errorf("begin tx: %w", err)
 	}
+	defer func() { _ = tx.Rollback(ctx) }()
 
-	fillUserFields(&user, telegramID, username, firstName, lastName, avatarURL, telegramAvatarURL, currentWorkplace, region, country, city, latitude, longitude)
-	return &user, passwordHash, nil
+	user, err := r.upsertUserIdentityTx(ctx, tx, payload)
+	if err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return nil, fmt.Errorf("commit tx: %w", err)
+	}
+	return user, nil
+}
+
+func (r *Repo) FindUserByProviderIdentity(ctx context.Context, provider model.AuthProvider, providerUserID string) (*model.User, error) {
+	query := fmt.Sprintf(`
+SELECT `+userSelectColumns+`
+FROM user_identities ui
+JOIN users u ON u.id = ui.user_id
+LEFT JOIN geo g ON g.user_id = u.id
+WHERE ui.provider = $1 AND ui.provider_user_id = $2
+`, r.trustedSelect("u.is_trusted"))
+
+	return scanUser(r.data.DB.QueryRow(ctx, query, string(provider), providerUserID))
 }
 
 func (r *Repo) FindUserByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
 	query := fmt.Sprintf(`
-SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
-  g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
+SELECT `+userSelectColumns+`
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
-WHERE id = $1
+WHERE u.id = $1
 `, r.trustedSelect("u.is_trusted"))
 	return scanUser(r.data.DB.QueryRow(ctx, query, id))
-}
-
-func (r *Repo) FindUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error) {
-	query := fmt.Sprintf(`
-SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
-  g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
-FROM users u
-LEFT JOIN geo g ON g.user_id = u.id
-WHERE telegram_id = $1
-`, r.trustedSelect("u.is_trusted"))
-	return scanUser(r.data.DB.QueryRow(ctx, query, telegramID))
 }
 
 func (r *Repo) UpdateProfile(ctx context.Context, userID uuid.UUID, currentWorkplace string) (*model.User, error) {
@@ -219,15 +203,13 @@ WITH updated_user AS (
   SET current_workplace = $2,
       updated_at = NOW()
   WHERE id = $1
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, %s, last_active_at, created_at, updated_at
+  RETURNING id
 )
-SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
-  g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
-FROM updated_user u
+SELECT `+userSelectColumns+`
+FROM users u
+JOIN updated_user uu ON uu.id = u.id
 LEFT JOIN geo g ON g.user_id = u.id
-`, r.trustedReturning(), r.trustedSelect("u.is_trusted"))
+`, r.trustedSelect("u.is_trusted"))
 	return scanUser(r.data.DB.QueryRow(ctx, query, userID, currentWorkplace))
 }
 
@@ -275,10 +257,7 @@ ON CONFLICT (user_id) DO UPDATE SET
 	}
 
 	query := fmt.Sprintf(`
-SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
-  g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
+SELECT `+userSelectColumns+`
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE u.id = $1
@@ -304,39 +283,87 @@ WITH updated_user AS (
   SET avatar_url = $2,
       updated_at = NOW()
   WHERE id = $1
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, %s, last_active_at, created_at, updated_at
+  RETURNING id
 )
-SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
-  g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
-FROM updated_user u
+SELECT `+userSelectColumns+`
+FROM users u
+JOIN updated_user uu ON uu.id = u.id
 LEFT JOIN geo g ON g.user_id = u.id
-`, r.trustedReturning(), r.trustedSelect("u.is_trusted"))
+`, r.trustedSelect("u.is_trusted"))
 	return scanUser(r.data.DB.QueryRow(ctx, query, userID, nullIfEmpty(avatarURL)))
 }
 
-func (r *Repo) BindTelegram(ctx context.Context, userID uuid.UUID, payload model.TelegramAuthPayload) (*model.User, error) {
-	query := fmt.Sprintf(`
-WITH updated_user AS (
-  UPDATE users
-  SET telegram_id = $2,
-      telegram_username = $3,
-      avatar_url = COALESCE(NULLIF($4, ''), avatar_url),
-      first_name = COALESCE(NULLIF($5, ''), first_name),
-      last_name = COALESCE(NULLIF($6, ''), last_name),
-      updated_at = NOW()
-  WHERE id = $1 AND telegram_id IS NULL
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, %s, last_active_at, created_at, updated_at
+func (r *Repo) BindIdentity(ctx context.Context, userID uuid.UUID, payload model.IdentityAuthPayload) (*model.User, error) {
+	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return nil, fmt.Errorf("begin tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	var existingUserID uuid.UUID
+	err = tx.QueryRow(ctx, `
+SELECT user_id
+FROM user_identities
+WHERE provider = $1 AND provider_user_id = $2
+`, string(payload.Provider), payload.ProviderUserID).Scan(&existingUserID)
+	if err == nil && existingUserID != userID {
+		return nil, profileerrors.ErrTelegramAlreadyBound
+	}
+	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
+		return nil, fmt.Errorf("find bound identity: %w", err)
+	}
+
+	_, err = tx.Exec(ctx, `
+INSERT INTO user_identities (
+  id,
+  user_id,
+  provider,
+  provider_user_id,
+  username,
+  email,
+  avatar_url,
+  is_primary,
+  created_at,
+  updated_at
 )
-SELECT
-  u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
-  g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
-FROM updated_user u
+VALUES (gen_random_uuid(), $1, $2, $3, COALESCE(NULLIF($4, ''), ''), COALESCE(NULLIF($5, ''), ''), COALESCE(NULLIF($6, ''), ''), FALSE, NOW(), NOW())
+ON CONFLICT (provider, provider_user_id) DO UPDATE SET
+  username = EXCLUDED.username,
+  email = EXCLUDED.email,
+  avatar_url = EXCLUDED.avatar_url,
+  updated_at = NOW()
+`, userID, string(payload.Provider), payload.ProviderUserID, payload.Username, payload.Email, payload.AvatarURL)
+	if err != nil {
+		return nil, fmt.Errorf("upsert user identity: %w", err)
+	}
+
+	_, err = tx.Exec(ctx, `
+UPDATE users
+SET username = COALESCE(NULLIF(username, ''), NULLIF($2, ''), ''),
+    first_name = COALESCE(NULLIF($3, ''), first_name),
+    last_name = COALESCE(NULLIF($4, ''), last_name),
+    avatar_url = COALESCE(NULLIF(avatar_url, ''), NULLIF($5, ''), ''),
+    updated_at = NOW()
+WHERE id = $1
+`, userID, payload.Username, payload.FirstName, payload.LastName, payload.AvatarURL)
+	if err != nil {
+		return nil, fmt.Errorf("update user after identity bind: %w", err)
+	}
+
+	query := fmt.Sprintf(`
+SELECT `+userSelectColumns+`
+FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
-`, r.trustedReturning(), r.trustedSelect("u.is_trusted"))
-	return scanUser(r.data.DB.QueryRow(ctx, query, userID, payload.ID, nullIfEmpty(payload.Username), nullIfEmpty(payload.PhotoURL), nullIfEmpty(payload.FirstName), nullIfEmpty(payload.LastName)))
+WHERE u.id = $1
+`, r.trustedSelect("u.is_trusted"))
+	user, err := scanUser(tx.QueryRow(ctx, query, userID))
+	if err != nil {
+		return nil, err
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return nil, fmt.Errorf("commit tx: %w", err)
+	}
+	return user, nil
 }
 
 func (r *Repo) DeleteUser(ctx context.Context, userID uuid.UUID) error {

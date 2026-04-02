@@ -318,14 +318,12 @@ func TestEnrichCommunityMapWithAvatarURLs(t *testing.T) {
 		}
 	})
 
-	t.Run("uses telegram avatar when avatar url is empty", func(t *testing.T) {
+	t.Run("keeps empty avatar when avatar url is empty", func(t *testing.T) {
 		t.Parallel()
-
-		telegramAvatar := "https://t.me/i/userpic/100/test.jpg"
 
 		resp := &model.CommunityMapResponse{
 			Points: []*model.CommunityMapPoint{
-				{UserID: uuid.New().String(), AvatarURL: "", TelegramAvatarURL: telegramAvatar},
+				{UserID: uuid.New().String(), AvatarURL: ""},
 			},
 		}
 
@@ -335,8 +333,8 @@ func TestEnrichCommunityMapWithAvatarURLs(t *testing.T) {
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
-		if resp.Points[0].AvatarURL != telegramAvatar {
-			t.Errorf("expected avatar url %s, got %s", telegramAvatar, resp.Points[0].AvatarURL)
+		if resp.Points[0].AvatarURL != "" {
+			t.Errorf("expected empty avatar url, got %s", resp.Points[0].AvatarURL)
 		}
 	})
 

@@ -65,6 +65,9 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Settings: profiledomainservice.Settings{
 			BotToken:            bootstrap.cfg.External.Telegram.BotToken,
 			BotUsername:         bootstrap.cfg.External.Telegram.BotUsername,
+			YandexClientID:      bootstrap.cfg.External.Yandex.ClientID,
+			YandexClientSecret:  bootstrap.cfg.External.Yandex.ClientSecret,
+			YandexRedirectURL:   bootstrap.cfg.External.Yandex.RedirectURL,
 			DevBypass:           bootstrap.cfg.Dev.AuthBypass,
 			DevUserID:           bootstrap.cfg.Dev.DevUserID,
 			CookieName:          bootstrap.cfg.Auth.Session.CookieName,

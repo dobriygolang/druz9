@@ -92,7 +92,7 @@ func resolveDisplayName(user *domain.User) string {
 	if value != "" {
 		return value
 	}
-	if value = strings.TrimSpace(user.TelegramUsername); value != "" {
+	if value = strings.TrimSpace(user.Username); value != "" {
 		return value
 	}
 	return "Игрок"

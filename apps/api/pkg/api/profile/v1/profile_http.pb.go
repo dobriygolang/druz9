@@ -27,12 +27,12 @@ const OperationProfileServiceCreateTelegramAuthChallenge = "/profile.v1.ProfileS
 const OperationProfileServiceGetPhotoUploadURL = "/profile.v1.ProfileService/GetPhotoUploadURL"
 const OperationProfileServiceGetProfile = "/profile.v1.ProfileService/GetProfile"
 const OperationProfileServiceGetProfileByID = "/profile.v1.ProfileService/GetProfileByID"
-const OperationProfileServiceLoginWithPassword = "/profile.v1.ProfileService/LoginWithPassword"
 const OperationProfileServiceLogout = "/profile.v1.ProfileService/Logout"
-const OperationProfileServiceRegisterWithPassword = "/profile.v1.ProfileService/RegisterWithPassword"
+const OperationProfileServiceStartYandexAuth = "/profile.v1.ProfileService/StartYandexAuth"
 const OperationProfileServiceTelegramAuth = "/profile.v1.ProfileService/TelegramAuth"
 const OperationProfileServiceUpdateLocation = "/profile.v1.ProfileService/UpdateLocation"
 const OperationProfileServiceUpdateProfile = "/profile.v1.ProfileService/UpdateProfile"
+const OperationProfileServiceYandexAuth = "/profile.v1.ProfileService/YandexAuth"
 
 type ProfileServiceHTTPServer interface {
 	BindTelegram(context.Context, *BindTelegramRequest) (*BindTelegramResponse, error)
@@ -43,12 +43,12 @@ type ProfileServiceHTTPServer interface {
 	GetPhotoUploadURL(context.Context, *GetPhotoUploadURLRequest) (*GetPhotoUploadURLResponse, error)
 	GetProfile(context.Context, *GetProfileRequest) (*ProfileResponse, error)
 	GetProfileByID(context.Context, *GetProfileByIDRequest) (*ProfileResponse, error)
-	LoginWithPassword(context.Context, *LoginWithPasswordRequest) (*LoginWithPasswordResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
-	RegisterWithPassword(context.Context, *RegisterWithPasswordRequest) (*RegisterWithPasswordResponse, error)
+	StartYandexAuth(context.Context, *StartYandexAuthRequest) (*StartYandexAuthResponse, error)
 	TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error)
 	UpdateLocation(context.Context, *UpdateLocationRequest) (*ProfileResponse, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*ProfileResponse, error)
+	YandexAuth(context.Context, *YandexAuthRequest) (*ProfileResponse, error)
 }
 
 func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServer) {
@@ -56,6 +56,8 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.POST("/api/v1/profile/auth/telegram/challenge", _ProfileService_CreateTelegramAuthChallenge0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/auth/telegram/confirm", _ProfileService_ConfirmTelegramAuth0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/auth/telegram", _ProfileService_TelegramAuth0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/auth/yandex/start", _ProfileService_StartYandexAuth0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/auth/yandex/callback", _ProfileService_YandexAuth0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/auth/complete-registration", _ProfileService_CompleteRegistration0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile", _ProfileService_GetProfile0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/{user_id}", _ProfileService_GetProfileByID0_HTTP_Handler(srv))
@@ -65,8 +67,6 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.POST("/api/v1/profile/bind-telegram", _ProfileService_BindTelegram0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/photo/upload-url", _ProfileService_GetPhotoUploadURL0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/photo/complete", _ProfileService_CompletePhotoUpload0_HTTP_Handler(srv))
-	r.POST("/api/v1/profile/auth/login-password", _ProfileService_LoginWithPassword0_HTTP_Handler(srv))
-	r.POST("/api/v1/profile/auth/register-password", _ProfileService_RegisterWithPassword0_HTTP_Handler(srv))
 }
 
 func _ProfileService_CreateTelegramAuthChallenge0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
@@ -125,6 +125,44 @@ func _ProfileService_TelegramAuth0_HTTP_Handler(srv ProfileServiceHTTPServer) fu
 		http.SetOperation(ctx, OperationProfileServiceTelegramAuth)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.TelegramAuth(ctx, req.(*TelegramAuthRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ProfileResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_StartYandexAuth0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in StartYandexAuthRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceStartYandexAuth)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.StartYandexAuth(ctx, req.(*StartYandexAuthRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*StartYandexAuthResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_YandexAuth0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in YandexAuthRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceYandexAuth)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.YandexAuth(ctx, req.(*YandexAuthRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -330,50 +368,6 @@ func _ProfileService_CompletePhotoUpload0_HTTP_Handler(srv ProfileServiceHTTPSer
 	}
 }
 
-func _ProfileService_LoginWithPassword0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in LoginWithPasswordRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationProfileServiceLoginWithPassword)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.LoginWithPassword(ctx, req.(*LoginWithPasswordRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*LoginWithPasswordResponse)
-		return ctx.Result(200, reply)
-	}
-}
-
-func _ProfileService_RegisterWithPassword0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
-	return func(ctx http.Context) error {
-		var in RegisterWithPasswordRequest
-		if err := ctx.Bind(&in); err != nil {
-			return err
-		}
-		if err := ctx.BindQuery(&in); err != nil {
-			return err
-		}
-		http.SetOperation(ctx, OperationProfileServiceRegisterWithPassword)
-		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
-			return srv.RegisterWithPassword(ctx, req.(*RegisterWithPasswordRequest))
-		})
-		out, err := h(ctx, &in)
-		if err != nil {
-			return err
-		}
-		reply := out.(*RegisterWithPasswordResponse)
-		return ctx.Result(200, reply)
-	}
-}
-
 type ProfileServiceHTTPClient interface {
 	BindTelegram(ctx context.Context, req *BindTelegramRequest, opts ...http.CallOption) (rsp *BindTelegramResponse, err error)
 	CompletePhotoUpload(ctx context.Context, req *CompletePhotoUploadRequest, opts ...http.CallOption) (rsp *CompletePhotoUploadResponse, err error)
@@ -383,12 +377,12 @@ type ProfileServiceHTTPClient interface {
 	GetPhotoUploadURL(ctx context.Context, req *GetPhotoUploadURLRequest, opts ...http.CallOption) (rsp *GetPhotoUploadURLResponse, err error)
 	GetProfile(ctx context.Context, req *GetProfileRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	GetProfileByID(ctx context.Context, req *GetProfileByIDRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
-	LoginWithPassword(ctx context.Context, req *LoginWithPasswordRequest, opts ...http.CallOption) (rsp *LoginWithPasswordResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutResponse, err error)
-	RegisterWithPassword(ctx context.Context, req *RegisterWithPasswordRequest, opts ...http.CallOption) (rsp *RegisterWithPasswordResponse, err error)
+	StartYandexAuth(ctx context.Context, req *StartYandexAuthRequest, opts ...http.CallOption) (rsp *StartYandexAuthResponse, err error)
 	TelegramAuth(ctx context.Context, req *TelegramAuthRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	UpdateLocation(ctx context.Context, req *UpdateLocationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	UpdateProfile(ctx context.Context, req *UpdateProfileRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
+	YandexAuth(ctx context.Context, req *YandexAuthRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 }
 
 type ProfileServiceHTTPClientImpl struct {
@@ -503,19 +497,6 @@ func (c *ProfileServiceHTTPClientImpl) GetProfileByID(ctx context.Context, in *G
 	return &out, nil
 }
 
-func (c *ProfileServiceHTTPClientImpl) LoginWithPassword(ctx context.Context, in *LoginWithPasswordRequest, opts ...http.CallOption) (*LoginWithPasswordResponse, error) {
-	var out LoginWithPasswordResponse
-	pattern := "/api/v1/profile/auth/login-password"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationProfileServiceLoginWithPassword))
-	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return &out, nil
-}
-
 func (c *ProfileServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts ...http.CallOption) (*LogoutResponse, error) {
 	var out LogoutResponse
 	pattern := "/api/v1/profile/auth/logout"
@@ -529,13 +510,13 @@ func (c *ProfileServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutReq
 	return &out, nil
 }
 
-func (c *ProfileServiceHTTPClientImpl) RegisterWithPassword(ctx context.Context, in *RegisterWithPasswordRequest, opts ...http.CallOption) (*RegisterWithPasswordResponse, error) {
-	var out RegisterWithPasswordResponse
-	pattern := "/api/v1/profile/auth/register-password"
-	path := binding.EncodeURL(pattern, in, false)
-	opts = append(opts, http.Operation(OperationProfileServiceRegisterWithPassword))
+func (c *ProfileServiceHTTPClientImpl) StartYandexAuth(ctx context.Context, in *StartYandexAuthRequest, opts ...http.CallOption) (*StartYandexAuthResponse, error) {
+	var out StartYandexAuthResponse
+	pattern := "/api/v1/profile/auth/yandex/start"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceStartYandexAuth))
 	opts = append(opts, http.PathTemplate(pattern))
-	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -575,6 +556,19 @@ func (c *ProfileServiceHTTPClientImpl) UpdateProfile(ctx context.Context, in *Up
 	opts = append(opts, http.Operation(OperationProfileServiceUpdateProfile))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) YandexAuth(ctx context.Context, in *YandexAuthRequest, opts ...http.CallOption) (*ProfileResponse, error) {
+	var out ProfileResponse
+	pattern := "/api/v1/profile/auth/yandex/callback"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceYandexAuth))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

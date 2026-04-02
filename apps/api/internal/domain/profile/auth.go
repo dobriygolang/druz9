@@ -2,6 +2,7 @@ package profile
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -16,7 +17,14 @@ func (s *Service) TelegramAuth(ctx context.Context, challengeToken, loginCode st
 		return nil, "", time.Time{}, err
 	}
 
-	user, err := s.repo.UpsertTelegramUser(ctx, payload)
+	user, err := s.repo.UpsertUserByIdentity(ctx, model.IdentityAuthPayload{
+		Provider:       model.AuthProviderTelegram,
+		ProviderUserID: fmt.Sprintf("%d", payload.ID),
+		Username:       payload.Username,
+		FirstName:      payload.FirstName,
+		LastName:       payload.LastName,
+		AvatarURL:      payload.PhotoURL,
+	})
 	if err != nil {
 		return nil, "", time.Time{}, err
 	}

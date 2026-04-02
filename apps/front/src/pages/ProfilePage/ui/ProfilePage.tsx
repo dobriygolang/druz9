@@ -462,7 +462,7 @@ export const ProfilePage: React.FC = () => {
             '--avatar-url': user.avatarUrl ? `url(${user.avatarUrl})` : 'none',
           } as React.CSSProperties}
         >
-          {!user.avatarUrl && user.telegramUsername?.charAt(0).toUpperCase()}
+          {!user.avatarUrl && (user.firstName?.charAt(0) || user.username?.charAt(0) || '').toUpperCase()}
         </div>
 
         <div className="profile-info" style={{ 
@@ -477,10 +477,10 @@ export const ProfilePage: React.FC = () => {
             justifyContent: isMobile ? 'center' : 'flex-start'
           }}>
             {user.firstName || ''} {user.lastName || ''}
-            {!user.firstName && !user.lastName ? user.telegramUsername : ''}
+            {!user.firstName && !user.lastName ? user.username : ''}
           </h2>
           <div className="profile-username">
-            @{user.telegramUsername}
+            @{user.username || 'user'}
           </div>
           <div className="profile-details" style={{ 
             justifyContent: isMobile ? 'center' : 'flex-start' 
@@ -571,12 +571,19 @@ export const ProfilePage: React.FC = () => {
             </button>
           )}
 
-          {isOwnProfile && user.telegramId && user.telegramId !== '0' ? (
+          {isOwnProfile && user.connectedProviders.includes('yandex') && (
+            <span className="profile-badge" style={{ background: 'rgba(255,255,255,0.08)', color: 'var(--text-primary)' }}>
+              <CheckCircle size={14} />
+              Яндекс подключен
+            </span>
+          )}
+
+          {isOwnProfile && user.connectedProviders.includes('telegram') ? (
             <span className="profile-badge" style={{ background: 'var(--success)', color: 'white' }}>
               <CheckCircle size={14} />
-              Telegram привязан
+              Telegram подключен
             </span>
-          ) : (
+          ) : isOwnProfile ? (
             <button
               className="btn btn-primary profile-telegram-btn"
               onClick={handleOpenBindTelegram}
@@ -584,7 +591,7 @@ export const ProfilePage: React.FC = () => {
               <Send size={12} />
               Привязать Telegram
             </button>
-          )}
+          ) : null}
         </div>
       </div>
 

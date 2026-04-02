@@ -42,7 +42,7 @@ export const EventForm: React.FC<EventFormProps> = ({
     const search = inviteSearchQuery.toLowerCase();
     return (
       user.title.toLowerCase().includes(search) ||
-      user.telegramUsername?.toLowerCase().includes(search) ||
+      user.username?.toLowerCase().includes(search) ||
       user.region?.toLowerCase().includes(search)
     );
   });

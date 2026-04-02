@@ -3,8 +3,7 @@ export type ActivityStatus = 'online' | 'recently_active' | 'offline';
 
 export interface User {
   id: string;
-  telegramId: string;
-  telegramUsername: string;
+  username: string;
   firstName: string;
   lastName: string;
   avatarUrl: string;
@@ -15,6 +14,8 @@ export interface User {
   isAdmin: boolean;
   isTrusted: boolean;
   currentWorkplace: string;
+  connectedProviders: string[];
+  primaryProvider: string;
   createdAt: string;
 }
 
@@ -49,7 +50,7 @@ export interface CommunityMapPoint {
   longitude: number;
   isCurrentUser: boolean;
   avatarUrl: string;
-  telegramUsername: string;
+  username: string;
   firstName: string;
   lastName: string;
   activityStatus: ActivityStatus;

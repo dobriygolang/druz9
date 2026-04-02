@@ -216,8 +216,8 @@ func displayName(user *model.User) string {
 			return name
 		}
 	}
-	if user.TelegramUsername != "" {
-		return user.TelegramUsername
+	if user.Username != "" {
+		return user.Username
 	}
 	return "user"
 }

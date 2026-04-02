@@ -125,7 +125,7 @@ export const PinMarker: React.FC<PinMarkerProps> = ({
 
 export const UserMarker: React.FC<{ point: DisplayUserPoint }> = ({ point }) => {
   const fullName = `${point.firstName} ${point.lastName}`.trim();
-  const label = fullName || point.title || point.telegramUsername || 'User';
+  const label = fullName || point.title || point.username || 'User';
 
   return (
     <PinMarker
@@ -137,7 +137,7 @@ export const UserMarker: React.FC<{ point: DisplayUserPoint }> = ({ point }) => 
 };
 
 export const ClusterMarker: React.FC<{ cluster: UserCluster }> = ({ cluster }) => {
-  const label = cluster.sample.title || cluster.sample.telegramUsername || 'Cluster';
+  const label = cluster.sample.title || cluster.sample.username || 'Cluster';
 
   return (
     <PinMarker

@@ -307,8 +307,8 @@ func resolveArenaDisplayName(user *domain.User) string {
 	if value != "" {
 		return value
 	}
-	if user.TelegramUsername != "" {
-		return user.TelegramUsername
+	if user.Username != "" {
+		return user.Username
 	}
 	return "Игрок"
 }

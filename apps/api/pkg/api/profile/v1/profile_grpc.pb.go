@@ -22,6 +22,8 @@ const (
 	ProfileService_CreateTelegramAuthChallenge_FullMethodName = "/profile.v1.ProfileService/CreateTelegramAuthChallenge"
 	ProfileService_ConfirmTelegramAuth_FullMethodName         = "/profile.v1.ProfileService/ConfirmTelegramAuth"
 	ProfileService_TelegramAuth_FullMethodName                = "/profile.v1.ProfileService/TelegramAuth"
+	ProfileService_StartYandexAuth_FullMethodName             = "/profile.v1.ProfileService/StartYandexAuth"
+	ProfileService_YandexAuth_FullMethodName                  = "/profile.v1.ProfileService/YandexAuth"
 	ProfileService_CompleteRegistration_FullMethodName        = "/profile.v1.ProfileService/CompleteRegistration"
 	ProfileService_GetProfile_FullMethodName                  = "/profile.v1.ProfileService/GetProfile"
 	ProfileService_GetProfileByID_FullMethodName              = "/profile.v1.ProfileService/GetProfileByID"
@@ -31,8 +33,6 @@ const (
 	ProfileService_BindTelegram_FullMethodName                = "/profile.v1.ProfileService/BindTelegram"
 	ProfileService_GetPhotoUploadURL_FullMethodName           = "/profile.v1.ProfileService/GetPhotoUploadURL"
 	ProfileService_CompletePhotoUpload_FullMethodName         = "/profile.v1.ProfileService/CompletePhotoUpload"
-	ProfileService_LoginWithPassword_FullMethodName           = "/profile.v1.ProfileService/LoginWithPassword"
-	ProfileService_RegisterWithPassword_FullMethodName        = "/profile.v1.ProfileService/RegisterWithPassword"
 )
 
 // ProfileServiceClient is the client API for ProfileService service.
@@ -42,6 +42,8 @@ type ProfileServiceClient interface {
 	CreateTelegramAuthChallenge(ctx context.Context, in *CreateTelegramAuthChallengeRequest, opts ...grpc.CallOption) (*CreateTelegramAuthChallengeResponse, error)
 	ConfirmTelegramAuth(ctx context.Context, in *ConfirmTelegramAuthRequest, opts ...grpc.CallOption) (*ConfirmTelegramAuthResponse, error)
 	TelegramAuth(ctx context.Context, in *TelegramAuthRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
+	StartYandexAuth(ctx context.Context, in *StartYandexAuthRequest, opts ...grpc.CallOption) (*StartYandexAuthResponse, error)
+	YandexAuth(ctx context.Context, in *YandexAuthRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
 	CompleteRegistration(ctx context.Context, in *CompleteRegistrationRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
 	GetProfile(ctx context.Context, in *GetProfileRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
 	GetProfileByID(ctx context.Context, in *GetProfileByIDRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
@@ -51,8 +53,6 @@ type ProfileServiceClient interface {
 	BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...grpc.CallOption) (*BindTelegramResponse, error)
 	GetPhotoUploadURL(ctx context.Context, in *GetPhotoUploadURLRequest, opts ...grpc.CallOption) (*GetPhotoUploadURLResponse, error)
 	CompletePhotoUpload(ctx context.Context, in *CompletePhotoUploadRequest, opts ...grpc.CallOption) (*CompletePhotoUploadResponse, error)
-	LoginWithPassword(ctx context.Context, in *LoginWithPasswordRequest, opts ...grpc.CallOption) (*LoginWithPasswordResponse, error)
-	RegisterWithPassword(ctx context.Context, in *RegisterWithPasswordRequest, opts ...grpc.CallOption) (*RegisterWithPasswordResponse, error)
 }
 
 type profileServiceClient struct {
@@ -87,6 +87,26 @@ func (c *profileServiceClient) TelegramAuth(ctx context.Context, in *TelegramAut
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ProfileResponse)
 	err := c.cc.Invoke(ctx, ProfileService_TelegramAuth_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profileServiceClient) StartYandexAuth(ctx context.Context, in *StartYandexAuthRequest, opts ...grpc.CallOption) (*StartYandexAuthResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StartYandexAuthResponse)
+	err := c.cc.Invoke(ctx, ProfileService_StartYandexAuth_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profileServiceClient) YandexAuth(ctx context.Context, in *YandexAuthRequest, opts ...grpc.CallOption) (*ProfileResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ProfileResponse)
+	err := c.cc.Invoke(ctx, ProfileService_YandexAuth_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -183,26 +203,6 @@ func (c *profileServiceClient) CompletePhotoUpload(ctx context.Context, in *Comp
 	return out, nil
 }
 
-func (c *profileServiceClient) LoginWithPassword(ctx context.Context, in *LoginWithPasswordRequest, opts ...grpc.CallOption) (*LoginWithPasswordResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LoginWithPasswordResponse)
-	err := c.cc.Invoke(ctx, ProfileService_LoginWithPassword_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *profileServiceClient) RegisterWithPassword(ctx context.Context, in *RegisterWithPasswordRequest, opts ...grpc.CallOption) (*RegisterWithPasswordResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(RegisterWithPasswordResponse)
-	err := c.cc.Invoke(ctx, ProfileService_RegisterWithPassword_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ProfileServiceServer is the server API for ProfileService service.
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility.
@@ -210,6 +210,8 @@ type ProfileServiceServer interface {
 	CreateTelegramAuthChallenge(context.Context, *CreateTelegramAuthChallengeRequest) (*CreateTelegramAuthChallengeResponse, error)
 	ConfirmTelegramAuth(context.Context, *ConfirmTelegramAuthRequest) (*ConfirmTelegramAuthResponse, error)
 	TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error)
+	StartYandexAuth(context.Context, *StartYandexAuthRequest) (*StartYandexAuthResponse, error)
+	YandexAuth(context.Context, *YandexAuthRequest) (*ProfileResponse, error)
 	CompleteRegistration(context.Context, *CompleteRegistrationRequest) (*ProfileResponse, error)
 	GetProfile(context.Context, *GetProfileRequest) (*ProfileResponse, error)
 	GetProfileByID(context.Context, *GetProfileByIDRequest) (*ProfileResponse, error)
@@ -219,8 +221,6 @@ type ProfileServiceServer interface {
 	BindTelegram(context.Context, *BindTelegramRequest) (*BindTelegramResponse, error)
 	GetPhotoUploadURL(context.Context, *GetPhotoUploadURLRequest) (*GetPhotoUploadURLResponse, error)
 	CompletePhotoUpload(context.Context, *CompletePhotoUploadRequest) (*CompletePhotoUploadResponse, error)
-	LoginWithPassword(context.Context, *LoginWithPasswordRequest) (*LoginWithPasswordResponse, error)
-	RegisterWithPassword(context.Context, *RegisterWithPasswordRequest) (*RegisterWithPasswordResponse, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -239,6 +239,12 @@ func (UnimplementedProfileServiceServer) ConfirmTelegramAuth(context.Context, *C
 }
 func (UnimplementedProfileServiceServer) TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method TelegramAuth not implemented")
+}
+func (UnimplementedProfileServiceServer) StartYandexAuth(context.Context, *StartYandexAuthRequest) (*StartYandexAuthResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StartYandexAuth not implemented")
+}
+func (UnimplementedProfileServiceServer) YandexAuth(context.Context, *YandexAuthRequest) (*ProfileResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method YandexAuth not implemented")
 }
 func (UnimplementedProfileServiceServer) CompleteRegistration(context.Context, *CompleteRegistrationRequest) (*ProfileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CompleteRegistration not implemented")
@@ -266,12 +272,6 @@ func (UnimplementedProfileServiceServer) GetPhotoUploadURL(context.Context, *Get
 }
 func (UnimplementedProfileServiceServer) CompletePhotoUpload(context.Context, *CompletePhotoUploadRequest) (*CompletePhotoUploadResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CompletePhotoUpload not implemented")
-}
-func (UnimplementedProfileServiceServer) LoginWithPassword(context.Context, *LoginWithPasswordRequest) (*LoginWithPasswordResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method LoginWithPassword not implemented")
-}
-func (UnimplementedProfileServiceServer) RegisterWithPassword(context.Context, *RegisterWithPasswordRequest) (*RegisterWithPasswordResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method RegisterWithPassword not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
 func (UnimplementedProfileServiceServer) testEmbeddedByValue()                        {}
@@ -344,6 +344,42 @@ func _ProfileService_TelegramAuth_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ProfileServiceServer).TelegramAuth(ctx, req.(*TelegramAuthRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfileService_StartYandexAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartYandexAuthRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).StartYandexAuth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_StartYandexAuth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).StartYandexAuth(ctx, req.(*StartYandexAuthRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfileService_YandexAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(YandexAuthRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).YandexAuth(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_YandexAuth_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).YandexAuth(ctx, req.(*YandexAuthRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -510,42 +546,6 @@ func _ProfileService_CompletePhotoUpload_Handler(srv interface{}, ctx context.Co
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProfileService_LoginWithPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LoginWithPasswordRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProfileServiceServer).LoginWithPassword(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ProfileService_LoginWithPassword_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceServer).LoginWithPassword(ctx, req.(*LoginWithPasswordRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ProfileService_RegisterWithPassword_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(RegisterWithPasswordRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProfileServiceServer).RegisterWithPassword(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ProfileService_RegisterWithPassword_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceServer).RegisterWithPassword(ctx, req.(*RegisterWithPasswordRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -564,6 +564,14 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "TelegramAuth",
 			Handler:    _ProfileService_TelegramAuth_Handler,
+		},
+		{
+			MethodName: "StartYandexAuth",
+			Handler:    _ProfileService_StartYandexAuth_Handler,
+		},
+		{
+			MethodName: "YandexAuth",
+			Handler:    _ProfileService_YandexAuth_Handler,
 		},
 		{
 			MethodName: "CompleteRegistration",
@@ -600,14 +608,6 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CompletePhotoUpload",
 			Handler:    _ProfileService_CompletePhotoUpload_Handler,
-		},
-		{
-			MethodName: "LoginWithPassword",
-			Handler:    _ProfileService_LoginWithPassword_Handler,
-		},
-		{
-			MethodName: "RegisterWithPassword",
-			Handler:    _ProfileService_RegisterWithPassword_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

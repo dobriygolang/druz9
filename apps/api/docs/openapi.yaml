@@ -839,24 +839,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
-    /api/v1/profile/auth/login-password:
-        post:
-            tags:
-                - ProfileService
-            operationId: ProfileService_LoginWithPassword
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/profile.v1.LoginWithPasswordRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/profile.v1.LoginWithPasswordResponse'
     /api/v1/profile/auth/logout:
         post:
             tags:
@@ -875,24 +857,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.LogoutResponse'
-    /api/v1/profile/auth/register-password:
-        post:
-            tags:
-                - ProfileService
-            operationId: ProfileService_RegisterWithPassword
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/profile.v1.RegisterWithPasswordRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/profile.v1.RegisterWithPasswordResponse'
     /api/v1/profile/auth/telegram:
         post:
             tags:
@@ -947,6 +911,39 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ConfirmTelegramAuthResponse'
+    /api/v1/profile/auth/yandex/callback:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_YandexAuth
+            parameters:
+                - name: state
+                  in: query
+                  schema:
+                    type: string
+                - name: code
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/auth/yandex/start:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_StartYandexAuth
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.StartYandexAuthResponse'
     /api/v1/profile/bind-telegram:
         post:
             tags:
@@ -1994,7 +1991,7 @@ components:
                     type: boolean
                 avatarUrl:
                     type: string
-                telegramUsername:
+                username:
                     type: string
                 firstName:
                     type: string
@@ -2251,23 +2248,6 @@ components:
                 expiresInSeconds:
                     type: integer
                     format: int32
-        profile.v1.LoginWithPasswordRequest:
-            type: object
-            properties:
-                login:
-                    type: string
-                password:
-                    type: string
-            description: LoginWithPassword authenticates user with password
-        profile.v1.LoginWithPasswordResponse:
-            type: object
-            properties:
-                accessToken:
-                    type: string
-                refreshToken:
-                    type: string
-                user:
-                    $ref: '#/components/schemas/profile.v1.User'
         profile.v1.LogoutRequest:
             type: object
             properties: {}
@@ -2283,27 +2263,16 @@ components:
                     $ref: '#/components/schemas/profile.v1.User'
                 needsProfileComplete:
                     type: boolean
-        profile.v1.RegisterWithPasswordRequest:
+        profile.v1.StartYandexAuthResponse:
             type: object
             properties:
-                login:
+                state:
                     type: string
-                password:
+                authUrl:
                     type: string
-                firstName:
+                expiresAt:
                     type: string
-                lastName:
-                    type: string
-            description: RegisterWithPassword registers new user with password
-        profile.v1.RegisterWithPasswordResponse:
-            type: object
-            properties:
-                accessToken:
-                    type: string
-                refreshToken:
-                    type: string
-                user:
-                    $ref: '#/components/schemas/profile.v1.User'
+                    format: date-time
         profile.v1.TelegramAuthRequest:
             type: object
             properties:
@@ -2336,9 +2305,7 @@ components:
             properties:
                 id:
                     type: string
-                telegramId:
-                    type: string
-                telegramUsername:
+                username:
                     type: string
                 firstName:
                     type: string
@@ -2366,6 +2333,12 @@ components:
                     type: boolean
                 isTrusted:
                     type: boolean
+                connectedProviders:
+                    type: array
+                    items:
+                        type: string
+                primaryProvider:
+                    type: string
         referral.v1.CreateReferralRequest:
             type: object
             properties:

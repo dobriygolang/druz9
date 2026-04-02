@@ -18,8 +18,8 @@ interface AuthContextType {
   isLoading: boolean;
   isAuthenticated: boolean;
   login: (token: string, code: string) => Promise<void>;
-  loginWithPassword: (email: string, password: string) => Promise<void>;
-  registerWithPassword: (payload: { login: string; password: string; firstName: string; lastName?: string }) => Promise<void>;
+  startYandexAuth: () => Promise<string>;
+  completeYandexAuth: (state: string, code: string) => Promise<void>;
   completeProfile: (payload: CompleteProfilePayload) => Promise<void>;
   updateLocation: (payload: CompleteProfilePayload) => Promise<void>;
   logout: () => Promise<void>;
@@ -163,8 +163,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setNeedsProfileComplete(data.needsProfileComplete);
   }, []);
 
-  const loginWithPassword = useCallback(async (login: string, password: string) => {
-    const data = await authApi.loginWithPassword({ login, password });
+  const completeYandexAuth = useCallback(async (state: string, code: string) => {
+    const data = await authApi.yandexAuth(state, code);
     cachedProfileRef.current = data;
     clearForcedGuestMode();
     markKnownAuthSession();
@@ -173,14 +173,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setNeedsProfileComplete(data.needsProfileComplete);
   }, []);
 
-  const registerWithPassword = useCallback(async (payload: { login: string; password: string; firstName: string; lastName?: string }) => {
-    const data = await authApi.registerWithPassword(payload);
-    cachedProfileRef.current = data;
-    clearForcedGuestMode();
-    markKnownAuthSession();
-    clearGuestCodeRoomSession();
-    setUser(data.user);
-    setNeedsProfileComplete(data.needsProfileComplete);
+  const startYandexAuth = useCallback(async () => {
+    const { authUrl } = await authApi.startYandexAuth();
+    return authUrl;
   }, []);
 
   const completeProfile = useCallback(async (payload: CompleteProfilePayload) => {
@@ -227,8 +222,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         isLoading,
         isAuthenticated: !!user,
         login,
-        loginWithPassword,
-        registerWithPassword,
+        startYandexAuth,
+        completeYandexAuth,
         completeProfile,
         updateLocation,
         logout,

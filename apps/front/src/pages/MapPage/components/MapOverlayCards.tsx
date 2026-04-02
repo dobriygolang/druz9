@@ -38,7 +38,7 @@ export const UserDetailCard: React.FC<UserDetailCardProps> = ({ user, onClose })
             }} />
           </div>
           <div className="map-overlay-card__subtitle">
-            @{user.telegramUsername || 'user'}
+            @{user.username || 'user'}
             <span style={{ opacity: 0.3 }}>•</span>
             <span style={{ fontSize: '11px' }}>
               {user.activityStatus === 'online' ? 'в сети' : 

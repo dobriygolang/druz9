@@ -7,6 +7,7 @@ import (
 	"encoding/base64"
 	"encoding/hex"
 	"fmt"
+	"net/http"
 	"net/url"
 	"sync"
 	"time"
@@ -29,6 +30,9 @@ type Config struct {
 type Settings struct {
 	BotToken            string
 	BotUsername         string
+	YandexClientID      string
+	YandexClientSecret  string
+	YandexRedirectURL   string
 	DevBypass           bool
 	DevUserID           string
 	CookieName          string
@@ -43,6 +47,8 @@ type Service struct {
 	sessions      SessionStorage
 	settings      Settings
 	auth          *telegramAuthChallenges
+	yandexAuth    *yandexAuthStates
+	httpClient    *http.Client
 	storage       ObjectStorage
 	activityCache *cache.TTLCache[time.Time]
 	profileCache  *cache.TTLCache[*model.User]
@@ -62,20 +68,23 @@ type telegramAuthChallengeState struct {
 	loginCode string
 }
 
+type yandexAuthStates struct {
+	mu      sync.Mutex
+	byState map[string]time.Time
+}
+
 // Repository is a data-layer interface for profile queries.
 //
 //go:generate mockery --case underscore --name Repository --with-expecter --output mocks
 type Repository interface {
-	UpsertTelegramUser(ctx context.Context, payload model.TelegramAuthPayload) (*model.User, error)
-	CreatePasswordUser(ctx context.Context, req model.PasswordRegistrationRequest, passwordHash string) (*model.User, error)
-	FindPasswordUserByLogin(ctx context.Context, login string) (*model.User, string, error)
+	UpsertUserByIdentity(ctx context.Context, payload model.IdentityAuthPayload) (*model.User, error)
+	FindUserByProviderIdentity(ctx context.Context, provider model.AuthProvider, providerUserID string) (*model.User, error)
 	FindUserByID(ctx context.Context, userID uuid.UUID) (*model.User, error)
-	FindUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error)
-	UpdateProfile(ctx context.Context, userID uuid.UUID, name string) (*model.User, error)
+	UpdateProfile(ctx context.Context, userID uuid.UUID, currentWorkplace string) (*model.User, error)
 	CompleteRegistration(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error)
 	UpdateLocation(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error)
 	UpdateAvatarURL(ctx context.Context, userID uuid.UUID, avatarURL string) (*model.User, error)
-	BindTelegram(ctx context.Context, userID uuid.UUID, payload model.TelegramAuthPayload) (*model.User, error)
+	BindIdentity(ctx context.Context, userID uuid.UUID, payload model.IdentityAuthPayload) (*model.User, error)
 }
 
 type ObjectStorage interface {
@@ -105,6 +114,10 @@ func NewProfileService(c Config) *Service {
 			byToken: make(map[string]*telegramAuthChallengeState),
 			byCode:  make(map[string]*telegramAuthChallengeState),
 		},
+		yandexAuth: &yandexAuthStates{
+			byState: make(map[string]time.Time),
+		},
+		httpClient:    &http.Client{Timeout: 10 * time.Second},
 		activityCache: cache.NewTTLCache[time.Time](10000, 15*time.Minute),
 		profileCache:  cache.NewTTLCache[*model.User](1000, 5*time.Minute),
 		sessionCache:  cache.NewTTLCache[*model.Session](5000, 30*time.Minute),

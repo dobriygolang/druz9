@@ -9,6 +9,7 @@ import { ENV } from '@/shared/config/env';
 
 // Lazy load pages for better bundle size
 const LoginPage = lazy(() => import('@/pages/LoginPage/ui/LoginPage').then(m => ({ default: m.LoginPage })));
+const AuthCallbackPage = lazy(() => import('@/pages/AuthCallbackPage/ui/AuthCallbackPage').then(m => ({ default: m.AuthCallbackPage })));
 const CompleteRegistrationPage = lazy(() => import('@/pages/CompleteRegistrationPage/ui/CompleteRegistrationPage').then(m => ({ default: m.CompleteRegistrationPage })));
 const FeedPage = lazy(() => import('@/pages/FeedPage/ui/FeedPage').then(m => ({ default: m.FeedPage })));
 const UsersPage = lazy(() => import('@/pages/UsersPage/ui/UsersPage').then(m => ({ default: m.UsersPage })));
@@ -95,6 +96,8 @@ export const RouterProvider: React.FC = () => {
             )
           }
         />
+
+        <Route path="/auth/callback" element={<AuthCallbackPage />} />
 
         <Route
           path="/complete-registration"

@@ -29,8 +29,7 @@ type BackendCommunityMapPoint = {
   isCurrentUser?: boolean;
   avatar_url?: string;
   avatarUrl?: string;
-  telegram_username?: string;
-  telegramUsername?: string;
+  username?: string;
   first_name?: string;
   firstName?: string;
   last_name?: string;
@@ -72,8 +71,7 @@ function normalizeCommunityMapPoint(
     longitude: point.longitude ?? 0,
     isCurrentUser: point.is_current_user ?? point.isCurrentUser ?? false,
     avatarUrl: point.avatar_url ?? point.avatarUrl ?? '',
-    telegramUsername:
-      point.telegram_username ?? point.telegramUsername ?? '',
+    username: point.username ?? '',
     firstName: point.first_name ?? point.firstName ?? '',
     lastName: point.last_name ?? point.lastName ?? '',
     activityStatus: normalizeActivityStatus(point.activity_status ?? point.activityStatus),

@@ -77,23 +77,23 @@ func UserStatusFromString(str string) UserStatus {
 }
 
 type User struct {
-	ID                uuid.UUID
-	TelegramID        int64
-	TelegramUsername  string
-	FirstName         string
-	LastName          string
-	AvatarURL         string
-	TelegramAvatarURL string
-	CurrentWorkplace  string
-	Region            string
-	Geo               UserGeo
-	Status            UserStatus
-	ActivityStatus    UserActivityStatus
-	IsAdmin           bool
-	IsTrusted         bool
-	LastActiveAt      time.Time
-	CreatedAt         time.Time
-	UpdatedAt         time.Time
+	ID                 uuid.UUID
+	Username           string
+	FirstName          string
+	LastName           string
+	AvatarURL          string
+	CurrentWorkplace   string
+	Region             string
+	Geo                UserGeo
+	Status             UserStatus
+	ActivityStatus     UserActivityStatus
+	IsAdmin            bool
+	IsTrusted          bool
+	ConnectedProviders []string
+	PrimaryProvider    string
+	LastActiveAt       time.Time
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
 }
 
 type UserGeo struct {
@@ -112,22 +112,45 @@ type TelegramAuthPayload struct {
 	PhotoURL  string
 }
 
+type AuthProvider string
+
+const (
+	AuthProviderTelegram AuthProvider = "telegram"
+	AuthProviderYandex   AuthProvider = "yandex"
+)
+
+type UserIdentity struct {
+	UserID         uuid.UUID
+	Provider       AuthProvider
+	ProviderUserID string
+	Username       string
+	Email          string
+	AvatarURL      string
+	IsPrimary      bool
+	CreatedAt      time.Time
+	UpdatedAt      time.Time
+}
+
+type IdentityAuthPayload struct {
+	Provider       AuthProvider
+	ProviderUserID string
+	Username       string
+	Email          string
+	FirstName      string
+	LastName       string
+	AvatarURL      string
+}
+
 type TelegramAuthChallenge struct {
 	Token       string
 	BotStartURL string
 	ExpiresAt   time.Time
 }
 
-type PasswordRegistrationRequest struct {
-	Login     string
-	Password  string
-	FirstName string
-	LastName  string
-}
-
-type PasswordLoginRequest struct {
-	Login    string
-	Password string
+type YandexAuthStart struct {
+	State     string
+	AuthURL   string
+	ExpiresAt time.Time
 }
 
 type CompleteRegistrationRequest struct {
@@ -142,6 +165,15 @@ type CompleteRegistrationRequest struct {
 type ProfileResponse struct {
 	User                 *User
 	NeedsProfileComplete bool
+}
+
+type YandexAuthUser struct {
+	ID        string
+	Login     string
+	Email     string
+	FirstName string
+	LastName  string
+	AvatarURL string
 }
 
 func ResolveActivityStatus(lastActiveAt, now time.Time) UserActivityStatus {

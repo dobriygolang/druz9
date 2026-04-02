@@ -11,12 +11,12 @@ func (c *Client) ListCommunityPoints(ctx context.Context, currentUserID string) 
 	const query = `
 SELECT
   u.id::text,
-  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.telegram_username, ''), 'user'),
+  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), 'user'),
   g.region,
   g.latitude,
   g.longitude,
   COALESCE(u.avatar_url, ''),
-  COALESCE(u.telegram_username, ''),
+  COALESCE(u.username, ''),
   COALESCE(u.first_name, ''),
   COALESCE(u.last_name, ''),
   CASE
@@ -47,7 +47,7 @@ LIMIT 250
 			&point.Latitude,
 			&point.Longitude,
 			&point.AvatarURL,
-			&point.TelegramUsername,
+			&point.Username,
 			&point.FirstName,
 			&point.LastName,
 			&point.ActivityStatus,

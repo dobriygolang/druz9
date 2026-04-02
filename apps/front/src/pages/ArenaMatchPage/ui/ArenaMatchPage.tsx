@@ -190,7 +190,7 @@ export const ArenaMatchPage: React.FC = () => {
 
   const myUserId = user?.id || getStoredGuestId();
   const myDisplayName = user
-    ? [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.telegramUsername || 'User'
+    ? [user.firstName, user.lastName].filter(Boolean).join(' ').trim() || user.username || 'User'
     : getStoredGuestName() || 'Guest';
 
   const {

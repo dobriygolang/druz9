@@ -367,6 +367,154 @@ func (x *TelegramAuthRequest) GetCode() string {
 	return ""
 }
 
+type StartYandexAuthRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartYandexAuthRequest) Reset() {
+	*x = StartYandexAuthRequest{}
+	mi := &file_profile_v1_profile_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartYandexAuthRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartYandexAuthRequest) ProtoMessage() {}
+
+func (x *StartYandexAuthRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_profile_v1_profile_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartYandexAuthRequest.ProtoReflect.Descriptor instead.
+func (*StartYandexAuthRequest) Descriptor() ([]byte, []int) {
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{5}
+}
+
+type StartYandexAuthResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	State         string                 `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
+	AuthUrl       string                 `protobuf:"bytes,2,opt,name=auth_url,json=authUrl,proto3" json:"auth_url,omitempty"`
+	ExpiresAt     *timestamppb.Timestamp `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartYandexAuthResponse) Reset() {
+	*x = StartYandexAuthResponse{}
+	mi := &file_profile_v1_profile_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartYandexAuthResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartYandexAuthResponse) ProtoMessage() {}
+
+func (x *StartYandexAuthResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_profile_v1_profile_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartYandexAuthResponse.ProtoReflect.Descriptor instead.
+func (*StartYandexAuthResponse) Descriptor() ([]byte, []int) {
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *StartYandexAuthResponse) GetState() string {
+	if x != nil {
+		return x.State
+	}
+	return ""
+}
+
+func (x *StartYandexAuthResponse) GetAuthUrl() string {
+	if x != nil {
+		return x.AuthUrl
+	}
+	return ""
+}
+
+func (x *StartYandexAuthResponse) GetExpiresAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return nil
+}
+
+type YandexAuthRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	State         string                 `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *YandexAuthRequest) Reset() {
+	*x = YandexAuthRequest{}
+	mi := &file_profile_v1_profile_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *YandexAuthRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*YandexAuthRequest) ProtoMessage() {}
+
+func (x *YandexAuthRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_profile_v1_profile_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use YandexAuthRequest.ProtoReflect.Descriptor instead.
+func (*YandexAuthRequest) Descriptor() ([]byte, []int) {
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *YandexAuthRequest) GetState() string {
+	if x != nil {
+		return x.State
+	}
+	return ""
+}
+
+func (x *YandexAuthRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
 type CompleteRegistrationRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Region        string                 `protobuf:"bytes,2,opt,name=region,proto3" json:"region,omitempty"`
@@ -380,7 +528,7 @@ type CompleteRegistrationRequest struct {
 
 func (x *CompleteRegistrationRequest) Reset() {
 	*x = CompleteRegistrationRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[5]
+	mi := &file_profile_v1_profile_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -392,7 +540,7 @@ func (x *CompleteRegistrationRequest) String() string {
 func (*CompleteRegistrationRequest) ProtoMessage() {}
 
 func (x *CompleteRegistrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[5]
+	mi := &file_profile_v1_profile_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -405,7 +553,7 @@ func (x *CompleteRegistrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteRegistrationRequest.ProtoReflect.Descriptor instead.
 func (*CompleteRegistrationRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{5}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *CompleteRegistrationRequest) GetRegion() string {
@@ -451,7 +599,7 @@ type GetProfileRequest struct {
 
 func (x *GetProfileRequest) Reset() {
 	*x = GetProfileRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[6]
+	mi := &file_profile_v1_profile_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -463,7 +611,7 @@ func (x *GetProfileRequest) String() string {
 func (*GetProfileRequest) ProtoMessage() {}
 
 func (x *GetProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[6]
+	mi := &file_profile_v1_profile_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -476,7 +624,7 @@ func (x *GetProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProfileRequest.ProtoReflect.Descriptor instead.
 func (*GetProfileRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{6}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{9}
 }
 
 type GetProfileByIDRequest struct {
@@ -488,7 +636,7 @@ type GetProfileByIDRequest struct {
 
 func (x *GetProfileByIDRequest) Reset() {
 	*x = GetProfileByIDRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[7]
+	mi := &file_profile_v1_profile_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -500,7 +648,7 @@ func (x *GetProfileByIDRequest) String() string {
 func (*GetProfileByIDRequest) ProtoMessage() {}
 
 func (x *GetProfileByIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[7]
+	mi := &file_profile_v1_profile_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -513,7 +661,7 @@ func (x *GetProfileByIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProfileByIDRequest.ProtoReflect.Descriptor instead.
 func (*GetProfileByIDRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{7}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetProfileByIDRequest) GetUserId() string {
@@ -536,7 +684,7 @@ type UpdateLocationRequest struct {
 
 func (x *UpdateLocationRequest) Reset() {
 	*x = UpdateLocationRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[8]
+	mi := &file_profile_v1_profile_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -548,7 +696,7 @@ func (x *UpdateLocationRequest) String() string {
 func (*UpdateLocationRequest) ProtoMessage() {}
 
 func (x *UpdateLocationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[8]
+	mi := &file_profile_v1_profile_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -561,7 +709,7 @@ func (x *UpdateLocationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateLocationRequest.ProtoReflect.Descriptor instead.
 func (*UpdateLocationRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{8}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UpdateLocationRequest) GetRegion() string {
@@ -607,7 +755,7 @@ type LogoutRequest struct {
 
 func (x *LogoutRequest) Reset() {
 	*x = LogoutRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[9]
+	mi := &file_profile_v1_profile_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -619,7 +767,7 @@ func (x *LogoutRequest) String() string {
 func (*LogoutRequest) ProtoMessage() {}
 
 func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[9]
+	mi := &file_profile_v1_profile_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -632,7 +780,7 @@ func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutRequest.ProtoReflect.Descriptor instead.
 func (*LogoutRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{9}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{12}
 }
 
 type UpdateProfileRequest struct {
@@ -644,7 +792,7 @@ type UpdateProfileRequest struct {
 
 func (x *UpdateProfileRequest) Reset() {
 	*x = UpdateProfileRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[10]
+	mi := &file_profile_v1_profile_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -656,7 +804,7 @@ func (x *UpdateProfileRequest) String() string {
 func (*UpdateProfileRequest) ProtoMessage() {}
 
 func (x *UpdateProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[10]
+	mi := &file_profile_v1_profile_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -669,7 +817,7 @@ func (x *UpdateProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateProfileRequest.ProtoReflect.Descriptor instead.
 func (*UpdateProfileRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{10}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UpdateProfileRequest) GetCurrentWorkplace() string {
@@ -690,7 +838,7 @@ type BindTelegramRequest struct {
 
 func (x *BindTelegramRequest) Reset() {
 	*x = BindTelegramRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[11]
+	mi := &file_profile_v1_profile_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -702,7 +850,7 @@ func (x *BindTelegramRequest) String() string {
 func (*BindTelegramRequest) ProtoMessage() {}
 
 func (x *BindTelegramRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[11]
+	mi := &file_profile_v1_profile_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -715,7 +863,7 @@ func (x *BindTelegramRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BindTelegramRequest.ProtoReflect.Descriptor instead.
 func (*BindTelegramRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{11}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *BindTelegramRequest) GetToken() string {
@@ -741,7 +889,7 @@ type BindTelegramResponse struct {
 
 func (x *BindTelegramResponse) Reset() {
 	*x = BindTelegramResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[12]
+	mi := &file_profile_v1_profile_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -753,7 +901,7 @@ func (x *BindTelegramResponse) String() string {
 func (*BindTelegramResponse) ProtoMessage() {}
 
 func (x *BindTelegramResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[12]
+	mi := &file_profile_v1_profile_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -766,7 +914,7 @@ func (x *BindTelegramResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BindTelegramResponse.ProtoReflect.Descriptor instead.
 func (*BindTelegramResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{12}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *BindTelegramResponse) GetStatus() string {
@@ -787,7 +935,7 @@ type GetPhotoUploadURLRequest struct {
 
 func (x *GetPhotoUploadURLRequest) Reset() {
 	*x = GetPhotoUploadURLRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[13]
+	mi := &file_profile_v1_profile_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -799,7 +947,7 @@ func (x *GetPhotoUploadURLRequest) String() string {
 func (*GetPhotoUploadURLRequest) ProtoMessage() {}
 
 func (x *GetPhotoUploadURLRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[13]
+	mi := &file_profile_v1_profile_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -812,7 +960,7 @@ func (x *GetPhotoUploadURLRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPhotoUploadURLRequest.ProtoReflect.Descriptor instead.
 func (*GetPhotoUploadURLRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{13}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *GetPhotoUploadURLRequest) GetFileName() string {
@@ -840,7 +988,7 @@ type GetPhotoUploadURLResponse struct {
 
 func (x *GetPhotoUploadURLResponse) Reset() {
 	*x = GetPhotoUploadURLResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[14]
+	mi := &file_profile_v1_profile_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -852,7 +1000,7 @@ func (x *GetPhotoUploadURLResponse) String() string {
 func (*GetPhotoUploadURLResponse) ProtoMessage() {}
 
 func (x *GetPhotoUploadURLResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[14]
+	mi := &file_profile_v1_profile_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -865,7 +1013,7 @@ func (x *GetPhotoUploadURLResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPhotoUploadURLResponse.ProtoReflect.Descriptor instead.
 func (*GetPhotoUploadURLResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{14}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *GetPhotoUploadURLResponse) GetUploadUrl() string {
@@ -899,7 +1047,7 @@ type CompletePhotoUploadRequest struct {
 
 func (x *CompletePhotoUploadRequest) Reset() {
 	*x = CompletePhotoUploadRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[15]
+	mi := &file_profile_v1_profile_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -911,7 +1059,7 @@ func (x *CompletePhotoUploadRequest) String() string {
 func (*CompletePhotoUploadRequest) ProtoMessage() {}
 
 func (x *CompletePhotoUploadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[15]
+	mi := &file_profile_v1_profile_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -924,7 +1072,7 @@ func (x *CompletePhotoUploadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompletePhotoUploadRequest.ProtoReflect.Descriptor instead.
 func (*CompletePhotoUploadRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{15}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *CompletePhotoUploadRequest) GetObjectKey() string {
@@ -944,7 +1092,7 @@ type CompletePhotoUploadResponse struct {
 
 func (x *CompletePhotoUploadResponse) Reset() {
 	*x = CompletePhotoUploadResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[16]
+	mi := &file_profile_v1_profile_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -956,7 +1104,7 @@ func (x *CompletePhotoUploadResponse) String() string {
 func (*CompletePhotoUploadResponse) ProtoMessage() {}
 
 func (x *CompletePhotoUploadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[16]
+	mi := &file_profile_v1_profile_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -969,7 +1117,7 @@ func (x *CompletePhotoUploadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompletePhotoUploadResponse.ProtoReflect.Descriptor instead.
 func (*CompletePhotoUploadResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{16}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *CompletePhotoUploadResponse) GetUser() *User {
@@ -986,248 +1134,6 @@ func (x *CompletePhotoUploadResponse) GetNeedsProfileComplete() bool {
 	return false
 }
 
-// LoginWithPassword authenticates user with password
-type LoginWithPasswordRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Login         string                 `protobuf:"bytes,1,opt,name=login,proto3" json:"login,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LoginWithPasswordRequest) Reset() {
-	*x = LoginWithPasswordRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[17]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LoginWithPasswordRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LoginWithPasswordRequest) ProtoMessage() {}
-
-func (x *LoginWithPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[17]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LoginWithPasswordRequest.ProtoReflect.Descriptor instead.
-func (*LoginWithPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{17}
-}
-
-func (x *LoginWithPasswordRequest) GetLogin() string {
-	if x != nil {
-		return x.Login
-	}
-	return ""
-}
-
-func (x *LoginWithPasswordRequest) GetPassword() string {
-	if x != nil {
-		return x.Password
-	}
-	return ""
-}
-
-type LoginWithPasswordResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	RefreshToken  string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
-	User          *User                  `protobuf:"bytes,3,opt,name=user,proto3" json:"user,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *LoginWithPasswordResponse) Reset() {
-	*x = LoginWithPasswordResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[18]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *LoginWithPasswordResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*LoginWithPasswordResponse) ProtoMessage() {}
-
-func (x *LoginWithPasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[18]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use LoginWithPasswordResponse.ProtoReflect.Descriptor instead.
-func (*LoginWithPasswordResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{18}
-}
-
-func (x *LoginWithPasswordResponse) GetAccessToken() string {
-	if x != nil {
-		return x.AccessToken
-	}
-	return ""
-}
-
-func (x *LoginWithPasswordResponse) GetRefreshToken() string {
-	if x != nil {
-		return x.RefreshToken
-	}
-	return ""
-}
-
-func (x *LoginWithPasswordResponse) GetUser() *User {
-	if x != nil {
-		return x.User
-	}
-	return nil
-}
-
-// RegisterWithPassword registers new user with password
-type RegisterWithPasswordRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Login         string                 `protobuf:"bytes,1,opt,name=login,proto3" json:"login,omitempty"`
-	Password      string                 `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
-	FirstName     string                 `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName      string                 `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RegisterWithPasswordRequest) Reset() {
-	*x = RegisterWithPasswordRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[19]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RegisterWithPasswordRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RegisterWithPasswordRequest) ProtoMessage() {}
-
-func (x *RegisterWithPasswordRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[19]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RegisterWithPasswordRequest.ProtoReflect.Descriptor instead.
-func (*RegisterWithPasswordRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{19}
-}
-
-func (x *RegisterWithPasswordRequest) GetLogin() string {
-	if x != nil {
-		return x.Login
-	}
-	return ""
-}
-
-func (x *RegisterWithPasswordRequest) GetPassword() string {
-	if x != nil {
-		return x.Password
-	}
-	return ""
-}
-
-func (x *RegisterWithPasswordRequest) GetFirstName() string {
-	if x != nil {
-		return x.FirstName
-	}
-	return ""
-}
-
-func (x *RegisterWithPasswordRequest) GetLastName() string {
-	if x != nil {
-		return x.LastName
-	}
-	return ""
-}
-
-type RegisterWithPasswordResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	AccessToken   string                 `protobuf:"bytes,1,opt,name=access_token,json=accessToken,proto3" json:"access_token,omitempty"`
-	RefreshToken  string                 `protobuf:"bytes,2,opt,name=refresh_token,json=refreshToken,proto3" json:"refresh_token,omitempty"`
-	User          *User                  `protobuf:"bytes,3,opt,name=user,proto3" json:"user,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *RegisterWithPasswordResponse) Reset() {
-	*x = RegisterWithPasswordResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[20]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *RegisterWithPasswordResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*RegisterWithPasswordResponse) ProtoMessage() {}
-
-func (x *RegisterWithPasswordResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[20]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use RegisterWithPasswordResponse.ProtoReflect.Descriptor instead.
-func (*RegisterWithPasswordResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{20}
-}
-
-func (x *RegisterWithPasswordResponse) GetAccessToken() string {
-	if x != nil {
-		return x.AccessToken
-	}
-	return ""
-}
-
-func (x *RegisterWithPasswordResponse) GetRefreshToken() string {
-	if x != nil {
-		return x.RefreshToken
-	}
-	return ""
-}
-
-func (x *RegisterWithPasswordResponse) GetUser() *User {
-	if x != nil {
-		return x.User
-	}
-	return nil
-}
-
 type ProfileResponse struct {
 	state                protoimpl.MessageState `protogen:"open.v1"`
 	User                 *User                  `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
@@ -1238,7 +1144,7 @@ type ProfileResponse struct {
 
 func (x *ProfileResponse) Reset() {
 	*x = ProfileResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[21]
+	mi := &file_profile_v1_profile_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1250,7 +1156,7 @@ func (x *ProfileResponse) String() string {
 func (*ProfileResponse) ProtoMessage() {}
 
 func (x *ProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[21]
+	mi := &file_profile_v1_profile_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1263,7 +1169,7 @@ func (x *ProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileResponse.ProtoReflect.Descriptor instead.
 func (*ProfileResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{21}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *ProfileResponse) GetUser() *User {
@@ -1289,7 +1195,7 @@ type LogoutResponse struct {
 
 func (x *LogoutResponse) Reset() {
 	*x = LogoutResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[22]
+	mi := &file_profile_v1_profile_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1301,7 +1207,7 @@ func (x *LogoutResponse) String() string {
 func (*LogoutResponse) ProtoMessage() {}
 
 func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[22]
+	mi := &file_profile_v1_profile_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1314,7 +1220,7 @@ func (x *LogoutResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutResponse.ProtoReflect.Descriptor instead.
 func (*LogoutResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{22}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *LogoutResponse) GetStatus() string {
@@ -1325,28 +1231,29 @@ func (x *LogoutResponse) GetStatus() string {
 }
 
 type User struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	Id               string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	TelegramId       int64                  `protobuf:"varint,2,opt,name=telegram_id,json=telegramId,proto3" json:"telegram_id,omitempty"`
-	TelegramUsername string                 `protobuf:"bytes,3,opt,name=telegram_username,json=telegramUsername,proto3" json:"telegram_username,omitempty"`
-	FirstName        string                 `protobuf:"bytes,4,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName         string                 `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	AvatarUrl        string                 `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
-	Region           string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`
-	CreatedAt        *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	Latitude         float64                `protobuf:"fixed64,10,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude        float64                `protobuf:"fixed64,11,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	ActivityStatus   UserActivityStatus     `protobuf:"varint,12,opt,name=activity_status,json=activityStatus,proto3,enum=profile.v1.UserActivityStatus" json:"activity_status,omitempty"`
-	CurrentWorkplace string                 `protobuf:"bytes,13,opt,name=current_workplace,json=currentWorkplace,proto3" json:"current_workplace,omitempty"`
-	IsAdmin          bool                   `protobuf:"varint,14,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
-	IsTrusted        bool                   `protobuf:"varint,16,opt,name=is_trusted,json=isTrusted,proto3" json:"is_trusted,omitempty"`
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state              protoimpl.MessageState `protogen:"open.v1"`
+	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Username           string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	FirstName          string                 `protobuf:"bytes,4,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName           string                 `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	AvatarUrl          string                 `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	Region             string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`
+	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Latitude           float64                `protobuf:"fixed64,10,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude          float64                `protobuf:"fixed64,11,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	ActivityStatus     UserActivityStatus     `protobuf:"varint,12,opt,name=activity_status,json=activityStatus,proto3,enum=profile.v1.UserActivityStatus" json:"activity_status,omitempty"`
+	CurrentWorkplace   string                 `protobuf:"bytes,13,opt,name=current_workplace,json=currentWorkplace,proto3" json:"current_workplace,omitempty"`
+	IsAdmin            bool                   `protobuf:"varint,14,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
+	IsTrusted          bool                   `protobuf:"varint,16,opt,name=is_trusted,json=isTrusted,proto3" json:"is_trusted,omitempty"`
+	ConnectedProviders []string               `protobuf:"bytes,17,rep,name=connected_providers,json=connectedProviders,proto3" json:"connected_providers,omitempty"`
+	PrimaryProvider    string                 `protobuf:"bytes,18,opt,name=primary_provider,json=primaryProvider,proto3" json:"primary_provider,omitempty"`
+	unknownFields      protoimpl.UnknownFields
+	sizeCache          protoimpl.SizeCache
 }
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_profile_v1_profile_proto_msgTypes[23]
+	mi := &file_profile_v1_profile_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1358,7 +1265,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[23]
+	mi := &file_profile_v1_profile_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1371,7 +1278,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{23}
+	return file_profile_v1_profile_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *User) GetId() string {
@@ -1381,16 +1288,9 @@ func (x *User) GetId() string {
 	return ""
 }
 
-func (x *User) GetTelegramId() int64 {
+func (x *User) GetUsername() string {
 	if x != nil {
-		return x.TelegramId
-	}
-	return 0
-}
-
-func (x *User) GetTelegramUsername() string {
-	if x != nil {
-		return x.TelegramUsername
+		return x.Username
 	}
 	return ""
 }
@@ -1472,6 +1372,20 @@ func (x *User) GetIsTrusted() bool {
 	return false
 }
 
+func (x *User) GetConnectedProviders() []string {
+	if x != nil {
+		return x.ConnectedProviders
+	}
+	return nil
+}
+
+func (x *User) GetPrimaryProvider() string {
+	if x != nil {
+		return x.PrimaryProvider
+	}
+	return ""
+}
+
 var File_profile_v1_profile_proto protoreflect.FileDescriptor
 
 const file_profile_v1_profile_proto_rawDesc = "" +
@@ -1499,6 +1413,15 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\x04code\x18\x02 \x01(\tR\x04code\"?\n" +
 	"\x13TelegramAuthRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\"\x18\n" +
+	"\x16StartYandexAuthRequest\"\x85\x01\n" +
+	"\x17StartYandexAuthResponse\x12\x14\n" +
+	"\x05state\x18\x01 \x01(\tR\x05state\x12\x19\n" +
+	"\bauth_url\x18\x02 \x01(\tR\aauthUrl\x129\n" +
+	"\n" +
+	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"=\n" +
+	"\x11YandexAuthRequest\x12\x14\n" +
+	"\x05state\x18\x01 \x01(\tR\x05state\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\tR\x04code\"\x9d\x01\n" +
 	"\x1bCompleteRegistrationRequest\x12\x16\n" +
 	"\x06region\x18\x02 \x01(\tR\x06region\x12\x18\n" +
@@ -1537,34 +1460,15 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"object_key\x18\x01 \x01(\tR\tobjectKey\"y\n" +
 	"\x1bCompletePhotoUploadResponse\x12$\n" +
 	"\x04user\x18\x01 \x01(\v2\x10.profile.v1.UserR\x04user\x124\n" +
-	"\x16needs_profile_complete\x18\x02 \x01(\bR\x14needsProfileComplete\"L\n" +
-	"\x18LoginWithPasswordRequest\x12\x14\n" +
-	"\x05login\x18\x01 \x01(\tR\x05login\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\"\x89\x01\n" +
-	"\x19LoginWithPasswordResponse\x12!\n" +
-	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
-	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\x12$\n" +
-	"\x04user\x18\x03 \x01(\v2\x10.profile.v1.UserR\x04user\"\x8b\x01\n" +
-	"\x1bRegisterWithPasswordRequest\x12\x14\n" +
-	"\x05login\x18\x01 \x01(\tR\x05login\x12\x1a\n" +
-	"\bpassword\x18\x02 \x01(\tR\bpassword\x12\x1d\n" +
-	"\n" +
-	"first_name\x18\x03 \x01(\tR\tfirstName\x12\x1b\n" +
-	"\tlast_name\x18\x04 \x01(\tR\blastName\"\x8c\x01\n" +
-	"\x1cRegisterWithPasswordResponse\x12!\n" +
-	"\faccess_token\x18\x01 \x01(\tR\vaccessToken\x12#\n" +
-	"\rrefresh_token\x18\x02 \x01(\tR\frefreshToken\x12$\n" +
-	"\x04user\x18\x03 \x01(\v2\x10.profile.v1.UserR\x04user\"m\n" +
+	"\x16needs_profile_complete\x18\x02 \x01(\bR\x14needsProfileComplete\"m\n" +
 	"\x0fProfileResponse\x12$\n" +
 	"\x04user\x18\x01 \x01(\v2\x10.profile.v1.UserR\x04user\x124\n" +
 	"\x16needs_profile_complete\x18\x02 \x01(\bR\x14needsProfileComplete\"(\n" +
 	"\x0eLogoutResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"\xfc\x03\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"\xa6\x04\n" +
 	"\x04User\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1f\n" +
-	"\vtelegram_id\x18\x02 \x01(\x03R\n" +
-	"telegramId\x12+\n" +
-	"\x11telegram_username\x18\x03 \x01(\tR\x10telegramUsername\x12\x1d\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
+	"\busername\x18\x02 \x01(\tR\busername\x12\x1d\n" +
 	"\n" +
 	"first_name\x18\x04 \x01(\tR\tfirstName\x12\x1b\n" +
 	"\tlast_name\x18\x05 \x01(\tR\blastName\x12\x1d\n" +
@@ -1580,16 +1484,21 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\x11current_workplace\x18\r \x01(\tR\x10currentWorkplace\x12\x19\n" +
 	"\bis_admin\x18\x0e \x01(\bR\aisAdmin\x12\x1d\n" +
 	"\n" +
-	"is_trusted\x18\x10 \x01(\bR\tisTrusted*\xa7\x01\n" +
+	"is_trusted\x18\x10 \x01(\bR\tisTrusted\x12/\n" +
+	"\x13connected_providers\x18\x11 \x03(\tR\x12connectedProviders\x12)\n" +
+	"\x10primary_provider\x18\x12 \x01(\tR\x0fprimaryProvider*\xa7\x01\n" +
 	"\x12UserActivityStatus\x12$\n" +
 	" USER_ACTIVITY_STATUS_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bUSER_ACTIVITY_STATUS_ONLINE\x10\x01\x12(\n" +
 	"$USER_ACTIVITY_STATUS_RECENTLY_ACTIVE\x10\x02\x12 \n" +
-	"\x1cUSER_ACTIVITY_STATUS_OFFLINE\x10\x032\xec\x0e\n" +
+	"\x1cUSER_ACTIVITY_STATUS_OFFLINE\x10\x032\xba\x0e\n" +
 	"\x0eProfileService\x12\xb2\x01\n" +
 	"\x1bCreateTelegramAuthChallenge\x12..profile.v1.CreateTelegramAuthChallengeRequest\x1a/.profile.v1.CreateTelegramAuthChallengeResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/profile/auth/telegram/challenge\x12\x98\x01\n" +
 	"\x13ConfirmTelegramAuth\x12&.profile.v1.ConfirmTelegramAuthRequest\x1a'.profile.v1.ConfirmTelegramAuthResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/profile/auth/telegram/confirm\x12v\n" +
-	"\fTelegramAuth\x12\x1f.profile.v1.TelegramAuthRequest\x1a\x1b.profile.v1.ProfileResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/profile/auth/telegram\x12\x93\x01\n" +
+	"\fTelegramAuth\x12\x1f.profile.v1.TelegramAuthRequest\x1a\x1b.profile.v1.ProfileResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/profile/auth/telegram\x12\x85\x01\n" +
+	"\x0fStartYandexAuth\x12\".profile.v1.StartYandexAuthRequest\x1a#.profile.v1.StartYandexAuthResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/profile/auth/yandex/start\x12v\n" +
+	"\n" +
+	"YandexAuth\x12\x1d.profile.v1.YandexAuthRequest\x1a\x1b.profile.v1.ProfileResponse\",\x82\xd3\xe4\x93\x02&\x12$/api/v1/profile/auth/yandex/callback\x12\x93\x01\n" +
 	"\x14CompleteRegistration\x12'.profile.v1.CompleteRegistrationRequest\x1a\x1b.profile.v1.ProfileResponse\"5\x82\xd3\xe4\x93\x02/:\x01*\"*/api/v1/profile/auth/complete-registration\x12a\n" +
 	"\n" +
 	"GetProfile\x12\x1d.profile.v1.GetProfileRequest\x1a\x1b.profile.v1.ProfileResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/profile\x12s\n" +
@@ -1599,9 +1508,7 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\x06Logout\x12\x19.profile.v1.LogoutRequest\x1a\x1a.profile.v1.LogoutResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/profile/auth/logout\x12{\n" +
 	"\fBindTelegram\x12\x1f.profile.v1.BindTelegramRequest\x1a .profile.v1.BindTelegramResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/profile/bind-telegram\x12\x8d\x01\n" +
 	"\x11GetPhotoUploadURL\x12$.profile.v1.GetPhotoUploadURLRequest\x1a%.profile.v1.GetPhotoUploadURLResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\" /api/v1/profile/photo/upload-url\x12\x91\x01\n" +
-	"\x13CompletePhotoUpload\x12&.profile.v1.CompletePhotoUploadRequest\x1a'.profile.v1.CompletePhotoUploadResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/profile/photo/complete\x12\x90\x01\n" +
-	"\x11LoginWithPassword\x12$.profile.v1.LoginWithPasswordRequest\x1a%.profile.v1.LoginWithPasswordResponse\".\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/profile/auth/login-password\x12\x9c\x01\n" +
-	"\x14RegisterWithPassword\x12'.profile.v1.RegisterWithPasswordRequest\x1a(.profile.v1.RegisterWithPasswordResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/api/v1/profile/auth/register-passwordB\x1bZ\x19api/pkg/api/profile/v1;v1b\x06proto3"
+	"\x13CompletePhotoUpload\x12&.profile.v1.CompletePhotoUploadRequest\x1a'.profile.v1.CompletePhotoUploadResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/profile/photo/completeB\x1bZ\x19api/pkg/api/profile/v1;v1b\x06proto3"
 
 var (
 	file_profile_v1_profile_proto_rawDescOnce sync.Once
@@ -1616,7 +1523,7 @@ func file_profile_v1_profile_proto_rawDescGZIP() []byte {
 }
 
 var file_profile_v1_profile_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_profile_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 24)
+var file_profile_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 23)
 var file_profile_v1_profile_proto_goTypes = []any{
 	(UserActivityStatus)(0),                     // 0: profile.v1.UserActivityStatus
 	(*CreateTelegramAuthChallengeRequest)(nil),  // 1: profile.v1.CreateTelegramAuthChallengeRequest
@@ -1624,68 +1531,66 @@ var file_profile_v1_profile_proto_goTypes = []any{
 	(*ConfirmTelegramAuthRequest)(nil),          // 3: profile.v1.ConfirmTelegramAuthRequest
 	(*ConfirmTelegramAuthResponse)(nil),         // 4: profile.v1.ConfirmTelegramAuthResponse
 	(*TelegramAuthRequest)(nil),                 // 5: profile.v1.TelegramAuthRequest
-	(*CompleteRegistrationRequest)(nil),         // 6: profile.v1.CompleteRegistrationRequest
-	(*GetProfileRequest)(nil),                   // 7: profile.v1.GetProfileRequest
-	(*GetProfileByIDRequest)(nil),               // 8: profile.v1.GetProfileByIDRequest
-	(*UpdateLocationRequest)(nil),               // 9: profile.v1.UpdateLocationRequest
-	(*LogoutRequest)(nil),                       // 10: profile.v1.LogoutRequest
-	(*UpdateProfileRequest)(nil),                // 11: profile.v1.UpdateProfileRequest
-	(*BindTelegramRequest)(nil),                 // 12: profile.v1.BindTelegramRequest
-	(*BindTelegramResponse)(nil),                // 13: profile.v1.BindTelegramResponse
-	(*GetPhotoUploadURLRequest)(nil),            // 14: profile.v1.GetPhotoUploadURLRequest
-	(*GetPhotoUploadURLResponse)(nil),           // 15: profile.v1.GetPhotoUploadURLResponse
-	(*CompletePhotoUploadRequest)(nil),          // 16: profile.v1.CompletePhotoUploadRequest
-	(*CompletePhotoUploadResponse)(nil),         // 17: profile.v1.CompletePhotoUploadResponse
-	(*LoginWithPasswordRequest)(nil),            // 18: profile.v1.LoginWithPasswordRequest
-	(*LoginWithPasswordResponse)(nil),           // 19: profile.v1.LoginWithPasswordResponse
-	(*RegisterWithPasswordRequest)(nil),         // 20: profile.v1.RegisterWithPasswordRequest
-	(*RegisterWithPasswordResponse)(nil),        // 21: profile.v1.RegisterWithPasswordResponse
-	(*ProfileResponse)(nil),                     // 22: profile.v1.ProfileResponse
-	(*LogoutResponse)(nil),                      // 23: profile.v1.LogoutResponse
-	(*User)(nil),                                // 24: profile.v1.User
-	(*timestamppb.Timestamp)(nil),               // 25: google.protobuf.Timestamp
+	(*StartYandexAuthRequest)(nil),              // 6: profile.v1.StartYandexAuthRequest
+	(*StartYandexAuthResponse)(nil),             // 7: profile.v1.StartYandexAuthResponse
+	(*YandexAuthRequest)(nil),                   // 8: profile.v1.YandexAuthRequest
+	(*CompleteRegistrationRequest)(nil),         // 9: profile.v1.CompleteRegistrationRequest
+	(*GetProfileRequest)(nil),                   // 10: profile.v1.GetProfileRequest
+	(*GetProfileByIDRequest)(nil),               // 11: profile.v1.GetProfileByIDRequest
+	(*UpdateLocationRequest)(nil),               // 12: profile.v1.UpdateLocationRequest
+	(*LogoutRequest)(nil),                       // 13: profile.v1.LogoutRequest
+	(*UpdateProfileRequest)(nil),                // 14: profile.v1.UpdateProfileRequest
+	(*BindTelegramRequest)(nil),                 // 15: profile.v1.BindTelegramRequest
+	(*BindTelegramResponse)(nil),                // 16: profile.v1.BindTelegramResponse
+	(*GetPhotoUploadURLRequest)(nil),            // 17: profile.v1.GetPhotoUploadURLRequest
+	(*GetPhotoUploadURLResponse)(nil),           // 18: profile.v1.GetPhotoUploadURLResponse
+	(*CompletePhotoUploadRequest)(nil),          // 19: profile.v1.CompletePhotoUploadRequest
+	(*CompletePhotoUploadResponse)(nil),         // 20: profile.v1.CompletePhotoUploadResponse
+	(*ProfileResponse)(nil),                     // 21: profile.v1.ProfileResponse
+	(*LogoutResponse)(nil),                      // 22: profile.v1.LogoutResponse
+	(*User)(nil),                                // 23: profile.v1.User
+	(*timestamppb.Timestamp)(nil),               // 24: google.protobuf.Timestamp
 }
 var file_profile_v1_profile_proto_depIdxs = []int32{
-	25, // 0: profile.v1.CreateTelegramAuthChallengeResponse.expires_at:type_name -> google.protobuf.Timestamp
-	24, // 1: profile.v1.CompletePhotoUploadResponse.user:type_name -> profile.v1.User
-	24, // 2: profile.v1.LoginWithPasswordResponse.user:type_name -> profile.v1.User
-	24, // 3: profile.v1.RegisterWithPasswordResponse.user:type_name -> profile.v1.User
-	24, // 4: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
-	25, // 5: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	0,  // 6: profile.v1.User.activity_status:type_name -> profile.v1.UserActivityStatus
-	1,  // 7: profile.v1.ProfileService.CreateTelegramAuthChallenge:input_type -> profile.v1.CreateTelegramAuthChallengeRequest
-	3,  // 8: profile.v1.ProfileService.ConfirmTelegramAuth:input_type -> profile.v1.ConfirmTelegramAuthRequest
-	5,  // 9: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
-	6,  // 10: profile.v1.ProfileService.CompleteRegistration:input_type -> profile.v1.CompleteRegistrationRequest
-	7,  // 11: profile.v1.ProfileService.GetProfile:input_type -> profile.v1.GetProfileRequest
-	8,  // 12: profile.v1.ProfileService.GetProfileByID:input_type -> profile.v1.GetProfileByIDRequest
-	9,  // 13: profile.v1.ProfileService.UpdateLocation:input_type -> profile.v1.UpdateLocationRequest
-	11, // 14: profile.v1.ProfileService.UpdateProfile:input_type -> profile.v1.UpdateProfileRequest
-	10, // 15: profile.v1.ProfileService.Logout:input_type -> profile.v1.LogoutRequest
-	12, // 16: profile.v1.ProfileService.BindTelegram:input_type -> profile.v1.BindTelegramRequest
-	14, // 17: profile.v1.ProfileService.GetPhotoUploadURL:input_type -> profile.v1.GetPhotoUploadURLRequest
-	16, // 18: profile.v1.ProfileService.CompletePhotoUpload:input_type -> profile.v1.CompletePhotoUploadRequest
-	18, // 19: profile.v1.ProfileService.LoginWithPassword:input_type -> profile.v1.LoginWithPasswordRequest
-	20, // 20: profile.v1.ProfileService.RegisterWithPassword:input_type -> profile.v1.RegisterWithPasswordRequest
-	2,  // 21: profile.v1.ProfileService.CreateTelegramAuthChallenge:output_type -> profile.v1.CreateTelegramAuthChallengeResponse
-	4,  // 22: profile.v1.ProfileService.ConfirmTelegramAuth:output_type -> profile.v1.ConfirmTelegramAuthResponse
-	22, // 23: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
-	22, // 24: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
-	22, // 25: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
-	22, // 26: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
-	22, // 27: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
-	22, // 28: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
-	23, // 29: profile.v1.ProfileService.Logout:output_type -> profile.v1.LogoutResponse
-	13, // 30: profile.v1.ProfileService.BindTelegram:output_type -> profile.v1.BindTelegramResponse
-	15, // 31: profile.v1.ProfileService.GetPhotoUploadURL:output_type -> profile.v1.GetPhotoUploadURLResponse
-	17, // 32: profile.v1.ProfileService.CompletePhotoUpload:output_type -> profile.v1.CompletePhotoUploadResponse
-	19, // 33: profile.v1.ProfileService.LoginWithPassword:output_type -> profile.v1.LoginWithPasswordResponse
-	21, // 34: profile.v1.ProfileService.RegisterWithPassword:output_type -> profile.v1.RegisterWithPasswordResponse
-	21, // [21:35] is the sub-list for method output_type
-	7,  // [7:21] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	24, // 0: profile.v1.CreateTelegramAuthChallengeResponse.expires_at:type_name -> google.protobuf.Timestamp
+	24, // 1: profile.v1.StartYandexAuthResponse.expires_at:type_name -> google.protobuf.Timestamp
+	23, // 2: profile.v1.CompletePhotoUploadResponse.user:type_name -> profile.v1.User
+	23, // 3: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
+	24, // 4: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	0,  // 5: profile.v1.User.activity_status:type_name -> profile.v1.UserActivityStatus
+	1,  // 6: profile.v1.ProfileService.CreateTelegramAuthChallenge:input_type -> profile.v1.CreateTelegramAuthChallengeRequest
+	3,  // 7: profile.v1.ProfileService.ConfirmTelegramAuth:input_type -> profile.v1.ConfirmTelegramAuthRequest
+	5,  // 8: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
+	6,  // 9: profile.v1.ProfileService.StartYandexAuth:input_type -> profile.v1.StartYandexAuthRequest
+	8,  // 10: profile.v1.ProfileService.YandexAuth:input_type -> profile.v1.YandexAuthRequest
+	9,  // 11: profile.v1.ProfileService.CompleteRegistration:input_type -> profile.v1.CompleteRegistrationRequest
+	10, // 12: profile.v1.ProfileService.GetProfile:input_type -> profile.v1.GetProfileRequest
+	11, // 13: profile.v1.ProfileService.GetProfileByID:input_type -> profile.v1.GetProfileByIDRequest
+	12, // 14: profile.v1.ProfileService.UpdateLocation:input_type -> profile.v1.UpdateLocationRequest
+	14, // 15: profile.v1.ProfileService.UpdateProfile:input_type -> profile.v1.UpdateProfileRequest
+	13, // 16: profile.v1.ProfileService.Logout:input_type -> profile.v1.LogoutRequest
+	15, // 17: profile.v1.ProfileService.BindTelegram:input_type -> profile.v1.BindTelegramRequest
+	17, // 18: profile.v1.ProfileService.GetPhotoUploadURL:input_type -> profile.v1.GetPhotoUploadURLRequest
+	19, // 19: profile.v1.ProfileService.CompletePhotoUpload:input_type -> profile.v1.CompletePhotoUploadRequest
+	2,  // 20: profile.v1.ProfileService.CreateTelegramAuthChallenge:output_type -> profile.v1.CreateTelegramAuthChallengeResponse
+	4,  // 21: profile.v1.ProfileService.ConfirmTelegramAuth:output_type -> profile.v1.ConfirmTelegramAuthResponse
+	21, // 22: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
+	7,  // 23: profile.v1.ProfileService.StartYandexAuth:output_type -> profile.v1.StartYandexAuthResponse
+	21, // 24: profile.v1.ProfileService.YandexAuth:output_type -> profile.v1.ProfileResponse
+	21, // 25: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
+	21, // 26: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
+	21, // 27: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
+	21, // 28: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
+	21, // 29: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
+	22, // 30: profile.v1.ProfileService.Logout:output_type -> profile.v1.LogoutResponse
+	16, // 31: profile.v1.ProfileService.BindTelegram:output_type -> profile.v1.BindTelegramResponse
+	18, // 32: profile.v1.ProfileService.GetPhotoUploadURL:output_type -> profile.v1.GetPhotoUploadURLResponse
+	20, // 33: profile.v1.ProfileService.CompletePhotoUpload:output_type -> profile.v1.CompletePhotoUploadResponse
+	20, // [20:34] is the sub-list for method output_type
+	6,  // [6:20] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_profile_v1_profile_proto_init() }
@@ -1699,7 +1604,7 @@ func file_profile_v1_profile_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_profile_v1_profile_proto_rawDesc), len(file_profile_v1_profile_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   24,
+			NumMessages:   23,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -1,20 +1,13 @@
 import React, { useState } from 'react';
-import { TelegramAuthWidget } from '@/features/Auth/ui/TelegramAuthWidget';
+import { ArrowRight, ShieldCheck } from 'lucide-react';
+
 import { useAuth } from '@/app/providers/AuthProvider';
-import { useIsMobile } from '@/shared/hooks/useIsMobile';
+import { TelegramAuthWidget } from '@/features/Auth/ui/TelegramAuthWidget';
 
 export const LoginPage: React.FC = () => {
-  const isMobile = useIsMobile();
-  const { login, loginWithPassword, registerWithPassword } = useAuth();
+  const { login, startYandexAuth } = useAuth();
   const [error, setError] = useState('');
-  const [mode, setMode] = useState<'telegram' | 'login' | 'register'>('telegram');
-  const [form, setForm] = useState({
-    login: '',
-    password: '',
-    firstName: '',
-    lastName: '',
-  });
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isYandexLoading, setIsYandexLoading] = useState(false);
 
   const handleTelegramAuth = async (token: string, code: string) => {
     try {
@@ -26,100 +19,67 @@ export const LoginPage: React.FC = () => {
     }
   };
 
-  const handlePasswordSubmit = async (event: React.FormEvent) => {
-    event.preventDefault();
+  const handleYandexAuth = async () => {
     try {
-      setIsSubmitting(true);
+      setIsYandexLoading(true);
       setError('');
-      if (mode === 'register') {
-        if (form.password.trim().length < 8) {
-          setError('Для регистрации нужен пароль минимум 8 символов');
-          return;
-        }
-        if (!form.firstName.trim()) {
-          setError('Укажите имя');
-          return;
-        }
-        await registerWithPassword(form);
-        return;
-      }
-      await loginWithPassword(form.login, form.password);
+      const authUrl = await startYandexAuth();
+      window.location.assign(authUrl);
     } catch (err) {
-      setError(mode === 'register' ? 'Ошибка обычной регистрации' : 'Ошибка входа по логину и паролю');
+      setError('Не удалось начать авторизацию через Яндекс');
+      setIsYandexLoading(false);
       console.error(err);
-    } finally {
-      setIsSubmitting(false);
     }
   };
 
   return (
-    <div className="flex-center full-height" style={{ padding: '20px' }}>
-      <div className="card fade-in" style={{ maxWidth: '380px', width: '100%', textAlign: 'center' }}>
-        <h1 style={{ fontSize: isMobile ? '22px' : '24px', marginBottom: '8px', fontWeight: '600' }}>Вход</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: isMobile ? '24px' : '32px', fontSize: '14px' }}>
-          {isMobile ? 'Авторизация через Telegram' : 'Для доступа необходима авторизация через Telegram'}
-        </p>
+    <div className="auth-screen">
+      <div className="auth-shell card fade-in">
+        <div className="auth-shell__hero">
+          <span className="auth-shell__eyebrow">Druz9 Access</span>
+          <h1 className="auth-shell__title">Вход через Яндекс или Telegram</h1>
+          <p className="auth-shell__subtitle">
+            Парольная регистрация удалена. Войти можно только через внешний провайдер.
+          </p>
+        </div>
 
         {error && (
-          <div style={{ color: 'var(--danger-color)', marginBottom: '24px', fontSize: '14px', backgroundColor: 'rgba(239, 68, 68, 0.1)', padding: '12px', borderRadius: '8px' }}>
+          <div className="auth-shell__error">
             {error}
           </div>
         )}
 
-        <div style={{ display: 'grid', gap: '12px' }}>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-            <button type="button" className={`btn ${mode === 'telegram' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('telegram')} style={{ minHeight: '42px', padding: '0 8px', fontSize: isMobile ? '12px' : '14px', opacity: mode === 'telegram' ? 1 : 0.7 }}>
-              Telegram
-            </button>
-            <button type="button" className={`btn ${mode === 'login' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('login')} style={{ minHeight: '42px', padding: '0 8px', fontSize: isMobile ? '12px' : '14px', opacity: mode === 'login' ? 1 : 0.7 }}>
-              Вход
-            </button>
-            <button type="button" className={`btn ${mode === 'register' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('register')} style={{ minHeight: '42px', padding: '0 8px', fontSize: isMobile ? '12px' : '14px', opacity: mode === 'register' ? 1 : 0.7 }}>
-              {isMobile ? 'Рега' : 'Регистрация'}
-            </button>
-          </div>
-
-          {mode === 'telegram' ? (
-            <div style={{ display: 'flex', justifyContent: 'center' }}>
-              <TelegramAuthWidget onAuth={handleTelegramAuth} />
+        <div className="auth-shell__grid">
+          <section className="auth-provider-card auth-provider-card--primary">
+            <div className="auth-provider-card__header">
+              <span className="auth-provider-card__badge">Рекомендуется</span>
+              <h2>Яндекс ID</h2>
             </div>
-          ) : (
-            <form onSubmit={handlePasswordSubmit} style={{ display: 'grid', gap: '12px', textAlign: 'left' }}>
-              {mode === 'register' && (
-                <>
-                  <input
-                    className="input"
-                    placeholder="Имя"
-                    value={form.firstName}
-                    onChange={(event) => setForm((prev) => ({ ...prev, firstName: event.target.value }))}
-                  />
-                  <input
-                    className="input"
-                    placeholder="Фамилия"
-                    value={form.lastName}
-                    onChange={(event) => setForm((prev) => ({ ...prev, lastName: event.target.value }))}
-                  />
-                </>
-              )}
-              <input
-                className="input"
-                type="text"
-                placeholder="Логин"
-                value={form.login}
-                onChange={(event) => setForm((prev) => ({ ...prev, login: event.target.value }))}
-              />
-              <input
-                className="input"
-                type="password"
-                placeholder={mode === 'register' ? 'Пароль, минимум 8 символов' : 'Пароль'}
-                value={form.password}
-                onChange={(event) => setForm((prev) => ({ ...prev, password: event.target.value }))}
-              />
-              <button type="submit" className="btn btn-primary" disabled={isSubmitting} style={{ minHeight: '46px' }}>
-                {isSubmitting ? 'Подождите...' : mode === 'register' ? 'Создать аккаунт' : 'Войти'}
-              </button>
-            </form>
-          )}
+            <p>Быстрый вход в браузере с автоматическим созданием аккаунта и сохранением сессии.</p>
+            <button
+              type="button"
+              className="btn btn-primary auth-provider-card__action"
+              disabled={isYandexLoading}
+              onClick={handleYandexAuth}
+            >
+              {isYandexLoading ? 'Переходим в Яндекс...' : 'Войти через Яндекс'}
+              <ArrowRight size={16} />
+            </button>
+          </section>
+
+          <section className="auth-provider-card">
+            <div className="auth-provider-card__header">
+              <span className="auth-provider-card__badge auth-provider-card__badge--neutral">Альтернатива</span>
+              <h2>Telegram</h2>
+            </div>
+            <p>Можно войти кодом из бота и позже привязать Telegram как дополнительный провайдер в профиле.</p>
+            <TelegramAuthWidget onAuth={handleTelegramAuth} />
+          </section>
+        </div>
+
+        <div className="auth-shell__footer">
+          <ShieldCheck size={16} />
+          <span>Сессия хранится в защищённой cookie. После первого входа откроется шаг завершения профиля.</span>
         </div>
       </div>
     </div>

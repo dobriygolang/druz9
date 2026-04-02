@@ -173,6 +173,20 @@ telegram_bot_username:
   type: "string"
   writable: false
 
+yandex_oauth_client_id:
+  usage: "Yandex OAuth client ID; env YANDEX_OAUTH_CLIENT_ID overrides"
+  group: "external"
+  value: ""
+  type: "string"
+  writable: false
+
+yandex_oauth_redirect_url:
+  usage: "Yandex OAuth callback URL; env YANDEX_OAUTH_REDIRECT_URL overrides"
+  group: "external"
+  value: "http://localhost:5173/auth/callback"
+  type: "string"
+  writable: false
+
 geocoder_base_url:
   usage: "Geocoder base URL"
   group: "external"
