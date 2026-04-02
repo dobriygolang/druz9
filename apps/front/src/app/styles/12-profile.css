@@ -3,7 +3,7 @@
    =========================================== */
 
 .profile-page {
-  padding-bottom: 40px;
+  padding-bottom: var(--space-10);
 }
 
 .profile-header {
@@ -11,714 +11,214 @@
   justify-content: space-between;
   align-items: center;
   flex-wrap: wrap;
-  gap: 16px;
-  margin-bottom: 32px;
-  padding: 20px 24px;
-  border-radius: 24px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  gap: var(--space-4);
+  margin-bottom: var(--space-8);
+  padding: var(--space-5) var(--space-6);
+  border-radius: var(--radius-xl);
+  border: 1px solid var(--border-color);
   background:
-    radial-gradient(circle at top right, rgba(93, 87, 255, 0.12), transparent 36%),
-    rgba(255, 255, 255, 0.03);
-  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.22);
+    radial-gradient(circle at top right, var(--accent-muted), transparent 40%),
+    linear-gradient(180deg, var(--surface-elevated), var(--surface-color));
+  box-shadow: var(--shadow-xl);
 }
 
 .profile-header h1 {
-  font-size: 28px;
-  font-weight: 600;
+  font-size: var(--font-size-2xl);
+  font-weight: 800;
   margin: 0;
+  letter-spacing: -0.03em;
 }
 
 .profile-edit-btn {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.035)),
-    radial-gradient(circle at top left, rgba(93, 87, 255, 0.12), transparent 58%) !important;
-  border: 1px solid rgba(130, 124, 255, 0.18) !important;
-  color: #f3f2ff !important;
-  padding: 10px 16px;
-}
-
-.profile-edit-btn:hover {
-  background:
-    linear-gradient(180deg, rgba(255, 255, 255, 0.095), rgba(255, 255, 255, 0.045)),
-    radial-gradient(circle at top left, rgba(93, 87, 255, 0.16), transparent 58%) !important;
-  border-color: rgba(145, 139, 255, 0.3) !important;
-}
-
-/* Telegram bind button */
-.profile-telegram-btn {
-  background: rgba(255, 255, 255, 0.05) !important;
-  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  background: var(--surface-hover) !important;
+  border: 1px solid var(--border-active) !important;
   color: var(--text-primary) !important;
-  font-size: 13px;
-  padding: 8px 14px;
-  font-weight: 600;
-  transition: all 0.2s ease;
-  border-radius: 12px !important;
-}
-
-.profile-telegram-btn.btn:hover {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border-color: var(--accent-color) !important;
-  transform: translateY(-1px);
 }
 
 /* Arena Stats Card */
 .arena-stats-card {
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
   display: grid;
-  gap: 14px;
-  background:
-    radial-gradient(circle at top right, rgba(93, 87, 255, 0.08), transparent 34%),
-    rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 20px;
+  gap: var(--space-4);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-5);
+  box-shadow: var(--shadow-md);
 }
 
 .arena-stats-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  gap: 12px;
+  gap: var(--space-3);
   flex-wrap: wrap;
 }
 
 .arena-stats-header h3 {
   margin: 0;
-  font-size: 18px;
-  font-weight: 600;
+  font-size: var(--font-size-lg);
+  font-weight: 700;
   display: flex;
   align-items: center;
-  gap: 8px;
-}
-
-.arena-stats-badges {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
+  gap: var(--space-2);
 }
 
 .arena-elo-badge {
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: rgba(245, 158, 11, 0.12);
-  color: #F59E0B;
-  font-weight: 700;
-  font-size: 13px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--warning-muted, rgba(245, 158, 11, 0.1));
+  color: var(--warning-color);
+  font-weight: 800;
+  font-size: var(--font-size-xs);
 }
 
 .arena-league-badge {
-  padding: 8px 14px;
-  border-radius: 999px;
-  background: rgba(79, 70, 229, 0.15);
-  border: 1px solid rgba(79, 70, 229, 0.3);
-  color: #c7c2ff;
-  font-weight: 700;
-  font-size: 13px;
+  padding: var(--space-2) var(--space-4);
+  border-radius: var(--radius-full);
+  background: var(--accent-muted);
+  border: 1px solid var(--border-active);
+  color: var(--accent-color);
+  font-weight: 800;
+  font-size: var(--font-size-xs);
 }
 
-.arena-stats-meta {
-  display: flex;
-  gap: 16px;
-  flex-wrap: wrap;
-  color: var(--text-secondary);
-  font-size: 14px;
-}
-
-.arena-stats-meta span {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* Profile Header Card */
+/* Profile Main Card */
 .profile-main-card {
   display: flex;
-  gap: 24px;
+  gap: var(--space-6);
   align-items: flex-start;
-  margin-bottom: 24px;
+  margin-bottom: var(--space-6);
   flex-wrap: wrap;
-  background:
-    radial-gradient(circle at top right, rgba(93, 87, 255, 0.08), transparent 34%),
-    rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 20px;
-  padding: 24px;
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
+  padding: var(--space-6);
+  box-shadow: var(--shadow-lg);
 }
 
 .profile-avatar {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  background-color: var(--bg-color);
-  background-image: var(--avatar-url);
-  background-size: cover;
-  background-position: center;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 24px;
-  color: var(--text-secondary);
-  border: 1px solid var(--border-color);
+  width: 88px;
+  height: 88px;
+  border-radius: var(--radius-full);
+  background-color: var(--surface-elevated);
+  border: 2px solid var(--border-active);
   flex-shrink: 0;
 }
 
-.profile-info {
-  flex: 1;
-  min-width: 200px;
-}
-
 .profile-name {
-  font-size: 20px;
-  margin-bottom: 4px;
-  display: flex;
-  align-items: center;
-  gap: 8px;
+  font-size: var(--font-size-xl);
+  font-weight: 700;
+  margin-bottom: var(--space-1);
 }
 
 .profile-username {
-  color: #c7c2ff;
-  margin-bottom: 8px;
-  font-size: 14px;
+  color: var(--accent-color);
+  margin-bottom: var(--space-2);
+  font-size: var(--font-size-sm);
+  font-weight: 600;
 }
 
 .profile-details {
   color: var(--text-secondary);
   display: flex;
-  align-items: flex-start;
-  flex-wrap: wrap;
-  gap: 12px;
-  font-size: 14px;
-}
-
-.profile-detail-item {
-  display: flex;
   align-items: center;
-  gap: 6px;
+  flex-wrap: wrap;
+  gap: var(--space-4);
+  font-size: var(--font-size-sm);
 }
 
 .profile-status {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px 10px;
-  border-radius: 8px;
-  font-size: 11px;
-  font-weight: 600;
+  padding: var(--space-1) var(--space-3);
+  border-radius: var(--radius-sm);
+  font-size: 10px;
+  font-weight: 800;
   text-transform: uppercase;
+  letter-spacing: 0.05em;
 }
 
 .profile-status--online {
-  background: rgba(16, 185, 129, 0.1);
-  color: #10B981;
+  background: var(--success-muted);
+  color: var(--success-color);
 }
 
-.profile-status--recently {
-  background: rgba(245, 158, 11, 0.1);
-  color: #F59E0B;
+/* League Banner */
+.profile-league-banner {
+  margin-bottom: var(--space-6);
+  padding: var(--space-5) var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-base);
 }
 
-.profile-status--offline {
-  background: rgba(156, 163, 175, 0.1);
-  color: #9CA3AF;
+.profile-league-banner__title h3 {
+  margin: 0;
+  font-size: var(--font-size-lg);
+  font-weight: 800;
 }
 
-.profile-status-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
+/* Master League Example */
+.profile-league-banner--master {
+  background: linear-gradient(135deg, rgba(139, 0, 255, 0.15) 0%, rgba(75, 0, 130, 0.1) 100%);
+  border-color: rgba(139, 0, 255, 0.4);
+  animation: league-master-legend 6s ease-in-out infinite;
 }
 
-.profile-status--online .profile-status-dot {
-  animation: pulse 2s infinite;
+.profile-league-banner--master h3 {
+  color: #a855f7;
 }
 
-/* Profile Badges */
-.profile-badges {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
+/* Info Section */
+.profile-info-section {
+  margin-top: var(--space-10);
 }
 
-.profile-badge {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  border-radius: 16px;
-  font-size: 12px;
-  font-weight: 500;
+.profile-info-section h2 {
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--space-4);
+  font-weight: 700;
+}
+
+.profile-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: var(--space-4);
+}
+
+.profile-info-card {
+  padding: var(--space-5);
+  background: var(--surface-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+}
+
+.profile-info-card h3 {
+  font-size: 11px;
+  margin-bottom: var(--space-2);
+  color: var(--accent-color);
   text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-weight: 800;
 }
 
-.profile-badge--account {
-  background: rgba(79, 70, 229, 0.1);
-  color: #c7c2ff;
-}
-
-@media (max-width: 960px) {
+/* Mobile Responsiveness */
+@media (max-width: 768px) {
   .profile-header,
   .profile-main-card,
   .arena-stats-card {
-    padding: 18px;
-    border-radius: 20px;
-  }
-
-  .profile-header {
-    margin-bottom: 20px;
-  }
-
-  .profile-main-card {
-    gap: 18px;
-  }
-}
-
-@media (max-width: 640px) {
-  .profile-page {
-    padding-bottom: 20px;
-  }
-
-  .profile-header,
-  .profile-main-card,
-  .arena-stats-card {
-    padding: 14px;
-    border-radius: 18px;
-  }
-
-  .profile-header h1 {
-    font-size: 22px;
+    padding: var(--space-4);
+    border-radius: var(--radius-lg);
   }
 
   .profile-avatar {
     width: 64px;
     height: 64px;
-    font-size: 20px;
   }
 
   .profile-name {
-    font-size: 18px;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-
-  .profile-username,
-  .profile-details,
-  .arena-stats-meta {
-    font-size: 12px;
-  }
-
-  .profile-details,
-  .arena-stats-meta,
-  .arena-stats-badges,
-  .profile-badges {
-    gap: 8px;
-  }
-
-  .arena-stats-header h3 {
-    font-size: 16px;
-  }
-
-  .arena-elo-badge,
-  .arena-league-badge,
-  .profile-badge {
-    padding: 6px 10px;
-    font-size: 11px;
-  }
-
-  .profile-edit-btn {
-    width: 100%;
-    justify-content: center;
-  }
-
-  .profile-telegram-btn {
-    width: 100%;
-    margin-top: 8px;
-    justify-content: center;
-  }
-}
-
-.profile-badge--admin {
-  background: rgba(245, 158, 11, 0.1);
-  color: #F59E0B;
-}
-
-/* Info Section */
-.profile-info-section {
-  margin-top: 40px;
-}
-
-.profile-info-section h2 {
-  font-size: 20px;
-  margin-bottom: 16px;
-  font-weight: 500;
-}
-
-.profile-info-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 16px;
-}
-
-.profile-info-card {
-  padding: 20px;
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: 12px;
-}
-
-.profile-info-card h3 {
-  font-size: 14px;
-  margin-bottom: 8px;
-  color: #8b7cff;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
-  display: flex;
-  align-items: center;
-  gap: 6px;
-}
-
-.profile-info-card p {
-  font-size: 14px;
-  color: var(--text-primary);
-}
-
-/* Edit Modal */
-.profile-modal-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.8);
-  backdrop-filter: blur(10px);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
-  padding: 20px;
-}
-
-.profile-modal {
-  width: 100%;
-  max-width: 600px;
-  max-height: 90vh;
-  overflow-y: auto;
-  position: relative;
-  padding: 32px;
-  background: var(--surface-color);
-  border: 1px solid var(--border-color);
-  border-radius: 16px;
-}
-
-.profile-modal-close {
-  position: absolute;
-  top: 20px;
-  right: 20px;
-  background: transparent;
-  border: none;
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 8px;
-  transition: all 0.2s ease;
-}
-
-.profile-modal-close:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: var(--text-primary);
-}
-
-.profile-modal h2 {
-  font-size: 24px;
-  margin-bottom: 24px;
-  font-weight: 600;
-}
-
-.profile-modal-section {
-  margin-bottom: 32px;
-}
-
-.profile-modal-section h3 {
-  font-size: 18px;
-  margin-bottom: 12px;
-  font-weight: 500;
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--text-primary);
-}
-
-.profile-modal-section p {
-  color: var(--text-secondary);
-  font-size: 14px;
-  margin-bottom: 16px;
-  line-height: 1.5;
-}
-
-.profile-modal-actions {
-  margin-top: 32px;
-  display: flex;
-  justify-content: flex-end;
-}
-
-.profile-modal-done-btn {
-  background: rgba(255, 255, 255, 0.1) !important;
-  border: 1px solid rgba(255, 255, 255, 0.1) !important;
-  color: var(--text-primary) !important;
-}
-
-.profile-modal-done-btn:hover {
-  background: rgba(255, 255, 255, 0.15) !important;
-}
-
-/* League Banner */
-.profile-league-banner {
-  margin-bottom: 24px;
-  padding: 20px 24px;
-  border-radius: 16px;
-  border: 1px solid;
-  position: relative;
-  overflow: visible;
-  transition: all 0.3s ease;
-}
-
-/* Novice League */
-.profile-league-banner--novice {
-  background: linear-gradient(135deg, rgba(156, 163, 175, 0.15) 0%, rgba(107, 114, 128, 0.1) 100%);
-  border-color: rgba(156, 163, 175, 0.4);
-  animation: league-novice-pulse 4s ease-in-out infinite;
-}
-
-.profile-league-banner--novice .profile-league-banner__glow {
-  background: radial-gradient(circle at top right, rgba(156, 163, 175, 0.4), transparent 70%);
-}
-
-.profile-league-banner--novice .profile-league-banner__title--novice {
-  color: #9CA3AF;
-}
-
-/* Rookie League */
-.profile-league-banner--rookie {
-  background: linear-gradient(135deg, rgba(34, 197, 94, 0.15) 0%, rgba(22, 163, 74, 0.1) 100%);
-  background-size: 200% 200%;
-  border-color: rgba(34, 197, 94, 0.4);
-  animation: league-rookie-flow 3s ease-in-out infinite;
-}
-
-.profile-league-banner--rookie .profile-league-banner__glow {
-  background: radial-gradient(circle at top right, rgba(34, 197, 94, 0.5), transparent 70%);
-}
-
-.profile-league-banner--rookie .profile-league-banner__title--rookie {
-  color: #22C55E;
-}
-
-/* Bronze League */
-.profile-league-banner--bronze {
-  background: linear-gradient(135deg, rgba(205, 127, 50, 0.2) 0%, rgba(139, 90, 43, 0.12) 100%);
-  border-color: rgba(205, 127, 50, 0.5);
-  animation: league-bronze-wave 2.5s ease-in-out infinite;
-}
-
-.profile-league-banner--bronze .profile-league-banner__glow {
-  background: radial-gradient(circle at top right, rgba(205, 127, 50, 0.5), transparent 70%);
-}
-
-/* Silver League */
-.profile-league-banner--silver {
-  background: linear-gradient(135deg, rgba(192, 192, 192, 0.2) 0%, rgba(128, 128, 128, 0.12) 100%);
-  border-color: rgba(192, 192, 192, 0.5);
-  animation: league-silver-sparkle 2s ease-in-out infinite;
-}
-
-.profile-league-banner--silver .profile-league-banner__glow {
-  background: radial-gradient(circle at top right, rgba(192, 192, 192, 0.5), transparent 70%);
-}
-
-/* Gold League */
-.profile-league-banner--gold {
-  background: linear-gradient(135deg, rgba(255, 215, 0, 0.2) 0%, rgba(218, 165, 32, 0.12) 100%);
-  border-color: rgba(255, 215, 0, 0.5);
-  animation: league-gold-royal 2s ease-in-out infinite;
-}
-
-.profile-league-banner--gold .profile-league-banner__glow {
-  background: radial-gradient(circle at top right, rgba(255, 215, 0, 0.6), transparent 70%);
-}
-
-/* Platinum League */
-.profile-league-banner--platinum {
-  background: linear-gradient(135deg, rgba(229, 228, 226, 0.2) 0%, rgba(0, 245, 212, 0.12) 100%);
-  border-color: rgba(0, 245, 212, 0.5);
-  animation: league-platinum-float 2.5s ease-in-out infinite;
-}
-
-.profile-league-banner--platinum .profile-league-banner__glow {
-  background: radial-gradient(circle at top right, rgba(0, 245, 212, 0.5), transparent 70%);
-}
-
-/* Diamond League */
-.profile-league-banner--diamond {
-  background: linear-gradient(135deg, rgba(185, 242, 255, 0.2) 0%, rgba(0, 199, 227, 0.12) 100%);
-  border-color: rgba(0, 199, 227, 0.5);
-  animation: league-diamond-sparkle 2s ease-in-out infinite;
-}
-
-.profile-league-banner--diamond .profile-league-banner__glow {
-  background: radial-gradient(circle at top right, rgba(0, 199, 227, 0.6), transparent 70%);
-}
-
-/* Master League */
-.profile-league-banner--master {
-  background: linear-gradient(135deg, rgba(139, 0, 255, 0.25) 0%, rgba(75, 0, 130, 0.15) 100%);
-  border-color: rgba(139, 0, 255, 0.6);
-  animation: league-master-legend 6s ease-in-out infinite;
-}
-
-.profile-league-banner--master .profile-league-banner__glow {
-  background: radial-gradient(circle at top right, rgba(139, 0, 255, 0.7), transparent 70%);
-}
-
-.profile-league-banner__glow {
-  position: absolute;
-  top: 0;
-  right: 0;
-  width: 200px;
-  height: 100%;
-  pointer-events: none;
-  border-radius: 0 16px 16px 0;
-}
-
-.profile-league-banner__content {
-  position: relative;
-  z-index: 1;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 16px;
-}
-
-.profile-league-banner__title {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-}
-
-.profile-league-banner__title h3 {
-  margin: 0;
-  font-size: 20px;
-  font-weight: 700;
-}
-
-.profile-league-banner__title--novice { color: #9CA3AF; }
-.profile-league-banner__title--rookie { color: #22C55E; }
-.profile-league-banner__title--bronze { color: #CD7F32; }
-.profile-league-banner__title--silver { color: #C0C0C0; }
-.profile-league-banner__title--gold { color: #FFD700; }
-.profile-league-banner__title--platinum { color: #E5E4E2; }
-.profile-league-banner__title--diamond { color: #00C7E3; }
-.profile-league-banner__title--master { color: #8B00FF; }
-
-.profile-league-banner__stats {
-  display: flex;
-  gap: 16px;
-  font-size: 14px;
-}
-
-.profile-league-banner__stat {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-/* Novice - steady ambient glow */
-@keyframes league-novice-pulse {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(156, 163, 175, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 12px rgba(156, 163, 175, 0.18);
-  }
-}
-
-/* Rookie - rising energy */
-@keyframes league-rookie-flow {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(34, 197, 94, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 14px rgba(34, 197, 94, 0.2);
-  }
-}
-
-/* Bronze - warm shimmer wave */
-@keyframes league-bronze-wave {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(205, 127, 50, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 14px rgba(205, 127, 50, 0.2);
-  }
-}
-
-/* Silver - glittering particles */
-@keyframes league-silver-sparkle {
-  0%, 100% {
-    box-shadow: 0 0 8px rgba(192, 192, 192, 0.1);
-  }
-  50% {
-    box-shadow: 0 0 14px rgba(192, 192, 192, 0.2);
-  }
-}
-
-/* Gold - royal shimmer with border glow */
-@keyframes league-gold-royal {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(255, 215, 0, 0.12);
-    border-color: rgba(255, 215, 0, 0.25);
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(255, 215, 0, 0.22);
-    border-color: rgba(255, 215, 0, 0.4);
-  }
-}
-
-/* Platinum - floating particles */
-@keyframes league-platinum-float {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(0, 245, 212, 0.12);
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(0, 245, 212, 0.22);
-  }
-}
-
-/* Diamond - subtle shimmer */
-@keyframes league-diamond-sparkle {
-  0%, 100% {
-    box-shadow: 0 0 10px rgba(0, 199, 227, 0.12);
-  }
-  50% {
-    box-shadow: 0 0 16px rgba(0, 199, 227, 0.22);
-  }
-}
-
-/* Master - legendary wave */
-@keyframes league-master-legend {
-  0% {
-    box-shadow: 0 0 8px rgba(139, 0, 255, 0.1);
-    border-color: rgba(139, 0, 255, 0.15);
-  }
-  50% {
-    box-shadow: 0 0 20px rgba(139, 0, 255, 0.35);
-    border-color: rgba(139, 0, 255, 0.45);
-  }
-  100% {
-    box-shadow: 0 0 8px rgba(139, 0, 255, 0.1);
-    border-color: rgba(139, 0, 255, 0.15);
+    font-size: var(--font-size-lg);
   }
 }
 

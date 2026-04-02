@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap');
 
 :root {
   /* Core Colors - Refined for depth */
@@ -25,13 +25,17 @@
   --danger-color: #EF4444;
   --danger-hover: #F87171;
   --danger-muted: rgba(239, 68, 68, 0.15);
+  --danger-glow: rgba(239, 68, 68, 0.25);
   
   --success-color: #10B981;
   --success-hover: #34D399;
   --success-muted: rgba(16, 185, 129, 0.15);
+  --success-glow: rgba(16, 185, 129, 0.25);
 
   --warning-color: #F59E0B;
   --warning-hover: #FBBF24;
+  --warning-muted: rgba(245, 158, 11, 0.12);
+  --warning-glow: rgba(245, 158, 11, 0.25);
 
   /* Typography - Manrope (Modern, Geometric, Premium) */
   --font-main: 'Manrope', 'Inter', system-ui, -apple-system, sans-serif;
