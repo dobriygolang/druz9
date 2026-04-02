@@ -141,7 +141,7 @@ export const FeedPage: React.FC = () => {
       <section className="page-header code-rooms-hero feed-hero">
         <div className="code-rooms-hero__copy">
           {!isMobile && <span className="code-rooms-kicker">Community Broadcasts</span>}
-          <h1>{isMobile ? 'Фид' : 'Подкасты'}</h1>
+          <h1>{isMobile ? 'Подкасты' : 'Подкасты'}</h1>
           <p className="code-rooms-subtitle">
             {isMobile 
               ? 'Голос сообщества и новости.' 

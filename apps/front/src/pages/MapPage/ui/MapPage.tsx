@@ -322,7 +322,7 @@ export const MapPage: React.FC = () => {
         )}
       </section>
 
-      <div className="card map-shell" style={{ minHeight: isMobile ? 'calc(100vh - 220px)' : '620px' }}>
+      <div className="card map-shell" style={{ border: isMobile ? 'none' : undefined, borderRadius: isMobile ? '0' : undefined, margin: isMobile ? '0 -12px' : undefined, width: isMobile ? 'calc(100% + 24px)' : undefined, minHeight: isMobile ? 'calc(100vh - 280px)' : '620px' }}>
         {isLoading && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, background: 'rgba(17, 24, 39, 0.72)', color: 'white' }}>Загружаем карту...</div>}
         {error && !isLoading && <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 5, background: 'rgba(239, 68, 68, 0.14)', color: '#fecaca', border: '1px solid rgba(239, 68, 68, 0.35)', borderRadius: '12px', padding: '12px 14px' }}>{error}</div>}
 
@@ -365,7 +365,7 @@ export const MapPage: React.FC = () => {
           minZoom={2.5}
           maxZoom={18.5}
           reuseMaps
-          style={{ width: '100%', height: '620px' }}
+          style={{ width: '100%', height: isMobile ? 'calc(100vh - 280px)' : '620px' }}
         >
           <NavigationControl position="top-right" showCompass={false} visualizePitch={false} />
           <ScaleControl position="bottom-right" unit="metric" />

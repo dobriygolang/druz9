@@ -1265,7 +1265,24 @@
   }
 
   .code-room-prep-launch--page .code-room-prep-launch__actions .btn,
-  .code-rooms-hero__actions .btn {
+  .code-rooms-hero__actions .btn,
+  .code-rooms-mode-card {
     width: 100%;
+    justify-content: center;
+  }
+
+  .leaderboard-rank {
+    width: 44px;
+    height: 44px;
+    font-size: 14px;
+  }
+
+  .leaderboard-name {
+    font-size: 16px;
+  }
+
+  .leaderboard-rate {
+    font-size: 16px;
+    min-width: 60px;
   }
 }

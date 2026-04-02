@@ -406,9 +406,9 @@ export function InterviewPrepPage() {
                   return (
                     <article key={task.id} className={`card dashboard-card interview-prep-card interview-prep-card--category ${categoryAccentClass(taskCategory)}`}>
                       <div className="interview-prep-card__head">
-                        <div className="task-item__meta">
+                        <div className="task-item__meta" style={{ flexWrap: 'wrap', gap: '4px' }}>
                           <span className="badge">{isMobile ? group.label.charAt(0) : CATEGORY_LABELS[taskCategory]}</span>
-                          <span className="badge">{isMobile ? '' : PREP_TYPE_LABELS[task.prepType] ?? task.prepType}</span>
+                          <span className="badge">{isMobile ? '' : (PREP_TYPE_LABELS[task.prepType] ?? task.prepType)}</span>
                           {task.companyTag && <span className="badge">{task.companyTag}</span>}
                           {!isMobile && <span className="badge">{task.language}</span>}
                           <span className="badge">
