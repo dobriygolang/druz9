@@ -645,7 +645,7 @@ export const CodeRoomPage: React.FC = () => {
           </div>
           <button
             type="button"
-            className="btn"
+            className="btn btn-primary"
             onClick={() => {
               setRoom(null);
               setRoomLoadError('');

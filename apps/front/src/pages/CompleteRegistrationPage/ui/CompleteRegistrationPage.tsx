@@ -79,12 +79,12 @@ export const CompleteRegistrationPage: React.FC = () => {
         <div style={{ display: 'flex', gap: '12px', marginBottom: '16px', flexWrap: 'wrap' }}>
           <button
             type="button"
-            className="btn"
+            className={`btn ${employmentMode === 'working' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setEmploymentMode('working')}
             style={{
               background:
                 employmentMode === 'working'
-                  ? 'var(--accent-color)'
+                  ? undefined
                   : 'rgba(255,255,255,0.05)',
             }}
           >
@@ -92,12 +92,12 @@ export const CompleteRegistrationPage: React.FC = () => {
           </button>
           <button
             type="button"
-            className="btn"
+            className={`btn ${employmentMode === 'not_working' ? 'btn-primary' : 'btn-secondary'}`}
             onClick={() => setEmploymentMode('not_working')}
             style={{
               background:
                 employmentMode === 'not_working'
-                  ? 'var(--accent-color)'
+                  ? undefined
                   : 'rgba(255,255,255,0.05)',
             }}
           >

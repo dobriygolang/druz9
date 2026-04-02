@@ -125,9 +125,9 @@ session_cookie_name:
   writable: false
 
 cookie_domain:
-  usage: "Session cookie domain"
+  usage: "Session cookie domain; keep empty for host-only cookies and multi-domain support"
   group: "auth"
-  value: "REPLACE_ME"
+  value: ""
   type: "string"
   writable: false
 
@@ -203,9 +203,9 @@ s3_endpoint:
   writable: false
 
 s3_public_endpoint:
-  usage: "Public S3 endpoint for signed URLs"
+  usage: "Public canonical endpoint for signed URLs"
   group: "external"
-  value: "https://druz9.duckdns.org"
+  value: "https://druz9.online"
   type: "string"
   writable: false
 

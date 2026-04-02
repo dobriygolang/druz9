@@ -57,6 +57,7 @@ Production контур теперь находится в [`deploy`](./deploy):
 - контейнеры публикуются только в `127.0.0.1`
 - runtime secrets лежат в `deploy/runtime/secrets/prod/*`
 - runtime values генерируются в `deploy/runtime/values_prod.yaml` из `.env.prod` без записи секретов в файл
+- primary домен задаётся через `APP_HOST`; дополнительные домены/алиасы настраиваются в хостовом `nginx`
 
 Подробности и актуальные шаги см. в [`deploy/README.md`](./deploy/README.md).
 
@@ -75,6 +76,7 @@ Production контур теперь находится в [`deploy`](./deploy):
 - `DEPLOY_SSH_PORT`
 - `DEPLOY_APP_DIR`
 - `APP_HOST`
+- `APP_ALIASES`
 - `API_HOST`
 - `APP_EMAIL`
 - `TELEGRAM_BOT_NAME`

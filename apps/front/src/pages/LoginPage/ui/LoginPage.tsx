@@ -66,13 +66,13 @@ export const LoginPage: React.FC = () => {
 
         <div style={{ display: 'grid', gap: '12px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-            <button type="button" className="btn" onClick={() => setMode('telegram')} style={{ minHeight: '42px', opacity: mode === 'telegram' ? 1 : 0.7 }}>
+            <button type="button" className={`btn ${mode === 'telegram' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('telegram')} style={{ minHeight: '42px', opacity: mode === 'telegram' ? 1 : 0.7 }}>
               Telegram
             </button>
-            <button type="button" className="btn" onClick={() => setMode('login')} style={{ minHeight: '42px', opacity: mode === 'login' ? 1 : 0.7 }}>
+            <button type="button" className={`btn ${mode === 'login' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('login')} style={{ minHeight: '42px', opacity: mode === 'login' ? 1 : 0.7 }}>
               Вход
             </button>
-            <button type="button" className="btn" onClick={() => setMode('register')} style={{ minHeight: '42px', opacity: mode === 'register' ? 1 : 0.7 }}>
+            <button type="button" className={`btn ${mode === 'register' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('register')} style={{ minHeight: '42px', opacity: mode === 'register' ? 1 : 0.7 }}>
               Регистрация
             </button>
           </div>

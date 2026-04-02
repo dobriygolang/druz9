@@ -58,7 +58,7 @@ export const UserDetailCard: React.FC<UserDetailCardProps> = ({ user, onClose })
       </div>
       <button
         type="button"
-        className="btn"
+        className="btn btn-primary"
         onClick={() => navigate(user.isCurrentUser ? '/profile' : `/profile/${user.userId}`)}
         style={{ width: '100%' }}
       >
@@ -193,7 +193,7 @@ export const EventDetailCard: React.FC<EventDetailCardProps> = ({
       {event.meeting_link && event.is_joined && (
         <a
           href={event.meeting_link.startsWith('http') ? event.meeting_link : `https://${event.meeting_link}`}
-          target="_blank" rel="noopener noreferrer" className="btn"
+          target="_blank" rel="noopener noreferrer" className="btn btn-primary"
           style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: '10px', marginBottom: '20px', background: '#10B981', fontWeight: 600, borderRadius: '12px', textDecoration: 'none', height: '48px' }}
         >
           <ExternalLink size={18} />
@@ -207,7 +207,7 @@ export const EventDetailCard: React.FC<EventDetailCardProps> = ({
       </div>
 
       <div style={{ display: 'flex', gap: '10px' }}>
-        <button type="button" className="btn" onClick={() => onExpand(event.id)} style={{ flex: 1, minWidth: '120px', height: '48px', borderRadius: '12px', fontWeight: 600 }}>
+        <button type="button" className="btn btn-primary" onClick={() => onExpand(event.id)} style={{ flex: 1, minWidth: '120px', height: '48px', borderRadius: '12px', fontWeight: 600 }}>
           Подробнее
         </button>
         {event.is_creator ? (

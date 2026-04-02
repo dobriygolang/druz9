@@ -210,7 +210,7 @@ export const VacanciesPage: React.FC = () => {
           </div>
 
           <div className="vacancies-actions">
-            <button className="btn" onClick={openCreate}>
+            <button className="btn btn-primary" onClick={openCreate}>
               <Plus size={18} />
               Добавить вакансию
             </button>
@@ -456,7 +456,7 @@ export const VacanciesPage: React.FC = () => {
                 <button type="button" className="btn btn-ghost" onClick={closeModal}>
                   Отмена
                 </button>
-                <button type="submit" className="btn" disabled={isSubmitting}>
+                <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
                   {isSubmitting ? 'Сохраняю…' : editingVacancy ? 'Сохранить изменения' : 'Опубликовать вакансию'}
                 </button>
               </div>

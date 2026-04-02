@@ -268,7 +268,7 @@ export const EventForm: React.FC<EventFormProps> = ({
       <div style={{ display: 'flex', gap: '10px', marginTop: '16px', flexShrink: 0 }}>
         <button
           type="button"
-          className="btn"
+          className="btn btn-primary"
           onClick={onSubmit}
           disabled={isSaving}
           style={{ flex: 1, height: '48px', borderRadius: '12px', fontWeight: 600 }}

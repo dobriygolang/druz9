@@ -7,6 +7,14 @@ import { useAuth } from '@/app/providers/AuthProvider';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal/ConfirmModal';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
+function pluralizeRu(count: number, one: string, few: string, many: string) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
+
 export const FeedPage: React.FC = () => {
   const isMobile = useIsMobile();
   const { user: currentUser, isAuthenticated } = useAuth();
@@ -141,7 +149,7 @@ export const FeedPage: React.FC = () => {
 
         {isAuthenticated && currentUser?.isAdmin && (
           <button
-            className="btn feed-hero__admin-btn"
+            className="btn btn-primary feed-hero__admin-btn"
             onClick={() => setIsAdminPanelOpen(!isAdminPanelOpen)}
           >
             {isAdminPanelOpen ? 'Закрыть форму' : <><Plus size={20} /> Добавить выпуск</>}
@@ -198,7 +206,7 @@ export const FeedPage: React.FC = () => {
           </div>
 
           <button
-            className="btn hover-scale"
+            className="btn btn-primary hover-scale"
             disabled={!newTitle || !selectedFile || isUploading}
             onClick={handleCreateAndUpload}
             style={{
@@ -233,6 +241,7 @@ export const FeedPage: React.FC = () => {
           ) : (
             podcasts.map(p => {
               const isActive = currentPodcast?.id === p.id;
+              const listensCount = Number(p.listens_count || 0);
 
               return (
                 <div key={p.id} className={`card fade-in feed-podcast-card ${isActive ? 'is-active' : ''}`}>
@@ -276,7 +285,7 @@ export const FeedPage: React.FC = () => {
                         <Clock size={16} /> {formatDuration(p.duration_seconds)}
                       </span>
                       <span style={{ opacity: 0.3 }}>•</span>
-                      <span>{p.listens_count} прослушиваний</span>
+                      <span>{listensCount} {pluralizeRu(listensCount, 'прослушивание', 'прослушивания', 'прослушиваний')}</span>
                     </div>
                   </div>
 

@@ -74,7 +74,7 @@ export const GuestNameModal: React.FC<GuestNameModalProps> = ({
             )}
             <button
               type="submit"
-              className="btn guest-name-modal__submit"
+              className="btn btn-primary guest-name-modal__submit"
               disabled={!trimmed}
             >
               {confirmText}

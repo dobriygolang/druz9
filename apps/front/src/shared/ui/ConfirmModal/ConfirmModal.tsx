@@ -106,13 +106,10 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
 
         <div style={{ display: 'flex', gap: '12px' }}>
           <button
-            className="btn"
+            className="btn btn-ghost"
             onClick={onCancel}
             style={{
               flex: 1,
-              background: 'rgba(255,255,255,0.05)',
-              border: '1px solid rgba(255,255,255,0.05)',
-              color: 'var(--text-primary)',
               height: '48px',
               fontWeight: 600
             }}
@@ -120,15 +117,12 @@ export const ConfirmModal: React.FC<ConfirmModalProps> = ({
             {cancelText}
           </button>
           <button
-            className="btn hover-scale"
+            className={`btn hover-scale ${isDangerous ? 'btn-danger' : 'btn-primary'}`}
             onClick={onConfirm}
             style={{
               flex: 1,
-              background: isDangerous ? '#ef4444' : 'var(--accent-color)',
-              color: 'white',
               height: '48px',
-              fontWeight: 600,
-              boxShadow: isDangerous ? '0 8px 20px rgba(239, 68, 68, 0.2)' : '0 8px 20px rgba(79, 70, 229, 0.2)'
+              fontWeight: 600
             }}
           >
             {confirmText}

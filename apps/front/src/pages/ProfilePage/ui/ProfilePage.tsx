@@ -420,7 +420,7 @@ export const ProfilePage: React.FC = () => {
         <h1>Профиль</h1>
         {isOwnProfile && (
           <button
-            className="btn"
+            className="btn btn-primary"
             onClick={() => setIsEditModalOpen(true)}
           >
             <Pencil size={18} /> Редактировать профиль
@@ -501,7 +501,7 @@ export const ProfilePage: React.FC = () => {
 
           {currentUser?.isAdmin && user?.id && (
             <button
-              className="btn"
+              className="btn btn-secondary"
               style={{ padding: '4px 8px', fontSize: '12px' }}
               disabled={trustedUpdating}
               onClick={async () => {
@@ -527,7 +527,7 @@ export const ProfilePage: React.FC = () => {
 
           {currentUser?.isAdmin && user?.id && (
             <button
-              className="btn"
+              className="btn btn-secondary"
               style={{ padding: '4px 8px', fontSize: '12px' }}
               disabled={adminUpdating}
               onClick={async () => {
@@ -557,7 +557,7 @@ export const ProfilePage: React.FC = () => {
             </span>
           ) : (
             <button
-              className="btn profile-telegram-btn"
+              className="btn btn-primary profile-telegram-btn"
               onClick={handleOpenBindTelegram}
             >
               <Send size={12} />
@@ -629,7 +629,7 @@ export const ProfilePage: React.FC = () => {
                     <div className="profile-photo-actions">
                       <button
                         type="button"
-                        className="btn profile-photo-upload-btn"
+                        className="btn btn-primary profile-photo-upload-btn"
                         onClick={() => fileInputRef.current?.click()}
                       >
                         <Upload size={16} /> Загрузить фото
@@ -637,7 +637,7 @@ export const ProfilePage: React.FC = () => {
                       {user.avatarUrl && (
                         <button
                           type="button"
-                          className="btn profile-photo-remove-btn"
+                          className="btn btn-ghost profile-photo-remove-btn"
                           onClick={handleRemoveAvatar}
                         >
                           <X size={16} /> Удалить
@@ -680,7 +680,7 @@ export const ProfilePage: React.FC = () => {
                   <div className="photo-crop-actions">
                     <button
                       type="button"
-                      className="btn"
+                      className="btn btn-ghost"
                       onClick={resetCrop}
                       disabled={isPhotoUploading}
                     >
@@ -688,7 +688,7 @@ export const ProfilePage: React.FC = () => {
                     </button>
                     <button
                       type="button"
-                      className="btn"
+                      className="btn btn-primary"
                       onClick={handleCropUpload}
                       disabled={isPhotoUploading}
                     >
@@ -728,7 +728,7 @@ export const ProfilePage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isSubmitting || !newWorkplace.trim()}
-                  className="btn"
+                  className="btn btn-primary"
                   onClick={handleUpdateWorkplace}
                 >
                   {isSubmitting ? 'Сохранение...' : 'Обновить'}
@@ -768,7 +768,7 @@ export const ProfilePage: React.FC = () => {
 
             <div className="profile-modal-actions">
               <button
-                className="btn"
+                className="btn btn-primary"
                 onClick={() => { setIsEditModalOpen(false); resetCrop(); }}
               >
                 Готово
@@ -797,7 +797,7 @@ export const ProfilePage: React.FC = () => {
                 href={telegramChallenge.botStartUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn"
+                className="btn btn-primary"
                 style={{ display: 'inline-flex', alignItems: 'center', gap: '8px', textDecoration: 'none' }}
               >
                 <Send size={18} />
@@ -819,7 +819,7 @@ export const ProfilePage: React.FC = () => {
                 <button
                   type="submit"
                   disabled={isBindingTelegram || !telegramCode}
-                  className="btn"
+                  className="btn btn-primary"
                 >
                   {isBindingTelegram ? 'Привязываем...' : 'Привязать'}
                 </button>

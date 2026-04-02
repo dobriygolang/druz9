@@ -16,6 +16,7 @@ import { geoApi } from '@/features/Geo/api/geoApi';
 import { FullEventOverlay } from '@/shared/ui/FullEventOverlay/FullEventOverlay';
 import { EventForm } from '@/shared/ui/EventForm/EventForm';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal/ConfirmModal';
+import { FancySelect } from '@/shared/ui/FancySelect';
 import { EventDraft } from '@/pages/MapPage/components/types';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { AxiosError } from '@/shared/api/base';
@@ -26,6 +27,14 @@ const MONTHS = [
   'Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь',
   'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'
 ];
+
+function pluralizeRu(count: number, one: string, few: string, many: string) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
 
 function buildDefaultScheduledAt(baseDate?: Date) {
   const date = baseDate ? new Date(baseDate) : new Date();
@@ -261,9 +270,9 @@ export const EventsPage: React.FC = () => {
             Общий календарь сообщества: встречи, алгоритмы, клубы и созвоны. Фильтруй по группе и типу, быстро листай месяцы и держи весь ритм комьюнити в одном месте.
           </p>
           <div className="events-hero__meta">
-            <span className="badge"><Calendar size={12} /> {events.length} событий</span>
-            <span className="badge"><Sparkles size={12} /> {eventGroups.length || 1} групп</span>
-            <span className="badge"><MapPin size={12} /> {eventTypes.length || 1} форматов</span>
+            <span className="badge"><Calendar size={12} /> {events.length} {pluralizeRu(events.length, 'событие', 'события', 'событий')}</span>
+            <span className="badge"><Sparkles size={12} /> {eventGroups.length || 1} {pluralizeRu(eventGroups.length || 1, 'группа', 'группы', 'групп')}</span>
+            <span className="badge"><MapPin size={12} /> {eventTypes.length || 1} {pluralizeRu(eventTypes.length || 1, 'формат', 'формата', 'форматов')}</span>
           </div>
         </div>
 
@@ -280,7 +289,7 @@ export const EventsPage: React.FC = () => {
             </button>
           </div>
 
-          <button className="btn events-hero__create" onClick={() => handleCreateClick()}>
+          <button className="btn btn-primary events-hero__create" onClick={() => handleCreateClick()}>
             <Plus size={18} />
             <span>Создать событие</span>
           </button>
@@ -301,25 +310,25 @@ export const EventsPage: React.FC = () => {
         <div className="events-filter-grid" style={{ gridTemplateColumns: isMobile ? '1fr' : undefined }}>
           <div className="events-filter-field">
             <label>Группа</label>
-            <select className="input" value={groupFilter} onChange={(e) => setGroupFilter(e.target.value)}>
-            <option value="all">Все группы</option>
-            {eventGroups.map((group) => (
-              <option key={group} value={group}>
-                {group}
-              </option>
-            ))}
-            </select>
+            <FancySelect
+              value={groupFilter}
+              options={[
+                { value: 'all', label: 'Все группы' },
+                ...eventGroups.map((group) => ({ value: group, label: group })),
+              ]}
+              onChange={setGroupFilter}
+            />
           </div>
           <div className="events-filter-field">
             <label>Тип</label>
-            <select className="input" value={typeFilter} onChange={(e) => setTypeFilter(e.target.value)}>
-            <option value="all">Все типы</option>
-            {eventTypes.map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-            </select>
+            <FancySelect
+              value={typeFilter}
+              options={[
+                { value: 'all', label: 'Все типы' },
+                ...eventTypes.map((type) => ({ value: type, label: type })),
+              ]}
+              onChange={setTypeFilter}
+            />
           </div>
           <button className="btn btn-secondary events-filter-reset" onClick={() => { setGroupFilter('all'); setTypeFilter('all'); }}>
             Сбросить фильтры

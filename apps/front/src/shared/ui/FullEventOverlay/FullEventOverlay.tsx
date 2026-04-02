@@ -34,6 +34,14 @@ function formatEventDate(value: string) {
   }).format(date);
 }
 
+function hasLocation(event: CommunityEvent) {
+  return Boolean(
+    event.place_label?.trim() ||
+    event.latitude !== undefined && event.latitude !== null ||
+    event.longitude !== undefined && event.longitude !== null,
+  );
+}
+
 export const FullEventOverlay: React.FC<FullEventOverlayProps> = ({
   eventId,
   events,
@@ -115,7 +123,7 @@ export const FullEventOverlay: React.FC<FullEventOverlayProps> = ({
             </div>
           </div>
 
-          {(fullEvent.place_label || fullEvent.latitude || fullEvent.longitude) && (
+          {hasLocation(fullEvent) && (
             <div className="event-overlay__meta-card">
               <div className="event-overlay__meta-icon">
                 <MapPin size={18} />

@@ -156,7 +156,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
           />
           <button
             type="button"
-            className="btn"
+            className="btn btn-secondary"
             onClick={handleResolve}
             disabled={!regionQuery.trim() || isResolving || isSubmitting}
             style={{ minWidth: '168px' }}
@@ -292,7 +292,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
       <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
         <button
           type="submit"
-          className="btn"
+          className="btn btn-primary"
           disabled={!selectedCandidate || isSubmitting || isResolving}
           style={{ minWidth: '240px' }}
         >

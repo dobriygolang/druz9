@@ -28,6 +28,14 @@ const CLUSTER_BREAK_ZOOM = 9.75;
 const CLUSTER_MIN_CELL_SIZE = 0.02;
 const CLUSTER_CELL_SIZE_FACTOR = 20;
 
+function pluralizeRu(count: number, one: string, few: string, many: string) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
+
 function buildViewState(points: CommunityMapPoint[], events: CommunityEvent[]): ViewState {
   const currentUserPoint = points.find((point) => point.isCurrentUser);
   if (currentUserPoint) {
@@ -273,11 +281,11 @@ export const MapPage: React.FC = () => {
         <div className="map-hero__stats">
           <div className="map-hero__stat">
             <Compass size={16} />
-            <span>{points.length} участников</span>
+            <span>{points.length} {pluralizeRu(points.length, 'участник', 'участника', 'участников')}</span>
           </div>
           <div className="map-hero__stat">
             <CalendarDays size={16} />
-            <span>{events.length} событий</span>
+            <span>{events.length} {pluralizeRu(events.length, 'событие', 'события', 'событий')}</span>
           </div>
           <div className="map-hero__stat">
             <Sparkles size={16} />
@@ -292,8 +300,8 @@ export const MapPage: React.FC = () => {
 
         <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 3, display: 'flex', gap: '10px' }}>
           <div className="card" style={{ padding: '12px 14px', background: 'rgba(17,24,39,0.88)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>События</div>
-            <div style={{ fontWeight: 600 }}>{events.length}</div>
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>На карте</div>
+            <div style={{ fontWeight: 600 }}>{events.length} {pluralizeRu(events.length, 'событие', 'события', 'событий')}</div>
           </div>
         </div>
 

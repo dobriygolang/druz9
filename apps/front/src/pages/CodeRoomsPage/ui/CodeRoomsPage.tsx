@@ -84,6 +84,14 @@ const LEAGUES = [
   { name: 'Legend', minRating: 2350 },
 ];
 
+function pluralizeRu(count: number, one: string, few: string, many: string) {
+  const mod10 = count % 10;
+  const mod100 = count % 100;
+  if (mod10 === 1 && mod100 !== 11) return one;
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
+  return many;
+}
+
 const ARENA_RULE_SECTIONS = [
   {
     title: 'Arena duel',
@@ -475,7 +483,7 @@ export const CodeRoomsPage: React.FC = () => {
                 Админка
               </button>
             )}
-            <button className="btn btn-primary" onClick={() => setShowLeaguesModal(true)}>
+            <button className="btn btn-secondary" onClick={() => setShowLeaguesModal(true)}>
               <Trophy size={16} />
               Лиги
             </button>
@@ -531,7 +539,7 @@ export const CodeRoomsPage: React.FC = () => {
               <div className="code-room-prep-launch__actions">
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn btn-ghost"
                   onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&mode=executable${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
                 >
                   Открыть каталог
@@ -662,7 +670,7 @@ export const CodeRoomsPage: React.FC = () => {
                     <div className="leaderboard-main">
                       <div className="leaderboard-name">{entry.displayName}</div>
                       <div className="leaderboard-meta">
-                        <span>{entry.rating} ELO</span> <span>•</span> <span>{entry.league}</span> <span>•</span> <span>{entry.wins} побед</span> <span>•</span> <span>{entry.matches} матчей</span>
+                        <span>{entry.rating} ELO</span> <span>•</span> <span>{entry.league}</span> <span>•</span> <span>{entry.wins} {pluralizeRu(entry.wins, 'победа', 'победы', 'побед')}</span> <span>•</span> <span>{entry.matches} {pluralizeRu(entry.matches, 'матч', 'матча', 'матчей')}</span>
                       </div>
                     </div>
                     <div className="leaderboard-rate">{Math.round(entry.winRate * 100)}%</div>
