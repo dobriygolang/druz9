@@ -177,7 +177,7 @@ telegram_bot_username:
 yandex_oauth_client_id:
   usage: "Yandex OAuth client ID; env YANDEX_OAUTH_CLIENT_ID overrides"
   group: "external"
-  value: ""
+  value: "df478727868b4c06aaa3ffffa414c58a"
   type: "string"
   writable: false
 
