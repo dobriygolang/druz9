@@ -496,7 +496,7 @@ export function InterviewPrepSessionPage() {
             aria-orientation="horizontal"
             aria-label="Изменить высоту live coding editor"
           />
-          <div className="interview-prep-live-actions">
+          <div className="interview-prep-live-actions interview-prep-live-actions--inline">
             <button
               className="btn btn-primary"
               onClick={() => void handleSubmitCode()}

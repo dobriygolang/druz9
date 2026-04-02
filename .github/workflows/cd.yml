@@ -20,6 +20,9 @@ jobs:
       DEPLOY_SSH_KEY: ${{ secrets.DEPLOY_SSH_KEY != '' && secrets.DEPLOY_SSH_KEY || secrets.ORACLE_SSH_KEY }}
       DEPLOY_SSH_PORT: ${{ secrets.DEPLOY_SSH_PORT != '' && secrets.DEPLOY_SSH_PORT || secrets.ORACLE_SSH_PORT || '22' }}
       DEPLOY_APP_DIR: ${{ secrets.DEPLOY_APP_DIR != '' && secrets.DEPLOY_APP_DIR || secrets.ORACLE_APP_DIR || '/root/druz9' }}
+      CANONICAL_APP_HOST: druz9.online
+      CANONICAL_APP_ALIASES: druz9.ru
+      CANONICAL_S3_HOST: s3.druz9.online
 
     steps:
       - uses: actions/checkout@v4
@@ -57,8 +60,9 @@ jobs:
       - name: Deploy on server
         uses: appleboy/ssh-action@v1.2.0
         env:
-          APP_HOST: ${{ secrets.APP_HOST }}
-          API_HOST: ${{ secrets.API_HOST }}
+          APP_HOST: ${{ env.CANONICAL_APP_HOST }}
+          API_HOST: ${{ env.CANONICAL_APP_HOST }}
+          APP_ALIASES: ${{ env.CANONICAL_APP_ALIASES }}
           APP_EMAIL: ${{ secrets.APP_EMAIL }}
           TELEGRAM_BOT_NAME: ${{ secrets.TELEGRAM_BOT_NAME }}
           ARENA_REQUIRE_AUTH: ${{ secrets.ARENA_REQUIRE_AUTH }}
@@ -66,9 +70,9 @@ jobs:
           POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
           S3_BUCKET: ${{ secrets.S3_BUCKET }}
           S3_REGION: ${{ secrets.S3_REGION }}
-          COOKIE_DOMAIN: ${{ secrets.COOKIE_DOMAIN }}
-          S3_PUBLIC_ENDPOINT: ${{ secrets.S3_PUBLIC_ENDPOINT }}
-          S3_HOST: ${{ secrets.S3_HOST }}
+          COOKIE_DOMAIN: ""
+          S3_PUBLIC_ENDPOINT: https://${{ env.CANONICAL_S3_HOST }}
+          S3_HOST: ${{ env.CANONICAL_S3_HOST }}
           MINIO_CONSOLE_HOST: ${{ secrets.MINIO_CONSOLE_HOST }}
           MINIO_CONSOLE_BASIC_AUTH: ${{ secrets.MINIO_CONSOLE_BASIC_AUTH }}
           DATABASE_URL: ${{ secrets.DATABASE_URL }}
@@ -78,12 +82,13 @@ jobs:
           S3_ACCESS_KEY: ${{ secrets.S3_ACCESS_KEY }}
           S3_SECRET_KEY: ${{ secrets.S3_SECRET_KEY }}
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          AI_REVIEW_API_KEY: ${{ secrets.AI_REVIEW_API_KEY }}
         with:
           host: ${{ env.DEPLOY_HOST }}
           username: ${{ env.DEPLOY_USER }}
           key: ${{ env.DEPLOY_SSH_KEY }}
           port: ${{ env.DEPLOY_SSH_PORT }}
-          envs: APP_HOST,API_HOST,APP_EMAIL,TELEGRAM_BOT_NAME,ARENA_REQUIRE_AUTH,POSTGRES_DB,POSTGRES_USER,S3_BUCKET,S3_REGION,COOKIE_DOMAIN,S3_PUBLIC_ENDPOINT,S3_HOST,MINIO_CONSOLE_HOST,MINIO_CONSOLE_BASIC_AUTH,DATABASE_URL,POSTGRES_PASSWORD,MINIO_ROOT_USER,MINIO_ROOT_PASSWORD,S3_ACCESS_KEY,S3_SECRET_KEY,TELEGRAM_BOT_TOKEN
+          envs: APP_HOST,API_HOST,APP_ALIASES,APP_EMAIL,TELEGRAM_BOT_NAME,ARENA_REQUIRE_AUTH,POSTGRES_DB,POSTGRES_USER,S3_BUCKET,S3_REGION,COOKIE_DOMAIN,S3_PUBLIC_ENDPOINT,S3_HOST,MINIO_CONSOLE_HOST,MINIO_CONSOLE_BASIC_AUTH,DATABASE_URL,POSTGRES_PASSWORD,MINIO_ROOT_USER,MINIO_ROOT_PASSWORD,S3_ACCESS_KEY,S3_SECRET_KEY,TELEGRAM_BOT_TOKEN,AI_REVIEW_API_KEY
           script: |
             set -euo pipefail
             cd "${{ env.DEPLOY_APP_DIR }}"
@@ -95,6 +100,7 @@ jobs:
             cat > apps/deploy/.env.prod <<EOF
             APP_HOST=${APP_HOST}
             API_HOST=${API_HOST}
+            APP_ALIASES=${APP_ALIASES}
             APP_EMAIL=${APP_EMAIL}
             TELEGRAM_BOT_NAME=${TELEGRAM_BOT_NAME}
             ARENA_REQUIRE_AUTH=${ARENA_REQUIRE_AUTH}
@@ -110,113 +116,6 @@ jobs:
             DATABASE_URL=${DATABASE_URL}
             EOF
 
-            cat > apps/deploy/runtime/values_prod.yaml <<EOF
-            server_http_addr:
-              usage: "HTTP server listen address"
-              group: "server"
-              value: ":8080"
-              type: "string"
-              writable: false
-
-            server_http_timeout:
-              usage: "HTTP server request timeout"
-              group: "server"
-              value: "30s"
-              type: "duration"
-              writable: false
-
-            server_grpc_addr:
-              usage: "gRPC server listen address"
-              group: "server"
-              value: ":9000"
-              type: "string"
-              writable: false
-
-            server_grpc_timeout:
-              usage: "gRPC server request timeout"
-              group: "server"
-              value: "30s"
-              type: "duration"
-              writable: false
-
-            arena_require_auth:
-              usage: "Require authentication for arena endpoints"
-              group: "arena"
-              value: "${ARENA_REQUIRE_AUTH}"
-              type: "bool"
-              writable: true
-
-            database_url:
-              usage: "Primary PostgreSQL DSN"
-              group: "data"
-              value: "${DATABASE_URL}"
-              type: "string"
-              writable: false
-
-            cookie_domain:
-              usage: "Session cookie domain"
-              group: "auth"
-              value: "${COOKIE_DOMAIN}"
-              type: "string"
-              writable: false
-
-            cookie_secure:
-              usage: "Use secure cookies"
-              group: "auth"
-              value: "true"
-              type: "bool"
-              writable: false
-
-            cookie_same_site:
-              usage: "Session cookie same-site policy"
-              group: "auth"
-              value: "None"
-              type: "string"
-              writable: false
-
-            telegram_bot_token:
-              usage: "Telegram bot token"
-              group: "external"
-              value: "${TELEGRAM_BOT_TOKEN}"
-              type: "string"
-              writable: false
-
-            s3_endpoint:
-              usage: "S3 endpoint"
-              group: "external"
-              value: "${S3_PUBLIC_ENDPOINT}"
-              type: "string"
-              writable: false
-
-            s3_public_endpoint:
-              usage: "Public S3 endpoint for signed URLs"
-              group: "external"
-              value: "${S3_PUBLIC_ENDPOINT}"
-              type: "string"
-              writable: false
-
-            s3_bucket:
-              usage: "S3 bucket name"
-              group: "external"
-              value: "${S3_BUCKET}"
-              type: "string"
-              writable: false
-
-            s3_access_key:
-              usage: "S3 access key"
-              group: "external"
-              value: "${S3_ACCESS_KEY}"
-              type: "string"
-              writable: false
-
-            s3_secret_key:
-              usage: "S3 secret key"
-              group: "external"
-              value: "${S3_SECRET_KEY}"
-              type: "string"
-              writable: false
-            EOF
-
             printf '%s' "${DATABASE_URL}" > apps/deploy/runtime/secrets/prod/database_url
             printf '%s' "${POSTGRES_PASSWORD}" > apps/deploy/runtime/secrets/prod/postgres_password
             printf '%s' "${MINIO_ROOT_USER}" > apps/deploy/runtime/secrets/prod/minio_root_user
@@ -224,6 +123,7 @@ jobs:
             printf '%s' "${S3_ACCESS_KEY}" > apps/deploy/runtime/secrets/prod/s3_access_key
             printf '%s' "${S3_SECRET_KEY}" > apps/deploy/runtime/secrets/prod/s3_secret_key
             printf '%s' "${TELEGRAM_BOT_TOKEN}" > apps/deploy/runtime/secrets/prod/telegram_bot_token
+            printf '%s' "${AI_REVIEW_API_KEY}" > apps/deploy/runtime/secrets/prod/ai_review_api_key
 
             chmod 600 apps/deploy/.env.prod apps/deploy/runtime/secrets/prod/*
 

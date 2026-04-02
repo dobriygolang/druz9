@@ -55,7 +55,7 @@ export function InterviewPrepPage() {
   const [error, setError] = useState<string | null>(null);
   const [startingTaskId, setStartingTaskId] = useState<string | null>(null);
   const [search, setSearch] = useState(searchParams.get('q') ?? '');
-  const [modeFilter, setModeFilter] = useState<TaskModeFilter>((searchParams.get('mode') as TaskModeFilter) || 'executable');
+  const [modeFilter, setModeFilter] = useState<TaskModeFilter>((searchParams.get('mode') as TaskModeFilter) || 'all');
   const [category, setCategory] = useState<TaskCategory>((searchParams.get('category') as TaskCategory) || 'all');
   const [company, setCompany] = useState(searchParams.get('company') ?? 'all');
   const randomLaunchTriggered = useRef(false);
@@ -111,7 +111,7 @@ export function InterviewPrepPage() {
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
-      if (task.prepType !== 'system_design' && !task.isExecutable) {
+      if (!task.isExecutable && task.prepType !== 'system_design') {
         return false;
       }
       const taskCategory = categoryForTask(task);
@@ -203,7 +203,7 @@ export function InterviewPrepPage() {
               onClick={() => {
                 setCategory('all');
                 setCompany('all');
-                setModeFilter('executable');
+                setModeFilter('all');
                 setSearch('');
               }}
             >

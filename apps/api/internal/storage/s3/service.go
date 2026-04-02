@@ -18,6 +18,7 @@ import (
 
 type Service struct {
 	client         *minio.Client
+	presignClient  *minio.Client
 	publicEndpoint *url.URL
 	bucket         string
 }
@@ -51,8 +52,20 @@ func New(cfg *config.S3) (*Service, error) {
 		return nil, fmt.Errorf("create minio client: %w", err)
 	}
 
+	var presignClient *minio.Client
+	if publicEndpoint != nil && (publicEndpoint.Path == "" || publicEndpoint.Path == "/") {
+		presignClient, err = minio.New(publicEndpoint.Host, &minio.Options{
+			Creds:  credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
+			Secure: publicEndpoint.Scheme == "https",
+		})
+		if err != nil {
+			return nil, fmt.Errorf("create public presign client: %w", err)
+		}
+	}
+
 	return &Service{
 		client:         client,
+		presignClient:  presignClient,
 		publicEndpoint: publicEndpoint,
 		bucket:         cfg.Bucket,
 	}, nil
@@ -131,11 +144,16 @@ func (s *Service) PresignGetObject(
 		expiry = time.Hour
 	}
 
-	u, err := s.client.PresignedGetObject(ctx, s.bucket, key, expiry, nil)
+	client := s.client
+	if s.presignClient != nil {
+		client = s.presignClient
+	}
+
+	u, err := client.PresignedGetObject(ctx, s.bucket, key, expiry, nil)
 	if err != nil {
 		return "", fmt.Errorf("presign object: %w", err)
 	}
-	if s.publicEndpoint != nil {
+	if s.presignClient == nil && s.publicEndpoint != nil {
 		u = replacePresignedEndpoint(u, s.publicEndpoint)
 	}
 	return u.String(), nil
@@ -156,11 +174,16 @@ func (s *Service) PresignPutObject(
 		expiry = 15 * time.Minute
 	}
 
-	u, err := s.client.PresignedPutObject(ctx, s.bucket, key, expiry)
+	client := s.client
+	if s.presignClient != nil {
+		client = s.presignClient
+	}
+
+	u, err := client.PresignedPutObject(ctx, s.bucket, key, expiry)
 	if err != nil {
 		return "", fmt.Errorf("presign put object: %w", err)
 	}
-	if s.publicEndpoint != nil {
+	if s.presignClient == nil && s.publicEndpoint != nil {
 		u = replacePresignedEndpoint(u, s.publicEndpoint)
 	}
 	return u.String(), nil

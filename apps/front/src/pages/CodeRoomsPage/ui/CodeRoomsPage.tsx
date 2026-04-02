@@ -540,14 +540,14 @@ export const CodeRoomsPage: React.FC = () => {
                 <button
                   type="button"
                   className="btn btn-ghost"
-                  onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&mode=executable${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
+                  onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
                 >
                   Открыть каталог
                 </button>
                 <button
                   type="button"
                   className="btn btn-primary"
-                  onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}&mode=executable${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
+                  onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
                 >
                   Случайная задача
                 </button>

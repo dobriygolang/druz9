@@ -960,6 +960,20 @@
   flex-wrap: wrap;
 }
 
+.interview-prep-live-actions--inline {
+  align-items: stretch;
+}
+
+.interview-prep-live-actions--inline .btn {
+  flex: 0 0 auto;
+}
+
+.interview-prep-live-actions--inline .interview-prep-live-result {
+  flex: 1 1 360px;
+  min-width: 280px;
+  margin: 0;
+}
+
 .interview-prep-live-spacer {
   flex: 1 1 auto;
 }
