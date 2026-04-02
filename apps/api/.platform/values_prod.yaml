@@ -240,7 +240,7 @@ ai_review_model:
 ai_review_timeout:
   usage: "Timeout for AI review provider requests"
   group: "external"
-  value: "30s"
+  value: "500s"
   type: "duration"
   writable: true
 
