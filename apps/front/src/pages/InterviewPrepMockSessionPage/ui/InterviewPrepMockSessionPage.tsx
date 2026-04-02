@@ -87,6 +87,7 @@ export function InterviewPrepMockSessionPage() {
   const [answerReview, setAnswerReview] = useState<InterviewPrepAnswerReview | null>(null);
   const [submitErrorDetails, setSubmitErrorDetails] = useState<string | null>(null);
   const [answerText, setAnswerText] = useState('');
+  const [selectedStageId, setSelectedStageId] = useState<string | null>(null);
   const [speechSupported] = useState(Boolean(getSpeechRecognitionCtor()));
   const [speechActive, setSpeechActive] = useState(false);
   const speechRef = useRef<any>(null);
@@ -119,6 +120,11 @@ export function InterviewPrepMockSessionPage() {
   }, [session?.currentStage?.id]);
 
   useEffect(() => {
+    if (!session?.currentStage?.id) return;
+    setSelectedStageId((current) => current ?? session.currentStage!.id);
+  }, [session?.currentStage?.id]);
+
+  useEffect(() => {
     return () => {
       if (speechRef.current) {
         speechRef.current.stop();
@@ -127,6 +133,11 @@ export function InterviewPrepMockSessionPage() {
   }, []);
 
   const currentStage = session?.currentStage;
+  const viewedStage = useMemo(
+    () => (session?.stages ?? []).find((stage) => stage.id === selectedStageId) ?? currentStage,
+    [currentStage, selectedStageId, session?.stages],
+  );
+  const isViewingCurrentStage = viewedStage?.id === currentStage?.id;
   const completedStages = useMemo(
     () => (session?.stages ?? []).filter((stage) => stage.status === 'completed'),
     [session],
@@ -270,13 +281,16 @@ export function InterviewPrepMockSessionPage() {
         <aside className="interview-prep-mock-timeline">
           <div className="timeline-title">Этапы интервью</div>
           <div className="timeline-list">
-            {(session.stages ?? []).map((stage, idx) => {
-              const isActive = stage.stageIndex === session.currentStageIndex;
-              const isCompleted = stage.status === 'completed';
-              return (
-                <div 
+              {(session.stages ?? []).map((stage, idx) => {
+                const isActive = stage.stageIndex === session.currentStageIndex;
+                const isCompleted = stage.status === 'completed';
+                const isSelected = stage.id === viewedStage?.id;
+                return (
+                <button
+                  type="button"
                   key={stage.id} 
-                  className={`timeline-item ${isActive ? 'is-active' : ''} ${isCompleted ? 'is-completed' : ''}`}
+                  className={`timeline-item ${isActive ? 'is-active' : ''} ${isCompleted ? 'is-completed' : ''} ${isSelected ? 'is-selected' : ''}`}
+                  onClick={() => setSelectedStageId(stage.id)}
                 >
                   <div className="timeline-item__node">
                     {isCompleted ? <CheckCircle2 size={14} /> : <span>{idx + 1}</span>}
@@ -288,7 +302,7 @@ export function InterviewPrepMockSessionPage() {
                     </span>
                   </div>
                   {isActive && <div className="timeline-item__active-indicator" />}
-                </div>
+                </button>
               );
             })}
           </div>
@@ -304,17 +318,25 @@ export function InterviewPrepMockSessionPage() {
           <section className="card dashboard-card task-statement-card">
             <div className="dashboard-card__header">
               <div>
-                <span className="badge badge-secondary">{STAGE_LABELS[currentStage.kind]}</span>
-                <h2>{currentStage.task?.title ?? 'Текущий этап'}</h2>
+                <span className="badge badge-secondary">{STAGE_LABELS[viewedStage?.kind ?? currentStage.kind]}</span>
+                <h2>{viewedStage?.task?.title ?? 'Текущий этап'}</h2>
               </div>
-              {currentStage.task?.durationSeconds ? (
+              {viewedStage?.task?.durationSeconds ? (
                 <div className="badge">
                   <Clock3 size={14} />
-                  {Math.round(currentStage.task.durationSeconds / 60)} мин
+                  {Math.round(viewedStage.task.durationSeconds / 60)} мин
                 </div>
               ) : null}
             </div>
-            <pre className="interview-prep-statement">{currentStage.task?.statement ?? ''}</pre>
+            {!isViewingCurrentStage && (
+              <div className="interview-prep-stage-banner">
+                <span className="badge">Архив этапа</span>
+                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setSelectedStageId(currentStage.id)}>
+                  Вернуться к текущему этапу
+                </button>
+              </div>
+            )}
+            <pre className="interview-prep-statement">{viewedStage?.task?.statement ?? ''}</pre>
           </section>
 
           {completedStages.length > 0 && (
@@ -350,7 +372,43 @@ export function InterviewPrepMockSessionPage() {
             </section>
           )}
 
-          {session.status !== 'finished' && currentStage.status === 'solving' && currentStage.kind !== 'system_design' && (
+          {!isViewingCurrentStage && viewedStage && (
+            <section className="card dashboard-card interview-prep-workstation interview-prep-workstation--readonly">
+              <div className="workstation-toolbar">
+                <div className="workstation-toolbar__title">
+                  <CheckCircle2 size={16} />
+                  <span>Просмотр пройденного этапа</span>
+                </div>
+                <span className="badge">{viewedStage.status === 'completed' ? 'Завершён' : 'В процессе'}</span>
+              </div>
+              <div className="workstation-archive">
+                <p className="interview-prep-muted">
+                  Здесь можно просматривать старые этапы, не теряя текущий прогресс справа и сверху.
+                </p>
+                {viewedStage.reviewSummary && (
+                  <div className="interview-prep-result-row interview-prep-result-row--stacked">
+                    <strong>Итог ревью</strong>
+                    <span>{viewedStage.reviewScore ? `${viewedStage.reviewScore}/10` : 'Без числовой оценки'}</span>
+                    <span>{viewedStage.reviewSummary}</span>
+                  </div>
+                )}
+                {(viewedStage.questionResults ?? []).length > 0 && (
+                  <div className="console-review-gaps">
+                    <span className="gaps-label">Follow-up вопросы:</span>
+                    <ul>
+                      {(viewedStage.questionResults ?? []).map((result) => (
+                        <li key={result.id}>
+                          {result.position}. {result.prompt} {result.answeredAt ? `(${result.score}/10)` : '(без ответа)'}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            </section>
+          )}
+
+          {session.status !== 'finished' && isViewingCurrentStage && currentStage.status === 'solving' && currentStage.kind !== 'system_design' && (
             <section className="card dashboard-card interview-prep-workstation">
               <div className="workstation-toolbar">
                 <div className="workstation-toolbar__title">
@@ -401,7 +459,7 @@ export function InterviewPrepMockSessionPage() {
             </section>
           )}
 
-          {session.status !== 'finished' && currentStage.status === 'solving' && currentStage.kind === 'system_design' && (
+          {session.status !== 'finished' && isViewingCurrentStage && currentStage.status === 'solving' && currentStage.kind === 'system_design' && (
             <section className="card dashboard-card interview-prep-workstation">
               <div className="workstation-toolbar">
                 <div className="workstation-toolbar__title">
@@ -455,7 +513,7 @@ export function InterviewPrepMockSessionPage() {
             </section>
           )}
 
-          {session.status !== 'finished' && currentStage.status === 'questions' && currentStage.currentQuestion && (
+          {session.status !== 'finished' && isViewingCurrentStage && currentStage.status === 'questions' && currentStage.currentQuestion && (
             <section className="card dashboard-card interview-prep-workstation">
               <div className="workstation-toolbar">
                 <div className="workstation-toolbar__title">

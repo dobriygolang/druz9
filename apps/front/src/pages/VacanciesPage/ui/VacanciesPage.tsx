@@ -194,6 +194,42 @@ export const VacanciesPage: React.FC = () => {
               <span className="badge">Нормальный поиск</span>
             </div>
           )}
+
+          {!isMobile && (
+            <div className="vacancies-hero__search-row">
+              <div className="vacancies-search__field vacancies-search__field--hero">
+                <Search size={18} />
+                <input
+                  type="text"
+                  className="input"
+                  placeholder="Поиск по названию, компании или описанию"
+                  aria-label="Поиск вакансий"
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+
+              <div className="vacancies-hero__selects">
+                <FancySelect
+                  value={employmentFilter}
+                  onChange={setEmploymentFilter}
+                  options={[
+                    { value: 'all', label: 'Любая занятость' },
+                    ...EMPLOYMENT_TYPE_OPTIONS.map((option) => ({ value: option.value, label: option.label })),
+                  ]}
+                />
+
+                <FancySelect
+                  value={locationFilter}
+                  onChange={setLocationFilter}
+                  options={[
+                    { value: 'all', label: 'Любая локация' },
+                    ...locations.map((location) => ({ value: location, label: location })),
+                  ]}
+                />
+              </div>
+            </div>
+          )}
         </div>
 
         {!isMobile && (
@@ -236,6 +272,7 @@ export const VacanciesPage: React.FC = () => {
         )}
       </section>
 
+      {isMobile && (
       <section className="vacancies-search">
         <div className="vacancies-search__row">
           <div className="vacancies-search__field">
@@ -269,6 +306,7 @@ export const VacanciesPage: React.FC = () => {
           />
         </div>
       </section>
+      )}
 
       {isLoading ? (
         <div style={{ display: 'flex', justifyContent: 'center', padding: '80px 0' }}>

@@ -65,14 +65,10 @@ export const EventForm: React.FC<EventFormProps> = ({
       className="card fade-in event-form-panel"
       style={{
         zIndex: 10,
-        backgroundColor: 'rgba(24, 24, 27, 0.98)',
-        backdropFilter: 'blur(24px)',
         padding: '24px',
         display: 'flex',
         flexDirection: 'column',
         borderRadius: '24px',
-        boxShadow: '0 20px 60px rgba(0, 0, 0, 0.5)',
-        border: '1px solid rgba(255, 255, 255, 0.1)',
         width: '100%',
       }}
     >
@@ -115,7 +111,6 @@ export const EventForm: React.FC<EventFormProps> = ({
           value={draft.title}
           onChange={(e) => setDraft(curr => curr ? { ...curr, title: e.target.value } : null)}
           style={{
-            background: 'rgba(0,0,0,0.2)',
             height: '44px',
             borderColor: fieldErrors?.title ? '#ef4444' : undefined,
           }}
@@ -130,7 +125,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           placeholder="Описание события (опционально)"
           value={draft.description}
           onChange={(e) => setDraft(curr => curr ? { ...curr, description: e.target.value } : null)}
-          style={{ minHeight: '80px', resize: 'vertical', background: 'rgba(0,0,0,0.2)', padding: '12px' }}
+          style={{ minHeight: '80px', resize: 'vertical', padding: '12px' }}
         />
         <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr 1fr', gap: '10px' }}>
           <input
@@ -138,14 +133,14 @@ export const EventForm: React.FC<EventFormProps> = ({
             placeholder="Группа / клуб"
             value={draft.event_group ?? ''}
             onChange={(e) => setDraft(curr => curr ? { ...curr, event_group: e.target.value } : null)}
-            style={{ background: 'rgba(0,0,0,0.2)', height: '44px' }}
+            style={{ height: '44px' }}
           />
           <input
             className="input"
             placeholder="Тип ивента"
             value={draft.event_type ?? ''}
             onChange={(e) => setDraft(curr => curr ? { ...curr, event_type: e.target.value } : null)}
-            style={{ background: 'rgba(0,0,0,0.2)', height: '44px' }}
+            style={{ height: '44px' }}
           />
           <FancySelect
             value={draft.event_color ?? 'violet'}
@@ -159,7 +154,6 @@ export const EventForm: React.FC<EventFormProps> = ({
             value={draft.meeting_link}
             onChange={(e) => setDraft(curr => curr ? { ...curr, meeting_link: e.target.value } : null)}
             style={{
-              background: 'rgba(0,0,0,0.2)',
               height: '44px',
               borderColor: fieldErrors?.meetingLink ? '#ef4444' : undefined,
             }}
@@ -195,7 +189,7 @@ export const EventForm: React.FC<EventFormProps> = ({
               placeholder="Название места (без координат точка на карте не появится)"
               value={draft.place_label}
               onChange={(e) => setDraft(curr => curr ? { ...curr, place_label: e.target.value } : null)}
-              style={{ background: 'rgba(0,0,0,0.2)', height: '44px' }}
+              style={{ height: '44px' }}
             />
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
               Сейчас карта принимает только события с координатами. Один текст локации без latitude/longitude не ставит точку на карту.
@@ -213,7 +207,6 @@ export const EventForm: React.FC<EventFormProps> = ({
             value={draft.scheduled_at}
             onChange={(e) => setDraft(curr => curr ? { ...curr, scheduled_at: e.target.value } : null)}
             style={{ 
-              background: 'rgba(0,0,0,0.2)', 
               height: '44px', 
               colorScheme: 'dark', 
               paddingLeft: '38px',

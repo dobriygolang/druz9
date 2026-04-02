@@ -9,7 +9,7 @@ import (
 const leaderboardSelect = `
 	SELECT
 		aps.user_id::text,
-		COALESCE(NULLIF(trim(concat_ws(' ', u.first_name, u.last_name)), ''), NULLIF(u.telegram_username, ''), aps.display_name),
+		COALESCE(NULLIF(trim(concat_ws(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), aps.display_name),
 		aps.rating,
 		aps.wins,
 		aps.losses,

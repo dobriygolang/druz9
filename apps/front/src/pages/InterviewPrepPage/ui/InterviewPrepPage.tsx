@@ -206,11 +206,17 @@ export function InterviewPrepPage() {
     setError(null);
     setStartingMock(true);
     try {
-      const session = await interviewPrepApi.startMockSession(company === 'all' ? 'general' : company);
+      const effectiveCompany = company === 'all' ? 'general' : company;
+      const session = await interviewPrepApi.startMockSession(effectiveCompany);
       navigate(`/interview-prep/mock/${session.id}`);
     } catch (e: any) {
       console.error('Failed to start mock interview:', e);
-      setError(e.response?.data?.error || 'Не удалось начать mock interview');
+      const apiError = e.response?.data?.error || '';
+      if (apiError.includes('mock interview task pool is incomplete')) {
+        setError('Для выбранной компании сценарий ещё не полностью собран. Запусти общий сценарий general или выбери компанию в фильтрах ниже.');
+      } else {
+        setError(apiError || 'Не удалось начать mock interview');
+      }
     } finally {
       setStartingMock(false);
     }
@@ -252,7 +258,7 @@ export function InterviewPrepPage() {
           <div className="interview-prep-hero__actions" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
             <button className="btn btn-secondary" disabled={startingMock} onClick={() => void startMockInterview()} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
               <BrainCircuit size={16} />
-              <span>{company === 'all' ? 'Запустить mock interview' : 'Запустить mock interview'}</span>
+              <span>{company === 'all' ? 'Запустить mock interview (general)' : 'Запустить mock interview'}</span>
             </button>
             <button className="btn btn-primary" onClick={() => void handleRandomStart(filteredTasks)} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
               <Shuffle size={16} />
@@ -374,6 +380,9 @@ export function InterviewPrepPage() {
                   {item === 'all' ? 'Все' : item}
                 </button>
               ))}
+            </div>
+            <div className="interview-prep-muted" style={{ marginTop: '8px' }}>
+              Если компанию не выбирать, mock interview стартует на общем сценарии `general`.
             </div>
           </div>
 

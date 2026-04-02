@@ -2,10 +2,10 @@
 
 :root {
   /* Core Colors - Refined for depth */
-  --bg-color: #08080A;
-  --surface-color: #121217;
-  --surface-elevated: #1C1C22;
-  --surface-active: #25252E;
+  --bg-color: #10141b;
+  --surface-color: #171c24;
+  --surface-elevated: #202632;
+  --surface-active: #2a3140;
   --surface-hover: rgba(255, 255, 255, 0.04);
   
   --text-primary: #FFFFFF;

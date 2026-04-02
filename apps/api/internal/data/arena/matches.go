@@ -413,7 +413,7 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 	rows, err := tx.Query(ctx, `
 		SELECT
 			p.user_id,
-			COALESCE(NULLIF(trim(concat_ws(' ', u.first_name, u.last_name)), ''), NULLIF(u.telegram_username, ''), p.display_name),
+			COALESCE(NULLIF(trim(concat_ws(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), p.display_name),
 			p.is_winner,
 			p.best_runtime_ms,
 			COALESCE(aps.rating, $2) AS rating,

@@ -46,14 +46,12 @@
   border-radius: var(--radius-lg);
   padding: var(--space-6);
   border: 1px solid var(--border-color);
-  transition: all var(--transition-base);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), background-color var(--transition-base);
   box-shadow: var(--shadow-sm);
 }
 
 .card:hover {
   border-color: var(--border-active);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
 }
 
 .compact {
@@ -72,6 +70,12 @@
   overflow-y: auto;
   background-color: var(--bg-color);
   min-width: 0;
+}
+
+@media (max-width: 1180px) {
+  .main-content {
+    padding: var(--space-6) var(--space-6) var(--space-10);
+  }
 }
 
 .main-content-code-room {
@@ -1421,6 +1425,10 @@
   min-width: min(320px, 100%);
 }
 
+.events-filter-grid--hero {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) auto;
+}
+
 .events-month-switcher {
   display: inline-flex;
   align-items: center;
@@ -1635,9 +1643,10 @@
 
 .event-form-panel {
   background:
-    linear-gradient(180deg, rgba(35, 35, 41, 0.97), rgba(23, 23, 30, 0.96)) !important;
-  border: 1px solid rgba(255, 255, 255, 0.09) !important;
-  box-shadow: 0 24px 64px rgba(0, 0, 0, 0.34) !important;
+    radial-gradient(circle at top right, var(--accent-muted), transparent 38%),
+    linear-gradient(180deg, var(--surface-elevated), var(--surface-color)) !important;
+  border: 1px solid var(--border-color) !important;
+  box-shadow: var(--shadow-xl) !important;
 }
 
 .event-form-panel__close {

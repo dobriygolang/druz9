@@ -120,7 +120,7 @@ SELECT
   e.scheduled_at,
   e.created_at,
   e.creator_id::text,
-  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.telegram_username, ''), 'user')
+  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.username, ''), 'user')
 FROM events e
 JOIN users cu ON cu.id = e.creator_id
 %s
@@ -206,9 +206,15 @@ func (r *Repo) fetchParticipants(
 SELECT
   ep.event_id::text,
   ep.user_id::text,
-  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', pu.first_name, pu.last_name)), ''), NULLIF(pu.telegram_username, ''), 'user'),
+  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', pu.first_name, pu.last_name)), ''), NULLIF(pu.username, ''), 'user'),
   COALESCE(pu.avatar_url, ''),
-  COALESCE(pu.telegram_username, ''),
+  COALESCE((
+    SELECT NULLIF(ui.username, '')
+    FROM user_identities ui
+    WHERE ui.user_id = pu.id
+      AND ui.provider = 'telegram'
+    LIMIT 1
+  ), ''),
   COALESCE(pu.first_name, ''),
   COALESCE(pu.last_name, ''),
   ep.status
@@ -291,7 +297,7 @@ SELECT
   e.scheduled_at,
   e.created_at,
   e.creator_id::text,
-  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.telegram_username, ''), 'user')
+  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.username, ''), 'user')
 FROM events e
 JOIN users cu ON cu.id = e.creator_id
 WHERE e.id = $1

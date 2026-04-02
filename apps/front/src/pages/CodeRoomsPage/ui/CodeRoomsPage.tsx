@@ -533,11 +533,22 @@ export const CodeRoomsPage: React.FC = () => {
                   type="button"
                   className="btn btn-primary solo-practice-hero__btn"
                   onClick={async () => {
+                    const effectiveCompany = prepLaunchCompany === 'all' ? 'general' : prepLaunchCompany;
                     try {
-                      const session = await interviewPrepApi.startMockSession(prepLaunchCompany === 'all' ? 'general' : prepLaunchCompany);
+                      const session = await interviewPrepApi.startMockSession(effectiveCompany);
                       navigate(`/interview-prep/mock/${session.id}`);
-                    } catch (error) {
+                    } catch (error: any) {
                       console.error('Failed to start mock interview:', error);
+                      const apiError = error?.response?.data?.error || '';
+                      if (effectiveCompany !== 'general' && apiError.includes('mock interview task pool is incomplete')) {
+                        try {
+                          const fallbackSession = await interviewPrepApi.startMockSession('general');
+                          navigate(`/interview-prep/mock/${fallbackSession.id}`);
+                          return;
+                        } catch (fallbackError) {
+                          console.error('Failed to fallback to general mock interview:', fallbackError);
+                        }
+                      }
                     }
                   }}
                 >
@@ -590,7 +601,7 @@ export const CodeRoomsPage: React.FC = () => {
           </div>
         )}
 
-        <div className="code-rooms-dashboard-grid">
+        <div className="code-rooms-dashboard-grid code-rooms-dashboard-grid--primary">
           <section className="card dashboard-card code-rooms-launch-card">
             <div className="dashboard-card__header">
               <div>
@@ -802,7 +813,7 @@ export const CodeRoomsPage: React.FC = () => {
             resetCreateModal();
           }
         }}>
-          <div className="modal modal-wide" onClick={(e) => e.stopPropagation()}>
+          <div className="modal modal-wide code-rooms-create-modal" onClick={(e) => e.stopPropagation()}>
             <>
               <div className="modal-header">
                 <h2>Новая комната</h2>

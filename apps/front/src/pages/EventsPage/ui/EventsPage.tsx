@@ -297,6 +297,36 @@ export const EventsPage: React.FC = () => {
             </button>
           </div>
 
+          {!isMobile && (
+            <div className="events-filter-grid events-filter-grid--hero">
+              <div className="events-filter-field">
+                <label>Группа</label>
+                <FancySelect
+                  value={groupFilter}
+                  options={[
+                    { value: 'all', label: 'Все группы' },
+                    ...eventGroups.map((group) => ({ value: group, label: group })),
+                  ]}
+                  onChange={setGroupFilter}
+                />
+              </div>
+              <div className="events-filter-field">
+                <label>Тип</label>
+                <FancySelect
+                  value={typeFilter}
+                  options={[
+                    { value: 'all', label: 'Все типы' },
+                    ...eventTypes.map((type) => ({ value: type, label: type })),
+                  ]}
+                  onChange={setTypeFilter}
+                />
+              </div>
+              <button className="btn btn-secondary events-filter-reset" onClick={() => { setGroupFilter('all'); setTypeFilter('all'); }}>
+                Сбросить
+              </button>
+            </div>
+          )}
+
           <button className="btn btn-primary events-hero__create" onClick={() => handleCreateClick()}>
             <Plus size={18} />
             <span>{isMobile ? 'Создать' : 'Создать событие'}</span>
@@ -314,48 +344,6 @@ export const EventsPage: React.FC = () => {
           )}
         </div>
       </section>
-
-      {!isMobile && (
-        <section className="card dashboard-card events-filter-card">
-          <div className="dashboard-card__header">
-            <div>
-              <h2>Фильтры календаря</h2>
-              <p className="interview-prep-muted">Оставь только нужные группы и типы, чтобы календарь не шумел.</p>
-            </div>
-            <div className="events-filter-card__icon">
-              <SlidersHorizontal size={16} />
-            </div>
-          </div>
-
-          <div className="events-filter-grid">
-            <div className="events-filter-field">
-              <label>Группа</label>
-              <FancySelect
-                value={groupFilter}
-                options={[
-                  { value: 'all', label: 'Все группы' },
-                  ...eventGroups.map((group) => ({ value: group, label: group })),
-                ]}
-                onChange={setGroupFilter}
-              />
-            </div>
-            <div className="events-filter-field">
-              <label>Тип</label>
-              <FancySelect
-                value={typeFilter}
-                options={[
-                  { value: 'all', label: 'Все типы' },
-                  ...eventTypes.map((type) => ({ value: type, label: type })),
-                ]}
-                onChange={setTypeFilter}
-              />
-            </div>
-            <button className="btn btn-secondary events-filter-reset" onClick={() => { setGroupFilter('all'); setTypeFilter('all'); }}>
-              Сбросить
-            </button>
-          </div>
-        </section>
-      )}
 
       <MobileDrawer
         isOpen={isFilterDrawerOpen}
