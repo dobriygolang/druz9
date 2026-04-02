@@ -204,7 +204,7 @@ s3_endpoint:
 s3_public_endpoint:
   usage: "Public canonical endpoint for signed URLs"
   group: "external"
-  value: "http://localhost:9010"
+  value: "http://localhost:9010/s3"
   type: "string"
   writable: false
 

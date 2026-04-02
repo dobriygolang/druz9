@@ -1,34 +1,10 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Code2, ArrowRight, Settings, Shield, BookOpen } from 'lucide-react';
-import { geoApi } from '@/features/Geo/api/geoApi';
-import { CommunityMapPoint } from '@/entities/User/model/types';
 
 export const Sidebar: React.FC = () => {
   const { logout, isAuthenticated, user } = useAuth();
-  const [userCount, setUserCount] = useState<number | null>(null);
-  const [points, setPoints] = useState<CommunityMapPoint[]>([]);
-
-  const fetchPointsRef = useRef<() => void>(() => {});
-
-  useEffect(() => {
-    const fetchPoints = () => {
-      geoApi.communityMap()
-        .then(data => {
-          setPoints(data);
-          setUserCount(data.length);
-        })
-        .catch(err => console.error('Failed to fetch user count', err));
-    };
-
-    fetchPointsRef.current = fetchPoints;
-    fetchPoints();
-    const interval = setInterval(() => fetchPointsRef.current(), 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  const actualOnlineCount = points.filter(p => p.activityStatus === 'online').length;
 
   return (
     <aside className="sidebar-desktop">
@@ -37,14 +13,13 @@ export const Sidebar: React.FC = () => {
           <div style={{ fontWeight: '700', fontSize: '20px', letterSpacing: '1px' }}>Друзья</div>
           <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '500', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '6px' }}>v1.0</span>
         </div>
-        {userCount !== null && (
+        {isAuthenticated && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)', animation: 'pulse 2s infinite' }} />
-              <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>{Math.max(actualOnlineCount, 1)} online</span>
-            </div>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginLeft: '16px' }}>
-              {userCount} {userCount === 1 ? 'участник' : 'участников'}
+              <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>
+                {user?.activityStatus === 'online' ? 'Вы онлайн' : 'Аккаунт активен'}
+              </span>
             </div>
           </div>
         )}
