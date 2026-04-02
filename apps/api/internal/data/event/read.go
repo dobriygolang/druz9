@@ -208,13 +208,7 @@ SELECT
   ep.user_id::text,
   COALESCE(NULLIF(TRIM(CONCAT_WS(' ', pu.first_name, pu.last_name)), ''), NULLIF(pu.username, ''), 'user'),
   COALESCE(pu.avatar_url, ''),
-  COALESCE((
-    SELECT NULLIF(ui.username, '')
-    FROM user_identities ui
-    WHERE ui.user_id = pu.id
-      AND ui.provider = 'telegram'
-    LIMIT 1
-  ), ''),
+  COALESCE(pu.telegram_username, ''),
   COALESCE(pu.first_name, ''),
   COALESCE(pu.last_name, ''),
   ep.status

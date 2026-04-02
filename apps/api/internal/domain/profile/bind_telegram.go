@@ -2,11 +2,8 @@ package profile
 
 import (
 	"context"
-	"errors"
 	"fmt"
-	stdErrors "errors"
 
-	profileerrors "api/internal/errors/profile"
 	"api/internal/model"
 
 	"github.com/google/uuid"
@@ -19,15 +16,6 @@ func (s *Service) BindTelegram(ctx context.Context, userID uuid.UUID, challengeT
 		return nil, err
 	}
 
-	// Check if telegram_id is already bound to another user
-	existingUser, err := s.repo.FindUserByProviderIdentity(ctx, model.AuthProviderTelegram, fmt.Sprintf("%d", payload.ID))
-	if err != nil && !stdErrors.Is(err, profileerrors.ErrUserNotFound) {
-		return nil, err
-	}
-	if existingUser != nil && existingUser.ID != userID {
-		return nil, profileerrors.ErrTelegramAlreadyBound
-	}
-
 	user, err := s.repo.BindIdentity(ctx, userID, model.IdentityAuthPayload{
 		Provider:       model.AuthProviderTelegram,
 		ProviderUserID: fmt.Sprintf("%d", payload.ID),
@@ -37,9 +25,6 @@ func (s *Service) BindTelegram(ctx context.Context, userID uuid.UUID, challengeT
 		AvatarURL:      payload.PhotoURL,
 	})
 	if err != nil {
-		if errors.Is(err, profileerrors.ErrUserNotFound) {
-			return nil, profileerrors.ErrUserNotFound
-		}
 		return nil, err
 	}
 

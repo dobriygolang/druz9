@@ -2123,6 +2123,52 @@
 
 .auth-provider-card__action {
   justify-self: start;
+  width: 100%;
+}
+
+.auth-provider-card__action-wrapper {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  gap: 14px;
+}
+
+/* Адаптивность для планшетов и десктопа */
+@media (max-width: 1200px) {
+  .auth-provider-card {
+    padding: 20px;
+  }
+  
+  .auth-provider-card__header h2 {
+    font-size: 22px;
+  }
+}
+
+@media (max-width: 768px) {
+  .auth-provider-card {
+    padding: 18px;
+    gap: 14px;
+  }
+  
+  .auth-provider-card__header h2 {
+    font-size: 20px;
+  }
+  
+  .auth-provider-card__badge {
+    font-size: 10px;
+    padding: 3px 8px;
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-provider-card {
+    padding: 16px;
+    gap: 12px;
+  }
+  
+  .auth-provider-card__header h2 {
+    font-size: 18px;
+  }
 }
 
 .auth-shell__footer {

@@ -28,7 +28,7 @@ func NewRepo(dataLayer *postgres.Store, logger log.Logger) referraldomain.Reposi
 	}
 }
 
-const referralColumns = `r.id, r.user_id::text, COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), 'user'), COALESCE((SELECT NULLIF(ui.username, '') FROM user_identities ui WHERE ui.user_id = u.id AND ui.provider = 'telegram' LIMIT 1), ''), r.title, r.company, COALESCE(r.vacancy_url, ''), r.description, COALESCE(r.experience, ''), COALESCE(r.location, ''), r.employment_type, r.created_at, r.updated_at`
+const referralColumns = `r.id, r.user_id::text, COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), 'user'), COALESCE(u.telegram_username, ''), r.title, r.company, COALESCE(r.vacancy_url, ''), r.description, COALESCE(r.experience, ''), COALESCE(r.location, ''), r.employment_type, r.created_at, r.updated_at`
 
 func (r *Repo) ListReferrals(ctx context.Context, currentUser *model.User, opts model.ListReferralsOptions) (*model.ListReferralsResponse, error) {
 	// Apply defaults
@@ -112,7 +112,7 @@ SELECT
   updated.id,
   updated.user_id::text,
   COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), 'user'),
-  COALESCE((SELECT NULLIF(ui.username, '') FROM user_identities ui WHERE ui.user_id = u.id AND ui.provider = 'telegram' LIMIT 1), ''),
+  COALESCE(u.telegram_username, ''),
   updated.title,
   updated.company,
   COALESCE(updated.vacancy_url, ''),

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strconv"
 
 	profileerrors "api/internal/errors/profile"
 	"api/internal/model"
@@ -17,17 +18,7 @@ const userSelectColumns = `
   NULLIF(u.username, ''),
   NULLIF(u.first_name, ''),
   NULLIF(u.last_name, ''),
-  COALESCE(
-    NULLIF(u.avatar_url, ''),
-    (
-      SELECT NULLIF(ui.avatar_url, '')
-      FROM user_identities ui
-      WHERE ui.user_id = u.id
-      ORDER BY CASE WHEN ui.is_primary THEN 0 ELSE 1 END, ui.created_at
-      LIMIT 1
-    ),
-    ''
-  ),
+  COALESCE(NULLIF(u.avatar_url, ''), NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), ''),
   NULLIF(u.current_workplace, ''),
   g.region,
   g.country,
@@ -37,29 +28,48 @@ const userSelectColumns = `
   u.status,
   u.is_admin,
   %s,
-  COALESCE((
-    SELECT array_agg(ui.provider ORDER BY ui.provider)
-    FROM user_identities ui
-    WHERE ui.user_id = u.id
-  ), ARRAY[]::text[]),
-  COALESCE((
-    SELECT ui.provider
-    FROM user_identities ui
-    WHERE ui.user_id = u.id
-    ORDER BY CASE WHEN ui.is_primary THEN 0 ELSE 1 END, ui.created_at
-    LIMIT 1
-  ), ''),
+  ARRAY_REMOVE(ARRAY[
+    CASE WHEN u.telegram_id IS NOT NULL THEN 'telegram' END,
+    CASE WHEN NULLIF(u.yandex_id, '') IS NOT NULL THEN 'yandex' END
+  ], NULL),
+  NULLIF(u.primary_provider, ''),
   u.last_active_at,
   u.created_at,
   u.updated_at
 `
 
-func (r *Repo) upsertUserIdentityTx(ctx context.Context, tx pgx.Tx, payload model.IdentityAuthPayload) (*model.User, error) {
-	query := fmt.Sprintf(`
-WITH existing_identity AS (
-  SELECT user_id
-  FROM user_identities
-  WHERE provider = $1 AND provider_user_id = $2
+func (r *Repo) userByIDQuery() string {
+	return fmt.Sprintf(`
+SELECT `+userSelectColumns+`
+FROM users u
+LEFT JOIN geo g ON g.user_id = u.id
+WHERE u.id = $1
+`, r.trustedSelect("u.is_trusted"))
+}
+
+func (r *Repo) selectUserByIDTx(ctx context.Context, tx pgx.Tx, userID uuid.UUID) (*model.User, error) {
+	return scanUser(tx.QueryRow(ctx, r.userByIDQuery(), userID))
+}
+
+func parseTelegramProviderID(value string) (int64, error) {
+	parsed, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return 0, fmt.Errorf("parse telegram provider id: %w", err)
+	}
+	return parsed, nil
+}
+
+func (r *Repo) upsertTelegramUserTx(ctx context.Context, tx pgx.Tx, payload model.IdentityAuthPayload) (*model.User, error) {
+	telegramID, err := parseTelegramProviderID(payload.ProviderUserID)
+	if err != nil {
+		return nil, err
+	}
+
+	query := `
+WITH existing_user AS (
+  SELECT id
+  FROM users
+  WHERE telegram_id = $1
 ),
 created_user AS (
   INSERT INTO users (
@@ -68,6 +78,10 @@ created_user AS (
     first_name,
     last_name,
     avatar_url,
+    telegram_id,
+    telegram_username,
+    telegram_avatar_url,
+    primary_provider,
     current_workplace,
     status,
     last_active_at,
@@ -76,85 +90,148 @@ created_user AS (
   )
   SELECT
     gen_random_uuid(),
+    COALESCE(NULLIF($2, ''), ''),
     COALESCE(NULLIF($3, ''), ''),
     COALESCE(NULLIF($4, ''), ''),
     COALESCE(NULLIF($5, ''), ''),
-    COALESCE(NULLIF($6, ''), ''),
+    $1,
+    COALESCE(NULLIF($2, ''), ''),
+    COALESCE(NULLIF($5, ''), ''),
+    'telegram',
     '',
-    $7,
+    $6,
     NOW(),
     NOW(),
     NOW()
-  WHERE NOT EXISTS (SELECT 1 FROM existing_identity)
+  WHERE NOT EXISTS (SELECT 1 FROM existing_user)
   RETURNING id
 ),
 target_user AS (
-  SELECT user_id AS id FROM existing_identity
+  SELECT id FROM existing_user
   UNION ALL
   SELECT id FROM created_user
-),
-upserted_identity AS (
-  INSERT INTO user_identities (
-    id,
-    user_id,
-    provider,
-    provider_user_id,
-    username,
-    email,
-    avatar_url,
-    is_primary,
-    created_at,
-    updated_at
-  )
-  SELECT
-    gen_random_uuid(),
-    tu.id,
-    $1,
-    $2,
-    COALESCE(NULLIF($3, ''), ''),
-    COALESCE(NULLIF($8, ''), ''),
-    COALESCE(NULLIF($6, ''), ''),
-    TRUE,
-    NOW(),
-    NOW()
-  FROM target_user tu
-  ON CONFLICT (provider, provider_user_id) DO UPDATE SET
-    username = EXCLUDED.username,
-    email = EXCLUDED.email,
-    avatar_url = EXCLUDED.avatar_url,
-    updated_at = NOW()
-  RETURNING user_id
 ),
 updated_user AS (
   UPDATE users u
   SET
-    username = COALESCE(NULLIF(u.username, ''), NULLIF($3, ''), ''),
-    first_name = COALESCE(NULLIF($4, ''), u.first_name),
-    last_name = COALESCE(NULLIF($5, ''), u.last_name),
-    avatar_url = COALESCE(NULLIF(u.avatar_url, ''), NULLIF($6, ''), ''),
+    username = COALESCE(NULLIF(u.username, ''), NULLIF($2, ''), ''),
+    first_name = COALESCE(NULLIF($3, ''), u.first_name),
+    last_name = COALESCE(NULLIF($4, ''), u.last_name),
+    avatar_url = COALESCE(NULLIF(u.avatar_url, ''), NULLIF($5, ''), ''),
+    telegram_id = $1,
+    telegram_username = COALESCE(NULLIF($2, ''), u.telegram_username, ''),
+    telegram_avatar_url = COALESCE(NULLIF($5, ''), u.telegram_avatar_url, ''),
+    primary_provider = COALESCE(NULLIF(u.primary_provider, ''), 'telegram'),
     last_active_at = NOW(),
     updated_at = NOW()
-  WHERE u.id = (SELECT user_id FROM upserted_identity LIMIT 1)
+  WHERE u.id = (SELECT id FROM target_user LIMIT 1)
   RETURNING u.id
 )
-SELECT `+userSelectColumns+`
-FROM users u
-LEFT JOIN geo g ON g.user_id = u.id
-WHERE u.id = (SELECT id FROM updated_user LIMIT 1)
-`, r.trustedSelect("u.is_trusted"))
+SELECT id FROM updated_user
+`
 
-	return scanUser(tx.QueryRow(
+	var userID uuid.UUID
+	if err := tx.QueryRow(
 		ctx,
 		query,
-		string(payload.Provider),
-		payload.ProviderUserID,
+		telegramID,
 		payload.Username,
 		payload.FirstName,
 		payload.LastName,
 		payload.AvatarURL,
 		model.UserStatusPendingProfile,
+	).Scan(&userID); err != nil {
+		return nil, fmt.Errorf("upsert telegram user: %w", err)
+	}
+
+	return r.selectUserByIDTx(ctx, tx, userID)
+}
+
+func (r *Repo) upsertYandexUserTx(ctx context.Context, tx pgx.Tx, payload model.IdentityAuthPayload) (*model.User, error) {
+	query := `
+WITH existing_user AS (
+  SELECT id
+  FROM users
+  WHERE yandex_id = $1
+),
+created_user AS (
+  INSERT INTO users (
+    id,
+    username,
+    first_name,
+    last_name,
+    avatar_url,
+    yandex_id,
+    yandex_login,
+    yandex_email,
+    yandex_avatar_url,
+    primary_provider,
+    current_workplace,
+    status,
+    last_active_at,
+    created_at,
+    updated_at
+  )
+  SELECT
+    gen_random_uuid(),
+    COALESCE(NULLIF($2, ''), ''),
+    COALESCE(NULLIF($3, ''), ''),
+    COALESCE(NULLIF($4, ''), ''),
+    COALESCE(NULLIF($5, ''), ''),
+    $1,
+    COALESCE(NULLIF($2, ''), ''),
+    COALESCE(NULLIF($6, ''), ''),
+    COALESCE(NULLIF($5, ''), ''),
+    'yandex',
+    '',
+    $7,
+    NOW(),
+    NOW(),
+    NOW()
+  WHERE NOT EXISTS (SELECT 1 FROM existing_user)
+  RETURNING id
+),
+target_user AS (
+  SELECT id FROM existing_user
+  UNION ALL
+  SELECT id FROM created_user
+),
+updated_user AS (
+  UPDATE users u
+  SET
+    username = COALESCE(NULLIF(u.username, ''), NULLIF($2, ''), ''),
+    first_name = COALESCE(NULLIF($3, ''), u.first_name),
+    last_name = COALESCE(NULLIF($4, ''), u.last_name),
+    avatar_url = COALESCE(NULLIF(u.avatar_url, ''), NULLIF($5, ''), ''),
+    yandex_id = $1,
+    yandex_login = COALESCE(NULLIF($2, ''), u.yandex_login, ''),
+    yandex_email = COALESCE(NULLIF($6, ''), u.yandex_email, ''),
+    yandex_avatar_url = COALESCE(NULLIF($5, ''), u.yandex_avatar_url, ''),
+    primary_provider = COALESCE(NULLIF(u.primary_provider, ''), 'yandex'),
+    last_active_at = NOW(),
+    updated_at = NOW()
+  WHERE u.id = (SELECT id FROM target_user LIMIT 1)
+  RETURNING u.id
+)
+SELECT id FROM updated_user
+`
+
+	var userID uuid.UUID
+	if err := tx.QueryRow(
+		ctx,
+		query,
+		payload.ProviderUserID,
+		payload.Username,
+		payload.FirstName,
+		payload.LastName,
+		payload.AvatarURL,
 		payload.Email,
-	))
+		model.UserStatusPendingProfile,
+	).Scan(&userID); err != nil {
+		return nil, fmt.Errorf("upsert yandex user: %w", err)
+	}
+
+	return r.selectUserByIDTx(ctx, tx, userID)
 }
 
 func (r *Repo) UpsertUserByIdentity(ctx context.Context, payload model.IdentityAuthPayload) (*model.User, error) {
@@ -164,10 +241,19 @@ func (r *Repo) UpsertUserByIdentity(ctx context.Context, payload model.IdentityA
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
-	user, err := r.upsertUserIdentityTx(ctx, tx, payload)
+	var user *model.User
+	switch payload.Provider {
+	case model.AuthProviderTelegram:
+		user, err = r.upsertTelegramUserTx(ctx, tx, payload)
+	case model.AuthProviderYandex:
+		user, err = r.upsertYandexUserTx(ctx, tx, payload)
+	default:
+		return nil, profileerrors.ErrInvalidPayload
+	}
 	if err != nil {
 		return nil, err
 	}
+
 	if err := tx.Commit(ctx); err != nil {
 		return nil, fmt.Errorf("commit tx: %w", err)
 	}
@@ -175,25 +261,34 @@ func (r *Repo) UpsertUserByIdentity(ctx context.Context, payload model.IdentityA
 }
 
 func (r *Repo) FindUserByProviderIdentity(ctx context.Context, provider model.AuthProvider, providerUserID string) (*model.User, error) {
-	query := fmt.Sprintf(`
-SELECT `+userSelectColumns+`
-FROM user_identities ui
-JOIN users u ON u.id = ui.user_id
-LEFT JOIN geo g ON g.user_id = u.id
-WHERE ui.provider = $1 AND ui.provider_user_id = $2
-`, r.trustedSelect("u.is_trusted"))
-
-	return scanUser(r.data.DB.QueryRow(ctx, query, string(provider), providerUserID))
-}
-
-func (r *Repo) FindUserByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
-	query := fmt.Sprintf(`
+	switch provider {
+	case model.AuthProviderTelegram:
+		telegramID, err := parseTelegramProviderID(providerUserID)
+		if err != nil {
+			return nil, err
+		}
+		query := fmt.Sprintf(`
 SELECT `+userSelectColumns+`
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
-WHERE u.id = $1
+WHERE u.telegram_id = $1
 `, r.trustedSelect("u.is_trusted"))
-	return scanUser(r.data.DB.QueryRow(ctx, query, id))
+		return scanUser(r.data.DB.QueryRow(ctx, query, telegramID))
+	case model.AuthProviderYandex:
+		query := fmt.Sprintf(`
+SELECT `+userSelectColumns+`
+FROM users u
+LEFT JOIN geo g ON g.user_id = u.id
+WHERE u.yandex_id = $1
+`, r.trustedSelect("u.is_trusted"))
+		return scanUser(r.data.DB.QueryRow(ctx, query, providerUserID))
+	default:
+		return nil, profileerrors.ErrInvalidPayload
+	}
+}
+
+func (r *Repo) FindUserByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
+	return scanUser(r.data.DB.QueryRow(ctx, r.userByIDQuery(), id))
 }
 
 func (r *Repo) UpdateProfile(ctx context.Context, userID uuid.UUID, currentWorkplace string) (*model.User, error) {
@@ -256,13 +351,7 @@ ON CONFLICT (user_id) DO UPDATE SET
 		return nil, fmt.Errorf("upsert user geo: %w", err)
 	}
 
-	query := fmt.Sprintf(`
-SELECT `+userSelectColumns+`
-FROM users u
-LEFT JOIN geo g ON g.user_id = u.id
-WHERE u.id = $1
-`, r.trustedSelect("u.is_trusted"))
-	user, err := scanUser(tx.QueryRow(ctx, query, userID))
+	user, err := r.selectUserByIDTx(ctx, tx, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -293,6 +382,227 @@ LEFT JOIN geo g ON g.user_id = u.id
 	return scanUser(r.data.DB.QueryRow(ctx, query, userID, nullIfEmpty(avatarURL)))
 }
 
+func (r *Repo) bindTelegramToUserTx(ctx context.Context, tx pgx.Tx, userID uuid.UUID, payload model.IdentityAuthPayload) error {
+	telegramID, err := parseTelegramProviderID(payload.ProviderUserID)
+	if err != nil {
+		return err
+	}
+
+	tag, err := tx.Exec(ctx, `
+UPDATE users
+SET username = COALESCE(NULLIF(username, ''), NULLIF($2, ''), ''),
+    first_name = COALESCE(NULLIF($3, ''), first_name),
+    last_name = COALESCE(NULLIF($4, ''), last_name),
+    avatar_url = COALESCE(NULLIF(avatar_url, ''), NULLIF($5, ''), ''),
+    telegram_id = $6,
+    telegram_username = COALESCE(NULLIF($2, ''), telegram_username, ''),
+    telegram_avatar_url = COALESCE(NULLIF($5, ''), telegram_avatar_url, ''),
+    updated_at = NOW()
+WHERE id = $1
+`, userID, payload.Username, payload.FirstName, payload.LastName, payload.AvatarURL, telegramID)
+	if err != nil {
+		return fmt.Errorf("bind telegram user: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return profileerrors.ErrUserNotFound
+	}
+	return nil
+}
+
+func (r *Repo) bindYandexToUserTx(ctx context.Context, tx pgx.Tx, userID uuid.UUID, payload model.IdentityAuthPayload) error {
+	tag, err := tx.Exec(ctx, `
+UPDATE users
+SET username = COALESCE(NULLIF(username, ''), NULLIF($2, ''), ''),
+    first_name = COALESCE(NULLIF($3, ''), first_name),
+    last_name = COALESCE(NULLIF($4, ''), last_name),
+    avatar_url = COALESCE(NULLIF(avatar_url, ''), NULLIF($5, ''), ''),
+    yandex_id = $6,
+    yandex_login = COALESCE(NULLIF($2, ''), yandex_login, ''),
+    yandex_email = COALESCE(NULLIF($7, ''), yandex_email, ''),
+    yandex_avatar_url = COALESCE(NULLIF($5, ''), yandex_avatar_url, ''),
+    updated_at = NOW()
+WHERE id = $1
+`, userID, payload.Username, payload.FirstName, payload.LastName, payload.AvatarURL, payload.ProviderUserID, payload.Email)
+	if err != nil {
+		return fmt.Errorf("bind yandex user: %w", err)
+	}
+	if tag.RowsAffected() == 0 {
+		return profileerrors.ErrUserNotFound
+	}
+	return nil
+}
+
+func (r *Repo) bindProviderToUserTx(ctx context.Context, tx pgx.Tx, userID uuid.UUID, payload model.IdentityAuthPayload) error {
+	switch payload.Provider {
+	case model.AuthProviderTelegram:
+		return r.bindTelegramToUserTx(ctx, tx, userID, payload)
+	case model.AuthProviderYandex:
+		return r.bindYandexToUserTx(ctx, tx, userID, payload)
+	default:
+		return profileerrors.ErrInvalidPayload
+	}
+}
+
+func (r *Repo) mergeUsersTx(ctx context.Context, tx pgx.Tx, canonicalUserID, secondaryUserID uuid.UUID) error {
+	if canonicalUserID == secondaryUserID {
+		return nil
+	}
+
+	if _, err := tx.Exec(ctx, `
+UPDATE users canonical
+SET
+  username = COALESCE(NULLIF(canonical.username, ''), NULLIF(secondary.username, ''), ''),
+  first_name = COALESCE(NULLIF(canonical.first_name, ''), NULLIF(secondary.first_name, ''), ''),
+  last_name = COALESCE(NULLIF(canonical.last_name, ''), NULLIF(secondary.last_name, ''), ''),
+  avatar_url = COALESCE(NULLIF(canonical.avatar_url, ''), NULLIF(secondary.avatar_url, ''), NULLIF(secondary.yandex_avatar_url, ''), NULLIF(secondary.telegram_avatar_url, ''), ''),
+  current_workplace = COALESCE(NULLIF(canonical.current_workplace, ''), NULLIF(secondary.current_workplace, ''), ''),
+  status = CASE
+    WHEN canonical.status = $3 OR secondary.status = $3 THEN $3
+    WHEN canonical.status = $4 OR secondary.status = $4 THEN $4
+    WHEN canonical.status = $5 OR secondary.status = $5 THEN $5
+    ELSE canonical.status
+  END,
+  primary_provider = COALESCE(NULLIF(canonical.primary_provider, ''), NULLIF(secondary.primary_provider, ''), ''),
+  yandex_id = COALESCE(NULLIF(canonical.yandex_id, ''), NULLIF(secondary.yandex_id, ''), ''),
+  yandex_login = COALESCE(NULLIF(canonical.yandex_login, ''), NULLIF(secondary.yandex_login, ''), ''),
+  yandex_email = COALESCE(NULLIF(canonical.yandex_email, ''), NULLIF(secondary.yandex_email, ''), ''),
+  yandex_avatar_url = COALESCE(NULLIF(canonical.yandex_avatar_url, ''), NULLIF(secondary.yandex_avatar_url, ''), ''),
+  telegram_id = COALESCE(canonical.telegram_id, secondary.telegram_id),
+  telegram_username = COALESCE(NULLIF(canonical.telegram_username, ''), NULLIF(secondary.telegram_username, ''), ''),
+  telegram_avatar_url = COALESCE(NULLIF(canonical.telegram_avatar_url, ''), NULLIF(secondary.telegram_avatar_url, ''), ''),
+  last_active_at = GREATEST(canonical.last_active_at, secondary.last_active_at),
+  updated_at = NOW()
+FROM users secondary
+WHERE canonical.id = $1
+  AND secondary.id = $2
+`, canonicalUserID, secondaryUserID, model.UserStatusActive, model.UserStatusPendingProfile, model.UserStatusGuest); err != nil {
+		return fmt.Errorf("merge user profiles: %w", err)
+	}
+
+	if _, err := tx.Exec(ctx, `DELETE FROM geo g USING geo keep WHERE g.user_id = $2 AND keep.user_id = $1`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("dedupe geo: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE geo SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move geo: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move sessions: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE events SET creator_id = $1 WHERE creator_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move events: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM event_participants ep USING event_participants keep WHERE ep.user_id = $2 AND keep.user_id = $1 AND keep.event_id = ep.event_id`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("dedupe event participants: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE event_participants SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move event participants: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE podcasts SET author_id = $1 WHERE author_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move podcasts: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE referrals SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move referrals: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE code_rooms SET creator_id = $1 WHERE creator_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move code room creators: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE code_rooms SET winner_user_id = $1 WHERE winner_user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move code room winners: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM code_participants cp USING code_participants keep WHERE cp.user_id = $2 AND keep.user_id = $1 AND keep.room_id = cp.room_id`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("dedupe code participants: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE code_participants SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move code participants: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE code_submissions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move code submissions: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE arena_matches SET creator_user_id = $1 WHERE creator_user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move arena match creators: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE arena_matches SET winner_user_id = $1 WHERE winner_user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move arena match winners: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM arena_match_players p USING arena_match_players keep WHERE p.user_id = $2 AND keep.user_id = $1 AND keep.match_id = p.match_id`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("dedupe arena match players: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE arena_match_players SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move arena match players: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM arena_editor_states s USING arena_editor_states keep WHERE s.user_id = $2 AND keep.user_id = $1 AND keep.match_id = s.match_id`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("dedupe arena editor states: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE arena_editor_states SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move arena editor states: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE arena_submissions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move arena submissions: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM arena_rating_penalties p USING arena_rating_penalties keep WHERE p.user_id = $2 AND keep.user_id = $1 AND keep.match_id = p.match_id AND keep.reason = p.reason`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("dedupe arena rating penalties: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE arena_rating_penalties SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move arena rating penalties: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `
+INSERT INTO arena_match_queue (user_id, display_name, topic, difficulty, queued_at, updated_at)
+SELECT $1, display_name, topic, difficulty, queued_at, NOW()
+FROM arena_match_queue
+WHERE user_id = $2
+ON CONFLICT (user_id) DO NOTHING
+`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("merge arena queue: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM arena_match_queue WHERE user_id = $1`, secondaryUserID); err != nil {
+		return fmt.Errorf("delete secondary arena queue: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `
+INSERT INTO arena_player_stats (user_id, display_name, rating, wins, losses, matches, best_runtime_ms, updated_at)
+SELECT $1, display_name, rating, wins, losses, matches, best_runtime_ms, NOW()
+FROM arena_player_stats
+WHERE user_id = $2
+ON CONFLICT (user_id) DO UPDATE SET
+  display_name = COALESCE(NULLIF(arena_player_stats.display_name, ''), NULLIF(EXCLUDED.display_name, ''), arena_player_stats.display_name),
+  wins = arena_player_stats.wins + EXCLUDED.wins,
+  losses = arena_player_stats.losses + EXCLUDED.losses,
+  matches = arena_player_stats.matches + EXCLUDED.matches,
+  best_runtime_ms = CASE
+    WHEN arena_player_stats.best_runtime_ms = 0 THEN EXCLUDED.best_runtime_ms
+    WHEN EXCLUDED.best_runtime_ms = 0 THEN arena_player_stats.best_runtime_ms
+    ELSE LEAST(arena_player_stats.best_runtime_ms, EXCLUDED.best_runtime_ms)
+  END,
+  updated_at = NOW()
+`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("merge arena player stats: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM arena_player_stats WHERE user_id = $1`, secondaryUserID); err != nil {
+		return fmt.Errorf("delete secondary arena stats: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `
+DELETE FROM interview_prep_sessions src
+USING interview_prep_sessions keep
+WHERE src.user_id = $2
+  AND keep.user_id = $1
+  AND src.task_id = keep.task_id
+  AND src.status = 'active'
+  AND keep.status = 'active'
+`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("dedupe interview prep sessions: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE interview_prep_sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move interview prep sessions: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `UPDATE interview_prep_mock_sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
+		return fmt.Errorf("move mock interview sessions: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM users WHERE id = $1`, secondaryUserID); err != nil {
+		return fmt.Errorf("delete secondary user: %w", err)
+	}
+
+	return nil
+}
+
 func (r *Repo) BindIdentity(ctx context.Context, userID uuid.UUID, payload model.IdentityAuthPayload) (*model.User, error) {
 	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
@@ -300,63 +610,26 @@ func (r *Repo) BindIdentity(ctx context.Context, userID uuid.UUID, payload model
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
-	var existingUserID uuid.UUID
-	err = tx.QueryRow(ctx, `
-SELECT user_id
-FROM user_identities
-WHERE provider = $1 AND provider_user_id = $2
-`, string(payload.Provider), payload.ProviderUserID).Scan(&existingUserID)
-	if err == nil && existingUserID != userID {
-		return nil, profileerrors.ErrTelegramAlreadyBound
-	}
-	if err != nil && !errors.Is(err, pgx.ErrNoRows) {
-		return nil, fmt.Errorf("find bound identity: %w", err)
+	if _, err := r.selectUserByIDTx(ctx, tx, userID); err != nil {
+		return nil, err
 	}
 
-	_, err = tx.Exec(ctx, `
-INSERT INTO user_identities (
-  id,
-  user_id,
-  provider,
-  provider_user_id,
-  username,
-  email,
-  avatar_url,
-  is_primary,
-  created_at,
-  updated_at
-)
-VALUES (gen_random_uuid(), $1, $2, $3, COALESCE(NULLIF($4, ''), ''), COALESCE(NULLIF($5, ''), ''), COALESCE(NULLIF($6, ''), ''), FALSE, NOW(), NOW())
-ON CONFLICT (provider, provider_user_id) DO UPDATE SET
-  username = EXCLUDED.username,
-  email = EXCLUDED.email,
-  avatar_url = EXCLUDED.avatar_url,
-  updated_at = NOW()
-`, userID, string(payload.Provider), payload.ProviderUserID, payload.Username, payload.Email, payload.AvatarURL)
-	if err != nil {
-		return nil, fmt.Errorf("upsert user identity: %w", err)
+	existingUser, err := r.FindUserByProviderIdentity(ctx, payload.Provider, payload.ProviderUserID)
+	if err != nil && !errors.Is(err, profileerrors.ErrUserNotFound) {
+		return nil, err
 	}
 
-	_, err = tx.Exec(ctx, `
-UPDATE users
-SET username = COALESCE(NULLIF(username, ''), NULLIF($2, ''), ''),
-    first_name = COALESCE(NULLIF($3, ''), first_name),
-    last_name = COALESCE(NULLIF($4, ''), last_name),
-    avatar_url = COALESCE(NULLIF(avatar_url, ''), NULLIF($5, ''), ''),
-    updated_at = NOW()
-WHERE id = $1
-`, userID, payload.Username, payload.FirstName, payload.LastName, payload.AvatarURL)
-	if err != nil {
-		return nil, fmt.Errorf("update user after identity bind: %w", err)
+	if existingUser != nil && existingUser.ID != userID {
+		if err := r.mergeUsersTx(ctx, tx, userID, existingUser.ID); err != nil {
+			return nil, err
+		}
 	}
 
-	query := fmt.Sprintf(`
-SELECT `+userSelectColumns+`
-FROM users u
-LEFT JOIN geo g ON g.user_id = u.id
-WHERE u.id = $1
-`, r.trustedSelect("u.is_trusted"))
-	user, err := scanUser(tx.QueryRow(ctx, query, userID))
+	if err := r.bindProviderToUserTx(ctx, tx, userID, payload); err != nil {
+		return nil, err
+	}
+
+	user, err := r.selectUserByIDTx(ctx, tx, userID)
 	if err != nil {
 		return nil, err
 	}

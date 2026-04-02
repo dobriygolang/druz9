@@ -56,15 +56,17 @@ export const LoginPage: React.FC = () => {
               <h2>Яндекс ID</h2>
             </div>
             <p>Быстрый вход в браузере с автоматическим созданием аккаунта и сохранением сессии.</p>
-            <button
-              type="button"
-              className="btn btn-primary auth-provider-card__action"
-              disabled={isYandexLoading}
-              onClick={handleYandexAuth}
-            >
-              {isYandexLoading ? 'Переходим в Яндекс...' : 'Войти через Яндекс'}
-              <ArrowRight size={16} />
-            </button>
+            <div className="auth-provider-card__action-wrapper">
+              <button
+                type="button"
+                className="btn btn-primary auth-provider-card__action"
+                disabled={isYandexLoading}
+                onClick={handleYandexAuth}
+              >
+                {isYandexLoading ? 'Переходим в Яндекс...' : 'Войти через Яндекс'}
+                <ArrowRight size={16} />
+              </button>
+            </div>
           </section>
 
           <section className="auth-provider-card">
@@ -73,7 +75,9 @@ export const LoginPage: React.FC = () => {
               <h2>Telegram</h2>
             </div>
             <p>Можно войти кодом из бота и позже привязать Telegram как дополнительный провайдер в профиле.</p>
-            <TelegramAuthWidget onAuth={handleTelegramAuth} />
+            <div className="auth-provider-card__action-wrapper">
+              <TelegramAuthWidget onAuth={handleTelegramAuth} />
+            </div>
           </section>
         </div>
 
