@@ -254,7 +254,7 @@ func writeError(w http.ResponseWriter, err error) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	if errors.Is(err, aireview.ErrNotConfigured) || errors.Is(err, aireview.ErrUnsupportedProvider) || errors.Is(err, aireview.ErrInvalidResponse) {
+	if errors.Is(err, aireview.ErrNotConfigured) || errors.Is(err, aireview.ErrUnsupportedProvider) || errors.Is(err, aireview.ErrInvalidResponse) || errors.Is(err, aireview.ErrVisionUnsupported) {
 		http.Error(w, err.Error(), http.StatusBadGateway)
 		return
 	}

@@ -82,6 +82,12 @@ export function InterviewPrepPage() {
     setSearchParams(next, { replace: true });
   }, [category, company, modeFilter, search, searchParams, setSearchParams]);
 
+  useEffect(() => {
+    if (category === 'system_design' && modeFilter === 'executable') {
+      setModeFilter('all');
+    }
+  }, [category, modeFilter]);
+
   const summary = useMemo(() => {
     return {
       total: tasks.length,
@@ -257,7 +263,12 @@ export function InterviewPrepPage() {
                   key={item}
                   type="button"
                   className={`pill-selector__pill ${category === item ? 'active' : ''}`}
-                  onClick={() => setCategory(item)}
+                  onClick={() => {
+                    setCategory(item);
+                    if (item === 'system_design' && modeFilter === 'executable') {
+                      setModeFilter('all');
+                    }
+                  }}
                 >
                   {CATEGORY_LABELS[item]}
                 </button>
@@ -278,6 +289,11 @@ export function InterviewPrepPage() {
                 Guided
               </button>
             </div>
+            {category === 'system_design' && (
+              <div className="interview-prep-muted" style={{ marginTop: '8px' }}>
+                Для System Design доступны guided-сценарии с AI review, поэтому live-coding фильтр здесь не применяется.
+              </div>
+            )}
           </div>
 
           <div className="form-group">

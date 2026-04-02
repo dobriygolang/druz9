@@ -17,6 +17,7 @@ var (
 	ErrNotConfigured       = errors.New("ai review provider is not configured")
 	ErrUnsupportedProvider = errors.New("unsupported ai review provider")
 	ErrInvalidResponse     = errors.New("invalid ai review response")
+	ErrVisionUnsupported   = errors.New("ai review model does not support image input")
 )
 
 type Config struct {
@@ -157,7 +158,7 @@ func (g *geminiReviewer) ReviewSystemDesign(ctx context.Context, req SystemDesig
 		return nil, err
 	}
 	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("ai review provider returned %d: %s", resp.StatusCode, truncate(string(respBody), 300))
+		return nil, mapProviderError(resp.StatusCode, respBody)
 	}
 
 	var parsed struct {
@@ -251,7 +252,7 @@ func (o *openAICompatibleReviewer) ReviewSystemDesign(ctx context.Context, req S
 		return nil, err
 	}
 	if resp.StatusCode >= 400 {
-		return nil, fmt.Errorf("ai review provider returned %d: %s", resp.StatusCode, truncate(string(respBody), 300))
+		return nil, mapProviderError(resp.StatusCode, respBody)
 	}
 
 	var parsed struct {
@@ -363,4 +364,17 @@ func truncate(value string, limit int) string {
 		return value
 	}
 	return value[:limit] + "..."
+}
+
+func mapProviderError(statusCode int, body []byte) error {
+	message := truncate(string(body), 300)
+	lowerMessage := strings.ToLower(message)
+
+	if strings.Contains(lowerMessage, "no endpoints found that support image input") ||
+		strings.Contains(lowerMessage, "does not support image input") ||
+		(strings.Contains(lowerMessage, "vision") && strings.Contains(lowerMessage, "not support")) {
+		return fmt.Errorf("%w: current model/provider cannot analyze screenshots, choose a vision-capable model", ErrVisionUnsupported)
+	}
+
+	return fmt.Errorf("ai review provider returned %d: %s", statusCode, message)
 }

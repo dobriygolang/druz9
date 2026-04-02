@@ -241,19 +241,14 @@ export const VacanciesPage: React.FC = () => {
             ]}
           />
 
-          <select
-            className="input"
-            aria-label="Фильтр по локации"
+          <FancySelect
             value={locationFilter}
-            onChange={(e) => setLocationFilter(e.target.value)}
-          >
-            <option value="all">Любая локация</option>
-            {locations.map((location) => (
-              <option key={location} value={location}>
-                {location}
-              </option>
-            ))}
-          </select>
+            onChange={setLocationFilter}
+            options={[
+              { value: 'all', label: 'Любая локация' },
+              ...locations.map((location) => ({ value: location, label: location })),
+            ]}
+          />
         </div>
       </section>
 
