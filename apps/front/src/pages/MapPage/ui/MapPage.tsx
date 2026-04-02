@@ -27,6 +27,7 @@ type ViewState = {
 const CLUSTER_BREAK_ZOOM = 9.75;
 const CLUSTER_MIN_CELL_SIZE = 0.02;
 const CLUSTER_CELL_SIZE_FACTOR = 20;
+const MARKER_SPREAD_START_ZOOM = 13.25;
 
 function pluralizeRu(count: number, one: string, few: string, many: string) {
   const mod10 = count % 10;
@@ -50,7 +51,10 @@ function buildViewState(points: CommunityMapPoint[], events: CommunityEvent[]): 
   return { longitude: totals.lng / allCoordinates.length, latitude: totals.lat / allCoordinates.length, zoom: 5 };
 }
 
-function distributeByCoordinates<T extends { latitude: number; longitude: number }>(items: T[]): Array<T & { displayLatitude: number; displayLongitude: number }> {
+function distributeByCoordinates<T extends { latitude: number; longitude: number; isCurrentUser?: boolean }>(
+  items: T[],
+  zoom: number,
+): Array<T & { displayLatitude: number; displayLongitude: number }> {
   const groups = new globalThis.Map<string, T[]>();
   items.forEach((item) => {
     const key = `${item.latitude.toFixed(5)}:${item.longitude.toFixed(5)}`;
@@ -61,10 +65,22 @@ function distributeByCoordinates<T extends { latitude: number; longitude: number
   return items.map((item) => {
     const key = `${item.latitude.toFixed(5)}:${item.longitude.toFixed(5)}`;
     const group = groups.get(key) ?? [item];
-    if (group.length === 1) return { ...item, displayLatitude: item.latitude, displayLongitude: item.longitude };
-    const index = group.findIndex((candidate) => candidate === item);
-    const angle = (Math.PI * 2 * index) / group.length;
-    const radius = 0.00045 + group.length * 0.00003;
+    if (group.length === 1 || zoom < MARKER_SPREAD_START_ZOOM) {
+      return { ...item, displayLatitude: item.latitude, displayLongitude: item.longitude };
+    }
+
+    const pinnedIndex = group.findIndex((candidate) => candidate.isCurrentUser);
+    const currentIndex = group.findIndex((candidate) => candidate === item);
+    if (currentIndex === pinnedIndex) {
+      return { ...item, displayLatitude: item.latitude, displayLongitude: item.longitude };
+    }
+
+    const spreadGroup = pinnedIndex >= 0
+      ? group.filter((_, index) => index !== pinnedIndex)
+      : group;
+    const spreadIndex = spreadGroup.findIndex((candidate) => candidate === item);
+    const angle = (Math.PI * 2 * spreadIndex) / Math.max(spreadGroup.length, 1);
+    const radius = 0.00005 + spreadGroup.length * 0.000012;
     return {
       ...item,
       displayLatitude: item.latitude + Math.sin(angle) * radius,
@@ -153,9 +169,9 @@ export const MapPage: React.FC = () => {
     };
   }, []);
 
-  const visibleUserPoints = useMemo(() => distributeByCoordinates(points), [points]);
+  const visibleUserPoints = useMemo(() => distributeByCoordinates(points, viewState.zoom), [points, viewState.zoom]);
   const userClusters = useMemo(() => buildUserClusters(points, viewState.zoom), [points, viewState.zoom]);
-  const displayEvents = useMemo(() => distributeByCoordinates(events), [events]);
+  const displayEvents = useMemo(() => distributeByCoordinates(events, viewState.zoom), [events, viewState.zoom]);
   const selectedUser = useMemo(() => visibleUserPoints.find(p => p.userId === selectedUserId), [visibleUserPoints, selectedUserId]);
   const selectedEvent = useMemo(() => events.find(e => e.id === selectedEventId), [events, selectedEventId]);
 

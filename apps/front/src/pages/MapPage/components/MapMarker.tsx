@@ -31,7 +31,6 @@ export const PinMarker: React.FC<PinMarkerProps> = ({
         position: 'relative',
         width: '48px',
         height: '64px',
-        transform: 'translate(-50%, -100%)',
         filter: `drop-shadow(0 12px 24px rgba(0, 0, 0, 0.55)) drop-shadow(0 0 18px ${markerColor}55)`,
         cursor: 'pointer',
       }}

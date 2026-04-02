@@ -1103,13 +1103,68 @@
   gap: 10px;
 }
 
-.interview-prep-upload-field input[type="file"] {
-  width: 100%;
-  padding: 14px;
-  border-radius: 14px;
-  border: 1px dashed var(--border-color);
-  background: rgba(255, 255, 255, 0.03);
+.interview-prep-upload-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.interview-prep-upload-control {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  min-height: 76px;
+  padding: 16px 18px;
+  border-radius: 18px;
+  border: 1px dashed rgba(129, 140, 248, 0.28);
+  background:
+    linear-gradient(135deg, rgba(99, 102, 241, 0.12), rgba(15, 23, 42, 0.14)),
+    rgba(255, 255, 255, 0.03);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease;
+}
+
+.interview-prep-upload-field:hover .interview-prep-upload-control,
+.interview-prep-upload-field:focus-within .interview-prep-upload-control {
+  border-color: rgba(129, 140, 248, 0.48);
+  background:
+    linear-gradient(135deg, rgba(99, 102, 241, 0.16), rgba(15, 23, 42, 0.18)),
+    rgba(255, 255, 255, 0.04);
+  transform: translateY(-1px);
+}
+
+.interview-prep-upload-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  flex-shrink: 0;
+  min-height: 42px;
+  padding: 0 16px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.92), rgba(79, 70, 229, 0.84));
+  color: #f8fafc;
+  font-size: 14px;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  box-shadow: 0 12px 28px rgba(79, 70, 229, 0.24);
+}
+
+.interview-prep-upload-filename {
+  min-width: 0;
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+.interview-prep-upload-filename.is-selected {
   color: var(--text-primary);
+  font-weight: 600;
 }
 
 .interview-prep-upload-name {
@@ -1199,6 +1254,11 @@
 @media (max-width: 720px) {
   .interview-prep-design-review-grid {
     grid-template-columns: 1fr;
+  }
+
+  .interview-prep-upload-control {
+    align-items: flex-start;
+    flex-direction: column;
   }
 
   .interview-prep-group__head,

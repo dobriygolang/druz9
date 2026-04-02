@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import Editor from '@monaco-editor/react';
-import { CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Play, TerminalSquare, XCircle } from 'lucide-react';
+import { CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Play, TerminalSquare, Upload, XCircle } from 'lucide-react';
 
 import {
   interviewPrepApi,
@@ -536,6 +536,7 @@ export function InterviewPrepSessionPage() {
               <span className="interview-prep-block-title">Скриншот архитектуры</span>
               <input
                 type="file"
+                className="interview-prep-upload-input"
                 accept="image/png,image/jpeg,image/webp"
                 onChange={(event) => {
                   const file = event.target.files?.[0] ?? null;
@@ -543,10 +544,18 @@ export function InterviewPrepSessionPage() {
                   setDesignReview(null);
                 }}
               />
+              <div className="interview-prep-upload-control">
+                <span className="interview-prep-upload-trigger">
+                  <Upload size={16} />
+                  <span>{designImage ? 'Заменить файл' : 'Выбрать файл'}</span>
+                </span>
+                <span className={`interview-prep-upload-filename ${designImage ? 'is-selected' : ''}`}>
+                  {designImage?.name ?? 'PNG, JPG или WEBP до 5 MB'}
+                </span>
+              </div>
               <span className="interview-prep-muted">
                 PNG, JPG или WEBP, до 5 MB. Подходит скриншот из Excalidraw, Figma или Miro.
               </span>
-              {designImage && <strong className="interview-prep-upload-name">{designImage.name}</strong>}
             </label>
 
             <label className="interview-prep-notes-field">
