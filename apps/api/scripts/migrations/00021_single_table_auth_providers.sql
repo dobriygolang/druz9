@@ -9,6 +9,7 @@ ALTER TABLE users
   ADD COLUMN IF NOT EXISTS telegram_username TEXT,
   ADD COLUMN IF NOT EXISTS telegram_avatar_url TEXT;
 
+-- +goose StatementBegin
 DO $$
 BEGIN
   IF NOT EXISTS (
@@ -21,6 +22,7 @@ BEGIN
       CHECK (primary_provider IN ('', 'telegram', 'yandex'));
   END IF;
 END $$;
+-- +goose StatementEnd
 
 UPDATE users u
 SET
@@ -169,4 +171,7 @@ ALTER TABLE users
   DROP COLUMN IF EXISTS yandex_id,
   DROP COLUMN IF EXISTS yandex_login,
   DROP COLUMN IF EXISTS yandex_email,
-  DROP COLUMN IF EXISTS yandex_avatar_url;
+  DROP COLUMN IF EXISTS yandex_avatar_url,
+  DROP COLUMN IF EXISTS telegram_id,
+  DROP COLUMN IF EXISTS telegram_username,
+  DROP COLUMN IF EXISTS telegram_avatar_url;
