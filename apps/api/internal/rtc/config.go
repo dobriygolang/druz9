@@ -97,6 +97,8 @@ const (
 	TelegramBotUsername Key = "telegram_bot_username"
 	// Yandex OAuth client ID; env YANDEX_OAUTH_CLIENT_ID overrides
 	YandexOauthClientId Key = "yandex_oauth_client_id"
+	// Yandex OAuth client secret; env YANDEX_OAUTH_CLIENT_SECRET overrides
+	YandexOauthClientSecret Key = "yandex_oauth_client_secret"
 	// Yandex OAuth callback URL; env YANDEX_OAUTH_REDIRECT_URL overrides
 	YandexOauthRedirectUrl Key = "yandex_oauth_redirect_url"
 )

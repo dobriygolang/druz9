@@ -220,13 +220,13 @@ SELECT id FROM updated_user
 	if err := tx.QueryRow(
 		ctx,
 		query,
-		payload.ProviderUserID,
-		payload.Username,
-		payload.FirstName,
-		payload.LastName,
-		payload.AvatarURL,
-		payload.Email,
-		model.UserStatusPendingProfile,
+		payload.ProviderUserID,         // $1 - yandex_id
+		payload.Username,               // $2 - username/yandex_login
+		payload.FirstName,              // $3 - first_name
+		payload.LastName,               // $4 - last_name
+		payload.AvatarURL,              // $5 - avatar_url/yandex_avatar_url
+		payload.Email,                  // $6 - yandex_email
+		model.UserStatusPendingProfile, // $7 - status
 	).Scan(&userID); err != nil {
 		return nil, fmt.Errorf("upsert yandex user: %w", err)
 	}
