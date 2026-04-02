@@ -1103,8 +1103,9 @@
 }
 
 .code-room-prep-launch--page .code-room-prep-launch__actions {
-  align-self: end;
-  min-width: 320px;
+  align-self: flex-start;
+  min-width: 0;
+  width: 100%;
 }
 
 .code-room-prep-launch--page .code-room-prep-launch__actions .btn {

@@ -259,7 +259,7 @@ export const authApi = {
     return normalizeProfileResponse(response.data);
   },
   logout: async () => {
-    const response = await apiClient.post('/api/v1/profile/auth/logout');
+    const response = await apiClient.post('/api/v1/profile/auth/logout', {});
     profileByIdCache.clear();
     profileByIdPromises.clear();
     // Clear auth token from localStorage on logout

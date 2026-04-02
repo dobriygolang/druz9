@@ -46,21 +46,20 @@
 
 /* Telegram bind button */
 .profile-telegram-btn {
-  background: rgba(255, 255, 255, 0.96) !important;
-  border: 1px solid rgba(0, 136, 204, 0.22) !important;
-  color: #0f172a !important;
-  font-size: 12px;
-  padding: 6px 12px;
-  font-weight: 500;
+  background: rgba(255, 255, 255, 0.05) !important;
+  border: 1px solid rgba(255, 255, 255, 0.12) !important;
+  color: var(--text-primary) !important;
+  font-size: 13px;
+  padding: 8px 14px;
+  font-weight: 600;
   transition: all 0.2s ease;
+  border-radius: 12px !important;
 }
 
 .profile-telegram-btn.btn:hover {
-  background: #1f2937 !important;
-  border-color: rgba(255, 255, 255, 0.2) !important;
-  color: white !important;
+  background: rgba(255, 255, 255, 0.1) !important;
+  border-color: var(--accent-color) !important;
   transform: translateY(-1px);
-  box-shadow: 0 4px 12px rgba(0, 136, 204, 0.3);
 }
 
 /* Arena Stats Card */
@@ -328,9 +327,14 @@
     font-size: 11px;
   }
 
-  .profile-edit-btn,
+  .profile-edit-btn {
+    width: 100%;
+    justify-content: center;
+  }
+
   .profile-telegram-btn {
     width: 100%;
+    margin-top: 8px;
     justify-content: center;
   }
 }

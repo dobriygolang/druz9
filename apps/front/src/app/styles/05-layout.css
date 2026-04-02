@@ -60,15 +60,14 @@
 
 .main-content {
   flex: 1;
-  padding: 40px;
+  padding: 24px 32px 32px;
   overflow-y: auto;
-  padding-bottom: 40px;
   background-color: var(--bg-color);
   min-width: 0;
 }
 
 .main-content-code-room {
-  padding: 18px 22px 26px;
+  padding: 10px 20px 24px;
   overflow: auto;
 }
 
@@ -673,8 +672,8 @@
 
 .interview-prep-category-strip {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 12px;
 }
 
 .interview-prep-category-card {
@@ -694,7 +693,7 @@
 }
 
 .interview-prep-category-card strong {
-  font-size: 30px;
+  font-size: clamp(20px, 4vw, 30px);
   line-height: 1;
   color: #f4f2ff;
   text-shadow: 0 8px 24px rgba(0, 0, 0, 0.22);
@@ -2283,6 +2282,7 @@
 
   .interview-prep-card__statement {
     -webkit-line-clamp: 5;
+    line-clamp: 5;
     font-size: 13px;
     line-height: 1.55;
   }

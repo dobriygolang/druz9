@@ -465,15 +465,26 @@ export const ProfilePage: React.FC = () => {
           {!user.avatarUrl && user.telegramUsername?.charAt(0).toUpperCase()}
         </div>
 
-        <div className="profile-info" style={{ textAlign: isMobile ? 'center' : 'left' }}>
-          <h2 className="profile-name" style={{ fontSize: isMobile ? '24px' : '28px' }}>
+        <div className="profile-info" style={{ 
+          textAlign: isMobile ? 'center' : 'left',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: isMobile ? 'center' : 'flex-start',
+          gap: isMobile ? '4px' : '0'
+        }}>
+          <h2 className="profile-name" style={{ 
+            fontSize: isMobile ? '24px' : '28px',
+            justifyContent: isMobile ? 'center' : 'flex-start'
+          }}>
             {user.firstName || ''} {user.lastName || ''}
             {!user.firstName && !user.lastName ? user.telegramUsername : ''}
           </h2>
           <div className="profile-username">
             @{user.telegramUsername}
           </div>
-          <div className="profile-details" style={{ justifyContent: isMobile ? 'center' : 'flex-start' }}>
+          <div className="profile-details" style={{ 
+            justifyContent: isMobile ? 'center' : 'flex-start' 
+          }}>
             <div className="profile-detail-item">
               <MapPin size={16} /> {user.region}
             </div>
@@ -492,7 +503,11 @@ export const ProfilePage: React.FC = () => {
           </div>
         </div>
 
-        <div className="profile-badges">
+        <div className="profile-badges" style={{ 
+          width: isMobile ? '100%' : 'auto',
+          justifyContent: isMobile ? 'center' : 'flex-start',
+          marginTop: isMobile ? '12px' : '0'
+        }}>
           <span className="profile-badge profile-badge--account">
             <CheckCircle size={14} />
             Аккаунт
