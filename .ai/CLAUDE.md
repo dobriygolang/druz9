@@ -2,13 +2,67 @@
 
 # Дополнительные инструкции для Claude Code
 
+## Приоритет правил
+
+- Сначала следуй `AGENTS.md`
+- Перед началом любой задачи обязательно прочитай `.ai/router.md`
+- По `.ai/router.md` выбери ровно **одну** категорию и ровно **один**
+  skill из `.ai/skills/`
+- Полностью прочитай выбранный skill перед выполнением задачи
+- Следуй `Process`, `Output format`, `Quality bar` и `Anti-patterns`
+  выбранного skill
+- Если skill не найден однозначно, используй fallback из `.ai/router.md`,
+  но все равно соблюдай его `Output Contract`
+- Не смешивай несколько skills в одном ответе
+
+## Быстрые правила роутинга
+
+Используй эти категории из `.ai/router.md`:
+
+- `product` — PRD, MVP, user stories, acceptance criteria, roadmap
+- `engineering` — backend, debugging, implementation, refactoring,
+  architecture, PR changes
+- `frontend` — frontend implementation, React/TypeScript, state,
+  rendering, performance
+- `design` — UI polish, layout, spacing, typography, design system
+- `testing` — Playwright, e2e, QA steps, bug reproduction
+- `research` — research, comparisons, landscape, cited summaries
+- `writing` — articles, posts, editing, structure, storytelling
+
+### Обязательные tie-break rules
+
+- Если задача про review существующего кода, diff, PR, риски,
+  регрессии или пробелы в тестах — выбирай
+  `.ai/skills/code_review.md`
+- Если задача про backend-реализацию, API, DB, сервисы, отладку или
+  надежность — выбирай `.ai/skills/senior_backend.md`
+- Если задача про high-level system design, границы сервисов,
+  масштабирование и trade-offs — выбирай
+  `.ai/skills/senior_architect.md`
+- Если задача про frontend implementation, state management,
+  rendering, performance — выбирай
+  `.ai/skills/senior_frontend.md`
+- Если задача про UI polish, layout, visual hierarchy, spacing,
+  readability — выбирай `.ai/skills/frontend_design.md`
+- Если задача про tokens, reusable patterns, typography scale,
+  spacing rules, design consistency — выбирай
+  `.ai/skills/ui_design_system.md`
+
 ## Проект
 
 Go-микросервис API с Kratos framework.
 
 ## Структура проекта
 
-```
+Полную структуру проекта читай в:
+
+- `./docs/maps/backend-architecture.md`
+- `./docs/maps/codebase.md`
+- `./docs/features/interview-prep.md`
+
+Базовая структура:
+
+```text
 cmd/api/           # точка входа (main.go, run.go)
 
 internal/
@@ -53,80 +107,3 @@ internal/
 
 pkg/api/           # сгенерированные protobuf файлы
 scripts/           # конфиги (prometheus.yaml, grafana/, migrations/)
-```
-
-## Архитектура
-
-Все домены используют паттерн: domain service в `internal/{domain}/service/` + gRPC wrapper в `internal/api/{domain}/`
-
-Каждый domain service содержит:
-- Интерфейс(ы) для data-слоя (Repository, Storage, TokenIssuer и т.д.)
-- Config struct для конфигурации
-- Service struct с методами бизнес-логики
-- New*Service() конструктор
-- Методы в отдельных файлах (one method per file)
-
-## Сборка и тесты
-
-- Сборка: `make build`
-- Тесты: `make test`
-- Линтер: `make lint`
-
-## Мониторинг (Prometheus + Grafana)
-
-Проект включает встроенный мониторинг:
-
-### Конфигурация
-
-Добавить в конфиг:
-```yaml
-metrics:
-  addr: "0.0.0.0:9090"
-```
-
-### Endpoints
-- `http://localhost:9090/metrics` — Prometheus metrics
-- `http://localhost:9090/debug/pprof/*` — pprof
-
-### Запуск мониторинга
-```bash
-# Создать .env из примера
-cp .env.example .env
-
-# Запустить с мониторингом
-make docker-up-with-monitoring
-
-# Или добавить prometheus/grafana к существующему
-docker compose up -d prometheus grafana
-```
-
-### Доступ
-- Prometheus: http://localhost:9091
-- Grafana: http://localhost:3001 (admin/admin)
-- Дашборд: API Overview (scripts/grafana/dashboards/api-overview.json)
-
-### Метрики
-- HTTP requests rate и latency (p50, p95, p99)
-- gRPC requests rate и latency
-- Error rate (5xx)
-- Go runtime (goroutines, heap, memory)
-- pprof для профилирования
-
-### Алерты
-Базовые алерты находятся в `scripts/prometheus/alerts/api_alerts.yaml`:
-
-- **Availability**: `APIServiceDown` — сервис недоступен
-- **HTTP Errors**: `HighHTTPErrorRate` (>5%), `CriticalHTTPErrorRate` (>15%)
-- **gRPC Errors**: `HighGRPCErrorRate` (>5%)
-- **Latency**: `HighHTTPLatency` (p95 >2s), `CriticalHTTPLatency` (p99 >5s)
-- **Resources**: `HighMemoryUsage` (>85%), `HighGoroutineCount` (>1000)
-- **Database**: `HighDBConnectionUsage` (>80%)
-
-Алерты автоматически загружаются Prometheus из `scripts/prometheus/alerts/`.
-
-## Стиль
-
-- Табличные тесты с t.Parallel()
-- Ранние возвраты, ошибки lowercase
-- Комментарии объясняют «зачем», а не «что»
-- Обязательные комментарии для экспортируемых функций и переменных (линтер revlive exported rule)

@@ -1,6 +1,14 @@
 /* ===========================================
-   UTILITIES
+   LAYOUT & FLEX
    =========================================== */
+
+.flex { display: flex; }
+.flex-col { flex-direction: column; }
+.items-center { align-items: center; }
+.justify-center { justify-content: center; }
+.justify-between { justify-content: space-between; }
+.flex-1 { flex: 1; }
+.flex-shrink-0 { flex-shrink: 0; }
 
 .flex-center {
   display: flex;
@@ -8,23 +16,79 @@
   justify-content: center;
 }
 
-.full-height {
-  min-height: 100vh;
+.grid { display: grid; }
+
+.w-full { width: 100%; }
+.h-full { height: 100%; }
+.min-h-screen { min-height: 100vh; }
+
+/* ===========================================
+   SPACING UTILITIES
+   =========================================== */
+
+.p-1 { padding: var(--space-1); }
+.p-2 { padding: var(--space-2); }
+.p-3 { padding: var(--space-3); }
+.p-4 { padding: var(--space-4); }
+.p-6 { padding: var(--space-6); }
+.p-8 { padding: var(--space-8); }
+
+.px-2 { padding-left: var(--space-2); padding-right: var(--space-2); }
+.px-4 { padding-left: var(--space-4); padding-right: var(--space-4); }
+.px-6 { padding-left: var(--space-6); padding-right: var(--space-6); }
+
+.py-2 { padding-top: var(--space-2); padding-bottom: var(--space-2); }
+.py-4 { padding-top: var(--space-4); padding-bottom: var(--space-4); }
+.py-6 { padding-top: var(--space-6); padding-bottom: var(--space-6); }
+
+.m-1 { margin: var(--space-1); }
+.m-2 { margin: var(--space-2); }
+.m-4 { margin: var(--space-4); }
+
+.mt-2 { margin-top: var(--space-2); }
+.mt-4 { margin-top: var(--space-4); }
+.mt-6 { margin-top: var(--space-6); }
+
+.gap-1 { gap: var(--space-1); }
+.gap-2 { gap: var(--space-2); }
+.gap-3 { gap: var(--space-3); }
+.gap-4 { gap: var(--space-4); }
+.gap-6 { gap: var(--space-6); }
+.gap-8 { gap: var(--space-8); }
+
+/* ===========================================
+   TEXT HIERARCHY
+   =========================================== */
+
+.text-xs { font-size: var(--font-size-xs); }
+.text-sm { font-size: var(--font-size-sm); }
+.text-md { font-size: var(--font-size-md); }
+.text-lg { font-size: var(--font-size-lg); }
+.text-xl { font-size: var(--font-size-xl); font-weight: 700; letter-spacing: -0.02em; }
+.text-2xl { font-size: var(--font-size-2xl); font-weight: 800; letter-spacing: -0.03em; }
+
+.font-medium { font-weight: 500; }
+.font-semibold { font-weight: 600; }
+.font-bold { font-weight: 700; }
+
+.text-primary { color: var(--text-primary); }
+.text-secondary { color: var(--text-secondary); }
+.text-muted { color: var(--text-muted); }
+.text-accent { color: var(--accent-color); }
+
+/* ===========================================
+   SPECIAL EFFECTS
+   =========================================== */
+
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(var(--glass-blur));
+  -webkit-backdrop-filter: blur(var(--glass-blur));
+  border: 1px solid var(--glass-border);
 }
 
-.w-full {
-  width: 100%;
-}
-
-.filter-dot {
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: var(--accent-color);
-  box-shadow: 0 0 8px var(--accent-color);
-  position: absolute;
-  top: 8px;
-  right: 8px;
+.shadow-premium {
+  box-shadow: var(--shadow-xl);
 }
 
 .hide-scrollbar {
@@ -36,20 +100,16 @@
   display: none;
 }
 
-.hover-opacity:hover {
-  opacity: 0.8;
-}
-
 .hover-scale {
-  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transition: transform var(--transition-base);
 }
 
 .hover-scale:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .hover-scale:active {
-  transform: scale(0.95);
+  transform: scale(0.98);
 }
 
 /* ===========================================
@@ -57,15 +117,7 @@
    =========================================== */
 
 .fade-in {
-  animation: fadeIn 0.3s ease-in-out;
-}
-
-.spin {
-  animation: spin 0.8s linear infinite;
-}
-
-.animate-spin {
-  animation: spin 1s linear infinite;
+  animation: fadeIn var(--transition-slow) ease-out forwards;
 }
 
 @keyframes fadeIn {
@@ -73,13 +125,11 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
+.spin {
+  animation: spin 1s linear infinite;
+}
+
 @keyframes spin {
   from { transform: rotate(0deg); }
   to { transform: rotate(360deg); }
-}
-
-@keyframes pulse {
-  0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); }
-  70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); }
-  100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); }
 }

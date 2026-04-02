@@ -1,11 +1,11 @@
 ---
-name: code-reviewer
-description: Comprehensive code review skill for TypeScript, JavaScript, Python, Swift, Kotlin, Go. Includes automated code analysis, best practice checking, security scanning, and review checklist generation. Use when reviewing pull requests, providing code feedback, identifying issues, or ensuring code quality standards.
+name: senior-frontend
+description: Comprehensive frontend development skill for building modern, performant web applications using ReactJS, NextJS, TypeScript, Tailwind CSS. Includes component scaffolding, performance optimization, bundle analysis, and UI best practices. Use when developing frontend features, optimizing performance, implementing UI/UX designs, managing state, or reviewing frontend code.
 ---
 
-# Code Reviewer
+# Senior Frontend
 
-Complete toolkit for code reviewer with modern tools and best practices.
+Complete toolkit for senior frontend with modern tools and best practices.
 
 ## Quick Start
 
@@ -14,21 +14,21 @@ Complete toolkit for code reviewer with modern tools and best practices.
 This skill provides three core capabilities through automated scripts:
 
 ```bash
-# Script 1: Pr Analyzer
-python scripts/pr_analyzer.py [options]
+# Script 1: Component Generator
+python scripts/component_generator.py [options]
 
-# Script 2: Code Quality Checker
-python scripts/code_quality_checker.py [options]
+# Script 2: Bundle Analyzer
+python scripts/bundle_analyzer.py [options]
 
-# Script 3: Review Report Generator
-python scripts/review_report_generator.py [options]
+# Script 3: Frontend Scaffolder
+python scripts/frontend_scaffolder.py [options]
 ```
 
 ## Core Capabilities
 
-### 1. Pr Analyzer
+### 1. Component Generator
 
-Automated tool for pr analyzer tasks.
+Automated tool for component generator tasks.
 
 **Features:**
 - Automated scaffolding
@@ -38,10 +38,10 @@ Automated tool for pr analyzer tasks.
 
 **Usage:**
 ```bash
-python scripts/pr_analyzer.py <project-path> [options]
+python scripts/component_generator.py <project-path> [options]
 ```
 
-### 2. Code Quality Checker
+### 2. Bundle Analyzer
 
 Comprehensive analysis and optimization tool.
 
@@ -53,10 +53,10 @@ Comprehensive analysis and optimization tool.
 
 **Usage:**
 ```bash
-python scripts/code_quality_checker.py <target-path> [--verbose]
+python scripts/bundle_analyzer.py <target-path> [--verbose]
 ```
 
-### 3. Review Report Generator
+### 3. Frontend Scaffolder
 
 Advanced tooling for specialized tasks.
 
@@ -68,14 +68,14 @@ Advanced tooling for specialized tasks.
 
 **Usage:**
 ```bash
-python scripts/review_report_generator.py [arguments] [options]
+python scripts/frontend_scaffolder.py [arguments] [options]
 ```
 
 ## Reference Documentation
 
-### Code Review Checklist
+### React Patterns
 
-Comprehensive guide available in `references/code_review_checklist.md`:
+Comprehensive guide available in `references/react_patterns.md`:
 
 - Detailed patterns and practices
 - Code examples
@@ -83,9 +83,9 @@ Comprehensive guide available in `references/code_review_checklist.md`:
 - Anti-patterns to avoid
 - Real-world scenarios
 
-### Coding Standards
+### Nextjs Optimization Guide
 
-Complete workflow documentation in `references/coding_standards.md`:
+Complete workflow documentation in `references/nextjs_optimization_guide.md`:
 
 - Step-by-step processes
 - Optimization strategies
@@ -93,9 +93,9 @@ Complete workflow documentation in `references/coding_standards.md`:
 - Performance tuning
 - Troubleshooting guide
 
-### Common Antipatterns
+### Frontend Best Practices
 
-Technical reference guide in `references/common_antipatterns.md`:
+Technical reference guide in `references/frontend_best_practices.md`:
 
 - Technology stack details
 - Configuration examples
@@ -130,7 +130,7 @@ cp .env.example .env
 
 ```bash
 # Use the analyzer script
-python scripts/code_quality_checker.py .
+python scripts/bundle_analyzer.py .
 
 # Review recommendations
 # Apply fixes
@@ -139,9 +139,9 @@ python scripts/code_quality_checker.py .
 ### 3. Implement Best Practices
 
 Follow the patterns and practices documented in:
-- `references/code_review_checklist.md`
-- `references/coding_standards.md`
-- `references/common_antipatterns.md`
+- `references/react_patterns.md`
+- `references/nextjs_optimization_guide.md`
+- `references/frontend_best_practices.md`
 
 ## Best Practices Summary
 
@@ -179,8 +179,8 @@ npm run test
 npm run lint
 
 # Analysis
-python scripts/code_quality_checker.py .
-python scripts/review_report_generator.py --analyze
+python scripts/bundle_analyzer.py .
+python scripts/frontend_scaffolder.py --analyze
 
 # Deployment
 docker build -t app:latest .
@@ -192,7 +192,7 @@ kubectl apply -f k8s/
 
 ### Common Issues
 
-Check the comprehensive troubleshooting section in `references/common_antipatterns.md`.
+Check the comprehensive troubleshooting section in `references/frontend_best_practices.md`.
 
 ### Getting Help
 
@@ -203,7 +203,7 @@ Check the comprehensive troubleshooting section in `references/common_antipatter
 
 ## Resources
 
-- Pattern Reference: `references/code_review_checklist.md`
-- Workflow Guide: `references/coding_standards.md`
-- Technical Guide: `references/common_antipatterns.md`
+- Pattern Reference: `references/react_patterns.md`
+- Workflow Guide: `references/nextjs_optimization_guide.md`
+- Technical Guide: `references/frontend_best_practices.md`
 - Tool Scripts: `scripts/` directory

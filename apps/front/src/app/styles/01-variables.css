@@ -1,24 +1,89 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap');
 
 :root {
-  --bg-color: #121212;
-  --surface-color: #242424;
+  /* Core Colors - Refined for depth */
+  --bg-color: #08080A;
+  --surface-color: #121217;
+  --surface-elevated: #1C1C22;
+  --surface-active: #25252E;
+  --surface-hover: rgba(255, 255, 255, 0.04);
+  
   --text-primary: #FFFFFF;
-  --text-secondary: #AAAAAA;
-  --border-color: #333333;
-  --accent-color: #4F46E5;
-  --accent-hover: #4338CA;
+  --text-secondary: #a1a1aa;
+  --text-muted: #71717a;
+  --text-dim: #52525b;
+  
+  --border-color: rgba(255, 255, 255, 0.08);
+  --border-subtle: rgba(255, 255, 255, 0.04);
+  --border-active: rgba(99, 102, 241, 0.3);
+  
+  --accent-color: #6366F1;
+  --accent-hover: #818CF8;
+  --accent-muted: rgba(99, 102, 241, 0.15);
+  --accent-glow: rgba(99, 102, 241, 0.25);
+  
   --danger-color: #EF4444;
+  --danger-hover: #F87171;
+  --danger-muted: rgba(239, 68, 68, 0.15);
+  
+  --success-color: #10B981;
+  --success-hover: #34D399;
+  --success-muted: rgba(16, 185, 129, 0.15);
 
-  /* Typography - Fluid (Scaled down ~10-15% as base for laptop optimization) */
-  --font-size-xs: clamp(0.65rem, 0.6rem + 0.2vw, 0.7rem);
-  --font-size-sm: clamp(0.75rem, 0.7rem + 0.2vw, 0.825rem);
-  --font-size-md: clamp(0.85rem, 0.8rem + 0.2vw, 0.95rem);
-  --font-size-lg: clamp(1rem, 0.95rem + 0.4vw, 1.15rem);
-  --font-size-xl: clamp(1.35rem, 1.2rem + 0.8vw, 1.9rem);
+  --warning-color: #F59E0B;
+  --warning-hover: #FBBF24;
 
-  /* Spacing */
-  --spacing-gutter: clamp(10px, 1.8vw, 24px);
+  /* Typography - Manrope (Modern, Geometric, Premium) */
+  --font-main: 'Manrope', 'Inter', system-ui, -apple-system, sans-serif;
+  
+  --font-size-xs: clamp(0.75rem, 0.72rem + 0.15vw, 0.8125rem);
+  --font-size-sm: clamp(0.875rem, 0.84rem + 0.18vw, 0.9375rem);
+  --font-size-md: clamp(1rem, 0.96rem + 0.2vw, 1.0625rem);
+  --font-size-lg: clamp(1.125rem, 1.08rem + 0.25vw, 1.25rem);
+  --font-size-xl: clamp(1.5rem, 1.4rem + 0.5vw, 1.75rem);
+  --font-size-2xl: clamp(1.875rem, 1.75rem + 1vw, 2.5rem);
+  --font-size-3xl: clamp(2.5rem, 2.25rem + 1.5vw, 3.5rem);
+
+  /* Spacing Scale - 4px step based */
+  --space-05: 2px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-gutter: clamp(1rem, 5vw, 2rem);
+
+  /* Border Radius */
+  --radius-xs: 4px;
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 24px;
+  --radius-2xl: 32px;
+  --radius-full: 9999px;
+
+  /* Shadows / Elevation */
+  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -1px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -2px rgba(0, 0, 0, 0.5);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 10px 10px -5px rgba(0, 0, 0, 0.6);
+  --shadow-glow: 0 0 20px var(--accent-glow);
+
+  /* Glassmorphism */
+  --glass-bg: rgba(255, 255, 255, 0.03);
+  --glass-border: rgba(255, 255, 255, 0.08);
+  --glass-blur: 12px;
+
+  /* Transitions */
+  --transition-fast: 120ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 200ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 350ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
@@ -26,14 +91,21 @@
   margin: 0;
   padding: 0;
   min-width: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 html,
 body {
-  font-family: 'Inter', sans-serif;
+  font-family: var(--font-main);
   background-color: var(--bg-color);
   color: var(--text-primary);
-  line-height: 1.5;
-  -webkit-font-smoothing: antialiased;
+  font-size: 16px;
+  line-height: 1.6;
   overflow-x: hidden;
+  height: 100%;
+}
+
+#root {
+  min-height: 100%;
 }

@@ -1,0 +1,191 @@
+/* ===========================================
+   CODE ROOM HEADER & TOOLBAR
+   =========================================== */
+
+.code-room-page {
+  min-height: calc(100vh - 72px);
+}
+
+.code-room-loading-state {
+  min-height: calc(100vh - 160px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  gap: 14px;
+  color: var(--text-secondary);
+}
+
+.code-room-hero {
+  padding: 8px 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background:
+    radial-gradient(circle at top right, rgba(79, 70, 229, 0.18), transparent 32%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
+    var(--surface-color);
+}
+
+.code-room-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  width: 100%;
+}
+
+.code-room-toolbar__spacer {
+  flex: 1;
+  min-width: 1px;
+}
+
+.code-room-hero__title-row {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.code-room-back-btn {
+  min-height: 28px;
+  min-width: 28px;
+  padding: 0 6px;
+  background: transparent;
+  border: none;
+  border-radius: 8px;
+  flex-shrink: 0;
+}
+
+.room-title {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 1px;
+  min-width: 0;
+}
+
+.room-title h2 {
+  margin: 0;
+  font-size: clamp(1rem, 1.2vw, 1.2rem);
+  line-height: 1;
+}
+
+.code-room-hero .code-rooms-kicker {
+  margin-bottom: 0;
+  padding: 3px 7px;
+  font-size: 10px;
+}
+
+.code-room-meta-strip {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+}
+
+.code-room-meta-strip--toolbar {
+  margin-top: 0;
+  justify-content: flex-end;
+}
+
+.meta-divider {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.room-actions .btn {
+  min-height: 28px;
+  padding: 0 10px;
+  font-size: 12px;
+  white-space: nowrap;
+  border-radius: 8px;
+  gap: 8px;
+}
+
+.room-actions {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 5px;
+  flex-wrap: wrap;
+  min-width: 0;
+}
+
+.room-actions .btn {
+  min-height: 32px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  gap: 6px;
+  background: rgba(79, 70, 229, 0.15);
+  border: 1px solid rgba(79, 70, 229, 0.3);
+  color: #c7c2ff;
+  transition: all 0.2s ease;
+}
+
+.room-actions .btn:hover {
+  background: rgba(79, 70, 229, 0.25);
+  border-color: rgba(79, 70, 229, 0.5);
+  transform: translateY(-1px);
+}
+
+.room-actions .btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+@media (max-width: 1024px) {
+  .code-room-toolbar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .room-actions {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .code-room-meta-strip--toolbar {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}
+
+@media (max-width: 720px) {
+  .code-room-page {
+    min-height: calc(100vh - 108px);
+  }
+
+  .code-room-hero {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .code-room-toolbar {
+    gap: 10px;
+  }
+
+  .code-room-hero__title-row {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .room-title h2 {
+    font-size: 1rem;
+    line-height: 1.1;
+  }
+
+  .code-room-meta-strip,
+  .code-room-meta-strip--toolbar {
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .room-actions .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 36px;
+    font-size: 12px;
+  }
+}

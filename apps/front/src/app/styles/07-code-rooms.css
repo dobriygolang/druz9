@@ -50,18 +50,18 @@
 
 /* Hero */
 .code-rooms-hero {
-  margin-bottom: 16px;
-  padding: 14px 18px;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 16px;
+  margin-bottom: var(--space-6);
+  padding: var(--space-6) var(--space-8);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-xl);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
+  gap: var(--space-6);
   background:
-    radial-gradient(circle at top right, rgba(79, 70, 229, 0.18), transparent 30%),
-    linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.01)),
-    var(--surface-color);
+    radial-gradient(circle at top right, var(--accent-muted), transparent 40%),
+    linear-gradient(180deg, var(--surface-elevated), var(--surface-color));
+  box-shadow: var(--shadow-lg);
 }
 
 .code-rooms-hero__stats {
@@ -121,20 +121,21 @@
 
 /* Queue Active Banner */
 .queue-active-banner {
-  margin-bottom: 16px;
-  padding: 16px 18px;
-  border-radius: 16px;
-  border: 2px solid rgba(79, 70, 229, 0.5);
-  background: linear-gradient(135deg, rgba(79, 70, 229, 0.2) 0%, rgba(99, 102, 241, 0.12) 100%);
-  animation: queue-pulse 2s ease-in-out infinite;
+  margin-bottom: var(--space-6);
+  padding: var(--space-5) var(--space-6);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-active);
+  background: linear-gradient(135deg, var(--accent-muted) 0%, rgba(99, 102, 241, 0.05) 100%);
+  animation: queue-pulse 3s ease-in-out infinite;
+  backdrop-filter: blur(var(--glass-blur));
 }
 
 @keyframes queue-pulse {
   0%, 100% {
-    box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.3);
+    box-shadow: 0 0 0 0 transparent;
   }
   50% {
-    box-shadow: 0 0 20px 4px rgba(79, 70, 229, 0.15);
+    box-shadow: 0 0 24px -4px var(--accent-glow);
   }
 }
 
@@ -317,32 +318,27 @@
 /* Mode Cards */
 .code-rooms-mode-card {
   appearance: none;
-  -webkit-appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  outline: none;
+  border: 1px solid var(--border-color);
   width: 100%;
-  border-radius: 18px;
-  background: rgba(255, 255, 255, 0.02);
+  border-radius: var(--radius-lg);
+  background: var(--surface-color);
   color: var(--text-primary);
   display: grid;
-  grid-template-columns: 40px 1fr auto;
+  grid-template-columns: 48px 1fr auto;
   align-items: center;
-  gap: 14px;
-  padding: 18px 18px;
+  gap: var(--space-4);
+  padding: var(--space-5) var(--space-6);
   cursor: pointer;
   text-align: left;
-  font: inherit;
-  line-height: inherit;
-  text-decoration: none;
-  box-sizing: border-box;
-  transition: transform 0.2s ease, border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  transition: all var(--transition-base);
+  box-shadow: var(--shadow-sm);
 }
 
 .code-rooms-mode-card:hover {
-  transform: translateY(-1px);
-  border-color: rgba(79, 70, 229, 0.35);
-  background: linear-gradient(180deg, rgba(79, 70, 229, 0.1), rgba(255, 255, 255, 0.02));
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.18);
+  transform: translateY(-2px);
+  border-color: var(--border-active);
+  background: var(--surface-elevated);
+  box-shadow: var(--shadow-md);
 }
 
 .code-rooms-mode-card:active {
