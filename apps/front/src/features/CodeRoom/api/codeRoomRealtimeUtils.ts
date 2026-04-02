@@ -178,17 +178,17 @@ export const buildAwarenessStyles = (
     .code-room-remote-label-pill {
       position: absolute;
       left: -1px;
-      top: -17px;
+      top: -15px;
       display: inline-flex;
       align-items: center;
-      gap: 3px;
-      min-height: 13px;
-      padding: 0 4px;
-      border-radius: 3px;
+      gap: 2px;
+      min-height: 12px;
+      padding: 0 3px;
+      border-radius: 2px;
       border: 1px solid transparent;
-      font-size: 8px;
-      font-weight: 500;
-      line-height: 13px;
+      font-size: 7.5px;
+      font-weight: 600;
+      line-height: 12px;
       white-space: nowrap;
       pointer-events: none;
       box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
@@ -208,8 +208,8 @@ export const buildAwarenessStyles = (
     }
 
     .code-room-remote-label-pill__status-dot {
-      width: 4px;
-      height: 4px;
+      width: 3px;
+      height: 3px;
       border-radius: 999px;
       background: currentColor;
       opacity: 0.9;
