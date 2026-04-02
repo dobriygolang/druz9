@@ -1218,4 +1218,54 @@
   .code-admin-modal {
     width: min(calc(100vw - 20px), 1180px);
   }
+
+  .launch-card-badges {
+    justify-content: flex-start;
+  }
+
+  .code-rooms-mode-card {
+    grid-template-columns: 36px 1fr;
+    padding: 14px;
+    gap: 10px;
+  }
+
+  .code-rooms-mode-card__icon {
+    width: 36px;
+    height: 36px;
+    border-radius: 10px;
+  }
+
+  .code-rooms-mode-card__title {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .code-rooms-mode-card__text,
+  .dashboard-card__subtitle,
+  .launch-card-desc {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .leaderboard-item {
+    padding: 14px;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .leaderboard-rank {
+    width: 42px;
+    height: 42px;
+  }
+
+  .leaderboard-rank__place {
+    min-width: 18px;
+    height: 18px;
+    font-size: 10px;
+  }
+
+  .code-room-prep-launch--page .code-room-prep-launch__actions .btn,
+  .code-rooms-hero__actions .btn {
+    width: 100%;
+  }
 }

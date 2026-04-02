@@ -548,6 +548,117 @@
   }
 }
 
+@media (max-width: 720px) {
+  .code-room-page,
+  .interview-ide-page,
+  .interview-ide-shell {
+    min-height: calc(100vh - 108px);
+  }
+
+  .code-room-hero {
+    padding: 10px;
+    border-radius: 12px;
+  }
+
+  .code-room-toolbar {
+    gap: 10px;
+  }
+
+  .code-room-hero__title-row {
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .room-title h2 {
+    font-size: 1rem;
+    line-height: 1.1;
+  }
+
+  .code-room-meta-strip,
+  .code-room-meta-strip--toolbar {
+    gap: 4px;
+    font-size: 11px;
+  }
+
+  .room-actions .btn {
+    width: 100%;
+    justify-content: center;
+    min-height: 36px;
+    font-size: 12px;
+  }
+
+  .code-room-participant-pill {
+    max-width: min(100%, 220px);
+    padding: 4px 8px;
+  }
+
+  .participant-name {
+    font-size: 11px;
+  }
+
+  .timelapse-toolbar {
+    padding: 10px 12px;
+    border-radius: 14px;
+  }
+
+  .panel-header {
+    padding: 9px 10px;
+    font-size: 11px;
+    gap: 8px;
+  }
+
+  .panel-header__group {
+    gap: 6px;
+  }
+
+  .panel-tab {
+    padding: 6px 9px;
+    font-size: 12px;
+  }
+
+  .language-badge {
+    min-height: 24px;
+    padding: 0 8px;
+    border-radius: 8px;
+    font-size: 11px;
+  }
+
+  .editor-run-button {
+    min-width: 0;
+    width: 100%;
+    min-height: 36px;
+    font-size: 12px;
+  }
+
+  .editor-panel,
+  .output-panel {
+    border-radius: 10px;
+  }
+
+  .task-description-panel,
+  .output-content,
+  .timelapse-code-view {
+    padding: 12px;
+    font-size: 12px;
+  }
+
+  .timelapse-code-view pre {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .room-leave-toasts {
+    right: 10px;
+    left: 10px;
+    bottom: 78px;
+  }
+
+  .room-leave-toast {
+    min-width: 0;
+    max-width: none;
+  }
+}
+
 /* ===========================================
    PARTICIPANTS
    =========================================== */

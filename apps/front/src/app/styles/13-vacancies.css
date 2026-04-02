@@ -426,12 +426,16 @@
   .vacancies-actions {
     grid-template-columns: 1fr;
   }
+
+  .vacancies-list {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 720px) {
   .vacancies-page {
-    gap: 20px;
-    padding-bottom: 32px;
+    gap: 16px;
+    padding-bottom: 24px;
   }
 
   .vacancies-hero__intro,
@@ -439,7 +443,7 @@
   .vacancies-search,
   .vacancies-card,
   .vacancies-modal__panel {
-    border-radius: 22px;
+    border-radius: 18px;
   }
 
   .vacancies-hero__intro,
@@ -447,7 +451,72 @@
   .vacancies-search,
   .vacancies-card,
   .vacancies-modal__panel {
-    padding: 20px;
+    padding: 14px;
+    box-shadow: 0 14px 36px rgba(0, 0, 0, 0.18);
+  }
+
+  .vacancies-hero__intro {
+    min-height: 0;
+    gap: 14px;
+  }
+
+  .vacancies-hero__intro > div:first-child {
+    gap: 10px;
+  }
+
+  .vacancies-hero__title {
+    font-size: clamp(26px, 9vw, 34px);
+  }
+
+  .vacancies-hero__description,
+  .vacancies-card__description,
+  .vacancies-modal__subtitle {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .vacancies-stat-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .vacancies-stat {
+    border-radius: 12px;
+    padding: 10px 12px;
+  }
+
+  .vacancies-stat__label {
+    font-size: 10px;
+  }
+
+  .vacancies-stat__value {
+    font-size: 18px;
+  }
+
+  .vacancies-search {
+    gap: 10px;
+  }
+
+  .vacancies-search .input,
+  .vacancies-search__field .input {
+    min-height: 46px;
+  }
+
+  .vacancies-card {
+    gap: 12px;
+  }
+
+  .vacancies-card__title {
+    font-size: 17px;
+  }
+
+  .vacancies-card__company {
+    font-size: 13px;
+  }
+
+  .vacancies-card__chip {
+    min-height: 28px;
+    padding: 0 10px;
+    font-size: 11px;
   }
 
   .vacancies-card__footer,
@@ -460,5 +529,9 @@
   .vacancies-form__footer .btn {
     width: 100%;
     justify-content: center;
+  }
+
+  .vacancies-modal__title {
+    font-size: 22px;
   }
 }

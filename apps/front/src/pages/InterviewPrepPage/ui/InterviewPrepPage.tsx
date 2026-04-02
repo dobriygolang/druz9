@@ -385,7 +385,7 @@ export function InterviewPrepPage() {
                   <h2>{group.label}</h2>
                   <p className="interview-prep-muted">{group.tasks.length} задач в текущем фильтре</p>
                 </div>
-                <button className="btn btn-secondary" onClick={() => void handleRandomStart(group.tasks)}>
+                <button className="btn btn-secondary interview-prep-group__action" onClick={() => void handleRandomStart(group.tasks)}>
                   <Shuffle size={16} />
                   <span>Рандом по категории</span>
                 </button>
@@ -435,7 +435,7 @@ export function InterviewPrepPage() {
                 })}
               </section>
               {hasMore && (
-                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '14px' }}>
+                <div className="interview-prep-group__more">
                   <button
                     type="button"
                     className="btn btn-secondary"

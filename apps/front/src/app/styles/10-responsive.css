@@ -2,6 +2,66 @@
    RESPONSIVE STYLES
    =========================================== */
 
+@media (min-width: 1440px) {
+  .main-content {
+    padding: 44px 48px;
+  }
+
+  .content-wrapper {
+    max-width: 1120px;
+  }
+
+  .content-wrapper-wide {
+    max-width: min(1840px, calc(100vw - 96px));
+  }
+
+  .page-header,
+  .code-rooms-hero,
+  .map-shell,
+  .dashboard-card {
+    border-radius: 22px;
+  }
+}
+
+@media (max-width: 1180px) {
+  .main-content {
+    padding: 28px 22px 32px;
+  }
+
+  .content-wrapper-wide {
+    max-width: 100%;
+  }
+
+  .page-header {
+    gap: 14px;
+  }
+
+  .code-rooms-hero {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .code-rooms-hero__actions,
+  .code-rooms-hero__stats,
+  .map-hero__stats,
+  .interview-prep-summary,
+  .vacancies-hero__stats,
+  .feed-hero__stats {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .code-rooms-dashboard-grid,
+  .code-rooms-dashboard-grid--secondary,
+  .vacancies-layout,
+  .events-layout,
+  .feed-layout,
+  .interview-prep-filters,
+  .interview-prep-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 768px) {
   .app-container {
     flex-direction: column;
@@ -16,11 +76,11 @@
   }
 
   .main-content {
-    padding: 24px 16px 100px 16px;
+    padding: 18px 14px 92px;
   }
 
   .main-content-code-room {
-    padding: 18px 12px 92px;
+    padding: 14px 10px 88px;
   }
 
   .content-wrapper {
@@ -32,27 +92,114 @@
   }
 
   .card {
-    padding: 18px;
-    border-radius: 20px;
+    padding: 16px;
+    border-radius: 18px;
   }
 
   .btn {
-    min-height: 48px;
-    border-radius: 14px;
+    min-height: 44px;
+    border-radius: 12px;
+    font-size: 14px;
   }
 
   .input {
-    min-height: 48px;
-    border-radius: 14px;
+    min-height: 44px;
+    border-radius: 12px;
+    font-size: 14px;
   }
 
   h1 {
-    font-size: 2rem !important;
-    line-height: 1.1;
+    font-size: 1.7rem !important;
+    line-height: 1.06;
   }
 
   h2 {
+    font-size: 1.15rem;
     line-height: 1.15;
+  }
+
+  .page-header {
+    margin-bottom: 12px;
+  }
+
+  .page-header h1,
+  .code-rooms-hero h1 {
+    margin-top: 6px;
+  }
+
+  .code-rooms-subtitle,
+  .interview-prep-muted,
+  .dashboard-card__subtitle {
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  .code-rooms-hero {
+    padding: 16px 14px;
+    border-radius: 18px;
+  }
+
+  .code-rooms-kicker {
+    padding: 3px 8px;
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .code-rooms-hero__stats,
+  .map-hero__stats,
+  .interview-prep-summary,
+  .vacancies-hero__stats,
+  .feed-hero__stats {
+    gap: 8px;
+  }
+
+  .code-rooms-hero__stat,
+  .map-hero__stat,
+  .interview-prep-summary__item,
+  .vacancies-stat-card,
+  .feed-stat-card {
+    min-height: 0;
+    padding: 7px 10px;
+    border-radius: 12px;
+    font-size: 11px;
+  }
+
+  .code-rooms-hero__actions .btn,
+  .interview-prep-hero__actions .btn,
+  .vacancies-hero__actions .btn,
+  .events-hero__actions .btn,
+  .feed-hero__actions .btn {
+    width: 100%;
+  }
+
+  .modal,
+  .modal.modal-wide,
+  .code-room-leagues-modal,
+  .event-form-panel {
+    width: min(calc(100vw - 16px), 100%);
+    max-height: calc(100vh - 16px);
+    border-radius: 18px;
+  }
+
+  .interview-prep-category-strip,
+  .interview-prep-grid,
+  .code-rooms-launch-grid,
+  .task-filters,
+  .code-room-create-filters {
+    grid-template-columns: 1fr;
+  }
+
+  .interview-prep-category-card,
+  .code-rooms-mode-card {
+    min-height: 0;
+    padding: 14px;
+  }
+
+  .interview-prep-card__statement,
+  .vacancy-card__description,
+  .feed-card__description {
+    font-size: 13px;
+    line-height: 1.45;
   }
 
   .hover-scale:hover {
@@ -116,11 +263,62 @@
 
   .page-header {
     flex-direction: column;
-    gap: 16px;
+    gap: 12px;
     align-items: flex-start;
   }
 
-  .code-rooms-hero {
-    padding: 22px 20px;
+  .map-shell {
+    min-height: calc(100vh - 190px) !important;
+  }
+
+  .map-shell .maplibregl-map {
+    min-height: calc(100vh - 190px);
+  }
+
+  .bottom-nav-mobile {
+    height: 64px;
+    padding: 0 4px;
+  }
+}
+
+@media (max-width: 640px) {
+  .main-content {
+    padding: 14px 10px 86px;
+  }
+
+  .card {
+    padding: 14px;
+    border-radius: 16px;
+  }
+
+  h1 {
+    font-size: 1.5rem !important;
+  }
+
+  .code-rooms-subtitle,
+  .interview-prep-muted,
+  .dashboard-card__subtitle {
+    font-size: 11px;
+  }
+
+  .code-rooms-hero__stats,
+  .map-hero__stats,
+  .interview-prep-summary {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .map-hero__stat:last-child,
+  .interview-prep-summary__item:last-child {
+    display: none;
+  }
+
+  .bottom-nav-mobile a span {
+    font-size: 9px;
+  }
+
+  .bottom-nav-mobile svg {
+    width: 18px;
+    height: 18px;
   }
 }

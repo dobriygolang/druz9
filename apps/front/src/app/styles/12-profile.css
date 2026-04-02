@@ -259,6 +259,82 @@
   color: #c7c2ff;
 }
 
+@media (max-width: 960px) {
+  .profile-header,
+  .profile-main-card,
+  .arena-stats-card {
+    padding: 18px;
+    border-radius: 20px;
+  }
+
+  .profile-header {
+    margin-bottom: 20px;
+  }
+
+  .profile-main-card {
+    gap: 18px;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-page {
+    padding-bottom: 20px;
+  }
+
+  .profile-header,
+  .profile-main-card,
+  .arena-stats-card {
+    padding: 14px;
+    border-radius: 18px;
+  }
+
+  .profile-header h1 {
+    font-size: 22px;
+  }
+
+  .profile-avatar {
+    width: 64px;
+    height: 64px;
+    font-size: 20px;
+  }
+
+  .profile-name {
+    font-size: 18px;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .profile-username,
+  .profile-details,
+  .arena-stats-meta {
+    font-size: 12px;
+  }
+
+  .profile-details,
+  .arena-stats-meta,
+  .arena-stats-badges,
+  .profile-badges {
+    gap: 8px;
+  }
+
+  .arena-stats-header h3 {
+    font-size: 16px;
+  }
+
+  .arena-elo-badge,
+  .arena-league-badge,
+  .profile-badge {
+    padding: 6px 10px;
+    font-size: 11px;
+  }
+
+  .profile-edit-btn,
+  .profile-telegram-btn {
+    width: 100%;
+    justify-content: center;
+  }
+}
+
 .profile-badge--admin {
   background: rgba(245, 158, 11, 0.1);
   color: #F59E0B;

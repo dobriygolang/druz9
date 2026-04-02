@@ -159,13 +159,13 @@ export const FeedPage: React.FC = () => {
 
       {isAuthenticated && currentUser?.isAdmin && isAdminPanelOpen && (
         <div className="card fade-in feed-admin-panel" style={{ padding: isMobile ? '20px' : '32px' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px', color: 'var(--accent-color)' }}>
+          <div className="feed-admin-panel__head" style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '24px', color: 'var(--accent-color)' }}>
             <ShieldCheck size={20} />
             <h3 style={{ fontSize: '20px', fontWeight: 700 }}>Публикация подкаста</h3>
           </div>
 
-          <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+          <div className="feed-admin-panel__grid" style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1fr 1fr', gap: '20px' }}>
+            <div className="feed-admin-panel__field" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label style={{ fontSize: '13px', color: 'var(--text-secondary)', marginLeft: '4px' }}>Название выпуска</label>
               <input
                 className="input"
@@ -176,9 +176,9 @@ export const FeedPage: React.FC = () => {
               />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <div className="feed-admin-panel__field" style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <label style={{ fontSize: '13px', color: 'var(--text-secondary)', marginLeft: '4px' }}>Аудиофайл (MP3)</label>
-              <div style={{ position: 'relative' }}>
+              <div className="feed-admin-panel__upload" style={{ position: 'relative' }}>
                 <input
                   type="file"
                   accept="audio/*"
@@ -225,7 +225,7 @@ export const FeedPage: React.FC = () => {
       )}
 
       {isLoading ? (
-        <div style={{ display: 'grid', gap: '16px' }}>
+        <div className="feed-list feed-list--loading" style={{ display: 'grid', gap: '16px' }}>
           {[1, 2, 3].map(i => (
             <div key={i} className="card" style={{ height: '96px', opacity: 0.3, animation: 'pulse 2s infinite' }} />
           ))}
@@ -247,6 +247,7 @@ export const FeedPage: React.FC = () => {
                 <div key={p.id} className={`card fade-in feed-podcast-card ${isActive ? 'is-active' : ''}`}>
                   <button
                     onClick={() => handlePlay(p)}
+                    className="feed-podcast-card__play hover-scale"
                     style={{
                       backgroundColor: isActive && isPlaying ? 'white' : 'var(--accent-color)',
                       color: isActive && isPlaying ? 'black' : 'white',
@@ -260,7 +261,6 @@ export const FeedPage: React.FC = () => {
                       cursor: 'pointer',
                       boxShadow: isActive && isPlaying ? '0 0 30px rgba(79, 70, 229, 0.4)' : '0 10px 20px rgba(0,0,0,0.2)',
                     }}
-                    className="hover-scale"
                   >
                     {isActive && isPlaying ? (
                       <div style={{ display: 'flex', gap: '3px', alignItems: 'flex-end', height: '24px' }}>
@@ -273,12 +273,12 @@ export const FeedPage: React.FC = () => {
                     )}
                   </button>
 
-                  <div style={{ flex: 1 }}>
-                    <div style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: '8px', marginBottom: '4px' }}>
+                  <div className="feed-podcast-card__body" style={{ flex: 1 }}>
+                    <div className="feed-podcast-card__title-row" style={{ display: 'flex', alignItems: isMobile ? 'flex-start' : 'center', flexDirection: isMobile ? 'column' : 'row', gap: '8px', marginBottom: '4px' }}>
                       <h3 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '700' }}>{p.title}</h3>
-                      {isActive && <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-color)', boxShadow: '0 0 10px var(--accent-color)', animation: 'pulse 2s infinite' }} />}
+                      {isActive && <div className="feed-podcast-card__live-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-color)', boxShadow: '0 0 10px var(--accent-color)', animation: 'pulse 2s infinite' }} />}
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: isMobile ? '10px' : '16px', color: 'var(--text-secondary)', fontSize: isMobile ? '14px' : '15px' }}>
+                    <div className="feed-podcast-card__meta" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: isMobile ? '10px' : '16px', color: 'var(--text-secondary)', fontSize: isMobile ? '14px' : '15px' }}>
                       <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{p.author_name}</span>
                       <span style={{ opacity: 0.3 }}>•</span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
@@ -292,6 +292,7 @@ export const FeedPage: React.FC = () => {
                   {(currentUser?.isAdmin || currentUser?.id === p.author_id) && (
                     <button
                       onClick={() => handleDelete(p.id)}
+                      className="feed-podcast-card__delete"
                       style={{
                         color: 'rgba(239, 68, 68, 0.4)',
                         background: 'transparent',

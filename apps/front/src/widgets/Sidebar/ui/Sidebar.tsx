@@ -1,10 +1,33 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
+import { geoApi } from '@/features/Geo/api/geoApi';
 import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Code2, ArrowRight, Settings, Shield, BookOpen } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const { logout, isAuthenticated, user } = useAuth();
+  const [onlineCount, setOnlineCount] = useState<number | null>(null);
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setOnlineCount(null);
+      return;
+    }
+
+    let cancelled = false;
+    void geoApi.communityMap().then((points) => {
+      if (cancelled) {
+        return;
+      }
+      setOnlineCount(points.filter((point) => point.activityStatus === 'online').length);
+    }).catch((error) => {
+      console.error('Failed to load online community count:', error);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthenticated]);
 
   return (
     <aside className="sidebar-desktop">
@@ -18,7 +41,7 @@ export const Sidebar: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)', animation: 'pulse 2s infinite' }} />
               <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>
-                {user?.activityStatus === 'online' ? 'Вы онлайн' : 'Аккаунт активен'}
+                {onlineCount !== null ? `${onlineCount} онлайн сейчас` : (user?.activityStatus === 'online' ? 'Вы онлайн' : 'Аккаунт активен')}
               </span>
             </div>
           </div>
