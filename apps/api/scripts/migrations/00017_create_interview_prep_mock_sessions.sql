@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE IF NOT EXISTS interview_prep_mock_sessions (
     id UUID PRIMARY KEY,
     user_id UUID NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -55,3 +56,8 @@ CREATE TABLE IF NOT EXISTS interview_prep_mock_stage_question_results (
 
 CREATE INDEX IF NOT EXISTS idx_interview_prep_mock_stage_question_results_stage
     ON interview_prep_mock_stage_question_results(stage_id, position);
+
+-- +goose Down
+DROP TABLE IF EXISTS interview_prep_mock_stage_question_results;
+DROP TABLE IF EXISTS interview_prep_mock_stages;
+DROP TABLE IF EXISTS interview_prep_mock_sessions;

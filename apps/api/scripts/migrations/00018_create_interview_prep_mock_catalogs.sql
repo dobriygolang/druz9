@@ -1,3 +1,4 @@
+-- +goose Up
 CREATE TABLE IF NOT EXISTS interview_prep_mock_question_pools (
     id UUID PRIMARY KEY,
     topic TEXT NOT NULL,
@@ -32,3 +33,7 @@ CREATE TABLE IF NOT EXISTS interview_prep_mock_company_presets (
 
 CREATE INDEX IF NOT EXISTS idx_interview_prep_mock_company_presets_lookup
     ON interview_prep_mock_company_presets(company_tag, is_active, position);
+
+-- +goose Down
+DROP TABLE IF EXISTS interview_prep_mock_company_presets;
+DROP TABLE IF EXISTS interview_prep_mock_question_pools;
