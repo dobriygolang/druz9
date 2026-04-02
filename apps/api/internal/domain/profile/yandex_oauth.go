@@ -51,10 +51,6 @@ func (s *Service) StartYandexAuth(_ context.Context) (*model.YandexAuthStart, er
 	s.yandexAuth.byState[state] = expiresAt
 	s.yandexAuth.mu.Unlock()
 
-	// Debug log
-	fmt.Printf("DEBUG: Stored yandex state %s, expires at %v, total states: %d\n",
-		state, expiresAt, len(s.yandexAuth.byState))
-
 	q := url.Values{}
 	q.Set("response_type", "code")
 	q.Set("client_id", s.settings.YandexClientID)
@@ -113,21 +109,12 @@ func (s *Service) consumeYandexState(state string) bool {
 	s.yandexAuth.mu.Lock()
 	defer s.yandexAuth.mu.Unlock()
 
-	fmt.Printf("DEBUG: Looking for yandex state %s, total states: %d\n", state, len(s.yandexAuth.byState))
-
 	expiresAt, ok := s.yandexAuth.byState[state]
 	if !ok {
-		fmt.Printf("DEBUG: Yandex state %s not found\n", state)
 		return false
 	}
-
 	delete(s.yandexAuth.byState, state)
-	valid := expiresAt.After(now)
-
-	fmt.Printf("DEBUG: Yandex state %s found, expires at %v, now: %v, valid: %v\n",
-		state, expiresAt, now, valid)
-
-	return valid
+	return expiresAt.After(now)
 }
 
 func (s *Service) fetchYandexUser(ctx context.Context, code string) (*model.YandexAuthUser, error) {
