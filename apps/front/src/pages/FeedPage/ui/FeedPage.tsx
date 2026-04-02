@@ -140,10 +140,12 @@ export const FeedPage: React.FC = () => {
     <div className="fade-in feed-page" style={{ paddingBottom: isMobile ? '24px' : '40px' }}>
       <section className="page-header code-rooms-hero feed-hero">
         <div className="code-rooms-hero__copy">
-          <span className="code-rooms-kicker">Community Broadcasts</span>
-          <h1>Подкасты</h1>
+          {!isMobile && <span className="code-rooms-kicker">Community Broadcasts</span>}
+          <h1>{isMobile ? 'Фид' : 'Подкасты'}</h1>
           <p className="code-rooms-subtitle">
-            Голос сообщества: короткие выпуски, локальные новости и внутренние эфиры в одной аудиоленте.
+            {isMobile 
+              ? 'Голос сообщества и новости.' 
+              : 'Голос сообщества: короткие выпуски, локальные новости и внутренние эфиры.'}
           </p>
         </div>
 
@@ -233,10 +235,9 @@ export const FeedPage: React.FC = () => {
       ) : (
         <div className="feed-list">
           {podcasts.length === 0 ? (
-            <div className="card feed-empty-state" style={{ padding: '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
-              <Music size={64} style={{ opacity: 0.1, marginBottom: '20px' }} />
-              <p style={{ fontSize: '18px' }}>Пока никто не опубликовал подкастов.</p>
-              <p style={{ fontSize: '14px', marginTop: '8px' }}>Будьте первыми, кто поделится голосом!</p>
+            <div className="card feed-empty-state" style={{ padding: isMobile ? '40px 20px' : '60px', textAlign: 'center', color: 'var(--text-secondary)' }}>
+              <Music size={48} style={{ opacity: 0.1, marginBottom: '20px' }} />
+              <p style={{ fontSize: isMobile ? '16px' : '18px' }}>Пока подкастов нет.</p>
             </div>
           ) : (
             podcasts.map(p => {
@@ -278,14 +279,18 @@ export const FeedPage: React.FC = () => {
                       <h3 style={{ fontSize: isMobile ? '18px' : '20px', fontWeight: '700' }}>{p.title}</h3>
                       {isActive && <div className="feed-podcast-card__live-dot" style={{ width: '8px', height: '8px', borderRadius: '50%', background: 'var(--accent-color)', boxShadow: '0 0 10px var(--accent-color)', animation: 'pulse 2s infinite' }} />}
                     </div>
-                    <div className="feed-podcast-card__meta" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: isMobile ? '10px' : '16px', color: 'var(--text-secondary)', fontSize: isMobile ? '14px' : '15px' }}>
+                    <div className="feed-podcast-card__meta" style={{ display: 'flex', alignItems: 'center', flexWrap: 'wrap', gap: isMobile ? '6px' : '16px', color: 'var(--text-secondary)', fontSize: isMobile ? '13px' : '15px' }}>
                       <span style={{ color: 'var(--text-primary)', fontWeight: 500 }}>{p.author_name}</span>
                       <span style={{ opacity: 0.3 }}>•</span>
                       <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                        <Clock size={16} /> {formatDuration(p.duration_seconds)}
+                        <Clock size={isMobile ? 14 : 16} /> {formatDuration(p.duration_seconds)}
                       </span>
-                      <span style={{ opacity: 0.3 }}>•</span>
-                      <span>{listensCount} {pluralizeRu(listensCount, 'прослушивание', 'прослушивания', 'прослушиваний')}</span>
+                      {(!isMobile || listensCount > 0) && (
+                        <>
+                          <span style={{ opacity: 0.3 }}>•</span>
+                          <span>{listensCount} {isMobile ? '🎧' : pluralizeRu(listensCount, 'прослушивание', 'прослушивания', 'прослушиваний')}</span>
+                        </>
+                      )}
                     </div>
                   </div>
 
@@ -317,9 +322,9 @@ export const FeedPage: React.FC = () => {
 
       <div className="feed-notes-section">
         <h2 className="feed-notes-section__title">Посты сообщества</h2>
-        <div className="card feed-notes-placeholder" style={{ padding: isMobile ? '32px 24px' : '48px', textAlign: 'center' }}>
-          <p style={{ color: 'var(--text-secondary)', fontSize: '16px' }}>
-            Скоро здесь появятся текстовые заметки и фотографии от ваших соседей.
+        <div className="card feed-notes-placeholder" style={{ padding: isMobile ? '32px 20px' : '48px', textAlign: 'center' }}>
+          <p style={{ color: 'var(--text-secondary)', fontSize: isMobile ? '14px' : '16px' }}>
+            {isMobile ? 'Скоро здесь появятся текстовые заметки.' : 'Скоро здесь появятся текстовые заметки и фотографии от ваших соседей.'}
           </p>
         </div>
       </div>

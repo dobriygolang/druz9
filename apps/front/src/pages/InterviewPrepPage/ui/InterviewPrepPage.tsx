@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight, Clock3, Filter, Shuffle, ShieldCheck, Sparkles, TerminalSquare } from 'lucide-react';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 import { interviewPrepApi, InterviewPrepTask, InterviewPrepType } from '@/features/InterviewPrep/api/interviewPrepApi';
 
@@ -48,6 +49,7 @@ function categoryAccentClass(category: TaskCategory) {
 }
 
 export function InterviewPrepPage() {
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const [tasks, setTasks] = useState<InterviewPrepTask[]>([]);
@@ -225,57 +227,64 @@ export function InterviewPrepPage() {
     <div className="code-rooms-page interview-prep-page">
       <section className="page-header code-rooms-hero interview-prep-hero">
         <div className="code-rooms-hero__copy">
-          <span className="code-rooms-kicker">Trusted Only</span>
-          <h1>Interview Prep Arena</h1>
+          {!isMobile && <span className="code-rooms-kicker">Trusted Only</span>}
+          <h1 style={{ fontSize: isMobile ? '28px' : '36px' }}>Interview Prep</h1>
           <p className="code-rooms-subtitle">
-            Выбирай категорию, бери случайную executable-задачу или фильтруй каталог вручную. Coding можно решать на Go или Python, system design поддерживает AI review.
+            {isMobile 
+              ? 'Сценарии для подготовки к техническим интервью.' 
+              : 'Выбирай категорию, бери случайную executable-задачу или фильтруй каталог вручную. Coding можно решать на Go или Python, system design поддерживает AI review.'}
           </p>
-          <div className="interview-prep-hero__actions">
-            <button className="btn btn-primary" onClick={() => void handleRandomStart(filteredTasks)}>
+          <div className="interview-prep-hero__actions" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
+            <button className="btn btn-primary" onClick={() => void handleRandomStart(filteredTasks)} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
               <Shuffle size={16} />
               <span>Случайная задача</span>
             </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => {
-                setCategory('all');
-                setCompany('all');
-                setModeFilter('all');
-                setSearch('');
-              }}
-            >
-              <Filter size={16} />
-              <span>Сбросить фильтры</span>
-            </button>
+            {!isMobile && (
+              <button
+                className="btn btn-secondary"
+                onClick={() => {
+                  setCategory('all');
+                  setCompany('all');
+                  setModeFilter('all');
+                  setSearch('');
+                }}
+              >
+                <Filter size={16} />
+                <span>Сбросить фильтры</span>
+              </button>
+            )}
           </div>
         </div>
 
-        <div className="interview-prep-summary interview-prep-summary--rich">
-          <div className="interview-prep-summary__item">
-            <Sparkles size={16} />
-            <span>{summary.total} сценариев</span>
+        {!isMobile && (
+          <div className="interview-prep-summary interview-prep-summary--rich">
+            <div className="interview-prep-summary__item">
+              <Sparkles size={16} />
+              <span>{summary.total} сценариев</span>
+            </div>
+            <div className="interview-prep-summary__item">
+              <TerminalSquare size={16} />
+              <span>{summary.executable} с автопроверкой</span>
+            </div>
+            <div className="interview-prep-summary__item">
+              <ShieldCheck size={16} />
+              <span>{summary.guidedCount} guided flow</span>
+            </div>
           </div>
-          <div className="interview-prep-summary__item">
-            <TerminalSquare size={16} />
-            <span>{summary.executable} с автопроверкой</span>
-          </div>
-          <div className="interview-prep-summary__item">
-            <ShieldCheck size={16} />
-            <span>{summary.guidedCount} guided flow</span>
-          </div>
-        </div>
+        )}
       </section>
 
-      <section className="interview-prep-category-strip">
+      <section className="interview-prep-category-strip" style={{ gap: isMobile ? '8px' : '12px' }}>
         {categoryStats.map((item) => (
           <button
             key={item.key}
             type="button"
             className={`card dashboard-card interview-prep-category-card ${category === item.key ? 'is-active' : ''} ${categoryAccentClass(item.key)}`}
             onClick={() => setCategory(item.key)}
+            style={{ padding: isMobile ? '12px' : '16px' }}
           >
-            <span className="interview-prep-category-card__label">{item.label}</span>
-            <strong>{item.count}</strong>
+            <span className="interview-prep-category-card__label" style={{ fontSize: isMobile ? '13px' : '14px' }}>{item.label}</span>
+            <strong style={{ fontSize: isMobile ? '18px' : '20px' }}>{item.count}</strong>
           </button>
         ))}
       </section>
@@ -283,8 +292,8 @@ export function InterviewPrepPage() {
       <section className="card dashboard-card interview-prep-filter-card">
         <div className="dashboard-card__header">
           <div>
-            <h2>Каталог задач</h2>
-            <p className="interview-prep-muted">Фильтруй по категории, типу потока и тексту задачи.</p>
+            <h2 style={{ fontSize: isMobile ? '20px' : '24px' }}>Задачи</h2>
+            {!isMobile && <p className="interview-prep-muted">Фильтруй по категории, типу потока и тексту задачи.</p>}
           </div>
         </div>
 
@@ -398,20 +407,20 @@ export function InterviewPrepPage() {
                     <article key={task.id} className={`card dashboard-card interview-prep-card interview-prep-card--category ${categoryAccentClass(taskCategory)}`}>
                       <div className="interview-prep-card__head">
                         <div className="task-item__meta">
-                          <span className="badge">{CATEGORY_LABELS[taskCategory]}</span>
-                          <span className="badge">{PREP_TYPE_LABELS[task.prepType] ?? task.prepType}</span>
+                          <span className="badge">{isMobile ? group.label.charAt(0) : CATEGORY_LABELS[taskCategory]}</span>
+                          <span className="badge">{isMobile ? '' : PREP_TYPE_LABELS[task.prepType] ?? task.prepType}</span>
                           {task.companyTag && <span className="badge">{task.companyTag}</span>}
-                          <span className="badge">{task.language}</span>
+                          {!isMobile && <span className="badge">{task.language}</span>}
                           <span className="badge">
                             <Clock3 size={12} />
-                            {Math.round(task.durationSeconds / 60)} мин
+                            {Math.round(task.durationSeconds / 60)}м
                           </span>
                         </div>
                         {!task.isActive && <span className="badge task-inactive">Неактивна</span>}
                       </div>
 
-                      <h3 className="interview-prep-card__title">{task.title}</h3>
-                      <p className="interview-prep-card__statement">{task.statement}</p>
+                      <h3 className="interview-prep-card__title" style={{ fontSize: isMobile ? '16px' : '18px' }}>{task.title}</h3>
+                      <p className={`interview-prep-card__statement ${isMobile ? 'text-prune-2' : ''}`}>{task.statement}</p>
 
                       <div className="interview-prep-card__footer">
                         <div className="interview-prep-card__hint">

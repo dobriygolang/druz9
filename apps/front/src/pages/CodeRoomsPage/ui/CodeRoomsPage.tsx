@@ -8,43 +8,21 @@ import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 import { ArenaLeaderboardEntry, ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode } from '@/entities/CodeRoom/model/types';
 import { ArrowRight, BookOpen, Eye, FileCode, Plus, ShieldCheck, Swords, TimerReset, Trophy, Users } from 'lucide-react';
 import { FancySelect } from '@/shared/ui/FancySelect';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 const MOTIVATIONAL_QUOTES = [
   'Код — это поэзия логики',
-  'Каждый баг — это возможность научиться',
-  'Компилятор не прощает ошибок, но учит дисциплине',
-  'Решение рождается в процессе написания',
-  'Чем сложнее задача, тем интереснее победа',
+  'Баг — это возможность',
+  'Решение в процессе',
   'Твой код изменит мир',
-  'Ошибки — это ступени к мастерству',
-  'Делай сегодня то, что другие не хотят',
-  'Завтра будешь благодарен себе за практику',
-  'Каждая строка кода — это шаг вперёд',
-  'Сложные задачи — просто возможности',
-  'Программист — это творец цифрового мира',
-  'Практика ведёт к совершенству',
-  'Кодь смело — ошибки покажут путь',
-  'Будущее принадлежит тем, кто пишет код',
-  'Решай, чтобы побеждать',
-  'Каждый коммит — это достижение',
-  'Обучение — это инвестиция в себя',
-  'Кто много кодит — тот много умеет',
-  'Сила в практике, сила в коде',
-  'Каждый эксперт когда-то был новичком',
-  'Код пишут люди, а не машины',
-  'Лучший код — это рабочий код',
+  'Ошибки — путь к мастерству',
+  'Сила в практике',
+  'Лучший код — рабочий код',
   'Отладка учит терпению',
   'Читай код — пиши код',
-  'Программирование — это искусство',
   'Сомневаешься — пиши тесты',
-  'Кто не рискует — тот не коммитит',
-  'Баги временны, а код вечен',
-  'Каждая функция должна делать одно дело',
-  'Простота — сложность для гениев',
-  'Рефакторинг — это не признак ошибки',
-  'Успех — это 1% вдохновения и 99% отладки',
-  'Код живёт, пока его поддерживают',
-  'Вдохновение приходит к пишущим',
+  'Баги временны, код вечен',
+  'Сложные задачи — это рост',
 ];
 
 const DUEL_TOPICS = [
@@ -125,6 +103,7 @@ const ARENA_RULE_SECTIONS = [
 
 export const CodeRoomsPage: React.FC = () => {
   type LaunchMode = CodeRoomMode | 'queue';
+  const isMobile = useIsMobile();
   const navigate = useNavigate();
   const location = useLocation();
   const skipArenaResume = Boolean(location.state?.skipArenaResume);
@@ -473,23 +452,23 @@ export const CodeRoomsPage: React.FC = () => {
       <div className="code-rooms-page">
         <div className="page-header code-rooms-hero">
           <div className="code-rooms-hero__copy">
-            <span className="code-rooms-kicker">Duel</span>
-            <h1>{motivationalQuote}</h1>
+            {!isMobile && <span className="code-rooms-kicker">Duel Arena</span>}
+            <h1>{isMobile ? 'Арена' : motivationalQuote}</h1>
           </div>
           <div className="code-rooms-hero__actions">
             {isAdmin && (
-              <button className="btn btn-secondary" onClick={() => navigate('/admin/code-tasks')}>
-                <ShieldCheck size={16} />
-                Админка
+              <button className="btn btn-secondary" onClick={() => navigate('/admin/code-tasks')} title="Админка">
+                <ShieldCheck size={18} />
+                {!isMobile && 'Админка'}
               </button>
             )}
-            <button className="btn btn-secondary" onClick={() => setShowLeaguesModal(true)}>
-              <Trophy size={16} />
-              Лиги
+            <button className="btn btn-secondary" onClick={() => setShowLeaguesModal(true)} title="Лиги">
+              <Trophy size={18} />
+              {!isMobile && 'Лиги'}
             </button>
             <button className="btn btn-primary code-rooms-create-btn" onClick={() => setShowCreateModal(true)}>
-              <Plus size={16} />
-              <span>Новая комната</span>
+              <Plus size={18} />
+              <span>{isMobile ? 'Создать' : 'Новая комната'}</span>
             </button>
           </div>
         </div>
@@ -500,7 +479,7 @@ export const CodeRoomsPage: React.FC = () => {
               <div>
                 <div className="code-room-prep-launch__title">Solo practice</div>
                 <div className="mode-desc">
-                  Открой executable interview-prep каталог или сразу возьми случайную задачу по нужной группе.
+                  {isMobile ? 'Каталог задач interview-prep.' : 'Открой executable interview-prep каталог или сразу возьми случайную задачу.'}
                 </div>
               </div>
               <BookOpen size={18} />
@@ -583,7 +562,7 @@ export const CodeRoomsPage: React.FC = () => {
               </div>
             </div>
             <p className="dashboard-card__subtitle launch-card-desc">
-              Создай комнату для совместной работы или дуэль, выбери тему и отправь другу ссылку-приглашение.
+              {isMobile ? 'Создай комнату для работы или дуэль.' : 'Создай комнату для совместной работы или дуэль, выбери тему и отправь ссылку.'}
             </p>
 
             <div className="code-rooms-launch-grid">
@@ -593,8 +572,8 @@ export const CodeRoomsPage: React.FC = () => {
               }}>
                 <div className="code-rooms-mode-card__icon"><Users size={18} /></div>
                 <div>
-                  <div className="code-rooms-mode-card__title">Комната для всех</div>
-                  <div className="code-rooms-mode-card__text">Один редактор, live-coding и общий запуск кода.</div>
+                  <div className="code-rooms-mode-card__title">Комната</div>
+                  <div className="code-rooms-mode-card__text">Live-coding и общий запуск.</div>
                 </div>
                 <ArrowRight size={16} />
               </button>
@@ -609,11 +588,11 @@ export const CodeRoomsPage: React.FC = () => {
               >
                 <div className="code-rooms-mode-card__icon"><Swords size={18} /></div>
                 <div>
-                  <div className="code-rooms-mode-card__title">Дуэль по приглашению</div>
+                  <div className="code-rooms-mode-card__title">Дуэль</div>
                   <div className="code-rooms-mode-card__text">
                     {isGuest
-                      ? 'Гости тоже могут играть, но рейтинг, история матчей и профиль доступны после регистрации.'
-                      : 'Случайная задача по теме, timer, judge по тестам и отдельный match-сценарий.'}
+                      ? 'Рейтинг и матчи доступны после регистрации.'
+                      : 'Случайная задача, таймер и судья.'}
                   </div>
                 </div>
                 <ArrowRight size={16} />
@@ -629,9 +608,9 @@ export const CodeRoomsPage: React.FC = () => {
               >
                 <div className="code-rooms-mode-card__icon"><TimerReset size={18} /></div>
                 <div>
-                  <div className="code-rooms-mode-card__title">Дуэль онлайн <span className="arena-chip card-chip"><Users size={12} />{publicQueueSize}</span></div>
+                  <div className="code-rooms-mode-card__title">Очередь <span className="arena-chip card-chip"><Users size={12} />{publicQueueSize}</span></div>
                   <div className="code-rooms-mode-card__text">
-                    Быстрый подбор соперника в очереди с такой же темой и случайной задачей.
+                    Быстрый подбор соперника онлайн.
                   </div>
                 </div>
                 <ArrowRight size={16} />
@@ -670,7 +649,11 @@ export const CodeRoomsPage: React.FC = () => {
                     <div className="leaderboard-main">
                       <div className="leaderboard-name">{entry.displayName}</div>
                       <div className="leaderboard-meta">
-                        <span>{entry.rating} ELO</span> <span>•</span> <span>{entry.league}</span> <span>•</span> <span>{entry.wins} {pluralizeRu(entry.wins, 'победа', 'победы', 'побед')}</span> <span>•</span> <span>{entry.matches} {pluralizeRu(entry.matches, 'матч', 'матча', 'матчей')}</span>
+                        {isMobile ? (
+                          <span>{entry.rating} ELO • {entry.wins} {pluralizeRu(entry.wins, 'победа', 'победы', 'побед')}</span>
+                        ) : (
+                          <span>{entry.rating} ELO <span>•</span> <span>{entry.league}</span> <span>•</span> <span>{entry.wins} {pluralizeRu(entry.wins, 'победа', 'победы', 'побед')}</span> <span>•</span> <span>{entry.matches} {pluralizeRu(entry.matches, 'матч', 'матча', 'матчей')}</span></span>
+                        )}
                       </div>
                     </div>
                     <div className="leaderboard-rate">{Math.round(entry.winRate * 100)}%</div>

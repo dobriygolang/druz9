@@ -21,6 +21,7 @@ import { EventDraft } from '@/pages/MapPage/components/types';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { AxiosError } from '@/shared/api/base';
 import { getEventColorSpec } from '@/features/Event/lib/eventMetadata';
+import { MobileDrawer } from '@/shared/ui/MobileDrawer/MobileDrawer';
 
 const WEEKDAYS = ['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'];
 const MONTHS = [
@@ -78,6 +79,7 @@ export const EventsPage: React.FC = () => {
   const [confirmDeleteId, setConfirmDeleteId] = useState<string | null>(null);
   const [groupFilter, setGroupFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
+  const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
 
   const loadRef = useRef<{ (): Promise<void> } | null>(null);
 
@@ -264,15 +266,21 @@ export const EventsPage: React.FC = () => {
     <div className="events-page fade-in">
       <section className="page-header code-rooms-hero events-hero">
         <div className="code-rooms-hero__copy">
-          <span className="code-rooms-kicker">Community Calendar</span>
-          <h1>Ивенты</h1>
+          {!isMobile && <span className="code-rooms-kicker">Community Calendar</span>}
+          <h1>{isMobile ? 'Календарь' : 'Ивенты'}</h1>
           <p className="code-rooms-subtitle">
-            Общий календарь сообщества: встречи, алгоритмы, клубы и созвоны. Фильтруй по группе и типу, быстро листай месяцы и держи весь ритм комьюнити в одном месте.
+            {isMobile 
+              ? 'Встречи, алгоритмы и созвоны сообщества.' 
+              : 'Общий календарь сообщества: встречи, алгоритмы, клубы и созвоны. Фильтруй по группе и типу, быстро листай месяцы.'}
           </p>
           <div className="events-hero__meta">
-            <span className="badge"><Calendar size={12} /> {events.length} {pluralizeRu(events.length, 'событие', 'события', 'событий')}</span>
-            <span className="badge"><Sparkles size={12} /> {eventGroups.length || 1} {pluralizeRu(eventGroups.length || 1, 'группа', 'группы', 'групп')}</span>
-            <span className="badge"><MapPin size={12} /> {eventTypes.length || 1} {pluralizeRu(eventTypes.length || 1, 'формат', 'формата', 'форматов')}</span>
+            <span className="badge"><Calendar size={12} /> {events.length}</span>
+            {!isMobile && (
+              <>
+                <span className="badge"><Sparkles size={12} /> {eventGroups.length || 1} {pluralizeRu(eventGroups.length || 1, 'группа', 'группы', 'групп')}</span>
+                <span className="badge"><MapPin size={12} /> {eventTypes.length || 1} {pluralizeRu(eventTypes.length || 1, 'формат', 'формата', 'форматов')}</span>
+              </>
+            )}
           </div>
         </div>
 
@@ -291,23 +299,78 @@ export const EventsPage: React.FC = () => {
 
           <button className="btn btn-primary events-hero__create" onClick={() => handleCreateClick()}>
             <Plus size={18} />
-            <span>Создать событие</span>
+            <span>{isMobile ? 'Создать' : 'Создать событие'}</span>
           </button>
+
+          {isMobile && (
+            <button 
+              className="btn btn-secondary events-hero__filter-btn" 
+              onClick={() => setIsFilterDrawerOpen(true)}
+              style={{ padding: '0 12px' }}
+            >
+              <SlidersHorizontal size={18} />
+              {(groupFilter !== 'all' || typeFilter !== 'all') && <span className="filter-dot" />}
+            </button>
+          )}
         </div>
       </section>
 
-      <section className="card dashboard-card events-filter-card">
-        <div className="dashboard-card__header">
-          <div>
-            <h2>Фильтры календаря</h2>
-            <p className="interview-prep-muted">Оставь только нужные группы и типы, чтобы календарь не шумел.</p>
+      {!isMobile && (
+        <section className="card dashboard-card events-filter-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>Фильтры календаря</h2>
+              <p className="interview-prep-muted">Оставь только нужные группы и типы, чтобы календарь не шумел.</p>
+            </div>
+            <div className="events-filter-card__icon">
+              <SlidersHorizontal size={16} />
+            </div>
           </div>
-          <div className="events-filter-card__icon">
-            <SlidersHorizontal size={16} />
-          </div>
-        </div>
 
-        <div className="events-filter-grid" style={{ gridTemplateColumns: isMobile ? '1fr' : undefined }}>
+          <div className="events-filter-grid">
+            <div className="events-filter-field">
+              <label>Группа</label>
+              <FancySelect
+                value={groupFilter}
+                options={[
+                  { value: 'all', label: 'Все группы' },
+                  ...eventGroups.map((group) => ({ value: group, label: group })),
+                ]}
+                onChange={setGroupFilter}
+              />
+            </div>
+            <div className="events-filter-field">
+              <label>Тип</label>
+              <FancySelect
+                value={typeFilter}
+                options={[
+                  { value: 'all', label: 'Все типы' },
+                  ...eventTypes.map((type) => ({ value: type, label: type })),
+                ]}
+                onChange={setTypeFilter}
+              />
+            </div>
+            <button className="btn btn-secondary events-filter-reset" onClick={() => { setGroupFilter('all'); setTypeFilter('all'); }}>
+              Сбросить
+            </button>
+          </div>
+        </section>
+      )}
+
+      <MobileDrawer
+        isOpen={isFilterDrawerOpen}
+        onClose={() => setIsFilterDrawerOpen(false)}
+        title="Фильтры календаря"
+        footer={
+          <button 
+            className="btn btn-primary w-full" 
+            onClick={() => setIsFilterDrawerOpen(false)}
+          >
+            Применить
+          </button>
+        }
+      >
+        <div className="events-mobile-filters">
           <div className="events-filter-field">
             <label>Группа</label>
             <FancySelect
@@ -319,7 +382,7 @@ export const EventsPage: React.FC = () => {
               onChange={setGroupFilter}
             />
           </div>
-          <div className="events-filter-field">
+          <div className="events-filter-field" style={{ marginTop: '16px' }}>
             <label>Тип</label>
             <FancySelect
               value={typeFilter}
@@ -330,11 +393,15 @@ export const EventsPage: React.FC = () => {
               onChange={setTypeFilter}
             />
           </div>
-          <button className="btn btn-secondary events-filter-reset" onClick={() => { setGroupFilter('all'); setTypeFilter('all'); }}>
+          <button 
+            className="btn btn-ghost w-full" 
+            style={{ marginTop: '20px' }}
+            onClick={() => { setGroupFilter('all'); setTypeFilter('all'); }}
+          >
             Сбросить фильтры
           </button>
         </div>
-      </section>
+      </MobileDrawer>
 
       <section className="events-calendar-shell">
         <div className="events-calendar-grid-head">

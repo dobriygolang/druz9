@@ -41,7 +41,7 @@ export const Sidebar: React.FC = () => {
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
               <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)', animation: 'pulse 2s infinite' }} />
               <span style={{ color: 'var(--text-primary)', fontWeight: '600' }}>
-                {onlineCount !== null ? `${onlineCount} онлайн сейчас` : (user?.activityStatus === 'online' ? 'Вы онлайн' : 'Аккаунт активен')}
+                {onlineCount !== null ? `${onlineCount} онлайн` : (user?.activityStatus === 'online' ? 'Вы онлайн' : 'Аккаунт активен')}
               </span>
             </div>
           </div>

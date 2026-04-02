@@ -9,6 +9,16 @@
   --accent-color: #4F46E5;
   --accent-hover: #4338CA;
   --danger-color: #EF4444;
+
+  /* Typography - Fluid */
+  --font-size-xs: clamp(0.7rem, 0.65rem + 0.25vw, 0.75rem);
+  --font-size-sm: clamp(0.8rem, 0.75rem + 0.25vw, 0.875rem);
+  --font-size-md: clamp(0.9rem, 0.85rem + 0.25vw, 1rem);
+  --font-size-lg: clamp(1.1rem, 1rem + 0.5vw, 1.25rem);
+  --font-size-xl: clamp(1.5rem, 1.25rem + 1vw, 2.25rem);
+
+  /* Spacing */
+  --spacing-gutter: clamp(12px, 2vw, 32px);
 }
 
 * {

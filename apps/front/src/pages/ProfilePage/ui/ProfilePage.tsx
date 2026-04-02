@@ -32,7 +32,10 @@ function centerAspectCrop(
     mediaHeight,
   )
 }
+
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 export const ProfilePage: React.FC = () => {
+  const isMobile = useIsMobile();
   const { user: currentUser, updateLocation } = useAuth();
   const { userId } = useParams();
   const [user, setUser] = useState<User | null>(currentUser);
@@ -416,12 +419,13 @@ export const ProfilePage: React.FC = () => {
         </Link>
       )}
 
-      <div className="profile-header">
-        <h1>Профиль</h1>
+      <div className="profile-header" style={{ flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '12px' : '20px' }}>
+        <h1 style={{ fontSize: isMobile ? '28px' : '32px' }}>Профиль</h1>
         {isOwnProfile && (
           <button
-            className="btn btn-primary"
+            className={`btn btn-primary ${isMobile ? 'w-full' : ''}`}
             onClick={() => setIsEditModalOpen(true)}
+            style={{ height: isMobile ? '48px' : 'auto' }}
           >
             <Pencil size={18} /> Редактировать профиль
           </button>
@@ -432,18 +436,20 @@ export const ProfilePage: React.FC = () => {
       {arenaStats && (
         <div className={`profile-league-banner profile-league-banner--${getLeagueInfo(arenaStats.league).className}`}>
           <div className="profile-league-banner__glow" />
-          <div className="profile-league-banner__content">
+          <div className="profile-league-banner__content" style={{ flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', gap: isMobile ? '8px' : '20px' }}>
             <div className="profile-league-banner__title">
               {getLeagueInfo(arenaStats.league).icon}
-              <h3 className={`profile-league-banner__title--${getLeagueInfo(arenaStats.league).className}`}>
-                {getLeagueInfo(arenaStats.league).name} Лига
+              <h3 className={`profile-league-banner__title--${getLeagueInfo(arenaStats.league).className}`} style={{ fontSize: isMobile ? '18px' : '22px' }}>
+                {getLeagueInfo(arenaStats.league).name}
               </h3>
-              <span className="arena-elo-badge" style={{ marginLeft: 8 }}>{arenaStats.rating} ELO</span>
+              <span className="arena-elo-badge" style={{ marginLeft: 8 }}>{arenaStats.rating}</span>
             </div>
-            <div className="profile-league-banner__stats">
-              <span className="profile-league-banner__stat">{arenaStats.matches} матчей</span>
-              <span className="profile-league-banner__stat">{arenaStats.wins} побед</span>
-            </div>
+            {!isMobile && (
+              <div className="profile-league-banner__stats">
+                <span className="profile-league-banner__stat">{arenaStats.matches} матчей</span>
+                <span className="profile-league-banner__stat">{arenaStats.wins} побед</span>
+              </div>
+            )}
           </div>
         </div>
       )}
@@ -459,20 +465,20 @@ export const ProfilePage: React.FC = () => {
           {!user.avatarUrl && user.telegramUsername?.charAt(0).toUpperCase()}
         </div>
 
-        <div className="profile-info">
-          <h2 className="profile-name">
+        <div className="profile-info" style={{ textAlign: isMobile ? 'center' : 'left' }}>
+          <h2 className="profile-name" style={{ fontSize: isMobile ? '24px' : '28px' }}>
             {user.firstName || ''} {user.lastName || ''}
             {!user.firstName && !user.lastName ? user.telegramUsername : ''}
           </h2>
           <div className="profile-username">
             @{user.telegramUsername}
           </div>
-          <div className="profile-details">
+          <div className="profile-details" style={{ justifyContent: isMobile ? 'center' : 'flex-start' }}>
             <div className="profile-detail-item">
               <MapPin size={16} /> {user.region}
             </div>
 
-            {user.currentWorkplace && (
+            {user.currentWorkplace && !isMobile && (
               <div className="profile-detail-item">
                 <Briefcase size={16} /> {user.currentWorkplace}
               </div>
@@ -481,7 +487,7 @@ export const ProfilePage: React.FC = () => {
             <div className={`profile-status ${user.activityStatus === 'online' ? 'profile-status--online' : user.activityStatus === 'recently_active' ? 'profile-status--recently' : 'profile-status--offline'}`}>
               <div className="profile-status-dot" />
               {user.activityStatus === 'online' ? 'В сети' :
-               user.activityStatus === 'recently_active' ? 'Был недавно' : 'Не в сети'}
+               user.activityStatus === 'recently_active' ? 'Был' : 'Offline'}
             </div>
           </div>
         </div>
@@ -569,8 +575,8 @@ export const ProfilePage: React.FC = () => {
 
       {/* Info Grid */}
       <div className="profile-info-section">
-        <h2>Данные профиля</h2>
-        <div className="profile-info-grid">
+        <h2>Информация</h2>
+        <div className="profile-info-grid" style={{ gridTemplateColumns: isMobile ? '1fr' : 'repeat(3, 1fr)' }}>
           <div className="profile-info-card">
             <h3><MapPin size={14} /> Локация</h3>
             <p>{user.region || 'Не указано'}</p>
@@ -578,13 +584,15 @@ export const ProfilePage: React.FC = () => {
 
           <div className="profile-info-card">
             <h3><Briefcase size={14} /> Работа</h3>
-            <p>{user.currentWorkplace || 'Не указано'}</p>
+            <p className="text-prune-1">{user.currentWorkplace || 'Не указано'}</p>
           </div>
 
-          <div className="profile-info-card">
-            <h3><Navigation size={14} /> Координаты</h3>
-            <p>{user.latitude.toFixed(5)}, {user.longitude.toFixed(5)}</p>
-          </div>
+          {!isMobile && (
+            <div className="profile-info-card">
+              <h3><Navigation size={14} /> Координаты</h3>
+              <p>{user.latitude.toFixed(4)}, {user.longitude.toFixed(4)}</p>
+            </div>
+          )}
         </div>
       </div>
 

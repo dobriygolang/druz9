@@ -529,18 +529,63 @@
   font-size: 11px;
 }
 
-@media (max-width: 720px) {
+@media (max-width: 768px) {
+  .card {
+    padding: 16px;
+    border-radius: 14px;
+    border: none;
+    background: rgba(255, 255, 255, 0.03);
+  }
+
+  .main-content {
+    padding: 16px 12px 80px;
+  }
+
+  .main-content-code-room {
+    padding: 12px;
+  }
+
+  .modal-overlay {
+    padding: 10px;
+    align-items: flex-end;
+  }
+
+  .modal {
+    padding: 24px 20px;
+    border-radius: 20px 20px 0 0;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+
   .event-overlay {
-    padding: 14px;
+    padding: 12px;
+  }
+
+  .event-overlay__dialog {
+    width: 100%;
+    max-height: 90vh;
+    padding: 16px;
+    border-radius: 20px;
+  }
+
+  .event-overlay__icon-shell {
+    width: 50px;
+    height: 50px;
+    border-radius: 16px;
   }
 
   .event-overlay__title {
-    font-size: 34px;
+    font-size: 28px;
   }
 
-  .event-overlay__meta-grid,
-  .event-overlay__participants {
-    grid-template-columns: 1fr;
+  .event-overlay__meta-card {
+    padding: 12px;
+    gap: 10px;
+  }
+
+  .event-overlay__meta-icon {
+    width: 34px;
+    height: 34px;
   }
 }
 
@@ -781,6 +826,7 @@
 .interview-prep-card__statement {
   display: -webkit-box;
   -webkit-line-clamp: 7;
+  line-clamp: 7;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }

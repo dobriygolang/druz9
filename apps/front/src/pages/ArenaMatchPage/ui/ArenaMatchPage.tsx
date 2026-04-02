@@ -10,6 +10,7 @@ import { useArenaRealtime } from '@/features/CodeRoom/api/useArenaRealtime';
 import { getStoredGuestId, getStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { AxiosError } from '@/shared/api/base';
 import { inferLanguageFromSource, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 // Anti-cheat countdown timer component
 const AntiCheatCountdown: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
@@ -156,6 +157,7 @@ export const ArenaMatchPage: React.FC = () => {
   const { matchId } = useParams<{ matchId: string }>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const { user, isLoading: authLoading } = useAuth();
   const isSpectator = searchParams.get('spectator') === '1';
 
@@ -175,6 +177,7 @@ export const ArenaMatchPage: React.FC = () => {
   const [antiCheatNotice, setAntiCheatNotice] = useState('');
   const [antiCheatWasEnabled, setAntiCheatWasEnabled] = useState(false);
   const [showAntiCheatBanner, setShowAntiCheatBanner] = useState(false);
+  const [activeTab, setActiveTab] = useState<'editor' | 'opponent' | 'output'>('editor');
   const arenaLanguage = monacoLanguageFor(inferLanguageFromSource(match?.starterCode));
 
   const hasJoinedRef = useRef(false);
@@ -305,27 +308,6 @@ export const ArenaMatchPage: React.FC = () => {
 
   const myAntiCheatStrikes = me?.suspicionCount ?? 0;
 
-  const antiCheatStatusText = useMemo(() => {
-    if (!match) {
-      return '';
-    }
-
-    if (match.status === 'finished') {
-      if (me?.antiCheatPenalized) {
-        return 'Anti-cheat penalty applied';
-      }
-      if (opponent?.antiCheatPenalized) {
-        return 'У соперника anti-cheat penalty';
-      }
-      return '';
-    }
-
-    if (!isSpectator && myAntiCheatStrikes > 0) {
-      return `Anti-cheat: ${Math.min(myAntiCheatStrikes, 2)}/2`;
-    }
-
-    return '';
-  }, [match, me?.antiCheatPenalized, opponent?.antiCheatPenalized, myAntiCheatStrikes, isSpectator]);
 
   const freezeLeft = useMemo(() => {
     if (!me?.freezeUntil) {
@@ -724,48 +706,36 @@ export const ArenaMatchPage: React.FC = () => {
           <div className="arena-page__meta">
             <div className={`connection-status ${isConnected ? 'connected' : ''}`}>
               <span className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`} />
-              <span>{isConnected ? 'Realtime активен' : 'Переподключение...'}</span>
+              {!isMobile && <span>{isConnected ? 'Realtime активен' : 'Переподключение...'}</span>}
             </div>
             {winner && (
               <div className="arena-chip arena-chip--winner">
                 <Trophy size={14} />
-                Победил {winner.displayName}
+                <span>{isMobile ? winner.displayName : `Победил ${winner.displayName}`}</span>
               </div>
             )}
-            {winnerReasonLabel && (
+            {!isMobile && winnerReasonLabel && (
               <div className="arena-chip arena-chip--winner-reason">
                 {winnerReasonLabel}
               </div>
             )}
-            {match.status === 'finished' && me?.antiCheatPenalized && (
-              <div className="arena-chip arena-chip--winner-reason">
-                У тебя anti-cheat penalty
-              </div>
+            {!isMobile && (
+              <>
+                <div className="arena-chip"><Clock3 size={14} /> {formatClock(elapsedSeconds)}</div>
+                <div className="arena-chip"><TimerReset size={14} /> {formatClock(remainingSeconds)}</div>
+                <div className="arena-chip"><Swords size={14} /> {match.topic || 'any'} / {match.difficulty || 'any'}</div>
+              </>
             )}
-            {match.status === 'finished' && opponent?.antiCheatPenalized && (
-              <div className="arena-chip arena-chip--winner-reason">
-                У соперника anti-cheat penalty
-              </div>
+            {isMobile && (
+               <div className="arena-chip"><TimerReset size={14} /> {formatClock(remainingSeconds)}</div>
             )}
-            {antiCheatStatusText && (
-              <div className="arena-chip arena-chip--winner-reason">
-                {antiCheatStatusText}
-              </div>
-            )}
-            {!isSpectator && match.startedAt && match.status !== 'finished' && <div className="arena-chip" onClick={() => setShowAntiCheatBanner(true)}>Anti-cheat активен</div>}
-            {match.status === 'finished' && match.isRated === false && match.unratedReason && match.unratedReason !== 'anti_cheat' && (
-              <div className="arena-chip arena-chip--winner-reason">
-                unrated • {match.unratedReason}
-              </div>
-            )}
-            {isSpectator && <div className="arena-chip arena-chip--spectator"><Eye size={14} /> Режим зрителя</div>}
-            <div className="arena-chip"><Clock3 size={14} /> прошло {formatClock(elapsedSeconds)}</div>
-            <div className="arena-chip"><TimerReset size={14} /> осталось {formatClock(remainingSeconds)}</div>
-            <div className="arena-chip"><Swords size={14} /> {match.topic || 'any'} / {match.difficulty || 'any'}</div>
+            {!isMobile && !isSpectator && match.startedAt && match.status !== 'finished' && <div className="arena-chip" onClick={() => setShowAntiCheatBanner(true)}>Anti-cheat активен</div>}
+            {isSpectator && <div className="arena-chip arena-chip--spectator"><Eye size={14} /> {isMobile ? '' : 'Режим зрителя'}</div>}
+            
             {!isSpectator && (
-              <button className="btn btn-primary arena-copy-btn" onClick={handleCopyLink}>
+              <button className="btn btn-primary arena-copy-btn" onClick={handleCopyLink} style={{ width: isMobile ? '40px' : '120px', padding: isMobile ? 0 : '0 10px' }}>
                 <Copy size={16} />
-                <span>{copied ? 'Скопировано' : 'Скопировать'}</span>
+                {!isMobile && <span>{copied ? 'Скопировано' : 'Скопировать'}</span>}
               </button>
             )}
             {canShowReplayActions && canUseTimelapse && (
@@ -781,22 +751,37 @@ export const ArenaMatchPage: React.FC = () => {
                   setShowTimelapse(false);
                   setIsTimelapsePlaying(false);
                 }}
+                style={{ width: isMobile ? '40px' : '120px', padding: isMobile ? 0 : '0 10px' }}
               >
-                <Square size={16} />
-                <span>{showTimelapse ? 'Вернуться в live' : 'Таймлайн'}</span>
-              </button>
-            )}
-            {canShowReplayActions && !canUseTimelapse && (
-              <button
-                className="btn btn-primary arena-copy-btn"
-                onClick={() => navigate(`/arena/${match.id}?spectator=1&replay=1`)}
-              >
-                <Eye size={16} />
-                <span>Режим зрителя</span>
+                {showTimelapse ? <Play size={16} /> : <Square size={16} />}
+                {!isMobile && <span>{showTimelapse ? 'Вернуться в live' : 'Таймлайн'}</span>}
               </button>
             )}
           </div>
         </div>
+
+        {isMobile && bothPlayersConnected && (
+          <div className="arena-mobile-tabs">
+            <button 
+              className={`arena-mobile-tab ${activeTab === 'editor' ? 'active' : ''}`}
+              onClick={() => setActiveTab('editor')}
+            >
+              Код
+            </button>
+            <button 
+              className={`arena-mobile-tab ${activeTab === 'opponent' ? 'active' : ''}`}
+              onClick={() => setActiveTab('opponent')}
+            >
+              Соперник
+            </button>
+            <button 
+              className={`arena-mobile-tab ${activeTab === 'output' ? 'active' : ''} ${submitError ? 'has-error' : ''}`}
+              onClick={() => setActiveTab('output')}
+            >
+              Output
+            </button>
+          </div>
+        )}
 
         {!isSpectator && showAntiCheatBanner && match.status === 'active' && (
           <div className="arena-anti-cheat-notice arena-anti-cheat-notice--live">
@@ -870,69 +855,74 @@ export const ArenaMatchPage: React.FC = () => {
           ref={gridRef}
           className="arena-page__grid arena-page__grid--resizable"
           style={{
-            gridTemplateColumns: isSpectator
+            gridTemplateColumns: isMobile
+              ? '1fr'
+              : isSpectator
               ? `minmax(0, ${editorWidth}fr) minmax(0, ${100 - editorWidth}fr)`
               : `minmax(0, ${editorWidth}fr) 8px minmax(0, ${100 - editorWidth}fr)`,
           }}
         >
-          <section className="arena-panel arena-panel--editor">
-            <div className="arena-panel__header">
-              <div>
-                <div className="arena-panel__title">{isSpectator ? 'Игрок слева' : 'Твой редактор'}</div>
-                <div className="arena-panel__subtitle">
-                  {isSpectator ? (leftPlayer?.displayName || 'Ожидаем первого игрока') : (me?.displayName || 'Игрок')}
-                  {!isSpectator && freezeLeft > 0 ? ` • freeze ${freezeLeft}s` : ''}
+          {(!isMobile || activeTab === 'editor') && (
+            <section className="arena-panel arena-panel--editor">
+              <div className="arena-panel__header">
+                <div>
+                  <div className="arena-panel__title">{isSpectator ? 'Игрок слева' : 'Твой редактор'}</div>
+                  <div className="arena-panel__subtitle">
+                    {isSpectator ? (leftPlayer?.displayName || 'Ожидаем первого игрока') : (me?.displayName || 'Игрок')}
+                    {!isSpectator && freezeLeft > 0 ? ` • freeze ${freezeLeft}s` : ''}
+                  </div>
                 </div>
+                {!isSpectator && freezeLeft > 0 && <div className="arena-freeze-badge"><TimerReset size={14} /> {freezeLeft}s</div>}
               </div>
-              {!isSpectator && freezeLeft > 0 && <div className="arena-freeze-badge"><TimerReset size={14} /> {freezeLeft}s</div>}
-            </div>
-            <div className="arena-panel__body">
-              {showTimelapse ? (
-                <div className="arena-editor-shell">
-                  <pre className="arena-editor-shell__pre">{displayedLeftCode}</pre>
-                </div>
-              ) : (
-                <Editor
-                  height="100%"
-                  defaultLanguage={arenaLanguage}
-                  language={arenaLanguage}
-                  value={leftCode}
-                  onChange={(value) => {
-                    if (!isSpectator) {
-                      setSelfCode(value || '');
-                    }
-                  }}
-                  options={{
-                    fontSize: 14,
-                    minimap: { enabled: false },
-                    wordWrap: 'on',
-                    automaticLayout: true,
-                    readOnly: isSpectator || freezeLeft > 0 || match.status === 'finished',
-                    scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 },
-                  }}
-                  theme="vs-dark"
-                />
-              )}
-            </div>
-            <div className="arena-panel__footer">
-              {isSpectator ? (
-                <div className="arena-spectator-note">
-                  <Eye size={16} />
-                  Только просмотр без участия в матче.
-                </div>
-              ) : (
-                <>
-                  <button className="btn btn-primary arena-submit-btn" disabled={!canSubmit} onClick={handleSubmit}>
-                    <Play size={16} />
-                    <span>{submitting ? 'Проверка...' : 'Отправить'}</span>
-                  </button>
-                  {submitError && <span className="arena-error-inline">{submitError}</span>}
-                </>
-              )}
-            </div>
-          </section>
+              <div className="arena-panel__body">
+                {showTimelapse ? (
+                  <div className="arena-editor-shell">
+                    <pre className="arena-editor-shell__pre">{displayedLeftCode}</pre>
+                  </div>
+                ) : (
+                  <Editor
+                    height="100%"
+                    defaultLanguage={arenaLanguage}
+                    language={arenaLanguage}
+                    value={leftCode}
+                    onChange={(value) => {
+                      if (!isSpectator) {
+                        setSelfCode(value || '');
+                      }
+                    }}
+                    options={{
+                      fontSize: isMobile ? 12 : 14,
+                      minimap: { enabled: false },
+                      wordWrap: 'on',
+                      automaticLayout: true,
+                      readOnly: isSpectator || freezeLeft > 0 || match.status === 'finished',
+                      scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 },
+                      lineNumbers: isMobile ? 'off' : 'on',
+                    }}
+                    theme="vs-dark"
+                  />
+                )}
+              </div>
+              <div className="arena-panel__footer">
+                {isSpectator ? (
+                  <div className="arena-spectator-note">
+                    <Eye size={16} />
+                    {!isMobile && 'Только просмотр без участия в матче.'}
+                  </div>
+                ) : (
+                  <>
+                    <button className="btn btn-primary arena-submit-btn" disabled={!canSubmit} onClick={handleSubmit} style={{ height: isMobile ? '40px' : 'auto' }}>
+                      <Play size={16} />
+                      <span>{submitting ? '...' : 'Отправить'}</span>
+                    </button>
+                    {submitError && !isMobile && <span className="arena-error-inline">{submitError}</span>}
+                  </>
+                )}
+              </div>
+            </section>
+          )}
 
-          {!isSpectator && (
+          {!isSpectator && !isMobile && (
             <button
               type="button"
               className="arena-resize-handle"
@@ -948,40 +938,48 @@ export const ArenaMatchPage: React.FC = () => {
             />
           )}
 
-          <section className="arena-panel arena-panel--opponent">
-            <div className="arena-panel__header">
-              <div>
-                <div className="arena-panel__title">{isSpectator ? 'Игрок справа' : 'Соперник'}</div>
-                <div className="arena-panel__subtitle">
-                  {isSpectator ? (rightPlayer?.displayName || 'Ожидаем второго игрока') : (opponent?.displayName || 'Ожидаем второго игрока')}
-                </div>
-              </div>
-              {!isSpectator && match.obfuscateOpponent && match.status !== 'finished' && opponent && (
-                <div className="arena-freeze-badge arena-freeze-badge--ghost"><ShieldAlert size={14} /> Код скрыт</div>
+          {(!isMobile || activeTab === 'opponent' || activeTab === 'output') && (
+            <section className="arena-panel arena-panel--opponent">
+              {(!isMobile || activeTab === 'opponent') && (
+                <>
+                  <div className="arena-panel__header">
+                    <div>
+                      <div className="arena-panel__title">{isSpectator ? 'Игрок справа' : 'Соперник'}</div>
+                      <div className="arena-panel__subtitle">
+                        {isSpectator ? (rightPlayer?.displayName || 'Ожидаем второго игрока') : (opponent?.displayName || 'Ожидаем второго игрока')}
+                      </div>
+                    </div>
+                    {!isSpectator && match.obfuscateOpponent && match.status !== 'finished' && opponent && (
+                      <div className="arena-freeze-badge arena-freeze-badge--ghost"><ShieldAlert size={14} /> {isMobile ? '' : 'Код скрыт'}</div>
+                    )}
+                  </div>
+                  <div className="arena-panel__body">
+                    {waitingForOpponent ? (
+                      <div className="arena-waiting-state">
+                        <Eye size={16} />
+                        <span>Ждём второго игрока.</span>
+                      </div>
+                    ) : (
+                      <div className="arena-editor-shell">
+                        <pre className="arena-editor-shell__pre" style={{ fontSize: isMobile ? '12px' : '13px' }}>
+                          {displayedRightCode || (!showTimelapse && shouldHideOpponentCode ? '**********\n**********\n**********' : '// соперник пока ничего не написал')}
+                        </pre>
+                      </div>
+                    )}
+                  </div>
+                </>
               )}
-            </div>
-            <div className="arena-panel__body">
-              {waitingForOpponent ? (
-                <div className="arena-waiting-state">
-                  <Eye size={16} />
-                  <span>Ждём второго игрока. Как только он зайдёт по ссылке, статус обновится сразу.</span>
-                </div>
-              ) : (
-                <div className="arena-editor-shell">
-                  <pre className="arena-editor-shell__pre">
-                    {displayedRightCode || (!showTimelapse && shouldHideOpponentCode ? '**********\n**********\n**********' : '// соперник пока ничего не написал')}
-                  </pre>
+              {(!isMobile || activeTab === 'output') && (
+                <div className="arena-panel__footer arena-panel__footer--output" style={{ borderTop: (isMobile && activeTab === 'output') ? 'none' : '1px solid rgba(255, 255, 255, 0.06)', flex: (isMobile && activeTab === 'output') ? 1 : 'unset' }}>
+                  <div className="arena-output-label">
+                    <AlertTriangle size={15} />
+                    Judge output
+                  </div>
+                  <pre className={outputStateClass} style={{ fontSize: isMobile ? '12px' : '13px' }}>{output || 'Результат проверки появится здесь.'}</pre>
                 </div>
               )}
-            </div>
-            <div className="arena-panel__footer arena-panel__footer--output">
-              <div className="arena-output-label">
-                <AlertTriangle size={15} />
-                Judge output
-              </div>
-              <pre className={outputStateClass}>{output || 'Результат проверки появится здесь. Wrong answer и ошибки подсвечиваются отдельно.'}</pre>
-            </div>
-          </section>
+            </section>
+          )}
         </div>
         ) : (
           <div className="arena-waiting-opponent">

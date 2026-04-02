@@ -17,6 +17,7 @@ import { UserMarker, ClusterMarker, EventMarker } from '../components/MapMarker'
 import { UserDetailCard, EventDetailCard } from '../components/MapOverlayCards';
 import { FullEventOverlay } from '@/shared/ui/FullEventOverlay/FullEventOverlay';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
+import { MobileDrawer } from '@/shared/ui/MobileDrawer/MobileDrawer';
 
 type ViewState = {
   longitude: number;
@@ -295,41 +296,45 @@ export const MapPage: React.FC = () => {
     <div className="fade-in map-page">
       <section className="page-header code-rooms-hero map-hero">
         <div className="code-rooms-hero__copy">
-          <span className="code-rooms-kicker">Community Map</span>
-          <h1>Карта сообщества</h1>
+          {!isMobile && <span className="code-rooms-kicker">Community Map</span>}
+          <h1>{isMobile ? 'Карта' : 'Карта сообщества'}</h1>
           <p className="code-rooms-subtitle">
-            Смотри, где находятся участники и события. Это живая география сообщества, а не просто список точек.
+            {isMobile 
+              ? 'Где сейчас участники и события.' 
+              : 'Смотри, где находятся участники и события. Это живая география сообщества.'}
           </p>
         </div>
-        <div className="map-hero__stats">
-          <div className="map-hero__stat">
-            <Compass size={16} />
-            <span>{points.length} {pluralizeRu(points.length, 'участник', 'участника', 'участников')}</span>
+        {!isMobile && (
+          <div className="map-hero__stats">
+            <div className="map-hero__stat">
+              <Compass size={16} />
+              <span>{points.length} {pluralizeRu(points.length, 'участник', 'участника', 'участников')}</span>
+            </div>
+            <div className="map-hero__stat">
+              <CalendarDays size={16} />
+              <span>{mappableEvents.length} {pluralizeRu(mappableEvents.length, 'событие', 'события', 'событий')}</span>
+            </div>
+            <div className="map-hero__stat">
+              <Sparkles size={16} />
+              <span>live карта</span>
+            </div>
           </div>
-          <div className="map-hero__stat">
-            <CalendarDays size={16} />
-            <span>{mappableEvents.length} {pluralizeRu(mappableEvents.length, 'событие', 'события', 'событий')}</span>
-          </div>
-          <div className="map-hero__stat">
-            <Sparkles size={16} />
-            <span>live карта</span>
-          </div>
-        </div>
+        )}
       </section>
 
       <div className="card map-shell" style={{ minHeight: isMobile ? 'calc(100vh - 220px)' : '620px' }}>
         {isLoading && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, background: 'rgba(17, 24, 39, 0.72)', color: 'white' }}>Загружаем карту...</div>}
         {error && !isLoading && <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 5, background: 'rgba(239, 68, 68, 0.14)', color: '#fecaca', border: '1px solid rgba(239, 68, 68, 0.35)', borderRadius: '12px', padding: '12px 14px' }}>{error}</div>}
 
-        <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 3, display: 'flex', gap: '10px' }}>
+        <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 3, display: isMobile ? 'none' : 'flex', gap: '10px' }}>
           <div className="card" style={{ padding: '12px 14px', background: 'rgba(17,24,39,0.88)' }}>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>На карте</div>
             <div style={{ fontWeight: 600 }}>{mappableEvents.length} {pluralizeRu(mappableEvents.length, 'событие', 'события', 'событий')}</div>
           </div>
         </div>
 
-        {selectedUser && <UserDetailCard user={selectedUser} onClose={() => setSelectedUserId(null)} />}
-        {selectedEvent && (
+        {!isMobile && selectedUser && <UserDetailCard user={selectedUser} onClose={() => setSelectedUserId(null)} />}
+        {!isMobile && selectedEvent && (
           <EventDetailCard
             event={selectedEvent}
             isEditing={isEditingEvent}
@@ -389,6 +394,41 @@ export const MapPage: React.FC = () => {
       </div>
 
       <FullEventOverlay eventId={fullEventId} events={events} onClose={() => setFullEventId(null)} />
+
+      <MobileDrawer
+        isOpen={isMobile && !!selectedUser}
+        onClose={() => setSelectedUserId(null)}
+        title={selectedUser?.title || 'Профиль'}
+      >
+        {selectedUser && <UserDetailCard user={selectedUser} onClose={() => setSelectedUserId(null)} />}
+      </MobileDrawer>
+
+      <MobileDrawer
+        isOpen={isMobile && !!selectedEvent}
+        onClose={() => setSelectedEventId(null)}
+        title={selectedEvent?.title || 'Событие'}
+      >
+        {selectedEvent && (
+          <EventDetailCard
+            event={selectedEvent}
+            isEditing={isEditingEvent}
+            setIsEditing={setIsEditingEvent}
+            draft={draftEvent}
+            setDraft={setDraftEvent}
+            onClose={() => setSelectedEventId(null)}
+            onExpand={setFullEventId}
+            onSave={handleUpdateEvent}
+            onDelete={handleDeleteEvent}
+            onJoinToggle={handleJoinToggle}
+            isSaving={isSavingEvent}
+            error={eventError}
+            fieldErrors={eventFieldErrors}
+            users={points}
+            inviteSearchQuery={inviteSearchQuery}
+            setInviteSearchQuery={setInviteSearchQuery}
+          />
+        )}
+      </MobileDrawer>
     </div>
   );
 };

@@ -12,6 +12,7 @@ import {
   Trash2,
   X,
 } from 'lucide-react';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { Vacancy, CreateVacancyPayload } from '@/entities/User/model/types';
@@ -46,6 +47,7 @@ function authorInitial(value: string): string {
 }
 
 export const VacanciesPage: React.FC = () => {
+  const isMobile = useIsMobile();
   const { user: currentUser } = useAuth();
   const [vacancies, setVacancies] = useState<Vacancy[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -171,51 +173,67 @@ export const VacanciesPage: React.FC = () => {
       <section className="vacancies-hero">
         <div className="vacancies-hero__intro">
           <div>
-            <div className="vacancies-hero__eyebrow">
-              <Briefcase size={14} />
-              Referral board
-            </div>
-            <h1 className="vacancies-hero__title">Вакансии</h1>
+            {!isMobile && (
+              <div className="vacancies-hero__eyebrow">
+                <Briefcase size={14} />
+                Referral board
+              </div>
+            )}
+            <h1 className="vacancies-hero__title">{isMobile ? 'Вакансии' : 'Вакансии'}</h1>
             <p className="vacancies-hero__description">
-              Лента реальных вакансий от сообщества. Быстро фильтруй по формату и локации,
-              открывай интересные позиции и публикуй свои реферальные объявления в одном месте.
+              {isMobile 
+                ? 'Реферальные вакансии от сообщества.' 
+                : 'Лента реальных вакансий от сообщества. Быстро фильтруй по формату и локации.'}
             </p>
           </div>
 
-          <div className="vacancies-hero__meta">
-            <span className="badge">Без лишнего шума</span>
-            <span className="badge">Рефералки и прямые контакты</span>
-            <span className="badge">Нормальный поиск</span>
-          </div>
+          {!isMobile && (
+            <div className="vacancies-hero__meta">
+              <span className="badge">Без лишнего шума</span>
+              <span className="badge">Рефералки и прямые контакты</span>
+              <span className="badge">Нормальный поиск</span>
+            </div>
+          )}
         </div>
 
-        <aside className="vacancies-hero__panel">
-          <div className="vacancies-stat-grid">
-            <div className="vacancies-stat">
-              <span className="vacancies-stat__label">В ленте</span>
-              <strong className="vacancies-stat__value">{stats.total}</strong>
+        {!isMobile && (
+          <aside className="vacancies-hero__panel">
+            <div className="vacancies-stat-grid">
+              <div className="vacancies-stat">
+                <span className="vacancies-stat__label">В ленте</span>
+                <strong className="vacancies-stat__value">{stats.total}</strong>
+              </div>
+              <div className="vacancies-stat">
+                <span className="vacancies-stat__label">Компаний</span>
+                <strong className="vacancies-stat__value">{stats.companies}</strong>
+              </div>
+              <div className="vacancies-stat">
+                <span className="vacancies-stat__label">Remote</span>
+                <strong className="vacancies-stat__value">{stats.remote}</strong>
+              </div>
+              <div className="vacancies-stat">
+                <span className="vacancies-stat__label">Авторов</span>
+                <strong className="vacancies-stat__value">{stats.authors}</strong>
+              </div>
             </div>
-            <div className="vacancies-stat">
-              <span className="vacancies-stat__label">Компаний</span>
-              <strong className="vacancies-stat__value">{stats.companies}</strong>
-            </div>
-            <div className="vacancies-stat">
-              <span className="vacancies-stat__label">Remote</span>
-              <strong className="vacancies-stat__value">{stats.remote}</strong>
-            </div>
-            <div className="vacancies-stat">
-              <span className="vacancies-stat__label">Авторов</span>
-              <strong className="vacancies-stat__value">{stats.authors}</strong>
-            </div>
-          </div>
 
-          <div className="vacancies-actions">
-            <button className="btn btn-primary" onClick={openCreate}>
+            <div className="vacancies-actions">
+              <button className="btn btn-primary" onClick={openCreate}>
+                <Plus size={18} />
+                Добавить вакансию
+              </button>
+            </div>
+          </aside>
+        )}
+
+        {isMobile && (
+          <div className="vacancies-actions" style={{ marginTop: '16px' }}>
+            <button className="btn btn-primary w-full" onClick={openCreate} style={{ height: '48px', borderRadius: '12px' }}>
               <Plus size={18} />
-              Добавить вакансию
+              Разместить вакансию
             </button>
           </div>
-        </aside>
+        )}
       </section>
 
       <section className="vacancies-search">
@@ -225,7 +243,7 @@ export const VacanciesPage: React.FC = () => {
             <input
               type="text"
               className="input"
-              placeholder="Поиск по названию, компании или описанию"
+              placeholder={isMobile ? "Поиск..." : "Поиск по названию, компании или описанию"}
               aria-label="Поиск вакансий"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
@@ -301,7 +319,7 @@ export const VacanciesPage: React.FC = () => {
                   )}
                 </div>
 
-                <p className="vacancies-card__description">{vacancy.description}</p>
+                <p className={`vacancies-card__description ${isMobile ? 'text-prune-2' : ''}`} style={{ marginBottom: isMobile ? '12px' : '16px' }}>{vacancy.description}</p>
 
                 <div className="vacancies-card__chips">
                   {!!vacancy.experience && (

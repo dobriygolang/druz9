@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import { TelegramAuthWidget } from '@/features/Auth/ui/TelegramAuthWidget';
 import { useAuth } from '@/app/providers/AuthProvider';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 export const LoginPage: React.FC = () => {
+  const isMobile = useIsMobile();
   const { login, loginWithPassword, registerWithPassword } = useAuth();
   const [error, setError] = useState('');
   const [mode, setMode] = useState<'telegram' | 'login' | 'register'>('telegram');
@@ -53,9 +55,9 @@ export const LoginPage: React.FC = () => {
   return (
     <div className="flex-center full-height" style={{ padding: '20px' }}>
       <div className="card fade-in" style={{ maxWidth: '380px', width: '100%', textAlign: 'center' }}>
-        <h1 style={{ fontSize: '24px', marginBottom: '8px', fontWeight: '600' }}>Вход в систему</h1>
-        <p style={{ color: 'var(--text-secondary)', marginBottom: '32px', fontSize: '14px' }}>
-          Необходима авторизация через Telegram
+        <h1 style={{ fontSize: isMobile ? '22px' : '24px', marginBottom: '8px', fontWeight: '600' }}>Вход</h1>
+        <p style={{ color: 'var(--text-secondary)', marginBottom: isMobile ? '24px' : '32px', fontSize: '14px' }}>
+          {isMobile ? 'Авторизация через Telegram' : 'Для доступа необходима авторизация через Telegram'}
         </p>
 
         {error && (
@@ -66,14 +68,14 @@ export const LoginPage: React.FC = () => {
 
         <div style={{ display: 'grid', gap: '12px' }}>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, 1fr)', gap: '8px' }}>
-            <button type="button" className={`btn ${mode === 'telegram' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('telegram')} style={{ minHeight: '42px', opacity: mode === 'telegram' ? 1 : 0.7 }}>
+            <button type="button" className={`btn ${mode === 'telegram' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('telegram')} style={{ minHeight: '42px', padding: '0 8px', fontSize: isMobile ? '12px' : '14px', opacity: mode === 'telegram' ? 1 : 0.7 }}>
               Telegram
             </button>
-            <button type="button" className={`btn ${mode === 'login' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('login')} style={{ minHeight: '42px', opacity: mode === 'login' ? 1 : 0.7 }}>
+            <button type="button" className={`btn ${mode === 'login' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('login')} style={{ minHeight: '42px', padding: '0 8px', fontSize: isMobile ? '12px' : '14px', opacity: mode === 'login' ? 1 : 0.7 }}>
               Вход
             </button>
-            <button type="button" className={`btn ${mode === 'register' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('register')} style={{ minHeight: '42px', opacity: mode === 'register' ? 1 : 0.7 }}>
-              Регистрация
+            <button type="button" className={`btn ${mode === 'register' ? 'btn-primary' : 'btn-secondary'}`} onClick={() => setMode('register')} style={{ minHeight: '42px', padding: '0 8px', fontSize: isMobile ? '12px' : '14px', opacity: mode === 'register' ? 1 : 0.7 }}>
+              {isMobile ? 'Рега' : 'Регистрация'}
             </button>
           </div>
 
