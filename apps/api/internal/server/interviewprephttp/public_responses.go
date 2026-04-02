@@ -194,10 +194,14 @@ func mapResult(result *model.InterviewPrepQuestionResult) *resultResponse {
 }
 
 func mapTask(task *model.InterviewPrepTask) *taskResponse {
+	return mapTaskWithOptions(task, true)
+}
+
+func mapTaskWithOptions(task *model.InterviewPrepTask, includeStarterCode bool) *taskResponse {
 	if task == nil {
 		return nil
 	}
-	return &taskResponse{
+	resp := &taskResponse{
 		ID:                 task.ID,
 		Slug:               task.Slug,
 		Title:              task.Title,
@@ -210,12 +214,15 @@ func mapTask(task *model.InterviewPrepTask) *taskResponse {
 		ExecutionProfile:   task.ExecutionProfile,
 		RunnerMode:         task.RunnerMode,
 		DurationSeconds:    task.DurationSeconds,
-		StarterCode:        task.StarterCode,
 		CodeTaskID:         task.CodeTaskID,
 		IsActive:           task.IsActive,
 		CreatedAt:          task.CreatedAt,
 		UpdatedAt:          task.UpdatedAt,
 	}
+	if includeStarterCode {
+		resp.StarterCode = task.StarterCode
+	}
+	return resp
 }
 
 func mapQuestion(q *model.InterviewPrepQuestion, includeAnswer bool) *questionResponse {
@@ -344,6 +351,10 @@ func mapMockQuestionResult(result *model.InterviewPrepMockQuestionResult) *mockQ
 }
 
 func mapMockStage(stage *model.InterviewPrepMockStage) *mockStageResponse {
+	return mapMockStageWithOptions(stage, true, true, true)
+}
+
+func mapMockStageWithOptions(stage *model.InterviewPrepMockStage, includeCode bool, includeTaskStarter bool, includeQuestions bool) *mockStageResponse {
 	if stage == nil {
 		return nil
 	}
@@ -355,7 +366,6 @@ func mapMockStage(stage *model.InterviewPrepMockStage) *mockStageResponse {
 		Status:               stage.Status.String(),
 		TaskID:               stage.TaskID,
 		SolveLanguage:        stage.SolveLanguage,
-		Code:                 stage.Code,
 		LastSubmissionPassed: stage.LastSubmissionPassed,
 		ReviewScore:          stage.ReviewScore,
 		ReviewSummary:        stage.ReviewSummary,
@@ -363,21 +373,28 @@ func mapMockStage(stage *model.InterviewPrepMockStage) *mockStageResponse {
 		FinishedAt:           stage.FinishedAt,
 		CreatedAt:            stage.CreatedAt,
 		UpdatedAt:            stage.UpdatedAt,
-		Task:                 mapTask(stage.Task),
+		Task:                 mapTaskWithOptions(stage.Task, includeTaskStarter),
 	}
-	if len(stage.QuestionResults) > 0 {
+	if includeCode {
+		resp.Code = stage.Code
+	}
+	if includeQuestions && len(stage.QuestionResults) > 0 {
 		resp.QuestionResults = make([]*mockQuestionResultResponse, 0, len(stage.QuestionResults))
 		for _, item := range stage.QuestionResults {
 			resp.QuestionResults = append(resp.QuestionResults, mapMockQuestionResult(item))
 		}
 	}
-	if stage.CurrentQuestion != nil {
+	if includeQuestions && stage.CurrentQuestion != nil {
 		resp.CurrentQuestion = mapMockQuestionResult(stage.CurrentQuestion)
 	}
 	return resp
 }
 
 func mapMockSession(session *model.InterviewPrepMockSession) *mockSessionResponse {
+	return mapMockSessionWithOptions(session, false)
+}
+
+func mapMockSessionWithOptions(session *model.InterviewPrepMockSession, verbose bool) *mockSessionResponse {
 	if session == nil {
 		return nil
 	}
@@ -395,11 +412,12 @@ func mapMockSession(session *model.InterviewPrepMockSession) *mockSessionRespons
 	if len(session.Stages) > 0 {
 		resp.Stages = make([]*mockStageResponse, 0, len(session.Stages))
 		for _, stage := range session.Stages {
-			resp.Stages = append(resp.Stages, mapMockStage(stage))
+			includeDetails := verbose || (session.CurrentStage != nil && stage.ID == session.CurrentStage.ID)
+			resp.Stages = append(resp.Stages, mapMockStageWithOptions(stage, includeDetails, includeDetails, includeDetails))
 		}
 	}
 	if session.CurrentStage != nil {
-		resp.CurrentStage = mapMockStage(session.CurrentStage)
+		resp.CurrentStage = mapMockStageWithOptions(session.CurrentStage, true, true, true)
 	}
 	return resp
 }
@@ -416,7 +434,7 @@ func mapMockSubmitResult(result *appinterviewprep.MockSubmitResult) *mockSubmitR
 		FailedTestIndex: result.FailedTestIndex,
 		FailureKind:     result.FailureKind,
 		Review:          mapInterviewSolutionReview(result.Review),
-		Session:         mapMockSession(result.Session),
+		Session:         mapMockSessionWithOptions(result.Session, false),
 	}
 }
 
@@ -426,7 +444,7 @@ func mapMockQuestionAnswerResult(result *appinterviewprep.MockQuestionAnswerResu
 	}
 	return &mockQuestionAnswerResponse{
 		Review:  mapInterviewAnswerReview(result.Review),
-		Session: mapMockSession(result.Session),
+		Session: mapMockSessionWithOptions(result.Session, false),
 	}
 }
 
@@ -436,7 +454,7 @@ func mapMockSystemDesignReviewResult(result *appinterviewprep.MockSystemDesignRe
 	}
 	return &mockSystemDesignReviewResponse{
 		Review:  mapSystemDesignReview(result.Review),
-		Session: mapMockSession(result.Session),
+		Session: mapMockSessionWithOptions(result.Session, false),
 	}
 }
 

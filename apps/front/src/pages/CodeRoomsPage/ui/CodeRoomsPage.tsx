@@ -521,17 +521,13 @@ export const CodeRoomsPage: React.FC = () => {
                   type="button"
                   className="btn btn-secondary"
                   onClick={async () => {
-                    if (prepLaunchCompany === 'all') {
-                      return;
-                    }
                     try {
-                      const session = await interviewPrepApi.startMockSession(prepLaunchCompany);
+                      const session = await interviewPrepApi.startMockSession(prepLaunchCompany === 'all' ? 'general' : prepLaunchCompany);
                       navigate(`/interview-prep/mock/${session.id}`);
                     } catch (error) {
                       console.error('Failed to start mock interview:', error);
                     }
                   }}
-                  disabled={prepLaunchCompany === 'all'}
                 >
                   Mock interview
                 </button>

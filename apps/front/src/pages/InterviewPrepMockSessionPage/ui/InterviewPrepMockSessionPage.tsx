@@ -84,6 +84,7 @@ export function InterviewPrepMockSessionPage() {
   const [designReview, setDesignReview] = useState<InterviewPrepSystemDesignReview | null>(null);
   const [solutionReview, setSolutionReview] = useState<InterviewPrepSolutionReview | null>(null);
   const [answerReview, setAnswerReview] = useState<InterviewPrepAnswerReview | null>(null);
+  const [submitErrorDetails, setSubmitErrorDetails] = useState<string | null>(null);
   const [answerText, setAnswerText] = useState('');
   const [speechSupported] = useState(Boolean(getSpeechRecognitionCtor()));
   const [speechActive, setSpeechActive] = useState(false);
@@ -111,6 +112,7 @@ export function InterviewPrepMockSessionPage() {
     setDesignReview(null);
     setSolutionReview(null);
     setAnswerReview(null);
+    setSubmitErrorDetails(null);
     setDesignImage(null);
     setDesignInput(DESIGN_INITIAL_STATE);
   }, [session?.currentStage?.id]);
@@ -134,12 +136,16 @@ export function InterviewPrepMockSessionPage() {
     if (!sessionId || !currentStage) return;
     setSubmitting(true);
     setError(null);
+    setSubmitErrorDetails(null);
     try {
       const result = await interviewPrepApi.submitMockStage(sessionId, {
         code,
         language: currentStage.solveLanguage,
         notes,
       });
+      if (!result.passed && result.lastError) {
+        setSubmitErrorDetails(result.lastError);
+      }
       if (result.review) {
         setSolutionReview(result.review);
       }
@@ -158,6 +164,7 @@ export function InterviewPrepMockSessionPage() {
     if (!sessionId || !designImage) return;
     setSubmitting(true);
     setError(null);
+    setSubmitErrorDetails(null);
     try {
       const result = await interviewPrepApi.reviewMockSystemDesign(sessionId, designImage, designInput);
       if (result.review) {
@@ -178,6 +185,7 @@ export function InterviewPrepMockSessionPage() {
     if (!sessionId || !answerText.trim()) return;
     setSubmitting(true);
     setError(null);
+    setSubmitErrorDetails(null);
     try {
       const result = await interviewPrepApi.answerMockQuestion(sessionId, answerText.trim());
       if (result.review) {
@@ -350,6 +358,16 @@ export function InterviewPrepMockSessionPage() {
                 <strong>{answerReview.score}/10</strong>
               </div>
               <p className="interview-prep-answer-preview">{answerReview.summary}</p>
+              {answerReview.gaps?.length ? (
+                <div className="interview-prep-design-review-list">
+                  <strong>Недочёты</strong>
+                  <ul>
+                    {answerReview.gaps.map((gap) => (
+                      <li key={gap}>{gap}</li>
+                    ))}
+                  </ul>
+                </div>
+              ) : null}
             </section>
           )}
         </aside>
@@ -402,6 +420,12 @@ export function InterviewPrepMockSessionPage() {
               />
             </div>
           </div>
+          {submitErrorDetails ? (
+            <div className="interview-prep-compile-error">
+              <strong>Ошибка проверки</strong>
+              <pre className="interview-prep-answer-preview">{submitErrorDetails}</pre>
+            </div>
+          ) : null}
           <div className="interview-prep-live-actions interview-prep-live-actions--inline">
             <button className="btn btn-primary" disabled={submitting} onClick={() => void handleSubmitStage()}>
               <Wand2 size={16} />

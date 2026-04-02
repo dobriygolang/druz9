@@ -203,14 +203,10 @@ export function InterviewPrepPage() {
   };
 
   const startMockInterview = async () => {
-    if (company === 'all') {
-      setError('Для mock interview сначала выбери конкретную компанию.');
-      return;
-    }
     setError(null);
     setStartingMock(true);
     try {
-      const session = await interviewPrepApi.startMockSession(company);
+      const session = await interviewPrepApi.startMockSession(company === 'all' ? 'general' : company);
       navigate(`/interview-prep/mock/${session.id}`);
     } catch (e: any) {
       console.error('Failed to start mock interview:', e);
@@ -256,7 +252,7 @@ export function InterviewPrepPage() {
           <div className="interview-prep-hero__actions" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
             <button className="btn btn-secondary" disabled={startingMock} onClick={() => void startMockInterview()} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
               <BrainCircuit size={16} />
-              <span>{company === 'all' ? 'Выбери компанию для mock interview' : 'Запустить mock interview'}</span>
+              <span>{company === 'all' ? 'Запустить mock interview' : 'Запустить mock interview'}</span>
             </button>
             <button className="btn btn-primary" onClick={() => void handleRandomStart(filteredTasks)} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
               <Shuffle size={16} />

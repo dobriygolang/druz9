@@ -546,6 +546,14 @@ func starterForMockTask(task *model.InterviewPrepTask, solveLanguage string) str
 	if task == nil {
 		return ""
 	}
+	if task.RunnerMode == "function_io" {
+		switch solveLanguage {
+		case "go":
+			return extractGoSolveStarter(task.StarterCode)
+		case "python":
+			return extractPythonSolveStarter(task.StarterCode)
+		}
+	}
 	if trimmed := strings.TrimSpace(task.StarterCode); trimmed != "" {
 		return task.StarterCode
 	}
@@ -559,6 +567,41 @@ func starterForMockTask(task *model.InterviewPrepTask, solveLanguage string) str
 	default:
 		return ""
 	}
+}
+
+func extractGoSolveStarter(code string) string {
+	trimmed := strings.TrimSpace(code)
+	if trimmed == "" {
+		return "func solve(input string) string {\n\treturn \"\"\n}\n"
+	}
+	index := strings.Index(trimmed, "func solve(")
+	if index < 0 {
+		return "func solve(input string) string {\n\treturn \"\"\n}\n"
+	}
+	snippet := strings.TrimSpace(trimmed[index:])
+	if mainIndex := strings.Index(snippet, "\nfunc main("); mainIndex >= 0 {
+		snippet = strings.TrimSpace(snippet[:mainIndex])
+	}
+	if !strings.HasSuffix(snippet, "\n") {
+		snippet += "\n"
+	}
+	return snippet
+}
+
+func extractPythonSolveStarter(code string) string {
+	trimmed := strings.TrimSpace(code)
+	if trimmed == "" {
+		return "def solve(input: str) -> str:\n    return \"\"\n"
+	}
+	index := strings.Index(trimmed, "def solve(")
+	if index < 0 {
+		return "def solve(input: str) -> str:\n    return \"\"\n"
+	}
+	snippet := strings.TrimSpace(trimmed[index:])
+	if !strings.HasSuffix(snippet, "\n") {
+		snippet += "\n"
+	}
+	return snippet
 }
 
 func stageQuestionsForTask(kind model.InterviewPrepMockStageKind, companyTag string, task *model.InterviewPrepTask, taskQuestions []*model.InterviewPrepQuestion, poolItems []*model.InterviewPrepMockQuestionPoolItem) []mockQuestionTemplate {

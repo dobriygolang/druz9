@@ -802,9 +802,16 @@ func parseInterviewAnswerJSON(raw string) (*InterviewAnswerReview, error) {
 	cleaned = strings.TrimSuffix(cleaned, "```")
 	cleaned = strings.TrimSpace(cleaned)
 
-	var review InterviewAnswerReview
-	if err := json.Unmarshal([]byte(cleaned), &review); err != nil {
+	var payload map[string]any
+	if err := json.Unmarshal([]byte(cleaned), &payload); err != nil {
 		return nil, fmt.Errorf("%w: %v", ErrInvalidResponse, err)
+	}
+	review := InterviewAnswerReview{
+		Provider: toStringValue(payload["provider"]),
+		Model:    toStringValue(payload["model"]),
+		Score:    toIntValue(payload["score"]),
+		Summary:  strings.TrimSpace(toStringValue(payload["summary"])),
+		Gaps:     normalizeStringList(payload["gaps"]),
 	}
 	if review.Score < 1 {
 		review.Score = 1
@@ -813,6 +820,66 @@ func parseInterviewAnswerJSON(raw string) (*InterviewAnswerReview, error) {
 		review.Score = 10
 	}
 	return &review, nil
+}
+
+func toStringValue(value any) string {
+	switch typed := value.(type) {
+	case string:
+		return typed
+	case json.Number:
+		return typed.String()
+	case float64:
+		return fmt.Sprintf("%.0f", typed)
+	default:
+		return ""
+	}
+}
+
+func toIntValue(value any) int {
+	switch typed := value.(type) {
+	case float64:
+		return int(typed)
+	case int:
+		return typed
+	case int32:
+		return int(typed)
+	case int64:
+		return int(typed)
+	case json.Number:
+		if parsed, err := typed.Int64(); err == nil {
+			return int(parsed)
+		}
+	}
+	return 0
+}
+
+func normalizeStringList(value any) []string {
+	switch typed := value.(type) {
+	case []any:
+		items := make([]string, 0, len(typed))
+		for _, item := range typed {
+			if text := strings.TrimSpace(toStringValue(item)); text != "" {
+				items = append(items, text)
+			}
+		}
+		return items
+	case []string:
+		items := make([]string, 0, len(typed))
+		for _, item := range typed {
+			if text := strings.TrimSpace(item); text != "" {
+				items = append(items, text)
+			}
+		}
+		return items
+	case string:
+		text := strings.TrimSpace(typed)
+		if text == "" {
+			return nil
+		}
+		return []string{text}
+	default:
+		return nil
+	}
 }
 
 func timeoutOrDefault(v time.Duration) time.Duration {
