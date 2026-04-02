@@ -9,6 +9,14 @@ const (
 	AiReviewMaxImageBytes Key = "ai_review_max_image_bytes"
 	// Default AI review model name
 	AiReviewModel Key = "ai_review_model"
+	// AI review model for architecture mock stages
+	AiReviewModelArchitecture Key = "ai_review_model_architecture"
+	// AI review model for code and executable mock stages
+	AiReviewModelCode Key = "ai_review_model_code"
+	// AI review model for follow-up answer evaluation
+	AiReviewModelFollowup Key = "ai_review_model_followup"
+	// AI review model for system design stages
+	AiReviewModelSystemDesign Key = "ai_review_model_system_design"
 	// AI review provider key, for example gemini or openai_compatible
 	AiReviewProvider Key = "ai_review_provider"
 	// Timeout for AI review provider requests
@@ -23,7 +31,7 @@ const (
 	CodeRoomCleanupInterval Key = "code_room_cleanup_interval"
 	// Code room idle TTL before cleanup
 	CodeRoomIdleTtl Key = "code_room_idle_ttl"
-	// Session cookie domain
+	// Session cookie domain; keep empty for host-only cookies and multi-domain support
 	CookieDomain Key = "cookie_domain"
 	// Session cookie same-site policy
 	CookieSameSite Key = "cookie_same_site"
@@ -55,7 +63,7 @@ const (
 	S3Bucket Key = "s3_bucket"
 	// S3 endpoint
 	S3Endpoint Key = "s3_endpoint"
-	// Public S3 endpoint for signed URLs
+	// Public canonical endpoint for signed URLs
 	S3PublicEndpoint Key = "s3_public_endpoint"
 	// Minimum requests before circuit breaker starts tripping
 	ServerCircuitBreakerRequest Key = "server_circuit_breaker_request"

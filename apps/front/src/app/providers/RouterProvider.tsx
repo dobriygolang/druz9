@@ -23,6 +23,7 @@ const RTConfigAdminPage = lazy(() => import('@/pages/RTConfigAdminPage/ui/RTConf
 const ArenaMatchPage = lazy(() => import('@/pages/ArenaMatchPage/ui/ArenaMatchPage').then(m => ({ default: m.ArenaMatchPage })));
 const InterviewPrepPage = lazy(() => import('@/pages/InterviewPrepPage/ui/InterviewPrepPage').then(m => ({ default: m.InterviewPrepPage })));
 const InterviewPrepSessionPage = lazy(() => import('@/pages/InterviewPrepSessionPage/ui/InterviewPrepSessionPage').then(m => ({ default: m.InterviewPrepSessionPage })));
+const InterviewPrepMockSessionPage = lazy(() => import('@/pages/InterviewPrepMockSessionPage/ui/InterviewPrepMockSessionPage').then(m => ({ default: m.InterviewPrepMockSessionPage })));
 const InterviewPrepAdminPage = lazy(() => import('@/pages/InterviewPrepAdminPage/ui/InterviewPrepAdminPage').then(m => ({ default: m.InterviewPrepAdminPage })));
 
 // Shared loading fallback
@@ -173,6 +174,17 @@ export const RouterProvider: React.FC = () => {
               <Navigate to="/" replace />
             ) : (
               <InterviewPrepSessionPage />
+            )}
+          />
+
+          <Route
+            path="/interview-prep/mock/:sessionId"
+            element={!isAuthenticated || needsProfileComplete ? (
+              <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
+            ) : !user?.isTrusted ? (
+              <Navigate to="/" replace />
+            ) : (
+              <InterviewPrepMockSessionPage />
             )}
           />
 

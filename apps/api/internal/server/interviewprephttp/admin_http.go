@@ -34,8 +34,43 @@ type adminQuestionRequest struct {
 	Answer   string `json:"answer"`
 }
 
+type adminMockQuestionPoolRequest struct {
+	Topic           string `json:"topic"`
+	CompanyTag      string `json:"companyTag"`
+	QuestionKey     string `json:"questionKey"`
+	Prompt          string `json:"prompt"`
+	ReferenceAnswer string `json:"referenceAnswer"`
+	Position        int32  `json:"position"`
+	AlwaysAsk       bool   `json:"alwaysAsk"`
+	IsActive        bool   `json:"isActive"`
+}
+
+type adminMockCompanyPresetRequest struct {
+	CompanyTag      string `json:"companyTag"`
+	StageKind       string `json:"stageKind"`
+	Position        int32  `json:"position"`
+	TaskSlugPattern string `json:"taskSlugPattern"`
+	AIModelOverride string `json:"aiModelOverride"`
+	IsActive        bool   `json:"isActive"`
+}
+
 func handleAdminPath(w http.ResponseWriter, r *http.Request, repo AdminRepo, parts []string) {
-	if len(parts) == 0 || parts[0] != "tasks" {
+	if len(parts) == 0 {
+		http.Error(w, "not found", http.StatusNotFound)
+		return
+	}
+
+	if parts[0] == "mock-question-pools" {
+		handleMockQuestionPoolsAdmin(w, r, repo, parts[1:])
+		return
+	}
+
+	if parts[0] == "mock-company-presets" {
+		handleMockCompanyPresetsAdmin(w, r, repo, parts[1:])
+		return
+	}
+
+	if parts[0] != "tasks" {
 		http.Error(w, "not found", http.StatusNotFound)
 		return
 	}
@@ -77,6 +112,166 @@ func handleAdminPath(w http.ResponseWriter, r *http.Request, repo AdminRepo, par
 	}
 
 	http.Error(w, "not found", http.StatusNotFound)
+}
+
+func handleMockQuestionPoolsAdmin(w http.ResponseWriter, r *http.Request, repo AdminRepo, parts []string) {
+	if len(parts) == 0 {
+		switch r.Method {
+		case http.MethodGet:
+			items, err := repo.ListMockQuestionPools(r.Context())
+			if err != nil {
+				writeAdminJSON(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+				return
+			}
+			writeAdminJSON(w, http.StatusOK, map[string]any{"items": items})
+		case http.MethodPost:
+			var req adminMockQuestionPoolRequest
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
+				return
+			}
+			now := time.Now().UTC()
+			item := &model.InterviewPrepMockQuestionPoolItem{
+				ID:              uuid.New(),
+				Topic:           req.Topic,
+				CompanyTag:      req.CompanyTag,
+				QuestionKey:     req.QuestionKey,
+				Prompt:          req.Prompt,
+				ReferenceAnswer: req.ReferenceAnswer,
+				Position:        req.Position,
+				AlwaysAsk:       req.AlwaysAsk,
+				IsActive:        req.IsActive,
+				CreatedAt:       now,
+				UpdatedAt:       now,
+			}
+			if err := repo.CreateMockQuestionPool(r.Context(), item); err != nil {
+				writeAdminJSON(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+				return
+			}
+			writeAdminJSON(w, http.StatusOK, map[string]any{"item": item})
+		default:
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		}
+		return
+	}
+
+	itemID, err := uuid.Parse(parts[0])
+	if err != nil {
+		writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "invalid item id"})
+		return
+	}
+
+	switch r.Method {
+	case http.MethodPut:
+		var req adminMockQuestionPoolRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
+			return
+		}
+		item := &model.InterviewPrepMockQuestionPoolItem{
+			ID:              itemID,
+			Topic:           req.Topic,
+			CompanyTag:      req.CompanyTag,
+			QuestionKey:     req.QuestionKey,
+			Prompt:          req.Prompt,
+			ReferenceAnswer: req.ReferenceAnswer,
+			Position:        req.Position,
+			AlwaysAsk:       req.AlwaysAsk,
+			IsActive:        req.IsActive,
+			UpdatedAt:       time.Now().UTC(),
+		}
+		if err := repo.UpdateMockQuestionPool(r.Context(), item); err != nil {
+			writeAdminJSON(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+			return
+		}
+		writeAdminJSON(w, http.StatusOK, map[string]any{"item": item})
+	case http.MethodDelete:
+		if err := repo.DeleteMockQuestionPool(r.Context(), itemID); err != nil {
+			writeAdminJSON(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+			return
+		}
+		writeAdminJSON(w, http.StatusOK, map[string]any{"status": "ok"})
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
+}
+
+func handleMockCompanyPresetsAdmin(w http.ResponseWriter, r *http.Request, repo AdminRepo, parts []string) {
+	if len(parts) == 0 {
+		switch r.Method {
+		case http.MethodGet:
+			items, err := repo.ListMockCompanyPresets(r.Context())
+			if err != nil {
+				writeAdminJSON(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+				return
+			}
+			writeAdminJSON(w, http.StatusOK, map[string]any{"items": items})
+		case http.MethodPost:
+			var req adminMockCompanyPresetRequest
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
+				return
+			}
+			now := time.Now().UTC()
+			item := &model.InterviewPrepMockCompanyPreset{
+				ID:              uuid.New(),
+				CompanyTag:      req.CompanyTag,
+				StageKind:       model.InterviewPrepMockStageKindFromString(req.StageKind),
+				Position:        req.Position,
+				TaskSlugPattern: req.TaskSlugPattern,
+				AIModelOverride: req.AIModelOverride,
+				IsActive:        req.IsActive,
+				CreatedAt:       now,
+				UpdatedAt:       now,
+			}
+			if err := repo.CreateMockCompanyPreset(r.Context(), item); err != nil {
+				writeAdminJSON(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+				return
+			}
+			writeAdminJSON(w, http.StatusOK, map[string]any{"item": item})
+		default:
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+		}
+		return
+	}
+
+	itemID, err := uuid.Parse(parts[0])
+	if err != nil {
+		writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "invalid item id"})
+		return
+	}
+
+	switch r.Method {
+	case http.MethodPut:
+		var req adminMockCompanyPresetRequest
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			writeAdminJSON(w, http.StatusBadRequest, map[string]any{"error": "bad request"})
+			return
+		}
+		item := &model.InterviewPrepMockCompanyPreset{
+			ID:              itemID,
+			CompanyTag:      req.CompanyTag,
+			StageKind:       model.InterviewPrepMockStageKindFromString(req.StageKind),
+			Position:        req.Position,
+			TaskSlugPattern: req.TaskSlugPattern,
+			AIModelOverride: req.AIModelOverride,
+			IsActive:        req.IsActive,
+			UpdatedAt:       time.Now().UTC(),
+		}
+		if err := repo.UpdateMockCompanyPreset(r.Context(), item); err != nil {
+			writeAdminJSON(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+			return
+		}
+		writeAdminJSON(w, http.StatusOK, map[string]any{"item": item})
+	case http.MethodDelete:
+		if err := repo.DeleteMockCompanyPreset(r.Context(), itemID); err != nil {
+			writeAdminJSON(w, http.StatusInternalServerError, map[string]any{"error": err.Error()})
+			return
+		}
+		writeAdminJSON(w, http.StatusOK, map[string]any{"status": "ok"})
+	default:
+		http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+	}
 }
 
 func handleTasksCollection(w http.ResponseWriter, r *http.Request, repo AdminRepo) {

@@ -109,10 +109,14 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		},
 	})
 	interviewPrepDomain := appinterviewprep.New(appinterviewprep.Config{
-		Repository:    storage.interviewRepo,
-		Sandbox:       sandboxService,
-		Reviewer:      aiReviewService,
-		MaxImageBytes: bootstrap.cfg.External.AIReview.MaxImageBytes,
+		Repository:        storage.interviewRepo,
+		Sandbox:           sandboxService,
+		Reviewer:          aiReviewService,
+		MaxImageBytes:     bootstrap.cfg.External.AIReview.MaxImageBytes,
+		ModelCode:         bootstrap.cfg.External.AIReview.ModelCode,
+		ModelArchitecture: bootstrap.cfg.External.AIReview.ModelArchitecture,
+		ModelFollowup:     bootstrap.cfg.External.AIReview.ModelFollowup,
+		ModelSystemDesign: bootstrap.cfg.External.AIReview.ModelSystemDesign,
 	})
 	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
 

@@ -219,6 +219,18 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 	if v := manager.GetValue(ctx, rtc.AiReviewModel); v.String() != "" {
 		cfg.External.AIReview.Model = v.String()
 	}
+	if v := manager.GetValue(ctx, rtc.AiReviewModelCode); v.String() != "" {
+		cfg.External.AIReview.ModelCode = v.String()
+	}
+	if v := manager.GetValue(ctx, rtc.AiReviewModelArchitecture); v.String() != "" {
+		cfg.External.AIReview.ModelArchitecture = v.String()
+	}
+	if v := manager.GetValue(ctx, rtc.AiReviewModelFollowup); v.String() != "" {
+		cfg.External.AIReview.ModelFollowup = v.String()
+	}
+	if v := manager.GetValue(ctx, rtc.AiReviewModelSystemDesign); v.String() != "" {
+		cfg.External.AIReview.ModelSystemDesign = v.String()
+	}
 	if v := manager.GetValue(ctx, rtc.AiReviewTimeout); v.String() != "" {
 		d, parseErr := time.ParseDuration(v.String())
 		if parseErr != nil {
@@ -304,6 +316,18 @@ func overrideSecretConfigFromEnv(cfg *Bootstrap) {
 	}
 	if value, ok := lookupEnvValue("AI_REVIEW_MODEL"); ok {
 		cfg.External.AIReview.Model = value
+	}
+	if value, ok := lookupEnvValue("AI_REVIEW_MODEL_CODE"); ok {
+		cfg.External.AIReview.ModelCode = value
+	}
+	if value, ok := lookupEnvValue("AI_REVIEW_MODEL_ARCHITECTURE"); ok {
+		cfg.External.AIReview.ModelArchitecture = value
+	}
+	if value, ok := lookupEnvValue("AI_REVIEW_MODEL_FOLLOWUP"); ok {
+		cfg.External.AIReview.ModelFollowup = value
+	}
+	if value, ok := lookupEnvValue("AI_REVIEW_MODEL_SYSTEM_DESIGN"); ok {
+		cfg.External.AIReview.ModelSystemDesign = value
 	}
 	if value, ok := lookupEnvValue("AI_REVIEW_TIMEOUT"); ok {
 		if parsed, err := time.ParseDuration(value); err == nil {

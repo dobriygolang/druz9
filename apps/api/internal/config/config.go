@@ -117,10 +117,14 @@ type S3 struct {
 }
 
 type AIReview struct {
-	Provider      string        `json:"provider"`
-	BaseURL       string        `json:"base_url"`
-	APIKey        string        `json:"api_key"`
-	Model         string        `json:"model"`
-	Timeout       time.Duration `json:"timeout"`
-	MaxImageBytes int64         `json:"max_image_bytes"`
+	Provider          string        `json:"provider"`
+	BaseURL           string        `json:"base_url"`
+	APIKey            string        `json:"api_key"`
+	Model             string        `json:"model"`
+	ModelCode         string        `json:"model_code"`
+	ModelArchitecture string        `json:"model_architecture"`
+	ModelFollowup     string        `json:"model_followup"`
+	ModelSystemDesign string        `json:"model_system_design"`
+	Timeout           time.Duration `json:"timeout"`
+	MaxImageBytes     int64         `json:"max_image_bytes"`
 }

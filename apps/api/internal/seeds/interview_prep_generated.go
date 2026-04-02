@@ -15,6 +15,54 @@ func generatedInterviewPrepTasks() []InterviewPrepCatalogTask {
 
 func goInterviewPrepTasks() []InterviewPrepCatalogTask {
 	return []InterviewPrepCatalogTask{
+		executableCodingTask(
+			"go-slices-compact-unique",
+			"Go: compact unique slice",
+			"go",
+			"Дан отсортированный массив чисел. Нужно in-place удалить дубликаты и вернуть длину префикса с уникальными значениями. После решения обсуди aliasing, append и почему нельзя терять порядок.",
+			goStarter("func solve(input string) string {\n\treturn \"\"\n}\n"),
+			"Решение идёт двумя указателями по отсортированному массиву: один читает, второй пишет следующий уникальный элемент. По памяти O(1), по времени O(n).",
+			&InterviewPrepCatalogCodeTask{
+				Slug:             "go-slices-compact-unique-exec",
+				Title:            "Go: compact unique slice [exec]",
+				Difficulty:       "easy",
+				Language:         "go",
+				ExecutionProfile: "pure",
+				RunnerMode:       "function_io",
+				DurationSeconds:  1500,
+				StarterCode:      "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n\t\"strconv\"\n\t\"strings\"\n)\n\nfunc solve(input string) string {\n\treturn \"\"\n}\n\nfunc main() {\n\treader := bufio.NewReader(os.Stdin)\n\tline, _ := reader.ReadString('\\n')\n\tline = strings.TrimSpace(line)\n\tfmt.Println(solve(line))\n}\n",
+				Cases: []CatalogCase{
+					{Input: "1 1 2 2 3\n", Output: "3", IsPublic: true},
+					{Input: "5 5 5 5\n", Output: "1", IsPublic: true},
+					{Input: "1 2 3 4\n", Output: "4", IsPublic: false},
+				},
+			},
+			q("Почему здесь легко словить aliasing bug?", "Потому что slice может продолжать смотреть в тот же backing array, и изменения через append или прямую запись будут видны в других представлениях."),
+		),
+		executableCodingTask(
+			"go-worker-pool-batcher",
+			"Go: worker pool batcher",
+			"go",
+			"Есть число workers и список длительностей jobs. Нужно посчитать минимальное время обработки всех jobs при жадном планировании на самый ранний свободный worker. После решения обсуди bounded concurrency и graceful shutdown.",
+			goStarter("func solve(input string) string {\n\treturn \"\"\n}\n"),
+			"Удобно держать min-heap по времени освобождения worker. Каждую новую job кладём на самый ранний worker и обновляем его finish time.",
+			&InterviewPrepCatalogCodeTask{
+				Slug:             "go-worker-pool-batcher-exec",
+				Title:            "Go: worker pool batcher [exec]",
+				Difficulty:       "medium",
+				Language:         "go",
+				ExecutionProfile: "pure",
+				RunnerMode:       "function_io",
+				DurationSeconds:  1800,
+				StarterCode:      "package main\n\nimport (\n\t\"bufio\"\n\t\"fmt\"\n\t\"os\"\n\t\"strings\"\n)\n\nfunc solve(input string) string {\n\treturn \"\"\n}\n\nfunc main() {\n\treader := bufio.NewReader(os.Stdin)\n\tline1, _ := reader.ReadString('\\n')\n\tline2, _ := reader.ReadString('\\n')\n\tfmt.Println(solve(strings.TrimSpace(line1) + \"\\n\" + strings.TrimSpace(line2)))\n}\n",
+				Cases: []CatalogCase{
+					{Input: "2\n5 3 4\n", Output: "7", IsPublic: true},
+					{Input: "3\n2 2 2 2\n", Output: "4", IsPublic: true},
+					{Input: "1\n7 1 3\n", Output: "11", IsPublic: false},
+				},
+			},
+			q("Почему без bounded queue такой worker pool может развалиться?", "Потому что producer сможет бесконтрольно заливать новые задачи, и система упрётся в память или tail latency."),
+		),
 		guidedCodingTask("go-lru-cache-api", "Go: LRU cache API", "go", "Спроектируй и напиши LRU cache с `Get/Put`, eviction и O(1) операциями. Затем объясни выбор структуры данных и как сделать реализацию thread-safe.", goStarter("type Cache interface {\n\tGet(key string) (string, bool)\n\tPut(key string, value string)\n}\n"), "Обычно используют hash map + doubly linked list: map даёт O(1) доступ по ключу, список хранит порядок использования. Для многопоточности нужен mutex или single-owner goroutine.", q("Почему одного map недостаточно?", "Map не хранит порядок использования. Без дополнительной структуры нельзя за O(1) понять, какой элемент вытеснять."), q("Что меняется в concurrent-версии?", "Нужно синхронизировать и map, и связный список. Часто достаточно одного mutex, если нет экстремальных требований к contention."), q("Какие типичные баги здесь?", "Необновлённый head/tail при eviction, потеря ссылки на узел, рассинхрон map и list, гонки в concurrent-режиме.")),
 		guidedCodingTask("go-merge-k-sorted-lists", "Go: merge k sorted lists", "go", "Реализуй merge k sorted lists через heap, затем объясни асимптотику и почему divide-and-conquer может быть альтернативой.", goStarter("type ListNode struct {\n\tVal  int\n\tNext *ListNode\n}\n\nfunc mergeKLists(lists []*ListNode) *ListNode {\n\treturn nil\n}\n"), "Классическое решение использует min-heap размера k и даёт O(n log k). Альтернатива через pairwise merge или divide-and-conquer даёт ту же асимптотику, но другой trade-off по константам.", q("Почему heap здесь хорошо подходит?", "Потому что в каждый момент нужен минимум среди текущих голов k списков. Heap даёт его за O(log k) на шаг."), q("Когда divide-and-conquer может быть проще?", "Когда проще переиспользовать merge двух списков и не хочется писать heap.Interface, особенно на интервью с ограниченным временем."), q("Где тут легко ошибиться в Go?", "В обработке nil-списков, в ссылках на следующий узел и в обновлении хвоста результирующего списка.")),
 		guidedCodingTask("go-idempotent-consumer", "Go: idempotent consumer", "go", "Спроектируй consumer, который обрабатывает сообщения идемпотентно. После решения обсуди dedup key, retention окна и exactly-once мифы.", goStarter("type Message struct {\n\tID      string\n\tPayload string\n}\n\ntype Store interface {\n\tSeen(id string) (bool, error)\n\tMarkSeen(id string) error\n}\n"), "Практически идемпотентность строится на dedup key и durable store с TTL/retention window. Exactly-once обычно заменяется at-least-once + идемпотентная обработка.", q("Почему at-least-once без идемпотентности опасен?", "Повторная доставка создаёт дублирующие записи, повторные списания или повторные сайд-эффекты."), q("Где хранить dedup state?", "В durable storage рядом с бизнес-состоянием или в отдельном KV/DB с гарантией консистентности относительно эффекта."), q("Почему exactly-once часто маркетинг?", "Потому что end-to-end exactly-once между брокером, приложением и внешними системами почти всегда распадается на набор локальных гарантий.")),
@@ -42,6 +90,29 @@ func pythonInterviewPrepTasks() []InterviewPrepCatalogTask {
 
 func sqlInterviewPrepTasks() []InterviewPrepCatalogTask {
 	return []InterviewPrepCatalogTask{
+		executableCodingTask(
+			"sql-revenue-by-user",
+			"SQL: revenue by user",
+			"sql",
+			"Есть таблица orders(user_id, amount, created_at). Нужно вернуть user_id с максимальной суммой amount. При равной сумме выбрать меньший user_id.",
+			"CREATE TABLE orders(user_id INT, amount INT, created_at DATE);\n\n-- Write a single SQL query below.\n",
+			"Нужно сгруппировать по user_id, посчитать SUM(amount), отсортировать по сумме DESC и user_id ASC, затем взять LIMIT 1.",
+			&InterviewPrepCatalogCodeTask{
+				Slug:             "sql-revenue-by-user-exec",
+				Title:            "SQL: revenue by user [exec]",
+				Difficulty:       "easy",
+				Language:         "sql",
+				ExecutionProfile: "pure",
+				RunnerMode:       "function_io",
+				DurationSeconds:  1200,
+				StarterCode:      "SELECT user_id\nFROM orders\nGROUP BY user_id\nORDER BY SUM(amount) DESC, user_id ASC\nLIMIT 1;\n",
+				Cases: []CatalogCase{
+					{Input: "CREATE TABLE orders(user_id INT, amount INT, created_at DATE);\nINSERT INTO orders VALUES (1, 50, '2026-01-01'), (2, 100, '2026-01-02'), (1, 60, '2026-01-03');\n", Output: "1", IsPublic: true},
+					{Input: "CREATE TABLE orders(user_id INT, amount INT, created_at DATE);\nINSERT INTO orders VALUES (3, 10, '2026-01-01'), (2, 10, '2026-01-02');\n", Output: "2", IsPublic: true},
+				},
+			},
+			q("Почему tie-break по user_id надо указать явно?", "Иначе при равной сумме БД может вернуть любую строку, и результат будет недетерминированным."),
+		),
 		guidedCodingTask("sql-first-order-per-user", "SQL: first order per user", "sql", "Есть orders(user_id, order_id, created_at). Нужно вернуть первый order каждого пользователя. Затем обсуди window functions vs group by + join.", sqlStarter("SELECT\n  user_id,\n  order_id,\n  created_at\nFROM orders;\n"), "Часто проще всего через ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY created_at). Альтернатива через MIN(created_at) + join тоже рабочая, но может давать неоднозначность при тай-брейках.", q("Почему MIN(created_at) не всегда достаточно?", "Потому что при одинаковом created_at у пользователя может быть несколько заказов, и нужен явный tie-break."), q("Когда window function удобнее?", "Когда нужно одновременно вернуть и саму строку, и ranking/ordering без дополнительного self-join."), q("Какие индексы помогут?", "Обычно orders(user_id, created_at, order_id) или близкий covering index.")),
 		guidedCodingTask("sql-top-products-by-category", "SQL: top products by category", "sql", "Нужно вывести top-3 продукта по выручке в каждой категории. Потом обсуди dense_rank и обработку ties.", sqlStarter("SELECT\n  category_id,\n  product_id,\n  revenue\nFROM product_sales;\n"), "Обычно решение строится на агрегировании revenue по product_id и затем DENSE_RANK/ROW_NUMBER в рамках category_id. Нужно заранее договориться, как вести себя при ties.", q("Почему LIMIT 3 на весь запрос не работает?", "Потому что нужен top-3 внутри каждой категории, а не глобально по таблице."), q("Когда использовать ROW_NUMBER, а когда DENSE_RANK?", "ROW_NUMBER жёстко режет до 3 строк, а DENSE_RANK может вернуть больше строк при одинаковом значении метрики."), q("Что обычно тяжёлое в таком запросе?", "Агрегация по большим фактам и последующая сортировка внутри partition'ов.")),
 		guidedCodingTask("sql-last-event-before-conversion", "SQL: last event before conversion", "sql", "Есть события пользователя и отдельно conversions. Нужно найти последнее событие перед конверсией. Затем обсуди join condition и duplicate conversions.", sqlStarter("SELECT\n  user_id,\n  event_name,\n  event_time\nFROM events;\n"), "Нужно корректно джойнить события по условию `event_time < conversion_time` и потом выбрать максимальное событие на каждую конверсию. Часто помогает window function или lateral join.", q("Почему простой MAX(event_time) GROUP BY user_id недостаточен?", "Потому что конверсий может быть несколько, и нужно искать событие отдельно для каждой конверсии."), q("Чем опасен join без временного условия?", "Он свяжет и события после конверсии, что сломает причинную интерпретацию воронки."), q("Какие данные здесь особенно вредят?", "Дубликаты конверсий, одинаковые timestamps и late-arriving events.")),
@@ -90,6 +161,24 @@ func guidedCodingTask(slug string, title string, language string, statement stri
 		IsActive:           true,
 		Questions:          questions,
 	}
+}
+
+func executableCodingTask(slug string, title string, language string, statement string, starter string, reference string, codeTask *InterviewPrepCatalogCodeTask, questions ...InterviewPrepCatalogQuestion) InterviewPrepCatalogTask {
+	task := guidedCodingTask(slug, title, language, statement, starter, reference, questions...)
+	task.IsExecutable = true
+	task.CodeTask = codeTask
+	if codeTask != nil {
+		task.ExecutionProfile = codeTask.ExecutionProfile
+		task.RunnerMode = codeTask.RunnerMode
+		task.DurationSeconds = codeTask.DurationSeconds
+		task.StarterCode = codeTask.StarterCode
+		task.Language = codeTask.Language
+		task.SupportedLanguages = []string{codeTask.Language}
+	}
+	if task.Language == "sql" {
+		task.PrepType = "sql"
+	}
+	return task
 }
 
 func systemDesignTask(slug string, title string, statement string, reference string, questions ...InterviewPrepCatalogQuestion) InterviewPrepCatalogTask {

@@ -20,8 +20,15 @@ var (
 	ErrForbidden                   = errors.New("forbidden: user is not trusted")
 	ErrTaskNotFound                = errors.New("task not found")
 	ErrSessionNotFound             = errors.New("session not found")
+	ErrMockSessionNotFound         = errors.New("mock interview session not found")
 	ErrSessionFinished             = errors.New("session already finished")
+	ErrMockSessionFinished         = errors.New("mock interview session already finished")
 	ErrQuestionLocked              = errors.New("question is locked or not current")
+	ErrMockStageSubmitNotAllowed   = errors.New("submit not allowed for current mock stage")
+	ErrMockQuestionNotReady        = errors.New("follow-up question is not ready yet")
+	ErrMockQuestionAnswerRequired  = errors.New("question answer is required")
+	ErrMockCompanyTagRequired      = errors.New("company tag is required")
+	ErrMockTaskPoolIncomplete      = errors.New("mock interview task pool is incomplete for selected company")
 	ErrInvalidAssessment           = errors.New("invalid self assessment")
 	ErrUnsupportedLanguage         = errors.New("unsupported interview prep language")
 	ErrExecutableTaskNotConfigured = errors.New("executable interview prep task is not linked to a code task")
@@ -32,10 +39,14 @@ var (
 )
 
 type Config struct {
-	Repository    Repository
-	Sandbox       Sandbox
-	Reviewer      Reviewer
-	MaxImageBytes int64
+	Repository        Repository
+	Sandbox           Sandbox
+	Reviewer          Reviewer
+	MaxImageBytes     int64
+	ModelCode         string
+	ModelArchitecture string
+	ModelFollowup     string
+	ModelSystemDesign string
 }
 
 type SystemDesignReviewInput struct {
@@ -53,6 +64,8 @@ type Sandbox interface {
 
 type Reviewer interface {
 	ReviewSystemDesign(ctx context.Context, req aireview.SystemDesignReviewRequest) (*aireview.SystemDesignReview, error)
+	ReviewInterviewSolution(ctx context.Context, req aireview.InterviewSolutionReviewRequest) (*aireview.InterviewSolutionReview, error)
+	ReviewInterviewAnswer(ctx context.Context, req aireview.InterviewAnswerReviewRequest) (*aireview.InterviewAnswerReview, error)
 }
 
 type Repository interface {
@@ -72,25 +85,45 @@ type Repository interface {
 	UpsertQuestionResult(ctx context.Context, result *model.InterviewPrepQuestionResult) error
 	ListQuestionResults(ctx context.Context, sessionID uuid.UUID) ([]*model.InterviewPrepQuestionResult, error)
 	GetCodeTask(ctx context.Context, taskID uuid.UUID) (*model.CodeTask, error)
+	ListMockQuestionPools(ctx context.Context) ([]*model.InterviewPrepMockQuestionPoolItem, error)
+	ListMockCompanyPresets(ctx context.Context) ([]*model.InterviewPrepMockCompanyPreset, error)
+
+	CreateMockSession(ctx context.Context, session *model.InterviewPrepMockSession, stages []*model.InterviewPrepMockStage, questionResults []*model.InterviewPrepMockQuestionResult) error
+	GetMockSession(ctx context.Context, sessionID uuid.UUID) (*model.InterviewPrepMockSession, error)
+	GetActiveMockSessionByUserAndCompany(ctx context.Context, userID uuid.UUID, companyTag string) (*model.InterviewPrepMockSession, error)
+	UpdateMockStageSubmission(ctx context.Context, stageID uuid.UUID, solveLanguage string, code string, passed bool, reviewScore int32, reviewSummary string, nextStatus model.InterviewPrepMockStageStatus) error
+	CompleteMockQuestion(ctx context.Context, questionResultID uuid.UUID, score int32, summary string, answeredAt time.Time) error
+	SetMockStageStatus(ctx context.Context, stageID uuid.UUID, status model.InterviewPrepMockStageStatus) error
+	AdvanceMockSession(ctx context.Context, sessionID uuid.UUID, currentStageIndex int32) error
+	CompleteMockStage(ctx context.Context, stageID uuid.UUID) error
+	FinishMockSession(ctx context.Context, sessionID uuid.UUID) error
 }
 
 type Service struct {
-	repo          Repository
-	sandbox       Sandbox
-	reviewer      Reviewer
-	maxImageBytes int64
-	taskListCache *cache.TTLCache[[]*model.InterviewPrepTask]
-	codeTaskCache *cache.TTLCache[*model.CodeTask]
+	repo              Repository
+	sandbox           Sandbox
+	reviewer          Reviewer
+	maxImageBytes     int64
+	taskListCache     *cache.TTLCache[[]*model.InterviewPrepTask]
+	codeTaskCache     *cache.TTLCache[*model.CodeTask]
+	modelCode         string
+	modelArchitecture string
+	modelFollowup     string
+	modelSystemDesign string
 }
 
 func New(c Config) *Service {
 	return &Service{
-		repo:          c.Repository,
-		sandbox:       c.Sandbox,
-		reviewer:      c.Reviewer,
-		maxImageBytes: maxImageBytesOrDefault(c.MaxImageBytes),
-		taskListCache: cache.NewTTLCache[[]*model.InterviewPrepTask](8, time.Minute),
-		codeTaskCache: cache.NewTTLCache[*model.CodeTask](64, 5*time.Minute),
+		repo:              c.Repository,
+		sandbox:           c.Sandbox,
+		reviewer:          c.Reviewer,
+		maxImageBytes:     maxImageBytesOrDefault(c.MaxImageBytes),
+		taskListCache:     cache.NewTTLCache[[]*model.InterviewPrepTask](8, time.Minute),
+		codeTaskCache:     cache.NewTTLCache[*model.CodeTask](64, 5*time.Minute),
+		modelCode:         strings.TrimSpace(c.ModelCode),
+		modelArchitecture: strings.TrimSpace(c.ModelArchitecture),
+		modelFollowup:     strings.TrimSpace(c.ModelFollowup),
+		modelSystemDesign: strings.TrimSpace(c.ModelSystemDesign),
 	}
 }
 

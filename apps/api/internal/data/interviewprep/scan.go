@@ -85,3 +85,71 @@ func scanQuestionResult(s scanner) (*model.InterviewPrepQuestionResult, error) {
 	item.SelfAssessment = model.InterviewPrepSelfAssessmentFromString(assessment)
 	return &item, nil
 }
+
+func scanMockSession(s scanner) (*model.InterviewPrepMockSession, error) {
+	var item model.InterviewPrepMockSession
+	var status string
+	if err := s.Scan(
+		&item.ID,
+		&item.UserID,
+		&item.CompanyTag,
+		&status,
+		&item.CurrentStageIndex,
+		&item.StartedAt,
+		&item.FinishedAt,
+		&item.CreatedAt,
+		&item.UpdatedAt,
+	); err != nil {
+		return nil, err
+	}
+	item.Status = model.InterviewPrepMockSessionStatusFromString(status)
+	return &item, nil
+}
+
+func scanMockStage(s scanner) (*model.InterviewPrepMockStage, error) {
+	var item model.InterviewPrepMockStage
+	var kind string
+	var status string
+	if err := s.Scan(
+		&item.ID,
+		&item.SessionID,
+		&item.StageIndex,
+		&kind,
+		&status,
+		&item.TaskID,
+		&item.SolveLanguage,
+		&item.Code,
+		&item.LastSubmissionPassed,
+		&item.ReviewScore,
+		&item.ReviewSummary,
+		&item.StartedAt,
+		&item.FinishedAt,
+		&item.CreatedAt,
+		&item.UpdatedAt,
+	); err != nil {
+		return nil, err
+	}
+	item.Kind = model.InterviewPrepMockStageKindFromString(kind)
+	item.Status = model.InterviewPrepMockStageStatusFromString(status)
+	return &item, nil
+}
+
+func scanMockQuestionResult(s scanner) (*model.InterviewPrepMockQuestionResult, error) {
+	var item model.InterviewPrepMockQuestionResult
+	if err := s.Scan(
+		&item.ID,
+		&item.StageID,
+		&item.Position,
+		&item.QuestionKey,
+		&item.Prompt,
+		&item.ReferenceAnswer,
+		&item.Score,
+		&item.Summary,
+		&item.AnsweredAt,
+		&item.CreatedAt,
+		&item.UpdatedAt,
+	); err != nil {
+		return nil, err
+	}
+	return &item, nil
+}

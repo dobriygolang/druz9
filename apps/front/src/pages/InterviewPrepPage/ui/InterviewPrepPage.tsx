@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowRight, Clock3, Filter, Shuffle, ShieldCheck, Sparkles, TerminalSquare } from 'lucide-react';
+import { ArrowRight, BrainCircuit, Clock3, Filter, Shuffle, ShieldCheck, Sparkles, TerminalSquare } from 'lucide-react';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 import { interviewPrepApi, InterviewPrepTask, InterviewPrepType } from '@/features/InterviewPrep/api/interviewPrepApi';
@@ -56,6 +56,7 @@ export function InterviewPrepPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [startingTaskId, setStartingTaskId] = useState<string | null>(null);
+  const [startingMock, setStartingMock] = useState(false);
   const [search, setSearch] = useState(searchParams.get('q') ?? '');
   const [modeFilter, setModeFilter] = useState<TaskModeFilter>((searchParams.get('mode') as TaskModeFilter) || 'all');
   const [category, setCategory] = useState<TaskCategory>((searchParams.get('category') as TaskCategory) || 'all');
@@ -201,6 +202,24 @@ export function InterviewPrepPage() {
     }
   };
 
+  const startMockInterview = async () => {
+    if (company === 'all') {
+      setError('Для mock interview сначала выбери конкретную компанию.');
+      return;
+    }
+    setError(null);
+    setStartingMock(true);
+    try {
+      const session = await interviewPrepApi.startMockSession(company);
+      navigate(`/interview-prep/mock/${session.id}`);
+    } catch (e: any) {
+      console.error('Failed to start mock interview:', e);
+      setError(e.response?.data?.error || 'Не удалось начать mock interview');
+    } finally {
+      setStartingMock(false);
+    }
+  };
+
   const handleRandomStart = async (pool: InterviewPrepTask[]) => {
     const activeTasks = pool.filter((task) => task.isActive);
     if (activeTasks.length === 0) {
@@ -235,6 +254,10 @@ export function InterviewPrepPage() {
               : 'Выбирай категорию, бери случайную executable-задачу или фильтруй каталог вручную. Coding можно решать на Go или Python, system design поддерживает AI review.'}
           </p>
           <div className="interview-prep-hero__actions" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
+            <button className="btn btn-secondary" disabled={startingMock} onClick={() => void startMockInterview()} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
+              <BrainCircuit size={16} />
+              <span>{company === 'all' ? 'Выбери компанию для mock interview' : 'Запустить mock interview'}</span>
+            </button>
             <button className="btn btn-primary" onClick={() => void handleRandomStart(filteredTasks)} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
               <Shuffle size={16} />
               <span>Случайная задача</span>

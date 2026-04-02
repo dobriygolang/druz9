@@ -9,6 +9,8 @@ export type InterviewPrepType =
 
 export type InterviewPrepSessionStatus = 'active' | 'finished';
 export type InterviewPrepSelfAssessment = 'answered' | 'skipped';
+export type InterviewPrepMockStageKind = 'slices' | 'concurrency' | 'sql' | 'architecture' | 'system_design';
+export type InterviewPrepMockStageStatus = 'pending' | 'solving' | 'questions' | 'completed';
 
 
 export interface InterviewPrepSystemDesignReview {
@@ -92,6 +94,112 @@ export interface InterviewPrepSubmitResult {
   session?: InterviewPrepSession;
 }
 
+export interface InterviewPrepMockQuestionResult {
+  id: string;
+  stageId: string;
+  position: number;
+  questionKey: string;
+  prompt: string;
+  score: number;
+  summary: string;
+  answeredAt?: string;
+}
+
+export interface InterviewPrepMockStage {
+  id: string;
+  sessionId: string;
+  stageIndex: number;
+  kind: InterviewPrepMockStageKind;
+  status: InterviewPrepMockStageStatus;
+  taskId: string;
+  solveLanguage: string;
+  code: string;
+  lastSubmissionPassed: boolean;
+  reviewScore: number;
+  reviewSummary: string;
+  startedAt: string;
+  finishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  task?: InterviewPrepTask;
+  currentQuestion?: InterviewPrepMockQuestionResult;
+  questionResults?: InterviewPrepMockQuestionResult[];
+}
+
+export interface InterviewPrepMockSession {
+  id: string;
+  userId: string;
+  companyTag: string;
+  status: InterviewPrepSessionStatus;
+  currentStageIndex: number;
+  startedAt: string;
+  finishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+  stages?: InterviewPrepMockStage[];
+  currentStage?: InterviewPrepMockStage;
+}
+
+export interface InterviewPrepSolutionReview {
+  provider?: string;
+  model?: string;
+  score: number;
+  summary: string;
+  strengths: string[];
+  issues: string[];
+  followUpQuestions: string[];
+}
+
+export interface InterviewPrepAnswerReview {
+  provider?: string;
+  model?: string;
+  score: number;
+  summary: string;
+  gaps: string[];
+}
+
+export interface InterviewPrepMockSubmitResult {
+  passed: boolean;
+  passedCount: number;
+  totalCount: number;
+  failedTestIndex: number;
+  failureKind: string;
+  lastError: string;
+  review?: InterviewPrepSolutionReview;
+  session?: InterviewPrepMockSession;
+}
+
+export interface InterviewPrepMockQuestionAnswerResult {
+  review?: InterviewPrepAnswerReview;
+  session?: InterviewPrepMockSession;
+}
+
+export interface InterviewPrepMockQuestionPoolItem {
+  id: string;
+  topic: string;
+  companyTag: string;
+  questionKey: string;
+  prompt: string;
+  referenceAnswer: string;
+  position: number;
+  alwaysAsk: boolean;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
+export interface InterviewPrepMockCompanyPreset {
+  id: string;
+  companyTag: string;
+  stageKind: InterviewPrepMockStageKind;
+  position: number;
+  taskSlugPattern: string;
+  aiModelOverride: string;
+  isActive: boolean;
+  createdAt?: string;
+  updatedAt?: string;
+}
+
 const normalizeTask = (task: any): InterviewPrepTask => ({
   id: task.id ?? task.ID,
   slug: task.slug ?? task.Slug,
@@ -141,6 +249,82 @@ const normalizeSession = (session: any): InterviewPrepSession => ({
   currentQuestion: session.currentQuestion || session.current_question || session.CurrentQuestion
     ? normalizeQuestion(session.currentQuestion ?? session.current_question ?? session.CurrentQuestion)
     : undefined,
+});
+
+const normalizeMockQuestionResult = (item: any): InterviewPrepMockQuestionResult => ({
+  id: item.id ?? item.ID,
+  stageId: item.stageId ?? item.stage_id ?? item.StageID,
+  position: Number(item.position ?? item.Position ?? 0),
+  questionKey: item.questionKey ?? item.question_key ?? item.QuestionKey ?? '',
+  prompt: item.prompt ?? item.Prompt ?? '',
+  score: Number(item.score ?? item.Score ?? 0),
+  summary: item.summary ?? item.Summary ?? '',
+  answeredAt: item.answeredAt ?? item.answered_at ?? item.AnsweredAt,
+});
+
+const normalizeMockStage = (stage: any): InterviewPrepMockStage => ({
+  id: stage.id ?? stage.ID,
+  sessionId: stage.sessionId ?? stage.session_id ?? stage.SessionID,
+  stageIndex: Number(stage.stageIndex ?? stage.stage_index ?? stage.StageIndex ?? 0),
+  kind: stage.kind ?? stage.Kind,
+  status: stage.status ?? stage.Status,
+  taskId: stage.taskId ?? stage.task_id ?? stage.TaskID,
+  solveLanguage: stage.solveLanguage ?? stage.solve_language ?? stage.SolveLanguage ?? '',
+  code: stage.code ?? stage.Code ?? '',
+  lastSubmissionPassed: Boolean(stage.lastSubmissionPassed ?? stage.last_submission_passed ?? stage.LastSubmissionPassed),
+  reviewScore: Number(stage.reviewScore ?? stage.review_score ?? stage.ReviewScore ?? 0),
+  reviewSummary: stage.reviewSummary ?? stage.review_summary ?? stage.ReviewSummary ?? '',
+  startedAt: stage.startedAt ?? stage.started_at ?? stage.StartedAt,
+  finishedAt: stage.finishedAt ?? stage.finished_at ?? stage.FinishedAt,
+  createdAt: stage.createdAt ?? stage.created_at ?? stage.CreatedAt,
+  updatedAt: stage.updatedAt ?? stage.updated_at ?? stage.UpdatedAt,
+  task: stage.task || stage.Task ? normalizeTask(stage.task ?? stage.Task) : undefined,
+  currentQuestion: stage.currentQuestion || stage.current_question || stage.CurrentQuestion
+    ? normalizeMockQuestionResult(stage.currentQuestion ?? stage.current_question ?? stage.CurrentQuestion)
+    : undefined,
+  questionResults: (stage.questionResults ?? stage.question_results ?? stage.QuestionResults ?? []).map(normalizeMockQuestionResult),
+});
+
+const normalizeMockSession = (session: any): InterviewPrepMockSession => ({
+  id: session.id ?? session.ID,
+  userId: session.userId ?? session.user_id ?? session.UserID,
+  companyTag: session.companyTag ?? session.company_tag ?? session.CompanyTag ?? '',
+  status: session.status ?? session.Status,
+  currentStageIndex: Number(session.currentStageIndex ?? session.current_stage_index ?? session.CurrentStageIndex ?? 0),
+  startedAt: session.startedAt ?? session.started_at ?? session.StartedAt,
+  finishedAt: session.finishedAt ?? session.finished_at ?? session.FinishedAt,
+  createdAt: session.createdAt ?? session.created_at ?? session.CreatedAt,
+  updatedAt: session.updatedAt ?? session.updated_at ?? session.UpdatedAt,
+  stages: (session.stages ?? session.Stages ?? []).map(normalizeMockStage),
+  currentStage: session.currentStage || session.current_stage || session.CurrentStage
+    ? normalizeMockStage(session.currentStage ?? session.current_stage ?? session.CurrentStage)
+    : undefined,
+});
+
+const normalizeMockQuestionPoolItem = (item: any): InterviewPrepMockQuestionPoolItem => ({
+  id: item.id ?? item.ID,
+  topic: item.topic ?? item.Topic ?? '',
+  companyTag: item.companyTag ?? item.company_tag ?? item.CompanyTag ?? '',
+  questionKey: item.questionKey ?? item.question_key ?? item.QuestionKey ?? '',
+  prompt: item.prompt ?? item.Prompt ?? '',
+  referenceAnswer: item.referenceAnswer ?? item.reference_answer ?? item.ReferenceAnswer ?? '',
+  position: Number(item.position ?? item.Position ?? 0),
+  alwaysAsk: Boolean(item.alwaysAsk ?? item.always_ask ?? item.AlwaysAsk),
+  isActive: Boolean(item.isActive ?? item.is_active ?? item.IsActive),
+  createdAt: item.createdAt ?? item.created_at ?? item.CreatedAt,
+  updatedAt: item.updatedAt ?? item.updated_at ?? item.UpdatedAt,
+});
+
+const normalizeMockCompanyPreset = (item: any): InterviewPrepMockCompanyPreset => ({
+  id: item.id ?? item.ID,
+  companyTag: item.companyTag ?? item.company_tag ?? item.CompanyTag ?? '',
+  stageKind: item.stageKind ?? item.stage_kind ?? item.StageKind,
+  position: Number(item.position ?? item.Position ?? 0),
+  taskSlugPattern: item.taskSlugPattern ?? item.task_slug_pattern ?? item.TaskSlugPattern ?? '',
+  aiModelOverride: item.aiModelOverride ?? item.ai_model_override ?? item.AIModelOverride ?? '',
+  isActive: Boolean(item.isActive ?? item.is_active ?? item.IsActive),
+  createdAt: item.createdAt ?? item.created_at ?? item.CreatedAt,
+  updatedAt: item.updatedAt ?? item.updated_at ?? item.UpdatedAt,
 });
 
 export const interviewPrepApi = {
@@ -211,6 +395,67 @@ export const interviewPrepApi = {
     );
 
     return response.data.review;
+  },
+
+  startMockSession: async (companyTag: string): Promise<InterviewPrepMockSession> => {
+    const response = await apiClient.post<{ session: any }>('/api/v1/interview-prep/mock-sessions', { companyTag });
+    return normalizeMockSession(response.data.session);
+  },
+
+  getMockSession: async (sessionId: string): Promise<InterviewPrepMockSession> => {
+    const response = await apiClient.get<{ session: any }>(`/api/v1/interview-prep/mock-sessions/${sessionId}`);
+    return normalizeMockSession(response.data.session);
+  },
+
+  submitMockStage: async (sessionId: string, payload: { code: string; language?: string; notes?: string }): Promise<InterviewPrepMockSubmitResult> => {
+    const response = await apiClient.post<{ result: any }>(`/api/v1/interview-prep/mock-sessions/${sessionId}/submit`, payload);
+    const result = response.data.result;
+    return {
+      passed: Boolean(result?.passed ?? false),
+      passedCount: Number(result?.passedCount ?? 0),
+      totalCount: Number(result?.totalCount ?? 0),
+      failedTestIndex: Number(result?.failedTestIndex ?? -1),
+      failureKind: result?.failureKind ?? '',
+      lastError: result?.lastError ?? '',
+      review: result?.review,
+      session: result?.session ? normalizeMockSession(result.session) : undefined,
+    };
+  },
+
+  reviewMockSystemDesign: async (
+    sessionId: string,
+    image: File,
+    input: InterviewPrepSystemDesignReviewInput,
+  ): Promise<{ review?: InterviewPrepSystemDesignReview; session?: InterviewPrepMockSession }> => {
+    const formData = new FormData();
+    formData.append('image', image);
+    formData.append('notes', input.notes);
+    formData.append('components', input.components);
+    formData.append('apis', input.apis);
+    formData.append('databaseSchema', input.databaseSchema);
+    formData.append('traffic', input.traffic);
+    formData.append('reliability', input.reliability);
+
+    const response = await apiClient.post<{ result: { review?: InterviewPrepSystemDesignReview; session?: any } }>(
+      `/api/v1/interview-prep/mock-sessions/${sessionId}/system-design-review`,
+      formData,
+      { headers: { 'Content-Type': 'multipart/form-data' } },
+    );
+    return {
+      review: response.data.result.review,
+      session: response.data.result.session ? normalizeMockSession(response.data.result.session) : undefined,
+    };
+  },
+
+  answerMockQuestion: async (sessionId: string, answer: string): Promise<InterviewPrepMockQuestionAnswerResult> => {
+    const response = await apiClient.post<{ result: { review?: InterviewPrepAnswerReview; session?: any } }>(
+      `/api/v1/interview-prep/mock-sessions/${sessionId}/questions/answer`,
+      { answer },
+    );
+    return {
+      review: response.data.result.review,
+      session: response.data.result.session ? normalizeMockSession(response.data.result.session) : undefined,
+    };
   },
 
   // Admin methods
@@ -295,5 +540,43 @@ export const interviewPrepApi = {
 
   adminDeleteQuestion: async (taskId: string, questionId: string): Promise<void> => {
     await apiClient.delete(`/api/admin/interview-prep/tasks/${taskId}/questions/${questionId}`);
+  },
+
+  adminListMockQuestionPools: async (): Promise<InterviewPrepMockQuestionPoolItem[]> => {
+    const response = await apiClient.get<{ items: any[] }>('/api/admin/interview-prep/mock-question-pools');
+    return (response.data.items || []).map(normalizeMockQuestionPoolItem);
+  },
+
+  adminCreateMockQuestionPool: async (item: Omit<InterviewPrepMockQuestionPoolItem, 'id'>): Promise<InterviewPrepMockQuestionPoolItem> => {
+    const response = await apiClient.post<{ item: any }>('/api/admin/interview-prep/mock-question-pools', item);
+    return normalizeMockQuestionPoolItem(response.data.item);
+  },
+
+  adminUpdateMockQuestionPool: async (id: string, item: Omit<InterviewPrepMockQuestionPoolItem, 'id'>): Promise<InterviewPrepMockQuestionPoolItem> => {
+    const response = await apiClient.put<{ item: any }>(`/api/admin/interview-prep/mock-question-pools/${id}`, item);
+    return normalizeMockQuestionPoolItem(response.data.item);
+  },
+
+  adminDeleteMockQuestionPool: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/admin/interview-prep/mock-question-pools/${id}`);
+  },
+
+  adminListMockCompanyPresets: async (): Promise<InterviewPrepMockCompanyPreset[]> => {
+    const response = await apiClient.get<{ items: any[] }>('/api/admin/interview-prep/mock-company-presets');
+    return (response.data.items || []).map(normalizeMockCompanyPreset);
+  },
+
+  adminCreateMockCompanyPreset: async (item: Omit<InterviewPrepMockCompanyPreset, 'id'>): Promise<InterviewPrepMockCompanyPreset> => {
+    const response = await apiClient.post<{ item: any }>('/api/admin/interview-prep/mock-company-presets', item);
+    return normalizeMockCompanyPreset(response.data.item);
+  },
+
+  adminUpdateMockCompanyPreset: async (id: string, item: Omit<InterviewPrepMockCompanyPreset, 'id'>): Promise<InterviewPrepMockCompanyPreset> => {
+    const response = await apiClient.put<{ item: any }>(`/api/admin/interview-prep/mock-company-presets/${id}`, item);
+    return normalizeMockCompanyPreset(response.data.item);
+  },
+
+  adminDeleteMockCompanyPreset: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/admin/interview-prep/mock-company-presets/${id}`);
   },
 };

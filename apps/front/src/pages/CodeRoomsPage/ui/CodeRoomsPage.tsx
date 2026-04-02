@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { authApi } from '@/features/Auth/api/authApi';
+import { interviewPrepApi } from '@/features/InterviewPrep/api/interviewPrepApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
@@ -516,6 +517,24 @@ export const CodeRoomsPage: React.FC = () => {
                 </div>
               </div>
               <div className="code-room-prep-launch__actions">
+                <button
+                  type="button"
+                  className="btn btn-secondary"
+                  onClick={async () => {
+                    if (prepLaunchCompany === 'all') {
+                      return;
+                    }
+                    try {
+                      const session = await interviewPrepApi.startMockSession(prepLaunchCompany);
+                      navigate(`/interview-prep/mock/${session.id}`);
+                    } catch (error) {
+                      console.error('Failed to start mock interview:', error);
+                    }
+                  }}
+                  disabled={prepLaunchCompany === 'all'}
+                >
+                  Mock interview
+                </button>
                 <button
                   type="button"
                   className="btn btn-ghost"

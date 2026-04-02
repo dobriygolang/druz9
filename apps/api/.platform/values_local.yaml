@@ -236,6 +236,34 @@ ai_review_model:
   type: "string"
   writable: true
 
+ai_review_model_code:
+  usage: "AI review model for code and executable mock stages"
+  group: "external"
+  value: "nvidia/nemotron-nano-12b-v2-vl:free"
+  type: "string"
+  writable: true
+
+ai_review_model_architecture:
+  usage: "AI review model for architecture mock stages"
+  group: "external"
+  value: "nvidia/nemotron-nano-12b-v2-vl:free"
+  type: "string"
+  writable: true
+
+ai_review_model_followup:
+  usage: "AI review model for follow-up answer evaluation"
+  group: "external"
+  value: "nvidia/nemotron-nano-12b-v2-vl:free"
+  type: "string"
+  writable: true
+
+ai_review_model_system_design:
+  usage: "AI review model for system design stages"
+  group: "external"
+  value: "nvidia/nemotron-nano-12b-v2-vl:free"
+  type: "string"
+  writable: true
+
 ai_review_timeout:
   usage: "Timeout for AI review provider requests"
   group: "external"

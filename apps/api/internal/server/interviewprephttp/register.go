@@ -13,9 +13,10 @@ import (
 )
 
 const (
-	TasksPath    = "/api/v1/interview-prep/tasks"
-	SessionsPath = "/api/v1/interview-prep/sessions"
-	AdminPrefix  = "/api/admin/interview-prep/"
+	TasksPath        = "/api/v1/interview-prep/tasks"
+	SessionsPath     = "/api/v1/interview-prep/sessions"
+	MockSessionsPath = "/api/v1/interview-prep/mock-sessions"
+	AdminPrefix      = "/api/admin/interview-prep/"
 )
 
 var SlugPattern = regexp.MustCompile(`[^a-z0-9]+`)
@@ -31,6 +32,11 @@ type Service interface {
 	ListTasks(ctx context.Context, user *model.User) ([]*model.InterviewPrepTask, error)
 	StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error)
 	GetSession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepSession, error)
+	StartMockSession(ctx context.Context, user *model.User, companyTag string) (*model.InterviewPrepMockSession, error)
+	GetMockSession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepMockSession, error)
+	SubmitMockStage(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string, notes string) (*appinterviewprep.MockSubmitResult, error)
+	ReviewMockSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req appinterviewprep.SystemDesignReviewInput) (*appinterviewprep.MockSystemDesignReviewResult, error)
+	AnswerMockQuestion(ctx context.Context, user *model.User, sessionID uuid.UUID, answer string) (*appinterviewprep.MockQuestionAnswerResult, error)
 	Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string) (*appinterviewprep.SubmitResult, error)
 	ReviewSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req appinterviewprep.SystemDesignReviewInput) (*appinterviewprep.SystemDesignReviewResult, error)
 	AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string) (*model.InterviewPrepSession, error)
@@ -51,6 +57,14 @@ type AdminRepo interface {
 	CreateQuestion(ctx context.Context, question *model.InterviewPrepQuestion) error
 	UpdateQuestion(ctx context.Context, question *model.InterviewPrepQuestion) error
 	DeleteQuestion(ctx context.Context, questionID uuid.UUID) error
+	ListMockQuestionPools(ctx context.Context) ([]*model.InterviewPrepMockQuestionPoolItem, error)
+	CreateMockQuestionPool(ctx context.Context, item *model.InterviewPrepMockQuestionPoolItem) error
+	UpdateMockQuestionPool(ctx context.Context, item *model.InterviewPrepMockQuestionPoolItem) error
+	DeleteMockQuestionPool(ctx context.Context, itemID uuid.UUID) error
+	ListMockCompanyPresets(ctx context.Context) ([]*model.InterviewPrepMockCompanyPreset, error)
+	CreateMockCompanyPreset(ctx context.Context, item *model.InterviewPrepMockCompanyPreset) error
+	UpdateMockCompanyPreset(ctx context.Context, item *model.InterviewPrepMockCompanyPreset) error
+	DeleteMockCompanyPreset(ctx context.Context, itemID uuid.UUID) error
 }
 
 func RegisterRoutes(srv interface {
@@ -59,6 +73,7 @@ func RegisterRoutes(srv interface {
 	handler := Handler(service, authorizer)
 	srv.HandlePrefix(TasksPath, handler)
 	srv.HandlePrefix(SessionsPath, handler)
+	srv.HandlePrefix(MockSessionsPath, handler)
 }
 
 func Handler(service Service, authorizer Authorizer) http.Handler {
@@ -66,6 +81,8 @@ func Handler(service Service, authorizer Authorizer) http.Handler {
 	mux.HandleFunc(TasksPath, handleTasks(service, authorizer))
 	mux.HandleFunc(SessionsPath, handleSessions(service, authorizer))
 	mux.HandleFunc(SessionsPath+"/", handleSessionResource(service, authorizer))
+	mux.HandleFunc(MockSessionsPath, handleMockSessions(service, authorizer))
+	mux.HandleFunc(MockSessionsPath+"/", handleMockSessionResource(service, authorizer))
 	return mux
 }
 

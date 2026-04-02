@@ -58,6 +58,84 @@ func InterviewPrepSessionStatusFromString(v string) InterviewPrepSessionStatus {
 	}
 }
 
+type InterviewPrepMockSessionStatus string
+
+const (
+	InterviewPrepMockSessionStatusActive   InterviewPrepMockSessionStatus = "active"
+	InterviewPrepMockSessionStatusFinished InterviewPrepMockSessionStatus = "finished"
+)
+
+func (s InterviewPrepMockSessionStatus) String() string {
+	return string(s)
+}
+
+func InterviewPrepMockSessionStatusFromString(v string) InterviewPrepMockSessionStatus {
+	switch v {
+	case "finished":
+		return InterviewPrepMockSessionStatusFinished
+	default:
+		return InterviewPrepMockSessionStatusActive
+	}
+}
+
+type InterviewPrepMockStageKind string
+
+const (
+	InterviewPrepMockStageKindUnknown      InterviewPrepMockStageKind = ""
+	InterviewPrepMockStageKindSlices       InterviewPrepMockStageKind = "slices"
+	InterviewPrepMockStageKindConcurrency  InterviewPrepMockStageKind = "concurrency"
+	InterviewPrepMockStageKindSQL          InterviewPrepMockStageKind = "sql"
+	InterviewPrepMockStageKindArchitecture InterviewPrepMockStageKind = "architecture"
+	InterviewPrepMockStageKindSystemDesign InterviewPrepMockStageKind = "system_design"
+)
+
+func (k InterviewPrepMockStageKind) String() string {
+	return string(k)
+}
+
+func InterviewPrepMockStageKindFromString(v string) InterviewPrepMockStageKind {
+	switch v {
+	case "slices":
+		return InterviewPrepMockStageKindSlices
+	case "concurrency":
+		return InterviewPrepMockStageKindConcurrency
+	case "sql":
+		return InterviewPrepMockStageKindSQL
+	case "architecture":
+		return InterviewPrepMockStageKindArchitecture
+	case "system_design":
+		return InterviewPrepMockStageKindSystemDesign
+	default:
+		return InterviewPrepMockStageKindUnknown
+	}
+}
+
+type InterviewPrepMockStageStatus string
+
+const (
+	InterviewPrepMockStageStatusPending   InterviewPrepMockStageStatus = "pending"
+	InterviewPrepMockStageStatusSolving   InterviewPrepMockStageStatus = "solving"
+	InterviewPrepMockStageStatusQuestions InterviewPrepMockStageStatus = "questions"
+	InterviewPrepMockStageStatusCompleted InterviewPrepMockStageStatus = "completed"
+)
+
+func (s InterviewPrepMockStageStatus) String() string {
+	return string(s)
+}
+
+func InterviewPrepMockStageStatusFromString(v string) InterviewPrepMockStageStatus {
+	switch v {
+	case "pending":
+		return InterviewPrepMockStageStatusPending
+	case "questions":
+		return InterviewPrepMockStageStatusQuestions
+	case "completed":
+		return InterviewPrepMockStageStatusCompleted
+	default:
+		return InterviewPrepMockStageStatusSolving
+	}
+}
+
 type InterviewPrepSelfAssessment string
 
 const (
@@ -138,4 +216,81 @@ type InterviewPrepSession struct {
 	Questions       []*InterviewPrepQuestion
 	CurrentQuestion *InterviewPrepQuestion
 	Results         []*InterviewPrepQuestionResult
+}
+
+type InterviewPrepMockQuestionResult struct {
+	ID              uuid.UUID
+	StageID         uuid.UUID
+	Position        int32
+	QuestionKey     string
+	Prompt          string
+	ReferenceAnswer string
+	Score           int32
+	Summary         string
+	AnsweredAt      *time.Time
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}
+
+type InterviewPrepMockStage struct {
+	ID                   uuid.UUID
+	SessionID            uuid.UUID
+	StageIndex           int32
+	Kind                 InterviewPrepMockStageKind
+	Status               InterviewPrepMockStageStatus
+	TaskID               uuid.UUID
+	SolveLanguage        string
+	Code                 string
+	LastSubmissionPassed bool
+	ReviewScore          int32
+	ReviewSummary        string
+	StartedAt            time.Time
+	FinishedAt           *time.Time
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
+
+	Task            *InterviewPrepTask
+	QuestionResults []*InterviewPrepMockQuestionResult
+	CurrentQuestion *InterviewPrepMockQuestionResult
+}
+
+type InterviewPrepMockSession struct {
+	ID                uuid.UUID
+	UserID            uuid.UUID
+	CompanyTag        string
+	Status            InterviewPrepMockSessionStatus
+	CurrentStageIndex int32
+	StartedAt         time.Time
+	FinishedAt        *time.Time
+	CreatedAt         time.Time
+	UpdatedAt         time.Time
+
+	Stages       []*InterviewPrepMockStage
+	CurrentStage *InterviewPrepMockStage
+}
+
+type InterviewPrepMockQuestionPoolItem struct {
+	ID              uuid.UUID
+	Topic           string
+	CompanyTag      string
+	QuestionKey     string
+	Prompt          string
+	ReferenceAnswer string
+	Position        int32
+	AlwaysAsk       bool
+	IsActive        bool
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
+}
+
+type InterviewPrepMockCompanyPreset struct {
+	ID              uuid.UUID
+	CompanyTag      string
+	StageKind       InterviewPrepMockStageKind
+	Position        int32
+	TaskSlugPattern string
+	AIModelOverride string
+	IsActive        bool
+	CreatedAt       time.Time
+	UpdatedAt       time.Time
 }

@@ -30,6 +30,7 @@ type Config struct {
 }
 
 type SystemDesignReviewRequest struct {
+	ModelOverride  string
 	TaskTitle      string
 	Statement      string
 	Notes          string
@@ -41,6 +42,44 @@ type SystemDesignReviewRequest struct {
 	ImageBytes     []byte
 	ImageMIME      string
 	ImageName      string
+}
+
+type InterviewSolutionReviewRequest struct {
+	ModelOverride     string
+	StageKind         string
+	TaskTitle         string
+	Statement         string
+	ReferenceSolution string
+	CandidateLanguage string
+	CandidateCode     string
+	CandidateNotes    string
+}
+
+type InterviewSolutionReview struct {
+	Provider          string   `json:"provider"`
+	Model             string   `json:"model"`
+	Score             int      `json:"score"`
+	Summary           string   `json:"summary"`
+	Strengths         []string `json:"strengths"`
+	Issues            []string `json:"issues"`
+	FollowUpQuestions []string `json:"followUpQuestions"`
+}
+
+type InterviewAnswerReviewRequest struct {
+	ModelOverride   string
+	Topic           string
+	TaskTitle       string
+	QuestionPrompt  string
+	ReferenceAnswer string
+	CandidateAnswer string
+}
+
+type InterviewAnswerReview struct {
+	Provider string   `json:"provider"`
+	Model    string   `json:"model"`
+	Score    int      `json:"score"`
+	Summary  string   `json:"summary"`
+	Gaps     []string `json:"gaps"`
 }
 
 type SystemDesignReview struct {
@@ -57,6 +96,8 @@ type SystemDesignReview struct {
 
 type Reviewer interface {
 	ReviewSystemDesign(ctx context.Context, req SystemDesignReviewRequest) (*SystemDesignReview, error)
+	ReviewInterviewSolution(ctx context.Context, req InterviewSolutionReviewRequest) (*InterviewSolutionReview, error)
+	ReviewInterviewAnswer(ctx context.Context, req InterviewAnswerReviewRequest) (*InterviewAnswerReview, error)
 }
 
 func New(cfg Config) Reviewer {
@@ -88,11 +129,27 @@ func (noopReviewer) ReviewSystemDesign(context.Context, SystemDesignReviewReques
 	return nil, ErrNotConfigured
 }
 
+func (noopReviewer) ReviewInterviewSolution(context.Context, InterviewSolutionReviewRequest) (*InterviewSolutionReview, error) {
+	return nil, ErrNotConfigured
+}
+
+func (noopReviewer) ReviewInterviewAnswer(context.Context, InterviewAnswerReviewRequest) (*InterviewAnswerReview, error) {
+	return nil, ErrNotConfigured
+}
+
 type unsupportedReviewer struct {
 	provider string
 }
 
 func (u unsupportedReviewer) ReviewSystemDesign(context.Context, SystemDesignReviewRequest) (*SystemDesignReview, error) {
+	return nil, fmt.Errorf("%w: %s", ErrUnsupportedProvider, u.provider)
+}
+
+func (u unsupportedReviewer) ReviewInterviewSolution(context.Context, InterviewSolutionReviewRequest) (*InterviewSolutionReview, error) {
+	return nil, fmt.Errorf("%w: %s", ErrUnsupportedProvider, u.provider)
+}
+
+func (u unsupportedReviewer) ReviewInterviewAnswer(context.Context, InterviewAnswerReviewRequest) (*InterviewAnswerReview, error) {
 	return nil, fmt.Errorf("%w: %s", ErrUnsupportedProvider, u.provider)
 }
 
@@ -187,6 +244,150 @@ func (g *geminiReviewer) ReviewSystemDesign(ctx context.Context, req SystemDesig
 	return review, nil
 }
 
+func (g *geminiReviewer) ReviewInterviewSolution(ctx context.Context, req InterviewSolutionReviewRequest) (*InterviewSolutionReview, error) {
+	if g.apiKey == "" || g.model == "" {
+		return nil, ErrNotConfigured
+	}
+
+	baseURL := g.baseURL
+	if baseURL == "" {
+		baseURL = "https://generativelanguage.googleapis.com"
+	}
+
+	body, err := json.Marshal(map[string]any{
+		"contents": []map[string]any{
+			{
+				"parts": []map[string]any{{"text": buildInterviewSolutionPrompt(req)}},
+			},
+		},
+		"generationConfig": map[string]any{
+			"temperature":      0.2,
+			"responseMimeType": "application/json",
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	modelName := firstNonEmptyTrimmed(req.ModelOverride, g.model)
+	url := fmt.Sprintf("%s/v1beta/models/%s:generateContent?key=%s", baseURL, modelName, g.apiKey)
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	resp, err := g.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= 400 {
+		return nil, mapProviderError(resp.StatusCode, respBody)
+	}
+
+	var parsed struct {
+		Candidates []struct {
+			Content struct {
+				Parts []struct {
+					Text string `json:"text"`
+				} `json:"parts"`
+			} `json:"content"`
+		} `json:"candidates"`
+	}
+	if err := json.Unmarshal(respBody, &parsed); err != nil {
+		return nil, err
+	}
+	if len(parsed.Candidates) == 0 || len(parsed.Candidates[0].Content.Parts) == 0 {
+		return nil, ErrInvalidResponse
+	}
+
+	review, err := parseInterviewSolutionJSON(parsed.Candidates[0].Content.Parts[0].Text)
+	if err != nil {
+		return nil, err
+	}
+	review.Provider = "gemini"
+	review.Model = modelName
+	return review, nil
+}
+
+func (g *geminiReviewer) ReviewInterviewAnswer(ctx context.Context, req InterviewAnswerReviewRequest) (*InterviewAnswerReview, error) {
+	if g.apiKey == "" || g.model == "" {
+		return nil, ErrNotConfigured
+	}
+
+	baseURL := g.baseURL
+	if baseURL == "" {
+		baseURL = "https://generativelanguage.googleapis.com"
+	}
+
+	body, err := json.Marshal(map[string]any{
+		"contents": []map[string]any{
+			{
+				"parts": []map[string]any{{"text": buildInterviewAnswerPrompt(req)}},
+			},
+		},
+		"generationConfig": map[string]any{
+			"temperature":      0.1,
+			"responseMimeType": "application/json",
+		},
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	modelName := firstNonEmptyTrimmed(req.ModelOverride, g.model)
+	url := fmt.Sprintf("%s/v1beta/models/%s:generateContent?key=%s", baseURL, modelName, g.apiKey)
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	resp, err := g.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= 400 {
+		return nil, mapProviderError(resp.StatusCode, respBody)
+	}
+
+	var parsed struct {
+		Candidates []struct {
+			Content struct {
+				Parts []struct {
+					Text string `json:"text"`
+				} `json:"parts"`
+			} `json:"content"`
+		} `json:"candidates"`
+	}
+	if err := json.Unmarshal(respBody, &parsed); err != nil {
+		return nil, err
+	}
+	if len(parsed.Candidates) == 0 || len(parsed.Candidates[0].Content.Parts) == 0 {
+		return nil, ErrInvalidResponse
+	}
+
+	review, err := parseInterviewAnswerJSON(parsed.Candidates[0].Content.Parts[0].Text)
+	if err != nil {
+		return nil, err
+	}
+	review.Provider = "gemini"
+	review.Model = modelName
+	return review, nil
+}
+
 type openAICompatibleReviewer struct {
 	baseURL string
 	apiKey  string
@@ -205,8 +406,9 @@ func (o *openAICompatibleReviewer) ReviewSystemDesign(ctx context.Context, req S
 	}
 
 	imageDataURL := "data:" + req.ImageMIME + ";base64," + base64.StdEncoding.EncodeToString(req.ImageBytes)
+	modelName := firstNonEmptyTrimmed(req.ModelOverride, o.model)
 	payload := map[string]any{
-		"model": o.model,
+		"model": modelName,
 		"messages": []map[string]any{
 			{
 				"role": "user",
@@ -275,7 +477,155 @@ func (o *openAICompatibleReviewer) ReviewSystemDesign(ctx context.Context, req S
 		return nil, err
 	}
 	review.Provider = "openai_compatible"
-	review.Model = o.model
+	review.Model = modelName
+	return review, nil
+}
+
+func (o *openAICompatibleReviewer) ReviewInterviewSolution(ctx context.Context, req InterviewSolutionReviewRequest) (*InterviewSolutionReview, error) {
+	if o.apiKey == "" || o.model == "" {
+		return nil, ErrNotConfigured
+	}
+
+	baseURL := o.baseURL
+	if baseURL == "" {
+		baseURL = "https://api.openai.com/v1"
+	}
+
+	modelName := firstNonEmptyTrimmed(req.ModelOverride, o.model)
+	payload := map[string]any{
+		"model": modelName,
+		"messages": []map[string]any{
+			{
+				"role":    "user",
+				"content": buildInterviewSolutionPrompt(req),
+			},
+		},
+		"temperature": 0.2,
+		"response_format": map[string]any{
+			"type": "json_object",
+		},
+	}
+
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/chat/completions", bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Authorization", "Bearer "+o.apiKey)
+
+	resp, err := o.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= 400 {
+		return nil, mapProviderError(resp.StatusCode, respBody)
+	}
+
+	var parsed struct {
+		Choices []struct {
+			Message struct {
+				Content string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
+	}
+	if err := json.Unmarshal(respBody, &parsed); err != nil {
+		return nil, err
+	}
+	if len(parsed.Choices) == 0 || strings.TrimSpace(parsed.Choices[0].Message.Content) == "" {
+		return nil, ErrInvalidResponse
+	}
+
+	review, err := parseInterviewSolutionJSON(parsed.Choices[0].Message.Content)
+	if err != nil {
+		return nil, err
+	}
+	review.Provider = "openai_compatible"
+	review.Model = modelName
+	return review, nil
+}
+
+func (o *openAICompatibleReviewer) ReviewInterviewAnswer(ctx context.Context, req InterviewAnswerReviewRequest) (*InterviewAnswerReview, error) {
+	if o.apiKey == "" || o.model == "" {
+		return nil, ErrNotConfigured
+	}
+
+	baseURL := o.baseURL
+	if baseURL == "" {
+		baseURL = "https://api.openai.com/v1"
+	}
+
+	modelName := firstNonEmptyTrimmed(req.ModelOverride, o.model)
+	payload := map[string]any{
+		"model": modelName,
+		"messages": []map[string]any{
+			{
+				"role":    "user",
+				"content": buildInterviewAnswerPrompt(req),
+			},
+		},
+		"temperature": 0.1,
+		"response_format": map[string]any{
+			"type": "json_object",
+		},
+	}
+
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return nil, err
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/chat/completions", bytes.NewReader(body))
+	if err != nil {
+		return nil, err
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Authorization", "Bearer "+o.apiKey)
+
+	resp, err := o.client.Do(httpReq)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, err
+	}
+	if resp.StatusCode >= 400 {
+		return nil, mapProviderError(resp.StatusCode, respBody)
+	}
+
+	var parsed struct {
+		Choices []struct {
+			Message struct {
+				Content string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
+	}
+	if err := json.Unmarshal(respBody, &parsed); err != nil {
+		return nil, err
+	}
+	if len(parsed.Choices) == 0 || strings.TrimSpace(parsed.Choices[0].Message.Content) == "" {
+		return nil, ErrInvalidResponse
+	}
+
+	review, err := parseInterviewAnswerJSON(parsed.Choices[0].Message.Content)
+	if err != nil {
+		return nil, err
+	}
+	review.Provider = "openai_compatible"
+	review.Model = modelName
 	return review, nil
 }
 
@@ -340,6 +690,68 @@ func buildSystemDesignPrompt(req SystemDesignReviewRequest) string {
 	return b.String()
 }
 
+func buildInterviewSolutionPrompt(req InterviewSolutionReviewRequest) string {
+	var b strings.Builder
+	b.WriteString("Ты проводишь строгое AI-ревью промежуточного решения кандидата на mock interview.\n")
+	b.WriteString("Верни только валидный JSON с полями: score, summary, strengths, issues, followUpQuestions.\n")
+	b.WriteString("Все поля должны быть только на русском языке. Score — целое число от 1 до 10.\n")
+	b.WriteString("Не хвали кандидата за объём текста или наличие кода. Оценивай только инженерическую состоятельность решения.\n")
+	b.WriteString("Если решение поверхностное, нерелевантное или не доведено до рабочего состояния, прямо скажи это.\n")
+	b.WriteString("Если это кодовая задача, особенно важны корректность, структура, граничные случаи, сложность, конкурентная безопасность и trade-off.\n")
+	b.WriteString("Если это архитектурная задача, особенно важны компоненты, потоки данных, надёжность, state management, failure modes и масштабирование.\n\n")
+	b.WriteString("Тип этапа: ")
+	b.WriteString(strings.TrimSpace(req.StageKind))
+	b.WriteString("\n\nНазвание задачи:\n")
+	b.WriteString(strings.TrimSpace(req.TaskTitle))
+	b.WriteString("\n\nУсловие:\n")
+	b.WriteString(strings.TrimSpace(req.Statement))
+	if value := strings.TrimSpace(req.ReferenceSolution); value != "" {
+		b.WriteString("\n\nОжидаемое направление решения / reference notes:\n")
+		b.WriteString(value)
+	}
+	if value := strings.TrimSpace(req.CandidateNotes); value != "" {
+		b.WriteString("\n\nПояснения кандидата:\n")
+		b.WriteString(value)
+	}
+	if value := strings.TrimSpace(req.CandidateCode); value != "" {
+		b.WriteString("\n\nРешение кандидата")
+		if lang := strings.TrimSpace(req.CandidateLanguage); lang != "" {
+			b.WriteString(" (")
+			b.WriteString(lang)
+			b.WriteString(")")
+		}
+		b.WriteString(":\n")
+		b.WriteString(value)
+	}
+	return b.String()
+}
+
+func buildInterviewAnswerPrompt(req InterviewAnswerReviewRequest) string {
+	var b strings.Builder
+	b.WriteString("Ты оцениваешь устный ответ кандидата на follow-up вопрос mock interview.\n")
+	b.WriteString("Верни только валидный JSON с полями: score, summary, gaps.\n")
+	b.WriteString("Все поля должны быть только на русском языке. Score — целое число от 1 до 10.\n")
+	b.WriteString("Оцени только полноту, точность и глубину ответа. Не додумывай правильные аргументы за кандидата.\n")
+	b.WriteString("Если ответ частичный, расплывчатый или уходит в сторону, прямо скажи это.\n\n")
+	if topic := strings.TrimSpace(req.Topic); topic != "" {
+		b.WriteString("Тема:\n")
+		b.WriteString(topic)
+		b.WriteString("\n\n")
+	}
+	if taskTitle := strings.TrimSpace(req.TaskTitle); taskTitle != "" {
+		b.WriteString("Контекст задачи:\n")
+		b.WriteString(taskTitle)
+		b.WriteString("\n\n")
+	}
+	b.WriteString("Вопрос:\n")
+	b.WriteString(strings.TrimSpace(req.QuestionPrompt))
+	b.WriteString("\n\nЭталонный ответ / что важно услышать:\n")
+	b.WriteString(strings.TrimSpace(req.ReferenceAnswer))
+	b.WriteString("\n\nОтвет кандидата:\n")
+	b.WriteString(strings.TrimSpace(req.CandidateAnswer))
+	return b.String()
+}
+
 func parseReviewJSON(raw string) (*SystemDesignReview, error) {
 	cleaned := strings.TrimSpace(raw)
 	cleaned = strings.TrimPrefix(cleaned, "```json")
@@ -363,11 +775,60 @@ func parseReviewJSON(raw string) (*SystemDesignReview, error) {
 	return &review, nil
 }
 
+func parseInterviewSolutionJSON(raw string) (*InterviewSolutionReview, error) {
+	cleaned := strings.TrimSpace(raw)
+	cleaned = strings.TrimPrefix(cleaned, "```json")
+	cleaned = strings.TrimPrefix(cleaned, "```")
+	cleaned = strings.TrimSuffix(cleaned, "```")
+	cleaned = strings.TrimSpace(cleaned)
+
+	var review InterviewSolutionReview
+	if err := json.Unmarshal([]byte(cleaned), &review); err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrInvalidResponse, err)
+	}
+	if review.Score < 1 {
+		review.Score = 1
+	}
+	if review.Score > 10 {
+		review.Score = 10
+	}
+	return &review, nil
+}
+
+func parseInterviewAnswerJSON(raw string) (*InterviewAnswerReview, error) {
+	cleaned := strings.TrimSpace(raw)
+	cleaned = strings.TrimPrefix(cleaned, "```json")
+	cleaned = strings.TrimPrefix(cleaned, "```")
+	cleaned = strings.TrimSuffix(cleaned, "```")
+	cleaned = strings.TrimSpace(cleaned)
+
+	var review InterviewAnswerReview
+	if err := json.Unmarshal([]byte(cleaned), &review); err != nil {
+		return nil, fmt.Errorf("%w: %v", ErrInvalidResponse, err)
+	}
+	if review.Score < 1 {
+		review.Score = 1
+	}
+	if review.Score > 10 {
+		review.Score = 10
+	}
+	return &review, nil
+}
+
 func timeoutOrDefault(v time.Duration) time.Duration {
 	if v <= 0 {
 		return 30 * time.Second
 	}
 	return v
+}
+
+func firstNonEmptyTrimmed(values ...string) string {
+	for _, value := range values {
+		if trimmed := strings.TrimSpace(value); trimmed != "" {
+			return trimmed
+		}
+	}
+	return ""
 }
 
 func truncate(value string, limit int) string {

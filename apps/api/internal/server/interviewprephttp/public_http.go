@@ -75,6 +75,35 @@ func handleSessions(service Service, authorizer Authorizer) http.HandlerFunc {
 	}
 }
 
+func handleMockSessions(service Service, authorizer Authorizer) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, ok := actorFromRequest(r, authorizer)
+		if !ok {
+			writeJSON(w, http.StatusUnauthorized, map[string]any{"error": "unauthorized"})
+			return
+		}
+		if r.Method != http.MethodPost {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		var req struct {
+			CompanyTag string `json:"companyTag"`
+		}
+		if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+			http.Error(w, "bad request", http.StatusBadRequest)
+			return
+		}
+
+		session, err := service.StartMockSession(r.Context(), user, req.CompanyTag)
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+		writeJSON(w, http.StatusOK, map[string]any{"session": mapMockSession(session)})
+	}
+}
+
 func handleSessionResource(service Service, authorizer Authorizer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, ok := actorFromRequest(r, authorizer)
@@ -131,6 +160,82 @@ func handleSessionResource(service Service, authorizer Authorizer) http.HandlerF
 
 		if len(parts) == 4 && parts[1] == "questions" && parts[3] == "answer" && r.Method == http.MethodPost {
 			handleQuestionAnswer(w, r, service, user, sessionID, parts[2])
+			return
+		}
+
+		http.Error(w, "not found", http.StatusNotFound)
+	}
+}
+
+func handleMockSessionResource(service Service, authorizer Authorizer) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		user, ok := actorFromRequest(r, authorizer)
+		if !ok {
+			writeJSON(w, http.StatusUnauthorized, map[string]any{"error": "unauthorized"})
+			return
+		}
+
+		path := strings.TrimPrefix(r.URL.Path, MockSessionsPath+"/")
+		parts := strings.Split(path, "/")
+		if len(parts) == 0 || parts[0] == "" {
+			http.Error(w, "not found", http.StatusNotFound)
+			return
+		}
+
+		sessionID, err := uuid.Parse(parts[0])
+		if err != nil {
+			http.Error(w, "bad session id", http.StatusBadRequest)
+			return
+		}
+
+		if len(parts) == 1 && r.Method == http.MethodGet {
+			session, err := service.GetMockSession(r.Context(), user, sessionID)
+			if err != nil {
+				writeError(w, err)
+				return
+			}
+			writeJSON(w, http.StatusOK, map[string]any{"session": mapMockSession(session)})
+			return
+		}
+
+		if len(parts) == 2 && parts[1] == "submit" && r.Method == http.MethodPost {
+			var req struct {
+				Code     string `json:"code"`
+				Language string `json:"language"`
+				Notes    string `json:"notes"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				http.Error(w, "bad request", http.StatusBadRequest)
+				return
+			}
+			result, err := service.SubmitMockStage(r.Context(), user, sessionID, req.Code, req.Language, req.Notes)
+			if err != nil {
+				writeError(w, err)
+				return
+			}
+			writeJSON(w, http.StatusOK, map[string]any{"result": mapMockSubmitResult(result)})
+			return
+		}
+
+		if len(parts) == 2 && parts[1] == "system-design-review" && r.Method == http.MethodPost {
+			handleMockSystemDesignReview(w, r, service, user, sessionID)
+			return
+		}
+
+		if len(parts) == 3 && parts[1] == "questions" && parts[2] == "answer" && r.Method == http.MethodPost {
+			var req struct {
+				Answer string `json:"answer"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+				http.Error(w, "bad request", http.StatusBadRequest)
+				return
+			}
+			result, err := service.AnswerMockQuestion(r.Context(), user, sessionID, req.Answer)
+			if err != nil {
+				writeError(w, err)
+				return
+			}
+			writeJSON(w, http.StatusOK, map[string]any{"result": mapMockQuestionAnswerResult(result)})
 			return
 		}
 
@@ -233,6 +338,56 @@ func handleSystemDesignReview(
 	writeJSON(w, http.StatusOK, map[string]any{"review": mapSystemDesignReview(review)})
 }
 
+func handleMockSystemDesignReview(
+	w http.ResponseWriter,
+	r *http.Request,
+	service Service,
+	user *model.User,
+	sessionID uuid.UUID,
+) {
+	r.Body = http.MaxBytesReader(w, r.Body, 6*1024*1024)
+	if err := r.ParseMultipartForm(6 * 1024 * 1024); err != nil {
+		http.Error(w, "bad multipart request", http.StatusBadRequest)
+		return
+	}
+
+	file, header, err := r.FormFile("image")
+	if err != nil {
+		http.Error(w, "image is required", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	imageBytes, err := io.ReadAll(file)
+	if err != nil {
+		http.Error(w, "failed to read image", http.StatusBadRequest)
+		return
+	}
+
+	result, err := service.ReviewMockSystemDesign(
+		r.Context(),
+		user,
+		sessionID,
+		header.Filename,
+		header.Header.Get("Content-Type"),
+		imageBytes,
+		appinterviewprep.SystemDesignReviewInput{
+			Notes:          r.FormValue("notes"),
+			Components:     r.FormValue("components"),
+			APIs:           r.FormValue("apis"),
+			DatabaseSchema: r.FormValue("databaseSchema"),
+			Traffic:        r.FormValue("traffic"),
+			Reliability:    r.FormValue("reliability"),
+		},
+	)
+	if err != nil {
+		writeError(w, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]any{"result": mapMockSystemDesignReviewResult(result)})
+}
+
 func writeError(w http.ResponseWriter, err error) {
 	if errors.Is(err, appinterviewprep.ErrForbidden) {
 		http.Error(w, err.Error(), http.StatusForbidden)
@@ -242,8 +397,18 @@ func writeError(w http.ResponseWriter, err error) {
 		http.Error(w, err.Error(), http.StatusNotFound)
 		return
 	}
+	if errors.Is(err, appinterviewprep.ErrMockSessionNotFound) {
+		http.Error(w, err.Error(), http.StatusNotFound)
+		return
+	}
 	if errors.Is(err, appinterviewprep.ErrSessionFinished) ||
+		errors.Is(err, appinterviewprep.ErrMockSessionFinished) ||
 		errors.Is(err, appinterviewprep.ErrSubmitNotAllowed) ||
+		errors.Is(err, appinterviewprep.ErrMockStageSubmitNotAllowed) ||
+		errors.Is(err, appinterviewprep.ErrMockQuestionNotReady) ||
+		errors.Is(err, appinterviewprep.ErrMockQuestionAnswerRequired) ||
+		errors.Is(err, appinterviewprep.ErrMockCompanyTagRequired) ||
+		errors.Is(err, appinterviewprep.ErrMockTaskPoolIncomplete) ||
 		errors.Is(err, appinterviewprep.ErrQuestionLocked) ||
 		errors.Is(err, appinterviewprep.ErrInvalidAssessment) ||
 		errors.Is(err, appinterviewprep.ErrUnsupportedLanguage) ||

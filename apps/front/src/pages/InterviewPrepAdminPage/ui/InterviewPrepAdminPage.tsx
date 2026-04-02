@@ -5,6 +5,9 @@ import { ListChecks, Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react';
 import { useAuth } from '@/app/providers/AuthProvider';
 import {
   interviewPrepApi,
+  InterviewPrepMockCompanyPreset,
+  InterviewPrepMockQuestionPoolItem,
+  InterviewPrepMockStageKind,
   InterviewPrepQuestion,
   InterviewPrepTask,
   InterviewPrepType,
@@ -25,6 +28,14 @@ const LANGUAGE_OPTIONS = [
   { value: 'go', label: 'Go' },
   { value: 'python', label: 'Python' },
   { value: 'sql', label: 'SQL' },
+];
+
+const MOCK_STAGE_OPTIONS: { value: InterviewPrepMockStageKind; label: string }[] = [
+  { value: 'slices', label: 'Slices' },
+  { value: 'concurrency', label: 'Concurrency' },
+  { value: 'sql', label: 'SQL' },
+  { value: 'architecture', label: 'Architecture' },
+  { value: 'system_design', label: 'System Design' },
 ];
 
 const DEFAULT_STARTER_CODE = `package main
@@ -62,6 +73,28 @@ type QuestionFormState = {
   answer: string;
 };
 
+type MockQuestionPoolFormState = {
+  id: string | null;
+  topic: string;
+  companyTag: string;
+  questionKey: string;
+  prompt: string;
+  referenceAnswer: string;
+  position: number;
+  alwaysAsk: boolean;
+  isActive: boolean;
+};
+
+type MockCompanyPresetFormState = {
+  id: string | null;
+  companyTag: string;
+  stageKind: InterviewPrepMockStageKind;
+  position: number;
+  taskSlugPattern: string;
+  aiModelOverride: string;
+  isActive: boolean;
+};
+
 const createEmptyTaskForm = (): TaskFormState => ({
   id: null,
   slug: '',
@@ -86,6 +119,28 @@ const createEmptyQuestionForm = (position = 1): QuestionFormState => ({
   position,
   prompt: '',
   answer: '',
+});
+
+const createEmptyMockQuestionPoolForm = (): MockQuestionPoolFormState => ({
+  id: null,
+  topic: 'concurrency',
+  companyTag: '',
+  questionKey: '',
+  prompt: '',
+  referenceAnswer: '',
+  position: 1,
+  alwaysAsk: false,
+  isActive: true,
+});
+
+const createEmptyMockCompanyPresetForm = (): MockCompanyPresetFormState => ({
+  id: null,
+  companyTag: 'ozon',
+  stageKind: 'slices',
+  position: 1,
+  taskSlugPattern: '',
+  aiModelOverride: '',
+  isActive: true,
 });
 
 const toSlug = (value: string) =>
@@ -121,6 +176,28 @@ const questionToForm = (question: InterviewPrepQuestion): QuestionFormState => (
   answer: question.answer,
 });
 
+const mockQuestionPoolToForm = (item: InterviewPrepMockQuestionPoolItem): MockQuestionPoolFormState => ({
+  id: item.id,
+  topic: item.topic,
+  companyTag: item.companyTag,
+  questionKey: item.questionKey,
+  prompt: item.prompt,
+  referenceAnswer: item.referenceAnswer,
+  position: item.position,
+  alwaysAsk: item.alwaysAsk,
+  isActive: item.isActive,
+});
+
+const mockCompanyPresetToForm = (item: InterviewPrepMockCompanyPreset): MockCompanyPresetFormState => ({
+  id: item.id,
+  companyTag: item.companyTag,
+  stageKind: item.stageKind,
+  position: item.position,
+  taskSlugPattern: item.taskSlugPattern,
+  aiModelOverride: item.aiModelOverride,
+  isActive: item.isActive,
+});
+
 export const InterviewPrepAdminPage: React.FC = () => {
   const { user } = useAuth();
   const [tasks, setTasks] = useState<InterviewPrepTask[]>([]);
@@ -132,6 +209,8 @@ export const InterviewPrepAdminPage: React.FC = () => {
   const [taskModalOpen, setTaskModalOpen] = useState(false);
   const [questionModalOpen, setQuestionModalOpen] = useState(false);
   const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
+  const [mockQuestionPools, setMockQuestionPools] = useState<InterviewPrepMockQuestionPoolItem[]>([]);
+  const [mockCompanyPresets, setMockCompanyPresets] = useState<InterviewPrepMockCompanyPreset[]>([]);
   const [search, setSearch] = useState('');
   const [prepTypeFilter, setPrepTypeFilter] = useState<'all' | InterviewPrepType>('all');
   const [companyFilter, setCompanyFilter] = useState('all');
@@ -139,6 +218,8 @@ export const InterviewPrepAdminPage: React.FC = () => {
   const [status, setStatus] = useState('');
   const [taskForm, setTaskForm] = useState<TaskFormState>(createEmptyTaskForm());
   const [questionForm, setQuestionForm] = useState<QuestionFormState>(createEmptyQuestionForm());
+  const [mockQuestionPoolForm, setMockQuestionPoolForm] = useState<MockQuestionPoolFormState>(createEmptyMockQuestionPoolForm());
+  const [mockCompanyPresetForm, setMockCompanyPresetForm] = useState<MockCompanyPresetFormState>(createEmptyMockCompanyPresetForm());
 
   const isAdmin = Boolean(user?.isAdmin);
   const selectedTask = useMemo(
@@ -178,6 +259,12 @@ export const InterviewPrepAdminPage: React.FC = () => {
       setTasks(data);
       const availableCodeTasks = await codeRoomApi.listTasks({ includeInactive: true });
       setCodeTasks(availableCodeTasks);
+      const [questionPoolsData, companyPresetsData] = await Promise.all([
+        interviewPrepApi.adminListMockQuestionPools(),
+        interviewPrepApi.adminListMockCompanyPresets(),
+      ]);
+      setMockQuestionPools(questionPoolsData);
+      setMockCompanyPresets(companyPresetsData);
     } catch (e: any) {
       console.error('Failed to load interview prep tasks:', e);
       setError(e.response?.data?.error || 'Не удалось загрузить задачи');
@@ -344,6 +431,100 @@ export const InterviewPrepAdminPage: React.FC = () => {
     }
   };
 
+  const handleSaveMockQuestionPool = async () => {
+    setSaving(true);
+    setError('');
+    setStatus('');
+    try {
+      const payload = {
+        topic: mockQuestionPoolForm.topic.trim(),
+        companyTag: mockQuestionPoolForm.companyTag.trim().toLowerCase(),
+        questionKey: mockQuestionPoolForm.questionKey.trim(),
+        prompt: mockQuestionPoolForm.prompt.trim(),
+        referenceAnswer: mockQuestionPoolForm.referenceAnswer.trim(),
+        position: mockQuestionPoolForm.position,
+        alwaysAsk: mockQuestionPoolForm.alwaysAsk,
+        isActive: mockQuestionPoolForm.isActive,
+      };
+      if (mockQuestionPoolForm.id) {
+        await interviewPrepApi.adminUpdateMockQuestionPool(mockQuestionPoolForm.id, payload);
+        setStatus('Question pool обновлён.');
+      } else {
+        await interviewPrepApi.adminCreateMockQuestionPool(payload);
+        setStatus('Question pool создан.');
+      }
+      setMockQuestionPoolForm(createEmptyMockQuestionPoolForm());
+      await loadTasks();
+    } catch (e: any) {
+      console.error('Failed to save mock question pool:', e);
+      setError(e.response?.data?.error || 'Не удалось сохранить question pool');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteMockQuestionPool = async (id: string) => {
+    setDeletingId(id);
+    setError('');
+    setStatus('');
+    try {
+      await interviewPrepApi.adminDeleteMockQuestionPool(id);
+      setStatus('Question pool удалён.');
+      await loadTasks();
+    } catch (e: any) {
+      console.error('Failed to delete mock question pool:', e);
+      setError(e.response?.data?.error || 'Не удалось удалить question pool');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleSaveMockCompanyPreset = async () => {
+    setSaving(true);
+    setError('');
+    setStatus('');
+    try {
+      const payload = {
+        companyTag: mockCompanyPresetForm.companyTag.trim().toLowerCase(),
+        stageKind: mockCompanyPresetForm.stageKind,
+        position: mockCompanyPresetForm.position,
+        taskSlugPattern: mockCompanyPresetForm.taskSlugPattern.trim(),
+        aiModelOverride: mockCompanyPresetForm.aiModelOverride.trim(),
+        isActive: mockCompanyPresetForm.isActive,
+      };
+      if (mockCompanyPresetForm.id) {
+        await interviewPrepApi.adminUpdateMockCompanyPreset(mockCompanyPresetForm.id, payload);
+        setStatus('Company preset обновлён.');
+      } else {
+        await interviewPrepApi.adminCreateMockCompanyPreset(payload);
+        setStatus('Company preset создан.');
+      }
+      setMockCompanyPresetForm(createEmptyMockCompanyPresetForm());
+      await loadTasks();
+    } catch (e: any) {
+      console.error('Failed to save mock company preset:', e);
+      setError(e.response?.data?.error || 'Не удалось сохранить company preset');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  const handleDeleteMockCompanyPreset = async (id: string) => {
+    setDeletingId(id);
+    setError('');
+    setStatus('');
+    try {
+      await interviewPrepApi.adminDeleteMockCompanyPreset(id);
+      setStatus('Company preset удалён.');
+      await loadTasks();
+    } catch (e: any) {
+      console.error('Failed to delete mock company preset:', e);
+      setError(e.response?.data?.error || 'Не удалось удалить company preset');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
   return (
     <>
       <div className="code-rooms-page code-admin-page">
@@ -440,6 +621,152 @@ export const InterviewPrepAdminPage: React.FC = () => {
               ))}
             </div>
           )}
+        </section>
+
+        <section className="card dashboard-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>Mock Question Pools</h2>
+              <p className="interview-prep-muted">Вопросы по темам и компаниям, без привязки к конкретной задаче.</p>
+            </div>
+          </div>
+          <div className="task-editor-grid">
+            <div className="form-group">
+              <label>Topic</label>
+              <FancySelect
+                value={mockQuestionPoolForm.topic}
+                options={MOCK_STAGE_OPTIONS.map((item) => ({ value: item.value, label: item.label }))}
+                onChange={(value) => setMockQuestionPoolForm((prev) => ({ ...prev, topic: value }))}
+              />
+            </div>
+            <div className="form-group">
+              <label>Company</label>
+              <input className="input" value={mockQuestionPoolForm.companyTag} onChange={(e) => setMockQuestionPoolForm((prev) => ({ ...prev, companyTag: e.target.value }))} placeholder="ozon / avito / empty for shared" />
+            </div>
+            <div className="form-group">
+              <label>Question Key</label>
+              <input className="input" value={mockQuestionPoolForm.questionKey} onChange={(e) => setMockQuestionPoolForm((prev) => ({ ...prev, questionKey: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label>Position</label>
+              <input className="input" type="number" min={1} value={mockQuestionPoolForm.position} onChange={(e) => setMockQuestionPoolForm((prev) => ({ ...prev, position: Number(e.target.value) || 1 }))} />
+            </div>
+          </div>
+          <div className="form-group">
+            <label>Prompt</label>
+            <textarea className="input textarea" value={mockQuestionPoolForm.prompt} onChange={(e) => setMockQuestionPoolForm((prev) => ({ ...prev, prompt: e.target.value }))} />
+          </div>
+          <div className="form-group">
+            <label>Reference Answer</label>
+            <textarea className="input textarea" value={mockQuestionPoolForm.referenceAnswer} onChange={(e) => setMockQuestionPoolForm((prev) => ({ ...prev, referenceAnswer: e.target.value }))} />
+          </div>
+          <div className="interview-prep-toggle-row">
+            <label className="toggle-field">
+              <input type="checkbox" checked={mockQuestionPoolForm.alwaysAsk} onChange={(e) => setMockQuestionPoolForm((prev) => ({ ...prev, alwaysAsk: e.target.checked }))} />
+              Always ask
+            </label>
+            <label className="toggle-field">
+              <input type="checkbox" checked={mockQuestionPoolForm.isActive} onChange={(e) => setMockQuestionPoolForm((prev) => ({ ...prev, isActive: e.target.checked }))} />
+              Активен
+            </label>
+          </div>
+          <div className="interview-prep-question-toolbar">
+            <button className="btn btn-primary" onClick={() => void handleSaveMockQuestionPool()} disabled={saving}>
+              {mockQuestionPoolForm.id ? 'Сохранить pool' : 'Добавить pool'}
+            </button>
+            <button className="btn btn-secondary" onClick={() => setMockQuestionPoolForm(createEmptyMockQuestionPoolForm())}>Очистить форму</button>
+          </div>
+          <div className="task-list">
+            {mockQuestionPools.map((item) => (
+              <div key={item.id} className="task-item">
+                <div className="task-item__header">
+                  <div>
+                    <div className="task-item__title">{item.topic} / {item.companyTag || 'shared'} / {item.questionKey}</div>
+                    <div className="task-item__meta">
+                      <span className="badge">#{item.position}</span>
+                      {item.alwaysAsk && <span className="badge">always</span>}
+                      {!item.isActive && <span className="badge task-inactive">inactive</span>}
+                    </div>
+                  </div>
+                  <div className="task-item__actions">
+                    <button className="btn-icon" onClick={() => setMockQuestionPoolForm(mockQuestionPoolToForm(item))}><Pencil size={16} /></button>
+                    <button className="btn-icon danger" onClick={() => void handleDeleteMockQuestionPool(item.id)} disabled={deletingId === item.id}><Trash2 size={16} /></button>
+                  </div>
+                </div>
+                <p className="task-item__statement">{item.prompt}</p>
+                <div className="interview-prep-answer-preview">{item.referenceAnswer}</div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        <section className="card dashboard-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>Mock Company Presets</h2>
+              <p className="interview-prep-muted">Порядок этапов, task pattern и model override для конкретной компании.</p>
+            </div>
+          </div>
+          <div className="task-editor-grid">
+            <div className="form-group">
+              <label>Company</label>
+              <input className="input" value={mockCompanyPresetForm.companyTag} onChange={(e) => setMockCompanyPresetForm((prev) => ({ ...prev, companyTag: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label>Stage</label>
+              <FancySelect
+                value={mockCompanyPresetForm.stageKind}
+                options={MOCK_STAGE_OPTIONS.map((item) => ({ value: item.value, label: item.label }))}
+                onChange={(value) => setMockCompanyPresetForm((prev) => ({ ...prev, stageKind: value as InterviewPrepMockStageKind }))}
+              />
+            </div>
+            <div className="form-group">
+              <label>Position</label>
+              <input className="input" type="number" min={1} value={mockCompanyPresetForm.position} onChange={(e) => setMockCompanyPresetForm((prev) => ({ ...prev, position: Number(e.target.value) || 1 }))} />
+            </div>
+            <div className="form-group">
+              <label>Task Slug Pattern</label>
+              <input className="input" value={mockCompanyPresetForm.taskSlugPattern} onChange={(e) => setMockCompanyPresetForm((prev) => ({ ...prev, taskSlugPattern: e.target.value }))} placeholder="slice / worker / url-shortener" />
+            </div>
+            <div className="form-group">
+              <label>AI Model Override</label>
+              <input className="input" value={mockCompanyPresetForm.aiModelOverride} onChange={(e) => setMockCompanyPresetForm((prev) => ({ ...prev, aiModelOverride: e.target.value }))} placeholder="openrouter model id" />
+            </div>
+          </div>
+          <div className="interview-prep-toggle-row">
+            <label className="toggle-field">
+              <input type="checkbox" checked={mockCompanyPresetForm.isActive} onChange={(e) => setMockCompanyPresetForm((prev) => ({ ...prev, isActive: e.target.checked }))} />
+              Активен
+            </label>
+          </div>
+          <div className="interview-prep-question-toolbar">
+            <button className="btn btn-primary" onClick={() => void handleSaveMockCompanyPreset()} disabled={saving}>
+              {mockCompanyPresetForm.id ? 'Сохранить preset' : 'Добавить preset'}
+            </button>
+            <button className="btn btn-secondary" onClick={() => setMockCompanyPresetForm(createEmptyMockCompanyPresetForm())}>Очистить форму</button>
+          </div>
+          <div className="task-list">
+            {mockCompanyPresets.map((item) => (
+              <div key={item.id} className="task-item">
+                <div className="task-item__header">
+                  <div>
+                    <div className="task-item__title">{item.companyTag} / {item.stageKind}</div>
+                    <div className="task-item__meta">
+                      <span className="badge">#{item.position}</span>
+                      {item.taskSlugPattern && <span className="badge">{item.taskSlugPattern}</span>}
+                      {item.aiModelOverride && <span className="badge">model override</span>}
+                      {!item.isActive && <span className="badge task-inactive">inactive</span>}
+                    </div>
+                  </div>
+                  <div className="task-item__actions">
+                    <button className="btn-icon" onClick={() => setMockCompanyPresetForm(mockCompanyPresetToForm(item))}><Pencil size={16} /></button>
+                    <button className="btn-icon danger" onClick={() => void handleDeleteMockCompanyPreset(item.id)} disabled={deletingId === item.id}><Trash2 size={16} /></button>
+                  </div>
+                </div>
+                <div className="interview-prep-answer-preview">{item.aiModelOverride || 'default model by stage'}</div>
+              </div>
+            ))}
+          </div>
         </section>
       </div>
 
