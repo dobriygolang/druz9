@@ -151,73 +151,51 @@ export const buildAwarenessStyles = (
     }
 
     .code-room-remote-selection {
-      border-radius: 4px;
+      border-radius: 1px;
       color: inherit !important;
       text-shadow: none !important;
     }
 
-    .code-room-remote-anchor {
-      position: relative;
-      width: 0;
-      height: 0;
-      overflow: visible;
-      pointer-events: none;
+    .code-room-remote-caret {
+      position: absolute;
+      width: 2px;
+      height: 100%;
+      background: currentColor;
+      box-shadow: 0 0 4px rgba(0, 0, 0, 0.2);
     }
 
-    .code-room-remote-anchor__caret {
+    .code-room-remote-caret::after {
+      content: '';
       position: absolute;
-      left: -1px;
-      top: -1px;
-      width: 1px;
-      height: 16px;
-      border-radius: 999px;
-      background: currentColor;
-      box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.04);
+      left: 0;
+      top: 0;
+      width: 2px;
+      height: 100%;
+      background: inherit;
     }
 
     .code-room-remote-label-pill {
       position: absolute;
-      left: -1px;
-      top: -15px;
-      display: inline-flex;
-      align-items: center;
-      gap: 2px;
-      min-height: 12px;
-      padding: 0 3px;
-      border-radius: 2px;
-      border: 1px solid transparent;
-      font-size: 7.5px;
+      left: 0;
+      top: -18px;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 11px;
       font-weight: 600;
-      line-height: 12px;
+      line-height: 1.2;
       white-space: nowrap;
       pointer-events: none;
-      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
     }
 
-    .code-room-remote-selection-offline {
-      opacity: 0.45;
-    }
-
-    .code-room-remote-anchor-offline .code-room-remote-anchor__caret {
+    .code-room-remote-caret-offline {
       opacity: 0.5;
     }
 
     .code-room-remote-label-pill-offline {
-      opacity: 0.72;
-      filter: saturate(0.75);
-    }
-
-    .code-room-remote-label-pill__status-dot {
-      width: 3px;
-      height: 3px;
-      border-radius: 999px;
-      background: currentColor;
-      opacity: 0.9;
-      flex: 0 0 auto;
-    }
-
-    .code-room-remote-label-pill__status-dot.offline {
-      opacity: 0.42;
+      opacity: 0.75;
+      filter: saturate(0.8);
     }
   `;
 
@@ -233,22 +211,20 @@ export const buildAwarenessStyles = (
     }
     const isOffline = typedState?.active === false;
     const selectionAlpha = isOffline ? 0.16 : 0.3;
-    const borderAlpha = isOffline ? 0.12 : 0.2;
-    const backgroundAlpha = isOffline ? 0.82 : 0.96;
+    const backgroundAlpha = isOffline ? 0.85 : 0.98;
 
     css += `
       .code-room-remote-selection-${awarenessID} {
         background: ${hexToRgba(user.color, selectionAlpha)};
       }
 
-      .code-room-remote-anchor-${awarenessID} {
+      .code-room-remote-caret-${awarenessID} {
         color: ${user.color};
       }
 
       .code-room-remote-label-pill-${awarenessID} {
-        background: ${hexToRgba(user.colorLight, backgroundAlpha)};
-        border-color: ${hexToRgba(user.color, borderAlpha)};
-        color: ${user.color};
+        background: ${user.color};
+        color: #FFFFFF;
       }
     `;
   }
