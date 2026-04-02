@@ -11,6 +11,7 @@ import (
 	"net/http"
 	"strings"
 	"time"
+	"unicode"
 )
 
 var (
@@ -280,52 +281,62 @@ func (o *openAICompatibleReviewer) ReviewSystemDesign(ctx context.Context, req S
 
 func buildSystemDesignPrompt(req SystemDesignReviewRequest) string {
 	var b strings.Builder
-	b.WriteString("You are reviewing a system design interview solution.\n")
-	b.WriteString("You receive an architecture diagram image plus structured candidate notes.\n")
-	b.WriteString("Return only valid JSON with fields: score, summary, strengths, issues, missingTopics, followUpQuestions, disclaimer.\n")
-	b.WriteString("Score must be an integer from 1 to 10.\n")
-	b.WriteString("Be strict, concrete, and evaluate architecture quality rather than drawing aesthetics.\n")
-	b.WriteString("If a claim is not supported by the diagram or notes, call that out explicitly.\n")
-	b.WriteString("If some information is missing, mention it in issues or missingTopics instead of inventing details.\n\n")
-	b.WriteString("Task title:\n")
+	b.WriteString("Ты проводишь строгий предварительный review ответа кандидата по system design.\n")
+	b.WriteString("На входе есть изображение схемы и структурированные поля с пояснениями кандидата.\n")
+	b.WriteString("Верни только валидный JSON с полями: score, summary, strengths, issues, missingTopics, followUpQuestions, disclaimer.\n")
+	b.WriteString("Все строки и элементы массивов должны быть только на русском языке.\n")
+	b.WriteString("Score должен быть целым числом от 1 до 10.\n")
+	b.WriteString("Оценивай архитектурное качество, а не красоту картинки.\n")
+	b.WriteString("Не додумывай детали за кандидата. Если тезис не подтверждается схемой или текстом, считай его отсутствующим.\n")
+	b.WriteString("Если текстовые поля выглядят как заглушки, мусор или бессодержательные повторы, считай их отсутствующими.\n")
+	b.WriteString("Не хвали кандидата за сам факт заполнения полей. У strengths должны быть только реальные инженерные решения, видимые по схеме или по подробным пояснениям.\n")
+	b.WriteString("Если вход почти пустой, слишком общий или состоит из заглушек вроде 123/test/qwe/asd, score должен быть низким, а summary/issues должны прямо это сказать.\n\n")
+	b.WriteString("Если на изображении нет архитектурной схемы или оно нерелевантно задаче (например, фото животного, мем, селфи, случайный скрин интерфейса, пейзаж, бытовое фото), считай материал нерелевантным для system design review, не выдумывай архитектуру и ставь низкую оценку.\n\n")
+	b.WriteString("Название задачи:\n")
 	b.WriteString(strings.TrimSpace(req.TaskTitle))
-	b.WriteString("\n\nTask statement:\n")
+	b.WriteString("\n\nУсловие задачи:\n")
 	b.WriteString(strings.TrimSpace(req.Statement))
 	if notes := strings.TrimSpace(req.Notes); notes != "" {
-		b.WriteString("\n\nCandidate notes:\n")
+		b.WriteString("\n\nЗаметки кандидата:\n")
 		b.WriteString(notes)
 	}
 	if components := strings.TrimSpace(req.Components); components != "" {
-		b.WriteString("\n\nDeclared components and responsibilities:\n")
+		b.WriteString("\n\nЗаявленные компоненты и зоны ответственности:\n")
 		b.WriteString(components)
 	}
 	if apis := strings.TrimSpace(req.APIs); apis != "" {
-		b.WriteString("\n\nDeclared APIs, handlers, queues or contracts:\n")
+		b.WriteString("\n\nЗаявленные API, очереди, обработчики и контракты:\n")
 		b.WriteString(apis)
 	}
 	if db := strings.TrimSpace(req.DatabaseSchema); db != "" {
-		b.WriteString("\n\nDeclared databases, tables, indexes and storage notes:\n")
+		b.WriteString("\n\nЗаявленные базы данных, таблицы, индексы и хранение:\n")
 		b.WriteString(db)
 	}
 	if traffic := strings.TrimSpace(req.Traffic); traffic != "" {
-		b.WriteString("\n\nTraffic and load assumptions:\n")
+		b.WriteString("\n\nНагрузочные и traffic-предположения:\n")
 		b.WriteString(traffic)
 	}
 	if reliability := strings.TrimSpace(req.Reliability); reliability != "" {
-		b.WriteString("\n\nReliability, scaling and failure-handling notes:\n")
+		b.WriteString("\n\nНадёжность, масштабирование и обработка сбоев:\n")
 		b.WriteString(reliability)
 	}
-	b.WriteString("\n\nReview rubric:\n")
-	b.WriteString("1. Requirements coverage and whether the design actually solves the asked problem.\n")
-	b.WriteString("2. Correctness of major components and data flow.\n")
-	b.WriteString("3. Storage choices: tables, indexes, partitioning, caching, consistency, retention.\n")
-	b.WriteString("4. Scalability: bottlenecks, fan-out, backpressure, hot keys, queues, horizontal scaling.\n")
-	b.WriteString("5. Reliability: timeouts, retries, idempotency, replication, failover, disaster recovery.\n")
-	b.WriteString("6. Security: auth, authz, secrets, PII, network boundaries.\n")
-	b.WriteString("7. Observability and operations: metrics, logs, tracing, alerts, rollouts.\n")
-	b.WriteString("8. Trade-offs and missing assumptions.\n")
-	b.WriteString("Use the image as primary architectural evidence and the candidate notes as supporting context. ")
-	b.WriteString("Disclaimer should clearly say this is a preliminary AI review, not a final interviewer verdict.")
+	if lowSignal := lowSignalSections(req); len(lowSignal) > 0 {
+		b.WriteString("\n\nПоля, которые выглядят как заглушки или бессодержательный ввод и должны считаться отсутствующими, если схема явно не компенсирует их:\n")
+		b.WriteString(strings.Join(lowSignal, ", "))
+		b.WriteString(".\n")
+	}
+	b.WriteString("\n\nРубрика оценки:\n")
+	b.WriteString("1. Насколько решение покрывает требования и реально решает задачу.\n")
+	b.WriteString("2. Корректность основных компонентов и потоков данных.\n")
+	b.WriteString("3. Выбор хранилищ: таблицы, индексы, консистентность, кеш, retention, очистка.\n")
+	b.WriteString("4. Масштабирование: очереди, bottleneck, fan-out, backpressure, hot keys, горизонтальный рост.\n")
+	b.WriteString("5. Надёжность: timeout, retry, idempotency, replication, failover, disaster recovery.\n")
+	b.WriteString("6. Безопасность: auth, authz, секреты, PII, сетевые границы, изоляция.\n")
+	b.WriteString("7. Наблюдаемость и эксплуатация: метрики, логи, tracing, alerts, rollout.\n")
+	b.WriteString("8. Явные trade-off и недостающие предположения.\n")
+	b.WriteString("Используй схему как основной источник архитектурных доказательств, а текст кандидата как вспомогательный контекст.\n")
+	b.WriteString("Если схема или текст слишком общие, прямо говори, что решение поверхностное и не подтверждает инженерную проработку.\n")
+	b.WriteString("Disclaimer должен явно говорить, что это предварительная AI-оценка, а не финальный вердикт интервьюера.")
 	return b.String()
 }
 
@@ -364,6 +375,90 @@ func truncate(value string, limit int) string {
 		return value
 	}
 	return value[:limit] + "..."
+}
+
+func lowSignalSections(req SystemDesignReviewRequest) []string {
+	sections := []struct {
+		label string
+		value string
+	}{
+		{label: "notes", value: req.Notes},
+		{label: "components", value: req.Components},
+		{label: "apis", value: req.APIs},
+		{label: "databaseSchema", value: req.DatabaseSchema},
+		{label: "traffic", value: req.Traffic},
+		{label: "reliability", value: req.Reliability},
+	}
+
+	var result []string
+	for _, section := range sections {
+		if isLowSignalText(section.value) {
+			result = append(result, section.label)
+		}
+	}
+	return result
+}
+
+func isLowSignalText(value string) bool {
+	trimmed := strings.TrimSpace(strings.ToLower(value))
+	if trimmed == "" {
+		return false
+	}
+
+	switch trimmed {
+	case "123", "1231", "1234", "23213", "test", "qwe", "asd", "zxc", "none", "null", "-", "n/a":
+		return true
+	}
+
+	fields := strings.FieldsFunc(trimmed, func(r rune) bool {
+		return unicode.IsSpace(r) || unicode.IsPunct(r) || unicode.IsSymbol(r)
+	})
+	if len(fields) == 0 {
+		return true
+	}
+
+	allNumeric := true
+	allSame := true
+	first := fields[0]
+	shortTokenCount := 0
+	for _, field := range fields {
+		if !isDigitsOnly(field) {
+			allNumeric = false
+		}
+		if field != first {
+			allSame = false
+		}
+		if len(field) <= 3 {
+			shortTokenCount++
+		}
+	}
+
+	if allNumeric || allSame {
+		return true
+	}
+	if len(fields) <= 3 && shortTokenCount == len(fields) {
+		return true
+	}
+
+	alphaCount := 0
+	for _, r := range trimmed {
+		if unicode.IsLetter(r) {
+			alphaCount++
+		}
+	}
+	return alphaCount < 4
+}
+
+func isDigitsOnly(value string) bool {
+	if value == "" {
+		return false
+	}
+	for _, r := range value {
+		if !unicode.IsDigit(r) {
+			return false
+		}
+	}
+	return true
 }
 
 func mapProviderError(statusCode int, body []byte) error {
