@@ -27,11 +27,11 @@ type yandexTokenResponse struct {
 }
 
 type yandexUserInfoResponse struct {
-	ID           string `json:"id"`
-	Login        string `json:"login"`
-	DefaultEmail string `json:"default_email"`
-	FirstName    string `json:"first_name"`
-	LastName     string `json:"last_name"`
+	ID            string `json:"id"`
+	Login         string `json:"login"`
+	DefaultEmail  string `json:"default_email"`
+	FirstName     string `json:"first_name"`
+	LastName      string `json:"last_name"`
 	DefaultAvatar string `json:"default_avatar_id"`
 	IsAvatarEmpty bool   `json:"is_avatar_empty"`
 }
@@ -50,6 +50,10 @@ func (s *Service) StartYandexAuth(_ context.Context) (*model.YandexAuthStart, er
 	s.yandexAuth.mu.Lock()
 	s.yandexAuth.byState[state] = expiresAt
 	s.yandexAuth.mu.Unlock()
+
+	// Debug log
+	fmt.Printf("DEBUG: Stored yandex state %s, expires at %v, total states: %d\n",
+		state, expiresAt, len(s.yandexAuth.byState))
 
 	q := url.Values{}
 	q.Set("response_type", "code")
@@ -109,12 +113,21 @@ func (s *Service) consumeYandexState(state string) bool {
 	s.yandexAuth.mu.Lock()
 	defer s.yandexAuth.mu.Unlock()
 
+	fmt.Printf("DEBUG: Looking for yandex state %s, total states: %d\n", state, len(s.yandexAuth.byState))
+
 	expiresAt, ok := s.yandexAuth.byState[state]
 	if !ok {
+		fmt.Printf("DEBUG: Yandex state %s not found\n", state)
 		return false
 	}
+
 	delete(s.yandexAuth.byState, state)
-	return expiresAt.After(now)
+	valid := expiresAt.After(now)
+
+	fmt.Printf("DEBUG: Yandex state %s found, expires at %v, now: %v, valid: %v\n",
+		state, expiresAt, now, valid)
+
+	return valid
 }
 
 func (s *Service) fetchYandexUser(ctx context.Context, code string) (*model.YandexAuthUser, error) {
