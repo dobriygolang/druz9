@@ -7,7 +7,7 @@ import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 import { ArenaLeaderboardEntry, ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode } from '@/entities/CodeRoom/model/types';
-import { ArrowRight, BookOpen, Eye, FileCode, Plus, ShieldCheck, Swords, TimerReset, Trophy, Users } from 'lucide-react';
+import { ArrowRight, BookOpen, BrainCircuit, Eye, FileCode, Plus, ShieldCheck, Shuffle, Sparkles, Swords, TimerReset, Trophy, Users } from 'lucide-react';
 import { FancySelect } from '@/shared/ui/FancySelect';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
@@ -475,20 +475,15 @@ export const CodeRoomsPage: React.FC = () => {
         </div>
 
         {user?.isTrusted && (
-          <section className="card dashboard-card code-room-prep-launch code-room-prep-launch--page">
-            <div className="code-room-prep-launch__head">
-              <div>
-                <div className="code-room-prep-launch__title">Solo practice</div>
-                <div className="mode-desc">
-                  {isMobile ? 'Каталог задач interview-prep.' : 'Открой executable interview-prep каталог или сразу возьми случайную задачу.'}
-                </div>
+          <section className="card dashboard-card solo-practice-section">
+            <div className="solo-practice-section__head">
+              <div className="solo-practice-section__title-wrap">
+                <BookOpen size={18} />
+                <h3 className="solo-practice-section__title">Solo practice</h3>
               </div>
-              <BookOpen size={18} />
-            </div>
-            <div className="code-room-prep-launch__body">
-              <div className="code-room-prep-launch__controls">
-                <div className="code-room-prep-launch__group">
-                  <span className="code-room-prep-launch__label">Категория</span>
+              <div className="solo-practice-section__filters">
+                <div className="solo-practice-filter-group">
+                  <span className="solo-practice-filter-label">Категория</span>
                   <div className="pill-selector">
                     {INTERVIEW_PREP_CATEGORY_OPTIONS.map((option) => (
                       <button
@@ -502,8 +497,8 @@ export const CodeRoomsPage: React.FC = () => {
                     ))}
                   </div>
                 </div>
-                <div className="code-room-prep-launch__group">
-                  <span className="code-room-prep-launch__label">Группа</span>
+                <div className="solo-practice-filter-group">
+                  <span className="solo-practice-filter-label">Компания / Группа</span>
                   <FancySelect
                     value={prepLaunchCompany}
                     options={[
@@ -516,10 +511,22 @@ export const CodeRoomsPage: React.FC = () => {
                   />
                 </div>
               </div>
-              <div className="code-room-prep-launch__actions">
+            </div>
+
+            <div className="solo-practice-grid">
+              <div className="solo-practice-hero">
+                <div className="solo-practice-hero__content">
+                  <div className="solo-practice-hero__icon">
+                    <BrainCircuit size={32} />
+                  </div>
+                  <div className="solo-practice-hero__copy">
+                    <h4>Mock Interview</h4>
+                    <p>Полноценная симуляция интервью: coding, follow-up и system design. AI оценит твоё решение и даст советы.</p>
+                  </div>
+                </div>
                 <button
                   type="button"
-                  className="btn btn-secondary"
+                  className="btn btn-primary solo-practice-hero__btn"
                   onClick={async () => {
                     try {
                       const session = await interviewPrepApi.startMockSession(prepLaunchCompany === 'all' ? 'general' : prepLaunchCompany);
@@ -529,21 +536,36 @@ export const CodeRoomsPage: React.FC = () => {
                     }
                   }}
                 >
-                  Mock interview
+                  <Sparkles size={16} />
+                  <span>Начать сценарий</span>
                 </button>
+              </div>
+
+              <div className="solo-practice-sidebar">
                 <button
                   type="button"
-                  className="btn btn-ghost"
-                  onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
-                >
-                  Открыть каталог
-                </button>
-                <button
-                  type="button"
-                  className="btn btn-primary"
+                  className="solo-practice-action-card"
                   onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
                 >
-                  Случайная задача
+                  <div className="solo-practice-action-card__icon"><Shuffle size={18} /></div>
+                  <div className="solo-practice-action-card__copy">
+                    <strong>Случайная задача</strong>
+                    <span>Быстрый старт с рандомным таском</span>
+                  </div>
+                  <ArrowRight size={16} />
+                </button>
+
+                <button
+                  type="button"
+                  className="solo-practice-action-card"
+                  onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
+                >
+                  <div className="solo-practice-action-card__icon"><Eye size={18} /></div>
+                  <div className="solo-practice-action-card__copy">
+                    <strong>Открыть каталог</strong>
+                    <span>Выбрать задачу вручную</span>
+                  </div>
+                  <ArrowRight size={16} />
                 </button>
               </div>
             </div>

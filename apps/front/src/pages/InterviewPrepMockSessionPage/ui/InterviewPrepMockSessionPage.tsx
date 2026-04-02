@@ -10,6 +10,7 @@ import {
   TerminalSquare,
   Upload,
   Wand2,
+  BrainCircuit,
 } from 'lucide-react';
 
 import {
@@ -243,82 +244,245 @@ export function InterviewPrepMockSessionPage() {
 
   return (
     <div className="interview-prep-session-page interview-prep-mock-page">
-      <section className="card dashboard-card interview-prep-session-hero">
-        <div>
-          <div className="task-item__meta">
-            <span className="badge">{session.companyTag}</span>
-            <span className="badge">{STAGE_LABELS[currentStage.kind]}</span>
-            {currentStage.task?.durationSeconds ? (
-              <span className="badge">
-                <Clock3 size={12} />
-                {Math.round(currentStage.task.durationSeconds / 60)} мин
-              </span>
-            ) : null}
+      <header className="interview-prep-mock-header">
+        <div className="interview-prep-mock-header__content">
+          <div className="interview-prep-mock-header__info">
+            <span className="badge badge-secondary">{session.companyTag}</span>
+            <h1>Mock interview</h1>
           </div>
-          <h1>Mock interview</h1>
-          <p className="code-rooms-subtitle">
-            Один цельный сценарий по компании: code stage, follow-up вопросы и финальный system design.
-          </p>
-        </div>
-        <div className="interview-prep-session-hero__aside">
-          <div className="interview-prep-progress">
-            <span>Этап</span>
-            <strong>{progress.completed}/{progress.total}</strong>
-          </div>
-        </div>
-      </section>
-
-      {error && (
-        <section className="card dashboard-card">
-          <div className="error-text">{error}</div>
-        </section>
-      )}
-
-      <section className="card dashboard-card interview-prep-filter-card">
-        <div className="interview-prep-category-strip">
-          {(session.stages ?? []).map((stage) => (
-            <div
-              key={stage.id}
-              className={`interview-prep-category-card ${stage.stageIndex === session.currentStageIndex ? 'is-active' : ''} ${stage.status === 'completed' ? 'is-coding' : ''}`}
-            >
-              <span className="interview-prep-category-card__label">{STAGE_LABELS[stage.kind]}</span>
-              <strong>{stage.status === 'completed' ? 'Done' : `#${stage.stageIndex + 1}`}</strong>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      <section className="interview-prep-session-grid">
-        <article className="card dashboard-card">
-          <div className="dashboard-card__header">
-            <div>
-              <h2>{currentStage.task?.title ?? 'Текущий этап'}</h2>
-              <p className="interview-prep-muted">
-                {currentStage.kind === 'system_design'
-                  ? 'Финальный этап: схема, пояснения и AI review.'
-                  : 'Сдаёшь решение, затем отвечаешь на follow-up вопросы по этому же этапу.'}
-              </p>
+          <div className="interview-prep-mock-header__stats">
+            <div className="interview-prep-progress-summary">
+              <span className="label">Прогресс интервью</span>
+              <div className="progress-bar">
+                <div className="progress-bar__fill" style={{ width: `${(progress.completed / progress.total) * 100}%` }} />
+              </div>
+              <span className="value">{progress.completed} / {progress.total} этапов</span>
             </div>
           </div>
-          <pre className="interview-prep-statement">{currentStage.task?.statement ?? ''}</pre>
-        </article>
+        </div>
+      </header>
 
-        <aside className="interview-prep-session-sidebar">
-          <section className="card dashboard-card">
+      <div className="interview-prep-mock-layout">
+        <aside className="interview-prep-mock-timeline">
+          <div className="timeline-title">Этапы интервью</div>
+          <div className="timeline-list">
+            {(session.stages ?? []).map((stage, idx) => {
+              const isActive = stage.stageIndex === session.currentStageIndex;
+              const isCompleted = stage.status === 'completed';
+              return (
+                <div 
+                  key={stage.id} 
+                  className={`timeline-item ${isActive ? 'is-active' : ''} ${isCompleted ? 'is-completed' : ''}`}
+                >
+                  <div className="timeline-item__node">
+                    {isCompleted ? <CheckCircle2 size={14} /> : <span>{idx + 1}</span>}
+                  </div>
+                  <div className="timeline-item__content">
+                    <span className="timeline-item__label">{STAGE_LABELS[stage.kind]}</span>
+                    <span className="timeline-item__status">
+                      {isActive ? 'Текущий этап' : isCompleted ? 'Пройдено' : 'Впереди'}
+                    </span>
+                  </div>
+                  {isActive && <div className="timeline-item__active-indicator" />}
+                </div>
+              );
+            })}
+          </div>
+        </aside>
+
+        <main className="interview-prep-mock-main">
+          {error && (
+            <div className="interview-prep-error-banner">
+              <div className="error-text">{error}</div>
+            </div>
+          )}
+
+          <section className="card dashboard-card task-statement-card">
             <div className="dashboard-card__header">
               <div>
-                <h2>Статус этапа</h2>
-                <p className="interview-prep-muted">{currentStage.status}</p>
+                <span className="badge badge-secondary">{STAGE_LABELS[currentStage.kind]}</span>
+                <h2>{currentStage.task?.title ?? 'Текущий этап'}</h2>
               </div>
+              {currentStage.task?.durationSeconds ? (
+                <div className="badge">
+                  <Clock3 size={14} />
+                  {Math.round(currentStage.task.durationSeconds / 60)} мин
+                </div>
+              ) : null}
             </div>
-            <div className="interview-prep-results">
+            <pre className="interview-prep-statement">{currentStage.task?.statement ?? ''}</pre>
+          </section>
+
+          {session.status === 'finished' && (
+            <section className="card dashboard-card interview-prep-finished">
+              <Sparkles size={24} className="sparkle-icon" />
+              <div>
+                <strong>Mock interview успешно завершён</strong>
+                <p className="interview-prep-muted">Поздравляем! Ты прошёл все этапы сценария для {session.companyTag}.</p>
+              </div>
+            </section>
+          )}
+
+          {session.status !== 'finished' && currentStage.status === 'solving' && currentStage.kind !== 'system_design' && (
+            <section className="card dashboard-card interview-prep-workstation">
+              <div className="workstation-toolbar">
+                <div className="workstation-toolbar__title">
+                  <TerminalSquare size={16} />
+                  <span>Решение задачи</span>
+                </div>
+                <span className="badge">{displayLanguageLabel(currentStage.solveLanguage || currentStage.task?.language)}</span>
+              </div>
+              <div className="workstation-editor">
+                <Editor
+                  language={monacoLanguageFor(currentStage.solveLanguage || currentStage.task?.language)}
+                  value={code}
+                  onChange={(value) => setCode(value ?? '')}
+                  height={480}
+                  theme="vs-dark"
+                  options={{
+                    minimap: { enabled: false },
+                    fontSize: 14,
+                    automaticLayout: true,
+                    roundedSelection: false,
+                    scrollBeyondLastLine: false,
+                    padding: { top: 16, bottom: 16 }
+                  }}
+                />
+              </div>
+              <div className="workstation-footer">
+                <div className="form-group workstation-notes">
+                  <label>Пояснения (опционально)</label>
+                  <textarea
+                    className="form-control"
+                    value={notes}
+                    onChange={(e) => setNotes(e.target.value)}
+                    placeholder="Коротко объясни логику или trade-offs..."
+                    rows={2}
+                  />
+                </div>
+                {submitErrorDetails && (
+                  <div className="interview-prep-compile-error">
+                    <strong>Ошибка проверки</strong>
+                    <pre>{submitErrorDetails}</pre>
+                  </div>
+                )}
+                <button className="btn btn-primary workstation-submit" disabled={submitting} onClick={() => void handleSubmitStage()}>
+                  <Wand2 size={16} />
+                  {currentStage.task?.isExecutable ? 'Проверить решение' : 'Отправить на AI ревью'}
+                </button>
+              </div>
+            </section>
+          )}
+
+          {session.status !== 'finished' && currentStage.status === 'solving' && currentStage.kind === 'system_design' && (
+            <section className="card dashboard-card interview-prep-workstation">
+              <div className="workstation-toolbar">
+                <div className="workstation-toolbar__title">
+                  <Sparkles size={16} />
+                  <span>System Design Workspace</span>
+                </div>
+              </div>
+              <div className="workstation-design-grid">
+                <div className="form-group upload-stage">
+                  <label>Архитектурная схема</label>
+                  <input
+                    id="mock-design-upload"
+                    className="interview-prep-upload-input"
+                    type="file"
+                    accept="image/png,image/jpeg,image/webp"
+                    onChange={(event) => setDesignImage(event.target.files?.[0] ?? null)}
+                  />
+                  <label htmlFor="mock-design-upload" className="interview-prep-upload-control">
+                    <span className="upload-trigger">
+                      <Upload size={16} />
+                      {designImage ? 'Заменить файл' : 'Загрузить схему'}
+                    </span>
+                    {designImage && <span className="upload-name">{designImage.name}</span>}
+                  </label>
+                </div>
+                <div className="design-notes-grid">
+                  {[
+                    ['notes', 'Заметки'],
+                    ['components', 'Компоненты'],
+                    ['apis', 'API и очереди'],
+                    ['databaseSchema', 'База и схемы'],
+                  ].map(([key, label]) => (
+                    <div key={key} className="form-group">
+                      <label>{label}</label>
+                      <textarea
+                        className="form-control"
+                        rows={3}
+                        value={(designInput as any)[key]}
+                        onChange={(event) => setDesignInput((prev) => ({ ...prev, [key]: event.target.value }))}
+                      />
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="workstation-footer">
+                <button className="btn btn-primary workstation-submit" disabled={submitting || !designImage} onClick={() => void handleReviewSystemDesign()}>
+                  <Sparkles size={16} />
+                  Получить AI обзор архитектуры
+                </button>
+              </div>
+            </section>
+          )}
+
+          {session.status !== 'finished' && currentStage.status === 'questions' && currentStage.currentQuestion && (
+            <section className="card dashboard-card interview-prep-workstation">
+              <div className="workstation-toolbar">
+                <div className="workstation-toolbar__title">
+                  <BrainCircuit size={16} />
+                  <span>Follow-up вопрос #{currentStage.currentQuestion.position}</span>
+                </div>
+              </div>
+              <div className="workstation-question-box">
+                <blockquote>{currentStage.currentQuestion.prompt}</blockquote>
+                <div className="question-input-wrap">
+                  <div className="question-input-toolbar">
+                    <button
+                      type="button"
+                      className={`btn ${speechActive ? 'btn-danger' : 'btn-secondary'} btn-sm`}
+                      disabled={!speechSupported}
+                      onClick={toggleSpeech}
+                    >
+                      {speechActive ? <MicOff size={14} /> : <Mic size={14} />}
+                      {speechActive ? 'Остановить' : 'Голосовой ввод'}
+                    </button>
+                  </div>
+                  <textarea
+                    className="form-control workstation-textarea"
+                    rows={6}
+                    value={answerText}
+                    onChange={(e) => setAnswerText(e.target.value)}
+                    placeholder="Напиши свой ответ или надиктуй его..."
+                  />
+                </div>
+              </div>
+              <div className="workstation-footer">
+                <button className="btn btn-primary workstation-submit" disabled={submitting || !answerText.trim()} onClick={() => void handleAnswerQuestion()}>
+                  Отправить ответ
+                </button>
+              </div>
+            </section>
+          )}
+        </main>
+
+        <aside className="interview-prep-mock-console">
+          <div className="console-title">Консоль интервьюера</div>
+          
+          <section className="console-card">
+            <div className="console-card__header">Статус этапа</div>
+            <div className="console-stats">
               {(currentStage.questionResults ?? []).length === 0 ? (
-                <div className="interview-prep-muted">Этот этап без follow-up вопросов.</div>
+                <div className="console-empty">Follow-up вопросы появятся здесь.</div>
               ) : (
                 currentStage.questionResults?.map((result) => (
-                  <div key={result.id} className="interview-prep-result-row">
-                    <span>Q{result.position}</span>
-                    <strong>{result.answeredAt ? `${result.score}/10` : 'pending'}</strong>
+                  <div key={result.id} className="console-stat-row">
+                    <span>Вопрос {result.position}</span>
+                    <strong className={result.score >= 7 ? 'text-success' : 'text-primary'}>
+                      {result.answeredAt ? `${result.score}/10` : 'ожидание'}
+                    </strong>
                   </div>
                 ))
               )}
@@ -326,212 +490,45 @@ export function InterviewPrepMockSessionPage() {
           </section>
 
           {(solutionReview || designReview) && (
-            <section className="card dashboard-card">
-              <div className="dashboard-card__header">
-                <div>
-                  <h2>AI review</h2>
-                  <p className="interview-prep-muted">Короткая оценка текущего решения.</p>
-                </div>
+            <section className="console-card console-card--ai">
+              <div className="console-card__header">
+                <Sparkles size={14} />
+                AI Ревью этапа
               </div>
-              {'score' in (solutionReview || designReview || {}) && (
-                <div className="interview-prep-design-review-score">
-                  <span>Score</span>
-                  <strong>{(solutionReview?.score ?? designReview?.score) || 0}/10</strong>
-                </div>
-              )}
-              <p className="interview-prep-answer-preview">
-                {solutionReview?.summary ?? designReview?.summary}
-              </p>
+              <div className="console-review-body">
+                {'score' in (solutionReview || designReview || {}) && (
+                  <div className="console-review-score">
+                    <span className="label">Оценка</span>
+                    <span className="value">{(solutionReview?.score ?? designReview?.score) || 0} / 10</span>
+                  </div>
+                )}
+                <p className="console-review-text">{solutionReview?.summary ?? designReview?.summary}</p>
+              </div>
             </section>
           )}
 
           {answerReview && (
-            <section className="card dashboard-card">
-              <div className="dashboard-card__header">
-                <div>
-                  <h2>Разбор ответа</h2>
-                  <p className="interview-prep-muted">Ответ пользователя не сохраняется, только оценка.</p>
+            <section className="console-card console-card--ai">
+              <div className="console-card__header">AI Валидация ответа</div>
+              <div className="console-review-body">
+                <div className="console-review-score">
+                  <span className="label">Оценка</span>
+                  <span className="value">{answerReview.score} / 10</span>
                 </div>
+                <p className="console-review-text">{answerReview.summary}</p>
+                {answerReview.gaps?.length ? (
+                  <div className="console-review-gaps">
+                    <span className="gaps-label">Что стоит улучшить:</span>
+                    <ul>
+                      {answerReview.gaps.map((gap, i) => <li key={i}>{gap}</li>)}
+                    </ul>
+                  </div>
+                ) : null}
               </div>
-              <div className="interview-prep-design-review-score">
-                <span>Score</span>
-                <strong>{answerReview.score}/10</strong>
-              </div>
-              <p className="interview-prep-answer-preview">{answerReview.summary}</p>
-              {answerReview.gaps?.length ? (
-                <div className="interview-prep-design-review-list">
-                  <strong>Недочёты</strong>
-                  <ul>
-                    {answerReview.gaps.map((gap) => (
-                      <li key={gap}>{gap}</li>
-                    ))}
-                  </ul>
-                </div>
-              ) : null}
             </section>
           )}
         </aside>
-      </section>
-
-      {session.status === 'finished' && (
-        <section className="card dashboard-card interview-prep-finished">
-          <CheckCircle2 size={18} />
-          <div>
-            <strong>Mock interview завершён</strong>
-            <p className="interview-prep-muted">Все этапы пройдены. Можно запускать новый сценарий под другую компанию.</p>
-          </div>
-        </section>
-      )}
-
-      {session.status !== 'finished' && currentStage.status === 'solving' && currentStage.kind !== 'system_design' && (
-        <section className="card dashboard-card interview-prep-live-card">
-          <div className="interview-prep-live-toolbar">
-            <div className="interview-prep-block-title">
-              <TerminalSquare size={16} />
-              <span>Рабочее окно</span>
-            </div>
-            <div className="task-item__meta">
-              <span className="badge interview-prep-badge--language">{displayLanguageLabel(currentStage.solveLanguage || currentStage.task?.language)}</span>
-            </div>
-          </div>
-          <div className="interview-prep-live-editor">
-            <Editor
-              language={monacoLanguageFor(currentStage.solveLanguage || currentStage.task?.language)}
-              value={code}
-              onChange={(value) => setCode(value ?? '')}
-              height={520}
-              theme="vs-dark"
-              options={{
-                minimap: { enabled: false },
-                fontSize: 14,
-                automaticLayout: true,
-              }}
-            />
-          </div>
-          <div className="interview-prep-design-review-grid">
-            <div className="form-group interview-prep-notes-field">
-              <label>Пояснения к решению</label>
-              <textarea
-                className="form-control interview-prep-notes-input"
-                value={notes}
-                onChange={(e) => setNotes(e.target.value)}
-                placeholder="Коротко объясни trade-off, структуру данных, ограничения."
-                rows={5}
-              />
-            </div>
-          </div>
-          {submitErrorDetails ? (
-            <div className="interview-prep-compile-error">
-              <strong>Ошибка проверки</strong>
-              <pre className="interview-prep-answer-preview">{submitErrorDetails}</pre>
-            </div>
-          ) : null}
-          <div className="interview-prep-live-actions interview-prep-live-actions--inline">
-            <button className="btn btn-primary" disabled={submitting} onClick={() => void handleSubmitStage()}>
-              <Wand2 size={16} />
-              {currentStage.task?.isExecutable ? 'Проверить и перейти дальше' : 'Отправить на AI review'}
-            </button>
-          </div>
-        </section>
-      )}
-
-      {session.status !== 'finished' && currentStage.status === 'solving' && currentStage.kind === 'system_design' && (
-        <section className="card dashboard-card interview-prep-design-review-card">
-          <div className="dashboard-card__header">
-            <div>
-              <h2>Система и схема</h2>
-              <p className="interview-prep-muted">Загрузи скрин архитектуры и пояснения по блокам.</p>
-            </div>
-            <Sparkles size={18} />
-          </div>
-          <div className="interview-prep-design-review-grid">
-            <div className="form-group interview-prep-upload-field">
-              <label>Скриншот архитектуры</label>
-              <input
-                id="mock-design-upload"
-                className="interview-prep-upload-input"
-                type="file"
-                accept="image/png,image/jpeg,image/webp"
-                onChange={(event) => setDesignImage(event.target.files?.[0] ?? null)}
-              />
-              <label htmlFor="mock-design-upload" className="interview-prep-upload-control">
-                <span className="interview-prep-upload-trigger">
-                  <Upload size={16} />
-                  Выбрать файл
-                </span>
-                <span className={`interview-prep-upload-filename ${designImage ? 'is-selected' : ''}`}>
-                  <span className="interview-prep-upload-name">{designImage?.name ?? 'PNG / JPEG / WEBP до 6MB'}</span>
-                </span>
-              </label>
-            </div>
-            {[
-              ['notes', 'Заметки'],
-              ['components', 'Компоненты'],
-              ['apis', 'API и очереди'],
-              ['databaseSchema', 'База и схемы'],
-              ['traffic', 'Нагрузка'],
-              ['reliability', 'Надёжность'],
-            ].map(([key, label]) => (
-              <div key={key} className="form-group interview-prep-notes-field">
-                <label>{label}</label>
-                <textarea
-                  className="form-control interview-prep-notes-input"
-                  rows={4}
-                  value={(designInput as any)[key]}
-                  onChange={(event) => setDesignInput((prev) => ({ ...prev, [key]: event.target.value }))}
-                />
-              </div>
-            ))}
-          </div>
-          <div className="interview-prep-live-actions interview-prep-live-actions--inline">
-            <button className="btn btn-primary" disabled={submitting || !designImage} onClick={() => void handleReviewSystemDesign()}>
-              <Sparkles size={16} />
-              Отправить на AI review
-            </button>
-          </div>
-        </section>
-      )}
-
-      {session.status !== 'finished' && currentStage.status === 'questions' && currentStage.currentQuestion && (
-        <section className="card dashboard-card interview-prep-question-card">
-          <div className="dashboard-card__header">
-            <div>
-              <h2>Follow-up вопрос #{currentStage.currentQuestion.position}</h2>
-              <p className="interview-prep-muted">Можно надиктовать ответ голосом, проверить текст и только потом отправить.</p>
-            </div>
-          </div>
-          <div className="interview-prep-question-review">
-            <strong>{currentStage.currentQuestion.prompt}</strong>
-          </div>
-          <div className="interview-prep-question-toolbar">
-            <button
-              type="button"
-              className="btn btn-secondary"
-              disabled={!speechSupported}
-              onClick={toggleSpeech}
-            >
-              {speechActive ? <MicOff size={16} /> : <Mic size={16} />}
-              {speechActive ? 'Остановить запись' : 'Надиктовать ответ'}
-            </button>
-            {!speechSupported && <span className="interview-prep-muted">Speech API недоступен в этом браузере.</span>}
-          </div>
-          <div className="form-group interview-prep-notes-field">
-            <label>Текст ответа перед отправкой</label>
-            <textarea
-              className="form-control interview-prep-notes-input"
-              rows={7}
-              value={answerText}
-              onChange={(e) => setAnswerText(e.target.value)}
-              placeholder="Текст не хранится на бэке: он только валидируется, отправляется в AI reviewer и сразу отбрасывается."
-            />
-          </div>
-          <div className="interview-prep-question-actions">
-            <button className="btn btn-primary" disabled={submitting || !answerText.trim()} onClick={() => void handleAnswerQuestion()}>
-              Проверить ответ
-            </button>
-          </div>
-        </section>
-      )}
+      </div>
     </div>
   );
 }
