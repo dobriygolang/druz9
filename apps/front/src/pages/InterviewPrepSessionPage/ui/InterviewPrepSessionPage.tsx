@@ -117,6 +117,7 @@ export function InterviewPrepSessionPage() {
   const [error, setError] = useState<string | null>(null);
   const [answering, setAnswering] = useState(false);
   const [revealedQuestion, setRevealedQuestion] = useState<InterviewPrepQuestion | null>(null);
+  const [revealedHistory, setRevealedHistory] = useState<InterviewPrepQuestion[]>([]);
   const [code, setCode] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [reviewingDesign, setReviewingDesign] = useState(false);
@@ -175,6 +176,11 @@ export function InterviewPrepSessionPage() {
     setCodeDrafts({ [fallbackLanguage]: nextDraft });
     setCode(nextDraft);
   }, [session?.id, session?.code, session?.solveLanguage, session?.task?.language, session?.task?.supportedLanguages, session?.task?.starterCode, session?.task?.runnerMode]);
+
+  useEffect(() => {
+    setRevealedHistory([]);
+    setRevealedQuestion(null);
+  }, [session?.id]);
 
   useEffect(() => {
     if (!isResizingEditor) {
@@ -258,6 +264,14 @@ export function InterviewPrepSessionPage() {
     try {
       const response = await interviewPrepApi.answerQuestion(sessionId, session.currentQuestion.id, selfAssessment);
       setRevealedQuestion(response.answeredQuestion ?? null);
+      if (response.answeredQuestion) {
+        const answeredQuestion = response.answeredQuestion;
+        setRevealedHistory((prev) => (
+          prev.some((question) => question.id === answeredQuestion.id)
+            ? prev
+            : [...prev, answeredQuestion]
+        ));
+      }
       setSession(response.session);
     } catch (e: any) {
       console.error('Failed to answer question:', e);
@@ -370,8 +384,8 @@ export function InterviewPrepSessionPage() {
             <section className="card dashboard-card">
               <div className="dashboard-card__header">
                 <div>
-                  <h2>Разбор предыдущего вопроса</h2>
-                  <p className="interview-prep-muted">Ответ раскрывается после честной самооценки.</p>
+                  <h2>Последний раскрытый ответ</h2>
+                  <p className="interview-prep-muted">Можно быстро вернуться к последнему разобранному follow-up.</p>
                 </div>
               </div>
               <div className="interview-prep-question-review">
@@ -380,8 +394,78 @@ export function InterviewPrepSessionPage() {
               </div>
             </section>
           )}
+
+          {revealedHistory.length > 0 && (
+            <section className="card dashboard-card">
+              <div className="dashboard-card__header">
+                <div>
+                  <h2>История follow-up</h2>
+                  <p className="interview-prep-muted">Все вопросы, которые уже были раскрыты в этой сессии.</p>
+                </div>
+              </div>
+              <div className="interview-prep-results">
+                {revealedHistory.map((question) => (
+                  <div key={question.id} className="interview-prep-result-row interview-prep-result-row--stacked">
+                    <strong>#{question.position} {question.prompt}</strong>
+                    <span>{question.answer}</span>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
         </aside>
       </section>
+
+      {session.status === 'finished' ? (
+        <section className="card dashboard-card interview-prep-finished">
+          <CheckCircle2 size={18} />
+          <span>Сессия завершена. Можешь взять следующую задачу или пройти эту заново позже.</span>
+        </section>
+      ) : canShowQuestions && session.currentQuestion ? (
+        <section className="card dashboard-card interview-prep-question-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>Follow-up вопрос #{session.currentQuestion.position}</h2>
+              <p className="interview-prep-muted">Сначала ответь сам, потом зафиксируй результат.</p>
+            </div>
+            <CircleDashed size={18} />
+          </div>
+          <div className="interview-prep-question-prompt">{session.currentQuestion.prompt}</div>
+          <div className="interview-prep-question-actions">
+            <button className="btn btn-primary" onClick={() => void handleAnswer('answered')} disabled={answering}>
+              <CheckCircle2 size={16} />
+              <span>{answering ? 'Сохраняю...' : 'Ответил сам'}</span>
+            </button>
+            <button className="btn btn-secondary" onClick={() => void handleAnswer('skipped')} disabled={answering}>
+              <XCircle size={16} />
+              <span>{answering ? 'Сохраняю...' : 'Не ответил'}</span>
+            </button>
+          </div>
+        </section>
+      ) : session.task?.isExecutable && !session.lastSubmissionPassed ? (
+        <section className="card dashboard-card interview-prep-question-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>Follow-up вопросы</h2>
+              <p className="interview-prep-muted">Откроются сразу после `accepted` по live-coding части.</p>
+            </div>
+            <CircleDashed size={18} />
+          </div>
+          <div className="interview-prep-muted">
+            Сейчас follow-up скрыты, потому что автопроверка ещё не пройдена.
+          </div>
+        </section>
+      ) : !session.currentQuestion ? (
+        <section className="card dashboard-card interview-prep-question-card">
+          <div className="dashboard-card__header">
+            <div>
+              <h2>Follow-up вопросы</h2>
+              <p className="interview-prep-muted">Для этой задачи пока не найдено ни одного привязанного follow-up вопроса.</p>
+            </div>
+            <CircleDashed size={18} />
+          </div>
+        </section>
+      ) : null}
 
       {showLiveCoding && task && (
         <section className="card dashboard-card interview-prep-live-card">
@@ -704,64 +788,6 @@ export function InterviewPrepSessionPage() {
         </section>
       )}
 
-      {session.status === 'finished' ? (
-        <section className="card dashboard-card interview-prep-finished">
-          <CheckCircle2 size={18} />
-          <span>Сессия завершена. Можешь взять следующую задачу или пройти эту заново позже.</span>
-        </section>
-      ) : canShowQuestions && session.currentQuestion ? (
-        <section className="card dashboard-card interview-prep-question-card">
-          <div className="dashboard-card__header">
-            <div>
-              <h2>Follow-up вопрос #{session.currentQuestion.position}</h2>
-              <p className="interview-prep-muted">Сначала ответь сам, потом зафиксируй результат.</p>
-            </div>
-            <CircleDashed size={18} />
-          </div>
-          <div className="interview-prep-question-prompt">{session.currentQuestion.prompt}</div>
-          <div className="interview-prep-question-actions">
-            <button
-              className="btn btn-primary"
-              onClick={() => void handleAnswer('answered')}
-              disabled={answering}
-            >
-              <CheckCircle2 size={16} />
-              <span>{answering ? 'Сохраняю...' : 'Ответил сам'}</span>
-            </button>
-            <button
-              className="btn btn-secondary"
-              onClick={() => void handleAnswer('skipped')}
-              disabled={answering}
-            >
-              <XCircle size={16} />
-              <span>{answering ? 'Сохраняю...' : 'Не ответил'}</span>
-            </button>
-          </div>
-        </section>
-      ) : session.task?.isExecutable && !session.lastSubmissionPassed ? (
-        <section className="card dashboard-card interview-prep-question-card">
-          <div className="dashboard-card__header">
-            <div>
-              <h2>Follow-up вопросы</h2>
-              <p className="interview-prep-muted">Откроются сразу после `accepted` по live-coding части.</p>
-            </div>
-            <CircleDashed size={18} />
-          </div>
-          <div className="interview-prep-muted">
-            Сейчас follow-up скрыты, потому что автопроверка ещё не пройдена.
-          </div>
-        </section>
-      ) : !session.currentQuestion ? (
-        <section className="card dashboard-card interview-prep-question-card">
-          <div className="dashboard-card__header">
-            <div>
-              <h2>Follow-up вопросы</h2>
-              <p className="interview-prep-muted">Для этой задачи пока не найдено ни одного привязанного follow-up вопроса.</p>
-            </div>
-            <CircleDashed size={18} />
-          </div>
-        </section>
-      ) : null}
     </div>
   );
 }

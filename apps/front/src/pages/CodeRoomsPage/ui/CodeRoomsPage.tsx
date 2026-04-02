@@ -498,11 +498,11 @@ export const CodeRoomsPage: React.FC = () => {
                   </div>
                 </div>
                 <div className="solo-practice-filter-group">
-                  <span className="solo-practice-filter-label">Компания / Группа</span>
+                  <span className="solo-practice-filter-label">Компания</span>
                   <FancySelect
                     value={prepLaunchCompany}
                     options={[
-                      { value: 'all', label: 'Все группы' },
+                      { value: 'all', label: 'Все компании' },
                       { value: 'ozon', label: 'ozon' },
                       { value: 'avito', label: 'avito' },
                       { value: 'general', label: 'general' },
@@ -521,7 +521,12 @@ export const CodeRoomsPage: React.FC = () => {
                   </div>
                   <div className="solo-practice-hero__copy">
                     <h4>Mock Interview</h4>
-                    <p>Полноценная симуляция интервью: coding, follow-up и system design. AI оценит твоё решение и даст советы.</p>
+                    <p>
+                      Полноценная симуляция интервью: coding, follow-up и system design.
+                      {prepLaunchCompany === 'all'
+                        ? ' Если компанию не выбирать, запустится общий сценарий general.'
+                        : ` Сценарий будет собран под компанию ${prepLaunchCompany}.`}
+                    </p>
                   </div>
                 </div>
                 <button

@@ -10,20 +10,22 @@ export const PageLayout: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const isCodeRoom = /^\/code-rooms\/[^/]+$/.test(location.pathname);
   const isArenaMatch = /^\/arena\/[^/]+$/.test(location.pathname);
+  const isInterviewPrepSession = /^\/interview-prep\/[^/]+$/.test(location.pathname);
+  const isInterviewPrepMock = /^\/interview-prep\/mock\/[^/]+$/.test(location.pathname);
   const isCodeRoomsDashboard = location.pathname === '/code-rooms';
   const isCodeTasksAdmin = location.pathname === '/admin/code-tasks';
   const isGuestCodeRoomsSurface = !isAuthenticated && isCodeRoomsDashboard;
   const showShell = !isCodeRoom && !isArenaMatch && !isGuestCodeRoomsSurface;
   const contentClassName = isArenaMatch
     ? 'content-wrapper content-wrapper-code-room'
-    : isCodeTasksAdmin || isCodeRoom
+    : isCodeTasksAdmin || isCodeRoom || isInterviewPrepSession || isInterviewPrepMock
       ? 'content-wrapper content-wrapper-wide'
       : 'content-wrapper';
 
   return (
     <div className="app-container">
       {showShell && <Sidebar />}
-      <main className={isCodeRoom || isArenaMatch ? 'main-content main-content-code-room' : 'main-content'}>
+      <main className={isCodeRoom || isArenaMatch || isInterviewPrepSession || isInterviewPrepMock ? 'main-content main-content-code-room' : 'main-content'}>
         <div className={contentClassName}>
           <Outlet />
         </div>

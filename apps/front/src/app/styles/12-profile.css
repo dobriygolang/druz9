@@ -87,7 +87,7 @@
 .profile-main-card {
   display: flex;
   gap: var(--space-6);
-  align-items: flex-start;
+  align-items: center;
   margin-bottom: var(--space-6);
   flex-wrap: wrap;
   background: var(--surface-color);
@@ -104,6 +104,16 @@
   background-color: var(--surface-elevated);
   border: 2px solid var(--border-active);
   flex-shrink: 0;
+  background-image: var(--avatar-url);
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  font-weight: 800;
+  color: var(--text-primary);
+  box-shadow: var(--shadow-md);
 }
 
 .profile-name {
@@ -128,7 +138,16 @@
   font-size: var(--font-size-sm);
 }
 
+.profile-detail-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 .profile-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   padding: var(--space-1) var(--space-3);
   border-radius: var(--radius-sm);
   font-size: 10px;
@@ -137,9 +156,27 @@
   letter-spacing: 0.05em;
 }
 
+.profile-status-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 999px;
+  background: currentColor;
+  opacity: 0.85;
+}
+
 .profile-status--online {
   background: var(--success-muted);
   color: var(--success-color);
+}
+
+.profile-status--recently {
+  background: rgba(245, 158, 11, 0.12);
+  color: var(--warning-color);
+}
+
+.profile-status--offline {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text-secondary);
 }
 
 /* League Banner */
@@ -157,6 +194,77 @@
   margin: 0;
   font-size: var(--font-size-lg);
   font-weight: 800;
+}
+
+.profile-league-banner__content {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  justify-content: space-between;
+}
+
+.profile-league-banner__title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.profile-league-banner__stats {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.profile-league-banner__stat {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.profile-info {
+  flex: 1 1 280px;
+  min-width: 0;
+}
+
+.profile-badges {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.profile-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-height: 34px;
+  padding: 0 12px;
+  border-radius: 999px;
+  border: 1px solid var(--border-color);
+  background: var(--surface-elevated);
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.profile-badge--account {
+  color: var(--accent-hover);
+}
+
+.profile-badge--admin {
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.24);
+}
+
+.profile-telegram-btn {
+  min-height: 38px;
 }
 
 /* Master League Example */
@@ -219,6 +327,25 @@
 
   .profile-name {
     font-size: var(--font-size-lg);
+  }
+
+  .profile-main-card {
+    gap: 16px;
+  }
+
+  .profile-badges {
+    justify-content: center;
+  }
+
+  .profile-toasts {
+    right: 12px;
+    left: 12px;
+    top: 12px;
+  }
+
+  .profile-toast {
+    min-width: 0;
+    max-width: none;
   }
 }
 

@@ -127,6 +127,10 @@ export function InterviewPrepMockSessionPage() {
   }, []);
 
   const currentStage = session?.currentStage;
+  const completedStages = useMemo(
+    () => (session?.stages ?? []).filter((stage) => stage.status === 'completed'),
+    [session],
+  );
   const progress = useMemo(() => {
     const stages = session?.stages ?? [];
     const completed = stages.filter((stage) => stage.status === 'completed').length;
@@ -312,6 +316,29 @@ export function InterviewPrepMockSessionPage() {
             </div>
             <pre className="interview-prep-statement">{currentStage.task?.statement ?? ''}</pre>
           </section>
+
+          {completedStages.length > 0 && (
+            <section className="card dashboard-card">
+              <div className="dashboard-card__header">
+                <div>
+                  <h2>Пройденные этапы</h2>
+                  <p className="interview-prep-muted">Краткая история секций, которые ты уже закрыл в этом mock interview.</p>
+                </div>
+              </div>
+              <div className="interview-prep-results">
+                {completedStages.map((stage) => (
+                  <div key={stage.id} className="interview-prep-result-row interview-prep-result-row--stacked">
+                    <strong>{STAGE_LABELS[stage.kind]}{stage.task?.title ? ` · ${stage.task.title}` : ''}</strong>
+                    <span>
+                      {stage.lastSubmissionPassed ? 'Автопроверка пройдена' : 'Этап завершён'}
+                      {stage.reviewScore ? ` · ${stage.reviewScore}/10` : ''}
+                    </span>
+                    {stage.reviewSummary ? <span>{stage.reviewSummary}</span> : null}
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
 
           {session.status === 'finished' && (
             <section className="card dashboard-card interview-prep-finished">

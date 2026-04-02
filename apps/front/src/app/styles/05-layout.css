@@ -75,7 +75,7 @@
 }
 
 .main-content-code-room {
-  padding: var(--space-3) var(--space-5) var(--space-6);
+  padding: var(--space-3) var(--space-4) var(--space-6);
   overflow: auto;
 }
 
@@ -87,7 +87,7 @@
 }
 
 .content-wrapper-wide {
-  max-width: min(1720px, calc(100vw - 64px));
+  max-width: min(1880px, calc(100vw - 48px));
 }
 
 .content-wrapper-code-room {
@@ -997,6 +997,11 @@
   background: rgba(255, 255, 255, 0.02);
 }
 
+.interview-prep-result-row--stacked {
+  flex-direction: column;
+  align-items: flex-start;
+}
+
 .interview-prep-question-card {
   display: flex;
   flex-direction: column;
@@ -1471,6 +1476,8 @@
 .events-filter-card {
   padding: 20px;
   border-radius: 22px;
+  width: min(920px, 100%);
+  margin: 0 auto;
 }
 
 .events-filter-card__icon {
@@ -1514,6 +1521,8 @@
   display: flex;
   flex-direction: column;
   min-height: 620px;
+  width: min(1240px, 100%);
+  margin: 0 auto;
   background:
     radial-gradient(circle at top right, rgba(93, 87, 255, 0.08), transparent 34%),
     rgba(255, 255, 255, 0.02);

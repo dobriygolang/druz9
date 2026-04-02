@@ -1199,20 +1199,21 @@
 
 /* Solo Practice Redesign */
 .solo-practice-section {
-  padding: 0;
+  padding: 24px 28px;
   overflow: hidden;
   display: flex;
   flex-direction: column;
+  gap: 20px;
+  background:
+    radial-gradient(circle at top right, rgba(99, 102, 241, 0.08), transparent 34%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.025), rgba(255, 255, 255, 0.01));
 }
 
 .solo-practice-section__head {
-  padding: 24px 28px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 32px;
-  background: rgba(255, 255, 255, 0.015);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
 .solo-practice-section__title-wrap {
@@ -1254,6 +1255,10 @@
   display: grid;
   grid-template-columns: 1.2fr 0.8fr;
   min-height: 220px;
+  border-radius: 24px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(0, 0, 0, 0.14);
 }
 
 .solo-practice-hero {
@@ -1375,6 +1380,11 @@
 }
 
 @media (max-width: 1024px) {
+  .solo-practice-section {
+    padding: 18px;
+    border-radius: 22px;
+  }
+
   .solo-practice-grid {
     grid-template-columns: 1fr;
   }
@@ -1498,7 +1508,7 @@
 
 .interview-prep-mock-layout {
   display: grid;
-  grid-template-columns: 240px 1fr 300px;
+  grid-template-columns: 220px minmax(0, 1fr) 280px;
   gap: 24px;
   align-items: start;
 }
@@ -1634,6 +1644,7 @@
 .interview-prep-workstation {
   padding: 0;
   overflow: hidden;
+  border-radius: 24px;
 }
 
 .workstation-toolbar {
@@ -1656,6 +1667,7 @@
 
 .workstation-editor {
   background: #0f172a;
+  width: 100%;
 }
 
 .workstation-footer {
@@ -1883,8 +1895,13 @@
 /* Responsive Overrides */
 @media (max-width: 1200px) {
   .interview-prep-mock-layout {
-    grid-template-columns: 200px 1fr;
+    grid-template-columns: 1fr;
   }
+
+  .interview-prep-mock-timeline {
+    position: static;
+  }
+
   .interview-prep-mock-console {
     grid-column: 1 / -1;
     display: grid;
@@ -1903,5 +1920,17 @@
   }
   .design-notes-grid {
     grid-template-columns: 1fr;
+  }
+
+  .task-statement-card {
+    padding: 18px;
+  }
+
+  .workstation-question-box {
+    padding: 20px;
+  }
+
+  .workstation-question-box blockquote {
+    font-size: 16px;
   }
 }
