@@ -1744,12 +1744,12 @@
 }
 
 .map-shell {
-  padding: 0;
+  padding: 0 !important;
   overflow: hidden;
   position: relative;
   background: #111827;
   border-radius: 24px;
-  min-height: 720px;
+  min-height: 620px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   box-shadow: 0 28px 80px rgba(0, 0, 0, 0.3);
 }
