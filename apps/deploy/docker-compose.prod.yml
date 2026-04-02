@@ -240,9 +240,7 @@ services:
       S3_SECRET_KEY_FILE: /run/secrets/s3_secret_key
       S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-}
       AI_REVIEW_API_KEY_FILE: /run/secrets/ai_review_api_key
-      YANDEX_OAUTH_CLIENT_ID: ${YANDEX_OAUTH_CLIENT_ID}
       YANDEX_OAUTH_CLIENT_SECRET: ${YANDEX_OAUTH_CLIENT_SECRET}
-      YANDEX_OAUTH_REDIRECT_URL: ${YANDEX_OAUTH_REDIRECT_URL}
     volumes:
       - ../api/.platform/values_prod.yaml:/app/.platform/values_prod.yaml:ro
     command: ["/app/bin/api"]
