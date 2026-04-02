@@ -98,7 +98,9 @@ VALUES (
   NOW(),
   NOW()
 )
-ON CONFLICT (telegram_id) WHERE telegram_id IS NOT NULL DO UPDATE
+ON CONFLICT (telegram_id)
+WHERE telegram_id IS NOT NULL
+DO UPDATE
 SET
   username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''), ''),
   first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
@@ -165,7 +167,9 @@ VALUES (
   NOW(),
   NOW()
 )
-ON CONFLICT (yandex_id) DO UPDATE
+ON CONFLICT (yandex_id)
+WHERE yandex_id IS NOT NULL AND yandex_id <> ''
+DO UPDATE
 SET
   username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''), ''),
   first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
