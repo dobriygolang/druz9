@@ -287,3 +287,5 @@ secrets:
     file: ./runtime/secrets/prod/minio_root_user
   minio_root_password:
     file: ./runtime/secrets/prod/minio_root_password
+  yandex_oauth_client_secret:
+    file: ./runtime/secrets/prod/yandex_oauth_client_secret

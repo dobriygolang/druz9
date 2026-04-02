@@ -66,68 +66,50 @@ func (r *Repo) upsertTelegramUserTx(ctx context.Context, tx pgx.Tx, payload mode
 	}
 
 	query := `
-WITH existing_user AS (
-  SELECT id
-  FROM users
-  WHERE telegram_id = $1
-),
-created_user AS (
-  INSERT INTO users (
-    id,
-    username,
-    first_name,
-    last_name,
-    avatar_url,
-    telegram_id,
-    telegram_username,
-    telegram_avatar_url,
-    primary_provider,
-    current_workplace,
-    status,
-    last_active_at,
-    created_at,
-    updated_at
-  )
-  SELECT
-    gen_random_uuid(),
-    COALESCE(NULLIF($2, ''), ''),
-    COALESCE(NULLIF($3, ''), ''),
-    COALESCE(NULLIF($4, ''), ''),
-    COALESCE(NULLIF($5, ''), ''),
-    $1,
-    COALESCE(NULLIF($2, ''), ''),
-    COALESCE(NULLIF($5, ''), ''),
-    'telegram',
-    '',
-    $6,
-    NOW(),
-    NOW(),
-    NOW()
-  WHERE NOT EXISTS (SELECT 1 FROM existing_user)
-  RETURNING id
-),
-target_user AS (
-  SELECT id FROM existing_user
-  UNION ALL
-  SELECT id FROM created_user
-),
-updated_user AS (
-  UPDATE users u
-  SET
-    username = COALESCE(NULLIF(u.username, ''), NULLIF($2, ''), ''),
-    first_name = COALESCE(NULLIF($3, ''), u.first_name),
-    last_name = COALESCE(NULLIF($4, ''), u.last_name),
-    avatar_url = COALESCE(NULLIF(u.avatar_url, ''), NULLIF($5, ''), ''),
-    telegram_id = $1,
-    telegram_username = COALESCE(NULLIF($2, ''), u.telegram_username, ''),
-    telegram_avatar_url = COALESCE(NULLIF($5, ''), u.telegram_avatar_url, ''),
-    primary_provider = COALESCE(NULLIF(u.primary_provider, ''), 'telegram'),
-    last_active_at = NOW(),
-    updated_at = NOW()
-  WHERE u.id = (SELECT id FROM target_user LIMIT 1)
-  RETURNING u.id
+INSERT INTO users (
+  id,
+  username,
+  first_name,
+  last_name,
+  avatar_url,
+  telegram_id,
+  telegram_username,
+  telegram_avatar_url,
+  primary_provider,
+  current_workplace,
+  status,
+  last_active_at,
+  created_at,
+  updated_at
 )
-SELECT id FROM updated_user
+VALUES (
+  gen_random_uuid(),
+  COALESCE(NULLIF($2, ''), ''),
+  COALESCE(NULLIF($3, ''), ''),
+  COALESCE(NULLIF($4, ''), ''),
+  COALESCE(NULLIF($5, ''), ''),
+  $1,
+  COALESCE(NULLIF($2, ''), ''),
+  COALESCE(NULLIF($5, ''), ''),
+  'telegram',
+  '',
+  $6,
+  NOW(),
+  NOW(),
+  NOW()
+)
+ON CONFLICT (telegram_id) WHERE telegram_id IS NOT NULL DO UPDATE
+SET
+  username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''), ''),
+  first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
+  last_name = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
+  avatar_url = COALESCE(NULLIF(users.avatar_url, ''), NULLIF(EXCLUDED.avatar_url, ''), ''),
+  telegram_username = COALESCE(NULLIF(EXCLUDED.telegram_username, ''), users.telegram_username, ''),
+  telegram_avatar_url = COALESCE(NULLIF(EXCLUDED.telegram_avatar_url, ''), users.telegram_avatar_url, ''),
+  primary_provider = COALESCE(NULLIF(users.primary_provider, ''), 'telegram'),
+  last_active_at = NOW(),
+  updated_at = NOW()
+RETURNING id
 `
 
 	var userID uuid.UUID
@@ -149,84 +131,66 @@ SELECT id FROM updated_user
 
 func (r *Repo) upsertYandexUserTx(ctx context.Context, tx pgx.Tx, payload model.IdentityAuthPayload) (*model.User, error) {
 	query := `
-WITH existing_user AS (
-  SELECT id
-  FROM users
-  WHERE yandex_id = $1
-),
-created_user AS (
-  INSERT INTO users (
-    id,
-    username,
-    first_name,
-    last_name,
-    avatar_url,
-    yandex_id,
-    yandex_login,
-    yandex_email,
-    yandex_avatar_url,
-    primary_provider,
-    current_workplace,
-    status,
-    last_active_at,
-    created_at,
-    updated_at
-  )
-  SELECT
-    gen_random_uuid(),
-    COALESCE(NULLIF($2, ''), ''),
-    COALESCE(NULLIF($3, ''), ''),
-    COALESCE(NULLIF($4, ''), ''),
-    COALESCE(NULLIF($5, ''), ''),
-    $1,
-    COALESCE(NULLIF($2, ''), ''),
-    COALESCE(NULLIF($6, ''), ''),
-    COALESCE(NULLIF($5, ''), ''),
-    'yandex',
-    '',
-    $7,
-    NOW(),
-    NOW(),
-    NOW()
-  WHERE NOT EXISTS (SELECT 1 FROM existing_user)
-  RETURNING id
-),
-target_user AS (
-  SELECT id FROM existing_user
-  UNION ALL
-  SELECT id FROM created_user
-),
-updated_user AS (
-  UPDATE users u
-  SET
-    username = COALESCE(NULLIF(u.username, ''), NULLIF($2, ''), ''),
-    first_name = COALESCE(NULLIF($3, ''), u.first_name),
-    last_name = COALESCE(NULLIF($4, ''), u.last_name),
-    avatar_url = COALESCE(NULLIF(u.avatar_url, ''), NULLIF($5, ''), ''),
-    yandex_id = $1,
-    yandex_login = COALESCE(NULLIF($2, ''), u.yandex_login, ''),
-    yandex_email = COALESCE(NULLIF($6, ''), u.yandex_email, ''),
-    yandex_avatar_url = COALESCE(NULLIF($5, ''), u.yandex_avatar_url, ''),
-    primary_provider = COALESCE(NULLIF(u.primary_provider, ''), 'yandex'),
-    last_active_at = NOW(),
-    updated_at = NOW()
-  WHERE u.id = (SELECT id FROM target_user LIMIT 1)
-  RETURNING u.id
+INSERT INTO users (
+  id,
+  username,
+  first_name,
+  last_name,
+  avatar_url,
+  yandex_id,
+  yandex_login,
+  yandex_email,
+  yandex_avatar_url,
+  primary_provider,
+  current_workplace,
+  status,
+  last_active_at,
+  created_at,
+  updated_at
 )
-SELECT id FROM updated_user
+VALUES (
+  gen_random_uuid(),
+  COALESCE(NULLIF($2, ''), ''),
+  COALESCE(NULLIF($3, ''), ''),
+  COALESCE(NULLIF($4, ''), ''),
+  COALESCE(NULLIF($5, ''), ''),
+  $1,
+  COALESCE(NULLIF($2, ''), ''),
+  COALESCE(NULLIF($6, ''), ''),
+  COALESCE(NULLIF($5, ''), ''),
+  'yandex',
+  '',
+  $7,
+  NOW(),
+  NOW(),
+  NOW()
+)
+ON CONFLICT (yandex_id) DO UPDATE
+SET
+  username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''), ''),
+  first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
+  last_name = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
+  avatar_url = COALESCE(NULLIF(users.avatar_url, ''), NULLIF(EXCLUDED.avatar_url, ''), ''),
+  yandex_login = COALESCE(NULLIF(EXCLUDED.yandex_login, ''), users.yandex_login, ''),
+  yandex_email = COALESCE(NULLIF(EXCLUDED.yandex_email, ''), users.yandex_email, ''),
+  yandex_avatar_url = COALESCE(NULLIF(EXCLUDED.yandex_avatar_url, ''), users.yandex_avatar_url, ''),
+  primary_provider = COALESCE(NULLIF(users.primary_provider, ''), 'yandex'),
+  last_active_at = NOW(),
+  updated_at = NOW()
+RETURNING id
 `
 
 	var userID uuid.UUID
 	if err := tx.QueryRow(
 		ctx,
 		query,
-		payload.ProviderUserID,         // $1 - yandex_id
-		payload.Username,               // $2 - username/yandex_login
-		payload.FirstName,              // $3 - first_name
-		payload.LastName,               // $4 - last_name
-		payload.AvatarURL,              // $5 - avatar_url/yandex_avatar_url
-		payload.Email,                  // $6 - yandex_email
-		model.UserStatusPendingProfile, // $7 - status
+		payload.ProviderUserID,
+		payload.Username,
+		payload.FirstName,
+		payload.LastName,
+		payload.AvatarURL,
+		payload.Email,
+		model.UserStatusPendingProfile,
 	).Scan(&userID); err != nil {
 		return nil, fmt.Errorf("upsert yandex user: %w", err)
 	}
