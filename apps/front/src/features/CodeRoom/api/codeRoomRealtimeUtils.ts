@@ -211,7 +211,6 @@ export const buildAwarenessStyles = (
     }
     const isOffline = typedState?.active === false;
     const selectionAlpha = isOffline ? 0.16 : 0.3;
-    const backgroundAlpha = isOffline ? 0.85 : 0.98;
 
     css += `
       .code-room-remote-selection-${awarenessID} {
