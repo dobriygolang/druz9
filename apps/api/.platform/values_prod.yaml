@@ -184,7 +184,7 @@ yandex_oauth_client_id:
 yandex_oauth_redirect_url:
   usage: "Yandex OAuth callback URL; env YANDEX_OAUTH_REDIRECT_URL overrides"
   group: "external"
-  value: "https://druz9.online/api/v1/profile/auth/yandex/callback"
+  value: "https://druz9.online/auth/callback"
   type: "string"
   writable: false
 
