@@ -37,6 +37,12 @@ function pluralizeRu(count: number, one: string, few: string, many: string) {
   return many;
 }
 
+function hasValidEventCoordinates(event: CommunityEvent) {
+  return Number.isFinite(event.latitude) &&
+    Number.isFinite(event.longitude) &&
+    !(event.latitude === 0 && event.longitude === 0);
+}
+
 function buildViewState(points: CommunityMapPoint[], events: CommunityEvent[]): ViewState {
   const currentUserPoint = points.find((point) => point.isCurrentUser);
   if (currentUserPoint) {
@@ -44,7 +50,7 @@ function buildViewState(points: CommunityMapPoint[], events: CommunityEvent[]): 
   }
   const allCoordinates = [
     ...points.map(p => ({ lng: p.longitude, lat: p.latitude })),
-    ...events.map(e => ({ lng: e.longitude, lat: e.latitude })),
+    ...events.filter(hasValidEventCoordinates).map(e => ({ lng: e.longitude, lat: e.latitude })),
   ];
   if (allCoordinates.length === 0) return { longitude: 37.6176, latitude: 55.7558, zoom: 4.5 };
   const totals = allCoordinates.reduce((acc, p) => ({ lng: acc.lng + p.lng, lat: acc.lat + p.lat }), { lng: 0, lat: 0 });
@@ -171,7 +177,8 @@ export const MapPage: React.FC = () => {
 
   const visibleUserPoints = useMemo(() => distributeByCoordinates(points, viewState.zoom), [points, viewState.zoom]);
   const userClusters = useMemo(() => buildUserClusters(points, viewState.zoom), [points, viewState.zoom]);
-  const displayEvents = useMemo(() => distributeByCoordinates(events, viewState.zoom), [events, viewState.zoom]);
+  const mappableEvents = useMemo(() => events.filter(hasValidEventCoordinates), [events]);
+  const displayEvents = useMemo(() => distributeByCoordinates(mappableEvents, viewState.zoom), [mappableEvents, viewState.zoom]);
   const selectedUser = useMemo(() => visibleUserPoints.find(p => p.userId === selectedUserId), [visibleUserPoints, selectedUserId]);
   const selectedEvent = useMemo(() => events.find(e => e.id === selectedEventId), [events, selectedEventId]);
 
@@ -301,7 +308,7 @@ export const MapPage: React.FC = () => {
           </div>
           <div className="map-hero__stat">
             <CalendarDays size={16} />
-            <span>{events.length} {pluralizeRu(events.length, 'событие', 'события', 'событий')}</span>
+            <span>{mappableEvents.length} {pluralizeRu(mappableEvents.length, 'событие', 'события', 'событий')}</span>
           </div>
           <div className="map-hero__stat">
             <Sparkles size={16} />
@@ -317,7 +324,7 @@ export const MapPage: React.FC = () => {
         <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 3, display: 'flex', gap: '10px' }}>
           <div className="card" style={{ padding: '12px 14px', background: 'rgba(17,24,39,0.88)' }}>
             <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>На карте</div>
-            <div style={{ fontWeight: 600 }}>{events.length} {pluralizeRu(events.length, 'событие', 'события', 'событий')}</div>
+            <div style={{ fontWeight: 600 }}>{mappableEvents.length} {pluralizeRu(mappableEvents.length, 'событие', 'события', 'событий')}</div>
           </div>
         </div>
 

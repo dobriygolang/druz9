@@ -58,6 +58,12 @@ export function InterviewPrepPage() {
   const [modeFilter, setModeFilter] = useState<TaskModeFilter>((searchParams.get('mode') as TaskModeFilter) || 'all');
   const [category, setCategory] = useState<TaskCategory>((searchParams.get('category') as TaskCategory) || 'all');
   const [company, setCompany] = useState(searchParams.get('company') ?? 'all');
+  const [visibleCounts, setVisibleCounts] = useState<Record<TaskCategory, number>>({
+    coding: 3,
+    sql: 3,
+    system_design: 3,
+    all: 3,
+  });
   const randomLaunchTriggered = useRef(false);
 
   useEffect(() => {
@@ -96,13 +102,35 @@ export function InterviewPrepPage() {
     };
   }, [tasks]);
 
+  const tasksForCategoryStats = useMemo(() => {
+    return tasks.filter((task) => {
+      if (!task.isExecutable && task.prepType !== 'system_design') {
+        return false;
+      }
+      if (company !== 'all' && (task.companyTag || 'general') !== company) {
+        return false;
+      }
+      if (modeFilter === 'executable' && !task.isExecutable) {
+        return false;
+      }
+      if (modeFilter === 'guided' && task.isExecutable) {
+        return false;
+      }
+      if (!search.trim()) {
+        return true;
+      }
+      const haystack = `${task.title} ${task.statement} ${task.language} ${task.prepType} ${task.companyTag}`.toLowerCase();
+      return haystack.includes(search.trim().toLowerCase());
+    });
+  }, [tasks, company, modeFilter, search]);
+
   const categoryStats = useMemo(() => {
     return CATEGORY_ORDER.map((item) => ({
       key: item,
       label: CATEGORY_LABELS[item],
-      count: tasks.filter((task) => categoryForTask(task) === item).length,
+      count: tasksForCategoryStats.filter((task) => categoryForTask(task) === item).length,
     }));
-  }, [tasks]);
+  }, [tasksForCategoryStats]);
 
   const companyOptions = useMemo(() => {
     const tags = Array.from(new Set(tasks.map((task) => task.companyTag).filter(Boolean))).sort();
@@ -147,6 +175,15 @@ export function InterviewPrepPage() {
       .map((key) => ({ key, label: CATEGORY_LABELS[key], tasks: groups.get(key) ?? [] }))
       .filter((group) => group.tasks.length > 0);
   }, [filteredTasks]);
+
+  useEffect(() => {
+    setVisibleCounts({
+      coding: 3,
+      sql: 3,
+      system_design: 3,
+      all: 3,
+    });
+  }, [category, company, modeFilter, search]);
 
   const startTask = async (taskId: string) => {
     setError(null);
@@ -336,8 +373,13 @@ export function InterviewPrepPage() {
         </section>
       ) : (
         <div className="interview-prep-groups">
-          {groupedTasks.map((group) => (
-            <section key={group.key} className="interview-prep-group">
+          {groupedTasks.map((group) => {
+            const visibleCount = visibleCounts[group.key] ?? 3;
+            const visibleTasks = group.tasks.slice(0, visibleCount);
+            const hasMore = group.tasks.length > visibleTasks.length;
+
+            return (
+              <section key={group.key} className="interview-prep-group">
               <div className="interview-prep-group__head">
                 <div>
                   <h2>{group.label}</h2>
@@ -350,7 +392,7 @@ export function InterviewPrepPage() {
               </div>
 
               <section className="interview-prep-grid">
-                {group.tasks.map((task) => {
+                {visibleTasks.map((task) => {
                   const taskCategory = categoryForTask(task);
                   return (
                     <article key={task.id} className={`card dashboard-card interview-prep-card interview-prep-card--category ${categoryAccentClass(taskCategory)}`}>
@@ -392,8 +434,23 @@ export function InterviewPrepPage() {
                   );
                 })}
               </section>
-            </section>
-          ))}
+              {hasMore && (
+                <div style={{ display: 'flex', justifyContent: 'center', marginTop: '14px' }}>
+                  <button
+                    type="button"
+                    className="btn btn-secondary"
+                    onClick={() => setVisibleCounts((current) => ({
+                      ...current,
+                      [group.key]: (current[group.key] ?? 3) + 3,
+                    }))}
+                  >
+                    Показать ещё 3
+                  </button>
+                </div>
+              )}
+              </section>
+            );
+          })}
         </div>
       )}
     </div>

@@ -183,16 +183,24 @@ export const EventForm: React.FC<EventFormProps> = ({
                 style={{ background: 'transparent', border: 'none', color: 'white', padding: 0, width: '100%' }}
               />
               <div style={{ fontSize: '11px', opacity: 0.6 }}>{draft.latitude.toFixed(4)}, {draft.longitude.toFixed(4)}</div>
+              <div style={{ fontSize: '11px', opacity: 0.7, marginTop: '4px' }}>
+                На карте показываются только события с точными координатами.
+              </div>
             </div>
           </div>
         ) : (
-          <input
-            className="input"
-            placeholder="Местоположение (опционально)"
-            value={draft.place_label}
-            onChange={(e) => setDraft(curr => curr ? { ...curr, place_label: e.target.value } : null)}
-            style={{ background: 'rgba(0,0,0,0.2)', height: '44px' }}
-          />
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
+            <input
+              className="input"
+              placeholder="Название места (без координат точка на карте не появится)"
+              value={draft.place_label}
+              onChange={(e) => setDraft(curr => curr ? { ...curr, place_label: e.target.value } : null)}
+              style={{ background: 'rgba(0,0,0,0.2)', height: '44px' }}
+            />
+            <div style={{ fontSize: '12px', color: 'var(--text-secondary)' }}>
+              Сейчас карта принимает только события с координатами. Один текст локации без latitude/longitude не ставит точку на карту.
+            </div>
+          </div>
         )}
 
         <div style={{ position: 'relative' }}>
