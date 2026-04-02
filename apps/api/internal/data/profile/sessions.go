@@ -64,17 +64,17 @@ func (r *Repo) DeleteSessionByHash(ctx context.Context, tokenHash string) error 
 }
 
 func (r *Repo) FindSessionByHash(ctx context.Context, tokenHash string) (*model.AuthState, error) {
-	const query = `
+	query := fmt.Sprintf(`
 SELECT
   s.id, s.user_id, s.token_hash, s.last_seen_at, s.expires_at,
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
 FROM sessions s
 JOIN users u ON u.id = s.user_id
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE s.token_hash = $1
-`
+`, r.trustedSelect("u.is_trusted"))
 
 	var session model.Session
 	var user model.User

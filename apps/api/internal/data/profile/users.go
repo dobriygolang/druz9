@@ -12,8 +12,22 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
+func (r *Repo) trustedSelect(columnRef string) string {
+	if r != nil && r.hasTrustedFlag {
+		return columnRef
+	}
+	return "FALSE AS is_trusted"
+}
+
+func (r *Repo) trustedReturning() string {
+	if r != nil && r.hasTrustedFlag {
+		return "is_trusted"
+	}
+	return "FALSE AS is_trusted"
+}
+
 func (r *Repo) UpsertTelegramUser(ctx context.Context, payload model.TelegramAuthPayload) (*model.User, error) {
-	const query = `
+	query := fmt.Sprintf(`
 WITH upserted_user AS (
   INSERT INTO users (
     id,
@@ -47,6 +61,7 @@ WITH upserted_user AS (
     current_workplace,
     status,
     is_admin,
+    %s,
     last_active_at,
     created_at,
     updated_at
@@ -54,10 +69,10 @@ WITH upserted_user AS (
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
 FROM upserted_user u
 LEFT JOIN geo g ON g.user_id = u.id
-`
+`, r.trustedReturning(), r.trustedSelect("u.is_trusted"))
 	return scanUser(r.data.DB.QueryRow(
 		ctx,
 		query,
@@ -72,7 +87,7 @@ LEFT JOIN geo g ON g.user_id = u.id
 }
 
 func (r *Repo) CreatePasswordUser(ctx context.Context, req model.PasswordRegistrationRequest, passwordHash string) (*model.User, error) {
-	const query = `
+	query := fmt.Sprintf(`
 WITH created_user AS (
   INSERT INTO users (
     id,
@@ -101,6 +116,7 @@ WITH created_user AS (
     current_workplace,
     status,
     is_admin,
+    %s,
     last_active_at,
     created_at,
     updated_at
@@ -108,10 +124,10 @@ WITH created_user AS (
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
 FROM created_user u
 LEFT JOIN geo g ON g.user_id = u.id
-`
+`, r.trustedReturning(), r.trustedSelect("u.is_trusted"))
 	return scanUser(r.data.DB.QueryRow(
 		ctx,
 		query,
@@ -125,16 +141,16 @@ LEFT JOIN geo g ON g.user_id = u.id
 }
 
 func (r *Repo) FindPasswordUserByLogin(ctx context.Context, login string) (*model.User, string, error) {
-	const query = `
+	query := fmt.Sprintf(`
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at,
+  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at,
   COALESCE(u.password_hash, '')
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE LOWER(u.login) = LOWER($1)
-`
+`, r.trustedSelect("u.is_trusted"))
 
 	var (
 		user              model.User
@@ -171,47 +187,47 @@ WHERE LOWER(u.login) = LOWER($1)
 }
 
 func (r *Repo) FindUserByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
-	const query = `
+	query := fmt.Sprintf(`
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE id = $1
-`
+`, r.trustedSelect("u.is_trusted"))
 	return scanUser(r.data.DB.QueryRow(ctx, query, id))
 }
 
 func (r *Repo) FindUserByTelegramID(ctx context.Context, telegramID int64) (*model.User, error) {
-	const query = `
+	query := fmt.Sprintf(`
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE telegram_id = $1
-`
+`, r.trustedSelect("u.is_trusted"))
 	return scanUser(r.data.DB.QueryRow(ctx, query, telegramID))
 }
 
 func (r *Repo) UpdateProfile(ctx context.Context, userID uuid.UUID, currentWorkplace string) (*model.User, error) {
-	const query = `
+	query := fmt.Sprintf(`
 WITH updated_user AS (
   UPDATE users
   SET current_workplace = $2,
       updated_at = NOW()
   WHERE id = $1
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, is_trusted, last_active_at, created_at, updated_at
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, %s, last_active_at, created_at, updated_at
 )
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
 FROM updated_user u
 LEFT JOIN geo g ON g.user_id = u.id
-`
+`, r.trustedReturning(), r.trustedSelect("u.is_trusted"))
 	return scanUser(r.data.DB.QueryRow(ctx, query, userID, currentWorkplace))
 }
 
@@ -258,15 +274,15 @@ ON CONFLICT (user_id) DO UPDATE SET
 		return nil, fmt.Errorf("upsert user geo: %w", err)
 	}
 
-	const query = `
+	query := fmt.Sprintf(`
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE u.id = $1
-`
+`, r.trustedSelect("u.is_trusted"))
 	user, err := scanUser(tx.QueryRow(ctx, query, userID))
 	if err != nil {
 		return nil, err
@@ -282,26 +298,26 @@ func (r *Repo) UpdateLocation(ctx context.Context, userID uuid.UUID, req model.C
 }
 
 func (r *Repo) UpdateAvatarURL(ctx context.Context, userID uuid.UUID, avatarURL string) (*model.User, error) {
-	const query = `
+	query := fmt.Sprintf(`
 WITH updated_user AS (
   UPDATE users
   SET avatar_url = $2,
       updated_at = NOW()
   WHERE id = $1
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, is_trusted, last_active_at, created_at, updated_at
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, %s, last_active_at, created_at, updated_at
 )
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
 FROM updated_user u
 LEFT JOIN geo g ON g.user_id = u.id
-`
+`, r.trustedReturning(), r.trustedSelect("u.is_trusted"))
 	return scanUser(r.data.DB.QueryRow(ctx, query, userID, nullIfEmpty(avatarURL)))
 }
 
 func (r *Repo) BindTelegram(ctx context.Context, userID uuid.UUID, payload model.TelegramAuthPayload) (*model.User, error) {
-	const query = `
+	query := fmt.Sprintf(`
 WITH updated_user AS (
   UPDATE users
   SET telegram_id = $2,
@@ -311,15 +327,15 @@ WITH updated_user AS (
       last_name = COALESCE(NULLIF($6, ''), last_name),
       updated_at = NOW()
   WHERE id = $1 AND telegram_id IS NULL
-  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, is_trusted, last_active_at, created_at, updated_at
+  RETURNING id, telegram_id, telegram_username, first_name, last_name, avatar_url, telegram_avatar_url, current_workplace, status, is_admin, %s, last_active_at, created_at, updated_at
 )
 SELECT
   u.id, u.telegram_id, u.telegram_username, u.first_name, u.last_name, u.avatar_url, u.telegram_avatar_url, u.current_workplace,
   g.region, g.country, g.city, g.latitude, g.longitude,
-  u.status, u.is_admin, u.is_trusted, u.last_active_at, u.created_at, u.updated_at
+  u.status, u.is_admin, %s, u.last_active_at, u.created_at, u.updated_at
 FROM updated_user u
 LEFT JOIN geo g ON g.user_id = u.id
-`
+`, r.trustedReturning(), r.trustedSelect("u.is_trusted"))
 	return scanUser(r.data.DB.QueryRow(ctx, query, userID, payload.ID, nullIfEmpty(payload.Username), nullIfEmpty(payload.PhotoURL), nullIfEmpty(payload.FirstName), nullIfEmpty(payload.LastName)))
 }
 
@@ -335,6 +351,10 @@ func (r *Repo) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 }
 
 func (r *Repo) UpdateUserTrusted(ctx context.Context, userID uuid.UUID, isTrusted bool) error {
+	if r == nil || !r.hasTrustedFlag {
+		return nil
+	}
+
 	tag, err := r.data.DB.Exec(ctx, `
 		UPDATE users
 		SET is_trusted = $2,
