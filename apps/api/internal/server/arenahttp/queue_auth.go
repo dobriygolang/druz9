@@ -36,9 +36,6 @@ func actorFromRequest(r *http.Request, authorizer Authorizer) (*model.User, bool
 	}
 
 	displayName := strings.TrimSpace(r.Header.Get(GuestNameHeader))
-	if displayName == "" {
-		displayName = "Игрок"
-	}
 	return &model.User{
 		ID:        parsedID,
 		FirstName: displayName,

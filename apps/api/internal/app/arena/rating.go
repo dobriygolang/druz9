@@ -86,7 +86,7 @@ func pickWinner(a, b *domain.Player) winnerCandidate {
 
 func resolveDisplayName(user *domain.User) string {
 	if user == nil {
-		return "Игрок"
+		return ""
 	}
 	value := strings.TrimSpace(strings.TrimSpace(user.FirstName) + " " + strings.TrimSpace(user.LastName))
 	if value != "" {
@@ -95,7 +95,7 @@ func resolveDisplayName(user *domain.User) string {
 	if value = strings.TrimSpace(user.Username); value != "" {
 		return value
 	}
-	return "Игрок"
+	return ""
 }
 
 func findPlayer(match *domain.Match, userID uuid.UUID) *domain.Player {

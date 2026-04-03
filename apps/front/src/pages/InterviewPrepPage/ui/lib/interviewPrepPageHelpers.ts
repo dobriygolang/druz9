@@ -9,6 +9,7 @@ export const PREP_TYPE_LABELS: Record<InterviewPrepType, string> = {
   system_design: 'System Design',
   sql: 'SQL',
   code_review: 'Code Review',
+  unspecified: 'Unspecified',
 };
 
 export const CATEGORY_LABELS: Record<TaskCategory, string> = {

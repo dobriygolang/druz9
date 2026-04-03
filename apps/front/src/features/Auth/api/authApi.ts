@@ -65,7 +65,7 @@ function normalizeActivityStatus(value: unknown): User['activityStatus'] {
   if (value === 1 || value === 'USER_ACTIVITY_STATUS_ONLINE' || value === 'online') return 'online';
   if (value === 2 || value === 'USER_ACTIVITY_STATUS_RECENTLY_ACTIVE' || value === 'recently_active') return 'recently_active';
   if (value === 3 || value === 'USER_ACTIVITY_STATUS_OFFLINE' || value === 'offline') return 'offline';
-  return 'offline';
+  return 'unspecified';
 }
 
 function normalizeUser(user: BackendUser): User {

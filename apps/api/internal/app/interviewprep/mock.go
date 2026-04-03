@@ -42,24 +42,6 @@ type mockQuestionTemplate struct {
 	Always bool
 }
 
-var mockQuestionBank = map[model.InterviewPrepMockStageKind][]mockQuestionTemplate{
-	model.InterviewPrepMockStageKindSlices: {
-		{Key: "slices-aliasing", Prompt: "Почему append по слайсу может неожиданно поменять исходный массив?", Answer: "Потому что slice — это view на backing array. Пока capacity позволяет, append пишет в тот же массив и может менять данные, на которые ссылаются другие slice.", Always: true},
-		{Key: "slices-capacity", Prompt: "Что важно помнить про len и cap при передаче слайса между функциями?", Answer: "len и cap влияют на то, где append создаст новый backing array. Если capacity хватает, изменения могут быть видны снаружи; если нет, append создаст копию.", Always: false},
-		{Key: "slices-copy", Prompt: "Когда здесь нужен copy, а не простое присваивание слайса?", Answer: "Когда нужно отделить данные и избежать aliasing между двумя представлениями одного backing array.", Always: false},
-	},
-	model.InterviewPrepMockStageKindConcurrency: {
-		{Key: "concurrency-contention", Prompt: "Где в таком решении главный contention point и как его уменьшить?", Answer: "Обычно contention появляется вокруг общего mutex, очереди или shared map. Уменьшают через sharding, worker ownership, bounded queues и локальные буферы.", Always: true},
-		{Key: "concurrency-cancel", Prompt: "Как здесь корректно завершать горутины без утечек?", Answer: "Нужен явный shutdown path: context cancellation, закрытие каналов по ownership rules, wait groups и bounded workers.", Always: false},
-		{Key: "concurrency-race", Prompt: "Где тут вероятнее всего появятся race conditions?", Answer: "На shared state, lifecycle каналов, двойном close, чтении после записи без синхронизации и в ошибках around goroutine ownership.", Always: false},
-	},
-	model.InterviewPrepMockStageKindSQL: {
-		{Key: "sql-index", Prompt: "Какие индексы поддержат такое решение и почему?", Answer: "Нужны индексы по join/filter/grouping полям. Конкретный выбор зависит от where/join/order by, но индекс должен покрывать hot predicates, а не создаваться абстрактно.", Always: true},
-		{Key: "sql-null", Prompt: "Как NULL и дубликаты могут сломать такой запрос?", Answer: "NULL меняет поведение агрегаций, join и сравнения, а дубликаты и fan-out через join могут раздуть counts и sums без dedup/grouping.", Always: false},
-		{Key: "sql-plan", Prompt: "Как бы ты проверил, что запрос не деградирует на реальных данных?", Answer: "Через EXPLAIN/ANALYZE, тестовые объёмы данных, проверку cardinality, индексов, sort/hash spill и worst-case plans.", Always: false},
-	},
-}
-
 var mockStageOrder = []model.InterviewPrepMockStageKind{
 	model.InterviewPrepMockStageKindSlices,
 	model.InterviewPrepMockStageKindConcurrency,
@@ -385,7 +367,10 @@ func (s *Service) buildMockStageQuestions(ctx context.Context, companyTag string
 	if err != nil {
 		return nil, err
 	}
-	templates := stageQuestionsForTask(stage.Kind, companyTag, task, taskQuestions, poolItems)
+	templates, err := stageQuestionsForTask(stage.Kind, companyTag, task, taskQuestions, poolItems)
+	if err != nil {
+		return nil, err
+	}
 	nowTime := time.Now().UTC()
 	results := make([]*model.InterviewPrepMockQuestionResult, 0, len(templates))
 	for index, template := range templates {
@@ -604,17 +589,22 @@ func extractPythonSolveStarter(code string) string {
 	return snippet
 }
 
-func stageQuestionsForTask(kind model.InterviewPrepMockStageKind, companyTag string, task *model.InterviewPrepTask, taskQuestions []*model.InterviewPrepQuestion, poolItems []*model.InterviewPrepMockQuestionPoolItem) []mockQuestionTemplate {
+func stageQuestionsForTask(kind model.InterviewPrepMockStageKind, companyTag string, task *model.InterviewPrepTask, taskQuestions []*model.InterviewPrepQuestion, poolItems []*model.InterviewPrepMockQuestionPoolItem) ([]mockQuestionTemplate, error) {
+	items := genericMockQuestions(kind, companyTag, poolItems)
+	if len(items) > 0 {
+		return items, nil
+	}
+
 	switch kind {
 	case model.InterviewPrepMockStageKindArchitecture, model.InterviewPrepMockStageKindSystemDesign:
-		return taskSpecificMockQuestions(task, kind, taskQuestions)
+		items = taskSpecificMockQuestions(task, taskQuestions)
 	default:
-		items := genericMockQuestions(kind, companyTag, poolItems)
-		if len(items) > 0 {
-			return items
-		}
-		return fallbackMockQuestions(kind)
+		items = nil
 	}
+	if len(items) == 0 {
+		return nil, ErrMockQuestionPoolIncomplete
+	}
+	return items, nil
 }
 
 func (s *Service) modelOverrideForStage(ctx context.Context, companyTag string, stage *model.InterviewPrepMockStage) string {
@@ -644,27 +634,6 @@ func (s *Service) modelOverrideForFollowup(ctx context.Context, companyTag strin
 		return s.modelFollowup
 	}
 	return s.modelOverrideForStage(ctx, companyTag, stage)
-}
-
-func fallbackMockQuestions(kind model.InterviewPrepMockStageKind) []mockQuestionTemplate {
-	pool := append([]mockQuestionTemplate{}, mockQuestionBank[kind]...)
-	if len(pool) <= 1 {
-		return pool
-	}
-	always := make([]mockQuestionTemplate, 0, len(pool))
-	optional := make([]mockQuestionTemplate, 0, len(pool))
-	for _, item := range pool {
-		if item.Always {
-			always = append(always, item)
-		} else {
-			optional = append(optional, item)
-		}
-	}
-	if len(optional) > 0 {
-		rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-		always = append(always, optional[rng.Intn(len(optional))])
-	}
-	return always
 }
 
 func genericMockQuestions(kind model.InterviewPrepMockStageKind, companyTag string, poolItems []*model.InterviewPrepMockQuestionPoolItem) []mockQuestionTemplate {
@@ -714,9 +683,9 @@ func fallbackSelection(pool []mockQuestionTemplate) []mockQuestionTemplate {
 	return always
 }
 
-func taskSpecificMockQuestions(task *model.InterviewPrepTask, kind model.InterviewPrepMockStageKind, taskQuestions []*model.InterviewPrepQuestion) []mockQuestionTemplate {
+func taskSpecificMockQuestions(task *model.InterviewPrepTask, taskQuestions []*model.InterviewPrepQuestion) []mockQuestionTemplate {
 	if task == nil {
-		return fallbackMockQuestions(kind)
+		return nil
 	}
 	if len(taskQuestions) > 0 {
 		templates := make([]mockQuestionTemplate, 0, len(taskQuestions))
@@ -742,9 +711,6 @@ func taskSpecificMockQuestions(task *model.InterviewPrepTask, kind model.Intervi
 			Answer: value,
 			Always: true,
 		})
-	}
-	if len(templates) == 0 {
-		templates = append(templates, fallbackMockQuestions(kind)...)
 	}
 	return templates
 }

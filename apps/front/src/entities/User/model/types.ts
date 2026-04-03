@@ -1,5 +1,5 @@
 export type UserStatus = 'pending_profile' | 'active';
-export type ActivityStatus = 'online' | 'recently_active' | 'offline';
+export type ActivityStatus = 'online' | 'recently_active' | 'offline' | 'unspecified';
 
 export interface User {
   id: string;
@@ -62,7 +62,7 @@ export interface EventParticipant {
   user_id: string;
   title: string;
   avatar_url: string;
-  status: 'invited' | 'joined' | 'declined';
+  status: 'invited' | 'joined' | 'declined' | 'unspecified';
 }
 
 export interface CommunityEvent {

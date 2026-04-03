@@ -11,7 +11,7 @@ func (c *Client) ListCommunityPoints(ctx context.Context, currentUserID string) 
 	const query = `
 SELECT
   u.id::text,
-  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), 'user'),
+  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), ''),
   g.region,
   g.latitude,
   g.longitude,

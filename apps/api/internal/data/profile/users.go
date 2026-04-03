@@ -24,7 +24,7 @@ SELECT `+userSelectColumns+`
 FROM users u
 JOIN updated_user uu ON uu.id = u.id
 LEFT JOIN geo g ON g.user_id = u.id
-`, r.trustedSelect("u.is_trusted"))
+`, "u.is_trusted")
 	return scanUser(r.data.DB.QueryRow(ctx, query, userID, currentWorkplace))
 }
 
@@ -97,10 +97,6 @@ func (r *Repo) DeleteUser(ctx context.Context, userID uuid.UUID) error {
 }
 
 func (r *Repo) UpdateUserTrusted(ctx context.Context, userID uuid.UUID, isTrusted bool) error {
-	if r == nil || !r.hasTrustedFlag {
-		return nil
-	}
-
 	tag, err := r.data.DB.Exec(ctx, `
 		UPDATE users
 		SET is_trusted = $2,

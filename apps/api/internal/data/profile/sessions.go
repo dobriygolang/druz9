@@ -72,7 +72,7 @@ FROM sessions s
 JOIN users u ON u.id = s.user_id
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE s.token_hash = $1
-`, r.trustedSelect("u.is_trusted"))
+`, "u.is_trusted")
 
 	var session model.Session
 	var user model.User

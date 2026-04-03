@@ -44,7 +44,7 @@ SELECT `+userSelectColumns+`
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE u.id = $1
-`, r.trustedSelect("u.is_trusted"))
+`, "u.is_trusted")
 }
 
 func (r *Repo) selectUserByIDTx(ctx context.Context, tx pgx.Tx, userID uuid.UUID) (*model.User, error) {
@@ -71,7 +71,7 @@ SELECT `+userSelectColumns+`
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE u.telegram_id = $1
-`, r.trustedSelect("u.is_trusted"))
+`, "u.is_trusted")
 		return scanUser(r.data.DB.QueryRow(ctx, query, telegramID))
 	case model.AuthProviderYandex:
 		query := fmt.Sprintf(`
@@ -79,7 +79,7 @@ SELECT `+userSelectColumns+`
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
 WHERE u.yandex_id = $1
-`, r.trustedSelect("u.is_trusted"))
+`, "u.is_trusted")
 		return scanUser(r.data.DB.QueryRow(ctx, query, providerUserID))
 	default:
 		return nil, profileerrors.ErrInvalidPayload

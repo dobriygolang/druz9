@@ -3,7 +3,6 @@ package interviewprep
 import "errors"
 
 var (
-	ErrForbidden         = errors.New("trusted privilege required")
 	ErrTaskNotFound      = errors.New("interview prep task not found")
 	ErrSessionNotFound   = errors.New("interview prep session not found")
 	ErrQuestionNotFound  = errors.New("interview prep question not found")

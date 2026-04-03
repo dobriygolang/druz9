@@ -41,6 +41,7 @@ func InterviewPrepTypeFromString(v string) InterviewPrepType {
 type InterviewPrepSessionStatus string
 
 const (
+	InterviewPrepSessionStatusUnknown  InterviewPrepSessionStatus = ""
 	InterviewPrepSessionStatusActive   InterviewPrepSessionStatus = "active"
 	InterviewPrepSessionStatusFinished InterviewPrepSessionStatus = "finished"
 )
@@ -51,16 +52,19 @@ func (s InterviewPrepSessionStatus) String() string {
 
 func InterviewPrepSessionStatusFromString(v string) InterviewPrepSessionStatus {
 	switch v {
+	case "active":
+		return InterviewPrepSessionStatusActive
 	case "finished":
 		return InterviewPrepSessionStatusFinished
 	default:
-		return InterviewPrepSessionStatusActive
+		return InterviewPrepSessionStatusUnknown
 	}
 }
 
 type InterviewPrepMockSessionStatus string
 
 const (
+	InterviewPrepMockSessionStatusUnknown  InterviewPrepMockSessionStatus = ""
 	InterviewPrepMockSessionStatusActive   InterviewPrepMockSessionStatus = "active"
 	InterviewPrepMockSessionStatusFinished InterviewPrepMockSessionStatus = "finished"
 )
@@ -71,10 +75,12 @@ func (s InterviewPrepMockSessionStatus) String() string {
 
 func InterviewPrepMockSessionStatusFromString(v string) InterviewPrepMockSessionStatus {
 	switch v {
+	case "active":
+		return InterviewPrepMockSessionStatusActive
 	case "finished":
 		return InterviewPrepMockSessionStatusFinished
 	default:
-		return InterviewPrepMockSessionStatusActive
+		return InterviewPrepMockSessionStatusUnknown
 	}
 }
 
@@ -113,6 +119,7 @@ func InterviewPrepMockStageKindFromString(v string) InterviewPrepMockStageKind {
 type InterviewPrepMockStageStatus string
 
 const (
+	InterviewPrepMockStageStatusUnknown   InterviewPrepMockStageStatus = ""
 	InterviewPrepMockStageStatusPending   InterviewPrepMockStageStatus = "pending"
 	InterviewPrepMockStageStatusSolving   InterviewPrepMockStageStatus = "solving"
 	InterviewPrepMockStageStatusQuestions InterviewPrepMockStageStatus = "questions"
@@ -127,12 +134,14 @@ func InterviewPrepMockStageStatusFromString(v string) InterviewPrepMockStageStat
 	switch v {
 	case "pending":
 		return InterviewPrepMockStageStatusPending
+	case "solving":
+		return InterviewPrepMockStageStatusSolving
 	case "questions":
 		return InterviewPrepMockStageStatusQuestions
 	case "completed":
 		return InterviewPrepMockStageStatusCompleted
 	default:
-		return InterviewPrepMockStageStatusSolving
+		return InterviewPrepMockStageStatusUnknown
 	}
 }
 

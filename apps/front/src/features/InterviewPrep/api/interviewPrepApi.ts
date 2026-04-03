@@ -5,12 +5,13 @@ export type InterviewPrepType =
   | 'algorithm'
   | 'system_design'
   | 'sql'
-  | 'code_review';
+  | 'code_review'
+  | 'unspecified';
 
-export type InterviewPrepSessionStatus = 'active' | 'finished';
-export type InterviewPrepSelfAssessment = 'answered' | 'skipped';
-export type InterviewPrepMockStageKind = 'slices' | 'concurrency' | 'sql' | 'architecture' | 'system_design';
-export type InterviewPrepMockStageStatus = 'pending' | 'solving' | 'questions' | 'completed';
+export type InterviewPrepSessionStatus = 'active' | 'finished' | 'unspecified';
+export type InterviewPrepSelfAssessment = 'answered' | 'skipped' | 'unspecified';
+export type InterviewPrepMockStageKind = 'slices' | 'concurrency' | 'sql' | 'architecture' | 'system_design' | 'unspecified';
+export type InterviewPrepMockStageStatus = 'pending' | 'solving' | 'questions' | 'completed' | 'unspecified';
 
 
 export interface InterviewPrepSystemDesignReview {
@@ -205,16 +206,16 @@ const normalizeTask = (task: any): InterviewPrepTask => ({
   slug: task.slug ?? task.Slug,
   title: task.title ?? task.Title,
   statement: task.statement ?? task.Statement,
-  prepType: task.prepType ?? task.prep_type ?? task.PrepType,
+  prepType: task.prepType ?? task.prep_type ?? task.PrepType ?? 'unspecified',
   language: task.language ?? task.Language,
   companyTag: task.companyTag ?? task.company_tag ?? task.CompanyTag,
   supportedLanguages: task.supportedLanguages ?? task.supported_languages ?? task.SupportedLanguages,
   codeTaskId: task.codeTaskId ?? task.code_task_id ?? task.CodeTaskID,
   referenceSolution: task.referenceSolution ?? task.reference_solution ?? task.ReferenceSolution,
   isExecutable: Boolean(task.isExecutable ?? task.is_executable ?? task.IsExecutable),
-  executionProfile: task.executionProfile ?? task.execution_profile ?? task.ExecutionProfile ?? 'pure',
-  runnerMode: task.runnerMode ?? task.runner_mode ?? task.RunnerMode ?? 'function_io',
-  durationSeconds: Number(task.durationSeconds ?? task.duration_seconds ?? task.DurationSeconds ?? 1800),
+  executionProfile: task.executionProfile ?? task.execution_profile ?? task.ExecutionProfile ?? '',
+  runnerMode: task.runnerMode ?? task.runner_mode ?? task.RunnerMode ?? '',
+  durationSeconds: Number(task.durationSeconds ?? task.duration_seconds ?? task.DurationSeconds ?? 0),
   starterCode: task.starterCode ?? task.starter_code ?? task.StarterCode ?? '',
   isActive: Boolean(task.isActive ?? task.is_active ?? task.IsActive),
   createdAt: task.createdAt ?? task.created_at ?? task.CreatedAt,
@@ -235,7 +236,7 @@ const normalizeSession = (session: any): InterviewPrepSession => ({
   id: session.id ?? session.ID,
   userId: session.userId ?? session.user_id ?? session.UserID,
   taskId: session.taskId ?? session.task_id ?? session.TaskID,
-  status: session.status ?? session.Status,
+  status: session.status ?? session.Status ?? 'unspecified',
   currentQuestionPosition: Number(session.currentQuestionPosition ?? session.current_question_position ?? session.CurrentQuestionPosition ?? 0),
   code: session.code ?? session.Code ?? '',
   solveLanguage: session.solveLanguage ?? session.solve_language ?? session.SolveLanguage,
@@ -266,8 +267,8 @@ const normalizeMockStage = (stage: any): InterviewPrepMockStage => ({
   id: stage.id ?? stage.ID,
   sessionId: stage.sessionId ?? stage.session_id ?? stage.SessionID,
   stageIndex: Number(stage.stageIndex ?? stage.stage_index ?? stage.StageIndex ?? 0),
-  kind: stage.kind ?? stage.Kind,
-  status: stage.status ?? stage.Status,
+  kind: stage.kind ?? stage.Kind ?? 'unspecified',
+  status: stage.status ?? stage.Status ?? 'unspecified',
   taskId: stage.taskId ?? stage.task_id ?? stage.TaskID,
   solveLanguage: stage.solveLanguage ?? stage.solve_language ?? stage.SolveLanguage ?? '',
   code: stage.code ?? stage.Code ?? '',
@@ -289,7 +290,7 @@ const normalizeMockSession = (session: any): InterviewPrepMockSession => ({
   id: session.id ?? session.ID,
   userId: session.userId ?? session.user_id ?? session.UserID,
   companyTag: session.companyTag ?? session.company_tag ?? session.CompanyTag ?? '',
-  status: session.status ?? session.Status,
+  status: session.status ?? session.Status ?? 'unspecified',
   currentStageIndex: Number(session.currentStageIndex ?? session.current_stage_index ?? session.CurrentStageIndex ?? 0),
   startedAt: session.startedAt ?? session.started_at ?? session.StartedAt,
   finishedAt: session.finishedAt ?? session.finished_at ?? session.FinishedAt,

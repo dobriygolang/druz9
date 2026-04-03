@@ -28,6 +28,7 @@ var (
 	ErrMockQuestionAnswerRequired  = errors.New("question answer is required")
 	ErrMockCompanyTagRequired      = errors.New("company tag is required")
 	ErrMockTaskPoolIncomplete      = errors.New("mock interview task pool is incomplete for selected company")
+	ErrMockQuestionPoolIncomplete  = errors.New("mock interview question pool is incomplete for selected company")
 	ErrInvalidAssessment           = errors.New("invalid self assessment")
 	ErrUnsupportedLanguage         = errors.New("unsupported interview prep language")
 	ErrExecutableTaskNotConfigured = errors.New("executable interview prep task is not linked to a code task")

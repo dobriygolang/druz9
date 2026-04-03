@@ -227,7 +227,7 @@ export const CodeRoomPage: React.FC = () => {
         exitCode: sub.exitCode,
         executionTimeMs: 0,
         submittedBy: sub.submittedBy,
-        submittedByName: 'Участник',
+        submittedByName: '',
         submittedAt: new Date().toISOString(),
       };
       return [...prev, newSubmission];
@@ -241,14 +241,14 @@ export const CodeRoomPage: React.FC = () => {
     if (authName) {
       return authName;
     }
-    return getStoredGuestName() || 'Гость';
+    return getStoredGuestName() || '';
   }, [user?.firstName, user?.lastName, user?.username]);
 
   const currentParticipantId = useMemo(() => {
     if (user?.id) {
       return user.id;
     }
-    return getStoredGuestName() || 'guest';
+    return getStoredGuestName() || '';
   }, [user?.id]);
 
   const { isConnected: isRealtimeConnected, code: realtimeCode, room: realtimeRoom, participants } = useCodeRoomRealtime({

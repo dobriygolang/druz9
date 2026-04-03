@@ -28,7 +28,7 @@ func NewRepo(dataLayer *postgres.Store, logger log.Logger) referraldomain.Reposi
 	}
 }
 
-const referralColumns = `r.id, r.user_id::text, COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), 'user'), COALESCE(u.telegram_username, ''), r.title, r.company, COALESCE(r.vacancy_url, ''), r.description, COALESCE(r.experience, ''), COALESCE(r.location, ''), r.employment_type, r.created_at, r.updated_at`
+const referralColumns = `r.id, r.user_id::text, COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), ''), COALESCE(u.telegram_username, ''), r.title, r.company, COALESCE(r.vacancy_url, ''), r.description, COALESCE(r.experience, ''), COALESCE(r.location, ''), r.employment_type, r.created_at, r.updated_at`
 
 func (r *Repo) ListReferrals(ctx context.Context, currentUser *model.User, opts model.ListReferralsOptions) (*model.ListReferralsResponse, error) {
 	// Apply defaults
@@ -111,7 +111,7 @@ WITH updated AS (
 SELECT
   updated.id,
   updated.user_id::text,
-  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), 'user'),
+  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), ''),
   COALESCE(u.telegram_username, ''),
   updated.title,
   updated.company,
@@ -213,7 +213,7 @@ func telegramProfileURL(username string) string {
 
 func referralAuthorName(user *model.User) string {
 	if user == nil {
-		return "user"
+		return ""
 	}
 	name := strings.TrimSpace(strings.TrimSpace(user.FirstName) + " " + strings.TrimSpace(user.LastName))
 	if name != "" {
@@ -222,5 +222,5 @@ func referralAuthorName(user *model.User) string {
 	if strings.TrimSpace(user.Username) != "" {
 		return user.Username
 	}
-	return "user"
+	return ""
 }

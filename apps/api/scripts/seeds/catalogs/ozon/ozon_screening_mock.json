@@ -1,0 +1,312 @@
+{
+  "version": "ozon-mock-v2-full-pdf",
+  "company_tag": "ozon",
+  "source_document": "ЗадачникГо.pdf",
+  "source_total_tasks": 88,
+  "category_file": "ozon_screening_mock.json",
+  "task_count": 17,
+  "tasks": [
+    {
+      "number": 1,
+      "title": "SQL запрос на JOIN нескольких таблиц с условием",
+      "title_raw": "с условием",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        1,
+        2
+      ],
+      "tags": [
+        "concurrency",
+        "sql"
+      ],
+      "prompt_raw": "1.\nс условием\nGO Скрининг\nСкрининг 10 мин 8907 раз Свернуть\nЕст\nь база с такой схемой данных\n// user\nid | firstname | lastname | birth\n1 | Ivan | Petrov | 1996-05-01\n2 | Anna | Petrova | 1999-06-01\n3 | Anna | Petrova | 1990-10-02\n// purchase\nsku| price | user_id | date\n1 | 5500 | 1 | 2021-02-15\n1 | 5700 | 1 | 2021-01-15\n2 | 4000 | 1 | 2021-02-14\n3 | 8000 | 2 | 2021-03-01\n4 | 400 | 2 | 2021-03-02\n// ban_list\nuser_id | date_from\n1 | 2021-03-08\nНужно вывести:\n1.\nВывести уникальные комбинации пользователя и id товара для\nвсех покупок, совершенных пользователями до того, как их\nзабанили\n. Отсортироват\nь сначала по имени пользователя, потом\nпо SKU\n2.\nНайти пользователей, которые совершили покупок на су\nу\nмм\nбольше 5000р. Вывести их имена в формате id пользователя |\nимя | фамилия | су\nмма покупок",
+      "answer_raw": "1) Здесь мы проверяем ч\nто человек у\norder\nмеет в джоины, distinct, where,\nSELECT distinct u.id, firstname, lastname, p.item_id\nFROM users u\njoin purchase p ON u.id = p.user_id\nleft join ban_list bl ON u.id = bl.user_id -- не\nзабыть left join, а то в запрос попадут только\nпокупки забаненных пользователей.\nProduct\nWHERE bl.user_id IS NULL --\nМотивация\nпользак не забанен\nOR bl.date_from > p.date --\nБазы данных(не для Data\nEngineer)\nили забанен позже, чем совершена покупка\nORDER BY lastname, firstname, u.id, p.item_id --\nлучше бы кандидат догадался или спросил, что в\nАналитик (бизнес)\nсортировке по имени надо сначала ставить фамилию,\nScala\nпотом имя.\nИнформационная безопасност\nь\nЭксплуатация/DevOps\nТехническая доку\nментация\nПроектное управление\nСистемная аналитика\nL2 Applica\ntion Support\n2) Здесь мы проверяем ч\nто человек у\na\nh\nving отличается от WHERE\nмеет в HAVING, знает\n, чем\nSELECT u.id, u.firstname, u.lastname, SUM(p.price)\nFROM users u join purchase p ON u.id = p.user_id\nGROUP BY u.id, u.firstname, u.lastname -- и знает,\nчто аггрегирующие функции без group by не будут\nработать\nHAVING SUM(p.price) > 5000\n-- В принципе, вариант\nSELECT * FROM (\nSELECT u.id, u.firstname, u.lastname,\nSUM(p.price) s\nFROM users u join purchase p ON u.id = p.user_id\nGROUP BY u.id, u.firstname, u.lastname\n) WHERE s > 5000\n-- тоже является корректным, но все равно надо\nспросить про HAVING",
+      "follow_up_raw": "",
+      "content_raw": "1.\nс условием\nGO Скрининг\nСкрининг 10 мин 8907 раз Свернуть\nЕст\nь база с такой схемой данных\n// user\nid | firstname | lastname | birth\n1 | Ivan | Petrov | 1996-05-01\n2 | Anna | Petrova | 1999-06-01\n3 | Anna | Petrova | 1990-10-02\n// purchase\nsku| price | user_id | date\n1 | 5500 | 1 | 2021-02-15\n1 | 5700 | 1 | 2021-01-15\n2 | 4000 | 1 | 2021-02-14\n3 | 8000 | 2 | 2021-03-01\n4 | 400 | 2 | 2021-03-02\n// ban_list\nuser_id | date_from\n1 | 2021-03-08\nНужно вывести:\n1.\nВывести уникальные комбинации пользователя и id товара для\nвсех покупок, совершенных пользователями до того, как их\nзабанили\n. Отсортироват\nь сначала по имени пользователя, потом\nпо SKU\n2.\nНайти пользователей, которые совершили покупок на су\nу\nмм\nбольше 5000р. Вывести их имена в формате id пользователя |\nимя | фамилия | су\nмма покупок\nОтвет\n1) Здесь мы проверяем ч\nто человек у\norder\nмеет в джоины, distinct, where,\nSELECT distinct u.id, firstname, lastname, p.item_id\nFROM users u\njoin purchase p ON u.id = p.user_id\nleft join ban_list bl ON u.id = bl.user_id -- не\nзабыть left join, а то в запрос попадут только\nпокупки забаненных пользователей.\nProduct\nWHERE bl.user_id IS NULL --\nМотивация\nпользак не забанен\nOR bl.date_from > p.date --\nБазы данных(не для Data\nEngineer)\nили забанен позже, чем совершена покупка\nORDER BY lastname, firstname, u.id, p.item_id --\nлучше бы кандидат догадался или спросил, что в\nАналитик (бизнес)\nсортировке по имени надо сначала ставить фамилию,\nScala\nпотом имя.\nИнформационная безопасност\nь\nЭксплуатация/DevOps\nТехническая доку\nментация\nПроектное управление\nСистемная аналитика\nL2 Applica\ntion Support\n2) Здесь мы проверяем ч\nто человек у\na\nh\nving отличается от WHERE\nмеет в HAVING, знает\n, чем\nSELECT u.id, u.firstname, u.lastname, SUM(p.price)\nFROM users u join purchase p ON u.id = p.user_id\nGROUP BY u.id, u.firstname, u.lastname -- и знает,\nчто аггрегирующие функции без group by не будут\nработать\nHAVING SUM(p.price) > 5000\n-- В принципе, вариант\nSELECT * FROM (\nSELECT u.id, u.firstname, u.lastname,\nSUM(p.price) s\nFROM users u join purchase p ON u.id = p.user_id\nGROUP BY u.id, u.firstname, u.lastname\n) WHERE s > 5000\n-- тоже является корректным, но все равно надо\nспросить про HAVING"
+    },
+    {
+      "number": 2,
+      "title": "Генерация N уникальных чисел",
+      "title_raw": "Генерация N уникальных чисел",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        2,
+        3
+      ],
+      "tags": [
+        "concurrency",
+        "maps",
+        "slices"
+      ],
+      "prompt_raw": "2. Генерация N уникальных чисел\nGO Скрининг\nСкрининг 5 мин 7164 раза Свернуть\nТребуется реализоват\nь ф\nункцию uniqRa\nслайс длины n уникальных, рандомных чисел.\nndn, которая генерирует\nimport (\n\"fmt\"\n\"math/rand\"\nfunc main() {\nfunc uniqRandn(n int) []int {\n//...\n)\n}\n}\nfmt.Println(uniqRandn(10))",
+      "answer_raw": "func uniqRandn(n int) []int {\nres, resMap := make([]int, 0, n),\nmake(map[int]struct{}, n)\nfor len(res) < n {\nval := rand.Int()\nif _, ok := resMap[val]; ok {\ncontinue\n}\nres = append(res, val)\nresMap[val] = struct{}{}\n}\nreturn res\n}",
+      "follow_up_raw": "",
+      "content_raw": "2. Генерация N уникальных чисел\nGO Скрининг\nСкрининг 5 мин 7164 раза Свернуть\nТребуется реализоват\nь ф\nункцию uniqRa\nслайс длины n уникальных, рандомных чисел.\nndn, которая генерирует\nimport (\n\"fmt\"\n\"math/rand\"\nfunc main() {\nfunc uniqRandn(n int) []int {\n//...\n)\n}\n}\nfmt.Println(uniqRandn(10))\nОтвет\nfunc uniqRandn(n int) []int {\nres, resMap := make([]int, 0, n),\nmake(map[int]struct{}, n)\nfor len(res) < n {\nval := rand.Int()\nif _, ok := resMap[val]; ok {\ncontinue\n}\nres = append(res, val)\nresMap[val] = struct{}{}\n}\nreturn res\n}"
+    },
+    {
+      "number": 12,
+      "title": "Определить, является ли слайс монотонным",
+      "title_raw": "монотонным",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        13
+      ],
+      "tags": [
+        "slices"
+      ],
+      "prompt_raw": "12.\nмонотонным\nGO Скрининг\nСкрининг 10 мин 3842 раза Свернуть\nЯвляется ли слайс монотонным?\nМонотонная ф\nункция - ф\nункция одной переменной, определённая на\nнекотором подмножестве действительных чисел, которая либо\nвезде (на области своего определения) не убывает\n, либо везде не\nвозрастает\n.\n{1,7} - true\n{1,1} - true\n{3,3,1} - true\n{9,5,1} - true\n{23,5,23} - false",
+      "answer_raw": "func isMonotonic(in []int) bool {\nisUp, isDown := true, true\nfor i := 1; i < len(in); i++ {\nisDown = isDown && in[i-1] >= in[i]\nisUp = isUp && in[i-1] <= in[i]\n}\nreturn isUp || isDown\n}",
+      "follow_up_raw": "",
+      "content_raw": "12.\nмонотонным\nGO Скрининг\nСкрининг 10 мин 3842 раза Свернуть\nЯвляется ли слайс монотонным?\nМонотонная ф\nункция - ф\nункция одной переменной, определённая на\nнекотором подмножестве действительных чисел, которая либо\nвезде (на области своего определения) не убывает\n, либо везде не\nвозрастает\n.\n{1,7} - true\n{1,1} - true\n{3,3,1} - true\n{9,5,1} - true\n{23,5,23} - false\nОтвет\nfunc isMonotonic(in []int) bool {\nisUp, isDown := true, true\nfor i := 1; i < len(in); i++ {\nisDown = isDown && in[i-1] >= in[i]\nisUp = isUp && in[i-1] <= in[i]\n}\nreturn isUp || isDown\n}"
+    },
+    {
+      "number": 18,
+      "title": "Задачка про слайсы 1",
+      "title_raw": "Задачка про слайсы 1",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        17,
+        18
+      ],
+      "tags": [
+        "concurrency",
+        "slices"
+      ],
+      "prompt_raw": "18. Задачка про слайсы 1\nGO Скрининг\nГрейд неизвестен 3373 раза Свернуть\nЧто выведет программа?\nfunc a() {\nx := []int{}\nx = append(x, 0)\nx = append(x, 1)\nx = append(x, 2)\ny := append(x, 3)\nz := append(x, 4)\nfmt.Println(y, z)\n}\nfunc main() {\na()\n}",
+      "answer_raw": "[0 1 2 4] [0 1 2 4]",
+      "follow_up_raw": "",
+      "content_raw": "18. Задачка про слайсы 1\nGO Скрининг\nГрейд неизвестен 3373 раза Свернуть\nЧто выведет программа?\nfunc a() {\nx := []int{}\nx = append(x, 0)\nx = append(x, 1)\nx = append(x, 2)\ny := append(x, 3)\nz := append(x, 4)\nfmt.Println(y, z)\n}\nfunc main() {\na()\n}\nОтвет\n[0 1 2 4] [0 1 2 4]"
+    },
+    {
+      "number": 20,
+      "title": "Задачка про строки",
+      "title_raw": "Задачка про строки",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        19
+      ],
+      "tags": [
+        "strings"
+      ],
+      "prompt_raw": "20. Задачка про строки\nGO Скрининг\nСкрининг 3 мин 3225 раз Свернуть\nЧто выведет программа?\ns := \"test\"\nprintln(s[0]) // ответ кандидата\ns[0] = \"R\"\nprintln(s) // ответ кандидата",
+      "answer_raw": "Слабый ответ: выведет 116 (номер байта) и не заменит R, будет test.\nПравильный: этот код не скомпилится вовсе.\nПродвинутый: поменят\nь этот код так, ч\nтобы он менял байты и все же\nработал.",
+      "follow_up_raw": "",
+      "content_raw": "20. Задачка про строки\nGO Скрининг\nСкрининг 3 мин 3225 раз Свернуть\nЧто выведет программа?\ns := \"test\"\nprintln(s[0]) // ответ кандидата\ns[0] = \"R\"\nprintln(s) // ответ кандидата\nОтвет\nСлабый ответ: выведет 116 (номер байта) и не заменит R, будет test.\nПравильный: этот код не скомпилится вовсе.\nПродвинутый: поменят\nь этот код так, ч\nтобы он менял байты и все же\nработал."
+    },
+    {
+      "number": 23,
+      "title": "Функция zip",
+      "title_raw": "Ф ункция zip",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        21,
+        22
+      ],
+      "tags": [
+        "concurrency",
+        "slices"
+      ],
+      "prompt_raw": "23. Ф\nункция zip\nGO Скрининг\nГрейд неизвестен 3052 раза Свернуть\nТребуется реализоват\nь ф\nункцию zip, которая соединяет элементы\nдвух слайсов в слайс пар\nfunc main() {\ns1, s2 := []int{1, 2, 3}, []int{4, 5, 6, 7, 8}\nfmt.Println(zip(s1, s2)) // [[1 4] [2 5] [3 6]]\nfunc zip(s1 []int, s2 []int) [][]int {\n//...\n}\n}",
+      "answer_raw": "func zip(s1 []int, s2 []int) [][]int {\nminLen := len(s1)\nif len(s2) < minLen {\nminLen = len(s2)\n}\nres := make([][]int, 0, minLen)\nfor i := 0; i < minLen; i++ {\nres = append(res, []int{s1[i], s2[i]})\n}\nreturn res\n}",
+      "follow_up_raw": "Дополнительные вопросы\nQ: Реализоват\nь версию ф\nпроизвольное количество слайсов\nA:\nункции zip которая сможет соединят\nь\nfunc zip(s ...[]int) [][]int {\nif len(s) == 0 {\nreturn [][]int{}\n}\nminLen := len(s[0])\nfor i := 1; i < len(s); i++ {\nif len(s[i]) < minLen {\nminLen = len(s[i])\n}\n}\nres := make([][]int, 0, minLen)\nfor i := 0; i < minLen; i++ {\nx := make([]int, 0, len(s))\nfor k := 0; k < len(s); k++ {\nx = append(x, s[k][i])\n}\nres = append(res, x)\n}\nreturn res\n}",
+      "content_raw": "23. Ф\nункция zip\nGO Скрининг\nГрейд неизвестен 3052 раза Свернуть\nТребуется реализоват\nь ф\nункцию zip, которая соединяет элементы\nдвух слайсов в слайс пар\nfunc main() {\ns1, s2 := []int{1, 2, 3}, []int{4, 5, 6, 7, 8}\nfmt.Println(zip(s1, s2)) // [[1 4] [2 5] [3 6]]\nfunc zip(s1 []int, s2 []int) [][]int {\n//...\n}\n}\nОтвет\nfunc zip(s1 []int, s2 []int) [][]int {\nminLen := len(s1)\nif len(s2) < minLen {\nminLen = len(s2)\n}\nres := make([][]int, 0, minLen)\nfor i := 0; i < minLen; i++ {\nres = append(res, []int{s1[i], s2[i]})\n}\nreturn res\n}\nДополнительные вопросы\nQ: Реализоват\nь версию ф\nпроизвольное количество слайсов\nA:\nункции zip которая сможет соединят\nь\nfunc zip(s ...[]int) [][]int {\nif len(s) == 0 {\nreturn [][]int{}\n}\nminLen := len(s[0])\nfor i := 1; i < len(s); i++ {\nif len(s[i]) < minLen {\nminLen = len(s[i])\n}\n}\nres := make([][]int, 0, minLen)\nfor i := 0; i < minLen; i++ {\nx := make([]int, 0, len(s))\nfor k := 0; k < len(s); k++ {\nx = append(x, s[k][i])\n}\nres = append(res, x)\n}\nreturn res\n}"
+    },
+    {
+      "number": 25,
+      "title": "Задачка про слайсы 3",
+      "title_raw": "Задачка про слайсы 3",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        23
+      ],
+      "tags": [
+        "slices"
+      ],
+      "prompt_raw": "25. Задачка про слайсы 3\nGO Скрининг\nГрейд неизвестен 2827 раз Свернуть\nЧто выведет программа? Почем\nу\n?\nfunc main() {\ntimeStart := time.Now()\n_, _ = <-worker(), <-worker()\nprintln(int(time.Since(timeStart).Seconds()))\n}\nfunc worker() chan int {\nch := make(chan int)\ngo func() {\ntime.Sleep(3 * time.Second)\nch <- 1\n}()\nreturn ch\n}",
+      "answer_raw": "6",
+      "follow_up_raw": "",
+      "content_raw": "25. Задачка про слайсы 3\nGO Скрининг\nГрейд неизвестен 2827 раз Свернуть\nЧто выведет программа? Почем\nу\n?\nfunc main() {\ntimeStart := time.Now()\n_, _ = <-worker(), <-worker()\nprintln(int(time.Since(timeStart).Seconds()))\n}\nfunc worker() chan int {\nch := make(chan int)\ngo func() {\ntime.Sleep(3 * time.Second)\nch <- 1\n}()\nreturn ch\n}\nОтвет\n6"
+    },
+    {
+      "number": 28,
+      "title": "Работа с слайсами",
+      "title_raw": "Работа с слайсами",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        25,
+        26
+      ],
+      "tags": [
+        "concurrency",
+        "slices"
+      ],
+      "prompt_raw": "28. Работа с слайсами\nGO Скрининг\n17 - 18 грейд 5 мин 2542 раза Свернуть\nЧто выведет данная программа. Почем\nу так ?\nfunc main() {\nnums := []int{1, 2, 3}\naddNum(nums[0:2])\nfmt.Println(nums) // ?\naddNums(nums[0:2])\nfmt.Println(nums) // ?\n}\nfunc addNum(nums []int) {\nnums = append(nums, 4)\n}\nfunc addNums(nums []int) {\nnums = append(nums, 5, 6)\n}",
+      "answer_raw": "17 грейд\n1) 1 2 4\n2) 1 2 4\nРасскажет про правила работы a\n18 грейд\nРасскажет про синтаксис [0:2:2]\nppend",
+      "follow_up_raw": "",
+      "content_raw": "28. Работа с слайсами\nGO Скрининг\n17 - 18 грейд 5 мин 2542 раза Свернуть\nЧто выведет данная программа. Почем\nу так ?\nfunc main() {\nnums := []int{1, 2, 3}\naddNum(nums[0:2])\nfmt.Println(nums) // ?\naddNums(nums[0:2])\nfmt.Println(nums) // ?\n}\nfunc addNum(nums []int) {\nnums = append(nums, 4)\n}\nfunc addNums(nums []int) {\nnums = append(nums, 5, 6)\n}\nОтвет\n17 грейд\n1) 1 2 4\n2) 1 2 4\nРасскажет про правила работы a\n18 грейд\nРасскажет про синтаксис [0:2:2]\nppend"
+    },
+    {
+      "number": 34,
+      "title": "Задача на простой select с группировкой",
+      "title_raw": "группировкой",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        31,
+        32
+      ],
+      "tags": [
+        "concurrency",
+        "sql"
+      ],
+      "prompt_raw": "34.\nгруппировкой\nGO Скрининг\n15 грейд 5 мин 1926 раз Свернуть\nДана таблица \"orders\":\n+-----+-----------+------------------------+---------\n-----+\n| id | user_id | created_at |\nprice_total |\n+-----+-----------+------------------------+---------\n-----+\n| 1 | 111 | 2024-01-01 10:00:00 | 2\n000 |\n| 2 | 222 | 2024-01-02 10:00:00 |\n100 |\n| 3 | 111 | 2024-04-01 10:00:00 | 20\n000 |\n| 4 | 222 | 2024-05-01 10:00:00 | 5\n000 |\n| 5 | 333 | 2024-05-02 10:00:00 | 10\n000 |\n+-----+-----------+------------------------+---------\n-----+\nНапишите SQL-запрос, который вернёт количество\nзаказов по каждому пользователю с price_total больше\nили равным 1000 в таком виде отсортированному по\nколичеству заказов в обратном порядке:\n+----------+-------------+\n| user_id | order_count |\n+----------+-------------+\n| 111 | 2 |\n| 222 | 1 |\n| 333 | 1 |\n+----------+-------------+",
+      "answer_raw": "SELECT user_id, COUNT(*) AS order_count FROM orders WHERE\nprice_total >= 1000 GROUP BY user_id ORDER BY order_count DESC\nЕсли с группировкой не может\n, то предложит\nь просто выбрат\nь\nзаказы с price_total >= 1000 (ч\nтобы убедит\nься ч\nто вообще понимает\nч\nто такое sql)",
+      "follow_up_raw": "",
+      "content_raw": "34.\nгруппировкой\nGO Скрининг\n15 грейд 5 мин 1926 раз Свернуть\nДана таблица \"orders\":\n+-----+-----------+------------------------+---------\n-----+\n| id | user_id | created_at |\nprice_total |\n+-----+-----------+------------------------+---------\n-----+\n| 1 | 111 | 2024-01-01 10:00:00 | 2\n000 |\n| 2 | 222 | 2024-01-02 10:00:00 |\n100 |\n| 3 | 111 | 2024-04-01 10:00:00 | 20\n000 |\n| 4 | 222 | 2024-05-01 10:00:00 | 5\n000 |\n| 5 | 333 | 2024-05-02 10:00:00 | 10\n000 |\n+-----+-----------+------------------------+---------\n-----+\nНапишите SQL-запрос, который вернёт количество\nзаказов по каждому пользователю с price_total больше\nили равным 1000 в таком виде отсортированному по\nколичеству заказов в обратном порядке:\n+----------+-------------+\n| user_id | order_count |\n+----------+-------------+\n| 111 | 2 |\n| 222 | 1 |\n| 333 | 1 |\n+----------+-------------+\nОтвет\nSELECT user_id, COUNT(*) AS order_count FROM orders WHERE\nprice_total >= 1000 GROUP BY user_id ORDER BY order_count DESC\nЕсли с группировкой не может\n, то предложит\nь просто выбрат\nь\nзаказы с price_total >= 1000 (ч\nтобы убедит\nься ч\nто вообще понимает\nч\nто такое sql)"
+    },
+    {
+      "number": 44,
+      "title": "Фильтрация элементов слайса",
+      "title_raw": "Филь трация элементов слайса",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        43,
+        44
+      ],
+      "tags": [
+        "slices"
+      ],
+      "prompt_raw": "44. Филь\nтрация элементов слайса\nGO Скрининг\nСкрининг 10 мин 1066 раз Свернуть\nДан слайс целых чисел. Напишите ф\nнули\nункцию remove, удаляющ\nую все\nПримеры:\nremove([]) -> []\nremove([0]) -> []\nremove([1,0,0,2]) -> [1,2]",
+      "answer_raw": "func remove(in []int) []int {\ni := 0\nj := 0\nfor ; i < len(in); i++ {\nif in[i] != 0 {\nin[j] = in[i]\nj++\n}\n}\nreturn in[:j]\n}",
+      "follow_up_raw": "Дополнительные вопросы\nОценит\nь сложност\nь решения",
+      "content_raw": "44. Филь\nтрация элементов слайса\nGO Скрининг\nСкрининг 10 мин 1066 раз Свернуть\nДан слайс целых чисел. Напишите ф\nнули\nункцию remove, удаляющ\nую все\nПримеры:\nremove([]) -> []\nremove([0]) -> []\nremove([1,0,0,2]) -> [1,2]\nОтвет\nfunc remove(in []int) []int {\ni := 0\nj := 0\nfor ; i < len(in); i++ {\nif in[i] != 0 {\nin[j] = in[i]\nj++\n}\n}\nreturn in[:j]\n}\nДополнительные вопросы\nОценит\nь сложност\nь решения"
+    },
+    {
+      "number": 47,
+      "title": "Самая сложная инженерная задача, которую приходилось решать",
+      "title_raw": "которую приходилось решат ь",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        46
+      ],
+      "tags": [
+        "general"
+      ],
+      "prompt_raw": "47.\nкоторую приходилось решат\nь\nGO Скрининг\nСкрининг 5 мин 838 раз Свернуть\nРасскажи сам\nую сложную или интересную инженерную задач\nу\nкоторую приходилось решат\nь?\n,\nДополнительные вопросы:\n1.\n2.\n3.\nВ чем была сложност\nь?\nКак удалось справит\nься с задачей?\nКак бы ты решил задач\nу сейчас?",
+      "answer_raw": "Четкого ответа нет",
+      "follow_up_raw": "",
+      "content_raw": "47.\nкоторую приходилось решат\nь\nGO Скрининг\nСкрининг 5 мин 838 раз Свернуть\nРасскажи сам\nую сложную или интересную инженерную задач\nу\nкоторую приходилось решат\nь?\n,\nДополнительные вопросы:\n1.\n2.\n3.\nВ чем была сложност\nь?\nКак удалось справит\nься с задачей?\nКак бы ты решил задач\nу сейчас?\nОтвет\nЧеткого ответа нет"
+    },
+    {
+      "number": 57,
+      "title": "Modifying slice during iteration",
+      "title_raw": "Modifying slice during iter a",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        61,
+        62
+      ],
+      "tags": [
+        "slices",
+        "strings"
+      ],
+      "prompt_raw": "57. Modifying slice during iter\na\nGO Скрининг\ntion\n18 грейд 5 мин 402 раза Свернуть\nЧто выведет этот код, и почем\nу\n?\npackage main\nimport \"fmt\"\nfunc main() {\nlst := []string{\"a\", \"b\", \"c\", \"d\"}\nfor k, v := range lst {\nif k == 0 {\nlst = []string{\"aa\", \"bb\", \"cc\", \"dd\"}\n}\nfmt.Println(v)\n}\n}",
+      "answer_raw": "Это задача даже не на специфику работы оператора r\na\nnge, а просто\nна знание одного из основных принципов языка — e ve ryt hi ng i n G o i s\na\np\nsse d by v\na l ue. Массив является по сути s t ruc t'ом из трех полей —\n`\nссылка на a\na\nи\nrr\ny\n,\nlen\nca\np\n`\n`\n`\n`\n`\n, при вызове r\na\nnge происходит ровно то\nже самое, ч\nто и при вызове ф\nункции — эта структура копируется (а\na\na\nrr\ny на который ссылаемся — нет). Присваивая переменной новое\nзначение мы никак не меняем исходный a\na\nrr\ny, поэтом\nу и выведется\na\nb\nc\nd\nА вот если менят\nь значения в нижележащем\nменят\nься, и r\na\nnge их увидит\na\na\nrr\ny'е, то они будут\nfunc main() {\nlst := []string{\"a\", \"b\", \"c\", \"d\"}\nfor k, v := range lst {\nif k == 0 {\nlst[3] = \"z\"\n}\nfmt.Println(v)\n}\n}\nвыведет\na\nb\nc\nz",
+      "follow_up_raw": "",
+      "content_raw": "57. Modifying slice during iter\na\nGO Скрининг\ntion\n18 грейд 5 мин 402 раза Свернуть\nЧто выведет этот код, и почем\nу\n?\npackage main\nimport \"fmt\"\nfunc main() {\nlst := []string{\"a\", \"b\", \"c\", \"d\"}\nfor k, v := range lst {\nif k == 0 {\nlst = []string{\"aa\", \"bb\", \"cc\", \"dd\"}\n}\nfmt.Println(v)\n}\n}\nОтвет\nЭто задача даже не на специфику работы оператора r\na\nnge, а просто\nна знание одного из основных принципов языка — e ve ryt hi ng i n G o i s\na\np\nsse d by v\na l ue. Массив является по сути s t ruc t'ом из трех полей —\n`\nссылка на a\na\nи\nrr\ny\n,\nlen\nca\np\n`\n`\n`\n`\n`\n, при вызове r\na\nnge происходит ровно то\nже самое, ч\nто и при вызове ф\nункции — эта структура копируется (а\na\na\nrr\ny на который ссылаемся — нет). Присваивая переменной новое\nзначение мы никак не меняем исходный a\na\nrr\ny, поэтом\nу и выведется\na\nb\nc\nd\nА вот если менят\nь значения в нижележащем\nменят\nься, и r\na\nnge их увидит\na\na\nrr\ny'е, то они будут\nfunc main() {\nlst := []string{\"a\", \"b\", \"c\", \"d\"}\nfor k, v := range lst {\nif k == 0 {\nlst[3] = \"z\"\n}\nfmt.Println(v)\n}\n}\nвыведет\na\nb\nc\nz"
+    },
+    {
+      "number": 77,
+      "title": "Задачка на логику",
+      "title_raw": "Задачка на логику",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        77,
+        78
+      ],
+      "tags": [
+        "general"
+      ],
+      "prompt_raw": "77. Задачка на логику\nGO Скрининг\nСкрининг 7 мин 8 раз Свернуть\nЕст\nь склад в Озоне где в углу заряжаются роботы, которые таскают\nполки\n.\nДля них ест\nь 25 мест зарядки в ряд, 1 роботу нужна 1 зарядка, но:\n1) роботы приезжают на зарядку строго последовательно (по\nодном\nу)\n2) робот никогда не встанет рядом с уже занятым местом\n3) робот всегда выбирает\nместо наиболее далекое от уже занятых\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\nВопрос — если изначально все места свободны — полу\nпервый встанет посередине.\nКакое кол-во занятых мест тогда полу\nчится в пределе?\nчается\nВопрос — а вот если руками выбрат\nь место, куда воткнут\nь на\nзарядку первого робота — полу\nчится ли лу\nчше?",
+      "answer_raw": "Понятно, ч\nто задача — с подвохом, и если ручками выбрат\nь первое\nместо будет лу\nчше.\nКак будет в слу\nчае полност\nью автоматического размещения:\n_ _ _ _ _ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ _\n// первый встанет посередине\n(самое дальнее от края — это центр)\n+ _ _ _ _ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ +\n+ _ _ _ _ _ _ + _ _ _ _ + _ _ _ _ + _ _ _ _ _ _ +\n+ _ _ _ + _ _ + _ _ _ _ + _ _ _ _ + _ _ + _ _ _ +\n+ _ + _ + _ _ + _ + _ _ + _ _ + _ + _ _ + _+ _ + // 11\nРу\nчной выбор места\nУ этой задачки ест\nь 2 пути решения — либо перебором первого\nместа, либо от обратного.\nОт обратного:\n+ _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + //13\n+ _ + _ + _ + _ + _ _ _ + _ + _ + _ + _ + _ + _ +\n+ _ _ _ + _ _ _ + _ _ _ + _ _ _ + _ _ _ + _ _ _ +\n+ _ _ _ _ _ _ _ + _ _ _ + _ _ _ + _ _ _ + _ _ _ +\n+ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ + _ _ _ _ _ _ _ +\n+ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ +\n_ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ +\n_ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n//\nместа 9 или 17\nAI proofing\nОтвет от Deepseek 3.2 (я пихал разные формулировки, всегда ответ\nкосячный):\n+ _ + _ + + _ + _ + _ + + _ + _ + _ + _ + _ + _ +\nНо это не точно, может быт\nь меньше плюсов.\nЕсли начат\nь с 1 вручную:\n+ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\nВ\nторой станет на 25 или 13 в зависимости от правил (вероятно\n25), затем в середину и т\n.д., ч\nто может привести к 13 роботам.\nЧто на самом деле будет если поставит\nробота на 1 место:\n+ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n+ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ +\n+ _ _ _ _ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ +\n+ _ _ _ _ _ + _ _ _ _ _ + _ _ _ _ _ + _ _ _ _ _ +\n+ _ _ + _ _ + _ _ + _ _ + _ _ + _ _ + _ _ + _ _ + // 9\nь",
+      "follow_up_raw": "",
+      "content_raw": "77. Задачка на логику\nGO Скрининг\nСкрининг 7 мин 8 раз Свернуть\nЕст\nь склад в Озоне где в углу заряжаются роботы, которые таскают\nполки\n.\nДля них ест\nь 25 мест зарядки в ряд, 1 роботу нужна 1 зарядка, но:\n1) роботы приезжают на зарядку строго последовательно (по\nодном\nу)\n2) робот никогда не встанет рядом с уже занятым местом\n3) робот всегда выбирает\nместо наиболее далекое от уже занятых\n_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\nВопрос — если изначально все места свободны — полу\nпервый встанет посередине.\nКакое кол-во занятых мест тогда полу\nчится в пределе?\nчается\nВопрос — а вот если руками выбрат\nь место, куда воткнут\nь на\nзарядку первого робота — полу\nчится ли лу\nчше?\nОтвет\nПонятно, ч\nто задача — с подвохом, и если ручками выбрат\nь первое\nместо будет лу\nчше.\nКак будет в слу\nчае полност\nью автоматического размещения:\n_ _ _ _ _ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ _\n// первый встанет посередине\n(самое дальнее от края — это центр)\n+ _ _ _ _ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ +\n+ _ _ _ _ _ _ + _ _ _ _ + _ _ _ _ + _ _ _ _ _ _ +\n+ _ _ _ + _ _ + _ _ _ _ + _ _ _ _ + _ _ + _ _ _ +\n+ _ + _ + _ _ + _ + _ _ + _ _ + _ + _ _ + _+ _ + // 11\nРу\nчной выбор места\nУ этой задачки ест\nь 2 пути решения — либо перебором первого\nместа, либо от обратного.\nОт обратного:\n+ _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + _ + //13\n+ _ + _ + _ + _ + _ _ _ + _ + _ + _ + _ + _ + _ +\n+ _ _ _ + _ _ _ + _ _ _ + _ _ _ + _ _ _ + _ _ _ +\n+ _ _ _ _ _ _ _ + _ _ _ + _ _ _ + _ _ _ + _ _ _ +\n+ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ + _ _ _ _ _ _ _ +\n+ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ +\n_ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ +\n_ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n//\nместа 9 или 17\nAI proofing\nОтвет от Deepseek 3.2 (я пихал разные формулировки, всегда ответ\nкосячный):\n+ _ + _ + + _ + _ + _ + + _ + _ + _ + _ + _ + _ +\nНо это не точно, может быт\nь меньше плюсов.\nЕсли начат\nь с 1 вручную:\n+ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\nВ\nторой станет на 25 или 13 в зависимости от правил (вероятно\n25), затем в середину и т\n.д., ч\nто может привести к 13 роботам.\nЧто на самом деле будет если поставит\nробота на 1 место:\n+ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _\n+ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ +\n+ _ _ _ _ _ _ _ _ _ _ _ + _ _ _ _ _ _ _ _ _ _ _ +\n+ _ _ _ _ _ + _ _ _ _ _ + _ _ _ _ _ + _ _ _ _ _ +\n+ _ _ + _ _ + _ _ + _ _ + _ _ + _ _ + _ _ + _ _ + // 9\nь"
+    },
+    {
+      "number": 79,
+      "title": "SQL-запросы #1",
+      "title_raw": "SQL-запросы #1",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        79,
+        80,
+        81
+      ],
+      "tags": [
+        "concurrency",
+        "sql"
+      ],
+      "prompt_raw": "79. SQL-запросы #1\nGO Скрининг\n17 - 19 грейд 10 мин 7 раз Свернуть\nЕст\nь следующая схема базы данных\n-- Таблица клиентов\nCREATE TABLE customers (\nid BIGSERIAL PRIMARY KEY,\nname VARCHAR(255) NOT NULL,\ncity VARCHAT(255) NOT NULL\n);\n-- Таблица товаров\nCREATE TABLE products (\nid BIGSERIAL PRIMARY KEY,\nname VARCHAR(255) NOT NULL,\ncategory VARCHAR(100)\n);\n-- Таблица позиций заказа\nCREATE TABLE order_items (\norder_id BIGINT NOT NULL,\nproduct_id BIGINT NOT NULL,\nqty DECIMAL(10, 3) NOT NULL CHECK (qty > 0), --\n10 цифр, 3 знака после запятой\nprice NUMERIC(10, 2) NOT NULL CHECK (price >= 0),\nPRIMARY KEY (order_id, product_id)\n);\n-- Таблица заказов\nCREATE TABLE orders (\nid BIGSERIAL PRIMARY KEY,\ncustomer_id BIGINT,\norder_date TIMESTAMP WITH TIME ZONE NOT NULL\nDEFAULT CURRENT_TIMESTAMP,\nstatus VARCHAR(50) NOT NULL CHECK (status IN\n('pending', 'paid', 'shipped', 'delivered',\n'cancelled')),\n);\n1.\n2.\nВыведите топ-3 города по выручке в убывающем порядке за\nпоследние 30 дней\nВыведите все товары у которых не было продаж за последние\nполгода",
+      "answer_raw": "17 грейд\nнаписан хотя бы один запрос\n18 грейд\nнаписаны оба запроса\n19 грейд\n•\nнаписаны оба запроса\n•\nне использовал никаких вложенных запросов, юзал только join\nу\n•\nчел, ч\nто неагрегированные поля, написанные в SELECT,\nсодержатся в GROUP BY, и лишних в селекте нет\nу\n•\nчел, ч\nто в GROUP BY записаны только неагрегированные поля",
+      "follow_up_raw": "Дополнительные вопросы\n17 грейд:\nВопрос: Что такое агрегатные ф\nункции?\nВопрос: Чем отличается LEFT JOIN от INNER JOIN?\n18 грейд:\nВопрос: Почем\nу в первом запросе необходимо использоват\nь\nWHERE, а не HAVING? Чем они отличаются?\nВопрос: Какие поля нужно писат\nь в GROUP BY?\nВопрос (если написал решение с подзапросом): предложит\nь\nисправит\nь на вариант без подзапросов, только с JOIN\n19 грейд:\nВопрос: Какие индексы можно было бы добавит\nь для оптимизации\nзапросов? Как бы ты удостоверился, ч\nто индексы рабочие?\nВопрос: Что будет\n, если в качестве PRIMARY KEY в поле ID будет тип\nuuid? Ест\nь ли минусы, какие и почем\nу\n? (ПК в постгре это б-\nтри, он\nсортированный; uuid генерится рандомный всегда и гарантироват\nь\nсоблюдение сортировки невозможно, поэтом\nу такой индекс будет\nпостоянно перестраиват\nься при добавлении новой записи)\nИли просто спросит\nь: какой бы тип ты указал в качестве типа для ID,\nкоторый ПК: int или uuid? Почем\nу\n?\nРазбиение на чанки заданного",
+      "content_raw": "79. SQL-запросы #1\nGO Скрининг\n17 - 19 грейд 10 мин 7 раз Свернуть\nЕст\nь следующая схема базы данных\n-- Таблица клиентов\nCREATE TABLE customers (\nid BIGSERIAL PRIMARY KEY,\nname VARCHAR(255) NOT NULL,\ncity VARCHAT(255) NOT NULL\n);\n-- Таблица товаров\nCREATE TABLE products (\nid BIGSERIAL PRIMARY KEY,\nname VARCHAR(255) NOT NULL,\ncategory VARCHAR(100)\n);\n-- Таблица позиций заказа\nCREATE TABLE order_items (\norder_id BIGINT NOT NULL,\nproduct_id BIGINT NOT NULL,\nqty DECIMAL(10, 3) NOT NULL CHECK (qty > 0), --\n10 цифр, 3 знака после запятой\nprice NUMERIC(10, 2) NOT NULL CHECK (price >= 0),\nPRIMARY KEY (order_id, product_id)\n);\n-- Таблица заказов\nCREATE TABLE orders (\nid BIGSERIAL PRIMARY KEY,\ncustomer_id BIGINT,\norder_date TIMESTAMP WITH TIME ZONE NOT NULL\nDEFAULT CURRENT_TIMESTAMP,\nstatus VARCHAR(50) NOT NULL CHECK (status IN\n('pending', 'paid', 'shipped', 'delivered',\n'cancelled')),\n);\n1.\n2.\nВыведите топ-3 города по выручке в убывающем порядке за\nпоследние 30 дней\nВыведите все товары у которых не было продаж за последние\nполгода\nОтвет\n17 грейд\nнаписан хотя бы один запрос\n18 грейд\nнаписаны оба запроса\n19 грейд\n•\nнаписаны оба запроса\n•\nне использовал никаких вложенных запросов, юзал только join\nу\n•\nчел, ч\nто неагрегированные поля, написанные в SELECT,\nсодержатся в GROUP BY, и лишних в селекте нет\nу\n•\nчел, ч\nто в GROUP BY записаны только неагрегированные поля\nДополнительные вопросы\n17 грейд:\nВопрос: Что такое агрегатные ф\nункции?\nВопрос: Чем отличается LEFT JOIN от INNER JOIN?\n18 грейд:\nВопрос: Почем\nу в первом запросе необходимо использоват\nь\nWHERE, а не HAVING? Чем они отличаются?\nВопрос: Какие поля нужно писат\nь в GROUP BY?\nВопрос (если написал решение с подзапросом): предложит\nь\nисправит\nь на вариант без подзапросов, только с JOIN\n19 грейд:\nВопрос: Какие индексы можно было бы добавит\nь для оптимизации\nзапросов? Как бы ты удостоверился, ч\nто индексы рабочие?\nВопрос: Что будет\n, если в качестве PRIMARY KEY в поле ID будет тип\nuuid? Ест\nь ли минусы, какие и почем\nу\n? (ПК в постгре это б-\nтри, он\nсортированный; uuid генерится рандомный всегда и гарантироват\nь\nсоблюдение сортировки невозможно, поэтом\nу такой индекс будет\nпостоянно перестраиват\nься при добавлении новой записи)\nИли просто спросит\nь: какой бы тип ты указал в качестве типа для ID,\nкоторый ПК: int или uuid? Почем\nу\n?\nРазбиение на чанки заданного"
+    },
+    {
+      "number": 83,
+      "title": "SQL-запросы #2",
+      "title_raw": "SQL-запросы #2",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        84,
+        85,
+        86
+      ],
+      "tags": [
+        "concurrency",
+        "sql"
+      ],
+      "prompt_raw": "83. SQL-запросы #2\nGO Скрининг\n17 - 19 грейд 10 мин 4 раза Свернуть\nЕст\nь следующая схема базы данных\n-- Таблица клиентов\nCREATE TABLE customers (\nid BIGSERIAL PRIMARY KEY,\nname VARCHAR(255) NOT NULL,\ncity VARCHAT(255) NOT NULL\n);\n-- Таблица товаров\nCREATE TABLE products (\nid BIGSERIAL PRIMARY KEY,\nname VARCHAR(255) NOT NULL,\ncategory VARCHAR(100)\n);\n-- Таблица позиций заказа\nCREATE TABLE order_items (\norder_id BIGINT NOT NULL,\nproduct_id BIGINT NOT NULL,\nqty DECIMAL(10, 3) NOT NULL CHECK (qty > 0), --\n10 цифр, 3 знака после запятой\nprice NUMERIC(10, 2) NOT NULL CHECK (price >= 0),\nPRIMARY KEY (order_id, product_id)\n);\n-- Таблица заказов\nCREATE TABLE orders (\nid BIGSERIAL PRIMARY KEY,\ncustomer_id BIGINT,\norder_date TIMESTAMP WITH TIME ZONE NOT NULL\nDEFAULT CURRENT_TIMESTAMP,\nstatus VARCHAR(50) NOT NULL CHECK (status IN\n('pending', 'paid', 'shipped', 'delivered',\n'cancelled')),\n);\n1.\n2.\nВыведите ТОП 10 по су\nмме заказов пользователей совершивших\nболее 2-х заказов за последние 30 дней\nВыведите ТОП 3 категорий по выручке за последние 6 месяцев",
+      "answer_raw": "17 грейд\nнаписан хотя бы один запрос\n18 грейд\nнаписаны оба запроса\n19 грейд\n•\nнаписаны оба запроса\n•\nне использовал никаких подзапросов, юзал только join\nу\n•\nчел, ч\nто неагрегированные поля, написанные в SELECT,\nсодержатся в GROUP BY, и лишних в селекте нет\nу\n•\nчел, ч\nто в GROUP BY записаны только неагрегированные поля",
+      "follow_up_raw": "Дополнительные вопросы\n17 грейд:\nВопрос: Что такое агрегатные ф\nункции?\nВопрос: Чем отличается LEFT JOIN от INNER JOIN?\n18 грейд:\nВопрос: Почем\nу в первом запросе необходимо использоват\nь\nWHERE, а не HAVING? Чем они отличаются?\nВопрос: Какие поля нужно писат\nь в GROUP BY?\nВопрос (если написал решение с подзапросом): предложит\nь\nисправит\nь на вариант без подзапросов, только с JOIN\n19 грейд:\nВопрос: Какие индексы можно было бы добавит\nь для оптимизации\nзапросов? Как бы ты удостоверился, ч\nто индексы рабочие?\nВопрос: Что будет\n, если в качестве PRIMARY KEY в поле ID будет тип\nuuid? Ест\nь ли минусы, какие и почем\nу\n? (ПК в постгре это б-\nтри, он\nсортированный; uuid генерится рандомный всегда и гарантироват\nь\nсоблюдение сортировки невозможно, поэтом\nу такой индекс будет\nпостоянно перестраиват\nься при добавлении новой записи)\nИли просто спросит\nь: какой бы тип ты указал в качестве типа для ID,\nкоторый ПК: int или uuid? Почем\nу\n?",
+      "content_raw": "83. SQL-запросы #2\nGO Скрининг\n17 - 19 грейд 10 мин 4 раза Свернуть\nЕст\nь следующая схема базы данных\n-- Таблица клиентов\nCREATE TABLE customers (\nid BIGSERIAL PRIMARY KEY,\nname VARCHAR(255) NOT NULL,\ncity VARCHAT(255) NOT NULL\n);\n-- Таблица товаров\nCREATE TABLE products (\nid BIGSERIAL PRIMARY KEY,\nname VARCHAR(255) NOT NULL,\ncategory VARCHAR(100)\n);\n-- Таблица позиций заказа\nCREATE TABLE order_items (\norder_id BIGINT NOT NULL,\nproduct_id BIGINT NOT NULL,\nqty DECIMAL(10, 3) NOT NULL CHECK (qty > 0), --\n10 цифр, 3 знака после запятой\nprice NUMERIC(10, 2) NOT NULL CHECK (price >= 0),\nPRIMARY KEY (order_id, product_id)\n);\n-- Таблица заказов\nCREATE TABLE orders (\nid BIGSERIAL PRIMARY KEY,\ncustomer_id BIGINT,\norder_date TIMESTAMP WITH TIME ZONE NOT NULL\nDEFAULT CURRENT_TIMESTAMP,\nstatus VARCHAR(50) NOT NULL CHECK (status IN\n('pending', 'paid', 'shipped', 'delivered',\n'cancelled')),\n);\n1.\n2.\nВыведите ТОП 10 по су\nмме заказов пользователей совершивших\nболее 2-х заказов за последние 30 дней\nВыведите ТОП 3 категорий по выручке за последние 6 месяцев\nОтвет\n17 грейд\nнаписан хотя бы один запрос\n18 грейд\nнаписаны оба запроса\n19 грейд\n•\nнаписаны оба запроса\n•\nне использовал никаких подзапросов, юзал только join\nу\n•\nчел, ч\nто неагрегированные поля, написанные в SELECT,\nсодержатся в GROUP BY, и лишних в селекте нет\nу\n•\nчел, ч\nто в GROUP BY записаны только неагрегированные поля\nДополнительные вопросы\n17 грейд:\nВопрос: Что такое агрегатные ф\nункции?\nВопрос: Чем отличается LEFT JOIN от INNER JOIN?\n18 грейд:\nВопрос: Почем\nу в первом запросе необходимо использоват\nь\nWHERE, а не HAVING? Чем они отличаются?\nВопрос: Какие поля нужно писат\nь в GROUP BY?\nВопрос (если написал решение с подзапросом): предложит\nь\nисправит\nь на вариант без подзапросов, только с JOIN\n19 грейд:\nВопрос: Какие индексы можно было бы добавит\nь для оптимизации\nзапросов? Как бы ты удостоверился, ч\nто индексы рабочие?\nВопрос: Что будет\n, если в качестве PRIMARY KEY в поле ID будет тип\nuuid? Ест\nь ли минусы, какие и почем\nу\n? (ПК в постгре это б-\nтри, он\nсортированный; uuid генерится рандомный всегда и гарантироват\nь\nсоблюдение сортировки невозможно, поэтом\nу такой индекс будет\nпостоянно перестраиват\nься при добавлении новой записи)\nИли просто спросит\nь: какой бы тип ты указал в качестве типа для ID,\nкоторый ПК: int или uuid? Почем\nу\n?"
+    },
+    {
+      "number": 85,
+      "title": "Напиши сортировку по полю в объекте",
+      "title_raw": "Напиши сортировку по полю в объекте",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        87,
+        88,
+        89
+      ],
+      "tags": [
+        "maps",
+        "slices",
+        "strings"
+      ],
+      "prompt_raw": "85. Напиши сортировку по полю в объекте\nGO Скрининг\n17 грейд 5 мин 1 раз Свернуть\nЕст\nь список задач, их 4 вида: Epic, Story, Ta\nsk, Sub-Ta\nsk\ntype Issue struct {\nID int\nType string // Epic, Story, Task, Sub-Task\n}\n// пример:\nissues := []Issue{\n{ID: 1, Type: \"Sub-Task\"},\n{ID: 2, Type: \"Sub-Task\"},\n{ID: 3, Type: \"Task\"},\n{ID: 4, Type: \"Story\"},\n{ID: 5, Type: \"Epic\"},\n}\nНужно написать программу, которая сортирует подобный\nсписок по приоритетам:\n1. Epic'и 2. Story'и 3. Task'и 4.Sub-Task'и\nа затем — по ID",
+      "answer_raw": "package main\nimport (\n\"fmt\"\n\"slices\"\n)\nvar prioriries = map[string]int{\n\"Epic\": 1,\n\"Story\": 2,\n\"Task\": 3,\n\"Sub-Task\": 4,\n}\ntype Issue struct {\nID int\nType string // Epic, Story, Task, Sub-Task\n}\nfunc main() {\n// пример:\nissues := []Issue{\n{ID: 2, Type: \"Sub-Task\"},\n{ID: 1, Type: \"Sub-Task\"},\n{ID: 3, Type: \"Task\"},\n{ID: 4, Type: \"Story\"},\n{ID: 5, Type: \"Epic\"},\n}\nslices.SortFunc(issues, func(a, b Issue) int {\npriorityA := prioriries[a.Type]\npriorityB := prioriries[b.Type]\nif priorityA == priorityB {\nreturn a.ID - b.ID\n}\nreturn priorityA - priorityB\n})\nfmt.Printf(\"%v\", issues)\n}",
+      "follow_up_raw": "Дополнительные вопросы\nВ\nторой вариант\n, более «трактористский»\npackage main\nimport (\n\"fmt\"\n\"sort\"\n)\nvar priorities = map[string]int{\n\"Epic\": 1,\n\"Story\": 2,\n\"Task\": 3,\n\"Sub-Task\": 4,\n}\ntype Issue struct {\nID int\nType string // Epic, Story, Task, Sub-Task\n}\n// ByPriority implements sort.Interface for []Issue\nbased on the priority map\ntype ByPriority []Issue\nfunc (a ByPriority) Len() int { return\nlen(a) }\nfunc (a ByPriority) Swap(i, j int) { a[i], a[j]\n= a[j], a[i] }\nfunc (a ByPriority) Less(i, j int) bool {\nreturn priorities[a[i].Type] <\npriorities[a[j].Type]\n}\nfunc main() {\n// пример:\nissues := []Issue{\n{ID: 1, Type: \"Sub-Task\"},\n{ID: 2, Type: \"Sub-Task\"},\n{ID: 3, Type: \"Task\"},\n{ID: 4, Type: \"Story\"},\n{ID: 5, Type: \"Epic\"},\n}\nsort.Sort(ByPriority(issues))\nfmt.Printf(\"%v\", issues)\n}",
+      "content_raw": "85. Напиши сортировку по полю в объекте\nGO Скрининг\n17 грейд 5 мин 1 раз Свернуть\nЕст\nь список задач, их 4 вида: Epic, Story, Ta\nsk, Sub-Ta\nsk\ntype Issue struct {\nID int\nType string // Epic, Story, Task, Sub-Task\n}\n// пример:\nissues := []Issue{\n{ID: 1, Type: \"Sub-Task\"},\n{ID: 2, Type: \"Sub-Task\"},\n{ID: 3, Type: \"Task\"},\n{ID: 4, Type: \"Story\"},\n{ID: 5, Type: \"Epic\"},\n}\nНужно написать программу, которая сортирует подобный\nсписок по приоритетам:\n1. Epic'и 2. Story'и 3. Task'и 4.Sub-Task'и\nа затем — по ID\nОтвет\npackage main\nimport (\n\"fmt\"\n\"slices\"\n)\nvar prioriries = map[string]int{\n\"Epic\": 1,\n\"Story\": 2,\n\"Task\": 3,\n\"Sub-Task\": 4,\n}\ntype Issue struct {\nID int\nType string // Epic, Story, Task, Sub-Task\n}\nfunc main() {\n// пример:\nissues := []Issue{\n{ID: 2, Type: \"Sub-Task\"},\n{ID: 1, Type: \"Sub-Task\"},\n{ID: 3, Type: \"Task\"},\n{ID: 4, Type: \"Story\"},\n{ID: 5, Type: \"Epic\"},\n}\nslices.SortFunc(issues, func(a, b Issue) int {\npriorityA := prioriries[a.Type]\npriorityB := prioriries[b.Type]\nif priorityA == priorityB {\nreturn a.ID - b.ID\n}\nreturn priorityA - priorityB\n})\nfmt.Printf(\"%v\", issues)\n}\nДополнительные вопросы\nВ\nторой вариант\n, более «трактористский»\npackage main\nimport (\n\"fmt\"\n\"sort\"\n)\nvar priorities = map[string]int{\n\"Epic\": 1,\n\"Story\": 2,\n\"Task\": 3,\n\"Sub-Task\": 4,\n}\ntype Issue struct {\nID int\nType string // Epic, Story, Task, Sub-Task\n}\n// ByPriority implements sort.Interface for []Issue\nbased on the priority map\ntype ByPriority []Issue\nfunc (a ByPriority) Len() int { return\nlen(a) }\nfunc (a ByPriority) Swap(i, j int) { a[i], a[j]\n= a[j], a[i] }\nfunc (a ByPriority) Less(i, j int) bool {\nreturn priorities[a[i].Type] <\npriorities[a[j].Type]\n}\nfunc main() {\n// пример:\nissues := []Issue{\n{ID: 1, Type: \"Sub-Task\"},\n{ID: 2, Type: \"Sub-Task\"},\n{ID: 3, Type: \"Task\"},\n{ID: 4, Type: \"Story\"},\n{ID: 5, Type: \"Epic\"},\n}\nsort.Sort(ByPriority(issues))\nfmt.Printf(\"%v\", issues)\n}"
+    },
+    {
+      "number": 88,
+      "title": "Ошибки",
+      "title_raw": "Ошибки",
+      "source_category": "GO Скрининг",
+      "source_pages": [
+        91,
+        92
+      ],
+      "tags": [
+        "review",
+        "sql",
+        "strings"
+      ],
+      "prompt_raw": "88. Ошибки\nGO Скрининг\n18 грейд 5 мин 0 раз Свернуть\nРасскажи ч\nто выведет код? Что ты про этот код ду\nмаешь?\n// Check if project exists\nexistingID, err :=\ni.projectRepo.GetIDByJiraID(ctx, postgresConn,\nissue.ID)\nif err != nil {\nreturn 0, fmt.Errorf(\"failed to check\nproject existence: %w\", issue.ID)\n}",
+      "answer_raw": "1) GetIDByJir\naID явно ходит в Postgres, ошибка может быт\nь\nsql.ErrNoRows которая явно говорит\nч\nто проекта в БД нет\n2) %w разрешено исопльзоват\nь\nтолько с переменными типа error\nЧто будет\n, если issue.ID не error?\nБ\nудет ли работат\nь errors.Is / errors.As ?",
+      "follow_up_raw": "Дополнительные вопросы\nОтвет от Ch\na\ntGPT:\nлибо:\n•\nвернё\nт (0, error) из теку\nщей ф\nункции,\n•\nлибо просто пойдё\nт дальше, если err == nil.\nКод скомпилируется, но при форматировании ошибки Go сделает\nтак:\n•\n%w с не-error аргу\nментом\n→\n•\n%!w(<type>=<value>)\nНапример:\nfailed to check project existence: %!w(string=ABC-\n123)\nЧто я ду\nмаю про этот код (как senior)\nМинусы\n•\n❌ Некорректное использование %w\n•\n❌ Потеря исходной ошибки\n•\n❌ Потенциально вводящий в заблуждение лог\nПлюсы\n•\n✅ Ест\nь контекстная ошибка\n•\n✅ Репозиторий абстрагирован\n•\n✅ Контекст (ctx ) пробрасывается\n© 1998 – 2026 ООО «Интернет Решения». Все права защищены",
+      "content_raw": "88. Ошибки\nGO Скрининг\n18 грейд 5 мин 0 раз Свернуть\nРасскажи ч\nто выведет код? Что ты про этот код ду\nмаешь?\n// Check if project exists\nexistingID, err :=\ni.projectRepo.GetIDByJiraID(ctx, postgresConn,\nissue.ID)\nif err != nil {\nreturn 0, fmt.Errorf(\"failed to check\nproject existence: %w\", issue.ID)\n}\nОтвет\n1) GetIDByJir\naID явно ходит в Postgres, ошибка может быт\nь\nsql.ErrNoRows которая явно говорит\nч\nто проекта в БД нет\n2) %w разрешено исопльзоват\nь\nтолько с переменными типа error\nЧто будет\n, если issue.ID не error?\nБ\nудет ли работат\nь errors.Is / errors.As ?\nДополнительные вопросы\nОтвет от Ch\na\ntGPT:\nлибо:\n•\nвернё\nт (0, error) из теку\nщей ф\nункции,\n•\nлибо просто пойдё\nт дальше, если err == nil.\nКод скомпилируется, но при форматировании ошибки Go сделает\nтак:\n•\n%w с не-error аргу\nментом\n→\n•\n%!w(<type>=<value>)\nНапример:\nfailed to check project existence: %!w(string=ABC-\n123)\nЧто я ду\nмаю про этот код (как senior)\nМинусы\n•\n❌ Некорректное использование %w\n•\n❌ Потеря исходной ошибки\n•\n❌ Потенциально вводящий в заблуждение лог\nПлюсы\n•\n✅ Ест\nь контекстная ошибка\n•\n✅ Репозиторий абстрагирован\n•\n✅ Контекст (ctx ) пробрасывается\n© 1998 – 2026 ООО «Интернет Решения». Все права защищены"
+    }
+  ]
+}

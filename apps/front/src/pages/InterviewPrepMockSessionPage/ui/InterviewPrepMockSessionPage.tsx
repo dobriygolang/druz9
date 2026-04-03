@@ -43,6 +43,7 @@ const STAGE_LABELS: Record<InterviewPrepMockStageKind, string> = {
   sql: 'SQL',
   architecture: 'Architecture',
   system_design: 'System Design',
+  unspecified: 'Unspecified',
 };
 
 const DESIGN_INITIAL_STATE: InterviewPrepSystemDesignReviewInput = {

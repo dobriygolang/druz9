@@ -19,6 +19,7 @@ SELECT 1;
 export const resultLabel: Record<InterviewPrepSelfAssessment, string> = {
   answered: 'Ответил сам',
   skipped: 'Пропустил',
+  unspecified: 'Unspecified',
 };
 
 export type SqlStarterTab = 'schema' | 'examples';

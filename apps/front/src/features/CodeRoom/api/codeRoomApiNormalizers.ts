@@ -254,7 +254,7 @@ export function normalizeTask(task: any): CodeTask {
 export function normalizeLeaderboardEntry(entry: any): CodeLeaderboardEntry {
   return {
     userId: entry?.userId || entry?.user_id || '',
-    displayName: entry?.displayName || entry?.display_name || 'Игрок',
+    displayName: entry?.displayName || entry?.display_name || '',
     wins: Number(entry?.wins || 0),
     matches: Number(entry?.matches || 0),
     winRate: Number(entry?.winRate ?? entry?.win_rate ?? 0),
@@ -265,7 +265,7 @@ export function normalizeLeaderboardEntry(entry: any): CodeLeaderboardEntry {
 export function normalizeArenaPlayer(player: any): ArenaPlayer {
   return {
     userId: player?.userId || player?.user_id || '',
-    displayName: player?.displayName || player?.display_name || 'Игрок',
+    displayName: player?.displayName || player?.display_name || '',
     side: normalizeArenaSide(player?.side),
     isCreator: Boolean(player?.isCreator ?? player?.is_creator),
     currentCode: player?.currentCode || player?.current_code || '',
@@ -306,7 +306,7 @@ export function normalizeArenaMatch(match: any): ArenaMatch {
 export function normalizeArenaLeaderboardEntry(entry: any): ArenaLeaderboardEntry {
   return {
     userId: entry?.userId || entry?.user_id || '',
-    displayName: entry?.displayName || entry?.display_name || 'Игрок',
+    displayName: entry?.displayName || entry?.display_name || '',
     rating: Number(entry?.rating ?? 300),
     league: normalizeArenaLeague(entry?.league),
     wins: Number(entry?.wins ?? 0),
@@ -331,7 +331,7 @@ export function normalizeArenaQueueState(state: any): ArenaQueueState {
 export function normalizeArenaPlayerStats(stats: any): ArenaPlayerStats {
   return {
     userId: stats?.userId || stats?.user_id || '',
-    displayName: stats?.displayName || stats?.display_name || 'Игрок',
+    displayName: stats?.displayName || stats?.display_name || '',
     rating: Number(stats?.rating ?? 300),
     league: normalizeArenaLeague(stats?.league),
     wins: Number(stats?.wins ?? 0),

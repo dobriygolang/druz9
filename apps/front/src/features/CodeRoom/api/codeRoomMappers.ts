@@ -32,7 +32,7 @@ const isCreatorParticipant = (participant: any) => (
 
 export function normalizeParticipant(participant: any): Participant {
   const userId = participant?.userId ?? participant?.user_id ?? null;
-  const displayName = participant?.displayName ?? participant?.name ?? 'Гость';
+  const displayName = participant?.displayName ?? participant?.name ?? '';
   const joinedAt = participant?.joinedAt ?? participant?.joined_at ?? new Date().toISOString();
   const role = isCreatorParticipant(participant) ? 'creator' : 'member';
 

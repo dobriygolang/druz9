@@ -62,7 +62,8 @@ type BackendEventResponse = {
 function normalizeParticipantStatus(value: unknown): EventParticipant['status'] {
   if (value === 2 || value === 'PARTICIPANT_STATUS_CONFIRMED' || value === 'confirmed' || value === 'joined') return 'joined';
   if (value === 3 || value === 'PARTICIPANT_STATUS_DECLINED' || value === 'declined') return 'declined';
-  return 'invited';
+  if (value === 1 || value === 'PARTICIPANT_STATUS_PENDING' || value === 'pending' || value === 'invited') return 'invited';
+  return 'unspecified';
 }
 
 function normalizeParticipant(

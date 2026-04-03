@@ -1,0 +1,36 @@
+{
+  "version": "ozon-mock-v2-full-pdf",
+  "company_tag": "ozon",
+  "source_document": "ЗадачникГо.pdf",
+  "total_tasks": 88,
+  "files": [
+    {
+      "file": "ozon_architecture_mock.json",
+      "task_count": 6
+    },
+    {
+      "file": "ozon_data_structures_mock.json",
+      "task_count": 1
+    },
+    {
+      "file": "ozon_go_practice_mock.json",
+      "task_count": 18
+    },
+    {
+      "file": "ozon_go_theory_mock.json",
+      "task_count": 23
+    },
+    {
+      "file": "ozon_os_network_mock.json",
+      "task_count": 14
+    },
+    {
+      "file": "ozon_screening_mock.json",
+      "task_count": 17
+    },
+    {
+      "file": "ozon_sql_mock.json",
+      "task_count": 9
+    }
+  ]
+}
