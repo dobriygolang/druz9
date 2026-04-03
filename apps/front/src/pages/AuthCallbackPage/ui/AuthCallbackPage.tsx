@@ -16,7 +16,7 @@ export const AuthCallbackPage: React.FC = () => {
 
   const nextPath = useMemo(() => {
     if (!isAuthenticated) return null;
-    return needsProfileComplete ? '/complete-registration' : '/feed';
+    return needsProfileComplete ? '/complete-registration' : '/home';
   }, [isAuthenticated, needsProfileComplete]);
 
   useEffect(() => {
@@ -36,7 +36,7 @@ export const AuthCallbackPage: React.FC = () => {
       try {
         await completeYandexAuth(state, code);
         if (!cancelled) {
-          navigate('/feed', { replace: true });
+          navigate('/home', { replace: true });
         }
       } catch (err) {
         if (!cancelled) {

@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useCallback, useEffect, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { authApi } from '@/features/Auth/api/authApi';
@@ -10,15 +10,16 @@ import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 import { ArenaLeaderboardEntry, ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode } from '@/entities/CodeRoom/model/types';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import {
-  ArenaPrimaryGrid,
-  ArenaSecondaryGrid,
   CodeRoomsHeroSection,
-  CreateRoomModal,
-  GuestLoginBanner,
-  LeaguesModal,
+  ArenaPrimaryGrid,
   SoloPracticeSection,
 } from './components/CodeRoomsSections';
 import { pickRandomValue, pluralizeRu, shuffledValues } from './lib/helpers';
+
+const ArenaSecondaryGrid = lazy(() => import('./components/CodeRoomsDeferredSections').then((m) => ({ default: m.ArenaSecondaryGrid })));
+const CreateRoomModal = lazy(() => import('./components/CodeRoomsDeferredSections').then((m) => ({ default: m.CreateRoomModal })));
+const GuestLoginBanner = lazy(() => import('./components/CodeRoomsDeferredSections').then((m) => ({ default: m.GuestLoginBanner })));
+const LeaguesModal = lazy(() => import('./components/CodeRoomsDeferredSections').then((m) => ({ default: m.LeaguesModal })));
 
 const MOTIVATIONAL_QUOTES = [
   'Код — это поэзия логики',
@@ -436,7 +437,11 @@ export const CodeRoomsPage: React.FC = () => {
 
   return (
     <>
-      {isGuest && <GuestLoginBanner />}
+      {isGuest && (
+        <Suspense fallback={null}>
+          <GuestLoginBanner />
+        </Suspense>
+      )}
       <div className="code-rooms-page">
         <CodeRoomsHeroSection
           isMobile={isMobile}
@@ -471,7 +476,7 @@ export const CodeRoomsPage: React.FC = () => {
                 for (const companyTag of candidateCompanies) {
                   try {
                     const session = await interviewPrepApi.startMockSession(companyTag);
-                    navigate(`/interview-prep/mock/${session.id}`);
+                    navigate(`/growth/interview-prep/mock/${session.id}`);
                     return;
                   } catch (innerError: any) {
                     const apiError = innerError?.response?.data?.error || '';
@@ -485,8 +490,8 @@ export const CodeRoomsPage: React.FC = () => {
               }
             })();
           }}
-          onOpenRandomTask={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
-          onOpenCatalog={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
+          onOpenRandomTask={() => navigate(`/growth/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
+          onOpenCatalog={() => navigate(`/growth/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
         />
 
         {queueState?.status === 'queued' && (
@@ -517,39 +522,40 @@ export const CodeRoomsPage: React.FC = () => {
           }}
         />
 
-        <ArenaSecondaryGrid
-          userId={user?.id}
-          openMatchesLoading={openMatchesLoading}
-          openMatches={openMatches}
-          sortedOpenMatches={sortedOpenMatches}
-          ruleSections={ARENA_RULE_SECTIONS}
-          onOpenMatch={(href) => navigate(href)}
-        />
+        <Suspense fallback={<div className="empty-state compact">Подгружаем дополнительные practice surfaces...</div>}>
+          <ArenaSecondaryGrid
+            userId={user?.id}
+            openMatchesLoading={openMatchesLoading}
+            openMatches={openMatches}
+            sortedOpenMatches={sortedOpenMatches}
+            ruleSections={ARENA_RULE_SECTIONS}
+            onOpenMatch={(href) => navigate(href)}
+          />
 
-      <CreateRoomModal
-        open={showCreateModal}
-        isGuest={isGuest}
-        creating={creating}
-        newRoomMode={newRoomMode}
-        queueState={queueState}
-        duelTopics={DUEL_TOPICS}
-        difficultyOptions={DIFFICULTY_OPTIONS}
-        newRoomTopic={newRoomTopic}
-        newRoomDifficulty={newRoomDifficulty}
-        onClose={() => {
-          // If in queue mode and queued, don't cancel - just close modal
-          if (newRoomMode === 'queue' && queueState?.status === 'queued') {
-            setShowCreateModal(false);
-          } else {
-            resetCreateModal();
-          }
-        }}
-        onCancelQueue={() => resetCreateModal()}
-        onCreate={() => { void handleCreateRoom(); }}
-        onModeChange={setNewRoomMode}
-        onTopicChange={setNewRoomTopic}
-        onDifficultyChange={setNewRoomDifficulty}
-      />
+          <CreateRoomModal
+            open={showCreateModal}
+            isGuest={isGuest}
+            creating={creating}
+            newRoomMode={newRoomMode}
+            queueState={queueState}
+            duelTopics={DUEL_TOPICS}
+            difficultyOptions={DIFFICULTY_OPTIONS}
+            newRoomTopic={newRoomTopic}
+            newRoomDifficulty={newRoomDifficulty}
+            onClose={() => {
+              if (newRoomMode === 'queue' && queueState?.status === 'queued') {
+                setShowCreateModal(false);
+              } else {
+                resetCreateModal();
+              }
+            }}
+            onCancelQueue={() => resetCreateModal()}
+            onCreate={() => { void handleCreateRoom(); }}
+            onModeChange={setNewRoomMode}
+            onTopicChange={setNewRoomTopic}
+            onDifficultyChange={setNewRoomDifficulty}
+          />
+        </Suspense>
       </div>
 
       <GuestNameModal
@@ -565,7 +571,9 @@ export const CodeRoomsPage: React.FC = () => {
         }}
       />
 
-      <LeaguesModal open={showLeaguesModal} leagues={LEAGUES} onClose={() => setShowLeaguesModal(false)} />
+      <Suspense fallback={null}>
+        <LeaguesModal open={showLeaguesModal} leagues={LEAGUES} onClose={() => setShowLeaguesModal(false)} />
+      </Suspense>
     </>
   );
 };

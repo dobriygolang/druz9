@@ -171,7 +171,7 @@ export function InterviewPrepPage() {
     setStartingTaskId(taskId);
     try {
       const session = await interviewPrepApi.startSession(taskId);
-      navigate(`/interview-prep/${session.id}`);
+      navigate(`/growth/interview-prep/${session.id}`);
     } catch (e: any) {
       console.error('Failed to start interview prep session:', e);
       setError(e.response?.data?.error || 'Не удалось начать сессию');
@@ -185,7 +185,7 @@ export function InterviewPrepPage() {
     setStartingCheckpointTaskId(taskId);
     try {
       const result = await interviewPrepApi.startCheckpoint(taskId);
-      navigate(`/interview-prep/${result.session.id}`);
+      navigate(`/growth/interview-prep/${result.session.id}`);
     } catch (e: any) {
       console.error('Failed to start checkpoint session:', e);
       setError(e.response?.data?.error || 'Не удалось начать checkpoint');
@@ -209,7 +209,7 @@ export function InterviewPrepPage() {
       for (const companyTag of candidateCompanies) {
         try {
           const session = await interviewPrepApi.startMockSession(companyTag);
-          navigate(`/interview-prep/mock/${session.id}`);
+          navigate(`/growth/interview-prep/mock/${session.id}`);
           return;
         } catch (e: any) {
           const apiError = e.response?.data?.error || '';

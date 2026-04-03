@@ -126,7 +126,7 @@ export const InterviewPrepAdminPage: React.FC = () => {
   }, []);
 
   if (!isAdmin) {
-    return <Navigate to="/feed" replace />;
+    return <Navigate to="/home" replace />;
   }
 
   const openCreateTaskModal = (task?: InterviewPrepTask) => {

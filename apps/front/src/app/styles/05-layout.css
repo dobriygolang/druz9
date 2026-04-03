@@ -1244,139 +1244,7 @@
   color: #ff9c97;
 }
 
-.feed-page {
-  display: flex;
-  flex-direction: column;
-  gap: 24px;
-}
-
-.feed-hero {
-  position: relative;
-  overflow: hidden;
-  background:
-    radial-gradient(circle at top right, rgba(93, 87, 255, 0.13), transparent 32%),
-    radial-gradient(circle at bottom left, rgba(56, 189, 248, 0.08), transparent 24%),
-    linear-gradient(180deg, rgba(29, 29, 35, 0.96), rgba(20, 20, 27, 0.94));
-}
-
-.feed-hero__admin-btn {
-  min-height: 40px;
-  border-radius: 14px;
-}
-
-.feed-admin-panel {
-  margin-bottom: 12px;
-  background:
-    radial-gradient(circle at top right, rgba(93, 87, 255, 0.12), transparent 34%),
-    rgba(255, 255, 255, 0.025);
-  border: 1px solid rgba(123, 117, 255, 0.22);
-  border-radius: 24px;
-}
-
-.feed-admin-panel__head {
-  flex-wrap: wrap;
-}
-
-.feed-admin-panel__grid {
-  align-items: start;
-}
-
-.feed-admin-panel__field {
-  min-width: 0;
-}
-
-.feed-admin-panel__upload {
-  min-width: 0;
-}
-
-.feed-list {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.feed-empty-state {
-  border: 1px dashed rgba(255,255,255,0.08);
-  background: rgba(255,255,255,0.015);
-  border-radius: 28px;
-}
-
-.feed-podcast-card {
-  display: flex;
-  align-items: center;
-  gap: 24px;
-  padding: 24px;
-  flex-wrap: nowrap;
-  background:
-    radial-gradient(circle at top right, rgba(93, 87, 255, 0.06), transparent 34%),
-    rgba(255,255,255,0.02);
-  border: 1px solid rgba(255,255,255,0.05);
-  border-radius: 24px;
-  transition: transform 0.24s ease, box-shadow 0.24s ease, border-color 0.24s ease, background 0.24s ease;
-}
-
-.feed-podcast-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255, 255, 255, 0.08);
-  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.22);
-}
-
-.feed-podcast-card.is-active {
-  background:
-    radial-gradient(circle at top right, rgba(93, 87, 255, 0.12), transparent 34%),
-    rgba(93, 87, 255, 0.06);
-  border-color: rgba(93, 87, 255, 0.4);
-  box-shadow: 0 12px 30px rgba(93, 87, 255, 0.12);
-}
-
-.feed-podcast-card__play {
-  flex: 0 0 auto;
-}
-
-.feed-podcast-card__body {
-  min-width: 0;
-}
-
-.feed-podcast-card__title-row {
-  min-width: 0;
-}
-
-.feed-podcast-card__title-row h3 {
-  margin: 0;
-  line-height: 1.2;
-}
-
-.feed-podcast-card__meta {
-  min-width: 0;
-}
-
-.feed-podcast-card__delete {
-  flex: 0 0 auto;
-}
-
-.feed-notes-section {
-  margin-top: 48px;
-}
-
-.feed-notes-section__title {
-  font-size: 24px;
-  margin-bottom: 24px;
-  font-weight: 700;
-}
-
-.feed-notes-placeholder {
-  background: rgba(255,255,255,0.01);
-  border: 1px dashed rgba(255,255,255,0.08);
-  border-radius: 32px;
-}
-
 @media (max-width: 900px) {
-  .feed-podcast-card {
-    gap: 16px;
-    padding: 18px;
-    flex-wrap: wrap;
-  }
-
   .events-hero__meta {
     gap: 8px;
   }
@@ -1407,13 +1275,11 @@
 }
 
 @media (max-width: 720px) {
-  .map-page,
-  .feed-page {
+  .map-page {
     gap: 18px;
   }
 
-  .map-hero,
-  .feed-hero {
+  .map-hero {
     padding: 22px 20px;
     border-radius: 22px;
   }
@@ -1521,58 +1387,4 @@
     font-size: 11px;
   }
 
-  .feed-admin-panel {
-    border-radius: 20px;
-  }
-
-  .feed-admin-panel__head {
-    margin-bottom: 18px !important;
-  }
-
-  .feed-admin-panel__grid {
-    gap: 14px !important;
-  }
-
-  .feed-empty-state,
-  .feed-notes-placeholder,
-  .feed-podcast-card {
-    border-radius: 22px;
-  }
-
-  .feed-podcast-card {
-    gap: 14px;
-    align-items: flex-start;
-  }
-
-  .feed-podcast-card__play {
-    width: 52px !important;
-    height: 52px !important;
-  }
-
-  .feed-podcast-card__title-row {
-    gap: 6px !important;
-    margin-bottom: 6px !important;
-  }
-
-  .feed-podcast-card__title-row h3 {
-    font-size: 17px !important;
-  }
-
-  .feed-podcast-card__meta {
-    gap: 8px 10px !important;
-    font-size: 13px !important;
-  }
-
-  .feed-podcast-card__meta span[style*='opacity: 0.3'] {
-    display: none;
-  }
-
-  .feed-notes-section {
-    margin-top: 28px;
-  }
-
-  .feed-notes-section__title {
-    font-size: 20px;
-    margin-bottom: 14px;
-  }
 }

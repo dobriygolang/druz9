@@ -1,13 +1,15 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CalendarDays, Code2, Orbit, Sparkles, Trophy, Users } from 'lucide-react';
+import { ArrowRight, CalendarDays, Clock3, Code2, Orbit, PlayCircle, Sparkles, Trophy, Users } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
+import { usePodcast } from '@/app/providers/PodcastProvider';
 import { Circle } from '@/entities/Circle/model/types';
-import { CommunityEvent, CommunityMapPoint } from '@/entities/User/model/types';
+import { CommunityEvent, CommunityMapPoint, Podcast } from '@/entities/User/model/types';
 import { circleApi } from '@/features/Circle/api/circleApi';
 import { eventApi } from '@/features/Event/api/eventApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
+import { podcastApi } from '@/features/Podcast/api/podcastApi';
 
 function formatDate(value: string) {
   return new Intl.DateTimeFormat('ru-RU', {
@@ -20,9 +22,11 @@ function formatDate(value: string) {
 
 export const HomePage: React.FC = () => {
   const { user } = useAuth();
+  const { currentPodcast, isPlaying, playPodcast } = usePodcast();
   const [users, setUsers] = useState<CommunityMapPoint[]>([]);
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [circles, setCircles] = useState<Circle[]>([]);
+  const [podcasts, setPodcasts] = useState<Podcast[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -31,18 +35,20 @@ export const HomePage: React.FC = () => {
     const load = async () => {
       try {
         setIsLoading(true);
-        const [nextUsers, nextEvents, nextCircles] = await Promise.all([
+        const [nextUsers, nextEvents, nextCircles, nextPodcasts] = await Promise.all([
           geoApi.communityMap(),
           eventApi.list(),
           circleApi.list({
             currentUserId: user?.id,
             currentUserRegion: user?.region,
           }),
+          podcastApi.list({ limit: 4 }),
         ]);
         if (!cancelled) {
           setUsers(nextUsers);
           setEvents(nextEvents);
           setCircles(nextCircles);
+          setPodcasts(nextPodcasts);
         }
       } catch (error) {
         console.error('Failed to load home dashboard', error);
@@ -191,6 +197,41 @@ export const HomePage: React.FC = () => {
               <strong>Арена теперь живет внутри Practice</strong>
               <p>Это снижает шум в верхнем уровне навигации и делает coding-сценарии единым потоком.</p>
             </div>
+          </div>
+        </article>
+
+        <article className="home-panel">
+          <div className="home-panel__head">
+            <div>
+              <span>Broadcast</span>
+              <h2>Подкасты и короткие апдейты</h2>
+            </div>
+            <Link to="/home">В Home</Link>
+          </div>
+          <div className="home-list">
+            {podcasts.length > 0 ? podcasts.slice(0, 3).map((podcast) => {
+              const isActive = currentPodcast?.id === podcast.id;
+              return (
+                <button
+                  key={podcast.id}
+                  type="button"
+                  className={`home-podcast-card ${isActive ? 'is-active' : ''}`}
+                  onClick={() => void playPodcast(podcast)}
+                >
+                  <div className="home-podcast-card__icon">
+                    <PlayCircle size={18} />
+                  </div>
+                  <div>
+                    <strong>{podcast.title}</strong>
+                    <span>{podcast.author_name}</span>
+                  </div>
+                  <div className="home-list__meta">
+                    <Clock3 size={14} />
+                    <span>{isActive && isPlaying ? 'Играет' : `${Math.max(1, Math.round(podcast.duration_seconds / 60))} мин`}</span>
+                  </div>
+                </button>
+              );
+            }) : <div className="home-empty">Подкастов пока нет.</div>}
           </div>
         </article>
       </section>

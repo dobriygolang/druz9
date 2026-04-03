@@ -1,8 +1,9 @@
 import React, { useEffect, useState, useRef } from 'react';
-import { Search, User as UserIcon, MapPin, ChevronRight } from 'lucide-react';
+import { User as UserIcon, MapPin, ChevronRight } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { geoApi } from '@/features/Geo/api/geoApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
+import { matchCommunityUser, useCommunityFilters } from '@/features/Community/model/useCommunityFilters';
 import { CommunityMapPoint } from '@/entities/User/model/types';
 import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
 
@@ -10,7 +11,7 @@ export const UsersPage: React.FC = () => {
   const [users, setUsers] = useState<CommunityMapPoint[]>([]);
   const [arenaStatsByUserId, setArenaStatsByUserId] = useState<Record<string, ArenaPlayerStats>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const [searchQuery, setSearchQuery] = useState('');
+  const { q, region, presence } = useCommunityFilters();
   const loadUsersRef = useRef<{ (initial?: boolean): Promise<void> } | null>(null);
 
   const loadUsers = async (initial = false) => {
@@ -58,16 +59,7 @@ export const UsersPage: React.FC = () => {
     };
   }, [users]);
 
-  const filteredUsers = users.filter(user => {
-    const searchLower = searchQuery.toLowerCase();
-    const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
-    return (
-      fullName.includes(searchLower) ||
-      (user.telegramUsername ?? '').toLowerCase().includes(searchLower) ||
-      user.region.toLowerCase().includes(searchLower) ||
-      user.title.toLowerCase().includes(searchLower)
-    );
-  });
+  const filteredUsers = users.filter((user) => matchCommunityUser(user, { q, region, presence }));
 
   return (
     <div className="fade-in">
@@ -76,27 +68,6 @@ export const UsersPage: React.FC = () => {
         <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
           Всего: <strong style={{ color: 'var(--text-primary)' }}>{users.length}</strong>
         </div>
-      </div>
-
-      <div style={{ position: 'relative', marginBottom: '32px' }}>
-        <Search size={18} style={{ position: 'absolute', left: '18px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
-        <input
-          type="text"
-          className="input"
-          placeholder="Поиск по имени, тегу или городу..."
-          aria-label="Поиск пользователей"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-          style={{
-            paddingLeft: '50px',
-            height: '48px',
-            fontSize: '15px',
-            background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.025))',
-            border: '1px solid rgba(255,255,255,0.08)',
-            borderRadius: '18px',
-            boxShadow: 'var(--shadow-md)',
-          }}
-        />
       </div>
 
       {isLoading ? (

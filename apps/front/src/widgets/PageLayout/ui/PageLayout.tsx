@@ -10,8 +10,8 @@ export const PageLayout: React.FC = () => {
   const { isAuthenticated } = useAuth();
   const isCodeRoom = /^\/code-rooms\/[^/]+$/.test(location.pathname);
   const isArenaMatch = /^\/arena\/[^/]+$/.test(location.pathname);
-  const isInterviewPrepSession = /^\/interview-prep\/[^/]+$/.test(location.pathname);
-  const isInterviewPrepMock = /^\/interview-prep\/mock\/[^/]+$/.test(location.pathname);
+  const isInterviewPrepSession = /^\/interview-prep\/[^/]+$/.test(location.pathname) || /^\/growth\/interview-prep\/[^/]+$/.test(location.pathname);
+  const isInterviewPrepMock = /^\/interview-prep\/mock\/[^/]+$/.test(location.pathname) || /^\/growth\/interview-prep\/mock\/[^/]+$/.test(location.pathname);
   const isCodeRoomsDashboard = location.pathname === '/code-rooms' || location.pathname === '/practice/code-rooms';
   const isCodeTasksAdmin = location.pathname === '/admin/code-tasks';
   const isGuestCodeRoomsSurface = !isAuthenticated && isCodeRoomsDashboard;

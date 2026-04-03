@@ -13,6 +13,7 @@ interface HubShellProps {
   description: string;
   tabs: HubTab[];
   aside?: React.ReactNode;
+  toolbar?: React.ReactNode;
 }
 
 export const HubShell: React.FC<HubShellProps> = ({
@@ -21,6 +22,7 @@ export const HubShell: React.FC<HubShellProps> = ({
   description,
   tabs,
   aside,
+  toolbar,
 }) => {
   return (
     <div className="hub-shell fade-in">
@@ -32,6 +34,8 @@ export const HubShell: React.FC<HubShellProps> = ({
         </div>
         {aside ? <div className="hub-shell__aside">{aside}</div> : null}
       </section>
+
+      {toolbar ? <div className="hub-shell__toolbar">{toolbar}</div> : null}
 
       <nav className="hub-shell__tabs">
         {tabs.map((tab) => (

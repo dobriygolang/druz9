@@ -1,6 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import Map, { Marker, MapRef, NavigationControl, ScaleControl } from 'react-map-gl/maplibre';
-import 'maplibre-gl/dist/maplibre-gl.css';
+import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { Compass, Sparkles, CalendarDays } from 'lucide-react';
 
 import {
@@ -10,14 +8,15 @@ import {
 } from '@/entities/User/model/types';
 import { eventApi } from '@/features/Event/api/eventApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
-import { COMMUNITY_MAP_STYLE } from '@/shared/config/mapStyle';
+import { matchCommunityEvent, matchCommunityUser, useCommunityFilters } from '@/features/Community/model/useCommunityFilters';
 
 import { UserCluster, EventDraft } from '../components/types';
-import { UserMarker, ClusterMarker, EventMarker } from '../components/MapMarker';
 import { UserDetailCard, EventDetailCard } from '../components/MapOverlayCards';
 import { FullEventOverlay } from '@/shared/ui/FullEventOverlay/FullEventOverlay';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { MobileDrawer } from '@/shared/ui/MobileDrawer/MobileDrawer';
+
+const MapCanvas = lazy(() => import('./MapCanvas').then((m) => ({ default: m.MapCanvas })));
 
 type ViewState = {
   longitude: number;
@@ -117,7 +116,6 @@ function buildUserClusters(points: CommunityMapPoint[], zoom: number): UserClust
 
 export const MapPage: React.FC = () => {
   const isMobile = useIsMobile();
-  const mapRef = useRef<MapRef | null>(null);
   const [points, setPoints] = useState<CommunityMapPoint[]>([]);
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -137,6 +135,8 @@ export const MapPage: React.FC = () => {
   const [fullEventId, setFullEventId] = useState<string | null>(null);
   const [inviteSearchQuery, setInviteSearchQuery] = useState('');
   const lastLoadedAtRef = useRef(0);
+  const { q, region, presence } = useCommunityFilters();
+  const [focusTarget, setFocusTarget] = useState<{ longitude: number; latitude: number; zoom: number; key: string } | null>(null);
 
   const loadData = async (initial = false, force = false) => {
     try {
@@ -176,12 +176,20 @@ export const MapPage: React.FC = () => {
     };
   }, []);
 
-  const visibleUserPoints = useMemo(() => distributeByCoordinates(points, viewState.zoom), [points, viewState.zoom]);
-  const userClusters = useMemo(() => buildUserClusters(points, viewState.zoom), [points, viewState.zoom]);
-  const mappableEvents = useMemo(() => events.filter(hasValidEventCoordinates), [events]);
+  const filteredPoints = useMemo(
+    () => points.filter((point) => matchCommunityUser(point, { q, region, presence })),
+    [points, presence, q, region],
+  );
+  const filteredEvents = useMemo(
+    () => events.filter((event) => matchCommunityEvent(event, { q, region })),
+    [events, q, region],
+  );
+  const visibleUserPoints = useMemo(() => distributeByCoordinates(filteredPoints, viewState.zoom), [filteredPoints, viewState.zoom]);
+  const userClusters = useMemo(() => buildUserClusters(filteredPoints, viewState.zoom), [filteredPoints, viewState.zoom]);
+  const mappableEvents = useMemo(() => filteredEvents.filter(hasValidEventCoordinates), [filteredEvents]);
   const displayEvents = useMemo(() => distributeByCoordinates(mappableEvents, viewState.zoom), [mappableEvents, viewState.zoom]);
   const selectedUser = useMemo(() => visibleUserPoints.find(p => p.userId === selectedUserId), [visibleUserPoints, selectedUserId]);
-  const selectedEvent = useMemo(() => events.find(e => e.id === selectedEventId), [events, selectedEventId]);
+  const selectedEvent = useMemo(() => filteredEvents.find(e => e.id === selectedEventId) ?? events.find(e => e.id === selectedEventId), [events, filteredEvents, selectedEventId]);
 
   const focusMap = (longitude: number, latitude: number, zoom = 10.5) => {
     const nextZoom = Math.max(viewState.zoom, zoom);
@@ -191,11 +199,11 @@ export const MapPage: React.FC = () => {
       latitude,
       zoom: nextZoom,
     }));
-    mapRef.current?.flyTo({
-      center: [longitude, latitude],
+    setFocusTarget({
+      longitude,
+      latitude,
       zoom: nextZoom,
-      duration: 900,
-      essential: true,
+      key: `${longitude}:${latitude}:${nextZoom}:${Date.now()}`,
     });
   };
 
@@ -309,7 +317,7 @@ export const MapPage: React.FC = () => {
           <div className="map-hero__stats">
             <div className="map-hero__stat">
               <Compass size={16} />
-              <span>{points.length} {pluralizeRu(points.length, 'участник', 'участника', 'участников')}</span>
+              <span>{filteredPoints.length} {pluralizeRu(filteredPoints.length, 'участник', 'участника', 'участников')}</span>
             </div>
             <div className="map-hero__stat">
               <CalendarDays size={16} />
@@ -350,51 +358,40 @@ export const MapPage: React.FC = () => {
             isSaving={isSavingEvent}
             error={eventError}
             fieldErrors={eventFieldErrors}
-            users={points}
+            users={filteredPoints}
             inviteSearchQuery={inviteSearchQuery}
             setInviteSearchQuery={setInviteSearchQuery}
           />
         )}
 
-        <Map
-          ref={mapRef}
-          {...viewState}
-          onMove={(e) => setViewState(e.viewState)}
-          onClick={handleMapClick}
-          mapStyle={COMMUNITY_MAP_STYLE}
-          attributionControl={false}
-          minZoom={2.5}
-          maxZoom={18.5}
-          reuseMaps
-          style={{ width: '100%', height: isMobile ? 'calc(100vh - 280px)' : '620px' }}
-        >
-          <NavigationControl position="top-right" showCompass={false} visualizePitch={false} />
-          <ScaleControl position="bottom-right" unit="metric" />
-          {userClusters.map((cluster) => (
-            <Marker key={cluster.id} longitude={cluster.longitude} latitude={cluster.latitude} anchor="bottom">
-              <button type="button" onClick={(e) => { e.stopPropagation(); focusMap(cluster.longitude, cluster.latitude, viewState.zoom + 2); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
-                <ClusterMarker cluster={cluster} />
-              </button>
-            </Marker>
-          ))}
-          {visibleUserPoints.map((p) => (
-            <Marker key={p.userId} longitude={p.displayLongitude} latitude={p.displayLatitude} anchor="bottom">
-              <button type="button" onClick={(e) => { e.stopPropagation(); setSelectedUserId(p.userId); setSelectedEventId(null); setDraftEvent(null); setIsEditingEvent(false); focusMap(p.longitude, p.latitude, 15.25); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
-                <UserMarker point={p} />
-              </button>
-            </Marker>
-          ))}
-          {displayEvents.map((e) => (
-            <Marker key={e.id} longitude={e.displayLongitude} latitude={e.displayLatitude} anchor="bottom">
-              <button type="button" onClick={(ev) => { ev.stopPropagation(); setSelectedEventId(e.id); setSelectedUserId(null); setIsEditingEvent(false); }} style={{ background: 'transparent', border: 'none', cursor: 'pointer' }}>
-                <EventMarker event={e} />
-              </button>
-            </Marker>
-          ))}
-        </Map>
+        <Suspense fallback={<div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', background: 'rgba(17, 24, 39, 0.72)', zIndex: 4 }}>Подгружаем карту…</div>}>
+          <MapCanvas
+            viewState={viewState}
+            isMobile={isMobile}
+            userClusters={userClusters}
+            visibleUserPoints={visibleUserPoints}
+            displayEvents={displayEvents}
+            focusTarget={focusTarget}
+            onMove={setViewState}
+            onMapClick={handleMapClick}
+            onClusterClick={(cluster) => focusMap(cluster.longitude, cluster.latitude, viewState.zoom + 2)}
+            onUserClick={(point) => {
+              setSelectedUserId(point.userId);
+              setSelectedEventId(null);
+              setDraftEvent(null);
+              setIsEditingEvent(false);
+              focusMap(point.longitude, point.latitude, 15.25);
+            }}
+            onEventClick={(event) => {
+              setSelectedEventId(event.id);
+              setSelectedUserId(null);
+              setIsEditingEvent(false);
+            }}
+          />
+        </Suspense>
       </div>
 
-      <FullEventOverlay eventId={fullEventId} events={events} onClose={() => setFullEventId(null)} />
+      <FullEventOverlay eventId={fullEventId} events={filteredEvents} onClose={() => setFullEventId(null)} />
 
       <MobileDrawer
         isOpen={isMobile && !!selectedUser}
@@ -424,7 +421,7 @@ export const MapPage: React.FC = () => {
             isSaving={isSavingEvent}
             error={eventError}
             fieldErrors={eventFieldErrors}
-            users={points}
+            users={filteredPoints}
             inviteSearchQuery={inviteSearchQuery}
             setInviteSearchQuery={setInviteSearchQuery}
           />

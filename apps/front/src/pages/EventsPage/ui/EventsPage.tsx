@@ -13,6 +13,7 @@ import {
 import { CommunityEvent, CommunityMapPoint, CreateEventPayload } from '@/entities/User/model/types';
 import { eventApi } from '@/features/Event/api/eventApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
+import { matchCommunityEvent, useCommunityFilters } from '@/features/Community/model/useCommunityFilters';
 import { FullEventOverlay } from '@/shared/ui/FullEventOverlay/FullEventOverlay';
 import { EventForm } from '@/shared/ui/EventForm/EventForm';
 import { ConfirmModal } from '@/shared/ui/ConfirmModal/ConfirmModal';
@@ -81,6 +82,7 @@ export const EventsPage: React.FC = () => {
   const [groupFilter, setGroupFilter] = useState('all');
   const [typeFilter, setTypeFilter] = useState('all');
   const [isFilterDrawerOpen, setIsFilterDrawerOpen] = useState(false);
+  const { q, region } = useCommunityFilters();
 
   const loadRef = useRef<{ (): Promise<void> } | null>(null);
 
@@ -238,10 +240,11 @@ export const EventsPage: React.FC = () => {
     () =>
       events.filter(
         (event) =>
+          matchCommunityEvent(event, { q, region }) &&
           (groupFilter === 'all' || event.event_group === groupFilter) &&
           (typeFilter === 'all' || event.event_type === typeFilter),
       ),
-    [events, groupFilter, typeFilter],
+    [events, groupFilter, q, region, typeFilter],
   );
 
   const confirmDelete = async () => {

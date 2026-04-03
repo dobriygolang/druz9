@@ -4,6 +4,7 @@ import { CalendarDays, CircleDot, Lock, Sparkles, Trophy, Users, MapPin, ArrowUp
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { Circle } from '@/entities/Circle/model/types';
+import { matchCircle, useCommunityFilters } from '@/features/Community/model/useCommunityFilters';
 import { circleApi } from '@/features/Circle/api/circleApi';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
@@ -32,7 +33,7 @@ export const CirclesPage: React.FC = () => {
   const [circles, setCircles] = useState<Circle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState('');
-  const [visibilityFilter, setVisibilityFilter] = useState<'all' | Circle['visibility']>('all');
+  const { q, region, visibility, setVisibility } = useCommunityFilters();
 
   useEffect(() => {
     let cancelled = false;
@@ -67,8 +68,8 @@ export const CirclesPage: React.FC = () => {
   }, [user?.id, user?.region]);
 
   const filteredCircles = useMemo(
-    () => circles.filter((circle) => visibilityFilter === 'all' || circle.visibility === visibilityFilter),
-    [circles, visibilityFilter],
+    () => circles.filter((circle) => matchCircle(circle, { q, region, visibility })),
+    [circles, q, region, visibility],
   );
 
   const metrics = useMemo(() => {
@@ -117,8 +118,8 @@ export const CirclesPage: React.FC = () => {
           <button
             key={value}
             type="button"
-            className={`circles-filter ${visibilityFilter === value ? 'is-active' : ''}`}
-            onClick={() => setVisibilityFilter(value)}
+            className={`circles-filter ${visibility === value ? 'is-active' : ''}`}
+            onClick={() => setVisibility(value)}
           >
             {value === 'all' ? 'Все' : value === 'open' ? 'Открытые' : 'Закрытые'}
           </button>

@@ -1,5 +1,5 @@
 import React, { Suspense, lazy, useMemo } from 'react';
-import { Navigate, Route, Routes, useSearchParams } from 'react-router-dom';
+import { Navigate, Route, Routes, useParams, useSearchParams } from 'react-router-dom';
 
 import { useAuth } from './AuthProvider';
 import { PageLayout } from '@/widgets/PageLayout/ui/PageLayout';
@@ -204,7 +204,7 @@ export const RouterProvider: React.FC = () => {
             />
 
             <Route
-              path="/interview-prep/:sessionId"
+              path="/growth/interview-prep/:sessionId"
               element={!isAuthenticated || needsProfileComplete ? (
                 <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
               ) : (
@@ -213,12 +213,22 @@ export const RouterProvider: React.FC = () => {
             />
 
             <Route
-              path="/interview-prep/mock/:sessionId"
+              path="/growth/interview-prep/mock/:sessionId"
               element={!isAuthenticated || needsProfileComplete ? (
                 <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
               ) : (
                 <InterviewPrepMockSessionPage />
               )}
+            />
+
+            <Route
+              path="/interview-prep/:sessionId"
+              element={<LegacyInterviewPrepSessionRedirect />}
+            />
+
+            <Route
+              path="/interview-prep/mock/:sessionId"
+              element={<LegacyInterviewPrepMockRedirect />}
             />
 
             <Route
@@ -325,4 +335,14 @@ const RootPageWithInvite: React.FC = () => {
   }
 
   return <Navigate to="/home" replace />;
+};
+
+const LegacyInterviewPrepSessionRedirect: React.FC = () => {
+  const { sessionId = '' } = useParams();
+  return <Navigate to={`/growth/interview-prep/${sessionId}`} replace />;
+};
+
+const LegacyInterviewPrepMockRedirect: React.FC = () => {
+  const { sessionId = '' } = useParams();
+  return <Navigate to={`/growth/interview-prep/mock/${sessionId}`} replace />;
 };
