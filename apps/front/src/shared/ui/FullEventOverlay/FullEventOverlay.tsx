@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Calendar, MapPin, ExternalLink, X, Trash2, Sparkles } from 'lucide-react';
 import { CommunityEvent } from '@/entities/User/model/types';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
@@ -9,7 +9,7 @@ interface FullEventOverlayProps {
   events: CommunityEvent[];
   onClose: () => void;
   isAdmin?: boolean;
-  onDelete?: (id: string) => void | Promise<void>;
+  onDelete?: (id: string, deleteScope?: 'single' | 'future' | 'all') => void | Promise<void>;
 }
 
 function getInitials(name: string) {
@@ -50,6 +50,7 @@ export const FullEventOverlay: React.FC<FullEventOverlayProps> = ({
   onDelete,
 }) => {
   const isMobile = useIsMobile();
+  const [showDeleteOptions, setShowDeleteOptions] = useState(false);
   if (!eventId) return null;
 
   const fullEvent = events.find((e) => e.id === eventId);
@@ -66,17 +67,29 @@ export const FullEventOverlay: React.FC<FullEventOverlayProps> = ({
       >
         <div className="event-overlay__topbar">
           {canDelete ? (
-            <button
-              type="button"
-              className="event-overlay__danger"
-              onClick={() => {
-                void onDelete?.(fullEvent.id);
-                onClose();
-              }}
-              title="Удалить событие"
-            >
-              <Trash2 size={18} />
-            </button>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+              {showDeleteOptions && (
+                <div style={{ display: 'flex', gap: '8px', flexWrap: 'wrap', justifyContent: 'flex-start' }}>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => { void onDelete?.(fullEvent.id, 'single'); onClose(); }}>
+                    Только это
+                  </button>
+                  <button type="button" className="btn btn-secondary btn-sm" onClick={() => { void onDelete?.(fullEvent.id, 'future'); onClose(); }}>
+                    Это и будущие
+                  </button>
+                  <button type="button" className="btn btn-danger btn-sm" onClick={() => { void onDelete?.(fullEvent.id, 'all'); onClose(); }}>
+                    Всю серию
+                  </button>
+                </div>
+              )}
+              <button
+                type="button"
+                className="event-overlay__danger"
+                onClick={() => setShowDeleteOptions((value) => !value)}
+                title="Удалить событие"
+              >
+                <Trash2 size={18} />
+              </button>
+            </div>
           ) : (
             <div />
           )}

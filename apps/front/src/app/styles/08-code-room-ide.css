@@ -240,7 +240,7 @@
 .editor-panel {
   display: flex;
   flex-direction: column;
-  background: #1a1d24;
+  background: #141821;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--border-color);
@@ -271,7 +271,7 @@
 .output-panel {
   display: flex;
   flex-direction: column;
-  background: #1a1d24;
+  background: #141821;
   border-radius: 16px;
   overflow: hidden;
   border: 1px solid var(--border-color);

@@ -4,6 +4,7 @@ import { useAuth } from '@/app/providers/AuthProvider';
 import { authApi } from '@/features/Auth/api/authApi';
 import { interviewPrepApi } from '@/features/InterviewPrep/api/interviewPrepApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
+import { geoApi } from '@/features/Geo/api/geoApi';
 import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 import { ArenaLeaderboardEntry, ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode } from '@/entities/CodeRoom/model/types';
@@ -224,8 +225,14 @@ export const CodeRoomsPage: React.FC = () => {
         setLeaderboardAvatars({});
         return;
       }
+      const points = await geoApi.communityMap().catch(() => []);
+      const pointAvatarByUserId = new Map(points.map((point) => [point.userId, point.avatarUrl] as const));
       const entries = await Promise.all(leaderboard.map(async (entry) => {
         try {
+          const geoAvatar = pointAvatarByUserId.get(entry.userId);
+          if (geoAvatar) {
+            return [entry.userId, geoAvatar] as const;
+          }
           const profile = await authApi.getProfileById(entry.userId);
           return [entry.userId, profile.user.avatarUrl] as const;
         } catch (error) {

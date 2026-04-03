@@ -11,6 +11,7 @@ import { getStoredGuestId, getStoredGuestName } from '@/features/CodeRoom/lib/gu
 import { AxiosError } from '@/shared/api/base';
 import { inferLanguageFromSource, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
+import { APP_MONACO_THEME, configureAppMonacoTheme } from '@/shared/lib/monacoTheme';
 
 // Anti-cheat countdown timer component
 const AntiCheatCountdown: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
@@ -882,6 +883,7 @@ export const ArenaMatchPage: React.FC = () => {
                 ) : (
                   <Editor
                     height="100%"
+                    beforeMount={configureAppMonacoTheme}
                     defaultLanguage={arenaLanguage}
                     language={arenaLanguage}
                     value={leftCode}
@@ -899,7 +901,7 @@ export const ArenaMatchPage: React.FC = () => {
                       scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 },
                       lineNumbers: isMobile ? 'off' : 'on',
                     }}
-                    theme="vs-dark"
+                    theme={APP_MONACO_THEME}
                   />
                 )}
               </div>

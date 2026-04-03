@@ -1,6 +1,7 @@
 package model
 
 import (
+	"context"
 	"time"
 
 	"github.com/google/uuid"
@@ -71,6 +72,20 @@ type Event struct {
 	IsJoined         bool
 	ParticipantCount int
 	Participants     []*EventParticipant
+}
+
+type eventDeleteScopeContextKey struct{}
+
+func ContextWithEventDeleteScope(ctx context.Context, scope string) context.Context {
+	return context.WithValue(ctx, eventDeleteScopeContextKey{}, scope)
+}
+
+func EventDeleteScopeFromContext(ctx context.Context) string {
+	if ctx == nil {
+		return ""
+	}
+	scope, _ := ctx.Value(eventDeleteScopeContextKey{}).(string)
+	return scope
 }
 
 // ListEventsOptions defines filters and pagination for event listing.

@@ -9,6 +9,7 @@ import {
   InterviewPrepTask,
 } from '@/features/InterviewPrep/api/interviewPrepApi';
 import { displayLanguageLabel, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
+import { APP_MONACO_THEME, configureAppMonacoTheme } from '@/shared/lib/monacoTheme';
 import { resultLabel, SqlStarterTab } from '../lib/interviewPrepSessionHelpers';
 
 export function SessionHero({
@@ -324,11 +325,12 @@ export function LiveCodingSection({
         <Editor
           key={`${task.id}-${solveLanguage}`}
           height={`${editorHeight}px`}
+          beforeMount={configureAppMonacoTheme}
           defaultLanguage={monacoLanguageFor(solveLanguage)}
           language={monacoLanguageFor(solveLanguage)}
           value={code}
           onChange={(value) => onCodeChange(value ?? '')}
-          theme="vs-dark"
+          theme={APP_MONACO_THEME}
           options={{
             minimap: { enabled: false },
             fontSize: 14,

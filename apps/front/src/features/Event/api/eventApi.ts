@@ -205,8 +205,10 @@ export const eventApi = {
     defaultEventsCache.data = null;
     defaultEventsCache.timestamp = 0;
   },
-  delete: async (eventId: string): Promise<void> => {
-    await apiClient.delete(`/api/v1/events/${eventId}`);
+  delete: async (eventId: string, deleteScope?: 'single' | 'future' | 'all'): Promise<void> => {
+    await apiClient.delete(`/api/v1/events/${eventId}`, {
+      params: deleteScope ? { deleteScope } : undefined,
+    });
     defaultEventsCache.data = null;
     defaultEventsCache.timestamp = 0;
   },

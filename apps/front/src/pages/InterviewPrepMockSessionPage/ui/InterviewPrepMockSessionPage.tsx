@@ -24,6 +24,7 @@ import {
   InterviewPrepSystemDesignReviewInput,
 } from '@/features/InterviewPrep/api/interviewPrepApi';
 import { displayLanguageLabel, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
+import { APP_MONACO_THEME, configureAppMonacoTheme } from '@/shared/lib/monacoTheme';
 
 type SpeechRecognitionCtor = new () => {
   continuous: boolean;
@@ -419,11 +420,12 @@ export function InterviewPrepMockSessionPage() {
               </div>
               <div className="workstation-editor">
                 <Editor
+                  beforeMount={configureAppMonacoTheme}
                   language={monacoLanguageFor(currentStage.solveLanguage || currentStage.task?.language)}
                   value={code}
                   onChange={(value) => setCode(value ?? '')}
                   height={480}
-                  theme="vs-dark"
+                  theme={APP_MONACO_THEME}
                   options={{
                     minimap: { enabled: false },
                     fontSize: 14,

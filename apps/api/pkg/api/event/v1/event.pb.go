@@ -547,6 +547,7 @@ func (x *UpdateEventRequest) GetMeetingLink() string {
 type DeleteEventRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EventId       string                 `protobuf:"bytes,1,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
+	DeleteScope   string                 `json:"delete_scope,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -584,6 +585,13 @@ func (*DeleteEventRequest) Descriptor() ([]byte, []int) {
 func (x *DeleteEventRequest) GetEventId() string {
 	if x != nil {
 		return x.EventId
+	}
+	return ""
+}
+
+func (x *DeleteEventRequest) GetDeleteScope() string {
+	if x != nil {
+		return x.DeleteScope
 	}
 	return ""
 }

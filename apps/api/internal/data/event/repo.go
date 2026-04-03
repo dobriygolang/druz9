@@ -15,6 +15,7 @@ import (
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgconn"
 )
 
 type Repo struct {
@@ -51,6 +52,11 @@ func (r *Repo) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.C
 	defer func() { _ = tx.Rollback(ctx) }()
 
 	scheduledAtList := buildCreateEventScheduleTimes(req.ScheduledAt, req.Repeat)
+	var seriesID *uuid.UUID
+	if len(scheduledAtList) > 1 {
+		value := uuid.New()
+		seriesID = &value
+	}
 	firstEventID := uuid.Nil
 	for _, scheduledAt := range scheduledAtList {
 		eventID := uuid.New()
@@ -59,9 +65,9 @@ func (r *Repo) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.C
 		}
 		_, err = tx.Exec(
 			ctx,
-			`INSERT INTO events (id, creator_id, title, place_label, description, meeting_link, region, country, city, latitude, longitude, scheduled_at, created_at, updated_at)
-			 VALUES ($1,$2,$3,$4,NULLIF($5,''),NULLIF($6,''),NULLIF($7,''),NULLIF($8,''),NULLIF($9,''),$10,$11,$12,NOW(),NOW())`,
-			eventID, creatorID, req.Title, req.PlaceLabel, req.Description, req.MeetingLink, req.Region, req.Country, req.City, req.Latitude, req.Longitude, scheduledAt,
+			`INSERT INTO events (id, creator_id, title, place_label, description, meeting_link, region, country, city, latitude, longitude, scheduled_at, series_id, repeat_rule, created_at, updated_at)
+			 VALUES ($1,$2,$3,$4,NULLIF($5,''),NULLIF($6,''),NULLIF($7,''),NULLIF($8,''),NULLIF($9,''),$10,$11,$12,$13,$14,NOW(),NOW())`,
+			eventID, creatorID, req.Title, req.PlaceLabel, req.Description, req.MeetingLink, req.Region, req.Country, req.City, req.Latitude, req.Longitude, scheduledAt, seriesID, normalizeRepeatRule(req.Repeat),
 		)
 		if err != nil {
 			return nil, fmt.Errorf("insert event: %w", err)
@@ -90,6 +96,15 @@ func (r *Repo) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.C
 	}
 
 	return r.getEvent(ctx, r.data.DB, firstEventID, creatorID)
+}
+
+func normalizeRepeatRule(repeat string) string {
+	switch repeat {
+	case model.EventRepeatDaily, model.EventRepeatWeekly, model.EventRepeatMonthly:
+		return repeat
+	default:
+		return model.EventRepeatNone
+	}
 }
 
 func buildCreateEventScheduleTimes(base time.Time, repeat string) []time.Time {
@@ -223,7 +238,17 @@ func (r *Repo) DeleteEvent(ctx context.Context, eventID uuid.UUID, actor *model.
 		return err
 	}
 
-	tag, err := tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)
+	var seriesID *uuid.UUID
+	var scheduledAt time.Time
+	if err := tx.QueryRow(ctx, `SELECT series_id, scheduled_at FROM events WHERE id = $1`, eventID).Scan(&seriesID, &scheduledAt); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return kratoserrors.NotFound("EVENT_NOT_FOUND", "event not found")
+		}
+		return fmt.Errorf("load event series: %w", err)
+	}
+
+	scope := model.EventDeleteScopeFromContext(ctx)
+	tag, err := deleteEventByScope(ctx, tx, eventID, seriesID, scheduledAt, scope)
 	if err != nil {
 		return fmt.Errorf("delete event: %w", err)
 	}
@@ -231,6 +256,28 @@ func (r *Repo) DeleteEvent(ctx context.Context, eventID uuid.UUID, actor *model.
 		return kratoserrors.NotFound("EVENT_NOT_FOUND", "event not found")
 	}
 	return tx.Commit(ctx)
+}
+
+func deleteEventByScope(
+	ctx context.Context,
+	tx pgx.Tx,
+	eventID uuid.UUID,
+	seriesID *uuid.UUID,
+	scheduledAt time.Time,
+	scope string,
+) (pgconn.CommandTag, error) {
+	if seriesID == nil {
+		return tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)
+	}
+
+	switch scope {
+	case "all":
+		return tx.Exec(ctx, `DELETE FROM events WHERE series_id = $1`, *seriesID)
+	case "future":
+		return tx.Exec(ctx, `DELETE FROM events WHERE series_id = $1 AND scheduled_at >= $2`, *seriesID, scheduledAt)
+	default:
+		return tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)
+	}
 }
 
 func ensureEventManager(ctx context.Context, tx pgx.Tx, eventID uuid.UUID, actor *model.User) error {

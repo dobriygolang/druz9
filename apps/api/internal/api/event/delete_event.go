@@ -20,6 +20,7 @@ func (i *Implementation) DeleteEvent(ctx context.Context, req *v1.DeleteEventReq
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_EVENT_ID", "invalid event id")
 	}
+	ctx = model.ContextWithEventDeleteScope(ctx, req.GetDeleteScope())
 	if err := i.service.DeleteEvent(ctx, eventID, user); err != nil {
 		return nil, err
 	}

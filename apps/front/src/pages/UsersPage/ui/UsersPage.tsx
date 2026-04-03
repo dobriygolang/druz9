@@ -63,7 +63,7 @@ export const UsersPage: React.FC = () => {
     const fullName = `${user.firstName} ${user.lastName}`.toLowerCase();
     return (
       fullName.includes(searchLower) ||
-      user.username.toLowerCase().includes(searchLower) ||
+      (user.telegramUsername ?? '').toLowerCase().includes(searchLower) ||
       user.region.toLowerCase().includes(searchLower) ||
       user.title.toLowerCase().includes(searchLower)
     );
@@ -79,7 +79,7 @@ export const UsersPage: React.FC = () => {
       </div>
 
       <div style={{ position: 'relative', marginBottom: '32px' }}>
-        <Search size={20} style={{ position: 'absolute', left: '16px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-secondary)' }} />
+        <Search size={18} style={{ position: 'absolute', left: '18px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-muted)', pointerEvents: 'none' }} />
         <input
           type="text"
           className="input"
@@ -87,7 +87,15 @@ export const UsersPage: React.FC = () => {
           aria-label="Поиск пользователей"
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          style={{ paddingLeft: '48px', height: '52px', fontSize: '16px', backgroundColor: '#1E1E1E', border: 'none', borderRadius: '16px' }}
+          style={{
+            paddingLeft: '50px',
+            height: '48px',
+            fontSize: '15px',
+            background: 'linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.025))',
+            border: '1px solid rgba(255,255,255,0.08)',
+            borderRadius: '18px',
+            boxShadow: 'var(--shadow-md)',
+          }}
         />
       </div>
 
@@ -97,7 +105,7 @@ export const UsersPage: React.FC = () => {
         <div style={{ display: 'grid', gap: '12px' }}>
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user) => {
-              const profileHandle = user.telegramUsername || user.username;
+              const profileHandle = user.telegramUsername ? `@${user.telegramUsername}` : 'тг не привязан';
 
               return (
                 <Link
@@ -150,7 +158,7 @@ export const UsersPage: React.FC = () => {
                     )}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '13px', color: 'var(--accent-color)' }}>@{profileHandle}</span>
+                    <span style={{ fontSize: '13px', color: user.telegramUsername ? 'var(--accent-color)' : 'var(--text-muted)' }}>{profileHandle}</span>
                     <span style={{ fontSize: '13px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <MapPin size={12} /> {user.region}
                     </span>

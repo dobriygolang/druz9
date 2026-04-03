@@ -212,7 +212,17 @@ export const EventsPage: React.FC = () => {
     }
   };
 
-  const handleDelete = (id: string) => {
+  const handleDelete = async (id: string, deleteScope?: 'single' | 'future' | 'all') => {
+    if (deleteScope) {
+      try {
+        await eventApi.delete(id, deleteScope);
+        await load();
+        setFullEventId(null);
+      } catch (err) {
+        console.error('Delete failed', err);
+      }
+      return;
+    }
     setConfirmDeleteId(id);
   };
 

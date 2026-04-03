@@ -15,6 +15,7 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
+import { APP_MONACO_THEME, configureAppMonacoTheme } from '@/shared/lib/monacoTheme';
 
 export function CodeRoomLoadingState({
   message,
@@ -238,8 +239,9 @@ export function CodeRoomEditorPanels({
                 height="100%"
                 defaultLanguage="go"
                 defaultValue={room.code}
+                beforeMount={configureAppMonacoTheme}
                 onMount={handleEditorMount}
-                theme="vs-dark"
+                theme={APP_MONACO_THEME}
                 options={editorOptions}
               />
             )}

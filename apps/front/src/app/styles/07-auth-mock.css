@@ -221,7 +221,7 @@
   overflow: hidden;
   border-radius: 24px;
   width: 100%;
-  min-height: 940px;
+  min-height: 960px;
 }
 
 .interview-prep-workstation--readonly {
@@ -247,9 +247,9 @@
 }
 
 .workstation-editor {
-  background: #101827;
+  background: #141821;
   width: 100%;
-  min-height: 640px;
+  min-height: 720px;
 }
 
 .workstation-footer {
@@ -259,8 +259,13 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
-  width: 72%;
-  align-self: flex-end;
+  width: 100%;
+  align-self: stretch;
+}
+
+.workstation-notes,
+.interview-prep-compile-error {
+  width: min(70%, 100%);
 }
 
 .workstation-notes label {

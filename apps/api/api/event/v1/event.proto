@@ -98,6 +98,7 @@ message UpdateEventRequest {
 
 message DeleteEventRequest {
   string event_id = 1;
+  string delete_scope = 2;
 }
 
 message ListEventsResponse {

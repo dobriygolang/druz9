@@ -13,7 +13,8 @@
 .code-admin-modal {
   max-height: calc(100vh - 32px);
   overflow: auto;
-  width: min(calc(100vw - 16px), 1680px);
+  width: min(calc(100vw - 4px), 1860px);
+  max-width: none;
 }
 
 .modal.modal-wide,
@@ -396,7 +397,8 @@
 }
 
 .code-admin-modal {
-  width: min(calc(100vw - 16px), 1680px);
+  width: min(calc(100vw - 4px), 1860px);
+  max-width: none;
 }
 
 /* Dashboard */
