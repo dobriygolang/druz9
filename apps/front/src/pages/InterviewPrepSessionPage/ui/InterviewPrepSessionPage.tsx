@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
+  InterviewPrepAnswerReview,
   interviewPrepApi,
   InterviewPrepQuestion,
   InterviewPrepSession,
@@ -22,12 +23,30 @@ import {
   starterForLanguage,
 } from './lib/interviewPrepSessionHelpers';
 
+type SpeechRecognitionCtor = new () => {
+  continuous: boolean;
+  interimResults: boolean;
+  lang: string;
+  start: () => void;
+  stop: () => void;
+  onresult: ((event: any) => void) | null;
+  onerror: ((event: any) => void) | null;
+  onend: (() => void) | null;
+};
+
+function getSpeechRecognitionCtor(): SpeechRecognitionCtor | null {
+  const candidate = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+  return typeof candidate === 'function' ? candidate : null;
+}
+
 export function InterviewPrepSessionPage() {
   const { sessionId = '' } = useParams();
   const [session, setSession] = useState<InterviewPrepSession | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [answering, setAnswering] = useState(false);
+  const [answerText, setAnswerText] = useState('');
+  const [answerReview, setAnswerReview] = useState<InterviewPrepAnswerReview | null>(null);
   const [revealedQuestion, setRevealedQuestion] = useState<InterviewPrepQuestion | null>(null);
   const [revealedHistory, setRevealedHistory] = useState<InterviewPrepQuestion[]>([]);
   const [code, setCode] = useState('');
@@ -50,6 +69,9 @@ export function InterviewPrepSessionPage() {
   const resizeStartYRef = useRef(0);
   const resizeStartHeightRef = useRef(560);
   const [isResizingEditor, setIsResizingEditor] = useState(false);
+  const [speechSupported] = useState(Boolean(getSpeechRecognitionCtor()));
+  const [speechActive, setSpeechActive] = useState(false);
+  const speechRef = useRef<any>(null);
   const [submitResult, setSubmitResult] = useState<{
     passed: boolean;
     lastError: string;
@@ -92,7 +114,24 @@ export function InterviewPrepSessionPage() {
   useEffect(() => {
     setRevealedHistory([]);
     setRevealedQuestion(null);
+    setAnswerText('');
+    setAnswerReview(null);
   }, [session?.id]);
+
+  useEffect(() => {
+    setAnswerText('');
+    setAnswerReview(null);
+    if (speechRef.current) {
+      speechRef.current.stop();
+    }
+    setSpeechActive(false);
+  }, [session?.currentQuestion?.id]);
+
+  useEffect(() => () => {
+    if (speechRef.current) {
+      speechRef.current.stop();
+    }
+  }, []);
 
   useEffect(() => {
     if (!isResizingEditor) {
@@ -174,9 +213,16 @@ export function InterviewPrepSessionPage() {
     setAnswering(true);
     setError(null);
     try {
-      const response = await interviewPrepApi.answerQuestion(sessionId, session.currentQuestion.id, selfAssessment);
+      const response = await interviewPrepApi.answerQuestion(
+        sessionId,
+        session.currentQuestion.id,
+        selfAssessment,
+        selfAssessment === 'answered' ? answerText.trim() : undefined,
+      );
       setRevealedQuestion(response.answeredQuestion ?? null);
       setRevealedHistory((prev) => appendRevealedQuestion(prev, response.answeredQuestion));
+      setAnswerReview(response.review ?? null);
+      setAnswerText('');
       setSession(response.session);
     } catch (e: any) {
       console.error('Failed to answer question:', e);
@@ -184,6 +230,32 @@ export function InterviewPrepSessionPage() {
     } finally {
       setAnswering(false);
     }
+  };
+
+  const toggleSpeech = () => {
+    const Ctor = getSpeechRecognitionCtor();
+    if (!Ctor) return;
+    if (speechActive && speechRef.current) {
+      speechRef.current.stop();
+      setSpeechActive(false);
+      return;
+    }
+    const recognition = new Ctor();
+    recognition.lang = 'ru-RU';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+    recognition.onresult = (event) => {
+      const transcript = Array.from(event.results)
+        .map((result: any) => result[0]?.transcript ?? '')
+        .join(' ')
+        .trim();
+      setAnswerText(transcript);
+    };
+    recognition.onerror = () => setSpeechActive(false);
+    recognition.onend = () => setSpeechActive(false);
+    speechRef.current = recognition;
+    recognition.start();
+    setSpeechActive(true);
   };
 
   const handleReviewSystemDesign = async () => {
@@ -239,7 +311,18 @@ export function InterviewPrepSessionPage() {
         <SessionSidebar session={session} revealedQuestion={revealedQuestion} revealedHistory={revealedHistory} />
       </section>
 
-      <FollowUpSection session={session} canShowQuestions={canShowQuestions} answering={answering} onAnswer={(value) => void handleAnswer(value)} />
+      <FollowUpSection
+        session={session}
+        canShowQuestions={canShowQuestions}
+        answering={answering}
+        answerText={answerText}
+        answerReview={answerReview}
+        speechSupported={speechSupported}
+        speechActive={speechActive}
+        onAnswerTextChange={setAnswerText}
+        onToggleSpeech={toggleSpeech}
+        onAnswer={(value) => void handleAnswer(value)}
+      />
 
       {showLiveCoding && task && (
         <LiveCodingSection

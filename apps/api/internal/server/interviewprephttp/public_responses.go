@@ -79,8 +79,9 @@ type submitResponse struct {
 }
 
 type answerResponse struct {
-	AnsweredQuestion *questionResponse `json:"answeredQuestion,omitempty"`
-	Session          *sessionResponse  `json:"session,omitempty"`
+	AnsweredQuestion *questionResponse              `json:"answeredQuestion,omitempty"`
+	Review           *interviewAnswerReviewResponse `json:"review,omitempty"`
+	Session          *sessionResponse               `json:"session,omitempty"`
 }
 
 type systemDesignReviewResponse struct {

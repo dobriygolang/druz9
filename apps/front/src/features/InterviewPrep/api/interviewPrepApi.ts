@@ -95,6 +95,12 @@ export interface InterviewPrepSubmitResult {
   session?: InterviewPrepSession;
 }
 
+export interface InterviewPrepQuestionAnswerResult {
+  session: InterviewPrepSession;
+  answeredQuestion?: InterviewPrepQuestion;
+  review?: InterviewPrepAnswerReview;
+}
+
 export interface InterviewPrepMockQuestionResult {
   id: string;
   stageId: string;
@@ -363,14 +369,16 @@ export const interviewPrepApi = {
     sessionId: string,
     questionId: string,
     selfAssessment: InterviewPrepSelfAssessment,
-  ): Promise<{ session: InterviewPrepSession; answeredQuestion?: InterviewPrepQuestion }> => {
-    const response = await apiClient.post<{ session: any; answeredQuestion?: any }>(
+    answer?: string,
+  ): Promise<InterviewPrepQuestionAnswerResult> => {
+    const response = await apiClient.post<{ session: any; answeredQuestion?: any; review?: InterviewPrepAnswerReview }>(
       `/api/v1/interview-prep/sessions/${sessionId}/questions/${questionId}/answer`,
-      { selfAssessment },
+      { selfAssessment, answer },
     );
     return {
       session: normalizeSession(response.data.session),
       answeredQuestion: response.data.answeredQuestion ? normalizeQuestion(response.data.answeredQuestion) : undefined,
+      review: response.data.review,
     };
   },
 

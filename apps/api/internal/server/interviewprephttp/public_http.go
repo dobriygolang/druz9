@@ -282,26 +282,28 @@ func handleQuestionAnswer(
 
 	var req struct {
 		SelfAssessment string `json:"selfAssessment"`
+		Answer         string `json:"answer"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "bad request", http.StatusBadRequest)
 		return
 	}
 
-	session, err := service.AnswerQuestion(r.Context(), user, sessionID, questionID, req.SelfAssessment)
+	result, err := service.AnswerQuestion(r.Context(), user, sessionID, questionID, req.SelfAssessment, req.Answer)
 	if err != nil {
 		writeError(w, err)
 		return
 	}
 
-	var answeredQuestion *questionResponse
-	if before != nil && before.CurrentQuestion != nil && before.CurrentQuestion.ID == questionID {
+	answeredQuestion := mapQuestion(result.AnsweredQuestion, true)
+	if answeredQuestion == nil && before != nil && before.CurrentQuestion != nil && before.CurrentQuestion.ID == questionID {
 		answeredQuestion = mapQuestion(before.CurrentQuestion, true)
 	}
 
 	writeJSON(w, http.StatusOK, answerResponse{
 		AnsweredQuestion: answeredQuestion,
-		Session:          mapSession(session, false),
+		Review:           mapInterviewAnswerReview(result.Review),
+		Session:          mapSession(result.Session, false),
 	})
 }
 

@@ -1,7 +1,8 @@
 import Editor from '@monaco-editor/react';
-import { CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Play, TerminalSquare, Upload, XCircle } from 'lucide-react';
+import { BrainCircuit, CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Mic, MicOff, Play, Sparkles, TerminalSquare, Upload, XCircle } from 'lucide-react';
 
 import {
+  InterviewPrepAnswerReview,
   InterviewPrepQuestion,
   InterviewPrepSession,
   InterviewPrepSystemDesignReview,
@@ -124,11 +125,23 @@ export function FollowUpSection({
   session,
   canShowQuestions,
   answering,
+  answerText,
+  answerReview,
+  speechSupported,
+  speechActive,
+  onAnswerTextChange,
+  onToggleSpeech,
   onAnswer,
 }: {
   session: InterviewPrepSession;
   canShowQuestions: boolean;
   answering: boolean;
+  answerText: string;
+  answerReview: InterviewPrepAnswerReview | null;
+  speechSupported: boolean;
+  speechActive: boolean;
+  onAnswerTextChange: (value: string) => void;
+  onToggleSpeech: () => void;
   onAnswer: (selfAssessment: 'answered' | 'skipped') => void;
 }) {
   if (session.status === 'finished') {
@@ -146,21 +159,64 @@ export function FollowUpSection({
         <div className="dashboard-card__header">
           <div>
             <h2>Follow-up вопрос #{session.currentQuestion.position}</h2>
-            <p className="interview-prep-muted">Сначала ответь сам, потом зафиксируй результат.</p>
+            <p className="interview-prep-muted">Отвечай текстом или голосом, затем отправляй ответ на AI-проверку.</p>
           </div>
-          <CircleDashed size={18} />
+          <BrainCircuit size={18} />
         </div>
         <div className="interview-prep-question-prompt">{session.currentQuestion.prompt}</div>
+        <div className="question-input-wrap">
+          <div className="question-input-toolbar">
+            <button
+              type="button"
+              className={`btn ${speechActive ? 'btn-danger' : 'btn-secondary'} btn-sm`}
+              disabled={!speechSupported || answering}
+              onClick={onToggleSpeech}
+            >
+              {speechActive ? <MicOff size={14} /> : <Mic size={14} />}
+              {speechActive ? 'Остановить' : 'Голосовой ввод'}
+            </button>
+          </div>
+          <textarea
+            className="form-control workstation-textarea"
+            rows={6}
+            value={answerText}
+            onChange={(event) => onAnswerTextChange(event.target.value)}
+            placeholder="Напиши свой ответ или надиктуй его..."
+          />
+        </div>
         <div className="interview-prep-question-actions">
-          <button className="btn btn-primary" onClick={() => onAnswer('answered')} disabled={answering}>
-            <CheckCircle2 size={16} />
-            <span>{answering ? 'Сохраняю...' : 'Ответил сам'}</span>
+          <button className="btn btn-primary" onClick={() => onAnswer('answered')} disabled={answering || !answerText.trim()}>
+            <Sparkles size={16} />
+            <span>{answering ? 'Проверяю...' : 'Отправить на AI разбор'}</span>
           </button>
           <button className="btn btn-secondary" onClick={() => onAnswer('skipped')} disabled={answering}>
             <XCircle size={16} />
             <span>{answering ? 'Сохраняю...' : 'Не ответил'}</span>
           </button>
         </div>
+        {answerReview && (
+          <div className="console-card console-card--ai">
+            <div className="console-card__header">
+              <Sparkles size={14} />
+              AI Валидация ответа
+            </div>
+            <div className="console-review-body">
+              <div className="console-review-score">
+                <span className="label">Оценка</span>
+                <span className="value">{answerReview.score} / 10</span>
+              </div>
+              <p className="console-review-text">{answerReview.summary}</p>
+              {answerReview.gaps?.length ? (
+                <div className="console-review-gaps">
+                  <span className="gaps-label">Что стоит улучшить:</span>
+                  <ul>
+                    {answerReview.gaps.map((gap, index) => <li key={index}>{gap}</li>)}
+                  </ul>
+                </div>
+              ) : null}
+            </div>
+          </div>
+        )}
       </section>
     );
   }

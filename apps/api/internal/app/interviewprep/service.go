@@ -247,6 +247,12 @@ type SubmitResult struct {
 	Session         *model.InterviewPrepSession `json:"session,omitempty"`
 }
 
+type QuestionAnswerResult struct {
+	AnsweredQuestion *model.InterviewPrepQuestion    `json:"answeredQuestion,omitempty"`
+	Review           *aireview.InterviewAnswerReview `json:"review,omitempty"`
+	Session          *model.InterviewPrepSession     `json:"session,omitempty"`
+}
+
 type SystemDesignReviewResult = aireview.SystemDesignReview
 
 func normalizeSolveLanguage(language string) string {
@@ -409,8 +415,8 @@ func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sess
 	})
 }
 
-func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string) (*model.InterviewPrepSession, error) {
-	session, err := s.repo.GetSession(ctx, sessionID)
+func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string, answer string) (*QuestionAnswerResult, error) {
+	session, err := s.GetSession(ctx, user, sessionID)
 	if err != nil {
 		return nil, err
 	}
@@ -430,6 +436,23 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 		return nil, ErrInvalidAssessment
 	}
 
+	answer = strings.TrimSpace(answer)
+	var review *aireview.InterviewAnswerReview
+	if selfAssessment == model.InterviewPrepSelfAssessmentAnswered && answer != "" {
+		review, err = s.reviewer.ReviewInterviewAnswer(ctx, aireview.InterviewAnswerReviewRequest{
+			ModelOverride:   s.modelFollowup,
+			Topic:           session.Task.PrepType.String(),
+			TaskTitle:       session.Task.Title,
+			QuestionPrompt:  session.CurrentQuestion.Prompt,
+			ReferenceAnswer: session.CurrentQuestion.Answer,
+			CandidateAnswer: answer,
+		})
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	answeredQuestion := session.CurrentQuestion
 	nowTime := time.Now()
 	result := &model.InterviewPrepQuestionResult{
 		ID:             uuid.New(),
@@ -451,13 +474,29 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 		if err := s.repo.FinishSession(ctx, session.ID); err != nil {
 			return nil, err
 		}
-		return s.GetSession(ctx, user, session.ID)
+		nextSession, err := s.GetSession(ctx, user, session.ID)
+		if err != nil {
+			return nil, err
+		}
+		return &QuestionAnswerResult{
+			AnsweredQuestion: answeredQuestion,
+			Review:           review,
+			Session:          nextSession,
+		}, nil
 	}
 
 	if err := s.repo.AdvanceSessionQuestion(ctx, session.ID, nextPosition); err != nil {
 		return nil, err
 	}
-	return s.GetSession(ctx, user, session.ID)
+	nextSession, err := s.GetSession(ctx, user, session.ID)
+	if err != nil {
+		return nil, err
+	}
+	return &QuestionAnswerResult{
+		AnsweredQuestion: answeredQuestion,
+		Review:           review,
+		Session:          nextSession,
+	}, nil
 }
 
 func normalizeReviewImageType(contentType string, fileName string) (string, error) {

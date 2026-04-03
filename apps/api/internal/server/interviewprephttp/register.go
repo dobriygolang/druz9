@@ -40,7 +40,7 @@ type Service interface {
 	AnswerMockQuestion(ctx context.Context, user *model.User, sessionID uuid.UUID, answer string) (*appinterviewprep.MockQuestionAnswerResult, error)
 	Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string) (*appinterviewprep.SubmitResult, error)
 	ReviewSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req appinterviewprep.SystemDesignReviewInput) (*appinterviewprep.SystemDesignReviewResult, error)
-	AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string) (*model.InterviewPrepSession, error)
+	AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string, answer string) (*appinterviewprep.QuestionAnswerResult, error)
 }
 
 type AdminAuthorizer interface {

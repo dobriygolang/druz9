@@ -161,13 +161,13 @@ export const ArenaMatchHeader: React.FC<{
       )}
       {isSpectator && <div className="arena-chip arena-chip--spectator"><Eye size={14} /> {isMobile ? '' : 'Режим зрителя'}</div>}
       {!isSpectator && (
-        <button className="btn btn-primary arena-copy-btn" onClick={onCopyLink} style={{ width: isMobile ? '40px' : '120px', padding: isMobile ? 0 : '0 10px' }}>
+        <button className="btn btn-primary arena-copy-btn" onClick={onCopyLink} style={{ width: isMobile ? '40px' : 'auto', padding: isMobile ? 0 : '0 12px' }}>
           <Copy size={16} />
           {!isMobile && <span>{copied ? 'Скопировано' : 'Скопировать'}</span>}
         </button>
       )}
       {canShowReplayActions && canUseTimelapse && (
-        <button className="btn btn-primary arena-copy-btn" onClick={onToggleTimelapse} style={{ width: isMobile ? '40px' : '120px', padding: isMobile ? 0 : '0 10px' }}>
+        <button className="btn btn-primary arena-copy-btn" onClick={onToggleTimelapse} style={{ width: isMobile ? '40px' : 'auto', padding: isMobile ? 0 : '0 12px' }}>
           {showTimelapse ? <Play size={16} /> : <Square size={16} />}
           {!isMobile && <span>{showTimelapse ? 'Вернуться в live' : 'Таймлайн'}</span>}
         </button>

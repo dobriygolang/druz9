@@ -78,9 +78,6 @@ export function InterviewPrepPage() {
 
   const tasksForCategoryStats = useMemo(() => {
     return tasks.filter((task) => {
-      if (!task.isExecutable && task.prepType !== 'system_design') {
-        return false;
-      }
       if (company !== 'all' && task.companyTag !== company) {
         return false;
       }
@@ -125,9 +122,6 @@ export function InterviewPrepPage() {
 
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
-      if (!task.isExecutable && task.prepType !== 'system_design') {
-        return false;
-      }
       const taskCategory = categoryForTask(task);
       if (category !== 'all' && taskCategory !== category) {
         return false;

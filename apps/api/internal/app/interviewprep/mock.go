@@ -595,12 +595,7 @@ func stageQuestionsForTask(kind model.InterviewPrepMockStageKind, companyTag str
 		return items, nil
 	}
 
-	switch kind {
-	case model.InterviewPrepMockStageKindArchitecture, model.InterviewPrepMockStageKindSystemDesign:
-		items = taskSpecificMockQuestions(task, taskQuestions)
-	default:
-		items = nil
-	}
+	items = taskSpecificMockQuestions(task, taskQuestions)
 	if len(items) == 0 {
 		return nil, ErrMockQuestionPoolIncomplete
 	}
