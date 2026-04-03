@@ -55,8 +55,8 @@ export const CommunityHubPage: React.FC = () => {
   return (
     <HubShell
       eyebrow="Community"
-      title="Люди, события, карта и circles"
-      description="Находи людей рядом, смотри события, переключайся на карту и открывай circles без лишних переходов между разными разделами."
+      title="Люди, события, карта и кружки"
+      description="Один экран сообщества: люди, календарь, карта и мини-комьюнити."
       tabs={[
         { to: '/community/people', label: 'People' },
         { to: '/community/events', label: 'Events' },
@@ -69,7 +69,7 @@ export const CommunityHubPage: React.FC = () => {
             <Users size={18} />
             <div>
               <strong>{isLoading ? '...' : `${users.length} человек`}</strong>
-              <span>{isLoading ? 'Собираем список участников' : `${metrics.online} онлайн прямо сейчас`}</span>
+              <span>{isLoading ? 'Собираем список участников' : `${metrics.online} онлайн сейчас`}</span>
             </div>
           </div>
           <div className="hub-shell__stat-card">
@@ -82,15 +82,15 @@ export const CommunityHubPage: React.FC = () => {
           <div className="hub-shell__stat-card">
             <Orbit size={18} />
             <div>
-              <strong>{isLoading ? '...' : `${circles.length} circles`}</strong>
-              <span>{isLoading ? 'Собираем мини-комьюнити' : `${metrics.openCircles} open • ${circles.length - metrics.openCircles} closed`}</span>
+              <strong>{isLoading ? '...' : `${circles.length} кружка`}</strong>
+              <span>{isLoading ? 'Собираем мини-комьюнити' : `${metrics.openCircles} открытых • ${circles.length - metrics.openCircles} закрытых`}</span>
             </div>
           </div>
           <div className="hub-shell__stat-card">
             <MapPin size={18} />
             <div>
               <strong>{isLoading ? '...' : `${metrics.regions} регионов`}</strong>
-              <span>{isLoading ? 'Строим social geography' : 'единая social geography'}</span>
+              <span>{isLoading ? 'Собираем географию' : 'география сообщества'}</span>
             </div>
           </div>
         </div>

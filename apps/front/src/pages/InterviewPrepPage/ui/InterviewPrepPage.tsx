@@ -268,7 +268,7 @@ export function InterviewPrepPage() {
   }, [filteredTasks, loading, searchParams]);
 
   if (loading) {
-    return <div className="empty-state compact">Загрузка interview prep...</div>;
+    return <div className="empty-state compact">Загружаем задачи...</div>;
   }
 
   return (

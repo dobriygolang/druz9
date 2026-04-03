@@ -1,15 +1,15 @@
 .circles-page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
+  gap: var(--space-5);
 }
 
 .circles-hero {
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.9fr);
-  gap: var(--space-5);
-  padding: var(--space-8);
-  border-radius: 28px;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: 24px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     radial-gradient(circle at top left, rgba(56, 189, 248, 0.16), transparent 35%),
@@ -19,13 +19,13 @@
 
 .circles-hero__copy {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-3);
   max-width: 720px;
 }
 
 .circles-hero__copy h1 {
-  font-size: clamp(2rem, 1.8rem + 1.4vw, 3.25rem);
-  line-height: 1.02;
+  font-size: clamp(1.9rem, 1.7rem + 1vw, 2.8rem);
+  line-height: 1.04;
 }
 
 .circles-hero__copy p,
@@ -49,7 +49,7 @@
 .circles-hero__stats {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-4);
+  gap: var(--space-3);
 }
 
 .circles-metric,
@@ -61,8 +61,8 @@
 .circles-metric {
   display: grid;
   gap: var(--space-2);
-  padding: var(--space-5);
-  border-radius: 22px;
+  padding: var(--space-4);
+  border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background: rgba(255, 255, 255, 0.04);
 }
@@ -73,7 +73,7 @@
 }
 
 .circles-metric strong {
-  font-size: 30px;
+  font-size: 26px;
   line-height: 1;
 }
 
@@ -102,14 +102,14 @@
 .circles-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
 .circles-card {
   display: grid;
-  gap: var(--space-5);
-  padding: var(--space-6);
-  border-radius: 28px;
+  gap: var(--space-4);
+  padding: var(--space-5);
+  border-radius: 22px;
   border: 1px solid rgba(255, 255, 255, 0.08);
   background:
     linear-gradient(135deg, color-mix(in srgb, var(--circle-accent) 18%, transparent), transparent 34%),
@@ -154,8 +154,8 @@
 }
 
 .circles-card__header h2 {
-  font-size: 28px;
-  line-height: 1.05;
+  font-size: 22px;
+  line-height: 1.08;
   margin-top: var(--space-2);
 }
 
@@ -208,6 +208,7 @@
 .circles-card__description {
   color: var(--text-secondary);
   max-width: 60ch;
+  line-height: 1.5;
 }
 
 .circles-card__stats {
@@ -219,12 +220,12 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  min-height: 40px;
-  padding: 0 12px;
-  border-radius: 14px;
+  min-height: 34px;
+  padding: 0 10px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.05);
   color: var(--text-primary);
-  font-size: 13px;
+  font-size: 12px;
 }
 
 .circles-card__section {
@@ -259,8 +260,8 @@
 .circles-member-card,
 .circles-leaderboard__row,
 .circles-card__aside {
-  padding: 14px 16px;
-  border-radius: 18px;
+  padding: 12px 14px;
+  border-radius: 14px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background: rgba(255, 255, 255, 0.03);
 }
@@ -274,7 +275,7 @@
 .circles-event-item strong,
 .circles-userline strong {
   display: block;
-  font-size: 14px;
+  font-size: 13px;
 }
 
 .circles-event-item span,

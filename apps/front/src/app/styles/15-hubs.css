@@ -52,8 +52,8 @@
 .arena-hub__copy p {
   color: var(--text-secondary);
   max-width: 62ch;
-  font-size: 15px;
-  line-height: 1.6;
+  font-size: 14px;
+  line-height: 1.5;
 }
 
 .hub-shell__eyebrow,
@@ -85,7 +85,7 @@
 .home-metric,
 .home-panel,
 .arena-hub__panel {
-  padding: var(--space-4);
+  padding: var(--space-3);
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background:
@@ -143,7 +143,7 @@
   display: grid;
   grid-template-columns: minmax(0, 1.15fr) minmax(240px, 0.85fr);
   gap: var(--space-4);
-  padding: var(--space-5);
+  padding: var(--space-4);
   border-radius: 24px;
   border: 1px solid rgba(255,255,255,0.06);
   background:
@@ -157,9 +157,9 @@
 }
 
 .people-page__hero p {
-  margin: 12px 0 0;
+  margin: 10px 0 0;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.5;
   max-width: 62ch;
 }
 
@@ -191,13 +191,13 @@
 }
 
 .people-page__summary-card {
-  padding: var(--space-4);
+  padding: var(--space-3);
   display: grid;
   gap: 6px;
 }
 
 .people-page__summary-card strong {
-  font-size: 30px;
+  font-size: 24px;
   line-height: 1;
 }
 
@@ -210,7 +210,7 @@
 }
 
 .people-filters {
-  padding: var(--space-4);
+  padding: var(--space-3);
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) repeat(2, minmax(180px, 0.75fr)) auto;
   gap: var(--space-3);

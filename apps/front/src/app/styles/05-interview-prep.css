@@ -1,7 +1,7 @@
 .interview-prep-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 14px;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 12px;
 }
 
 .interview-prep-hero {
@@ -17,8 +17,8 @@
 }
 
 .interview-prep-summary--rich {
-  justify-content: center;
-  min-width: min(280px, 100%);
+  justify-content: flex-start;
+  min-width: min(240px, 100%);
 }
 
 .interview-prep-category-strip {
@@ -93,8 +93,8 @@
 }
 
 .interview-prep-filter-card {
-  padding: 18px;
-  border-radius: 22px;
+  padding: 16px;
+  border-radius: 20px;
   background:
     radial-gradient(circle at top right, rgba(56, 189, 248, 0.08), transparent 30%),
     linear-gradient(180deg, rgba(255, 255, 255, 0.03), rgba(255, 255, 255, 0.015)),
@@ -104,14 +104,14 @@
 .interview-prep-filters {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 12px;
+  gap: 10px;
   align-items: start;
 }
 
 .interview-prep-group__head {
   display: flex;
   justify-content: space-between;
-  gap: 12px;
+  gap: 10px;
   align-items: end;
   flex-wrap: wrap;
 }
@@ -123,10 +123,10 @@
 .interview-prep-card {
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  min-height: 248px;
-  padding: 18px;
-  border-radius: 22px;
+  gap: 14px;
+  min-height: 220px;
+  padding: 16px;
+  border-radius: 20px;
   box-shadow: 0 16px 40px rgba(0, 0, 0, 0.14);
 }
 
@@ -144,8 +144,8 @@
 .interview-prep-summary {
   flex-direction: column;
   align-items: flex-start;
-  padding: 16px 18px;
-  border-radius: 18px;
+  padding: 14px 16px;
+  border-radius: 16px;
   background: linear-gradient(180deg, rgba(125, 211, 252, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
   border: 1px solid rgba(125, 211, 252, 0.18);
 }
@@ -154,13 +154,13 @@
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  font-size: 14px;
+  font-size: 13px;
   color: var(--text-primary);
 }
 
 .interview-prep-card__title {
   margin: 0;
-  font-size: 22px;
+  font-size: 20px;
   line-height: 1.2;
   word-break: break-word;
 }
@@ -170,14 +170,14 @@
 .interview-prep-answer-preview {
   margin: 0;
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.5;
   white-space: pre-wrap;
 }
 
 .interview-prep-card__statement {
   display: -webkit-box;
-  -webkit-line-clamp: 5;
-  line-clamp: 5;
+  -webkit-line-clamp: 4;
+  line-clamp: 4;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
@@ -191,8 +191,8 @@
 .interview-prep-card__hint,
 .interview-prep-muted {
   color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.5;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .interview-prep-card__head .badge,

@@ -85,11 +85,10 @@ export const CirclesPage: React.FC = () => {
     <div className="fade-in circles-page">
       <section className="circles-hero">
         <div className="circles-hero__copy">
-          <span className="circles-hero__kicker">Teams / circles / mini-communities</span>
-          <h1>Кружки поверх сообщества</h1>
+          <span className="circles-hero__kicker">Circles</span>
+          <h1>Мини-комьюнити</h1>
           <p>
-            Не отдельный Slack, а легкий слой над текущими людьми, событиями и ареной:
-            свои составы, собственные ивенты и локальный лидерборд внутри каждого круга.
+            Небольшие круги по интересу, региону или соревновательному режиму. У каждого свой состав, события и локальный рейтинг.
           </p>
         </div>
 
@@ -204,7 +203,7 @@ export const CirclesPage: React.FC = () => {
                     ))}
                   </div>
                 ) : (
-                  <div className="circles-muted">Пока без выделенных ивентов. Circle живет за счет состава и arena-ядра.</div>
+                  <div className="circles-muted">Пока без ближайших событий.</div>
                 )}
               </div>
 
@@ -259,14 +258,14 @@ export const CirclesPage: React.FC = () => {
                   ))}
                 </div>
                 <div className="circles-card__cta">
-                  <span>{circle.visibility === 'open' ? 'Вход через ивенты и участников' : 'Вход по инвайту от состава'}</span>
+                  <span>{circle.visibility === 'open' ? 'Можно зайти через участников' : 'Вход по инвайту'}</span>
                   <ArrowUpRight size={16} />
                 </div>
               </div>
 
               {circle.recommendedMembers.length > 0 && (
                 <div className="circles-card__aside">
-                  <span>Кого добавить next</span>
+                  <span>Кого позвать</span>
                   <div className="circles-recommendations">
                     {circle.recommendedMembers.slice(0, 3).map((member) => (
                       <Link key={member.userId} to={`/profile/${member.userId}`}>

@@ -299,7 +299,7 @@
 .profile-progress-section {
   margin-top: var(--space-8);
   display: grid;
-  gap: var(--space-5);
+  gap: var(--space-4);
 }
 
 .profile-progress-section__header {
@@ -312,15 +312,17 @@
 
 .profile-progress-section__header h2 {
   margin: 0 0 var(--space-2);
-  font-size: var(--font-size-xl);
+  font-size: clamp(28px, 2vw, 36px);
   font-weight: 800;
+  letter-spacing: -0.04em;
 }
 
 .profile-progress-section__header p {
   margin: 0;
   color: var(--text-secondary);
-  max-width: 760px;
-  line-height: 1.65;
+  max-width: 620px;
+  line-height: 1.5;
+  font-size: 14px;
 }
 
 .profile-progress-section__badges {
@@ -355,15 +357,23 @@
 }
 
 .profile-progress-card {
-  padding: var(--space-4);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-xl);
+  padding: 18px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 22px;
   background:
-    radial-gradient(circle at top right, rgba(34, 211, 238, 0.08), transparent 34%),
-    linear-gradient(180deg, var(--surface-elevated), var(--surface-color));
-  box-shadow: var(--shadow-lg);
+    radial-gradient(circle at top right, rgba(103, 232, 249, 0.12), transparent 28%),
+    radial-gradient(circle at bottom left, rgba(99, 102, 241, 0.1), transparent 26%),
+    linear-gradient(180deg, rgba(34, 40, 56, 0.94), rgba(18, 24, 34, 0.98));
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.22);
   overflow: hidden;
   min-width: 0;
+}
+
+.profile-progress-card--radar {
+  background:
+    radial-gradient(circle at 50% 42%, rgba(103, 232, 249, 0.12), transparent 18%),
+    radial-gradient(circle at top left, rgba(99, 102, 241, 0.16), transparent 30%),
+    linear-gradient(180deg, rgba(33, 40, 58, 0.98), rgba(19, 25, 36, 1));
 }
 
 .profile-progress-card--wide {
@@ -371,7 +381,7 @@
 }
 
 .profile-progress-card__header {
-  margin-bottom: var(--space-3);
+  margin-bottom: 14px;
 }
 
 .profile-progress-card__header h3 {
@@ -379,20 +389,23 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  font-size: var(--font-size-lg);
+  font-size: 16px;
   font-weight: 800;
+  letter-spacing: -0.02em;
 }
 
 .profile-progress-card__header p {
   margin: 0;
   color: var(--text-secondary);
-  line-height: 1.55;
+  line-height: 1.45;
+  font-size: 13px;
+  max-width: 48ch;
 }
 
 .profile-progress-orbit {
   width: 100%;
   display: grid;
-  gap: var(--space-4);
+  gap: 14px;
   position: relative;
   min-width: 0;
 }
@@ -405,15 +418,16 @@
 }
 
 .profile-progress-orbit__core {
-  fill: rgba(34, 211, 238, 0.14);
-  stroke: rgba(103, 232, 249, 0.7);
-  stroke-width: 1.5;
+  fill: rgba(103, 232, 249, 0.18);
+  stroke: rgba(147, 197, 253, 0.92);
+  stroke-width: 1.6;
+  filter: drop-shadow(0 0 24px rgba(103, 232, 249, 0.28));
   animation: profile-orbit-core-pulse 3.6s ease-in-out infinite;
 }
 
 .profile-progress-orbit__pulse {
   fill: none;
-  stroke: rgba(34, 211, 238, 0.12);
+  stroke: rgba(103, 232, 249, 0.18);
   stroke-width: 1;
   stroke-dasharray: 8 8;
   animation: profile-orbit-spin 18s linear infinite;
@@ -421,7 +435,7 @@
 
 .profile-progress-orbit__ring {
   fill: none;
-  stroke: rgba(255, 255, 255, 0.09);
+  stroke: rgba(148, 163, 184, 0.18);
   stroke-width: 1;
   opacity: 0;
   transform-origin: 220px 210px;
@@ -438,14 +452,14 @@
 }
 
 .profile-progress-orbit__arc--practice {
-  stroke: rgba(34, 211, 238, 0.78);
-  filter: drop-shadow(0 0 10px rgba(34, 211, 238, 0.22));
+  stroke: rgba(103, 232, 249, 0.92);
+  filter: drop-shadow(0 0 14px rgba(103, 232, 249, 0.3));
 }
 
 .profile-progress-orbit__arc--verified {
-  stroke: rgba(52, 211, 153, 0.95);
+  stroke: rgba(129, 140, 248, 0.96);
   stroke-width: 3.4;
-  filter: drop-shadow(0 0 12px rgba(52, 211, 153, 0.3));
+  filter: drop-shadow(0 0 16px rgba(129, 140, 248, 0.34));
 }
 
 .profile-progress-orbit__node {
@@ -458,35 +472,38 @@
 }
 
 .profile-progress-orbit__node--verified {
-  fill: #6ee7b7;
+  fill: #a5b4fc;
   stroke: rgba(8, 10, 18, 0.95);
   stroke-width: 2;
-  filter: drop-shadow(0 0 10px rgba(52, 211, 153, 0.34));
+  filter: drop-shadow(0 0 12px rgba(129, 140, 248, 0.38));
   animation:
     profile-orbit-node-enter 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) forwards,
     profile-orbit-node-verified-glow 2s ease-in-out infinite;
 }
 
 .profile-progress-orbit__node--practice {
-  fill: #67e8f9;
+  fill: #7dd3fc;
   stroke: rgba(8, 10, 18, 0.95);
   stroke-width: 2;
-  filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.28));
+  filter: drop-shadow(0 0 10px rgba(103, 232, 249, 0.34));
   animation:
     profile-orbit-node-enter 0.55s cubic-bezier(0.2, 0.8, 0.2, 1) forwards,
     profile-orbit-node-practice-glow 2.4s ease-in-out infinite;
 }
 
 .profile-progress-orbit__label {
-  fill: var(--text-primary);
-  font-size: 10px;
-  font-weight: 700;
+  fill: rgba(241, 245, 249, 0.96);
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: -0.01em;
+  font-family: inherit;
 }
 
 .profile-progress-orbit__value {
-  fill: #22d3ee;
-  font-size: 10px;
+  fill: #7dd3fc;
+  font-size: 11px;
   font-weight: 800;
+  font-family: inherit;
 }
 
 .profile-progress-orbit__glow {
@@ -495,47 +512,50 @@
 
 .profile-progress-orbit__legend {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-  gap: 10px;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
 }
 
 .profile-progress-orbit__legend-item {
   display: grid;
   gap: 4px;
-  padding: 12px;
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px solid var(--border-color);
+  padding: 10px 12px;
+  border-radius: 16px;
+  background: rgba(9, 14, 24, 0.42);
+  border: 1px solid rgba(255, 255, 255, 0.06);
   transition: transform 0.22s ease, border-color 0.22s ease, background-color 0.22s ease;
 }
 
 .profile-progress-orbit__legend-item.is-hovered {
   transform: translateY(-2px);
-  border-color: rgba(34, 211, 238, 0.3);
-  background: rgba(34, 211, 238, 0.06);
+  border-color: rgba(103, 232, 249, 0.32);
+  background: rgba(103, 232, 249, 0.08);
 }
 
 .profile-progress-orbit__legend-item strong {
   margin: 0;
+  font-size: 14px;
+  letter-spacing: -0.02em;
 }
 
 .profile-progress-orbit__legend-item small {
   color: var(--text-secondary);
-  line-height: 1.5;
+  line-height: 1.35;
+  font-size: 12px;
 }
 
 .profile-progress-orbit__tooltip {
   width: 100%;
-  padding: var(--space-4);
-  border-radius: var(--radius-lg);
-  border: 1px solid rgba(34, 211, 238, 0.18);
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(103, 232, 249, 0.18);
   background:
-    linear-gradient(180deg, rgba(14, 20, 28, 0.94), rgba(9, 14, 22, 0.96)),
+    linear-gradient(180deg, rgba(11, 17, 28, 0.98), rgba(8, 12, 22, 0.98)),
     var(--surface-color);
-  box-shadow: 0 18px 42px rgba(0, 0, 0, 0.24);
+  box-shadow: 0 22px 48px rgba(0, 0, 0, 0.28);
   backdrop-filter: blur(12px);
   display: grid;
-  gap: 8px;
+  gap: 6px;
 }
 
 .profile-progress-orbit__tooltip-top {
@@ -549,37 +569,38 @@
 .profile-progress-orbit__tooltip p {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 12px;
+  line-height: 1.45;
 }
 
 .profile-progress-metrics {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: var(--space-3);
+  gap: 10px;
 }
 
 .profile-progress-metric {
-  padding: 12px 14px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.03);
+  padding: 12px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(12, 16, 27, 0.42);
   display: grid;
-  gap: 6px;
+  gap: 4px;
 }
 
 .profile-progress-metric .label {
   color: var(--text-secondary);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
 }
 
 .profile-progress-metric strong {
-  font-size: 22px;
+  font-size: 28px;
   line-height: 1.1;
   overflow-wrap: anywhere;
+  letter-spacing: -0.03em;
 }
 
 .profile-progress-company-strip {
@@ -630,9 +651,9 @@
   justify-content: space-between;
   gap: var(--space-3);
   padding: 12px 14px;
-  border-radius: var(--radius-lg);
-  border: 1px solid var(--border-color);
-  background: rgba(255, 255, 255, 0.03);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  background: rgba(12, 16, 27, 0.38);
 }
 
 .profile-progress-list__item > div,
@@ -646,6 +667,8 @@
 .profile-progress-checkpoint strong {
   display: block;
   margin-bottom: 6px;
+  font-size: 15px;
+  letter-spacing: -0.02em;
 }
 
 .profile-progress-list__title {
@@ -660,8 +683,8 @@
 .profile-progress-checkpoint span {
   margin: 0;
   color: var(--text-secondary);
-  font-size: 13px;
-  line-height: 1.55;
+  font-size: 12px;
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
@@ -669,8 +692,8 @@
 .profile-progress-checkpoint b {
   min-width: 44px;
   text-align: right;
-  font-size: 24px;
-  color: #22d3ee;
+  font-size: 22px;
+  color: #93c5fd;
   flex-shrink: 0;
 }
 
@@ -693,13 +716,13 @@
 }
 
 .profile-progress-confidence--medium {
-  background: rgba(56, 189, 248, 0.12);
-  color: #7dd3fc;
+  background: rgba(99, 102, 241, 0.14);
+  color: #a5b4fc;
 }
 
 .profile-progress-confidence--verified {
-  background: rgba(16, 185, 129, 0.14);
-  color: #6ee7b7;
+  background: rgba(103, 232, 249, 0.14);
+  color: #7dd3fc;
 }
 
 .profile-progress-link {
@@ -719,14 +742,15 @@
 
 .profile-progress-empty {
   color: var(--text-secondary);
-  line-height: 1.6;
+  line-height: 1.45;
+  font-size: 13px;
 }
 
 .profile-progress-empty.compact {
   padding: 12px 14px;
-  border-radius: var(--radius-lg);
-  background: rgba(255, 255, 255, 0.03);
-  border: 1px dashed var(--border-color);
+  border-radius: 16px;
+  background: rgba(12, 16, 27, 0.34);
+  border: 1px dashed rgba(255, 255, 255, 0.08);
 }
 
 @keyframes profile-orbit-spin {

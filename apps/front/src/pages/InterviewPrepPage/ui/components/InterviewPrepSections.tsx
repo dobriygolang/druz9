@@ -34,7 +34,7 @@ export function InterviewPrepHero({
         <p className="code-rooms-subtitle">
           {isMobile
             ? 'Сценарии для подготовки к техническим интервью.'
-            : 'Выбирай сценарий, запускай случайную задачу или собирай свой поток через компактные фильтры ниже. Экран стал короче и быстрее читается с первого захода.'}
+            : 'Запускай mock interview, выбирай задачу вручную или стартуй со случайного сценария.'}
         </p>
         <div className="interview-prep-hero__actions" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
           <button className="btn btn-secondary" disabled={startingMock} onClick={onStartMockInterview} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
@@ -70,7 +70,7 @@ export function InterviewPrepHero({
           </div>
           <div className="interview-prep-summary__item">
             <ShieldCheck size={16} />
-            <span>{summary.guidedCount} guided flow</span>
+            <span>{summary.guidedCount} с разбором</span>
           </div>
         </div>
       )}
@@ -108,7 +108,7 @@ export function InterviewPrepFilters({
       <div className="dashboard-card__header">
         <div>
           <h2 style={{ fontSize: isMobile ? '20px' : '24px' }}>Каталог задач</h2>
-          {!isMobile && <p className="interview-prep-muted">Один компактный блок вместо длинной полосы категорий и массивов pill-фильтров.</p>}
+          {!isMobile && <p className="interview-prep-muted">Фильтры по категории, формату, компании и поиску.</p>}
         </div>
       </div>
 
@@ -128,11 +128,11 @@ export function InterviewPrepFilters({
           <select className="input" value={modeFilter} onChange={(event) => onModeFilterChange(event.target.value as TaskModeFilter)}>
             <option value="all">Все форматы</option>
             <option value="executable">Live coding</option>
-            <option value="guided">Guided</option>
+            <option value="guided">С разбором</option>
           </select>
           {category === 'system_design' && (
             <div className="interview-prep-muted" style={{ marginTop: '8px' }}>
-              Для System Design доступны guided-сценарии с AI review, поэтому live-coding фильтр здесь не применяется.
+              Для system design доступны сценарии с разбором.
             </div>
           )}
         </div>
@@ -145,7 +145,7 @@ export function InterviewPrepFilters({
             ))}
           </select>
           <div className="interview-prep-muted" style={{ marginTop: '8px' }}>
-            Если компанию не выбирать, mock interview стартует на случайной доступной компании.
+            Если компанию не выбирать, mock interview стартует случайно.
           </div>
         </div>
 
@@ -200,7 +200,7 @@ export function InterviewPrepTaskGroups({
               </div>
               <button className="btn btn-secondary interview-prep-group__action" onClick={() => onRandomStart(group.tasks)}>
                 <Shuffle size={16} />
-                <span>Рандом по категории</span>
+                <span>Случайная задача</span>
               </button>
             </div>
 
@@ -230,10 +230,10 @@ export function InterviewPrepTaskGroups({
                     <div className="interview-prep-card__footer">
                       <div className="interview-prep-card__hint">
                         {task.prepType === 'system_design'
-                          ? 'AI review схемы + follow-up вопросы'
+                          ? 'Схема и follow-up вопросы'
                           : task.isExecutable
                             ? 'Live coding с автопроверкой'
-                            : 'Guided flow: решение + последовательные вопросы'}
+                            : 'Решение и последовательные вопросы'}
                       </div>
                       <div className="interview-prep-card__actions">
                         {supportsCheckpoint && (

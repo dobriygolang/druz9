@@ -74,7 +74,7 @@ export const UsersPage: React.FC = () => {
         <div>
           <span className="people-page__eyebrow">People</span>
           <h1>Люди сообщества</h1>
-          <p>Здесь только участники. Без смешения с events, map и circles: сначала находишь людей, потом уже проваливаешься глубже по контексту.</p>
+          <p>Список участников сообщества. Найди человека по имени, региону или активности.</p>
         </div>
         <div className="people-page__summary">
           <div className="people-page__summary-card">
@@ -124,7 +124,7 @@ export const UsersPage: React.FC = () => {
         {!isLoading && filteredUsers.length > 0 && (
           <div className="people-page__hint">
             <Sparkles size={14} />
-            <span>Открывай профиль, чтобы увидеть локацию, статус и прогресс</span>
+            <span>Открывай профиль для деталей</span>
           </div>
         )}
       </div>

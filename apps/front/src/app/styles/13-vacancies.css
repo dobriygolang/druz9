@@ -1,8 +1,8 @@
 .vacancies-page {
   display: flex;
   flex-direction: column;
-  gap: var(--space-6);
-  padding-bottom: var(--space-16);
+  gap: var(--space-5);
+  padding-bottom: var(--space-12);
 }
 
 .vacancies-hero {
@@ -27,7 +27,7 @@
 .vacancies-hero__intro {
   border-radius: var(--radius-xl);
   padding: var(--space-3) var(--space-4);
-  min-height: 150px;
+  min-height: 132px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -92,10 +92,10 @@
 
 .vacancies-hero__panel {
   border-radius: var(--radius-xl);
-  padding: var(--space-4);
+  padding: var(--space-3);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   justify-content: space-between;
 }
 
@@ -107,7 +107,7 @@
 
 .vacancies-stat {
   border-radius: var(--radius-md);
-  padding: var(--space-3) var(--space-4);
+  padding: var(--space-2) var(--space-3);
   background: var(--surface-elevated);
   border: 1px solid var(--border-subtle);
 }
@@ -136,7 +136,7 @@
 
 .vacancies-search {
   border-radius: var(--radius-xl);
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-4) var(--space-5);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -152,10 +152,10 @@
 
 .vacancies-card {
   border-radius: var(--radius-xl);
-  padding: var(--space-5) var(--space-6);
+  padding: var(--space-4) var(--space-5);
   display: flex;
   flex-direction: column;
-  gap: var(--space-4);
+  gap: var(--space-3);
   transition: border-color var(--transition-base), box-shadow var(--transition-base), background-color var(--transition-base);
 }
 
@@ -230,7 +230,7 @@
 
 .vacancies-card__footer {
   margin-top: auto;
-  padding-top: var(--space-4);
+  padding-top: var(--space-3);
   display: flex;
   justify-content: space-between;
   gap: var(--space-3);

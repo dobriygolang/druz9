@@ -182,16 +182,15 @@ export const VacanciesPage: React.FC = () => {
             <h1 className="vacancies-hero__title">{isMobile ? 'Вакансии' : 'Вакансии'}</h1>
             <p className="vacancies-hero__description">
               {isMobile 
-                ? 'Реферальные вакансии от сообщества.' 
-                : 'Лента реальных вакансий от сообщества. Быстро фильтруй по формату и локации.'}
+                ? 'Вакансии от сообщества.' 
+                : 'Короткая лента вакансий от сообщества с поиском по роли, формату и локации.'}
             </p>
           </div>
 
           {!isMobile && (
             <div className="vacancies-hero__meta">
-              <span className="badge">Без лишнего шума</span>
-              <span className="badge">Рефералки и прямые контакты</span>
-              <span className="badge">Нормальный поиск</span>
+              <span className="badge">Рефералки</span>
+              <span className="badge">Прямые контакты</span>
             </div>
           )}
 

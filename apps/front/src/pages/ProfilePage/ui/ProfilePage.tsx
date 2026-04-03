@@ -282,7 +282,7 @@ export const ProfilePage: React.FC = () => {
 
   const handleOpenBindTelegram = async () => {
     const popup = typeof window !== 'undefined'
-      ? window.open('', '_blank', 'noopener,noreferrer')
+      ? window.open('about:blank', '_blank')
       : null;
     try {
       const challenge = await authApi.createTelegramAuthChallenge();
@@ -290,9 +290,10 @@ export const ProfilePage: React.FC = () => {
       setIsBindTelegramModalOpen(true);
       if (challenge.botStartUrl) {
         if (popup) {
-          popup.location.href = challenge.botStartUrl;
+          popup.location.replace(challenge.botStartUrl);
+          popup.focus();
         } else if (typeof window !== 'undefined') {
-          window.open(challenge.botStartUrl, '_blank', 'noopener,noreferrer');
+          window.location.href = challenge.botStartUrl;
         }
       } else if (popup) {
         popup.close();
@@ -547,7 +548,7 @@ export const ProfilePage: React.FC = () => {
         <div className="profile-progress-section__header">
           <div>
             <h2>Профиль прогресса</h2>
-            <p>Здесь собраны практика, подтвержденные результаты и следующие шаги. Блоки разделены так, чтобы профиль читался сверху вниз, а не как одна длинная смешанная лента.</p>
+            <p>Практика, подтвержденные зоны и следующие шаги в одном блоке.</p>
           </div>
           <div className="profile-progress-section__badges">
             <span className="profile-progress-badge"><Flame size={14} /> {formatDayLabel(progress.overview.currentStreakDays)} подряд</span>
@@ -560,7 +561,7 @@ export const ProfilePage: React.FC = () => {
             <div className="profile-progress-card__header">
               <div>
                 <h3><BrainCircuit size={18} /> Карта навыков</h3>
-                <p>Каждая орбита показывает отдельную зону. Слева карта, ниже короткая расшифровка по темам.</p>
+                <p>Орбиты показывают глубину по ключевым темам.</p>
               </div>
             </div>
 
@@ -664,7 +665,7 @@ export const ProfilePage: React.FC = () => {
             <div className="profile-progress-card__header">
               <div>
                 <h3><Target size={18} /> Объем практики</h3>
-                <p>Это учебный слой. Он показывает накопленный опыт в solo-режиме и помогает понять, насколько регулярно человек тренируется.</p>
+                <p>Сколько практики уже накоплено.</p>
               </div>
             </div>
 
@@ -713,7 +714,7 @@ export const ProfilePage: React.FC = () => {
             <div className="profile-progress-card__header">
               <div>
                 <h3>Подтвержденные зоны</h3>
-                <p>Здесь показываются темы, где уже виден не только объем, но и подтвержденный уровень по результатам.</p>
+                <p>Темы, где уже есть подтвержденный результат.</p>
               </div>
             </div>
             <div className="profile-progress-list">
@@ -737,7 +738,7 @@ export const ProfilePage: React.FC = () => {
             <div className="profile-progress-card__header">
               <div>
                 <h3>Зоны роста</h3>
-                <p>Здесь виден разрыв между объемом практики и подтвержденным уровнем. Обычно именно отсюда начинается самый быстрый рост.</p>
+                <p>Темы, где практика уже есть, а подтверждение еще слабое.</p>
               </div>
             </div>
             <div className="profile-progress-list">
@@ -761,7 +762,7 @@ export const ProfilePage: React.FC = () => {
             <div className="profile-progress-card__header">
               <div>
                 <h3>Что сделать дальше</h3>
-                <p>Следующие ходы, которые дадут самый заметный сигнал по профилю.</p>
+                <p>Следующий полезный шаг.</p>
               </div>
             </div>
             <div className="profile-progress-recommendations">
@@ -784,7 +785,7 @@ export const ProfilePage: React.FC = () => {
           <div className="profile-progress-card__header">
             <div>
               <h3><ShieldCheck size={18} /> Пройденные checkpoints</h3>
-              <p>Только успешно закрытые timed checkpoints. Это самый чистый подтвержденный сигнал после mock.</p>
+              <p>Успешно закрытые timed checkpoints.</p>
             </div>
           </div>
           <div className="profile-progress-checkpoints">
