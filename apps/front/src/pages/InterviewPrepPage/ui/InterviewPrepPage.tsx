@@ -4,7 +4,6 @@ import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 import { interviewPrepApi, InterviewPrepTask } from '@/features/InterviewPrep/api/interviewPrepApi';
 import {
-  InterviewPrepCategoryStats,
   InterviewPrepFilters,
   InterviewPrepHero,
   InterviewPrepTaskGroups,
@@ -34,10 +33,10 @@ export function InterviewPrepPage() {
   const [category, setCategory] = useState<TaskCategory>((searchParams.get('category') as TaskCategory) || 'all');
   const [company, setCompany] = useState(searchParams.get('company') ?? 'all');
   const [visibleCounts, setVisibleCounts] = useState<Record<TaskCategory, number>>({
-    coding: 3,
-    sql: 3,
-    system_design: 3,
-    all: 3,
+    coding: 2,
+    sql: 2,
+    system_design: 2,
+    all: 2,
   });
   const randomLaunchTriggered = useRef(false);
 
@@ -159,10 +158,10 @@ export function InterviewPrepPage() {
 
   useEffect(() => {
     setVisibleCounts({
-      coding: 3,
-      sql: 3,
-      system_design: 3,
-      all: 3,
+      coding: 2,
+      sql: 2,
+      system_design: 2,
+      all: 2,
     });
   }, [category, company, modeFilter, search]);
 
@@ -289,13 +288,6 @@ export function InterviewPrepPage() {
         }}
       />
 
-      <InterviewPrepCategoryStats
-        isMobile={isMobile}
-        category={category}
-        categoryStats={categoryStats}
-        onCategoryChange={(item) => setCategory(item)}
-      />
-
       <InterviewPrepFilters
         isMobile={isMobile}
         category={category}
@@ -303,6 +295,7 @@ export function InterviewPrepPage() {
         company={company}
         companyOptions={companyOptions}
         search={search}
+        categoryStats={categoryStats}
         onCategoryChange={(item) => {
           setCategory(item);
           if (item === 'system_design' && modeFilter === 'executable') {
@@ -336,7 +329,7 @@ export function InterviewPrepPage() {
           onRandomStart={(tasks) => void handleRandomStart(tasks)}
           onShowMore={(groupKey) => setVisibleCounts((current) => ({
             ...current,
-            [groupKey]: (current[groupKey] ?? 3) + 3,
+            [groupKey]: (current[groupKey] ?? 2) + 2,
           }))}
         />
       )}

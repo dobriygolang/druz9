@@ -3,6 +3,7 @@ import {
   LocationCandidate,
 } from '@/entities/User/model/types';
 import { apiClient } from '@/shared/api/base';
+import { getCachedValue, setCachedValue } from '@/shared/api/cache';
 
 type BackendCandidate = {
   region?: string;
@@ -97,9 +98,18 @@ export const geoApi = {
     return (response.data.candidates ?? []).map(normalizeCandidate);
   },
   communityMap: async (force = false): Promise<CommunityMapPoint[]> => {
+    const cacheKey = 'geo:community-map';
     const now = Date.now();
     if (!force && communityMapCache.data && now - communityMapCache.timestamp < communityMapCache.ttl) {
       return communityMapCache.data;
+    }
+    if (!force) {
+      const cached = getCachedValue<CommunityMapPoint[]>(cacheKey);
+      if (cached) {
+        communityMapCache.data = cached;
+        communityMapCache.timestamp = now;
+        return cached;
+      }
     }
     const response = await apiClient.get<BackendCommunityMapResponse>(
       '/api/v1/geo/community',
@@ -107,6 +117,7 @@ export const geoApi = {
     const points = (response.data.points ?? []).map(normalizeCommunityMapPoint);
     communityMapCache.data = points;
     communityMapCache.timestamp = now;
+    setCachedValue(cacheKey, points, communityMapCache.ttl);
     return points;
   },
 };

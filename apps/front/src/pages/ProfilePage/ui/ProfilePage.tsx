@@ -269,11 +269,26 @@ export const ProfilePage: React.FC = () => {
   };
 
   const handleOpenBindTelegram = async () => {
+    const popup = typeof window !== 'undefined'
+      ? window.open('', '_blank', 'noopener,noreferrer')
+      : null;
     try {
       const challenge = await authApi.createTelegramAuthChallenge();
       setTelegramChallenge(challenge);
       setIsBindTelegramModalOpen(true);
+      if (challenge.botStartUrl) {
+        if (popup) {
+          popup.location.href = challenge.botStartUrl;
+        } else if (typeof window !== 'undefined') {
+          window.open(challenge.botStartUrl, '_blank', 'noopener,noreferrer');
+        }
+      } else if (popup) {
+        popup.close();
+      }
     } catch (err) {
+      if (popup) {
+        popup.close();
+      }
       console.error('Failed to create telegram challenge', err);
       showToast('Не удалось начать привязку Telegram', 'error');
     }

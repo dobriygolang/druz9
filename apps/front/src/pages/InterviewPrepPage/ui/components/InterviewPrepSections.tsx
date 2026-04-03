@@ -2,7 +2,6 @@ import { ArrowRight, BrainCircuit, Clock3, Filter, ShieldCheck, Shuffle, Sparkle
 import { InterviewPrepTask } from '@/features/InterviewPrep/api/interviewPrepApi';
 import {
   CATEGORY_LABELS,
-  CATEGORY_ORDER,
   PREP_TYPE_LABELS,
   TaskCategory,
   TaskModeFilter,
@@ -31,11 +30,11 @@ export function InterviewPrepHero({
     <section className="page-header code-rooms-hero interview-prep-hero">
       <div className="code-rooms-hero__copy">
         {!isMobile && <span className="code-rooms-kicker">Interview Prep</span>}
-        <h1 style={{ fontSize: isMobile ? '28px' : '36px' }}>Interview Prep</h1>
+        <h1 style={{ fontSize: isMobile ? '28px' : '36px' }}>Подготовка к интервью</h1>
         <p className="code-rooms-subtitle">
           {isMobile
             ? 'Сценарии для подготовки к техническим интервью.'
-            : 'Выбирай категорию, бери случайную executable-задачу или фильтруй каталог вручную. Coding можно решать на Go или Python, system design поддерживает AI review.'}
+            : 'Выбирай сценарий, запускай случайную задачу или собирай свой поток через компактные фильтры ниже. Экран стал короче и быстрее читается с первого захода.'}
         </p>
         <div className="interview-prep-hero__actions" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
           <button className="btn btn-secondary" disabled={startingMock} onClick={onStartMockInterview} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
@@ -79,35 +78,6 @@ export function InterviewPrepHero({
   );
 }
 
-export function InterviewPrepCategoryStats({
-  isMobile,
-  category,
-  categoryStats,
-  onCategoryChange,
-}: {
-  isMobile: boolean;
-  category: TaskCategory;
-  categoryStats: Array<{ key: TaskCategory; label: string; count: number }>;
-  onCategoryChange: (value: TaskCategory) => void;
-}) {
-  return (
-    <section className="interview-prep-category-strip" style={{ gap: isMobile ? '8px' : '12px' }}>
-      {categoryStats.map((item) => (
-        <button
-          key={item.key}
-          type="button"
-          className={`card dashboard-card interview-prep-category-card ${category === item.key ? 'is-active' : ''} ${categoryAccentClass(item.key)}`}
-          onClick={() => onCategoryChange(item.key)}
-          style={{ padding: isMobile ? '12px' : '16px' }}
-        >
-          <span className="interview-prep-category-card__label" style={{ fontSize: isMobile ? '13px' : '14px' }}>{item.label}</span>
-          <strong style={{ fontSize: isMobile ? '18px' : '20px' }}>{item.count}</strong>
-        </button>
-      ))}
-    </section>
-  );
-}
-
 export function InterviewPrepFilters({
   isMobile,
   category,
@@ -115,6 +85,7 @@ export function InterviewPrepFilters({
   company,
   companyOptions,
   search,
+  categoryStats,
   onCategoryChange,
   onModeFilterChange,
   onCompanyChange,
@@ -126,6 +97,7 @@ export function InterviewPrepFilters({
   company: string;
   companyOptions: string[];
   search: string;
+  categoryStats: Array<{ key: TaskCategory; label: string; count: number }>;
   onCategoryChange: (value: TaskCategory) => void;
   onModeFilterChange: (value: TaskModeFilter) => void;
   onCompanyChange: (value: string) => void;
@@ -135,38 +107,29 @@ export function InterviewPrepFilters({
     <section className="card dashboard-card interview-prep-filter-card">
       <div className="dashboard-card__header">
         <div>
-          <h2 style={{ fontSize: isMobile ? '20px' : '24px' }}>Задачи</h2>
-          {!isMobile && <p className="interview-prep-muted">Фильтруй по категории, типу потока и тексту задачи.</p>}
+          <h2 style={{ fontSize: isMobile ? '20px' : '24px' }}>Каталог задач</h2>
+          {!isMobile && <p className="interview-prep-muted">Один компактный блок вместо длинной полосы категорий и массивов pill-фильтров.</p>}
         </div>
       </div>
 
       <div className="interview-prep-filters">
         <div className="form-group">
           <label>Категория</label>
-          <div className="pill-selector">
-            <button type="button" className={`pill-selector__pill ${category === 'all' ? 'active' : ''}`} onClick={() => onCategoryChange('all')}>
-              Все
-            </button>
-            {CATEGORY_ORDER.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={`pill-selector__pill ${category === item ? 'active' : ''}`}
-                onClick={() => onCategoryChange(item)}
-              >
-                {CATEGORY_LABELS[item]}
-              </button>
+          <select className="input" value={category} onChange={(event) => onCategoryChange(event.target.value as TaskCategory)}>
+            <option value="all">Все категории</option>
+            {categoryStats.map((item) => (
+              <option key={item.key} value={item.key}>{item.label} ({item.count})</option>
             ))}
-          </div>
+          </select>
         </div>
 
         <div className="form-group">
           <label>Формат</label>
-          <div className="pill-selector">
-            <button type="button" className={`pill-selector__pill ${modeFilter === 'all' ? 'active' : ''}`} onClick={() => onModeFilterChange('all')}>Все</button>
-            <button type="button" className={`pill-selector__pill ${modeFilter === 'executable' ? 'active' : ''}`} onClick={() => onModeFilterChange('executable')}>Live coding</button>
-            <button type="button" className={`pill-selector__pill ${modeFilter === 'guided' ? 'active' : ''}`} onClick={() => onModeFilterChange('guided')}>Guided</button>
-          </div>
+          <select className="input" value={modeFilter} onChange={(event) => onModeFilterChange(event.target.value as TaskModeFilter)}>
+            <option value="all">Все форматы</option>
+            <option value="executable">Live coding</option>
+            <option value="guided">Guided</option>
+          </select>
           {category === 'system_design' && (
             <div className="interview-prep-muted" style={{ marginTop: '8px' }}>
               Для System Design доступны guided-сценарии с AI review, поэтому live-coding фильтр здесь не применяется.
@@ -176,18 +139,11 @@ export function InterviewPrepFilters({
 
         <div className="form-group">
           <label>Компания / группа</label>
-          <div className="pill-selector">
+          <select className="input" value={company} onChange={(event) => onCompanyChange(event.target.value)}>
             {companyOptions.map((item) => (
-              <button
-                key={item}
-                type="button"
-                className={`pill-selector__pill ${company === item ? 'active' : ''}`}
-                onClick={() => onCompanyChange(item || '')}
-              >
-                {item === 'all' ? 'Все' : item}
-              </button>
+              <option key={item} value={item}>{item === 'all' ? 'Все компании' : item}</option>
             ))}
-          </div>
+          </select>
           <div className="interview-prep-muted" style={{ marginTop: '8px' }}>
             Если компанию не выбирать, mock interview стартует на случайной доступной компании.
           </div>
@@ -298,7 +254,7 @@ export function InterviewPrepTaskGroups({
             {hasMore && (
               <div className="interview-prep-group__more">
                 <button type="button" className="btn btn-secondary" onClick={() => onShowMore(group.key)}>
-                  Показать ещё 3
+                  Показать ещё 2
                 </button>
               </div>
             )}

@@ -1,4 +1,5 @@
-import { BrainCircuit, CheckCircle2, CircleDashed, Clock3, Mic, MicOff, ShieldCheck, Sparkles, XCircle } from 'lucide-react';
+import { ArrowLeft, BrainCircuit, CheckCircle2, CircleDashed, Clock3, Mic, MicOff, ShieldCheck, Sparkles, XCircle } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 import {
   InterviewPrepAnswerReview,
@@ -39,6 +40,10 @@ export function SessionHero({
   return (
     <section className="card dashboard-card interview-prep-session-hero">
       <div>
+        <Link to="/growth/interview-prep" className="interview-prep-back-link">
+          <ArrowLeft size={14} />
+          <span>Назад к задачам</span>
+        </Link>
         <div className="task-item__meta">
           <span className="badge">{task?.prepType}</span>
           <span className="badge">{displayLanguageLabel(task?.language)}</span>
@@ -181,7 +186,7 @@ export function FollowUpSection({
         <div className="dashboard-card__header">
           <div>
             <h2>Checkpoint rules</h2>
-            <p className="interview-prep-muted">В checkpoint follow-up отключены. Verified signal строится только по timed submit.</p>
+            <p className="interview-prep-muted">В checkpoint follow-up отключены. Подтвержденный сигнал строится только по timed submit.</p>
           </div>
           <ShieldBadge status={checkpoint.status} />
         </div>

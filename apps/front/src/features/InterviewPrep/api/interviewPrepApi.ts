@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/base';
+import { getCachedValue, invalidateCachedPrefix, setCachedValue } from '@/shared/api/cache';
 
 export type InterviewPrepType =
   | 'coding'
@@ -385,18 +386,35 @@ const fileToBase64 = async (file: File): Promise<string> => {
 
 export const interviewPrepApi = {
   listTasks: async (): Promise<InterviewPrepTask[]> => {
+    const cacheKey = 'interview-prep:tasks';
+    const cached = getCachedValue<InterviewPrepTask[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
     const response = await apiClient.get<{ tasks: any[] }>('/api/v1/interview-prep/tasks');
-    return (response.data.tasks || []).map(normalizeTask);
+    const tasks = (response.data.tasks || []).map(normalizeTask);
+    setCachedValue(cacheKey, tasks, 120_000);
+    return tasks;
   },
 
   startSession: async (taskId: string): Promise<InterviewPrepSession> => {
     const response = await apiClient.post<{ session: any }>('/api/v1/interview-prep/sessions', { taskId });
-    return normalizeSession(response.data.session);
+    const session = normalizeSession(response.data.session);
+    invalidateCachedPrefix('interview-prep:tasks');
+    setCachedValue(`interview-prep:session:${session.id}`, session, 15_000);
+    return session;
   },
 
   getSession: async (sessionId: string): Promise<InterviewPrepSession> => {
+    const cacheKey = `interview-prep:session:${sessionId}`;
+    const cached = getCachedValue<InterviewPrepSession>(cacheKey);
+    if (cached) {
+      return cached;
+    }
     const response = await apiClient.get<{ session: any }>(`/api/v1/interview-prep/sessions/${sessionId}`);
-    return normalizeSession(response.data.session);
+    const session = normalizeSession(response.data.session);
+    setCachedValue(cacheKey, session, 15_000);
+    return session;
   },
 
   startCheckpoint: async (taskId: string): Promise<{ session: InterviewPrepSession; checkpoint: InterviewPrepCheckpoint }> => {
@@ -404,20 +422,34 @@ export const interviewPrepApi = {
       '/api/v1/interview-prep/checkpoints/start',
       { task_id: taskId },
     );
-    return {
-      session: normalizeSession(response.data.session),
-      checkpoint: normalizeCheckpoint(response.data.checkpoint),
-    };
+    const session = normalizeSession(response.data.session);
+    const checkpoint = normalizeCheckpoint(response.data.checkpoint);
+    setCachedValue(`interview-prep:session:${session.id}`, session, 15_000);
+    setCachedValue(`interview-prep:checkpoint:${session.id}`, checkpoint, 10_000);
+    return { session, checkpoint };
   },
 
   getCheckpoint: async (sessionId: string): Promise<InterviewPrepCheckpoint> => {
+    const cacheKey = `interview-prep:checkpoint:${sessionId}`;
+    const cached = getCachedValue<InterviewPrepCheckpoint>(cacheKey);
+    if (cached) {
+      return cached;
+    }
     const response = await apiClient.get<{ checkpoint: any }>(`/api/v1/interview-prep/checkpoints/session/${sessionId}`);
-    return normalizeCheckpoint(response.data.checkpoint);
+    const checkpoint = normalizeCheckpoint(response.data.checkpoint);
+    setCachedValue(cacheKey, checkpoint, 10_000);
+    return checkpoint;
   },
 
   submit: async (sessionId: string, code: string, solveLanguage?: string): Promise<InterviewPrepSubmitResult> => {
     const response = await apiClient.post<any>(`/api/v1/interview-prep/sessions/${sessionId}/submit`, { code, language: solveLanguage });
     const result = response.data.result;
+    if (result?.session) {
+      setCachedValue(`interview-prep:session:${sessionId}`, normalizeSession(result.session), 15_000);
+    } else {
+      invalidateCachedPrefix(`interview-prep:session:${sessionId}`);
+    }
+    invalidateCachedPrefix(`interview-prep:checkpoint:${sessionId}`);
     return {
       passed: Boolean(result?.passed ?? false),
       passedCount: result?.passedCount ?? 0,
@@ -440,8 +472,10 @@ export const interviewPrepApi = {
       `/api/v1/interview-prep/sessions/${sessionId}/questions/${questionId}/answer`,
       { selfAssessment, answer },
     );
+    const session = normalizeSession(response.data.session);
+    setCachedValue(`interview-prep:session:${sessionId}`, session, 15_000);
     return {
-      session: normalizeSession(response.data.session),
+      session,
       answeredQuestion: response.data.answeredQuestion ? normalizeQuestion(response.data.answeredQuestion) : undefined,
       review: response.data.review,
     };

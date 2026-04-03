@@ -1,4 +1,5 @@
 import { apiClient, withGuestArenaHeaders, withGuestCodeRoomHeaders } from '@/shared/api/base';
+import { getCachedValue, setCachedValue } from '@/shared/api/cache';
 import { markGuestCodeRoomSession } from '@/features/CodeRoom/lib/guestIdentity';
 import { normalizeRoom } from '@/features/CodeRoom/api/codeRoomMappers';
 import {
@@ -350,10 +351,17 @@ export const codeRoomApi = {
   },
 
   getOpenArenaMatches: async (limit = 8): Promise<ArenaMatch[]> => {
+    const cacheKey = `arena:open-matches:${limit}`;
+    const cached = getCachedValue<ArenaMatch[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
     const response = await apiClient.get<{ matches: any[] }>('/api/v1/arena/open-matches', {
       params: { limit },
     });
-    return (response.data.matches || []).map(normalizeArenaMatch);
+    const matches = (response.data.matches || []).map(normalizeArenaMatch);
+    setCachedValue(cacheKey, matches, 30_000);
+    return matches;
   },
 
   joinArenaQueue: async (payload: JoinArenaQueueRequest): Promise<ArenaQueueState> => {
@@ -391,10 +399,17 @@ export const codeRoomApi = {
   },
 
   getArenaLeaderboard: async (limit = 20): Promise<ArenaLeaderboardEntry[]> => {
+    const cacheKey = `arena:leaderboard:${limit}`;
+    const cached = getCachedValue<ArenaLeaderboardEntry[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
     const response = await apiClient.get<{ entries: any[] }>('/api/v1/arena/leaderboard', {
       params: { limit },
     });
-    return (response.data.entries || []).map(normalizeArenaLeaderboardEntry);
+    const entries = (response.data.entries || []).map(normalizeArenaLeaderboardEntry);
+    setCachedValue(cacheKey, entries, 30_000);
+    return entries;
   },
 
   getArenaStats: async (userId: string): Promise<ArenaPlayerStats> => {

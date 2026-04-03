@@ -11,6 +11,7 @@ import { CommunityEvent, CommunityMapPoint } from '@/entities/User/model/types';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { eventApi } from '@/features/Event/api/eventApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
+import { getCachedValue, setCachedValue } from '@/shared/api/cache';
 
 type CircleContext = {
   currentUserId?: string;
@@ -295,6 +296,12 @@ function toCircle(blueprint: CircleBlueprint, currentUserId?: string): Circle {
 
 export const circleApi = {
   list: async (options?: { currentUserId?: string; currentUserRegion?: string }): Promise<Circle[]> => {
+    const cacheKey = `circles:list:${options?.currentUserId ?? 'guest'}:${options?.currentUserRegion ?? 'all'}`;
+    const cached = getCachedValue<Circle[]>(cacheKey);
+    if (cached) {
+      return cached;
+    }
+
     const [events, users] = await Promise.all([
       eventApi.list(),
       geoApi.communityMap(),
@@ -337,7 +344,7 @@ export const circleApi = {
 
     const presets = [buildArenaCore(ctx), buildLocalBuilders(ctx)].filter((circle): circle is CircleBlueprint => Boolean(circle));
 
-    return [...dynamicCircles, ...presets]
+    const circles = [...dynamicCircles, ...presets]
       .filter((circle, index, items) => items.findIndex((item) => item.id === circle.id) === index)
       .map((circle) => toCircle(circle, options?.currentUserId))
       .sort((left, right) => {
@@ -349,5 +356,8 @@ export const circleApi = {
         }
         return right.memberCount - left.memberCount;
       });
+
+    setCachedValue(cacheKey, circles, 60_000);
+    return circles;
   },
 };

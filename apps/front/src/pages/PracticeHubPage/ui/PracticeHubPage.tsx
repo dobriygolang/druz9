@@ -6,8 +6,8 @@ export const PracticeHubPage: React.FC = () => {
   return (
     <HubShell
       eyebrow="Practice"
-      title="Code rooms и arena в одном тренировочном контуре"
-      description="Весь coding practice теперь собран в одном хабе: live-rooms, arena, рейтинги и будущие командные режимы ощущаются как один продуктовый слой."
+      title="Практика кода в одном контуре"
+      description="Code rooms, arena, рейтинги и будущие командные режимы собраны в одном месте. Здесь не должно быть лишнего шума и пустых широких блоков."
       tabs={[
         { to: '/practice/code-rooms', label: 'Code Rooms' },
         { to: '/practice/arena', label: 'Arena' },
@@ -17,7 +17,7 @@ export const PracticeHubPage: React.FC = () => {
           <Code2 size={18} />
           <div>
             <strong>Practice layer</strong>
-            <span>Solo rooms, рейтинговая arena и будущие team battles</span>
+            <span>Solo rooms, arena и будущие team battles</span>
           </div>
         </div>
       )}

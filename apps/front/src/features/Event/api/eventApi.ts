@@ -4,6 +4,7 @@ import {
   EventParticipant,
 } from '@/entities/User/model/types';
 import { apiClient, ListQueryParams, withDefaultListQuery } from '@/shared/api/base';
+import { getCachedValue, invalidateCachedPrefix, setCachedValue } from '@/shared/api/cache';
 import { encodeEventDescription, parseEventDescription } from '@/features/Event/lib/eventMetadata';
 
 const defaultEventsCache = {
@@ -131,9 +132,18 @@ function toProtoTimestamp(value: string): string {
 export const eventApi = {
   list: async (params?: ListQueryParams): Promise<CommunityEvent[]> => {
     const useCache = !params || Object.keys(params).length === 0;
+    const cacheKey = 'events:list:default';
     const now = Date.now();
     if (useCache && defaultEventsCache.data && now - defaultEventsCache.timestamp < defaultEventsCache.ttlMs) {
       return defaultEventsCache.data;
+    }
+    if (useCache) {
+      const cached = getCachedValue<CommunityEvent[]>(cacheKey);
+      if (cached) {
+        defaultEventsCache.data = cached;
+        defaultEventsCache.timestamp = now;
+        return cached;
+      }
     }
     const response = await apiClient.get<BackendListEventsResponse>('/api/v1/events', {
       params: withDefaultListQuery(params),
@@ -142,6 +152,7 @@ export const eventApi = {
     if (useCache) {
       defaultEventsCache.data = events;
       defaultEventsCache.timestamp = now;
+      setCachedValue(cacheKey, events, defaultEventsCache.ttlMs);
     }
     return events;
   },
@@ -166,6 +177,7 @@ export const eventApi = {
     });
     defaultEventsCache.data = null;
     defaultEventsCache.timestamp = 0;
+    invalidateCachedPrefix('events:list:');
     return normalizeEvent(response.data.event ?? {});
   },
   update: async (
@@ -190,6 +202,7 @@ export const eventApi = {
     );
     defaultEventsCache.data = null;
     defaultEventsCache.timestamp = 0;
+    invalidateCachedPrefix('events:list:');
     return normalizeEvent(response.data.event ?? {});
   },
   join: async (eventId: string): Promise<CommunityEvent> => {
@@ -199,12 +212,14 @@ export const eventApi = {
     );
     defaultEventsCache.data = null;
     defaultEventsCache.timestamp = 0;
+    invalidateCachedPrefix('events:list:');
     return normalizeEvent(response.data.event ?? {});
   },
   leave: async (eventId: string): Promise<void> => {
     await apiClient.post(`/api/v1/events/${eventId}/leave`, { eventId });
     defaultEventsCache.data = null;
     defaultEventsCache.timestamp = 0;
+    invalidateCachedPrefix('events:list:');
   },
   delete: async (eventId: string, deleteScope?: 'single' | 'future' | 'all'): Promise<void> => {
     await apiClient.delete(`/api/v1/events/${eventId}`, {
@@ -212,5 +227,6 @@ export const eventApi = {
     });
     defaultEventsCache.data = null;
     defaultEventsCache.timestamp = 0;
+    invalidateCachedPrefix('events:list:');
   },
 };
