@@ -22,34 +22,28 @@ func (r *Repo) ListEvents(
 	currentUserID uuid.UUID,
 	opts model.ListEventsOptions,
 ) (*model.ListEventsResponse, error) {
-	// Apply defaults
 	if opts.Limit <= 0 || opts.Limit > maxEventsLimit {
 		opts.Limit = defaultEventsLimit
 	}
 
-	// Build base query with filters
 	baseQuery, countQuery, args, err := r.buildListEventsQueries(opts)
 	if err != nil {
 		return nil, err
 	}
 
-	// Get total count
 	var totalCount int32
 	if err := r.data.DB.QueryRow(ctx, countQuery, args...).Scan(&totalCount); err != nil {
 		return nil, fmt.Errorf("count events: %w", err)
 	}
 
-	// Add pagination to main query
 	paginatedQuery := baseQuery + fmt.Sprintf(" LIMIT $%d OFFSET $%d", len(args)+1, len(args)+2)
 	args = append(args, opts.Limit, opts.Offset)
 
-	// Fetch events
 	events, err := r.fetchEvents(ctx, paginatedQuery, args, currentUserID)
 	if err != nil {
 		return nil, err
 	}
 
-	// Fetch participants for fetched events
 	if len(events) > 0 {
 		if err := r.fetchParticipants(ctx, events, currentUserID); err != nil {
 			return nil, err
@@ -70,10 +64,8 @@ func (r *Repo) ListEvents(
 func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, string, []any, error) {
 	var args []any
 	argNum := 1
-
 	conditions := []string{}
 
-	// Time filter
 	if opts.From != nil {
 		conditions = append(conditions, fmt.Sprintf("e.scheduled_at >= $%d", argNum))
 		args = append(args, *opts.From)
@@ -85,7 +77,6 @@ func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, str
 		argNum++
 	}
 
-	// Default time range if no filters
 	if opts.From == nil && opts.To == nil {
 		if opts.Status == "past" {
 			conditions = append(conditions, "e.scheduled_at < NOW() - INTERVAL '12 hours'")
@@ -94,7 +85,6 @@ func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, str
 		}
 	}
 
-	// Creator filter
 	if opts.CreatorID != nil {
 		conditions = append(conditions, fmt.Sprintf("e.creator_id = $%d", argNum))
 		args = append(args, *opts.CreatorID)
@@ -177,7 +167,6 @@ func (r *Repo) fetchEvents(
 		event.CreatedAt = createdAt
 		event.IsCreator = event.CreatorID == currentUserID.String()
 		event.Participants = make([]*model.EventParticipant, 0, 4)
-
 		events = append(events, &event)
 	}
 
@@ -269,7 +258,6 @@ ORDER BY ep.event_id, ep.created_at ASC
 	return rows.Err()
 }
 
-// getEvent returns a single event by ID (unchanged)
 func (r *Repo) getEvent(
 	ctx context.Context,
 	queryer eventQueryer,
@@ -309,7 +297,7 @@ WHERE e.id = $1
 		if err := rows.Err(); err != nil {
 			return nil, fmt.Errorf("iterate event: %w", err)
 		}
-		return nil, nil // Not found
+		return nil, nil
 	}
 
 	if err := rows.Scan(
@@ -336,7 +324,6 @@ WHERE e.id = $1
 	event.IsCreator = event.CreatorID == currentUserID.String()
 	event.Participants = make([]*model.EventParticipant, 0)
 
-	// Fetch participants separately
 	rows.Close()
 	if err := r.fetchParticipants(ctx, []*model.Event{&event}, currentUserID); err != nil {
 		return nil, err

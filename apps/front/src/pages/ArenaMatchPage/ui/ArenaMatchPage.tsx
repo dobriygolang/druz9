@@ -1,158 +1,30 @@
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
-import Editor from '@monaco-editor/react';
-import { AlertTriangle, ArrowLeft, Clock3, Copy, Eye, Pause, Play, ShieldAlert, SkipBack, Square, Swords, TimerReset, Trophy, X } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
-import { ArenaMatch, ArenaPlayer } from '@/entities/CodeRoom/model/types';
+import { ArenaMatch } from '@/entities/CodeRoom/model/types';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { useArenaRealtime } from '@/features/CodeRoom/api/useArenaRealtime';
 import { getStoredGuestId, getStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { AxiosError } from '@/shared/api/base';
 import { inferLanguageFromSource, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
-import { APP_MONACO_THEME, configureAppMonacoTheme } from '@/shared/lib/monacoTheme';
-
-// Anti-cheat countdown timer component
-const AntiCheatCountdown: React.FC<{ onComplete: () => void }> = ({ onComplete }) => {
-  const [secondsLeft, setSecondsLeft] = useState(10);
-  const [key, setKey] = useState(0);
-
-  useEffect(() => {
-    if (secondsLeft <= 0) {
-      onComplete();
-      return;
-    }
-    const timer = setTimeout(() => {
-      setSecondsLeft(secondsLeft - 1);
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [secondsLeft, onComplete]);
-
-  // Reset animation on mount
-  useEffect(() => {
-    setKey(prev => prev + 1);
-  }, []);
-
-  return (
-    <span style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: '8px' }}>
-      <div style={{
-        width: '40px',
-        height: '4px',
-        background: 'rgba(245, 158, 11, 0.3)',
-        borderRadius: '2px',
-        overflow: 'hidden'
-      }}>
-        <div
-          key={key}
-          style={{
-            width: '100%',
-            height: '100%',
-            background: '#fcd34d',
-            animation: 'antiCheatShrink 10s linear forwards'
-          }}
-        />
-      </div>
-      <span style={{ fontSize: '12px', opacity: 0.8 }}>{secondsLeft}s</span>
-    </span>
-  );
-};
-
-const ARENA_RULES = [
-  'Матч завершается, когда оба игрока получили accepted, либо когда истёк таймер.',
-  'Если только один игрок получил accepted к концу таймера, побеждает он.',
-  'После wrong answer или runtime error включается freeze на 30 секунд.',
-  'Рейтинг начисляется только авторизованным пользователям.',
-  'Изменение ELO не фиксированное: максимум +50 или -50, точное число зависит от разницы рейтингов.',
-  'Лиги арены: Bronze, Silver, Gold, Diamond, Master, Legend.',
-  'Anti-cheat: переключение вкладки и попытки paste во время матча логируются.',
-  'После завершения матча оба игрока видят решения друг друга.',
-  'Зритель видит оба редактора, но не может менять код или отправлять решение.',
-];
-
-const TASK_HEADER_MARKER = '// Arena Task';
-
-const WIN_REASON_LABELS: Record<string, string> = {
-  single_ac: 'первый accepted',
-  accepted_time: 'раньше по времени',
-  runtime: 'быстрее по runtime',
-  timeout: 'победа к концу таймера',
-  anti_cheat: 'нарушение правил',
-  none: 'без победителя',
-};
-
-const formatClock = (totalSeconds: number) => {
-  const safe = Math.max(0, totalSeconds);
-  const minutes = Math.floor(safe / 60);
-  const seconds = safe % 60;
-  return `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-};
-
-const getPlayerCode = (player: ArenaPlayer | null, playerCodes: Record<string, string>, fallback = '') => {
-  if (!player) {
-    return fallback;
-  }
-  return playerCodes[player.userId] ?? player.currentCode ?? fallback;
-};
-
-const buildArenaEditorTemplate = (match: ArenaMatch | null, code: string) => {
-  const baseCode = code || match?.starterCode || '';
-  if (!match?.taskStatement) {
-    return baseCode;
-  }
-  if (baseCode.startsWith(TASK_HEADER_MARKER)) {
-    return baseCode;
-  }
-
-  const commentBlock = [
-    `${TASK_HEADER_MARKER}: ${match.taskTitle || 'Duel task'}`,
-    '//',
-    ...match.taskStatement.split('\n').map((line) => `// ${line}`),
-    '',
-  ].join('\n');
-
-  return `${commentBlock}\n${baseCode}`.trim();
-};
-
-const buildArenaSubmitError = (result: {
-  passedCount: number;
-  totalCount: number;
-  failedTestIndex?: number;
-  failureKind?: string;
-  freezeUntil?: string;
-  error?: string;
-}) => {
-  const parts: string[] = ['❌ Решение не прошло проверку.'];
-  const errorText = (result.error || '').toLowerCase();
-
-  if (result.failureKind === 'timeout' || errorText.includes('timeout') || errorText.includes('timed out')) {
-    parts.push('Превышен лимит времени.');
-  } else if (result.failureKind === 'compile_error') {
-    parts.push('Ошибка компиляции.');
-  } else if (result.failureKind === 'runtime_error') {
-    parts.push('Runtime error.');
-  } else if (result.failureKind === 'wrong_answer') {
-    parts.push('Wrong answer.');
-  }
-
-  if (result.error && result.failureKind !== 'wrong_answer' && result.failureKind !== 'timeout') {
-    // Обрезаем длинные ошибки
-    const shortError = result.error.length > 200 ? result.error.slice(0, 200) + '...' : result.error;
-    parts.push(shortError);
-  }
-
-  parts.push(`Тесты: ${result.passedCount}/${result.totalCount}.`);
-
-  if (result.failedTestIndex && result.failureKind !== 'compile_error') {
-    parts.push(`Упал на тесте ${result.failedTestIndex}/${result.totalCount}.`);
-  }
-
-  if (result.freezeUntil) {
-    parts.push('Следующая отправка через 30 сек.');
-  }
-
-  return parts.join(' ');
-};
+import {
+  ArenaMatchGrid,
+  ArenaMatchHeader,
+  ArenaMobileTabs,
+  ArenaNotice,
+  ArenaPageState,
+  ArenaRulesModal,
+  ArenaTimelapseToolbar,
+  ArenaWaitingState,
+} from './components/ArenaMatchSections';
+import {
+  WIN_REASON_LABELS,
+  buildArenaEditorTemplate,
+  buildArenaSubmitError,
+  getPlayerCode,
+} from './lib/arenaMatchHelpers';
 
 export const ArenaMatchPage: React.FC = () => {
   const { matchId } = useParams<{ matchId: string }>();
@@ -662,341 +534,141 @@ export const ArenaMatchPage: React.FC = () => {
     }
   };
 
+  const handleToggleTimelapse = () => {
+    if (!showTimelapse) {
+      setShowTimelapse(true);
+      setTimelapseIndex(Math.max(0, timelineSnapshots.length - 1));
+      setIsTimelapsePlaying(false);
+      return;
+    }
+    setShowTimelapse(false);
+    setIsTimelapsePlaying(false);
+  };
+
+  const handleTimelapseReset = () => {
+    setIsTimelapsePlaying(false);
+    setTimelapseIndex(0);
+  };
+
+  const handleTimelapseSeek = (index: number) => {
+    setIsTimelapsePlaying(false);
+    setTimelapseIndex(index);
+  };
+
+  const handleResizeStart = () => {
+    if (window.innerWidth <= 1024) {
+      return;
+    }
+    isResizingRef.current = true;
+    document.body.style.cursor = 'col-resize';
+    document.body.style.userSelect = 'none';
+  };
+
   if (loading) {
-    return <div className="arena-page-state">Загрузка арены...</div>;
+    return <ArenaPageState message="Загрузка арены..." />;
   }
 
   if (error || !match) {
     return (
-      <div className="arena-page-state">
-        <div>{error || 'Матч не найден'}</div>
-        <button className="btn btn-secondary" onClick={handleBack}>Назад</button>
-      </div>
+      <ArenaPageState
+        message={error || 'Матч не найден'}
+        buttonLabel="Назад"
+        onButtonClick={handleBack}
+      />
     );
   }
 
   return (
     <>
-      {showRulesModal && (
-        <div className="modal-overlay" onClick={() => setShowRulesModal(false)}>
-          <div className="modal arena-rules-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Правила арены</h2>
-            <div className="arena-rules-modal__list">
-              {ARENA_RULES.map((rule) => (
-                <div key={rule} className="arena-rules-modal__item">
-                  <span className="arena-rules-modal__dot" />
-                  <span>{rule}</span>
-                </div>
-              ))}
-            </div>
-            <div className="modal-actions">
-              <button className="btn btn-primary" onClick={() => setShowRulesModal(false)}>Понятно</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <ArenaRulesModal isOpen={showRulesModal} onClose={() => setShowRulesModal(false)} />
 
       <div className="arena-page">
-        <div className="arena-page__header">
-          <div className="arena-page__header-left">
-            <button className="btn btn-secondary arena-back-btn" onClick={handleBack}>
-              <ArrowLeft size={16} />
-            </button>
-            <span className="code-rooms-kicker">Arena duel</span>
-          </div>
-          <div className="arena-page__meta">
-            <div className={`connection-status ${isConnected ? 'connected' : ''}`}>
-              <span className={`status-dot ${isConnected ? 'connected' : 'disconnected'}`} />
-              {!isMobile && <span>{isConnected ? 'Realtime активен' : 'Переподключение...'}</span>}
-            </div>
-            {winner && (
-              <div className="arena-chip arena-chip--winner">
-                <Trophy size={14} />
-                <span>{isMobile ? winner.displayName : `Победил ${winner.displayName}`}</span>
-              </div>
-            )}
-            {!isMobile && winnerReasonLabel && (
-              <div className="arena-chip arena-chip--winner-reason">
-                {winnerReasonLabel}
-              </div>
-            )}
-            {!isMobile && (
-              <>
-                <div className="arena-chip"><Clock3 size={14} /> {formatClock(elapsedSeconds)}</div>
-                <div className="arena-chip"><TimerReset size={14} /> {formatClock(remainingSeconds)}</div>
-                <div className="arena-chip"><Swords size={14} /> {match.topic || 'any'} / {match.difficulty || 'any'}</div>
-              </>
-            )}
-            {isMobile && (
-               <div className="arena-chip"><TimerReset size={14} /> {formatClock(remainingSeconds)}</div>
-            )}
-            {!isMobile && !isSpectator && match.startedAt && match.status !== 'finished' && <div className="arena-chip" onClick={() => setShowAntiCheatBanner(true)}>Anti-cheat активен</div>}
-            {isSpectator && <div className="arena-chip arena-chip--spectator"><Eye size={14} /> {isMobile ? '' : 'Режим зрителя'}</div>}
-            
-            {!isSpectator && (
-              <button className="btn btn-primary arena-copy-btn" onClick={handleCopyLink} style={{ width: isMobile ? '40px' : '120px', padding: isMobile ? 0 : '0 10px' }}>
-                <Copy size={16} />
-                {!isMobile && <span>{copied ? 'Скопировано' : 'Скопировать'}</span>}
-              </button>
-            )}
-            {canShowReplayActions && canUseTimelapse && (
-              <button
-                className="btn btn-primary arena-copy-btn"
-                onClick={() => {
-                  if (!showTimelapse) {
-                    setShowTimelapse(true);
-                    setTimelapseIndex(Math.max(0, timelineSnapshots.length - 1));
-                    setIsTimelapsePlaying(false);
-                    return;
-                  }
-                  setShowTimelapse(false);
-                  setIsTimelapsePlaying(false);
-                }}
-                style={{ width: isMobile ? '40px' : '120px', padding: isMobile ? 0 : '0 10px' }}
-              >
-                {showTimelapse ? <Play size={16} /> : <Square size={16} />}
-                {!isMobile && <span>{showTimelapse ? 'Вернуться в live' : 'Таймлайн'}</span>}
-              </button>
-            )}
-          </div>
-        </div>
+        <ArenaMatchHeader
+          isConnected={isConnected}
+          isMobile={isMobile}
+          isSpectator={isSpectator}
+          copied={copied}
+          elapsedSeconds={elapsedSeconds}
+          remainingSeconds={remainingSeconds}
+          winner={winner}
+          winnerReasonLabel={winnerReasonLabel}
+          match={match}
+          canShowReplayActions={canShowReplayActions}
+          canUseTimelapse={canUseTimelapse}
+          showTimelapse={showTimelapse}
+          onBack={handleBack}
+          onCopyLink={handleCopyLink}
+          onToggleTimelapse={handleToggleTimelapse}
+          onShowAntiCheat={() => setShowAntiCheatBanner(true)}
+        />
 
-        {isMobile && bothPlayersConnected && (
-          <div className="arena-mobile-tabs">
-            <button 
-              className={`arena-mobile-tab ${activeTab === 'editor' ? 'active' : ''}`}
-              onClick={() => setActiveTab('editor')}
-            >
-              Код
-            </button>
-            <button 
-              className={`arena-mobile-tab ${activeTab === 'opponent' ? 'active' : ''}`}
-              onClick={() => setActiveTab('opponent')}
-            >
-              Соперник
-            </button>
-            <button 
-              className={`arena-mobile-tab ${activeTab === 'output' ? 'active' : ''} ${submitError ? 'has-error' : ''}`}
-              onClick={() => setActiveTab('output')}
-            >
-              Output
-            </button>
-          </div>
-        )}
+        <ArenaMobileTabs
+          bothPlayersConnected={bothPlayersConnected}
+          activeTab={activeTab}
+          submitError={submitError}
+          onChange={setActiveTab}
+        />
 
         {!isSpectator && showAntiCheatBanner && match.status === 'active' && (
-          <div className="arena-anti-cheat-notice arena-anti-cheat-notice--live">
-            <ShieldAlert size={16} />
-            <span>Anti-cheat активен: уход со вкладки, переключение окна и paste фиксируются. При 2 нарушениях применяется penalty.</span>
-            <AntiCheatCountdown onComplete={() => setShowAntiCheatBanner(false)} />
-          </div>
+          <ArenaNotice
+            message="Anti-cheat активен: уход со вкладки, переключение окна и paste фиксируются. При 2 нарушениях применяется penalty."
+            showLiveCountdown
+            onClose={() => setShowAntiCheatBanner(false)}
+          />
         )}
 
-        {canShowReplayActions && canUseTimelapse && showTimelapse && (
-          <div className="timelapse-toolbar arena-timelapse-toolbar">
-            <button
-              type="button"
-              className="btn-icon timelapse-toolbar__icon"
-              onClick={() => {
-                setIsTimelapsePlaying(false);
-                setTimelapseIndex(0);
-              }}
-            >
-              <SkipBack size={16} />
-            </button>
-            <button
-              type="button"
-              className="btn-icon timelapse-toolbar__icon"
-              onClick={() => setIsTimelapsePlaying((current) => !current)}
-            >
-              {isTimelapsePlaying ? <Pause size={16} /> : <Play size={16} />}
-            </button>
-            <input
-              className="timelapse-toolbar__range"
-              type="range"
-              min={0}
-              max={Math.max(0, timelineSnapshots.length - 1)}
-              value={Math.min(timelapseIndex, Math.max(0, timelineSnapshots.length - 1))}
-              onChange={(event) => {
-                setIsTimelapsePlaying(false);
-                setTimelapseIndex(Number(event.target.value));
-              }}
-            />
-            <div className="timelapse-toolbar__meta">
-              <span>{(((displayedTimelineSnapshot?.timestamp ?? 0) / 1000).toFixed(1))}s</span>
-              <span>{timelineSnapshots.length} steps</span>
-            </div>
-          </div>
-        )}
+        <ArenaTimelapseToolbar
+          isVisible={canShowReplayActions && canUseTimelapse && showTimelapse}
+          isPlaying={isTimelapsePlaying}
+          timelineLength={timelineSnapshots.length}
+          timelapseIndex={timelapseIndex}
+          currentTimestamp={displayedTimelineSnapshot?.timestamp ?? 0}
+          onReset={handleTimelapseReset}
+          onTogglePlay={() => setIsTimelapsePlaying((current) => !current)}
+          onSeek={handleTimelapseSeek}
+        />
 
         {antiCheatNotice && (
-          <div className="arena-anti-cheat-notice">
-            <ShieldAlert size={16} />
-            <span>
-              {antiCheatNotice}
-              {match?.status !== 'finished' && myAntiCheatStrikes > 0 ? ` (${Math.min(myAntiCheatStrikes, 2)}/2)` : ''}
-            </span>
-            {match?.status !== 'finished' ? (
-              <AntiCheatCountdown onComplete={() => setAntiCheatNotice('')} />
-            ) : (
-              <button
-                type="button"
-                className="btn-icon"
-                onClick={() => setAntiCheatNotice('')}
-                aria-label="Закрыть уведомление"
-              >
-                <X size={14} />
-              </button>
-            )}
-          </div>
+          <ArenaNotice
+            message={antiCheatNotice}
+            strikes={myAntiCheatStrikes}
+            matchFinished={match.status === 'finished'}
+            onClose={() => setAntiCheatNotice('')}
+          />
         )}
 
         {bothPlayersConnected ? (
-        <div
-          ref={gridRef}
-          className="arena-page__grid arena-page__grid--resizable"
-          style={{
-            gridTemplateColumns: isMobile
-              ? '1fr'
-              : isSpectator
-              ? `minmax(0, ${editorWidth}fr) minmax(0, ${100 - editorWidth}fr)`
-              : `minmax(0, ${editorWidth}fr) 8px minmax(0, ${100 - editorWidth}fr)`,
-          }}
-        >
-          {(!isMobile || activeTab === 'editor') && (
-            <section className="arena-panel arena-panel--editor">
-              <div className="arena-panel__header">
-                <div>
-                  <div className="arena-panel__title">{isSpectator ? 'Игрок слева' : 'Твой редактор'}</div>
-                  <div className="arena-panel__subtitle">
-                    {isSpectator ? (leftPlayer?.displayName || 'Ожидаем первого игрока') : (me?.displayName || 'Игрок')}
-                    {!isSpectator && freezeLeft > 0 ? ` • freeze ${freezeLeft}s` : ''}
-                  </div>
-                </div>
-                {!isSpectator && freezeLeft > 0 && <div className="arena-freeze-badge"><TimerReset size={14} /> {freezeLeft}s</div>}
-              </div>
-              <div className="arena-panel__body">
-                {showTimelapse ? (
-                  <div className="arena-editor-shell">
-                    <pre className="arena-editor-shell__pre">{displayedLeftCode}</pre>
-                  </div>
-                ) : (
-                  <Editor
-                    height="100%"
-                    beforeMount={configureAppMonacoTheme}
-                    defaultLanguage={arenaLanguage}
-                    language={arenaLanguage}
-                    value={leftCode}
-                    onChange={(value) => {
-                      if (!isSpectator) {
-                        setSelfCode(value || '');
-                      }
-                    }}
-                    options={{
-                      fontSize: isMobile ? 12 : 14,
-                      minimap: { enabled: false },
-                      wordWrap: 'on',
-                      automaticLayout: true,
-                      readOnly: isSpectator || freezeLeft > 0 || match.status === 'finished',
-                      scrollbar: { verticalScrollbarSize: 8, horizontalScrollbarSize: 8 },
-                      lineNumbers: isMobile ? 'off' : 'on',
-                    }}
-                    theme={APP_MONACO_THEME}
-                  />
-                )}
-              </div>
-              <div className="arena-panel__footer">
-                {isSpectator ? (
-                  <div className="arena-spectator-note">
-                    <Eye size={16} />
-                    {!isMobile && 'Только просмотр без участия в матче.'}
-                  </div>
-                ) : (
-                  <>
-                    <button className="btn btn-primary arena-submit-btn" disabled={!canSubmit} onClick={handleSubmit} style={{ height: isMobile ? '40px' : 'auto' }}>
-                      <Play size={16} />
-                      <span>{submitting ? '...' : 'Отправить'}</span>
-                    </button>
-                    {submitError && !isMobile && <span className="arena-error-inline">{submitError}</span>}
-                  </>
-                )}
-              </div>
-            </section>
-          )}
-
-          {!isSpectator && !isMobile && (
-            <button
-              type="button"
-              className="arena-resize-handle"
-              aria-label="Изменить размер панелей арены"
-              onMouseDown={() => {
-                if (window.innerWidth <= 1024) {
-                  return;
-                }
-                isResizingRef.current = true;
-                document.body.style.cursor = 'col-resize';
-                document.body.style.userSelect = 'none';
-              }}
-            />
-          )}
-
-          {(!isMobile || activeTab === 'opponent' || activeTab === 'output') && (
-            <section className="arena-panel arena-panel--opponent">
-              {(!isMobile || activeTab === 'opponent') && (
-                <>
-                  <div className="arena-panel__header">
-                    <div>
-                      <div className="arena-panel__title">{isSpectator ? 'Игрок справа' : 'Соперник'}</div>
-                      <div className="arena-panel__subtitle">
-                        {isSpectator ? (rightPlayer?.displayName || 'Ожидаем второго игрока') : (opponent?.displayName || 'Ожидаем второго игрока')}
-                      </div>
-                    </div>
-                    {!isSpectator && match.obfuscateOpponent && match.status !== 'finished' && opponent && (
-                      <div className="arena-freeze-badge arena-freeze-badge--ghost"><ShieldAlert size={14} /> {isMobile ? '' : 'Код скрыт'}</div>
-                    )}
-                  </div>
-                  <div className="arena-panel__body">
-                    {waitingForOpponent ? (
-                      <div className="arena-waiting-state">
-                        <Eye size={16} />
-                        <span>Ждём второго игрока.</span>
-                      </div>
-                    ) : (
-                      <div className="arena-editor-shell">
-                        <pre className="arena-editor-shell__pre" style={{ fontSize: isMobile ? '12px' : '13px' }}>
-                          {displayedRightCode || (!showTimelapse && shouldHideOpponentCode ? '**********\n**********\n**********' : '// соперник пока ничего не написал')}
-                        </pre>
-                      </div>
-                    )}
-                  </div>
-                </>
-              )}
-              {(!isMobile || activeTab === 'output') && (
-                <div className="arena-panel__footer arena-panel__footer--output" style={{ borderTop: (isMobile && activeTab === 'output') ? 'none' : '1px solid rgba(255, 255, 255, 0.06)', flex: (isMobile && activeTab === 'output') ? 1 : 'unset' }}>
-                  <div className="arena-output-label">
-                    <AlertTriangle size={15} />
-                    Judge output
-                  </div>
-                  <pre className={outputStateClass} style={{ fontSize: isMobile ? '12px' : '13px' }}>{output || 'Результат проверки появится здесь.'}</pre>
-                </div>
-              )}
-            </section>
-          )}
-        </div>
+          <ArenaMatchGrid
+            isMobile={isMobile}
+            isSpectator={isSpectator}
+            match={match}
+            bothPlayersConnected={bothPlayersConnected}
+            waitingForOpponent={waitingForOpponent}
+            activeTab={activeTab}
+            gridRef={gridRef}
+            editorWidth={editorWidth}
+            me={me}
+            opponent={opponent}
+            leftPlayer={leftPlayer}
+            rightPlayer={rightPlayer}
+            freezeLeft={freezeLeft}
+            canSubmit={canSubmit}
+            showTimelapse={showTimelapse}
+            displayedLeftCode={displayedLeftCode}
+            displayedRightCode={displayedRightCode}
+            leftCode={leftCode}
+            arenaLanguage={arenaLanguage}
+            submitting={submitting}
+            submitError={submitError}
+            output={output}
+            outputStateClass={outputStateClass}
+            shouldHideOpponentCode={shouldHideOpponentCode}
+            setSelfCode={setSelfCode}
+            onSubmit={handleSubmit}
+            onResizeStart={handleResizeStart}
+          />
         ) : (
-          <div className="arena-waiting-opponent">
-            <div className="arena-waiting-opponent__content">
-              <div className="arena-waiting-opponent__icon">
-                <Swords size={48} />
-              </div>
-              <h2>Ожидаем соперника</h2>
-              <p>Поделитесь ссылкой с другом, чтобы начать дуэль</p>
-              <button className="btn btn-primary arena-waiting-opponent__btn" onClick={handleCopyLink}>
-                <Copy size={16} />
-                <span>{copied ? 'Скопировано' : 'Скопировать'}</span>
-              </button>
-            </div>
-          </div>
+          <ArenaWaitingState copied={copied} onCopyLink={handleCopyLink} />
         )}
       </div>
     </>
