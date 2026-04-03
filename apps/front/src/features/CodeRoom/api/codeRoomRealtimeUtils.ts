@@ -177,12 +177,12 @@ export const buildAwarenessStyles = (
     .code-room-remote-label-pill {
       position: absolute;
       left: 0;
-      top: -18px;
-      padding: 2px 6px;
-      border-radius: 4px;
-      font-size: 11px;
+      top: -12px;
+      padding: 1px 4px;
+      border-radius: 3px;
+      font-size: 8px;
       font-weight: 600;
-      line-height: 1.2;
+      line-height: 1;
       white-space: nowrap;
       pointer-events: none;
       z-index: 10;

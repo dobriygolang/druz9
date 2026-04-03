@@ -52,6 +52,7 @@ export interface CommunityMapPoint {
   isCurrentUser: boolean;
   avatarUrl: string;
   username: string;
+  telegramUsername?: string;
   firstName: string;
   lastName: string;
   activityStatus: ActivityStatus;
@@ -95,6 +96,7 @@ export interface CreateEventPayload {
   event_color?: 'violet' | 'emerald' | 'amber' | 'rose' | 'sky';
   event_group?: string;
   event_type?: string;
+  repeat?: 'none' | 'daily' | 'weekly' | 'monthly';
   meeting_link: string;
   place_label: string;
   region: string;

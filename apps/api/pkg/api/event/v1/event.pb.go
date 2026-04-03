@@ -205,6 +205,7 @@ type CreateEventRequest struct {
 	InvitedUserIds []string               `protobuf:"bytes,9,rep,name=invited_user_ids,json=invitedUserIds,proto3" json:"invited_user_ids,omitempty"`
 	Description    string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
 	MeetingLink    string                 `protobuf:"bytes,11,opt,name=meeting_link,json=meetingLink,proto3" json:"meeting_link,omitempty"`
+	Repeat         string                 `json:"repeat,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -312,6 +313,13 @@ func (x *CreateEventRequest) GetDescription() string {
 func (x *CreateEventRequest) GetMeetingLink() string {
 	if x != nil {
 		return x.MeetingLink
+	}
+	return ""
+}
+
+func (x *CreateEventRequest) GetRepeat() string {
+	if x != nil {
+		return x.Repeat
 	}
 	return ""
 }

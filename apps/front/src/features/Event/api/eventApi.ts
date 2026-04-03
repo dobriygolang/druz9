@@ -152,6 +152,7 @@ export const eventApi = {
         group: payload.event_group,
         type: payload.event_type,
       }),
+      repeat: payload.repeat ?? 'none',
       meetingLink: payload.meeting_link,
       placeLabel: payload.place_label,
       region: payload.region,

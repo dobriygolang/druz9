@@ -213,6 +213,7 @@ export const MapPage: React.FC = () => {
   const toEventPayload = (draft: EventDraft): CreateEventPayload => ({
     title: draft.title,
     description: draft.description,
+    repeat: draft.repeat ?? 'none',
     meeting_link: draft.meeting_link,
     place_label: draft.place_label,
     region: draft.region,

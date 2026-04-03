@@ -17,11 +17,15 @@ func (i *Implementation) CreateEvent(ctx context.Context, req *v1.CreateEventReq
 	if req.ScheduledAt == nil {
 		return nil, errors.BadRequest("INVALID_PAYLOAD", "scheduled_at is required")
 	}
+	if !user.IsAdmin {
+		return nil, errors.Forbidden("FORBIDDEN", "forbidden")
+	}
 
 	event, err := i.service.CreateEvent(ctx, user.ID, model.CreateEventRequest{
 		Title:          req.Title,
 		PlaceLabel:     req.PlaceLabel,
 		Description:    req.Description,
+		Repeat:         req.GetRepeat(),
 		MeetingLink:    req.MeetingLink,
 		Region:         req.Region,
 		Country:        req.Country,

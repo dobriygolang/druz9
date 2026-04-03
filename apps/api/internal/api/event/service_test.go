@@ -20,7 +20,7 @@ func TestListEvents(t *testing.T) {
 	t.Run("delegates to service", func(t *testing.T) {
 		t.Parallel()
 
-		user := &model.User{ID: uuid.New()}
+		user := &model.User{ID: uuid.New(), IsAdmin: true}
 		req := &v1.ListEventsRequest{Limit: 10, Offset: 0}
 		expectedResp := &model.ListEventsResponse{
 			Events:      []*model.Event{{ID: uuid.New(), Title: "Test Event"}},
@@ -68,7 +68,7 @@ func TestListEvents(t *testing.T) {
 	t.Run("propagates service error", func(t *testing.T) {
 		t.Parallel()
 
-		user := &model.User{ID: uuid.New()}
+		user := &model.User{ID: uuid.New(), IsAdmin: true}
 		expectedErr := errors.New("database error")
 		mockService := mocks.NewService(t)
 		mockService.On("ListEvents", mock.Anything, user.ID, mock.Anything).Return(nil, expectedErr).Once()
@@ -89,7 +89,7 @@ func TestCreateEvent(t *testing.T) {
 	t.Run("creates event and returns response", func(t *testing.T) {
 		t.Parallel()
 
-		user := &model.User{ID: uuid.New()}
+		user := &model.User{ID: uuid.New(), IsAdmin: true}
 		req := &v1.CreateEventRequest{
 			Title:       "Test Event",
 			PlaceLabel:  "Conference Room",
@@ -125,6 +125,22 @@ func TestCreateEvent(t *testing.T) {
 		}
 
 		mockService.AssertExpectations(t)
+	})
+
+	t.Run("returns forbidden for non admin", func(t *testing.T) {
+		t.Parallel()
+
+		user := &model.User{ID: uuid.New(), IsAdmin: false}
+		impl := New(nil)
+		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+
+		_, err := impl.CreateEvent(ctx, &v1.CreateEventRequest{
+			Title:       "Test",
+			ScheduledAt: timestamppb.Now(),
+		})
+		if err == nil {
+			t.Error("expected forbidden for non-admin user")
+		}
 	})
 
 	t.Run("returns error when no user in context", func(t *testing.T) {

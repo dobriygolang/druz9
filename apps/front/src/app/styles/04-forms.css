@@ -91,6 +91,7 @@ select.input option {
 
 .fancy-select {
   position: relative;
+  z-index: 2;
 }
 
 .fancy-select__trigger {
@@ -141,7 +142,7 @@ select.input option {
   top: calc(100% + 8px);
   left: 0;
   right: 0;
-  z-index: 50;
+  z-index: 120;
   padding: 8px;
   border-radius: var(--radius-lg);
   background: var(--surface-elevated);
@@ -181,4 +182,3 @@ select.input option {
   color: var(--accent-color);
   font-weight: 600;
 }
-

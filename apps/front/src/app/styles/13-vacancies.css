@@ -26,12 +26,18 @@
 
 .vacancies-hero__intro {
   border-radius: var(--radius-xl);
-  padding: var(--space-6) var(--space-8);
-  min-height: 220px;
+  padding: var(--space-3) var(--space-4);
+  min-height: 150px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: var(--space-6);
+  gap: var(--space-4);
+}
+
+.vacancies-hero__intro > div:first-child {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
 }
 
 .vacancies-hero__eyebrow {
@@ -51,36 +57,42 @@
 
 .vacancies-hero__title {
   margin: 0;
-  font-size: clamp(34px, 3.2vw, 48px);
-  line-height: 0.98;
+  font-size: clamp(18px, 1.55vw, 24px);
+  line-height: 1.02;
   letter-spacing: -0.04em;
   font-weight: 800;
 }
 
 .vacancies-hero__description {
   margin: 0;
-  font-size: clamp(14px, 1.15vw, 17px);
-  line-height: 1.65;
+  font-size: clamp(12px, 0.92vw, 14px);
+  line-height: 1.5;
   color: var(--text-secondary);
-  max-width: 760px;
+  max-width: 640px;
+}
+
+.vacancies-hero__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .vacancies-hero__search-row {
   display: grid;
   grid-template-columns: minmax(0, 1.4fr) auto;
-  gap: var(--space-4);
+  gap: var(--space-3);
   align-items: end;
 }
 
 .vacancies-hero__selects {
   display: grid;
   grid-template-columns: repeat(2, minmax(200px, 1fr));
-  gap: var(--space-3);
+  gap: 10px;
 }
 
 .vacancies-hero__panel {
   border-radius: var(--radius-xl);
-  padding: var(--space-6);
+  padding: var(--space-4);
   display: flex;
   flex-direction: column;
   gap: var(--space-4);
@@ -272,9 +284,21 @@
   overflow: auto;
   border-radius: var(--radius-xl);
   padding: var(--space-6);
+  position: relative;
+}
+
+.vacancies-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--space-4);
+  margin-bottom: var(--space-5);
 }
 
 .vacancies-modal__close {
+  position: sticky;
+  top: 0;
+  margin-left: auto;
   width: 44px;
   height: 44px;
   flex-shrink: 0;
@@ -287,12 +311,33 @@
   color: var(--text-secondary);
   cursor: pointer;
   transition: all var(--transition-base);
+  z-index: 2;
 }
 
 .vacancies-modal__close:hover {
   background: var(--surface-hover);
   color: var(--text-primary);
   transform: translateY(-1px);
+}
+
+.vacancies-search__field {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.vacancies-search__field svg {
+  position: absolute;
+  left: 14px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.vacancies-search__field .input {
+  padding-left: 42px;
 }
 
 .vacancies-modal__title {

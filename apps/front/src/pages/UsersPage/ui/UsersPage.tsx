@@ -96,31 +96,34 @@ export const UsersPage: React.FC = () => {
       ) : (
         <div style={{ display: 'grid', gap: '12px' }}>
           {filteredUsers.length > 0 ? (
-            filteredUsers.map((user) => (
-              <Link 
-                key={user.userId} 
-                to={`/profile/${user.userId}`} 
-                className="card hover-opacity"
-                style={{ 
-                  display: 'flex', 
-                  alignItems: 'center', 
-                  gap: '16px', 
-                  padding: '16px', 
-                  textDecoration: 'none', 
-                  color: 'inherit',
-                  transition: 'transform 0.2s, background-color 0.2s',
-                  background: 'rgba(255,255,255,0.03)',
-                  border: '1px solid rgba(255,255,255,0.05)'
-                }}
-                onMouseOver={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)';
-                  e.currentTarget.style.transform = 'translateY(-2px)';
-                }}
-                onMouseOut={(e) => {
-                  e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)';
-                  e.currentTarget.style.transform = 'translateY(0)';
-                }}
-              >
+            filteredUsers.map((user) => {
+              const profileHandle = user.telegramUsername || user.username;
+
+              return (
+                <Link
+                  key={user.userId}
+                  to={`/profile/${user.userId}`}
+                  className="card hover-opacity"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '16px',
+                    padding: '16px',
+                    textDecoration: 'none',
+                    color: 'inherit',
+                    transition: 'background-color 0.2s, border-color 0.2s',
+                    background: 'rgba(255,255,255,0.03)',
+                    border: '1px solid rgba(255,255,255,0.05)',
+                  }}
+                  onMouseOver={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
+                  }}
+                  onMouseOut={(e) => {
+                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)';
+                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
+                  }}
+                >
                 <div style={{ 
                   width: '52px', 
                   height: '52px', 
@@ -147,7 +150,7 @@ export const UsersPage: React.FC = () => {
                     )}
                   </div>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '13px', color: 'var(--accent-color)' }}>@{user.username}</span>
+                    <span style={{ fontSize: '13px', color: 'var(--accent-color)' }}>@{profileHandle}</span>
                     <span style={{ fontSize: '13px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
                       <MapPin size={12} /> {user.region}
                     </span>
@@ -159,7 +162,8 @@ export const UsersPage: React.FC = () => {
 
                 <ChevronRight size={20} color="#444" />
               </Link>
-            ))
+              );
+            })
           ) : (
             <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Никого не найдено</div>
           )}

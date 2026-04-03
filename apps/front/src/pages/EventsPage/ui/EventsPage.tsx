@@ -59,6 +59,7 @@ function getLocalDateKey(value: string | Date) {
 export const EventsPage: React.FC = () => {
   const isMobile = useIsMobile();
   const { user: currentUser } = useAuth();
+  const canCreateEvents = Boolean(currentUser?.isAdmin);
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [points, setPoints] = useState<CommunityMapPoint[]>([]);
   
@@ -117,12 +118,16 @@ export const EventsPage: React.FC = () => {
   }, []);
 
   const handleCreateClick = (date?: Date) => {
+    if (!canCreateEvents) {
+      return;
+    }
     setDraft({
       title: '',
       description: '',
       event_color: 'violet',
       event_group: '',
       event_type: '',
+      repeat: 'none',
       meeting_link: '',
       place_label: '',
       region: '',
@@ -142,6 +147,7 @@ export const EventsPage: React.FC = () => {
     event_color: draft.event_color,
     event_group: draft.event_group,
     event_type: draft.event_type,
+    repeat: draft.repeat ?? 'none',
     meeting_link: draft.meeting_link,
     place_label: draft.place_label,
     region: draft.region,
@@ -327,10 +333,12 @@ export const EventsPage: React.FC = () => {
             </div>
           )}
 
-          <button className="btn btn-primary events-hero__create" onClick={() => handleCreateClick()}>
-            <Plus size={18} />
-            <span>{isMobile ? 'Создать' : 'Создать событие'}</span>
-          </button>
+          {canCreateEvents && (
+            <button className="btn btn-primary events-hero__create" onClick={() => handleCreateClick()}>
+              <Plus size={18} />
+              <span>{isMobile ? 'Создать' : 'Создать событие'}</span>
+            </button>
+          )}
 
           {isMobile && (
             <button 
@@ -410,7 +418,7 @@ export const EventsPage: React.FC = () => {
             return (
               <div 
                 key={idx} 
-                onClick={() => !dayEvents.length && handleCreateClick(date)}
+                onClick={() => !dayEvents.length && canCreateEvents && handleCreateClick(date)}
                 className={`events-calendar-day ${isCurrentMonth ? '' : 'is-outside'} ${isToday ? 'is-today' : ''}`}
               >
                 <div className={`events-calendar-day__date ${isToday ? 'is-today' : ''}`}>

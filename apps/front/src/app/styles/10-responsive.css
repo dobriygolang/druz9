@@ -34,7 +34,7 @@
    =========================================== */
 @media (min-width: 1181px) and (max-width: 1600px) {
   .main-content {
-    padding: var(--space-7) var(--space-8) var(--space-11);
+    padding: var(--space-gutter) var(--space-gutter) var(--space-12);
   }
 
   .sidebar-desktop {
@@ -79,7 +79,7 @@
   .vacancies-hero,
   .events-hero {
     grid-template-columns: 1fr;
-    gap: var(--space-4);
+    gap: 12px;
   }
 }
 

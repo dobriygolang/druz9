@@ -38,7 +38,7 @@ export const EventForm: React.FC<EventFormProps> = ({
   inviteSearchQuery,
   setInviteSearchQuery,
 }) => {
-  const filteredInvitees = users.filter((user) => {
+const filteredInvitees = users.filter((user) => {
     const search = inviteSearchQuery.toLowerCase();
     return (
       user.title.toLowerCase().includes(search) ||
@@ -59,6 +59,13 @@ export const EventForm: React.FC<EventFormProps> = ({
       };
     });
   };
+
+  const repeatOptions = [
+    { value: 'none', label: 'Без повтора' },
+    { value: 'daily', label: 'Каждый день' },
+    { value: 'weekly', label: 'Каждую неделю' },
+    { value: 'monthly', label: 'Каждый месяц' },
+  ];
 
   return (
     <div
@@ -127,7 +134,7 @@ export const EventForm: React.FC<EventFormProps> = ({
           onChange={(e) => setDraft(curr => curr ? { ...curr, description: e.target.value } : null)}
           style={{ minHeight: '80px', resize: 'vertical', padding: '12px' }}
         />
-        <div style={{ display: 'grid', gridTemplateColumns: '1.1fr 1fr 1fr', gap: '10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: '1.05fr 1fr 1fr', gap: '10px' }}>
           <input
             className="input"
             placeholder="Группа / клуб"
@@ -213,6 +220,14 @@ export const EventForm: React.FC<EventFormProps> = ({
               fontFamily: 'inherit',
               borderColor: fieldErrors?.scheduledAt ? '#ef4444' : undefined,
             }}
+          />
+        </div>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '8px' }}>
+          <div style={{ fontSize: '13px', color: 'var(--text-secondary)' }}>Повторение</div>
+          <FancySelect
+            value={draft.repeat ?? 'none'}
+            onChange={(value) => setDraft(curr => curr ? { ...curr, repeat: value as EventDraft['repeat'] } : null)}
+            options={repeatOptions}
           />
         </div>
         {fieldErrors?.scheduledAt && (

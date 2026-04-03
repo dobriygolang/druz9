@@ -152,10 +152,6 @@ export function SoloPracticeSection({
             </div>
           </div>
           <div className="solo-practice-hero__cta">
-            <div className="solo-practice-filter-group solo-practice-filter-group--hero">
-              <span className="solo-practice-filter-label">Компания</span>
-              <FancySelect value={prepLaunchCompany} options={companyOptions} onChange={onCompanyChange} />
-            </div>
             <button type="button" className="btn btn-primary solo-practice-hero__btn" onClick={onStartScenario}>
               <Sparkles size={16} />
               <span>Начать сценарий</span>
@@ -164,6 +160,11 @@ export function SoloPracticeSection({
         </div>
 
         <div className="solo-practice-sidebar">
+          <div className="solo-practice-filter-group solo-practice-filter-group--sidebar">
+            <span className="solo-practice-filter-label">Компания</span>
+            <FancySelect value={prepLaunchCompany} options={companyOptions} onChange={onCompanyChange} />
+          </div>
+
           <button type="button" className="solo-practice-action-card" onClick={onOpenRandomTask}>
             <div className="solo-practice-action-card__icon"><Shuffle size={18} /></div>
             <div className="solo-practice-action-card__copy">

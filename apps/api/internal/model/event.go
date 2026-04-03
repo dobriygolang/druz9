@@ -88,6 +88,13 @@ const (
 	MaxEventsLimit     = 100
 )
 
+const (
+	EventRepeatNone    = "none"
+	EventRepeatDaily   = "daily"
+	EventRepeatWeekly  = "weekly"
+	EventRepeatMonthly = "monthly"
+)
+
 type ListEventsResponse struct {
 	Events      []*Event
 	Limit       int32
@@ -100,6 +107,7 @@ type CreateEventRequest struct {
 	Title          string
 	PlaceLabel     string
 	Description    string
+	Repeat         string
 	MeetingLink    string
 	Region         string
 	Country        string

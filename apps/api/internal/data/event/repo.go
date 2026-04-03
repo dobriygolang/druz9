@@ -50,39 +50,76 @@ func (r *Repo) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.C
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
-	eventID := uuid.New()
-	_, err = tx.Exec(
-		ctx,
-		`INSERT INTO events (id, creator_id, title, place_label, description, meeting_link, region, country, city, latitude, longitude, scheduled_at, created_at, updated_at)
-		 VALUES ($1,$2,$3,$4,NULLIF($5,''),NULLIF($6,''),NULLIF($7,''),NULLIF($8,''),NULLIF($9,''),$10,$11,$12,NOW(),NOW())`,
-		eventID, creatorID, req.Title, req.PlaceLabel, req.Description, req.MeetingLink, req.Region, req.Country, req.City, req.Latitude, req.Longitude, req.ScheduledAt,
-	)
-	if err != nil {
-		return nil, fmt.Errorf("insert event: %w", err)
-	}
+	scheduledAtList := buildCreateEventScheduleTimes(req.ScheduledAt, req.Repeat)
+	firstEventID := uuid.Nil
+	for _, scheduledAt := range scheduledAtList {
+		eventID := uuid.New()
+		if firstEventID == uuid.Nil {
+			firstEventID = eventID
+		}
+		_, err = tx.Exec(
+			ctx,
+			`INSERT INTO events (id, creator_id, title, place_label, description, meeting_link, region, country, city, latitude, longitude, scheduled_at, created_at, updated_at)
+			 VALUES ($1,$2,$3,$4,NULLIF($5,''),NULLIF($6,''),NULLIF($7,''),NULLIF($8,''),NULLIF($9,''),$10,$11,$12,NOW(),NOW())`,
+			eventID, creatorID, req.Title, req.PlaceLabel, req.Description, req.MeetingLink, req.Region, req.Country, req.City, req.Latitude, req.Longitude, scheduledAt,
+		)
+		if err != nil {
+			return nil, fmt.Errorf("insert event: %w", err)
+		}
 
-	if _, err := tx.Exec(
-		ctx,
-		`INSERT INTO event_participants (event_id, user_id, status) VALUES ($1, $2, $3)`,
-		eventID, creatorID, model.EventParticipantStatusConfirmed,
-	); err != nil {
-		return nil, fmt.Errorf("insert creator participant: %w", err)
-	}
+		if _, err := tx.Exec(
+			ctx,
+			`INSERT INTO event_participants (event_id, user_id, status) VALUES ($1, $2, $3)`,
+			eventID, creatorID, model.EventParticipantStatusConfirmed,
+		); err != nil {
+			return nil, fmt.Errorf("insert creator participant: %w", err)
+		}
 
-	if err := insertInvitedParticipants(
-		ctx,
-		tx,
-		eventID,
-		invitedUserIDStrings(req.InvitedUserIDs, creatorID),
-	); err != nil {
-		return nil, err
+		if err := insertInvitedParticipants(
+			ctx,
+			tx,
+			eventID,
+			invitedUserIDStrings(req.InvitedUserIDs, creatorID),
+		); err != nil {
+			return nil, err
+		}
 	}
 
 	if err := tx.Commit(ctx); err != nil {
 		return nil, fmt.Errorf("commit tx: %w", err)
 	}
 
-	return r.getEvent(ctx, r.data.DB, eventID, creatorID)
+	return r.getEvent(ctx, r.data.DB, firstEventID, creatorID)
+}
+
+func buildCreateEventScheduleTimes(base time.Time, repeat string) []time.Time {
+	switch repeat {
+	case model.EventRepeatDaily:
+		return buildRepeatedScheduleTimes(base, 30, func(value time.Time, step int) time.Time {
+			return value.AddDate(0, 0, step)
+		})
+	case model.EventRepeatWeekly:
+		return buildRepeatedScheduleTimes(base, 12, func(value time.Time, step int) time.Time {
+			return value.AddDate(0, 0, 7*step)
+		})
+	case model.EventRepeatMonthly:
+		return buildRepeatedScheduleTimes(base, 12, func(value time.Time, step int) time.Time {
+			return value.AddDate(0, step, 0)
+		})
+	default:
+		return []time.Time{base}
+	}
+}
+
+func buildRepeatedScheduleTimes(base time.Time, count int, next func(time.Time, int) time.Time) []time.Time {
+	if count <= 1 {
+		return []time.Time{base}
+	}
+	items := make([]time.Time, 0, count)
+	for step := 0; step < count; step++ {
+		items = append(items, next(base, step))
+	}
+	return items
 }
 
 func (r *Repo) JoinEvent(ctx context.Context, eventID, userID uuid.UUID) (*model.Event, error) {

@@ -59,6 +59,23 @@ func TestListEvents(t *testing.T) {
 
 		mockRepo.AssertExpectations(t)
 	})
+
+	t.Run("rejects invalid repeat", func(t *testing.T) {
+		t.Parallel()
+
+		mockRepo := mocks.NewRepository(t)
+		svc := NewEventService(Config{
+			Repository: mockRepo,
+		})
+
+		_, err := svc.CreateEvent(context.Background(), uuid.New(), model.CreateEventRequest{
+			Title:  "Test Event",
+			Repeat: "yearly",
+		})
+		if err == nil {
+			t.Fatal("expected error")
+		}
+	})
 }
 
 func TestCreateEvent(t *testing.T) {
