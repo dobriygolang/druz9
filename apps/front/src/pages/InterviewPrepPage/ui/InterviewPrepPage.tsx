@@ -1,63 +1,23 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { ArrowRight, BrainCircuit, Clock3, Filter, Shuffle, ShieldCheck, Sparkles, TerminalSquare } from 'lucide-react';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
-import { interviewPrepApi, InterviewPrepTask, InterviewPrepType } from '@/features/InterviewPrep/api/interviewPrepApi';
-
-type TaskCategory = 'all' | 'coding' | 'sql' | 'system_design';
-type TaskModeFilter = 'all' | 'executable' | 'guided';
-
-const PREP_TYPE_LABELS: Record<InterviewPrepType, string> = {
-  coding: 'Coding',
-  algorithm: 'Algorithm',
-  system_design: 'System Design',
-  sql: 'SQL',
-  code_review: 'Code Review',
-};
-
-const CATEGORY_LABELS: Record<TaskCategory, string> = {
-  all: 'Все категории',
-  coding: 'Coding',
-  sql: 'SQL',
-  system_design: 'System Design',
-};
-
-const CATEGORY_ORDER: TaskCategory[] = ['coding', 'sql', 'system_design'];
-
-function categoryForTask(task: InterviewPrepTask): TaskCategory {
-  if (task.prepType === 'system_design') {
-    return 'system_design';
-  }
-  if (task.language === 'sql') {
-    return 'sql';
-  }
-  return 'coding';
-}
-
-function categoryAccentClass(category: TaskCategory) {
-  switch (category) {
-    case 'coding':
-      return 'is-coding';
-    case 'sql':
-      return 'is-sql';
-    case 'system_design':
-      return 'is-system-design';
-    default:
-      return '';
-  }
-}
-
-function pickRandomValue<T>(values: T[]): T | null {
-  if (values.length === 0) {
-    return null;
-  }
-  return values[Math.floor(Math.random() * values.length)];
-}
-
-function shuffledValues<T>(values: T[]): T[] {
-  return [...values].sort(() => Math.random() - 0.5);
-}
+import { interviewPrepApi, InterviewPrepTask } from '@/features/InterviewPrep/api/interviewPrepApi';
+import {
+  InterviewPrepCategoryStats,
+  InterviewPrepFilters,
+  InterviewPrepHero,
+  InterviewPrepTaskGroups,
+} from './components/InterviewPrepSections';
+import {
+  CATEGORY_LABELS,
+  CATEGORY_ORDER,
+  TaskCategory,
+  TaskModeFilter,
+  categoryForTask,
+  pickRandomValue,
+  shuffledValues,
+} from './lib/interviewPrepPageHelpers';
 
 export function InterviewPrepPage() {
   const isMobile = useIsMobile();
@@ -147,7 +107,11 @@ export function InterviewPrepPage() {
   }, [tasksForCategoryStats]);
 
   const companyOptions = useMemo(() => {
-    const tags = Array.from(new Set(tasks.map((task) => task.companyTag).filter(Boolean))).sort();
+    const tags = Array.from(new Set(
+      tasks
+        .map((task) => task.companyTag?.trim())
+        .filter((companyTag): companyTag is string => Boolean(companyTag)),
+    )).sort();
     return ['all', ...tags];
   }, [tasks]);
 
@@ -291,157 +255,44 @@ export function InterviewPrepPage() {
 
   return (
     <div className="code-rooms-page interview-prep-page">
-      <section className="page-header code-rooms-hero interview-prep-hero">
-        <div className="code-rooms-hero__copy">
-          {!isMobile && <span className="code-rooms-kicker">Trusted Only</span>}
-          <h1 style={{ fontSize: isMobile ? '28px' : '36px' }}>Interview Prep</h1>
-          <p className="code-rooms-subtitle">
-            {isMobile 
-              ? 'Сценарии для подготовки к техническим интервью.' 
-              : 'Выбирай категорию, бери случайную executable-задачу или фильтруй каталог вручную. Coding можно решать на Go или Python, system design поддерживает AI review.'}
-          </p>
-          <div className="interview-prep-hero__actions" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
-            <button className="btn btn-secondary" disabled={startingMock} onClick={() => void startMockInterview()} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
-              <BrainCircuit size={16} />
-              <span>Запустить mock interview</span>
-            </button>
-            <button className="btn btn-primary" onClick={() => void handleRandomStart(filteredTasks)} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
-              <Shuffle size={16} />
-              <span>Случайная задача</span>
-            </button>
-            {!isMobile && (
-              <button
-                className="btn btn-secondary"
-                onClick={() => {
-                  setCategory('all');
-                  setCompany('all');
-                  setModeFilter('all');
-                  setSearch('');
-                }}
-              >
-                <Filter size={16} />
-                <span>Сбросить фильтры</span>
-              </button>
-            )}
-          </div>
-        </div>
+      <InterviewPrepHero
+        isMobile={isMobile}
+        startingMock={startingMock}
+        summary={summary}
+        onStartMockInterview={() => void startMockInterview()}
+        onStartRandomTask={() => void handleRandomStart(filteredTasks)}
+        onResetFilters={() => {
+          setCategory('all');
+          setCompany('all');
+          setModeFilter('all');
+          setSearch('');
+        }}
+      />
 
-        {!isMobile && (
-          <div className="interview-prep-summary interview-prep-summary--rich">
-            <div className="interview-prep-summary__item">
-              <Sparkles size={16} />
-              <span>{summary.total} сценариев</span>
-            </div>
-            <div className="interview-prep-summary__item">
-              <TerminalSquare size={16} />
-              <span>{summary.executable} с автопроверкой</span>
-            </div>
-            <div className="interview-prep-summary__item">
-              <ShieldCheck size={16} />
-              <span>{summary.guidedCount} guided flow</span>
-            </div>
-          </div>
-        )}
-      </section>
+      <InterviewPrepCategoryStats
+        isMobile={isMobile}
+        category={category}
+        categoryStats={categoryStats}
+        onCategoryChange={(item) => setCategory(item)}
+      />
 
-      <section className="interview-prep-category-strip" style={{ gap: isMobile ? '8px' : '12px' }}>
-        {categoryStats.map((item) => (
-          <button
-            key={item.key}
-            type="button"
-            className={`card dashboard-card interview-prep-category-card ${category === item.key ? 'is-active' : ''} ${categoryAccentClass(item.key)}`}
-            onClick={() => setCategory(item.key)}
-            style={{ padding: isMobile ? '12px' : '16px' }}
-          >
-            <span className="interview-prep-category-card__label" style={{ fontSize: isMobile ? '13px' : '14px' }}>{item.label}</span>
-            <strong style={{ fontSize: isMobile ? '18px' : '20px' }}>{item.count}</strong>
-          </button>
-        ))}
-      </section>
-
-      <section className="card dashboard-card interview-prep-filter-card">
-        <div className="dashboard-card__header">
-          <div>
-            <h2 style={{ fontSize: isMobile ? '20px' : '24px' }}>Задачи</h2>
-            {!isMobile && <p className="interview-prep-muted">Фильтруй по категории, типу потока и тексту задачи.</p>}
-          </div>
-        </div>
-
-        <div className="interview-prep-filters">
-          <div className="form-group">
-            <label>Категория</label>
-            <div className="pill-selector">
-              <button type="button" className={`pill-selector__pill ${category === 'all' ? 'active' : ''}`} onClick={() => setCategory('all')}>
-                Все
-              </button>
-              {CATEGORY_ORDER.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={`pill-selector__pill ${category === item ? 'active' : ''}`}
-                  onClick={() => {
-                    setCategory(item);
-                    if (item === 'system_design' && modeFilter === 'executable') {
-                      setModeFilter('all');
-                    }
-                  }}
-                >
-                  {CATEGORY_LABELS[item]}
-                </button>
-              ))}
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Формат</label>
-            <div className="pill-selector">
-              <button type="button" className={`pill-selector__pill ${modeFilter === 'all' ? 'active' : ''}`} onClick={() => setModeFilter('all')}>
-                Все
-              </button>
-              <button type="button" className={`pill-selector__pill ${modeFilter === 'executable' ? 'active' : ''}`} onClick={() => setModeFilter('executable')}>
-                Live coding
-              </button>
-              <button type="button" className={`pill-selector__pill ${modeFilter === 'guided' ? 'active' : ''}`} onClick={() => setModeFilter('guided')}>
-                Guided
-              </button>
-            </div>
-            {category === 'system_design' && (
-              <div className="interview-prep-muted" style={{ marginTop: '8px' }}>
-                Для System Design доступны guided-сценарии с AI review, поэтому live-coding фильтр здесь не применяется.
-              </div>
-            )}
-          </div>
-
-          <div className="form-group">
-            <label>Компания / группа</label>
-            <div className="pill-selector">
-              {companyOptions.map((item) => (
-                <button
-                  key={item}
-                  type="button"
-                  className={`pill-selector__pill ${company === item ? 'active' : ''}`}
-                  onClick={() => setCompany(item || '')}
-                >
-                  {item === 'all' ? 'Все' : item}
-                </button>
-              ))}
-            </div>
-            <div className="interview-prep-muted" style={{ marginTop: '8px' }}>
-              Если компанию не выбирать, mock interview стартует на случайной доступной компании.
-            </div>
-          </div>
-
-          <div className="form-group">
-            <label>Поиск</label>
-            <input
-              className="input"
-              placeholder="worker pool, sql, url shortener..."
-              value={search}
-              onChange={(event) => setSearch(event.target.value)}
-            />
-          </div>
-        </div>
-      </section>
+      <InterviewPrepFilters
+        isMobile={isMobile}
+        category={category}
+        modeFilter={modeFilter}
+        company={company}
+        companyOptions={companyOptions}
+        search={search}
+        onCategoryChange={(item) => {
+          setCategory(item);
+          if (item === 'system_design' && modeFilter === 'executable') {
+            setModeFilter('all');
+          }
+        }}
+        onModeFilterChange={setModeFilter}
+        onCompanyChange={setCompany}
+        onSearchChange={setSearch}
+      />
 
       {error && (
         <section className="card dashboard-card">
@@ -454,86 +305,18 @@ export function InterviewPrepPage() {
           <div className="empty-state compact">Под текущий фильтр задач пока нет.</div>
         </section>
       ) : (
-        <div className="interview-prep-groups">
-          {groupedTasks.map((group) => {
-            const visibleCount = visibleCounts[group.key] ?? 3;
-            const visibleTasks = group.tasks.slice(0, visibleCount);
-            const hasMore = group.tasks.length > visibleTasks.length;
-
-            return (
-              <section key={group.key} className="interview-prep-group">
-              <div className="interview-prep-group__head">
-                <div>
-                  <h2>{group.label}</h2>
-                  <p className="interview-prep-muted">{group.tasks.length} задач в текущем фильтре</p>
-                </div>
-                <button className="btn btn-secondary interview-prep-group__action" onClick={() => void handleRandomStart(group.tasks)}>
-                  <Shuffle size={16} />
-                  <span>Рандом по категории</span>
-                </button>
-              </div>
-
-              <section className="interview-prep-grid">
-                {visibleTasks.map((task) => {
-                  const taskCategory = categoryForTask(task);
-                  return (
-                    <article key={task.id} className={`card dashboard-card interview-prep-card interview-prep-card--category ${categoryAccentClass(taskCategory)}`}>
-                      <div className="interview-prep-card__head">
-                        <div className="task-item__meta" style={{ flexWrap: 'wrap', gap: '4px' }}>
-                          <span className="badge">{isMobile ? group.label.charAt(0) : CATEGORY_LABELS[taskCategory]}</span>
-                          <span className="badge">{isMobile ? '' : (PREP_TYPE_LABELS[task.prepType] ?? task.prepType)}</span>
-                          {task.companyTag && <span className="badge">{task.companyTag}</span>}
-                          {!isMobile && <span className="badge">{task.language}</span>}
-                          <span className="badge">
-                            <Clock3 size={12} />
-                            {Math.round(task.durationSeconds / 60)}м
-                          </span>
-                        </div>
-                        {!task.isActive && <span className="badge task-inactive">Неактивна</span>}
-                      </div>
-
-                      <h3 className="interview-prep-card__title" style={{ fontSize: isMobile ? '16px' : '18px' }}>{task.title}</h3>
-                      <p className={`interview-prep-card__statement ${isMobile ? 'text-prune-2' : ''}`}>{task.statement}</p>
-
-                      <div className="interview-prep-card__footer">
-                        <div className="interview-prep-card__hint">
-                          {task.prepType === 'system_design'
-                            ? 'AI review схемы + follow-up вопросы'
-                            : task.isExecutable
-                              ? 'Live coding с автопроверкой'
-                              : 'Guided flow: решение + последовательные вопросы'}
-                        </div>
-                        <button
-                          className="btn btn-primary"
-                          onClick={() => void startTask(task.id)}
-                          disabled={startingTaskId === task.id}
-                        >
-                          <span>{startingTaskId === task.id ? 'Запуск...' : 'Начать'}</span>
-                          <ArrowRight size={16} />
-                        </button>
-                      </div>
-                    </article>
-                  );
-                })}
-              </section>
-              {hasMore && (
-                <div className="interview-prep-group__more">
-                  <button
-                    type="button"
-                    className="btn btn-secondary"
-                    onClick={() => setVisibleCounts((current) => ({
-                      ...current,
-                      [group.key]: (current[group.key] ?? 3) + 3,
-                    }))}
-                  >
-                    Показать ещё 3
-                  </button>
-                </div>
-              )}
-              </section>
-            );
-          })}
-        </div>
+        <InterviewPrepTaskGroups
+          isMobile={isMobile}
+          groupedTasks={groupedTasks}
+          visibleCounts={visibleCounts}
+          startingTaskId={startingTaskId}
+          onStartTask={(taskId) => void startTask(taskId)}
+          onRandomStart={(tasks) => void handleRandomStart(tasks)}
+          onShowMore={(groupKey) => setVisibleCounts((current) => ({
+            ...current,
+            [groupKey]: (current[groupKey] ?? 3) + 3,
+          }))}
+        />
       )}
     </div>
   );
