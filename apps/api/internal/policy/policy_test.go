@@ -827,6 +827,24 @@ func TestResolvePolicy(t *testing.T) {
 	})
 }
 
+func TestResolvePolicy_PreservesMockOnlyWhenAllowedHostsProvided(t *testing.T) {
+	t.Parallel()
+
+	policy, err := ResolvePolicy(TaskSpec{
+		Type:          TaskTypeAPIJSON,
+		Language:      LanguageGo,
+		MockEndpoints: []string{"http://mock.local"},
+		AllowedHosts:  []string{"mock.local"},
+	})
+	if err != nil {
+		t.Fatalf("resolve policy: %v", err)
+	}
+
+	if policy.Network.Mode != NetworkMockOnly {
+		t.Fatalf("expected network mode %q, got %q", NetworkMockOnly, policy.Network.Mode)
+	}
+}
+
 func TestRunnerConfigSummary(t *testing.T) {
 	t.Parallel()
 

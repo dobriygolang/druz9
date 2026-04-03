@@ -613,7 +613,7 @@
       "targets": [
         {
           "refId": "A",
-          "expr": "up{job=~\"backend|postgres|minio|prometheus|node\"}",
+          "expr": "up{job=~\"backend|sandbox_runner|postgres|minio|prometheus|node\"}",
           "legendFormat": "{{job}} {{instance}}"
         }
       ],

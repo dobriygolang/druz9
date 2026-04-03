@@ -23,6 +23,8 @@ import (
 	"api/internal/realtime"
 	"api/internal/sandbox"
 	server "api/internal/server"
+	"context"
+	"strings"
 )
 
 type serviceContext struct {
@@ -51,7 +53,17 @@ type serviceContext struct {
 
 func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*serviceContext, error) {
 	realtimeHub := realtime.NewCodeEditorHub(storage.codeEditorRepo)
-	sandboxService := sandbox.New()
+	var sandboxService interface {
+		Execute(ctx context.Context, req sandbox.ExecutionRequest) (sandbox.ExecutionResult, error)
+	}
+	if bootstrap.cfg.Sandbox != nil && strings.EqualFold(strings.TrimSpace(bootstrap.cfg.Sandbox.Mode), "remote") {
+		sandboxService = sandbox.NewRemote(sandbox.RemoteConfig{
+			BaseURL: bootstrap.cfg.Sandbox.RunnerURL,
+			Timeout: bootstrap.cfg.Sandbox.Timeout,
+		})
+	} else {
+		sandboxService = sandbox.New()
+	}
 	aiReviewService := aireview.New(aireview.Config{
 		Provider: bootstrap.cfg.External.AIReview.Provider,
 		BaseURL:  bootstrap.cfg.External.AIReview.BaseURL,

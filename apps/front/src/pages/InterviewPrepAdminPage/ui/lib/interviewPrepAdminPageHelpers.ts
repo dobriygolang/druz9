@@ -6,6 +6,7 @@ import {
   InterviewPrepTask,
   InterviewPrepType,
 } from '@/features/InterviewPrep/api/interviewPrepApi';
+import { CodeTask, CodeTaskCase } from '@/entities/CodeRoom/model/types';
 
 export const PREP_TYPES: { value: InterviewPrepType; label: string }[] = [
   { value: 'coding', label: 'Coding' },
@@ -39,6 +40,10 @@ func solve(input string) string {
 }
 `;
 
+export const SQL_STARTER_CODE = `-- Read input schema/examples from the statement and return the final query here.
+SELECT 1;
+`;
+
 export type InterviewPrepTemplateKey =
   | 'go_coding'
   | 'algorithm'
@@ -63,6 +68,8 @@ export type TaskFormState = {
   codeTaskId: string;
   referenceSolution: string;
   isActive: boolean;
+  publicTestCases: CodeTaskCase[];
+  hiddenTestCases: CodeTaskCase[];
 };
 
 export const INTERVIEW_PREP_TEMPLATES: { key: InterviewPrepTemplateKey; label: string; description: string }[] = [
@@ -72,6 +79,15 @@ export const INTERVIEW_PREP_TEMPLATES: { key: InterviewPrepTemplateKey; label: s
   { key: 'question_bank', label: 'Questions', description: 'Theory or verbal interview question.' },
   { key: 'system_design', label: 'System design', description: 'Architecture or system design discussion.' },
 ];
+
+export const createEmptyCase = (isPublic: boolean, order: number): CodeTaskCase => ({
+  id: '',
+  input: '',
+  expectedOutput: '',
+  isPublic,
+  weight: 1,
+  order,
+});
 
 export type QuestionFormState = {
   id: string | null;
@@ -119,6 +135,8 @@ export const createEmptyTaskForm = (): TaskFormState => ({
   codeTaskId: '',
   referenceSolution: '',
   isActive: true,
+  publicTestCases: [createEmptyCase(true, 1)],
+  hiddenTestCases: [createEmptyCase(false, 1)],
 });
 
 export const applyTaskTemplate = (form: TaskFormState, template: InterviewPrepTemplateKey): TaskFormState => {
@@ -141,6 +159,8 @@ export const applyTaskTemplate = (form: TaskFormState, template: InterviewPrepTe
         runnerMode: 'function_io',
         durationSeconds: 2700,
         starterCode: DEFAULT_STARTER_CODE,
+        publicTestCases: base.publicTestCases.length ? base.publicTestCases : [createEmptyCase(true, 1)],
+        hiddenTestCases: base.hiddenTestCases.length ? base.hiddenTestCases : [createEmptyCase(false, 1)],
       };
     case 'algorithm':
       return {
@@ -153,6 +173,8 @@ export const applyTaskTemplate = (form: TaskFormState, template: InterviewPrepTe
         runnerMode: 'function_io',
         durationSeconds: 2700,
         starterCode: DEFAULT_STARTER_CODE,
+        publicTestCases: base.publicTestCases.length ? base.publicTestCases : [createEmptyCase(true, 1)],
+        hiddenTestCases: base.hiddenTestCases.length ? base.hiddenTestCases : [createEmptyCase(false, 1)],
       };
     case 'sql':
       return {
@@ -164,7 +186,9 @@ export const applyTaskTemplate = (form: TaskFormState, template: InterviewPrepTe
         executionProfile: 'pure',
         runnerMode: 'function_io',
         durationSeconds: 1800,
-        starterCode: '',
+        starterCode: SQL_STARTER_CODE,
+        publicTestCases: [createEmptyCase(true, 1)],
+        hiddenTestCases: [createEmptyCase(false, 1)],
       };
     case 'question_bank':
       return {
@@ -177,6 +201,8 @@ export const applyTaskTemplate = (form: TaskFormState, template: InterviewPrepTe
         runnerMode: 'function_io',
         durationSeconds: 1200,
         starterCode: '',
+        publicTestCases: [createEmptyCase(true, 1)],
+        hiddenTestCases: [createEmptyCase(false, 1)],
       };
     case 'system_design':
       return {
@@ -189,6 +215,8 @@ export const applyTaskTemplate = (form: TaskFormState, template: InterviewPrepTe
         runnerMode: 'function_io',
         durationSeconds: 2400,
         starterCode: '',
+        publicTestCases: [createEmptyCase(true, 1)],
+        hiddenTestCases: [createEmptyCase(false, 1)],
       };
     default:
       return base;
@@ -231,7 +259,7 @@ export const toSlug = (value: string) =>
     .replace(/[^a-z0-9]+/g, '-')
     .replace(/^-+|-+$/g, '');
 
-export const taskToForm = (task: InterviewPrepTask): TaskFormState => ({
+export const taskToForm = (task: InterviewPrepTask, linkedCodeTask?: CodeTask | null): TaskFormState => ({
   id: task.id,
   slug: task.slug,
   title: task.title,
@@ -248,7 +276,20 @@ export const taskToForm = (task: InterviewPrepTask): TaskFormState => ({
   codeTaskId: task.codeTaskId || '',
   referenceSolution: task.referenceSolution ?? '',
   isActive: task.isActive,
+  publicTestCases: linkedCodeTask?.publicTestCases?.length ? linkedCodeTask.publicTestCases : [createEmptyCase(true, 1)],
+  hiddenTestCases: linkedCodeTask?.hiddenTestCases?.length ? linkedCodeTask.hiddenTestCases : [createEmptyCase(false, 1)],
 });
+
+export const languageOptionsForPrepType = (prepType: InterviewPrepType) => {
+  switch (prepType) {
+    case 'sql':
+      return [{ value: 'sql', label: 'SQL' }];
+    case 'system_design':
+      return [{ value: 'system_design', label: 'System Design' }];
+    default:
+      return LANGUAGE_OPTIONS.filter((item) => item.value === 'go' || item.value === 'python');
+  }
+};
 
 export const questionToForm = (question: InterviewPrepQuestion): QuestionFormState => ({
   id: question.id,

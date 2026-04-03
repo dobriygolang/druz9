@@ -59,9 +59,11 @@ func ResolvePolicy(task TaskSpec) (SandboxPolicy, error) {
 	}
 	if len(task.AllowedHosts) > 0 || len(task.AllowedPorts) > 0 {
 		p.Network.Enabled = true
-		p.Network.Mode = NetworkAllowlist
 		p.Network.AllowedHosts = appendUnique(p.Network.AllowedHosts, task.AllowedHosts...)
 		p.Network.AllowedPorts = appendUniqueInts(p.Network.AllowedPorts, task.AllowedPorts...)
+		if len(task.MockEndpoints) == 0 {
+			p.Network.Mode = NetworkAllowlist
+		}
 	}
 
 	if task.Type == TaskTypeArenaDuel {

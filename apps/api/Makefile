@@ -33,6 +33,11 @@ build:
 run:
 	set -a && . ./.env && set +a && GOCACHE=$(GOCACHE_DIR) go run ./cmd/api
 
+.PHONY: run-sandbox-runner
+# run isolated sandbox worker locally
+run-sandbox-runner:
+	GOCACHE=$(GOCACHE_DIR) go run ./cmd/sandbox-runner
+
 .PHONY: migrate-up
 # apply goose migrations to local database
 migrate-up:
@@ -154,7 +159,7 @@ docker-down:
 .PHONY: docker-logs
 # tail local infra logs
 docker-logs:
-	docker compose logs -f postgres minio minio-init prometheus alertmanager grafana
+	docker compose logs -f postgres minio minio-init prometheus alertmanager grafana sandbox-runner
 
 .PHONY: docker-up-with-monitoring
 # start docker-compose with monitoring (prometheus + grafana)

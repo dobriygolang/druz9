@@ -16,6 +16,7 @@ export function InterviewPrepHero({
   summary,
   onStartMockInterview,
   onStartRandomTask,
+  onStartRandomCheckpoint,
   onResetFilters,
 }: {
   isMobile: boolean;
@@ -23,6 +24,7 @@ export function InterviewPrepHero({
   summary: { total: number; executable: number; guidedCount: number };
   onStartMockInterview: () => void;
   onStartRandomTask: () => void;
+  onStartRandomCheckpoint: () => void;
   onResetFilters: () => void;
 }) {
   return (
@@ -43,6 +45,10 @@ export function InterviewPrepHero({
           <button className="btn btn-primary" onClick={onStartRandomTask} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
             <Shuffle size={16} />
             <span>Случайная задача</span>
+          </button>
+          <button className="btn btn-secondary" onClick={onStartRandomCheckpoint} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
+            <ShieldCheck size={16} />
+            <span>Checkpoint</span>
           </button>
           {!isMobile && (
             <button className="btn btn-secondary" onClick={onResetFilters}>
@@ -206,7 +212,9 @@ export function InterviewPrepTaskGroups({
   groupedTasks,
   visibleCounts,
   startingTaskId,
+  startingCheckpointTaskId,
   onStartTask,
+  onStartCheckpoint,
   onRandomStart,
   onShowMore,
 }: {
@@ -214,7 +222,9 @@ export function InterviewPrepTaskGroups({
   groupedTasks: Array<{ key: TaskCategory; label: string; tasks: InterviewPrepTask[] }>;
   visibleCounts: Record<TaskCategory, number>;
   startingTaskId: string | null;
+  startingCheckpointTaskId: string | null;
   onStartTask: (taskId: string) => void;
+  onStartCheckpoint: (taskId: string) => void;
   onRandomStart: (tasks: InterviewPrepTask[]) => void;
   onShowMore: (category: TaskCategory) => void;
 }) {
@@ -241,6 +251,7 @@ export function InterviewPrepTaskGroups({
             <section className="interview-prep-grid">
               {visibleTasks.map((task) => {
                 const taskCategory = categoryForTask(task);
+                const supportsCheckpoint = task.isActive && task.isExecutable && task.prepType !== 'system_design' && task.prepType !== 'code_review';
                 return (
                   <article key={task.id} className={`card dashboard-card interview-prep-card interview-prep-card--category ${categoryAccentClass(taskCategory)}`}>
                     <div className="interview-prep-card__head">
@@ -268,10 +279,17 @@ export function InterviewPrepTaskGroups({
                             ? 'Live coding с автопроверкой'
                             : 'Guided flow: решение + последовательные вопросы'}
                       </div>
-                      <button className="btn btn-primary" onClick={() => onStartTask(task.id)} disabled={startingTaskId === task.id}>
-                        <span>{startingTaskId === task.id ? 'Запуск...' : 'Начать'}</span>
-                        <ArrowRight size={16} />
-                      </button>
+                      <div className="interview-prep-card__actions">
+                        {supportsCheckpoint && (
+                          <button className="btn btn-secondary" onClick={() => onStartCheckpoint(task.id)} disabled={startingCheckpointTaskId === task.id}>
+                            <span>{startingCheckpointTaskId === task.id ? 'Старт...' : 'Checkpoint'}</span>
+                          </button>
+                        )}
+                        <button className="btn btn-primary" onClick={() => onStartTask(task.id)} disabled={startingTaskId === task.id}>
+                          <span>{startingTaskId === task.id ? 'Запуск...' : 'Начать'}</span>
+                          <ArrowRight size={16} />
+                        </button>
+                      </div>
                     </div>
                   </article>
                 );

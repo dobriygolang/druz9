@@ -1,8 +1,9 @@
 import Editor from '@monaco-editor/react';
-import { BrainCircuit, CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Mic, MicOff, Play, Sparkles, TerminalSquare, Upload, XCircle } from 'lucide-react';
+import { BrainCircuit, CheckCircle2, ChevronDown, ChevronUp, CircleDashed, Clock3, Mic, MicOff, Play, ShieldCheck, Sparkles, TerminalSquare, Upload, XCircle } from 'lucide-react';
 
 import {
   InterviewPrepAnswerReview,
+  InterviewPrepCheckpoint,
   InterviewPrepQuestion,
   InterviewPrepSession,
   InterviewPrepSystemDesignReview,
@@ -13,13 +14,31 @@ import { displayLanguageLabel, monacoLanguageFor } from '@/shared/lib/codeEditor
 import { APP_MONACO_THEME, configureAppMonacoTheme } from '@/shared/lib/monacoTheme';
 import { resultLabel, SqlStarterTab } from '../lib/interviewPrepSessionHelpers';
 
+function ShieldBadge({ status }: { status: InterviewPrepCheckpoint['status'] }) {
+  return (
+    <span className={`badge interview-prep-checkpoint-badge interview-prep-checkpoint-badge--${status}`}>
+      <ShieldCheck size={12} />
+      {status}
+    </span>
+  );
+}
+
 export function SessionHero({
   task,
   answeredCount,
+  checkpoint,
+  nowTs,
 }: {
   task: InterviewPrepTask | null | undefined;
   answeredCount: number;
+  checkpoint: InterviewPrepCheckpoint | null;
+  nowTs: number;
 }) {
+  const remainingSeconds = checkpoint
+    ? Math.max(0, Math.floor((new Date(checkpoint.startedAt).getTime() + checkpoint.durationSeconds * 1000 - nowTs) / 1000))
+    : 0;
+  const remainingMinutes = Math.floor(remainingSeconds / 60);
+  const remainingRemainder = remainingSeconds % 60;
   return (
     <section className="card dashboard-card interview-prep-session-hero">
       <div>
@@ -33,10 +52,23 @@ export function SessionHero({
         </div>
         <h1>{task?.title ?? 'Interview Prep'}</h1>
         <p className="code-rooms-subtitle">
-          Сначала решаешь задачу, затем честно отмечаешь, на какие follow-up вопросы смог ответить без подсказки.
+          {checkpoint
+            ? 'Checkpoint mode: ограниченное время, ограниченные попытки и сразу verified signal в профиле после успешной сдачи.'
+            : 'Сначала решаешь задачу, затем честно отмечаешь, на какие follow-up вопросы смог ответить без подсказки.'}
         </p>
       </div>
       <div className="interview-prep-session-hero__aside">
+        {checkpoint && (
+          <div className={`interview-prep-progress interview-prep-progress--checkpoint interview-prep-progress--${checkpoint.status}`}>
+            <span>Checkpoint</span>
+            <strong>
+              {checkpoint.status === 'active'
+                ? `${remainingMinutes}:${String(remainingRemainder).padStart(2, '0')}`
+                : checkpoint.status}
+            </strong>
+            <small>{checkpoint.attemptsUsed} / {checkpoint.maxAttempts} попыток</small>
+          </div>
+        )}
         <div className="interview-prep-progress">
           <span>Пройдено вопросов</span>
           <strong>{answeredCount}</strong>
@@ -123,6 +155,7 @@ export function SessionSidebar({
 
 export function FollowUpSection({
   session,
+  checkpoint,
   canShowQuestions,
   answering,
   answerText,
@@ -134,6 +167,7 @@ export function FollowUpSection({
   onAnswer,
 }: {
   session: InterviewPrepSession;
+  checkpoint: InterviewPrepCheckpoint | null;
   canShowQuestions: boolean;
   answering: boolean;
   answerText: string;
@@ -144,6 +178,26 @@ export function FollowUpSection({
   onToggleSpeech: () => void;
   onAnswer: (selfAssessment: 'answered' | 'skipped') => void;
 }) {
+  if (checkpoint) {
+    return (
+      <section className="card dashboard-card interview-prep-question-card">
+        <div className="dashboard-card__header">
+          <div>
+            <h2>Checkpoint rules</h2>
+            <p className="interview-prep-muted">В checkpoint follow-up отключены. Verified signal строится только по timed submit.</p>
+          </div>
+          <ShieldBadge status={checkpoint.status} />
+        </div>
+        <div className="interview-prep-muted">
+          {checkpoint.status === 'active' && 'Сдай задачу вовремя. После accepted сессия завершится и результат уйдет в verified skill.'}
+          {checkpoint.status === 'passed' && `Checkpoint passed. В профиль ушел verified score ${checkpoint.score}.`}
+          {checkpoint.status === 'failed' && 'Checkpoint failed: попытки закончились.'}
+          {checkpoint.status === 'expired' && 'Checkpoint expired: время закончилось.'}
+        </div>
+      </section>
+    );
+  }
+
   if (session.status === 'finished') {
     return (
       <section className="card dashboard-card interview-prep-finished">
@@ -257,6 +311,7 @@ export function FollowUpSection({
 
 export function LiveCodingSection({
   task,
+  checkpoint,
   canSubmitExecutable,
   solveLanguage,
   solveLanguageOptions,
@@ -275,6 +330,7 @@ export function LiveCodingSection({
   onSubmitCode,
 }: {
   task: InterviewPrepTask;
+  checkpoint: InterviewPrepCheckpoint | null;
   canSubmitExecutable: boolean;
   solveLanguage: string;
   solveLanguageOptions: string[];
@@ -305,7 +361,9 @@ export function LiveCodingSection({
         <div>
           <h2>Live coding</h2>
           <p className="interview-prep-muted">
-            У каждого пользователя свой editor и свой `session_id`, поэтому решения одной и той же задачи не пересекаются.
+            {checkpoint
+              ? 'Checkpoint mode: follow-up отключены, время ограничено, verified signal дается только за успешный timed submit.'
+              : 'У каждого пользователя свой editor и свой `session_id`, поэтому решения одной и той же задачи не пересекаются.'}
           </p>
         </div>
         <TerminalSquare size={18} />

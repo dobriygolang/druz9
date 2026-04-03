@@ -552,6 +552,10 @@
   gap: var(--space-3);
 }
 
+.arena-rules-overview--compact {
+  margin-top: 0;
+}
+
 .arena-open-card,
 .arena-rules-overview__card,
 .arena-rules-overview__item {
@@ -601,8 +605,17 @@
   background: var(--surface-elevated);
 }
 
+.arena-rules-overview__list {
+  display: grid;
+  gap: var(--space-3);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
 .arena-rules-overview__item {
-  display: inline-flex;
+  display: grid;
+  grid-template-columns: 8px minmax(0, 1fr);
   align-items: flex-start;
   gap: var(--space-3);
   padding: var(--space-3) var(--space-4);
@@ -635,6 +648,22 @@
   border-radius: var(--radius-xs);
   font-family: 'Fira Code', monospace;
   font-size: 12px;
+}
+
+.arena-rules-overview__item--league {
+  grid-template-columns: 8px minmax(0, 1fr) auto;
+  align-items: center;
+}
+
+.arena-rules-overview__league-name {
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.arena-rules-overview__league-rating {
+  font-size: var(--font-size-sm);
+  color: var(--accent-hover);
+  white-space: nowrap;
 }
 
 /* Task List */
@@ -723,6 +752,10 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: 16px;
+  padding-bottom: 14px;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--border-subtle);
+  flex-shrink: 0;
 }
 
 .admin-modal__header-actions {
@@ -735,6 +768,10 @@
 .admin-modal__actions {
   margin-top: 0;
   flex-shrink: 0;
+  position: sticky;
+  bottom: 0;
+  background: linear-gradient(180deg, rgba(20, 24, 34, 0), rgba(20, 24, 34, 0.98) 20%);
+  padding-top: 18px;
 }
 
 .admin-template-strip {
@@ -742,6 +779,36 @@
   flex-wrap: wrap;
   gap: 8px;
   margin-bottom: 16px;
+}
+
+.form-group--full {
+  grid-column: 1 / -1;
+}
+
+.topic-picker {
+  display: grid;
+  gap: 12px;
+}
+
+.topic-picker__selected,
+.topic-picker__catalog {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.topic-picker__create {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+}
+
+.topic-chip--interactive {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  border: none;
 }
 
 .task-cases-grid {
@@ -1119,6 +1186,10 @@
   .task-cases-grid,
   .task-policy-grid,
   .task-policy-help__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .topic-picker__create {
     grid-template-columns: 1fr;
   }
 

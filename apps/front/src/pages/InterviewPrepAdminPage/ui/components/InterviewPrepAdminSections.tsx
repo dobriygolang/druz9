@@ -1,7 +1,7 @@
 import React from 'react';
 import { ListChecks, Pencil, Plus, Settings2, ShieldCheck, Trash2, X } from 'lucide-react';
 
-import { CodeTask } from '@/entities/CodeRoom/model/types';
+import { CodeTaskCase } from '@/entities/CodeRoom/model/types';
 import {
   InterviewPrepMockCompanyPreset,
   InterviewPrepMockQuestionPoolItem,
@@ -13,10 +13,11 @@ import {
 import { FancySelect } from '@/shared/ui/FancySelect';
 
 import {
-  createEmptyQuestionForm,
   applyTaskTemplate,
+  createEmptyQuestionForm,
+  createEmptyCase,
   INTERVIEW_PREP_TEMPLATES,
-  LANGUAGE_OPTIONS,
+  languageOptionsForPrepType,
   mockCompanyPresetToForm,
   MockCompanyPresetFormState,
   mockQuestionPoolToForm,
@@ -410,20 +411,24 @@ export function InterviewPrepTaskModal({
   open,
   saving,
   form,
-  codeTasks,
   onClose,
   onSave,
   onTitleChange,
   onFormChange,
+  updateTaskCase,
+  addTaskCase,
+  removeTaskCase,
 }: {
   open: boolean;
   saving: boolean;
   form: TaskFormState;
-  codeTasks: CodeTask[];
   onClose: () => void;
   onSave: () => void;
   onTitleChange: (title: string) => void;
   onFormChange: React.Dispatch<React.SetStateAction<TaskFormState>>;
+  updateTaskCase: (key: 'publicTestCases' | 'hiddenTestCases', index: number, field: 'input' | 'expectedOutput', value: string) => void;
+  addTaskCase: (key: 'publicTestCases' | 'hiddenTestCases', isPublic: boolean) => void;
+  removeTaskCase: (key: 'publicTestCases' | 'hiddenTestCases', index: number) => void;
 }) {
   const [showAdvanced, setShowAdvanced] = React.useState(false);
 
@@ -475,7 +480,17 @@ export function InterviewPrepTaskModal({
               <select
                 className="input"
                 value={form.prepType}
-                onChange={(event) => onFormChange((prev) => ({ ...prev, prepType: event.target.value as InterviewPrepType }))}
+                onChange={(event) => {
+                  const prepType = event.target.value as InterviewPrepType;
+                  const language = languageOptionsForPrepType(prepType)[0]?.value || form.language;
+                  onFormChange((prev) => ({
+                    ...prev,
+                    prepType,
+                    language,
+                    supportedLanguages: language === 'system_design' ? [] : [language],
+                    isExecutable: prepType === 'system_design' ? false : prev.isExecutable,
+                  }));
+                }}
               >
                 {PREP_TYPES.map((item) => (
                   <option key={item.value} value={item.value}>{item.label}</option>
@@ -486,8 +501,12 @@ export function InterviewPrepTaskModal({
               <label>Язык</label>
               <FancySelect
                 value={form.language}
-                options={LANGUAGE_OPTIONS}
-                onChange={(language) => onFormChange((prev) => ({ ...prev, language }))}
+                options={languageOptionsForPrepType(form.prepType)}
+                onChange={(language) => onFormChange((prev) => ({
+                  ...prev,
+                  language,
+                  supportedLanguages: language === 'system_design' ? [] : [language],
+                }))}
               />
             </div>
             <div className="form-group">
@@ -500,11 +519,45 @@ export function InterviewPrepTaskModal({
               />
             </div>
             <div className="form-group">
-              <label>Режим</label>
+              <label>Формат</label>
               <div className="task-policy-empty">
-                {form.isExecutable ? 'Live coding с автопроверкой и follow-up после accepted.' : 'Guided interview question без автопроверки.'}
+                {form.prepType === 'system_design'
+                  ? 'Обсуждение архитектуры и системы.'
+                  : form.prepType === 'sql'
+                    ? 'SQL-задача или вопрос по базам данных.'
+                    : 'Кодинг-задача с follow-up вопросами.'}
               </div>
             </div>
+          </div>
+
+          <div className="interview-prep-toggle-row">
+            <label className="toggle-field">
+              <input
+                type="checkbox"
+                checked={form.isExecutable}
+                disabled={form.prepType === 'system_design'}
+                onChange={(event) => onFormChange((prev) => ({
+                  ...prev,
+                  isExecutable: event.target.checked,
+                  starterCode: event.target.checked
+                    ? (prev.starterCode || (prev.language === 'sql'
+                      ? '-- Write SQL solution here\nSELECT 1;\n'
+                      : 'package main\n\nfunc solve(input string) string {\n\t_ = input\n\t// TODO: parse input and return the answer as a string.\n\treturn "implement me"\n}\n'))
+                    : prev.starterCode,
+                  publicTestCases: event.target.checked ? prev.publicTestCases : [createEmptyCase(true, 1)],
+                  hiddenTestCases: event.target.checked ? prev.hiddenTestCases : [createEmptyCase(false, 1)],
+                }))}
+              />
+              <span>Нужно запускать код</span>
+            </label>
+            <label className="toggle-field">
+              <input
+                type="checkbox"
+                checked={form.isActive}
+                onChange={(event) => onFormChange((prev) => ({ ...prev, isActive: event.target.checked }))}
+              />
+              <span>Активна</span>
+            </label>
           </div>
 
           <div className="form-group">
@@ -517,42 +570,70 @@ export function InterviewPrepTaskModal({
           </div>
 
           {form.isExecutable && (
-            <div className="form-group">
-              <label>Starter Code</label>
-              <textarea
-                className="input textarea code-textarea"
-                value={form.starterCode}
-                onChange={(event) => onFormChange((prev) => ({ ...prev, starterCode: event.target.value }))}
-              />
-            </div>
+            <>
+              <div className="form-group">
+                <label>Starter Code</label>
+                <textarea
+                  className="input textarea code-textarea"
+                  value={form.starterCode}
+                  onChange={(event) => onFormChange((prev) => ({ ...prev, starterCode: event.target.value }))}
+                />
+              </div>
+
+              <div className="task-cases-grid">
+                {(['publicTestCases', 'hiddenTestCases'] as const).map((key) => {
+                  const title = key === 'publicTestCases' ? 'Публичные тесты' : 'Скрытые тесты';
+                  const isPublic = key === 'publicTestCases';
+                  return (
+                    <div key={key} className="task-cases-card">
+                      <div className="dashboard-card__header">
+                        <h3>{title}</h3>
+                        <button className="btn btn-secondary btn-sm" onClick={() => addTaskCase(key, isPublic)}>
+                          <Plus size={14} />
+                          Тест
+                        </button>
+                      </div>
+                      <div className="task-case-list">
+                        {form[key].map((testCase: CodeTaskCase, index: number) => (
+                          <div key={`${key}-${index}`} className="task-case-item">
+                            <div className="task-case-item__header">
+                              <span>Тест #{index + 1}</span>
+                              <button className="btn-icon danger" onClick={() => removeTaskCase(key, index)}>
+                                <Trash2 size={14} />
+                              </button>
+                            </div>
+                            <textarea
+                              className="input textarea"
+                              placeholder="input"
+                              value={testCase.input}
+                              onChange={(event) => updateTaskCase(key, index, 'input', event.target.value)}
+                            />
+                            <textarea
+                              className="input textarea"
+                              placeholder="expected output"
+                              value={testCase.expectedOutput}
+                              onChange={(event) => updateTaskCase(key, index, 'expectedOutput', event.target.value)}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
           )}
 
           <div className="form-group">
-            <label>Reference Solution</label>
+            <label>Эталонный ответ / разбор</label>
+            <div className="interview-prep-muted">
+              Сюда пиши правильное решение, разбор, SQL-запрос или ключевые тезисы. Это бывший `Reference Solution`.
+            </div>
             <textarea
               className="input textarea code-textarea"
               value={form.referenceSolution}
               onChange={(event) => onFormChange((prev) => ({ ...prev, referenceSolution: event.target.value }))}
             />
-          </div>
-
-          <div className="interview-prep-toggle-row">
-            <label className="toggle-field">
-              <input
-                type="checkbox"
-                checked={form.isExecutable}
-                onChange={(event) => onFormChange((prev) => ({ ...prev, isExecutable: event.target.checked }))}
-              />
-              Executable
-            </label>
-            <label className="toggle-field">
-              <input
-                type="checkbox"
-                checked={form.isActive}
-                onChange={(event) => onFormChange((prev) => ({ ...prev, isActive: event.target.checked }))}
-              />
-              Активна
-            </label>
           </div>
 
           <div className="interview-prep-question-toolbar">
@@ -586,47 +667,9 @@ export function InterviewPrepTaskModal({
                   />
                 </div>
                 <div className="form-group">
-                  <label>Execution Profile</label>
-                  <input
-                    className="input"
-                    value={form.executionProfile}
-                    onChange={(event) => onFormChange((prev) => ({ ...prev, executionProfile: event.target.value }))}
-                  />
-                </div>
-                <div className="form-group">
-                  <label>Runner Mode</label>
-                  <input
-                    className="input"
-                    value={form.runnerMode}
-                    onChange={(event) => onFormChange((prev) => ({ ...prev, runnerMode: event.target.value }))}
-                  />
-                </div>
-                {form.isExecutable && (
-                  <div className="form-group">
-                    <label>Code task для автопроверки</label>
-                    <FancySelect
-                      value={form.codeTaskId || '__none__'}
-                      options={[
-                        { value: '__none__', label: 'Не привязано' },
-                        ...codeTasks.map((task) => ({
-                          value: task.id,
-                          label: `${task.title} (${task.language})`,
-                        })),
-                      ]}
-                      onChange={(codeTaskId) => onFormChange((prev) => ({
-                        ...prev,
-                        codeTaskId: codeTaskId === '__none__' ? '' : codeTaskId,
-                      }))}
-                    />
-                  </div>
-                )}
-                <div className="form-group">
                   <label>Языки решения</label>
                   <div className="pill-selector">
-                    {LANGUAGE_OPTIONS.map((option) => {
-                      if (option.value === 'system_design') {
-                        return null;
-                      }
+                    {languageOptionsForPrepType(form.prepType).map((option) => {
                       const active = form.supportedLanguages.includes(option.value);
                       return (
                         <button
@@ -646,6 +689,14 @@ export function InterviewPrepTaskModal({
                     })}
                   </div>
                 </div>
+                {form.isExecutable && form.codeTaskId && (
+                  <div className="form-group">
+                    <label>Автопроверка</label>
+                    <div className="task-policy-empty">
+                      Связанный `code task` уже существует и обновится автоматически при сохранении.
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           )}

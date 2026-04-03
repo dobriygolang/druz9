@@ -21,6 +21,7 @@ import {
   MockQuestionPoolsSection,
 } from './components/InterviewPrepAdminSections';
 import {
+  createEmptyCase,
   createEmptyMockCompanyPresetForm,
   createEmptyMockQuestionPoolForm,
   createEmptyQuestionForm,
@@ -131,7 +132,8 @@ export const InterviewPrepAdminPage: React.FC = () => {
   const openCreateTaskModal = (task?: InterviewPrepTask) => {
     setStatus('');
     setError('');
-    setTaskForm(task ? taskToForm(task) : createEmptyTaskForm());
+    const linkedCodeTask = task?.codeTaskId ? codeTasks.find((item) => item.id === task.codeTaskId) ?? null : null;
+    setTaskForm(task ? taskToForm(task, linkedCodeTask) : createEmptyTaskForm());
     setTaskModalOpen(true);
   };
 
@@ -170,10 +172,59 @@ export const InterviewPrepAdminPage: React.FC = () => {
       return;
     }
 
+    if (taskForm.isExecutable) {
+      const hasAtLeastOneCase = [...taskForm.publicTestCases, ...taskForm.hiddenTestCases]
+        .some((item) => item.input.trim() || item.expectedOutput.trim());
+      if (!hasAtLeastOneCase) {
+        setError('Для executable-задачи нужен хотя бы один тест.');
+        return;
+      }
+    }
+
     setSaving(true);
     setError('');
     setStatus('');
     try {
+      let linkedCodeTaskId = taskForm.codeTaskId || '';
+      if (taskForm.isExecutable) {
+        const codeTaskPayload = {
+          title: `[Interview Prep] ${taskForm.title.trim()}`,
+          slug: `interview-prep-${toSlug(taskForm.slug || taskForm.title)}`,
+          statement: taskForm.statement.trim(),
+          difficulty: 'medium',
+          topics: ['interview-prep'],
+          starterCode: taskForm.starterCode,
+          language: taskForm.language === 'sql' ? 'sql' : 'go',
+          taskType: 'algorithm_practice',
+          executionProfile: 'pure',
+          runnerMode: 'function_io',
+          durationSeconds: taskForm.durationSeconds || 1800,
+          fixtureFiles: [],
+          readablePaths: [],
+          writablePaths: [],
+          allowedHosts: [],
+          allowedPorts: [],
+          mockEndpoints: [],
+          writableTempDir: false,
+          isActive: false,
+          publicTestCases: taskForm.publicTestCases
+            .filter((item) => item.input.trim() || item.expectedOutput.trim())
+            .map((item, index) => ({ ...item, isPublic: true, order: index + 1 })),
+          hiddenTestCases: taskForm.hiddenTestCases
+            .filter((item) => item.input.trim() || item.expectedOutput.trim())
+            .map((item, index) => ({ ...item, isPublic: false, order: index + 1 })),
+        };
+
+        if (linkedCodeTaskId) {
+          await codeRoomApi.adminUpdateTask(linkedCodeTaskId, codeTaskPayload);
+        } else {
+          const createdCodeTask = await codeRoomApi.adminCreateTask(codeTaskPayload);
+          linkedCodeTaskId = createdCodeTask.id;
+        }
+      } else {
+        linkedCodeTaskId = '';
+      }
+
       const payload = {
         ...taskForm,
         slug: toSlug(taskForm.slug || taskForm.title),
@@ -181,9 +232,9 @@ export const InterviewPrepAdminPage: React.FC = () => {
         supportedLanguages: taskForm.language === 'system_design'
           ? []
           : (taskForm.supportedLanguages.length ? taskForm.supportedLanguages : [taskForm.language]),
-        executionProfile: taskForm.executionProfile || 'pure',
-        runnerMode: taskForm.runnerMode || 'function_io',
-        codeTaskId: taskForm.codeTaskId || undefined,
+        executionProfile: 'pure',
+        runnerMode: 'function_io',
+        codeTaskId: linkedCodeTaskId || undefined,
       };
       if (taskForm.id) {
         await interviewPrepApi.adminUpdateTask(taskForm.id, payload);
@@ -200,6 +251,36 @@ export const InterviewPrepAdminPage: React.FC = () => {
     } finally {
       setSaving(false);
     }
+  };
+
+  const updateTaskCase = (
+    key: 'publicTestCases' | 'hiddenTestCases',
+    index: number,
+    field: 'input' | 'expectedOutput',
+    value: string,
+  ) => {
+    setTaskForm((prev) => {
+      const nextCases = [...prev[key]];
+      nextCases[index] = { ...nextCases[index], [field]: value };
+      return { ...prev, [key]: nextCases };
+    });
+  };
+
+  const addTaskCase = (key: 'publicTestCases' | 'hiddenTestCases', isPublic: boolean) => {
+    setTaskForm((prev) => ({
+      ...prev,
+      [key]: [...prev[key], createEmptyCase(isPublic, prev[key].length + 1)],
+    }));
+  };
+
+  const removeTaskCase = (key: 'publicTestCases' | 'hiddenTestCases', index: number) => {
+    setTaskForm((prev) => {
+      const nextCases = prev[key].filter((_, currentIndex) => currentIndex !== index);
+      return {
+        ...prev,
+        [key]: nextCases.length > 0 ? nextCases : [createEmptyCase(key === 'publicTestCases', 1)],
+      };
+    });
   };
 
   const handleDeleteTask = async (taskId: string) => {
@@ -417,11 +498,13 @@ export const InterviewPrepAdminPage: React.FC = () => {
         open={taskModalOpen}
         saving={saving}
         form={taskForm}
-        codeTasks={codeTasks}
         onClose={closeTaskModal}
         onSave={() => void handleSaveTask()}
         onTitleChange={handleTaskTitleChange}
         onFormChange={setTaskForm}
+        updateTaskCase={updateTaskCase}
+        addTaskCase={addTaskCase}
+        removeTaskCase={removeTaskCase}
       />
 
       <InterviewPrepQuestionModal

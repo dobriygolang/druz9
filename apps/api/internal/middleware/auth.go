@@ -163,11 +163,16 @@ func RequireAdmin() middleware.Middleware {
 
 func extractSessionToken(tr transport.Transporter, cookieName string) (string, error) {
 	if ht, ok := tr.(*kratoshttp.Transport); ok {
-		cookie, err := ht.Request().Cookie(cookieName)
-		if err != nil {
-			return "", err
+		if ht.Request() != nil {
+			cookie, err := ht.Request().Cookie(cookieName)
+			if err == nil && strings.TrimSpace(cookie.Value) != "" {
+				return cookie.Value, nil
+			}
+			if token := bearerTokenFromHeader(ht.Request().Header.Get("Authorization")); token != "" {
+				return token, nil
+			}
 		}
-		return cookie.Value, nil
+		return "", http.ErrNoCookie
 	}
 
 	if gt, ok := tr.(*kratosgrpc.Transport); ok {
@@ -177,13 +182,28 @@ func extractSessionToken(tr transport.Transporter, cookieName string) (string, e
 		}
 		req := http.Request{Header: http.Header{"Cookie": []string{header}}}
 		cookie, err := req.Cookie(cookieName)
-		if err != nil {
-			return "", err
+		if err == nil && strings.TrimSpace(cookie.Value) != "" {
+			return cookie.Value, nil
 		}
-		return cookie.Value, nil
+		if token := bearerTokenFromHeader(gt.RequestHeader().Get("Authorization")); token != "" {
+			return token, nil
+		}
+		return "", http.ErrNoCookie
 	}
 
 	return "", http.ErrNoCookie
+}
+
+func bearerTokenFromHeader(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return ""
+	}
+	const prefix = "bearer "
+	if len(value) < len(prefix) || strings.ToLower(value[:len(prefix)]) != prefix {
+		return ""
+	}
+	return strings.TrimSpace(value[len(prefix):])
 }
 
 func hasExplicitGuestOverride(ctx context.Context) bool {

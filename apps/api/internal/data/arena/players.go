@@ -15,6 +15,8 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+const antiCheatDuplicateWindow = 2 * time.Second
+
 func (r *Repo) loadPlayersForMatches(ctx context.Context, matches []*domain.Match, matchMap map[uuid.UUID]*domain.Match) error {
 	if len(matches) == 0 {
 		return nil
@@ -166,20 +168,37 @@ func (r *Repo) ReportPlayerSuspicion(ctx context.Context, matchID, userID uuid.U
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
-	res, err := tx.Exec(ctx, `
+	now := time.Now()
+
+	var (
+		lastReason string
+		lastAt     pgtype.Timestamptz
+	)
+	if err := tx.QueryRow(ctx, `
+		SELECT last_suspicion_reason, last_suspicion_at
+		FROM arena_match_players
+		WHERE match_id = $1 AND user_id = $2
+		FOR UPDATE
+	`, matchID, userID).Scan(&lastReason, &lastAt); err != nil {
+		return fmt.Errorf("load arena suspicion state: %w", err)
+	}
+
+	if shouldDeduplicateSuspicion(lastReason, timestamptzPtr(lastAt), reason, now) {
+		if err := tx.Commit(ctx); err != nil {
+			return fmt.Errorf("commit report arena suspicion noop tx: %w", err)
+		}
+		return nil
+	}
+
+	if _, err := tx.Exec(ctx, `
 		UPDATE arena_match_players
 		SET suspicion_count = suspicion_count + 1,
 		    last_suspicion_reason = $3,
-		    last_suspicion_at = NOW(),
-		    updated_at = NOW()
+		    last_suspicion_at = $4,
+		    updated_at = $4
 		WHERE match_id = $1 AND user_id = $2
-	`, matchID, userID, reason)
-	if err != nil {
+	`, matchID, userID, reason, now); err != nil {
 		return fmt.Errorf("report arena suspicion: %w", err)
-	}
-
-	if res.RowsAffected() == 0 {
-		return fmt.Errorf("report arena suspicion: player %s is not in match %s", userID, matchID)
 	}
 
 	if err := tx.Commit(ctx); err != nil {
@@ -187,6 +206,45 @@ func (r *Repo) ReportPlayerSuspicion(ctx context.Context, matchID, userID uuid.U
 	}
 
 	return nil
+}
+
+func shouldDeduplicateSuspicion(lastReason string, lastAt *time.Time, nextReason string, now time.Time) bool {
+	if lastAt == nil || lastAt.IsZero() || now.Sub(*lastAt) > antiCheatDuplicateWindow {
+		return false
+	}
+
+	prev := normalizeSuspicionReason(lastReason)
+	next := normalizeSuspicionReason(nextReason)
+	if prev == "" || next == "" {
+		return false
+	}
+
+	if prev == next {
+		return true
+	}
+
+	return isFocusLossSuspicion(prev) && isFocusLossSuspicion(next)
+}
+
+func normalizeSuspicionReason(reason string) string {
+	return strings.ToLower(strings.TrimSpace(reason))
+}
+
+func isFocusLossSuspicion(reason string) bool {
+	switch normalizeSuspicionReason(reason) {
+	case "tab_hidden", "window_blur":
+		return true
+	default:
+		return false
+	}
+}
+
+func timestamptzPtr(value pgtype.Timestamptz) *time.Time {
+	if !value.Valid {
+		return nil
+	}
+	t := value.Time
+	return &t
 }
 
 func (r *Repo) ApplyAntiCheatPenalty(ctx context.Context, matchID, userID uuid.UUID, delta int32, reason string) error {

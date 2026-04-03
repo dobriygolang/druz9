@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { geoApi } from '@/features/Geo/api/geoApi';
-import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Code2, ArrowRight, Settings, Shield, BookOpen } from 'lucide-react';
+import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Code2, ArrowRight, Settings, Shield, BookOpen, Orbit } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const { logout, isAuthenticated, user } = useAuth();
@@ -34,7 +34,7 @@ export const Sidebar: React.FC = () => {
       <div className="sidebar-desktop__brand">
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
           <div style={{ fontWeight: '700', fontSize: '20px', letterSpacing: '1px' }}>Друзья</div>
-          <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '500', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '6px' }}>v1.5.0</span>
+          <span style={{ fontSize: '11px', color: 'var(--text-secondary)', fontWeight: '500', background: 'rgba(255,255,255,0.05)', padding: '2px 6px', borderRadius: '6px' }}>v1.5.2</span>
         </div>
         {isAuthenticated && (
           <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '12px' }}>
@@ -53,6 +53,7 @@ export const Sidebar: React.FC = () => {
         {isAuthenticated ? (
           <>
             <NavItem to="/feed" icon={<Compass size={20} />} label="Подкаст" />
+            <NavItem to="/circles" icon={<Orbit size={20} />} label="Circles" />
             <NavItem to="/users" icon={<Users size={20} />} label="Пользователи" />
             <NavItem to="/events" icon={<Calendar size={20} />} label="Ивент" />
             <NavItem to="/vacancies" icon={<Briefcase size={20} />} label="Вакансии" />

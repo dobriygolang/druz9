@@ -75,7 +75,6 @@ const LEAGUES = [
 const ARENA_RULE_SECTIONS = [
   {
     title: 'Arena duel',
-    caption: 'Как определяется победитель',
     items: [
       'Побеждает первый accepted submit.',
       'После wrong answer или runtime error включается freeze на 30 секунд.',
@@ -83,18 +82,7 @@ const ARENA_RULE_SECTIONS = [
     ],
   },
   {
-    title: 'Policy layer',
-    caption: 'Что именно задача может делать во время запуска',
-    items: [
-      '`pure`: можно читать вход и печатать ответ. Нельзя файлы, сеть, временную запись.',
-      '`file_io`: можно читать только заранее выданные файлы. Нельзя интернет, нельзя выходить за workspace.',
-      '`http_client`: можно делать HTTP-запросы только в разрешенные mock/host endpoints. Нельзя произвольную сеть и файлы.',
-      '`interview_realistic`: можно разрешенные файлы и mock HTTP. Нельзя внешний интернет и unrestricted access.',
-    ],
-  },
-  {
     title: 'Рейтинг',
-    caption: 'Что влияет на ELO',
     items: [
       'Новый игрок стартует с 300 ELO.',
       'Сложность влияет на изменение рейтинга: easy 1x, medium 1.5x, hard 2x.',

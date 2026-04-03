@@ -12,7 +12,8 @@ import {
   BookOpen,
   Settings,
   Shield,
-  LogOut
+  LogOut,
+  Orbit,
 } from 'lucide-react';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { MobileDrawer } from '@/shared/ui/MobileDrawer/MobileDrawer';
@@ -44,6 +45,7 @@ export const BottomNav: React.FC = () => {
       >
         <div className="mobile-menu-grid">
           <MenuLink to="/profile" icon={<UserIcon size={20} />} label="Мой профиль" onClick={() => setIsMenuOpen(false)} />
+          <MenuLink to="/circles" icon={<Orbit size={20} />} label="Circles" onClick={() => setIsMenuOpen(false)} />
           <MenuLink to="/users" icon={<Users size={20} />} label="Сообщество" onClick={() => setIsMenuOpen(false)} />
           <MenuLink to="/vacancies" icon={<Briefcase size={20} />} label="Вакансии" onClick={() => setIsMenuOpen(false)} />
           

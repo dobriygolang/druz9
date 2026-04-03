@@ -228,6 +228,13 @@
   white-space: nowrap;
 }
 
+.interview-prep-card__actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .interview-prep-group__more {
   display: flex;
   justify-content: center;
@@ -270,6 +277,47 @@
 .interview-prep-progress strong {
   font-size: 28px;
   line-height: 1;
+}
+
+.interview-prep-progress small {
+  color: var(--text-secondary);
+}
+
+.interview-prep-progress--checkpoint {
+  background:
+    radial-gradient(circle at top left, rgba(245, 158, 11, 0.14), transparent 42%),
+    rgba(255, 255, 255, 0.03);
+  border-color: rgba(245, 158, 11, 0.18);
+}
+
+.interview-prep-progress--passed {
+  border-color: rgba(16, 185, 129, 0.24);
+}
+
+.interview-prep-progress--failed,
+.interview-prep-progress--expired {
+  border-color: rgba(239, 68, 68, 0.24);
+}
+
+.interview-prep-checkpoint-badge {
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.interview-prep-checkpoint-badge--active {
+  background: rgba(245, 158, 11, 0.12);
+  color: #fbbf24;
+}
+
+.interview-prep-checkpoint-badge--passed {
+  background: rgba(16, 185, 129, 0.14);
+  color: #6ee7b7;
+}
+
+.interview-prep-checkpoint-badge--failed,
+.interview-prep-checkpoint-badge--expired {
+  background: rgba(239, 68, 68, 0.14);
+  color: #fca5a5;
 }
 
 .interview-prep-statement,
@@ -657,6 +705,18 @@
   display: flex;
   flex-direction: column;
   overflow: hidden;
+}
+
+.interview-prep-modal .modal-scroll-content {
+  padding-top: 18px;
+}
+
+.interview-prep-modal .toggle-field {
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  background: var(--surface-color);
 }
 
 @media (max-width: 960px) {

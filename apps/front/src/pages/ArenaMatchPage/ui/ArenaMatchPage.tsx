@@ -376,15 +376,15 @@ export const ArenaMatchPage: React.FC = () => {
       return;
     }
 
-    const report = async (reason: string, message: string) => {
+    const report = async (reason: string, message: string, cooldownKey = reason) => {
       const now = Date.now();
-      const last = antiCheatCooldownsRef.current.get(reason) || 0;
+      const last = antiCheatCooldownsRef.current.get(cooldownKey) || 0;
 
       if (now - last < 5000) {
         return;
       }
 
-      antiCheatCooldownsRef.current.set(reason, now);
+      antiCheatCooldownsRef.current.set(cooldownKey, now);
 
       try {
         await codeRoomApi.reportArenaSuspicion(
@@ -396,7 +396,7 @@ export const ArenaMatchPage: React.FC = () => {
 
         const nextStrikes = Math.min(myAntiCheatStrikes + 1, 2);
         const suffix = nextStrikes >= 2
-          ? ' Матч будет завершён из-за повторного нарушения.'
+          ? ' Применён штраф рейтинга.'
           : ` (${nextStrikes}/2)`;
 
         setAntiCheatNotice(`${message}${suffix}`);
@@ -407,13 +407,13 @@ export const ArenaMatchPage: React.FC = () => {
 
     const handleVisibilityChange = () => {
       if (document.visibilityState === 'hidden') {
-        void report('tab_hidden', 'Выход из вкладки зафиксирован anti-cheat системой');
+        void report('tab_hidden', 'Выход из вкладки зафиксирован anti-cheat системой', 'focus_loss');
       }
     };
 
     const handleBlur = () => {
       if (document.visibilityState === 'visible') {
-        void report('window_blur', 'Переключение окна зафиксировано anti-cheat системой');
+        void report('window_blur', 'Переключение окна зафиксировано anti-cheat системой', 'focus_loss');
       }
     };
 

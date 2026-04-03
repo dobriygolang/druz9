@@ -10,6 +10,47 @@ groups:
           summary: "Backend недоступен"
           description: "Prometheus не может собрать метрики с backend больше 1 минуты."
 
+      - alert: SandboxRunnerDown
+        expr: up{job="sandbox_runner"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Sandbox runner недоступен"
+          description: "Prometheus не может собрать метрики с sandbox-runner больше 1 минуты."
+
+      - alert: SandboxRunnerHighExecutionErrorRate
+        expr: |
+          (
+            sum(rate(sandbox_runner_executions_total{status="error"}[5m]))
+            /
+            clamp_min(sum(rate(sandbox_runner_executions_total[5m])), 0.1)
+          ) > 0.2
+          and
+          sum(rate(sandbox_runner_executions_total[5m])) > 0.05
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Высокая доля ошибок sandbox runner"
+          description: "Больше 20% sandbox execution запросов завершаются ошибкой дольше 5 минут."
+
+      - alert: SandboxRunnerCriticalExecutionErrorRate
+        expr: |
+          (
+            sum(rate(sandbox_runner_executions_total{status="error"}[5m]))
+            /
+            clamp_min(sum(rate(sandbox_runner_executions_total[5m])), 0.1)
+          ) > 0.5
+          and
+          sum(rate(sandbox_runner_executions_total[5m])) > 0.05
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Критическая доля ошибок sandbox runner"
+          description: "Больше 50% sandbox execution запросов завершаются ошибкой."
+
       - alert: PostgresExporterDown
         expr: up{job="postgres"} == 0
         for: 2m

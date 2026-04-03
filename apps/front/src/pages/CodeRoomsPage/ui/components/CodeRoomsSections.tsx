@@ -28,7 +28,6 @@ type LaunchMode = CodeRoomMode | 'queue';
 
 type RuleSection = {
   title: string;
-  caption: string;
   items: string[];
 };
 
@@ -381,28 +380,20 @@ export function ArenaSecondaryGrid({
       </section>
 
       <section className="card dashboard-card">
-        <div className="dashboard-card__header">
-          <div className="dashboard-card__header-left">
-            <h3>Правила арены</h3>
-            <p className="dashboard-card__subtitle">Коротко о том, как сейчас работает duel flow.</p>
-          </div>
-          <ShieldCheck size={18} />
-        </div>
-        <div className="arena-rules-overview">
+        <div className="arena-rules-overview arena-rules-overview--compact">
           {ruleSections.map((section) => (
             <div key={section.title} className="arena-rules-overview__card">
               <div className="arena-rules-overview__card-head">
                 <div className="arena-rules-overview__title">{section.title}</div>
-                <div className="arena-rules-overview__caption">{section.caption}</div>
               </div>
-              <div className="arena-rules-overview__chips">
+              <ul className="arena-rules-overview__list">
                 {section.items.map((rule) => (
-                  <div key={rule} className="arena-rules-overview__item">
+                  <li key={rule} className="arena-rules-overview__item">
                     <span className="arena-rules-overview__dot" />
                     <span>{rule}</span>
-                  </div>
+                  </li>
                 ))}
-              </div>
+              </ul>
             </div>
           ))}
         </div>
@@ -559,33 +550,46 @@ export function LeaguesModal({
       <div className="modal modal-wide code-room-leagues-modal" onClick={(e) => e.stopPropagation()}>
         <h2>Лиги и ELO</h2>
         <p className="dashboard-card__subtitle">
-          Новый игрок стартует с <strong>300 ELO</strong>. Чем сложнее задача, тем сильнее изменение рейтинга.
+          Рейтинг нужен для подбора силы соперника и перехода между лигами. Новый игрок стартует с <strong>300 ELO</strong>.
         </p>
-        <div className="arena-rules-overview">
+        <div className="arena-rules-overview arena-rules-overview--leagues">
           <div className="arena-rules-overview__card">
             <div className="arena-rules-overview__card-head">
-              <div className="arena-rules-overview__title">Формула</div>
-              <div className="arena-rules-overview__caption">Сложность влияет на коэффициент изменения</div>
+              <div className="arena-rules-overview__title">Как меняется рейтинг</div>
             </div>
-            <div className="arena-rules-overview__chips">
-              <div className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>`new = old + 40 * difficultyMultiplier * (score - expectedScore)`</span></div>
-              <div className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>`easy = 1x`, `medium = 1.5x`, `hard = 2x`</span></div>
-              <div className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>Минимальный рейтинг: `100`</span></div>
-            </div>
+            <ul className="arena-rules-overview__list">
+              <li className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>Победа дает рейтинг, поражение его снимает.</span></li>
+              <li className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>Если соперник был сильнее тебя, за победу получишь больше.</span></li>
+              <li className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>Чем выше сложность, тем сильнее изменение: <code>easy 1x</code>, <code>medium 1.5x</code>, <code>hard 2x</code>.</span></li>
+              <li className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>Рейтинг не падает ниже <code>100 ELO</code>.</span></li>
+            </ul>
           </div>
+
           <div className="arena-rules-overview__card">
             <div className="arena-rules-overview__card-head">
-              <div className="arena-rules-overview__title">Лиги</div>
-              <div className="arena-rules-overview__caption">Порог повышается автоматически по ELO</div>
+              <div className="arena-rules-overview__title">Ориентир по изменению за матч</div>
             </div>
-            <div className="arena-rules-overview__chips">
+            <ul className="arena-rules-overview__list">
+              <li className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>Против равного соперника: примерно <code>+20 / -20</code> на <code>easy</code>.</span></li>
+              <li className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>На <code>medium</code>: около <code>+30 / -30</code>.</span></li>
+              <li className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>На <code>hard</code>: около <code>+40 / -40</code>.</span></li>
+              <li className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>Если рейтинг игроков сильно отличается, итоговый сдвиг будет несимметричным.</span></li>
+            </ul>
+          </div>
+
+          <div className="arena-rules-overview__card">
+            <div className="arena-rules-overview__card-head">
+              <div className="arena-rules-overview__title">Лестница лиг</div>
+            </div>
+            <ul className="arena-rules-overview__list">
               {leagues.map((league) => (
-                <div key={league.name} className="arena-rules-overview__item">
+                <li key={league.name} className="arena-rules-overview__item arena-rules-overview__item--league">
                   <span className="arena-rules-overview__dot" />
-                  <span>{league.name}: от {league.minRating} ELO</span>
-                </div>
+                  <span className="arena-rules-overview__league-name">{league.name}</span>
+                  <span className="arena-rules-overview__league-rating">от {league.minRating} ELO</span>
+                </li>
               ))}
-            </div>
+            </ul>
           </div>
         </div>
         <div className="modal-actions">

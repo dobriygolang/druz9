@@ -12,6 +12,7 @@ const LoginPage = lazy(() => import('@/pages/LoginPage/ui/LoginPage').then(m => 
 const AuthCallbackPage = lazy(() => import('@/pages/AuthCallbackPage/ui/AuthCallbackPage').then(m => ({ default: m.AuthCallbackPage })));
 const CompleteRegistrationPage = lazy(() => import('@/pages/CompleteRegistrationPage/ui/CompleteRegistrationPage').then(m => ({ default: m.CompleteRegistrationPage })));
 const FeedPage = lazy(() => import('@/pages/FeedPage/ui/FeedPage').then(m => ({ default: m.FeedPage })));
+const CirclesPage = lazy(() => import('@/pages/CirclesPage/ui/CirclesPage').then(m => ({ default: m.CirclesPage })));
 const UsersPage = lazy(() => import('@/pages/UsersPage/ui/UsersPage').then(m => ({ default: m.UsersPage })));
 const EventsPage = lazy(() => import('@/pages/EventsPage/ui/EventsPage').then(m => ({ default: m.EventsPage })));
 const VacanciesPage = lazy(() => import('@/pages/VacanciesPage/ui/VacanciesPage').then(m => ({ default: m.VacanciesPage })));
@@ -115,6 +116,7 @@ export const RouterProvider: React.FC = () => {
         {/* Protected routes with layout */}
         <Route element={<PageLayout />}>
           <Route path="/feed" element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <FeedPage />} />
+          <Route path="/circles" element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <CirclesPage />} />
           <Route path="/users" element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <UsersPage />} />
           <Route path="/search" element={<Navigate to="/users" replace />} />
           <Route path="/events" element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <EventsPage />} />

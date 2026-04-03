@@ -15,6 +15,7 @@ import (
 const (
 	defaultEventsLimit = 20
 	maxEventsLimit     = 100
+	maxEventsWindow    = 365 * 24 * time.Hour
 )
 
 func (r *Repo) ListEvents(
@@ -62,6 +63,8 @@ func (r *Repo) ListEvents(
 }
 
 func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, string, []any, error) {
+	opts = normalizeListEventsWindow(opts, time.Now())
+
 	var args []any
 	argNum := 1
 	conditions := []string{}
@@ -125,6 +128,52 @@ JOIN users cu ON cu.id = e.creator_id
 `, whereClause)
 
 	return listQuery, strings.TrimSpace(countQuery), args, nil
+}
+
+func normalizeListEventsWindow(opts model.ListEventsOptions, now time.Time) model.ListEventsOptions {
+	defaultFrom := now.Add(-12 * time.Hour)
+	defaultTo := now.Add(maxEventsWindow)
+	if opts.Status == "past" {
+		defaultFrom = now.Add(-maxEventsWindow)
+		defaultTo = now.Add(12 * time.Hour)
+	}
+
+	switch {
+	case opts.From == nil && opts.To == nil:
+		opts.From = timePtr(defaultFrom)
+		opts.To = timePtr(defaultTo)
+	case opts.From != nil && opts.To == nil:
+		upperBound := opts.From.Add(maxEventsWindow)
+		if defaultTo.Before(upperBound) {
+			upperBound = defaultTo
+		}
+		opts.To = timePtr(upperBound)
+	case opts.From == nil && opts.To != nil:
+		lowerBound := opts.To.Add(-maxEventsWindow)
+		if defaultFrom.After(lowerBound) {
+			lowerBound = defaultFrom
+		}
+		opts.From = timePtr(lowerBound)
+	case opts.To.Sub(*opts.From) > maxEventsWindow:
+		clampedTo := opts.From.Add(maxEventsWindow)
+		if opts.Status == "past" && defaultTo.Before(clampedTo) {
+			clampedTo = defaultTo
+		}
+		if opts.Status != "past" && defaultTo.Before(clampedTo) {
+			clampedTo = defaultTo
+		}
+		opts.To = timePtr(clampedTo)
+	}
+
+	if opts.From != nil && opts.To != nil && opts.To.Before(*opts.From) {
+		opts.To = timePtr(*opts.From)
+	}
+
+	return opts
+}
+
+func timePtr(value time.Time) *time.Time {
+	return &value
 }
 
 func (r *Repo) fetchEvents(

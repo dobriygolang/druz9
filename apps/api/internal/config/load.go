@@ -354,6 +354,17 @@ func overrideSecretConfigFromEnv(cfg *Bootstrap) {
 			cfg.External.AIReview.MaxImageBytes = parsed
 		}
 	}
+	if value, ok := lookupEnvValue("SANDBOX_MODE"); ok {
+		cfg.Sandbox.Mode = strings.TrimSpace(value)
+	}
+	if value, ok := lookupEnvValue("SANDBOX_RUNNER_URL"); ok {
+		cfg.Sandbox.RunnerURL = strings.TrimSpace(value)
+	}
+	if value, ok := lookupEnvValue("SANDBOX_RUNNER_TIMEOUT"); ok {
+		if parsed, err := time.ParseDuration(value); err == nil {
+			cfg.Sandbox.Timeout = parsed
+		}
+	}
 }
 
 func lookupEnvValue(key string) (string, bool) {
@@ -421,8 +432,13 @@ func defaultBootstrap() *Bootstrap {
 				TelegramAuthMaxAge: 24 * time.Hour,
 			},
 		},
-		Dev:     &Dev{},
-		Arena:   &Arena{},
+		Dev:   &Dev{},
+		Arena: &Arena{},
+		Sandbox: &Sandbox{
+			Mode:      "local",
+			RunnerURL: "http://localhost:8098",
+			Timeout:   20 * time.Second,
+		},
 		Metrics: &Metrics{},
 		External: &External{
 			Telegram: &Telegram{},

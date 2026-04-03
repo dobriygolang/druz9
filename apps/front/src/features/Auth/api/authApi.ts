@@ -1,5 +1,6 @@
 import {
   CompleteProfilePayload,
+  ProfileProgress,
   ProfileResponse,
   User,
 } from '@/entities/User/model/types';
@@ -39,6 +40,10 @@ type BackendProfileResponse = {
   user: BackendUser;
   needs_profile_complete?: boolean;
   needsProfileComplete?: boolean;
+};
+
+type BackendProfileProgressResponse = {
+  progress?: ProfileProgress;
 };
 
 type BindTelegramResponse = {
@@ -200,6 +205,28 @@ export const authApi = {
 
     profileByIdPromises.set(userId, request);
     return request;
+  },
+  getProfileProgress: async (userId: string): Promise<ProfileProgress> => {
+    const response = await apiClient.get<BackendProfileProgressResponse>(`/api/v1/profile/${userId}/progress`);
+    return response.data.progress ?? {
+      overview: {
+        practiceSessions: 0,
+        practicePassedSessions: 0,
+        practiceActiveDays: 0,
+        completedMockSessions: 0,
+        completedMockStages: 0,
+        answeredQuestions: 0,
+        averageStageScore: 0,
+        averageQuestionScore: 0,
+        currentStreakDays: 0,
+      },
+      competencies: [],
+      strongest: [],
+      weakest: [],
+      recommendations: [],
+      checkpoints: [],
+      companies: [],
+    };
   },
   updateLocation: async (
     payload: CompleteProfilePayload,

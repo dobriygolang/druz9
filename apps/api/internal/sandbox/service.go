@@ -97,18 +97,29 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 	if err := materializeFiles(tmpDir, req.Files, cfg.Filesystem); err != nil {
 		return "", false, err
 	}
+	if err := validateExecutionRequest(req, cfg); err != nil {
+		return "", false, err
+	}
 
 	runDir := tmpDir
 	if strings.TrimSpace(req.RunnerMode) == "function_io" {
 		runDir = filepath.Join(tmpDir, "work")
 	}
 
-	command, runArgs, stdin, err := prepareExecution(tmpDir, req)
+	command, runArgs, stdin, err := prepareExecution(tmpDir, req, cfg)
 	if err != nil {
 		return "", false, err
 	}
 
-	execEnv, err := buildExecutionEnv(tmpDir, cfg.MinimalEnv)
+	networkEnv, proxyServer, err := buildNetworkEnv(execCtx, cfg.Network)
+	if err != nil {
+		return "", false, err
+	}
+	if proxyServer != nil {
+		defer proxyServer.close()
+	}
+
+	execEnv, err := buildExecutionEnv(tmpDir, cfg.MinimalEnv, networkEnv)
 	if err != nil {
 		return "", false, err
 	}
@@ -144,7 +155,7 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 	return outputStr, false, nil
 }
 
-func prepareExecution(root string, req ExecutionRequest) (string, []string, string, error) {
+func prepareExecution(root string, req ExecutionRequest, cfg policy.RunnerConfig) (string, []string, string, error) {
 	switch req.Language {
 	case policy.LanguagePython:
 		args, stdin, err := preparePythonSources(root, req)
@@ -175,7 +186,7 @@ func prepareExecution(root string, req ExecutionRequest) (string, []string, stri
 		}
 		return command, args, stdin, nil
 	case policy.LanguageGo, "":
-		args, stdin, err := prepareGoSources(root, req)
+		args, stdin, err := prepareGoSources(root, req, cfg)
 		if err != nil {
 			return "", nil, "", err
 		}
@@ -193,7 +204,7 @@ func prepareExecution(root string, req ExecutionRequest) (string, []string, stri
 	}
 }
 
-func prepareGoSources(root string, req ExecutionRequest) ([]string, string, error) {
+func prepareGoSources(root string, req ExecutionRequest, cfg policy.RunnerConfig) ([]string, string, error) {
 	mode := strings.TrimSpace(req.RunnerMode)
 	if mode == "" {
 		mode = "program"
@@ -215,6 +226,9 @@ func prepareGoSources(root string, req ExecutionRequest) ([]string, string, erro
 		if err := os.WriteFile(solutionFile, []byte(normalizeGoFunctionIOSource(req.Code)), privateFileMode); err != nil {
 			return nil, "", fmt.Errorf("write solution file: %w", err)
 		}
+		if err := maybeWriteGoHTTPProxyBootstrap(workDir, cfg); err != nil {
+			return nil, "", err
+		}
 		wrapperFile := filepath.Join(workDir, "main.go")
 		if err := os.WriteFile(wrapperFile, []byte(goFunctionIOWrapper()), privateFileMode); err != nil {
 			return nil, "", fmt.Errorf("write wrapper file: %w", err)
@@ -224,6 +238,12 @@ func prepareGoSources(root string, req ExecutionRequest) ([]string, string, erro
 		mainFile := filepath.Join(root, "main.go")
 		if err := os.WriteFile(mainFile, []byte(normalizeGoPackageSource(req.Code)), privateFileMode); err != nil {
 			return nil, "", fmt.Errorf("write code file: %w", err)
+		}
+		if err := maybeWriteGoHTTPProxyBootstrap(root, cfg); err != nil {
+			return nil, "", err
+		}
+		if cfg.Network.Mode == policy.NetworkMockOnly {
+			return []string{"run", mainFile, filepath.Join(root, "sandbox_transport.go")}, req.Input, nil
 		}
 		return []string{"run", mainFile}, req.Input, nil
 	}
@@ -310,6 +330,120 @@ func main() {
 `
 }
 
+func maybeWriteGoHTTPProxyBootstrap(root string, cfg policy.RunnerConfig) error {
+	if cfg.Network.Mode != policy.NetworkMockOnly {
+		return nil
+	}
+	bootstrap := filepath.Join(root, "sandbox_transport.go")
+	if err := os.WriteFile(bootstrap, []byte(goHTTPProxyBootstrap()), privateFileMode); err != nil {
+		return fmt.Errorf("write go http proxy bootstrap: %w", err)
+	}
+	return nil
+}
+
+func goHTTPProxyBootstrap() string {
+	return `package main
+
+import (
+	"bytes"
+	"fmt"
+	"io"
+	"net/http"
+	"net/url"
+	"os"
+	"strings"
+)
+
+func init() {
+	mock := sandboxMockTransport{
+		allowedHosts:  splitSandboxCSV(os.Getenv("SANDBOX_ALLOWED_HOSTS")),
+		mockEndpoints: splitSandboxCSV(os.Getenv("SANDBOX_MOCK_ENDPOINTS")),
+		proxyURL:      os.Getenv("SANDBOX_HTTP_PROXY"),
+	}
+	http.DefaultTransport = mock
+	http.DefaultClient.Transport = mock
+}
+
+type sandboxMockTransport struct {
+	allowedHosts  []string
+	mockEndpoints []string
+	proxyURL      string
+}
+
+func (t sandboxMockTransport) RoundTrip(req *http.Request) (*http.Response, error) {
+	target := req.URL.String()
+	if !t.isAllowed(req.URL) {
+		return sandboxMockResponse(req, http.StatusForbidden, fmt.Sprintf(` + "`" + `{"mock":true,"blocked":true,"url":%q,"reason":"outbound network is blocked"}` + "`" + `, target)), nil
+	}
+
+	var body []byte
+	if req.Body != nil {
+		payload, err := io.ReadAll(req.Body)
+		if err != nil {
+			return nil, err
+		}
+		body = payload
+		req.Body = io.NopCloser(bytes.NewReader(payload))
+	}
+
+	responseBody := fmt.Sprintf(` + "`" + `{"mock":true,"url":%q,"method":%q,"body":%q,"proxy":%q}` + "`" + `, target, req.Method, string(body), t.proxyURL)
+	return sandboxMockResponse(req, http.StatusOK, responseBody), nil
+}
+
+func (t sandboxMockTransport) isAllowed(target *url.URL) bool {
+	host := strings.ToLower(strings.TrimSpace(target.Hostname()))
+	if host == "" {
+		return false
+	}
+	for _, allowed := range t.allowedHosts {
+		if strings.ToLower(strings.TrimSpace(allowed)) == host {
+			return true
+		}
+	}
+	for _, endpoint := range t.mockEndpoints {
+		parsed, err := url.Parse(endpoint)
+		if err != nil {
+			continue
+		}
+		if strings.ToLower(strings.TrimSpace(parsed.Hostname())) == host {
+			return true
+		}
+	}
+	return false
+}
+
+func sandboxMockResponse(req *http.Request, status int, body string) *http.Response {
+	return &http.Response{
+		StatusCode: status,
+		Status:     fmt.Sprintf("%d %s", status, http.StatusText(status)),
+		Header: http.Header{
+			"Content-Type":   []string{"application/json"},
+			"X-Sandbox-Mock": []string{"true"},
+		},
+		Body:       io.NopCloser(strings.NewReader(body)),
+		Request:    req,
+		ProtoMajor: 1,
+		ProtoMinor: 1,
+	}
+}
+
+func splitSandboxCSV(value string) []string {
+	if strings.TrimSpace(value) == "" {
+		return nil
+	}
+	parts := strings.Split(value, ",")
+	result := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			result = append(result, part)
+		}
+	}
+	return result
+}
+`
+}
+
 func pythonFunctionIOWrapper() string {
 	return `from solution import solve
 import sys
@@ -350,7 +484,7 @@ func effectiveExecutionTimeout(ctx context.Context, requested time.Duration) (ti
 	return requested, nil
 }
 
-func buildExecutionEnv(root string, base []string) ([]string, error) {
+func buildExecutionEnv(root string, base []string, extra []string) ([]string, error) {
 	homeDir := filepath.Join(root, ".home")
 	cacheDir, err := sharedGoCacheDir()
 	if err != nil {
@@ -376,6 +510,7 @@ func buildExecutionEnv(root string, base []string) ([]string, error) {
 	if pathValue := os.Getenv("PATH"); pathValue != "" {
 		env = append(env, "PATH="+pathValue)
 	}
+	env = append(env, extra...)
 
 	return env, nil
 }

@@ -1,0 +1,156 @@
+package sandbox
+
+import (
+	"context"
+	"fmt"
+	"io"
+	"net"
+	"net/http"
+	"net/http/httputil"
+	"net/url"
+	"strings"
+	"time"
+
+	"api/internal/policy"
+)
+
+type mockProxyServer struct {
+	server *http.Server
+	base   string
+}
+
+func (s *mockProxyServer) close() {
+	if s == nil || s.server == nil {
+		return
+	}
+	shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Second)
+	defer cancel()
+	_ = s.server.Shutdown(shutdownCtx)
+}
+
+func startMockProxy(ctx context.Context, cfg policy.RunnerNetworkConfig) (*mockProxyServer, error) {
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		return nil, fmt.Errorf("start mock proxy listener: %w", err)
+	}
+
+	handler := &mockProxyHandler{cfg: cfg}
+	srv := &http.Server{
+		Handler:           handler,
+		ReadHeaderTimeout: 2 * time.Second,
+	}
+
+	go func() {
+		<-ctx.Done()
+		shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		_ = srv.Shutdown(shutdownCtx)
+	}()
+
+	go func() {
+		_ = srv.Serve(listener)
+	}()
+
+	return &mockProxyServer{
+		server: srv,
+		base:   "http://" + listener.Addr().String(),
+	}, nil
+}
+
+func buildNetworkEnv(ctx context.Context, cfg policy.RunnerNetworkConfig) ([]string, *mockProxyServer, error) {
+	switch cfg.Mode {
+	case policy.NetworkDisabled:
+		return []string{
+			"SANDBOX_HTTP_PROXY=http://127.0.0.1:1",
+			"HTTP_PROXY=http://127.0.0.1:1",
+			"http_proxy=http://127.0.0.1:1",
+			"HTTPS_PROXY=http://127.0.0.1:1",
+			"https_proxy=http://127.0.0.1:1",
+			"ALL_PROXY=http://127.0.0.1:1",
+			"all_proxy=http://127.0.0.1:1",
+			"NO_PROXY=",
+			"no_proxy=",
+		}, nil, nil
+	case policy.NetworkMockOnly:
+		proxy, err := startMockProxy(ctx, cfg)
+		if err != nil {
+			return nil, nil, err
+		}
+		return []string{
+			"SANDBOX_HTTP_PROXY=" + proxy.base,
+			"HTTP_PROXY=" + proxy.base,
+			"http_proxy=" + proxy.base,
+			"HTTPS_PROXY=" + proxy.base,
+			"https_proxy=" + proxy.base,
+			"ALL_PROXY=" + proxy.base,
+			"all_proxy=" + proxy.base,
+			"NO_PROXY=",
+			"no_proxy=",
+		}, proxy, nil
+	case policy.NetworkAllowlist:
+		return []string{
+			"NO_PROXY=",
+			"no_proxy=",
+		}, nil, nil
+	default:
+		return nil, nil, fmt.Errorf("unsupported sandbox network mode: %s", cfg.Mode)
+	}
+}
+
+type mockProxyHandler struct {
+	cfg policy.RunnerNetworkConfig
+}
+
+func (h *mockProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodConnect {
+		http.Error(w, "https connect is blocked in sandbox mock transport", http.StatusForbidden)
+		return
+	}
+
+	target := r.URL
+	if !target.IsAbs() {
+		host := r.Host
+		if host == "" {
+			host = "mock.local"
+		}
+		target = &url.URL{
+			Scheme:   "http",
+			Host:     host,
+			Path:     r.URL.Path,
+			RawQuery: r.URL.RawQuery,
+		}
+	}
+
+	if !h.isAllowed(target) {
+		http.Error(w, fmt.Sprintf("outbound network is blocked for %s", target.String()), http.StatusForbidden)
+		return
+	}
+
+	dump, _ := httputil.DumpRequest(r, true)
+	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("X-Sandbox-Mock", "true")
+	w.WriteHeader(http.StatusOK)
+	_, _ = io.WriteString(w, fmt.Sprintf(`{"mock":true,"url":%q,"method":%q,"body":%q}`, target.String(), r.Method, string(dump)))
+}
+
+func (h *mockProxyHandler) isAllowed(target *url.URL) bool {
+	host := strings.ToLower(strings.TrimSpace(target.Hostname()))
+	if host == "" {
+		return false
+	}
+	for _, allowed := range h.cfg.AllowedHosts {
+		if strings.ToLower(strings.TrimSpace(allowed)) == host {
+			return true
+		}
+	}
+	for _, endpoint := range h.cfg.MockEndpoints {
+		parsed, err := url.Parse(endpoint)
+		if err != nil {
+			continue
+		}
+		if strings.ToLower(strings.TrimSpace(parsed.Hostname())) == host {
+			return true
+		}
+	}
+	return false
+}

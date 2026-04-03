@@ -1,9 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, MapPin, Pencil, Briefcase, Shield, X, Navigation, Trophy, Crown, Medal, Zap, Diamond, Send } from 'lucide-react';
+import { ArrowLeft, CheckCircle, MapPin, Pencil, Briefcase, Shield, X, Navigation, Trophy, Crown, Medal, Zap, Diamond, Send, BrainCircuit, Flame, TrendingUp, Target, ShieldCheck } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
-import { User } from '@/entities/User/model/types';
+import { ProfileCompetency, ProfileProgress, User } from '@/entities/User/model/types';
 import { adminApi } from '@/features/Admin/api/adminApi';
 import { authApi, clearProfileByIdCache } from '@/features/Auth/api/authApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
@@ -11,6 +11,52 @@ import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
 import { LocationPicker } from '@/features/Geo/ui/LocationPicker';
 
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
+
+const EMPTY_PROGRESS: ProfileProgress = {
+  overview: {
+    practiceSessions: 0,
+    practicePassedSessions: 0,
+    practiceActiveDays: 0,
+    completedMockSessions: 0,
+    completedMockStages: 0,
+    answeredQuestions: 0,
+    averageStageScore: 0,
+    averageQuestionScore: 0,
+    currentStreakDays: 0,
+  },
+  competencies: [],
+  strongest: [],
+  weakest: [],
+  recommendations: [],
+  checkpoints: [],
+  companies: [],
+};
+
+const RADAR_AXES = ['Slices', 'Concurrency', 'SQL', 'Architecture', 'System Design'];
+
+function buildOrbitPoint(index: number, total: number, radius: number, centerX: number, centerY: number, angleOffset = -Math.PI / 2) {
+  const angle = angleOffset + ((Math.PI * 2 * index) / total);
+  return {
+    x: centerX + Math.cos(angle) * radius,
+    y: centerY + Math.sin(angle) * radius,
+  };
+}
+
+function formatCompetencyAttempts(item: ProfileCompetency) {
+  return `${item.stageCount} stages • ${item.questionCount} questions • ${item.practiceSessions} practice`;
+}
+
+function confidenceLabel(value: ProfileCompetency['confidence']) {
+  switch (value) {
+    case 'verified':
+      return 'Verified';
+    case 'medium':
+      return 'Medium';
+    default:
+      return 'Low';
+  }
+}
+
 export const ProfilePage: React.FC = () => {
   const isMobile = useIsMobile();
   const { user: currentUser, updateLocation } = useAuth();
@@ -22,12 +68,14 @@ export const ProfilePage: React.FC = () => {
   const [newWorkplace, setNewWorkplace] = useState(currentUser?.currentWorkplace || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [arenaStats, setArenaStats] = useState<ArenaPlayerStats | null>(null);
+  const [progress, setProgress] = useState<ProfileProgress>(EMPTY_PROGRESS);
   const [isBindTelegramModalOpen, setIsBindTelegramModalOpen] = useState(false);
   const [telegramChallenge, setTelegramChallenge] = useState<{ token: string; botStartUrl: string } | null>(null);
   const [telegramCode, setTelegramCode] = useState('');
   const [isBindingTelegram, setIsBindingTelegram] = useState(false);
   const [trustedUpdating, setTrustedUpdating] = useState(false);
   const [adminUpdating, setAdminUpdating] = useState(false);
+  const [hoveredCompetencyKey, setHoveredCompetencyKey] = useState<string | null>(null);
   const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'error' | 'info' }[]>([]);
 
   // Toast helpers
@@ -87,6 +135,20 @@ export const ProfilePage: React.FC = () => {
       });
   }, [currentUser?.id, userId]);
 
+  useEffect(() => {
+    const targetUserId = userId || currentUser?.id;
+    if (!targetUserId) {
+      setProgress(EMPTY_PROGRESS);
+      return;
+    }
+    authApi.getProfileProgress(targetUserId)
+      .then(setProgress)
+      .catch((progressError) => {
+        console.error('Failed to load profile progress', progressError);
+        setProgress(EMPTY_PROGRESS);
+      });
+  }, [currentUser?.id, userId]);
+
   if (isLoading) {
     return <div className="fade-in">Загрузка профиля...</div>;
   }
@@ -103,6 +165,56 @@ export const ProfilePage: React.FC = () => {
   const telegramProfileHandle = user.connectedProviders.includes('telegram') && user.telegramUsername
     ? `@${user.telegramUsername}`
     : 'профиль не привязан к тг';
+  const competencies = progress.competencies.length > 0
+    ? progress.competencies
+    : RADAR_AXES.map((label, index) => ({
+      key: `empty-${index}`,
+      label,
+      score: 0,
+      practiceScore: 0,
+      verifiedScore: 0,
+      stageCount: 0,
+      questionCount: 0,
+      practiceSessions: 0,
+      practicePassedSessions: 0,
+      practiceDays: 0,
+      confidence: 'low' as const,
+      averageScore: 0,
+    }));
+  const hasProgressData = progress.overview.completedMockStages > 0 || progress.overview.answeredQuestions > 0 || progress.overview.practiceSessions > 0;
+  const orbitGeometry = useMemo(() => {
+    const centerX = 220;
+    const centerY = 210;
+    const baseRadius = 44;
+    const orbitGap = 30;
+    return competencies.map((item, orbitIndex) => {
+      const nodeCount = 14;
+      const totalCount = Math.round((Math.max(0, Math.min(100, item.score)) / 100) * nodeCount);
+      const verifiedCount = Math.round((Math.max(0, Math.min(100, item.verifiedScore)) / 100) * nodeCount);
+      const practiceCount = Math.max(0, totalCount - verifiedCount);
+      const radius = baseRadius + orbitIndex * orbitGap;
+      const angleOffset = (-Math.PI / 2) + orbitIndex * 0.28;
+      const nodes = Array.from({ length: nodeCount }, (_, nodeIndex) => ({
+        ...buildOrbitPoint(nodeIndex, nodeCount, radius, centerX, centerY, angleOffset),
+        status: nodeIndex < verifiedCount ? 'verified' : nodeIndex < verifiedCount + practiceCount ? 'practice' : 'inactive',
+        delay: orbitIndex * 0.22 + nodeIndex * 0.05,
+      }));
+      const labelPoint = buildOrbitPoint(Math.max(1, orbitIndex * 2), nodeCount, radius + 30, centerX, centerY, angleOffset);
+      const circumference = 2 * Math.PI * radius;
+      const verifiedArc = circumference * (Math.max(0, Math.min(100, item.verifiedScore)) / 100);
+      const practiceArc = circumference * (Math.max(0, Math.min(100, item.score)) / 100);
+      return {
+        ...item,
+        radius,
+        nodes,
+        labelPoint,
+        circumference,
+        verifiedDashOffset: circumference - verifiedArc,
+        practiceDashOffset: circumference - practiceArc,
+      };
+    });
+  }, [competencies]);
+  const hoveredCompetency = orbitGeometry.find((item) => item.key === hoveredCompetencyKey) ?? orbitGeometry[0] ?? null;
 
   const getLeagueInfo = (league: string) => {
     const leagues: Record<string, { name: string; icon: React.ReactNode; className: string }> = {
@@ -381,6 +493,260 @@ export const ProfilePage: React.FC = () => {
           ) : null}
         </div>
       </div>
+
+      <section className="profile-progress-section">
+        <div className="profile-progress-section__header">
+          <div>
+            <h2>Progress profile</h2>
+            <p>Practice и verified skill теперь разведены: solo накапливает объем, а mock и arena подтверждают реальный сигнал.</p>
+          </div>
+          <div className="profile-progress-section__badges">
+            <span className="profile-progress-badge"><Flame size={14} /> {progress.overview.currentStreakDays} day streak</span>
+            <span className="profile-progress-badge"><TrendingUp size={14} /> {progress.overview.practiceSessions} practice runs</span>
+          </div>
+        </div>
+
+        <div className="profile-progress-layout">
+          <div className="card profile-progress-card profile-progress-card--radar">
+            <div className="profile-progress-card__header">
+              <div>
+                <h3><BrainCircuit size={18} /> Competency graph</h3>
+                <p>Orbital map навыков: каждая орбита это отдельная зона, а узлы и дуги анимированно показывают depth и confidence сигнала.</p>
+              </div>
+            </div>
+
+            <div className="profile-progress-orbit" onMouseLeave={() => setHoveredCompetencyKey(null)}>
+              <svg viewBox="0 0 440 420" className="profile-progress-orbit__svg" role="img" aria-label="Competency orbit map">
+                <defs>
+                  <radialGradient id="profile-orbit-glow" cx="50%" cy="50%" r="50%">
+                    <stop offset="0%" stopColor="rgba(103, 232, 249, 0.78)" />
+                    <stop offset="55%" stopColor="rgba(34, 211, 238, 0.18)" />
+                    <stop offset="100%" stopColor="rgba(34, 211, 238, 0)" />
+                  </radialGradient>
+                </defs>
+                <circle cx="220" cy="210" r="34" className="profile-progress-orbit__core" />
+                <circle cx="220" cy="210" r="72" className="profile-progress-orbit__pulse" />
+                {orbitGeometry.map((orbit, orbitIndex) => (
+                  <g key={orbit.key} onMouseEnter={() => setHoveredCompetencyKey(orbit.key)} className={hoveredCompetencyKey === orbit.key ? 'is-hovered' : ''}>
+                    <circle cx="220" cy="210" r={orbit.radius} className="profile-progress-orbit__ring" style={{ animationDelay: `${orbitIndex * 0.16}s` }} />
+                    <circle
+                      cx="220"
+                      cy="210"
+                      r={orbit.radius}
+                      className="profile-progress-orbit__arc profile-progress-orbit__arc--practice"
+                      style={{
+                        strokeDasharray: orbit.circumference,
+                        strokeDashoffset: orbit.practiceDashOffset,
+                        transform: `rotate(${orbitIndex * 26 - 90}deg)`,
+                        transformOrigin: '220px 210px',
+                        animationDelay: `${0.18 + orbitIndex * 0.16}s`,
+                      }}
+                    />
+                    <circle
+                      cx="220"
+                      cy="210"
+                      r={orbit.radius}
+                      className="profile-progress-orbit__arc profile-progress-orbit__arc--verified"
+                      style={{
+                        strokeDasharray: orbit.circumference,
+                        strokeDashoffset: orbit.verifiedDashOffset,
+                        transform: `rotate(${orbitIndex * 26 - 90}deg)`,
+                        transformOrigin: '220px 210px',
+                        animationDelay: `${0.3 + orbitIndex * 0.16}s`,
+                      }}
+                    />
+                    {orbit.nodes.map((node, nodeIndex) => (
+                      <circle
+                        key={`${orbit.key}-${nodeIndex}`}
+                        cx={node.x}
+                        cy={node.y}
+                        r={node.status === 'verified' ? 5.8 : node.status === 'practice' ? 4.8 : 3.2}
+                        className={`profile-progress-orbit__node profile-progress-orbit__node--${node.status}`}
+                        style={{ animationDelay: `${node.delay}s` }}
+                      />
+                    ))}
+                    <text x={orbit.labelPoint.x} y={orbit.labelPoint.y} className="profile-progress-orbit__label" textAnchor="middle">
+                      {orbit.label}
+                    </text>
+                    <text x={orbit.labelPoint.x} y={orbit.labelPoint.y + 16} className="profile-progress-orbit__value" textAnchor="middle">
+                      {orbit.score}
+                    </text>
+                  </g>
+                ))}
+                <circle cx="220" cy="210" r="54" fill="url(#profile-orbit-glow)" className="profile-progress-orbit__glow" />
+              </svg>
+              {hoveredCompetency && (
+                <div className="profile-progress-orbit__tooltip">
+                  <div className="profile-progress-orbit__tooltip-top">
+                    <strong>{hoveredCompetency.label}</strong>
+                    <span className={`profile-progress-confidence profile-progress-confidence--${hoveredCompetency.confidence}`}>{confidenceLabel(hoveredCompetency.confidence)}</span>
+                  </div>
+                  <p>Blended {hoveredCompetency.score} • Verified {hoveredCompetency.verifiedScore} • Practice {hoveredCompetency.practiceScore}</p>
+                  <p>{hoveredCompetency.stageCount} stages • {hoveredCompetency.questionCount} questions • {hoveredCompetency.practiceDays} independent days</p>
+                </div>
+              )}
+              <div className="profile-progress-orbit__legend">
+                {competencies.map((item) => (
+                  <div
+                    key={`legend-${item.key}`}
+                    className={`profile-progress-orbit__legend-item ${hoveredCompetencyKey === item.key ? 'is-hovered' : ''}`}
+                    onMouseEnter={() => setHoveredCompetencyKey(item.key)}
+                  >
+                    <span className={`profile-progress-confidence profile-progress-confidence--${item.confidence}`}>{confidenceLabel(item.confidence)}</span>
+                    <strong>{item.label}</strong>
+                    <small>Verified {item.verifiedScore} • Practice {item.practiceScore}</small>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {!hasProgressData && (
+              <div className="profile-progress-empty">
+                Пока мало данных. Начни с practice или mock interview, и профиль начнет собирать volume и verified skill отдельно.
+              </div>
+            )}
+          </div>
+
+          <div className="card profile-progress-card">
+            <div className="profile-progress-card__header">
+              <div>
+                <h3><Target size={18} /> Practice volume</h3>
+                <p>Это обучающий слой. Он показывает, сколько solo-попыток уже накоплено, но не претендует на verified skill.</p>
+              </div>
+            </div>
+
+            <div className="profile-progress-metrics">
+              <div className="profile-progress-metric">
+                <span className="label">Practice sessions</span>
+                <strong>{progress.overview.practiceSessions}</strong>
+              </div>
+              <div className="profile-progress-metric">
+                <span className="label">Passed sessions</span>
+                <strong>{progress.overview.practicePassedSessions}</strong>
+              </div>
+              <div className="profile-progress-metric">
+                <span className="label">Active days</span>
+                <strong>{progress.overview.practiceActiveDays}</strong>
+              </div>
+              <div className="profile-progress-metric">
+                <span className="label">Finished mocks</span>
+                <strong>{progress.overview.completedMockSessions}</strong>
+              </div>
+              <div className="profile-progress-metric">
+                <span className="label">Completed stages</span>
+                <strong>{progress.overview.completedMockStages}</strong>
+              </div>
+              <div className="profile-progress-metric">
+                <span className="label">Current streak</span>
+                <strong>{progress.overview.currentStreakDays} days</strong>
+              </div>
+            </div>
+
+            {progress.companies.length > 0 && (
+              <div className="profile-progress-company-strip">
+                <span className="profile-progress-company-strip__label">Companies</span>
+                <div className="profile-progress-company-strip__items">
+                  {progress.companies.map((company) => (
+                    <span key={company} className="profile-progress-company-pill">{company}</span>
+                  ))}
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+
+        <div className="profile-progress-layout profile-progress-layout--secondary">
+          <div className="card profile-progress-card">
+            <div className="profile-progress-card__header">
+              <div>
+                <h3>Verified skill</h3>
+                <p>Сильные зоны теперь показывают verified signal, practice volume и confidence по каждой теме.</p>
+              </div>
+            </div>
+            <div className="profile-progress-list">
+              {progress.strongest.length > 0 ? progress.strongest.map((item) => (
+                <div key={item.key} className="profile-progress-list__item">
+                  <div>
+                    <div className="profile-progress-list__title">
+                      <strong>{item.label}</strong>
+                      <span className={`profile-progress-confidence profile-progress-confidence--${item.confidence}`}>{confidenceLabel(item.confidence)}</span>
+                    </div>
+                    <span>{formatCompetencyAttempts(item)}</span>
+                    <span>Verified {item.verifiedScore} • Practice {item.practiceScore} • {item.practiceDays} independent days</span>
+                  </div>
+                  <b>{item.score}</b>
+                </div>
+              )) : <div className="profile-progress-empty compact">Сильные зоны появятся после первых mock interview.</div>}
+            </div>
+          </div>
+
+          <div className="card profile-progress-card">
+            <div className="profile-progress-card__header">
+              <div>
+                <h3>Weakest zones</h3>
+                <p>Здесь виден разрыв между practice и verified skill. Обычно именно отсюда начинается самый быстрый рост.</p>
+              </div>
+            </div>
+            <div className="profile-progress-list">
+              {progress.weakest.length > 0 ? progress.weakest.map((item) => (
+                <div key={item.key} className="profile-progress-list__item">
+                  <div>
+                    <div className="profile-progress-list__title">
+                      <strong>{item.label}</strong>
+                      <span className={`profile-progress-confidence profile-progress-confidence--${item.confidence}`}>{confidenceLabel(item.confidence)}</span>
+                    </div>
+                    <span>{formatCompetencyAttempts(item)}</span>
+                    <span>Verified {item.verifiedScore} • Practice {item.practiceScore} • {item.practiceDays} independent days</span>
+                  </div>
+                  <b>{item.score}</b>
+                </div>
+              )) : <div className="profile-progress-empty compact">Пока недостаточно данных для слабых зон.</div>}
+            </div>
+          </div>
+
+          <div className="card profile-progress-card">
+            <div className="profile-progress-card__header">
+              <div>
+                <h3>Recommended next</h3>
+                <p>Следующие ходы, которые дадут самый заметный сигнал по профилю.</p>
+              </div>
+            </div>
+            <div className="profile-progress-recommendations">
+              {progress.recommendations.length > 0 ? progress.recommendations.map((item) => (
+                <div key={item.key} className="profile-progress-recommendation">
+                  <div>
+                    <strong>{item.title}</strong>
+                    <p>{item.description}</p>
+                  </div>
+                  {isOwnProfile && (
+                    <Link to={item.href} className="profile-progress-link">Открыть</Link>
+                  )}
+                </div>
+              )) : <div className="profile-progress-empty compact">Рекомендации появятся после завершенных mock stages.</div>}
+            </div>
+          </div>
+        </div>
+
+        <div className="card profile-progress-card">
+          <div className="profile-progress-card__header">
+            <div>
+              <h3><ShieldCheck size={18} /> Passed checkpoints</h3>
+              <p>Только успешно закрытые timed checkpoints. Это самый чистый verified signal после mock.</p>
+            </div>
+          </div>
+          <div className="profile-progress-checkpoints">
+            {progress.checkpoints.length > 0 ? progress.checkpoints.map((item) => (
+              <div key={item.id} className="profile-progress-checkpoint">
+                <div>
+                  <strong>{item.taskTitle}</strong>
+                  <span>{item.skillLabel} • {item.finishedAt ? new Date(item.finishedAt).toLocaleDateString('ru-RU') : 'passed'}</span>
+                </div>
+                <b>{item.score}</b>
+              </div>
+            )) : <div className="profile-progress-empty compact">Passed checkpoints пока нет. Первый checkpoint сразу начнет наполнять verified timeline.</div>}
+          </div>
+        </div>
+      </section>
 
       {/* Info Grid */}
       <div className="profile-info-section">

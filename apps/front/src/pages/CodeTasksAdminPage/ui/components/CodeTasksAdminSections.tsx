@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pencil, Plus, Settings2, ShieldCheck, Trash2, X } from 'lucide-react';
+import { Pencil, Plus, ShieldCheck, Trash2, X } from 'lucide-react';
 
 import { CodeTask, CodeTaskCase } from '@/entities/CodeRoom/model/types';
 import { FancySelect } from '@/shared/ui/FancySelect';
@@ -9,11 +9,7 @@ import {
   CODE_TASK_TEMPLATES,
   DIFFICULTIES,
   DUEL_TOPICS,
-  LANGUAGE_OPTIONS,
-  POLICY_HELP,
-  POLICY_TEMPLATES,
   TaskFormState,
-  normalizePolicyFields,
 } from '../lib/codeTasksAdminHelpers';
 
 type HeroProps = {
@@ -122,8 +118,6 @@ export const CodeTasksAdminListSection: React.FC<ListProps> = ({
                   {task.topics.map((topic) => (
                     <span key={topic} className="topic-chip">{topic}</span>
                   ))}
-                  <span className="badge task-policy-badge">{task.executionProfile}</span>
-                  <span className="badge task-policy-badge task-policy-badge--muted">{task.taskType}</span>
                   {!task.isActive && <span className="badge task-inactive">Неактивна</span>}
                 </div>
               </div>
@@ -157,48 +151,80 @@ type ModalProps = {
   isOpen: boolean;
   taskForm: TaskFormState;
   savingTask: boolean;
-  showPolicyHelp: boolean;
-  policySummary: string;
-  policyWarnings: string[];
-  showFilesystemPolicy: boolean;
-  showNetworkPolicy: boolean;
-  selectedPolicyHelp: (typeof POLICY_HELP)[keyof typeof POLICY_HELP];
+  existingTopics: string[];
   onClose: () => void;
   onSave: () => void;
-  setShowPolicyHelp: React.Dispatch<React.SetStateAction<boolean>>;
   setTaskForm: React.Dispatch<React.SetStateAction<TaskFormState>>;
   updateTaskCase: (key: 'publicTestCases' | 'hiddenTestCases', index: number, field: keyof CodeTaskCase, value: string | number | boolean) => void;
   addTaskCase: (key: 'publicTestCases' | 'hiddenTestCases', isPublic: boolean) => void;
   removeTaskCase: (key: 'publicTestCases' | 'hiddenTestCases', index: number) => void;
 };
 
+const TopicPicker: React.FC<{
+  value: string;
+  existingTopics: string[];
+  onChange: (value: string) => void;
+}> = ({ value, existingTopics, onChange }) => {
+  const selected = value.split(',').map((item) => item.trim()).filter(Boolean);
+  const [draft, setDraft] = React.useState('');
+
+  const addTopic = (topic: string) => {
+    const normalized = topic.trim().toLowerCase();
+    if (!normalized || selected.includes(normalized)) return;
+    onChange([...selected, normalized].join(', '));
+    setDraft('');
+  };
+
+  const removeTopic = (topic: string) => {
+    onChange(selected.filter((item) => item !== topic).join(', '));
+  };
+
+  return (
+    <div className="topic-picker">
+      <div className="topic-picker__selected">
+        {selected.length === 0 ? (
+          <span className="interview-prep-muted">Выбери существующий топик или добавь новый.</span>
+        ) : selected.map((topic) => (
+          <button key={topic} type="button" className="topic-chip topic-chip--interactive" onClick={() => removeTopic(topic)}>
+            {topic} <X size={12} />
+          </button>
+        ))}
+      </div>
+      <div className="topic-picker__catalog">
+        {existingTopics.map((topic) => (
+          <button key={topic} type="button" className={`pill-selector__pill ${selected.includes(topic) ? 'active' : ''}`} onClick={() => addTopic(topic)}>
+            {topic}
+          </button>
+        ))}
+      </div>
+      <div className="topic-picker__create">
+        <input
+          className="input"
+          value={draft}
+          onChange={(event) => setDraft(event.target.value)}
+          placeholder="Новый топик"
+        />
+        <button type="button" className="btn btn-secondary" onClick={() => addTopic(draft)}>Добавить</button>
+      </div>
+    </div>
+  );
+};
+
 export const CodeTasksAdminModal: React.FC<ModalProps> = ({
   isOpen,
   taskForm,
   savingTask,
-  showPolicyHelp,
-  policySummary,
-  policyWarnings,
-  showFilesystemPolicy,
-  showNetworkPolicy,
-  selectedPolicyHelp,
+  existingTopics,
   onClose,
   onSave,
-  setShowPolicyHelp,
   setTaskForm,
   updateTaskCase,
   addTaskCase,
   removeTaskCase,
 }) => {
-  const [showAdvanced, setShowAdvanced] = React.useState(false);
-
   if (!isOpen) {
     return null;
   }
-
-  const networkDisabled = (taskForm.executionProfile === 'http_client' || taskForm.executionProfile === 'interview_realistic')
-    && !taskForm.allowedHosts.trim()
-    && !taskForm.mockEndpoints.trim();
 
   return (
     <div className="modal-overlay" onClick={onClose}>
@@ -217,250 +243,133 @@ export const CodeTasksAdminModal: React.FC<ModalProps> = ({
         </div>
 
         <div className="modal-scroll-content">
-        {!taskForm.id && (
-          <div className="admin-template-strip">
-            {CODE_TASK_TEMPLATES.map((template) => (
-              <button
-                key={template.key}
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => setTaskForm((prev) => applyTaskTemplate(prev, template.key))}
-              >
-                {template.label}
-              </button>
-            ))}
-          </div>
-        )}
-
-        <div className="task-editor-grid">
-          <div className="form-group">
-            <label>Название</label>
-            <input className="input" value={taskForm.title} onChange={(e) => setTaskForm((prev) => ({ ...prev, title: e.target.value }))} />
-          </div>
-          <div className="form-group">
-            <label>Сложность</label>
-            <FancySelect
-              value={taskForm.difficulty}
-              options={DIFFICULTIES.filter(Boolean).map((difficulty) => ({ value: difficulty, label: difficulty }))}
-              onChange={(difficulty) => setTaskForm((prev) => ({ ...prev, difficulty }))}
-            />
-          </div>
-          <div className="form-group">
-            <label>Topics через запятую</label>
-            <input className="input" value={taskForm.topics} onChange={(e) => setTaskForm((prev) => ({ ...prev, topics: e.target.value }))} placeholder="two-pointers, linked-list" />
-          </div>
-          <div className="form-group">
-            <label>Language</label>
-            <FancySelect
-              value={taskForm.language}
-              options={[...LANGUAGE_OPTIONS]}
-              onChange={(language) => setTaskForm((prev) => ({ ...prev, language }))}
-            />
-          </div>
-          <div className="form-group">
-            <label>Duration (seconds) for arena</label>
-            <input
-              className="input"
-              type="number"
-              min="60"
-              max="3600"
-              value={taskForm.durationSeconds}
-              onChange={(e) => setTaskForm((prev) => ({ ...prev, durationSeconds: e.target.value }))}
-              placeholder="900"
-            />
-          </div>
-          <div className="form-group">
-            <label>Runtime contract</label>
-            <div className="task-policy-empty">
-              {taskForm.runnerMode === 'function_io'
-                ? 'Пользователь пишет `func solve(input string) string`. Sandbox сам подставляет hidden main и передает stdin как строку.'
-                : 'Пользователь пишет обычный `func main()` и сам работает со stdin/stdout.'}
-            </div>
-          </div>
-        </div>
-
-        <div className="interview-prep-question-toolbar">
-          <button type="button" className="btn btn-secondary" onClick={() => setShowAdvanced((value) => !value)}>
-            <Settings2 size={16} />
-            <span>{showAdvanced ? 'Скрыть advanced' : 'Показать advanced'}</span>
-          </button>
-        </div>
-
-        {showAdvanced && (
-        <div className="task-policy-panel">
-          <div className="task-policy-panel__header">
-            <div>
-              <strong>Policy layer</strong>
-              <div className="dashboard-card__subtitle">Явные capabilities задачи. Без скрытых эвристик по title или topics.</div>
-            </div>
-            <div className="task-policy-panel__header-actions">
-              <span className="badge task-policy-badge">{policySummary}</span>
-              <button type="button" className="btn btn-secondary btn-sm" onClick={() => setShowPolicyHelp((current) => !current)}>
-                {showPolicyHelp ? 'Скрыть help' : 'Показать help'}
-              </button>
-            </div>
-          </div>
-          <div className="task-policy-templates">
-            {POLICY_TEMPLATES.map((template) => (
-              <button
-                key={template.key}
-                type="button"
-                className="btn btn-secondary btn-sm"
-                onClick={() => setTaskForm((prev) => normalizePolicyFields(template.apply(prev)))}
-              >
-                {template.label}
-              </button>
-            ))}
-          </div>
-          {showPolicyHelp && (
-            <div className="task-policy-help">
-              <div className="task-policy-help__summary">
-                <strong>{selectedPolicyHelp.title}</strong>
-                <span>{selectedPolicyHelp.summary}</span>
-              </div>
-              <div className="task-policy-help__grid">
-                <div className="task-policy-help__card">
-                  <div className="task-policy-help__label">Разрешено</div>
-                  {selectedPolicyHelp.allows.map((item) => (
-                    <div key={item} className="task-policy-help__item">{item}</div>
-                  ))}
-                </div>
-                <div className="task-policy-help__card">
-                  <div className="task-policy-help__label">Запрещено</div>
-                  {selectedPolicyHelp.forbids.map((item) => (
-                    <div key={item} className="task-policy-help__item">{item}</div>
-                  ))}
-                </div>
-              </div>
-            </div>
-          )}
-          {policyWarnings.length > 0 && (
-            <div className="task-policy-warning-list">
-              {policyWarnings.map((warning) => (
-                <div key={warning} className="task-policy-warning">{warning}</div>
+          {!taskForm.id && (
+            <div className="admin-template-strip">
+              {CODE_TASK_TEMPLATES.map((template) => (
+                <button
+                  key={template.key}
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => setTaskForm((prev) => applyTaskTemplate(prev, template.key))}
+                >
+                  {template.label}
+                </button>
               ))}
             </div>
           )}
-          {(showFilesystemPolicy || showNetworkPolicy) ? (
-            <>
-              <div className="task-policy-grid">
-                {showFilesystemPolicy && (
-                  <>
-                    <div className="form-group">
-                      <label>Fixture files</label>
-                      <input className="input" value={taskForm.fixtureFiles} onChange={(e) => setTaskForm((prev) => ({ ...prev, fixtureFiles: e.target.value }))} placeholder="fixtures/input.txt, fixtures/cases.json" />
-                    </div>
-                    <div className="form-group">
-                      <label>Readable paths</label>
-                      <input className="input" value={taskForm.readablePaths} onChange={(e) => setTaskForm((prev) => ({ ...prev, readablePaths: e.target.value }))} placeholder="fixtures, data/sample.txt" />
-                    </div>
-                    <div className="form-group">
-                      <label>Writable paths</label>
-                      <input className="input" value={taskForm.writablePaths} onChange={(e) => setTaskForm((prev) => ({ ...prev, writablePaths: e.target.value }))} placeholder="tmp/output.txt" />
-                    </div>
-                  </>
-                )}
-                {showNetworkPolicy && (
-                  <>
-                    <div className="form-group">
-                      <label>Allowed hosts</label>
-                      <input className="input" value={taskForm.allowedHosts} onChange={(e) => setTaskForm((prev) => ({ ...prev, allowedHosts: e.target.value }))} placeholder="mock.local, api.internal" />
-                    </div>
-                    <div className="form-group">
-                      <label>Allowed ports</label>
-                      <input className="input" value={taskForm.allowedPorts} onChange={(e) => setTaskForm((prev) => ({ ...prev, allowedPorts: e.target.value }))} placeholder="80, 443, 8080" />
-                    </div>
-                    <div className="form-group">
-                      <label>Mock endpoints</label>
-                      <input className="input" value={taskForm.mockEndpoints} onChange={(e) => setTaskForm((prev) => ({ ...prev, mockEndpoints: e.target.value }))} placeholder="http://mock.local/users, http://mock.local/ping" />
-                    </div>
-                  </>
-                )}
-              </div>
-              {showFilesystemPolicy && (
-                <label className="toggle-field">
-                  <input
-                    type="checkbox"
-                    checked={taskForm.writableTempDir}
-                    onChange={(e) => setTaskForm((prev) => ({ ...prev, writableTempDir: e.target.checked }))}
-                  />
-                  Разрешить запись во временную директорию
-                </label>
-              )}
-            </>
-          ) : (
+
+          <div className="task-policy-panel">
             <div className="task-policy-empty">
-              Для профиля <strong>{taskForm.executionProfile}</strong> дополнительные filesystem/network поля не нужны.
+              Жесткий runtime contract: все задачи в этой админке алгоритмические, `Go`, `pure`, `function_io`, без файлов и без сети. Если в решении кто-то попробует сеть, sandbox ее не даст.
             </div>
-          )}
-        </div>
-        )}
+          </div>
 
-        <div className="form-group">
-          <label>Условие</label>
-          <textarea className="input textarea" value={taskForm.statement} onChange={(e) => setTaskForm((prev) => ({ ...prev, statement: e.target.value }))} />
-        </div>
-
-        <div className="form-group">
-          <label>Starter code</label>
-          <textarea className="input textarea code-textarea" value={taskForm.starterCode} onChange={(e) => setTaskForm((prev) => ({ ...prev, starterCode: e.target.value }))} />
-        </div>
-
-        <div className="task-cases-grid">
-          {(['publicTestCases', 'hiddenTestCases'] as const).map((key) => {
-            const title = key === 'publicTestCases' ? 'Публичные тесты' : 'Скрытые тесты';
-            const isPublic = key === 'publicTestCases';
-            return (
-              <div key={key} className="task-cases-card">
-                <div className="dashboard-card__header">
-                  <h3>{title}</h3>
-                  <button className="btn btn-secondary btn-sm" onClick={() => addTaskCase(key, isPublic)}>
-                    <Plus size={14} />
-                    Тест
-                  </button>
-                </div>
-                <div className="task-case-list">
-                  {taskForm[key].map((testCase, index) => (
-                    <div key={`${key}-${index}`} className="task-case-item">
-                      <div className="task-case-item__header">
-                        <span>Тест #{index + 1}</span>
-                        <button className="btn-icon danger" onClick={() => removeTaskCase(key, index)}>
-                          <Trash2 size={14} />
-                        </button>
-                      </div>
-                      <textarea
-                        className="input textarea"
-                        placeholder="stdin"
-                        value={testCase.input}
-                        onChange={(e) => updateTaskCase(key, index, 'input', e.target.value)}
-                      />
-                      <textarea
-                        className="input textarea"
-                        placeholder="expected stdout"
-                        value={testCase.expectedOutput}
-                        onChange={(e) => updateTaskCase(key, index, 'expectedOutput', e.target.value)}
-                      />
-                    </div>
-                  ))}
-                </div>
+          <div className="task-editor-grid">
+            <div className="form-group">
+              <label>Название</label>
+              <input className="input" value={taskForm.title} onChange={(e) => setTaskForm((prev) => ({ ...prev, title: e.target.value }))} />
+            </div>
+            <div className="form-group">
+              <label>Сложность</label>
+              <FancySelect
+                value={taskForm.difficulty}
+                options={DIFFICULTIES.filter(Boolean).map((difficulty) => ({ value: difficulty, label: difficulty }))}
+                onChange={(difficulty) => setTaskForm((prev) => ({ ...prev, difficulty }))}
+              />
+            </div>
+            <div className="form-group form-group--full">
+              <label>Топики</label>
+              <TopicPicker value={taskForm.topics} existingTopics={existingTopics} onChange={(topics) => setTaskForm((prev) => ({ ...prev, topics }))} />
+            </div>
+            <div className="form-group">
+              <label>Язык</label>
+              <div className="task-policy-empty">Go</div>
+            </div>
+            <div className="form-group">
+              <label>Длительность, сек</label>
+              <input
+                className="input"
+                type="number"
+                min="60"
+                max="3600"
+                value={taskForm.durationSeconds}
+                onChange={(e) => setTaskForm((prev) => ({ ...prev, durationSeconds: e.target.value }))}
+                placeholder="900"
+              />
+            </div>
+            <div className="form-group form-group--full">
+              <label>Формат запуска</label>
+              <div className="task-policy-empty">
+                Всегда используется шаблон `func solve(input string) string`, stdin передается как строка, ответ сравнивается по stdout.
               </div>
-            );
-          })}
-        </div>
+            </div>
+          </div>
 
-        <label className="toggle-field">
-          <input
-            type="checkbox"
-            checked={taskForm.isActive}
-            onChange={(e) => setTaskForm((prev) => ({ ...prev, isActive: e.target.checked }))}
-          />
-          Активна и может попадать в random duel
-        </label>
+          <div className="form-group">
+            <label>Условие</label>
+            <textarea className="input textarea" value={taskForm.statement} onChange={(e) => setTaskForm((prev) => ({ ...prev, statement: e.target.value }))} />
+          </div>
+
+          <div className="form-group">
+            <label>Starter code</label>
+            <textarea className="input textarea code-textarea" value={taskForm.starterCode} onChange={(e) => setTaskForm((prev) => ({ ...prev, starterCode: e.target.value }))} />
+          </div>
+
+          <div className="task-cases-grid">
+            {(['publicTestCases', 'hiddenTestCases'] as const).map((key) => {
+              const title = key === 'publicTestCases' ? 'Публичные тесты' : 'Скрытые тесты';
+              const isPublic = key === 'publicTestCases';
+              return (
+                <div key={key} className="task-cases-card">
+                  <div className="dashboard-card__header">
+                    <h3>{title}</h3>
+                    <button className="btn btn-secondary btn-sm" onClick={() => addTaskCase(key, isPublic)}>
+                      <Plus size={14} />
+                      Тест
+                    </button>
+                  </div>
+                  <div className="task-case-list">
+                    {taskForm[key].map((testCase, index) => (
+                      <div key={`${key}-${index}`} className="task-case-item">
+                        <div className="task-case-item__header">
+                          <span>Тест #{index + 1}</span>
+                          <button className="btn-icon danger" onClick={() => removeTaskCase(key, index)}>
+                            <Trash2 size={14} />
+                          </button>
+                        </div>
+                        <textarea
+                          className="input textarea"
+                          placeholder="stdin"
+                          value={testCase.input}
+                          onChange={(e) => updateTaskCase(key, index, 'input', e.target.value)}
+                        />
+                        <textarea
+                          className="input textarea"
+                          placeholder="expected stdout"
+                          value={testCase.expectedOutput}
+                          onChange={(e) => updateTaskCase(key, index, 'expectedOutput', e.target.value)}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          <label className="toggle-field">
+            <input
+              type="checkbox"
+              checked={taskForm.isActive}
+              onChange={(e) => setTaskForm((prev) => ({ ...prev, isActive: e.target.checked }))}
+            />
+            Активна и может попадать в random duel
+          </label>
         </div>
 
         <div className="modal-actions admin-modal__actions">
           <button className="btn btn-secondary" onClick={onClose}>Отмена</button>
-          <button className="btn btn-primary" onClick={onSave} disabled={savingTask || networkDisabled}>
+          <button className="btn btn-primary" onClick={onSave} disabled={savingTask}>
             {savingTask ? 'Сохранение...' : taskForm.id ? 'Сохранить' : 'Создать задачу'}
           </button>
         </div>

@@ -12,6 +12,7 @@ export type InterviewPrepSessionStatus = 'active' | 'finished' | 'unspecified';
 export type InterviewPrepSelfAssessment = 'answered' | 'skipped' | 'unspecified';
 export type InterviewPrepMockStageKind = 'slices' | 'concurrency' | 'sql' | 'architecture' | 'system_design' | 'unspecified';
 export type InterviewPrepMockStageStatus = 'pending' | 'solving' | 'questions' | 'completed' | 'unspecified';
+export type InterviewPrepCheckpointStatus = 'active' | 'passed' | 'failed' | 'expired' | 'unspecified';
 
 
 export interface InterviewPrepSystemDesignReview {
@@ -207,6 +208,23 @@ export interface InterviewPrepMockCompanyPreset {
   updatedAt?: string;
 }
 
+export interface InterviewPrepCheckpoint {
+  id: string;
+  userId: string;
+  taskId: string;
+  sessionId: string;
+  skillKey: string;
+  status: InterviewPrepCheckpointStatus;
+  durationSeconds: number;
+  attemptsUsed: number;
+  maxAttempts: number;
+  score: number;
+  startedAt: string;
+  finishedAt?: string;
+  createdAt: string;
+  updatedAt: string;
+}
+
 const normalizeTask = (task: any): InterviewPrepTask => ({
   id: task.id ?? task.ID,
   slug: task.slug ?? task.Slug,
@@ -334,6 +352,23 @@ const normalizeMockCompanyPreset = (item: any): InterviewPrepMockCompanyPreset =
   updatedAt: item.updatedAt ?? item.updated_at ?? item.UpdatedAt,
 });
 
+const normalizeCheckpoint = (item: any): InterviewPrepCheckpoint => ({
+  id: item.id ?? item.ID,
+  userId: item.userId ?? item.user_id ?? item.UserID,
+  taskId: item.taskId ?? item.task_id ?? item.TaskID,
+  sessionId: item.sessionId ?? item.session_id ?? item.SessionID,
+  skillKey: item.skillKey ?? item.skill_key ?? item.SkillKey ?? '',
+  status: item.status ?? item.Status ?? 'unspecified',
+  durationSeconds: Number(item.durationSeconds ?? item.duration_seconds ?? item.DurationSeconds ?? 0),
+  attemptsUsed: Number(item.attemptsUsed ?? item.attempts_used ?? item.AttemptsUsed ?? 0),
+  maxAttempts: Number(item.maxAttempts ?? item.max_attempts ?? item.MaxAttempts ?? 0),
+  score: Number(item.score ?? item.Score ?? 0),
+  startedAt: item.startedAt ?? item.started_at ?? item.StartedAt,
+  finishedAt: item.finishedAt ?? item.finished_at ?? item.FinishedAt,
+  createdAt: item.createdAt ?? item.created_at ?? item.CreatedAt,
+  updatedAt: item.updatedAt ?? item.updated_at ?? item.UpdatedAt,
+});
+
 const fileToBase64 = async (file: File): Promise<string> => {
   const buffer = await file.arrayBuffer();
   const bytes = new Uint8Array(buffer);
@@ -362,6 +397,22 @@ export const interviewPrepApi = {
   getSession: async (sessionId: string): Promise<InterviewPrepSession> => {
     const response = await apiClient.get<{ session: any }>(`/api/v1/interview-prep/sessions/${sessionId}`);
     return normalizeSession(response.data.session);
+  },
+
+  startCheckpoint: async (taskId: string): Promise<{ session: InterviewPrepSession; checkpoint: InterviewPrepCheckpoint }> => {
+    const response = await apiClient.post<{ session: any; checkpoint: any }>(
+      '/api/v1/interview-prep/checkpoints/start',
+      { task_id: taskId },
+    );
+    return {
+      session: normalizeSession(response.data.session),
+      checkpoint: normalizeCheckpoint(response.data.checkpoint),
+    };
+  },
+
+  getCheckpoint: async (sessionId: string): Promise<InterviewPrepCheckpoint> => {
+    const response = await apiClient.get<{ checkpoint: any }>(`/api/v1/interview-prep/checkpoints/session/${sessionId}`);
+    return normalizeCheckpoint(response.data.checkpoint);
   },
 
   submit: async (sessionId: string, code: string, solveLanguage?: string): Promise<InterviewPrepSubmitResult> => {

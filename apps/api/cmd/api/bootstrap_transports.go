@@ -3,6 +3,8 @@ package main
 import (
 	"api/internal/closer"
 	server "api/internal/server"
+	interviewprepcheckpointhttp "api/internal/server/interviewprepcheckpointhttp"
+	profileprogresshttp "api/internal/server/profileprogresshttp"
 	adminv1 "api/pkg/api/admin/v1"
 	arenav1 "api/pkg/api/arena/v1"
 	codeeditorv1 "api/pkg/api/code_editor/v1"
@@ -83,6 +85,8 @@ func registerManualHTTPRoutes(
 	server.RegisterCodeEditorRealtime(httpServer, services.realtimeHub)
 	server.RegisterArenaRealtime(httpServer, services.arenaRealtimeHub)
 	server.RegisterAdminUsersRoutes(httpServer, storage.profileRepo, services.profileServiceDomain, services.profileServiceDomain)
+	profileprogresshttp.Register(httpServer, storage.profileRepo, services.profileServiceDomain)
+	interviewprepcheckpointhttp.Register(httpServer, services.interviewPrepDomain, services.profileServiceDomain)
 }
 
 func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.Server, services *serviceContext) {

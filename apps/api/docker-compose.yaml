@@ -150,6 +150,46 @@ services:
     networks:
       - api_network
 
+  sandbox-runner:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: sandbox-runner-runtime
+    image: druz9-sandbox-runner:local
+    container_name: api-sandbox-runner
+    restart: unless-stopped
+    depends_on:
+      sandbox-exec-image:
+        condition: service_completed_successfully
+    environment:
+      SANDBOX_RUNNER_BIND_ADDR: ":8098"
+      SANDBOX_EXEC_IMAGE: druz9-sandbox-exec:local
+      SANDBOX_RUNNER_TIMEOUT: 25s
+    ports:
+      - "8098:8098"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8098/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - api_network
+
+  sandbox-exec-image:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: sandbox-exec-runtime
+    image: druz9-sandbox-exec:local
+    container_name: api-sandbox-exec-image
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["exit 0"]
+    networks:
+      - api_network
+
   # backend intentionally omitted from local compose;
   # run it separately via `make run`.
   #

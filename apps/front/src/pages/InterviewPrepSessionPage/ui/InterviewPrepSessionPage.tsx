@@ -2,6 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   InterviewPrepAnswerReview,
+  InterviewPrepCheckpoint,
   interviewPrepApi,
   InterviewPrepQuestion,
   InterviewPrepSession,
@@ -47,6 +48,7 @@ export function InterviewPrepSessionPage() {
   const [answering, setAnswering] = useState(false);
   const [answerText, setAnswerText] = useState('');
   const [answerReview, setAnswerReview] = useState<InterviewPrepAnswerReview | null>(null);
+  const [checkpoint, setCheckpoint] = useState<InterviewPrepCheckpoint | null>(null);
   const [revealedQuestion, setRevealedQuestion] = useState<InterviewPrepQuestion | null>(null);
   const [revealedHistory, setRevealedHistory] = useState<InterviewPrepQuestion[]>([]);
   const [code, setCode] = useState('');
@@ -71,6 +73,7 @@ export function InterviewPrepSessionPage() {
   const [isResizingEditor, setIsResizingEditor] = useState(false);
   const [speechSupported] = useState(Boolean(getSpeechRecognitionCtor()));
   const [speechActive, setSpeechActive] = useState(false);
+  const [clockNow, setClockNow] = useState(() => Date.now());
   const speechRef = useRef<any>(null);
   const [submitResult, setSubmitResult] = useState<{
     passed: boolean;
@@ -92,6 +95,24 @@ export function InterviewPrepSessionPage() {
       })
       .finally(() => setLoading(false));
   }, [sessionId]);
+
+  useEffect(() => {
+    if (!sessionId) {
+      setCheckpoint(null);
+      return;
+    }
+    interviewPrepApi.getCheckpoint(sessionId)
+      .then(setCheckpoint)
+      .catch(() => setCheckpoint(null));
+  }, [sessionId]);
+
+  useEffect(() => {
+    if (!checkpoint || checkpoint.status !== 'active') {
+      return;
+    }
+    const id = window.setInterval(() => setClockNow(Date.now()), 1000);
+    return () => window.clearInterval(id);
+  }, [checkpoint]);
 
   useEffect(() => {
     const fallbackLanguage = session?.solveLanguage || session?.task?.supportedLanguages?.[0] || session?.task?.language || 'go';
@@ -163,7 +184,7 @@ export function InterviewPrepSessionPage() {
 
   const canShowQuestions = Boolean(
     session?.currentQuestion && (!session?.task?.isExecutable || session?.lastSubmissionPassed),
-  );
+  ) && !checkpoint;
   const showLiveCoding = Boolean(session?.task?.starterCode && session?.task?.isExecutable);
   const canSubmitExecutable = Boolean(session?.task?.isExecutable);
   const showSystemDesignReview = session?.task?.prepType === 'system_design';
@@ -199,6 +220,14 @@ export function InterviewPrepSessionPage() {
       });
       if (result.session) {
         setSession(result.session);
+      }
+      if (checkpoint) {
+        try {
+          const nextCheckpoint = await interviewPrepApi.getCheckpoint(sessionId);
+          setCheckpoint(nextCheckpoint);
+        } catch {
+          setCheckpoint(null);
+        }
       }
     } catch (e: any) {
       console.error('Failed to submit code:', e);
@@ -289,7 +318,7 @@ export function InterviewPrepSessionPage() {
 
   return (
     <div className="interview-prep-session-page">
-      <SessionHero task={task} answeredCount={progress.answeredCount} />
+      <SessionHero task={task} answeredCount={progress.answeredCount} checkpoint={checkpoint} nowTs={clockNow} />
 
       {error && (
         <section className="card dashboard-card">
@@ -313,6 +342,7 @@ export function InterviewPrepSessionPage() {
 
       <FollowUpSection
         session={session}
+        checkpoint={checkpoint}
         canShowQuestions={canShowQuestions}
         answering={answering}
         answerText={answerText}
@@ -327,6 +357,7 @@ export function InterviewPrepSessionPage() {
       {showLiveCoding && task && (
         <LiveCodingSection
           task={task}
+          checkpoint={checkpoint}
           canSubmitExecutable={canSubmitExecutable}
           solveLanguage={solveLanguage}
           solveLanguageOptions={solveLanguageOptions}

@@ -25,6 +25,61 @@ export interface ProfileResponse {
   needsProfileComplete: boolean;
 }
 
+export interface ProfileProgressOverview {
+  practiceSessions: number;
+  practicePassedSessions: number;
+  practiceActiveDays: number;
+  completedMockSessions: number;
+  completedMockStages: number;
+  answeredQuestions: number;
+  averageStageScore: number;
+  averageQuestionScore: number;
+  currentStreakDays: number;
+  lastActivityAt?: string;
+}
+
+export interface ProfileCompetency {
+  key: string;
+  label: string;
+  score: number;
+  practiceScore: number;
+  verifiedScore: number;
+  stageCount: number;
+  questionCount: number;
+  practiceSessions: number;
+  practicePassedSessions: number;
+  practiceDays: number;
+  confidence: 'low' | 'medium' | 'verified';
+  averageScore: number;
+}
+
+export interface ProfileProgressRecommendation {
+  key: string;
+  title: string;
+  description: string;
+  href: string;
+}
+
+export interface ProfileCheckpointProgress {
+  id: string;
+  taskId: string;
+  taskTitle: string;
+  skillKey: string;
+  skillLabel: string;
+  score: number;
+  finishedAt?: string;
+}
+
+export interface ProfileProgress {
+  overview: ProfileProgressOverview;
+  competencies: ProfileCompetency[];
+  strongest: ProfileCompetency[];
+  weakest: ProfileCompetency[];
+  recommendations: ProfileProgressRecommendation[];
+  checkpoints: ProfileCheckpointProgress[];
+  companies: string[];
+}
+
 export interface LocationCandidate {
   region: string;
   country: string;

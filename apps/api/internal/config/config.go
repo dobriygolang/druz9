@@ -8,6 +8,7 @@ type Bootstrap struct {
 	Auth     *Auth     `json:"auth"`
 	Dev      *Dev      `json:"dev"`
 	Arena    *Arena    `json:"arena"`
+	Sandbox  *Sandbox  `json:"sandbox"`
 	External *External `json:"external"`
 	Metrics  *Metrics  `json:"metrics"`
 }
@@ -78,6 +79,12 @@ type Auth struct {
 type Dev struct {
 	AuthBypass bool   `json:"auth_bypass"`
 	DevUserID  string `json:"dev_user_id"`
+}
+
+type Sandbox struct {
+	Mode      string        `json:"mode"`
+	RunnerURL string        `json:"runner_url"`
+	Timeout   time.Duration `json:"timeout"`
 }
 
 type Session struct {

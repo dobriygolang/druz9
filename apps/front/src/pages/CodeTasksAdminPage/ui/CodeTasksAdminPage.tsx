@@ -12,7 +12,6 @@ import {
   CodeTasksAdminModal,
 } from './components/CodeTasksAdminSections';
 import {
-  POLICY_HELP,
   TaskFormState,
   buildTaskPayload,
   createEmptyCase,
@@ -30,7 +29,6 @@ export const CodeTasksAdminPage: React.FC = () => {
   const [difficultyFilter, setDifficultyFilter] = useState('');
   const [search, setSearch] = useState('');
   const [showTaskModal, setShowTaskModal] = useState(false);
-  const [showPolicyHelp, setShowPolicyHelp] = useState(false);
   const [taskForm, setTaskForm] = useState<TaskFormState>(createEmptyTaskForm());
   const [savingTask, setSavingTask] = useState(false);
   const [deletingTaskId, setDeletingTaskId] = useState<string | null>(null);
@@ -72,16 +70,18 @@ export const CodeTasksAdminPage: React.FC = () => {
   }, [search, tasks]);
 
   const activeTasksCount = useMemo(() => tasks.filter((task) => task.isActive).length, [tasks]);
+  const existingTopics = useMemo(
+    () => Array.from(new Set(tasks.flatMap((task) => task.topics))).sort(),
+    [tasks],
+  );
 
   const closeTaskModal = () => {
     setShowTaskModal(false);
-    setShowPolicyHelp(false);
     setTaskForm(createEmptyTaskForm());
   };
 
   const openCreateTaskModal = (task?: CodeTask) => {
     setTaskForm(task ? taskToForm(task) : createEmptyTaskForm());
-    setShowPolicyHelp(false);
     setShowTaskModal(true);
   };
 
@@ -144,44 +144,6 @@ export const CodeTasksAdminPage: React.FC = () => {
     }
   };
 
-  const policySummary = useMemo(() => {
-    const parts = [taskForm.executionProfile];
-    if (taskForm.fixtureFiles.trim()) {
-      parts.push(`files ${taskForm.fixtureFiles.split(',').filter(Boolean).length}`);
-    }
-    if (taskForm.allowedHosts.trim() || taskForm.mockEndpoints.trim()) {
-      parts.push('network restricted');
-    }
-    if (taskForm.writableTempDir) {
-      parts.push('temp write');
-    }
-    return parts.join(' • ');
-  }, [taskForm.allowedHosts, taskForm.executionProfile, taskForm.fixtureFiles, taskForm.mockEndpoints, taskForm.writableTempDir]);
-
-  const showFilesystemPolicy = taskForm.executionProfile === 'file_io' || taskForm.executionProfile === 'interview_realistic';
-  const showNetworkPolicy = taskForm.executionProfile === 'http_client' || taskForm.executionProfile === 'interview_realistic';
-  const selectedPolicyHelp = POLICY_HELP[taskForm.executionProfile as keyof typeof POLICY_HELP];
-
-  const policyWarnings = useMemo(() => {
-    const warnings: string[] = [];
-    if (taskForm.executionProfile === 'pure' && (taskForm.fixtureFiles.trim() || taskForm.allowedHosts.trim() || taskForm.mockEndpoints.trim())) {
-      warnings.push('`pure` не поддерживает файлы и сеть. Эти поля будут очищены при сохранении.');
-    }
-    if (taskForm.executionProfile === 'file_io' && (taskForm.allowedHosts.trim() || taskForm.mockEndpoints.trim())) {
-      warnings.push('`file_io` не поддерживает сеть. Network-поля будут очищены при сохранении.');
-    }
-    if (taskForm.executionProfile === 'http_client' && (taskForm.fixtureFiles.trim() || taskForm.readablePaths.trim() || taskForm.writablePaths.trim())) {
-      warnings.push('`http_client` не использует filesystem policy. File-поля будут очищены при сохранении.');
-    }
-    if (showNetworkPolicy && !taskForm.allowedHosts.trim() && !taskForm.mockEndpoints.trim()) {
-      warnings.push('Для network profile укажи хотя бы один allowlist host или mock endpoint.');
-    }
-    if (taskForm.executionProfile === 'file_io' && !taskForm.fixtureFiles.trim()) {
-      warnings.push('Для `file_io` укажи хотя бы один fixture file.');
-    }
-    return warnings;
-  }, [showNetworkPolicy, taskForm.allowedHosts, taskForm.executionProfile, taskForm.fixtureFiles, taskForm.mockEndpoints, taskForm.readablePaths, taskForm.writablePaths]);
-
   const handleDeleteTask = async (taskId: string) => {
     setDeletingTaskId(taskId);
     try {
@@ -226,15 +188,9 @@ export const CodeTasksAdminPage: React.FC = () => {
         isOpen={showTaskModal}
         taskForm={taskForm}
         savingTask={savingTask}
-        showPolicyHelp={showPolicyHelp}
-        policySummary={policySummary}
-        policyWarnings={policyWarnings}
-        showFilesystemPolicy={showFilesystemPolicy}
-        showNetworkPolicy={showNetworkPolicy}
-        selectedPolicyHelp={selectedPolicyHelp}
+        existingTopics={existingTopics}
         onClose={closeTaskModal}
         onSave={() => void handleSaveTask()}
-        setShowPolicyHelp={setShowPolicyHelp}
         setTaskForm={setTaskForm}
         updateTaskCase={updateTaskCase}
         addTaskCase={addTaskCase}

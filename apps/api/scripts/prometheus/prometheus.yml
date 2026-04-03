@@ -16,6 +16,11 @@ scrape_configs:
       - targets: ['backend:8081']
     metrics_path: /metrics
 
+  - job_name: 'sandbox_runner'
+    static_configs:
+      - targets: ['sandbox-runner:8098']
+    metrics_path: /metrics
+
   - job_name: 'postgres'
     static_configs:
       - targets: ['postgres-exporter:9187']

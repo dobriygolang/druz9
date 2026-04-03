@@ -27,6 +27,7 @@ export function InterviewPrepPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [startingTaskId, setStartingTaskId] = useState<string | null>(null);
+  const [startingCheckpointTaskId, setStartingCheckpointTaskId] = useState<string | null>(null);
   const [startingMock, setStartingMock] = useState(false);
   const [search, setSearch] = useState(searchParams.get('q') ?? '');
   const [modeFilter, setModeFilter] = useState<TaskModeFilter>((searchParams.get('mode') as TaskModeFilter) || 'all');
@@ -179,6 +180,20 @@ export function InterviewPrepPage() {
     }
   };
 
+  const startCheckpoint = async (taskId: string) => {
+    setError(null);
+    setStartingCheckpointTaskId(taskId);
+    try {
+      const result = await interviewPrepApi.startCheckpoint(taskId);
+      navigate(`/interview-prep/${result.session.id}`);
+    } catch (e: any) {
+      console.error('Failed to start checkpoint session:', e);
+      setError(e.response?.data?.error || 'Не удалось начать checkpoint');
+    } finally {
+      setStartingCheckpointTaskId(null);
+    }
+  };
+
   const startMockInterview = async () => {
     setError(null);
     setStartingMock(true);
@@ -235,6 +250,16 @@ export function InterviewPrepPage() {
     await startTask(picked.id);
   };
 
+  const handleRandomCheckpoint = async (pool: InterviewPrepTask[]) => {
+    const eligibleTasks = pool.filter((task) => task.isActive && task.isExecutable && task.prepType !== 'system_design' && task.prepType !== 'code_review');
+    if (eligibleTasks.length === 0) {
+      setError('Для текущего фильтра пока нет задач, подходящих для checkpoint.');
+      return;
+    }
+    const picked = eligibleTasks[Math.floor(Math.random() * eligibleTasks.length)];
+    await startCheckpoint(picked.id);
+  };
+
   useEffect(() => {
     if (loading || randomLaunchTriggered.current || searchParams.get('pick') !== 'random') {
       return;
@@ -255,6 +280,7 @@ export function InterviewPrepPage() {
         summary={summary}
         onStartMockInterview={() => void startMockInterview()}
         onStartRandomTask={() => void handleRandomStart(filteredTasks)}
+        onStartRandomCheckpoint={() => void handleRandomCheckpoint(filteredTasks)}
         onResetFilters={() => {
           setCategory('all');
           setCompany('all');
@@ -304,7 +330,9 @@ export function InterviewPrepPage() {
           groupedTasks={groupedTasks}
           visibleCounts={visibleCounts}
           startingTaskId={startingTaskId}
+          startingCheckpointTaskId={startingCheckpointTaskId}
           onStartTask={(taskId) => void startTask(taskId)}
+          onStartCheckpoint={(taskId) => void startCheckpoint(taskId)}
           onRandomStart={(tasks) => void handleRandomStart(tasks)}
           onShowMore={(groupKey) => setVisibleCounts((current) => ({
             ...current,

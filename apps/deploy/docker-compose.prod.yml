@@ -215,6 +215,42 @@ services:
     networks:
       - app_network
 
+  sandbox-runner:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+      target: sandbox-runner-runtime
+    image: druz9-sandbox-runner:prod
+    restart: unless-stopped
+    depends_on:
+      sandbox-exec-image:
+        condition: service_completed_successfully
+    environment:
+      SANDBOX_RUNNER_BIND_ADDR: ":8098"
+      SANDBOX_EXEC_IMAGE: druz9-sandbox-exec:prod
+      SANDBOX_RUNNER_TIMEOUT: 25s
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8098/healthz >/dev/null 2>&1 || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+    networks:
+      - app_network
+
+  sandbox-exec-image:
+    build:
+      context: ../api
+      dockerfile: Dockerfile
+      target: sandbox-exec-runtime
+    image: druz9-sandbox-exec:prod
+    restart: "no"
+    entrypoint: ["/bin/sh", "-c"]
+    command: ["exit 0"]
+    networks:
+      - app_network
+
   backend:
     build:
       context: ../api
@@ -229,6 +265,8 @@ services:
         condition: service_healthy
       minio-init:
         condition: service_completed_successfully
+      sandbox-runner:
+        condition: service_healthy
     environment:
       CONFIG_PROFILE: prod
       RTC_VALUES_PATH: /app/.platform/values_prod.yaml
@@ -241,6 +279,9 @@ services:
       S3_PUBLIC_ENDPOINT: ${S3_PUBLIC_ENDPOINT:-}
       AI_REVIEW_API_KEY_FILE: /run/secrets/ai_review_api_key
       YANDEX_OAUTH_CLIENT_SECRET: ${YANDEX_OAUTH_CLIENT_SECRET}
+      SANDBOX_MODE: remote
+      SANDBOX_RUNNER_URL: http://sandbox-runner:8098
+      SANDBOX_RUNNER_TIMEOUT: 25s
     volumes:
       - ../api/.platform/values_prod.yaml:/app/.platform/values_prod.yaml:ro
     command: ["/app/bin/api"]
