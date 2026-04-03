@@ -1234,19 +1234,19 @@ type User struct {
 	state              protoimpl.MessageState `protogen:"open.v1"`
 	Id                 string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	Username           string                 `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	FirstName          string                 `protobuf:"bytes,4,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName           string                 `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	AvatarUrl          string                 `protobuf:"bytes,6,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
-	Region             string                 `protobuf:"bytes,7,opt,name=region,proto3" json:"region,omitempty"`
-	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,8,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	Latitude           float64                `protobuf:"fixed64,10,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude          float64                `protobuf:"fixed64,11,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	ActivityStatus     UserActivityStatus     `protobuf:"varint,12,opt,name=activity_status,json=activityStatus,proto3,enum=profile.v1.UserActivityStatus" json:"activity_status,omitempty"`
-	CurrentWorkplace   string                 `protobuf:"bytes,13,opt,name=current_workplace,json=currentWorkplace,proto3" json:"current_workplace,omitempty"`
-	IsAdmin            bool                   `protobuf:"varint,14,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
-	IsTrusted          bool                   `protobuf:"varint,16,opt,name=is_trusted,json=isTrusted,proto3" json:"is_trusted,omitempty"`
-	ConnectedProviders []string               `protobuf:"bytes,17,rep,name=connected_providers,json=connectedProviders,proto3" json:"connected_providers,omitempty"`
-	PrimaryProvider    string                 `protobuf:"bytes,18,opt,name=primary_provider,json=primaryProvider,proto3" json:"primary_provider,omitempty"`
+	FirstName          string                 `protobuf:"bytes,3,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName           string                 `protobuf:"bytes,4,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	AvatarUrl          string                 `protobuf:"bytes,5,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	Region             string                 `protobuf:"bytes,6,opt,name=region,proto3" json:"region,omitempty"`
+	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	Latitude           float64                `protobuf:"fixed64,8,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude          float64                `protobuf:"fixed64,9,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	ActivityStatus     UserActivityStatus     `protobuf:"varint,10,opt,name=activity_status,json=activityStatus,proto3,enum=profile.v1.UserActivityStatus" json:"activity_status,omitempty"`
+	CurrentWorkplace   string                 `protobuf:"bytes,11,opt,name=current_workplace,json=currentWorkplace,proto3" json:"current_workplace,omitempty"`
+	IsAdmin            bool                   `protobuf:"varint,12,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
+	IsTrusted          bool                   `protobuf:"varint,13,opt,name=is_trusted,json=isTrusted,proto3" json:"is_trusted,omitempty"`
+	ConnectedProviders []string               `protobuf:"bytes,14,rep,name=connected_providers,json=connectedProviders,proto3" json:"connected_providers,omitempty"`
+	PrimaryProvider    string                 `protobuf:"bytes,15,opt,name=primary_provider,json=primaryProvider,proto3" json:"primary_provider,omitempty"`
 	unknownFields      protoimpl.UnknownFields
 	sizeCache          protoimpl.SizeCache
 }
@@ -1470,23 +1470,23 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x1d\n" +
 	"\n" +
-	"first_name\x18\x04 \x01(\tR\tfirstName\x12\x1b\n" +
-	"\tlast_name\x18\x05 \x01(\tR\blastName\x12\x1d\n" +
+	"first_name\x18\x03 \x01(\tR\tfirstName\x12\x1b\n" +
+	"\tlast_name\x18\x04 \x01(\tR\blastName\x12\x1d\n" +
 	"\n" +
-	"avatar_url\x18\x06 \x01(\tR\tavatarUrl\x12\x16\n" +
-	"\x06region\x18\a \x01(\tR\x06region\x129\n" +
+	"avatar_url\x18\x05 \x01(\tR\tavatarUrl\x12\x16\n" +
+	"\x06region\x18\x06 \x01(\tR\x06region\x129\n" +
 	"\n" +
-	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x1a\n" +
-	"\blatitude\x18\n" +
-	" \x01(\x01R\blatitude\x12\x1c\n" +
-	"\tlongitude\x18\v \x01(\x01R\tlongitude\x12G\n" +
-	"\x0factivity_status\x18\f \x01(\x0e2\x1e.profile.v1.UserActivityStatusR\x0eactivityStatus\x12+\n" +
-	"\x11current_workplace\x18\r \x01(\tR\x10currentWorkplace\x12\x19\n" +
-	"\bis_admin\x18\x0e \x01(\bR\aisAdmin\x12\x1d\n" +
+	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x1a\n" +
+	"\blatitude\x18\b \x01(\x01R\blatitude\x12\x1c\n" +
+	"\tlongitude\x18\t \x01(\x01R\tlongitude\x12G\n" +
+	"\x0factivity_status\x18\n" +
+	" \x01(\x0e2\x1e.profile.v1.UserActivityStatusR\x0eactivityStatus\x12+\n" +
+	"\x11current_workplace\x18\v \x01(\tR\x10currentWorkplace\x12\x19\n" +
+	"\bis_admin\x18\f \x01(\bR\aisAdmin\x12\x1d\n" +
 	"\n" +
-	"is_trusted\x18\x10 \x01(\bR\tisTrusted\x12/\n" +
-	"\x13connected_providers\x18\x11 \x03(\tR\x12connectedProviders\x12)\n" +
-	"\x10primary_provider\x18\x12 \x01(\tR\x0fprimaryProvider*\xa7\x01\n" +
+	"is_trusted\x18\r \x01(\bR\tisTrusted\x12/\n" +
+	"\x13connected_providers\x18\x0e \x03(\tR\x12connectedProviders\x12)\n" +
+	"\x10primary_provider\x18\x0f \x01(\tR\x0fprimaryProvider*\xa7\x01\n" +
 	"\x12UserActivityStatus\x12$\n" +
 	" USER_ACTIVITY_STATUS_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bUSER_ACTIVITY_STATUS_ONLINE\x10\x01\x12(\n" +

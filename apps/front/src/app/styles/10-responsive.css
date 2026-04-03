@@ -6,9 +6,9 @@
 .mobile-only { display: none; }
 
 /* ===========================================
-   BREAKPOINT: Ultra-Wide (Monitor 24"+)
+   BREAKPOINT: Ultra-Wide (Monitor 14"+)
    =========================================== */
-@media (min-width: 1601px) {
+@media (min-width: 1600px) {
   .main-content {
     padding: var(--space-10) var(--space-12);
   }
@@ -28,10 +28,11 @@
   }
 }
 
+
 /* ===========================================
-   BREAKPOINT: Laptop & Desktop
+   BREAKPOINT: Tablet & Small Laptop
    =========================================== */
-@media (min-width: 1181px) and (max-width: 1600px) {
+@media (min-width: 1181px) and (max-width: 1399px) {
   .main-content {
     padding: var(--space-7) var(--space-8) var(--space-10);
   }

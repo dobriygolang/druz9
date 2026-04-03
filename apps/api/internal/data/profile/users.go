@@ -15,7 +15,7 @@ import (
 
 const userSelectColumns = `
   u.id,
-  NULLIF(u.username, ''),
+  COALESCE(NULLIF(u.telegram_username, ''), NULLIF(u.username, ''), ''),
   NULLIF(u.first_name, ''),
   NULLIF(u.last_name, ''),
   COALESCE(NULLIF(u.avatar_url, ''), NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), ''),

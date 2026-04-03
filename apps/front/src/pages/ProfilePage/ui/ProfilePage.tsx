@@ -508,11 +508,6 @@ export const ProfilePage: React.FC = () => {
           justifyContent: isMobile ? 'center' : 'flex-start',
           marginTop: isMobile ? '12px' : '0'
         }}>
-          <span className="profile-badge profile-badge--account">
-            <CheckCircle size={14} />
-            Аккаунт
-          </span>
-
           {user.isAdmin && (
             <span className="profile-badge profile-badge--admin">
               <Shield size={14} />

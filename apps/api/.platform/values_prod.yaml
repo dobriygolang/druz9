@@ -166,7 +166,6 @@ telegram_auth_max_age:
   type: "duration"
   writable: false
 
-
 telegram_bot_username:
   usage: "Telegram bot username without @; env TELEGRAM_BOT_USERNAME overrides"
   group: "external"

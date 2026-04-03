@@ -209,19 +209,19 @@ message LogoutResponse {
 message User {
   string id = 1;
   string username = 2;
-  string first_name = 4;
-  string last_name = 5;
-  string avatar_url = 6;
-  string region = 7;
-  google.protobuf.Timestamp created_at = 8;
-  double latitude = 10;
-  double longitude = 11;
-  UserActivityStatus activity_status = 12;
-  string current_workplace = 13;
-  bool is_admin = 14;
-  bool is_trusted = 16;
-  repeated string connected_providers = 17;
-  string primary_provider = 18;
+  string first_name = 3;
+  string last_name = 4;
+  string avatar_url = 5;
+  string region = 6;
+  google.protobuf.Timestamp created_at = 7;
+  double latitude = 8;
+  double longitude = 9;
+  UserActivityStatus activity_status = 10;
+  string current_workplace = 11;
+  bool is_admin = 12;
+  bool is_trusted = 13;
+  repeated string connected_providers = 14;
+  string primary_provider = 15;
 }
 
 enum UserActivityStatus {

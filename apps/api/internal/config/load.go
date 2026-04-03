@@ -195,9 +195,6 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 	if v := manager.GetValue(ctx, rtc.YandexOauthClientId); v.String() != "" {
 		cfg.External.Yandex.ClientID = v.String()
 	}
-	if v := manager.GetValue(ctx, rtc.YandexOauthClientSecret); v.String() != "" {
-		cfg.External.Yandex.ClientSecret = v.String()
-	}
 	if v := manager.GetValue(ctx, rtc.YandexOauthRedirectUrl); v.String() != "" {
 		cfg.External.Yandex.RedirectURL = v.String()
 	}
