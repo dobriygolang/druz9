@@ -47,9 +47,7 @@ export const BottomNav: React.FC = () => {
           <MenuLink to="/users" icon={<Users size={20} />} label="Сообщество" onClick={() => setIsMenuOpen(false)} />
           <MenuLink to="/vacancies" icon={<Briefcase size={20} />} label="Вакансии" onClick={() => setIsMenuOpen(false)} />
           
-          {user?.isTrusted && (
-            <MenuLink to="/interview-prep" icon={<BookOpen size={20} />} label="Go Prep" onClick={() => setIsMenuOpen(false)} />
-          )}
+          <MenuLink to="/interview-prep" icon={<BookOpen size={20} />} label="Go Prep" onClick={() => setIsMenuOpen(false)} />
           
           {user?.isAdmin && (
             <>

@@ -652,7 +652,9 @@
   border: 1px solid var(--border-color);
   background: rgba(255, 255, 255, 0.03);
   display: grid;
-  gap: 16px;
+  grid-template-rows: auto auto 1fr;
+  gap: 14px;
+  min-height: 280px;
 }
 
 .auth-provider-card--primary {
@@ -664,15 +666,19 @@
 .auth-provider-card__header {
   display: grid;
   gap: 8px;
+  align-content: start;
 }
 
 .auth-provider-card__header h2 {
   margin: 0;
   font-size: 24px;
+  line-height: 1.08;
 }
 
 .auth-provider-card__badge {
   display: inline-flex;
+  align-self: start;
+  align-items: center;
   width: fit-content;
   padding: 4px 10px;
   border-radius: 999px;
@@ -680,6 +686,8 @@
   color: #86efac;
   font-size: 11px;
   font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }
@@ -697,14 +705,74 @@
 .auth-provider-card__action-wrapper {
   display: flex;
   flex-direction: column;
+  justify-content: end;
   width: 100%;
   gap: 14px;
+  min-height: 108px;
+}
+
+.auth-provider-card > p {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.55;
+}
+
+.telegram-auth-widget {
+  display: grid;
+  gap: 14px;
+  width: 100%;
+}
+
+.telegram-auth-widget__controls {
+  display: grid;
+  gap: 10px;
+}
+
+.telegram-auth-widget__primary,
+.telegram-auth-widget__secondary {
+  width: 100%;
+  min-height: 46px;
+}
+
+.telegram-auth-widget__code-input {
+  width: 100%;
+  min-height: 46px;
+  border-radius: 14px;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text-primary);
+  padding: 0 14px;
+  font-size: 16px;
+  letter-spacing: 0.16em;
+  text-align: center;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+}
+
+.telegram-auth-widget__code-input::placeholder {
+  color: rgba(148, 163, 184, 0.74);
+  letter-spacing: 0.04em;
+}
+
+.telegram-auth-widget__code-input:focus {
+  outline: none;
+  border-color: rgba(99, 102, 241, 0.42);
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.14);
+}
+
+.telegram-auth-widget__hint {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  text-align: center;
 }
 
 @media (max-width: 768px) {
   .auth-provider-card {
     padding: 18px;
     gap: 14px;
+    min-height: auto;
+    grid-template-rows: auto;
   }
 
   .auth-provider-card__header h2 {
@@ -714,6 +782,10 @@
   .auth-provider-card__badge {
     font-size: 10px;
     padding: 3px 8px;
+  }
+
+  .auth-provider-card__action-wrapper {
+    min-height: 0;
   }
 }
 

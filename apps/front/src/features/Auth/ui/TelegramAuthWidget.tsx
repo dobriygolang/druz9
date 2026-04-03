@@ -69,17 +69,16 @@ export const TelegramAuthWidget: React.FC<TelegramAuthWidgetProps> = ({
   };
 
   return (
-    <div style={{ display: 'grid', gap: '14px', width: '100%' }}>
+    <div className="telegram-auth-widget">
       <button
         type="button"
-        className="btn btn-primary"
+        className="btn btn-primary telegram-auth-widget__primary"
         onClick={handleStart}
         disabled={isStarting}
-        style={{ width: '100%', minHeight: '46px' }}
       >
         {isStarting ? 'Открываем Telegram...' : 'Получить код в Telegram'}
       </button>
-      <div style={{ display: 'grid', gap: '10px' }}>
+      <div className="telegram-auth-widget__controls">
         <input
           type="text"
           inputMode="numeric"
@@ -87,31 +86,19 @@ export const TelegramAuthWidget: React.FC<TelegramAuthWidgetProps> = ({
           placeholder="Код из бота"
           value={code}
           onChange={(event) => setCode(event.target.value.replace(/[^\d]/g, '').slice(0, 6))}
-          style={{
-            width: '100%',
-            minHeight: '46px',
-            borderRadius: '12px',
-            border: '1px solid rgba(148, 163, 184, 0.28)',
-            background: 'rgba(15, 23, 42, 0.28)',
-            color: 'var(--text-primary)',
-            padding: '0 14px',
-            fontSize: '16px',
-            letterSpacing: '0.18em',
-            textAlign: 'center',
-          }}
+          className="telegram-auth-widget__code-input"
         />
         <button
           type="button"
-          className="btn btn-secondary"
+          className="btn btn-secondary telegram-auth-widget__secondary"
           onClick={handleSubmit}
           disabled={isSubmitting || code.trim().length < 4}
-          style={{ width: '100%', minHeight: '44px' }}
         >
           {isSubmitting ? 'Проверяем код...' : 'Войти по коду'}
         </button>
       </div>
       {hint && (
-        <div style={{ fontSize: '13px', lineHeight: 1.5, color: 'var(--text-secondary)', textAlign: 'center' }}>
+        <div className="telegram-auth-widget__hint">
           {hint}
         </div>
       )}

@@ -365,6 +365,30 @@
   text-align: center;
 }
 
+.arena-mobile-tabs {
+  display: none;
+}
+
+.arena-mobile-tab {
+  appearance: none;
+  border: none;
+  background: transparent;
+  color: var(--text-secondary);
+  font: inherit;
+  font-weight: 600;
+  min-height: 42px;
+  cursor: pointer;
+  transition: background 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.arena-mobile-tab.has-error {
+  color: #fca5a5;
+}
+
+.arena-mobile-tab.active {
+  color: #ffffff;
+}
+
 @media (max-width: 1024px) {
   .arena-page {
     height: auto;
@@ -396,6 +420,7 @@
     gap: var(--space-1);
     padding: var(--space-1);
     background: var(--surface-color);
+    border: 1px solid var(--border-color);
     border-radius: var(--radius-lg);
     margin: 0 var(--space-4);
   }

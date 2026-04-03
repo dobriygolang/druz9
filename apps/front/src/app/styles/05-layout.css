@@ -79,7 +79,7 @@
 }
 
 .main-content-code-room {
-  padding: var(--space-3) var(--space-4) var(--space-6);
+  padding: var(--space-2) var(--space-3) var(--space-6);
   overflow: auto;
 }
 
@@ -92,6 +92,12 @@
 
 .content-wrapper-wide {
   max-width: min(1880px, calc(100vw - 48px));
+}
+
+.main-content-code-room .content-wrapper-wide,
+.main-content-code-room .content-wrapper-code-room {
+  max-width: none;
+  width: 100%;
 }
 
 .content-wrapper-code-room {

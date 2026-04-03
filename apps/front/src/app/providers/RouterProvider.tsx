@@ -67,7 +67,7 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 
 
 export const RouterProvider: React.FC = () => {
-  const { isLoading, isAuthenticated, needsProfileComplete, user } = useAuth();
+  const { isLoading, isAuthenticated, needsProfileComplete } = useAuth();
 
   // Show global loading only on initial load
   if (isLoading) {
@@ -162,8 +162,6 @@ export const RouterProvider: React.FC = () => {
             path="/interview-prep"
             element={!isAuthenticated || needsProfileComplete ? (
               <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
-            ) : !user?.isTrusted ? (
-              <Navigate to="/" replace />
             ) : (
               <InterviewPrepPage />
             )}
@@ -173,8 +171,6 @@ export const RouterProvider: React.FC = () => {
             path="/interview-prep/:sessionId"
             element={!isAuthenticated || needsProfileComplete ? (
               <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
-            ) : !user?.isTrusted ? (
-              <Navigate to="/" replace />
             ) : (
               <InterviewPrepSessionPage />
             )}
@@ -184,8 +180,6 @@ export const RouterProvider: React.FC = () => {
             path="/interview-prep/mock/:sessionId"
             element={!isAuthenticated || needsProfileComplete ? (
               <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
-            ) : !user?.isTrusted ? (
-              <Navigate to="/" replace />
             ) : (
               <InterviewPrepMockSessionPage />
             )}
