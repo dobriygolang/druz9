@@ -30,6 +30,7 @@ type Authorizer interface {
 
 type Service interface {
 	ListTasks(ctx context.Context, user *model.User) ([]*model.InterviewPrepTask, error)
+	GetAvailableCompanies(ctx context.Context) ([]string, error)
 	StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error)
 	GetSession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepSession, error)
 	StartMockSession(ctx context.Context, user *model.User, companyTag string) (*model.InterviewPrepMockSession, error)

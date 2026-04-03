@@ -15,10 +15,11 @@ import (
 
 const userSelectColumns = `
   u.id,
-  COALESCE(NULLIF(u.telegram_username, ''), NULLIF(u.username, ''), ''),
+  COALESCE(NULLIF(u.username, ''), ''),
+  NULLIF(u.telegram_username, ''),
   NULLIF(u.first_name, ''),
   NULLIF(u.last_name, ''),
-  COALESCE(NULLIF(u.avatar_url, ''), NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), ''),
+  COALESCE(NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), ''),
   NULLIF(u.current_workplace, ''),
   g.region,
   g.country,
@@ -71,7 +72,6 @@ INSERT INTO users (
   username,
   first_name,
   last_name,
-  avatar_url,
   telegram_id,
   telegram_username,
   telegram_avatar_url,
@@ -87,7 +87,6 @@ VALUES (
   COALESCE(NULLIF($2, ''), ''),
   COALESCE(NULLIF($3, ''), ''),
   COALESCE(NULLIF($4, ''), ''),
-  COALESCE(NULLIF($5, ''), ''),
   $1,
   COALESCE(NULLIF($2, ''), ''),
   COALESCE(NULLIF($5, ''), ''),
@@ -105,7 +104,6 @@ SET
   username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''), ''),
   first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
   last_name = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
-  avatar_url = COALESCE(NULLIF(users.avatar_url, ''), NULLIF(EXCLUDED.avatar_url, ''), ''),
   telegram_username = COALESCE(NULLIF(EXCLUDED.telegram_username, ''), users.telegram_username, ''),
   telegram_avatar_url = COALESCE(NULLIF(EXCLUDED.telegram_avatar_url, ''), users.telegram_avatar_url, ''),
   primary_provider = COALESCE(NULLIF(users.primary_provider, ''), 'telegram'),
@@ -138,7 +136,6 @@ INSERT INTO users (
   username,
   first_name,
   last_name,
-  avatar_url,
   yandex_id,
   yandex_login,
   yandex_email,
@@ -155,7 +152,6 @@ VALUES (
   COALESCE(NULLIF($2, ''), ''),
   COALESCE(NULLIF($3, ''), ''),
   COALESCE(NULLIF($4, ''), ''),
-  COALESCE(NULLIF($5, ''), ''),
   $1,
   COALESCE(NULLIF($2, ''), ''),
   COALESCE(NULLIF($6, ''), ''),
@@ -174,7 +170,6 @@ SET
   username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''), ''),
   first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
   last_name = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
-  avatar_url = COALESCE(NULLIF(users.avatar_url, ''), NULLIF(EXCLUDED.avatar_url, ''), ''),
   yandex_login = COALESCE(NULLIF(EXCLUDED.yandex_login, ''), users.yandex_login, ''),
   yandex_email = COALESCE(NULLIF(EXCLUDED.yandex_email, ''), users.yandex_email, ''),
   yandex_avatar_url = COALESCE(NULLIF(EXCLUDED.yandex_avatar_url, ''), users.yandex_avatar_url, ''),
@@ -333,23 +328,6 @@ func (r *Repo) UpdateLocation(ctx context.Context, userID uuid.UUID, req model.C
 	return r.CompleteRegistration(ctx, userID, req)
 }
 
-func (r *Repo) UpdateAvatarURL(ctx context.Context, userID uuid.UUID, avatarURL string) (*model.User, error) {
-	query := fmt.Sprintf(`
-WITH updated_user AS (
-  UPDATE users
-  SET avatar_url = $2,
-      updated_at = NOW()
-  WHERE id = $1
-  RETURNING id
-)
-SELECT `+userSelectColumns+`
-FROM users u
-JOIN updated_user uu ON uu.id = u.id
-LEFT JOIN geo g ON g.user_id = u.id
-`, r.trustedSelect("u.is_trusted"))
-	return scanUser(r.data.DB.QueryRow(ctx, query, userID, nullIfEmpty(avatarURL)))
-}
-
 func (r *Repo) bindTelegramToUserTx(ctx context.Context, tx pgx.Tx, userID uuid.UUID, payload model.IdentityAuthPayload) error {
 	telegramID, err := parseTelegramProviderID(payload.ProviderUserID)
 	if err != nil {
@@ -361,7 +339,6 @@ UPDATE users
 SET username = COALESCE(NULLIF(username, ''), NULLIF($2, ''), ''),
     first_name = COALESCE(NULLIF($3, ''), first_name),
     last_name = COALESCE(NULLIF($4, ''), last_name),
-    avatar_url = COALESCE(NULLIF(avatar_url, ''), NULLIF($5, ''), ''),
     telegram_id = $6,
     telegram_username = COALESCE(NULLIF($2, ''), telegram_username, ''),
     telegram_avatar_url = COALESCE(NULLIF($5, ''), telegram_avatar_url, ''),
@@ -383,7 +360,6 @@ UPDATE users
 SET username = COALESCE(NULLIF(username, ''), NULLIF($2, ''), ''),
     first_name = COALESCE(NULLIF($3, ''), first_name),
     last_name = COALESCE(NULLIF($4, ''), last_name),
-    avatar_url = COALESCE(NULLIF(avatar_url, ''), NULLIF($5, ''), ''),
     yandex_id = $6,
     yandex_login = COALESCE(NULLIF($2, ''), yandex_login, ''),
     yandex_email = COALESCE(NULLIF($7, ''), yandex_email, ''),
@@ -422,7 +398,6 @@ SET
   username = COALESCE(NULLIF(canonical.username, ''), NULLIF(secondary.username, ''), ''),
   first_name = COALESCE(NULLIF(canonical.first_name, ''), NULLIF(secondary.first_name, ''), ''),
   last_name = COALESCE(NULLIF(canonical.last_name, ''), NULLIF(secondary.last_name, ''), ''),
-  avatar_url = COALESCE(NULLIF(canonical.avatar_url, ''), NULLIF(secondary.avatar_url, ''), NULLIF(secondary.yandex_avatar_url, ''), NULLIF(secondary.telegram_avatar_url, ''), ''),
   current_workplace = COALESCE(NULLIF(canonical.current_workplace, ''), NULLIF(secondary.current_workplace, ''), ''),
   status = CASE
     WHEN canonical.status = $3 OR secondary.status = $3 THEN $3

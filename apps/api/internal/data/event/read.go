@@ -207,7 +207,7 @@ SELECT
   ep.event_id::text,
   ep.user_id::text,
   COALESCE(NULLIF(TRIM(CONCAT_WS(' ', pu.first_name, pu.last_name)), ''), NULLIF(pu.username, ''), 'user'),
-  COALESCE(pu.avatar_url, ''),
+  COALESCE(NULLIF(pu.yandex_avatar_url, ''), NULLIF(pu.telegram_avatar_url, ''), ''),
   COALESCE(pu.telegram_username, ''),
   COALESCE(pu.first_name, ''),
   COALESCE(pu.last_name, ''),

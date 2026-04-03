@@ -23,8 +23,6 @@ var httpAuthOperations = map[string]struct{}{
 	profilev1.OperationProfileServiceUpdateProfile:         {},
 	profilev1.OperationProfileServiceUpdateLocation:        {},
 	profilev1.OperationProfileServiceLogout:                {},
-	profilev1.OperationProfileServiceGetPhotoUploadURL:     {},
-	profilev1.OperationProfileServiceCompletePhotoUpload:   {},
 	profilev1.OperationProfileServiceBindTelegram:          {},
 	adminv1.OperationAdminServiceDeleteUser:                {},
 	geov1.OperationGeoServiceResolve:                       {},

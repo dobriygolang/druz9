@@ -980,42 +980,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
-    /api/v1/profile/photo/complete:
-        post:
-            tags:
-                - ProfileService
-            operationId: ProfileService_CompletePhotoUpload
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/profile.v1.CompletePhotoUploadRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/profile.v1.CompletePhotoUploadResponse'
-    /api/v1/profile/photo/upload-url:
-        post:
-            tags:
-                - ProfileService
-            operationId: ProfileService_GetPhotoUploadURL
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/profile.v1.GetPhotoUploadURLRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/profile.v1.GetPhotoUploadURLResponse'
     /api/v1/profile/update:
         post:
             tags:
@@ -2165,19 +2129,6 @@ components:
             properties:
                 status:
                     type: string
-        profile.v1.CompletePhotoUploadRequest:
-            type: object
-            properties:
-                objectKey:
-                    type: string
-            description: CompletePhotoUpload finalizes photo upload
-        profile.v1.CompletePhotoUploadResponse:
-            type: object
-            properties:
-                user:
-                    $ref: '#/components/schemas/profile.v1.User'
-                needsProfileComplete:
-                    type: boolean
         profile.v1.CompleteRegistrationRequest:
             type: object
             properties:
@@ -2230,24 +2181,6 @@ components:
                 expiresAt:
                     type: string
                     format: date-time
-        profile.v1.GetPhotoUploadURLRequest:
-            type: object
-            properties:
-                fileName:
-                    type: string
-                contentType:
-                    type: string
-            description: GetPhotoUploadURL generates presigned URL for photo upload
-        profile.v1.GetPhotoUploadURLResponse:
-            type: object
-            properties:
-                uploadUrl:
-                    type: string
-                objectKey:
-                    type: string
-                expiresInSeconds:
-                    type: integer
-                    format: int32
         profile.v1.LogoutRequest:
             type: object
             properties: {}
@@ -2306,6 +2239,8 @@ components:
                 id:
                     type: string
                 username:
+                    type: string
+                telegramUsername:
                     type: string
                 firstName:
                     type: string

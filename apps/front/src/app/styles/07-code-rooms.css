@@ -23,8 +23,8 @@
 }
 
 .code-rooms-create-modal {
-  width: min(calc(100vw - 32px), 1080px);
-  min-height: min(720px, calc(100vh - 56px));
+  width: min(calc(100vw - 32px), 1180px);
+  min-height: min(780px, calc(100vh - 48px));
 }
 
 .code-admin-filters {
@@ -37,30 +37,33 @@
 .page-header {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: stretch;
   margin-bottom: 16px;
 }
 
 .page-header h1 {
-  font-size: 20px;
-  font-weight: 700;
+  font-size: clamp(34px, 3.2vw, 48px);
+  line-height: 0.98;
+  letter-spacing: -0.04em;
+  font-weight: 800;
 }
 
 .code-rooms-subtitle {
-  margin-top: 8px;
+  margin-top: 12px;
   color: var(--text-secondary);
-  max-width: 640px;
-  line-height: 1.5;
+  max-width: 760px;
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.65;
 }
 
 /* Hero */
 .code-rooms-hero {
   margin-bottom: var(--space-6);
-  padding: var(--space-6) var(--space-8);
+  padding: clamp(24px, 3vw, 36px) clamp(24px, 4vw, 40px);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
   gap: var(--space-6);
   background:
@@ -94,17 +97,15 @@
   min-width: 0;
   display: flex;
   flex-direction: column;
+  justify-content: center;
 }
 
 .code-rooms-hero h1 {
-  font-size: 20px;
-  line-height: 1.2;
   margin-top: 10px;
 }
 
 .code-rooms-hero .code-rooms-subtitle {
-  font-size: 13px;
-  margin-top: 4px;
+  margin-top: 12px;
 }
 
 .code-rooms-hero .code-rooms-subtitle + .code-rooms-subtitle {
@@ -119,9 +120,9 @@
 }
 
 .code-rooms-hero__actions .btn {
-  min-height: 32px;
-  padding: 0 12px;
-  font-size: 13px;
+  min-height: 42px;
+  padding: 0 14px;
+  font-size: 14px;
 }
 
 /* Queue Active Banner */
@@ -1272,7 +1273,7 @@
   padding: 32px 36px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  justify-content: space-between;
   gap: 24px;
   background:
     radial-gradient(circle at top right, rgba(99, 102, 241, 0.12), transparent 40%),
@@ -1284,6 +1285,17 @@
   display: flex;
   align-items: flex-start;
   gap: 20px;
+}
+
+.solo-practice-hero__cta {
+  display: flex;
+  align-items: end;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.solo-practice-filter-group--hero {
+  min-width: min(260px, 100%);
 }
 
 .solo-practice-hero__icon {
@@ -1315,7 +1327,7 @@
 
 .solo-practice-hero__btn {
   width: fit-content;
-  min-height: 44px;
+  min-height: 48px;
   padding: 0 24px;
   font-size: 15px;
   font-weight: 600;
@@ -1442,6 +1454,11 @@
     width: 100%;
     justify-content: center;
   }
+
+  .solo-practice-hero__cta {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 /* Mock Interview Session Page - Mission Control UI */
@@ -1514,7 +1531,7 @@
 
 .interview-prep-mock-layout {
   display: grid;
-  grid-template-columns: 220px minmax(0, 1fr) 280px;
+  grid-template-columns: 200px minmax(0, 1.35fr) 240px;
   gap: 24px;
   align-items: start;
 }
@@ -1670,6 +1687,7 @@
   overflow: hidden;
   border-radius: 24px;
   width: 100%;
+  min-height: 720px;
 }
 
 .interview-prep-workstation--readonly {
@@ -1697,6 +1715,7 @@
 .workstation-editor {
   background: #101827;
   width: 100%;
+  min-height: 480px;
 }
 
 .workstation-footer {
@@ -1748,6 +1767,8 @@
   padding: 24px;
   display: grid;
   gap: 16px;
+  max-height: 640px;
+  overflow: auto;
 }
 
 /* Design Workspace */
@@ -1808,7 +1829,7 @@
   display: flex;
   flex-direction: column;
   gap: 24px;
-  min-height: 360px;
+  min-height: 520px;
   justify-content: flex-start;
 }
 
@@ -2002,13 +2023,6 @@
 
   .workstation-question-box blockquote {
     font-size: 16px;
-  }
-}
-
-@media (min-width: 1181px) and (max-width: 1600px) {
-  .interview-prep-workstation {
-    padding: 0;
-    border-radius: var(--radius-xl);
   }
 }
 

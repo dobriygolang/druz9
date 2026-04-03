@@ -51,17 +51,18 @@
 
 .vacancies-hero__title {
   margin: 0;
-  font-size: clamp(32px, 4vw, 52px);
-  line-height: 0.95;
+  font-size: clamp(34px, 3.2vw, 48px);
+  line-height: 0.98;
   letter-spacing: -0.04em;
   font-weight: 800;
 }
 
 .vacancies-hero__description {
   margin: 0;
-  font-size: var(--font-size-md);
-  line-height: 1.6;
+  font-size: clamp(14px, 1.15vw, 17px);
+  line-height: 1.65;
   color: var(--text-secondary);
+  max-width: 760px;
 }
 
 .vacancies-hero__search-row {

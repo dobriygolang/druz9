@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"api/internal/api/profile/mocks"
-	profiledomain "api/internal/domain/profile"
 	"api/internal/model"
 	v1 "api/pkg/api/profile/v1"
 
@@ -138,7 +137,6 @@ func TestGetProfileByID(t *testing.T) {
 
 		mockService := mocks.NewService(t)
 		mockService.On("GetProfileByID", mock.Anything, userID).Return(expectedResponse, nil).Once()
-		mockService.On("GetAvatarURL", mock.Anything, "").Return("", nil).Once()
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 
@@ -328,108 +326,6 @@ func TestUpdateLocation(t *testing.T) {
 		impl := New(mockService, mockCookie)
 
 		_, err := impl.UpdateLocation(context.Background(), &v1.UpdateLocationRequest{})
-		if err == nil {
-			t.Error("expected error when no user in context")
-		}
-	})
-}
-
-func TestGetPhotoUploadURL(t *testing.T) {
-	t.Parallel()
-
-	t.Run("gets photo upload URL", func(t *testing.T) {
-		t.Parallel()
-
-		userID := uuid.New()
-		req := &v1.GetPhotoUploadURLRequest{
-			ContentType: "image/jpeg",
-			FileName:    "photo.jpg",
-		}
-		expectedTarget := &profiledomain.PhotoUploadTarget{
-			UploadURL: "https://s3.example.com/upload/photo.jpg",
-			ObjectKey: "photos/photo.jpg",
-		}
-
-		mockService := mocks.NewService(t)
-		mockService.On("PreparePhotoUpload", mock.Anything, userID.String(), "photo.jpg", "image/jpeg").Return(expectedTarget, nil).Once()
-
-		mockCookie := mocks.NewSessionCookieManager(t)
-
-		impl := New(mockService, mockCookie)
-
-		user := &model.User{ID: userID}
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
-
-		resp, err := impl.GetPhotoUploadURL(ctx, req)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-		if resp == nil {
-			t.Error("expected response, got nil")
-		}
-
-		mockService.AssertExpectations(t)
-	})
-
-	t.Run("returns error when no user in context", func(t *testing.T) {
-		t.Parallel()
-
-		mockService := mocks.NewService(t)
-		mockCookie := mocks.NewSessionCookieManager(t)
-
-		impl := New(mockService, mockCookie)
-
-		_, err := impl.GetPhotoUploadURL(context.Background(), &v1.GetPhotoUploadURLRequest{})
-		if err == nil {
-			t.Error("expected error when no user in context")
-		}
-	})
-}
-
-func TestCompletePhotoUpload(t *testing.T) {
-	t.Parallel()
-
-	t.Run("completes photo upload", func(t *testing.T) {
-		t.Parallel()
-
-		userID := uuid.New()
-		req := &v1.CompletePhotoUploadRequest{
-			ObjectKey: "photos/photo.jpg",
-		}
-		expectedResponse := &model.ProfileResponse{
-			User: &model.User{ID: userID, AvatarURL: "https://s3.example.com/files/photo.jpg"},
-		}
-
-		mockService := mocks.NewService(t)
-		mockService.On("CompletePhotoUpload", mock.Anything, userID, "photos/photo.jpg").Return(expectedResponse, nil).Once()
-
-		mockCookie := mocks.NewSessionCookieManager(t)
-
-		impl := New(mockService, mockCookie)
-
-		user := &model.User{ID: userID}
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
-
-		resp, err := impl.CompletePhotoUpload(ctx, req)
-		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-		if resp == nil {
-			t.Error("expected response, got nil")
-		}
-
-		mockService.AssertExpectations(t)
-	})
-
-	t.Run("returns error when no user in context", func(t *testing.T) {
-		t.Parallel()
-
-		mockService := mocks.NewService(t)
-		mockCookie := mocks.NewSessionCookieManager(t)
-
-		impl := New(mockService, mockCookie)
-
-		_, err := impl.CompletePhotoUpload(context.Background(), &v1.CompletePhotoUploadRequest{})
 		if err == nil {
 			t.Error("expected error when no user in context")
 		}

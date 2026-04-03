@@ -76,13 +76,13 @@ WHERE s.token_hash = $1
 
 	var session model.Session
 	var user model.User
-	var username, firstName, lastName, avatarURL, currentWorkplace, region, country, city, primaryProvider *string
+	var username, telegramUsername, firstName, lastName, avatarURL, currentWorkplace, region, country, city, primaryProvider *string
 	var latitude, longitude *float64
 	var connectedProviders []string
 
 	err := r.data.DB.QueryRow(ctx, query, tokenHash).Scan(
 		&session.ID, &session.UserID, &session.TokenHash, &session.LastSeenAt, &session.ExpiresAt,
-		&user.ID, &username, &firstName, &lastName, &avatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.IsTrusted, &connectedProviders, &primaryProvider, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &username, &telegramUsername, &firstName, &lastName, &avatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.IsTrusted, &connectedProviders, &primaryProvider, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
@@ -91,7 +91,7 @@ WHERE s.token_hash = $1
 		return nil, fmt.Errorf("find session by hash: %w", err)
 	}
 
-	fillUserFields(&user, username, firstName, lastName, avatarURL, currentWorkplace, region, country, city, latitude, longitude)
+	fillUserFields(&user, username, telegramUsername, firstName, lastName, avatarURL, currentWorkplace, region, country, city, latitude, longitude)
 	user.ConnectedProviders = connectedProviders
 	user.PrimaryProvider = valueOrEmpty(primaryProvider)
 	user.ActivityStatus = model.ResolveActivityStatus(user.LastActiveAt, time.Now().UTC())

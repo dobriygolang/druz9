@@ -4,7 +4,6 @@ import (
 	"context"
 	"time"
 
-	profiledomain "api/internal/domain/profile"
 	"api/internal/model"
 
 	"github.com/google/uuid"
@@ -22,10 +21,7 @@ type Service interface {
 	GetProfileByID(context.Context, uuid.UUID) (*model.ProfileResponse, error)
 	UpdateLocation(context.Context, uuid.UUID, model.CompleteRegistrationRequest) (*model.ProfileResponse, error)
 	UpdateProfile(context.Context, uuid.UUID, string) (*model.ProfileResponse, error)
-	PreparePhotoUpload(context.Context, string, string, string) (*profiledomain.PhotoUploadTarget, error)
-	CompletePhotoUpload(context.Context, uuid.UUID, string) (*model.ProfileResponse, error)
 	Logout(context.Context, string) error
-	GetAvatarURL(context.Context, string) (string, error)
 	DevBypass() bool
 	DevUserID() string
 }

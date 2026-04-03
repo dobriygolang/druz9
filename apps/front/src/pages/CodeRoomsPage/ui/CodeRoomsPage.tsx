@@ -7,9 +7,17 @@ import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 import { ArenaLeaderboardEntry, ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode } from '@/entities/CodeRoom/model/types';
-import { ArrowRight, BookOpen, BrainCircuit, Eye, FileCode, Plus, ShieldCheck, Shuffle, Sparkles, Swords, TimerReset, Trophy, Users } from 'lucide-react';
-import { FancySelect } from '@/shared/ui/FancySelect';
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
+import {
+  ArenaPrimaryGrid,
+  ArenaSecondaryGrid,
+  CodeRoomsHeroSection,
+  CreateRoomModal,
+  GuestLoginBanner,
+  LeaguesModal,
+  SoloPracticeSection,
+} from './components/CodeRoomsSections';
+import { pickRandomValue, pluralizeRu, shuffledValues } from './lib/helpers';
 
 const MOTIVATIONAL_QUOTES = [
   'Код — это поэзия логики',
@@ -62,14 +70,6 @@ const LEAGUES = [
   { name: 'Master', minRating: 1900 },
   { name: 'Legend', minRating: 2350 },
 ];
-
-function pluralizeRu(count: number, one: string, few: string, many: string) {
-  const mod10 = count % 10;
-  const mod100 = count % 100;
-  if (mod10 === 1 && mod100 !== 11) return one;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
-  return many;
-}
 
 const ARENA_RULE_SECTIONS = [
   {
@@ -190,9 +190,16 @@ export const CodeRoomsPage: React.FC = () => {
   const [openMatches, setOpenMatches] = useState<ArenaMatch[]>([]);
   const [openMatchesLoading, setOpenMatchesLoading] = useState(true);
   const [myArenaStats, setMyArenaStats] = useState<ArenaPlayerStats | null>(null);
-  const [publicQueueSize, setPublicQueueSize] = useState(0);
   const [activeTaskCount, setActiveTaskCount] = useState(0);
   const [showLeaguesModal, setShowLeaguesModal] = useState(false);
+  const prepCompanyOptions = ['ozon', 'avito'];
+
+  const resolveMockLaunchCompany = useCallback(() => {
+    if (prepLaunchCompany !== 'all') {
+      return prepLaunchCompany;
+    }
+    return pickRandomValue(prepCompanyOptions);
+  }, [prepLaunchCompany]);
 
   const loadLeaderboard = useCallback(async () => {
     setLeaderboardLoading(true);
@@ -273,14 +280,9 @@ export const CodeRoomsPage: React.FC = () => {
   }, [user?.id]);
 
   useEffect(() => {
-    let cancelled = false;
-
     const loadQueueSize = async () => {
       try {
-        const state = await codeRoomApi.getArenaQueueStatus();
-        if (!cancelled) {
-          setPublicQueueSize(state.queueSize || 0);
-        }
+        await codeRoomApi.getArenaQueueStatus();
       } catch (e) {
         console.error('Failed to load public arena queue size:', e);
       }
@@ -292,7 +294,6 @@ export const CodeRoomsPage: React.FC = () => {
     }, 5000);
 
     return () => {
-      cancelled = true;
       window.clearInterval(interval);
     };
   }, []);
@@ -440,152 +441,59 @@ export const CodeRoomsPage: React.FC = () => {
 
   return (
     <>
-      {isGuest && (
-        <div className="guest-cta-banner" style={{ marginBottom: '20px' }}>
-          <div className="guest-cta-banner__copy">
-            <span className="guest-cta-banner__kicker">Регистрация</span>
-            <strong>Зарегистрируйся, чтобы сохранить рейтинг и историю матчей</strong>
-            <span>Гости могут играть, но прогресс не сохраняется.</span>
-          </div>
-          <button className="btn btn-primary" onClick={() => navigate('/login')}>Войти / Регистрация</button>
-        </div>
-      )}
+      {isGuest && <GuestLoginBanner />}
       <div className="code-rooms-page">
-        <div className="page-header code-rooms-hero">
-          <div className="code-rooms-hero__copy">
-            {!isMobile && <span className="code-rooms-kicker">Duel Arena</span>}
-            <h1>{isMobile ? 'Арена' : motivationalQuote}</h1>
-          </div>
-          <div className="code-rooms-hero__actions">
-            {isAdmin && (
-              <button className="btn btn-secondary" onClick={() => navigate('/admin/code-tasks')} title="Админка">
-                <ShieldCheck size={18} />
-                {!isMobile && 'Админка'}
-              </button>
-            )}
-            <button className="btn btn-secondary" onClick={() => setShowLeaguesModal(true)} title="Лиги">
-              <Trophy size={18} />
-              {!isMobile && 'Лиги'}
-            </button>
-            <button className="btn btn-primary code-rooms-create-btn" onClick={() => setShowCreateModal(true)}>
-              <Plus size={18} />
-              <span>{isMobile ? 'Создать' : 'Новая комната'}</span>
-            </button>
-          </div>
-        </div>
+        <CodeRoomsHeroSection
+          isMobile={isMobile}
+          isAdmin={isAdmin}
+          motivationalQuote={motivationalQuote}
+          onOpenAdmin={() => navigate('/admin/code-tasks')}
+          onShowLeagues={() => setShowLeaguesModal(true)}
+          onShowCreate={() => setShowCreateModal(true)}
+        />
 
         {user?.isTrusted && (
-          <section className="card dashboard-card solo-practice-section">
-            <div className="solo-practice-section__head">
-              <div className="solo-practice-section__title-wrap">
-                <BookOpen size={18} />
-                <h3 className="solo-practice-section__title">Solo practice</h3>
-              </div>
-              <div className="solo-practice-section__filters">
-                <div className="solo-practice-filter-group">
-                  <span className="solo-practice-filter-label">Категория</span>
-                  <div className="pill-selector">
-                    {INTERVIEW_PREP_CATEGORY_OPTIONS.map((option) => (
-                      <button
-                        key={option.value}
-                        type="button"
-                        className={`pill-selector__pill ${prepLaunchCategory === option.value ? 'active' : ''}`}
-                        onClick={() => setPrepLaunchCategory(option.value)}
-                      >
-                        {option.label}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-                <div className="solo-practice-filter-group">
-                  <span className="solo-practice-filter-label">Компания</span>
-                  <FancySelect
-                    value={prepLaunchCompany}
-                    options={[
-                      { value: 'all', label: 'Все компании' },
-                      { value: 'ozon', label: 'ozon' },
-                      { value: 'avito', label: 'avito' },
-                      { value: 'general', label: 'general' },
-                    ]}
-                    onChange={setPrepLaunchCompany}
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div className="solo-practice-grid">
-              <div className="solo-practice-hero">
-                <div className="solo-practice-hero__content">
-                  <div className="solo-practice-hero__icon">
-                    <BrainCircuit size={32} />
-                  </div>
-                  <div className="solo-practice-hero__copy">
-                    <h4>Mock Interview</h4>
-                    <p>
-                      Полноценная симуляция интервью: coding, follow-up и system design.
-                      {prepLaunchCompany === 'all'
-                        ? ' Если компанию не выбирать, запустится общий сценарий general.'
-                        : ` Сценарий будет собран под компанию ${prepLaunchCompany}.`}
-                    </p>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  className="btn btn-primary solo-practice-hero__btn"
-                  onClick={async () => {
-                    const effectiveCompany = prepLaunchCompany === 'all' ? 'general' : prepLaunchCompany;
+          <SoloPracticeSection
+            prepLaunchCategory={prepLaunchCategory}
+            prepLaunchCompany={prepLaunchCompany}
+            categoryOptions={INTERVIEW_PREP_CATEGORY_OPTIONS}
+            companyOptions={[
+              { value: 'all', label: 'Случайная компания' },
+              { value: 'ozon', label: 'ozon' },
+              { value: 'avito', label: 'avito' },
+            ]}
+            onCategoryChange={setPrepLaunchCategory}
+            onCompanyChange={setPrepLaunchCompany}
+            onStartScenario={() => {
+              void (async () => {
+                const explicitCompany = resolveMockLaunchCompany();
+                if (!explicitCompany) {
+                  return;
+                }
+                const candidateCompanies = prepLaunchCompany === 'all'
+                  ? shuffledValues(prepCompanyOptions)
+                  : [explicitCompany];
+                try {
+                  for (const companyTag of candidateCompanies) {
                     try {
-                      const session = await interviewPrepApi.startMockSession(effectiveCompany);
+                      const session = await interviewPrepApi.startMockSession(companyTag);
                       navigate(`/interview-prep/mock/${session.id}`);
-                    } catch (error: any) {
-                      console.error('Failed to start mock interview:', error);
-                      const apiError = error?.response?.data?.error || '';
-                      if (effectiveCompany !== 'general' && apiError.includes('mock interview task pool is incomplete')) {
-                        try {
-                          const fallbackSession = await interviewPrepApi.startMockSession('general');
-                          navigate(`/interview-prep/mock/${fallbackSession.id}`);
-                          return;
-                        } catch (fallbackError) {
-                          console.error('Failed to fallback to general mock interview:', fallbackError);
-                        }
+                      return;
+                    } catch (innerError: any) {
+                      const apiError = innerError?.response?.data?.error || '';
+                      if (!apiError.includes('mock interview task pool is incomplete')) {
+                        throw innerError;
                       }
                     }
-                  }}
-                >
-                  <Sparkles size={16} />
-                  <span>Начать сценарий</span>
-                </button>
-              </div>
-
-              <div className="solo-practice-sidebar">
-                <button
-                  type="button"
-                  className="solo-practice-action-card"
-                  onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
-                >
-                  <div className="solo-practice-action-card__icon"><Shuffle size={18} /></div>
-                  <div className="solo-practice-action-card__copy">
-                    <strong>Случайная задача</strong>
-                    <span>Быстрый старт с рандомным таском</span>
-                  </div>
-                  <ArrowRight size={16} />
-                </button>
-
-                <button
-                  type="button"
-                  className="solo-practice-action-card"
-                  onClick={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
-                >
-                  <div className="solo-practice-action-card__icon"><Eye size={18} /></div>
-                  <div className="solo-practice-action-card__copy">
-                    <strong>Открыть каталог</strong>
-                    <span>Выбрать задачу вручную</span>
-                  </div>
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-            </div>
-          </section>
+                  }
+                } catch (error: any) {
+                  console.error('Failed to start mock interview:', error);
+                }
+              })();
+            }}
+            onOpenRandomTask={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
+            onOpenCatalog={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
+          />
         )}
 
         {queueState?.status === 'queued' && (
@@ -601,342 +509,54 @@ export const CodeRoomsPage: React.FC = () => {
           </div>
         )}
 
-        <div className="code-rooms-dashboard-grid code-rooms-dashboard-grid--primary">
-          <section className="card dashboard-card code-rooms-launch-card">
-            <div className="dashboard-card__header">
-              <div>
-                <h3>Быстрый запуск</h3>
-              </div>
-              <div className="launch-card-badges">
-                <span className="arena-chip"><FileCode size={14} />{activeTaskCount} задач</span>
-                {myArenaStats && (
-                  <span className="arena-chip arena-chip--winner"><Trophy size={14} />{myArenaStats.rating} ELO • {myArenaStats.league}</span>
-                )}
-              </div>
-            </div>
-            <p className="dashboard-card__subtitle launch-card-desc">
-              {isMobile ? 'Создай комнату для работы или дуэль.' : 'Создай комнату для совместной работы или дуэль, выбери тему и отправь ссылку.'}
-            </p>
+        <ArenaPrimaryGrid
+          isMobile={isMobile}
+          isGuest={isGuest}
+          myArenaStats={myArenaStats}
+          activeTaskCount={activeTaskCount}
+          leaderboardLoading={leaderboardLoading}
+          leaderboard={leaderboard}
+          leaderboardAvatars={leaderboardAvatars}
+          pluralizeRu={pluralizeRu}
+          onOpenRoom={(mode) => {
+            setNewRoomMode(mode);
+            setShowCreateModal(true);
+          }}
+        />
 
-            <div className="code-rooms-launch-grid">
-              <button type="button" className="code-rooms-mode-card" onClick={() => {
-                setNewRoomMode('all');
-                setShowCreateModal(true);
-              }}>
-                <div className="code-rooms-mode-card__icon"><Users size={18} /></div>
-                <div>
-                  <div className="code-rooms-mode-card__title">Комната</div>
-                  <div className="code-rooms-mode-card__text">Live-coding и общий запуск.</div>
-                </div>
-                <ArrowRight size={16} />
-              </button>
+        <ArenaSecondaryGrid
+          userId={user?.id}
+          openMatchesLoading={openMatchesLoading}
+          openMatches={openMatches}
+          sortedOpenMatches={sortedOpenMatches}
+          ruleSections={ARENA_RULE_SECTIONS}
+          onOpenMatch={(href) => navigate(href)}
+        />
 
-              <button
-                type="button"
-                className="code-rooms-mode-card"
-                onClick={() => {
-                  setNewRoomMode('duel');
-                  setShowCreateModal(true);
-                }}
-              >
-                <div className="code-rooms-mode-card__icon"><Swords size={18} /></div>
-                <div>
-                  <div className="code-rooms-mode-card__title">Дуэль</div>
-                  <div className="code-rooms-mode-card__text">
-                    {isGuest
-                      ? 'Рейтинг и матчи доступны после регистрации.'
-                      : 'Случайная задача, таймер и судья.'}
-                  </div>
-                </div>
-                <ArrowRight size={16} />
-              </button>
-
-              <button
-                type="button"
-                className="code-rooms-mode-card"
-                onClick={() => {
-                  setNewRoomMode('queue');
-                  setShowCreateModal(true);
-                }}
-              >
-                <div className="code-rooms-mode-card__icon"><TimerReset size={18} /></div>
-                <div>
-                  <div className="code-rooms-mode-card__title">Очередь <span className="arena-chip card-chip"><Users size={12} />{publicQueueSize}</span></div>
-                  <div className="code-rooms-mode-card__text">
-                    Быстрый подбор соперника онлайн.
-                  </div>
-                </div>
-                <ArrowRight size={16} />
-              </button>
-
-            </div>
-          </section>
-
-          <section className="card dashboard-card">
-            <div className="dashboard-card__header">
-              <div className="dashboard-card__header-left">
-                <h3>Лидерборд</h3>
-                <p className="dashboard-card__subtitle">Только авторизованные игроки: победы, матчи, ELO и лучшее время решения.</p>
-              </div>
-              <Trophy size={18} />
-            </div>
-          {leaderboardLoading ? (
-            <div className="empty-state compact">Загрузка рейтинга...</div>
-          ) : leaderboard.length === 0 ? (
-            <div className="empty-state compact">Пока нет завершенных дуэлей.</div>
-          ) : (
-            <div className="leaderboard-list">
-              {leaderboard.map((entry, index) => {
-                const rankClass = index === 0 ? 'rank-gold' : index === 1 ? 'rank-silver' : index === 2 ? 'rank-bronze' : '';
-                const avatarUrl = leaderboardAvatars[entry.userId] || '';
-                return (
-                  <div key={`${entry.userId}-${index}`} className="leaderboard-item">
-                    <div className={`leaderboard-rank ${rankClass}`}>
-                      {avatarUrl ? (
-                        <img src={avatarUrl} alt={entry.displayName} className="leaderboard-rank__avatar" />
-                      ) : (
-                        <span>{entry.displayName.charAt(0).toUpperCase()}</span>
-                      )}
-                      <span className="leaderboard-rank__place">{index + 1}</span>
-                    </div>
-                    <div className="leaderboard-main">
-                      <div className="leaderboard-name">{entry.displayName}</div>
-                      <div className="leaderboard-meta">
-                        {isMobile ? (
-                          <span>{entry.rating} ELO • {entry.wins} {pluralizeRu(entry.wins, 'победа', 'победы', 'побед')}</span>
-                        ) : (
-                          <span>{entry.rating} ELO <span>•</span> <span>{entry.league}</span> <span>•</span> <span>{entry.wins} {pluralizeRu(entry.wins, 'победа', 'победы', 'побед')}</span> <span>•</span> <span>{entry.matches} {pluralizeRu(entry.matches, 'матч', 'матча', 'матчей')}</span></span>
-                        )}
-                      </div>
-                    </div>
-                    <div className="leaderboard-rate">{Math.round(entry.winRate * 100)}%</div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-          </section>
-        </div>
-
-        <div className="code-rooms-dashboard-grid code-rooms-dashboard-grid--secondary">
-          <section className="card dashboard-card">
-            <div className="dashboard-card__header">
-              <div className="dashboard-card__header-left">
-                <h3>Открытые дуэли</h3>
-                <p className="dashboard-card__subtitle">Можно открыть матч как зритель и смотреть за двумя редакторами в realtime.</p>
-              </div>
-              <Eye size={18} />
-            </div>
-            {openMatchesLoading ? (
-              <div className="empty-state compact">Загрузка открытых дуэлей...</div>
-            ) : openMatches.length === 0 ? (
-              <div className="empty-state compact">Сейчас нет открытых матчей для просмотра.</div>
-            ) : (
-              <div className="arena-open-list">
-                {sortedOpenMatches.map((arenaMatch) => {
-                  const leftPlayer = arenaMatch.players.find((item) => item.side === 'left');
-                  const rightPlayer = arenaMatch.players.find((item) => item.side === 'right');
-                  const isMyMatch = arenaMatch.players.some((item) => item.userId === (user?.id || getStoredGuestId()));
-                  return (
-                    <div key={arenaMatch.id} className="arena-open-card">
-                      <div className="arena-open-card__header">
-                        <div>
-                          <div className="arena-open-card__title">{arenaMatch.taskTitle || 'Arena duel'}</div>
-                          <div className="arena-open-card__meta">
-                            <span>{arenaMatch.topic || 'any'}</span> <span>/</span> <span>{arenaMatch.difficulty || 'any'}</span>
-                          </div>
-                        </div>
-                        <div className={`badge ${arenaMatch.status === 'active' ? 'badge-success' : 'badge-warning'}`}>
-                          {arenaMatch.status === 'active' ? 'Идёт матч' : 'Ожидает старт'}
-                        </div>
-                      </div>
-                      <div className="arena-open-card__players">
-                        <span>{leftPlayer?.displayName || 'Игрок слева'}</span>
-                        <Swords size={14} className="swords-icon" />
-                        <span>{rightPlayer?.displayName || 'Ждём соперника'}</span>
-                      </div>
-                      <div className="arena-open-card__footer">
-                        <div className="arena-open-card__timer">
-                          <TimerReset size={14} />
-                          <span>{arenaMatch.durationSeconds > 0 ? `${Math.floor(arenaMatch.durationSeconds / 60)} мин` : 'Без лимита'}</span>
-                        </div>
-                        <button
-                          className="arena-watch-btn"
-                          onClick={() => navigate(isMyMatch ? `/arena/${arenaMatch.id}` : `/arena/${arenaMatch.id}?spectator=1`)}
-                        >
-                          <Eye size={16} />
-                          <span>{isMyMatch ? 'Вернуться в матч' : 'Смотреть'}</span>
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            )}
-          </section>
-
-          <section className="card dashboard-card">
-            <div className="dashboard-card__header">
-              <div className="dashboard-card__header-left">
-                <h3>Правила арены</h3>
-                <p className="dashboard-card__subtitle">Коротко о том, как сейчас работает duel flow.</p>
-              </div>
-              <ShieldCheck size={18} />
-            </div>
-            <div className="arena-rules-overview">
-              {ARENA_RULE_SECTIONS.map((section) => (
-                <div key={section.title} className="arena-rules-overview__card">
-                  <div className="arena-rules-overview__card-head">
-                    <div className="arena-rules-overview__title">{section.title}</div>
-                    <div className="arena-rules-overview__caption">{section.caption}</div>
-                  </div>
-                  <div className="arena-rules-overview__chips">
-                    {section.items.map((rule) => (
-                      <div key={rule} className="arena-rules-overview__item">
-                        <span className="arena-rules-overview__dot" />
-                        <span>{rule}</span>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </section>
-        </div>
-
-      {showCreateModal && (
-        <div className="modal-overlay" onClick={() => {
+      <CreateRoomModal
+        open={showCreateModal}
+        isGuest={isGuest}
+        creating={creating}
+        newRoomMode={newRoomMode}
+        queueState={queueState}
+        duelTopics={DUEL_TOPICS}
+        difficultyOptions={DIFFICULTY_OPTIONS}
+        newRoomTopic={newRoomTopic}
+        newRoomDifficulty={newRoomDifficulty}
+        onClose={() => {
           // If in queue mode and queued, don't cancel - just close modal
           if (newRoomMode === 'queue' && queueState?.status === 'queued') {
             setShowCreateModal(false);
           } else {
             resetCreateModal();
           }
-        }}>
-          <div className="modal modal-wide code-rooms-create-modal" onClick={(e) => e.stopPropagation()}>
-            <>
-              <div className="modal-header">
-                <h2>Новая комната</h2>
-                <button
-                  type="button"
-                  className="modal-close"
-                  onClick={() => {
-                    if (newRoomMode === 'queue' && queueState?.status === 'queued') {
-                      setShowCreateModal(false);
-                    } else {
-                      resetCreateModal();
-                    }
-                  }}
-                  aria-label="Закрыть"
-                >
-                  ✕
-                </button>
-              </div>
-                <p className="dashboard-card__subtitle" style={{ marginBottom: '20px' }}>
-                  Выберите режим. Для пригласительной дуэли можно отправить ссылку, для онлайн-дуэли включится поиск соперника.
-                </p>
-
-                <div className="form-group">
-                  <label>Режим</label>
-                  <div className="mode-selector">
-                    <button
-                      type="button"
-                      className={`mode-btn ${newRoomMode === 'all' ? 'active' : ''}`}
-                      onClick={() => setNewRoomMode('all')}
-                    >
-                      <span className="mode-icon">👥</span>
-                      <span className="mode-btn-title">Для всех</span>
-                      <span className="mode-desc">Совместное редактирование одного файла</span>
-                    </button>
-                    <button
-                      type="button"
-                      className={`mode-btn ${newRoomMode === 'duel' ? 'active' : ''}`}
-                      onClick={() => {
-                        setNewRoomMode('duel');
-                      }}
-                    >
-                      <span className="mode-icon">⚔️</span>
-                      <span className="mode-btn-title">По приглашению</span>
-                      <span className="mode-desc">
-                        {isGuest
-                          ? 'Доступно и гостям'
-                          : 'Judge по тестам и фиксируем первого победителя'}
-                      </span>
-                    </button>
-                    <button
-                      type="button"
-                      className={`mode-btn ${newRoomMode === 'queue' ? 'active' : ''}`}
-                      onClick={() => {
-                        setNewRoomMode('queue');
-                      }}
-                    >
-                      <span className="mode-icon">🎯</span>
-                      <span className="mode-btn-title">Онлайн матч</span>
-                      <span className="mode-desc">Встаешь в очередь и ждёшь соперника с той же темой</span>
-                    </button>
-                  </div>
-                </div>
-
-                {(newRoomMode === 'duel' || newRoomMode === 'queue') && (
-                  <div className="task-filters code-room-create-filters">
-                    <div className="form-group">
-                      <label>Тема дуэли</label>
-                      <div className="pill-selector">
-                        {DUEL_TOPICS.map((opt) => (
-                          <button
-                            key={opt.value || '__empty'}
-                            type="button"
-                            className={`pill-selector__pill ${newRoomTopic === opt.value ? 'active' : ''}`}
-                            onClick={() => setNewRoomTopic(opt.value)}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                    <div className="form-group">
-                      <label>Сложность</label>
-                      <div className="pill-selector">
-                        {DIFFICULTY_OPTIONS.map((opt) => (
-                          <button
-                            key={opt.value || '__empty'}
-                            type="button"
-                            className={`pill-selector__pill pill-${opt.value} ${newRoomDifficulty === opt.value ? 'active' : ''}`}
-                            onClick={() => setNewRoomDifficulty(opt.value)}
-                          >
-                            {opt.label}
-                          </button>
-                        ))}
-                      </div>
-                    </div>
-                  </div>
-                )}
-
-                {newRoomMode === 'queue' && queueState?.status === 'queued' ? (
-                  <>
-                    <div className="guest-cta-banner" style={{ marginTop: '16px' }}>
-                      <div className="guest-cta-banner__copy">
-                        <span className="guest-cta-banner__kicker">Queue</span>
-                        <strong>Ищем соперника...</strong>
-                        <span>Тема: {queueState.topic || 'любая'} • в очереди сейчас {queueState.queueSize || 0} чел. • поиск обновляется автоматически.</span>
-                      </div>
-                    </div>
-                    <div className="modal-actions">
-                      <button className="btn btn-secondary" onClick={() => resetCreateModal()}>Отменить поиск</button>
-                    </div>
-                  </>
-                ) : (
-                  <div className="modal-actions">
-                    <button className="btn btn-secondary" onClick={() => resetCreateModal()}>Отмена</button>
-                    <button className="btn btn-primary" onClick={() => void handleCreateRoom()} disabled={creating}>
-                      {creating ? 'Создание...' : (newRoomMode === 'queue' ? 'Играть' : 'Создать комнату')}
-                    </button>
-                  </div>
-                )}
-            </>
-          </div>
-        </div>
-      )}
+        }}
+        onCancelQueue={() => resetCreateModal()}
+        onCreate={() => { void handleCreateRoom(); }}
+        onModeChange={setNewRoomMode}
+        onTopicChange={setNewRoomTopic}
+        onDifficultyChange={setNewRoomDifficulty}
+      />
       </div>
 
       <GuestNameModal
@@ -952,46 +572,7 @@ export const CodeRoomsPage: React.FC = () => {
         }}
       />
 
-      {showLeaguesModal && (
-        <div className="modal-overlay" onClick={() => setShowLeaguesModal(false)}>
-          <div className="modal modal-wide code-room-leagues-modal" onClick={(e) => e.stopPropagation()}>
-            <h2>Лиги и ELO</h2>
-            <p className="dashboard-card__subtitle">
-              Новый игрок стартует с <strong>300 ELO</strong>. Чем сложнее задача, тем сильнее изменение рейтинга.
-            </p>
-            <div className="arena-rules-overview">
-              <div className="arena-rules-overview__card">
-                <div className="arena-rules-overview__card-head">
-                  <div className="arena-rules-overview__title">Формула</div>
-                  <div className="arena-rules-overview__caption">Сложность влияет на коэффициент изменения</div>
-                </div>
-                <div className="arena-rules-overview__chips">
-                  <div className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>`new = old + 40 * difficultyMultiplier * (score - expectedScore)`</span></div>
-                  <div className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>`easy = 1x`, `medium = 1.5x`, `hard = 2x`</span></div>
-                  <div className="arena-rules-overview__item"><span className="arena-rules-overview__dot" /><span>Минимальный рейтинг: `100`</span></div>
-                </div>
-              </div>
-              <div className="arena-rules-overview__card">
-                <div className="arena-rules-overview__card-head">
-                  <div className="arena-rules-overview__title">Лиги</div>
-                  <div className="arena-rules-overview__caption">Порог повышается автоматически по ELO</div>
-                </div>
-                <div className="arena-rules-overview__chips">
-                  {LEAGUES.map((league) => (
-                    <div key={league.name} className="arena-rules-overview__item">
-                      <span className="arena-rules-overview__dot" />
-                      <span>{league.name}: от {league.minRating} ELO</span>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-            <div className="modal-actions">
-              <button className="btn btn-primary" onClick={() => setShowLeaguesModal(false)}>Закрыть</button>
-            </div>
-          </div>
-        </div>
-      )}
+      <LeaguesModal open={showLeaguesModal} leagues={LEAGUES} onClose={() => setShowLeaguesModal(false)} />
     </>
   );
 };

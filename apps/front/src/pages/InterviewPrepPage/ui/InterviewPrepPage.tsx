@@ -48,6 +48,17 @@ function categoryAccentClass(category: TaskCategory) {
   }
 }
 
+function pickRandomValue<T>(values: T[]): T | null {
+  if (values.length === 0) {
+    return null;
+  }
+  return values[Math.floor(Math.random() * values.length)];
+}
+
+function shuffledValues<T>(values: T[]): T[] {
+  return [...values].sort(() => Math.random() - 0.5);
+}
+
 export function InterviewPrepPage() {
   const isMobile = useIsMobile();
   const navigate = useNavigate();
@@ -110,7 +121,7 @@ export function InterviewPrepPage() {
       if (!task.isExecutable && task.prepType !== 'system_design') {
         return false;
       }
-      if (company !== 'all' && (task.companyTag || 'general') !== company) {
+      if (company !== 'all' && task.companyTag !== company) {
         return false;
       }
       if (modeFilter === 'executable' && !task.isExecutable) {
@@ -140,6 +151,14 @@ export function InterviewPrepPage() {
     return ['all', ...tags];
   }, [tasks]);
 
+  const availableMockCompanies = useMemo(() => {
+    return Array.from(new Set(
+      tasks
+        .map((task) => task.companyTag?.trim())
+        .filter((companyTag): companyTag is string => Boolean(companyTag)),
+    )).sort();
+  }, [tasks]);
+
   const filteredTasks = useMemo(() => {
     return tasks.filter((task) => {
       if (!task.isExecutable && task.prepType !== 'system_design') {
@@ -149,7 +168,7 @@ export function InterviewPrepPage() {
       if (category !== 'all' && taskCategory !== category) {
         return false;
       }
-      if (company !== 'all' && (task.companyTag || 'general') !== company) {
+      if (company !== 'all' && task.companyTag !== company) {
         return false;
       }
       if (modeFilter === 'executable' && !task.isExecutable) {
@@ -206,14 +225,40 @@ export function InterviewPrepPage() {
     setError(null);
     setStartingMock(true);
     try {
-      const effectiveCompany = company === 'all' ? 'general' : company;
-      const session = await interviewPrepApi.startMockSession(effectiveCompany);
-      navigate(`/interview-prep/mock/${session.id}`);
+      const effectiveCompany = company === 'all' ? pickRandomValue(availableMockCompanies) : company;
+      if (!effectiveCompany) {
+        setError('Пока нет доступных компаний для mock interview.');
+        return;
+      }
+      const candidateCompanies = company === 'all'
+        ? shuffledValues(availableMockCompanies)
+        : [effectiveCompany];
+      for (const companyTag of candidateCompanies) {
+        try {
+          const session = await interviewPrepApi.startMockSession(companyTag);
+          navigate(`/interview-prep/mock/${session.id}`);
+          return;
+        } catch (e: any) {
+          const apiError = e.response?.data?.error || '';
+          if (!apiError.includes('mock interview task pool is incomplete')) {
+            throw e;
+          }
+        }
+      }
+      setError(
+        company === 'all'
+          ? 'Не удалось собрать случайный сценарий. Попробуй выбрать компанию вручную в фильтрах ниже.'
+          : 'Для выбранной компании сценарий ещё не полностью собран. Выбери другую компанию или запусти случайную.'
+      );
     } catch (e: any) {
       console.error('Failed to start mock interview:', e);
       const apiError = e.response?.data?.error || '';
       if (apiError.includes('mock interview task pool is incomplete')) {
-        setError('Для выбранной компании сценарий ещё не полностью собран. Запусти общий сценарий general или выбери компанию в фильтрах ниже.');
+        setError(
+          company === 'all'
+            ? 'Не удалось собрать случайный сценарий. Попробуй выбрать компанию вручную в фильтрах ниже.'
+            : 'Для выбранной компании сценарий ещё не полностью собран. Выбери другую компанию или запусти случайную.'
+        );
       } else {
         setError(apiError || 'Не удалось начать mock interview');
       }
@@ -258,7 +303,7 @@ export function InterviewPrepPage() {
           <div className="interview-prep-hero__actions" style={{ flexDirection: isMobile ? 'column' : 'row', width: isMobile ? '100%' : 'auto' }}>
             <button className="btn btn-secondary" disabled={startingMock} onClick={() => void startMockInterview()} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
               <BrainCircuit size={16} />
-              <span>{company === 'all' ? 'Запустить mock interview (general)' : 'Запустить mock interview'}</span>
+              <span>Запустить mock interview</span>
             </button>
             <button className="btn btn-primary" onClick={() => void handleRandomStart(filteredTasks)} style={{ height: isMobile ? '48px' : 'auto', width: isMobile ? '100%' : 'auto' }}>
               <Shuffle size={16} />
@@ -382,7 +427,7 @@ export function InterviewPrepPage() {
               ))}
             </div>
             <div className="interview-prep-muted" style={{ marginTop: '8px' }}>
-              Если компанию не выбирать, mock interview стартует на общем сценарии `general`.
+              Если компанию не выбирать, mock interview стартует на случайной доступной компании.
             </div>
           </div>
 

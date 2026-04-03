@@ -61,7 +61,6 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 	profileServiceDomain := profiledomainservice.NewProfileService(profiledomainservice.Config{
 		Repository:     storage.profileRepo,
 		SessionStorage: storage.profileRepo,
-		Storage:        storage.storageClient,
 		Settings: profiledomainservice.Settings{
 			BotToken:            bootstrap.cfg.External.Telegram.BotToken,
 			BotUsername:         bootstrap.cfg.External.Telegram.BotUsername,
@@ -81,14 +80,10 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 	})
 	geoServiceDomain := geodomainservice.NewGeoService(geodomainservice.Config{
 		Resolver:      storage.geoClient,
-		Storage:       storage.storageClient,
-		AvatarCache:   storage.avatarURLCache,
 		ActivityCache: profileServiceDomain.ActivityCache(),
 	})
 	eventServiceDomain := eventdomainservice.NewService(eventdomainservice.Config{
-		Repository:  storage.eventRepo,
-		Storage:     storage.storageClient,
-		AvatarCache: storage.avatarURLCache,
+		Repository: storage.eventRepo,
 	})
 	podcastServiceDomain := podcastdomainservice.NewPodcastService(podcastdomainservice.Config{
 		Repository: storage.podcastRepo,

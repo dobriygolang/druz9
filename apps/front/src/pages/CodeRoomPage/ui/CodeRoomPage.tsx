@@ -1,14 +1,25 @@
 import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import Editor, { OnMount } from '@monaco-editor/react';
+import { OnMount } from '@monaco-editor/react';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { useCodeRoomRealtime } from '@/features/CodeRoom/api/useCodeRoomRealtime';
 import { CodeRoom, Participant, Submission } from '@/entities/CodeRoom/model/types';
-import { Copy, Play, ArrowLeft, Loader2, Clock, CheckCircle, XCircle, Pause, SkipBack, Bell, BellOff, X, History } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import { AxiosError } from '@/shared/api/base';
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
+import {
+  CodeRoomEditorPanels,
+  CodeRoomHeader,
+  CodeRoomLoadingState,
+  LeaveToasts,
+  ParticipantsStrip,
+  TimelapseToolbar,
+} from './components/CodeRoomSections';
+import { useResizableEditor } from './hooks/useResizableEditor';
+import { useRoomLoader } from './hooks/useRoomLoader';
+import { useRoomPresenceToasts } from './hooks/useRoomPresenceToasts';
 
 const DEFAULT_CODE = `package main
 
@@ -20,11 +31,6 @@ func main() {
 `;
 
 const roomNotificationsStorageKey = (roomId: string) => `code_room_notifications:${roomId}`;
-
-type LeaveToast = {
-  id: string;
-  message: string;
-};
 
 const normalizeParticipantIdentity = (value?: string | null) => (value || '').trim().toLowerCase();
 
@@ -62,29 +68,41 @@ export const CodeRoomPage: React.FC = () => {
   const [isRunning, setIsRunning] = useState(false);
   const [showCopied, setShowCopied] = useState(false);
   const [error, setError] = useState('');
-  const [isRoomLoading, setIsRoomLoading] = useState(true);
-  const [roomLoadError, setRoomLoadError] = useState('');
   const [submissions, setSubmissions] = useState<Submission[]>([]);
-  const [editorWidth, setEditorWidth] = useState(50);
   const [editorInstance, setEditorInstance] = useState<any | null>(null);
   const [activeRightTab, setActiveRightTab] = useState<'output' | 'history' | 'description'>('output');
   const [showTimelapse, setShowTimelapse] = useState(false);
   const [isTimelapsePlaying, setIsTimelapsePlaying] = useState(false);
   const [timelapseIndex, setTimelapseIndex] = useState(0);
-  const [leaveToasts, setLeaveToasts] = useState<LeaveToast[]>([]);
   const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-  const [needsGuestName, setNeedsGuestName] = useState(false);
   const [isTimelapseTransitioning, setIsTimelapseTransitioning] = useState(false);
 
   const editorRef = useRef<any>(null);
-  const editorContainerRef = useRef<HTMLDivElement | null>(null);
   const codeRef = useRef(code);
-  const isResizing = useRef(false);
   const timelineStartedAtRef = useRef(Date.now());
   const timelineSnapshotsRef = useRef<Array<{ timestamp: number; code: string }>>([]);
-  const previousParticipantsRef = useRef<Participant[]>([]);
-  const leaveBatchRef = useRef<string[]>([]);
-  const leaveBatchTimerRef = useRef<number | null>(null);
+  const { editorWidth, editorContainerRef, startResize } = useResizableEditor();
+
+  const handleRoomLoaded = useCallback((nextRoom: CodeRoom) => {
+    setRoom(nextRoom);
+    if (nextRoom.code) {
+      setCode(nextRoom.code);
+      codeRef.current = nextRoom.code;
+    }
+  }, []);
+
+  const {
+    isRoomLoading,
+    roomLoadError,
+    needsGuestName,
+    setNeedsGuestName,
+    setIsRoomLoading,
+    setRoomLoadError,
+  } = useRoomLoader({
+    roomId,
+    user,
+    onRoomLoaded: handleRoomLoaded,
+  });
 
   useEffect(() => {
     if (!roomId) {
@@ -215,90 +233,6 @@ export const CodeRoomPage: React.FC = () => {
       return [...prev, newSubmission];
     });
   }, []);
-
-  // Загрузка начального состояния комнаты
-  useEffect(() => {
-    if (!roomId) return;
-
-    let cancelled = false;
-
-    const loadRoom = async () => {
-      setIsRoomLoading(true);
-      setRoomLoadError('');
-
-      // Check if user is authenticated
-      if (!user) {
-        const guestName = getStoredGuestName();
-        if (!guestName) {
-          // Need to get guest name first
-          setNeedsGuestName(true);
-          setIsRoomLoading(false);
-          return;
-        }
-
-        // Join as guest
-        for (let attempt = 0; attempt < 3; attempt += 1) {
-          try {
-            const nextRoom = await codeRoomApi.joinRoom(roomId, { guestName });
-            if (cancelled) {
-              return;
-            }
-            setRoom(nextRoom);
-            if (nextRoom.code) {
-              setCode(nextRoom.code);
-              codeRef.current = nextRoom.code;
-            }
-            setIsRoomLoading(false);
-            return;
-          } catch (e) {
-            if (cancelled) {
-              return;
-            }
-            console.error('Failed to join room:', e);
-            if (attempt < 2) {
-              await new Promise((resolve) => window.setTimeout(resolve, 500 * (attempt + 1)));
-            }
-          }
-        }
-      }
-
-      // Get room (for authenticated users or as fallback)
-      for (let attempt = 0; attempt < 3; attempt += 1) {
-        try {
-          const nextRoom = await codeRoomApi.getRoom(roomId);
-          if (cancelled) {
-            return;
-          }
-          setRoom(nextRoom);
-          if (nextRoom.code) {
-            setCode(nextRoom.code);
-            codeRef.current = nextRoom.code;
-          }
-          setIsRoomLoading(false);
-          return;
-        } catch (e) {
-          if (cancelled) {
-            return;
-          }
-          console.error('Failed to load room:', e);
-          if (attempt < 2) {
-            await new Promise((resolve) => window.setTimeout(resolve, 500 * (attempt + 1)));
-          }
-        }
-      }
-
-      if (!cancelled) {
-        setRoomLoadError('Не удалось загрузить комнату. Попробуйте еще раз.');
-        setIsRoomLoading(false);
-      }
-    };
-
-    loadRoom();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [roomId, navigate, user]);
 
   const currentUserName = useMemo(() => {
     const authName = [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim()
@@ -499,123 +433,15 @@ export const CodeRoomPage: React.FC = () => {
     return userId === creatorId;
   }, [user?.id, room?.creatorId, isRoomLoading]);
 
-  useEffect(() => {
-    const previous = previousParticipantsRef.current;
-    previousParticipantsRef.current = uniqueParticipants;
-
-    if (!notificationsEnabled || previous.length === 0) {
-      return;
-    }
-
-    const previousById = new Map(previous.map((participant) => [participant.id, participant]));
-    const currentById = new Map(uniqueParticipants.map((participant) => [participant.id, participant]));
-    const leftNames: string[] = [];
-
-    previousById.forEach((participant, id) => {
-      if (participant.role === 'creator') {
-        return;
-      }
-
-      const wasActive = isParticipantInRoom(participant);
-      const current = currentById.get(id);
-      const isNowActive = current ? isParticipantInRoom(current) : false;
-
-      if (wasActive && !isNowActive) {
-        leftNames.push(participant.displayName);
-      }
-    });
-
-    if (leftNames.length === 0) {
-      return;
-    }
-
-    leaveBatchRef.current.push(...leftNames);
-
-    if (leaveBatchTimerRef.current !== null) {
-      return;
-    }
-
-    leaveBatchTimerRef.current = window.setTimeout(() => {
-      const batch = Array.from(new Set(leaveBatchRef.current));
-      leaveBatchRef.current = [];
-      leaveBatchTimerRef.current = null;
-
-      if (batch.length === 0) {
-        return;
-      }
-
-      const message = batch.length === 1
-        ? `${batch[0]} покинул страницу`
-        : batch.length === 2
-          ? `${batch[0]} и ${batch[1]} покинули страницу`
-          : `${batch[0]}, ${batch[1]} и еще ${batch.length - 2} покинули страницу`;
-
-      const toastId = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
-      setLeaveToasts((current) => [...current.slice(-2), { id: toastId, message }]);
-      window.setTimeout(() => {
-        setLeaveToasts((current) => current.filter((toast) => toast.id !== toastId));
-      }, 5200);
-    }, 1200);
-  }, [isParticipantInRoom, notificationsEnabled, uniqueParticipants]);
-
-  useEffect(() => () => {
-    if (leaveBatchTimerRef.current !== null) {
-      window.clearTimeout(leaveBatchTimerRef.current);
-    }
-  }, []);
-
-  useEffect(() => {
-    const handleMouseMove = (event: MouseEvent) => {
-      if (!isResizing.current) {
-        return;
-      }
-
-      const minEditor = 10;
-      const maxEditor = 90;
-      const container = editorContainerRef.current;
-      if (!container) {
-        return;
-      }
-      const rect = container.getBoundingClientRect();
-      const next = ((event.clientX - rect.left) / rect.width) * 100;
-      setEditorWidth(Math.min(maxEditor, Math.max(minEditor, next)));
-    };
-
-    const handleMouseUp = () => {
-      isResizing.current = false;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-
-    window.addEventListener('mousemove', handleMouseMove);
-    window.addEventListener('mouseup', handleMouseUp);
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-      window.removeEventListener('mouseup', handleMouseUp);
-      // Ensure styles are reset on unmount
-      isResizing.current = false;
-      document.body.style.cursor = '';
-      document.body.style.userSelect = '';
-    };
-  }, []);
-
-  const startResize = () => {
-    if (window.innerWidth <= 768) {
-      return;
-    }
-    isResizing.current = true;
-    document.body.style.cursor = 'col-resize';
-    document.body.style.userSelect = 'none';
-  };
+  const { leaveToasts, dismissToast } = useRoomPresenceToasts({
+    uniqueParticipants,
+    notificationsEnabled,
+    isParticipantInRoom,
+  });
 
   if (isRoomLoading) {
     return (
-      <div className="code-room-page">
-        <div className="code-room-loading-state">
-          <Loader2 className="animate-spin" size={28} />
-          <span>Загружаем комнату...</span>
-        </div>
-      </div>
+      <CodeRoomLoadingState message={<><Loader2 className="animate-spin" size={28} /><span>Загружаем комнату...</span></>} />
     );
   }
 
@@ -638,11 +464,9 @@ export const CodeRoomPage: React.FC = () => {
 
   if (roomLoadError) {
     return (
-      <div className="code-room-page">
-        <div className="code-room-loading-state">
-          <div className="error-banner" style={{ marginTop: 0 }}>
-            {roomLoadError}
-          </div>
+      <CodeRoomLoadingState
+        message={<div className="error-banner" style={{ marginTop: 0 }}>{roomLoadError}</div>}
+        action={(
           <button
             type="button"
             className="btn btn-primary"
@@ -655,8 +479,8 @@ export const CodeRoomPage: React.FC = () => {
           >
             Перезагрузить комнату
           </button>
-        </div>
-      </div>
+        )}
+      />
     );
   }
 
@@ -667,261 +491,79 @@ export const CodeRoomPage: React.FC = () => {
   return (
     <div className="code-room-page interview-ide-page">
       <div className="interview-ide-shell">
-        <div className="code-room-header interview-ide-header code-room-hero">
-          <div className="code-room-toolbar">
-            <div className="interview-ide-header__left">
-              <div className="code-room-hero__title-row">
-                <button className="btn code-room-back-btn" onClick={handleBack}>
-                  <ArrowLeft size={14} />
-                </button>
+        <CodeRoomHeader
+          isRealtimeConnected={isRealtimeConnected}
+          activeParticipantsCount={activeParticipantsCount}
+          isRoomCreator={isRoomCreator}
+          notificationsEnabled={notificationsEnabled}
+          isTimelapseTransitioning={isTimelapseTransitioning}
+          showTimelapse={showTimelapse}
+          showCopied={showCopied}
+          onBack={handleBack}
+          onToggleNotifications={() => setNotificationsEnabled((current) => !current)}
+          onToggleTimelapse={() => {
+            if (isTimelapseTransitioning) {
+              return;
+            }
+            setIsTimelapseTransitioning(true);
 
-                <span className="code-rooms-kicker">Code room</span>
-              </div>
-            </div>
+            if (!showTimelapse) {
+              setShowTimelapse(true);
+              setTimelapseIndex(Math.max(0, timelineSnapshots.length - 1));
+              setIsTimelapsePlaying(false);
+            } else {
+              setShowTimelapse(false);
+              setIsTimelapsePlaying(false);
+            }
 
-            <div className="code-room-toolbar__spacer" />
+            setTimeout(() => setIsTimelapseTransitioning(false), 300);
+          }}
+          onCopyInvite={handleCopyInviteCode}
+        />
 
-            <div className="room-actions">
-              <div className={`connection-status ${isRealtimeConnected ? 'connected' : ''}`}>
-                <span className={`status-dot ${isRealtimeConnected ? 'connected' : 'disconnected'}`} />
-                <span>{isRealtimeConnected ? 'Подключено' : 'Подключение...'}</span>
-              </div>
-              <div className="arena-chip">Активных {activeParticipantsCount}</div>
-              {isRoomCreator && (
-                <button
-                  className="btn btn-secondary"
-                  onClick={() => setNotificationsEnabled((current) => !current)}
-                  title={notificationsEnabled ? 'Отключить уведомления комнаты' : 'Включить уведомления комнаты'}
-                >
-                  {notificationsEnabled ? <Bell size={14} /> : <BellOff size={14} />}
-                  {notificationsEnabled ? 'Уведомления вкл' : 'Уведомления выкл'}
-                </button>
-              )}
-              <button
-                className="btn btn-secondary"
-                disabled={isTimelapseTransitioning}
-                onClick={() => {
-                  if (isTimelapseTransitioning) {
-                    return;
-                  }
-                  setIsTimelapseTransitioning(true);
-
-                  if (!showTimelapse) {
-                    setShowTimelapse(true);
-                    setTimelapseIndex(Math.max(0, timelineSnapshots.length - 1));
-                    setIsTimelapsePlaying(false);
-                  } else {
-                    setShowTimelapse(false);
-                    setIsTimelapsePlaying(false);
-                  }
-
-                  setTimeout(() => setIsTimelapseTransitioning(false), 300);
-                }}
-              >
-                <History size={14} />
-                {showTimelapse ? 'Вернуться в live' : 'Завершить интервью'}
-              </button>
-              <button className="btn btn-secondary" onClick={handleCopyInviteCode}>
-                <Copy size={14} />
-                {showCopied ? 'Скопировано' : 'Скопировать'}
-              </button>
-            </div>
-          </div>
-        </div>
-
-        <div className="code-room-participants-strip">
-          {uniqueParticipants.map((p) => (
-            <div key={p.id || p.userId || `${p.displayName}:${p.joinedAt}`} className="code-room-participant-pill">
-              <span className="participant-name">
-                <span className="participant-name__text">{p.displayName}</span>
-                {p.isGuest && <span className="guest-badge">Гость</span>}
-                {matchesCreator(p, room?.creatorId) && <span className="creator-badge">Создатель</span>}
-                <span className={`participant-state ${isParticipantInRoom(p) ? 'active' : 'inactive'}`}>
-                  {isParticipantInRoom(p) ? 'В комнате' : 'Неактивен'}
-                </span>
-                {room.mode === 'duel' && p.score !== undefined && (
-                  <span className="score-badge">{p.score} очков</span>
-                )}
-              </span>
-            </div>
-          ))}
-        </div>
+        <ParticipantsStrip
+          participants={uniqueParticipants}
+          room={room}
+          matchesCreator={matchesCreator}
+          isParticipantInRoom={isParticipantInRoom}
+        />
 
         {showTimelapse && (
-          <div className="timelapse-toolbar">
-            <button
-              type="button"
-              className="btn-icon timelapse-toolbar__icon"
-              onClick={() => {
-                setIsTimelapsePlaying(false);
-                setTimelapseIndex(0);
-              }}
-            >
-              <SkipBack size={16} />
-            </button>
-            <button
-              type="button"
-              className="btn-icon timelapse-toolbar__icon"
-              onClick={() => setIsTimelapsePlaying((current) => !current)}
-            >
-              {isTimelapsePlaying ? <Pause size={16} /> : <Play size={16} />}
-            </button>
-            <input
-              className="timelapse-toolbar__range"
-              type="range"
-              min={0}
-              max={Math.max(0, timelineSnapshots.length - 1)}
-              value={Math.min(timelapseIndex, Math.max(0, timelineSnapshots.length - 1))}
-              onChange={(event) => {
-                setIsTimelapsePlaying(false);
-                setTimelapseIndex(Number(event.target.value));
-              }}
-            />
-            <div className="timelapse-toolbar__meta">
-              <span>{(((timelineSnapshots[Math.min(timelapseIndex, timelineSnapshots.length - 1)]?.timestamp ?? 0) / 1000).toFixed(1))}s</span>
-              <span>{timelineSnapshots.length} steps</span>
-            </div>
-          </div>
+          <TimelapseToolbar
+            snapshotsCount={timelineSnapshots.length}
+            timelapseIndex={timelapseIndex}
+            currentTimestampSeconds={(((timelineSnapshots[Math.min(timelapseIndex, timelineSnapshots.length - 1)]?.timestamp ?? 0) / 1000).toFixed(1))}
+            isTimelapsePlaying={isTimelapsePlaying}
+            onReset={() => {
+              setIsTimelapsePlaying(false);
+              setTimelapseIndex(0);
+            }}
+            onTogglePlay={() => setIsTimelapsePlaying((current) => !current)}
+            onSeek={(value) => {
+              setIsTimelapsePlaying(false);
+              setTimelapseIndex(value);
+            }}
+          />
         )}
 
-        <div className="interview-ide-main">
-          <div
-            ref={editorContainerRef}
-            className="editor-container interview-ide-grid"
-            style={{ gridTemplateColumns: `minmax(0, ${editorWidth}fr) 6px minmax(0, ${100 - editorWidth}fr)` }}
-          >
-            <div className="editor-panel interview-ide-editor-panel">
-              <div className="panel-header panel-header--editor">
-                <div className="panel-header__group">
-                  <span>main.go</span>
-                  <span className="language-badge">Go</span>
-                </div>
-                <div className="panel-header__group">
-                  <button
-                    className="btn btn-primary editor-run-button"
-                    onClick={handleSubmitCode}
-                    disabled={isRunning || room.status === 'finished'}
-                  >
-                    {isRunning ? (
-                      <Loader2 size={16} className="animate-spin" />
-                    ) : (
-                      <Play size={16} />
-                    )}
-                    Запустить код
-                  </button>
-                </div>
-              </div>
-              <div className="interview-ide-editor-scroll">
-                {showTimelapse ? (
-                  <div className="timelapse-code-view">
-                    <pre>{displayedPlaybackCode || DEFAULT_CODE}</pre>
-                  </div>
-                ) : (
-                  <Editor
-                    height="100%"
-                    defaultLanguage="go"
-                    defaultValue={room.code || DEFAULT_CODE}
-                    onMount={handleEditorMount}
-                    theme="vs-dark"
-                    options={editorOptions}
-                  />
-                )}
-              </div>
-            </div>
-
-            <button
-              type="button"
-              className="editor-resize-handle"
-              aria-label="Изменить размер панелей"
-              onMouseDown={startResize}
-            />
-
-            <div className="output-panel interview-ide-output-panel">
-              <div className="panel-header panel-header-tabs">
-                <div className="panel-tabs">
-                  <button
-                    type="button"
-                    className={`panel-tab ${activeRightTab === 'output' ? 'active' : ''}`}
-                    onClick={() => setActiveRightTab('output')}
-                  >
-                    Вывод
-                  </button>
-                  <button
-                    type="button"
-                    className={`panel-tab ${activeRightTab === 'history' ? 'active' : ''}`}
-                    onClick={() => setActiveRightTab('history')}
-                  >
-                    История {submissions.length > 0 && `(${submissions.length})`}
-                  </button>
-                  <button
-                    type="button"
-                    className={`panel-tab ${activeRightTab === 'description' ? 'active' : ''}`}
-                    onClick={() => setActiveRightTab('description')}
-                  >
-                    Описание
-                  </button>
-                </div>
-                {activeRightTab === 'output' && isRunning && <Loader2 size={14} className="animate-spin" />}
-              </div>
-              <div className="interview-ide-output-body">
-                {activeRightTab === 'output' ? (
-                  <pre className={`output-content ${error ? 'error' : ''}`}>
-                    {output || 'Нажмите "Запустить" для выполнения кода'}
-                  </pre>
-                ) : activeRightTab === 'history' ? (
-                  <div className="submissions-list">
-                    {submissions.length === 0 ? (
-                      <div className="empty-history">История пуста</div>
-                    ) : (
-                      submissions.slice().reverse().map((sub) => (
-                        <div key={sub.id} className="submission-item">
-                          <div className="submission-header">
-                            <span className="submission-user">{sub.submittedByName}</span>
-                            <span className="submission-time">
-                              <Clock size={12} />
-                              {new Date(sub.submittedAt).toLocaleTimeString('ru')}
-                            </span>
-                            {sub.exitCode === 0 ? (
-                              <CheckCircle size={14} className="icon-success" />
-                            ) : (
-                              <XCircle size={14} className="icon-error" />
-                            )}
-                          </div>
-                          <pre className="submission-output">{sub.error || sub.output}</pre>
-                        </div>
-                      ))
-                    )}
-                  </div>
-                ) : (
-                  <div className="task-description-panel">
-                    <div className="task-description-panel__label">
-                      Описание комнаты
-                    </div>
-                    <div className="task-description-panel__body">
-                      {room.task || 'Пока описание задачи не задано. Когда комната будет связана с задачей, здесь появится условие, ограничения и примеры.'}
-                    </div>
-                  </div>
-                )}
-              </div>
-            </div>
-          </div>
-        </div>
-        {leaveToasts.length > 0 && (
-          <div className="room-leave-toasts">
-            {leaveToasts.map((toast) => (
-              <div key={toast.id} className="room-leave-toast">
-                <span>{toast.message}</span>
-                <button
-                  type="button"
-                  className="btn-icon room-leave-toast__close"
-                  onClick={() => setLeaveToasts((current) => current.filter((item) => item.id !== toast.id))}
-                >
-                  <X size={14} />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
+        <CodeRoomEditorPanels
+          room={room}
+          editorWidth={editorWidth}
+          editorContainerRef={editorContainerRef}
+          showTimelapse={showTimelapse}
+          displayedPlaybackCode={displayedPlaybackCode || DEFAULT_CODE}
+          handleEditorMount={handleEditorMount}
+          editorOptions={editorOptions as unknown as Record<string, unknown>}
+          startResize={startResize}
+          activeRightTab={activeRightTab}
+          isRunning={isRunning}
+          submissions={submissions}
+          error={error}
+          output={output}
+          onTabChange={setActiveRightTab}
+          onSubmitCode={() => { void handleSubmitCode(); }}
+        />
+        <LeaveToasts toasts={leaveToasts} onClose={dismissToast} />
       </div>
     </div>
   );

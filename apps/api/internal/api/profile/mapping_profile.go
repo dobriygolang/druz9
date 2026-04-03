@@ -25,6 +25,7 @@ func mapUser(user *model.User) *profilev1.User {
 	return &profilev1.User{
 		Id:                 user.ID.String(),
 		Username:           user.Username,
+		TelegramUsername:   user.TelegramUsername,
 		FirstName:          user.FirstName,
 		LastName:           user.LastName,
 		AvatarUrl:          user.AvatarURL,

@@ -23,7 +23,6 @@ type Config struct {
 	Repository     Repository
 	SessionStorage SessionStorage
 	Settings       Settings
-	Storage        ObjectStorage
 }
 
 // Settings holds profile service settings.
@@ -49,7 +48,6 @@ type Service struct {
 	auth          *telegramAuthChallenges
 	yandexAuth    *yandexAuthStates
 	httpClient    *http.Client
-	storage       ObjectStorage
 	activityCache *cache.TTLCache[time.Time]
 	profileCache  *cache.TTLCache[*model.User]
 	sessionCache  *cache.TTLCache[*model.Session]
@@ -83,13 +81,7 @@ type Repository interface {
 	UpdateProfile(ctx context.Context, userID uuid.UUID, currentWorkplace string) (*model.User, error)
 	CompleteRegistration(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error)
 	UpdateLocation(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error)
-	UpdateAvatarURL(ctx context.Context, userID uuid.UUID, avatarURL string) (*model.User, error)
 	BindIdentity(ctx context.Context, userID uuid.UUID, payload model.IdentityAuthPayload) (*model.User, error)
-}
-
-type ObjectStorage interface {
-	PresignPutObject(ctx context.Context, key string, opts model.PresignOptions) (string, error)
-	PresignGetObject(ctx context.Context, key string, opts model.PresignOptions) (string, error)
 }
 
 // SessionStorage handles session management.
@@ -109,7 +101,6 @@ func NewProfileService(c Config) *Service {
 		repo:     c.Repository,
 		sessions: c.SessionStorage,
 		settings: c.Settings,
-		storage:  c.Storage,
 		auth: &telegramAuthChallenges{
 			byToken: make(map[string]*telegramAuthChallengeState),
 			byCode:  make(map[string]*telegramAuthChallengeState),

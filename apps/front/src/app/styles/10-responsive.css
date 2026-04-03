@@ -6,7 +6,7 @@
 .mobile-only { display: none; }
 
 /* ===========================================
-   BREAKPOINT: Ultra-Wide (Monitor 14"+)
+   BREAKPOINT: Ultra-Wide
    =========================================== */
 @media (min-width: 1600px) {
   .main-content {
@@ -14,7 +14,7 @@
   }
 
   .content-wrapper {
-    max-width: 1180px;
+    max-width: 1240px;
   }
 
   .content-wrapper-wide {
@@ -30,36 +30,40 @@
 
 
 /* ===========================================
-   BREAKPOINT: Tablet & Small Laptop
+   BREAKPOINT: Desktop
    =========================================== */
-@media (min-width: 1181px) and (max-width: 1399px) {
+@media (min-width: 1181px) and (max-width: 1600px) {
   .main-content {
-    padding: var(--space-7) var(--space-8) var(--space-10);
+    padding: var(--space-7) var(--space-8) var(--space-11);
   }
 
   .sidebar-desktop {
-    width: 240px;
+    width: 248px;
     padding: var(--space-6) var(--space-3);
   }
 
-  .card {
-    padding: var(--space-5);
+  .content-wrapper {
+    max-width: 1180px;
   }
 
-  .content-wrapper {
-    max-width: 1120px;
+  .content-wrapper-wide {
+    max-width: min(1600px, calc(100vw - 72px));
   }
 
   .card, 
   .page-header,
   .dashboard-card {
-    border-radius: var(--radius-lg);
+    border-radius: var(--radius-xl);
   }
 }
 
 @media (max-width: 1180px) {
   .main-content {
     padding: var(--space-6) var(--space-6) var(--space-10);
+    padding-top: 24px;
+    padding-right: 24px;
+    padding-bottom: 40px;
+    padding-left: 24px;
   }
 
   .content-wrapper-wide {
@@ -71,7 +75,9 @@
   .events-layout,
   .feed-layout,
   .interview-prep-filters,
-  .interview-prep-grid {
+  .interview-prep-grid,
+  .vacancies-hero,
+  .events-hero {
     grid-template-columns: 1fr;
     gap: var(--space-4);
   }

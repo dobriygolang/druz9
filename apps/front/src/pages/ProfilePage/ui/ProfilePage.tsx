@@ -1,8 +1,6 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, CheckCircle, MapPin, Pencil, Briefcase, Shield, X, Navigation, Trophy, Crown, Medal, Zap, Diamond, Send, Upload, User as UserIcon, Camera } from 'lucide-react';
-import ReactCrop, { Crop, PixelCrop, centerCrop, makeAspectCrop } from 'react-image-crop';
-import 'react-image-crop/dist/ReactCrop.css';
+import { ArrowLeft, CheckCircle, MapPin, Pencil, Briefcase, Shield, X, Navigation, Trophy, Crown, Medal, Zap, Diamond, Send } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { User } from '@/entities/User/model/types';
@@ -11,27 +9,6 @@ import { authApi, clearProfileByIdCache } from '@/features/Auth/api/authApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
 import { LocationPicker } from '@/features/Geo/ui/LocationPicker';
-
-// Helper to create aspect-crop centered
-function centerAspectCrop(
-  mediaWidth: number,
-  mediaHeight: number,
-  aspect: number,
-) {
-  return centerCrop(
-    makeAspectCrop(
-      {
-        unit: '%',
-        width: 90,
-      },
-      aspect,
-      mediaWidth,
-      mediaHeight,
-    ),
-    mediaWidth,
-    mediaHeight,
-  )
-}
 
 import { useIsMobile } from '@/shared/hooks/useIsMobile';
 export const ProfilePage: React.FC = () => {
@@ -45,21 +22,12 @@ export const ProfilePage: React.FC = () => {
   const [newWorkplace, setNewWorkplace] = useState(currentUser?.currentWorkplace || '');
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [arenaStats, setArenaStats] = useState<ArenaPlayerStats | null>(null);
-  const [isPhotoUploading, setIsPhotoUploading] = useState(false);
   const [isBindTelegramModalOpen, setIsBindTelegramModalOpen] = useState(false);
   const [telegramChallenge, setTelegramChallenge] = useState<{ token: string; botStartUrl: string } | null>(null);
   const [telegramCode, setTelegramCode] = useState('');
   const [isBindingTelegram, setIsBindingTelegram] = useState(false);
   const [trustedUpdating, setTrustedUpdating] = useState(false);
   const [adminUpdating, setAdminUpdating] = useState(false);
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  // Crop state
-  const [srcImage, setSrcImage] = useState<string | null>(null);
-  const [crop, setCrop] = useState<Crop>();
-  const [completedCrop, setCompletedCrop] = useState<PixelCrop>();
-  const [isCropping, setIsCropping] = useState(false);
-  const [isDragging, setIsDragging] = useState(false);
   const [toasts, setToasts] = useState<{ id: string; message: string; type: 'success' | 'error' | 'info' }[]>([]);
 
   // Toast helpers
@@ -73,46 +41,6 @@ export const ProfilePage: React.FC = () => {
 
   const removeToast = (id: string) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
-  };
-  const imgRef = useRef<HTMLImageElement | null>(null);
-
-  // Generate cropped image as blob
-  const getCroppedImage = async (): Promise<Blob | null> => {
-    if (!imgRef.current || !completedCrop) return null;
-
-    const canvas = document.createElement('canvas');
-    const scaleX = imgRef.current.naturalWidth / imgRef.current.width;
-    const scaleY = imgRef.current.naturalHeight / imgRef.current.height;
-
-    canvas.width = completedCrop.width * scaleX;
-    canvas.height = completedCrop.height * scaleY;
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) return null;
-
-    ctx.drawImage(
-      imgRef.current,
-      completedCrop.x * scaleX,
-      completedCrop.y * scaleY,
-      completedCrop.width * scaleX,
-      completedCrop.height * scaleY,
-      0,
-      0,
-      canvas.width,
-      canvas.height,
-    );
-
-    return new Promise((resolve) => {
-      canvas.toBlob((blob) => resolve(blob), 'image/jpeg', 0.95);
-    });
-  };
-
-  // Reset crop state
-  const resetCrop = () => {
-    setSrcImage(null);
-    setCrop(undefined);
-    setCompletedCrop(undefined);
-    setIsCropping(false);
   };
 
   useEffect(() => {
@@ -172,6 +100,9 @@ export const ProfilePage: React.FC = () => {
   }
 
   const isOwnProfile = !userId || currentUser?.id === user.id;
+  const telegramProfileHandle = user.connectedProviders.includes('telegram') && user.telegramUsername
+    ? `@${user.telegramUsername}`
+    : 'профиль не привязан к тг';
 
   const getLeagueInfo = (league: string) => {
     const leagues: Record<string, { name: string; icon: React.ReactNode; className: string }> = {
@@ -202,145 +133,6 @@ export const ProfilePage: React.FC = () => {
       setWorkplaceMessage({ type: 'error', text: 'Ошибка при сохранении' });
     } finally {
       setIsSubmitting(false);
-    }
-  };
-
-  const handlePhotoSelect = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
-    if (!file || !currentUser || !isOwnProfile) {
-      return;
-    }
-    if (!file.type.startsWith('image/')) {
-      showToast('Можно загрузить только изображение', 'error');
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      showToast('Максимальный размер изображения 10MB', 'error');
-      return;
-    }
-
-    // Create object URL for cropping preview
-    const reader = new FileReader();
-    reader.onload = () => {
-      setSrcImage(reader.result as string);
-      setIsCropping(true);
-      setCrop(undefined);
-      setCompletedCrop(undefined);
-    };
-    reader.readAsDataURL(file);
-
-    if (fileInputRef.current) {
-      fileInputRef.current.value = '';
-    }
-  };
-
-  // Process file - shared logic for click and drag & drop
-  const processFile = (file: File) => {
-    if (!file.type.startsWith('image/')) {
-      showToast('Можно загрузить только изображение', 'error');
-      return;
-    }
-    if (file.size > 10 * 1024 * 1024) {
-      showToast('Максимальный размер изображения 10MB', 'error');
-      return;
-    }
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      setSrcImage(reader.result as string);
-      setIsCropping(true);
-      setCrop(undefined);
-      setCompletedCrop(undefined);
-    };
-    reader.readAsDataURL(file);
-  };
-
-  // Drag & drop handlers
-  const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(true);
-  };
-
-  const handleDragLeave = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-  };
-
-  const handleDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    setIsDragging(false);
-    const file = e.dataTransfer.files[0];
-    if (file) {
-      processFile(file);
-    }
-  };
-
-  // Handle cropped image upload
-  const handleCropUpload = async () => {
-    if (!srcImage) return;
-
-    try {
-      setIsPhotoUploading(true);
-
-      // Get cropped blob
-      const blob = await getCroppedImage();
-      if (!blob) {
-        throw new Error('Failed to create cropped image');
-      }
-
-      // Create file from blob
-      const file = new File([blob], 'photo.jpg', { type: 'image/jpeg' });
-
-      // Get presigned URL
-      const resp = await authApi.getPhotoUploadURL(file.name, file.type);
-      const upload_url = (resp as any).uploadUrl || (resp as any).upload_url;
-      const object_key = (resp as any).objectKey || (resp as any).object_key;
-
-      if (!upload_url) {
-        throw new Error('upload_url is empty');
-      }
-
-      // Upload
-      const uploadResponse = await fetch(upload_url, {
-        method: 'PUT',
-        body: file,
-        headers: {
-          'Content-Type': file.type,
-        },
-      });
-      if (!uploadResponse.ok) {
-        throw new Error(`upload failed: ${uploadResponse.status}`);
-      }
-
-      // Complete upload
-      const response = await authApi.completePhotoUpload(object_key);
-      setUser(response.user);
-      resetCrop();
-      showToast('Фото профиля обновлено!', 'success');
-    } catch (err) {
-      console.error('Failed to upload profile photo', err);
-      showToast('Не удалось обновить фото профиля', 'error');
-    } finally {
-      setIsPhotoUploading(false);
-    }
-  };
-
-  // Handle remove avatar
-  const handleRemoveAvatar = async () => {
-    if (!confirm('Вы уверены, что хотите удалить фото профиля?')) {
-      return;
-    }
-
-    try {
-      setIsPhotoUploading(true);
-      // TODO: Add API call to remove avatar when backend supports it
-      // For now, just show a message
-      showToast('Функция удаления аватара временно недоступна', 'info');
-    } catch (err) {
-      console.error('Failed to remove avatar', err);
-      showToast('Не удалось удалить фото профиля', 'error');
-    } finally {
-      setIsPhotoUploading(false);
     }
   };
 
@@ -480,7 +272,7 @@ export const ProfilePage: React.FC = () => {
             {!user.firstName && !user.lastName ? user.username : ''}
           </h2>
           <div className="profile-username">
-            @{user.username || 'user'}
+            {telegramProfileHandle}
           </div>
           <div className="profile-details" style={{ 
             justifyContent: isMobile ? 'center' : 'flex-start' 
@@ -619,7 +411,7 @@ export const ProfilePage: React.FC = () => {
           <div className="profile-modal fade-in">
             <button
               className="profile-modal-close"
-              onClick={() => { setIsEditModalOpen(false); resetCrop(); }}
+              onClick={() => { setIsEditModalOpen(false); }}
             >
               <X size={24} />
             </button>
@@ -627,116 +419,10 @@ export const ProfilePage: React.FC = () => {
             <h2>Редактировать профиль</h2>
 
             <div className="profile-modal-section">
-              <h3>Фотография профиля</h3>
-
-              {/* Avatar preview with edit hint - drag & drop enabled */}
-              {!isCropping && (
-                <div
-                  className={`profile-photo-edit ${isDragging ? 'profile-photo-edit--dragging' : ''}`}
-                  onDragOver={handleDragOver}
-                  onDragLeave={handleDragLeave}
-                  onDrop={handleDrop}
-                >
-                  <div className="profile-photo-edit__main">
-                    <div className="profile-photo-preview">
-                      {user.avatarUrl ? (
-                        <img src={user.avatarUrl} alt="Текущий аватар" />
-                      ) : (
-                        <div className="profile-photo-placeholder">
-                          <UserIcon size={32} />
-                        </div>
-                      )}
-                      <div className="profile-photo-overlay" onClick={() => fileInputRef.current?.click()}>
-                        <Camera size={20} />
-                        <span>Сменить</span>
-                      </div>
-                    </div>
-                    <div className="profile-photo-actions">
-                      <button
-                        type="button"
-                        className="btn btn-primary profile-photo-upload-btn"
-                        onClick={() => fileInputRef.current?.click()}
-                      >
-                        <Upload size={16} /> Загрузить фото
-                      </button>
-                      {user.avatarUrl && (
-                        <button
-                          type="button"
-                          className="btn btn-ghost profile-photo-remove-btn"
-                          onClick={handleRemoveAvatar}
-                        >
-                          <X size={16} /> Удалить
-                        </button>
-                      )}
-                    </div>
-                  </div>
-                  <div className="profile-photo-hints">
-                    <p>Нажмите на фото или кнопку для загрузки</p>
-                    <p className="profile-photo-requirements">JPG, PNG или WebP. Макс. 10MB. Рекомендуется квадратное фото.</p>
-                  </div>
-                </div>
-              )}
-
-              {isCropping && srcImage && (
-                <div className="photo-crop-container">
-                  <ReactCrop
-                    crop={crop}
-                    onChange={(_, percentCrop) => setCrop(percentCrop)}
-                    onComplete={(c) => setCompletedCrop(c)}
-                    aspect={1}
-                    circularCrop
-                  >
-                    <img
-                      ref={imgRef}
-                      src={srcImage}
-                      alt="Crop preview"
-                      style={{ maxHeight: '300px', maxWidth: '100%' }}
-                      onLoad={(e) => {
-                        const img = e.currentTarget;
-                        imgRef.current = img;
-                        const { width, height } = img;
-                        setCrop(centerAspectCrop(width, height, 1));
-                      }}
-                    />
-                  </ReactCrop>
-                  <p className="crop-hint">
-                    Перемещайте и масштабируйте область, чтобы выбрать нужную часть фото
-                  </p>
-                  <div className="photo-crop-actions">
-                    <button
-                      type="button"
-                      className="btn btn-ghost"
-                      onClick={resetCrop}
-                      disabled={isPhotoUploading}
-                    >
-                      <X size={16} /> Отмена
-                    </button>
-                    <button
-                      type="button"
-                      className="btn btn-primary"
-                      onClick={handleCropUpload}
-                      disabled={isPhotoUploading}
-                    >
-                      {isPhotoUploading ? (
-                        'Загрузка...'
-                      ) : (
-                        <>
-                          <Upload size={16} /> Загрузить
-                        </>
-                      )}
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Hidden file input - triggered by avatar click */}
-              <input
-                ref={fileInputRef}
-                type="file"
-                accept="image/*"
-                onChange={handlePhotoSelect}
-                style={{ display: 'none' }}
-              />
+              <h3>Аватар</h3>
+              <p className="profile-provider-avatar-note">
+                Аватар берётся из подключённых провайдеров Яндекс или Telegram и больше не загружается в Druz9.
+              </p>
             </div>
 
             {/* Workplace Section */}
@@ -794,7 +480,7 @@ export const ProfilePage: React.FC = () => {
             <div className="profile-modal-actions">
               <button
                 className="btn btn-primary"
-                onClick={() => { setIsEditModalOpen(false); resetCrop(); }}
+                onClick={() => { setIsEditModalOpen(false); }}
               >
                 Готово
               </button>

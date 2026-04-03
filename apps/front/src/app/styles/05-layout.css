@@ -1422,7 +1422,7 @@
   flex-direction: column;
   justify-content: space-between;
   gap: 16px;
-  min-width: min(320px, 100%);
+  min-width: min(360px, 100%);
 }
 
 .events-filter-grid--hero {

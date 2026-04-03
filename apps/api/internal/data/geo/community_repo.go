@@ -15,7 +15,7 @@ SELECT
   g.region,
   g.latitude,
   g.longitude,
-  COALESCE(u.avatar_url, ''),
+  COALESCE(NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), ''),
   COALESCE(u.username, ''),
   COALESCE(u.first_name, ''),
   COALESCE(u.last_name, ''),

@@ -17,7 +17,6 @@ import (
 )
 
 var (
-	ErrForbidden                   = errors.New("forbidden: user is not trusted")
 	ErrTaskNotFound                = errors.New("task not found")
 	ErrSessionNotFound             = errors.New("session not found")
 	ErrMockSessionNotFound         = errors.New("mock interview session not found")
@@ -87,6 +86,7 @@ type Repository interface {
 	GetCodeTask(ctx context.Context, taskID uuid.UUID) (*model.CodeTask, error)
 	ListMockQuestionPools(ctx context.Context) ([]*model.InterviewPrepMockQuestionPoolItem, error)
 	ListMockCompanyPresets(ctx context.Context) ([]*model.InterviewPrepMockCompanyPreset, error)
+	GetAvailableCompanies(ctx context.Context) ([]string, error)
 
 	CreateMockSession(ctx context.Context, session *model.InterviewPrepMockSession, stages []*model.InterviewPrepMockStage, questionResults []*model.InterviewPrepMockQuestionResult) error
 	GetMockSession(ctx context.Context, sessionID uuid.UUID) (*model.InterviewPrepMockSession, error)
@@ -127,17 +127,7 @@ func New(c Config) *Service {
 	}
 }
 
-func ensureTrusted(user *model.User) error {
-	if user == nil || !user.IsTrusted {
-		return ErrForbidden
-	}
-	return nil
-}
-
 func (s *Service) ListTasks(ctx context.Context, user *model.User) ([]*model.InterviewPrepTask, error) {
-	if err := ensureTrusted(user); err != nil {
-		return nil, err
-	}
 	if s.taskListCache != nil {
 		if items, ok := s.taskListCache.Get("active"); ok && len(items) > 0 {
 			return items, nil
@@ -153,11 +143,11 @@ func (s *Service) ListTasks(ctx context.Context, user *model.User) ([]*model.Int
 	return items, nil
 }
 
-func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error) {
-	if err := ensureTrusted(user); err != nil {
-		return nil, err
-	}
+func (s *Service) GetAvailableCompanies(ctx context.Context) ([]string, error) {
+	return s.repo.GetAvailableCompanies(ctx)
+}
 
+func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error) {
 	task, err := s.repo.GetTask(ctx, taskID)
 	if err != nil {
 		return nil, err
@@ -208,10 +198,6 @@ func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uui
 }
 
 func (s *Service) GetSession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepSession, error) {
-	if err := ensureTrusted(user); err != nil {
-		return nil, err
-	}
-
 	session, err := s.repo.GetSession(ctx, sessionID)
 	if err != nil {
 		return nil, err
@@ -301,11 +287,7 @@ func firstNonEmptyLanguage(values ...string) string {
 }
 
 func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string) (*SubmitResult, error) {
-	if err := ensureTrusted(user); err != nil {
-		return nil, err
-	}
-
-	session, err := s.GetSession(ctx, user, sessionID)
+	session, err := s.repo.GetSession(ctx, sessionID)
 	if err != nil {
 		return nil, err
 	}
@@ -385,20 +367,8 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 	return nil, ErrSubmitNotAllowed
 }
 
-func (s *Service) ReviewSystemDesign(
-	ctx context.Context,
-	user *model.User,
-	sessionID uuid.UUID,
-	fileName string,
-	contentType string,
-	imageBytes []byte,
-	req SystemDesignReviewInput,
-) (*SystemDesignReviewResult, error) {
-	if err := ensureTrusted(user); err != nil {
-		return nil, err
-	}
-
-	session, err := s.GetSession(ctx, user, sessionID)
+func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req SystemDesignReviewInput) (*SystemDesignReviewResult, error) {
+	session, err := s.repo.GetSession(ctx, sessionID)
 	if err != nil {
 		return nil, err
 	}
@@ -439,11 +409,7 @@ func (s *Service) ReviewSystemDesign(
 }
 
 func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string) (*model.InterviewPrepSession, error) {
-	if err := ensureTrusted(user); err != nil {
-		return nil, err
-	}
-
-	session, err := s.GetSession(ctx, user, sessionID)
+	session, err := s.repo.GetSession(ctx, sessionID)
 	if err != nil {
 		return nil, err
 	}

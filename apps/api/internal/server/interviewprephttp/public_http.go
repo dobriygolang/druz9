@@ -40,6 +40,23 @@ func handleTasks(service Service, authorizer Authorizer) http.HandlerFunc {
 	}
 }
 
+func handleCompanies(service Service, authorizer Authorizer) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodGet {
+			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
+			return
+		}
+
+		companies, err := service.GetAvailableCompanies(r.Context())
+		if err != nil {
+			writeError(w, err)
+			return
+		}
+
+		writeJSON(w, http.StatusOK, map[string]any{"companies": companies})
+	}
+}
+
 func handleSessions(service Service, authorizer Authorizer) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		user, ok := actorFromRequest(r, authorizer)
@@ -389,18 +406,6 @@ func handleMockSystemDesignReview(
 }
 
 func writeError(w http.ResponseWriter, err error) {
-	if errors.Is(err, appinterviewprep.ErrForbidden) {
-		http.Error(w, err.Error(), http.StatusForbidden)
-		return
-	}
-	if errors.Is(err, appinterviewprep.ErrTaskNotFound) || errors.Is(err, appinterviewprep.ErrSessionNotFound) {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
-	if errors.Is(err, appinterviewprep.ErrMockSessionNotFound) {
-		http.Error(w, err.Error(), http.StatusNotFound)
-		return
-	}
 	if errors.Is(err, appinterviewprep.ErrSessionFinished) ||
 		errors.Is(err, appinterviewprep.ErrMockSessionFinished) ||
 		errors.Is(err, appinterviewprep.ErrSubmitNotAllowed) ||

@@ -8,6 +8,8 @@ import { apiClient } from '@/shared/api/base';
 type BackendUser = {
   id: string;
   username?: string;
+  telegram_username?: string;
+  telegramUsername?: string;
   first_name?: string;
   firstName?: string;
   last_name?: string;
@@ -43,21 +45,6 @@ type BindTelegramResponse = {
   status: string;
 };
 
-type GetPhotoUploadURLResponse = {
-  upload_url: string;
-  uploadUrl?: string;
-  object_key: string;
-  objectKey?: string;
-  expires_in_seconds: number;
-  expiresInSeconds?: number;
-};
-
-type CompletePhotoUploadResponse = {
-  user: BackendUser;
-  needs_profile_complete?: boolean;
-  needsProfileComplete?: boolean;
-};
-
 type TelegramAuthChallengeResponse = {
   token: string;
   bot_start_url?: string;
@@ -85,6 +72,7 @@ function normalizeUser(user: BackendUser): User {
   return {
     id: user.id,
     username: user.username ?? '',
+    telegramUsername: user.telegram_username ?? user.telegramUsername ?? '',
     firstName: user.first_name ?? user.firstName ?? '',
     lastName: user.last_name ?? user.lastName ?? '',
     avatarUrl: user.avatar_url ?? user.avatarUrl ?? '',
@@ -250,26 +238,5 @@ export const authApi = {
       localStorage.removeItem('authToken');
     }
     return response.data;
-  },
-  getPhotoUploadURL: async (fileName: string, contentType: string) => {
-    const response = await apiClient.post<GetPhotoUploadURLResponse>(
-      '/api/v1/profile/photo/upload-url',
-      { file_name: fileName, content_type: contentType },
-    );
-    return {
-      uploadUrl: response.data.upload_url ?? response.data.uploadUrl ?? '',
-      objectKey: response.data.object_key ?? response.data.objectKey ?? '',
-      expiresInSeconds: response.data.expires_in_seconds ?? response.data.expiresInSeconds ?? 900,
-    };
-  },
-  completePhotoUpload: async (objectKey: string): Promise<ProfileResponse> => {
-    const response = await apiClient.post<CompletePhotoUploadResponse>(
-      '/api/v1/profile/photo/complete',
-      { object_key: objectKey },
-    );
-    return normalizeProfileResponse({
-      user: response.data.user,
-      needs_profile_complete: response.data.needs_profile_complete ?? response.data.needsProfileComplete ?? false,
-    });
   },
 };

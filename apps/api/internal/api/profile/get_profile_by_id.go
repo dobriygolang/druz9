@@ -20,12 +20,5 @@ func (i *Implementation) GetProfileByID(ctx context.Context, req *v1.GetProfileB
 		return nil, err
 	}
 
-	// Generate presigned URL for avatar
-	avatarURL, err := i.service.GetAvatarURL(ctx, response.User.AvatarURL)
-	if err != nil {
-		return nil, err
-	}
-	response.User.AvatarURL = avatarURL
-
 	return mapProfileResponse(response), nil
 }

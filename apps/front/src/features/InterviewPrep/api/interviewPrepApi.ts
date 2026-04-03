@@ -402,6 +402,11 @@ export const interviewPrepApi = {
     return normalizeMockSession(response.data.session);
   },
 
+  getAvailableCompanies: async (): Promise<string[]> => {
+    const response = await apiClient.get<{ companies: string[] }>('/api/v1/interview-prep/companies');
+    return response.data.companies || [];
+  },
+
   getMockSession: async (sessionId: string): Promise<InterviewPrepMockSession> => {
     const response = await apiClient.get<{ session: any }>(`/api/v1/interview-prep/mock-sessions/${sessionId}`);
     return normalizeMockSession(response.data.session);

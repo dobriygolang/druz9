@@ -23,9 +23,17 @@
 }
 
 .creator-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 12px;
+  border-radius: var(--radius-full);
+  font-size: var(--font-size-xs);
+  font-weight: 700;
+  line-height: 1;
+  border: 1px solid var(--border-active);
   background: var(--accent-muted);
   color: var(--accent-color);
-  border-color: var(--border-active);
 }
 
 .topic-chip {
@@ -122,4 +130,3 @@
 .icon-error {
   color: var(--danger-color);
 }
-

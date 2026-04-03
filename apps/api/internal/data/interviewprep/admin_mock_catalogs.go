@@ -3,6 +3,7 @@ package interviewprep
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"api/internal/model"
 
@@ -125,6 +126,42 @@ func (r *Repo) ListMockCompanyPresets(ctx context.Context) ([]*model.InterviewPr
 		items = append(items, &item)
 	}
 	return items, rows.Err()
+}
+
+func (r *Repo) GetAvailableCompanies(ctx context.Context) ([]string, error) {
+	rows, err := r.data.DB.Query(ctx, `
+		SELECT DISTINCT company_tag
+		FROM (
+			SELECT company_tag FROM interview_prep_tasks
+			UNION ALL
+			SELECT company_tag FROM interview_prep_mock_question_pools
+			UNION ALL
+			SELECT company_tag FROM interview_prep_mock_company_presets
+		) sources
+		WHERE NULLIF(BTRIM(company_tag), '') IS NOT NULL
+		ORDER BY company_tag ASC
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("get available companies: %w", err)
+	}
+	defer rows.Close()
+
+	companies := make([]string, 0, 16)
+	for rows.Next() {
+		var company string
+		if err := rows.Scan(&company); err != nil {
+			return nil, fmt.Errorf("scan available company: %w", err)
+		}
+		company = strings.TrimSpace(company)
+		if company != "" {
+			companies = append(companies, company)
+		}
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate available companies: %w", err)
+	}
+
+	return companies, nil
 }
 
 func (r *Repo) CreateMockCompanyPreset(ctx context.Context, item *model.InterviewPrepMockCompanyPreset) error {

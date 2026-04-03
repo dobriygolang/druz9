@@ -79,6 +79,7 @@ func UserStatusFromString(str string) UserStatus {
 type User struct {
 	ID                 uuid.UUID
 	Username           string
+	TelegramUsername   string
 	FirstName          string
 	LastName           string
 	AvatarURL          string

@@ -31,8 +31,6 @@ const (
 	ProfileService_UpdateProfile_FullMethodName               = "/profile.v1.ProfileService/UpdateProfile"
 	ProfileService_Logout_FullMethodName                      = "/profile.v1.ProfileService/Logout"
 	ProfileService_BindTelegram_FullMethodName                = "/profile.v1.ProfileService/BindTelegram"
-	ProfileService_GetPhotoUploadURL_FullMethodName           = "/profile.v1.ProfileService/GetPhotoUploadURL"
-	ProfileService_CompletePhotoUpload_FullMethodName         = "/profile.v1.ProfileService/CompletePhotoUpload"
 )
 
 // ProfileServiceClient is the client API for ProfileService service.
@@ -51,8 +49,6 @@ type ProfileServiceClient interface {
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
 	BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...grpc.CallOption) (*BindTelegramResponse, error)
-	GetPhotoUploadURL(ctx context.Context, in *GetPhotoUploadURLRequest, opts ...grpc.CallOption) (*GetPhotoUploadURLResponse, error)
-	CompletePhotoUpload(ctx context.Context, in *CompletePhotoUploadRequest, opts ...grpc.CallOption) (*CompletePhotoUploadResponse, error)
 }
 
 type profileServiceClient struct {
@@ -183,26 +179,6 @@ func (c *profileServiceClient) BindTelegram(ctx context.Context, in *BindTelegra
 	return out, nil
 }
 
-func (c *profileServiceClient) GetPhotoUploadURL(ctx context.Context, in *GetPhotoUploadURLRequest, opts ...grpc.CallOption) (*GetPhotoUploadURLResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetPhotoUploadURLResponse)
-	err := c.cc.Invoke(ctx, ProfileService_GetPhotoUploadURL_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *profileServiceClient) CompletePhotoUpload(ctx context.Context, in *CompletePhotoUploadRequest, opts ...grpc.CallOption) (*CompletePhotoUploadResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(CompletePhotoUploadResponse)
-	err := c.cc.Invoke(ctx, ProfileService_CompletePhotoUpload_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 // ProfileServiceServer is the server API for ProfileService service.
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility.
@@ -219,8 +195,6 @@ type ProfileServiceServer interface {
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*ProfileResponse, error)
 	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
 	BindTelegram(context.Context, *BindTelegramRequest) (*BindTelegramResponse, error)
-	GetPhotoUploadURL(context.Context, *GetPhotoUploadURLRequest) (*GetPhotoUploadURLResponse, error)
-	CompletePhotoUpload(context.Context, *CompletePhotoUploadRequest) (*CompletePhotoUploadResponse, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -266,12 +240,6 @@ func (UnimplementedProfileServiceServer) Logout(context.Context, *LogoutRequest)
 }
 func (UnimplementedProfileServiceServer) BindTelegram(context.Context, *BindTelegramRequest) (*BindTelegramResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method BindTelegram not implemented")
-}
-func (UnimplementedProfileServiceServer) GetPhotoUploadURL(context.Context, *GetPhotoUploadURLRequest) (*GetPhotoUploadURLResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetPhotoUploadURL not implemented")
-}
-func (UnimplementedProfileServiceServer) CompletePhotoUpload(context.Context, *CompletePhotoUploadRequest) (*CompletePhotoUploadResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method CompletePhotoUpload not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
 func (UnimplementedProfileServiceServer) testEmbeddedByValue()                        {}
@@ -510,42 +478,6 @@ func _ProfileService_BindTelegram_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProfileService_GetPhotoUploadURL_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetPhotoUploadURLRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProfileServiceServer).GetPhotoUploadURL(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ProfileService_GetPhotoUploadURL_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceServer).GetPhotoUploadURL(ctx, req.(*GetPhotoUploadURLRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ProfileService_CompletePhotoUpload_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(CompletePhotoUploadRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProfileServiceServer).CompletePhotoUpload(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ProfileService_CompletePhotoUpload_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceServer).CompletePhotoUpload(ctx, req.(*CompletePhotoUploadRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 // ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -600,14 +532,6 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BindTelegram",
 			Handler:    _ProfileService_BindTelegram_Handler,
-		},
-		{
-			MethodName: "GetPhotoUploadURL",
-			Handler:    _ProfileService_GetPhotoUploadURL_Handler,
-		},
-		{
-			MethodName: "CompletePhotoUpload",
-			Handler:    _ProfileService_CompletePhotoUpload_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

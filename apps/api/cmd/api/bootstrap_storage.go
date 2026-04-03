@@ -2,9 +2,7 @@ package main
 
 import (
 	"context"
-	"time"
 
-	"api/internal/cache"
 	"api/internal/closer"
 	arenadata "api/internal/data/arena"
 	codeeditordata "api/internal/data/code_editor"
@@ -23,7 +21,6 @@ type storageContext struct {
 	store          *postgres.Store
 	storageClient  *s3storage.Service
 	geoClient      *geodata.Client
-	avatarURLCache *cache.TTLCache[string]
 	profileRepo    *profiledata.Repo
 	eventRepo      *eventdata.Repo
 	podcastRepo    *podcastdata.Repo
@@ -74,7 +71,6 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 		store:          store,
 		storageClient:  storageClient,
 		geoClient:      geodata.NewClient(bootstrap.cfg, store, bootstrap.kratosLogger),
-		avatarURLCache: cache.NewTTLCache[string](1000, 1*time.Hour),
 		profileRepo:    profiledata.NewRepo(store, bootstrap.kratosLogger),
 		eventRepo:      eventdata.NewRepo(store, bootstrap.kratosLogger),
 		podcastRepo:    podcastdata.NewRepo(store, bootstrap.kratosLogger),

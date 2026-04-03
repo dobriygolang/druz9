@@ -80,20 +80,6 @@ service ProfileService {
     };
   }
 
-  rpc GetPhotoUploadURL(GetPhotoUploadURLRequest) returns (GetPhotoUploadURLResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/profile/photo/upload-url"
-      body: "*"
-    };
-  }
-
-  rpc CompletePhotoUpload(CompletePhotoUploadRequest) returns (CompletePhotoUploadResponse) {
-    option (google.api.http) = {
-      post: "/api/v1/profile/photo/complete"
-      body: "*"
-    };
-  }
-
 }
 
 message CreateTelegramAuthChallengeRequest {}
@@ -175,28 +161,6 @@ message BindTelegramResponse {
   string status = 1;
 }
 
-// GetPhotoUploadURL generates presigned URL for photo upload
-message GetPhotoUploadURLRequest {
-  string file_name = 1;
-  string content_type = 2;
-}
-
-message GetPhotoUploadURLResponse {
-  string upload_url = 1;
-  string object_key = 2;
-  int32 expires_in_seconds = 3;
-}
-
-// CompletePhotoUpload finalizes photo upload
-message CompletePhotoUploadRequest {
-  string object_key = 1;
-}
-
-message CompletePhotoUploadResponse {
-  User user = 1;
-  bool needs_profile_complete = 2;
-}
-
 message ProfileResponse {
   User user = 1;
   bool needs_profile_complete = 2;
@@ -209,6 +173,7 @@ message LogoutResponse {
 message User {
   string id = 1;
   string username = 2;
+  string telegram_username = 16;
   string first_name = 3;
   string last_name = 4;
   string avatar_url = 5;

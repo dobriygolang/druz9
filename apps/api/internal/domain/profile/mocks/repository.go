@@ -263,66 +263,6 @@ func (_c *Repository_FindUserByProviderIdentity_Call) RunAndReturn(run func(cont
 	return _c
 }
 
-// UpdateAvatarURL provides a mock function with given fields: ctx, userID, avatarURL
-func (_m *Repository) UpdateAvatarURL(ctx context.Context, userID uuid.UUID, avatarURL string) (*model.User, error) {
-	ret := _m.Called(ctx, userID, avatarURL)
-
-	if len(ret) == 0 {
-		panic("no return value specified for UpdateAvatarURL")
-	}
-
-	var r0 *model.User
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) (*model.User, error)); ok {
-		return rf(ctx, userID, avatarURL)
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) *model.User); ok {
-		r0 = rf(ctx, userID, avatarURL)
-	} else {
-		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*model.User)
-		}
-	}
-
-	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string) error); ok {
-		r1 = rf(ctx, userID, avatarURL)
-	} else {
-		r1 = ret.Error(1)
-	}
-
-	return r0, r1
-}
-
-// Repository_UpdateAvatarURL_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'UpdateAvatarURL'
-type Repository_UpdateAvatarURL_Call struct {
-	*mock.Call
-}
-
-// UpdateAvatarURL is a helper method to define mock.On call
-//   - ctx context.Context
-//   - userID uuid.UUID
-//   - avatarURL string
-func (_e *Repository_Expecter) UpdateAvatarURL(ctx interface{}, userID interface{}, avatarURL interface{}) *Repository_UpdateAvatarURL_Call {
-	return &Repository_UpdateAvatarURL_Call{Call: _e.mock.On("UpdateAvatarURL", ctx, userID, avatarURL)}
-}
-
-func (_c *Repository_UpdateAvatarURL_Call) Run(run func(ctx context.Context, userID uuid.UUID, avatarURL string)) *Repository_UpdateAvatarURL_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string))
-	})
-	return _c
-}
-
-func (_c *Repository_UpdateAvatarURL_Call) Return(_a0 *model.User, _a1 error) *Repository_UpdateAvatarURL_Call {
-	_c.Call.Return(_a0, _a1)
-	return _c
-}
-
-func (_c *Repository_UpdateAvatarURL_Call) RunAndReturn(run func(context.Context, uuid.UUID, string) (*model.User, error)) *Repository_UpdateAvatarURL_Call {
-	_c.Call.Return(run)
-	return _c
-}
-
 // UpdateLocation provides a mock function with given fields: ctx, userID, req
 func (_m *Repository) UpdateLocation(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.User, error) {
 	ret := _m.Called(ctx, userID, req)

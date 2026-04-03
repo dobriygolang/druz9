@@ -4,6 +4,7 @@ export type ActivityStatus = 'online' | 'recently_active' | 'offline';
 export interface User {
   id: string;
   username: string;
+  telegramUsername?: string;
   firstName: string;
   lastName: string;
   avatarUrl: string;
