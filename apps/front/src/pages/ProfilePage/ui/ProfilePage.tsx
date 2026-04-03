@@ -32,7 +32,7 @@ const EMPTY_PROGRESS: ProfileProgress = {
   companies: [],
 };
 
-const RADAR_AXES = ['Slices', 'Concurrency', 'SQL', 'Architecture', 'System Design'];
+const RADAR_AXES = ['Срезы', 'Параллелизм', 'SQL', 'Архитектура', 'Системный дизайн'];
 
 function buildOrbitPoint(index: number, total: number, radius: number, centerX: number, centerY: number, angleOffset = -Math.PI / 2) {
   const angle = angleOffset + ((Math.PI * 2 * index) / total);
@@ -43,17 +43,37 @@ function buildOrbitPoint(index: number, total: number, radius: number, centerX: 
 }
 
 function formatCompetencyAttempts(item: ProfileCompetency) {
-  return `${item.stageCount} stages • ${item.questionCount} questions • ${item.practiceSessions} practice`;
+  return `${item.stageCount} этапов • ${item.questionCount} вопросов • ${item.practiceSessions} практик`;
+}
+
+function formatDayLabel(value: number) {
+  if (value % 10 === 1 && value % 100 !== 11) {
+    return `${value} день`;
+  }
+  if ([2, 3, 4].includes(value % 10) && ![12, 13, 14].includes(value % 100)) {
+    return `${value} дня`;
+  }
+  return `${value} дней`;
+}
+
+function formatRunLabel(value: number) {
+  if (value % 10 === 1 && value % 100 !== 11) {
+    return `${value} практика`;
+  }
+  if ([2, 3, 4].includes(value % 10) && ![12, 13, 14].includes(value % 100)) {
+    return `${value} практики`;
+  }
+  return `${value} практик`;
 }
 
 function confidenceLabel(value: ProfileCompetency['confidence']) {
   switch (value) {
     case 'verified':
-      return 'Verified';
+      return 'Проверено';
     case 'medium':
-      return 'Medium';
+      return 'Средний';
     default:
-      return 'Low';
+      return 'Низкий';
   }
 }
 
@@ -309,7 +329,7 @@ export const ProfilePage: React.FC = () => {
 
       {!isOwnProfile && (
         <Link
-          to="/map"
+          to="/community/map"
           style={{
             display: 'inline-flex',
             alignItems: 'center',
@@ -399,10 +419,10 @@ export const ProfilePage: React.FC = () => {
               </div>
             )}
 
-            <div className={`profile-status ${user.activityStatus === 'online' ? 'profile-status--online' : user.activityStatus === 'recently_active' ? 'profile-status--recently' : 'profile-status--offline'}`}>
+              <div className={`profile-status ${user.activityStatus === 'online' ? 'profile-status--online' : user.activityStatus === 'recently_active' ? 'profile-status--recently' : 'profile-status--offline'}`}>
               <div className="profile-status-dot" />
               {user.activityStatus === 'online' ? 'В сети' :
-               user.activityStatus === 'recently_active' ? 'Был' : 'Offline'}
+               user.activityStatus === 'recently_active' ? 'Недавно заходил' : 'Не в сети'}
             </div>
           </div>
         </div>
@@ -497,12 +517,12 @@ export const ProfilePage: React.FC = () => {
       <section className="profile-progress-section">
         <div className="profile-progress-section__header">
           <div>
-            <h2>Progress profile</h2>
-            <p>Practice и verified skill теперь разведены: solo накапливает объем, а mock и arena подтверждают реальный сигнал.</p>
+            <h2>Профиль прогресса</h2>
+            <p>Здесь собраны практика, подтвержденные результаты и следующие шаги. Блоки разделены так, чтобы профиль читался сверху вниз, а не как одна длинная смешанная лента.</p>
           </div>
           <div className="profile-progress-section__badges">
-            <span className="profile-progress-badge"><Flame size={14} /> {progress.overview.currentStreakDays} day streak</span>
-            <span className="profile-progress-badge"><TrendingUp size={14} /> {progress.overview.practiceSessions} practice runs</span>
+            <span className="profile-progress-badge"><Flame size={14} /> {formatDayLabel(progress.overview.currentStreakDays)} подряд</span>
+            <span className="profile-progress-badge"><TrendingUp size={14} /> {formatRunLabel(progress.overview.practiceSessions)}</span>
           </div>
         </div>
 
@@ -510,13 +530,13 @@ export const ProfilePage: React.FC = () => {
           <div className="card profile-progress-card profile-progress-card--radar">
             <div className="profile-progress-card__header">
               <div>
-                <h3><BrainCircuit size={18} /> Competency graph</h3>
-                <p>Orbital map навыков: каждая орбита это отдельная зона, а узлы и дуги анимированно показывают depth и confidence сигнала.</p>
+                <h3><BrainCircuit size={18} /> Карта навыков</h3>
+                <p>Каждая орбита показывает отдельную зону. Практика и подтвержденный результат разведены, чтобы было видно не только объем, но и реальную глубину.</p>
               </div>
             </div>
 
             <div className="profile-progress-orbit" onMouseLeave={() => setHoveredCompetencyKey(null)}>
-              <svg viewBox="0 0 440 420" className="profile-progress-orbit__svg" role="img" aria-label="Competency orbit map">
+              <svg viewBox="0 0 440 420" className="profile-progress-orbit__svg" role="img" aria-label="Карта навыков">
                 <defs>
                   <radialGradient id="profile-orbit-glow" cx="50%" cy="50%" r="50%">
                     <stop offset="0%" stopColor="rgba(103, 232, 249, 0.78)" />
@@ -581,8 +601,8 @@ export const ProfilePage: React.FC = () => {
                     <strong>{hoveredCompetency.label}</strong>
                     <span className={`profile-progress-confidence profile-progress-confidence--${hoveredCompetency.confidence}`}>{confidenceLabel(hoveredCompetency.confidence)}</span>
                   </div>
-                  <p>Blended {hoveredCompetency.score} • Verified {hoveredCompetency.verifiedScore} • Practice {hoveredCompetency.practiceScore}</p>
-                  <p>{hoveredCompetency.stageCount} stages • {hoveredCompetency.questionCount} questions • {hoveredCompetency.practiceDays} independent days</p>
+                  <p>Общий сигнал: {hoveredCompetency.score} • Подтверждено: {hoveredCompetency.verifiedScore} • Практика: {hoveredCompetency.practiceScore}</p>
+                  <p>{hoveredCompetency.stageCount} этапов • {hoveredCompetency.questionCount} вопросов • {formatDayLabel(hoveredCompetency.practiceDays)} самостоятельной практики</p>
                 </div>
               )}
               <div className="profile-progress-orbit__legend">
@@ -594,7 +614,7 @@ export const ProfilePage: React.FC = () => {
                   >
                     <span className={`profile-progress-confidence profile-progress-confidence--${item.confidence}`}>{confidenceLabel(item.confidence)}</span>
                     <strong>{item.label}</strong>
-                    <small>Verified {item.verifiedScore} • Practice {item.practiceScore}</small>
+                    <small>Подтверждено {item.verifiedScore} • Практика {item.practiceScore}</small>
                   </div>
                 ))}
               </div>
@@ -602,7 +622,7 @@ export const ProfilePage: React.FC = () => {
 
             {!hasProgressData && (
               <div className="profile-progress-empty">
-                Пока мало данных. Начни с practice или mock interview, и профиль начнет собирать volume и verified skill отдельно.
+                Пока данных мало. Начни с практики или mock interview, и профиль начнет отдельно собирать объем и подтвержденный сигнал.
               </div>
             )}
           </div>
@@ -610,41 +630,41 @@ export const ProfilePage: React.FC = () => {
           <div className="card profile-progress-card">
             <div className="profile-progress-card__header">
               <div>
-                <h3><Target size={18} /> Practice volume</h3>
-                <p>Это обучающий слой. Он показывает, сколько solo-попыток уже накоплено, но не претендует на verified skill.</p>
+                <h3><Target size={18} /> Объем практики</h3>
+                <p>Это учебный слой. Он показывает накопленный опыт в solo-режиме и помогает понять, насколько регулярно человек тренируется.</p>
               </div>
             </div>
 
             <div className="profile-progress-metrics">
               <div className="profile-progress-metric">
-                <span className="label">Practice sessions</span>
+                <span className="label">Практики</span>
                 <strong>{progress.overview.practiceSessions}</strong>
               </div>
               <div className="profile-progress-metric">
-                <span className="label">Passed sessions</span>
+                <span className="label">Успешные сессии</span>
                 <strong>{progress.overview.practicePassedSessions}</strong>
               </div>
               <div className="profile-progress-metric">
-                <span className="label">Active days</span>
+                <span className="label">Активные дни</span>
                 <strong>{progress.overview.practiceActiveDays}</strong>
               </div>
               <div className="profile-progress-metric">
-                <span className="label">Finished mocks</span>
+                <span className="label">Завершенные mock</span>
                 <strong>{progress.overview.completedMockSessions}</strong>
               </div>
               <div className="profile-progress-metric">
-                <span className="label">Completed stages</span>
+                <span className="label">Пройденные этапы</span>
                 <strong>{progress.overview.completedMockStages}</strong>
               </div>
               <div className="profile-progress-metric">
-                <span className="label">Current streak</span>
-                <strong>{progress.overview.currentStreakDays} days</strong>
+                <span className="label">Текущая серия</span>
+                <strong>{formatDayLabel(progress.overview.currentStreakDays)}</strong>
               </div>
             </div>
 
             {progress.companies.length > 0 && (
               <div className="profile-progress-company-strip">
-                <span className="profile-progress-company-strip__label">Companies</span>
+                <span className="profile-progress-company-strip__label">Компании</span>
                 <div className="profile-progress-company-strip__items">
                   {progress.companies.map((company) => (
                     <span key={company} className="profile-progress-company-pill">{company}</span>
@@ -659,8 +679,8 @@ export const ProfilePage: React.FC = () => {
           <div className="card profile-progress-card">
             <div className="profile-progress-card__header">
               <div>
-                <h3>Verified skill</h3>
-                <p>Сильные зоны теперь показывают verified signal, practice volume и confidence по каждой теме.</p>
+                <h3>Подтвержденные зоны</h3>
+                <p>Здесь показываются темы, где уже виден не только объем, но и подтвержденный уровень по результатам.</p>
               </div>
             </div>
             <div className="profile-progress-list">
@@ -672,7 +692,7 @@ export const ProfilePage: React.FC = () => {
                       <span className={`profile-progress-confidence profile-progress-confidence--${item.confidence}`}>{confidenceLabel(item.confidence)}</span>
                     </div>
                     <span>{formatCompetencyAttempts(item)}</span>
-                    <span>Verified {item.verifiedScore} • Practice {item.practiceScore} • {item.practiceDays} independent days</span>
+                    <span>Подтверждено {item.verifiedScore} • Практика {item.practiceScore} • {formatDayLabel(item.practiceDays)} самостоятельной практики</span>
                   </div>
                   <b>{item.score}</b>
                 </div>
@@ -683,8 +703,8 @@ export const ProfilePage: React.FC = () => {
           <div className="card profile-progress-card">
             <div className="profile-progress-card__header">
               <div>
-                <h3>Weakest zones</h3>
-                <p>Здесь виден разрыв между practice и verified skill. Обычно именно отсюда начинается самый быстрый рост.</p>
+                <h3>Зоны роста</h3>
+                <p>Здесь виден разрыв между объемом практики и подтвержденным уровнем. Обычно именно отсюда начинается самый быстрый рост.</p>
               </div>
             </div>
             <div className="profile-progress-list">
@@ -696,7 +716,7 @@ export const ProfilePage: React.FC = () => {
                       <span className={`profile-progress-confidence profile-progress-confidence--${item.confidence}`}>{confidenceLabel(item.confidence)}</span>
                     </div>
                     <span>{formatCompetencyAttempts(item)}</span>
-                    <span>Verified {item.verifiedScore} • Practice {item.practiceScore} • {item.practiceDays} independent days</span>
+                    <span>Подтверждено {item.verifiedScore} • Практика {item.practiceScore} • {formatDayLabel(item.practiceDays)} самостоятельной практики</span>
                   </div>
                   <b>{item.score}</b>
                 </div>
@@ -704,10 +724,10 @@ export const ProfilePage: React.FC = () => {
             </div>
           </div>
 
-          <div className="card profile-progress-card">
+          <div className="card profile-progress-card profile-progress-card--wide">
             <div className="profile-progress-card__header">
               <div>
-                <h3>Recommended next</h3>
+                <h3>Что сделать дальше</h3>
                 <p>Следующие ходы, которые дадут самый заметный сигнал по профилю.</p>
               </div>
             </div>
@@ -730,8 +750,8 @@ export const ProfilePage: React.FC = () => {
         <div className="card profile-progress-card">
           <div className="profile-progress-card__header">
             <div>
-              <h3><ShieldCheck size={18} /> Passed checkpoints</h3>
-              <p>Только успешно закрытые timed checkpoints. Это самый чистый verified signal после mock.</p>
+              <h3><ShieldCheck size={18} /> Пройденные checkpoints</h3>
+              <p>Только успешно закрытые timed checkpoints. Это самый чистый подтвержденный сигнал после mock.</p>
             </div>
           </div>
           <div className="profile-progress-checkpoints">

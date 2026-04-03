@@ -186,7 +186,7 @@ export const CirclesPage: React.FC = () => {
               <div className="circles-card__section">
                 <div className="circles-card__section-head">
                   <span>Ближайшие события</span>
-                  <Link to="/events">Все ивенты</Link>
+                  <Link to="/community/events">Все ивенты</Link>
                 </div>
                 {circle.upcomingEvents.length > 0 ? (
                   <div className="circles-event-list">
@@ -211,7 +211,7 @@ export const CirclesPage: React.FC = () => {
               <div className="circles-card__section">
                 <div className="circles-card__section-head">
                   <span>Мини-лидерборд</span>
-                  <Link to="/users">Сообщество</Link>
+                  <Link to="/community/people">Сообщество</Link>
                 </div>
                 <div className="circles-leaderboard">
                   {circle.leaderboard.slice(0, 3).map((entry, index) => (
@@ -230,7 +230,7 @@ export const CirclesPage: React.FC = () => {
               <div className="circles-card__section">
                 <div className="circles-card__section-head">
                   <span>Подборка участников</span>
-                  <Link to="/users">Открыть список</Link>
+                  <Link to="/community/people">Открыть список</Link>
                 </div>
                 <div className="circles-member-list">
                   {circle.members.slice(0, isMobile ? 4 : 5).map((member) => (

@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { Loader2, MapPin } from 'lucide-react';
 
 import {
@@ -6,7 +6,9 @@ import {
   LocationCandidate,
 } from '@/entities/User/model/types';
 import { geoApi } from '@/features/Geo/api/geoApi';
-import { LocationPreviewMap } from '@/shared/ui/LocationPreviewMap';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
+
+const LocationPreviewMap = lazy(() => import('@/shared/ui/LocationPreviewMap').then((m) => ({ default: m.LocationPreviewMap })));
 
 interface LocationPickerProps {
   initialQuery?: string;
@@ -35,6 +37,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
   submitLoadingLabel,
   onSubmit,
 }) => {
+  const isMobile = useIsMobile();
   const [regionQuery, setRegionQuery] = useState(initialQuery);
   const [candidates, setCandidates] = useState<LocationCandidate[]>(
     initialCandidate ? [initialCandidate] : [],
@@ -136,7 +139,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         <div
           style={{
             display: 'grid',
-            gridTemplateColumns: '1fr auto',
+            gridTemplateColumns: isMobile ? '1fr' : '1fr auto',
             gap: '12px',
             alignItems: 'center',
           }}
@@ -159,7 +162,7 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
             className="btn btn-secondary"
             onClick={handleResolve}
             disabled={!regionQuery.trim() || isResolving || isSubmitting}
-            style={{ minWidth: '168px' }}
+            style={{ minWidth: isMobile ? '100%' : '168px', width: isMobile ? '100%' : undefined }}
           >
             {isResolving ? 'Ищем...' : 'Найти варианты'}
           </button>
@@ -279,7 +282,9 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
               </div>
             </div>
           </div>
-          <LocationPreviewMap candidate={selectedLocation} />
+          <Suspense fallback={<div className="empty-state compact">Загрузка карты...</div>}>
+            <LocationPreviewMap candidate={selectedLocation} />
+          </Suspense>
         </div>
       )}
 
@@ -289,12 +294,12 @@ export const LocationPicker: React.FC<LocationPickerProps> = ({
         </div>
       )}
 
-      <div style={{ marginTop: '24px', display: 'flex', justifyContent: 'flex-end' }}>
+      <div style={{ marginTop: '24px', display: 'flex', justifyContent: isMobile ? 'stretch' : 'flex-end' }}>
         <button
           type="submit"
           className="btn btn-primary"
           disabled={!selectedCandidate || isSubmitting || isResolving}
-          style={{ minWidth: '240px' }}
+          style={{ minWidth: isMobile ? '100%' : '240px', width: isMobile ? '100%' : undefined }}
         >
           {isSubmitting ? submitLoadingLabel : submitLabel}
         </button>

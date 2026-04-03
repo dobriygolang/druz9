@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { Navigate } from 'react-router-dom';
 
 import { useAuth } from '@/app/providers/AuthProvider';
@@ -15,8 +15,6 @@ import { CodeTask } from '@/entities/CodeRoom/model/types';
 import {
   InterviewPrepAdminHero,
   InterviewPrepAdminTaskSection,
-  InterviewPrepQuestionModal,
-  InterviewPrepTaskModal,
   MockCompanyPresetsSection,
   MockQuestionPoolsSection,
 } from './components/InterviewPrepAdminSections';
@@ -33,6 +31,17 @@ import {
   taskToForm,
   toSlug,
 } from './lib/interviewPrepAdminPageHelpers';
+
+const InterviewPrepTaskModal = lazy(() => import('./components/InterviewPrepAdminModals').then((m) => ({ default: m.InterviewPrepTaskModal })));
+const InterviewPrepQuestionModal = lazy(() => import('./components/InterviewPrepAdminModals').then((m) => ({ default: m.InterviewPrepQuestionModal })));
+
+const AdminModalFallback = () => (
+  <div className="modal-overlay">
+    <div className="modal interview-prep-modal admin-modal-shell">
+      <div className="empty-state compact">Загрузка модального окна...</div>
+    </div>
+  </div>
+);
 
 export const InterviewPrepAdminPage: React.FC = () => {
   const { user } = useAuth();
@@ -494,31 +503,35 @@ export const InterviewPrepAdminPage: React.FC = () => {
         />
       </div>
 
-      <InterviewPrepTaskModal
-        open={taskModalOpen}
-        saving={saving}
-        form={taskForm}
-        onClose={closeTaskModal}
-        onSave={() => void handleSaveTask()}
-        onTitleChange={handleTaskTitleChange}
-        onFormChange={setTaskForm}
-        updateTaskCase={updateTaskCase}
-        addTaskCase={addTaskCase}
-        removeTaskCase={removeTaskCase}
-      />
+      <Suspense fallback={<AdminModalFallback />}>
+        <InterviewPrepTaskModal
+          open={taskModalOpen}
+          saving={saving}
+          form={taskForm}
+          onClose={closeTaskModal}
+          onSave={() => void handleSaveTask()}
+          onTitleChange={handleTaskTitleChange}
+          onFormChange={setTaskForm}
+          updateTaskCase={updateTaskCase}
+          addTaskCase={addTaskCase}
+          removeTaskCase={removeTaskCase}
+        />
+      </Suspense>
 
-      <InterviewPrepQuestionModal
-        open={questionModalOpen}
-        saving={saving}
-        deletingId={deletingId}
-        selectedTask={selectedTask}
-        sortedQuestions={sortedQuestions}
-        form={questionForm}
-        onClose={closeQuestionModal}
-        onSave={() => void handleSaveQuestion()}
-        onDelete={(questionId) => void handleDeleteQuestion(questionId)}
-        onFormChange={setQuestionForm}
-      />
+      <Suspense fallback={<AdminModalFallback />}>
+        <InterviewPrepQuestionModal
+          open={questionModalOpen}
+          saving={saving}
+          deletingId={deletingId}
+          selectedTask={selectedTask}
+          sortedQuestions={sortedQuestions}
+          form={questionForm}
+          onClose={closeQuestionModal}
+          onSave={() => void handleSaveQuestion()}
+          onDelete={(questionId) => void handleDeleteQuestion(questionId)}
+          onFormChange={setQuestionForm}
+        />
+      </Suspense>
     </>
   );
 };

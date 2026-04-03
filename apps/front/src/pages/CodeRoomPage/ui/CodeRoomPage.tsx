@@ -336,7 +336,7 @@ export const CodeRoomPage: React.FC = () => {
   };
 
   const handleBack = () => {
-    navigate('/code-rooms');
+    navigate('/practice/code-rooms');
   };
 
   const handleEditorMount: OnMount = (editor) => {

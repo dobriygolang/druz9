@@ -90,15 +90,15 @@ export const HomePage: React.FC = () => {
         </div>
 
         <div className="home-hero__metrics">
-          <div className="home-metric">
+          <div className="home-metric home-metric--online">
             <span>Онлайн</span>
             <strong>{isLoading ? '...' : onlineCount}</strong>
           </div>
-          <div className="home-metric">
+          <div className="home-metric home-metric--events">
             <span>Ближайшие events</span>
             <strong>{isLoading ? '...' : upcomingEvents.length}</strong>
           </div>
-          <div className="home-metric">
+          <div className="home-metric home-metric--circles">
             <span>Активные circles</span>
             <strong>{isLoading ? '...' : circles.length}</strong>
           </div>
@@ -106,7 +106,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       <section className="home-clusters">
-        <Link to="/community/people" className="home-cluster-card">
+        <Link to="/community/people" className="home-cluster-card home-cluster-card--community">
           <Users size={22} />
           <div>
             <strong>Community</strong>
@@ -115,7 +115,7 @@ export const HomePage: React.FC = () => {
           <ArrowRight size={18} />
         </Link>
 
-        <Link to="/practice/code-rooms" className="home-cluster-card">
+        <Link to="/practice/code-rooms" className="home-cluster-card home-cluster-card--practice">
           <Code2 size={22} />
           <div>
             <strong>Practice</strong>
@@ -124,7 +124,7 @@ export const HomePage: React.FC = () => {
           <ArrowRight size={18} />
         </Link>
 
-        <Link to="/growth/interview-prep" className="home-cluster-card">
+        <Link to="/growth/interview-prep" className="home-cluster-card home-cluster-card--growth">
           <Sparkles size={22} />
           <div>
             <strong>Growth</strong>
@@ -135,7 +135,7 @@ export const HomePage: React.FC = () => {
       </section>
 
       <section className="home-grid">
-        <article className="home-panel">
+        <article className="home-panel home-panel--events">
           <div className="home-panel__head">
             <div>
               <span>Upcoming</span>
@@ -159,7 +159,7 @@ export const HomePage: React.FC = () => {
           </div>
         </article>
 
-        <article className="home-panel">
+        <article className="home-panel home-panel--circles">
           <div className="home-panel__head">
             <div>
               <span>Circles</span>
@@ -183,7 +183,7 @@ export const HomePage: React.FC = () => {
           </div>
         </article>
 
-        <article className="home-panel">
+        <article className="home-panel home-panel--arena">
           <div className="home-panel__head">
             <div>
               <span>Arena</span>
@@ -200,7 +200,7 @@ export const HomePage: React.FC = () => {
           </div>
         </article>
 
-        <article className="home-panel">
+        <article className="home-panel home-panel--broadcast">
           <div className="home-panel__head">
             <div>
               <span>Broadcast</span>

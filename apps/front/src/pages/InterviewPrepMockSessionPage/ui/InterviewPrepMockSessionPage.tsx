@@ -1,16 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Editor from '@monaco-editor/react';
 import {
   CheckCircle2,
   Clock3,
-  Mic,
-  MicOff,
   Sparkles,
-  TerminalSquare,
-  Upload,
-  Wand2,
-  BrainCircuit,
 } from 'lucide-react';
 
 import {
@@ -23,8 +16,14 @@ import {
   InterviewPrepSystemDesignReview,
   InterviewPrepSystemDesignReviewInput,
 } from '@/features/InterviewPrep/api/interviewPrepApi';
-import { displayLanguageLabel, monacoLanguageFor } from '@/shared/lib/codeEditorLanguage';
-import { APP_MONACO_THEME, configureAppMonacoTheme } from '@/shared/lib/monacoTheme';
+
+const InterviewPrepMockWorkstation = lazy(() => import('./components/InterviewPrepMockWorkstation').then((m) => ({ default: m.InterviewPrepMockWorkstation })));
+
+const WorkstationFallback = () => (
+  <section className="card dashboard-card">
+    <div className="empty-state compact">Загрузка workstation...</div>
+  </section>
+);
 
 type SpeechRecognitionCtor = new () => {
   continuous: boolean;
@@ -374,185 +373,37 @@ export function InterviewPrepMockSessionPage() {
             </section>
           )}
 
-          {!isViewingCurrentStage && viewedStage && (
-            <section className="card dashboard-card interview-prep-workstation interview-prep-workstation--readonly">
-              <div className="workstation-toolbar">
-                <div className="workstation-toolbar__title">
-                  <CheckCircle2 size={16} />
-                  <span>Просмотр пройденного этапа</span>
-                </div>
-                <span className="badge">{viewedStage.status === 'completed' ? 'Завершён' : 'В процессе'}</span>
-              </div>
-              <div className="workstation-archive">
-                <p className="interview-prep-muted">
-                  Здесь можно просматривать старые этапы, не теряя текущий прогресс справа и сверху.
-                </p>
-                {viewedStage.reviewSummary && (
-                  <div className="interview-prep-result-row interview-prep-result-row--stacked">
-                    <strong>Итог ревью</strong>
-                    <span>{viewedStage.reviewScore ? `${viewedStage.reviewScore}/10` : 'Без числовой оценки'}</span>
-                    <span>{viewedStage.reviewSummary}</span>
-                  </div>
-                )}
-                {(viewedStage.questionResults ?? []).length > 0 && (
-                  <div className="console-review-gaps">
-                    <span className="gaps-label">Follow-up вопросы:</span>
-                    <ul>
-                      {(viewedStage.questionResults ?? []).map((result) => (
-                        <li key={result.id}>
-                          {result.position}. {result.prompt} {result.answeredAt ? `(${result.score}/10)` : '(без ответа)'}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
-
-          {session.status !== 'finished' && isViewingCurrentStage && currentStage.status === 'solving' && currentStage.kind !== 'system_design' && (
-            <section className="card dashboard-card interview-prep-workstation">
-              <div className="workstation-toolbar">
-                <div className="workstation-toolbar__title">
-                  <TerminalSquare size={16} />
-                  <span>Решение задачи</span>
-                </div>
-                <span className="badge">{displayLanguageLabel(currentStage.solveLanguage || currentStage.task?.language)}</span>
-              </div>
-              <div className="workstation-editor">
-                <Editor
-                  beforeMount={configureAppMonacoTheme}
-                  language={monacoLanguageFor(currentStage.solveLanguage || currentStage.task?.language)}
-                  value={code}
-                  onChange={(value) => setCode(value ?? '')}
-                  height={480}
-                  theme={APP_MONACO_THEME}
-                  options={{
-                    minimap: { enabled: false },
-                    fontSize: 14,
-                    automaticLayout: true,
-                    roundedSelection: false,
-                    scrollBeyondLastLine: false,
-                    padding: { top: 16, bottom: 16 }
-                  }}
-                />
-              </div>
-              <div className="workstation-footer">
-                <div className="form-group workstation-notes">
-                  <label>Пояснения (опционально)</label>
-                  <textarea
-                    className="form-control"
-                    value={notes}
-                    onChange={(e) => setNotes(e.target.value)}
-                    placeholder="Коротко объясни логику или trade-offs..."
-                    rows={2}
-                  />
-                </div>
-                {submitErrorDetails && (
-                  <div className="interview-prep-compile-error">
-                    <strong>Ошибка проверки</strong>
-                    <pre>{submitErrorDetails}</pre>
-                  </div>
-                )}
-                <button className="btn btn-primary workstation-submit" disabled={submitting} onClick={() => void handleSubmitStage()}>
-                  <Wand2 size={16} />
-                  {currentStage.task?.isExecutable ? 'Проверить решение' : 'Отправить на AI ревью'}
-                </button>
-              </div>
-            </section>
-          )}
-
-          {session.status !== 'finished' && isViewingCurrentStage && currentStage.status === 'solving' && currentStage.kind === 'system_design' && (
-            <section className="card dashboard-card interview-prep-workstation">
-              <div className="workstation-toolbar">
-                <div className="workstation-toolbar__title">
-                  <Sparkles size={16} />
-                  <span>System Design Workspace</span>
-                </div>
-              </div>
-              <div className="workstation-design-grid">
-                <div className="form-group upload-stage">
-                  <label>Архитектурная схема</label>
-                  <input
-                    id="mock-design-upload"
-                    className="interview-prep-upload-input"
-                    type="file"
-                    accept="image/png,image/jpeg,image/webp"
-                    onChange={(event) => setDesignImage(event.target.files?.[0] ?? null)}
-                  />
-                  <label htmlFor="mock-design-upload" className="interview-prep-upload-control">
-                    <span className="upload-trigger">
-                      <Upload size={16} />
-                      {designImage ? 'Заменить файл' : 'Загрузить схему'}
-                    </span>
-                    {designImage && <span className="upload-name">{designImage.name}</span>}
-                  </label>
-                </div>
-                <div className="design-notes-grid">
-                  {[
-                    ['notes', 'Заметки'],
-                    ['components', 'Компоненты'],
-                    ['apis', 'API и очереди'],
-                    ['databaseSchema', 'База и схемы'],
-                  ].map(([key, label]) => (
-                    <div key={key} className="form-group">
-                      <label>{label}</label>
-                      <textarea
-                        className="form-control"
-                        rows={3}
-                        value={(designInput as any)[key]}
-                        onChange={(event) => setDesignInput((prev) => ({ ...prev, [key]: event.target.value }))}
-                      />
-                    </div>
-                  ))}
-                </div>
-              </div>
-              <div className="workstation-footer">
-                <button className="btn btn-primary workstation-submit" disabled={submitting || !designImage} onClick={() => void handleReviewSystemDesign()}>
-                  <Sparkles size={16} />
-                  Получить AI обзор архитектуры
-                </button>
-              </div>
-            </section>
-          )}
-
-          {session.status !== 'finished' && isViewingCurrentStage && currentStage.status === 'questions' && currentStage.currentQuestion && (
-            <section className="card dashboard-card interview-prep-workstation">
-              <div className="workstation-toolbar">
-                <div className="workstation-toolbar__title">
-                  <BrainCircuit size={16} />
-                  <span>Follow-up вопрос #{currentStage.currentQuestion.position}</span>
-                </div>
-              </div>
-              <div className="workstation-question-box">
-                <blockquote>{currentStage.currentQuestion.prompt}</blockquote>
-                <div className="question-input-wrap">
-                  <div className="question-input-toolbar">
-                    <button
-                      type="button"
-                      className={`btn ${speechActive ? 'btn-danger' : 'btn-secondary'} btn-sm`}
-                      disabled={!speechSupported}
-                      onClick={toggleSpeech}
-                    >
-                      {speechActive ? <MicOff size={14} /> : <Mic size={14} />}
-                      {speechActive ? 'Остановить' : 'Голосовой ввод'}
-                    </button>
-                  </div>
-                  <textarea
-                    className="form-control workstation-textarea"
-                    rows={6}
-                    value={answerText}
-                    onChange={(e) => setAnswerText(e.target.value)}
-                    placeholder="Напиши свой ответ или надиктуй его..."
-                  />
-                </div>
-              </div>
-              <div className="workstation-footer">
-                <button className="btn btn-primary workstation-submit" disabled={submitting || !answerText.trim()} onClick={() => void handleAnswerQuestion()}>
-                  Отправить ответ
-                </button>
-              </div>
-            </section>
+          {viewedStage && (
+            <Suspense fallback={<WorkstationFallback />}>
+              <InterviewPrepMockWorkstation
+                session={session}
+                currentStage={currentStage}
+                viewedStage={viewedStage}
+                isViewingCurrentStage={isViewingCurrentStage}
+                code={code}
+                notes={notes}
+                submitting={submitting}
+                designImage={designImage}
+                designInput={designInput}
+                designReview={designReview}
+                solutionReview={solutionReview}
+                answerReview={answerReview}
+                submitErrorDetails={submitErrorDetails}
+                answerText={answerText}
+                speechSupported={speechSupported}
+                speechActive={speechActive}
+                onReturnToCurrentStage={() => setSelectedStageId(currentStage.id)}
+                onCodeChange={setCode}
+                onNotesChange={setNotes}
+                onSubmitStage={() => void handleSubmitStage()}
+                onDesignImageChange={(file) => setDesignImage(file)}
+                onDesignInputChange={setDesignInput}
+                onReviewSystemDesign={() => void handleReviewSystemDesign()}
+                onAnswerTextChange={setAnswerText}
+                onToggleSpeech={toggleSpeech}
+                onAnswerQuestion={() => void handleAnswerQuestion()}
+              />
+            </Suspense>
           )}
         </main>
 

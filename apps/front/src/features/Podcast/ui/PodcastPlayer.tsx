@@ -1,18 +1,17 @@
 import React, { useState } from 'react';
 import { Play, Pause, X } from 'lucide-react';
 import { usePodcast } from '@/app/providers/PodcastProvider';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 export const PodcastPlayer: React.FC = () => {
-  const { 
-    currentPodcast, isPlaying, progress, duration, 
-    togglePlay, seek, closePlayer, playbackRate, setPlaybackRate 
+  const {
+    currentPodcast, isPlaying, progress, duration,
+    togglePlay, seek, closePlayer, playbackRate, setPlaybackRate
   } = usePodcast();
-
+  const isMobile = useIsMobile();
   const [isSpeedHovered, setIsSpeedHovered] = useState(false);
 
   if (!currentPodcast) return null;
-
-  const isMobile = window.innerWidth <= 768;
 
   const formatTime = (time: number) => {
     const m = Math.floor(time / 60);

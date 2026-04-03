@@ -113,6 +113,7 @@
   justify-content: space-between;
   gap: 12px;
   align-items: end;
+  flex-wrap: wrap;
 }
 
 .interview-prep-group__action {
@@ -233,6 +234,11 @@
   gap: 10px;
   flex-wrap: wrap;
   justify-content: flex-end;
+}
+
+.interview-prep-card__actions .btn,
+.interview-prep-group__action {
+  min-width: 0;
 }
 
 .interview-prep-group__more {

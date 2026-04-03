@@ -62,7 +62,7 @@ export const RTConfigAdminPage: React.FC = () => {
   });
 
   if (!isAdmin) {
-    return <Navigate to="/code-rooms" replace />;
+    return <Navigate to="/practice/code-rooms" replace />;
   }
 
   return (

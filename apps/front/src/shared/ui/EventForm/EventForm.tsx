@@ -3,6 +3,7 @@ import { X, Search, UserRound, MapPin, Calendar } from 'lucide-react';
 import { CommunityMapPoint } from '@/entities/User/model/types';
 import { EventDraft } from '@/pages/MapPage/components/types';
 import { EVENT_COLOR_OPTIONS } from '@/features/Event/lib/eventMetadata';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 import { FancySelect } from '@/shared/ui/FancySelect';
 
 type EventFieldErrors = {
@@ -38,7 +39,8 @@ export const EventForm: React.FC<EventFormProps> = ({
   inviteSearchQuery,
   setInviteSearchQuery,
 }) => {
-const filteredInvitees = users.filter((user) => {
+  const isMobile = useIsMobile();
+  const filteredInvitees = users.filter((user) => {
     const search = inviteSearchQuery.toLowerCase();
     return (
       user.title.toLowerCase().includes(search) ||
@@ -83,6 +85,8 @@ const filteredInvitees = users.filter((user) => {
         style={{
           display: 'flex',
           justifyContent: 'space-between',
+          alignItems: isMobile ? 'flex-start' : 'center',
+          flexDirection: isMobile ? 'column' : 'row',
           gap: '12px',
           marginBottom: '16px',
           flexShrink: 0,
@@ -134,7 +138,7 @@ const filteredInvitees = users.filter((user) => {
           onChange={(e) => setDraft(curr => curr ? { ...curr, description: e.target.value } : null)}
           style={{ minHeight: '80px', resize: 'vertical', padding: '12px' }}
         />
-        <div style={{ display: 'grid', gridTemplateColumns: '1.05fr 1fr 1fr', gap: '10px' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: isMobile ? '1fr' : '1.05fr 1fr 1fr', gap: '10px' }}>
           <input
             className="input"
             placeholder="Группа / клуб"
@@ -247,7 +251,7 @@ const filteredInvitees = users.filter((user) => {
               style={{ border: 'none', background: 'transparent', color: 'white', fontSize: '14px', outline: 'none', flex: 1 }}
             />
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(140px, 1fr))', gap: '6px', maxHeight: '120px', overflowY: 'auto' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: `repeat(auto-fill, minmax(${isMobile ? 120 : 140}px, 1fr))`, gap: '6px', maxHeight: '120px', overflowY: 'auto' }}>
             {filteredInvitees.map((user) => (
               <button
                 key={user.userId}

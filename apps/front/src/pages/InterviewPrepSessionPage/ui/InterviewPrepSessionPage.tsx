@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import {
   InterviewPrepAnswerReview,
@@ -10,9 +10,7 @@ import {
   InterviewPrepSystemDesignReviewInput,
 } from '@/features/InterviewPrep/api/interviewPrepApi';
 import {
-  DesignReviewSection,
   FollowUpSection,
-  LiveCodingSection,
   SessionHero,
   SessionSidebar,
 } from './components/InterviewPrepSessionSections';
@@ -23,6 +21,15 @@ import {
   SqlStarterTab,
   starterForLanguage,
 } from './lib/interviewPrepSessionHelpers';
+
+const LiveCodingSection = lazy(() => import('./components/InterviewPrepSessionWorkstationSections').then((m) => ({ default: m.LiveCodingSection })));
+const DesignReviewSection = lazy(() => import('./components/InterviewPrepSessionWorkstationSections').then((m) => ({ default: m.DesignReviewSection })));
+
+const WorkstationFallback = () => (
+  <section className="card dashboard-card">
+    <div className="empty-state compact">Загрузка workspace...</div>
+  </section>
+);
 
 type SpeechRecognitionCtor = new () => {
   continuous: boolean;
@@ -355,48 +362,52 @@ export function InterviewPrepSessionPage() {
       />
 
       {showLiveCoding && task && (
-        <LiveCodingSection
-          task={task}
-          checkpoint={checkpoint}
-          canSubmitExecutable={canSubmitExecutable}
-          solveLanguage={solveLanguage}
-          solveLanguageOptions={solveLanguageOptions}
-          sqlStarterTab={sqlStarterTab}
-          sqlStarterValue={sqlStarterValue}
-          editorHeight={editorHeight}
-          isResizingEditor={isResizingEditor}
-          submitting={submitting}
-          code={code}
-          submitResult={submitResult}
-          onLanguageChange={switchSolveLanguage}
-          onSqlStarterTabChange={setSqlStarterTab}
-          onEditorHeightChange={setEditorHeight}
-          onResizeStart={(event) => {
-            resizeStartYRef.current = event.clientY;
-            resizeStartHeightRef.current = editorHeight;
-            setIsResizingEditor(true);
-          }}
-          onCodeChange={(nextCode) => {
-            setCode(nextCode);
-            setCodeDrafts((prev) => ({ ...prev, [solveLanguage]: nextCode }));
-          }}
-          onSubmitCode={() => void handleSubmitCode()}
-        />
+        <Suspense fallback={<WorkstationFallback />}>
+          <LiveCodingSection
+            task={task}
+            checkpoint={checkpoint}
+            canSubmitExecutable={canSubmitExecutable}
+            solveLanguage={solveLanguage}
+            solveLanguageOptions={solveLanguageOptions}
+            sqlStarterTab={sqlStarterTab}
+            sqlStarterValue={sqlStarterValue}
+            editorHeight={editorHeight}
+            isResizingEditor={isResizingEditor}
+            submitting={submitting}
+            code={code}
+            submitResult={submitResult}
+            onLanguageChange={switchSolveLanguage}
+            onSqlStarterTabChange={setSqlStarterTab}
+            onEditorHeightChange={setEditorHeight}
+            onResizeStart={(event) => {
+              resizeStartYRef.current = event.clientY;
+              resizeStartHeightRef.current = editorHeight;
+              setIsResizingEditor(true);
+            }}
+            onCodeChange={(nextCode) => {
+              setCode(nextCode);
+              setCodeDrafts((prev) => ({ ...prev, [solveLanguage]: nextCode }));
+            }}
+            onSubmitCode={() => void handleSubmitCode()}
+          />
+        </Suspense>
       )}
 
       {showSystemDesignReview && task && (
-        <DesignReviewSection
-          reviewingDesign={reviewingDesign}
-          designImage={designImage}
-          designReviewInput={designReviewInput}
-          designReview={designReview}
-          onDesignImageChange={(file) => {
-            setDesignImage(file);
-            setDesignReview(null);
-          }}
-          onDesignReviewInputChange={setDesignReviewInput}
-          onReview={() => void handleReviewSystemDesign()}
-        />
+        <Suspense fallback={<WorkstationFallback />}>
+          <DesignReviewSection
+            reviewingDesign={reviewingDesign}
+            designImage={designImage}
+            designReviewInput={designReviewInput}
+            designReview={designReview}
+            onDesignImageChange={(file) => {
+              setDesignImage(file);
+              setDesignReview(null);
+            }}
+            onDesignReviewInputChange={setDesignReviewInput}
+            onReview={() => void handleReviewSystemDesign()}
+          />
+        </Suspense>
       )}
 
     </div>

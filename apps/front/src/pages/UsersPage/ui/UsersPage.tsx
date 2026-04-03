@@ -1,23 +1,25 @@
-import React, { useEffect, useState, useRef } from 'react';
-import { User as UserIcon, MapPin, ChevronRight } from 'lucide-react';
+import React, { useEffect, useMemo, useState, useRef } from 'react';
+import { User as UserIcon, MapPin, ChevronRight, Search, Sparkles } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { geoApi } from '@/features/Geo/api/geoApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { matchCommunityUser, useCommunityFilters } from '@/features/Community/model/useCommunityFilters';
 import { CommunityMapPoint } from '@/entities/User/model/types';
 import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
+import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 export const UsersPage: React.FC = () => {
+  const isMobile = useIsMobile();
   const [users, setUsers] = useState<CommunityMapPoint[]>([]);
   const [arenaStatsByUserId, setArenaStatsByUserId] = useState<Record<string, ArenaPlayerStats>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const { q, region, presence } = useCommunityFilters();
+  const { q, region, presence, setQ, setRegion, setPresence, reset } = useCommunityFilters();
   const loadUsersRef = useRef<{ (initial?: boolean): Promise<void> } | null>(null);
 
   const loadUsers = async (initial = false) => {
     try {
       if (initial) setIsLoading(true);
-      const data = await geoApi.communityMap();
+      const data = await geoApi.communityMap(initial);
       setUsers(data);
     } catch (err) {
       console.error('Failed to load users', err);
@@ -59,21 +61,78 @@ export const UsersPage: React.FC = () => {
     };
   }, [users]);
 
+  const regionOptions = useMemo(
+    () => Array.from(new Set(users.map((user) => user.region).filter(Boolean))).sort((left, right) => left.localeCompare(right, 'ru')),
+    [users],
+  );
+
   const filteredUsers = users.filter((user) => matchCommunityUser(user, { q, region, presence }));
 
   return (
-    <div className="fade-in">
-      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '24px' }}>
-        <h1 style={{ fontSize: '28px', fontWeight: '600' }}>Пользователи</h1>
-        <div style={{ fontSize: '14px', color: 'var(--text-secondary)' }}>
-          Всего: <strong style={{ color: 'var(--text-primary)' }}>{users.length}</strong>
+    <div className="fade-in people-page">
+      <section className="people-page__hero">
+        <div>
+          <span className="people-page__eyebrow">People</span>
+          <h1>Люди сообщества</h1>
+          <p>Здесь только участники. Без смешения с events, map и circles: сначала находишь людей, потом уже проваливаешься глубже по контексту.</p>
         </div>
+        <div className="people-page__summary">
+          <div className="people-page__summary-card">
+            <strong>{isLoading ? '...' : filteredUsers.length}</strong>
+            <span>подходит под текущий фильтр</span>
+          </div>
+          <div className="people-page__summary-card">
+            <strong>{isLoading ? '...' : users.filter((item) => item.activityStatus === 'online').length}</strong>
+            <span>онлайн прямо сейчас</span>
+          </div>
+        </div>
+      </section>
+
+      <section className="people-filters">
+        <label className="people-filters__search">
+          <Search size={16} />
+          <input
+            className="input"
+            value={q}
+            onChange={(event) => setQ(event.target.value)}
+            placeholder="Поиск по имени, Telegram или региону"
+          />
+        </label>
+
+        <select className="input people-filters__select" value={region} onChange={(event) => setRegion(event.target.value)}>
+          <option value="all">Все регионы</option>
+          {regionOptions.map((item) => (
+            <option key={item} value={item}>{item}</option>
+          ))}
+        </select>
+
+        <select className="input people-filters__select" value={presence} onChange={(event) => setPresence(event.target.value as 'all' | 'online')}>
+          <option value="all">Любая активность</option>
+          <option value="online">Только онлайн</option>
+        </select>
+
+        <button type="button" className="btn btn-secondary" onClick={reset}>
+          Сбросить
+        </button>
+      </section>
+
+      <div className="people-page__section-head">
+        <div>
+          <h2>Пользователи</h2>
+          <span>{isLoading ? 'Загружаем участников...' : `Всего в выборке: ${filteredUsers.length}`}</span>
+        </div>
+        {!isLoading && filteredUsers.length > 0 && (
+          <div className="people-page__hint">
+            <Sparkles size={14} />
+            <span>Открывай профиль, чтобы увидеть локацию, статус и прогресс</span>
+          </div>
+        )}
       </div>
 
       {isLoading ? (
-        <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Загрузка списка пользователей...</div>
+        <div className="people-page__empty">Загрузка списка пользователей...</div>
       ) : (
-        <div style={{ display: 'grid', gap: '12px' }}>
+        <div className="people-list">
           {filteredUsers.length > 0 ? (
             filteredUsers.map((user) => {
               const profileHandle = user.telegramUsername ? `@${user.telegramUsername}` : 'тг не привязан';
@@ -82,36 +141,9 @@ export const UsersPage: React.FC = () => {
                 <Link
                   key={user.userId}
                   to={`/profile/${user.userId}`}
-                  className="card hover-opacity"
-                  style={{
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '16px',
-                    padding: '16px',
-                    textDecoration: 'none',
-                    color: 'inherit',
-                    transition: 'background-color 0.2s, border-color 0.2s',
-                    background: 'rgba(255,255,255,0.03)',
-                    border: '1px solid rgba(255,255,255,0.05)',
-                  }}
-                  onMouseOver={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.06)';
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.12)';
-                  }}
-                  onMouseOut={(e) => {
-                    e.currentTarget.style.backgroundColor = 'rgba(255,255,255,0.03)';
-                    e.currentTarget.style.borderColor = 'rgba(255,255,255,0.05)';
-                  }}
+                  className="people-card"
                 >
-                <div style={{ 
-                  width: '52px', 
-                  height: '52px', 
-                  borderRadius: '50%', 
-                  overflow: 'hidden', 
-                  background: 'var(--bg-color)',
-                  flexShrink: 0,
-                  border: '2px solid rgba(255,255,255,0.1)'
-                }}>
+                <div className="people-card__avatar">
                   {user.avatarUrl ? (
                     <img src={user.avatarUrl} alt={`${user.firstName} ${user.lastName}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
                   ) : (
@@ -121,30 +153,30 @@ export const UsersPage: React.FC = () => {
                   )}
                 </div>
                 
-                <div style={{ flex: 1, minWidth: 0 }}>
-                  <div style={{ fontWeight: '600', fontSize: '16px', marginBottom: '2px', display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <div className="people-card__body">
+                  <div className="people-card__title">
                     {user.firstName} {user.lastName}
                     {user.isCurrentUser && (
-                      <span style={{ fontSize: '10px', background: 'var(--accent-color)', padding: '2px 6px', borderRadius: '4px', textTransform: 'uppercase' }}>Вы</span>
+                      <span className="people-card__badge">Вы</span>
                     )}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-                    <span style={{ fontSize: '13px', color: user.telegramUsername ? 'var(--accent-color)' : 'var(--text-muted)' }}>{profileHandle}</span>
-                    <span style={{ fontSize: '13px', color: 'var(--text-secondary)', display: 'flex', alignItems: 'center', gap: '4px' }}>
+                  <div className="people-card__meta">
+                    <span className={`people-card__handle ${user.telegramUsername ? 'is-linked' : ''}`}>{profileHandle}</span>
+                    <span className="people-card__region">
                       <MapPin size={12} /> {user.region}
                     </span>
-                    <span style={{ fontSize: '13px', color: 'var(--warning-color, #f4c95d)' }}>
+                    <span className="people-card__elo">
                       {arenaStatsByUserId[user.userId]?.rating ?? 1000} ELO
                     </span>
                   </div>
                 </div>
 
-                <ChevronRight size={20} color="#444" />
+                {!isMobile && <ChevronRight size={20} className="people-card__chevron" />}
               </Link>
               );
             })
           ) : (
-            <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-secondary)' }}>Никого не найдено</div>
+            <div className="people-page__empty">Никого не найдено</div>
           )}
         </div>
       )}

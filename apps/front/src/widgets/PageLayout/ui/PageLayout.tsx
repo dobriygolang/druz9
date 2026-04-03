@@ -1,13 +1,16 @@
-import React from 'react';
+import React, { Suspense, lazy } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
+import { usePodcast } from '@/app/providers/PodcastProvider';
 import { Sidebar } from '@/widgets/Sidebar/ui/Sidebar';
 import { BottomNav } from '@/widgets/BottomNav/ui/BottomNav';
-import { PodcastPlayer } from '@/features/Podcast/ui/PodcastPlayer';
+
+const PodcastPlayer = lazy(() => import('@/features/Podcast/ui/PodcastPlayer').then((m) => ({ default: m.PodcastPlayer })));
 
 export const PageLayout: React.FC = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
+  const { currentPodcast } = usePodcast();
   const isCodeRoom = /^\/code-rooms\/[^/]+$/.test(location.pathname);
   const isArenaMatch = /^\/arena\/[^/]+$/.test(location.pathname);
   const isInterviewPrepSession = /^\/interview-prep\/[^/]+$/.test(location.pathname) || /^\/growth\/interview-prep\/[^/]+$/.test(location.pathname);
@@ -31,7 +34,11 @@ export const PageLayout: React.FC = () => {
         </div>
       </main>
       {isAuthenticated && <BottomNav />}
-      {showShell && <PodcastPlayer />}
+      {showShell && currentPodcast && (
+        <Suspense fallback={null}>
+          <PodcastPlayer />
+        </Suspense>
+      )}
     </div>
   );
 };

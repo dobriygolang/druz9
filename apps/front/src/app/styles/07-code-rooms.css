@@ -152,12 +152,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  flex-wrap: wrap;
 }
 
 .queue-active-banner__info {
   display: flex;
   flex-direction: column;
   gap: 4px;
+  min-width: 0;
 }
 
 .queue-active-banner__kicker {
@@ -181,6 +183,7 @@
 .queue-active-banner__meta {
   color: rgba(255, 255, 255, 0.6);
   font-size: 13px;
+  overflow-wrap: anywhere;
 }
 
 .code-rooms-kicker {

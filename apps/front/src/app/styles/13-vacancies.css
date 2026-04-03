@@ -169,12 +169,14 @@
   justify-content: space-between;
   gap: 12px;
   align-items: flex-start;
+  flex-wrap: wrap;
 }
 
 .vacancies-card__top > div:first-child {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .vacancies-card__title {
@@ -233,6 +235,7 @@
   justify-content: space-between;
   gap: var(--space-3);
   align-items: center;
+  flex-wrap: wrap;
   border-top: 1px solid var(--border-subtle);
 }
 
@@ -250,6 +253,7 @@
   font-weight: 700;
   transition: all var(--transition-base);
   box-shadow: 0 4px 14px var(--accent-glow);
+  flex-shrink: 0;
 }
 
 .vacancies-card__cta:hover {

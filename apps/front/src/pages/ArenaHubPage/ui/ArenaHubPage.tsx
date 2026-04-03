@@ -44,23 +44,32 @@ export const ArenaHubPage: React.FC = () => {
       <section className="arena-hub__hero">
         <div className="arena-hub__copy">
           <span>Arena</span>
-          <h2>Ranked coding without a separate top-level product</h2>
+          <h2>Рейтинговая арена внутри practice</h2>
           <p>
-            Арена теперь оформлена как часть practice-хаба. Дальше сюда же логично ложатся circle ladders,
-            private scrims и team modes.
+            Здесь собраны ranked-матчи, открытые дуэли и следующие режимы. Это не отдельный продуктовый мир, а один из сценариев внутри practice.
           </p>
+          <div className="arena-hub__hero-stats">
+            <div className="arena-hub__hero-pill">
+              <strong>{isLoading ? '...' : leaderboard.length}</strong>
+              <span>в топе сейчас</span>
+            </div>
+            <div className="arena-hub__hero-pill">
+              <strong>{isLoading ? '...' : matches.length}</strong>
+              <span>открытых матчей</span>
+            </div>
+          </div>
         </div>
         <Link to="/practice/code-rooms" className="arena-hub__cta">
-          <span>Перейти к code rooms</span>
+          <span>К code rooms</span>
           <ArrowRight size={16} />
         </Link>
       </section>
 
       <div className="arena-hub__grid">
-        <article className="arena-hub__panel">
+        <article className="arena-hub__panel arena-hub__panel--leaderboard">
           <div className="arena-hub__panel-head">
             <Trophy size={18} />
-            <strong>Top leaderboard</strong>
+            <strong>Лидерборд</strong>
           </div>
           <div className="arena-hub__list">
             {isLoading ? (
@@ -80,10 +89,10 @@ export const ArenaHubPage: React.FC = () => {
           </div>
         </article>
 
-        <article className="arena-hub__panel">
+        <article className="arena-hub__panel arena-hub__panel--matches">
           <div className="arena-hub__panel-head">
             <Users size={18} />
-            <strong>Open matches</strong>
+            <strong>Открытые матчи</strong>
           </div>
           <div className="arena-hub__list">
             {isLoading ? (
@@ -92,7 +101,7 @@ export const ArenaHubPage: React.FC = () => {
               <div key={match.id} className="arena-hub__row">
                 <div>
                   <strong>{match.taskTitle}</strong>
-                  <span>{match.difficulty} • {match.players.length}/2 players</span>
+                  <span>{match.difficulty} • {match.players.length}/2 игрока</span>
                 </div>
                 <Link to={`/arena/${match.id}`}>Открыть</Link>
               </div>
@@ -102,13 +111,13 @@ export const ArenaHubPage: React.FC = () => {
           </div>
         </article>
 
-        <article className="arena-hub__panel">
+        <article className="arena-hub__panel arena-hub__panel--notes">
           <div className="arena-hub__panel-head">
             <Shield size={18} />
-            <strong>Next steps</strong>
+            <strong>Следующие режимы</strong>
           </div>
           <div className="arena-hub__notes">
-            <div>Circle ladder должен жить здесь как режим practice, а не как новый раздел в основном меню.</div>
+            <div>Circle ladder должен жить здесь как режим practice, а не как отдельный раздел.</div>
             <div>Private scrims и team battles лучше строить поверх текущей arena-модели.</div>
           </div>
         </article>

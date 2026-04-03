@@ -453,7 +453,7 @@ export const ArenaMatchPage: React.FC = () => {
     } catch (e) {
       console.error('Failed to leave arena match:', e);
     } finally {
-      navigate('/code-rooms', { state: { skipArenaResume: true } });
+      navigate('/practice/code-rooms', { state: { skipArenaResume: true } });
     }
   };
 

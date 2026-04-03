@@ -119,6 +119,7 @@ export const Sidebar: React.FC = () => {
       {isAuthenticated && (
         <div className="sidebar-desktop__footer">
           <button
+            type="button"
             onClick={logout}
             aria-label="Выйти"
             className="sidebar-desktop__logout"

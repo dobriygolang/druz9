@@ -40,18 +40,23 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 12px;
   padding: 16px 20px;
   flex-shrink: 0;
 }
 
 .mobile-drawer-title {
+  min-width: 0;
+  flex: 1 1 auto;
   font-size: 1.1rem;
   font-weight: 700;
   margin: 0;
   color: var(--text-primary);
+  word-break: break-word;
 }
 
 .mobile-drawer-close {
+  flex: 0 0 auto;
   background: rgba(255, 255, 255, 0.05);
   border: none;
   border-radius: 50%;
@@ -73,6 +78,7 @@
   padding: 0 20px 20px;
   overflow-y: auto;
   flex: 1;
+  min-height: 0;
 }
 
 .mobile-drawer-footer {

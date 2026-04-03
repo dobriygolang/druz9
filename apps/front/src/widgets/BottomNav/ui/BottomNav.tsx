@@ -25,7 +25,8 @@ export const BottomNav: React.FC = () => {
         <BottomNavItem to="/community/people" icon={<Users size={20} />} label="Community" />
         <BottomNavItem to="/practice/code-rooms" icon={<Code2 size={20} />} label="Practice" />
         <BottomNavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" />
-        <button 
+        <button
+          type="button"
           className="bottom-nav-mobile__button"
           onClick={() => setIsMenuOpen(true)}
         >
@@ -56,7 +57,7 @@ export const BottomNav: React.FC = () => {
           )}
 
           <div className="mobile-menu-divider" />
-          <button className="mobile-menu-logout" onClick={() => { logout(); setIsMenuOpen(false); }}>
+          <button type="button" className="mobile-menu-logout" onClick={() => { logout(); setIsMenuOpen(false); }}>
             <LogOut size={20} />
             <span>Выйти из аккаунта</span>
           </button>

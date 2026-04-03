@@ -40,7 +40,7 @@ export const MobileDrawer: React.FC<MobileDrawerProps> = ({
         
         <div className="mobile-drawer-header">
           {title && <h2 className="mobile-drawer-title">{title}</h2>}
-          <button className="mobile-drawer-close" onClick={onClose} aria-label="Close">
+          <button type="button" className="mobile-drawer-close" onClick={onClose} aria-label="Close">
             <X size={20} />
           </button>
         </div>
