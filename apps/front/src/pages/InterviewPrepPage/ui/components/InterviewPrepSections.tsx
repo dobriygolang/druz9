@@ -28,7 +28,7 @@ export function InterviewPrepHero({
   return (
     <section className="page-header code-rooms-hero interview-prep-hero">
       <div className="code-rooms-hero__copy">
-        {!isMobile && <span className="code-rooms-kicker">Trusted Only</span>}
+        {!isMobile && <span className="code-rooms-kicker">Interview Prep</span>}
         <h1 style={{ fontSize: isMobile ? '28px' : '36px' }}>Interview Prep</h1>
         <p className="code-rooms-subtitle">
           {isMobile

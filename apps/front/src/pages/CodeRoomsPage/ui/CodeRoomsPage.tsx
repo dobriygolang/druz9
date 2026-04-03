@@ -459,49 +459,47 @@ export const CodeRoomsPage: React.FC = () => {
           onShowCreate={() => setShowCreateModal(true)}
         />
 
-        {user?.isTrusted && (
-          <SoloPracticeSection
-            prepLaunchCategory={prepLaunchCategory}
-            prepLaunchCompany={prepLaunchCompany}
-            categoryOptions={INTERVIEW_PREP_CATEGORY_OPTIONS}
-            companyOptions={[
-              { value: 'all', label: 'Случайная компания' },
-              { value: 'ozon', label: 'ozon' },
-              { value: 'avito', label: 'avito' },
-            ]}
-            onCategoryChange={setPrepLaunchCategory}
-            onCompanyChange={setPrepLaunchCompany}
-            onStartScenario={() => {
-              void (async () => {
-                const explicitCompany = resolveMockLaunchCompany();
-                if (!explicitCompany) {
-                  return;
-                }
-                const candidateCompanies = prepLaunchCompany === 'all'
-                  ? shuffledValues(prepCompanyOptions)
-                  : [explicitCompany];
-                try {
-                  for (const companyTag of candidateCompanies) {
-                    try {
-                      const session = await interviewPrepApi.startMockSession(companyTag);
-                      navigate(`/interview-prep/mock/${session.id}`);
-                      return;
-                    } catch (innerError: any) {
-                      const apiError = innerError?.response?.data?.error || '';
-                      if (!apiError.includes('mock interview task pool is incomplete')) {
-                        throw innerError;
-                      }
+        <SoloPracticeSection
+          prepLaunchCategory={prepLaunchCategory}
+          prepLaunchCompany={prepLaunchCompany}
+          categoryOptions={INTERVIEW_PREP_CATEGORY_OPTIONS}
+          companyOptions={[
+            { value: 'all', label: 'Случайная компания' },
+            { value: 'ozon', label: 'ozon' },
+            { value: 'avito', label: 'avito' },
+          ]}
+          onCategoryChange={setPrepLaunchCategory}
+          onCompanyChange={setPrepLaunchCompany}
+          onStartScenario={() => {
+            void (async () => {
+              const explicitCompany = resolveMockLaunchCompany();
+              if (!explicitCompany) {
+                return;
+              }
+              const candidateCompanies = prepLaunchCompany === 'all'
+                ? shuffledValues(prepCompanyOptions)
+                : [explicitCompany];
+              try {
+                for (const companyTag of candidateCompanies) {
+                  try {
+                    const session = await interviewPrepApi.startMockSession(companyTag);
+                    navigate(`/interview-prep/mock/${session.id}`);
+                    return;
+                  } catch (innerError: any) {
+                    const apiError = innerError?.response?.data?.error || '';
+                    if (!apiError.includes('mock interview task pool is incomplete')) {
+                      throw innerError;
                     }
                   }
-                } catch (error: any) {
-                  console.error('Failed to start mock interview:', error);
                 }
-              })();
-            }}
-            onOpenRandomTask={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
-            onOpenCatalog={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
-          />
-        )}
+              } catch (error: any) {
+                console.error('Failed to start mock interview:', error);
+              }
+            })();
+          }}
+          onOpenRandomTask={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
+          onOpenCatalog={() => navigate(`/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
+        />
 
         {queueState?.status === 'queued' && (
           <div className="queue-active-banner">
