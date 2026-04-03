@@ -82,7 +82,6 @@ func registerManualHTTPRoutes(
 	server.RegisterArenaRealtime(httpServer, services.arenaRealtimeHub)
 	server.RegisterArenaOpenMatches(httpServer, services.arenaServiceDomain)
 	server.RegisterArenaQueue(httpServer, services.arenaServiceDomain, services.profileServiceDomain)
-	server.RegisterRTConfig(httpServer, bootstrap.rtcManager, services.profileServiceDomain)
 	server.RegisterInterviewPrepRoutes(httpServer, services.interviewPrepDomain, services.profileServiceDomain)
 	server.RegisterAdminUsersRoutes(httpServer, storage.profileRepo, services.profileServiceDomain, services.profileServiceDomain)
 	server.RegisterAdminInterviewPrepRoutes(httpServer, storage.interviewRepo, services.profileServiceDomain)

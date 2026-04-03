@@ -12,8 +12,8 @@
 
 .code-admin-modal {
   max-height: calc(100vh - 32px);
-  overflow: auto;
-  width: min(calc(100vw - 4px), 1860px);
+  width: min(calc(100vw - 32px), 1120px);
+  overflow: hidden;
   max-width: none;
 }
 
@@ -713,6 +713,37 @@
   gap: 16px;
 }
 
+.admin-modal-shell {
+  display: flex;
+  flex-direction: column;
+}
+
+.admin-modal__header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-modal__header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.admin-modal__actions {
+  margin-top: 0;
+  flex-shrink: 0;
+}
+
+.admin-template-strip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
 .task-cases-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -1145,7 +1176,7 @@
   .modal.modal-wide,
   .code-room-leagues-modal,
   .code-admin-modal {
-    width: min(calc(100vw - 12px), 1680px);
+    width: min(calc(100vw - 12px), 1120px);
   }
 
   .launch-card-badges {

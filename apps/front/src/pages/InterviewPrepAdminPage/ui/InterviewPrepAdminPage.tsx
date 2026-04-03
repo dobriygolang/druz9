@@ -178,7 +178,9 @@ export const InterviewPrepAdminPage: React.FC = () => {
         ...taskForm,
         slug: toSlug(taskForm.slug || taskForm.title),
         companyTag: taskForm.companyTag || 'general',
-        supportedLanguages: taskForm.supportedLanguages.length ? taskForm.supportedLanguages : [taskForm.language],
+        supportedLanguages: taskForm.language === 'system_design'
+          ? []
+          : (taskForm.supportedLanguages.length ? taskForm.supportedLanguages : [taskForm.language]),
         executionProfile: taskForm.executionProfile || 'pure',
         runnerMode: taskForm.runnerMode || 'function_io',
         codeTaskId: taskForm.codeTaskId || undefined,

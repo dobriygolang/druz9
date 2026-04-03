@@ -45,33 +45,19 @@ type OpenMatchesService interface {
 }
 
 func RegisterQueue(srv *kratoshttp.Server, service QueueService, authorizer Authorizer) {
-	srv.HandlePrefix(QueueJoinPath, QueueHandler(service, authorizer))
-	srv.HandlePrefix(QueueLeavePath, QueueHandler(service, authorizer))
-	srv.HandlePrefix(QueueStatusPath, QueueHandler(service, authorizer))
-	srv.HandlePrefix(StatsPrefix, QueueHandler(service, authorizer))
-	srv.HandlePrefix(StatsBatchPath, QueueHandler(service, authorizer))
-	srv.HandlePrefix(AntiCheatEventPath, QueueHandler(service, authorizer))
-}
-
-func QueueHandler(service QueueService, authorizer Authorizer) http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc(QueueJoinPath, handleQueueJoin(service, authorizer))
-	mux.HandleFunc(QueueLeavePath, handleQueueLeave(service, authorizer))
-	mux.HandleFunc(QueueStatusPath, handleQueueStatus(service, authorizer))
-	mux.HandleFunc(StatsPrefix, handleStats(service))
-	mux.HandleFunc(StatsBatchPath, handleStatsBatch(service))
-	mux.HandleFunc(AntiCheatEventPath, handleAntiCheatEvent(service, authorizer))
-	return mux
+	router := srv.Route("/api/v1/arena")
+	router.POST("/queue/join", wrapHandler(handleQueueJoin(service, authorizer)))
+	router.POST("/queue/leave", wrapHandler(handleQueueLeave(service, authorizer)))
+	router.GET("/queue/status", wrapHandler(handleQueueStatus(service, authorizer)))
+	router.GET("/stats/{user_id}", wrapHandler(handleStats(service)))
+	router.POST("/stats/batch", wrapHandler(handleStatsBatch(service)))
+	router.POST("/anti-cheat/event", wrapHandler(handleAntiCheatEvent(service, authorizer)))
 }
 
 func RegisterOpenMatches(srv *kratoshttp.Server, service OpenMatchesService) {
-	srv.HandlePrefix(OpenMatchesPath, OpenMatchesHandler(service))
-}
-
-func OpenMatchesHandler(service OpenMatchesService) http.Handler {
-	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	srv.Route("/api/v1/arena").GET("/open-matches", wrapHandler(func(w http.ResponseWriter, r *http.Request) {
 		handleOpenMatches(w, r, service)
-	})
+	}))
 }
 
 func RegisterRealtime(srv *kratoshttp.Server, hub *realtime.ArenaHub) {
@@ -89,4 +75,11 @@ func RealtimeHandler(hub *realtime.ArenaHub) http.Handler {
 		hub.Handler(matchID).ServeHTTP(w, r)
 	})
 	return mux
+}
+
+func wrapHandler(handler http.HandlerFunc) func(kratoshttp.Context) error {
+	return func(ctx kratoshttp.Context) error {
+		handler(ctx.Response(), ctx.Request())
+		return nil
+	}
 }

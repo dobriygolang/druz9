@@ -4,27 +4,24 @@ import (
 	"encoding/json"
 	"errors"
 	"net/http"
-	"strings"
 
 	profileerrors "api/internal/errors/profile"
 
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 )
 
-func handleUsers(repo Repo, authorizer Authorizer, cacheInvalidator CacheInvalidator) http.HandlerFunc {
+func handleUsers(field string, repo Repo, authorizer Authorizer, cacheInvalidator CacheInvalidator) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		if r.Method != http.MethodPatch {
-			http.Error(w, "method not allowed", http.StatusMethodNotAllowed)
-			return
-		}
 		if !isAdmin(r, authorizer) {
 			http.Error(w, "unauthorized", http.StatusUnauthorized)
 			return
 		}
 
-		userID, field, ok := parseUserPatchPath(r.URL.Path)
-		if !ok {
-			http.Error(w, "not found", http.StatusNotFound)
+		userIDRaw := mux.Vars(r)["user_id"]
+		userID, err := uuid.Parse(userIDRaw)
+		if err != nil {
+			http.Error(w, "bad user id", http.StatusBadRequest)
 			return
 		}
 
@@ -38,7 +35,6 @@ func handleUsers(repo Repo, authorizer Authorizer, cacheInvalidator CacheInvalid
 		}
 
 		payload := map[string]any{"status": "ok"}
-		var err error
 		switch field {
 		case "trust":
 			err = repo.UpdateUserTrusted(r.Context(), userID, req.IsTrusted)
@@ -61,30 +57,6 @@ func handleUsers(repo Repo, authorizer Authorizer, cacheInvalidator CacheInvalid
 
 		cacheInvalidator.InvalidateProfileCache(userID)
 		writeJSON(w, http.StatusOK, payload)
-	}
-}
-
-func parseUserPatchPath(path string) (uuid.UUID, string, bool) {
-	trimmed := strings.TrimPrefix(path, Prefix)
-	switch {
-	case strings.HasSuffix(trimmed, "/trust"):
-		userIDRaw := strings.TrimSuffix(trimmed, "/trust")
-		userIDRaw = strings.TrimSuffix(userIDRaw, "/")
-		userID, err := uuid.Parse(userIDRaw)
-		if err != nil {
-			return uuid.Nil, "", false
-		}
-		return userID, "trust", true
-	case strings.HasSuffix(trimmed, "/admin"):
-		userIDRaw := strings.TrimSuffix(trimmed, "/admin")
-		userIDRaw = strings.TrimSuffix(userIDRaw, "/")
-		userID, err := uuid.Parse(userIDRaw)
-		if err != nil {
-			return uuid.Nil, "", false
-		}
-		return userID, "admin", true
-	default:
-		return uuid.Nil, "", false
 	}
 }
 

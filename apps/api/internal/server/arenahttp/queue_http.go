@@ -10,6 +10,7 @@ import (
 	"api/internal/model"
 
 	"github.com/google/uuid"
+	"github.com/gorilla/mux"
 )
 
 func handleQueueJoin(service QueueService, authorizer Authorizer) http.HandlerFunc {
@@ -285,10 +286,10 @@ func statsJSON(stats *model.ArenaPlayerStats) map[string]any {
 }
 
 func parseStatsUserID(r *http.Request) (uuid.UUID, bool) {
-	if r == nil || !strings.HasPrefix(r.URL.Path, StatsPrefix) {
+	if r == nil {
 		return uuid.Nil, false
 	}
-	raw := strings.TrimPrefix(r.URL.Path, StatsPrefix)
+	raw := mux.Vars(r)["user_id"]
 	if raw == "" || strings.Contains(raw, "/") {
 		return uuid.Nil, false
 	}

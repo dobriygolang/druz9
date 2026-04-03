@@ -1,5 +1,5 @@
 import React from 'react';
-import { ListChecks, Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react';
+import { ListChecks, Pencil, Plus, Settings2, ShieldCheck, Trash2, X } from 'lucide-react';
 
 import { CodeTask } from '@/entities/CodeRoom/model/types';
 import {
@@ -14,6 +14,8 @@ import { FancySelect } from '@/shared/ui/FancySelect';
 
 import {
   createEmptyQuestionForm,
+  applyTaskTemplate,
+  INTERVIEW_PREP_TEMPLATES,
   LANGUAGE_OPTIONS,
   mockCompanyPresetToForm,
   MockCompanyPresetFormState,
@@ -423,37 +425,50 @@ export function InterviewPrepTaskModal({
   onTitleChange: (title: string) => void;
   onFormChange: React.Dispatch<React.SetStateAction<TaskFormState>>;
 }) {
+  const [showAdvanced, setShowAdvanced] = React.useState(false);
+
   if (!open) {
     return null;
   }
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal modal-xl interview-prep-modal" onClick={(event) => event.stopPropagation()}>
-        <div className="dashboard-card__header">
+      <div className="modal modal-xl interview-prep-modal admin-modal-shell" onClick={(event) => event.stopPropagation()}>
+        <div className="dashboard-card__header admin-modal__header">
           <div>
             <h2>{form.id ? 'Редактировать задачу' : 'Новая задача'}</h2>
             <p className="interview-prep-muted">
               Один сценарий = задача + прикрепленная серия follow-up вопросов.
             </p>
           </div>
-          <ShieldCheck size={18} />
+          <div className="admin-modal__header-actions">
+            <ShieldCheck size={18} />
+            <button type="button" className="btn-icon" onClick={onClose} aria-label="Закрыть">
+              <X size={16} />
+            </button>
+          </div>
         </div>
 
         <div className="modal-scroll-content">
+          {!form.id && (
+            <div className="admin-template-strip">
+              {INTERVIEW_PREP_TEMPLATES.map((template) => (
+                <button
+                  key={template.key}
+                  type="button"
+                  className="btn btn-secondary btn-sm"
+                  onClick={() => onFormChange((prev) => applyTaskTemplate(prev, template.key))}
+                >
+                  {template.label}
+                </button>
+              ))}
+            </div>
+          )}
+
           <div className="task-editor-grid">
             <div className="form-group">
               <label>Название</label>
               <input className="input" value={form.title} onChange={(event) => onTitleChange(event.target.value)} />
-            </div>
-            <div className="form-group">
-              <label>Slug</label>
-              <input
-                className="input"
-                value={form.slug}
-                onChange={(event) => onFormChange((prev) => ({ ...prev, slug: toSlug(event.target.value) }))}
-                placeholder="go-two-sum-hash-map"
-              />
             </div>
             <div className="form-group">
               <label>Тип</label>
@@ -485,70 +500,9 @@ export function InterviewPrepTaskModal({
               />
             </div>
             <div className="form-group">
-              <label>Длительность, сек</label>
-              <input
-                className="input"
-                type="number"
-                min={300}
-                step={60}
-                value={form.durationSeconds}
-                onChange={(event) => onFormChange((prev) => ({ ...prev, durationSeconds: Number(event.target.value) || 0 }))}
-              />
-            </div>
-            <div className="form-group">
-              <label>Execution Profile</label>
-              <input
-                className="input"
-                value={form.executionProfile}
-                onChange={(event) => onFormChange((prev) => ({ ...prev, executionProfile: event.target.value }))}
-              />
-            </div>
-            <div className="form-group">
-              <label>Runner Mode</label>
-              <input
-                className="input"
-                value={form.runnerMode}
-                onChange={(event) => onFormChange((prev) => ({ ...prev, runnerMode: event.target.value }))}
-              />
-            </div>
-            <div className="form-group">
-              <label>Code task для автопроверки</label>
-              <FancySelect
-                value={form.codeTaskId || '__none__'}
-                options={[
-                  { value: '__none__', label: 'Не привязано' },
-                  ...codeTasks.map((task) => ({
-                    value: task.id,
-                    label: `${task.title} (${task.language})`,
-                  })),
-                ]}
-                onChange={(codeTaskId) => onFormChange((prev) => ({
-                  ...prev,
-                  codeTaskId: codeTaskId === '__none__' ? '' : codeTaskId,
-                }))}
-              />
-            </div>
-            <div className="form-group">
-              <label>Языки решения</label>
-              <div className="pill-selector">
-                {LANGUAGE_OPTIONS.map((option) => {
-                  const active = form.supportedLanguages.includes(option.value);
-                  return (
-                    <button
-                      key={option.value}
-                      type="button"
-                      className={`pill-selector__pill ${active ? 'active' : ''}`}
-                      onClick={() => onFormChange((prev) => ({
-                        ...prev,
-                        supportedLanguages: active
-                          ? prev.supportedLanguages.filter((value) => value !== option.value)
-                          : [...prev.supportedLanguages, option.value],
-                      }))}
-                    >
-                      {option.label}
-                    </button>
-                  );
-                })}
+              <label>Режим</label>
+              <div className="task-policy-empty">
+                {form.isExecutable ? 'Live coding с автопроверкой и follow-up после accepted.' : 'Guided interview question без автопроверки.'}
               </div>
             </div>
           </div>
@@ -562,14 +516,16 @@ export function InterviewPrepTaskModal({
             />
           </div>
 
-          <div className="form-group">
-            <label>Starter Code</label>
-            <textarea
-              className="input textarea code-textarea"
-              value={form.starterCode}
-              onChange={(event) => onFormChange((prev) => ({ ...prev, starterCode: event.target.value }))}
-            />
-          </div>
+          {form.isExecutable && (
+            <div className="form-group">
+              <label>Starter Code</label>
+              <textarea
+                className="input textarea code-textarea"
+                value={form.starterCode}
+                onChange={(event) => onFormChange((prev) => ({ ...prev, starterCode: event.target.value }))}
+              />
+            </div>
+          )}
 
           <div className="form-group">
             <label>Reference Solution</label>
@@ -598,9 +554,104 @@ export function InterviewPrepTaskModal({
               Активна
             </label>
           </div>
+
+          <div className="interview-prep-question-toolbar">
+            <button type="button" className="btn btn-secondary" onClick={() => setShowAdvanced((value) => !value)}>
+              <Settings2 size={16} />
+              <span>{showAdvanced ? 'Скрыть advanced' : 'Показать advanced'}</span>
+            </button>
+          </div>
+
+          {showAdvanced && (
+            <div className="task-policy-panel">
+              <div className="task-editor-grid">
+                <div className="form-group">
+                  <label>Slug</label>
+                  <input
+                    className="input"
+                    value={form.slug}
+                    onChange={(event) => onFormChange((prev) => ({ ...prev, slug: toSlug(event.target.value) }))}
+                    placeholder="go-two-sum-hash-map"
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Длительность, сек</label>
+                  <input
+                    className="input"
+                    type="number"
+                    min={300}
+                    step={60}
+                    value={form.durationSeconds}
+                    onChange={(event) => onFormChange((prev) => ({ ...prev, durationSeconds: Number(event.target.value) || 0 }))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Execution Profile</label>
+                  <input
+                    className="input"
+                    value={form.executionProfile}
+                    onChange={(event) => onFormChange((prev) => ({ ...prev, executionProfile: event.target.value }))}
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Runner Mode</label>
+                  <input
+                    className="input"
+                    value={form.runnerMode}
+                    onChange={(event) => onFormChange((prev) => ({ ...prev, runnerMode: event.target.value }))}
+                  />
+                </div>
+                {form.isExecutable && (
+                  <div className="form-group">
+                    <label>Code task для автопроверки</label>
+                    <FancySelect
+                      value={form.codeTaskId || '__none__'}
+                      options={[
+                        { value: '__none__', label: 'Не привязано' },
+                        ...codeTasks.map((task) => ({
+                          value: task.id,
+                          label: `${task.title} (${task.language})`,
+                        })),
+                      ]}
+                      onChange={(codeTaskId) => onFormChange((prev) => ({
+                        ...prev,
+                        codeTaskId: codeTaskId === '__none__' ? '' : codeTaskId,
+                      }))}
+                    />
+                  </div>
+                )}
+                <div className="form-group">
+                  <label>Языки решения</label>
+                  <div className="pill-selector">
+                    {LANGUAGE_OPTIONS.map((option) => {
+                      if (option.value === 'system_design') {
+                        return null;
+                      }
+                      const active = form.supportedLanguages.includes(option.value);
+                      return (
+                        <button
+                          key={option.value}
+                          type="button"
+                          className={`pill-selector__pill ${active ? 'active' : ''}`}
+                          onClick={() => onFormChange((prev) => ({
+                            ...prev,
+                            supportedLanguages: active
+                              ? prev.supportedLanguages.filter((value) => value !== option.value)
+                              : [...prev.supportedLanguages, option.value],
+                          }))}
+                        >
+                          {option.label}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        <div className="modal-actions">
+        <div className="modal-actions admin-modal__actions">
           <button className="btn btn-secondary" onClick={onClose}>Отмена</button>
           <button className="btn btn-primary" onClick={onSave} disabled={saving}>
             {saving ? 'Сохранение...' : form.id ? 'Сохранить' : 'Создать'}
@@ -640,14 +691,17 @@ export function InterviewPrepQuestionModal({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal modal-xl interview-prep-modal" onClick={(event) => event.stopPropagation()}>
-        <div className="dashboard-card__header">
+      <div className="modal modal-xl interview-prep-modal admin-modal-shell" onClick={(event) => event.stopPropagation()}>
+        <div className="dashboard-card__header admin-modal__header">
           <div>
             <h2>Вопросы: {selectedTask.title}</h2>
             <p className="interview-prep-muted">
               Порядок важен: вопросы идут последовательно, а не рандомно.
             </p>
           </div>
+          <button type="button" className="btn-icon" onClick={onClose} aria-label="Закрыть">
+            <X size={16} />
+          </button>
         </div>
 
         <div className="modal-scroll-content">
@@ -734,7 +788,7 @@ export function InterviewPrepQuestionModal({
           </div>
         </div>
 
-        <div className="modal-actions">
+        <div className="modal-actions admin-modal__actions">
           <button className="btn btn-secondary" onClick={onClose}>Закрыть</button>
         </div>
       </div>

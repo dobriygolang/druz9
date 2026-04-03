@@ -22,9 +22,11 @@ func (r *Repo) PickRandomTask(ctx context.Context, topic, difficulty string) (*d
 		WHERE is_active = TRUE
 		  AND ($1 = '' OR $1 = ANY(topics))
 		  AND ($2 = 0 OR difficulty = $2)
+		  AND task_type = $3
+		  AND execution_profile = $4
 		ORDER BY random()
 		LIMIT 1
-	`, topic, difficultyValue), &task)
+	`, topic, difficultyValue, model.TaskTypeAlgorithm, model.ExecutionProfilePure.String()), &task)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil

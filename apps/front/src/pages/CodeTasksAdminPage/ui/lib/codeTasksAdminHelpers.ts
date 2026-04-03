@@ -21,7 +21,6 @@ export const TASK_TYPE_OPTIONS = [
   { value: 'file_parsing', label: 'File parsing' },
   { value: 'api_json', label: 'API / JSON' },
   { value: 'interview_practice', label: 'Interview realistic' },
-  { value: 'arena_duel', label: 'Arena duel' },
   { value: 'code_editor', label: 'Code editor' },
 ] as const;
 export const EXECUTION_PROFILE_OPTIONS = [
@@ -83,8 +82,8 @@ export const POLICY_HELP = {
 } as const;
 export const POLICY_TEMPLATES = [
   {
-    key: 'pure',
-    label: 'Шаблон pure',
+    key: 'algorithm',
+    label: 'Алгоритм',
     apply: (form: TaskFormState): TaskFormState => ({
       ...form,
       taskType: 'algorithm_practice',
@@ -101,7 +100,7 @@ export const POLICY_TEMPLATES = [
   },
   {
     key: 'file_io',
-    label: 'Шаблон file_io',
+    label: 'Файлы',
     apply: (form: TaskFormState): TaskFormState => ({
       ...form,
       taskType: 'file_parsing',
@@ -118,7 +117,7 @@ export const POLICY_TEMPLATES = [
   },
   {
     key: 'http_client',
-    label: 'Шаблон http_client',
+    label: 'API / JSON',
     apply: (form: TaskFormState): TaskFormState => ({
       ...form,
       taskType: 'api_json',
@@ -135,7 +134,7 @@ export const POLICY_TEMPLATES = [
   },
   {
     key: 'interview_realistic',
-    label: 'Шаблон interview',
+    label: 'Interview',
     apply: (form: TaskFormState): TaskFormState => ({
       ...form,
       taskType: 'interview_practice',
@@ -151,6 +150,15 @@ export const POLICY_TEMPLATES = [
     }),
   },
 ] as const;
+
+export type CodeTaskTemplateKey = 'algorithm' | 'file_io' | 'http_client' | 'interview_realistic';
+
+export const CODE_TASK_TEMPLATES: { key: CodeTaskTemplateKey; label: string; description: string }[] = [
+  { key: 'algorithm', label: 'Алгоритм / дуэль', description: 'Pure algorithmic task for duel and practice.' },
+  { key: 'file_io', label: 'Файлы', description: 'Task with prepared fixtures and file reading.' },
+  { key: 'http_client', label: 'API / JSON', description: 'Task with mock HTTP/API calls.' },
+  { key: 'interview_realistic', label: 'Interview', description: 'Realistic mixed interview sandbox.' },
+];
 
 export const DEFAULT_STARTER_CODE = `package main
 
@@ -233,6 +241,25 @@ export const createEmptyTaskForm = (): TaskFormState => ({
   publicTestCases: [createEmptyCase(true, 1)],
   hiddenTestCases: [createEmptyCase(false, 1)],
 });
+
+export const applyTaskTemplate = (form: TaskFormState, key: CodeTaskTemplateKey): TaskFormState => {
+  const template = POLICY_TEMPLATES.find((item) => item.key === key);
+  if (!template) {
+    return form;
+  }
+  const next = template.apply(form);
+  if (key === 'algorithm') {
+    return {
+      ...next,
+      taskType: 'algorithm_practice',
+      language: 'go',
+      difficulty: next.difficulty || 'easy',
+      topics: next.topics || 'arrays',
+      durationSeconds: next.durationSeconds || '900',
+    };
+  }
+  return next;
+};
 
 export const slugify = (value: string) =>
   value

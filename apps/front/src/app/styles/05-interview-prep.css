@@ -653,8 +653,10 @@
 
 .interview-prep-modal {
   max-height: calc(100vh - 40px);
+  width: min(calc(100vw - 32px), 1100px);
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 @media (max-width: 960px) {

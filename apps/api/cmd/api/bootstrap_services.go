@@ -133,7 +133,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		interviewPrepDomain:     interviewPrepDomain,
 		realtimeHub:             realtimeHub,
 		arenaRealtimeHub:        arenaRealtimeHub,
-		adminService:            adminservice.New(adminServiceDomain),
+		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager),
 		profileService:          profileservice.New(profileServiceDomain, cookies),
 		geoService:              geoservice.New(geoServiceDomain),
 		eventService:            eventservice.New(eventServiceDomain),

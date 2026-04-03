@@ -19,6 +19,7 @@ export const LANGUAGE_OPTIONS = [
   { value: 'go', label: 'Go' },
   { value: 'python', label: 'Python' },
   { value: 'sql', label: 'SQL' },
+  { value: 'system_design', label: 'System Design' },
 ];
 
 export const MOCK_STAGE_OPTIONS: { value: InterviewPrepMockStageKind; label: string }[] = [
@@ -38,6 +39,13 @@ func solve(input string) string {
 }
 `;
 
+export type InterviewPrepTemplateKey =
+  | 'go_coding'
+  | 'algorithm'
+  | 'sql'
+  | 'question_bank'
+  | 'system_design';
+
 export type TaskFormState = {
   id: string | null;
   slug: string;
@@ -56,6 +64,14 @@ export type TaskFormState = {
   referenceSolution: string;
   isActive: boolean;
 };
+
+export const INTERVIEW_PREP_TEMPLATES: { key: InterviewPrepTemplateKey; label: string; description: string }[] = [
+  { key: 'go_coding', label: 'Go coding', description: 'Executable Go task with live coding.' },
+  { key: 'algorithm', label: 'Algorithm', description: 'Algorithmic Go task with live coding.' },
+  { key: 'sql', label: 'SQL', description: 'SQL or database-oriented guided task.' },
+  { key: 'question_bank', label: 'Questions', description: 'Theory or verbal interview question.' },
+  { key: 'system_design', label: 'System design', description: 'Architecture or system design discussion.' },
+];
 
 export type QuestionFormState = {
   id: string | null;
@@ -104,6 +120,80 @@ export const createEmptyTaskForm = (): TaskFormState => ({
   referenceSolution: '',
   isActive: true,
 });
+
+export const applyTaskTemplate = (form: TaskFormState, template: InterviewPrepTemplateKey): TaskFormState => {
+  const base = {
+    ...form,
+    codeTaskId: '',
+    companyTag: form.companyTag || 'general',
+    isActive: form.isActive ?? true,
+  };
+
+  switch (template) {
+    case 'go_coding':
+      return {
+        ...base,
+        prepType: 'coding',
+        language: 'go',
+        supportedLanguages: ['go'],
+        isExecutable: true,
+        executionProfile: 'pure',
+        runnerMode: 'function_io',
+        durationSeconds: 2700,
+        starterCode: DEFAULT_STARTER_CODE,
+      };
+    case 'algorithm':
+      return {
+        ...base,
+        prepType: 'algorithm',
+        language: 'go',
+        supportedLanguages: ['go'],
+        isExecutable: true,
+        executionProfile: 'pure',
+        runnerMode: 'function_io',
+        durationSeconds: 2700,
+        starterCode: DEFAULT_STARTER_CODE,
+      };
+    case 'sql':
+      return {
+        ...base,
+        prepType: 'sql',
+        language: 'sql',
+        supportedLanguages: ['sql'],
+        isExecutable: false,
+        executionProfile: 'pure',
+        runnerMode: 'function_io',
+        durationSeconds: 1800,
+        starterCode: '',
+      };
+    case 'question_bank':
+      return {
+        ...base,
+        prepType: 'coding',
+        language: 'go',
+        supportedLanguages: ['go'],
+        isExecutable: false,
+        executionProfile: 'pure',
+        runnerMode: 'function_io',
+        durationSeconds: 1200,
+        starterCode: '',
+      };
+    case 'system_design':
+      return {
+        ...base,
+        prepType: 'system_design',
+        language: 'system_design',
+        supportedLanguages: [],
+        isExecutable: false,
+        executionProfile: 'pure',
+        runnerMode: 'function_io',
+        durationSeconds: 2400,
+        starterCode: '',
+      };
+    default:
+      return base;
+  }
+};
 
 export const createEmptyQuestionForm = (position = 1): QuestionFormState => ({
   id: null,

@@ -1,22 +1,19 @@
 import React from 'react';
-import { Pencil, Plus, ShieldCheck, Trash2 } from 'lucide-react';
+import { Pencil, Plus, Settings2, ShieldCheck, Trash2, X } from 'lucide-react';
 
 import { CodeTask, CodeTaskCase } from '@/entities/CodeRoom/model/types';
 import { FancySelect } from '@/shared/ui/FancySelect';
 
 import {
+  applyTaskTemplate,
+  CODE_TASK_TEMPLATES,
   DIFFICULTIES,
   DUEL_TOPICS,
-  EXECUTION_PROFILE_OPTIONS,
   LANGUAGE_OPTIONS,
   POLICY_HELP,
-  POLICY_PRESET_BY_TASK_TYPE,
   POLICY_TEMPLATES,
-  RUNNER_MODE_OPTIONS,
-  TASK_TYPE_OPTIONS,
   TaskFormState,
   normalizePolicyFields,
-  normalizeRunnerMode,
 } from '../lib/codeTasksAdminHelpers';
 
 type HeroProps = {
@@ -193,6 +190,8 @@ export const CodeTasksAdminModal: React.FC<ModalProps> = ({
   addTaskCase,
   removeTaskCase,
 }) => {
+  const [showAdvanced, setShowAdvanced] = React.useState(false);
+
   if (!isOpen) {
     return null;
   }
@@ -203,23 +202,40 @@ export const CodeTasksAdminModal: React.FC<ModalProps> = ({
 
   return (
     <div className="modal-overlay" onClick={onClose}>
-      <div className="modal modal-xl code-admin-modal" onClick={(e) => e.stopPropagation()}>
-        <div className="dashboard-card__header">
+      <div className="modal modal-xl code-admin-modal admin-modal-shell" onClick={(e) => e.stopPropagation()}>
+        <div className="dashboard-card__header admin-modal__header">
           <div>
             <h2>{taskForm.id ? 'Редактировать задачу' : 'Новая задача'}</h2>
             <p className="dashboard-card__subtitle">Statement, starter code, public/hidden tests и включение задачи в random duel.</p>
           </div>
-          <ShieldCheck size={18} />
+          <div className="admin-modal__header-actions">
+            <ShieldCheck size={18} />
+            <button type="button" className="btn-icon" onClick={onClose} aria-label="Закрыть">
+              <X size={16} />
+            </button>
+          </div>
         </div>
+
+        <div className="modal-scroll-content">
+        {!taskForm.id && (
+          <div className="admin-template-strip">
+            {CODE_TASK_TEMPLATES.map((template) => (
+              <button
+                key={template.key}
+                type="button"
+                className="btn btn-secondary btn-sm"
+                onClick={() => setTaskForm((prev) => applyTaskTemplate(prev, template.key))}
+              >
+                {template.label}
+              </button>
+            ))}
+          </div>
+        )}
 
         <div className="task-editor-grid">
           <div className="form-group">
             <label>Название</label>
             <input className="input" value={taskForm.title} onChange={(e) => setTaskForm((prev) => ({ ...prev, title: e.target.value }))} />
-          </div>
-          <div className="form-group">
-            <label>Slug</label>
-            <input className="input" value={taskForm.slug} onChange={(e) => setTaskForm((prev) => ({ ...prev, slug: e.target.value }))} placeholder="Если пусто, соберется из title" />
           </div>
           <div className="form-group">
             <label>Сложность</label>
@@ -239,36 +255,6 @@ export const CodeTasksAdminModal: React.FC<ModalProps> = ({
               value={taskForm.language}
               options={[...LANGUAGE_OPTIONS]}
               onChange={(language) => setTaskForm((prev) => ({ ...prev, language }))}
-            />
-          </div>
-          <div className="form-group">
-            <label>Task type</label>
-            <FancySelect
-              value={taskForm.taskType}
-              options={[...TASK_TYPE_OPTIONS]}
-              onChange={(taskType) => setTaskForm((prev) => ({
-                ...normalizeRunnerMode(normalizePolicyFields({
-                  ...prev,
-                  taskType,
-                  executionProfile: POLICY_PRESET_BY_TASK_TYPE[taskType] || prev.executionProfile,
-                })),
-              }))}
-            />
-          </div>
-          <div className="form-group">
-            <label>Execution profile</label>
-            <FancySelect
-              value={taskForm.executionProfile}
-              options={[...EXECUTION_PROFILE_OPTIONS]}
-              onChange={(executionProfile) => setTaskForm((prev) => normalizeRunnerMode(normalizePolicyFields({ ...prev, executionProfile })))}
-            />
-          </div>
-          <div className="form-group">
-            <label>Runner mode</label>
-            <FancySelect
-              value={taskForm.runnerMode}
-              options={[...RUNNER_MODE_OPTIONS]}
-              onChange={(runnerMode) => setTaskForm((prev) => normalizeRunnerMode({ ...prev, runnerMode }))}
             />
           </div>
           <div className="form-group">
@@ -293,6 +279,14 @@ export const CodeTasksAdminModal: React.FC<ModalProps> = ({
           </div>
         </div>
 
+        <div className="interview-prep-question-toolbar">
+          <button type="button" className="btn btn-secondary" onClick={() => setShowAdvanced((value) => !value)}>
+            <Settings2 size={16} />
+            <span>{showAdvanced ? 'Скрыть advanced' : 'Показать advanced'}</span>
+          </button>
+        </div>
+
+        {showAdvanced && (
         <div className="task-policy-panel">
           <div className="task-policy-panel__header">
             <div>
@@ -400,6 +394,7 @@ export const CodeTasksAdminModal: React.FC<ModalProps> = ({
             </div>
           )}
         </div>
+        )}
 
         <div className="form-group">
           <label>Условие</label>
@@ -461,8 +456,9 @@ export const CodeTasksAdminModal: React.FC<ModalProps> = ({
           />
           Активна и может попадать в random duel
         </label>
+        </div>
 
-        <div className="modal-actions">
+        <div className="modal-actions admin-modal__actions">
           <button className="btn btn-secondary" onClick={onClose}>Отмена</button>
           <button className="btn btn-primary" onClick={onSave} disabled={savingTask || networkDisabled}>
             {savingTask ? 'Сохранение...' : taskForm.id ? 'Сохранить' : 'Создать задачу'}
