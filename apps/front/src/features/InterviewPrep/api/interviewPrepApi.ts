@@ -334,6 +334,20 @@ const normalizeMockCompanyPreset = (item: any): InterviewPrepMockCompanyPreset =
   updatedAt: item.updatedAt ?? item.updated_at ?? item.UpdatedAt,
 });
 
+const fileToBase64 = async (file: File): Promise<string> => {
+  const buffer = await file.arrayBuffer();
+  const bytes = new Uint8Array(buffer);
+  let binary = '';
+  const chunkSize = 0x8000;
+
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    const chunk = bytes.subarray(offset, offset + chunkSize);
+    binary += String.fromCharCode(...chunk);
+  }
+
+  return btoa(binary);
+};
+
 export const interviewPrepApi = {
   listTasks: async (): Promise<InterviewPrepTask[]> => {
     const response = await apiClient.get<{ tasks: any[] }>('/api/v1/interview-prep/tasks');
@@ -384,22 +398,20 @@ export const interviewPrepApi = {
 
 
   reviewSystemDesign: async (sessionId: string, image: File, input: InterviewPrepSystemDesignReviewInput): Promise<InterviewPrepSystemDesignReview> => {
-    const formData = new FormData();
-    formData.append('image', image);
-    formData.append('notes', input.notes);
-    formData.append('components', input.components);
-    formData.append('apis', input.apis);
-    formData.append('databaseSchema', input.databaseSchema);
-    formData.append('traffic', input.traffic);
-    formData.append('reliability', input.reliability);
+    const imageBase64 = await fileToBase64(image);
 
     const response = await apiClient.post<{ review: InterviewPrepSystemDesignReview }>(
       `/api/v1/interview-prep/sessions/${sessionId}/system-design-review`,
-      formData,
       {
-        headers: {
-          'Content-Type': 'multipart/form-data',
-        },
+        image: imageBase64,
+        imageName: image.name,
+        imageContentType: image.type || 'application/octet-stream',
+        notes: input.notes,
+        components: input.components,
+        apis: input.apis,
+        databaseSchema: input.databaseSchema,
+        traffic: input.traffic,
+        reliability: input.reliability,
       },
     );
 
@@ -441,19 +453,21 @@ export const interviewPrepApi = {
     image: File,
     input: InterviewPrepSystemDesignReviewInput,
   ): Promise<{ review?: InterviewPrepSystemDesignReview; session?: InterviewPrepMockSession }> => {
-    const formData = new FormData();
-    formData.append('image', image);
-    formData.append('notes', input.notes);
-    formData.append('components', input.components);
-    formData.append('apis', input.apis);
-    formData.append('databaseSchema', input.databaseSchema);
-    formData.append('traffic', input.traffic);
-    formData.append('reliability', input.reliability);
+    const imageBase64 = await fileToBase64(image);
 
     const response = await apiClient.post<{ result: { review?: InterviewPrepSystemDesignReview; session?: any } }>(
       `/api/v1/interview-prep/mock-sessions/${sessionId}/system-design-review`,
-      formData,
-      { headers: { 'Content-Type': 'multipart/form-data' } },
+      {
+        image: imageBase64,
+        imageName: image.name,
+        imageContentType: image.type || 'application/octet-stream',
+        notes: input.notes,
+        components: input.components,
+        apis: input.apis,
+        databaseSchema: input.databaseSchema,
+        traffic: input.traffic,
+        reliability: input.reliability,
+      },
     );
     return {
       review: response.data.result.review,

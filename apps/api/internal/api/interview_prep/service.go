@@ -1,32 +1,15 @@
-package interviewprephttp
+package interview_prep
 
 import (
 	"context"
-	"net/http"
-	"regexp"
-	"strings"
 
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/model"
+	v1 "api/pkg/api/interview_prep/v1"
 
 	"github.com/google/uuid"
+	"google.golang.org/grpc"
 )
-
-const (
-	TasksPath        = "/api/v1/interview-prep/tasks"
-	SessionsPath     = "/api/v1/interview-prep/sessions"
-	MockSessionsPath = "/api/v1/interview-prep/mock-sessions"
-	AdminPrefix      = "/api/admin/interview-prep/"
-)
-
-var SlugPattern = regexp.MustCompile(`[^a-z0-9]+`)
-
-type Authorizer interface {
-	AuthenticateByToken(context.Context, string) (*model.AuthState, error)
-	CookieName() string
-	DevBypass() bool
-	DevUserID() string
-}
 
 type Service interface {
 	ListTasks(ctx context.Context, user *model.User) ([]*model.InterviewPrepTask, error)
@@ -41,11 +24,6 @@ type Service interface {
 	Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string) (*appinterviewprep.SubmitResult, error)
 	ReviewSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req appinterviewprep.SystemDesignReviewInput) (*appinterviewprep.SystemDesignReviewResult, error)
 	AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string, answer string) (*appinterviewprep.QuestionAnswerResult, error)
-}
-
-type AdminAuthorizer interface {
-	AuthenticateByToken(context.Context, string) (*model.AuthState, error)
-	CookieName() string
 }
 
 type AdminRepo interface {
@@ -68,54 +46,19 @@ type AdminRepo interface {
 	DeleteMockCompanyPreset(ctx context.Context, itemID uuid.UUID) error
 }
 
-func RegisterRoutes(srv interface {
-	HandlePrefix(prefix string, handler http.Handler)
-}, service Service, authorizer Authorizer) {
-	handler := Handler(service, authorizer)
-	srv.HandlePrefix(TasksPath, handler)
-	srv.HandlePrefix(SessionsPath, handler)
-	srv.HandlePrefix(MockSessionsPath, handler)
+// Implementation of interview_prep service.
+type Implementation struct {
+	v1.UnimplementedInterviewPrepServiceServer
+	service Service
+	admin   AdminRepo
 }
 
-func Handler(service Service, authorizer Authorizer) http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc(TasksPath, handleTasks(service, authorizer))
-	mux.HandleFunc(SessionsPath, handleSessions(service, authorizer))
-	mux.HandleFunc(SessionsPath+"/", handleSessionResource(service, authorizer))
-	mux.HandleFunc(MockSessionsPath, handleMockSessions(service, authorizer))
-	mux.HandleFunc(MockSessionsPath+"/", handleMockSessionResource(service, authorizer))
-	return mux
+// New returns new instance of Implementation.
+func New(service Service, admin AdminRepo) *Implementation {
+	return &Implementation{service: service, admin: admin}
 }
 
-func RegisterAdminRoutes(
-	srv interface {
-		HandlePrefix(prefix string, handler http.Handler)
-	},
-	repo AdminRepo,
-	authorizer AdminAuthorizer,
-) {
-	srv.HandlePrefix(AdminPrefix, AdminHandler(repo, authorizer))
-}
-
-func AdminHandler(repo AdminRepo, authorizer AdminAuthorizer) http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		user, authErr := adminCheckAuth(r, authorizer)
-		if authErr != nil {
-			writeAdminJSON(w, authErr.status, authErr.response)
-			return
-		}
-		if !user.IsAdmin {
-			writeAdminJSON(w, http.StatusForbidden, map[string]any{"error": "admin required"})
-			return
-		}
-
-		path := strings.Trim(strings.TrimPrefix(r.URL.Path, AdminPrefix), "/")
-		if path == "" {
-			http.Error(w, "not found", http.StatusNotFound)
-			return
-		}
-		handleAdminPath(w, r, repo, strings.Split(path, "/"))
-	})
-	return mux
+// GetDescription returns grpc service description.
+func (i *Implementation) GetDescription() grpc.ServiceDesc {
+	return v1.InterviewPrepService_ServiceDesc
 }

@@ -118,6 +118,325 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/admin.v1.UpdateConfigResponse'
+    /api/admin/interview-prep/mock-company-presets:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_ListMockCompanyPresets
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.MockCompanyPresetListResponse'
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_CreateMockCompanyPreset
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.CreateMockCompanyPresetRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.MockCompanyPresetEnvelope'
+    /api/admin/interview-prep/mock-company-presets/{id}:
+        put:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_UpdateMockCompanyPreset
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.UpdateMockCompanyPresetRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.MockCompanyPresetEnvelope'
+        delete:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_DeleteMockCompanyPreset
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.StatusResponse'
+    /api/admin/interview-prep/mock-question-pools:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_ListMockQuestionPools
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.MockQuestionPoolListResponse'
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_CreateMockQuestionPool
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.CreateMockQuestionPoolRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.MockQuestionPoolEnvelope'
+    /api/admin/interview-prep/mock-question-pools/{id}:
+        put:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_UpdateMockQuestionPool
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.UpdateMockQuestionPoolRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.MockQuestionPoolEnvelope'
+        delete:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_DeleteMockQuestionPool
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.StatusResponse'
+    /api/admin/interview-prep/tasks:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_ListAdminTasks
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.ListAdminTasksResponse'
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_CreateAdminTask
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.CreateAdminTaskRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.AdminTaskEnvelope'
+    /api/admin/interview-prep/tasks/{taskId}:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_GetAdminTask
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.AdminTaskEnvelope'
+        put:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_UpdateAdminTask
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.UpdateAdminTaskRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.AdminTaskEnvelope'
+        delete:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_DeleteAdminTask
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.StatusResponse'
+    /api/admin/interview-prep/tasks/{taskId}/questions:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_ListAdminQuestions
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.ListAdminQuestionsResponse'
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_CreateAdminQuestion
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.CreateAdminQuestionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.AdminQuestionEnvelope'
+    /api/admin/interview-prep/tasks/{taskId}/questions/{questionId}:
+        put:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_UpdateAdminQuestion
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: questionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.UpdateAdminQuestionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.AdminQuestionEnvelope'
+        delete:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_DeleteAdminQuestion
+            parameters:
+                - name: taskId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: questionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.StatusResponse'
     /api/admin/podcasts:
         post:
             tags:
@@ -244,6 +563,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/admin.v1.AdminStatusResponse'
+    /api/v1/arena/anti-cheat/event:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_ReportAntiCheatEvent
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.ReportAntiCheatEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaStatusResponse'
     /api/v1/arena/leaderboard:
         get:
             tags:
@@ -370,6 +707,108 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/arena.v1.SubmitCodeResponse'
+    /api/v1/arena/open-matches:
+        get:
+            tags:
+                - ArenaService
+            operationId: ArenaService_ListOpenMatches
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ListOpenMatchesResponse'
+    /api/v1/arena/queue/join:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_JoinQueue
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.JoinQueueRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaQueueStateResponse'
+    /api/v1/arena/queue/leave:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_LeaveQueue
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.LeaveQueueRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaQueueStateResponse'
+    /api/v1/arena/queue/status:
+        get:
+            tags:
+                - ArenaService
+            operationId: ArenaService_GetQueueStatus
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaQueueStateResponse'
+    /api/v1/arena/stats/batch:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_GetPlayerStatsBatch
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.GetPlayerStatsBatchRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaPlayerStatsBatchResponse'
+    /api/v1/arena/stats/{userId}:
+        get:
+            tags:
+                - ArenaService
+            operationId: ArenaService_GetPlayerStats
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaPlayerStatsResponse'
     /api/v1/code-editor/join:
         post:
             tags:
@@ -665,6 +1104,10 @@ paths:
                   required: true
                   schema:
                     type: string
+                - name: deleteScope
+                  in: query
+                  schema:
+                    type: string
             responses:
                 "200":
                     description: OK
@@ -750,6 +1193,251 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/geo.v1.ResolveResponse'
+    /api/v1/interview-prep/companies:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_ListCompanies
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.ListCompaniesResponse'
+    /api/v1/interview-prep/mock-sessions:
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_StartMockSession
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.StartMockSessionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.MockSessionEnvelope'
+    /api/v1/interview-prep/mock-sessions/{sessionId}:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_GetMockSession
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.MockSessionEnvelope'
+    /api/v1/interview-prep/mock-sessions/{sessionId}/questions/answer:
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_AnswerMockQuestion
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.AnswerMockQuestionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.AnswerMockQuestionResponse'
+    /api/v1/interview-prep/mock-sessions/{sessionId}/submit:
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_SubmitMockStage
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.SubmitMockStageRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.SubmitMockStageResponse'
+    /api/v1/interview-prep/mock-sessions/{sessionId}/system-design-review:
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_ReviewMockSystemDesign
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.ReviewMockSystemDesignRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.ReviewMockSystemDesignResponse'
+    /api/v1/interview-prep/sessions:
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_StartSession
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.StartSessionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.SessionEnvelope'
+    /api/v1/interview-prep/sessions/{sessionId}:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_GetSession
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.SessionEnvelope'
+    /api/v1/interview-prep/sessions/{sessionId}/questions/{questionId}/answer:
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_AnswerQuestion
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: questionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.AnswerQuestionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.AnswerQuestionResponse'
+    /api/v1/interview-prep/sessions/{sessionId}/submit:
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_SubmitSession
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.SubmitSessionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.SubmitSessionResponse'
+    /api/v1/interview-prep/sessions/{sessionId}/system-design-review:
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_ReviewSystemDesign
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.ReviewSystemDesignRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.ReviewSystemDesignResponse'
+    /api/v1/interview-prep/tasks:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_ListTasks
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.ListTasksResponse'
     /api/v1/podcasts:
         get:
             tags:
@@ -1271,6 +1959,65 @@ components:
                     format: int32
                 antiCheatPenalized:
                     type: boolean
+        arena.v1.ArenaPlayerStats:
+            type: object
+            properties:
+                userId:
+                    type: string
+                displayName:
+                    type: string
+                rating:
+                    type: integer
+                    format: int32
+                league:
+                    type: string
+                wins:
+                    type: integer
+                    format: int32
+                losses:
+                    type: integer
+                    format: int32
+                matches:
+                    type: integer
+                    format: int32
+                winRate:
+                    type: number
+                    format: double
+                bestRuntime:
+                    type: string
+        arena.v1.ArenaPlayerStatsBatchResponse:
+            type: object
+            properties:
+                stats:
+                    type: object
+                    additionalProperties:
+                        $ref: '#/components/schemas/arena.v1.ArenaPlayerStats'
+        arena.v1.ArenaPlayerStatsResponse:
+            type: object
+            properties:
+                stats:
+                    $ref: '#/components/schemas/arena.v1.ArenaPlayerStats'
+        arena.v1.ArenaQueueStateResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+                topic:
+                    type: string
+                difficulty:
+                    type: string
+                queueSize:
+                    type: integer
+                    format: int32
+                queuedAt:
+                    type: string
+                match:
+                    $ref: '#/components/schemas/arena.v1.ArenaMatch'
+        arena.v1.ArenaStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: string
         arena.v1.CreateMatchRequest:
             type: object
             properties:
@@ -1288,15 +2035,48 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/arena.v1.ArenaLeaderboardEntry'
+        arena.v1.GetPlayerStatsBatchRequest:
+            type: object
+            properties:
+                userIds:
+                    type: array
+                    items:
+                        type: string
         arena.v1.JoinMatchRequest:
             type: object
             properties:
                 matchId:
                     type: string
+        arena.v1.JoinQueueRequest:
+            type: object
+            properties:
+                topic:
+                    type: string
+                difficulty:
+                    type: string
+                obfuscateOpponent:
+                    type: boolean
         arena.v1.LeaveMatchRequest:
             type: object
             properties:
                 matchId:
+                    type: string
+        arena.v1.LeaveQueueRequest:
+            type: object
+            properties: {}
+        arena.v1.ListOpenMatchesResponse:
+            type: object
+            properties:
+                matches:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/arena.v1.ArenaMatch'
+        arena.v1.ReportAntiCheatEventRequest:
+            type: object
+            properties:
+                matchId:
+                    type: string
+                reason:
                     type: string
         arena.v1.SubmitCodeRequest:
             type: object
@@ -1803,6 +2583,8 @@ components:
                     type: string
                 meetingLink:
                     type: string
+                repeat:
+                    type: string
         event.v1.DeleteEventResponse:
             type: object
             properties:
@@ -2000,6 +2782,728 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/geo.v1.GeoCandidate'
+        interview_prep.v1.AdminQuestionEnvelope:
+            type: object
+            properties:
+                question:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepQuestion'
+        interview_prep.v1.AdminQuestionPayload:
+            type: object
+            properties:
+                position:
+                    type: integer
+                    format: int32
+                prompt:
+                    type: string
+                answer:
+                    type: string
+        interview_prep.v1.AdminTaskEnvelope:
+            type: object
+            properties:
+                task:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepTask'
+        interview_prep.v1.AdminTaskPayload:
+            type: object
+            properties:
+                slug:
+                    type: string
+                title:
+                    type: string
+                statement:
+                    type: string
+                prepType:
+                    type: string
+                language:
+                    type: string
+                companyTag:
+                    type: string
+                supportedLanguages:
+                    type: array
+                    items:
+                        type: string
+                isExecutable:
+                    type: boolean
+                executionProfile:
+                    type: string
+                runnerMode:
+                    type: string
+                durationSeconds:
+                    type: integer
+                    format: int32
+                starterCode:
+                    type: string
+                referenceSolution:
+                    type: string
+                codeTaskId:
+                    type: string
+                isActive:
+                    type: boolean
+        interview_prep.v1.AnswerMockQuestionRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                answer:
+                    type: string
+        interview_prep.v1.AnswerMockQuestionResponse:
+            type: object
+            properties:
+                result:
+                    $ref: '#/components/schemas/interview_prep.v1.AnswerMockQuestionResult'
+        interview_prep.v1.AnswerMockQuestionResult:
+            type: object
+            properties:
+                review:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewAnswerReview'
+                session:
+                    $ref: '#/components/schemas/interview_prep.v1.MockSession'
+        interview_prep.v1.AnswerQuestionRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                questionId:
+                    type: string
+                selfAssessment:
+                    type: string
+                answer:
+                    type: string
+        interview_prep.v1.AnswerQuestionResponse:
+            type: object
+            properties:
+                session:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepSession'
+                answeredQuestion:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepQuestion'
+                review:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewAnswerReview'
+        interview_prep.v1.CreateAdminQuestionRequest:
+            type: object
+            properties:
+                taskId:
+                    type: string
+                question:
+                    $ref: '#/components/schemas/interview_prep.v1.AdminQuestionPayload'
+        interview_prep.v1.CreateAdminTaskRequest:
+            type: object
+            properties:
+                task:
+                    $ref: '#/components/schemas/interview_prep.v1.AdminTaskPayload'
+        interview_prep.v1.CreateMockCompanyPresetRequest:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/interview_prep.v1.MockCompanyPresetPayload'
+        interview_prep.v1.CreateMockQuestionPoolRequest:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/interview_prep.v1.MockQuestionPoolPayload'
+        interview_prep.v1.InterviewAnswerReview:
+            type: object
+            properties:
+                provider:
+                    type: string
+                model:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                summary:
+                    type: string
+                gaps:
+                    type: array
+                    items:
+                        type: string
+        interview_prep.v1.InterviewPrepQuestion:
+            type: object
+            properties:
+                id:
+                    type: string
+                taskId:
+                    type: string
+                position:
+                    type: integer
+                    format: int32
+                prompt:
+                    type: string
+                answer:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        interview_prep.v1.InterviewPrepQuestionResult:
+            type: object
+            properties:
+                id:
+                    type: string
+                sessionId:
+                    type: string
+                questionId:
+                    type: string
+                selfAssessment:
+                    type: string
+                answeredAt:
+                    type: string
+        interview_prep.v1.InterviewPrepSession:
+            type: object
+            properties:
+                id:
+                    type: string
+                userId:
+                    type: string
+                taskId:
+                    type: string
+                status:
+                    type: string
+                currentQuestionPosition:
+                    type: integer
+                    format: int32
+                solveLanguage:
+                    type: string
+                code:
+                    type: string
+                lastSubmissionPassed:
+                    type: boolean
+                startedAt:
+                    type: string
+                finishedAt:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                task:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepTask'
+                currentQuestion:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepQuestion'
+                results:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.InterviewPrepQuestionResult'
+        interview_prep.v1.InterviewPrepTask:
+            type: object
+            properties:
+                id:
+                    type: string
+                slug:
+                    type: string
+                title:
+                    type: string
+                statement:
+                    type: string
+                prepType:
+                    type: string
+                language:
+                    type: string
+                companyTag:
+                    type: string
+                supportedLanguages:
+                    type: array
+                    items:
+                        type: string
+                isExecutable:
+                    type: boolean
+                executionProfile:
+                    type: string
+                runnerMode:
+                    type: string
+                durationSeconds:
+                    type: integer
+                    format: int32
+                starterCode:
+                    type: string
+                referenceSolution:
+                    type: string
+                codeTaskId:
+                    type: string
+                isActive:
+                    type: boolean
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        interview_prep.v1.InterviewSolutionReview:
+            type: object
+            properties:
+                provider:
+                    type: string
+                model:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                summary:
+                    type: string
+                strengths:
+                    type: array
+                    items:
+                        type: string
+                issues:
+                    type: array
+                    items:
+                        type: string
+                followUpQuestions:
+                    type: array
+                    items:
+                        type: string
+        interview_prep.v1.ListAdminQuestionsResponse:
+            type: object
+            properties:
+                questions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.InterviewPrepQuestion'
+        interview_prep.v1.ListAdminTasksResponse:
+            type: object
+            properties:
+                tasks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.InterviewPrepTask'
+        interview_prep.v1.ListCompaniesResponse:
+            type: object
+            properties:
+                companies:
+                    type: array
+                    items:
+                        type: string
+        interview_prep.v1.ListTasksResponse:
+            type: object
+            properties:
+                tasks:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.InterviewPrepTask'
+        interview_prep.v1.MockCompanyPreset:
+            type: object
+            properties:
+                id:
+                    type: string
+                companyTag:
+                    type: string
+                stageKind:
+                    type: string
+                position:
+                    type: integer
+                    format: int32
+                taskSlugPattern:
+                    type: string
+                aiModelOverride:
+                    type: string
+                isActive:
+                    type: boolean
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        interview_prep.v1.MockCompanyPresetEnvelope:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/interview_prep.v1.MockCompanyPreset'
+        interview_prep.v1.MockCompanyPresetListResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.MockCompanyPreset'
+        interview_prep.v1.MockCompanyPresetPayload:
+            type: object
+            properties:
+                companyTag:
+                    type: string
+                stageKind:
+                    type: string
+                position:
+                    type: integer
+                    format: int32
+                taskSlugPattern:
+                    type: string
+                aiModelOverride:
+                    type: string
+                isActive:
+                    type: boolean
+        interview_prep.v1.MockQuestionPoolEnvelope:
+            type: object
+            properties:
+                item:
+                    $ref: '#/components/schemas/interview_prep.v1.MockQuestionPoolItem'
+        interview_prep.v1.MockQuestionPoolItem:
+            type: object
+            properties:
+                id:
+                    type: string
+                topic:
+                    type: string
+                companyTag:
+                    type: string
+                questionKey:
+                    type: string
+                prompt:
+                    type: string
+                referenceAnswer:
+                    type: string
+                position:
+                    type: integer
+                    format: int32
+                alwaysAsk:
+                    type: boolean
+                isActive:
+                    type: boolean
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        interview_prep.v1.MockQuestionPoolListResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.MockQuestionPoolItem'
+        interview_prep.v1.MockQuestionPoolPayload:
+            type: object
+            properties:
+                topic:
+                    type: string
+                companyTag:
+                    type: string
+                questionKey:
+                    type: string
+                prompt:
+                    type: string
+                referenceAnswer:
+                    type: string
+                position:
+                    type: integer
+                    format: int32
+                alwaysAsk:
+                    type: boolean
+                isActive:
+                    type: boolean
+        interview_prep.v1.MockQuestionResult:
+            type: object
+            properties:
+                id:
+                    type: string
+                stageId:
+                    type: string
+                position:
+                    type: integer
+                    format: int32
+                questionKey:
+                    type: string
+                prompt:
+                    type: string
+                referenceAnswer:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                summary:
+                    type: string
+                answeredAt:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+        interview_prep.v1.MockSession:
+            type: object
+            properties:
+                id:
+                    type: string
+                userId:
+                    type: string
+                companyTag:
+                    type: string
+                status:
+                    type: string
+                currentStageIndex:
+                    type: integer
+                    format: int32
+                startedAt:
+                    type: string
+                finishedAt:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                stages:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.MockStage'
+                currentStage:
+                    $ref: '#/components/schemas/interview_prep.v1.MockStage'
+        interview_prep.v1.MockSessionEnvelope:
+            type: object
+            properties:
+                session:
+                    $ref: '#/components/schemas/interview_prep.v1.MockSession'
+        interview_prep.v1.MockStage:
+            type: object
+            properties:
+                id:
+                    type: string
+                sessionId:
+                    type: string
+                stageIndex:
+                    type: integer
+                    format: int32
+                kind:
+                    type: string
+                status:
+                    type: string
+                taskId:
+                    type: string
+                solveLanguage:
+                    type: string
+                code:
+                    type: string
+                lastSubmissionPassed:
+                    type: boolean
+                reviewScore:
+                    type: integer
+                    format: int32
+                reviewSummary:
+                    type: string
+                startedAt:
+                    type: string
+                finishedAt:
+                    type: string
+                createdAt:
+                    type: string
+                updatedAt:
+                    type: string
+                task:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepTask'
+                questionResults:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.MockQuestionResult'
+                currentQuestion:
+                    $ref: '#/components/schemas/interview_prep.v1.MockQuestionResult'
+        interview_prep.v1.ReviewMockSystemDesignRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                image:
+                    type: string
+                    format: bytes
+                imageName:
+                    type: string
+                imageContentType:
+                    type: string
+                notes:
+                    type: string
+                components:
+                    type: string
+                apis:
+                    type: string
+                databaseSchema:
+                    type: string
+                traffic:
+                    type: string
+                reliability:
+                    type: string
+        interview_prep.v1.ReviewMockSystemDesignResponse:
+            type: object
+            properties:
+                result:
+                    $ref: '#/components/schemas/interview_prep.v1.ReviewMockSystemDesignResult'
+        interview_prep.v1.ReviewMockSystemDesignResult:
+            type: object
+            properties:
+                review:
+                    $ref: '#/components/schemas/interview_prep.v1.SystemDesignReview'
+                session:
+                    $ref: '#/components/schemas/interview_prep.v1.MockSession'
+        interview_prep.v1.ReviewSystemDesignRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                image:
+                    type: string
+                    format: bytes
+                imageName:
+                    type: string
+                imageContentType:
+                    type: string
+                notes:
+                    type: string
+                components:
+                    type: string
+                apis:
+                    type: string
+                databaseSchema:
+                    type: string
+                traffic:
+                    type: string
+                reliability:
+                    type: string
+        interview_prep.v1.ReviewSystemDesignResponse:
+            type: object
+            properties:
+                review:
+                    $ref: '#/components/schemas/interview_prep.v1.SystemDesignReview'
+        interview_prep.v1.SessionEnvelope:
+            type: object
+            properties:
+                session:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepSession'
+        interview_prep.v1.StartMockSessionRequest:
+            type: object
+            properties:
+                companyTag:
+                    type: string
+        interview_prep.v1.StartSessionRequest:
+            type: object
+            properties:
+                taskId:
+                    type: string
+        interview_prep.v1.StatusResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        interview_prep.v1.SubmitMockStageRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                code:
+                    type: string
+                language:
+                    type: string
+                notes:
+                    type: string
+        interview_prep.v1.SubmitMockStageResponse:
+            type: object
+            properties:
+                result:
+                    $ref: '#/components/schemas/interview_prep.v1.SubmitMockStageResult'
+        interview_prep.v1.SubmitMockStageResult:
+            type: object
+            properties:
+                passed:
+                    type: boolean
+                lastError:
+                    type: string
+                passedCount:
+                    type: integer
+                    format: int32
+                totalCount:
+                    type: integer
+                    format: int32
+                failedTestIndex:
+                    type: integer
+                    format: int32
+                failureKind:
+                    type: string
+                review:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewSolutionReview'
+                session:
+                    $ref: '#/components/schemas/interview_prep.v1.MockSession'
+        interview_prep.v1.SubmitSessionRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
+                code:
+                    type: string
+                language:
+                    type: string
+        interview_prep.v1.SubmitSessionResponse:
+            type: object
+            properties:
+                result:
+                    $ref: '#/components/schemas/interview_prep.v1.SubmitSessionResult'
+        interview_prep.v1.SubmitSessionResult:
+            type: object
+            properties:
+                passed:
+                    type: boolean
+                lastError:
+                    type: string
+                passedCount:
+                    type: integer
+                    format: int32
+                totalCount:
+                    type: integer
+                    format: int32
+                failedTestIndex:
+                    type: integer
+                    format: int32
+                failureKind:
+                    type: string
+                session:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepSession'
+        interview_prep.v1.SystemDesignReview:
+            type: object
+            properties:
+                provider:
+                    type: string
+                model:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                summary:
+                    type: string
+                strengths:
+                    type: array
+                    items:
+                        type: string
+                issues:
+                    type: array
+                    items:
+                        type: string
+                missingTopics:
+                    type: array
+                    items:
+                        type: string
+                followUpQuestions:
+                    type: array
+                    items:
+                        type: string
+                disclaimer:
+                    type: string
+        interview_prep.v1.UpdateAdminQuestionRequest:
+            type: object
+            properties:
+                taskId:
+                    type: string
+                questionId:
+                    type: string
+                question:
+                    $ref: '#/components/schemas/interview_prep.v1.AdminQuestionPayload'
+        interview_prep.v1.UpdateAdminTaskRequest:
+            type: object
+            properties:
+                taskId:
+                    type: string
+                task:
+                    $ref: '#/components/schemas/interview_prep.v1.AdminTaskPayload'
+        interview_prep.v1.UpdateMockCompanyPresetRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                item:
+                    $ref: '#/components/schemas/interview_prep.v1.MockCompanyPresetPayload'
+        interview_prep.v1.UpdateMockQuestionPoolRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                item:
+                    $ref: '#/components/schemas/interview_prep.v1.MockQuestionPoolPayload'
         podcast.v1.CompletePodcastUploadRequest:
             type: object
             properties:
@@ -2375,6 +3879,7 @@ tags:
     - name: CodeEditorService
     - name: EventService
     - name: GeoService
+    - name: InterviewPrepService
     - name: PodcastService
     - name: ProfileService
     - name: ReferralService

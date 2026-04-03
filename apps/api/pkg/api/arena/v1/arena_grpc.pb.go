@@ -19,12 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ArenaService_CreateMatch_FullMethodName    = "/arena.v1.ArenaService/CreateMatch"
-	ArenaService_GetMatch_FullMethodName       = "/arena.v1.ArenaService/GetMatch"
-	ArenaService_JoinMatch_FullMethodName      = "/arena.v1.ArenaService/JoinMatch"
-	ArenaService_SubmitCode_FullMethodName     = "/arena.v1.ArenaService/SubmitCode"
-	ArenaService_GetLeaderboard_FullMethodName = "/arena.v1.ArenaService/GetLeaderboard"
-	ArenaService_LeaveMatch_FullMethodName     = "/arena.v1.ArenaService/LeaveMatch"
+	ArenaService_CreateMatch_FullMethodName          = "/arena.v1.ArenaService/CreateMatch"
+	ArenaService_GetMatch_FullMethodName             = "/arena.v1.ArenaService/GetMatch"
+	ArenaService_JoinMatch_FullMethodName            = "/arena.v1.ArenaService/JoinMatch"
+	ArenaService_SubmitCode_FullMethodName           = "/arena.v1.ArenaService/SubmitCode"
+	ArenaService_GetLeaderboard_FullMethodName       = "/arena.v1.ArenaService/GetLeaderboard"
+	ArenaService_LeaveMatch_FullMethodName           = "/arena.v1.ArenaService/LeaveMatch"
+	ArenaService_JoinQueue_FullMethodName            = "/arena.v1.ArenaService/JoinQueue"
+	ArenaService_LeaveQueue_FullMethodName           = "/arena.v1.ArenaService/LeaveQueue"
+	ArenaService_GetQueueStatus_FullMethodName       = "/arena.v1.ArenaService/GetQueueStatus"
+	ArenaService_GetPlayerStats_FullMethodName       = "/arena.v1.ArenaService/GetPlayerStats"
+	ArenaService_GetPlayerStatsBatch_FullMethodName  = "/arena.v1.ArenaService/GetPlayerStatsBatch"
+	ArenaService_ReportAntiCheatEvent_FullMethodName = "/arena.v1.ArenaService/ReportAntiCheatEvent"
+	ArenaService_ListOpenMatches_FullMethodName      = "/arena.v1.ArenaService/ListOpenMatches"
 )
 
 // ArenaServiceClient is the client API for ArenaService service.
@@ -37,6 +44,13 @@ type ArenaServiceClient interface {
 	SubmitCode(ctx context.Context, in *SubmitCodeRequest, opts ...grpc.CallOption) (*SubmitCodeResponse, error)
 	GetLeaderboard(ctx context.Context, in *GetLeaderboardRequest, opts ...grpc.CallOption) (*GetLeaderboardResponse, error)
 	LeaveMatch(ctx context.Context, in *LeaveMatchRequest, opts ...grpc.CallOption) (*ArenaMatchResponse, error)
+	JoinQueue(ctx context.Context, in *JoinQueueRequest, opts ...grpc.CallOption) (*ArenaQueueStateResponse, error)
+	LeaveQueue(ctx context.Context, in *LeaveQueueRequest, opts ...grpc.CallOption) (*ArenaQueueStateResponse, error)
+	GetQueueStatus(ctx context.Context, in *GetQueueStatusRequest, opts ...grpc.CallOption) (*ArenaQueueStateResponse, error)
+	GetPlayerStats(ctx context.Context, in *GetPlayerStatsRequest, opts ...grpc.CallOption) (*ArenaPlayerStatsResponse, error)
+	GetPlayerStatsBatch(ctx context.Context, in *GetPlayerStatsBatchRequest, opts ...grpc.CallOption) (*ArenaPlayerStatsBatchResponse, error)
+	ReportAntiCheatEvent(ctx context.Context, in *ReportAntiCheatEventRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error)
+	ListOpenMatches(ctx context.Context, in *ListOpenMatchesRequest, opts ...grpc.CallOption) (*ListOpenMatchesResponse, error)
 }
 
 type arenaServiceClient struct {
@@ -107,6 +121,76 @@ func (c *arenaServiceClient) LeaveMatch(ctx context.Context, in *LeaveMatchReque
 	return out, nil
 }
 
+func (c *arenaServiceClient) JoinQueue(ctx context.Context, in *JoinQueueRequest, opts ...grpc.CallOption) (*ArenaQueueStateResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArenaQueueStateResponse)
+	err := c.cc.Invoke(ctx, ArenaService_JoinQueue_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) LeaveQueue(ctx context.Context, in *LeaveQueueRequest, opts ...grpc.CallOption) (*ArenaQueueStateResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArenaQueueStateResponse)
+	err := c.cc.Invoke(ctx, ArenaService_LeaveQueue_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) GetQueueStatus(ctx context.Context, in *GetQueueStatusRequest, opts ...grpc.CallOption) (*ArenaQueueStateResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArenaQueueStateResponse)
+	err := c.cc.Invoke(ctx, ArenaService_GetQueueStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) GetPlayerStats(ctx context.Context, in *GetPlayerStatsRequest, opts ...grpc.CallOption) (*ArenaPlayerStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArenaPlayerStatsResponse)
+	err := c.cc.Invoke(ctx, ArenaService_GetPlayerStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) GetPlayerStatsBatch(ctx context.Context, in *GetPlayerStatsBatchRequest, opts ...grpc.CallOption) (*ArenaPlayerStatsBatchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArenaPlayerStatsBatchResponse)
+	err := c.cc.Invoke(ctx, ArenaService_GetPlayerStatsBatch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) ReportAntiCheatEvent(ctx context.Context, in *ReportAntiCheatEventRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArenaStatusResponse)
+	err := c.cc.Invoke(ctx, ArenaService_ReportAntiCheatEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) ListOpenMatches(ctx context.Context, in *ListOpenMatchesRequest, opts ...grpc.CallOption) (*ListOpenMatchesResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListOpenMatchesResponse)
+	err := c.cc.Invoke(ctx, ArenaService_ListOpenMatches_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArenaServiceServer is the server API for ArenaService service.
 // All implementations must embed UnimplementedArenaServiceServer
 // for forward compatibility.
@@ -117,6 +201,13 @@ type ArenaServiceServer interface {
 	SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error)
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
 	LeaveMatch(context.Context, *LeaveMatchRequest) (*ArenaMatchResponse, error)
+	JoinQueue(context.Context, *JoinQueueRequest) (*ArenaQueueStateResponse, error)
+	LeaveQueue(context.Context, *LeaveQueueRequest) (*ArenaQueueStateResponse, error)
+	GetQueueStatus(context.Context, *GetQueueStatusRequest) (*ArenaQueueStateResponse, error)
+	GetPlayerStats(context.Context, *GetPlayerStatsRequest) (*ArenaPlayerStatsResponse, error)
+	GetPlayerStatsBatch(context.Context, *GetPlayerStatsBatchRequest) (*ArenaPlayerStatsBatchResponse, error)
+	ReportAntiCheatEvent(context.Context, *ReportAntiCheatEventRequest) (*ArenaStatusResponse, error)
+	ListOpenMatches(context.Context, *ListOpenMatchesRequest) (*ListOpenMatchesResponse, error)
 	mustEmbedUnimplementedArenaServiceServer()
 }
 
@@ -144,6 +235,27 @@ func (UnimplementedArenaServiceServer) GetLeaderboard(context.Context, *GetLeade
 }
 func (UnimplementedArenaServiceServer) LeaveMatch(context.Context, *LeaveMatchRequest) (*ArenaMatchResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method LeaveMatch not implemented")
+}
+func (UnimplementedArenaServiceServer) JoinQueue(context.Context, *JoinQueueRequest) (*ArenaQueueStateResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method JoinQueue not implemented")
+}
+func (UnimplementedArenaServiceServer) LeaveQueue(context.Context, *LeaveQueueRequest) (*ArenaQueueStateResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LeaveQueue not implemented")
+}
+func (UnimplementedArenaServiceServer) GetQueueStatus(context.Context, *GetQueueStatusRequest) (*ArenaQueueStateResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetQueueStatus not implemented")
+}
+func (UnimplementedArenaServiceServer) GetPlayerStats(context.Context, *GetPlayerStatsRequest) (*ArenaPlayerStatsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPlayerStats not implemented")
+}
+func (UnimplementedArenaServiceServer) GetPlayerStatsBatch(context.Context, *GetPlayerStatsBatchRequest) (*ArenaPlayerStatsBatchResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetPlayerStatsBatch not implemented")
+}
+func (UnimplementedArenaServiceServer) ReportAntiCheatEvent(context.Context, *ReportAntiCheatEventRequest) (*ArenaStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ReportAntiCheatEvent not implemented")
+}
+func (UnimplementedArenaServiceServer) ListOpenMatches(context.Context, *ListOpenMatchesRequest) (*ListOpenMatchesResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListOpenMatches not implemented")
 }
 func (UnimplementedArenaServiceServer) mustEmbedUnimplementedArenaServiceServer() {}
 func (UnimplementedArenaServiceServer) testEmbeddedByValue()                      {}
@@ -274,6 +386,132 @@ func _ArenaService_LeaveMatch_Handler(srv interface{}, ctx context.Context, dec 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArenaService_JoinQueue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(JoinQueueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).JoinQueue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_JoinQueue_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).JoinQueue(ctx, req.(*JoinQueueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_LeaveQueue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaveQueueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).LeaveQueue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_LeaveQueue_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).LeaveQueue(ctx, req.(*LeaveQueueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_GetQueueStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetQueueStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).GetQueueStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_GetQueueStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).GetQueueStatus(ctx, req.(*GetQueueStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_GetPlayerStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPlayerStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).GetPlayerStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_GetPlayerStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).GetPlayerStats(ctx, req.(*GetPlayerStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_GetPlayerStatsBatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetPlayerStatsBatchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).GetPlayerStatsBatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_GetPlayerStatsBatch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).GetPlayerStatsBatch(ctx, req.(*GetPlayerStatsBatchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_ReportAntiCheatEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ReportAntiCheatEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).ReportAntiCheatEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_ReportAntiCheatEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).ReportAntiCheatEvent(ctx, req.(*ReportAntiCheatEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_ListOpenMatches_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListOpenMatchesRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).ListOpenMatches(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_ListOpenMatches_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).ListOpenMatches(ctx, req.(*ListOpenMatchesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArenaService_ServiceDesc is the grpc.ServiceDesc for ArenaService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -304,6 +542,34 @@ var ArenaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LeaveMatch",
 			Handler:    _ArenaService_LeaveMatch_Handler,
+		},
+		{
+			MethodName: "JoinQueue",
+			Handler:    _ArenaService_JoinQueue_Handler,
+		},
+		{
+			MethodName: "LeaveQueue",
+			Handler:    _ArenaService_LeaveQueue_Handler,
+		},
+		{
+			MethodName: "GetQueueStatus",
+			Handler:    _ArenaService_GetQueueStatus_Handler,
+		},
+		{
+			MethodName: "GetPlayerStats",
+			Handler:    _ArenaService_GetPlayerStats_Handler,
+		},
+		{
+			MethodName: "GetPlayerStatsBatch",
+			Handler:    _ArenaService_GetPlayerStatsBatch_Handler,
+		},
+		{
+			MethodName: "ReportAntiCheatEvent",
+			Handler:    _ArenaService_ReportAntiCheatEvent_Handler,
+		},
+		{
+			MethodName: "ListOpenMatches",
+			Handler:    _ArenaService_ListOpenMatches_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

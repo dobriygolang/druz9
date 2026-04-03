@@ -1,0 +1,399 @@
+syntax = "proto3";
+
+package interview_prep.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "api/pkg/api/interview_prep/v1;v1";
+
+service InterviewPrepService {
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
+    option (google.api.http) = { get: "/api/v1/interview-prep/tasks" };
+  }
+  rpc StartSession(StartSessionRequest) returns (SessionEnvelope) {
+    option (google.api.http) = { post: "/api/v1/interview-prep/sessions" body: "*" };
+  }
+  rpc GetSession(GetSessionRequest) returns (SessionEnvelope) {
+    option (google.api.http) = { get: "/api/v1/interview-prep/sessions/{session_id}" };
+  }
+  rpc SubmitSession(SubmitSessionRequest) returns (SubmitSessionResponse) {
+    option (google.api.http) = { post: "/api/v1/interview-prep/sessions/{session_id}/submit" body: "*" };
+  }
+  rpc AnswerQuestion(AnswerQuestionRequest) returns (AnswerQuestionResponse) {
+    option (google.api.http) = { post: "/api/v1/interview-prep/sessions/{session_id}/questions/{question_id}/answer" body: "*" };
+  }
+  rpc ReviewSystemDesign(ReviewSystemDesignRequest) returns (ReviewSystemDesignResponse) {
+    option (google.api.http) = { post: "/api/v1/interview-prep/sessions/{session_id}/system-design-review" body: "*" };
+  }
+  rpc ListCompanies(ListCompaniesRequest) returns (ListCompaniesResponse) {
+    option (google.api.http) = { get: "/api/v1/interview-prep/companies" };
+  }
+  rpc StartMockSession(StartMockSessionRequest) returns (MockSessionEnvelope) {
+    option (google.api.http) = { post: "/api/v1/interview-prep/mock-sessions" body: "*" };
+  }
+  rpc GetMockSession(GetMockSessionRequest) returns (MockSessionEnvelope) {
+    option (google.api.http) = { get: "/api/v1/interview-prep/mock-sessions/{session_id}" };
+  }
+  rpc SubmitMockStage(SubmitMockStageRequest) returns (SubmitMockStageResponse) {
+    option (google.api.http) = { post: "/api/v1/interview-prep/mock-sessions/{session_id}/submit" body: "*" };
+  }
+  rpc ReviewMockSystemDesign(ReviewMockSystemDesignRequest) returns (ReviewMockSystemDesignResponse) {
+    option (google.api.http) = { post: "/api/v1/interview-prep/mock-sessions/{session_id}/system-design-review" body: "*" };
+  }
+  rpc AnswerMockQuestion(AnswerMockQuestionRequest) returns (AnswerMockQuestionResponse) {
+    option (google.api.http) = { post: "/api/v1/interview-prep/mock-sessions/{session_id}/questions/answer" body: "*" };
+  }
+
+  rpc ListAdminTasks(ListAdminTasksRequest) returns (ListAdminTasksResponse) {
+    option (google.api.http) = { get: "/api/admin/interview-prep/tasks" };
+  }
+  rpc CreateAdminTask(CreateAdminTaskRequest) returns (AdminTaskEnvelope) {
+    option (google.api.http) = { post: "/api/admin/interview-prep/tasks" body: "*" };
+  }
+  rpc GetAdminTask(GetAdminTaskRequest) returns (AdminTaskEnvelope) {
+    option (google.api.http) = { get: "/api/admin/interview-prep/tasks/{task_id}" };
+  }
+  rpc UpdateAdminTask(UpdateAdminTaskRequest) returns (AdminTaskEnvelope) {
+    option (google.api.http) = { put: "/api/admin/interview-prep/tasks/{task_id}" body: "*" };
+  }
+  rpc DeleteAdminTask(DeleteAdminTaskRequest) returns (StatusResponse) {
+    option (google.api.http) = { delete: "/api/admin/interview-prep/tasks/{task_id}" };
+  }
+  rpc ListAdminQuestions(ListAdminQuestionsRequest) returns (ListAdminQuestionsResponse) {
+    option (google.api.http) = { get: "/api/admin/interview-prep/tasks/{task_id}/questions" };
+  }
+  rpc CreateAdminQuestion(CreateAdminQuestionRequest) returns (AdminQuestionEnvelope) {
+    option (google.api.http) = { post: "/api/admin/interview-prep/tasks/{task_id}/questions" body: "*" };
+  }
+  rpc UpdateAdminQuestion(UpdateAdminQuestionRequest) returns (AdminQuestionEnvelope) {
+    option (google.api.http) = { put: "/api/admin/interview-prep/tasks/{task_id}/questions/{question_id}" body: "*" };
+  }
+  rpc DeleteAdminQuestion(DeleteAdminQuestionRequest) returns (StatusResponse) {
+    option (google.api.http) = { delete: "/api/admin/interview-prep/tasks/{task_id}/questions/{question_id}" };
+  }
+  rpc ListMockQuestionPools(ListMockQuestionPoolsRequest) returns (MockQuestionPoolListResponse) {
+    option (google.api.http) = { get: "/api/admin/interview-prep/mock-question-pools" };
+  }
+  rpc CreateMockQuestionPool(CreateMockQuestionPoolRequest) returns (MockQuestionPoolEnvelope) {
+    option (google.api.http) = { post: "/api/admin/interview-prep/mock-question-pools" body: "*" };
+  }
+  rpc UpdateMockQuestionPool(UpdateMockQuestionPoolRequest) returns (MockQuestionPoolEnvelope) {
+    option (google.api.http) = { put: "/api/admin/interview-prep/mock-question-pools/{id}" body: "*" };
+  }
+  rpc DeleteMockQuestionPool(DeleteMockQuestionPoolRequest) returns (StatusResponse) {
+    option (google.api.http) = { delete: "/api/admin/interview-prep/mock-question-pools/{id}" };
+  }
+  rpc ListMockCompanyPresets(ListMockCompanyPresetsRequest) returns (MockCompanyPresetListResponse) {
+    option (google.api.http) = { get: "/api/admin/interview-prep/mock-company-presets" };
+  }
+  rpc CreateMockCompanyPreset(CreateMockCompanyPresetRequest) returns (MockCompanyPresetEnvelope) {
+    option (google.api.http) = { post: "/api/admin/interview-prep/mock-company-presets" body: "*" };
+  }
+  rpc UpdateMockCompanyPreset(UpdateMockCompanyPresetRequest) returns (MockCompanyPresetEnvelope) {
+    option (google.api.http) = { put: "/api/admin/interview-prep/mock-company-presets/{id}" body: "*" };
+  }
+  rpc DeleteMockCompanyPreset(DeleteMockCompanyPresetRequest) returns (StatusResponse) {
+    option (google.api.http) = { delete: "/api/admin/interview-prep/mock-company-presets/{id}" };
+  }
+}
+
+message ListTasksRequest {}
+message StartSessionRequest { string task_id = 1; }
+message GetSessionRequest { string session_id = 1; }
+message SubmitSessionRequest { string session_id = 1; string code = 2; string language = 3; }
+message AnswerQuestionRequest { string session_id = 1; string question_id = 2; string self_assessment = 3; string answer = 4; }
+message ReviewSystemDesignRequest {
+  string session_id = 1;
+  bytes image = 2;
+  string image_name = 3;
+  string image_content_type = 4;
+  string notes = 5;
+  string components = 6;
+  string apis = 7;
+  string database_schema = 8;
+  string traffic = 9;
+  string reliability = 10;
+}
+message ListCompaniesRequest {}
+message StartMockSessionRequest { string company_tag = 1; }
+message GetMockSessionRequest { string session_id = 1; }
+message SubmitMockStageRequest { string session_id = 1; string code = 2; string language = 3; string notes = 4; }
+message ReviewMockSystemDesignRequest {
+  string session_id = 1;
+  bytes image = 2;
+  string image_name = 3;
+  string image_content_type = 4;
+  string notes = 5;
+  string components = 6;
+  string apis = 7;
+  string database_schema = 8;
+  string traffic = 9;
+  string reliability = 10;
+}
+message AnswerMockQuestionRequest { string session_id = 1; string answer = 2; }
+
+message ListAdminTasksRequest {}
+message GetAdminTaskRequest { string task_id = 1; }
+message DeleteAdminTaskRequest { string task_id = 1; }
+message ListAdminQuestionsRequest { string task_id = 1; }
+message DeleteAdminQuestionRequest { string task_id = 1; string question_id = 2; }
+message ListMockQuestionPoolsRequest {}
+message DeleteMockQuestionPoolRequest { string id = 1; }
+message ListMockCompanyPresetsRequest {}
+message DeleteMockCompanyPresetRequest { string id = 1; }
+
+message InterviewPrepTask {
+  string id = 1;
+  string slug = 2;
+  string title = 3;
+  string statement = 4;
+  string prep_type = 5;
+  string language = 6;
+  string company_tag = 7;
+  repeated string supported_languages = 8;
+  bool is_executable = 9;
+  string execution_profile = 10;
+  string runner_mode = 11;
+  int32 duration_seconds = 12;
+  string starter_code = 13;
+  string reference_solution = 14;
+  string code_task_id = 15;
+  bool is_active = 16;
+  string created_at = 17;
+  string updated_at = 18;
+}
+
+message InterviewPrepQuestion {
+  string id = 1;
+  string task_id = 2;
+  int32 position = 3;
+  string prompt = 4;
+  string answer = 5;
+  string created_at = 6;
+  string updated_at = 7;
+}
+
+message InterviewPrepQuestionResult {
+  string id = 1;
+  string session_id = 2;
+  string question_id = 3;
+  string self_assessment = 4;
+  string answered_at = 5;
+}
+
+message InterviewPrepSession {
+  string id = 1;
+  string user_id = 2;
+  string task_id = 3;
+  string status = 4;
+  int32 current_question_position = 5;
+  string solve_language = 6;
+  string code = 7;
+  bool last_submission_passed = 8;
+  string started_at = 9;
+  string finished_at = 10;
+  string created_at = 11;
+  string updated_at = 12;
+  InterviewPrepTask task = 13;
+  InterviewPrepQuestion current_question = 14;
+  repeated InterviewPrepQuestionResult results = 15;
+}
+
+message SystemDesignReview {
+  string provider = 1;
+  string model = 2;
+  int32 score = 3;
+  string summary = 4;
+  repeated string strengths = 5;
+  repeated string issues = 6;
+  repeated string missing_topics = 7;
+  repeated string follow_up_questions = 8;
+  string disclaimer = 9;
+}
+
+message InterviewSolutionReview {
+  string provider = 1;
+  string model = 2;
+  int32 score = 3;
+  string summary = 4;
+  repeated string strengths = 5;
+  repeated string issues = 6;
+  repeated string follow_up_questions = 7;
+}
+
+message InterviewAnswerReview {
+  string provider = 1;
+  string model = 2;
+  int32 score = 3;
+  string summary = 4;
+  repeated string gaps = 5;
+}
+
+message MockQuestionResult {
+  string id = 1;
+  string stage_id = 2;
+  int32 position = 3;
+  string question_key = 4;
+  string prompt = 5;
+  string reference_answer = 6;
+  int32 score = 7;
+  string summary = 8;
+  string answered_at = 9;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+message MockStage {
+  string id = 1;
+  string session_id = 2;
+  int32 stage_index = 3;
+  string kind = 4;
+  string status = 5;
+  string task_id = 6;
+  string solve_language = 7;
+  string code = 8;
+  bool last_submission_passed = 9;
+  int32 review_score = 10;
+  string review_summary = 11;
+  string started_at = 12;
+  string finished_at = 13;
+  string created_at = 14;
+  string updated_at = 15;
+  InterviewPrepTask task = 16;
+  repeated MockQuestionResult question_results = 17;
+  MockQuestionResult current_question = 18;
+}
+
+message MockSession {
+  string id = 1;
+  string user_id = 2;
+  string company_tag = 3;
+  string status = 4;
+  int32 current_stage_index = 5;
+  string started_at = 6;
+  string finished_at = 7;
+  string created_at = 8;
+  string updated_at = 9;
+  repeated MockStage stages = 10;
+  MockStage current_stage = 11;
+}
+
+message MockQuestionPoolItem {
+  string id = 1;
+  string topic = 2;
+  string company_tag = 3;
+  string question_key = 4;
+  string prompt = 5;
+  string reference_answer = 6;
+  int32 position = 7;
+  bool always_ask = 8;
+  bool is_active = 9;
+  string created_at = 10;
+  string updated_at = 11;
+}
+
+message MockCompanyPreset {
+  string id = 1;
+  string company_tag = 2;
+  string stage_kind = 3;
+  int32 position = 4;
+  string task_slug_pattern = 5;
+  string ai_model_override = 6;
+  bool is_active = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message SessionEnvelope { InterviewPrepSession session = 1; }
+message MockSessionEnvelope { MockSession session = 1; }
+message ListTasksResponse { repeated InterviewPrepTask tasks = 1; }
+message ListCompaniesResponse { repeated string companies = 1; }
+message SubmitSessionResult {
+  bool passed = 1;
+  string last_error = 2;
+  int32 passed_count = 3;
+  int32 total_count = 4;
+  int32 failed_test_index = 5;
+  string failure_kind = 6;
+  InterviewPrepSession session = 7;
+}
+message SubmitSessionResponse { SubmitSessionResult result = 1; }
+message AnswerQuestionResponse {
+  InterviewPrepSession session = 1;
+  InterviewPrepQuestion answered_question = 2;
+  InterviewAnswerReview review = 3;
+}
+message ReviewSystemDesignResponse { SystemDesignReview review = 1; }
+message SubmitMockStageResult {
+  bool passed = 1;
+  string last_error = 2;
+  int32 passed_count = 3;
+  int32 total_count = 4;
+  int32 failed_test_index = 5;
+  string failure_kind = 6;
+  InterviewSolutionReview review = 7;
+  MockSession session = 8;
+}
+message SubmitMockStageResponse { SubmitMockStageResult result = 1; }
+message ReviewMockSystemDesignResult { SystemDesignReview review = 1; MockSession session = 2; }
+message ReviewMockSystemDesignResponse { ReviewMockSystemDesignResult result = 1; }
+message AnswerMockQuestionResult { InterviewAnswerReview review = 1; MockSession session = 2; }
+message AnswerMockQuestionResponse { AnswerMockQuestionResult result = 1; }
+
+message AdminTaskPayload {
+  string slug = 1;
+  string title = 2;
+  string statement = 3;
+  string prep_type = 4;
+  string language = 5;
+  string company_tag = 6;
+  repeated string supported_languages = 7;
+  bool is_executable = 8;
+  string execution_profile = 9;
+  string runner_mode = 10;
+  int32 duration_seconds = 11;
+  string starter_code = 12;
+  string reference_solution = 13;
+  string code_task_id = 14;
+  bool is_active = 15;
+}
+message CreateAdminTaskRequest { AdminTaskPayload task = 1; }
+message UpdateAdminTaskRequest { string task_id = 1; AdminTaskPayload task = 2; }
+message ListAdminTasksResponse { repeated InterviewPrepTask tasks = 1; }
+message AdminTaskEnvelope { InterviewPrepTask task = 1; }
+
+message AdminQuestionPayload { int32 position = 1; string prompt = 2; string answer = 3; }
+message CreateAdminQuestionRequest { string task_id = 1; AdminQuestionPayload question = 2; }
+message UpdateAdminQuestionRequest { string task_id = 1; string question_id = 2; AdminQuestionPayload question = 3; }
+message ListAdminQuestionsResponse { repeated InterviewPrepQuestion questions = 1; }
+message AdminQuestionEnvelope { InterviewPrepQuestion question = 1; }
+
+message MockQuestionPoolPayload {
+  string topic = 1;
+  string company_tag = 2;
+  string question_key = 3;
+  string prompt = 4;
+  string reference_answer = 5;
+  int32 position = 6;
+  bool always_ask = 7;
+  bool is_active = 8;
+}
+message CreateMockQuestionPoolRequest { MockQuestionPoolPayload item = 1; }
+message UpdateMockQuestionPoolRequest { string id = 1; MockQuestionPoolPayload item = 2; }
+message MockQuestionPoolListResponse { repeated MockQuestionPoolItem items = 1; }
+message MockQuestionPoolEnvelope { MockQuestionPoolItem item = 1; }
+
+message MockCompanyPresetPayload {
+  string company_tag = 1;
+  string stage_kind = 2;
+  int32 position = 3;
+  string task_slug_pattern = 4;
+  string ai_model_override = 5;
+  bool is_active = 6;
+}
+message CreateMockCompanyPresetRequest { MockCompanyPresetPayload item = 1; }
+message UpdateMockCompanyPresetRequest { string id = 1; MockCompanyPresetPayload item = 2; }
+message MockCompanyPresetListResponse { repeated MockCompanyPreset items = 1; }
+message MockCompanyPresetEnvelope { MockCompanyPreset item = 1; }
+
+message StatusResponse { string status = 1; }

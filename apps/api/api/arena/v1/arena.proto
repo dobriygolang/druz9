@@ -47,6 +47,52 @@ service ArenaService {
       body: "*"
     };
   }
+
+  rpc JoinQueue(JoinQueueRequest) returns (ArenaQueueStateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/queue/join"
+      body: "*"
+    };
+  }
+
+  rpc LeaveQueue(LeaveQueueRequest) returns (ArenaQueueStateResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/queue/leave"
+      body: "*"
+    };
+  }
+
+  rpc GetQueueStatus(GetQueueStatusRequest) returns (ArenaQueueStateResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/arena/queue/status"
+    };
+  }
+
+  rpc GetPlayerStats(GetPlayerStatsRequest) returns (ArenaPlayerStatsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/arena/stats/{user_id}"
+    };
+  }
+
+  rpc GetPlayerStatsBatch(GetPlayerStatsBatchRequest) returns (ArenaPlayerStatsBatchResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/stats/batch"
+      body: "*"
+    };
+  }
+
+  rpc ReportAntiCheatEvent(ReportAntiCheatEventRequest) returns (ArenaStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/anti-cheat/event"
+      body: "*"
+    };
+  }
+
+  rpc ListOpenMatches(ListOpenMatchesRequest) returns (ListOpenMatchesResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/arena/open-matches"
+    };
+  }
 }
 
 message CreateMatchRequest {
@@ -110,6 +156,70 @@ message GetLeaderboardResponse {
 
 message LeaveMatchRequest {
   string match_id = 1;
+}
+
+message JoinQueueRequest {
+  string topic = 1;
+  string difficulty = 2;
+  bool obfuscate_opponent = 3;
+}
+
+message LeaveQueueRequest {}
+
+message GetQueueStatusRequest {}
+
+message ArenaQueueStateResponse {
+  string status = 1;
+  string topic = 2;
+  string difficulty = 3;
+  int32 queue_size = 4;
+  string queued_at = 5;
+  ArenaMatch match = 6;
+}
+
+message GetPlayerStatsRequest {
+  string user_id = 1;
+}
+
+message GetPlayerStatsBatchRequest {
+  repeated string user_ids = 1;
+}
+
+message ArenaPlayerStatsResponse {
+  ArenaPlayerStats stats = 1;
+}
+
+message ArenaPlayerStatsBatchResponse {
+  map<string, ArenaPlayerStats> stats = 1;
+}
+
+message ArenaPlayerStats {
+  string user_id = 1;
+  string display_name = 2;
+  int32 rating = 3;
+  string league = 4;
+  int32 wins = 5;
+  int32 losses = 6;
+  int32 matches = 7;
+  double win_rate = 8;
+  int64 best_runtime = 9;
+}
+
+message ReportAntiCheatEventRequest {
+  string match_id = 1;
+  string reason = 2;
+}
+
+message ArenaStatusResponse {
+  string status = 1;
+}
+
+message ListOpenMatchesRequest {
+  int32 limit = 1;
+}
+
+message ListOpenMatchesResponse {
+  repeated ArenaMatch matches = 1;
 }
 
 message ArenaMatch {

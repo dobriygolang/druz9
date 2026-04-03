@@ -851,6 +851,690 @@ func (x *LeaveMatchRequest) GetMatchId() string {
 	return ""
 }
 
+type JoinQueueRequest struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Topic             string                 `protobuf:"bytes,1,opt,name=topic,proto3" json:"topic,omitempty"`
+	Difficulty        string                 `protobuf:"bytes,2,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
+	ObfuscateOpponent bool                   `protobuf:"varint,3,opt,name=obfuscate_opponent,json=obfuscateOpponent,proto3" json:"obfuscate_opponent,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *JoinQueueRequest) Reset() {
+	*x = JoinQueueRequest{}
+	mi := &file_arena_v1_arena_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *JoinQueueRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*JoinQueueRequest) ProtoMessage() {}
+
+func (x *JoinQueueRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use JoinQueueRequest.ProtoReflect.Descriptor instead.
+func (*JoinQueueRequest) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *JoinQueueRequest) GetTopic() string {
+	if x != nil {
+		return x.Topic
+	}
+	return ""
+}
+
+func (x *JoinQueueRequest) GetDifficulty() string {
+	if x != nil {
+		return x.Difficulty
+	}
+	return ""
+}
+
+func (x *JoinQueueRequest) GetObfuscateOpponent() bool {
+	if x != nil {
+		return x.ObfuscateOpponent
+	}
+	return false
+}
+
+type LeaveQueueRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LeaveQueueRequest) Reset() {
+	*x = LeaveQueueRequest{}
+	mi := &file_arena_v1_arena_proto_msgTypes[10]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LeaveQueueRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LeaveQueueRequest) ProtoMessage() {}
+
+func (x *LeaveQueueRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[10]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LeaveQueueRequest.ProtoReflect.Descriptor instead.
+func (*LeaveQueueRequest) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{10}
+}
+
+type GetQueueStatusRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetQueueStatusRequest) Reset() {
+	*x = GetQueueStatusRequest{}
+	mi := &file_arena_v1_arena_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetQueueStatusRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetQueueStatusRequest) ProtoMessage() {}
+
+func (x *GetQueueStatusRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetQueueStatusRequest.ProtoReflect.Descriptor instead.
+func (*GetQueueStatusRequest) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{11}
+}
+
+type ArenaQueueStateResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Topic         string                 `protobuf:"bytes,2,opt,name=topic,proto3" json:"topic,omitempty"`
+	Difficulty    string                 `protobuf:"bytes,3,opt,name=difficulty,proto3" json:"difficulty,omitempty"`
+	QueueSize     int32                  `protobuf:"varint,4,opt,name=queue_size,json=queueSize,proto3" json:"queue_size,omitempty"`
+	QueuedAt      string                 `protobuf:"bytes,5,opt,name=queued_at,json=queuedAt,proto3" json:"queued_at,omitempty"`
+	Match         *ArenaMatch            `protobuf:"bytes,6,opt,name=match,proto3" json:"match,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ArenaQueueStateResponse) Reset() {
+	*x = ArenaQueueStateResponse{}
+	mi := &file_arena_v1_arena_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ArenaQueueStateResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ArenaQueueStateResponse) ProtoMessage() {}
+
+func (x *ArenaQueueStateResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ArenaQueueStateResponse.ProtoReflect.Descriptor instead.
+func (*ArenaQueueStateResponse) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *ArenaQueueStateResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *ArenaQueueStateResponse) GetTopic() string {
+	if x != nil {
+		return x.Topic
+	}
+	return ""
+}
+
+func (x *ArenaQueueStateResponse) GetDifficulty() string {
+	if x != nil {
+		return x.Difficulty
+	}
+	return ""
+}
+
+func (x *ArenaQueueStateResponse) GetQueueSize() int32 {
+	if x != nil {
+		return x.QueueSize
+	}
+	return 0
+}
+
+func (x *ArenaQueueStateResponse) GetQueuedAt() string {
+	if x != nil {
+		return x.QueuedAt
+	}
+	return ""
+}
+
+func (x *ArenaQueueStateResponse) GetMatch() *ArenaMatch {
+	if x != nil {
+		return x.Match
+	}
+	return nil
+}
+
+type GetPlayerStatsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPlayerStatsRequest) Reset() {
+	*x = GetPlayerStatsRequest{}
+	mi := &file_arena_v1_arena_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPlayerStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPlayerStatsRequest) ProtoMessage() {}
+
+func (x *GetPlayerStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPlayerStatsRequest.ProtoReflect.Descriptor instead.
+func (*GetPlayerStatsRequest) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *GetPlayerStatsRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type GetPlayerStatsBatchRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserIds       []string               `protobuf:"bytes,1,rep,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetPlayerStatsBatchRequest) Reset() {
+	*x = GetPlayerStatsBatchRequest{}
+	mi := &file_arena_v1_arena_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetPlayerStatsBatchRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetPlayerStatsBatchRequest) ProtoMessage() {}
+
+func (x *GetPlayerStatsBatchRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetPlayerStatsBatchRequest.ProtoReflect.Descriptor instead.
+func (*GetPlayerStatsBatchRequest) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *GetPlayerStatsBatchRequest) GetUserIds() []string {
+	if x != nil {
+		return x.UserIds
+	}
+	return nil
+}
+
+type ArenaPlayerStatsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Stats         *ArenaPlayerStats      `protobuf:"bytes,1,opt,name=stats,proto3" json:"stats,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ArenaPlayerStatsResponse) Reset() {
+	*x = ArenaPlayerStatsResponse{}
+	mi := &file_arena_v1_arena_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ArenaPlayerStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ArenaPlayerStatsResponse) ProtoMessage() {}
+
+func (x *ArenaPlayerStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ArenaPlayerStatsResponse.ProtoReflect.Descriptor instead.
+func (*ArenaPlayerStatsResponse) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *ArenaPlayerStatsResponse) GetStats() *ArenaPlayerStats {
+	if x != nil {
+		return x.Stats
+	}
+	return nil
+}
+
+type ArenaPlayerStatsBatchResponse struct {
+	state         protoimpl.MessageState       `protogen:"open.v1"`
+	Stats         map[string]*ArenaPlayerStats `protobuf:"bytes,1,rep,name=stats,proto3" json:"stats,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ArenaPlayerStatsBatchResponse) Reset() {
+	*x = ArenaPlayerStatsBatchResponse{}
+	mi := &file_arena_v1_arena_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ArenaPlayerStatsBatchResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ArenaPlayerStatsBatchResponse) ProtoMessage() {}
+
+func (x *ArenaPlayerStatsBatchResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ArenaPlayerStatsBatchResponse.ProtoReflect.Descriptor instead.
+func (*ArenaPlayerStatsBatchResponse) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *ArenaPlayerStatsBatchResponse) GetStats() map[string]*ArenaPlayerStats {
+	if x != nil {
+		return x.Stats
+	}
+	return nil
+}
+
+type ArenaPlayerStats struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	DisplayName   string                 `protobuf:"bytes,2,opt,name=display_name,json=displayName,proto3" json:"display_name,omitempty"`
+	Rating        int32                  `protobuf:"varint,3,opt,name=rating,proto3" json:"rating,omitempty"`
+	League        string                 `protobuf:"bytes,4,opt,name=league,proto3" json:"league,omitempty"`
+	Wins          int32                  `protobuf:"varint,5,opt,name=wins,proto3" json:"wins,omitempty"`
+	Losses        int32                  `protobuf:"varint,6,opt,name=losses,proto3" json:"losses,omitempty"`
+	Matches       int32                  `protobuf:"varint,7,opt,name=matches,proto3" json:"matches,omitempty"`
+	WinRate       float64                `protobuf:"fixed64,8,opt,name=win_rate,json=winRate,proto3" json:"win_rate,omitempty"`
+	BestRuntime   int64                  `protobuf:"varint,9,opt,name=best_runtime,json=bestRuntime,proto3" json:"best_runtime,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ArenaPlayerStats) Reset() {
+	*x = ArenaPlayerStats{}
+	mi := &file_arena_v1_arena_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ArenaPlayerStats) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ArenaPlayerStats) ProtoMessage() {}
+
+func (x *ArenaPlayerStats) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ArenaPlayerStats.ProtoReflect.Descriptor instead.
+func (*ArenaPlayerStats) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *ArenaPlayerStats) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *ArenaPlayerStats) GetDisplayName() string {
+	if x != nil {
+		return x.DisplayName
+	}
+	return ""
+}
+
+func (x *ArenaPlayerStats) GetRating() int32 {
+	if x != nil {
+		return x.Rating
+	}
+	return 0
+}
+
+func (x *ArenaPlayerStats) GetLeague() string {
+	if x != nil {
+		return x.League
+	}
+	return ""
+}
+
+func (x *ArenaPlayerStats) GetWins() int32 {
+	if x != nil {
+		return x.Wins
+	}
+	return 0
+}
+
+func (x *ArenaPlayerStats) GetLosses() int32 {
+	if x != nil {
+		return x.Losses
+	}
+	return 0
+}
+
+func (x *ArenaPlayerStats) GetMatches() int32 {
+	if x != nil {
+		return x.Matches
+	}
+	return 0
+}
+
+func (x *ArenaPlayerStats) GetWinRate() float64 {
+	if x != nil {
+		return x.WinRate
+	}
+	return 0
+}
+
+func (x *ArenaPlayerStats) GetBestRuntime() int64 {
+	if x != nil {
+		return x.BestRuntime
+	}
+	return 0
+}
+
+type ReportAntiCheatEventRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	MatchId       string                 `protobuf:"bytes,1,opt,name=match_id,json=matchId,proto3" json:"match_id,omitempty"`
+	Reason        string                 `protobuf:"bytes,2,opt,name=reason,proto3" json:"reason,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ReportAntiCheatEventRequest) Reset() {
+	*x = ReportAntiCheatEventRequest{}
+	mi := &file_arena_v1_arena_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ReportAntiCheatEventRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ReportAntiCheatEventRequest) ProtoMessage() {}
+
+func (x *ReportAntiCheatEventRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ReportAntiCheatEventRequest.ProtoReflect.Descriptor instead.
+func (*ReportAntiCheatEventRequest) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *ReportAntiCheatEventRequest) GetMatchId() string {
+	if x != nil {
+		return x.MatchId
+	}
+	return ""
+}
+
+func (x *ReportAntiCheatEventRequest) GetReason() string {
+	if x != nil {
+		return x.Reason
+	}
+	return ""
+}
+
+type ArenaStatusResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ArenaStatusResponse) Reset() {
+	*x = ArenaStatusResponse{}
+	mi := &file_arena_v1_arena_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ArenaStatusResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ArenaStatusResponse) ProtoMessage() {}
+
+func (x *ArenaStatusResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ArenaStatusResponse.ProtoReflect.Descriptor instead.
+func (*ArenaStatusResponse) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *ArenaStatusResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+type ListOpenMatchesRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Limit         int32                  `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListOpenMatchesRequest) Reset() {
+	*x = ListOpenMatchesRequest{}
+	mi := &file_arena_v1_arena_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListOpenMatchesRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListOpenMatchesRequest) ProtoMessage() {}
+
+func (x *ListOpenMatchesRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListOpenMatchesRequest.ProtoReflect.Descriptor instead.
+func (*ListOpenMatchesRequest) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *ListOpenMatchesRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+type ListOpenMatchesResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Matches       []*ArenaMatch          `protobuf:"bytes,1,rep,name=matches,proto3" json:"matches,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListOpenMatchesResponse) Reset() {
+	*x = ListOpenMatchesResponse{}
+	mi := &file_arena_v1_arena_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListOpenMatchesResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListOpenMatchesResponse) ProtoMessage() {}
+
+func (x *ListOpenMatchesResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_arena_v1_arena_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListOpenMatchesResponse.ProtoReflect.Descriptor instead.
+func (*ListOpenMatchesResponse) Descriptor() ([]byte, []int) {
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *ListOpenMatchesResponse) GetMatches() []*ArenaMatch {
+	if x != nil {
+		return x.Matches
+	}
+	return nil
+}
+
 type ArenaMatch struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Id                string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -878,7 +1562,7 @@ type ArenaMatch struct {
 
 func (x *ArenaMatch) Reset() {
 	*x = ArenaMatch{}
-	mi := &file_arena_v1_arena_proto_msgTypes[9]
+	mi := &file_arena_v1_arena_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -890,7 +1574,7 @@ func (x *ArenaMatch) String() string {
 func (*ArenaMatch) ProtoMessage() {}
 
 func (x *ArenaMatch) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[9]
+	mi := &file_arena_v1_arena_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -903,7 +1587,7 @@ func (x *ArenaMatch) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaMatch.ProtoReflect.Descriptor instead.
 func (*ArenaMatch) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{9}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ArenaMatch) GetId() string {
@@ -1059,7 +1743,7 @@ type ArenaPlayer struct {
 
 func (x *ArenaPlayer) Reset() {
 	*x = ArenaPlayer{}
-	mi := &file_arena_v1_arena_proto_msgTypes[10]
+	mi := &file_arena_v1_arena_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1071,7 +1755,7 @@ func (x *ArenaPlayer) String() string {
 func (*ArenaPlayer) ProtoMessage() {}
 
 func (x *ArenaPlayer) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[10]
+	mi := &file_arena_v1_arena_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1084,7 +1768,7 @@ func (x *ArenaPlayer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaPlayer.ProtoReflect.Descriptor instead.
 func (*ArenaPlayer) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{10}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ArenaPlayer) GetUserId() string {
@@ -1188,7 +1872,7 @@ type ArenaLeaderboardEntry struct {
 
 func (x *ArenaLeaderboardEntry) Reset() {
 	*x = ArenaLeaderboardEntry{}
-	mi := &file_arena_v1_arena_proto_msgTypes[11]
+	mi := &file_arena_v1_arena_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1200,7 +1884,7 @@ func (x *ArenaLeaderboardEntry) String() string {
 func (*ArenaLeaderboardEntry) ProtoMessage() {}
 
 func (x *ArenaLeaderboardEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_arena_v1_arena_proto_msgTypes[11]
+	mi := &file_arena_v1_arena_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1213,7 +1897,7 @@ func (x *ArenaLeaderboardEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ArenaLeaderboardEntry.ProtoReflect.Descriptor instead.
 func (*ArenaLeaderboardEntry) Descriptor() ([]byte, []int) {
-	return file_arena_v1_arena_proto_rawDescGZIP(), []int{11}
+	return file_arena_v1_arena_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ArenaLeaderboardEntry) GetUserId() string {
@@ -1319,7 +2003,56 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x16GetLeaderboardResponse\x129\n" +
 	"\aentries\x18\x01 \x03(\v2\x1f.arena.v1.ArenaLeaderboardEntryR\aentries\".\n" +
 	"\x11LeaveMatchRequest\x12\x19\n" +
-	"\bmatch_id\x18\x01 \x01(\tR\amatchId\"\xaf\x06\n" +
+	"\bmatch_id\x18\x01 \x01(\tR\amatchId\"w\n" +
+	"\x10JoinQueueRequest\x12\x14\n" +
+	"\x05topic\x18\x01 \x01(\tR\x05topic\x12\x1e\n" +
+	"\n" +
+	"difficulty\x18\x02 \x01(\tR\n" +
+	"difficulty\x12-\n" +
+	"\x12obfuscate_opponent\x18\x03 \x01(\bR\x11obfuscateOpponent\"\x13\n" +
+	"\x11LeaveQueueRequest\"\x17\n" +
+	"\x15GetQueueStatusRequest\"\xcf\x01\n" +
+	"\x17ArenaQueueStateResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\x12\x14\n" +
+	"\x05topic\x18\x02 \x01(\tR\x05topic\x12\x1e\n" +
+	"\n" +
+	"difficulty\x18\x03 \x01(\tR\n" +
+	"difficulty\x12\x1d\n" +
+	"\n" +
+	"queue_size\x18\x04 \x01(\x05R\tqueueSize\x12\x1b\n" +
+	"\tqueued_at\x18\x05 \x01(\tR\bqueuedAt\x12*\n" +
+	"\x05match\x18\x06 \x01(\v2\x14.arena.v1.ArenaMatchR\x05match\"0\n" +
+	"\x15GetPlayerStatsRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"7\n" +
+	"\x1aGetPlayerStatsBatchRequest\x12\x19\n" +
+	"\buser_ids\x18\x01 \x03(\tR\auserIds\"L\n" +
+	"\x18ArenaPlayerStatsResponse\x120\n" +
+	"\x05stats\x18\x01 \x01(\v2\x1a.arena.v1.ArenaPlayerStatsR\x05stats\"\xbf\x01\n" +
+	"\x1dArenaPlayerStatsBatchResponse\x12H\n" +
+	"\x05stats\x18\x01 \x03(\v22.arena.v1.ArenaPlayerStatsBatchResponse.StatsEntryR\x05stats\x1aT\n" +
+	"\n" +
+	"StatsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x120\n" +
+	"\x05value\x18\x02 \x01(\v2\x1a.arena.v1.ArenaPlayerStatsR\x05value:\x028\x01\"\x82\x02\n" +
+	"\x10ArenaPlayerStats\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
+	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x16\n" +
+	"\x06rating\x18\x03 \x01(\x05R\x06rating\x12\x16\n" +
+	"\x06league\x18\x04 \x01(\tR\x06league\x12\x12\n" +
+	"\x04wins\x18\x05 \x01(\x05R\x04wins\x12\x16\n" +
+	"\x06losses\x18\x06 \x01(\x05R\x06losses\x12\x18\n" +
+	"\amatches\x18\a \x01(\x05R\amatches\x12\x19\n" +
+	"\bwin_rate\x18\b \x01(\x01R\awinRate\x12!\n" +
+	"\fbest_runtime\x18\t \x01(\x03R\vbestRuntime\"P\n" +
+	"\x1bReportAntiCheatEventRequest\x12\x19\n" +
+	"\bmatch_id\x18\x01 \x01(\tR\amatchId\x12\x16\n" +
+	"\x06reason\x18\x02 \x01(\tR\x06reason\"-\n" +
+	"\x13ArenaStatusResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\".\n" +
+	"\x16ListOpenMatchesRequest\x12\x14\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\"I\n" +
+	"\x17ListOpenMatchesResponse\x12.\n" +
+	"\amatches\x18\x01 \x03(\v2\x14.arena.v1.ArenaMatchR\amatches\"\xaf\x06\n" +
 	"\n" +
 	"ArenaMatch\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
@@ -1412,7 +2145,7 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x1eARENA_MATCH_STATUS_UNSPECIFIED\x10\x00\x12\x1e\n" +
 	"\x1aARENA_MATCH_STATUS_WAITING\x10\x01\x12\x1d\n" +
 	"\x19ARENA_MATCH_STATUS_ACTIVE\x10\x02\x12\x1f\n" +
-	"\x1bARENA_MATCH_STATUS_FINISHED\x10\x032\xd4\x05\n" +
+	"\x1bARENA_MATCH_STATUS_FINISHED\x10\x032\xc4\f\n" +
 	"\fArenaService\x12k\n" +
 	"\vCreateMatch\x12\x1c.arena.v1.CreateMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/arena/matches\x12m\n" +
 	"\bGetMatch\x12\x19.arena.v1.GetMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\"(\x82\xd3\xe4\x93\x02\"\x12 /api/v1/arena/matches/{match_id}\x12w\n" +
@@ -1421,7 +2154,15 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"SubmitCode\x12\x1b.arena.v1.SubmitCodeRequest\x1a\x1c.arena.v1.SubmitCodeResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/arena/matches/{match_id}/submit\x12v\n" +
 	"\x0eGetLeaderboard\x12\x1f.arena.v1.GetLeaderboardRequest\x1a .arena.v1.GetLeaderboardResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/arena/leaderboard\x12z\n" +
 	"\n" +
-	"LeaveMatch\x12\x1b.arena.v1.LeaveMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/api/v1/arena/matches/{match_id}/leaveB\x19Z\x17api/pkg/api/arena/v1;v1b\x06proto3"
+	"LeaveMatch\x12\x1b.arena.v1.LeaveMatchRequest\x1a\x1c.arena.v1.ArenaMatchResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/api/v1/arena/matches/{match_id}/leave\x12o\n" +
+	"\tJoinQueue\x12\x1a.arena.v1.JoinQueueRequest\x1a!.arena.v1.ArenaQueueStateResponse\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/v1/arena/queue/join\x12r\n" +
+	"\n" +
+	"LeaveQueue\x12\x1b.arena.v1.LeaveQueueRequest\x1a!.arena.v1.ArenaQueueStateResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/arena/queue/leave\x12x\n" +
+	"\x0eGetQueueStatus\x12\x1f.arena.v1.GetQueueStatusRequest\x1a!.arena.v1.ArenaQueueStateResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/arena/queue/status\x12|\n" +
+	"\x0eGetPlayerStats\x12\x1f.arena.v1.GetPlayerStatsRequest\x1a\".arena.v1.ArenaPlayerStatsResponse\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/v1/arena/stats/{user_id}\x12\x8a\x01\n" +
+	"\x13GetPlayerStatsBatch\x12$.arena.v1.GetPlayerStatsBatchRequest\x1a'.arena.v1.ArenaPlayerStatsBatchResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/arena/stats/batch\x12\x87\x01\n" +
+	"\x14ReportAntiCheatEvent\x12%.arena.v1.ReportAntiCheatEventRequest\x1a\x1d.arena.v1.ArenaStatusResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/arena/anti-cheat/event\x12z\n" +
+	"\x0fListOpenMatches\x12 .arena.v1.ListOpenMatchesRequest\x1a!.arena.v1.ListOpenMatchesResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/v1/arena/open-matchesB\x19Z\x17api/pkg/api/arena/v1;v1b\x06proto3"
 
 var (
 	file_arena_v1_arena_proto_rawDescOnce sync.Once
@@ -1436,64 +2177,97 @@ func file_arena_v1_arena_proto_rawDescGZIP() []byte {
 }
 
 var file_arena_v1_arena_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_arena_v1_arena_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_arena_v1_arena_proto_msgTypes = make([]protoimpl.MessageInfo, 26)
 var file_arena_v1_arena_proto_goTypes = []any{
-	(Difficulty)(0),                // 0: arena.v1.Difficulty
-	(SubmitFailureKind)(0),         // 1: arena.v1.SubmitFailureKind
-	(WinnerReason)(0),              // 2: arena.v1.WinnerReason
-	(ArenaPlayerSide)(0),           // 3: arena.v1.ArenaPlayerSide
-	(ArenaLeague)(0),               // 4: arena.v1.ArenaLeague
-	(ArenaMatchStatus)(0),          // 5: arena.v1.ArenaMatchStatus
-	(*CreateMatchRequest)(nil),     // 6: arena.v1.CreateMatchRequest
-	(*GetMatchRequest)(nil),        // 7: arena.v1.GetMatchRequest
-	(*JoinMatchRequest)(nil),       // 8: arena.v1.JoinMatchRequest
-	(*SubmitCodeRequest)(nil),      // 9: arena.v1.SubmitCodeRequest
-	(*SubmitCodeResponse)(nil),     // 10: arena.v1.SubmitCodeResponse
-	(*ArenaMatchResponse)(nil),     // 11: arena.v1.ArenaMatchResponse
-	(*GetLeaderboardRequest)(nil),  // 12: arena.v1.GetLeaderboardRequest
-	(*GetLeaderboardResponse)(nil), // 13: arena.v1.GetLeaderboardResponse
-	(*LeaveMatchRequest)(nil),      // 14: arena.v1.LeaveMatchRequest
-	(*ArenaMatch)(nil),             // 15: arena.v1.ArenaMatch
-	(*ArenaPlayer)(nil),            // 16: arena.v1.ArenaPlayer
-	(*ArenaLeaderboardEntry)(nil),  // 17: arena.v1.ArenaLeaderboardEntry
-	(*timestamppb.Timestamp)(nil),  // 18: google.protobuf.Timestamp
+	(Difficulty)(0),                       // 0: arena.v1.Difficulty
+	(SubmitFailureKind)(0),                // 1: arena.v1.SubmitFailureKind
+	(WinnerReason)(0),                     // 2: arena.v1.WinnerReason
+	(ArenaPlayerSide)(0),                  // 3: arena.v1.ArenaPlayerSide
+	(ArenaLeague)(0),                      // 4: arena.v1.ArenaLeague
+	(ArenaMatchStatus)(0),                 // 5: arena.v1.ArenaMatchStatus
+	(*CreateMatchRequest)(nil),            // 6: arena.v1.CreateMatchRequest
+	(*GetMatchRequest)(nil),               // 7: arena.v1.GetMatchRequest
+	(*JoinMatchRequest)(nil),              // 8: arena.v1.JoinMatchRequest
+	(*SubmitCodeRequest)(nil),             // 9: arena.v1.SubmitCodeRequest
+	(*SubmitCodeResponse)(nil),            // 10: arena.v1.SubmitCodeResponse
+	(*ArenaMatchResponse)(nil),            // 11: arena.v1.ArenaMatchResponse
+	(*GetLeaderboardRequest)(nil),         // 12: arena.v1.GetLeaderboardRequest
+	(*GetLeaderboardResponse)(nil),        // 13: arena.v1.GetLeaderboardResponse
+	(*LeaveMatchRequest)(nil),             // 14: arena.v1.LeaveMatchRequest
+	(*JoinQueueRequest)(nil),              // 15: arena.v1.JoinQueueRequest
+	(*LeaveQueueRequest)(nil),             // 16: arena.v1.LeaveQueueRequest
+	(*GetQueueStatusRequest)(nil),         // 17: arena.v1.GetQueueStatusRequest
+	(*ArenaQueueStateResponse)(nil),       // 18: arena.v1.ArenaQueueStateResponse
+	(*GetPlayerStatsRequest)(nil),         // 19: arena.v1.GetPlayerStatsRequest
+	(*GetPlayerStatsBatchRequest)(nil),    // 20: arena.v1.GetPlayerStatsBatchRequest
+	(*ArenaPlayerStatsResponse)(nil),      // 21: arena.v1.ArenaPlayerStatsResponse
+	(*ArenaPlayerStatsBatchResponse)(nil), // 22: arena.v1.ArenaPlayerStatsBatchResponse
+	(*ArenaPlayerStats)(nil),              // 23: arena.v1.ArenaPlayerStats
+	(*ReportAntiCheatEventRequest)(nil),   // 24: arena.v1.ReportAntiCheatEventRequest
+	(*ArenaStatusResponse)(nil),           // 25: arena.v1.ArenaStatusResponse
+	(*ListOpenMatchesRequest)(nil),        // 26: arena.v1.ListOpenMatchesRequest
+	(*ListOpenMatchesResponse)(nil),       // 27: arena.v1.ListOpenMatchesResponse
+	(*ArenaMatch)(nil),                    // 28: arena.v1.ArenaMatch
+	(*ArenaPlayer)(nil),                   // 29: arena.v1.ArenaPlayer
+	(*ArenaLeaderboardEntry)(nil),         // 30: arena.v1.ArenaLeaderboardEntry
+	nil,                                   // 31: arena.v1.ArenaPlayerStatsBatchResponse.StatsEntry
+	(*timestamppb.Timestamp)(nil),         // 32: google.protobuf.Timestamp
 }
 var file_arena_v1_arena_proto_depIdxs = []int32{
 	0,  // 0: arena.v1.CreateMatchRequest.difficulty:type_name -> arena.v1.Difficulty
-	18, // 1: arena.v1.SubmitCodeResponse.freeze_until:type_name -> google.protobuf.Timestamp
-	15, // 2: arena.v1.SubmitCodeResponse.match:type_name -> arena.v1.ArenaMatch
+	32, // 1: arena.v1.SubmitCodeResponse.freeze_until:type_name -> google.protobuf.Timestamp
+	28, // 2: arena.v1.SubmitCodeResponse.match:type_name -> arena.v1.ArenaMatch
 	1,  // 3: arena.v1.SubmitCodeResponse.failure_kind:type_name -> arena.v1.SubmitFailureKind
-	15, // 4: arena.v1.ArenaMatchResponse.match:type_name -> arena.v1.ArenaMatch
-	17, // 5: arena.v1.GetLeaderboardResponse.entries:type_name -> arena.v1.ArenaLeaderboardEntry
-	0,  // 6: arena.v1.ArenaMatch.difficulty:type_name -> arena.v1.Difficulty
-	5,  // 7: arena.v1.ArenaMatch.status:type_name -> arena.v1.ArenaMatchStatus
-	2,  // 8: arena.v1.ArenaMatch.winner_reason:type_name -> arena.v1.WinnerReason
-	18, // 9: arena.v1.ArenaMatch.started_at:type_name -> google.protobuf.Timestamp
-	18, // 10: arena.v1.ArenaMatch.finished_at:type_name -> google.protobuf.Timestamp
-	18, // 11: arena.v1.ArenaMatch.created_at:type_name -> google.protobuf.Timestamp
-	16, // 12: arena.v1.ArenaMatch.players:type_name -> arena.v1.ArenaPlayer
-	3,  // 13: arena.v1.ArenaPlayer.side:type_name -> arena.v1.ArenaPlayerSide
-	18, // 14: arena.v1.ArenaPlayer.freeze_until:type_name -> google.protobuf.Timestamp
-	18, // 15: arena.v1.ArenaPlayer.accepted_at:type_name -> google.protobuf.Timestamp
-	18, // 16: arena.v1.ArenaPlayer.joined_at:type_name -> google.protobuf.Timestamp
-	4,  // 17: arena.v1.ArenaLeaderboardEntry.league:type_name -> arena.v1.ArenaLeague
-	6,  // 18: arena.v1.ArenaService.CreateMatch:input_type -> arena.v1.CreateMatchRequest
-	7,  // 19: arena.v1.ArenaService.GetMatch:input_type -> arena.v1.GetMatchRequest
-	8,  // 20: arena.v1.ArenaService.JoinMatch:input_type -> arena.v1.JoinMatchRequest
-	9,  // 21: arena.v1.ArenaService.SubmitCode:input_type -> arena.v1.SubmitCodeRequest
-	12, // 22: arena.v1.ArenaService.GetLeaderboard:input_type -> arena.v1.GetLeaderboardRequest
-	14, // 23: arena.v1.ArenaService.LeaveMatch:input_type -> arena.v1.LeaveMatchRequest
-	11, // 24: arena.v1.ArenaService.CreateMatch:output_type -> arena.v1.ArenaMatchResponse
-	11, // 25: arena.v1.ArenaService.GetMatch:output_type -> arena.v1.ArenaMatchResponse
-	11, // 26: arena.v1.ArenaService.JoinMatch:output_type -> arena.v1.ArenaMatchResponse
-	10, // 27: arena.v1.ArenaService.SubmitCode:output_type -> arena.v1.SubmitCodeResponse
-	13, // 28: arena.v1.ArenaService.GetLeaderboard:output_type -> arena.v1.GetLeaderboardResponse
-	11, // 29: arena.v1.ArenaService.LeaveMatch:output_type -> arena.v1.ArenaMatchResponse
-	24, // [24:30] is the sub-list for method output_type
-	18, // [18:24] is the sub-list for method input_type
-	18, // [18:18] is the sub-list for extension type_name
-	18, // [18:18] is the sub-list for extension extendee
-	0,  // [0:18] is the sub-list for field type_name
+	28, // 4: arena.v1.ArenaMatchResponse.match:type_name -> arena.v1.ArenaMatch
+	30, // 5: arena.v1.GetLeaderboardResponse.entries:type_name -> arena.v1.ArenaLeaderboardEntry
+	28, // 6: arena.v1.ArenaQueueStateResponse.match:type_name -> arena.v1.ArenaMatch
+	23, // 7: arena.v1.ArenaPlayerStatsResponse.stats:type_name -> arena.v1.ArenaPlayerStats
+	31, // 8: arena.v1.ArenaPlayerStatsBatchResponse.stats:type_name -> arena.v1.ArenaPlayerStatsBatchResponse.StatsEntry
+	28, // 9: arena.v1.ListOpenMatchesResponse.matches:type_name -> arena.v1.ArenaMatch
+	0,  // 10: arena.v1.ArenaMatch.difficulty:type_name -> arena.v1.Difficulty
+	5,  // 11: arena.v1.ArenaMatch.status:type_name -> arena.v1.ArenaMatchStatus
+	2,  // 12: arena.v1.ArenaMatch.winner_reason:type_name -> arena.v1.WinnerReason
+	32, // 13: arena.v1.ArenaMatch.started_at:type_name -> google.protobuf.Timestamp
+	32, // 14: arena.v1.ArenaMatch.finished_at:type_name -> google.protobuf.Timestamp
+	32, // 15: arena.v1.ArenaMatch.created_at:type_name -> google.protobuf.Timestamp
+	29, // 16: arena.v1.ArenaMatch.players:type_name -> arena.v1.ArenaPlayer
+	3,  // 17: arena.v1.ArenaPlayer.side:type_name -> arena.v1.ArenaPlayerSide
+	32, // 18: arena.v1.ArenaPlayer.freeze_until:type_name -> google.protobuf.Timestamp
+	32, // 19: arena.v1.ArenaPlayer.accepted_at:type_name -> google.protobuf.Timestamp
+	32, // 20: arena.v1.ArenaPlayer.joined_at:type_name -> google.protobuf.Timestamp
+	4,  // 21: arena.v1.ArenaLeaderboardEntry.league:type_name -> arena.v1.ArenaLeague
+	23, // 22: arena.v1.ArenaPlayerStatsBatchResponse.StatsEntry.value:type_name -> arena.v1.ArenaPlayerStats
+	6,  // 23: arena.v1.ArenaService.CreateMatch:input_type -> arena.v1.CreateMatchRequest
+	7,  // 24: arena.v1.ArenaService.GetMatch:input_type -> arena.v1.GetMatchRequest
+	8,  // 25: arena.v1.ArenaService.JoinMatch:input_type -> arena.v1.JoinMatchRequest
+	9,  // 26: arena.v1.ArenaService.SubmitCode:input_type -> arena.v1.SubmitCodeRequest
+	12, // 27: arena.v1.ArenaService.GetLeaderboard:input_type -> arena.v1.GetLeaderboardRequest
+	14, // 28: arena.v1.ArenaService.LeaveMatch:input_type -> arena.v1.LeaveMatchRequest
+	15, // 29: arena.v1.ArenaService.JoinQueue:input_type -> arena.v1.JoinQueueRequest
+	16, // 30: arena.v1.ArenaService.LeaveQueue:input_type -> arena.v1.LeaveQueueRequest
+	17, // 31: arena.v1.ArenaService.GetQueueStatus:input_type -> arena.v1.GetQueueStatusRequest
+	19, // 32: arena.v1.ArenaService.GetPlayerStats:input_type -> arena.v1.GetPlayerStatsRequest
+	20, // 33: arena.v1.ArenaService.GetPlayerStatsBatch:input_type -> arena.v1.GetPlayerStatsBatchRequest
+	24, // 34: arena.v1.ArenaService.ReportAntiCheatEvent:input_type -> arena.v1.ReportAntiCheatEventRequest
+	26, // 35: arena.v1.ArenaService.ListOpenMatches:input_type -> arena.v1.ListOpenMatchesRequest
+	11, // 36: arena.v1.ArenaService.CreateMatch:output_type -> arena.v1.ArenaMatchResponse
+	11, // 37: arena.v1.ArenaService.GetMatch:output_type -> arena.v1.ArenaMatchResponse
+	11, // 38: arena.v1.ArenaService.JoinMatch:output_type -> arena.v1.ArenaMatchResponse
+	10, // 39: arena.v1.ArenaService.SubmitCode:output_type -> arena.v1.SubmitCodeResponse
+	13, // 40: arena.v1.ArenaService.GetLeaderboard:output_type -> arena.v1.GetLeaderboardResponse
+	11, // 41: arena.v1.ArenaService.LeaveMatch:output_type -> arena.v1.ArenaMatchResponse
+	18, // 42: arena.v1.ArenaService.JoinQueue:output_type -> arena.v1.ArenaQueueStateResponse
+	18, // 43: arena.v1.ArenaService.LeaveQueue:output_type -> arena.v1.ArenaQueueStateResponse
+	18, // 44: arena.v1.ArenaService.GetQueueStatus:output_type -> arena.v1.ArenaQueueStateResponse
+	21, // 45: arena.v1.ArenaService.GetPlayerStats:output_type -> arena.v1.ArenaPlayerStatsResponse
+	22, // 46: arena.v1.ArenaService.GetPlayerStatsBatch:output_type -> arena.v1.ArenaPlayerStatsBatchResponse
+	25, // 47: arena.v1.ArenaService.ReportAntiCheatEvent:output_type -> arena.v1.ArenaStatusResponse
+	27, // 48: arena.v1.ArenaService.ListOpenMatches:output_type -> arena.v1.ListOpenMatchesResponse
+	36, // [36:49] is the sub-list for method output_type
+	23, // [23:36] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_arena_v1_arena_proto_init() }
@@ -1507,7 +2281,7 @@ func file_arena_v1_arena_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_arena_v1_arena_proto_rawDesc), len(file_arena_v1_arena_proto_rawDesc)),
 			NumEnums:      6,
-			NumMessages:   12,
+			NumMessages:   26,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

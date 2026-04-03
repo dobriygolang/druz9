@@ -7,6 +7,7 @@ import (
 	codeeditorservice "api/internal/api/code_editor"
 	eventservice "api/internal/api/event"
 	geoservice "api/internal/api/geo"
+	interviewprepservice "api/internal/api/interview_prep"
 	podcastservice "api/internal/api/podcast"
 	profileservice "api/internal/api/profile"
 	referralservice "api/internal/api/referral"
@@ -45,6 +46,7 @@ type serviceContext struct {
 	referralService         *referralservice.Implementation
 	codeEditorService       *codeeditorservice.Implementation
 	arenaService            *arenaservice.Implementation
+	interviewPrepService    *interviewprepservice.Implementation
 }
 
 func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*serviceContext, error) {
@@ -143,5 +145,6 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		arenaService: arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
 		}),
+		interviewPrepService: interviewprepservice.New(interviewPrepDomain, storage.interviewRepo),
 	}, nil
 }

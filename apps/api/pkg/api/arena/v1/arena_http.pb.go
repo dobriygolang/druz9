@@ -22,16 +22,30 @@ const _ = http.SupportPackageIsVersion1
 const OperationArenaServiceCreateMatch = "/arena.v1.ArenaService/CreateMatch"
 const OperationArenaServiceGetLeaderboard = "/arena.v1.ArenaService/GetLeaderboard"
 const OperationArenaServiceGetMatch = "/arena.v1.ArenaService/GetMatch"
+const OperationArenaServiceGetPlayerStats = "/arena.v1.ArenaService/GetPlayerStats"
+const OperationArenaServiceGetPlayerStatsBatch = "/arena.v1.ArenaService/GetPlayerStatsBatch"
+const OperationArenaServiceGetQueueStatus = "/arena.v1.ArenaService/GetQueueStatus"
 const OperationArenaServiceJoinMatch = "/arena.v1.ArenaService/JoinMatch"
+const OperationArenaServiceJoinQueue = "/arena.v1.ArenaService/JoinQueue"
 const OperationArenaServiceLeaveMatch = "/arena.v1.ArenaService/LeaveMatch"
+const OperationArenaServiceLeaveQueue = "/arena.v1.ArenaService/LeaveQueue"
+const OperationArenaServiceListOpenMatches = "/arena.v1.ArenaService/ListOpenMatches"
+const OperationArenaServiceReportAntiCheatEvent = "/arena.v1.ArenaService/ReportAntiCheatEvent"
 const OperationArenaServiceSubmitCode = "/arena.v1.ArenaService/SubmitCode"
 
 type ArenaServiceHTTPServer interface {
 	CreateMatch(context.Context, *CreateMatchRequest) (*ArenaMatchResponse, error)
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
 	GetMatch(context.Context, *GetMatchRequest) (*ArenaMatchResponse, error)
+	GetPlayerStats(context.Context, *GetPlayerStatsRequest) (*ArenaPlayerStatsResponse, error)
+	GetPlayerStatsBatch(context.Context, *GetPlayerStatsBatchRequest) (*ArenaPlayerStatsBatchResponse, error)
+	GetQueueStatus(context.Context, *GetQueueStatusRequest) (*ArenaQueueStateResponse, error)
 	JoinMatch(context.Context, *JoinMatchRequest) (*ArenaMatchResponse, error)
+	JoinQueue(context.Context, *JoinQueueRequest) (*ArenaQueueStateResponse, error)
 	LeaveMatch(context.Context, *LeaveMatchRequest) (*ArenaMatchResponse, error)
+	LeaveQueue(context.Context, *LeaveQueueRequest) (*ArenaQueueStateResponse, error)
+	ListOpenMatches(context.Context, *ListOpenMatchesRequest) (*ListOpenMatchesResponse, error)
+	ReportAntiCheatEvent(context.Context, *ReportAntiCheatEventRequest) (*ArenaStatusResponse, error)
 	SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error)
 }
 
@@ -43,6 +57,13 @@ func RegisterArenaServiceHTTPServer(s *http.Server, srv ArenaServiceHTTPServer) 
 	r.POST("/api/v1/arena/matches/{match_id}/submit", _ArenaService_SubmitCode1_HTTP_Handler(srv))
 	r.GET("/api/v1/arena/leaderboard", _ArenaService_GetLeaderboard1_HTTP_Handler(srv))
 	r.POST("/api/v1/arena/matches/{match_id}/leave", _ArenaService_LeaveMatch0_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/queue/join", _ArenaService_JoinQueue0_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/queue/leave", _ArenaService_LeaveQueue0_HTTP_Handler(srv))
+	r.GET("/api/v1/arena/queue/status", _ArenaService_GetQueueStatus0_HTTP_Handler(srv))
+	r.GET("/api/v1/arena/stats/{user_id}", _ArenaService_GetPlayerStats0_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/stats/batch", _ArenaService_GetPlayerStatsBatch0_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/anti-cheat/event", _ArenaService_ReportAntiCheatEvent0_HTTP_Handler(srv))
+	r.GET("/api/v1/arena/open-matches", _ArenaService_ListOpenMatches0_HTTP_Handler(srv))
 }
 
 func _ArenaService_CreateMatch0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
@@ -183,12 +204,167 @@ func _ArenaService_LeaveMatch0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx
 	}
 }
 
+func _ArenaService_JoinQueue0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in JoinQueueRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceJoinQueue)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.JoinQueue(ctx, req.(*JoinQueueRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ArenaQueueStateResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_LeaveQueue0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LeaveQueueRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceLeaveQueue)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.LeaveQueue(ctx, req.(*LeaveQueueRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ArenaQueueStateResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_GetQueueStatus0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetQueueStatusRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceGetQueueStatus)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetQueueStatus(ctx, req.(*GetQueueStatusRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ArenaQueueStateResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_GetPlayerStats0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetPlayerStatsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceGetPlayerStats)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetPlayerStats(ctx, req.(*GetPlayerStatsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ArenaPlayerStatsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_GetPlayerStatsBatch0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetPlayerStatsBatchRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceGetPlayerStatsBatch)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetPlayerStatsBatch(ctx, req.(*GetPlayerStatsBatchRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ArenaPlayerStatsBatchResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_ReportAntiCheatEvent0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ReportAntiCheatEventRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceReportAntiCheatEvent)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ReportAntiCheatEvent(ctx, req.(*ReportAntiCheatEventRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ArenaStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_ListOpenMatches0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListOpenMatchesRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceListOpenMatches)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListOpenMatches(ctx, req.(*ListOpenMatchesRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListOpenMatchesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ArenaServiceHTTPClient interface {
 	CreateMatch(ctx context.Context, req *CreateMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	GetLeaderboard(ctx context.Context, req *GetLeaderboardRequest, opts ...http.CallOption) (rsp *GetLeaderboardResponse, err error)
 	GetMatch(ctx context.Context, req *GetMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
+	GetPlayerStats(ctx context.Context, req *GetPlayerStatsRequest, opts ...http.CallOption) (rsp *ArenaPlayerStatsResponse, err error)
+	GetPlayerStatsBatch(ctx context.Context, req *GetPlayerStatsBatchRequest, opts ...http.CallOption) (rsp *ArenaPlayerStatsBatchResponse, err error)
+	GetQueueStatus(ctx context.Context, req *GetQueueStatusRequest, opts ...http.CallOption) (rsp *ArenaQueueStateResponse, err error)
 	JoinMatch(ctx context.Context, req *JoinMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
+	JoinQueue(ctx context.Context, req *JoinQueueRequest, opts ...http.CallOption) (rsp *ArenaQueueStateResponse, err error)
 	LeaveMatch(ctx context.Context, req *LeaveMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
+	LeaveQueue(ctx context.Context, req *LeaveQueueRequest, opts ...http.CallOption) (rsp *ArenaQueueStateResponse, err error)
+	ListOpenMatches(ctx context.Context, req *ListOpenMatchesRequest, opts ...http.CallOption) (rsp *ListOpenMatchesResponse, err error)
+	ReportAntiCheatEvent(ctx context.Context, req *ReportAntiCheatEventRequest, opts ...http.CallOption) (rsp *ArenaStatusResponse, err error)
 	SubmitCode(ctx context.Context, req *SubmitCodeRequest, opts ...http.CallOption) (rsp *SubmitCodeResponse, err error)
 }
 
@@ -239,6 +415,45 @@ func (c *ArenaServiceHTTPClientImpl) GetMatch(ctx context.Context, in *GetMatchR
 	return &out, nil
 }
 
+func (c *ArenaServiceHTTPClientImpl) GetPlayerStats(ctx context.Context, in *GetPlayerStatsRequest, opts ...http.CallOption) (*ArenaPlayerStatsResponse, error) {
+	var out ArenaPlayerStatsResponse
+	pattern := "/api/v1/arena/stats/{user_id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationArenaServiceGetPlayerStats))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ArenaServiceHTTPClientImpl) GetPlayerStatsBatch(ctx context.Context, in *GetPlayerStatsBatchRequest, opts ...http.CallOption) (*ArenaPlayerStatsBatchResponse, error) {
+	var out ArenaPlayerStatsBatchResponse
+	pattern := "/api/v1/arena/stats/batch"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceGetPlayerStatsBatch))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ArenaServiceHTTPClientImpl) GetQueueStatus(ctx context.Context, in *GetQueueStatusRequest, opts ...http.CallOption) (*ArenaQueueStateResponse, error) {
+	var out ArenaQueueStateResponse
+	pattern := "/api/v1/arena/queue/status"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationArenaServiceGetQueueStatus))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *ArenaServiceHTTPClientImpl) JoinMatch(ctx context.Context, in *JoinMatchRequest, opts ...http.CallOption) (*ArenaMatchResponse, error) {
 	var out ArenaMatchResponse
 	pattern := "/api/v1/arena/matches/{match_id}/join"
@@ -252,11 +467,63 @@ func (c *ArenaServiceHTTPClientImpl) JoinMatch(ctx context.Context, in *JoinMatc
 	return &out, nil
 }
 
+func (c *ArenaServiceHTTPClientImpl) JoinQueue(ctx context.Context, in *JoinQueueRequest, opts ...http.CallOption) (*ArenaQueueStateResponse, error) {
+	var out ArenaQueueStateResponse
+	pattern := "/api/v1/arena/queue/join"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceJoinQueue))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *ArenaServiceHTTPClientImpl) LeaveMatch(ctx context.Context, in *LeaveMatchRequest, opts ...http.CallOption) (*ArenaMatchResponse, error) {
 	var out ArenaMatchResponse
 	pattern := "/api/v1/arena/matches/{match_id}/leave"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationArenaServiceLeaveMatch))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ArenaServiceHTTPClientImpl) LeaveQueue(ctx context.Context, in *LeaveQueueRequest, opts ...http.CallOption) (*ArenaQueueStateResponse, error) {
+	var out ArenaQueueStateResponse
+	pattern := "/api/v1/arena/queue/leave"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceLeaveQueue))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ArenaServiceHTTPClientImpl) ListOpenMatches(ctx context.Context, in *ListOpenMatchesRequest, opts ...http.CallOption) (*ListOpenMatchesResponse, error) {
+	var out ListOpenMatchesResponse
+	pattern := "/api/v1/arena/open-matches"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationArenaServiceListOpenMatches))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ArenaServiceHTTPClientImpl) ReportAntiCheatEvent(ctx context.Context, in *ReportAntiCheatEventRequest, opts ...http.CallOption) (*ArenaStatusResponse, error) {
+	var out ArenaStatusResponse
+	pattern := "/api/v1/arena/anti-cheat/event"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceReportAntiCheatEvent))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

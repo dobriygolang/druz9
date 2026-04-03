@@ -22,6 +22,13 @@ type Service interface {
 	SavePlayerCode(ctx context.Context, matchID uuid.UUID, user *domain.User, code string) error
 	SubmitCode(ctx context.Context, matchID uuid.UUID, user *domain.User, code string) (*domain.Submission, *domain.Match, error)
 	GetLeaderboard(ctx context.Context, limit int32) ([]*domain.LeaderboardEntry, error)
+	EnqueueMatchmaking(ctx context.Context, user *domain.User, topic, difficulty string, obfuscateOpponent bool) (*domain.QueueState, error)
+	LeaveQueue(ctx context.Context, user *domain.User) error
+	GetQueueStatus(ctx context.Context, user *domain.User) (*domain.QueueState, error)
+	GetPlayerStats(ctx context.Context, userID uuid.UUID) (*domain.PlayerStats, error)
+	GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID]*domain.PlayerStats, error)
+	ReportPlayerSuspicion(ctx context.Context, matchID uuid.UUID, user *domain.User, reason string) error
+	ListOpenMatches(ctx context.Context, limit int32) ([]*domain.Match, error)
 }
 
 //go:generate mockery --case underscore --name RealtimePublisher --with-expecter --output mocks

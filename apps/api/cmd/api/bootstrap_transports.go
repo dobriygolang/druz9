@@ -8,6 +8,7 @@ import (
 	codeeditorv1 "api/pkg/api/code_editor/v1"
 	eventv1 "api/pkg/api/event/v1"
 	geov1 "api/pkg/api/geo/v1"
+	interviewprepv1 "api/pkg/api/interview_prep/v1"
 	podcastv1 "api/pkg/api/podcast/v1"
 	referralv1 "api/pkg/api/referral/v1"
 
@@ -78,13 +79,10 @@ func registerManualHTTPRoutes(
 	storage *storageContext,
 	services *serviceContext,
 ) {
+	_ = bootstrap
 	server.RegisterCodeEditorRealtime(httpServer, services.realtimeHub)
 	server.RegisterArenaRealtime(httpServer, services.arenaRealtimeHub)
-	server.RegisterArenaOpenMatches(httpServer, services.arenaServiceDomain)
-	server.RegisterArenaQueue(httpServer, services.arenaServiceDomain, services.profileServiceDomain)
-	server.RegisterInterviewPrepRoutes(httpServer, services.interviewPrepDomain, services.profileServiceDomain)
 	server.RegisterAdminUsersRoutes(httpServer, storage.profileRepo, services.profileServiceDomain, services.profileServiceDomain)
-	server.RegisterAdminInterviewPrepRoutes(httpServer, storage.interviewRepo, services.profileServiceDomain)
 }
 
 func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.Server, services *serviceContext) {
@@ -92,6 +90,8 @@ func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.S
 	adminv1.RegisterAdminServiceServer(grpcServer, services.adminService)
 	arenav1.RegisterArenaServiceHTTPServer(httpServer, services.arenaService)
 	arenav1.RegisterArenaServiceServer(grpcServer, services.arenaService)
+	interviewprepv1.RegisterInterviewPrepServiceHTTPServer(httpServer, services.interviewPrepService)
+	interviewprepv1.RegisterInterviewPrepServiceServer(grpcServer, services.interviewPrepService)
 	geov1.RegisterGeoServiceHTTPServer(httpServer, services.geoService)
 	geov1.RegisterGeoServiceServer(grpcServer, services.geoService)
 	eventv1.RegisterEventServiceHTTPServer(httpServer, services.eventService)

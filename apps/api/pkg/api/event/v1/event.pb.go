@@ -205,7 +205,7 @@ type CreateEventRequest struct {
 	InvitedUserIds []string               `protobuf:"bytes,9,rep,name=invited_user_ids,json=invitedUserIds,proto3" json:"invited_user_ids,omitempty"`
 	Description    string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
 	MeetingLink    string                 `protobuf:"bytes,11,opt,name=meeting_link,json=meetingLink,proto3" json:"meeting_link,omitempty"`
-	Repeat         string                 `json:"repeat,omitempty"`
+	Repeat         string                 `protobuf:"bytes,12,opt,name=repeat,proto3" json:"repeat,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -547,7 +547,7 @@ func (x *UpdateEventRequest) GetMeetingLink() string {
 type DeleteEventRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	EventId       string                 `protobuf:"bytes,1,opt,name=event_id,json=eventId,proto3" json:"event_id,omitempty"`
-	DeleteScope   string                 `json:"delete_scope,omitempty"`
+	DeleteScope   string                 `protobuf:"bytes,2,opt,name=delete_scope,json=deleteScope,proto3" json:"delete_scope,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1062,7 +1062,7 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\x06offset\x18\x02 \x01(\x05R\x06offset\x121\n" +
 	"\x06status\x18\x03 \x01(\x0e2\x19.event.v1.EventListFilterR\x06status\x12\x1d\n" +
 	"\n" +
-	"creator_id\x18\x04 \x01(\tR\tcreatorId\"\xf9\x02\n" +
+	"creator_id\x18\x04 \x01(\tR\tcreatorId\"\x91\x03\n" +
 	"\x12CreateEventRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x1f\n" +
 	"\vplace_label\x18\x02 \x01(\tR\n" +
@@ -1076,7 +1076,8 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\x10invited_user_ids\x18\t \x03(\tR\x0einvitedUserIds\x12 \n" +
 	"\vdescription\x18\n" +
 	" \x01(\tR\vdescription\x12!\n" +
-	"\fmeeting_link\x18\v \x01(\tR\vmeetingLink\"-\n" +
+	"\fmeeting_link\x18\v \x01(\tR\vmeetingLink\x12\x16\n" +
+	"\x06repeat\x18\f \x01(\tR\x06repeat\"-\n" +
 	"\x10JoinEventRequest\x12\x19\n" +
 	"\bevent_id\x18\x01 \x01(\tR\aeventId\".\n" +
 	"\x11LeaveEventRequest\x12\x19\n" +
@@ -1095,9 +1096,10 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\x10invited_user_ids\x18\n" +
 	" \x03(\tR\x0einvitedUserIds\x12 \n" +
 	"\vdescription\x18\v \x01(\tR\vdescription\x12!\n" +
-	"\fmeeting_link\x18\f \x01(\tR\vmeetingLink\"/\n" +
+	"\fmeeting_link\x18\f \x01(\tR\vmeetingLink\"R\n" +
 	"\x12DeleteEventRequest\x12\x19\n" +
-	"\bevent_id\x18\x01 \x01(\tR\aeventId\"\xb0\x01\n" +
+	"\bevent_id\x18\x01 \x01(\tR\aeventId\x12!\n" +
+	"\fdelete_scope\x18\x02 \x01(\tR\vdeleteScope\"\xb0\x01\n" +
 	"\x12ListEventsResponse\x12'\n" +
 	"\x06events\x18\x01 \x03(\v2\x0f.event.v1.EventR\x06events\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x16\n" +
