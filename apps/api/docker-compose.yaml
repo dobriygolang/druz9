@@ -138,7 +138,8 @@ services:
   seed:                                                                                                                                       
     build:                                        
       context: .                                                                                                                              
-      dockerfile: Dockerfile                                                             
+      dockerfile: Dockerfile
+      target: api-runtime
     restart: "no"                                                                                                                             
     depends_on:                                                                          
       postgres:                                                                                                                               

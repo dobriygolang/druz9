@@ -1,19 +1,15 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import { 
-  Compass, 
-  Calendar, 
-  MapPin, 
+  Home,
   User as UserIcon, 
   Code2,
   Menu,
   Users,
-  Briefcase,
-  BookOpen,
   Settings,
   Shield,
   LogOut,
-  Orbit,
+  Sparkles,
 } from 'lucide-react';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { MobileDrawer } from '@/shared/ui/MobileDrawer/MobileDrawer';
@@ -25,10 +21,10 @@ export const BottomNav: React.FC = () => {
   return (
     <>
       <nav className="bottom-nav-mobile">
-        <BottomNavItem to="/feed" icon={<Compass size={20} />} label="Лента" />
-        <BottomNavItem to="/events" icon={<Calendar size={20} />} label="Ивенты" />
-        <BottomNavItem to="/code-rooms" icon={<Code2 size={20} />} label="Код" />
-        <BottomNavItem to="/map" icon={<MapPin size={20} />} label="Карта" />
+        <BottomNavItem to="/home" icon={<Home size={20} />} label="Home" />
+        <BottomNavItem to="/community/people" icon={<Users size={20} />} label="Community" />
+        <BottomNavItem to="/practice/code-rooms" icon={<Code2 size={20} />} label="Practice" />
+        <BottomNavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" />
         <button 
           className="bottom-nav-mobile__button"
           onClick={() => setIsMenuOpen(true)}
@@ -45,11 +41,10 @@ export const BottomNav: React.FC = () => {
       >
         <div className="mobile-menu-grid">
           <MenuLink to="/profile" icon={<UserIcon size={20} />} label="Мой профиль" onClick={() => setIsMenuOpen(false)} />
-          <MenuLink to="/circles" icon={<Orbit size={20} />} label="Circles" onClick={() => setIsMenuOpen(false)} />
-          <MenuLink to="/users" icon={<Users size={20} />} label="Сообщество" onClick={() => setIsMenuOpen(false)} />
-          <MenuLink to="/vacancies" icon={<Briefcase size={20} />} label="Вакансии" onClick={() => setIsMenuOpen(false)} />
-          
-          <MenuLink to="/interview-prep" icon={<BookOpen size={20} />} label="Go Prep" onClick={() => setIsMenuOpen(false)} />
+          <MenuLink to="/community/circles" icon={<Users size={20} />} label="Circles" onClick={() => setIsMenuOpen(false)} />
+          <MenuLink to="/community/events" icon={<Users size={20} />} label="Events" onClick={() => setIsMenuOpen(false)} />
+          <MenuLink to="/growth/vacancies" icon={<Sparkles size={20} />} label="Вакансии" onClick={() => setIsMenuOpen(false)} />
+          <MenuLink to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Go Prep" onClick={() => setIsMenuOpen(false)} />
           
           {user?.isAdmin && (
             <>

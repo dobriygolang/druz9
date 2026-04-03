@@ -12,7 +12,7 @@ export const PageLayout: React.FC = () => {
   const isArenaMatch = /^\/arena\/[^/]+$/.test(location.pathname);
   const isInterviewPrepSession = /^\/interview-prep\/[^/]+$/.test(location.pathname);
   const isInterviewPrepMock = /^\/interview-prep\/mock\/[^/]+$/.test(location.pathname);
-  const isCodeRoomsDashboard = location.pathname === '/code-rooms';
+  const isCodeRoomsDashboard = location.pathname === '/code-rooms' || location.pathname === '/practice/code-rooms';
   const isCodeTasksAdmin = location.pathname === '/admin/code-tasks';
   const isGuestCodeRoomsSurface = !isAuthenticated && isCodeRoomsDashboard;
   const showShell = !isCodeRoom && !isArenaMatch && !isGuestCodeRoomsSurface;

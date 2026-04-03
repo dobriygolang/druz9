@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { geoApi } from '@/features/Geo/api/geoApi';
-import { Compass, Users, Calendar, MapPin, User as UserIcon, LogOut, Briefcase, Code2, ArrowRight, Settings, Shield, BookOpen, Orbit } from 'lucide-react';
+import { Home, Users, User as UserIcon, LogOut, Code2, ArrowRight, Settings, Shield, Sparkles } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const { logout, isAuthenticated, user } = useAuth();
@@ -49,16 +49,12 @@ export const Sidebar: React.FC = () => {
       </div>
 
       <nav className="sidebar-desktop__nav">
-        <NavItem to="/code-rooms" icon={<Code2 size={20} />} label="Код" />
         {isAuthenticated ? (
           <>
-            <NavItem to="/feed" icon={<Compass size={20} />} label="Подкаст" />
-            <NavItem to="/circles" icon={<Orbit size={20} />} label="Circles" />
-            <NavItem to="/users" icon={<Users size={20} />} label="Пользователи" />
-            <NavItem to="/events" icon={<Calendar size={20} />} label="Ивент" />
-            <NavItem to="/vacancies" icon={<Briefcase size={20} />} label="Вакансии" />
-            <NavItem to="/map" icon={<MapPin size={20} />} label="Карта" />
-            <NavItem to="/interview-prep" icon={<BookOpen size={20} />} label="Go Prep" />
+            <NavItem to="/home" icon={<Home size={20} />} label="Home" />
+            <NavItem to="/community/people" icon={<Users size={20} />} label="Community" />
+            <NavItem to="/practice/code-rooms" icon={<Code2 size={20} />} label="Practice" />
+            <NavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" />
             <div style={{ height: '32px' }} />
             {user?.isAdmin && (
               <>

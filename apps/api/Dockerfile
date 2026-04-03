@@ -17,7 +17,7 @@ RUN CGO_ENABLED=0 GOOS=linux go build -o bin/sandbox-runner ./cmd/sandbox-runner
 RUN CGO_ENABLED=0 GOOS=linux go build -o bin/sandbox-exec ./cmd/sandbox-exec
 
 # Runtime image
-FROM alpine:3.18
+FROM alpine:3.18 AS api-runtime
 
 RUN apk add --no-cache bash ca-certificates postgresql-client go python3 sqlite
 

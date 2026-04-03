@@ -192,6 +192,7 @@ services:
     build:
       context: ../api
       dockerfile: Dockerfile
+      target: api-runtime
     restart: "no"
     depends_on:
       postgres:
@@ -255,6 +256,7 @@ services:
     build:
       context: ../api
       dockerfile: Dockerfile
+      target: api-runtime
     restart: unless-stopped
     depends_on:
       seed:
