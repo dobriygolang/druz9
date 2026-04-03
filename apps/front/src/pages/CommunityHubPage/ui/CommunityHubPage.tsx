@@ -56,7 +56,7 @@ export const CommunityHubPage: React.FC = () => {
     <HubShell
       eyebrow="Community"
       title="Люди, события, карта и circles"
-      description="Community теперь работает как один социальный слой. Сверху обзор, а внутри отдельных вкладок уже конкретные сценарии: люди, события, карта и мини-комьюнити."
+      description="Находи людей рядом, смотри события, переключайся на карту и открывай circles без лишних переходов между разными разделами."
       tabs={[
         { to: '/community/people', label: 'People' },
         { to: '/community/events', label: 'Events' },

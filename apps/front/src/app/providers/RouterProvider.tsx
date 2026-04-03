@@ -32,9 +32,7 @@ const InterviewPrepMockSessionPage = lazy(() => import('@/pages/InterviewPrepMoc
 const InterviewPrepAdminPage = lazy(() => import('@/pages/InterviewPrepAdminPage/ui/InterviewPrepAdminPage').then((m) => ({ default: m.InterviewPrepAdminPage })));
 
 const LoadingFallback: React.FC = () => (
-  <div className="flex-center full-height" style={{ backgroundColor: 'var(--bg-color)', color: 'var(--text-primary)' }}>
-    <div>Загрузка...</div>
-  </div>
+  null
 );
 
 class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { hasError: boolean; error: Error | null }> {
@@ -71,7 +69,7 @@ export const RouterProvider: React.FC = () => {
   const { isLoading, isAuthenticated, needsProfileComplete } = useAuth();
 
   if (isLoading) {
-    return <LoadingFallback />;
+    return null;
   }
 
   return (

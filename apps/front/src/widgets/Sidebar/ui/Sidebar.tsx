@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { geoApi } from '@/features/Geo/api/geoApi';
-import { Home, Users, User as UserIcon, LogOut, Code2, ArrowRight, Settings, Shield, Sparkles } from 'lucide-react';
+import { Home, Users, User as UserIcon, LogOut, Code2, ArrowRight, Settings, Shield, Sparkles, Headphones } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const { logout, isAuthenticated, user } = useAuth();
@@ -68,6 +68,7 @@ export const Sidebar: React.FC = () => {
               </>
             )}
             <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" />
+            <NavItem to="/home#broadcast" icon={<Headphones size={20} />} label="Подкасты" />
           </>
         ) : (
           <>

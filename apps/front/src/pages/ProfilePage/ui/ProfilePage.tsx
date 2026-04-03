@@ -66,6 +66,18 @@ function formatRunLabel(value: number) {
   return `${value} практик`;
 }
 
+function orbitLabelLines(label: string) {
+  if (label.length <= 11 || !label.includes(' ')) {
+    return [label];
+  }
+  const parts = label.split(' ');
+  if (parts.length === 2) {
+    return parts;
+  }
+  const middle = Math.ceil(parts.length / 2);
+  return [parts.slice(0, middle).join(' '), parts.slice(middle).join(' ')];
+}
+
 function confidenceLabel(value: ProfileCompetency['confidence']) {
   switch (value) {
     case 'verified':
@@ -362,6 +374,7 @@ export const ProfilePage: React.FC = () => {
         <h1 style={{ fontSize: isMobile ? '28px' : '32px' }}>Профиль</h1>
         {isOwnProfile && (
           <button
+            type="button"
             className={`btn btn-primary ${isMobile ? 'w-full' : ''}`}
             onClick={() => setIsEditModalOpen(true)}
             style={{ height: isMobile ? '48px' : 'auto' }}
@@ -519,6 +532,7 @@ export const ProfilePage: React.FC = () => {
             </span>
           ) : isOwnProfile ? (
             <button
+              type="button"
               className="btn btn-primary profile-telegram-btn"
               onClick={handleOpenBindTelegram}
             >
@@ -546,7 +560,7 @@ export const ProfilePage: React.FC = () => {
             <div className="profile-progress-card__header">
               <div>
                 <h3><BrainCircuit size={18} /> Карта навыков</h3>
-                <p>Каждая орбита показывает отдельную зону. Практика и подтвержденный результат разведены, чтобы было видно не только объем, но и реальную глубину.</p>
+                <p>Каждая орбита показывает отдельную зону. Слева карта, ниже короткая расшифровка по темам.</p>
               </div>
             </div>
 
@@ -601,7 +615,11 @@ export const ProfilePage: React.FC = () => {
                       />
                     ))}
                     <text x={orbit.labelPoint.x} y={orbit.labelPoint.y} className="profile-progress-orbit__label" textAnchor="middle">
-                      {orbit.label}
+                      {orbitLabelLines(orbit.label).map((line, index) => (
+                        <tspan key={`${orbit.key}-${line}-${index}`} x={orbit.labelPoint.x} dy={index === 0 ? 0 : 12}>
+                          {line}
+                        </tspan>
+                      ))}
                     </text>
                     <text x={orbit.labelPoint.x} y={orbit.labelPoint.y + 16} className="profile-progress-orbit__value" textAnchor="middle">
                       {orbit.score}

@@ -10,6 +10,7 @@ import {
   Shield,
   LogOut,
   Sparkles,
+  Headphones,
 } from 'lucide-react';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { MobileDrawer } from '@/shared/ui/MobileDrawer/MobileDrawer';
@@ -46,6 +47,7 @@ export const BottomNav: React.FC = () => {
           <MenuLink to="/community/events" icon={<Users size={20} />} label="Events" onClick={() => setIsMenuOpen(false)} />
           <MenuLink to="/growth/vacancies" icon={<Sparkles size={20} />} label="Вакансии" onClick={() => setIsMenuOpen(false)} />
           <MenuLink to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Go Prep" onClick={() => setIsMenuOpen(false)} />
+          <MenuLink to="/home#broadcast" icon={<Headphones size={20} />} label="Подкасты" onClick={() => setIsMenuOpen(false)} />
           
           {user?.isAdmin && (
             <>

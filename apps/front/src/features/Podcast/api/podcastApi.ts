@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { apiClient, ListQueryParams, withDefaultListQuery } from '@/shared/api/base';
 import { Podcast } from '@/entities/User/model/types';
+import { getCachedValue, setCachedValue } from '@/shared/api/cache';
 
 type BackendPodcast = {
   id: string;
@@ -85,10 +86,22 @@ function normalizePodcast(p: BackendPodcast): Podcast {
 
 export const podcastApi = {
   list: async (params?: ListQueryParams): Promise<Podcast[]> => {
+    const useCache = !params || Object.keys(params).length === 0 || (params.limit === 4 && (params.offset === undefined || params.offset === 0));
+    const cacheKey = `podcasts:list:${params?.limit ?? 'default'}:${params?.offset ?? 0}`;
+    if (useCache) {
+      const cached = getCachedValue<Podcast[]>(cacheKey);
+      if (cached) {
+        return cached;
+      }
+    }
     const response = await apiClient.get<ListPodcastsResponse>('/api/v1/podcasts', {
       params: withDefaultListQuery(params),
     });
-    return (response.data.podcasts ?? []).map(normalizePodcast);
+    const podcasts = (response.data.podcasts ?? []).map(normalizePodcast);
+    if (useCache) {
+      setCachedValue(cacheKey, podcasts, 120_000);
+    }
+    return podcasts;
   },
   
   get: async (id: string): Promise<Podcast> => {

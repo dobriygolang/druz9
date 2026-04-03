@@ -44,9 +44,9 @@ export const ArenaHubPage: React.FC = () => {
       <section className="arena-hub__hero">
         <div className="arena-hub__copy">
           <span>Arena</span>
-          <h2>Рейтинговая арена внутри practice</h2>
+          <h2>Арена</h2>
           <p>
-            Здесь собраны ranked-матчи, открытые дуэли и следующие режимы. Это не отдельный продуктовый мир, а один из сценариев внутри practice.
+            Здесь рейтинговые матчи, открытые дуэли и быстрый вход в соревновательный режим.
           </p>
           <div className="arena-hub__hero-stats">
             <div className="arena-hub__hero-pill">
@@ -114,11 +114,11 @@ export const ArenaHubPage: React.FC = () => {
         <article className="arena-hub__panel arena-hub__panel--notes">
           <div className="arena-hub__panel-head">
             <Shield size={18} />
-            <strong>Следующие режимы</strong>
+            <strong>Форматы</strong>
           </div>
           <div className="arena-hub__notes">
-            <div>Circle ladder должен жить здесь как режим practice, а не как отдельный раздел.</div>
-            <div>Private scrims и team battles лучше строить поверх текущей arena-модели.</div>
+            <div>Закрытые scrims для своей команды.</div>
+            <div>Локальные ладдеры внутри circles.</div>
           </div>
         </article>
       </div>

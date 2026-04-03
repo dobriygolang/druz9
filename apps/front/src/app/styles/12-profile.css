@@ -20,6 +20,8 @@
     radial-gradient(circle at top right, var(--accent-muted), transparent 40%),
     linear-gradient(180deg, var(--surface-elevated), var(--surface-color));
   box-shadow: var(--shadow-xl);
+  position: relative;
+  z-index: 2;
 }
 
 .profile-header h1 {
@@ -27,6 +29,12 @@
   font-weight: 800;
   margin: 0;
   letter-spacing: -0.03em;
+}
+
+.profile-header .btn {
+  position: relative;
+  z-index: 3;
+  pointer-events: auto;
 }
 
 .profile-edit-btn {
@@ -347,7 +355,7 @@
 }
 
 .profile-progress-card {
-  padding: var(--space-5);
+  padding: var(--space-4);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-xl);
   background:
@@ -363,7 +371,7 @@
 }
 
 .profile-progress-card__header {
-  margin-bottom: var(--space-4);
+  margin-bottom: var(--space-3);
 }
 
 .profile-progress-card__header h3 {
@@ -471,13 +479,13 @@
 
 .profile-progress-orbit__label {
   fill: var(--text-primary);
-  font-size: 12px;
+  font-size: 10px;
   font-weight: 700;
 }
 
 .profile-progress-orbit__value {
   fill: #22d3ee;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 800;
 }
 
@@ -487,14 +495,14 @@
 
 .profile-progress-orbit__legend {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-  gap: var(--space-3);
+  grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+  gap: 10px;
 }
 
 .profile-progress-orbit__legend-item {
   display: grid;
   gap: 4px;
-  padding: var(--space-3);
+  padding: 12px;
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.03);
   border: 1px solid var(--border-color);
@@ -552,7 +560,7 @@
 }
 
 .profile-progress-metric {
-  padding: var(--space-4);
+  padding: 12px 14px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   background: rgba(255, 255, 255, 0.03);
@@ -621,7 +629,7 @@
   align-items: flex-start;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: var(--space-4);
+  padding: 12px 14px;
   border-radius: var(--radius-lg);
   border: 1px solid var(--border-color);
   background: rgba(255, 255, 255, 0.03);
@@ -715,7 +723,7 @@
 }
 
 .profile-progress-empty.compact {
-  padding: var(--space-4);
+  padding: 12px 14px;
   border-radius: var(--radius-lg);
   background: rgba(255, 255, 255, 0.03);
   border: 1px dashed var(--border-color);

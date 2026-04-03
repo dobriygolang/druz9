@@ -7,7 +7,7 @@ export const GrowthHubPage: React.FC = () => {
     <HubShell
       eyebrow="Growth"
       title="Подготовка и карьерный трек"
-      description="Interview Prep и вакансии объединены в growth-контур: прокачка навыков и карьерные шаги больше не висят отдельными несвязанными разделами."
+      description="Подготовка к интервью, практика и вакансии собраны в одном месте. Здесь можно выбрать задачу, пройти mock и посмотреть карьерные возможности."
       tabs={[
         { to: '/growth/interview-prep', label: 'Interview Prep' },
         { to: '/growth/vacancies', label: 'Vacancies' },
@@ -16,8 +16,8 @@ export const GrowthHubPage: React.FC = () => {
         <div className="hub-shell__stat-card">
           <Sparkles size={18} />
           <div>
-            <strong>Growth layer</strong>
-            <span>Preparation, outcomes and next career moves</span>
+            <strong>Growth</strong>
+            <span>Подготовка, результаты и карьерные шаги</span>
           </div>
         </div>
       )}

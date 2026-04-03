@@ -2,7 +2,7 @@
 .home-page,
 .arena-hub {
   display: grid;
-  gap: var(--space-6);
+  gap: var(--space-5);
 }
 
 .hub-shell__hero,
@@ -11,8 +11,8 @@
   display: grid;
   grid-template-columns: minmax(0, 1.3fr) minmax(320px, 0.85fr);
   gap: var(--space-5);
-  padding: var(--space-6);
-  border-radius: 28px;
+  padding: var(--space-5);
+  border-radius: 24px;
   border: 1px solid var(--border-color);
   background:
     radial-gradient(circle at top left, rgba(99, 102, 241, 0.24), transparent 36%),
@@ -85,8 +85,8 @@
 .home-metric,
 .home-panel,
 .arena-hub__panel {
-  padding: var(--space-5);
-  border-radius: 22px;
+  padding: var(--space-4);
+  border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, 0.06);
   background:
     linear-gradient(180deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.025));
@@ -390,7 +390,7 @@
 .home-metric {
   display: grid;
   gap: var(--space-2);
-  min-height: 132px;
+  min-height: 104px;
   align-content: start;
   position: relative;
   overflow: hidden;
@@ -453,7 +453,7 @@
 .home-grid,
 .arena-hub__grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: var(--space-4);
 }
 
@@ -461,8 +461,8 @@
   position: relative;
   align-items: flex-start;
   gap: 14px;
-  padding: var(--space-5);
-  border-radius: 22px;
+  padding: var(--space-4);
+  border-radius: 18px;
   border: 1px solid rgba(255,255,255,0.06);
   background:
     linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
@@ -525,7 +525,7 @@
 .home-panel,
 .arena-hub__panel {
   display: grid;
-  gap: var(--space-4);
+  gap: var(--space-3);
   position: relative;
   overflow: hidden;
   transition:
@@ -628,8 +628,8 @@
   align-items: center;
   justify-content: space-between;
   gap: var(--space-3);
-  padding: 14px 16px;
-  border-radius: 18px;
+  padding: 12px 14px;
+  border-radius: 14px;
   background: rgba(255,255,255,0.035);
   border: 1px solid rgba(255,255,255,0.05);
   min-width: 0;
@@ -694,9 +694,40 @@
   gap: 4px;
 }
 
+.home-circle-list {
+  display: grid;
+  gap: 10px;
+}
+
+.home-circle-card {
+  display: grid;
+  gap: 8px;
+  padding: 12px 14px;
+  border-radius: 14px;
+  border: 1px solid rgba(255,255,255,0.05);
+  background: rgba(255,255,255,0.035);
+  text-decoration: none;
+  color: inherit;
+  min-width: 0;
+  transition: border-color var(--transition-base), background-color var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.home-circle-card strong,
+.home-circle-card span {
+  overflow-wrap: anywhere;
+}
+
+.home-circle-card__meta {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--text-secondary);
+  font-size: 12px;
+}
+
 .arena-hub__notes div {
-  padding: 14px 16px;
-  border-radius: 18px;
+  padding: 12px 14px;
+  border-radius: 14px;
   background: rgba(255,255,255,0.03);
   color: var(--text-secondary);
 }
@@ -766,6 +797,13 @@
     color: #c4b5fd;
   }
 
+  .home-circle-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(99, 102, 241, 0.24);
+    background: rgba(255,255,255,0.05);
+    box-shadow: 0 18px 38px rgba(0, 0, 0, 0.2), 0 0 24px rgba(99, 102, 241, 0.12);
+  }
+
   .people-card:hover {
     transform: translateY(-3px);
     border-color: rgba(99, 102, 241, 0.24);
@@ -781,10 +819,6 @@
     grid-template-columns: minmax(0, 1.18fr) minmax(300px, 0.82fr);
   }
 
-  .home-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
   .arena-hub__grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
@@ -796,6 +830,10 @@
 
 @media (max-width: 1280px) {
   .home-clusters {
+    grid-template-columns: 1fr;
+  }
+
+  .home-grid {
     grid-template-columns: 1fr;
   }
 
@@ -846,7 +884,7 @@
   }
 
   .home-metric {
-    min-height: 116px;
+    min-height: 96px;
   }
 
   .people-filters {
@@ -873,8 +911,8 @@
   .home-panel,
   .arena-hub__panel,
   .home-cluster-card {
-    padding: var(--space-5);
-    border-radius: 24px;
+    padding: var(--space-4);
+    border-radius: 18px;
   }
 
   .home-hero__metrics {

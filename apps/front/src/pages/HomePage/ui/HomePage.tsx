@@ -82,10 +82,9 @@ export const HomePage: React.FC = () => {
       <section className="home-hero">
         <div className="home-hero__copy">
           <span className="home-hero__eyebrow">Home</span>
-          <h1>Один вход в продукт вместо набора несвязанных разделов</h1>
+          <h1>Главное рядом</h1>
           <p>
-            Здесь собраны ближайшие события, активные circles и social/practice/growth входы,
-            чтобы продукт ощущался как одна система, а не набор отдельных экранов.
+            Ближайшие события, люди, circles и подкасты собраны на одном экране, чтобы ты быстро понял, куда идти дальше.
           </p>
         </div>
 
@@ -110,7 +109,7 @@ export const HomePage: React.FC = () => {
           <Users size={22} />
           <div>
             <strong>Community</strong>
-            <p>Люди, карта, события и circles в одном социальном слое.</p>
+            <p>Люди, события, карта и circles.</p>
           </div>
           <ArrowRight size={18} />
         </Link>
@@ -119,7 +118,7 @@ export const HomePage: React.FC = () => {
           <Code2 size={22} />
           <div>
             <strong>Practice</strong>
-            <p>Code Rooms, arena и тренировочные сценарии без отдельной навигационной ветки под каждую механику.</p>
+            <p>Code rooms, arena и практика кода.</p>
           </div>
           <ArrowRight size={18} />
         </Link>
@@ -128,7 +127,7 @@ export const HomePage: React.FC = () => {
           <Sparkles size={22} />
           <div>
             <strong>Growth</strong>
-            <p>Interview Prep и вакансии как трек роста, а не пара разрозненных страниц.</p>
+            <p>Подготовка к интервью и вакансии.</p>
           </div>
           <ArrowRight size={18} />
         </Link>
@@ -167,18 +166,18 @@ export const HomePage: React.FC = () => {
             </div>
             <Link to="/community/circles">Все circles</Link>
           </div>
-          <div className="home-list">
+          <div className="home-circle-list">
             {topCircles.length > 0 ? topCircles.map((circle) => (
-              <div key={circle.id} className="home-list__item">
+              <Link key={circle.id} to="/community/circles" className="home-circle-card">
                 <div>
                   <strong>{circle.name}</strong>
                   <span>{circle.memberCount} участников • {circle.visibility === 'open' ? 'открытый' : 'закрытый'}</span>
                 </div>
-                <div className="home-list__meta">
+                <div className="home-circle-card__meta">
                   <Orbit size={14} />
                   <span>{circle.hubLabel}</span>
                 </div>
-              </div>
+              </Link>
             )) : <div className="home-empty">Circles пока не собраны.</div>}
           </div>
         </article>
@@ -187,26 +186,26 @@ export const HomePage: React.FC = () => {
           <div className="home-panel__head">
             <div>
               <span>Arena</span>
-              <h2>Practice snapshot</h2>
+              <h2>Арена</h2>
             </div>
-            <Link to="/practice/arena">В practice</Link>
+            <Link to="/practice/arena">Открыть</Link>
           </div>
           <div className="home-arena-card">
             <Trophy size={22} />
             <div>
-              <strong>Арена теперь живет внутри Practice</strong>
-              <p>Это снижает шум в верхнем уровне навигации и делает coding-сценарии единым потоком.</p>
+              <strong>Рейтинг и быстрые матчи</strong>
+              <p>Открывай арену, если хочешь сыграть дуэль или посмотреть таблицу лидеров.</p>
             </div>
           </div>
         </article>
 
-        <article className="home-panel home-panel--broadcast">
+        <article className="home-panel home-panel--broadcast" id="broadcast">
           <div className="home-panel__head">
             <div>
               <span>Broadcast</span>
               <h2>Подкасты и короткие апдейты</h2>
             </div>
-            <Link to="/home">В Home</Link>
+            <a href="#broadcast">Слушать</a>
           </div>
           <div className="home-list">
             {podcasts.length > 0 ? podcasts.slice(0, 3).map((podcast) => {
