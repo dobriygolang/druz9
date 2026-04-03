@@ -76,7 +76,7 @@ func defaultHTTPClientPolicy() SandboxPolicy {
 		AllowStdout:   true,
 		AllowStderr:   true,
 		Limits: ResourceLimits{
-			TimeLimitMs:      15000,
+			TimeLimitMs:      30000,
 			MemoryLimitMB:    192,
 			CPULimitMilli:    1000,
 			ProcessLimit:     24,
