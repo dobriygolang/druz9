@@ -1,21 +1,51 @@
 import React, { useState } from 'react';
-import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Brain, Code, MapPin, ShieldCheck, Users } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { TelegramAuthWidget } from '@/features/Auth/ui/TelegramAuthWidget';
+
+const FEATURES_LEFT = [
+  {
+    icon: Code,
+    color: '#818CF8',
+    title: 'Code Rooms',
+    desc: 'Реальное время, совместный код',
+  },
+  {
+    icon: Brain,
+    color: '#34D399',
+    title: 'Mock Interviews',
+    desc: 'AI-подготовка к интервью',
+  },
+  {
+    icon: Users,
+    color: '#FBBF24',
+    title: 'Community',
+    desc: 'Сообщество IT-разработчиков',
+  },
+];
+
+const FEATURES_RIGHT = [
+  {
+    icon: MapPin,
+    color: '#F472B6',
+    title: 'Geo Map',
+    desc: 'Карта разработчиков рядом',
+  },
+];
 
 export const LoginPage: React.FC = () => {
   const { login, startYandexAuth } = useAuth();
   const [error, setError] = useState('');
   const [isYandexLoading, setIsYandexLoading] = useState(false);
+  const [showTelegram, setShowTelegram] = useState(false);
 
   const handleTelegramAuth = async (token: string, code: string) => {
     try {
       setError('');
       await login(token, code);
-    } catch (err) {
+    } catch {
       setError('Ошибка авторизации через Telegram');
-      console.error(err);
     }
   };
 
@@ -25,67 +55,97 @@ export const LoginPage: React.FC = () => {
       setError('');
       const authUrl = await startYandexAuth();
       window.location.assign(authUrl);
-    } catch (err) {
+    } catch {
       setError('Не удалось начать авторизацию через Яндекс');
       setIsYandexLoading(false);
-      console.error(err);
     }
   };
 
   return (
     <div className="auth-screen">
-      <div className="auth-shell card fade-in">
-        <div className="auth-shell__hero">
-          <span className="auth-shell__eyebrow">Druz9 Access</span>
-          <h1 className="auth-shell__title">Вход через Яндекс или Telegram</h1>
-          <p className="auth-shell__subtitle">
-            Парольная регистрация удалена. Войти можно только через внешний провайдер.
-          </p>
+      <div className="auth-bg">
+        <div className="auth-bg__glow auth-bg__glow--tr" />
+        <div className="auth-bg__glow auth-bg__glow--bl" />
+      </div>
+
+      <aside className="auth-features auth-features--left">
+        {FEATURES_LEFT.map(({ icon: Icon, color, title, desc }) => (
+          <div key={title} className="auth-feature-card">
+            <Icon size={18} style={{ color, flexShrink: 0 }} />
+            <div>
+              <div className="auth-feature-card__title">{title}</div>
+              <div className="auth-feature-card__desc">{desc}</div>
+            </div>
+          </div>
+        ))}
+      </aside>
+
+      <div className="auth-content">
+        <div className="auth-brand">
+          <div className="auth-brand__row">
+            <span className="auth-brand__badge">D9</span>
+            <span className="auth-brand__name">Druz9</span>
+          </div>
+          <p className="auth-brand__tagline">Платформа для IT-сообщества</p>
         </div>
 
-        {error && (
-          <div className="auth-shell__error">
-            {error}
-          </div>
-        )}
+        <div className="auth-card">
+          <div className="auth-card__body">
+            <h1 className="auth-card__headline">Войти в аккаунт</h1>
+            <p className="auth-card__sub">Выберите способ авторизации</p>
 
-        <div className="auth-shell__grid">
-          <section className="auth-provider-card auth-provider-card--primary">
-            <div className="auth-provider-card__header">
-              <span className="auth-provider-card__badge">Рекомендуется</span>
-              <h2>Яндекс ID</h2>
-            </div>
-            <p>Быстрый вход в браузере с автоматическим созданием аккаунта и сохранением сессии.</p>
-            <div className="auth-provider-card__action-wrapper">
+            {error && (
+              <div className="auth-card__error">{error}</div>
+            )}
+
+            <div className="auth-card__actions">
               <button
                 type="button"
-                className="btn btn-primary auth-provider-card__action"
+                className="btn btn-primary auth-card__btn"
                 disabled={isYandexLoading}
                 onClick={handleYandexAuth}
               >
-                {isYandexLoading ? 'Переходим в Яндекс...' : 'Войти через Яндекс'}
+                {isYandexLoading ? 'Переходим в Яндекс...' : 'Войти через Яндекс ID'}
                 <ArrowRight size={16} />
               </button>
-            </div>
-          </section>
 
-          <section className="auth-provider-card">
-            <div className="auth-provider-card__header">
-              <span className="auth-provider-card__badge auth-provider-card__badge--neutral">Альтернатива</span>
-              <h2>Telegram</h2>
+              <button
+                type="button"
+                className="btn btn-secondary auth-card__btn"
+                onClick={() => setShowTelegram((v) => !v)}
+              >
+                Войти через Telegram
+              </button>
             </div>
-            <p>Можно войти кодом из бота и позже привязать Telegram как дополнительный провайдер в профиле.</p>
-            <div className="auth-provider-card__action-wrapper">
-              <TelegramAuthWidget onAuth={handleTelegramAuth} />
-            </div>
-          </section>
-        </div>
 
-        <div className="auth-shell__footer">
-          <ShieldCheck size={16} />
-          <span>Сессия хранится в защищённой cookie. После первого входа откроется шаг завершения профиля.</span>
+            {showTelegram && (
+              <div className="auth-card__telegram">
+                <div className="auth-card__telegram-divider">
+                  <span>код из Telegram-бота</span>
+                </div>
+                <TelegramAuthWidget onAuth={handleTelegramAuth} />
+              </div>
+            )}
+          </div>
+
+          <div className="auth-card__footer">
+            <ShieldCheck size={14} />
+            <span>Сессия в защищённой cookie. После входа — шаг завершения профиля.</span>
+          </div>
         </div>
       </div>
+
+      <aside className="auth-features auth-features--right">
+        {FEATURES_RIGHT.map(({ icon: Icon, color, title, desc }) => (
+          <div key={title} className="auth-feature-card">
+            <Icon size={18} style={{ color, flexShrink: 0 }} />
+            <div>
+              <div className="auth-feature-card__title">{title}</div>
+              <div className="auth-feature-card__desc">{desc}</div>
+            </div>
+          </div>
+        ))}
+      </aside>
     </div>
   );
 };

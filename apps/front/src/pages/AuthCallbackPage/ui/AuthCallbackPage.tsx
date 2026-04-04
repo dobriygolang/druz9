@@ -57,19 +57,26 @@ export const AuthCallbackPage: React.FC = () => {
 
   return (
     <div className="auth-screen">
-      <div className="auth-shell card fade-in">
-        <div className="auth-shell__hero">
-          <span className="auth-shell__eyebrow">Yandex OAuth</span>
-          <h1 className="auth-shell__title">Завершаем вход</h1>
-          <p className="auth-shell__subtitle">
-            {error || (isSubmitting ? 'Проверяем код авторизации и поднимаем сессию…' : 'Нужно вернуться и повторить вход.')}
-          </p>
+      <div className="auth-bg">
+        <div className="auth-bg__glow auth-bg__glow--tr" />
+        <div className="auth-bg__glow auth-bg__glow--bl" />
+      </div>
+      <div className="auth-content">
+        <div className="auth-card fade-in">
+          <div className="auth-card__body">
+            <h1 className="auth-card__headline">Завершаем вход</h1>
+            <p className="auth-card__sub">
+              {error || (isSubmitting ? 'Проверяем код авторизации и поднимаем сессию…' : 'Нужно вернуться и повторить вход.')}
+            </p>
+            {error && (
+              <div className="auth-card__actions">
+                <button type="button" className="btn btn-primary auth-card__btn" onClick={() => navigate('/login', { replace: true })}>
+                  Вернуться ко входу
+                </button>
+              </div>
+            )}
+          </div>
         </div>
-        {error && (
-          <button type="button" className="btn btn-primary auth-provider-card__action" onClick={() => navigate('/login', { replace: true })}>
-            Вернуться ко входу
-          </button>
-        )}
       </div>
     </div>
   );
