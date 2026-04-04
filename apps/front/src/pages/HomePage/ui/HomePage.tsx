@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { ArrowRight, CalendarDays, Clock3, Code2, Orbit, PlayCircle, Sparkles, Trophy, Users } from 'lucide-react';
+import { CalendarDays, CirclePlay, Orbit } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { usePodcast } from '@/app/providers/PodcastProvider';
@@ -18,6 +18,10 @@ function formatDate(value: string) {
     hour: '2-digit',
     minute: '2-digit',
   }).format(new Date(value));
+}
+
+function getInitials(firstName: string, lastName: string) {
+  return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
 }
 
 export const HomePage: React.FC = () => {
@@ -38,11 +42,8 @@ export const HomePage: React.FC = () => {
         const [nextUsers, nextEvents, nextCircles, nextPodcasts] = await Promise.all([
           geoApi.communityMap(),
           eventApi.list(),
-          circleApi.list({
-            currentUserId: user?.id,
-            currentUserRegion: user?.region,
-          }),
-          podcastApi.list({ limit: 4 }),
+          circleApi.list({ currentUserId: user?.id, currentUserRegion: user?.region }),
+          podcastApi.list({ limit: 3 }),
         ]);
         if (!cancelled) {
           setUsers(nextUsers);
@@ -53,187 +54,151 @@ export const HomePage: React.FC = () => {
       } catch (error) {
         console.error('Failed to load home dashboard', error);
       } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
+        if (!cancelled) setIsLoading(false);
       }
     };
 
     void load();
-    return () => {
-      cancelled = true;
-    };
+    return () => { cancelled = true; };
   }, [user?.id, user?.region]);
 
   const upcomingEvents = useMemo(
     () => events
-      .filter((event) => new Date(event.scheduled_at).getTime() >= Date.now())
-      .sort((left, right) => new Date(left.scheduled_at).getTime() - new Date(right.scheduled_at).getTime())
+      .filter((e) => new Date(e.scheduled_at).getTime() >= Date.now())
+      .sort((a, b) => new Date(a.scheduled_at).getTime() - new Date(b.scheduled_at).getTime())
       .slice(0, 3),
     [events],
   );
 
-  const joinedCircles = circles.filter((circle) => circle.joined).slice(0, 3);
-  const topCircles = (joinedCircles.length > 0 ? joinedCircles : circles).slice(0, 3);
-  const onlineCount = users.filter((item) => item.activityStatus === 'online').length;
+  const topCircles = useMemo(
+    () => (circles.filter((c) => c.joined).length > 0
+      ? circles.filter((c) => c.joined)
+      : circles).slice(0, 3),
+    [circles],
+  );
+
+  const onlineCount = users.filter((u) => u.activityStatus === 'online').length;
 
   return (
     <div className="home-page fade-in">
-      <section className="home-hero">
-        <div className="home-hero__copy">
-          <span className="home-hero__eyebrow">Home</span>
-          <h1>Главное рядом</h1>
-          <p>
-            Ближайшие события, люди, circles и подкасты собраны на одном экране, чтобы ты быстро понял, куда идти дальше.
+
+      {/* ── Header ─────────────────────────────────────────────── */}
+      <div className="home-header">
+        <div className="home-header__left">
+          <h1 className="home-header__title">
+            {user ? `Привет, ${user.firstName}` : 'Добро пожаловать'}
+          </h1>
+          <p className="home-header__sub">
+            {isLoading ? 'Загружаем данные…' : `${onlineCount} человек онлайн в сообществе`}
           </p>
         </div>
+        {user && (
+          <div className="home-header__avatar">
+            {getInitials(user.firstName, user.lastName)}
+          </div>
+        )}
+      </div>
 
-        <div className="home-hero__metrics">
-          <div className="home-metric home-metric--online">
-            <span>Онлайн</span>
-            <strong>{isLoading ? '...' : onlineCount}</strong>
-          </div>
-          <div className="home-metric home-metric--events">
-            <span>Ближайшие events</span>
-            <strong>{isLoading ? '...' : upcomingEvents.length}</strong>
-          </div>
-          <div className="home-metric home-metric--circles">
-            <span>Активные circles</span>
-            <strong>{isLoading ? '...' : circles.length}</strong>
-          </div>
+      {/* ── Metrics ────────────────────────────────────────────── */}
+      <div className="home-metrics">
+        <div className="home-metric-card">
+          <span>Онлайн</span>
+          <strong>{isLoading ? '…' : onlineCount}</strong>
         </div>
-      </section>
+        <div className="home-metric-card">
+          <span>Событий на неделе</span>
+          <strong>{isLoading ? '…' : upcomingEvents.length}</strong>
+        </div>
+        <div className="home-metric-card">
+          <span>Circles</span>
+          <strong>{isLoading ? '…' : circles.length}</strong>
+        </div>
+      </div>
 
-      <section className="home-clusters">
-        <Link to="/community/people" className="home-cluster-card home-cluster-card--community">
-          <Users size={22} />
-          <div>
-            <strong>Community</strong>
-            <p>Люди, события, карта и circles.</p>
-          </div>
-          <ArrowRight size={18} />
-        </Link>
+      {/* ── Content columns ────────────────────────────────────── */}
+      <div className="home-content">
 
-        <Link to="/practice/code-rooms" className="home-cluster-card home-cluster-card--practice">
-          <Code2 size={22} />
-          <div>
-            <strong>Practice</strong>
-            <p>Code rooms, arena и практика кода.</p>
-          </div>
-          <ArrowRight size={18} />
-        </Link>
-
-        <Link to="/growth/interview-prep" className="home-cluster-card home-cluster-card--growth">
-          <Sparkles size={22} />
-          <div>
-            <strong>Growth</strong>
-            <p>Подготовка к интервью и вакансии.</p>
-          </div>
-          <ArrowRight size={18} />
-        </Link>
-      </section>
-
-      <section className="home-grid">
+        {/* Events */}
         <article className="home-panel home-panel--events">
           <div className="home-panel__head">
-            <div>
-              <span>Upcoming</span>
-              <h2>События рядом</h2>
-            </div>
-            <Link to="/community/events">Открыть</Link>
+            <h2>Ближайшие события</h2>
+            <Link to="/community/events" className="home-panel__link">Все →</Link>
           </div>
-          <div className="home-list">
+          <div className="home-event-list">
             {upcomingEvents.length > 0 ? upcomingEvents.map((event) => (
-              <div key={event.id} className="home-list__item">
-                <div>
+              <div key={event.id} className="home-event-item">
+                <div className="home-event-item__body">
                   <strong>{event.title}</strong>
                   <span>{formatDate(event.scheduled_at)}</span>
                 </div>
-                <div className="home-list__meta">
-                  <CalendarDays size={14} />
+                <div className="home-event-item__meta">
+                  <CalendarDays size={12} />
                   <span>{event.region || 'Online'}</span>
                 </div>
               </div>
-            )) : <div className="home-empty">Пока нет ближайших событий.</div>}
+            )) : (
+              <div className="home-empty">Пока нет ближайших событий.</div>
+            )}
           </div>
         </article>
 
+        {/* Circles */}
         <article className="home-panel home-panel--circles">
           <div className="home-panel__head">
-            <div>
-              <span>Circles</span>
-              <h2>Мини-комьюнити</h2>
-            </div>
-            <Link to="/community/circles">Все circles</Link>
+            <h2>Мои Circles</h2>
+            <Link to="/community/circles" className="home-panel__link">Все →</Link>
           </div>
           <div className="home-circle-list">
             {topCircles.length > 0 ? topCircles.map((circle) => (
-              <Link key={circle.id} to="/community/circles" className="home-circle-card">
-                <div>
-                  <strong>{circle.name}</strong>
-                  <span>{circle.memberCount} участников • {circle.visibility === 'open' ? 'открытый' : 'закрытый'}</span>
-                </div>
-                <div className="home-circle-card__meta">
+              <Link key={circle.id} to="/community/circles" className="home-circle-item">
+                <div className="home-circle-item__icon">
                   <Orbit size={14} />
-                  <span>{circle.hubLabel}</span>
+                </div>
+                <div className="home-circle-item__body">
+                  <strong>{circle.name}</strong>
+                  <span>{circle.memberCount} участников</span>
                 </div>
               </Link>
-            )) : <div className="home-empty">Circles пока не собраны.</div>}
+            )) : (
+              <div className="home-empty">Circles пока не собраны.</div>
+            )}
           </div>
         </article>
 
-        <article className="home-panel home-panel--arena">
-          <div className="home-panel__head">
-            <div>
-              <span>Arena</span>
-              <h2>Арена</h2>
-            </div>
-            <Link to="/practice/arena">Открыть</Link>
-          </div>
-          <div className="home-arena-card">
-            <Trophy size={22} />
-            <div>
-              <strong>Рейтинг и быстрые матчи</strong>
-              <p>Открывай арену, если хочешь сыграть дуэль или посмотреть таблицу лидеров.</p>
-            </div>
-          </div>
-        </article>
+      </div>
 
-        <article className="home-panel home-panel--broadcast" id="broadcast">
+      {/* ── Podcasts ───────────────────────────────────────────── */}
+      {podcasts.length > 0 && (
+        <article className="home-panel home-panel--podcasts">
           <div className="home-panel__head">
-            <div>
-              <span>Broadcast</span>
-              <h2>Подкасты и короткие апдейты</h2>
-            </div>
-            <a href="#broadcast">Слушать</a>
+            <h2>Подкасты</h2>
           </div>
-          <div className="home-list">
-            {podcasts.length > 0 ? podcasts.slice(0, 3).map((podcast) => {
+          <div className="home-podcast-list">
+            {podcasts.map((podcast) => {
               const isActive = currentPodcast?.id === podcast.id;
               return (
                 <button
                   key={podcast.id}
                   type="button"
-                  className={`home-podcast-card ${isActive ? 'is-active' : ''}`}
+                  className={`home-podcast-item${isActive ? ' is-active' : ''}`}
                   onClick={() => void playPodcast(podcast)}
                 >
-                  <div className="home-podcast-card__icon">
-                    <PlayCircle size={18} />
-                  </div>
-                  <div>
+                  <CirclePlay size={16} className="home-podcast-item__icon" />
+                  <div className="home-podcast-item__body">
                     <strong>{podcast.title}</strong>
-                    <span>{podcast.author_name}</span>
-                  </div>
-                  <div className="home-list__meta">
-                    <Clock3 size={14} />
-                    <span>{isActive && isPlaying ? 'Играет' : `${Math.max(1, Math.round(podcast.duration_seconds / 60))} мин`}</span>
+                    <span>
+                      {isActive && isPlaying
+                        ? 'Играет'
+                        : `${Math.max(1, Math.round(podcast.duration_seconds / 60))} мин`}
+                    </span>
                   </div>
                 </button>
               );
-            }) : <div className="home-empty">Подкастов пока нет.</div>}
+            })}
           </div>
         </article>
-      </section>
+      )}
+
     </div>
   );
 };
