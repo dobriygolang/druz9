@@ -21,9 +21,12 @@ import {
 interface SidebarProps {
   isAdmin?: boolean;
   isHome?: boolean;
+  isCommunity?: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = false }) => {
+type SidebarVariant = 'default' | 'home' | 'community';
+
+export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = false, isCommunity = false }) => {
   const location = useLocation();
   const { logout, isAuthenticated, user } = useAuth();
   const [onlineCount, setOnlineCount] = useState<number | null>(null);
@@ -50,11 +53,12 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
   const textSecondary = isAdmin ? '#64748b' : 'var(--text-secondary)';
   const bgSurface    = isAdmin ? '#f1f5f9' : 'var(--surface-color)';
   const accentColor  = '#6366f1';
+  const variant: SidebarVariant = isHome ? 'home' : (isCommunity ? 'community' : 'default');
   const homeDisplayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.username || 'Профиль';
   const homeSecondaryText = user?.username ? `@${user.username}` : (user?.region || (onlineCount !== null ? `${onlineCount} онлайн` : 'Аккаунт активен'));
 
   return (
-    <aside className={`sidebar-desktop${isAdmin ? ' sidebar-desktop--admin' : ''}${isHome ? ' sidebar-desktop--home' : ''}`}>
+    <aside className={`sidebar-desktop${isAdmin ? ' sidebar-desktop--admin' : ''}${isHome ? ' sidebar-desktop--home' : ''}${isCommunity ? ' sidebar-desktop--community' : ''}`}>
       <div className="sidebar-desktop__brand">
         {isHome ? (
           <div className="sidebar-desktop__brand-home">
@@ -62,6 +66,15 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
               <span />
             </div>
             <span className="sidebar-desktop__brand-home-label">LUNARIS</span>
+          </div>
+        ) : isCommunity ? (
+          <div className="sidebar-desktop__brand-community">
+            <div className="sidebar-desktop__brand-home">
+              <div className="sidebar-desktop__brand-home-mark" aria-hidden="true">
+                <span />
+              </div>
+              <span className="sidebar-desktop__brand-home-label">LUNARIS</span>
+            </div>
           </div>
         ) : (
           <>
@@ -99,54 +112,58 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
           <>
             {!isAdmin && (
               <>
-                <NavItem to="/home" icon={<Home size={20} />} label="Home" isAdmin={isAdmin} />
-                <NavItem to="/community/people" icon={<Users size={20} />} label="Community" isAdmin={isAdmin} />
-                <NavItem to="/practice/code-rooms" icon={<Code2 size={20} />} label="Practice" isAdmin={isAdmin} />
-                <NavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" isAdmin={isAdmin} />
-                <NavItem to="/home#podcasts" icon={<Headphones size={20} />} label="Подкасты" isAdmin={isAdmin} matchHash="#podcasts" currentHash={location.hash} />
-                <NavItem to="/practice/arena" icon={<Sword size={20} />} label="Arena" isAdmin={isAdmin} />
-                {!isHome && <div style={{ height: '32px' }} />}
+                <NavItem to="/home" icon={<Home size={20} />} label="Home" isAdmin={isAdmin} variant={variant} />
+                <NavItem to="/community/people" icon={<Users size={20} />} label="Community" isAdmin={isAdmin} variant={variant} />
+                <NavItem to="/practice/code-rooms" icon={<Code2 size={20} />} label="Practice" isAdmin={isAdmin} variant={variant} />
+                <NavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" isAdmin={isAdmin} variant={variant} />
+                {!isCommunity && (
+                  <>
+                    <NavItem to="/home#podcasts" icon={<Headphones size={20} />} label="Подкасты" isAdmin={isAdmin} variant={variant} matchHash="#podcasts" currentHash={location.hash} />
+                    <NavItem to="/practice/arena" icon={<Sword size={20} />} label="Arena" isAdmin={isAdmin} variant={variant} />
+                  </>
+                )}
+                {!isHome && !isCommunity && <div style={{ height: '32px' }} />}
               </>
             )}
 
             {isAdmin && (
               <>
                 {/* Back to app */}
-                <NavItem to="/home" icon={<ArrowRight size={18} style={{ transform: 'rotate(180deg)' }} />} label="К приложению" isAdmin={isAdmin} />
+                <NavItem to="/home" icon={<ArrowRight size={18} style={{ transform: 'rotate(180deg)' }} />} label="К приложению" isAdmin={isAdmin} variant={variant} />
                 <div style={{ height: '8px' }} />
 
                 {/* Admin nav sections */}
                 <div className="sidebar-section-title" style={{ color: textSecondary }}>УПРАВЛЕНИЕ</div>
-                <NavItem to="/admin/code-tasks" icon={<Code2 size={20} />} label="Code Tasks" isAdmin={isAdmin} />
-                <NavItem to="/admin/code-game" icon={<Sword size={20} />} label="Code Game" isAdmin={isAdmin} />
-                <NavItem to="/admin/interview-prep" icon={<Shield size={20} />} label="Interview Prep" isAdmin={isAdmin} />
-                <NavItem to="/admin/config" icon={<Settings size={20} />} label="Config" isAdmin={isAdmin} />
+                <NavItem to="/admin/code-tasks" icon={<Code2 size={20} />} label="Code Tasks" isAdmin={isAdmin} variant={variant} />
+                <NavItem to="/admin/code-game" icon={<Sword size={20} />} label="Code Game" isAdmin={isAdmin} variant={variant} />
+                <NavItem to="/admin/interview-prep" icon={<Shield size={20} />} label="Interview Prep" isAdmin={isAdmin} variant={variant} />
+                <NavItem to="/admin/config" icon={<Settings size={20} />} label="Config" isAdmin={isAdmin} variant={variant} />
                 <div style={{ height: '8px' }} />
                 <div className="sidebar-section-title" style={{ color: textSecondary }}>СТАТИСТИКА</div>
-                <NavItem to="/admin/analytics" icon={<BarChart2 size={20} />} label="Analytics" isAdmin={isAdmin} />
+                <NavItem to="/admin/analytics" icon={<BarChart2 size={20} />} label="Analytics" isAdmin={isAdmin} variant={variant} />
               </>
             )}
 
-            {!isAdmin && !isHome && user?.isAdmin && (
+            {!isAdmin && !isHome && !isCommunity && user?.isAdmin && (
               <>
                 <div className="sidebar-section-title" style={{ color: textSecondary }}>Админ</div>
-                <NavItem to="/admin/code-tasks" icon={<Code2 size={20} />} label="Задачи" isAdmin={isAdmin} />
-                <NavItem to="/admin/code-game" icon={<Sword size={20} />} label="Code Game" isAdmin={isAdmin} />
-                <NavItem to="/admin/analytics" icon={<BarChart2 size={20} />} label="Аналитика" isAdmin={isAdmin} />
+                <NavItem to="/admin/code-tasks" icon={<Code2 size={20} />} label="Задачи" isAdmin={isAdmin} variant={variant} />
+                <NavItem to="/admin/code-game" icon={<Sword size={20} />} label="Code Game" isAdmin={isAdmin} variant={variant} />
+                <NavItem to="/admin/analytics" icon={<BarChart2 size={20} />} label="Аналитика" isAdmin={isAdmin} variant={variant} />
                 <div style={{ height: '16px' }} />
               </>
             )}
 
-            {!isAdmin && !isHome && (
+            {!isAdmin && !isHome && !isCommunity && (
               <>
-                <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" isAdmin={isAdmin} />
+                <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" isAdmin={isAdmin} variant={variant} />
               </>
             )}
 
             {isAdmin && (
               <>
                 <div style={{ height: '16px' }} />
-                <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" isAdmin={isAdmin} />
+                <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" isAdmin={isAdmin} variant={variant} />
               </>
             )}
           </>
@@ -194,14 +211,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
               </NavLink>
             </div>
             <div style={{ height: '20px' }} />
-            <NavItem to="/login" icon={<UserIcon size={20} />} label="Войти" isAdmin={isAdmin} />
+            <NavItem to="/login" icon={<UserIcon size={20} />} label="Войти" isAdmin={isAdmin} variant={variant} />
           </>
         )}
       </nav>
 
-      {isAuthenticated && isHome && !isAdmin ? (
+      {isAuthenticated && (isHome || isCommunity) && !isAdmin ? (
         <div className="sidebar-desktop__footer sidebar-desktop__footer--home">
-          <NavLink to="/profile" className="sidebar-desktop__home-profile">
+          <NavLink to="/profile" className={`sidebar-desktop__home-profile${isCommunity ? ' sidebar-desktop__home-profile--community' : ''}`}>
             <div className="sidebar-desktop__home-profile-copy">
               <strong>{homeDisplayName}</strong>
               <span>{homeSecondaryText}</span>
@@ -239,20 +256,31 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
   );
 };
 
-const NavItem: React.FC<{ icon: React.ReactNode; label: string; to: string; isAdmin: boolean; matchHash?: string; currentHash?: string }> = ({ icon, label, to, isAdmin, matchHash, currentHash }) => (
+const NavItem: React.FC<{ icon: React.ReactNode; label: string; to: string; isAdmin: boolean; variant?: SidebarVariant; matchHash?: string; currentHash?: string }> = ({ icon, label, to, isAdmin, variant = 'default', matchHash, currentHash }) => (
   <NavLink
     to={to}
     end={to === '/home' || to === '/admin/code-tasks'}
     className="sidebar-desktop__nav-item"
-    style={({ isActive }) => ({
-      color: ((matchHash ? currentHash === matchHash : isActive))
-        ? (isAdmin ? '#6366f1' : 'var(--accent-color)')
-        : (isAdmin ? '#475569' : 'var(--text-secondary)'),
-      backgroundColor: ((matchHash ? currentHash === matchHash : isActive))
-        ? (isAdmin ? '#eff6ff' : 'var(--surface-color)')
-        : 'transparent',
-      fontWeight: (matchHash ? currentHash === matchHash : isActive) ? '600' : '500',
-    })}
+    style={({ isActive }) => {
+      const active = matchHash ? currentHash === matchHash : isActive;
+      if (variant === 'community') {
+        return {
+          color: active ? '#111111' : '#666666',
+          backgroundColor: active ? '#cbccc9' : 'transparent',
+          fontWeight: active ? '500' : '400',
+        };
+      }
+
+      return {
+        color: active
+          ? (isAdmin ? '#6366f1' : 'var(--accent-color)')
+          : (isAdmin ? '#475569' : 'var(--text-secondary)'),
+        backgroundColor: active
+          ? (isAdmin ? '#eff6ff' : 'var(--surface-color)')
+          : 'transparent',
+        fontWeight: active ? '600' : '500',
+      };
+    }}
   >
     {icon} <span>{label}</span>
   </NavLink>
