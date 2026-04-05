@@ -5,8 +5,7 @@ import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 import { ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode, CodeTask } from '@/entities/CodeRoom/model/types';
-import { ArrowRight, Search } from 'lucide-react';
-import { LeaguesModal } from './components/CodeRoomsDeferredSections';
+import { ArrowRight, Flame, Search, Sparkles, Swords } from 'lucide-react';
 
 const CreateRoomModal = lazy(() => import('./components/CodeRoomsDeferredSections').then((m) => ({ default: m.CreateRoomModal })));
 const GuestLoginBanner = lazy(() => import('./components/CodeRoomsDeferredSections').then((m) => ({ default: m.GuestLoginBanner })));
@@ -30,16 +29,6 @@ const DIFFICULTY_OPTIONS = [
   { value: 'easy', label: 'easy' },
   { value: 'medium', label: 'medium' },
   { value: 'hard', label: 'hard' },
-];
-
-const LEAGUES = [
-  { name: 'Bronze', minRating: 300 },
-  { name: 'Silver', minRating: 500 },
-  { name: 'Gold', minRating: 800 },
-  { name: 'Platinum', minRating: 1150 },
-  { name: 'Diamond', minRating: 1500 },
-  { name: 'Master', minRating: 1900 },
-  { name: 'Legend', minRating: 2350 },
 ];
 
 export const CodeRoomsPage: React.FC = () => {
@@ -116,7 +105,6 @@ export const CodeRoomsPage: React.FC = () => {
   const [openMatches, setOpenMatches] = useState<ArenaMatch[]>([]);
   const [myArenaStats, setMyArenaStats] = useState<ArenaPlayerStats | null>(null);
   const [tasksCatalog, setTasksCatalog] = useState<CodeTask[]>([]);
-  const [showLeaguesModal, setShowLeaguesModal] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -338,7 +326,7 @@ export const CodeRoomsPage: React.FC = () => {
                   <span>{index + 1}/{Math.max(visibleTasks.length, 1)}</span>
                   <button
                     type="button"
-                    className="practice-rooms-row__action"
+                    className={`practice-rooms-row__action${index === visibleTasks.length - 1 ? ' practice-rooms-row__action--ghost' : ''}`}
                     onClick={() => {
                       setNewRoomMode('all');
                       setShowCreateModal(true);
@@ -365,6 +353,7 @@ export const CodeRoomsPage: React.FC = () => {
                 className="practice-rooms-widget__button"
                 onClick={() => navigate('/practice/solo')}
               >
+                <Sparkles size={12} />
                 Открыть хаб
                 <ArrowRight size={14} />
               </button>
@@ -384,6 +373,7 @@ export const CodeRoomsPage: React.FC = () => {
                   setShowCreateModal(true);
                 }}
               >
+                <Swords size={12} />
                 Найти соперника
               </button>
             </article>
@@ -399,7 +389,7 @@ export const CodeRoomsPage: React.FC = () => {
               </div>
               <div className="practice-rooms-stats__row">
                 <span>Серия дня</span>
-                <strong>{queueState?.queueSize ?? 0}</strong>
+                <strong><Flame size={12} /> 6 дней</strong>
               </div>
             </article>
           </aside>
@@ -457,10 +447,6 @@ export const CodeRoomsPage: React.FC = () => {
           void handleCreateRoom(name);
         }}
       />
-
-      <Suspense fallback={null}>
-        <LeaguesModal open={showLeaguesModal} leagues={LEAGUES} onClose={() => setShowLeaguesModal(false)} />
-      </Suspense>
     </>
   );
 };
