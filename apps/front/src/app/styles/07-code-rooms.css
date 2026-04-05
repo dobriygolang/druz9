@@ -246,42 +246,42 @@
 }
 
 .pill-selector__pill.active {
-  background: rgba(79, 70, 229, 0.2);
-  border-color: rgba(79, 70, 229, 0.5);
-  color: #c7c2ff;
+  background: rgba(255, 132, 0, 0.1);
+  border-color: rgba(255, 132, 0, 0.4);
+  color: #FF8400;
 }
 
 .pill-selector__pill.pill-easy {
-  border-color: rgba(34, 197, 94, 0.25);
-  color: #86efac;
+  border-color: rgba(22, 163, 74, 0.25);
+  color: #16a34a;
 }
 
 .pill-selector__pill.pill-easy.active {
-  background: rgba(34, 197, 94, 0.18);
-  border-color: rgba(34, 197, 94, 0.45);
-  color: #86efac;
+  background: rgba(22, 163, 74, 0.1);
+  border-color: rgba(22, 163, 74, 0.4);
+  color: #15803d;
 }
 
 .pill-selector__pill.pill-medium {
-  border-color: rgba(234, 179, 8, 0.25);
-  color: #fde047;
+  border-color: rgba(180, 83, 9, 0.25);
+  color: #b45309;
 }
 
 .pill-selector__pill.pill-medium.active {
-  background: rgba(234, 179, 8, 0.18);
-  border-color: rgba(234, 179, 8, 0.45);
-  color: #fde047;
+  background: rgba(180, 83, 9, 0.1);
+  border-color: rgba(180, 83, 9, 0.4);
+  color: #b45309;
 }
 
 .pill-selector__pill.pill-hard {
-  border-color: rgba(239, 68, 68, 0.25);
-  color: #fca5a5;
+  border-color: rgba(220, 38, 38, 0.25);
+  color: #dc2626;
 }
 
 .pill-selector__pill.pill-hard.active {
-  background: rgba(239, 68, 68, 0.18);
-  border-color: rgba(239, 68, 68, 0.45);
-  color: #fca5a5;
+  background: rgba(220, 38, 38, 0.1);
+  border-color: rgba(220, 38, 38, 0.4);
+  color: #dc2626;
 }
 
 /* Dashboard Grid */
@@ -378,8 +378,8 @@
   border-radius: 12px;
   display: grid;
   place-items: center;
-  background: rgba(79, 70, 229, 0.16);
-  color: #c9c3ff;
+  background: rgba(255, 132, 0, 0.1);
+  color: #FF8400;
 }
 
 .code-rooms-mode-card__title {
@@ -492,21 +492,21 @@
 }
 
 .leaderboard-rank.rank-gold {
-  background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(234, 179, 8, 0.08));
+  background: rgba(234, 179, 8, 0.1);
   border: 1px solid rgba(234, 179, 8, 0.35);
-  color: #fde047;
+  color: #92400e;
 }
 
 .leaderboard-rank.rank-silver {
-  background: linear-gradient(135deg, rgba(148, 163, 184, 0.2), rgba(148, 163, 184, 0.08));
+  background: rgba(148, 163, 184, 0.15);
   border: 1px solid rgba(148, 163, 184, 0.35);
-  color: #e2e8f0;
+  color: #475569;
 }
 
 .leaderboard-rank.rank-bronze {
-  background: linear-gradient(135deg, rgba(180, 83, 9, 0.2), rgba(180, 83, 9, 0.08));
+  background: rgba(180, 83, 9, 0.1);
   border: 1px solid rgba(180, 83, 9, 0.35);
-  color: #fdba74;
+  color: #92400e;
 }
 
 .leaderboard-rank__place {
