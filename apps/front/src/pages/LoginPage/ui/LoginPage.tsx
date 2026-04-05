@@ -95,7 +95,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F2F3F0] flex items-center justify-center relative overflow-hidden px-4">
+    <div className="min-h-screen bg-[#F2F3F0] flex items-start sm:items-center justify-center relative overflow-hidden px-4 pt-10 sm:pt-0">
 
       {/* Ambient glow */}
       <div className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full pointer-events-none"

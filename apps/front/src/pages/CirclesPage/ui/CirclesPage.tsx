@@ -83,7 +83,7 @@ export function CirclesPage() {
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchCircles() }} />
 
   return (
-    <div className="px-6 pt-4 pb-6">
+    <div className="px-4 md:px-6 pt-4 pb-4 md:pb-6">
       {/* Search bar */}
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
@@ -96,14 +96,14 @@ export function CirclesPage() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="h-[220px] bg-white rounded-2xl border border-[#CBCCC9] animate-pulse" />
           ))
           : filtered.length === 0
             ? (
-              <div className="col-span-3 flex flex-col items-center justify-center py-20 text-center">
+              <div className="col-span-1 sm:col-span-2 lg:col-span-3 flex flex-col items-center justify-center py-20 text-center">
                 <div className="w-14 h-14 rounded-2xl bg-[#f0f0ee] flex items-center justify-center mb-4">
                   <Users className="w-7 h-7 text-[#94a3b8]" />
                 </div>

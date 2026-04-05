@@ -159,6 +159,14 @@ interface ArenaStats {
   win_rate: number
 }
 
+function computeLeague(rating: number): string {
+  if (rating < 1000) return 'Бронза'
+  if (rating < 1500) return 'Серебро'
+  if (rating < 2000) return 'Золото'
+  if (rating < 2500) return 'Платина'
+  return 'Алмаз'
+}
+
 /* ── Main component ────────────────────────────────────────── */
 export function ProfilePage() {
   const { userId } = useParams()
@@ -241,7 +249,7 @@ export function ProfilePage() {
     return (
       <div className="p-6 animate-pulse space-y-4">
         <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5 h-[100px]" />
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-white rounded-2xl border border-[#CBCCC9] h-20" />)}
         </div>
       </div>
@@ -303,7 +311,7 @@ export function ProfilePage() {
 
       {/* Stats grid */}
       {progress && (
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { label: 'Сессий', value: progress.overview.practiceSessions, icon: <Zap className="w-4 h-4 text-[#6366F1]" /> },
             { label: 'Пройдено', value: progress.overview.practicePassedSessions, icon: <Trophy className="w-4 h-4 text-[#22c55e]" /> },
@@ -323,7 +331,7 @@ export function ProfilePage() {
 
       {/* Arena stats row */}
       {arenaStats && (
-        <div className="grid grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
           {[
             { label: 'Побед', value: arenaStats.wins, icon: <Trophy className="w-4 h-4 text-[#6366F1]" /> },
             { label: 'Поражений', value: arenaStats.losses, icon: <Swords className="w-4 h-4 text-[#ef4444]" /> },
@@ -351,7 +359,7 @@ export function ProfilePage() {
         )}
       </Card>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         {/* Left column */}
         <div className="flex-1 flex flex-col gap-4">
           {/* Companies */}
@@ -403,7 +411,7 @@ export function ProfilePage() {
         </div>
 
         {/* Right column */}
-        <div className="w-[300px] flex-shrink-0 flex flex-col gap-3">
+        <div className="w-full lg:w-[300px] lg:flex-shrink-0 flex flex-col gap-3">
           {/* League with ELO ring */}
           <Card padding="md" dark orangeBorder>
             <div className="flex items-center gap-2 mb-3">
@@ -411,7 +419,7 @@ export function ProfilePage() {
               <h3 className="text-sm font-semibold text-[#CBCCC9]">Лига</h3>
             </div>
             {arenaStats ? (
-              <EloRing rating={arenaStats.rating} league={arenaStats.league} />
+              <EloRing rating={arenaStats.rating} league={computeLeague(arenaStats.rating)} />
             ) : (
               <>
                 <p className="font-mono text-2xl font-bold text-[#6366F1]">--</p>

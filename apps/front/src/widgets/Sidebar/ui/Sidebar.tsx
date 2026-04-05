@@ -50,6 +50,9 @@ export function Sidebar() {
     return () => document.removeEventListener('keydown', handleKey)
   }, [popoverOpen])
 
+  const isFullScreen = location.pathname.startsWith('/code-rooms/') || location.pathname.startsWith('/arena/')
+  if (isFullScreen) return null
+
   const isActive = (item: NavItem) => {
     if (item.matchPrefix) return location.pathname.startsWith(item.matchPrefix)
     return location.pathname === item.href
@@ -59,24 +62,22 @@ export function Sidebar() {
   const email = user?.telegramUsername ? `@${user.telegramUsername}` : ''
 
   return (
-    <aside className="w-[220px] min-h-screen bg-[#E7E8E5] border-r border-[#CBCCC9] flex flex-col flex-shrink-0">
+    <aside className="hidden md:flex w-[64px] lg:w-[220px] min-h-screen bg-[#E7E8E5] border-r border-[#CBCCC9] flex-col flex-shrink-0 transition-all duration-200">
       {/* Logo */}
-      <div className="h-[80px] flex items-center px-5">
+      <div className="h-[72px] flex items-center justify-center lg:justify-start px-3 lg:px-5">
         <div className="flex items-center gap-2.5">
           {/* Network graph mark */}
           <div className="w-8 h-8 bg-[#6366F1] rounded-lg flex items-center justify-center flex-shrink-0 shadow-[0_2px_8px_rgba(99,102,241,0.35)]">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-              {/* edges */}
               <line x1="5" y1="6" x2="15" y2="6"  stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.6"/>
               <line x1="5" y1="6" x2="10" y2="15" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.6"/>
               <line x1="15" y1="6" x2="10" y2="15" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.6"/>
-              {/* nodes */}
               <circle cx="5"  cy="6"  r="2.4" fill="white"/>
               <circle cx="15" cy="6"  r="2.4" fill="white"/>
               <circle cx="10" cy="15" r="2.4" fill="white"/>
             </svg>
           </div>
-          <div className="flex flex-col">
+          <div className="hidden lg:flex flex-col">
             <span className="font-bold text-[13px] text-[#6366F1] tracking-[0.18em] leading-tight uppercase"
               style={{ fontFamily: 'Geist, Inter, system-ui, sans-serif' }}>
               ДРУЗЬЯ
@@ -87,15 +88,16 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-3 flex flex-col gap-0.5">
+      <nav className="flex-1 px-2 lg:px-3 flex flex-col gap-0.5">
         {NAV_ITEMS.map((item) => {
           const active = isActive(item)
           return (
             <Link
               key={item.href}
               to={item.href}
+              title={item.label}
               className={cn(
-                'relative flex items-center gap-2.5 px-3 py-2.5 rounded-full text-[13px] font-medium transition-all duration-200 font-geist',
+                'relative flex items-center justify-center lg:justify-start gap-2.5 px-2 lg:px-3 py-2.5 rounded-full text-[13px] font-medium transition-all duration-200 font-geist',
                 active
                   ? 'bg-[#CBCCC9] text-[#111111]'
                   : 'text-[#666666] hover:bg-[#D8D9D6] hover:text-[#111111]',
@@ -105,7 +107,7 @@ export function Sidebar() {
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#6366F1] rounded-r-full" />
               )}
               {item.icon}
-              {item.label}
+              <span className="hidden lg:block">{item.label}</span>
             </Link>
           )
         })}
@@ -113,7 +115,7 @@ export function Sidebar() {
 
       {/* Footer with popover menu */}
       {user && (
-        <div className="relative px-4 py-4 border-t border-[#CBCCC9]" ref={popoverRef}>
+        <div className="relative px-2 lg:px-4 py-4 border-t border-[#CBCCC9]" ref={popoverRef}>
           {/* Popover */}
           {popoverOpen && (
             <div className="absolute bottom-full left-3 right-3 mb-2 bg-white rounded-xl shadow-lg border border-[#CBCCC9] z-50 overflow-hidden">
@@ -167,14 +169,14 @@ export function Sidebar() {
           {/* Clickable footer area */}
           <button
             onClick={() => setPopoverOpen(prev => !prev)}
-            className="w-full flex items-center gap-3 text-left rounded-lg hover:bg-[#D8D9D6] p-1 -m-1 transition-colors"
+            className="w-full flex items-center justify-center lg:justify-start gap-3 text-left rounded-lg hover:bg-[#D8D9D6] p-1 -m-1 transition-colors"
           >
             <Avatar
               name={displayName}
               src={user.avatarUrl || undefined}
               size="sm"
             />
-            <div className="flex-1 min-w-0">
+            <div className="hidden lg:block flex-1 min-w-0">
               <p className="text-sm font-medium text-[#111111] font-geist truncate">{displayName}</p>
               {email && <p className="text-xs text-[#666666] font-geist truncate">{email}</p>}
             </div>

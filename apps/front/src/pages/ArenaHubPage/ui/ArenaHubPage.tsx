@@ -81,7 +81,7 @@ export function ArenaHubPage() {
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchData() }} />
 
   return (
-    <div className="px-6 pt-4 pb-6 flex gap-4">
+    <div className="px-4 md:px-6 pt-4 pb-4 md:pb-6 flex flex-col lg:flex-row gap-4">
       {/* Left column */}
       <div className="flex-1 flex flex-col gap-4">
         {/* Queue card */}
@@ -151,7 +151,7 @@ export function ArenaHubPage() {
       </div>
 
       {/* Right column */}
-      <div className="w-[300px] flex-shrink-0 flex flex-col gap-4">
+      <div className="w-full lg:w-[300px] lg:flex-shrink-0 flex flex-col gap-4">
         {/* League card */}
         <Card padding="md" dark orangeBorder>
           <div className="flex items-center gap-2 mb-3">

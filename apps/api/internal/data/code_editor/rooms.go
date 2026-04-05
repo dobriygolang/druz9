@@ -51,13 +51,8 @@ func (r *Repo) CreateRoom(ctx context.Context, room *codeeditordomain.Room) (*co
 }
 
 func (r *Repo) GetRoom(ctx context.Context, roomID uuid.UUID) (*codeeditordomain.Room, error) {
-	var room codeeditordomain.Room
-	err := scanRoom(r.data.DB.QueryRow(ctx, `
-		SELECT `+roomSelectColumns+`
-		FROM code_rooms cr
-		LEFT JOIN code_tasks ct ON ct.id = cr.task_id
-		WHERE cr.id = $1
-	`, roomID), &room)
+	row := r.data.DB.QueryRow(ctx, roomFullQuery+` WHERE cr.id = $1 GROUP BY cr.id, ct.id`, roomID)
+	room, err := scanRoomFull(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, codeeditordomain.ErrRoomNotFound
@@ -67,18 +62,12 @@ func (r *Repo) GetRoom(ctx context.Context, roomID uuid.UUID) (*codeeditordomain
 		}
 		return nil, fmt.Errorf("get room: %w", err)
 	}
-	room.Participants, _ = r.getParticipants(ctx, roomID)
-	return &room, nil
+	return room, nil
 }
 
 func (r *Repo) GetRoomByInviteCode(ctx context.Context, inviteCode string) (*codeeditordomain.Room, error) {
-	var room codeeditordomain.Room
-	err := scanRoom(r.data.DB.QueryRow(ctx, `
-		SELECT `+roomSelectColumns+`
-		FROM code_rooms cr
-		LEFT JOIN code_tasks ct ON ct.id = cr.task_id
-		WHERE cr.invite_code = $1
-	`, inviteCode), &room)
+	row := r.data.DB.QueryRow(ctx, roomFullQuery+` WHERE cr.invite_code = $1 GROUP BY cr.id, ct.id`, inviteCode)
+	room, err := scanRoomFull(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, codeeditordomain.ErrRoomNotFound
@@ -88,8 +77,7 @@ func (r *Repo) GetRoomByInviteCode(ctx context.Context, inviteCode string) (*cod
 		}
 		return nil, fmt.Errorf("get room by invite code: %w", err)
 	}
-	room.Participants, _ = r.getParticipants(ctx, room.ID)
-	return &room, nil
+	return room, nil
 }
 
 func (r *Repo) SaveCodeSnapshot(ctx context.Context, roomID uuid.UUID, code string) error {

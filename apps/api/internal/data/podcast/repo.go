@@ -38,14 +38,14 @@ func (r *Repo) ListPodcasts(ctx context.Context, opts model.ListPodcastsOptions)
 
 	// Get total count
 	var totalCount int32
-	if err := r.data.DB.QueryRow(ctx, `SELECT COUNT(*) FROM podcasts WHERE COALESCE(object_key, '') <> ''`).Scan(&totalCount); err != nil {
+	if err := r.data.DB.QueryRow(ctx, `SELECT COUNT(*) FROM podcasts WHERE object_key IS NOT NULL AND object_key <> ''`).Scan(&totalCount); err != nil {
 		return nil, fmt.Errorf("count podcasts: %w", err)
 	}
 
 	query := fmt.Sprintf(`
 SELECT %s
 FROM podcasts
-WHERE COALESCE(object_key, '') <> ''
+WHERE object_key IS NOT NULL AND object_key <> ''
 ORDER BY created_at DESC
 LIMIT $1 OFFSET $2
 `, podcastColumns)

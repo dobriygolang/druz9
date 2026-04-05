@@ -36,7 +36,7 @@ export function AdminAnalyticsPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
         <StatCard label="Пользователей" value="1,234" icon={<Users className="w-5 h-5 text-[#6366f1]" />} change="+12% за период" />
         <StatCard label="Активных сессий" value="456" icon={<Code2 className="w-5 h-5 text-[#6366F1]" />} change="+8%" />
         <StatCard label="Матчей Arena" value="89" icon={<Trophy className="w-5 h-5 text-[#f59e0b]" />} change="+23%" />
@@ -44,7 +44,7 @@ export function AdminAnalyticsPage() {
       </div>
 
       {/* Charts placeholder */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="bg-white rounded-xl border border-[#CBCCC9] p-5">
           <h3 className="text-sm font-semibold text-[#0f172a] mb-4 flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-[#6366f1]" /> Активность пользователей

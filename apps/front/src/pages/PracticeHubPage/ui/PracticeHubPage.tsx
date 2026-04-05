@@ -2,8 +2,6 @@ import { useEffect, useState } from 'react'
 import { Outlet, useLocation, Link, useNavigate } from 'react-router-dom'
 import { Code2, Swords, Target } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
-import { Card } from '@/shared/ui/Card'
-import { Button } from '@/shared/ui/Button'
 import { Avatar } from '@/shared/ui/Avatar'
 import { apiClient } from '@/shared/api/base'
 
@@ -20,29 +18,6 @@ interface LeaderboardUser {
   wins: number
 }
 
-const FEATURES = [
-  {
-    icon: Code2,
-    title: 'Code Rooms',
-    description: 'Решай задачи с друзьями в реальном времени',
-    button: 'Создать комнату',
-    href: '/practice/code-rooms',
-  },
-  {
-    icon: Swords,
-    title: 'Arena Duels',
-    description: 'Соревнуйся 1 на 1 за ELO рейтинг',
-    button: 'Найти соперника',
-    href: '/practice/arena',
-  },
-  {
-    icon: Target,
-    title: 'Solo Practice',
-    description: 'Тренируйся в своём темпе на любых задачах',
-    button: 'Начать',
-    href: '/practice/solo',
-  },
-] as const
 
 export function PracticeHubPage() {
   const location = useLocation()
@@ -65,7 +40,7 @@ export function PracticeHubPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
-      <div className="px-6 pt-6 pb-0 bg-[#F2F3F0]">
+      <div className="px-4 md:px-6 pt-4 md:pt-6 pb-0 bg-[#F2F3F0]">
         {/* Page heading */}
         <div className="flex items-center justify-between mb-5">
           <div>
@@ -74,28 +49,34 @@ export function PracticeHubPage() {
           </div>
         </div>
 
-        {/* Hero feature cards */}
-        <div className="grid grid-cols-3 gap-4 mb-5">
-          {FEATURES.map(f => {
+        {/* Mode quick links */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+          {[
+            { icon: Code2, title: 'Code Rooms', sub: 'Совместный кодинг', href: '/practice/code-rooms', color: '#6366F1' },
+            { icon: Swords, title: 'Arena Duels', sub: '1-на-1 за ELO', href: '/practice/arena', color: '#6366F1' },
+            { icon: Target, title: 'Solo Practice', sub: 'В своём темпе', href: '/practice/solo', color: '#6366F1' },
+          ].map(f => {
             const Icon = f.icon
+            const isAct = location.pathname.startsWith(f.href)
             return (
-              <Card key={f.title} dark padding="lg" className="flex flex-col gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#1e293b] flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-[#6366F1]" />
+              <button
+                key={f.title}
+                onClick={() => navigate(f.href)}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all text-left ${
+                  isAct
+                    ? 'bg-white border-[#6366F1] shadow-sm'
+                    : 'bg-white border-[#CBCCC9] hover:border-[#6366F1]/40 hover:shadow-sm'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isAct ? 'bg-[#EEF2FF]' : 'bg-[#F2F3F0]'}`}>
+                  <Icon className="w-4 h-4 text-[#6366F1]" />
                 </div>
-                <div>
-                  <h3 className="text-base font-semibold text-white">{f.title}</h3>
-                  <p className="text-sm text-[#94a3b8] mt-1">{f.description}</p>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[#111111] leading-tight">{f.title}</p>
+                  <p className="text-xs text-[#666666] leading-tight mt-0.5">{f.sub}</p>
                 </div>
-                <Button
-                  variant="orange"
-                  size="sm"
-                  className="mt-auto self-start"
-                  onClick={() => navigate(f.href)}
-                >
-                  {f.button}
-                </Button>
-              </Card>
+                {isAct && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#6366F1] flex-shrink-0" />}
+              </button>
             )
           })}
         </div>

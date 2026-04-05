@@ -19,7 +19,7 @@ interface AchievementBadgesProps {
 export const AchievementBadges: React.FC<AchievementBadgesProps> = ({ achievements, compact = false }) => {
   const unlocked = achievements.filter(a => a.unlocked).length
   const total = achievements.length
-  const cols = compact ? 'grid-cols-3' : 'grid-cols-4'
+  const cols = compact ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-3 sm:grid-cols-4'
 
   return (
     <div>

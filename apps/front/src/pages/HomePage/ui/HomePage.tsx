@@ -55,7 +55,7 @@ export function HomePage() {
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
         {[
           { label: 'Онлайн', value: onlineCount, icon: <Users className="w-4 h-4 text-[#666666]" /> },
           { label: 'Событий', value: events.length, icon: <Calendar className="w-4 h-4 text-[#666666]" /> },

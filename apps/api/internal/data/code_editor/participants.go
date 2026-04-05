@@ -29,24 +29,17 @@ func (r *Repo) getParticipants(ctx context.Context, roomID uuid.UUID) ([]*codeed
 
 func (r *Repo) AddParticipant(ctx context.Context, roomID uuid.UUID, participant *codeeditordomain.Participant) (*codeeditordomain.Room, error) {
 	if participant.UserID != nil {
+		// Single UPSERT: insert or update name/is_guest on conflict with existing user_id
 		_, err := r.data.DB.Exec(
-			ctx,
-			`UPDATE code_participants SET name = $3, is_guest = $4 WHERE room_id = $1 AND user_id = $2`,
-			roomID, participant.UserID, participant.Name, participant.IsGuest,
-		)
-		if err != nil {
-			return nil, fmt.Errorf("update participant: %w", err)
-		}
-
-		_, err = r.data.DB.Exec(
 			ctx,
 			`INSERT INTO code_participants (room_id, user_id, name, is_guest, is_ready, is_winner, joined_at)
 			 VALUES ($1, $2, $3, $4, $5, $6, NOW())
-			 ON CONFLICT DO NOTHING`,
+			 ON CONFLICT (room_id, user_id) DO UPDATE
+			   SET name = EXCLUDED.name, is_guest = EXCLUDED.is_guest`,
 			roomID, participant.UserID, participant.Name, participant.IsGuest, participant.IsReady, participant.IsWinner,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("add participant: %w", err)
+			return nil, fmt.Errorf("upsert participant: %w", err)
 		}
 	} else {
 		_, err := r.data.DB.Exec(
@@ -57,7 +50,7 @@ func (r *Repo) AddParticipant(ctx context.Context, roomID uuid.UUID, participant
 			roomID, participant.UserID, participant.Name, participant.IsGuest, participant.IsReady, participant.IsWinner,
 		)
 		if err != nil {
-			return nil, fmt.Errorf("add participant: %w", err)
+			return nil, fmt.Errorf("add guest participant: %w", err)
 		}
 	}
 

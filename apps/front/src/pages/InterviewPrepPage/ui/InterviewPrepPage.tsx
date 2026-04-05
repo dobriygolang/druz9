@@ -79,7 +79,7 @@ export function InterviewPrepPage() {
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchTasks() }} />
 
   return (
-    <div className="px-6 pt-4 pb-6">
+    <div className="px-4 md:px-6 pt-4 pb-4 md:pb-6">
       {/* Company cards */}
       {companies.length > 0 && (
         <div className="mb-4">
@@ -116,7 +116,7 @@ export function InterviewPrepPage() {
       )}
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-3 mb-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 mb-4">
         {stats.map(s => (
           <Card key={s.label} padding="md" className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center">{s.icon}</div>
@@ -180,7 +180,7 @@ export function InterviewPrepPage() {
         </div>
       </div>
 
-      <div className="flex gap-4">
+      <div className="flex flex-col lg:flex-row gap-4">
         {/* Task list */}
         <div className="flex-1">
           <div className="bg-white rounded-2xl border border-[#CBCCC9] overflow-hidden">
@@ -227,7 +227,7 @@ export function InterviewPrepPage() {
         </div>
 
         {/* Right sidebar */}
-        <div className="w-[300px] flex-shrink-0 flex flex-col gap-3">
+        <div className="w-full lg:w-[300px] lg:flex-shrink-0 flex flex-col gap-3">
           <Card padding="md" dark orangeBorder>
             <h3 className="text-sm font-semibold text-[#CBCCC9] mb-2">Mock Interview</h3>
             <p className="text-xs text-[#94a3b8] mb-3">Симулируй полное собеседование с AI</p>
