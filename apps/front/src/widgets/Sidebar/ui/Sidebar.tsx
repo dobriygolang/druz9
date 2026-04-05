@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { NavLink, useLocation } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { geoApi } from '@/features/Geo/api/geoApi';
 import {
@@ -24,6 +24,7 @@ interface SidebarProps {
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = false }) => {
+  const location = useLocation();
   const { logout, isAuthenticated, user } = useAuth();
   const [onlineCount, setOnlineCount] = useState<number | null>(null);
 
@@ -102,7 +103,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
                 <NavItem to="/community/people" icon={<Users size={20} />} label="Community" isAdmin={isAdmin} />
                 <NavItem to="/practice/code-rooms" icon={<Code2 size={20} />} label="Practice" isAdmin={isAdmin} />
                 <NavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" isAdmin={isAdmin} />
-                <NavItem to="/home" icon={<Headphones size={20} />} label="Подкасты" isAdmin={isAdmin} />
+                <NavItem to="/home#podcasts" icon={<Headphones size={20} />} label="Подкасты" isAdmin={isAdmin} matchHash="#podcasts" currentHash={location.hash} />
                 <NavItem to="/practice/arena" icon={<Sword size={20} />} label="Arena" isAdmin={isAdmin} />
                 {!isHome && <div style={{ height: '32px' }} />}
               </>
@@ -238,19 +239,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
   );
 };
 
-const NavItem: React.FC<{ icon: React.ReactNode; label: string; to: string; isAdmin: boolean }> = ({ icon, label, to, isAdmin }) => (
+const NavItem: React.FC<{ icon: React.ReactNode; label: string; to: string; isAdmin: boolean; matchHash?: string; currentHash?: string }> = ({ icon, label, to, isAdmin, matchHash, currentHash }) => (
   <NavLink
     to={to}
     end={to === '/home' || to === '/admin/code-tasks'}
     className="sidebar-desktop__nav-item"
     style={({ isActive }) => ({
-      color: isActive
+      color: ((matchHash ? currentHash === matchHash : isActive))
         ? (isAdmin ? '#6366f1' : 'var(--accent-color)')
         : (isAdmin ? '#475569' : 'var(--text-secondary)'),
-      backgroundColor: isActive
+      backgroundColor: ((matchHash ? currentHash === matchHash : isActive))
         ? (isAdmin ? '#eff6ff' : 'var(--surface-color)')
         : 'transparent',
-      fontWeight: isActive ? '600' : '500',
+      fontWeight: (matchHash ? currentHash === matchHash : isActive) ? '600' : '500',
     })}
   >
     {icon} <span>{label}</span>
