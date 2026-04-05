@@ -1,5 +1,5 @@
 /* ===========================================
-   BUTTONS
+   BUTTONS — LUNARIS light theme
    =========================================== */
 
 .btn {
@@ -7,7 +7,7 @@
   align-items: center;
   justify-content: center;
   gap: var(--space-2);
-  background: var(--surface-elevated);
+  background: var(--surface-color);
   color: var(--text-primary);
   border: 1px solid var(--border-color);
   padding: 12px 24px;
@@ -19,6 +19,7 @@
   transition: all var(--transition-base);
   box-shadow: var(--shadow-sm);
   white-space: nowrap;
+  text-decoration: none;
 }
 
 .btn svg {
@@ -29,17 +30,18 @@
 
 .btn:hover:not(:disabled) {
   transform: translateY(-1px);
-  background: var(--surface-active);
-  border-color: var(--border-active);
+  background: #F2F3F0;
+  border-color: #AAAAAA;
   box-shadow: var(--shadow-md);
 }
 
 .btn:active:not(:disabled) {
-  transform: translateY(0);
+  transform: scale(0.97);
+  box-shadow: var(--shadow-sm);
 }
 
 .btn:disabled {
-  opacity: 0.5;
+  opacity: 0.4;
   cursor: not-allowed;
 }
 
@@ -60,29 +62,28 @@
 /* VARIANTS */
 
 .btn-primary {
-  background: linear-gradient(135deg, var(--accent-color) 0%, var(--accent-hover) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  color: white;
-  box-shadow: 0 8px 16px -4px var(--accent-glow);
+  background: #FF8400;
+  border-color: #FF8400;
+  color: #FFFFFF;
+  box-shadow: 0 4px 12px rgba(255, 132, 0, 0.3);
 }
 
 .btn-primary:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--accent-hover) 0%, var(--accent-color) 100%);
-  border-color: rgba(255, 255, 255, 0.2);
-  box-shadow: 0 12px 20px -4px var(--accent-glow);
+  background: #e87800;
+  border-color: #e87800;
+  box-shadow: 0 6px 16px rgba(255, 132, 0, 0.4);
+  transform: translateY(-1px);
 }
 
 .btn-secondary {
-  background: var(--glass-bg);
-  backdrop-filter: blur(var(--glass-blur));
-  -webkit-backdrop-filter: blur(var(--glass-blur));
-  border: 1px solid var(--glass-border);
+  background: #FFFFFF;
+  border: 1px solid var(--border-color);
   color: var(--text-primary);
 }
 
 .btn-secondary:hover:not(:disabled) {
-  background: var(--surface-hover);
-  border-color: var(--border-active);
+  background: #F2F3F0;
+  border-color: #AAAAAA;
 }
 
 .btn-ghost {
@@ -93,21 +94,22 @@
 }
 
 .btn-ghost:hover:not(:disabled) {
-  background: var(--surface-hover);
+  background: rgba(203, 204, 201, 0.5);
   color: var(--text-primary);
   border-color: var(--border-subtle);
 }
 
 .btn-danger {
-  background: linear-gradient(135deg, var(--danger-color) 0%, var(--danger-hover) 100%);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--danger-color);
+  border-color: var(--danger-color);
   color: white;
-  box-shadow: 0 8px 16px -4px var(--danger-muted);
+  box-shadow: 0 4px 12px var(--danger-muted);
 }
 
 .btn-danger:hover:not(:disabled) {
-  background: linear-gradient(135deg, var(--danger-hover) 0%, var(--danger-color) 100%);
-  box-shadow: 0 12px 20px -4px var(--danger-muted);
+  background: var(--danger-hover);
+  border-color: var(--danger-hover);
+  box-shadow: 0 6px 16px var(--danger-muted);
 }
 
 .btn-icon {
@@ -118,19 +120,49 @@
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-md);
-  background: var(--surface-elevated);
+  background: var(--surface-color);
   border: 1px solid var(--border-color);
   color: var(--text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-base);
 }
 
 .btn-icon:hover:not(:disabled) {
-  background: var(--surface-active);
+  background: #F2F3F0;
   color: var(--text-primary);
-  border-color: var(--border-active);
-  transform: translateY(-2px);
+  border-color: #AAAAAA;
+  transform: translateY(-1px);
 }
 
 .btn-full {
   width: 100%;
 }
 
+/* Dark surface buttons (code room / arena session) */
+.app-dark .btn {
+  background: var(--surface-elevated);
+  border-color: var(--border-color);
+  color: var(--text-primary);
+}
+
+.app-dark .btn:hover:not(:disabled) {
+  background: var(--surface-active);
+  border-color: var(--border-active);
+}
+
+.app-dark .btn-secondary {
+  background: var(--glass-bg);
+  border-color: var(--glass-border);
+}
+
+.app-dark .btn-icon {
+  background: var(--surface-elevated);
+  border-color: var(--border-color);
+  color: var(--text-secondary);
+}
+
+.app-dark .btn-icon:hover:not(:disabled) {
+  background: var(--surface-active);
+  color: var(--text-primary);
+  border-color: var(--border-active);
+}

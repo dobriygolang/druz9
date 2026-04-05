@@ -20,16 +20,25 @@ import {
 
 interface SidebarProps {
   isAdmin?: boolean;
+  isLight?: boolean;
+  /** @deprecated use isLight */
   isHome?: boolean;
+  /** @deprecated use isLight */
   isCommunity?: boolean;
 }
 
-type SidebarVariant = 'default' | 'home' | 'community';
-
-export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = false, isCommunity = false }) => {
+export const Sidebar: React.FC<SidebarProps> = ({
+  isAdmin = false,
+  isLight = true,
+  isHome,
+  isCommunity,
+}) => {
   const location = useLocation();
   const { logout, isAuthenticated, user } = useAuth();
   const [onlineCount, setOnlineCount] = useState<number | null>(null);
+
+  // Support legacy props — kept for backward-compatibility, actual usage driven by CSS vars
+  void (isLight || isHome || isCommunity);
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -48,63 +57,23 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
     return () => { cancelled = true; };
   }, [isAuthenticated]);
 
-  /* ── colour tokens depending on context ── */
-  const textPrimary  = isAdmin ? '#0f172a' : 'var(--text-primary)';
-  const textSecondary = isAdmin ? '#64748b' : 'var(--text-secondary)';
-  const bgSurface    = isAdmin ? '#f1f5f9' : 'var(--surface-color)';
-  const accentColor  = '#6366f1';
-  const variant: SidebarVariant = isHome ? 'home' : (isCommunity ? 'community' : 'default');
-  const homeDisplayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.username || 'Профиль';
-  const homeSecondaryText = user?.username ? `@${user.username}` : (user?.region || (onlineCount !== null ? `${onlineCount} онлайн` : 'Аккаунт активен'));
+  const displayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.username || 'Профиль';
+  const secondaryText = user?.username
+    ? `@${user.username}`
+    : (user?.region || (onlineCount !== null ? `${onlineCount} онлайн` : 'Аккаунт активен'));
+
+  const sidebarClass = [
+    'sidebar-desktop',
+    isAdmin ? ' sidebar-desktop--admin' : '',
+  ].join('');
 
   return (
-    <aside className={`sidebar-desktop${isAdmin ? ' sidebar-desktop--admin' : ''}${isHome ? ' sidebar-desktop--home' : ''}${isCommunity ? ' sidebar-desktop--community' : ''}`}>
+    <aside className={sidebarClass}>
       <div className="sidebar-desktop__brand">
-        {isHome ? (
-          <div className="sidebar-desktop__brand-home">
-            <div className="sidebar-desktop__brand-home-mark" aria-hidden="true">
-              <span />
-            </div>
-            <span className="sidebar-desktop__brand-home-label">LUNARIS</span>
-          </div>
-        ) : isCommunity ? (
-          <div className="sidebar-desktop__brand-community">
-            <div className="sidebar-desktop__brand-home">
-              <div className="sidebar-desktop__brand-home-mark" aria-hidden="true">
-                <span />
-              </div>
-              <span className="sidebar-desktop__brand-home-label">LUNARIS</span>
-            </div>
-          </div>
-        ) : (
-          <>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <div style={{ fontWeight: '700', fontSize: '20px', letterSpacing: '1px', color: textPrimary }}>
-                Друзья
-              </div>
-              <span style={{
-                fontSize: '11px',
-                color: textSecondary,
-                fontWeight: '500',
-                background: isAdmin ? '#f1f5f9' : 'rgba(255,255,255,0.05)',
-                padding: '2px 6px',
-                borderRadius: '6px',
-              }}>
-                v1.5.2
-              </span>
-            </div>
-            {isAuthenticated && (
-              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '12px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
-                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)', animation: 'pulse 2s infinite' }} />
-                  <span style={{ color: textPrimary, fontWeight: '600' }}>
-                    {onlineCount !== null ? `${onlineCount} онлайн` : (user?.activityStatus === 'online' ? 'Вы онлайн' : 'Аккаунт активен')}
-                  </span>
-                </div>
-              </div>
-            )}
-          </>
-        )}
+        <div className="sidebar-desktop__brand-home">
+          <LunarisMark />
+          <span className="sidebar-desktop__brand-home-label">LUNARIS</span>
+        </div>
       </div>
 
       <nav className="sidebar-desktop__nav">
@@ -112,58 +81,49 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
           <>
             {!isAdmin && (
               <>
-                <NavItem to="/home" icon={<Home size={20} />} label="Home" isAdmin={isAdmin} variant={variant} />
-                <NavItem to="/community/people" icon={<Users size={20} />} label="Community" isAdmin={isAdmin} variant={variant} />
-                <NavItem to="/practice" icon={<Code2 size={20} />} label="Practice" isAdmin={isAdmin} variant={variant} />
-                <NavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" isAdmin={isAdmin} variant={variant} />
-                {!isCommunity && (
-                  <>
-                    <NavItem to="/home#podcasts" icon={<Headphones size={20} />} label="Подкасты" isAdmin={isAdmin} variant={variant} matchHash="#podcasts" currentHash={location.hash} />
-                    <NavItem to="/practice/arena" icon={<Sword size={20} />} label="Arena" isAdmin={isAdmin} variant={variant} />
-                  </>
-                )}
-                {!isHome && !isCommunity && <div style={{ height: '32px' }} />}
+                <NavItem to="/home" icon={<Home size={20} />} label="Главная" />
+                <NavItem to="/community/people" icon={<Users size={20} />} label="Community" />
+                <NavItem to="/practice" icon={<Code2 size={20} />} label="Practice" />
+                <NavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" />
+                <NavItem
+                  to="/home#podcasts"
+                  icon={<Headphones size={20} />}
+                  label="Подкасты"
+                  matchHash="#podcasts"
+                  currentHash={location.hash}
+                />
+                <NavItem to="/practice/arena" icon={<Sword size={20} />} label="Arena" />
               </>
             )}
 
             {isAdmin && (
               <>
-                {/* Back to app */}
-                <NavItem to="/home" icon={<ArrowRight size={18} style={{ transform: 'rotate(180deg)' }} />} label="К приложению" isAdmin={isAdmin} variant={variant} />
+                <NavItem
+                  to="/home"
+                  icon={<ArrowRight size={18} style={{ transform: 'rotate(180deg)' }} />}
+                  label="К приложению"
+                />
                 <div style={{ height: '8px' }} />
 
-                {/* Admin nav sections */}
-                <div className="sidebar-section-title" style={{ color: textSecondary }}>УПРАВЛЕНИЕ</div>
-                <NavItem to="/admin/code-tasks" icon={<Code2 size={20} />} label="Code Tasks" isAdmin={isAdmin} variant={variant} />
-                <NavItem to="/admin/code-game" icon={<Sword size={20} />} label="Code Game" isAdmin={isAdmin} variant={variant} />
-                <NavItem to="/admin/interview-prep" icon={<Shield size={20} />} label="Interview Prep" isAdmin={isAdmin} variant={variant} />
-                <NavItem to="/admin/config" icon={<Settings size={20} />} label="Config" isAdmin={isAdmin} variant={variant} />
+                <div className="sidebar-section-title">УПРАВЛЕНИЕ</div>
+                <NavItem to="/admin/code-tasks" icon={<Code2 size={20} />} label="Code Tasks" />
+                <NavItem to="/admin/code-game" icon={<Sword size={20} />} label="Code Game" />
+                <NavItem to="/admin/interview-prep" icon={<Shield size={20} />} label="Interview Prep" />
+                <NavItem to="/admin/config" icon={<Settings size={20} />} label="Config" />
                 <div style={{ height: '8px' }} />
-                <div className="sidebar-section-title" style={{ color: textSecondary }}>СТАТИСТИКА</div>
-                <NavItem to="/admin/analytics" icon={<BarChart2 size={20} />} label="Analytics" isAdmin={isAdmin} variant={variant} />
-              </>
-            )}
-
-            {!isAdmin && !isHome && !isCommunity && user?.isAdmin && (
-              <>
-                <div className="sidebar-section-title" style={{ color: textSecondary }}>Админ</div>
-                <NavItem to="/admin/code-tasks" icon={<Code2 size={20} />} label="Задачи" isAdmin={isAdmin} variant={variant} />
-                <NavItem to="/admin/code-game" icon={<Sword size={20} />} label="Code Game" isAdmin={isAdmin} variant={variant} />
-                <NavItem to="/admin/analytics" icon={<BarChart2 size={20} />} label="Аналитика" isAdmin={isAdmin} variant={variant} />
+                <div className="sidebar-section-title">СТАТИСТИКА</div>
+                <NavItem to="/admin/analytics" icon={<BarChart2 size={20} />} label="Analytics" />
                 <div style={{ height: '16px' }} />
+                <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" />
               </>
             )}
 
-            {!isAdmin && !isHome && !isCommunity && (
+            {!isAdmin && user?.isAdmin && (
               <>
-                <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" isAdmin={isAdmin} variant={variant} />
-              </>
-            )}
-
-            {isAdmin && (
-              <>
-                <div style={{ height: '16px' }} />
-                <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" isAdmin={isAdmin} variant={variant} />
+                <div className="sidebar-section-title">Админ</div>
+                <NavItem to="/admin/code-tasks" icon={<Code2 size={20} />} label="Задачи" />
+                <NavItem to="/admin/code-game" icon={<Sword size={20} />} label="Code Game" />
+                <NavItem to="/admin/analytics" icon={<BarChart2 size={20} />} label="Аналитика" />
               </>
             )}
           </>
@@ -171,22 +131,20 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
           <>
             <div
               style={{
-                marginTop: '12px',
+                marginTop: '16px',
                 padding: '16px',
-                borderRadius: '18px',
-                border: isAdmin ? '1px solid #e2e8f0' : '1px solid rgba(255,255,255,0.08)',
-                background: isAdmin
-                  ? 'linear-gradient(180deg, rgba(99,102,241,0.08) 0%, #f8fafc 100%)'
-                  : 'linear-gradient(180deg, rgba(93,76,229,0.16) 0%, rgba(255,255,255,0.04) 100%)',
+                borderRadius: '16px',
+                border: '1px solid #CBCCC9',
+                background: 'rgba(255, 132, 0, 0.04)',
                 display: 'flex',
                 flexDirection: 'column',
                 gap: '12px',
               }}
             >
-              <div style={{ fontSize: '16px', fontWeight: 700, color: textPrimary, lineHeight: 1.3 }}>
+              <div style={{ fontSize: '15px', fontWeight: 700, color: '#111111', lineHeight: 1.3 }}>
                 Зарегистрируйся и попади в рейтинг arena
               </div>
-              <div style={{ fontSize: '13px', color: textSecondary, lineHeight: 1.5 }}>
+              <div style={{ fontSize: '13px', color: '#666666', lineHeight: 1.5 }}>
                 Сохраняй ELO, попадай в лидерборд, открывай профиль и играй без гостевых ограничений.
               </div>
               <NavLink
@@ -197,10 +155,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
                   justifyContent: 'center',
                   gap: '8px',
                   minHeight: '44px',
-                  padding: '0 14px',
+                  padding: '0 16px',
                   borderRadius: '12px',
                   textDecoration: 'none',
-                  background: accentColor,
+                  background: '#FF8400',
                   color: '#fff',
                   fontWeight: 600,
                   fontSize: '14px',
@@ -210,78 +168,94 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
                 <ArrowRight size={16} />
               </NavLink>
             </div>
-            <div style={{ height: '20px' }} />
-            <NavItem to="/login" icon={<UserIcon size={20} />} label="Войти" isAdmin={isAdmin} variant={variant} />
+            <div style={{ height: '8px' }} />
+            <NavItem to="/login" icon={<UserIcon size={20} />} label="Войти" />
           </>
         )}
       </nav>
 
-      {isAuthenticated && (isHome || isCommunity) && !isAdmin ? (
-        <div className="sidebar-desktop__footer sidebar-desktop__footer--home">
-          <NavLink to="/profile" className={`sidebar-desktop__home-profile${isCommunity ? ' sidebar-desktop__home-profile--community' : ''}`}>
-            <div className="sidebar-desktop__home-profile-copy">
-              <strong>{homeDisplayName}</strong>
-              <span>{homeSecondaryText}</span>
-            </div>
-            <span className="sidebar-desktop__home-profile-chevron" aria-hidden="true">
-              <ChevronDown size={18} />
-            </span>
-          </NavLink>
-        </div>
-      ) : isAuthenticated ? (
+      {isAuthenticated ? (
         <div className="sidebar-desktop__footer">
-          <button
-            type="button"
-            onClick={logout}
-            aria-label="Выйти"
-            className="sidebar-desktop__logout"
-            onMouseOver={(e) => {
-              e.currentTarget.style.backgroundColor = bgSurface;
-              e.currentTarget.style.color = textPrimary;
-              e.currentTarget.style.transform = 'translateY(-1px)';
-            }}
-            onMouseOut={(e) => {
-              e.currentTarget.style.backgroundColor = 'transparent';
-              e.currentTarget.style.color = textSecondary;
-              e.currentTarget.style.transform = 'translateY(0)';
-            }}
-            style={{ color: textSecondary }}
-          >
-            <LogOut size={20} style={{ flexShrink: 0 }} />
-            <span style={{ display: 'block' }}>Выйти</span>
-          </button>
+          {!isAdmin ? (
+            <NavLink to="/profile" className="sidebar-desktop__home-profile">
+              <div
+                style={{
+                  width: 36,
+                  height: 36,
+                  borderRadius: '50%',
+                  background: '#FF8400',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: '#fff',
+                  fontFamily: "'JetBrains Mono', monospace",
+                  fontSize: 13,
+                  fontWeight: 700,
+                  flexShrink: 0,
+                }}
+              >
+                {getInitials(user?.firstName, user?.lastName, user?.username)}
+              </div>
+              <div className="sidebar-desktop__home-profile-copy">
+                <strong>{displayName}</strong>
+                <span>{secondaryText}</span>
+              </div>
+              <span className="sidebar-desktop__home-profile-chevron" aria-hidden="true">
+                <ChevronDown size={16} />
+              </span>
+            </NavLink>
+          ) : (
+            <button
+              type="button"
+              onClick={logout}
+              aria-label="Выйти"
+              className="sidebar-desktop__logout"
+            >
+              <LogOut size={18} style={{ flexShrink: 0 }} />
+              <span>Выйти</span>
+            </button>
+          )}
         </div>
       ) : null}
     </aside>
   );
 };
 
-const NavItem: React.FC<{ icon: React.ReactNode; label: string; to: string; isAdmin: boolean; variant?: SidebarVariant; matchHash?: string; currentHash?: string }> = ({ icon, label, to, isAdmin, variant = 'default', matchHash, currentHash }) => (
+const NavItem: React.FC<{
+  icon: React.ReactNode;
+  label: string;
+  to: string;
+  matchHash?: string;
+  currentHash?: string;
+}> = ({ icon, label, to, matchHash, currentHash }) => (
   <NavLink
     to={to}
     end={to === '/home' || to === '/admin/code-tasks'}
-    className="sidebar-desktop__nav-item"
-    style={({ isActive }) => {
+    className={({ isActive }) => {
       const active = matchHash ? currentHash === matchHash : isActive;
-      if (variant === 'community') {
-        return {
-          color: active ? '#111111' : '#666666',
-          backgroundColor: active ? '#cbccc9' : 'transparent',
-          fontWeight: active ? '500' : '400',
-        };
-      }
-
-      return {
-        color: active
-          ? (isAdmin ? '#6366f1' : 'var(--accent-color)')
-          : (isAdmin ? '#475569' : 'var(--text-secondary)'),
-        backgroundColor: active
-          ? (isAdmin ? '#eff6ff' : 'var(--surface-color)')
-          : 'transparent',
-        fontWeight: active ? '600' : '500',
-      };
+      return `sidebar-desktop__nav-item${active ? ' active' : ''}`;
     }}
   >
     {icon} <span>{label}</span>
   </NavLink>
+);
+
+function getInitials(firstName?: string, lastName?: string, username?: string): string {
+  const first = firstName?.trim().charAt(0);
+  const last = lastName?.trim().charAt(0);
+  if (first || last) {
+    return `${first ?? ''}${last ?? ''}`.toUpperCase();
+  }
+  return username?.trim().slice(0, 2).toUpperCase() || 'U';
+}
+
+const LunarisMark: React.FC = () => (
+  <span className="sidebar-desktop__brand-home-mark" aria-hidden="true">
+    <svg viewBox="0 0 32 32" fill="none">
+      <path
+        d="M16 0c8.83656 0 16 7.16344 16 16 0 8.83656-7.16344 16-16 16-8.83656 0-16-7.16344-16-16 0-8.83656 7.16344-16 16-16zm1.86035 8.71777c-.66585-1.68829-3.05485-1.68829-3.7207 0l-1.21485 3.08008c-.20329.51544-.61151.92366-1.12695 1.12695l-3.08008 1.21485c-1.68829.66585-1.68829 3.05485 0 3.7207l3.08008 1.21485c.51544.20329.92366.61151 1.12695 1.12695l1.21485 3.08008c.66585 1.68829 3.05485 1.68829 3.7207 0l1.21485-3.08008c.20329-.51544.61151-.92366 1.12695-1.12695l3.08008-1.21485c1.68829-.66585 1.68829-3.05485 0-3.7207l-3.08008-1.21485c-.51544-.20329-.92366-.61151-1.12695-1.12695l-1.21485-3.08008z"
+        fill="#FF8400"
+      />
+    </svg>
+  </span>
 );

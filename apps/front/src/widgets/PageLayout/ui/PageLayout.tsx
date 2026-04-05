@@ -11,32 +11,59 @@ export const PageLayout: React.FC = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { currentPodcast } = usePodcast();
-  const isHomeRoute = location.pathname === '/home';
-  const isCommunityRoute = location.pathname.startsWith('/community');
-  const isPracticeRoute = location.pathname.startsWith('/practice');
-  const isHubRoute = isCommunityRoute || isPracticeRoute;
-  const isLightShellRoute = isHomeRoute;
+
+  const isAdminRoute = location.pathname.startsWith('/admin/');
   const isCodeRoom = /^\/code-rooms\/[^/]+$/.test(location.pathname);
   const isArenaMatch = /^\/arena\/[^/]+$/.test(location.pathname);
-  const isInterviewPrepSession = /^\/interview-prep\/[^/]+$/.test(location.pathname) || /^\/growth\/interview-prep\/[^/]+$/.test(location.pathname);
-  const isInterviewPrepMock = /^\/interview-prep\/mock\/[^/]+$/.test(location.pathname) || /^\/growth\/interview-prep\/mock\/[^/]+$/.test(location.pathname);
-  const isCodeRoomsDashboard = location.pathname === '/code-rooms' || location.pathname === '/practice/code-rooms';
-  const isCodeTasksAdmin = location.pathname === '/admin/code-tasks';
-  const isAdminRoute = location.pathname.startsWith('/admin/');
+  const isInterviewPrepSession =
+    /^\/interview-prep\/[^/]+$/.test(location.pathname) ||
+    /^\/growth\/interview-prep\/[^/]+$/.test(location.pathname);
+  const isInterviewPrepMock =
+    /^\/interview-prep\/mock\/[^/]+$/.test(location.pathname) ||
+    /^\/growth\/interview-prep\/mock\/[^/]+$/.test(location.pathname);
+  const isCodeRoomsDashboard =
+    location.pathname === '/code-rooms' || location.pathname === '/practice/code-rooms';
   const isGuestCodeRoomsSurface = !isAuthenticated && isCodeRoomsDashboard;
-  const showShell = !isCodeRoom && !isArenaMatch && !isGuestCodeRoomsSurface;
+
+  // Fullscreen dark sessions — keep dark theme
+  const isFullscreenDark = isCodeRoom || isArenaMatch;
+
+  // Shell is hidden for fullscreen dark sessions and guest code rooms
+  const showShell = !isFullscreenDark && !isGuestCodeRoomsSurface;
+
+  // All non-admin, non-fullscreen pages get the LUNARIS light shell
+  const isLightShell = !isAdminRoute && !isFullscreenDark;
+
   const contentClassName = isArenaMatch
     ? 'content-wrapper content-wrapper-code-room'
-    : isCodeTasksAdmin || isCodeRoom || isInterviewPrepSession || isInterviewPrepMock
+    : isCodeRoom || isInterviewPrepSession || isInterviewPrepMock
       ? 'content-wrapper content-wrapper-wide'
-      : isHubRoute
-        ? 'content-wrapper content-wrapper--community'
-      : `content-wrapper${isLightShellRoute ? ' content-wrapper--home' : ''}`;
+      : isAdminRoute
+        ? 'content-wrapper content-wrapper-wide'
+        : 'content-wrapper content-wrapper--home';
+
+  const mainClassName = [
+    isFullscreenDark ? 'main-content-code-room' : 'main-content',
+    isAdminRoute ? ' main-content--admin' : '',
+    isLightShell && !isFullscreenDark ? ' main-content--home' : '',
+  ].join('');
 
   return (
-    <div className={`app-container${isAdminRoute ? ' app-container--admin' : ''}${isLightShellRoute ? ' app-container--home' : ''}${isHubRoute ? ' app-container--community' : ''}`}>
-      {showShell && <Sidebar isAdmin={isAdminRoute} isHome={isLightShellRoute} isCommunity={isHubRoute} />}
-      <main className={isCodeRoom || isArenaMatch || isInterviewPrepSession || isInterviewPrepMock ? 'main-content main-content-code-room' : `main-content${isAdminRoute ? ' main-content--admin' : ''}${isLightShellRoute ? ' main-content--home' : ''}${isHubRoute ? ' main-content--community' : ''}`}>
+    <div
+      className={[
+        'app-container',
+        isAdminRoute ? ' app-container--admin' : '',
+        isLightShell ? ' app-container--home' : '',
+        isFullscreenDark ? ' app-dark' : '',
+      ].join('')}
+    >
+      {showShell && (
+        <Sidebar
+          isAdmin={isAdminRoute}
+          isLight={isLightShell}
+        />
+      )}
+      <main className={mainClassName}>
         <div className={contentClassName}>
           <Outlet />
         </div>

@@ -153,11 +153,19 @@
   border: 0;
   border-radius: 999px;
   background: #ff8400;
-  color: #111111;
+  color: #FFFFFF;
   font-family: 'Manrope', var(--font-main);
   font-size: 13px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
+  transition: background var(--transition-base), transform var(--transition-base), box-shadow var(--transition-base);
+}
+
+.community-screen__cta:hover {
+  background: #e87800;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 12px rgba(255, 132, 0, 0.3);
 }
 
 .community-screen__tabs {
@@ -215,6 +223,16 @@
   border: 1px solid #cbccc9;
   border-radius: 12px;
   background: #ffffff;
+  transition: transform var(--transition-base), box-shadow var(--transition-base), border-color var(--transition-base);
+  text-decoration: none;
+  color: inherit;
+}
+
+.community-event-card:hover,
+.community-circle-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+  border-color: #AAAAAA;
 }
 
 .community-event-card__top,

@@ -16,12 +16,15 @@
   padding: var(--space-5) var(--space-6);
   border-radius: var(--radius-xl);
   border: 1px solid var(--border-color);
-  background:
-    radial-gradient(circle at top right, var(--accent-muted), transparent 40%),
-    linear-gradient(180deg, var(--surface-elevated), var(--surface-color));
-  box-shadow: var(--shadow-xl);
+  background: #FFFFFF;
+  box-shadow: var(--shadow-sm);
   position: relative;
   z-index: 2;
+  transition: box-shadow var(--transition-base);
+}
+
+.profile-header:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .profile-header h1 {
@@ -38,9 +41,14 @@
 }
 
 .profile-edit-btn {
-  background: var(--surface-hover) !important;
-  border: 1px solid var(--border-active) !important;
-  color: var(--text-primary) !important;
+  background: #F2F3F0 !important;
+  border: 1px solid #CBCCC9 !important;
+  color: #111111 !important;
+}
+
+.profile-edit-btn:hover {
+  background: #E7E8E5 !important;
+  border-color: #AAAAAA !important;
 }
 
 /* Arena Stats Card */
@@ -84,9 +92,9 @@
 .arena-league-badge {
   padding: var(--space-2) var(--space-4);
   border-radius: var(--radius-full);
-  background: var(--accent-muted);
-  border: 1px solid var(--border-active);
-  color: var(--accent-color);
+  background: rgba(255, 132, 0, 0.1);
+  border: 1px solid rgba(255, 132, 0, 0.25);
+  color: #FF8400;
   font-weight: 800;
   font-size: var(--font-size-xs);
 }

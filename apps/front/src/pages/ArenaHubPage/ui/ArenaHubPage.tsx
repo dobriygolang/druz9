@@ -2,10 +2,22 @@ import React, { useEffect, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Shield, Timer } from 'lucide-react';
 
+import { useAuth } from '@/app/providers/AuthProvider';
+
 import { ArenaLeaderboardEntry, ArenaMatch } from '@/entities/CodeRoom/model/types';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 
+// Module-level cache (TTL: 2 min)
+type ArenaCache = {
+  leaderboard: ArenaLeaderboardEntry[];
+  matches: ArenaMatch[];
+  expiresAt: number;
+};
+let arenaCache: ArenaCache | null = null;
+const ARENA_CACHE_TTL = 2 * 60 * 1000;
+
 export const ArenaHubPage: React.FC = () => {
+  const { user } = useAuth();
   const [leaderboard, setLeaderboard] = useState<ArenaLeaderboardEntry[]>([]);
   const [matches, setMatches] = useState<ArenaMatch[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -14,6 +26,15 @@ export const ArenaHubPage: React.FC = () => {
     let cancelled = false;
 
     const load = async () => {
+      if (arenaCache && Date.now() < arenaCache.expiresAt) {
+        if (!cancelled) {
+          setLeaderboard(arenaCache.leaderboard);
+          setMatches(arenaCache.matches);
+          setIsLoading(false);
+        }
+        return;
+      }
+
       try {
         setIsLoading(true);
         const [nextLeaderboard, nextMatches] = await Promise.all([
@@ -21,6 +42,11 @@ export const ArenaHubPage: React.FC = () => {
           codeRoomApi.getOpenArenaMatches(5),
         ]);
         if (!cancelled) {
+          arenaCache = {
+            leaderboard: nextLeaderboard,
+            matches: nextMatches,
+            expiresAt: Date.now() + ARENA_CACHE_TTL,
+          };
           setLeaderboard(nextLeaderboard);
           setMatches(nextMatches);
         }
@@ -45,6 +71,7 @@ export const ArenaHubPage: React.FC = () => {
 
   const visibleMatches = matches.slice(0, 3);
   const visibleLeaders = leaderboard.slice(0, 4);
+  const selfLabel = user?.username || 'joe_doe';
 
   return (
     <div className="practice-surface practice-surface--arena">
@@ -136,6 +163,7 @@ export const ArenaHubPage: React.FC = () => {
               </span>
             </div>
             <div className="practice-arena-league__score">
+              <span className="practice-arena-league__emoji" aria-hidden="true">⚔️</span>
               <strong>{topRating.toLocaleString('ru-RU')}</strong>
               <span>ELO рейтинг</span>
             </div>
@@ -168,7 +196,7 @@ export const ArenaHubPage: React.FC = () => {
                 {visibleLeaders.map((entry, index) => (
                   <div key={entry.userId} className="practice-arena-board-row">
                     <span className="practice-arena-board-row__rank">{index < 3 ? ['🥇', '🥈', '🥉'][index] : index + 1}</span>
-                    <div className="practice-arena-match-row__meta">
+                    <div className="practice-arena-board-row__meta">
                       <span className={`practice-arena-board-row__avatar ${
                         index === 0 ? 'practice-arena-board-row__avatar--gold' :
                         index === 1 ? 'practice-arena-board-row__avatar--violet' :
@@ -187,10 +215,10 @@ export const ArenaHubPage: React.FC = () => {
                 ))}
                 <div className="practice-arena-board-row practice-arena-board-row--self">
                   <span className="practice-arena-board-row__rank">38</span>
-                  <div className="practice-arena-match-row__meta">
-                    <span className="practice-arena-board-row__avatar practice-arena-board-row__avatar--gold">ВЫ</span>
+                  <div className="practice-arena-board-row__meta">
+                    <span className="practice-arena-board-row__avatar practice-arena-board-row__avatar--self">ВЫ</span>
                     <div className="practice-arena-board-row__copy">
-                      <strong>joe_doe</strong>
+                      <strong>{selfLabel}</strong>
                       <span>{topLeague}</span>
                     </div>
                   </div>

@@ -12,10 +12,14 @@
   padding: var(--space-5);
   border-radius: 24px;
   border: 1px solid var(--border-color);
-  background:
-    radial-gradient(circle at top left, rgba(99, 102, 241, 0.24), transparent 36%),
-    radial-gradient(circle at bottom right, rgba(99, 102, 241, 0.12), transparent 30%),
-    linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.025));
+  background: #FFFFFF;
+  box-shadow: var(--shadow-sm);
+  transition: box-shadow var(--transition-base);
+}
+
+.hub-shell__hero:hover,
+.arena-hub__hero:hover {
+  box-shadow: var(--shadow-md);
 }
 
 .hub-shell__copy,
@@ -49,11 +53,12 @@
 .hub-shell__eyebrow,
 .arena-hub__copy > span {
   width: fit-content;
-  padding: 8px 12px;
+  padding: 6px 12px;
   border-radius: var(--radius-full);
-  background: rgba(99, 102, 241, 0.14);
-  color: #c7d2fe;
-  font-size: 12px;
+  background: rgba(255, 132, 0, 0.1);
+  color: #FF8400;
+  font-size: 11px;
+  font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.08em;
 }

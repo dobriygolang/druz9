@@ -126,6 +126,14 @@
   background: #ffffff;
   text-decoration: none;
   color: inherit;
+  border: 1px solid transparent;
+  transition: background var(--transition-fast), border-color var(--transition-fast), transform var(--transition-fast);
+}
+
+.community-people__row:hover {
+  background: #F2F3F0;
+  border-color: #CBCCC9;
+  transform: translateX(2px);
 }
 
 .community-people__avatar {

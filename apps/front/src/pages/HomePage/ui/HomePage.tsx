@@ -9,6 +9,17 @@ import { circleApi } from '@/features/Circle/api/circleApi';
 import { eventApi } from '@/features/Event/api/eventApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
 
+// Module-level cache to avoid re-fetching on every re-render (TTL: 5 min)
+type HomeCache = {
+  users: CommunityMapPoint[];
+  events: CommunityEvent[];
+  circles: Circle[];
+  userId: string;
+  expiresAt: number;
+};
+let homeCache: HomeCache | null = null;
+const HOME_CACHE_TTL = 5 * 60 * 1000;
+
 function formatDate(value: string) {
   const formatter = new Intl.DateTimeFormat('ru-RU', {
     weekday: 'short',
@@ -62,6 +73,21 @@ export const HomePage: React.FC = () => {
     let cancelled = false;
 
     const load = async () => {
+      // Serve from cache if still fresh for the same user
+      if (
+        homeCache &&
+        homeCache.userId === (user?.id ?? '') &&
+        Date.now() < homeCache.expiresAt
+      ) {
+        if (!cancelled) {
+          setUsers(homeCache.users);
+          setEvents(homeCache.events);
+          setCircles(homeCache.circles);
+          setIsLoading(false);
+        }
+        return;
+      }
+
       try {
         setIsLoading(true);
         const [nextUsers, nextEvents, nextCircles] = await Promise.all([
@@ -73,6 +99,13 @@ export const HomePage: React.FC = () => {
           }),
         ]);
         if (!cancelled) {
+          homeCache = {
+            users: nextUsers,
+            events: nextEvents,
+            circles: nextCircles,
+            userId: user?.id ?? '',
+            expiresAt: Date.now() + HOME_CACHE_TTL,
+          };
           setUsers(nextUsers);
           setEvents(nextEvents);
           setCircles(nextCircles);

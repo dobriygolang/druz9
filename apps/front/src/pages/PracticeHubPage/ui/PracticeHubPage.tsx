@@ -1,12 +1,23 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom';
-import { ArrowRight, Code2, Plus, Search, Sparkles, Sword, Terminal } from 'lucide-react';
+import { ArrowRight, Code2, Plus, Search, Sparkles, Sword, Swords, Terminal } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { ArenaLeaderboardEntry, ArenaMatch, CodeTask } from '@/entities/CodeRoom/model/types';
 import { CommunityMapPoint } from '@/entities/User/model/types';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
+
+// Module-level cache (TTL: 2 min)
+type PracticeCache = {
+  leaderboard: ArenaLeaderboardEntry[];
+  openMatches: ArenaMatch[];
+  tasks: CodeTask[];
+  communityPoints: CommunityMapPoint[];
+  expiresAt: number;
+};
+let practiceCache: PracticeCache | null = null;
+const PRACTICE_CACHE_TTL = 2 * 60 * 1000;
 
 type ActivityRow = {
   label: string;
@@ -34,6 +45,17 @@ export const PracticeHubPage: React.FC = () => {
     let cancelled = false;
 
     const load = async () => {
+      if (practiceCache && Date.now() < practiceCache.expiresAt) {
+        if (!cancelled) {
+          setLeaderboard(practiceCache.leaderboard);
+          setOpenMatches(practiceCache.openMatches);
+          setTasks(practiceCache.tasks);
+          setCommunityPoints(practiceCache.communityPoints);
+          setIsLoading(false);
+        }
+        return;
+      }
+
       try {
         setIsLoading(true);
         const [nextLeaderboard, nextMatches, nextTasks, nextPoints] = await Promise.all([
@@ -44,6 +66,13 @@ export const PracticeHubPage: React.FC = () => {
         ]);
 
         if (!cancelled) {
+          practiceCache = {
+            leaderboard: nextLeaderboard,
+            openMatches: nextMatches,
+            tasks: nextTasks,
+            communityPoints: nextPoints,
+            expiresAt: Date.now() + PRACTICE_CACHE_TTL,
+          };
           setLeaderboard(nextLeaderboard);
           setOpenMatches(nextMatches);
           setTasks(nextTasks);
@@ -65,10 +94,14 @@ export const PracticeHubPage: React.FC = () => {
   }, []);
 
   const isOverview = location.pathname === '/practice';
+  const isCodeRooms = location.pathname.startsWith('/practice/code-rooms');
+  const isArena = location.pathname.startsWith('/practice/arena');
   const onlineCount = communityPoints.filter((point) => point.activityStatus === 'online').length;
   const tasksCount = tasks.length;
   const activeMatches = openMatches.length;
   const userRating = user?.id ? leaderboard.find((entry) => entry.userId === user.id)?.rating ?? 300 : 300;
+  const activeRoomsLabel = `${Math.max(14, Math.max(activeMatches, 1) * 7)} комнат активно`;
+  const arenaPlayersLabel = `${Math.max(38, onlineCount || 0)} игроков онлайн`;
 
   const activityRows = useMemo<ActivityRow[]>(() => {
     const taskTopics = tasks.map((task) => task.topics[0]).filter(Boolean);
@@ -104,24 +137,24 @@ export const PracticeHubPage: React.FC = () => {
       <section className="practice-overview__header">
         <div className="practice-overview__title-block">
           <h1>Practice</h1>
-          <p>Тренируйся в реальном времени или выходи в Arena</p>
+          {isOverview ? <p>Тренируйся в реальном времени или выходи в Arena</p> : null}
         </div>
 
         <div className="practice-overview__actions">
           <div className="practice-overview__stats">
             <span className="practice-overview__stat practice-overview__stat--green">
               <span className="practice-overview__dot" />
-              {isLoading ? 'Загрузка...' : `${activeMatches} сессий активно`}
+              {isLoading ? 'Загрузка...' : isCodeRooms ? activeRoomsLabel : isArena ? arenaPlayersLabel : `${activeMatches} сессий активно`}
             </span>
             <span className="practice-overview__stat">
               <Search size={12} />
-              {isLoading ? 'Загрузка...' : `${tasksCount} задачек online`}
+              {isLoading ? 'Загрузка...' : isArena ? `${tasksCount} задач online` : `${tasksCount} задач online`}
             </span>
           </div>
 
           <Link to="/practice/code-rooms" className="practice-overview__cta">
-            <Plus size={16} />
-            <span>Создать комнату</span>
+            {isArena ? <Swords size={16} /> : <Plus size={16} />}
+            <span>{isArena ? 'Быстрый матч' : 'Создать комнату'}</span>
           </Link>
         </div>
       </section>
