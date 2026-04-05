@@ -1,439 +1,92 @@
-import { apiClient, withGuestArenaHeaders, withGuestCodeRoomHeaders } from '@/shared/api/base';
-import { getCachedValue, setCachedValue } from '@/shared/api/cache';
-import { markGuestCodeRoomSession } from '@/features/CodeRoom/lib/guestIdentity';
-import { normalizeRoom } from '@/features/CodeRoom/api/codeRoomMappers';
-import {
-  ArenaPlayerStats,
-  ArenaQueueState,
-  ArenaLeaderboardEntry,
-  ArenaMatch,
-  CodeLeaderboardEntry,
-  CodeRoom,
-  CodeRoomMode,
-  CodeTask,
-  CodeTaskCase,
-  RunCodeResponse,
-  Submission,
-  roomModeToEnum,
-} from '@/entities/CodeRoom/model/types';
-import {
-  normalizeArenaLeaderboardEntry,
-  normalizeArenaMatch,
-  normalizeArenaPlayerStats,
-  normalizeArenaQueueState,
-  normalizeLeaderboardEntry,
-  normalizeTask,
-  toArenaDifficultyEnum,
-  toProgrammingLanguageEnum,
-  toTaskDifficultyEnum,
-  toTaskTypeEnum,
-} from '@/features/CodeRoom/api/codeRoomApiNormalizers';
+import { apiClient, withGuestCodeRoomHeaders } from '@/shared/api/base'
+import type { Room, Task } from '@/entities/CodeRoom/model/types'
 
-// ===========================================
-// Типы запросов
-// ===========================================
-
-export interface CreateRoomRequest {
-  mode: CodeRoomMode;
-  topic?: string;
-  difficulty?: string;
-  guestName?: string;
+type BackendRoom = {
+  id: string
+  mode?: string
+  code?: string
+  status?: string
+  invite_code?: string
+  task?: string
+  created_at?: string
+  participants?: Array<{
+    user_id?: string; name?: string; is_guest?: boolean; is_ready?: boolean; is_winner?: boolean; joined_at?: string; is_creator?: boolean
+  }>
+  task_id?: string
+  code_revision?: number
+  creator_id?: string
 }
 
-export interface JoinRoomRequest {
-  userId?: string;
-  guestName?: string;
+function normalizeRoom(r: BackendRoom): Room {
+  return {
+    id: r.id,
+    mode: (r.mode as Room['mode']) ?? 'ROOM_MODE_UNSPECIFIED',
+    code: r.code ?? '',
+    status: (r.status as Room['status']) ?? 'ROOM_STATUS_UNSPECIFIED',
+    inviteCode: r.invite_code ?? '',
+    task: r.task ?? '',
+    createdAt: r.created_at ?? '',
+    participants: (r.participants ?? []).map((p) => ({
+      userId: p.user_id ?? '', name: p.name ?? '', isGuest: p.is_guest ?? false,
+      isReady: p.is_ready ?? false, isWinner: p.is_winner ?? false, joinedAt: p.joined_at ?? '', isCreator: p.is_creator ?? false,
+    })),
+    taskId: r.task_id ?? '',
+    codeRevision: r.code_revision ?? 0,
+    creatorId: r.creator_id ?? '',
+  }
 }
-
-export interface JoinRoomByInviteCodeRequest {
-  inviteCode: string;
-  guestName?: string; // Имя гостя (без авторизации)
-}
-
-export interface SubmitCodeRequest {
-  code: string;
-}
-
-export interface SetReadyRequest {
-  ready: boolean;
-}
-
-export interface CreateTaskRequest {
-  title: string;
-  slug: string;
-  statement: string;
-  difficulty: string;
-  topics: string[];
-  starterCode: string;
-  language: string;
-  taskType: string;
-  executionProfile: string;
-  runnerMode: string;
-  durationSeconds: number;
-  fixtureFiles: string[];
-  readablePaths: string[];
-  writablePaths: string[];
-  allowedHosts: string[];
-  allowedPorts: number[];
-  mockEndpoints: string[];
-  writableTempDir: boolean;
-  isActive: boolean;
-  publicTestCases: CodeTaskCase[];
-  hiddenTestCases: CodeTaskCase[];
-}
-
-export interface CreateArenaMatchRequest {
-  topic?: string;
-  difficulty?: string;
-  obfuscateOpponent?: boolean;
-  actorId?: string;
-  guestName?: string;
-}
-
-export interface JoinArenaQueueRequest {
-  topic?: string;
-  difficulty?: string;
-  obfuscateOpponent?: boolean;
-  actorId?: string;
-  guestName?: string;
-}
-
-// ===========================================
-// API
-// ===========================================
 
 export const codeRoomApi = {
-  // Создать комнату
-  createRoom: async (data: CreateRoomRequest): Promise<CodeRoom> => {
-    const response = await apiClient.post<{ room: any }>('/api/v1/code-editor/rooms', {
-      ...(data.guestName && { name: data.guestName }),
-      mode: roomModeToEnum(data.mode),
-      topic: data.topic || '',
-      difficulty: data.difficulty || '',
-    }, {
-      headers: withGuestCodeRoomHeaders(data.guestName),
-    });
-    if (data.guestName) {
-      markGuestCodeRoomSession();
-    }
-    return normalizeRoom(response.data.room);
+  listTasks: async (params?: { topic?: string; difficulty?: string }): Promise<Task[]> => {
+    const r = await apiClient.get<{ tasks?: unknown[] }>('/api/v1/code-editor/tasks', { params })
+    return (r.data.tasks ?? []) as Task[]
   },
-
-  // Получить комнату по ID
-  getRoom: async (roomId: string): Promise<CodeRoom> => {
-    const response = await apiClient.get<{ room: any }>(`/api/v1/code-editor/rooms/${roomId}`);
-    return normalizeRoom(response.data.room);
+  createRoom: async (payload: { mode?: string; task?: string; name?: string; topic?: string; difficulty?: string }, guestName?: string): Promise<{ room: Room; inviteCode: string }> => {
+    const r = await apiClient.post<{ room?: BackendRoom; invite_code?: string }>(
+      '/api/v1/code-editor/rooms',
+      { mode: payload.mode ?? 'ROOM_MODE_ALL', task: payload.task, name: payload.name, topic: payload.topic, difficulty: payload.difficulty },
+      { headers: withGuestCodeRoomHeaders(guestName) },
+    )
+    return { room: normalizeRoom(r.data.room ?? { id: '' }), inviteCode: r.data.invite_code ?? '' }
   },
-
-  // Присоединиться к комнате
-  joinRoom: async (roomId: string, data?: JoinRoomRequest): Promise<CodeRoom> => {
-    const response = await apiClient.post<{ room: any }>(`/api/v1/code-editor/rooms/${roomId}/join`, {
-      ...(data?.userId && { userId: data.userId }),
-      ...(data?.guestName && { name: data.guestName }),
-    }, {
-      headers: withGuestCodeRoomHeaders(data?.guestName),
-    });
-    return normalizeRoom(response.data.room);
-  },
-
-  // Присоединиться по коду приглашения
-  joinRoomByInviteCode: async (inviteCode: string, guestName?: string): Promise<CodeRoom> => {
-    const response = await apiClient.post<{ room: any }>('/api/v1/code-editor/join', {
-      inviteCode,
-      ...(guestName && { name: guestName }),
-    }, {
+  getRoom: async (roomId: string, guestName?: string): Promise<Room> => {
+    const r = await apiClient.get<{ room?: BackendRoom }>(`/api/v1/code-editor/rooms/${roomId}`, {
       headers: withGuestCodeRoomHeaders(guestName),
-    });
-    if (guestName) {
-      markGuestCodeRoomSession();
-    }
-    return normalizeRoom(response.data.room);
+    })
+    return normalizeRoom(r.data.room ?? { id: roomId })
   },
-
-  // Покинуть комнату
-  leaveRoom: async (roomId: string, guestName?: string): Promise<void> => {
-    await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/leave`, {}, {
-      headers: withGuestCodeRoomHeaders(guestName),
-    });
+  joinRoom: async (roomId: string, name?: string, guestName?: string): Promise<Room> => {
+    const r = await apiClient.post<{ room?: BackendRoom }>(
+      `/api/v1/code-editor/rooms/${roomId}/join`,
+      { name },
+      { headers: withGuestCodeRoomHeaders(guestName) },
+    )
+    return normalizeRoom(r.data.room ?? { id: roomId })
   },
-
-  // Запустить/отправить код
-  submitCode: async (roomId: string, code: string, guestName?: string): Promise<RunCodeResponse> => {
-    const response = await apiClient.post<{
-      output: string;
-      error?: string;
-      isCorrect?: boolean;
-    }>(`/api/v1/code-editor/rooms/${roomId}/submit`, { code }, {
-      headers: withGuestCodeRoomHeaders(guestName),
-    });
-    return {
-      output: response.data.output || '',
-      error: response.data.error || undefined,
-      exitCode: response.data.error ? 1 : 0,
-      executionTimeMs: 0,
-    };
+  joinRoomByInviteCode: async (inviteCode: string, name?: string, guestName?: string): Promise<Room> => {
+    const r = await apiClient.post<{ room?: BackendRoom }>(
+      '/api/v1/code-editor/join',
+      { invite_code: inviteCode, name },
+      { headers: withGuestCodeRoomHeaders(guestName) },
+    )
+    return normalizeRoom(r.data.room ?? { id: '' })
   },
-
-  // Установить готовность (для дуэли)
-  setReady: async (roomId: string, ready: boolean, guestName?: string): Promise<void> => {
-    await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/ready`, { ready }, {
-      headers: withGuestCodeRoomHeaders(guestName),
-    });
+  leaveRoom: async (roomId: string): Promise<void> => {
+    await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/leave`, {})
   },
-
-  // Получить историю submission-ов
-  getSubmissions: async (roomId: string): Promise<Submission[]> => {
-    const response = await apiClient.get<{ submissions: Submission[] }>(`/api/v1/code-editor/rooms/${roomId}/submissions`);
-    return response.data.submissions;
+  submitCode: async (roomId: string, code: string, guestName?: string): Promise<{ output: string; error: string; isCorrect: boolean }> => {
+    const r = await apiClient.post<{ output?: string; error?: string; is_correct?: boolean }>(
+      `/api/v1/code-editor/rooms/${roomId}/submit`,
+      { code },
+      { headers: withGuestCodeRoomHeaders(guestName) },
+    )
+    return { output: r.data.output ?? '', error: r.data.error ?? '', isCorrect: r.data.is_correct ?? false }
   },
-
-  listTasks: async (params?: { topic?: string; difficulty?: string; includeInactive?: boolean }): Promise<CodeTask[]> => {
-    const response = await apiClient.get<{ tasks: any[] }>('/api/v1/code-editor/tasks', {
-      params: {
-        topic: params?.topic || '',
-        difficulty: toTaskDifficultyEnum(params?.difficulty),
-        includeInactive: params?.includeInactive || false,
-      },
-    });
-    return (response.data.tasks || []).map(normalizeTask);
+  setReady: async (roomId: string, ready: boolean): Promise<void> => {
+    await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/ready`, { ready })
   },
-
-  getLeaderboard: async (limit = 20): Promise<CodeLeaderboardEntry[]> => {
-    const response = await apiClient.get<{ entries: any[] }>('/api/v1/code-editor/leaderboard', {
-      params: { limit },
-    });
-    return (response.data.entries || []).map(normalizeLeaderboardEntry);
+  getLeaderboard: async () => {
+    const r = await apiClient.get<{ entries?: unknown[] }>('/api/v1/code-editor/leaderboard', { params: { limit: 20 } })
+    return r.data.entries ?? []
   },
-
-  adminCreateTask: async (payload: CreateTaskRequest): Promise<CodeTask> => {
-    const response = await apiClient.post<{ task: any }>('/api/admin/code-editor/tasks', {
-      title: payload.title,
-      slug: payload.slug,
-      statement: payload.statement,
-      difficulty: toTaskDifficultyEnum(payload.difficulty),
-      topics: payload.topics,
-      starterCode: payload.starterCode,
-      language: toProgrammingLanguageEnum(payload.language),
-      taskType: toTaskTypeEnum(payload.taskType),
-      executionProfile: payload.executionProfile,
-      runnerMode: payload.runnerMode,
-      durationSeconds: payload.durationSeconds,
-      fixtureFiles: payload.fixtureFiles,
-      readablePaths: payload.readablePaths,
-      writablePaths: payload.writablePaths,
-      allowedHosts: payload.allowedHosts,
-      allowedPorts: payload.allowedPorts,
-      mockEndpoints: payload.mockEndpoints,
-      writableTempDir: payload.writableTempDir,
-      isActive: payload.isActive,
-      publicTestCases: payload.publicTestCases,
-      hiddenTestCases: payload.hiddenTestCases,
-    });
-    return normalizeTask(response.data.task);
-  },
-
-  adminUpdateTask: async (taskId: string, payload: CreateTaskRequest): Promise<CodeTask> => {
-    const response = await apiClient.put<{ task: any }>(`/api/admin/code-editor/tasks/${taskId}`, {
-      taskId,
-      title: payload.title,
-      slug: payload.slug,
-      statement: payload.statement,
-      difficulty: toTaskDifficultyEnum(payload.difficulty),
-      topics: payload.topics,
-      starterCode: payload.starterCode,
-      language: toProgrammingLanguageEnum(payload.language),
-      taskType: toTaskTypeEnum(payload.taskType),
-      executionProfile: payload.executionProfile,
-      runnerMode: payload.runnerMode,
-      durationSeconds: payload.durationSeconds,
-      fixtureFiles: payload.fixtureFiles,
-      readablePaths: payload.readablePaths,
-      writablePaths: payload.writablePaths,
-      allowedHosts: payload.allowedHosts,
-      allowedPorts: payload.allowedPorts,
-      mockEndpoints: payload.mockEndpoints,
-      writableTempDir: payload.writableTempDir,
-      isActive: payload.isActive,
-      publicTestCases: payload.publicTestCases,
-      hiddenTestCases: payload.hiddenTestCases,
-    });
-    return normalizeTask(response.data.task);
-  },
-
-  adminDeleteTask: async (taskId: string): Promise<void> => {
-    await apiClient.delete(`/api/admin/code-editor/tasks/${taskId}`);
-  },
-
-  createArenaMatch: async (payload: CreateArenaMatchRequest): Promise<ArenaMatch> => {
-    const response = await apiClient.post<{ match: any }>('/api/v1/arena/matches', {
-      topic: payload.topic || '',
-      difficulty: toArenaDifficultyEnum(payload.difficulty),
-      obfuscateOpponent: payload.obfuscateOpponent ?? true,
-    }, {
-      headers: withGuestArenaHeaders(payload.actorId, payload.guestName),
-    });
-    if (payload.guestName) {
-      markGuestCodeRoomSession();
-    }
-    return normalizeArenaMatch(response.data.match);
-  },
-
-  getArenaMatch: async (matchId: string, actorId?: string, guestName?: string): Promise<ArenaMatch> => {
-    const response = await apiClient.get<{ match: any }>(`/api/v1/arena/matches/${matchId}`, {
-      headers: withGuestArenaHeaders(actorId, guestName),
-    });
-    return normalizeArenaMatch(response.data.match);
-  },
-
-  joinArenaMatch: async (matchId: string, actorId?: string, guestName?: string): Promise<ArenaMatch> => {
-    const response = await apiClient.post<{ match: any }>(`/api/v1/arena/matches/${matchId}/join`, {}, {
-      headers: withGuestArenaHeaders(actorId, guestName),
-    });
-    if (guestName) {
-      markGuestCodeRoomSession();
-    }
-    return normalizeArenaMatch(response.data.match);
-  },
-
-  submitArenaCode: async (matchId: string, code: string, actorId?: string, guestName?: string) => {
-    const response = await apiClient.post<{
-      match?: any;
-      output: string;
-      error?: string;
-      isCorrect: boolean;
-      passedCount: number;
-      totalCount: number;
-      runtimeMs: number;
-      freezeUntil?: string;
-      failedTestIndex?: number;
-      failed_test_index?: number;
-      failureKind?: number | string;
-      failure_kind?: number | string;
-    }>(`/api/v1/arena/matches/${matchId}/submit`, { code }, {
-      headers: withGuestArenaHeaders(actorId, guestName),
-    });
-
-    const rawFailureKind = response.data.failureKind ?? response.data.failure_kind;
-
-    let failureKind = '';
-    if (
-      rawFailureKind === 1 ||
-      rawFailureKind === 'SUBMIT_FAILURE_KIND_COMPILE_ERROR' ||
-      rawFailureKind === 'compile_error'
-    ) {
-      failureKind = 'compile_error';
-    } else if (
-      rawFailureKind === 2 ||
-      rawFailureKind === 'SUBMIT_FAILURE_KIND_RUNTIME_ERROR' ||
-      rawFailureKind === 'runtime_error'
-    ) {
-      failureKind = 'runtime_error';
-    } else if (
-      rawFailureKind === 3 ||
-      rawFailureKind === 'SUBMIT_FAILURE_KIND_WRONG_ANSWER' ||
-      rawFailureKind === 'wrong_answer'
-    ) {
-      failureKind = 'wrong_answer';
-    } else if (
-      rawFailureKind === 4 ||
-      rawFailureKind === 'SUBMIT_FAILURE_KIND_TIMEOUT' ||
-      rawFailureKind === 'timeout'
-    ) {
-      failureKind = 'timeout';
-    }
-
-    return {
-      ...response.data,
-      match: response.data.match ? normalizeArenaMatch(response.data.match) : undefined,
-      failedTestIndex: Number(response.data.failedTestIndex ?? response.data.failed_test_index ?? 0),
-      failureKind,
-    };
-  },
-
-  getOpenArenaMatches: async (limit = 8): Promise<ArenaMatch[]> => {
-    const cacheKey = `arena:open-matches:${limit}`;
-    const cached = getCachedValue<ArenaMatch[]>(cacheKey);
-    if (cached) {
-      return cached;
-    }
-    const response = await apiClient.get<{ matches: any[] }>('/api/v1/arena/open-matches', {
-      params: { limit },
-    });
-    const matches = (response.data.matches || []).map(normalizeArenaMatch);
-    setCachedValue(cacheKey, matches, 30_000);
-    return matches;
-  },
-
-  joinArenaQueue: async (payload: JoinArenaQueueRequest): Promise<ArenaQueueState> => {
-    const response = await apiClient.post('/api/v1/arena/queue/join', {
-      topic: payload.topic || '',
-      difficulty: toArenaDifficultyEnum(payload.difficulty),
-      obfuscateOpponent: payload.obfuscateOpponent ?? true,
-    }, {
-      headers: withGuestArenaHeaders(payload.actorId, payload.guestName),
-    });
-    if (payload.guestName) {
-      markGuestCodeRoomSession();
-    }
-    return normalizeArenaQueueState(response.data);
-  },
-
-  leaveArenaQueue: async (actorId?: string, guestName?: string): Promise<void> => {
-    await apiClient.post('/api/v1/arena/queue/leave', {}, {
-      headers: withGuestArenaHeaders(actorId, guestName),
-    });
-  },
-
-  leaveArenaMatch: async (matchId: string, actorId?: string, guestName?: string): Promise<ArenaMatch> => {
-    const response = await apiClient.post<{ match: any }>(`/api/v1/arena/matches/${matchId}/leave`, {}, {
-      headers: withGuestArenaHeaders(actorId, guestName),
-    });
-    return normalizeArenaMatch(response.data.match);
-  },
-
-  getArenaQueueStatus: async (actorId?: string, guestName?: string): Promise<ArenaQueueState> => {
-    const response = await apiClient.get('/api/v1/arena/queue/status', {
-      headers: withGuestArenaHeaders(actorId, guestName),
-    });
-    return normalizeArenaQueueState(response.data);
-  },
-
-  getArenaLeaderboard: async (limit = 20): Promise<ArenaLeaderboardEntry[]> => {
-    const cacheKey = `arena:leaderboard:${limit}`;
-    const cached = getCachedValue<ArenaLeaderboardEntry[]>(cacheKey);
-    if (cached) {
-      return cached;
-    }
-    const response = await apiClient.get<{ entries: any[] }>('/api/v1/arena/leaderboard', {
-      params: { limit },
-    });
-    const entries = (response.data.entries || []).map(normalizeArenaLeaderboardEntry);
-    setCachedValue(cacheKey, entries, 30_000);
-    return entries;
-  },
-
-  getArenaStats: async (userId: string): Promise<ArenaPlayerStats> => {
-    const response = await apiClient.get<{ stats: any }>(`/api/v1/arena/stats/${userId}`);
-    return normalizeArenaPlayerStats(response.data.stats);
-  },
-
-  getArenaStatsBatch: async (userIds: string[]): Promise<Record<string, ArenaPlayerStats>> => {
-    const response = await apiClient.post<{ stats: Record<string, any> }>('/api/v1/arena/stats/batch', {
-      userIds,
-    });
-    const statsMap: Record<string, ArenaPlayerStats> = {};
-    for (const [userId, stats] of Object.entries(response.data.stats || {})) {
-      statsMap[userId] = normalizeArenaPlayerStats(stats);
-    }
-    return statsMap;
-  },
-
-  reportArenaSuspicion: async (matchId: string, reason: string, actorId?: string, guestName?: string): Promise<void> => {
-    await apiClient.post('/api/v1/arena/anti-cheat/event', {
-      matchId,
-      reason,
-    }, {
-      headers: withGuestArenaHeaders(actorId, guestName),
-    });
-  },
-};
+}

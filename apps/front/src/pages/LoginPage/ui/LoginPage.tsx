@@ -1,131 +1,104 @@
-import React, { useState } from 'react';
-import { ShieldCheck, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
+import { useState } from 'react'
+import { authApi } from '@/features/Auth/api/authApi'
+import { useAuth } from '@/app/providers/AuthProvider'
+import { useNavigate } from 'react-router-dom'
+import { Spinner } from '@/shared/ui/Spinner'
 
-import { useAuth } from '@/app/providers/AuthProvider';
-import { TelegramAuthWidget } from '@/features/Auth/ui/TelegramAuthWidget';
+export function LoginPage() {
+  const { refresh } = useAuth()
+  const navigate = useNavigate()
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
 
-export const LoginPage: React.FC = () => {
-  const { login, startYandexAuth } = useAuth();
-  const [error, setError] = useState('');
-  const [isYandexLoading, setIsYandexLoading] = useState(false);
-  const [showTelegram, setShowTelegram] = useState(false);
-
-  const handleTelegramAuth = async (token: string, code: string) => {
+  const handleYandex = async () => {
+    setLoading(true)
+    setError('')
     try {
-      setError('');
-      await login(token, code);
-    } catch (err) {
-      setError('Ошибка авторизации через Telegram');
-      console.error(err);
+      const { authUrl } = await authApi.startYandexAuth()
+      window.location.href = authUrl
+    } catch (e: any) {
+      setError('Ошибка авторизации')
+      setLoading(false)
     }
-  };
+  }
 
-  const handleYandexAuth = async () => {
+  const handleTelegram = async () => {
+    setLoading(true)
+    setError('')
     try {
-      setIsYandexLoading(true);
-      setError('');
-      const authUrl = await startYandexAuth();
-      window.location.assign(authUrl);
-    } catch (err) {
-      setError('Не удалось начать авторизацию через Яндекс');
-      setIsYandexLoading(false);
-      console.error(err);
+      const { botStartUrl } = await authApi.createTelegramAuthChallenge()
+      window.open(botStartUrl, '_blank')
+      // Poll for auth completion
+      const poll = setInterval(async () => {
+        try {
+          await refresh()
+          clearInterval(poll)
+          navigate('/home')
+        } catch {}
+      }, 2000)
+      setTimeout(() => clearInterval(poll), 120000)
+    } catch {
+      setError('Ошибка авторизации')
+    } finally {
+      setLoading(false)
     }
-  };
+  }
 
   return (
-    <div className="auth-screen">
-      {/* Abstract background */}
-      <div className="auth-bg" aria-hidden="true" />
-
-      {/* Feature highlights */}
-      <aside className="auth-features auth-features--left" aria-hidden="true">
-        <div className="auth-feature-card">
-          <span className="auth-feature-card__icon">⚡</span>
-          <strong>500+ задач</strong>
-          <span>от Easy до Hard</span>
-        </div>
-        <div className="auth-feature-card">
-          <span className="auth-feature-card__icon">🤖</span>
-          <strong>AI-ревью</strong>
-          <span>разбор решений</span>
-        </div>
-        <div className="auth-feature-card">
-          <span className="auth-feature-card__icon">🏆</span>
-          <strong>Дуэли</strong>
-          <span>live PvP арена</span>
-        </div>
-      </aside>
-
-      {/* Central login card */}
-      <div className="auth-card fade-in">
-        <div className="auth-card__logo">
-          <span className="auth-card__wordmark">Druz9</span>
-          <p className="auth-card__tagline">Прокачай алгоритмическое мышление</p>
-        </div>
-
-        <div className="auth-card__divider" />
-
-        {error && (
-          <div className="auth-card__error">
-            {error}
-          </div>
-        )}
-
-        <div className="auth-card__actions">
-          <button
-            type="button"
-            className="btn auth-card__btn auth-card__btn--yandex"
-            disabled={isYandexLoading}
-            onClick={handleYandexAuth}
-          >
-            <svg className="auth-card__btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
-              <path d="M13.4 12L19 2H14.6L12 7.2L9.4 2H5L10.6 12L5 22H9.4L12 16.8L14.6 22H19L13.4 12Z" fill="currentColor"/>
+    <div className="min-h-screen bg-[#F2F3F0] flex items-center justify-center">
+      <div className="w-full max-w-[400px] mx-4">
+        {/* Logo */}
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 bg-[#FF8400] rounded-2xl flex items-center justify-center mx-auto mb-4">
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none">
+              <path d="M4 20L12 4L20 20" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+              <path d="M7 14H17" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
             </svg>
-            {isYandexLoading ? 'Переходим...' : 'Войти через Яндекс'}
-          </button>
+          </div>
+          <h1 className="font-mono text-2xl font-bold text-[#FF8400] tracking-widest">LUNARIS</h1>
+          <p className="text-sm text-[#64748b] mt-2">Сообщество разработчиков</p>
+        </div>
 
-          <button
-            type="button"
-            className="btn auth-card__btn auth-card__btn--telegram"
-            onClick={() => setShowTelegram(v => !v)}
-          >
-            <MessageCircle size={18} />
-            Войти через Telegram
-            {showTelegram ? <ChevronUp size={16} className="auth-card__btn-chevron" /> : <ChevronDown size={16} className="auth-card__btn-chevron" />}
-          </button>
+        {/* Card */}
+        <div className="bg-white rounded-2xl border border-[#CBCCC9] p-8">
+          <h2 className="text-xl font-bold text-[#18181b] mb-2">Добро пожаловать</h2>
+          <p className="text-sm text-[#64748b] mb-6">Войдите, чтобы продолжить</p>
 
-          {showTelegram && (
-            <div className="auth-card__telegram">
-              <TelegramAuthWidget onAuth={handleTelegramAuth} />
+          {error && (
+            <div className="mb-4 p-3 bg-[#fef2f2] border border-[#fca5a5] rounded-lg text-sm text-[#dc2626]">
+              {error}
             </div>
           )}
-        </div>
 
-        <div className="auth-card__footer">
-          <ShieldCheck size={14} />
-          <span>Сессия хранится в защищённой cookie</span>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={handleYandex}
+              disabled={loading}
+              className="flex items-center justify-center gap-3 w-full px-4 py-3 bg-[#fc3f1d] hover:bg-[#e5381a] text-white rounded-xl font-medium text-sm transition-colors disabled:opacity-50"
+            >
+              {loading ? <Spinner size="sm" /> : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12.5 2h-1.7C7.9 2 6.1 4.3 6.1 7.1c0 2.5 1.1 3.9 3.2 5.1L6.1 22h3.4l3-9.3h.7V22H16V2h-3.5zm0 7.9h-.8c-1.5 0-2.2-.9-2.2-2.8 0-1.9.7-2.8 2.2-2.8h.8v5.6z"/>
+                </svg>
+              )}
+              Войти через Яндекс
+            </button>
+
+            <button
+              onClick={handleTelegram}
+              disabled={loading}
+              className="flex items-center justify-center gap-3 w-full px-4 py-3 bg-[#2AABEE] hover:bg-[#229ed9] text-white rounded-xl font-medium text-sm transition-colors disabled:opacity-50"
+            >
+              {loading ? <Spinner size="sm" /> : (
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm4.917 7.049-1.833 8.632c-.135.601-.495.748-.999.466l-2.75-2.026-1.328 1.278c-.146.146-.269.269-.552.269l.197-2.795 5.082-4.591c.22-.197-.049-.307-.342-.11l-6.283 3.953-2.706-.847c-.588-.183-.599-.588.123-.87l10.564-4.073c.489-.176.918.12.827.714z"/>
+                </svg>
+              )}
+              Войти через Telegram
+            </button>
+          </div>
         </div>
       </div>
-
-      {/* Feature highlights right */}
-      <aside className="auth-features auth-features--right" aria-hidden="true">
-        <div className="auth-feature-card">
-          <span className="auth-feature-card__icon">📊</span>
-          <strong>Аналитика</strong>
-          <span>прогресс в деталях</span>
-        </div>
-        <div className="auth-feature-card">
-          <span className="auth-feature-card__icon">🎯</span>
-          <strong>Mock-интервью</strong>
-          <span>с AI-интервьюером</span>
-        </div>
-        <div className="auth-feature-card">
-          <span className="auth-feature-card__icon">🔥</span>
-          <strong>Стрики</strong>
-          <span>ежедневные задачи</span>
-        </div>
-      </aside>
     </div>
-  );
-};
+  )
+}

@@ -1,473 +1,143 @@
-import { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
-import { useParams } from 'react-router-dom';
-import {
-  CheckCircle2,
-  Clock3,
-  Sparkles,
-} from 'lucide-react';
-
-import {
-  interviewPrepApi,
-  InterviewPrepAnswerReview,
-  InterviewPrepMockSession,
-  InterviewPrepMockStage,
-  InterviewPrepMockStageKind,
-  InterviewPrepSolutionReview,
-  InterviewPrepSystemDesignReview,
-  InterviewPrepSystemDesignReviewInput,
-} from '@/features/InterviewPrep/api/interviewPrepApi';
-
-const InterviewPrepMockWorkstation = lazy(() => import('./components/InterviewPrepMockWorkstation').then((m) => ({ default: m.InterviewPrepMockWorkstation })));
-
-const WorkstationFallback = () => (
-  <section className="card dashboard-card">
-    <div className="empty-state compact">Загрузка workstation...</div>
-  </section>
-);
-
-type SpeechRecognitionCtor = new () => {
-  continuous: boolean;
-  interimResults: boolean;
-  lang: string;
-  start: () => void;
-  stop: () => void;
-  onresult: ((event: any) => void) | null;
-  onerror: ((event: any) => void) | null;
-  onend: (() => void) | null;
-};
-
-const STAGE_LABELS: Record<InterviewPrepMockStageKind, string> = {
-  slices: 'Slices',
-  concurrency: 'Concurrency',
-  sql: 'SQL',
-  architecture: 'Architecture',
-  system_design: 'System Design',
-  unspecified: 'Unspecified',
-};
-
-const DESIGN_INITIAL_STATE: InterviewPrepSystemDesignReviewInput = {
-  notes: '',
-  components: '',
-  apis: '',
-  databaseSchema: '',
-  traffic: '',
-  reliability: '',
-};
-
-function getSpeechRecognitionCtor(): SpeechRecognitionCtor | null {
-  const candidate = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-  return typeof candidate === 'function' ? candidate : null;
-}
-
-function defaultCode(stage: InterviewPrepMockStage | undefined) {
-  if (!stage) return '';
-  if (stage.code) return stage.code;
-  switch (stage.solveLanguage) {
-    case 'python':
-      return 'def solve(input: str) -> str:\n    return ""\n';
-    case 'sql':
-      return '-- Write SQL here\nSELECT 1;\n';
-    case 'go':
-    default:
-      return 'package main\n\nfunc solve(input string) string {\n\treturn ""\n}\n';
-  }
-}
+import { useEffect, useState, useRef, useCallback } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { ArrowLeft, Clock, Send } from 'lucide-react'
+import Editor from '@monaco-editor/react'
+import { interviewPrepApi } from '@/features/InterviewPrep/api/interviewPrepApi'
+import { Badge } from '@/shared/ui/Badge'
+import { Button } from '@/shared/ui/Button'
+import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import type * as Monaco from 'monaco-editor'
 
 export function InterviewPrepMockSessionPage() {
-  const { sessionId = '' } = useParams();
-  const [session, setSession] = useState<InterviewPrepMockSession | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [code, setCode] = useState('');
-  const [notes, setNotes] = useState('');
-  const [submitting, setSubmitting] = useState(false);
-  const [designImage, setDesignImage] = useState<File | null>(null);
-  const [designInput, setDesignInput] = useState<InterviewPrepSystemDesignReviewInput>(DESIGN_INITIAL_STATE);
-  const [designReview, setDesignReview] = useState<InterviewPrepSystemDesignReview | null>(null);
-  const [solutionReview, setSolutionReview] = useState<InterviewPrepSolutionReview | null>(null);
-  const [answerReview, setAnswerReview] = useState<InterviewPrepAnswerReview | null>(null);
-  const [submitErrorDetails, setSubmitErrorDetails] = useState<string | null>(null);
-  const [answerText, setAnswerText] = useState('');
-  const [selectedStageId, setSelectedStageId] = useState<string | null>(null);
-  const [speechSupported] = useState(Boolean(getSpeechRecognitionCtor()));
-  const [speechActive, setSpeechActive] = useState(false);
-  const speechRef = useRef<any>(null);
+  const { sessionId } = useParams<{ sessionId: string }>()
+  const navigate = useNavigate()
+  const [session, setSession] = useState<any>(null)
+  const [code, setCode] = useState('')
+  const [notes, setNotes] = useState('')
+  const [submitting, setSubmitting] = useState(false)
+  const [timeLeft, setTimeLeft] = useState(0)
+  const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
 
   useEffect(() => {
-    if (!sessionId) return;
-    setLoading(true);
-    interviewPrepApi.getMockSession(sessionId)
-      .then((res) => {
-        setSession(res);
-        setCode(defaultCode(res.currentStage));
-      })
-      .catch((e: any) => {
-        console.error('Failed to load mock interview session:', e);
-        setError(e.response?.data?.error || 'Не удалось загрузить mock interview');
-      })
-      .finally(() => setLoading(false));
-  }, [sessionId]);
+    if (!sessionId) return
+    interviewPrepApi.getMockSession(sessionId).then((s: any) => {
+      setSession(s)
+      const stage = s?.current_stage
+      if (stage?.task?.starter_code) setCode(stage.task.starter_code)
+      if (stage?.task?.duration_seconds) setTimeLeft(stage.task.duration_seconds)
+    }).catch(() => navigate('/growth/interview-prep'))
+  }, [sessionId])
 
   useEffect(() => {
-    setCode(defaultCode(session?.currentStage));
-    setNotes('');
-    setAnswerText('');
-    setDesignReview(null);
-    setSolutionReview(null);
-    setAnswerReview(null);
-    setSubmitErrorDetails(null);
-    setDesignImage(null);
-    setDesignInput(DESIGN_INITIAL_STATE);
-  }, [session?.currentStage?.id]);
+    if (timeLeft <= 0) return
+    const t = setInterval(() => setTimeLeft(p => p > 0 ? p - 1 : 0), 1000)
+    return () => clearInterval(t)
+  }, [timeLeft > 0])
 
-  useEffect(() => {
-    if (!session?.currentStage?.id) return;
-    setSelectedStageId((current) => current ?? session.currentStage!.id);
-  }, [session?.currentStage?.id]);
+  const formatTime = (s: number) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`
 
-  useEffect(() => {
-    return () => {
-      if (speechRef.current) {
-        speechRef.current.stop();
-      }
-    };
-  }, []);
-
-  const currentStage = session?.currentStage;
-  const viewedStage = useMemo(
-    () => (session?.stages ?? []).find((stage) => stage.id === selectedStageId) ?? currentStage,
-    [currentStage, selectedStageId, session?.stages],
-  );
-  const isViewingCurrentStage = viewedStage?.id === currentStage?.id;
-  const completedStages = useMemo(
-    () => (session?.stages ?? []).filter((stage) => stage.status === 'completed'),
-    [session],
-  );
-  const progress = useMemo(() => {
-    const stages = session?.stages ?? [];
-    const completed = stages.filter((stage) => stage.status === 'completed').length;
-    return { completed, total: stages.length };
-  }, [session]);
-
-  const handleSubmitStage = async () => {
-    if (!sessionId || !currentStage) return;
-    setSubmitting(true);
-    setError(null);
-    setSubmitErrorDetails(null);
+  const handleSubmit = async () => {
+    if (!sessionId) return
+    setSubmitting(true)
     try {
-      const result = await interviewPrepApi.submitMockStage(sessionId, {
-        code,
-        language: currentStage.solveLanguage,
-        notes,
-      });
-      if (!result.passed && result.lastError) {
-        setSubmitErrorDetails(result.lastError);
-      }
-      if (result.review) {
-        setSolutionReview(result.review);
-      }
-      if (result.session) {
-        setSession(result.session);
-      }
-    } catch (e: any) {
-      console.error('Failed to submit mock stage:', e);
-      setError(e.response?.data?.error || 'Не удалось отправить решение');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleReviewSystemDesign = async () => {
-    if (!sessionId || !designImage) return;
-    setSubmitting(true);
-    setError(null);
-    setSubmitErrorDetails(null);
-    try {
-      const result = await interviewPrepApi.reviewMockSystemDesign(sessionId, designImage, designInput);
-      if (result.review) {
-        setDesignReview(result.review);
-      }
-      if (result.session) {
-        setSession(result.session);
-      }
-    } catch (e: any) {
-      console.error('Failed to review mock system design:', e);
-      setError(e.response?.data?.error || 'Не удалось получить ревью');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const handleAnswerQuestion = async () => {
-    if (!sessionId || !answerText.trim()) return;
-    setSubmitting(true);
-    setError(null);
-    setSubmitErrorDetails(null);
-    try {
-      const result = await interviewPrepApi.answerMockQuestion(sessionId, answerText.trim());
-      if (result.review) {
-        setAnswerReview(result.review);
-      }
-      if (result.session) {
-        setSession(result.session);
-      }
-      setAnswerText('');
-    } catch (e: any) {
-      console.error('Failed to answer mock question:', e);
-      setError(e.response?.data?.error || 'Не удалось проверить ответ');
-    } finally {
-      setSubmitting(false);
-    }
-  };
-
-  const toggleSpeech = () => {
-    const Ctor = getSpeechRecognitionCtor();
-    if (!Ctor) return;
-    if (speechActive && speechRef.current) {
-      speechRef.current.stop();
-      setSpeechActive(false);
-      return;
-    }
-    const recognition = new Ctor();
-    recognition.lang = 'ru-RU';
-    recognition.continuous = true;
-    recognition.interimResults = true;
-    recognition.onresult = (event) => {
-      const transcript = Array.from(event.results)
-        .map((result: any) => result[0]?.transcript ?? '')
-        .join(' ')
-        .trim();
-      setAnswerText(transcript);
-    };
-    recognition.onerror = () => setSpeechActive(false);
-    recognition.onend = () => setSpeechActive(false);
-    speechRef.current = recognition;
-    recognition.start();
-    setSpeechActive(true);
-  };
-
-  if (loading) {
-    return <div className="empty-state compact">Загрузка mock interview...</div>;
+      await (interviewPrepApi as any).submitMockStage?.(sessionId, code, 'python3', notes)
+      const updated = await interviewPrepApi.getMockSession(sessionId) as any
+      setSession(updated)
+      if (updated.status === 'finished') navigate('/growth/interview-prep')
+    } catch {} finally { setSubmitting(false) }
   }
 
-  if (!session || !currentStage) {
-    return (
-      <section className="card dashboard-card">
-        <div className="error-text">{error ?? 'Сессия не найдена'}</div>
-      </section>
-    );
-  }
+  const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
+    editorRef.current = editor
+    registerDarkTheme(monaco)
+    monaco.editor.setTheme('lunaris-dark')
+  }, [])
+
+  const currentStage = session?.current_stage
+  const stages = session?.stages ?? []
+  const companyTag = session?.company_tag ?? ''
 
   return (
-    <div className="interview-prep-session-page interview-prep-mock-page">
-      <header className="interview-prep-mock-header">
-        <div className="interview-prep-mock-header__content">
-          <div className="interview-prep-mock-header__info">
-            <span className="badge badge-secondary">{session.companyTag}</span>
-            <h1>Mock interview</h1>
+    <div className="flex flex-col h-screen bg-[#f8fafc] overflow-hidden">
+      <header className="h-[52px] bg-white border-b border-[#e2e8f0] flex items-center justify-between px-5 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <button onClick={() => navigate('/growth/interview-prep')} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#f1f5f9] text-[#64748b]">
+            <ArrowLeft className="w-4 h-4" />
+          </button>
+          <div>
+            <p className="text-sm font-bold text-[#0f172a]">Mock Interview · {companyTag || 'General'}</p>
+            <p className="text-xs text-[#64748b]">Stage {(session?.current_stage_index ?? 0) + 1} of {stages.length}</p>
           </div>
-          <div className="interview-prep-mock-header__stats">
-            <div className="interview-prep-progress-summary">
-              <span className="label">Прогресс интервью</span>
-              <div className="progress-bar">
-                <div className="progress-bar__fill" style={{ width: `${(progress.completed / progress.total) * 100}%` }} />
-              </div>
-              <span className="value">{progress.completed} / {progress.total} этапов</span>
+          <Badge variant="success" dot>Идёт интервью</Badge>
+        </div>
+        <div className="flex items-center gap-2">
+          {timeLeft > 0 && (
+            <div className="flex items-center gap-1.5 px-3 py-1 bg-[#fef3c7] rounded-full text-xs font-bold text-[#92400e]">
+              <Clock className="w-3 h-3" /> {formatTime(timeLeft)}
             </div>
-          </div>
+          )}
+          <Button variant="orange" size="sm" onClick={handleSubmit} loading={submitting}>
+            <Send className="w-3.5 h-3.5" /> Завершить этап
+          </Button>
         </div>
       </header>
 
-      <div className="interview-prep-mock-layout">
-        <aside className="interview-prep-mock-timeline">
-          <div className="timeline-title">Этапы интервью</div>
-          <div className="timeline-list">
-              {(session.stages ?? []).map((stage, idx) => {
-                const isActive = stage.stageIndex === session.currentStageIndex;
-                const isCompleted = stage.status === 'completed';
-                const isSelected = stage.id === viewedStage?.id;
+      <div className="flex flex-1 min-h-0">
+        {/* Stage progress + problem */}
+        <div className="w-[380px] flex-shrink-0 bg-white border-r border-[#e2e8f0] flex flex-col">
+          {/* Stage progress */}
+          <div className="px-4 py-3 border-b border-[#e2e8f0]">
+            <div className="flex items-center gap-2">
+              {stages.map((s: any, i: number) => {
+                const isCurrent = i === session?.current_stage_index
+                const isDone = s.status === 'finished'
                 return (
-                <button
-                  type="button"
-                  key={stage.id} 
-                  className={`timeline-item ${isActive ? 'is-active' : ''} ${isCompleted ? 'is-completed' : ''} ${isSelected ? 'is-selected' : ''}`}
-                  onClick={() => setSelectedStageId(stage.id)}
-                >
-                  <div className="timeline-item__node">
-                    {isCompleted ? <CheckCircle2 size={14} /> : <span>{idx + 1}</span>}
+                  <div key={s.id ?? i} className="flex items-center gap-1">
+                    <div className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${isDone ? 'bg-[#22c55e] text-white' : isCurrent ? 'bg-[#FF8400] text-white' : 'bg-[#E7E8E5] text-[#64748b]'}`}>
+                      {isDone ? '✓' : i + 1}
+                    </div>
+                    {i < stages.length - 1 && <div className="w-4 h-0.5 bg-[#CBCCC9]" />}
                   </div>
-                  <div className="timeline-item__content">
-                    <span className="timeline-item__label">{STAGE_LABELS[stage.kind]}</span>
-                    <span className="timeline-item__status">
-                      {isActive ? 'Текущий этап' : isCompleted ? 'Пройдено' : 'Впереди'}
-                    </span>
-                  </div>
-                  {isActive && <div className="timeline-item__active-indicator" />}
-                </button>
-              );
-            })}
+                )
+              })}
+            </div>
           </div>
-        </aside>
-
-        <main className="interview-prep-mock-main">
-          {error && (
-            <div className="interview-prep-error-banner">
-              <div className="error-text">{error}</div>
-            </div>
-          )}
-
-          <section className="card dashboard-card task-statement-card">
-            <div className="dashboard-card__header">
-              <div>
-                <span className="badge badge-secondary">{STAGE_LABELS[viewedStage?.kind ?? currentStage.kind]}</span>
-                <h2>{viewedStage?.task?.title ?? 'Текущий этап'}</h2>
-              </div>
-              {viewedStage?.task?.durationSeconds ? (
-                <div className="badge">
-                  <Clock3 size={14} />
-                  {Math.round(viewedStage.task.durationSeconds / 60)} мин
-                </div>
-              ) : null}
-            </div>
-            {!isViewingCurrentStage && (
-              <div className="interview-prep-stage-banner">
-                <span className="badge">Архив этапа</span>
-                <button type="button" className="btn btn-secondary btn-sm" onClick={() => setSelectedStageId(currentStage.id)}>
-                  Вернуться к текущему этапу
-                </button>
+          {/* Problem */}
+          <div className="flex-1 overflow-y-auto p-4">
+            <h2 className="text-base font-bold text-[#0f172a] mb-3">{currentStage?.task?.title ?? 'Задача'}</h2>
+            <p className="text-sm text-[#475569] leading-relaxed whitespace-pre-wrap">{currentStage?.task?.statement ?? 'Загружается...'}</p>
+            {currentStage?.kind === 'system_design' && (
+              <div className="mt-4">
+                <p className="text-xs font-semibold text-[#475569] mb-2">Заметки</p>
+                <textarea
+                  value={notes}
+                  onChange={e => setNotes(e.target.value)}
+                  placeholder="Опишите архитектуру решения..."
+                  rows={8}
+                  className="w-full px-3 py-2 text-sm bg-[#f8fafc] border border-[#e2e8f0] rounded-lg resize-none focus:outline-none"
+                />
               </div>
             )}
-            <pre className="interview-prep-statement">{viewedStage?.task?.statement ?? ''}</pre>
-          </section>
+          </div>
+        </div>
 
-          {completedStages.length > 0 && (
-            <section className="card dashboard-card">
-              <div className="dashboard-card__header">
-                <div>
-                  <h2>Пройденные этапы</h2>
-                  <p className="interview-prep-muted">Краткая история секций, которые ты уже закрыл в этом mock interview.</p>
-                </div>
-              </div>
-              <div className="interview-prep-results">
-                {completedStages.map((stage) => (
-                  <div key={stage.id} className="interview-prep-result-row interview-prep-result-row--stacked">
-                    <strong>{STAGE_LABELS[stage.kind]}{stage.task?.title ? ` · ${stage.task.title}` : ''}</strong>
-                    <span>
-                      {stage.lastSubmissionPassed ? 'Автопроверка пройдена' : 'Этап завершён'}
-                      {stage.reviewScore ? ` · ${stage.reviewScore}/10` : ''}
-                    </span>
-                    {stage.reviewSummary ? <span>{stage.reviewSummary}</span> : null}
-                  </div>
-                ))}
-              </div>
-            </section>
-          )}
-
-          {session.status === 'finished' && (
-            <section className="card dashboard-card interview-prep-finished">
-              <Sparkles size={24} className="sparkle-icon" />
-              <div>
-                <strong>Mock interview успешно завершён</strong>
-                <p className="interview-prep-muted">Поздравляем! Ты прошёл все этапы сценария для {session.companyTag}.</p>
-              </div>
-            </section>
-          )}
-
-          {viewedStage && (
-            <Suspense fallback={<WorkstationFallback />}>
-              <InterviewPrepMockWorkstation
-                session={session}
-                currentStage={currentStage}
-                viewedStage={viewedStage}
-                isViewingCurrentStage={isViewingCurrentStage}
-                code={code}
-                notes={notes}
-                submitting={submitting}
-                designImage={designImage}
-                designInput={designInput}
-                designReview={designReview}
-                solutionReview={solutionReview}
-                answerReview={answerReview}
-                submitErrorDetails={submitErrorDetails}
-                answerText={answerText}
-                speechSupported={speechSupported}
-                speechActive={speechActive}
-                onReturnToCurrentStage={() => setSelectedStageId(currentStage.id)}
-                onCodeChange={setCode}
-                onNotesChange={setNotes}
-                onSubmitStage={() => void handleSubmitStage()}
-                onDesignImageChange={(file) => setDesignImage(file)}
-                onDesignInputChange={setDesignInput}
-                onReviewSystemDesign={() => void handleReviewSystemDesign()}
-                onAnswerTextChange={setAnswerText}
-                onToggleSpeech={toggleSpeech}
-                onAnswerQuestion={() => void handleAnswerQuestion()}
-              />
-            </Suspense>
-          )}
-        </main>
-
-        <aside className="interview-prep-mock-console">
-          <div className="console-title">Консоль интервьюера</div>
-          
-          <section className="console-card">
-            <div className="console-card__header">Статус этапа</div>
-            <div className="console-stats">
-              {(currentStage.questionResults ?? []).length === 0 ? (
-                <div className="console-empty">Follow-up вопросы появятся здесь.</div>
-              ) : (
-                currentStage.questionResults?.map((result) => (
-                  <div key={result.id} className="console-stat-row">
-                    <span>Вопрос {result.position}</span>
-                    <strong className={result.score >= 7 ? 'text-success' : 'text-primary'}>
-                      {result.answeredAt ? `${result.score}/10` : 'ожидание'}
-                    </strong>
-                  </div>
-                ))
-              )}
-            </div>
-          </section>
-
-          {(solutionReview || designReview) && (
-            <section className="console-card console-card--ai">
-              <div className="console-card__header">
-                <Sparkles size={14} />
-                AI Ревью этапа
-              </div>
-              <div className="console-review-body">
-                {'score' in (solutionReview || designReview || {}) && (
-                  <div className="console-review-score">
-                    <span className="label">Оценка</span>
-                    <span className="value">{(solutionReview?.score ?? designReview?.score) || 0} / 10</span>
-                  </div>
-                )}
-                <p className="console-review-text">{solutionReview?.summary ?? designReview?.summary}</p>
-              </div>
-            </section>
-          )}
-
-          {answerReview && (
-            <section className="console-card console-card--ai">
-              <div className="console-card__header">AI Валидация ответа</div>
-              <div className="console-review-body">
-                <div className="console-review-score">
-                  <span className="label">Оценка</span>
-                  <span className="value">{answerReview.score} / 10</span>
-                </div>
-                <p className="console-review-text">{answerReview.summary}</p>
-                {answerReview.gaps?.length ? (
-                  <div className="console-review-gaps">
-                    <span className="gaps-label">Что стоит улучшить:</span>
-                    <ul>
-                      {answerReview.gaps.map((gap, i) => <li key={i}>{gap}</li>)}
-                    </ul>
-                  </div>
-                ) : null}
-              </div>
-            </section>
-          )}
-        </aside>
+        {/* Code editor */}
+        <div className="flex-1 flex flex-col min-w-0">
+          <div className="h-9 bg-[#1e293b] flex items-center px-4 flex-shrink-0">
+            <span className="text-xs text-[#94a3b8] font-mono">solution.py</span>
+          </div>
+          <div className="flex-1">
+            <Editor
+              height="100%"
+              language="python"
+              value={code}
+              onChange={v => setCode(v ?? '')}
+              onMount={handleEditorMount}
+              options={{ fontSize: 13, fontFamily: '"JetBrains Mono", monospace', minimap: { enabled: false }, scrollBeyondLastLine: false, lineNumbers: 'on', padding: { top: 12 } }}
+            />
+          </div>
+        </div>
       </div>
     </div>
-  );
+  )
 }

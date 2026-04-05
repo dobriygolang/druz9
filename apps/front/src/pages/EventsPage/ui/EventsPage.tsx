@@ -1,113 +1,124 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { NavLink } from 'react-router-dom';
-import { Plus, Users } from 'lucide-react';
+import { useEffect, useState } from 'react'
+import { Calendar, MapPin, Users, Plus } from 'lucide-react'
+import { eventApi, type Event, type CreateEventPayload } from '@/features/Event/api/eventApi'
+import { Card } from '@/shared/ui/Card'
+import { Badge } from '@/shared/ui/Badge'
+import { Button } from '@/shared/ui/Button'
+import { Modal } from '@/shared/ui/Modal'
+import { Input } from '@/shared/ui/Input'
 
-import { useAuth } from '@/app/providers/AuthProvider';
-import { CommunityEvent } from '@/entities/User/model/types';
-import { eventApi } from '@/features/Event/api/eventApi';
-
-function formatEventDate(value: string) {
-  const date = new Date(value);
-  return new Intl.DateTimeFormat('ru-RU', {
-    day: 'numeric',
-    month: 'short',
-    hour: '2-digit',
-    minute: '2-digit',
-  }).format(date).replace(',', ' ·');
+function formatDate(iso: string) {
+  try {
+    const d = new Date(iso)
+    return d.toLocaleDateString('ru-RU', { month: 'long', day: 'numeric', year: 'numeric' })
+  } catch { return iso }
 }
 
-function eventBadge(event: CommunityEvent) {
-  if (event.place_label || event.region) {
-    return event.place_label || event.region;
-  }
-  return 'Online';
+function formatTime(iso: string) {
+  try {
+    return new Date(iso).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
+  } catch { return '' }
 }
 
-export const EventsPage: React.FC = () => {
-  const { user } = useAuth();
-  const [events, setEvents] = useState<CommunityEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
+export function EventsPage() {
+  const [events, setEvents] = useState<Event[]>([])
+  const [loading, setLoading] = useState(true)
+  const [showCreate, setShowCreate] = useState(false)
+  const [creating, setCreating] = useState(false)
+  const [form, setForm] = useState<Partial<CreateEventPayload>>({})
 
   useEffect(() => {
-    let cancelled = false;
+    eventApi.listEvents({ limit: 6 })
+      .then(r => setEvents(r.events))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
 
-    const load = async () => {
-      try {
-        setIsLoading(true);
-        const data = await eventApi.list();
-        if (!cancelled) {
-          setEvents(data);
-        }
-      } catch (error) {
-        console.error('Failed to load events', error);
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    };
+  const handleJoin = async (id: string) => {
+    try {
+      const updated = await eventApi.joinEvent(id)
+      setEvents(prev => prev.map(e => e.id === id ? updated : e))
+    } catch {}
+  }
 
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const cards = useMemo(
-    () => events
-      .slice()
-      .sort((left, right) => new Date(left.scheduled_at).getTime() - new Date(right.scheduled_at).getTime())
-      .slice(0, 6),
-    [events],
-  );
+  const handleCreate = async () => {
+    if (!form.title || !form.scheduledAt) return
+    setCreating(true)
+    try {
+      const created = await eventApi.createEvent(form as CreateEventPayload)
+      setEvents(prev => [created, ...prev])
+      setShowCreate(false)
+      setForm({})
+    } catch {} finally { setCreating(false) }
+  }
 
   return (
-    <div className="community-screen fade-in">
-      <section className="community-screen__header">
-        <div className="community-screen__top-row">
-          <div className="community-screen__title-block">
-            <h1>Community</h1>
-            <p>{isLoading ? 'Загружаем события...' : `${events.length} событий в этом месяце`}</p>
-          </div>
-
-          {user?.isAdmin && (
-            <button type="button" className="community-screen__cta">
-              <Plus size={16} />
-              <span>Создать событие</span>
-            </button>
-          )}
-        </div>
-
-        <nav className="community-screen__tabs" aria-label="Community sections">
-          <NavLink to="/community/people" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>People</NavLink>
-          <NavLink to="/community/events" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>Events</NavLink>
-          <NavLink to="/community/map" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>Map</NavLink>
-          <NavLink to="/community/circles" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>Circles</NavLink>
-        </nav>
-      </section>
-
-      <section className="community-events-grid">
-        {isLoading ? (
-          <div className="community-screen__empty">Загрузка событий...</div>
-        ) : cards.length > 0 ? (
-          cards.map((event) => (
-            <article key={event.id} className="community-event-card">
-              <div className="community-event-card__top">
-                <span className={`community-event-card__badge${eventBadge(event) === 'Online' ? ' is-online' : ''}`}>{eventBadge(event)}</span>
-                <span className="community-event-card__date">{formatEventDate(event.scheduled_at)}</span>
-              </div>
-              <h2>{event.title}</h2>
-              <p>{event.description || event.raw_description || 'Событие сообщества.'}</p>
-              <div className="community-event-card__meta">
-                <Users size={12} />
-                <span>{event.participant_count} участников</span>
-              </div>
-            </article>
+    <div className="px-6 pt-4 pb-6">
+      <div className="grid grid-cols-3 gap-4">
+        {loading
+          ? Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-[180px] bg-white rounded-2xl border border-[#CBCCC9] animate-pulse" />
           ))
-        ) : (
-          <div className="community-screen__empty">Пока нет событий.</div>
-        )}
-      </section>
+          : events.map((e) => (
+            <Card key={e.id} padding="md" className="flex flex-col gap-3 hover:border-[#94a3b8] transition-colors cursor-pointer">
+              <div className="flex items-start justify-between">
+                <div className="w-10 h-10 rounded-xl bg-[#fff7ed] flex items-center justify-center">
+                  <Calendar className="w-5 h-5 text-[#FF8400]" />
+                </div>
+                {e.isJoined && <Badge variant="success">Вы идёте</Badge>}
+              </div>
+              <div>
+                <h3 className="text-sm font-semibold text-[#18181b] line-clamp-2">{e.title}</h3>
+                {e.scheduledAt && (
+                  <p className="text-xs text-[#64748b] mt-1">{formatDate(e.scheduledAt)} · {formatTime(e.scheduledAt)}</p>
+                )}
+              </div>
+              <div className="flex items-center gap-3 mt-auto">
+                {(e.city || e.placeLabel) && (
+                  <span className="flex items-center gap-1 text-xs text-[#64748b]">
+                    <MapPin className="w-3 h-3" /> {e.city || e.placeLabel}
+                  </span>
+                )}
+                <span className="flex items-center gap-1 text-xs text-[#64748b] ml-auto">
+                  <Users className="w-3 h-3" /> {e.participantCount}
+                </span>
+              </div>
+              {!e.isJoined && (
+                <Button size="sm" variant="orange" className="w-full justify-center" onClick={() => handleJoin(e.id)}>
+                  Участвовать
+                </Button>
+              )}
+            </Card>
+          ))
+        }
+        {/* Add event card */}
+        <button
+          onClick={() => setShowCreate(true)}
+          className="h-[180px] border-2 border-dashed border-[#CBCCC9] rounded-2xl flex flex-col items-center justify-center gap-2 text-[#94a3b8] hover:border-[#FF8400] hover:text-[#FF8400] transition-colors"
+        >
+          <Plus className="w-6 h-6" />
+          <span className="text-sm font-medium">Создать событие</span>
+        </button>
+      </div>
+
+      <Modal
+        open={showCreate}
+        onClose={() => setShowCreate(false)}
+        title="Новое событие"
+        footer={
+          <>
+            <Button variant="secondary" size="sm" onClick={() => setShowCreate(false)}>Отмена</Button>
+            <Button variant="orange" size="sm" onClick={handleCreate} loading={creating}>Создать</Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <Input label="Название" value={form.title ?? ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Название события" />
+          <Input label="Дата и время" type="datetime-local" value={form.scheduledAt ?? ''} onChange={e => setForm(f => ({ ...f, scheduledAt: e.target.value }))} />
+          <Input label="Место" value={form.placeLabel ?? ''} onChange={e => setForm(f => ({ ...f, placeLabel: e.target.value }))} placeholder="Город, место" />
+          <Input label="Ссылка на встречу" value={form.meetingLink ?? ''} onChange={e => setForm(f => ({ ...f, meetingLink: e.target.value }))} placeholder="https://..." />
+        </div>
+      </Modal>
     </div>
-  );
-};
+  )
+}

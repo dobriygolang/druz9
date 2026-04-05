@@ -1,52 +1,44 @@
-import { apiClient } from '@/shared/api/base';
-
-export interface ConfigItem {
-  key: string;
-  value: string;
-  type: string;
-  writable: boolean;
-  usage: string;
-  group: string;
-}
-
-export interface ConfigListResponse {
-  configs: ConfigItem[];
-}
-
-export interface ConfigUpdateRequest {
-  value: string;
-}
-
-export interface ConfigUpdateResponse {
-  key: string;
-  value: string;
-  success: boolean;
-}
+import { apiClient } from '@/shared/api/base'
 
 export const adminApi = {
-  listConfig: async (): Promise<ConfigItem[]> => {
-    const response = await apiClient.get<ConfigListResponse>('/api/admin/config');
-    return response.data.configs;
+  listCodeTasks: async (params?: { topic?: string; difficulty?: string; includeInactive?: boolean }) => {
+    const r = await apiClient.get<{ tasks?: unknown[] }>('/api/v1/code-editor/tasks', {
+      params: { topic: params?.topic, difficulty: params?.difficulty, include_inactive: params?.includeInactive ?? true },
+    })
+    return r.data.tasks ?? []
   },
-
-  getConfig: async (key: string): Promise<ConfigItem> => {
-    const response = await apiClient.get<ConfigItem>(`/api/admin/config/${key}`);
-    return response.data;
+  createCodeTask: async (payload: unknown) => {
+    const r = await apiClient.post<{ task?: unknown }>('/api/admin/code-editor/tasks', payload)
+    return r.data.task
   },
-
-  updateConfig: async (key: string, value: string): Promise<ConfigUpdateResponse> => {
-    const response = await apiClient.put<ConfigUpdateResponse>(
-      `/api/admin/config/${key}`,
-      { value }
-    );
-    return response.data;
+  updateCodeTask: async (taskId: string, payload: unknown) => {
+    const r = await apiClient.put<{ task?: unknown }>(`/api/admin/code-editor/tasks/${taskId}`, payload)
+    return r.data.task
   },
-
-  setUserTrusted: async (userId: string, isTrusted: boolean): Promise<void> => {
-    await apiClient.patch(`/api/admin/users/${userId}/trust`, { isTrusted });
+  deleteCodeTask: async (taskId: string) => {
+    await apiClient.delete(`/api/admin/code-editor/tasks/${taskId}`)
   },
-
-  setUserAdmin: async (userId: string, isAdmin: boolean): Promise<void> => {
-    await apiClient.patch(`/api/admin/users/${userId}/admin`, { isAdmin });
+  listInterviewPrepTasks: async () => {
+    const r = await apiClient.get<{ tasks?: unknown[] }>('/api/admin/interview-prep/tasks')
+    return r.data.tasks ?? []
   },
-};
+  createInterviewPrepTask: async (payload: unknown) => {
+    const r = await apiClient.post<{ task?: unknown }>('/api/admin/interview-prep/tasks', payload)
+    return r.data.task
+  },
+  updateInterviewPrepTask: async (taskId: string, payload: unknown) => {
+    const r = await apiClient.put<{ task?: unknown }>(`/api/admin/interview-prep/tasks/${taskId}`, payload)
+    return r.data.task
+  },
+  deleteInterviewPrepTask: async (taskId: string) => {
+    await apiClient.delete(`/api/admin/interview-prep/tasks/${taskId}`)
+  },
+  getConfig: async () => {
+    const r = await apiClient.get<unknown>('/api/admin/config')
+    return r.data
+  },
+  updateConfig: async (payload: unknown) => {
+    const r = await apiClient.put<unknown>('/api/admin/config', payload)
+    return r.data
+  },
+}

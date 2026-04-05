@@ -1,338 +1,141 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
-import { useNavigate, useSearchParams } from 'react-router-dom';
-import { useIsMobile } from '@/shared/hooks/useIsMobile';
+import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
+import { Search, ChevronRight, BookOpen, Code2, MessageSquare } from 'lucide-react'
+import { interviewPrepApi, type InterviewPrepTask } from '@/features/InterviewPrep/api/interviewPrepApi'
+import { Badge } from '@/shared/ui/Badge'
+import { Card } from '@/shared/ui/Card'
+import { Button } from '@/shared/ui/Button'
 
-import { interviewPrepApi, InterviewPrepTask } from '@/features/InterviewPrep/api/interviewPrepApi';
-import {
-  InterviewPrepFilters,
-  InterviewPrepHero,
-  InterviewPrepTaskGroups,
-} from './components/InterviewPrepSections';
-import {
-  CATEGORY_LABELS,
-  CATEGORY_ORDER,
-  TaskCategory,
-  TaskModeFilter,
-  categoryForTask,
-  pickRandomValue,
-  shuffledValues,
-} from './lib/interviewPrepPageHelpers';
+const PREP_TYPE_ICONS: Record<string, React.ReactNode> = {
+  coding: <Code2 className="w-4 h-4 text-[#6366f1]" />,
+  system_design: <BookOpen className="w-4 h-4 text-[#FF8400]" />,
+  behavioral: <MessageSquare className="w-4 h-4 text-[#22c55e]" />,
+}
+
+const PREP_TYPE_LABELS: Record<string, string> = {
+  coding: 'Coding', system_design: 'System Design', behavioral: 'Behavioral',
+}
 
 export function InterviewPrepPage() {
-  const isMobile = useIsMobile();
-  const navigate = useNavigate();
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [tasks, setTasks] = useState<InterviewPrepTask[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [startingTaskId, setStartingTaskId] = useState<string | null>(null);
-  const [startingCheckpointTaskId, setStartingCheckpointTaskId] = useState<string | null>(null);
-  const [startingMock, setStartingMock] = useState(false);
-  const [search, setSearch] = useState(searchParams.get('q') ?? '');
-  const [modeFilter, setModeFilter] = useState<TaskModeFilter>((searchParams.get('mode') as TaskModeFilter) || 'all');
-  const [category, setCategory] = useState<TaskCategory>((searchParams.get('category') as TaskCategory) || 'all');
-  const [company, setCompany] = useState(searchParams.get('company') ?? 'all');
-  const [visibleCounts, setVisibleCounts] = useState<Record<TaskCategory, number>>({
-    coding: 2,
-    sql: 2,
-    system_design: 2,
-    all: 2,
-  });
-  const randomLaunchTriggered = useRef(false);
+  const navigate = useNavigate()
+  const [tasks, setTasks] = useState<InterviewPrepTask[]>([])
+  const [loading, setLoading] = useState(true)
+  const [search, setSearch] = useState('')
+  const [category, setCategory] = useState('')
 
   useEffect(() => {
     interviewPrepApi.listTasks()
-      .then(setTasks)
-      .catch((e) => {
-        console.error('Failed to load interview prep tasks:', e);
-        setError(e.response?.data?.error || 'Не удалось загрузить задачи');
-      })
-      .finally(() => setLoading(false));
-  }, []);
+      .then(ts => setTasks(ts))
+      .catch(() => {})
+      .finally(() => setLoading(false))
+  }, [])
 
-  useEffect(() => {
-    const next = new URLSearchParams();
-    category === 'all' ? next.delete('category') : next.set('category', category);
-    company === 'all' ? next.delete('company') : next.set('company', company);
-    modeFilter === 'all' ? next.delete('mode') : next.set('mode', modeFilter);
-    search.trim() ? next.set('q', search.trim()) : next.delete('q');
-    if (searchParams.get('pick') === 'random') {
-      next.set('pick', 'random');
-    }
-    setSearchParams(next, { replace: true });
-  }, [category, company, modeFilter, search, searchParams, setSearchParams]);
+  const filtered = tasks.filter(t => {
+    if (category && t.prepType !== category) return false
+    if (search && !t.title.toLowerCase().includes(search.toLowerCase())) return false
+    return true
+  })
 
-  useEffect(() => {
-    if (category === 'system_design' && modeFilter === 'executable') {
-      setModeFilter('all');
-    }
-  }, [category, modeFilter]);
-
-  const summary = useMemo(() => {
-    return {
-      total: tasks.length,
-      executable: tasks.filter((task) => task.isExecutable).length,
-      guidedCount: tasks.filter((task) => !task.isExecutable).length,
-    };
-  }, [tasks]);
-
-  const tasksForCategoryStats = useMemo(() => {
-    return tasks.filter((task) => {
-      if (company !== 'all' && task.companyTag !== company) {
-        return false;
-      }
-      if (modeFilter === 'executable' && !task.isExecutable) {
-        return false;
-      }
-      if (modeFilter === 'guided' && task.isExecutable) {
-        return false;
-      }
-      if (!search.trim()) {
-        return true;
-      }
-      const haystack = `${task.title} ${task.statement} ${task.language} ${task.prepType} ${task.companyTag}`.toLowerCase();
-      return haystack.includes(search.trim().toLowerCase());
-    });
-  }, [tasks, company, modeFilter, search]);
-
-  const categoryStats = useMemo(() => {
-    return CATEGORY_ORDER.map((item) => ({
-      key: item,
-      label: CATEGORY_LABELS[item],
-      count: tasksForCategoryStats.filter((task) => categoryForTask(task) === item).length,
-    }));
-  }, [tasksForCategoryStats]);
-
-  const companyOptions = useMemo(() => {
-    const tags = Array.from(new Set(
-      tasks
-        .map((task) => task.companyTag?.trim())
-        .filter((companyTag): companyTag is string => Boolean(companyTag)),
-    )).sort();
-    return ['all', ...tags];
-  }, [tasks]);
-
-  const availableMockCompanies = useMemo(() => {
-    return Array.from(new Set(
-      tasks
-        .map((task) => task.companyTag?.trim())
-        .filter((companyTag): companyTag is string => Boolean(companyTag)),
-    )).sort();
-  }, [tasks]);
-
-  const filteredTasks = useMemo(() => {
-    return tasks.filter((task) => {
-      const taskCategory = categoryForTask(task);
-      if (category !== 'all' && taskCategory !== category) {
-        return false;
-      }
-      if (company !== 'all' && task.companyTag !== company) {
-        return false;
-      }
-      if (modeFilter === 'executable' && !task.isExecutable) {
-        return false;
-      }
-      if (modeFilter === 'guided' && task.isExecutable) {
-        return false;
-      }
-      if (!search.trim()) {
-        return true;
-      }
-      const haystack = `${task.title} ${task.statement} ${task.language} ${task.prepType} ${task.companyTag}`.toLowerCase();
-      return haystack.includes(search.trim().toLowerCase());
-    });
-  }, [tasks, category, company, modeFilter, search]);
-
-  const groupedTasks = useMemo(() => {
-    const groups = new Map<TaskCategory, InterviewPrepTask[]>();
-    for (const task of filteredTasks) {
-      const taskCategory = categoryForTask(task);
-      const existing = groups.get(taskCategory) ?? [];
-      existing.push(task);
-      groups.set(taskCategory, existing);
-    }
-    return CATEGORY_ORDER
-      .map((key) => ({ key, label: CATEGORY_LABELS[key], tasks: groups.get(key) ?? [] }))
-      .filter((group) => group.tasks.length > 0);
-  }, [filteredTasks]);
-
-  useEffect(() => {
-    setVisibleCounts({
-      coding: 2,
-      sql: 2,
-      system_design: 2,
-      all: 2,
-    });
-  }, [category, company, modeFilter, search]);
-
-  const startTask = async (taskId: string) => {
-    setError(null);
-    setStartingTaskId(taskId);
-    try {
-      const session = await interviewPrepApi.startSession(taskId);
-      navigate(`/growth/interview-prep/${session.id}`);
-    } catch (e: any) {
-      console.error('Failed to start interview prep session:', e);
-      setError(e.response?.data?.error || 'Не удалось начать сессию');
-    } finally {
-      setStartingTaskId(null);
-    }
-  };
-
-  const startCheckpoint = async (taskId: string) => {
-    setError(null);
-    setStartingCheckpointTaskId(taskId);
-    try {
-      const result = await interviewPrepApi.startCheckpoint(taskId);
-      navigate(`/growth/interview-prep/${result.session.id}`);
-    } catch (e: any) {
-      console.error('Failed to start checkpoint session:', e);
-      setError(e.response?.data?.error || 'Не удалось начать checkpoint');
-    } finally {
-      setStartingCheckpointTaskId(null);
-    }
-  };
-
-  const startMockInterview = async () => {
-    setError(null);
-    setStartingMock(true);
-    try {
-      const effectiveCompany = company === 'all' ? pickRandomValue(availableMockCompanies) : company;
-      if (!effectiveCompany) {
-        setError('Пока нет доступных компаний для mock interview.');
-        return;
-      }
-      const candidateCompanies = company === 'all'
-        ? shuffledValues(availableMockCompanies)
-        : [effectiveCompany];
-      for (const companyTag of candidateCompanies) {
-        try {
-          const session = await interviewPrepApi.startMockSession(companyTag);
-          navigate(`/growth/interview-prep/mock/${session.id}`);
-          return;
-        } catch (e: any) {
-          const apiError = e.response?.data?.error || '';
-          if (!apiError.includes('mock interview task pool is incomplete')) {
-            throw e;
-          }
-        }
-      }
-      setError(
-        company === 'all'
-          ? 'Не удалось собрать случайный сценарий. Попробуй выбрать компанию вручную в фильтрах ниже.'
-          : 'Для выбранной компании сценарий ещё не полностью собран. Выбери другую компанию или запусти случайную.'
-      );
-    } catch (e: any) {
-      console.error('Failed to start mock interview:', e);
-      const apiError = e.response?.data?.error || '';
-      if (apiError.includes('mock interview task pool is incomplete')) {
-        setError(
-          company === 'all'
-            ? 'Не удалось собрать случайный сценарий. Попробуй выбрать компанию вручную в фильтрах ниже.'
-            : 'Для выбранной компании сценарий ещё не полностью собран. Выбери другую компанию или запусти случайную.'
-        );
-      } else {
-        setError(apiError || 'Не удалось начать mock interview');
-      }
-    } finally {
-      setStartingMock(false);
-    }
-  };
-
-  const handleRandomStart = async (pool: InterviewPrepTask[]) => {
-    const activeTasks = pool.filter((task) => task.isActive);
-    if (activeTasks.length === 0) {
-      setError('Для выбранного фильтра пока нет активных задач.');
-      return;
-    }
-    const picked = activeTasks[Math.floor(Math.random() * activeTasks.length)];
-    await startTask(picked.id);
-  };
-
-  const handleRandomCheckpoint = async (pool: InterviewPrepTask[]) => {
-    const eligibleTasks = pool.filter((task) => task.isActive && task.isExecutable && task.prepType !== 'system_design' && task.prepType !== 'code_review');
-    if (eligibleTasks.length === 0) {
-      setError('Для текущего фильтра пока нет задач, подходящих для checkpoint.');
-      return;
-    }
-    const picked = eligibleTasks[Math.floor(Math.random() * eligibleTasks.length)];
-    await startCheckpoint(picked.id);
-  };
-
-  useEffect(() => {
-    if (loading || randomLaunchTriggered.current || searchParams.get('pick') !== 'random') {
-      return;
-    }
-    randomLaunchTriggered.current = true;
-    void handleRandomStart(filteredTasks);
-  }, [filteredTasks, loading, searchParams]);
-
-  if (loading) {
-    return <div className="empty-state compact">Загружаем задачи...</div>;
-  }
+  const stats = [
+    { label: 'Задач', value: tasks.length, icon: <BookOpen className="w-4 h-4 text-[#6366f1]" /> },
+    { label: 'Coding', value: tasks.filter(t => t.prepType === 'coding').length, icon: <Code2 className="w-4 h-4 text-[#FF8400]" /> },
+    { label: 'System Design', value: tasks.filter(t => t.prepType === 'system_design').length, icon: <BookOpen className="w-4 h-4 text-[#22c55e]" /> },
+    { label: 'Behavioral', value: tasks.filter(t => t.prepType === 'behavioral').length, icon: <MessageSquare className="w-4 h-4 text-[#f59e0b]" /> },
+  ]
 
   return (
-    <div className="code-rooms-page interview-prep-page">
-      <InterviewPrepHero
-        isMobile={isMobile}
-        startingMock={startingMock}
-        summary={summary}
-        onStartMockInterview={() => void startMockInterview()}
-        onStartRandomTask={() => void handleRandomStart(filteredTasks)}
-        onStartRandomCheckpoint={() => void handleRandomCheckpoint(filteredTasks)}
-        onResetFilters={() => {
-          setCategory('all');
-          setCompany('all');
-          setModeFilter('all');
-          setSearch('');
-        }}
-      />
+    <div className="px-6 pt-4 pb-6">
+      {/* Stats */}
+      <div className="grid grid-cols-4 gap-3 mb-4">
+        {stats.map(s => (
+          <Card key={s.label} padding="md" className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center">{s.icon}</div>
+            <div>
+              <p className="text-lg font-bold text-[#18181b] leading-none">{s.value}</p>
+              <p className="text-xs text-[#64748b] mt-0.5">{s.label}</p>
+            </div>
+          </Card>
+        ))}
+      </div>
 
-      <InterviewPrepFilters
-        isMobile={isMobile}
-        category={category}
-        modeFilter={modeFilter}
-        company={company}
-        companyOptions={companyOptions}
-        search={search}
-        categoryStats={categoryStats}
-        onCategoryChange={(item) => {
-          setCategory(item);
-          if (item === 'system_design' && modeFilter === 'executable') {
-            setModeFilter('all');
-          }
-        }}
-        onModeFilterChange={setModeFilter}
-        onCompanyChange={setCompany}
-        onSearchChange={setSearch}
-      />
+      {/* Filters */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex-1 relative">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
+          <input
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Поиск задач..."
+            className="w-full pl-9 pr-4 py-2 bg-white border border-[#CBCCC9] rounded-lg text-sm focus:outline-none"
+          />
+        </div>
+        <div className="flex items-center gap-2">
+          {['', 'coding', 'system_design', 'behavioral'].map(cat => (
+            <button
+              key={cat}
+              onClick={() => setCategory(cat)}
+              className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                category === cat ? 'bg-[#FF8400] text-[#0f172a]' : 'bg-white border border-[#CBCCC9] text-[#64748b] hover:border-[#94a3b8]'
+              }`}
+            >
+              {cat === '' ? 'Все' : PREP_TYPE_LABELS[cat] ?? cat}
+            </button>
+          ))}
+        </div>
+      </div>
 
-      {error && (
-        <section className="card dashboard-card">
-          <div className="error-text">{error}</div>
-        </section>
-      )}
+      <div className="flex gap-4">
+        {/* Task list */}
+        <div className="flex-1">
+          <div className="bg-white rounded-2xl border border-[#CBCCC9] overflow-hidden">
+            <div className="divide-y divide-[#F2F3F0]">
+              {loading ? Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="px-5 py-4 flex items-center gap-4 animate-pulse">
+                  <div className="w-8 h-8 rounded-lg bg-[#E7E8E5]" />
+                  <div className="flex-1 h-4 bg-[#E7E8E5] rounded" />
+                  <div className="w-20 h-4 bg-[#E7E8E5] rounded" />
+                </div>
+              )) : filtered.length === 0 ? (
+                <div className="px-5 py-12 text-center text-sm text-[#94a3b8]">Ничего не найдено</div>
+              ) : filtered.map((task) => (
+                <div
+                  key={task.id}
+                  onClick={async () => {
+                    try {
+                      const session = await interviewPrepApi.startSession(task.id) as any
+                      navigate(`/growth/interview-prep/${session?.id ?? task.id}`)
+                    } catch {}
+                  }}
+                  className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#F2F3F0] cursor-pointer transition-colors"
+                >
+                  <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center flex-shrink-0">
+                    {PREP_TYPE_ICONS[task.prepType] ?? <BookOpen className="w-4 h-4 text-[#94a3b8]" />}
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium text-[#18181b] truncate">{task.title}</p>
+                    <p className="text-xs text-[#64748b] mt-0.5">{task.companyTag || 'General'} · {Math.round(task.durationSeconds / 60)} мин</p>
+                  </div>
+                  <Badge variant={task.prepType === 'coding' ? 'indigo' : task.prepType === 'system_design' ? 'orange' : 'success'}>
+                    {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
+                  </Badge>
+                  <ChevronRight className="w-4 h-4 text-[#CBCCC9]" />
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
 
-      {filteredTasks.length === 0 && !error ? (
-        <section className="card dashboard-card">
-          <div className="empty-state compact">Под текущий фильтр задач пока нет.</div>
-        </section>
-      ) : (
-        <InterviewPrepTaskGroups
-          isMobile={isMobile}
-          groupedTasks={groupedTasks}
-          visibleCounts={visibleCounts}
-          startingTaskId={startingTaskId}
-          startingCheckpointTaskId={startingCheckpointTaskId}
-          onStartTask={(taskId) => void startTask(taskId)}
-          onStartCheckpoint={(taskId) => void startCheckpoint(taskId)}
-          onRandomStart={(tasks) => void handleRandomStart(tasks)}
-          onShowMore={(groupKey) => setVisibleCounts((current) => ({
-            ...current,
-            [groupKey]: (current[groupKey] ?? 2) + 2,
-          }))}
-        />
-      )}
+        {/* Right sidebar */}
+        <div className="w-[300px] flex-shrink-0 flex flex-col gap-3">
+          <Card padding="md" dark orangeBorder>
+            <h3 className="text-sm font-semibold text-[#e2e8f0] mb-2">Mock Interview</h3>
+            <p className="text-xs text-[#94a3b8] mb-3">Симулируй полное собеседование с AI</p>
+            <Button variant="orange" size="sm" className="w-full justify-center">
+              Начать Mock
+            </Button>
+          </Card>
+        </div>
+      </div>
     </div>
-  );
+  )
 }

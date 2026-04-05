@@ -1,537 +1,183 @@
-import React, { Suspense, lazy, useEffect, useMemo, useState } from 'react';
-import { Navigate } from 'react-router-dom';
+import { useEffect, useState } from 'react'
+import { Plus, Edit2, Trash2 } from 'lucide-react'
+import { adminApi } from '@/features/Admin/api/adminApi'
+import { Badge } from '@/shared/ui/Badge'
+import { Button } from '@/shared/ui/Button'
+import { Modal } from '@/shared/ui/Modal'
+import { Input } from '@/shared/ui/Input'
+import { Select } from '@/shared/ui/Select'
+import { Textarea } from '@/shared/ui/Textarea'
+import { Toggle } from '@/shared/ui/Toggle'
+import { ConfirmModal } from '@/shared/ui/ConfirmModal'
 
-import { useAuth } from '@/app/providers/AuthProvider';
-import {
-  interviewPrepApi,
-  InterviewPrepMockCompanyPreset,
-  InterviewPrepMockQuestionPoolItem,
-  InterviewPrepQuestion,
-  InterviewPrepTask,
-  InterviewPrepType,
-} from '@/features/InterviewPrep/api/interviewPrepApi';
-import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
-import { CodeTask } from '@/entities/CodeRoom/model/types';
-import {
-  InterviewPrepAdminHero,
-  InterviewPrepAdminTaskSection,
-  MockCompanyPresetsSection,
-  MockQuestionPoolsSection,
-} from './components/InterviewPrepAdminSections';
-import {
-  createEmptyCase,
-  createEmptyMockCompanyPresetForm,
-  createEmptyMockQuestionPoolForm,
-  createEmptyQuestionForm,
-  createEmptyTaskForm,
-  MockCompanyPresetFormState,
-  MockQuestionPoolFormState,
-  QuestionFormState,
-  TaskFormState,
-  taskToForm,
-  toSlug,
-} from './lib/interviewPrepAdminPageHelpers';
+const PREP_TYPE_LABELS: Record<string, string> = { coding: 'Coding', system_design: 'System Design', behavioral: 'Behavioral' }
 
-const InterviewPrepTaskModal = lazy(() => import('./components/InterviewPrepAdminModals').then((m) => ({ default: m.InterviewPrepTaskModal })));
-const InterviewPrepQuestionModal = lazy(() => import('./components/InterviewPrepAdminModals').then((m) => ({ default: m.InterviewPrepQuestionModal })));
+export function InterviewPrepAdminPage() {
+  const [tasks, setTasks] = useState<any[]>([])
+  const [loading, setLoading] = useState(true)
+  const [activeTab, setActiveTab] = useState<'tasks' | 'pools' | 'presets'>('tasks')
+  const [showEdit, setShowEdit] = useState(false)
+  const [editTask, setEditTask] = useState<any>(null)
+  const [saving, setSaving] = useState(false)
+  const [deleteId, setDeleteId] = useState<string | null>(null)
 
-const AdminModalFallback = () => (
-  <div className="modal-overlay">
-    <div className="modal interview-prep-modal admin-modal-shell">
-      <div className="empty-state compact">Загрузка модального окна...</div>
-    </div>
-  </div>
-);
-
-export const InterviewPrepAdminPage: React.FC = () => {
-  const { user } = useAuth();
-  const [tasks, setTasks] = useState<InterviewPrepTask[]>([]);
-  const [codeTasks, setCodeTasks] = useState<CodeTask[]>([]);
-  const [questions, setQuestions] = useState<InterviewPrepQuestion[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [saving, setSaving] = useState(false);
-  const [deletingId, setDeletingId] = useState<string | null>(null);
-  const [taskModalOpen, setTaskModalOpen] = useState(false);
-  const [questionModalOpen, setQuestionModalOpen] = useState(false);
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  const [mockQuestionPools, setMockQuestionPools] = useState<InterviewPrepMockQuestionPoolItem[]>([]);
-  const [mockCompanyPresets, setMockCompanyPresets] = useState<InterviewPrepMockCompanyPreset[]>([]);
-  const [search, setSearch] = useState('');
-  const [prepTypeFilter, setPrepTypeFilter] = useState<'all' | InterviewPrepType>('all');
-  const [companyFilter, setCompanyFilter] = useState('all');
-  const [error, setError] = useState('');
-  const [status, setStatus] = useState('');
-  const [taskForm, setTaskForm] = useState<TaskFormState>(createEmptyTaskForm());
-  const [questionForm, setQuestionForm] = useState<QuestionFormState>(createEmptyQuestionForm());
-  const [mockQuestionPoolForm, setMockQuestionPoolForm] = useState<MockQuestionPoolFormState>(createEmptyMockQuestionPoolForm());
-  const [mockCompanyPresetForm, setMockCompanyPresetForm] = useState<MockCompanyPresetFormState>(createEmptyMockCompanyPresetForm());
-
-  const isAdmin = Boolean(user?.isAdmin);
-  const selectedTask = useMemo(
-    () => tasks.find((task) => task.id === selectedTaskId) ?? null,
-    [selectedTaskId, tasks],
-  );
-
-  const filteredTasks = useMemo(() => {
-    const query = search.trim().toLowerCase();
-    return tasks.filter((task) => {
-      if (prepTypeFilter !== 'all' && task.prepType !== prepTypeFilter) {
-        return false;
-      }
-      if (companyFilter !== 'all' && (task.companyTag || 'general') !== companyFilter) {
-        return false;
-      }
-      if (!query) return true;
-      return [task.title, task.slug, task.statement, task.prepType, task.companyTag, ...(task.supportedLanguages || [])]
-        .join(' ')
-        .toLowerCase()
-        .includes(query);
-    });
-  }, [companyFilter, prepTypeFilter, search, tasks]);
-
-  const companyOptions = useMemo(() => ['all', ...Array.from(new Set(tasks.map((task) => task.companyTag || 'general'))).sort()], [tasks]);
-
-  const sortedQuestions = useMemo(
-    () => [...questions].sort((left, right) => left.position - right.position),
-    [questions],
-  );
-
-  const loadTasks = async () => {
-    setLoading(true);
-    setError('');
-    try {
-      const data = await interviewPrepApi.adminListTasks();
-      setTasks(data);
-      const availableCodeTasks = await codeRoomApi.listTasks({ includeInactive: true });
-      setCodeTasks(availableCodeTasks);
-      const [questionPoolsData, companyPresetsData] = await Promise.all([
-        interviewPrepApi.adminListMockQuestionPools(),
-        interviewPrepApi.adminListMockCompanyPresets(),
-      ]);
-      setMockQuestionPools(questionPoolsData);
-      setMockCompanyPresets(companyPresetsData);
-    } catch (e: any) {
-      console.error('Failed to load interview prep tasks:', e);
-      setError(e.response?.data?.error || 'Не удалось загрузить задачи');
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const loadQuestions = async (taskId: string) => {
-    try {
-      const data = await interviewPrepApi.adminListQuestions(taskId);
-      setQuestions(data);
-      return data;
-    } catch (e: any) {
-      console.error('Failed to load interview prep questions:', e);
-      setError(e.response?.data?.error || 'Не удалось загрузить вопросы');
-      return [];
-    }
-  };
-
-  useEffect(() => {
-    void loadTasks();
-  }, []);
-
-  if (!isAdmin) {
-    return <Navigate to="/home" replace />;
+  const loadTasks = () => {
+    adminApi.listInterviewPrepTasks()
+      .then((ts: any[]) => setTasks(ts))
+      .catch(() => {})
+      .finally(() => setLoading(false))
   }
 
-  const openCreateTaskModal = (task?: InterviewPrepTask) => {
-    setStatus('');
-    setError('');
-    const linkedCodeTask = task?.codeTaskId ? codeTasks.find((item) => item.id === task.codeTaskId) ?? null : null;
-    setTaskForm(task ? taskToForm(task, linkedCodeTask) : createEmptyTaskForm());
-    setTaskModalOpen(true);
-  };
+  useEffect(() => { loadTasks() }, [])
 
-  const closeTaskModal = () => {
-    setTaskModalOpen(false);
-    setTaskForm(createEmptyTaskForm());
-  };
-
-  const openQuestionModal = async (task: InterviewPrepTask) => {
-    setStatus('');
-    setError('');
-    setSelectedTaskId(task.id);
-    const items = await loadQuestions(task.id);
-    setQuestionForm(createEmptyQuestionForm(items.length + 1));
-    setQuestionModalOpen(true);
-  };
-
-  const closeQuestionModal = () => {
-    setQuestionModalOpen(false);
-    setSelectedTaskId(null);
-    setQuestions([]);
-    setQuestionForm(createEmptyQuestionForm());
-  };
-
-  const handleTaskTitleChange = (title: string) => {
-    setTaskForm((prev) => ({
-      ...prev,
-      title,
-      slug: prev.id || prev.slug ? prev.slug : toSlug(title),
-    }));
-  };
-
-  const handleSaveTask = async () => {
-    if (!taskForm.title.trim() || !taskForm.statement.trim()) {
-      setError('Заполни название и условие задачи.');
-      return;
-    }
-
-    if (taskForm.isExecutable) {
-      const hasAtLeastOneCase = [...taskForm.publicTestCases, ...taskForm.hiddenTestCases]
-        .some((item) => item.input.trim() || item.expectedOutput.trim());
-      if (!hasAtLeastOneCase) {
-        setError('Для executable-задачи нужен хотя бы один тест.');
-        return;
-      }
-    }
-
-    setSaving(true);
-    setError('');
-    setStatus('');
+  const handleSave = async () => {
+    if (!editTask) return
+    setSaving(true)
     try {
-      let linkedCodeTaskId = taskForm.codeTaskId || '';
-      if (taskForm.isExecutable) {
-        const codeTaskPayload = {
-          title: `[Interview Prep] ${taskForm.title.trim()}`,
-          slug: `interview-prep-${toSlug(taskForm.slug || taskForm.title)}`,
-          statement: taskForm.statement.trim(),
-          difficulty: 'medium',
-          topics: ['interview-prep'],
-          starterCode: taskForm.starterCode,
-          language: taskForm.language === 'sql' ? 'sql' : 'go',
-          taskType: 'algorithm_practice',
-          executionProfile: 'pure',
-          runnerMode: 'function_io',
-          durationSeconds: taskForm.durationSeconds || 1800,
-          fixtureFiles: [],
-          readablePaths: [],
-          writablePaths: [],
-          allowedHosts: [],
-          allowedPorts: [],
-          mockEndpoints: [],
-          writableTempDir: false,
-          isActive: false,
-          publicTestCases: taskForm.publicTestCases
-            .filter((item) => item.input.trim() || item.expectedOutput.trim())
-            .map((item, index) => ({ ...item, isPublic: true, order: index + 1 })),
-          hiddenTestCases: taskForm.hiddenTestCases
-            .filter((item) => item.input.trim() || item.expectedOutput.trim())
-            .map((item, index) => ({ ...item, isPublic: false, order: index + 1 })),
-        };
+      if (editTask.id) await adminApi.updateInterviewPrepTask(editTask.id, { task: editTask })
+      else await adminApi.createInterviewPrepTask({ task: editTask })
+      loadTasks()
+      setShowEdit(false)
+      setEditTask(null)
+    } catch {} finally { setSaving(false) }
+  }
 
-        if (linkedCodeTaskId) {
-          await codeRoomApi.adminUpdateTask(linkedCodeTaskId, codeTaskPayload);
-        } else {
-          const createdCodeTask = await codeRoomApi.adminCreateTask(codeTaskPayload);
-          linkedCodeTaskId = createdCodeTask.id;
-        }
-      } else {
-        linkedCodeTaskId = '';
-      }
-
-      const payload = {
-        ...taskForm,
-        slug: toSlug(taskForm.slug || taskForm.title),
-        companyTag: taskForm.companyTag || 'general',
-        supportedLanguages: taskForm.language === 'system_design'
-          ? []
-          : (taskForm.supportedLanguages.length ? taskForm.supportedLanguages : [taskForm.language]),
-        executionProfile: 'pure',
-        runnerMode: 'function_io',
-        codeTaskId: linkedCodeTaskId || undefined,
-      };
-      if (taskForm.id) {
-        await interviewPrepApi.adminUpdateTask(taskForm.id, payload);
-        setStatus('Задача обновлена.');
-      } else {
-        await interviewPrepApi.adminCreateTask(payload);
-        setStatus('Задача создана.');
-      }
-      closeTaskModal();
-      await loadTasks();
-    } catch (e: any) {
-      console.error('Failed to save interview prep task:', e);
-      setError(e.response?.data?.error || 'Не удалось сохранить задачу');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const updateTaskCase = (
-    key: 'publicTestCases' | 'hiddenTestCases',
-    index: number,
-    field: 'input' | 'expectedOutput',
-    value: string,
-  ) => {
-    setTaskForm((prev) => {
-      const nextCases = [...prev[key]];
-      nextCases[index] = { ...nextCases[index], [field]: value };
-      return { ...prev, [key]: nextCases };
-    });
-  };
-
-  const addTaskCase = (key: 'publicTestCases' | 'hiddenTestCases', isPublic: boolean) => {
-    setTaskForm((prev) => ({
-      ...prev,
-      [key]: [...prev[key], createEmptyCase(isPublic, prev[key].length + 1)],
-    }));
-  };
-
-  const removeTaskCase = (key: 'publicTestCases' | 'hiddenTestCases', index: number) => {
-    setTaskForm((prev) => {
-      const nextCases = prev[key].filter((_, currentIndex) => currentIndex !== index);
-      return {
-        ...prev,
-        [key]: nextCases.length > 0 ? nextCases : [createEmptyCase(key === 'publicTestCases', 1)],
-      };
-    });
-  };
-
-  const handleDeleteTask = async (taskId: string) => {
-    setDeletingId(taskId);
-    setError('');
-    setStatus('');
+  const handleDelete = async () => {
+    if (!deleteId) return
     try {
-      await interviewPrepApi.adminDeleteTask(taskId);
-      setStatus('Задача удалена.');
-      await loadTasks();
-    } catch (e: any) {
-      console.error('Failed to delete interview prep task:', e);
-      setError(e.response?.data?.error || 'Не удалось удалить задачу');
-    } finally {
-      setDeletingId(null);
-    }
-  };
+      await adminApi.deleteInterviewPrepTask(deleteId)
+      setTasks(prev => prev.filter(t => t.id !== deleteId))
+      setDeleteId(null)
+    } catch {}
+  }
 
-  const handleSaveQuestion = async () => {
-    if (!selectedTaskId) return;
-    if (!questionForm.prompt.trim() || !questionForm.answer.trim()) {
-      setError('Для вопроса нужны и prompt, и answer.');
-      return;
-    }
-    if (questionForm.position < 1) {
-      setError('Позиция вопроса должна быть больше нуля.');
-      return;
-    }
-
-    setSaving(true);
-    setError('');
-    setStatus('');
-    try {
-      if (questionForm.id) {
-        await interviewPrepApi.adminUpdateQuestion(selectedTaskId, questionForm.id, questionForm);
-        setStatus('Вопрос обновлен.');
-      } else {
-        await interviewPrepApi.adminCreateQuestion(selectedTaskId, questionForm);
-        setStatus('Вопрос добавлен.');
-      }
-      const data = await loadQuestions(selectedTaskId);
-      setQuestionForm(createEmptyQuestionForm(data.length + 1));
-    } catch (e: any) {
-      console.error('Failed to save interview prep question:', e);
-      setError(e.response?.data?.error || 'Не удалось сохранить вопрос');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDeleteQuestion = async (questionId: string) => {
-    if (!selectedTaskId) return;
-    setDeletingId(questionId);
-    setError('');
-    setStatus('');
-    try {
-      await interviewPrepApi.adminDeleteQuestion(selectedTaskId, questionId);
-      setStatus('Вопрос удален.');
-      const data = await loadQuestions(selectedTaskId);
-      setQuestionForm(createEmptyQuestionForm(data.length + 1));
-    } catch (e: any) {
-      console.error('Failed to delete interview prep question:', e);
-      setError(e.response?.data?.error || 'Не удалось удалить вопрос');
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
-  const handleSaveMockQuestionPool = async () => {
-    setSaving(true);
-    setError('');
-    setStatus('');
-    try {
-      const payload = {
-        topic: mockQuestionPoolForm.topic.trim(),
-        companyTag: mockQuestionPoolForm.companyTag.trim().toLowerCase(),
-        questionKey: mockQuestionPoolForm.questionKey.trim(),
-        prompt: mockQuestionPoolForm.prompt.trim(),
-        referenceAnswer: mockQuestionPoolForm.referenceAnswer.trim(),
-        position: mockQuestionPoolForm.position,
-        alwaysAsk: mockQuestionPoolForm.alwaysAsk,
-        isActive: mockQuestionPoolForm.isActive,
-      };
-      if (mockQuestionPoolForm.id) {
-        await interviewPrepApi.adminUpdateMockQuestionPool(mockQuestionPoolForm.id, payload);
-        setStatus('Question pool обновлён.');
-      } else {
-        await interviewPrepApi.adminCreateMockQuestionPool(payload);
-        setStatus('Question pool создан.');
-      }
-      setMockQuestionPoolForm(createEmptyMockQuestionPoolForm());
-      await loadTasks();
-    } catch (e: any) {
-      console.error('Failed to save mock question pool:', e);
-      setError(e.response?.data?.error || 'Не удалось сохранить question pool');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDeleteMockQuestionPool = async (id: string) => {
-    setDeletingId(id);
-    setError('');
-    setStatus('');
-    try {
-      await interviewPrepApi.adminDeleteMockQuestionPool(id);
-      setStatus('Question pool удалён.');
-      await loadTasks();
-    } catch (e: any) {
-      console.error('Failed to delete mock question pool:', e);
-      setError(e.response?.data?.error || 'Не удалось удалить question pool');
-    } finally {
-      setDeletingId(null);
-    }
-  };
-
-  const handleSaveMockCompanyPreset = async () => {
-    setSaving(true);
-    setError('');
-    setStatus('');
-    try {
-      const payload = {
-        companyTag: mockCompanyPresetForm.companyTag.trim().toLowerCase(),
-        stageKind: mockCompanyPresetForm.stageKind,
-        position: mockCompanyPresetForm.position,
-        taskSlugPattern: mockCompanyPresetForm.taskSlugPattern.trim(),
-        aiModelOverride: mockCompanyPresetForm.aiModelOverride.trim(),
-        isActive: mockCompanyPresetForm.isActive,
-      };
-      if (mockCompanyPresetForm.id) {
-        await interviewPrepApi.adminUpdateMockCompanyPreset(mockCompanyPresetForm.id, payload);
-        setStatus('Company preset обновлён.');
-      } else {
-        await interviewPrepApi.adminCreateMockCompanyPreset(payload);
-        setStatus('Company preset создан.');
-      }
-      setMockCompanyPresetForm(createEmptyMockCompanyPresetForm());
-      await loadTasks();
-    } catch (e: any) {
-      console.error('Failed to save mock company preset:', e);
-      setError(e.response?.data?.error || 'Не удалось сохранить company preset');
-    } finally {
-      setSaving(false);
-    }
-  };
-
-  const handleDeleteMockCompanyPreset = async (id: string) => {
-    setDeletingId(id);
-    setError('');
-    setStatus('');
-    try {
-      await interviewPrepApi.adminDeleteMockCompanyPreset(id);
-      setStatus('Company preset удалён.');
-      await loadTasks();
-    } catch (e: any) {
-      console.error('Failed to delete mock company preset:', e);
-      setError(e.response?.data?.error || 'Не удалось удалить company preset');
-    } finally {
-      setDeletingId(null);
-    }
-  };
+  const tabs = [
+    { id: 'tasks', label: 'Tasks', count: tasks.length },
+    { id: 'pools', label: 'Question Pools' },
+    { id: 'presets', label: 'Company Presets' },
+  ]
 
   return (
-    <>
-      <div className="code-rooms-page code-admin-page">
-        <InterviewPrepAdminHero onCreateTask={() => openCreateTaskModal()} />
-
-        {(error || status) && (
-          <section className="card dashboard-card">
-            {error && <div className="error-text">{error}</div>}
-            {!error && status && <div className="success-text">{status}</div>}
-          </section>
-        )}
-
-        <InterviewPrepAdminTaskSection
-          loading={loading}
-          filteredTasks={filteredTasks}
-          search={search}
-          prepTypeFilter={prepTypeFilter}
-          companyFilter={companyFilter}
-          companyOptions={companyOptions}
-          deletingId={deletingId}
-          onSearchChange={setSearch}
-          onPrepTypeFilterChange={setPrepTypeFilter}
-          onCompanyFilterChange={setCompanyFilter}
-          onOpenQuestions={(task) => void openQuestionModal(task)}
-          onEditTask={openCreateTaskModal}
-          onDeleteTask={(taskId) => void handleDeleteTask(taskId)}
-        />
-
-        <MockQuestionPoolsSection
-          form={mockQuestionPoolForm}
-          items={mockQuestionPools}
-          saving={saving}
-          deletingId={deletingId}
-          onFormChange={setMockQuestionPoolForm}
-          onSave={() => void handleSaveMockQuestionPool()}
-          onReset={() => setMockQuestionPoolForm(createEmptyMockQuestionPoolForm())}
-          onDelete={(id) => void handleDeleteMockQuestionPool(id)}
-        />
-
-        <MockCompanyPresetsSection
-          form={mockCompanyPresetForm}
-          items={mockCompanyPresets}
-          saving={saving}
-          deletingId={deletingId}
-          onFormChange={setMockCompanyPresetForm}
-          onSave={() => void handleSaveMockCompanyPreset()}
-          onReset={() => setMockCompanyPresetForm(createEmptyMockCompanyPresetForm())}
-          onDelete={(id) => void handleDeleteMockCompanyPreset(id)}
-        />
+    <div className="p-6">
+      <div className="flex items-center justify-between mb-5">
+        <div>
+          <h1 className="text-xl font-bold text-[#0f172a]">Interview Prep</h1>
+          <p className="text-sm text-[#64748b] mt-0.5">Управление задачами и шаблонами</p>
+        </div>
+        <Button variant="orange" onClick={() => { setEditTask({}); setShowEdit(true) }}>
+          <Plus className="w-4 h-4" /> Добавить задачу
+        </Button>
       </div>
 
-      <Suspense fallback={<AdminModalFallback />}>
-        <InterviewPrepTaskModal
-          open={taskModalOpen}
-          saving={saving}
-          form={taskForm}
-          onClose={closeTaskModal}
-          onSave={() => void handleSaveTask()}
-          onTitleChange={handleTaskTitleChange}
-          onFormChange={setTaskForm}
-          updateTaskCase={updateTaskCase}
-          addTaskCase={addTaskCase}
-          removeTaskCase={removeTaskCase}
-        />
-      </Suspense>
+      {/* Tabs */}
+      <div className="flex border-b border-[#e2e8f0] mb-4">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id as any)}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === tab.id ? 'border-[#FF8400] text-[#0f172a]' : 'border-transparent text-[#64748b] hover:text-[#0f172a]'}`}
+          >
+            {tab.label}
+            {tab.count !== undefined && <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-[#f1f5f9] text-[#64748b] rounded-full">{tab.count}</span>}
+          </button>
+        ))}
+      </div>
 
-      <Suspense fallback={<AdminModalFallback />}>
-        <InterviewPrepQuestionModal
-          open={questionModalOpen}
-          saving={saving}
-          deletingId={deletingId}
-          selectedTask={selectedTask}
-          sortedQuestions={sortedQuestions}
-          form={questionForm}
-          onClose={closeQuestionModal}
-          onSave={() => void handleSaveQuestion()}
-          onDelete={(questionId) => void handleDeleteQuestion(questionId)}
-          onFormChange={setQuestionForm}
-        />
-      </Suspense>
-    </>
-  );
-};
+      {activeTab === 'tasks' && (
+        <div className="bg-white rounded-xl border border-[#e2e8f0] overflow-hidden">
+          <div className="divide-y divide-[#f8fafc]">
+            {loading ? Array.from({ length: 5 }).map((_, i) => (
+              <div key={i} className="px-5 py-4 flex items-center gap-4 animate-pulse">
+                <div className="w-8 h-8 rounded-lg bg-[#f1f5f9]" />
+                <div className="flex-1 h-4 bg-[#f1f5f9] rounded" />
+                <div className="w-20 h-4 bg-[#f1f5f9] rounded" />
+              </div>
+            )) : tasks.length === 0 ? (
+              <div className="px-5 py-12 text-center text-sm text-[#94a3b8]">Задач не найдено</div>
+            ) : tasks.map((task, i) => (
+              <div key={task.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#fafafa]">
+                <div className="w-8 h-8 rounded-lg bg-[#f1f5f9] flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-mono text-[#64748b]">{i + 1}</span>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-medium text-[#0f172a] truncate">{task.title}</p>
+                  <p className="text-xs text-[#64748b]">{task.company_tag ?? 'General'} · {Math.round((task.duration_seconds ?? 0) / 60)} мин</p>
+                </div>
+                <Badge variant={task.prep_type === 'coding' ? 'indigo' : task.prep_type === 'system_design' ? 'orange' : 'success'}>
+                  {PREP_TYPE_LABELS[task.prep_type] ?? task.prep_type}
+                </Badge>
+                <Badge variant={task.is_active !== false ? 'success' : 'default'}>
+                  {task.is_active !== false ? 'Active' : 'Inactive'}
+                </Badge>
+                <div className="flex gap-1">
+                  <button onClick={() => { setEditTask(task); setShowEdit(true) }} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f1f5f9] text-[#64748b]">
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button onClick={() => setDeleteId(task.id)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#fef2f2] text-[#94a3b8] hover:text-[#ef4444]">
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {activeTab === 'pools' && (
+        <div className="bg-white rounded-xl border border-[#e2e8f0] p-8 text-center text-[#94a3b8] text-sm">
+          Управление пулами вопросов — скоро
+        </div>
+      )}
+
+      {activeTab === 'presets' && (
+        <div className="bg-white rounded-xl border border-[#e2e8f0] p-8 text-center text-[#94a3b8] text-sm">
+          Управление пресетами компаний — скоро
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      <Modal
+        open={showEdit}
+        onClose={() => { setShowEdit(false); setEditTask(null) }}
+        title={editTask?.id ? 'Редактировать задачу' : 'Новая задача'}
+        size="lg"
+        footer={
+          <>
+            <Button variant="secondary" size="sm" onClick={() => { setShowEdit(false); setEditTask(null) }}>Отмена</Button>
+            <Button variant="orange" size="sm" onClick={handleSave} loading={saving}>Сохранить</Button>
+          </>
+        }
+      >
+        {editTask && (
+          <div className="grid grid-cols-2 gap-4">
+            <Input label="Название" value={editTask.title ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, title: e.target.value }))} />
+            <Input label="Slug" value={editTask.slug ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, slug: e.target.value }))} />
+            <Select label="Тип" options={[{ value: 'coding', label: 'Coding' }, { value: 'system_design', label: 'System Design' }, { value: 'behavioral', label: 'Behavioral' }]} value={editTask.prep_type ?? 'coding'} onChange={v => setEditTask((t: any) => ({ ...t, prep_type: v }))} />
+            <Select label="Язык" options={[{ value: 'python3', label: 'Python 3' }, { value: 'go', label: 'Go' }, { value: 'javascript', label: 'JavaScript' }]} value={editTask.language ?? 'python3'} onChange={v => setEditTask((t: any) => ({ ...t, language: v }))} />
+            <Input label="Компания" value={editTask.company_tag ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, company_tag: e.target.value }))} placeholder="google, yandex, ..." />
+            <Input label="Длительность (сек)" type="number" value={editTask.duration_seconds ?? 2700} onChange={e => setEditTask((t: any) => ({ ...t, duration_seconds: parseInt(e.target.value) }))} />
+            <div className="col-span-2">
+              <Textarea label="Описание задачи" value={editTask.statement ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, statement: e.target.value }))} rows={5} />
+            </div>
+            <div className="flex items-center gap-2">
+              <Toggle checked={editTask.is_active ?? true} onChange={v => setEditTask((t: any) => ({ ...t, is_active: v }))} label="Активна" />
+            </div>
+            <div className="flex items-center gap-2">
+              <Toggle checked={editTask.is_executable ?? false} onChange={v => setEditTask((t: any) => ({ ...t, is_executable: v }))} label="Исполняемая" />
+            </div>
+          </div>
+        )}
+      </Modal>
+
+      <ConfirmModal
+        open={!!deleteId}
+        onClose={() => setDeleteId(null)}
+        onConfirm={handleDelete}
+        title="Удалить задачу"
+        message="Это действие нельзя отменить."
+        confirmLabel="Удалить"
+        danger
+      />
+    </div>
+  )
+}

@@ -1,142 +1,74 @@
-import React, { useEffect, useMemo, useRef, useState } from 'react';
-import { ChevronRight, Search, X } from 'lucide-react';
-import { Link, NavLink } from 'react-router-dom';
-import { geoApi } from '@/features/Geo/api/geoApi';
-import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
-import { matchCommunityUser, useCommunityFilters } from '@/features/Community/model/useCommunityFilters';
-import { CommunityMapPoint } from '@/entities/User/model/types';
-import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
+import { useState } from 'react'
+import { useOutletContext } from 'react-router-dom'
+import { ChevronRight, MapPin, Briefcase } from 'lucide-react'
+import { Avatar } from '@/shared/ui/Avatar'
+import type { User } from '@/entities/User/model/types'
 
-export const UsersPage: React.FC = () => {
-  const [users, setUsers] = useState<CommunityMapPoint[]>([]);
-  const [arenaStatsByUserId, setArenaStatsByUserId] = useState<Record<string, ArenaPlayerStats>>({});
-  const [isLoading, setIsLoading] = useState(true);
-  const { q, region, presence, setQ } = useCommunityFilters();
-  const loadUsersRef = useRef<{ (initial?: boolean): Promise<void> } | null>(null);
+const STATUS_COLORS: Record<string, string> = {
+  online: 'bg-[#22c55e]',
+  recently_active: 'bg-[#f59e0b]',
+  offline: 'bg-[#94a3b8]',
+}
 
-  const loadUsers = async (initial = false) => {
-    try {
-      if (initial) setIsLoading(true);
-      const data = await geoApi.communityMap(initial);
-      setUsers(data);
-    } catch (err) {
-      console.error('Failed to load users', err);
-    } finally {
-      if (initial) setIsLoading(false);
-    }
-  };
+export function UsersPage() {
+  const { search = '' } = useOutletContext<{ search: string }>()
+  const [users] = useState<User[]>([])
 
-  loadUsersRef.current = loadUsers;
+  // Placeholder users for design matching
+  const displayUsers: Partial<User>[] = users.length > 0 ? users : [
+    { id: '1', firstName: 'Алексей', lastName: 'Иванов', username: 'alexei_ivan', region: 'Москва', currentWorkplace: 'Яндекс', activityStatus: 'online' },
+    { id: '2', firstName: 'Мария', lastName: 'Петрова', username: 'maria_p', region: 'Санкт-Петербург', currentWorkplace: 'Сбер', activityStatus: 'recently_active' },
+    { id: '3', firstName: 'Дмитрий', lastName: 'Смирнов', username: 'dsmirn', region: 'Казань', currentWorkplace: 'VK', activityStatus: 'offline' },
+    { id: '4', firstName: 'Анна', lastName: 'Козлова', username: 'ann_k', region: 'Новосибирск', currentWorkplace: 'Ozon', activityStatus: 'online' },
+    { id: '5', firstName: 'Игорь', lastName: 'Фёдоров', username: 'ifed', region: 'Москва', currentWorkplace: 'Тинькофф', activityStatus: 'recently_active' },
+  ]
 
-  useEffect(() => {
-    void loadUsers(true);
-    const interval = setInterval(() => loadUsersRef.current?.(false), 30000);
-    return () => clearInterval(interval);
-  }, []);
-
-  useEffect(() => {
-    if (users.length === 0) {
-      setArenaStatsByUserId({});
-      return;
-    }
-
-    let cancelled = false;
-
-    const loadArenaStats = async () => {
-      // Use batch endpoint to fetch all stats in a single request (O(1) instead of O(n))
-      const userIds = users.map(u => u.userId);
-      const statsMap = await codeRoomApi.getArenaStatsBatch(userIds);
-
-      if (!cancelled) {
-        setArenaStatsByUserId(statsMap);
-      }
-    };
-
-    void loadArenaStats();
-
-    return () => {
-      cancelled = true;
-    };
-  }, [users]);
-
-  const regionOptions = useMemo(
-    () => Array.from(new Set(users.map((user) => user.region).filter(Boolean))).sort((left, right) => left.localeCompare(right, 'ru')),
-    [users],
-  );
-
-  const filteredUsers = users.filter((user) => matchCommunityUser(user, { q, region, presence }));
-  const onlineCount = users.filter((item) => item.activityStatus === 'online').length;
-
-  const summaryText = useMemo(() => {
-    const regionCount = regionOptions.length;
-    return `${users.length} участников · ${onlineCount} онлайн · ${regionCount} ${regionCount === 1 ? 'регион' : regionCount >= 2 && regionCount <= 4 ? 'региона' : 'регионов'}`;
-  }, [onlineCount, regionOptions.length, users.length]);
-
-  const rows = filteredUsers.slice(0, 5);
+  const filtered = displayUsers.filter(u => {
+    if (!search) return true
+    const name = `${u.firstName} ${u.lastName} ${u.username}`.toLowerCase()
+    return name.includes(search.toLowerCase())
+  })
 
   return (
-    <div className="community-people fade-in">
-      <section className="community-people__header">
-        <div className="community-people__top-row">
-          <div className="community-people__title-block">
-            <h1>Community</h1>
-            <p>{isLoading ? 'Загружаем сообщество...' : summaryText}</p>
+    <div className="px-6 pt-4 pb-6 flex flex-col gap-2">
+      {filtered.map((user) => {
+        const name = `${user.firstName} ${user.lastName}`.trim()
+        return (
+          <div
+            key={user.id}
+            className="flex items-center gap-3.5 px-4 py-3 bg-white rounded-xl border border-[#CBCCC9] hover:border-[#94a3b8] cursor-pointer transition-colors"
+          >
+            <div className="relative">
+              <Avatar name={name} size="md" />
+              <span
+                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${STATUS_COLORS[user.activityStatus ?? 'offline']}`}
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <p className="text-sm font-semibold text-[#18181b]">{name}</p>
+                <span className="text-xs text-[#94a3b8]">@{user.username}</span>
+              </div>
+              <div className="flex items-center gap-3 mt-0.5">
+                {user.region && (
+                  <span className="flex items-center gap-1 text-xs text-[#64748b]">
+                    <MapPin className="w-3 h-3" /> {user.region}
+                  </span>
+                )}
+                {user.currentWorkplace && (
+                  <span className="flex items-center gap-1 text-xs text-[#64748b]">
+                    <Briefcase className="w-3 h-3" /> {user.currentWorkplace}
+                  </span>
+                )}
+              </div>
+            </div>
+            <ChevronRight className="w-4 h-4 text-[#CBCCC9] flex-shrink-0" />
           </div>
-
-          <label className="community-people__search">
-            <Search size={16} />
-            <input
-              value={q}
-              onChange={(event) => setQ(event.target.value)}
-              placeholder="Search..."
-              aria-label="Search people"
-            />
-            <span className="community-people__search-clear" aria-hidden="true">
-              {q ? <X size={16} /> : null}
-            </span>
-          </label>
-        </div>
-
-        <nav className="community-people__tabs" aria-label="Community sections">
-          <NavLink to="/community/people" end className={({ isActive }) => `community-people__tab${isActive ? ' is-active' : ''}`}>People</NavLink>
-          <NavLink to="/community/events" className={({ isActive }) => `community-people__tab${isActive ? ' is-active' : ''}`}>Events</NavLink>
-          <NavLink to="/community/map" className={({ isActive }) => `community-people__tab${isActive ? ' is-active' : ''}`}>Map</NavLink>
-          <NavLink to="/community/circles" className={({ isActive }) => `community-people__tab${isActive ? ' is-active' : ''}`}>Circles</NavLink>
-        </nav>
-      </section>
-
-      <section className="community-people__list">
-        {isLoading ? (
-          <div className="community-people__empty">Загрузка списка пользователей...</div>
-        ) : rows.length > 0 ? (
-          rows.map((user) => {
-            const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.username;
-            const initials = `${user.firstName?.charAt(0) ?? ''}${user.lastName?.charAt(0) ?? ''}`.trim().toUpperCase() || user.username.slice(0, 2).toUpperCase();
-            const handle = user.telegramUsername ? `@${user.telegramUsername}` : '@unknown';
-            const rating = arenaStatsByUserId[user.userId]?.rating ?? 1000;
-
-            return (
-              <Link key={user.userId} to={`/profile/${user.userId}`} className="community-people__row">
-                <div className="community-people__avatar" aria-hidden="true">{initials}</div>
-                <div className="community-people__info">
-                  <div className="community-people__name-row">
-                    <strong>{fullName}</strong>
-                    {user.activityStatus === 'online' && <span className="community-people__badge">online</span>}
-                  </div>
-                  <div className="community-people__meta-row">
-                    <span className="community-people__handle">{handle}</span>
-                    <span>{user.region || 'Online'}</span>
-                    <span>{rating} ELO</span>
-                  </div>
-                </div>
-                <ChevronRight size={16} className="community-people__chevron" />
-              </Link>
-            );
-          })
-        ) : (
-          <div className="community-people__empty">Никого не найдено</div>
-        )}
-      </section>
+        )
+      })}
+      {filtered.length === 0 && (
+        <div className="text-center py-16 text-[#94a3b8] text-sm">Ничего не найдено</div>
+      )}
     </div>
-  );
-};
+  )
+}

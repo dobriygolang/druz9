@@ -1,18 +1,16 @@
-import React from 'react';
-import { AuthProvider } from './providers/AuthProvider';
-import { PodcastProvider } from './providers/PodcastProvider';
-import { RouterProvider } from './providers/RouterProvider';
-import { RuntimeConfigProvider } from './providers/RuntimeConfigProvider';
-import '@/app/styles/index.css';
+import { BrowserRouter } from 'react-router-dom'
+import { AuthProvider } from './providers/AuthProvider'
+import { RuntimeConfigProvider } from './providers/RuntimeConfigProvider'
+import { RouterProvider } from './providers/RouterProvider'
 
-export const App: React.FC = () => {
+export function App() {
   return (
-    <RuntimeConfigProvider>
-      <AuthProvider>
-        <PodcastProvider>
+    <BrowserRouter>
+      <RuntimeConfigProvider>
+        <AuthProvider>
           <RouterProvider />
-        </PodcastProvider>
-      </AuthProvider>
-    </RuntimeConfigProvider>
-  );
-};
+        </AuthProvider>
+      </RuntimeConfigProvider>
+    </BrowserRouter>
+  )
+}

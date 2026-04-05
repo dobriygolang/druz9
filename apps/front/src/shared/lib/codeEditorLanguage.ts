@@ -1,44 +1,41 @@
-export type AppCodeLanguage = 'go' | 'python' | 'sql' | 'system_design';
-
-export function normalizeAppLanguage(value?: string | null): AppCodeLanguage {
-  switch ((value || '').trim().toLowerCase()) {
-    case 'python':
-      return 'python';
-    case 'sql':
-      return 'sql';
-    case 'system_design':
-      return 'system_design';
-    case 'go':
-    default:
-      return 'go';
+export function getMonacoLanguage(language: string): string {
+  const map: Record<string, string> = {
+    python: 'python',
+    python3: 'python',
+    javascript: 'javascript',
+    typescript: 'typescript',
+    go: 'go',
+    rust: 'rust',
+    cpp: 'cpp',
+    java: 'java',
+    PROGRAMMING_LANGUAGE_PYTHON: 'python',
+    PROGRAMMING_LANGUAGE_JAVASCRIPT: 'javascript',
+    PROGRAMMING_LANGUAGE_TYPESCRIPT: 'typescript',
+    PROGRAMMING_LANGUAGE_GO: 'go',
+    PROGRAMMING_LANGUAGE_RUST: 'rust',
+    PROGRAMMING_LANGUAGE_CPP: 'cpp',
+    PROGRAMMING_LANGUAGE_JAVA: 'java',
   }
+  return map[language] ?? 'plaintext'
 }
 
-export function monacoLanguageFor(value?: string | null): string {
-  return normalizeAppLanguage(value);
-}
-
-export function displayLanguageLabel(value?: string | null): string {
-  switch (normalizeAppLanguage(value)) {
-    case 'python':
-      return 'Python';
-    case 'sql':
-      return 'SQL';
-    case 'system_design':
-      return 'System Design';
-    case 'go':
-    default:
-      return 'Go';
+export function getLanguageLabel(language: string): string {
+  const labels: Record<string, string> = {
+    python: 'Python 3',
+    python3: 'Python 3',
+    javascript: 'JavaScript',
+    typescript: 'TypeScript',
+    go: 'Go',
+    rust: 'Rust',
+    cpp: 'C++',
+    java: 'Java',
+    PROGRAMMING_LANGUAGE_PYTHON: 'Python 3',
+    PROGRAMMING_LANGUAGE_JAVASCRIPT: 'JavaScript',
+    PROGRAMMING_LANGUAGE_TYPESCRIPT: 'TypeScript',
+    PROGRAMMING_LANGUAGE_GO: 'Go',
+    PROGRAMMING_LANGUAGE_RUST: 'Rust',
+    PROGRAMMING_LANGUAGE_CPP: 'C++',
+    PROGRAMMING_LANGUAGE_JAVA: 'Java',
   }
-}
-
-export function inferLanguageFromSource(source?: string | null): AppCodeLanguage {
-  const normalized = (source || '').trim().toLowerCase();
-  if (normalized.startsWith('select ') || normalized.startsWith('with ') || normalized.includes('create table')) {
-    return 'sql';
-  }
-  if (normalized.includes('def solve') || normalized.includes('import sys') || normalized.includes('print(')) {
-    return 'python';
-  }
-  return 'go';
+  return labels[language] ?? language
 }

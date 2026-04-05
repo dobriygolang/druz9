@@ -1,232 +1,94 @@
-import {
-  CommunityEvent,
-  CreateEventPayload,
-  EventParticipant,
-} from '@/entities/User/model/types';
-import { apiClient, ListQueryParams, withDefaultListQuery } from '@/shared/api/base';
-import { getCachedValue, invalidateCachedPrefix, setCachedValue } from '@/shared/api/cache';
-import { encodeEventDescription, parseEventDescription } from '@/features/Event/lib/eventMetadata';
+import { apiClient, withDefaultListQuery, type ListQueryParams } from '@/shared/api/base'
 
-const defaultEventsCache = {
-  data: null as CommunityEvent[] | null,
-  timestamp: 0,
-  ttlMs: 60_000,
-};
-
-type BackendEventParticipant = {
-  user_id?: string;
-  userId?: string;
-  title?: string;
-  avatar_url?: string;
-  avatarUrl?: string;
-  status?: EventParticipant['status'];
-};
+export interface Event {
+  id: string
+  title: string
+  placeLabel: string
+  region: string
+  country: string
+  city: string
+  latitude: number
+  longitude: number
+  scheduledAt: string
+  createdAt: string
+  creatorId: string
+  creatorName: string
+  isCreator: boolean
+  isJoined: boolean
+  participantCount: number
+  description: string
+  meetingLink: string
+}
 
 type BackendEvent = {
-  id?: string;
-  title?: string;
-  description?: string;
-  meeting_link?: string;
-  meetingLink?: string;
-  place_label?: string;
-  placeLabel?: string;
-  region?: string;
-  country?: string;
-  city?: string;
-  latitude?: number;
-  longitude?: number;
-  scheduled_at?: string;
-  scheduledAt?: string;
-  created_at?: string;
-  createdAt?: string;
-  creator_id?: string;
-  creatorId?: string;
-  creator_name?: string;
-  creatorName?: string;
-  is_creator?: boolean;
-  isCreator?: boolean;
-  is_joined?: boolean;
-  isJoined?: boolean;
-  participant_count?: number;
-  participantCount?: number;
-  participants?: BackendEventParticipant[];
-};
-
-type BackendListEventsResponse = {
-  events?: BackendEvent[];
-};
-
-type BackendEventResponse = {
-  event?: BackendEvent;
-};
-
-function normalizeParticipantStatus(value: unknown): EventParticipant['status'] {
-  if (value === 2 || value === 'PARTICIPANT_STATUS_CONFIRMED' || value === 'confirmed' || value === 'joined') return 'joined';
-  if (value === 3 || value === 'PARTICIPANT_STATUS_DECLINED' || value === 'declined') return 'declined';
-  if (value === 1 || value === 'PARTICIPANT_STATUS_PENDING' || value === 'pending' || value === 'invited') return 'invited';
-  return 'unspecified';
+  id: string
+  title: string
+  place_label?: string
+  region?: string
+  country?: string
+  city?: string
+  latitude?: number
+  longitude?: number
+  scheduled_at?: string
+  created_at?: string
+  creator_id?: string
+  creator_name?: string
+  is_creator?: boolean
+  is_joined?: boolean
+  participant_count?: number
+  description?: string
+  meeting_link?: string
 }
 
-function normalizeParticipant(
-  participant: BackendEventParticipant,
-): EventParticipant {
+function normalizeEvent(e: BackendEvent): Event {
   return {
-    user_id: participant.user_id ?? participant.userId ?? '',
-    title: participant.title ?? '',
-    avatar_url: participant.avatar_url ?? participant.avatarUrl ?? '',
-    status: normalizeParticipantStatus(participant.status),
-  };
+    id: e.id, title: e.title,
+    placeLabel: e.place_label ?? '', region: e.region ?? '', country: e.country ?? '', city: e.city ?? '',
+    latitude: e.latitude ?? 0, longitude: e.longitude ?? 0,
+    scheduledAt: e.scheduled_at ?? '', createdAt: e.created_at ?? '',
+    creatorId: e.creator_id ?? '', creatorName: e.creator_name ?? '',
+    isCreator: e.is_creator ?? false, isJoined: e.is_joined ?? false,
+    participantCount: e.participant_count ?? 0,
+    description: e.description ?? '', meetingLink: e.meeting_link ?? '',
+  }
 }
 
-function normalizeEvent(event: BackendEvent): CommunityEvent {
-  const rawDescription = event.description ?? '';
-  const parsed = parseEventDescription(rawDescription);
-  return {
-    id: event.id ?? '',
-    title: event.title ?? '',
-    description: parsed.description,
-    raw_description: rawDescription,
-    meeting_link: event.meeting_link ?? event.meetingLink ?? '',
-    place_label: event.place_label ?? event.placeLabel ?? '',
-    region: event.region ?? '',
-    country: event.country ?? '',
-    city: event.city ?? '',
-    latitude: event.latitude ?? 0,
-    longitude: event.longitude ?? 0,
-    scheduled_at: event.scheduled_at ?? event.scheduledAt ?? '',
-    created_at: event.created_at ?? event.createdAt ?? '',
-    creator_id: event.creator_id ?? event.creatorId ?? '',
-    creator_name: event.creator_name ?? event.creatorName ?? '',
-    is_creator: event.is_creator ?? event.isCreator ?? false,
-    is_joined: event.is_joined ?? event.isJoined ?? false,
-    participant_count: event.participant_count ?? event.participantCount ?? 0,
-    event_color: parsed.meta.color,
-    event_group: parsed.meta.group,
-    event_type: parsed.meta.type,
-    participants: (event.participants ?? []).map(normalizeParticipant),
-  };
-}
-
-function toProtoTimestamp(value: string): string {
-  const localDateTimePattern = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2})(?::(\d{2}))?$/;
-  const localMatch = value.match(localDateTimePattern);
-  if (localMatch) {
-    const [, datePart, timePart, secondsPart] = localMatch;
-    const date = new Date(`${datePart}T${timePart}:${secondsPart ?? '00'}`);
-    const offsetMinutes = -date.getTimezoneOffset();
-    const sign = offsetMinutes >= 0 ? '+' : '-';
-    const absoluteOffset = Math.abs(offsetMinutes);
-    const offsetHours = String(Math.floor(absoluteOffset / 60)).padStart(2, '0');
-    const offsetRestMinutes = String(absoluteOffset % 60).padStart(2, '0');
-
-    return `${datePart}T${timePart}:${secondsPart ?? '00'}${sign}${offsetHours}:${offsetRestMinutes}`;
-  }
-
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) {
-    return value;
-  }
-  return date.toISOString();
+export interface CreateEventPayload {
+  title: string
+  placeLabel?: string
+  region?: string
+  country?: string
+  city?: string
+  latitude?: number
+  longitude?: number
+  scheduledAt: string
+  description?: string
+  meetingLink?: string
 }
 
 export const eventApi = {
-  list: async (params?: ListQueryParams): Promise<CommunityEvent[]> => {
-    const useCache = !params || Object.keys(params).length === 0;
-    const cacheKey = 'events:list:default';
-    const now = Date.now();
-    if (useCache && defaultEventsCache.data && now - defaultEventsCache.timestamp < defaultEventsCache.ttlMs) {
-      return defaultEventsCache.data;
-    }
-    if (useCache) {
-      const cached = getCachedValue<CommunityEvent[]>(cacheKey);
-      if (cached) {
-        defaultEventsCache.data = cached;
-        defaultEventsCache.timestamp = now;
-        return cached;
-      }
-    }
-    const response = await apiClient.get<BackendListEventsResponse>('/api/v1/events', {
-      params: withDefaultListQuery(params),
-    });
-    const events = (response.data.events ?? []).map(normalizeEvent);
-    if (useCache) {
-      defaultEventsCache.data = events;
-      defaultEventsCache.timestamp = now;
-      setCachedValue(cacheKey, events, defaultEventsCache.ttlMs);
-    }
-    return events;
+  listEvents: async (params?: ListQueryParams & { status?: string; creatorId?: string }): Promise<{ events: Event[]; total: number }> => {
+    const r = await apiClient.get<{ events?: BackendEvent[]; total_count?: number }>('/api/v1/events', {
+      params: { ...withDefaultListQuery(params), status: params?.status, creator_id: params?.creatorId },
+    })
+    return { events: (r.data.events ?? []).map(normalizeEvent), total: r.data.total_count ?? 0 }
   },
-  create: async (payload: CreateEventPayload): Promise<CommunityEvent> => {
-    const response = await apiClient.post<BackendEventResponse>('/api/v1/events', {
-      title: payload.title,
-      description: encodeEventDescription(payload.description, {
-        color: payload.event_color,
-        group: payload.event_group,
-        type: payload.event_type,
-      }),
-      repeat: payload.repeat ?? 'none',
-      meetingLink: payload.meeting_link,
-      placeLabel: payload.place_label,
-      region: payload.region,
-      country: payload.country,
-      city: payload.city,
-      latitude: payload.latitude,
-      longitude: payload.longitude,
-      scheduledAt: toProtoTimestamp(payload.scheduled_at),
-      invitedUserIds: payload.invited_user_ids,
-    });
-    defaultEventsCache.data = null;
-    defaultEventsCache.timestamp = 0;
-    invalidateCachedPrefix('events:list:');
-    return normalizeEvent(response.data.event ?? {});
+  createEvent: async (payload: CreateEventPayload): Promise<Event> => {
+    const r = await apiClient.post<{ event: BackendEvent }>('/api/v1/events', {
+      title: payload.title, place_label: payload.placeLabel, region: payload.region,
+      country: payload.country, city: payload.city, latitude: payload.latitude, longitude: payload.longitude,
+      scheduled_at: payload.scheduledAt, description: payload.description, meeting_link: payload.meetingLink,
+    })
+    return normalizeEvent(r.data.event)
   },
-  update: async (
-    eventId: string,
-    payload: Partial<CreateEventPayload>,
-  ): Promise<CommunityEvent> => {
-    const response = await apiClient.patch<BackendEventResponse>(
-      `/api/v1/events/${eventId}`,
-      {
-        title: payload.title,
-        description: encodeEventDescription(payload.description ?? '', {
-          color: payload.event_color,
-          group: payload.event_group,
-          type: payload.event_type,
-        }),
-        meetingLink: payload.meeting_link,
-        placeLabel: payload.place_label,
-        scheduledAt: payload.scheduled_at
-          ? toProtoTimestamp(payload.scheduled_at)
-          : undefined,
-      },
-    );
-    defaultEventsCache.data = null;
-    defaultEventsCache.timestamp = 0;
-    invalidateCachedPrefix('events:list:');
-    return normalizeEvent(response.data.event ?? {});
+  joinEvent: async (eventId: string): Promise<Event> => {
+    const r = await apiClient.post<{ event: BackendEvent }>(`/api/v1/events/${eventId}/join`, {})
+    return normalizeEvent(r.data.event)
   },
-  join: async (eventId: string): Promise<CommunityEvent> => {
-    const response = await apiClient.post<BackendEventResponse>(
-      `/api/v1/events/${eventId}/join`,
-      { eventId },
-    );
-    defaultEventsCache.data = null;
-    defaultEventsCache.timestamp = 0;
-    invalidateCachedPrefix('events:list:');
-    return normalizeEvent(response.data.event ?? {});
+  leaveEvent: async (eventId: string): Promise<void> => {
+    await apiClient.post(`/api/v1/events/${eventId}/leave`, {})
   },
-  leave: async (eventId: string): Promise<void> => {
-    await apiClient.post(`/api/v1/events/${eventId}/leave`, { eventId });
-    defaultEventsCache.data = null;
-    defaultEventsCache.timestamp = 0;
-    invalidateCachedPrefix('events:list:');
+  deleteEvent: async (eventId: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/events/${eventId}`)
   },
-  delete: async (eventId: string, deleteScope?: 'single' | 'future' | 'all'): Promise<void> => {
-    await apiClient.delete(`/api/v1/events/${eventId}`, {
-      params: deleteScope ? { deleteScope } : undefined,
-    });
-    defaultEventsCache.data = null;
-    defaultEventsCache.timestamp = 0;
-    invalidateCachedPrefix('events:list:');
-  },
-};
+}

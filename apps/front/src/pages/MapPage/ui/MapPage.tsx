@@ -1,119 +1,74 @@
-import React, { useEffect, useMemo, useState } from 'react';
-import { NavLink } from 'react-router-dom';
+import { useRef, useState } from 'react'
+import { Search } from 'lucide-react'
+import { Avatar } from '@/shared/ui/Avatar'
+import type { User } from '@/entities/User/model/types'
 
-import { CommunityEvent, CommunityMapPoint } from '@/entities/User/model/types';
-import { eventApi } from '@/features/Event/api/eventApi';
-import { geoApi } from '@/features/Geo/api/geoApi';
-
-function buildInitials(point: CommunityMapPoint) {
-  return `${point.firstName?.charAt(0) ?? ''}${point.lastName?.charAt(0) ?? ''}`.trim().toUpperCase() || point.username.slice(0, 2).toUpperCase();
-}
-
-const avatarPalette = ['#f2f3f0', '#4f46e5', '#0891b2', '#7c3aed', '#166534'];
-
-export const MapPage: React.FC = () => {
-  const [points, setPoints] = useState<CommunityMapPoint[]>([]);
-  const [events, setEvents] = useState<CommunityEvent[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    let cancelled = false;
-
-    const load = async () => {
-      try {
-        setIsLoading(true);
-        const [nextPoints, nextEvents] = await Promise.all([
-          geoApi.communityMap(),
-          eventApi.list(),
-        ]);
-        if (!cancelled) {
-          setPoints(nextPoints);
-          setEvents(nextEvents);
-        }
-      } catch (error) {
-        console.error('Failed to load community map', error);
-      } finally {
-        if (!cancelled) {
-          setIsLoading(false);
-        }
-      }
-    };
-
-    void load();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  const onlineUsers = useMemo(
-    () => points.filter((point) => point.activityStatus === 'online').slice(0, 3),
-    [points],
-  );
-
-  const topMeta = `${points.length} участников · ${events.length} событий · ${onlineUsers.length} онлайн`;
+export function MapPage() {
+  const [_users] = useState<User[]>([])
+  const [search, setSearch] = useState('')
+  const mapRef = useRef<HTMLDivElement>(null)
 
   return (
-    <div className="community-screen fade-in">
-      <section className="community-screen__header">
-        <div className="community-screen__top-row">
-          <div className="community-screen__title-block">
-            <h1>Community</h1>
+    <div className="flex h-[calc(100vh-180px)] min-h-[500px]">
+      {/* Map area */}
+      <div ref={mapRef} className="flex-1 bg-[#0c1120] relative flex items-center justify-center">
+        <div className="text-center text-[#475569]">
+          <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-[#1e293b] flex items-center justify-center">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
+              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+              <circle cx="12" cy="9" r="2.5"/>
+            </svg>
           </div>
-          <div className="community-screen__meta-text">{isLoading ? 'Загрузка...' : topMeta}</div>
+          <p className="text-sm font-medium">Карта участников</p>
+          <p className="text-xs mt-1">Интерактивная карта загружается...</p>
         </div>
-
-        <nav className="community-screen__tabs" aria-label="Community sections">
-          <NavLink to="/community/people" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>People</NavLink>
-          <NavLink to="/community/events" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>Events</NavLink>
-          <NavLink to="/community/map" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>Map</NavLink>
-          <NavLink to="/community/circles" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>Circles</NavLink>
-        </nav>
-      </section>
-
-      <section className="community-map-shell">
-        <div className="community-map-stage">
-          <div className="community-map-stage__legend">
-            <span className="is-orange" />
-            <span className="is-orange" />
-            <span className="is-orange" />
-            <span className="is-green" />
-            <span className="is-green" />
+        {/* Sample pins */}
+        {[
+          { top: '40%', left: '35%', name: 'АИ' },
+          { top: '55%', left: '55%', name: 'МП' },
+          { top: '30%', left: '60%', name: 'ДС' },
+        ].map((pin, i) => (
+          <div
+            key={i}
+            className="absolute w-8 h-8 rounded-full bg-[#FF8400] border-2 border-white flex items-center justify-center text-xs font-bold text-white shadow-lg cursor-pointer hover:scale-110 transition-transform"
+            style={{ top: pin.top, left: pin.left }}
+            title={pin.name}
+          >
+            {pin.name[0]}
           </div>
-          <div className="community-map-stage__label">
-            <div className="community-map-stage__pin" />
-            <strong>Интерактивная карта сообщества</strong>
-            <span>{points.length} разработчиков онлайн · отображение по регионам</span>
-          </div>
-          <div className="community-map-stage__dots">
-            <span className="dot-a" />
-            <span className="dot-b" />
-            <span className="dot-c" />
-            <span className="dot-d" />
-            <span className="dot-e" />
-            <span className="dot-f" />
+        ))}
+      </div>
+
+      {/* Right panel */}
+      <div className="w-[280px] bg-white border-l border-[#CBCCC9] flex flex-col">
+        <div className="p-4 border-b border-[#CBCCC9]">
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Поиск участников..."
+              className="w-full pl-9 pr-3 py-2 text-sm bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:outline-none"
+            />
           </div>
         </div>
-
-        <aside className="community-map-panel">
-          <div className="community-map-panel__head">Онлайн сейчас</div>
-          <div className="community-map-panel__list">
-            {isLoading ? (
-              <div className="community-screen__empty">Загрузка...</div>
-            ) : onlineUsers.map((user, index) => (
-              <div key={user.userId} className="community-map-user">
-                <div className="community-map-user__avatar" style={{ background: avatarPalette[index % avatarPalette.length], color: index === 0 ? '#111111' : '#fff' }}>
-                  {buildInitials(user)}
+        <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1">
+          {[
+            { name: 'Алексей Иванов', city: 'Москва' },
+            { name: 'Мария Петрова', city: 'СПб' },
+            { name: 'Дмитрий Смирнов', city: 'Казань' },
+          ].filter(u => !search || u.name.toLowerCase().includes(search.toLowerCase()))
+            .map((u, i) => (
+              <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F2F3F0] cursor-pointer">
+                <Avatar name={u.name} size="sm" />
+                <div>
+                  <p className="text-sm font-medium text-[#18181b]">{u.name}</p>
+                  <p className="text-xs text-[#64748b]">{u.city}</p>
                 </div>
-                <div className="community-map-user__info">
-                  <strong>{[user.firstName, user.lastName].filter(Boolean).join(' ') || user.username}</strong>
-                  <span>{user.region || 'Online'} · {user.username || 'Developer'}</span>
-                </div>
-                <span className="community-map-user__status" />
               </div>
             ))}
-          </div>
-        </aside>
-      </section>
+        </div>
+      </div>
     </div>
-  );
-};
+  )
+}

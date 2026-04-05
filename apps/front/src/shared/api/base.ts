@@ -1,67 +1,44 @@
-import axios, { AxiosError } from 'axios';
-import { ENV } from '../config/env';
+import axios, { AxiosError } from 'axios'
+import { ENV } from '../config/env'
 
-export { AxiosError };
+export { AxiosError }
 
-// Токен для авторизации (можно положить в localStorage.setItem('authToken', 'xxx'))
 const getAuthToken = () => {
-  if (typeof window === 'undefined') return null;
-  return localStorage.getItem('authToken');
-};
+  if (typeof window === 'undefined') return null
+  return localStorage.getItem('authToken')
+}
 
 export const apiClient = axios.create({
   baseURL: ENV.API_URL,
   withCredentials: true,
-  headers: {
-    'Content-Type': 'application/json',
-  },
-});
+  headers: { 'Content-Type': 'application/json' },
+})
 
-// Add auth token dynamically on each request
 apiClient.interceptors.request.use((config) => {
-  const token = getAuthToken();
-  if (token) {
-    config.headers.Authorization = `Bearer ${token}`;
-  }
-  return config;
-});
+  const token = getAuthToken()
+  if (token) config.headers.Authorization = `Bearer ${token}`
+  return config
+})
 
 export function withGuestArenaHeaders(actorId?: string, guestName?: string) {
-  const headers: Record<string, string> = {};
-  if (actorId) {
-    headers['X-Arena-Guest-Id'] = actorId;
-  }
-  if (guestName) {
-    // Base64 encode to support Unicode characters in HTTP header
-    headers['X-Arena-Guest-Name'] = btoa(unescape(encodeURIComponent(guestName)));
-  }
-  return headers;
+  const headers: Record<string, string> = {}
+  if (actorId) headers['X-Arena-Guest-Id'] = actorId
+  if (guestName) headers['X-Arena-Guest-Name'] = btoa(unescape(encodeURIComponent(guestName)))
+  return headers
 }
 
 export function withGuestCodeRoomHeaders(guestName?: string) {
-  if (!guestName) {
-    return {};
-  }
-  // Base64 encode to support Unicode characters in HTTP header
-  const encoded = btoa(unescape(encodeURIComponent(guestName)));
-  return {
-    'X-Code-Editor-Guest-Name': encoded,
-  };
+  if (!guestName) return {}
+  return { 'X-Code-Editor-Guest-Name': btoa(unescape(encodeURIComponent(guestName))) }
 }
 
 export interface ListQueryParams {
-  limit?: number;
-  offset?: number;
+  limit?: number
+  offset?: number
 }
 
-export const DEFAULT_LIST_QUERY: Required<ListQueryParams> = {
-  limit: 100,
-  offset: 0,
-};
+export const DEFAULT_LIST_QUERY: Required<ListQueryParams> = { limit: 100, offset: 0 }
 
 export function withDefaultListQuery(params?: ListQueryParams) {
-  return {
-    ...DEFAULT_LIST_QUERY,
-    ...params,
-  };
+  return { ...DEFAULT_LIST_QUERY, ...params }
 }
