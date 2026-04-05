@@ -4,6 +4,7 @@ import { podcastApi } from '@/features/Podcast/api/podcastApi'
 import type { Podcast } from '@/entities/Podcast/model/types'
 import { Card } from '@/shared/ui/Card'
 import { Badge } from '@/shared/ui/Badge'
+import { ErrorState } from '@/shared/ui/ErrorState'
 
 const CATEGORY_FILTERS = ['Все', 'Технологии', 'Карьера', 'Архитектура', 'DevOps']
 
@@ -38,6 +39,7 @@ export function PodcastsPage() {
   const [podcasts, setPodcasts] = useState<Podcast[]>([])
   const [activeFilter, setActiveFilter] = useState('Все')
   const [search, setSearch] = useState('')
+  const [error, setError] = useState<string | null>(null)
 
   // Player state
   const [playing, setPlaying] = useState<Podcast | null>(null)
@@ -47,12 +49,19 @@ export function PodcastsPage() {
   const audioRef = useRef<HTMLAudioElement | null>(null)
   const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  const fetchPodcasts = useCallback(() => {
+    setError(null)
+    podcastApi.list({ limit: 50 })
+      .then(r => setPodcasts(r.podcasts))
+      .catch(() => setError('Не удалось загрузить данные'))
+  }, [])
+
   useEffect(() => {
-    podcastApi.list({ limit: 50 }).then(r => setPodcasts(r.podcasts)).catch(() => {})
+    fetchPodcasts()
     return () => {
       if (progressTimer.current) clearInterval(progressTimer.current)
     }
-  }, [])
+  }, [fetchPodcasts])
 
   const handlePlay = useCallback(async (podcast: Podcast) => {
     // Stop current playback
@@ -115,6 +124,8 @@ export function PodcastsPage() {
     if (search && !p.title.toLowerCase().includes(search.toLowerCase()) && !p.authorName.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
+
+  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchPodcasts() }} />
 
   return (
     <div className="p-8 flex flex-col gap-6 min-h-full">

@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Calendar, MapPin, Users, Plus } from 'lucide-react'
 import { eventApi, type Event, type CreateEventPayload } from '@/features/Event/api/eventApi'
 import { Card } from '@/shared/ui/Card'
@@ -6,6 +6,8 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Modal } from '@/shared/ui/Modal'
 import { Input } from '@/shared/ui/Input'
+import { ErrorState } from '@/shared/ui/ErrorState'
+import { useToast } from '@/shared/ui/Toast'
 
 function formatDate(iso: string) {
   try {
@@ -21,24 +23,35 @@ function formatTime(iso: string) {
 }
 
 export function EventsPage() {
+  const { toast } = useToast()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [showCreate, setShowCreate] = useState(false)
   const [creating, setCreating] = useState(false)
   const [form, setForm] = useState<Partial<CreateEventPayload>>({})
 
-  useEffect(() => {
+  const fetchEvents = useCallback(() => {
+    setError(null)
+    setLoading(true)
     eventApi.listEvents({ limit: 6 })
       .then(r => setEvents(r.events))
-      .catch(() => {})
+      .catch(() => setError('Не удалось загрузить данные'))
       .finally(() => setLoading(false))
   }, [])
+
+  useEffect(() => {
+    fetchEvents()
+  }, [fetchEvents])
 
   const handleJoin = async (id: string) => {
     try {
       const updated = await eventApi.joinEvent(id)
       setEvents(prev => prev.map(e => e.id === id ? updated : e))
-    } catch {}
+      toast('Вы записались на событие', 'success')
+    } catch {
+      toast('Не удалось записаться', 'error')
+    }
   }
 
   const handleCreate = async () => {
@@ -49,8 +62,13 @@ export function EventsPage() {
       setEvents(prev => [created, ...prev])
       setShowCreate(false)
       setForm({})
-    } catch {} finally { setCreating(false) }
+      toast('Событие создано', 'success')
+    } catch {
+      toast('Не удалось создать событие', 'error')
+    } finally { setCreating(false) }
   }
+
+  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchEvents() }} />
 
   return (
     <div className="px-6 pt-4 pb-6">

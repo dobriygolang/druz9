@@ -1,10 +1,12 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, ChevronRight, BookOpen, Code2, MessageSquare } from 'lucide-react'
+import { Search, ChevronRight, BookOpen, Code2, MessageSquare, Building2, ArrowRight } from 'lucide-react'
 import { interviewPrepApi, type InterviewPrepTask } from '@/features/InterviewPrep/api/interviewPrepApi'
 import { Badge } from '@/shared/ui/Badge'
 import { Card } from '@/shared/ui/Card'
 import { Button } from '@/shared/ui/Button'
+import { ErrorState } from '@/shared/ui/ErrorState'
+import { useToast } from '@/shared/ui/Toast'
 
 const PREP_TYPE_ICONS: Record<string, React.ReactNode> = {
   coding: <Code2 className="w-4 h-4 text-[#6366f1]" />,
@@ -18,20 +20,36 @@ const PREP_TYPE_LABELS: Record<string, string> = {
 
 export function InterviewPrepPage() {
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [tasks, setTasks] = useState<InterviewPrepTask[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
+  const [companies, setCompanies] = useState<string[]>([])
+  const [selectedCompany, setSelectedCompany] = useState('')
+  const [mockLoading, setMockLoading] = useState(false)
+  const [mockError, setMockError] = useState('')
 
-  useEffect(() => {
+  const fetchTasks = useCallback(() => {
+    setError(null)
+    setLoading(true)
     interviewPrepApi.listTasks()
       .then(ts => setTasks(ts))
-      .catch(() => {})
+      .catch(() => setError('Не удалось загрузить данные'))
       .finally(() => setLoading(false))
+    interviewPrepApi.listCompanies()
+      .then(cs => setCompanies(cs))
+      .catch(() => {})
   }, [])
+
+  useEffect(() => {
+    fetchTasks()
+  }, [fetchTasks])
 
   const filtered = tasks.filter(t => {
     if (category && t.prepType !== category) return false
+    if (selectedCompany && t.companyTag !== selectedCompany) return false
     if (search && !t.title.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
@@ -43,8 +61,60 @@ export function InterviewPrepPage() {
     { label: 'Behavioral', value: tasks.filter(t => t.prepType === 'behavioral').length, icon: <MessageSquare className="w-4 h-4 text-[#f59e0b]" /> },
   ]
 
+  const handleStartMock = async (companyTag?: string) => {
+    setMockLoading(true)
+    setMockError('')
+    try {
+      const session = await interviewPrepApi.startMockSession(companyTag || selectedCompany || '') as any
+      toast('Mock-сессия создана', 'success')
+      navigate(`/growth/interview-prep/mock/${session?.id}`)
+    } catch {
+      setMockError('Не удалось создать mock-сессию')
+      toast('Не удалось создать mock-сессию', 'error')
+    } finally {
+      setMockLoading(false)
+    }
+  }
+
+  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchTasks() }} />
+
   return (
     <div className="px-6 pt-4 pb-6">
+      {/* Company cards */}
+      {companies.length > 0 && (
+        <div className="mb-4">
+          <div className="flex gap-3 overflow-x-auto pb-2">
+            {companies.map(company => {
+              const count = tasks.filter(t => t.companyTag === company).length
+              return (
+                <div
+                  key={company}
+                  onClick={() => setSelectedCompany(prev => prev === company ? '' : company)}
+                  className={`flex-shrink-0 w-[200px] rounded-2xl p-4 cursor-pointer transition-colors border ${
+                    selectedCompany === company
+                      ? 'bg-[#0f172a] border-[#FF8400]'
+                      : 'bg-[#0f172a] border-[#1e293b] hover:border-[#334155]'
+                  }`}
+                >
+                  <div className="flex items-center gap-2 mb-2">
+                    <Building2 className="w-4 h-4 text-[#FF8400]" />
+                    <span className="text-sm font-semibold text-white truncate">{company}</span>
+                  </div>
+                  <p className="text-xs text-[#94a3b8] mb-3">{count} задач</p>
+                  <button
+                    onClick={(e) => { e.stopPropagation(); handleStartMock(company) }}
+                    disabled={mockLoading}
+                    className="flex items-center gap-1 text-xs font-medium text-[#FF8400] hover:text-[#e5781a] transition-colors disabled:opacity-50"
+                  >
+                    Начать Mock <ArrowRight className="w-3 h-3" />
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
+      )}
+
       {/* Stats */}
       <div className="grid grid-cols-4 gap-3 mb-4">
         {stats.map(s => (
@@ -69,7 +139,33 @@ export function InterviewPrepPage() {
             className="w-full pl-9 pr-4 py-2 bg-white border border-[#CBCCC9] rounded-lg text-sm focus:outline-none"
           />
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
+          {/* Company filter */}
+          {companies.length > 0 && (
+            <>
+              <button
+                onClick={() => setSelectedCompany('')}
+                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                  selectedCompany === '' ? 'bg-[#0f172a] text-white' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
+                }`}
+              >
+                Все компании
+              </button>
+              {companies.map(c => (
+                <button
+                  key={c}
+                  onClick={() => setSelectedCompany(prev => prev === c ? '' : c)}
+                  className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                    selectedCompany === c ? 'bg-[#0f172a] text-white' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
+                  }`}
+                >
+                  {c}
+                </button>
+              ))}
+              <div className="w-px h-5 bg-[#CBCCC9]" />
+            </>
+          )}
+          {/* Category filter */}
           {['', 'coding', 'system_design', 'behavioral'].map(cat => (
             <button
               key={cat}
@@ -115,6 +211,11 @@ export function InterviewPrepPage() {
                     <p className="text-sm font-medium text-[#111111] truncate">{task.title}</p>
                     <p className="text-xs text-[#666666] mt-0.5">{task.companyTag || 'General'} · {Math.round(task.durationSeconds / 60)} мин</p>
                   </div>
+                  {task.companyTag && (
+                    <Badge variant="default">
+                      {task.companyTag}
+                    </Badge>
+                  )}
                   <Badge variant={task.prepType === 'coding' ? 'indigo' : task.prepType === 'system_design' ? 'orange' : 'success'}>
                     {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
                   </Badge>
@@ -130,7 +231,16 @@ export function InterviewPrepPage() {
           <Card padding="md" dark orangeBorder>
             <h3 className="text-sm font-semibold text-[#CBCCC9] mb-2">Mock Interview</h3>
             <p className="text-xs text-[#94a3b8] mb-3">Симулируй полное собеседование с AI</p>
-            <Button variant="orange" size="sm" className="w-full justify-center">
+            {mockError && (
+              <p className="text-xs text-[#ef4444] mb-2">{mockError}</p>
+            )}
+            <Button
+              variant="orange"
+              size="sm"
+              className="w-full justify-center"
+              loading={mockLoading}
+              onClick={() => handleStartMock()}
+            >
               Начать Mock
             </Button>
           </Card>

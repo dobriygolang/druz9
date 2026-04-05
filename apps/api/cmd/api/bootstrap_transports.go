@@ -8,6 +8,7 @@ import (
 	adminv1 "api/pkg/api/admin/v1"
 	arenav1 "api/pkg/api/arena/v1"
 	codeeditorv1 "api/pkg/api/code_editor/v1"
+	circlev1 "api/pkg/api/circle/v1"
 	eventv1 "api/pkg/api/event/v1"
 	geov1 "api/pkg/api/geo/v1"
 	interviewprepv1 "api/pkg/api/interview_prep/v1"
@@ -101,6 +102,8 @@ func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.S
 	interviewprepv1.RegisterInterviewPrepServiceServer(grpcServer, services.interviewPrepService)
 	geov1.RegisterGeoServiceHTTPServer(httpServer, services.geoService)
 	geov1.RegisterGeoServiceServer(grpcServer, services.geoService)
+	circlev1.RegisterCircleServiceHTTPServer(httpServer, services.circleService)
+	circlev1.RegisterCircleServiceServer(grpcServer, services.circleService)
 	eventv1.RegisterEventServiceHTTPServer(httpServer, services.eventService)
 	eventv1.RegisterEventServiceServer(grpcServer, services.eventService)
 	podcastv1.RegisterPodcastServiceHTTPServer(httpServer, services.podcastService)

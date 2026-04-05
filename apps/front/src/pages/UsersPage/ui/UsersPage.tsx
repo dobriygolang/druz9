@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import { ChevronRight, MapPin } from 'lucide-react'
 import { Avatar } from '@/shared/ui/Avatar'
+import { ErrorState } from '@/shared/ui/ErrorState'
 import { geoApi, type CommunityPoint } from '@/features/Geo/api/geoApi'
 
 const STATUS_COLORS: Record<string, string> = {
@@ -13,10 +14,20 @@ const STATUS_COLORS: Record<string, string> = {
 export function UsersPage() {
   const { search = '' } = useOutletContext<{ search: string }>()
   const [users, setUsers] = useState<CommunityPoint[]>([])
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchUsers = useCallback(() => {
+    setError(null)
+    geoApi.getCommunity()
+      .then(setUsers)
+      .catch(() => setError('Не удалось загрузить данные'))
+  }, [])
 
   useEffect(() => {
-    geoApi.getCommunity().then(setUsers).catch(() => {})
-  }, [])
+    fetchUsers()
+  }, [fetchUsers])
+
+  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchUsers() }} />
 
   const filtered = users.filter(u => {
     if (!search) return true

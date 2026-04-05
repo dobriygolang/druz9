@@ -4,6 +4,7 @@ import (
 	"api/internal/aireview"
 	adminservice "api/internal/api/admin"
 	arenaservice "api/internal/api/arena"
+	circleservice "api/internal/api/circle"
 	codeeditorservice "api/internal/api/code_editor"
 	eventservice "api/internal/api/event"
 	geoservice "api/internal/api/geo"
@@ -15,6 +16,7 @@ import (
 	appcodeeditor "api/internal/app/codeeditor"
 	appinterviewprep "api/internal/app/interviewprep"
 	admindomainservice "api/internal/domain/admin"
+	circledomainservice "api/internal/domain/circle"
 	eventdomainservice "api/internal/domain/event"
 	geodomainservice "api/internal/domain/geo"
 	podcastdomainservice "api/internal/domain/podcast"
@@ -32,6 +34,7 @@ type serviceContext struct {
 	profileServiceDomain    *profiledomainservice.Service
 	adminServiceDomain      *admindomainservice.Service
 	geoServiceDomain        *geodomainservice.Service
+	circleServiceDomain     *circledomainservice.Service
 	eventServiceDomain      *eventdomainservice.Service
 	podcastServiceDomain    *podcastdomainservice.Service
 	referralServiceDomain   *referraldomainservice.Service
@@ -43,6 +46,7 @@ type serviceContext struct {
 	adminService            *adminservice.Implementation
 	profileService          *profileservice.Implementation
 	geoService              *geoservice.Implementation
+	circleService           *circleservice.Implementation
 	eventService            *eventservice.Implementation
 	podcastService          *podcastservice.Implementation
 	referralService         *referralservice.Implementation
@@ -96,6 +100,9 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Resolver:      storage.geoClient,
 		ActivityCache: profileServiceDomain.ActivityCache(),
 	})
+	circleServiceDomain := circledomainservice.NewService(circledomainservice.Config{
+		Repository: storage.circleRepo,
+	})
 	eventServiceDomain := eventdomainservice.NewService(eventdomainservice.Config{
 		Repository: storage.eventRepo,
 	})
@@ -139,6 +146,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		profileServiceDomain:    profileServiceDomain,
 		adminServiceDomain:      adminServiceDomain,
 		geoServiceDomain:        geoServiceDomain,
+		circleServiceDomain:     circleServiceDomain,
 		eventServiceDomain:      eventServiceDomain,
 		podcastServiceDomain:    podcastServiceDomain,
 		referralServiceDomain:   referralServiceDomain,
@@ -150,6 +158,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager),
 		profileService:          profileservice.New(profileServiceDomain, cookies),
 		geoService:              geoservice.New(geoServiceDomain),
+		circleService:           circleservice.New(circleServiceDomain),
 		eventService:            eventservice.New(eventServiceDomain),
 		podcastService:          podcastservice.New(podcastServiceDomain),
 		referralService:         referralservice.New(referralServiceDomain),

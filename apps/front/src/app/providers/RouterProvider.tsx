@@ -31,6 +31,7 @@ const InterviewPrepAdminPage = lazy(() => import('@/pages/InterviewPrepAdminPage
 const AdminAnalyticsPage = lazy(() => import('@/pages/AdminAnalyticsPage/ui/AdminAnalyticsPage').then(m => ({ default: m.AdminAnalyticsPage })))
 const AdminCodeGamePage = lazy(() => import('@/pages/AdminCodeGamePage/ui/AdminCodeGamePage').then(m => ({ default: m.AdminCodeGamePage })))
 const PodcastsPage = lazy(() => import('@/pages/PodcastsPage/ui/PodcastsPage').then(m => ({ default: m.PodcastsPage })))
+const CirclesPage = lazy(() => import('@/pages/CirclesPage/ui/CirclesPage').then(m => ({ default: m.CirclesPage })))
 const VacanciesPage = lazy(() => import('@/pages/VacanciesPage/ui/VacanciesPage').then(m => ({ default: m.VacanciesPage })))
 
 const Fallback: React.FC = () => null
@@ -101,7 +102,9 @@ export const RouterProvider: React.FC = () => {
               <Route index element={<Navigate to="people" replace />} />
               <Route path="people" element={<UsersPage />} />
               <Route path="events" element={<EventsPage />} />
+              <Route path="circles" element={<CirclesPage />} />
               <Route path="map" element={<MapPage />} />
+              <Route path="vacancies" element={<VacanciesPage />} />
             </Route>
 
             {/* Practice */}
@@ -120,9 +123,6 @@ export const RouterProvider: React.FC = () => {
 
             {/* Podcasts */}
             <Route path="/podcasts" element={gate ? <Navigate to="/login" replace /> : <PodcastsPage />} />
-
-            {/* Vacancies */}
-            <Route path="/vacancies" element={gate ? <Navigate to="/login" replace /> : <VacanciesPage />} />
 
             {/* Profile */}
             <Route path="/profile" element={
@@ -155,6 +155,7 @@ export const RouterProvider: React.FC = () => {
             <Route path="/interview-prep/:sessionId" element={<LegacySessionRedirect base="/growth/interview-prep" />} />
             <Route path="/interview-prep/mock/:sessionId" element={<LegacySessionRedirect base="/growth/interview-prep/mock" />} />
             <Route path="/code-rooms" element={<Navigate to="/practice/code-rooms" replace />} />
+            <Route path="/vacancies" element={<Navigate to="/community/vacancies" replace />} />
           </Route>
 
           {/* Admin layout */}

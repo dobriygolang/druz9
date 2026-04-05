@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
 import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords } from 'lucide-react'
 import { useAuth } from '@/app/providers/AuthProvider'
@@ -8,6 +8,7 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
+import { ErrorState } from '@/shared/ui/ErrorState'
 import { apiClient } from '@/shared/api/base'
 
 function formatJoinDate(iso: string) {
@@ -162,21 +163,31 @@ export function ProfilePage() {
   const [user, setUser] = useState<User | null>(null)
   const [progress, setProgress] = useState<ProfileProgress | null>(null)
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [arenaStats, setArenaStats] = useState<ArenaStats | null>(null)
 
   const targetId = userId ?? authUser?.id ?? ''
   const isOwn = !userId || userId === authUser?.id
 
-  useEffect(() => {
+  const fetchProfile = useCallback(() => {
     if (!targetId) return
+    setError(null)
+    setLoading(true)
     Promise.all([
       authApi.getProfileById(targetId),
       authApi.getProfileProgress(targetId),
     ])
       .then(([p, prog]) => { setUser(p.user); setProgress(prog) })
-      .catch(() => { if (authUser) setUser(authUser) })
+      .catch(() => {
+        if (authUser) setUser(authUser)
+        else setError('Не удалось загрузить данные')
+      })
       .finally(() => setLoading(false))
-  }, [targetId])
+  }, [targetId, authUser])
+
+  useEffect(() => {
+    fetchProfile()
+  }, [fetchProfile])
 
   // Fetch arena stats
   useEffect(() => {
@@ -192,6 +203,8 @@ export function ProfilePage() {
 
   // Skill values (placeholder)
   const skillValues = [0.7, 0.5, 0.6, 0.8, 0.45]
+
+  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchProfile() }} />
 
   if (loading) {
     return (

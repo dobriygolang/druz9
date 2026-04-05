@@ -7,8 +7,10 @@ import { Modal } from '@/shared/ui/Modal'
 import { Input } from '@/shared/ui/Input'
 import { Textarea } from '@/shared/ui/Textarea'
 import { Select } from '@/shared/ui/Select'
+import { ErrorState } from '@/shared/ui/ErrorState'
 import { referralApi, type CreateReferralData } from '@/features/Referral/api/referralApi'
 import type { Referral } from '@/entities/Referral/model/types'
+import { useToast } from '@/shared/ui/Toast'
 
 const EMPLOYMENT_TYPES = [
   { value: 'full-time', label: 'Full-time' },
@@ -53,8 +55,10 @@ function ReferralCardSkeleton() {
 }
 
 export function VacanciesPage() {
+  const { toast } = useToast()
   const [referrals, setReferrals] = useState<Referral[]>([])
   const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState<string>('Все')
   const [modalOpen, setModalOpen] = useState(false)
@@ -62,12 +66,13 @@ export function VacanciesPage() {
   const [submitting, setSubmitting] = useState(false)
 
   const fetchReferrals = useCallback(async () => {
+    setError(null)
     setLoading(true)
     try {
       const res = await referralApi.list()
       setReferrals(res.referrals)
     } catch {
-      // silent
+      setError('Не удалось загрузить данные')
     } finally {
       setLoading(false)
     }
@@ -85,8 +90,9 @@ export function VacanciesPage() {
       setReferrals(prev => [created, ...prev])
       setForm(EMPTY_FORM)
       setModalOpen(false)
+      toast('Рефералка опубликована', 'success')
     } catch {
-      // silent
+      toast('Не удалось опубликовать', 'error')
     } finally {
       setSubmitting(false)
     }
@@ -100,6 +106,8 @@ export function VacanciesPage() {
     }
     return true
   })
+
+  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchReferrals() }} />
 
   return (
     <div className="flex-1 min-h-0 overflow-y-auto">

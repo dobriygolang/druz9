@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Users, Code2, TrendingUp, Mic, Swords, Briefcase, User, Settings, LogOut } from 'lucide-react'
+import { Home, Users, Code2, TrendingUp, Mic, User, Settings, LogOut } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { Avatar } from '@/shared/ui/Avatar'
@@ -18,8 +18,6 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Practice', icon: <Code2 className="w-4 h-4" />, href: '/practice', matchPrefix: '/practice' },
   { label: 'Growth', icon: <TrendingUp className="w-4 h-4" />, href: '/growth', matchPrefix: '/growth' },
   { label: 'Подкасты', icon: <Mic className="w-4 h-4" />, href: '/podcasts' },
-  { label: 'Arena', icon: <Swords className="w-4 h-4" />, href: '/practice/arena' },
-  { label: 'Вакансии', icon: <Briefcase className="w-4 h-4" />, href: '/vacancies' },
 ]
 
 export function Sidebar() {
@@ -60,22 +58,24 @@ export function Sidebar() {
   const email = user?.telegramUsername ? `@${user.telegramUsername}` : ''
 
   return (
-    <aside className="w-[280px] min-h-screen bg-[#E7E8E5] border-r border-[#CBCCC9] flex flex-col flex-shrink-0">
+    <aside className="w-[220px] min-h-screen bg-[#E7E8E5] border-r border-[#CBCCC9] flex flex-col flex-shrink-0">
       {/* Logo */}
-      <div className="h-[88px] flex items-center px-8">
-        <div className="flex items-center gap-3">
+      <div className="h-[80px] flex items-center px-5">
+        <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-[#FF8400] rounded-lg flex items-center justify-center transition-transform duration-200 hover:scale-110">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <path d="M3 15L9 3L15 15" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-              <path d="M5.5 11H12.5" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+              <text x="9" y="14" textAnchor="middle" fill="white" fontWeight="bold" fontSize="14" fontFamily="sans-serif">Д</text>
             </svg>
           </div>
-          <span className="font-mono font-bold text-lg text-[#FF8400] tracking-wider">ДРУЗЬЯ</span>
+          <div className="flex flex-col">
+            <span className="font-mono font-bold text-base text-[#FF8400] tracking-wider leading-tight">ДРУЗЬЯ</span>
+            <span className="text-[10px] text-[#94a3b8] font-mono leading-tight">v2.0.0</span>
+          </div>
         </div>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-4 flex flex-col gap-1">
+      <nav className="flex-1 px-3 flex flex-col gap-0.5">
         {NAV_ITEMS.map((item) => {
           const active = isActive(item)
           return (
@@ -83,12 +83,15 @@ export function Sidebar() {
               key={item.href}
               to={item.href}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium transition-all duration-200 font-geist',
+                'relative flex items-center gap-2.5 px-3 py-2.5 rounded-full text-[13px] font-medium transition-all duration-200 font-geist',
                 active
                   ? 'bg-[#CBCCC9] text-[#111111]'
                   : 'text-[#666666] hover:bg-[#D8D9D6] hover:text-[#111111]',
               )}
             >
+              {active && (
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#FF8400] rounded-r-full" />
+              )}
               {item.icon}
               {item.label}
             </Link>
@@ -98,10 +101,10 @@ export function Sidebar() {
 
       {/* Footer with popover menu */}
       {user && (
-        <div className="relative px-6 py-5 border-t border-[#CBCCC9]" ref={popoverRef}>
+        <div className="relative px-4 py-4 border-t border-[#CBCCC9]" ref={popoverRef}>
           {/* Popover */}
           {popoverOpen && (
-            <div className="absolute bottom-full left-4 right-4 mb-2 bg-white rounded-xl shadow-lg border border-[#CBCCC9] z-50 overflow-hidden">
+            <div className="absolute bottom-full left-3 right-3 mb-2 bg-white rounded-xl shadow-lg border border-[#CBCCC9] z-50 overflow-hidden">
               {/* User info */}
               <div className="px-4 py-3 flex items-center gap-3">
                 <Avatar

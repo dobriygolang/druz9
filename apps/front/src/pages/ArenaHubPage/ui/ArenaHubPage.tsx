@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Flame, Trophy, Swords, Zap } from 'lucide-react'
 import { apiClient } from '@/shared/api/base'
@@ -7,6 +7,8 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Select } from '@/shared/ui/Select'
+import { ErrorState } from '@/shared/ui/ErrorState'
+import { useToast } from '@/shared/ui/Toast'
 
 const LEAGUE_COLORS: Record<string, string> = {
   ARENA_LEAGUE_BRONZE: 'text-[#cd7f32]',
@@ -25,6 +27,7 @@ const LEAGUE_LABELS: Record<string, string> = {
 
 export function ArenaHubPage() {
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [leaderboard, setLeaderboard] = useState<any[]>([])
   const [openMatches, setOpenMatches] = useState<any[]>([])
   const [queueStatus, setQueueStatus] = useState<any>(null)
@@ -32,17 +35,25 @@ export function ArenaHubPage() {
   const [joining, setJoining] = useState(false)
   const [topic, setTopic] = useState('')
   const [difficulty, setDifficulty] = useState('DIFFICULTY_MEDIUM')
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchData = useCallback(() => {
+    setError(null)
+    Promise.all([
+      apiClient.get('/api/v1/arena/leaderboard?limit=10').then(r => setLeaderboard((r.data as any).entries ?? [])),
+      apiClient.get('/api/v1/arena/open-matches?limit=5').then(r => setOpenMatches((r.data as any).matches ?? [])),
+      apiClient.get('/api/v1/arena/queue/status').then(r => {
+        const d = r.data as any
+        setQueueStatus(d)
+        setInQueue(d.status === 'IN_QUEUE')
+        if (d.match?.id) navigate(`/arena/${d.match.id}`)
+      }),
+    ]).catch(() => setError('Не удалось загрузить данные'))
+  }, [navigate])
 
   useEffect(() => {
-    apiClient.get('/api/v1/arena/leaderboard?limit=10').then(r => setLeaderboard((r.data as any).entries ?? [])).catch(() => {})
-    apiClient.get('/api/v1/arena/open-matches?limit=5').then(r => setOpenMatches((r.data as any).matches ?? [])).catch(() => {})
-    apiClient.get('/api/v1/arena/queue/status').then(r => {
-      const d = r.data as any
-      setQueueStatus(d)
-      setInQueue(d.status === 'IN_QUEUE')
-      if (d.match?.id) navigate(`/arena/${d.match.id}`)
-    }).catch(() => {})
-  }, [navigate])
+    fetchData()
+  }, [fetchData])
 
   const handleJoinQueue = async () => {
     setJoining(true)
@@ -50,14 +61,24 @@ export function ArenaHubPage() {
       const r = await apiClient.post('/api/v1/arena/queue/join', { topic, difficulty })
       const d = r.data as any
       setInQueue(true)
+      toast('Вы в очереди', 'success')
       if (d.match?.id) navigate(`/arena/${d.match.id}`)
-    } catch {} finally { setJoining(false) }
+    } catch {
+      toast('Не удалось встать в очередь', 'error')
+    } finally { setJoining(false) }
   }
 
   const handleLeaveQueue = async () => {
-    try { await apiClient.post('/api/v1/arena/queue/leave', {}) } catch {}
+    try {
+      await apiClient.post('/api/v1/arena/queue/leave', {})
+      toast('Вы вышли из очереди', 'info')
+    } catch {
+      toast('Ошибка выхода из очереди', 'error')
+    }
     setInQueue(false)
   }
+
+  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchData() }} />
 
   return (
     <div className="px-6 pt-4 pb-6 flex gap-4">

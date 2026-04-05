@@ -5,7 +5,9 @@ import { useState } from 'react'
 const TABS = [
   { id: 'people', label: 'People', href: '/community/people' },
   { id: 'events', label: 'Events', href: '/community/events' },
+  { id: 'circles', label: 'Circles', href: '/community/circles' },
   { id: 'map', label: 'Map', href: '/community/map' },
+  { id: 'vacancies', label: 'Вакансии', href: '/community/vacancies' },
 ]
 
 export function CommunityHubPage() {

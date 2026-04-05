@@ -809,6 +809,94 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/arena.v1.ArenaPlayerStatsResponse'
+    /api/v1/circles:
+        get:
+            tags:
+                - CircleService
+            operationId: CircleService_ListCircles
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.ListCirclesResponse'
+        post:
+            tags:
+                - CircleService
+            operationId: CircleService_CreateCircle
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/circle.v1.CreateCircleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.CircleResponse'
+    /api/v1/circles/{circleId}/join:
+        post:
+            tags:
+                - CircleService
+            operationId: CircleService_JoinCircle
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/circle.v1.JoinCircleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.JoinCircleResponse'
+    /api/v1/circles/{circleId}/leave:
+        post:
+            tags:
+                - CircleService
+            operationId: CircleService_LeaveCircle
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/circle.v1.LeaveCircleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.LeaveCircleResponse'
     /api/v1/code-editor/join:
         post:
             tags:
@@ -2113,6 +2201,77 @@ components:
                 failureKind:
                     type: integer
                     format: enum
+        circle.v1.Circle:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                creatorId:
+                    type: string
+                memberCount:
+                    type: integer
+                    format: uint32
+                tags:
+                    type: array
+                    items:
+                        type: string
+                isPublic:
+                    type: boolean
+                isJoined:
+                    type: boolean
+                createdAt:
+                    type: string
+                    format: date-time
+        circle.v1.CircleResponse:
+            type: object
+            properties:
+                circle:
+                    $ref: '#/components/schemas/circle.v1.Circle'
+        circle.v1.CreateCircleRequest:
+            type: object
+            properties:
+                name:
+                    type: string
+                description:
+                    type: string
+                tags:
+                    type: array
+                    items:
+                        type: string
+        circle.v1.JoinCircleRequest:
+            type: object
+            properties:
+                circleId:
+                    type: string
+        circle.v1.JoinCircleResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        circle.v1.LeaveCircleRequest:
+            type: object
+            properties:
+                circleId:
+                    type: string
+        circle.v1.LeaveCircleResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        circle.v1.ListCirclesResponse:
+            type: object
+            properties:
+                circles:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/circle.v1.Circle'
+                totalCount:
+                    type: integer
+                    format: int32
         code_editor.v1.CreateRoomRequest:
             type: object
             properties:
@@ -3876,6 +4035,7 @@ components:
 tags:
     - name: AdminService
     - name: ArenaService
+    - name: CircleService
     - name: CodeEditorService
     - name: EventService
     - name: GeoService

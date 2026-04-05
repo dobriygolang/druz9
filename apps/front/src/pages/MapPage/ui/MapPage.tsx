@@ -3,6 +3,7 @@ import { Search } from 'lucide-react'
 import { Map, Marker, type ViewStateChangeEvent } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { Avatar } from '@/shared/ui/Avatar'
+import { ErrorState } from '@/shared/ui/ErrorState'
 import { geoApi, type CommunityPoint } from '@/features/Geo/api/geoApi'
 import { ENV } from '@/shared/config/env'
 
@@ -11,6 +12,7 @@ const MAP_STYLE = `https://api.maptiler.com/maps/streets-v2/style.json?key=${ENV
 export function MapPage() {
   const [points, setPoints] = useState<CommunityPoint[]>([])
   const [search, setSearch] = useState('')
+  const [error, setError] = useState<string | null>(null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
   const [viewState, setViewState] = useState({
     longitude: 37.6,
@@ -18,9 +20,16 @@ export function MapPage() {
     zoom: 4,
   })
 
-  useEffect(() => {
-    geoApi.getCommunity().then(setPoints).catch(() => {})
+  const fetchPoints = useCallback(() => {
+    setError(null)
+    geoApi.getCommunity()
+      .then(setPoints)
+      .catch(() => setError('Не удалось загрузить данные'))
   }, [])
+
+  useEffect(() => {
+    fetchPoints()
+  }, [fetchPoints])
 
   const handleMove = useCallback((e: ViewStateChangeEvent) => {
     setViewState(e.viewState)
@@ -31,6 +40,8 @@ export function MapPage() {
     const name = `${p.firstName} ${p.lastName} ${p.username} ${p.region}`.toLowerCase()
     return name.includes(search.toLowerCase())
   })
+
+  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchPoints() }} />
 
   return (
     <div className="flex h-[calc(100vh-180px)] min-h-[500px]">

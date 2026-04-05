@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Calendar, Users, Briefcase, ChevronRight } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { eventApi, type Event } from '@/features/Event/api/eventApi'
+import { geoApi } from '@/features/Geo/api/geoApi'
 import { Card } from '@/shared/ui/Card'
 import { Avatar } from '@/shared/ui/Avatar'
+import { ErrorState } from '@/shared/ui/ErrorState'
+import { AnimatedNumber } from '@/shared/ui/AnimatedNumber'
 
 function formatDate(iso: string) {
   try {
@@ -15,13 +18,26 @@ function formatDate(iso: string) {
 export function HomePage() {
   const { user } = useAuth()
   const [events, setEvents] = useState<Event[]>([])
-  const [onlineCount] = useState(0)
+  const [onlineCount, setOnlineCount] = useState(0)
+  const [error, setError] = useState<string | null>(null)
 
-  useEffect(() => {
-    eventApi.listEvents({ limit: 3 }).then(r => setEvents(r.events)).catch(() => {})
+  const fetchData = useCallback(() => {
+    setError(null)
+    Promise.all([
+      eventApi.listEvents({ limit: 3 }).then(r => setEvents(r.events)),
+      geoApi.getCommunity().then(points => setOnlineCount(points.length)),
+    ]).catch(() => {
+      setError('Не удалось загрузить данные')
+    })
   }, [])
 
+  useEffect(() => {
+    fetchData()
+  }, [fetchData])
+
   const firstName = user?.firstName || user?.username || 'Иван'
+
+  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchData() }} />
 
   return (
     <div className="p-8 flex flex-col gap-6 min-h-full">
@@ -32,7 +48,7 @@ export function HomePage() {
             Добро пожаловать, {firstName}
           </h1>
           <p className="text-sm text-[#666666] font-geist mt-1">
-            Сегодня в сообществе {onlineCount || 12} человек онлайн
+            Сегодня в сообществе {onlineCount} человек онлайн
           </p>
         </div>
         <Avatar name={firstName} src={user?.avatarUrl || undefined} size="md" className="bg-[#FF8400]" />
@@ -41,15 +57,15 @@ export function HomePage() {
       {/* Metrics */}
       <div className="grid grid-cols-2 gap-4">
         {[
-          { label: 'Онлайн', value: onlineCount || 12, icon: <Users className="w-4 h-4 text-[#666666]" /> },
-          { label: 'Событий', value: events.length || 4, icon: <Calendar className="w-4 h-4 text-[#666666]" /> },
+          { label: 'Онлайн', value: onlineCount, icon: <Users className="w-4 h-4 text-[#666666]" /> },
+          { label: 'Событий', value: events.length, icon: <Calendar className="w-4 h-4 text-[#666666]" /> },
         ].map((m) => (
           <Card key={m.label} padding="lg" className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
               <span className="text-sm text-[#666666]">{m.label}</span>
               {m.icon}
             </div>
-            <span className="font-mono text-[32px] font-bold text-[#111111] leading-none">{m.value}</span>
+            <span className="font-mono text-[32px] font-bold text-[#111111] leading-none"><AnimatedNumber value={m.value} /></span>
           </Card>
         ))}
       </div>
@@ -92,7 +108,7 @@ export function HomePage() {
         </Card>
 
         {/* Vacancies teaser */}
-        <Link to="/vacancies" className="w-[340px] flex-shrink-0 no-underline">
+        <Link to="/community/vacancies" className="w-[340px] flex-shrink-0 no-underline">
           <Card className="h-full flex flex-col items-center justify-center gap-3 hover:border-[#FF8400] transition-colors cursor-pointer" padding="lg">
             <div className="w-12 h-12 rounded-full bg-[#fff7ed] flex items-center justify-center">
               <Briefcase className="w-6 h-6 text-[#FF8400]" />

@@ -5,6 +5,7 @@ import (
 
 	"api/internal/closer"
 	arenadata "api/internal/data/arena"
+	circledata "api/internal/data/circle"
 	codeeditordata "api/internal/data/code_editor"
 	eventdata "api/internal/data/event"
 	geodata "api/internal/data/geo"
@@ -23,6 +24,7 @@ type storageContext struct {
 	geoClient      *geodata.Client
 	profileRepo    *profiledata.Repo
 	eventRepo      *eventdata.Repo
+	circleRepo     *circledata.Repo
 	podcastRepo    *podcastdata.Repo
 	referralRepo   referraldomainservice.Repository
 	codeEditorRepo *codeeditordata.Repo
@@ -73,6 +75,7 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 		geoClient:      geodata.NewClient(bootstrap.cfg, store, bootstrap.kratosLogger),
 		profileRepo:    profiledata.NewRepo(store, bootstrap.kratosLogger),
 		eventRepo:      eventdata.NewRepo(store, bootstrap.kratosLogger),
+		circleRepo:     circledata.NewRepo(store, bootstrap.kratosLogger),
 		podcastRepo:    podcastdata.NewRepo(store, bootstrap.kratosLogger),
 		referralRepo:   referraldata.NewRepo(store, bootstrap.kratosLogger),
 		codeEditorRepo: codeeditordata.NewRepo(store, bootstrap.kratosLogger),
