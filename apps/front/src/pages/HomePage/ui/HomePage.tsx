@@ -1,33 +1,61 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useLocation } from 'react-router-dom';
-import { ArrowRight, CalendarDays, Clock3, Code2, Orbit, PlayCircle, Sparkles, Trophy, Users } from 'lucide-react';
+import { Link } from 'react-router-dom';
+import { Orbit } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
-import { usePodcast } from '@/app/providers/PodcastProvider';
 import { Circle } from '@/entities/Circle/model/types';
-import { CommunityEvent, CommunityMapPoint, Podcast } from '@/entities/User/model/types';
+import { CommunityEvent, CommunityMapPoint } from '@/entities/User/model/types';
 import { circleApi } from '@/features/Circle/api/circleApi';
 import { eventApi } from '@/features/Event/api/eventApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
-import { podcastApi } from '@/features/Podcast/api/podcastApi';
 
 function formatDate(value: string) {
-  return new Intl.DateTimeFormat('ru-RU', {
+  const formatter = new Intl.DateTimeFormat('ru-RU', {
+    weekday: 'short',
     day: 'numeric',
     month: 'short',
     hour: '2-digit',
     minute: '2-digit',
-  }).format(new Date(value));
+  });
+
+  const parts = formatter.formatToParts(new Date(value));
+  const lookup = Object.fromEntries(parts.filter((part) => part.type !== 'literal').map((part) => [part.type, part.value]));
+  const weekday = lookup.weekday ? `${lookup.weekday.replace('.', '').charAt(0).toUpperCase()}${lookup.weekday.replace('.', '').slice(1)}` : '';
+  const month = lookup.month?.replace('.', '') || '';
+
+  return `${weekday}, ${lookup.day} ${month} · ${lookup.hour}:${lookup.minute}`;
+}
+
+function formatParticipantLabel(value: number) {
+  const mod10 = value % 10;
+  const mod100 = value % 100;
+
+  if (mod10 === 1 && mod100 !== 11) {
+    return `${value} участник`;
+  }
+
+  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) {
+    return `${value} участника`;
+  }
+
+  return `${value} участников`;
+}
+
+function getInitials(firstName?: string, lastName?: string, username?: string) {
+  const first = firstName?.trim().charAt(0);
+  const last = lastName?.trim().charAt(0);
+  if (first || last) {
+    return `${first ?? ''}${last ?? ''}`.toUpperCase();
+  }
+
+  return username?.trim().slice(0, 2).toUpperCase() || 'U';
 }
 
 export const HomePage: React.FC = () => {
-  const location = useLocation();
   const { user } = useAuth();
-  const { currentPodcast, isPlaying, playPodcast } = usePodcast();
   const [users, setUsers] = useState<CommunityMapPoint[]>([]);
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [circles, setCircles] = useState<Circle[]>([]);
-  const [podcasts, setPodcasts] = useState<Podcast[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
@@ -36,20 +64,18 @@ export const HomePage: React.FC = () => {
     const load = async () => {
       try {
         setIsLoading(true);
-        const [nextUsers, nextEvents, nextCircles, nextPodcasts] = await Promise.all([
+        const [nextUsers, nextEvents, nextCircles] = await Promise.all([
           geoApi.communityMap(),
           eventApi.list(),
           circleApi.list({
             currentUserId: user?.id,
             currentUserRegion: user?.region,
           }),
-          podcastApi.list({ limit: 4 }),
         ]);
         if (!cancelled) {
           setUsers(nextUsers);
           setEvents(nextEvents);
           setCircles(nextCircles);
-          setPodcasts(nextPodcasts);
         }
       } catch (error) {
         console.error('Failed to load home dashboard', error);
@@ -77,174 +103,73 @@ export const HomePage: React.FC = () => {
   const joinedCircles = circles.filter((circle) => circle.joined).slice(0, 3);
   const topCircles = (joinedCircles.length > 0 ? joinedCircles : circles).slice(0, 3);
   const onlineCount = users.filter((item) => item.activityStatus === 'online').length;
-
-  useEffect(() => {
-    if (location.hash !== '#broadcast') {
-      return;
-    }
-    const target = document.getElementById('broadcast');
-    if (!target) {
-      return;
-    }
-    requestAnimationFrame(() => {
-      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    });
-  }, [location.hash, podcasts.length]);
+  const userName = user?.firstName || user?.username || 'друг';
+  const initials = getInitials(user?.firstName, user?.lastName, user?.username);
 
   return (
-    <div className="home-page fade-in">
-      <section className="home-hero">
-        <div className="home-hero__copy">
-          <span className="home-hero__eyebrow">Home</span>
-          <h1>Главное рядом</h1>
+    <div className="home-dashboard fade-in">
+      <header className="home-dashboard__header">
+        <div className="home-dashboard__title">
+          <h1>Добро пожаловать, {userName}</h1>
           <p>
-            Ближайшие события, люди, circles и подкасты собраны на одном экране, чтобы ты быстро понял, куда идти дальше.
+            {isLoading ? 'Загружаем сводку сообщества...' : `Сегодня в сообществе ${onlineCount} человек онлайн`}
           </p>
         </div>
+        <div className="home-dashboard__avatar" aria-hidden="true">{initials}</div>
+      </header>
 
-        <div className="home-hero__metrics">
-          <div className="home-metric home-metric--online">
-            <span>Онлайн</span>
-            <strong>{isLoading ? '...' : onlineCount}</strong>
-          </div>
-          <div className="home-metric home-metric--events">
-            <span>Ближайшие events</span>
-            <strong>{isLoading ? '...' : upcomingEvents.length}</strong>
-          </div>
-          <div className="home-metric home-metric--circles">
-            <span>Активные circles</span>
-            <strong>{isLoading ? '...' : circles.length}</strong>
-          </div>
-        </div>
+      <section className="home-dashboard__metrics" aria-label="Ключевые показатели">
+        <article className="home-dashboard__metric">
+          <span>Онлайн</span>
+          <strong>{isLoading ? '...' : onlineCount}</strong>
+        </article>
+        <article className="home-dashboard__metric">
+          <span>Событий</span>
+          <strong>{isLoading ? '...' : events.length}</strong>
+        </article>
+        <article className="home-dashboard__metric">
+          <span>Circles</span>
+          <strong>{isLoading ? '...' : circles.length}</strong>
+        </article>
       </section>
 
-      <section className="home-clusters">
-        <Link to="/community/people" className="home-cluster-card home-cluster-card--community">
-          <Users size={22} />
-          <div>
-            <strong>Community</strong>
-            <p>Люди, события, карта и circles.</p>
+      <section className="home-dashboard__content">
+        <article className="home-dashboard__panel">
+          <div className="home-dashboard__panel-head">
+            <h2>Ближайшие события</h2>
+            <Link to="/community/events">Все →</Link>
           </div>
-          <ArrowRight size={18} />
-        </Link>
-
-        <Link to="/practice/code-rooms" className="home-cluster-card home-cluster-card--practice">
-          <Code2 size={22} />
-          <div>
-            <strong>Practice</strong>
-            <p>Code rooms, arena и практика кода.</p>
-          </div>
-          <ArrowRight size={18} />
-        </Link>
-
-        <Link to="/growth/interview-prep" className="home-cluster-card home-cluster-card--growth">
-          <Sparkles size={22} />
-          <div>
-            <strong>Growth</strong>
-            <p>Подготовка к интервью и вакансии.</p>
-          </div>
-          <ArrowRight size={18} />
-        </Link>
-      </section>
-
-      <section className="home-grid">
-        <article className="home-panel home-panel--events">
-          <div className="home-panel__head">
-            <div>
-              <span>Upcoming</span>
-              <h2>События рядом</h2>
-            </div>
-            <Link to="/community/events">Открыть</Link>
-          </div>
-          <div className="home-list">
+          <div className="home-dashboard__list">
             {upcomingEvents.length > 0 ? upcomingEvents.map((event) => (
-              <div key={event.id} className="home-list__item">
-                <div>
-                  <strong>{event.title}</strong>
-                  <span>{formatDate(event.scheduled_at)}</span>
-                </div>
-                <div className="home-list__meta">
-                  <CalendarDays size={14} />
-                  <span>{event.region || 'Online'}</span>
-                </div>
-              </div>
-            )) : <div className="home-empty">Пока нет ближайших событий.</div>}
+              <Link key={event.id} to="/community/events" className="home-dashboard__list-item">
+                <strong>{event.title}</strong>
+                <span className="home-dashboard__event-meta">{formatDate(event.scheduled_at)} · {event.place_label || event.region || 'Online'}</span>
+              </Link>
+            )) : (
+              <div className="home-dashboard__empty">Пока нет ближайших событий.</div>
+            )}
           </div>
         </article>
 
-        <article className="home-panel home-panel--circles">
-          <div className="home-panel__head">
-            <div>
-              <span>Circles</span>
-              <h2>Мини-комьюнити</h2>
-            </div>
-            <Link to="/community/circles">Все circles</Link>
+        <article className="home-dashboard__panel home-dashboard__panel--circles">
+          <div className="home-dashboard__panel-head">
+            <h2>Мои Circles</h2>
+            <Link to="/community/circles">Все →</Link>
           </div>
-          <div className="home-circle-list">
+          <div className="home-dashboard__list">
             {topCircles.length > 0 ? topCircles.map((circle) => (
-              <Link key={circle.id} to="/community/circles" className="home-circle-card">
-                <div>
+              <Link key={circle.id} to="/community/circles" className="home-dashboard__circle-item">
+                <span className="home-dashboard__circle-icon" aria-hidden="true">
+                  <Orbit size={15} />
+                </span>
+                <div className="home-dashboard__circle-copy">
                   <strong>{circle.name}</strong>
-                  <span>{circle.memberCount} участников • {circle.visibility === 'open' ? 'открытый' : 'закрытый'}</span>
-                </div>
-                <div className="home-circle-card__meta">
-                  <Orbit size={14} />
-                  <span>{circle.hubLabel}</span>
+                  <span>{formatParticipantLabel(circle.memberCount)}</span>
                 </div>
               </Link>
-            )) : <div className="home-empty">Circles пока не собраны.</div>}
-          </div>
-        </article>
-
-        <article className="home-panel home-panel--arena">
-          <div className="home-panel__head">
-            <div>
-              <span>Arena</span>
-              <h2>Арена</h2>
-            </div>
-            <Link to="/practice/arena">Открыть</Link>
-          </div>
-          <div className="home-arena-card">
-            <Trophy size={22} />
-            <div>
-              <strong>Рейтинг и быстрые матчи</strong>
-              <p>Открывай арену, если хочешь сыграть дуэль или посмотреть таблицу лидеров.</p>
-            </div>
-          </div>
-        </article>
-
-        <article className="home-panel home-panel--broadcast" id="broadcast">
-          <div className="home-panel__head">
-            <div>
-              <span>Broadcast</span>
-              <h2>Подкасты и короткие апдейты</h2>
-            </div>
-            <a href="#broadcast">Слушать</a>
-          </div>
-          <div className="home-list">
-            {podcasts.length > 0 ? podcasts.slice(0, 3).map((podcast) => {
-              const isActive = currentPodcast?.id === podcast.id;
-              return (
-                <button
-                  key={podcast.id}
-                  type="button"
-                  className={`home-podcast-card ${isActive ? 'is-active' : ''}`}
-                  onClick={() => void playPodcast(podcast)}
-                >
-                  <div className="home-podcast-card__icon">
-                    <PlayCircle size={18} />
-                  </div>
-                  <div>
-                    <strong>{podcast.title}</strong>
-                    <span>{podcast.author_name}</span>
-                  </div>
-                  <div className="home-list__meta">
-                    <Clock3 size={14} />
-                    <span>{isActive && isPlaying ? 'Играет' : `${Math.max(1, Math.round(podcast.duration_seconds / 60))} мин`}</span>
-                  </div>
-                </button>
-              );
-            }) : <div className="home-empty">Подкастов пока нет.</div>}
+            )) : (
+              <div className="home-dashboard__empty">У тебя пока нет circles.</div>
+            )}
           </div>
         </article>
       </section>

@@ -5,6 +5,7 @@ import { geoApi } from '@/features/Geo/api/geoApi';
 import {
   ArrowRight,
   BarChart2,
+  ChevronDown,
   Code2,
   Headphones,
   Home,
@@ -19,9 +20,10 @@ import {
 
 interface SidebarProps {
   isAdmin?: boolean;
+  isHome?: boolean;
 }
 
-export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false }) => {
+export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = false }) => {
   const { logout, isAuthenticated, user } = useAuth();
   const [onlineCount, setOnlineCount] = useState<number | null>(null);
 
@@ -47,34 +49,47 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false }) => {
   const textSecondary = isAdmin ? '#64748b' : 'var(--text-secondary)';
   const bgSurface    = isAdmin ? '#f1f5f9' : 'var(--surface-color)';
   const accentColor  = '#6366f1';
+  const homeDisplayName = [user?.firstName, user?.lastName].filter(Boolean).join(' ') || user?.username || 'Профиль';
+  const homeSecondaryText = user?.username ? `@${user.username}` : (user?.region || (onlineCount !== null ? `${onlineCount} онлайн` : 'Аккаунт активен'));
 
   return (
-    <aside className={`sidebar-desktop${isAdmin ? ' sidebar-desktop--admin' : ''}`}>
+    <aside className={`sidebar-desktop${isAdmin ? ' sidebar-desktop--admin' : ''}${isHome ? ' sidebar-desktop--home' : ''}`}>
       <div className="sidebar-desktop__brand">
-        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ fontWeight: '700', fontSize: '20px', letterSpacing: '1px', color: textPrimary }}>
-            Друзья
+        {isHome ? (
+          <div className="sidebar-desktop__brand-home">
+            <div className="sidebar-desktop__brand-home-mark" aria-hidden="true">
+              <span />
+            </div>
+            <span className="sidebar-desktop__brand-home-label">LUNARIS</span>
           </div>
-          <span style={{
-            fontSize: '11px',
-            color: textSecondary,
-            fontWeight: '500',
-            background: isAdmin ? '#f1f5f9' : 'rgba(255,255,255,0.05)',
-            padding: '2px 6px',
-            borderRadius: '6px',
-          }}>
-            v1.5.2
-          </span>
-        </div>
-        {isAuthenticated && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '12px' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
-              <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)', animation: 'pulse 2s infinite' }} />
-              <span style={{ color: textPrimary, fontWeight: '600' }}>
-                {onlineCount !== null ? `${onlineCount} онлайн` : (user?.activityStatus === 'online' ? 'Вы онлайн' : 'Аккаунт активен')}
+        ) : (
+          <>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+              <div style={{ fontWeight: '700', fontSize: '20px', letterSpacing: '1px', color: textPrimary }}>
+                Друзья
+              </div>
+              <span style={{
+                fontSize: '11px',
+                color: textSecondary,
+                fontWeight: '500',
+                background: isAdmin ? '#f1f5f9' : 'rgba(255,255,255,0.05)',
+                padding: '2px 6px',
+                borderRadius: '6px',
+              }}>
+                v1.5.2
               </span>
             </div>
-          </div>
+            {isAuthenticated && (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '6px', marginTop: '12px' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px' }}>
+                  <div style={{ width: '8px', height: '8px', borderRadius: '50%', background: '#10B981', boxShadow: '0 0 10px rgba(16, 185, 129, 0.4)', animation: 'pulse 2s infinite' }} />
+                  <span style={{ color: textPrimary, fontWeight: '600' }}>
+                    {onlineCount !== null ? `${onlineCount} онлайн` : (user?.activityStatus === 'online' ? 'Вы онлайн' : 'Аккаунт активен')}
+                  </span>
+                </div>
+              </div>
+            )}
+          </>
         )}
       </div>
 
@@ -87,7 +102,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false }) => {
                 <NavItem to="/community/people" icon={<Users size={20} />} label="Community" isAdmin={isAdmin} />
                 <NavItem to="/practice/code-rooms" icon={<Code2 size={20} />} label="Practice" isAdmin={isAdmin} />
                 <NavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" isAdmin={isAdmin} />
-                <div style={{ height: '32px' }} />
+                <NavItem to="/home" icon={<Headphones size={20} />} label="Подкасты" isAdmin={isAdmin} />
+                <NavItem to="/practice/arena" icon={<Sword size={20} />} label="Arena" isAdmin={isAdmin} />
+                {!isHome && <div style={{ height: '32px' }} />}
               </>
             )}
 
@@ -109,7 +126,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false }) => {
               </>
             )}
 
-            {!isAdmin && user?.isAdmin && (
+            {!isAdmin && !isHome && user?.isAdmin && (
               <>
                 <div className="sidebar-section-title" style={{ color: textSecondary }}>Админ</div>
                 <NavItem to="/admin/code-tasks" icon={<Code2 size={20} />} label="Задачи" isAdmin={isAdmin} />
@@ -119,10 +136,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false }) => {
               </>
             )}
 
-            {!isAdmin && (
+            {!isAdmin && !isHome && (
               <>
                 <NavItem to="/profile" icon={<UserIcon size={20} />} label="Профиль" isAdmin={isAdmin} />
-                <NavItem to="/home#broadcast" icon={<Headphones size={20} />} label="Подкасты" isAdmin={isAdmin} />
               </>
             )}
 
@@ -182,7 +198,19 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false }) => {
         )}
       </nav>
 
-      {isAuthenticated && (
+      {isAuthenticated && isHome && !isAdmin ? (
+        <div className="sidebar-desktop__footer sidebar-desktop__footer--home">
+          <NavLink to="/profile" className="sidebar-desktop__home-profile">
+            <div className="sidebar-desktop__home-profile-copy">
+              <strong>{homeDisplayName}</strong>
+              <span>{homeSecondaryText}</span>
+            </div>
+            <span className="sidebar-desktop__home-profile-chevron" aria-hidden="true">
+              <ChevronDown size={18} />
+            </span>
+          </NavLink>
+        </div>
+      ) : isAuthenticated ? (
         <div className="sidebar-desktop__footer">
           <button
             type="button"
@@ -205,7 +233,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false }) => {
             <span style={{ display: 'block' }}>Выйти</span>
           </button>
         </div>
-      )}
+      ) : null}
     </aside>
   );
 };

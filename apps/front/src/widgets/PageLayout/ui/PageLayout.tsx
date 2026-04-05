@@ -11,6 +11,7 @@ export const PageLayout: React.FC = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
   const { currentPodcast } = usePodcast();
+  const isHomeRoute = location.pathname === '/home';
   const isCodeRoom = /^\/code-rooms\/[^/]+$/.test(location.pathname);
   const isArenaMatch = /^\/arena\/[^/]+$/.test(location.pathname);
   const isInterviewPrepSession = /^\/interview-prep\/[^/]+$/.test(location.pathname) || /^\/growth\/interview-prep\/[^/]+$/.test(location.pathname);
@@ -24,12 +25,12 @@ export const PageLayout: React.FC = () => {
     ? 'content-wrapper content-wrapper-code-room'
     : isCodeTasksAdmin || isCodeRoom || isInterviewPrepSession || isInterviewPrepMock
       ? 'content-wrapper content-wrapper-wide'
-      : 'content-wrapper';
+      : `content-wrapper${isHomeRoute ? ' content-wrapper--home' : ''}`;
 
   return (
-    <div className={`app-container${isAdminRoute ? ' app-container--admin' : ''}`}>
-      {showShell && <Sidebar isAdmin={isAdminRoute} />}
-      <main className={isCodeRoom || isArenaMatch || isInterviewPrepSession || isInterviewPrepMock ? 'main-content main-content-code-room' : `main-content${isAdminRoute ? ' main-content--admin' : ''}`}>
+    <div className={`app-container${isAdminRoute ? ' app-container--admin' : ''}${isHomeRoute ? ' app-container--home' : ''}`}>
+      {showShell && <Sidebar isAdmin={isAdminRoute} isHome={isHomeRoute} />}
+      <main className={isCodeRoom || isArenaMatch || isInterviewPrepSession || isInterviewPrepMock ? 'main-content main-content-code-room' : `main-content${isAdminRoute ? ' main-content--admin' : ''}${isHomeRoute ? ' main-content--home' : ''}`}>
         <div className={contentClassName}>
           <Outlet />
         </div>
