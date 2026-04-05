@@ -138,7 +138,6 @@ export const RouterProvider: React.FC = () => {
             </Route>
 
             <Route path="/practice" element={<PracticeHubPage />}>
-              <Route index element={<Navigate to="code-rooms" replace />} />
               <Route
                 path="code-rooms"
                 element={(

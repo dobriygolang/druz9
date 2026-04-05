@@ -13,6 +13,8 @@ export const PageLayout: React.FC = () => {
   const { currentPodcast } = usePodcast();
   const isHomeRoute = location.pathname === '/home';
   const isCommunityRoute = location.pathname.startsWith('/community');
+  const isPracticeRoute = location.pathname.startsWith('/practice');
+  const isHubRoute = isCommunityRoute || isPracticeRoute;
   const isLightShellRoute = isHomeRoute;
   const isCodeRoom = /^\/code-rooms\/[^/]+$/.test(location.pathname);
   const isArenaMatch = /^\/arena\/[^/]+$/.test(location.pathname);
@@ -27,14 +29,14 @@ export const PageLayout: React.FC = () => {
     ? 'content-wrapper content-wrapper-code-room'
     : isCodeTasksAdmin || isCodeRoom || isInterviewPrepSession || isInterviewPrepMock
       ? 'content-wrapper content-wrapper-wide'
-      : isCommunityRoute
+      : isHubRoute
         ? 'content-wrapper content-wrapper--community'
       : `content-wrapper${isLightShellRoute ? ' content-wrapper--home' : ''}`;
 
   return (
-    <div className={`app-container${isAdminRoute ? ' app-container--admin' : ''}${isLightShellRoute ? ' app-container--home' : ''}${isCommunityRoute ? ' app-container--community' : ''}`}>
-      {showShell && <Sidebar isAdmin={isAdminRoute} isHome={isLightShellRoute} isCommunity={isCommunityRoute} />}
-      <main className={isCodeRoom || isArenaMatch || isInterviewPrepSession || isInterviewPrepMock ? 'main-content main-content-code-room' : `main-content${isAdminRoute ? ' main-content--admin' : ''}${isLightShellRoute ? ' main-content--home' : ''}${isCommunityRoute ? ' main-content--community' : ''}`}>
+    <div className={`app-container${isAdminRoute ? ' app-container--admin' : ''}${isLightShellRoute ? ' app-container--home' : ''}${isHubRoute ? ' app-container--community' : ''}`}>
+      {showShell && <Sidebar isAdmin={isAdminRoute} isHome={isLightShellRoute} isCommunity={isHubRoute} />}
+      <main className={isCodeRoom || isArenaMatch || isInterviewPrepSession || isInterviewPrepMock ? 'main-content main-content-code-room' : `main-content${isAdminRoute ? ' main-content--admin' : ''}${isLightShellRoute ? ' main-content--home' : ''}${isHubRoute ? ' main-content--community' : ''}`}>
         <div className={contentClassName}>
           <Outlet />
         </div>

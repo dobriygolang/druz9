@@ -114,7 +114,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isAdmin = false, isHome = fals
               <>
                 <NavItem to="/home" icon={<Home size={20} />} label="Home" isAdmin={isAdmin} variant={variant} />
                 <NavItem to="/community/people" icon={<Users size={20} />} label="Community" isAdmin={isAdmin} variant={variant} />
-                <NavItem to="/practice/code-rooms" icon={<Code2 size={20} />} label="Practice" isAdmin={isAdmin} variant={variant} />
+                <NavItem to="/practice" icon={<Code2 size={20} />} label="Practice" isAdmin={isAdmin} variant={variant} />
                 <NavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" isAdmin={isAdmin} variant={variant} />
                 {!isCommunity && (
                   <>

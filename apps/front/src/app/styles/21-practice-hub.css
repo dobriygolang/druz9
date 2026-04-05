@@ -1,0 +1,509 @@
+.practice-overview {
+  display: grid;
+  gap: 20px;
+  min-height: 0;
+  align-content: start;
+  align-items: start;
+}
+
+.practice-overview__header {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 24px;
+  padding: 20px 24px 0;
+}
+
+.practice-overview__title-block {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-overview__title-block h1 {
+  margin: 0;
+  color: #111111;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 28px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.practice-overview__title-block p {
+  margin: 0;
+  color: #666666;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 12px;
+  line-height: 1.35;
+}
+
+.practice-overview__actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.practice-overview__stats {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.practice-overview__stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #666666;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 11px;
+  line-height: 1;
+}
+
+.practice-overview__stat--green {
+  color: #4f7a53;
+}
+
+.practice-overview__dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: #23c16b;
+}
+
+.practice-overview__cta {
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 0 16px;
+  border-radius: 999px;
+  background: #ff8400;
+  color: #111111;
+  text-decoration: none;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.practice-overview__tabs {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 24px 14px;
+  border-bottom: 1px solid #cbccc9;
+}
+
+.practice-overview__tab {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 12px;
+  border-radius: 999px;
+  color: #666666;
+  text-decoration: none;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 11px;
+  line-height: 1;
+  background: #e7e8e5;
+}
+
+.practice-overview__tab.is-active {
+  background: #cbccc9;
+  color: #111111;
+}
+
+.practice-overview__body,
+.practice-overview__nested {
+  width: 100%;
+  display: grid;
+  gap: 20px;
+  padding: 0 24px 24px;
+  align-self: start;
+}
+
+.practice-overview__modes {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.practice-mode-panel {
+  min-height: 148px;
+  display: grid;
+  align-content: start;
+  gap: 10px;
+  padding: 14px;
+  border-radius: 8px;
+  text-decoration: none;
+  position: relative;
+}
+
+.practice-mode-panel--rooms {
+  border: 1px solid #cbccc9;
+  background: #ffffff;
+}
+
+.practice-mode-panel--arena {
+  background: #1a2030;
+}
+
+.practice-mode-panel--mock {
+  background: #221a35;
+}
+
+.practice-mode-panel__top {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.practice-mode-panel__pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 16px;
+  padding: 1px 6px;
+  border-radius: 999px;
+  background: #dfe3ff;
+  color: #5163d6;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1;
+}
+
+.practice-mode-panel__pill--amber {
+  background: rgba(255, 193, 7, 0.16);
+  color: #f7c93b;
+}
+
+.practice-mode-panel__pill--violet {
+  background: rgba(149, 96, 255, 0.22);
+  color: #b89bff;
+}
+
+.practice-mode-panel__icon {
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.practice-mode-panel--rooms .practice-mode-panel__icon {
+  color: #ffb648;
+}
+
+.practice-mode-panel--arena .practice-mode-panel__icon {
+  color: #7db0ff;
+}
+
+.practice-mode-panel--mock .practice-mode-panel__icon {
+  color: #b89bff;
+}
+
+.practice-mode-panel h2 {
+  margin: 0;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 13px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.practice-mode-panel p {
+  margin: 0;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.practice-mode-panel--rooms h2,
+.practice-mode-panel--rooms p {
+  color: #111111;
+}
+
+.practice-mode-panel--arena h2,
+.practice-mode-panel--arena p,
+.practice-mode-panel--mock h2,
+.practice-mode-panel--mock p {
+  color: #ffffff;
+}
+
+.practice-mode-panel__meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  color: #8b90a0;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 10px;
+  line-height: 1;
+}
+
+.practice-mode-panel--rooms .practice-mode-panel__meta {
+  color: #666666;
+}
+
+.practice-mode-panel__meta span {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.practice-mode-panel__link,
+.practice-mode-panel__button {
+  margin-top: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  text-decoration: none;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.practice-mode-panel__link {
+  color: #ff8400;
+}
+
+.practice-mode-panel__link--light {
+  color: #ffffff;
+}
+
+.practice-mode-panel__button {
+  min-height: 30px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: #ffb648;
+  color: #111111;
+  justify-self: start;
+}
+
+.practice-overview__columns {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 230px;
+  gap: 16px;
+}
+
+.practice-activity-card,
+.practice-side-card {
+  border: 1px solid #cbccc9;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.practice-activity-card {
+  min-height: 254px;
+}
+
+.practice-activity-card__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px 10px;
+}
+
+.practice-activity-card__head h3,
+.practice-side-card h3 {
+  margin: 0;
+  color: #111111;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.practice-activity-card__head a {
+  color: #ff8400;
+  text-decoration: none;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 10px;
+}
+
+.practice-activity-card__rows {
+  display: grid;
+}
+
+.practice-activity-row {
+  display: grid;
+  grid-template-columns: 34px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 16px;
+  border-top: 1px solid #ecece8;
+}
+
+.practice-activity-row__tone {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 16px;
+  border-radius: 3px;
+  font-family: 'Geist Mono', 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.practice-activity-row__tone--easy {
+  background: #e5f7eb;
+  color: #23a55a;
+}
+
+.practice-activity-row__tone--medium {
+  background: #fff2df;
+  color: #ff8400;
+}
+
+.practice-activity-row__tone--hard {
+  background: #ffe6e4;
+  color: #e24a3b;
+}
+
+.practice-activity-row__copy {
+  min-width: 0;
+  display: grid;
+  gap: 2px;
+}
+
+.practice-activity-row__copy strong {
+  color: #111111;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.practice-activity-row__copy span,
+.practice-activity-row__badge {
+  color: #8a8f98;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 10px;
+}
+
+.practice-overview__side {
+  display: grid;
+  gap: 12px;
+  align-content: start;
+}
+
+.practice-side-card {
+  display: grid;
+  gap: 12px;
+  padding: 14px;
+}
+
+.practice-focus-list {
+  display: grid;
+  gap: 10px;
+}
+
+.practice-focus-item {
+  display: grid;
+  gap: 6px;
+}
+
+.practice-focus-item__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: #666666;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 10px;
+}
+
+.practice-focus-item__top strong {
+  color: #111111;
+  font-weight: 600;
+}
+
+.practice-focus-item__track {
+  height: 6px;
+  border-radius: 999px;
+  background: #ecece8;
+  overflow: hidden;
+}
+
+.practice-focus-item__track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #ff8400;
+}
+
+.practice-side-card--accent {
+  gap: 8px;
+}
+
+.practice-side-card__kicker {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  color: #ff8400;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.practice-side-card--accent strong {
+  color: #111111;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.practice-side-card--accent p {
+  margin: 0;
+  color: #666666;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 10px;
+  line-height: 1.45;
+}
+
+.practice-side-card__button {
+  min-height: 28px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0 10px;
+  border-radius: 8px;
+  background: #ff8400;
+  color: #111111;
+  text-decoration: none;
+  font-family: 'Manrope', var(--font-main);
+  font-size: 11px;
+  font-weight: 600;
+  justify-self: start;
+}
+
+@media (max-width: 1180px) {
+  .practice-overview__modes {
+    grid-template-columns: 1fr;
+  }
+
+  .practice-overview__columns {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .practice-overview__header {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .practice-overview__actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .practice-overview__stats {
+    justify-content: flex-start;
+  }
+
+  .practice-overview__tabs {
+    overflow-x: auto;
+  }
+}

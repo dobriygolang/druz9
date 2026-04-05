@@ -24,7 +24,7 @@ export const BottomNav: React.FC = () => {
       <nav className="bottom-nav-mobile">
         <BottomNavItem to="/home" icon={<Home size={20} />} label="Home" />
         <BottomNavItem to="/community/people" icon={<Users size={20} />} label="Community" />
-        <BottomNavItem to="/practice/code-rooms" icon={<Code2 size={20} />} label="Practice" />
+        <BottomNavItem to="/practice" icon={<Code2 size={20} />} label="Practice" />
         <BottomNavItem to="/growth/interview-prep" icon={<Sparkles size={20} />} label="Growth" />
         <button
           type="button"
