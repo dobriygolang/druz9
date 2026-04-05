@@ -20,6 +20,17 @@ apiClient.interceptors.request.use((config) => {
   return config
 })
 
+apiClient.interceptors.response.use(
+  res => res,
+  (err: AxiosError) => {
+    if (err.response?.status === 401) {
+      // Clear stale Bearer token if present — cookies remain untouched
+      localStorage.removeItem('authToken')
+    }
+    return Promise.reject(err)
+  },
+)
+
 export function withGuestArenaHeaders(actorId?: string, guestName?: string) {
   const headers: Record<string, string> = {}
   if (actorId) headers['X-Arena-Guest-Id'] = actorId

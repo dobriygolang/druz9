@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Outlet, useLocation, Link, useNavigate } from 'react-router-dom'
-import { Code2, Swords, Target } from 'lucide-react'
+import { Outlet, useLocation, Link } from 'react-router-dom'
 import { cn } from '@/shared/lib/cn'
 import { Avatar } from '@/shared/ui/Avatar'
 import { apiClient } from '@/shared/api/base'
@@ -21,7 +20,6 @@ interface LeaderboardUser {
 
 export function PracticeHubPage() {
   const location = useLocation()
-  const navigate = useNavigate()
   const active = TABS.find(t => location.pathname.startsWith(t.href))?.id ?? 'code-rooms'
 
   const [leaders, setLeaders] = useState<LeaderboardUser[]>([])
@@ -47,38 +45,6 @@ export function PracticeHubPage() {
             <h1 className="text-2xl font-bold text-[#111111]">Practice</h1>
             <p className="text-sm text-[#666666] mt-0.5">Практикуйся и соревнуйся с другими</p>
           </div>
-        </div>
-
-        {/* Mode quick links */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
-          {[
-            { icon: Code2, title: 'Code Rooms', sub: 'Совместный кодинг', href: '/practice/code-rooms', color: '#6366F1' },
-            { icon: Swords, title: 'Arena Duels', sub: '1-на-1 за ELO', href: '/practice/arena', color: '#6366F1' },
-            { icon: Target, title: 'Solo Practice', sub: 'В своём темпе', href: '/practice/solo', color: '#6366F1' },
-          ].map(f => {
-            const Icon = f.icon
-            const isAct = location.pathname.startsWith(f.href)
-            return (
-              <button
-                key={f.title}
-                onClick={() => navigate(f.href)}
-                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all text-left ${
-                  isAct
-                    ? 'bg-white border-[#6366F1] shadow-sm'
-                    : 'bg-white border-[#CBCCC9] hover:border-[#6366F1]/40 hover:shadow-sm'
-                }`}
-              >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isAct ? 'bg-[#EEF2FF]' : 'bg-[#F2F3F0]'}`}>
-                  <Icon className="w-4 h-4 text-[#6366F1]" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#111111] leading-tight">{f.title}</p>
-                  <p className="text-xs text-[#666666] leading-tight mt-0.5">{f.sub}</p>
-                </div>
-                {isAct && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#6366F1] flex-shrink-0" />}
-              </button>
-            )
-          })}
         </div>
 
         {/* Leaderboard row */}

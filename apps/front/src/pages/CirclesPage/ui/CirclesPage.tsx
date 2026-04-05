@@ -7,7 +7,6 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Modal } from '@/shared/ui/Modal'
 import { Input } from '@/shared/ui/Input'
-import { ErrorState } from '@/shared/ui/ErrorState'
 import { useToast } from '@/shared/ui/Toast'
 
 export function CirclesPage() {
@@ -80,7 +79,15 @@ export function CirclesPage() {
       )
     : circles
 
-  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchCircles() }} />
+  if (error) return (
+    <div className="flex flex-col items-center justify-center py-24 text-center px-4">
+      <div className="w-16 h-16 rounded-2xl bg-[#EEF2FF] flex items-center justify-center mb-4">
+        <Users className="w-8 h-8 text-[#6366F1]" />
+      </div>
+      <h2 className="text-base font-bold text-[#111111] mb-1">Круги скоро появятся</h2>
+      <p className="text-sm text-[#666666]">Функциональность в разработке</p>
+    </div>
+  )
 
   return (
     <div className="px-4 md:px-6 pt-4 pb-4 md:pb-6">
