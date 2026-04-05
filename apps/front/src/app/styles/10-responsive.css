@@ -68,12 +68,10 @@
 
   .code-rooms-dashboard-grid,
   .vacancies-layout,
-  .events-layout,
   .feed-layout,
   .interview-prep-filters,
   .interview-prep-grid,
-  .vacancies-hero,
-  .events-hero {
+  .vacancies-hero {
     grid-template-columns: 1fr;
     gap: 12px;
   }

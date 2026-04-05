@@ -43,9 +43,6 @@
 /* 13 - Vacancies page */
 @import './13-vacancies.css';
 
-/* 14 - Circles page */
-@import './14-circles.css';
-
 /* 15 - Hubs and home */
 @import './15-hubs.css';
 
@@ -60,3 +57,6 @@
 
 /* 19 - Community people v3 */
 @import './19-community-people.css';
+
+/* 20 - Community events/map/circles v3 */
+@import './20-community-surfaces.css';

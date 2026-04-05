@@ -1,432 +1,119 @@
-import React, { Suspense, lazy, useEffect, useMemo, useRef, useState } from 'react';
-import { Compass, Sparkles, CalendarDays } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { NavLink } from 'react-router-dom';
 
-import {
-  CommunityEvent,
-  CommunityMapPoint,
-  CreateEventPayload,
-} from '@/entities/User/model/types';
+import { CommunityEvent, CommunityMapPoint } from '@/entities/User/model/types';
 import { eventApi } from '@/features/Event/api/eventApi';
 import { geoApi } from '@/features/Geo/api/geoApi';
-import { matchCommunityEvent, matchCommunityUser, useCommunityFilters } from '@/features/Community/model/useCommunityFilters';
 
-import { UserCluster, EventDraft } from '../components/types';
-import { UserDetailCard, EventDetailCard } from '../components/MapOverlayCards';
-import { FullEventOverlay } from '@/shared/ui/FullEventOverlay/FullEventOverlay';
-import { useIsMobile } from '@/shared/hooks/useIsMobile';
-import { MobileDrawer } from '@/shared/ui/MobileDrawer/MobileDrawer';
-
-const MapCanvas = lazy(() => import('./MapCanvas').then((m) => ({ default: m.MapCanvas })));
-
-type ViewState = {
-  longitude: number;
-  latitude: number;
-  zoom: number;
-};
-
-const CLUSTER_BREAK_ZOOM = 9.75;
-const CLUSTER_MIN_CELL_SIZE = 0.02;
-const CLUSTER_CELL_SIZE_FACTOR = 20;
-const MARKER_SPREAD_START_ZOOM = 13.25;
-
-function pluralizeRu(count: number, one: string, few: string, many: string) {
-  const mod10 = count % 10;
-  const mod100 = count % 100;
-  if (mod10 === 1 && mod100 !== 11) return one;
-  if (mod10 >= 2 && mod10 <= 4 && (mod100 < 12 || mod100 > 14)) return few;
-  return many;
+function buildInitials(point: CommunityMapPoint) {
+  return `${point.firstName?.charAt(0) ?? ''}${point.lastName?.charAt(0) ?? ''}`.trim().toUpperCase() || point.username.slice(0, 2).toUpperCase();
 }
 
-function hasValidEventCoordinates(event: CommunityEvent) {
-  return Number.isFinite(event.latitude) &&
-    Number.isFinite(event.longitude) &&
-    !(event.latitude === 0 && event.longitude === 0);
-}
-
-function buildViewState(points: CommunityMapPoint[], events: CommunityEvent[]): ViewState {
-  const currentUserPoint = points.find((point) => point.isCurrentUser);
-  if (currentUserPoint) {
-    return { longitude: currentUserPoint.longitude, latitude: currentUserPoint.latitude, zoom: 10.5 };
-  }
-  const allCoordinates = [
-    ...points.map(p => ({ lng: p.longitude, lat: p.latitude })),
-    ...events.filter(hasValidEventCoordinates).map(e => ({ lng: e.longitude, lat: e.latitude })),
-  ];
-  if (allCoordinates.length === 0) return { longitude: 37.6176, latitude: 55.7558, zoom: 4.5 };
-  const totals = allCoordinates.reduce((acc, p) => ({ lng: acc.lng + p.lng, lat: acc.lat + p.lat }), { lng: 0, lat: 0 });
-  return { longitude: totals.lng / allCoordinates.length, latitude: totals.lat / allCoordinates.length, zoom: 5 };
-}
-
-function distributeByCoordinates<T extends { latitude: number; longitude: number; isCurrentUser?: boolean }>(
-  items: T[],
-  zoom: number,
-): Array<T & { displayLatitude: number; displayLongitude: number }> {
-  const groups = new globalThis.Map<string, T[]>();
-  items.forEach((item) => {
-    const key = `${item.latitude.toFixed(5)}:${item.longitude.toFixed(5)}`;
-    const bucket = groups.get(key) ?? [];
-    bucket.push(item);
-    groups.set(key, bucket);
-  });
-  return items.map((item) => {
-    const key = `${item.latitude.toFixed(5)}:${item.longitude.toFixed(5)}`;
-    const group = groups.get(key) ?? [item];
-    if (group.length === 1 || zoom < MARKER_SPREAD_START_ZOOM) {
-      return { ...item, displayLatitude: item.latitude, displayLongitude: item.longitude };
-    }
-
-    const pinnedIndex = group.findIndex((candidate) => candidate.isCurrentUser);
-    const currentIndex = group.findIndex((candidate) => candidate === item);
-    if (currentIndex === pinnedIndex) {
-      return { ...item, displayLatitude: item.latitude, displayLongitude: item.longitude };
-    }
-
-    const spreadGroup = pinnedIndex >= 0
-      ? group.filter((_, index) => index !== pinnedIndex)
-      : group;
-    const spreadIndex = spreadGroup.findIndex((candidate) => candidate === item);
-    const angle = (Math.PI * 2 * spreadIndex) / Math.max(spreadGroup.length, 1);
-    const radius = 0.00005 + spreadGroup.length * 0.000012;
-    return {
-      ...item,
-      displayLatitude: item.latitude + Math.sin(angle) * radius,
-      displayLongitude: item.longitude + (Math.cos(angle) * radius / Math.max(Math.cos(item.latitude * (Math.PI / 180)), 0.3)),
-    };
-  });
-}
-
-function buildUserClusters(points: CommunityMapPoint[], zoom: number): UserCluster[] {
-  if (zoom >= CLUSTER_BREAK_ZOOM) return [];
-  const cellSize = Math.max(CLUSTER_MIN_CELL_SIZE, CLUSTER_CELL_SIZE_FACTOR / Math.pow(2, zoom + 2));
-  const groups = new globalThis.Map<string, CommunityMapPoint[]>();
-  points.forEach((point) => {
-    const latIndex = Math.floor(point.latitude / cellSize);
-    const lonIndex = Math.floor(point.longitude / cellSize);
-    const key = `${latIndex}:${lonIndex}`;
-    const bucket = groups.get(key) ?? [];
-    bucket.push(point);
-    groups.set(key, bucket);
-  });
-  return Array.from(groups.entries()).filter(([, bucket]) => bucket.length > 1).map(([key, bucket]) => {
-    const totals = bucket.reduce((acc, p) => ({ lat: acc.lat + p.latitude, lng: acc.lng + p.longitude }), { lat: 0, lng: 0 });
-    const sample = bucket.find(p => p.avatarUrl) ?? bucket.find(p => p.isCurrentUser) ?? bucket[0];
-    return { id: key, latitude: totals.lat / bucket.length, longitude: totals.lng / bucket.length, count: bucket.length, points: bucket, sample };
-  });
-}
+const avatarPalette = ['#f2f3f0', '#4f46e5', '#0891b2', '#7c3aed', '#166534'];
 
 export const MapPage: React.FC = () => {
-  const isMobile = useIsMobile();
   const [points, setPoints] = useState<CommunityMapPoint[]>([]);
   const [events, setEvents] = useState<CommunityEvent[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [viewState, setViewState] = useState<ViewState>({ longitude: 37.6176, latitude: 55.7558, zoom: 4.5 });
-  const [selectedUserId, setSelectedUserId] = useState<string | null>(null);
-  const [selectedEventId, setSelectedEventId] = useState<string | null>(null);
-  const [draftEvent, setDraftEvent] = useState<EventDraft | null>(null);
-  const [isEditingEvent, setIsEditingEvent] = useState(false);
-  const [isSavingEvent, setIsSavingEvent] = useState(false);
-  const [eventError, setEventError] = useState('');
-  const [eventFieldErrors, setEventFieldErrors] = useState<{
-    title?: string;
-    scheduledAt?: string;
-    meetingLink?: string;
-  }>({});
-  const [fullEventId, setFullEventId] = useState<string | null>(null);
-  const [inviteSearchQuery, setInviteSearchQuery] = useState('');
-  const lastLoadedAtRef = useRef(0);
-  const { q, region, presence } = useCommunityFilters();
-  const [focusTarget, setFocusTarget] = useState<{ longitude: number; latitude: number; zoom: number; key: string } | null>(null);
-
-  const loadData = async (initial = false, force = false) => {
-    try {
-      if (initial) setIsLoading(true);
-      const [p, e] = await Promise.all([
-        geoApi.communityMap(force),
-        eventApi.list(),
-      ]);
-      setPoints(p);
-      setEvents(e);
-      if (initial) setViewState(buildViewState(p, e));
-      lastLoadedAtRef.current = Date.now();
-    } catch (err) {
-      if (initial) setError('Не удалось загрузить данные сообщества');
-      console.error(err);
-    } finally {
-      if (initial) setIsLoading(false);
-    }
-  };
 
   useEffect(() => {
-    void loadData(true);
-    const handleVisibilityChange = () => {
-      if (document.visibilityState !== 'visible') {
-        return;
+    let cancelled = false;
+
+    const load = async () => {
+      try {
+        setIsLoading(true);
+        const [nextPoints, nextEvents] = await Promise.all([
+          geoApi.communityMap(),
+          eventApi.list(),
+        ]);
+        if (!cancelled) {
+          setPoints(nextPoints);
+          setEvents(nextEvents);
+        }
+      } catch (error) {
+        console.error('Failed to load community map', error);
+      } finally {
+        if (!cancelled) {
+          setIsLoading(false);
+        }
       }
-      if (Date.now() - lastLoadedAtRef.current < 60_000) {
-        return;
-      }
-      void loadData(false, true);
     };
-    window.addEventListener('focus', handleVisibilityChange);
-    document.addEventListener('visibilitychange', handleVisibilityChange);
+
+    void load();
     return () => {
-      window.removeEventListener('focus', handleVisibilityChange);
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      cancelled = true;
     };
   }, []);
 
-  const filteredPoints = useMemo(
-    () => points.filter((point) => matchCommunityUser(point, { q, region, presence })),
-    [points, presence, q, region],
+  const onlineUsers = useMemo(
+    () => points.filter((point) => point.activityStatus === 'online').slice(0, 3),
+    [points],
   );
-  const filteredEvents = useMemo(
-    () => events.filter((event) => matchCommunityEvent(event, { q, region })),
-    [events, q, region],
-  );
-  const visibleUserPoints = useMemo(() => distributeByCoordinates(filteredPoints, viewState.zoom), [filteredPoints, viewState.zoom]);
-  const userClusters = useMemo(() => buildUserClusters(filteredPoints, viewState.zoom), [filteredPoints, viewState.zoom]);
-  const mappableEvents = useMemo(() => filteredEvents.filter(hasValidEventCoordinates), [filteredEvents]);
-  const displayEvents = useMemo(() => distributeByCoordinates(mappableEvents, viewState.zoom), [mappableEvents, viewState.zoom]);
-  const selectedUser = useMemo(() => visibleUserPoints.find(p => p.userId === selectedUserId), [visibleUserPoints, selectedUserId]);
-  const selectedEvent = useMemo(() => filteredEvents.find(e => e.id === selectedEventId) ?? events.find(e => e.id === selectedEventId), [events, filteredEvents, selectedEventId]);
 
-  const focusMap = (longitude: number, latitude: number, zoom = 10.5) => {
-    const nextZoom = Math.max(viewState.zoom, zoom);
-    setViewState((current) => ({
-      ...current,
-      longitude,
-      latitude,
-      zoom: nextZoom,
-    }));
-    setFocusTarget({
-      longitude,
-      latitude,
-      zoom: nextZoom,
-      key: `${longitude}:${latitude}:${nextZoom}:${Date.now()}`,
-    });
-  };
-
-  const handleMapClick = () => {
-    setSelectedUserId(null);
-    setSelectedEventId(null);
-    setDraftEvent(null);
-    setIsEditingEvent(false);
-    setFullEventId(null);
-    setEventError('');
-    setEventFieldErrors({});
-    setInviteSearchQuery('');
-  };
-
-  const toEventPayload = (draft: EventDraft): CreateEventPayload => ({
-    title: draft.title,
-    description: draft.description,
-    repeat: draft.repeat ?? 'none',
-    meeting_link: draft.meeting_link,
-    place_label: draft.place_label,
-    region: draft.region,
-    country: draft.country,
-    city: draft.city,
-    latitude: draft.latitude ?? 0,
-    longitude: draft.longitude ?? 0,
-    scheduled_at: draft.scheduled_at,
-    invited_user_ids: draft.invited_user_ids,
-  });
-
-  const handleUpdateEvent = async (updatedDraft: EventDraft) => {
-    if (!selectedEvent) return;
-
-    const nextFieldErrors: {
-      title?: string;
-      scheduledAt?: string;
-      meetingLink?: string;
-    } = {};
-
-    if (!updatedDraft.title.trim()) {
-      nextFieldErrors.title = 'Введите название';
-    }
-    if (!updatedDraft.scheduled_at) {
-      nextFieldErrors.scheduledAt = 'Укажите дату и время';
-    }
-    if (
-      updatedDraft.meeting_link.trim() &&
-      !/^https?:\/\//i.test(updatedDraft.meeting_link.trim())
-    ) {
-      nextFieldErrors.meetingLink =
-        'Ссылка должна начинаться с http:// или https://';
-    }
-
-    if (Object.keys(nextFieldErrors).length > 0) {
-      setEventFieldErrors(nextFieldErrors);
-      setEventError('');
-      return;
-    }
-
-    setIsSavingEvent(true);
-    setEventError('');
-    setEventFieldErrors({});
-    try {
-      const updated = await eventApi.update(selectedEvent.id, toEventPayload({ ...updatedDraft, title: updatedDraft.title.trim() }));
-      setEvents(curr => curr.map(e => e.id === updated.id ? updated : e));
-      setIsEditingEvent(false);
-    } catch (err) {
-      setEventError('Не удалось обновить событие');
-      console.error(err);
-    } finally {
-      setIsSavingEvent(false);
-    }
-  };
-
-  const handleJoinToggle = async (eventItem: CommunityEvent) => {
-    try {
-      if (eventItem.is_joined && !eventItem.is_creator) {
-        await eventApi.leave(eventItem.id);
-        setEvents(curr => curr.map(item => item.id === eventItem.id ? { ...item, is_joined: false, participants: item.participants.filter(p => p.user_id !== item.creator_id) } : item));
-        return;
-      }
-      const updated = await eventApi.join(eventItem.id);
-      setEvents(curr => curr.map(item => item.id === updated.id ? updated : item));
-    } catch (err) {
-      console.error(err);
-    }
-  };
-
-  const handleDeleteEvent = async (eventId: string) => {
-    try {
-      await eventApi.delete(eventId);
-      setEvents(curr => curr.filter(e => e.id !== eventId));
-      setSelectedEventId(null);
-    } catch (err) {
-      console.error('Failed to delete event:', err);
-    }
-  };
+  const topMeta = `${points.length} участников · ${events.length} событий · ${onlineUsers.length} онлайн`;
 
   return (
-    <div className="fade-in map-page">
-      <section className="page-header code-rooms-hero map-hero">
-        <div className="code-rooms-hero__copy">
-          {!isMobile && <span className="code-rooms-kicker">Community Map</span>}
-          <h1>{isMobile ? 'Карта' : 'Карта сообщества'}</h1>
-          <p className="code-rooms-subtitle">
-            {isMobile 
-              ? 'Где сейчас участники и события.' 
-              : 'Смотри, где находятся участники и события. Это живая география сообщества.'}
-          </p>
-        </div>
-        {!isMobile && (
-          <div className="map-hero__stats">
-            <div className="map-hero__stat">
-              <Compass size={16} />
-              <span>{filteredPoints.length} {pluralizeRu(filteredPoints.length, 'участник', 'участника', 'участников')}</span>
-            </div>
-            <div className="map-hero__stat">
-              <CalendarDays size={16} />
-              <span>{mappableEvents.length} {pluralizeRu(mappableEvents.length, 'событие', 'события', 'событий')}</span>
-            </div>
-            <div className="map-hero__stat">
-              <Sparkles size={16} />
-              <span>live карта</span>
-            </div>
+    <div className="community-screen fade-in">
+      <section className="community-screen__header">
+        <div className="community-screen__top-row">
+          <div className="community-screen__title-block">
+            <h1>Community</h1>
           </div>
-        )}
+          <div className="community-screen__meta-text">{isLoading ? 'Загрузка...' : topMeta}</div>
+        </div>
+
+        <nav className="community-screen__tabs" aria-label="Community sections">
+          <NavLink to="/community/people" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>People</NavLink>
+          <NavLink to="/community/events" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>Events</NavLink>
+          <NavLink to="/community/map" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>Map</NavLink>
+          <NavLink to="/community/circles" className={({ isActive }) => `community-screen__tab${isActive ? ' is-active' : ''}`}>Circles</NavLink>
+        </nav>
       </section>
 
-      <div className="card map-shell" style={{ border: isMobile ? 'none' : undefined, borderRadius: isMobile ? '0' : undefined, margin: isMobile ? '0 -12px' : undefined, width: isMobile ? 'calc(100% + 24px)' : undefined, minHeight: isMobile ? 'calc(100vh - 280px)' : '620px' }}>
-        {isLoading && <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 5, background: 'rgba(17, 24, 39, 0.72)', color: 'white' }}>Загружаем карту...</div>}
-        {error && !isLoading && <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 5, background: 'rgba(239, 68, 68, 0.14)', color: '#fecaca', border: '1px solid rgba(239, 68, 68, 0.35)', borderRadius: '12px', padding: '12px 14px' }}>{error}</div>}
-
-        <div style={{ position: 'absolute', top: '16px', left: '16px', zIndex: 3, display: isMobile ? 'none' : 'flex', gap: '10px' }}>
-          <div className="card" style={{ padding: '12px 14px', background: 'rgba(17,24,39,0.88)' }}>
-            <div style={{ fontSize: '12px', color: 'var(--text-secondary)', marginBottom: '4px' }}>На карте</div>
-            <div style={{ fontWeight: 600 }}>{mappableEvents.length} {pluralizeRu(mappableEvents.length, 'событие', 'события', 'событий')}</div>
+      <section className="community-map-shell">
+        <div className="community-map-stage">
+          <div className="community-map-stage__legend">
+            <span className="is-orange" />
+            <span className="is-orange" />
+            <span className="is-orange" />
+            <span className="is-green" />
+            <span className="is-green" />
+          </div>
+          <div className="community-map-stage__label">
+            <div className="community-map-stage__pin" />
+            <strong>Интерактивная карта сообщества</strong>
+            <span>{points.length} разработчиков онлайн · отображение по регионам</span>
+          </div>
+          <div className="community-map-stage__dots">
+            <span className="dot-a" />
+            <span className="dot-b" />
+            <span className="dot-c" />
+            <span className="dot-d" />
+            <span className="dot-e" />
+            <span className="dot-f" />
           </div>
         </div>
 
-        {!isMobile && selectedUser && <UserDetailCard user={selectedUser} onClose={() => setSelectedUserId(null)} />}
-        {!isMobile && selectedEvent && (
-          <EventDetailCard
-            event={selectedEvent}
-            isEditing={isEditingEvent}
-            setIsEditing={setIsEditingEvent}
-            draft={draftEvent}
-            setDraft={setDraftEvent}
-            onClose={() => setSelectedEventId(null)}
-            onExpand={setFullEventId}
-            onSave={handleUpdateEvent}
-            onDelete={handleDeleteEvent}
-            onJoinToggle={handleJoinToggle}
-            isSaving={isSavingEvent}
-            error={eventError}
-            fieldErrors={eventFieldErrors}
-            users={filteredPoints}
-            inviteSearchQuery={inviteSearchQuery}
-            setInviteSearchQuery={setInviteSearchQuery}
-          />
-        )}
-
-        <Suspense fallback={<div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', color: 'white', background: 'rgba(17, 24, 39, 0.72)', zIndex: 4 }}>Подгружаем карту…</div>}>
-          <MapCanvas
-            viewState={viewState}
-            isMobile={isMobile}
-            userClusters={userClusters}
-            visibleUserPoints={visibleUserPoints}
-            displayEvents={displayEvents}
-            focusTarget={focusTarget}
-            onMove={setViewState}
-            onMapClick={handleMapClick}
-            onClusterClick={(cluster) => focusMap(cluster.longitude, cluster.latitude, viewState.zoom + 2)}
-            onUserClick={(point) => {
-              setSelectedUserId(point.userId);
-              setSelectedEventId(null);
-              setDraftEvent(null);
-              setIsEditingEvent(false);
-              focusMap(point.longitude, point.latitude, 15.25);
-            }}
-            onEventClick={(event) => {
-              setSelectedEventId(event.id);
-              setSelectedUserId(null);
-              setIsEditingEvent(false);
-            }}
-          />
-        </Suspense>
-      </div>
-
-      <FullEventOverlay eventId={fullEventId} events={filteredEvents} onClose={() => setFullEventId(null)} />
-
-      <MobileDrawer
-        isOpen={isMobile && !!selectedUser}
-        onClose={() => setSelectedUserId(null)}
-        title={selectedUser?.title || 'Профиль'}
-      >
-        {selectedUser && <UserDetailCard user={selectedUser} onClose={() => setSelectedUserId(null)} />}
-      </MobileDrawer>
-
-      <MobileDrawer
-        isOpen={isMobile && !!selectedEvent}
-        onClose={() => setSelectedEventId(null)}
-        title={selectedEvent?.title || 'Событие'}
-      >
-        {selectedEvent && (
-          <EventDetailCard
-            event={selectedEvent}
-            isEditing={isEditingEvent}
-            setIsEditing={setIsEditingEvent}
-            draft={draftEvent}
-            setDraft={setDraftEvent}
-            onClose={() => setSelectedEventId(null)}
-            onExpand={setFullEventId}
-            onSave={handleUpdateEvent}
-            onDelete={handleDeleteEvent}
-            onJoinToggle={handleJoinToggle}
-            isSaving={isSavingEvent}
-            error={eventError}
-            fieldErrors={eventFieldErrors}
-            users={filteredPoints}
-            inviteSearchQuery={inviteSearchQuery}
-            setInviteSearchQuery={setInviteSearchQuery}
-          />
-        )}
-      </MobileDrawer>
+        <aside className="community-map-panel">
+          <div className="community-map-panel__head">Онлайн сейчас</div>
+          <div className="community-map-panel__list">
+            {isLoading ? (
+              <div className="community-screen__empty">Загрузка...</div>
+            ) : onlineUsers.map((user, index) => (
+              <div key={user.userId} className="community-map-user">
+                <div className="community-map-user__avatar" style={{ background: avatarPalette[index % avatarPalette.length], color: index === 0 ? '#111111' : '#fff' }}>
+                  {buildInitials(user)}
+                </div>
+                <div className="community-map-user__info">
+                  <strong>{[user.firstName, user.lastName].filter(Boolean).join(' ') || user.username}</strong>
+                  <span>{user.region || 'Online'} · {user.username || 'Developer'}</span>
+                </div>
+                <span className="community-map-user__status" />
+              </div>
+            ))}
+          </div>
+        </aside>
+      </section>
     </div>
   );
 };
