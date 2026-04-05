@@ -90,21 +90,21 @@ export function InterviewPrepPage() {
                 <div
                   key={company}
                   onClick={() => setSelectedCompany(prev => prev === company ? '' : company)}
-                  className={`flex-shrink-0 w-[200px] rounded-2xl p-4 cursor-pointer transition-colors border ${
+                  className={`flex-shrink-0 w-[200px] rounded-2xl p-4 cursor-pointer transition-all border ${
                     selectedCompany === company
-                      ? 'bg-[#0f172a] border-[#6366F1]'
-                      : 'bg-[#0f172a] border-[#1e293b] hover:border-[#334155]'
+                      ? 'bg-[#EEF2FF] border-[#6366F1]'
+                      : 'bg-white border-[#CBCCC9] hover:border-[#6366F1]/40 hover:shadow-sm'
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-2">
                     <Building2 className="w-4 h-4 text-[#6366F1]" />
-                    <span className="text-sm font-semibold text-white truncate">{company}</span>
+                    <span className="text-sm font-semibold text-[#111111] truncate">{company}</span>
                   </div>
-                  <p className="text-xs text-[#94a3b8] mb-3">{count} задач</p>
+                  <p className="text-xs text-[#666666] mb-3">{count} задач</p>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleStartMock(company) }}
                     disabled={mockLoading}
-                    className="flex items-center gap-1 text-xs font-medium text-[#6366F1] hover:text-[#e5781a] transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1 text-xs font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors disabled:opacity-50"
                   >
                     Начать Mock <ArrowRight className="w-3 h-3" />
                   </button>
@@ -146,7 +146,7 @@ export function InterviewPrepPage() {
               <button
                 onClick={() => setSelectedCompany('')}
                 className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-                  selectedCompany === '' ? 'bg-[#0f172a] text-white' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
+                  selectedCompany === '' ? 'bg-[#6366F1] text-white' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
                 }`}
               >
                 Все компании
@@ -156,7 +156,7 @@ export function InterviewPrepPage() {
                   key={c}
                   onClick={() => setSelectedCompany(prev => prev === c ? '' : c)}
                   className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-                    selectedCompany === c ? 'bg-[#0f172a] text-white' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
+                    selectedCompany === c ? 'bg-[#6366F1] text-white' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
                   }`}
                 >
                   {c}
@@ -228,9 +228,9 @@ export function InterviewPrepPage() {
 
         {/* Right sidebar */}
         <div className="w-full lg:w-[300px] lg:flex-shrink-0 flex flex-col gap-3">
-          <Card padding="md" dark orangeBorder>
-            <h3 className="text-sm font-semibold text-[#CBCCC9] mb-2">Mock Interview</h3>
-            <p className="text-xs text-[#94a3b8] mb-3">Симулируй полное собеседование с AI</p>
+          <Card padding="md">
+            <h3 className="text-sm font-semibold text-[#111111] mb-2">Mock Interview</h3>
+            <p className="text-xs text-[#666666] mb-3">Симулируй полное собеседование с AI</p>
             {mockError && (
               <p className="text-xs text-[#ef4444] mb-2">{mockError}</p>
             )}

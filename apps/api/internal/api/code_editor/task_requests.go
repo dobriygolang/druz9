@@ -9,64 +9,40 @@ import (
 )
 
 func taskFromCreateRequest(req *v1.CreateTaskRequest) *codeeditordomain.Task {
-	return buildTaskFromRequest(uuid.New(), req)
+	return buildTaskFromPayload(uuid.New(), req.Task)
 }
 
 func taskFromUpdateRequest(taskID uuid.UUID, req *v1.UpdateTaskRequest) *codeeditordomain.Task {
-	return buildTaskFromUpdateRequest(taskID, req)
+	return buildTaskFromPayload(taskID, req.Task)
 }
 
-func buildTaskFromRequest(taskID uuid.UUID, req *v1.CreateTaskRequest) *codeeditordomain.Task {
-	return &codeeditordomain.Task{
-		ID:               taskID,
-		Title:            req.Title,
-		Slug:             req.Slug,
-		Statement:        req.Statement,
-		Difficulty:       protoDifficultyToModel(req.Difficulty),
-		Topics:           req.Topics,
-		StarterCode:      req.StarterCode,
-		Language:         protoLanguageToModel(req.Language),
-		TaskType:         protoTaskTypeToModel(req.TaskType),
-		ExecutionProfile: model.ExecutionProfileFromString(req.ExecutionProfile),
-		RunnerMode:       model.RunnerModeFromString(req.RunnerMode),
-		DurationSeconds:  req.DurationSeconds,
-		FixtureFiles:     req.FixtureFiles,
-		ReadablePaths:    req.ReadablePaths,
-		WritablePaths:    req.WritablePaths,
-		AllowedHosts:     req.AllowedHosts,
-		AllowedPorts:     req.AllowedPorts,
-		MockEndpoints:    req.MockEndpoints,
-		WritableTempDir:  req.WritableTempDir,
-		IsActive:         req.IsActive,
-		PublicTestCases:  taskCasesFromProto(req.PublicTestCases),
-		HiddenTestCases:  taskCasesFromProto(req.HiddenTestCases),
+func buildTaskFromPayload(taskID uuid.UUID, p *v1.TaskPayload) *codeeditordomain.Task {
+	if p == nil {
+		return &codeeditordomain.Task{ID: taskID}
 	}
-}
-
-func buildTaskFromUpdateRequest(taskID uuid.UUID, req *v1.UpdateTaskRequest) *codeeditordomain.Task {
 	return &codeeditordomain.Task{
 		ID:               taskID,
-		Title:            req.Title,
-		Slug:             req.Slug,
-		Statement:        req.Statement,
-		Difficulty:       protoDifficultyToModel(req.Difficulty),
-		Topics:           req.Topics,
-		StarterCode:      req.StarterCode,
-		Language:         protoLanguageToModel(req.Language),
-		TaskType:         protoTaskTypeToModel(req.TaskType),
-		ExecutionProfile: model.ExecutionProfileFromString(req.ExecutionProfile),
-		RunnerMode:       model.RunnerModeFromString(req.RunnerMode),
-		DurationSeconds:  req.DurationSeconds,
-		FixtureFiles:     req.FixtureFiles,
-		ReadablePaths:    req.ReadablePaths,
-		WritablePaths:    req.WritablePaths,
-		AllowedHosts:     req.AllowedHosts,
-		AllowedPorts:     req.AllowedPorts,
-		MockEndpoints:    req.MockEndpoints,
-		WritableTempDir:  req.WritableTempDir,
-		IsActive:         req.IsActive,
-		PublicTestCases:  taskCasesFromProto(req.PublicTestCases),
-		HiddenTestCases:  taskCasesFromProto(req.HiddenTestCases),
+		Title:            p.Title,
+		Slug:             p.Slug,
+		Statement:        p.Statement,
+		Difficulty:       protoDifficultyToModel(p.Difficulty),
+		Topics:           p.Topics,
+		StarterCode:      p.StarterCode,
+		Language:         protoLanguageToModel(p.Language),
+		TaskType:         protoTaskTypeToModel(p.TaskType),
+		ExecutionProfile: model.ExecutionProfileFromString(p.ExecutionProfile),
+		RunnerMode:       model.RunnerModeFromString(p.RunnerMode),
+		DurationSeconds:  p.DurationSeconds,
+		FixtureFiles:     p.FixtureFiles,
+		ReadablePaths:    p.ReadablePaths,
+		WritablePaths:    p.WritablePaths,
+		AllowedHosts:     p.AllowedHosts,
+		AllowedPorts:     p.AllowedPorts,
+		MockEndpoints:    p.MockEndpoints,
+		WritableTempDir:  p.WritableTempDir,
+		IsActive:         p.IsActive,
+		PublicTestCases:  taskCasesFromProto(p.PublicTestCases),
+		HiddenTestCases:  taskCasesFromProto(p.HiddenTestCases),
 	}
 }
 

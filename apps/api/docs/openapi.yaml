@@ -2297,71 +2297,8 @@ components:
         code_editor.v1.CreateTaskRequest:
             type: object
             properties:
-                title:
-                    type: string
-                slug:
-                    type: string
-                statement:
-                    type: string
-                difficulty:
-                    type: integer
-                    format: enum
-                topics:
-                    type: array
-                    items:
-                        type: string
-                starterCode:
-                    type: string
-                language:
-                    type: integer
-                    format: enum
-                isActive:
-                    type: boolean
-                publicTestCases:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/code_editor.v1.TaskTestCase'
-                hiddenTestCases:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/code_editor.v1.TaskTestCase'
-                taskType:
-                    type: integer
-                    format: enum
-                executionProfile:
-                    type: string
-                fixtureFiles:
-                    type: array
-                    items:
-                        type: string
-                readablePaths:
-                    type: array
-                    items:
-                        type: string
-                writablePaths:
-                    type: array
-                    items:
-                        type: string
-                allowedHosts:
-                    type: array
-                    items:
-                        type: string
-                allowedPorts:
-                    type: array
-                    items:
-                        type: integer
-                        format: int32
-                mockEndpoints:
-                    type: array
-                    items:
-                        type: string
-                writableTempDir:
-                    type: boolean
-                runnerMode:
-                    type: string
-                durationSeconds:
-                    type: integer
-                    format: int32
+                task:
+                    $ref: '#/components/schemas/code_editor.v1.TaskPayload'
         code_editor.v1.DeleteTaskResponse:
             type: object
             properties:
@@ -2620,33 +2557,9 @@ components:
                 durationSeconds:
                     type: integer
                     format: int32
-        code_editor.v1.TaskResponse:
+        code_editor.v1.TaskPayload:
             type: object
             properties:
-                task:
-                    $ref: '#/components/schemas/code_editor.v1.Task'
-        code_editor.v1.TaskTestCase:
-            type: object
-            properties:
-                id:
-                    type: string
-                input:
-                    type: string
-                expectedOutput:
-                    type: string
-                isPublic:
-                    type: boolean
-                weight:
-                    type: integer
-                    format: int32
-                order:
-                    type: integer
-                    format: int32
-        code_editor.v1.UpdateTaskRequest:
-            type: object
-            properties:
-                taskId:
-                    type: string
                 title:
                     type: string
                 slug:
@@ -2712,6 +2625,35 @@ components:
                 durationSeconds:
                     type: integer
                     format: int32
+        code_editor.v1.TaskResponse:
+            type: object
+            properties:
+                task:
+                    $ref: '#/components/schemas/code_editor.v1.Task'
+        code_editor.v1.TaskTestCase:
+            type: object
+            properties:
+                id:
+                    type: string
+                input:
+                    type: string
+                expectedOutput:
+                    type: string
+                isPublic:
+                    type: boolean
+                weight:
+                    type: integer
+                    format: int32
+                order:
+                    type: integer
+                    format: int32
+        code_editor.v1.UpdateTaskRequest:
+            type: object
+            properties:
+                taskId:
+                    type: string
+                task:
+                    $ref: '#/components/schemas/code_editor.v1.TaskPayload'
         event.v1.CreateEventRequest:
             type: object
             properties:

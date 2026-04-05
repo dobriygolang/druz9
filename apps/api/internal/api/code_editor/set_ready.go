@@ -16,16 +16,13 @@ func (i *Implementation) SetReady(ctx context.Context, req *v1.SetReadyRequest) 
 	}
 
 	userID, guestName, _ := resolveActor(ctx, "")
-	err = i.service.SetReady(ctx, roomID, userID, guestName, req.Ready)
-	if err != nil {
-		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
+	if err := i.service.SetReady(ctx, roomID, userID, guestName, req.Ready); err != nil {
+		return nil, mapErr(err)
 	}
 
 	if room, getErr := i.service.GetRoom(ctx, roomID); getErr == nil {
 		i.realtime.PublishRoomUpdate(mapRealtimeRoom(room))
 	}
 
-	return &v1.SetReadyResponse{
-		Status: "ok",
-	}, nil
+	return &v1.SetReadyResponse{Status: "ok"}, nil
 }

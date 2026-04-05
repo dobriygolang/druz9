@@ -16,16 +16,13 @@ func (i *Implementation) LeaveRoom(ctx context.Context, req *v1.LeaveRoomRequest
 	}
 
 	userID, guestName, _ := resolveActor(ctx, "")
-	err = i.service.LeaveRoom(ctx, roomID, userID, guestName)
-	if err != nil {
-		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
+	if err := i.service.LeaveRoom(ctx, roomID, userID, guestName); err != nil {
+		return nil, mapErr(err)
 	}
 
 	if room, getErr := i.service.GetRoom(ctx, roomID); getErr == nil {
 		i.realtime.PublishRoomUpdate(mapRealtimeRoom(room))
 	}
 
-	return &v1.LeaveRoomResponse{
-		Status: "ok",
-	}, nil
+	return &v1.LeaveRoomResponse{Status: "ok"}, nil
 }

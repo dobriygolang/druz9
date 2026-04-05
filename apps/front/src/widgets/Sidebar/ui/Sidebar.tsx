@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Users, Code2, TrendingUp, Mic, User, Settings, LogOut, Flame } from 'lucide-react'
+import { Home, Users, Code2, TrendingUp, Mic, User, Settings, LogOut, Flame, Shield } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { Avatar } from '@/shared/ui/Avatar'
@@ -50,7 +50,7 @@ export function Sidebar() {
     return () => document.removeEventListener('keydown', handleKey)
   }, [popoverOpen])
 
-  const isFullScreen = location.pathname.startsWith('/code-rooms/') || location.pathname.startsWith('/arena/')
+  const isFullScreen = location.pathname.startsWith('/code-rooms/') || location.pathname.startsWith('/arena/') || location.pathname.startsWith('/growth/interview-prep/mock/')
   if (isFullScreen) return null
 
   const isActive = (item: NavItem) => {
@@ -144,12 +144,21 @@ export function Sidebar() {
                   Мой профиль
                 </button>
                 <button
-                  disabled
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#666666] opacity-50 cursor-not-allowed font-geist"
+                  onClick={() => { setPopoverOpen(false); navigate('/settings') }}
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#111111] hover:bg-[#F2F3F0] transition-colors font-geist"
                 >
-                  <Settings className="w-4 h-4" />
+                  <Settings className="w-4 h-4 text-[#666666]" />
                   Настройки
                 </button>
+                {user.isAdmin && (
+                  <button
+                    onClick={() => { setPopoverOpen(false); navigate('/admin') }}
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#6366F1] hover:bg-[#EEF2FF] transition-colors font-geist"
+                  >
+                    <Shield className="w-4 h-4" />
+                    Админ панель
+                  </button>
+                )}
               </div>
 
               <div className="h-px bg-[#CBCCC9]" />

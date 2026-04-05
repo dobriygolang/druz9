@@ -2,6 +2,8 @@ package arena
 
 import (
 	"context"
+	"sync"
+	"time"
 
 	domain "api/internal/domain/arena"
 	"api/internal/realtime/schema"
@@ -25,13 +27,23 @@ type Config struct {
 	AntiCheatEnabled func() bool
 }
 
+type leaderboardSnapshot struct {
+	entries   []*domain.LeaderboardEntry
+	expiresAt time.Time
+}
+
 type Service struct {
 	repo             domain.Repository
 	sandbox          Sandbox
 	realtime         RealtimePublisher
 	allowGuestAccess func() bool
 	antiCheatEnabled func() bool
+
+	leaderboardMu    sync.Mutex
+	leaderboardCache leaderboardSnapshot
 }
+
+const leaderboardCacheTTL = 30 * time.Second
 
 func New(c Config) *Service {
 	allowGuestAccess := c.AllowGuestAccess

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords } from 'lucide-react'
+import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, X, Check } from 'lucide-react'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi } from '@/features/Auth/api/authApi'
 import type { User, ProfileProgress } from '@/entities/User/model/types'
@@ -178,6 +178,12 @@ export function ProfilePage() {
   const [arenaStats, setArenaStats] = useState<ArenaStats | null>(null)
   const [achievements, setAchievements] = useState<Achievement[]>([])
   const [activity, setActivity] = useState<{ date: string; count: number }[]>([])
+  const [editMode, setEditMode] = useState(false)
+  const [editFirstName, setEditFirstName] = useState('')
+  const [editLastName, setEditLastName] = useState('')
+  const [editWorkplace, setEditWorkplace] = useState('')
+  const [editRegion, setEditRegion] = useState('')
+  const [saving, setSaving] = useState(false)
 
   const targetId = userId ?? authUser?.id ?? ''
   const isOwn = !userId || userId === authUser?.id
@@ -220,9 +226,18 @@ export function ProfilePage() {
     apiClient
       .get(`/api/v1/profile/${targetId}/achievements`)
       .then(res => {
-        const data = res.data
-        if (Array.isArray(data)) setAchievements(data)
-        else if (Array.isArray(data?.achievements)) setAchievements(data.achievements)
+        const raw = res.data
+        const arr: any[] = Array.isArray(raw) ? raw : Array.isArray(raw?.achievements) ? raw.achievements : []
+        const normalized: Achievement[] = arr.map((a: any, i: number) => ({
+          id: a.id ?? a.ID ?? String(i),
+          title: a.title ?? a.Title ?? '',
+          description: a.description ?? a.Description ?? '',
+          icon: a.icon ?? a.Icon ?? '🏅',
+          unlocked: a.unlocked ?? a.Unlocked ?? false,
+          category: a.category ?? a.Category ?? '',
+          unlocked_at: a.unlocked_at ?? a.UnlockedAt,
+        }))
+        setAchievements(normalized)
       })
       .catch(() => {})
   }, [targetId])
@@ -233,12 +248,43 @@ export function ProfilePage() {
     apiClient
       .get(`/api/v1/profile/${targetId}/activity`)
       .then(res => {
-        const data = res.data
-        if (Array.isArray(data)) setActivity(data)
-        else if (Array.isArray(data?.activity)) setActivity(data.activity)
+        const raw = res.data
+        const arr: any[] = Array.isArray(raw) ? raw : Array.isArray(raw?.activity) ? raw.activity : []
+        setActivity(arr.map((a: any) => ({
+          date: a.date ?? a.Date ?? '',
+          count: a.count ?? a.Count ?? 0,
+        })))
       })
       .catch(() => {})
   }, [targetId])
+
+  const openEdit = () => {
+    if (!user) return
+    setEditFirstName(user.firstName ?? '')
+    setEditLastName(user.lastName ?? '')
+    setEditWorkplace(user.currentWorkplace ?? '')
+    setEditRegion(user.region ?? '')
+    setEditMode(true)
+  }
+
+  const saveEdit = async () => {
+    if (!targetId) return
+    setSaving(true)
+    try {
+      await apiClient.patch(`/api/v1/profile/${targetId}`, {
+        firstName: editFirstName,
+        lastName: editLastName,
+        currentWorkplace: editWorkplace,
+        region: editRegion,
+      })
+      setUser(prev => prev ? { ...prev, firstName: editFirstName, lastName: editLastName, currentWorkplace: editWorkplace, region: editRegion } : prev)
+      setEditMode(false)
+    } catch {
+      // silently keep modal open
+    } finally {
+      setSaving(false)
+    }
+  }
 
   // Skill values (placeholder)
   const skillValues = [0.7, 0.5, 0.6, 0.8, 0.45]
@@ -302,7 +348,7 @@ export function ProfilePage() {
             </div>
           </div>
           {isOwn && (
-            <Button variant="secondary" size="sm" className="flex-shrink-0">
+            <Button variant="secondary" size="sm" className="flex-shrink-0" onClick={openEdit}>
               <Edit3 className="w-3.5 h-3.5" /> Редактировать
             </Button>
           )}
@@ -413,10 +459,10 @@ export function ProfilePage() {
         {/* Right column */}
         <div className="w-full lg:w-[300px] lg:flex-shrink-0 flex flex-col gap-3">
           {/* League with ELO ring */}
-          <Card padding="md" dark orangeBorder>
+          <Card padding="md">
             <div className="flex items-center gap-2 mb-3">
               <Trophy className="w-4 h-4 text-[#6366F1]" />
-              <h3 className="text-sm font-semibold text-[#CBCCC9]">Лига</h3>
+              <h3 className="text-sm font-semibold text-[#111111]">Лига</h3>
             </div>
             {arenaStats ? (
               <EloRing rating={arenaStats.rating} league={computeLeague(arenaStats.rating)} />
@@ -444,6 +490,54 @@ export function ProfilePage() {
           )}
         </div>
       </div>
+
+      {/* Edit modal */}
+      {editMode && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
+          <div className="bg-white rounded-2xl shadow-xl border border-[#CBCCC9] w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-base font-bold text-[#111111]">Редактировать профиль</h2>
+              <button onClick={() => setEditMode(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="text-xs font-medium text-[#666666] mb-1 block">Имя</label>
+                  <input value={editFirstName} onChange={e => setEditFirstName(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+                </div>
+                <div>
+                  <label className="text-xs font-medium text-[#666666] mb-1 block">Фамилия</label>
+                  <input value={editLastName} onChange={e => setEditLastName(e.target.value)}
+                    className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#666666] mb-1 block">Место работы</label>
+                <input value={editWorkplace} onChange={e => setEditWorkplace(e.target.value)}
+                  placeholder="Компания"
+                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#666666] mb-1 block">Регион</label>
+                <input value={editRegion} onChange={e => setEditRegion(e.target.value)}
+                  placeholder="Москва, Санкт-Петербург..."
+                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-5">
+              <Button variant="secondary" size="sm" onClick={() => setEditMode(false)} className="flex-1 justify-center">
+                Отмена
+              </Button>
+              <Button variant="orange" size="sm" onClick={saveEdit} loading={saving} className="flex-1 justify-center">
+                <Check className="w-3.5 h-3.5" /> Сохранить
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

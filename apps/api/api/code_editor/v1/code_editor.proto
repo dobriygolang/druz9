@@ -250,7 +250,7 @@ message ListTasksResponse {
   repeated Task tasks = 1;
 }
 
-message CreateTaskRequest {
+message TaskPayload {
   string title = 1;
   string slug = 2;
   string statement = 3;
@@ -261,8 +261,8 @@ message CreateTaskRequest {
   bool is_active = 8;
   repeated TaskTestCase public_test_cases = 9;
   repeated TaskTestCase hidden_test_cases = 10;
-  TaskType task_type = 11;  // semantic task kind for authoring/UI
-  string execution_profile = 12;  // runtime sandbox profile
+  TaskType task_type = 11;
+  string execution_profile = 12;
   repeated string fixture_files = 13;
   repeated string readable_paths = 14;
   repeated string writable_paths = 15;
@@ -271,32 +271,16 @@ message CreateTaskRequest {
   repeated string mock_endpoints = 18;
   bool writable_temp_dir = 19;
   string runner_mode = 20;
-  int32 duration_seconds = 21;  // duration in seconds for arena matches
+  int32 duration_seconds = 21;
+}
+
+message CreateTaskRequest {
+  TaskPayload task = 1;
 }
 
 message UpdateTaskRequest {
   string task_id = 1;
-  string title = 2;
-  string slug = 3;
-  string statement = 4;
-  TaskDifficulty difficulty = 5;
-  repeated string topics = 6;
-  string starter_code = 7;
-  ProgrammingLanguage language = 8;
-  bool is_active = 9;
-  repeated TaskTestCase public_test_cases = 10;
-  repeated TaskTestCase hidden_test_cases = 11;
-  TaskType task_type = 12;  // semantic task kind for authoring/UI
-  string execution_profile = 13;  // runtime sandbox profile
-  repeated string fixture_files = 14;
-  repeated string readable_paths = 15;
-  repeated string writable_paths = 16;
-  repeated string allowed_hosts = 17;
-  repeated int32 allowed_ports = 18;
-  repeated string mock_endpoints = 19;
-  bool writable_temp_dir = 20;
-  string runner_mode = 21;
-  int32 duration_seconds = 22;  // duration in seconds for arena matches
+  TaskPayload task = 2;
 }
 
 message TaskResponse {

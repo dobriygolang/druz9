@@ -1796,7 +1796,7 @@ func (x *ListTasksResponse) GetTasks() []*Task {
 	return nil
 }
 
-type CreateTaskRequest struct {
+type TaskPayload struct {
 	state            protoimpl.MessageState `protogen:"open.v1"`
 	Title            string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
 	Slug             string                 `protobuf:"bytes,2,opt,name=slug,proto3" json:"slug,omitempty"`
@@ -1808,8 +1808,8 @@ type CreateTaskRequest struct {
 	IsActive         bool                   `protobuf:"varint,8,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
 	PublicTestCases  []*TaskTestCase        `protobuf:"bytes,9,rep,name=public_test_cases,json=publicTestCases,proto3" json:"public_test_cases,omitempty"`
 	HiddenTestCases  []*TaskTestCase        `protobuf:"bytes,10,rep,name=hidden_test_cases,json=hiddenTestCases,proto3" json:"hidden_test_cases,omitempty"`
-	TaskType         TaskType               `protobuf:"varint,11,opt,name=task_type,json=taskType,proto3,enum=code_editor.v1.TaskType" json:"task_type,omitempty"` // semantic task kind for authoring/UI
-	ExecutionProfile string                 `protobuf:"bytes,12,opt,name=execution_profile,json=executionProfile,proto3" json:"execution_profile,omitempty"`       // runtime sandbox profile
+	TaskType         TaskType               `protobuf:"varint,11,opt,name=task_type,json=taskType,proto3,enum=code_editor.v1.TaskType" json:"task_type,omitempty"`
+	ExecutionProfile string                 `protobuf:"bytes,12,opt,name=execution_profile,json=executionProfile,proto3" json:"execution_profile,omitempty"`
 	FixtureFiles     []string               `protobuf:"bytes,13,rep,name=fixture_files,json=fixtureFiles,proto3" json:"fixture_files,omitempty"`
 	ReadablePaths    []string               `protobuf:"bytes,14,rep,name=readable_paths,json=readablePaths,proto3" json:"readable_paths,omitempty"`
 	WritablePaths    []string               `protobuf:"bytes,15,rep,name=writable_paths,json=writablePaths,proto3" json:"writable_paths,omitempty"`
@@ -1818,14 +1818,198 @@ type CreateTaskRequest struct {
 	MockEndpoints    []string               `protobuf:"bytes,18,rep,name=mock_endpoints,json=mockEndpoints,proto3" json:"mock_endpoints,omitempty"`
 	WritableTempDir  bool                   `protobuf:"varint,19,opt,name=writable_temp_dir,json=writableTempDir,proto3" json:"writable_temp_dir,omitempty"`
 	RunnerMode       string                 `protobuf:"bytes,20,opt,name=runner_mode,json=runnerMode,proto3" json:"runner_mode,omitempty"`
-	DurationSeconds  int32                  `protobuf:"varint,21,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"` // duration in seconds for arena matches
+	DurationSeconds  int32                  `protobuf:"varint,21,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
 
+func (x *TaskPayload) Reset() {
+	*x = TaskPayload{}
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *TaskPayload) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*TaskPayload) ProtoMessage() {}
+
+func (x *TaskPayload) ProtoReflect() protoreflect.Message {
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use TaskPayload.ProtoReflect.Descriptor instead.
+func (*TaskPayload) Descriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *TaskPayload) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *TaskPayload) GetSlug() string {
+	if x != nil {
+		return x.Slug
+	}
+	return ""
+}
+
+func (x *TaskPayload) GetStatement() string {
+	if x != nil {
+		return x.Statement
+	}
+	return ""
+}
+
+func (x *TaskPayload) GetDifficulty() TaskDifficulty {
+	if x != nil {
+		return x.Difficulty
+	}
+	return TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED
+}
+
+func (x *TaskPayload) GetTopics() []string {
+	if x != nil {
+		return x.Topics
+	}
+	return nil
+}
+
+func (x *TaskPayload) GetStarterCode() string {
+	if x != nil {
+		return x.StarterCode
+	}
+	return ""
+}
+
+func (x *TaskPayload) GetLanguage() ProgrammingLanguage {
+	if x != nil {
+		return x.Language
+	}
+	return ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED
+}
+
+func (x *TaskPayload) GetIsActive() bool {
+	if x != nil {
+		return x.IsActive
+	}
+	return false
+}
+
+func (x *TaskPayload) GetPublicTestCases() []*TaskTestCase {
+	if x != nil {
+		return x.PublicTestCases
+	}
+	return nil
+}
+
+func (x *TaskPayload) GetHiddenTestCases() []*TaskTestCase {
+	if x != nil {
+		return x.HiddenTestCases
+	}
+	return nil
+}
+
+func (x *TaskPayload) GetTaskType() TaskType {
+	if x != nil {
+		return x.TaskType
+	}
+	return TaskType_TASK_TYPE_UNSPECIFIED
+}
+
+func (x *TaskPayload) GetExecutionProfile() string {
+	if x != nil {
+		return x.ExecutionProfile
+	}
+	return ""
+}
+
+func (x *TaskPayload) GetFixtureFiles() []string {
+	if x != nil {
+		return x.FixtureFiles
+	}
+	return nil
+}
+
+func (x *TaskPayload) GetReadablePaths() []string {
+	if x != nil {
+		return x.ReadablePaths
+	}
+	return nil
+}
+
+func (x *TaskPayload) GetWritablePaths() []string {
+	if x != nil {
+		return x.WritablePaths
+	}
+	return nil
+}
+
+func (x *TaskPayload) GetAllowedHosts() []string {
+	if x != nil {
+		return x.AllowedHosts
+	}
+	return nil
+}
+
+func (x *TaskPayload) GetAllowedPorts() []int32 {
+	if x != nil {
+		return x.AllowedPorts
+	}
+	return nil
+}
+
+func (x *TaskPayload) GetMockEndpoints() []string {
+	if x != nil {
+		return x.MockEndpoints
+	}
+	return nil
+}
+
+func (x *TaskPayload) GetWritableTempDir() bool {
+	if x != nil {
+		return x.WritableTempDir
+	}
+	return false
+}
+
+func (x *TaskPayload) GetRunnerMode() string {
+	if x != nil {
+		return x.RunnerMode
+	}
+	return ""
+}
+
+func (x *TaskPayload) GetDurationSeconds() int32 {
+	if x != nil {
+		return x.DurationSeconds
+	}
+	return 0
+}
+
+type CreateTaskRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Task          *TaskPayload           `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
 func (x *CreateTaskRequest) Reset() {
 	*x = CreateTaskRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[22]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1837,7 +2021,7 @@ func (x *CreateTaskRequest) String() string {
 func (*CreateTaskRequest) ProtoMessage() {}
 
 func (x *CreateTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[22]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1850,187 +2034,27 @@ func (x *CreateTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTaskRequest.ProtoReflect.Descriptor instead.
 func (*CreateTaskRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{22}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{23}
 }
 
-func (x *CreateTaskRequest) GetTitle() string {
+func (x *CreateTaskRequest) GetTask() *TaskPayload {
 	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *CreateTaskRequest) GetSlug() string {
-	if x != nil {
-		return x.Slug
-	}
-	return ""
-}
-
-func (x *CreateTaskRequest) GetStatement() string {
-	if x != nil {
-		return x.Statement
-	}
-	return ""
-}
-
-func (x *CreateTaskRequest) GetDifficulty() TaskDifficulty {
-	if x != nil {
-		return x.Difficulty
-	}
-	return TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED
-}
-
-func (x *CreateTaskRequest) GetTopics() []string {
-	if x != nil {
-		return x.Topics
+		return x.Task
 	}
 	return nil
-}
-
-func (x *CreateTaskRequest) GetStarterCode() string {
-	if x != nil {
-		return x.StarterCode
-	}
-	return ""
-}
-
-func (x *CreateTaskRequest) GetLanguage() ProgrammingLanguage {
-	if x != nil {
-		return x.Language
-	}
-	return ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED
-}
-
-func (x *CreateTaskRequest) GetIsActive() bool {
-	if x != nil {
-		return x.IsActive
-	}
-	return false
-}
-
-func (x *CreateTaskRequest) GetPublicTestCases() []*TaskTestCase {
-	if x != nil {
-		return x.PublicTestCases
-	}
-	return nil
-}
-
-func (x *CreateTaskRequest) GetHiddenTestCases() []*TaskTestCase {
-	if x != nil {
-		return x.HiddenTestCases
-	}
-	return nil
-}
-
-func (x *CreateTaskRequest) GetTaskType() TaskType {
-	if x != nil {
-		return x.TaskType
-	}
-	return TaskType_TASK_TYPE_UNSPECIFIED
-}
-
-func (x *CreateTaskRequest) GetExecutionProfile() string {
-	if x != nil {
-		return x.ExecutionProfile
-	}
-	return ""
-}
-
-func (x *CreateTaskRequest) GetFixtureFiles() []string {
-	if x != nil {
-		return x.FixtureFiles
-	}
-	return nil
-}
-
-func (x *CreateTaskRequest) GetReadablePaths() []string {
-	if x != nil {
-		return x.ReadablePaths
-	}
-	return nil
-}
-
-func (x *CreateTaskRequest) GetWritablePaths() []string {
-	if x != nil {
-		return x.WritablePaths
-	}
-	return nil
-}
-
-func (x *CreateTaskRequest) GetAllowedHosts() []string {
-	if x != nil {
-		return x.AllowedHosts
-	}
-	return nil
-}
-
-func (x *CreateTaskRequest) GetAllowedPorts() []int32 {
-	if x != nil {
-		return x.AllowedPorts
-	}
-	return nil
-}
-
-func (x *CreateTaskRequest) GetMockEndpoints() []string {
-	if x != nil {
-		return x.MockEndpoints
-	}
-	return nil
-}
-
-func (x *CreateTaskRequest) GetWritableTempDir() bool {
-	if x != nil {
-		return x.WritableTempDir
-	}
-	return false
-}
-
-func (x *CreateTaskRequest) GetRunnerMode() string {
-	if x != nil {
-		return x.RunnerMode
-	}
-	return ""
-}
-
-func (x *CreateTaskRequest) GetDurationSeconds() int32 {
-	if x != nil {
-		return x.DurationSeconds
-	}
-	return 0
 }
 
 type UpdateTaskRequest struct {
-	state            protoimpl.MessageState `protogen:"open.v1"`
-	TaskId           string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	Title            string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Slug             string                 `protobuf:"bytes,3,opt,name=slug,proto3" json:"slug,omitempty"`
-	Statement        string                 `protobuf:"bytes,4,opt,name=statement,proto3" json:"statement,omitempty"`
-	Difficulty       TaskDifficulty         `protobuf:"varint,5,opt,name=difficulty,proto3,enum=code_editor.v1.TaskDifficulty" json:"difficulty,omitempty"`
-	Topics           []string               `protobuf:"bytes,6,rep,name=topics,proto3" json:"topics,omitempty"`
-	StarterCode      string                 `protobuf:"bytes,7,opt,name=starter_code,json=starterCode,proto3" json:"starter_code,omitempty"`
-	Language         ProgrammingLanguage    `protobuf:"varint,8,opt,name=language,proto3,enum=code_editor.v1.ProgrammingLanguage" json:"language,omitempty"`
-	IsActive         bool                   `protobuf:"varint,9,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
-	PublicTestCases  []*TaskTestCase        `protobuf:"bytes,10,rep,name=public_test_cases,json=publicTestCases,proto3" json:"public_test_cases,omitempty"`
-	HiddenTestCases  []*TaskTestCase        `protobuf:"bytes,11,rep,name=hidden_test_cases,json=hiddenTestCases,proto3" json:"hidden_test_cases,omitempty"`
-	TaskType         TaskType               `protobuf:"varint,12,opt,name=task_type,json=taskType,proto3,enum=code_editor.v1.TaskType" json:"task_type,omitempty"` // semantic task kind for authoring/UI
-	ExecutionProfile string                 `protobuf:"bytes,13,opt,name=execution_profile,json=executionProfile,proto3" json:"execution_profile,omitempty"`       // runtime sandbox profile
-	FixtureFiles     []string               `protobuf:"bytes,14,rep,name=fixture_files,json=fixtureFiles,proto3" json:"fixture_files,omitempty"`
-	ReadablePaths    []string               `protobuf:"bytes,15,rep,name=readable_paths,json=readablePaths,proto3" json:"readable_paths,omitempty"`
-	WritablePaths    []string               `protobuf:"bytes,16,rep,name=writable_paths,json=writablePaths,proto3" json:"writable_paths,omitempty"`
-	AllowedHosts     []string               `protobuf:"bytes,17,rep,name=allowed_hosts,json=allowedHosts,proto3" json:"allowed_hosts,omitempty"`
-	AllowedPorts     []int32                `protobuf:"varint,18,rep,packed,name=allowed_ports,json=allowedPorts,proto3" json:"allowed_ports,omitempty"`
-	MockEndpoints    []string               `protobuf:"bytes,19,rep,name=mock_endpoints,json=mockEndpoints,proto3" json:"mock_endpoints,omitempty"`
-	WritableTempDir  bool                   `protobuf:"varint,20,opt,name=writable_temp_dir,json=writableTempDir,proto3" json:"writable_temp_dir,omitempty"`
-	RunnerMode       string                 `protobuf:"bytes,21,opt,name=runner_mode,json=runnerMode,proto3" json:"runner_mode,omitempty"`
-	DurationSeconds  int32                  `protobuf:"varint,22,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"` // duration in seconds for arena matches
-	unknownFields    protoimpl.UnknownFields
-	sizeCache        protoimpl.SizeCache
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TaskId        string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	Task          *TaskPayload           `protobuf:"bytes,2,opt,name=task,proto3" json:"task,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
 }
 
 func (x *UpdateTaskRequest) Reset() {
 	*x = UpdateTaskRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[23]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2042,7 +2066,7 @@ func (x *UpdateTaskRequest) String() string {
 func (*UpdateTaskRequest) ProtoMessage() {}
 
 func (x *UpdateTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[23]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2055,7 +2079,7 @@ func (x *UpdateTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTaskRequest.ProtoReflect.Descriptor instead.
 func (*UpdateTaskRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{23}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *UpdateTaskRequest) GetTaskId() string {
@@ -2065,151 +2089,11 @@ func (x *UpdateTaskRequest) GetTaskId() string {
 	return ""
 }
 
-func (x *UpdateTaskRequest) GetTitle() string {
+func (x *UpdateTaskRequest) GetTask() *TaskPayload {
 	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *UpdateTaskRequest) GetSlug() string {
-	if x != nil {
-		return x.Slug
-	}
-	return ""
-}
-
-func (x *UpdateTaskRequest) GetStatement() string {
-	if x != nil {
-		return x.Statement
-	}
-	return ""
-}
-
-func (x *UpdateTaskRequest) GetDifficulty() TaskDifficulty {
-	if x != nil {
-		return x.Difficulty
-	}
-	return TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED
-}
-
-func (x *UpdateTaskRequest) GetTopics() []string {
-	if x != nil {
-		return x.Topics
+		return x.Task
 	}
 	return nil
-}
-
-func (x *UpdateTaskRequest) GetStarterCode() string {
-	if x != nil {
-		return x.StarterCode
-	}
-	return ""
-}
-
-func (x *UpdateTaskRequest) GetLanguage() ProgrammingLanguage {
-	if x != nil {
-		return x.Language
-	}
-	return ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED
-}
-
-func (x *UpdateTaskRequest) GetIsActive() bool {
-	if x != nil {
-		return x.IsActive
-	}
-	return false
-}
-
-func (x *UpdateTaskRequest) GetPublicTestCases() []*TaskTestCase {
-	if x != nil {
-		return x.PublicTestCases
-	}
-	return nil
-}
-
-func (x *UpdateTaskRequest) GetHiddenTestCases() []*TaskTestCase {
-	if x != nil {
-		return x.HiddenTestCases
-	}
-	return nil
-}
-
-func (x *UpdateTaskRequest) GetTaskType() TaskType {
-	if x != nil {
-		return x.TaskType
-	}
-	return TaskType_TASK_TYPE_UNSPECIFIED
-}
-
-func (x *UpdateTaskRequest) GetExecutionProfile() string {
-	if x != nil {
-		return x.ExecutionProfile
-	}
-	return ""
-}
-
-func (x *UpdateTaskRequest) GetFixtureFiles() []string {
-	if x != nil {
-		return x.FixtureFiles
-	}
-	return nil
-}
-
-func (x *UpdateTaskRequest) GetReadablePaths() []string {
-	if x != nil {
-		return x.ReadablePaths
-	}
-	return nil
-}
-
-func (x *UpdateTaskRequest) GetWritablePaths() []string {
-	if x != nil {
-		return x.WritablePaths
-	}
-	return nil
-}
-
-func (x *UpdateTaskRequest) GetAllowedHosts() []string {
-	if x != nil {
-		return x.AllowedHosts
-	}
-	return nil
-}
-
-func (x *UpdateTaskRequest) GetAllowedPorts() []int32 {
-	if x != nil {
-		return x.AllowedPorts
-	}
-	return nil
-}
-
-func (x *UpdateTaskRequest) GetMockEndpoints() []string {
-	if x != nil {
-		return x.MockEndpoints
-	}
-	return nil
-}
-
-func (x *UpdateTaskRequest) GetWritableTempDir() bool {
-	if x != nil {
-		return x.WritableTempDir
-	}
-	return false
-}
-
-func (x *UpdateTaskRequest) GetRunnerMode() string {
-	if x != nil {
-		return x.RunnerMode
-	}
-	return ""
-}
-
-func (x *UpdateTaskRequest) GetDurationSeconds() int32 {
-	if x != nil {
-		return x.DurationSeconds
-	}
-	return 0
 }
 
 type TaskResponse struct {
@@ -2221,7 +2105,7 @@ type TaskResponse struct {
 
 func (x *TaskResponse) Reset() {
 	*x = TaskResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[24]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2233,7 +2117,7 @@ func (x *TaskResponse) String() string {
 func (*TaskResponse) ProtoMessage() {}
 
 func (x *TaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[24]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2246,7 +2130,7 @@ func (x *TaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskResponse.ProtoReflect.Descriptor instead.
 func (*TaskResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{24}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *TaskResponse) GetTask() *Task {
@@ -2265,7 +2149,7 @@ type DeleteTaskRequest struct {
 
 func (x *DeleteTaskRequest) Reset() {
 	*x = DeleteTaskRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[25]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2277,7 +2161,7 @@ func (x *DeleteTaskRequest) String() string {
 func (*DeleteTaskRequest) ProtoMessage() {}
 
 func (x *DeleteTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[25]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2290,7 +2174,7 @@ func (x *DeleteTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTaskRequest.ProtoReflect.Descriptor instead.
 func (*DeleteTaskRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{25}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *DeleteTaskRequest) GetTaskId() string {
@@ -2309,7 +2193,7 @@ type DeleteTaskResponse struct {
 
 func (x *DeleteTaskResponse) Reset() {
 	*x = DeleteTaskResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[26]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2321,7 +2205,7 @@ func (x *DeleteTaskResponse) String() string {
 func (*DeleteTaskResponse) ProtoMessage() {}
 
 func (x *DeleteTaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[26]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2334,7 +2218,7 @@ func (x *DeleteTaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTaskResponse.ProtoReflect.Descriptor instead.
 func (*DeleteTaskResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{26}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *DeleteTaskResponse) GetStatus() string {
@@ -2353,7 +2237,7 @@ type GetLeaderboardRequest struct {
 
 func (x *GetLeaderboardRequest) Reset() {
 	*x = GetLeaderboardRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[27]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2365,7 +2249,7 @@ func (x *GetLeaderboardRequest) String() string {
 func (*GetLeaderboardRequest) ProtoMessage() {}
 
 func (x *GetLeaderboardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[27]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2378,7 +2262,7 @@ func (x *GetLeaderboardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLeaderboardRequest.ProtoReflect.Descriptor instead.
 func (*GetLeaderboardRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{27}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *GetLeaderboardRequest) GetLimit() int32 {
@@ -2402,7 +2286,7 @@ type LeaderboardEntry struct {
 
 func (x *LeaderboardEntry) Reset() {
 	*x = LeaderboardEntry{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[28]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2414,7 +2298,7 @@ func (x *LeaderboardEntry) String() string {
 func (*LeaderboardEntry) ProtoMessage() {}
 
 func (x *LeaderboardEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[28]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2427,7 +2311,7 @@ func (x *LeaderboardEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LeaderboardEntry.ProtoReflect.Descriptor instead.
 func (*LeaderboardEntry) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{28}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *LeaderboardEntry) GetUserId() string {
@@ -2481,7 +2365,7 @@ type GetLeaderboardResponse struct {
 
 func (x *GetLeaderboardResponse) Reset() {
 	*x = GetLeaderboardResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[29]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2493,7 +2377,7 @@ func (x *GetLeaderboardResponse) String() string {
 func (*GetLeaderboardResponse) ProtoMessage() {}
 
 func (x *GetLeaderboardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[29]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2506,7 +2390,7 @@ func (x *GetLeaderboardResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLeaderboardResponse.ProtoReflect.Descriptor instead.
 func (*GetLeaderboardResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{29}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetLeaderboardResponse) GetEntries() []*LeaderboardEntry {
@@ -2655,8 +2539,8 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"difficulty\x12)\n" +
 	"\x10include_inactive\x18\x03 \x01(\bR\x0fincludeInactive\"?\n" +
 	"\x11ListTasksResponse\x12*\n" +
-	"\x05tasks\x18\x01 \x03(\v2\x14.code_editor.v1.TaskR\x05tasks\"\x88\a\n" +
-	"\x11CreateTaskRequest\x12\x14\n" +
+	"\x05tasks\x18\x01 \x03(\v2\x14.code_editor.v1.TaskR\x05tasks\"\x82\a\n" +
+	"\vTaskPayload\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x12\n" +
 	"\x04slug\x18\x02 \x01(\tR\x04slug\x12\x1c\n" +
 	"\tstatement\x18\x03 \x01(\tR\tstatement\x12>\n" +
@@ -2681,34 +2565,12 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x11writable_temp_dir\x18\x13 \x01(\bR\x0fwritableTempDir\x12\x1f\n" +
 	"\vrunner_mode\x18\x14 \x01(\tR\n" +
 	"runnerMode\x12)\n" +
-	"\x10duration_seconds\x18\x15 \x01(\x05R\x0fdurationSeconds\"\xa1\a\n" +
+	"\x10duration_seconds\x18\x15 \x01(\x05R\x0fdurationSeconds\"D\n" +
+	"\x11CreateTaskRequest\x12/\n" +
+	"\x04task\x18\x01 \x01(\v2\x1b.code_editor.v1.TaskPayloadR\x04task\"]\n" +
 	"\x11UpdateTaskRequest\x12\x17\n" +
-	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\x12\x12\n" +
-	"\x04slug\x18\x03 \x01(\tR\x04slug\x12\x1c\n" +
-	"\tstatement\x18\x04 \x01(\tR\tstatement\x12>\n" +
-	"\n" +
-	"difficulty\x18\x05 \x01(\x0e2\x1e.code_editor.v1.TaskDifficultyR\n" +
-	"difficulty\x12\x16\n" +
-	"\x06topics\x18\x06 \x03(\tR\x06topics\x12!\n" +
-	"\fstarter_code\x18\a \x01(\tR\vstarterCode\x12?\n" +
-	"\blanguage\x18\b \x01(\x0e2#.code_editor.v1.ProgrammingLanguageR\blanguage\x12\x1b\n" +
-	"\tis_active\x18\t \x01(\bR\bisActive\x12H\n" +
-	"\x11public_test_cases\x18\n" +
-	" \x03(\v2\x1c.code_editor.v1.TaskTestCaseR\x0fpublicTestCases\x12H\n" +
-	"\x11hidden_test_cases\x18\v \x03(\v2\x1c.code_editor.v1.TaskTestCaseR\x0fhiddenTestCases\x125\n" +
-	"\ttask_type\x18\f \x01(\x0e2\x18.code_editor.v1.TaskTypeR\btaskType\x12+\n" +
-	"\x11execution_profile\x18\r \x01(\tR\x10executionProfile\x12#\n" +
-	"\rfixture_files\x18\x0e \x03(\tR\ffixtureFiles\x12%\n" +
-	"\x0ereadable_paths\x18\x0f \x03(\tR\rreadablePaths\x12%\n" +
-	"\x0ewritable_paths\x18\x10 \x03(\tR\rwritablePaths\x12#\n" +
-	"\rallowed_hosts\x18\x11 \x03(\tR\fallowedHosts\x12#\n" +
-	"\rallowed_ports\x18\x12 \x03(\x05R\fallowedPorts\x12%\n" +
-	"\x0emock_endpoints\x18\x13 \x03(\tR\rmockEndpoints\x12*\n" +
-	"\x11writable_temp_dir\x18\x14 \x01(\bR\x0fwritableTempDir\x12\x1f\n" +
-	"\vrunner_mode\x18\x15 \x01(\tR\n" +
-	"runnerMode\x12)\n" +
-	"\x10duration_seconds\x18\x16 \x01(\x05R\x0fdurationSeconds\"8\n" +
+	"\atask_id\x18\x01 \x01(\tR\x06taskId\x12/\n" +
+	"\x04task\x18\x02 \x01(\v2\x1b.code_editor.v1.TaskPayloadR\x04task\"8\n" +
 	"\fTaskResponse\x12(\n" +
 	"\x04task\x18\x01 \x01(\v2\x14.code_editor.v1.TaskR\x04task\",\n" +
 	"\x11DeleteTaskRequest\x12\x17\n" +
@@ -2788,7 +2650,7 @@ func file_code_editor_v1_code_editor_proto_rawDescGZIP() []byte {
 }
 
 var file_code_editor_v1_code_editor_proto_enumTypes = make([]protoimpl.EnumInfo, 5)
-var file_code_editor_v1_code_editor_proto_msgTypes = make([]protoimpl.MessageInfo, 30)
+var file_code_editor_v1_code_editor_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
 var file_code_editor_v1_code_editor_proto_goTypes = []any{
 	(RoomMode)(0),                       // 0: code_editor.v1.RoomMode
 	(RoomStatus)(0),                     // 1: code_editor.v1.RoomStatus
@@ -2817,15 +2679,16 @@ var file_code_editor_v1_code_editor_proto_goTypes = []any{
 	(*Task)(nil),                        // 24: code_editor.v1.Task
 	(*ListTasksRequest)(nil),            // 25: code_editor.v1.ListTasksRequest
 	(*ListTasksResponse)(nil),           // 26: code_editor.v1.ListTasksResponse
-	(*CreateTaskRequest)(nil),           // 27: code_editor.v1.CreateTaskRequest
-	(*UpdateTaskRequest)(nil),           // 28: code_editor.v1.UpdateTaskRequest
-	(*TaskResponse)(nil),                // 29: code_editor.v1.TaskResponse
-	(*DeleteTaskRequest)(nil),           // 30: code_editor.v1.DeleteTaskRequest
-	(*DeleteTaskResponse)(nil),          // 31: code_editor.v1.DeleteTaskResponse
-	(*GetLeaderboardRequest)(nil),       // 32: code_editor.v1.GetLeaderboardRequest
-	(*LeaderboardEntry)(nil),            // 33: code_editor.v1.LeaderboardEntry
-	(*GetLeaderboardResponse)(nil),      // 34: code_editor.v1.GetLeaderboardResponse
-	(*timestamppb.Timestamp)(nil),       // 35: google.protobuf.Timestamp
+	(*TaskPayload)(nil),                 // 27: code_editor.v1.TaskPayload
+	(*CreateTaskRequest)(nil),           // 28: code_editor.v1.CreateTaskRequest
+	(*UpdateTaskRequest)(nil),           // 29: code_editor.v1.UpdateTaskRequest
+	(*TaskResponse)(nil),                // 30: code_editor.v1.TaskResponse
+	(*DeleteTaskRequest)(nil),           // 31: code_editor.v1.DeleteTaskRequest
+	(*DeleteTaskResponse)(nil),          // 32: code_editor.v1.DeleteTaskResponse
+	(*GetLeaderboardRequest)(nil),       // 33: code_editor.v1.GetLeaderboardRequest
+	(*LeaderboardEntry)(nil),            // 34: code_editor.v1.LeaderboardEntry
+	(*GetLeaderboardResponse)(nil),      // 35: code_editor.v1.GetLeaderboardResponse
+	(*timestamppb.Timestamp)(nil),       // 36: google.protobuf.Timestamp
 }
 var file_code_editor_v1_code_editor_proto_depIdxs = []int32{
 	0,  // 0: code_editor.v1.CreateRoomRequest.mode:type_name -> code_editor.v1.RoomMode
@@ -2836,62 +2699,59 @@ var file_code_editor_v1_code_editor_proto_depIdxs = []int32{
 	22, // 5: code_editor.v1.GetSubmissionsResponse.submissions:type_name -> code_editor.v1.Submission
 	0,  // 6: code_editor.v1.Room.mode:type_name -> code_editor.v1.RoomMode
 	1,  // 7: code_editor.v1.Room.status:type_name -> code_editor.v1.RoomStatus
-	35, // 8: code_editor.v1.Room.created_at:type_name -> google.protobuf.Timestamp
+	36, // 8: code_editor.v1.Room.created_at:type_name -> google.protobuf.Timestamp
 	21, // 9: code_editor.v1.Room.participants:type_name -> code_editor.v1.Participant
-	35, // 10: code_editor.v1.Participant.joined_at:type_name -> google.protobuf.Timestamp
-	35, // 11: code_editor.v1.Submission.submitted_at:type_name -> google.protobuf.Timestamp
+	36, // 10: code_editor.v1.Participant.joined_at:type_name -> google.protobuf.Timestamp
+	36, // 11: code_editor.v1.Submission.submitted_at:type_name -> google.protobuf.Timestamp
 	2,  // 12: code_editor.v1.Task.difficulty:type_name -> code_editor.v1.TaskDifficulty
 	3,  // 13: code_editor.v1.Task.language:type_name -> code_editor.v1.ProgrammingLanguage
 	23, // 14: code_editor.v1.Task.public_test_cases:type_name -> code_editor.v1.TaskTestCase
 	23, // 15: code_editor.v1.Task.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
-	35, // 16: code_editor.v1.Task.created_at:type_name -> google.protobuf.Timestamp
-	35, // 17: code_editor.v1.Task.updated_at:type_name -> google.protobuf.Timestamp
+	36, // 16: code_editor.v1.Task.created_at:type_name -> google.protobuf.Timestamp
+	36, // 17: code_editor.v1.Task.updated_at:type_name -> google.protobuf.Timestamp
 	4,  // 18: code_editor.v1.Task.task_type:type_name -> code_editor.v1.TaskType
 	2,  // 19: code_editor.v1.ListTasksRequest.difficulty:type_name -> code_editor.v1.TaskDifficulty
 	24, // 20: code_editor.v1.ListTasksResponse.tasks:type_name -> code_editor.v1.Task
-	2,  // 21: code_editor.v1.CreateTaskRequest.difficulty:type_name -> code_editor.v1.TaskDifficulty
-	3,  // 22: code_editor.v1.CreateTaskRequest.language:type_name -> code_editor.v1.ProgrammingLanguage
-	23, // 23: code_editor.v1.CreateTaskRequest.public_test_cases:type_name -> code_editor.v1.TaskTestCase
-	23, // 24: code_editor.v1.CreateTaskRequest.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
-	4,  // 25: code_editor.v1.CreateTaskRequest.task_type:type_name -> code_editor.v1.TaskType
-	2,  // 26: code_editor.v1.UpdateTaskRequest.difficulty:type_name -> code_editor.v1.TaskDifficulty
-	3,  // 27: code_editor.v1.UpdateTaskRequest.language:type_name -> code_editor.v1.ProgrammingLanguage
-	23, // 28: code_editor.v1.UpdateTaskRequest.public_test_cases:type_name -> code_editor.v1.TaskTestCase
-	23, // 29: code_editor.v1.UpdateTaskRequest.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
-	4,  // 30: code_editor.v1.UpdateTaskRequest.task_type:type_name -> code_editor.v1.TaskType
-	24, // 31: code_editor.v1.TaskResponse.task:type_name -> code_editor.v1.Task
-	33, // 32: code_editor.v1.GetLeaderboardResponse.entries:type_name -> code_editor.v1.LeaderboardEntry
-	5,  // 33: code_editor.v1.CodeEditorService.CreateRoom:input_type -> code_editor.v1.CreateRoomRequest
-	7,  // 34: code_editor.v1.CodeEditorService.GetRoom:input_type -> code_editor.v1.GetRoomRequest
-	9,  // 35: code_editor.v1.CodeEditorService.JoinRoom:input_type -> code_editor.v1.JoinRoomRequest
-	10, // 36: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:input_type -> code_editor.v1.JoinRoomByInviteCodeRequest
-	12, // 37: code_editor.v1.CodeEditorService.LeaveRoom:input_type -> code_editor.v1.LeaveRoomRequest
-	14, // 38: code_editor.v1.CodeEditorService.SubmitCode:input_type -> code_editor.v1.SubmitCodeRequest
-	16, // 39: code_editor.v1.CodeEditorService.SetReady:input_type -> code_editor.v1.SetReadyRequest
-	18, // 40: code_editor.v1.CodeEditorService.GetSubmissions:input_type -> code_editor.v1.GetSubmissionsRequest
-	25, // 41: code_editor.v1.CodeEditorService.ListTasks:input_type -> code_editor.v1.ListTasksRequest
-	27, // 42: code_editor.v1.CodeEditorService.CreateTask:input_type -> code_editor.v1.CreateTaskRequest
-	28, // 43: code_editor.v1.CodeEditorService.UpdateTask:input_type -> code_editor.v1.UpdateTaskRequest
-	30, // 44: code_editor.v1.CodeEditorService.DeleteTask:input_type -> code_editor.v1.DeleteTaskRequest
-	32, // 45: code_editor.v1.CodeEditorService.GetLeaderboard:input_type -> code_editor.v1.GetLeaderboardRequest
-	6,  // 46: code_editor.v1.CodeEditorService.CreateRoom:output_type -> code_editor.v1.CreateRoomResponse
-	8,  // 47: code_editor.v1.CodeEditorService.GetRoom:output_type -> code_editor.v1.GetRoomResponse
-	11, // 48: code_editor.v1.CodeEditorService.JoinRoom:output_type -> code_editor.v1.JoinRoomResponse
-	11, // 49: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:output_type -> code_editor.v1.JoinRoomResponse
-	13, // 50: code_editor.v1.CodeEditorService.LeaveRoom:output_type -> code_editor.v1.LeaveRoomResponse
-	15, // 51: code_editor.v1.CodeEditorService.SubmitCode:output_type -> code_editor.v1.SubmitCodeResponse
-	17, // 52: code_editor.v1.CodeEditorService.SetReady:output_type -> code_editor.v1.SetReadyResponse
-	19, // 53: code_editor.v1.CodeEditorService.GetSubmissions:output_type -> code_editor.v1.GetSubmissionsResponse
-	26, // 54: code_editor.v1.CodeEditorService.ListTasks:output_type -> code_editor.v1.ListTasksResponse
-	29, // 55: code_editor.v1.CodeEditorService.CreateTask:output_type -> code_editor.v1.TaskResponse
-	29, // 56: code_editor.v1.CodeEditorService.UpdateTask:output_type -> code_editor.v1.TaskResponse
-	31, // 57: code_editor.v1.CodeEditorService.DeleteTask:output_type -> code_editor.v1.DeleteTaskResponse
-	34, // 58: code_editor.v1.CodeEditorService.GetLeaderboard:output_type -> code_editor.v1.GetLeaderboardResponse
-	46, // [46:59] is the sub-list for method output_type
-	33, // [33:46] is the sub-list for method input_type
-	33, // [33:33] is the sub-list for extension type_name
-	33, // [33:33] is the sub-list for extension extendee
-	0,  // [0:33] is the sub-list for field type_name
+	2,  // 21: code_editor.v1.TaskPayload.difficulty:type_name -> code_editor.v1.TaskDifficulty
+	3,  // 22: code_editor.v1.TaskPayload.language:type_name -> code_editor.v1.ProgrammingLanguage
+	23, // 23: code_editor.v1.TaskPayload.public_test_cases:type_name -> code_editor.v1.TaskTestCase
+	23, // 24: code_editor.v1.TaskPayload.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
+	4,  // 25: code_editor.v1.TaskPayload.task_type:type_name -> code_editor.v1.TaskType
+	27, // 26: code_editor.v1.CreateTaskRequest.task:type_name -> code_editor.v1.TaskPayload
+	27, // 27: code_editor.v1.UpdateTaskRequest.task:type_name -> code_editor.v1.TaskPayload
+	24, // 28: code_editor.v1.TaskResponse.task:type_name -> code_editor.v1.Task
+	34, // 29: code_editor.v1.GetLeaderboardResponse.entries:type_name -> code_editor.v1.LeaderboardEntry
+	5,  // 30: code_editor.v1.CodeEditorService.CreateRoom:input_type -> code_editor.v1.CreateRoomRequest
+	7,  // 31: code_editor.v1.CodeEditorService.GetRoom:input_type -> code_editor.v1.GetRoomRequest
+	9,  // 32: code_editor.v1.CodeEditorService.JoinRoom:input_type -> code_editor.v1.JoinRoomRequest
+	10, // 33: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:input_type -> code_editor.v1.JoinRoomByInviteCodeRequest
+	12, // 34: code_editor.v1.CodeEditorService.LeaveRoom:input_type -> code_editor.v1.LeaveRoomRequest
+	14, // 35: code_editor.v1.CodeEditorService.SubmitCode:input_type -> code_editor.v1.SubmitCodeRequest
+	16, // 36: code_editor.v1.CodeEditorService.SetReady:input_type -> code_editor.v1.SetReadyRequest
+	18, // 37: code_editor.v1.CodeEditorService.GetSubmissions:input_type -> code_editor.v1.GetSubmissionsRequest
+	25, // 38: code_editor.v1.CodeEditorService.ListTasks:input_type -> code_editor.v1.ListTasksRequest
+	28, // 39: code_editor.v1.CodeEditorService.CreateTask:input_type -> code_editor.v1.CreateTaskRequest
+	29, // 40: code_editor.v1.CodeEditorService.UpdateTask:input_type -> code_editor.v1.UpdateTaskRequest
+	31, // 41: code_editor.v1.CodeEditorService.DeleteTask:input_type -> code_editor.v1.DeleteTaskRequest
+	33, // 42: code_editor.v1.CodeEditorService.GetLeaderboard:input_type -> code_editor.v1.GetLeaderboardRequest
+	6,  // 43: code_editor.v1.CodeEditorService.CreateRoom:output_type -> code_editor.v1.CreateRoomResponse
+	8,  // 44: code_editor.v1.CodeEditorService.GetRoom:output_type -> code_editor.v1.GetRoomResponse
+	11, // 45: code_editor.v1.CodeEditorService.JoinRoom:output_type -> code_editor.v1.JoinRoomResponse
+	11, // 46: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:output_type -> code_editor.v1.JoinRoomResponse
+	13, // 47: code_editor.v1.CodeEditorService.LeaveRoom:output_type -> code_editor.v1.LeaveRoomResponse
+	15, // 48: code_editor.v1.CodeEditorService.SubmitCode:output_type -> code_editor.v1.SubmitCodeResponse
+	17, // 49: code_editor.v1.CodeEditorService.SetReady:output_type -> code_editor.v1.SetReadyResponse
+	19, // 50: code_editor.v1.CodeEditorService.GetSubmissions:output_type -> code_editor.v1.GetSubmissionsResponse
+	26, // 51: code_editor.v1.CodeEditorService.ListTasks:output_type -> code_editor.v1.ListTasksResponse
+	30, // 52: code_editor.v1.CodeEditorService.CreateTask:output_type -> code_editor.v1.TaskResponse
+	30, // 53: code_editor.v1.CodeEditorService.UpdateTask:output_type -> code_editor.v1.TaskResponse
+	32, // 54: code_editor.v1.CodeEditorService.DeleteTask:output_type -> code_editor.v1.DeleteTaskResponse
+	35, // 55: code_editor.v1.CodeEditorService.GetLeaderboard:output_type -> code_editor.v1.GetLeaderboardResponse
+	43, // [43:56] is the sub-list for method output_type
+	30, // [30:43] is the sub-list for method input_type
+	30, // [30:30] is the sub-list for extension type_name
+	30, // [30:30] is the sub-list for extension extendee
+	0,  // [0:30] is the sub-list for field type_name
 }
 
 func init() { file_code_editor_v1_code_editor_proto_init() }
@@ -2905,7 +2765,7 @@ func file_code_editor_v1_code_editor_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_code_editor_v1_code_editor_proto_rawDesc), len(file_code_editor_v1_code_editor_proto_rawDesc)),
 			NumEnums:      5,
-			NumMessages:   30,
+			NumMessages:   31,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -8,11 +8,11 @@ export const adminApi = {
     return r.data.tasks ?? []
   },
   createCodeTask: async (payload: unknown) => {
-    const r = await apiClient.post<{ task?: unknown }>('/api/admin/code-editor/tasks', payload)
+    const r = await apiClient.post<{ task?: unknown }>('/api/admin/code-editor/tasks', { task: payload })
     return r.data.task
   },
   updateCodeTask: async (taskId: string, payload: unknown) => {
-    const r = await apiClient.put<{ task?: unknown }>(`/api/admin/code-editor/tasks/${taskId}`, payload)
+    const r = await apiClient.put<{ task?: unknown }>(`/api/admin/code-editor/tasks/${taskId}`, { task: payload })
     return r.data.task
   },
   deleteCodeTask: async (taskId: string) => {

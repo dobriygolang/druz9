@@ -19,14 +19,7 @@ func (i *Implementation) JoinQueue(ctx context.Context, req *v1.JoinQueueRequest
 
 	state, err := i.service.EnqueueMatchmaking(ctx, user, req.Topic, req.Difficulty, req.ObfuscateOpponent)
 	if err != nil {
-		switch {
-		case errors.Is(err, arenadomain.ErrNoAvailableTasks):
-			return nil, errors.BadRequest("NO_AVAILABLE_TASKS", "no available arena tasks for this filter")
-		case errors.Is(err, arenadomain.ErrGuestsNotSupported):
-			return nil, errors.Forbidden("ARENA_REQUIRES_AUTH", "arena is available only for registered users")
-		default:
-			return nil, errors.BadRequest("QUEUE_JOIN_FAILED", err.Error())
-		}
+		return nil, mapErr(err)
 	}
 
 	return mapQueueState(state), nil
@@ -58,7 +51,7 @@ func (i *Implementation) GetQueueStatus(ctx context.Context, req *v1.GetQueueSta
 	user, _ := resolveArenaActor(ctx, false)
 	state, err := i.service.GetQueueStatus(ctx, user)
 	if err != nil {
-		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
+		return nil, mapErr(err)
 	}
 
 	return mapQueueState(state), nil
@@ -72,7 +65,7 @@ func (i *Implementation) GetPlayerStats(ctx context.Context, req *v1.GetPlayerSt
 
 	stats, err := i.service.GetPlayerStats(ctx, userID)
 	if err != nil {
-		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
+		return nil, mapErr(err)
 	}
 
 	return &v1.ArenaPlayerStatsResponse{Stats: mapPlayerStats(stats)}, nil
@@ -93,7 +86,7 @@ func (i *Implementation) GetPlayerStatsBatch(ctx context.Context, req *v1.GetPla
 
 	statsMap, err := i.service.GetPlayerStatsBatch(ctx, userIDs)
 	if err != nil {
-		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
+		return nil, mapErr(err)
 	}
 
 	result := make(map[string]*v1.ArenaPlayerStats, len(statsMap))
@@ -133,7 +126,7 @@ func (i *Implementation) ListOpenMatches(ctx context.Context, req *v1.ListOpenMa
 
 	matches, err := i.service.ListOpenMatches(ctx, limit)
 	if err != nil {
-		return nil, errors.InternalServer("INTERNAL_ERROR", "failed to list open matches")
+		return nil, mapErr(err)
 	}
 
 	items := make([]*v1.ArenaMatch, 0, len(matches))

@@ -3,7 +3,6 @@ package code_editor
 import (
 	"context"
 
-	codeeditordomain "api/internal/domain/codeeditor"
 	"api/internal/metrics"
 	v1 "api/pkg/api/code_editor/v1"
 
@@ -21,19 +20,11 @@ func (i *Implementation) JoinRoom(ctx context.Context, req *v1.JoinRoomRequest) 
 
 	room, err := i.service.JoinRoom(ctx, roomID, userID, name, isGuest)
 	if err != nil {
-		if errors.Is(err, codeeditordomain.ErrRoomNotFound) {
-			return nil, errors.NotFound("ROOM_NOT_FOUND", "room not found")
-		}
-		if errors.Is(err, codeeditordomain.ErrRoomFull) {
-			return nil, errors.BadRequest("ROOM_FULL", "room is full")
-		}
-		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
+		return nil, mapErr(err)
 	}
 
 	i.realtime.PublishRoomUpdate(mapRealtimeRoom(room))
 	metrics.IncRoomsJoined()
 
-	return &v1.JoinRoomResponse{
-		Room: mapRoom(room),
-	}, nil
+	return &v1.JoinRoomResponse{Room: mapRoom(room)}, nil
 }

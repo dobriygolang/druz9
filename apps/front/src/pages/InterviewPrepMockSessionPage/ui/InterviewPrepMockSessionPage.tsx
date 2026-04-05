@@ -43,15 +43,16 @@ export function InterviewPrepMockSessionPage() {
   }, [sessionId, navigate])
 
   const resetStageState = (s: any) => {
-    const stage = s?.current_stage
-    setCode(stage?.task?.starter_code ?? '')
+    const stage = s?.currentStage ?? s?.current_stage
+    setCode(stage?.task?.starterCode ?? stage?.task?.starter_code ?? '')
     setTextAnswer('')
     setDesignNotes('')
     setDesignComponents('')
     setDesignApis('')
     setDesignSchema('')
     setReview(null)
-    if (stage?.task?.duration_seconds) setTimeLeft(stage.task.duration_seconds)
+    const dur = stage?.task?.durationSeconds ?? stage?.task?.duration_seconds
+    if (dur) setTimeLeft(dur)
     else setTimeLeft(0)
   }
 
@@ -64,12 +65,12 @@ export function InterviewPrepMockSessionPage() {
 
   const formatTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`
 
-  const currentStage = session?.current_stage
+  const currentStage = session?.currentStage ?? session?.current_stage
   const stageKind: StageKind = currentStage?.kind ?? 'coding'
   const stages: any[] = session?.stages ?? []
-  const companyTag = session?.company_tag ?? ''
-  const currentStageIndex = session?.current_stage_index ?? 0
-  const isFinished = session?.status === 'finished'
+  const companyTag = session?.companyTag ?? session?.company_tag ?? ''
+  const currentStageIndex = session?.currentStageIndex ?? session?.current_stage_index ?? 0
+  const isFinished = session?.status === 'MOCK_SESSION_STATUS_FINISHED' || session?.status === 'finished'
 
   const handleSubmit = async () => {
     if (!sessionId) return
@@ -96,9 +97,11 @@ export function InterviewPrepMockSessionPage() {
       const updated = await interviewPrepApi.getMockSession(sessionId) as any
       setSession(updated)
 
-      if (updated.status === 'finished') {
+      const updatedIdx = updated?.currentStageIndex ?? updated?.current_stage_index ?? 0
+      const updatedFinished = updated?.status === 'MOCK_SESSION_STATUS_FINISHED' || updated?.status === 'finished'
+      if (updatedFinished) {
         // Stay on page and show completion
-      } else if (updated.current_stage_index !== currentStageIndex) {
+      } else if (updatedIdx !== currentStageIndex) {
         // Auto-advanced to next stage, reset state
         resetStageState(updated)
       }
@@ -154,7 +157,7 @@ export function InterviewPrepMockSessionPage() {
             <div className="flex items-center gap-1.5">
               {stages.map((s: any, i: number) => {
                 const isCurrent = i === currentStageIndex
-                const isDone = s.status === 'finished'
+                const isDone = s.status === 'STAGE_STATUS_FINISHED' || s.status === 'finished' || s.completed === true
                 return (
                   <div key={s.id ?? i} className="flex items-center gap-1.5">
                     <div
@@ -195,9 +198,9 @@ export function InterviewPrepMockSessionPage() {
               </div>
             ) : (
               <>
-                <h2 className="text-base font-bold text-[#0f172a] mb-3">{currentStage?.task?.title ?? 'Задача'}</h2>
+                <h2 className="text-base font-bold text-[#111111] mb-3">{currentStage?.task?.title ?? currentStage?.title ?? 'Задача'}</h2>
                 <p className="text-sm text-[#475569] leading-relaxed whitespace-pre-wrap">
-                  {currentStage?.task?.statement ?? 'Загружается...'}
+                  {currentStage?.task?.statement ?? currentStage?.statement ?? 'Загружается...'}
                 </p>
               </>
             )}

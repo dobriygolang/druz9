@@ -1,10 +1,12 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
-import { Mic, Play, Pause, Search } from 'lucide-react'
+import { Mic, Play, Pause, Search, Upload, X } from 'lucide-react'
 import { podcastApi } from '@/features/Podcast/api/podcastApi'
 import type { Podcast } from '@/entities/Podcast/model/types'
 import { Card } from '@/shared/ui/Card'
 import { Badge } from '@/shared/ui/Badge'
 import { ErrorState } from '@/shared/ui/ErrorState'
+import { useAuth } from '@/app/providers/AuthProvider'
+import { apiClient } from '@/shared/api/base'
 
 const CATEGORY_FILTERS = ['Все', 'Технологии', 'Карьера', 'Архитектура', 'DevOps']
 
@@ -36,10 +38,17 @@ const GRADIENT_COLORS = [
 ]
 
 export function PodcastsPage() {
+  const { user } = useAuth()
   const [podcasts, setPodcasts] = useState<Podcast[]>([])
   const [activeFilter, setActiveFilter] = useState('Все')
   const [search, setSearch] = useState('')
   const [error, setError] = useState<string | null>(null)
+  const [showUpload, setShowUpload] = useState(false)
+  const [uploadTitle, setUploadTitle] = useState('')
+  const [uploadAuthor, setUploadAuthor] = useState('')
+  const [uploadDesc, setUploadDesc] = useState('')
+  const [uploadFile, setUploadFile] = useState<File | null>(null)
+  const [uploading, setUploading] = useState(false)
 
   // Player state
   const [playing, setPlaying] = useState<Podcast | null>(null)
@@ -125,6 +134,26 @@ export function PodcastsPage() {
     return true
   })
 
+  const handleUpload = async () => {
+    if (!uploadTitle || !uploadAuthor || !uploadFile) return
+    setUploading(true)
+    try {
+      const form = new FormData()
+      form.append('title', uploadTitle)
+      form.append('authorName', uploadAuthor)
+      form.append('description', uploadDesc)
+      form.append('file', uploadFile)
+      await apiClient.post('/api/v1/podcasts', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+      setShowUpload(false)
+      setUploadTitle(''); setUploadAuthor(''); setUploadDesc(''); setUploadFile(null)
+      fetchPodcasts()
+    } catch {
+      // silently keep open
+    } finally {
+      setUploading(false)
+    }
+  }
+
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchPodcasts() }} />
 
   return (
@@ -135,6 +164,15 @@ export function PodcastsPage() {
           <h1 className="font-mono text-2xl font-bold text-[#111111]">Подкасты</h1>
           <p className="text-sm text-[#666666] font-geist mt-1">Слушай и учись у лучших разработчиков</p>
         </div>
+        <div className="flex items-center gap-3">
+        {user?.isAdmin && (
+          <button
+            onClick={() => setShowUpload(true)}
+            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#6366F1] text-white text-sm font-medium hover:bg-[#4F46E5] transition-colors"
+          >
+            <Upload className="w-4 h-4" /> Загрузить подкаст
+          </button>
+        )}
         <div className="relative w-[280px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
           <input
@@ -143,6 +181,7 @@ export function PodcastsPage() {
             placeholder="Поиск подкастов..."
             className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#CBCCC9] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 transition-shadow"
           />
+        </div>
         </div>
       </div>
 
@@ -342,6 +381,57 @@ export function PodcastsPage() {
           </Card>
         </div>
       </div>
+
+      {/* Upload modal */}
+      {showUpload && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
+          <div className="bg-white rounded-2xl shadow-xl border border-[#CBCCC9] w-full max-w-sm p-6">
+            <div className="flex items-center justify-between mb-5">
+              <h2 className="text-base font-bold text-[#111111]">Загрузить подкаст</h2>
+              <button onClick={() => setShowUpload(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="flex flex-col gap-3">
+              <div>
+                <label className="text-xs font-medium text-[#666666] mb-1 block">Название *</label>
+                <input value={uploadTitle} onChange={e => setUploadTitle(e.target.value)}
+                  placeholder="Название подкаста"
+                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#666666] mb-1 block">Автор *</label>
+                <input value={uploadAuthor} onChange={e => setUploadAuthor(e.target.value)}
+                  placeholder="Имя автора"
+                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#666666] mb-1 block">Описание</label>
+                <textarea value={uploadDesc} onChange={e => setUploadDesc(e.target.value)}
+                  placeholder="Краткое описание"
+                  rows={2}
+                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1] resize-none" />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#666666] mb-1 block">Аудиофайл * (mp3, m4a)</label>
+                <input type="file" accept="audio/*"
+                  onChange={e => setUploadFile(e.target.files?.[0] ?? null)}
+                  className="w-full text-sm text-[#666666] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-[#EEF2FF] file:text-[#6366F1] hover:file:bg-[#E0E7FF]" />
+              </div>
+            </div>
+            <div className="flex gap-2 mt-5">
+              <button onClick={() => setShowUpload(false)}
+                className="flex-1 py-2 text-sm font-medium text-[#666666] bg-[#F2F3F0] rounded-xl hover:bg-[#E7E8E5] transition-colors">
+                Отмена
+              </button>
+              <button onClick={handleUpload} disabled={uploading || !uploadTitle || !uploadAuthor || !uploadFile}
+                className="flex-1 py-2 text-sm font-medium text-white bg-[#6366F1] rounded-xl hover:bg-[#4F46E5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                {uploading ? 'Загружаем...' : 'Загрузить'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

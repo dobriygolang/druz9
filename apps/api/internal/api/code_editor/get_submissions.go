@@ -17,10 +17,8 @@ func (i *Implementation) GetSubmissions(ctx context.Context, req *v1.GetSubmissi
 
 	submissions, err := i.service.GetSubmissions(ctx, roomID)
 	if err != nil {
-		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
+		return nil, mapErr(err)
 	}
 
-	return &v1.GetSubmissionsResponse{
-		Submissions: mapSubmissions(submissions),
-	}, nil
+	return &v1.GetSubmissionsResponse{Submissions: mapSubmissions(submissions)}, nil
 }

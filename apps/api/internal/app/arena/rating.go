@@ -20,7 +20,27 @@ const (
 )
 
 func (s *Service) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.LeaderboardEntry, error) {
-	return s.repo.GetLeaderboard(ctx, limit)
+	s.leaderboardMu.Lock()
+	cached := s.leaderboardCache
+	s.leaderboardMu.Unlock()
+
+	if cached.entries != nil && time.Now().Before(cached.expiresAt) {
+		return cached.entries, nil
+	}
+
+	entries, err := s.repo.GetLeaderboard(ctx, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	s.leaderboardMu.Lock()
+	s.leaderboardCache = leaderboardSnapshot{
+		entries:   entries,
+		expiresAt: time.Now().Add(leaderboardCacheTTL),
+	}
+	s.leaderboardMu.Unlock()
+
+	return entries, nil
 }
 
 func (s *Service) refreshMatchState(ctx context.Context, match *domain.Match) error {
