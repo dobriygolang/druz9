@@ -2,12 +2,16 @@
   display: grid;
   gap: 8px;
   min-height: 0;
+  align-content: start;
+  align-items: start;
 }
 
 .community-people__header {
   display: grid;
   gap: 20px;
   padding: 24px 24px 0;
+  width: 100%;
+  align-self: start;
 }
 
 .community-people__top-row {
@@ -109,6 +113,8 @@
   display: grid;
   gap: 2px;
   padding: 8px 24px 24px;
+  width: 100%;
+  align-self: start;
 }
 
 .community-people__row {

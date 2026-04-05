@@ -95,12 +95,16 @@
   min-height: 100vh;
   padding: 24px;
   background: #f2f3f0;
+  align-content: start;
+  align-items: start;
 }
 
 .community-screen__header {
   display: grid;
   gap: 20px;
   padding: 0;
+  width: 100%;
+  align-self: start;
 }
 
 .community-screen__top-row {
@@ -189,6 +193,8 @@
   display: grid;
   gap: 16px;
   padding: 20px 0 0;
+  width: 100%;
+  align-self: start;
 }
 
 .community-events-grid {
@@ -290,6 +296,8 @@
   min-height: 0;
   gap: 0;
   padding-top: 0;
+  width: 100%;
+  align-self: start;
 }
 
 .community-map-stage {
