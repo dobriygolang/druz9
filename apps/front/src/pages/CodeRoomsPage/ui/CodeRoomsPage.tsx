@@ -1,40 +1,15 @@
-import React, { Suspense, lazy, useCallback, useEffect, useState } from 'react';
+import React, { Suspense, lazy, useEffect, useMemo, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
-import { authApi } from '@/features/Auth/api/authApi';
-import { interviewPrepApi } from '@/features/InterviewPrep/api/interviewPrepApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
-import { geoApi } from '@/features/Geo/api/geoApi';
 import { getStoredGuestId, getStoredGuestName, setStoredGuestName } from '@/features/CodeRoom/lib/guestIdentity';
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
-import { ArenaLeaderboardEntry, ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode } from '@/entities/CodeRoom/model/types';
-import { useIsMobile } from '@/shared/hooks/useIsMobile';
-import {
-  CodeRoomsHeroSection,
-  ArenaPrimaryGrid,
-  SoloPracticeSection,
-} from './components/CodeRoomsSections';
-import { pickRandomValue, pluralizeRu, shuffledValues } from './lib/helpers';
+import { ArenaMatch, ArenaPlayerStats, ArenaQueueState, CodeRoomMode, CodeTask } from '@/entities/CodeRoom/model/types';
+import { ArrowRight, Search } from 'lucide-react';
+import { LeaguesModal } from './components/CodeRoomsDeferredSections';
 
-const ArenaSecondaryGrid = lazy(() => import('./components/CodeRoomsDeferredSections').then((m) => ({ default: m.ArenaSecondaryGrid })));
 const CreateRoomModal = lazy(() => import('./components/CodeRoomsDeferredSections').then((m) => ({ default: m.CreateRoomModal })));
 const GuestLoginBanner = lazy(() => import('./components/CodeRoomsDeferredSections').then((m) => ({ default: m.GuestLoginBanner })));
-const LeaguesModal = lazy(() => import('./components/CodeRoomsDeferredSections').then((m) => ({ default: m.LeaguesModal })));
-
-const MOTIVATIONAL_QUOTES = [
-  'Код — это поэзия логики',
-  'Баг — это возможность',
-  'Решение в процессе',
-  'Твой код изменит мир',
-  'Ошибки — путь к мастерству',
-  'Сила в практике',
-  'Лучший код — рабочий код',
-  'Отладка учит терпению',
-  'Читай код — пиши код',
-  'Сомневаешься — пиши тесты',
-  'Баги временны, код вечен',
-  'Сложные задачи — это рост',
-];
 
 const DUEL_TOPICS = [
   { value: '', label: 'Любая тема' },
@@ -57,12 +32,6 @@ const DIFFICULTY_OPTIONS = [
   { value: 'hard', label: 'hard' },
 ];
 
-const INTERVIEW_PREP_CATEGORY_OPTIONS = [
-  { value: 'coding', label: 'Coding' },
-  { value: 'sql', label: 'SQL' },
-  { value: 'system_design', label: 'System Design' },
-];
-
 const LEAGUES = [
   { name: 'Bronze', minRating: 300 },
   { name: 'Silver', minRating: 500 },
@@ -73,43 +42,16 @@ const LEAGUES = [
   { name: 'Legend', minRating: 2350 },
 ];
 
-const ARENA_RULE_SECTIONS = [
-  {
-    title: 'Arena duel',
-    items: [
-      'Побеждает первый accepted submit.',
-      'После wrong answer или runtime error включается freeze на 30 секунд.',
-      'Зрители могут смотреть матч, но не могут менять код.',
-    ],
-  },
-  {
-    title: 'Рейтинг',
-    items: [
-      'Новый игрок стартует с 300 ELO.',
-      'Сложность влияет на изменение рейтинга: easy 1x, medium 1.5x, hard 2x.',
-      'Подробные пороги и формула есть в кнопке `Лиги`.',
-    ],
-  },
-];
-
 export const CodeRoomsPage: React.FC = () => {
   type LaunchMode = CodeRoomMode | 'queue';
-  const isMobile = useIsMobile();
   const navigate = useNavigate();
   const location = useLocation();
   const skipArenaResume = Boolean(location.state?.skipArenaResume);
   const { user, isLoading: authLoading } = useAuth();
-  const isAdmin = Boolean(user?.isAdmin);
   const isGuest = !user;
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [guestNameModalMode, setGuestNameModalMode] = useState<'create' | null>(null);
   const [creating, setCreating] = useState(false);
-
-  // Random motivational quote on each page load
-  const [motivationalQuote] = useState(() => {
-    const index = Math.floor(Math.random() * MOTIVATIONAL_QUOTES.length);
-    return MOTIVATIONAL_QUOTES[index];
-  });
 
   const [newRoomMode, setNewRoomMode] = useState<LaunchMode>(() => {
     const saved = localStorage.getItem('arenaNewRoomMode');
@@ -120,9 +62,6 @@ export const CodeRoomsPage: React.FC = () => {
   });
   const [newRoomTopic, setNewRoomTopic] = useState('');
   const [newRoomDifficulty, setNewRoomDifficulty] = useState('');
-  const [prepLaunchCategory, setPrepLaunchCategory] = useState('coding');
-  const [prepLaunchCompany, setPrepLaunchCompany] = useState('all');
-
   // Initialize queueState from localStorage to persist across page refreshes
   const [queueState, setQueueState] = useState<ArenaQueueState | null>(() => {
     const saved = localStorage.getItem('arenaQueueState');
@@ -174,77 +113,17 @@ export const CodeRoomsPage: React.FC = () => {
     void restoreQueueState();
   }, []);
 
-  const [leaderboard, setLeaderboard] = useState<ArenaLeaderboardEntry[]>([]);
-  const [leaderboardAvatars, setLeaderboardAvatars] = useState<Record<string, string>>({});
-  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [openMatches, setOpenMatches] = useState<ArenaMatch[]>([]);
-  const [openMatchesLoading, setOpenMatchesLoading] = useState(true);
   const [myArenaStats, setMyArenaStats] = useState<ArenaPlayerStats | null>(null);
-  const [activeTaskCount, setActiveTaskCount] = useState(0);
+  const [tasksCatalog, setTasksCatalog] = useState<CodeTask[]>([]);
   const [showLeaguesModal, setShowLeaguesModal] = useState(false);
-  const prepCompanyOptions = ['ozon', 'avito'];
-
-  const resolveMockLaunchCompany = useCallback(() => {
-    if (prepLaunchCompany !== 'all') {
-      return prepLaunchCompany;
-    }
-    return pickRandomValue(prepCompanyOptions);
-  }, [prepLaunchCompany]);
-
-  const loadLeaderboard = useCallback(async () => {
-    setLeaderboardLoading(true);
-    try {
-      const data = await codeRoomApi.getArenaLeaderboard(12);
-      setLeaderboard(data);
-    } catch (e) {
-      console.error('Failed to load leaderboard:', e);
-    } finally {
-      setLeaderboardLoading(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    void loadLeaderboard();
-  }, [loadLeaderboard]);
-
-  useEffect(() => {
-    let cancelled = false;
-    const loadLeaderboardAvatars = async () => {
-      if (leaderboard.length === 0) {
-        setLeaderboardAvatars({});
-        return;
-      }
-      const points = await geoApi.communityMap().catch(() => []);
-      const pointAvatarByUserId = new Map(points.map((point) => [point.userId, point.avatarUrl] as const));
-      const entries = await Promise.all(leaderboard.map(async (entry) => {
-        try {
-          const geoAvatar = pointAvatarByUserId.get(entry.userId);
-          if (geoAvatar) {
-            return [entry.userId, geoAvatar] as const;
-          }
-          const profile = await authApi.getProfileById(entry.userId);
-          return [entry.userId, profile.user.avatarUrl] as const;
-        } catch (error) {
-          console.error('Failed to load leaderboard avatar:', error);
-          return [entry.userId, ''] as const;
-        }
-      }));
-      if (!cancelled) {
-        setLeaderboardAvatars(Object.fromEntries(entries));
-      }
-    };
-    void loadLeaderboardAvatars();
-    return () => {
-      cancelled = true;
-    };
-  }, [leaderboard]);
 
   useEffect(() => {
     let cancelled = false;
     codeRoomApi.listTasks()
       .then((tasks) => {
         if (!cancelled) {
-          setActiveTaskCount(tasks.filter((task) => task.isActive).length);
+          setTasksCatalog(tasks.filter((task) => task.isActive));
         }
       })
       .catch((e) => {
@@ -298,7 +177,6 @@ export const CodeRoomsPage: React.FC = () => {
     let cancelled = false;
 
     const loadOpenMatches = async () => {
-      setOpenMatchesLoading(true);
       try {
         const data = await codeRoomApi.getOpenArenaMatches(8);
         if (!cancelled) {
@@ -306,10 +184,6 @@ export const CodeRoomsPage: React.FC = () => {
         }
       } catch (e) {
         console.error('Failed to load open arena matches:', e);
-      } finally {
-        if (!cancelled) {
-          setOpenMatchesLoading(false);
-        }
       }
     };
 
@@ -424,16 +298,10 @@ export const CodeRoomsPage: React.FC = () => {
     }
   };
 
-  const sortedOpenMatches = [...openMatches].sort((a, b) => {
-    const aMine = a.players.some((player) => player.userId === (user?.id || getStoredGuestId()));
-    const bMine = b.players.some((player) => player.userId === (user?.id || getStoredGuestId()));
-    if (aMine !== bMine) {
-      return aMine ? -1 : 1;
-    }
-    const aStartedAt = a.startedAt || a.createdAt || '';
-    const bStartedAt = b.startedAt || b.createdAt || '';
-    return bStartedAt.localeCompare(aStartedAt);
-  });
+  const visibleTasks = useMemo(
+    () => tasksCatalog.slice(0, 5),
+    [tasksCatalog],
+  );
 
   return (
     <>
@@ -442,57 +310,100 @@ export const CodeRoomsPage: React.FC = () => {
           <GuestLoginBanner />
         </Suspense>
       )}
-      <div className="code-rooms-page">
-        <CodeRoomsHeroSection
-          isMobile={isMobile}
-          isAdmin={isAdmin}
-          motivationalQuote={motivationalQuote}
-          onOpenAdmin={() => navigate('/admin/code-tasks')}
-          onShowLeagues={() => setShowLeaguesModal(true)}
-          onShowCreate={() => setShowCreateModal(true)}
-        />
+      <div className="practice-surface practice-surface--code-rooms">
+        <div className="practice-rooms-toolbar">
+          <div className="practice-rooms-search">
+            <Search size={14} />
+            <span>Поиск</span>
+          </div>
+          <div className="practice-rooms-filters">
+            {['Topic', 'Easy', 'Medium', 'Hard', 'Tree', 'Array', 'DFS'].map((item) => (
+              <span key={item} className="practice-rooms-filter">{item}</span>
+            ))}
+          </div>
+        </div>
 
-        <SoloPracticeSection
-          prepLaunchCategory={prepLaunchCategory}
-          prepLaunchCompany={prepLaunchCompany}
-          categoryOptions={INTERVIEW_PREP_CATEGORY_OPTIONS}
-          companyOptions={[
-            { value: 'all', label: 'Случайная компания' },
-            { value: 'ozon', label: 'ozon' },
-            { value: 'avito', label: 'avito' },
-          ]}
-          onCategoryChange={setPrepLaunchCategory}
-          onCompanyChange={setPrepLaunchCompany}
-          onStartScenario={() => {
-            void (async () => {
-              const explicitCompany = resolveMockLaunchCompany();
-              if (!explicitCompany) {
-                return;
-              }
-              const candidateCompanies = prepLaunchCompany === 'all'
-                ? shuffledValues(prepCompanyOptions)
-                : [explicitCompany];
-              try {
-                for (const companyTag of candidateCompanies) {
-                  try {
-                    const session = await interviewPrepApi.startMockSession(companyTag);
-                    navigate(`/growth/interview-prep/mock/${session.id}`);
-                    return;
-                  } catch (innerError: any) {
-                    const apiError = innerError?.response?.data?.error || '';
-                    if (!apiError.includes('mock interview task pool is incomplete')) {
-                      throw innerError;
-                    }
-                  }
-                }
-              } catch (error: any) {
-                console.error('Failed to start mock interview:', error);
-              }
-            })();
-          }}
-          onOpenRandomTask={() => navigate(`/growth/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}&pick=random`)}
-          onOpenCatalog={() => navigate(`/growth/interview-prep?category=${prepLaunchCategory}${prepLaunchCompany !== 'all' ? `&company=${prepLaunchCompany}` : ''}`)}
-        />
+        <div className="practice-rooms-layout">
+          <section className="practice-rooms-list">
+            {visibleTasks.length > 0 ? visibleTasks.map((task, index) => (
+              <article key={task.id} className="practice-rooms-row">
+                <span className={`practice-rooms-row__difficulty practice-rooms-row__difficulty--${task.difficulty || 'easy'}`}>
+                  {task.difficulty || 'Easy'}
+                </span>
+                <div className="practice-rooms-row__copy">
+                  <strong>{task.title}</strong>
+                  <span>{task.topics.slice(0, 2).join(' · ') || 'Code Room task'}</span>
+                </div>
+                <div className="practice-rooms-row__meta">
+                  <span>{index + 1}/{Math.max(visibleTasks.length, 1)}</span>
+                  <button
+                    type="button"
+                    className="practice-rooms-row__action"
+                    onClick={() => {
+                      setNewRoomMode('all');
+                      setShowCreateModal(true);
+                    }}
+                  >
+                    {index === visibleTasks.length - 1 ? 'Смотреть' : 'Быстро'}
+                  </button>
+                </div>
+              </article>
+            )) : (
+              <div className="practice-surface__empty">Загрузка задач...</div>
+            )}
+          </section>
+
+          <aside className="practice-rooms-side">
+            <article className="practice-rooms-widget">
+              <div className="practice-rooms-widget__top">
+                <h3>Соло режим</h3>
+                <span className="practice-rooms-widget__pill">new</span>
+              </div>
+              <p>Практикуй solо задачи без таймера и соперников.</p>
+              <button
+                type="button"
+                className="practice-rooms-widget__button"
+                onClick={() => navigate('/practice/solo')}
+              >
+                Открыть хаб
+                <ArrowRight size={14} />
+              </button>
+            </article>
+
+            <article className="practice-rooms-widget practice-rooms-widget--accent">
+              <div className="practice-rooms-widget__top">
+                <h3>Дуэль</h3>
+                <span className="practice-rooms-widget__pill practice-rooms-widget__pill--dark">{openMatches.length} online</span>
+              </div>
+              <p>Быстрый вход в рейтинг и формат live-соперника.</p>
+              <button
+                type="button"
+                className="practice-rooms-widget__button practice-rooms-widget__button--solid"
+                onClick={() => {
+                  setNewRoomMode('queue');
+                  setShowCreateModal(true);
+                }}
+              >
+                Найти соперника
+              </button>
+            </article>
+
+            <article className="practice-rooms-stats">
+              <div className="practice-rooms-stats__row">
+                <span>Мои stats</span>
+                <strong>{myArenaStats?.rating ?? 300}</strong>
+              </div>
+              <div className="practice-rooms-stats__row">
+                <span>Точность</span>
+                <strong>{myArenaStats ? `${Math.round(myArenaStats.winRate * 100)}%` : '91%'}</strong>
+              </div>
+              <div className="practice-rooms-stats__row">
+                <span>Серия дня</span>
+                <strong>{queueState?.queueSize ?? 0}</strong>
+              </div>
+            </article>
+          </aside>
+        </div>
 
         {queueState?.status === 'queued' && (
           <div className="queue-active-banner">
@@ -507,31 +418,7 @@ export const CodeRoomsPage: React.FC = () => {
           </div>
         )}
 
-        <ArenaPrimaryGrid
-          isMobile={isMobile}
-          isGuest={isGuest}
-          myArenaStats={myArenaStats}
-          activeTaskCount={activeTaskCount}
-          leaderboardLoading={leaderboardLoading}
-          leaderboard={leaderboard}
-          leaderboardAvatars={leaderboardAvatars}
-          pluralizeRu={pluralizeRu}
-          onOpenRoom={(mode) => {
-            setNewRoomMode(mode);
-            setShowCreateModal(true);
-          }}
-        />
-
-        <Suspense fallback={<div className="empty-state compact">Подгружаем дополнительные practice surfaces...</div>}>
-          <ArenaSecondaryGrid
-            userId={user?.id}
-            openMatchesLoading={openMatchesLoading}
-            openMatches={openMatches}
-            sortedOpenMatches={sortedOpenMatches}
-            ruleSections={ARENA_RULE_SECTIONS}
-            onOpenMatch={(href) => navigate(href)}
-          />
-
+        <Suspense fallback={null}>
           <CreateRoomModal
             open={showCreateModal}
             isGuest={isGuest}

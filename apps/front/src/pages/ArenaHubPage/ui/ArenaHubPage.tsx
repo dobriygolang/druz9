@@ -40,88 +40,62 @@ export const ArenaHubPage: React.FC = () => {
   }, []);
 
   return (
-    <div className="arena-hub">
-      <section className="arena-hub__hero">
-        <div className="arena-hub__copy">
-          <span>Arena</span>
+    <div className="practice-surface practice-surface--arena">
+      <section className="practice-arena-hero">
+        <div className="practice-arena-hero__copy">
+          <span className="practice-arena-hero__eyebrow">Arena</span>
           <h2>Арена</h2>
-          <p>
-            Здесь рейтинговые матчи, открытые дуэли и быстрый вход в соревновательный режим.
-          </p>
-          <div className="arena-hub__hero-stats">
-            <div className="arena-hub__hero-pill">
+          <p>Здесь рейтинговые матчи, открытые дуэли и быстрый вход в соревновательный режим.</p>
+          <div className="practice-arena-hero__stats">
+            <div>
               <strong>{isLoading ? '...' : leaderboard.length}</strong>
               <span>в топе сейчас</span>
             </div>
-            <div className="arena-hub__hero-pill">
+            <div>
               <strong>{isLoading ? '...' : matches.length}</strong>
               <span>открытых матчей</span>
             </div>
           </div>
         </div>
-        <Link to="/practice/code-rooms" className="arena-hub__cta">
+
+        <Link to="/practice/code-rooms" className="practice-arena-hero__cta">
           <span>К code rooms</span>
           <ArrowRight size={16} />
         </Link>
       </section>
 
-      <div className="arena-hub__grid">
-        <article className="arena-hub__panel arena-hub__panel--leaderboard">
-          <div className="arena-hub__panel-head">
-            <Trophy size={18} />
+      <section className="practice-arena-grid">
+        <article className="practice-arena-card">
+          <div className="practice-arena-card__head">
+            <Trophy size={16} />
             <strong>Лидерборд</strong>
           </div>
-          <div className="arena-hub__list">
-            {isLoading ? (
-              <div className="home-empty">Загрузка рейтинга...</div>
-            ) : leaderboard.length > 0 ? leaderboard.map((entry, index) => (
-              <div key={entry.userId} className="arena-hub__row">
-                <span>#{index + 1}</span>
-                <div>
-                  <strong>{entry.displayName}</strong>
-                  <span>{entry.matches} матчей</span>
-                </div>
-                <span>{entry.rating} ELO</span>
-              </div>
-            )) : (
-              <div className="home-empty">Лидерборд пока пуст.</div>
-            )}
+          <div className="practice-arena-card__body">
+            {isLoading ? 'Загрузка рейтинга...' : leaderboard.length > 0 ? 'Есть активные рейтинги.' : 'Лидерборд пока пуст.'}
           </div>
         </article>
 
-        <article className="arena-hub__panel arena-hub__panel--matches">
-          <div className="arena-hub__panel-head">
-            <Users size={18} />
+        <article className="practice-arena-card">
+          <div className="practice-arena-card__head">
+            <Users size={16} />
             <strong>Открытые матчи</strong>
           </div>
-          <div className="arena-hub__list">
-            {isLoading ? (
-              <div className="home-empty">Загрузка матчей...</div>
-            ) : matches.length > 0 ? matches.map((match) => (
-              <div key={match.id} className="arena-hub__row">
-                <div>
-                  <strong>{match.taskTitle}</strong>
-                  <span>{match.difficulty} • {match.players.length}/2 игрока</span>
-                </div>
-                <Link to={`/arena/${match.id}`}>Открыть</Link>
-              </div>
-            )) : (
-              <div className="home-empty">Открытых матчей сейчас нет.</div>
-            )}
+          <div className="practice-arena-card__body">
+            {isLoading ? 'Загрузка матчей...' : matches.length > 0 ? 'Открытых матчей сейчас нет.' : 'Открытых матчей сейчас нет.'}
           </div>
         </article>
 
-        <article className="arena-hub__panel arena-hub__panel--notes">
-          <div className="arena-hub__panel-head">
-            <Shield size={18} />
+        <article className="practice-arena-card practice-arena-card--notes">
+          <div className="practice-arena-card__head">
+            <Shield size={16} />
             <strong>Форматы</strong>
           </div>
-          <div className="arena-hub__notes">
+          <div className="practice-arena-card__notes">
             <div>Закрытые scrims для своей команды.</div>
             <div>Локальные ладдеры внутри circles.</div>
           </div>
         </article>
-      </div>
+      </section>
     </div>
   );
 };
