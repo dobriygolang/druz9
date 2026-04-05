@@ -17,6 +17,7 @@ export const PageLayout: React.FC = () => {
   const isInterviewPrepMock = /^\/interview-prep\/mock\/[^/]+$/.test(location.pathname) || /^\/growth\/interview-prep\/mock\/[^/]+$/.test(location.pathname);
   const isCodeRoomsDashboard = location.pathname === '/code-rooms' || location.pathname === '/practice/code-rooms';
   const isCodeTasksAdmin = location.pathname === '/admin/code-tasks';
+  const isAdminRoute = location.pathname.startsWith('/admin/');
   const isGuestCodeRoomsSurface = !isAuthenticated && isCodeRoomsDashboard;
   const showShell = !isCodeRoom && !isArenaMatch && !isGuestCodeRoomsSurface;
   const contentClassName = isArenaMatch
@@ -26,9 +27,9 @@ export const PageLayout: React.FC = () => {
       : 'content-wrapper';
 
   return (
-    <div className="app-container">
-      {showShell && <Sidebar />}
-      <main className={isCodeRoom || isArenaMatch || isInterviewPrepSession || isInterviewPrepMock ? 'main-content main-content-code-room' : 'main-content'}>
+    <div className={`app-container${isAdminRoute ? ' app-container--admin' : ''}`}>
+      {showShell && <Sidebar isAdmin={isAdminRoute} />}
+      <main className={isCodeRoom || isArenaMatch || isInterviewPrepSession || isInterviewPrepMock ? 'main-content main-content-code-room' : `main-content${isAdminRoute ? ' main-content--admin' : ''}`}>
         <div className={contentClassName}>
           <Outlet />
         </div>
