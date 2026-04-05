@@ -31,6 +31,7 @@ import (
 
 type serviceContext struct {
 	cookies                 *server.SessionCookieManager
+	aiReviewService         aireview.Reviewer
 	profileServiceDomain    *profiledomainservice.Service
 	adminServiceDomain      *admindomainservice.Service
 	geoServiceDomain        *geodomainservice.Service
@@ -143,6 +144,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 
 	return &serviceContext{
 		cookies:                 cookies,
+		aiReviewService:         aiReviewService,
 		profileServiceDomain:    profileServiceDomain,
 		adminServiceDomain:      adminServiceDomain,
 		geoServiceDomain:        geoServiceDomain,

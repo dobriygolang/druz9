@@ -24,11 +24,11 @@ const FILTER_PILLS = ['Все', 'Full-time', 'Part-time', 'Remote', 'Contract'] 
 const EMPTY_FORM: CreateReferralData = {
   title: '',
   company: '',
-  vacancy_url: '',
+  vacancyUrl: '',
   description: '',
   experience: '',
   location: '',
-  employment_type: '',
+  employmentType: '',
 }
 
 function formatDate(iso: string) {
@@ -131,7 +131,7 @@ export function VacanciesPage() {
             placeholder="Поиск по названию, компании..."
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-xl text-[#111111] placeholder-[#666666] focus:outline-none focus:ring-2 focus:ring-[#FF8400]/20 focus:border-[#FF8400] transition-colors font-geist"
+            className="w-full pl-10 pr-4 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-xl text-[#111111] placeholder-[#666666] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 focus:border-[#6366F1] transition-colors font-geist"
           />
         </div>
 
@@ -143,7 +143,7 @@ export function VacanciesPage() {
               onClick={() => setFilter(pill)}
               className={`px-4 py-1.5 text-sm rounded-full font-medium transition-colors font-geist ${
                 filter === pill
-                  ? 'bg-[#FF8400] text-white'
+                  ? 'bg-[#6366F1] text-white'
                   : 'bg-white border border-[#CBCCC9] text-[#666666] hover:bg-[#F2F3F0]'
               }`}
             >
@@ -161,8 +161,8 @@ export function VacanciesPage() {
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-20 text-center">
-            <div className="w-16 h-16 rounded-2xl bg-[#FF8400]/10 flex items-center justify-center mb-4">
-              <Briefcase className="w-8 h-8 text-[#FF8400]" />
+            <div className="w-16 h-16 rounded-2xl bg-[#6366F1]/10 flex items-center justify-center mb-4">
+              <Briefcase className="w-8 h-8 text-[#6366F1]" />
             </div>
             <p className="text-lg font-semibold text-[#111111] font-geist mb-1">
               Пока нет вакансий
@@ -213,7 +213,7 @@ export function VacanciesPage() {
                     href={ref.vacancyUrl}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#FF8400] bg-[#FF8400]/10 rounded-lg hover:bg-[#FF8400]/20 transition-colors"
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-[#6366F1] bg-[#6366F1]/10 rounded-lg hover:bg-[#6366F1]/20 transition-colors"
                   >
                     Открыть
                     <ExternalLink className="w-3 h-3" />
@@ -259,8 +259,8 @@ export function VacanciesPage() {
           <Input
             label="Ссылка на вакансию"
             placeholder="https://..."
-            value={form.vacancy_url}
-            onChange={e => setForm(prev => ({ ...prev, vacancy_url: e.target.value }))}
+            value={form.vacancyUrl}
+            onChange={e => setForm(prev => ({ ...prev, vacancyUrl: e.target.value }))}
           />
           <Textarea
             label="Описание"
@@ -286,8 +286,8 @@ export function VacanciesPage() {
           <Select
             label="Тип занятости"
             options={EMPLOYMENT_TYPES}
-            value={form.employment_type}
-            onChange={v => setForm(prev => ({ ...prev, employment_type: v }))}
+            value={form.employmentType}
+            onChange={v => setForm(prev => ({ ...prev, employmentType: v }))}
             placeholder="Выберите тип"
           />
         </div>

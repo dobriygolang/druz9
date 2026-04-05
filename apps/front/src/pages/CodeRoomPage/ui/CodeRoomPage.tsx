@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Play, Send, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, PanelRightClose, PanelRightOpen } from 'lucide-react'
+import { ArrowLeft, Play, Send, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, PanelRightClose, PanelRightOpen, Bot } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { useCodeRoomWs } from '@/features/CodeRoom/hooks/useCodeRoomWs'
@@ -11,6 +11,7 @@ import { Button } from '@/shared/ui/Button'
 import { Avatar } from '@/shared/ui/Avatar'
 import { getMonacoLanguage, getLanguageLabel } from '@/shared/lib/codeEditorLanguage'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import { apiClient } from '@/shared/api/base'
 import type * as Monaco from 'monaco-editor'
 
 const AI_HINTS = [
@@ -36,14 +37,14 @@ function GuestNamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder="Ваше имя"
-          className="w-full px-4 py-2.5 bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8400]/30"
+          className="w-full px-4 py-2.5 bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30"
           onKeyDown={e => { if (e.key === 'Enter' && name.trim()) onSubmit(name.trim()) }}
           autoFocus
         />
         <button
           onClick={() => name.trim() && onSubmit(name.trim())}
           disabled={!name.trim()}
-          className="w-full py-2.5 bg-[#FF8400] hover:bg-[#ea7700] text-[#0f172a] font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
+          className="w-full py-2.5 bg-[#6366F1] hover:bg-[#ea7700] text-[#0f172a] font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
         >
           Войти в комнату
         </button>
@@ -61,9 +62,11 @@ export function CodeRoomPage() {
   const [running, setRunning] = useState(false)
   const [submitResult, setSubmitResult] = useState<{ isCorrect: boolean; output: string; error: string } | null>(null)
   const [activeTab, setActiveTab] = useState<'problem' | 'tests'>('problem')
-  const [aiTab, setAiTab] = useState<'hints' | 'result'>('hints')
+  const [aiTab, setAiTab] = useState<'hints' | 'result' | 'review'>('hints')
   const [hints, setHints] = useState<string[]>([])
   const [showAiPanel, setShowAiPanel] = useState(false)
+  const [aiReview, setAiReview] = useState<string | null>(null)
+  const [reviewLoading, setReviewLoading] = useState(false)
   const [copied, setCopied] = useState(false)
   const [needsGuestName, setNeedsGuestName] = useState(false)
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
@@ -155,6 +158,27 @@ export function CodeRoomPage() {
     } catch {} finally { setRunning(false) }
   }
 
+  const handleAiReview = async () => {
+    setReviewLoading(true)
+    setAiReview(null)
+    setShowAiPanel(true)
+    setAiTab('review')
+    try {
+      const res = await apiClient.post('/api/v1/code-editor/ai-review', {
+        language: lang,
+        code: localCode,
+        task_title: room?.task ?? '',
+        statement: room?.task ? `Реши задачу: ${room.task}` : '',
+      })
+      const data = res.data
+      setAiReview(data?.review ?? data?.feedback ?? JSON.stringify(data))
+    } catch {
+      setAiReview('Не удалось получить ревью')
+    } finally {
+      setReviewLoading(false)
+    }
+  }
+
   const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
     editorRef.current = editor
     registerDarkTheme(monaco)
@@ -235,6 +259,9 @@ export function CodeRoomPage() {
             {showAiPanel ? <PanelRightClose className="w-3.5 h-3.5" /> : <PanelRightOpen className="w-3.5 h-3.5" />}
           </button>
 
+          <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading}>
+            <Bot className="w-3.5 h-3.5" /> AI Ревью
+          </Button>
           <Button variant="secondary" size="sm" onClick={handleRun} loading={running}>
             <Play className="w-3.5 h-3.5" /> Запустить
           </Button>
@@ -251,7 +278,7 @@ export function CodeRoomPage() {
           <div className="flex border-b border-[#CBCCC9]">
             <button
               onClick={() => setActiveTab('problem')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'problem' ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}
+              className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'problem' ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666]'}`}
             >
               Задача
             </button>
@@ -298,17 +325,17 @@ export function CodeRoomPage() {
         {showAiPanel && (
           <div className="w-[280px] flex-shrink-0 bg-white border-l border-[#CBCCC9] flex flex-col">
             <div className="px-4 py-3 border-b border-[#CBCCC9] flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#FF8400]" />
+              <Sparkles className="w-4 h-4 text-[#6366F1]" />
               <span className="text-sm font-bold text-[#111111]">AI Помощник</span>
             </div>
             <div className="flex border-b border-[#CBCCC9]">
-              {(['hints', 'result'] as const).map(tab => (
+              {(['hints', 'result', 'review'] as const).map(tab => (
                 <button
                   key={tab}
                   onClick={() => setAiTab(tab)}
-                  className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${aiTab === tab ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}
+                  className={`px-3 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${aiTab === tab ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666]'}`}
                 >
-                  {tab === 'hints' ? 'Подсказки' : 'Результат'}
+                  {tab === 'hints' ? 'Подсказки' : tab === 'result' ? 'Результат' : 'AI Ревью'}
                 </button>
               ))}
             </div>
@@ -340,7 +367,7 @@ export function CodeRoomPage() {
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : aiTab === 'result' ? (
                 <div className="flex flex-col gap-3">
                   {submitResult ? (
                     <div className={`p-3 rounded-lg ${submitResult.isCorrect ? 'bg-[#e8f9ef] border border-[#86efac]' : 'bg-[#fef2f2] border border-[#fca5a5]'}`}>
@@ -353,6 +380,35 @@ export function CodeRoomPage() {
                     </div>
                   ) : (
                     <p className="text-sm text-[#94a3b8]">Запустите код чтобы увидеть результаты</p>
+                  )}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-3">
+                  {reviewLoading ? (
+                    <div className="flex items-center gap-2">
+                      <span className="w-3.5 h-3.5 border-2 border-[#CBCCC9] border-t-[#6366F1] rounded-full animate-spin" />
+                      <p className="text-sm text-[#666666]">Анализируем код...</p>
+                    </div>
+                  ) : aiReview ? (
+                    <div className="flex flex-col gap-2">
+                      <p className="text-xs font-semibold text-[#111111]">Результат ревью</p>
+                      <p className="text-xs text-[#666666] whitespace-pre-wrap leading-relaxed">{aiReview}</p>
+                    </div>
+                  ) : (
+                    <>
+                      <p className="text-sm text-[#666666] leading-relaxed">
+                        Нажмите «AI Ревью» в панели инструментов, чтобы получить анализ вашего кода
+                      </p>
+                      <Button
+                        variant="orange"
+                        size="sm"
+                        className="w-full"
+                        onClick={handleAiReview}
+                        loading={reviewLoading}
+                      >
+                        <Bot className="w-3.5 h-3.5" /> Запустить ревью
+                      </Button>
+                    </>
                   )}
                 </div>
               )}

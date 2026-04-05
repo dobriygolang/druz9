@@ -81,7 +81,7 @@ export function EventsPage() {
             <Card key={e.id} padding="md" className="stagger-item flex flex-col gap-3 hover:border-[#94a3b8] transition-colors cursor-pointer">
               <div className="flex items-start justify-between">
                 <div className="w-10 h-10 rounded-xl bg-[#fff7ed] flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-[#FF8400]" />
+                  <Calendar className="w-5 h-5 text-[#6366F1]" />
                 </div>
                 {e.isJoined && <Badge variant="success">Вы идёте</Badge>}
               </div>
@@ -112,7 +112,7 @@ export function EventsPage() {
         {/* Add event card */}
         <button
           onClick={() => setShowCreate(true)}
-          className="h-[180px] border-2 border-dashed border-[#CBCCC9] rounded-2xl flex flex-col items-center justify-center gap-2 text-[#94a3b8] hover:border-[#FF8400] hover:text-[#FF8400] transition-colors"
+          className="h-[180px] border-2 border-dashed border-[#CBCCC9] rounded-2xl flex flex-col items-center justify-center gap-2 text-[#94a3b8] hover:border-[#6366F1] hover:text-[#6366F1] transition-colors"
         >
           <Plus className="w-6 h-6" />
           <span className="text-sm font-medium">Создать событие</span>

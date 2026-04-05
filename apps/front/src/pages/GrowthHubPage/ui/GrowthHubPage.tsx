@@ -25,7 +25,7 @@ export function GrowthHubPage() {
               to={tab.href}
               className={cn(
                 'px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors',
-                active === tab.id ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666] hover:text-[#111111]'
+                active === tab.id ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666] hover:text-[#111111]'
               )}
             >
               {tab.label}

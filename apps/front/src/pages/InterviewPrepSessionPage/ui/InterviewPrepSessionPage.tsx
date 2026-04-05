@@ -102,13 +102,13 @@ export function InterviewPrepSessionPage() {
         {/* Left: problem/question */}
         <div className="w-[380px] flex-shrink-0 bg-white border-r border-[#CBCCC9] flex flex-col">
           <div className="flex border-b border-[#CBCCC9]">
-            <button onClick={() => setActiveTab('problem')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'problem' ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
+            <button onClick={() => setActiveTab('problem')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'problem' ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
               Задача
             </button>
-            {question && <button onClick={() => setActiveTab('question')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'question' ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
+            {question && <button onClick={() => setActiveTab('question')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'question' ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
               Вопрос
             </button>}
-            {review && <button onClick={() => setActiveTab('result')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'result' ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
+            {review && <button onClick={() => setActiveTab('result')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'result' ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
               Оценка
             </button>}
           </div>

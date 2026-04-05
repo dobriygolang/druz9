@@ -51,7 +51,7 @@ export function HomePage() {
             Сегодня в сообществе {onlineCount} человек онлайн
           </p>
         </div>
-        <Avatar name={firstName} src={user?.avatarUrl || undefined} size="md" className="bg-[#FF8400]" />
+        <Avatar name={firstName} src={user?.avatarUrl || undefined} size="md" className="bg-[#6366F1]" />
       </div>
 
       {/* Metrics */}
@@ -76,7 +76,7 @@ export function HomePage() {
         <Card className="flex-1" padding="lg">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-[#111111]">Ближайшие события</h2>
-            <Link to="/community/events" className="text-xs text-[#FF8400] font-medium flex items-center gap-1">
+            <Link to="/community/events" className="text-xs text-[#6366F1] font-medium flex items-center gap-1">
               Все <ChevronRight className="w-3 h-3" />
             </Link>
           </div>
@@ -94,7 +94,7 @@ export function HomePage() {
               : events.map((e) => (
                 <div key={e.id} className="py-3 flex items-center gap-3">
                   <div className="w-8 h-8 rounded-lg bg-[#fff7ed] flex items-center justify-center flex-shrink-0">
-                    <Calendar className="w-4 h-4 text-[#FF8400]" />
+                    <Calendar className="w-4 h-4 text-[#6366F1]" />
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-medium text-[#111111] truncate">{e.title}</p>
@@ -109,15 +109,15 @@ export function HomePage() {
 
         {/* Vacancies teaser */}
         <Link to="/community/vacancies" className="w-[340px] flex-shrink-0 no-underline">
-          <Card className="h-full flex flex-col items-center justify-center gap-3 hover:border-[#FF8400] transition-colors cursor-pointer" padding="lg">
+          <Card className="h-full flex flex-col items-center justify-center gap-3 hover:border-[#6366F1] transition-colors cursor-pointer" padding="lg">
             <div className="w-12 h-12 rounded-full bg-[#fff7ed] flex items-center justify-center">
-              <Briefcase className="w-6 h-6 text-[#FF8400]" />
+              <Briefcase className="w-6 h-6 text-[#6366F1]" />
             </div>
             <div className="text-center">
               <h2 className="text-sm font-semibold text-[#111111]">Вакансии</h2>
               <p className="text-xs text-[#666666] mt-1">Рефералки и вакансии</p>
             </div>
-            <span className="text-xs text-[#FF8400] font-medium flex items-center gap-1">
+            <span className="text-xs text-[#6366F1] font-medium flex items-center gap-1">
               Перейти <ChevronRight className="w-3 h-3" />
             </span>
           </Card>

@@ -7,7 +7,7 @@
 
 @layer utilities {
   .text-gradient-orange {
-    background: linear-gradient(135deg, #FF8400, #f59e0b);
+    background: linear-gradient(135deg, #6366F1, #f59e0b);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
   }

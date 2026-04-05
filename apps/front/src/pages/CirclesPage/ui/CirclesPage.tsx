@@ -161,7 +161,7 @@ export function CirclesPage() {
         {!loading && filtered.length > 0 && (
           <button
             onClick={() => setShowCreate(true)}
-            className="h-[220px] border-2 border-dashed border-[#CBCCC9] rounded-2xl flex flex-col items-center justify-center gap-2 text-[#94a3b8] hover:border-[#FF8400] hover:text-[#FF8400] transition-colors"
+            className="h-[220px] border-2 border-dashed border-[#CBCCC9] rounded-2xl flex flex-col items-center justify-center gap-2 text-[#94a3b8] hover:border-[#6366F1] hover:text-[#6366F1] transition-colors"
           >
             <Plus className="w-6 h-6" />
             <span className="text-sm font-medium">Создать круг</span>

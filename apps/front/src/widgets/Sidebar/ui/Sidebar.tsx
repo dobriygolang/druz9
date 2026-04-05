@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Users, Code2, TrendingUp, Mic, User, Settings, LogOut } from 'lucide-react'
+import { Home, Users, Code2, TrendingUp, Mic, User, Settings, LogOut, Flame } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { Avatar } from '@/shared/ui/Avatar'
@@ -16,6 +16,7 @@ const NAV_ITEMS: NavItem[] = [
   { label: 'Главная', icon: <Home className="w-4 h-4" />, href: '/home' },
   { label: 'Community', icon: <Users className="w-4 h-4" />, href: '/community', matchPrefix: '/community' },
   { label: 'Practice', icon: <Code2 className="w-4 h-4" />, href: '/practice', matchPrefix: '/practice' },
+  { label: 'Daily', icon: <Flame className="w-4 h-4" />, href: '/daily-challenge' },
   { label: 'Growth', icon: <TrendingUp className="w-4 h-4" />, href: '/growth', matchPrefix: '/growth' },
   { label: 'Подкасты', icon: <Mic className="w-4 h-4" />, href: '/podcasts' },
 ]
@@ -62,14 +63,25 @@ export function Sidebar() {
       {/* Logo */}
       <div className="h-[80px] flex items-center px-5">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-[#FF8400] rounded-lg flex items-center justify-center transition-transform duration-200 hover:scale-110">
-            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
-              <text x="9" y="14" textAnchor="middle" fill="white" fontWeight="bold" fontSize="14" fontFamily="sans-serif">Д</text>
+          {/* Network graph mark */}
+          <div className="w-8 h-8 bg-[#6366F1] rounded-lg flex items-center justify-center flex-shrink-0 shadow-[0_2px_8px_rgba(99,102,241,0.35)]">
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
+              {/* edges */}
+              <line x1="5" y1="6" x2="15" y2="6"  stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.6"/>
+              <line x1="5" y1="6" x2="10" y2="15" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.6"/>
+              <line x1="15" y1="6" x2="10" y2="15" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.6"/>
+              {/* nodes */}
+              <circle cx="5"  cy="6"  r="2.4" fill="white"/>
+              <circle cx="15" cy="6"  r="2.4" fill="white"/>
+              <circle cx="10" cy="15" r="2.4" fill="white"/>
             </svg>
           </div>
           <div className="flex flex-col">
-            <span className="font-mono font-bold text-base text-[#FF8400] tracking-wider leading-tight">ДРУЗЬЯ</span>
-            <span className="text-[10px] text-[#94a3b8] font-mono leading-tight">v2.0.0</span>
+            <span className="font-bold text-[13px] text-[#6366F1] tracking-[0.18em] leading-tight uppercase"
+              style={{ fontFamily: 'Geist, Inter, system-ui, sans-serif' }}>
+              ДРУЗЬЯ
+            </span>
+            <span className="text-[10px] text-[#94a3b8] leading-tight" style={{ fontFamily: 'Geist, Inter, system-ui, sans-serif' }}>v2.0.0</span>
           </div>
         </div>
       </div>
@@ -90,7 +102,7 @@ export function Sidebar() {
               )}
             >
               {active && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#FF8400] rounded-r-full" />
+                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#6366F1] rounded-r-full" />
               )}
               {item.icon}
               {item.label}

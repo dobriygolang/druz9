@@ -3,7 +3,7 @@ import { apiClient } from '@/shared/api/base'
 export const adminApi = {
   listCodeTasks: async (params?: { topic?: string; difficulty?: string; includeInactive?: boolean }) => {
     const r = await apiClient.get<{ tasks?: unknown[] }>('/api/v1/code-editor/tasks', {
-      params: { topic: params?.topic, difficulty: params?.difficulty, include_inactive: params?.includeInactive ?? true },
+      params: { topic: params?.topic, difficulty: params?.difficulty, includeInactive: params?.includeInactive ?? true },
     })
     return r.data.tasks ?? []
   },

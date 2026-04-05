@@ -29,7 +29,7 @@ function formatTimeAgo(iso: string) {
 const GRADIENT_COLORS = [
   ['#6366f1', '#8b5cf6'],
   ['#22c55e', '#16a34a'],
-  ['#f59e0b', '#FF8400'],
+  ['#f59e0b', '#6366F1'],
   ['#ec4899', '#be185d'],
   ['#3b82f6', '#1d4ed8'],
   ['#14b8a6', '#0d9488'],
@@ -141,7 +141,7 @@ export function PodcastsPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Поиск подкастов..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#CBCCC9] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8400]/20 transition-shadow"
+            className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#CBCCC9] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 transition-shadow"
           />
         </div>
       </div>
@@ -154,12 +154,12 @@ export function PodcastsPage() {
             <div className="bg-[#0f172a] rounded-2xl p-6 flex items-center gap-5 animate-fade-in">
               <div
                 className="w-[120px] h-[120px] rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: `linear-gradient(135deg, #FF8400, #f59e0b)` }}
+                style={{ background: `linear-gradient(135deg, #6366F1, #f59e0b)` }}
               >
                 <Mic className="w-12 h-12 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] text-[#FF8400] font-medium tracking-wider font-geist uppercase">Сейчас играет</p>
+                <p className="text-[11px] text-[#6366F1] font-medium tracking-wider font-geist uppercase">Сейчас играет</p>
                 <h3 className="font-mono text-lg font-bold text-white mt-1 truncate">{playing.title}</h3>
                 <p className="text-sm text-[#94a3b8] font-geist mt-0.5">
                   {playing.authorName} · {formatDuration(playing.durationSeconds)}
@@ -167,13 +167,13 @@ export function PodcastsPage() {
                 <div className="flex items-center gap-3 mt-3">
                   <button
                     onClick={togglePlayPause}
-                    className="w-10 h-10 rounded-full bg-[#FF8400] flex items-center justify-center hover:bg-[#ea7700] transition-colors"
+                    className="w-10 h-10 rounded-full bg-[#6366F1] flex items-center justify-center hover:bg-[#ea7700] transition-colors"
                   >
                     {isPlaying ? <Pause className="w-[18px] h-[18px] text-white" /> : <Play className="w-[18px] h-[18px] text-white ml-0.5" />}
                   </button>
                   <div className="flex-1 flex items-center gap-2">
                     <div className="flex-1 h-1 bg-[#1e293b] rounded-full overflow-hidden">
-                      <div className="h-full bg-[#FF8400] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+                      <div className="h-full bg-[#6366F1] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
                     </div>
                     <span className="text-[11px] font-mono text-[#666666] w-[90px] text-right">
                       {formatDuration(currentTime)} / {formatDuration(playing.durationSeconds)}
@@ -196,7 +196,7 @@ export function PodcastsPage() {
                   onClick={() => setActiveFilter(f)}
                   className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
                     activeFilter === f
-                      ? 'bg-[#FF8400] text-[#111111]'
+                      ? 'bg-[#6366F1] text-[#111111]'
                       : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
                   }`}
                 >
@@ -234,7 +234,7 @@ export function PodcastsPage() {
                     onClick={() => handlePlay(podcast)}
                     className={`stagger-item flex items-center gap-4 p-4 rounded-xl border text-left transition-all duration-200 ${
                       isCurrentlyPlaying
-                        ? 'bg-[#fff7ed] border-[#FF8400]/30'
+                        ? 'bg-[#fff7ed] border-[#6366F1]/30'
                         : 'bg-white border-[#CBCCC9] hover:border-[#94a3b8] hover:shadow-sm'
                     }`}
                   >
@@ -324,11 +324,11 @@ export function PodcastsPage() {
             <h3 className="font-mono text-sm font-semibold text-[#CBCCC9] mb-4">Статистика</h3>
             <div className="flex gap-4 mb-4">
               <div className="flex-1 text-center">
-                <p className="font-mono text-[28px] font-bold text-[#FF8400] leading-none">{podcasts.length || '—'}</p>
+                <p className="font-mono text-[28px] font-bold text-[#6366F1] leading-none">{podcasts.length || '—'}</p>
                 <p className="text-[11px] text-[#94a3b8] mt-1 font-geist">Эпизодов</p>
               </div>
               <div className="flex-1 text-center">
-                <p className="font-mono text-[28px] font-bold text-[#FF8400] leading-none">
+                <p className="font-mono text-[28px] font-bold text-[#6366F1] leading-none">
                   {podcasts.reduce((sum, p) => sum + p.listensCount, 0) || '—'}
                 </p>
                 <p className="text-[11px] text-[#94a3b8] mt-1 font-geist">Слушателей</p>

@@ -9,6 +9,9 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Card } from '@/shared/ui/Card'
 import { ErrorState } from '@/shared/ui/ErrorState'
+import { ActivityHeatmap } from '@/shared/ui/ActivityHeatmap'
+import { AchievementBadges } from '@/shared/ui/AchievementBadges'
+import type { Achievement } from '@/shared/ui/AchievementBadges'
 import { apiClient } from '@/shared/api/base'
 
 function formatJoinDate(iso: string) {
@@ -43,7 +46,7 @@ function EloRing({ rating, league }: { rating: number; league: string }) {
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="#FF8400"
+          stroke="#6366F1"
           strokeWidth={stroke}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -57,7 +60,7 @@ function EloRing({ rating, league }: { rating: number; league: string }) {
           y={size / 2 - 6}
           textAnchor="middle"
           dominantBaseline="central"
-          className="fill-[#FF8400]"
+          className="fill-[#6366F1]"
           style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '22px', fontWeight: 700 }}
         >
           {rating}
@@ -123,10 +126,10 @@ function SkillRadar({ values }: { values: number[] }) {
         <line key={i} x1={cx} y1={cy} x2={p[0]} y2={p[1]} stroke="#CBCCC9" strokeWidth={0.5} />
       ))}
       {/* Data area */}
-      <polygon points={dataPoly} fill="#FF8400" fillOpacity={0.2} stroke="#FF8400" strokeWidth={1.5} />
+      <polygon points={dataPoly} fill="#6366F1" fillOpacity={0.2} stroke="#6366F1" strokeWidth={1.5} />
       {/* Data dots */}
       {dataPoints.map((p, i) => (
-        <circle key={i} cx={p[0]} cy={p[1]} r={3} fill="#FF8400" />
+        <circle key={i} cx={p[0]} cy={p[1]} r={3} fill="#6366F1" />
       ))}
       {/* Labels */}
       {labelPts.map((p, i) => (
@@ -165,6 +168,8 @@ export function ProfilePage() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [arenaStats, setArenaStats] = useState<ArenaStats | null>(null)
+  const [achievements, setAchievements] = useState<Achievement[]>([])
+  const [activity, setActivity] = useState<{ date: string; count: number }[]>([])
 
   const targetId = userId ?? authUser?.id ?? ''
   const isOwn = !userId || userId === authUser?.id
@@ -197,6 +202,32 @@ export function ProfilePage() {
       .then(res => {
         const s = res.data?.stats ?? res.data
         if (s && typeof s.rating === 'number') setArenaStats(s)
+      })
+      .catch(() => {})
+  }, [targetId])
+
+  // Fetch achievements
+  useEffect(() => {
+    if (!targetId) return
+    apiClient
+      .get(`/api/v1/profile/${targetId}/achievements`)
+      .then(res => {
+        const data = res.data
+        if (Array.isArray(data)) setAchievements(data)
+        else if (Array.isArray(data?.achievements)) setAchievements(data.achievements)
+      })
+      .catch(() => {})
+  }, [targetId])
+
+  // Fetch activity
+  useEffect(() => {
+    if (!targetId) return
+    apiClient
+      .get(`/api/v1/profile/${targetId}/activity`)
+      .then(res => {
+        const data = res.data
+        if (Array.isArray(data)) setActivity(data)
+        else if (Array.isArray(data?.activity)) setActivity(data.activity)
       })
       .catch(() => {})
   }, [targetId])
@@ -274,7 +305,7 @@ export function ProfilePage() {
       {progress && (
         <div className="grid grid-cols-4 gap-3">
           {[
-            { label: 'Сессий', value: progress.overview.practiceSessions, icon: <Zap className="w-4 h-4 text-[#FF8400]" /> },
+            { label: 'Сессий', value: progress.overview.practiceSessions, icon: <Zap className="w-4 h-4 text-[#6366F1]" /> },
             { label: 'Пройдено', value: progress.overview.practicePassedSessions, icon: <Trophy className="w-4 h-4 text-[#22c55e]" /> },
             { label: 'Стрик', value: `${progress.overview.currentStreakDays}д`, icon: <Zap className="w-4 h-4 text-[#f59e0b]" /> },
             { label: 'Mock', value: progress.overview.completedMockSessions, icon: <Briefcase className="w-4 h-4 text-[#6366f1]" /> },
@@ -294,7 +325,7 @@ export function ProfilePage() {
       {arenaStats && (
         <div className="grid grid-cols-4 gap-3">
           {[
-            { label: 'Побед', value: arenaStats.wins, icon: <Trophy className="w-4 h-4 text-[#FF8400]" /> },
+            { label: 'Побед', value: arenaStats.wins, icon: <Trophy className="w-4 h-4 text-[#6366F1]" /> },
             { label: 'Поражений', value: arenaStats.losses, icon: <Swords className="w-4 h-4 text-[#ef4444]" /> },
             { label: 'Матчей', value: arenaStats.matches, icon: <Swords className="w-4 h-4 text-[#6366f1]" /> },
             { label: 'Winrate', value: `${Math.round(arenaStats.win_rate * 100)}%`, icon: <Zap className="w-4 h-4 text-[#22c55e]" /> },
@@ -309,6 +340,16 @@ export function ProfilePage() {
           ))}
         </div>
       )}
+
+      {/* Activity Heatmap */}
+      <Card padding="md">
+        <h3 className="text-sm font-semibold text-[#111111] mb-3">Активность</h3>
+        {activity.length > 0 ? (
+          <ActivityHeatmap activity={activity} />
+        ) : (
+          <div className="h-20 bg-[#F2F3F0] rounded animate-pulse" />
+        )}
+      </Card>
 
       <div className="flex gap-4">
         {/* Left column */}
@@ -345,6 +386,13 @@ export function ProfilePage() {
             </Card>
           )}
 
+          {/* Achievements */}
+          {achievements.length > 0 && (
+            <Card padding="md">
+              <AchievementBadges achievements={achievements} />
+            </Card>
+          )}
+
           {/* Skill Radar */}
           <Card padding="md">
             <h3 className="text-sm font-semibold text-[#111111] mb-3">Навыки</h3>
@@ -359,14 +407,14 @@ export function ProfilePage() {
           {/* League with ELO ring */}
           <Card padding="md" dark orangeBorder>
             <div className="flex items-center gap-2 mb-3">
-              <Trophy className="w-4 h-4 text-[#FF8400]" />
+              <Trophy className="w-4 h-4 text-[#6366F1]" />
               <h3 className="text-sm font-semibold text-[#CBCCC9]">Лига</h3>
             </div>
             {arenaStats ? (
               <EloRing rating={arenaStats.rating} league={arenaStats.league} />
             ) : (
               <>
-                <p className="font-mono text-2xl font-bold text-[#FF8400]">--</p>
+                <p className="font-mono text-2xl font-bold text-[#6366F1]">--</p>
                 <p className="text-xs text-[#666666] mt-1">Нет данных арены</p>
               </>
             )}
@@ -379,7 +427,7 @@ export function ProfilePage() {
               <ul className="space-y-1.5">
                 {progress.recommendations.slice(0, 3).map((r, i) => (
                   <li key={i} className="flex items-start gap-2 text-xs text-[#666666]">
-                    <span className="text-[#FF8400] mt-0.5">&rarr;</span>
+                    <span className="text-[#6366F1] mt-0.5">&rarr;</span>
                     {r}
                   </li>
                 ))}

@@ -24,7 +24,7 @@ export function AdminLayout() {
       <header className="h-[52px] bg-white border-b border-[#CBCCC9] flex items-center justify-between px-6 flex-shrink-0 z-10">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-[#FF8400] rounded-lg flex items-center justify-center">
+            <div className="w-7 h-7 bg-[#6366F1] rounded-lg flex items-center justify-center">
               <span className="text-xs font-bold text-white">Д</span>
             </div>
             <span className="text-sm font-semibold text-[#0f172a]">Друзья Admin</span>
@@ -37,7 +37,7 @@ export function AdminLayout() {
                 className={cn(
                   'px-3 py-1.5 text-xs font-medium rounded-lg transition-colors',
                   location.pathname === tab.href
-                    ? 'bg-[#FF8400] text-[#0f172a]'
+                    ? 'bg-[#6366F1] text-[#0f172a]'
                     : 'text-[#666666] hover:bg-[#F2F3F0]',
                 )}
               >

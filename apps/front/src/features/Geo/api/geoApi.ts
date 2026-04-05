@@ -10,7 +10,7 @@ export interface GeoSuggestion {
 }
 
 type BackendGeoSuggestion = {
-  place_label?: string
+  placeLabel?: string
   city?: string
   region?: string
   country?: string
@@ -33,24 +33,24 @@ export interface CommunityPoint {
 }
 
 type BackendCommunityPoint = {
-  user_id?: string
+  userId?: string
   title?: string
   region?: string
   latitude?: number
   longitude?: number
-  is_current_user?: boolean
-  avatar_url?: string | null
+  isCurrentUser?: boolean
+  avatarUrl?: string | null
   username?: string
-  first_name?: string
-  last_name?: string
-  activity_status?: string
+  firstName?: string
+  lastName?: string
+  activityStatus?: string
 }
 
 export const geoApi = {
   suggest: async (query: string): Promise<GeoSuggestion[]> => {
     const r = await apiClient.post<{ suggestions?: BackendGeoSuggestion[] }>('/api/v1/geo/resolve', { query })
     return (r.data.suggestions ?? []).map((s) => ({
-      placeLabel: s.place_label ?? '', city: s.city, region: s.region, country: s.country,
+      placeLabel: s.placeLabel ?? '', city: s.city, region: s.region, country: s.country,
       latitude: s.latitude ?? 0, longitude: s.longitude ?? 0,
     }))
   },
@@ -58,17 +58,17 @@ export const geoApi = {
   getCommunity: async (): Promise<CommunityPoint[]> => {
     const r = await apiClient.get<{ points?: BackendCommunityPoint[] }>('/api/v1/geo/community')
     return (r.data.points ?? []).map((p) => ({
-      userId: p.user_id ?? '',
+      userId: p.userId ?? '',
       title: p.title ?? '',
       region: p.region ?? '',
       latitude: p.latitude ?? 0,
       longitude: p.longitude ?? 0,
-      isCurrentUser: p.is_current_user ?? false,
-      avatarUrl: p.avatar_url ?? null,
+      isCurrentUser: p.isCurrentUser ?? false,
+      avatarUrl: p.avatarUrl ?? null,
       username: p.username ?? '',
-      firstName: p.first_name ?? '',
-      lastName: p.last_name ?? '',
-      activityStatus: p.activity_status ?? 'offline',
+      firstName: p.firstName ?? '',
+      lastName: p.lastName ?? '',
+      activityStatus: p.activityStatus ?? 'offline',
     }))
   },
 }

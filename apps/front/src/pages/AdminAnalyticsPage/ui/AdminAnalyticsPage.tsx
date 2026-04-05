@@ -38,7 +38,7 @@ export function AdminAnalyticsPage() {
       {/* Stats */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         <StatCard label="Пользователей" value="1,234" icon={<Users className="w-5 h-5 text-[#6366f1]" />} change="+12% за период" />
-        <StatCard label="Активных сессий" value="456" icon={<Code2 className="w-5 h-5 text-[#FF8400]" />} change="+8%" />
+        <StatCard label="Активных сессий" value="456" icon={<Code2 className="w-5 h-5 text-[#6366F1]" />} change="+8%" />
         <StatCard label="Матчей Arena" value="89" icon={<Trophy className="w-5 h-5 text-[#f59e0b]" />} change="+23%" />
         <StatCard label="Событий" value="14" icon={<Calendar className="w-5 h-5 text-[#22c55e]" />} />
       </div>
@@ -60,12 +60,12 @@ export function AdminAnalyticsPage() {
         </div>
         <div className="bg-white rounded-xl border border-[#CBCCC9] p-5">
           <h3 className="text-sm font-semibold text-[#0f172a] mb-4 flex items-center gap-2">
-            <BarChart2 className="w-4 h-4 text-[#FF8400]" /> Типы задач
+            <BarChart2 className="w-4 h-4 text-[#6366F1]" /> Типы задач
           </h3>
           <div className="flex flex-col gap-3">
             {[
               { label: 'Coding', value: 65, color: '#6366f1' },
-              { label: 'System Design', value: 22, color: '#FF8400' },
+              { label: 'System Design', value: 22, color: '#6366F1' },
               { label: 'Behavioral', value: 13, color: '#22c55e' },
             ].map(item => (
               <div key={item.label}>

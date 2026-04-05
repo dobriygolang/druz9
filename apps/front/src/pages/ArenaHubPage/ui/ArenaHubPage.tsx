@@ -17,7 +17,7 @@ const LEAGUE_COLORS: Record<string, string> = {
   ARENA_LEAGUE_PLATINUM: 'text-[#22c55e]',
   ARENA_LEAGUE_DIAMOND: 'text-[#6366f1]',
   ARENA_LEAGUE_MASTER: 'text-[#8b5cf6]',
-  ARENA_LEAGUE_LEGEND: 'text-[#FF8400]',
+  ARENA_LEAGUE_LEGEND: 'text-[#6366F1]',
 }
 const LEAGUE_LABELS: Record<string, string> = {
   ARENA_LEAGUE_BRONZE: 'Bronze', ARENA_LEAGUE_SILVER: 'Silver',
@@ -155,11 +155,11 @@ export function ArenaHubPage() {
         {/* League card */}
         <Card padding="md" dark orangeBorder>
           <div className="flex items-center gap-2 mb-3">
-            <Trophy className="w-4 h-4 text-[#FF8400]" />
+            <Trophy className="w-4 h-4 text-[#6366F1]" />
             <h3 className="text-sm font-semibold text-[#CBCCC9]">Лига</h3>
           </div>
           <div className="text-center py-2">
-            <p className="font-mono text-3xl font-bold text-[#FF8400]">Gold</p>
+            <p className="font-mono text-3xl font-bold text-[#6366F1]">Gold</p>
             <p className="text-xs text-[#666666] mt-1">1240 очков рейтинга</p>
           </div>
         </Card>

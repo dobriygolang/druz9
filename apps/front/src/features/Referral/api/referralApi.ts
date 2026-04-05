@@ -5,21 +5,21 @@ interface ReferralRaw {
   id: string
   title: string
   company: string
-  vacancy_url: string
+  vacancyUrl: string
   description: string
   experience: string
   location: string
-  employment_type: string
-  creator_id: string
-  created_at: string
+  employmentType: string
+  creatorId: string
+  createdAt: string
 }
 
 interface ReferralListResponse {
   referrals: ReferralRaw[]
   limit: number
   offset: number
-  total_count: number
-  has_next_page: boolean
+  totalCount: number
+  hasNextPage: boolean
 }
 
 function normalize(raw: ReferralRaw): Referral {
@@ -27,24 +27,24 @@ function normalize(raw: ReferralRaw): Referral {
     id: raw.id,
     title: raw.title,
     company: raw.company,
-    vacancyUrl: raw.vacancy_url,
+    vacancyUrl: raw.vacancyUrl,
     description: raw.description,
     experience: raw.experience,
     location: raw.location,
-    employmentType: raw.employment_type,
-    creatorId: raw.creator_id,
-    createdAt: raw.created_at,
+    employmentType: raw.employmentType,
+    creatorId: raw.creatorId,
+    createdAt: raw.createdAt,
   }
 }
 
 export interface CreateReferralData {
   title: string
   company: string
-  vacancy_url: string
+  vacancyUrl: string
   description: string
   experience: string
   location: string
-  employment_type: string
+  employmentType: string
 }
 
 export const referralApi = {
@@ -55,8 +55,8 @@ export const referralApi = {
       referrals: res.data.referrals.map(normalize),
       limit: res.data.limit,
       offset: res.data.offset,
-      totalCount: res.data.total_count,
-      hasNextPage: res.data.has_next_page,
+      totalCount: res.data.totalCount,
+      hasNextPage: res.data.hasNextPage,
     }
   },
 

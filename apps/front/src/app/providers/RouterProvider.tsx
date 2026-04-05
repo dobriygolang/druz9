@@ -33,6 +33,7 @@ const AdminCodeGamePage = lazy(() => import('@/pages/AdminCodeGamePage/ui/AdminC
 const PodcastsPage = lazy(() => import('@/pages/PodcastsPage/ui/PodcastsPage').then(m => ({ default: m.PodcastsPage })))
 const CirclesPage = lazy(() => import('@/pages/CirclesPage/ui/CirclesPage').then(m => ({ default: m.CirclesPage })))
 const VacanciesPage = lazy(() => import('@/pages/VacanciesPage/ui/VacanciesPage').then(m => ({ default: m.VacanciesPage })))
+const DailyChallengePage = lazy(() => import('@/pages/DailyChallengePage/ui/DailyChallengePage').then(m => ({ default: m.DailyChallengePage })))
 
 const Fallback: React.FC = () => null
 
@@ -57,7 +58,7 @@ class ErrorBoundary extends React.Component<
           <div className="text-center">
             <h2 className="text-xl font-semibold mb-2">Что-то пошло не так</h2>
             <p className="text-[#666666] mb-4 text-sm">{msg}</p>
-            <button className="px-4 py-2 bg-[#FF8400] rounded-lg text-sm font-medium" onClick={() => window.location.reload()}>
+            <button className="px-4 py-2 bg-[#6366F1] rounded-lg text-sm font-medium" onClick={() => window.location.reload()}>
               Перезагрузить страницу
             </button>
           </div>
@@ -120,6 +121,9 @@ export const RouterProvider: React.FC = () => {
               <Route index element={<Navigate to="interview-prep" replace />} />
               <Route path="interview-prep" element={<InterviewPrepPage />} />
             </Route>
+
+            {/* Daily Challenge */}
+            <Route path="/daily-challenge" element={gate ? <Navigate to="/login" replace /> : <DailyChallengePage />} />
 
             {/* Podcasts */}
             <Route path="/podcasts" element={gate ? <Navigate to="/login" replace /> : <PodcastsPage />} />

@@ -22,7 +22,7 @@ export function AdminCodeGamePage() {
       <div className="grid grid-cols-3 gap-4 mb-5">
         {[
           { label: 'Активных игроков', value: 0, icon: <Users className="w-5 h-5 text-[#6366f1]" /> },
-          { label: 'Активных комнат', value: rooms.length, icon: <Gamepad2 className="w-5 h-5 text-[#FF8400]" /> },
+          { label: 'Активных комнат', value: rooms.length, icon: <Gamepad2 className="w-5 h-5 text-[#6366F1]" /> },
           { label: 'Завершённых игр', value: 0, icon: <Trophy className="w-5 h-5 text-[#f59e0b]" /> },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-xl border border-[#CBCCC9] p-4 flex items-center gap-4">

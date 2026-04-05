@@ -75,7 +75,7 @@ export function InterviewPrepAdminPage() {
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === tab.id ? 'border-[#FF8400] text-[#0f172a]' : 'border-transparent text-[#666666] hover:text-[#0f172a]'}`}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === tab.id ? 'border-[#6366F1] text-[#0f172a]' : 'border-transparent text-[#666666] hover:text-[#0f172a]'}`}
           >
             {tab.label}
             {tab.count !== undefined && <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-[#F2F3F0] text-[#666666] rounded-full">{tab.count}</span>}

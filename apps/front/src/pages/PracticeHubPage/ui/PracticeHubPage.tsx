@@ -81,7 +81,7 @@ export function PracticeHubPage() {
             return (
               <Card key={f.title} dark padding="lg" className="flex flex-col gap-3">
                 <div className="w-10 h-10 rounded-xl bg-[#1e293b] flex items-center justify-center">
-                  <Icon className="w-5 h-5 text-[#FF8400]" />
+                  <Icon className="w-5 h-5 text-[#6366F1]" />
                 </div>
                 <div>
                   <h3 className="text-base font-semibold text-white">{f.title}</h3>
@@ -116,7 +116,7 @@ export function PracticeHubPage() {
                   key={u.userId}
                   className="flex items-center gap-2.5 px-4 py-2 bg-white rounded-xl border border-[#CBCCC9]"
                 >
-                  <span className="text-xs font-mono font-bold text-[#FF8400] w-4 text-center">{idx + 1}</span>
+                  <span className="text-xs font-mono font-bold text-[#6366F1] w-4 text-center">{idx + 1}</span>
                   <Avatar name={u.username} src={u.avatarUrl} size="xs" />
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-[#111111] truncate">{u.username}</p>

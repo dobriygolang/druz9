@@ -17,7 +17,7 @@ export function registerDarkTheme(monaco: typeof Monaco) {
       'editorLineNumber.activeForeground': '#64748b',
       'editor.selectionBackground': '#1e3a5f',
       'editor.lineHighlightBackground': '#0f1f3d',
-      'editorCursor.foreground': '#FF8400',
+      'editorCursor.foreground': '#6366F1',
       'editorIndentGuide.background': '#1e293b',
       'editorIndentGuide.activeBackground': '#334155',
     },

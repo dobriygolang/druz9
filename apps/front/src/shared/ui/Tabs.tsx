@@ -48,7 +48,7 @@ export function Tabs({ tabs, active, onChange, variant = 'underline', className 
           className={cn(
             'px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors',
             active === tab.id
-              ? 'border-[#FF8400] text-[#18181b]'
+              ? 'border-[#6366F1] text-[#18181b]'
               : 'border-transparent text-[#64748b] hover:text-[#18181b]',
           )}
         >

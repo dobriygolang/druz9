@@ -60,7 +60,7 @@ export function MapPage() {
                 onMouseEnter={() => setHoveredId(p.userId)}
                 onMouseLeave={() => setHoveredId(null)}
               >
-                <div className="w-3.5 h-3.5 rounded-full bg-[#FF8400] border-2 border-white shadow-md cursor-pointer" />
+                <div className="w-3.5 h-3.5 rounded-full bg-[#6366F1] border-2 border-white shadow-md cursor-pointer" />
                 {hoveredId === p.userId && (
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-[#CBCCC9] whitespace-nowrap z-10">
                     <p className="text-xs font-medium text-[#111111]">{p.firstName} {p.lastName}</p>

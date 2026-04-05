@@ -4,25 +4,25 @@ import type { CompleteProfilePayload, ProfileProgress, ProfileResponse, User } f
 type BackendUser = {
   id: string
   username?: string
-  telegram_username?: string
-  first_name?: string
-  last_name?: string
-  avatar_url?: string
+  telegramUsername?: string
+  firstName?: string
+  lastName?: string
+  avatarUrl?: string
   region?: string
   latitude?: number
   longitude?: number
-  activity_status?: unknown
-  is_admin?: boolean
-  is_trusted?: boolean
-  created_at?: string
-  current_workplace?: string
-  connected_providers?: string[]
-  primary_provider?: string
+  activityStatus?: unknown
+  isAdmin?: boolean
+  isTrusted?: boolean
+  createdAt?: string
+  currentWorkplace?: string
+  connectedProviders?: string[]
+  primaryProvider?: string
 }
 
 type BackendProfileResponse = {
   user: BackendUser
-  needs_profile_complete?: boolean
+  needsProfileComplete?: boolean
 }
 
 function normalizeActivityStatus(value: unknown): User['activityStatus'] {
@@ -36,27 +36,27 @@ function normalizeUser(user: BackendUser): User {
   return {
     id: user.id,
     username: user.username ?? '',
-    telegramUsername: user.telegram_username ?? '',
-    firstName: user.first_name ?? '',
-    lastName: user.last_name ?? '',
-    avatarUrl: user.avatar_url ?? '',
+    telegramUsername: user.telegramUsername ?? '',
+    firstName: user.firstName ?? '',
+    lastName: user.lastName ?? '',
+    avatarUrl: user.avatarUrl ?? '',
     region: user.region ?? '',
     latitude: user.latitude ?? 0,
     longitude: user.longitude ?? 0,
-    activityStatus: normalizeActivityStatus(user.activity_status),
-    isAdmin: user.is_admin ?? false,
-    isTrusted: user.is_trusted ?? false,
-    currentWorkplace: user.current_workplace ?? '',
-    connectedProviders: user.connected_providers ?? [],
-    primaryProvider: user.primary_provider ?? '',
-    createdAt: user.created_at ?? '',
+    activityStatus: normalizeActivityStatus(user.activityStatus),
+    isAdmin: user.isAdmin ?? false,
+    isTrusted: user.isTrusted ?? false,
+    currentWorkplace: user.currentWorkplace ?? '',
+    connectedProviders: user.connectedProviders ?? [],
+    primaryProvider: user.primaryProvider ?? '',
+    createdAt: user.createdAt ?? '',
   }
 }
 
 function normalizeProfileResponse(data: BackendProfileResponse): ProfileResponse {
   return {
     user: normalizeUser(data.user),
-    needsProfileComplete: data.needs_profile_complete ?? false,
+    needsProfileComplete: data.needsProfileComplete ?? false,
   }
 }
 
@@ -70,18 +70,18 @@ export function clearProfileByIdCache(userId?: string) {
 
 export const authApi = {
   createTelegramAuthChallenge: async () => {
-    const r = await apiClient.post<{ token: string; bot_start_url?: string; expires_at?: string }>(
+    const r = await apiClient.post<{ token: string; botStartUrl?: string; expiresAt?: string }>(
       '/api/v1/profile/auth/telegram/challenge', {},
     )
-    return { token: r.data.token, botStartUrl: r.data.bot_start_url ?? '', expiresAt: r.data.expires_at ?? '' }
+    return { token: r.data.token, botStartUrl: r.data.botStartUrl ?? '', expiresAt: r.data.expiresAt ?? '' }
   },
   telegramLogin: async (token: string, code: string): Promise<ProfileResponse> => {
     const r = await apiClient.post<BackendProfileResponse>('/api/v1/profile/auth/telegram', { token, code })
     return normalizeProfileResponse(r.data)
   },
   startYandexAuth: async () => {
-    const r = await apiClient.get<{ state: string; auth_url?: string; expires_at?: string }>('/api/v1/profile/auth/yandex/start')
-    return { state: r.data.state, authUrl: r.data.auth_url ?? '', expiresAt: r.data.expires_at ?? '' }
+    const r = await apiClient.get<{ state: string; authUrl?: string; expiresAt?: string }>('/api/v1/profile/auth/yandex/start')
+    return { state: r.data.state, authUrl: r.data.authUrl ?? '', expiresAt: r.data.expiresAt ?? '' }
   },
   yandexAuth: async (state: string, code: string): Promise<ProfileResponse> => {
     const r = await apiClient.get<BackendProfileResponse>('/api/v1/profile/auth/yandex/callback', { params: { state, code } })

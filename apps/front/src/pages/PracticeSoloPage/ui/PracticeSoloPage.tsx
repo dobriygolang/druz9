@@ -99,7 +99,7 @@ export function PracticeSoloPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Поиск задач..."
-            className="w-full pl-9 pr-4 py-2 bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#FF8400]/20"
+            className="w-full pl-9 pr-4 py-2 bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
           />
         </div>
       </div>
@@ -113,7 +113,7 @@ export function PracticeSoloPage() {
             onClick={() => setTopic(tf.value)}
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 ${
               topic === tf.value
-                ? 'bg-[#FF8400] text-white shadow-sm'
+                ? 'bg-[#6366F1] text-white shadow-sm'
                 : 'bg-[#F2F3F0] text-[#666666] hover:bg-[#E7E8E5] hover:text-[#111111]'
             }`}
           >

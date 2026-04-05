@@ -37,7 +37,7 @@ export function AdminSidebar() {
                   : 'text-[#475569] hover:bg-[#F2F3F0]',
               )}
             >
-              <span className={cn(active && 'text-[#FF8400]')}>{item.icon}</span>
+              <span className={cn(active && 'text-[#6366F1]')}>{item.icon}</span>
               {item.label}
             </Link>
           )

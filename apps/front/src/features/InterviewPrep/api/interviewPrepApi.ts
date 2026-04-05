@@ -18,18 +18,18 @@ export interface InterviewPrepTask {
 }
 
 type BackendTask = {
-  id: string; slug?: string; title?: string; statement?: string; prep_type?: string; language?: string
-  company_tag?: string; supported_languages?: string[]; is_executable?: boolean; duration_seconds?: number
-  starter_code?: string; is_active?: boolean; created_at?: string; updated_at?: string
+  id: string; slug?: string; title?: string; statement?: string; prepType?: string; language?: string
+  companyTag?: string; supportedLanguages?: string[]; isExecutable?: boolean; durationSeconds?: number
+  starterCode?: string; isActive?: boolean; createdAt?: string; updatedAt?: string
 }
 
 function normalizeTask(t: BackendTask): InterviewPrepTask {
   return {
     id: t.id, slug: t.slug ?? '', title: t.title ?? '', statement: t.statement ?? '',
-    prepType: t.prep_type ?? '', language: t.language ?? '', companyTag: t.company_tag ?? '',
-    supportedLanguages: t.supported_languages ?? [], isExecutable: t.is_executable ?? false,
-    durationSeconds: t.duration_seconds ?? 0, starterCode: t.starter_code ?? '',
-    isActive: t.is_active ?? true, createdAt: t.created_at ?? '', updatedAt: t.updated_at ?? '',
+    prepType: t.prepType ?? '', language: t.language ?? '', companyTag: t.companyTag ?? '',
+    supportedLanguages: t.supportedLanguages ?? [], isExecutable: t.isExecutable ?? false,
+    durationSeconds: t.durationSeconds ?? 0, starterCode: t.starterCode ?? '',
+    isActive: t.isActive ?? true, createdAt: t.createdAt ?? '', updatedAt: t.updatedAt ?? '',
   }
 }
 
@@ -39,7 +39,7 @@ export const interviewPrepApi = {
     return (r.data.tasks ?? []).map(normalizeTask)
   },
   startSession: async (taskId: string) => {
-    const r = await apiClient.post<{ session?: unknown }>('/api/v1/interview-prep/sessions', { task_id: taskId })
+    const r = await apiClient.post<{ session?: unknown }>('/api/v1/interview-prep/sessions', { taskId })
     return r.data.session
   },
   getSession: async (sessionId: string) => {
@@ -51,7 +51,7 @@ export const interviewPrepApi = {
     return r.data.result
   },
   answerQuestion: async (sessionId: string, questionId: string, answer: string, selfAssessment: string) => {
-    const r = await apiClient.post<{ session?: unknown; review?: unknown }>(`/api/v1/interview-prep/sessions/${sessionId}/questions/${questionId}/answer`, { answer, self_assessment: selfAssessment })
+    const r = await apiClient.post<{ session?: unknown; review?: unknown }>(`/api/v1/interview-prep/sessions/${sessionId}/questions/${questionId}/answer`, { answer, selfAssessment })
     return r.data
   },
   listCompanies: async (): Promise<string[]> => {
@@ -59,7 +59,7 @@ export const interviewPrepApi = {
     return r.data.companies ?? []
   },
   startMockSession: async (companyTag: string) => {
-    const r = await apiClient.post<{ session?: unknown }>('/api/v1/interview-prep/mock-sessions', { company_tag: companyTag })
+    const r = await apiClient.post<{ session?: unknown }>('/api/v1/interview-prep/mock-sessions', { companyTag })
     return r.data.session
   },
   getMockSession: async (sessionId: string) => {
@@ -78,7 +78,7 @@ export const interviewPrepApi = {
     const r = await apiClient.post<{ review?: unknown }>(`/api/v1/interview-prep/sessions/${sessionId}/system-design-review`, data)
     return r.data.review
   },
-  submitMockSystemDesignReview: async (sessionId: string, data: { notes: string; components: string; apis: string; database_schema: string }) => {
+  submitMockSystemDesignReview: async (sessionId: string, data: { notes: string; components: string; apis: string; databaseSchema: string }) => {
     const r = await apiClient.post<{ review?: unknown; session?: unknown }>(`/api/v1/interview-prep/mock-sessions/${sessionId}/system-design-review`, data)
     return r.data
   },

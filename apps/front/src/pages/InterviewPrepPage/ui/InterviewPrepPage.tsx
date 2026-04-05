@@ -10,7 +10,7 @@ import { useToast } from '@/shared/ui/Toast'
 
 const PREP_TYPE_ICONS: Record<string, React.ReactNode> = {
   coding: <Code2 className="w-4 h-4 text-[#6366f1]" />,
-  system_design: <BookOpen className="w-4 h-4 text-[#FF8400]" />,
+  system_design: <BookOpen className="w-4 h-4 text-[#6366F1]" />,
   behavioral: <MessageSquare className="w-4 h-4 text-[#22c55e]" />,
 }
 
@@ -56,7 +56,7 @@ export function InterviewPrepPage() {
 
   const stats = [
     { label: 'Задач', value: tasks.length, icon: <BookOpen className="w-4 h-4 text-[#6366f1]" /> },
-    { label: 'Coding', value: tasks.filter(t => t.prepType === 'coding').length, icon: <Code2 className="w-4 h-4 text-[#FF8400]" /> },
+    { label: 'Coding', value: tasks.filter(t => t.prepType === 'coding').length, icon: <Code2 className="w-4 h-4 text-[#6366F1]" /> },
     { label: 'System Design', value: tasks.filter(t => t.prepType === 'system_design').length, icon: <BookOpen className="w-4 h-4 text-[#22c55e]" /> },
     { label: 'Behavioral', value: tasks.filter(t => t.prepType === 'behavioral').length, icon: <MessageSquare className="w-4 h-4 text-[#f59e0b]" /> },
   ]
@@ -92,19 +92,19 @@ export function InterviewPrepPage() {
                   onClick={() => setSelectedCompany(prev => prev === company ? '' : company)}
                   className={`flex-shrink-0 w-[200px] rounded-2xl p-4 cursor-pointer transition-colors border ${
                     selectedCompany === company
-                      ? 'bg-[#0f172a] border-[#FF8400]'
+                      ? 'bg-[#0f172a] border-[#6366F1]'
                       : 'bg-[#0f172a] border-[#1e293b] hover:border-[#334155]'
                   }`}
                 >
                   <div className="flex items-center gap-2 mb-2">
-                    <Building2 className="w-4 h-4 text-[#FF8400]" />
+                    <Building2 className="w-4 h-4 text-[#6366F1]" />
                     <span className="text-sm font-semibold text-white truncate">{company}</span>
                   </div>
                   <p className="text-xs text-[#94a3b8] mb-3">{count} задач</p>
                   <button
                     onClick={(e) => { e.stopPropagation(); handleStartMock(company) }}
                     disabled={mockLoading}
-                    className="flex items-center gap-1 text-xs font-medium text-[#FF8400] hover:text-[#e5781a] transition-colors disabled:opacity-50"
+                    className="flex items-center gap-1 text-xs font-medium text-[#6366F1] hover:text-[#e5781a] transition-colors disabled:opacity-50"
                   >
                     Начать Mock <ArrowRight className="w-3 h-3" />
                   </button>
@@ -171,7 +171,7 @@ export function InterviewPrepPage() {
               key={cat}
               onClick={() => setCategory(cat)}
               className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-                category === cat ? 'bg-[#FF8400] text-[#0f172a]' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
+                category === cat ? 'bg-[#6366F1] text-[#0f172a]' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
               }`}
             >
               {cat === '' ? 'Все' : PREP_TYPE_LABELS[cat] ?? cat}

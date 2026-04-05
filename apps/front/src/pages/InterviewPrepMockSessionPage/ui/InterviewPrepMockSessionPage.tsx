@@ -84,7 +84,7 @@ export function InterviewPrepMockSessionPage() {
           notes: designNotes,
           components: designComponents,
           apis: designApis,
-          database_schema: designSchema,
+          databaseSchema: designSchema,
         })
       } else {
         // behavioral or theoretical
@@ -162,7 +162,7 @@ export function InterviewPrepMockSessionPage() {
                         isDone
                           ? 'bg-[#22c55e] text-white'
                           : isCurrent
-                            ? 'bg-[#FF8400] text-white'
+                            ? 'bg-[#6366F1] text-white'
                             : 'bg-[#E7E8E5] text-[#666666]'
                       }`}
                     >
@@ -235,7 +235,7 @@ export function InterviewPrepMockSessionPage() {
                   onChange={e => setDesignNotes(e.target.value)}
                   placeholder="Опишите общую архитектуру решения..."
                   rows={6}
-                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#FF8400]"
+                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1]"
                 />
               </div>
               <div>
@@ -245,7 +245,7 @@ export function InterviewPrepMockSessionPage() {
                   onChange={e => setDesignComponents(e.target.value)}
                   placeholder="Перечислите основные компоненты (сервисы, базы данных, кеши...)"
                   rows={4}
-                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#FF8400]"
+                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1]"
                 />
               </div>
               <div>
@@ -255,7 +255,7 @@ export function InterviewPrepMockSessionPage() {
                   onChange={e => setDesignApis(e.target.value)}
                   placeholder="Опишите ключевые API endpoints..."
                   rows={3}
-                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#FF8400]"
+                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1]"
                 />
               </div>
               <div>
@@ -265,7 +265,7 @@ export function InterviewPrepMockSessionPage() {
                   onChange={e => setDesignSchema(e.target.value)}
                   placeholder="Опишите схему данных..."
                   rows={3}
-                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#FF8400]"
+                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1]"
                 />
               </div>
             </div>
@@ -277,7 +277,7 @@ export function InterviewPrepMockSessionPage() {
                 value={textAnswer}
                 onChange={e => setTextAnswer(e.target.value)}
                 placeholder="Напишите ваш ответ здесь..."
-                className="flex-1 w-full px-4 py-3 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#FF8400] leading-relaxed"
+                className="flex-1 w-full px-4 py-3 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1] leading-relaxed"
               />
             </div>
           )}
@@ -286,7 +286,7 @@ export function InterviewPrepMockSessionPage() {
         {/* Right: AI Feedback panel */}
         <div className="w-[300px] flex-shrink-0 bg-white border-l border-[#CBCCC9] flex flex-col">
           <div className="px-4 py-3 border-b border-[#CBCCC9] flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#FF8400]" />
+            <Sparkles className="w-4 h-4 text-[#6366F1]" />
             <span className="text-sm font-bold text-[#111111]">AI Обратная связь</span>
           </div>
           <div className="flex-1 overflow-y-auto p-4">
@@ -328,7 +328,7 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: StageKind 
       {score !== null && (
         <div className="flex items-center gap-3">
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white ${
-            score >= 7 ? 'bg-[#22c55e]' : score >= 4 ? 'bg-[#FF8400]' : 'bg-[#ef4444]'
+            score >= 7 ? 'bg-[#22c55e]' : score >= 4 ? 'bg-[#6366F1]' : 'bg-[#ef4444]'
           }`}>
             {score}
           </div>
@@ -370,13 +370,13 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: StageKind 
       {gaps.length > 0 && (
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
-            <AlertTriangle className="w-3.5 h-3.5 text-[#FF8400]" />
-            <p className="text-xs font-semibold text-[#FF8400]">Пробелы</p>
+            <AlertTriangle className="w-3.5 h-3.5 text-[#6366F1]" />
+            <p className="text-xs font-semibold text-[#6366F1]">Пробелы</p>
           </div>
           <ul className="flex flex-col gap-1">
             {gaps.map((g: string, i: number) => (
               <li key={i} className="text-sm text-[#111111] flex items-start gap-1.5">
-                <span className="text-[#FF8400] mt-0.5">-</span> {g}
+                <span className="text-[#6366F1] mt-0.5">-</span> {g}
               </li>
             ))}
           </ul>

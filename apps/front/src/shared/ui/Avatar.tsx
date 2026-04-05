@@ -10,7 +10,7 @@ interface AvatarProps {
 
 const COLORS = [
   'bg-[#6366f1]',
-  'bg-[#FF8400]',
+  'bg-[#6366F1]',
   'bg-[#22c55e]',
   'bg-[#f59e0b]',
   'bg-[#ef4444]',

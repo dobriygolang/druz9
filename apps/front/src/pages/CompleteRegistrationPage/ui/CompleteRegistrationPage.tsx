@@ -32,7 +32,7 @@ export function CompleteRegistrationPage() {
       <div className="w-full max-w-[420px] mx-4">
         <div className="bg-white rounded-2xl border border-[#CBCCC9] p-8">
           <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-[#FF8400] rounded-2xl flex items-center justify-center mx-auto mb-3">
+            <div className="w-12 h-12 bg-[#6366F1] rounded-2xl flex items-center justify-center mx-auto mb-3">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                 <path d="M4 20L12 4L20 20" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                 <path d="M7 14H17" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>

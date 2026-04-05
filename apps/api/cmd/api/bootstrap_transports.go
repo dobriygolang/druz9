@@ -3,6 +3,10 @@ package main
 import (
 	"api/internal/closer"
 	server "api/internal/server"
+	achievementshttp "api/internal/server/achievementshttp"
+	activityhttp "api/internal/server/activityhttp"
+	aireviewhttp "api/internal/server/aireviewhttp"
+	dailychallengehttp "api/internal/server/dailychallengehttp"
 	interviewprepcheckpointhttp "api/internal/server/interviewprepcheckpointhttp"
 	profileprogresshttp "api/internal/server/profileprogresshttp"
 	adminv1 "api/pkg/api/admin/v1"
@@ -91,6 +95,10 @@ func registerManualHTTPRoutes(
 	server.RegisterPublicRuntimeConfigRoutes(httpServer, bootstrap.rtcManager)
 	profileprogresshttp.Register(httpServer, storage.profileRepo, services.profileServiceDomain)
 	interviewprepcheckpointhttp.Register(httpServer, services.interviewPrepDomain, services.profileServiceDomain)
+	achievementshttp.Register(httpServer, storage.profileRepo, services.profileServiceDomain)
+	activityhttp.Register(httpServer, storage.profileRepo, services.profileServiceDomain)
+	aireviewhttp.Register(httpServer, services.aiReviewService, services.profileServiceDomain)
+	dailychallengehttp.Register(httpServer, services.codeEditorServiceDomain)
 }
 
 func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.Server, services *serviceContext) {

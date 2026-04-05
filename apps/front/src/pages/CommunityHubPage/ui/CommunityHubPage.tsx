@@ -27,7 +27,7 @@ export function CommunityHubPage() {
           {active === 'events' && (
             <Link
               to="/community/events"
-              className="px-5 py-2 bg-[#FF8400] rounded-full text-sm font-medium text-[#0f172a] hover:bg-[#ea7700] transition-colors"
+              className="px-5 py-2 bg-[#6366F1] rounded-full text-sm font-medium text-[#0f172a] hover:bg-[#ea7700] transition-colors"
             >
               + Create Event
             </Link>
@@ -53,7 +53,7 @@ export function CommunityHubPage() {
               to={tab.href}
               className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 active === tab.id
-                  ? 'border-[#FF8400] text-[#111111]'
+                  ? 'border-[#6366F1] text-[#111111]'
                   : 'border-transparent text-[#666666] hover:text-[#111111]'
               }`}
             >

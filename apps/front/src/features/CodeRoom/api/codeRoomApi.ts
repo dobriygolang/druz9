@@ -7,15 +7,15 @@ type BackendRoom = {
   mode?: string
   code?: string
   status?: string
-  invite_code?: string
+  inviteCode?: string
   task?: string
-  created_at?: string
+  createdAt?: string
   participants?: Array<{
-    user_id?: string; name?: string; is_guest?: boolean; is_ready?: boolean; is_winner?: boolean; joined_at?: string; is_creator?: boolean
+    userId?: string; name?: string; isGuest?: boolean; isReady?: boolean; isWinner?: boolean; joinedAt?: string; isCreator?: boolean
   }>
-  task_id?: string
-  code_revision?: number
-  creator_id?: string
+  taskId?: string
+  codeRevision?: number
+  creatorId?: string
 }
 
 function normalizeRoom(r: BackendRoom): Room {
@@ -24,16 +24,16 @@ function normalizeRoom(r: BackendRoom): Room {
     mode: (r.mode as Room['mode']) ?? 'ROOM_MODE_UNSPECIFIED',
     code: r.code ?? '',
     status: (r.status as Room['status']) ?? 'ROOM_STATUS_UNSPECIFIED',
-    inviteCode: r.invite_code ?? '',
+    inviteCode: r.inviteCode ?? '',
     task: r.task ?? '',
-    createdAt: r.created_at ?? '',
+    createdAt: r.createdAt ?? '',
     participants: (r.participants ?? []).map((p) => ({
-      userId: p.user_id ?? '', name: p.name ?? '', isGuest: p.is_guest ?? false,
-      isReady: p.is_ready ?? false, isWinner: p.is_winner ?? false, joinedAt: p.joined_at ?? '', isCreator: p.is_creator ?? false,
+      userId: p.userId ?? '', name: p.name ?? '', isGuest: p.isGuest ?? false,
+      isReady: p.isReady ?? false, isWinner: p.isWinner ?? false, joinedAt: p.joinedAt ?? '', isCreator: p.isCreator ?? false,
     })),
-    taskId: r.task_id ?? '',
-    codeRevision: r.code_revision ?? 0,
-    creatorId: r.creator_id ?? '',
+    taskId: r.taskId ?? '',
+    codeRevision: r.codeRevision ?? 0,
+    creatorId: r.creatorId ?? '',
   }
 }
 
@@ -51,12 +51,12 @@ export const codeRoomApi = {
     return req
   },
   createRoom: async (payload: { mode?: string; task?: string; name?: string; topic?: string; difficulty?: string }, guestName?: string): Promise<{ room: Room; inviteCode: string }> => {
-    const r = await apiClient.post<{ room?: BackendRoom; invite_code?: string }>(
+    const r = await apiClient.post<{ room?: BackendRoom; inviteCode?: string }>(
       '/api/v1/code-editor/rooms',
       { mode: payload.mode ?? 'ROOM_MODE_ALL', task: payload.task, name: payload.name, topic: payload.topic, difficulty: payload.difficulty },
       { headers: withGuestCodeRoomHeaders(guestName) },
     )
-    return { room: normalizeRoom(r.data.room ?? { id: '' }), inviteCode: r.data.invite_code ?? '' }
+    return { room: normalizeRoom(r.data.room ?? { id: '' }), inviteCode: r.data.inviteCode ?? '' }
   },
   getRoom: async (roomId: string, guestName?: string): Promise<Room> => {
     const r = await apiClient.get<{ room?: BackendRoom }>(`/api/v1/code-editor/rooms/${roomId}`, {
@@ -75,7 +75,7 @@ export const codeRoomApi = {
   joinRoomByInviteCode: async (inviteCode: string, name?: string, guestName?: string): Promise<Room> => {
     const r = await apiClient.post<{ room?: BackendRoom }>(
       '/api/v1/code-editor/join',
-      { invite_code: inviteCode, name },
+      { inviteCode, name },
       { headers: withGuestCodeRoomHeaders(guestName) },
     )
     return normalizeRoom(r.data.room ?? { id: '' })
@@ -84,12 +84,12 @@ export const codeRoomApi = {
     await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/leave`, {})
   },
   submitCode: async (roomId: string, code: string, guestName?: string): Promise<{ output: string; error: string; isCorrect: boolean }> => {
-    const r = await apiClient.post<{ output?: string; error?: string; is_correct?: boolean }>(
+    const r = await apiClient.post<{ output?: string; error?: string; isCorrect?: boolean }>(
       `/api/v1/code-editor/rooms/${roomId}/submit`,
       { code },
       { headers: withGuestCodeRoomHeaders(guestName) },
     )
-    return { output: r.data.output ?? '', error: r.data.error ?? '', isCorrect: r.data.is_correct ?? false }
+    return { output: r.data.output ?? '', error: r.data.error ?? '', isCorrect: r.data.isCorrect ?? false }
   },
   setReady: async (roomId: string, ready: boolean): Promise<void> => {
     await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/ready`, { ready })
