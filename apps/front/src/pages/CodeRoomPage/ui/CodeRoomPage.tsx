@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Play, Send, Check, X, ChevronDown, Wifi, WifiOff } from 'lucide-react'
+import { ArrowLeft, Play, Send, Check, X, ChevronDown, Wifi, WifiOff, Sparkles } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { useCodeRoomWs } from '@/features/CodeRoom/hooks/useCodeRoomWs'
@@ -12,6 +12,12 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { getMonacoLanguage, getLanguageLabel } from '@/shared/lib/codeEditorLanguage'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import type * as Monaco from 'monaco-editor'
+
+const AI_HINTS = [
+  'Подумайте о граничных случаях',
+  'Рассмотрите временную сложность вашего решения',
+  'Попробуйте разбить задачу на подзадачи',
+]
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'success' | 'warning' | 'default' }> = {
   ROOM_STATUS_WAITING: { label: 'Ожидание', variant: 'warning' },
@@ -28,6 +34,8 @@ export function CodeRoomPage() {
   const [running, setRunning] = useState(false)
   const [submitResult, setSubmitResult] = useState<{ isCorrect: boolean; output: string; error: string } | null>(null)
   const [activeTab, setActiveTab] = useState<'problem' | 'tests'>('problem')
+  const [aiTab, setAiTab] = useState<'hints' | 'result'>('hints')
+  const [hints, setHints] = useState<string[]>([])
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
   const guestName = typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined
   const skipNextWsUpdate = useRef(false)
@@ -61,7 +69,7 @@ export function CodeRoomPage() {
   useEffect(() => {
     if (ws.lastSubmission) {
       setSubmitResult(ws.lastSubmission)
-      setActiveTab('tests')
+      setAiTab('result')
     }
   }, [ws.lastSubmission])
 
@@ -79,7 +87,7 @@ export function CodeRoomPage() {
     try {
       const result = await codeRoomApi.submitCode(roomId, localCode, guestName)
       setSubmitResult(result)
-      setActiveTab('tests')
+      setAiTab('result')
     } catch {} finally { setRunning(false) }
   }
 
@@ -148,45 +156,25 @@ export function CodeRoomPage() {
         </div>
       </header>
 
-      {/* 2-panel layout */}
+      {/* 3-panel layout */}
       <div className="flex flex-1 min-h-0">
         {/* Problem panel */}
         <div className="w-[380px] flex-shrink-0 bg-white border-r border-[#CBCCC9] flex flex-col">
           <div className="flex border-b border-[#CBCCC9]">
-            {(['problem', 'tests'] as const).map(tab => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === tab ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}
-              >
-                {tab === 'problem' ? 'Задача' : 'Тесты'}
-              </button>
-            ))}
+            <button
+              onClick={() => setActiveTab('problem')}
+              className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'problem' ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}
+            >
+              Задача
+            </button>
           </div>
           <div className="flex-1 overflow-y-auto p-4">
-            {activeTab === 'problem' ? (
-              <div className="prose prose-sm max-w-none">
-                <h2 className="text-base font-bold text-[#0f172a] mb-3">{room?.task || 'Условие задачи'}</h2>
-                <p className="text-sm text-[#475569] leading-relaxed">
-                  {room?.task ? `Реши задачу: ${room.task}` : 'Загружается условие задачи...'}
-                </p>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-3">
-                {submitResult ? (
-                  <div className={`p-3 rounded-lg ${submitResult.isCorrect ? 'bg-[#e8f9ef] border border-[#86efac]' : 'bg-[#fef2f2] border border-[#fca5a5]'}`}>
-                    <div className="flex items-center gap-2 mb-2">
-                      {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
-                      <span className="text-sm font-semibold">{submitResult.isCorrect ? 'Принято!' : 'Неверно'}</span>
-                    </div>
-                    {submitResult.output && <pre className="text-xs text-[#475569] font-mono whitespace-pre-wrap">{submitResult.output}</pre>}
-                    {submitResult.error && <pre className="text-xs text-[#ef4444] font-mono whitespace-pre-wrap">{submitResult.error}</pre>}
-                  </div>
-                ) : (
-                  <p className="text-sm text-[#94a3b8]">Запустите код чтобы увидеть результаты</p>
-                )}
-              </div>
-            )}
+            <div className="prose prose-sm max-w-none">
+              <h2 className="text-base font-bold text-[#0f172a] mb-3">{room?.task || 'Условие задачи'}</h2>
+              <p className="text-sm text-[#475569] leading-relaxed">
+                {room?.task ? `Реши задачу: ${room.task}` : 'Загружается условие задачи...'}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -215,6 +203,70 @@ export function CodeRoomPage() {
                 theme: 'druzya-dark',
               }}
             />
+          </div>
+        </div>
+
+        {/* AI Помощник panel */}
+        <div className="w-[280px] flex-shrink-0 bg-white border-l border-[#CBCCC9] flex flex-col">
+          <div className="px-4 py-3 border-b border-[#CBCCC9] flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#FF8400]" />
+            <span className="text-sm font-bold text-[#111111]">AI Помощник</span>
+          </div>
+          <div className="flex border-b border-[#CBCCC9]">
+            {(['hints', 'result'] as const).map(tab => (
+              <button
+                key={tab}
+                onClick={() => setAiTab(tab)}
+                className={`px-4 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${aiTab === tab ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}
+              >
+                {tab === 'hints' ? 'Подсказки' : 'Результат'}
+              </button>
+            ))}
+          </div>
+          <div className="flex-1 overflow-y-auto p-4">
+            {aiTab === 'hints' ? (
+              <div className="flex flex-col gap-3">
+                {hints.length === 0 ? (
+                  <>
+                    <p className="text-sm text-[#666666] leading-relaxed">
+                      Начните решать задачу, и AI поможет если застрянете
+                    </p>
+                    <Button
+                      variant="orange"
+                      size="sm"
+                      className="w-full"
+                      onClick={() => setHints(AI_HINTS)}
+                    >
+                      <Sparkles className="w-3.5 h-3.5" /> Получить подсказку
+                    </Button>
+                  </>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {hints.map((hint, i) => (
+                      <div key={i} className="p-3 bg-[#FFF7ED] border border-[#FDBA74] rounded-lg">
+                        <p className="text-xs font-semibold text-[#9a3412] mb-0.5">Подсказка {i + 1}</p>
+                        <p className="text-sm text-[#111111]">{hint}</p>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="flex flex-col gap-3">
+                {submitResult ? (
+                  <div className={`p-3 rounded-lg ${submitResult.isCorrect ? 'bg-[#e8f9ef] border border-[#86efac]' : 'bg-[#fef2f2] border border-[#fca5a5]'}`}>
+                    <div className="flex items-center gap-2 mb-2">
+                      {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
+                      <span className="text-sm font-semibold">{submitResult.isCorrect ? 'Принято!' : 'Неверно'}</span>
+                    </div>
+                    {submitResult.output && <pre className="text-xs text-[#475569] font-mono whitespace-pre-wrap">{submitResult.output}</pre>}
+                    {submitResult.error && <pre className="text-xs text-[#ef4444] font-mono whitespace-pre-wrap">{submitResult.error}</pre>}
+                  </div>
+                ) : (
+                  <p className="text-sm text-[#94a3b8]">Запустите код чтобы увидеть результаты</p>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>

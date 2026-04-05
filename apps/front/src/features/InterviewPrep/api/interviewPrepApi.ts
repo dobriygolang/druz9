@@ -66,4 +66,20 @@ export const interviewPrepApi = {
     const r = await apiClient.get<{ session?: unknown }>(`/api/v1/interview-prep/mock-sessions/${sessionId}`)
     return r.data.session
   },
+  submitMockSession: async (sessionId: string, code: string, language: string, notes?: string) => {
+    const r = await apiClient.post<{ result?: unknown; review?: unknown; session?: unknown }>(`/api/v1/interview-prep/mock-sessions/${sessionId}/submit`, { code, language, notes })
+    return r.data
+  },
+  answerMockQuestion: async (sessionId: string, answer: string) => {
+    const r = await apiClient.post<{ review?: unknown; session?: unknown }>(`/api/v1/interview-prep/mock-sessions/${sessionId}/questions/answer`, { answer })
+    return r.data
+  },
+  submitSystemDesignReview: async (sessionId: string, data: unknown) => {
+    const r = await apiClient.post<{ review?: unknown }>(`/api/v1/interview-prep/sessions/${sessionId}/system-design-review`, data)
+    return r.data.review
+  },
+  submitMockSystemDesignReview: async (sessionId: string, data: { notes: string; components: string; apis: string; database_schema: string }) => {
+    const r = await apiClient.post<{ review?: unknown; session?: unknown }>(`/api/v1/interview-prep/mock-sessions/${sessionId}/system-design-review`, data)
+    return r.data
+  },
 }

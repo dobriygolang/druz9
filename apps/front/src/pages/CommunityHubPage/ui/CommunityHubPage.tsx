@@ -6,7 +6,6 @@ const TABS = [
   { id: 'people', label: 'People', href: '/community/people' },
   { id: 'events', label: 'Events', href: '/community/events' },
   { id: 'map', label: 'Map', href: '/community/map' },
-  { id: 'circles', label: 'Circles', href: '/community/circles' },
 ]
 
 export function CommunityHubPage() {

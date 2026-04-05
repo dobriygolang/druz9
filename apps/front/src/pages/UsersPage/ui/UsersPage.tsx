@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import { ChevronRight, MapPin, Briefcase } from 'lucide-react'
+import { ChevronRight, MapPin } from 'lucide-react'
 import { Avatar } from '@/shared/ui/Avatar'
-import type { User } from '@/entities/User/model/types'
+import { geoApi, type CommunityPoint } from '@/features/Geo/api/geoApi'
 
 const STATUS_COLORS: Record<string, string> = {
   online: 'bg-[#22c55e]',
@@ -12,18 +12,13 @@ const STATUS_COLORS: Record<string, string> = {
 
 export function UsersPage() {
   const { search = '' } = useOutletContext<{ search: string }>()
-  const [users] = useState<User[]>([])
+  const [users, setUsers] = useState<CommunityPoint[]>([])
 
-  // Placeholder users for design matching
-  const displayUsers: Partial<User>[] = users.length > 0 ? users : [
-    { id: '1', firstName: 'Алексей', lastName: 'Иванов', username: 'alexei_ivan', region: 'Москва', currentWorkplace: 'Яндекс', activityStatus: 'online' },
-    { id: '2', firstName: 'Мария', lastName: 'Петрова', username: 'maria_p', region: 'Санкт-Петербург', currentWorkplace: 'Сбер', activityStatus: 'recently_active' },
-    { id: '3', firstName: 'Дмитрий', lastName: 'Смирнов', username: 'dsmirn', region: 'Казань', currentWorkplace: 'VK', activityStatus: 'offline' },
-    { id: '4', firstName: 'Анна', lastName: 'Козлова', username: 'ann_k', region: 'Новосибирск', currentWorkplace: 'Ozon', activityStatus: 'online' },
-    { id: '5', firstName: 'Игорь', lastName: 'Фёдоров', username: 'ifed', region: 'Москва', currentWorkplace: 'Тинькофф', activityStatus: 'recently_active' },
-  ]
+  useEffect(() => {
+    geoApi.getCommunity().then(setUsers).catch(() => {})
+  }, [])
 
-  const filtered = displayUsers.filter(u => {
+  const filtered = users.filter(u => {
     if (!search) return true
     const name = `${u.firstName} ${u.lastName} ${u.username}`.toLowerCase()
     return name.includes(search.toLowerCase())
@@ -35,13 +30,13 @@ export function UsersPage() {
         const name = `${user.firstName} ${user.lastName}`.trim()
         return (
           <div
-            key={user.id}
+            key={user.userId}
             className="stagger-item flex items-center gap-3.5 px-4 py-3 bg-white rounded-xl border border-[#CBCCC9] hover:border-[#94a3b8] cursor-pointer transition-colors"
           >
             <div className="relative">
-              <Avatar name={name} size="md" />
+              <Avatar name={name} src={user.avatarUrl || undefined} size="md" />
               <span
-                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${STATUS_COLORS[user.activityStatus ?? 'offline']}`}
+                className={`absolute bottom-0 right-0 w-3 h-3 rounded-full border-2 border-white ${STATUS_COLORS[user.activityStatus] ?? STATUS_COLORS.offline}`}
               />
             </div>
             <div className="flex-1 min-w-0">
@@ -53,11 +48,6 @@ export function UsersPage() {
                 {user.region && (
                   <span className="flex items-center gap-1 text-xs text-[#666666]">
                     <MapPin className="w-3 h-3" /> {user.region}
-                  </span>
-                )}
-                {user.currentWorkplace && (
-                  <span className="flex items-center gap-1 text-xs text-[#666666]">
-                    <Briefcase className="w-3 h-3" /> {user.currentWorkplace}
                   </span>
                 )}
               </div>

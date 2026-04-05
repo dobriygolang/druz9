@@ -1,42 +1,65 @@
-import { useRef, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Search } from 'lucide-react'
+import { Map, Marker, type ViewStateChangeEvent } from 'react-map-gl/maplibre'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import { Avatar } from '@/shared/ui/Avatar'
-import type { User } from '@/entities/User/model/types'
+import { geoApi, type CommunityPoint } from '@/features/Geo/api/geoApi'
+import { ENV } from '@/shared/config/env'
+
+const MAP_STYLE = `https://api.maptiler.com/maps/streets-v2/style.json?key=${ENV.MAPTILER_KEY}`
 
 export function MapPage() {
-  const [_users] = useState<User[]>([])
+  const [points, setPoints] = useState<CommunityPoint[]>([])
   const [search, setSearch] = useState('')
-  const mapRef = useRef<HTMLDivElement>(null)
+  const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [viewState, setViewState] = useState({
+    longitude: 37.6,
+    latitude: 55.75,
+    zoom: 4,
+  })
+
+  useEffect(() => {
+    geoApi.getCommunity().then(setPoints).catch(() => {})
+  }, [])
+
+  const handleMove = useCallback((e: ViewStateChangeEvent) => {
+    setViewState(e.viewState)
+  }, [])
+
+  const filtered = points.filter(p => {
+    if (!search) return true
+    const name = `${p.firstName} ${p.lastName} ${p.username} ${p.region}`.toLowerCase()
+    return name.includes(search.toLowerCase())
+  })
 
   return (
     <div className="flex h-[calc(100vh-180px)] min-h-[500px]">
       {/* Map area */}
-      <div ref={mapRef} className="flex-1 bg-[#0c1120] relative flex items-center justify-center">
-        <div className="text-center text-[#475569]">
-          <div className="w-16 h-16 mx-auto mb-3 rounded-full bg-[#1e293b] flex items-center justify-center">
-            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-              <circle cx="12" cy="9" r="2.5"/>
-            </svg>
-          </div>
-          <p className="text-sm font-medium">Карта участников</p>
-          <p className="text-xs mt-1">Интерактивная карта загружается...</p>
-        </div>
-        {/* Sample pins */}
-        {[
-          { top: '40%', left: '35%', name: 'АИ' },
-          { top: '55%', left: '55%', name: 'МП' },
-          { top: '30%', left: '60%', name: 'ДС' },
-        ].map((pin, i) => (
-          <div
-            key={i}
-            className="absolute w-8 h-8 rounded-full bg-[#FF8400] border-2 border-white flex items-center justify-center text-xs font-bold text-white shadow-lg cursor-pointer hover:scale-110 transition-transform"
-            style={{ top: pin.top, left: pin.left }}
-            title={pin.name}
-          >
-            {pin.name[0]}
-          </div>
-        ))}
+      <div className="flex-1 relative">
+        <Map
+          {...viewState}
+          onMove={handleMove}
+          mapStyle={MAP_STYLE}
+          style={{ width: '100%', height: '100%' }}
+        >
+          {filtered.map((p) => (
+            <Marker key={p.userId} longitude={p.longitude} latitude={p.latitude} anchor="center">
+              <div
+                className="relative"
+                onMouseEnter={() => setHoveredId(p.userId)}
+                onMouseLeave={() => setHoveredId(null)}
+              >
+                <div className="w-3.5 h-3.5 rounded-full bg-[#FF8400] border-2 border-white shadow-md cursor-pointer" />
+                {hoveredId === p.userId && (
+                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-[#CBCCC9] whitespace-nowrap z-10">
+                    <p className="text-xs font-medium text-[#111111]">{p.firstName} {p.lastName}</p>
+                    {p.region && <p className="text-[10px] text-[#666666]">{p.region}</p>}
+                  </div>
+                )}
+              </div>
+            </Marker>
+          ))}
+        </Map>
       </div>
 
       {/* Right panel */}
@@ -53,20 +76,21 @@ export function MapPage() {
           </div>
         </div>
         <div className="flex-1 overflow-y-auto p-3 flex flex-col gap-1">
-          {[
-            { name: 'Алексей Иванов', city: 'Москва' },
-            { name: 'Мария Петрова', city: 'СПб' },
-            { name: 'Дмитрий Смирнов', city: 'Казань' },
-          ].filter(u => !search || u.name.toLowerCase().includes(search.toLowerCase()))
-            .map((u, i) => (
-              <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F2F3F0] cursor-pointer">
-                <Avatar name={u.name} size="sm" />
+          {filtered.map((p) => {
+            const name = `${p.firstName} ${p.lastName}`.trim()
+            return (
+              <div key={p.userId} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F2F3F0] cursor-pointer">
+                <Avatar name={name} src={p.avatarUrl || undefined} size="sm" />
                 <div>
-                  <p className="text-sm font-medium text-[#111111]">{u.name}</p>
-                  <p className="text-xs text-[#666666]">{u.city}</p>
+                  <p className="text-sm font-medium text-[#111111]">{name}</p>
+                  <p className="text-xs text-[#666666]">{p.region}</p>
                 </div>
               </div>
-            ))}
+            )
+          })}
+          {filtered.length === 0 && (
+            <div className="text-center py-8 text-[#94a3b8] text-sm">Ничего не найдено</div>
+          )}
         </div>
       </div>
     </div>

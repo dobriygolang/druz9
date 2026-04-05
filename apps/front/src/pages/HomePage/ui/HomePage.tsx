@@ -1,9 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Calendar, Users, Circle as CircleIcon, ChevronRight } from 'lucide-react'
+import { Calendar, Users, Briefcase, ChevronRight } from 'lucide-react'
+import { Link } from 'react-router-dom'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { eventApi, type Event } from '@/features/Event/api/eventApi'
-import { circleApi } from '@/features/Circle/api/circleApi'
-import type { Circle } from '@/entities/Circle/model/types'
 import { Card } from '@/shared/ui/Card'
 import { Avatar } from '@/shared/ui/Avatar'
 
@@ -16,12 +15,10 @@ function formatDate(iso: string) {
 export function HomePage() {
   const { user } = useAuth()
   const [events, setEvents] = useState<Event[]>([])
-  const [circles, setCircles] = useState<Circle[]>([])
   const [onlineCount] = useState(0)
 
   useEffect(() => {
     eventApi.listEvents({ limit: 3 }).then(r => setEvents(r.events)).catch(() => {})
-    circleApi.listCircles().then(cs => setCircles(cs.slice(0, 3))).catch(() => {})
   }, [])
 
   const firstName = user?.firstName || user?.username || 'Иван'
@@ -42,11 +39,10 @@ export function HomePage() {
       </div>
 
       {/* Metrics */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-2 gap-4">
         {[
           { label: 'Онлайн', value: onlineCount || 12, icon: <Users className="w-4 h-4 text-[#666666]" /> },
           { label: 'Событий', value: events.length || 4, icon: <Calendar className="w-4 h-4 text-[#666666]" /> },
-          { label: 'Circles', value: circles.length || 7, icon: <CircleIcon className="w-4 h-4 text-[#666666]" /> },
         ].map((m) => (
           <Card key={m.label} padding="lg" className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
@@ -64,9 +60,9 @@ export function HomePage() {
         <Card className="flex-1" padding="lg">
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-sm font-semibold text-[#111111]">Ближайшие события</h2>
-            <button className="text-xs text-[#FF8400] font-medium flex items-center gap-1">
+            <Link to="/community/events" className="text-xs text-[#FF8400] font-medium flex items-center gap-1">
               Все <ChevronRight className="w-3 h-3" />
-            </button>
+            </Link>
           </div>
           <div className="flex flex-col divide-y divide-[#CBCCC9]">
             {events.length === 0
@@ -95,39 +91,21 @@ export function HomePage() {
           </div>
         </Card>
 
-        {/* Circles */}
-        <Card className="w-[340px] flex-shrink-0" padding="lg">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[#111111]">Circles</h2>
-            <button className="text-xs text-[#FF8400] font-medium flex items-center gap-1">
-              Все <ChevronRight className="w-3 h-3" />
-            </button>
-          </div>
-          <div className="flex flex-col divide-y divide-[#CBCCC9]">
-            {circles.length === 0
-              ? Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="py-3 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#E7E8E5]" />
-                  <div className="flex-1">
-                    <div className="h-3.5 bg-[#E7E8E5] rounded w-32 mb-1.5" />
-                    <div className="h-3 bg-[#E7E8E5] rounded w-20" />
-                  </div>
-                </div>
-              ))
-              : circles.map((c) => (
-                <div key={c.id} className="py-3 flex items-center gap-3">
-                  <div className="w-8 h-8 rounded-full bg-[#E7E8E5] flex items-center justify-center">
-                    <CircleIcon className="w-4 h-4 text-[#94a3b8]" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#111111] truncate">{c.name}</p>
-                    <p className="text-xs text-[#666666]">{c.memberCount} участников</p>
-                  </div>
-                </div>
-              ))
-            }
-          </div>
-        </Card>
+        {/* Vacancies teaser */}
+        <Link to="/vacancies" className="w-[340px] flex-shrink-0 no-underline">
+          <Card className="h-full flex flex-col items-center justify-center gap-3 hover:border-[#FF8400] transition-colors cursor-pointer" padding="lg">
+            <div className="w-12 h-12 rounded-full bg-[#fff7ed] flex items-center justify-center">
+              <Briefcase className="w-6 h-6 text-[#FF8400]" />
+            </div>
+            <div className="text-center">
+              <h2 className="text-sm font-semibold text-[#111111]">Вакансии</h2>
+              <p className="text-xs text-[#666666] mt-1">Рефералки и вакансии</p>
+            </div>
+            <span className="text-xs text-[#FF8400] font-medium flex items-center gap-1">
+              Перейти <ChevronRight className="w-3 h-3" />
+            </span>
+          </Card>
+        </Link>
       </div>
     </div>
   )

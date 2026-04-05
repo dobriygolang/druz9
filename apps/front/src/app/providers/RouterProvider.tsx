@@ -14,7 +14,6 @@ const CommunityHubPage = lazy(() => import('@/pages/CommunityHubPage/ui/Communit
 const UsersPage = lazy(() => import('@/pages/UsersPage/ui/UsersPage').then(m => ({ default: m.UsersPage })))
 const EventsPage = lazy(() => import('@/pages/EventsPage/ui/EventsPage').then(m => ({ default: m.EventsPage })))
 const MapPage = lazy(() => import('@/pages/MapPage/ui/MapPage').then(m => ({ default: m.MapPage })))
-const CirclesPage = lazy(() => import('@/pages/CirclesPage/ui/CirclesPage').then(m => ({ default: m.CirclesPage })))
 const PracticeHubPage = lazy(() => import('@/pages/PracticeHubPage/ui/PracticeHubPage').then(m => ({ default: m.PracticeHubPage })))
 const CodeRoomsPage = lazy(() => import('@/pages/CodeRoomsPage/ui/CodeRoomsPage').then(m => ({ default: m.CodeRoomsPage })))
 const ArenaHubPage = lazy(() => import('@/pages/ArenaHubPage/ui/ArenaHubPage').then(m => ({ default: m.ArenaHubPage })))
@@ -32,6 +31,7 @@ const InterviewPrepAdminPage = lazy(() => import('@/pages/InterviewPrepAdminPage
 const AdminAnalyticsPage = lazy(() => import('@/pages/AdminAnalyticsPage/ui/AdminAnalyticsPage').then(m => ({ default: m.AdminAnalyticsPage })))
 const AdminCodeGamePage = lazy(() => import('@/pages/AdminCodeGamePage/ui/AdminCodeGamePage').then(m => ({ default: m.AdminCodeGamePage })))
 const PodcastsPage = lazy(() => import('@/pages/PodcastsPage/ui/PodcastsPage').then(m => ({ default: m.PodcastsPage })))
+const VacanciesPage = lazy(() => import('@/pages/VacanciesPage/ui/VacanciesPage').then(m => ({ default: m.VacanciesPage })))
 
 const Fallback: React.FC = () => null
 
@@ -102,7 +102,6 @@ export const RouterProvider: React.FC = () => {
               <Route path="people" element={<UsersPage />} />
               <Route path="events" element={<EventsPage />} />
               <Route path="map" element={<MapPage />} />
-              <Route path="circles" element={<CirclesPage />} />
             </Route>
 
             {/* Practice */}
@@ -121,6 +120,9 @@ export const RouterProvider: React.FC = () => {
 
             {/* Podcasts */}
             <Route path="/podcasts" element={gate ? <Navigate to="/login" replace /> : <PodcastsPage />} />
+
+            {/* Vacancies */}
+            <Route path="/vacancies" element={gate ? <Navigate to="/login" replace /> : <VacanciesPage />} />
 
             {/* Profile */}
             <Route path="/profile" element={
@@ -148,7 +150,6 @@ export const RouterProvider: React.FC = () => {
             <Route path="/feed" element={<Navigate to="/home" replace />} />
             <Route path="/users" element={<Navigate to="/community/people" replace />} />
             <Route path="/events" element={<Navigate to="/community/events" replace />} />
-            <Route path="/circles" element={<Navigate to="/community/circles" replace />} />
             <Route path="/map" element={<Navigate to="/community/map" replace />} />
             <Route path="/interview-prep" element={<Navigate to="/growth/interview-prep" replace />} />
             <Route path="/interview-prep/:sessionId" element={<LegacySessionRedirect base="/growth/interview-prep" />} />

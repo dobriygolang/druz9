@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { Flame, Send, Flag, X, Check, Wifi, WifiOff, Eye, EyeOff } from 'lucide-react'
+import { Flame, Send, Flag, X, Check, Wifi, WifiOff, Eye, EyeOff, ShieldAlert } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { apiClient } from '@/shared/api/base'
 import { useArenaWs } from '@/features/CodeRoom/hooks/useArenaWs'
@@ -9,6 +9,7 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Avatar } from '@/shared/ui/Avatar'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import { useAntiCheat } from '@/features/CodeRoom/hooks/useAntiCheat'
 import type * as Monaco from 'monaco-editor'
 
 function formatDuration(seconds: number) {
@@ -25,7 +26,29 @@ export function ArenaMatchPage() {
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<any>(null)
   const [timeLeft, setTimeLeft] = useState(0)
+  const [antiCheatWarning, setAntiCheatWarning] = useState(false)
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
+
+  // Anti-cheat monitoring
+  const { handleEditorPaste } = useAntiCheat({
+    matchId,
+    enabled: !!matchId,
+  })
+
+  // Show warning banner on anti-cheat events
+  useEffect(() => {
+    if (!matchId) return
+    const handleVisibility = () => {
+      if (document.hidden) setAntiCheatWarning(true)
+    }
+    const handleBlur = () => setAntiCheatWarning(true)
+    document.addEventListener('visibilitychange', handleVisibility)
+    window.addEventListener('blur', handleBlur)
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibility)
+      window.removeEventListener('blur', handleBlur)
+    }
+  }, [matchId])
 
   // WebSocket realtime
   const ws = useArenaWs({
@@ -102,8 +125,29 @@ export function ArenaMatchPage() {
   const oppPlayer = ws.players.find(p => p.userId !== user?.id) ?? null
   const matchFinished = ws.matchState?.status === 'MATCH_STATUS_FINISHED'
 
+  // Attach paste handler to editor
+  useEffect(() => {
+    const editor = editorRef.current
+    if (!editor) return
+    const dom = editor.getDomNode()
+    if (!dom) return
+    const handler = (e: Event) => handleEditorPaste(e as ClipboardEvent)
+    dom.addEventListener('paste', handler)
+    return () => dom.removeEventListener('paste', handler)
+  }, [handleEditorPaste])
+
   return (
     <div className="flex flex-col h-screen bg-[#F2F3F0] overflow-hidden">
+      {/* Anti-cheat warning banner */}
+      {antiCheatWarning && (
+        <div className="h-8 bg-[#fef2f2] border-b border-[#fecaca] flex items-center justify-center gap-2 flex-shrink-0">
+          <ShieldAlert className="w-3.5 h-3.5 text-[#dc2626]" />
+          <span className="text-xs font-medium text-[#dc2626]">
+            Внимание: обнаружена подозрительная активность
+          </span>
+        </div>
+      )}
+
       {/* Dark top bar */}
       <header className="h-[52px] bg-[#0f172a] flex items-center justify-between px-5 flex-shrink-0">
         <div className="flex items-center gap-3">

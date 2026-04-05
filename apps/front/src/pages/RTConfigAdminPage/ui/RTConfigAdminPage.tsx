@@ -21,7 +21,7 @@ export function RTConfigAdminPage() {
   const handleSave = async () => {
     setSaving(true)
     try {
-      await adminApi.updateConfig(config)
+      await Promise.all(Object.entries(config).map(([key, value]) => adminApi.updateConfig(key, value)))
       setSaved(true)
       setTimeout(() => setSaved(false), 2000)
     } catch {} finally { setSaving(false) }

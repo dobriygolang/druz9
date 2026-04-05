@@ -23,7 +23,7 @@ export const RuntimeConfigProvider: React.FC<{ children: React.ReactNode }> = ({
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
-    apiClient.get<{ app_require_auth?: boolean; arena_require_auth?: boolean }>('/api/v1/runtime-config')
+    apiClient.get<{ app_require_auth?: boolean; arena_require_auth?: boolean }>('/api/public/runtime-config')
       .then((r) => setConfig({
         appRequireAuth: r.data.app_require_auth ?? false,
         arenaRequireAuth: r.data.arena_require_auth ?? false,
