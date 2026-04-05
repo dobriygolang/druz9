@@ -20,6 +20,7 @@ func NewGRPCServer(
 	profileService *profileservice.Implementation,
 	authorizer authmiddleware.ProfileAuthorizer,
 	cookies *SessionCookieManager,
+	shouldRequireAuth func() bool,
 	kLogger klog.Logger,
 	rateLimitCfg *config.RateLimit,
 	cbCfg *config.CircuitBreaker,
@@ -34,7 +35,7 @@ func NewGRPCServer(
 			newServerRateLimiter(rateLimitCfg),
 			newGRPCServerCircuitBreaker(cbCfg),
 			newGRPCOptionalAuthMiddleware(authorizer, cookies),
-			newGRPCAuthMiddleware(authorizer, cookies),
+			newGRPCAuthMiddleware(authorizer, cookies, shouldRequireAuth),
 			newGRPCAdminMiddleware(),
 		),
 	)

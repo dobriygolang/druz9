@@ -2,10 +2,10 @@ import React, { Suspense, lazy, useMemo } from 'react';
 import { Navigate, Route, Routes, useParams, useSearchParams } from 'react-router-dom';
 
 import { useAuth } from './AuthProvider';
+import { useRuntimeConfig } from './RuntimeConfigProvider';
 import { PageLayout } from '@/widgets/PageLayout/ui/PageLayout';
 import { GuestNameModal } from '@/features/CodeRoom/ui/GuestNameModal';
 import { useInviteHandler } from '@/shared/hooks/useInviteHandler';
-import { ENV } from '@/shared/config/env';
 
 const LoginPage = lazy(() => import('@/pages/LoginPage/ui/LoginPage').then((m) => ({ default: m.LoginPage })));
 const AuthCallbackPage = lazy(() => import('@/pages/AuthCallbackPage/ui/AuthCallbackPage').then((m) => ({ default: m.AuthCallbackPage })));
@@ -30,6 +30,9 @@ const InterviewPrepPage = lazy(() => import('@/pages/InterviewPrepPage/ui/Interv
 const InterviewPrepSessionPage = lazy(() => import('@/pages/InterviewPrepSessionPage/ui/InterviewPrepSessionPage').then((m) => ({ default: m.InterviewPrepSessionPage })));
 const InterviewPrepMockSessionPage = lazy(() => import('@/pages/InterviewPrepMockSessionPage/ui/InterviewPrepMockSessionPage').then((m) => ({ default: m.InterviewPrepMockSessionPage })));
 const InterviewPrepAdminPage = lazy(() => import('@/pages/InterviewPrepAdminPage/ui/InterviewPrepAdminPage').then((m) => ({ default: m.InterviewPrepAdminPage })));
+const AdminAnalyticsPage = lazy(() => import('@/pages/AdminAnalyticsPage/ui/AdminAnalyticsPage').then((m) => ({ default: m.AdminAnalyticsPage })));
+const AdminCodeGamePage = lazy(() => import('@/pages/AdminCodeGamePage/ui/AdminCodeGamePage').then((m) => ({ default: m.AdminCodeGamePage })));
+const PracticeSoloPage = lazy(() => import('@/pages/PracticeSoloPage/ui/PracticeSoloPage').then((m) => ({ default: m.PracticeSoloPage })));
 
 const LoadingFallback: React.FC = () => (
   null
@@ -67,10 +70,15 @@ class ErrorBoundary extends React.Component<{ children: React.ReactNode }, { has
 
 export const RouterProvider: React.FC = () => {
   const { isLoading, isAuthenticated, needsProfileComplete } = useAuth();
+  const { isLoading: isRuntimeLoading, appRequireAuth, arenaRequireAuth } = useRuntimeConfig();
 
-  if (isLoading) {
+  if (isLoading || isRuntimeLoading) {
     return null;
   }
+
+  const shouldGate = appRequireAuth;
+  const needsProtectedAuth = shouldGate && (!isAuthenticated || needsProfileComplete);
+  const needsAuthenticatedUser = !isAuthenticated || needsProfileComplete;
 
   return (
     <Suspense fallback={<LoadingFallback />}>
@@ -106,8 +114,8 @@ export const RouterProvider: React.FC = () => {
 
           <Route element={<PageLayout />}>
             <Route
-              path="/home"
-              element={!isAuthenticated || needsProfileComplete ? (
+            path="/home"
+              element={needsProtectedAuth ? (
                 <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
               ) : (
                 <HomePage />
@@ -115,8 +123,8 @@ export const RouterProvider: React.FC = () => {
             />
 
             <Route
-              path="/community"
-              element={!isAuthenticated || needsProfileComplete ? (
+            path="/community"
+              element={needsProtectedAuth ? (
                 <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
               ) : (
                 <CommunityHubPage />
@@ -146,11 +154,12 @@ export const RouterProvider: React.FC = () => {
                 )}
               />
               <Route path="arena" element={<ArenaHubPage />} />
+              <Route path="solo" element={<PracticeSoloPage />} />
             </Route>
 
             <Route
               path="/growth"
-              element={!isAuthenticated || needsProfileComplete ? (
+              element={needsProtectedAuth ? (
                 <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
               ) : (
                 <GrowthHubPage />
@@ -172,11 +181,11 @@ export const RouterProvider: React.FC = () => {
 
             <Route
               path="/profile"
-              element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <ProfilePage />}
+              element={needsAuthenticatedUser ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <ProfilePage />}
             />
             <Route
               path="/profile/:userId"
-              element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <ProfilePage />}
+              element={needsProtectedAuth ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <ProfilePage />}
             />
 
             <Route path="/code-rooms" element={<Navigate to="/practice/code-rooms" replace />} />
@@ -195,7 +204,7 @@ export const RouterProvider: React.FC = () => {
             <Route
               path="/arena/:matchId"
               element={
-                ENV.ARENA_REQUIRE_AUTH
+                arenaRequireAuth
                   ? (!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <ArenaMatchPage />)
                   : <ArenaMatchPage />
               }
@@ -203,7 +212,7 @@ export const RouterProvider: React.FC = () => {
 
             <Route
               path="/growth/interview-prep/:sessionId"
-              element={!isAuthenticated || needsProfileComplete ? (
+              element={needsAuthenticatedUser ? (
                 <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
               ) : (
                 <InterviewPrepSessionPage />
@@ -212,7 +221,7 @@ export const RouterProvider: React.FC = () => {
 
             <Route
               path="/growth/interview-prep/mock/:sessionId"
-              element={!isAuthenticated || needsProfileComplete ? (
+              element={needsAuthenticatedUser ? (
                 <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} />
               ) : (
                 <InterviewPrepMockSessionPage />
@@ -240,6 +249,14 @@ export const RouterProvider: React.FC = () => {
             <Route
               path="/admin/interview-prep"
               element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <InterviewPrepAdminPage />}
+            />
+            <Route
+              path="/admin/analytics"
+              element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <AdminAnalyticsPage />}
+            />
+            <Route
+              path="/admin/code-game"
+              element={!isAuthenticated || needsProfileComplete ? <NavigateToAuth isAuthenticated={isAuthenticated} needsProfileComplete={needsProfileComplete} /> : <AdminCodeGamePage />}
             />
           </Route>
 
@@ -292,14 +309,16 @@ const RootPageWithInvite: React.FC = () => {
   const [searchParams] = useSearchParams();
   const inviteCode = searchParams.get('invite');
   const { isAuthenticated, isLoading, needsProfileComplete } = useAuth();
+  const { appRequireAuth } = useRuntimeConfig();
 
   const fallbackRedirect = useMemo(
     () => {
+      if (!appRequireAuth) return '/home';
       if (!isAuthenticated) return '/login';
       if (needsProfileComplete) return '/complete-registration';
       return '/home';
     },
-    [isAuthenticated, needsProfileComplete],
+    [appRequireAuth, isAuthenticated, needsProfileComplete],
   );
 
   const { redirectTo, isProcessing, needsGuestName, getGuestName, setGuestName, cancelGuestName } = useInviteHandler(

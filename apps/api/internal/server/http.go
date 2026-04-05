@@ -20,6 +20,7 @@ func NewHTTPServer(
 	profileService *profileservice.Implementation,
 	authorizer authmiddleware.ProfileAuthorizer,
 	cookies *SessionCookieManager,
+	shouldRequireAuth func() bool,
 	kLogger klog.Logger,
 	rateLimitCfg *config.RateLimit,
 	cbCfg *config.CircuitBreaker,
@@ -35,7 +36,7 @@ func NewHTTPServer(
 			newServerRateLimiter(rateLimitCfg),
 			newHTTPServerCircuitBreaker(cbCfg),
 			newHTTPOptionalAuthMiddleware(authorizer, cookies),
-			newHTTPAuthMiddleware(authorizer, cookies),
+			newHTTPAuthMiddleware(authorizer, cookies, shouldRequireAuth),
 			newHTTPAdminMiddleware(),
 		),
 	}

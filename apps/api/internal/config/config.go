@@ -73,7 +73,8 @@ type PoolSettings struct {
 }
 
 type Auth struct {
-	Session *Session `json:"session"`
+	RequireAuth bool     `json:"require_auth"`
+	Session     *Session `json:"session"`
 }
 
 type Dev struct {

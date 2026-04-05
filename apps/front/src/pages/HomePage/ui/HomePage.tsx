@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 import { ArrowRight, CalendarDays, Clock3, Code2, Orbit, PlayCircle, Sparkles, Trophy, Users } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
@@ -21,6 +21,7 @@ function formatDate(value: string) {
 }
 
 export const HomePage: React.FC = () => {
+  const location = useLocation();
   const { user } = useAuth();
   const { currentPodcast, isPlaying, playPodcast } = usePodcast();
   const [users, setUsers] = useState<CommunityMapPoint[]>([]);
@@ -76,6 +77,19 @@ export const HomePage: React.FC = () => {
   const joinedCircles = circles.filter((circle) => circle.joined).slice(0, 3);
   const topCircles = (joinedCircles.length > 0 ? joinedCircles : circles).slice(0, 3);
   const onlineCount = users.filter((item) => item.activityStatus === 'online').length;
+
+  useEffect(() => {
+    if (location.hash !== '#broadcast') {
+      return;
+    }
+    const target = document.getElementById('broadcast');
+    if (!target) {
+      return;
+    }
+    requestAnimationFrame(() => {
+      target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    });
+  }, [location.hash, podcasts.length]);
 
   return (
     <div className="home-page fade-in">

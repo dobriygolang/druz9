@@ -1,3 +1,10 @@
+app_require_auth:
+  usage: "Require authentication for protected app pages"
+  group: "auth"
+  value: "true"
+  type: "bool"
+  writable: true
+
 server_http_addr:
   usage: "HTTP server listen address"
   group: "server"

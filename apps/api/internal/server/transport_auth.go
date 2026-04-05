@@ -257,9 +257,9 @@ var grpcAdminOperations = map[string]struct{}{
 	podcastv1.PodcastService_DeletePodcast_FullMethodName:                       {},
 }
 
-func newHTTPAuthMiddleware(authorizer authmiddleware.ProfileAuthorizer, cookies *SessionCookieManager) middleware.Middleware {
+func newHTTPAuthMiddleware(authorizer authmiddleware.ProfileAuthorizer, cookies *SessionCookieManager, shouldRequireAuth func() bool) middleware.Middleware {
 	return selector.Server(
-		authmiddleware.RequireAuth(authorizer, cookies),
+		authmiddleware.RequireAuth(authorizer, cookies, shouldRequireAuth),
 	).Match(matchOperation(httpAuthOperations)).Build()
 }
 
@@ -275,9 +275,9 @@ func newHTTPAdminMiddleware() middleware.Middleware {
 	).Match(matchOperation(httpAdminOperations)).Build()
 }
 
-func newGRPCAuthMiddleware(authorizer authmiddleware.ProfileAuthorizer, cookies *SessionCookieManager) middleware.Middleware {
+func newGRPCAuthMiddleware(authorizer authmiddleware.ProfileAuthorizer, cookies *SessionCookieManager, shouldRequireAuth func() bool) middleware.Middleware {
 	return selector.Server(
-		authmiddleware.RequireAuth(authorizer, cookies),
+		authmiddleware.RequireAuth(authorizer, cookies, shouldRequireAuth),
 	).Match(matchOperation(grpcAuthOperations)).Build()
 }
 

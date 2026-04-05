@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { NavLink } from 'react-router-dom';
 import { useAuth } from '@/app/providers/AuthProvider';
 import { geoApi } from '@/features/Geo/api/geoApi';
-import { Home, Users, User as UserIcon, LogOut, Code2, ArrowRight, Settings, Shield, Sparkles, Headphones } from 'lucide-react';
+import { Home, Users, User as UserIcon, LogOut, Code2, ArrowRight, Settings, Shield, Sparkles, Headphones, BarChart2, Sword } from 'lucide-react';
 
 export const Sidebar: React.FC = () => {
   const { logout, isAuthenticated, user } = useAuth();
@@ -61,9 +61,11 @@ export const Sidebar: React.FC = () => {
                 <div style={{ fontSize: '11px', fontWeight: 600, color: 'var(--text-secondary)', textTransform: 'uppercase', padding: '0 12px', marginBottom: '4px' }}>
                   Админ
                 </div>
-                <NavItem to="/admin/config" icon={<Settings size={20} />} label="Конфиг" />
-                <NavItem to="/admin/code-tasks" icon={<Shield size={20} />} label="Задачи" />
+                <NavItem to="/admin/code-tasks" icon={<Code2 size={20} />} label="Задачи" />
+                <NavItem to="/admin/code-game" icon={<Sword size={20} />} label="Code Game" />
                 <NavItem to="/admin/interview-prep" icon={<Shield size={20} />} label="Interview Prep" />
+                <NavItem to="/admin/config" icon={<Settings size={20} />} label="Конфиг" />
+                <NavItem to="/admin/analytics" icon={<BarChart2 size={20} />} label="Аналитика" />
                 <div style={{ height: '16px' }} />
               </>
             )}

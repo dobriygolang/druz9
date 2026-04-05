@@ -21,6 +21,8 @@ const (
 	AiReviewProvider Key = "ai_review_provider"
 	// Timeout for AI review provider requests
 	AiReviewTimeout Key = "ai_review_timeout"
+	// Require authentication for protected app pages
+	AppRequireAuth Key = "app_require_auth"
 	// Arena cleanup check interval
 	ArenaCleanupInterval Key = "arena_cleanup_interval"
 	// Arena match idle TTL before cleanup

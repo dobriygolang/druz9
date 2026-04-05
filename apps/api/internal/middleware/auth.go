@@ -39,9 +39,12 @@ type SessionCookieManager interface {
 	ClearSessionCookie(context.Context)
 }
 
-func RequireAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager) middleware.Middleware {
+func RequireAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager, shouldRequireAuth func() bool) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
+			if shouldRequireAuth != nil && !shouldRequireAuth() {
+				return handler(ctx, req)
+			}
 			// DevBypass: use dev user in development
 			if authorizer.DevBypass() {
 				devUserID := authorizer.DevUserID()

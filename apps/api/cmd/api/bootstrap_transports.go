@@ -32,6 +32,7 @@ func initializeTransports(
 		services.profileService,
 		services.profileServiceDomain,
 		services.cookies,
+		func() bool { return bootstrap.cfg.Auth != nil && bootstrap.cfg.Auth.RequireAuth },
 		bootstrap.kratosLogger,
 		bootstrap.cfg.Server.RateLimit,
 		bootstrap.cfg.Server.CircuitBreaker,
@@ -42,6 +43,7 @@ func initializeTransports(
 		services.profileService,
 		services.profileServiceDomain,
 		services.cookies,
+		func() bool { return bootstrap.cfg.Auth != nil && bootstrap.cfg.Auth.RequireAuth },
 		bootstrap.kratosLogger,
 		bootstrap.cfg.Server.RateLimit,
 		bootstrap.cfg.Server.CircuitBreaker,
@@ -85,6 +87,7 @@ func registerManualHTTPRoutes(
 	server.RegisterCodeEditorRealtime(httpServer, services.realtimeHub)
 	server.RegisterArenaRealtime(httpServer, services.arenaRealtimeHub)
 	server.RegisterAdminUsersRoutes(httpServer, storage.profileRepo, services.profileServiceDomain, services.profileServiceDomain)
+	server.RegisterPublicRuntimeConfigRoutes(httpServer, bootstrap.rtcManager)
 	profileprogresshttp.Register(httpServer, storage.profileRepo, services.profileServiceDomain)
 	interviewprepcheckpointhttp.Register(httpServer, services.interviewPrepDomain, services.profileServiceDomain)
 }

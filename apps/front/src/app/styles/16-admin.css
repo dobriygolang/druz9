@@ -1,0 +1,458 @@
+/* ============================================
+   Admin pages — shared styles
+   ============================================ */
+
+/* ── Page scaffold ──────────────────────────── */
+.admin-page {
+  padding: 28px 32px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  max-width: 1200px;
+}
+
+.admin-page__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.admin-page__header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.admin-page__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-page__title {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  letter-spacing: -0.02em;
+}
+
+.admin-page__subtitle {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.admin-page__refresh-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 36px;
+  padding: 0 14px;
+  font-size: 13px;
+}
+
+.admin-page__error {
+  padding: 12px 16px;
+  border-radius: 10px;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  color: #dc2626;
+  font-size: 13px;
+}
+
+/* ── Stat cards grid ────────────────────────── */
+.admin-stat-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+}
+
+.admin-stat-grid--secondary {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.admin-stat-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 18px 20px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  transition: box-shadow 0.15s ease;
+}
+
+.admin-stat-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.06);
+}
+
+.admin-stat-card__icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.admin-stat-card__body {
+  min-width: 0;
+}
+
+.admin-stat-card__value {
+  font-size: 26px;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+.admin-stat-card__label {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-top: 2px;
+}
+
+.admin-stat-card__sub {
+  font-size: 11px;
+  color: #94a3b8;
+  margin-top: 1px;
+}
+
+/* ── Charts row ─────────────────────────────── */
+.admin-charts-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.admin-chart-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.admin-chart-card__header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.admin-chart-card__body {
+  padding: 20px;
+}
+
+.admin-chart-card__body--empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 140px;
+  font-size: 12px;
+  color: #94a3b8;
+  text-align: center;
+  gap: 4px;
+}
+
+.admin-chart-card__loading {
+  font-size: 13px;
+  color: #94a3b8;
+  text-align: center;
+  padding: 20px;
+}
+
+/* ── Difficulty bars ────────────────────────── */
+.admin-difficulty-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.admin-difficulty-bar-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.admin-difficulty-badge {
+  width: 56px;
+  flex-shrink: 0;
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 11px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.admin-difficulty-bar-track {
+  flex: 1;
+  height: 8px;
+  background: #f1f5f9;
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.admin-difficulty-bar-fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.5s ease;
+}
+
+.admin-difficulty-bar-count {
+  width: 28px;
+  text-align: right;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+/* ── Table card ─────────────────────────────── */
+.admin-table-card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  overflow: hidden;
+}
+
+.admin-table-card__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid #f1f5f9;
+}
+
+.admin-table-card__title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.admin-table-card__count {
+  font-size: 12px;
+  color: #94a3b8;
+  font-weight: 500;
+}
+
+.admin-table-loading,
+.admin-table-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px;
+  font-size: 13px;
+  color: #94a3b8;
+  gap: 8px;
+  text-align: center;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.admin-table thead tr {
+  border-bottom: 1px solid #f1f5f9;
+  background: #fafafa;
+}
+
+.admin-table thead th {
+  padding: 10px 16px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  text-align: left;
+  white-space: nowrap;
+}
+
+.admin-table tbody tr {
+  border-bottom: 1px solid #f8fafc;
+  transition: background 0.1s;
+}
+
+.admin-table tbody tr:last-child {
+  border-bottom: none;
+}
+
+.admin-table tbody tr:hover {
+  background: #f8fafc;
+}
+
+.admin-table tbody td {
+  padding: 12px 16px;
+  font-size: 13px;
+  color: var(--text-primary);
+  vertical-align: middle;
+}
+
+.admin-table__title-cell {
+  font-weight: 600;
+  color: var(--text-primary) !important;
+  max-width: 240px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.admin-table__topics-cell {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+/* ── Topic tags ─────────────────────────────── */
+.admin-topic-tag {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #475569;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+.admin-topic-tag--more {
+  color: #94a3b8;
+}
+
+.admin-type-badge {
+  font-size: 11px;
+  font-weight: 600;
+  color: #6366f1;
+  background: #eff6ff;
+  padding: 2px 8px;
+  border-radius: 6px;
+}
+
+/* ── Rank badge ─────────────────────────────── */
+.admin-rank-badge {
+  font-size: 14px;
+  min-width: 24px;
+  display: inline-block;
+  text-align: center;
+}
+
+/* ── Match player chips ─────────────────────── */
+.admin-match-players {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.admin-player-chip {
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: #f1f5f9;
+  color: #334155;
+  font-size: 11px;
+  font-weight: 500;
+}
+
+/* ── Info cards ─────────────────────────────── */
+.admin-info-card {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 16px 18px;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+}
+
+.admin-info-card__title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin-bottom: 4px;
+}
+
+.admin-info-card__desc {
+  font-size: 12px;
+  color: #64748b;
+  line-height: 1.5;
+}
+
+/* ── Two-column layout ──────────────────────── */
+.admin-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ── Spin animation ─────────────────────────── */
+.spin {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* ── RTConfig page (override dark colors) ────── */
+.rt-config-page .card {
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+}
+
+.rt-config-input {
+  background: #f8fafc !important;
+  border: 1px solid #e2e8f0 !important;
+  color: var(--text-primary) !important;
+}
+
+.rt-config-input:disabled {
+  background: #f1f5f9 !important;
+  color: #94a3b8 !important;
+}
+
+/* ── Responsive ─────────────────────────────── */
+@media (max-width: 1100px) {
+  .admin-stat-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .admin-stat-grid--secondary {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .admin-charts-row {
+    grid-template-columns: 1fr;
+  }
+  .admin-two-col {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .admin-page {
+    padding: 16px;
+  }
+  .admin-stat-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+  .admin-two-col {
+    grid-template-columns: 1fr;
+  }
+}

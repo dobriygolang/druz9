@@ -254,6 +254,9 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 	if v := manager.GetValue(ctx, rtc.DevAuthBypass); v.String() != "" {
 		cfg.Dev.AuthBypass = strings.EqualFold(v.String(), "true") || v.String() == "1"
 	}
+	if v := manager.GetValue(ctx, rtc.AppRequireAuth); v.String() != "" {
+		cfg.Auth.RequireAuth = strings.EqualFold(v.String(), "true") || v.String() == "1"
+	}
 	if v := manager.GetValue(ctx, rtc.DevUserId); v.String() != "" {
 		cfg.Dev.DevUserID = v.String()
 	}
@@ -394,6 +397,11 @@ func registerConfigWatchers(manager *rtc.Manager, cfg *Bootstrap) error {
 	}); err != nil {
 		return err
 	}
+	if err := manager.WatchValue(ctx, rtc.AppRequireAuth, func(oldVar, newVar rtc.Variable) {
+		cfg.Auth.RequireAuth = newVar.Value().Bool()
+	}); err != nil {
+		return err
+	}
 	if err := manager.WatchValue(ctx, rtc.Key("arena_require_auth"), func(oldVar, newVar rtc.Variable) {
 		if cfg.Arena == nil {
 			cfg.Arena = &Arena{}
@@ -424,6 +432,7 @@ func defaultBootstrap() *Bootstrap {
 			Database: &Database{},
 		},
 		Auth: &Auth{
+			RequireAuth: true,
 			Session: &Session{
 				CookieName:         "session_token",
 				CookieSameSite:     "Lax",

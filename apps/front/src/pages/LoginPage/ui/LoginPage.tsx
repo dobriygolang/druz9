@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ArrowRight, ShieldCheck } from 'lucide-react';
+import { ShieldCheck, MessageCircle, ChevronDown, ChevronUp } from 'lucide-react';
 
 import { useAuth } from '@/app/providers/AuthProvider';
 import { TelegramAuthWidget } from '@/features/Auth/ui/TelegramAuthWidget';
@@ -8,6 +8,7 @@ export const LoginPage: React.FC = () => {
   const { login, startYandexAuth } = useAuth();
   const [error, setError] = useState('');
   const [isYandexLoading, setIsYandexLoading] = useState(false);
+  const [showTelegram, setShowTelegram] = useState(false);
 
   const handleTelegramAuth = async (token: string, code: string) => {
     try {
@@ -34,58 +35,97 @@ export const LoginPage: React.FC = () => {
 
   return (
     <div className="auth-screen">
-      <div className="auth-shell card fade-in">
-        <div className="auth-shell__hero">
-          <span className="auth-shell__eyebrow">Druz9 Access</span>
-          <h1 className="auth-shell__title">Вход через Яндекс или Telegram</h1>
-          <p className="auth-shell__subtitle">
-            Парольная регистрация удалена. Войти можно только через внешний провайдер.
-          </p>
+      {/* Abstract background */}
+      <div className="auth-bg" aria-hidden="true" />
+
+      {/* Feature highlights */}
+      <aside className="auth-features auth-features--left" aria-hidden="true">
+        <div className="auth-feature-card">
+          <span className="auth-feature-card__icon">⚡</span>
+          <strong>500+ задач</strong>
+          <span>от Easy до Hard</span>
+        </div>
+        <div className="auth-feature-card">
+          <span className="auth-feature-card__icon">🤖</span>
+          <strong>AI-ревью</strong>
+          <span>разбор решений</span>
+        </div>
+        <div className="auth-feature-card">
+          <span className="auth-feature-card__icon">🏆</span>
+          <strong>Дуэли</strong>
+          <span>live PvP арена</span>
+        </div>
+      </aside>
+
+      {/* Central login card */}
+      <div className="auth-card fade-in">
+        <div className="auth-card__logo">
+          <span className="auth-card__wordmark">Druz9</span>
+          <p className="auth-card__tagline">Прокачай алгоритмическое мышление</p>
         </div>
 
+        <div className="auth-card__divider" />
+
         {error && (
-          <div className="auth-shell__error">
+          <div className="auth-card__error">
             {error}
           </div>
         )}
 
-        <div className="auth-shell__grid">
-          <section className="auth-provider-card auth-provider-card--primary">
-            <div className="auth-provider-card__header">
-              <span className="auth-provider-card__badge">Рекомендуется</span>
-              <h2>Яндекс ID</h2>
-            </div>
-            <p>Быстрый вход в браузере с автоматическим созданием аккаунта и сохранением сессии.</p>
-            <div className="auth-provider-card__action-wrapper">
-              <button
-                type="button"
-                className="btn btn-primary auth-provider-card__action"
-                disabled={isYandexLoading}
-                onClick={handleYandexAuth}
-              >
-                {isYandexLoading ? 'Переходим в Яндекс...' : 'Войти через Яндекс'}
-                <ArrowRight size={16} />
-              </button>
-            </div>
-          </section>
+        <div className="auth-card__actions">
+          <button
+            type="button"
+            className="btn auth-card__btn auth-card__btn--yandex"
+            disabled={isYandexLoading}
+            onClick={handleYandexAuth}
+          >
+            <svg className="auth-card__btn-icon" width="18" height="18" viewBox="0 0 24 24" fill="none">
+              <path d="M13.4 12L19 2H14.6L12 7.2L9.4 2H5L10.6 12L5 22H9.4L12 16.8L14.6 22H19L13.4 12Z" fill="currentColor"/>
+            </svg>
+            {isYandexLoading ? 'Переходим...' : 'Войти через Яндекс'}
+          </button>
 
-          <section className="auth-provider-card">
-            <div className="auth-provider-card__header">
-              <span className="auth-provider-card__badge auth-provider-card__badge--neutral">Альтернатива</span>
-              <h2>Telegram</h2>
-            </div>
-            <p>Можно войти кодом из бота и позже привязать Telegram как дополнительный провайдер в профиле.</p>
-            <div className="auth-provider-card__action-wrapper">
+          <button
+            type="button"
+            className="btn auth-card__btn auth-card__btn--telegram"
+            onClick={() => setShowTelegram(v => !v)}
+          >
+            <MessageCircle size={18} />
+            Войти через Telegram
+            {showTelegram ? <ChevronUp size={16} className="auth-card__btn-chevron" /> : <ChevronDown size={16} className="auth-card__btn-chevron" />}
+          </button>
+
+          {showTelegram && (
+            <div className="auth-card__telegram">
               <TelegramAuthWidget onAuth={handleTelegramAuth} />
             </div>
-          </section>
+          )}
         </div>
 
-        <div className="auth-shell__footer">
-          <ShieldCheck size={16} />
-          <span>Сессия хранится в защищённой cookie. После первого входа откроется шаг завершения профиля.</span>
+        <div className="auth-card__footer">
+          <ShieldCheck size={14} />
+          <span>Сессия хранится в защищённой cookie</span>
         </div>
       </div>
+
+      {/* Feature highlights right */}
+      <aside className="auth-features auth-features--right" aria-hidden="true">
+        <div className="auth-feature-card">
+          <span className="auth-feature-card__icon">📊</span>
+          <strong>Аналитика</strong>
+          <span>прогресс в деталях</span>
+        </div>
+        <div className="auth-feature-card">
+          <span className="auth-feature-card__icon">🎯</span>
+          <strong>Mock-интервью</strong>
+          <span>с AI-интервьюером</span>
+        </div>
+        <div className="auth-feature-card">
+          <span className="auth-feature-card__icon">🔥</span>
+          <strong>Стрики</strong>
+          <span>ежедневные задачи</span>
+        </div>
+      </aside>
     </div>
   );
 };

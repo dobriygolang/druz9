@@ -48,3 +48,9 @@
 
 /* 15 - Hubs and home */
 @import './15-hubs.css';
+
+/* 16 - Admin pages */
+@import './16-admin.css';
+
+/* 17 - Hub pages v2 (Practice, Growth, Community, Solo) */
+@import './17-hubs-v2.css';
