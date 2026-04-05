@@ -1,19 +1,17 @@
-import React, { useEffect, useMemo, useState, useRef } from 'react';
-import { User as UserIcon, MapPin, ChevronRight, Search, Sparkles } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
+import { ChevronRight, Search, X } from 'lucide-react';
+import { Link, NavLink } from 'react-router-dom';
 import { geoApi } from '@/features/Geo/api/geoApi';
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi';
 import { matchCommunityUser, useCommunityFilters } from '@/features/Community/model/useCommunityFilters';
 import { CommunityMapPoint } from '@/entities/User/model/types';
 import { ArenaPlayerStats } from '@/entities/CodeRoom/model/types';
-import { useIsMobile } from '@/shared/hooks/useIsMobile';
 
 export const UsersPage: React.FC = () => {
-  const isMobile = useIsMobile();
   const [users, setUsers] = useState<CommunityMapPoint[]>([]);
   const [arenaStatsByUserId, setArenaStatsByUserId] = useState<Record<string, ArenaPlayerStats>>({});
   const [isLoading, setIsLoading] = useState(true);
-  const { q, region, presence, setQ, setRegion, setPresence, reset } = useCommunityFilters();
+  const { q, region, presence, setQ } = useCommunityFilters();
   const loadUsersRef = useRef<{ (initial?: boolean): Promise<void> } | null>(null);
 
   const loadUsers = async (initial = false) => {
@@ -67,119 +65,78 @@ export const UsersPage: React.FC = () => {
   );
 
   const filteredUsers = users.filter((user) => matchCommunityUser(user, { q, region, presence }));
+  const onlineCount = users.filter((item) => item.activityStatus === 'online').length;
+
+  const summaryText = useMemo(() => {
+    const regionCount = regionOptions.length;
+    return `${users.length} участников · ${onlineCount} онлайн · ${regionCount} ${regionCount === 1 ? 'регион' : regionCount >= 2 && regionCount <= 4 ? 'региона' : 'регионов'}`;
+  }, [onlineCount, regionOptions.length, users.length]);
+
+  const rows = filteredUsers.slice(0, 5);
 
   return (
-    <div className="fade-in people-page">
-      <section className="people-page__hero">
-        <div>
-          <span className="people-page__eyebrow">People</span>
-          <h1>Люди сообщества</h1>
-          <p>Список участников сообщества. Найди человека по имени, региону или активности.</p>
-        </div>
-        <div className="people-page__summary">
-          <div className="people-page__summary-card">
-            <strong>{isLoading ? '...' : filteredUsers.length}</strong>
-            <span>подходит под текущий фильтр</span>
+    <div className="community-people fade-in">
+      <section className="community-people__header">
+        <div className="community-people__top-row">
+          <div className="community-people__title-block">
+            <h1>Community</h1>
+            <p>{isLoading ? 'Загружаем сообщество...' : summaryText}</p>
           </div>
-          <div className="people-page__summary-card">
-            <strong>{isLoading ? '...' : users.filter((item) => item.activityStatus === 'online').length}</strong>
-            <span>онлайн прямо сейчас</span>
-          </div>
+
+          <label className="community-people__search">
+            <Search size={16} />
+            <input
+              value={q}
+              onChange={(event) => setQ(event.target.value)}
+              placeholder="Search..."
+              aria-label="Search people"
+            />
+            <span className="community-people__search-clear" aria-hidden="true">
+              {q ? <X size={16} /> : null}
+            </span>
+          </label>
         </div>
+
+        <nav className="community-people__tabs" aria-label="Community sections">
+          <NavLink to="/community/people" end className={({ isActive }) => `community-people__tab${isActive ? ' is-active' : ''}`}>People</NavLink>
+          <NavLink to="/community/events" className={({ isActive }) => `community-people__tab${isActive ? ' is-active' : ''}`}>Events</NavLink>
+          <NavLink to="/community/map" className={({ isActive }) => `community-people__tab${isActive ? ' is-active' : ''}`}>Map</NavLink>
+          <NavLink to="/community/circles" className={({ isActive }) => `community-people__tab${isActive ? ' is-active' : ''}`}>Circles</NavLink>
+        </nav>
       </section>
 
-      <section className="people-filters">
-        <label className="people-filters__search">
-          <Search size={16} />
-          <input
-            className="input"
-            value={q}
-            onChange={(event) => setQ(event.target.value)}
-            placeholder="Поиск по имени, Telegram или региону"
-          />
-        </label>
+      <section className="community-people__list">
+        {isLoading ? (
+          <div className="community-people__empty">Загрузка списка пользователей...</div>
+        ) : rows.length > 0 ? (
+          rows.map((user) => {
+            const fullName = [user.firstName, user.lastName].filter(Boolean).join(' ') || user.username;
+            const initials = `${user.firstName?.charAt(0) ?? ''}${user.lastName?.charAt(0) ?? ''}`.trim().toUpperCase() || user.username.slice(0, 2).toUpperCase();
+            const handle = user.telegramUsername ? `@${user.telegramUsername}` : '@unknown';
+            const rating = arenaStatsByUserId[user.userId]?.rating ?? 1000;
 
-        <select className="input people-filters__select" value={region} onChange={(event) => setRegion(event.target.value)}>
-          <option value="all">Все регионы</option>
-          {regionOptions.map((item) => (
-            <option key={item} value={item}>{item}</option>
-          ))}
-        </select>
-
-        <select className="input people-filters__select" value={presence} onChange={(event) => setPresence(event.target.value as 'all' | 'online')}>
-          <option value="all">Любая активность</option>
-          <option value="online">Только онлайн</option>
-        </select>
-
-        <button type="button" className="btn btn-secondary" onClick={reset}>
-          Сбросить
-        </button>
-      </section>
-
-      <div className="people-page__section-head">
-        <div>
-          <h2>Пользователи</h2>
-          <span>{isLoading ? 'Загружаем участников...' : `Всего в выборке: ${filteredUsers.length}`}</span>
-        </div>
-        {!isLoading && filteredUsers.length > 0 && (
-          <div className="people-page__hint">
-            <Sparkles size={14} />
-            <span>Открывай профиль для деталей</span>
-          </div>
-        )}
-      </div>
-
-      {isLoading ? (
-        <div className="people-page__empty">Загрузка списка пользователей...</div>
-      ) : (
-        <div className="people-list">
-          {filteredUsers.length > 0 ? (
-            filteredUsers.map((user) => {
-              const profileHandle = user.telegramUsername ? `@${user.telegramUsername}` : 'тг не привязан';
-
-              return (
-                <Link
-                  key={user.userId}
-                  to={`/profile/${user.userId}`}
-                  className="people-card"
-                >
-                <div className="people-card__avatar">
-                  {user.avatarUrl ? (
-                    <img src={user.avatarUrl} alt={`${user.firstName} ${user.lastName}`} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
-                  ) : (
-                    <div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', backgroundColor: '#333' }}>
-                      <UserIcon size={24} color="#888" />
-                    </div>
-                  )}
-                </div>
-                
-                <div className="people-card__body">
-                  <div className="people-card__title">
-                    {user.firstName} {user.lastName}
-                    {user.isCurrentUser && (
-                      <span className="people-card__badge">Вы</span>
-                    )}
+            return (
+              <Link key={user.userId} to={`/profile/${user.userId}`} className="community-people__row">
+                <div className="community-people__avatar" aria-hidden="true">{initials}</div>
+                <div className="community-people__info">
+                  <div className="community-people__name-row">
+                    <strong>{fullName}</strong>
+                    {user.activityStatus === 'online' && <span className="community-people__badge">online</span>}
                   </div>
-                  <div className="people-card__meta">
-                    <span className={`people-card__handle ${user.telegramUsername ? 'is-linked' : ''}`}>{profileHandle}</span>
-                    <span className="people-card__region">
-                      <MapPin size={12} /> {user.region}
-                    </span>
-                    <span className="people-card__elo">
-                      {arenaStatsByUserId[user.userId]?.rating ?? 1000} ELO
-                    </span>
+                  <div className="community-people__meta-row">
+                    <span className="community-people__handle">{handle}</span>
+                    <span>{user.region || 'Online'}</span>
+                    <span>{rating} ELO</span>
                   </div>
                 </div>
-
-                {!isMobile && <ChevronRight size={20} className="people-card__chevron" />}
+                <ChevronRight size={16} className="community-people__chevron" />
               </Link>
-              );
-            })
-          ) : (
-            <div className="people-page__empty">Никого не найдено</div>
-          )}
-        </div>
-      )}
+            );
+          })
+        ) : (
+          <div className="community-people__empty">Никого не найдено</div>
+        )}
+      </section>
     </div>
   );
 };
