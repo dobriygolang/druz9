@@ -28,13 +28,14 @@ export function InterviewPrepSessionPage() {
       if (s?.task?.duration_seconds) setTimeLeft(s.task.duration_seconds)
       if (s?.current_question) setActiveTab('question')
     }).catch(() => navigate('/growth/interview-prep'))
-  }, [sessionId])
+  }, [sessionId, navigate])
 
+  const timerActive = timeLeft > 0
   useEffect(() => {
-    if (timeLeft <= 0) return
+    if (!timerActive) return
     const t = setInterval(() => setTimeLeft(p => p > 0 ? p - 1 : 0), 1000)
     return () => clearInterval(t)
-  }, [timeLeft > 0])
+  }, [timerActive])
 
   const formatTime = (s: number) => `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`
 
@@ -67,20 +68,20 @@ export function InterviewPrepSessionPage() {
   const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
     editorRef.current = editor
     registerDarkTheme(monaco)
-    monaco.editor.setTheme('lunaris-dark')
+    monaco.editor.setTheme('druzya-dark')
   }, [])
 
   return (
-    <div className="flex flex-col h-screen bg-[#f8fafc] overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#F2F3F0] overflow-hidden">
       {/* Top bar */}
-      <header className="h-[52px] bg-white border-b border-[#e2e8f0] flex items-center justify-between px-5 flex-shrink-0">
+      <header className="h-[52px] bg-white border-b border-[#CBCCC9] flex items-center justify-between px-5 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/growth/interview-prep')} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#f1f5f9] text-[#64748b]">
+          <button onClick={() => navigate('/growth/interview-prep')} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
             <p className="text-sm font-bold text-[#0f172a]">{task?.title ?? 'Interview Session'}</p>
-            <p className="text-xs text-[#64748b]">{task?.company_tag ?? 'General'} · {task?.prep_type ?? ''}</p>
+            <p className="text-xs text-[#666666]">{task?.company_tag ?? 'General'} · {task?.prep_type ?? ''}</p>
           </div>
           <Badge variant="success" dot>Идёт интервью</Badge>
         </div>
@@ -99,15 +100,15 @@ export function InterviewPrepSessionPage() {
       {/* Content */}
       <div className="flex flex-1 min-h-0">
         {/* Left: problem/question */}
-        <div className="w-[380px] flex-shrink-0 bg-white border-r border-[#e2e8f0] flex flex-col">
-          <div className="flex border-b border-[#e2e8f0]">
-            <button onClick={() => setActiveTab('problem')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'problem' ? 'border-[#FF8400] text-[#18181b]' : 'border-transparent text-[#64748b]'}`}>
+        <div className="w-[380px] flex-shrink-0 bg-white border-r border-[#CBCCC9] flex flex-col">
+          <div className="flex border-b border-[#CBCCC9]">
+            <button onClick={() => setActiveTab('problem')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'problem' ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
               Задача
             </button>
-            {question && <button onClick={() => setActiveTab('question')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'question' ? 'border-[#FF8400] text-[#18181b]' : 'border-transparent text-[#64748b]'}`}>
+            {question && <button onClick={() => setActiveTab('question')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'question' ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
               Вопрос
             </button>}
-            {review && <button onClick={() => setActiveTab('result')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'result' ? 'border-[#FF8400] text-[#18181b]' : 'border-transparent text-[#64748b]'}`}>
+            {review && <button onClick={() => setActiveTab('result')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'result' ? 'border-[#FF8400] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
               Оценка
             </button>}
           </div>
@@ -128,7 +129,7 @@ export function InterviewPrepSessionPage() {
                   onChange={e => setAnswer(e.target.value)}
                   placeholder="Ваш ответ..."
                   rows={6}
-                  className="w-full px-3 py-2 text-sm bg-[#f8fafc] border border-[#e2e8f0] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
+                  className="w-full px-3 py-2 text-sm bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
                 />
                 <Button variant="primary" size="sm" onClick={handleAnswerQuestion} loading={submitting} className="w-full justify-center">
                   <Send className="w-3.5 h-3.5" /> Ответить
@@ -137,7 +138,7 @@ export function InterviewPrepSessionPage() {
             )}
             {activeTab === 'result' && review && (
               <div className="flex flex-col gap-3">
-                <div className="p-3 bg-[#f8fafc] rounded-lg border border-[#e2e8f0]">
+                <div className="p-3 bg-[#F2F3F0] rounded-lg border border-[#CBCCC9]">
                   <div className="flex items-center justify-between mb-2">
                     <span className="text-xs font-semibold text-[#475569] uppercase">Оценка</span>
                     <span className="font-mono text-lg font-bold text-[#6366f1]">{review.score ?? '--'}/10</span>
@@ -148,7 +149,7 @@ export function InterviewPrepSessionPage() {
                   <div>
                     <p className="text-xs font-semibold text-[#475569] mb-2">Пробелы:</p>
                     {review.gaps.map((g: string, i: number) => (
-                      <p key={i} className="text-xs text-[#64748b] flex gap-2"><span className="text-[#ef4444]">•</span>{g}</p>
+                      <p key={i} className="text-xs text-[#666666] flex gap-2"><span className="text-[#ef4444]">•</span>{g}</p>
                     ))}
                   </div>
                 )}

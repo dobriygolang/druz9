@@ -33,12 +33,12 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
       <div
-        className="absolute inset-0 bg-[#1e293b]/60"
+        className="absolute inset-0 bg-[#1e293b]/60 animate-fade-in"
         onClick={onClose}
       />
       <div
         className={cn(
-          'relative w-full bg-white rounded-xl border border-[#e2e8f0] shadow-modal flex flex-col',
+          'relative w-full bg-white rounded-xl border border-[#e2e8f0] shadow-modal flex flex-col animate-modal-in',
           sizes[size],
           className,
         )}

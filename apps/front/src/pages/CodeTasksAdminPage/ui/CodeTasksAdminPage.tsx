@@ -67,7 +67,7 @@ export function CodeTasksAdminPage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-xl font-bold text-[#0f172a]">Code Tasks</h1>
-          <p className="text-sm text-[#64748b] mt-0.5">{tasks.length} задач</p>
+          <p className="text-sm text-[#666666] mt-0.5">{tasks.length} задач</p>
         </div>
         <Button variant="orange" onClick={() => { setEditTask({}); setShowEdit(true) }}>
           <Plus className="w-4 h-4" /> Добавить задачу
@@ -82,7 +82,7 @@ export function CodeTasksAdminPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Поиск задач..."
-            className="w-full pl-9 pr-3 py-2 text-sm bg-[#f1f5f9] border border-[#e2e8f0] rounded-lg focus:outline-none"
+            className="w-full pl-9 pr-3 py-2 text-sm bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg focus:outline-none"
           />
         </div>
         <Select
@@ -96,8 +96,8 @@ export function CodeTasksAdminPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-[#e2e8f0] overflow-hidden">
-        <div className="grid grid-cols-[auto_1fr_120px_100px_80px_80px] items-center px-6 py-3 border-b border-[#e2e8f0] text-xs font-semibold text-[#64748b] uppercase tracking-wide">
+      <div className="bg-white rounded-xl border border-[#CBCCC9] overflow-hidden">
+        <div className="grid grid-cols-[auto_1fr_120px_100px_80px_80px] items-center px-6 py-3 border-b border-[#CBCCC9] text-xs font-semibold text-[#666666] uppercase tracking-wide">
           <span className="w-8 text-right">#</span>
           <span className="ml-4">Название</span>
           <span>Тема</span>
@@ -105,14 +105,14 @@ export function CodeTasksAdminPage() {
           <span className="text-center">Статус</span>
           <span />
         </div>
-        <div className="divide-y divide-[#f8fafc]">
+        <div className="divide-y divide-[#F2F3F0]">
           {loading ? Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="px-6 py-3.5 grid grid-cols-[auto_1fr_120px_100px_80px_80px] items-center gap-4 animate-pulse">
-              <div className="w-8 h-3 bg-[#f1f5f9] rounded" />
-              <div className="h-3 bg-[#f1f5f9] rounded ml-4" />
-              <div className="h-3 bg-[#f1f5f9] rounded" />
-              <div className="h-3 bg-[#f1f5f9] rounded" />
-              <div className="h-3 bg-[#f1f5f9] rounded" />
+              <div className="w-8 h-3 bg-[#F2F3F0] rounded" />
+              <div className="h-3 bg-[#F2F3F0] rounded ml-4" />
+              <div className="h-3 bg-[#F2F3F0] rounded" />
+              <div className="h-3 bg-[#F2F3F0] rounded" />
+              <div className="h-3 bg-[#F2F3F0] rounded" />
             </div>
           )) : filtered.length === 0 ? (
             <div className="px-6 py-12 text-center text-sm text-[#94a3b8]">Задачи не найдены</div>
@@ -123,7 +123,7 @@ export function CodeTasksAdminPage() {
                 <p className="text-sm font-medium text-[#0f172a]">{task.title}</p>
                 {task.slug && <p className="text-xs text-[#94a3b8] font-mono">{task.slug}</p>}
               </div>
-              <p className="text-xs text-[#64748b]">{task.topics?.slice(0,2).join(', ') ?? ''}</p>
+              <p className="text-xs text-[#666666]">{task.topics?.slice(0,2).join(', ') ?? ''}</p>
               <div>
                 {task.difficulty && task.difficulty !== 'TASK_DIFFICULTY_UNSPECIFIED' && (
                   <Badge variant={DIFF_VARIANTS[task.difficulty] ?? 'default'}>
@@ -139,7 +139,7 @@ export function CodeTasksAdminPage() {
               <div className="flex justify-end gap-1">
                 <button
                   onClick={() => { setEditTask(task); setShowEdit(true) }}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#f1f5f9] text-[#64748b]"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]"
                 >
                   <Edit2 className="w-3.5 h-3.5" />
                 </button>
@@ -156,7 +156,7 @@ export function CodeTasksAdminPage() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between px-4 py-3 mt-2 text-xs text-[#64748b]">
+      <div className="flex items-center justify-between px-4 py-3 mt-2 text-xs text-[#666666]">
         <span>{filtered.length} задач</span>
       </div>
 

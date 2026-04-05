@@ -31,6 +31,7 @@ const RTConfigAdminPage = lazy(() => import('@/pages/RTConfigAdminPage/ui/RTConf
 const InterviewPrepAdminPage = lazy(() => import('@/pages/InterviewPrepAdminPage/ui/InterviewPrepAdminPage').then(m => ({ default: m.InterviewPrepAdminPage })))
 const AdminAnalyticsPage = lazy(() => import('@/pages/AdminAnalyticsPage/ui/AdminAnalyticsPage').then(m => ({ default: m.AdminAnalyticsPage })))
 const AdminCodeGamePage = lazy(() => import('@/pages/AdminCodeGamePage/ui/AdminCodeGamePage').then(m => ({ default: m.AdminCodeGamePage })))
+const PodcastsPage = lazy(() => import('@/pages/PodcastsPage/ui/PodcastsPage').then(m => ({ default: m.PodcastsPage })))
 
 const Fallback: React.FC = () => null
 
@@ -54,7 +55,7 @@ class ErrorBoundary extends React.Component<
         <div className="flex items-center justify-center h-screen bg-[#F2F3F0]">
           <div className="text-center">
             <h2 className="text-xl font-semibold mb-2">Что-то пошло не так</h2>
-            <p className="text-[#64748b] mb-4 text-sm">{msg}</p>
+            <p className="text-[#666666] mb-4 text-sm">{msg}</p>
             <button className="px-4 py-2 bg-[#FF8400] rounded-lg text-sm font-medium" onClick={() => window.location.reload()}>
               Перезагрузить страницу
             </button>
@@ -67,7 +68,7 @@ class ErrorBoundary extends React.Component<
 }
 
 export const RouterProvider: React.FC = () => {
-  const { isLoading, isAuthenticated, needsProfileComplete } = useAuth()
+  const { isLoading, isAuthenticated, needsProfileComplete, user } = useAuth()
   const { isLoading: rcLoading, appRequireAuth, arenaRequireAuth } = useRuntimeConfig()
 
   if (isLoading || rcLoading) return null
@@ -118,6 +119,9 @@ export const RouterProvider: React.FC = () => {
               <Route path="interview-prep" element={<InterviewPrepPage />} />
             </Route>
 
+            {/* Podcasts */}
+            <Route path="/podcasts" element={gate ? <Navigate to="/login" replace /> : <PodcastsPage />} />
+
             {/* Profile */}
             <Route path="/profile" element={
               !isAuthenticated || needsProfileComplete
@@ -155,19 +159,19 @@ export const RouterProvider: React.FC = () => {
           {/* Admin layout */}
           <Route element={<AdminLayout />}>
             <Route path="/admin/code-tasks" element={
-              !isAuthenticated ? <Navigate to="/login" replace /> : <CodeTasksAdminPage />
+              !isAuthenticated || !user?.isAdmin ? <Navigate to="/login" replace /> : <CodeTasksAdminPage />
             } />
             <Route path="/admin/config" element={
-              !isAuthenticated ? <Navigate to="/login" replace /> : <RTConfigAdminPage />
+              !isAuthenticated || !user?.isAdmin ? <Navigate to="/login" replace /> : <RTConfigAdminPage />
             } />
             <Route path="/admin/interview-prep" element={
-              !isAuthenticated ? <Navigate to="/login" replace /> : <InterviewPrepAdminPage />
+              !isAuthenticated || !user?.isAdmin ? <Navigate to="/login" replace /> : <InterviewPrepAdminPage />
             } />
             <Route path="/admin/analytics" element={
-              !isAuthenticated ? <Navigate to="/login" replace /> : <AdminAnalyticsPage />
+              !isAuthenticated || !user?.isAdmin ? <Navigate to="/login" replace /> : <AdminAnalyticsPage />
             } />
             <Route path="/admin/code-game" element={
-              !isAuthenticated ? <Navigate to="/login" replace /> : <AdminCodeGamePage />
+              !isAuthenticated || !user?.isAdmin ? <Navigate to="/login" replace /> : <AdminCodeGamePage />
             } />
           </Route>
 

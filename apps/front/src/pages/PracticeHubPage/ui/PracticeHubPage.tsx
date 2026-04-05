@@ -16,8 +16,8 @@ export function PracticeHubPage() {
       <div className="px-6 pt-6 pb-0 bg-[#F2F3F0]">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#18181b]">Practice</h1>
-            <p className="text-sm text-[#64748b] mt-0.5">Практикуйся и соревнуйся с другими</p>
+            <h1 className="text-2xl font-bold text-[#111111]">Practice</h1>
+            <p className="text-sm text-[#666666] mt-0.5">Практикуйся и соревнуйся с другими</p>
           </div>
           {/* Pill tabs for mode selection */}
           <div className="flex items-center gap-1 p-1 bg-[#E7E8E5] border border-[#CBCCC9] rounded-full">
@@ -27,7 +27,7 @@ export function PracticeHubPage() {
                 to={tab.href}
                 className={cn(
                   'px-4 py-1.5 text-sm font-medium rounded-full transition-colors',
-                  active === tab.id ? 'bg-white text-[#18181b] shadow-sm' : 'text-[#64748b] hover:text-[#18181b]'
+                  active === tab.id ? 'bg-white text-[#111111] shadow-sm' : 'text-[#666666] hover:text-[#111111]'
                 )}
               >
                 {tab.label}

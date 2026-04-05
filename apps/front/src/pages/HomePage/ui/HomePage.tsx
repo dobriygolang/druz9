@@ -31,10 +31,10 @@ export function HomePage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="font-mono text-2xl font-semibold text-[#18181b]">
+          <h1 className="font-mono text-2xl font-semibold text-[#111111]">
             Добро пожаловать, {firstName}
           </h1>
-          <p className="text-sm text-[#64748b] font-geist mt-1">
+          <p className="text-sm text-[#666666] font-geist mt-1">
             Сегодня в сообществе {onlineCount || 12} человек онлайн
           </p>
         </div>
@@ -44,16 +44,16 @@ export function HomePage() {
       {/* Metrics */}
       <div className="grid grid-cols-3 gap-4">
         {[
-          { label: 'Онлайн', value: onlineCount || 12, icon: <Users className="w-4 h-4 text-[#64748b]" /> },
-          { label: 'Событий', value: events.length || 4, icon: <Calendar className="w-4 h-4 text-[#64748b]" /> },
-          { label: 'Circles', value: circles.length || 7, icon: <CircleIcon className="w-4 h-4 text-[#64748b]" /> },
+          { label: 'Онлайн', value: onlineCount || 12, icon: <Users className="w-4 h-4 text-[#666666]" /> },
+          { label: 'Событий', value: events.length || 4, icon: <Calendar className="w-4 h-4 text-[#666666]" /> },
+          { label: 'Circles', value: circles.length || 7, icon: <CircleIcon className="w-4 h-4 text-[#666666]" /> },
         ].map((m) => (
           <Card key={m.label} padding="lg" className="flex flex-col gap-3">
             <div className="flex items-center justify-between">
-              <span className="text-sm text-[#64748b]">{m.label}</span>
+              <span className="text-sm text-[#666666]">{m.label}</span>
               {m.icon}
             </div>
-            <span className="font-mono text-[32px] font-bold text-[#18181b] leading-none">{m.value}</span>
+            <span className="font-mono text-[32px] font-bold text-[#111111] leading-none">{m.value}</span>
           </Card>
         ))}
       </div>
@@ -63,7 +63,7 @@ export function HomePage() {
         {/* Events */}
         <Card className="flex-1" padding="lg">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[#18181b]">Ближайшие события</h2>
+            <h2 className="text-sm font-semibold text-[#111111]">Ближайшие события</h2>
             <button className="text-xs text-[#FF8400] font-medium flex items-center gap-1">
               Все <ChevronRight className="w-3 h-3" />
             </button>
@@ -85,8 +85,8 @@ export function HomePage() {
                     <Calendar className="w-4 h-4 text-[#FF8400]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#18181b] truncate">{e.title}</p>
-                    <p className="text-xs text-[#64748b]">{formatDate(e.scheduledAt)} · {e.city || e.placeLabel}</p>
+                    <p className="text-sm font-medium text-[#111111] truncate">{e.title}</p>
+                    <p className="text-xs text-[#666666]">{formatDate(e.scheduledAt)} · {e.city || e.placeLabel}</p>
                   </div>
                   <span className="text-xs text-[#94a3b8]">{e.participantCount} чел.</span>
                 </div>
@@ -98,7 +98,7 @@ export function HomePage() {
         {/* Circles */}
         <Card className="w-[340px] flex-shrink-0" padding="lg">
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-sm font-semibold text-[#18181b]">Circles</h2>
+            <h2 className="text-sm font-semibold text-[#111111]">Circles</h2>
             <button className="text-xs text-[#FF8400] font-medium flex items-center gap-1">
               Все <ChevronRight className="w-3 h-3" />
             </button>
@@ -120,8 +120,8 @@ export function HomePage() {
                     <CircleIcon className="w-4 h-4 text-[#94a3b8]" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#18181b] truncate">{c.name}</p>
-                    <p className="text-xs text-[#64748b]">{c.memberCount} участников</p>
+                    <p className="text-sm font-medium text-[#111111] truncate">{c.name}</p>
+                    <p className="text-xs text-[#666666]">{c.memberCount} участников</p>
                   </div>
                 </div>
               ))

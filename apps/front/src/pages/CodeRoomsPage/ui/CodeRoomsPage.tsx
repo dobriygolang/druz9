@@ -78,19 +78,19 @@ export function CodeRoomsPage() {
               <Link
                 key={room.id}
                 to={`/code-rooms/${room.id}`}
-                className="flex items-center gap-4 p-4 bg-white rounded-2xl border border-[#CBCCC9] hover:border-[#94a3b8] transition-colors"
+                className="stagger-item flex items-center gap-4 p-4 bg-white rounded-2xl border border-[#CBCCC9] hover:border-[#94a3b8] transition-colors"
               >
-                <div className="w-10 h-10 rounded-xl bg-[#f1f5f9] flex items-center justify-center flex-shrink-0">
+                <div className="w-10 h-10 rounded-xl bg-[#F2F3F0] flex items-center justify-center flex-shrink-0">
                   <Code2 className="w-5 h-5 text-[#6366f1]" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <p className="text-sm font-semibold text-[#18181b]">{room.task || 'Без задачи'}</p>
+                    <p className="text-sm font-semibold text-[#111111]">{room.task || 'Без задачи'}</p>
                     <Badge variant={st.variant}>{st.label}</Badge>
                   </div>
                   <div className="flex items-center gap-3 mt-0.5">
-                    <span className="text-xs text-[#64748b]">{MODE_LABELS[room.mode] ?? room.mode}</span>
-                    <span className="flex items-center gap-1 text-xs text-[#64748b]">
+                    <span className="text-xs text-[#666666]">{MODE_LABELS[room.mode] ?? room.mode}</span>
+                    <span className="flex items-center gap-1 text-xs text-[#666666]">
                       <Users className="w-3 h-3" /> {room.participants.length}
                     </span>
                   </div>
@@ -106,12 +106,12 @@ export function CodeRoomsPage() {
           {/* Solo card */}
           <Card padding="md">
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-8 h-8 rounded-lg bg-[#f1f5f9] flex items-center justify-center">
+              <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center">
                 <Code2 className="w-4 h-4 text-[#6366f1]" />
               </div>
-              <h3 className="text-sm font-semibold text-[#18181b]">Solo практика</h3>
+              <h3 className="text-sm font-semibold text-[#111111]">Solo практика</h3>
             </div>
-            <p className="text-xs text-[#64748b] mb-3">Решай задачи в своём темпе без давления времени</p>
+            <p className="text-xs text-[#666666] mb-3">Решай задачи в своём темпе без давления времени</p>
             <Button variant="secondary" size="sm" className="w-full justify-center" onClick={() => navigate('/practice/solo')}>
               Начать
             </Button>
@@ -123,7 +123,7 @@ export function CodeRoomsPage() {
               <div className="w-8 h-8 rounded-lg bg-[#1e293b] flex items-center justify-center">
                 <Swords className="w-4 h-4 text-[#FF8400]" />
               </div>
-              <h3 className="text-sm font-semibold text-[#e2e8f0]">Дуэль</h3>
+              <h3 className="text-sm font-semibold text-[#CBCCC9]">Дуэль</h3>
             </div>
             <p className="text-xs text-[#94a3b8] mb-3">Создай комнату-дуэль и пригласи соперника по ссылке</p>
             <Button

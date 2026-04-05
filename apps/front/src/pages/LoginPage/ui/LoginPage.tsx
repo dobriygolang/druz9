@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { authApi } from '@/features/Auth/api/authApi'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { useNavigate } from 'react-router-dom'
@@ -9,6 +9,13 @@ export function LoginPage() {
   const navigate = useNavigate()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  useEffect(() => {
+    return () => {
+      if (pollRef.current) clearInterval(pollRef.current)
+    }
+  }, [])
 
   const handleYandex = async () => {
     setLoading(true)
@@ -29,14 +36,20 @@ export function LoginPage() {
       const { botStartUrl } = await authApi.createTelegramAuthChallenge()
       window.open(botStartUrl, '_blank')
       // Poll for auth completion
+      if (pollRef.current) clearInterval(pollRef.current)
       const poll = setInterval(async () => {
         try {
           await refresh()
-          clearInterval(poll)
+          if (pollRef.current) clearInterval(pollRef.current)
+          pollRef.current = null
           navigate('/home')
         } catch {}
       }, 2000)
-      setTimeout(() => clearInterval(poll), 120000)
+      pollRef.current = poll
+      setTimeout(() => {
+        if (pollRef.current) clearInterval(pollRef.current)
+        pollRef.current = null
+      }, 120000)
     } catch {
       setError('Ошибка авторизации')
     } finally {
@@ -55,14 +68,14 @@ export function LoginPage() {
               <path d="M7 14H17" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
             </svg>
           </div>
-          <h1 className="font-mono text-2xl font-bold text-[#FF8400] tracking-widest">LUNARIS</h1>
-          <p className="text-sm text-[#64748b] mt-2">Сообщество разработчиков</p>
+          <h1 className="font-mono text-2xl font-bold text-[#FF8400] tracking-widest">ДРУЗЬЯ</h1>
+          <p className="text-sm text-[#666666] mt-2">Сообщество разработчиков</p>
         </div>
 
         {/* Card */}
         <div className="bg-white rounded-2xl border border-[#CBCCC9] p-8">
-          <h2 className="text-xl font-bold text-[#18181b] mb-2">Добро пожаловать</h2>
-          <p className="text-sm text-[#64748b] mb-6">Войдите, чтобы продолжить</p>
+          <h2 className="text-xl font-bold text-[#111111] mb-2">Добро пожаловать</h2>
+          <p className="text-sm text-[#666666] mb-6">Войдите, чтобы продолжить</p>
 
           {error && (
             <div className="mb-4 p-3 bg-[#fef2f2] border border-[#fca5a5] rounded-lg text-sm text-[#dc2626]">

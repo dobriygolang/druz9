@@ -51,8 +51,8 @@ export function InterviewPrepPage() {
           <Card key={s.label} padding="md" className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center">{s.icon}</div>
             <div>
-              <p className="text-lg font-bold text-[#18181b] leading-none">{s.value}</p>
-              <p className="text-xs text-[#64748b] mt-0.5">{s.label}</p>
+              <p className="text-lg font-bold text-[#111111] leading-none">{s.value}</p>
+              <p className="text-xs text-[#666666] mt-0.5">{s.label}</p>
             </div>
           </Card>
         ))}
@@ -75,7 +75,7 @@ export function InterviewPrepPage() {
               key={cat}
               onClick={() => setCategory(cat)}
               className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
-                category === cat ? 'bg-[#FF8400] text-[#0f172a]' : 'bg-white border border-[#CBCCC9] text-[#64748b] hover:border-[#94a3b8]'
+                category === cat ? 'bg-[#FF8400] text-[#0f172a]' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
               }`}
             >
               {cat === '' ? 'Все' : PREP_TYPE_LABELS[cat] ?? cat}
@@ -112,8 +112,8 @@ export function InterviewPrepPage() {
                     {PREP_TYPE_ICONS[task.prepType] ?? <BookOpen className="w-4 h-4 text-[#94a3b8]" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-[#18181b] truncate">{task.title}</p>
-                    <p className="text-xs text-[#64748b] mt-0.5">{task.companyTag || 'General'} · {Math.round(task.durationSeconds / 60)} мин</p>
+                    <p className="text-sm font-medium text-[#111111] truncate">{task.title}</p>
+                    <p className="text-xs text-[#666666] mt-0.5">{task.companyTag || 'General'} · {Math.round(task.durationSeconds / 60)} мин</p>
                   </div>
                   <Badge variant={task.prepType === 'coding' ? 'indigo' : task.prepType === 'system_design' ? 'orange' : 'success'}>
                     {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
@@ -128,7 +128,7 @@ export function InterviewPrepPage() {
         {/* Right sidebar */}
         <div className="w-[300px] flex-shrink-0 flex flex-col gap-3">
           <Card padding="md" dark orangeBorder>
-            <h3 className="text-sm font-semibold text-[#e2e8f0] mb-2">Mock Interview</h3>
+            <h3 className="text-sm font-semibold text-[#CBCCC9] mb-2">Mock Interview</h3>
             <p className="text-xs text-[#94a3b8] mb-3">Симулируй полное собеседование с AI</p>
             <Button variant="orange" size="sm" className="w-full justify-center">
               Начать Mock

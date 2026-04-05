@@ -1,7 +1,7 @@
 import type * as Monaco from 'monaco-editor'
 
 export function registerDarkTheme(monaco: typeof Monaco) {
-  monaco.editor.defineTheme('lunaris-dark', {
+  monaco.editor.defineTheme('druzya-dark', {
     base: 'vs-dark',
     inherit: true,
     rules: [

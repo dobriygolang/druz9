@@ -38,8 +38,8 @@ export function CompleteRegistrationPage() {
                 <path d="M7 14H17" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
               </svg>
             </div>
-            <h2 className="text-xl font-bold text-[#18181b]">Завершите регистрацию</h2>
-            <p className="text-sm text-[#64748b] mt-1">Укажите ваше местоположение</p>
+            <h2 className="text-xl font-bold text-[#111111]">Завершите регистрацию</h2>
+            <p className="text-sm text-[#666666] mt-1">Укажите ваше местоположение</p>
           </div>
           {error && (
             <div className="mb-4 p-3 bg-[#fef2f2] border border-[#fca5a5] rounded-lg text-sm text-[#dc2626]">{error}</div>

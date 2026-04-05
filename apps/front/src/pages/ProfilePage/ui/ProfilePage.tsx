@@ -59,24 +59,24 @@ export function ProfilePage() {
           <Avatar name={displayName} src={user.avatarUrl || undefined} size="xl" className="flex-shrink-0" />
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-xl font-bold text-[#18181b]">{displayName}</h1>
+              <h1 className="text-xl font-bold text-[#111111]">{displayName}</h1>
               {user.isTrusted && <Badge variant="info">Trusted</Badge>}
               {user.isAdmin && <Badge variant="warning">Admin</Badge>}
             </div>
             {user.username && <p className="text-sm text-[#666666] mt-0.5">@{user.username}</p>}
             <div className="flex items-center gap-4 mt-2 flex-wrap">
               {user.region && (
-                <span className="flex items-center gap-1 text-xs text-[#64748b]">
+                <span className="flex items-center gap-1 text-xs text-[#666666]">
                   <MapPin className="w-3 h-3" /> {user.region}
                 </span>
               )}
               {user.currentWorkplace && (
-                <span className="flex items-center gap-1 text-xs text-[#64748b]">
+                <span className="flex items-center gap-1 text-xs text-[#666666]">
                   <Briefcase className="w-3 h-3" /> {user.currentWorkplace}
                 </span>
               )}
               {user.createdAt && (
-                <span className="flex items-center gap-1 text-xs text-[#64748b]">
+                <span className="flex items-center gap-1 text-xs text-[#666666]">
                   <Calendar className="w-3 h-3" /> С {formatJoinDate(user.createdAt)}
                 </span>
               )}
@@ -110,8 +110,8 @@ export function ProfilePage() {
             <Card key={s.label} padding="md" className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center">{s.icon}</div>
               <div>
-                <p className="text-xl font-bold text-[#18181b] leading-none">{s.value}</p>
-                <p className="text-xs text-[#64748b] mt-0.5">{s.label}</p>
+                <p className="text-xl font-bold text-[#111111] leading-none">{s.value}</p>
+                <p className="text-xs text-[#666666] mt-0.5">{s.label}</p>
               </div>
             </Card>
           ))}
@@ -124,12 +124,12 @@ export function ProfilePage() {
           {/* Companies */}
           {progress && progress.companies.length > 0 && (
             <Card padding="md">
-              <h3 className="text-sm font-semibold text-[#18181b] mb-3">Компании</h3>
+              <h3 className="text-sm font-semibold text-[#111111] mb-3">Компании</h3>
               <div className="flex flex-wrap gap-2">
                 {progress.companies.map(c => (
                   <div key={c.tag} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F3F0] rounded-lg">
-                    <span className="text-sm font-medium text-[#18181b]">{c.tag}</span>
-                    <span className="text-xs text-[#64748b]">×{c.sessions}</span>
+                    <span className="text-sm font-medium text-[#111111]">{c.tag}</span>
+                    <span className="text-xs text-[#666666]">×{c.sessions}</span>
                   </div>
                 ))}
               </div>
@@ -139,14 +139,14 @@ export function ProfilePage() {
           {/* Checkpoints */}
           {progress && progress.checkpoints.length > 0 && (
             <Card padding="md">
-              <h3 className="text-sm font-semibold text-[#18181b] mb-3">Прогресс</h3>
+              <h3 className="text-sm font-semibold text-[#111111] mb-3">Прогресс</h3>
               <div className="flex flex-col gap-2">
                 {progress.checkpoints.map((cp, i) => (
                   <div key={i} className="flex items-center gap-3">
                     <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center ${cp.done ? 'bg-[#22c55e]' : 'bg-[#E7E8E5]'}`}>
                       {cp.done && <span className="text-[8px] text-white">✓</span>}
                     </div>
-                    <span className={`text-sm ${cp.done ? 'text-[#18181b]' : 'text-[#94a3b8]'}`}>{cp.title}</span>
+                    <span className={`text-sm ${cp.done ? 'text-[#111111]' : 'text-[#94a3b8]'}`}>{cp.title}</span>
                   </div>
                 ))}
               </div>
@@ -160,19 +160,19 @@ export function ProfilePage() {
           <Card padding="md" dark orangeBorder>
             <div className="flex items-center gap-2 mb-2">
               <Trophy className="w-4 h-4 text-[#FF8400]" />
-              <h3 className="text-sm font-semibold text-[#e2e8f0]">Лига</h3>
+              <h3 className="text-sm font-semibold text-[#CBCCC9]">Лига</h3>
             </div>
             <p className="font-mono text-2xl font-bold text-[#FF8400]">Gold</p>
-            <p className="text-xs text-[#64748b] mt-1">Топ 15% пользователей</p>
+            <p className="text-xs text-[#666666] mt-1">Топ 15% пользователей</p>
           </Card>
 
           {/* Recommendations */}
           {progress && progress.recommendations.length > 0 && (
             <Card padding="md">
-              <h3 className="text-sm font-semibold text-[#18181b] mb-2">Рекомендации</h3>
+              <h3 className="text-sm font-semibold text-[#111111] mb-2">Рекомендации</h3>
               <ul className="space-y-1.5">
                 {progress.recommendations.slice(0, 3).map((r, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-[#64748b]">
+                  <li key={i} className="flex items-start gap-2 text-xs text-[#666666]">
                     <span className="text-[#FF8400] mt-0.5">→</span>
                     {r}
                   </li>

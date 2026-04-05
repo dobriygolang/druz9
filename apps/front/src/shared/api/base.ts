@@ -23,13 +23,13 @@ apiClient.interceptors.request.use((config) => {
 export function withGuestArenaHeaders(actorId?: string, guestName?: string) {
   const headers: Record<string, string> = {}
   if (actorId) headers['X-Arena-Guest-Id'] = actorId
-  if (guestName) headers['X-Arena-Guest-Name'] = btoa(unescape(encodeURIComponent(guestName)))
+  if (guestName) headers['X-Arena-Guest-Name'] = btoa(encodeURIComponent(guestName).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16))))
   return headers
 }
 
 export function withGuestCodeRoomHeaders(guestName?: string) {
   if (!guestName) return {}
-  return { 'X-Code-Editor-Guest-Name': btoa(unescape(encodeURIComponent(guestName))) }
+  return { 'X-Code-Editor-Guest-Name': btoa(encodeURIComponent(guestName).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16)))) }
 }
 
 export interface ListQueryParams {

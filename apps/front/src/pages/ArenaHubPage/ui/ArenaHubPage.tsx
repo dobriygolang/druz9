@@ -42,7 +42,7 @@ export function ArenaHubPage() {
       setInQueue(d.status === 'IN_QUEUE')
       if (d.match?.id) navigate(`/arena/${d.match.id}`)
     }).catch(() => {})
-  }, [])
+  }, [navigate])
 
   const handleJoinQueue = async () => {
     setJoining(true)
@@ -67,7 +67,7 @@ export function ArenaHubPage() {
         <Card padding="md" dark orangeBorder>
           <div className="flex items-center gap-2 mb-3">
             <Flame className="w-5 h-5 text-[#f59e0b]" />
-            <h3 className="text-sm font-bold text-[#e2e8f0]">Arena Queue</h3>
+            <h3 className="text-sm font-bold text-[#CBCCC9]">Arena Queue</h3>
             {inQueue && <Badge variant="warning" dot>В очереди...</Badge>}
           </div>
 
@@ -75,7 +75,7 @@ export function ArenaHubPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-xs text-[#94a3b8]">Ищем соперника</p>
-                <p className="text-xs text-[#64748b] mt-0.5">В очереди: {queueStatus?.queue_size ?? 1} чел.</p>
+                <p className="text-xs text-[#666666] mt-0.5">В очереди: {queueStatus?.queue_size ?? 1} чел.</p>
               </div>
               <Button variant="secondary" size="sm" onClick={handleLeaveQueue} className="bg-[#1e293b] text-[#94a3b8] border-[#334155]">
                 Выйти
@@ -88,13 +88,13 @@ export function ArenaHubPage() {
                   options={[{ value: '', label: 'Любая тема' }, { value: 'arrays', label: 'Arrays' }, { value: 'graphs', label: 'Graphs' }, { value: 'dp', label: 'Dynamic Prog.' }]}
                   value={topic}
                   onChange={setTopic}
-                  className="bg-[#1e293b] border-[#334155] text-[#e2e8f0] text-xs"
+                  className="bg-[#1e293b] border-[#334155] text-[#CBCCC9] text-xs"
                 />
                 <Select
                   options={[{ value: 'DIFFICULTY_EASY', label: 'Easy' }, { value: 'DIFFICULTY_MEDIUM', label: 'Medium' }, { value: 'DIFFICULTY_HARD', label: 'Hard' }]}
                   value={difficulty}
                   onChange={setDifficulty}
-                  className="bg-[#1e293b] border-[#334155] text-[#e2e8f0] text-xs"
+                  className="bg-[#1e293b] border-[#334155] text-[#CBCCC9] text-xs"
                 />
               </div>
               <Button variant="orange" size="md" onClick={handleJoinQueue} loading={joining} className="w-full justify-center">
@@ -107,7 +107,7 @@ export function ArenaHubPage() {
         {/* Open matches */}
         <Card padding="none">
           <div className="px-4 py-3 border-b border-[#CBCCC9] flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-[#18181b]">Открытые матчи</h3>
+            <h3 className="text-sm font-semibold text-[#111111]">Открытые матчи</h3>
             <span className="text-xs text-[#94a3b8]">{openMatches.length}</span>
           </div>
           <div className="divide-y divide-[#CBCCC9]">
@@ -115,10 +115,10 @@ export function ArenaHubPage() {
               <div className="px-4 py-8 text-center text-xs text-[#94a3b8]">Нет открытых матчей</div>
             ) : openMatches.map((m: any, i: number) => (
               <div key={m.id ?? i} className="flex items-center gap-3 px-4 py-2.5">
-                <Swords className="w-4 h-4 text-[#64748b] flex-shrink-0" />
+                <Swords className="w-4 h-4 text-[#666666] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#18181b] truncate">{m.task_title ?? 'Задача'}</p>
-                  <p className="text-xs text-[#64748b]">{m.topic ?? ''} · {m.difficulty ?? ''}</p>
+                  <p className="text-sm font-medium text-[#111111] truncate">{m.task_title ?? 'Задача'}</p>
+                  <p className="text-xs text-[#666666]">{m.topic ?? ''} · {m.difficulty ?? ''}</p>
                 </div>
                 <Button size="sm" variant="secondary" onClick={() => navigate(`/arena/${m.id}`)}>
                   Войти
@@ -135,18 +135,18 @@ export function ArenaHubPage() {
         <Card padding="md" dark orangeBorder>
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="w-4 h-4 text-[#FF8400]" />
-            <h3 className="text-sm font-semibold text-[#e2e8f0]">Лига</h3>
+            <h3 className="text-sm font-semibold text-[#CBCCC9]">Лига</h3>
           </div>
           <div className="text-center py-2">
             <p className="font-mono text-3xl font-bold text-[#FF8400]">Gold</p>
-            <p className="text-xs text-[#64748b] mt-1">1240 очков рейтинга</p>
+            <p className="text-xs text-[#666666] mt-1">1240 очков рейтинга</p>
           </div>
         </Card>
 
         {/* Leaderboard */}
         <Card padding="none">
           <div className="px-4 py-3 border-b border-[#CBCCC9] flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-[#18181b]">Лидерборд</h3>
+            <h3 className="text-sm font-semibold text-[#111111]">Лидерборд</h3>
             <Trophy className="w-4 h-4 text-[#f59e0b]" />
           </div>
           <div className="divide-y divide-[#CBCCC9]">
@@ -163,10 +163,10 @@ export function ArenaHubPage() {
                   <span className="w-5 text-xs font-mono text-[#94a3b8] text-right">{i + 1}</span>
                   <Avatar name={e.display_name ?? '?'} size="xs" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-[#18181b] truncate">{e.display_name}</p>
+                    <p className="text-xs font-medium text-[#111111] truncate">{e.display_name}</p>
                     <p className={`text-[10px] ${LEAGUE_COLORS[e.league] ?? 'text-[#94a3b8]'}`}>{LEAGUE_LABELS[e.league] ?? ''}</p>
                   </div>
-                  <span className="text-xs font-mono text-[#64748b]">{e.rating ?? e.wins ?? 0}</span>
+                  <span className="text-xs font-mono text-[#666666]">{e.rating ?? e.wins ?? 0}</span>
                 </div>
               ))
             }

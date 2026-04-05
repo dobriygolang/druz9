@@ -1,4 +1,5 @@
 import { apiClient, withDefaultListQuery, type ListQueryParams } from '@/shared/api/base'
+import { createCache } from '@/shared/api/cache'
 
 export interface Event {
   id: string
@@ -66,12 +67,21 @@ export interface CreateEventPayload {
   meetingLink?: string
 }
 
+const listEventsCache = createCache<string, { events: Event[]; total: number }>()
+
 export const eventApi = {
   listEvents: async (params?: ListQueryParams & { status?: string; creatorId?: string }): Promise<{ events: Event[]; total: number }> => {
-    const r = await apiClient.get<{ events?: BackendEvent[]; total_count?: number }>('/api/v1/events', {
+    const key = JSON.stringify(params ?? {})
+    const inFlight = listEventsCache.getInFlight(key)
+    if (inFlight) return inFlight
+    const req = apiClient.get<{ events?: BackendEvent[]; total_count?: number }>('/api/v1/events', {
       params: { ...withDefaultListQuery(params), status: params?.status, creator_id: params?.creatorId },
-    })
-    return { events: (r.data.events ?? []).map(normalizeEvent), total: r.data.total_count ?? 0 }
+    }).then(r => {
+      const result = { events: (r.data.events ?? []).map(normalizeEvent), total: r.data.total_count ?? 0 }
+      return result
+    }).finally(() => listEventsCache.deleteInFlight(key))
+    listEventsCache.setInFlight(key, req)
+    return req
   },
   createEvent: async (payload: CreateEventPayload): Promise<Event> => {
     const r = await apiClient.post<{ event: BackendEvent }>('/api/v1/events', {

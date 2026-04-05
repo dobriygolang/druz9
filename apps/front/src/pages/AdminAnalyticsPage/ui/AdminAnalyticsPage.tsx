@@ -3,11 +3,11 @@ import { BarChart2, Users, Code2, Trophy, TrendingUp, Calendar } from 'lucide-re
 
 function StatCard({ label, value, icon, change }: { label: string; value: string | number; icon: React.ReactNode; change?: string }) {
   return (
-    <div className="bg-white rounded-xl border border-[#e2e8f0] p-4 flex items-center gap-4">
-      <div className="w-10 h-10 rounded-xl bg-[#f1f5f9] flex items-center justify-center flex-shrink-0">{icon}</div>
+    <div className="bg-white rounded-xl border border-[#CBCCC9] p-4 flex items-center gap-4">
+      <div className="w-10 h-10 rounded-xl bg-[#F2F3F0] flex items-center justify-center flex-shrink-0">{icon}</div>
       <div>
         <p className="text-2xl font-bold text-[#0f172a] leading-none">{value}</p>
-        <p className="text-xs text-[#64748b] mt-0.5">{label}</p>
+        <p className="text-xs text-[#666666] mt-0.5">{label}</p>
         {change && <p className="text-xs text-[#22c55e] mt-0.5">{change}</p>}
       </div>
     </div>
@@ -22,12 +22,12 @@ export function AdminAnalyticsPage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-xl font-bold text-[#0f172a]">Analytics</h1>
-          <p className="text-sm text-[#64748b] mt-0.5">Статистика платформы</p>
+          <p className="text-sm text-[#666666] mt-0.5">Статистика платформы</p>
         </div>
         <select
           value={period}
           onChange={e => setPeriod(e.target.value)}
-          className="px-3 py-2 text-sm bg-white border border-[#e2e8f0] rounded-lg focus:outline-none"
+          className="px-3 py-2 text-sm bg-white border border-[#CBCCC9] rounded-lg focus:outline-none"
         >
           <option value="7d">Последние 7 дней</option>
           <option value="30d">Последние 30 дней</option>
@@ -45,7 +45,7 @@ export function AdminAnalyticsPage() {
 
       {/* Charts placeholder */}
       <div className="grid grid-cols-2 gap-4">
-        <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
+        <div className="bg-white rounded-xl border border-[#CBCCC9] p-5">
           <h3 className="text-sm font-semibold text-[#0f172a] mb-4 flex items-center gap-2">
             <TrendingUp className="w-4 h-4 text-[#6366f1]" /> Активность пользователей
           </h3>
@@ -58,7 +58,7 @@ export function AdminAnalyticsPage() {
             ))}
           </div>
         </div>
-        <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
+        <div className="bg-white rounded-xl border border-[#CBCCC9] p-5">
           <h3 className="text-sm font-semibold text-[#0f172a] mb-4 flex items-center gap-2">
             <BarChart2 className="w-4 h-4 text-[#FF8400]" /> Типы задач
           </h3>
@@ -70,10 +70,10 @@ export function AdminAnalyticsPage() {
             ].map(item => (
               <div key={item.label}>
                 <div className="flex justify-between text-xs mb-1">
-                  <span className="text-[#64748b]">{item.label}</span>
+                  <span className="text-[#666666]">{item.label}</span>
                   <span className="font-medium text-[#0f172a]">{item.value}%</span>
                 </div>
-                <div className="h-2 bg-[#f1f5f9] rounded-full overflow-hidden">
+                <div className="h-2 bg-[#F2F3F0] rounded-full overflow-hidden">
                   <div className="h-full rounded-full" style={{ width: `${item.value}%`, backgroundColor: item.color }} />
                 </div>
               </div>

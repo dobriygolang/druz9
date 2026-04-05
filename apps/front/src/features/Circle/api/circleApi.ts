@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/base'
+import { createCache } from '@/shared/api/cache'
 import type { Circle } from '@/entities/Circle/model/types'
 
 type BackendCircle = {
@@ -20,10 +21,18 @@ function normalizeCircle(c: BackendCircle): Circle {
   }
 }
 
+const listCirclesCache = createCache<string, Circle[]>()
+
 export const circleApi = {
   listCircles: async (): Promise<Circle[]> => {
-    const r = await apiClient.get<{ circles?: BackendCircle[] }>('/api/v1/circles')
-    return (r.data.circles ?? []).map(normalizeCircle)
+    const key = 'all'
+    const inFlight = listCirclesCache.getInFlight(key)
+    if (inFlight) return inFlight
+    const req = apiClient.get<{ circles?: BackendCircle[] }>('/api/v1/circles')
+      .then(r => (r.data.circles ?? []).map(normalizeCircle))
+      .finally(() => listCirclesCache.deleteInFlight(key))
+    listCirclesCache.setInFlight(key, req)
+    return req
   },
   joinCircle: async (circleId: string): Promise<Circle> => {
     const r = await apiClient.post<{ circle: BackendCircle }>(`/api/v1/circles/${circleId}/join`, {})

@@ -20,8 +20,8 @@ export function Card({ className, children, padding = 'md', dark, border = true,
   return (
     <div
       className={cn(
-        'rounded-2xl',
-        dark ? 'bg-[#0f1629]' : 'bg-white',
+        'rounded-2xl transition-all duration-200',
+        dark ? 'bg-[#0f1629]' : 'bg-white hover:shadow-md',
         border && !orangeBorder && 'border',
         border && !orangeBorder && (dark ? 'border-[#1e293b]' : 'border-[#CBCCC9]'),
         orangeBorder && 'border border-[#FF8400]',

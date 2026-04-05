@@ -36,7 +36,7 @@ export function UsersPage() {
         return (
           <div
             key={user.id}
-            className="flex items-center gap-3.5 px-4 py-3 bg-white rounded-xl border border-[#CBCCC9] hover:border-[#94a3b8] cursor-pointer transition-colors"
+            className="stagger-item flex items-center gap-3.5 px-4 py-3 bg-white rounded-xl border border-[#CBCCC9] hover:border-[#94a3b8] cursor-pointer transition-colors"
           >
             <div className="relative">
               <Avatar name={name} size="md" />
@@ -46,17 +46,17 @@ export function UsersPage() {
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2">
-                <p className="text-sm font-semibold text-[#18181b]">{name}</p>
+                <p className="text-sm font-semibold text-[#111111]">{name}</p>
                 <span className="text-xs text-[#94a3b8]">@{user.username}</span>
               </div>
               <div className="flex items-center gap-3 mt-0.5">
                 {user.region && (
-                  <span className="flex items-center gap-1 text-xs text-[#64748b]">
+                  <span className="flex items-center gap-1 text-xs text-[#666666]">
                     <MapPin className="w-3 h-3" /> {user.region}
                   </span>
                 )}
                 {user.currentWorkplace && (
-                  <span className="flex items-center gap-1 text-xs text-[#64748b]">
+                  <span className="flex items-center gap-1 text-xs text-[#666666]">
                     <Briefcase className="w-3 h-3" /> {user.currentWorkplace}
                   </span>
                 )}

@@ -1,4 +1,5 @@
 import { apiClient, withGuestCodeRoomHeaders } from '@/shared/api/base'
+import { createCache } from '@/shared/api/cache'
 import type { Room, Task } from '@/entities/CodeRoom/model/types'
 
 type BackendRoom = {
@@ -36,10 +37,18 @@ function normalizeRoom(r: BackendRoom): Room {
   }
 }
 
+const listTasksCache = createCache<string, Task[]>()
+
 export const codeRoomApi = {
   listTasks: async (params?: { topic?: string; difficulty?: string }): Promise<Task[]> => {
-    const r = await apiClient.get<{ tasks?: unknown[] }>('/api/v1/code-editor/tasks', { params })
-    return (r.data.tasks ?? []) as Task[]
+    const key = JSON.stringify(params ?? {})
+    const inFlight = listTasksCache.getInFlight(key)
+    if (inFlight) return inFlight
+    const req = apiClient.get<{ tasks?: unknown[] }>('/api/v1/code-editor/tasks', { params })
+      .then(r => (r.data.tasks ?? []) as Task[])
+      .finally(() => listTasksCache.deleteInFlight(key))
+    listTasksCache.setInFlight(key, req)
+    return req
   },
   createRoom: async (payload: { mode?: string; task?: string; name?: string; topic?: string; difficulty?: string }, guestName?: string): Promise<{ room: Room; inviteCode: string }> => {
     const r = await apiClient.post<{ room?: BackendRoom; invite_code?: string }>(

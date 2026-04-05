@@ -21,7 +21,7 @@ export function AdminSidebar() {
   const location = useLocation()
 
   return (
-    <aside className="w-[220px] min-h-screen bg-white border-r border-[#e2e8f0] flex flex-col flex-shrink-0">
+    <aside className="w-[220px] min-h-screen bg-white border-r border-[#CBCCC9] flex flex-col flex-shrink-0">
       <nav className="flex-1 p-2.5 pt-4">
         <p className="px-3 mb-2 text-[10px] font-bold text-[#475569] uppercase tracking-widest">Управление</p>
         {ADMIN_NAV.map((item) => {
@@ -34,7 +34,7 @@ export function AdminSidebar() {
                 'flex items-center gap-2.5 px-3 py-2 rounded-lg text-xs font-medium mb-0.5 transition-colors',
                 active
                   ? 'bg-[#eff6ff] text-[#3730a3]'
-                  : 'text-[#475569] hover:bg-[#f8fafc]',
+                  : 'text-[#475569] hover:bg-[#F2F3F0]',
               )}
             >
               <span className={cn(active && 'text-[#FF8400]')}>{item.icon}</span>

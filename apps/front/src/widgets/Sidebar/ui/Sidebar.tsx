@@ -37,13 +37,13 @@ export function Sidebar() {
       {/* Logo */}
       <div className="h-[88px] flex items-center px-8">
         <div className="flex items-center gap-3">
-          <div className="w-8 h-8 bg-[#FF8400] rounded-lg flex items-center justify-center">
+          <div className="w-8 h-8 bg-[#FF8400] rounded-lg flex items-center justify-center transition-transform duration-200 hover:scale-110">
             <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
               <path d="M3 15L9 3L15 15" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
               <path d="M5.5 11H12.5" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
             </svg>
           </div>
-          <span className="font-mono font-bold text-lg text-[#FF8400] tracking-wider">LUNARIS</span>
+          <span className="font-mono font-bold text-lg text-[#FF8400] tracking-wider">ДРУЗЬЯ</span>
         </div>
       </div>
 
@@ -56,10 +56,10 @@ export function Sidebar() {
               key={item.href}
               to={item.href}
               className={cn(
-                'flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium transition-colors font-geist',
+                'flex items-center gap-3 px-4 py-3 rounded-full text-sm font-medium transition-all duration-200 font-geist',
                 active
-                  ? 'bg-[#CBCCC9] text-[#18181b]'
-                  : 'text-[#64748b] hover:bg-[#D8D9D6] hover:text-[#18181b]',
+                  ? 'bg-[#CBCCC9] text-[#111111]'
+                  : 'text-[#666666] hover:bg-[#D8D9D6] hover:text-[#111111]',
               )}
             >
               {item.icon}
@@ -79,7 +79,7 @@ export function Sidebar() {
               size="sm"
             />
             <div className="flex-1 min-w-0">
-              <p className="text-sm font-medium text-[#18181b] font-geist truncate">{displayName}</p>
+              <p className="text-sm font-medium text-[#111111] font-geist truncate">{displayName}</p>
               {email && <p className="text-xs text-[#666666] font-geist truncate">{email}</p>}
             </div>
             <button

@@ -59,7 +59,7 @@ export function PracticeSoloPage() {
 
       {/* Task table */}
       <div className="bg-white rounded-2xl border border-[#CBCCC9] overflow-hidden">
-        <div className="grid grid-cols-[auto_1fr_auto_auto_auto] items-center px-6 py-3 border-b border-[#CBCCC9] text-xs font-semibold text-[#64748b] uppercase tracking-wide">
+        <div className="grid grid-cols-[auto_1fr_auto_auto_auto] items-center px-6 py-3 border-b border-[#CBCCC9] text-xs font-semibold text-[#666666] uppercase tracking-wide">
           <span className="w-8">#</span>
           <span>Задача</span>
           <span className="w-20 text-center">Теги</span>
@@ -84,9 +84,9 @@ export function PracticeSoloPage() {
             >
               <span className="w-8 text-sm text-[#94a3b8] font-mono">{i + 1}</span>
               <div>
-                <p className="text-sm font-medium text-[#18181b]">{task.title}</p>
+                <p className="text-sm font-medium text-[#111111]">{task.title}</p>
                 {task.topics.length > 0 && (
-                  <p className="text-xs text-[#64748b] mt-0.5">{task.topics.slice(0, 2).join(', ')}</p>
+                  <p className="text-xs text-[#666666] mt-0.5">{task.topics.slice(0, 2).join(', ')}</p>
                 )}
               </div>
               <div className="w-20 flex justify-center" />

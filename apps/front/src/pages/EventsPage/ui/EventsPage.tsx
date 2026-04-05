@@ -60,7 +60,7 @@ export function EventsPage() {
             <div key={i} className="h-[180px] bg-white rounded-2xl border border-[#CBCCC9] animate-pulse" />
           ))
           : events.map((e) => (
-            <Card key={e.id} padding="md" className="flex flex-col gap-3 hover:border-[#94a3b8] transition-colors cursor-pointer">
+            <Card key={e.id} padding="md" className="stagger-item flex flex-col gap-3 hover:border-[#94a3b8] transition-colors cursor-pointer">
               <div className="flex items-start justify-between">
                 <div className="w-10 h-10 rounded-xl bg-[#fff7ed] flex items-center justify-center">
                   <Calendar className="w-5 h-5 text-[#FF8400]" />
@@ -68,18 +68,18 @@ export function EventsPage() {
                 {e.isJoined && <Badge variant="success">Вы идёте</Badge>}
               </div>
               <div>
-                <h3 className="text-sm font-semibold text-[#18181b] line-clamp-2">{e.title}</h3>
+                <h3 className="text-sm font-semibold text-[#111111] line-clamp-2">{e.title}</h3>
                 {e.scheduledAt && (
-                  <p className="text-xs text-[#64748b] mt-1">{formatDate(e.scheduledAt)} · {formatTime(e.scheduledAt)}</p>
+                  <p className="text-xs text-[#666666] mt-1">{formatDate(e.scheduledAt)} · {formatTime(e.scheduledAt)}</p>
                 )}
               </div>
               <div className="flex items-center gap-3 mt-auto">
                 {(e.city || e.placeLabel) && (
-                  <span className="flex items-center gap-1 text-xs text-[#64748b]">
+                  <span className="flex items-center gap-1 text-xs text-[#666666]">
                     <MapPin className="w-3 h-3" /> {e.city || e.placeLabel}
                   </span>
                 )}
-                <span className="flex items-center gap-1 text-xs text-[#64748b] ml-auto">
+                <span className="flex items-center gap-1 text-xs text-[#666666] ml-auto">
                   <Users className="w-3 h-3" /> {e.participantCount}
                 </span>
               </div>

@@ -20,8 +20,8 @@ export function CommunityHubPage() {
       <div className="px-6 pt-6 pb-0 bg-[#F2F3F0]">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#18181b]">Community</h1>
-            <p className="text-sm text-[#64748b] mt-0.5">Найди коллег и единомышленников</p>
+            <h1 className="text-2xl font-bold text-[#111111]">Community</h1>
+            <p className="text-sm text-[#666666] mt-0.5">Найди коллег и единомышленников</p>
           </div>
           {active === 'events' && (
             <Link
@@ -52,8 +52,8 @@ export function CommunityHubPage() {
               to={tab.href}
               className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 active === tab.id
-                  ? 'border-[#FF8400] text-[#18181b]'
-                  : 'border-transparent text-[#64748b] hover:text-[#18181b]'
+                  ? 'border-[#FF8400] text-[#111111]'
+                  : 'border-transparent text-[#666666] hover:text-[#111111]'
               }`}
             >
               {tab.label}

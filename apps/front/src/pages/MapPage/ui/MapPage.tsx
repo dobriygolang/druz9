@@ -48,7 +48,7 @@ export function MapPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder="Поиск участников..."
-              className="w-full pl-9 pr-3 py-2 text-sm bg-[#f8fafc] border border-[#e2e8f0] rounded-lg focus:outline-none"
+              className="w-full pl-9 pr-3 py-2 text-sm bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg focus:outline-none"
             />
           </div>
         </div>
@@ -62,8 +62,8 @@ export function MapPage() {
               <div key={i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-[#F2F3F0] cursor-pointer">
                 <Avatar name={u.name} size="sm" />
                 <div>
-                  <p className="text-sm font-medium text-[#18181b]">{u.name}</p>
-                  <p className="text-xs text-[#64748b]">{u.city}</p>
+                  <p className="text-sm font-medium text-[#111111]">{u.name}</p>
+                  <p className="text-xs text-[#666666]">{u.city}</p>
                 </div>
               </div>
             ))}

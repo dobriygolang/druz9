@@ -43,6 +43,7 @@ export function Avatar({ name = '', src, size = 'md', className, colorIndex }: A
       <img
         src={src}
         alt={name}
+        loading="lazy"
         className={cn('rounded-full object-cover', sizes[size], className)}
       />
     )
