@@ -594,6 +594,10 @@ export function CodeRoomPage() {
     let pendingCursorUpdate: (() => void) | null = null
 
     editor.onDidChangeCursorSelection((e) => {
+      // Suppress awareness during model.setValue (remote code application):
+      // Monaco resets cursor to (1,1) on setValue which would broadcast a bogus
+      // position and make remote users see the cursor jump on every keystroke.
+      if (isApplyingRemoteCode.current) return
       const sel = e.selection
       lastCursorRef.current = { line: sel.positionLineNumber, col: sel.positionColumn }
       const hasSelection = !(
