@@ -160,6 +160,8 @@ export const RouterProvider: React.FC = () => {
             <Route path="/interview-prep/mock/:sessionId" element={<LegacySessionRedirect base="/growth/interview-prep/mock" />} />
             <Route path="/code-rooms" element={<Navigate to="/practice/code-rooms" replace />} />
             <Route path="/vacancies" element={<Navigate to="/community/vacancies" replace />} />
+            <Route path="/settings" element={<Navigate to="/profile" replace />} />
+            <Route path="/admin" element={<Navigate to="/admin/code-tasks" replace />} />
           </Route>
 
           {/* Admin layout */}

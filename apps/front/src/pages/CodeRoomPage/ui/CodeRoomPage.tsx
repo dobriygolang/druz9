@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Play, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, PanelRightClose, PanelRightOpen, Bot } from 'lucide-react'
+import { ArrowLeft, Play, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, Bot } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { useCodeRoomWs } from '@/features/CodeRoom/hooks/useCodeRoomWs'
@@ -160,6 +160,10 @@ export function CodeRoomPage() {
   }
 
   const handleAiReview = () => {
+    if (showAiPanel) {
+      setShowAiPanel(false)
+      return
+    }
     setShowAiPanel(true)
     setAiTab('review')
   }
@@ -264,15 +268,6 @@ export function CodeRoomPage() {
           >
             {copied ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Share2 className="w-3.5 h-3.5" />}
             <span>{copied ? 'Скопировано' : 'Пригласить'}</span>
-          </button>
-
-          {/* Toggle AI panel */}
-          <button
-            onClick={() => setShowAiPanel(prev => !prev)}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#666666] hover:text-[#111111] hover:bg-[#F2F3F0] rounded-lg transition-colors"
-            title={showAiPanel ? 'Скрыть AI панель' : 'Показать AI панель'}
-          >
-            {showAiPanel ? <PanelRightClose className="w-3.5 h-3.5" /> : <PanelRightOpen className="w-3.5 h-3.5" />}
           </button>
 
           <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading}>

@@ -22,6 +22,14 @@ interface ReferralListResponse {
   hasNextPage: boolean
 }
 
+const EMPLOYMENT_TYPE_LABELS: Record<string, string> = {
+  EMPLOYMENT_TYPE_FULL_TIME:   'Full-time',
+  EMPLOYMENT_TYPE_PART_TIME:   'Part-time',
+  EMPLOYMENT_TYPE_CONTRACT:    'Contract',
+  EMPLOYMENT_TYPE_INTERNSHIP:  'Internship',
+  EMPLOYMENT_TYPE_REMOTE:      'Remote',
+}
+
 function normalize(raw: ReferralRaw): Referral {
   return {
     id: raw.id,
@@ -31,7 +39,7 @@ function normalize(raw: ReferralRaw): Referral {
     description: raw.description,
     experience: raw.experience,
     location: raw.location,
-    employmentType: raw.employmentType,
+    employmentType: EMPLOYMENT_TYPE_LABELS[raw.employmentType] ?? raw.employmentType,
     creatorId: raw.creatorId,
     createdAt: raw.createdAt,
   }

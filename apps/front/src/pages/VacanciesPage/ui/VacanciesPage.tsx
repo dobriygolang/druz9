@@ -13,10 +13,11 @@ import type { Referral } from '@/entities/Referral/model/types'
 import { useToast } from '@/shared/ui/Toast'
 
 const EMPLOYMENT_TYPES = [
-  { value: 'full-time', label: 'Full-time' },
-  { value: 'part-time', label: 'Part-time' },
-  { value: 'remote', label: 'Remote' },
-  { value: 'contract', label: 'Contract' },
+  { value: 'EMPLOYMENT_TYPE_FULL_TIME',  label: 'Full-time' },
+  { value: 'EMPLOYMENT_TYPE_PART_TIME',  label: 'Part-time' },
+  { value: 'EMPLOYMENT_TYPE_REMOTE',     label: 'Remote' },
+  { value: 'EMPLOYMENT_TYPE_CONTRACT',   label: 'Contract' },
+  { value: 'EMPLOYMENT_TYPE_INTERNSHIP', label: 'Internship' },
 ]
 
 const FILTER_PILLS = ['Все', 'Full-time', 'Part-time', 'Remote', 'Contract'] as const

@@ -6,6 +6,7 @@ import (
 	authmiddleware "api/internal/middleware"
 	adminv1 "api/pkg/api/admin/v1"
 	arenav1 "api/pkg/api/arena/v1"
+	circlev1 "api/pkg/api/circle/v1"
 	codeeditorv1 "api/pkg/api/code_editor/v1"
 	eventv1 "api/pkg/api/event/v1"
 	geov1 "api/pkg/api/geo/v1"
@@ -49,6 +50,10 @@ var httpAuthOperations = map[string]struct{}{
 	referralv1.OperationReferralServiceCreateReferral:                    {},
 	referralv1.OperationReferralServiceUpdateReferral:                    {},
 	referralv1.OperationReferralServiceDeleteReferral:                    {},
+	circlev1.OperationCircleServiceListCircles:                           {},
+	circlev1.OperationCircleServiceCreateCircle:                          {},
+	circlev1.OperationCircleServiceJoinCircle:                            {},
+	circlev1.OperationCircleServiceLeaveCircle:                           {},
 	interviewprepv1.OperationInterviewPrepServiceListTasks:               {},
 	interviewprepv1.OperationInterviewPrepServiceStartSession:            {},
 	interviewprepv1.OperationInterviewPrepServiceGetSession:              {},
@@ -168,6 +173,10 @@ var grpcAuthOperations = map[string]struct{}{
 	referralv1.ReferralService_CreateReferral_FullMethodName:                    {},
 	referralv1.ReferralService_UpdateReferral_FullMethodName:                    {},
 	referralv1.ReferralService_DeleteReferral_FullMethodName:                    {},
+	circlev1.CircleService_ListCircles_FullMethodName:                           {},
+	circlev1.CircleService_CreateCircle_FullMethodName:                          {},
+	circlev1.CircleService_JoinCircle_FullMethodName:                            {},
+	circlev1.CircleService_LeaveCircle_FullMethodName:                           {},
 	interviewprepv1.InterviewPrepService_ListTasks_FullMethodName:               {},
 	interviewprepv1.InterviewPrepService_StartSession_FullMethodName:            {},
 	interviewprepv1.InterviewPrepService_GetSession_FullMethodName:              {},

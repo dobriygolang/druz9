@@ -14,6 +14,8 @@ interface DailyTask {
     statement: string
     difficulty: string
     language: string
+    starterCode: string
+    topics: string[]
   }
   date: string
   expires_at: string
@@ -23,12 +25,37 @@ const DIFF_LABELS: Record<string, string> = {
   TASK_DIFFICULTY_EASY: 'Easy',
   TASK_DIFFICULTY_MEDIUM: 'Medium',
   TASK_DIFFICULTY_HARD: 'Hard',
+  '1': 'Easy', '2': 'Medium', '3': 'Hard',
 }
 
 const DIFF_VARIANTS: Record<string, 'success' | 'warning' | 'danger'> = {
   TASK_DIFFICULTY_EASY: 'success',
   TASK_DIFFICULTY_MEDIUM: 'warning',
   TASK_DIFFICULTY_HARD: 'danger',
+  '1': 'success', '2': 'warning', '3': 'danger',
+}
+
+const LANG_MAP: Record<string | number, string> = {
+  1: 'python', 2: 'javascript', 3: 'typescript', 4: 'go', 5: 'rust', 6: 'java',
+  python: 'python', go: 'go', javascript: 'javascript', typescript: 'typescript',
+}
+
+function normalizeTask(raw: any): DailyTask {
+  const t = raw.task ?? {}
+  return {
+    date: raw.date ?? raw.Date ?? '',
+    expires_at: raw.expires_at ?? raw.ExpiresAt ?? '',
+    task: {
+      id: t.id ?? t.ID ?? '',
+      title: t.title ?? t.Title ?? '',
+      slug: t.slug ?? t.Slug ?? '',
+      statement: t.statement ?? t.Statement ?? '',
+      difficulty: String(t.difficulty ?? t.Difficulty ?? ''),
+      language: LANG_MAP[t.language ?? t.Language ?? ''] ?? 'go',
+      starterCode: t.starterCode ?? t.StarterCode ?? '',
+      topics: t.topics ?? t.Topics ?? [],
+    },
+  }
 }
 
 function formatDateRu(dateStr: string): string {
@@ -54,7 +81,9 @@ export function DailyChallengePage() {
   useEffect(() => {
     apiClient.get('/api/v1/code-editor/daily')
       .then(res => {
-        setTask(res.data)
+        const normalized = normalizeTask(res.data)
+        setTask(normalized)
+        if (normalized.task.starterCode) setCode(normalized.task.starterCode)
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
@@ -163,13 +192,13 @@ export function DailyChallengePage() {
           <div className="bg-white rounded-2xl border border-[#CBCCC9] overflow-hidden">
             <div className="h-9 bg-[#1e293b] flex items-center px-4">
               <span className="text-xs text-[#94a3b8] font-mono">
-                solution.{task.task.language === 'python' ? 'py' : task.task.language === 'go' ? 'go' : task.task.language ?? 'py'}
+                solution.{task.task.language === 'python' ? 'py' : task.task.language === 'javascript' ? 'js' : task.task.language === 'typescript' ? 'ts' : task.task.language}
               </span>
             </div>
             <div style={{ minHeight: 400 }}>
               <Editor
                 height="400px"
-                language={task.task.language === 'python' ? 'python' : task.task.language === 'go' ? 'go' : task.task.language ?? 'python'}
+                language={task.task.language}
                 value={code}
                 onChange={v => setCode(v ?? '')}
                 options={{

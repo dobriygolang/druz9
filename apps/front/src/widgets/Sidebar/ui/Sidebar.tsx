@@ -62,7 +62,7 @@ export function Sidebar() {
   const email = user?.telegramUsername ? `@${user.telegramUsername}` : ''
 
   return (
-    <aside className="hidden md:flex w-[64px] lg:w-[220px] min-h-screen bg-[#E7E8E5] border-r border-[#CBCCC9] flex-col flex-shrink-0 transition-all duration-200">
+    <aside className="hidden md:flex w-[64px] lg:w-[220px] h-screen sticky top-0 bg-[#E7E8E5] border-r border-[#CBCCC9] flex-col flex-shrink-0 transition-all duration-200">
       {/* Logo */}
       <div className="h-[72px] flex items-center justify-center lg:justify-start px-3 lg:px-5">
         <div className="flex items-center gap-2.5">
@@ -88,7 +88,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 px-2 lg:px-3 flex flex-col gap-0.5">
+      <nav className="flex-1 overflow-y-auto px-2 lg:px-3 flex flex-col gap-0.5">
         {NAV_ITEMS.map((item) => {
           const active = isActive(item)
           return (

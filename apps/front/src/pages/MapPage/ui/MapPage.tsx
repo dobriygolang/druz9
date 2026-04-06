@@ -9,7 +9,44 @@ import { ENV } from '@/shared/config/env'
 
 const MAP_STYLE = ENV.MAPTILER_KEY
   ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${ENV.MAPTILER_KEY}`
-  : 'https://demotiles.maplibre.org/style.json'
+  : 'https://tiles.openfreemap.org/styles/positron'
+
+// Recolor map layers to match site palette (#F2F3F0 bg, indigo accents)
+function transformMapStyle(_prev: unknown, next: { layers?: unknown[] } & Record<string, unknown>) {
+  if (!next?.layers) return next
+  return {
+    ...next,
+    layers: (next.layers as Record<string, unknown>[]).map(layer => {
+      // Land background
+      if (layer.type === 'background') {
+        return { ...layer, paint: { 'background-color': '#f0f1ee' } }
+      }
+      // Water bodies
+      if (
+        layer.type === 'fill' &&
+        (String(layer.id ?? '').toLowerCase().includes('water') || layer['source-layer'] === 'water')
+      ) {
+        return { ...layer, paint: { ...layer.paint as object, 'fill-color': '#cde0f5', 'fill-outline-color': '#b8cce8' } }
+      }
+      // Waterways (rivers, streams)
+      if (layer.type === 'line' && layer['source-layer'] === 'waterway') {
+        return { ...layer, paint: { ...layer.paint as object, 'line-color': '#b8cce8' } }
+      }
+      // Park / green areas — keep light greenish
+      if (
+        layer.type === 'fill' &&
+        (String(layer.id ?? '').toLowerCase().includes('park') || String(layer.id ?? '').toLowerCase().includes('green') || String(layer.id ?? '').toLowerCase().includes('grass'))
+      ) {
+        return { ...layer, paint: { ...layer.paint as object, 'fill-color': '#e4ede4' } }
+      }
+      // Country / region borders — softer
+      if (layer.type === 'line' && layer['source-layer'] === 'boundary') {
+        return { ...layer, paint: { ...layer.paint as object, 'line-color': '#a0aec0' } }
+      }
+      return layer
+    }),
+  }
+}
 
 export function MapPage() {
   const [points, setPoints] = useState<CommunityPoint[]>([])
@@ -53,7 +90,9 @@ export function MapPage() {
           {...viewState}
           onMove={handleMove}
           mapStyle={MAP_STYLE}
+          transformStyle={transformMapStyle}
           style={{ width: '100%', height: '100%' }}
+          attributionControl={false}
         >
           {filtered.map((p) => (
             <Marker key={p.userId} longitude={p.longitude} latitude={p.latitude} anchor="center">
@@ -62,7 +101,7 @@ export function MapPage() {
                 onMouseEnter={() => setHoveredId(p.userId)}
                 onMouseLeave={() => setHoveredId(null)}
               >
-                <div className="w-3.5 h-3.5 rounded-full bg-[#6366F1] border-2 border-white shadow-md cursor-pointer" />
+                <div className={`w-4 h-4 rounded-full bg-[#6366F1] border-2 border-white shadow-md cursor-pointer transition-transform duration-150 ${hoveredId === p.userId ? 'scale-150' : 'hover:scale-125'}`} />
                 {hoveredId === p.userId && (
                   <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-[#CBCCC9] whitespace-nowrap z-10">
                     <p className="text-xs font-medium text-[#111111]">{p.firstName} {p.lastName}</p>
