@@ -22,9 +22,9 @@ func (r *Repo) CreateRoom(ctx context.Context, room *codeeditordomain.Room) (*co
 
 	_, err = tx.Exec(
 		ctx,
-		`INSERT INTO code_rooms (id, mode, code, code_revision, status, creator_id, invite_code, task_id, duel_topic, created_at, updated_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, NOW(), NOW())`,
-		room.ID, room.Mode, room.Code, room.CodeRevision, room.Status, room.CreatorID, room.InviteCode, room.TaskID, room.DuelTopic,
+		`INSERT INTO code_rooms (id, mode, code, code_revision, status, creator_id, invite_code, task, task_id, duel_topic, created_at, updated_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())`,
+		room.ID, room.Mode, room.Code, room.CodeRevision, room.Status, room.CreatorID, room.InviteCode, room.Task, room.TaskID, room.DuelTopic,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("insert room: %w", err)
@@ -90,6 +90,14 @@ func (r *Repo) SaveCodeSnapshot(ctx context.Context, roomID uuid.UUID, code stri
 	)
 	if err != nil {
 		return fmt.Errorf("save code snapshot: %w", err)
+	}
+	return nil
+}
+
+func (r *Repo) UpdateRoomTask(ctx context.Context, roomID uuid.UUID, task string) error {
+	_, err := r.data.DB.Exec(ctx, `UPDATE code_rooms SET task = $2, updated_at = NOW() WHERE id = $1`, roomID, task)
+	if err != nil {
+		return fmt.Errorf("update room task: %w", err)
 	}
 	return nil
 }

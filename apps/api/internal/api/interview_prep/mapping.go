@@ -23,6 +23,8 @@ func mapPrepType(t model.InterviewPrepType) v1.PrepType {
 		return v1.PrepType_PREP_TYPE_SQL
 	case model.InterviewPrepTypeCodeReview:
 		return v1.PrepType_PREP_TYPE_CODE_REVIEW
+	case model.InterviewPrepTypeBehavioral:
+		return v1.PrepType_PREP_TYPE_BEHAVIORAL
 	default:
 		return v1.PrepType_PREP_TYPE_UNSPECIFIED
 	}
@@ -40,6 +42,8 @@ func unmapPrepType(t v1.PrepType) model.InterviewPrepType {
 		return model.InterviewPrepTypeSQL
 	case v1.PrepType_PREP_TYPE_CODE_REVIEW:
 		return model.InterviewPrepTypeCodeReview
+	case v1.PrepType_PREP_TYPE_BEHAVIORAL:
+		return model.InterviewPrepTypeBehavioral
 	default:
 		return model.InterviewPrepTypeUnknown
 	}

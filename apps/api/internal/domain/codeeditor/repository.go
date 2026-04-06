@@ -32,5 +32,6 @@ type Repository interface {
 	GetTask(ctx context.Context, taskID uuid.UUID) (*Task, error)
 	PickRandomTask(ctx context.Context, topic, difficulty string) (*Task, error)
 	GetLeaderboard(ctx context.Context, limit int32) ([]*LeaderboardEntry, error)
+	UpdateRoomTask(ctx context.Context, roomID uuid.UUID, task string) error
 	ListRoomsForUser(ctx context.Context, userID uuid.UUID) ([]*Room, error)
 }

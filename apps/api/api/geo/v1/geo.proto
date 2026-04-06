@@ -55,6 +55,7 @@ message CommunityMapPoint {
   string first_name = 9;
   string last_name = 10;
   UserActivityStatus activity_status = 11;
+  string telegram_username = 12;
 }
 
 enum UserActivityStatus {

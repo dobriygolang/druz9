@@ -387,20 +387,20 @@ export function PodcastsPage() {
                 <label className="text-xs font-medium text-[#666666] mb-1 block">Название *</label>
                 <input value={uploadTitle} onChange={e => setUploadTitle(e.target.value)}
                   placeholder="Название подкаста"
-                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
               </div>
               <div>
                 <label className="text-xs font-medium text-[#666666] mb-1 block">Автор *</label>
                 <input value={uploadAuthor} onChange={e => setUploadAuthor(e.target.value)}
                   placeholder="Имя автора"
-                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
               </div>
               <div>
                 <label className="text-xs font-medium text-[#666666] mb-1 block">Описание</label>
                 <textarea value={uploadDesc} onChange={e => setUploadDesc(e.target.value)}
                   placeholder="Краткое описание"
                   rows={2}
-                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1] resize-none" />
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] resize-none" />
               </div>
               <div>
                 <label className="text-xs font-medium text-[#666666] mb-1 block">Аудиофайл * (mp3, m4a)</label>

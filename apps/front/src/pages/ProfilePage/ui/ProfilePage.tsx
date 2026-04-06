@@ -538,25 +538,25 @@ export function ProfilePage() {
                 <div>
                   <label className="text-xs font-medium text-[#666666] mb-1 block">Имя</label>
                   <input value={editFirstName} onChange={e => setEditFirstName(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
                 </div>
                 <div>
                   <label className="text-xs font-medium text-[#666666] mb-1 block">Фамилия</label>
                   <input value={editLastName} onChange={e => setEditLastName(e.target.value)}
-                    className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+                    className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
                 </div>
               </div>
               <div>
                 <label className="text-xs font-medium text-[#666666] mb-1 block">Место работы</label>
                 <input value={editWorkplace} onChange={e => setEditWorkplace(e.target.value)}
                   placeholder="Компания"
-                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
               </div>
               <div>
                 <label className="text-xs font-medium text-[#666666] mb-1 block">Регион</label>
                 <input value={editRegion} onChange={e => setEditRegion(e.target.value)}
                   placeholder="Москва, Санкт-Петербург..."
-                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1]" />
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
               </div>
             </div>
             <div className="flex gap-2 mt-5">

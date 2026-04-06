@@ -369,7 +369,7 @@ export function EventsPage() {
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder="Расскажите о событии..."
               rows={3}
-              className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 resize-none"
+              className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 placeholder:text-[#94a3b8] resize-none"
             />
           </div>
 

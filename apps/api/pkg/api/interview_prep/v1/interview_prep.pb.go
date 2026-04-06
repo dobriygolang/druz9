@@ -33,6 +33,7 @@ const (
 	PrepType_PREP_TYPE_SYSTEM_DESIGN PrepType = 3
 	PrepType_PREP_TYPE_SQL           PrepType = 4
 	PrepType_PREP_TYPE_CODE_REVIEW   PrepType = 5
+	PrepType_PREP_TYPE_BEHAVIORAL    PrepType = 6
 )
 
 // Enum value maps for PrepType.
@@ -44,6 +45,7 @@ var (
 		3: "PREP_TYPE_SYSTEM_DESIGN",
 		4: "PREP_TYPE_SQL",
 		5: "PREP_TYPE_CODE_REVIEW",
+		6: "PREP_TYPE_BEHAVIORAL",
 	}
 	PrepType_value = map[string]int32{
 		"PREP_TYPE_UNSPECIFIED":   0,
@@ -52,6 +54,7 @@ var (
 		"PREP_TYPE_SYSTEM_DESIGN": 3,
 		"PREP_TYPE_SQL":           4,
 		"PREP_TYPE_CODE_REVIEW":   5,
+		"PREP_TYPE_BEHAVIORAL":    6,
 	}
 )
 

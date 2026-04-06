@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Code2, Users, Plus, ChevronRight, Copy, Check } from 'lucide-react'
+import { Code2, Users, Plus, ChevronRight, Copy, Check, Lock } from 'lucide-react'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import type { Room } from '@/entities/CodeRoom/model/types'
 import { Card } from '@/shared/ui/Card'
@@ -8,6 +8,7 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Modal } from '@/shared/ui/Modal'
 import { Select } from '@/shared/ui/Select'
+import { useAuth } from '@/app/providers/AuthProvider'
 
 const MODE_LABELS: Record<string, string> = {
   ROOM_MODE_ALL: 'Совместная',
@@ -22,12 +23,14 @@ const STATUS_LABELS: Record<string, { label: string; variant: 'success' | 'warni
 
 export function CodeRoomsPage() {
   const navigate = useNavigate()
+  const { user: authUser } = useAuth()
   const [rooms, setRooms] = useState<Room[]>([])
   const [showCreate, setShowCreate] = useState(false)
   const [creating, setCreating] = useState(false)
   const [mode, setMode] = useState('ROOM_MODE_ALL')
   const [createdRoom, setCreatedRoom] = useState<Room | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+  const [closingId, setClosingId] = useState<string | null>(null)
 
   useEffect(() => {
     codeRoomApi.listRooms().then(setRooms).catch(() => {})
@@ -48,6 +51,14 @@ export function CodeRoomsPage() {
       setCreatedRoom(room)
       setRooms(prev => [room, ...prev])
     } catch {} finally { setCreating(false) }
+  }
+
+  const handleCloseRoom = async (roomId: string) => {
+    setClosingId(roomId)
+    try {
+      await codeRoomApi.closeRoom(roomId)
+      setRooms(prev => prev.map(r => r.id === roomId ? { ...r, status: 'ROOM_STATUS_FINISHED' } : r))
+    } catch {} finally { setClosingId(null) }
   }
 
   const handleGoToRoom = () => {
@@ -114,6 +125,17 @@ export function CodeRoomsPage() {
                 {copiedId === room.id ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Copy className="w-3.5 h-3.5" />}
                 <span className="hidden sm:inline">{copiedId === room.id ? 'Скопировано' : 'Ссылка'}</span>
               </button>
+              {authUser?.id && room.creatorId === authUser.id && room.status !== 'ROOM_STATUS_FINISHED' && (
+                <button
+                  onClick={() => handleCloseRoom(room.id)}
+                  disabled={closingId === room.id}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#ef4444] hover:text-white hover:bg-[#ef4444] rounded-lg transition-colors disabled:opacity-50"
+                  title="Закрыть комнату"
+                >
+                  <Lock className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">{closingId === room.id ? '...' : 'Закрыть'}</span>
+                </button>
+              )}
             </div>
           )
         })}

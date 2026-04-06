@@ -29,7 +29,8 @@ export interface CommunityPoint {
   username: string
   firstName: string
   lastName: string
-  activityStatus: string
+  activityStatus: 'online' | 'recently_active' | 'offline'
+  telegramUsername: string
 }
 
 type BackendCommunityPoint = {
@@ -44,6 +45,20 @@ type BackendCommunityPoint = {
   firstName?: string
   lastName?: string
   activityStatus?: string
+  telegramUsername?: string
+}
+
+const ACTIVITY_STATUS_MAP: Record<string, CommunityPoint['activityStatus']> = {
+  USER_ACTIVITY_STATUS_ONLINE: 'online',
+  USER_ACTIVITY_STATUS_RECENTLY_ACTIVE: 'recently_active',
+  USER_ACTIVITY_STATUS_OFFLINE: 'offline',
+  online: 'online',
+  recently_active: 'recently_active',
+  offline: 'offline',
+}
+
+function normalizeActivityStatus(s?: string): CommunityPoint['activityStatus'] {
+  return ACTIVITY_STATUS_MAP[s ?? ''] ?? 'offline'
 }
 
 export const geoApi = {
@@ -68,7 +83,8 @@ export const geoApi = {
       username: p.username ?? '',
       firstName: p.firstName ?? '',
       lastName: p.lastName ?? '',
-      activityStatus: p.activityStatus ?? 'offline',
+      activityStatus: normalizeActivityStatus(p.activityStatus),
+      telegramUsername: p.telegramUsername ?? '',
     }))
   },
 }

@@ -116,6 +116,7 @@ enum PrepType {
   PREP_TYPE_SYSTEM_DESIGN = 3;
   PREP_TYPE_SQL           = 4;
   PREP_TYPE_CODE_REVIEW   = 5;
+  PREP_TYPE_BEHAVIORAL    = 6;
 }
 
 // ProgrammingLanguage lists all languages supported by the execution sandbox.

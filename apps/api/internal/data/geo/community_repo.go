@@ -19,6 +19,7 @@ SELECT
   COALESCE(u.username, ''),
   COALESCE(u.first_name, ''),
   COALESCE(u.last_name, ''),
+  COALESCE(u.telegram_username, ''),
   CASE
     WHEN COALESCE(u.last_active_at, u.updated_at, u.created_at, NOW()) >= NOW() - INTERVAL '2 minutes' THEN 'online'
     WHEN COALESCE(u.last_active_at, u.updated_at, u.created_at, NOW()) >= NOW() - INTERVAL '15 minutes' THEN 'recently_active'
@@ -51,6 +52,7 @@ LIMIT 250
 			&point.FirstName,
 			&point.LastName,
 			&point.ActivityStatus,
+			&point.TelegramUsername,
 		); err != nil {
 			return nil, fmt.Errorf("scan community map point: %w", err)
 		}

@@ -15,6 +15,7 @@ const (
 	InterviewPrepTypeSystemDesign InterviewPrepType = "system_design"
 	InterviewPrepTypeSQL          InterviewPrepType = "sql"
 	InterviewPrepTypeCodeReview   InterviewPrepType = "code_review"
+	InterviewPrepTypeBehavioral  InterviewPrepType = "behavioral"
 )
 
 func (t InterviewPrepType) String() string {
@@ -33,6 +34,8 @@ func InterviewPrepTypeFromString(v string) InterviewPrepType {
 		return InterviewPrepTypeSQL
 	case "code_review":
 		return InterviewPrepTypeCodeReview
+	case "behavioral":
+		return InterviewPrepTypeBehavioral
 	default:
 		return InterviewPrepTypeUnknown
 	}

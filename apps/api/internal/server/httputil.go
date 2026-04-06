@@ -34,6 +34,16 @@ func writeJSON(w http.ResponseWriter, status int, payload any) {
 	_ = json.NewEncoder(w).Encode(payload)
 }
 
+// Authenticate is the exported version of authenticate for use outside the server package.
+func Authenticate(r *http.Request, auth Authorizer) (*uuid.UUID, bool) {
+	return authenticate(r, auth)
+}
+
+// PathSegment is the exported version of pathSegment for use outside the server package.
+func PathSegment(path, key string, offset int) string {
+	return pathSegment(path, key, offset)
+}
+
 // authenticate extracts and validates a session token, returning the caller's UUID.
 func authenticate(r *http.Request, auth Authorizer) (*uuid.UUID, bool) {
 	if r == nil || auth == nil {

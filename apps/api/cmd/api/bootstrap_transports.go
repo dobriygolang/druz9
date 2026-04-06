@@ -15,6 +15,10 @@ import (
 	profilev1 "api/pkg/api/profile/v1"
 	referralv1 "api/pkg/api/referral/v1"
 
+	"encoding/json"
+	"net/http"
+	"strings"
+
 	"github.com/go-kratos/kratos/v2"
 	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
@@ -82,6 +86,54 @@ func registerManualHTTPRoutes(
 ) {
 	// Realtime WebSocket endpoints (cannot be expressed as proto RPCs).
 	wshandler.Register(httpServer, services.realtimeHub, services.arenaRealtimeHub)
+
+	// Manual code-editor room routes not covered by proto HTTP annotations.
+	auth := services.profileServiceDomain
+	svc := services.codeEditorServiceDomain
+
+	mux := http.NewServeMux()
+	mux.HandleFunc("/api/v1/code-editor/rooms/", func(w http.ResponseWriter, r *http.Request) {
+		path := r.URL.Path
+		// PATCH /api/v1/code-editor/rooms/{room_id} — update room task
+		if r.Method == http.MethodPatch && !strings.HasSuffix(path, "/close") {
+			userID, ok := server.Authenticate(r, auth)
+			if !ok {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			var body struct {
+				Task string `json:"task"`
+			}
+			if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
+				w.WriteHeader(http.StatusBadRequest)
+				return
+			}
+			roomID := server.PathSegment(path, "rooms", 1)
+			if err := svc.SetRoomTaskByString(r.Context(), roomID, userID, body.Task); err != nil {
+				w.WriteHeader(http.StatusForbidden)
+				return
+			}
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		// POST /api/v1/code-editor/rooms/{room_id}/close — close room
+		if r.Method == http.MethodPost && strings.HasSuffix(path, "/close") {
+			userID, ok := server.Authenticate(r, auth)
+			if !ok {
+				w.WriteHeader(http.StatusUnauthorized)
+				return
+			}
+			roomID := server.PathSegment(path, "rooms", 1)
+			if err := svc.CloseRoomByString(r.Context(), roomID, userID); err != nil {
+				w.WriteHeader(http.StatusForbidden)
+				return
+			}
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		http.NotFound(w, r)
+	})
+	httpServer.HandlePrefix("/api/v1/code-editor/rooms/", mux)
 }
 
 func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.Server, services *serviceContext) {

@@ -10,4 +10,5 @@ var (
 	ErrNoAvailableTasks  = errors.New("no available tasks")
 	ErrRoomAlreadyClosed = errors.New("room already finished")
 	ErrForbidden         = errors.New("forbidden")
+	ErrNotRoomCreator    = errors.New("only the room creator can perform this action")
 )

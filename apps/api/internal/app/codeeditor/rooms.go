@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string) (*domain.Room, error) {
+func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string) (*domain.Room, error) {
 	modeEnum := model.RoomModeFromString(mode)
 	if modeEnum != model.RoomModeAll && modeEnum != model.RoomModeDuel {
 		return nil, domain.ErrInvalidMode
@@ -44,6 +44,7 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 		Status:     model.RoomStatusWaiting,
 		CreatorID:  uuid.Nil,
 		InviteCode: inviteCode,
+		Task:       task,
 		TaskID:     taskID,
 		DuelTopic:  topic,
 		CreatedAt:  nowTime,
@@ -65,6 +66,44 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 	room.Participants = []*domain.Participant{participant}
 
 	return s.repo.CreateRoom(ctx, room)
+}
+
+func (s *Service) SetRoomTask(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, task string) error {
+	room, err := s.repo.GetRoom(ctx, roomID)
+	if err != nil {
+		return err
+	}
+	if callerID == nil || room.CreatorID != *callerID {
+		return domain.ErrNotRoomCreator
+	}
+	return s.repo.UpdateRoomTask(ctx, roomID, task)
+}
+
+func (s *Service) CloseRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) error {
+	room, err := s.repo.GetRoom(ctx, roomID)
+	if err != nil {
+		return err
+	}
+	if callerID == nil || room.CreatorID != *callerID {
+		return domain.ErrNotRoomCreator
+	}
+	return s.repo.UpdateRoomStatus(ctx, roomID, model.RoomStatusFinished)
+}
+
+func (s *Service) SetRoomTaskByString(ctx context.Context, roomIDStr string, callerID *uuid.UUID, task string) error {
+	roomID, err := uuid.Parse(roomIDStr)
+	if err != nil {
+		return domain.ErrRoomNotFound
+	}
+	return s.SetRoomTask(ctx, roomID, callerID, task)
+}
+
+func (s *Service) CloseRoomByString(ctx context.Context, roomIDStr string, callerID *uuid.UUID) error {
+	roomID, err := uuid.Parse(roomIDStr)
+	if err != nil {
+		return domain.ErrRoomNotFound
+	}
+	return s.CloseRoom(ctx, roomID, callerID)
 }
 
 func (s *Service) GetRoom(ctx context.Context, roomID uuid.UUID) (*domain.Room, error) {
@@ -129,6 +168,10 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 	room, err := s.repo.GetRoom(ctx, roomID)
 	if err != nil {
 		return nil, err
+	}
+
+	if room.Status == model.RoomStatusFinished {
+		return nil, domain.ErrRoomAlreadyClosed
 	}
 
 	// Для гостей проверяем кэш

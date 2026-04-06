@@ -993,7 +993,7 @@ export function CodeRoomPage() {
                   value={editTaskTitle}
                   onChange={e => setEditTaskTitle(e.target.value)}
                   placeholder="Например: Two Sum"
-                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10"
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#6366F1]/10"
                 />
               </div>
               <div>
@@ -1003,7 +1003,7 @@ export function CodeRoomPage() {
                   onChange={e => setEditTaskStatement(e.target.value)}
                   placeholder="Опишите задачу, входные и выходные данные, примеры..."
                   rows={8}
-                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 resize-none font-mono"
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#6366F1]/10 resize-none font-mono"
                 />
               </div>
             </div>

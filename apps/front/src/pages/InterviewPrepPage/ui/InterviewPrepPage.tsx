@@ -9,12 +9,14 @@ import { useToast } from '@/shared/ui/Toast'
 
 const PREP_TYPE_ICONS: Record<string, React.ReactNode> = {
   coding:        <Code2 className="w-4 h-4 text-[#6366f1]" />,
+  algorithm:     <Cpu className="w-4 h-4 text-[#8b5cf6]" />,
+  sql:           <Database className="w-4 h-4 text-[#a16207]" />,
   system_design: <BookOpen className="w-4 h-4 text-[#6366F1]" />,
   behavioral:    <MessageSquare className="w-4 h-4 text-[#22c55e]" />,
 }
 
 const PREP_TYPE_LABELS: Record<string, string> = {
-  coding: 'Coding', system_design: 'System Design', behavioral: 'Behavioral',
+  coding: 'Coding', algorithm: 'Алгоритмы', sql: 'SQL', system_design: 'System Design', behavioral: 'Behavioral',
 }
 
 const MOCK_STAGES = [
@@ -179,7 +181,7 @@ export function InterviewPrepPage() {
             />
           </div>
           <div className="flex gap-1.5 flex-wrap">
-            {(['', 'coding', 'system_design', 'behavioral'] as const).map(cat => (
+            {(['', 'coding', 'algorithm', 'sql', 'system_design', 'behavioral'] as const).map(cat => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
@@ -228,7 +230,12 @@ export function InterviewPrepPage() {
                         {task.companyTag || 'General'} · {Math.round(task.durationSeconds / 60)} мин
                       </p>
                     </div>
-                    <Badge variant={task.prepType === 'coding' ? 'indigo' : task.prepType === 'system_design' ? 'orange' : 'success'}>
+                    <Badge variant={
+                      task.prepType === 'coding' ? 'indigo' :
+                      task.prepType === 'algorithm' ? 'indigo' :
+                      task.prepType === 'sql' ? 'orange' :
+                      task.prepType === 'system_design' ? 'orange' : 'success'
+                    }>
                       {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
                     </Badge>
                     <ChevronRight className="w-4 h-4 text-[#CBCCC9] flex-shrink-0" />
@@ -241,10 +248,12 @@ export function InterviewPrepPage() {
 
       {/* ── Stats row ────────────────────────────────────────────────── */}
       {tasks.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
           {[
-            { label: 'Задач', value: tasks.length },
+            { label: 'Всего', value: tasks.length },
             { label: 'Coding', value: tasks.filter(t => t.prepType === 'coding').length },
+            { label: 'Алгоритмы', value: tasks.filter(t => t.prepType === 'algorithm').length },
+            { label: 'SQL', value: tasks.filter(t => t.prepType === 'sql').length },
             { label: 'System Design', value: tasks.filter(t => t.prepType === 'system_design').length },
             { label: 'Behavioral', value: tasks.filter(t => t.prepType === 'behavioral').length },
           ].map(s => (

@@ -338,9 +338,10 @@ type CommunityMapPoint struct {
 	Username       string                 `protobuf:"bytes,8,opt,name=username,proto3" json:"username,omitempty"`
 	FirstName      string                 `protobuf:"bytes,9,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
 	LastName       string                 `protobuf:"bytes,10,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	ActivityStatus UserActivityStatus     `protobuf:"varint,11,opt,name=activity_status,json=activityStatus,proto3,enum=geo.v1.UserActivityStatus" json:"activity_status,omitempty"`
-	unknownFields  protoimpl.UnknownFields
-	sizeCache      protoimpl.SizeCache
+	ActivityStatus   UserActivityStatus `protobuf:"varint,11,opt,name=activity_status,json=activityStatus,proto3,enum=geo.v1.UserActivityStatus" json:"activity_status,omitempty"`
+	TelegramUsername string             `protobuf:"bytes,12,opt,name=telegram_username,json=telegramUsername,proto3" json:"telegram_username,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
 }
 
 func (x *CommunityMapPoint) Reset() {
@@ -448,6 +449,13 @@ func (x *CommunityMapPoint) GetActivityStatus() UserActivityStatus {
 		return x.ActivityStatus
 	}
 	return UserActivityStatus_USER_ACTIVITY_STATUS_UNSPECIFIED
+}
+
+func (x *CommunityMapPoint) GetTelegramUsername() string {
+	if x != nil {
+		return x.TelegramUsername
+	}
+	return ""
 }
 
 var File_geo_v1_geo_proto protoreflect.FileDescriptor

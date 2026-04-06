@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Flame, Trophy, Swords, Zap } from 'lucide-react'
 import { apiClient } from '@/shared/api/base'
@@ -36,6 +36,16 @@ export function ArenaHubPage() {
   const [topic, setTopic] = useState('')
   const [difficulty, setDifficulty] = useState('DIFFICULTY_MEDIUM')
   const [error, setError] = useState<string | null>(null)
+  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const refreshQueueStatus = useCallback(() => {
+    apiClient.get('/api/v1/arena/queue/status').then(r => {
+      const d = r.data as any
+      setQueueStatus(d)
+      setInQueue(d.status === 'IN_QUEUE')
+      if (d.match?.id) navigate(`/arena/${d.match.id}`)
+    }).catch(() => {})
+  }, [navigate])
 
   const fetchData = useCallback(() => {
     setError(null)
@@ -51,9 +61,17 @@ export function ArenaHubPage() {
     ]).catch(() => setError('Не удалось загрузить данные'))
   }, [navigate])
 
+  useEffect(() => { fetchData() }, [fetchData])
+
+  // Poll queue status every 3s while in queue
   useEffect(() => {
-    fetchData()
-  }, [fetchData])
+    if (inQueue) {
+      pollRef.current = setInterval(refreshQueueStatus, 3000)
+    } else {
+      if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null }
+    }
+    return () => { if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null } }
+  }, [inQueue, refreshQueueStatus])
 
   const handleJoinQueue = async () => {
     setJoining(true)
@@ -63,6 +81,7 @@ export function ArenaHubPage() {
       setInQueue(true)
       toast('Вы в очереди', 'success')
       if (d.match?.id) navigate(`/arena/${d.match.id}`)
+      else refreshQueueStatus()
     } catch {
       toast('Не удалось встать в очередь', 'error')
     } finally { setJoining(false) }
@@ -89,14 +108,36 @@ export function ArenaHubPage() {
           <div className="flex items-center gap-2 mb-3">
             <Flame className="w-5 h-5 text-[#f59e0b]" />
             <h3 className="text-sm font-bold text-[#111111]">Arena Queue</h3>
-            {inQueue && <Badge variant="warning" dot>В очереди...</Badge>}
+            {inQueue && <span className="px-2 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] text-[11px] font-medium">В очереди</span>}
           </div>
 
           {inQueue ? (
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-xs text-[#666666]">Ищем соперника</p>
-                <p className="text-xs text-[#94a3b8] mt-0.5">В очереди: {queueStatus?.queueSize ?? queueStatus?.queue_size ?? 1} чел.</p>
+            <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                {/* Animated radar rings */}
+                <div className="relative w-10 h-10 flex-shrink-0">
+                  <span className="absolute inset-0 rounded-full bg-[#f59e0b]/20 animate-ping" />
+                  <span className="absolute inset-1 rounded-full bg-[#f59e0b]/30 animate-ping [animation-delay:0.3s]" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <Swords className="w-4 h-4 text-[#f59e0b]" />
+                  </div>
+                </div>
+                <div>
+                  <div className="flex items-center gap-1 text-sm font-semibold text-[#111111]">
+                    Ищем соперника
+                    <span className="flex gap-0.5 ml-1">
+                      <span className="w-1 h-1 rounded-full bg-[#f59e0b] animate-bounce [animation-delay:0ms]" />
+                      <span className="w-1 h-1 rounded-full bg-[#f59e0b] animate-bounce [animation-delay:150ms]" />
+                      <span className="w-1 h-1 rounded-full bg-[#f59e0b] animate-bounce [animation-delay:300ms]" />
+                    </span>
+                  </div>
+                  <p className="text-xs text-[#94a3b8] mt-0.5">
+                    В очереди: {(() => {
+                      const n = queueStatus?.queueSize ?? queueStatus?.queue_size
+                      return (typeof n === 'number' && n > 0) ? `${n} чел.` : '...'
+                    })()}
+                  </p>
+                </div>
               </div>
               <Button variant="secondary" size="sm" onClick={handleLeaveQueue}>
                 Выйти

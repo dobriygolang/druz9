@@ -51,6 +51,7 @@ const PREP_TYPE_ENUM_TO_FRIENDLY: Record<string, string> = {
   PREP_TYPE_SYSTEM_DESIGN: 'system_design',
   PREP_TYPE_SQL: 'sql',
   PREP_TYPE_CODE_REVIEW: 'code_review',
+  PREP_TYPE_BEHAVIORAL: 'behavioral',
 }
 
 const SELF_ASSESSMENT_FRIENDLY_TO_ENUM: Record<string, string> = {

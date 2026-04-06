@@ -53,7 +53,12 @@ function UserMiniProfile({ user, onClose, onNavigate }: {
             />
           </div>
           <h2 className="text-base font-bold text-[#111111]">{name}</h2>
-          <p className="text-sm text-[#94a3b8] mt-0.5">@{user.username}</p>
+          <div className="flex flex-col items-center gap-0.5 mt-0.5">
+            {user.username && <p className="text-sm text-[#94a3b8]">@{user.username}</p>}
+            {user.telegramUsername && (
+              <p className="text-xs text-[#64748b]">TG: @{user.telegramUsername}</p>
+            )}
+          </div>
           <span className={`mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
             status === 'online' ? 'bg-[#e8f9ef] text-[#166534]' :
             status === 'recently_active' ? 'bg-[#fef3c7] text-[#92400e]' :
@@ -117,7 +122,7 @@ export function UsersPage() {
 
   const filtered = users.filter(u => {
     if (!search) return true
-    const name = `${u.firstName} ${u.lastName} ${u.username}`.toLowerCase()
+    const name = `${u.firstName} ${u.lastName} ${u.username} ${u.telegramUsername}`.toLowerCase()
     return name.includes(search.toLowerCase())
   })
 
@@ -139,9 +144,10 @@ export function UsersPage() {
                 />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-2 flex-wrap">
                   <p className="text-sm font-semibold text-[#111111]">{name}</p>
-                  <span className="text-xs text-[#94a3b8]">@{user.username}</span>
+                  {user.username && <span className="text-xs text-[#94a3b8]">@{user.username}</span>}
+                  {user.telegramUsername && <span className="text-xs text-[#64748b]">TG: @{user.telegramUsername}</span>}
                 </div>
                 <div className="flex items-center gap-3 mt-0.5">
                   {user.region && (

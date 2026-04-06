@@ -14,7 +14,9 @@ import (
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
-	CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string) (*codeeditordomain.Room, error)
+	CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string) (*codeeditordomain.Room, error)
+	SetRoomTask(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, task string) error
+	CloseRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) error
 	GetRoom(ctx context.Context, roomID uuid.UUID) (*codeeditordomain.Room, error)
 	JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, name string, isGuest bool) (*codeeditordomain.Room, error)
 	JoinRoomByInviteCode(ctx context.Context, inviteCode string, userID *uuid.UUID, name string, isGuest bool) (*codeeditordomain.Room, error)

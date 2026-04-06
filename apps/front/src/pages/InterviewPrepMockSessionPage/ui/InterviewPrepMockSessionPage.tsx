@@ -1,6 +1,6 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Clock, Send, Sparkles, CheckCircle, AlertTriangle, Zap, Target } from 'lucide-react'
+import { ArrowLeft, Clock, Send, Sparkles, CheckCircle, AlertTriangle, Zap, Target, MessageCircle, Code2 } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { interviewPrepApi } from '@/features/InterviewPrep/api/interviewPrepApi'
 import { Button } from '@/shared/ui/Button'
@@ -44,6 +44,17 @@ const KIND_LANGUAGE: Record<string, string> = {
   coding:      'python',
 }
 
+function normalizeStageStatus(raw: string | undefined): string {
+  if (!raw) return ''
+  const map: Record<string, string> = {
+    MOCK_STAGE_STATUS_PENDING:   'pending',
+    MOCK_STAGE_STATUS_SOLVING:   'solving',
+    MOCK_STAGE_STATUS_QUESTIONS: 'questions',
+    MOCK_STAGE_STATUS_COMPLETED: 'completed',
+  }
+  return map[raw] ?? raw
+}
+
 export function InterviewPrepMockSessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
@@ -57,6 +68,7 @@ export function InterviewPrepMockSessionPage() {
   const [submitting, setSubmitting] = useState(false)
   const [timeLeft, setTimeLeft] = useState(0)
   const [review, setReview] = useState<any>(null)
+  const [testResult, setTestResult] = useState<any>(null)
   const [reviewLoading, setReviewLoading] = useState(false)
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
 
@@ -70,13 +82,14 @@ export function InterviewPrepMockSessionPage() {
 
   const resetStageState = (s: any) => {
     const stage = s?.currentStage ?? s?.current_stage
-    setCode(stage?.task?.starterCode ?? stage?.task?.starter_code ?? '')
+    setCode(stage?.code ?? stage?.task?.starterCode ?? stage?.task?.starter_code ?? '')
     setTextAnswer('')
     setDesignNotes('')
     setDesignComponents('')
     setDesignApis('')
     setDesignSchema('')
     setReview(null)
+    setTestResult(null)
     const dur = stage?.task?.durationSeconds ?? stage?.task?.duration_seconds
     if (dur) setTimeLeft(dur)
     else setTimeLeft(0)
@@ -92,8 +105,11 @@ export function InterviewPrepMockSessionPage() {
   const formatTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`
 
   const currentStage = session?.currentStage ?? session?.current_stage
+  const stageStatus = normalizeStageStatus(currentStage?.status)
+  const isInQuestionsPhase = stageStatus === 'questions'
+  const currentQuestion = currentStage?.currentQuestion ?? currentStage?.current_question
   const stageKind = normalizeKind(currentStage?.kind)
-  const editorLang = KIND_LANGUAGE[stageKind] ?? (currentStage?.task?.language ?? 'python')
+  const editorLang = KIND_LANGUAGE[stageKind] ?? (currentStage?.solveLanguage ?? currentStage?.task?.language ?? 'python')
   const stages: any[] = session?.stages ?? []
   const companyTag = session?.companyTag ?? session?.company_tag ?? ''
   const currentStageIndex = session?.currentStageIndex ?? session?.current_stage_index ?? 0
@@ -103,21 +119,32 @@ export function InterviewPrepMockSessionPage() {
     if (!sessionId) return
     setSubmitting(true)
     setReviewLoading(true)
+    setTestResult(null)
+    setReview(null)
     try {
       let result: any
-      if (stageKind === 'system_design') {
+
+      if (isInQuestionsPhase) {
+        // Question answering phase — send text answer, get AI review
+        result = await interviewPrepApi.answerMockQuestion(sessionId, textAnswer)
+        if (result?.review) setReview(result.review)
+      } else if (stageKind === 'system_design') {
         result = await interviewPrepApi.submitMockSystemDesignReview(sessionId, {
           notes: designNotes,
           components: designComponents,
           apis: designApis,
           databaseSchema: designSchema,
         })
+        if (result?.review) setReview(result.review)
       } else if (CODE_KINDS.has(stageKind)) {
         result = await interviewPrepApi.submitMockSession(sessionId, code, editorLang)
+        // Store test execution result for display even when review is absent
+        if (result?.result) setTestResult(result.result)
+        if (result?.review) setReview(result.review)
       } else {
         result = await interviewPrepApi.answerMockQuestion(sessionId, textAnswer)
+        if (result?.review) setReview(result.review)
       }
-      if (result?.review) setReview(result.review)
 
       const updated = await interviewPrepApi.getMockSession(sessionId) as any
       setSession(updated)
@@ -125,7 +152,15 @@ export function InterviewPrepMockSessionPage() {
       const updatedIdx = updated?.currentStageIndex ?? updated?.current_stage_index ?? 0
       const updatedFinished = updated?.status === 'MOCK_SESSION_STATUS_FINISHED' || updated?.status === 'finished'
       if (!updatedFinished && updatedIdx !== currentStageIndex) {
+        // Stage advanced — reset for next stage
         resetStageState(updated)
+      } else {
+        // Same stage — check if moved to questions phase (clear text answer for next question)
+        const updatedStage = updated?.currentStage ?? updated?.current_stage
+        const updatedStatus = normalizeStageStatus(updatedStage?.status)
+        if (updatedStatus === 'questions') {
+          setTextAnswer('')
+        }
       }
     } catch {
       // silently handle
@@ -140,6 +175,9 @@ export function InterviewPrepMockSessionPage() {
     registerDarkTheme(monaco)
     monaco.editor.setTheme('druzya-dark')
   }, [])
+
+  // Determine what the submit button does and its label
+  const submitLabel = isInQuestionsPhase ? 'Ответить' : 'Завершить этап'
 
   return (
     <div className="flex flex-col h-screen bg-[#F2F3F0] overflow-hidden">
@@ -174,7 +212,7 @@ export function InterviewPrepMockSessionPage() {
           )}
           {!isFinished && (
             <Button variant="orange" size="sm" onClick={handleSubmit} loading={submitting}>
-              <Send className="w-3.5 h-3.5" /> Завершить этап
+              <Send className="w-3.5 h-3.5" /> {submitLabel}
             </Button>
           )}
         </div>
@@ -208,13 +246,25 @@ export function InterviewPrepMockSessionPage() {
               })}
             </div>
             {currentStage && !isFinished && (
-              <p className="text-[10px] text-[#94a3b8] mt-1.5 font-medium uppercase tracking-wide">
-                {STAGE_KIND_LABELS[stageKind] ?? stageKind}
-              </p>
+              <div className="flex items-center gap-1.5 mt-1.5">
+                <p className="text-[10px] text-[#94a3b8] font-medium uppercase tracking-wide">
+                  {STAGE_KIND_LABELS[stageKind] ?? stageKind}
+                </p>
+                {isInQuestionsPhase && (
+                  <span className="flex items-center gap-1 text-[10px] text-[#6366F1] font-medium">
+                    <MessageCircle className="w-2.5 h-2.5" /> Вопрос
+                  </span>
+                )}
+                {!isInQuestionsPhase && CODE_KINDS.has(stageKind) && (
+                  <span className="flex items-center gap-1 text-[10px] text-[#94a3b8] font-medium">
+                    <Code2 className="w-2.5 h-2.5" /> Кодинг
+                  </span>
+                )}
+              </div>
             )}
           </div>
 
-          {/* Content */}
+          {/* Content: task statement OR current question */}
           <div className="flex-1 overflow-y-auto p-4">
             {isFinished ? (
               <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
@@ -227,6 +277,19 @@ export function InterviewPrepMockSessionPage() {
                   Вернуться
                 </Button>
               </div>
+            ) : isInQuestionsPhase && currentQuestion ? (
+              <>
+                <div className="flex items-center gap-1.5 mb-3">
+                  <MessageCircle className="w-3.5 h-3.5 text-[#6366F1]" />
+                  <span className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide">Вопрос от интервьюера</span>
+                </div>
+                <p className="text-sm text-[#111111] leading-relaxed font-medium">
+                  {currentQuestion.prompt}
+                </p>
+                <p className="text-xs text-[#94a3b8] mt-3 leading-relaxed">
+                  Ответьте на вопрос в поле справа. После ответа AI оценит вашу реакцию.
+                </p>
+              </>
             ) : (
               <>
                 <h2 className="text-base font-bold text-[#111111] mb-3">
@@ -245,6 +308,17 @@ export function InterviewPrepMockSessionPage() {
           {isFinished ? (
             <div className="flex-1 flex items-center justify-center bg-[#F2F3F0]">
               <p className="text-sm text-[#94a3b8]">Все этапы завершены</p>
+            </div>
+          ) : isInQuestionsPhase ? (
+            // Questions phase: always show text area regardless of stage kind
+            <div className="flex-1 flex flex-col p-5 bg-[#F2F3F0]">
+              <label className="text-xs font-semibold text-[#475569] mb-2 block">Ваш ответ</label>
+              <textarea
+                value={textAnswer}
+                onChange={e => setTextAnswer(e.target.value)}
+                placeholder="Напишите ваш ответ на вопрос..."
+                className="flex-1 w-full px-4 py-3 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1] leading-relaxed"
+              />
             </div>
           ) : CODE_KINDS.has(stageKind) ? (
             <>
@@ -312,19 +386,61 @@ export function InterviewPrepMockSessionPage() {
               </div>
             ) : review ? (
               <ReviewPanel review={review} stageKind={stageKind} />
+            ) : testResult ? (
+              <TestResultPanel testResult={testResult} />
             ) : (
               <div className="flex flex-col items-center justify-center h-full gap-3 text-center">
                 <div className="w-10 h-10 rounded-full bg-[#F2F3F0] flex items-center justify-center">
                   <Sparkles className="w-5 h-5 text-[#CBCCC9]" />
                 </div>
                 <p className="text-sm text-[#666666] leading-relaxed">
-                  Завершите этап, чтобы получить оценку AI
+                  {isInQuestionsPhase
+                    ? 'Ответьте на вопрос, чтобы получить оценку AI'
+                    : 'Завершите этап, чтобы получить оценку AI'}
                 </p>
               </div>
             )}
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function TestResultPanel({ testResult }: { testResult: any }) {
+  const passed: boolean = testResult?.passed ?? false
+  const passedCount: number = testResult?.passedCount ?? 0
+  const totalCount: number = testResult?.totalCount ?? 0
+  const lastError: string = testResult?.lastError ?? ''
+
+  return (
+    <div className="flex flex-col gap-4">
+      <div className="flex items-center gap-3">
+        <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${passed ? 'bg-[#22c55e]' : 'bg-[#ef4444]'}`}>
+          {passed
+            ? <CheckCircle className="w-6 h-6 text-white" />
+            : <AlertTriangle className="w-6 h-6 text-white" />}
+        </div>
+        <div>
+          <p className="text-sm font-bold text-[#111111]">{passed ? 'Тесты прошли' : 'Тесты не прошли'}</p>
+          {totalCount > 0 && (
+            <p className="text-xs text-[#666666]">{passedCount} из {totalCount} тестов</p>
+          )}
+        </div>
+      </div>
+
+      {lastError && (
+        <div className="bg-[#fef2f2] border border-[#fecaca] rounded-lg p-3">
+          <p className="text-xs font-semibold text-[#ef4444] mb-1">Ошибка</p>
+          <p className="text-xs text-[#7f1d1d] font-mono leading-relaxed break-all">{lastError}</p>
+        </div>
+      )}
+
+      {passed && (
+        <p className="text-sm text-[#475569] leading-relaxed">
+          Отлично! Теперь ответь на вопрос интервьюера в левой панели.
+        </p>
+      )}
     </div>
   )
 }

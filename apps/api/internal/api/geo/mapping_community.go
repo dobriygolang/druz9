@@ -29,6 +29,7 @@ func mapCommunityMapResponse(resp *model.CommunityMapResponse) *v1.CommunityMapR
 			FirstName:        point.FirstName,
 			LastName:         point.LastName,
 			ActivityStatus:   mapActivityStatus(point.ActivityStatus),
+			TelegramUsername: point.TelegramUsername,
 		})
 	}
 

@@ -2,7 +2,6 @@ package seeds
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -15,29 +14,17 @@ import (
 
 const interviewPrepSeedName = "interview_prep_pack"
 const interviewPrepCatalogPath = "scripts/seeds/catalogs/interview_prep.json"
-const interviewPrepOzonCatalogPath = "scripts/seeds/catalogs/ozon/interview_prep_ozon.json"
-const interviewPrepSeedVersion = "v6-ozon-pack"
+const interviewPrepSeedVersion = "v7-full-rewrite"
 
 func (r *Runner) runInterviewPrep(ctx context.Context) (Result, error) {
 	catalog, rawCatalog, err := loadInterviewPrepCatalog(interviewPrepCatalogPath)
 	if err != nil {
 		return Result{}, err
 	}
-	ozonCatalog, rawOzonCatalog, err := loadInterviewPrepCatalog(interviewPrepOzonCatalogPath)
-	if err != nil {
-		return Result{}, err
-	}
-	catalog.Tasks = append(catalog.Tasks, ozonCatalog.Tasks...)
 	catalog.Tasks = append(catalog.Tasks, generatedInterviewPrepTasks()...)
 
-	generatedCatalog, err := json.Marshal(catalog.Tasks)
-	if err != nil {
-		return Result{}, fmt.Errorf("marshal generated interview prep catalog: %w", err)
-	}
 	checksumPayload := append([]byte{}, rawCatalog...)
-	checksumPayload = append(checksumPayload, rawOzonCatalog...)
 	checksumPayload = append(checksumPayload, []byte("|"+interviewPrepSeedVersion+"|")...)
-	checksumPayload = append(checksumPayload, generatedCatalog...)
 	checksum := digest(checksumPayload)
 	shouldApply, appliedAt, err := r.shouldApply(ctx, interviewPrepSeedName, seedKindCatalog, checksum)
 	if err != nil {
