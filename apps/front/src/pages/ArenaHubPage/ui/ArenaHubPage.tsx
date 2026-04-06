@@ -41,7 +41,7 @@ export function ArenaHubPage() {
     apiClient.get('/api/v1/arena/queue/status').then(r => {
       const d = r.data as any
       setQueueStatus(d)
-      setInQueue(d.status === 'IN_QUEUE')
+      setInQueue(d.status === 'ARENA_QUEUE_STATUS_QUEUED' || d.status === 'ARENA_QUEUE_STATUS_MATCHED')
       if (d.match?.id) navigate(`/arena/${d.match.id}`)
     }).catch(() => {})
   }, [navigate])
@@ -54,7 +54,7 @@ export function ArenaHubPage() {
       apiClient.get('/api/v1/arena/queue/status').then(r => {
         const d = r.data as any
         setQueueStatus(d)
-        setInQueue(d.status === 'IN_QUEUE')
+        setInQueue(d.status === 'ARENA_QUEUE_STATUS_QUEUED' || d.status === 'ARENA_QUEUE_STATUS_MATCHED')
         if (d.match?.id) navigate(`/arena/${d.match.id}`)
       }),
     ]).catch(() => setError('Не удалось загрузить данные'))

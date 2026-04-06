@@ -16,6 +16,13 @@ import (
 // optionalAuthOperations are routes where auth is extracted if present but
 // not required — anonymous access is allowed. All other proto routes require auth.
 var optionalAuthOperations = map[string]struct{}{
+	// Auth flows — must be public (user has no session yet)
+	profilev1.OperationProfileServiceStartYandexAuth:            {},
+	profilev1.OperationProfileServiceYandexAuth:                 {},
+	profilev1.OperationProfileServiceTelegramAuth:               {},
+	profilev1.OperationProfileServiceCreateTelegramAuthChallenge: {},
+	profilev1.OperationProfileServiceConfirmTelegramAuth:        {},
+	profilev1.OperationProfileServiceCompleteRegistration:       {},
 	profilev1.OperationProfileServiceGetProfileByID:             {},
 	codeeditorv1.OperationCodeEditorServiceCreateRoom:           {},
 	codeeditorv1.OperationCodeEditorServiceListTasks:            {},
