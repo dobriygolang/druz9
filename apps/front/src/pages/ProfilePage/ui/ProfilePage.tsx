@@ -1,13 +1,12 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams } from 'react-router-dom'
-import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, X, Check } from 'lucide-react'
+import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, X, Check, Flame } from 'lucide-react'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi } from '@/features/Auth/api/authApi'
 import type { User, ProfileProgress } from '@/entities/User/model/types'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
-import { Card } from '@/shared/ui/Card'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { ActivityHeatmap } from '@/shared/ui/ActivityHeatmap'
 import { AchievementBadges } from '@/shared/ui/AchievementBadges'
@@ -18,138 +17,6 @@ function formatJoinDate(iso: string) {
   try { return new Date(iso).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }) } catch { return '' }
 }
 
-/* ── ELO Ring SVG ──────────────────────────────────────────── */
-function EloRing({ rating, league }: { rating: number; league: string }) {
-  const size = 120
-  const stroke = 8
-  const radius = (size - stroke) / 2
-  const circumference = 2 * Math.PI * radius
-  const maxElo = 3000
-  const progress = Math.min(rating / maxElo, 1)
-  const offset = circumference * (1 - progress)
-
-  return (
-    <div className="flex flex-col items-center">
-      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-        {/* Background ring */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="#1e293b"
-          strokeWidth={stroke}
-        />
-        {/* Foreground ring */}
-        <circle
-          cx={size / 2}
-          cy={size / 2}
-          r={radius}
-          fill="none"
-          stroke="#6366F1"
-          strokeWidth={stroke}
-          strokeLinecap="round"
-          strokeDasharray={circumference}
-          strokeDashoffset={offset}
-          transform={`rotate(-90 ${size / 2} ${size / 2})`}
-          className="transition-all duration-700"
-        />
-        {/* Rating number */}
-        <text
-          x={size / 2}
-          y={size / 2 - 6}
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="fill-[#6366F1]"
-          style={{ fontFamily: 'JetBrains Mono, monospace', fontSize: '22px', fontWeight: 700 }}
-        >
-          {rating}
-        </text>
-        {/* League label */}
-        <text
-          x={size / 2}
-          y={size / 2 + 16}
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="fill-[#94a3b8]"
-          style={{ fontSize: '11px', fontWeight: 500 }}
-        >
-          {league}
-        </text>
-      </svg>
-    </div>
-  )
-}
-
-/* ── Skill Radar Chart SVG ─────────────────────────────────── */
-const SKILL_LABELS = ['Go', 'SQL', 'System Design', 'Algorithms', 'Behavioral']
-
-function SkillRadar({ values }: { values: number[] }) {
-  const size = 200
-  const cx = size / 2
-  const cy = size / 2
-  const maxR = 80
-  const sides = 5
-  const angleStep = (2 * Math.PI) / sides
-  const offset = -Math.PI / 2
-
-  function point(i: number, r: number): [number, number] {
-    const angle = offset + i * angleStep
-    return [cx + r * Math.cos(angle), cy + r * Math.sin(angle)]
-  }
-
-  // Background pentagon outlines
-  const levels = [0.25, 0.5, 0.75, 1]
-  const gridLines = levels.map(l => {
-    const pts = Array.from({ length: sides }, (_, i) => point(i, maxR * l))
-    return pts.map(p => p.join(',')).join(' ')
-  })
-
-  // Axis lines
-  const axes = Array.from({ length: sides }, (_, i) => point(i, maxR))
-
-  // Data polygon
-  const dataPoints = values.map((v, i) => point(i, maxR * Math.min(v, 1)))
-  const dataPoly = dataPoints.map(p => p.join(',')).join(' ')
-
-  // Label positions (pushed slightly outward)
-  const labelPts = Array.from({ length: sides }, (_, i) => point(i, maxR + 20))
-
-  return (
-    <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}>
-      {/* Grid polygons */}
-      {gridLines.map((pts, i) => (
-        <polygon key={i} points={pts} fill="none" stroke="#CBCCC9" strokeWidth={0.5} />
-      ))}
-      {/* Axis lines */}
-      {axes.map((p, i) => (
-        <line key={i} x1={cx} y1={cy} x2={p[0]} y2={p[1]} stroke="#CBCCC9" strokeWidth={0.5} />
-      ))}
-      {/* Data area */}
-      <polygon points={dataPoly} fill="#6366F1" fillOpacity={0.2} stroke="#6366F1" strokeWidth={1.5} />
-      {/* Data dots */}
-      {dataPoints.map((p, i) => (
-        <circle key={i} cx={p[0]} cy={p[1]} r={3} fill="#6366F1" />
-      ))}
-      {/* Labels */}
-      {labelPts.map((p, i) => (
-        <text
-          key={i}
-          x={p[0]}
-          y={p[1]}
-          textAnchor="middle"
-          dominantBaseline="central"
-          className="fill-[#666666]"
-          style={{ fontSize: '10px', fontWeight: 500 }}
-        >
-          {SKILL_LABELS[i]}
-        </text>
-      ))}
-    </svg>
-  )
-}
-
-/* ── Arena stats types ─────────────────────────────────────── */
 interface ArenaStats {
   rating: number
   league: string
@@ -167,7 +34,8 @@ function computeLeague(rating: number): string {
   return 'Алмаз'
 }
 
-/* ── Main component ────────────────────────────────────────── */
+type Tab = 'activity' | 'progress' | 'achievements'
+
 export function ProfilePage() {
   const { userId } = useParams()
   const { user: authUser } = useAuth()
@@ -178,6 +46,7 @@ export function ProfilePage() {
   const [arenaStats, setArenaStats] = useState<ArenaStats | null>(null)
   const [achievements, setAchievements] = useState<Achievement[]>([])
   const [activity, setActivity] = useState<{ date: string; count: number }[]>([])
+  const [activeTab, setActiveTab] = useState<Tab>('activity')
   const [editMode, setEditMode] = useState(false)
   const [editFirstName, setEditFirstName] = useState('')
   const [editLastName, setEditLastName] = useState('')
@@ -204,15 +73,11 @@ export function ProfilePage() {
       .finally(() => setLoading(false))
   }, [targetId, authUser])
 
-  useEffect(() => {
-    fetchProfile()
-  }, [fetchProfile])
+  useEffect(() => { fetchProfile() }, [fetchProfile])
 
-  // Fetch arena stats
   useEffect(() => {
     if (!targetId) return
-    apiClient
-      .get(`/api/v1/arena/stats/${targetId}`)
+    apiClient.get(`/api/v1/arena/stats/${targetId}`)
       .then(res => {
         const s = res.data?.stats ?? res.data
         if (s && typeof s.rating === 'number') setArenaStats(s)
@@ -220,15 +85,13 @@ export function ProfilePage() {
       .catch(() => {})
   }, [targetId])
 
-  // Fetch achievements
   useEffect(() => {
     if (!targetId) return
-    apiClient
-      .get(`/api/v1/profile/${targetId}/achievements`)
+    apiClient.get(`/api/v1/profile/${targetId}/achievements`)
       .then(res => {
         const raw = res.data
         const arr: any[] = Array.isArray(raw) ? raw : Array.isArray(raw?.achievements) ? raw.achievements : []
-        const normalized: Achievement[] = arr.map((a: any, i: number) => ({
+        setAchievements(arr.map((a: any, i: number) => ({
           id: a.id ?? a.ID ?? String(i),
           title: a.title ?? a.Title ?? '',
           description: a.description ?? a.Description ?? '',
@@ -236,17 +99,14 @@ export function ProfilePage() {
           unlocked: a.unlocked ?? a.Unlocked ?? false,
           category: a.category ?? a.Category ?? '',
           unlocked_at: a.unlocked_at ?? a.UnlockedAt,
-        }))
-        setAchievements(normalized)
+        })))
       })
       .catch(() => {})
   }, [targetId])
 
-  // Fetch activity
   useEffect(() => {
     if (!targetId) return
-    apiClient
-      .get(`/api/v1/profile/${targetId}/activity`)
+    apiClient.get(`/api/v1/profile/${targetId}/activity`)
       .then(res => {
         const raw = res.data
         const arr: any[] = Array.isArray(raw) ? raw : Array.isArray(raw?.activity) ? raw.activity : []
@@ -280,24 +140,22 @@ export function ProfilePage() {
       setUser(prev => prev ? { ...prev, firstName: editFirstName, lastName: editLastName, currentWorkplace: editWorkplace, region: editRegion } : prev)
       setEditMode(false)
     } catch {
-      // silently keep modal open
+      // keep modal open
     } finally {
       setSaving(false)
     }
   }
 
-  // Skill values (placeholder)
-  const skillValues = [0.7, 0.5, 0.6, 0.8, 0.45]
-
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchProfile() }} />
 
   if (loading) {
     return (
-      <div className="p-6 animate-pulse space-y-4">
-        <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5 h-[100px]" />
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-white rounded-2xl border border-[#CBCCC9] h-20" />)}
+      <div className="p-4 md:p-6 animate-pulse space-y-3">
+        <div className="bg-white rounded-2xl border border-[#CBCCC9] h-[140px]" />
+        <div className="grid grid-cols-4 gap-3">
+          {Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-white rounded-2xl border border-[#CBCCC9] h-16" />)}
         </div>
+        <div className="bg-white rounded-2xl border border-[#CBCCC9] h-[200px]" />
       </div>
     )
   }
@@ -308,20 +166,49 @@ export function ProfilePage() {
 
   const displayName = `${user.firstName} ${user.lastName}`.trim() || user.username
 
+  const stats = [
+    ...(progress ? [
+      { label: 'Сессий', value: progress.overview.practiceSessions, icon: <Zap className="w-3.5 h-3.5 text-[#6366F1]" />, bg: '#EEF2FF' },
+      { label: 'Стрик', value: `${progress.overview.currentStreakDays}д`, icon: <Flame className="w-3.5 h-3.5 text-[#f59e0b]" />, bg: '#FFFBEB' },
+    ] : []),
+    ...(arenaStats ? [
+      { label: 'Рейтинг', value: arenaStats.rating, icon: <Trophy className="w-3.5 h-3.5 text-[#6366F1]" />, bg: '#EEF2FF' },
+      { label: 'Побед', value: arenaStats.wins, icon: <Swords className="w-3.5 h-3.5 text-[#22c55e]" />, bg: '#F0FDF4' },
+    ] : []),
+  ]
+
+  const tabs: { id: Tab; label: string }[] = [
+    { id: 'activity', label: 'Активность' },
+    { id: 'progress', label: 'Прогресс' },
+    { id: 'achievements', label: 'Достижения' },
+  ]
+
   return (
-    <div className="p-6 flex flex-col gap-4">
-      {/* Profile header */}
-      <Card padding="none">
-        <div className="flex items-start gap-5 p-5 border-b border-[#CBCCC9]">
+    <div className="p-4 md:p-6 flex flex-col gap-4 max-w-3xl mx-auto w-full">
+      {/* Hero card */}
+      <div className="bg-white rounded-2xl border border-[#CBCCC9] overflow-hidden">
+        {/* Top accent strip */}
+        <div className="h-1.5 bg-gradient-to-r from-[#6366F1] via-[#818CF8] to-[#a78bfa]" />
+        <div className="p-5 flex items-start gap-4">
           <Avatar name={displayName} src={user.avatarUrl || undefined} size="xl" className="flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-3 flex-wrap">
-              <h1 className="text-xl font-bold text-[#111111]">{displayName}</h1>
-              {user.isTrusted && <Badge variant="info">Trusted</Badge>}
-              {user.isAdmin && <Badge variant="warning">Admin</Badge>}
+            <div className="flex items-start justify-between gap-2 flex-wrap">
+              <div>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-lg font-bold text-[#111111]">{displayName}</h1>
+                  {user.isTrusted && <Badge variant="info">Trusted</Badge>}
+                  {user.isAdmin && <Badge variant="warning">Admin</Badge>}
+                </div>
+                {user.username && <p className="text-xs text-[#94a3b8] mt-0.5">@{user.username}</p>}
+              </div>
+              {isOwn && (
+                <Button variant="secondary" size="sm" className="flex-shrink-0" onClick={openEdit}>
+                  <Edit3 className="w-3.5 h-3.5" /> Изменить
+                </Button>
+              )}
             </div>
-            {user.username && <p className="text-sm text-[#666666] mt-0.5">@{user.username}</p>}
-            <div className="flex items-center gap-4 mt-2 flex-wrap">
+
+            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2.5">
               {user.region && (
                 <span className="flex items-center gap-1 text-xs text-[#666666]">
                   <MapPin className="w-3 h-3" /> {user.region}
@@ -338,158 +225,184 @@ export function ProfilePage() {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2 mt-3">
-              {user.connectedProviders.includes('telegram') && (
-                <Badge className="bg-[#e8f4fd] text-[#0088cc]">TG</Badge>
-              )}
-              {user.connectedProviders.includes('yandex') && (
-                <Badge className="bg-[#fffbeb] text-[#f59e0b]">YA</Badge>
-              )}
-            </div>
+
+            {(user.connectedProviders.includes('telegram') || user.connectedProviders.includes('yandex')) && (
+              <div className="flex items-center gap-1.5 mt-2.5">
+                {user.connectedProviders.includes('telegram') && (
+                  <span className="px-2 py-0.5 bg-[#e8f4fd] text-[#0088cc] text-[11px] font-medium rounded-full">Telegram</span>
+                )}
+                {user.connectedProviders.includes('yandex') && (
+                  <span className="px-2 py-0.5 bg-[#fffbeb] text-[#f59e0b] text-[11px] font-medium rounded-full">Яндекс</span>
+                )}
+              </div>
+            )}
           </div>
-          {isOwn && (
-            <Button variant="secondary" size="sm" className="flex-shrink-0" onClick={openEdit}>
-              <Edit3 className="w-3.5 h-3.5" /> Редактировать
-            </Button>
+        </div>
+
+        {/* Stats strip */}
+        {stats.length > 0 && (
+          <div className="border-t border-[#F2F3F0] grid divide-x divide-[#F2F3F0]" style={{ gridTemplateColumns: `repeat(${stats.length}, 1fr)` }}>
+            {stats.map(s => (
+              <div key={s.label} className="flex flex-col items-center justify-center gap-0.5 py-3">
+                <div className="flex items-center gap-1.5">
+                  <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: s.bg }}>
+                    {s.icon}
+                  </div>
+                  <span className="text-base font-bold text-[#111111] font-mono">{s.value}</span>
+                </div>
+                <span className="text-[11px] text-[#94a3b8]">{s.label}</span>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* Tabs */}
+      <div className="flex gap-1 bg-[#F2F3F0] p-1 rounded-xl w-fit">
+        {tabs.map(tab => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
+              activeTab === tab.id
+                ? 'bg-white text-[#111111] shadow-sm'
+                : 'text-[#666666] dark:text-[#4d6380] hover:text-[#111111] dark:hover:text-[#e2e8f3]'
+            }`}
+          >
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      {activeTab === 'activity' && (
+        <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
+          <h3 className="text-sm font-semibold text-[#111111] mb-4">Активность за год</h3>
+          {activity.length > 0 ? (
+            <ActivityHeatmap activity={activity} />
+          ) : (
+            <div className="h-20 bg-[#F2F3F0] rounded-xl flex items-center justify-center">
+              <p className="text-xs text-[#94a3b8]">Нет данных об активности</p>
+            </div>
+          )}
+
+          {arenaStats && (
+            <div className="mt-5 pt-5 border-t border-[#F2F3F0]">
+              <h3 className="text-sm font-semibold text-[#111111] mb-3">Арена</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { label: 'Матчей', value: arenaStats.matches },
+                  { label: 'Побед', value: arenaStats.wins },
+                  { label: 'Поражений', value: arenaStats.losses },
+                  { label: 'Winrate', value: `${Math.round(arenaStats.win_rate * 100)}%` },
+                ].map(s => (
+                  <div key={s.label} className="bg-[#F2F3F0] rounded-xl px-3 py-2.5 text-center">
+                    <p className="text-lg font-bold text-[#111111] font-mono">{s.value}</p>
+                    <p className="text-xs text-[#666666] mt-0.5">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+              <div className="mt-3 flex items-center gap-2">
+                <div className="flex-1 bg-[#F2F3F0] rounded-full h-2">
+                  <div
+                    className="h-2 rounded-full bg-[#6366F1]"
+                    style={{ width: `${Math.min(arenaStats.rating / 3000 * 100, 100)}%` }}
+                  />
+                </div>
+                <span className="text-xs font-semibold text-[#6366F1] font-mono">{arenaStats.rating} ELO</span>
+                <span className="text-xs text-[#94a3b8]">· {computeLeague(arenaStats.rating)}</span>
+              </div>
+            </div>
           )}
         </div>
-      </Card>
-
-      {/* Stats grid */}
-      {progress && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[
-            { label: 'Сессий', value: progress.overview.practiceSessions, icon: <Zap className="w-4 h-4 text-[#6366F1]" /> },
-            { label: 'Пройдено', value: progress.overview.practicePassedSessions, icon: <Trophy className="w-4 h-4 text-[#22c55e]" /> },
-            { label: 'Стрик', value: `${progress.overview.currentStreakDays}д`, icon: <Zap className="w-4 h-4 text-[#f59e0b]" /> },
-            { label: 'Mock', value: progress.overview.completedMockSessions, icon: <Briefcase className="w-4 h-4 text-[#6366f1]" /> },
-          ].map(s => (
-            <Card key={s.label} padding="md" className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center">{s.icon}</div>
-              <div>
-                <p className="text-xl font-bold text-[#111111] leading-none">{s.value}</p>
-                <p className="text-xs text-[#666666] mt-0.5">{s.label}</p>
-              </div>
-            </Card>
-          ))}
-        </div>
       )}
 
-      {/* Arena stats row */}
-      {arenaStats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          {[
-            { label: 'Побед', value: arenaStats.wins, icon: <Trophy className="w-4 h-4 text-[#6366F1]" /> },
-            { label: 'Поражений', value: arenaStats.losses, icon: <Swords className="w-4 h-4 text-[#ef4444]" /> },
-            { label: 'Матчей', value: arenaStats.matches, icon: <Swords className="w-4 h-4 text-[#6366f1]" /> },
-            { label: 'Winrate', value: `${Math.round(arenaStats.win_rate * 100)}%`, icon: <Zap className="w-4 h-4 text-[#22c55e]" /> },
-          ].map(s => (
-            <Card key={s.label} padding="md" className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center">{s.icon}</div>
-              <div>
-                <p className="text-xl font-bold text-[#111111] font-mono leading-none">{s.value}</p>
-                <p className="text-xs text-[#666666] mt-0.5">{s.label}</p>
+      {activeTab === 'progress' && (
+        <div className="flex flex-col gap-4">
+          {progress && progress.overview.practiceSessions > 0 && (
+            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
+              <h3 className="text-sm font-semibold text-[#111111] mb-3">Обзор</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {[
+                  { label: 'Сессий', value: progress.overview.practiceSessions },
+                  { label: 'Пройдено', value: progress.overview.practicePassedSessions },
+                  { label: 'Стрик', value: `${progress.overview.currentStreakDays}д` },
+                  { label: 'Mock', value: progress.overview.completedMockSessions },
+                ].map(s => (
+                  <div key={s.label} className="bg-[#F2F3F0] rounded-xl px-3 py-2.5 text-center">
+                    <p className="text-lg font-bold text-[#111111] font-mono">{s.value}</p>
+                    <p className="text-xs text-[#666666] mt-0.5">{s.label}</p>
+                  </div>
+                ))}
               </div>
-            </Card>
-          ))}
-        </div>
-      )}
+            </div>
+          )}
 
-      {/* Activity Heatmap */}
-      <Card padding="md">
-        <h3 className="text-sm font-semibold text-[#111111] mb-3">Активность</h3>
-        {activity.length > 0 ? (
-          <ActivityHeatmap activity={activity} />
-        ) : (
-          <div className="h-20 bg-[#F2F3F0] rounded animate-pulse" />
-        )}
-      </Card>
-
-      <div className="flex flex-col lg:flex-row gap-4">
-        {/* Left column */}
-        <div className="flex-1 flex flex-col gap-4">
-          {/* Companies */}
           {progress && progress.companies.length > 0 && (
-            <Card padding="md">
+            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
               <h3 className="text-sm font-semibold text-[#111111] mb-3">Компании</h3>
               <div className="flex flex-wrap gap-2">
                 {progress.companies.map(c => (
                   <div key={c.tag} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F3F0] rounded-lg">
                     <span className="text-sm font-medium text-[#111111]">{c.tag}</span>
-                    <span className="text-xs text-[#666666]">&times;{c.sessions}</span>
+                    <span className="text-xs text-[#94a3b8]">&times;{c.sessions}</span>
                   </div>
                 ))}
               </div>
-            </Card>
+            </div>
           )}
 
-          {/* Checkpoints */}
           {progress && progress.checkpoints.length > 0 && (
-            <Card padding="md">
+            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
               <h3 className="text-sm font-semibold text-[#111111] mb-3">Прогресс</h3>
               <div className="flex flex-col gap-2">
                 {progress.checkpoints.map((cp, i) => (
-                  <div key={i} className="flex items-center gap-3">
-                    <div className={`w-4 h-4 rounded-full flex-shrink-0 flex items-center justify-center ${cp.done ? 'bg-[#22c55e]' : 'bg-[#E7E8E5]'}`}>
-                      {cp.done && <span className="text-[8px] text-white">&#10003;</span>}
+                  <div key={i} className="flex items-center gap-3 py-1">
+                    <div className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center ${cp.done ? 'bg-[#22c55e]' : 'bg-[#E7E8E5]'}`}>
+                      {cp.done && <Check className="w-3 h-3 text-white" />}
                     </div>
                     <span className={`text-sm ${cp.done ? 'text-[#111111]' : 'text-[#94a3b8]'}`}>{cp.title}</span>
                   </div>
                 ))}
               </div>
-            </Card>
+            </div>
           )}
 
-          {/* Achievements */}
-          {achievements.length > 0 && (
-            <Card padding="md">
-              <AchievementBadges achievements={achievements} />
-            </Card>
-          )}
-
-          {/* Skill Radar */}
-          <Card padding="md">
-            <h3 className="text-sm font-semibold text-[#111111] mb-3">Навыки</h3>
-            <div className="flex justify-center">
-              <SkillRadar values={skillValues} />
-            </div>
-          </Card>
-        </div>
-
-        {/* Right column */}
-        <div className="w-full lg:w-[300px] lg:flex-shrink-0 flex flex-col gap-3">
-          {/* League with ELO ring */}
-          <Card padding="md">
-            <div className="flex items-center gap-2 mb-3">
-              <Trophy className="w-4 h-4 text-[#6366F1]" />
-              <h3 className="text-sm font-semibold text-[#111111]">Лига</h3>
-            </div>
-            {arenaStats ? (
-              <EloRing rating={arenaStats.rating} league={computeLeague(arenaStats.rating)} />
-            ) : (
-              <>
-                <p className="font-mono text-2xl font-bold text-[#6366F1]">--</p>
-                <p className="text-xs text-[#666666] mt-1">Нет данных арены</p>
-              </>
-            )}
-          </Card>
-
-          {/* Recommendations */}
           {progress && progress.recommendations.length > 0 && (
-            <Card padding="md">
-              <h3 className="text-sm font-semibold text-[#111111] mb-2">Рекомендации</h3>
-              <ul className="space-y-1.5">
-                {progress.recommendations.slice(0, 3).map((r, i) => (
-                  <li key={i} className="flex items-start gap-2 text-xs text-[#666666]">
-                    <span className="text-[#6366F1] mt-0.5">&rarr;</span>
+            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
+              <h3 className="text-sm font-semibold text-[#111111] mb-3">Рекомендации</h3>
+              <ul className="space-y-2">
+                {progress.recommendations.map((r, i) => (
+                  <li key={i} className="flex items-start gap-2 text-sm text-[#475569]">
+                    <span className="text-[#6366F1] mt-0.5 flex-shrink-0">&rarr;</span>
                     {r}
                   </li>
                 ))}
               </ul>
-            </Card>
+            </div>
+          )}
+
+          {(!progress || (progress.companies.length === 0 && progress.checkpoints.length === 0)) && (
+            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-12 flex flex-col items-center text-center">
+              <Zap className="w-8 h-8 text-[#CBCCC9] mb-3" />
+              <p className="text-sm text-[#94a3b8]">Данных о прогрессе пока нет</p>
+            </div>
           )}
         </div>
-      </div>
+      )}
+
+      {activeTab === 'achievements' && (
+        <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
+          {achievements.length > 0 ? (
+            <AchievementBadges achievements={achievements} />
+          ) : (
+            <div className="flex flex-col items-center py-10 text-center">
+              <Trophy className="w-8 h-8 text-[#CBCCC9] mb-3" />
+              <p className="text-sm text-[#94a3b8]">Достижения пока не получены</p>
+            </div>
+          )}
+        </div>
+      )}
 
       {/* Edit modal */}
       {editMode && (

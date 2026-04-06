@@ -39,14 +39,41 @@ function injectCursorCSS(safeId: string, hex: string) {
   const [r, g, b] = [hex.slice(1,3), hex.slice(3,5), hex.slice(5,7)].map(h => parseInt(h, 16))
   const style = document.createElement('style')
   style.textContent = [
-    // Line gutter highlight
-    `.remote-line-${safeId}{background:rgba(${r},${g},${b},0.12);border-left:3px solid ${hex};}`,
-    // Selection highlight
-    `.remote-sel-${safeId}{background:rgba(${r},${g},${b},0.30);}`,
-    // Thin cursor bar via ::before on the character at cursor column
-    `.remote-cursor-bar-${safeId}::before{content:'';position:absolute;top:0;left:-1px;width:2px;height:1.2em;background:${hex};pointer-events:none;z-index:10;}`,
+    // Selection highlight only (no full-line background)
+    `.remote-sel-${safeId}{background:rgba(${r},${g},${b},0.25);}`,
   ].join('')
   document.head.appendChild(style)
+}
+
+function buildCursorWidget(
+  userId: string,
+  displayName: string,
+  color: string,
+  cursorLine: number,
+  cursorColumn: number,
+  monaco: typeof Monaco,
+): Monaco.editor.IContentWidget {
+  const domNode = document.createElement('div')
+  domNode.style.cssText = 'position:relative;width:0;height:0;overflow:visible;pointer-events:none;'
+
+  const bar = document.createElement('div')
+  bar.style.cssText = `position:absolute;top:0;left:-1px;width:2px;height:18px;background:${color};pointer-events:none;z-index:20;`
+
+  const chip = document.createElement('div')
+  chip.textContent = displayName
+  chip.style.cssText = `position:absolute;bottom:18px;left:-1px;background:${color};color:#fff;font-size:10px;line-height:14px;padding:1px 5px;border-radius:3px;font-weight:600;white-space:nowrap;font-family:sans-serif;pointer-events:none;z-index:20;`
+
+  domNode.appendChild(bar)
+  domNode.appendChild(chip)
+
+  return {
+    getId: () => `remote-cursor-${userId}`,
+    getDomNode: () => domNode,
+    getPosition: () => ({
+      position: { lineNumber: cursorLine, column: cursorColumn },
+      preference: [monaco.editor.ContentWidgetPositionPreference.EXACT],
+    }),
+  }
 }
 
 const LANGUAGES = [
@@ -132,6 +159,8 @@ export function CodeRoomPage() {
   const skipNextWsUpdate = useRef(false)
   const lastCursorRef = useRef({ line: 1, col: 1 })
   const isCreatorRef = useRef(false)
+  const starterCodeRef = useRef((location.state as { starterCode?: string } | null)?.starterCode ?? '')
+  const sentStarterCode = useRef(false)
 
   // Check if guest name is needed
   useEffect(() => {
@@ -168,6 +197,7 @@ export function CodeRoomPage() {
     displayName: user?.firstName ?? guestNameRef.current ?? 'Guest',
     guestName: guestNameRef.current,
     enabled: !!roomId && !needsGuestName,
+    initialLanguage: getMonacoLanguage((location.state as { language?: string } | null)?.language ?? ''),
     onLeave: useCallback((_userId: string, displayName: string) => {
       addNotification(`${displayName} покинул(-а) комнату`)
     }, [addNotification]),
@@ -214,6 +244,22 @@ export function CodeRoomPage() {
     // Keep React state in sync (model already updated, Monaco won't reset cursor)
     setLocalCode(ws.code)
   }, [ws.code])
+
+  // Initialize starter code once snapshot arrives (only if room is empty)
+  useEffect(() => {
+    if (!ws.gotSnapshot || sentStarterCode.current || !starterCodeRef.current) return
+    sentStarterCode.current = true
+    if (!ws.code) {
+      const model = editorRef.current?.getModel()
+      if (model) {
+        model.setValue(starterCodeRef.current)
+        setLocalCode(starterCodeRef.current)
+        ws.sendUpdate(starterCodeRef.current)
+      } else {
+        setLocalCode(starterCodeRef.current)
+      }
+    }
+  }, [ws.gotSnapshot, ws.code, ws.sendUpdate])
 
   // Update room from room_update WS message (fired on join/leave/status change)
   useEffect(() => {
@@ -291,65 +337,28 @@ export function CodeRoomPage() {
       const safeId = state.userId.replace(/[^a-z0-9]/gi, '_')
       injectCursorCSS(safeId, color)
 
-      // Line gutter highlight
-      newDecorations.push({
-        range: new monaco.Range(state.cursorLine, 1, state.cursorLine, 1),
-        options: {
-          isWholeLine: true,
-          className: `remote-line-${safeId}`,
-          overviewRuler: { color, position: monaco.editor.OverviewRulerLane.Right },
-        },
-      })
-
-      // Thin cursor bar at exact column via ::before pseudo-element
+      // Cursor bar + name chip via content widget (EXACT position)
       const col = state.cursorColumn ?? 1
-      newDecorations.push({
-        range: new monaco.Range(state.cursorLine, col, state.cursorLine, col + 1),
-        options: { beforeContentClassName: `remote-cursor-bar-${safeId}` },
-      })
-
-      const hasSelection =
-        state.selStartLine != null &&
-        state.selEndLine != null &&
-        !(state.selStartLine === state.selEndLine && state.selStartCol === state.selEndCol)
-
-      if (hasSelection) {
-        newDecorations.push({
-          range: new monaco.Range(
-            state.selStartLine!,
-            state.selStartCol ?? 1,
-            state.selEndLine!,
-            state.selEndCol ?? 1,
-          ),
-          options: { className: `remote-sel-${safeId}` },
-        })
-      }
-
-      const domNode = document.createElement('div')
-      domNode.textContent = state.displayName
-      Object.assign(domNode.style, {
-        background: color,
-        color: '#fff',
-        fontSize: '10px',
-        lineHeight: '14px',
-        padding: '1px 5px',
-        borderRadius: '3px',
-        pointerEvents: 'none',
-        fontWeight: '600',
-        whiteSpace: 'nowrap',
-        fontFamily: 'sans-serif',
-        zIndex: '10',
-      })
-      const widget: Monaco.editor.IContentWidget = {
-        getId: () => `remote-cursor-${state.userId}`,
-        getDomNode: () => domNode,
-        getPosition: () => ({
-          position: { lineNumber: state.cursorLine!, column: state.cursorColumn ?? 1 },
-          preference: [monaco.editor.ContentWidgetPositionPreference.ABOVE],
-        }),
-      }
+      const widget = buildCursorWidget(state.userId, state.displayName, color, state.cursorLine, col, monaco)
       editor.addContentWidget(widget)
       widgetsRef.current.set(state.userId, widget)
+
+      // Overview ruler dot so you can spot remote cursor even when scrolled
+      newDecorations.push({
+        range: new monaco.Range(state.cursorLine, col, state.cursorLine, col),
+        options: { overviewRuler: { color, position: monaco.editor.OverviewRulerLane.Right } },
+      })
+
+      // Selection range highlight
+      if (
+        state.selStartLine && state.selEndLine &&
+        !(state.selStartLine === state.selEndLine && (state.selStartCol ?? 1) === (state.selEndCol ?? 1))
+      ) {
+        newDecorations.push({
+          range: new monaco.Range(state.selStartLine, state.selStartCol ?? 1, state.selEndLine, state.selEndCol ?? 1),
+          options: { className: `remote-sel-${safeId}`, isWholeLine: false },
+        })
+      }
     })
 
     if (decorationsRef.current) {
@@ -539,7 +548,7 @@ export function CodeRoomPage() {
           {/* Copy invite link */}
           <button
             onClick={copyInviteLink}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#666666] hover:text-[#111111] hover:bg-[#F2F3F0] rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#666666] dark:text-[#4d6380] hover:text-[#111111] dark:hover:text-[#c8d8ec] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] rounded-lg transition-colors"
             title="Скопировать ссылку-приглашение"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Share2 className="w-3.5 h-3.5" />}

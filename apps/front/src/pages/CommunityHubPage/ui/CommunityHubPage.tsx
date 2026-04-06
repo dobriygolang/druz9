@@ -19,11 +19,11 @@ export function CommunityHubPage() {
   return (
     <div className="flex flex-col h-full min-h-screen">
       {/* Header */}
-      <div className="px-6 pt-6 pb-0 bg-[#F2F3F0]">
+      <div className="px-6 pt-6 pb-0 bg-[#F2F3F0] dark:bg-[#0b0d16]">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h1 className="text-2xl font-bold text-[#111111]">Community</h1>
-            <p className="text-sm text-[#666666] mt-0.5">Найди коллег и единомышленников</p>
+            <h1 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">Community</h1>
+            <p className="text-sm text-[#666666] dark:text-[#4d6380] mt-0.5">Найди коллег и единомышленников</p>
           </div>
           {active === 'people' && (
             <div className="relative">
@@ -32,22 +32,22 @@ export function CommunityHubPage() {
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Поиск людей..."
-                className="pl-9 pr-4 py-2 w-[280px] bg-white border border-[#CBCCC9] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
+                className="pl-9 pr-4 py-2 w-[280px] bg-white dark:bg-[#161c2d] border border-[#CBCCC9] dark:border-[#1a2540] rounded-lg text-sm text-[#111111] dark:text-[#c8d8ec] placeholder-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
               />
             </div>
           )}
         </div>
 
         {/* Tabs */}
-        <div className="flex items-center gap-0 border-b border-[#CBCCC9]">
+        <div className="flex items-center gap-0 border-b border-[#CBCCC9] dark:border-[#1a2540]">
           {TABS.map(tab => (
             <Link
               key={tab.id}
               to={tab.href}
               className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
                 active === tab.id
-                  ? 'border-[#6366F1] text-[#111111]'
-                  : 'border-transparent text-[#666666] hover:text-[#111111]'
+                  ? 'border-[#6366F1] text-[#111111] dark:text-[#e2e8f3]'
+                  : 'border-transparent text-[#666666] dark:text-[#4d6380] hover:text-[#111111] dark:hover:text-[#c8d8ec]'
               }`}
             >
               {tab.label}

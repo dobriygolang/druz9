@@ -253,11 +253,52 @@ export function DailyChallengePage() {
           )}
 
           {review && (
-            <div className="bg-white rounded-xl border border-[#CBCCC9] p-4">
-              <h3 className="text-sm font-semibold mb-2">AI Ревью</h3>
-              <p className="text-xs text-[#666666] whitespace-pre-wrap">
-                {review.review ?? review.feedback ?? JSON.stringify(review)}
-              </p>
+            <div className="bg-white rounded-xl border border-[#CBCCC9] p-5 flex flex-col gap-3">
+              <div className="flex items-center justify-between">
+                <h3 className="text-sm font-semibold text-[#111111]">AI Ревью</h3>
+                {review.score != null && (
+                  <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
+                    review.score >= 8 ? 'bg-[#dcfce7] text-[#16a34a]'
+                    : review.score >= 5 ? 'bg-[#fef9c3] text-[#854d0e]'
+                    : 'bg-[#fee2e2] text-[#dc2626]'
+                  }`}>{review.score}/10</span>
+                )}
+              </div>
+              {(review.summary ?? review.review ?? review.feedback) && (
+                <p className="text-xs text-[#475569] leading-relaxed whitespace-pre-wrap">
+                  {review.summary ?? review.review ?? review.feedback}
+                </p>
+              )}
+              {Array.isArray(review.strengths) && review.strengths.length > 0 && (
+                <div>
+                  <p className="text-[11px] font-semibold text-[#16a34a] uppercase tracking-wide mb-1">Сильные стороны</p>
+                  <ul className="flex flex-col gap-1">
+                    {review.strengths.map((s: string, i: number) => (
+                      <li key={i} className="text-xs text-[#475569] flex gap-2"><span className="text-[#16a34a] flex-shrink-0">✓</span>{s}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {Array.isArray(review.issues) && review.issues.length > 0 && (
+                <div>
+                  <p className="text-[11px] font-semibold text-[#dc2626] uppercase tracking-wide mb-1">Замечания</p>
+                  <ul className="flex flex-col gap-1">
+                    {review.issues.map((s: string, i: number) => (
+                      <li key={i} className="text-xs text-[#475569] flex gap-2"><span className="text-[#dc2626] flex-shrink-0">✗</span>{s}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              {Array.isArray(review.followUpQuestions) && review.followUpQuestions.length > 0 && (
+                <div>
+                  <p className="text-[11px] font-semibold text-[#6366F1] uppercase tracking-wide mb-1">Вопросы для углубления</p>
+                  <ul className="flex flex-col gap-1">
+                    {review.followUpQuestions.map((q: string, i: number) => (
+                      <li key={i} className="text-xs text-[#475569] flex gap-2"><span className="text-[#6366F1] flex-shrink-0">?</span>{q}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           )}
         </div>

@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Users, Code2, TrendingUp, Mic, User, Settings, LogOut, Flame, Shield, Moon, Sun } from 'lucide-react'
+import { Home, Users, Code2, TrendingUp, Mic, User, LogOut, Flame, Shield, Moon, Sun } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
@@ -167,13 +167,6 @@ export function Sidebar() {
                 >
                   <User className="w-4 h-4 text-[#666666] dark:text-[#4d6380]" />
                   Мой профиль
-                </button>
-                <button
-                  onClick={() => { setPopoverOpen(false); navigate('/settings') }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#111111] dark:text-[#c8d8ec] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] transition-colors font-geist"
-                >
-                  <Settings className="w-4 h-4 text-[#666666] dark:text-[#4d6380]" />
-                  Настройки
                 </button>
                 {user.isAdmin && (
                   <button

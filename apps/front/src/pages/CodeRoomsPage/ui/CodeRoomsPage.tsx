@@ -103,7 +103,7 @@ export function CodeRoomsPage() {
               </Link>
               <button
                 onClick={() => copyRoomLink(room.id)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#666666] hover:text-[#111111] hover:bg-[#F2F3F0] rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#666666] dark:text-[#4d6380] hover:text-[#111111] dark:hover:text-[#c8d8ec] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] rounded-lg transition-colors"
                 title="Скопировать ссылку"
               >
                 {copiedId === room.id ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Copy className="w-3.5 h-3.5" />}

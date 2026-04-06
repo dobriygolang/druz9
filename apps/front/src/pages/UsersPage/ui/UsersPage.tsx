@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useOutletContext, useNavigate } from 'react-router-dom'
-import { ChevronRight, MapPin, X, ExternalLink, Briefcase } from 'lucide-react'
+import { ChevronRight, MapPin, X, ExternalLink } from 'lucide-react'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { ErrorState } from '@/shared/ui/ErrorState'
@@ -78,17 +78,6 @@ function UserMiniProfile({ user, onClose, onNavigate }: {
             </div>
           )}
 
-          {user.title && (
-            <div className="flex items-center gap-3 text-sm">
-              <div className="w-8 h-8 rounded-lg bg-[#fff7ed] flex items-center justify-center flex-shrink-0">
-                <Briefcase className="w-4 h-4 text-[#f97316]" />
-              </div>
-              <div>
-                <p className="text-[10px] text-[#94a3b8] uppercase tracking-wide font-medium">Должность</p>
-                <p className="text-sm font-medium text-[#111111]">{user.title}</p>
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Footer */}

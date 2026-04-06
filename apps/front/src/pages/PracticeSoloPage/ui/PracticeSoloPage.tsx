@@ -116,7 +116,7 @@ export function PracticeSoloPage() {
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 ${
               topic === tf.value
                 ? 'bg-[#6366F1] text-white shadow-sm'
-                : 'bg-[#F2F3F0] text-[#666666] hover:bg-[#E7E8E5] hover:text-[#111111]'
+                : 'bg-[#F2F3F0] dark:bg-[#1a2236] text-[#666666] dark:text-[#4d6380] hover:bg-[#E7E8E5] dark:hover:bg-[#1e2d45] hover:text-[#111111] dark:hover:text-[#c8d8ec]'
             }`}
           >
             {tf.label}
@@ -139,7 +139,7 @@ export function PracticeSoloPage() {
             className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 ${
               difficulty === df.value
                 ? 'bg-[#111111] text-white shadow-sm'
-                : 'bg-[#F2F3F0] text-[#666666] hover:bg-[#E7E8E5] hover:text-[#111111]'
+                : 'bg-[#F2F3F0] dark:bg-[#1a2236] text-[#666666] dark:text-[#4d6380] hover:bg-[#E7E8E5] dark:hover:bg-[#1e2d45] hover:text-[#111111] dark:hover:text-[#c8d8ec]'
             }`}
           >
             {df.label}

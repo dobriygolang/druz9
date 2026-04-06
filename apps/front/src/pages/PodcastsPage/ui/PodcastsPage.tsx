@@ -9,7 +9,6 @@ import { useAuth } from '@/app/providers/AuthProvider'
 import { apiClient } from '@/shared/api/base'
 import { useAudioPlayer } from '@/features/Podcast/providers/AudioPlayerProvider'
 
-const CATEGORY_FILTERS = ['Все', 'Технологии', 'Карьера', 'Архитектура', 'DevOps']
 
 function formatDuration(seconds: number) {
   const m = Math.floor(seconds / 60)
@@ -42,7 +41,6 @@ export function PodcastsPage() {
   const { user } = useAuth()
   const player = useAudioPlayer()
   const [podcasts, setPodcasts] = useState<Podcast[]>([])
-  const [activeFilter, setActiveFilter] = useState('Все')
   const [search, setSearch] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [showUpload, setShowUpload] = useState(false)
@@ -232,27 +230,10 @@ export function PodcastsPage() {
             </div>
           )}
 
-          {/* Filter pills + episode list header */}
-          <div className="flex items-center justify-between">
-            <h2 className="font-mono text-base font-semibold text-[#111111]">
-              {player.playing ? 'Последние эпизоды' : 'Все подкасты'}
-            </h2>
-            <div className="flex gap-2">
-              {CATEGORY_FILTERS.map(f => (
-                <button
-                  key={f}
-                  onClick={() => setActiveFilter(f)}
-                  className={`px-3.5 py-1.5 rounded-full text-xs font-medium transition-all duration-200 ${
-                    activeFilter === f
-                      ? 'bg-[#6366F1] text-[#111111]'
-                      : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
-                  }`}
-                >
-                  {f}
-                </button>
-              ))}
-            </div>
-          </div>
+          {/* Episode list header */}
+          <h2 className="font-mono text-base font-semibold text-[#111111]">
+            {player.playing ? 'Последние эпизоды' : 'Все подкасты'}
+          </h2>
 
           {/* Episode list */}
           <div className="flex flex-col gap-2">

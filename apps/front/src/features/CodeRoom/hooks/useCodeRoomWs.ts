@@ -52,6 +52,7 @@ interface UseCodeRoomWsOptions {
   displayName: string
   guestName?: string
   enabled?: boolean
+  initialLanguage?: string
   onLeave?: (userId: string, displayName: string) => void
   onBehaviorEvent?: (userId: string, displayName: string, event: BehaviorEventType) => void
 }
@@ -65,6 +66,7 @@ export interface SelectionInfo {
 
 interface UseCodeRoomWsReturn {
   connected: boolean
+  gotSnapshot: boolean
   code: string
   language: string
   awareness: Map<string, AwarenessState>
@@ -76,7 +78,7 @@ interface UseCodeRoomWsReturn {
 }
 
 export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
-  const { roomId, userId, displayName, guestName, enabled = true, onLeave, onBehaviorEvent } = opts
+  const { roomId, userId, displayName, guestName, enabled = true, initialLanguage, onLeave, onBehaviorEvent } = opts
   const onLeaveRef = useRef(onLeave)
   onLeaveRef.current = onLeave
   const onBehaviorRef = useRef(onBehaviorEvent)
@@ -87,8 +89,9 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   const awarenessId = useRef(Math.floor(Math.random() * 0xffffffff))
 
   const [connected, setConnected] = useState(false)
+  const [gotSnapshot, setGotSnapshot] = useState(false)
   const [code, setCode] = useState('')
-  const [language, setLanguage] = useState('python')
+  const [language, setLanguage] = useState(initialLanguage ?? 'python')
   const [awareness, setAwareness] = useState<Map<string, AwarenessState>>(new Map())
   const [lastSubmission, setLastSubmission] = useState<SubmissionResult | null>(null)
   const [lastRoomUpdate, setLastRoomUpdate] = useState<unknown>(null)
@@ -103,6 +106,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         if (msg.plainText !== undefined) setCode(msg.plainText)
         if (msg.language) setLanguage(msg.language)
         isRemoteUpdate.current = false
+        setGotSnapshot(true)
         break
       }
       case 'update': {
@@ -259,5 +263,5 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     })
   }, [userId, guestName, displayName])
 
-  return { connected, code, language, awareness, lastSubmission, lastRoomUpdate, sendUpdate, sendLanguageChange, sendAwareness }
+  return { connected, gotSnapshot, code, language, awareness, lastSubmission, lastRoomUpdate, sendUpdate, sendLanguageChange, sendAwareness }
 }
