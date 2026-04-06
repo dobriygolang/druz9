@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Search } from 'lucide-react'
+import { Search, Plus, Minus } from 'lucide-react'
 import { Map, Marker, type ViewStateChangeEvent } from 'react-map-gl/maplibre'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import { Avatar } from '@/shared/ui/Avatar'
@@ -92,23 +92,57 @@ export function MapPage() {
           attributionControl={false}
         >
           {filtered.map((p) => (
-            <Marker key={p.userId} longitude={p.longitude} latitude={p.latitude} anchor="center">
+            <Marker key={p.userId} longitude={p.longitude} latitude={p.latitude} anchor="bottom">
               <div
-                className="relative"
+                className="relative flex flex-col items-center cursor-pointer group"
                 onMouseEnter={() => setHoveredId(p.userId)}
                 onMouseLeave={() => setHoveredId(null)}
+                onClick={() => setViewState(v => ({ ...v, longitude: p.longitude, latitude: p.latitude, zoom: Math.min(v.zoom + 3, 14) }))}
               >
-                <div className={`w-4 h-4 rounded-full bg-[#6366F1] border-2 border-white shadow-md cursor-pointer transition-transform duration-150 ${hoveredId === p.userId ? 'scale-150' : 'hover:scale-125'}`} />
+                {/* Tooltip */}
                 {hoveredId === p.userId && (
-                  <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-[#CBCCC9] whitespace-nowrap z-10">
+                  <div className="absolute bottom-full mb-1 px-3 py-1.5 bg-white rounded-lg shadow-lg border border-[#CBCCC9] whitespace-nowrap z-20 pointer-events-none">
                     <p className="text-xs font-medium text-[#111111]">{p.firstName} {p.lastName}</p>
                     {p.region && <p className="text-[10px] text-[#666666]">{p.region}</p>}
                   </div>
                 )}
+                {/* Avatar circle */}
+                <div className="w-10 h-10 rounded-full border-2 border-white shadow-lg overflow-hidden transition-transform duration-150 group-hover:scale-110"
+                  style={{ background: '#6366F1' }}>
+                  {p.avatarUrl
+                    ? <img src={p.avatarUrl} alt="" className="w-full h-full object-cover" />
+                    : <div className="w-full h-full flex items-center justify-center text-white text-sm font-bold">
+                        {(p.firstName?.[0] ?? p.username?.[0] ?? '?').toUpperCase()}
+                      </div>
+                  }
+                </div>
+                {/* Droplet tail */}
+                <div className="w-0 h-0 -mt-px" style={{
+                  borderLeft: '5px solid transparent',
+                  borderRight: '5px solid transparent',
+                  borderTop: '8px solid white',
+                  filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.15))',
+                }} />
               </div>
             </Marker>
           ))}
         </Map>
+
+        {/* Zoom controls */}
+        <div className="absolute top-4 right-4 z-10 flex flex-col gap-1">
+          <button
+            onClick={() => setViewState(v => ({ ...v, zoom: Math.min(v.zoom + 1, 18) }))}
+            className="w-9 h-9 bg-white rounded-xl shadow border border-[#CBCCC9] flex items-center justify-center text-[#111111] hover:bg-[#F2F3F0] hover:border-[#6366F1] transition-colors"
+          >
+            <Plus className="w-4 h-4" />
+          </button>
+          <button
+            onClick={() => setViewState(v => ({ ...v, zoom: Math.max(v.zoom - 1, 1) }))}
+            className="w-9 h-9 bg-white rounded-xl shadow border border-[#CBCCC9] flex items-center justify-center text-[#111111] hover:bg-[#F2F3F0] hover:border-[#6366F1] transition-colors"
+          >
+            <Minus className="w-4 h-4" />
+          </button>
+        </div>
       </div>
 
       {/* Right panel */}

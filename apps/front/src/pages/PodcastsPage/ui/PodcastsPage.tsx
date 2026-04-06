@@ -134,8 +134,19 @@ export function PodcastsPage() {
     return true
   })
 
+  const [uploadError, setUploadError] = useState<string | null>(null)
+
+  // Warn user if they try to leave while uploading
+  useEffect(() => {
+    if (!uploading) return
+    const handler = (e: BeforeUnloadEvent) => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', handler)
+    return () => window.removeEventListener('beforeunload', handler)
+  }, [uploading])
+
   const handleUpload = async () => {
     if (!uploadTitle || !uploadAuthor || !uploadFile) return
+    setUploadError(null)
     setUploading(true)
     try {
       const form = new FormData()
@@ -148,7 +159,7 @@ export function PodcastsPage() {
       setUploadTitle(''); setUploadAuthor(''); setUploadDesc(''); setUploadFile(null)
       fetchPodcasts()
     } catch {
-      // silently keep open
+      setUploadError('Не удалось загрузить подкаст. Попробуйте снова.')
     } finally {
       setUploading(false)
     }
@@ -388,7 +399,7 @@ export function PodcastsPage() {
           <div className="bg-white rounded-2xl shadow-xl border border-[#CBCCC9] w-full max-w-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-base font-bold text-[#111111]">Загрузить подкаст</h2>
-              <button onClick={() => setShowUpload(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]">
+              <button onClick={() => { if (!uploading) setShowUpload(false) }} disabled={uploading} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666] disabled:opacity-30 disabled:cursor-not-allowed">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -419,8 +430,16 @@ export function PodcastsPage() {
                   className="w-full text-sm text-[#666666] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-[#EEF2FF] file:text-[#6366F1] hover:file:bg-[#E0E7FF]" />
               </div>
             </div>
-            <div className="flex gap-2 mt-5">
-              <button onClick={() => setShowUpload(false)}
+            {uploading && (
+              <p className="mt-3 text-xs text-[#f59e0b] font-medium text-center">
+                Идёт загрузка — не закрывайте страницу и модальное окно
+              </p>
+            )}
+            {uploadError && (
+              <p className="mt-2 text-xs text-[#dc2626] text-center">{uploadError}</p>
+            )}
+            <div className="flex gap-2 mt-4">
+              <button onClick={() => { if (!uploading) setShowUpload(false) }} disabled={uploading}
                 className="flex-1 py-2 text-sm font-medium text-[#666666] bg-[#F2F3F0] rounded-xl hover:bg-[#E7E8E5] transition-colors">
                 Отмена
               </button>

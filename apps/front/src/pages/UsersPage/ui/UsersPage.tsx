@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { useOutletContext, useNavigate } from 'react-router-dom'
 import { ChevronRight, MapPin } from 'lucide-react'
 import { Avatar } from '@/shared/ui/Avatar'
 import { ErrorState } from '@/shared/ui/ErrorState'
@@ -12,6 +12,7 @@ const STATUS_COLORS: Record<string, string> = {
 }
 
 export function UsersPage() {
+  const navigate = useNavigate()
   const { search = '' } = useOutletContext<{ search: string }>()
   const [users, setUsers] = useState<CommunityPoint[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -42,7 +43,8 @@ export function UsersPage() {
         return (
           <div
             key={user.userId}
-            className="stagger-item flex items-center gap-3.5 px-4 py-3 bg-white rounded-xl border border-[#CBCCC9] hover:border-[#94a3b8] cursor-pointer transition-colors"
+            onClick={() => navigate(`/profile/${user.userId}`)}
+            className="stagger-item flex items-center gap-3.5 px-4 py-3 bg-white rounded-xl border border-[#CBCCC9] hover:border-[#6366F1] cursor-pointer transition-colors"
           >
             <div className="relative">
               <Avatar name={name} src={user.avatarUrl || undefined} size="md" />

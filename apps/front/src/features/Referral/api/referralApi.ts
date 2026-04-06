@@ -69,7 +69,10 @@ export const referralApi = {
   },
 
   async create(data: CreateReferralData) {
-    const res = await apiClient.post<{ referral: ReferralRaw }>('/api/v1/referrals', { referral: data })
+    // Strip empty employmentType — gRPC-gateway fails to parse "" as a proto enum
+    const payload = { ...data } as Record<string, unknown>
+    if (!payload.employmentType) delete payload.employmentType
+    const res = await apiClient.post<{ referral: ReferralRaw }>('/api/v1/referrals', { referral: payload })
     return normalize(res.data.referral)
   },
 

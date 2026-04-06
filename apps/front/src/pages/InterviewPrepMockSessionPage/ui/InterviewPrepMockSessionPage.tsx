@@ -40,7 +40,7 @@ export function InterviewPrepMockSessionPage() {
       setSession(s)
       resetStageState(s)
     }).catch(() => navigate('/growth/interview-prep'))
-  }, [sessionId, navigate])
+  }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
 
   const resetStageState = (s: any) => {
     const stage = s?.currentStage ?? s?.current_stage

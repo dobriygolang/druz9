@@ -68,7 +68,10 @@ export function EventsPage() {
     if (!form.title || !form.scheduledAt) return
     setCreating(true)
     try {
-      const created = await eventApi.createEvent(form as CreateEventPayload)
+      const scheduledAt = form.scheduledAt && !form.scheduledAt.includes(':00', 16)
+        ? `${form.scheduledAt}:00`
+        : form.scheduledAt
+      const created = await eventApi.createEvent({ ...form, scheduledAt } as CreateEventPayload)
       setEvents(prev => [created, ...prev])
       setShowCreate(false)
       setForm({})

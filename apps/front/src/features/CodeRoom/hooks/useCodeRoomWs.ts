@@ -16,7 +16,7 @@ interface CodeEditorMessage {
   clientId?: string
   awarenessId?: number
   userId?: string
-  code?: string
+  plainText?: string
   language?: string
   awareness?: Record<string, AwarenessState>
   room?: unknown
@@ -78,7 +78,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     switch (msg.type) {
       case 'snapshot': {
         isRemoteUpdate.current = true
-        if (msg.code !== undefined) setCode(msg.code)
+        if (msg.plainText !== undefined) setCode(msg.plainText)
         if (msg.language) setLanguage(msg.language)
         if (msg.awareness) {
           setAwareness(new Map(Object.entries(msg.awareness)))
@@ -88,7 +88,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       }
       case 'update': {
         isRemoteUpdate.current = true
-        if (msg.code !== undefined) setCode(msg.code)
+        if (msg.plainText !== undefined) setCode(msg.plainText)
         isRemoteUpdate.current = false
         break
       }
@@ -166,7 +166,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     socketRef.current?.send({
       type: 'update',
       clientId: clientId.current,
-      code: newCode,
+      plainText: newCode,
     })
   }, [])
 
