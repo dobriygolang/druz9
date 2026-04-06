@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Calendar, MapPin, Users, Plus, Link2, User, X, Clock } from 'lucide-react'
+import { createPortal } from 'react-dom'
+import { Calendar, MapPin, Users, Plus, Link2, User, X, Clock, Trash2 } from 'lucide-react'
 import { useOutletContext } from 'react-router-dom'
 import { eventApi, type Event, type CreateEventPayload } from '@/features/Event/api/eventApi'
 import { Card } from '@/shared/ui/Card'
@@ -23,13 +24,15 @@ function formatTime(iso: string) {
   } catch { return '' }
 }
 
-function EventDetailModal({ event, onClose, onJoin, onLeave }: {
+function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
   event: Event
   onClose: () => void
   onJoin: (id: string) => Promise<void>
   onLeave: (id: string) => Promise<void>
+  onDelete: (id: string) => Promise<void>
 }) {
   const [loading, setLoading] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   const handleAction = async () => {
     setLoading(true)
@@ -41,7 +44,16 @@ function EventDetailModal({ event, onClose, onJoin, onLeave }: {
     }
   }
 
-  return (
+  const handleDelete = async () => {
+    setDeleting(true)
+    try {
+      await onDelete(event.id)
+    } finally {
+      setDeleting(false)
+    }
+  }
+
+  return createPortal(
     <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4">
       <div className="absolute inset-0 bg-[#1e293b]/60 animate-fade-in" onClick={onClose} />
       <div className="relative w-full sm:max-w-lg bg-white sm:rounded-2xl rounded-t-2xl shadow-modal animate-modal-in overflow-hidden flex flex-col max-h-[90vh]">
@@ -156,7 +168,17 @@ function EventDetailModal({ event, onClose, onJoin, onLeave }: {
           <Button variant="secondary" size="sm" onClick={onClose} className="flex-1 justify-center">
             Закрыть
           </Button>
-          {!event.isCreator && (
+          {event.isCreator ? (
+            <Button
+              variant="secondary"
+              size="sm"
+              className="flex-1 justify-center text-[#dc2626] hover:bg-[#fee2e2] hover:border-[#dc2626]"
+              onClick={handleDelete}
+              loading={deleting}
+            >
+              <Trash2 className="w-4 h-4" /> Удалить
+            </Button>
+          ) : (
             <Button
               variant={event.isJoined ? 'secondary' : 'orange'}
               size="sm"
@@ -169,7 +191,8 @@ function EventDetailModal({ event, onClose, onJoin, onLeave }: {
           )}
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }
 
@@ -221,6 +244,17 @@ export function EventsPage() {
       toast('Вы отказались от участия', 'success')
     } catch {
       toast('Не удалось отказаться', 'error')
+    }
+  }
+
+  const handleDelete = async (id: string) => {
+    try {
+      await eventApi.deleteEvent(id)
+      setEvents(prev => prev.filter(e => e.id !== id))
+      setSelectedEvent(null)
+      toast('Событие удалено', 'success')
+    } catch {
+      toast('Не удалось удалить событие', 'error')
     }
   }
 
@@ -298,6 +332,7 @@ export function EventsPage() {
           onClose={() => setSelectedEvent(null)}
           onJoin={handleJoin}
           onLeave={handleLeave}
+          onDelete={handleDelete}
         />
       )}
 
