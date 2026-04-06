@@ -8,7 +8,6 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Modal } from '@/shared/ui/Modal'
 import { Select } from '@/shared/ui/Select'
-import { useAuth } from '@/app/providers/AuthProvider'
 
 const MODE_LABELS: Record<string, string> = {
   ROOM_MODE_ALL: 'Совместная',
@@ -23,7 +22,6 @@ const STATUS_LABELS: Record<string, { label: string; variant: 'success' | 'warni
 
 export function CodeRoomsPage() {
   const navigate = useNavigate()
-  const { user: authUser } = useAuth()
   const [rooms, setRooms] = useState<Room[]>([])
   const [showCreate, setShowCreate] = useState(false)
   const [creating, setCreating] = useState(false)
