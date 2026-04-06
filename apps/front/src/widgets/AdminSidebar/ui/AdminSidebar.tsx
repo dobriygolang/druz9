@@ -1,5 +1,5 @@
 import { Link, useLocation } from 'react-router-dom'
-import { Code2, Gamepad2, BookOpen, Settings, BarChart3 } from 'lucide-react'
+import { Code2, BookOpen, Settings, BarChart3 } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 
 interface AdminNavItem {
@@ -11,10 +11,9 @@ interface AdminNavItem {
 
 const ADMIN_NAV: AdminNavItem[] = [
   { label: 'Code Tasks', icon: <Code2 className="w-3.5 h-3.5" />, href: '/admin/code-tasks' },
-  { label: 'Code Game', icon: <Gamepad2 className="w-3.5 h-3.5" />, href: '/admin/code-game' },
   { label: 'Interview Prep', icon: <BookOpen className="w-3.5 h-3.5" />, href: '/admin/interview-prep' },
-  { label: 'Config', icon: <Settings className="w-3.5 h-3.5" />, href: '/admin/config' },
   { label: 'Analytics', icon: <BarChart3 className="w-3.5 h-3.5" />, href: '/admin/analytics' },
+  { label: 'Config', icon: <Settings className="w-3.5 h-3.5" />, href: '/admin/config' },
 ]
 
 export function AdminSidebar() {

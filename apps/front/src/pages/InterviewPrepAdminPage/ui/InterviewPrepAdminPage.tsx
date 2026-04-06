@@ -95,7 +95,7 @@ export function InterviewPrepAdminPage() {
             )) : tasks.length === 0 ? (
               <div className="px-5 py-12 text-center text-sm text-[#94a3b8]">Задач не найдено</div>
             ) : tasks.map((task, i) => (
-              <div key={task.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#fafafa]">
+              <div key={task.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#F2F3F0]">
                 <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center flex-shrink-0">
                   <span className="text-xs font-mono text-[#666666]">{i + 1}</span>
                 </div>

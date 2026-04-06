@@ -7,10 +7,9 @@ import { cn } from '@/shared/lib/cn'
 
 const ADMIN_TABS = [
   { label: 'Code Tasks', href: '/admin/code-tasks' },
-  { label: 'Code Game', href: '/admin/code-game' },
   { label: 'Interview Prep', href: '/admin/interview-prep' },
-  { label: 'Config', href: '/admin/config' },
   { label: 'Analytics', href: '/admin/analytics' },
+  { label: 'Config', href: '/admin/config' },
 ]
 
 export function AdminLayout() {

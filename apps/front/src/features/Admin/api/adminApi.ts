@@ -36,12 +36,15 @@ export const adminApi = {
 
   // Config
   getConfig: async () => {
-    const r = await apiClient.get<unknown>('/api/admin/config')
-    return r.data
+    const r = await apiClient.get<{ configs?: Array<{ key: string; value: string; type: string }> }>('/api/admin/config')
+    const map: Record<string, any> = {}
+    for (const item of r.data.configs ?? []) {
+      map[item.key] = item.type === 'bool' ? item.value === 'true' : item.value
+    }
+    return map
   },
   updateConfig: async (key: string, value: unknown) => {
-    const r = await apiClient.put<unknown>(`/api/admin/config/${key}`, { value })
-    return r.data
+    await apiClient.put(`/api/admin/config/${key}`, { value: String(value) })
   },
 
   // Mock question pools

@@ -10,7 +10,7 @@ interface ModalProps {
   subtitle?: string
   children: React.ReactNode
   footer?: React.ReactNode
-  size?: 'sm' | 'md' | 'lg'
+  size?: 'sm' | 'md' | 'lg' | 'xl'
   className?: string
 }
 
@@ -29,6 +29,7 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
     sm: 'max-w-sm',
     md: 'max-w-[560px]',
     lg: 'max-w-2xl',
+    xl: 'max-w-4xl',
   }
 
   return createPortal(

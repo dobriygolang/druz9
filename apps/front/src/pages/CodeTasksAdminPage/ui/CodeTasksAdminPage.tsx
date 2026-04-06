@@ -1,12 +1,17 @@
-import { useEffect, useState } from 'react'
-import { Plus, Search, Edit2, Trash2 } from 'lucide-react'
+import { useEffect, useState, useMemo } from 'react'
+import { Plus, Search, Edit2, Trash2, ChevronLeft, ChevronRight } from 'lucide-react'
 import { adminApi } from '@/features/Admin/api/adminApi'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
-import { Modal } from '@/shared/ui/Modal'
-import { Input } from '@/shared/ui/Input'
 import { Select } from '@/shared/ui/Select'
 import { ConfirmModal } from '@/shared/ui/ConfirmModal'
+import { TaskEditModal } from './TaskEditModal'
+import {
+  TASK_CATEGORIES,
+  getCategoryFromTopics,
+  getDisplayTopics,
+  CATEGORY_LABELS,
+} from '@/features/Admin/model/taskCategories'
 
 const DIFF_LABELS: Record<string, string> = {
   TASK_DIFFICULTY_EASY: 'Easy', TASK_DIFFICULTY_MEDIUM: 'Medium', TASK_DIFFICULTY_HARD: 'Hard',
@@ -14,13 +19,23 @@ const DIFF_LABELS: Record<string, string> = {
 const DIFF_VARIANTS: Record<string, 'success' | 'warning' | 'danger'> = {
   TASK_DIFFICULTY_EASY: 'success', TASK_DIFFICULTY_MEDIUM: 'warning', TASK_DIFFICULTY_HARD: 'danger',
 }
+const LANG_LABELS: Record<string, string> = {
+  PROGRAMMING_LANGUAGE_PYTHON: 'Python', PROGRAMMING_LANGUAGE_JAVASCRIPT: 'JS',
+  PROGRAMMING_LANGUAGE_TYPESCRIPT: 'TS', PROGRAMMING_LANGUAGE_GO: 'Go',
+  PROGRAMMING_LANGUAGE_RUST: 'Rust', PROGRAMMING_LANGUAGE_CPP: 'C++',
+  PROGRAMMING_LANGUAGE_JAVA: 'Java', PROGRAMMING_LANGUAGE_SQL: 'SQL',
+}
+
+const PAGE_SIZE = 20
 
 export function CodeTasksAdminPage() {
   const [tasks, setTasks] = useState<any[]>([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [topic, setTopic] = useState('')
-  const [difficulty, setDifficulty] = useState('')
+  const [topicFilter, setTopicFilter] = useState('')
+  const [difficultyFilter, setDifficultyFilter] = useState('')
+  const [categoryFilter, setCategoryFilter] = useState('')
+  const [page, setPage] = useState(0)
   const [showEdit, setShowEdit] = useState(false)
   const [editTask, setEditTask] = useState<any>(null)
   const [saving, setSaving] = useState(false)
@@ -28,22 +43,45 @@ export function CodeTasksAdminPage() {
   const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
-    adminApi.listCodeTasks({ topic: topic || undefined, difficulty: difficulty || undefined })
+    adminApi.listCodeTasks({ topic: topicFilter || undefined, difficulty: difficultyFilter || undefined })
       .then((ts: any[]) => setTasks(ts))
       .catch(() => {})
       .finally(() => setLoading(false))
-  }, [topic, difficulty])
+  }, [topicFilter, difficultyFilter])
 
-  const filtered = tasks.filter(t => !search || t.title?.toLowerCase().includes(search.toLowerCase()))
+  // Extract unique topics from data (excluding category: tags)
+  const allTopics = useMemo(() => {
+    const set = new Set<string>()
+    tasks.forEach(t => getDisplayTopics(t.topics).forEach(topic => set.add(topic)))
+    return Array.from(set).sort()
+  }, [tasks])
 
-  const handleSave = async () => {
-    if (!editTask) return
+  // Client-side filtering
+  const filtered = useMemo(() => {
+    return tasks.filter(t => {
+      if (search && !t.title?.toLowerCase().includes(search.toLowerCase())) return false
+      if (categoryFilter) {
+        const cat = getCategoryFromTopics(t.topics)
+        if (categoryFilter === '__none__') { if (cat) return false }
+        else if (cat !== categoryFilter) return false
+      }
+      return true
+    })
+  }, [tasks, search, categoryFilter])
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE))
+  const paginated = filtered.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE)
+
+  // Reset page when filters change
+  useEffect(() => { setPage(0) }, [search, categoryFilter, topicFilter, difficultyFilter])
+
+  const handleSave = async (task: any) => {
     setSaving(true)
     try {
-      if (editTask.id) {
-        await adminApi.updateCodeTask(editTask.id, editTask)
+      if (task.id) {
+        await adminApi.updateCodeTask(task.id, task)
       } else {
-        await adminApi.createCodeTask(editTask)
+        await adminApi.createCodeTask(task)
       }
       const updated = await adminApi.listCodeTasks({})
       setTasks(updated as any[])
@@ -75,126 +113,131 @@ export function CodeTasksAdminPage() {
       </div>
 
       {/* Filters */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className="flex items-center gap-3 mb-4 flex-wrap">
         <div className="relative flex-1 max-w-xs">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Поиск задач..."
-            className="w-full pl-9 pr-3 py-2 text-sm bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg focus:outline-none"
+            className="w-full pl-9 pr-3 py-2 text-sm bg-[#F2F3F0] dark:bg-[#0f1117] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none text-[#111111] dark:text-[#e2e8f3]"
           />
         </div>
         <Select
-          options={[{ value: '', label: 'Все темы' }, { value: 'arrays', label: 'Arrays' }, { value: 'graphs', label: 'Graphs' }, { value: 'dp', label: 'Dynamic Programming' }]}
-          value={topic} onChange={setTopic} className="w-40"
+          options={[
+            { value: '', label: 'Все категории' },
+            ...TASK_CATEGORIES.map(c => ({ value: c.value, label: c.label })),
+            { value: '__none__', label: 'Без категории' },
+          ]}
+          value={categoryFilter} onChange={setCategoryFilter} className="w-44"
+        />
+        <Select
+          options={[{ value: '', label: 'Все темы' }, ...allTopics.map(t => ({ value: t, label: t }))]}
+          value={topicFilter} onChange={setTopicFilter} className="w-40"
         />
         <Select
           options={[{ value: '', label: 'Все' }, { value: 'TASK_DIFFICULTY_EASY', label: 'Easy' }, { value: 'TASK_DIFFICULTY_MEDIUM', label: 'Medium' }, { value: 'TASK_DIFFICULTY_HARD', label: 'Hard' }]}
-          value={difficulty} onChange={setDifficulty} className="w-32"
+          value={difficultyFilter} onChange={setDifficultyFilter} className="w-32"
         />
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-xl border border-[#CBCCC9] overflow-hidden">
-        <div className="grid grid-cols-[auto_1fr_120px_100px_80px_80px] items-center px-6 py-3 border-b border-[#CBCCC9] text-xs font-semibold text-[#666666] uppercase tracking-wide">
-          <span className="w-8 text-right">#</span>
-          <span className="ml-4">Название</span>
-          <span>Тема</span>
+      <div className="bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1e3158] overflow-hidden">
+        <div className="grid grid-cols-[40px_1fr_110px_100px_80px_70px_70px_80px] items-center px-5 py-2.5 border-b border-[#CBCCC9] dark:border-[#1e3158] text-[10px] font-semibold text-[#666666] dark:text-[#4d6380] uppercase tracking-wide">
+          <span>#</span>
+          <span>Название</span>
+          <span>Категория</span>
+          <span>Темы</span>
           <span>Сложность</span>
-          <span className="text-center">Статус</span>
+          <span>Язык</span>
+          <span>Статус</span>
           <span />
         </div>
-        <div className="divide-y divide-[#F2F3F0]">
+        <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
           {loading ? Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="px-6 py-3.5 grid grid-cols-[auto_1fr_120px_100px_80px_80px] items-center gap-4 animate-pulse">
-              <div className="w-8 h-3 bg-[#F2F3F0] rounded" />
-              <div className="h-3 bg-[#F2F3F0] rounded ml-4" />
-              <div className="h-3 bg-[#F2F3F0] rounded" />
-              <div className="h-3 bg-[#F2F3F0] rounded" />
-              <div className="h-3 bg-[#F2F3F0] rounded" />
+            <div key={i} className="px-5 py-3 grid grid-cols-[40px_1fr_110px_100px_80px_70px_70px_80px] items-center animate-pulse">
+              <div className="w-5 h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded" />
+              <div className="h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded mr-4" />
+              <div className="h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded" />
+              <div className="h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded" />
+              <div className="h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded" />
             </div>
-          )) : filtered.length === 0 ? (
-            <div className="px-6 py-12 text-center text-sm text-[#94a3b8]">Задачи не найдены</div>
-          ) : filtered.map((task, i) => (
-            <div key={task.id} className="grid grid-cols-[auto_1fr_120px_100px_80px_80px] items-center px-6 py-3.5 hover:bg-[#fafafa]">
-              <span className="w-8 text-right text-sm text-[#94a3b8] font-mono">{i + 1}</span>
-              <div className="ml-4">
-                <p className="text-sm font-medium text-[#0f172a]">{task.title}</p>
-                {task.slug && <p className="text-xs text-[#94a3b8] font-mono">{task.slug}</p>}
-              </div>
-              <p className="text-xs text-[#666666]">{task.topics?.slice(0,2).join(', ') ?? ''}</p>
-              <div>
-                {task.difficulty && task.difficulty !== 'TASK_DIFFICULTY_UNSPECIFIED' && (
-                  <Badge variant={DIFF_VARIANTS[task.difficulty] ?? 'default'}>
-                    {DIFF_LABELS[task.difficulty] ?? task.difficulty}
-                  </Badge>
-                )}
-              </div>
-              <div className="flex justify-center">
+          )) : paginated.length === 0 ? (
+            <div className="px-5 py-12 text-center text-sm text-[#94a3b8] dark:text-[#4d6380]">Задачи не найдены</div>
+          ) : paginated.map((task, i) => {
+            const cat = getCategoryFromTopics(task.topics)
+            const topics = getDisplayTopics(task.topics)
+            return (
+              <div key={task.id} className="grid grid-cols-[40px_1fr_110px_100px_80px_70px_70px_80px] items-center px-5 py-3 hover:bg-[#F2F3F0] transition-colors">
+                <span className="text-xs text-[#94a3b8] font-mono">{page * PAGE_SIZE + i + 1}</span>
+                <div className="min-w-0 pr-2">
+                  <p className="text-sm font-medium text-[#0f172a] truncate">{task.title}</p>
+                  {task.slug && <p className="text-[10px] text-[#94a3b8] font-mono truncate">{task.slug}</p>}
+                </div>
+                <div>
+                  {cat ? (
+                    <Badge variant={cat === 'mock' ? 'indigo' : 'orange'}>{CATEGORY_LABELS[cat]}</Badge>
+                  ) : (
+                    <span className="text-[10px] text-[#94a3b8]">-</span>
+                  )}
+                </div>
+                <p className="text-[10px] text-[#666666] truncate">{topics.slice(0, 2).join(', ')}</p>
+                <div>
+                  {task.difficulty && task.difficulty !== 'TASK_DIFFICULTY_UNSPECIFIED' && (
+                    <Badge variant={DIFF_VARIANTS[task.difficulty] ?? 'default'}>
+                      {DIFF_LABELS[task.difficulty] ?? task.difficulty}
+                    </Badge>
+                  )}
+                </div>
+                <span className="text-[10px] text-[#666666]">{LANG_LABELS[task.language] ?? ''}</span>
                 <Badge variant={task.is_active !== false ? 'success' : 'default'}>
-                  {task.is_active !== false ? 'Active' : 'Inactive'}
+                  {task.is_active !== false ? 'On' : 'Off'}
                 </Badge>
+                <div className="flex justify-end gap-1">
+                  <button
+                    onClick={() => { setEditTask({ ...task }); setShowEdit(true) }}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]"
+                  >
+                    <Edit2 className="w-3.5 h-3.5" />
+                  </button>
+                  <button
+                    onClick={() => setDeleteId(task.id)}
+                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#fef2f2] text-[#94a3b8] hover:text-[#ef4444]"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
-              <div className="flex justify-end gap-1">
-                <button
-                  onClick={() => { setEditTask(task); setShowEdit(true) }}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]"
-                >
-                  <Edit2 className="w-3.5 h-3.5" />
-                </button>
-                <button
-                  onClick={() => setDeleteId(task.id)}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#fef2f2] text-[#94a3b8] hover:text-[#ef4444]"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-              </div>
-            </div>
-          ))}
+            )
+          })}
         </div>
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between px-4 py-3 mt-2 text-xs text-[#666666]">
+      <div className="flex items-center justify-between px-2 py-3 mt-1 text-xs text-[#666666] dark:text-[#4d6380]">
         <span>{filtered.length} задач</span>
+        {totalPages > 1 && (
+          <div className="flex items-center gap-2">
+            <button disabled={page === 0} onClick={() => setPage(p => p - 1)} className="p-1 rounded hover:bg-[#F2F3F0] disabled:opacity-30">
+              <ChevronLeft className="w-4 h-4" />
+            </button>
+            <span className="text-xs">{page + 1} / {totalPages}</span>
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)} className="p-1 rounded hover:bg-[#F2F3F0] disabled:opacity-30">
+              <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Edit modal */}
-      <Modal
+      <TaskEditModal
         open={showEdit}
+        task={editTask}
+        saving={saving}
         onClose={() => { setShowEdit(false); setEditTask(null) }}
-        title={editTask?.id ? 'Редактировать задачу' : 'Новая задача'}
-        subtitle={editTask?.slug ? `${editTask.title ?? ''} · ${editTask.topics?.join(', ') ?? ''}` : undefined}
-        footer={
-          <>
-            <Button variant="secondary" size="sm" onClick={() => { setShowEdit(false); setEditTask(null) }}>Отмена</Button>
-            <Button variant="orange" size="sm" onClick={handleSave} loading={saving}>Сохранить</Button>
-          </>
-        }
-      >
-        {editTask && (
-          <div className="grid grid-cols-2 gap-4">
-            <Input label="Название" value={editTask.title ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, title: e.target.value }))} />
-            <Input label="Slug" value={editTask.slug ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, slug: e.target.value }))} />
-            <Select
-              label="Сложность"
-              options={[{ value: 'TASK_DIFFICULTY_EASY', label: 'Easy' }, { value: 'TASK_DIFFICULTY_MEDIUM', label: 'Medium' }, { value: 'TASK_DIFFICULTY_HARD', label: 'Hard' }]}
-              value={editTask.difficulty ?? 'TASK_DIFFICULTY_MEDIUM'}
-              onChange={v => setEditTask((t: any) => ({ ...t, difficulty: v }))}
-            />
-            <Select
-              label="Язык"
-              options={[{ value: 'PROGRAMMING_LANGUAGE_PYTHON', label: 'Python' }, { value: 'PROGRAMMING_LANGUAGE_GO', label: 'Go' }, { value: 'PROGRAMMING_LANGUAGE_JAVASCRIPT', label: 'JavaScript' }]}
-              value={editTask.language ?? 'PROGRAMMING_LANGUAGE_PYTHON'}
-              onChange={v => setEditTask((t: any) => ({ ...t, language: v }))}
-            />
-            <div className="col-span-2">
-              <Input label="Темы (через запятую)" value={editTask.topics?.join(', ') ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, topics: e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean) }))} />
-            </div>
-          </div>
-        )}
-      </Modal>
+        onSave={handleSave}
+        onChange={setEditTask}
+      />
 
       <ConfirmModal
         open={!!deleteId}
