@@ -13,6 +13,7 @@ const TABS = [
 export function CommunityHubPage() {
   const location = useLocation()
   const [search, setSearch] = useState('')
+  const [openCreateEvent, setOpenCreateEvent] = useState(false)
   const active = TABS.find(t => location.pathname.startsWith(`/community/${t.id}`))?.id ?? 'people'
 
   return (

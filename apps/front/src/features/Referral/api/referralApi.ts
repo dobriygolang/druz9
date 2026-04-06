@@ -61,12 +61,12 @@ export const referralApi = {
   },
 
   async create(data: CreateReferralData) {
-    const res = await apiClient.post<{ referral: ReferralRaw }>('/api/v1/referrals', data)
+    const res = await apiClient.post<{ referral: ReferralRaw }>('/api/v1/referrals', { referral: data })
     return normalize(res.data.referral)
   },
 
   async update(id: string, data: Partial<CreateReferralData>) {
-    const res = await apiClient.put<{ referral: ReferralRaw }>(`/api/v1/referrals/${id}`, data)
+    const res = await apiClient.put<{ referral: ReferralRaw }>(`/api/v1/referrals/${id}`, { referral: data })
     return normalize(res.data.referral)
   },
 

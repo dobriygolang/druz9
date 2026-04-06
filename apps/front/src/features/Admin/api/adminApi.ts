@@ -23,11 +23,11 @@ export const adminApi = {
     return r.data.tasks ?? []
   },
   createInterviewPrepTask: async (payload: unknown) => {
-    const r = await apiClient.post<{ task?: unknown }>('/api/admin/interview-prep/tasks', payload)
+    const r = await apiClient.post<{ task?: unknown }>('/api/admin/interview-prep/tasks', { task: payload })
     return r.data.task
   },
   updateInterviewPrepTask: async (taskId: string, payload: unknown) => {
-    const r = await apiClient.put<{ task?: unknown }>(`/api/admin/interview-prep/tasks/${taskId}`, payload)
+    const r = await apiClient.put<{ task?: unknown }>(`/api/admin/interview-prep/tasks/${taskId}`, { task: payload })
     return r.data.task
   },
   deleteInterviewPrepTask: async (taskId: string) => {
@@ -46,16 +46,16 @@ export const adminApi = {
 
   // Mock question pools
   listMockQuestionPools: async () => {
-    const r = await apiClient.get<{ pools?: unknown[] }>('/api/admin/interview-prep/mock-question-pools')
-    return r.data.pools ?? []
+    const r = await apiClient.get<{ items?: unknown[] }>('/api/admin/interview-prep/mock-question-pools')
+    return r.data.items ?? []
   },
   createMockQuestionPool: async (data: unknown) => {
-    const r = await apiClient.post<{ pool?: unknown }>('/api/admin/interview-prep/mock-question-pools', data)
-    return r.data.pool
+    const r = await apiClient.post<{ item?: unknown }>('/api/admin/interview-prep/mock-question-pools', { item: data })
+    return r.data.item
   },
   updateMockQuestionPool: async (id: string, data: unknown) => {
-    const r = await apiClient.put<{ pool?: unknown }>(`/api/admin/interview-prep/mock-question-pools/${id}`, data)
-    return r.data.pool
+    const r = await apiClient.put<{ item?: unknown }>(`/api/admin/interview-prep/mock-question-pools/${id}`, { item: data })
+    return r.data.item
   },
   deleteMockQuestionPool: async (id: string) => {
     await apiClient.delete(`/api/admin/interview-prep/mock-question-pools/${id}`)
@@ -63,16 +63,16 @@ export const adminApi = {
 
   // Company presets
   listCompanyPresets: async () => {
-    const r = await apiClient.get<{ presets?: unknown[] }>('/api/admin/interview-prep/mock-company-presets')
-    return r.data.presets ?? []
+    const r = await apiClient.get<{ items?: unknown[] }>('/api/admin/interview-prep/mock-company-presets')
+    return r.data.items ?? []
   },
   createCompanyPreset: async (data: unknown) => {
-    const r = await apiClient.post<{ preset?: unknown }>('/api/admin/interview-prep/mock-company-presets', data)
-    return r.data.preset
+    const r = await apiClient.post<{ item?: unknown }>('/api/admin/interview-prep/mock-company-presets', { item: data })
+    return r.data.item
   },
   updateCompanyPreset: async (id: string, data: unknown) => {
-    const r = await apiClient.put<{ preset?: unknown }>(`/api/admin/interview-prep/mock-company-presets/${id}`, data)
-    return r.data.preset
+    const r = await apiClient.put<{ item?: unknown }>(`/api/admin/interview-prep/mock-company-presets/${id}`, { item: data })
+    return r.data.item
   },
   deleteCompanyPreset: async (id: string) => {
     await apiClient.delete(`/api/admin/interview-prep/mock-company-presets/${id}`)

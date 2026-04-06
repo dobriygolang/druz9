@@ -23,14 +23,79 @@ type BackendTask = {
   starterCode?: string; isActive?: boolean; createdAt?: string; updatedAt?: string
 }
 
+const LANGUAGE_ENUM_TO_FRIENDLY: Record<string, string> = {
+  PROGRAMMING_LANGUAGE_JAVASCRIPT: 'javascript',
+  PROGRAMMING_LANGUAGE_TYPESCRIPT: 'typescript',
+  PROGRAMMING_LANGUAGE_PYTHON: 'python',
+  PROGRAMMING_LANGUAGE_GO: 'go',
+  PROGRAMMING_LANGUAGE_RUST: 'rust',
+  PROGRAMMING_LANGUAGE_CPP: 'cpp',
+  PROGRAMMING_LANGUAGE_JAVA: 'java',
+  PROGRAMMING_LANGUAGE_SQL: 'sql',
+}
+
+const LANGUAGE_FRIENDLY_TO_ENUM: Record<string, string> = {
+  javascript: 'PROGRAMMING_LANGUAGE_JAVASCRIPT',
+  typescript: 'PROGRAMMING_LANGUAGE_TYPESCRIPT',
+  python: 'PROGRAMMING_LANGUAGE_PYTHON',
+  go: 'PROGRAMMING_LANGUAGE_GO',
+  rust: 'PROGRAMMING_LANGUAGE_RUST',
+  cpp: 'PROGRAMMING_LANGUAGE_CPP',
+  java: 'PROGRAMMING_LANGUAGE_JAVA',
+  sql: 'PROGRAMMING_LANGUAGE_SQL',
+}
+
+const PREP_TYPE_ENUM_TO_FRIENDLY: Record<string, string> = {
+  PREP_TYPE_CODING: 'coding',
+  PREP_TYPE_ALGORITHM: 'algorithm',
+  PREP_TYPE_SYSTEM_DESIGN: 'system_design',
+  PREP_TYPE_SQL: 'sql',
+  PREP_TYPE_CODE_REVIEW: 'code_review',
+}
+
+const SELF_ASSESSMENT_FRIENDLY_TO_ENUM: Record<string, string> = {
+  answered: 'SELF_ASSESSMENT_ANSWERED',
+  skipped: 'SELF_ASSESSMENT_SKIPPED',
+}
+
+function toLanguageEnum(lang: string): string {
+  return LANGUAGE_FRIENDLY_TO_ENUM[lang] ?? lang
+}
+
+function fromLanguageEnum(lang: string): string {
+  return LANGUAGE_ENUM_TO_FRIENDLY[lang] ?? lang
+}
+
+function fromPrepTypeEnum(t: string): string {
+  return PREP_TYPE_ENUM_TO_FRIENDLY[t] ?? t
+}
+
+function toSelfAssessmentEnum(s: string): string {
+  return SELF_ASSESSMENT_FRIENDLY_TO_ENUM[s] ?? s
+}
+
 function normalizeTask(t: BackendTask): InterviewPrepTask {
   return {
     id: t.id, slug: t.slug ?? '', title: t.title ?? '', statement: t.statement ?? '',
-    prepType: t.prepType ?? '', language: t.language ?? '', companyTag: t.companyTag ?? '',
+    prepType: fromPrepTypeEnum(t.prepType ?? ''),
+    language: fromLanguageEnum(t.language ?? ''),
+    companyTag: t.companyTag ?? '',
     supportedLanguages: t.supportedLanguages ?? [], isExecutable: t.isExecutable ?? false,
     durationSeconds: t.durationSeconds ?? 0, starterCode: t.starterCode ?? '',
     isActive: t.isActive ?? true, createdAt: t.createdAt ?? '', updatedAt: t.updatedAt ?? '',
   }
+}
+
+export interface SystemDesignPayload {
+  image?: Uint8Array | string
+  imageName?: string
+  imageContentType?: string
+  notes?: string
+  components?: string
+  apis?: string
+  databaseSchema?: string
+  traffic?: string
+  reliability?: string
 }
 
 export const interviewPrepApi = {
@@ -47,11 +112,17 @@ export const interviewPrepApi = {
     return r.data.session
   },
   submitSession: async (sessionId: string, code: string, language: string) => {
-    const r = await apiClient.post<{ result?: unknown }>(`/api/v1/interview-prep/sessions/${sessionId}/submit`, { code, language })
+    const r = await apiClient.post<{ result?: unknown }>(`/api/v1/interview-prep/sessions/${sessionId}/submit`, {
+      code,
+      language: toLanguageEnum(language),
+    })
     return r.data.result
   },
   answerQuestion: async (sessionId: string, questionId: string, answer: string, selfAssessment: string) => {
-    const r = await apiClient.post<{ session?: unknown; review?: unknown }>(`/api/v1/interview-prep/sessions/${sessionId}/questions/${questionId}/answer`, { answer, selfAssessment })
+    const r = await apiClient.post<{ session?: unknown; review?: unknown }>(
+      `/api/v1/interview-prep/sessions/${sessionId}/questions/${questionId}/answer`,
+      { answer, selfAssessment: toSelfAssessmentEnum(selfAssessment) },
+    )
     return r.data
   },
   listCompanies: async (): Promise<string[]> => {
@@ -67,19 +138,31 @@ export const interviewPrepApi = {
     return r.data.session
   },
   submitMockSession: async (sessionId: string, code: string, language: string, notes?: string) => {
-    const r = await apiClient.post<{ result?: unknown; review?: unknown; session?: unknown }>(`/api/v1/interview-prep/mock-sessions/${sessionId}/submit`, { code, language, notes })
+    const r = await apiClient.post<{ result?: unknown; review?: unknown; session?: unknown }>(
+      `/api/v1/interview-prep/mock-sessions/${sessionId}/submit`,
+      { code, language: toLanguageEnum(language), notes },
+    )
     return r.data
   },
   answerMockQuestion: async (sessionId: string, answer: string) => {
-    const r = await apiClient.post<{ review?: unknown; session?: unknown }>(`/api/v1/interview-prep/mock-sessions/${sessionId}/questions/answer`, { answer })
+    const r = await apiClient.post<{ review?: unknown; session?: unknown }>(
+      `/api/v1/interview-prep/mock-sessions/${sessionId}/questions/answer`,
+      { answer },
+    )
     return r.data
   },
-  submitSystemDesignReview: async (sessionId: string, data: unknown) => {
-    const r = await apiClient.post<{ review?: unknown }>(`/api/v1/interview-prep/sessions/${sessionId}/system-design-review`, data)
+  submitSystemDesignReview: async (sessionId: string, design: SystemDesignPayload) => {
+    const r = await apiClient.post<{ review?: unknown }>(
+      `/api/v1/interview-prep/sessions/${sessionId}/system-design-review`,
+      { design },
+    )
     return r.data.review
   },
-  submitMockSystemDesignReview: async (sessionId: string, data: { notes: string; components: string; apis: string; databaseSchema: string }) => {
-    const r = await apiClient.post<{ review?: unknown; session?: unknown }>(`/api/v1/interview-prep/mock-sessions/${sessionId}/system-design-review`, data)
+  submitMockSystemDesignReview: async (sessionId: string, design: SystemDesignPayload) => {
+    const r = await apiClient.post<{ review?: unknown; session?: unknown }>(
+      `/api/v1/interview-prep/mock-sessions/${sessionId}/system-design-review`,
+      { design },
+    )
     return r.data
   },
 }
