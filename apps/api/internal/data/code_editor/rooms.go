@@ -102,6 +102,14 @@ func (r *Repo) UpdateRoomTask(ctx context.Context, roomID uuid.UUID, task string
 	return nil
 }
 
+func (r *Repo) UpdateRoomPrivacy(ctx context.Context, roomID uuid.UUID, isPrivate bool) error {
+	_, err := r.data.DB.Exec(ctx, `UPDATE code_rooms SET is_private = $2, updated_at = NOW() WHERE id = $1`, roomID, isPrivate)
+	if err != nil {
+		return fmt.Errorf("update room privacy: %w", err)
+	}
+	return nil
+}
+
 func (r *Repo) UpdateRoomStatus(ctx context.Context, roomID uuid.UUID, status model.RoomStatus) error {
 	_, err := r.data.DB.Exec(ctx, `UPDATE code_rooms SET status = $2, updated_at = NOW() WHERE id = $1`, roomID, status)
 	if err != nil {

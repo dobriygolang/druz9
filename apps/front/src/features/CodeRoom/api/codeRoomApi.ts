@@ -110,6 +110,9 @@ export const codeRoomApi = {
     const r = await apiClient.get<{ rooms?: BackendRoom[] }>('/api/v1/code-editor/rooms')
     return (r.data.rooms ?? []).map(normalizeRoom)
   },
+  updateRoomPrivacy: async (roomId: string, isPrivate: boolean): Promise<void> => {
+    await apiClient.patch(`/api/v1/code-editor/rooms/${roomId}`, { isPrivate })
+  },
   closeRoom: async (roomId: string): Promise<void> => {
     await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/close`, {})
   },

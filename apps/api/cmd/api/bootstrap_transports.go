@@ -93,7 +93,7 @@ func registerManualHTTPRoutes(
 
 	r := httpServer.Route("/")
 
-	// PATCH /api/v1/code-editor/rooms/{room_id} — update room task
+	// PATCH /api/v1/code-editor/rooms/{room_id} — update room task and/or privacy
 	r.PATCH("/api/v1/code-editor/rooms/{room_id}", func(ctx kratoshttp.Context) error {
 		req := ctx.Request()
 		userID, ok := server.Authenticate(req, auth)
@@ -102,16 +102,25 @@ func registerManualHTTPRoutes(
 			return nil
 		}
 		var body struct {
-			Task string `json:"task"`
+			Task      string `json:"task"`
+			IsPrivate *bool  `json:"isPrivate,omitempty"`
 		}
 		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
 			ctx.Response().WriteHeader(http.StatusBadRequest)
 			return nil
 		}
 		roomID := server.PathSegment(req.URL.Path, "rooms", 1)
-		if err := svc.SetRoomTaskByString(req.Context(), roomID, userID, body.Task); err != nil {
-			ctx.Response().WriteHeader(http.StatusForbidden)
-			return nil
+		if body.Task != "" {
+			if err := svc.SetRoomTaskByString(req.Context(), roomID, userID, body.Task); err != nil {
+				ctx.Response().WriteHeader(http.StatusForbidden)
+				return nil
+			}
+		}
+		if body.IsPrivate != nil {
+			if err := svc.SetRoomPrivacyByString(req.Context(), roomID, userID, *body.IsPrivate); err != nil {
+				ctx.Response().WriteHeader(http.StatusForbidden)
+				return nil
+			}
 		}
 		ctx.Response().WriteHeader(http.StatusNoContent)
 		return nil

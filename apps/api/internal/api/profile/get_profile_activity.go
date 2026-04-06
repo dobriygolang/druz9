@@ -10,18 +10,20 @@ import (
 	"github.com/google/uuid"
 )
 
-// GetProfileActivity stub. Please implement it.
+// GetProfileActivity returns real daily activity counts for the last 365 days.
 func (i *Implementation) GetProfileActivity(ctx context.Context, req *v1.GetProfileActivityRequest) (*v1.GetProfileActivityResponse, error) {
 	userID, err := uuid.Parse(req.UserId)
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_USER_ID", "invalid user id")
 	}
-	progress, err := i.progressRepo.GetProfileProgress(ctx, userID)
+
+	const calendarDays = 365
+	dailyCounts, err := i.progressRepo.GetDailyActivity(ctx, userID, calendarDays)
 	if err != nil {
 		return nil, err
 	}
-	ov := progress.Overview
-	days := activity.Generate(userID, int(ov.PracticeSessions), int(ov.CurrentStreakDays))
+
+	days := activity.BuildCalendar(dailyCounts)
 	out := make([]*v1.ActivityDay, 0, len(days))
 	for _, d := range days {
 		out = append(out, &v1.ActivityDay{Date: d.Date, Count: int32(d.Count)})

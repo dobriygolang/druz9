@@ -683,6 +683,59 @@ func minInt(a, b int) int {
 	return b
 }
 
+func (r *Repo) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int) (map[string]int, error) {
+	rows, err := r.data.DB.Query(ctx, `
+		SELECT activity_date, SUM(cnt)::int AS total
+		FROM (
+			SELECT DATE(finished_at AT TIME ZONE 'UTC') AS activity_date, COUNT(*) AS cnt
+			FROM interview_prep_mock_sessions
+			WHERE user_id = $1
+			  AND finished_at IS NOT NULL
+			  AND finished_at >= NOW() - make_interval(days => $2)
+			GROUP BY 1
+
+			UNION ALL
+
+			SELECT DATE(qr.answered_at AT TIME ZONE 'UTC') AS activity_date, COUNT(*) AS cnt
+			FROM interview_prep_mock_stage_question_results qr
+			JOIN interview_prep_mock_stages s ON s.id = qr.stage_id
+			JOIN interview_prep_mock_sessions ms ON ms.id = s.session_id
+			WHERE ms.user_id = $1
+			  AND qr.answered_at IS NOT NULL
+			  AND qr.answered_at >= NOW() - make_interval(days => $2)
+			GROUP BY 1
+
+			UNION ALL
+
+			SELECT DATE(COALESCE(s.finished_at, s.updated_at, s.started_at) AT TIME ZONE 'UTC') AS activity_date, COUNT(*) AS cnt
+			FROM interview_prep_sessions s
+			WHERE s.user_id = $1
+			  AND COALESCE(s.finished_at, s.updated_at, s.started_at) >= NOW() - make_interval(days => $2)
+			GROUP BY 1
+		) activity
+		GROUP BY activity_date
+		ORDER BY activity_date
+	`, userID, days)
+	if err != nil {
+		return nil, fmt.Errorf("query daily activity: %w", err)
+	}
+	defer rows.Close()
+
+	result := make(map[string]int, days)
+	for rows.Next() {
+		var date time.Time
+		var count int
+		if err := rows.Scan(&date, &count); err != nil {
+			return nil, fmt.Errorf("scan daily activity: %w", err)
+		}
+		result[date.Format("2006-01-02")] = count
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate daily activity: %w", err)
+	}
+	return result, nil
+}
+
 func mapPrepTypeToCompetencyKeys(prepType string) []string {
 	switch model.InterviewPrepTypeFromString(prepType) {
 	case model.InterviewPrepTypeCoding, model.InterviewPrepTypeAlgorithm:

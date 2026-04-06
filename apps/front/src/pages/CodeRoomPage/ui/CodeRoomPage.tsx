@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useNavigate, useLocation } from 'react-router-dom'
-import { ArrowLeft, Play, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, Bot, Pencil, Bell, BellOff, Sun, Moon } from 'lucide-react'
+import { ArrowLeft, Play, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, Bot, Pencil, Bell, BellOff, Sun, Moon, EyeOff, Eye } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { useCodeRoomWs } from '@/features/CodeRoom/hooks/useCodeRoomWs'
@@ -195,6 +195,7 @@ export function CodeRoomPage() {
   const [notifications, setNotifications] = useState<Array<{ id: string; text: string }>>([])
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [showLangDropdown, setShowLangDropdown] = useState(false)
+  const [togglingPrivacy, setTogglingPrivacy] = useState(false)
   const [leftWidth, setLeftWidth] = useState(300)
   const isResizingLeft = useRef(false)
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
@@ -249,6 +250,16 @@ export function CodeRoomPage() {
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     })
+  }
+
+  const handleTogglePrivacy = async () => {
+    if (!roomId || !room || togglingPrivacy) return
+    const newValue = !room.isPrivate
+    setTogglingPrivacy(true)
+    try {
+      await codeRoomApi.updateRoomPrivacy(roomId, newValue)
+      setRoom(prev => prev ? { ...prev, isPrivate: newValue } : prev)
+    } catch {} finally { setTogglingPrivacy(false) }
   }
 
   const addNotification = useCallback((text: string) => {
@@ -633,6 +644,10 @@ export function CodeRoomPage() {
     monaco.editor.setTheme(theme === 'dark' ? 'druzya-dark' : 'vs')
 
     // Send cursor + selection awareness, track last known position
+    // Throttle to ~30ms with trailing edge so the LAST position is always sent
+    let cursorThrottleTimer: ReturnType<typeof setTimeout> | null = null
+    let pendingCursorUpdate: (() => void) | null = null
+
     editor.onDidChangeCursorSelection((e) => {
       const sel = e.selection
       lastCursorRef.current = { line: sel.positionLineNumber, col: sel.positionColumn }
@@ -640,16 +655,35 @@ export function CodeRoomPage() {
         sel.startLineNumber === sel.endLineNumber &&
         sel.startColumn === sel.endColumn
       )
-      ws.sendAwareness(
-        sel.positionLineNumber,
-        sel.positionColumn,
-        hasSelection ? {
-          startLine: sel.startLineNumber,
-          startCol: sel.startColumn,
-          endLine: sel.endLineNumber,
-          endCol: sel.endColumn,
-        } : undefined,
-      )
+
+      const send = () => {
+        ws.sendAwareness(
+          sel.positionLineNumber,
+          sel.positionColumn,
+          hasSelection ? {
+            startLine: sel.startLineNumber,
+            startCol: sel.startColumn,
+            endLine: sel.endLineNumber,
+            endCol: sel.endColumn,
+          } : undefined,
+        )
+      }
+
+      // If no throttle active, send immediately and start cooldown
+      if (!cursorThrottleTimer) {
+        send()
+        cursorThrottleTimer = setTimeout(() => {
+          // Fire trailing edge if a newer update arrived during cooldown
+          if (pendingCursorUpdate) {
+            pendingCursorUpdate()
+            pendingCursorUpdate = null
+          }
+          cursorThrottleTimer = null
+        }, 30)
+      } else {
+        // Store the latest update to fire on trailing edge
+        pendingCursorUpdate = send
+      }
     })
 
     // Detect paste → anti-cheat signal
@@ -734,6 +768,17 @@ export function CodeRoomPage() {
             <span>{copied ? 'Скопировано' : 'Пригласить'}</span>
           </button>
 
+          {isCreator && (
+            <button
+              onClick={handleTogglePrivacy}
+              disabled={togglingPrivacy}
+              title={room?.isPrivate ? 'Сделать публичной' : 'Сделать приватной'}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg transition-colors disabled:opacity-50 ${room?.isPrivate ? 'text-[#6366F1] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]' : 'text-[#94a3b8] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]'}`}
+            >
+              {room?.isPrivate ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+              <span className="hidden sm:inline">{room?.isPrivate ? 'Приватная' : 'Публичная'}</span>
+            </button>
+          )}
           {isCreator && (
             <button
               onClick={() => setNotificationsEnabled(v => !v)}

@@ -5,12 +5,18 @@ import Editor from '@monaco-editor/react'
 import { interviewPrepApi } from '@/features/InterviewPrep/api/interviewPrepApi'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
+import { useToast } from '@/shared/ui/Toast'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import type * as Monaco from 'monaco-editor'
+
+const PREP_TYPE_LABELS: Record<string, string> = {
+  coding: 'Coding', algorithm: 'Алгоритмы', sql: 'SQL', system_design: 'System Design', behavioral: 'Behavioral',
+}
 
 export function InterviewPrepSessionPage() {
   const { sessionId } = useParams<{ sessionId: string }>()
   const navigate = useNavigate()
+  const { toast } = useToast()
   const [session, setSession] = useState<any>(null)
   const [code, setCode] = useState('')
   const [answer, setAnswer] = useState('')
@@ -46,7 +52,9 @@ export function InterviewPrepSessionPage() {
       const r = await interviewPrepApi.submitSession(sessionId, code, 'python3') as any
       setReview(r)
       setActiveTab('result')
-    } catch {} finally { setSubmitting(false) }
+    } catch {
+      toast('Не удалось отправить решение', 'error')
+    } finally { setSubmitting(false) }
   }
 
   const handleAnswerQuestion = async () => {
@@ -55,11 +63,14 @@ export function InterviewPrepSessionPage() {
     try {
       const r = await interviewPrepApi.answerQuestion(sessionId, session.currentQuestion.id, answer, 'answered') as any
       setSession(r.session)
-      setReview(r.review)
+      if (r.review) setReview(r.review)
       setAnswer('')
-      if (r.session?.currentQuestion) setActiveTab('question')
+      if (r.review) setActiveTab('result')
+      else if (r.session?.currentQuestion) setActiveTab('question')
       else setActiveTab('result')
-    } catch {} finally { setSubmitting(false) }
+    } catch {
+      toast('Не удалось отправить ответ', 'error')
+    } finally { setSubmitting(false) }
   }
 
   const task = session?.task
@@ -82,7 +93,7 @@ export function InterviewPrepSessionPage() {
           </button>
           <div>
             <p className="text-sm font-bold text-[#0f172a]">{task?.title ?? 'Interview Session'}</p>
-            <p className="text-xs text-[#666666]">{task?.companyTag ?? 'General'} · {task?.prepType ?? ''}</p>
+            <p className="text-xs text-[#666666]">{task?.companyTag ?? 'General'} · {PREP_TYPE_LABELS[task?.prepType] ?? task?.prepType ?? ''}</p>
           </div>
           <Badge variant="success" dot>Идёт интервью</Badge>
         </div>

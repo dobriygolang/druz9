@@ -1,9 +1,9 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef } from 'react'
 import { authApi } from '@/features/Auth/api/authApi'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { useNavigate } from 'react-router-dom'
 import { Spinner } from '@/shared/ui/Spinner'
-import { Swords, Code2, BookOpen, Calendar, Flame } from 'lucide-react'
+import { Swords, Code2, BookOpen, Calendar, Flame, ArrowLeft } from 'lucide-react'
 
 /* ── Логотип-марка (граф связей) ───────────────────────────── */
 function LogoMark() {
@@ -51,11 +51,13 @@ export function LoginPage() {
   const [loading, setLoading] = useState(false)
   const [loadingProvider, setLoadingProvider] = useState<'yandex' | 'telegram' | null>(null)
   const [error, setError] = useState('')
-  const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
-  useEffect(() => {
-    return () => { if (pollRef.current) clearInterval(pollRef.current) }
-  }, [])
+  // Telegram code entry flow
+  const [telegramStep, setTelegramStep] = useState<'idle' | 'code'>('idle')
+  const [telegramToken, setTelegramToken] = useState('')
+  const [telegramCode, setTelegramCode] = useState('')
+  const [submittingCode, setSubmittingCode] = useState(false)
+  const codeInputRef = useRef<HTMLInputElement>(null)
 
   const handleYandex = async () => {
     setLoading(true); setLoadingProvider('yandex'); setError('')
@@ -71,27 +73,38 @@ export function LoginPage() {
   const handleTelegram = async () => {
     setLoading(true); setLoadingProvider('telegram'); setError('')
     try {
-      const { botStartUrl } = await authApi.createTelegramAuthChallenge()
+      const { token, botStartUrl } = await authApi.createTelegramAuthChallenge()
       window.open(botStartUrl, '_blank')
-      if (pollRef.current) clearInterval(pollRef.current)
-      const poll = setInterval(async () => {
-        try {
-          await refresh()
-          if (pollRef.current) clearInterval(pollRef.current)
-          pollRef.current = null
-          navigate('/home')
-        } catch {}
-      }, 2000)
-      pollRef.current = poll
-      setTimeout(() => {
-        if (pollRef.current) clearInterval(pollRef.current)
-        pollRef.current = null
-      }, 120000)
+      setTelegramToken(token)
+      setTelegramCode('')
+      setTelegramStep('code')
+      setTimeout(() => codeInputRef.current?.focus(), 100)
     } catch {
       setError('Ошибка авторизации. Попробуйте ещё раз.')
     } finally {
       setLoading(false); setLoadingProvider(null)
     }
+  }
+
+  const handleTelegramCodeSubmit = async () => {
+    const code = telegramCode.trim()
+    if (code.length < 4) return
+    setSubmittingCode(true); setError('')
+    try {
+      await authApi.telegramLogin(telegramToken, code)
+      await refresh()
+      navigate('/home')
+    } catch {
+      setError('Неверный код. Попробуйте ещё раз.')
+      setSubmittingCode(false)
+    }
+  }
+
+  const handleTelegramBack = () => {
+    setTelegramStep('idle')
+    setTelegramToken('')
+    setTelegramCode('')
+    setError('')
   }
 
   return (
@@ -147,38 +160,82 @@ export function LoginPage() {
             </div>
           )}
 
-          <div className="flex flex-col gap-2.5">
-            {/* Yandex — site style */}
-            <button
-              onClick={handleYandex}
-              disabled={loading}
-              className="flex items-center gap-3 w-full px-4 py-3.5 rounded-xl font-medium text-sm text-[#111111] bg-white border border-[#CBCCC9] hover:bg-[#F2F3F0] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
-            >
-              {loadingProvider === 'yandex'
-                ? <Spinner size="sm" />
-                : <span className="w-5 h-5 flex items-center justify-center flex-shrink-0"><YandexIcon /></span>}
-              <span className="flex-1 text-center">Войти через Яндекс</span>
-            </button>
+          {telegramStep === 'code' ? (
+            /* ── Telegram code entry ─────────────────────────── */
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={handleTelegramBack}
+                className="flex items-center gap-1.5 text-sm text-[#6366F1] hover:text-[#4F46E5] transition-colors self-start -mb-1"
+              >
+                <ArrowLeft className="w-4 h-4" />
+                Назад
+              </button>
 
-            {/* Divider */}
-            <div className="flex items-center gap-3">
-              <div className="flex-1 h-px bg-[#E7E8E5]" />
-              <span className="text-[11px] text-[#94a3b8] font-medium tracking-wide">ИЛИ</span>
-              <div className="flex-1 h-px bg-[#E7E8E5]" />
+              <div className="text-sm text-[#0f172a]">
+                <p className="font-medium mb-1">Введите код из Telegram</p>
+                <p className="text-[#94a3b8] text-xs">
+                  Мы отправили код в бот. Введите его ниже, чтобы войти.
+                </p>
+              </div>
+
+              <input
+                ref={codeInputRef}
+                type="text"
+                inputMode="numeric"
+                maxLength={8}
+                placeholder="Код из бота"
+                value={telegramCode}
+                onChange={(e) => setTelegramCode(e.target.value.replace(/\D/g, ''))}
+                onKeyDown={(e) => { if (e.key === 'Enter') handleTelegramCodeSubmit() }}
+                disabled={submittingCode}
+                className="w-full px-4 py-3.5 rounded-xl text-sm text-[#111111] bg-white border border-[#CBCCC9] focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/20 outline-none transition-all disabled:opacity-40"
+              />
+
+              <button
+                onClick={handleTelegramCodeSubmit}
+                disabled={submittingCode || telegramCode.trim().length < 4}
+                className="flex items-center justify-center gap-2 w-full px-4 py-3.5 rounded-xl font-medium text-sm text-white transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+                style={{ background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)' }}
+              >
+                {submittingCode ? <Spinner size="sm" /> : null}
+                {submittingCode ? 'Проверяем...' : 'Войти'}
+              </button>
             </div>
+          ) : (
+            /* ── Provider buttons ────────────────────────────── */
+            <div className="flex flex-col gap-2.5">
+              {/* Yandex — site style */}
+              <button
+                onClick={handleYandex}
+                disabled={loading}
+                className="flex items-center gap-3 w-full px-4 py-3.5 rounded-xl font-medium text-sm text-[#111111] bg-white border border-[#CBCCC9] hover:bg-[#F2F3F0] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+              >
+                {loadingProvider === 'yandex'
+                  ? <Spinner size="sm" />
+                  : <span className="w-5 h-5 flex items-center justify-center flex-shrink-0"><YandexIcon /></span>}
+                <span className="flex-1 text-center">Войти через Яндекс</span>
+              </button>
 
-            {/* Telegram — site style */}
-            <button
-              onClick={handleTelegram}
-              disabled={loading}
-              className="flex items-center gap-3 w-full px-4 py-3.5 rounded-xl font-medium text-sm text-[#111111] bg-white border border-[#CBCCC9] hover:bg-[#F2F3F0] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
-            >
-              {loadingProvider === 'telegram'
-                ? <Spinner size="sm" />
-                : <span className="w-5 h-5 flex items-center justify-center flex-shrink-0"><TelegramIcon /></span>}
-              <span className="flex-1 text-center">Войти через Telegram</span>
-            </button>
-          </div>
+              {/* Divider */}
+              <div className="flex items-center gap-3">
+                <div className="flex-1 h-px bg-[#E7E8E5]" />
+                <span className="text-[11px] text-[#94a3b8] font-medium tracking-wide">ИЛИ</span>
+                <div className="flex-1 h-px bg-[#E7E8E5]" />
+              </div>
+
+              {/* Telegram — site style */}
+              <button
+                onClick={handleTelegram}
+                disabled={loading}
+                className="flex items-center gap-3 w-full px-4 py-3.5 rounded-xl font-medium text-sm text-[#111111] bg-white border border-[#CBCCC9] hover:bg-[#F2F3F0] transition-colors duration-150 disabled:opacity-40 disabled:cursor-not-allowed active:scale-[0.98]"
+              >
+                {loadingProvider === 'telegram'
+                  ? <Spinner size="sm" />
+                  : <span className="w-5 h-5 flex items-center justify-center flex-shrink-0"><TelegramIcon /></span>}
+                <span className="flex-1 text-center">Войти через Telegram</span>
+              </button>
+            </div>
+          )}
 
           {/* Divider */}
           <div className="h-px bg-[#F2F3F0] my-6" />

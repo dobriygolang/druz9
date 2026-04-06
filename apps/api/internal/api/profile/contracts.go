@@ -35,4 +35,5 @@ type SessionCookieManager interface {
 // ProgressRepository retrieves profile progress data.
 type ProgressRepository interface {
 	GetProfileProgress(ctx context.Context, userID uuid.UUID) (*model.ProfileProgress, error)
+	GetDailyActivity(ctx context.Context, userID uuid.UUID, days int) (map[string]int, error)
 }

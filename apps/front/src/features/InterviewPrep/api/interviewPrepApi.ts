@@ -87,6 +87,15 @@ function normalizeTask(t: BackendTask): InterviewPrepTask {
   }
 }
 
+/** Normalize session object returned by backend: convert proto enum strings in nested task. */
+function normalizeSession(s: any): any {
+  if (!s) return s
+  if (s.task) {
+    s.task = normalizeTask(s.task)
+  }
+  return s
+}
+
 export interface SystemDesignPayload {
   image?: Uint8Array | string
   imageName?: string
@@ -106,11 +115,11 @@ export const interviewPrepApi = {
   },
   startSession: async (taskId: string) => {
     const r = await apiClient.post<{ session?: unknown }>('/api/v1/interview-prep/sessions', { taskId })
-    return r.data.session
+    return normalizeSession(r.data.session)
   },
   getSession: async (sessionId: string) => {
     const r = await apiClient.get<{ session?: unknown }>(`/api/v1/interview-prep/sessions/${sessionId}`)
-    return r.data.session
+    return normalizeSession(r.data.session)
   },
   submitSession: async (sessionId: string, code: string, language: string) => {
     const r = await apiClient.post<{ result?: unknown }>(`/api/v1/interview-prep/sessions/${sessionId}/submit`, {
@@ -124,7 +133,7 @@ export const interviewPrepApi = {
       `/api/v1/interview-prep/sessions/${sessionId}/questions/${questionId}/answer`,
       { answer, selfAssessment: toSelfAssessmentEnum(selfAssessment) },
     )
-    return r.data
+    return { ...r.data, session: normalizeSession(r.data.session) }
   },
   listCompanies: async (): Promise<string[]> => {
     const r = await apiClient.get<{ companies?: string[] }>('/api/v1/interview-prep/companies')

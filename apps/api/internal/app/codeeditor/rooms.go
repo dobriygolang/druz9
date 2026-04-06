@@ -99,6 +99,25 @@ func (s *Service) SetRoomTaskByString(ctx context.Context, roomIDStr string, cal
 	return s.SetRoomTask(ctx, roomID, callerID, task)
 }
 
+func (s *Service) SetRoomPrivacy(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, isPrivate bool) error {
+	room, err := s.repo.GetRoom(ctx, roomID)
+	if err != nil {
+		return err
+	}
+	if callerID == nil || room.CreatorID != *callerID {
+		return domain.ErrNotRoomCreator
+	}
+	return s.repo.UpdateRoomPrivacy(ctx, roomID, isPrivate)
+}
+
+func (s *Service) SetRoomPrivacyByString(ctx context.Context, roomIDStr string, callerID *uuid.UUID, isPrivate bool) error {
+	roomID, err := uuid.Parse(roomIDStr)
+	if err != nil {
+		return domain.ErrRoomNotFound
+	}
+	return s.SetRoomPrivacy(ctx, roomID, callerID, isPrivate)
+}
+
 func (s *Service) CloseRoomByString(ctx context.Context, roomIDStr string, callerID *uuid.UUID) error {
 	roomID, err := uuid.Parse(roomIDStr)
 	if err != nil {

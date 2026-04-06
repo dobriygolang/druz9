@@ -614,7 +614,7 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 
 	answer = strings.TrimSpace(answer)
 	var review *aireview.InterviewAnswerReview
-	if selfAssessment == model.InterviewPrepSelfAssessmentAnswered && answer != "" {
+	if selfAssessment == model.InterviewPrepSelfAssessmentAnswered && answer != "" && s.reviewer != nil {
 		review, err = s.reviewer.ReviewInterviewAnswer(ctx, aireview.InterviewAnswerReviewRequest{
 			ModelOverride:   s.modelFollowup,
 			Topic:           session.Task.PrepType.String(),
@@ -624,7 +624,9 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 			CandidateAnswer: answer,
 		})
 		if err != nil {
-			return nil, err
+			// AI review failure is non-fatal: proceed without review so the user
+			// can still advance to the next question.
+			review = nil
 		}
 	}
 

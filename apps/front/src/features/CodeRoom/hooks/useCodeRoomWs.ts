@@ -98,6 +98,37 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
 
   const isRemoteUpdate = useRef(false)
 
+  // Batch awareness updates into a single React render per animation frame
+  const pendingAwareness = useRef<Map<string, { action: 'set'; state: AwarenessState } | { action: 'delete' }>>(new Map())
+  const rafId = useRef<number | null>(null)
+
+  const flushAwareness = useCallback(() => {
+    rafId.current = null
+    const batch = pendingAwareness.current
+    if (batch.size === 0) return
+    // Copy and clear before applying to avoid re-entrancy issues
+    const entries = new Map(batch)
+    batch.clear()
+
+    setAwareness(prev => {
+      const next = new Map(prev)
+      entries.forEach((op, key) => {
+        if (op.action === 'delete') {
+          next.delete(key)
+        } else {
+          next.set(key, op.state)
+        }
+      })
+      return next
+    })
+  }, [])
+
+  const scheduleAwarenessFlush = useCallback(() => {
+    if (rafId.current === null) {
+      rafId.current = requestAnimationFrame(flushAwareness)
+    }
+  }, [flushAwareness])
+
   const handleMessage = useCallback((raw: unknown) => {
     const msg = raw as CodeEditorMessage
     switch (msg.type) {
@@ -127,30 +158,28 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
 
           // Explicit disconnect signal
           if (cursorData.active === false) {
-            setAwareness(prev => {
-              const next = new Map(prev)
-              next.delete(msg.userId!)
-              return next
-            })
+            pendingAwareness.current.set(msg.userId!, { action: 'delete' })
+            scheduleAwarenessFlush()
             onLeaveRef.current?.(msg.userId!, incomingDisplayName)
             break
           }
 
-          setAwareness(prev => {
-            const existing = prev.get(msg.userId!)
-            const next = new Map(prev)
+          // Detect behavior transitions for anti-cheat (read current state synchronously)
+          const existing = pendingAwareness.current.has(msg.userId!)
+            ? (pendingAwareness.current.get(msg.userId!) as { action: 'set'; state: AwarenessState } | undefined)?.state
+            : undefined
+          if (cursorData.tabHidden === true && !existing?.tabHidden) {
+            onBehaviorRef.current?.(msg.userId!, incomingDisplayName, 'tab_hidden')
+          } else if (cursorData.tabHidden === false && existing?.tabHidden) {
+            onBehaviorRef.current?.(msg.userId!, incomingDisplayName, 'tab_visible')
+          }
+          if (cursorData.pastedCode === true && !existing?.pastedCode) {
+            onBehaviorRef.current?.(msg.userId!, incomingDisplayName, 'pasted')
+          }
 
-            // Detect behavior transitions for anti-cheat
-            if (cursorData.tabHidden === true && !existing?.tabHidden) {
-              onBehaviorRef.current?.(msg.userId!, incomingDisplayName, 'tab_hidden')
-            } else if (cursorData.tabHidden === false && existing?.tabHidden) {
-              onBehaviorRef.current?.(msg.userId!, incomingDisplayName, 'tab_visible')
-            }
-            if (cursorData.pastedCode === true && !existing?.pastedCode) {
-              onBehaviorRef.current?.(msg.userId!, incomingDisplayName, 'pasted')
-            }
-
-            next.set(msg.userId!, {
+          pendingAwareness.current.set(msg.userId!, {
+            action: 'set',
+            state: {
               userId: msg.userId!,
               displayName: incomingDisplayName,
               cursorLine: cursorData.cursorLine as number | undefined,
@@ -161,24 +190,34 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
               selEndCol: cursorData.selEndCol as number | undefined,
               tabHidden: cursorData.tabHidden as boolean | undefined,
               pastedCode: cursorData.pastedCode as boolean | undefined,
-            })
-            return next
+            },
           })
+          scheduleAwarenessFlush()
         }
         break
       }
       case 'awareness_remove': {
         if (msg.userId) {
-          setAwareness(prev => {
-            const existing = prev.get(msg.userId!)
-            const next = new Map(prev)
-            next.delete(msg.userId!)
-            // Fire onLeave using stored displayName
-            if (existing) {
-              onLeaveRef.current?.(msg.userId!, existing.displayName)
-            }
-            return next
-          })
+          // Check pending batch first, then fall back to committed state via callback
+          const pendingEntry = pendingAwareness.current.get(msg.userId!)
+          const pendingDisplayName = pendingEntry && pendingEntry.action === 'set'
+            ? pendingEntry.state.displayName : undefined
+          pendingAwareness.current.set(msg.userId!, { action: 'delete' })
+          scheduleAwarenessFlush()
+          // Fire onLeave - if we have a pending displayName use it, otherwise
+          // the callback from the committed state is handled by the flush
+          if (pendingDisplayName) {
+            onLeaveRef.current?.(msg.userId!, pendingDisplayName)
+          } else {
+            // Read from committed state synchronously via a one-off setState
+            setAwareness(prev => {
+              const existing = prev.get(msg.userId!)
+              if (existing) {
+                onLeaveRef.current?.(msg.userId!, existing.displayName)
+              }
+              return prev // no change, flush handles deletion
+            })
+          }
         }
         break
       }
@@ -191,7 +230,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         break
       }
     }
-  }, [])
+  }, [scheduleAwarenessFlush])
 
   useEffect(() => {
     if (!roomId || !enabled) return
@@ -220,6 +259,12 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       socket.close()
       socketRef.current = null
       setConnected(false)
+      // Cancel any pending awareness batch
+      if (rafId.current !== null) {
+        cancelAnimationFrame(rafId.current)
+        rafId.current = null
+      }
+      pendingAwareness.current.clear()
     }
   }, [roomId, userId, enabled, handleMessage, displayName, guestName])
 
