@@ -17,7 +17,6 @@ import (
 
 	"encoding/json"
 	"net/http"
-	"strings"
 
 	"github.com/go-kratos/kratos/v2"
 	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
@@ -88,52 +87,52 @@ func registerManualHTTPRoutes(
 	wshandler.Register(httpServer, services.realtimeHub, services.arenaRealtimeHub)
 
 	// Manual code-editor room routes not covered by proto HTTP annotations.
+	// Registered via Route() so they don't shadow proto-generated GET/POST/DELETE handlers.
 	auth := services.profileServiceDomain
 	svc := services.codeEditorServiceDomain
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/api/v1/code-editor/rooms/", func(w http.ResponseWriter, r *http.Request) {
-		path := r.URL.Path
-		// PATCH /api/v1/code-editor/rooms/{room_id} — update room task
-		if r.Method == http.MethodPatch && !strings.HasSuffix(path, "/close") {
-			userID, ok := server.Authenticate(r, auth)
-			if !ok {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			var body struct {
-				Task string `json:"task"`
-			}
-			if err := json.NewDecoder(r.Body).Decode(&body); err != nil {
-				w.WriteHeader(http.StatusBadRequest)
-				return
-			}
-			roomID := server.PathSegment(path, "rooms", 1)
-			if err := svc.SetRoomTaskByString(r.Context(), roomID, userID, body.Task); err != nil {
-				w.WriteHeader(http.StatusForbidden)
-				return
-			}
-			w.WriteHeader(http.StatusNoContent)
-			return
+	r := httpServer.Route("/")
+
+	// PATCH /api/v1/code-editor/rooms/{room_id} — update room task
+	r.PATCH("/api/v1/code-editor/rooms/{room_id}", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
 		}
-		// POST /api/v1/code-editor/rooms/{room_id}/close — close room
-		if r.Method == http.MethodPost && strings.HasSuffix(path, "/close") {
-			userID, ok := server.Authenticate(r, auth)
-			if !ok {
-				w.WriteHeader(http.StatusUnauthorized)
-				return
-			}
-			roomID := server.PathSegment(path, "rooms", 1)
-			if err := svc.CloseRoomByString(r.Context(), roomID, userID); err != nil {
-				w.WriteHeader(http.StatusForbidden)
-				return
-			}
-			w.WriteHeader(http.StatusNoContent)
-			return
+		var body struct {
+			Task string `json:"task"`
 		}
-		http.NotFound(w, r)
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			ctx.Response().WriteHeader(http.StatusBadRequest)
+			return nil
+		}
+		roomID := server.PathSegment(req.URL.Path, "rooms", 1)
+		if err := svc.SetRoomTaskByString(req.Context(), roomID, userID, body.Task); err != nil {
+			ctx.Response().WriteHeader(http.StatusForbidden)
+			return nil
+		}
+		ctx.Response().WriteHeader(http.StatusNoContent)
+		return nil
 	})
-	httpServer.HandlePrefix("/api/v1/code-editor/rooms/", mux)
+
+	// POST /api/v1/code-editor/rooms/{room_id}/close — close room
+	r.POST("/api/v1/code-editor/rooms/{room_id}/close", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		roomID := server.PathSegment(req.URL.Path, "rooms", 1)
+		if err := svc.CloseRoomByString(req.Context(), roomID, userID); err != nil {
+			ctx.Response().WriteHeader(http.StatusForbidden)
+			return nil
+		}
+		ctx.Response().WriteHeader(http.StatusNoContent)
+		return nil
+	})
 }
 
 func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.Server, services *serviceContext) {

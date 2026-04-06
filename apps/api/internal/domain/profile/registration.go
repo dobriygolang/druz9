@@ -16,6 +16,10 @@ func (s *Service) CompleteRegistration(ctx context.Context, userID uuid.UUID, re
 		return nil, "", time.Time{}, err
 	}
 
+	// Invalidate stale cached profile so subsequent GetProfile returns updated status.
+	s.InvalidateProfileCache(userID)
+	s.CacheProfile(userID, user)
+
 	rawToken, session, err := s.NewSession(ctx, user.ID)
 	if err != nil {
 		return nil, "", time.Time{}, err
