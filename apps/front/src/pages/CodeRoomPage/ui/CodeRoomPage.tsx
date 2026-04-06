@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Play, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, Bot, Pencil } from 'lucide-react'
+import { ArrowLeft, Play, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, Bot, Pencil, Bell, BellOff } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { useCodeRoomWs } from '@/features/CodeRoom/hooks/useCodeRoomWs'
@@ -23,6 +23,13 @@ function getCursorColor(userId: string): string {
     hash = userId.charCodeAt(i) + ((hash << 5) - hash)
   }
   return CURSOR_COLORS[Math.abs(hash) % CURSOR_COLORS.length]
+}
+
+/* WS status (lowercase) → Room status (protobuf-style) */
+const WS_STATUS_MAP: Record<string, string> = {
+  waiting: 'ROOM_STATUS_WAITING',
+  active: 'ROOM_STATUS_ACTIVE',
+  finished: 'ROOM_STATUS_FINISHED',
 }
 
 const injectedCursorStyles = new Set<string>()
@@ -98,10 +105,13 @@ export function CodeRoomPage() {
   const [showTaskEditor, setShowTaskEditor] = useState(false)
   const [editTaskTitle, setEditTaskTitle] = useState('')
   const [editTaskStatement, setEditTaskStatement] = useState('')
+  const [notifications, setNotifications] = useState<Array<{ id: string; text: string }>>([])
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<typeof Monaco | null>(null)
   const decorationsRef = useRef<Monaco.editor.IEditorDecorationsCollection | null>(null)
   const widgetsRef = useRef<Map<string, Monaco.editor.IContentWidget>>(new Map())
+  const prevParticipantIdsRef = useRef<Set<string>>(new Set())
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
   const skipNextWsUpdate = useRef(false)
 
@@ -126,6 +136,13 @@ export function CodeRoomPage() {
     })
   }
 
+  const addNotification = useCallback((text: string) => {
+    if (!notificationsEnabled) return
+    const id = Math.random().toString(36).slice(2)
+    setNotifications(prev => [...prev.slice(-4), { id, text }])
+    setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), 4000)
+  }, [notificationsEnabled])
+
   // WebSocket realtime
   const ws = useCodeRoomWs({
     roomId,
@@ -133,6 +150,9 @@ export function CodeRoomPage() {
     displayName: user?.firstName ?? guestNameRef.current ?? 'Guest',
     guestName: guestNameRef.current,
     enabled: !!roomId && !needsGuestName,
+    onLeave: useCallback((userId: string, displayName: string) => {
+      addNotification(`${displayName} покинул(-а) комнату`)
+    }, [addNotification]),
   })
 
   // Fetch initial room data via REST
@@ -143,24 +163,63 @@ export function CodeRoomPage() {
       .catch(() => navigate('/practice/code-rooms'))
   }, [roomId, needsGuestName])
 
-  // Sync WebSocket code -> local (remote changes)
+  // Sync WebSocket code -> local (remote changes), preserve cursor position
   useEffect(() => {
-    if (ws.code && !skipNextWsUpdate.current) {
-      setLocalCode(ws.code)
+    if (!ws.code || skipNextWsUpdate.current) {
+      skipNextWsUpdate.current = false
+      return
     }
     skipNextWsUpdate.current = false
+    const editor = editorRef.current
+    if (editor && editor.getModel()?.getValue() !== ws.code) {
+      const viewState = editor.saveViewState()
+      setLocalCode(ws.code)
+      requestAnimationFrame(() => {
+        if (viewState && editorRef.current) {
+          editorRef.current.restoreViewState(viewState)
+        }
+      })
+    } else {
+      setLocalCode(ws.code)
+    }
   }, [ws.code])
 
   // Update room from room_update WS message (fired on join/leave/status change)
   useEffect(() => {
     if (!ws.lastRoomUpdate) return
-    const update = ws.lastRoomUpdate as { status?: string; participants?: unknown[] }
+    const update = ws.lastRoomUpdate as {
+      status?: string
+      participants?: Array<{ id: string; displayName: string; userId?: string; isGuest?: boolean; isReady?: boolean; joinedAt?: string }>
+    }
+
+    // Detect new participants and notify
+    if (update.participants) {
+      const myId = user?.id ?? guestNameRef.current ?? ''
+      update.participants.forEach(p => {
+        const pid = p.id || p.userId || ''
+        if (!prevParticipantIdsRef.current.has(pid) && prevParticipantIdsRef.current.size > 0 && pid !== myId) {
+          addNotification(`${p.displayName} присоединился(-ась) к комнате`)
+        }
+      })
+      prevParticipantIdsRef.current = new Set(update.participants.map(p => p.id || p.userId || ''))
+    }
+
     setRoom(prev => {
       if (!prev) return prev
+      const mappedStatus = update.status ? (WS_STATUS_MAP[update.status] ?? update.status) : undefined
+      const mappedParticipants = update.participants?.map(p => ({
+        userId: p.userId ?? '',
+        name: p.displayName ?? '',
+        isGuest: p.isGuest ?? false,
+        isReady: p.isReady ?? false,
+        isWinner: false,
+        joinedAt: p.joinedAt ?? '',
+        isCreator: p.userId === prev.creatorId,
+      }))
       return {
         ...prev,
-        ...(update.status ? { status: update.status as Room['status'] } : {}),
-        ...(update.participants ? { participants: update.participants as Room['participants'] } : {}),
+        ...(mappedStatus ? { status: mappedStatus as Room['status'] } : {}),
+        ...(mappedParticipants ? { participants: mappedParticipants } : {}),
       }
     })
   }, [ws.lastRoomUpdate])
@@ -419,6 +478,15 @@ export function CodeRoomPage() {
             <span>{copied ? 'Скопировано' : 'Пригласить'}</span>
           </button>
 
+          {isCreator && (
+            <button
+              onClick={() => setNotificationsEnabled(v => !v)}
+              title={notificationsEnabled ? 'Выключить уведомления' : 'Включить уведомления'}
+              className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${notificationsEnabled ? 'text-[#6366F1] hover:bg-[#F2F3F0]' : 'text-[#94a3b8] hover:bg-[#F2F3F0]'}`}
+            >
+              {notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
+            </button>
+          )}
           <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading}>
             <Bot className="w-3.5 h-3.5" /> AI Ревью
           </Button>
@@ -609,6 +677,21 @@ export function CodeRoomPage() {
           </div>
         )}
       </div>
+
+      {/* Activity notifications */}
+      {notifications.length > 0 && (
+        <div className="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none">
+          {notifications.map(n => (
+            <div
+              key={n.id}
+              className="bg-[#1e293b] text-white text-xs px-4 py-2.5 rounded-xl shadow-lg flex items-center gap-2 animate-fade-in"
+            >
+              <span className="w-1.5 h-1.5 rounded-full bg-[#94a3b8] flex-shrink-0" />
+              {n.text}
+            </div>
+          ))}
+        </div>
+      )}
 
       {/* Task editor modal — creator only */}
       {showTaskEditor && (

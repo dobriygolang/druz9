@@ -34,6 +34,11 @@ export interface CreateCirclePayload {
 }
 
 export const circleApi = {
+  getCircle: async (circleId: string): Promise<Circle> => {
+    const r = await apiClient.get<{ circle: BackendCircle }>(`/api/v1/circles/${circleId}`)
+    return normalizeCircle(r.data.circle)
+  },
+
   listCircles: async (params?: { limit?: number; offset?: number }): Promise<{ circles: Circle[]; totalCount: number }> => {
     const r = await apiClient.get<{ circles?: BackendCircle[]; totalCount?: number }>('/api/v1/circles', {
       params: { limit: params?.limit ?? 20, offset: params?.offset ?? 0 },

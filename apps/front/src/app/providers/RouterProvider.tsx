@@ -32,6 +32,7 @@ const AdminAnalyticsPage = lazy(() => import('@/pages/AdminAnalyticsPage/ui/Admi
 const AdminCodeGamePage = lazy(() => import('@/pages/AdminCodeGamePage/ui/AdminCodeGamePage').then(m => ({ default: m.AdminCodeGamePage })))
 const PodcastsPage = lazy(() => import('@/pages/PodcastsPage/ui/PodcastsPage').then(m => ({ default: m.PodcastsPage })))
 const CirclesPage = lazy(() => import('@/pages/CirclesPage/ui/CirclesPage').then(m => ({ default: m.CirclesPage })))
+const CirclePage = lazy(() => import('@/pages/CirclePage/ui/CirclePage').then(m => ({ default: m.CirclePage })))
 const VacanciesPage = lazy(() => import('@/pages/VacanciesPage/ui/VacanciesPage').then(m => ({ default: m.VacanciesPage })))
 const DailyChallengePage = lazy(() => import('@/pages/DailyChallengePage/ui/DailyChallengePage').then(m => ({ default: m.DailyChallengePage })))
 
@@ -104,6 +105,7 @@ export const RouterProvider: React.FC = () => {
               <Route path="people" element={<UsersPage />} />
               <Route path="events" element={<EventsPage />} />
               <Route path="circles" element={<CirclesPage />} />
+              <Route path="circles/:circleId" element={<CirclePage />} />
               <Route path="map" element={<MapPage />} />
               <Route path="vacancies" element={<VacanciesPage />} />
             </Route>

@@ -98,6 +98,11 @@ server {
         proxy_set_header Upgrade $http_upgrade;
         proxy_set_header Connection "upgrade";
         client_max_body_size 200m;
+        # Required for large file uploads (podcasts, etc.)
+        client_body_timeout      300s;
+        proxy_read_timeout       300s;
+        proxy_send_timeout       300s;
+        proxy_request_buffering  off;
     }
 
     location /metrics/grafana/ {

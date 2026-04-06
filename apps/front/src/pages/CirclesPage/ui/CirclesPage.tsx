@@ -1,4 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { Users, Plus, Hash, Search } from 'lucide-react'
 import { circleApi, type CreateCirclePayload } from '@/features/Circle/api/circleApi'
 import type { Circle } from '@/entities/Circle/model/types'
@@ -11,6 +12,7 @@ import { useToast } from '@/shared/ui/Toast'
 
 export function CirclesPage() {
   const { toast } = useToast()
+  const navigate = useNavigate()
   const [circles, setCircles] = useState<Circle[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -122,7 +124,7 @@ export function CirclesPage() {
               </div>
             )
             : filtered.map(c => (
-              <Card key={c.id} padding="md" className="stagger-item flex flex-col gap-3 hover:border-[#94a3b8] transition-colors">
+              <Card key={c.id} padding="md" className="stagger-item flex flex-col gap-3 hover:border-[#6366F1] transition-all cursor-pointer hover:shadow-sm" onClick={() => navigate(`/community/circles/${c.id}`)}>
                 <div className="flex items-start justify-between">
                   <div className="w-10 h-10 rounded-xl bg-[#eff6ff] flex items-center justify-center">
                     <Users className="w-5 h-5 text-[#6366f1]" />
@@ -151,16 +153,8 @@ export function CirclesPage() {
                   <span className="flex items-center gap-1 text-xs text-[#666666]">
                     <Users className="w-3 h-3" /> {c.memberCount} участников
                   </span>
+                  <span className="ml-auto text-xs text-[#6366F1] font-medium">Открыть →</span>
                 </div>
-                {c.isJoined ? (
-                  <Button size="sm" variant="secondary" className="w-full justify-center" onClick={() => handleLeave(c.id)}>
-                    Покинуть
-                  </Button>
-                ) : (
-                  <Button size="sm" variant="orange" className="w-full justify-center" onClick={() => handleJoin(c.id)}>
-                    Вступить
-                  </Button>
-                )}
               </Card>
             ))
         }

@@ -49,6 +49,7 @@ interface UseCodeRoomWsOptions {
   /** If no userId, connect as guest with this name */
   guestName?: string
   enabled?: boolean
+  onLeave?: (userId: string, displayName: string) => void
 }
 
 export interface SelectionInfo {
@@ -70,7 +71,9 @@ interface UseCodeRoomWsReturn {
 }
 
 export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
-  const { roomId, userId, displayName, guestName, enabled = true } = opts
+  const { roomId, userId, displayName, guestName, enabled = true, onLeave } = opts
+  const onLeaveRef = useRef(onLeave)
+  onLeaveRef.current = onLeave
   const socketRef = useRef<RealtimeSocket | null>(null)
   const clientId = useRef(`client-${Math.random().toString(36).slice(2, 10)}`)
   const awarenessId = useRef(Math.floor(Math.random() * 0xffffffff))
@@ -106,6 +109,13 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
           let cursorData: Record<string, unknown> = {}
           if (msg.data) {
             try { cursorData = JSON.parse(msg.data) } catch {}
+          }
+          // active: false means user disconnected
+          if (cursorData.active === false) {
+            const displayName = (cursorData.displayName as string) ?? msg.userId!
+            setAwareness(prev => { const next = new Map(prev); next.delete(msg.userId!); return next })
+            onLeaveRef.current?.(msg.userId!, displayName)
+            break
           }
           setAwareness(prev => {
             const next = new Map(prev)
