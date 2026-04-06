@@ -3339,6 +3339,8 @@ components:
                 activityStatus:
                     type: integer
                     format: enum
+                telegramUsername:
+                    type: string
         geo.v1.CommunityMapResponse:
             type: object
             properties:

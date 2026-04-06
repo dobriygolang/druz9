@@ -327,19 +327,19 @@ func (x *CommunityMapResponse) GetPoints() []*CommunityMapPoint {
 }
 
 type CommunityMapPoint struct {
-	state          protoimpl.MessageState `protogen:"open.v1"`
-	UserId         string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Title          string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Region         string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
-	Latitude       float64                `protobuf:"fixed64,4,opt,name=latitude,proto3" json:"latitude,omitempty"`
-	Longitude      float64                `protobuf:"fixed64,5,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	IsCurrentUser  bool                   `protobuf:"varint,6,opt,name=is_current_user,json=isCurrentUser,proto3" json:"is_current_user,omitempty"`
-	AvatarUrl      string                 `protobuf:"bytes,7,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
-	Username       string                 `protobuf:"bytes,8,opt,name=username,proto3" json:"username,omitempty"`
-	FirstName      string                 `protobuf:"bytes,9,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName       string                 `protobuf:"bytes,10,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	ActivityStatus   UserActivityStatus `protobuf:"varint,11,opt,name=activity_status,json=activityStatus,proto3,enum=geo.v1.UserActivityStatus" json:"activity_status,omitempty"`
-	TelegramUsername string             `protobuf:"bytes,12,opt,name=telegram_username,json=telegramUsername,proto3" json:"telegram_username,omitempty"`
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	UserId           string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Title            string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
+	Region           string                 `protobuf:"bytes,3,opt,name=region,proto3" json:"region,omitempty"`
+	Latitude         float64                `protobuf:"fixed64,4,opt,name=latitude,proto3" json:"latitude,omitempty"`
+	Longitude        float64                `protobuf:"fixed64,5,opt,name=longitude,proto3" json:"longitude,omitempty"`
+	IsCurrentUser    bool                   `protobuf:"varint,6,opt,name=is_current_user,json=isCurrentUser,proto3" json:"is_current_user,omitempty"`
+	AvatarUrl        string                 `protobuf:"bytes,7,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	Username         string                 `protobuf:"bytes,8,opt,name=username,proto3" json:"username,omitempty"`
+	FirstName        string                 `protobuf:"bytes,9,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName         string                 `protobuf:"bytes,10,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	ActivityStatus   UserActivityStatus     `protobuf:"varint,11,opt,name=activity_status,json=activityStatus,proto3,enum=geo.v1.UserActivityStatus" json:"activity_status,omitempty"`
+	TelegramUsername string                 `protobuf:"bytes,12,opt,name=telegram_username,json=telegramUsername,proto3" json:"telegram_username,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -478,7 +478,7 @@ const file_geo_v1_geo_proto_rawDesc = "" +
 	"\fdisplay_name\x18\x06 \x01(\tR\vdisplayName\"\x15\n" +
 	"\x13CommunityMapRequest\"I\n" +
 	"\x14CommunityMapResponse\x121\n" +
-	"\x06points\x18\x01 \x03(\v2\x19.geo.v1.CommunityMapPointR\x06points\"\xf8\x02\n" +
+	"\x06points\x18\x01 \x03(\v2\x19.geo.v1.CommunityMapPointR\x06points\"\xa5\x03\n" +
 	"\x11CommunityMapPoint\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x16\n" +
@@ -493,7 +493,8 @@ const file_geo_v1_geo_proto_rawDesc = "" +
 	"first_name\x18\t \x01(\tR\tfirstName\x12\x1b\n" +
 	"\tlast_name\x18\n" +
 	" \x01(\tR\blastName\x12C\n" +
-	"\x0factivity_status\x18\v \x01(\x0e2\x1a.geo.v1.UserActivityStatusR\x0eactivityStatus*\xa7\x01\n" +
+	"\x0factivity_status\x18\v \x01(\x0e2\x1a.geo.v1.UserActivityStatusR\x0eactivityStatus\x12+\n" +
+	"\x11telegram_username\x18\f \x01(\tR\x10telegramUsername*\xa7\x01\n" +
 	"\x12UserActivityStatus\x12$\n" +
 	" USER_ACTIVITY_STATUS_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bUSER_ACTIVITY_STATUS_ONLINE\x10\x01\x12(\n" +

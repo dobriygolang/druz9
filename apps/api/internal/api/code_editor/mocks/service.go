@@ -24,6 +24,54 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
+// CloseRoom provides a mock function with given fields: ctx, roomID, callerID
+func (_m *Service) CloseRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) error {
+	ret := _m.Called(ctx, roomID, callerID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CloseRoom")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *uuid.UUID) error); ok {
+		r0 = rf(ctx, roomID, callerID)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Service_CloseRoom_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CloseRoom'
+type Service_CloseRoom_Call struct {
+	*mock.Call
+}
+
+// CloseRoom is a helper method to define mock.On call
+//   - ctx context.Context
+//   - roomID uuid.UUID
+//   - callerID *uuid.UUID
+func (_e *Service_Expecter) CloseRoom(ctx interface{}, roomID interface{}, callerID interface{}) *Service_CloseRoom_Call {
+	return &Service_CloseRoom_Call{Call: _e.mock.On("CloseRoom", ctx, roomID, callerID)}
+}
+
+func (_c *Service_CloseRoom_Call) Run(run func(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID)) *Service_CloseRoom_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_CloseRoom_Call) Return(_a0 error) *Service_CloseRoom_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Service_CloseRoom_Call) RunAndReturn(run func(context.Context, uuid.UUID, *uuid.UUID) error) *Service_CloseRoom_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateRoom provides a mock function with given fields: ctx, creatorID, name, isGuest, mode, topic, difficulty, task
 func (_m *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string) (*model.Room, error) {
 	ret := _m.Called(ctx, creatorID, name, isGuest, mode, topic, difficulty, task)
@@ -87,62 +135,6 @@ func (_c *Service_CreateRoom_Call) Return(_a0 *model.Room, _a1 error) *Service_C
 func (_c *Service_CreateRoom_Call) RunAndReturn(run func(context.Context, *uuid.UUID, string, bool, string, string, string, string) (*model.Room, error)) *Service_CreateRoom_Call {
 	_c.Call.Return(run)
 	return _c
-}
-
-// CloseRoom provides a mock function with given fields: ctx, roomID, callerID
-func (_m *Service) CloseRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) error {
-	ret := _m.Called(ctx, roomID, callerID)
-	if len(ret) == 0 {
-		panic("no return value specified for CloseRoom")
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *uuid.UUID) error); ok {
-		return rf(ctx, roomID, callerID)
-	}
-	return ret.Error(0)
-}
-
-// Service_CloseRoom_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CloseRoom'
-type Service_CloseRoom_Call struct{ *mock.Call }
-
-func (_e *Service_Expecter) CloseRoom(ctx interface{}, roomID interface{}, callerID interface{}) *Service_CloseRoom_Call {
-	return &Service_CloseRoom_Call{Call: _e.mock.On("CloseRoom", ctx, roomID, callerID)}
-}
-func (_c *Service_CloseRoom_Call) Run(run func(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID)) *Service_CloseRoom_Call {
-	_c.Call.Run(func(args mock.Arguments) { run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*uuid.UUID)) })
-	return _c
-}
-func (_c *Service_CloseRoom_Call) Return(err error) *Service_CloseRoom_Call { _c.Call.Return(err); return _c }
-func (_c *Service_CloseRoom_Call) RunAndReturn(run func(context.Context, uuid.UUID, *uuid.UUID) error) *Service_CloseRoom_Call {
-	_c.Call.Return(run); return _c
-}
-
-// SetRoomTask provides a mock function with given fields: ctx, roomID, callerID, task
-func (_m *Service) SetRoomTask(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, task string) error {
-	ret := _m.Called(ctx, roomID, callerID, task)
-	if len(ret) == 0 {
-		panic("no return value specified for SetRoomTask")
-	}
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *uuid.UUID, string) error); ok {
-		return rf(ctx, roomID, callerID, task)
-	}
-	return ret.Error(0)
-}
-
-// Service_SetRoomTask_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetRoomTask'
-type Service_SetRoomTask_Call struct{ *mock.Call }
-
-func (_e *Service_Expecter) SetRoomTask(ctx interface{}, roomID interface{}, callerID interface{}, task interface{}) *Service_SetRoomTask_Call {
-	return &Service_SetRoomTask_Call{Call: _e.mock.On("SetRoomTask", ctx, roomID, callerID, task)}
-}
-func (_c *Service_SetRoomTask_Call) Run(run func(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, task string)) *Service_SetRoomTask_Call {
-	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*uuid.UUID), args[3].(string))
-	})
-	return _c
-}
-func (_c *Service_SetRoomTask_Call) Return(err error) *Service_SetRoomTask_Call { _c.Call.Return(err); return _c }
-func (_c *Service_SetRoomTask_Call) RunAndReturn(run func(context.Context, uuid.UUID, *uuid.UUID, string) error) *Service_SetRoomTask_Call {
-	_c.Call.Return(run); return _c
 }
 
 // CreateTask provides a mock function with given fields: ctx, task
@@ -765,6 +757,55 @@ func (_c *Service_SetReady_Call) Return(_a0 error) *Service_SetReady_Call {
 }
 
 func (_c *Service_SetReady_Call) RunAndReturn(run func(context.Context, uuid.UUID, *uuid.UUID, string, bool) error) *Service_SetReady_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// SetRoomTask provides a mock function with given fields: ctx, roomID, callerID, task
+func (_m *Service) SetRoomTask(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, task string) error {
+	ret := _m.Called(ctx, roomID, callerID, task)
+
+	if len(ret) == 0 {
+		panic("no return value specified for SetRoomTask")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *uuid.UUID, string) error); ok {
+		r0 = rf(ctx, roomID, callerID, task)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Service_SetRoomTask_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetRoomTask'
+type Service_SetRoomTask_Call struct {
+	*mock.Call
+}
+
+// SetRoomTask is a helper method to define mock.On call
+//   - ctx context.Context
+//   - roomID uuid.UUID
+//   - callerID *uuid.UUID
+//   - task string
+func (_e *Service_Expecter) SetRoomTask(ctx interface{}, roomID interface{}, callerID interface{}, task interface{}) *Service_SetRoomTask_Call {
+	return &Service_SetRoomTask_Call{Call: _e.mock.On("SetRoomTask", ctx, roomID, callerID, task)}
+}
+
+func (_c *Service_SetRoomTask_Call) Run(run func(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, task string)) *Service_SetRoomTask_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*uuid.UUID), args[3].(string))
+	})
+	return _c
+}
+
+func (_c *Service_SetRoomTask_Call) Return(_a0 error) *Service_SetRoomTask_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Service_SetRoomTask_Call) RunAndReturn(run func(context.Context, uuid.UUID, *uuid.UUID, string) error) *Service_SetRoomTask_Call {
 	_c.Call.Return(run)
 	return _c
 }

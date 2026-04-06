@@ -5767,14 +5767,15 @@ const file_interview_prep_v1_interview_prep_proto_rawDesc = "" +
 	"\asession\x18\x01 \x01(\v2'.interview_prep.v1.InterviewPrepSessionR\asession\x12E\n" +
 	"\n" +
 	"checkpoint\x18\x02 \x01(\v2%.interview_prep.v1.CheckpointProgressR\n" +
-	"checkpoint*\x9f\x01\n" +
+	"checkpoint*\xb9\x01\n" +
 	"\bPrepType\x12\x19\n" +
 	"\x15PREP_TYPE_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10PREP_TYPE_CODING\x10\x01\x12\x17\n" +
 	"\x13PREP_TYPE_ALGORITHM\x10\x02\x12\x1b\n" +
 	"\x17PREP_TYPE_SYSTEM_DESIGN\x10\x03\x12\x11\n" +
 	"\rPREP_TYPE_SQL\x10\x04\x12\x19\n" +
-	"\x15PREP_TYPE_CODE_REVIEW\x10\x05*\xbd\x02\n" +
+	"\x15PREP_TYPE_CODE_REVIEW\x10\x05\x12\x18\n" +
+	"\x14PREP_TYPE_BEHAVIORAL\x10\x06*\xbd\x02\n" +
 	"\x13ProgrammingLanguage\x12$\n" +
 	" PROGRAMMING_LANGUAGE_UNSPECIFIED\x10\x00\x12#\n" +
 	"\x1fPROGRAMMING_LANGUAGE_JAVASCRIPT\x10\x01\x12#\n" +
