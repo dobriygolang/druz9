@@ -12,7 +12,7 @@ func (i *Implementation) CreateRoom(ctx context.Context, req *v1.CreateRoomReque
 
 	mode := protoRoomModeToModel(req.Mode)
 	difficulty := protoDifficultyToModel(req.Difficulty)
-	room, err := i.service.CreateRoom(ctx, userID, name, isGuest, mode.String(), req.Topic, difficulty.String(), req.Task, req.IsPrivate)
+	room, err := i.service.CreateRoom(ctx, userID, name, isGuest, mode.String(), req.Topic, difficulty.String(), req.Task)
 	if err != nil {
 		return nil, mapErr(err)
 	}

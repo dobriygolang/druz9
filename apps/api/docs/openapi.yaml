@@ -2723,6 +2723,8 @@ components:
                 difficulty:
                     type: integer
                     format: enum
+                isPrivate:
+                    type: boolean
         code_editor.v1.CreateRoomResponse:
             type: object
             properties:
@@ -2891,6 +2893,8 @@ components:
                     type: string
                 creatorId:
                     type: string
+                isPrivate:
+                    type: boolean
         code_editor.v1.SetReadyRequest:
             type: object
             properties:

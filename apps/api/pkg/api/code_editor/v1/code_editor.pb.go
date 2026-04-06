@@ -2919,7 +2919,7 @@ var File_code_editor_v1_code_editor_proto protoreflect.FileDescriptor
 
 const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\n" +
-	" code_editor/v1/code_editor.proto\x12\x0ecode_editor.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbf\x01\n" +
+	" code_editor/v1/code_editor.proto\x12\x0ecode_editor.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xde\x01\n" +
 	"\x11CreateRoomRequest\x12,\n" +
 	"\x04mode\x18\x01 \x01(\x0e2\x18.code_editor.v1.RoomModeR\x04mode\x12\x12\n" +
 	"\x04task\x18\x02 \x01(\tR\x04task\x12\x12\n" +
@@ -2927,7 +2927,9 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x05topic\x18\x04 \x01(\tR\x05topic\x12>\n" +
 	"\n" +
 	"difficulty\x18\x05 \x01(\x0e2\x1e.code_editor.v1.TaskDifficultyR\n" +
-	"difficulty\")\n" +
+	"difficulty\x12\x1d\n" +
+	"\n" +
+	"is_private\x18\x06 \x01(\bR\tisPrivate\")\n" +
 	"\x0eGetRoomRequest\x12\x17\n" +
 	"\aroom_id\x18\x01 \x01(\tR\x06roomId\">\n" +
 	"\x0fJoinRoomRequest\x12\x17\n" +
@@ -3022,7 +3024,7 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\bwin_rate\x18\x05 \x01(\x01R\awinRate\x12\"\n" +
 	"\rbest_solve_ms\x18\x06 \x01(\x03R\vbestSolveMs\"T\n" +
 	"\x16GetLeaderboardResponse\x12:\n" +
-	"\aentries\x18\x01 \x03(\v2 .code_editor.v1.LeaderboardEntryR\aentries\"\x9a\x03\n" +
+	"\aentries\x18\x01 \x03(\v2 .code_editor.v1.LeaderboardEntryR\aentries\"\xb9\x03\n" +
 	"\x04Room\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12,\n" +
 	"\x04mode\x18\x02 \x01(\x0e2\x18.code_editor.v1.RoomModeR\x04mode\x12\x12\n" +
@@ -3038,7 +3040,9 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\rcode_revision\x18\n" +
 	" \x01(\x03R\fcodeRevision\x12\x1d\n" +
 	"\n" +
-	"creator_id\x18\v \x01(\tR\tcreatorId\"\xe5\x01\n" +
+	"creator_id\x18\v \x01(\tR\tcreatorId\x12\x1d\n" +
+	"\n" +
+	"is_private\x18\f \x01(\bR\tisPrivate\"\xe5\x01\n" +
 	"\vParticipant\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x19\n" +
