@@ -101,4 +101,7 @@ export const codeRoomApi = {
     const r = await apiClient.get<{ entries?: unknown[] }>('/api/v1/code-editor/leaderboard', { params: { limit: 20 } })
     return r.data.entries ?? []
   },
+  startRoom: async (roomId: string): Promise<void> => {
+    await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/start`, {})
+  },
 }

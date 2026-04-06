@@ -9,4 +9,5 @@ var (
 	ErrTaskNotFound      = errors.New("task not found")
 	ErrNoAvailableTasks  = errors.New("no available tasks")
 	ErrRoomAlreadyClosed = errors.New("room already finished")
+	ErrForbidden         = errors.New("forbidden")
 )

@@ -300,6 +300,34 @@ func (s *Service) GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*doma
 	return s.repo.GetSubmissions(ctx, roomID)
 }
 
+// StartRoom transitions a ROOM_MODE_ALL room from waiting → active.
+// Only the room creator may call this. Idempotent: already-active rooms return nil.
+func (s *Service) StartRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) (*domain.Room, error) {
+	room, err := s.repo.GetRoom(ctx, roomID)
+	if err != nil {
+		return nil, err
+	}
+
+	// Verify caller is the creator
+	if callerID == nil || room.CreatorID == uuid.Nil || *callerID != room.CreatorID {
+		return nil, domain.ErrForbidden
+	}
+
+	// Already active or finished — nothing to do
+	if room.Status == model.RoomStatusActive || room.Status == model.RoomStatusFinished {
+		room.Participants = s.addCachedGuestsToRoom(room.Participants, roomID)
+		return room, nil
+	}
+
+	if err := s.repo.UpdateRoomStatus(ctx, roomID, model.RoomStatusActive); err != nil {
+		return nil, err
+	}
+	room.Status = model.RoomStatusActive
+
+	room.Participants = s.addCachedGuestsToRoom(room.Participants, roomID)
+	return room, nil
+}
+
 func (s *Service) CleanupInactiveRooms(ctx context.Context, idleFor time.Duration) (int64, error) {
 	return s.repo.CleanupInactiveRooms(ctx, idleFor)
 }

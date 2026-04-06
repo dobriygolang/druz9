@@ -184,7 +184,7 @@ export function ProfilePage() {
   ]
 
   return (
-    <div className="p-4 md:p-6 flex flex-col gap-4 max-w-3xl mx-auto w-full">
+    <div className="p-4 md:p-6 flex flex-col gap-4 max-w-5xl mx-auto w-full">
       {/* Hero card */}
       <div className="bg-white rounded-2xl border border-[#CBCCC9] overflow-hidden">
         {/* Top accent strip */}
@@ -229,10 +229,10 @@ export function ProfilePage() {
             {(user.connectedProviders.includes('telegram') || user.connectedProviders.includes('yandex')) && (
               <div className="flex items-center gap-1.5 mt-2.5">
                 {user.connectedProviders.includes('telegram') && (
-                  <span className="px-2 py-0.5 bg-[#e8f4fd] text-[#0088cc] text-[11px] font-medium rounded-full">Telegram</span>
+                  <span className="px-2 py-0.5 bg-[#e8f4fd] text-[#0088cc] text-[11px] font-medium rounded-full">Вход: Telegram</span>
                 )}
                 {user.connectedProviders.includes('yandex') && (
-                  <span className="px-2 py-0.5 bg-[#fffbeb] text-[#f59e0b] text-[11px] font-medium rounded-full">Яндекс</span>
+                  <span className="px-2 py-0.5 bg-[#fffbeb] text-[#f59e0b] text-[11px] font-medium rounded-full">Вход: Яндекс</span>
                 )}
               </div>
             )}
@@ -345,7 +345,7 @@ export function ProfilePage() {
                 {progress.companies.map(c => (
                   <div key={c.tag} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F3F0] rounded-lg">
                     <span className="text-sm font-medium text-[#111111]">{c.tag}</span>
-                    <span className="text-xs text-[#94a3b8]">&times;{c.sessions}</span>
+                    <span className="text-xs text-[#94a3b8]">{c.sessions} сес.</span>
                   </div>
                 ))}
               </div>

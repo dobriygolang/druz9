@@ -45,12 +45,28 @@ function injectCursorCSS(safeId: string, hex: string) {
   document.head.appendChild(style)
 }
 
+/** OT-style cursor offset transform: shifts cursor when text changes before it */
+function transformCursorOffset(offset: number, oldCode: string, newCode: string): number {
+  if (oldCode === newCode) return offset
+  let start = 0
+  const minLen = Math.min(oldCode.length, newCode.length)
+  while (start < minLen && oldCode[start] === newCode[start]) start++
+  if (offset <= start) return offset
+  let oldTail = oldCode.length
+  let newTail = newCode.length
+  while (oldTail > start && newTail > start && oldCode[oldTail - 1] === newCode[newTail - 1]) { oldTail--; newTail-- }
+  const deleted = oldTail - start
+  const inserted = newTail - start
+  if (offset < start + deleted) return start + inserted
+  return offset - deleted + inserted
+}
+
+/** posRef is mutable — update it and call layoutContentWidget instead of re-adding */
 function buildCursorWidget(
   userId: string,
   displayName: string,
   color: string,
-  cursorLine: number,
-  cursorColumn: number,
+  posRef: { line: number; col: number },
   monaco: typeof Monaco,
 ): Monaco.editor.IContentWidget {
   const domNode = document.createElement('div')
@@ -70,7 +86,7 @@ function buildCursorWidget(
     getId: () => `remote-cursor-${userId}`,
     getDomNode: () => domNode,
     getPosition: () => ({
-      position: { lineNumber: cursorLine, column: cursorColumn },
+      position: { lineNumber: posRef.line, column: posRef.col },
       preference: [monaco.editor.ContentWidgetPositionPreference.EXACT],
     }),
   }
@@ -161,6 +177,8 @@ export function CodeRoomPage() {
   const isCreatorRef = useRef(false)
   const starterCodeRef = useRef((location.state as { starterCode?: string } | null)?.starterCode ?? '')
   const sentStarterCode = useRef(false)
+  // Mutable cursor positions for remote users — updated in-place, no widget re-add needed
+  const cursorPositionsRef = useRef<Map<string, { line: number; col: number }>>(new Map())
 
   // Check if guest name is needed
   useEffect(() => {
@@ -224,42 +242,67 @@ export function CodeRoomPage() {
       .catch(() => navigate('/practice/code-rooms'))
   }, [roomId, needsGuestName])
 
-  // Sync WebSocket code -> local (remote changes), preserve cursor
+  // Sync WebSocket code -> local (remote changes), preserve local cursor + OT-transform remote cursors
   useEffect(() => {
     if (!ws.code || skipNextWsUpdate.current) {
       skipNextWsUpdate.current = false
       return
     }
     skipNextWsUpdate.current = false
+    if (starterCodeRef.current && !sentStarterCode.current) return
     const editor = editorRef.current
+    const monaco = monacoRef.current
     const model = editor?.getModel()
     if (model && model.getValue() !== ws.code) {
-      // Update model directly so @monaco-editor/react skips its own setValue on re-render
+      const oldCode = model.getValue()
+      // Save remote cursor offsets BEFORE model changes (needed for OT transform)
+      const savedOffsets = new Map<string, number>()
+      cursorPositionsRef.current.forEach((posRef, userId) => {
+        try {
+          savedOffsets.set(userId, model.getOffsetAt({ lineNumber: posRef.line, column: posRef.col }))
+        } catch { savedOffsets.set(userId, 0) }
+      })
+
       const pos = editor!.getPosition()
       const sel = editor!.getSelection()
       model.setValue(ws.code)
       if (pos) editor!.setPosition(pos)
       if (sel) editor!.setSelection(sel)
+
+      // OT-transform remote cursor positions and re-layout in-place
+      if (monaco) {
+        savedOffsets.forEach((oldOffset, userId) => {
+          const newOffset = transformCursorOffset(oldOffset, oldCode, ws.code)
+          const newPos = model.getPositionAt(Math.min(newOffset, ws.code.length))
+          const posRef = cursorPositionsRef.current.get(userId)
+          if (posRef) {
+            posRef.line = newPos.lineNumber
+            posRef.col = newPos.column
+            const widget = widgetsRef.current.get(userId)
+            if (widget) editor!.layoutContentWidget(widget)
+          }
+        })
+      }
     }
-    // Keep React state in sync (model already updated, Monaco won't reset cursor)
     setLocalCode(ws.code)
   }, [ws.code])
 
-  // Initialize starter code once snapshot arrives (only if room is empty)
+  // Push starter code once snapshot arrives, overriding whatever the server has
   useEffect(() => {
     if (!ws.gotSnapshot || sentStarterCode.current || !starterCodeRef.current) return
     sentStarterCode.current = true
-    if (!ws.code) {
-      const model = editorRef.current?.getModel()
-      if (model) {
-        model.setValue(starterCodeRef.current)
-        setLocalCode(starterCodeRef.current)
-        ws.sendUpdate(starterCodeRef.current)
-      } else {
-        setLocalCode(starterCodeRef.current)
-      }
+    // Always push the task starter code — don't check ws.code, the server may
+    // have the default boilerplate ("Hello, World!") which we need to replace.
+    if (ws.code === starterCodeRef.current) return // already correct, no resend needed
+    const model = editorRef.current?.getModel()
+    if (model) {
+      model.setValue(starterCodeRef.current)
+      setLocalCode(starterCodeRef.current)
+      ws.sendUpdate(starterCodeRef.current)
+    } else {
+      setLocalCode(starterCodeRef.current)
     }
-  }, [ws.gotSnapshot, ws.code, ws.sendUpdate])
+  }, [ws.gotSnapshot, ws.sendUpdate])
 
   // Update room from room_update WS message (fired on join/leave/status change)
   useEffect(() => {
@@ -305,6 +348,15 @@ export function CodeRoomPage() {
   const isCreator = !!user && !!room && (user.id === room.creatorId || room.participants.some(p => p.userId === user.id && p.isCreator))
   useEffect(() => { isCreatorRef.current = isCreator }, [isCreator])
 
+  // Auto-start room: creator's connection triggers waiting→active transition
+  const startedRoomRef = useRef(false)
+  useEffect(() => {
+    if (!ws.connected || !isCreator || startedRoomRef.current) return
+    if (room?.status === 'ROOM_STATUS_ACTIVE' || room?.status === 'ROOM_STATUS_FINISHED') return
+    startedRoomRef.current = true
+    codeRoomApi.startRoom(roomId!).catch(() => { startedRoomRef.current = false })
+  }, [ws.connected, isCreator, room?.status, roomId])
+
   // Tab visibility anti-cheat tracking
   useEffect(() => {
     if (!ws.connected) return
@@ -320,14 +372,21 @@ export function CodeRoomPage() {
     return () => document.removeEventListener('visibilitychange', handler)
   }, [ws.connected, ws.sendAwareness])
 
-  // Remote cursor decorations in Monaco
+  // Remote cursor widgets — update mutable posRef in-place (no remove/re-add = no flicker)
   useEffect(() => {
     const editor = editorRef.current
     const monaco = monacoRef.current
     if (!editor || !monaco) return
 
-    widgetsRef.current.forEach(w => editor.removeContentWidget(w))
-    widgetsRef.current.clear()
+    // Remove widgets for users who left
+    const presentIds = new Set(ws.awareness.keys())
+    widgetsRef.current.forEach((widget, userId) => {
+      if (!presentIds.has(userId)) {
+        editor.removeContentWidget(widget)
+        widgetsRef.current.delete(userId)
+        cursorPositionsRef.current.delete(userId)
+      }
+    })
 
     const newDecorations: Monaco.editor.IModelDeltaDecoration[] = []
 
@@ -336,20 +395,26 @@ export function CodeRoomPage() {
       const color = getCursorColor(state.userId)
       const safeId = state.userId.replace(/[^a-z0-9]/gi, '_')
       injectCursorCSS(safeId, color)
-
-      // Cursor bar + name chip via content widget (EXACT position)
       const col = state.cursorColumn ?? 1
-      const widget = buildCursorWidget(state.userId, state.displayName, color, state.cursorLine, col, monaco)
-      editor.addContentWidget(widget)
-      widgetsRef.current.set(state.userId, widget)
 
-      // Overview ruler dot so you can spot remote cursor even when scrolled
+      const existingPos = cursorPositionsRef.current.get(state.userId)
+      if (existingPos && widgetsRef.current.has(state.userId)) {
+        // Mutate posRef so getPosition() returns new coords, then re-layout without re-adding
+        existingPos.line = state.cursorLine
+        existingPos.col = col
+        editor.layoutContentWidget(widgetsRef.current.get(state.userId)!)
+      } else {
+        const posRef = { line: state.cursorLine, col }
+        cursorPositionsRef.current.set(state.userId, posRef)
+        const widget = buildCursorWidget(state.userId, state.displayName, color, posRef, monaco)
+        editor.addContentWidget(widget)
+        widgetsRef.current.set(state.userId, widget)
+      }
+
       newDecorations.push({
         range: new monaco.Range(state.cursorLine, col, state.cursorLine, col),
         options: { overviewRuler: { color, position: monaco.editor.OverviewRulerLane.Right } },
       })
-
-      // Selection range highlight
       if (
         state.selStartLine && state.selEndLine &&
         !(state.selStartLine === state.selEndLine && (state.selStartCol ?? 1) === (state.selEndCol ?? 1))
@@ -366,12 +431,16 @@ export function CodeRoomPage() {
     } else {
       decorationsRef.current = editor.createDecorationsCollection(newDecorations)
     }
-
-    return () => {
-      widgetsRef.current.forEach(w => editor.removeContentWidget(w))
-      widgetsRef.current.clear()
-    }
+    // No cleanup on re-run — managed by cursorPositionsRef; only unmount cleans up
   }, [ws.awareness])
+
+  // Unmount cleanup for remote cursor widgets
+  useEffect(() => () => {
+    const editor = editorRef.current
+    widgetsRef.current.forEach(w => editor?.removeContentWidget(w))
+    widgetsRef.current.clear()
+    cursorPositionsRef.current.clear()
+  }, [])
 
   // Sync WebSocket submission results
   useEffect(() => {

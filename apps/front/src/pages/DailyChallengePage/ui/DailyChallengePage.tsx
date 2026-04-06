@@ -122,7 +122,7 @@ export function DailyChallengePage() {
         task_title: task?.task.title ?? '',
         statement: task?.task.statement ?? '',
       })
-      setReview(res.data)
+      setReview(res.data?.review ?? res.data)
     } catch {
       // keep submitted=true, review stays null
     } finally {
