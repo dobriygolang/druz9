@@ -10,7 +10,7 @@ export interface GeoSuggestion {
 }
 
 type BackendGeoSuggestion = {
-  placeLabel?: string
+  displayName?: string
   city?: string
   region?: string
   country?: string
@@ -63,9 +63,9 @@ function normalizeActivityStatus(s?: string): CommunityPoint['activityStatus'] {
 
 export const geoApi = {
   suggest: async (query: string): Promise<GeoSuggestion[]> => {
-    const r = await apiClient.post<{ suggestions?: BackendGeoSuggestion[] }>('/api/v1/geo/resolve', { query })
-    return (r.data.suggestions ?? []).map((s) => ({
-      placeLabel: s.placeLabel ?? '', city: s.city, region: s.region, country: s.country,
+    const r = await apiClient.post<{ candidates?: BackendGeoSuggestion[] }>('/api/v1/geo/resolve', { query })
+    return (r.data.candidates ?? []).map((s) => ({
+      placeLabel: s.displayName ?? s.city ?? '', city: s.city, region: s.region, country: s.country,
       latitude: s.latitude ?? 0, longitude: s.longitude ?? 0,
     }))
   },
