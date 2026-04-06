@@ -34,26 +34,6 @@ export function CirclesPage() {
     fetchCircles()
   }, [fetchCircles])
 
-  const handleJoin = async (id: string) => {
-    try {
-      await circleApi.joinCircle(id)
-      setCircles(prev => prev.map(c => c.id === id ? { ...c, isJoined: true, memberCount: c.memberCount + 1 } : c))
-      toast('Вы вступили в круг', 'success')
-    } catch {
-      toast('Не удалось вступить', 'error')
-    }
-  }
-
-  const handleLeave = async (id: string) => {
-    try {
-      await circleApi.leaveCircle(id)
-      setCircles(prev => prev.map(c => c.id === id ? { ...c, isJoined: false, memberCount: Math.max(c.memberCount - 1, 0) } : c))
-      toast('Вы покинули круг', 'success')
-    } catch {
-      toast('Не удалось покинуть круг', 'error')
-    }
-  }
-
   const handleCreate = async () => {
     if (!form.name) return
     setCreating(true)

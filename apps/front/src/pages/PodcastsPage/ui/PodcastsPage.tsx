@@ -145,16 +145,54 @@ export function PodcastsPage() {
   }, [uploading])
 
   const handleUpload = async () => {
-    if (!uploadTitle || !uploadAuthor || !uploadFile) return
+    if (!uploadTitle || !uploadFile) return
     setUploadError(null)
     setUploading(true)
     try {
-      const form = new FormData()
-      form.append('title', uploadTitle)
-      form.append('authorName', uploadAuthor)
-      form.append('description', uploadDesc)
-      form.append('file', uploadFile)
-      await apiClient.post('/api/v1/podcasts', form, { headers: { 'Content-Type': 'multipart/form-data' } })
+      // Step 1: Create podcast record
+      const createRes = await apiClient.post<{ podcast: { id: string } }>('/api/admin/podcasts', { title: uploadTitle })
+      const podcastId = createRes.data.podcast.id
+
+      // Determine content type enum from MIME type
+      const mimeType = uploadFile.type
+      let contentType = 'MEDIA_CONTENT_TYPE_AUDIO_MPEG'
+      if (mimeType === 'audio/wav') contentType = 'MEDIA_CONTENT_TYPE_AUDIO_WAV'
+      else if (mimeType === 'audio/ogg') contentType = 'MEDIA_CONTENT_TYPE_AUDIO_OGG'
+      else if (mimeType === 'audio/mp4' || mimeType === 'audio/x-m4a') contentType = 'MEDIA_CONTENT_TYPE_AUDIO_MP4'
+
+      // Get duration from audio metadata
+      let durationSeconds = 0
+      try {
+        const blobUrl = URL.createObjectURL(uploadFile)
+        durationSeconds = await new Promise<number>((resolve) => {
+          const audio = new Audio(blobUrl)
+          audio.addEventListener('loadedmetadata', () => { URL.revokeObjectURL(blobUrl); resolve(Math.round(audio.duration) || 0) })
+          audio.addEventListener('error', () => { URL.revokeObjectURL(blobUrl); resolve(0) })
+        })
+      } catch { durationSeconds = 0 }
+
+      // Step 2: Prepare upload — get S3 pre-signed URL
+      const prepareRes = await apiClient.post<{ uploadUrl: string; objectKey: string }>(
+        `/api/admin/podcasts/${podcastId}/upload/prepare`,
+        { fileName: uploadFile.name, contentType, durationSeconds },
+      )
+      const { uploadUrl, objectKey } = prepareRes.data
+
+      // Step 3: Upload file directly to S3/MinIO
+      await fetch(uploadUrl, {
+        method: 'PUT',
+        body: uploadFile,
+        headers: { 'Content-Type': uploadFile.type || 'audio/mpeg' },
+      })
+
+      // Step 4: Mark upload as complete
+      await apiClient.post(`/api/admin/podcasts/${podcastId}/upload/complete`, {
+        fileName: uploadFile.name,
+        contentType,
+        durationSeconds,
+        objectKey,
+      })
+
       setShowUpload(false)
       setUploadTitle(''); setUploadAuthor(''); setUploadDesc(''); setUploadFile(null)
       fetchPodcasts()
@@ -443,7 +481,7 @@ export function PodcastsPage() {
                 className="flex-1 py-2 text-sm font-medium text-[#666666] bg-[#F2F3F0] rounded-xl hover:bg-[#E7E8E5] transition-colors">
                 Отмена
               </button>
-              <button onClick={handleUpload} disabled={uploading || !uploadTitle || !uploadAuthor || !uploadFile}
+              <button onClick={handleUpload} disabled={uploading || !uploadTitle || !uploadFile}
                 className="flex-1 py-2 text-sm font-medium text-white bg-[#6366F1] rounded-xl hover:bg-[#4F46E5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {uploading ? 'Загружаем...' : 'Загрузить'}
               </button>

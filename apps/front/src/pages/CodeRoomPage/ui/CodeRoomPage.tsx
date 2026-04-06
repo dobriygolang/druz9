@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
-import { useParams, useNavigate } from 'react-router-dom'
+import { useParams, useNavigate, useLocation } from 'react-router-dom'
 import { ArrowLeft, Play, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, Bot, Pencil, Bell, BellOff } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
@@ -45,6 +45,16 @@ function injectCursorCSS(safeId: string, hex: string) {
   document.head.appendChild(style)
 }
 
+const LANGUAGES = [
+  { value: 'python', label: 'Python 3' },
+  { value: 'javascript', label: 'JavaScript' },
+  { value: 'typescript', label: 'TypeScript' },
+  { value: 'go', label: 'Go' },
+  { value: 'rust', label: 'Rust' },
+  { value: 'cpp', label: 'C++' },
+  { value: 'java', label: 'Java' },
+]
+
 const AI_HINTS = [
   'Подумайте о граничных случаях',
   'Рассмотрите временную сложность вашего решения',
@@ -87,6 +97,7 @@ function GuestNamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
 export function CodeRoomPage() {
   const { roomId } = useParams<{ roomId: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
   const { user } = useAuth()
   const [room, setRoom] = useState<Room | null>(null)
   const [localCode, setLocalCode] = useState('')
@@ -107,6 +118,7 @@ export function CodeRoomPage() {
   const [editTaskStatement, setEditTaskStatement] = useState('')
   const [notifications, setNotifications] = useState<Array<{ id: string; text: string }>>([])
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
+  const [showLangDropdown, setShowLangDropdown] = useState(false)
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<typeof Monaco | null>(null)
   const decorationsRef = useRef<Monaco.editor.IEditorDecorationsCollection | null>(null)
@@ -150,7 +162,7 @@ export function CodeRoomPage() {
     displayName: user?.firstName ?? guestNameRef.current ?? 'Guest',
     guestName: guestNameRef.current,
     enabled: !!roomId && !needsGuestName,
-    onLeave: useCallback((userId: string, displayName: string) => {
+    onLeave: useCallback((_userId: string, displayName: string) => {
       addNotification(`${displayName} покинул(-а) комнату`)
     }, [addNotification]),
   })
@@ -158,8 +170,14 @@ export function CodeRoomPage() {
   // Fetch initial room data via REST
   useEffect(() => {
     if (!roomId || needsGuestName) return
+    const taskState = location.state as { statement?: string; starterCode?: string; language?: string } | null
     codeRoomApi.getRoom(roomId, guestNameRef.current)
-      .then(r => { setRoom(r); if (r.code && !ws.code) setLocalCode(r.code) })
+      .then(r => {
+        setRoom(r)
+        if (taskState?.statement) setTaskStatement(taskState.statement)
+        const initCode = r.code || taskState?.starterCode || ''
+        if (initCode) setLocalCode(initCode)
+      })
       .catch(() => navigate('/practice/code-rooms'))
   }, [roomId, needsGuestName])
 
@@ -557,9 +575,30 @@ export function CodeRoomPage() {
               <span className="text-xs text-[#94a3b8] font-mono">
                 solution.{lang === 'python' ? 'py' : lang === 'javascript' ? 'js' : lang === 'typescript' ? 'ts' : lang === 'go' ? 'go' : lang === 'rust' ? 'rs' : lang === 'java' ? 'java' : 'py'}
               </span>
-              <button className="ml-auto flex items-center gap-1 px-2 py-1 text-xs text-[#94a3b8] rounded hover:bg-[#0f172a] transition-colors">
-                {getLanguageLabel(lang)} <ChevronDown className="w-3 h-3" />
-              </button>
+              <div className="ml-auto relative">
+                <button
+                  onClick={() => setShowLangDropdown(v => !v)}
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-[#94a3b8] rounded hover:bg-[#0f172a] transition-colors"
+                >
+                  {getLanguageLabel(lang)} <ChevronDown className="w-3 h-3" />
+                </button>
+                {showLangDropdown && (
+                  <>
+                    <div className="fixed inset-0 z-40" onClick={() => setShowLangDropdown(false)} />
+                    <div className="absolute right-0 top-full mt-1 z-50 bg-[#1e293b] border border-[#334155] rounded-lg shadow-xl overflow-hidden min-w-[130px]">
+                      {LANGUAGES.map(l => (
+                        <button
+                          key={l.value}
+                          onClick={() => { ws.sendLanguageChange(l.value); setShowLangDropdown(false) }}
+                          className={`w-full text-left px-3 py-2 text-xs transition-colors ${lang === l.value ? 'text-[#6366F1] bg-[#0f172a]' : 'text-[#94a3b8] hover:bg-[#0f172a] hover:text-white'}`}
+                        >
+                          {l.label}
+                        </button>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
             </div>
             <div className="flex-1">
               <Editor

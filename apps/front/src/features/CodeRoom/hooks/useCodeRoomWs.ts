@@ -67,6 +67,7 @@ interface UseCodeRoomWsReturn {
   lastSubmission: SubmissionResult | null
   lastRoomUpdate: unknown
   sendUpdate: (code: string) => void
+  sendLanguageChange: (lang: string) => void
   sendAwareness: (line: number, column: number, selection?: SelectionInfo) => void
 }
 
@@ -101,6 +102,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       case 'update': {
         isRemoteUpdate.current = true
         if (msg.plainText !== undefined) setCode(msg.plainText)
+        if (msg.language) setLanguage(msg.language)
         isRemoteUpdate.current = false
         break
       }
@@ -198,6 +200,11 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     })
   }, [])
 
+  const sendLanguageChange = useCallback((lang: string) => {
+    setLanguage(lang)
+    socketRef.current?.send({ type: 'update', language: lang })
+  }, [])
+
   const sendAwareness = useCallback((line: number, column: number, selection?: SelectionInfo) => {
     const cursorData: Record<string, unknown> = {
       displayName,
@@ -218,5 +225,5 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     })
   }, [userId, guestName, displayName])
 
-  return { connected, code, language, awareness, lastSubmission, lastRoomUpdate, sendUpdate, sendAwareness }
+  return { connected, code, language, awareness, lastSubmission, lastRoomUpdate, sendUpdate, sendLanguageChange, sendAwareness }
 }
