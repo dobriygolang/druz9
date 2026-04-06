@@ -62,16 +62,6 @@ function injectCursorCSS(safeId: string, hex: string) {
   document.head.appendChild(style)
 }
 
-/** Convert line/col (1-based) to a flat offset in a given code string */
-function getCodeOffset(code: string, line: number, col: number): number {
-  const lines = code.split('\n')
-  let offset = 0
-  for (let i = 0; i < line - 1 && i < lines.length; i++) {
-    offset += lines[i].length + 1 // +1 for \n
-  }
-  return Math.min(offset + col - 1, code.length)
-}
-
 /** OT-style cursor offset transform: shifts cursor when text changes before it */
 function transformCursorOffset(offset: number, oldCode: string, newCode: string): number {
   if (oldCode === newCode) return offset
@@ -305,7 +295,7 @@ export function CodeRoomPage() {
       .catch(() => navigate('/practice/code-rooms'))
   }, [roomId, needsGuestName])
 
-  // Sync WebSocket code -> local (remote changes), preserve local cursor + OT-transform remote cursors
+  // Sync WebSocket code -> local (remote changes), preserve local cursor position
   useEffect(() => {
     if (!ws.code || skipNextWsUpdate.current) {
       skipNextWsUpdate.current = false
@@ -314,18 +304,9 @@ export function CodeRoomPage() {
     skipNextWsUpdate.current = false
     if (starterCodeRef.current && !sentStarterCode.current) return
     const editor = editorRef.current
-    const monaco = monacoRef.current
     const model = editor?.getModel()
     if (model && model.getValue() !== ws.code) {
       const oldCode = model.getValue()
-      // Save remote cursor offsets BEFORE model changes (needed for OT transform)
-      const savedOffsets = new Map<string, number>()
-      cursorPositionsRef.current.forEach((posRef, userId) => {
-        try {
-          savedOffsets.set(userId, model.getOffsetAt({ lineNumber: posRef.line, column: posRef.col }))
-        } catch { savedOffsets.set(userId, 0) }
-      })
-
       const pos = editor!.getPosition()
       const sel = editor!.getSelection()
       const localCursorOffset = pos ? model.getOffsetAt(pos) : null
@@ -347,21 +328,7 @@ export function CodeRoomPage() {
         const e = model.getPositionAt(Math.min(newEnd, ws.code.length))
         editor!.setSelection({ startLineNumber: s.lineNumber, startColumn: s.column, endLineNumber: e.lineNumber, endColumn: e.column })
       }
-
-      // OT-transform remote cursor positions and re-layout in-place
-      if (monaco) {
-        savedOffsets.forEach((oldOffset, userId) => {
-          const newOffset = transformCursorOffset(oldOffset, oldCode, ws.code)
-          const newPos = model.getPositionAt(Math.min(newOffset, ws.code.length))
-          const posRef = cursorPositionsRef.current.get(userId)
-          if (posRef) {
-            posRef.line = newPos.lineNumber
-            posRef.col = newPos.column
-            const widget = widgetsRef.current.get(userId)
-            if (widget) editor!.layoutContentWidget(widget)
-          }
-        })
-      }
+      // Remote cursors are driven exclusively by awareness messages — no OT transform here
     }
     setLocalCode(ws.code)
     prevLocalCodeRef.current = ws.code
@@ -371,17 +338,11 @@ export function CodeRoomPage() {
   useEffect(() => {
     if (!ws.gotSnapshot || sentStarterCode.current || !starterCodeRef.current) return
     sentStarterCode.current = true
-    // Always push the task starter code — don't check ws.code, the server may
-    // have the default boilerplate ("Hello, World!") which we need to replace.
     if (ws.code === starterCodeRef.current) return // already correct, no resend needed
     const model = editorRef.current?.getModel()
-    if (model) {
-      model.setValue(starterCodeRef.current)
-      setLocalCode(starterCodeRef.current)
-      ws.sendUpdate(starterCodeRef.current)
-    } else {
-      setLocalCode(starterCodeRef.current)
-    }
+    if (model) model.setValue(starterCodeRef.current)
+    setLocalCode(starterCodeRef.current)
+    ws.sendUpdate(starterCodeRef.current) // always push — model readiness is irrelevant
   }, [ws.gotSnapshot, ws.sendUpdate])
 
   // Update room from room_update WS message (fired on join/leave/status change)
@@ -434,7 +395,7 @@ export function CodeRoomPage() {
     if (!ws.connected || !isCreator || startedRoomRef.current) return
     if (room?.status === 'ROOM_STATUS_ACTIVE' || room?.status === 'ROOM_STATUS_FINISHED') return
     startedRoomRef.current = true
-    codeRoomApi.startRoom(roomId!).catch(() => { startedRoomRef.current = false })
+    codeRoomApi.startRoom(roomId!).catch((err) => { startedRoomRef.current = false; console.error('Failed to start room:', err) })
   }, [ws.connected, isCreator, room?.status, roomId])
 
   // Tab visibility anti-cheat tracking
@@ -533,29 +494,13 @@ export function CodeRoomPage() {
 
   const handleCodeChange = useCallback((value: string | undefined) => {
     if (isApplyingRemoteCode.current) return
-    const oldCode = prevLocalCodeRef.current
     const v = value ?? ''
     prevLocalCodeRef.current = v
     setLocalCode(v)
     skipNextWsUpdate.current = true
     ws.sendUpdate(v)
-
-    // OT-transform remote cursor positions so they follow along as the local user types
-    if (cursorPositionsRef.current.size > 0 && oldCode !== v) {
-      const editor = editorRef.current
-      const model = editor?.getModel()
-      if (model) {
-        cursorPositionsRef.current.forEach((posRef, userId) => {
-          const oldOffset = getCodeOffset(oldCode, posRef.line, posRef.col)
-          const newOffset = transformCursorOffset(oldOffset, oldCode, v)
-          const newPos = model.getPositionAt(Math.min(newOffset, v.length))
-          posRef.line = newPos.lineNumber
-          posRef.col = newPos.column
-          const widget = widgetsRef.current.get(userId)
-          if (widget) editor!.layoutContentWidget(widget)
-        })
-      }
-    }
+    // Remote cursor positions are driven solely by awareness messages.
+    // OT-transforming them here fights with incoming awareness updates and causes jumping.
 
     if (soloDraftTaskId) {
       if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)

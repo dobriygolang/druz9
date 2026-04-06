@@ -28,7 +28,7 @@ export const RuntimeConfigProvider: React.FC<{ children: React.ReactNode }> = ({
         appRequireAuth: r.data.appRequireAuth ?? false,
         arenaRequireAuth: r.data.arenaRequireAuth ?? false,
       }))
-      .catch(() => {})
+      .catch((err) => { console.error('Failed to load runtime config:', err) })
       .finally(() => setIsLoading(false))
   }, [])
 

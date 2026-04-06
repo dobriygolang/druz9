@@ -94,7 +94,7 @@ export const codeRoomApi = {
     return { output: r.data.output ?? '', error: r.data.error ?? '', isCorrect: r.data.isCorrect ?? false }
   },
   updateRoomTask: async (roomId: string, task: string, taskStatement: string): Promise<void> => {
-    await apiClient.patch(`/api/v1/code-editor/rooms/${roomId}`, { task, taskStatement }).catch(() => {})
+    await apiClient.patch(`/api/v1/code-editor/rooms/${roomId}`, { task, taskStatement })
   },
   setReady: async (roomId: string, ready: boolean): Promise<void> => {
     await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/ready`, { ready })

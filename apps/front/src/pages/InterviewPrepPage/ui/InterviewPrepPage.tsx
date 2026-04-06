@@ -49,7 +49,7 @@ export function InterviewPrepPage() {
       .finally(() => setLoading(false))
     interviewPrepApi.listCompanies()
       .then(cs => setCompanies(cs))
-      .catch(() => {})
+      .catch((err) => { console.error('InterviewPrepPage companies fetch error:', err) })
   }, [])
 
   useEffect(() => { fetchTasks() }, [fetchTasks])

@@ -151,7 +151,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         if (msg.userId && msg.awarenessId !== undefined) {
           let cursorData: Record<string, unknown> = {}
           if (msg.data) {
-            try { cursorData = JSON.parse(msg.data) } catch {}
+            try { cursorData = JSON.parse(msg.data) } catch (err) { console.error('Failed to parse cursor data:', err) }
           }
 
           const incomingDisplayName = (cursorData.displayName as string) ?? msg.userId!

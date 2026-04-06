@@ -31,7 +31,7 @@ export function CodeRoomsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   useEffect(() => {
-    codeRoomApi.listRooms().then(setRooms).catch(() => {})
+    codeRoomApi.listRooms().then(setRooms).catch((err) => { console.error('CodeRoomsPage fetch error:', err) })
   }, [])
 
   const getRoomShareUrl = (room: Room) =>

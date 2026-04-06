@@ -2,6 +2,7 @@ package realtime
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"sync"
 
@@ -75,6 +76,9 @@ func (h *CodeEditorHub) Handler(roomID string) http.Handler {
 }
 
 func EncodeMessage(msg schema.CodeEditorMessage) []byte {
-	payload, _ := json.Marshal(msg)
+	payload, err := json.Marshal(msg)
+	if err != nil {
+		panic(fmt.Sprintf("EncodeMessage: failed to marshal CodeEditorMessage: %v", err))
+	}
 	return payload
 }

@@ -496,15 +496,20 @@ func mockStageCandidates(kind model.InterviewPrepMockStageKind, tasks []*model.I
 		}
 		switch kind {
 		case model.InterviewPrepMockStageKindSlices:
-			if task.IsExecutable && strings.Contains(task.Slug, "slice") {
+			slug := task.Slug
+			if strings.Contains(slug, "slice") || strings.Contains(slug, "slay") {
 				result = append(result, task)
 			}
 		case model.InterviewPrepMockStageKindConcurrency:
-			if task.IsExecutable && (strings.Contains(task.Slug, "worker") || strings.Contains(task.Slug, "mutex") || strings.Contains(task.Slug, "concurr")) {
+			slug := task.Slug
+			if strings.Contains(slug, "worker") || strings.Contains(slug, "mutex") || strings.Contains(slug, "concurr") ||
+				strings.Contains(slug, "goroutine") || strings.Contains(slug, "gorutin") ||
+				strings.Contains(slug, "kanal") || strings.Contains(slug, "race") ||
+				strings.Contains(slug, "myuteks") || strings.Contains(slug, "sync") {
 				result = append(result, task)
 			}
 		case model.InterviewPrepMockStageKindSQL:
-			if task.IsExecutable && normalizeSolveLanguage(task.Language) == "sql" {
+			if normalizeSolveLanguage(task.Language) == "sql" {
 				result = append(result, task)
 			}
 		case model.InterviewPrepMockStageKindArchitecture:

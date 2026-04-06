@@ -93,7 +93,7 @@ export function ProfilePage() {
         const s = res.data?.stats ?? res.data
         if (s && typeof s.rating === 'number') setArenaStats(s)
       })
-      .catch(() => {})
+      .catch((err) => { console.error('ProfilePage arena stats fetch error:', err) })
   }, [targetId])
 
   useEffect(() => {
@@ -112,7 +112,7 @@ export function ProfilePage() {
           unlocked_at: a.unlocked_at ?? a.UnlockedAt,
         })))
       })
-      .catch(() => {})
+      .catch((err) => { console.error('ProfilePage achievements fetch error:', err) })
   }, [targetId])
 
   useEffect(() => {
@@ -126,7 +126,7 @@ export function ProfilePage() {
           count: a.count ?? a.Count ?? 0,
         })))
       })
-      .catch(() => {})
+      .catch((err) => { console.error('ProfilePage activity fetch error:', err) })
   }, [targetId])
 
   const bindTelegram = async () => {

@@ -456,10 +456,11 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 
 		codeTaskID := session.Task.CodeTaskID.String()
 		var codeTask *model.CodeTask
+		var cacheHit bool
 		if s.codeTaskCache != nil {
-			codeTask, _ = s.codeTaskCache.Get(codeTaskID)
+			codeTask, cacheHit = s.codeTaskCache.Get(codeTaskID)
 		}
-		if codeTask == nil {
+		if !cacheHit {
 			codeTask, err = s.repo.GetCodeTask(ctx, *session.Task.CodeTaskID)
 			if err != nil {
 				return nil, err
@@ -624,9 +625,7 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 			CandidateAnswer: answer,
 		})
 		if err != nil {
-			// AI review failure is non-fatal: proceed without review so the user
-			// can still advance to the next question.
-			review = nil
+			return nil, fmt.Errorf("reviewer.ReviewInterviewAnswer: %w", err)
 		}
 	}
 

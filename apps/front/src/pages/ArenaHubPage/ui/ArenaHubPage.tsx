@@ -43,7 +43,7 @@ export function ArenaHubPage() {
       setQueueStatus(d)
       setInQueue(d.status === 'ARENA_QUEUE_STATUS_QUEUED' || d.status === 'ARENA_QUEUE_STATUS_MATCHED')
       if (d.match?.id) navigate(`/arena/${d.match.id}`)
-    }).catch(() => {})
+    }).catch((err) => { console.error('ArenaHubPage queue status fetch error:', err) })
   }, [navigate])
 
   const fetchData = useCallback(() => {
