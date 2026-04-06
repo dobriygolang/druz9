@@ -7,41 +7,31 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { geoApi, type CommunityPoint } from '@/features/Geo/api/geoApi'
 import { ENV } from '@/shared/config/env'
 
-const MAP_STYLE = ENV.MAPTILER_KEY
+const BASE_STYLE_URL = ENV.MAPTILER_KEY
   ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${ENV.MAPTILER_KEY}`
   : 'https://tiles.openfreemap.org/styles/positron'
 
-// Recolor map layers to match site palette (#F2F3F0 bg, indigo accents)
-function transformMapStyle(_prev: unknown, next: { layers?: unknown[] } & Record<string, unknown>) {
-  if (!next?.layers) return next
+// Recolor map layers to match site palette at load time
+function applyCustomColors(style: Record<string, unknown>): Record<string, unknown> {
+  const layers = style.layers as Record<string, unknown>[] | undefined
+  if (!layers) return style
   return {
-    ...next,
-    layers: (next.layers as Record<string, unknown>[]).map(layer => {
-      // Land background
+    ...style,
+    layers: layers.map(layer => {
       if (layer.type === 'background') {
         return { ...layer, paint: { 'background-color': '#f0f1ee' } }
       }
-      // Water bodies
-      if (
-        layer.type === 'fill' &&
-        (String(layer.id ?? '').toLowerCase().includes('water') || layer['source-layer'] === 'water')
-      ) {
-        return { ...layer, paint: { ...layer.paint as object, 'fill-color': '#cde0f5', 'fill-outline-color': '#b8cce8' } }
+      if (layer.type === 'fill' && (String(layer.id ?? '').toLowerCase().includes('water') || layer['source-layer'] === 'water')) {
+        return { ...layer, paint: { ...(layer.paint as object), 'fill-color': '#cde0f5', 'fill-outline-color': '#b8cce8' } }
       }
-      // Waterways (rivers, streams)
       if (layer.type === 'line' && layer['source-layer'] === 'waterway') {
-        return { ...layer, paint: { ...layer.paint as object, 'line-color': '#b8cce8' } }
+        return { ...layer, paint: { ...(layer.paint as object), 'line-color': '#b8cce8' } }
       }
-      // Park / green areas — keep light greenish
-      if (
-        layer.type === 'fill' &&
-        (String(layer.id ?? '').toLowerCase().includes('park') || String(layer.id ?? '').toLowerCase().includes('green') || String(layer.id ?? '').toLowerCase().includes('grass'))
-      ) {
-        return { ...layer, paint: { ...layer.paint as object, 'fill-color': '#e4ede4' } }
+      if (layer.type === 'fill' && (String(layer.id ?? '').toLowerCase().includes('park') || String(layer.id ?? '').toLowerCase().includes('green') || String(layer.id ?? '').toLowerCase().includes('grass'))) {
+        return { ...layer, paint: { ...(layer.paint as object), 'fill-color': '#e4ede4' } }
       }
-      // Country / region borders — softer
       if (layer.type === 'line' && layer['source-layer'] === 'boundary') {
-        return { ...layer, paint: { ...layer.paint as object, 'line-color': '#a0aec0' } }
+        return { ...layer, paint: { ...(layer.paint as object), 'line-color': '#a0aec0' } }
       }
       return layer
     }),
@@ -53,11 +43,19 @@ export function MapPage() {
   const [search, setSearch] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [hoveredId, setHoveredId] = useState<string | null>(null)
+  const [mapStyle, setMapStyle] = useState<Record<string, unknown> | string>(BASE_STYLE_URL)
   const [viewState, setViewState] = useState({
     longitude: 37.6,
     latitude: 55.75,
     zoom: 4,
   })
+
+  useEffect(() => {
+    fetch(BASE_STYLE_URL)
+      .then(r => r.json())
+      .then(style => setMapStyle(applyCustomColors(style)))
+      .catch(() => setMapStyle(BASE_STYLE_URL))
+  }, [])
 
   const fetchPoints = useCallback(() => {
     setError(null)
@@ -89,8 +87,7 @@ export function MapPage() {
         <Map
           {...viewState}
           onMove={handleMove}
-          mapStyle={MAP_STYLE}
-          transformStyle={transformMapStyle}
+          mapStyle={mapStyle as string}
           style={{ width: '100%', height: '100%' }}
           attributionControl={false}
         >
