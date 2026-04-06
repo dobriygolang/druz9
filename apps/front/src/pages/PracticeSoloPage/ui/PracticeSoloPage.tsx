@@ -84,7 +84,7 @@ export function PracticeSoloPage() {
     try {
       const { room } = await codeRoomApi.createRoom({ mode: 'ROOM_MODE_ALL' })
       navigate(`/code-rooms/${room.id}`, {
-        state: { title: task.title, statement: task.statement, starterCode: task.starterCode, language: task.language },
+        state: { title: task.title, statement: task.statement, starterCode: task.starterCode, language: task.language, taskId: task.id },
       })
     } catch {}
   }

@@ -72,6 +72,8 @@ type Event struct {
 	IsJoined         bool
 	ParticipantCount int
 	Participants     []*EventParticipant
+	CircleID         *uuid.UUID
+	Repeat           string
 }
 
 type eventDeleteScopeContextKey struct{}
@@ -95,6 +97,7 @@ type ListEventsOptions struct {
 	From      *time.Time
 	To        *time.Time
 	CreatorID *uuid.UUID
+	CircleID  *uuid.UUID
 	Status    string
 }
 
@@ -108,6 +111,7 @@ const (
 	EventRepeatDaily   = "daily"
 	EventRepeatWeekly  = "weekly"
 	EventRepeatMonthly = "monthly"
+	EventRepeatYearly  = "yearly"
 )
 
 type ListEventsResponse struct {
@@ -131,6 +135,7 @@ type CreateEventRequest struct {
 	Longitude      float64
 	ScheduledAt    time.Time
 	InvitedUserIDs []string
+	CircleID       *uuid.UUID
 }
 
 type UpdateEventRequest struct {

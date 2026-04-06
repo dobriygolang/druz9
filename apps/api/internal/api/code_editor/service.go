@@ -26,6 +26,7 @@ type Service interface {
 	UpdateTask(ctx context.Context, task *codeeditordomain.Task) (*codeeditordomain.Task, error)
 	DeleteTask(ctx context.Context, taskID uuid.UUID) error
 	GetLeaderboard(ctx context.Context, limit int32) ([]*codeeditordomain.LeaderboardEntry, error)
+	ListRooms(ctx context.Context, userID *uuid.UUID) ([]*codeeditordomain.Room, error)
 }
 
 //go:generate mockery --case underscore --name RealtimePublisher --with-expecter --output mocks

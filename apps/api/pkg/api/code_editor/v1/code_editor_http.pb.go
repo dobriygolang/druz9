@@ -32,6 +32,7 @@ const OperationCodeEditorServiceListTasks = "/code_editor.v1.CodeEditorService/L
 const OperationCodeEditorServiceSetReady = "/code_editor.v1.CodeEditorService/SetReady"
 const OperationCodeEditorServiceSubmitCode = "/code_editor.v1.CodeEditorService/SubmitCode"
 const OperationCodeEditorServiceUpdateTask = "/code_editor.v1.CodeEditorService/UpdateTask"
+const OperationCodeEditorServiceListRooms = "/code_editor.v1.CodeEditorService/ListRooms"
 
 type CodeEditorServiceHTTPServer interface {
 	CreateRoom(context.Context, *CreateRoomRequest) (*CreateRoomResponse, error)
@@ -47,6 +48,7 @@ type CodeEditorServiceHTTPServer interface {
 	SetReady(context.Context, *SetReadyRequest) (*StatusResponse, error)
 	SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error)
 	UpdateTask(context.Context, *UpdateTaskRequest) (*TaskResponse, error)
+	ListRooms(context.Context, *ListRoomsRequest) (*ListRoomsResponse, error)
 }
 
 func RegisterCodeEditorServiceHTTPServer(s *http.Server, srv CodeEditorServiceHTTPServer) {
@@ -64,6 +66,7 @@ func RegisterCodeEditorServiceHTTPServer(s *http.Server, srv CodeEditorServiceHT
 	r.PUT("/api/admin/code-editor/tasks/{task_id}", _CodeEditorService_UpdateTask0_HTTP_Handler(srv))
 	r.DELETE("/api/admin/code-editor/tasks/{task_id}", _CodeEditorService_DeleteTask0_HTTP_Handler(srv))
 	r.GET("/api/v1/code-editor/leaderboard", _CodeEditorService_GetLeaderboard0_HTTP_Handler(srv))
+	r.GET("/api/v1/code-editor/rooms", _CodeEditorService_ListRooms_HTTP_Handler(srv))
 }
 
 func _CodeEditorService_CreateRoom0_HTTP_Handler(srv CodeEditorServiceHTTPServer) func(ctx http.Context) error {
@@ -552,4 +555,22 @@ func (c *CodeEditorServiceHTTPClientImpl) UpdateTask(ctx context.Context, in *Up
 		return nil, err
 	}
 	return &out, nil
+}
+
+func _CodeEditorService_ListRooms_HTTP_Handler(srv CodeEditorServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListRoomsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCodeEditorServiceListRooms)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListRooms(ctx, req.(*ListRoomsRequest))
+		})
+		reply, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		return ctx.Result(200, reply)
+	}
 }

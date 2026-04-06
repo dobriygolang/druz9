@@ -51,9 +51,9 @@ func (r *Repo) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.C
 		}
 		_, err = tx.Exec(
 			ctx,
-			`INSERT INTO events (id, creator_id, title, place_label, description, meeting_link, region, country, city, latitude, longitude, scheduled_at, series_id, repeat_rule, created_at, updated_at)
-			 VALUES ($1,$2,$3,$4,NULLIF($5,''),NULLIF($6,''),NULLIF($7,''),NULLIF($8,''),NULLIF($9,''),$10,$11,$12,$13,$14,NOW(),NOW())`,
-			eventID, creatorID, req.Title, req.PlaceLabel, req.Description, req.MeetingLink, req.Region, req.Country, req.City, req.Latitude, req.Longitude, scheduledAt, seriesID, normalizeRepeatRule(req.Repeat),
+			`INSERT INTO events (id, creator_id, title, place_label, description, meeting_link, region, country, city, latitude, longitude, scheduled_at, series_id, repeat_rule, circle_id, created_at, updated_at)
+			 VALUES ($1,$2,$3,$4,NULLIF($5,''),NULLIF($6,''),NULLIF($7,''),NULLIF($8,''),NULLIF($9,''),$10,$11,$12,$13,$14,$15,NOW(),NOW())`,
+			eventID, creatorID, req.Title, req.PlaceLabel, req.Description, req.MeetingLink, req.Region, req.Country, req.City, req.Latitude, req.Longitude, scheduledAt, seriesID, normalizeRepeatRule(req.Repeat), req.CircleID,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("insert event: %w", err)
@@ -86,26 +86,36 @@ func (r *Repo) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.C
 
 func normalizeRepeatRule(repeat string) string {
 	switch repeat {
-	case model.EventRepeatDaily, model.EventRepeatWeekly, model.EventRepeatMonthly:
+	case model.EventRepeatDaily, model.EventRepeatWeekly, model.EventRepeatMonthly, model.EventRepeatYearly:
 		return repeat
 	default:
 		return model.EventRepeatNone
 	}
 }
 
+// buildCreateEventScheduleTimes generates occurrence timestamps.
+// Horizons are intentionally short to avoid bloating the DB:
+//   daily   → 14 occurrences (2 weeks)
+//   weekly  → 8  occurrences (2 months)
+//   monthly → 6  occurrences (6 months)
+//   yearly  → 2  occurrences (2 years)
 func buildCreateEventScheduleTimes(base time.Time, repeat string) []time.Time {
 	switch repeat {
 	case model.EventRepeatDaily:
-		return buildRepeatedScheduleTimes(base, 30, func(value time.Time, step int) time.Time {
+		return buildRepeatedScheduleTimes(base, 14, func(value time.Time, step int) time.Time {
 			return value.AddDate(0, 0, step)
 		})
 	case model.EventRepeatWeekly:
-		return buildRepeatedScheduleTimes(base, 12, func(value time.Time, step int) time.Time {
+		return buildRepeatedScheduleTimes(base, 8, func(value time.Time, step int) time.Time {
 			return value.AddDate(0, 0, 7*step)
 		})
 	case model.EventRepeatMonthly:
-		return buildRepeatedScheduleTimes(base, 12, func(value time.Time, step int) time.Time {
+		return buildRepeatedScheduleTimes(base, 6, func(value time.Time, step int) time.Time {
 			return value.AddDate(0, step, 0)
+		})
+	case model.EventRepeatYearly:
+		return buildRepeatedScheduleTimes(base, 2, func(value time.Time, step int) time.Time {
+			return value.AddDate(step, 0, 0)
 		})
 	default:
 		return []time.Time{base}

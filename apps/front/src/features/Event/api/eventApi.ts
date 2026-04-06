@@ -19,6 +19,8 @@ export interface Event {
   participantCount: number
   description: string
   meetingLink: string
+  repeat: string
+  circleId?: string
 }
 
 type BackendEvent = {
@@ -51,7 +53,19 @@ function normalizeEvent(e: BackendEvent): Event {
     isCreator: e.isCreator ?? false, isJoined: e.isJoined ?? false,
     participantCount: e.participantCount ?? 0,
     description: e.description ?? '', meetingLink: e.meetingLink ?? '',
+    repeat: (e as any).repeat ?? 'none',
+    circleId: (e as any).circleId ?? undefined,
   }
+}
+
+export type EventRepeat = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly'
+
+export const REPEAT_LABELS: Record<EventRepeat, string> = {
+  none: 'Не повторять',
+  daily: 'Каждый день (14 дней)',
+  weekly: 'Каждую неделю (8 нед.)',
+  monthly: 'Каждый месяц (6 мес.)',
+  yearly: 'Каждый год (2 года)',
 }
 
 export interface CreateEventPayload {
@@ -65,6 +79,7 @@ export interface CreateEventPayload {
   scheduledAt: string
   description?: string
   meetingLink?: string
+  repeat?: EventRepeat
 }
 
 const listEventsCache = createCache<string, { events: Event[]; total: number }>()
@@ -100,5 +115,22 @@ export const eventApi = {
   },
   deleteEvent: async (eventId: string): Promise<void> => {
     await apiClient.delete(`/api/v1/events/${eventId}`)
+  },
+  listCircleEvents: async (circleId: string, status?: string): Promise<Event[]> => {
+    const r = await apiClient.get<{ events?: BackendEvent[] }>(`/api/v1/circles/${circleId}/events`, {
+      params: status ? { status } : undefined,
+    })
+    return (r.data.events ?? []).map(normalizeEvent)
+  },
+  createCircleEvent: async (circleId: string, payload: CreateEventPayload): Promise<Event> => {
+    const r = await apiClient.post<{ event: BackendEvent }>(`/api/v1/circles/${circleId}/events`, {
+      title: payload.title,
+      description: payload.description,
+      meetingLink: payload.meetingLink,
+      placeLabel: payload.placeLabel,
+      scheduledAt: payload.scheduledAt,
+      repeat: payload.repeat ?? 'none',
+    })
+    return normalizeEvent(r.data.event)
   },
 }

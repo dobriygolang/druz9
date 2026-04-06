@@ -7,6 +7,8 @@ import (
 	activityhttp "api/internal/server/activityhttp"
 	aireviewhttp "api/internal/server/aireviewhttp"
 	dailychallengehttp "api/internal/server/dailychallengehttp"
+	circlemembershttp "api/internal/server/circlemembershttp"
+	circleeventhttp "api/internal/server/circleeventhttp"
 	startroomhttp "api/internal/server/startroomhttp"
 	interviewprepcheckpointhttp "api/internal/server/interviewprepcheckpointhttp"
 	profileprogresshttp "api/internal/server/profileprogresshttp"
@@ -101,6 +103,8 @@ func registerManualHTTPRoutes(
 	aireviewhttp.Register(httpServer, services.aiReviewService, services.profileServiceDomain)
 	dailychallengehttp.Register(httpServer, services.codeEditorServiceDomain)
 	startroomhttp.Register(httpServer, services.codeEditorServiceDomain, services.realtimeHub, services.profileServiceDomain)
+	circlemembershttp.Register(httpServer, services.circleServiceDomain, services.profileServiceDomain)
+	circleeventhttp.Register(httpServer, services.eventServiceDomain, services.circleServiceDomain, services.profileServiceDomain)
 }
 
 func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.Server, services *serviceContext) {

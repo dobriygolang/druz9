@@ -78,6 +78,44 @@ LIMIT $2 OFFSET $3
 	}, nil
 }
 
+func (r *Repo) ListCircleMembers(ctx context.Context, circleID uuid.UUID, limit int32) ([]*model.CircleMemberProfile, error) {
+	if limit <= 0 || limit > 100 {
+		limit = 50
+	}
+	query := `
+SELECT
+  u.id,
+  COALESCE(NULLIF(u.first_name, ''), '') AS first_name,
+  COALESCE(NULLIF(u.last_name, ''), '') AS last_name,
+  COALESCE(NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), '') AS avatar_url,
+  cm.role,
+  cm.joined_at
+FROM circle_members cm
+JOIN users u ON u.id = cm.user_id
+WHERE cm.circle_id = $1
+ORDER BY cm.joined_at ASC
+LIMIT $2
+`
+	rows, err := r.data.DB.Query(ctx, query, circleID, limit)
+	if err != nil {
+		return nil, fmt.Errorf("query circle members: %w", err)
+	}
+	defer rows.Close()
+
+	members := make([]*model.CircleMemberProfile, 0, limit)
+	for rows.Next() {
+		var m model.CircleMemberProfile
+		if err := rows.Scan(&m.UserID, &m.FirstName, &m.LastName, &m.AvatarURL, &m.Role, &m.JoinedAt); err != nil {
+			return nil, fmt.Errorf("scan circle member: %w", err)
+		}
+		members = append(members, &m)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate circle members: %w", err)
+	}
+	return members, nil
+}
+
 func (r *Repo) IsMember(ctx context.Context, circleID, userID uuid.UUID) (bool, error) {
 	var exists bool
 	err := r.data.DB.QueryRow(ctx,

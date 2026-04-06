@@ -33,6 +33,15 @@ export interface CreateCirclePayload {
   tags?: string[]
 }
 
+export interface CircleMember {
+  userId: string
+  firstName: string
+  lastName: string
+  avatarUrl: string
+  role: string
+  joinedAt: string
+}
+
 export const circleApi = {
   getCircle: async (circleId: string): Promise<Circle> => {
     // Backend has no GET /api/v1/circles/{id} — fetch list and find by id
@@ -69,5 +78,9 @@ export const circleApi = {
 
   leaveCircle: async (circleId: string): Promise<void> => {
     await apiClient.post(`/api/v1/circles/${circleId}/leave`, {})
+  },
+  listMembers: async (circleId: string): Promise<CircleMember[]> => {
+    const r = await apiClient.get<{ members?: CircleMember[] }>(`/api/v1/circles/${circleId}/members`)
+    return r.data.members ?? []
   },
 }

@@ -91,7 +91,14 @@ func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, str
 	if opts.CreatorID != nil {
 		conditions = append(conditions, fmt.Sprintf("e.creator_id = $%d", argNum))
 		args = append(args, *opts.CreatorID)
+		argNum++
 	}
+	if opts.CircleID != nil {
+		conditions = append(conditions, fmt.Sprintf("e.circle_id = $%d", argNum))
+		args = append(args, *opts.CircleID)
+		argNum++
+	}
+	_ = argNum
 
 	whereClause := ""
 	if len(conditions) > 0 {
@@ -113,7 +120,9 @@ SELECT
   e.scheduled_at,
   e.created_at,
   e.creator_id::text,
-  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.username, ''), '')
+  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.username, ''), ''),
+  e.circle_id,
+  COALESCE(e.repeat_rule, 'none')
 FROM events e
 JOIN users cu ON cu.id = e.creator_id
 %s
@@ -208,6 +217,8 @@ func (r *Repo) fetchEvents(
 			&createdAt,
 			&event.CreatorID,
 			&event.CreatorName,
+			&event.CircleID,
+			&event.Repeat,
 		); err != nil {
 			return nil, fmt.Errorf("scan event: %w", err)
 		}

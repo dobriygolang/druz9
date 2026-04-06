@@ -101,6 +101,47 @@
 @keyframes slide-in-right { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
 .animate-slide-in { animation: slide-in-right 0.3s ease-out; }
 
+/* ─── Unified select / dropdown ──────────────────────────────────────────── */
+.select-field {
+  appearance: none;
+  cursor: pointer;
+  padding: 0.375rem 2rem 0.375rem 0.75rem; /* right padding for arrow */
+  font-size: 0.875rem;
+  line-height: 1.25rem;
+  background-color: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.5rem;
+  color: #0f172a;
+  transition: border-color 0.15s, box-shadow 0.15s;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 0.6rem center;
+}
+.select-field:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.12);
+}
+.select-field:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+.dark .select-field {
+  background-color: #131929;
+  border-color: #1e3158;
+  color: #e2e8f3;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%234d6380' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+}
+.dark .select-field:focus {
+  border-color: #818cf8;
+  box-shadow: 0 0 0 3px rgba(129, 140, 248, 0.15);
+}
+/* Dropdown options inherit OS styles, but tint background in dark */
+.dark .select-field option {
+  background-color: #1c2436;
+  color: #e2e8f3;
+}
+
 /* ─── Global dark mode overrides ─────────────────────────────────────────── */
 /* These cover hardcoded hex Tailwind classes used throughout page components */
 

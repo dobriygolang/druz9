@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams } from 'react-router-dom'
 import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, X, Check, Flame } from 'lucide-react'
 import { useAuth } from '@/app/providers/AuthProvider'
@@ -38,7 +38,7 @@ type Tab = 'activity' | 'progress' | 'achievements'
 
 export function ProfilePage() {
   const { userId } = useParams()
-  const { user: authUser } = useAuth()
+  const { user: authUser, refresh } = useAuth()
   const [user, setUser] = useState<User | null>(null)
   const [progress, setProgress] = useState<ProfileProgress | null>(null)
   const [loading, setLoading] = useState(true)
@@ -53,6 +53,9 @@ export function ProfilePage() {
   const [editWorkplace, setEditWorkplace] = useState('')
   const [editRegion, setEditRegion] = useState('')
   const [saving, setSaving] = useState(false)
+  const [bindingProvider, setBindingProvider] = useState<'telegram' | 'yandex' | null>(null)
+  const [bindError, setBindError] = useState('')
+  const bindPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
   const targetId = userId ?? authUser?.id ?? ''
   const isOwn = !userId || userId === authUser?.id
@@ -117,6 +120,42 @@ export function ProfilePage() {
       })
       .catch(() => {})
   }, [targetId])
+
+  const bindTelegram = async () => {
+    setBindingProvider('telegram'); setBindError('')
+    try {
+      const { botStartUrl } = await authApi.createTelegramAuthChallenge()
+      window.open(botStartUrl, '_blank')
+      if (bindPollRef.current) clearInterval(bindPollRef.current)
+      const poll = setInterval(async () => {
+        try {
+          await refresh()
+          clearInterval(poll); bindPollRef.current = null
+          setBindingProvider(null)
+          fetchProfile()
+        } catch {}
+      }, 2000)
+      bindPollRef.current = poll
+      setTimeout(() => {
+        if (bindPollRef.current) { clearInterval(bindPollRef.current); bindPollRef.current = null }
+        setBindingProvider(null)
+      }, 120000)
+    } catch {
+      setBindError('Не удалось открыть Telegram. Попробуйте ещё раз.')
+      setBindingProvider(null)
+    }
+  }
+
+  const bindYandex = async () => {
+    setBindingProvider('yandex'); setBindError('')
+    try {
+      const { authUrl } = await authApi.startYandexAuth()
+      window.location.href = authUrl
+    } catch {
+      setBindError('Не удалось открыть Яндекс. Попробуйте ещё раз.')
+      setBindingProvider(null)
+    }
+  }
 
   const openEdit = () => {
     if (!user) return
@@ -226,16 +265,33 @@ export function ProfilePage() {
               )}
             </div>
 
-            {(user.connectedProviders.includes('telegram') || user.connectedProviders.includes('yandex')) && (
-              <div className="flex items-center gap-1.5 mt-2.5">
-                {user.connectedProviders.includes('telegram') && (
-                  <span className="px-2 py-0.5 bg-[#e8f4fd] text-[#0088cc] text-[11px] font-medium rounded-full">Вход: Telegram</span>
-                )}
-                {user.connectedProviders.includes('yandex') && (
-                  <span className="px-2 py-0.5 bg-[#fffbeb] text-[#f59e0b] text-[11px] font-medium rounded-full">Вход: Яндекс</span>
-                )}
-              </div>
-            )}
+            <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
+              {user.connectedProviders.includes('telegram') && (
+                <span className="px-2 py-0.5 bg-[#e8f4fd] text-[#0088cc] text-[11px] font-medium rounded-full">Telegram</span>
+              )}
+              {user.connectedProviders.includes('yandex') && (
+                <span className="px-2 py-0.5 bg-[#fff7ed] text-[#ea580c] text-[11px] font-medium rounded-full">Яндекс</span>
+              )}
+              {isOwn && !user.connectedProviders.includes('telegram') && (
+                <button
+                  onClick={bindTelegram}
+                  disabled={!!bindingProvider}
+                  className="px-2 py-0.5 bg-[#e8f4fd] text-[#0088cc] text-[11px] font-medium rounded-full border border-[#0088cc]/20 hover:bg-[#cce9fa] transition-colors disabled:opacity-50"
+                >
+                  {bindingProvider === 'telegram' ? 'Открываем...' : '+ Привязать Telegram'}
+                </button>
+              )}
+              {isOwn && !user.connectedProviders.includes('yandex') && (
+                <button
+                  onClick={bindYandex}
+                  disabled={!!bindingProvider}
+                  className="px-2 py-0.5 bg-[#fff7ed] text-[#ea580c] text-[11px] font-medium rounded-full border border-[#ea580c]/20 hover:bg-[#ffe4cc] transition-colors disabled:opacity-50"
+                >
+                  {bindingProvider === 'yandex' ? 'Перенаправляем...' : '+ Привязать Яндекс'}
+                </button>
+              )}
+              {bindError && <span className="text-[11px] text-red-500">{bindError}</span>}
+            </div>
           </div>
         </div>
 
@@ -338,17 +394,28 @@ export function ProfilePage() {
             </div>
           )}
 
-          {progress && progress.companies.length > 0 && (
+          {progress && (
             <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
-              <h3 className="text-sm font-semibold text-[#111111] mb-3">Компании</h3>
-              <div className="flex flex-wrap gap-2">
-                {progress.companies.map(c => (
-                  <div key={c.tag} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F3F0] rounded-lg">
-                    <span className="text-sm font-medium text-[#111111]">{c.tag}</span>
-                    <span className="text-xs text-[#94a3b8]">{c.sessions} сес.</span>
-                  </div>
-                ))}
+              <div className="flex items-start justify-between gap-2 mb-1">
+                <h3 className="text-sm font-semibold text-[#111111]">Компании</h3>
               </div>
+              <p className="text-xs text-[#94a3b8] mb-3">
+                Компании, по которым ты проходил mock-интервью. Чтобы добавить — начни сессию в разделе <span className="text-[#6366F1]">Growth Hub</span> и укажи целевую компанию.
+              </p>
+              {progress.companies.length > 0 ? (
+                <div className="flex flex-wrap gap-2">
+                  {progress.companies.map(c => (
+                    <div key={c.tag} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F3F0] rounded-lg">
+                      <span className="text-sm font-medium text-[#111111]">{c.tag}</span>
+                      <span className="text-xs text-[#94a3b8]">{c.sessions} сессий</span>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center gap-2 px-3 py-2.5 bg-[#F2F3F0] rounded-lg text-xs text-[#94a3b8]">
+                  Пока нет пройденных сессий по компаниям
+                </div>
+              )}
             </div>
           )}
 

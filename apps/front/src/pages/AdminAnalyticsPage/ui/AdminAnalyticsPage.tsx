@@ -27,7 +27,7 @@ export function AdminAnalyticsPage() {
         <select
           value={period}
           onChange={e => setPeriod(e.target.value)}
-          className="px-3 py-2 text-sm bg-white border border-[#CBCCC9] rounded-lg focus:outline-none"
+          className="select-field"
         >
           <option value="7d">Последние 7 дней</option>
           <option value="30d">Последние 30 дней</option>

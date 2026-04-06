@@ -14,6 +14,22 @@ import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { apiClient } from '@/shared/api/base'
 import type * as Monaco from 'monaco-editor'
 
+/* ─── Solo draft storage (LRU, max 10 tasks) ─── */
+const SOLO_DRAFT_MAX = 10
+const SOLO_DRAFT_INDEX_KEY = 'solo:drafts:index'
+
+function getSoloDraft(taskId: string): string | null {
+  return localStorage.getItem(`solo:code:${taskId}`)
+}
+
+function setSoloDraft(taskId: string, code: string) {
+  localStorage.setItem(`solo:code:${taskId}`, code)
+  const prev: string[] = JSON.parse(localStorage.getItem(SOLO_DRAFT_INDEX_KEY) ?? '[]')
+  const next = [taskId, ...prev.filter(id => id !== taskId)].slice(0, SOLO_DRAFT_MAX)
+  prev.filter(id => !next.includes(id)).forEach(id => localStorage.removeItem(`solo:code:${id}`))
+  localStorage.setItem(SOLO_DRAFT_INDEX_KEY, JSON.stringify(next))
+}
+
 /* ─── Remote cursor helpers ─── */
 const CURSOR_COLORS = ['#f97316', '#06b6d4', '#8b5cf6', '#10b981', '#f43f5e', '#eab308']
 
@@ -173,10 +189,15 @@ export function CodeRoomPage() {
   const prevParticipantIdsRef = useRef<Set<string>>(new Set())
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
   const skipNextWsUpdate = useRef(false)
+  const isApplyingRemoteCode = useRef(false)
   const lastCursorRef = useRef({ line: 1, col: 1 })
   const isCreatorRef = useRef(false)
-  const starterCodeRef = useRef((location.state as { starterCode?: string } | null)?.starterCode ?? '')
+  const taskState = (location.state as { starterCode?: string; taskId?: string } | null)
+  const soloDraftTaskId = taskState?.taskId ?? null
+  const soloDraft = soloDraftTaskId ? getSoloDraft(soloDraftTaskId) : null
+  const starterCodeRef = useRef(soloDraft ?? taskState?.starterCode ?? '')
   const sentStarterCode = useRef(false)
+  const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Mutable cursor positions for remote users — updated in-place, no widget re-add needed
   const cursorPositionsRef = useRef<Map<string, { line: number; col: number }>>(new Map())
 
@@ -230,13 +251,15 @@ export function CodeRoomPage() {
   // Fetch initial room data via REST
   useEffect(() => {
     if (!roomId || needsGuestName) return
-    const taskState = location.state as { title?: string; statement?: string; starterCode?: string; language?: string } | null
+    const state = location.state as { title?: string; statement?: string; starterCode?: string; language?: string; taskId?: string } | null
     codeRoomApi.getRoom(roomId, guestNameRef.current)
       .then(r => {
-        if (taskState?.title && !r.task) r = { ...r, task: taskState.title }
+        if (state?.title && !r.task) r = { ...r, task: state.title }
         setRoom(r)
-        if (taskState?.statement) setTaskStatement(taskState.statement)
-        const initCode = taskState?.starterCode || r.code || ''
+        if (state?.statement) setTaskStatement(state.statement)
+        // Prefer saved draft > starter code from state > server code
+        const draft = state?.taskId ? getSoloDraft(state.taskId) : null
+        const initCode = draft ?? state?.starterCode ?? r.code ?? ''
         if (initCode) setLocalCode(initCode)
       })
       .catch(() => navigate('/practice/code-rooms'))
@@ -265,7 +288,9 @@ export function CodeRoomPage() {
 
       const pos = editor!.getPosition()
       const sel = editor!.getSelection()
+      isApplyingRemoteCode.current = true
       model.setValue(ws.code)
+      isApplyingRemoteCode.current = false
       if (pos) editor!.setPosition(pos)
       if (sel) editor!.setSelection(sel)
 
@@ -452,11 +477,16 @@ export function CodeRoomPage() {
   }, [ws.lastSubmission])
 
   const handleCodeChange = useCallback((value: string | undefined) => {
+    if (isApplyingRemoteCode.current) return
     const v = value ?? ''
     setLocalCode(v)
     skipNextWsUpdate.current = true
     ws.sendUpdate(v)
-  }, [ws.sendUpdate])
+    if (soloDraftTaskId) {
+      if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
+      saveDraftTimer.current = setTimeout(() => setSoloDraft(soloDraftTaskId, v), 1000)
+    }
+  }, [ws.sendUpdate, soloDraftTaskId])
 
   const handleRun = async () => {
     if (!roomId) return

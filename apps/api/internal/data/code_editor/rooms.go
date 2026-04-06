@@ -148,3 +148,25 @@ func (r *Repo) CountOpenRooms(ctx context.Context, activeSince time.Time) (int, 
 	}
 	return count, nil
 }
+
+func (r *Repo) ListRoomsForUser(ctx context.Context, userID uuid.UUID) ([]*codeeditordomain.Room, error) {
+	query := roomFullQuery + `
+		WHERE (cr.creator_id = $1 OR cr.id IN (SELECT room_id FROM code_participants WHERE user_id = $1))
+		GROUP BY cr.id, ct.id
+		ORDER BY cr.updated_at DESC
+		LIMIT 50`
+	rows, err := r.data.DB.Query(ctx, query, userID)
+	if err != nil {
+		return nil, fmt.Errorf("list rooms for user: %w", err)
+	}
+	defer rows.Close()
+	var result []*codeeditordomain.Room
+	for rows.Next() {
+		room, err := scanRoomFull(rows)
+		if err != nil {
+			return nil, fmt.Errorf("scan room: %w", err)
+		}
+		result = append(result, room)
+	}
+	return result, rows.Err()
+}

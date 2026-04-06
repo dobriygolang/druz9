@@ -335,3 +335,10 @@ func (s *Service) CleanupInactiveRooms(ctx context.Context, idleFor time.Duratio
 func (s *Service) CleanupOldSubmissions(ctx context.Context, idleFor time.Duration) (int64, error) {
 	return s.repo.CleanupOldSubmissions(ctx, idleFor)
 }
+
+func (s *Service) ListRooms(ctx context.Context, userID *uuid.UUID) ([]*domain.Room, error) {
+	if userID == nil {
+		return nil, nil
+	}
+	return s.repo.ListRoomsForUser(ctx, *userID)
+}

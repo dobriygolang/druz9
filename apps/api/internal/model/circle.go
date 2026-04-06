@@ -26,6 +26,15 @@ type CircleMember struct {
 	JoinedAt time.Time
 }
 
+type CircleMemberProfile struct {
+	UserID    uuid.UUID
+	FirstName string
+	LastName  string
+	AvatarURL string
+	Role      string
+	JoinedAt  time.Time
+}
+
 type ListCirclesOptions struct {
 	Limit  int32
 	Offset int32

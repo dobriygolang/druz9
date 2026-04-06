@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { Calendar, Clock } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { Badge } from '@/shared/ui/Badge'
@@ -80,14 +80,23 @@ export function DailyChallengePage() {
   const [reviewing, setReviewing] = useState(false)
   const [review, setReview] = useState<any>(null)
   const [submitted, setSubmitted] = useState(false)
+  const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Fetch daily task
+  // Fetch daily task, restore draft from localStorage
   useEffect(() => {
     apiClient.get('/api/v1/code-editor/daily')
       .then(res => {
         const normalized = normalizeTask(res.data)
         setTask(normalized)
-        if (normalized.task.starterCode) setCode(normalized.task.starterCode)
+        const cacheKey = `daily:code:${normalized.task.id}`
+        const saved = normalized.task.id ? localStorage.getItem(cacheKey) : null
+        setCode(saved ?? normalized.task.starterCode ?? '')
+        // Purge stale drafts from previous days
+        if (normalized.task.id) {
+          Object.keys(localStorage)
+            .filter(k => k.startsWith('daily:code:') && k !== cacheKey)
+            .forEach(k => localStorage.removeItem(k))
+        }
       })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
@@ -209,7 +218,16 @@ export function DailyChallengePage() {
                 height="400px"
                 language={task.task.language}
                 value={code}
-                onChange={v => setCode(v ?? '')}
+                onChange={v => {
+                  const next = v ?? ''
+                  setCode(next)
+                  if (task.task.id) {
+                    if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
+                    saveDraftTimer.current = setTimeout(() => {
+                      localStorage.setItem(`daily:code:${task.task.id}`, next)
+                    }, 1000)
+                  }
+                }}
                 onMount={handleEditorMount}
                 theme={theme === 'dark' ? 'druzya-dark' : 'vs'}
                 options={{

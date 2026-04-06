@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Code2, Users, Plus, ChevronRight, Copy, Check } from 'lucide-react'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
@@ -22,12 +22,16 @@ const STATUS_LABELS: Record<string, { label: string; variant: 'success' | 'warni
 
 export function CodeRoomsPage() {
   const navigate = useNavigate()
-  const [rooms] = useState<Room[]>([])
+  const [rooms, setRooms] = useState<Room[]>([])
   const [showCreate, setShowCreate] = useState(false)
   const [creating, setCreating] = useState(false)
   const [mode, setMode] = useState('ROOM_MODE_ALL')
   const [createdRoom, setCreatedRoom] = useState<Room | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
+
+  useEffect(() => {
+    codeRoomApi.listRooms().then(setRooms).catch(() => {})
+  }, [])
 
   const copyRoomLink = (roomId: string) => {
     const url = `${window.location.origin}/code-rooms/${roomId}`
@@ -42,6 +46,7 @@ export function CodeRoomsPage() {
     try {
       const { room } = await codeRoomApi.createRoom({ mode })
       setCreatedRoom(room)
+      setRooms(prev => [room, ...prev])
     } catch {} finally { setCreating(false) }
   }
 
