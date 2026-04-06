@@ -1,3 +1,4 @@
+-- +goose Up
 -- Add circle_id to events (nullable — events can exist outside circles)
 ALTER TABLE events
   ADD COLUMN circle_id UUID REFERENCES circles(id) ON DELETE SET NULL;
@@ -12,3 +13,10 @@ ALTER TABLE events
 ALTER TABLE events
   ADD CONSTRAINT events_repeat_rule_check
   CHECK (repeat_rule IN ('none', 'daily', 'weekly', 'monthly', 'yearly'));
+
+-- +goose Down
+ALTER TABLE events DROP CONSTRAINT IF EXISTS events_repeat_rule_check;
+ALTER TABLE events
+  ADD CONSTRAINT events_repeat_rule_check
+  CHECK (repeat_rule IN ('none', 'daily', 'weekly', 'monthly'));
+ALTER TABLE events DROP COLUMN IF EXISTS circle_id;
