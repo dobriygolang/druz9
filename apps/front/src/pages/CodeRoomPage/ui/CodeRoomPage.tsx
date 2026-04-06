@@ -466,13 +466,11 @@ export function CodeRoomPage() {
       injectCursorCSS(safeId, color)
       const col = state.cursorColumn ?? 1
 
-      const existingPos = cursorPositionsRef.current.get(state.userId)
-      if (existingPos && widgetsRef.current.has(state.userId)) {
-        // Mutate posRef so getPosition() returns new coords, then re-layout without re-adding
-        existingPos.line = state.cursorLine
-        existingPos.col = col
-        editor.layoutContentWidget(widgetsRef.current.get(state.userId)!)
-      } else {
+      if (!widgetsRef.current.has(state.userId)) {
+        // New user — create widget at awareness position.
+        // Position updates for existing widgets are handled exclusively by onCursorUpdate
+        // (which filters stale awareness via codeLen). This avoids RAF-batched stale
+        // awareness overwriting the OT-predicted position during rapid typing.
         const posRef = { line: state.cursorLine, col }
         cursorPositionsRef.current.set(state.userId, posRef)
         const widget = buildCursorWidget(state.userId, state.displayName, color, posRef, monaco)
