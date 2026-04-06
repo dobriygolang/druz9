@@ -27,7 +27,7 @@ func (i *Implementation) ListTasks(ctx context.Context, req *v1.ListTasksRequest
 
 	items := make([]*v1.InterviewPrepTask, 0, len(tasks))
 	for _, task := range tasks {
-		items = append(items, mapTask(task))
+		items = append(items, mapTaskPublic(task))
 	}
 	return &v1.ListTasksResponse{Tasks: items}, nil
 }

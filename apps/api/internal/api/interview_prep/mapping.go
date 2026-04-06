@@ -266,6 +266,16 @@ func mapTask(task *model.InterviewPrepTask) *v1.InterviewPrepTask {
 	}
 }
 
+// mapTaskPublic is mapTask without sensitive fields (referenceSolution).
+// Use this in all public-facing responses; mapTask is for admin only.
+func mapTaskPublic(task *model.InterviewPrepTask) *v1.InterviewPrepTask {
+	t := mapTask(task)
+	if t != nil {
+		t.ReferenceSolution = ""
+	}
+	return t
+}
+
 func mapQuestion(question *model.InterviewPrepQuestion) *v1.InterviewPrepQuestion {
 	if question == nil {
 		return nil
@@ -279,6 +289,16 @@ func mapQuestion(question *model.InterviewPrepQuestion) *v1.InterviewPrepQuestio
 		CreatedAt: timestamppb.New(question.CreatedAt),
 		UpdatedAt: timestamppb.New(question.UpdatedAt),
 	}
+}
+
+// mapQuestionPublic is mapQuestion without the reference answer.
+// Use for currentQuestion in active sessions; mapQuestion is for admin and post-answer feedback.
+func mapQuestionPublic(question *model.InterviewPrepQuestion) *v1.InterviewPrepQuestion {
+	q := mapQuestion(question)
+	if q != nil {
+		q.Answer = ""
+	}
+	return q
 }
 
 func mapQuestionResult(result *model.InterviewPrepQuestionResult) *v1.InterviewPrepQuestionResult {
@@ -316,8 +336,8 @@ func mapSession(session *model.InterviewPrepSession) *v1.InterviewPrepSession {
 		StartedAt:               timestamppb.New(session.StartedAt),
 		CreatedAt:               timestamppb.New(session.CreatedAt),
 		UpdatedAt:               timestamppb.New(session.UpdatedAt),
-		Task:                    mapTask(session.Task),
-		CurrentQuestion:         mapQuestion(session.CurrentQuestion),
+		Task:                    mapTaskPublic(session.Task),
+		CurrentQuestion:         mapQuestionPublic(session.CurrentQuestion),
 		Results:                 results,
 	}
 	if session.FinishedAt != nil {
@@ -376,19 +396,20 @@ func mapMockQuestionResult(result *model.InterviewPrepMockQuestionResult) *v1.Mo
 		return nil
 	}
 	r := &v1.MockQuestionResult{
-		Id:              result.ID.String(),
-		StageId:         result.StageID.String(),
-		Position:        result.Position,
-		QuestionKey:     result.QuestionKey,
-		Prompt:          result.Prompt,
-		ReferenceAnswer: result.ReferenceAnswer,
-		Score:           result.Score,
-		Summary:         result.Summary,
-		CreatedAt:       timestamppb.New(result.CreatedAt),
-		UpdatedAt:       timestamppb.New(result.UpdatedAt),
+		Id:          result.ID.String(),
+		StageId:     result.StageID.String(),
+		Position:    result.Position,
+		QuestionKey: result.QuestionKey,
+		Prompt:      result.Prompt,
+		Score:       result.Score,
+		Summary:     result.Summary,
+		CreatedAt:   timestamppb.New(result.CreatedAt),
+		UpdatedAt:   timestamppb.New(result.UpdatedAt),
 	}
+	// Only reveal the reference answer once the user has submitted their answer.
 	if result.AnsweredAt != nil {
 		r.AnsweredAt = timestamppb.New(*result.AnsweredAt)
+		r.ReferenceAnswer = result.ReferenceAnswer
 	}
 	return r
 }
@@ -417,7 +438,7 @@ func mapMockStage(stage *model.InterviewPrepMockStage) *v1.MockStage {
 		StartedAt:            timestamppb.New(stage.StartedAt),
 		CreatedAt:            timestamppb.New(stage.CreatedAt),
 		UpdatedAt:            timestamppb.New(stage.UpdatedAt),
-		Task:                 mapTask(stage.Task),
+		Task:                 mapTaskPublic(stage.Task),
 		QuestionResults:      questions,
 		CurrentQuestion:      mapMockQuestionResult(stage.CurrentQuestion),
 	}
