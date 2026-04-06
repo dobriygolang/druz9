@@ -196,6 +196,7 @@ export function CodeRoomPage() {
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
   const skipNextWsUpdate = useRef(false)
   const isApplyingRemoteCode = useRef(false)
+  const lastLocalEditTs = useRef(0)
   const lastCursorRef = useRef({ line: 1, col: 1 })
   const isCreatorRef = useRef(false)
   const taskState = (location.state as { starterCode?: string; taskId?: string } | null)
@@ -277,7 +278,10 @@ export function CodeRoomPage() {
       else if (event === 'pasted') addNotification(`⚠️ ${displayName} вставил(-а) код`)
     }, [addNotification]),
     onCursorUpdate: useCallback((userId: string, line: number, col: number) => {
-      // Runs synchronously in the WS message handler — no RAF, no React render cycle
+      // During active local typing, OT already placed the cursor correctly.
+      // Stale awareness (sent before the remote side applied our edit) would
+      // reset the cursor one character back. Suppress for 150ms after last edit.
+      if (performance.now() - lastLocalEditTs.current < 150) return
       const posRef = cursorPositionsRef.current.get(userId)
       if (posRef && widgetsRef.current.has(userId)) {
         posRef.line = line
@@ -324,8 +328,9 @@ export function CodeRoomPage() {
 
       isApplyingRemoteCode.current = true
       model.setValue(ws.code)
-      isApplyingRemoteCode.current = false
 
+      // Restore cursor + selection while still suppressed, so only ONE awareness
+      // fires (with both position AND selection) after we lift the flag.
       if (localCursorOffset !== null) {
         const newOffset = transformCursorOffset(localCursorOffset, oldCode, ws.code)
         editor!.setPosition(model.getPositionAt(Math.min(newOffset, ws.code.length)))
@@ -337,11 +342,23 @@ export function CodeRoomPage() {
         const e = model.getPositionAt(Math.min(newEnd, ws.code.length))
         editor!.setSelection({ startLineNumber: s.lineNumber, startColumn: s.column, endLineNumber: e.lineNumber, endColumn: e.column })
       }
-      // Remote cursors are driven exclusively by awareness messages — no OT transform here
+      isApplyingRemoteCode.current = false
+
+      // Send one awareness with correct cursor + selection (all intermediate events were suppressed)
+      const finalPos = editor!.getPosition()
+      const finalSel = editor!.getSelection()
+      if (finalPos) {
+        const hasSel = finalSel && !(finalSel.startLineNumber === finalSel.endLineNumber && finalSel.startColumn === finalSel.endColumn)
+        ws.sendAwareness(
+          finalPos.lineNumber,
+          finalPos.column,
+          hasSel && finalSel ? { startLine: finalSel.startLineNumber, startCol: finalSel.startColumn, endLine: finalSel.endLineNumber, endCol: finalSel.endColumn } : undefined,
+        )
+      }
     }
     setLocalCode(ws.code)
     prevLocalCodeRef.current = ws.code
-  }, [ws.code])
+  }, [ws.code, ws.sendAwareness])
 
   // Push starter code once snapshot arrives, overriding whatever the server has
   useEffect(() => {
@@ -503,6 +520,7 @@ export function CodeRoomPage() {
 
   const handleCodeChange = useCallback((value: string | undefined) => {
     if (isApplyingRemoteCode.current) return
+    lastLocalEditTs.current = performance.now()
     const oldCode = prevLocalCodeRef.current
     const v = value ?? ''
     prevLocalCodeRef.current = v
