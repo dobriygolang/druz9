@@ -51,8 +51,8 @@ LIMIT 250
 			&point.Username,
 			&point.FirstName,
 			&point.LastName,
-			&point.ActivityStatus,
 			&point.TelegramUsername,
+			&point.ActivityStatus,
 		); err != nil {
 			return nil, fmt.Errorf("scan community map point: %w", err)
 		}
