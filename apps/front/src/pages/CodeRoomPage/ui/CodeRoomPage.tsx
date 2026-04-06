@@ -494,13 +494,43 @@ export function CodeRoomPage() {
 
   const handleCodeChange = useCallback((value: string | undefined) => {
     if (isApplyingRemoteCode.current) return
+    const oldCode = prevLocalCodeRef.current
     const v = value ?? ''
     prevLocalCodeRef.current = v
     setLocalCode(v)
     skipNextWsUpdate.current = true
     ws.sendUpdate(v)
-    // Remote cursor positions are driven solely by awareness messages.
-    // OT-transforming them here fights with incoming awareness updates and causes jumping.
+
+    // OT-transform remote cursor positions so they follow local typing smoothly.
+    // The main source of jumping was onDidChangeCursorSelection firing during model.setValue
+    // (which sent bogus (1,1) awareness). That's now suppressed. OT here is safe.
+    if (cursorPositionsRef.current.size > 0 && oldCode !== v) {
+      const editor = editorRef.current
+      const model = editor?.getModel()
+      if (model) {
+        cursorPositionsRef.current.forEach((posRef, userId) => {
+          const lines = oldCode.split('\n')
+          let offset = 0
+          for (let i = 0; i < posRef.line - 1 && i < lines.length; i++) offset += lines[i].length + 1
+          offset = Math.min(offset + posRef.col - 1, oldCode.length)
+          let start = 0
+          const minLen = Math.min(oldCode.length, v.length)
+          while (start < minLen && oldCode[start] === v[start]) start++
+          if (offset > start) {
+            let oldTail = oldCode.length; let newTail = v.length
+            while (oldTail > start && newTail > start && oldCode[oldTail - 1] === v[newTail - 1]) { oldTail--; newTail-- }
+            const deleted = oldTail - start; const inserted = newTail - start
+            if (offset >= start + deleted) offset = offset - deleted + inserted
+            else offset = start + inserted
+          }
+          const newPos = model.getPositionAt(Math.min(offset, v.length))
+          posRef.line = newPos.lineNumber
+          posRef.col = newPos.column
+          const widget = widgetsRef.current.get(userId)
+          if (widget) editor!.layoutContentWidget(widget)
+        })
+      }
+    }
 
     if (soloDraftTaskId) {
       if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
