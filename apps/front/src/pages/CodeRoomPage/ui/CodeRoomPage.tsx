@@ -68,7 +68,7 @@ function transformCursorOffset(offset: number, oldCode: string, newCode: string)
   let start = 0
   const minLen = Math.min(oldCode.length, newCode.length)
   while (start < minLen && oldCode[start] === newCode[start]) start++
-  if (offset <= start) return offset
+  if (offset < start) return offset
   let oldTail = oldCode.length
   let newTail = newCode.length
   while (oldTail > start && newTail > start && oldCode[oldTail - 1] === newCode[newTail - 1]) { oldTail--; newTail-- }
@@ -525,7 +525,7 @@ export function CodeRoomPage() {
           let start = 0
           const minLen = Math.min(oldCode.length, v.length)
           while (start < minLen && oldCode[start] === v[start]) start++
-          if (offset > start) {
+          if (offset >= start) {
             let oldTail = oldCode.length; let newTail = v.length
             while (oldTail > start && newTail > start && oldCode[oldTail - 1] === v[newTail - 1]) { oldTail--; newTail-- }
             const deleted = oldTail - start; const inserted = newTail - start
