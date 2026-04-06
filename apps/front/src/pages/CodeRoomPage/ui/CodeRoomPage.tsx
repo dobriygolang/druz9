@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Play, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, Bot } from 'lucide-react'
+import { ArrowLeft, Play, Check, X, ChevronDown, Wifi, WifiOff, Sparkles, Share2, Bot, Pencil } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { useCodeRoomWs } from '@/features/CodeRoom/hooks/useCodeRoomWs'
@@ -70,6 +70,10 @@ export function CodeRoomPage() {
   const [reviewPrompt, setReviewPrompt] = useState('')
   const [copied, setCopied] = useState(false)
   const [needsGuestName, setNeedsGuestName] = useState(false)
+  const [taskStatement, setTaskStatement] = useState('')
+  const [showTaskEditor, setShowTaskEditor] = useState(false)
+  const [editTaskTitle, setEditTaskTitle] = useState('')
+  const [editTaskStatement, setEditTaskStatement] = useState('')
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
   const skipNextWsUpdate = useRef(false)
@@ -199,6 +203,23 @@ export function CodeRoomPage() {
     }
   }
 
+  const isCreator = !!user && !!room && (user.id === room.creatorId || room.participants.some(p => p.userId === user.id && p.isCreator))
+
+  const openTaskEditor = () => {
+    setEditTaskTitle(room?.task ?? '')
+    setEditTaskStatement(taskStatement)
+    setShowTaskEditor(true)
+  }
+
+  const saveTask = () => {
+    const title = editTaskTitle.trim()
+    const stmt = editTaskStatement.trim()
+    setRoom(prev => prev ? { ...prev, task: title } : prev)
+    setTaskStatement(stmt)
+    setShowTaskEditor(false)
+    if (roomId) codeRoomApi.updateRoomTask(roomId, title, stmt)
+  }
+
   const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
     editorRef.current = editor
     registerDarkTheme(monaco)
@@ -280,52 +301,88 @@ export function CodeRoomPage() {
       </header>
 
       {/* 3-panel layout */}
-      <div className="flex flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 bg-[#F2F3F0]">
         {/* Problem panel — 25% / 300px */}
         <div className="w-[300px] flex-shrink-0 bg-white border-r border-[#CBCCC9] flex flex-col">
-          <div className="flex border-b border-[#CBCCC9]">
+          <div className="flex items-center justify-between border-b border-[#CBCCC9] px-1">
             <button
               onClick={() => setActiveTab('problem')}
-              className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'problem' ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666]'}`}
+              className={`px-3 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'problem' ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666]'}`}
             >
               Задача
             </button>
+            {isCreator && (
+              <button
+                onClick={openTaskEditor}
+                title="Редактировать условие задачи"
+                className="mr-2 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#94a3b8] hover:text-[#6366F1] transition-colors"
+              >
+                <Pencil className="w-3.5 h-3.5" />
+              </button>
+            )}
           </div>
           <div className="flex-1 overflow-y-auto p-4">
-            <div className="prose prose-sm max-w-none">
-              <h2 className="text-base font-bold text-[#0f172a] mb-3">{room?.task || 'Условие задачи'}</h2>
-              <p className="text-sm text-[#475569] leading-relaxed">
-                {room?.task ? `Реши задачу: ${room.task}` : 'Загружается условие задачи...'}
-              </p>
-            </div>
+            {room?.task ? (
+              <div>
+                <h2 className="text-sm font-bold text-[#0f172a] mb-3">{room.task}</h2>
+                {taskStatement ? (
+                  <p className="text-sm text-[#475569] leading-relaxed whitespace-pre-wrap">{taskStatement}</p>
+                ) : isCreator ? (
+                  <button
+                    onClick={openTaskEditor}
+                    className="text-xs text-[#6366F1] hover:underline"
+                  >
+                    + Добавить описание
+                  </button>
+                ) : (
+                  <p className="text-xs text-[#94a3b8]">Описание не добавлено</p>
+                )}
+              </div>
+            ) : isCreator ? (
+              <button
+                onClick={openTaskEditor}
+                className="w-full h-full flex flex-col items-center justify-center gap-2 text-center py-8 text-[#94a3b8] hover:text-[#6366F1] transition-colors group"
+              >
+                <div className="w-10 h-10 rounded-xl border-2 border-dashed border-[#CBCCC9] group-hover:border-[#6366F1] flex items-center justify-center transition-colors">
+                  <Pencil className="w-4 h-4" />
+                </div>
+                <span className="text-xs font-medium">Добавить условие задачи</span>
+              </button>
+            ) : (
+              <p className="text-sm text-[#94a3b8] text-center py-8">Задача не задана</p>
+            )}
           </div>
         </div>
 
         {/* Editor — flex-1 (takes remaining space ~70%) */}
-        <div className="flex-1 flex flex-col min-w-0">
-          <div className="h-9 bg-[#18172d] flex items-center px-4 gap-3 flex-shrink-0">
-            <span className="text-xs text-[#94a3b8] font-mono">solution.py</span>
-            <button className="ml-auto flex items-center gap-1 px-2 py-1 text-xs text-[#94a3b8] rounded hover:bg-[#0f172a]">
-              {getLanguageLabel(lang)} <ChevronDown className="w-3 h-3" />
-            </button>
-          </div>
-          <div className="flex-1">
-            <Editor
-              height="100%"
-              language={getMonacoLanguage(lang)}
-              value={localCode}
-              onChange={handleCodeChange}
-              onMount={handleEditorMount}
-              options={{
-                fontSize: 13,
-                fontFamily: '"JetBrains Mono", monospace',
-                minimap: { enabled: false },
-                scrollBeyondLastLine: false,
-                lineNumbers: 'on',
-                padding: { top: 12 },
-                theme: 'druzya-dark',
-              }}
-            />
+        <div className="flex-1 flex flex-col min-w-0 bg-[#F2F3F0] p-3">
+          <div className="flex-1 flex flex-col rounded-xl overflow-hidden border border-[#2d3748] shadow-md">
+            <div className="h-9 bg-[#1e293b] flex items-center px-4 gap-3 flex-shrink-0">
+              <span className="text-xs text-[#94a3b8] font-mono">
+                solution.{lang === 'python' ? 'py' : lang === 'javascript' ? 'js' : lang === 'typescript' ? 'ts' : lang === 'go' ? 'go' : lang === 'rust' ? 'rs' : lang === 'java' ? 'java' : 'py'}
+              </span>
+              <button className="ml-auto flex items-center gap-1 px-2 py-1 text-xs text-[#94a3b8] rounded hover:bg-[#0f172a] transition-colors">
+                {getLanguageLabel(lang)} <ChevronDown className="w-3 h-3" />
+              </button>
+            </div>
+            <div className="flex-1">
+              <Editor
+                height="100%"
+                language={getMonacoLanguage(lang)}
+                value={localCode}
+                onChange={handleCodeChange}
+                onMount={handleEditorMount}
+                options={{
+                  fontSize: 13,
+                  fontFamily: '"JetBrains Mono", monospace',
+                  minimap: { enabled: false },
+                  scrollBeyondLastLine: false,
+                  lineNumbers: 'on',
+                  padding: { top: 12 },
+                  theme: 'druzya-dark',
+                }}
+              />
+            </div>
           </div>
         </div>
 
@@ -424,6 +481,45 @@ export function CodeRoomPage() {
           </div>
         )}
       </div>
+
+      {/* Task editor modal — creator only */}
+      {showTaskEditor && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-2xl shadow-xl border border-[#CBCCC9] w-full max-w-lg">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#CBCCC9]">
+              <h2 className="text-sm font-bold text-[#111111]">Условие задачи</h2>
+              <button onClick={() => setShowTaskEditor(false)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]">
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+            <div className="p-5 flex flex-col gap-4">
+              <div>
+                <label className="text-xs font-medium text-[#666666] mb-1.5 block">Название задачи</label>
+                <input
+                  value={editTaskTitle}
+                  onChange={e => setEditTaskTitle(e.target.value)}
+                  placeholder="Например: Two Sum"
+                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10"
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium text-[#666666] mb-1.5 block">Условие задачи</label>
+                <textarea
+                  value={editTaskStatement}
+                  onChange={e => setEditTaskStatement(e.target.value)}
+                  placeholder="Опишите задачу, входные и выходные данные, примеры..."
+                  rows={8}
+                  className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 resize-none font-mono"
+                />
+              </div>
+            </div>
+            <div className="flex gap-2 px-5 pb-5">
+              <Button variant="secondary" size="sm" onClick={() => setShowTaskEditor(false)}>Отмена</Button>
+              <Button variant="primary" size="sm" onClick={saveTask} disabled={!editTaskTitle.trim()}>Сохранить</Button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }
