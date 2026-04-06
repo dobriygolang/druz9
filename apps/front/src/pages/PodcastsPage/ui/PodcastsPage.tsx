@@ -1,4 +1,4 @@
-import { useEffect, useState, useRef, useCallback } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Mic, Play, Pause, Search, Upload, X } from 'lucide-react'
 import { podcastApi } from '@/features/Podcast/api/podcastApi'
 import type { Podcast } from '@/entities/Podcast/model/types'
@@ -7,6 +7,7 @@ import { Badge } from '@/shared/ui/Badge'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { apiClient } from '@/shared/api/base'
+import { useAudioPlayer } from '@/features/Podcast/providers/AudioPlayerProvider'
 
 const CATEGORY_FILTERS = ['Все', 'Технологии', 'Карьера', 'Архитектура', 'DevOps']
 
@@ -39,6 +40,7 @@ const GRADIENT_COLORS = [
 
 export function PodcastsPage() {
   const { user } = useAuth()
+  const player = useAudioPlayer()
   const [podcasts, setPodcasts] = useState<Podcast[]>([])
   const [activeFilter, setActiveFilter] = useState('Все')
   const [search, setSearch] = useState('')
@@ -50,14 +52,6 @@ export function PodcastsPage() {
   const [uploadFile, setUploadFile] = useState<File | null>(null)
   const [uploading, setUploading] = useState(false)
 
-  // Player state
-  const [playing, setPlaying] = useState<Podcast | null>(null)
-  const [isPlaying, setIsPlaying] = useState(false)
-  const [progress, setProgress] = useState(0)
-  const [currentTime, setCurrentTime] = useState(0)
-  const audioRef = useRef<HTMLAudioElement | null>(null)
-  const progressTimer = useRef<ReturnType<typeof setInterval> | null>(null)
-
   const fetchPodcasts = useCallback(() => {
     setError(null)
     podcastApi.list({ limit: 50 })
@@ -65,69 +59,19 @@ export function PodcastsPage() {
       .catch(() => setError('Не удалось загрузить данные'))
   }, [])
 
-  useEffect(() => {
-    fetchPodcasts()
-    return () => {
-      if (progressTimer.current) clearInterval(progressTimer.current)
-    }
-  }, [fetchPodcasts])
+  useEffect(() => { fetchPodcasts() }, [fetchPodcasts])
 
-  const handlePlay = useCallback(async (podcast: Podcast) => {
-    // Stop current playback
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current = null
-    }
-    if (progressTimer.current) {
-      clearInterval(progressTimer.current)
-      progressTimer.current = null
-    }
+  const handleSeek = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect()
+    const pct = ((e.clientX - rect.left) / rect.width) * 100
+    player.seek(Math.max(0, Math.min(100, pct)))
+  }
 
-    if (playing?.id === podcast.id && isPlaying) {
-      setIsPlaying(false)
-      setPlaying(null)
-      return
-    }
-
-    try {
-      const { streamUrl } = await podcastApi.play(podcast.id)
-      const audio = new Audio(streamUrl)
-      audioRef.current = audio
-
-      audio.addEventListener('ended', () => {
-        setIsPlaying(false)
-        setProgress(0)
-        setCurrentTime(0)
-        if (progressTimer.current) clearInterval(progressTimer.current)
-      })
-
-      await audio.play()
-      setPlaying(podcast)
-      setIsPlaying(true)
-      setProgress(0)
-      setCurrentTime(0)
-
-      progressTimer.current = setInterval(() => {
-        if (audio.duration) {
-          setProgress((audio.currentTime / audio.duration) * 100)
-          setCurrentTime(Math.floor(audio.currentTime))
-        }
-      }, 500)
-    } catch {
-      // Playback failed
-    }
-  }, [playing, isPlaying])
-
-  const togglePlayPause = useCallback(() => {
-    if (!audioRef.current) return
-    if (isPlaying) {
-      audioRef.current.pause()
-      setIsPlaying(false)
-    } else {
-      audioRef.current.play()
-      setIsPlaying(true)
-    }
-  }, [isPlaying])
+  const SPEEDS = [0.75, 1, 1.25, 1.5, 2]
+  const cycleSpeed = () => {
+    const idx = SPEEDS.indexOf(player.speed)
+    player.setSpeed(SPEEDS[(idx + 1) % SPEEDS.length])
+  }
 
   const filtered = podcasts.filter(p => {
     if (search && !p.title.toLowerCase().includes(search.toLowerCase()) && !p.authorName.toLowerCase().includes(search.toLowerCase())) return false
@@ -238,7 +182,7 @@ export function PodcastsPage() {
         {/* Left column */}
         <div className="flex-1 flex flex-col gap-5 min-w-0">
           {/* Now Playing */}
-          {playing && (
+          {player.playing && (
             <div className="bg-[#0f172a] rounded-2xl p-6 flex items-center gap-5 animate-fade-in">
               <div
                 className="w-[120px] h-[120px] rounded-xl flex items-center justify-center flex-shrink-0"
@@ -248,23 +192,39 @@ export function PodcastsPage() {
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-[11px] text-[#6366F1] font-medium tracking-wider font-geist uppercase">Сейчас играет</p>
-                <h3 className="font-mono text-lg font-bold text-white mt-1 truncate">{playing.title}</h3>
+                <h3 className="font-mono text-lg font-bold text-white mt-1 truncate">{player.playing.title}</h3>
                 <p className="text-sm text-[#94a3b8] font-geist mt-0.5">
-                  {playing.authorName} · {formatDuration(playing.durationSeconds)}
+                  {player.playing.authorName} · {formatDuration(player.duration)}
                 </p>
                 <div className="flex items-center gap-3 mt-3">
                   <button
-                    onClick={togglePlayPause}
+                    onClick={player.isPlaying ? player.pause : player.resume}
                     className="w-10 h-10 rounded-full bg-[#6366F1] flex items-center justify-center hover:bg-[#ea7700] transition-colors"
                   >
-                    {isPlaying ? <Pause className="w-[18px] h-[18px] text-white" /> : <Play className="w-[18px] h-[18px] text-white ml-0.5" />}
+                    {player.isPlaying ? <Pause className="w-[18px] h-[18px] text-white" /> : <Play className="w-[18px] h-[18px] text-white ml-0.5" />}
+                  </button>
+                  {/* Speed */}
+                  <button
+                    onClick={cycleSpeed}
+                    className="px-2 py-1 text-[11px] font-bold text-[#64748b] hover:text-white bg-[#1e293b] hover:bg-[#263148] rounded-md transition-colors min-w-[40px] text-center"
+                  >
+                    {player.speed === 1 ? '1×' : `${player.speed}×`}
                   </button>
                   <div className="flex-1 flex items-center gap-2">
-                    <div className="flex-1 h-1 bg-[#1e293b] rounded-full overflow-hidden">
-                      <div className="h-full bg-[#6366F1] rounded-full transition-all duration-300" style={{ width: `${progress}%` }} />
+                    {/* Seekable progress bar */}
+                    <div
+                      className="flex-1 h-2 bg-[#1e293b] rounded-full overflow-hidden cursor-pointer group relative"
+                      onClick={handleSeek}
+                    >
+                      <div
+                        className="h-full bg-[#6366F1] rounded-full relative transition-all duration-300"
+                        style={{ width: `${player.progress}%` }}
+                      >
+                        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity" />
+                      </div>
                     </div>
-                    <span className="text-[11px] font-mono text-[#666666] w-[90px] text-right">
-                      {formatDuration(currentTime)} / {formatDuration(playing.durationSeconds)}
+                    <span className="text-[11px] font-mono text-[#666666] w-[90px] text-right flex-shrink-0">
+                      {formatDuration(player.currentTime)} / {formatDuration(player.duration)}
                     </span>
                   </div>
                 </div>
@@ -275,7 +235,7 @@ export function PodcastsPage() {
           {/* Filter pills + episode list header */}
           <div className="flex items-center justify-between">
             <h2 className="font-mono text-base font-semibold text-[#111111]">
-              {playing ? 'Последние эпизоды' : 'Все подкасты'}
+              {player.playing ? 'Последние эпизоды' : 'Все подкасты'}
             </h2>
             <div className="flex gap-2">
               {CATEGORY_FILTERS.map(f => (
@@ -315,11 +275,11 @@ export function PodcastsPage() {
             ) : (
               filtered.map((podcast, i) => {
                 const colors = GRADIENT_COLORS[i % GRADIENT_COLORS.length]
-                const isCurrentlyPlaying = playing?.id === podcast.id
+                const isCurrentlyPlaying = player.playing?.id === podcast.id
                 return (
                   <button
                     key={podcast.id}
-                    onClick={() => handlePlay(podcast)}
+                    onClick={() => player.play(podcast)}
                     className={`stagger-item flex items-center gap-4 p-4 rounded-xl border text-left transition-all duration-200 ${
                       isCurrentlyPlaying
                         ? 'bg-[#fff7ed] border-[#6366F1]/30'
@@ -330,7 +290,7 @@ export function PodcastsPage() {
                       className="w-14 h-14 rounded-xl flex items-center justify-center flex-shrink-0"
                       style={{ background: `linear-gradient(135deg, ${colors[0]}, ${colors[1]})` }}
                     >
-                      {isCurrentlyPlaying && isPlaying ? (
+                      {isCurrentlyPlaying && player.isPlaying ? (
                         <Pause className="w-6 h-6 text-white" />
                       ) : (
                         <Play className="w-6 h-6 text-white ml-0.5" />
@@ -351,7 +311,7 @@ export function PodcastsPage() {
                         <span className="text-xs text-[#94a3b8]">{podcast.listensCount} прослушиваний</span>
                       )}
                       <div className="w-9 h-9 rounded-full bg-[#F2F3F0] flex items-center justify-center">
-                        {isCurrentlyPlaying && isPlaying ? (
+                        {isCurrentlyPlaying && player.isPlaying ? (
                           <Pause className="w-4 h-4 text-[#111111]" />
                         ) : (
                           <Play className="w-4 h-4 text-[#111111] ml-0.5" />

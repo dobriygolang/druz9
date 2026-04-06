@@ -5,6 +5,37 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─── Design tokens ─── */
+:root {
+  --bg-page:     #F2F3F0;
+  --bg-sidebar:  #E7E8E5;
+  --bg-card:     #ffffff;
+  --bg-elevated: #f1f5f9;
+  --bg-hover:    #F2F3F0;
+  --border:      #CBCCC9;
+  --border-subtle: #e2e8f0;
+  --text-primary:   #111111;
+  --text-secondary: #666666;
+  --text-muted:     #94a3b8;
+  --accent:      #6366F1;
+  --accent-light: #818cf8;
+}
+
+.dark {
+  --bg-page:     #0f1117;
+  --bg-sidebar:  #0b0d16;
+  --bg-card:     #161c2d;
+  --bg-elevated: #1c2436;
+  --bg-hover:    #1a2236;
+  --border:      #1e3158;
+  --border-subtle: #1a2540;
+  --text-primary:   #e2e8f3;
+  --text-secondary: #7e93b0;
+  --text-muted:     #4d6380;
+  --accent:      #818cf8;
+  --accent-light: #a5b4fc;
+}
+
 @layer utilities {
   .text-gradient-orange {
     background: linear-gradient(135deg, #6366F1, #f59e0b);
@@ -49,23 +80,100 @@
     color: #18181b;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background-color 0.2s ease, color 0.2s ease;
   }
 
-  ::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
+  .dark body {
+    background-color: #0f1117;
+    color: #e2e8f3;
   }
-  ::-webkit-scrollbar-track {
-    background: transparent;
-  }
-  ::-webkit-scrollbar-thumb {
-    background: #CBCCC9;
-    border-radius: 3px;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8;
-  }
+
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: #CBCCC9; border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+  .dark ::-webkit-scrollbar-track { background: #0f1117; }
+  .dark ::-webkit-scrollbar-thumb { background: #1e3158; }
+  .dark ::-webkit-scrollbar-thumb:hover { background: #2a4a7a; }
 }
 
 @keyframes slide-in-right { from { opacity: 0; transform: translateX(100%); } to { opacity: 1; transform: translateX(0); } }
 .animate-slide-in { animation: slide-in-right 0.3s ease-out; }
+
+/* ─── Global dark mode overrides ─────────────────────────────────────────── */
+/* These cover hardcoded hex Tailwind classes used throughout page components */
+
+/* Backgrounds */
+.dark .bg-white                  { background-color: #161c2d; }
+.dark .bg-\[\#ffffff\]           { background-color: #161c2d; }
+.dark .bg-\[\#FFFFFF\]           { background-color: #161c2d; }
+.dark .bg-\[\#F2F3F0\]           { background-color: #0f1117; }
+.dark .bg-\[\#f1f5f9\]           { background-color: #1c2436; }
+.dark .bg-\[\#f8fafc\]           { background-color: #131929; }
+.dark .bg-\[\#E7E8E5\]           { background-color: #0b0d16; }
+.dark .bg-\[\#D8D9D6\]           { background-color: #1a2640; }
+.dark .bg-\[\#e2e8f0\]           { background-color: #1c2436; }
+.dark .bg-\[\#f0f0ee\]           { background-color: #1c2436; }
+.dark .bg-\[\#f0f0ff\]           { background-color: #1a1e4a; }
+.dark .bg-\[\#EEF2FF\]           { background-color: #1e1e4a; }
+.dark .bg-\[\#eff6ff\]           { background-color: #0d1e40; }
+.dark .bg-\[\#e8f9ef\]           { background-color: #0d2a1f; }
+.dark .bg-\[\#fef3c7\]           { background-color: #2a200a; }
+.dark .bg-\[\#fef9c3\]           { background-color: #2a200a; }
+.dark .bg-\[\#fef2f2\]           { background-color: #2a0f0f; }
+.dark .bg-\[\#fff7ed\]           { background-color: #1f1206; }
+.dark .bg-\[\#FFF7ED\]           { background-color: #1f1206; }
+.dark .bg-\[\#fff\]              { background-color: #161c2d; }
+
+/* Borders */
+.dark .border-\[\#CBCCC9\]       { border-color: #1e3158; }
+.dark .border-\[\#cbccc9\]       { border-color: #1e3158; }
+.dark .border-\[\#e2e8f0\]       { border-color: #1e3158; }
+.dark .border-\[\#f1f5f9\]       { border-color: #1a2540; }
+.dark .border-\[\#f0f0ee\]       { border-color: #1a2540; }
+.dark .divide-\[\#F2F3F0\] > *   { border-color: #1a2540; }
+
+/* Primary text */
+.dark .text-\[\#111111\]         { color: #e2e8f3; }
+.dark .text-\[\#0f172a\]         { color: #e2e8f3; }
+.dark .text-\[\#18181b\]         { color: #e2e8f3; }
+.dark .text-\[\#1e293b\]         { color: #cbd5e1; }
+
+/* Secondary text */
+.dark .text-\[\#666666\]         { color: #7e93b0; }
+.dark .text-\[\#475569\]         { color: #7e93b0; }
+
+/* Muted text */
+.dark .text-\[\#94a3b8\]         { color: #4d6380; }
+.dark .text-\[\#64748b\]         { color: #4d6380; }
+
+/* Success colors — keep them vivid */
+.dark .text-\[\#166534\]         { color: #4ade80; }
+.dark .text-\[\#22c55e\]         { color: #4ade80; }
+
+/* Warning colors */
+.dark .text-\[\#92400e\]         { color: #fbbf24; }
+.dark .text-\[\#f59e0b\]         { color: #fbbf24; }
+
+/* Danger */
+.dark .text-\[\#dc2626\]         { color: #f87171; }
+.dark .text-\[\#ef4444\]         { color: #f87171; }
+
+/* Hover backgrounds */
+.dark .hover\:bg-white:hover            { background-color: #1c2436; }
+.dark .hover\:bg-\[\#F2F3F0\]:hover     { background-color: #1a2236; }
+.dark .hover\:bg-\[\#f2f3f0\]:hover     { background-color: #1a2236; }
+.dark .hover\:bg-\[\#e2e8f0\]:hover     { background-color: #1c2640; }
+.dark .hover\:bg-\[\#D8D9D6\]:hover     { background-color: #1a2640; }
+.dark .hover\:bg-\[\#fef2f2\]:hover     { background-color: #2a0f0f; }
+.dark .hover\:bg-\[\#EEF2FF\]:hover     { background-color: #1e1e4a; }
+.dark .hover\:bg-\[\#f1f5f9\]:hover     { background-color: #1c2436; }
+
+/* Hover borders */
+.dark .hover\:border-\[\#6366F1\]:hover { border-color: #818cf8; }
+.dark .hover\:border-\[\#6366f1\]:hover { border-color: #818cf8; }
+
+/* Shadow overrides */
+.dark .hover\:shadow-md:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.5); }
+.dark .shadow-modal { box-shadow: 0 20px 60px rgba(0,0,0,0.6); }
