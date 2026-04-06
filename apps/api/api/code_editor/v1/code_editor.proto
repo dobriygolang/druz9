@@ -93,6 +93,12 @@ service CodeEditorService {
       get: "/api/v1/code-editor/leaderboard"
     };
   }
+
+  rpc ListRooms(ListRoomsRequest) returns (ListRoomsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/code-editor/rooms"
+    };
+  }
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────
@@ -215,6 +221,12 @@ message DeleteTaskRequest {
 
 message GetLeaderboardRequest {
   int32 limit = 1;
+}
+
+message ListRoomsRequest {}
+
+message ListRoomsResponse {
+  repeated Room rooms = 1;
 }
 
 // ── Response messages ──────────────────────────────────────────────────────

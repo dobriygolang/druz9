@@ -934,6 +934,17 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/code_editor.v1.GetLeaderboardResponse'
     /api/v1/code-editor/rooms:
+        get:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_ListRooms
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.ListRoomsResponse'
         post:
             tags:
                 - CodeEditorService
@@ -2367,6 +2378,13 @@ components:
             properties:
                 roomId:
                     type: string
+        code_editor.v1.ListRoomsResponse:
+            type: object
+            properties:
+                rooms:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/code_editor.v1.Room'
         code_editor.v1.ListTasksResponse:
             type: object
             properties:

@@ -544,6 +544,65 @@ func (_c *Service_LeaveRoom_Call) RunAndReturn(run func(context.Context, uuid.UU
 	return _c
 }
 
+// ListRooms provides a mock function with given fields: ctx, userID
+func (_m *Service) ListRooms(ctx context.Context, userID *uuid.UUID) ([]*model.Room, error) {
+	ret := _m.Called(ctx, userID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListRooms")
+	}
+
+	var r0 []*model.Room
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, *uuid.UUID) ([]*model.Room, error)); ok {
+		return rf(ctx, userID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, *uuid.UUID) []*model.Room); ok {
+		r0 = rf(ctx, userID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.Room)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, *uuid.UUID) error); ok {
+		r1 = rf(ctx, userID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_ListRooms_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListRooms'
+type Service_ListRooms_Call struct {
+	*mock.Call
+}
+
+// ListRooms is a helper method to define mock.On call
+//   - ctx context.Context
+//   - userID *uuid.UUID
+func (_e *Service_Expecter) ListRooms(ctx interface{}, userID interface{}) *Service_ListRooms_Call {
+	return &Service_ListRooms_Call{Call: _e.mock.On("ListRooms", ctx, userID)}
+}
+
+func (_c *Service_ListRooms_Call) Run(run func(ctx context.Context, userID *uuid.UUID)) *Service_ListRooms_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(*uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_ListRooms_Call) Return(_a0 []*model.Room, _a1 error) *Service_ListRooms_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_ListRooms_Call) RunAndReturn(run func(context.Context, *uuid.UUID) ([]*model.Room, error)) *Service_ListRooms_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // ListTasks provides a mock function with given fields: ctx, filter
 func (_m *Service) ListTasks(ctx context.Context, filter model.CodeTaskFilter) ([]*model.CodeTask, error) {
 	ret := _m.Called(ctx, filter)

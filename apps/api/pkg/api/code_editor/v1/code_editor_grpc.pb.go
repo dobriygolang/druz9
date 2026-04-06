@@ -32,6 +32,7 @@ const (
 	CodeEditorService_UpdateTask_FullMethodName           = "/code_editor.v1.CodeEditorService/UpdateTask"
 	CodeEditorService_DeleteTask_FullMethodName           = "/code_editor.v1.CodeEditorService/DeleteTask"
 	CodeEditorService_GetLeaderboard_FullMethodName       = "/code_editor.v1.CodeEditorService/GetLeaderboard"
+	CodeEditorService_ListRooms_FullMethodName            = "/code_editor.v1.CodeEditorService/ListRooms"
 )
 
 // CodeEditorServiceClient is the client API for CodeEditorService service.
@@ -51,6 +52,7 @@ type CodeEditorServiceClient interface {
 	UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*TaskResponse, error)
 	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	GetLeaderboard(ctx context.Context, in *GetLeaderboardRequest, opts ...grpc.CallOption) (*GetLeaderboardResponse, error)
+	ListRooms(ctx context.Context, in *ListRoomsRequest, opts ...grpc.CallOption) (*ListRoomsResponse, error)
 }
 
 type codeEditorServiceClient struct {
@@ -191,6 +193,16 @@ func (c *codeEditorServiceClient) GetLeaderboard(ctx context.Context, in *GetLea
 	return out, nil
 }
 
+func (c *codeEditorServiceClient) ListRooms(ctx context.Context, in *ListRoomsRequest, opts ...grpc.CallOption) (*ListRoomsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListRoomsResponse)
+	err := c.cc.Invoke(ctx, CodeEditorService_ListRooms_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CodeEditorServiceServer is the server API for CodeEditorService service.
 // All implementations must embed UnimplementedCodeEditorServiceServer
 // for forward compatibility.
@@ -208,6 +220,7 @@ type CodeEditorServiceServer interface {
 	UpdateTask(context.Context, *UpdateTaskRequest) (*TaskResponse, error)
 	DeleteTask(context.Context, *DeleteTaskRequest) (*StatusResponse, error)
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
+	ListRooms(context.Context, *ListRoomsRequest) (*ListRoomsResponse, error)
 	mustEmbedUnimplementedCodeEditorServiceServer()
 }
 
@@ -256,6 +269,9 @@ func (UnimplementedCodeEditorServiceServer) DeleteTask(context.Context, *DeleteT
 }
 func (UnimplementedCodeEditorServiceServer) GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetLeaderboard not implemented")
+}
+func (UnimplementedCodeEditorServiceServer) ListRooms(context.Context, *ListRoomsRequest) (*ListRoomsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListRooms not implemented")
 }
 func (UnimplementedCodeEditorServiceServer) mustEmbedUnimplementedCodeEditorServiceServer() {}
 func (UnimplementedCodeEditorServiceServer) testEmbeddedByValue()                           {}
@@ -512,6 +528,24 @@ func _CodeEditorService_GetLeaderboard_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CodeEditorService_ListRooms_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListRoomsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CodeEditorServiceServer).ListRooms(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CodeEditorService_ListRooms_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CodeEditorServiceServer).ListRooms(ctx, req.(*ListRoomsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CodeEditorService_ServiceDesc is the grpc.ServiceDesc for CodeEditorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -570,6 +604,10 @@ var CodeEditorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetLeaderboard",
 			Handler:    _CodeEditorService_GetLeaderboard_Handler,
+		},
+		{
+			MethodName: "ListRooms",
+			Handler:    _CodeEditorService_ListRooms_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
