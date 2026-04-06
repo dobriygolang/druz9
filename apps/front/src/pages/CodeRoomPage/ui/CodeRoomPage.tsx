@@ -182,12 +182,13 @@ export function CodeRoomPage() {
   // Fetch initial room data via REST
   useEffect(() => {
     if (!roomId || needsGuestName) return
-    const taskState = location.state as { statement?: string; starterCode?: string; language?: string } | null
+    const taskState = location.state as { title?: string; statement?: string; starterCode?: string; language?: string } | null
     codeRoomApi.getRoom(roomId, guestNameRef.current)
       .then(r => {
+        if (taskState?.title && !r.task) r = { ...r, task: taskState.title }
         setRoom(r)
         if (taskState?.statement) setTaskStatement(taskState.statement)
-        const initCode = r.code || taskState?.starterCode || ''
+        const initCode = taskState?.starterCode || r.code || ''
         if (initCode) setLocalCode(initCode)
       })
       .catch(() => navigate('/practice/code-rooms'))

@@ -130,7 +130,7 @@ export function DailyChallengePage() {
     }
   }
 
-  const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
+  const handleEditorMount = useCallback((_editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
     registerDarkTheme(monaco)
     monaco.editor.setTheme(theme === 'dark' ? 'druzya-dark' : 'vs')
   }, [theme])

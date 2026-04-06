@@ -82,9 +82,9 @@ export function PracticeSoloPage() {
 
   const handleStartSolo = async (task: Task) => {
     try {
-      const { room } = await codeRoomApi.createRoom({ mode: 'ROOM_MODE_ALL', task: task.title })
+      const { room } = await codeRoomApi.createRoom({ mode: 'ROOM_MODE_ALL' })
       navigate(`/code-rooms/${room.id}`, {
-        state: { statement: task.statement, starterCode: task.starterCode, language: task.language },
+        state: { title: task.title, statement: task.statement, starterCode: task.starterCode, language: task.language },
       })
     } catch {}
   }
