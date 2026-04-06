@@ -55,6 +55,8 @@ interface UseCodeRoomWsOptions {
   initialLanguage?: string
   onLeave?: (userId: string, displayName: string) => void
   onBehaviorEvent?: (userId: string, displayName: string, event: BehaviorEventType) => void
+  /** Fired synchronously on every cursor position change — use for direct widget updates without React cycle */
+  onCursorUpdate?: (userId: string, line: number, col: number) => void
 }
 
 export interface SelectionInfo {
@@ -78,11 +80,13 @@ interface UseCodeRoomWsReturn {
 }
 
 export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
-  const { roomId, userId, displayName, guestName, enabled = true, initialLanguage, onLeave, onBehaviorEvent } = opts
+  const { roomId, userId, displayName, guestName, enabled = true, initialLanguage, onLeave, onBehaviorEvent, onCursorUpdate } = opts
   const onLeaveRef = useRef(onLeave)
   onLeaveRef.current = onLeave
   const onBehaviorRef = useRef(onBehaviorEvent)
   onBehaviorRef.current = onBehaviorEvent
+  const onCursorUpdateRef = useRef(onCursorUpdate)
+  onCursorUpdateRef.current = onCursorUpdate
 
   const socketRef = useRef<RealtimeSocket | null>(null)
   const clientId = useRef(`client-${Math.random().toString(36).slice(2, 10)}`)
@@ -177,13 +181,21 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
             onBehaviorRef.current?.(msg.userId!, incomingDisplayName, 'pasted')
           }
 
+          const cursorLine = cursorData.cursorLine as number | undefined
+          const cursorColumn = cursorData.cursorColumn as number | undefined
+
+          // Fire synchronously — bypasses RAF/React for zero-lag widget repositioning
+          if (cursorLine) {
+            onCursorUpdateRef.current?.(msg.userId!, cursorLine, cursorColumn ?? 1)
+          }
+
           pendingAwareness.current.set(msg.userId!, {
             action: 'set',
             state: {
               userId: msg.userId!,
               displayName: incomingDisplayName,
-              cursorLine: cursorData.cursorLine as number | undefined,
-              cursorColumn: cursorData.cursorColumn as number | undefined,
+              cursorLine,
+              cursorColumn,
               selStartLine: cursorData.selStartLine as number | undefined,
               selStartCol: cursorData.selStartCol as number | undefined,
               selEndLine: cursorData.selEndLine as number | undefined,

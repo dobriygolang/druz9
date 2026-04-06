@@ -276,6 +276,15 @@ export function CodeRoomPage() {
       else if (event === 'tab_visible') addNotification(`${displayName} вернулся(-ась)`)
       else if (event === 'pasted') addNotification(`⚠️ ${displayName} вставил(-а) код`)
     }, [addNotification]),
+    onCursorUpdate: useCallback((userId: string, line: number, col: number) => {
+      // Runs synchronously in the WS message handler — no RAF, no React render cycle
+      const posRef = cursorPositionsRef.current.get(userId)
+      if (posRef && widgetsRef.current.has(userId)) {
+        posRef.line = line
+        posRef.col = col
+        editorRef.current?.layoutContentWidget(widgetsRef.current.get(userId)!)
+      }
+    }, []),
   })
 
   // Fetch initial room data via REST
