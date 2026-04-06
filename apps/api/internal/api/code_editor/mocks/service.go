@@ -712,6 +712,66 @@ func (_c *Service_SetReady_Call) RunAndReturn(run func(context.Context, uuid.UUI
 	return _c
 }
 
+// StartRoom provides a mock function with given fields: ctx, roomID, callerID
+func (_m *Service) StartRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) (*model.Room, error) {
+	ret := _m.Called(ctx, roomID, callerID)
+
+	if len(ret) == 0 {
+		panic("no return value specified for StartRoom")
+	}
+
+	var r0 *model.Room
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *uuid.UUID) (*model.Room, error)); ok {
+		return rf(ctx, roomID, callerID)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *uuid.UUID) *model.Room); ok {
+		r0 = rf(ctx, roomID, callerID)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.Room)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, *uuid.UUID) error); ok {
+		r1 = rf(ctx, roomID, callerID)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_StartRoom_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'StartRoom'
+type Service_StartRoom_Call struct {
+	*mock.Call
+}
+
+// StartRoom is a helper method to define mock.On call
+//   - ctx context.Context
+//   - roomID uuid.UUID
+//   - callerID *uuid.UUID
+func (_e *Service_Expecter) StartRoom(ctx interface{}, roomID interface{}, callerID interface{}) *Service_StartRoom_Call {
+	return &Service_StartRoom_Call{Call: _e.mock.On("StartRoom", ctx, roomID, callerID)}
+}
+
+func (_c *Service_StartRoom_Call) Run(run func(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID)) *Service_StartRoom_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_StartRoom_Call) Return(_a0 *model.Room, _a1 error) *Service_StartRoom_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_StartRoom_Call) RunAndReturn(run func(context.Context, uuid.UUID, *uuid.UUID) (*model.Room, error)) *Service_StartRoom_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // SubmitCode provides a mock function with given fields: ctx, roomID, userID, guestName, code
 func (_m *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, code string) (*model.Submission, error) {
 	ret := _m.Called(ctx, roomID, userID, guestName, code)

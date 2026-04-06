@@ -31,6 +31,9 @@ const (
 	ProfileService_UpdateProfile_FullMethodName               = "/profile.v1.ProfileService/UpdateProfile"
 	ProfileService_Logout_FullMethodName                      = "/profile.v1.ProfileService/Logout"
 	ProfileService_BindTelegram_FullMethodName                = "/profile.v1.ProfileService/BindTelegram"
+	ProfileService_GetProfileProgress_FullMethodName          = "/profile.v1.ProfileService/GetProfileProgress"
+	ProfileService_GetAchievements_FullMethodName             = "/profile.v1.ProfileService/GetAchievements"
+	ProfileService_GetProfileActivity_FullMethodName          = "/profile.v1.ProfileService/GetProfileActivity"
 )
 
 // ProfileServiceClient is the client API for ProfileService service.
@@ -49,6 +52,9 @@ type ProfileServiceClient interface {
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*ProfileStatusResponse, error)
 	BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...grpc.CallOption) (*ProfileStatusResponse, error)
+	GetProfileProgress(ctx context.Context, in *GetProfileProgressRequest, opts ...grpc.CallOption) (*ProfileProgressResponse, error)
+	GetAchievements(ctx context.Context, in *GetAchievementsRequest, opts ...grpc.CallOption) (*GetAchievementsResponse, error)
+	GetProfileActivity(ctx context.Context, in *GetProfileActivityRequest, opts ...grpc.CallOption) (*GetProfileActivityResponse, error)
 }
 
 type profileServiceClient struct {
@@ -179,6 +185,36 @@ func (c *profileServiceClient) BindTelegram(ctx context.Context, in *BindTelegra
 	return out, nil
 }
 
+func (c *profileServiceClient) GetProfileProgress(ctx context.Context, in *GetProfileProgressRequest, opts ...grpc.CallOption) (*ProfileProgressResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ProfileProgressResponse)
+	err := c.cc.Invoke(ctx, ProfileService_GetProfileProgress_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profileServiceClient) GetAchievements(ctx context.Context, in *GetAchievementsRequest, opts ...grpc.CallOption) (*GetAchievementsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetAchievementsResponse)
+	err := c.cc.Invoke(ctx, ProfileService_GetAchievements_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *profileServiceClient) GetProfileActivity(ctx context.Context, in *GetProfileActivityRequest, opts ...grpc.CallOption) (*GetProfileActivityResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetProfileActivityResponse)
+	err := c.cc.Invoke(ctx, ProfileService_GetProfileActivity_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfileServiceServer is the server API for ProfileService service.
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility.
@@ -195,6 +231,9 @@ type ProfileServiceServer interface {
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*ProfileResponse, error)
 	Logout(context.Context, *LogoutRequest) (*ProfileStatusResponse, error)
 	BindTelegram(context.Context, *BindTelegramRequest) (*ProfileStatusResponse, error)
+	GetProfileProgress(context.Context, *GetProfileProgressRequest) (*ProfileProgressResponse, error)
+	GetAchievements(context.Context, *GetAchievementsRequest) (*GetAchievementsResponse, error)
+	GetProfileActivity(context.Context, *GetProfileActivityRequest) (*GetProfileActivityResponse, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -240,6 +279,15 @@ func (UnimplementedProfileServiceServer) Logout(context.Context, *LogoutRequest)
 }
 func (UnimplementedProfileServiceServer) BindTelegram(context.Context, *BindTelegramRequest) (*ProfileStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method BindTelegram not implemented")
+}
+func (UnimplementedProfileServiceServer) GetProfileProgress(context.Context, *GetProfileProgressRequest) (*ProfileProgressResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetProfileProgress not implemented")
+}
+func (UnimplementedProfileServiceServer) GetAchievements(context.Context, *GetAchievementsRequest) (*GetAchievementsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetAchievements not implemented")
+}
+func (UnimplementedProfileServiceServer) GetProfileActivity(context.Context, *GetProfileActivityRequest) (*GetProfileActivityResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetProfileActivity not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
 func (UnimplementedProfileServiceServer) testEmbeddedByValue()                        {}
@@ -478,6 +526,60 @@ func _ProfileService_BindTelegram_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfileService_GetProfileProgress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProfileProgressRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).GetProfileProgress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_GetProfileProgress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).GetProfileProgress(ctx, req.(*GetProfileProgressRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfileService_GetAchievements_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetAchievementsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).GetAchievements(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_GetAchievements_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).GetAchievements(ctx, req.(*GetAchievementsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProfileService_GetProfileActivity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProfileActivityRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).GetProfileActivity(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_GetProfileActivity_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).GetProfileActivity(ctx, req.(*GetProfileActivityRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -532,6 +634,18 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "BindTelegram",
 			Handler:    _ProfileService_BindTelegram_Handler,
+		},
+		{
+			MethodName: "GetProfileProgress",
+			Handler:    _ProfileService_GetProfileProgress_Handler,
+		},
+		{
+			MethodName: "GetAchievements",
+			Handler:    _ProfileService_GetAchievements_Handler,
+		},
+		{
+			MethodName: "GetProfileActivity",
+			Handler:    _ProfileService_GetProfileActivity_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

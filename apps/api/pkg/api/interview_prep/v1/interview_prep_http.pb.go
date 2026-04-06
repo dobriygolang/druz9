@@ -30,6 +30,7 @@ const OperationInterviewPrepServiceDeleteAdminTask = "/interview_prep.v1.Intervi
 const OperationInterviewPrepServiceDeleteMockCompanyPreset = "/interview_prep.v1.InterviewPrepService/DeleteMockCompanyPreset"
 const OperationInterviewPrepServiceDeleteMockQuestionPool = "/interview_prep.v1.InterviewPrepService/DeleteMockQuestionPool"
 const OperationInterviewPrepServiceGetAdminTask = "/interview_prep.v1.InterviewPrepService/GetAdminTask"
+const OperationInterviewPrepServiceGetCheckpointBySession = "/interview_prep.v1.InterviewPrepService/GetCheckpointBySession"
 const OperationInterviewPrepServiceGetMockSession = "/interview_prep.v1.InterviewPrepService/GetMockSession"
 const OperationInterviewPrepServiceGetSession = "/interview_prep.v1.InterviewPrepService/GetSession"
 const OperationInterviewPrepServiceListAdminQuestions = "/interview_prep.v1.InterviewPrepService/ListAdminQuestions"
@@ -40,6 +41,7 @@ const OperationInterviewPrepServiceListMockQuestionPools = "/interview_prep.v1.I
 const OperationInterviewPrepServiceListTasks = "/interview_prep.v1.InterviewPrepService/ListTasks"
 const OperationInterviewPrepServiceReviewMockSystemDesign = "/interview_prep.v1.InterviewPrepService/ReviewMockSystemDesign"
 const OperationInterviewPrepServiceReviewSystemDesign = "/interview_prep.v1.InterviewPrepService/ReviewSystemDesign"
+const OperationInterviewPrepServiceStartCheckpointSession = "/interview_prep.v1.InterviewPrepService/StartCheckpointSession"
 const OperationInterviewPrepServiceStartMockSession = "/interview_prep.v1.InterviewPrepService/StartMockSession"
 const OperationInterviewPrepServiceStartSession = "/interview_prep.v1.InterviewPrepService/StartSession"
 const OperationInterviewPrepServiceSubmitMockStage = "/interview_prep.v1.InterviewPrepService/SubmitMockStage"
@@ -61,6 +63,7 @@ type InterviewPrepServiceHTTPServer interface {
 	DeleteMockCompanyPreset(context.Context, *DeleteMockCompanyPresetRequest) (*StatusResponse, error)
 	DeleteMockQuestionPool(context.Context, *DeleteMockQuestionPoolRequest) (*StatusResponse, error)
 	GetAdminTask(context.Context, *GetAdminTaskRequest) (*AdminTaskEnvelope, error)
+	GetCheckpointBySession(context.Context, *GetCheckpointBySessionRequest) (*CheckpointSessionResponse, error)
 	GetMockSession(context.Context, *GetMockSessionRequest) (*MockSessionEnvelope, error)
 	GetSession(context.Context, *GetSessionRequest) (*SessionEnvelope, error)
 	ListAdminQuestions(context.Context, *ListAdminQuestionsRequest) (*ListAdminQuestionsResponse, error)
@@ -71,6 +74,7 @@ type InterviewPrepServiceHTTPServer interface {
 	ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error)
 	ReviewMockSystemDesign(context.Context, *ReviewMockSystemDesignRequest) (*ReviewMockSystemDesignResponse, error)
 	ReviewSystemDesign(context.Context, *ReviewSystemDesignRequest) (*ReviewSystemDesignResponse, error)
+	StartCheckpointSession(context.Context, *StartCheckpointSessionRequest) (*CheckpointSessionResponse, error)
 	StartMockSession(context.Context, *StartMockSessionRequest) (*MockSessionEnvelope, error)
 	StartSession(context.Context, *StartSessionRequest) (*SessionEnvelope, error)
 	SubmitMockStage(context.Context, *SubmitMockStageRequest) (*SubmitMockStageResponse, error)
@@ -112,6 +116,8 @@ func RegisterInterviewPrepServiceHTTPServer(s *http.Server, srv InterviewPrepSer
 	r.POST("/api/admin/interview-prep/mock-company-presets", _InterviewPrepService_CreateMockCompanyPreset0_HTTP_Handler(srv))
 	r.PUT("/api/admin/interview-prep/mock-company-presets/{id}", _InterviewPrepService_UpdateMockCompanyPreset0_HTTP_Handler(srv))
 	r.DELETE("/api/admin/interview-prep/mock-company-presets/{id}", _InterviewPrepService_DeleteMockCompanyPreset0_HTTP_Handler(srv))
+	r.POST("/api/v1/interview-prep/checkpoints/start", _InterviewPrepService_StartCheckpointSession0_HTTP_Handler(srv))
+	r.GET("/api/v1/interview-prep/checkpoints/session/{session_id}", _InterviewPrepService_GetCheckpointBySession0_HTTP_Handler(srv))
 }
 
 func _InterviewPrepService_ListTasks1_HTTP_Handler(srv InterviewPrepServiceHTTPServer) func(ctx http.Context) error {
@@ -770,6 +776,50 @@ func _InterviewPrepService_DeleteMockCompanyPreset0_HTTP_Handler(srv InterviewPr
 	}
 }
 
+func _InterviewPrepService_StartCheckpointSession0_HTTP_Handler(srv InterviewPrepServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in StartCheckpointSessionRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInterviewPrepServiceStartCheckpointSession)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.StartCheckpointSession(ctx, req.(*StartCheckpointSessionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CheckpointSessionResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InterviewPrepService_GetCheckpointBySession0_HTTP_Handler(srv InterviewPrepServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetCheckpointBySessionRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInterviewPrepServiceGetCheckpointBySession)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetCheckpointBySession(ctx, req.(*GetCheckpointBySessionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CheckpointSessionResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type InterviewPrepServiceHTTPClient interface {
 	AnswerMockQuestion(ctx context.Context, req *AnswerMockQuestionRequest, opts ...http.CallOption) (rsp *AnswerMockQuestionResponse, err error)
 	AnswerQuestion(ctx context.Context, req *AnswerQuestionRequest, opts ...http.CallOption) (rsp *AnswerQuestionResponse, err error)
@@ -782,6 +832,7 @@ type InterviewPrepServiceHTTPClient interface {
 	DeleteMockCompanyPreset(ctx context.Context, req *DeleteMockCompanyPresetRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
 	DeleteMockQuestionPool(ctx context.Context, req *DeleteMockQuestionPoolRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
 	GetAdminTask(ctx context.Context, req *GetAdminTaskRequest, opts ...http.CallOption) (rsp *AdminTaskEnvelope, err error)
+	GetCheckpointBySession(ctx context.Context, req *GetCheckpointBySessionRequest, opts ...http.CallOption) (rsp *CheckpointSessionResponse, err error)
 	GetMockSession(ctx context.Context, req *GetMockSessionRequest, opts ...http.CallOption) (rsp *MockSessionEnvelope, err error)
 	GetSession(ctx context.Context, req *GetSessionRequest, opts ...http.CallOption) (rsp *SessionEnvelope, err error)
 	ListAdminQuestions(ctx context.Context, req *ListAdminQuestionsRequest, opts ...http.CallOption) (rsp *ListAdminQuestionsResponse, err error)
@@ -792,6 +843,7 @@ type InterviewPrepServiceHTTPClient interface {
 	ListTasks(ctx context.Context, req *ListTasksRequest, opts ...http.CallOption) (rsp *ListTasksResponse, err error)
 	ReviewMockSystemDesign(ctx context.Context, req *ReviewMockSystemDesignRequest, opts ...http.CallOption) (rsp *ReviewMockSystemDesignResponse, err error)
 	ReviewSystemDesign(ctx context.Context, req *ReviewSystemDesignRequest, opts ...http.CallOption) (rsp *ReviewSystemDesignResponse, err error)
+	StartCheckpointSession(ctx context.Context, req *StartCheckpointSessionRequest, opts ...http.CallOption) (rsp *CheckpointSessionResponse, err error)
 	StartMockSession(ctx context.Context, req *StartMockSessionRequest, opts ...http.CallOption) (rsp *MockSessionEnvelope, err error)
 	StartSession(ctx context.Context, req *StartSessionRequest, opts ...http.CallOption) (rsp *SessionEnvelope, err error)
 	SubmitMockStage(ctx context.Context, req *SubmitMockStageRequest, opts ...http.CallOption) (rsp *SubmitMockStageResponse, err error)
@@ -953,6 +1005,19 @@ func (c *InterviewPrepServiceHTTPClientImpl) GetAdminTask(ctx context.Context, i
 	return &out, nil
 }
 
+func (c *InterviewPrepServiceHTTPClientImpl) GetCheckpointBySession(ctx context.Context, in *GetCheckpointBySessionRequest, opts ...http.CallOption) (*CheckpointSessionResponse, error) {
+	var out CheckpointSessionResponse
+	pattern := "/api/v1/interview-prep/checkpoints/session/{session_id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationInterviewPrepServiceGetCheckpointBySession))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *InterviewPrepServiceHTTPClientImpl) GetMockSession(ctx context.Context, in *GetMockSessionRequest, opts ...http.CallOption) (*MockSessionEnvelope, error) {
 	var out MockSessionEnvelope
 	pattern := "/api/v1/interview-prep/mock-sessions/{session_id}"
@@ -1075,6 +1140,19 @@ func (c *InterviewPrepServiceHTTPClientImpl) ReviewSystemDesign(ctx context.Cont
 	pattern := "/api/v1/interview-prep/sessions/{session_id}/system-design-review"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationInterviewPrepServiceReviewSystemDesign))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *InterviewPrepServiceHTTPClientImpl) StartCheckpointSession(ctx context.Context, in *StartCheckpointSessionRequest, opts ...http.CallOption) (*CheckpointSessionResponse, error) {
+	var out CheckpointSessionResponse
+	pattern := "/api/v1/interview-prep/checkpoints/start"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationInterviewPrepServiceStartCheckpointSession))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

@@ -157,14 +157,14 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		interviewPrepDomain:     interviewPrepDomain,
 		realtimeHub:             realtimeHub,
 		arenaRealtimeHub:        arenaRealtimeHub,
-		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager),
-		profileService:          profileservice.New(profileServiceDomain, cookies),
+		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager, storage.profileRepo, profileServiceDomain),
+		profileService:          profileservice.New(profileServiceDomain, cookies, storage.profileRepo),
 		geoService:              geoservice.New(geoServiceDomain),
-		circleService:           circleservice.New(circleServiceDomain),
+		circleService:           circleservice.New(circleServiceDomain, eventServiceDomain),
 		eventService:            eventservice.New(eventServiceDomain),
 		podcastService:          podcastservice.New(podcastServiceDomain),
 		referralService:         referralservice.New(referralServiceDomain),
-		codeEditorService:       codeeditorservice.New(codeEditorServiceDomain, realtimeHub),
+		codeEditorService:       codeeditorservice.New(codeEditorServiceDomain, realtimeHub, aiReviewService),
 		arenaService: arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
 		}),

@@ -206,6 +206,8 @@ export function EventsPage() {
   const [creating, setCreating] = useState(false)
   const [form, setForm] = useState<Partial<CreateEventPayload>>({})
   const [selectedEvent, setSelectedEvent] = useState<Event | null>(null)
+  const [inviteInput, setInviteInput] = useState('')
+  const [inviteIds, setInviteIds] = useState<string[]>([])
 
   const fetchEvents = useCallback(() => {
     setError(null)
@@ -259,16 +261,20 @@ export function EventsPage() {
   }
 
   const handleCreate = async () => {
-    if (!form.title || !form.scheduledAt) return
+    if (!form.title || !form.description) return
     setCreating(true)
     try {
       let scheduledAt = form.scheduledAt ?? ''
       if (scheduledAt && !scheduledAt.match(/T\d{2}:\d{2}:\d{2}/)) scheduledAt = `${scheduledAt}:00`
       if (scheduledAt && !/[Z+\-]\d*$/.test(scheduledAt)) scheduledAt = `${scheduledAt}Z`
-      const created = await eventApi.createEvent({ ...form, scheduledAt } as CreateEventPayload)
+      const created = await eventApi.createEvent({ ...form, scheduledAt: scheduledAt || undefined } as CreateEventPayload)
       setEvents(prev => [created, ...prev])
+      // Send invites for collected user IDs (fire-and-forget)
+      inviteIds.forEach(uid => eventApi.inviteToEvent(created.id, uid).catch(() => {}))
       setShowCreate(false)
       setForm({})
+      setInviteIds([])
+      setInviteInput('')
       toast('Событие создано', 'success')
     } catch {
       toast('Не удалось создать событие', 'error')
@@ -339,22 +345,25 @@ export function EventsPage() {
       {/* Create event modal */}
       <Modal
         open={showCreate}
-        onClose={() => setShowCreate(false)}
+        onClose={() => { setShowCreate(false); setForm({}); setInviteIds([]); setInviteInput('') }}
         title="Новое событие"
         footer={
           <>
-            <Button variant="secondary" size="sm" onClick={() => setShowCreate(false)}>Отмена</Button>
-            <Button variant="orange" size="sm" onClick={handleCreate} loading={creating}>Создать</Button>
+            <Button variant="secondary" size="sm" onClick={() => { setShowCreate(false); setForm({}); setInviteIds([]); setInviteInput('') }}>Отмена</Button>
+            <Button variant="orange" size="sm" onClick={handleCreate} loading={creating} disabled={!form.title || !form.description}>Создать</Button>
           </>
         }
       >
         <div className="flex flex-col gap-4">
-          <Input label="Название" value={form.title ?? ''} onChange={e => setForm(f => ({ ...f, title: e.target.value }))} placeholder="Название события" />
-          <Input label="Дата и время" type="datetime-local" value={form.scheduledAt ?? ''} onChange={e => setForm(f => ({ ...f, scheduledAt: e.target.value }))} />
-          <Input label="Место" value={form.placeLabel ?? ''} onChange={e => setForm(f => ({ ...f, placeLabel: e.target.value }))} placeholder="Город, место" />
-          <Input label="Ссылка на встречу" value={form.meetingLink ?? ''} onChange={e => setForm(f => ({ ...f, meetingLink: e.target.value }))} placeholder="https://..." />
+          {/* Required */}
+          <Input
+            label="Название *"
+            value={form.title ?? ''}
+            onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+            placeholder="Название события"
+          />
           <div>
-            <label className="block text-xs font-medium text-[#475569] mb-1.5">Описание</label>
+            <label className="block text-xs font-medium text-[#475569] mb-1.5">Описание *</label>
             <textarea
               value={form.description ?? ''}
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
@@ -362,6 +371,60 @@ export function EventsPage() {
               rows={3}
               className="w-full px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 resize-none"
             />
+          </div>
+
+          {/* Optional */}
+          <div className="border-t border-[#F2F3F0] pt-4 flex flex-col gap-3">
+            <p className="text-xs text-[#94a3b8] -mb-1">Необязательно</p>
+            <Input label="Дата и время" type="datetime-local" value={form.scheduledAt ?? ''} onChange={e => setForm(f => ({ ...f, scheduledAt: e.target.value }))} />
+            <Input label="Место" value={form.placeLabel ?? ''} onChange={e => setForm(f => ({ ...f, placeLabel: e.target.value }))} placeholder="Город, место" />
+            <Input label="Ссылка на встречу" value={form.meetingLink ?? ''} onChange={e => setForm(f => ({ ...f, meetingLink: e.target.value }))} placeholder="https://..." />
+          </div>
+
+          {/* Invite */}
+          <div className="border-t border-[#F2F3F0] pt-4">
+            <label className="block text-xs font-medium text-[#475569] mb-1.5">Пригласить участников</label>
+            <div className="flex gap-2">
+              <input
+                value={inviteInput}
+                onChange={e => setInviteInput(e.target.value)}
+                onKeyDown={e => {
+                  if ((e.key === 'Enter' || e.key === ',') && inviteInput.trim()) {
+                    e.preventDefault()
+                    const id = inviteInput.trim()
+                    if (!inviteIds.includes(id)) setInviteIds(prev => [...prev, id])
+                    setInviteInput('')
+                  }
+                }}
+                placeholder="ID пользователя, Enter для добавления"
+                className="flex-1 px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
+              />
+              <button
+                type="button"
+                onClick={() => {
+                  const id = inviteInput.trim()
+                  if (id && !inviteIds.includes(id)) setInviteIds(prev => [...prev, id])
+                  setInviteInput('')
+                }}
+                disabled={!inviteInput.trim()}
+                className="px-3 py-2 text-sm bg-[#F2F3F0] hover:bg-[#e2e8f0] rounded-lg transition-colors disabled:opacity-40"
+              >
+                <Plus className="w-4 h-4" />
+              </button>
+            </div>
+            {inviteIds.length > 0 && (
+              <div className="flex flex-wrap gap-1.5 mt-2">
+                {inviteIds.map(id => (
+                  <span key={id} className="flex items-center gap-1 px-2 py-0.5 bg-[#f0f0ff] text-[#6366F1] text-xs rounded-full">
+                    <User className="w-3 h-3" />
+                    {id.length > 12 ? `${id.slice(0, 8)}…` : id}
+                    <button type="button" onClick={() => setInviteIds(prev => prev.filter(i => i !== id))} className="ml-0.5 hover:text-[#4F46E5]">
+                      <X className="w-3 h-3" />
+                    </button>
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </Modal>

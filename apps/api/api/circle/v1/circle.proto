@@ -4,6 +4,7 @@ package circle.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "event/v1/event.proto";
 
 option go_package = "api/pkg/api/circle/v1;v1";
 
@@ -36,6 +37,21 @@ service CircleService {
   rpc InviteToCircle(InviteToCircleRequest) returns (InviteToCircleResponse) {
     option (google.api.http) = {
       post: "/api/v1/circles/{circle_id}/invite"
+      body: "*"
+    };
+  }
+
+  rpc ListCircleMembers(ListCircleMembersRequest) returns (ListCircleMembersResponse) {
+    option (google.api.http) = { get: "/api/v1/circles/{circle_id}/members" };
+  }
+
+  rpc ListCircleEvents(ListCircleEventsRequest) returns (ListCircleEventsResponse) {
+    option (google.api.http) = { get: "/api/v1/circles/{circle_id}/events" };
+  }
+
+  rpc CreateCircleEvent(CreateCircleEventRequest) returns (CreateCircleEventResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/circles/{circle_id}/events"
       body: "*"
     };
   }
@@ -85,6 +101,46 @@ message InviteToCircleRequest {
 
 message InviteToCircleResponse {
   string status = 1;
+}
+
+message ListCircleMembersRequest {
+  string circle_id = 1;
+}
+
+message CircleMember {
+  string                    user_id    = 1;
+  string                    first_name = 2;
+  string                    last_name  = 3;
+  string                    avatar_url = 4;
+  string                    role       = 5;
+  google.protobuf.Timestamp joined_at  = 6;
+}
+
+message ListCircleMembersResponse {
+  repeated CircleMember members = 1;
+}
+
+message ListCircleEventsRequest {
+  string circle_id = 1;
+  string status    = 2;
+}
+
+message ListCircleEventsResponse {
+  repeated event.v1.Event events = 1;
+}
+
+message CreateCircleEventRequest {
+  string circle_id   = 1;
+  string title       = 2;
+  string description = 3;
+  string meeting_link = 4;
+  string place_label  = 5;
+  string scheduled_at = 6;  // RFC3339
+  string repeat       = 7;
+}
+
+message CreateCircleEventResponse {
+  event.v1.Event event = 1;
 }
 
 message Circle {

@@ -5052,6 +5052,294 @@ func (x *MockCompanyPreset) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+type StartCheckpointSessionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	TaskId        string                 `protobuf:"bytes,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartCheckpointSessionRequest) Reset() {
+	*x = StartCheckpointSessionRequest{}
+	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[69]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartCheckpointSessionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartCheckpointSessionRequest) ProtoMessage() {}
+
+func (x *StartCheckpointSessionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[69]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartCheckpointSessionRequest.ProtoReflect.Descriptor instead.
+func (*StartCheckpointSessionRequest) Descriptor() ([]byte, []int) {
+	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{69}
+}
+
+func (x *StartCheckpointSessionRequest) GetTaskId() string {
+	if x != nil {
+		return x.TaskId
+	}
+	return ""
+}
+
+type GetCheckpointBySessionRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	SessionId     string                 `protobuf:"bytes,1,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCheckpointBySessionRequest) Reset() {
+	*x = GetCheckpointBySessionRequest{}
+	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[70]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCheckpointBySessionRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCheckpointBySessionRequest) ProtoMessage() {}
+
+func (x *GetCheckpointBySessionRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[70]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCheckpointBySessionRequest.ProtoReflect.Descriptor instead.
+func (*GetCheckpointBySessionRequest) Descriptor() ([]byte, []int) {
+	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{70}
+}
+
+func (x *GetCheckpointBySessionRequest) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+type CheckpointProgress struct {
+	state           protoimpl.MessageState `protogen:"open.v1"`
+	Id              string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId          string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	TaskId          string                 `protobuf:"bytes,3,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	SessionId       string                 `protobuf:"bytes,4,opt,name=session_id,json=sessionId,proto3" json:"session_id,omitempty"`
+	SkillKey        string                 `protobuf:"bytes,5,opt,name=skill_key,json=skillKey,proto3" json:"skill_key,omitempty"`
+	Status          string                 `protobuf:"bytes,6,opt,name=status,proto3" json:"status,omitempty"`
+	DurationSeconds int32                  `protobuf:"varint,7,opt,name=duration_seconds,json=durationSeconds,proto3" json:"duration_seconds,omitempty"`
+	AttemptsUsed    int32                  `protobuf:"varint,8,opt,name=attempts_used,json=attemptsUsed,proto3" json:"attempts_used,omitempty"`
+	MaxAttempts     int32                  `protobuf:"varint,9,opt,name=max_attempts,json=maxAttempts,proto3" json:"max_attempts,omitempty"`
+	Score           int32                  `protobuf:"varint,10,opt,name=score,proto3" json:"score,omitempty"`
+	StartedAt       *timestamppb.Timestamp `protobuf:"bytes,11,opt,name=started_at,json=startedAt,proto3" json:"started_at,omitempty"`
+	FinishedAt      *timestamppb.Timestamp `protobuf:"bytes,12,opt,name=finished_at,json=finishedAt,proto3" json:"finished_at,omitempty"`
+	CreatedAt       *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	UpdatedAt       *timestamppb.Timestamp `protobuf:"bytes,14,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	unknownFields   protoimpl.UnknownFields
+	sizeCache       protoimpl.SizeCache
+}
+
+func (x *CheckpointProgress) Reset() {
+	*x = CheckpointProgress{}
+	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[71]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckpointProgress) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckpointProgress) ProtoMessage() {}
+
+func (x *CheckpointProgress) ProtoReflect() protoreflect.Message {
+	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[71]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckpointProgress.ProtoReflect.Descriptor instead.
+func (*CheckpointProgress) Descriptor() ([]byte, []int) {
+	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{71}
+}
+
+func (x *CheckpointProgress) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CheckpointProgress) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CheckpointProgress) GetTaskId() string {
+	if x != nil {
+		return x.TaskId
+	}
+	return ""
+}
+
+func (x *CheckpointProgress) GetSessionId() string {
+	if x != nil {
+		return x.SessionId
+	}
+	return ""
+}
+
+func (x *CheckpointProgress) GetSkillKey() string {
+	if x != nil {
+		return x.SkillKey
+	}
+	return ""
+}
+
+func (x *CheckpointProgress) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *CheckpointProgress) GetDurationSeconds() int32 {
+	if x != nil {
+		return x.DurationSeconds
+	}
+	return 0
+}
+
+func (x *CheckpointProgress) GetAttemptsUsed() int32 {
+	if x != nil {
+		return x.AttemptsUsed
+	}
+	return 0
+}
+
+func (x *CheckpointProgress) GetMaxAttempts() int32 {
+	if x != nil {
+		return x.MaxAttempts
+	}
+	return 0
+}
+
+func (x *CheckpointProgress) GetScore() int32 {
+	if x != nil {
+		return x.Score
+	}
+	return 0
+}
+
+func (x *CheckpointProgress) GetStartedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartedAt
+	}
+	return nil
+}
+
+func (x *CheckpointProgress) GetFinishedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.FinishedAt
+	}
+	return nil
+}
+
+func (x *CheckpointProgress) GetCreatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.CreatedAt
+	}
+	return nil
+}
+
+func (x *CheckpointProgress) GetUpdatedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.UpdatedAt
+	}
+	return nil
+}
+
+type CheckpointSessionResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Session       *InterviewPrepSession  `protobuf:"bytes,1,opt,name=session,proto3" json:"session,omitempty"`
+	Checkpoint    *CheckpointProgress    `protobuf:"bytes,2,opt,name=checkpoint,proto3" json:"checkpoint,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CheckpointSessionResponse) Reset() {
+	*x = CheckpointSessionResponse{}
+	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[72]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CheckpointSessionResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CheckpointSessionResponse) ProtoMessage() {}
+
+func (x *CheckpointSessionResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[72]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CheckpointSessionResponse.ProtoReflect.Descriptor instead.
+func (*CheckpointSessionResponse) Descriptor() ([]byte, []int) {
+	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{72}
+}
+
+func (x *CheckpointSessionResponse) GetSession() *InterviewPrepSession {
+	if x != nil {
+		return x.Session
+	}
+	return nil
+}
+
+func (x *CheckpointSessionResponse) GetCheckpoint() *CheckpointProgress {
+	if x != nil {
+		return x.Checkpoint
+	}
+	return nil
+}
+
 var File_interview_prep_v1_interview_prep_proto protoreflect.FileDescriptor
 
 const file_interview_prep_v1_interview_prep_proto_rawDesc = "" +
@@ -5445,7 +5733,38 @@ const file_interview_prep_v1_interview_prep_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\b \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt*\x9f\x01\n" +
+	"updated_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"8\n" +
+	"\x1dStartCheckpointSessionRequest\x12\x17\n" +
+	"\atask_id\x18\x01 \x01(\tR\x06taskId\">\n" +
+	"\x1dGetCheckpointBySessionRequest\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\"\xa1\x04\n" +
+	"\x12CheckpointProgress\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x17\n" +
+	"\atask_id\x18\x03 \x01(\tR\x06taskId\x12\x1d\n" +
+	"\n" +
+	"session_id\x18\x04 \x01(\tR\tsessionId\x12\x1b\n" +
+	"\tskill_key\x18\x05 \x01(\tR\bskillKey\x12\x16\n" +
+	"\x06status\x18\x06 \x01(\tR\x06status\x12)\n" +
+	"\x10duration_seconds\x18\a \x01(\x05R\x0fdurationSeconds\x12#\n" +
+	"\rattempts_used\x18\b \x01(\x05R\fattemptsUsed\x12!\n" +
+	"\fmax_attempts\x18\t \x01(\x05R\vmaxAttempts\x12\x14\n" +
+	"\x05score\x18\n" +
+	" \x01(\x05R\x05score\x129\n" +
+	"\n" +
+	"started_at\x18\v \x01(\v2\x1a.google.protobuf.TimestampR\tstartedAt\x12;\n" +
+	"\vfinished_at\x18\f \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"finishedAt\x129\n" +
+	"\n" +
+	"created_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
+	"\n" +
+	"updated_at\x18\x0e \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAt\"\xa5\x01\n" +
+	"\x19CheckpointSessionResponse\x12A\n" +
+	"\asession\x18\x01 \x01(\v2'.interview_prep.v1.InterviewPrepSessionR\asession\x12E\n" +
+	"\n" +
+	"checkpoint\x18\x02 \x01(\v2%.interview_prep.v1.CheckpointProgressR\n" +
+	"checkpoint*\x9f\x01\n" +
 	"\bPrepType\x12\x19\n" +
 	"\x15PREP_TYPE_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10PREP_TYPE_CODING\x10\x01\x12\x17\n" +
@@ -5504,7 +5823,7 @@ const file_interview_prep_v1_interview_prep_proto_rawDesc = "" +
 	"!SUBMIT_FAILURE_KIND_COMPILE_ERROR\x10\x01\x12%\n" +
 	"!SUBMIT_FAILURE_KIND_RUNTIME_ERROR\x10\x02\x12$\n" +
 	" SUBMIT_FAILURE_KIND_WRONG_ANSWER\x10\x03\x12\x1f\n" +
-	"\x1bSUBMIT_FAILURE_KIND_TIMEOUT\x10\x042\xc3&\n" +
+	"\x1bSUBMIT_FAILURE_KIND_TIMEOUT\x10\x042\xaf)\n" +
 	"\x14InterviewPrepService\x12|\n" +
 	"\tListTasks\x12#.interview_prep.v1.ListTasksRequest\x1a$.interview_prep.v1.ListTasksResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/interview-prep/tasks\x12\x86\x01\n" +
 	"\fStartSession\x12&.interview_prep.v1.StartSessionRequest\x1a\".interview_prep.v1.SessionEnvelope\"*\x82\xd3\xe4\x93\x02$:\x01*\"\x1f/api/v1/interview-prep/sessions\x12\x8c\x01\n" +
@@ -5535,7 +5854,9 @@ const file_interview_prep_v1_interview_prep_proto_rawDesc = "" +
 	"\x16ListMockCompanyPresets\x120.interview_prep.v1.ListMockCompanyPresetsRequest\x1a0.interview_prep.v1.MockCompanyPresetListResponse\"6\x82\xd3\xe4\x93\x020\x12./api/admin/interview-prep/mock-company-presets\x12\xb5\x01\n" +
 	"\x17CreateMockCompanyPreset\x121.interview_prep.v1.CreateMockCompanyPresetRequest\x1a,.interview_prep.v1.MockCompanyPresetEnvelope\"9\x82\xd3\xe4\x93\x023:\x01*\"./api/admin/interview-prep/mock-company-presets\x12\xba\x01\n" +
 	"\x17UpdateMockCompanyPreset\x121.interview_prep.v1.UpdateMockCompanyPresetRequest\x1a,.interview_prep.v1.MockCompanyPresetEnvelope\">\x82\xd3\xe4\x93\x028:\x01*\x1a3/api/admin/interview-prep/mock-company-presets/{id}\x12\xac\x01\n" +
-	"\x17DeleteMockCompanyPreset\x121.interview_prep.v1.DeleteMockCompanyPresetRequest\x1a!.interview_prep.v1.StatusResponse\";\x82\xd3\xe4\x93\x025*3/api/admin/interview-prep/mock-company-presets/{id}B\"Z api/pkg/api/interview_prep/v1;v1b\x06proto3"
+	"\x17DeleteMockCompanyPreset\x121.interview_prep.v1.DeleteMockCompanyPresetRequest\x1a!.interview_prep.v1.StatusResponse\";\x82\xd3\xe4\x93\x025*3/api/admin/interview-prep/mock-company-presets/{id}\x12\xad\x01\n" +
+	"\x16StartCheckpointSession\x120.interview_prep.v1.StartCheckpointSessionRequest\x1a,.interview_prep.v1.CheckpointSessionResponse\"3\x82\xd3\xe4\x93\x02-:\x01*\"(/api/v1/interview-prep/checkpoints/start\x12\xb9\x01\n" +
+	"\x16GetCheckpointBySession\x120.interview_prep.v1.GetCheckpointBySessionRequest\x1a,.interview_prep.v1.CheckpointSessionResponse\"?\x82\xd3\xe4\x93\x029\x127/api/v1/interview-prep/checkpoints/session/{session_id}B\"Z api/pkg/api/interview_prep/v1;v1b\x06proto3"
 
 var (
 	file_interview_prep_v1_interview_prep_proto_rawDescOnce sync.Once
@@ -5550,7 +5871,7 @@ func file_interview_prep_v1_interview_prep_proto_rawDescGZIP() []byte {
 }
 
 var file_interview_prep_v1_interview_prep_proto_enumTypes = make([]protoimpl.EnumInfo, 10)
-var file_interview_prep_v1_interview_prep_proto_msgTypes = make([]protoimpl.MessageInfo, 69)
+var file_interview_prep_v1_interview_prep_proto_msgTypes = make([]protoimpl.MessageInfo, 73)
 var file_interview_prep_v1_interview_prep_proto_goTypes = []any{
 	(PrepType)(0),                          // 0: interview_prep.v1.PrepType
 	(ProgrammingLanguage)(0),               // 1: interview_prep.v1.ProgrammingLanguage
@@ -5631,7 +5952,11 @@ var file_interview_prep_v1_interview_prep_proto_goTypes = []any{
 	(*MockSession)(nil),                    // 76: interview_prep.v1.MockSession
 	(*MockQuestionPoolItem)(nil),           // 77: interview_prep.v1.MockQuestionPoolItem
 	(*MockCompanyPreset)(nil),              // 78: interview_prep.v1.MockCompanyPreset
-	(*timestamppb.Timestamp)(nil),          // 79: google.protobuf.Timestamp
+	(*StartCheckpointSessionRequest)(nil),  // 79: interview_prep.v1.StartCheckpointSessionRequest
+	(*GetCheckpointBySessionRequest)(nil),  // 80: interview_prep.v1.GetCheckpointBySessionRequest
+	(*CheckpointProgress)(nil),             // 81: interview_prep.v1.CheckpointProgress
+	(*CheckpointSessionResponse)(nil),      // 82: interview_prep.v1.CheckpointSessionResponse
+	(*timestamppb.Timestamp)(nil),          // 83: google.protobuf.Timestamp
 }
 var file_interview_prep_v1_interview_prep_proto_depIdxs = []int32{
 	1,   // 0: interview_prep.v1.SubmitSessionRequest.language:type_name -> interview_prep.v1.ProgrammingLanguage
@@ -5683,106 +6008,116 @@ var file_interview_prep_v1_interview_prep_proto_depIdxs = []int32{
 	1,   // 46: interview_prep.v1.InterviewPrepTask.language:type_name -> interview_prep.v1.ProgrammingLanguage
 	2,   // 47: interview_prep.v1.InterviewPrepTask.execution_profile:type_name -> interview_prep.v1.ExecutionProfile
 	3,   // 48: interview_prep.v1.InterviewPrepTask.runner_mode:type_name -> interview_prep.v1.RunnerMode
-	79,  // 49: interview_prep.v1.InterviewPrepTask.created_at:type_name -> google.protobuf.Timestamp
-	79,  // 50: interview_prep.v1.InterviewPrepTask.updated_at:type_name -> google.protobuf.Timestamp
-	79,  // 51: interview_prep.v1.InterviewPrepQuestion.created_at:type_name -> google.protobuf.Timestamp
-	79,  // 52: interview_prep.v1.InterviewPrepQuestion.updated_at:type_name -> google.protobuf.Timestamp
+	83,  // 49: interview_prep.v1.InterviewPrepTask.created_at:type_name -> google.protobuf.Timestamp
+	83,  // 50: interview_prep.v1.InterviewPrepTask.updated_at:type_name -> google.protobuf.Timestamp
+	83,  // 51: interview_prep.v1.InterviewPrepQuestion.created_at:type_name -> google.protobuf.Timestamp
+	83,  // 52: interview_prep.v1.InterviewPrepQuestion.updated_at:type_name -> google.protobuf.Timestamp
 	8,   // 53: interview_prep.v1.InterviewPrepQuestionResult.self_assessment:type_name -> interview_prep.v1.SelfAssessment
-	79,  // 54: interview_prep.v1.InterviewPrepQuestionResult.answered_at:type_name -> google.protobuf.Timestamp
+	83,  // 54: interview_prep.v1.InterviewPrepQuestionResult.answered_at:type_name -> google.protobuf.Timestamp
 	4,   // 55: interview_prep.v1.InterviewPrepSession.status:type_name -> interview_prep.v1.SessionStatus
-	79,  // 56: interview_prep.v1.InterviewPrepSession.started_at:type_name -> google.protobuf.Timestamp
-	79,  // 57: interview_prep.v1.InterviewPrepSession.finished_at:type_name -> google.protobuf.Timestamp
-	79,  // 58: interview_prep.v1.InterviewPrepSession.created_at:type_name -> google.protobuf.Timestamp
-	79,  // 59: interview_prep.v1.InterviewPrepSession.updated_at:type_name -> google.protobuf.Timestamp
+	83,  // 56: interview_prep.v1.InterviewPrepSession.started_at:type_name -> google.protobuf.Timestamp
+	83,  // 57: interview_prep.v1.InterviewPrepSession.finished_at:type_name -> google.protobuf.Timestamp
+	83,  // 58: interview_prep.v1.InterviewPrepSession.created_at:type_name -> google.protobuf.Timestamp
+	83,  // 59: interview_prep.v1.InterviewPrepSession.updated_at:type_name -> google.protobuf.Timestamp
 	67,  // 60: interview_prep.v1.InterviewPrepSession.task:type_name -> interview_prep.v1.InterviewPrepTask
 	68,  // 61: interview_prep.v1.InterviewPrepSession.current_question:type_name -> interview_prep.v1.InterviewPrepQuestion
 	69,  // 62: interview_prep.v1.InterviewPrepSession.results:type_name -> interview_prep.v1.InterviewPrepQuestionResult
-	79,  // 63: interview_prep.v1.MockQuestionResult.answered_at:type_name -> google.protobuf.Timestamp
-	79,  // 64: interview_prep.v1.MockQuestionResult.created_at:type_name -> google.protobuf.Timestamp
-	79,  // 65: interview_prep.v1.MockQuestionResult.updated_at:type_name -> google.protobuf.Timestamp
+	83,  // 63: interview_prep.v1.MockQuestionResult.answered_at:type_name -> google.protobuf.Timestamp
+	83,  // 64: interview_prep.v1.MockQuestionResult.created_at:type_name -> google.protobuf.Timestamp
+	83,  // 65: interview_prep.v1.MockQuestionResult.updated_at:type_name -> google.protobuf.Timestamp
 	6,   // 66: interview_prep.v1.MockStage.kind:type_name -> interview_prep.v1.MockStageKind
 	7,   // 67: interview_prep.v1.MockStage.status:type_name -> interview_prep.v1.MockStageStatus
-	79,  // 68: interview_prep.v1.MockStage.started_at:type_name -> google.protobuf.Timestamp
-	79,  // 69: interview_prep.v1.MockStage.finished_at:type_name -> google.protobuf.Timestamp
-	79,  // 70: interview_prep.v1.MockStage.created_at:type_name -> google.protobuf.Timestamp
-	79,  // 71: interview_prep.v1.MockStage.updated_at:type_name -> google.protobuf.Timestamp
+	83,  // 68: interview_prep.v1.MockStage.started_at:type_name -> google.protobuf.Timestamp
+	83,  // 69: interview_prep.v1.MockStage.finished_at:type_name -> google.protobuf.Timestamp
+	83,  // 70: interview_prep.v1.MockStage.created_at:type_name -> google.protobuf.Timestamp
+	83,  // 71: interview_prep.v1.MockStage.updated_at:type_name -> google.protobuf.Timestamp
 	67,  // 72: interview_prep.v1.MockStage.task:type_name -> interview_prep.v1.InterviewPrepTask
 	74,  // 73: interview_prep.v1.MockStage.question_results:type_name -> interview_prep.v1.MockQuestionResult
 	74,  // 74: interview_prep.v1.MockStage.current_question:type_name -> interview_prep.v1.MockQuestionResult
 	5,   // 75: interview_prep.v1.MockSession.status:type_name -> interview_prep.v1.MockSessionStatus
-	79,  // 76: interview_prep.v1.MockSession.started_at:type_name -> google.protobuf.Timestamp
-	79,  // 77: interview_prep.v1.MockSession.finished_at:type_name -> google.protobuf.Timestamp
-	79,  // 78: interview_prep.v1.MockSession.created_at:type_name -> google.protobuf.Timestamp
-	79,  // 79: interview_prep.v1.MockSession.updated_at:type_name -> google.protobuf.Timestamp
+	83,  // 76: interview_prep.v1.MockSession.started_at:type_name -> google.protobuf.Timestamp
+	83,  // 77: interview_prep.v1.MockSession.finished_at:type_name -> google.protobuf.Timestamp
+	83,  // 78: interview_prep.v1.MockSession.created_at:type_name -> google.protobuf.Timestamp
+	83,  // 79: interview_prep.v1.MockSession.updated_at:type_name -> google.protobuf.Timestamp
 	75,  // 80: interview_prep.v1.MockSession.stages:type_name -> interview_prep.v1.MockStage
 	75,  // 81: interview_prep.v1.MockSession.current_stage:type_name -> interview_prep.v1.MockStage
-	79,  // 82: interview_prep.v1.MockQuestionPoolItem.created_at:type_name -> google.protobuf.Timestamp
-	79,  // 83: interview_prep.v1.MockQuestionPoolItem.updated_at:type_name -> google.protobuf.Timestamp
-	79,  // 84: interview_prep.v1.MockCompanyPreset.created_at:type_name -> google.protobuf.Timestamp
-	79,  // 85: interview_prep.v1.MockCompanyPreset.updated_at:type_name -> google.protobuf.Timestamp
-	10,  // 86: interview_prep.v1.InterviewPrepService.ListTasks:input_type -> interview_prep.v1.ListTasksRequest
-	11,  // 87: interview_prep.v1.InterviewPrepService.StartSession:input_type -> interview_prep.v1.StartSessionRequest
-	12,  // 88: interview_prep.v1.InterviewPrepService.GetSession:input_type -> interview_prep.v1.GetSessionRequest
-	13,  // 89: interview_prep.v1.InterviewPrepService.SubmitSession:input_type -> interview_prep.v1.SubmitSessionRequest
-	14,  // 90: interview_prep.v1.InterviewPrepService.AnswerQuestion:input_type -> interview_prep.v1.AnswerQuestionRequest
-	16,  // 91: interview_prep.v1.InterviewPrepService.ReviewSystemDesign:input_type -> interview_prep.v1.ReviewSystemDesignRequest
-	17,  // 92: interview_prep.v1.InterviewPrepService.ListCompanies:input_type -> interview_prep.v1.ListCompaniesRequest
-	18,  // 93: interview_prep.v1.InterviewPrepService.StartMockSession:input_type -> interview_prep.v1.StartMockSessionRequest
-	19,  // 94: interview_prep.v1.InterviewPrepService.GetMockSession:input_type -> interview_prep.v1.GetMockSessionRequest
-	20,  // 95: interview_prep.v1.InterviewPrepService.SubmitMockStage:input_type -> interview_prep.v1.SubmitMockStageRequest
-	21,  // 96: interview_prep.v1.InterviewPrepService.ReviewMockSystemDesign:input_type -> interview_prep.v1.ReviewMockSystemDesignRequest
-	22,  // 97: interview_prep.v1.InterviewPrepService.AnswerMockQuestion:input_type -> interview_prep.v1.AnswerMockQuestionRequest
-	23,  // 98: interview_prep.v1.InterviewPrepService.ListAdminTasks:input_type -> interview_prep.v1.ListAdminTasksRequest
-	48,  // 99: interview_prep.v1.InterviewPrepService.CreateAdminTask:input_type -> interview_prep.v1.CreateAdminTaskRequest
-	24,  // 100: interview_prep.v1.InterviewPrepService.GetAdminTask:input_type -> interview_prep.v1.GetAdminTaskRequest
-	49,  // 101: interview_prep.v1.InterviewPrepService.UpdateAdminTask:input_type -> interview_prep.v1.UpdateAdminTaskRequest
-	25,  // 102: interview_prep.v1.InterviewPrepService.DeleteAdminTask:input_type -> interview_prep.v1.DeleteAdminTaskRequest
-	26,  // 103: interview_prep.v1.InterviewPrepService.ListAdminQuestions:input_type -> interview_prep.v1.ListAdminQuestionsRequest
-	53,  // 104: interview_prep.v1.InterviewPrepService.CreateAdminQuestion:input_type -> interview_prep.v1.CreateAdminQuestionRequest
-	54,  // 105: interview_prep.v1.InterviewPrepService.UpdateAdminQuestion:input_type -> interview_prep.v1.UpdateAdminQuestionRequest
-	27,  // 106: interview_prep.v1.InterviewPrepService.DeleteAdminQuestion:input_type -> interview_prep.v1.DeleteAdminQuestionRequest
-	28,  // 107: interview_prep.v1.InterviewPrepService.ListMockQuestionPools:input_type -> interview_prep.v1.ListMockQuestionPoolsRequest
-	58,  // 108: interview_prep.v1.InterviewPrepService.CreateMockQuestionPool:input_type -> interview_prep.v1.CreateMockQuestionPoolRequest
-	59,  // 109: interview_prep.v1.InterviewPrepService.UpdateMockQuestionPool:input_type -> interview_prep.v1.UpdateMockQuestionPoolRequest
-	29,  // 110: interview_prep.v1.InterviewPrepService.DeleteMockQuestionPool:input_type -> interview_prep.v1.DeleteMockQuestionPoolRequest
-	30,  // 111: interview_prep.v1.InterviewPrepService.ListMockCompanyPresets:input_type -> interview_prep.v1.ListMockCompanyPresetsRequest
-	63,  // 112: interview_prep.v1.InterviewPrepService.CreateMockCompanyPreset:input_type -> interview_prep.v1.CreateMockCompanyPresetRequest
-	64,  // 113: interview_prep.v1.InterviewPrepService.UpdateMockCompanyPreset:input_type -> interview_prep.v1.UpdateMockCompanyPresetRequest
-	31,  // 114: interview_prep.v1.InterviewPrepService.DeleteMockCompanyPreset:input_type -> interview_prep.v1.DeleteMockCompanyPresetRequest
-	35,  // 115: interview_prep.v1.InterviewPrepService.ListTasks:output_type -> interview_prep.v1.ListTasksResponse
-	33,  // 116: interview_prep.v1.InterviewPrepService.StartSession:output_type -> interview_prep.v1.SessionEnvelope
-	33,  // 117: interview_prep.v1.InterviewPrepService.GetSession:output_type -> interview_prep.v1.SessionEnvelope
-	38,  // 118: interview_prep.v1.InterviewPrepService.SubmitSession:output_type -> interview_prep.v1.SubmitSessionResponse
-	39,  // 119: interview_prep.v1.InterviewPrepService.AnswerQuestion:output_type -> interview_prep.v1.AnswerQuestionResponse
-	40,  // 120: interview_prep.v1.InterviewPrepService.ReviewSystemDesign:output_type -> interview_prep.v1.ReviewSystemDesignResponse
-	36,  // 121: interview_prep.v1.InterviewPrepService.ListCompanies:output_type -> interview_prep.v1.ListCompaniesResponse
-	34,  // 122: interview_prep.v1.InterviewPrepService.StartMockSession:output_type -> interview_prep.v1.MockSessionEnvelope
-	34,  // 123: interview_prep.v1.InterviewPrepService.GetMockSession:output_type -> interview_prep.v1.MockSessionEnvelope
-	42,  // 124: interview_prep.v1.InterviewPrepService.SubmitMockStage:output_type -> interview_prep.v1.SubmitMockStageResponse
-	44,  // 125: interview_prep.v1.InterviewPrepService.ReviewMockSystemDesign:output_type -> interview_prep.v1.ReviewMockSystemDesignResponse
-	46,  // 126: interview_prep.v1.InterviewPrepService.AnswerMockQuestion:output_type -> interview_prep.v1.AnswerMockQuestionResponse
-	50,  // 127: interview_prep.v1.InterviewPrepService.ListAdminTasks:output_type -> interview_prep.v1.ListAdminTasksResponse
-	51,  // 128: interview_prep.v1.InterviewPrepService.CreateAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
-	51,  // 129: interview_prep.v1.InterviewPrepService.GetAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
-	51,  // 130: interview_prep.v1.InterviewPrepService.UpdateAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
-	32,  // 131: interview_prep.v1.InterviewPrepService.DeleteAdminTask:output_type -> interview_prep.v1.StatusResponse
-	55,  // 132: interview_prep.v1.InterviewPrepService.ListAdminQuestions:output_type -> interview_prep.v1.ListAdminQuestionsResponse
-	56,  // 133: interview_prep.v1.InterviewPrepService.CreateAdminQuestion:output_type -> interview_prep.v1.AdminQuestionEnvelope
-	56,  // 134: interview_prep.v1.InterviewPrepService.UpdateAdminQuestion:output_type -> interview_prep.v1.AdminQuestionEnvelope
-	32,  // 135: interview_prep.v1.InterviewPrepService.DeleteAdminQuestion:output_type -> interview_prep.v1.StatusResponse
-	60,  // 136: interview_prep.v1.InterviewPrepService.ListMockQuestionPools:output_type -> interview_prep.v1.MockQuestionPoolListResponse
-	61,  // 137: interview_prep.v1.InterviewPrepService.CreateMockQuestionPool:output_type -> interview_prep.v1.MockQuestionPoolEnvelope
-	61,  // 138: interview_prep.v1.InterviewPrepService.UpdateMockQuestionPool:output_type -> interview_prep.v1.MockQuestionPoolEnvelope
-	32,  // 139: interview_prep.v1.InterviewPrepService.DeleteMockQuestionPool:output_type -> interview_prep.v1.StatusResponse
-	65,  // 140: interview_prep.v1.InterviewPrepService.ListMockCompanyPresets:output_type -> interview_prep.v1.MockCompanyPresetListResponse
-	66,  // 141: interview_prep.v1.InterviewPrepService.CreateMockCompanyPreset:output_type -> interview_prep.v1.MockCompanyPresetEnvelope
-	66,  // 142: interview_prep.v1.InterviewPrepService.UpdateMockCompanyPreset:output_type -> interview_prep.v1.MockCompanyPresetEnvelope
-	32,  // 143: interview_prep.v1.InterviewPrepService.DeleteMockCompanyPreset:output_type -> interview_prep.v1.StatusResponse
-	115, // [115:144] is the sub-list for method output_type
-	86,  // [86:115] is the sub-list for method input_type
-	86,  // [86:86] is the sub-list for extension type_name
-	86,  // [86:86] is the sub-list for extension extendee
-	0,   // [0:86] is the sub-list for field type_name
+	83,  // 82: interview_prep.v1.MockQuestionPoolItem.created_at:type_name -> google.protobuf.Timestamp
+	83,  // 83: interview_prep.v1.MockQuestionPoolItem.updated_at:type_name -> google.protobuf.Timestamp
+	83,  // 84: interview_prep.v1.MockCompanyPreset.created_at:type_name -> google.protobuf.Timestamp
+	83,  // 85: interview_prep.v1.MockCompanyPreset.updated_at:type_name -> google.protobuf.Timestamp
+	83,  // 86: interview_prep.v1.CheckpointProgress.started_at:type_name -> google.protobuf.Timestamp
+	83,  // 87: interview_prep.v1.CheckpointProgress.finished_at:type_name -> google.protobuf.Timestamp
+	83,  // 88: interview_prep.v1.CheckpointProgress.created_at:type_name -> google.protobuf.Timestamp
+	83,  // 89: interview_prep.v1.CheckpointProgress.updated_at:type_name -> google.protobuf.Timestamp
+	70,  // 90: interview_prep.v1.CheckpointSessionResponse.session:type_name -> interview_prep.v1.InterviewPrepSession
+	81,  // 91: interview_prep.v1.CheckpointSessionResponse.checkpoint:type_name -> interview_prep.v1.CheckpointProgress
+	10,  // 92: interview_prep.v1.InterviewPrepService.ListTasks:input_type -> interview_prep.v1.ListTasksRequest
+	11,  // 93: interview_prep.v1.InterviewPrepService.StartSession:input_type -> interview_prep.v1.StartSessionRequest
+	12,  // 94: interview_prep.v1.InterviewPrepService.GetSession:input_type -> interview_prep.v1.GetSessionRequest
+	13,  // 95: interview_prep.v1.InterviewPrepService.SubmitSession:input_type -> interview_prep.v1.SubmitSessionRequest
+	14,  // 96: interview_prep.v1.InterviewPrepService.AnswerQuestion:input_type -> interview_prep.v1.AnswerQuestionRequest
+	16,  // 97: interview_prep.v1.InterviewPrepService.ReviewSystemDesign:input_type -> interview_prep.v1.ReviewSystemDesignRequest
+	17,  // 98: interview_prep.v1.InterviewPrepService.ListCompanies:input_type -> interview_prep.v1.ListCompaniesRequest
+	18,  // 99: interview_prep.v1.InterviewPrepService.StartMockSession:input_type -> interview_prep.v1.StartMockSessionRequest
+	19,  // 100: interview_prep.v1.InterviewPrepService.GetMockSession:input_type -> interview_prep.v1.GetMockSessionRequest
+	20,  // 101: interview_prep.v1.InterviewPrepService.SubmitMockStage:input_type -> interview_prep.v1.SubmitMockStageRequest
+	21,  // 102: interview_prep.v1.InterviewPrepService.ReviewMockSystemDesign:input_type -> interview_prep.v1.ReviewMockSystemDesignRequest
+	22,  // 103: interview_prep.v1.InterviewPrepService.AnswerMockQuestion:input_type -> interview_prep.v1.AnswerMockQuestionRequest
+	23,  // 104: interview_prep.v1.InterviewPrepService.ListAdminTasks:input_type -> interview_prep.v1.ListAdminTasksRequest
+	48,  // 105: interview_prep.v1.InterviewPrepService.CreateAdminTask:input_type -> interview_prep.v1.CreateAdminTaskRequest
+	24,  // 106: interview_prep.v1.InterviewPrepService.GetAdminTask:input_type -> interview_prep.v1.GetAdminTaskRequest
+	49,  // 107: interview_prep.v1.InterviewPrepService.UpdateAdminTask:input_type -> interview_prep.v1.UpdateAdminTaskRequest
+	25,  // 108: interview_prep.v1.InterviewPrepService.DeleteAdminTask:input_type -> interview_prep.v1.DeleteAdminTaskRequest
+	26,  // 109: interview_prep.v1.InterviewPrepService.ListAdminQuestions:input_type -> interview_prep.v1.ListAdminQuestionsRequest
+	53,  // 110: interview_prep.v1.InterviewPrepService.CreateAdminQuestion:input_type -> interview_prep.v1.CreateAdminQuestionRequest
+	54,  // 111: interview_prep.v1.InterviewPrepService.UpdateAdminQuestion:input_type -> interview_prep.v1.UpdateAdminQuestionRequest
+	27,  // 112: interview_prep.v1.InterviewPrepService.DeleteAdminQuestion:input_type -> interview_prep.v1.DeleteAdminQuestionRequest
+	28,  // 113: interview_prep.v1.InterviewPrepService.ListMockQuestionPools:input_type -> interview_prep.v1.ListMockQuestionPoolsRequest
+	58,  // 114: interview_prep.v1.InterviewPrepService.CreateMockQuestionPool:input_type -> interview_prep.v1.CreateMockQuestionPoolRequest
+	59,  // 115: interview_prep.v1.InterviewPrepService.UpdateMockQuestionPool:input_type -> interview_prep.v1.UpdateMockQuestionPoolRequest
+	29,  // 116: interview_prep.v1.InterviewPrepService.DeleteMockQuestionPool:input_type -> interview_prep.v1.DeleteMockQuestionPoolRequest
+	30,  // 117: interview_prep.v1.InterviewPrepService.ListMockCompanyPresets:input_type -> interview_prep.v1.ListMockCompanyPresetsRequest
+	63,  // 118: interview_prep.v1.InterviewPrepService.CreateMockCompanyPreset:input_type -> interview_prep.v1.CreateMockCompanyPresetRequest
+	64,  // 119: interview_prep.v1.InterviewPrepService.UpdateMockCompanyPreset:input_type -> interview_prep.v1.UpdateMockCompanyPresetRequest
+	31,  // 120: interview_prep.v1.InterviewPrepService.DeleteMockCompanyPreset:input_type -> interview_prep.v1.DeleteMockCompanyPresetRequest
+	79,  // 121: interview_prep.v1.InterviewPrepService.StartCheckpointSession:input_type -> interview_prep.v1.StartCheckpointSessionRequest
+	80,  // 122: interview_prep.v1.InterviewPrepService.GetCheckpointBySession:input_type -> interview_prep.v1.GetCheckpointBySessionRequest
+	35,  // 123: interview_prep.v1.InterviewPrepService.ListTasks:output_type -> interview_prep.v1.ListTasksResponse
+	33,  // 124: interview_prep.v1.InterviewPrepService.StartSession:output_type -> interview_prep.v1.SessionEnvelope
+	33,  // 125: interview_prep.v1.InterviewPrepService.GetSession:output_type -> interview_prep.v1.SessionEnvelope
+	38,  // 126: interview_prep.v1.InterviewPrepService.SubmitSession:output_type -> interview_prep.v1.SubmitSessionResponse
+	39,  // 127: interview_prep.v1.InterviewPrepService.AnswerQuestion:output_type -> interview_prep.v1.AnswerQuestionResponse
+	40,  // 128: interview_prep.v1.InterviewPrepService.ReviewSystemDesign:output_type -> interview_prep.v1.ReviewSystemDesignResponse
+	36,  // 129: interview_prep.v1.InterviewPrepService.ListCompanies:output_type -> interview_prep.v1.ListCompaniesResponse
+	34,  // 130: interview_prep.v1.InterviewPrepService.StartMockSession:output_type -> interview_prep.v1.MockSessionEnvelope
+	34,  // 131: interview_prep.v1.InterviewPrepService.GetMockSession:output_type -> interview_prep.v1.MockSessionEnvelope
+	42,  // 132: interview_prep.v1.InterviewPrepService.SubmitMockStage:output_type -> interview_prep.v1.SubmitMockStageResponse
+	44,  // 133: interview_prep.v1.InterviewPrepService.ReviewMockSystemDesign:output_type -> interview_prep.v1.ReviewMockSystemDesignResponse
+	46,  // 134: interview_prep.v1.InterviewPrepService.AnswerMockQuestion:output_type -> interview_prep.v1.AnswerMockQuestionResponse
+	50,  // 135: interview_prep.v1.InterviewPrepService.ListAdminTasks:output_type -> interview_prep.v1.ListAdminTasksResponse
+	51,  // 136: interview_prep.v1.InterviewPrepService.CreateAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
+	51,  // 137: interview_prep.v1.InterviewPrepService.GetAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
+	51,  // 138: interview_prep.v1.InterviewPrepService.UpdateAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
+	32,  // 139: interview_prep.v1.InterviewPrepService.DeleteAdminTask:output_type -> interview_prep.v1.StatusResponse
+	55,  // 140: interview_prep.v1.InterviewPrepService.ListAdminQuestions:output_type -> interview_prep.v1.ListAdminQuestionsResponse
+	56,  // 141: interview_prep.v1.InterviewPrepService.CreateAdminQuestion:output_type -> interview_prep.v1.AdminQuestionEnvelope
+	56,  // 142: interview_prep.v1.InterviewPrepService.UpdateAdminQuestion:output_type -> interview_prep.v1.AdminQuestionEnvelope
+	32,  // 143: interview_prep.v1.InterviewPrepService.DeleteAdminQuestion:output_type -> interview_prep.v1.StatusResponse
+	60,  // 144: interview_prep.v1.InterviewPrepService.ListMockQuestionPools:output_type -> interview_prep.v1.MockQuestionPoolListResponse
+	61,  // 145: interview_prep.v1.InterviewPrepService.CreateMockQuestionPool:output_type -> interview_prep.v1.MockQuestionPoolEnvelope
+	61,  // 146: interview_prep.v1.InterviewPrepService.UpdateMockQuestionPool:output_type -> interview_prep.v1.MockQuestionPoolEnvelope
+	32,  // 147: interview_prep.v1.InterviewPrepService.DeleteMockQuestionPool:output_type -> interview_prep.v1.StatusResponse
+	65,  // 148: interview_prep.v1.InterviewPrepService.ListMockCompanyPresets:output_type -> interview_prep.v1.MockCompanyPresetListResponse
+	66,  // 149: interview_prep.v1.InterviewPrepService.CreateMockCompanyPreset:output_type -> interview_prep.v1.MockCompanyPresetEnvelope
+	66,  // 150: interview_prep.v1.InterviewPrepService.UpdateMockCompanyPreset:output_type -> interview_prep.v1.MockCompanyPresetEnvelope
+	32,  // 151: interview_prep.v1.InterviewPrepService.DeleteMockCompanyPreset:output_type -> interview_prep.v1.StatusResponse
+	82,  // 152: interview_prep.v1.InterviewPrepService.StartCheckpointSession:output_type -> interview_prep.v1.CheckpointSessionResponse
+	82,  // 153: interview_prep.v1.InterviewPrepService.GetCheckpointBySession:output_type -> interview_prep.v1.CheckpointSessionResponse
+	123, // [123:154] is the sub-list for method output_type
+	92,  // [92:123] is the sub-list for method input_type
+	92,  // [92:92] is the sub-list for extension type_name
+	92,  // [92:92] is the sub-list for extension extendee
+	0,   // [0:92] is the sub-list for field type_name
 }
 
 func init() { file_interview_prep_v1_interview_prep_proto_init() }
@@ -5796,7 +6131,7 @@ func file_interview_prep_v1_interview_prep_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_interview_prep_v1_interview_prep_proto_rawDesc), len(file_interview_prep_v1_interview_prep_proto_rawDesc)),
 			NumEnums:      10,
-			NumMessages:   69,
+			NumMessages:   73,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

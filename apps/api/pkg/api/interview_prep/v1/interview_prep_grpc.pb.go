@@ -48,6 +48,8 @@ const (
 	InterviewPrepService_CreateMockCompanyPreset_FullMethodName = "/interview_prep.v1.InterviewPrepService/CreateMockCompanyPreset"
 	InterviewPrepService_UpdateMockCompanyPreset_FullMethodName = "/interview_prep.v1.InterviewPrepService/UpdateMockCompanyPreset"
 	InterviewPrepService_DeleteMockCompanyPreset_FullMethodName = "/interview_prep.v1.InterviewPrepService/DeleteMockCompanyPreset"
+	InterviewPrepService_StartCheckpointSession_FullMethodName  = "/interview_prep.v1.InterviewPrepService/StartCheckpointSession"
+	InterviewPrepService_GetCheckpointBySession_FullMethodName  = "/interview_prep.v1.InterviewPrepService/GetCheckpointBySession"
 )
 
 // InterviewPrepServiceClient is the client API for InterviewPrepService service.
@@ -83,6 +85,8 @@ type InterviewPrepServiceClient interface {
 	CreateMockCompanyPreset(ctx context.Context, in *CreateMockCompanyPresetRequest, opts ...grpc.CallOption) (*MockCompanyPresetEnvelope, error)
 	UpdateMockCompanyPreset(ctx context.Context, in *UpdateMockCompanyPresetRequest, opts ...grpc.CallOption) (*MockCompanyPresetEnvelope, error)
 	DeleteMockCompanyPreset(ctx context.Context, in *DeleteMockCompanyPresetRequest, opts ...grpc.CallOption) (*StatusResponse, error)
+	StartCheckpointSession(ctx context.Context, in *StartCheckpointSessionRequest, opts ...grpc.CallOption) (*CheckpointSessionResponse, error)
+	GetCheckpointBySession(ctx context.Context, in *GetCheckpointBySessionRequest, opts ...grpc.CallOption) (*CheckpointSessionResponse, error)
 }
 
 type interviewPrepServiceClient struct {
@@ -383,6 +387,26 @@ func (c *interviewPrepServiceClient) DeleteMockCompanyPreset(ctx context.Context
 	return out, nil
 }
 
+func (c *interviewPrepServiceClient) StartCheckpointSession(ctx context.Context, in *StartCheckpointSessionRequest, opts ...grpc.CallOption) (*CheckpointSessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckpointSessionResponse)
+	err := c.cc.Invoke(ctx, InterviewPrepService_StartCheckpointSession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *interviewPrepServiceClient) GetCheckpointBySession(ctx context.Context, in *GetCheckpointBySessionRequest, opts ...grpc.CallOption) (*CheckpointSessionResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CheckpointSessionResponse)
+	err := c.cc.Invoke(ctx, InterviewPrepService_GetCheckpointBySession_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InterviewPrepServiceServer is the server API for InterviewPrepService service.
 // All implementations must embed UnimplementedInterviewPrepServiceServer
 // for forward compatibility.
@@ -416,6 +440,8 @@ type InterviewPrepServiceServer interface {
 	CreateMockCompanyPreset(context.Context, *CreateMockCompanyPresetRequest) (*MockCompanyPresetEnvelope, error)
 	UpdateMockCompanyPreset(context.Context, *UpdateMockCompanyPresetRequest) (*MockCompanyPresetEnvelope, error)
 	DeleteMockCompanyPreset(context.Context, *DeleteMockCompanyPresetRequest) (*StatusResponse, error)
+	StartCheckpointSession(context.Context, *StartCheckpointSessionRequest) (*CheckpointSessionResponse, error)
+	GetCheckpointBySession(context.Context, *GetCheckpointBySessionRequest) (*CheckpointSessionResponse, error)
 	mustEmbedUnimplementedInterviewPrepServiceServer()
 }
 
@@ -512,6 +538,12 @@ func (UnimplementedInterviewPrepServiceServer) UpdateMockCompanyPreset(context.C
 }
 func (UnimplementedInterviewPrepServiceServer) DeleteMockCompanyPreset(context.Context, *DeleteMockCompanyPresetRequest) (*StatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteMockCompanyPreset not implemented")
+}
+func (UnimplementedInterviewPrepServiceServer) StartCheckpointSession(context.Context, *StartCheckpointSessionRequest) (*CheckpointSessionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StartCheckpointSession not implemented")
+}
+func (UnimplementedInterviewPrepServiceServer) GetCheckpointBySession(context.Context, *GetCheckpointBySessionRequest) (*CheckpointSessionResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCheckpointBySession not implemented")
 }
 func (UnimplementedInterviewPrepServiceServer) mustEmbedUnimplementedInterviewPrepServiceServer() {}
 func (UnimplementedInterviewPrepServiceServer) testEmbeddedByValue()                              {}
@@ -1056,6 +1088,42 @@ func _InterviewPrepService_DeleteMockCompanyPreset_Handler(srv interface{}, ctx 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InterviewPrepService_StartCheckpointSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartCheckpointSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InterviewPrepServiceServer).StartCheckpointSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InterviewPrepService_StartCheckpointSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InterviewPrepServiceServer).StartCheckpointSession(ctx, req.(*StartCheckpointSessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InterviewPrepService_GetCheckpointBySession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCheckpointBySessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InterviewPrepServiceServer).GetCheckpointBySession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InterviewPrepService_GetCheckpointBySession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InterviewPrepServiceServer).GetCheckpointBySession(ctx, req.(*GetCheckpointBySessionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InterviewPrepService_ServiceDesc is the grpc.ServiceDesc for InterviewPrepService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1178,6 +1246,14 @@ var InterviewPrepService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteMockCompanyPreset",
 			Handler:    _InterviewPrepService_DeleteMockCompanyPreset_Handler,
+		},
+		{
+			MethodName: "StartCheckpointSession",
+			Handler:    _InterviewPrepService_StartCheckpointSession_Handler,
+		},
+		{
+			MethodName: "GetCheckpointBySession",
+			Handler:    _InterviewPrepService_GetCheckpointBySession_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

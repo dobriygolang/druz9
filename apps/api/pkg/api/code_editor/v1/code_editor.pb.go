@@ -1141,6 +1141,402 @@ func (x *ListRoomsResponse) GetRooms() []*Room {
 	return nil
 }
 
+type AIReviewRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Language      string                 `protobuf:"bytes,1,opt,name=language,proto3" json:"language,omitempty"`
+	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
+	TaskTitle     string                 `protobuf:"bytes,3,opt,name=task_title,json=taskTitle,proto3" json:"task_title,omitempty"`
+	Statement     string                 `protobuf:"bytes,4,opt,name=statement,proto3" json:"statement,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AIReviewRequest) Reset() {
+	*x = AIReviewRequest{}
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AIReviewRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AIReviewRequest) ProtoMessage() {}
+
+func (x *AIReviewRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AIReviewRequest.ProtoReflect.Descriptor instead.
+func (*AIReviewRequest) Descriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *AIReviewRequest) GetLanguage() string {
+	if x != nil {
+		return x.Language
+	}
+	return ""
+}
+
+func (x *AIReviewRequest) GetCode() string {
+	if x != nil {
+		return x.Code
+	}
+	return ""
+}
+
+func (x *AIReviewRequest) GetTaskTitle() string {
+	if x != nil {
+		return x.TaskTitle
+	}
+	return ""
+}
+
+func (x *AIReviewRequest) GetStatement() string {
+	if x != nil {
+		return x.Statement
+	}
+	return ""
+}
+
+type InterviewSolutionReview struct {
+	state             protoimpl.MessageState `protogen:"open.v1"`
+	Provider          string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
+	Model             string                 `protobuf:"bytes,2,opt,name=model,proto3" json:"model,omitempty"`
+	Score             int32                  `protobuf:"varint,3,opt,name=score,proto3" json:"score,omitempty"`
+	Summary           string                 `protobuf:"bytes,4,opt,name=summary,proto3" json:"summary,omitempty"`
+	Strengths         []string               `protobuf:"bytes,5,rep,name=strengths,proto3" json:"strengths,omitempty"`
+	Issues            []string               `protobuf:"bytes,6,rep,name=issues,proto3" json:"issues,omitempty"`
+	FollowUpQuestions []string               `protobuf:"bytes,7,rep,name=follow_up_questions,json=followUpQuestions,proto3" json:"follow_up_questions,omitempty"`
+	unknownFields     protoimpl.UnknownFields
+	sizeCache         protoimpl.SizeCache
+}
+
+func (x *InterviewSolutionReview) Reset() {
+	*x = InterviewSolutionReview{}
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InterviewSolutionReview) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InterviewSolutionReview) ProtoMessage() {}
+
+func (x *InterviewSolutionReview) ProtoReflect() protoreflect.Message {
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InterviewSolutionReview.ProtoReflect.Descriptor instead.
+func (*InterviewSolutionReview) Descriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *InterviewSolutionReview) GetProvider() string {
+	if x != nil {
+		return x.Provider
+	}
+	return ""
+}
+
+func (x *InterviewSolutionReview) GetModel() string {
+	if x != nil {
+		return x.Model
+	}
+	return ""
+}
+
+func (x *InterviewSolutionReview) GetScore() int32 {
+	if x != nil {
+		return x.Score
+	}
+	return 0
+}
+
+func (x *InterviewSolutionReview) GetSummary() string {
+	if x != nil {
+		return x.Summary
+	}
+	return ""
+}
+
+func (x *InterviewSolutionReview) GetStrengths() []string {
+	if x != nil {
+		return x.Strengths
+	}
+	return nil
+}
+
+func (x *InterviewSolutionReview) GetIssues() []string {
+	if x != nil {
+		return x.Issues
+	}
+	return nil
+}
+
+func (x *InterviewSolutionReview) GetFollowUpQuestions() []string {
+	if x != nil {
+		return x.FollowUpQuestions
+	}
+	return nil
+}
+
+type AIReviewResponse struct {
+	state         protoimpl.MessageState   `protogen:"open.v1"`
+	Review        *InterviewSolutionReview `protobuf:"bytes,1,opt,name=review,proto3" json:"review,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AIReviewResponse) Reset() {
+	*x = AIReviewResponse{}
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AIReviewResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AIReviewResponse) ProtoMessage() {}
+
+func (x *AIReviewResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AIReviewResponse.ProtoReflect.Descriptor instead.
+func (*AIReviewResponse) Descriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *AIReviewResponse) GetReview() *InterviewSolutionReview {
+	if x != nil {
+		return x.Review
+	}
+	return nil
+}
+
+type GetDailyChallengeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDailyChallengeRequest) Reset() {
+	*x = GetDailyChallengeRequest{}
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDailyChallengeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDailyChallengeRequest) ProtoMessage() {}
+
+func (x *GetDailyChallengeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDailyChallengeRequest.ProtoReflect.Descriptor instead.
+func (*GetDailyChallengeRequest) Descriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{18}
+}
+
+type GetDailyChallengeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Task          *Task                  `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	Date          string                 `protobuf:"bytes,2,opt,name=date,proto3" json:"date,omitempty"`
+	ExpiresAt     string                 `protobuf:"bytes,3,opt,name=expires_at,json=expiresAt,proto3" json:"expires_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetDailyChallengeResponse) Reset() {
+	*x = GetDailyChallengeResponse{}
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetDailyChallengeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetDailyChallengeResponse) ProtoMessage() {}
+
+func (x *GetDailyChallengeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetDailyChallengeResponse.ProtoReflect.Descriptor instead.
+func (*GetDailyChallengeResponse) Descriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *GetDailyChallengeResponse) GetTask() *Task {
+	if x != nil {
+		return x.Task
+	}
+	return nil
+}
+
+func (x *GetDailyChallengeResponse) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *GetDailyChallengeResponse) GetExpiresAt() string {
+	if x != nil {
+		return x.ExpiresAt
+	}
+	return ""
+}
+
+type StartRoomRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RoomId        string                 `protobuf:"bytes,1,opt,name=room_id,json=roomId,proto3" json:"room_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartRoomRequest) Reset() {
+	*x = StartRoomRequest{}
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartRoomRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartRoomRequest) ProtoMessage() {}
+
+func (x *StartRoomRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartRoomRequest.ProtoReflect.Descriptor instead.
+func (*StartRoomRequest) Descriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *StartRoomRequest) GetRoomId() string {
+	if x != nil {
+		return x.RoomId
+	}
+	return ""
+}
+
+type StartRoomResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	RoomStatus    string                 `protobuf:"bytes,2,opt,name=room_status,json=roomStatus,proto3" json:"room_status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *StartRoomResponse) Reset() {
+	*x = StartRoomResponse{}
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *StartRoomResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*StartRoomResponse) ProtoMessage() {}
+
+func (x *StartRoomResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use StartRoomResponse.ProtoReflect.Descriptor instead.
+func (*StartRoomResponse) Descriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *StartRoomResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
+func (x *StartRoomResponse) GetRoomStatus() string {
+	if x != nil {
+		return x.RoomStatus
+	}
+	return ""
+}
+
 // StatusResponse is used for operations that only need to confirm success.
 type StatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1151,7 +1547,7 @@ type StatusResponse struct {
 
 func (x *StatusResponse) Reset() {
 	*x = StatusResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[15]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1163,7 +1559,7 @@ func (x *StatusResponse) String() string {
 func (*StatusResponse) ProtoMessage() {}
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[15]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1176,7 +1572,7 @@ func (x *StatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
 func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{15}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *StatusResponse) GetStatus() string {
@@ -1196,7 +1592,7 @@ type CreateRoomResponse struct {
 
 func (x *CreateRoomResponse) Reset() {
 	*x = CreateRoomResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[16]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1208,7 +1604,7 @@ func (x *CreateRoomResponse) String() string {
 func (*CreateRoomResponse) ProtoMessage() {}
 
 func (x *CreateRoomResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[16]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1221,7 +1617,7 @@ func (x *CreateRoomResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateRoomResponse.ProtoReflect.Descriptor instead.
 func (*CreateRoomResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{16}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *CreateRoomResponse) GetRoom() *Room {
@@ -1247,7 +1643,7 @@ type GetRoomResponse struct {
 
 func (x *GetRoomResponse) Reset() {
 	*x = GetRoomResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[17]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1259,7 +1655,7 @@ func (x *GetRoomResponse) String() string {
 func (*GetRoomResponse) ProtoMessage() {}
 
 func (x *GetRoomResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[17]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1272,7 +1668,7 @@ func (x *GetRoomResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRoomResponse.ProtoReflect.Descriptor instead.
 func (*GetRoomResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{17}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GetRoomResponse) GetRoom() *Room {
@@ -1291,7 +1687,7 @@ type JoinRoomResponse struct {
 
 func (x *JoinRoomResponse) Reset() {
 	*x = JoinRoomResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[18]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1303,7 +1699,7 @@ func (x *JoinRoomResponse) String() string {
 func (*JoinRoomResponse) ProtoMessage() {}
 
 func (x *JoinRoomResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[18]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1316,7 +1712,7 @@ func (x *JoinRoomResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JoinRoomResponse.ProtoReflect.Descriptor instead.
 func (*JoinRoomResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{18}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *JoinRoomResponse) GetRoom() *Room {
@@ -1337,7 +1733,7 @@ type SubmitCodeResponse struct {
 
 func (x *SubmitCodeResponse) Reset() {
 	*x = SubmitCodeResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[19]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1349,7 +1745,7 @@ func (x *SubmitCodeResponse) String() string {
 func (*SubmitCodeResponse) ProtoMessage() {}
 
 func (x *SubmitCodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[19]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1362,7 +1758,7 @@ func (x *SubmitCodeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitCodeResponse.ProtoReflect.Descriptor instead.
 func (*SubmitCodeResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{19}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *SubmitCodeResponse) GetOutput() string {
@@ -1395,7 +1791,7 @@ type GetSubmissionsResponse struct {
 
 func (x *GetSubmissionsResponse) Reset() {
 	*x = GetSubmissionsResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[20]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1407,7 +1803,7 @@ func (x *GetSubmissionsResponse) String() string {
 func (*GetSubmissionsResponse) ProtoMessage() {}
 
 func (x *GetSubmissionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[20]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1420,7 +1816,7 @@ func (x *GetSubmissionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSubmissionsResponse.ProtoReflect.Descriptor instead.
 func (*GetSubmissionsResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{20}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *GetSubmissionsResponse) GetSubmissions() []*Submission {
@@ -1439,7 +1835,7 @@ type ListTasksResponse struct {
 
 func (x *ListTasksResponse) Reset() {
 	*x = ListTasksResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[21]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1451,7 +1847,7 @@ func (x *ListTasksResponse) String() string {
 func (*ListTasksResponse) ProtoMessage() {}
 
 func (x *ListTasksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[21]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1464,7 +1860,7 @@ func (x *ListTasksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTasksResponse.ProtoReflect.Descriptor instead.
 func (*ListTasksResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{21}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ListTasksResponse) GetTasks() []*Task {
@@ -1483,7 +1879,7 @@ type TaskResponse struct {
 
 func (x *TaskResponse) Reset() {
 	*x = TaskResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[22]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1495,7 +1891,7 @@ func (x *TaskResponse) String() string {
 func (*TaskResponse) ProtoMessage() {}
 
 func (x *TaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[22]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1508,7 +1904,7 @@ func (x *TaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskResponse.ProtoReflect.Descriptor instead.
 func (*TaskResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{22}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *TaskResponse) GetTask() *Task {
@@ -1532,7 +1928,7 @@ type LeaderboardEntry struct {
 
 func (x *LeaderboardEntry) Reset() {
 	*x = LeaderboardEntry{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[23]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1544,7 +1940,7 @@ func (x *LeaderboardEntry) String() string {
 func (*LeaderboardEntry) ProtoMessage() {}
 
 func (x *LeaderboardEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[23]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1557,7 +1953,7 @@ func (x *LeaderboardEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LeaderboardEntry.ProtoReflect.Descriptor instead.
 func (*LeaderboardEntry) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{23}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *LeaderboardEntry) GetUserId() string {
@@ -1611,7 +2007,7 @@ type GetLeaderboardResponse struct {
 
 func (x *GetLeaderboardResponse) Reset() {
 	*x = GetLeaderboardResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[24]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1623,7 +2019,7 @@ func (x *GetLeaderboardResponse) String() string {
 func (*GetLeaderboardResponse) ProtoMessage() {}
 
 func (x *GetLeaderboardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[24]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1636,7 +2032,7 @@ func (x *GetLeaderboardResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLeaderboardResponse.ProtoReflect.Descriptor instead.
 func (*GetLeaderboardResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{24}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *GetLeaderboardResponse) GetEntries() []*LeaderboardEntry {
@@ -1665,7 +2061,7 @@ type Room struct {
 
 func (x *Room) Reset() {
 	*x = Room{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[25]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1677,7 +2073,7 @@ func (x *Room) String() string {
 func (*Room) ProtoMessage() {}
 
 func (x *Room) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[25]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1690,7 +2086,7 @@ func (x *Room) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Room.ProtoReflect.Descriptor instead.
 func (*Room) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{25}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *Room) GetId() string {
@@ -1785,7 +2181,7 @@ type Participant struct {
 
 func (x *Participant) Reset() {
 	*x = Participant{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[26]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1797,7 +2193,7 @@ func (x *Participant) String() string {
 func (*Participant) ProtoMessage() {}
 
 func (x *Participant) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[26]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1810,7 +2206,7 @@ func (x *Participant) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Participant.ProtoReflect.Descriptor instead.
 func (*Participant) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{26}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *Participant) GetUserId() string {
@@ -1881,7 +2277,7 @@ type Submission struct {
 
 func (x *Submission) Reset() {
 	*x = Submission{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[27]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1893,7 +2289,7 @@ func (x *Submission) String() string {
 func (*Submission) ProtoMessage() {}
 
 func (x *Submission) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[27]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1906,7 +2302,7 @@ func (x *Submission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Submission.ProtoReflect.Descriptor instead.
 func (*Submission) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{27}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *Submission) GetId() string {
@@ -2000,7 +2396,7 @@ type TaskTestCase struct {
 
 func (x *TaskTestCase) Reset() {
 	*x = TaskTestCase{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[28]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2012,7 +2408,7 @@ func (x *TaskTestCase) String() string {
 func (*TaskTestCase) ProtoMessage() {}
 
 func (x *TaskTestCase) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[28]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2025,7 +2421,7 @@ func (x *TaskTestCase) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskTestCase.ProtoReflect.Descriptor instead.
 func (*TaskTestCase) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{28}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *TaskTestCase) GetId() string {
@@ -2102,7 +2498,7 @@ type Task struct {
 
 func (x *Task) Reset() {
 	*x = Task{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[29]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2114,7 +2510,7 @@ func (x *Task) String() string {
 func (*Task) ProtoMessage() {}
 
 func (x *Task) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[29]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2127,7 +2523,7 @@ func (x *Task) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Task.ProtoReflect.Descriptor instead.
 func (*Task) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{29}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *Task) GetId() string {
@@ -2328,7 +2724,7 @@ type TaskPayload struct {
 
 func (x *TaskPayload) Reset() {
 	*x = TaskPayload{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[30]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2340,7 +2736,7 @@ func (x *TaskPayload) String() string {
 func (*TaskPayload) ProtoMessage() {}
 
 func (x *TaskPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[30]
+	mi := &file_code_editor_v1_code_editor_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2353,7 +2749,7 @@ func (x *TaskPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskPayload.ProtoReflect.Descriptor instead.
 func (*TaskPayload) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{30}
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *TaskPayload) GetTitle() string {
@@ -2552,7 +2948,35 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\"\x12\n" +
 	"\x10ListRoomsRequest\"?\n" +
 	"\x11ListRoomsResponse\x12*\n" +
-	"\x05rooms\x18\x01 \x03(\v2\x14.code_editor.v1.RoomR\x05rooms\"(\n" +
+	"\x05rooms\x18\x01 \x03(\v2\x14.code_editor.v1.RoomR\x05rooms\"~\n" +
+	"\x0fAIReviewRequest\x12\x1a\n" +
+	"\blanguage\x18\x01 \x01(\tR\blanguage\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code\x12\x1d\n" +
+	"\n" +
+	"task_title\x18\x03 \x01(\tR\ttaskTitle\x12\x1c\n" +
+	"\tstatement\x18\x04 \x01(\tR\tstatement\"\xe1\x01\n" +
+	"\x17InterviewSolutionReview\x12\x1a\n" +
+	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x14\n" +
+	"\x05model\x18\x02 \x01(\tR\x05model\x12\x14\n" +
+	"\x05score\x18\x03 \x01(\x05R\x05score\x12\x18\n" +
+	"\asummary\x18\x04 \x01(\tR\asummary\x12\x1c\n" +
+	"\tstrengths\x18\x05 \x03(\tR\tstrengths\x12\x16\n" +
+	"\x06issues\x18\x06 \x03(\tR\x06issues\x12.\n" +
+	"\x13follow_up_questions\x18\a \x03(\tR\x11followUpQuestions\"S\n" +
+	"\x10AIReviewResponse\x12?\n" +
+	"\x06review\x18\x01 \x01(\v2'.code_editor.v1.InterviewSolutionReviewR\x06review\"\x1a\n" +
+	"\x18GetDailyChallengeRequest\"x\n" +
+	"\x19GetDailyChallengeResponse\x12(\n" +
+	"\x04task\x18\x01 \x01(\v2\x14.code_editor.v1.TaskR\x04task\x12\x12\n" +
+	"\x04date\x18\x02 \x01(\tR\x04date\x12\x1d\n" +
+	"\n" +
+	"expires_at\x18\x03 \x01(\tR\texpiresAt\"+\n" +
+	"\x10StartRoomRequest\x12\x17\n" +
+	"\aroom_id\x18\x01 \x01(\tR\x06roomId\"L\n" +
+	"\x11StartRoomResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\x12\x1f\n" +
+	"\vroom_status\x18\x02 \x01(\tR\n" +
+	"roomStatus\"(\n" +
 	"\x0eStatusResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\tR\x06status\"_\n" +
 	"\x12CreateRoomResponse\x12(\n" +
@@ -2730,7 +3154,7 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"RunnerMode\x12\x1b\n" +
 	"\x17RUNNER_MODE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13RUNNER_MODE_PROGRAM\x10\x01\x12\x1b\n" +
-	"\x17RUNNER_MODE_FUNCTION_IO\x10\x022\xbc\x0e\n" +
+	"\x17RUNNER_MODE_FUNCTION_IO\x10\x022\xcc\x11\n" +
 	"\x11CodeEditorService\x12y\n" +
 	"\n" +
 	"CreateRoom\x12!.code_editor.v1.CreateRoomRequest\x1a\".code_editor.v1.CreateRoomResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/code-editor/rooms\x12w\n" +
@@ -2750,7 +3174,10 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\n" +
 	"DeleteTask\x12!.code_editor.v1.DeleteTaskRequest\x1a\x1e.code_editor.v1.StatusResponse\".\x82\xd3\xe4\x93\x02(*&/api/admin/code-editor/tasks/{task_id}\x12\x88\x01\n" +
 	"\x0eGetLeaderboard\x12%.code_editor.v1.GetLeaderboardRequest\x1a&.code_editor.v1.GetLeaderboardResponse\"'\x82\xd3\xe4\x93\x02!\x12\x1f/api/v1/code-editor/leaderboard\x12s\n" +
-	"\tListRooms\x12 .code_editor.v1.ListRoomsRequest\x1a!.code_editor.v1.ListRoomsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/code-editor/roomsB\x1fZ\x1dapi/pkg/api/code_editor/v1;v1b\x06proto3"
+	"\tListRooms\x12 .code_editor.v1.ListRoomsRequest\x1a!.code_editor.v1.ListRoomsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/code-editor/rooms\x12w\n" +
+	"\bAIReview\x12\x1f.code_editor.v1.AIReviewRequest\x1a .code_editor.v1.AIReviewResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/code-editor/ai-review\x12\x8b\x01\n" +
+	"\x11GetDailyChallenge\x12(.code_editor.v1.GetDailyChallengeRequest\x1a).code_editor.v1.GetDailyChallengeResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/code-editor/daily\x12\x86\x01\n" +
+	"\tStartRoom\x12 .code_editor.v1.StartRoomRequest\x1a!.code_editor.v1.StartRoomResponse\"4\x82\xd3\xe4\x93\x02.:\x01*\")/api/v1/code-editor/rooms/{room_id}/startB\x1fZ\x1dapi/pkg/api/code_editor/v1;v1b\x06proto3"
 
 var (
 	file_code_editor_v1_code_editor_proto_rawDescOnce sync.Once
@@ -2765,7 +3192,7 @@ func file_code_editor_v1_code_editor_proto_rawDescGZIP() []byte {
 }
 
 var file_code_editor_v1_code_editor_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
-var file_code_editor_v1_code_editor_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
+var file_code_editor_v1_code_editor_proto_msgTypes = make([]protoimpl.MessageInfo, 38)
 var file_code_editor_v1_code_editor_proto_goTypes = []any{
 	(RoomMode)(0),                       // 0: code_editor.v1.RoomMode
 	(RoomStatus)(0),                     // 1: code_editor.v1.RoomStatus
@@ -2789,93 +3216,108 @@ var file_code_editor_v1_code_editor_proto_goTypes = []any{
 	(*GetLeaderboardRequest)(nil),       // 19: code_editor.v1.GetLeaderboardRequest
 	(*ListRoomsRequest)(nil),            // 20: code_editor.v1.ListRoomsRequest
 	(*ListRoomsResponse)(nil),           // 21: code_editor.v1.ListRoomsResponse
-	(*StatusResponse)(nil),              // 22: code_editor.v1.StatusResponse
-	(*CreateRoomResponse)(nil),          // 23: code_editor.v1.CreateRoomResponse
-	(*GetRoomResponse)(nil),             // 24: code_editor.v1.GetRoomResponse
-	(*JoinRoomResponse)(nil),            // 25: code_editor.v1.JoinRoomResponse
-	(*SubmitCodeResponse)(nil),          // 26: code_editor.v1.SubmitCodeResponse
-	(*GetSubmissionsResponse)(nil),      // 27: code_editor.v1.GetSubmissionsResponse
-	(*ListTasksResponse)(nil),           // 28: code_editor.v1.ListTasksResponse
-	(*TaskResponse)(nil),                // 29: code_editor.v1.TaskResponse
-	(*LeaderboardEntry)(nil),            // 30: code_editor.v1.LeaderboardEntry
-	(*GetLeaderboardResponse)(nil),      // 31: code_editor.v1.GetLeaderboardResponse
-	(*Room)(nil),                        // 32: code_editor.v1.Room
-	(*Participant)(nil),                 // 33: code_editor.v1.Participant
-	(*Submission)(nil),                  // 34: code_editor.v1.Submission
-	(*TaskTestCase)(nil),                // 35: code_editor.v1.TaskTestCase
-	(*Task)(nil),                        // 36: code_editor.v1.Task
-	(*TaskPayload)(nil),                 // 37: code_editor.v1.TaskPayload
-	(*timestamppb.Timestamp)(nil),       // 38: google.protobuf.Timestamp
+	(*AIReviewRequest)(nil),             // 22: code_editor.v1.AIReviewRequest
+	(*InterviewSolutionReview)(nil),     // 23: code_editor.v1.InterviewSolutionReview
+	(*AIReviewResponse)(nil),            // 24: code_editor.v1.AIReviewResponse
+	(*GetDailyChallengeRequest)(nil),    // 25: code_editor.v1.GetDailyChallengeRequest
+	(*GetDailyChallengeResponse)(nil),   // 26: code_editor.v1.GetDailyChallengeResponse
+	(*StartRoomRequest)(nil),            // 27: code_editor.v1.StartRoomRequest
+	(*StartRoomResponse)(nil),           // 28: code_editor.v1.StartRoomResponse
+	(*StatusResponse)(nil),              // 29: code_editor.v1.StatusResponse
+	(*CreateRoomResponse)(nil),          // 30: code_editor.v1.CreateRoomResponse
+	(*GetRoomResponse)(nil),             // 31: code_editor.v1.GetRoomResponse
+	(*JoinRoomResponse)(nil),            // 32: code_editor.v1.JoinRoomResponse
+	(*SubmitCodeResponse)(nil),          // 33: code_editor.v1.SubmitCodeResponse
+	(*GetSubmissionsResponse)(nil),      // 34: code_editor.v1.GetSubmissionsResponse
+	(*ListTasksResponse)(nil),           // 35: code_editor.v1.ListTasksResponse
+	(*TaskResponse)(nil),                // 36: code_editor.v1.TaskResponse
+	(*LeaderboardEntry)(nil),            // 37: code_editor.v1.LeaderboardEntry
+	(*GetLeaderboardResponse)(nil),      // 38: code_editor.v1.GetLeaderboardResponse
+	(*Room)(nil),                        // 39: code_editor.v1.Room
+	(*Participant)(nil),                 // 40: code_editor.v1.Participant
+	(*Submission)(nil),                  // 41: code_editor.v1.Submission
+	(*TaskTestCase)(nil),                // 42: code_editor.v1.TaskTestCase
+	(*Task)(nil),                        // 43: code_editor.v1.Task
+	(*TaskPayload)(nil),                 // 44: code_editor.v1.TaskPayload
+	(*timestamppb.Timestamp)(nil),       // 45: google.protobuf.Timestamp
 }
 var file_code_editor_v1_code_editor_proto_depIdxs = []int32{
 	0,  // 0: code_editor.v1.CreateRoomRequest.mode:type_name -> code_editor.v1.RoomMode
 	2,  // 1: code_editor.v1.CreateRoomRequest.difficulty:type_name -> code_editor.v1.TaskDifficulty
 	2,  // 2: code_editor.v1.ListTasksRequest.difficulty:type_name -> code_editor.v1.TaskDifficulty
-	37, // 3: code_editor.v1.CreateTaskRequest.task:type_name -> code_editor.v1.TaskPayload
-	37, // 4: code_editor.v1.UpdateTaskRequest.task:type_name -> code_editor.v1.TaskPayload
-	32, // 5: code_editor.v1.ListRoomsResponse.rooms:type_name -> code_editor.v1.Room
-	32, // 6: code_editor.v1.CreateRoomResponse.room:type_name -> code_editor.v1.Room
-	32, // 7: code_editor.v1.GetRoomResponse.room:type_name -> code_editor.v1.Room
-	32, // 8: code_editor.v1.JoinRoomResponse.room:type_name -> code_editor.v1.Room
-	34, // 9: code_editor.v1.GetSubmissionsResponse.submissions:type_name -> code_editor.v1.Submission
-	36, // 10: code_editor.v1.ListTasksResponse.tasks:type_name -> code_editor.v1.Task
-	36, // 11: code_editor.v1.TaskResponse.task:type_name -> code_editor.v1.Task
-	30, // 12: code_editor.v1.GetLeaderboardResponse.entries:type_name -> code_editor.v1.LeaderboardEntry
-	0,  // 13: code_editor.v1.Room.mode:type_name -> code_editor.v1.RoomMode
-	1,  // 14: code_editor.v1.Room.status:type_name -> code_editor.v1.RoomStatus
-	38, // 15: code_editor.v1.Room.created_at:type_name -> google.protobuf.Timestamp
-	33, // 16: code_editor.v1.Room.participants:type_name -> code_editor.v1.Participant
-	38, // 17: code_editor.v1.Participant.joined_at:type_name -> google.protobuf.Timestamp
-	38, // 18: code_editor.v1.Submission.submitted_at:type_name -> google.protobuf.Timestamp
-	2,  // 19: code_editor.v1.Task.difficulty:type_name -> code_editor.v1.TaskDifficulty
-	3,  // 20: code_editor.v1.Task.language:type_name -> code_editor.v1.ProgrammingLanguage
-	35, // 21: code_editor.v1.Task.public_test_cases:type_name -> code_editor.v1.TaskTestCase
-	35, // 22: code_editor.v1.Task.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
-	38, // 23: code_editor.v1.Task.created_at:type_name -> google.protobuf.Timestamp
-	38, // 24: code_editor.v1.Task.updated_at:type_name -> google.protobuf.Timestamp
-	4,  // 25: code_editor.v1.Task.task_type:type_name -> code_editor.v1.TaskType
-	5,  // 26: code_editor.v1.Task.execution_profile:type_name -> code_editor.v1.ExecutionProfile
-	6,  // 27: code_editor.v1.Task.runner_mode:type_name -> code_editor.v1.RunnerMode
-	2,  // 28: code_editor.v1.TaskPayload.difficulty:type_name -> code_editor.v1.TaskDifficulty
-	3,  // 29: code_editor.v1.TaskPayload.language:type_name -> code_editor.v1.ProgrammingLanguage
-	35, // 30: code_editor.v1.TaskPayload.public_test_cases:type_name -> code_editor.v1.TaskTestCase
-	35, // 31: code_editor.v1.TaskPayload.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
-	4,  // 32: code_editor.v1.TaskPayload.task_type:type_name -> code_editor.v1.TaskType
-	5,  // 33: code_editor.v1.TaskPayload.execution_profile:type_name -> code_editor.v1.ExecutionProfile
-	6,  // 34: code_editor.v1.TaskPayload.runner_mode:type_name -> code_editor.v1.RunnerMode
-	7,  // 35: code_editor.v1.CodeEditorService.CreateRoom:input_type -> code_editor.v1.CreateRoomRequest
-	8,  // 36: code_editor.v1.CodeEditorService.GetRoom:input_type -> code_editor.v1.GetRoomRequest
-	9,  // 37: code_editor.v1.CodeEditorService.JoinRoom:input_type -> code_editor.v1.JoinRoomRequest
-	10, // 38: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:input_type -> code_editor.v1.JoinRoomByInviteCodeRequest
-	11, // 39: code_editor.v1.CodeEditorService.LeaveRoom:input_type -> code_editor.v1.LeaveRoomRequest
-	12, // 40: code_editor.v1.CodeEditorService.SubmitCode:input_type -> code_editor.v1.SubmitCodeRequest
-	13, // 41: code_editor.v1.CodeEditorService.SetReady:input_type -> code_editor.v1.SetReadyRequest
-	14, // 42: code_editor.v1.CodeEditorService.GetSubmissions:input_type -> code_editor.v1.GetSubmissionsRequest
-	15, // 43: code_editor.v1.CodeEditorService.ListTasks:input_type -> code_editor.v1.ListTasksRequest
-	16, // 44: code_editor.v1.CodeEditorService.CreateTask:input_type -> code_editor.v1.CreateTaskRequest
-	17, // 45: code_editor.v1.CodeEditorService.UpdateTask:input_type -> code_editor.v1.UpdateTaskRequest
-	18, // 46: code_editor.v1.CodeEditorService.DeleteTask:input_type -> code_editor.v1.DeleteTaskRequest
-	19, // 47: code_editor.v1.CodeEditorService.GetLeaderboard:input_type -> code_editor.v1.GetLeaderboardRequest
-	20, // 48: code_editor.v1.CodeEditorService.ListRooms:input_type -> code_editor.v1.ListRoomsRequest
-	23, // 49: code_editor.v1.CodeEditorService.CreateRoom:output_type -> code_editor.v1.CreateRoomResponse
-	24, // 50: code_editor.v1.CodeEditorService.GetRoom:output_type -> code_editor.v1.GetRoomResponse
-	25, // 51: code_editor.v1.CodeEditorService.JoinRoom:output_type -> code_editor.v1.JoinRoomResponse
-	25, // 52: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:output_type -> code_editor.v1.JoinRoomResponse
-	22, // 53: code_editor.v1.CodeEditorService.LeaveRoom:output_type -> code_editor.v1.StatusResponse
-	26, // 54: code_editor.v1.CodeEditorService.SubmitCode:output_type -> code_editor.v1.SubmitCodeResponse
-	22, // 55: code_editor.v1.CodeEditorService.SetReady:output_type -> code_editor.v1.StatusResponse
-	27, // 56: code_editor.v1.CodeEditorService.GetSubmissions:output_type -> code_editor.v1.GetSubmissionsResponse
-	28, // 57: code_editor.v1.CodeEditorService.ListTasks:output_type -> code_editor.v1.ListTasksResponse
-	29, // 58: code_editor.v1.CodeEditorService.CreateTask:output_type -> code_editor.v1.TaskResponse
-	29, // 59: code_editor.v1.CodeEditorService.UpdateTask:output_type -> code_editor.v1.TaskResponse
-	22, // 60: code_editor.v1.CodeEditorService.DeleteTask:output_type -> code_editor.v1.StatusResponse
-	31, // 61: code_editor.v1.CodeEditorService.GetLeaderboard:output_type -> code_editor.v1.GetLeaderboardResponse
-	21, // 62: code_editor.v1.CodeEditorService.ListRooms:output_type -> code_editor.v1.ListRoomsResponse
-	49, // [49:63] is the sub-list for method output_type
-	35, // [35:49] is the sub-list for method input_type
-	35, // [35:35] is the sub-list for extension type_name
-	35, // [35:35] is the sub-list for extension extendee
-	0,  // [0:35] is the sub-list for field type_name
+	44, // 3: code_editor.v1.CreateTaskRequest.task:type_name -> code_editor.v1.TaskPayload
+	44, // 4: code_editor.v1.UpdateTaskRequest.task:type_name -> code_editor.v1.TaskPayload
+	39, // 5: code_editor.v1.ListRoomsResponse.rooms:type_name -> code_editor.v1.Room
+	23, // 6: code_editor.v1.AIReviewResponse.review:type_name -> code_editor.v1.InterviewSolutionReview
+	43, // 7: code_editor.v1.GetDailyChallengeResponse.task:type_name -> code_editor.v1.Task
+	39, // 8: code_editor.v1.CreateRoomResponse.room:type_name -> code_editor.v1.Room
+	39, // 9: code_editor.v1.GetRoomResponse.room:type_name -> code_editor.v1.Room
+	39, // 10: code_editor.v1.JoinRoomResponse.room:type_name -> code_editor.v1.Room
+	41, // 11: code_editor.v1.GetSubmissionsResponse.submissions:type_name -> code_editor.v1.Submission
+	43, // 12: code_editor.v1.ListTasksResponse.tasks:type_name -> code_editor.v1.Task
+	43, // 13: code_editor.v1.TaskResponse.task:type_name -> code_editor.v1.Task
+	37, // 14: code_editor.v1.GetLeaderboardResponse.entries:type_name -> code_editor.v1.LeaderboardEntry
+	0,  // 15: code_editor.v1.Room.mode:type_name -> code_editor.v1.RoomMode
+	1,  // 16: code_editor.v1.Room.status:type_name -> code_editor.v1.RoomStatus
+	45, // 17: code_editor.v1.Room.created_at:type_name -> google.protobuf.Timestamp
+	40, // 18: code_editor.v1.Room.participants:type_name -> code_editor.v1.Participant
+	45, // 19: code_editor.v1.Participant.joined_at:type_name -> google.protobuf.Timestamp
+	45, // 20: code_editor.v1.Submission.submitted_at:type_name -> google.protobuf.Timestamp
+	2,  // 21: code_editor.v1.Task.difficulty:type_name -> code_editor.v1.TaskDifficulty
+	3,  // 22: code_editor.v1.Task.language:type_name -> code_editor.v1.ProgrammingLanguage
+	42, // 23: code_editor.v1.Task.public_test_cases:type_name -> code_editor.v1.TaskTestCase
+	42, // 24: code_editor.v1.Task.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
+	45, // 25: code_editor.v1.Task.created_at:type_name -> google.protobuf.Timestamp
+	45, // 26: code_editor.v1.Task.updated_at:type_name -> google.protobuf.Timestamp
+	4,  // 27: code_editor.v1.Task.task_type:type_name -> code_editor.v1.TaskType
+	5,  // 28: code_editor.v1.Task.execution_profile:type_name -> code_editor.v1.ExecutionProfile
+	6,  // 29: code_editor.v1.Task.runner_mode:type_name -> code_editor.v1.RunnerMode
+	2,  // 30: code_editor.v1.TaskPayload.difficulty:type_name -> code_editor.v1.TaskDifficulty
+	3,  // 31: code_editor.v1.TaskPayload.language:type_name -> code_editor.v1.ProgrammingLanguage
+	42, // 32: code_editor.v1.TaskPayload.public_test_cases:type_name -> code_editor.v1.TaskTestCase
+	42, // 33: code_editor.v1.TaskPayload.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
+	4,  // 34: code_editor.v1.TaskPayload.task_type:type_name -> code_editor.v1.TaskType
+	5,  // 35: code_editor.v1.TaskPayload.execution_profile:type_name -> code_editor.v1.ExecutionProfile
+	6,  // 36: code_editor.v1.TaskPayload.runner_mode:type_name -> code_editor.v1.RunnerMode
+	7,  // 37: code_editor.v1.CodeEditorService.CreateRoom:input_type -> code_editor.v1.CreateRoomRequest
+	8,  // 38: code_editor.v1.CodeEditorService.GetRoom:input_type -> code_editor.v1.GetRoomRequest
+	9,  // 39: code_editor.v1.CodeEditorService.JoinRoom:input_type -> code_editor.v1.JoinRoomRequest
+	10, // 40: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:input_type -> code_editor.v1.JoinRoomByInviteCodeRequest
+	11, // 41: code_editor.v1.CodeEditorService.LeaveRoom:input_type -> code_editor.v1.LeaveRoomRequest
+	12, // 42: code_editor.v1.CodeEditorService.SubmitCode:input_type -> code_editor.v1.SubmitCodeRequest
+	13, // 43: code_editor.v1.CodeEditorService.SetReady:input_type -> code_editor.v1.SetReadyRequest
+	14, // 44: code_editor.v1.CodeEditorService.GetSubmissions:input_type -> code_editor.v1.GetSubmissionsRequest
+	15, // 45: code_editor.v1.CodeEditorService.ListTasks:input_type -> code_editor.v1.ListTasksRequest
+	16, // 46: code_editor.v1.CodeEditorService.CreateTask:input_type -> code_editor.v1.CreateTaskRequest
+	17, // 47: code_editor.v1.CodeEditorService.UpdateTask:input_type -> code_editor.v1.UpdateTaskRequest
+	18, // 48: code_editor.v1.CodeEditorService.DeleteTask:input_type -> code_editor.v1.DeleteTaskRequest
+	19, // 49: code_editor.v1.CodeEditorService.GetLeaderboard:input_type -> code_editor.v1.GetLeaderboardRequest
+	20, // 50: code_editor.v1.CodeEditorService.ListRooms:input_type -> code_editor.v1.ListRoomsRequest
+	22, // 51: code_editor.v1.CodeEditorService.AIReview:input_type -> code_editor.v1.AIReviewRequest
+	25, // 52: code_editor.v1.CodeEditorService.GetDailyChallenge:input_type -> code_editor.v1.GetDailyChallengeRequest
+	27, // 53: code_editor.v1.CodeEditorService.StartRoom:input_type -> code_editor.v1.StartRoomRequest
+	30, // 54: code_editor.v1.CodeEditorService.CreateRoom:output_type -> code_editor.v1.CreateRoomResponse
+	31, // 55: code_editor.v1.CodeEditorService.GetRoom:output_type -> code_editor.v1.GetRoomResponse
+	32, // 56: code_editor.v1.CodeEditorService.JoinRoom:output_type -> code_editor.v1.JoinRoomResponse
+	32, // 57: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:output_type -> code_editor.v1.JoinRoomResponse
+	29, // 58: code_editor.v1.CodeEditorService.LeaveRoom:output_type -> code_editor.v1.StatusResponse
+	33, // 59: code_editor.v1.CodeEditorService.SubmitCode:output_type -> code_editor.v1.SubmitCodeResponse
+	29, // 60: code_editor.v1.CodeEditorService.SetReady:output_type -> code_editor.v1.StatusResponse
+	34, // 61: code_editor.v1.CodeEditorService.GetSubmissions:output_type -> code_editor.v1.GetSubmissionsResponse
+	35, // 62: code_editor.v1.CodeEditorService.ListTasks:output_type -> code_editor.v1.ListTasksResponse
+	36, // 63: code_editor.v1.CodeEditorService.CreateTask:output_type -> code_editor.v1.TaskResponse
+	36, // 64: code_editor.v1.CodeEditorService.UpdateTask:output_type -> code_editor.v1.TaskResponse
+	29, // 65: code_editor.v1.CodeEditorService.DeleteTask:output_type -> code_editor.v1.StatusResponse
+	38, // 66: code_editor.v1.CodeEditorService.GetLeaderboard:output_type -> code_editor.v1.GetLeaderboardResponse
+	21, // 67: code_editor.v1.CodeEditorService.ListRooms:output_type -> code_editor.v1.ListRoomsResponse
+	24, // 68: code_editor.v1.CodeEditorService.AIReview:output_type -> code_editor.v1.AIReviewResponse
+	26, // 69: code_editor.v1.CodeEditorService.GetDailyChallenge:output_type -> code_editor.v1.GetDailyChallengeResponse
+	28, // 70: code_editor.v1.CodeEditorService.StartRoom:output_type -> code_editor.v1.StartRoomResponse
+	54, // [54:71] is the sub-list for method output_type
+	37, // [37:54] is the sub-list for method input_type
+	37, // [37:37] is the sub-list for extension type_name
+	37, // [37:37] is the sub-list for extension extendee
+	0,  // [0:37] is the sub-list for field type_name
 }
 
 func init() { file_code_editor_v1_code_editor_proto_init() }
@@ -2889,7 +3331,7 @@ func file_code_editor_v1_code_editor_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_code_editor_v1_code_editor_proto_rawDesc), len(file_code_editor_v1_code_editor_proto_rawDesc)),
 			NumEnums:      7,
-			NumMessages:   31,
+			NumMessages:   38,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

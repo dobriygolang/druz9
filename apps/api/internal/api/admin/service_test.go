@@ -63,7 +63,7 @@ func TestDeleteUser(t *testing.T) {
 		mockService := mocks.NewService(t)
 		mockService.On("DeleteUser", context.Background(), userID).Return(nil).Once()
 
-		impl := New(mockService, nil)
+		impl := New(mockService, nil, nil, nil)
 		req := &v1.DeleteUserRequest{UserId: userID.String()}
 
 		resp, err := impl.DeleteUser(context.Background(), req)
@@ -78,7 +78,7 @@ func TestDeleteUser(t *testing.T) {
 	t.Run("returns error for invalid user id", func(t *testing.T) {
 		t.Parallel()
 
-		impl := New(nil, nil)
+		impl := New(nil, nil, nil, nil)
 		req := &v1.DeleteUserRequest{UserId: "invalid-uuid"}
 
 		_, err := impl.DeleteUser(context.Background(), req)
@@ -95,7 +95,7 @@ func TestDeleteUser(t *testing.T) {
 		userID := uuid.New()
 		mockService.On("DeleteUser", context.Background(), userID).Return(expectedErr).Once()
 
-		impl := New(mockService, nil)
+		impl := New(mockService, nil, nil, nil)
 		req := &v1.DeleteUserRequest{UserId: userID.String()}
 
 		_, err := impl.DeleteUser(context.Background(), req)
@@ -123,7 +123,7 @@ func TestConfigMethods(t *testing.T) {
 		},
 	}
 
-	impl := New(nil, configService)
+	impl := New(nil, configService, nil, nil)
 
 	t.Run("get config", func(t *testing.T) {
 		resp, err := impl.GetConfig(context.Background(), &v1.GetConfigRequest{Key: "server_http_addr"})

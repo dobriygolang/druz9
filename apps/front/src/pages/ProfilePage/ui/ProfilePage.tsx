@@ -1,12 +1,15 @@
-import { useEffect, useState, useCallback, useRef } from 'react'
-import { useParams } from 'react-router-dom'
-import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, X, Check, Flame } from 'lucide-react'
+import { useEffect, useState, useCallback } from 'react'
+import { useParams, useNavigate } from 'react-router-dom'
+import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, X, Check, Flame, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi } from '@/features/Auth/api/authApi'
 import type { User, ProfileProgress } from '@/entities/User/model/types'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
+import { Modal } from '@/shared/ui/Modal'
+import { Input } from '@/shared/ui/Input'
+import { useToast } from '@/shared/ui/Toast'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { ActivityHeatmap } from '@/shared/ui/ActivityHeatmap'
 import { AchievementBadges } from '@/shared/ui/AchievementBadges'
@@ -39,6 +42,8 @@ type Tab = 'activity' | 'progress' | 'achievements'
 export function ProfilePage() {
   const { userId } = useParams()
   const { user: authUser, refresh } = useAuth()
+  const { toast } = useToast()
+  const navigate = useNavigate()
   const [user, setUser] = useState<User | null>(null)
   const [progress, setProgress] = useState<ProfileProgress | null>(null)
   const [loading, setLoading] = useState(true)
@@ -55,7 +60,10 @@ export function ProfilePage() {
   const [saving, setSaving] = useState(false)
   const [bindingProvider, setBindingProvider] = useState<'telegram' | 'yandex' | null>(null)
   const [bindError, setBindError] = useState('')
-  const bindPollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [tgToken, setTgToken] = useState('')
+  const [tgCode, setTgCode] = useState('')
+  const [showTgCodeModal, setShowTgCodeModal] = useState(false)
+  const [submittingTgCode, setSubmittingTgCode] = useState(false)
 
   const targetId = userId ?? authUser?.id ?? ''
   const isOwn = !userId || userId === authUser?.id
@@ -124,25 +132,33 @@ export function ProfilePage() {
   const bindTelegram = async () => {
     setBindingProvider('telegram'); setBindError('')
     try {
-      const { botStartUrl } = await authApi.createTelegramAuthChallenge()
+      const { token, botStartUrl } = await authApi.createTelegramAuthChallenge()
+      setTgToken(token)
+      setTgCode('')
       window.open(botStartUrl, '_blank')
-      if (bindPollRef.current) clearInterval(bindPollRef.current)
-      const poll = setInterval(async () => {
-        try {
-          await refresh()
-          clearInterval(poll); bindPollRef.current = null
-          setBindingProvider(null)
-          fetchProfile()
-        } catch {}
-      }, 2000)
-      bindPollRef.current = poll
-      setTimeout(() => {
-        if (bindPollRef.current) { clearInterval(bindPollRef.current); bindPollRef.current = null }
-        setBindingProvider(null)
-      }, 120000)
+      setShowTgCodeModal(true)
     } catch {
       setBindError('Не удалось открыть Telegram. Попробуйте ещё раз.')
+    } finally {
       setBindingProvider(null)
+    }
+  }
+
+  const submitTgCode = async () => {
+    if (!tgCode.trim() || !tgToken) return
+    setSubmittingTgCode(true)
+    try {
+      await authApi.bindTelegram(tgToken, tgCode.trim())
+      await refresh()
+      fetchProfile()
+      setShowTgCodeModal(false)
+      setTgCode('')
+      setTgToken('')
+      toast('Telegram привязан', 'success')
+    } catch {
+      toast('Неверный код. Проверьте и попробуйте снова.', 'error')
+    } finally {
+      setSubmittingTgCode(false)
     }
   }
 
@@ -402,7 +418,44 @@ export function ProfilePage() {
               <p className="text-xs text-[#94a3b8] mb-3">
                 Компании, по которым ты проходил mock-интервью. Чтобы добавить — начни сессию в разделе <span className="text-[#6366F1]">Growth Hub</span> и укажи целевую компанию.
               </p>
-              {progress.companies.length > 0 ? (
+              {(progress.mockSessions && progress.mockSessions.length > 0) ? (
+                <div className="flex flex-col gap-2">
+                  {progress.mockSessions.map(s => {
+                    const isActive = s.status === 'active'
+                    const stageKindLabel: Record<string, string> = {
+                      coding: 'Кодинг', slices: 'Срезы', concurrency: 'Многопоточность',
+                      sql: 'SQL', architecture: 'Архитектура', system_design: 'System Design',
+                    }
+                    const kindLabel = stageKindLabel[s.currentStageKind] ?? s.currentStageKind
+                    const stageNum = Math.min(s.currentStageIndex + 1, s.totalStages || 1)
+                    return (
+                      <button
+                        key={s.id}
+                        onClick={() => navigate(`/growth/interview-prep/mock/${s.id}`)}
+                        className="flex items-center gap-3 px-4 py-3 bg-[#F2F3F0] rounded-xl hover:bg-[#E7E8E5] transition-colors text-left w-full"
+                      >
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5">
+                            <span className="text-sm font-semibold text-[#111111] capitalize">{s.companyTag}</span>
+                            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${isActive ? 'bg-[#dcfce7] text-[#16a34a]' : 'bg-[#E7E8E5] text-[#666666]'}`}>
+                              {isActive ? 'В процессе' : 'Завершено'}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1.5 text-xs text-[#94a3b8]">
+                            {s.totalStages > 0 && (
+                              <>
+                                <span>Этап {stageNum} из {s.totalStages}</span>
+                                {kindLabel && <><span>·</span><span>{kindLabel}</span></>}
+                              </>
+                            )}
+                          </div>
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-[#94a3b8] flex-shrink-0" />
+                      </button>
+                    )
+                  })}
+                </div>
+              ) : progress.companies.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {progress.companies.map(c => (
                     <div key={c} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F3F0] rounded-lg">
@@ -517,6 +570,32 @@ export function ProfilePage() {
           </div>
         </div>
       )}
+
+      {/* Telegram code modal */}
+      <Modal
+        open={showTgCodeModal}
+        onClose={() => { setShowTgCodeModal(false); setTgCode('') }}
+        title="Введите код из Telegram"
+        footer={
+          <>
+            <Button variant="secondary" size="sm" onClick={() => { setShowTgCodeModal(false); setTgCode('') }}>Отмена</Button>
+            <Button variant="orange" size="sm" onClick={submitTgCode} loading={submittingTgCode} disabled={!tgCode.trim()}>Подтвердить</Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-3">
+          <p className="text-sm text-[#666666] dark:text-[#7e93b0]">
+            Бот отправил вам код в Telegram. Введите его ниже для привязки аккаунта.
+          </p>
+          <Input
+            label="Код"
+            value={tgCode}
+            onChange={e => setTgCode(e.target.value)}
+            placeholder="123456"
+            onKeyDown={e => { if (e.key === 'Enter') submitTgCode() }}
+          />
+        </div>
+      </Modal>
     </div>
   )
 }

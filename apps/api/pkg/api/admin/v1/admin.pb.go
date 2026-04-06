@@ -66,6 +66,146 @@ func (x *DeleteUserRequest) GetUserId() string {
 	return ""
 }
 
+type UpdateUserTrustRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	IsTrusted     bool                   `protobuf:"varint,2,opt,name=is_trusted,json=isTrusted,proto3" json:"is_trusted,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserTrustRequest) Reset() {
+	*x = UpdateUserTrustRequest{}
+	mi := &file_admin_v1_admin_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserTrustRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserTrustRequest) ProtoMessage() {}
+
+func (x *UpdateUserTrustRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_admin_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserTrustRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserTrustRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *UpdateUserTrustRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UpdateUserTrustRequest) GetIsTrusted() bool {
+	if x != nil {
+		return x.IsTrusted
+	}
+	return false
+}
+
+type UpdateUserAdminRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	IsAdmin       bool                   `protobuf:"varint,2,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateUserAdminRequest) Reset() {
+	*x = UpdateUserAdminRequest{}
+	mi := &file_admin_v1_admin_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateUserAdminRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateUserAdminRequest) ProtoMessage() {}
+
+func (x *UpdateUserAdminRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_admin_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateUserAdminRequest.ProtoReflect.Descriptor instead.
+func (*UpdateUserAdminRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{2}
+}
+
+func (x *UpdateUserAdminRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *UpdateUserAdminRequest) GetIsAdmin() bool {
+	if x != nil {
+		return x.IsAdmin
+	}
+	return false
+}
+
+type GetRuntimeConfigRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetRuntimeConfigRequest) Reset() {
+	*x = GetRuntimeConfigRequest{}
+	mi := &file_admin_v1_admin_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRuntimeConfigRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRuntimeConfigRequest) ProtoMessage() {}
+
+func (x *GetRuntimeConfigRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_admin_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRuntimeConfigRequest.ProtoReflect.Descriptor instead.
+func (*GetRuntimeConfigRequest) Descriptor() ([]byte, []int) {
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{3}
+}
+
 type AdminStatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
@@ -75,7 +215,7 @@ type AdminStatusResponse struct {
 
 func (x *AdminStatusResponse) Reset() {
 	*x = AdminStatusResponse{}
-	mi := &file_admin_v1_admin_proto_msgTypes[1]
+	mi := &file_admin_v1_admin_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -87,7 +227,7 @@ func (x *AdminStatusResponse) String() string {
 func (*AdminStatusResponse) ProtoMessage() {}
 
 func (x *AdminStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[1]
+	mi := &file_admin_v1_admin_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -100,7 +240,7 @@ func (x *AdminStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminStatusResponse.ProtoReflect.Descriptor instead.
 func (*AdminStatusResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{1}
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AdminStatusResponse) GetStatus() string {
@@ -119,7 +259,7 @@ type GetConfigRequest struct {
 
 func (x *GetConfigRequest) Reset() {
 	*x = GetConfigRequest{}
-	mi := &file_admin_v1_admin_proto_msgTypes[2]
+	mi := &file_admin_v1_admin_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -131,7 +271,7 @@ func (x *GetConfigRequest) String() string {
 func (*GetConfigRequest) ProtoMessage() {}
 
 func (x *GetConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[2]
+	mi := &file_admin_v1_admin_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -144,7 +284,7 @@ func (x *GetConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetConfigRequest.ProtoReflect.Descriptor instead.
 func (*GetConfigRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{2}
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetConfigRequest) GetKey() string {
@@ -168,7 +308,7 @@ type GetConfigResponse struct {
 
 func (x *GetConfigResponse) Reset() {
 	*x = GetConfigResponse{}
-	mi := &file_admin_v1_admin_proto_msgTypes[3]
+	mi := &file_admin_v1_admin_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -180,7 +320,7 @@ func (x *GetConfigResponse) String() string {
 func (*GetConfigResponse) ProtoMessage() {}
 
 func (x *GetConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[3]
+	mi := &file_admin_v1_admin_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -193,7 +333,7 @@ func (x *GetConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetConfigResponse.ProtoReflect.Descriptor instead.
 func (*GetConfigResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{3}
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetConfigResponse) GetKey() string {
@@ -246,7 +386,7 @@ type ListConfigRequest struct {
 
 func (x *ListConfigRequest) Reset() {
 	*x = ListConfigRequest{}
-	mi := &file_admin_v1_admin_proto_msgTypes[4]
+	mi := &file_admin_v1_admin_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -258,7 +398,7 @@ func (x *ListConfigRequest) String() string {
 func (*ListConfigRequest) ProtoMessage() {}
 
 func (x *ListConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[4]
+	mi := &file_admin_v1_admin_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -271,7 +411,7 @@ func (x *ListConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListConfigRequest.ProtoReflect.Descriptor instead.
 func (*ListConfigRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{4}
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{7}
 }
 
 type ListConfigResponse struct {
@@ -283,7 +423,7 @@ type ListConfigResponse struct {
 
 func (x *ListConfigResponse) Reset() {
 	*x = ListConfigResponse{}
-	mi := &file_admin_v1_admin_proto_msgTypes[5]
+	mi := &file_admin_v1_admin_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -295,7 +435,7 @@ func (x *ListConfigResponse) String() string {
 func (*ListConfigResponse) ProtoMessage() {}
 
 func (x *ListConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[5]
+	mi := &file_admin_v1_admin_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -308,7 +448,7 @@ func (x *ListConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListConfigResponse.ProtoReflect.Descriptor instead.
 func (*ListConfigResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{5}
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListConfigResponse) GetConfigs() []*ConfigItem {
@@ -332,7 +472,7 @@ type ConfigItem struct {
 
 func (x *ConfigItem) Reset() {
 	*x = ConfigItem{}
-	mi := &file_admin_v1_admin_proto_msgTypes[6]
+	mi := &file_admin_v1_admin_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -344,7 +484,7 @@ func (x *ConfigItem) String() string {
 func (*ConfigItem) ProtoMessage() {}
 
 func (x *ConfigItem) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[6]
+	mi := &file_admin_v1_admin_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -357,7 +497,7 @@ func (x *ConfigItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigItem.ProtoReflect.Descriptor instead.
 func (*ConfigItem) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{6}
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ConfigItem) GetKey() string {
@@ -412,7 +552,7 @@ type UpdateConfigRequest struct {
 
 func (x *UpdateConfigRequest) Reset() {
 	*x = UpdateConfigRequest{}
-	mi := &file_admin_v1_admin_proto_msgTypes[7]
+	mi := &file_admin_v1_admin_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -424,7 +564,7 @@ func (x *UpdateConfigRequest) String() string {
 func (*UpdateConfigRequest) ProtoMessage() {}
 
 func (x *UpdateConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[7]
+	mi := &file_admin_v1_admin_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -437,7 +577,7 @@ func (x *UpdateConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateConfigRequest.ProtoReflect.Descriptor instead.
 func (*UpdateConfigRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{7}
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UpdateConfigRequest) GetKey() string {
@@ -465,7 +605,7 @@ type UpdateConfigResponse struct {
 
 func (x *UpdateConfigResponse) Reset() {
 	*x = UpdateConfigResponse{}
-	mi := &file_admin_v1_admin_proto_msgTypes[8]
+	mi := &file_admin_v1_admin_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -477,7 +617,7 @@ func (x *UpdateConfigResponse) String() string {
 func (*UpdateConfigResponse) ProtoMessage() {}
 
 func (x *UpdateConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[8]
+	mi := &file_admin_v1_admin_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -490,7 +630,7 @@ func (x *UpdateConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateConfigResponse.ProtoReflect.Descriptor instead.
 func (*UpdateConfigResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{8}
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UpdateConfigResponse) GetKey() string {
@@ -514,13 +654,73 @@ func (x *UpdateConfigResponse) GetSuccess() bool {
 	return false
 }
 
+type GetRuntimeConfigResponse struct {
+	state            protoimpl.MessageState `protogen:"open.v1"`
+	AppRequireAuth   bool                   `protobuf:"varint,1,opt,name=app_require_auth,json=appRequireAuth,proto3" json:"app_require_auth,omitempty"`
+	ArenaRequireAuth bool                   `protobuf:"varint,2,opt,name=arena_require_auth,json=arenaRequireAuth,proto3" json:"arena_require_auth,omitempty"`
+	unknownFields    protoimpl.UnknownFields
+	sizeCache        protoimpl.SizeCache
+}
+
+func (x *GetRuntimeConfigResponse) Reset() {
+	*x = GetRuntimeConfigResponse{}
+	mi := &file_admin_v1_admin_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetRuntimeConfigResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetRuntimeConfigResponse) ProtoMessage() {}
+
+func (x *GetRuntimeConfigResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_admin_v1_admin_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetRuntimeConfigResponse.ProtoReflect.Descriptor instead.
+func (*GetRuntimeConfigResponse) Descriptor() ([]byte, []int) {
+	return file_admin_v1_admin_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *GetRuntimeConfigResponse) GetAppRequireAuth() bool {
+	if x != nil {
+		return x.AppRequireAuth
+	}
+	return false
+}
+
+func (x *GetRuntimeConfigResponse) GetArenaRequireAuth() bool {
+	if x != nil {
+		return x.ArenaRequireAuth
+	}
+	return false
+}
+
 var File_admin_v1_admin_proto protoreflect.FileDescriptor
 
 const file_admin_v1_admin_proto_rawDesc = "" +
 	"\n" +
 	"\x14admin/v1/admin.proto\x12\badmin.v1\x1a\x1cgoogle/api/annotations.proto\",\n" +
 	"\x11DeleteUserRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"-\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\"P\n" +
+	"\x16UpdateUserTrustRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"is_trusted\x18\x02 \x01(\bR\tisTrusted\"L\n" +
+	"\x16UpdateUserAdminRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x19\n" +
+	"\bis_admin\x18\x02 \x01(\bR\aisAdmin\"\x19\n" +
+	"\x17GetRuntimeConfigRequest\"-\n" +
 	"\x13AdminStatusResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\tR\x06status\"$\n" +
 	"\x10GetConfigRequest\x12\x10\n" +
@@ -549,14 +749,20 @@ const file_admin_v1_admin_proto_rawDesc = "" +
 	"\x14UpdateConfigResponse\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value\x12\x18\n" +
-	"\asuccess\x18\x03 \x01(\bR\asuccess2\xba\x03\n" +
+	"\asuccess\x18\x03 \x01(\bR\asuccess\"r\n" +
+	"\x18GetRuntimeConfigResponse\x12(\n" +
+	"\x10app_require_auth\x18\x01 \x01(\bR\x0eappRequireAuth\x12,\n" +
+	"\x12arena_require_auth\x18\x02 \x01(\bR\x10arenaRequireAuth2\xbb\x06\n" +
 	"\fAdminService\x12l\n" +
 	"\n" +
-	"DeleteUser\x12\x1b.admin.v1.DeleteUserRequest\x1a\x1d.admin.v1.AdminStatusResponse\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/api/admin/users/{user_id}\x12e\n" +
+	"DeleteUser\x12\x1b.admin.v1.DeleteUserRequest\x1a\x1d.admin.v1.AdminStatusResponse\"\"\x82\xd3\xe4\x93\x02\x1c*\x1a/api/admin/users/{user_id}\x12\x7f\n" +
+	"\x0fUpdateUserTrust\x12 .admin.v1.UpdateUserTrustRequest\x1a\x1d.admin.v1.AdminStatusResponse\"+\x82\xd3\xe4\x93\x02%:\x01*2 /api/admin/users/{user_id}/trust\x12\x7f\n" +
+	"\x0fUpdateUserAdmin\x12 .admin.v1.UpdateUserAdminRequest\x1a\x1d.admin.v1.AdminStatusResponse\"+\x82\xd3\xe4\x93\x02%:\x01*2 /api/admin/users/{user_id}/admin\x12e\n" +
 	"\tGetConfig\x12\x1a.admin.v1.GetConfigRequest\x1a\x1b.admin.v1.GetConfigResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/admin/config/{key}\x12b\n" +
 	"\n" +
 	"ListConfig\x12\x1b.admin.v1.ListConfigRequest\x1a\x1c.admin.v1.ListConfigResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/admin/config\x12q\n" +
-	"\fUpdateConfig\x12\x1d.admin.v1.UpdateConfigRequest\x1a\x1e.admin.v1.UpdateConfigResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/admin/config/{key}B\x19Z\x17api/pkg/api/admin/v1;v1b\x06proto3"
+	"\fUpdateConfig\x12\x1d.admin.v1.UpdateConfigRequest\x1a\x1e.admin.v1.UpdateConfigResponse\"\"\x82\xd3\xe4\x93\x02\x1c:\x01*\x1a\x17/api/admin/config/{key}\x12}\n" +
+	"\x10GetRuntimeConfig\x12!.admin.v1.GetRuntimeConfigRequest\x1a\".admin.v1.GetRuntimeConfigResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/public/runtime-configB\x19Z\x17api/pkg/api/admin/v1;v1b\x06proto3"
 
 var (
 	file_admin_v1_admin_proto_rawDescOnce sync.Once
@@ -570,33 +776,43 @@ func file_admin_v1_admin_proto_rawDescGZIP() []byte {
 	return file_admin_v1_admin_proto_rawDescData
 }
 
-var file_admin_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_admin_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
 var file_admin_v1_admin_proto_goTypes = []any{
-	(*DeleteUserRequest)(nil),    // 0: admin.v1.DeleteUserRequest
-	(*AdminStatusResponse)(nil),  // 1: admin.v1.AdminStatusResponse
-	(*GetConfigRequest)(nil),     // 2: admin.v1.GetConfigRequest
-	(*GetConfigResponse)(nil),    // 3: admin.v1.GetConfigResponse
-	(*ListConfigRequest)(nil),    // 4: admin.v1.ListConfigRequest
-	(*ListConfigResponse)(nil),   // 5: admin.v1.ListConfigResponse
-	(*ConfigItem)(nil),           // 6: admin.v1.ConfigItem
-	(*UpdateConfigRequest)(nil),  // 7: admin.v1.UpdateConfigRequest
-	(*UpdateConfigResponse)(nil), // 8: admin.v1.UpdateConfigResponse
+	(*DeleteUserRequest)(nil),        // 0: admin.v1.DeleteUserRequest
+	(*UpdateUserTrustRequest)(nil),   // 1: admin.v1.UpdateUserTrustRequest
+	(*UpdateUserAdminRequest)(nil),   // 2: admin.v1.UpdateUserAdminRequest
+	(*GetRuntimeConfigRequest)(nil),  // 3: admin.v1.GetRuntimeConfigRequest
+	(*AdminStatusResponse)(nil),      // 4: admin.v1.AdminStatusResponse
+	(*GetConfigRequest)(nil),         // 5: admin.v1.GetConfigRequest
+	(*GetConfigResponse)(nil),        // 6: admin.v1.GetConfigResponse
+	(*ListConfigRequest)(nil),        // 7: admin.v1.ListConfigRequest
+	(*ListConfigResponse)(nil),       // 8: admin.v1.ListConfigResponse
+	(*ConfigItem)(nil),               // 9: admin.v1.ConfigItem
+	(*UpdateConfigRequest)(nil),      // 10: admin.v1.UpdateConfigRequest
+	(*UpdateConfigResponse)(nil),     // 11: admin.v1.UpdateConfigResponse
+	(*GetRuntimeConfigResponse)(nil), // 12: admin.v1.GetRuntimeConfigResponse
 }
 var file_admin_v1_admin_proto_depIdxs = []int32{
-	6, // 0: admin.v1.ListConfigResponse.configs:type_name -> admin.v1.ConfigItem
-	0, // 1: admin.v1.AdminService.DeleteUser:input_type -> admin.v1.DeleteUserRequest
-	2, // 2: admin.v1.AdminService.GetConfig:input_type -> admin.v1.GetConfigRequest
-	4, // 3: admin.v1.AdminService.ListConfig:input_type -> admin.v1.ListConfigRequest
-	7, // 4: admin.v1.AdminService.UpdateConfig:input_type -> admin.v1.UpdateConfigRequest
-	1, // 5: admin.v1.AdminService.DeleteUser:output_type -> admin.v1.AdminStatusResponse
-	3, // 6: admin.v1.AdminService.GetConfig:output_type -> admin.v1.GetConfigResponse
-	5, // 7: admin.v1.AdminService.ListConfig:output_type -> admin.v1.ListConfigResponse
-	8, // 8: admin.v1.AdminService.UpdateConfig:output_type -> admin.v1.UpdateConfigResponse
-	5, // [5:9] is the sub-list for method output_type
-	1, // [1:5] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	9,  // 0: admin.v1.ListConfigResponse.configs:type_name -> admin.v1.ConfigItem
+	0,  // 1: admin.v1.AdminService.DeleteUser:input_type -> admin.v1.DeleteUserRequest
+	1,  // 2: admin.v1.AdminService.UpdateUserTrust:input_type -> admin.v1.UpdateUserTrustRequest
+	2,  // 3: admin.v1.AdminService.UpdateUserAdmin:input_type -> admin.v1.UpdateUserAdminRequest
+	5,  // 4: admin.v1.AdminService.GetConfig:input_type -> admin.v1.GetConfigRequest
+	7,  // 5: admin.v1.AdminService.ListConfig:input_type -> admin.v1.ListConfigRequest
+	10, // 6: admin.v1.AdminService.UpdateConfig:input_type -> admin.v1.UpdateConfigRequest
+	3,  // 7: admin.v1.AdminService.GetRuntimeConfig:input_type -> admin.v1.GetRuntimeConfigRequest
+	4,  // 8: admin.v1.AdminService.DeleteUser:output_type -> admin.v1.AdminStatusResponse
+	4,  // 9: admin.v1.AdminService.UpdateUserTrust:output_type -> admin.v1.AdminStatusResponse
+	4,  // 10: admin.v1.AdminService.UpdateUserAdmin:output_type -> admin.v1.AdminStatusResponse
+	6,  // 11: admin.v1.AdminService.GetConfig:output_type -> admin.v1.GetConfigResponse
+	8,  // 12: admin.v1.AdminService.ListConfig:output_type -> admin.v1.ListConfigResponse
+	11, // 13: admin.v1.AdminService.UpdateConfig:output_type -> admin.v1.UpdateConfigResponse
+	12, // 14: admin.v1.AdminService.GetRuntimeConfig:output_type -> admin.v1.GetRuntimeConfigResponse
+	8,  // [8:15] is the sub-list for method output_type
+	1,  // [1:8] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_admin_v1_admin_proto_init() }
@@ -610,7 +826,7 @@ func file_admin_v1_admin_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_admin_proto_rawDesc), len(file_admin_v1_admin_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

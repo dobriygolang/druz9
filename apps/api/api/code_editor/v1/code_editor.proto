@@ -99,6 +99,24 @@ service CodeEditorService {
       get: "/api/v1/code-editor/rooms"
     };
   }
+
+  rpc AIReview(AIReviewRequest) returns (AIReviewResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/code-editor/ai-review"
+      body: "*"
+    };
+  }
+
+  rpc GetDailyChallenge(GetDailyChallengeRequest) returns (GetDailyChallengeResponse) {
+    option (google.api.http) = { get: "/api/v1/code-editor/daily" };
+  }
+
+  rpc StartRoom(StartRoomRequest) returns (StartRoomResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/code-editor/rooms/{room_id}/start"
+      body: "*"
+    };
+  }
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────
@@ -227,6 +245,44 @@ message ListRoomsRequest {}
 
 message ListRoomsResponse {
   repeated Room rooms = 1;
+}
+
+message AIReviewRequest {
+  string language   = 1;
+  string code       = 2;
+  string task_title = 3;
+  string statement  = 4;
+}
+
+message InterviewSolutionReview {
+  string          provider            = 1;
+  string          model               = 2;
+  int32           score               = 3;
+  string          summary             = 4;
+  repeated string strengths           = 5;
+  repeated string issues              = 6;
+  repeated string follow_up_questions = 7;
+}
+
+message AIReviewResponse {
+  InterviewSolutionReview review = 1;
+}
+
+message GetDailyChallengeRequest {}
+
+message GetDailyChallengeResponse {
+  Task   task       = 1;
+  string date       = 2;
+  string expires_at = 3;
+}
+
+message StartRoomRequest {
+  string room_id = 1;
+}
+
+message StartRoomResponse {
+  string status      = 1;
+  string room_status = 2;
 }
 
 // ── Response messages ──────────────────────────────────────────────────────

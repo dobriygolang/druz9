@@ -112,9 +112,9 @@ type Service_InviteToCircle_Call struct {
 
 // InviteToCircle is a helper method to define mock.On call
 //   - _a0 context.Context
-//   - _a1 uuid.UUID (circleID)
-//   - _a2 uuid.UUID (inviterID)
-//   - _a3 uuid.UUID (inviteeID)
+//   - _a1 uuid.UUID
+//   - _a2 uuid.UUID
+//   - _a3 uuid.UUID
 func (_e *Service_Expecter) InviteToCircle(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}) *Service_InviteToCircle_Call {
 	return &Service_InviteToCircle_Call{Call: _e.mock.On("InviteToCircle", _a0, _a1, _a2, _a3)}
 }
@@ -132,6 +132,64 @@ func (_c *Service_InviteToCircle_Call) Return(_a0 error) *Service_InviteToCircle
 }
 
 func (_c *Service_InviteToCircle_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) error) *Service_InviteToCircle_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// IsMember provides a mock function with given fields: _a0, _a1, _a2
+func (_m *Service) IsMember(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (bool, error) {
+	ret := _m.Called(_a0, _a1, _a2)
+
+	if len(ret) == 0 {
+		panic("no return value specified for IsMember")
+	}
+
+	var r0 bool
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (bool, error)); ok {
+		return rf(_a0, _a1, _a2)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) bool); ok {
+		r0 = rf(_a0, _a1, _a2)
+	} else {
+		r0 = ret.Get(0).(bool)
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r1 = rf(_a0, _a1, _a2)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_IsMember_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'IsMember'
+type Service_IsMember_Call struct {
+	*mock.Call
+}
+
+// IsMember is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 uuid.UUID
+//   - _a2 uuid.UUID
+func (_e *Service_Expecter) IsMember(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_IsMember_Call {
+	return &Service_IsMember_Call{Call: _e.mock.On("IsMember", _a0, _a1, _a2)}
+}
+
+func (_c *Service_IsMember_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_IsMember_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_IsMember_Call) Return(_a0 bool, _a1 error) *Service_IsMember_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_IsMember_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID) (bool, error)) *Service_IsMember_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -228,6 +286,66 @@ func (_c *Service_LeaveCircle_Call) Return(_a0 error) *Service_LeaveCircle_Call 
 }
 
 func (_c *Service_LeaveCircle_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID) error) *Service_LeaveCircle_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// ListCircleMembers provides a mock function with given fields: _a0, _a1, _a2
+func (_m *Service) ListCircleMembers(_a0 context.Context, _a1 uuid.UUID, _a2 int32) ([]*model.CircleMemberProfile, error) {
+	ret := _m.Called(_a0, _a1, _a2)
+
+	if len(ret) == 0 {
+		panic("no return value specified for ListCircleMembers")
+	}
+
+	var r0 []*model.CircleMemberProfile
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, int32) ([]*model.CircleMemberProfile, error)); ok {
+		return rf(_a0, _a1, _a2)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, int32) []*model.CircleMemberProfile); ok {
+		r0 = rf(_a0, _a1, _a2)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.CircleMemberProfile)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, int32) error); ok {
+		r1 = rf(_a0, _a1, _a2)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_ListCircleMembers_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ListCircleMembers'
+type Service_ListCircleMembers_Call struct {
+	*mock.Call
+}
+
+// ListCircleMembers is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 uuid.UUID
+//   - _a2 int32
+func (_e *Service_Expecter) ListCircleMembers(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_ListCircleMembers_Call {
+	return &Service_ListCircleMembers_Call{Call: _e.mock.On("ListCircleMembers", _a0, _a1, _a2)}
+}
+
+func (_c *Service_ListCircleMembers_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 int32)) *Service_ListCircleMembers_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(int32))
+	})
+	return _c
+}
+
+func (_c *Service_ListCircleMembers_Call) Return(_a0 []*model.CircleMemberProfile, _a1 error) *Service_ListCircleMembers_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_ListCircleMembers_Call) RunAndReturn(run func(context.Context, uuid.UUID, int32) ([]*model.CircleMemberProfile, error)) *Service_ListCircleMembers_Call {
 	_c.Call.Return(run)
 	return _c
 }

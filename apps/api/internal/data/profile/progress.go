@@ -63,11 +63,18 @@ func (r *Repo) GetProfileProgress(ctx context.Context, userID uuid.UUID) (*model
 	}
 	progress.Checkpoints = checkpoints
 
-	companies, err := r.loadProfileProgressCompanies(ctx, userID)
+	mockSessions, err := r.loadProfileProgressMockSessions(ctx, userID)
 	if err != nil {
 		return nil, err
 	}
-	progress.Companies = companies
+	progress.MockSessions = mockSessions
+	seen := make(map[string]struct{}, len(mockSessions))
+	for _, s := range mockSessions {
+		if _, ok := seen[s.CompanyTag]; !ok {
+			seen[s.CompanyTag] = struct{}{}
+			progress.Companies = append(progress.Companies, s.CompanyTag)
+		}
+	}
 
 	streakDays, err := r.loadProfileProgressStreak(ctx, userID, time.Now().UTC())
 	if err != nil {
@@ -263,28 +270,40 @@ func (r *Repo) loadProfileCompetencies(ctx context.Context, userID uuid.UUID) ([
 	return items, nil
 }
 
-func (r *Repo) loadProfileProgressCompanies(ctx context.Context, userID uuid.UUID) ([]string, error) {
+func (r *Repo) loadProfileProgressMockSessions(ctx context.Context, userID uuid.UUID) ([]*model.ProfileMockSession, error) {
 	rows, err := r.data.DB.Query(ctx, `
-		SELECT DISTINCT NULLIF(BTRIM(ms.company_tag), '')
+		SELECT
+			ms.id::text,
+			BTRIM(ms.company_tag)                                           AS company_tag,
+			ms.status,
+			ms.current_stage_index,
+			COUNT(mst.id)                                                   AS total_stages,
+			COALESCE((
+				SELECT mst2.kind
+				FROM interview_prep_mock_stages mst2
+				WHERE mst2.session_id = ms.id
+				ORDER BY mst2.created_at ASC
+				LIMIT 1 OFFSET ms.current_stage_index
+			), '')                                                          AS current_stage_kind
 		FROM interview_prep_mock_sessions ms
+		LEFT JOIN interview_prep_mock_stages mst ON mst.session_id = ms.id
 		WHERE ms.user_id = $1
 		  AND NULLIF(BTRIM(ms.company_tag), '') IS NOT NULL
-		ORDER BY 1 ASC
+		GROUP BY ms.id, ms.company_tag, ms.status, ms.current_stage_index
+		ORDER BY ms.created_at DESC
 	`, userID)
 	if err != nil {
-		return nil, fmt.Errorf("query profile companies: %w", err)
+		return nil, fmt.Errorf("query profile mock sessions: %w", err)
 	}
 	defer rows.Close()
 
-	items := make([]string, 0, 4)
+	items := make([]*model.ProfileMockSession, 0, 8)
 	for rows.Next() {
-		var company string
-		if err := rows.Scan(&company); err != nil {
-			return nil, fmt.Errorf("scan profile company: %w", err)
+		var s model.ProfileMockSession
+		if err := rows.Scan(&s.ID, &s.CompanyTag, &s.Status, &s.CurrentStageIndex, &s.TotalStages, &s.CurrentStageKind); err != nil {
+			return nil, fmt.Errorf("scan profile mock session: %w", err)
 		}
-		if company != "" {
-			items = append(items, company)
-		}
+		items = append(items, &s)
 	}
 	return items, rows.Err()
 }

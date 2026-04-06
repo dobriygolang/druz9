@@ -21,22 +21,31 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationAdminServiceDeleteUser = "/admin.v1.AdminService/DeleteUser"
 const OperationAdminServiceGetConfig = "/admin.v1.AdminService/GetConfig"
+const OperationAdminServiceGetRuntimeConfig = "/admin.v1.AdminService/GetRuntimeConfig"
 const OperationAdminServiceListConfig = "/admin.v1.AdminService/ListConfig"
 const OperationAdminServiceUpdateConfig = "/admin.v1.AdminService/UpdateConfig"
+const OperationAdminServiceUpdateUserAdmin = "/admin.v1.AdminService/UpdateUserAdmin"
+const OperationAdminServiceUpdateUserTrust = "/admin.v1.AdminService/UpdateUserTrust"
 
 type AdminServiceHTTPServer interface {
 	DeleteUser(context.Context, *DeleteUserRequest) (*AdminStatusResponse, error)
 	GetConfig(context.Context, *GetConfigRequest) (*GetConfigResponse, error)
+	GetRuntimeConfig(context.Context, *GetRuntimeConfigRequest) (*GetRuntimeConfigResponse, error)
 	ListConfig(context.Context, *ListConfigRequest) (*ListConfigResponse, error)
 	UpdateConfig(context.Context, *UpdateConfigRequest) (*UpdateConfigResponse, error)
+	UpdateUserAdmin(context.Context, *UpdateUserAdminRequest) (*AdminStatusResponse, error)
+	UpdateUserTrust(context.Context, *UpdateUserTrustRequest) (*AdminStatusResponse, error)
 }
 
 func RegisterAdminServiceHTTPServer(s *http.Server, srv AdminServiceHTTPServer) {
 	r := s.Route("/")
 	r.DELETE("/api/admin/users/{user_id}", _AdminService_DeleteUser0_HTTP_Handler(srv))
+	r.PATCH("/api/admin/users/{user_id}/trust", _AdminService_UpdateUserTrust0_HTTP_Handler(srv))
+	r.PATCH("/api/admin/users/{user_id}/admin", _AdminService_UpdateUserAdmin0_HTTP_Handler(srv))
 	r.GET("/api/admin/config/{key}", _AdminService_GetConfig0_HTTP_Handler(srv))
 	r.GET("/api/admin/config", _AdminService_ListConfig0_HTTP_Handler(srv))
 	r.PUT("/api/admin/config/{key}", _AdminService_UpdateConfig0_HTTP_Handler(srv))
+	r.GET("/api/public/runtime-config", _AdminService_GetRuntimeConfig0_HTTP_Handler(srv))
 }
 
 func _AdminService_DeleteUser0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
@@ -51,6 +60,56 @@ func _AdminService_DeleteUser0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx
 		http.SetOperation(ctx, OperationAdminServiceDeleteUser)
 		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
 			return srv.DeleteUser(ctx, req.(*DeleteUserRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AdminService_UpdateUserTrust0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateUserTrustRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceUpdateUserTrust)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateUserTrust(ctx, req.(*UpdateUserTrustRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _AdminService_UpdateUserAdmin0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateUserAdminRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceUpdateUserAdmin)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateUserAdmin(ctx, req.(*UpdateUserAdminRequest))
 		})
 		out, err := h(ctx, &in)
 		if err != nil {
@@ -127,11 +186,33 @@ func _AdminService_UpdateConfig0_HTTP_Handler(srv AdminServiceHTTPServer) func(c
 	}
 }
 
+func _AdminService_GetRuntimeConfig0_HTTP_Handler(srv AdminServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetRuntimeConfigRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationAdminServiceGetRuntimeConfig)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetRuntimeConfig(ctx, req.(*GetRuntimeConfigRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetRuntimeConfigResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type AdminServiceHTTPClient interface {
 	DeleteUser(ctx context.Context, req *DeleteUserRequest, opts ...http.CallOption) (rsp *AdminStatusResponse, err error)
 	GetConfig(ctx context.Context, req *GetConfigRequest, opts ...http.CallOption) (rsp *GetConfigResponse, err error)
+	GetRuntimeConfig(ctx context.Context, req *GetRuntimeConfigRequest, opts ...http.CallOption) (rsp *GetRuntimeConfigResponse, err error)
 	ListConfig(ctx context.Context, req *ListConfigRequest, opts ...http.CallOption) (rsp *ListConfigResponse, err error)
 	UpdateConfig(ctx context.Context, req *UpdateConfigRequest, opts ...http.CallOption) (rsp *UpdateConfigResponse, err error)
+	UpdateUserAdmin(ctx context.Context, req *UpdateUserAdminRequest, opts ...http.CallOption) (rsp *AdminStatusResponse, err error)
+	UpdateUserTrust(ctx context.Context, req *UpdateUserTrustRequest, opts ...http.CallOption) (rsp *AdminStatusResponse, err error)
 }
 
 type AdminServiceHTTPClientImpl struct {
@@ -168,6 +249,19 @@ func (c *AdminServiceHTTPClientImpl) GetConfig(ctx context.Context, in *GetConfi
 	return &out, nil
 }
 
+func (c *AdminServiceHTTPClientImpl) GetRuntimeConfig(ctx context.Context, in *GetRuntimeConfigRequest, opts ...http.CallOption) (*GetRuntimeConfigResponse, error) {
+	var out GetRuntimeConfigResponse
+	pattern := "/api/public/runtime-config"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationAdminServiceGetRuntimeConfig))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *AdminServiceHTTPClientImpl) ListConfig(ctx context.Context, in *ListConfigRequest, opts ...http.CallOption) (*ListConfigResponse, error) {
 	var out ListConfigResponse
 	pattern := "/api/admin/config"
@@ -188,6 +282,32 @@ func (c *AdminServiceHTTPClientImpl) UpdateConfig(ctx context.Context, in *Updat
 	opts = append(opts, http.Operation(OperationAdminServiceUpdateConfig))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AdminServiceHTTPClientImpl) UpdateUserAdmin(ctx context.Context, in *UpdateUserAdminRequest, opts ...http.CallOption) (*AdminStatusResponse, error) {
+	var out AdminStatusResponse
+	pattern := "/api/admin/users/{user_id}/admin"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAdminServiceUpdateUserAdmin))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *AdminServiceHTTPClientImpl) UpdateUserTrust(ctx context.Context, in *UpdateUserTrustRequest, opts ...http.CallOption) (*AdminStatusResponse, error) {
+	var out AdminStatusResponse
+	pattern := "/api/admin/users/{user_id}/trust"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationAdminServiceUpdateUserTrust))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PATCH", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

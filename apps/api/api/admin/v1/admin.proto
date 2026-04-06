@@ -10,6 +10,12 @@ service AdminService {
   rpc DeleteUser(DeleteUserRequest) returns (AdminStatusResponse) {
     option (google.api.http) = { delete: "/api/admin/users/{user_id}" };
   }
+  rpc UpdateUserTrust(UpdateUserTrustRequest) returns (AdminStatusResponse) {
+    option (google.api.http) = { patch: "/api/admin/users/{user_id}/trust", body: "*" };
+  }
+  rpc UpdateUserAdmin(UpdateUserAdminRequest) returns (AdminStatusResponse) {
+    option (google.api.http) = { patch: "/api/admin/users/{user_id}/admin", body: "*" };
+  }
   rpc GetConfig(GetConfigRequest) returns (GetConfigResponse) {
     option (google.api.http) = { get: "/api/admin/config/{key}" };
   }
@@ -19,11 +25,26 @@ service AdminService {
   rpc UpdateConfig(UpdateConfigRequest) returns (UpdateConfigResponse) {
     option (google.api.http) = { put: "/api/admin/config/{key}", body: "*" };
   }
+  rpc GetRuntimeConfig(GetRuntimeConfigRequest) returns (GetRuntimeConfigResponse) {
+    option (google.api.http) = { get: "/api/public/runtime-config" };
+  }
 }
 
 message DeleteUserRequest {
   string user_id = 1;
 }
+
+message UpdateUserTrustRequest {
+  string user_id   = 1;
+  bool   is_trusted = 2;
+}
+
+message UpdateUserAdminRequest {
+  string user_id  = 1;
+  bool   is_admin = 2;
+}
+
+message GetRuntimeConfigRequest {}
 
 message AdminStatusResponse {
   string status = 1;
@@ -66,4 +87,9 @@ message UpdateConfigResponse {
   string key = 1;
   string value = 2;
   bool success = 3;
+}
+
+message GetRuntimeConfigResponse {
+  bool app_require_auth   = 1;
+  bool arena_require_auth = 2;
 }

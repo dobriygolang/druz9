@@ -31,6 +31,7 @@ export interface CreateCirclePayload {
   name: string
   description?: string
   tags?: string[]
+  isPublic?: boolean
 }
 
 export interface CircleMember {
@@ -68,8 +69,13 @@ export const circleApi = {
       name: payload.name,
       description: payload.description ?? '',
       tags: payload.tags ?? [],
+      isPublic: payload.isPublic ?? true,
     })
     return normalizeCircle(r.data.circle)
+  },
+
+  inviteMember: async (circleId: string, userId: string): Promise<void> => {
+    await apiClient.post(`/api/v1/circles/${circleId}/invite`, { userId })
   },
 
   joinCircle: async (circleId: string): Promise<void> => {

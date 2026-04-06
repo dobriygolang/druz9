@@ -19,11 +19,14 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CircleService_ListCircles_FullMethodName    = "/circle.v1.CircleService/ListCircles"
-	CircleService_CreateCircle_FullMethodName   = "/circle.v1.CircleService/CreateCircle"
-	CircleService_JoinCircle_FullMethodName     = "/circle.v1.CircleService/JoinCircle"
-	CircleService_LeaveCircle_FullMethodName    = "/circle.v1.CircleService/LeaveCircle"
-	CircleService_InviteToCircle_FullMethodName = "/circle.v1.CircleService/InviteToCircle"
+	CircleService_ListCircles_FullMethodName       = "/circle.v1.CircleService/ListCircles"
+	CircleService_CreateCircle_FullMethodName      = "/circle.v1.CircleService/CreateCircle"
+	CircleService_JoinCircle_FullMethodName        = "/circle.v1.CircleService/JoinCircle"
+	CircleService_LeaveCircle_FullMethodName       = "/circle.v1.CircleService/LeaveCircle"
+	CircleService_InviteToCircle_FullMethodName    = "/circle.v1.CircleService/InviteToCircle"
+	CircleService_ListCircleMembers_FullMethodName = "/circle.v1.CircleService/ListCircleMembers"
+	CircleService_ListCircleEvents_FullMethodName  = "/circle.v1.CircleService/ListCircleEvents"
+	CircleService_CreateCircleEvent_FullMethodName = "/circle.v1.CircleService/CreateCircleEvent"
 )
 
 // CircleServiceClient is the client API for CircleService service.
@@ -35,6 +38,9 @@ type CircleServiceClient interface {
 	JoinCircle(ctx context.Context, in *JoinCircleRequest, opts ...grpc.CallOption) (*JoinCircleResponse, error)
 	LeaveCircle(ctx context.Context, in *LeaveCircleRequest, opts ...grpc.CallOption) (*LeaveCircleResponse, error)
 	InviteToCircle(ctx context.Context, in *InviteToCircleRequest, opts ...grpc.CallOption) (*InviteToCircleResponse, error)
+	ListCircleMembers(ctx context.Context, in *ListCircleMembersRequest, opts ...grpc.CallOption) (*ListCircleMembersResponse, error)
+	ListCircleEvents(ctx context.Context, in *ListCircleEventsRequest, opts ...grpc.CallOption) (*ListCircleEventsResponse, error)
+	CreateCircleEvent(ctx context.Context, in *CreateCircleEventRequest, opts ...grpc.CallOption) (*CreateCircleEventResponse, error)
 }
 
 type circleServiceClient struct {
@@ -95,6 +101,36 @@ func (c *circleServiceClient) InviteToCircle(ctx context.Context, in *InviteToCi
 	return out, nil
 }
 
+func (c *circleServiceClient) ListCircleMembers(ctx context.Context, in *ListCircleMembersRequest, opts ...grpc.CallOption) (*ListCircleMembersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCircleMembersResponse)
+	err := c.cc.Invoke(ctx, CircleService_ListCircleMembers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *circleServiceClient) ListCircleEvents(ctx context.Context, in *ListCircleEventsRequest, opts ...grpc.CallOption) (*ListCircleEventsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCircleEventsResponse)
+	err := c.cc.Invoke(ctx, CircleService_ListCircleEvents_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *circleServiceClient) CreateCircleEvent(ctx context.Context, in *CreateCircleEventRequest, opts ...grpc.CallOption) (*CreateCircleEventResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateCircleEventResponse)
+	err := c.cc.Invoke(ctx, CircleService_CreateCircleEvent_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CircleServiceServer is the server API for CircleService service.
 // All implementations must embed UnimplementedCircleServiceServer
 // for forward compatibility.
@@ -104,6 +140,9 @@ type CircleServiceServer interface {
 	JoinCircle(context.Context, *JoinCircleRequest) (*JoinCircleResponse, error)
 	LeaveCircle(context.Context, *LeaveCircleRequest) (*LeaveCircleResponse, error)
 	InviteToCircle(context.Context, *InviteToCircleRequest) (*InviteToCircleResponse, error)
+	ListCircleMembers(context.Context, *ListCircleMembersRequest) (*ListCircleMembersResponse, error)
+	ListCircleEvents(context.Context, *ListCircleEventsRequest) (*ListCircleEventsResponse, error)
+	CreateCircleEvent(context.Context, *CreateCircleEventRequest) (*CreateCircleEventResponse, error)
 	mustEmbedUnimplementedCircleServiceServer()
 }
 
@@ -128,6 +167,15 @@ func (UnimplementedCircleServiceServer) LeaveCircle(context.Context, *LeaveCircl
 }
 func (UnimplementedCircleServiceServer) InviteToCircle(context.Context, *InviteToCircleRequest) (*InviteToCircleResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method InviteToCircle not implemented")
+}
+func (UnimplementedCircleServiceServer) ListCircleMembers(context.Context, *ListCircleMembersRequest) (*ListCircleMembersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListCircleMembers not implemented")
+}
+func (UnimplementedCircleServiceServer) ListCircleEvents(context.Context, *ListCircleEventsRequest) (*ListCircleEventsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListCircleEvents not implemented")
+}
+func (UnimplementedCircleServiceServer) CreateCircleEvent(context.Context, *CreateCircleEventRequest) (*CreateCircleEventResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateCircleEvent not implemented")
 }
 func (UnimplementedCircleServiceServer) mustEmbedUnimplementedCircleServiceServer() {}
 func (UnimplementedCircleServiceServer) testEmbeddedByValue()                       {}
@@ -240,6 +288,60 @@ func _CircleService_InviteToCircle_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CircleService_ListCircleMembers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCircleMembersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CircleServiceServer).ListCircleMembers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CircleService_ListCircleMembers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CircleServiceServer).ListCircleMembers(ctx, req.(*ListCircleMembersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CircleService_ListCircleEvents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCircleEventsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CircleServiceServer).ListCircleEvents(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CircleService_ListCircleEvents_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CircleServiceServer).ListCircleEvents(ctx, req.(*ListCircleEventsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CircleService_CreateCircleEvent_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCircleEventRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CircleServiceServer).CreateCircleEvent(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CircleService_CreateCircleEvent_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CircleServiceServer).CreateCircleEvent(ctx, req.(*CreateCircleEventRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CircleService_ServiceDesc is the grpc.ServiceDesc for CircleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -266,6 +368,18 @@ var CircleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "InviteToCircle",
 			Handler:    _CircleService_InviteToCircle_Handler,
+		},
+		{
+			MethodName: "ListCircleMembers",
+			Handler:    _CircleService_ListCircleMembers_Handler,
+		},
+		{
+			MethodName: "ListCircleEvents",
+			Handler:    _CircleService_ListCircleEvents_Handler,
+		},
+		{
+			MethodName: "CreateCircleEvent",
+			Handler:    _CircleService_CreateCircleEvent_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

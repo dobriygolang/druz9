@@ -31,3 +31,8 @@ type SessionCookieManager interface {
 	SetSessionCookie(context.Context, string, time.Time)
 	ClearSessionCookie(context.Context)
 }
+
+// ProgressRepository retrieves profile progress data.
+type ProgressRepository interface {
+	GetProfileProgress(ctx context.Context, userID uuid.UUID) (*model.ProfileProgress, error)
+}

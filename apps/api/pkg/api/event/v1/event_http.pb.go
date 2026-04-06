@@ -21,6 +21,7 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationEventServiceCreateEvent = "/event.v1.EventService/CreateEvent"
 const OperationEventServiceDeleteEvent = "/event.v1.EventService/DeleteEvent"
+const OperationEventServiceInviteToEvent = "/event.v1.EventService/InviteToEvent"
 const OperationEventServiceJoinEvent = "/event.v1.EventService/JoinEvent"
 const OperationEventServiceLeaveEvent = "/event.v1.EventService/LeaveEvent"
 const OperationEventServiceListEvents = "/event.v1.EventService/ListEvents"
@@ -29,6 +30,7 @@ const OperationEventServiceUpdateEvent = "/event.v1.EventService/UpdateEvent"
 type EventServiceHTTPServer interface {
 	CreateEvent(context.Context, *CreateEventRequest) (*EventResponse, error)
 	DeleteEvent(context.Context, *DeleteEventRequest) (*EventStatusResponse, error)
+	InviteToEvent(context.Context, *InviteToEventRequest) (*EventStatusResponse, error)
 	JoinEvent(context.Context, *JoinEventRequest) (*EventResponse, error)
 	LeaveEvent(context.Context, *LeaveEventRequest) (*EventStatusResponse, error)
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsResponse, error)
@@ -43,6 +45,7 @@ func RegisterEventServiceHTTPServer(s *http.Server, srv EventServiceHTTPServer) 
 	r.POST("/api/v1/events/{event_id}/leave", _EventService_LeaveEvent0_HTTP_Handler(srv))
 	r.PUT("/api/v1/events/{event_id}", _EventService_UpdateEvent0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/events/{event_id}", _EventService_DeleteEvent0_HTTP_Handler(srv))
+	r.POST("/api/v1/events/{event_id}/invite", _EventService_InviteToEvent0_HTTP_Handler(srv))
 }
 
 func _EventService_ListEvents0_HTTP_Handler(srv EventServiceHTTPServer) func(ctx http.Context) error {
@@ -183,9 +186,35 @@ func _EventService_DeleteEvent0_HTTP_Handler(srv EventServiceHTTPServer) func(ct
 	}
 }
 
+func _EventService_InviteToEvent0_HTTP_Handler(srv EventServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in InviteToEventRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationEventServiceInviteToEvent)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.InviteToEvent(ctx, req.(*InviteToEventRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*EventStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type EventServiceHTTPClient interface {
 	CreateEvent(ctx context.Context, req *CreateEventRequest, opts ...http.CallOption) (rsp *EventResponse, err error)
 	DeleteEvent(ctx context.Context, req *DeleteEventRequest, opts ...http.CallOption) (rsp *EventStatusResponse, err error)
+	InviteToEvent(ctx context.Context, req *InviteToEventRequest, opts ...http.CallOption) (rsp *EventStatusResponse, err error)
 	JoinEvent(ctx context.Context, req *JoinEventRequest, opts ...http.CallOption) (rsp *EventResponse, err error)
 	LeaveEvent(ctx context.Context, req *LeaveEventRequest, opts ...http.CallOption) (rsp *EventStatusResponse, err error)
 	ListEvents(ctx context.Context, req *ListEventsRequest, opts ...http.CallOption) (rsp *ListEventsResponse, err error)
@@ -220,6 +249,19 @@ func (c *EventServiceHTTPClientImpl) DeleteEvent(ctx context.Context, in *Delete
 	opts = append(opts, http.Operation(OperationEventServiceDeleteEvent))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *EventServiceHTTPClientImpl) InviteToEvent(ctx context.Context, in *InviteToEventRequest, opts ...http.CallOption) (*EventStatusResponse, error) {
+	var out EventStatusResponse
+	pattern := "/api/v1/events/{event_id}/invite"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationEventServiceInviteToEvent))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

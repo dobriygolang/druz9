@@ -3,19 +3,45 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Clock, Send, Sparkles, CheckCircle, AlertTriangle, Zap, Target } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { interviewPrepApi } from '@/features/InterviewPrep/api/interviewPrepApi'
-import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Spinner } from '@/shared/ui/Spinner'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import type * as Monaco from 'monaco-editor'
 
-type StageKind = 'coding' | 'system_design' | 'behavioral' | 'theoretical'
+// Map proto enum names → friendly keys
+const STAGE_KIND_ENUM_MAP: Record<string, string> = {
+  MOCK_STAGE_KIND_SLICES:       'slices',
+  MOCK_STAGE_KIND_CONCURRENCY:  'concurrency',
+  MOCK_STAGE_KIND_SQL:          'sql',
+  MOCK_STAGE_KIND_ARCHITECTURE: 'architecture',
+  MOCK_STAGE_KIND_SYSTEM_DESIGN:'system_design',
+}
 
-const STAGE_KIND_LABELS: Record<StageKind, string> = {
-  coding: 'Кодирование',
-  system_design: 'System Design',
-  behavioral: 'Поведенческий',
-  theoretical: 'Теоретический',
+function normalizeKind(raw: string | undefined): string {
+  if (!raw) return 'coding'
+  return STAGE_KIND_ENUM_MAP[raw] ?? raw
+}
+
+const STAGE_KIND_LABELS: Record<string, string> = {
+  slices:       'Go: Срезы',
+  concurrency:  'Go: Многопоточность',
+  sql:          'SQL',
+  architecture: 'Архитектура',
+  system_design:'System Design',
+  coding:       'Кодирование',
+  behavioral:   'Поведенческий',
+  theoretical:  'Теоретический',
+}
+
+// Which kinds use the code editor
+const CODE_KINDS = new Set(['slices', 'concurrency', 'sql', 'coding'])
+
+// Editor language per kind
+const KIND_LANGUAGE: Record<string, string> = {
+  slices:      'go',
+  concurrency: 'go',
+  sql:         'sql',
+  coding:      'python',
 }
 
 export function InterviewPrepMockSessionPage() {
@@ -66,7 +92,8 @@ export function InterviewPrepMockSessionPage() {
   const formatTime = (s: number) => `${Math.floor(s / 60).toString().padStart(2, '0')}:${(s % 60).toString().padStart(2, '0')}`
 
   const currentStage = session?.currentStage ?? session?.current_stage
-  const stageKind: StageKind = currentStage?.kind ?? 'coding'
+  const stageKind = normalizeKind(currentStage?.kind)
+  const editorLang = KIND_LANGUAGE[stageKind] ?? (currentStage?.task?.language ?? 'python')
   const stages: any[] = session?.stages ?? []
   const companyTag = session?.companyTag ?? session?.company_tag ?? ''
   const currentStageIndex = session?.currentStageIndex ?? session?.current_stage_index ?? 0
@@ -78,31 +105,26 @@ export function InterviewPrepMockSessionPage() {
     setReviewLoading(true)
     try {
       let result: any
-      if (stageKind === 'coding') {
-        result = await interviewPrepApi.submitMockSession(sessionId, code, 'python3')
-      } else if (stageKind === 'system_design') {
+      if (stageKind === 'system_design') {
         result = await interviewPrepApi.submitMockSystemDesignReview(sessionId, {
           notes: designNotes,
           components: designComponents,
           apis: designApis,
           databaseSchema: designSchema,
         })
+      } else if (CODE_KINDS.has(stageKind)) {
+        result = await interviewPrepApi.submitMockSession(sessionId, code, editorLang)
       } else {
-        // behavioral or theoretical
         result = await interviewPrepApi.answerMockQuestion(sessionId, textAnswer)
       }
       if (result?.review) setReview(result.review)
 
-      // Refresh session to get updated stage info
       const updated = await interviewPrepApi.getMockSession(sessionId) as any
       setSession(updated)
 
       const updatedIdx = updated?.currentStageIndex ?? updated?.current_stage_index ?? 0
       const updatedFinished = updated?.status === 'MOCK_SESSION_STATUS_FINISHED' || updated?.status === 'finished'
-      if (updatedFinished) {
-        // Stay on page and show completion
-      } else if (updatedIdx !== currentStageIndex) {
-        // Auto-advanced to next stage, reset state
+      if (!updatedFinished && updatedIdx !== currentStageIndex) {
         resetStageState(updated)
       }
     } catch {
@@ -129,11 +151,20 @@ export function InterviewPrepMockSessionPage() {
           <div>
             <p className="text-sm font-bold text-[#0f172a]">Mock Interview · {companyTag || 'General'}</p>
             <p className="text-xs text-[#666666]">
-              {isFinished ? 'Интервью завершено' : `Этап ${currentStageIndex + 1} из ${stages.length} · ${STAGE_KIND_LABELS[stageKind] ?? stageKind}`}
+              {isFinished
+                ? 'Интервью завершено'
+                : `Этап ${currentStageIndex + 1} из ${stages.length} · ${STAGE_KIND_LABELS[stageKind] ?? stageKind}`}
             </p>
           </div>
-          {!isFinished && <Badge variant="success" dot>Идёт интервью</Badge>}
-          {isFinished && <Badge variant="default">Завершено</Badge>}
+          {!isFinished && (
+            <span className="flex items-center gap-1.5 px-2 py-0.5 rounded-full bg-[#dcfce7] text-[#16a34a] text-[11px] font-medium">
+              <span className="w-1.5 h-1.5 rounded-full bg-[#22c55e] animate-pulse" />
+              Идёт
+            </span>
+          )}
+          {isFinished && (
+            <span className="px-2 py-0.5 rounded-full bg-[#F2F3F0] text-[#666666] text-[11px] font-medium">Завершено</span>
+          )}
         </div>
         <div className="flex items-center gap-2">
           {timeLeft > 0 && !isFinished && (
@@ -151,22 +182,20 @@ export function InterviewPrepMockSessionPage() {
 
       <div className="flex flex-1 min-h-0">
         {/* Left: Stage progress + problem/question */}
-        <div className="w-[350px] flex-shrink-0 bg-white border-r border-[#CBCCC9] flex flex-col">
-          {/* Stage progress bar */}
+        <div className="w-[340px] flex-shrink-0 bg-white border-r border-[#CBCCC9] flex flex-col">
+          {/* Stage progress */}
           <div className="px-4 py-3 border-b border-[#CBCCC9]">
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center gap-1.5 flex-wrap">
               {stages.map((s: any, i: number) => {
                 const isCurrent = i === currentStageIndex
-                const isDone = s.status === 'STAGE_STATUS_FINISHED' || s.status === 'finished' || s.completed === true
+                const isDone = s.status === 'MOCK_STAGE_STATUS_COMPLETED' || s.status === 'finished' || s.completed === true
+                const kind = normalizeKind(s.kind)
                 return (
                   <div key={s.id ?? i} className="flex items-center gap-1.5">
                     <div
+                      title={STAGE_KIND_LABELS[kind] ?? kind}
                       className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                        isDone
-                          ? 'bg-[#22c55e] text-white'
-                          : isCurrent
-                            ? 'bg-[#6366F1] text-white'
-                            : 'bg-[#E7E8E5] text-[#666666]'
+                        isDone ? 'bg-[#22c55e] text-white' : isCurrent ? 'bg-[#6366F1] text-white' : 'bg-[#E7E8E5] text-[#666666]'
                       }`}
                     >
                       {isDone ? <CheckCircle className="w-3.5 h-3.5" /> : i + 1}
@@ -179,11 +208,13 @@ export function InterviewPrepMockSessionPage() {
               })}
             </div>
             {currentStage && !isFinished && (
-              <p className="text-[10px] text-[#666666] mt-1.5">{STAGE_KIND_LABELS[stageKind] ?? stageKind}</p>
+              <p className="text-[10px] text-[#94a3b8] mt-1.5 font-medium uppercase tracking-wide">
+                {STAGE_KIND_LABELS[stageKind] ?? stageKind}
+              </p>
             )}
           </div>
 
-          {/* Problem / question content */}
+          {/* Content */}
           <div className="flex-1 overflow-y-auto p-4">
             {isFinished ? (
               <div className="flex flex-col items-center justify-center h-full gap-4 text-center">
@@ -191,14 +222,16 @@ export function InterviewPrepMockSessionPage() {
                   <CheckCircle className="w-7 h-7 text-white" />
                 </div>
                 <h2 className="text-lg font-bold text-[#0f172a]">Интервью завершено</h2>
-                <p className="text-sm text-[#666666]">Все этапы пройдены. Посмотрите результаты справа.</p>
+                <p className="text-sm text-[#666666]">Все этапы пройдены.</p>
                 <Button variant="secondary" size="sm" onClick={() => navigate('/growth/interview-prep')}>
                   Вернуться
                 </Button>
               </div>
             ) : (
               <>
-                <h2 className="text-base font-bold text-[#111111] mb-3">{currentStage?.task?.title ?? currentStage?.title ?? 'Задача'}</h2>
+                <h2 className="text-base font-bold text-[#111111] mb-3">
+                  {currentStage?.task?.title ?? currentStage?.title ?? 'Задача'}
+                </h2>
                 <p className="text-sm text-[#475569] leading-relaxed whitespace-pre-wrap">
                   {currentStage?.task?.statement ?? currentStage?.statement ?? 'Загружается...'}
                 </p>
@@ -207,21 +240,24 @@ export function InterviewPrepMockSessionPage() {
           </div>
         </div>
 
-        {/* Center: Code editor OR answer area */}
+        {/* Center: editor or answer area */}
         <div className="flex-1 flex flex-col min-w-0">
           {isFinished ? (
             <div className="flex-1 flex items-center justify-center bg-[#F2F3F0]">
-              <p className="text-sm text-[#666666]">Интервью завершено</p>
+              <p className="text-sm text-[#94a3b8]">Все этапы завершены</p>
             </div>
-          ) : stageKind === 'coding' ? (
+          ) : CODE_KINDS.has(stageKind) ? (
             <>
-              <div className="h-9 bg-[#1e293b] flex items-center px-4 flex-shrink-0">
-                <span className="text-xs text-[#94a3b8] font-mono">solution.py</span>
+              <div className="h-9 bg-[#1e293b] flex items-center px-4 gap-3 flex-shrink-0">
+                <span className="text-xs text-[#94a3b8] font-mono">
+                  {editorLang === 'go' ? 'solution.go' : editorLang === 'sql' ? 'solution.sql' : 'solution.py'}
+                </span>
+                <span className="ml-auto text-[10px] text-[#475569] uppercase tracking-wider">{editorLang}</span>
               </div>
               <div className="flex-1">
                 <Editor
                   height="100%"
-                  language="python"
+                  language={editorLang}
                   value={code}
                   onChange={v => setCode(v ?? '')}
                   onMount={handleEditorMount}
@@ -231,62 +267,38 @@ export function InterviewPrepMockSessionPage() {
             </>
           ) : stageKind === 'system_design' ? (
             <div className="flex-1 overflow-y-auto p-5 flex flex-col gap-4 bg-[#F2F3F0]">
-              <div>
-                <label className="text-xs font-semibold text-[#475569] mb-1.5 block">Заметки и описание архитектуры</label>
-                <textarea
-                  value={designNotes}
-                  onChange={e => setDesignNotes(e.target.value)}
-                  placeholder="Опишите общую архитектуру решения..."
-                  rows={6}
-                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1]"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-[#475569] mb-1.5 block">Компоненты системы</label>
-                <textarea
-                  value={designComponents}
-                  onChange={e => setDesignComponents(e.target.value)}
-                  placeholder="Перечислите основные компоненты (сервисы, базы данных, кеши...)"
-                  rows={4}
-                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1]"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-[#475569] mb-1.5 block">API</label>
-                <textarea
-                  value={designApis}
-                  onChange={e => setDesignApis(e.target.value)}
-                  placeholder="Опишите ключевые API endpoints..."
-                  rows={3}
-                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1]"
-                />
-              </div>
-              <div>
-                <label className="text-xs font-semibold text-[#475569] mb-1.5 block">Схема базы данных</label>
-                <textarea
-                  value={designSchema}
-                  onChange={e => setDesignSchema(e.target.value)}
-                  placeholder="Опишите схему данных..."
-                  rows={3}
-                  className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1]"
-                />
-              </div>
+              {[
+                { label: 'Общая архитектура', key: 'notes', value: designNotes, set: setDesignNotes, rows: 6, placeholder: 'Опишите общую архитектуру решения...' },
+                { label: 'Компоненты', key: 'components', value: designComponents, set: setDesignComponents, rows: 4, placeholder: 'Сервисы, базы данных, кеши...' },
+                { label: 'API', key: 'apis', value: designApis, set: setDesignApis, rows: 3, placeholder: 'Ключевые endpoints...' },
+                { label: 'Схема БД', key: 'schema', value: designSchema, set: setDesignSchema, rows: 3, placeholder: 'Структура таблиц / коллекций...' },
+              ].map(({ label, key, value, set, rows, placeholder }) => (
+                <div key={key}>
+                  <label className="text-xs font-semibold text-[#475569] mb-1.5 block">{label}</label>
+                  <textarea
+                    value={value}
+                    onChange={e => set(e.target.value)}
+                    placeholder={placeholder}
+                    rows={rows}
+                    className="w-full px-3 py-2.5 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1]"
+                  />
+                </div>
+              ))}
             </div>
           ) : (
-            /* behavioral / theoretical */
             <div className="flex-1 flex flex-col p-5 bg-[#F2F3F0]">
               <label className="text-xs font-semibold text-[#475569] mb-2 block">Ваш ответ</label>
               <textarea
                 value={textAnswer}
                 onChange={e => setTextAnswer(e.target.value)}
-                placeholder="Напишите ваш ответ здесь..."
+                placeholder="Напишите ваш ответ..."
                 className="flex-1 w-full px-4 py-3 text-sm bg-white border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:border-[#6366F1] leading-relaxed"
               />
             </div>
           )}
         </div>
 
-        {/* Right: AI Feedback panel */}
+        {/* Right: AI feedback */}
         <div className="w-[300px] flex-shrink-0 bg-white border-l border-[#CBCCC9] flex flex-col">
           <div className="px-4 py-3 border-b border-[#CBCCC9] flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-[#6366F1]" />
@@ -296,7 +308,7 @@ export function InterviewPrepMockSessionPage() {
             {reviewLoading ? (
               <div className="flex flex-col items-center justify-center h-full gap-3">
                 <Spinner size="md" />
-                <p className="text-sm text-[#666666]">AI анализирует ваш ответ...</p>
+                <p className="text-sm text-[#666666]">Анализирую ответ...</p>
               </div>
             ) : review ? (
               <ReviewPanel review={review} stageKind={stageKind} />
@@ -317,17 +329,16 @@ export function InterviewPrepMockSessionPage() {
   )
 }
 
-function ReviewPanel({ review, stageKind }: { review: any; stageKind: StageKind }) {
+function ReviewPanel({ review, stageKind }: { review: any; stageKind: string }) {
   const score = review?.score ?? review?.overall_score ?? null
   const summary = review?.summary ?? review?.feedback ?? ''
-  const gaps = review?.gaps ?? review?.weaknesses ?? []
+  const gaps = review?.gaps ?? review?.weaknesses ?? review?.issues ?? []
   const strengths = review?.strengths ?? []
   const missingTopics = review?.missing_topics ?? []
   const followUpQuestions = review?.follow_up_questions ?? []
 
   return (
     <div className="flex flex-col gap-4">
-      {/* Score badge */}
       {score !== null && (
         <div className="flex items-center gap-3">
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white ${
@@ -344,7 +355,6 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: StageKind 
         </div>
       )}
 
-      {/* Summary */}
       {summary && (
         <div>
           <p className="text-xs font-semibold text-[#475569] mb-1.5">Резюме</p>
@@ -352,7 +362,6 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: StageKind 
         </div>
       )}
 
-      {/* Strengths */}
       {strengths.length > 0 && (
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
@@ -369,7 +378,6 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: StageKind 
         </div>
       )}
 
-      {/* Gaps */}
       {gaps.length > 0 && (
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
@@ -379,19 +387,18 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: StageKind 
           <ul className="flex flex-col gap-1">
             {gaps.map((g: string, i: number) => (
               <li key={i} className="text-sm text-[#111111] flex items-start gap-1.5">
-                <span className="text-[#6366F1] mt-0.5">-</span> {g}
+                <span className="text-[#6366F1] mt-0.5">−</span> {g}
               </li>
             ))}
           </ul>
         </div>
       )}
 
-      {/* System design: missing topics */}
       {stageKind === 'system_design' && missingTopics.length > 0 && (
         <div>
           <div className="flex items-center gap-1.5 mb-1.5">
             <Target className="w-3.5 h-3.5 text-[#ef4444]" />
-            <p className="text-xs font-semibold text-[#ef4444]">Упущенные темы</p>
+            <p className="text-xs font-semibold text-[#ef4444]">Упущено</p>
           </div>
           <ul className="flex flex-col gap-1">
             {missingTopics.map((t: string, i: number) => (
@@ -403,15 +410,12 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: StageKind 
         </div>
       )}
 
-      {/* System design: follow-up questions */}
-      {stageKind === 'system_design' && followUpQuestions.length > 0 && (
+      {followUpQuestions.length > 0 && (
         <div>
-          <p className="text-xs font-semibold text-[#475569] mb-1.5">Дополнительные вопросы</p>
+          <p className="text-xs font-semibold text-[#475569] mb-1.5">Вопросы на уточнение</p>
           <ul className="flex flex-col gap-1.5">
             {followUpQuestions.map((q: string, i: number) => (
-              <li key={i} className="text-sm text-[#111111] leading-relaxed">
-                {i + 1}. {q}
-              </li>
+              <li key={i} className="text-sm text-[#111111] leading-relaxed">{i + 1}. {q}</li>
             ))}
           </ul>
         </div>

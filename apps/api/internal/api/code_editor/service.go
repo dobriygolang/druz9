@@ -3,6 +3,7 @@ package code_editor
 import (
 	"context"
 
+	"api/internal/aireview"
 	codeeditordomain "api/internal/domain/codeeditor"
 	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/code_editor/v1"
@@ -27,6 +28,7 @@ type Service interface {
 	DeleteTask(ctx context.Context, taskID uuid.UUID) error
 	GetLeaderboard(ctx context.Context, limit int32) ([]*codeeditordomain.LeaderboardEntry, error)
 	ListRooms(ctx context.Context, userID *uuid.UUID) ([]*codeeditordomain.Room, error)
+	StartRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) (*codeeditordomain.Room, error)
 }
 
 //go:generate mockery --case underscore --name RealtimePublisher --with-expecter --output mocks
@@ -40,13 +42,15 @@ type Implementation struct {
 	v1.UnimplementedCodeEditorServiceServer
 	service  Service
 	realtime RealtimePublisher
+	reviewer aireview.Reviewer
 }
 
 // New returns new instance of Implementation.
-func New(service Service, realtime RealtimePublisher) *Implementation {
+func New(service Service, realtime RealtimePublisher, reviewer aireview.Reviewer) *Implementation {
 	return &Implementation{
 		service:  service,
 		realtime: realtime,
+		reviewer: reviewer,
 	}
 }
 

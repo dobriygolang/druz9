@@ -1,0 +1,22 @@
+package admin
+
+import (
+	"context"
+
+	v1 "api/pkg/api/admin/v1"
+
+	"github.com/go-kratos/kratos/v2/errors"
+	"github.com/google/uuid"
+)
+
+func (i *Implementation) UpdateUserTrust(ctx context.Context, req *v1.UpdateUserTrustRequest) (*v1.AdminStatusResponse, error) {
+	userID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, errors.BadRequest("INVALID_USER_ID", "invalid user id")
+	}
+	if err := i.userManager.UpdateUserTrusted(ctx, userID, req.IsTrusted); err != nil {
+		return nil, err
+	}
+	i.cacheInval.InvalidateProfileCache(userID)
+	return &v1.AdminStatusResponse{Status: "ok"}, nil
+}

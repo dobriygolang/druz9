@@ -32,6 +32,15 @@ export interface CompleteProfilePayload {
   longitude: number
 }
 
+export interface ProfileMockSession {
+  id: string
+  companyTag: string
+  status: 'active' | 'finished' | string
+  currentStageIndex: number
+  totalStages: number
+  currentStageKind: string
+}
+
 export interface ProfileProgress {
   overview: {
     practiceSessions: number
@@ -50,4 +59,5 @@ export interface ProfileProgress {
   recommendations: string[]
   checkpoints: Array<{ title: string; done: boolean }>
   companies: string[]
+  mockSessions?: ProfileMockSession[]
 }

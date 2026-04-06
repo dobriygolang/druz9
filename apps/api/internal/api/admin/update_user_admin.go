@@ -1,0 +1,23 @@
+package admin
+
+import (
+	"context"
+
+	v1 "api/pkg/api/admin/v1"
+
+	"github.com/go-kratos/kratos/v2/errors"
+	"github.com/google/uuid"
+)
+
+// UpdateUserAdmin stub. Please implement it.
+func (i *Implementation) UpdateUserAdmin(ctx context.Context, req *v1.UpdateUserAdminRequest) (*v1.AdminStatusResponse, error) {
+	userID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, errors.BadRequest("INVALID_USER_ID", "invalid user id")
+	}
+	if err := i.userManager.UpdateUserAdmin(ctx, userID, req.IsAdmin); err != nil {
+		return nil, err
+	}
+	i.cacheInval.InvalidateProfileCache(userID)
+	return &v1.AdminStatusResponse{Status: "ok"}, nil
+}

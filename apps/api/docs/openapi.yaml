@@ -563,6 +563,66 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/admin.v1.AdminStatusResponse'
+    /api/admin/users/{userId}/admin:
+        patch:
+            tags:
+                - AdminService
+            operationId: AdminService_UpdateUserAdmin
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/admin.v1.UpdateUserAdminRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.AdminStatusResponse'
+    /api/admin/users/{userId}/trust:
+        patch:
+            tags:
+                - AdminService
+            operationId: AdminService_UpdateUserTrust
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/admin.v1.UpdateUserTrustRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.AdminStatusResponse'
+    /api/public/runtime-config:
+        get:
+            tags:
+                - AdminService
+            operationId: AdminService_GetRuntimeConfig
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/admin.v1.GetRuntimeConfigResponse'
     /api/v1/arena/anti-cheat/event:
         post:
             tags:
@@ -849,6 +909,51 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/circle.v1.CircleResponse'
+    /api/v1/circles/{circleId}/events:
+        get:
+            tags:
+                - CircleService
+            operationId: CircleService_ListCircleEvents
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: status
+                  in: query
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.ListCircleEventsResponse'
+        post:
+            tags:
+                - CircleService
+            operationId: CircleService_CreateCircleEvent
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/circle.v1.CreateCircleEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.CreateCircleEventResponse'
     /api/v1/circles/{circleId}/invite:
         post:
             tags:
@@ -921,6 +1026,54 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/circle.v1.LeaveCircleResponse'
+    /api/v1/circles/{circleId}/members:
+        get:
+            tags:
+                - CircleService
+            operationId: CircleService_ListCircleMembers
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.ListCircleMembersResponse'
+    /api/v1/code-editor/ai-review:
+        post:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_AIReview
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.AIReviewRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.AIReviewResponse'
+    /api/v1/code-editor/daily:
+        get:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_GetDailyChallenge
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.GetDailyChallengeResponse'
     /api/v1/code-editor/join:
         post:
             tags:
@@ -1076,6 +1229,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/code_editor.v1.StatusResponse'
+    /api/v1/code-editor/rooms/{roomId}/start:
+        post:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_StartRoom
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.StartRoomRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.StartRoomResponse'
     /api/v1/code-editor/rooms/{roomId}/submissions:
         get:
             tags:
@@ -1239,6 +1416,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/event.v1.EventStatusResponse'
+    /api/v1/events/{eventId}/invite:
+        post:
+            tags:
+                - EventService
+            operationId: EventService_InviteToEvent
+            parameters:
+                - name: eventId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/event.v1.InviteToEventRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/event.v1.EventStatusResponse'
     /api/v1/events/{eventId}/join:
         post:
             tags:
@@ -1317,6 +1518,42 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/geo.v1.ResolveResponse'
+    /api/v1/interview-prep/checkpoints/session/{sessionId}:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_GetCheckpointBySession
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.CheckpointSessionResponse'
+    /api/v1/interview-prep/checkpoints/start:
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_StartCheckpointSession
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.StartCheckpointSessionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.CheckpointSessionResponse'
     /api/v1/interview-prep/companies:
         get:
             tags:
@@ -1828,6 +2065,60 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
+    /api/v1/profile/{userId}/achievements:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetAchievements
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.GetAchievementsResponse'
+    /api/v1/profile/{userId}/activity:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetProfileActivity
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.GetProfileActivityResponse'
+    /api/v1/profile/{userId}/progress:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetProfileProgress
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.ProfileProgressResponse'
     /api/v1/referrals:
         get:
             tags:
@@ -1946,6 +2237,13 @@ components:
                     type: string
                 group:
                     type: string
+        admin.v1.GetRuntimeConfigResponse:
+            type: object
+            properties:
+                appRequireAuth:
+                    type: boolean
+                arenaRequireAuth:
+                    type: boolean
         admin.v1.ListConfigResponse:
             type: object
             properties:
@@ -1968,6 +2266,20 @@ components:
                 value:
                     type: string
                 success:
+                    type: boolean
+        admin.v1.UpdateUserAdminRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                isAdmin:
+                    type: boolean
+        admin.v1.UpdateUserTrustRequest:
+            type: object
+            properties:
+                userId:
+                    type: string
+                isTrusted:
                     type: boolean
         arena.v1.ArenaLeaderboardEntry:
             type: object
@@ -2268,11 +2580,49 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+        circle.v1.CircleMember:
+            type: object
+            properties:
+                userId:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                avatarUrl:
+                    type: string
+                role:
+                    type: string
+                joinedAt:
+                    type: string
+                    format: date-time
         circle.v1.CircleResponse:
             type: object
             properties:
                 circle:
                     $ref: '#/components/schemas/circle.v1.Circle'
+        circle.v1.CreateCircleEventRequest:
+            type: object
+            properties:
+                circleId:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                meetingLink:
+                    type: string
+                placeLabel:
+                    type: string
+                scheduledAt:
+                    type: string
+                repeat:
+                    type: string
+        circle.v1.CreateCircleEventResponse:
+            type: object
+            properties:
+                event:
+                    $ref: '#/components/schemas/event.v1.Event'
         circle.v1.CreateCircleRequest:
             type: object
             properties:
@@ -2318,6 +2668,20 @@ components:
             properties:
                 status:
                     type: string
+        circle.v1.ListCircleEventsResponse:
+            type: object
+            properties:
+                events:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/event.v1.Event'
+        circle.v1.ListCircleMembersResponse:
+            type: object
+            properties:
+                members:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/circle.v1.CircleMember'
         circle.v1.ListCirclesResponse:
             type: object
             properties:
@@ -2328,6 +2692,22 @@ components:
                 totalCount:
                     type: integer
                     format: int32
+        code_editor.v1.AIReviewRequest:
+            type: object
+            properties:
+                language:
+                    type: string
+                code:
+                    type: string
+                taskTitle:
+                    type: string
+                statement:
+                    type: string
+        code_editor.v1.AIReviewResponse:
+            type: object
+            properties:
+                review:
+                    $ref: '#/components/schemas/code_editor.v1.InterviewSolutionReview'
         code_editor.v1.CreateRoomRequest:
             type: object
             properties:
@@ -2355,6 +2735,15 @@ components:
             properties:
                 task:
                     $ref: '#/components/schemas/code_editor.v1.TaskPayload'
+        code_editor.v1.GetDailyChallengeResponse:
+            type: object
+            properties:
+                task:
+                    $ref: '#/components/schemas/code_editor.v1.Task'
+                date:
+                    type: string
+                expiresAt:
+                    type: string
         code_editor.v1.GetLeaderboardResponse:
             type: object
             properties:
@@ -2374,6 +2763,30 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/code_editor.v1.Submission'
+        code_editor.v1.InterviewSolutionReview:
+            type: object
+            properties:
+                provider:
+                    type: string
+                model:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                summary:
+                    type: string
+                strengths:
+                    type: array
+                    items:
+                        type: string
+                issues:
+                    type: array
+                    items:
+                        type: string
+                followUpQuestions:
+                    type: array
+                    items:
+                        type: string
         code_editor.v1.JoinRoomByInviteCodeRequest:
             type: object
             properties:
@@ -2485,6 +2898,18 @@ components:
                     type: string
                 ready:
                     type: boolean
+        code_editor.v1.StartRoomRequest:
+            type: object
+            properties:
+                roomId:
+                    type: string
+        code_editor.v1.StartRoomResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+                roomStatus:
+                    type: string
         code_editor.v1.StatusResponse:
             type: object
             properties:
@@ -2819,6 +3244,13 @@ components:
                 status:
                     type: string
             description: EventStatusResponse replaces the separate LeaveEventResponse and DeleteEventResponse.
+        event.v1.InviteToEventRequest:
+            type: object
+            properties:
+                eventId:
+                    type: string
+                userId:
+                    type: string
         event.v1.JoinEventRequest:
             type: object
             properties:
@@ -3043,6 +3475,52 @@ components:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewPrepQuestion'
                 review:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewAnswerReview'
+        interview_prep.v1.CheckpointProgress:
+            type: object
+            properties:
+                id:
+                    type: string
+                userId:
+                    type: string
+                taskId:
+                    type: string
+                sessionId:
+                    type: string
+                skillKey:
+                    type: string
+                status:
+                    type: string
+                durationSeconds:
+                    type: integer
+                    format: int32
+                attemptsUsed:
+                    type: integer
+                    format: int32
+                maxAttempts:
+                    type: integer
+                    format: int32
+                score:
+                    type: integer
+                    format: int32
+                startedAt:
+                    type: string
+                    format: date-time
+                finishedAt:
+                    type: string
+                    format: date-time
+                createdAt:
+                    type: string
+                    format: date-time
+                updatedAt:
+                    type: string
+                    format: date-time
+        interview_prep.v1.CheckpointSessionResponse:
+            type: object
+            properties:
+                session:
+                    $ref: '#/components/schemas/interview_prep.v1.InterviewPrepSession'
+                checkpoint:
+                    $ref: '#/components/schemas/interview_prep.v1.CheckpointProgress'
         interview_prep.v1.CreateAdminQuestionRequest:
             type: object
             properties:
@@ -3522,6 +4000,11 @@ components:
             properties:
                 session:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewPrepSession'
+        interview_prep.v1.StartCheckpointSessionRequest:
+            type: object
+            properties:
+                taskId:
+                    type: string
         interview_prep.v1.StartMockSessionRequest:
             type: object
             properties:
@@ -3817,6 +4300,29 @@ components:
                 durationSeconds:
                     type: integer
                     format: uint32
+        profile.v1.Achievement:
+            type: object
+            properties:
+                id:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                icon:
+                    type: string
+                unlocked:
+                    type: boolean
+                category:
+                    type: string
+        profile.v1.ActivityDay:
+            type: object
+            properties:
+                date:
+                    type: string
+                count:
+                    type: integer
+                    format: int32
         profile.v1.BindTelegramRequest:
             type: object
             properties:
@@ -3880,9 +4386,156 @@ components:
                 expiresAt:
                     type: string
                     format: date-time
+        profile.v1.GetAchievementsResponse:
+            type: object
+            properties:
+                achievements:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.Achievement'
+        profile.v1.GetProfileActivityResponse:
+            type: object
+            properties:
+                activity:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.ActivityDay'
         profile.v1.LogoutRequest:
             type: object
             properties: {}
+        profile.v1.ProfileCheckpointProgress:
+            type: object
+            properties:
+                id:
+                    type: string
+                taskId:
+                    type: string
+                taskTitle:
+                    type: string
+                skillKey:
+                    type: string
+                skillLabel:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                finishedAt:
+                    type: string
+                    format: date-time
+        profile.v1.ProfileCompetency:
+            type: object
+            properties:
+                key:
+                    type: string
+                label:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                practiceScore:
+                    type: integer
+                    format: int32
+                verifiedScore:
+                    type: integer
+                    format: int32
+                stageCount:
+                    type: integer
+                    format: int32
+                questionCount:
+                    type: integer
+                    format: int32
+                practiceSessions:
+                    type: integer
+                    format: int32
+                practicePassedSessions:
+                    type: integer
+                    format: int32
+                practiceDays:
+                    type: integer
+                    format: int32
+                confidence:
+                    type: string
+                averageScore:
+                    type: number
+                    format: double
+        profile.v1.ProfileProgress:
+            type: object
+            properties:
+                overview:
+                    $ref: '#/components/schemas/profile.v1.ProfileProgressOverview'
+                competencies:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.ProfileCompetency'
+                strongest:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.ProfileCompetency'
+                weakest:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.ProfileCompetency'
+                recommendations:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.ProfileProgressRecommendation'
+                checkpoints:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.ProfileCheckpointProgress'
+                companies:
+                    type: array
+                    items:
+                        type: string
+        profile.v1.ProfileProgressOverview:
+            type: object
+            properties:
+                practiceSessions:
+                    type: integer
+                    format: int32
+                practicePassedSessions:
+                    type: integer
+                    format: int32
+                practiceActiveDays:
+                    type: integer
+                    format: int32
+                completedMockSessions:
+                    type: integer
+                    format: int32
+                completedMockStages:
+                    type: integer
+                    format: int32
+                answeredQuestions:
+                    type: integer
+                    format: int32
+                averageStageScore:
+                    type: number
+                    format: double
+                averageQuestionScore:
+                    type: number
+                    format: double
+                currentStreakDays:
+                    type: integer
+                    format: int32
+                lastActivityAt:
+                    type: string
+                    format: date-time
+        profile.v1.ProfileProgressRecommendation:
+            type: object
+            properties:
+                key:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                href:
+                    type: string
+        profile.v1.ProfileProgressResponse:
+            type: object
+            properties:
+                progress:
+                    $ref: '#/components/schemas/profile.v1.ProfileProgress'
         profile.v1.ProfileResponse:
             type: object
             properties:

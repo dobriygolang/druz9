@@ -9,12 +9,13 @@ import (
 // Implementation of circle service.
 type Implementation struct {
 	v1.UnimplementedCircleServiceServer
-	service Service
+	service  Service
+	eventSvc EventService
 }
 
 // New returns new instance of Implementation.
-func New(service Service) *Implementation {
-	return &Implementation{service: service}
+func New(service Service, eventSvc EventService) *Implementation {
+	return &Implementation{service: service, eventSvc: eventSvc}
 }
 
 // GetDescription returns grpc service description.

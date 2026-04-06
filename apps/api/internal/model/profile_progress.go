@@ -47,6 +47,15 @@ type ProfileCheckpointProgress struct {
 	FinishedAt *time.Time `json:"finishedAt,omitempty"`
 }
 
+type ProfileMockSession struct {
+	ID                string `json:"id"`
+	CompanyTag        string `json:"companyTag"`
+	Status            string `json:"status"`
+	CurrentStageIndex int32  `json:"currentStageIndex"`
+	TotalStages       int32  `json:"totalStages"`
+	CurrentStageKind  string `json:"currentStageKind"`
+}
+
 type ProfileProgress struct {
 	Overview        ProfileProgressOverview          `json:"overview"`
 	Competencies    []*ProfileCompetency             `json:"competencies"`
@@ -55,4 +64,5 @@ type ProfileProgress struct {
 	Recommendations []*ProfileProgressRecommendation `json:"recommendations"`
 	Checkpoints     []*ProfileCheckpointProgress     `json:"checkpoints"`
 	Companies       []string                         `json:"companies"`
+	MockSessions    []*ProfileMockSession            `json:"mockSessions"`
 }

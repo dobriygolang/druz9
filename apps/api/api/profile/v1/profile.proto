@@ -79,6 +79,18 @@ service ProfileService {
       body: "*"
     };
   }
+
+  rpc GetProfileProgress(GetProfileProgressRequest) returns (ProfileProgressResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}/progress" };
+  }
+
+  rpc GetAchievements(GetAchievementsRequest) returns (GetAchievementsResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}/achievements" };
+  }
+
+  rpc GetProfileActivity(GetProfileActivityRequest) returns (GetProfileActivityResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}/activity" };
+  }
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────
@@ -155,6 +167,10 @@ message BindTelegramRequest {
   string code  = 2;
 }
 
+message GetProfileProgressRequest  { string user_id = 1; }
+message GetAchievementsRequest     { string user_id = 1; }
+message GetProfileActivityRequest  { string user_id = 1; }
+
 // ── Response messages ──────────────────────────────────────────────────────
 
 // ProfileStatusResponse replaces the separate LogoutResponse and BindTelegramResponse.
@@ -182,6 +198,89 @@ message StartYandexAuthResponse {
 message ProfileResponse {
   User user                      = 1;
   bool needs_profile_complete    = 2;
+}
+
+// ── Profile progress / achievements / activity ─────────────────────────────
+
+message ProfileProgressOverview {
+  int32                     practice_sessions        = 1;
+  int32                     practice_passed_sessions = 2;
+  int32                     practice_active_days     = 3;
+  int32                     completed_mock_sessions  = 4;
+  int32                     completed_mock_stages    = 5;
+  int32                     answered_questions       = 6;
+  double                    average_stage_score      = 7;
+  double                    average_question_score   = 8;
+  int32                     current_streak_days      = 9;
+  google.protobuf.Timestamp last_activity_at         = 10;
+}
+
+message ProfileCompetency {
+  string key                      = 1;
+  string label                    = 2;
+  int32  score                    = 3;
+  int32  practice_score           = 4;
+  int32  verified_score           = 5;
+  int32  stage_count              = 6;
+  int32  question_count           = 7;
+  int32  practice_sessions        = 8;
+  int32  practice_passed_sessions = 9;
+  int32  practice_days            = 10;
+  string confidence               = 11;
+  double average_score            = 12;
+}
+
+message ProfileProgressRecommendation {
+  string key         = 1;
+  string title       = 2;
+  string description = 3;
+  string href        = 4;
+}
+
+message ProfileCheckpointProgress {
+  string                    id          = 1;
+  string                    task_id     = 2;
+  string                    task_title  = 3;
+  string                    skill_key   = 4;
+  string                    skill_label = 5;
+  int32                     score       = 6;
+  google.protobuf.Timestamp finished_at = 7;
+}
+
+message ProfileProgress {
+  ProfileProgressOverview              overview         = 1;
+  repeated ProfileCompetency           competencies     = 2;
+  repeated ProfileCompetency           strongest        = 3;
+  repeated ProfileCompetency           weakest          = 4;
+  repeated ProfileProgressRecommendation recommendations = 5;
+  repeated ProfileCheckpointProgress  checkpoints      = 6;
+  repeated string                     companies        = 7;
+}
+
+message ProfileProgressResponse {
+  ProfileProgress progress = 1;
+}
+
+message Achievement {
+  string id          = 1;
+  string title       = 2;
+  string description = 3;
+  string icon        = 4;
+  bool   unlocked    = 5;
+  string category    = 6;
+}
+
+message GetAchievementsResponse {
+  repeated Achievement achievements = 1;
+}
+
+message ActivityDay {
+  string date  = 1;
+  int32  count = 2;
+}
+
+message GetProfileActivityResponse {
+  repeated ActivityDay activity = 1;
 }
 
 // ── Domain entities ────────────────────────────────────────────────────────

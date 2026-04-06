@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Users, Plus, Search } from 'lucide-react'
+import { Users, Plus, Search, Lock, Globe } from 'lucide-react'
 import { circleApi, type CreateCirclePayload } from '@/features/Circle/api/circleApi'
 import type { Circle } from '@/entities/Circle/model/types'
 import { Badge } from '@/shared/ui/Badge'
@@ -33,7 +33,7 @@ export function CirclesPage() {
   const [showCreate, setShowCreate] = useState(false)
   const [creating, setCreating] = useState(false)
   const [search, setSearch] = useState('')
-  const [form, setForm] = useState<Partial<CreateCirclePayload & { tagsInput: string }>>({})
+  const [form, setForm] = useState<Partial<CreateCirclePayload & { tagsInput: string }>>({ isPublic: true })
 
   const fetchCircles = useCallback(() => {
     setError(null)
@@ -57,6 +57,7 @@ export function CirclesPage() {
         name: form.name,
         description: form.description ?? '',
         tags,
+        isPublic: form.isPublic ?? true,
       })
       setCircles(prev => [created, ...prev])
       setShowCreate(false)
@@ -163,7 +164,10 @@ export function CirclesPage() {
                       >
                         {c.name.slice(0, 1).toUpperCase()}
                       </div>
-                      {c.isJoined && <Badge variant="success">Участник</Badge>}
+                      <div className="flex items-center gap-1.5">
+                        {!c.isPublic && <Lock className="w-3.5 h-3.5 text-[#94a3b8]" />}
+                        {c.isJoined && <Badge variant="success">Участник</Badge>}
+                      </div>
                     </div>
 
                     {/* Name */}
@@ -245,6 +249,42 @@ export function CirclesPage() {
           <Input label="Название" value={form.name ?? ''} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} placeholder="Название круга" />
           <Input label="Описание" value={form.description ?? ''} onChange={e => setForm(f => ({ ...f, description: e.target.value }))} placeholder="Краткое описание" />
           <Input label="Теги (через запятую)" value={form.tagsInput ?? ''} onChange={e => setForm(f => ({ ...f, tagsInput: e.target.value }))} placeholder="golang, backend, карьера" />
+          {/* Privacy toggle */}
+          <div className="flex flex-col gap-2">
+            <span className="text-sm font-medium text-[#111111] dark:text-[#e2e8f3]">Доступность</span>
+            <div className="grid grid-cols-2 gap-2">
+              <button
+                type="button"
+                onClick={() => setForm(f => ({ ...f, isPublic: true }))}
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                  (form.isPublic ?? true)
+                    ? 'bg-[#EEF2FF] border-[#6366F1] text-[#6366F1]'
+                    : 'bg-white dark:bg-[#161c2d] border-[#CBCCC9] dark:border-[#1e3158] text-[#666666] dark:text-[#7e93b0] hover:border-[#6366F1]/40'
+                }`}
+              >
+                <Globe className="w-4 h-4 flex-shrink-0" />
+                <div className="text-left">
+                  <div>Публичный</div>
+                  <div className="text-[10px] font-normal opacity-70">Виден всем</div>
+                </div>
+              </button>
+              <button
+                type="button"
+                onClick={() => setForm(f => ({ ...f, isPublic: false }))}
+                className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${
+                  !(form.isPublic ?? true)
+                    ? 'bg-[#EEF2FF] border-[#6366F1] text-[#6366F1]'
+                    : 'bg-white dark:bg-[#161c2d] border-[#CBCCC9] dark:border-[#1e3158] text-[#666666] dark:text-[#7e93b0] hover:border-[#6366F1]/40'
+                }`}
+              >
+                <Lock className="w-4 h-4 flex-shrink-0" />
+                <div className="text-left">
+                  <div>Приватный</div>
+                  <div className="text-[10px] font-normal opacity-70">Только по инвайту</div>
+                </div>
+              </button>
+            </div>
+          </div>
         </div>
       </Modal>
     </div>

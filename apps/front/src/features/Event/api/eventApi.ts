@@ -76,7 +76,7 @@ export interface CreateEventPayload {
   city?: string
   latitude?: number
   longitude?: number
-  scheduledAt: string
+  scheduledAt?: string
   description?: string
   meetingLink?: string
   repeat?: EventRepeat
@@ -115,6 +115,9 @@ export const eventApi = {
   },
   deleteEvent: async (eventId: string): Promise<void> => {
     await apiClient.delete(`/api/v1/events/${eventId}`)
+  },
+  inviteToEvent: async (eventId: string, userId: string): Promise<void> => {
+    await apiClient.post(`/api/v1/events/${eventId}/invite`, { userId })
   },
   listCircleEvents: async (circleId: string, status?: string): Promise<Event[]> => {
     const r = await apiClient.get<{ events?: BackendEvent[] }>(`/api/v1/circles/${circleId}/events`, {

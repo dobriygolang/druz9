@@ -3,10 +3,8 @@ package server
 import (
 	"time"
 
-	profileservice "api/internal/api/profile"
 	"api/internal/config"
 	authmiddleware "api/internal/middleware"
-	v1 "api/pkg/api/profile/v1"
 
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
@@ -17,7 +15,6 @@ import (
 func NewGRPCServer(
 	addr string,
 	timeout time.Duration,
-	profileService *profileservice.Implementation,
 	authorizer authmiddleware.ProfileAuthorizer,
 	cookies *SessionCookieManager,
 	shouldRequireAuth func() bool,
@@ -25,7 +22,7 @@ func NewGRPCServer(
 	rateLimitCfg *config.RateLimit,
 	cbCfg *config.CircuitBreaker,
 ) *kratosgrpc.Server {
-	srv := kratosgrpc.NewServer(
+	return kratosgrpc.NewServer(
 		kratosgrpc.Address(addr),
 		kratosgrpc.Timeout(timeout),
 		kratosgrpc.Middleware(
@@ -39,7 +36,4 @@ func NewGRPCServer(
 			newGRPCAdminMiddleware(),
 		),
 	)
-
-	v1.RegisterProfileServiceServer(srv, profileService)
-	return srv
 }

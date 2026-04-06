@@ -23,8 +23,11 @@ const OperationProfileServiceBindTelegram = "/profile.v1.ProfileService/BindTele
 const OperationProfileServiceCompleteRegistration = "/profile.v1.ProfileService/CompleteRegistration"
 const OperationProfileServiceConfirmTelegramAuth = "/profile.v1.ProfileService/ConfirmTelegramAuth"
 const OperationProfileServiceCreateTelegramAuthChallenge = "/profile.v1.ProfileService/CreateTelegramAuthChallenge"
+const OperationProfileServiceGetAchievements = "/profile.v1.ProfileService/GetAchievements"
 const OperationProfileServiceGetProfile = "/profile.v1.ProfileService/GetProfile"
+const OperationProfileServiceGetProfileActivity = "/profile.v1.ProfileService/GetProfileActivity"
 const OperationProfileServiceGetProfileByID = "/profile.v1.ProfileService/GetProfileByID"
+const OperationProfileServiceGetProfileProgress = "/profile.v1.ProfileService/GetProfileProgress"
 const OperationProfileServiceLogout = "/profile.v1.ProfileService/Logout"
 const OperationProfileServiceStartYandexAuth = "/profile.v1.ProfileService/StartYandexAuth"
 const OperationProfileServiceTelegramAuth = "/profile.v1.ProfileService/TelegramAuth"
@@ -37,8 +40,11 @@ type ProfileServiceHTTPServer interface {
 	CompleteRegistration(context.Context, *CompleteRegistrationRequest) (*ProfileResponse, error)
 	ConfirmTelegramAuth(context.Context, *ConfirmTelegramAuthRequest) (*ConfirmTelegramAuthResponse, error)
 	CreateTelegramAuthChallenge(context.Context, *CreateTelegramAuthChallengeRequest) (*CreateTelegramAuthChallengeResponse, error)
+	GetAchievements(context.Context, *GetAchievementsRequest) (*GetAchievementsResponse, error)
 	GetProfile(context.Context, *GetProfileRequest) (*ProfileResponse, error)
+	GetProfileActivity(context.Context, *GetProfileActivityRequest) (*GetProfileActivityResponse, error)
 	GetProfileByID(context.Context, *GetProfileByIDRequest) (*ProfileResponse, error)
+	GetProfileProgress(context.Context, *GetProfileProgressRequest) (*ProfileProgressResponse, error)
 	Logout(context.Context, *LogoutRequest) (*ProfileStatusResponse, error)
 	StartYandexAuth(context.Context, *StartYandexAuthRequest) (*StartYandexAuthResponse, error)
 	TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error)
@@ -61,6 +67,9 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.POST("/api/v1/profile/update", _ProfileService_UpdateProfile0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/auth/logout", _ProfileService_Logout0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/bind-telegram", _ProfileService_BindTelegram0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/{user_id}/progress", _ProfileService_GetProfileProgress0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/{user_id}/achievements", _ProfileService_GetAchievements0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/{user_id}/activity", _ProfileService_GetProfileActivity0_HTTP_Handler(srv))
 }
 
 func _ProfileService_CreateTelegramAuthChallenge0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
@@ -318,13 +327,82 @@ func _ProfileService_BindTelegram0_HTTP_Handler(srv ProfileServiceHTTPServer) fu
 	}
 }
 
+func _ProfileService_GetProfileProgress0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetProfileProgressRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceGetProfileProgress)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetProfileProgress(ctx, req.(*GetProfileProgressRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ProfileProgressResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_GetAchievements0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetAchievementsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceGetAchievements)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetAchievements(ctx, req.(*GetAchievementsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetAchievementsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ProfileService_GetProfileActivity0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetProfileActivityRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceGetProfileActivity)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetProfileActivity(ctx, req.(*GetProfileActivityRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetProfileActivityResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ProfileServiceHTTPClient interface {
 	BindTelegram(ctx context.Context, req *BindTelegramRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
 	CompleteRegistration(ctx context.Context, req *CompleteRegistrationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	ConfirmTelegramAuth(ctx context.Context, req *ConfirmTelegramAuthRequest, opts ...http.CallOption) (rsp *ConfirmTelegramAuthResponse, err error)
 	CreateTelegramAuthChallenge(ctx context.Context, req *CreateTelegramAuthChallengeRequest, opts ...http.CallOption) (rsp *CreateTelegramAuthChallengeResponse, err error)
+	GetAchievements(ctx context.Context, req *GetAchievementsRequest, opts ...http.CallOption) (rsp *GetAchievementsResponse, err error)
 	GetProfile(ctx context.Context, req *GetProfileRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
+	GetProfileActivity(ctx context.Context, req *GetProfileActivityRequest, opts ...http.CallOption) (rsp *GetProfileActivityResponse, err error)
 	GetProfileByID(ctx context.Context, req *GetProfileByIDRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
+	GetProfileProgress(ctx context.Context, req *GetProfileProgressRequest, opts ...http.CallOption) (rsp *ProfileProgressResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
 	StartYandexAuth(ctx context.Context, req *StartYandexAuthRequest, opts ...http.CallOption) (rsp *StartYandexAuthResponse, err error)
 	TelegramAuth(ctx context.Context, req *TelegramAuthRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
@@ -393,6 +471,19 @@ func (c *ProfileServiceHTTPClientImpl) CreateTelegramAuthChallenge(ctx context.C
 	return &out, nil
 }
 
+func (c *ProfileServiceHTTPClientImpl) GetAchievements(ctx context.Context, in *GetAchievementsRequest, opts ...http.CallOption) (*GetAchievementsResponse, error) {
+	var out GetAchievementsResponse
+	pattern := "/api/v1/profile/{user_id}/achievements"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceGetAchievements))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *ProfileServiceHTTPClientImpl) GetProfile(ctx context.Context, in *GetProfileRequest, opts ...http.CallOption) (*ProfileResponse, error) {
 	var out ProfileResponse
 	pattern := "/api/v1/profile"
@@ -406,11 +497,37 @@ func (c *ProfileServiceHTTPClientImpl) GetProfile(ctx context.Context, in *GetPr
 	return &out, nil
 }
 
+func (c *ProfileServiceHTTPClientImpl) GetProfileActivity(ctx context.Context, in *GetProfileActivityRequest, opts ...http.CallOption) (*GetProfileActivityResponse, error) {
+	var out GetProfileActivityResponse
+	pattern := "/api/v1/profile/{user_id}/activity"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceGetProfileActivity))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *ProfileServiceHTTPClientImpl) GetProfileByID(ctx context.Context, in *GetProfileByIDRequest, opts ...http.CallOption) (*ProfileResponse, error) {
 	var out ProfileResponse
 	pattern := "/api/v1/profile/{user_id}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationProfileServiceGetProfileByID))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) GetProfileProgress(ctx context.Context, in *GetProfileProgressRequest, opts ...http.CallOption) (*ProfileProgressResponse, error) {
+	var out ProfileProgressResponse
+	pattern := "/api/v1/profile/{user_id}/progress"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceGetProfileProgress))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

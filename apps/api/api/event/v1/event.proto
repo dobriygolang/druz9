@@ -43,6 +43,13 @@ service EventService {
   rpc DeleteEvent(DeleteEventRequest) returns (EventStatusResponse) {
     option (google.api.http) = { delete: "/api/v1/events/{event_id}" };
   }
+
+  rpc InviteToEvent(InviteToEventRequest) returns (EventStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/events/{event_id}/invite"
+      body: "*"
+    };
+  }
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────
@@ -128,6 +135,11 @@ message UpdateEventRequest {
 message DeleteEventRequest {
   string           event_id     = 1;
   DeleteEventScope delete_scope = 2;  // was: string
+}
+
+message InviteToEventRequest {
+  string event_id = 1;
+  string user_id  = 2;
 }
 
 // ── Response messages ──────────────────────────────────────────────────────

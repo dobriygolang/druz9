@@ -41,7 +41,7 @@ func TestCreateRoom(t *testing.T) {
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
 
 		resp, err := impl.CreateRoom(ctx, req)
@@ -79,7 +79,7 @@ func TestCreateRoom(t *testing.T) {
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 
 		resp, err := impl.CreateRoom(context.Background(), req)
 		if err != nil {
@@ -104,7 +104,7 @@ func TestCreateRoom(t *testing.T) {
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
 
 		_, err := impl.CreateRoom(ctx, &v1.CreateRoomRequest{Mode: v1.RoomMode_ROOM_MODE_DUEL})
@@ -133,7 +133,7 @@ func TestGetRoom(t *testing.T) {
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 
 		resp, err := impl.GetRoom(context.Background(), req)
 		if err != nil {
@@ -152,7 +152,7 @@ func TestGetRoom(t *testing.T) {
 	t.Run("returns error for invalid room id", func(t *testing.T) {
 		t.Parallel()
 
-		impl := New(nil, nil)
+		impl := New(nil, nil, nil)
 
 		_, err := impl.GetRoom(context.Background(), &v1.GetRoomRequest{RoomId: "invalid-uuid"})
 		if err == nil {
@@ -182,7 +182,7 @@ func TestJoinRoom(t *testing.T) {
 		mockRealtime := mocks.NewRealtimePublisher(t)
 		mockRealtime.On("PublishRoomUpdate", mock.Anything).Once()
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
 
 		resp, err := impl.JoinRoom(ctx, req)
@@ -199,7 +199,7 @@ func TestJoinRoom(t *testing.T) {
 	t.Run("returns error for invalid room id", func(t *testing.T) {
 		t.Parallel()
 
-		impl := New(nil, nil)
+		impl := New(nil, nil, nil)
 
 		_, err := impl.JoinRoom(context.Background(), &v1.JoinRoomRequest{RoomId: "invalid-uuid"})
 		if err == nil {
@@ -225,7 +225,7 @@ func TestLeaveRoom(t *testing.T) {
 		mockRealtime := mocks.NewRealtimePublisher(t)
 		mockRealtime.On("PublishRoomUpdate", mock.Anything).Once()
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
 
 		resp, err := impl.LeaveRoom(ctx, &v1.LeaveRoomRequest{RoomId: roomID.String()})
@@ -242,7 +242,7 @@ func TestLeaveRoom(t *testing.T) {
 	t.Run("returns error for invalid room id", func(t *testing.T) {
 		t.Parallel()
 
-		impl := New(nil, nil)
+		impl := New(nil, nil, nil)
 
 		_, err := impl.LeaveRoom(context.Background(), &v1.LeaveRoomRequest{RoomId: "invalid-uuid"})
 		if err == nil {
@@ -282,7 +282,7 @@ func TestSubmitCode(t *testing.T) {
 		mockRealtime.On("PublishSubmission", mock.Anything, mock.Anything).Once()
 		mockRealtime.On("PublishRoomUpdate", mock.Anything).Once()
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
 
 		resp, err := impl.SubmitCode(ctx, req)
@@ -314,7 +314,7 @@ func TestSetReady(t *testing.T) {
 		mockRealtime := mocks.NewRealtimePublisher(t)
 		mockRealtime.On("PublishRoomUpdate", mock.Anything).Once()
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
 
 		resp, err := impl.SetReady(ctx, &v1.SetReadyRequest{RoomId: roomID.String(), Ready: true})
@@ -354,7 +354,7 @@ func TestGetSubmissions(t *testing.T) {
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 
 		resp, err := impl.GetSubmissions(context.Background(), req)
 		if err != nil {
@@ -396,7 +396,7 @@ func TestListTasks(t *testing.T) {
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 
 		resp, err := impl.ListTasks(context.Background(), req)
 		if err != nil {
@@ -426,7 +426,7 @@ func TestDeleteTask(t *testing.T) {
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 
 		resp, err := impl.DeleteTask(context.Background(), &v1.DeleteTaskRequest{TaskId: taskID.String()})
 		if err != nil {
@@ -442,7 +442,7 @@ func TestDeleteTask(t *testing.T) {
 	t.Run("returns error for invalid task id", func(t *testing.T) {
 		t.Parallel()
 
-		impl := New(nil, nil)
+		impl := New(nil, nil, nil)
 
 		_, err := impl.DeleteTask(context.Background(), &v1.DeleteTaskRequest{TaskId: "invalid-uuid"})
 		if err == nil {
@@ -467,7 +467,7 @@ func TestGetLeaderboard(t *testing.T) {
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
-		impl := New(mockService, mockRealtime)
+		impl := New(mockService, mockRealtime, nil)
 
 		resp, err := impl.GetLeaderboard(context.Background(), req)
 		if err != nil {

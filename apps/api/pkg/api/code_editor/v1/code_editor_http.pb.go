@@ -19,9 +19,11 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationCodeEditorServiceAIReview = "/code_editor.v1.CodeEditorService/AIReview"
 const OperationCodeEditorServiceCreateRoom = "/code_editor.v1.CodeEditorService/CreateRoom"
 const OperationCodeEditorServiceCreateTask = "/code_editor.v1.CodeEditorService/CreateTask"
 const OperationCodeEditorServiceDeleteTask = "/code_editor.v1.CodeEditorService/DeleteTask"
+const OperationCodeEditorServiceGetDailyChallenge = "/code_editor.v1.CodeEditorService/GetDailyChallenge"
 const OperationCodeEditorServiceGetLeaderboard = "/code_editor.v1.CodeEditorService/GetLeaderboard"
 const OperationCodeEditorServiceGetRoom = "/code_editor.v1.CodeEditorService/GetRoom"
 const OperationCodeEditorServiceGetSubmissions = "/code_editor.v1.CodeEditorService/GetSubmissions"
@@ -31,13 +33,16 @@ const OperationCodeEditorServiceLeaveRoom = "/code_editor.v1.CodeEditorService/L
 const OperationCodeEditorServiceListRooms = "/code_editor.v1.CodeEditorService/ListRooms"
 const OperationCodeEditorServiceListTasks = "/code_editor.v1.CodeEditorService/ListTasks"
 const OperationCodeEditorServiceSetReady = "/code_editor.v1.CodeEditorService/SetReady"
+const OperationCodeEditorServiceStartRoom = "/code_editor.v1.CodeEditorService/StartRoom"
 const OperationCodeEditorServiceSubmitCode = "/code_editor.v1.CodeEditorService/SubmitCode"
 const OperationCodeEditorServiceUpdateTask = "/code_editor.v1.CodeEditorService/UpdateTask"
 
 type CodeEditorServiceHTTPServer interface {
+	AIReview(context.Context, *AIReviewRequest) (*AIReviewResponse, error)
 	CreateRoom(context.Context, *CreateRoomRequest) (*CreateRoomResponse, error)
 	CreateTask(context.Context, *CreateTaskRequest) (*TaskResponse, error)
 	DeleteTask(context.Context, *DeleteTaskRequest) (*StatusResponse, error)
+	GetDailyChallenge(context.Context, *GetDailyChallengeRequest) (*GetDailyChallengeResponse, error)
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
 	GetRoom(context.Context, *GetRoomRequest) (*GetRoomResponse, error)
 	GetSubmissions(context.Context, *GetSubmissionsRequest) (*GetSubmissionsResponse, error)
@@ -47,6 +52,7 @@ type CodeEditorServiceHTTPServer interface {
 	ListRooms(context.Context, *ListRoomsRequest) (*ListRoomsResponse, error)
 	ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error)
 	SetReady(context.Context, *SetReadyRequest) (*StatusResponse, error)
+	StartRoom(context.Context, *StartRoomRequest) (*StartRoomResponse, error)
 	SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error)
 	UpdateTask(context.Context, *UpdateTaskRequest) (*TaskResponse, error)
 }
@@ -67,6 +73,9 @@ func RegisterCodeEditorServiceHTTPServer(s *http.Server, srv CodeEditorServiceHT
 	r.DELETE("/api/admin/code-editor/tasks/{task_id}", _CodeEditorService_DeleteTask0_HTTP_Handler(srv))
 	r.GET("/api/v1/code-editor/leaderboard", _CodeEditorService_GetLeaderboard0_HTTP_Handler(srv))
 	r.GET("/api/v1/code-editor/rooms", _CodeEditorService_ListRooms0_HTTP_Handler(srv))
+	r.POST("/api/v1/code-editor/ai-review", _CodeEditorService_AIReview0_HTTP_Handler(srv))
+	r.GET("/api/v1/code-editor/daily", _CodeEditorService_GetDailyChallenge0_HTTP_Handler(srv))
+	r.POST("/api/v1/code-editor/rooms/{room_id}/start", _CodeEditorService_StartRoom0_HTTP_Handler(srv))
 }
 
 func _CodeEditorService_CreateRoom0_HTTP_Handler(srv CodeEditorServiceHTTPServer) func(ctx http.Context) error {
@@ -383,10 +392,78 @@ func _CodeEditorService_ListRooms0_HTTP_Handler(srv CodeEditorServiceHTTPServer)
 	}
 }
 
+func _CodeEditorService_AIReview0_HTTP_Handler(srv CodeEditorServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AIReviewRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCodeEditorServiceAIReview)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AIReview(ctx, req.(*AIReviewRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AIReviewResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _CodeEditorService_GetDailyChallenge0_HTTP_Handler(srv CodeEditorServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetDailyChallengeRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCodeEditorServiceGetDailyChallenge)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetDailyChallenge(ctx, req.(*GetDailyChallengeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetDailyChallengeResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _CodeEditorService_StartRoom0_HTTP_Handler(srv CodeEditorServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in StartRoomRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCodeEditorServiceStartRoom)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.StartRoom(ctx, req.(*StartRoomRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*StartRoomResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type CodeEditorServiceHTTPClient interface {
+	AIReview(ctx context.Context, req *AIReviewRequest, opts ...http.CallOption) (rsp *AIReviewResponse, err error)
 	CreateRoom(ctx context.Context, req *CreateRoomRequest, opts ...http.CallOption) (rsp *CreateRoomResponse, err error)
 	CreateTask(ctx context.Context, req *CreateTaskRequest, opts ...http.CallOption) (rsp *TaskResponse, err error)
 	DeleteTask(ctx context.Context, req *DeleteTaskRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
+	GetDailyChallenge(ctx context.Context, req *GetDailyChallengeRequest, opts ...http.CallOption) (rsp *GetDailyChallengeResponse, err error)
 	GetLeaderboard(ctx context.Context, req *GetLeaderboardRequest, opts ...http.CallOption) (rsp *GetLeaderboardResponse, err error)
 	GetRoom(ctx context.Context, req *GetRoomRequest, opts ...http.CallOption) (rsp *GetRoomResponse, err error)
 	GetSubmissions(ctx context.Context, req *GetSubmissionsRequest, opts ...http.CallOption) (rsp *GetSubmissionsResponse, err error)
@@ -396,6 +473,7 @@ type CodeEditorServiceHTTPClient interface {
 	ListRooms(ctx context.Context, req *ListRoomsRequest, opts ...http.CallOption) (rsp *ListRoomsResponse, err error)
 	ListTasks(ctx context.Context, req *ListTasksRequest, opts ...http.CallOption) (rsp *ListTasksResponse, err error)
 	SetReady(ctx context.Context, req *SetReadyRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
+	StartRoom(ctx context.Context, req *StartRoomRequest, opts ...http.CallOption) (rsp *StartRoomResponse, err error)
 	SubmitCode(ctx context.Context, req *SubmitCodeRequest, opts ...http.CallOption) (rsp *SubmitCodeResponse, err error)
 	UpdateTask(ctx context.Context, req *UpdateTaskRequest, opts ...http.CallOption) (rsp *TaskResponse, err error)
 }
@@ -406,6 +484,19 @@ type CodeEditorServiceHTTPClientImpl struct {
 
 func NewCodeEditorServiceHTTPClient(client *http.Client) CodeEditorServiceHTTPClient {
 	return &CodeEditorServiceHTTPClientImpl{client}
+}
+
+func (c *CodeEditorServiceHTTPClientImpl) AIReview(ctx context.Context, in *AIReviewRequest, opts ...http.CallOption) (*AIReviewResponse, error) {
+	var out AIReviewResponse
+	pattern := "/api/v1/code-editor/ai-review"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationCodeEditorServiceAIReview))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *CodeEditorServiceHTTPClientImpl) CreateRoom(ctx context.Context, in *CreateRoomRequest, opts ...http.CallOption) (*CreateRoomResponse, error) {
@@ -441,6 +532,19 @@ func (c *CodeEditorServiceHTTPClientImpl) DeleteTask(ctx context.Context, in *De
 	opts = append(opts, http.Operation(OperationCodeEditorServiceDeleteTask))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *CodeEditorServiceHTTPClientImpl) GetDailyChallenge(ctx context.Context, in *GetDailyChallengeRequest, opts ...http.CallOption) (*GetDailyChallengeResponse, error) {
+	var out GetDailyChallengeResponse
+	pattern := "/api/v1/code-editor/daily"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationCodeEditorServiceGetDailyChallenge))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -556,6 +660,19 @@ func (c *CodeEditorServiceHTTPClientImpl) SetReady(ctx context.Context, in *SetR
 	pattern := "/api/v1/code-editor/rooms/{room_id}/ready"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationCodeEditorServiceSetReady))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *CodeEditorServiceHTTPClientImpl) StartRoom(ctx context.Context, in *StartRoomRequest, opts ...http.CallOption) (*StartRoomResponse, error) {
+	var out StartRoomResponse
+	pattern := "/api/v1/code-editor/rooms/{room_id}/start"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationCodeEditorServiceStartRoom))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

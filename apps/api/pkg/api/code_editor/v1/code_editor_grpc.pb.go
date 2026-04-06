@@ -33,6 +33,9 @@ const (
 	CodeEditorService_DeleteTask_FullMethodName           = "/code_editor.v1.CodeEditorService/DeleteTask"
 	CodeEditorService_GetLeaderboard_FullMethodName       = "/code_editor.v1.CodeEditorService/GetLeaderboard"
 	CodeEditorService_ListRooms_FullMethodName            = "/code_editor.v1.CodeEditorService/ListRooms"
+	CodeEditorService_AIReview_FullMethodName             = "/code_editor.v1.CodeEditorService/AIReview"
+	CodeEditorService_GetDailyChallenge_FullMethodName    = "/code_editor.v1.CodeEditorService/GetDailyChallenge"
+	CodeEditorService_StartRoom_FullMethodName            = "/code_editor.v1.CodeEditorService/StartRoom"
 )
 
 // CodeEditorServiceClient is the client API for CodeEditorService service.
@@ -53,6 +56,9 @@ type CodeEditorServiceClient interface {
 	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	GetLeaderboard(ctx context.Context, in *GetLeaderboardRequest, opts ...grpc.CallOption) (*GetLeaderboardResponse, error)
 	ListRooms(ctx context.Context, in *ListRoomsRequest, opts ...grpc.CallOption) (*ListRoomsResponse, error)
+	AIReview(ctx context.Context, in *AIReviewRequest, opts ...grpc.CallOption) (*AIReviewResponse, error)
+	GetDailyChallenge(ctx context.Context, in *GetDailyChallengeRequest, opts ...grpc.CallOption) (*GetDailyChallengeResponse, error)
+	StartRoom(ctx context.Context, in *StartRoomRequest, opts ...grpc.CallOption) (*StartRoomResponse, error)
 }
 
 type codeEditorServiceClient struct {
@@ -203,6 +209,36 @@ func (c *codeEditorServiceClient) ListRooms(ctx context.Context, in *ListRoomsRe
 	return out, nil
 }
 
+func (c *codeEditorServiceClient) AIReview(ctx context.Context, in *AIReviewRequest, opts ...grpc.CallOption) (*AIReviewResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AIReviewResponse)
+	err := c.cc.Invoke(ctx, CodeEditorService_AIReview_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *codeEditorServiceClient) GetDailyChallenge(ctx context.Context, in *GetDailyChallengeRequest, opts ...grpc.CallOption) (*GetDailyChallengeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetDailyChallengeResponse)
+	err := c.cc.Invoke(ctx, CodeEditorService_GetDailyChallenge_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *codeEditorServiceClient) StartRoom(ctx context.Context, in *StartRoomRequest, opts ...grpc.CallOption) (*StartRoomResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StartRoomResponse)
+	err := c.cc.Invoke(ctx, CodeEditorService_StartRoom_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CodeEditorServiceServer is the server API for CodeEditorService service.
 // All implementations must embed UnimplementedCodeEditorServiceServer
 // for forward compatibility.
@@ -221,6 +257,9 @@ type CodeEditorServiceServer interface {
 	DeleteTask(context.Context, *DeleteTaskRequest) (*StatusResponse, error)
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
 	ListRooms(context.Context, *ListRoomsRequest) (*ListRoomsResponse, error)
+	AIReview(context.Context, *AIReviewRequest) (*AIReviewResponse, error)
+	GetDailyChallenge(context.Context, *GetDailyChallengeRequest) (*GetDailyChallengeResponse, error)
+	StartRoom(context.Context, *StartRoomRequest) (*StartRoomResponse, error)
 	mustEmbedUnimplementedCodeEditorServiceServer()
 }
 
@@ -272,6 +311,15 @@ func (UnimplementedCodeEditorServiceServer) GetLeaderboard(context.Context, *Get
 }
 func (UnimplementedCodeEditorServiceServer) ListRooms(context.Context, *ListRoomsRequest) (*ListRoomsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListRooms not implemented")
+}
+func (UnimplementedCodeEditorServiceServer) AIReview(context.Context, *AIReviewRequest) (*AIReviewResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AIReview not implemented")
+}
+func (UnimplementedCodeEditorServiceServer) GetDailyChallenge(context.Context, *GetDailyChallengeRequest) (*GetDailyChallengeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetDailyChallenge not implemented")
+}
+func (UnimplementedCodeEditorServiceServer) StartRoom(context.Context, *StartRoomRequest) (*StartRoomResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method StartRoom not implemented")
 }
 func (UnimplementedCodeEditorServiceServer) mustEmbedUnimplementedCodeEditorServiceServer() {}
 func (UnimplementedCodeEditorServiceServer) testEmbeddedByValue()                           {}
@@ -546,6 +594,60 @@ func _CodeEditorService_ListRooms_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CodeEditorService_AIReview_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AIReviewRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CodeEditorServiceServer).AIReview(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CodeEditorService_AIReview_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CodeEditorServiceServer).AIReview(ctx, req.(*AIReviewRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CodeEditorService_GetDailyChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetDailyChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CodeEditorServiceServer).GetDailyChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CodeEditorService_GetDailyChallenge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CodeEditorServiceServer).GetDailyChallenge(ctx, req.(*GetDailyChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CodeEditorService_StartRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(StartRoomRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CodeEditorServiceServer).StartRoom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CodeEditorService_StartRoom_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CodeEditorServiceServer).StartRoom(ctx, req.(*StartRoomRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CodeEditorService_ServiceDesc is the grpc.ServiceDesc for CodeEditorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -608,6 +710,18 @@ var CodeEditorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListRooms",
 			Handler:    _CodeEditorService_ListRooms_Handler,
+		},
+		{
+			MethodName: "AIReview",
+			Handler:    _CodeEditorService_AIReview_Handler,
+		},
+		{
+			MethodName: "GetDailyChallenge",
+			Handler:    _CodeEditorService_GetDailyChallenge_Handler,
+		},
+		{
+			MethodName: "StartRoom",
+			Handler:    _CodeEditorService_StartRoom_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

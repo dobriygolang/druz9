@@ -96,6 +96,14 @@ service InterviewPrepService {
   rpc DeleteMockCompanyPreset(DeleteMockCompanyPresetRequest) returns (StatusResponse) {
     option (google.api.http) = { delete: "/api/admin/interview-prep/mock-company-presets/{id}" };
   }
+
+  rpc StartCheckpointSession(StartCheckpointSessionRequest) returns (CheckpointSessionResponse) {
+    option (google.api.http) = { post: "/api/v1/interview-prep/checkpoints/start" body: "*" };
+  }
+
+  rpc GetCheckpointBySession(GetCheckpointBySessionRequest) returns (CheckpointSessionResponse) {
+    option (google.api.http) = { get: "/api/v1/interview-prep/checkpoints/session/{session_id}" };
+  }
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────
@@ -520,4 +528,36 @@ message MockCompanyPreset {
   bool                      is_active         = 7;
   google.protobuf.Timestamp created_at        = 8;  // was: string
   google.protobuf.Timestamp updated_at        = 9;  // was: string
+}
+
+// ── Checkpoint messages ────────────────────────────────────────────────────
+
+message StartCheckpointSessionRequest {
+  string task_id = 1;
+}
+
+message GetCheckpointBySessionRequest {
+  string session_id = 1;
+}
+
+message CheckpointProgress {
+  string                    id               = 1;
+  string                    user_id          = 2;
+  string                    task_id          = 3;
+  string                    session_id       = 4;
+  string                    skill_key        = 5;
+  string                    status           = 6;
+  int32                     duration_seconds = 7;
+  int32                     attempts_used    = 8;
+  int32                     max_attempts     = 9;
+  int32                     score            = 10;
+  google.protobuf.Timestamp started_at       = 11;
+  google.protobuf.Timestamp finished_at      = 12;
+  google.protobuf.Timestamp created_at       = 13;
+  google.protobuf.Timestamp updated_at       = 14;
+}
+
+message CheckpointSessionResponse {
+  InterviewPrepSession session    = 1;
+  CheckpointProgress   checkpoint = 2;
 }

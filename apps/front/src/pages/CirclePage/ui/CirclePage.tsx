@@ -53,6 +53,9 @@ export function CirclePage() {
   const [eventForm, setEventForm] = useState<{ title: string; description: string; meetingLink: string; scheduledAt: string; repeat: EventRepeat }>({
     title: '', description: '', meetingLink: '', scheduledAt: '', repeat: 'none',
   })
+  const [showInvite, setShowInvite] = useState(false)
+  const [inviteUserId, setInviteUserId] = useState('')
+  const [inviting, setInviting] = useState(false)
 
   useEffect(() => {
     if (!circleId) return
@@ -137,6 +140,20 @@ export function CirclePage() {
     } catch {
       toast('Не удалось создать комнату', 'error')
     } finally { setPracticeLoading(false) }
+  }
+
+  const handleInvite = async () => {
+    if (!circleId || !inviteUserId.trim()) return
+    setInviting(true)
+    try {
+      await circleApi.inviteMember(circleId, inviteUserId.trim())
+      toast('Пользователь приглашён', 'success')
+      setShowInvite(false)
+      setInviteUserId('')
+      loadMembers()
+    } catch {
+      toast('Не удалось пригласить. Проверьте ID пользователя.', 'error')
+    } finally { setInviting(false) }
   }
 
   const handleShare = () => {
@@ -323,6 +340,15 @@ export function CirclePage() {
         )}
 
         {activeTab === 'members' && (
+          <>
+          {/* Invite button — visible to creator only (private circles) or anyone for public */}
+          {circle.isJoined && !circle.isPublic && (
+            <div className="flex justify-end">
+              <Button variant="orange" size="sm" onClick={() => setShowInvite(true)}>
+                <UserPlus className="w-3.5 h-3.5" /> Пригласить
+              </Button>
+            </div>
+          )}
           <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] overflow-hidden">
             {membersLoading ? (
               <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
@@ -365,6 +391,7 @@ export function CirclePage() {
               </div>
             )}
           </div>
+          </>
         )}
 
         {activeTab === 'events' && (
@@ -447,6 +474,26 @@ export function CirclePage() {
           </>
         )}
       </div>
+
+      {/* Invite member modal */}
+      <Modal
+        open={showInvite}
+        onClose={() => { setShowInvite(false); setInviteUserId('') }}
+        title="Пригласить участника"
+        footer={
+          <>
+            <Button variant="secondary" size="sm" onClick={() => { setShowInvite(false); setInviteUserId('') }}>Отмена</Button>
+            <Button variant="orange" size="sm" onClick={handleInvite} loading={inviting} disabled={!inviteUserId.trim()}>Пригласить</Button>
+          </>
+        }
+      >
+        <Input
+          label="ID пользователя"
+          value={inviteUserId}
+          onChange={e => setInviteUserId(e.target.value)}
+          placeholder="UUID пользователя"
+        />
+      </Modal>
 
       {/* Create event modal */}
       <Modal
