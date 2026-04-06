@@ -122,7 +122,8 @@ SELECT
   e.creator_id::text,
   COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.username, ''), ''),
   e.circle_id,
-  COALESCE(e.repeat_rule, 'none')
+  COALESCE(e.repeat_rule, 'none'),
+  e.is_public
 FROM events e
 JOIN users cu ON cu.id = e.creator_id
 %s
@@ -219,6 +220,7 @@ func (r *Repo) fetchEvents(
 			&event.CreatorName,
 			&event.CircleID,
 			&event.Repeat,
+			&event.IsPublic,
 		); err != nil {
 			return nil, fmt.Errorf("scan event: %w", err)
 		}
@@ -339,7 +341,8 @@ SELECT
   e.scheduled_at,
   e.created_at,
   e.creator_id::text,
-  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.username, ''), '')
+  COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.username, ''), ''),
+  e.is_public
 FROM events e
 JOIN users cu ON cu.id = e.creator_id
 WHERE e.id = $1
@@ -375,6 +378,7 @@ WHERE e.id = $1
 		&createdAt,
 		&event.CreatorID,
 		&event.CreatorName,
+		&event.IsPublic,
 	); err != nil {
 		return nil, fmt.Errorf("scan event: %w", err)
 	}

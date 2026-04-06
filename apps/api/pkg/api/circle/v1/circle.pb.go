@@ -80,6 +80,7 @@ type CreateCircleRequest struct {
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
 	Description   string                 `protobuf:"bytes,2,opt,name=description,proto3" json:"description,omitempty"`
 	Tags          []string               `protobuf:"bytes,3,rep,name=tags,proto3" json:"tags,omitempty"`
+	IsPublic      bool                   `protobuf:"varint,4,opt,name=is_public,json=isPublic,proto3" json:"is_public,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -133,6 +134,13 @@ func (x *CreateCircleRequest) GetTags() []string {
 		return x.Tags
 	}
 	return nil
+}
+
+func (x *CreateCircleRequest) GetIsPublic() bool {
+	if x != nil {
+		return x.IsPublic
+	}
+	return false
 }
 
 type JoinCircleRequest struct {
@@ -407,6 +415,102 @@ func (x *LeaveCircleResponse) GetStatus() string {
 	return ""
 }
 
+type InviteToCircleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CircleId      string                 `protobuf:"bytes,1,opt,name=circle_id,json=circleId,proto3" json:"circle_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InviteToCircleRequest) Reset() {
+	*x = InviteToCircleRequest{}
+	mi := &file_circle_v1_circle_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InviteToCircleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InviteToCircleRequest) ProtoMessage() {}
+
+func (x *InviteToCircleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InviteToCircleRequest.ProtoReflect.Descriptor instead.
+func (*InviteToCircleRequest) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *InviteToCircleRequest) GetCircleId() string {
+	if x != nil {
+		return x.CircleId
+	}
+	return ""
+}
+
+func (x *InviteToCircleRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type InviteToCircleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InviteToCircleResponse) Reset() {
+	*x = InviteToCircleResponse{}
+	mi := &file_circle_v1_circle_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InviteToCircleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InviteToCircleResponse) ProtoMessage() {}
+
+func (x *InviteToCircleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InviteToCircleResponse.ProtoReflect.Descriptor instead.
+func (*InviteToCircleResponse) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *InviteToCircleResponse) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
+}
+
 type Circle struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -424,7 +528,7 @@ type Circle struct {
 
 func (x *Circle) Reset() {
 	*x = Circle{}
-	mi := &file_circle_v1_circle_proto_msgTypes[8]
+	mi := &file_circle_v1_circle_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -436,7 +540,7 @@ func (x *Circle) String() string {
 func (*Circle) ProtoMessage() {}
 
 func (x *Circle) ProtoReflect() protoreflect.Message {
-	mi := &file_circle_v1_circle_proto_msgTypes[8]
+	mi := &file_circle_v1_circle_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -449,7 +553,7 @@ func (x *Circle) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Circle.ProtoReflect.Descriptor instead.
 func (*Circle) Descriptor() ([]byte, []int) {
-	return file_circle_v1_circle_proto_rawDescGZIP(), []int{8}
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *Circle) GetId() string {
@@ -522,11 +626,12 @@ const file_circle_v1_circle_proto_rawDesc = "" +
 	"\x16circle/v1/circle.proto\x12\tcircle.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"B\n" +
 	"\x12ListCirclesRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x02 \x01(\x05R\x06offset\"_\n" +
+	"\x06offset\x18\x02 \x01(\x05R\x06offset\"|\n" +
 	"\x13CreateCircleRequest\x12\x12\n" +
 	"\x04name\x18\x01 \x01(\tR\x04name\x12 \n" +
 	"\vdescription\x18\x02 \x01(\tR\vdescription\x12\x12\n" +
-	"\x04tags\x18\x03 \x03(\tR\x04tags\"0\n" +
+	"\x04tags\x18\x03 \x03(\tR\x04tags\x12\x1b\n" +
+	"\tis_public\x18\x04 \x01(\bR\bisPublic\"0\n" +
 	"\x11JoinCircleRequest\x12\x1b\n" +
 	"\tcircle_id\x18\x01 \x01(\tR\bcircleId\"1\n" +
 	"\x12LeaveCircleRequest\x12\x1b\n" +
@@ -540,6 +645,11 @@ const file_circle_v1_circle_proto_rawDesc = "" +
 	"\x12JoinCircleResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\tR\x06status\"-\n" +
 	"\x13LeaveCircleResponse\x12\x16\n" +
+	"\x06status\x18\x01 \x01(\tR\x06status\"M\n" +
+	"\x15InviteToCircleRequest\x12\x1b\n" +
+	"\tcircle_id\x18\x01 \x01(\tR\bcircleId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"0\n" +
+	"\x16InviteToCircleResponse\x12\x16\n" +
 	"\x06status\x18\x01 \x01(\tR\x06status\"\x99\x02\n" +
 	"\x06Circle\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
@@ -552,13 +662,14 @@ const file_circle_v1_circle_proto_rawDesc = "" +
 	"\tis_public\x18\a \x01(\bR\bisPublic\x12\x1b\n" +
 	"\tis_joined\x18\b \x01(\bR\bisJoined\x129\n" +
 	"\n" +
-	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt2\xd1\x03\n" +
+	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt2\xd8\x04\n" +
 	"\rCircleService\x12e\n" +
 	"\vListCircles\x12\x1d.circle.v1.ListCirclesRequest\x1a\x1e.circle.v1.ListCirclesResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/circles\x12e\n" +
 	"\fCreateCircle\x12\x1e.circle.v1.CreateCircleRequest\x1a\x19.circle.v1.CircleResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/api/v1/circles\x12v\n" +
 	"\n" +
 	"JoinCircle\x12\x1c.circle.v1.JoinCircleRequest\x1a\x1d.circle.v1.JoinCircleResponse\"+\x82\xd3\xe4\x93\x02%:\x01*\" /api/v1/circles/{circle_id}/join\x12z\n" +
-	"\vLeaveCircle\x12\x1d.circle.v1.LeaveCircleRequest\x1a\x1e.circle.v1.LeaveCircleResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/api/v1/circles/{circle_id}/leaveB\x1aZ\x18api/pkg/api/circle/v1;v1b\x06proto3"
+	"\vLeaveCircle\x12\x1d.circle.v1.LeaveCircleRequest\x1a\x1e.circle.v1.LeaveCircleResponse\",\x82\xd3\xe4\x93\x02&:\x01*\"!/api/v1/circles/{circle_id}/leave\x12\x84\x01\n" +
+	"\x0eInviteToCircle\x12 .circle.v1.InviteToCircleRequest\x1a!.circle.v1.InviteToCircleResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/api/v1/circles/{circle_id}/inviteB\x1aZ\x18api/pkg/api/circle/v1;v1b\x06proto3"
 
 var (
 	file_circle_v1_circle_proto_rawDescOnce sync.Once
@@ -572,36 +683,40 @@ func file_circle_v1_circle_proto_rawDescGZIP() []byte {
 	return file_circle_v1_circle_proto_rawDescData
 }
 
-var file_circle_v1_circle_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_circle_v1_circle_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
 var file_circle_v1_circle_proto_goTypes = []any{
-	(*ListCirclesRequest)(nil),    // 0: circle.v1.ListCirclesRequest
-	(*CreateCircleRequest)(nil),   // 1: circle.v1.CreateCircleRequest
-	(*JoinCircleRequest)(nil),     // 2: circle.v1.JoinCircleRequest
-	(*LeaveCircleRequest)(nil),    // 3: circle.v1.LeaveCircleRequest
-	(*ListCirclesResponse)(nil),   // 4: circle.v1.ListCirclesResponse
-	(*CircleResponse)(nil),        // 5: circle.v1.CircleResponse
-	(*JoinCircleResponse)(nil),    // 6: circle.v1.JoinCircleResponse
-	(*LeaveCircleResponse)(nil),   // 7: circle.v1.LeaveCircleResponse
-	(*Circle)(nil),                // 8: circle.v1.Circle
-	(*timestamppb.Timestamp)(nil), // 9: google.protobuf.Timestamp
+	(*ListCirclesRequest)(nil),     // 0: circle.v1.ListCirclesRequest
+	(*CreateCircleRequest)(nil),    // 1: circle.v1.CreateCircleRequest
+	(*JoinCircleRequest)(nil),      // 2: circle.v1.JoinCircleRequest
+	(*LeaveCircleRequest)(nil),     // 3: circle.v1.LeaveCircleRequest
+	(*ListCirclesResponse)(nil),    // 4: circle.v1.ListCirclesResponse
+	(*CircleResponse)(nil),         // 5: circle.v1.CircleResponse
+	(*JoinCircleResponse)(nil),     // 6: circle.v1.JoinCircleResponse
+	(*LeaveCircleResponse)(nil),    // 7: circle.v1.LeaveCircleResponse
+	(*InviteToCircleRequest)(nil),  // 8: circle.v1.InviteToCircleRequest
+	(*InviteToCircleResponse)(nil), // 9: circle.v1.InviteToCircleResponse
+	(*Circle)(nil),                 // 10: circle.v1.Circle
+	(*timestamppb.Timestamp)(nil),  // 11: google.protobuf.Timestamp
 }
 var file_circle_v1_circle_proto_depIdxs = []int32{
-	8, // 0: circle.v1.ListCirclesResponse.circles:type_name -> circle.v1.Circle
-	8, // 1: circle.v1.CircleResponse.circle:type_name -> circle.v1.Circle
-	9, // 2: circle.v1.Circle.created_at:type_name -> google.protobuf.Timestamp
-	0, // 3: circle.v1.CircleService.ListCircles:input_type -> circle.v1.ListCirclesRequest
-	1, // 4: circle.v1.CircleService.CreateCircle:input_type -> circle.v1.CreateCircleRequest
-	2, // 5: circle.v1.CircleService.JoinCircle:input_type -> circle.v1.JoinCircleRequest
-	3, // 6: circle.v1.CircleService.LeaveCircle:input_type -> circle.v1.LeaveCircleRequest
-	4, // 7: circle.v1.CircleService.ListCircles:output_type -> circle.v1.ListCirclesResponse
-	5, // 8: circle.v1.CircleService.CreateCircle:output_type -> circle.v1.CircleResponse
-	6, // 9: circle.v1.CircleService.JoinCircle:output_type -> circle.v1.JoinCircleResponse
-	7, // 10: circle.v1.CircleService.LeaveCircle:output_type -> circle.v1.LeaveCircleResponse
-	7, // [7:11] is the sub-list for method output_type
-	3, // [3:7] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	10, // 0: circle.v1.ListCirclesResponse.circles:type_name -> circle.v1.Circle
+	10, // 1: circle.v1.CircleResponse.circle:type_name -> circle.v1.Circle
+	11, // 2: circle.v1.Circle.created_at:type_name -> google.protobuf.Timestamp
+	0,  // 3: circle.v1.CircleService.ListCircles:input_type -> circle.v1.ListCirclesRequest
+	1,  // 4: circle.v1.CircleService.CreateCircle:input_type -> circle.v1.CreateCircleRequest
+	2,  // 5: circle.v1.CircleService.JoinCircle:input_type -> circle.v1.JoinCircleRequest
+	3,  // 6: circle.v1.CircleService.LeaveCircle:input_type -> circle.v1.LeaveCircleRequest
+	8,  // 7: circle.v1.CircleService.InviteToCircle:input_type -> circle.v1.InviteToCircleRequest
+	4,  // 8: circle.v1.CircleService.ListCircles:output_type -> circle.v1.ListCirclesResponse
+	5,  // 9: circle.v1.CircleService.CreateCircle:output_type -> circle.v1.CircleResponse
+	6,  // 10: circle.v1.CircleService.JoinCircle:output_type -> circle.v1.JoinCircleResponse
+	7,  // 11: circle.v1.CircleService.LeaveCircle:output_type -> circle.v1.LeaveCircleResponse
+	9,  // 12: circle.v1.CircleService.InviteToCircle:output_type -> circle.v1.InviteToCircleResponse
+	8,  // [8:13] is the sub-list for method output_type
+	3,  // [3:8] is the sub-list for method input_type
+	3,  // [3:3] is the sub-list for extension type_name
+	3,  // [3:3] is the sub-list for extension extendee
+	0,  // [0:3] is the sub-list for field type_name
 }
 
 func init() { file_circle_v1_circle_proto_init() }
@@ -615,7 +730,7 @@ func file_circle_v1_circle_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_circle_v1_circle_proto_rawDesc), len(file_circle_v1_circle_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

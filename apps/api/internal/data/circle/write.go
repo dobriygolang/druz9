@@ -11,7 +11,7 @@ import (
 	"github.com/jackc/pgx/v5"
 )
 
-func (r *Repo) CreateCircle(ctx context.Context, creatorID uuid.UUID, name, description string, tags []string) (*model.Circle, error) {
+func (r *Repo) CreateCircle(ctx context.Context, creatorID uuid.UUID, name, description string, tags []string, isPublic bool) (*model.Circle, error) {
 	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {
 		return nil, fmt.Errorf("begin tx: %w", err)
@@ -20,9 +20,9 @@ func (r *Repo) CreateCircle(ctx context.Context, creatorID uuid.UUID, name, desc
 
 	circleID := uuid.New()
 	if _, err := tx.Exec(ctx, `
-INSERT INTO circles (id, name, description, creator_id, tags, member_count)
-VALUES ($1, $2, $3, $4, $5, 1)`,
-		circleID, name, description, creatorID, tags,
+INSERT INTO circles (id, name, description, creator_id, tags, member_count, is_public)
+VALUES ($1, $2, $3, $4, $5, 1, $6)`,
+		circleID, name, description, creatorID, tags, isPublic,
 	); err != nil {
 		return nil, fmt.Errorf("insert circle: %w", err)
 	}
@@ -45,9 +45,56 @@ INSERT INTO circle_members (circle_id, user_id, role) VALUES ($1, $2, 'creator')
 		CreatorID:   creatorID,
 		MemberCount: 1,
 		Tags:        tags,
-		IsPublic:    true,
+		IsPublic:    isPublic,
 		IsJoined:    true,
 	}, nil
+}
+
+func (r *Repo) GetCircle(ctx context.Context, circleID uuid.UUID) (*model.Circle, error) {
+	var c model.Circle
+	err := r.data.DB.QueryRow(ctx, `
+SELECT id, name, description, creator_id, member_count, tags, is_public, created_at
+FROM circles WHERE id = $1`, circleID).Scan(
+		&c.ID, &c.Name, &c.Description, &c.CreatorID,
+		&c.MemberCount, &c.Tags, &c.IsPublic, &c.CreatedAt,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("get circle: %w", err)
+	}
+	return &c, nil
+}
+
+func (r *Repo) InviteToCircle(ctx context.Context, circleID, inviterID, inviteeID uuid.UUID) error {
+	// Only creator can invite
+	circle, err := r.GetCircle(ctx, circleID)
+	if err != nil {
+		return err
+	}
+	if circle.CreatorID != inviterID {
+		return kratoserrors.Forbidden("FORBIDDEN", "only the circle creator can invite members")
+	}
+
+	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return fmt.Errorf("begin tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	tag, err := tx.Exec(ctx, `
+INSERT INTO circle_members (circle_id, user_id, role) VALUES ($1, $2, 'member')
+ON CONFLICT (circle_id, user_id) DO NOTHING`, circleID, inviteeID)
+	if err != nil {
+		return fmt.Errorf("invite to circle: %w", err)
+	}
+	if tag.RowsAffected() > 0 {
+		if _, err := tx.Exec(ctx,
+			`UPDATE circles SET member_count = member_count + 1, updated_at = now() WHERE id = $1`,
+			circleID,
+		); err != nil {
+			return fmt.Errorf("update member count: %w", err)
+		}
+	}
+	return tx.Commit(ctx)
 }
 
 func (r *Repo) JoinCircle(ctx context.Context, circleID, userID uuid.UUID) error {

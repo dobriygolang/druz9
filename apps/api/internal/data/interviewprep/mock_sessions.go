@@ -136,6 +136,26 @@ func (r *Repo) GetMockSession(ctx context.Context, sessionID uuid.UUID) (*model.
 	return session, nil
 }
 
+func (r *Repo) GetAnyActiveMockSessionByUser(ctx context.Context, userID uuid.UUID) (*model.InterviewPrepMockSession, error) {
+	row := r.data.DB.QueryRow(ctx, `
+		SELECT id, user_id, company_tag, status, current_stage_index,
+		       started_at, finished_at, created_at, updated_at
+		FROM interview_prep_mock_sessions
+		WHERE user_id = $1 AND status = $2
+		ORDER BY updated_at DESC
+		LIMIT 1
+	`, userID, model.InterviewPrepMockSessionStatusActive)
+
+	session, err := scanMockSession(row)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, nil
+		}
+		return nil, fmt.Errorf("get any active mock session: %w", err)
+	}
+	return r.GetMockSession(ctx, session.ID)
+}
+
 func (r *Repo) GetActiveMockSessionByUserAndCompany(ctx context.Context, userID uuid.UUID, companyTag string) (*model.InterviewPrepMockSession, error) {
 	row := r.data.DB.QueryRow(ctx, `
 		SELECT id, user_id, company_tag, status, current_stage_index,

@@ -292,6 +292,7 @@ func toHTTPError(err error) error {
 		errors.Is(err, appinterviewprep.ErrMockQuestionNotReady),
 		errors.Is(err, appinterviewprep.ErrMockQuestionAnswerRequired),
 		errors.Is(err, appinterviewprep.ErrMockCompanyTagRequired),
+		errors.Is(err, appinterviewprep.ErrAnotherMockSessionActive),
 		errors.Is(err, appinterviewprep.ErrMockTaskPoolIncomplete),
 		errors.Is(err, appinterviewprep.ErrMockQuestionPoolIncomplete),
 		errors.Is(err, appinterviewprep.ErrQuestionLocked),

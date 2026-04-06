@@ -849,6 +849,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/circle.v1.CircleResponse'
+    /api/v1/circles/{circleId}/invite:
+        post:
+            tags:
+                - CircleService
+            operationId: CircleService_InviteToCircle
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/circle.v1.InviteToCircleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.InviteToCircleResponse'
     /api/v1/circles/{circleId}/join:
         post:
             tags:
@@ -2260,6 +2284,20 @@ components:
                     type: array
                     items:
                         type: string
+                isPublic:
+                    type: boolean
+        circle.v1.InviteToCircleRequest:
+            type: object
+            properties:
+                circleId:
+                    type: string
+                userId:
+                    type: string
+        circle.v1.InviteToCircleResponse:
+            type: object
+            properties:
+                status:
+                    type: string
         circle.v1.JoinCircleRequest:
             type: object
             properties:
@@ -2708,6 +2746,8 @@ components:
                 repeat:
                     type: integer
                     format: enum
+                isPublic:
+                    type: boolean
         event.v1.Event:
             type: object
             properties:
@@ -2754,6 +2794,8 @@ components:
                     type: string
                 meetingLink:
                     type: string
+                isPublic:
+                    type: boolean
         event.v1.EventParticipant:
             type: object
             properties:

@@ -51,9 +51,9 @@ func (r *Repo) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.C
 		}
 		_, err = tx.Exec(
 			ctx,
-			`INSERT INTO events (id, creator_id, title, place_label, description, meeting_link, region, country, city, latitude, longitude, scheduled_at, series_id, repeat_rule, circle_id, created_at, updated_at)
-			 VALUES ($1,$2,$3,$4,NULLIF($5,''),NULLIF($6,''),NULLIF($7,''),NULLIF($8,''),NULLIF($9,''),$10,$11,$12,$13,$14,$15,NOW(),NOW())`,
-			eventID, creatorID, req.Title, req.PlaceLabel, req.Description, req.MeetingLink, req.Region, req.Country, req.City, req.Latitude, req.Longitude, scheduledAt, seriesID, normalizeRepeatRule(req.Repeat), req.CircleID,
+			`INSERT INTO events (id, creator_id, title, place_label, description, meeting_link, region, country, city, latitude, longitude, scheduled_at, series_id, repeat_rule, circle_id, is_public, created_at, updated_at)
+			 VALUES ($1,$2,$3,$4,NULLIF($5,''),NULLIF($6,''),NULLIF($7,''),NULLIF($8,''),NULLIF($9,''),$10,$11,$12,$13,$14,$15,$16,NOW(),NOW())`,
+			eventID, creatorID, req.Title, req.PlaceLabel, req.Description, req.MeetingLink, req.Region, req.Country, req.City, req.Latitude, req.Longitude, scheduledAt, seriesID, normalizeRepeatRule(req.Repeat), req.CircleID, req.IsPublic,
 		)
 		if err != nil {
 			return nil, fmt.Errorf("insert event: %w", err)

@@ -82,20 +82,32 @@ export function DailyChallengePage() {
   const [submitted, setSubmitted] = useState(false)
   const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  // Fetch daily task, restore draft from localStorage
+  // Fetch daily task, restore draft + review from localStorage
   useEffect(() => {
     apiClient.get('/api/v1/code-editor/daily')
       .then(res => {
         const normalized = normalizeTask(res.data)
         setTask(normalized)
-        const cacheKey = `daily:code:${normalized.task.id}`
-        const saved = normalized.task.id ? localStorage.getItem(cacheKey) : null
-        setCode(saved ?? normalized.task.starterCode ?? '')
-        // Purge stale drafts from previous days
-        if (normalized.task.id) {
+        const id = normalized.task.id
+        if (id) {
+          const codeKey = `daily:code:${id}`
+          const reviewKey = `daily:review:${id}`
+          const savedCode = localStorage.getItem(codeKey)
+          const savedReview = localStorage.getItem(reviewKey)
+          setCode(savedCode ?? normalized.task.starterCode ?? '')
+          if (savedReview) {
+            try {
+              const parsed = JSON.parse(savedReview)
+              setReview(parsed)
+              setSubmitted(true)
+            } catch { /* ignore corrupt cache */ }
+          }
+          // Purge stale entries from previous days
           Object.keys(localStorage)
-            .filter(k => k.startsWith('daily:code:') && k !== cacheKey)
+            .filter(k => (k.startsWith('daily:code:') && k !== codeKey) || (k.startsWith('daily:review:') && k !== reviewKey))
             .forEach(k => localStorage.removeItem(k))
+        } else {
+          setCode(normalized.task.starterCode ?? '')
         }
       })
       .catch(() => setError(true))
@@ -131,7 +143,11 @@ export function DailyChallengePage() {
         task_title: task?.task.title ?? '',
         statement: task?.task.statement ?? '',
       })
-      setReview(res.data?.review ?? res.data)
+      const reviewData = res.data?.review ?? res.data
+      setReview(reviewData)
+      if (task?.task.id) {
+        try { localStorage.setItem(`daily:review:${task.task.id}`, JSON.stringify(reviewData)) } catch { /* quota */ }
+      }
     } catch {
       // keep submitted=true, review stays null
     } finally {

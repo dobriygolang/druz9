@@ -314,7 +314,8 @@ type CreateEventRequest struct {
 	InvitedUserIds []string               `protobuf:"bytes,9,rep,name=invited_user_ids,json=invitedUserIds,proto3" json:"invited_user_ids,omitempty"`
 	Description    string                 `protobuf:"bytes,10,opt,name=description,proto3" json:"description,omitempty"`
 	MeetingLink    string                 `protobuf:"bytes,11,opt,name=meeting_link,json=meetingLink,proto3" json:"meeting_link,omitempty"`
-	Repeat         EventRepeat            `protobuf:"varint,12,opt,name=repeat,proto3,enum=event.v1.EventRepeat" json:"repeat,omitempty"` // was: string
+	Repeat         EventRepeat            `protobuf:"varint,12,opt,name=repeat,proto3,enum=event.v1.EventRepeat" json:"repeat,omitempty"`
+	IsPublic       bool                   `protobuf:"varint,13,opt,name=is_public,json=isPublic,proto3" json:"is_public,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -431,6 +432,13 @@ func (x *CreateEventRequest) GetRepeat() EventRepeat {
 		return x.Repeat
 	}
 	return EventRepeat_EVENT_REPEAT_UNSPECIFIED
+}
+
+func (x *CreateEventRequest) GetIsPublic() bool {
+	if x != nil {
+		return x.IsPublic
+	}
+	return false
 }
 
 type JoinEventRequest struct {
@@ -890,6 +898,7 @@ type Event struct {
 	Participants     []*EventParticipant    `protobuf:"bytes,16,rep,name=participants,proto3" json:"participants,omitempty"`
 	Description      string                 `protobuf:"bytes,17,opt,name=description,proto3" json:"description,omitempty"`
 	MeetingLink      string                 `protobuf:"bytes,18,opt,name=meeting_link,json=meetingLink,proto3" json:"meeting_link,omitempty"`
+	IsPublic         bool                   `protobuf:"varint,19,opt,name=is_public,json=isPublic,proto3" json:"is_public,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -1050,6 +1059,13 @@ func (x *Event) GetMeetingLink() string {
 	return ""
 }
 
+func (x *Event) GetIsPublic() bool {
+	if x != nil {
+		return x.IsPublic
+	}
+	return false
+}
+
 type EventParticipant struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -1128,7 +1144,7 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\x06offset\x18\x02 \x01(\x05R\x06offset\x121\n" +
 	"\x06status\x18\x03 \x01(\x0e2\x19.event.v1.EventListFilterR\x06status\x12\x1d\n" +
 	"\n" +
-	"creator_id\x18\x04 \x01(\tR\tcreatorId\"\xa8\x03\n" +
+	"creator_id\x18\x04 \x01(\tR\tcreatorId\"\xc5\x03\n" +
 	"\x12CreateEventRequest\x12\x14\n" +
 	"\x05title\x18\x01 \x01(\tR\x05title\x12\x1f\n" +
 	"\vplace_label\x18\x02 \x01(\tR\n" +
@@ -1143,7 +1159,8 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\vdescription\x18\n" +
 	" \x01(\tR\vdescription\x12!\n" +
 	"\fmeeting_link\x18\v \x01(\tR\vmeetingLink\x12-\n" +
-	"\x06repeat\x18\f \x01(\x0e2\x15.event.v1.EventRepeatR\x06repeat\"-\n" +
+	"\x06repeat\x18\f \x01(\x0e2\x15.event.v1.EventRepeatR\x06repeat\x12\x1b\n" +
+	"\tis_public\x18\r \x01(\bR\bisPublic\"-\n" +
 	"\x10JoinEventRequest\x12\x19\n" +
 	"\bevent_id\x18\x01 \x01(\tR\aeventId\".\n" +
 	"\x11LeaveEventRequest\x12\x19\n" +
@@ -1176,7 +1193,7 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"totalCount\x12\"\n" +
 	"\rhas_next_page\x18\x05 \x01(\bR\vhasNextPage\"6\n" +
 	"\rEventResponse\x12%\n" +
-	"\x05event\x18\x01 \x01(\v2\x0f.event.v1.EventR\x05event\"\xf8\x04\n" +
+	"\x05event\x18\x01 \x01(\v2\x0f.event.v1.EventR\x05event\"\x95\x05\n" +
 	"\x05Event\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x1f\n" +
@@ -1200,7 +1217,8 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\x11participant_count\x18\x0f \x01(\rR\x10participantCount\x12>\n" +
 	"\fparticipants\x18\x10 \x03(\v2\x1a.event.v1.EventParticipantR\fparticipants\x12 \n" +
 	"\vdescription\x18\x11 \x01(\tR\vdescription\x12!\n" +
-	"\fmeeting_link\x18\x12 \x01(\tR\vmeetingLink\"\xa2\x01\n" +
+	"\fmeeting_link\x18\x12 \x01(\tR\vmeetingLink\x12\x1b\n" +
+	"\tis_public\x18\x13 \x01(\bR\bisPublic\"\xa2\x01\n" +
 	"\x10EventParticipant\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12!\n" +
 	"\fdisplay_name\x18\x02 \x01(\tR\vdisplayName\x12\x1d\n" +

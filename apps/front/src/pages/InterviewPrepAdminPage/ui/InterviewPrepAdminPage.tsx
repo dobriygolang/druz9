@@ -34,8 +34,8 @@ export function InterviewPrepAdminPage() {
     if (!editTask) return
     setSaving(true)
     try {
-      if (editTask.id) await adminApi.updateInterviewPrepTask(editTask.id, { task: editTask })
-      else await adminApi.createInterviewPrepTask({ task: editTask })
+      if (editTask.id) await adminApi.updateInterviewPrepTask(editTask.id, editTask)
+      else await adminApi.createInterviewPrepTask(editTask)
       loadTasks()
       setShowEdit(false)
       setEditTask(null)

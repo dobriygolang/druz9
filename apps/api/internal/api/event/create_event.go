@@ -34,6 +34,7 @@ func (i *Implementation) CreateEvent(ctx context.Context, req *v1.CreateEventReq
 		Longitude:      req.Longitude,
 		ScheduledAt:    req.ScheduledAt.AsTime(),
 		InvitedUserIDs: req.InvitedUserIds,
+		IsPublic:       req.IsPublic,
 	})
 	if err != nil {
 		return nil, err

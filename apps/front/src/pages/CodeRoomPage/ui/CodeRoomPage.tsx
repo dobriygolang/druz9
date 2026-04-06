@@ -61,6 +61,16 @@ function injectCursorCSS(safeId: string, hex: string) {
   document.head.appendChild(style)
 }
 
+/** Convert line/col (1-based) to a flat offset in a given code string */
+function getCodeOffset(code: string, line: number, col: number): number {
+  const lines = code.split('\n')
+  let offset = 0
+  for (let i = 0; i < line - 1 && i < lines.length; i++) {
+    offset += lines[i].length + 1 // +1 for \n
+  }
+  return Math.min(offset + col - 1, code.length)
+}
+
 /** OT-style cursor offset transform: shifts cursor when text changes before it */
 function transformCursorOffset(offset: number, oldCode: string, newCode: string): number {
   if (oldCode === newCode) return offset
@@ -93,10 +103,11 @@ function buildCursorWidget(
 
   const chip = document.createElement('div')
   chip.textContent = displayName
-  chip.style.cssText = `position:absolute;bottom:18px;left:-1px;background:${color};color:#fff;font-size:10px;line-height:14px;padding:1px 5px;border-radius:3px;font-weight:600;white-space:nowrap;font-family:sans-serif;pointer-events:none;z-index:20;`
+  // top:-16px: chip height = line-height(14) + padding-v(2) = 16px → bottom edge sits exactly on the bar's top
+  chip.style.cssText = `position:absolute;top:-16px;left:-1px;background:${color};color:#fff;font-size:10px;line-height:14px;padding:1px 5px;border-radius:3px 3px 3px 0;font-weight:600;white-space:nowrap;font-family:sans-serif;pointer-events:none;z-index:21;`
 
-  domNode.appendChild(bar)
   domNode.appendChild(chip)
+  domNode.appendChild(bar)
 
   return {
     getId: () => `remote-cursor-${userId}`,
@@ -200,6 +211,8 @@ export function CodeRoomPage() {
   const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Mutable cursor positions for remote users — updated in-place, no widget re-add needed
   const cursorPositionsRef = useRef<Map<string, { line: number; col: number }>>(new Map())
+  // Tracks the last-known local code value so handleCodeChange can compute an OT delta
+  const prevLocalCodeRef = useRef('')
 
   // Check if guest name is needed
   useEffect(() => {
@@ -260,7 +273,7 @@ export function CodeRoomPage() {
         // Prefer saved draft > starter code from state > server code
         const draft = state?.taskId ? getSoloDraft(state.taskId) : null
         const initCode = draft ?? state?.starterCode ?? r.code ?? ''
-        if (initCode) setLocalCode(initCode)
+        if (initCode) { setLocalCode(initCode); prevLocalCodeRef.current = initCode }
       })
       .catch(() => navigate('/practice/code-rooms'))
   }, [roomId, needsGuestName])
@@ -310,6 +323,7 @@ export function CodeRoomPage() {
       }
     }
     setLocalCode(ws.code)
+    prevLocalCodeRef.current = ws.code
   }, [ws.code])
 
   // Push starter code once snapshot arrives, overriding whatever the server has
@@ -478,10 +492,30 @@ export function CodeRoomPage() {
 
   const handleCodeChange = useCallback((value: string | undefined) => {
     if (isApplyingRemoteCode.current) return
+    const oldCode = prevLocalCodeRef.current
     const v = value ?? ''
+    prevLocalCodeRef.current = v
     setLocalCode(v)
     skipNextWsUpdate.current = true
     ws.sendUpdate(v)
+
+    // OT-transform remote cursor positions so they follow along as the local user types
+    if (cursorPositionsRef.current.size > 0 && oldCode !== v) {
+      const editor = editorRef.current
+      const model = editor?.getModel()
+      if (model) {
+        cursorPositionsRef.current.forEach((posRef, userId) => {
+          const oldOffset = getCodeOffset(oldCode, posRef.line, posRef.col)
+          const newOffset = transformCursorOffset(oldOffset, oldCode, v)
+          const newPos = model.getPositionAt(Math.min(newOffset, v.length))
+          posRef.line = newPos.lineNumber
+          posRef.col = newPos.column
+          const widget = widgetsRef.current.get(userId)
+          if (widget) editor!.layoutContentWidget(widget)
+        })
+      }
+    }
+
     if (soloDraftTaskId) {
       if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
       saveDraftTimer.current = setTimeout(() => setSoloDraft(soloDraftTaskId, v), 1000)

@@ -70,6 +70,7 @@ type Event struct {
 	CreatorName      string
 	IsCreator        bool
 	IsJoined         bool
+	IsPublic         bool
 	ParticipantCount int
 	Participants     []*EventParticipant
 	CircleID         *uuid.UUID
@@ -136,6 +137,7 @@ type CreateEventRequest struct {
 	ScheduledAt    time.Time
 	InvitedUserIDs []string
 	CircleID       *uuid.UUID
+	IsPublic       bool
 }
 
 type UpdateEventRequest struct {

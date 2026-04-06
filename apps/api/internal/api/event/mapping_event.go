@@ -57,6 +57,7 @@ func mapEvent(item *model.Event) *v1.Event {
 		CreatorName:      item.CreatorName,
 		IsCreator:        item.IsCreator,
 		IsJoined:         item.IsJoined,
+		IsPublic:         item.IsPublic,
 		ParticipantCount: participantCount,
 		Participants:     participants,
 	}

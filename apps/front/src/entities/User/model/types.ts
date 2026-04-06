@@ -49,5 +49,5 @@ export interface ProfileProgress {
   weakest: string[]
   recommendations: string[]
   checkpoints: Array<{ title: string; done: boolean }>
-  companies: Array<{ tag: string; sessions: number }>
+  companies: string[]
 }

@@ -28,6 +28,7 @@ var (
 	ErrMockQuestionNotReady        = errors.New("follow-up question is not ready yet")
 	ErrMockQuestionAnswerRequired  = errors.New("question answer is required")
 	ErrMockCompanyTagRequired      = errors.New("company tag is required")
+	ErrAnotherMockSessionActive    = errors.New("another mock session is already active: finish it before starting a new one")
 	ErrMockTaskPoolIncomplete      = errors.New("mock interview task pool is incomplete for selected company")
 	ErrMockQuestionPoolIncomplete  = errors.New("mock interview question pool is incomplete for selected company")
 	ErrInvalidAssessment           = errors.New("invalid self assessment")
@@ -101,6 +102,7 @@ type Repository interface {
 	CreateMockSession(ctx context.Context, session *model.InterviewPrepMockSession, stages []*model.InterviewPrepMockStage, questionResults []*model.InterviewPrepMockQuestionResult) error
 	GetMockSession(ctx context.Context, sessionID uuid.UUID) (*model.InterviewPrepMockSession, error)
 	GetActiveMockSessionByUserAndCompany(ctx context.Context, userID uuid.UUID, companyTag string) (*model.InterviewPrepMockSession, error)
+	GetAnyActiveMockSessionByUser(ctx context.Context, userID uuid.UUID) (*model.InterviewPrepMockSession, error)
 	UpdateMockStageSubmission(ctx context.Context, stageID uuid.UUID, solveLanguage string, code string, passed bool, reviewScore int32, reviewSummary string, nextStatus model.InterviewPrepMockStageStatus) error
 	CompleteMockQuestion(ctx context.Context, questionResultID uuid.UUID, score int32, summary string, answeredAt time.Time) error
 	SetMockStageStatus(ctx context.Context, stageID uuid.UUID, status model.InterviewPrepMockStageStatus) error

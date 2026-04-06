@@ -59,12 +59,22 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 		return nil, ErrMockCompanyTagRequired
 	}
 
+	// Check if user already has an active session for this exact company → resume it
 	existing, err := s.repo.GetActiveMockSessionByUserAndCompany(ctx, user.ID, companyTag)
 	if err != nil {
 		return nil, err
 	}
 	if existing != nil {
 		return s.GetMockSession(ctx, user, existing.ID)
+	}
+
+	// Block creating a new session if any other active session exists
+	anyActive, err := s.repo.GetAnyActiveMockSessionByUser(ctx, user.ID)
+	if err != nil {
+		return nil, err
+	}
+	if anyActive != nil {
+		return nil, ErrAnotherMockSessionActive
 	}
 
 	tasks, err := s.ListTasks(ctx, user)

@@ -405,9 +405,8 @@ export function ProfilePage() {
               {progress.companies.length > 0 ? (
                 <div className="flex flex-wrap gap-2">
                   {progress.companies.map(c => (
-                    <div key={c.tag} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F3F0] rounded-lg">
-                      <span className="text-sm font-medium text-[#111111]">{c.tag}</span>
-                      <span className="text-xs text-[#94a3b8]">{c.sessions} сессий</span>
+                    <div key={c} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F3F0] rounded-lg">
+                      <span className="text-sm font-medium text-[#111111]">{c}</span>
                     </div>
                   ))}
                 </div>

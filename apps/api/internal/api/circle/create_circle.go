@@ -15,7 +15,7 @@ func (i *Implementation) CreateCircle(ctx context.Context, req *v1.CreateCircleR
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
 	}
 
-	circle, err := i.service.CreateCircle(ctx, user.ID, req.Name, req.Description, req.Tags)
+	circle, err := i.service.CreateCircle(ctx, user.ID, req.Name, req.Description, req.Tags, req.IsPublic)
 	if err != nil {
 		return nil, err
 	}

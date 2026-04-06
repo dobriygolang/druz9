@@ -98,7 +98,8 @@ message CreateEventRequest {
   repeated string           invited_user_ids = 9;
   string                    description      = 10;
   string                    meeting_link     = 11;
-  EventRepeat               repeat           = 12;  // was: string
+  EventRepeat               repeat           = 12;
+  bool                      is_public        = 13;
 }
 
 message JoinEventRequest {
@@ -169,6 +170,7 @@ message Event {
   repeated EventParticipant participants      = 16;
   string                    description       = 17;
   string                    meeting_link      = 18;
+  bool                      is_public         = 19;
 }
 
 message EventParticipant {

@@ -60,7 +60,7 @@ export const referralApi = {
     const query = withDefaultListQuery(params)
     const res = await apiClient.get<ReferralListResponse>('/api/v1/referrals', { params: query })
     return {
-      referrals: res.data.referrals.map(normalize),
+      referrals: (res.data.referrals ?? []).map(normalize),
       limit: res.data.limit,
       offset: res.data.offset,
       totalCount: res.data.totalCount,

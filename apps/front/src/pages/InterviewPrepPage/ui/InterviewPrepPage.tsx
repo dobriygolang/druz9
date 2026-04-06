@@ -66,11 +66,21 @@ export function InterviewPrepPage() {
     setMockError('')
     try {
       const session = await interviewPrepApi.startMockSession(companyTag || selectedCompany || '') as any
+      localStorage.setItem('interview:last_mock_session', session?.id ?? '')
       toast('Mock-сессия создана', 'success')
       navigate(`/growth/interview-prep/mock/${session?.id}`)
-    } catch {
-      setMockError('Не удалось создать mock-сессию')
-      toast('Не удалось создать mock-сессию', 'error')
+    } catch (e: any) {
+      const msg = e?.response?.data?.message ?? ''
+      if (msg.includes('another mock session') || msg.includes('active')) {
+        const lastId = localStorage.getItem('interview:last_mock_session')
+        setMockError(lastId
+          ? 'active_session:' + lastId
+          : 'Завершите текущую mock-сессию перед началом новой'
+        )
+      } else {
+        setMockError('Не удалось создать mock-сессию')
+        toast('Не удалось создать mock-сессию', 'error')
+      }
     } finally {
       setMockLoading(false)
     }
@@ -200,7 +210,9 @@ export function InterviewPrepPage() {
                     try {
                       const session = await interviewPrepApi.startSession(task.id) as any
                       navigate(`/growth/interview-prep/${session?.id ?? task.id}`)
-                    } catch {}
+                    } catch {
+                      toast('Не удалось начать сессию', 'error')
+                    }
                   }}
                   className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#F2F3F0] cursor-pointer transition-colors"
                 >
@@ -231,8 +243,19 @@ export function InterviewPrepPage() {
           <Card padding="md">
             <h3 className="text-sm font-semibold text-[#111111] mb-2">Mock Interview</h3>
             <p className="text-xs text-[#666666] mb-3">Симулируй полное собеседование с AI</p>
-            {mockError && (
+            {mockError && !mockError.startsWith('active_session:') && (
               <p className="text-xs text-[#ef4444] mb-2">{mockError}</p>
+            )}
+            {mockError && mockError.startsWith('active_session:') && (
+              <div className="mb-2 p-2.5 bg-[#FFF7ED] border border-[#FED7AA] rounded-lg">
+                <p className="text-xs text-[#92400E] mb-1.5">У вас есть незавершённая сессия</p>
+                <button
+                  onClick={() => navigate(`/growth/interview-prep/mock/${mockError.split(':')[1]}`)}
+                  className="text-xs font-medium text-[#EA580C] hover:underline"
+                >
+                  Продолжить →
+                </button>
+              </div>
             )}
             <Button
               variant="orange"

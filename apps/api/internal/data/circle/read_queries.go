@@ -24,7 +24,12 @@ func (r *Repo) ListCircles(
 	}
 
 	var totalCount int32
-	if err := r.data.DB.QueryRow(ctx, `SELECT COUNT(*) FROM circles`).Scan(&totalCount); err != nil {
+	if err := r.data.DB.QueryRow(ctx, `
+SELECT COUNT(*) FROM circles c
+WHERE c.is_public = true
+   OR EXISTS(SELECT 1 FROM circle_members cm WHERE cm.circle_id = c.id AND cm.user_id = $1)`,
+		currentUserID,
+	).Scan(&totalCount); err != nil {
 		return nil, fmt.Errorf("count circles: %w", err)
 	}
 
@@ -40,6 +45,8 @@ SELECT
   c.created_at,
   EXISTS(SELECT 1 FROM circle_members cm WHERE cm.circle_id = c.id AND cm.user_id = $1) AS is_joined
 FROM circles c
+WHERE c.is_public = true
+   OR EXISTS(SELECT 1 FROM circle_members cm WHERE cm.circle_id = c.id AND cm.user_id = $1)
 ORDER BY c.created_at DESC
 LIMIT $2 OFFSET $3
 `
