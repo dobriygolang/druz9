@@ -68,9 +68,15 @@ export function EventsPage() {
     if (!form.title || !form.scheduledAt) return
     setCreating(true)
     try {
-      const scheduledAt = form.scheduledAt && !form.scheduledAt.includes(':00', 16)
-        ? `${form.scheduledAt}:00`
-        : form.scheduledAt
+      let scheduledAt = form.scheduledAt ?? ''
+      // Append seconds if missing (datetime-local gives "YYYY-MM-DDTHH:MM")
+      if (scheduledAt && !scheduledAt.match(/T\d{2}:\d{2}:\d{2}/)) {
+        scheduledAt = `${scheduledAt}:00`
+      }
+      // Append UTC offset if absent (proto Timestamp requires RFC 3339 with timezone)
+      if (scheduledAt && !/[Z+\-]\d*$/.test(scheduledAt)) {
+        scheduledAt = `${scheduledAt}Z`
+      }
       const created = await eventApi.createEvent({ ...form, scheduledAt } as CreateEventPayload)
       setEvents(prev => [created, ...prev])
       setShowCreate(false)

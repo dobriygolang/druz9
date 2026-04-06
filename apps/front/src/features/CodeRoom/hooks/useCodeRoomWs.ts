@@ -17,8 +17,8 @@ interface CodeEditorMessage {
   awarenessId?: number
   userId?: string
   plainText?: string
+  data?: string
   language?: string
-  awareness?: Record<string, AwarenessState>
   room?: unknown
   submission?: SubmissionResult
 }
@@ -28,7 +28,10 @@ export interface AwarenessState {
   displayName: string
   cursorLine?: number
   cursorColumn?: number
-  color?: string
+  selStartLine?: number
+  selStartCol?: number
+  selEndLine?: number
+  selEndCol?: number
 }
 
 export interface SubmissionResult {
@@ -48,14 +51,22 @@ interface UseCodeRoomWsOptions {
   enabled?: boolean
 }
 
+export interface SelectionInfo {
+  startLine: number
+  startCol: number
+  endLine: number
+  endCol: number
+}
+
 interface UseCodeRoomWsReturn {
   connected: boolean
   code: string
   language: string
   awareness: Map<string, AwarenessState>
   lastSubmission: SubmissionResult | null
+  lastRoomUpdate: unknown
   sendUpdate: (code: string) => void
-  sendAwareness: (line: number, column: number) => void
+  sendAwareness: (line: number, column: number, selection?: SelectionInfo) => void
 }
 
 export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
@@ -69,6 +80,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   const [language, setLanguage] = useState('python')
   const [awareness, setAwareness] = useState<Map<string, AwarenessState>>(new Map())
   const [lastSubmission, setLastSubmission] = useState<SubmissionResult | null>(null)
+  const [lastRoomUpdate, setLastRoomUpdate] = useState<unknown>(null)
 
   // Track whether updates come from remote to avoid echo
   const isRemoteUpdate = useRef(false)
@@ -80,9 +92,6 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         isRemoteUpdate.current = true
         if (msg.plainText !== undefined) setCode(msg.plainText)
         if (msg.language) setLanguage(msg.language)
-        if (msg.awareness) {
-          setAwareness(new Map(Object.entries(msg.awareness)))
-        }
         isRemoteUpdate.current = false
         break
       }
@@ -94,14 +103,21 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       }
       case 'awareness': {
         if (msg.userId && msg.awarenessId !== undefined) {
+          let cursorData: Record<string, unknown> = {}
+          if (msg.data) {
+            try { cursorData = JSON.parse(msg.data) } catch {}
+          }
           setAwareness(prev => {
             const next = new Map(prev)
             next.set(msg.userId!, {
               userId: msg.userId!,
-              displayName: (msg as any).displayName ?? msg.userId!,
-              cursorLine: (msg as any).cursorLine,
-              cursorColumn: (msg as any).cursorColumn,
-              color: (msg as any).color,
+              displayName: (cursorData.displayName as string) ?? msg.userId!,
+              cursorLine: cursorData.cursorLine as number | undefined,
+              cursorColumn: cursorData.cursorColumn as number | undefined,
+              selStartLine: cursorData.selStartLine as number | undefined,
+              selStartCol: cursorData.selStartCol as number | undefined,
+              selEndLine: cursorData.selEndLine as number | undefined,
+              selEndCol: cursorData.selEndCol as number | undefined,
             })
             return next
           })
@@ -119,7 +135,9 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         break
       }
       case 'room_update': {
-        // Room metadata changed (status, participants, etc.)
+        if (msg.room) {
+          setLastRoomUpdate(msg.room)
+        }
         break
       }
       case 'submission': {
@@ -170,16 +188,25 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     })
   }, [])
 
-  const sendAwareness = useCallback((line: number, column: number) => {
+  const sendAwareness = useCallback((line: number, column: number, selection?: SelectionInfo) => {
+    const cursorData: Record<string, unknown> = {
+      displayName,
+      cursorLine: line,
+      cursorColumn: column,
+    }
+    if (selection) {
+      cursorData.selStartLine = selection.startLine
+      cursorData.selStartCol = selection.startCol
+      cursorData.selEndLine = selection.endLine
+      cursorData.selEndCol = selection.endCol
+    }
     socketRef.current?.send({
       type: 'awareness',
       awarenessId: awarenessId.current,
       userId: userId ?? guestName ?? 'anonymous',
-      cursorLine: line,
-      cursorColumn: column,
-      displayName,
+      data: JSON.stringify(cursorData),
     })
   }, [userId, guestName, displayName])
 
-  return { connected, code, language, awareness, lastSubmission, sendUpdate, sendAwareness }
+  return { connected, code, language, awareness, lastSubmission, lastRoomUpdate, sendUpdate, sendAwareness }
 }

@@ -14,6 +14,30 @@ import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { apiClient } from '@/shared/api/base'
 import type * as Monaco from 'monaco-editor'
 
+/* ─── Remote cursor helpers ─── */
+const CURSOR_COLORS = ['#f97316', '#06b6d4', '#8b5cf6', '#10b981', '#f43f5e', '#eab308']
+
+function getCursorColor(userId: string): string {
+  let hash = 0
+  for (let i = 0; i < userId.length; i++) {
+    hash = userId.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  return CURSOR_COLORS[Math.abs(hash) % CURSOR_COLORS.length]
+}
+
+const injectedCursorStyles = new Set<string>()
+function injectCursorCSS(safeId: string, hex: string) {
+  if (injectedCursorStyles.has(safeId)) return
+  injectedCursorStyles.add(safeId)
+  const [r, g, b] = [hex.slice(1,3), hex.slice(3,5), hex.slice(5,7)].map(h => parseInt(h, 16))
+  const style = document.createElement('style')
+  style.textContent = [
+    `.remote-line-${safeId}{background:rgba(${r},${g},${b},0.08);border-left:2px solid ${hex};}`,
+    `.remote-sel-${safeId}{background:rgba(${r},${g},${b},0.28);}`,
+  ].join('')
+  document.head.appendChild(style)
+}
+
 const AI_HINTS = [
   'Подумайте о граничных случаях',
   'Рассмотрите временную сложность вашего решения',
@@ -75,6 +99,9 @@ export function CodeRoomPage() {
   const [editTaskTitle, setEditTaskTitle] = useState('')
   const [editTaskStatement, setEditTaskStatement] = useState('')
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
+  const monacoRef = useRef<typeof Monaco | null>(null)
+  const decorationsRef = useRef<Monaco.editor.IEditorDecorationsCollection | null>(null)
+  const widgetsRef = useRef<Map<string, Monaco.editor.IContentWidget>>(new Map())
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
   const skipNextWsUpdate = useRef(false)
 
@@ -124,16 +151,101 @@ export function CodeRoomPage() {
     skipNextWsUpdate.current = false
   }, [ws.code])
 
-  // Update room status from WS
+  // Update room from room_update WS message (fired on join/leave/status change)
   useEffect(() => {
-    if (ws.connected && room) {
-      const participantCount = ws.awareness.size
-      const hasMultiple = participantCount > 1
-      if (room.status === 'ROOM_STATUS_WAITING' && hasMultiple) {
-        setRoom(prev => prev ? { ...prev, status: 'ROOM_STATUS_ACTIVE' } : prev)
+    if (!ws.lastRoomUpdate) return
+    const update = ws.lastRoomUpdate as { status?: string; participants?: unknown[] }
+    setRoom(prev => {
+      if (!prev) return prev
+      return {
+        ...prev,
+        ...(update.status ? { status: update.status as Room['status'] } : {}),
+        ...(update.participants ? { participants: update.participants as Room['participants'] } : {}),
       }
+    })
+  }, [ws.lastRoomUpdate])
+
+  // Remote cursor decorations in Monaco
+  useEffect(() => {
+    const editor = editorRef.current
+    const monaco = monacoRef.current
+    if (!editor || !monaco) return
+
+    widgetsRef.current.forEach(w => editor.removeContentWidget(w))
+    widgetsRef.current.clear()
+
+    const newDecorations: Monaco.editor.IModelDeltaDecoration[] = []
+
+    ws.awareness.forEach((state) => {
+      if (!state.cursorLine) return
+      const color = getCursorColor(state.userId)
+      const safeId = state.userId.replace(/[^a-z0-9]/gi, '_')
+      injectCursorCSS(safeId, color)
+
+      newDecorations.push({
+        range: new monaco.Range(state.cursorLine, 1, state.cursorLine, 1),
+        options: {
+          isWholeLine: true,
+          className: `remote-line-${safeId}`,
+          overviewRuler: { color, position: monaco.editor.OverviewRulerLane.Right },
+        },
+      })
+
+      const hasSelection =
+        state.selStartLine != null &&
+        state.selEndLine != null &&
+        !(state.selStartLine === state.selEndLine && state.selStartCol === state.selEndCol)
+
+      if (hasSelection) {
+        newDecorations.push({
+          range: new monaco.Range(
+            state.selStartLine!,
+            state.selStartCol ?? 1,
+            state.selEndLine!,
+            state.selEndCol ?? 1,
+          ),
+          options: { className: `remote-sel-${safeId}` },
+        })
+      }
+
+      const domNode = document.createElement('div')
+      domNode.textContent = state.displayName
+      Object.assign(domNode.style, {
+        background: color,
+        color: '#fff',
+        fontSize: '10px',
+        lineHeight: '14px',
+        padding: '1px 5px',
+        borderRadius: '3px',
+        pointerEvents: 'none',
+        fontWeight: '600',
+        whiteSpace: 'nowrap',
+        fontFamily: 'sans-serif',
+        zIndex: '10',
+      })
+      const widget: Monaco.editor.IContentWidget = {
+        getId: () => `remote-cursor-${state.userId}`,
+        getDomNode: () => domNode,
+        getPosition: () => ({
+          position: { lineNumber: state.cursorLine!, column: state.cursorColumn ?? 1 },
+          preference: [monaco.editor.ContentWidgetPositionPreference.ABOVE],
+        }),
+      }
+      editor.addContentWidget(widget)
+      widgetsRef.current.set(state.userId, widget)
+    })
+
+    if (decorationsRef.current) {
+      decorationsRef.current.set(newDecorations)
+    } else {
+      decorationsRef.current = editor.createDecorationsCollection(newDecorations)
     }
-  }, [ws.awareness.size, ws.connected])
+
+    return () => {
+      widgetsRef.current.forEach(w => editor.removeContentWidget(w))
+      widgetsRef.current.clear()
+    }
+  }, [ws.awareness])
 
   // Sync WebSocket submission results
   useEffect(() => {
@@ -222,12 +334,27 @@ export function CodeRoomPage() {
 
   const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
     editorRef.current = editor
+    monacoRef.current = monaco
     registerDarkTheme(monaco)
     monaco.editor.setTheme('druzya-dark')
 
-    // Send cursor awareness on position change
-    editor.onDidChangeCursorPosition((e) => {
-      ws.sendAwareness(e.position.lineNumber, e.position.column)
+    // Send cursor + selection awareness
+    editor.onDidChangeCursorSelection((e) => {
+      const sel = e.selection
+      const hasSelection = !(
+        sel.startLineNumber === sel.endLineNumber &&
+        sel.startColumn === sel.endColumn
+      )
+      ws.sendAwareness(
+        sel.positionLineNumber,
+        sel.positionColumn,
+        hasSelection ? {
+          startLine: sel.startLineNumber,
+          startCol: sel.startColumn,
+          endLine: sel.endLineNumber,
+          endCol: sel.endColumn,
+        } : undefined,
+      )
     })
   }, [ws.sendAwareness])
 
@@ -268,10 +395,11 @@ export function CodeRoomPage() {
         <div className="flex items-center gap-2">
           {/* Realtime participants from awareness */}
           {Array.from(ws.awareness.values()).map(a => (
-            <div key={a.userId} className="relative">
+            <div key={a.userId} className="relative" title={a.displayName}>
               <Avatar name={a.displayName} size="xs" />
               <span
-                className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white bg-[#22c55e]"
+                className="absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full border-2 border-white"
+                style={{ background: getCursorColor(a.userId) }}
               />
             </div>
           ))}
