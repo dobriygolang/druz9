@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, ChevronRight, BookOpen, Code2, MessageSquare, Play, ArrowRight, Database, Cpu, Server, Building2 } from 'lucide-react'
+import { Search, ChevronRight, BookOpen, Code2, MessageSquare, Play, Database, Cpu, Server, Building2 } from 'lucide-react'
 import { interviewPrepApi, type InterviewPrepTask } from '@/features/InterviewPrep/api/interviewPrepApi'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
