@@ -1,10 +1,13 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import { Calendar, Clock } from 'lucide-react'
 import Editor from '@monaco-editor/react'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Spinner } from '@/shared/ui/Spinner'
 import { apiClient } from '@/shared/api/base'
+import { useTheme } from '@/app/providers/ThemeProvider'
+import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import type * as Monaco from 'monaco-editor'
 
 interface DailyTask {
   task: {
@@ -68,6 +71,7 @@ function formatDateRu(dateStr: string): string {
 }
 
 export function DailyChallengePage() {
+  const { theme } = useTheme()
   const [task, setTask] = useState<DailyTask | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -125,6 +129,11 @@ export function DailyChallengePage() {
       setReviewing(false)
     }
   }
+
+  const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
+    registerDarkTheme(monaco)
+    monaco.editor.setTheme(theme === 'dark' ? 'druzya-dark' : 'vs')
+  }, [theme])
 
   const today = formatDateRu(task?.date ?? new Date().toISOString())
 
@@ -201,6 +210,8 @@ export function DailyChallengePage() {
                 language={task.task.language}
                 value={code}
                 onChange={v => setCode(v ?? '')}
+                onMount={handleEditorMount}
+                theme={theme === 'dark' ? 'druzya-dark' : 'vs'}
                 options={{
                   fontSize: 13,
                   fontFamily: '"JetBrains Mono", monospace',

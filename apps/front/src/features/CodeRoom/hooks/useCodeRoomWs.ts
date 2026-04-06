@@ -32,6 +32,8 @@ export interface AwarenessState {
   selStartCol?: number
   selEndLine?: number
   selEndCol?: number
+  tabHidden?: boolean
+  pastedCode?: boolean
 }
 
 export interface SubmissionResult {
@@ -42,14 +44,16 @@ export interface SubmissionResult {
   error: string
 }
 
+export type BehaviorEventType = 'tab_hidden' | 'tab_visible' | 'pasted'
+
 interface UseCodeRoomWsOptions {
   roomId: string | undefined
   userId: string | undefined
   displayName: string
-  /** If no userId, connect as guest with this name */
   guestName?: string
   enabled?: boolean
   onLeave?: (userId: string, displayName: string) => void
+  onBehaviorEvent?: (userId: string, displayName: string, event: BehaviorEventType) => void
 }
 
 export interface SelectionInfo {
@@ -68,13 +72,16 @@ interface UseCodeRoomWsReturn {
   lastRoomUpdate: unknown
   sendUpdate: (code: string) => void
   sendLanguageChange: (lang: string) => void
-  sendAwareness: (line: number, column: number, selection?: SelectionInfo) => void
+  sendAwareness: (line: number, column: number, selection?: SelectionInfo, meta?: Record<string, unknown>) => void
 }
 
 export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
-  const { roomId, userId, displayName, guestName, enabled = true, onLeave } = opts
+  const { roomId, userId, displayName, guestName, enabled = true, onLeave, onBehaviorEvent } = opts
   const onLeaveRef = useRef(onLeave)
   onLeaveRef.current = onLeave
+  const onBehaviorRef = useRef(onBehaviorEvent)
+  onBehaviorRef.current = onBehaviorEvent
+
   const socketRef = useRef<RealtimeSocket | null>(null)
   const clientId = useRef(`client-${Math.random().toString(36).slice(2, 10)}`)
   const awarenessId = useRef(Math.floor(Math.random() * 0xffffffff))
@@ -86,7 +93,6 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   const [lastSubmission, setLastSubmission] = useState<SubmissionResult | null>(null)
   const [lastRoomUpdate, setLastRoomUpdate] = useState<unknown>(null)
 
-  // Track whether updates come from remote to avoid echo
   const isRemoteUpdate = useRef(false)
 
   const handleMessage = useCallback((raw: unknown) => {
@@ -112,24 +118,45 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
           if (msg.data) {
             try { cursorData = JSON.parse(msg.data) } catch {}
           }
-          // active: false means user disconnected
+
+          const incomingDisplayName = (cursorData.displayName as string) ?? msg.userId!
+
+          // Explicit disconnect signal
           if (cursorData.active === false) {
-            const displayName = (cursorData.displayName as string) ?? msg.userId!
-            setAwareness(prev => { const next = new Map(prev); next.delete(msg.userId!); return next })
-            onLeaveRef.current?.(msg.userId!, displayName)
+            setAwareness(prev => {
+              const next = new Map(prev)
+              next.delete(msg.userId!)
+              return next
+            })
+            onLeaveRef.current?.(msg.userId!, incomingDisplayName)
             break
           }
+
           setAwareness(prev => {
+            const existing = prev.get(msg.userId!)
             const next = new Map(prev)
+
+            // Detect behavior transitions for anti-cheat
+            if (cursorData.tabHidden === true && !existing?.tabHidden) {
+              onBehaviorRef.current?.(msg.userId!, incomingDisplayName, 'tab_hidden')
+            } else if (cursorData.tabHidden === false && existing?.tabHidden) {
+              onBehaviorRef.current?.(msg.userId!, incomingDisplayName, 'tab_visible')
+            }
+            if (cursorData.pastedCode === true && !existing?.pastedCode) {
+              onBehaviorRef.current?.(msg.userId!, incomingDisplayName, 'pasted')
+            }
+
             next.set(msg.userId!, {
               userId: msg.userId!,
-              displayName: (cursorData.displayName as string) ?? msg.userId!,
+              displayName: incomingDisplayName,
               cursorLine: cursorData.cursorLine as number | undefined,
               cursorColumn: cursorData.cursorColumn as number | undefined,
               selStartLine: cursorData.selStartLine as number | undefined,
               selStartCol: cursorData.selStartCol as number | undefined,
               selEndLine: cursorData.selEndLine as number | undefined,
               selEndCol: cursorData.selEndCol as number | undefined,
+              tabHidden: cursorData.tabHidden as boolean | undefined,
+              pastedCode: cursorData.pastedCode as boolean | undefined,
             })
             return next
           })
@@ -139,23 +166,24 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       case 'awareness_remove': {
         if (msg.userId) {
           setAwareness(prev => {
+            const existing = prev.get(msg.userId!)
             const next = new Map(prev)
             next.delete(msg.userId!)
+            // Fire onLeave using stored displayName
+            if (existing) {
+              onLeaveRef.current?.(msg.userId!, existing.displayName)
+            }
             return next
           })
         }
         break
       }
       case 'room_update': {
-        if (msg.room) {
-          setLastRoomUpdate(msg.room)
-        }
+        if (msg.room) setLastRoomUpdate(msg.room)
         break
       }
       case 'submission': {
-        if (msg.submission) {
-          setLastSubmission(msg.submission)
-        }
+        if (msg.submission) setLastSubmission(msg.submission)
         break
       }
     }
@@ -205,11 +233,17 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     socketRef.current?.send({ type: 'update', language: lang })
   }, [])
 
-  const sendAwareness = useCallback((line: number, column: number, selection?: SelectionInfo) => {
+  const sendAwareness = useCallback((
+    line: number,
+    column: number,
+    selection?: SelectionInfo,
+    meta?: Record<string, unknown>,
+  ) => {
     const cursorData: Record<string, unknown> = {
       displayName,
       cursorLine: line,
       cursorColumn: column,
+      ...meta,
     }
     if (selection) {
       cursorData.selStartLine = selection.startLine

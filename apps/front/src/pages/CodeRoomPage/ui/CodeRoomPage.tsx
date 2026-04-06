@@ -39,8 +39,12 @@ function injectCursorCSS(safeId: string, hex: string) {
   const [r, g, b] = [hex.slice(1,3), hex.slice(3,5), hex.slice(5,7)].map(h => parseInt(h, 16))
   const style = document.createElement('style')
   style.textContent = [
-    `.remote-line-${safeId}{background:rgba(${r},${g},${b},0.08);border-left:2px solid ${hex};}`,
-    `.remote-sel-${safeId}{background:rgba(${r},${g},${b},0.28);}`,
+    // Line gutter highlight
+    `.remote-line-${safeId}{background:rgba(${r},${g},${b},0.12);border-left:3px solid ${hex};}`,
+    // Selection highlight
+    `.remote-sel-${safeId}{background:rgba(${r},${g},${b},0.30);}`,
+    // Thin cursor bar via ::before on the character at cursor column
+    `.remote-cursor-bar-${safeId}::before{content:'';position:absolute;top:0;left:-1px;width:2px;height:1.2em;background:${hex};pointer-events:none;z-index:10;}`,
   ].join('')
   document.head.appendChild(style)
 }
@@ -126,6 +130,8 @@ export function CodeRoomPage() {
   const prevParticipantIdsRef = useRef<Set<string>>(new Set())
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
   const skipNextWsUpdate = useRef(false)
+  const lastCursorRef = useRef({ line: 1, col: 1 })
+  const isCreatorRef = useRef(false)
 
   // Check if guest name is needed
   useEffect(() => {
@@ -165,6 +171,12 @@ export function CodeRoomPage() {
     onLeave: useCallback((_userId: string, displayName: string) => {
       addNotification(`${displayName} покинул(-а) комнату`)
     }, [addNotification]),
+    onBehaviorEvent: useCallback((_userId: string, displayName: string, event: import('@/features/CodeRoom/hooks/useCodeRoomWs').BehaviorEventType) => {
+      if (!isCreatorRef.current) return
+      if (event === 'tab_hidden') addNotification(`⚠️ ${displayName} скрыл(-а) вкладку`)
+      else if (event === 'tab_visible') addNotification(`${displayName} вернулся(-ась)`)
+      else if (event === 'pasted') addNotification(`⚠️ ${displayName} вставил(-а) код`)
+    }, [addNotification]),
   })
 
   // Fetch initial room data via REST
@@ -181,7 +193,7 @@ export function CodeRoomPage() {
       .catch(() => navigate('/practice/code-rooms'))
   }, [roomId, needsGuestName])
 
-  // Sync WebSocket code -> local (remote changes), preserve cursor position
+  // Sync WebSocket code -> local (remote changes), preserve cursor
   useEffect(() => {
     if (!ws.code || skipNextWsUpdate.current) {
       skipNextWsUpdate.current = false
@@ -189,17 +201,17 @@ export function CodeRoomPage() {
     }
     skipNextWsUpdate.current = false
     const editor = editorRef.current
-    if (editor && editor.getModel()?.getValue() !== ws.code) {
-      const viewState = editor.saveViewState()
-      setLocalCode(ws.code)
-      requestAnimationFrame(() => {
-        if (viewState && editorRef.current) {
-          editorRef.current.restoreViewState(viewState)
-        }
-      })
-    } else {
-      setLocalCode(ws.code)
+    const model = editor?.getModel()
+    if (model && model.getValue() !== ws.code) {
+      // Update model directly so @monaco-editor/react skips its own setValue on re-render
+      const pos = editor!.getPosition()
+      const sel = editor!.getSelection()
+      model.setValue(ws.code)
+      if (pos) editor!.setPosition(pos)
+      if (sel) editor!.setSelection(sel)
     }
+    // Keep React state in sync (model already updated, Monaco won't reset cursor)
+    setLocalCode(ws.code)
   }, [ws.code])
 
   // Update room from room_update WS message (fired on join/leave/status change)
@@ -242,6 +254,25 @@ export function CodeRoomPage() {
     })
   }, [ws.lastRoomUpdate])
 
+  // Keep isCreatorRef in sync for use inside callbacks
+  const isCreator = !!user && !!room && (user.id === room.creatorId || room.participants.some(p => p.userId === user.id && p.isCreator))
+  useEffect(() => { isCreatorRef.current = isCreator }, [isCreator])
+
+  // Tab visibility anti-cheat tracking
+  useEffect(() => {
+    if (!ws.connected) return
+    const handler = () => {
+      ws.sendAwareness(
+        lastCursorRef.current.line,
+        lastCursorRef.current.col,
+        undefined,
+        { tabHidden: document.hidden },
+      )
+    }
+    document.addEventListener('visibilitychange', handler)
+    return () => document.removeEventListener('visibilitychange', handler)
+  }, [ws.connected, ws.sendAwareness])
+
   // Remote cursor decorations in Monaco
   useEffect(() => {
     const editor = editorRef.current
@@ -259,6 +290,7 @@ export function CodeRoomPage() {
       const safeId = state.userId.replace(/[^a-z0-9]/gi, '_')
       injectCursorCSS(safeId, color)
 
+      // Line gutter highlight
       newDecorations.push({
         range: new monaco.Range(state.cursorLine, 1, state.cursorLine, 1),
         options: {
@@ -266,6 +298,13 @@ export function CodeRoomPage() {
           className: `remote-line-${safeId}`,
           overviewRuler: { color, position: monaco.editor.OverviewRulerLane.Right },
         },
+      })
+
+      // Thin cursor bar at exact column via ::before pseudo-element
+      const col = state.cursorColumn ?? 1
+      newDecorations.push({
+        range: new monaco.Range(state.cursorLine, col, state.cursorLine, col + 1),
+        options: { beforeContentClassName: `remote-cursor-bar-${safeId}` },
       })
 
       const hasSelection =
@@ -392,8 +431,6 @@ export function CodeRoomPage() {
     }
   }
 
-  const isCreator = !!user && !!room && (user.id === room.creatorId || room.participants.some(p => p.userId === user.id && p.isCreator))
-
   const openTaskEditor = () => {
     setEditTaskTitle(room?.task ?? '')
     setEditTaskStatement(taskStatement)
@@ -415,9 +452,10 @@ export function CodeRoomPage() {
     registerDarkTheme(monaco)
     monaco.editor.setTheme('druzya-dark')
 
-    // Send cursor + selection awareness
+    // Send cursor + selection awareness, track last known position
     editor.onDidChangeCursorSelection((e) => {
       const sel = e.selection
+      lastCursorRef.current = { line: sel.positionLineNumber, col: sel.positionColumn }
       const hasSelection = !(
         sel.startLineNumber === sel.endLineNumber &&
         sel.startColumn === sel.endColumn
@@ -432,6 +470,17 @@ export function CodeRoomPage() {
           endCol: sel.endColumn,
         } : undefined,
       )
+    })
+
+    // Detect paste → anti-cheat signal
+    editor.onDidPaste(() => {
+      if (!isCreatorRef.current) {
+        ws.sendAwareness(lastCursorRef.current.line, lastCursorRef.current.col, undefined, { pastedCode: true })
+        // Clear the flag after a short delay so it can fire again
+        setTimeout(() => {
+          ws.sendAwareness(lastCursorRef.current.line, lastCursorRef.current.col, undefined, { pastedCode: false })
+        }, 2000)
+      }
     })
   }, [ws.sendAwareness])
 
