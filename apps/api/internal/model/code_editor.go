@@ -293,6 +293,7 @@ type Room struct {
 	FinishedAt   *time.Time
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
+	IsPrivate    bool // if true, only joinable via invite code
 	Participants []*Participant
 }
 

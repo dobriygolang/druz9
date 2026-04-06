@@ -28,6 +28,7 @@ func scanRoom(row scanner, room *codeeditordomain.Room) error {
 		&room.FinishedAt,
 		&room.CreatedAt,
 		&room.UpdatedAt,
+		&room.IsPrivate,
 	)
 }
 
@@ -62,6 +63,7 @@ func scanRoomFull(row scanner) (*codeeditordomain.Room, error) {
 		&room.FinishedAt,
 		&room.CreatedAt,
 		&room.UpdatedAt,
+		&room.IsPrivate,
 		&participantsJSON,
 	); err != nil {
 		return nil, err

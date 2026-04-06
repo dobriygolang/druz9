@@ -184,6 +184,7 @@ message CreateRoomRequest {
   string         name       = 3;  // creator display name
   string         topic      = 4;  // preferred duel topic
   TaskDifficulty difficulty = 5;  // preferred duel difficulty
+  bool           is_private = 6;  // if true, only joinable via invite code
 }
 
 message GetRoomRequest {
@@ -350,6 +351,7 @@ message Room {
   string                    task_id       = 9;
   int64                     code_revision = 10;
   string                    creator_id    = 11;
+  bool                      is_private    = 12;
 }
 
 message Participant {

@@ -72,9 +72,9 @@ func (_c *Service_CloseRoom_Call) RunAndReturn(run func(context.Context, uuid.UU
 	return _c
 }
 
-// CreateRoom provides a mock function with given fields: ctx, creatorID, name, isGuest, mode, topic, difficulty, task
-func (_m *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string) (*model.Room, error) {
-	ret := _m.Called(ctx, creatorID, name, isGuest, mode, topic, difficulty, task)
+// CreateRoom provides a mock function with given fields: ctx, creatorID, name, isGuest, mode, topic, difficulty, task, isPrivate
+func (_m *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string, isPrivate bool) (*model.Room, error) {
+	ret := _m.Called(ctx, creatorID, name, isGuest, mode, topic, difficulty, task, isPrivate)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateRoom")
@@ -82,19 +82,19 @@ func (_m *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name st
 
 	var r0 *model.Room
 	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, *uuid.UUID, string, bool, string, string, string, string) (*model.Room, error)); ok {
-		return rf(ctx, creatorID, name, isGuest, mode, topic, difficulty, task)
+	if rf, ok := ret.Get(0).(func(context.Context, *uuid.UUID, string, bool, string, string, string, string, bool) (*model.Room, error)); ok {
+		return rf(ctx, creatorID, name, isGuest, mode, topic, difficulty, task, isPrivate)
 	}
-	if rf, ok := ret.Get(0).(func(context.Context, *uuid.UUID, string, bool, string, string, string, string) *model.Room); ok {
-		r0 = rf(ctx, creatorID, name, isGuest, mode, topic, difficulty, task)
+	if rf, ok := ret.Get(0).(func(context.Context, *uuid.UUID, string, bool, string, string, string, string, bool) *model.Room); ok {
+		r0 = rf(ctx, creatorID, name, isGuest, mode, topic, difficulty, task, isPrivate)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Room)
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, *uuid.UUID, string, bool, string, string, string, string) error); ok {
-		r1 = rf(ctx, creatorID, name, isGuest, mode, topic, difficulty, task)
+	if rf, ok := ret.Get(1).(func(context.Context, *uuid.UUID, string, bool, string, string, string, string, bool) error); ok {
+		r1 = rf(ctx, creatorID, name, isGuest, mode, topic, difficulty, task, isPrivate)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -116,13 +116,14 @@ type Service_CreateRoom_Call struct {
 //   - topic string
 //   - difficulty string
 //   - task string
-func (_e *Service_Expecter) CreateRoom(ctx interface{}, creatorID interface{}, name interface{}, isGuest interface{}, mode interface{}, topic interface{}, difficulty interface{}, task interface{}) *Service_CreateRoom_Call {
-	return &Service_CreateRoom_Call{Call: _e.mock.On("CreateRoom", ctx, creatorID, name, isGuest, mode, topic, difficulty, task)}
+//   - isPrivate bool
+func (_e *Service_Expecter) CreateRoom(ctx interface{}, creatorID interface{}, name interface{}, isGuest interface{}, mode interface{}, topic interface{}, difficulty interface{}, task interface{}, isPrivate interface{}) *Service_CreateRoom_Call {
+	return &Service_CreateRoom_Call{Call: _e.mock.On("CreateRoom", ctx, creatorID, name, isGuest, mode, topic, difficulty, task, isPrivate)}
 }
 
-func (_c *Service_CreateRoom_Call) Run(run func(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string)) *Service_CreateRoom_Call {
+func (_c *Service_CreateRoom_Call) Run(run func(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string, isPrivate bool)) *Service_CreateRoom_Call {
 	_c.Call.Run(func(args mock.Arguments) {
-		run(args[0].(context.Context), args[1].(*uuid.UUID), args[2].(string), args[3].(bool), args[4].(string), args[5].(string), args[6].(string), args[7].(string))
+		run(args[0].(context.Context), args[1].(*uuid.UUID), args[2].(string), args[3].(bool), args[4].(string), args[5].(string), args[6].(string), args[7].(string), args[8].(bool))
 	})
 	return _c
 }
@@ -132,7 +133,7 @@ func (_c *Service_CreateRoom_Call) Return(_a0 *model.Room, _a1 error) *Service_C
 	return _c
 }
 
-func (_c *Service_CreateRoom_Call) RunAndReturn(run func(context.Context, *uuid.UUID, string, bool, string, string, string, string) (*model.Room, error)) *Service_CreateRoom_Call {
+func (_c *Service_CreateRoom_Call) RunAndReturn(run func(context.Context, *uuid.UUID, string, bool, string, string, string, string, bool) (*model.Room, error)) *Service_CreateRoom_Call {
 	_c.Call.Return(run)
 	return _c
 }

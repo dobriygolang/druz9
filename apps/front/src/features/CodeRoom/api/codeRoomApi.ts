@@ -16,6 +16,7 @@ type BackendRoom = {
   taskId?: string
   codeRevision?: number
   creatorId?: string
+  isPrivate?: boolean
 }
 
 function normalizeRoom(r: BackendRoom): Room {
@@ -34,6 +35,7 @@ function normalizeRoom(r: BackendRoom): Room {
     taskId: r.taskId ?? '',
     codeRevision: r.codeRevision ?? 0,
     creatorId: r.creatorId ?? '',
+    isPrivate: r.isPrivate ?? false,
   }
 }
 
@@ -50,10 +52,10 @@ export const codeRoomApi = {
     listTasksCache.setInFlight(key, req)
     return req
   },
-  createRoom: async (payload: { mode?: string; task?: string; name?: string; topic?: string; difficulty?: string }, guestName?: string): Promise<{ room: Room; inviteCode: string }> => {
+  createRoom: async (payload: { mode?: string; task?: string; name?: string; topic?: string; difficulty?: string; isPrivate?: boolean }, guestName?: string): Promise<{ room: Room; inviteCode: string }> => {
     const r = await apiClient.post<{ room?: BackendRoom; inviteCode?: string }>(
       '/api/v1/code-editor/rooms',
-      { mode: payload.mode ?? 'ROOM_MODE_ALL', task: payload.task, name: payload.name, topic: payload.topic, difficulty: payload.difficulty },
+      { mode: payload.mode ?? 'ROOM_MODE_ALL', task: payload.task, name: payload.name, topic: payload.topic, difficulty: payload.difficulty, isPrivate: payload.isPrivate },
       { headers: withGuestCodeRoomHeaders(guestName) },
     )
     return { room: normalizeRoom(r.data.room ?? { id: '' }), inviteCode: r.data.inviteCode ?? '' }

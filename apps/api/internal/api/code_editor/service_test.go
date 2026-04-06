@@ -37,7 +37,7 @@ func TestCreateRoom(t *testing.T) {
 		}
 
 		mockService := mocks.NewService(t)
-		mockService.On("CreateRoom", mock.Anything, &userID, "John", false, "duel", "algorithms", "medium", "").Return(expectedRoom, nil).Once()
+		mockService.On("CreateRoom", mock.Anything, &userID, "John", false, "duel", "algorithms", "medium", "", false).Return(expectedRoom, nil).Once()
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 

@@ -408,6 +408,7 @@ type CreateRoomRequest struct {
 	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`                                                 // creator display name
 	Topic         string                 `protobuf:"bytes,4,opt,name=topic,proto3" json:"topic,omitempty"`                                               // preferred duel topic
 	Difficulty    TaskDifficulty         `protobuf:"varint,5,opt,name=difficulty,proto3,enum=code_editor.v1.TaskDifficulty" json:"difficulty,omitempty"` // preferred duel difficulty
+	IsPrivate     bool                   `protobuf:"varint,6,opt,name=is_private,json=isPrivate,proto3" json:"is_private,omitempty"`                     // if true, only joinable via invite code
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -475,6 +476,13 @@ func (x *CreateRoomRequest) GetDifficulty() TaskDifficulty {
 		return x.Difficulty
 	}
 	return TaskDifficulty_TASK_DIFFICULTY_UNSPECIFIED
+}
+
+func (x *CreateRoomRequest) GetIsPrivate() bool {
+	if x != nil {
+		return x.IsPrivate
+	}
+	return false
 }
 
 type GetRoomRequest struct {
@@ -2055,6 +2063,7 @@ type Room struct {
 	TaskId        string                 `protobuf:"bytes,9,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
 	CodeRevision  int64                  `protobuf:"varint,10,opt,name=code_revision,json=codeRevision,proto3" json:"code_revision,omitempty"`
 	CreatorId     string                 `protobuf:"bytes,11,opt,name=creator_id,json=creatorId,proto3" json:"creator_id,omitempty"`
+	IsPrivate     bool                   `protobuf:"varint,12,opt,name=is_private,json=isPrivate,proto3" json:"is_private,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -2164,6 +2173,13 @@ func (x *Room) GetCreatorId() string {
 		return x.CreatorId
 	}
 	return ""
+}
+
+func (x *Room) GetIsPrivate() bool {
+	if x != nil {
+		return x.IsPrivate
+	}
+	return false
 }
 
 type Participant struct {

@@ -22,9 +22,9 @@ func (r *Repo) CreateRoom(ctx context.Context, room *codeeditordomain.Room) (*co
 
 	_, err = tx.Exec(
 		ctx,
-		`INSERT INTO code_rooms (id, mode, code, code_revision, status, creator_id, invite_code, task, task_id, duel_topic, created_at, updated_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, NOW(), NOW())`,
-		room.ID, room.Mode, room.Code, room.CodeRevision, room.Status, room.CreatorID, room.InviteCode, room.Task, room.TaskID, room.DuelTopic,
+		`INSERT INTO code_rooms (id, mode, code, code_revision, status, creator_id, invite_code, task, task_id, duel_topic, is_private, created_at, updated_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())`,
+		room.ID, room.Mode, room.Code, room.CodeRevision, room.Status, room.CreatorID, room.InviteCode, room.Task, room.TaskID, room.DuelTopic, room.IsPrivate,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("insert room: %w", err)

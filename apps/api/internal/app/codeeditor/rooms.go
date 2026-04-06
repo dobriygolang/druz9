@@ -13,7 +13,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string) (*domain.Room, error) {
+func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string, isPrivate bool) (*domain.Room, error) {
 	modeEnum := model.RoomModeFromString(mode)
 	if modeEnum != model.RoomModeAll && modeEnum != model.RoomModeDuel {
 		return nil, domain.ErrInvalidMode
@@ -47,6 +47,7 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 		Task:       task,
 		TaskID:     taskID,
 		DuelTopic:  topic,
+		IsPrivate:  isPrivate,
 		CreatedAt:  nowTime,
 		UpdatedAt:  nowTime,
 	}
@@ -172,6 +173,22 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 
 	if room.Status == model.RoomStatusFinished {
 		return nil, domain.ErrRoomAlreadyClosed
+	}
+
+	// Private rooms can only be joined via invite code, not by room ID directly.
+	// Allow if user is already the creator.
+	if room.IsPrivate && (userID == nil || room.CreatorID != *userID) {
+		// Check if already a participant.
+		alreadyIn := false
+		for _, p := range room.Participants {
+			if userID != nil && p.UserID != nil && *p.UserID == *userID {
+				alreadyIn = true
+				break
+			}
+		}
+		if !alreadyIn {
+			return nil, domain.ErrRoomNotFound
+		}
 	}
 
 	// Для гостей проверяем кэш

@@ -44,6 +44,7 @@ func mapRoom(room *codeeditordomain.Room) *v1.Room {
 		TaskId:       userIDToString(room.TaskID),
 		CodeRevision: room.CodeRevision,
 		CreatorId:    room.CreatorID.String(),
+		IsPrivate:    room.IsPrivate,
 	}
 }
 

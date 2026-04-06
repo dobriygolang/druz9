@@ -24,9 +24,9 @@ export function InterviewPrepSessionPage() {
     if (!sessionId) return
     interviewPrepApi.getSession(sessionId).then((s: any) => {
       setSession(s)
-      if (s?.task?.starter_code) setCode(s.task.starter_code)
-      if (s?.task?.duration_seconds) setTimeLeft(s.task.duration_seconds)
-      if (s?.current_question) setActiveTab('question')
+      if (s?.task?.starterCode) setCode(s.task.starterCode)
+      if (s?.task?.durationSeconds) setTimeLeft(s.task.durationSeconds)
+      if (s?.currentQuestion) setActiveTab('question')
     }).catch(() => navigate('/growth/interview-prep'))
   }, [sessionId, navigate])
 
@@ -50,20 +50,21 @@ export function InterviewPrepSessionPage() {
   }
 
   const handleAnswerQuestion = async () => {
-    if (!sessionId || !session?.current_question?.id) return
+    if (!sessionId || !session?.currentQuestion?.id) return
     setSubmitting(true)
     try {
-      const r = await interviewPrepApi.answerQuestion(sessionId, session.current_question.id, answer, '4') as any
+      const r = await interviewPrepApi.answerQuestion(sessionId, session.currentQuestion.id, answer, 'answered') as any
       setSession(r.session)
       setReview(r.review)
       setAnswer('')
-      setActiveTab('result')
+      if (r.session?.currentQuestion) setActiveTab('question')
+      else setActiveTab('result')
     } catch {} finally { setSubmitting(false) }
   }
 
   const task = session?.task
-  const question = session?.current_question
-  const isCodeTask = task?.is_executable
+  const question = session?.currentQuestion
+  const isCodeTask = task?.isExecutable
 
   const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
     editorRef.current = editor
@@ -81,7 +82,7 @@ export function InterviewPrepSessionPage() {
           </button>
           <div>
             <p className="text-sm font-bold text-[#0f172a]">{task?.title ?? 'Interview Session'}</p>
-            <p className="text-xs text-[#666666]">{task?.company_tag ?? 'General'} · {task?.prep_type ?? ''}</p>
+            <p className="text-xs text-[#666666]">{task?.companyTag ?? 'General'} · {task?.prepType ?? ''}</p>
           </div>
           <Badge variant="success" dot>Идёт интервью</Badge>
         </div>

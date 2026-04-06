@@ -33,6 +33,7 @@ export interface Room {
   taskId: string
   codeRevision: number
   creatorId: string
+  isPrivate: boolean
 }
 
 export interface Submission {
