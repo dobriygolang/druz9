@@ -15,13 +15,13 @@ func (i *Implementation) CreateReferral(ctx context.Context, req *v1.CreateRefer
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
 	}
 	item, err := i.service.CreateReferral(ctx, user, model.CreateReferralRequest{
-		Title:          req.Title,
-		Company:        req.Company,
-		VacancyURL:     req.VacancyUrl,
-		Description:    req.Description,
-		Experience:     req.Experience,
-		Location:       req.Location,
-		EmploymentType: unmapEmploymentType(req.EmploymentType),
+		Title:          req.Referral.Title,
+		Company:        req.Referral.Company,
+		VacancyURL:     req.Referral.VacancyUrl,
+		Description:    req.Referral.Description,
+		Experience:     req.Referral.Experience,
+		Location:       req.Referral.Location,
+		EmploymentType: unmapEmploymentType(req.Referral.EmploymentType),
 	})
 	if err != nil {
 		return nil, err

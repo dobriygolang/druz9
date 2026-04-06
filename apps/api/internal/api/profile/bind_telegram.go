@@ -9,7 +9,7 @@ import (
 	"github.com/go-kratos/kratos/v2/errors"
 )
 
-func (i *Implementation) BindTelegram(ctx context.Context, req *v1.BindTelegramRequest) (*v1.BindTelegramResponse, error) {
+func (i *Implementation) BindTelegram(ctx context.Context, req *v1.BindTelegramRequest) (*v1.ProfileStatusResponse, error) {
 	user, ok := model.UserFromContext(ctx)
 	if !ok {
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
@@ -20,5 +20,5 @@ func (i *Implementation) BindTelegram(ctx context.Context, req *v1.BindTelegramR
 		return nil, err
 	}
 
-	return &v1.BindTelegramResponse{Status: "ok"}, nil
+	return &v1.ProfileStatusResponse{Status: "ok"}, nil
 }

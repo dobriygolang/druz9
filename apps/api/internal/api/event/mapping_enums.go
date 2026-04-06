@@ -28,3 +28,31 @@ func mapEventListFilter(filter v1.EventListFilter) string {
 		return ""
 	}
 }
+
+// unmapEventRepeat converts the proto enum to the string constant used by the domain.
+func unmapEventRepeat(repeat v1.EventRepeat) string {
+	switch repeat {
+	case v1.EventRepeat_EVENT_REPEAT_DAILY:
+		return model.EventRepeatDaily
+	case v1.EventRepeat_EVENT_REPEAT_WEEKLY:
+		return model.EventRepeatWeekly
+	case v1.EventRepeat_EVENT_REPEAT_MONTHLY:
+		return model.EventRepeatMonthly
+	default:
+		return model.EventRepeatNone
+	}
+}
+
+// unmapDeleteEventScope converts the proto enum to the string used by the domain context.
+func unmapDeleteEventScope(scope v1.DeleteEventScope) string {
+	switch scope {
+	case v1.DeleteEventScope_DELETE_EVENT_SCOPE_SINGLE:
+		return "single"
+	case v1.DeleteEventScope_DELETE_EVENT_SCOPE_FUTURE:
+		return "future"
+	case v1.DeleteEventScope_DELETE_EVENT_SCOPE_ALL:
+		return "all"
+	default:
+		return "single"
+	}
+}

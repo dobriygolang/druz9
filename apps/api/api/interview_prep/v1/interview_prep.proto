@@ -3,6 +3,7 @@ syntax = "proto3";
 package interview_prep.v1;
 
 import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
 
 option go_package = "api/pkg/api/interview_prep/v1;v1";
 
@@ -97,40 +98,151 @@ service InterviewPrepService {
   }
 }
 
+// ── Enums ──────────────────────────────────────────────────────────────────
+
+// PrepType classifies the kind of interview preparation task.
+enum PrepType {
+  PREP_TYPE_UNSPECIFIED   = 0;
+  PREP_TYPE_CODING        = 1;
+  PREP_TYPE_ALGORITHM     = 2;
+  PREP_TYPE_SYSTEM_DESIGN = 3;
+  PREP_TYPE_SQL           = 4;
+  PREP_TYPE_CODE_REVIEW   = 5;
+}
+
+// ProgrammingLanguage lists all languages supported by the execution sandbox.
+enum ProgrammingLanguage {
+  PROGRAMMING_LANGUAGE_UNSPECIFIED = 0;
+  PROGRAMMING_LANGUAGE_JAVASCRIPT  = 1;
+  PROGRAMMING_LANGUAGE_TYPESCRIPT  = 2;
+  PROGRAMMING_LANGUAGE_PYTHON      = 3;
+  PROGRAMMING_LANGUAGE_GO          = 4;
+  PROGRAMMING_LANGUAGE_RUST        = 5;
+  PROGRAMMING_LANGUAGE_CPP         = 6;
+  PROGRAMMING_LANGUAGE_JAVA        = 7;
+  PROGRAMMING_LANGUAGE_SQL         = 8;
+}
+
+// ExecutionProfile defines the sandbox environment.
+enum ExecutionProfile {
+  EXECUTION_PROFILE_UNSPECIFIED         = 0;
+  EXECUTION_PROFILE_PURE                = 1;
+  EXECUTION_PROFILE_FILE_IO             = 2;
+  EXECUTION_PROFILE_HTTP_CLIENT         = 3;
+  EXECUTION_PROFILE_INTERVIEW_REALISTIC = 4;
+}
+
+// RunnerMode defines how code is invoked inside the sandbox.
+enum RunnerMode {
+  RUNNER_MODE_UNSPECIFIED = 0;
+  RUNNER_MODE_PROGRAM     = 1;
+  RUNNER_MODE_FUNCTION_IO = 2;
+}
+
+enum SessionStatus {
+  SESSION_STATUS_UNSPECIFIED = 0;
+  SESSION_STATUS_ACTIVE      = 1;
+  SESSION_STATUS_FINISHED    = 2;
+}
+
+enum MockSessionStatus {
+  MOCK_SESSION_STATUS_UNSPECIFIED = 0;
+  MOCK_SESSION_STATUS_ACTIVE      = 1;
+  MOCK_SESSION_STATUS_FINISHED    = 2;
+}
+
+// MockStageKind classifies the interview stage topic.
+enum MockStageKind {
+  MOCK_STAGE_KIND_UNSPECIFIED   = 0;
+  MOCK_STAGE_KIND_SLICES        = 1;
+  MOCK_STAGE_KIND_CONCURRENCY   = 2;
+  MOCK_STAGE_KIND_SQL           = 3;
+  MOCK_STAGE_KIND_ARCHITECTURE  = 4;
+  MOCK_STAGE_KIND_SYSTEM_DESIGN = 5;
+}
+
+enum MockStageStatus {
+  MOCK_STAGE_STATUS_UNSPECIFIED = 0;
+  MOCK_STAGE_STATUS_PENDING     = 1;
+  MOCK_STAGE_STATUS_SOLVING     = 2;
+  MOCK_STAGE_STATUS_QUESTIONS   = 3;
+  MOCK_STAGE_STATUS_COMPLETED   = 4;
+}
+
+// SelfAssessment captures whether the candidate answered or skipped a question.
+enum SelfAssessment {
+  SELF_ASSESSMENT_UNSPECIFIED = 0;
+  SELF_ASSESSMENT_ANSWERED    = 1;
+  SELF_ASSESSMENT_SKIPPED     = 2;
+}
+
+// SubmitFailureKind classifies why code submission failed.
+enum SubmitFailureKind {
+  SUBMIT_FAILURE_KIND_UNSPECIFIED   = 0;
+  SUBMIT_FAILURE_KIND_COMPILE_ERROR = 1;
+  SUBMIT_FAILURE_KIND_RUNTIME_ERROR = 2;
+  SUBMIT_FAILURE_KIND_WRONG_ANSWER  = 3;
+  SUBMIT_FAILURE_KIND_TIMEOUT       = 4;
+}
+
+// ── Request messages ───────────────────────────────────────────────────────
+
 message ListTasksRequest {}
 message StartSessionRequest { string task_id = 1; }
 message GetSessionRequest { string session_id = 1; }
-message SubmitSessionRequest { string session_id = 1; string code = 2; string language = 3; }
-message AnswerQuestionRequest { string session_id = 1; string question_id = 2; string self_assessment = 3; string answer = 4; }
-message ReviewSystemDesignRequest {
-  string session_id = 1;
-  bytes image = 2;
-  string image_name = 3;
-  string image_content_type = 4;
-  string notes = 5;
-  string components = 6;
-  string apis = 7;
-  string database_schema = 8;
-  string traffic = 9;
-  string reliability = 10;
+
+message SubmitSessionRequest {
+  string              session_id = 1;
+  string              code       = 2;
+  ProgrammingLanguage language   = 3;  // was: string
 }
+
+message AnswerQuestionRequest {
+  string         session_id      = 1;
+  string         question_id     = 2;
+  SelfAssessment self_assessment = 3;  // was: string
+  string         answer          = 4;
+}
+
+// SystemDesignPayload contains the candidate's system design artefacts.
+// Shared by ReviewSystemDesignRequest and ReviewMockSystemDesignRequest.
+message SystemDesignPayload {
+  bytes  image              = 1;
+  string image_name         = 2;
+  string image_content_type = 3;
+  string notes              = 4;
+  string components         = 5;
+  string apis               = 6;
+  string database_schema    = 7;
+  string traffic            = 8;
+  string reliability        = 9;
+}
+
+message ReviewSystemDesignRequest {
+  string              session_id = 1;
+  SystemDesignPayload design     = 2;
+}
+
 message ListCompaniesRequest {}
 message StartMockSessionRequest { string company_tag = 1; }
 message GetMockSessionRequest { string session_id = 1; }
-message SubmitMockStageRequest { string session_id = 1; string code = 2; string language = 3; string notes = 4; }
-message ReviewMockSystemDesignRequest {
-  string session_id = 1;
-  bytes image = 2;
-  string image_name = 3;
-  string image_content_type = 4;
-  string notes = 5;
-  string components = 6;
-  string apis = 7;
-  string database_schema = 8;
-  string traffic = 9;
-  string reliability = 10;
+
+message SubmitMockStageRequest {
+  string              session_id = 1;
+  string              code       = 2;
+  ProgrammingLanguage language   = 3;  // was: string
+  string              notes      = 4;
 }
-message AnswerMockQuestionRequest { string session_id = 1; string answer = 2; }
+
+message ReviewMockSystemDesignRequest {
+  string              session_id = 1;
+  SystemDesignPayload design     = 2;
+}
+
+message AnswerMockQuestionRequest {
+  string session_id = 1;
+  string answer     = 2;
+}
 
 message ListAdminTasksRequest {}
 message GetAdminTaskRequest { string task_id = 1; }
@@ -142,258 +254,270 @@ message DeleteMockQuestionPoolRequest { string id = 1; }
 message ListMockCompanyPresetsRequest {}
 message DeleteMockCompanyPresetRequest { string id = 1; }
 
+// ── Response messages ──────────────────────────────────────────────────────
+
+message StatusResponse { string status = 1; }
+
+message SessionEnvelope         { InterviewPrepSession session = 1; }
+message MockSessionEnvelope      { MockSession session = 1; }
+message ListTasksResponse        { repeated InterviewPrepTask tasks = 1; }
+message ListCompaniesResponse    { repeated string companies = 1; }
+
+message SubmitSessionResult {
+  bool              passed           = 1;
+  string            last_error       = 2;
+  int32             passed_count     = 3;
+  int32             total_count      = 4;
+  int32             failed_test_index = 5;
+  SubmitFailureKind failure_kind     = 6;  // was: string
+  InterviewPrepSession session       = 7;
+}
+message SubmitSessionResponse { SubmitSessionResult result = 1; }
+
+message AnswerQuestionResponse {
+  InterviewPrepSession    session          = 1;
+  InterviewPrepQuestion   answered_question = 2;
+  InterviewAnswerReview   review           = 3;
+}
+
+message ReviewSystemDesignResponse { SystemDesignReview review = 1; }
+
+message SubmitMockStageResult {
+  bool                    passed           = 1;
+  string                  last_error       = 2;
+  int32                   passed_count     = 3;
+  int32                   total_count      = 4;
+  int32                   failed_test_index = 5;
+  SubmitFailureKind        failure_kind     = 6;  // was: string
+  InterviewSolutionReview  review           = 7;
+  MockSession              session          = 8;
+}
+message SubmitMockStageResponse { SubmitMockStageResult result = 1; }
+
+message ReviewMockSystemDesignResult { SystemDesignReview review = 1; MockSession session = 2; }
+message ReviewMockSystemDesignResponse { ReviewMockSystemDesignResult result = 1; }
+
+message AnswerMockQuestionResult { InterviewAnswerReview review = 1; MockSession session = 2; }
+message AnswerMockQuestionResponse { AnswerMockQuestionResult result = 1; }
+
+// ── Admin request/response messages ───────────────────────────────────────
+
+message AdminTaskPayload {
+  string              slug                = 1;
+  string              title               = 2;
+  string              statement           = 3;
+  PrepType            prep_type           = 4;  // was: string
+  ProgrammingLanguage language            = 5;  // was: string
+  string              company_tag         = 6;
+  repeated string     supported_languages = 7;
+  bool                is_executable       = 8;
+  ExecutionProfile    execution_profile   = 9;  // was: string
+  RunnerMode          runner_mode         = 10; // was: string
+  int32               duration_seconds    = 11;
+  string              starter_code        = 12;
+  string              reference_solution  = 13;
+  string              code_task_id        = 14;
+  bool                is_active           = 15;
+}
+message CreateAdminTaskRequest   { AdminTaskPayload task = 1; }
+message UpdateAdminTaskRequest   { string task_id = 1; AdminTaskPayload task = 2; }
+message ListAdminTasksResponse   { repeated InterviewPrepTask tasks = 1; }
+message AdminTaskEnvelope        { InterviewPrepTask task = 1; }
+
+message AdminQuestionPayload     { int32 position = 1; string prompt = 2; string answer = 3; }
+message CreateAdminQuestionRequest { string task_id = 1; AdminQuestionPayload question = 2; }
+message UpdateAdminQuestionRequest { string task_id = 1; string question_id = 2; AdminQuestionPayload question = 3; }
+message ListAdminQuestionsResponse { repeated InterviewPrepQuestion questions = 1; }
+message AdminQuestionEnvelope    { InterviewPrepQuestion question = 1; }
+
+message MockQuestionPoolPayload {
+  string  topic            = 1;
+  string  company_tag      = 2;
+  string  question_key     = 3;
+  string  prompt           = 4;
+  string  reference_answer = 5;
+  int32   position         = 6;
+  bool    always_ask       = 7;
+  bool    is_active        = 8;
+}
+message CreateMockQuestionPoolRequest { MockQuestionPoolPayload item = 1; }
+message UpdateMockQuestionPoolRequest { string id = 1; MockQuestionPoolPayload item = 2; }
+message MockQuestionPoolListResponse  { repeated MockQuestionPoolItem items = 1; }
+message MockQuestionPoolEnvelope      { MockQuestionPoolItem item = 1; }
+
+message MockCompanyPresetPayload {
+  string  company_tag       = 1;
+  string  stage_kind        = 2;
+  int32   position          = 3;
+  string  task_slug_pattern = 4;
+  string  ai_model_override = 5;
+  bool    is_active         = 6;
+}
+message CreateMockCompanyPresetRequest { MockCompanyPresetPayload item = 1; }
+message UpdateMockCompanyPresetRequest { string id = 1; MockCompanyPresetPayload item = 2; }
+message MockCompanyPresetListResponse  { repeated MockCompanyPreset items = 1; }
+message MockCompanyPresetEnvelope      { MockCompanyPreset item = 1; }
+
+// ── Domain entities ────────────────────────────────────────────────────────
+
 message InterviewPrepTask {
-  string id = 1;
-  string slug = 2;
-  string title = 3;
-  string statement = 4;
-  string prep_type = 5;
-  string language = 6;
-  string company_tag = 7;
-  repeated string supported_languages = 8;
-  bool is_executable = 9;
-  string execution_profile = 10;
-  string runner_mode = 11;
-  int32 duration_seconds = 12;
-  string starter_code = 13;
-  string reference_solution = 14;
-  string code_task_id = 15;
-  bool is_active = 16;
-  string created_at = 17;
-  string updated_at = 18;
+  string                    id                  = 1;
+  string                    slug                = 2;
+  string                    title               = 3;
+  string                    statement           = 4;
+  PrepType                  prep_type           = 5;  // was: string
+  ProgrammingLanguage       language            = 6;  // was: string
+  string                    company_tag         = 7;
+  repeated string           supported_languages = 8;
+  bool                      is_executable       = 9;
+  ExecutionProfile          execution_profile   = 10; // was: string
+  RunnerMode                runner_mode         = 11; // was: string
+  int32                     duration_seconds    = 12;
+  string                    starter_code        = 13;
+  string                    reference_solution  = 14;
+  string                    code_task_id        = 15;
+  bool                      is_active           = 16;
+  google.protobuf.Timestamp created_at          = 17; // was: string
+  google.protobuf.Timestamp updated_at          = 18; // was: string
 }
 
 message InterviewPrepQuestion {
-  string id = 1;
-  string task_id = 2;
-  int32 position = 3;
-  string prompt = 4;
-  string answer = 5;
-  string created_at = 6;
-  string updated_at = 7;
+  string                    id         = 1;
+  string                    task_id    = 2;
+  int32                     position   = 3;
+  string                    prompt     = 4;
+  string                    answer     = 5;
+  google.protobuf.Timestamp created_at = 6; // was: string
+  google.protobuf.Timestamp updated_at = 7; // was: string
 }
 
 message InterviewPrepQuestionResult {
-  string id = 1;
-  string session_id = 2;
-  string question_id = 3;
-  string self_assessment = 4;
-  string answered_at = 5;
+  string                    id              = 1;
+  string                    session_id      = 2;
+  string                    question_id     = 3;
+  SelfAssessment            self_assessment = 4; // was: string
+  google.protobuf.Timestamp answered_at     = 5; // was: string
 }
 
 message InterviewPrepSession {
-  string id = 1;
-  string user_id = 2;
-  string task_id = 3;
-  string status = 4;
-  int32 current_question_position = 5;
-  string solve_language = 6;
-  string code = 7;
-  bool last_submission_passed = 8;
-  string started_at = 9;
-  string finished_at = 10;
-  string created_at = 11;
-  string updated_at = 12;
-  InterviewPrepTask task = 13;
-  InterviewPrepQuestion current_question = 14;
-  repeated InterviewPrepQuestionResult results = 15;
+  string                              id                       = 1;
+  string                              user_id                  = 2;
+  string                              task_id                  = 3;
+  SessionStatus                       status                   = 4;  // was: string
+  int32                               current_question_position = 5;
+  string                              solve_language           = 6;
+  string                              code                     = 7;
+  bool                                last_submission_passed   = 8;
+  google.protobuf.Timestamp           started_at               = 9;  // was: string
+  google.protobuf.Timestamp           finished_at              = 10; // was: string (nullable → nil when not finished)
+  google.protobuf.Timestamp           created_at               = 11; // was: string
+  google.protobuf.Timestamp           updated_at               = 12; // was: string
+  InterviewPrepTask                   task                     = 13;
+  InterviewPrepQuestion               current_question         = 14;
+  repeated InterviewPrepQuestionResult results                 = 15;
 }
 
 message SystemDesignReview {
-  string provider = 1;
-  string model = 2;
-  int32 score = 3;
-  string summary = 4;
-  repeated string strengths = 5;
-  repeated string issues = 6;
-  repeated string missing_topics = 7;
+  string          provider           = 1;
+  string          model              = 2;
+  int32           score              = 3;
+  string          summary            = 4;
+  repeated string strengths          = 5;
+  repeated string issues             = 6;
+  repeated string missing_topics     = 7;
   repeated string follow_up_questions = 8;
-  string disclaimer = 9;
+  string          disclaimer         = 9;
 }
 
 message InterviewSolutionReview {
-  string provider = 1;
-  string model = 2;
-  int32 score = 3;
-  string summary = 4;
-  repeated string strengths = 5;
-  repeated string issues = 6;
+  string          provider            = 1;
+  string          model               = 2;
+  int32           score               = 3;
+  string          summary             = 4;
+  repeated string strengths           = 5;
+  repeated string issues              = 6;
   repeated string follow_up_questions = 7;
 }
 
 message InterviewAnswerReview {
-  string provider = 1;
-  string model = 2;
-  int32 score = 3;
-  string summary = 4;
-  repeated string gaps = 5;
+  string          provider = 1;
+  string          model    = 2;
+  int32           score    = 3;
+  string          summary  = 4;
+  repeated string gaps     = 5;
 }
 
 message MockQuestionResult {
-  string id = 1;
-  string stage_id = 2;
-  int32 position = 3;
-  string question_key = 4;
-  string prompt = 5;
-  string reference_answer = 6;
-  int32 score = 7;
-  string summary = 8;
-  string answered_at = 9;
-  string created_at = 10;
-  string updated_at = 11;
+  string                    id               = 1;
+  string                    stage_id         = 2;
+  int32                     position         = 3;
+  string                    question_key     = 4;
+  string                    prompt           = 5;
+  string                    reference_answer = 6;
+  int32                     score            = 7;
+  string                    summary          = 8;
+  google.protobuf.Timestamp answered_at      = 9;  // was: string (nullable)
+  google.protobuf.Timestamp created_at       = 10; // was: string
+  google.protobuf.Timestamp updated_at       = 11; // was: string
 }
 
 message MockStage {
-  string id = 1;
-  string session_id = 2;
-  int32 stage_index = 3;
-  string kind = 4;
-  string status = 5;
-  string task_id = 6;
-  string solve_language = 7;
-  string code = 8;
-  bool last_submission_passed = 9;
-  int32 review_score = 10;
-  string review_summary = 11;
-  string started_at = 12;
-  string finished_at = 13;
-  string created_at = 14;
-  string updated_at = 15;
-  InterviewPrepTask task = 16;
-  repeated MockQuestionResult question_results = 17;
-  MockQuestionResult current_question = 18;
+  string                    id                    = 1;
+  string                    session_id            = 2;
+  int32                     stage_index           = 3;
+  MockStageKind             kind                  = 4;  // was: string
+  MockStageStatus           status                = 5;  // was: string
+  string                    task_id               = 6;
+  string                    solve_language        = 7;
+  string                    code                  = 8;
+  bool                      last_submission_passed = 9;
+  int32                     review_score          = 10;
+  string                    review_summary        = 11;
+  google.protobuf.Timestamp started_at            = 12; // was: string
+  google.protobuf.Timestamp finished_at           = 13; // was: string (nullable)
+  google.protobuf.Timestamp created_at            = 14; // was: string
+  google.protobuf.Timestamp updated_at            = 15; // was: string
+  InterviewPrepTask         task                  = 16;
+  repeated MockQuestionResult question_results    = 17;
+  MockQuestionResult        current_question      = 18;
 }
 
 message MockSession {
-  string id = 1;
-  string user_id = 2;
-  string company_tag = 3;
-  string status = 4;
-  int32 current_stage_index = 5;
-  string started_at = 6;
-  string finished_at = 7;
-  string created_at = 8;
-  string updated_at = 9;
-  repeated MockStage stages = 10;
-  MockStage current_stage = 11;
+  string                    id                  = 1;
+  string                    user_id             = 2;
+  string                    company_tag         = 3;
+  MockSessionStatus         status              = 4;  // was: string
+  int32                     current_stage_index = 5;
+  google.protobuf.Timestamp started_at          = 6;  // was: string
+  google.protobuf.Timestamp finished_at         = 7;  // was: string (nullable)
+  google.protobuf.Timestamp created_at          = 8;  // was: string
+  google.protobuf.Timestamp updated_at          = 9;  // was: string
+  repeated MockStage        stages              = 10;
+  MockStage                 current_stage       = 11;
 }
 
 message MockQuestionPoolItem {
-  string id = 1;
-  string topic = 2;
-  string company_tag = 3;
-  string question_key = 4;
-  string prompt = 5;
-  string reference_answer = 6;
-  int32 position = 7;
-  bool always_ask = 8;
-  bool is_active = 9;
-  string created_at = 10;
-  string updated_at = 11;
+  string                    id               = 1;
+  string                    topic            = 2;
+  string                    company_tag      = 3;
+  string                    question_key     = 4;
+  string                    prompt           = 5;
+  string                    reference_answer = 6;
+  int32                     position         = 7;
+  bool                      always_ask       = 8;
+  bool                      is_active        = 9;
+  google.protobuf.Timestamp created_at       = 10; // was: string
+  google.protobuf.Timestamp updated_at       = 11; // was: string
 }
 
 message MockCompanyPreset {
-  string id = 1;
-  string company_tag = 2;
-  string stage_kind = 3;
-  int32 position = 4;
-  string task_slug_pattern = 5;
-  string ai_model_override = 6;
-  bool is_active = 7;
-  string created_at = 8;
-  string updated_at = 9;
+  string                    id                = 1;
+  string                    company_tag       = 2;
+  string                    stage_kind        = 3;
+  int32                     position          = 4;
+  string                    task_slug_pattern = 5;
+  string                    ai_model_override = 6;
+  bool                      is_active         = 7;
+  google.protobuf.Timestamp created_at        = 8;  // was: string
+  google.protobuf.Timestamp updated_at        = 9;  // was: string
 }
-
-message SessionEnvelope { InterviewPrepSession session = 1; }
-message MockSessionEnvelope { MockSession session = 1; }
-message ListTasksResponse { repeated InterviewPrepTask tasks = 1; }
-message ListCompaniesResponse { repeated string companies = 1; }
-message SubmitSessionResult {
-  bool passed = 1;
-  string last_error = 2;
-  int32 passed_count = 3;
-  int32 total_count = 4;
-  int32 failed_test_index = 5;
-  string failure_kind = 6;
-  InterviewPrepSession session = 7;
-}
-message SubmitSessionResponse { SubmitSessionResult result = 1; }
-message AnswerQuestionResponse {
-  InterviewPrepSession session = 1;
-  InterviewPrepQuestion answered_question = 2;
-  InterviewAnswerReview review = 3;
-}
-message ReviewSystemDesignResponse { SystemDesignReview review = 1; }
-message SubmitMockStageResult {
-  bool passed = 1;
-  string last_error = 2;
-  int32 passed_count = 3;
-  int32 total_count = 4;
-  int32 failed_test_index = 5;
-  string failure_kind = 6;
-  InterviewSolutionReview review = 7;
-  MockSession session = 8;
-}
-message SubmitMockStageResponse { SubmitMockStageResult result = 1; }
-message ReviewMockSystemDesignResult { SystemDesignReview review = 1; MockSession session = 2; }
-message ReviewMockSystemDesignResponse { ReviewMockSystemDesignResult result = 1; }
-message AnswerMockQuestionResult { InterviewAnswerReview review = 1; MockSession session = 2; }
-message AnswerMockQuestionResponse { AnswerMockQuestionResult result = 1; }
-
-message AdminTaskPayload {
-  string slug = 1;
-  string title = 2;
-  string statement = 3;
-  string prep_type = 4;
-  string language = 5;
-  string company_tag = 6;
-  repeated string supported_languages = 7;
-  bool is_executable = 8;
-  string execution_profile = 9;
-  string runner_mode = 10;
-  int32 duration_seconds = 11;
-  string starter_code = 12;
-  string reference_solution = 13;
-  string code_task_id = 14;
-  bool is_active = 15;
-}
-message CreateAdminTaskRequest { AdminTaskPayload task = 1; }
-message UpdateAdminTaskRequest { string task_id = 1; AdminTaskPayload task = 2; }
-message ListAdminTasksResponse { repeated InterviewPrepTask tasks = 1; }
-message AdminTaskEnvelope { InterviewPrepTask task = 1; }
-
-message AdminQuestionPayload { int32 position = 1; string prompt = 2; string answer = 3; }
-message CreateAdminQuestionRequest { string task_id = 1; AdminQuestionPayload question = 2; }
-message UpdateAdminQuestionRequest { string task_id = 1; string question_id = 2; AdminQuestionPayload question = 3; }
-message ListAdminQuestionsResponse { repeated InterviewPrepQuestion questions = 1; }
-message AdminQuestionEnvelope { InterviewPrepQuestion question = 1; }
-
-message MockQuestionPoolPayload {
-  string topic = 1;
-  string company_tag = 2;
-  string question_key = 3;
-  string prompt = 4;
-  string reference_answer = 5;
-  int32 position = 6;
-  bool always_ask = 7;
-  bool is_active = 8;
-}
-message CreateMockQuestionPoolRequest { MockQuestionPoolPayload item = 1; }
-message UpdateMockQuestionPoolRequest { string id = 1; MockQuestionPoolPayload item = 2; }
-message MockQuestionPoolListResponse { repeated MockQuestionPoolItem items = 1; }
-message MockQuestionPoolEnvelope { MockQuestionPoolItem item = 1; }
-
-message MockCompanyPresetPayload {
-  string company_tag = 1;
-  string stage_kind = 2;
-  int32 position = 3;
-  string task_slug_pattern = 4;
-  string ai_model_override = 5;
-  bool is_active = 6;
-}
-message CreateMockCompanyPresetRequest { MockCompanyPresetPayload item = 1; }
-message UpdateMockCompanyPresetRequest { string id = 1; MockCompanyPresetPayload item = 2; }
-message MockCompanyPresetListResponse { repeated MockCompanyPreset items = 1; }
-message MockCompanyPresetEnvelope { MockCompanyPreset item = 1; }
-
-message StatusResponse { string status = 1; }

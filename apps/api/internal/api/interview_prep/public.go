@@ -76,7 +76,7 @@ func (i *Implementation) SubmitSession(ctx context.Context, req *v1.SubmitSessio
 		return nil, err
 	}
 
-	result, err := i.service.Submit(ctx, user, sessionID, req.Code, req.Language)
+	result, err := i.service.Submit(ctx, user, sessionID, req.Code, unmapProgrammingLanguage(req.Language))
 	if err != nil {
 		return nil, toHTTPError(err)
 	}
@@ -88,7 +88,7 @@ func (i *Implementation) SubmitSession(ctx context.Context, req *v1.SubmitSessio
 			PassedCount:     result.PassedCount,
 			TotalCount:      result.TotalCount,
 			FailedTestIndex: result.FailedTestIndex,
-			FailureKind:     result.FailureKind,
+			FailureKind:     mapSubmitFailureKind(result.FailureKind),
 			Session:         mapSession(result.Session),
 		},
 	}, nil
@@ -108,7 +108,7 @@ func (i *Implementation) AnswerQuestion(ctx context.Context, req *v1.AnswerQuest
 		return nil, err
 	}
 
-	result, err := i.service.AnswerQuestion(ctx, user, sessionID, questionID, req.SelfAssessment, req.Answer)
+	result, err := i.service.AnswerQuestion(ctx, user, sessionID, questionID, string(unmapSelfAssessment(req.SelfAssessment)), req.Answer)
 	if err != nil {
 		return nil, toHTTPError(err)
 	}
@@ -128,17 +128,17 @@ func (i *Implementation) ReviewSystemDesign(ctx context.Context, req *v1.ReviewS
 	if err != nil {
 		return nil, err
 	}
-	if len(req.Image) == 0 {
+	if req.Design == nil || len(req.Design.Image) == 0 {
 		return nil, kratoserrors.BadRequest("IMAGE_REQUIRED", "image is required")
 	}
 
-	review, err := i.service.ReviewSystemDesign(ctx, user, sessionID, req.ImageName, req.ImageContentType, req.Image, appinterviewprep.SystemDesignReviewInput{
-		Notes:          req.Notes,
-		Components:     req.Components,
-		APIs:           req.Apis,
-		DatabaseSchema: req.DatabaseSchema,
-		Traffic:        req.Traffic,
-		Reliability:    req.Reliability,
+	review, err := i.service.ReviewSystemDesign(ctx, user, sessionID, req.Design.ImageName, req.Design.ImageContentType, req.Design.Image, appinterviewprep.SystemDesignReviewInput{
+		Notes:          req.Design.Notes,
+		Components:     req.Design.Components,
+		APIs:           req.Design.Apis,
+		DatabaseSchema: req.Design.DatabaseSchema,
+		Traffic:        req.Design.Traffic,
+		Reliability:    req.Design.Reliability,
 	})
 	if err != nil {
 		return nil, toHTTPError(err)
@@ -192,7 +192,7 @@ func (i *Implementation) SubmitMockStage(ctx context.Context, req *v1.SubmitMock
 	if err != nil {
 		return nil, err
 	}
-	result, err := i.service.SubmitMockStage(ctx, user, sessionID, req.Code, req.Language, req.Notes)
+	result, err := i.service.SubmitMockStage(ctx, user, sessionID, req.Code, unmapProgrammingLanguage(req.Language), req.Notes)
 	if err != nil {
 		return nil, toHTTPError(err)
 	}
@@ -203,7 +203,7 @@ func (i *Implementation) SubmitMockStage(ctx context.Context, req *v1.SubmitMock
 			PassedCount:     result.PassedCount,
 			TotalCount:      result.TotalCount,
 			FailedTestIndex: result.FailedTestIndex,
-			FailureKind:     result.FailureKind,
+			FailureKind:     mapSubmitFailureKind(result.FailureKind),
 			Review:          mapInterviewSolutionReview(result.Review),
 			Session:         mapMockSession(result.Session),
 		},
@@ -219,17 +219,17 @@ func (i *Implementation) ReviewMockSystemDesign(ctx context.Context, req *v1.Rev
 	if err != nil {
 		return nil, err
 	}
-	if len(req.Image) == 0 {
+	if req.Design == nil || len(req.Design.Image) == 0 {
 		return nil, kratoserrors.BadRequest("IMAGE_REQUIRED", "image is required")
 	}
 
-	result, err := i.service.ReviewMockSystemDesign(ctx, user, sessionID, req.ImageName, req.ImageContentType, req.Image, appinterviewprep.SystemDesignReviewInput{
-		Notes:          req.Notes,
-		Components:     req.Components,
-		APIs:           req.Apis,
-		DatabaseSchema: req.DatabaseSchema,
-		Traffic:        req.Traffic,
-		Reliability:    req.Reliability,
+	result, err := i.service.ReviewMockSystemDesign(ctx, user, sessionID, req.Design.ImageName, req.Design.ImageContentType, req.Design.Image, appinterviewprep.SystemDesignReviewInput{
+		Notes:          req.Design.Notes,
+		Components:     req.Design.Components,
+		APIs:           req.Design.Apis,
+		DatabaseSchema: req.Design.DatabaseSchema,
+		Traffic:        req.Design.Traffic,
+		Reliability:    req.Design.Reliability,
 	})
 	if err != nil {
 		return nil, toHTTPError(err)

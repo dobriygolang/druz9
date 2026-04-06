@@ -28,9 +28,9 @@ const OperationEventServiceUpdateEvent = "/event.v1.EventService/UpdateEvent"
 
 type EventServiceHTTPServer interface {
 	CreateEvent(context.Context, *CreateEventRequest) (*EventResponse, error)
-	DeleteEvent(context.Context, *DeleteEventRequest) (*DeleteEventResponse, error)
+	DeleteEvent(context.Context, *DeleteEventRequest) (*EventStatusResponse, error)
 	JoinEvent(context.Context, *JoinEventRequest) (*EventResponse, error)
-	LeaveEvent(context.Context, *LeaveEventRequest) (*LeaveEventResponse, error)
+	LeaveEvent(context.Context, *LeaveEventRequest) (*EventStatusResponse, error)
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsResponse, error)
 	UpdateEvent(context.Context, *UpdateEventRequest) (*EventResponse, error)
 }
@@ -131,7 +131,7 @@ func _EventService_LeaveEvent0_HTTP_Handler(srv EventServiceHTTPServer) func(ctx
 		if err != nil {
 			return err
 		}
-		reply := out.(*LeaveEventResponse)
+		reply := out.(*EventStatusResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -178,16 +178,16 @@ func _EventService_DeleteEvent0_HTTP_Handler(srv EventServiceHTTPServer) func(ct
 		if err != nil {
 			return err
 		}
-		reply := out.(*DeleteEventResponse)
+		reply := out.(*EventStatusResponse)
 		return ctx.Result(200, reply)
 	}
 }
 
 type EventServiceHTTPClient interface {
 	CreateEvent(ctx context.Context, req *CreateEventRequest, opts ...http.CallOption) (rsp *EventResponse, err error)
-	DeleteEvent(ctx context.Context, req *DeleteEventRequest, opts ...http.CallOption) (rsp *DeleteEventResponse, err error)
+	DeleteEvent(ctx context.Context, req *DeleteEventRequest, opts ...http.CallOption) (rsp *EventStatusResponse, err error)
 	JoinEvent(ctx context.Context, req *JoinEventRequest, opts ...http.CallOption) (rsp *EventResponse, err error)
-	LeaveEvent(ctx context.Context, req *LeaveEventRequest, opts ...http.CallOption) (rsp *LeaveEventResponse, err error)
+	LeaveEvent(ctx context.Context, req *LeaveEventRequest, opts ...http.CallOption) (rsp *EventStatusResponse, err error)
 	ListEvents(ctx context.Context, req *ListEventsRequest, opts ...http.CallOption) (rsp *ListEventsResponse, err error)
 	UpdateEvent(ctx context.Context, req *UpdateEventRequest, opts ...http.CallOption) (rsp *EventResponse, err error)
 }
@@ -213,8 +213,8 @@ func (c *EventServiceHTTPClientImpl) CreateEvent(ctx context.Context, in *Create
 	return &out, nil
 }
 
-func (c *EventServiceHTTPClientImpl) DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...http.CallOption) (*DeleteEventResponse, error) {
-	var out DeleteEventResponse
+func (c *EventServiceHTTPClientImpl) DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...http.CallOption) (*EventStatusResponse, error) {
+	var out EventStatusResponse
 	pattern := "/api/v1/events/{event_id}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationEventServiceDeleteEvent))
@@ -239,8 +239,8 @@ func (c *EventServiceHTTPClientImpl) JoinEvent(ctx context.Context, in *JoinEven
 	return &out, nil
 }
 
-func (c *EventServiceHTTPClientImpl) LeaveEvent(ctx context.Context, in *LeaveEventRequest, opts ...http.CallOption) (*LeaveEventResponse, error) {
-	var out LeaveEventResponse
+func (c *EventServiceHTTPClientImpl) LeaveEvent(ctx context.Context, in *LeaveEventRequest, opts ...http.CallOption) (*EventStatusResponse, error) {
+	var out EventStatusResponse
 	pattern := "/api/v1/events/{event_id}/leave"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationEventServiceLeaveEvent))

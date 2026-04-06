@@ -1,14 +1,9 @@
 import { useEffect, useState } from 'react'
-import { Outlet, useLocation, Link } from 'react-router-dom'
-import { cn } from '@/shared/lib/cn'
+import { Outlet, useLocation, useNavigate } from 'react-router-dom'
+import { Code2, Swords, Target } from 'lucide-react'
 import { Avatar } from '@/shared/ui/Avatar'
 import { apiClient } from '@/shared/api/base'
 
-const TABS = [
-  { id: 'code-rooms', label: 'Code Rooms', href: '/practice/code-rooms' },
-  { id: 'arena', label: 'Arena', href: '/practice/arena' },
-  { id: 'solo', label: 'Solo Practice', href: '/practice/solo' },
-]
 
 interface LeaderboardUser {
   userId: string
@@ -20,7 +15,7 @@ interface LeaderboardUser {
 
 export function PracticeHubPage() {
   const location = useLocation()
-  const active = TABS.find(t => location.pathname.startsWith(t.href))?.id ?? 'code-rooms'
+  const navigate = useNavigate()
 
   const [leaders, setLeaders] = useState<LeaderboardUser[]>([])
   const [leadersLoading, setLeadersLoading] = useState(true)
@@ -45,6 +40,38 @@ export function PracticeHubPage() {
             <h1 className="text-2xl font-bold text-[#111111]">Practice</h1>
             <p className="text-sm text-[#666666] mt-0.5">Практикуйся и соревнуйся с другими</p>
           </div>
+        </div>
+
+        {/* Mode cards — also serve as navigation */}
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+          {[
+            { icon: Code2, title: 'Code Rooms', sub: 'Совместный кодинг', href: '/practice/code-rooms' },
+            { icon: Swords, title: 'Arena Duels', sub: '1-на-1 за ELO', href: '/practice/arena' },
+            { icon: Target, title: 'Solo Practice', sub: 'В своём темпе', href: '/practice/solo' },
+          ].map(f => {
+            const Icon = f.icon
+            const isAct = location.pathname.startsWith(f.href)
+            return (
+              <button
+                key={f.title}
+                onClick={() => navigate(f.href)}
+                className={`flex items-center gap-3 px-4 py-3.5 rounded-xl border transition-all text-left ${
+                  isAct
+                    ? 'bg-white border-[#6366F1] shadow-sm'
+                    : 'bg-white border-[#CBCCC9] hover:border-[#6366F1]/40 hover:shadow-sm'
+                }`}
+              >
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isAct ? 'bg-[#EEF2FF]' : 'bg-[#F2F3F0]'}`}>
+                  <Icon className="w-4 h-4 text-[#6366F1]" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-[#111111] leading-tight">{f.title}</p>
+                  <p className="text-xs text-[#666666] leading-tight mt-0.5">{f.sub}</p>
+                </div>
+                {isAct && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#6366F1] flex-shrink-0" />}
+              </button>
+            )
+          })}
         </div>
 
         {/* Leaderboard row */}
@@ -77,21 +104,6 @@ export function PracticeHubPage() {
           )}
         </div>
 
-        {/* Pill tabs for mode selection */}
-        <div className="flex items-center gap-1 p-1 bg-[#E7E8E5] border border-[#CBCCC9] rounded-full w-fit">
-          {TABS.map(tab => (
-            <Link
-              key={tab.id}
-              to={tab.href}
-              className={cn(
-                'px-4 py-1.5 text-sm font-medium rounded-full transition-colors',
-                active === tab.id ? 'bg-white text-[#111111] shadow-sm' : 'text-[#666666] hover:text-[#111111]'
-              )}
-            >
-              {tab.label}
-            </Link>
-          ))}
-        </div>
       </div>
       <div className="flex-1">
         <Outlet />

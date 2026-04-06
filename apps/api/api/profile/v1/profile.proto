@@ -66,68 +66,64 @@ service ProfileService {
     };
   }
 
-  rpc Logout(LogoutRequest) returns (LogoutResponse) {
+  rpc Logout(LogoutRequest) returns (ProfileStatusResponse) {
     option (google.api.http) = {
       post: "/api/v1/profile/auth/logout"
       body: "*"
     };
   }
 
-  rpc BindTelegram(BindTelegramRequest) returns (BindTelegramResponse) {
+  rpc BindTelegram(BindTelegramRequest) returns (ProfileStatusResponse) {
     option (google.api.http) = {
       post: "/api/v1/profile/bind-telegram"
       body: "*"
     };
   }
-
 }
+
+// ── Enums ──────────────────────────────────────────────────────────────────
+
+enum UserActivityStatus {
+  USER_ACTIVITY_STATUS_UNSPECIFIED     = 0;
+  USER_ACTIVITY_STATUS_ONLINE          = 1;
+  USER_ACTIVITY_STATUS_RECENTLY_ACTIVE = 2;
+  USER_ACTIVITY_STATUS_OFFLINE         = 3;
+}
+
+// ── Request messages ───────────────────────────────────────────────────────
 
 message CreateTelegramAuthChallengeRequest {}
 
-message CreateTelegramAuthChallengeResponse {
-  string token = 1;
-  string bot_start_url = 2;
-  google.protobuf.Timestamp expires_at = 3;
-}
-
 message ConfirmTelegramAuthRequest {
-  string token = 1;
-  string bot_token = 2;
-  int64 telegram_id = 3;
-  string first_name = 4;
-  string last_name = 5;
-  string username = 6;
-  string photo_url = 7;
-}
-
-message ConfirmTelegramAuthResponse {
-  string status = 1;
-  string code = 2;
+  string token       = 1;
+  string bot_token   = 2;
+  int64  telegram_id = 3;
+  string first_name  = 4;
+  string last_name   = 5;
+  string username    = 6;
+  string photo_url   = 7;
 }
 
 message TelegramAuthRequest {
   string token = 1;
-  string code = 2;
+  string code  = 2;
 }
 
 message StartYandexAuthRequest {}
 
-message StartYandexAuthResponse {
-  string state = 1;
-  string auth_url = 2;
-  google.protobuf.Timestamp expires_at = 3;
-}
-
 message YandexAuthRequest {
   string state = 1;
-  string code = 2;
+  string code  = 2;
 }
 
+// field 1 was previously used and removed; fields 2-6 keep their original numbers
+// for binary-wire compatibility with existing gRPC clients.
 message CompleteRegistrationRequest {
-  string region = 2;
-  string country = 3;
-  string city = 4;
-  double latitude = 5;
+  reserved 1;
+  string region    = 2;
+  string country   = 3;
+  string city      = 4;
+  double latitude  = 5;
   double longitude = 6;
 }
 
@@ -137,61 +133,74 @@ message GetProfileByIDRequest {
   string user_id = 1;
 }
 
+// field 1 was previously used and removed; kept reserved for wire compatibility.
 message UpdateLocationRequest {
-  string region = 2;
-  string country = 3;
-  string city = 4;
-  double latitude = 5;
+  reserved 1;
+  string region    = 2;
+  string country   = 3;
+  string city      = 4;
+  double latitude  = 5;
   double longitude = 6;
 }
-
-message LogoutRequest {}
 
 message UpdateProfileRequest {
   string current_workplace = 1;
 }
 
-// BindTelegram binds user's Telegram account
+message LogoutRequest {}
+
+// BindTelegram links an existing account to a Telegram identity via challenge flow.
 message BindTelegramRequest {
   string token = 1;
-  string code = 2;
+  string code  = 2;
 }
 
-message BindTelegramResponse {
+// ── Response messages ──────────────────────────────────────────────────────
+
+// ProfileStatusResponse replaces the separate LogoutResponse and BindTelegramResponse.
+message ProfileStatusResponse {
   string status = 1;
+}
+
+message CreateTelegramAuthChallengeResponse {
+  string                    token         = 1;
+  string                    bot_start_url = 2;
+  google.protobuf.Timestamp expires_at    = 3;
+}
+
+message ConfirmTelegramAuthResponse {
+  string status = 1;
+  string code   = 2;
+}
+
+message StartYandexAuthResponse {
+  string                    state    = 1;
+  string                    auth_url = 2;
+  google.protobuf.Timestamp expires_at = 3;
 }
 
 message ProfileResponse {
-  User user = 1;
-  bool needs_profile_complete = 2;
+  User user                      = 1;
+  bool needs_profile_complete    = 2;
 }
 
-message LogoutResponse {
-  string status = 1;
-}
+// ── Domain entities ────────────────────────────────────────────────────────
 
 message User {
-  string id = 1;
-  string username = 2;
-  string telegram_username = 16;
-  string first_name = 3;
-  string last_name = 4;
-  string avatar_url = 5;
-  string region = 6;
-  google.protobuf.Timestamp created_at = 7;
-  double latitude = 8;
-  double longitude = 9;
-  UserActivityStatus activity_status = 10;
-  string current_workplace = 11;
-  bool is_admin = 12;
-  bool is_trusted = 13;
-  repeated string connected_providers = 14;
-  string primary_provider = 15;
-}
-
-enum UserActivityStatus {
-  USER_ACTIVITY_STATUS_UNSPECIFIED = 0;
-  USER_ACTIVITY_STATUS_ONLINE = 1;
-  USER_ACTIVITY_STATUS_RECENTLY_ACTIVE = 2;
-  USER_ACTIVITY_STATUS_OFFLINE = 3;
+  string                    id                  = 1;
+  string                    username            = 2;
+  string                    first_name          = 3;
+  string                    last_name           = 4;
+  string                    avatar_url          = 5;
+  string                    region              = 6;
+  google.protobuf.Timestamp created_at          = 7;
+  double                    latitude            = 8;
+  double                    longitude           = 9;
+  UserActivityStatus        activity_status     = 10;
+  string                    current_workplace   = 11;
+  bool                      is_admin            = 12;
+  bool                      is_trusted          = 13;
+  repeated string           connected_providers = 14;
+  string                    primary_provider    = 15;
+  string                    telegram_username   = 16;
 }

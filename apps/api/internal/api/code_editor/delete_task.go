@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (i *Implementation) DeleteTask(ctx context.Context, req *v1.DeleteTaskRequest) (*v1.DeleteTaskResponse, error) {
+func (i *Implementation) DeleteTask(ctx context.Context, req *v1.DeleteTaskRequest) (*v1.StatusResponse, error) {
 	taskID, err := uuid.Parse(req.TaskId)
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_TASK_ID", "invalid task id")
@@ -19,5 +19,5 @@ func (i *Implementation) DeleteTask(ctx context.Context, req *v1.DeleteTaskReque
 		return nil, mapErr(err)
 	}
 
-	return &v1.DeleteTaskResponse{Status: "ok"}, nil
+	return &v1.StatusResponse{Status: "ok"}, nil
 }

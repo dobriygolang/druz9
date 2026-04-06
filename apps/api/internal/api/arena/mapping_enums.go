@@ -41,12 +41,12 @@ func mapWinnerReason(reason model.ArenaWinnerReason) v1.WinnerReason {
 		return v1.WinnerReason_WINNER_REASON_TIMEOUT
 	case model.ArenaWinnerReasonSingleAC:
 		return v1.WinnerReason_WINNER_REASON_SINGLE_AC
+	case model.ArenaWinnerReasonNone:
+		return v1.WinnerReason_WINNER_REASON_NONE
 	case model.ArenaWinnerReasonAntiCheat:
 		return v1.WinnerReason_WINNER_REASON_ANTI_CHEAT
 	case model.ArenaWinnerReasonOpponentLeft:
 		return v1.WinnerReason_WINNER_REASON_OPPONENT_LEFT
-	case model.ArenaWinnerReasonNone:
-		return v1.WinnerReason_WINNER_REASON_NONE
 	default:
 		return v1.WinnerReason_WINNER_REASON_UNSPECIFIED
 	}
@@ -109,5 +109,32 @@ func mapSubmitFailureKind(kind model.ArenaSubmissionFailureKind) v1.SubmitFailur
 		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_TIMEOUT
 	default:
 		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_UNSPECIFIED
+	}
+}
+
+// mapQueueStatus converts internal match status + match state to the typed queue status enum.
+func mapQueueStatus(matchStatus model.ArenaMatchStatus, hasMatch bool) v1.ArenaQueueStatus {
+	if hasMatch || matchStatus == model.ArenaMatchStatusActive {
+		return v1.ArenaQueueStatus_ARENA_QUEUE_STATUS_MATCHED
+	}
+	if matchStatus == model.ArenaMatchStatusWaiting {
+		return v1.ArenaQueueStatus_ARENA_QUEUE_STATUS_QUEUED
+	}
+	return v1.ArenaQueueStatus_ARENA_QUEUE_STATUS_IDLE
+}
+
+// unmapAntiCheatReason converts the proto enum to the string used by the domain.
+func unmapAntiCheatReason(reason v1.AntiCheatEventReason) string {
+	switch reason {
+	case v1.AntiCheatEventReason_ANTI_CHEAT_EVENT_REASON_TAB_SWITCH:
+		return "tab_switch"
+	case v1.AntiCheatEventReason_ANTI_CHEAT_EVENT_REASON_COPY_PASTE:
+		return "copy_paste"
+	case v1.AntiCheatEventReason_ANTI_CHEAT_EVENT_REASON_EXTERNAL_CODE:
+		return "external_code"
+	case v1.AntiCheatEventReason_ANTI_CHEAT_EVENT_REASON_OTHER:
+		return "other"
+	default:
+		return ""
 	}
 }

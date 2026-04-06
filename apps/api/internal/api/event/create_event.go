@@ -25,7 +25,7 @@ func (i *Implementation) CreateEvent(ctx context.Context, req *v1.CreateEventReq
 		Title:          req.Title,
 		PlaceLabel:     req.PlaceLabel,
 		Description:    req.Description,
-		Repeat:         req.GetRepeat(),
+		Repeat:         unmapEventRepeat(req.Repeat),
 		MeetingLink:    req.MeetingLink,
 		Region:         req.Region,
 		Country:        req.Country,

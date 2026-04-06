@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (i *Implementation) LeaveEvent(ctx context.Context, req *v1.LeaveEventRequest) (*v1.LeaveEventResponse, error) {
+func (i *Implementation) LeaveEvent(ctx context.Context, req *v1.LeaveEventRequest) (*v1.EventStatusResponse, error) {
 	user, ok := model.UserFromContext(ctx)
 	if !ok {
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
@@ -24,5 +24,5 @@ func (i *Implementation) LeaveEvent(ctx context.Context, req *v1.LeaveEventReque
 	if err := i.service.LeaveEvent(ctx, eventID, user.ID); err != nil {
 		return nil, errors.BadRequest("LEAVE_EVENT_FAILED", err.Error())
 	}
-	return &v1.LeaveEventResponse{Status: "ok"}, nil
+	return &v1.EventStatusResponse{Status: "ok"}, nil
 }

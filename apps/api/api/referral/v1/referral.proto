@@ -31,51 +31,56 @@ service ReferralService {
   }
 }
 
-message ListReferralsRequest {
-  int32 limit = 1;
-  int32 offset = 2;
-}
-
-message CreateReferralRequest {
-  string title = 1;
-  string company = 2;
-  string vacancy_url = 3;
-  string description = 4;
-  string experience = 5;
-  string location = 6;
-  EmploymentType employment_type = 7;
-}
+// ── Enums ──────────────────────────────────────────────────────────────────
 
 enum EmploymentType {
   EMPLOYMENT_TYPE_UNSPECIFIED = 0;
-  EMPLOYMENT_TYPE_FULL_TIME = 1;
-  EMPLOYMENT_TYPE_PART_TIME = 2;
-  EMPLOYMENT_TYPE_CONTRACT = 3;
-  EMPLOYMENT_TYPE_INTERNSHIP = 4;
-  EMPLOYMENT_TYPE_REMOTE = 5;
+  EMPLOYMENT_TYPE_FULL_TIME   = 1;
+  EMPLOYMENT_TYPE_PART_TIME   = 2;
+  EMPLOYMENT_TYPE_CONTRACT    = 3;
+  EMPLOYMENT_TYPE_INTERNSHIP  = 4;
+  EMPLOYMENT_TYPE_REMOTE      = 5;
+}
+
+// ── Request messages ───────────────────────────────────────────────────────
+
+message ListReferralsRequest {
+  int32 limit  = 1;
+  int32 offset = 2;
+}
+
+// ReferralPayload contains the mutable fields shared by create and update requests.
+message ReferralPayload {
+  string         title           = 1;
+  string         company         = 2;
+  string         vacancy_url     = 3;
+  string         description     = 4;
+  string         experience      = 5;
+  string         location        = 6;
+  EmploymentType employment_type = 7;
+}
+
+message CreateReferralRequest {
+  ReferralPayload referral = 1;
 }
 
 message UpdateReferralRequest {
-  string referral_id = 1;
-  string title = 2;
-  string company = 3;
-  string vacancy_url = 4;
-  string description = 5;
-  string experience = 6;
-  string location = 7;
-  EmploymentType employment_type = 8;
+  string          referral_id = 1;
+  ReferralPayload referral    = 2;
 }
 
 message DeleteReferralRequest {
   string referral_id = 1;
 }
 
+// ── Response messages ──────────────────────────────────────────────────────
+
 message ListReferralsResponse {
-  repeated Referral referrals = 1;
-  int32 limit = 2;
-  int32 offset = 3;
-  int32 total_count = 4;
-  bool has_next_page = 5;
+  repeated Referral referrals    = 1;
+  int32             limit        = 2;
+  int32             offset       = 3;
+  int32             total_count  = 4;
+  bool              has_next_page = 5;
 }
 
 message ReferralResponse {
@@ -86,17 +91,21 @@ message ReferralStatusResponse {
   string status = 1;
 }
 
+// ── Domain entities ────────────────────────────────────────────────────────
+
+// Note: field numbers 3-5 are reserved — they were removed in a prior revision.
 message Referral {
-  string id = 1;
-  string user_id = 2;
-  string author_name = 3;
-  string title = 6;
-  string company = 7;
-  string vacancy_url = 8;
-  string description = 9;
-  string experience = 10;
-  string location = 11;
-  EmploymentType employment_type = 12;
-  bool is_owner = 13;
-  google.protobuf.Timestamp created_at = 14;
+  string                    id              = 1;
+  string                    user_id         = 2;
+  string                    author_name     = 3;
+  reserved                  4, 5;
+  string                    title           = 6;
+  string                    company         = 7;
+  string                    vacancy_url     = 8;
+  string                    description     = 9;
+  string                    experience      = 10;
+  string                    location        = 11;
+  EmploymentType            employment_type = 12;
+  bool                      is_owner        = 13;
+  google.protobuf.Timestamp created_at      = 14;
 }

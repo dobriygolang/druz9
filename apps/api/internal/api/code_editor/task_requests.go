@@ -2,7 +2,6 @@ package code_editor
 
 import (
 	codeeditordomain "api/internal/domain/codeeditor"
-	"api/internal/model"
 	v1 "api/pkg/api/code_editor/v1"
 
 	"github.com/google/uuid"
@@ -30,8 +29,8 @@ func buildTaskFromPayload(taskID uuid.UUID, p *v1.TaskPayload) *codeeditordomain
 		StarterCode:      p.StarterCode,
 		Language:         protoLanguageToModel(p.Language),
 		TaskType:         protoTaskTypeToModel(p.TaskType),
-		ExecutionProfile: model.ExecutionProfileFromString(p.ExecutionProfile),
-		RunnerMode:       model.RunnerModeFromString(p.RunnerMode),
+		ExecutionProfile: protoExecutionProfileToModel(p.ExecutionProfile),
+		RunnerMode:       protoRunnerModeToModel(p.RunnerMode),
 		DurationSeconds:  p.DurationSeconds,
 		FixtureFiles:     p.FixtureFiles,
 		ReadablePaths:    p.ReadablePaths,

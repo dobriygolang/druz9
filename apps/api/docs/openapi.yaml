@@ -64,7 +64,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/code_editor.v1.DeleteTaskResponse'
+                                $ref: '#/components/schemas/code_editor.v1.StatusResponse'
     /api/admin/config:
         get:
             tags:
@@ -1016,7 +1016,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/code_editor.v1.LeaveRoomResponse'
+                                $ref: '#/components/schemas/code_editor.v1.StatusResponse'
     /api/v1/code-editor/rooms/{roomId}/ready:
         post:
             tags:
@@ -1040,7 +1040,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/code_editor.v1.SetReadyResponse'
+                                $ref: '#/components/schemas/code_editor.v1.StatusResponse'
     /api/v1/code-editor/rooms/{roomId}/submissions:
         get:
             tags:
@@ -1195,14 +1195,15 @@ paths:
                 - name: deleteScope
                   in: query
                   schema:
-                    type: string
+                    type: integer
+                    format: enum
             responses:
                 "200":
                     description: OK
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/event.v1.DeleteEventResponse'
+                                $ref: '#/components/schemas/event.v1.EventStatusResponse'
     /api/v1/events/{eventId}/join:
         post:
             tags:
@@ -1250,7 +1251,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/event.v1.LeaveEventResponse'
+                                $ref: '#/components/schemas/event.v1.EventStatusResponse'
     /api/v1/geo/community:
         get:
             tags:
@@ -1632,7 +1633,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/profile.v1.LogoutResponse'
+                                $ref: '#/components/schemas/profile.v1.ProfileStatusResponse'
     /api/v1/profile/auth/telegram:
         post:
             tags:
@@ -1737,7 +1738,7 @@ paths:
                     content:
                         application/json:
                             schema:
-                                $ref: '#/components/schemas/profile.v1.BindTelegramResponse'
+                                $ref: '#/components/schemas/profile.v1.ProfileStatusResponse'
     /api/v1/profile/location:
         post:
             tags:
@@ -2058,7 +2059,8 @@ components:
                     type: integer
                     format: int32
                 league:
-                    type: string
+                    type: integer
+                    format: enum
                 wins:
                     type: integer
                     format: int32
@@ -2089,16 +2091,19 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
                 topic:
                     type: string
                 difficulty:
-                    type: string
+                    type: integer
+                    format: enum
                 queueSize:
                     type: integer
                     format: int32
                 queuedAt:
                     type: string
+                    format: date-time
                 match:
                     $ref: '#/components/schemas/arena.v1.ArenaMatch'
         arena.v1.ArenaStatusResponse:
@@ -2141,7 +2146,8 @@ components:
                 topic:
                     type: string
                 difficulty:
-                    type: string
+                    type: integer
+                    format: enum
                 obfuscateOpponent:
                     type: boolean
         arena.v1.LeaveMatchRequest:
@@ -2165,7 +2171,8 @@ components:
                 matchId:
                     type: string
                 reason:
-                    type: string
+                    type: integer
+                    format: enum
         arena.v1.SubmitCodeRequest:
             type: object
             properties:
@@ -2299,11 +2306,6 @@ components:
             properties:
                 task:
                     $ref: '#/components/schemas/code_editor.v1.TaskPayload'
-        code_editor.v1.DeleteTaskResponse:
-            type: object
-            properties:
-                status:
-                    type: string
         code_editor.v1.GetLeaderboardResponse:
             type: object
             properties:
@@ -2364,11 +2366,6 @@ components:
             type: object
             properties:
                 roomId:
-                    type: string
-        code_editor.v1.LeaveRoomResponse:
-            type: object
-            properties:
-                status:
                     type: string
         code_editor.v1.ListTasksResponse:
             type: object
@@ -2432,11 +2429,12 @@ components:
                     type: string
                 ready:
                     type: boolean
-        code_editor.v1.SetReadyResponse:
+        code_editor.v1.StatusResponse:
             type: object
             properties:
                 status:
                     type: string
+            description: StatusResponse is used for operations that only need to confirm success.
         code_editor.v1.Submission:
             type: object
             properties:
@@ -2524,7 +2522,8 @@ components:
                     type: integer
                     format: enum
                 executionProfile:
-                    type: string
+                    type: integer
+                    format: enum
                 fixtureFiles:
                     type: array
                     items:
@@ -2553,7 +2552,8 @@ components:
                 writableTempDir:
                     type: boolean
                 runnerMode:
-                    type: string
+                    type: integer
+                    format: enum
                 durationSeconds:
                     type: integer
                     format: int32
@@ -2592,7 +2592,8 @@ components:
                     type: integer
                     format: enum
                 executionProfile:
-                    type: string
+                    type: integer
+                    format: enum
                 fixtureFiles:
                     type: array
                     items:
@@ -2621,10 +2622,12 @@ components:
                 writableTempDir:
                     type: boolean
                 runnerMode:
-                    type: string
+                    type: integer
+                    format: enum
                 durationSeconds:
                     type: integer
                     format: int32
+            description: TaskPayload is used for create/update requests and mirrors Task minus server-managed fields.
         code_editor.v1.TaskResponse:
             type: object
             properties:
@@ -2685,12 +2688,8 @@ components:
                 meetingLink:
                     type: string
                 repeat:
-                    type: string
-        event.v1.DeleteEventResponse:
-            type: object
-            properties:
-                status:
-                    type: string
+                    type: integer
+                    format: enum
         event.v1.Event:
             type: object
             properties:
@@ -2742,7 +2741,7 @@ components:
             properties:
                 userId:
                     type: string
-                title:
+                displayName:
                     type: string
                 avatarUrl:
                     type: string
@@ -2754,6 +2753,12 @@ components:
             properties:
                 event:
                     $ref: '#/components/schemas/event.v1.Event'
+        event.v1.EventStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+            description: EventStatusResponse replaces the separate LeaveEventResponse and DeleteEventResponse.
         event.v1.JoinEventRequest:
             type: object
             properties:
@@ -2763,11 +2768,6 @@ components:
             type: object
             properties:
                 eventId:
-                    type: string
-        event.v1.LeaveEventResponse:
-            type: object
-            properties:
-                status:
                     type: string
         event.v1.ListEventsResponse:
             type: object
@@ -2913,9 +2913,11 @@ components:
                 statement:
                     type: string
                 prepType:
-                    type: string
+                    type: integer
+                    format: enum
                 language:
-                    type: string
+                    type: integer
+                    format: enum
                 companyTag:
                     type: string
                 supportedLanguages:
@@ -2925,9 +2927,11 @@ components:
                 isExecutable:
                     type: boolean
                 executionProfile:
-                    type: string
+                    type: integer
+                    format: enum
                 runnerMode:
-                    type: string
+                    type: integer
+                    format: enum
                 durationSeconds:
                     type: integer
                     format: int32
@@ -2966,7 +2970,8 @@ components:
                 questionId:
                     type: string
                 selfAssessment:
-                    type: string
+                    type: integer
+                    format: enum
                 answer:
                     type: string
         interview_prep.v1.AnswerQuestionResponse:
@@ -3032,8 +3037,10 @@ components:
                     type: string
                 createdAt:
                     type: string
+                    format: date-time
                 updatedAt:
                     type: string
+                    format: date-time
         interview_prep.v1.InterviewPrepQuestionResult:
             type: object
             properties:
@@ -3044,9 +3051,11 @@ components:
                 questionId:
                     type: string
                 selfAssessment:
-                    type: string
+                    type: integer
+                    format: enum
                 answeredAt:
                     type: string
+                    format: date-time
         interview_prep.v1.InterviewPrepSession:
             type: object
             properties:
@@ -3057,7 +3066,8 @@ components:
                 taskId:
                     type: string
                 status:
-                    type: string
+                    type: integer
+                    format: enum
                 currentQuestionPosition:
                     type: integer
                     format: int32
@@ -3069,12 +3079,16 @@ components:
                     type: boolean
                 startedAt:
                     type: string
+                    format: date-time
                 finishedAt:
                     type: string
+                    format: date-time
                 createdAt:
                     type: string
+                    format: date-time
                 updatedAt:
                     type: string
+                    format: date-time
                 task:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewPrepTask'
                 currentQuestion:
@@ -3095,9 +3109,11 @@ components:
                 statement:
                     type: string
                 prepType:
-                    type: string
+                    type: integer
+                    format: enum
                 language:
-                    type: string
+                    type: integer
+                    format: enum
                 companyTag:
                     type: string
                 supportedLanguages:
@@ -3107,9 +3123,11 @@ components:
                 isExecutable:
                     type: boolean
                 executionProfile:
-                    type: string
+                    type: integer
+                    format: enum
                 runnerMode:
-                    type: string
+                    type: integer
+                    format: enum
                 durationSeconds:
                     type: integer
                     format: int32
@@ -3123,8 +3141,10 @@ components:
                     type: boolean
                 createdAt:
                     type: string
+                    format: date-time
                 updatedAt:
                     type: string
+                    format: date-time
         interview_prep.v1.InterviewSolutionReview:
             type: object
             properties:
@@ -3197,8 +3217,10 @@ components:
                     type: boolean
                 createdAt:
                     type: string
+                    format: date-time
                 updatedAt:
                     type: string
+                    format: date-time
         interview_prep.v1.MockCompanyPresetEnvelope:
             type: object
             properties:
@@ -3256,8 +3278,10 @@ components:
                     type: boolean
                 createdAt:
                     type: string
+                    format: date-time
                 updatedAt:
                     type: string
+                    format: date-time
         interview_prep.v1.MockQuestionPoolListResponse:
             type: object
             properties:
@@ -3308,10 +3332,13 @@ components:
                     type: string
                 answeredAt:
                     type: string
+                    format: date-time
                 createdAt:
                     type: string
+                    format: date-time
                 updatedAt:
                     type: string
+                    format: date-time
         interview_prep.v1.MockSession:
             type: object
             properties:
@@ -3322,18 +3349,23 @@ components:
                 companyTag:
                     type: string
                 status:
-                    type: string
+                    type: integer
+                    format: enum
                 currentStageIndex:
                     type: integer
                     format: int32
                 startedAt:
                     type: string
+                    format: date-time
                 finishedAt:
                     type: string
+                    format: date-time
                 createdAt:
                     type: string
+                    format: date-time
                 updatedAt:
                     type: string
+                    format: date-time
                 stages:
                     type: array
                     items:
@@ -3356,9 +3388,11 @@ components:
                     type: integer
                     format: int32
                 kind:
-                    type: string
+                    type: integer
+                    format: enum
                 status:
-                    type: string
+                    type: integer
+                    format: enum
                 taskId:
                     type: string
                 solveLanguage:
@@ -3374,12 +3408,16 @@ components:
                     type: string
                 startedAt:
                     type: string
+                    format: date-time
                 finishedAt:
                     type: string
+                    format: date-time
                 createdAt:
                     type: string
+                    format: date-time
                 updatedAt:
                     type: string
+                    format: date-time
                 task:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewPrepTask'
                 questionResults:
@@ -3393,25 +3431,8 @@ components:
             properties:
                 sessionId:
                     type: string
-                image:
-                    type: string
-                    format: bytes
-                imageName:
-                    type: string
-                imageContentType:
-                    type: string
-                notes:
-                    type: string
-                components:
-                    type: string
-                apis:
-                    type: string
-                databaseSchema:
-                    type: string
-                traffic:
-                    type: string
-                reliability:
-                    type: string
+                design:
+                    $ref: '#/components/schemas/interview_prep.v1.SystemDesignPayload'
         interview_prep.v1.ReviewMockSystemDesignResponse:
             type: object
             properties:
@@ -3429,25 +3450,8 @@ components:
             properties:
                 sessionId:
                     type: string
-                image:
-                    type: string
-                    format: bytes
-                imageName:
-                    type: string
-                imageContentType:
-                    type: string
-                notes:
-                    type: string
-                components:
-                    type: string
-                apis:
-                    type: string
-                databaseSchema:
-                    type: string
-                traffic:
-                    type: string
-                reliability:
-                    type: string
+                design:
+                    $ref: '#/components/schemas/interview_prep.v1.SystemDesignPayload'
         interview_prep.v1.ReviewSystemDesignResponse:
             type: object
             properties:
@@ -3481,7 +3485,8 @@ components:
                 code:
                     type: string
                 language:
-                    type: string
+                    type: integer
+                    format: enum
                 notes:
                     type: string
         interview_prep.v1.SubmitMockStageResponse:
@@ -3506,7 +3511,8 @@ components:
                     type: integer
                     format: int32
                 failureKind:
-                    type: string
+                    type: integer
+                    format: enum
                 review:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewSolutionReview'
                 session:
@@ -3519,7 +3525,8 @@ components:
                 code:
                     type: string
                 language:
-                    type: string
+                    type: integer
+                    format: enum
         interview_prep.v1.SubmitSessionResponse:
             type: object
             properties:
@@ -3542,9 +3549,35 @@ components:
                     type: integer
                     format: int32
                 failureKind:
-                    type: string
+                    type: integer
+                    format: enum
                 session:
                     $ref: '#/components/schemas/interview_prep.v1.InterviewPrepSession'
+        interview_prep.v1.SystemDesignPayload:
+            type: object
+            properties:
+                image:
+                    type: string
+                    format: bytes
+                imageName:
+                    type: string
+                imageContentType:
+                    type: string
+                notes:
+                    type: string
+                components:
+                    type: string
+                apis:
+                    type: string
+                databaseSchema:
+                    type: string
+                traffic:
+                    type: string
+                reliability:
+                    type: string
+            description: |-
+                SystemDesignPayload contains the candidate's system design artefacts.
+                 Shared by ReviewSystemDesignRequest and ReviewMockSystemDesignRequest.
         interview_prep.v1.SystemDesignReview:
             type: object
             properties:
@@ -3613,7 +3646,8 @@ components:
                 fileName:
                     type: string
                 contentType:
-                    type: string
+                    type: integer
+                    format: enum
                 durationSeconds:
                     type: integer
                     format: uint32
@@ -3693,7 +3727,8 @@ components:
                 fileName:
                     type: string
                 contentType:
-                    type: string
+                    type: integer
+                    format: enum
                 durationSeconds:
                     type: integer
                     format: uint32
@@ -3714,7 +3749,8 @@ components:
                 fileName:
                     type: string
                 contentType:
-                    type: string
+                    type: integer
+                    format: enum
                 content:
                     type: string
                     format: bytes
@@ -3728,12 +3764,7 @@ components:
                     type: string
                 code:
                     type: string
-            description: BindTelegram binds user's Telegram account
-        profile.v1.BindTelegramResponse:
-            type: object
-            properties:
-                status:
-                    type: string
+            description: BindTelegram links an existing account to a Telegram identity via challenge flow.
         profile.v1.CompleteRegistrationRequest:
             type: object
             properties:
@@ -3749,6 +3780,9 @@ components:
                 longitude:
                     type: number
                     format: double
+            description: |-
+                field 1 was previously used and removed; fields 2-6 keep their original numbers
+                 for binary-wire compatibility with existing gRPC clients.
         profile.v1.ConfirmTelegramAuthRequest:
             type: object
             properties:
@@ -3789,11 +3823,6 @@ components:
         profile.v1.LogoutRequest:
             type: object
             properties: {}
-        profile.v1.LogoutResponse:
-            type: object
-            properties:
-                status:
-                    type: string
         profile.v1.ProfileResponse:
             type: object
             properties:
@@ -3801,6 +3830,12 @@ components:
                     $ref: '#/components/schemas/profile.v1.User'
                 needsProfileComplete:
                     type: boolean
+        profile.v1.ProfileStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+            description: ProfileStatusResponse replaces the separate LogoutResponse and BindTelegramResponse.
         profile.v1.StartYandexAuthResponse:
             type: object
             properties:
@@ -3833,6 +3868,7 @@ components:
                 longitude:
                     type: number
                     format: double
+            description: field 1 was previously used and removed; kept reserved for wire compatibility.
         profile.v1.UpdateProfileRequest:
             type: object
             properties:
@@ -3844,8 +3880,6 @@ components:
                 id:
                     type: string
                 username:
-                    type: string
-                telegramUsername:
                     type: string
                 firstName:
                     type: string
@@ -3879,24 +3913,13 @@ components:
                         type: string
                 primaryProvider:
                     type: string
+                telegramUsername:
+                    type: string
         referral.v1.CreateReferralRequest:
             type: object
             properties:
-                title:
-                    type: string
-                company:
-                    type: string
-                vacancyUrl:
-                    type: string
-                description:
-                    type: string
-                experience:
-                    type: string
-                location:
-                    type: string
-                employmentType:
-                    type: integer
-                    format: enum
+                referral:
+                    $ref: '#/components/schemas/referral.v1.ReferralPayload'
         referral.v1.ListReferralsResponse:
             type: object
             properties:
@@ -3944,21 +3967,10 @@ components:
                 createdAt:
                     type: string
                     format: date-time
-        referral.v1.ReferralResponse:
+            description: 'Note: field numbers 3-5 are reserved — they were removed in a prior revision.'
+        referral.v1.ReferralPayload:
             type: object
             properties:
-                referral:
-                    $ref: '#/components/schemas/referral.v1.Referral'
-        referral.v1.ReferralStatusResponse:
-            type: object
-            properties:
-                status:
-                    type: string
-        referral.v1.UpdateReferralRequest:
-            type: object
-            properties:
-                referralId:
-                    type: string
                 title:
                     type: string
                 company:
@@ -3974,6 +3986,24 @@ components:
                 employmentType:
                     type: integer
                     format: enum
+            description: ReferralPayload contains the mutable fields shared by create and update requests.
+        referral.v1.ReferralResponse:
+            type: object
+            properties:
+                referral:
+                    $ref: '#/components/schemas/referral.v1.Referral'
+        referral.v1.ReferralStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: string
+        referral.v1.UpdateReferralRequest:
+            type: object
+            properties:
+                referralId:
+                    type: string
+                referral:
+                    $ref: '#/components/schemas/referral.v1.ReferralPayload'
 tags:
     - name: AdminService
     - name: ArenaService

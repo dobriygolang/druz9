@@ -24,14 +24,6 @@ export function CommunityHubPage() {
             <h1 className="text-2xl font-bold text-[#111111]">Community</h1>
             <p className="text-sm text-[#666666] mt-0.5">Найди коллег и единомышленников</p>
           </div>
-          {active === 'events' && (
-            <Link
-              to="/community/events"
-              className="px-5 py-2 bg-[#6366F1] rounded-full text-sm font-medium text-[#0f172a] hover:bg-[#ea7700] transition-colors"
-            >
-              + Create Event
-            </Link>
-          )}
           {active === 'people' && (
             <div className="relative">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
@@ -64,7 +56,7 @@ export function CommunityHubPage() {
       </div>
 
       <div className="flex-1">
-        <Outlet context={{ search }} />
+        <Outlet context={{ search, openCreateEvent, setOpenCreateEvent }} />
       </div>
     </div>
   )

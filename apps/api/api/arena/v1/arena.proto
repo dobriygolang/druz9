@@ -95,17 +95,81 @@ service ArenaService {
   }
 }
 
-message CreateMatchRequest {
-  string topic = 1;
-  Difficulty difficulty = 2;
-  bool obfuscate_opponent = 3;
-}
+// ── Enums ──────────────────────────────────────────────────────────────────
 
 enum Difficulty {
   DIFFICULTY_UNSPECIFIED = 0;
-  DIFFICULTY_EASY = 1;
-  DIFFICULTY_MEDIUM = 2;
-  DIFFICULTY_HARD = 3;
+  DIFFICULTY_EASY        = 1;
+  DIFFICULTY_MEDIUM      = 2;
+  DIFFICULTY_HARD        = 3;
+}
+
+enum ArenaMatchStatus {
+  ARENA_MATCH_STATUS_UNSPECIFIED = 0;
+  ARENA_MATCH_STATUS_WAITING     = 1;
+  ARENA_MATCH_STATUS_ACTIVE      = 2;
+  ARENA_MATCH_STATUS_FINISHED    = 3;
+}
+
+// ArenaQueueStatus represents the current queue state for a player.
+enum ArenaQueueStatus {
+  ARENA_QUEUE_STATUS_UNSPECIFIED = 0;
+  ARENA_QUEUE_STATUS_IDLE        = 1;  // not in queue
+  ARENA_QUEUE_STATUS_QUEUED      = 2;  // waiting for an opponent
+  ARENA_QUEUE_STATUS_MATCHED     = 3;  // match found
+}
+
+enum ArenaLeague {
+  ARENA_LEAGUE_UNSPECIFIED = 0;
+  ARENA_LEAGUE_BRONZE      = 1;
+  ARENA_LEAGUE_SILVER      = 2;
+  ARENA_LEAGUE_GOLD        = 3;
+  ARENA_LEAGUE_PLATINUM    = 4;
+  ARENA_LEAGUE_DIAMOND     = 5;
+  ARENA_LEAGUE_MASTER      = 6;
+  ARENA_LEAGUE_LEGEND      = 7;
+}
+
+enum ArenaPlayerSide {
+  ARENA_PLAYER_SIDE_UNSPECIFIED = 0;
+  ARENA_PLAYER_SIDE_LEFT        = 1;
+  ARENA_PLAYER_SIDE_RIGHT       = 2;
+}
+
+enum WinnerReason {
+  WINNER_REASON_UNSPECIFIED     = 0;
+  WINNER_REASON_ACCEPTED_TIME   = 1;
+  WINNER_REASON_RUNTIME         = 2;
+  WINNER_REASON_TIMEOUT         = 3;
+  WINNER_REASON_SINGLE_AC       = 4;
+  WINNER_REASON_NONE            = 5;
+  WINNER_REASON_ANTI_CHEAT      = 6;
+  WINNER_REASON_OPPONENT_LEFT   = 7;
+}
+
+enum SubmitFailureKind {
+  SUBMIT_FAILURE_KIND_UNSPECIFIED    = 0;
+  SUBMIT_FAILURE_KIND_COMPILE_ERROR  = 1;
+  SUBMIT_FAILURE_KIND_RUNTIME_ERROR  = 2;
+  SUBMIT_FAILURE_KIND_WRONG_ANSWER   = 3;
+  SUBMIT_FAILURE_KIND_TIMEOUT        = 4;
+}
+
+// AntiCheatEventReason classifies the suspicious behaviour being reported.
+enum AntiCheatEventReason {
+  ANTI_CHEAT_EVENT_REASON_UNSPECIFIED    = 0;
+  ANTI_CHEAT_EVENT_REASON_TAB_SWITCH     = 1;
+  ANTI_CHEAT_EVENT_REASON_COPY_PASTE     = 2;
+  ANTI_CHEAT_EVENT_REASON_EXTERNAL_CODE  = 3;
+  ANTI_CHEAT_EVENT_REASON_OTHER          = 4;
+}
+
+// ── Request / Response messages ────────────────────────────────────────────
+
+message CreateMatchRequest {
+  string     topic              = 1;
+  Difficulty difficulty         = 2;
+  bool       obfuscate_opponent = 3;
 }
 
 message GetMatchRequest {
@@ -116,66 +180,28 @@ message JoinMatchRequest {
   string match_id = 1;
 }
 
+message LeaveMatchRequest {
+  string match_id = 1;
+}
+
 message SubmitCodeRequest {
   string match_id = 1;
-  string code = 2;
-}
-
-enum SubmitFailureKind {
-  SUBMIT_FAILURE_KIND_UNSPECIFIED = 0;
-  SUBMIT_FAILURE_KIND_COMPILE_ERROR = 1;
-  SUBMIT_FAILURE_KIND_RUNTIME_ERROR = 2;
-  SUBMIT_FAILURE_KIND_WRONG_ANSWER = 3;
-  SUBMIT_FAILURE_KIND_TIMEOUT = 4;
-}
-
-message SubmitCodeResponse {
-  string output = 1;
-  string error = 2;
-  bool is_correct = 3;
-  int32 passed_count = 4;
-  int32 total_count = 5;
-  int64 runtime_ms = 6;
-  google.protobuf.Timestamp freeze_until = 7;
-  ArenaMatch match = 8;
-  int32 failed_test_index = 9;
-  SubmitFailureKind failure_kind = 10;
-}
-
-message ArenaMatchResponse {
-  ArenaMatch match = 1;
+  string code     = 2;
 }
 
 message GetLeaderboardRequest {
   int32 limit = 1;
 }
 
-message GetLeaderboardResponse {
-  repeated ArenaLeaderboardEntry entries = 1;
-}
-
-message LeaveMatchRequest {
-  string match_id = 1;
-}
-
 message JoinQueueRequest {
-  string topic = 1;
-  string difficulty = 2;
-  bool obfuscate_opponent = 3;
+  string     topic              = 1;
+  Difficulty difficulty         = 2;  // was: string
+  bool       obfuscate_opponent = 3;
 }
 
 message LeaveQueueRequest {}
 
 message GetQueueStatusRequest {}
-
-message ArenaQueueStateResponse {
-  string status = 1;
-  string topic = 2;
-  string difficulty = 3;
-  int32 queue_size = 4;
-  string queued_at = 5;
-  ArenaMatch match = 6;
-}
 
 message GetPlayerStatsRequest {
   string user_id = 1;
@@ -183,6 +209,47 @@ message GetPlayerStatsRequest {
 
 message GetPlayerStatsBatchRequest {
   repeated string user_ids = 1;
+}
+
+message ReportAntiCheatEventRequest {
+  string              match_id = 1;
+  AntiCheatEventReason reason  = 2;  // was: string
+}
+
+message ListOpenMatchesRequest {
+  int32 limit = 1;
+}
+
+// ── Response messages ──────────────────────────────────────────────────────
+
+message ArenaMatchResponse {
+  ArenaMatch match = 1;
+}
+
+message SubmitCodeResponse {
+  string                    output           = 1;
+  string                    error            = 2;
+  bool                      is_correct       = 3;
+  int32                     passed_count     = 4;
+  int32                     total_count      = 5;
+  int64                     runtime_ms       = 6;
+  google.protobuf.Timestamp freeze_until     = 7;
+  ArenaMatch                match            = 8;
+  int32                     failed_test_index = 9;
+  SubmitFailureKind          failure_kind     = 10;
+}
+
+message GetLeaderboardResponse {
+  repeated ArenaLeaderboardEntry entries = 1;
+}
+
+message ArenaQueueStateResponse {
+  ArenaQueueStatus          status     = 1;  // was: string
+  string                    topic      = 2;
+  Difficulty                difficulty = 3;  // was: string
+  int32                     queue_size = 4;
+  google.protobuf.Timestamp queued_at  = 5;  // was: string
+  ArenaMatch                match      = 6;
 }
 
 message ArenaPlayerStatsResponse {
@@ -193,115 +260,73 @@ message ArenaPlayerStatsBatchResponse {
   map<string, ArenaPlayerStats> stats = 1;
 }
 
-message ArenaPlayerStats {
-  string user_id = 1;
-  string display_name = 2;
-  int32 rating = 3;
-  string league = 4;
-  int32 wins = 5;
-  int32 losses = 6;
-  int32 matches = 7;
-  double win_rate = 8;
-  int64 best_runtime = 9;
-}
-
-message ReportAntiCheatEventRequest {
-  string match_id = 1;
-  string reason = 2;
-}
-
 message ArenaStatusResponse {
   string status = 1;
-}
-
-message ListOpenMatchesRequest {
-  int32 limit = 1;
 }
 
 message ListOpenMatchesResponse {
   repeated ArenaMatch matches = 1;
 }
 
-message ArenaMatch {
-  string id = 1;
-  string task_id = 2;
-  string task_title = 3;
-  string task_statement = 4;
-  string starter_code = 5;
-  string topic = 6;
-  Difficulty difficulty = 7;
-  ArenaMatchStatus status = 8;
-  int32 duration_seconds = 9;
-  bool obfuscate_opponent = 10;
-  string winner_user_id = 11;
-  WinnerReason winner_reason = 12;
-  google.protobuf.Timestamp started_at = 13;
-  google.protobuf.Timestamp finished_at = 14;
-  google.protobuf.Timestamp created_at = 15;
-  repeated ArenaPlayer players = 16;
-  bool is_rated = 17;
-  string unrated_reason = 18;
-  bool anti_cheat_enabled = 19;
-}
+// ── Domain entities ────────────────────────────────────────────────────────
 
-enum WinnerReason {
-  WINNER_REASON_UNSPECIFIED = 0;
-  WINNER_REASON_ACCEPTED_TIME = 1;
-  WINNER_REASON_RUNTIME = 2;
-  WINNER_REASON_TIMEOUT = 3;
-  WINNER_REASON_SINGLE_AC = 4;
-  WINNER_REASON_ANTI_CHEAT = 6;
-  WINNER_REASON_OPPONENT_LEFT = 7;
-  WINNER_REASON_NONE = 5;
+message ArenaMatch {
+  string                    id                 = 1;
+  string                    task_id            = 2;
+  string                    task_title         = 3;
+  string                    task_statement     = 4;
+  string                    starter_code       = 5;
+  string                    topic              = 6;
+  Difficulty                difficulty         = 7;
+  ArenaMatchStatus          status             = 8;
+  int32                     duration_seconds   = 9;
+  bool                      obfuscate_opponent = 10;
+  string                    winner_user_id     = 11;
+  WinnerReason              winner_reason      = 12;
+  google.protobuf.Timestamp started_at         = 13;
+  google.protobuf.Timestamp finished_at        = 14;
+  google.protobuf.Timestamp created_at         = 15;
+  repeated ArenaPlayer      players            = 16;
+  bool                      is_rated           = 17;
+  string                    unrated_reason     = 18;  // free-form; set by domain
+  bool                      anti_cheat_enabled = 19;
 }
 
 message ArenaPlayer {
-  string user_id = 1;
-  string display_name = 2;
-  ArenaPlayerSide side = 3;
-  bool is_creator = 4;
-  google.protobuf.Timestamp freeze_until = 5;
-  google.protobuf.Timestamp accepted_at = 6;
-  int64 best_runtime_ms = 7;
-  bool is_winner = 8;
-  google.protobuf.Timestamp joined_at = 9;
-  string current_code = 10;
-  int32 suspicion_count = 11;
-  bool anti_cheat_penalized = 12;
+  string                    user_id             = 1;
+  string                    display_name        = 2;
+  ArenaPlayerSide           side                = 3;
+  bool                      is_creator          = 4;
+  google.protobuf.Timestamp freeze_until        = 5;
+  google.protobuf.Timestamp accepted_at         = 6;
+  int64                     best_runtime_ms     = 7;
+  bool                      is_winner           = 8;
+  google.protobuf.Timestamp joined_at           = 9;
+  string                    current_code        = 10;
+  int32                     suspicion_count     = 11;
+  bool                      anti_cheat_penalized = 12;
 }
 
-enum ArenaPlayerSide {
-  ARENA_PLAYER_SIDE_UNSPECIFIED = 0;
-  ARENA_PLAYER_SIDE_LEFT = 1;
-  ARENA_PLAYER_SIDE_RIGHT = 2;
+message ArenaPlayerStats {
+  string      user_id      = 1;
+  string      display_name = 2;
+  int32       rating       = 3;
+  ArenaLeague league       = 4;  // was: string (bug fix)
+  int32       wins         = 5;
+  int32       losses       = 6;
+  int32       matches      = 7;
+  double      win_rate     = 8;
+  int64       best_runtime = 9;
 }
 
 message ArenaLeaderboardEntry {
-  string user_id = 1;
-  string display_name = 2;
-  int32 wins = 3;
-  int32 matches = 4;
-  double win_rate = 5;
-  int64 best_runtime = 6;
-  int32 rating = 7;
-  ArenaLeague league = 8;
-  int32 losses = 9;
-}
-
-enum ArenaLeague {
-  ARENA_LEAGUE_UNSPECIFIED = 0;
-  ARENA_LEAGUE_BRONZE = 1;
-  ARENA_LEAGUE_SILVER = 2;
-  ARENA_LEAGUE_GOLD = 3;
-  ARENA_LEAGUE_PLATINUM = 4;
-  ARENA_LEAGUE_DIAMOND = 5;
-  ARENA_LEAGUE_MASTER = 6;
-  ARENA_LEAGUE_LEGEND = 7;
-}
-
-enum ArenaMatchStatus {
-  ARENA_MATCH_STATUS_UNSPECIFIED = 0;
-  ARENA_MATCH_STATUS_WAITING = 1;
-  ARENA_MATCH_STATUS_ACTIVE = 2;
-  ARENA_MATCH_STATUS_FINISHED = 3;
+  string      user_id      = 1;
+  string      display_name = 2;
+  int32       wins         = 3;
+  int32       matches      = 4;
+  double      win_rate     = 5;
+  int64       best_runtime = 6;
+  int32       rating       = 7;
+  ArenaLeague league       = 8;
+  int32       losses       = 9;
 }

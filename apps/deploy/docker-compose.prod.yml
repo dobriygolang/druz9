@@ -10,6 +10,7 @@ services:
         VITE_SSE_URL: https://${APP_HOST}
         VITE_WS_URL: https://${APP_HOST}
         VITE_ARENA_REQUIRE_AUTH: ${ARENA_REQUIRE_AUTH:-false}
+        VITE_MAPTILER_KEY: ${VITE_MAPTILER_KEY:-}
     ports:
       - "127.0.0.1:3000:80"
     restart: unless-stopped

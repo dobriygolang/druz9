@@ -9,7 +9,7 @@ import (
 	"github.com/go-kratos/kratos/v2/errors"
 )
 
-func (i *Implementation) Logout(ctx context.Context, _ *v1.LogoutRequest) (*v1.LogoutResponse, error) {
+func (i *Implementation) Logout(ctx context.Context, _ *v1.LogoutRequest) (*v1.ProfileStatusResponse, error) {
 	session, ok := model.SessionFromContext(ctx)
 	if !ok {
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
@@ -20,5 +20,5 @@ func (i *Implementation) Logout(ctx context.Context, _ *v1.LogoutRequest) (*v1.L
 	}
 
 	i.cookie.ClearSessionCookie(ctx)
-	return &v1.LogoutResponse{Status: "ok"}, nil
+	return &v1.ProfileStatusResponse{Status: "ok"}, nil
 }

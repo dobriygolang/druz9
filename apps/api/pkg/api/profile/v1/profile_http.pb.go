@@ -33,13 +33,13 @@ const OperationProfileServiceUpdateProfile = "/profile.v1.ProfileService/UpdateP
 const OperationProfileServiceYandexAuth = "/profile.v1.ProfileService/YandexAuth"
 
 type ProfileServiceHTTPServer interface {
-	BindTelegram(context.Context, *BindTelegramRequest) (*BindTelegramResponse, error)
+	BindTelegram(context.Context, *BindTelegramRequest) (*ProfileStatusResponse, error)
 	CompleteRegistration(context.Context, *CompleteRegistrationRequest) (*ProfileResponse, error)
 	ConfirmTelegramAuth(context.Context, *ConfirmTelegramAuthRequest) (*ConfirmTelegramAuthResponse, error)
 	CreateTelegramAuthChallenge(context.Context, *CreateTelegramAuthChallengeRequest) (*CreateTelegramAuthChallengeResponse, error)
 	GetProfile(context.Context, *GetProfileRequest) (*ProfileResponse, error)
 	GetProfileByID(context.Context, *GetProfileByIDRequest) (*ProfileResponse, error)
-	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
+	Logout(context.Context, *LogoutRequest) (*ProfileStatusResponse, error)
 	StartYandexAuth(context.Context, *StartYandexAuthRequest) (*StartYandexAuthResponse, error)
 	TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error)
 	UpdateLocation(context.Context, *UpdateLocationRequest) (*ProfileResponse, error)
@@ -291,7 +291,7 @@ func _ProfileService_Logout0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx
 		if err != nil {
 			return err
 		}
-		reply := out.(*LogoutResponse)
+		reply := out.(*ProfileStatusResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -313,19 +313,19 @@ func _ProfileService_BindTelegram0_HTTP_Handler(srv ProfileServiceHTTPServer) fu
 		if err != nil {
 			return err
 		}
-		reply := out.(*BindTelegramResponse)
+		reply := out.(*ProfileStatusResponse)
 		return ctx.Result(200, reply)
 	}
 }
 
 type ProfileServiceHTTPClient interface {
-	BindTelegram(ctx context.Context, req *BindTelegramRequest, opts ...http.CallOption) (rsp *BindTelegramResponse, err error)
+	BindTelegram(ctx context.Context, req *BindTelegramRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
 	CompleteRegistration(ctx context.Context, req *CompleteRegistrationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	ConfirmTelegramAuth(ctx context.Context, req *ConfirmTelegramAuthRequest, opts ...http.CallOption) (rsp *ConfirmTelegramAuthResponse, err error)
 	CreateTelegramAuthChallenge(ctx context.Context, req *CreateTelegramAuthChallengeRequest, opts ...http.CallOption) (rsp *CreateTelegramAuthChallengeResponse, err error)
 	GetProfile(ctx context.Context, req *GetProfileRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	GetProfileByID(ctx context.Context, req *GetProfileByIDRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
-	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *LogoutResponse, err error)
+	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
 	StartYandexAuth(ctx context.Context, req *StartYandexAuthRequest, opts ...http.CallOption) (rsp *StartYandexAuthResponse, err error)
 	TelegramAuth(ctx context.Context, req *TelegramAuthRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	UpdateLocation(ctx context.Context, req *UpdateLocationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
@@ -341,8 +341,8 @@ func NewProfileServiceHTTPClient(client *http.Client) ProfileServiceHTTPClient {
 	return &ProfileServiceHTTPClientImpl{client}
 }
 
-func (c *ProfileServiceHTTPClientImpl) BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...http.CallOption) (*BindTelegramResponse, error) {
-	var out BindTelegramResponse
+func (c *ProfileServiceHTTPClientImpl) BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...http.CallOption) (*ProfileStatusResponse, error) {
+	var out ProfileStatusResponse
 	pattern := "/api/v1/profile/bind-telegram"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationProfileServiceBindTelegram))
@@ -419,8 +419,8 @@ func (c *ProfileServiceHTTPClientImpl) GetProfileByID(ctx context.Context, in *G
 	return &out, nil
 }
 
-func (c *ProfileServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts ...http.CallOption) (*LogoutResponse, error) {
-	var out LogoutResponse
+func (c *ProfileServiceHTTPClientImpl) Logout(ctx context.Context, in *LogoutRequest, opts ...http.CallOption) (*ProfileStatusResponse, error) {
+	var out ProfileStatusResponse
 	pattern := "/api/v1/profile/auth/logout"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationProfileServiceLogout))

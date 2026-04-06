@@ -35,7 +35,7 @@ service CodeEditorService {
     };
   }
 
-  rpc LeaveRoom(LeaveRoomRequest) returns (LeaveRoomResponse) {
+  rpc LeaveRoom(LeaveRoomRequest) returns (StatusResponse) {
     option (google.api.http) = {
       post: "/api/v1/code-editor/rooms/{room_id}/leave"
       body: "*"
@@ -49,7 +49,7 @@ service CodeEditorService {
     };
   }
 
-  rpc SetReady(SetReadyRequest) returns (SetReadyResponse) {
+  rpc SetReady(SetReadyRequest) returns (StatusResponse) {
     option (google.api.http) = {
       post: "/api/v1/code-editor/rooms/{room_id}/ready"
       body: "*"
@@ -82,7 +82,7 @@ service CodeEditorService {
     };
   }
 
-  rpc DeleteTask(DeleteTaskRequest) returns (DeleteTaskResponse) {
+  rpc DeleteTask(DeleteTaskRequest) returns (StatusResponse) {
     option (google.api.http) = {
       delete: "/api/admin/code-editor/tasks/{task_id}"
     };
@@ -95,183 +95,109 @@ service CodeEditorService {
   }
 }
 
-message CreateRoomRequest {
-  RoomMode mode = 1;
-  string task = 2; // task description for duel
-  string name = 3; // creator name
-  string topic = 4; // preferred duel topic
-  TaskDifficulty difficulty = 5; // preferred duel difficulty
+// ── Enums ──────────────────────────────────────────────────────────────────
+
+enum RoomMode {
+  ROOM_MODE_UNSPECIFIED = 0;
+  ROOM_MODE_ALL         = 1;  // collaborative mode
+  ROOM_MODE_DUEL        = 2;  // duel mode (two users race)
 }
 
-message CreateRoomResponse {
-  Room room = 1;
-  string invite_code = 2;
+enum RoomStatus {
+  ROOM_STATUS_UNSPECIFIED = 0;
+  ROOM_STATUS_WAITING     = 1;  // waiting for participants
+  ROOM_STATUS_ACTIVE      = 2;  // room is active
+  ROOM_STATUS_FINISHED    = 3;  // duel finished
+}
+
+enum TaskDifficulty {
+  TASK_DIFFICULTY_UNSPECIFIED = 0;
+  TASK_DIFFICULTY_EASY        = 1;
+  TASK_DIFFICULTY_MEDIUM      = 2;
+  TASK_DIFFICULTY_HARD        = 3;
+}
+
+enum ProgrammingLanguage {
+  PROGRAMMING_LANGUAGE_UNSPECIFIED = 0;
+  PROGRAMMING_LANGUAGE_JAVASCRIPT  = 1;
+  PROGRAMMING_LANGUAGE_TYPESCRIPT  = 2;
+  PROGRAMMING_LANGUAGE_PYTHON      = 3;
+  PROGRAMMING_LANGUAGE_GO          = 4;
+  PROGRAMMING_LANGUAGE_RUST        = 5;
+  PROGRAMMING_LANGUAGE_CPP         = 6;
+  PROGRAMMING_LANGUAGE_JAVA        = 7;
+  PROGRAMMING_LANGUAGE_SQL         = 8;  // was missing, used as raw int(8) in mapping
+}
+
+enum TaskType {
+  TASK_TYPE_UNSPECIFIED  = 0;
+  TASK_TYPE_ALGORITHM    = 1;
+  TASK_TYPE_DEBUGGING    = 2;
+  TASK_TYPE_REFACTORING  = 3;
+}
+
+// ExecutionProfile defines the sandbox environment for code execution.
+enum ExecutionProfile {
+  EXECUTION_PROFILE_UNSPECIFIED          = 0;
+  EXECUTION_PROFILE_PURE                 = 1;  // no I/O, pure computation
+  EXECUTION_PROFILE_FILE_IO              = 2;  // filesystem read/write allowed
+  EXECUTION_PROFILE_HTTP_CLIENT          = 3;  // outbound HTTP allowed
+  EXECUTION_PROFILE_INTERVIEW_REALISTIC  = 4;  // full interview-like environment
+}
+
+// RunnerMode defines how code is invoked inside the sandbox.
+enum RunnerMode {
+  RUNNER_MODE_UNSPECIFIED  = 0;
+  RUNNER_MODE_PROGRAM      = 1;  // full program with main entry point
+  RUNNER_MODE_FUNCTION_IO  = 2;  // single function called with test case args
+}
+
+// ── Request messages ───────────────────────────────────────────────────────
+
+message CreateRoomRequest {
+  RoomMode       mode       = 1;
+  string         task       = 2;  // task description for duel
+  string         name       = 3;  // creator display name
+  string         topic      = 4;  // preferred duel topic
+  TaskDifficulty difficulty = 5;  // preferred duel difficulty
 }
 
 message GetRoomRequest {
   string room_id = 1;
 }
 
-message GetRoomResponse {
-  Room room = 1;
-}
-
 message JoinRoomRequest {
   string room_id = 1;
-  string name = 2; // guest name
+  string name    = 2;  // guest display name
 }
 
 message JoinRoomByInviteCodeRequest {
   string invite_code = 1;
-  string name = 2; // guest name
-}
-
-message JoinRoomResponse {
-  Room room = 1;
+  string name        = 2;  // guest display name
 }
 
 message LeaveRoomRequest {
   string room_id = 1;
 }
 
-message LeaveRoomResponse {
-  string status = 1;
-}
-
 message SubmitCodeRequest {
   string room_id = 1;
-  string code = 2;
-}
-
-message SubmitCodeResponse {
-  string output = 1;
-  string error = 2;
-  bool is_correct = 3;
+  string code    = 2;
 }
 
 message SetReadyRequest {
   string room_id = 1;
-  bool ready = 2;
-}
-
-message SetReadyResponse {
-  string status = 1;
+  bool   ready   = 2;
 }
 
 message GetSubmissionsRequest {
   string room_id = 1;
 }
 
-message GetSubmissionsResponse {
-  repeated Submission submissions = 1;
-}
-
-message Room {
-  string id = 1;
-  RoomMode mode = 2;
-  string code = 3;
-  RoomStatus status = 4;
-  string invite_code = 5;
-  string task = 6;
-  google.protobuf.Timestamp created_at = 7;
-  repeated Participant participants = 8;
-  string task_id = 9;
-  int64 code_revision = 10;
-  string creator_id = 11;
-}
-
-message Participant {
-  string user_id = 1;
-  string name = 2;
-  bool is_guest = 3;
-  bool is_ready = 4;
-  bool is_winner = 5;
-  google.protobuf.Timestamp joined_at = 6;
-  bool is_creator = 7;
-}
-
-message Submission {
-  string id = 1;
-  string user_id = 2;
-  string guest_name = 3;
-  string code = 4;
-  string output = 5;
-  string error = 6;
-  google.protobuf.Timestamp submitted_at = 7;
-  int64 duration_ms = 8;
-  bool is_correct = 9;
-  int32 passed_count = 10;
-  int32 total_count = 11;
-}
-
-message TaskTestCase {
-  string id = 1;
-  string input = 2;
-  string expected_output = 3;
-  bool is_public = 4;
-  int32 weight = 5;
-  int32 order = 6;
-}
-
-message Task {
-  string id = 1;
-  string title = 2;
-  string slug = 3;
-  string statement = 4;
-  TaskDifficulty difficulty = 5;
-  repeated string topics = 6;
-  string starter_code = 7;
-  ProgrammingLanguage language = 8;
-  bool is_active = 9;
-  repeated TaskTestCase public_test_cases = 10;
-  repeated TaskTestCase hidden_test_cases = 11;
-  google.protobuf.Timestamp created_at = 12;
-  google.protobuf.Timestamp updated_at = 13;
-  TaskType task_type = 14;  // semantic task kind for authoring/UI
-  string execution_profile = 15;  // runtime sandbox profile: pure/file_io/http_client/interview_realistic
-  repeated string fixture_files = 16;
-  repeated string readable_paths = 17;
-  repeated string writable_paths = 18;
-  repeated string allowed_hosts = 19;
-  repeated int32 allowed_ports = 20;
-  repeated string mock_endpoints = 21;
-  bool writable_temp_dir = 22;
-  string runner_mode = 23;  // program or function_io
-  int32 duration_seconds = 24;  // duration in seconds for arena matches (default 15 minutes)
-}
-
 message ListTasksRequest {
-  string topic = 1;
-  TaskDifficulty difficulty = 2;
-  bool include_inactive = 3;
-}
-
-message ListTasksResponse {
-  repeated Task tasks = 1;
-}
-
-message TaskPayload {
-  string title = 1;
-  string slug = 2;
-  string statement = 3;
-  TaskDifficulty difficulty = 4;
-  repeated string topics = 5;
-  string starter_code = 6;
-  ProgrammingLanguage language = 7;
-  bool is_active = 8;
-  repeated TaskTestCase public_test_cases = 9;
-  repeated TaskTestCase hidden_test_cases = 10;
-  TaskType task_type = 11;
-  string execution_profile = 12;
-  repeated string fixture_files = 13;
-  repeated string readable_paths = 14;
-  repeated string writable_paths = 15;
-  repeated string allowed_hosts = 16;
-  repeated int32 allowed_ports = 17;
-  repeated string mock_endpoints = 18;
-  bool writable_temp_dir = 19;
-  string runner_mode = 20;
-  int32 duration_seconds = 21;
+  string         topic            = 1;
+  TaskDifficulty difficulty       = 2;
+  bool           include_inactive = 3;
 }
 
 message CreateTaskRequest {
@@ -279,73 +205,166 @@ message CreateTaskRequest {
 }
 
 message UpdateTaskRequest {
-  string task_id = 1;
-  TaskPayload task = 2;
-}
-
-message TaskResponse {
-  Task task = 1;
+  string      task_id = 1;
+  TaskPayload task    = 2;
 }
 
 message DeleteTaskRequest {
   string task_id = 1;
 }
 
-message DeleteTaskResponse {
-  string status = 1;
-}
-
 message GetLeaderboardRequest {
   int32 limit = 1;
 }
 
+// ── Response messages ──────────────────────────────────────────────────────
+
+// StatusResponse is used for operations that only need to confirm success.
+message StatusResponse {
+  string status = 1;
+}
+
+message CreateRoomResponse {
+  Room   room        = 1;
+  string invite_code = 2;
+}
+
+message GetRoomResponse {
+  Room room = 1;
+}
+
+message JoinRoomResponse {
+  Room room = 1;
+}
+
+message SubmitCodeResponse {
+  string output     = 1;
+  string error      = 2;
+  bool   is_correct = 3;
+}
+
+message GetSubmissionsResponse {
+  repeated Submission submissions = 1;
+}
+
+message ListTasksResponse {
+  repeated Task tasks = 1;
+}
+
+message TaskResponse {
+  Task task = 1;
+}
+
 message LeaderboardEntry {
-  string user_id = 1;
+  string user_id      = 1;
   string display_name = 2;
-  int32 wins = 3;
-  int32 matches = 4;
-  double win_rate = 5;
-  int64 best_solve_ms = 6;
+  int32  wins         = 3;
+  int32  matches      = 4;
+  double win_rate     = 5;
+  int64  best_solve_ms = 6;
 }
 
 message GetLeaderboardResponse {
   repeated LeaderboardEntry entries = 1;
 }
 
-enum RoomMode {
-  ROOM_MODE_UNSPECIFIED = 0;
-  ROOM_MODE_ALL = 1;   // collaborative mode
-  ROOM_MODE_DUEL = 2;  // duel mode (two users race)
+// ── Domain entities ────────────────────────────────────────────────────────
+
+message Room {
+  string                    id            = 1;
+  RoomMode                  mode          = 2;
+  string                    code          = 3;
+  RoomStatus                status        = 4;
+  string                    invite_code   = 5;
+  string                    task          = 6;  // task description (duel only)
+  google.protobuf.Timestamp created_at    = 7;
+  repeated Participant      participants  = 8;
+  string                    task_id       = 9;
+  int64                     code_revision = 10;
+  string                    creator_id    = 11;
 }
 
-enum RoomStatus {
-  ROOM_STATUS_UNSPECIFIED = 0;
-  ROOM_STATUS_WAITING = 1;   // waiting for participants
-  ROOM_STATUS_ACTIVE = 2;    // room is active
-  ROOM_STATUS_FINISHED = 3;  // duel finished
+message Participant {
+  string                    user_id    = 1;
+  string                    name       = 2;
+  bool                      is_guest   = 3;
+  bool                      is_ready   = 4;
+  bool                      is_winner  = 5;
+  google.protobuf.Timestamp joined_at  = 6;
+  bool                      is_creator = 7;
 }
 
-enum TaskDifficulty {
-  TASK_DIFFICULTY_UNSPECIFIED = 0;
-  TASK_DIFFICULTY_EASY = 1;
-  TASK_DIFFICULTY_MEDIUM = 2;
-  TASK_DIFFICULTY_HARD = 3;
+message Submission {
+  string                    id           = 1;
+  string                    user_id      = 2;
+  string                    guest_name   = 3;
+  string                    code         = 4;
+  string                    output       = 5;
+  string                    error        = 6;
+  google.protobuf.Timestamp submitted_at = 7;
+  int64                     duration_ms  = 8;
+  bool                      is_correct   = 9;
+  int32                     passed_count = 10;
+  int32                     total_count  = 11;
 }
 
-enum ProgrammingLanguage {
-  PROGRAMMING_LANGUAGE_UNSPECIFIED = 0;
-  PROGRAMMING_LANGUAGE_JAVASCRIPT = 1;
-  PROGRAMMING_LANGUAGE_TYPESCRIPT = 2;
-  PROGRAMMING_LANGUAGE_PYTHON = 3;
-  PROGRAMMING_LANGUAGE_GO = 4;
-  PROGRAMMING_LANGUAGE_RUST = 5;
-  PROGRAMMING_LANGUAGE_CPP = 6;
-  PROGRAMMING_LANGUAGE_JAVA = 7;
+message TaskTestCase {
+  string id              = 1;
+  string input           = 2;
+  string expected_output = 3;
+  bool   is_public       = 4;
+  int32  weight          = 5;
+  int32  order           = 6;
 }
 
-enum TaskType {
-  TASK_TYPE_UNSPECIFIED = 0;
-  TASK_TYPE_ALGORITHM = 1;
-  TASK_TYPE_DEBUGGING = 2;
-  TASK_TYPE_REFACTORING = 3;
+message Task {
+  string                    id                = 1;
+  string                    title             = 2;
+  string                    slug              = 3;
+  string                    statement         = 4;
+  TaskDifficulty            difficulty        = 5;
+  repeated string           topics            = 6;
+  string                    starter_code      = 7;
+  ProgrammingLanguage       language          = 8;
+  bool                      is_active         = 9;
+  repeated TaskTestCase     public_test_cases  = 10;
+  repeated TaskTestCase     hidden_test_cases  = 11;
+  google.protobuf.Timestamp created_at        = 12;
+  google.protobuf.Timestamp updated_at        = 13;
+  TaskType                  task_type         = 14;
+  ExecutionProfile          execution_profile = 15;  // was: string
+  repeated string           fixture_files     = 16;
+  repeated string           readable_paths    = 17;
+  repeated string           writable_paths    = 18;
+  repeated string           allowed_hosts     = 19;
+  repeated int32            allowed_ports     = 20;
+  repeated string           mock_endpoints    = 21;
+  bool                      writable_temp_dir = 22;
+  RunnerMode                runner_mode       = 23;  // was: string
+  int32                     duration_seconds  = 24;
+}
+
+// TaskPayload is used for create/update requests and mirrors Task minus server-managed fields.
+message TaskPayload {
+  string                title             = 1;
+  string                slug              = 2;
+  string                statement         = 3;
+  TaskDifficulty        difficulty        = 4;
+  repeated string       topics            = 5;
+  string                starter_code      = 6;
+  ProgrammingLanguage   language          = 7;
+  bool                  is_active         = 8;
+  repeated TaskTestCase public_test_cases  = 9;
+  repeated TaskTestCase hidden_test_cases  = 10;
+  TaskType              task_type         = 11;
+  ExecutionProfile      execution_profile = 12;  // was: string
+  repeated string       fixture_files     = 13;
+  repeated string       readable_paths    = 14;
+  repeated string       writable_paths    = 15;
+  repeated string       allowed_hosts     = 16;
+  repeated int32        allowed_ports     = 17;
+  repeated string       mock_endpoints    = 18;
+  bool                  writable_temp_dir = 19;
+  RunnerMode            runner_mode       = 20;  // was: string
+  int32                 duration_seconds  = 21;
 }

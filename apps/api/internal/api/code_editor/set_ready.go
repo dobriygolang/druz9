@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (i *Implementation) SetReady(ctx context.Context, req *v1.SetReadyRequest) (*v1.SetReadyResponse, error) {
+func (i *Implementation) SetReady(ctx context.Context, req *v1.SetReadyRequest) (*v1.StatusResponse, error) {
 	roomID, err := uuid.Parse(req.RoomId)
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_ROOM_ID", "invalid room id")
@@ -24,5 +24,5 @@ func (i *Implementation) SetReady(ctx context.Context, req *v1.SetReadyRequest) 
 		i.realtime.PublishRoomUpdate(mapRealtimeRoom(room))
 	}
 
-	return &v1.SetReadyResponse{Status: "ok"}, nil
+	return &v1.StatusResponse{Status: "ok"}, nil
 }

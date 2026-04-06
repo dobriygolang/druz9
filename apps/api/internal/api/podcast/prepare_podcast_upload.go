@@ -22,7 +22,7 @@ func (i *Implementation) PreparePodcastUpload(ctx context.Context, req *v1.Prepa
 
 	item, uploadURL, objectKey, err := i.service.PreparePodcastUpload(ctx, podcastID, model.PreparePodcastUploadRequest{
 		FileName:        req.FileName,
-		ContentType:     req.ContentType,
+		ContentType:     unmapContentType(req.ContentType),
 		DurationSeconds: req.DurationSeconds,
 	})
 	if err != nil {

@@ -20,13 +20,13 @@ func (i *Implementation) UpdateReferral(ctx context.Context, req *v1.UpdateRefer
 		return nil, errors.BadRequest("INVALID_REFERRAL_ID", "invalid referral id")
 	}
 	item, err := i.service.UpdateReferral(ctx, referralID, user, model.UpdateReferralRequest{
-		Title:          req.Title,
-		Company:        req.Company,
-		VacancyURL:     req.VacancyUrl,
-		Description:    req.Description,
-		Experience:     req.Experience,
-		Location:       req.Location,
-		EmploymentType: unmapEmploymentType(req.EmploymentType),
+		Title:          req.Referral.Title,
+		Company:        req.Referral.Company,
+		VacancyURL:     req.Referral.VacancyUrl,
+		Description:    req.Referral.Description,
+		Experience:     req.Referral.Experience,
+		Location:       req.Referral.Location,
+		EmploymentType: unmapEmploymentType(req.Referral.EmploymentType),
 	})
 	if err != nil {
 		return nil, err

@@ -10,7 +10,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (i *Implementation) DeleteEvent(ctx context.Context, req *v1.DeleteEventRequest) (*v1.DeleteEventResponse, error) {
+func (i *Implementation) DeleteEvent(ctx context.Context, req *v1.DeleteEventRequest) (*v1.EventStatusResponse, error) {
 	user, ok := model.UserFromContext(ctx)
 	if !ok {
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
@@ -20,9 +20,9 @@ func (i *Implementation) DeleteEvent(ctx context.Context, req *v1.DeleteEventReq
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_EVENT_ID", "invalid event id")
 	}
-	ctx = model.ContextWithEventDeleteScope(ctx, req.GetDeleteScope())
+	ctx = model.ContextWithEventDeleteScope(ctx, unmapDeleteEventScope(req.DeleteScope))
 	if err := i.service.DeleteEvent(ctx, eventID, user); err != nil {
 		return nil, err
 	}
-	return &v1.DeleteEventResponse{Status: "ok"}, nil
+	return &v1.EventStatusResponse{Status: "ok"}, nil
 }

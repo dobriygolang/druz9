@@ -22,7 +22,7 @@ func (i *Implementation) CompletePodcastUpload(ctx context.Context, req *v1.Comp
 
 	item, err := i.service.CompletePodcastUpload(ctx, podcastID, model.CompletePodcastUploadRequest{
 		FileName:        req.FileName,
-		ContentType:     req.ContentType,
+		ContentType:     unmapContentType(req.ContentType),
 		DurationSeconds: req.DurationSeconds,
 		ObjectKey:       req.ObjectKey,
 	})

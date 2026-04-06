@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { Calendar, MapPin, Users, Plus } from 'lucide-react'
+import { useOutletContext } from 'react-router-dom'
 import { eventApi, type Event, type CreateEventPayload } from '@/features/Event/api/eventApi'
 import { Card } from '@/shared/ui/Card'
 import { Badge } from '@/shared/ui/Badge'
@@ -24,6 +25,7 @@ function formatTime(iso: string) {
 
 export function EventsPage() {
   const { toast } = useToast()
+  const ctx = useOutletContext<{ openCreateEvent?: boolean; setOpenCreateEvent?: (v: boolean) => void } | null>()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -43,6 +45,14 @@ export function EventsPage() {
   useEffect(() => {
     fetchEvents()
   }, [fetchEvents])
+
+  // Sync open state with parent hub
+  useEffect(() => {
+    if (ctx?.openCreateEvent) {
+      setShowCreate(true)
+      ctx.setOpenCreateEvent?.(false)
+    }
+  }, [ctx?.openCreateEvent])
 
   const handleJoin = async (id: string) => {
     try {

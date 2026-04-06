@@ -34,9 +34,9 @@ type EventServiceClient interface {
 	ListEvents(ctx context.Context, in *ListEventsRequest, opts ...grpc.CallOption) (*ListEventsResponse, error)
 	CreateEvent(ctx context.Context, in *CreateEventRequest, opts ...grpc.CallOption) (*EventResponse, error)
 	JoinEvent(ctx context.Context, in *JoinEventRequest, opts ...grpc.CallOption) (*EventResponse, error)
-	LeaveEvent(ctx context.Context, in *LeaveEventRequest, opts ...grpc.CallOption) (*LeaveEventResponse, error)
+	LeaveEvent(ctx context.Context, in *LeaveEventRequest, opts ...grpc.CallOption) (*EventStatusResponse, error)
 	UpdateEvent(ctx context.Context, in *UpdateEventRequest, opts ...grpc.CallOption) (*EventResponse, error)
-	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*DeleteEventResponse, error)
+	DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*EventStatusResponse, error)
 }
 
 type eventServiceClient struct {
@@ -77,9 +77,9 @@ func (c *eventServiceClient) JoinEvent(ctx context.Context, in *JoinEventRequest
 	return out, nil
 }
 
-func (c *eventServiceClient) LeaveEvent(ctx context.Context, in *LeaveEventRequest, opts ...grpc.CallOption) (*LeaveEventResponse, error) {
+func (c *eventServiceClient) LeaveEvent(ctx context.Context, in *LeaveEventRequest, opts ...grpc.CallOption) (*EventStatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LeaveEventResponse)
+	out := new(EventStatusResponse)
 	err := c.cc.Invoke(ctx, EventService_LeaveEvent_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -97,9 +97,9 @@ func (c *eventServiceClient) UpdateEvent(ctx context.Context, in *UpdateEventReq
 	return out, nil
 }
 
-func (c *eventServiceClient) DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*DeleteEventResponse, error) {
+func (c *eventServiceClient) DeleteEvent(ctx context.Context, in *DeleteEventRequest, opts ...grpc.CallOption) (*EventStatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteEventResponse)
+	out := new(EventStatusResponse)
 	err := c.cc.Invoke(ctx, EventService_DeleteEvent_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -114,9 +114,9 @@ type EventServiceServer interface {
 	ListEvents(context.Context, *ListEventsRequest) (*ListEventsResponse, error)
 	CreateEvent(context.Context, *CreateEventRequest) (*EventResponse, error)
 	JoinEvent(context.Context, *JoinEventRequest) (*EventResponse, error)
-	LeaveEvent(context.Context, *LeaveEventRequest) (*LeaveEventResponse, error)
+	LeaveEvent(context.Context, *LeaveEventRequest) (*EventStatusResponse, error)
 	UpdateEvent(context.Context, *UpdateEventRequest) (*EventResponse, error)
-	DeleteEvent(context.Context, *DeleteEventRequest) (*DeleteEventResponse, error)
+	DeleteEvent(context.Context, *DeleteEventRequest) (*EventStatusResponse, error)
 	mustEmbedUnimplementedEventServiceServer()
 }
 
@@ -136,13 +136,13 @@ func (UnimplementedEventServiceServer) CreateEvent(context.Context, *CreateEvent
 func (UnimplementedEventServiceServer) JoinEvent(context.Context, *JoinEventRequest) (*EventResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method JoinEvent not implemented")
 }
-func (UnimplementedEventServiceServer) LeaveEvent(context.Context, *LeaveEventRequest) (*LeaveEventResponse, error) {
+func (UnimplementedEventServiceServer) LeaveEvent(context.Context, *LeaveEventRequest) (*EventStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method LeaveEvent not implemented")
 }
 func (UnimplementedEventServiceServer) UpdateEvent(context.Context, *UpdateEventRequest) (*EventResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateEvent not implemented")
 }
-func (UnimplementedEventServiceServer) DeleteEvent(context.Context, *DeleteEventRequest) (*DeleteEventResponse, error) {
+func (UnimplementedEventServiceServer) DeleteEvent(context.Context, *DeleteEventRequest) (*EventStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteEvent not implemented")
 }
 func (UnimplementedEventServiceServer) mustEmbedUnimplementedEventServiceServer() {}

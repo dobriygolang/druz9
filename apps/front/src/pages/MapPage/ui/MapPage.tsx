@@ -7,7 +7,9 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { geoApi, type CommunityPoint } from '@/features/Geo/api/geoApi'
 import { ENV } from '@/shared/config/env'
 
-const MAP_STYLE = `https://api.maptiler.com/maps/streets-v2/style.json?key=${ENV.MAPTILER_KEY}`
+const MAP_STYLE = ENV.MAPTILER_KEY
+  ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${ENV.MAPTILER_KEY}`
+  : 'https://demotiles.maplibre.org/style.json'
 
 export function MapPage() {
   const [points, setPoints] = useState<CommunityPoint[]>([])

@@ -2,13 +2,13 @@ package arena
 
 import (
 	"context"
-	"time"
 
 	arenadomain "api/internal/domain/arena"
 	v1 "api/pkg/api/arena/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (i *Implementation) JoinQueue(ctx context.Context, req *v1.JoinQueueRequest) (*v1.ArenaQueueStateResponse, error) {
@@ -17,7 +17,7 @@ func (i *Implementation) JoinQueue(ctx context.Context, req *v1.JoinQueueRequest
 		return nil, err
 	}
 
-	state, err := i.service.EnqueueMatchmaking(ctx, user, req.Topic, req.Difficulty, req.ObfuscateOpponent)
+	state, err := i.service.EnqueueMatchmaking(ctx, user, req.Topic, unmapDifficulty(req.Difficulty).String(), req.ObfuscateOpponent)
 	if err != nil {
 		return nil, mapErr(err)
 	}
@@ -39,7 +39,7 @@ func (i *Implementation) LeaveQueue(ctx context.Context, req *v1.LeaveQueueReque
 
 	state, err := i.service.GetQueueStatus(ctx, nil)
 	if err != nil {
-		return &v1.ArenaQueueStateResponse{Status: "idle"}, nil
+		return &v1.ArenaQueueStateResponse{Status: v1.ArenaQueueStatus_ARENA_QUEUE_STATUS_IDLE}, nil
 	}
 
 	return mapQueueState(state), nil
@@ -108,7 +108,7 @@ func (i *Implementation) ReportAntiCheatEvent(ctx context.Context, req *v1.Repor
 		return nil, err
 	}
 
-	if err := i.service.ReportPlayerSuspicion(ctx, matchID, user, req.Reason); err != nil {
+	if err := i.service.ReportPlayerSuspicion(ctx, matchID, user, unmapAntiCheatReason(req.Reason)); err != nil {
 		return nil, errors.BadRequest("ANTI_CHEAT_REPORT_FAILED", err.Error())
 	}
 
@@ -142,17 +142,17 @@ func (i *Implementation) ListOpenMatches(ctx context.Context, req *v1.ListOpenMa
 
 func mapQueueState(state *arenadomain.QueueState) *v1.ArenaQueueStateResponse {
 	if state == nil {
-		return &v1.ArenaQueueStateResponse{Status: "idle", QueueSize: 0}
+		return &v1.ArenaQueueStateResponse{Status: v1.ArenaQueueStatus_ARENA_QUEUE_STATUS_IDLE}
 	}
 
 	resp := &v1.ArenaQueueStateResponse{
-		Status:     queueStatusValue(state),
-		Topic:      state.Topic,
-		Difficulty: state.Difficulty.String(),
-		QueueSize:  state.QueueSize,
+		Status:    mapQueueStatus(state.Status, state.Match != nil),
+		Topic:     state.Topic,
+		Difficulty: mapDifficulty(state.Difficulty),
+		QueueSize: state.QueueSize,
 	}
 	if state.QueuedAt != nil && !state.QueuedAt.IsZero() {
-		resp.QueuedAt = state.QueuedAt.UTC().Format(time.RFC3339Nano)
+		resp.QueuedAt = timestamppb.New(*state.QueuedAt)
 	}
 	if state.Match != nil {
 		resp.Match = mapArenaMatch(state.Match)
@@ -169,24 +169,11 @@ func mapPlayerStats(stats *arenadomain.PlayerStats) *v1.ArenaPlayerStats {
 		UserId:      stats.UserID,
 		DisplayName: stats.DisplayName,
 		Rating:      stats.Rating,
-		League:      stats.League.String(),
+		League:      mapArenaLeague(stats.League),
 		Wins:        stats.Wins,
 		Losses:      stats.Losses,
 		Matches:     stats.Matches,
 		WinRate:     stats.WinRate,
 		BestRuntime: stats.BestRuntime,
 	}
-}
-
-func queueStatusValue(state *arenadomain.QueueState) string {
-	if state == nil {
-		return "idle"
-	}
-	if state.Match != nil || state.Status == arenadomain.MatchStatusActive {
-		return "matched"
-	}
-	if state.Status == arenadomain.MatchStatusWaiting {
-		return "queued"
-	}
-	return "idle"
 }

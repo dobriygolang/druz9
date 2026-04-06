@@ -47,8 +47,8 @@ type ProfileServiceClient interface {
 	GetProfileByID(ctx context.Context, in *GetProfileByIDRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
 	UpdateLocation(ctx context.Context, in *UpdateLocationRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
 	UpdateProfile(ctx context.Context, in *UpdateProfileRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
-	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error)
-	BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...grpc.CallOption) (*BindTelegramResponse, error)
+	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*ProfileStatusResponse, error)
+	BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...grpc.CallOption) (*ProfileStatusResponse, error)
 }
 
 type profileServiceClient struct {
@@ -159,9 +159,9 @@ func (c *profileServiceClient) UpdateProfile(ctx context.Context, in *UpdateProf
 	return out, nil
 }
 
-func (c *profileServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*LogoutResponse, error) {
+func (c *profileServiceClient) Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*ProfileStatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LogoutResponse)
+	out := new(ProfileStatusResponse)
 	err := c.cc.Invoke(ctx, ProfileService_Logout_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -169,9 +169,9 @@ func (c *profileServiceClient) Logout(ctx context.Context, in *LogoutRequest, op
 	return out, nil
 }
 
-func (c *profileServiceClient) BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...grpc.CallOption) (*BindTelegramResponse, error) {
+func (c *profileServiceClient) BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...grpc.CallOption) (*ProfileStatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(BindTelegramResponse)
+	out := new(ProfileStatusResponse)
 	err := c.cc.Invoke(ctx, ProfileService_BindTelegram_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -193,8 +193,8 @@ type ProfileServiceServer interface {
 	GetProfileByID(context.Context, *GetProfileByIDRequest) (*ProfileResponse, error)
 	UpdateLocation(context.Context, *UpdateLocationRequest) (*ProfileResponse, error)
 	UpdateProfile(context.Context, *UpdateProfileRequest) (*ProfileResponse, error)
-	Logout(context.Context, *LogoutRequest) (*LogoutResponse, error)
-	BindTelegram(context.Context, *BindTelegramRequest) (*BindTelegramResponse, error)
+	Logout(context.Context, *LogoutRequest) (*ProfileStatusResponse, error)
+	BindTelegram(context.Context, *BindTelegramRequest) (*ProfileStatusResponse, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -235,10 +235,10 @@ func (UnimplementedProfileServiceServer) UpdateLocation(context.Context, *Update
 func (UnimplementedProfileServiceServer) UpdateProfile(context.Context, *UpdateProfileRequest) (*ProfileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateProfile not implemented")
 }
-func (UnimplementedProfileServiceServer) Logout(context.Context, *LogoutRequest) (*LogoutResponse, error) {
+func (UnimplementedProfileServiceServer) Logout(context.Context, *LogoutRequest) (*ProfileStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Logout not implemented")
 }
-func (UnimplementedProfileServiceServer) BindTelegram(context.Context, *BindTelegramRequest) (*BindTelegramResponse, error) {
+func (UnimplementedProfileServiceServer) BindTelegram(context.Context, *BindTelegramRequest) (*ProfileStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method BindTelegram not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}

@@ -36,15 +36,15 @@ const OperationCodeEditorServiceUpdateTask = "/code_editor.v1.CodeEditorService/
 type CodeEditorServiceHTTPServer interface {
 	CreateRoom(context.Context, *CreateRoomRequest) (*CreateRoomResponse, error)
 	CreateTask(context.Context, *CreateTaskRequest) (*TaskResponse, error)
-	DeleteTask(context.Context, *DeleteTaskRequest) (*DeleteTaskResponse, error)
+	DeleteTask(context.Context, *DeleteTaskRequest) (*StatusResponse, error)
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
 	GetRoom(context.Context, *GetRoomRequest) (*GetRoomResponse, error)
 	GetSubmissions(context.Context, *GetSubmissionsRequest) (*GetSubmissionsResponse, error)
 	JoinRoom(context.Context, *JoinRoomRequest) (*JoinRoomResponse, error)
 	JoinRoomByInviteCode(context.Context, *JoinRoomByInviteCodeRequest) (*JoinRoomResponse, error)
-	LeaveRoom(context.Context, *LeaveRoomRequest) (*LeaveRoomResponse, error)
+	LeaveRoom(context.Context, *LeaveRoomRequest) (*StatusResponse, error)
 	ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error)
-	SetReady(context.Context, *SetReadyRequest) (*SetReadyResponse, error)
+	SetReady(context.Context, *SetReadyRequest) (*StatusResponse, error)
 	SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error)
 	UpdateTask(context.Context, *UpdateTaskRequest) (*TaskResponse, error)
 }
@@ -177,7 +177,7 @@ func _CodeEditorService_LeaveRoom0_HTTP_Handler(srv CodeEditorServiceHTTPServer)
 		if err != nil {
 			return err
 		}
-		reply := out.(*LeaveRoomResponse)
+		reply := out.(*StatusResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -227,7 +227,7 @@ func _CodeEditorService_SetReady0_HTTP_Handler(srv CodeEditorServiceHTTPServer) 
 		if err != nil {
 			return err
 		}
-		reply := out.(*SetReadyResponse)
+		reply := out.(*StatusResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -337,7 +337,7 @@ func _CodeEditorService_DeleteTask0_HTTP_Handler(srv CodeEditorServiceHTTPServer
 		if err != nil {
 			return err
 		}
-		reply := out.(*DeleteTaskResponse)
+		reply := out.(*StatusResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -364,15 +364,15 @@ func _CodeEditorService_GetLeaderboard0_HTTP_Handler(srv CodeEditorServiceHTTPSe
 type CodeEditorServiceHTTPClient interface {
 	CreateRoom(ctx context.Context, req *CreateRoomRequest, opts ...http.CallOption) (rsp *CreateRoomResponse, err error)
 	CreateTask(ctx context.Context, req *CreateTaskRequest, opts ...http.CallOption) (rsp *TaskResponse, err error)
-	DeleteTask(ctx context.Context, req *DeleteTaskRequest, opts ...http.CallOption) (rsp *DeleteTaskResponse, err error)
+	DeleteTask(ctx context.Context, req *DeleteTaskRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
 	GetLeaderboard(ctx context.Context, req *GetLeaderboardRequest, opts ...http.CallOption) (rsp *GetLeaderboardResponse, err error)
 	GetRoom(ctx context.Context, req *GetRoomRequest, opts ...http.CallOption) (rsp *GetRoomResponse, err error)
 	GetSubmissions(ctx context.Context, req *GetSubmissionsRequest, opts ...http.CallOption) (rsp *GetSubmissionsResponse, err error)
 	JoinRoom(ctx context.Context, req *JoinRoomRequest, opts ...http.CallOption) (rsp *JoinRoomResponse, err error)
 	JoinRoomByInviteCode(ctx context.Context, req *JoinRoomByInviteCodeRequest, opts ...http.CallOption) (rsp *JoinRoomResponse, err error)
-	LeaveRoom(ctx context.Context, req *LeaveRoomRequest, opts ...http.CallOption) (rsp *LeaveRoomResponse, err error)
+	LeaveRoom(ctx context.Context, req *LeaveRoomRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
 	ListTasks(ctx context.Context, req *ListTasksRequest, opts ...http.CallOption) (rsp *ListTasksResponse, err error)
-	SetReady(ctx context.Context, req *SetReadyRequest, opts ...http.CallOption) (rsp *SetReadyResponse, err error)
+	SetReady(ctx context.Context, req *SetReadyRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
 	SubmitCode(ctx context.Context, req *SubmitCodeRequest, opts ...http.CallOption) (rsp *SubmitCodeResponse, err error)
 	UpdateTask(ctx context.Context, req *UpdateTaskRequest, opts ...http.CallOption) (rsp *TaskResponse, err error)
 }
@@ -411,8 +411,8 @@ func (c *CodeEditorServiceHTTPClientImpl) CreateTask(ctx context.Context, in *Cr
 	return &out, nil
 }
 
-func (c *CodeEditorServiceHTTPClientImpl) DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...http.CallOption) (*DeleteTaskResponse, error) {
-	var out DeleteTaskResponse
+func (c *CodeEditorServiceHTTPClientImpl) DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...http.CallOption) (*StatusResponse, error) {
+	var out StatusResponse
 	pattern := "/api/admin/code-editor/tasks/{task_id}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationCodeEditorServiceDeleteTask))
@@ -489,8 +489,8 @@ func (c *CodeEditorServiceHTTPClientImpl) JoinRoomByInviteCode(ctx context.Conte
 	return &out, nil
 }
 
-func (c *CodeEditorServiceHTTPClientImpl) LeaveRoom(ctx context.Context, in *LeaveRoomRequest, opts ...http.CallOption) (*LeaveRoomResponse, error) {
-	var out LeaveRoomResponse
+func (c *CodeEditorServiceHTTPClientImpl) LeaveRoom(ctx context.Context, in *LeaveRoomRequest, opts ...http.CallOption) (*StatusResponse, error) {
+	var out StatusResponse
 	pattern := "/api/v1/code-editor/rooms/{room_id}/leave"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationCodeEditorServiceLeaveRoom))
@@ -515,8 +515,8 @@ func (c *CodeEditorServiceHTTPClientImpl) ListTasks(ctx context.Context, in *Lis
 	return &out, nil
 }
 
-func (c *CodeEditorServiceHTTPClientImpl) SetReady(ctx context.Context, in *SetReadyRequest, opts ...http.CallOption) (*SetReadyResponse, error) {
-	var out SetReadyResponse
+func (c *CodeEditorServiceHTTPClientImpl) SetReady(ctx context.Context, in *SetReadyRequest, opts ...http.CallOption) (*StatusResponse, error) {
+	var out StatusResponse
 	pattern := "/api/v1/code-editor/rooms/{room_id}/ready"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationCodeEditorServiceSetReady))

@@ -356,13 +356,13 @@ func buildTask(payload *v1.AdminTaskPayload, taskID uuid.UUID) (*model.Interview
 		Slug:               req.Slug,
 		Title:              req.Title,
 		Statement:          req.Statement,
-		PrepType:           model.InterviewPrepTypeFromString(req.PrepType),
-		Language:           req.Language,
+		PrepType:           unmapPrepType(req.PrepType),
+		Language:           unmapProgrammingLanguage(req.Language),
 		CompanyTag:         req.CompanyTag,
 		SupportedLanguages: append([]string{}, req.SupportedLanguages...),
 		IsExecutable:       req.IsExecutable,
-		ExecutionProfile:   req.ExecutionProfile,
-		RunnerMode:         req.RunnerMode,
+		ExecutionProfile:   unmapExecutionProfile(req.ExecutionProfile),
+		RunnerMode:         unmapRunnerMode(req.RunnerMode),
 		DurationSeconds:    req.DurationSeconds,
 		StarterCode:        req.StarterCode,
 		ReferenceSolution:  req.ReferenceSolution,
@@ -395,32 +395,28 @@ func buildQuestion(payload *v1.AdminQuestionPayload, taskID uuid.UUID, questionI
 func normalizeTaskPayload(req *v1.AdminTaskPayload) *v1.AdminTaskPayload {
 	req.Title = strings.TrimSpace(req.Title)
 	req.Statement = strings.TrimSpace(req.Statement)
-	req.PrepType = strings.TrimSpace(req.PrepType)
-	req.Language = strings.TrimSpace(req.Language)
 	req.CompanyTag = strings.TrimSpace(strings.ToLower(req.CompanyTag))
-	req.ExecutionProfile = strings.TrimSpace(req.ExecutionProfile)
-	req.RunnerMode = strings.TrimSpace(req.RunnerMode)
 	req.StarterCode = strings.TrimSpace(req.StarterCode)
 	req.ReferenceSolution = strings.TrimSpace(req.ReferenceSolution)
 	req.CodeTaskId = strings.TrimSpace(req.CodeTaskId)
 	req.Slug = normalizeSlug(req.Slug, req.Title)
-	if req.PrepType == "" {
-		req.PrepType = model.InterviewPrepTypeAlgorithm.String()
+	if req.PrepType == v1.PrepType_PREP_TYPE_UNSPECIFIED {
+		req.PrepType = v1.PrepType_PREP_TYPE_ALGORITHM
 	}
-	if req.Language == "" {
-		req.Language = "go"
+	if req.Language == v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED {
+		req.Language = v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO
 	}
 	if len(req.SupportedLanguages) == 0 {
-		req.SupportedLanguages = []string{req.Language}
+		req.SupportedLanguages = []string{unmapProgrammingLanguage(req.Language)}
 	}
 	for idx := range req.SupportedLanguages {
 		req.SupportedLanguages[idx] = strings.TrimSpace(strings.ToLower(req.SupportedLanguages[idx]))
 	}
-	if req.ExecutionProfile == "" {
-		req.ExecutionProfile = "pure"
+	if req.ExecutionProfile == v1.ExecutionProfile_EXECUTION_PROFILE_UNSPECIFIED {
+		req.ExecutionProfile = v1.ExecutionProfile_EXECUTION_PROFILE_PURE
 	}
-	if req.RunnerMode == "" {
-		req.RunnerMode = "function_io"
+	if req.RunnerMode == v1.RunnerMode_RUNNER_MODE_UNSPECIFIED {
+		req.RunnerMode = v1.RunnerMode_RUNNER_MODE_FUNCTION_IO
 	}
 	if req.DurationSeconds <= 0 {
 		req.DurationSeconds = 1800
@@ -438,11 +434,13 @@ func validateTaskPayload(req *v1.AdminTaskPayload) string {
 	if req.Statement == "" {
 		return "statement is required"
 	}
-	if model.InterviewPrepTypeFromString(req.PrepType) == model.InterviewPrepTypeUnknown {
+	if req.PrepType == v1.PrepType_PREP_TYPE_UNSPECIFIED {
 		return "invalid prep type"
 	}
 	switch req.Language {
-	case "go", "python", "sql":
+	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO,
+		v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_PYTHON,
+		v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_SQL:
 	default:
 		return "unsupported language"
 	}

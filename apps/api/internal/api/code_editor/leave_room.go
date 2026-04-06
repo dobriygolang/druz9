@@ -9,7 +9,7 @@ import (
 	"github.com/google/uuid"
 )
 
-func (i *Implementation) LeaveRoom(ctx context.Context, req *v1.LeaveRoomRequest) (*v1.LeaveRoomResponse, error) {
+func (i *Implementation) LeaveRoom(ctx context.Context, req *v1.LeaveRoomRequest) (*v1.StatusResponse, error) {
 	roomID, err := uuid.Parse(req.RoomId)
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_ROOM_ID", "invalid room id")
@@ -24,5 +24,5 @@ func (i *Implementation) LeaveRoom(ctx context.Context, req *v1.LeaveRoomRequest
 		i.realtime.PublishRoomUpdate(mapRealtimeRoom(room))
 	}
 
-	return &v1.LeaveRoomResponse{Status: "ok"}, nil
+	return &v1.StatusResponse{Status: "ok"}, nil
 }

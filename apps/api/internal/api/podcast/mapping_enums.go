@@ -19,3 +19,18 @@ func mapContentType(contentType model.PodcastContentType) v1.MediaContentType {
 		return v1.MediaContentType_MEDIA_CONTENT_TYPE_UNSPECIFIED
 	}
 }
+
+func unmapContentType(ct v1.MediaContentType) string {
+	switch ct {
+	case v1.MediaContentType_MEDIA_CONTENT_TYPE_AUDIO_MPEG:
+		return "audio/mpeg"
+	case v1.MediaContentType_MEDIA_CONTENT_TYPE_AUDIO_WAV:
+		return "audio/wav"
+	case v1.MediaContentType_MEDIA_CONTENT_TYPE_AUDIO_OGG:
+		return "audio/ogg"
+	case v1.MediaContentType_MEDIA_CONTENT_TYPE_AUDIO_MP4:
+		return "audio/mp4"
+	default:
+		return ""
+	}
+}

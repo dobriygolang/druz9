@@ -30,7 +30,7 @@ func (i *Implementation) UploadPodcast(ctx context.Context, req *v1.UploadPodcas
 
 	item, err := i.service.UploadPodcast(ctx, podcastID, model.UploadPodcastRequest{
 		FileName:        req.FileName,
-		ContentType:     req.ContentType,
+		ContentType:     unmapContentType(req.ContentType),
 		Content:         req.Content,
 		DurationSeconds: req.DurationSeconds,
 	})

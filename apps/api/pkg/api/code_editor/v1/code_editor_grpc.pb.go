@@ -42,14 +42,14 @@ type CodeEditorServiceClient interface {
 	GetRoom(ctx context.Context, in *GetRoomRequest, opts ...grpc.CallOption) (*GetRoomResponse, error)
 	JoinRoom(ctx context.Context, in *JoinRoomRequest, opts ...grpc.CallOption) (*JoinRoomResponse, error)
 	JoinRoomByInviteCode(ctx context.Context, in *JoinRoomByInviteCodeRequest, opts ...grpc.CallOption) (*JoinRoomResponse, error)
-	LeaveRoom(ctx context.Context, in *LeaveRoomRequest, opts ...grpc.CallOption) (*LeaveRoomResponse, error)
+	LeaveRoom(ctx context.Context, in *LeaveRoomRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	SubmitCode(ctx context.Context, in *SubmitCodeRequest, opts ...grpc.CallOption) (*SubmitCodeResponse, error)
-	SetReady(ctx context.Context, in *SetReadyRequest, opts ...grpc.CallOption) (*SetReadyResponse, error)
+	SetReady(ctx context.Context, in *SetReadyRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	GetSubmissions(ctx context.Context, in *GetSubmissionsRequest, opts ...grpc.CallOption) (*GetSubmissionsResponse, error)
 	ListTasks(ctx context.Context, in *ListTasksRequest, opts ...grpc.CallOption) (*ListTasksResponse, error)
 	CreateTask(ctx context.Context, in *CreateTaskRequest, opts ...grpc.CallOption) (*TaskResponse, error)
 	UpdateTask(ctx context.Context, in *UpdateTaskRequest, opts ...grpc.CallOption) (*TaskResponse, error)
-	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*DeleteTaskResponse, error)
+	DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	GetLeaderboard(ctx context.Context, in *GetLeaderboardRequest, opts ...grpc.CallOption) (*GetLeaderboardResponse, error)
 }
 
@@ -101,9 +101,9 @@ func (c *codeEditorServiceClient) JoinRoomByInviteCode(ctx context.Context, in *
 	return out, nil
 }
 
-func (c *codeEditorServiceClient) LeaveRoom(ctx context.Context, in *LeaveRoomRequest, opts ...grpc.CallOption) (*LeaveRoomResponse, error) {
+func (c *codeEditorServiceClient) LeaveRoom(ctx context.Context, in *LeaveRoomRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LeaveRoomResponse)
+	out := new(StatusResponse)
 	err := c.cc.Invoke(ctx, CodeEditorService_LeaveRoom_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -121,9 +121,9 @@ func (c *codeEditorServiceClient) SubmitCode(ctx context.Context, in *SubmitCode
 	return out, nil
 }
 
-func (c *codeEditorServiceClient) SetReady(ctx context.Context, in *SetReadyRequest, opts ...grpc.CallOption) (*SetReadyResponse, error) {
+func (c *codeEditorServiceClient) SetReady(ctx context.Context, in *SetReadyRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SetReadyResponse)
+	out := new(StatusResponse)
 	err := c.cc.Invoke(ctx, CodeEditorService_SetReady_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -171,9 +171,9 @@ func (c *codeEditorServiceClient) UpdateTask(ctx context.Context, in *UpdateTask
 	return out, nil
 }
 
-func (c *codeEditorServiceClient) DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*DeleteTaskResponse, error) {
+func (c *codeEditorServiceClient) DeleteTask(ctx context.Context, in *DeleteTaskRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(DeleteTaskResponse)
+	out := new(StatusResponse)
 	err := c.cc.Invoke(ctx, CodeEditorService_DeleteTask_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
@@ -199,14 +199,14 @@ type CodeEditorServiceServer interface {
 	GetRoom(context.Context, *GetRoomRequest) (*GetRoomResponse, error)
 	JoinRoom(context.Context, *JoinRoomRequest) (*JoinRoomResponse, error)
 	JoinRoomByInviteCode(context.Context, *JoinRoomByInviteCodeRequest) (*JoinRoomResponse, error)
-	LeaveRoom(context.Context, *LeaveRoomRequest) (*LeaveRoomResponse, error)
+	LeaveRoom(context.Context, *LeaveRoomRequest) (*StatusResponse, error)
 	SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error)
-	SetReady(context.Context, *SetReadyRequest) (*SetReadyResponse, error)
+	SetReady(context.Context, *SetReadyRequest) (*StatusResponse, error)
 	GetSubmissions(context.Context, *GetSubmissionsRequest) (*GetSubmissionsResponse, error)
 	ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error)
 	CreateTask(context.Context, *CreateTaskRequest) (*TaskResponse, error)
 	UpdateTask(context.Context, *UpdateTaskRequest) (*TaskResponse, error)
-	DeleteTask(context.Context, *DeleteTaskRequest) (*DeleteTaskResponse, error)
+	DeleteTask(context.Context, *DeleteTaskRequest) (*StatusResponse, error)
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
 	mustEmbedUnimplementedCodeEditorServiceServer()
 }
@@ -230,13 +230,13 @@ func (UnimplementedCodeEditorServiceServer) JoinRoom(context.Context, *JoinRoomR
 func (UnimplementedCodeEditorServiceServer) JoinRoomByInviteCode(context.Context, *JoinRoomByInviteCodeRequest) (*JoinRoomResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method JoinRoomByInviteCode not implemented")
 }
-func (UnimplementedCodeEditorServiceServer) LeaveRoom(context.Context, *LeaveRoomRequest) (*LeaveRoomResponse, error) {
+func (UnimplementedCodeEditorServiceServer) LeaveRoom(context.Context, *LeaveRoomRequest) (*StatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method LeaveRoom not implemented")
 }
 func (UnimplementedCodeEditorServiceServer) SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SubmitCode not implemented")
 }
-func (UnimplementedCodeEditorServiceServer) SetReady(context.Context, *SetReadyRequest) (*SetReadyResponse, error) {
+func (UnimplementedCodeEditorServiceServer) SetReady(context.Context, *SetReadyRequest) (*StatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetReady not implemented")
 }
 func (UnimplementedCodeEditorServiceServer) GetSubmissions(context.Context, *GetSubmissionsRequest) (*GetSubmissionsResponse, error) {
@@ -251,7 +251,7 @@ func (UnimplementedCodeEditorServiceServer) CreateTask(context.Context, *CreateT
 func (UnimplementedCodeEditorServiceServer) UpdateTask(context.Context, *UpdateTaskRequest) (*TaskResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateTask not implemented")
 }
-func (UnimplementedCodeEditorServiceServer) DeleteTask(context.Context, *DeleteTaskRequest) (*DeleteTaskResponse, error) {
+func (UnimplementedCodeEditorServiceServer) DeleteTask(context.Context, *DeleteTaskRequest) (*StatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteTask not implemented")
 }
 func (UnimplementedCodeEditorServiceServer) GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error) {
