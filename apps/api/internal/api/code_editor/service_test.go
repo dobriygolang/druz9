@@ -37,7 +37,7 @@ func TestCreateRoom(t *testing.T) {
 		}
 
 		mockService := mocks.NewService(t)
-		mockService.On("CreateRoom", mock.Anything, &userID, "John", false, "duel", "algorithms", "medium").Return(expectedRoom, nil).Once()
+		mockService.On("CreateRoom", mock.Anything, &userID, "John", false, "duel", "algorithms", "medium", "").Return(expectedRoom, nil).Once()
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
@@ -75,7 +75,7 @@ func TestCreateRoom(t *testing.T) {
 		}
 
 		mockService := mocks.NewService(t)
-		mockService.On("CreateRoom", mock.Anything, (*uuid.UUID)(nil), "Guest Room", true, "all", "algorithms", "easy").Return(expectedRoom, nil).Once()
+		mockService.On("CreateRoom", mock.Anything, (*uuid.UUID)(nil), "Guest Room", true, "all", "algorithms", "easy", "").Return(expectedRoom, nil).Once()
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
@@ -100,7 +100,7 @@ func TestCreateRoom(t *testing.T) {
 		expectedErr := errors.New("invalid mode")
 
 		mockService := mocks.NewService(t)
-		mockService.On("CreateRoom", mock.Anything, &userID, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, expectedErr).Once()
+		mockService.On("CreateRoom", mock.Anything, &userID, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything, mock.Anything).Return(nil, expectedErr).Once()
 
 		mockRealtime := mocks.NewRealtimePublisher(t)
 
