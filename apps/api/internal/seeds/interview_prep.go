@@ -14,7 +14,7 @@ import (
 
 const interviewPrepSeedName = "interview_prep_pack"
 const interviewPrepCatalogPath = "scripts/seeds/catalogs/interview_prep.json"
-const interviewPrepSeedVersion = "v7-full-rewrite"
+const interviewPrepSeedVersion = "v8-questions-fix"
 
 func (r *Runner) runInterviewPrep(ctx context.Context) (Result, error) {
 	catalog, rawCatalog, err := loadInterviewPrepCatalog(interviewPrepCatalogPath)
