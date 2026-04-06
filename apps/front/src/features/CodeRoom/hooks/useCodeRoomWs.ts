@@ -56,7 +56,7 @@ interface UseCodeRoomWsOptions {
   onLeave?: (userId: string, displayName: string) => void
   onBehaviorEvent?: (userId: string, displayName: string, event: BehaviorEventType) => void
   /** Fired synchronously on every cursor position change — use for direct widget updates without React cycle */
-  onCursorUpdate?: (userId: string, line: number, col: number) => void
+  onCursorUpdate?: (userId: string, line: number, col: number, remoteCodeLen?: number) => void
 }
 
 export interface SelectionInfo {
@@ -183,10 +183,11 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
 
           const cursorLine = cursorData.cursorLine as number | undefined
           const cursorColumn = cursorData.cursorColumn as number | undefined
+          const remoteCodeLen = cursorData.codeLen as number | undefined
 
           // Fire synchronously — bypasses RAF/React for zero-lag widget repositioning
           if (cursorLine) {
-            onCursorUpdateRef.current?.(msg.userId!, cursorLine, cursorColumn ?? 1)
+            onCursorUpdateRef.current?.(msg.userId!, cursorLine, cursorColumn ?? 1, remoteCodeLen)
           }
 
           pendingAwareness.current.set(msg.userId!, {

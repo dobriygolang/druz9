@@ -196,7 +196,6 @@ export function CodeRoomPage() {
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
   const skipNextWsUpdate = useRef(false)
   const isApplyingRemoteCode = useRef(false)
-  const lastLocalEditTs = useRef(0)
   const lastCursorRef = useRef({ line: 1, col: 1 })
   const isCreatorRef = useRef(false)
   const taskState = (location.state as { starterCode?: string; taskId?: string } | null)
@@ -277,11 +276,13 @@ export function CodeRoomPage() {
       else if (event === 'tab_visible') addNotification(`${displayName} вернулся(-ась)`)
       else if (event === 'pasted') addNotification(`⚠️ ${displayName} вставил(-а) код`)
     }, [addNotification]),
-    onCursorUpdate: useCallback((userId: string, line: number, col: number) => {
-      // During active local typing, OT already placed the cursor correctly.
-      // Stale awareness (sent before the remote side applied our edit) would
-      // reset the cursor one character back. Suppress for 150ms after last edit.
-      if (performance.now() - lastLocalEditTs.current < 150) return
+    onCursorUpdate: useCallback((userId: string, line: number, col: number, remoteCodeLen?: number) => {
+      // If the remote side sent a code length that doesn't match ours, their cursor
+      // position was computed on a different code version — skip (stale awareness).
+      if (remoteCodeLen !== undefined) {
+        const localLen = editorRef.current?.getModel()?.getValueLength()
+        if (localLen !== undefined && remoteCodeLen !== localLen) return
+      }
       const posRef = cursorPositionsRef.current.get(userId)
       if (posRef && widgetsRef.current.has(userId)) {
         posRef.line = line
@@ -353,6 +354,7 @@ export function CodeRoomPage() {
           finalPos.lineNumber,
           finalPos.column,
           hasSel && finalSel ? { startLine: finalSel.startLineNumber, startCol: finalSel.startColumn, endLine: finalSel.endLineNumber, endCol: finalSel.endColumn } : undefined,
+          { codeLen: model.getValueLength() },
         )
       }
     }
@@ -520,7 +522,6 @@ export function CodeRoomPage() {
 
   const handleCodeChange = useCallback((value: string | undefined) => {
     if (isApplyingRemoteCode.current) return
-    lastLocalEditTs.current = performance.now()
     const oldCode = prevLocalCodeRef.current
     const v = value ?? ''
     prevLocalCodeRef.current = v
@@ -672,6 +673,7 @@ export function CodeRoomPage() {
             endLine: sel.endLineNumber,
             endCol: sel.endColumn,
           } : undefined,
+          { codeLen: editor.getModel()?.getValueLength() },
         )
       }
 
