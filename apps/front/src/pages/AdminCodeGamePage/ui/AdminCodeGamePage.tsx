@@ -1,10 +1,9 @@
-import { useState } from 'react'
 import { Plus, Users, Trophy, Gamepad2 } from 'lucide-react'
 import { Button } from '@/shared/ui/Button'
 import { Badge } from '@/shared/ui/Badge'
 
 export function AdminCodeGamePage() {
-  const [rooms] = useState<any[]>([])
+  const rooms: { id: string; participants?: string[] }[] = []
 
   return (
     <div className="p-6">
@@ -47,7 +46,7 @@ export function AdminCodeGamePage() {
           </div>
         ) : (
           <div className="divide-y divide-[#F2F3F0]">
-            {rooms.map((room: any, i) => (
+            {rooms.map((room, i) => (
               <div key={room.id ?? i} className="flex items-center gap-4 px-5 py-3.5">
                 <p className="text-sm font-medium text-[#0f172a]">{room.id}</p>
                 <Badge variant="success">Active</Badge>

@@ -10,6 +10,7 @@ interface ArenaMessage {
   players?: ArenaPlayerState[]
   match?: ArenaMatchState
   code?: string
+  obfuscated?: boolean
 }
 
 export interface ArenaPlayerState {
@@ -73,7 +74,7 @@ export function useArenaWs(opts: UseArenaWsOptions): UseArenaWsReturn {
         if (msg.userId && msg.code !== undefined) {
           setPlayers(prev =>
             prev.map(p =>
-              p.userId === msg.userId ? { ...p, code: msg.code! } : p,
+              p.userId === msg.userId ? { ...p, code: msg.code!, obfuscated: msg.obfuscated ?? p.obfuscated } : p,
             ),
           )
         }
@@ -83,8 +84,8 @@ export function useArenaWs(opts: UseArenaWsOptions): UseArenaWsReturn {
         // Match state update (status change, winner declared, etc.)
         if (msg.match) {
           setMatchState(msg.match)
-          if (msg.match.players) setPlayers(msg.match.players)
         }
+        if (msg.players) setPlayers(msg.players)
         break
       }
     }

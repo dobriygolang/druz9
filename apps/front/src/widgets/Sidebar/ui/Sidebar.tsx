@@ -1,26 +1,11 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { Home, Users, Code2, TrendingUp, Mic, User, LogOut, Flame, Shield, Moon, Sun } from 'lucide-react'
+import { User, LogOut, Shield, Moon, Sun } from 'lucide-react'
 import { cn } from '@/shared/lib/cn'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { Avatar } from '@/shared/ui/Avatar'
-
-interface NavItem {
-  label: string
-  icon: React.ReactNode
-  href: string
-  matchPrefix?: string
-}
-
-const NAV_ITEMS: NavItem[] = [
-  { label: 'Главная', icon: <Home className="w-4 h-4" />, href: '/home' },
-  { label: 'Community', icon: <Users className="w-4 h-4" />, href: '/community', matchPrefix: '/community' },
-  { label: 'Practice', icon: <Code2 className="w-4 h-4" />, href: '/practice', matchPrefix: '/practice' },
-  { label: 'Daily', icon: <Flame className="w-4 h-4" />, href: '/daily-challenge' },
-  { label: 'Growth', icon: <TrendingUp className="w-4 h-4" />, href: '/growth', matchPrefix: '/growth' },
-  { label: 'Подкасты', icon: <Mic className="w-4 h-4" />, href: '/podcasts' },
-]
+import { PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS, isFullscreenPath, isNavItemActive } from '@/widgets/navigation/model/navigation'
 
 export function Sidebar() {
   const location = useLocation()
@@ -37,26 +22,19 @@ export function Sidebar() {
         setPopoverOpen(false)
       }
     }
-    document.addEventListener('mousedown', handleMouseDown)
-    return () => document.removeEventListener('mousedown', handleMouseDown)
-  }, [popoverOpen])
-
-  useEffect(() => {
-    if (!popoverOpen) return
     const handleKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') setPopoverOpen(false)
     }
+    document.addEventListener('mousedown', handleMouseDown)
     document.addEventListener('keydown', handleKey)
-    return () => document.removeEventListener('keydown', handleKey)
+    return () => {
+      document.removeEventListener('mousedown', handleMouseDown)
+      document.removeEventListener('keydown', handleKey)
+    }
   }, [popoverOpen])
 
-  const isFullScreen = location.pathname.startsWith('/code-rooms/') || location.pathname.startsWith('/arena/') || location.pathname.startsWith('/growth/interview-prep/mock/')
+  const isFullScreen = isFullscreenPath(location.pathname)
   if (isFullScreen) return null
-
-  const isActive = (item: NavItem) => {
-    if (item.matchPrefix) return location.pathname.startsWith(item.matchPrefix)
-    return location.pathname === item.href
-  }
 
   const displayName = user ? `${user.firstName} ${user.lastName}`.trim() || user.username : ''
   const email = user?.telegramUsername ? `@${user.telegramUsername}` : ''
@@ -94,8 +72,9 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-2 lg:px-3 flex flex-col gap-0.5">
-        {NAV_ITEMS.map((item) => {
-          const active = isActive(item)
+        {[...PRIMARY_NAV_ITEMS, ...SECONDARY_NAV_ITEMS].map((item) => {
+          const active = isNavItemActive(location.pathname, item)
+          const Icon = item.icon
           return (
             <Link
               key={item.href}
@@ -111,7 +90,7 @@ export function Sidebar() {
               {active && (
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#6366F1] dark:bg-[#818cf8] rounded-r-full" />
               )}
-              {item.icon}
+              <Icon className="w-4 h-4" />
               <span className="hidden lg:block">{item.label}</span>
             </Link>
           )

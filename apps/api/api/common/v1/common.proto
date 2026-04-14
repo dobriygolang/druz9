@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package common.v1;
+
+option go_package = "api/pkg/api/common/v1;v1";
+
+// ── Shared enums ──────────────────────────────────────────────────────────
+
+enum UserActivityStatus {
+  USER_ACTIVITY_STATUS_UNSPECIFIED     = 0;
+  USER_ACTIVITY_STATUS_ONLINE          = 1;
+  USER_ACTIVITY_STATUS_RECENTLY_ACTIVE = 2;
+  USER_ACTIVITY_STATUS_OFFLINE         = 3;
+}
+
+enum Difficulty {
+  DIFFICULTY_UNSPECIFIED = 0;
+  DIFFICULTY_EASY        = 1;
+  DIFFICULTY_MEDIUM      = 2;
+  DIFFICULTY_HARD        = 3;
+}
+
+enum ProgrammingLanguage {
+  PROGRAMMING_LANGUAGE_UNSPECIFIED = 0;
+  PROGRAMMING_LANGUAGE_JAVASCRIPT  = 1;
+  PROGRAMMING_LANGUAGE_TYPESCRIPT  = 2;
+  PROGRAMMING_LANGUAGE_PYTHON      = 3;
+  PROGRAMMING_LANGUAGE_GO          = 4;
+  PROGRAMMING_LANGUAGE_RUST        = 5;
+  PROGRAMMING_LANGUAGE_CPP         = 6;
+  PROGRAMMING_LANGUAGE_JAVA        = 7;
+  PROGRAMMING_LANGUAGE_SQL         = 8;
+}
+
+// ExecutionProfile defines the sandbox environment for code execution.
+enum ExecutionProfile {
+  EXECUTION_PROFILE_UNSPECIFIED          = 0;
+  EXECUTION_PROFILE_PURE                 = 1;
+  EXECUTION_PROFILE_FILE_IO              = 2;
+  EXECUTION_PROFILE_HTTP_CLIENT          = 3;
+  EXECUTION_PROFILE_INTERVIEW_REALISTIC  = 4;
+}
+
+// RunnerMode defines how code is invoked inside the sandbox.
+enum RunnerMode {
+  RUNNER_MODE_UNSPECIFIED  = 0;
+  RUNNER_MODE_PROGRAM      = 1;
+  RUNNER_MODE_FUNCTION_IO  = 2;
+}
+
+// SubmitFailureKind classifies why code submission failed.
+enum SubmitFailureKind {
+  SUBMIT_FAILURE_KIND_UNSPECIFIED    = 0;
+  SUBMIT_FAILURE_KIND_COMPILE_ERROR  = 1;
+  SUBMIT_FAILURE_KIND_RUNTIME_ERROR  = 2;
+  SUBMIT_FAILURE_KIND_WRONG_ANSWER   = 3;
+  SUBMIT_FAILURE_KIND_TIMEOUT        = 4;
+}
+
+// ── Shared messages ───────────────────────────────────────────────────────
+
+message InterviewSolutionReview {
+  string          provider            = 1;
+  string          model               = 2;
+  int32           score               = 3;
+  string          summary             = 4;
+  repeated string strengths           = 5;
+  repeated string issues              = 6;
+  repeated string follow_up_questions = 7;
+}

@@ -36,11 +36,12 @@ type arenaMatchRoom struct {
 }
 
 type arenaClient struct {
-	matchID   string
-	userID    string
-	spectator bool
-	ws        *websocket.Conn
-	send      chan schema.ArenaMessage
+	matchID             string
+	authenticatedUserID string
+	userID              string
+	spectator           bool
+	ws                  *websocket.Conn
+	send                chan schema.ArenaMessage
 }
 
 var arenaUpgrader = websocket.Upgrader{
@@ -60,7 +61,7 @@ func NewArenaHub(service arenaStateService) *ArenaHub {
 	return hub
 }
 
-func (h *ArenaHub) Handler(matchID string) http.Handler {
+func (h *ArenaHub) Handler(matchID string, authenticatedUserID string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ws, err := arenaUpgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -68,9 +69,10 @@ func (h *ArenaHub) Handler(matchID string) http.Handler {
 		}
 
 		client := &arenaClient{
-			matchID: matchID,
-			ws:      ws,
-			send:    make(chan schema.ArenaMessage, 64),
+			matchID:             matchID,
+			authenticatedUserID: authenticatedUserID,
+			ws:                  ws,
+			send:                make(chan schema.ArenaMessage, 64),
 		}
 
 		h.addClient(client)

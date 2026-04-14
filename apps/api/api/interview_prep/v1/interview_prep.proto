@@ -4,6 +4,7 @@ package interview_prep.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "common/v1/common.proto";
 
 option go_package = "api/pkg/api/interview_prep/v1;v1";
 
@@ -119,35 +120,6 @@ enum PrepType {
   PREP_TYPE_BEHAVIORAL    = 6;
 }
 
-// ProgrammingLanguage lists all languages supported by the execution sandbox.
-enum ProgrammingLanguage {
-  PROGRAMMING_LANGUAGE_UNSPECIFIED = 0;
-  PROGRAMMING_LANGUAGE_JAVASCRIPT  = 1;
-  PROGRAMMING_LANGUAGE_TYPESCRIPT  = 2;
-  PROGRAMMING_LANGUAGE_PYTHON      = 3;
-  PROGRAMMING_LANGUAGE_GO          = 4;
-  PROGRAMMING_LANGUAGE_RUST        = 5;
-  PROGRAMMING_LANGUAGE_CPP         = 6;
-  PROGRAMMING_LANGUAGE_JAVA        = 7;
-  PROGRAMMING_LANGUAGE_SQL         = 8;
-}
-
-// ExecutionProfile defines the sandbox environment.
-enum ExecutionProfile {
-  EXECUTION_PROFILE_UNSPECIFIED         = 0;
-  EXECUTION_PROFILE_PURE                = 1;
-  EXECUTION_PROFILE_FILE_IO             = 2;
-  EXECUTION_PROFILE_HTTP_CLIENT         = 3;
-  EXECUTION_PROFILE_INTERVIEW_REALISTIC = 4;
-}
-
-// RunnerMode defines how code is invoked inside the sandbox.
-enum RunnerMode {
-  RUNNER_MODE_UNSPECIFIED = 0;
-  RUNNER_MODE_PROGRAM     = 1;
-  RUNNER_MODE_FUNCTION_IO = 2;
-}
-
 enum SessionStatus {
   SESSION_STATUS_UNSPECIFIED = 0;
   SESSION_STATUS_ACTIVE      = 1;
@@ -185,15 +157,6 @@ enum SelfAssessment {
   SELF_ASSESSMENT_SKIPPED     = 2;
 }
 
-// SubmitFailureKind classifies why code submission failed.
-enum SubmitFailureKind {
-  SUBMIT_FAILURE_KIND_UNSPECIFIED   = 0;
-  SUBMIT_FAILURE_KIND_COMPILE_ERROR = 1;
-  SUBMIT_FAILURE_KIND_RUNTIME_ERROR = 2;
-  SUBMIT_FAILURE_KIND_WRONG_ANSWER  = 3;
-  SUBMIT_FAILURE_KIND_TIMEOUT       = 4;
-}
-
 // ── Request messages ───────────────────────────────────────────────────────
 
 message ListTasksRequest {}
@@ -203,7 +166,7 @@ message GetSessionRequest { string session_id = 1; }
 message SubmitSessionRequest {
   string              session_id = 1;
   string              code       = 2;
-  ProgrammingLanguage language   = 3;  // was: string
+  common.v1.ProgrammingLanguage language   = 3;  // was: string
 }
 
 message AnswerQuestionRequest {
@@ -239,7 +202,7 @@ message GetMockSessionRequest { string session_id = 1; }
 message SubmitMockStageRequest {
   string              session_id = 1;
   string              code       = 2;
-  ProgrammingLanguage language   = 3;  // was: string
+  common.v1.ProgrammingLanguage language   = 3;  // was: string
   string              notes      = 4;
 }
 
@@ -278,7 +241,7 @@ message SubmitSessionResult {
   int32             passed_count     = 3;
   int32             total_count      = 4;
   int32             failed_test_index = 5;
-  SubmitFailureKind failure_kind     = 6;  // was: string
+  common.v1.SubmitFailureKind failure_kind     = 6;  // was: string
   InterviewPrepSession session       = 7;
 }
 message SubmitSessionResponse { SubmitSessionResult result = 1; }
@@ -297,8 +260,8 @@ message SubmitMockStageResult {
   int32                   passed_count     = 3;
   int32                   total_count      = 4;
   int32                   failed_test_index = 5;
-  SubmitFailureKind        failure_kind     = 6;  // was: string
-  InterviewSolutionReview  review           = 7;
+  common.v1.SubmitFailureKind       failure_kind     = 6;  // was: string
+  common.v1.InterviewSolutionReview review           = 7;
   MockSession              session          = 8;
 }
 message SubmitMockStageResponse { SubmitMockStageResult result = 1; }
@@ -316,12 +279,12 @@ message AdminTaskPayload {
   string              title               = 2;
   string              statement           = 3;
   PrepType            prep_type           = 4;  // was: string
-  ProgrammingLanguage language            = 5;  // was: string
+  common.v1.ProgrammingLanguage language            = 5;  // was: string
   string              company_tag         = 6;
   repeated string     supported_languages = 7;
   bool                is_executable       = 8;
-  ExecutionProfile    execution_profile   = 9;  // was: string
-  RunnerMode          runner_mode         = 10; // was: string
+  common.v1.ExecutionProfile   execution_profile   = 9;  // was: string
+  common.v1.RunnerMode         runner_mode         = 10; // was: string
   int32               duration_seconds    = 11;
   string              starter_code        = 12;
   string              reference_solution  = 13;
@@ -375,12 +338,12 @@ message InterviewPrepTask {
   string                    title               = 3;
   string                    statement           = 4;
   PrepType                  prep_type           = 5;  // was: string
-  ProgrammingLanguage       language            = 6;  // was: string
+  common.v1.ProgrammingLanguage      language            = 6;  // was: string
   string                    company_tag         = 7;
   repeated string           supported_languages = 8;
   bool                      is_executable       = 9;
-  ExecutionProfile          execution_profile   = 10; // was: string
-  RunnerMode                runner_mode         = 11; // was: string
+  common.v1.ExecutionProfile         execution_profile   = 10; // was: string
+  common.v1.RunnerMode               runner_mode         = 11; // was: string
   int32                     duration_seconds    = 12;
   string                    starter_code        = 13;
   string                    reference_solution  = 14;
@@ -438,15 +401,6 @@ message SystemDesignReview {
   string          disclaimer         = 9;
 }
 
-message InterviewSolutionReview {
-  string          provider            = 1;
-  string          model               = 2;
-  int32           score               = 3;
-  string          summary             = 4;
-  repeated string strengths           = 5;
-  repeated string issues              = 6;
-  repeated string follow_up_questions = 7;
-}
 
 message InterviewAnswerReview {
   string          provider = 1;

@@ -15,7 +15,10 @@ func (r *Repo) mergeUsersTx(ctx context.Context, tx pgx.Tx, canonicalUserID, sec
 		return nil
 	}
 
-	if _, err := tx.Exec(ctx, `
+	batch := &pgx.Batch{}
+
+	// 1. Merge user profile fields
+	batch.Queue(`
 UPDATE users canonical
 SET
   username = COALESCE(NULLIF(canonical.username, ''), NULLIF(secondary.username, ''), ''),
@@ -41,89 +44,52 @@ SET
 FROM users secondary
 WHERE canonical.id = $1
   AND secondary.id = $2
-`, canonicalUserID, secondaryUserID, model.UserStatusActive, model.UserStatusPendingProfile, model.UserStatusGuest); err != nil {
-		return fmt.Errorf("merge user profiles: %w", err)
-	}
+`, canonicalUserID, secondaryUserID, model.UserStatusActive, model.UserStatusPendingProfile, model.UserStatusGuest)
 
-	if _, err := tx.Exec(ctx, `DELETE FROM geo g USING geo keep WHERE g.user_id = $2 AND keep.user_id = $1`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("dedupe geo: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE geo SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move geo: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move sessions: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE events SET creator_id = $1 WHERE creator_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move events: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `DELETE FROM event_participants ep USING event_participants keep WHERE ep.user_id = $2 AND keep.user_id = $1 AND keep.event_id = ep.event_id`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("dedupe event participants: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE event_participants SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move event participants: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE podcasts SET author_id = $1 WHERE author_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move podcasts: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE referrals SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move referrals: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE code_rooms SET creator_id = $1 WHERE creator_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move code room creators: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE code_rooms SET winner_user_id = $1 WHERE winner_user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move code room winners: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `DELETE FROM code_participants cp USING code_participants keep WHERE cp.user_id = $2 AND keep.user_id = $1 AND keep.room_id = cp.room_id`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("dedupe code participants: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE code_participants SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move code participants: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE code_submissions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move code submissions: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE arena_matches SET creator_user_id = $1 WHERE creator_user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move arena match creators: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE arena_matches SET winner_user_id = $1 WHERE winner_user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move arena match winners: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `DELETE FROM arena_match_players p USING arena_match_players keep WHERE p.user_id = $2 AND keep.user_id = $1 AND keep.match_id = p.match_id`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("dedupe arena match players: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE arena_match_players SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move arena match players: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `DELETE FROM arena_editor_states s USING arena_editor_states keep WHERE s.user_id = $2 AND keep.user_id = $1 AND keep.match_id = s.match_id`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("dedupe arena editor states: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE arena_editor_states SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move arena editor states: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE arena_submissions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move arena submissions: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `DELETE FROM arena_rating_penalties p USING arena_rating_penalties keep WHERE p.user_id = $2 AND keep.user_id = $1 AND keep.match_id = p.match_id AND keep.reason = p.reason`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("dedupe arena rating penalties: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE arena_rating_penalties SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move arena rating penalties: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `
+	// 2. Geo: dedupe then move
+	batch.Queue(`DELETE FROM geo g USING geo keep WHERE g.user_id = $2 AND keep.user_id = $1`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE geo SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+
+	// 3. Sessions
+	batch.Queue(`UPDATE sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+
+	// 4. Events
+	batch.Queue(`UPDATE events SET creator_id = $1 WHERE creator_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`DELETE FROM event_participants ep USING event_participants keep WHERE ep.user_id = $2 AND keep.user_id = $1 AND keep.event_id = ep.event_id`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE event_participants SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+
+	// 5. Podcasts & Referrals
+	batch.Queue(`UPDATE podcasts SET author_id = $1 WHERE author_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE referrals SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+
+	// 6. Code rooms & participants
+	batch.Queue(`UPDATE code_rooms SET creator_id = $1 WHERE creator_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE code_rooms SET winner_user_id = $1 WHERE winner_user_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`DELETE FROM code_participants cp USING code_participants keep WHERE cp.user_id = $2 AND keep.user_id = $1 AND keep.room_id = cp.room_id`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE code_participants SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE code_submissions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+
+	// 7. Arena matches & players
+	batch.Queue(`UPDATE arena_matches SET creator_user_id = $1 WHERE creator_user_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE arena_matches SET winner_user_id = $1 WHERE winner_user_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`DELETE FROM arena_match_players p USING arena_match_players keep WHERE p.user_id = $2 AND keep.user_id = $1 AND keep.match_id = p.match_id`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE arena_match_players SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`DELETE FROM arena_editor_states s USING arena_editor_states keep WHERE s.user_id = $2 AND keep.user_id = $1 AND keep.match_id = s.match_id`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE arena_editor_states SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE arena_submissions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`DELETE FROM arena_rating_penalties p USING arena_rating_penalties keep WHERE p.user_id = $2 AND keep.user_id = $1 AND keep.match_id = p.match_id AND keep.reason = p.reason`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE arena_rating_penalties SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+
+	// 8. Arena queue & stats (merge with UPSERT)
+	batch.Queue(`
 INSERT INTO arena_match_queue (user_id, display_name, topic, difficulty, queued_at, updated_at)
 SELECT $1, display_name, topic, difficulty, queued_at, NOW()
 FROM arena_match_queue
 WHERE user_id = $2
 ON CONFLICT (user_id) DO NOTHING
-`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("merge arena queue: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `DELETE FROM arena_match_queue WHERE user_id = $1`, secondaryUserID); err != nil {
-		return fmt.Errorf("delete secondary arena queue: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `
+`, canonicalUserID, secondaryUserID)
+	batch.Queue(`DELETE FROM arena_match_queue WHERE user_id = $1`, secondaryUserID)
+	batch.Queue(`
 INSERT INTO arena_player_stats (user_id, display_name, rating, wins, losses, matches, best_runtime_ms, updated_at)
 SELECT $1, display_name, rating, wins, losses, matches, best_runtime_ms, NOW()
 FROM arena_player_stats
@@ -139,13 +105,11 @@ ON CONFLICT (user_id) DO UPDATE SET
     ELSE LEAST(arena_player_stats.best_runtime_ms, EXCLUDED.best_runtime_ms)
   END,
   updated_at = NOW()
-`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("merge arena player stats: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `DELETE FROM arena_player_stats WHERE user_id = $1`, secondaryUserID); err != nil {
-		return fmt.Errorf("delete secondary arena stats: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `
+`, canonicalUserID, secondaryUserID)
+	batch.Queue(`DELETE FROM arena_player_stats WHERE user_id = $1`, secondaryUserID)
+
+	// 9. Interview prep sessions (dedupe + move)
+	batch.Queue(`
 DELETE FROM interview_prep_sessions src
 USING interview_prep_sessions keep
 WHERE src.user_id = $2
@@ -153,17 +117,40 @@ WHERE src.user_id = $2
   AND src.task_id = keep.task_id
   AND src.status = 'active'
   AND keep.status = 'active'
-`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("dedupe interview prep sessions: %w", err)
+`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE interview_prep_sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE interview_prep_mock_sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+
+	// 10. Delete secondary user
+	batch.Queue(`DELETE FROM users WHERE id = $1`, secondaryUserID)
+
+	// Execute entire batch in a single round-trip.
+	results := tx.SendBatch(ctx, batch)
+	defer results.Close()
+
+	labels := []string{
+		"merge user profiles",
+		"dedupe geo", "move geo",
+		"move sessions",
+		"move events", "dedupe event participants", "move event participants",
+		"move podcasts", "move referrals",
+		"move code room creators", "move code room winners",
+		"dedupe code participants", "move code participants", "move code submissions",
+		"move arena match creators", "move arena match winners",
+		"dedupe arena match players", "move arena match players",
+		"dedupe arena editor states", "move arena editor states",
+		"move arena submissions",
+		"dedupe arena rating penalties", "move arena rating penalties",
+		"merge arena queue", "delete secondary arena queue",
+		"merge arena player stats", "delete secondary arena stats",
+		"dedupe interview prep sessions", "move interview prep sessions", "move mock interview sessions",
+		"delete secondary user",
 	}
-	if _, err := tx.Exec(ctx, `UPDATE interview_prep_sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move interview prep sessions: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `UPDATE interview_prep_mock_sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID); err != nil {
-		return fmt.Errorf("move mock interview sessions: %w", err)
-	}
-	if _, err := tx.Exec(ctx, `DELETE FROM users WHERE id = $1`, secondaryUserID); err != nil {
-		return fmt.Errorf("delete secondary user: %w", err)
+
+	for _, label := range labels {
+		if _, err := results.Exec(); err != nil {
+			return fmt.Errorf("%s: %w", label, err)
+		}
 	}
 
 	return nil

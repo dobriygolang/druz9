@@ -4,6 +4,7 @@ import (
 	"api/internal/aireview"
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/model"
+	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/interview_prep/v1"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -127,116 +128,116 @@ func unmapSelfAssessment(s v1.SelfAssessment) model.InterviewPrepSelfAssessment 
 
 // ── Entity mappings ────────────────────────────────────────────────────────
 
-func mapProgrammingLanguage(lang string) v1.ProgrammingLanguage {
+func mapProgrammingLanguage(lang string) commonv1.ProgrammingLanguage {
 	switch lang {
 	case "javascript":
-		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVASCRIPT
+		return commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVASCRIPT
 	case "typescript":
-		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_TYPESCRIPT
+		return commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_TYPESCRIPT
 	case "python":
-		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_PYTHON
+		return commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_PYTHON
 	case "go":
-		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO
+		return commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO
 	case "rust":
-		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_RUST
+		return commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_RUST
 	case "cpp":
-		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_CPP
+		return commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_CPP
 	case "java":
-		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVA
+		return commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVA
 	case "sql":
-		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_SQL
+		return commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_SQL
 	default:
-		return v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED
+		return commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED
 	}
 }
 
-func unmapProgrammingLanguage(lang v1.ProgrammingLanguage) string {
+func unmapProgrammingLanguage(lang commonv1.ProgrammingLanguage) string {
 	switch lang {
-	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVASCRIPT:
+	case commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVASCRIPT:
 		return "javascript"
-	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_TYPESCRIPT:
+	case commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_TYPESCRIPT:
 		return "typescript"
-	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_PYTHON:
+	case commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_PYTHON:
 		return "python"
-	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO:
+	case commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO:
 		return "go"
-	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_RUST:
+	case commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_RUST:
 		return "rust"
-	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_CPP:
+	case commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_CPP:
 		return "cpp"
-	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVA:
+	case commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_JAVA:
 		return "java"
-	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_SQL:
+	case commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_SQL:
 		return "sql"
 	default:
 		return ""
 	}
 }
 
-func mapExecutionProfile(ep string) v1.ExecutionProfile {
+func mapExecutionProfile(ep string) commonv1.ExecutionProfile {
 	switch ep {
 	case "pure":
-		return v1.ExecutionProfile_EXECUTION_PROFILE_PURE
+		return commonv1.ExecutionProfile_EXECUTION_PROFILE_PURE
 	case "file_io":
-		return v1.ExecutionProfile_EXECUTION_PROFILE_FILE_IO
+		return commonv1.ExecutionProfile_EXECUTION_PROFILE_FILE_IO
 	case "http_client":
-		return v1.ExecutionProfile_EXECUTION_PROFILE_HTTP_CLIENT
+		return commonv1.ExecutionProfile_EXECUTION_PROFILE_HTTP_CLIENT
 	case "interview_realistic":
-		return v1.ExecutionProfile_EXECUTION_PROFILE_INTERVIEW_REALISTIC
+		return commonv1.ExecutionProfile_EXECUTION_PROFILE_INTERVIEW_REALISTIC
 	default:
-		return v1.ExecutionProfile_EXECUTION_PROFILE_UNSPECIFIED
+		return commonv1.ExecutionProfile_EXECUTION_PROFILE_UNSPECIFIED
 	}
 }
 
-func unmapExecutionProfile(ep v1.ExecutionProfile) string {
+func unmapExecutionProfile(ep commonv1.ExecutionProfile) string {
 	switch ep {
-	case v1.ExecutionProfile_EXECUTION_PROFILE_PURE:
+	case commonv1.ExecutionProfile_EXECUTION_PROFILE_PURE:
 		return "pure"
-	case v1.ExecutionProfile_EXECUTION_PROFILE_FILE_IO:
+	case commonv1.ExecutionProfile_EXECUTION_PROFILE_FILE_IO:
 		return "file_io"
-	case v1.ExecutionProfile_EXECUTION_PROFILE_HTTP_CLIENT:
+	case commonv1.ExecutionProfile_EXECUTION_PROFILE_HTTP_CLIENT:
 		return "http_client"
-	case v1.ExecutionProfile_EXECUTION_PROFILE_INTERVIEW_REALISTIC:
+	case commonv1.ExecutionProfile_EXECUTION_PROFILE_INTERVIEW_REALISTIC:
 		return "interview_realistic"
 	default:
 		return ""
 	}
 }
 
-func mapRunnerMode(rm string) v1.RunnerMode {
+func mapRunnerMode(rm string) commonv1.RunnerMode {
 	switch rm {
 	case "program":
-		return v1.RunnerMode_RUNNER_MODE_PROGRAM
+		return commonv1.RunnerMode_RUNNER_MODE_PROGRAM
 	case "function_io":
-		return v1.RunnerMode_RUNNER_MODE_FUNCTION_IO
+		return commonv1.RunnerMode_RUNNER_MODE_FUNCTION_IO
 	default:
-		return v1.RunnerMode_RUNNER_MODE_UNSPECIFIED
+		return commonv1.RunnerMode_RUNNER_MODE_UNSPECIFIED
 	}
 }
 
-func unmapRunnerMode(rm v1.RunnerMode) string {
+func unmapRunnerMode(rm commonv1.RunnerMode) string {
 	switch rm {
-	case v1.RunnerMode_RUNNER_MODE_PROGRAM:
+	case commonv1.RunnerMode_RUNNER_MODE_PROGRAM:
 		return "program"
-	case v1.RunnerMode_RUNNER_MODE_FUNCTION_IO:
+	case commonv1.RunnerMode_RUNNER_MODE_FUNCTION_IO:
 		return "function_io"
 	default:
 		return ""
 	}
 }
 
-func mapSubmitFailureKind(kind string) v1.SubmitFailureKind {
+func mapSubmitFailureKind(kind string) commonv1.SubmitFailureKind {
 	switch kind {
 	case "compile_error":
-		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_COMPILE_ERROR
+		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_COMPILE_ERROR
 	case "runtime_error":
-		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_RUNTIME_ERROR
+		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_RUNTIME_ERROR
 	case "wrong_answer":
-		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_WRONG_ANSWER
+		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_WRONG_ANSWER
 	case "timeout":
-		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_TIMEOUT
+		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_TIMEOUT
 	default:
-		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_UNSPECIFIED
+		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_UNSPECIFIED
 	}
 }
 
@@ -367,11 +368,11 @@ func mapSystemDesignReview(review *appinterviewprep.SystemDesignReviewResult) *v
 	}
 }
 
-func mapInterviewSolutionReview(review *aireview.InterviewSolutionReview) *v1.InterviewSolutionReview {
+func mapInterviewSolutionReview(review *aireview.InterviewSolutionReview) *commonv1.InterviewSolutionReview {
 	if review == nil {
 		return nil
 	}
-	return &v1.InterviewSolutionReview{
+	return &commonv1.InterviewSolutionReview{
 		Provider:          review.Provider,
 		Model:             review.Model,
 		Score:             int32(review.Score),

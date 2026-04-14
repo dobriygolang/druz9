@@ -71,7 +71,6 @@ func dtoFromArenaMatch(match *model.ArenaMatch) *schema.ArenaMatch {
 			DisplayName:    player.DisplayName,
 			Side:           player.Side.String(),
 			IsCreator:      player.IsCreator,
-			CurrentCode:    player.CurrentCode,
 			SuspicionCount: player.SuspicionCount,
 			BestRuntimeMs:  player.BestRuntimeMs,
 			IsWinner:       player.IsWinner,

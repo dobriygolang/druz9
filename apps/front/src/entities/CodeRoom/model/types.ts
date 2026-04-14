@@ -7,6 +7,7 @@ export type ProgrammingLanguage =
   | 'PROGRAMMING_LANGUAGE_TYPESCRIPT'
   | 'PROGRAMMING_LANGUAGE_PYTHON'
   | 'PROGRAMMING_LANGUAGE_GO'
+  | 'PROGRAMMING_LANGUAGE_SQL'
   | 'PROGRAMMING_LANGUAGE_RUST'
   | 'PROGRAMMING_LANGUAGE_CPP'
   | 'PROGRAMMING_LANGUAGE_JAVA'
@@ -34,6 +35,7 @@ export interface Room {
   codeRevision: number
   creatorId: string
   isPrivate: boolean
+  language: ProgrammingLanguage
 }
 
 export interface Submission {

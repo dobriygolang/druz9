@@ -14,6 +14,11 @@ import { getMonacoLanguage, getLanguageLabel } from '@/shared/lib/codeEditorLang
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { apiClient } from '@/shared/api/base'
 import type * as Monaco from 'monaco-editor'
+import * as Y from 'yjs'
+import { MonacoBinding } from 'y-monaco'
+import * as syncProtocol from 'y-protocols/sync'
+import * as encoding from 'lib0/encoding'
+import * as decoding from 'lib0/decoding'
 
 /* ─── Solo draft storage (LRU, max 10 tasks) ─── */
 const SOLO_DRAFT_MAX = 10
@@ -27,7 +32,11 @@ function setSoloDraft(taskId: string, code: string) {
   localStorage.setItem(`solo:code:${taskId}`, code)
   const prev: string[] = JSON.parse(localStorage.getItem(SOLO_DRAFT_INDEX_KEY) ?? '[]')
   const next = [taskId, ...prev.filter(id => id !== taskId)].slice(0, SOLO_DRAFT_MAX)
-  prev.filter(id => !next.includes(id)).forEach(id => localStorage.removeItem(`solo:code:${id}`))
+  // O(n) eviction via Set lookup instead of O(n²) with Array.includes
+  const kept = new Set(next)
+  for (const id of prev) {
+    if (!kept.has(id)) localStorage.removeItem(`solo:code:${id}`)
+  }
   localStorage.setItem(SOLO_DRAFT_INDEX_KEY, JSON.stringify(next))
 }
 
@@ -78,6 +87,25 @@ function transformCursorOffset(offset: number, oldCode: string, newCode: string)
   return offset - deleted + inserted
 }
 
+function encodeBinaryToBase64(bytes: Uint8Array): string {
+  let binary = ''
+  const chunkSize = 0x8000
+  for (let offset = 0; offset < bytes.length; offset += chunkSize) {
+    const chunk = bytes.subarray(offset, offset + chunkSize)
+    binary += String.fromCharCode(...chunk)
+  }
+  return btoa(binary)
+}
+
+function decodeBase64ToBinary(payload: string): Uint8Array {
+  const binary = atob(payload)
+  const bytes = new Uint8Array(binary.length)
+  for (let i = 0; i < binary.length; i++) {
+    bytes[i] = binary.charCodeAt(i)
+  }
+  return bytes
+}
+
 /** posRef is mutable — update it and call layoutContentWidget instead of re-adding */
 function buildCursorWidget(
   userId: string,
@@ -112,13 +140,19 @@ function buildCursorWidget(
 
 const LANGUAGES = [
   { value: 'python', label: 'Python 3' },
-  { value: 'javascript', label: 'JavaScript' },
-  { value: 'typescript', label: 'TypeScript' },
   { value: 'go', label: 'Go' },
-  { value: 'rust', label: 'Rust' },
-  { value: 'cpp', label: 'C++' },
-  { value: 'java', label: 'Java' },
+  { value: 'sql', label: 'SQL' },
 ]
+
+function getAvailableRoomLanguages(mode: Room['mode'] | undefined, currentLanguage: string) {
+  if (currentLanguage === 'sql') {
+    return LANGUAGES.filter(item => item.value === 'sql')
+  }
+  if (mode === 'ROOM_MODE_DUEL') {
+    return LANGUAGES.filter(item => item.value === 'python' || item.value === 'go')
+  }
+  return LANGUAGES.filter(item => item.value === 'python' || item.value === 'go')
+}
 
 const AI_HINTS = [
   'Подумайте о граничных случаях',
@@ -166,7 +200,6 @@ export function CodeRoomPage() {
   const { user } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const [room, setRoom] = useState<Room | null>(null)
-  const [localCode, setLocalCode] = useState('')
   const [running, setRunning] = useState(false)
   const [submitResult, setSubmitResult] = useState<{ isCorrect: boolean; output: string; error: string } | null>(null)
   const [activeTab, setActiveTab] = useState<'problem' | 'tests'>('problem')
@@ -190,24 +223,26 @@ export function CodeRoomPage() {
   const isResizingLeft = useRef(false)
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<typeof Monaco | null>(null)
+  const bindingRef = useRef<MonacoBinding | null>(null)
+  const yDocRef = useRef<Y.Doc | null>(null)
   const decorationsRef = useRef<Monaco.editor.IEditorDecorationsCollection | null>(null)
   const widgetsRef = useRef<Map<string, Monaco.editor.IContentWidget>>(new Map())
   const prevParticipantIdsRef = useRef<Set<string>>(new Set())
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
-  const skipNextWsUpdate = useRef(false)
-  const isApplyingRemoteCode = useRef(false)
+  const queuedDocMessagesRef = useRef<string[]>([])
+  const sendDocSyncRef = useRef<(data: string) => void>(() => {})
+  const currentCodeRef = useRef('')
+  const initialCodeRef = useRef('')
   const lastCursorRef = useRef({ line: 1, col: 1 })
   const isCreatorRef = useRef(false)
   const taskState = (location.state as { starterCode?: string; taskId?: string } | null)
   const soloDraftTaskId = taskState?.taskId ?? null
   const soloDraft = soloDraftTaskId ? getSoloDraft(soloDraftTaskId) : null
   const starterCodeRef = useRef(soloDraft ?? taskState?.starterCode ?? '')
-  const sentStarterCode = useRef(false)
   const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Mutable cursor positions for remote users — updated in-place, no widget re-add needed
   const cursorPositionsRef = useRef<Map<string, { line: number; col: number }>>(new Map())
-  // Tracks the last-known local code value so handleCodeChange can compute an OT delta
-  const prevLocalCodeRef = useRef('')
 
   // Left panel resize
   useEffect(() => {
@@ -259,14 +294,40 @@ export function CodeRoomPage() {
     setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), 4000)
   }, [notificationsEnabled])
 
+  const handleIncomingDocSync = useCallback((payload: string) => {
+    const doc = yDocRef.current
+    if (!doc) {
+      queuedDocMessagesRef.current.push(payload)
+      return
+    }
+
+    const decoder = decoding.createDecoder(decodeBase64ToBinary(payload))
+    const encoder = encoding.createEncoder()
+    syncProtocol.readSyncMessage(decoder, encoder, doc, 'remote')
+
+    const reply = encoding.toUint8Array(encoder)
+    if (reply.byteLength > 1) {
+      sendDocSyncRef.current(encodeBinaryToBase64(reply))
+    }
+  }, [])
+
+  const flushQueuedDocMessages = useCallback(() => {
+    if (!yDocRef.current || queuedDocMessagesRef.current.length === 0) return
+    const pending = queuedDocMessagesRef.current.splice(0)
+    pending.forEach(handleIncomingDocSync)
+  }, [handleIncomingDocSync])
+
   // WebSocket realtime
+  const isDuelRoom = room?.mode === 'ROOM_MODE_DUEL'
   const ws = useCodeRoomWs({
     roomId,
     userId: user?.id,
     displayName: user?.firstName ?? guestNameRef.current ?? 'Guest',
     guestName: guestNameRef.current,
-    enabled: !!roomId && !needsGuestName,
-    initialLanguage: getMonacoLanguage((location.state as { language?: string } | null)?.language ?? ''),
+    mode: room?.mode === 'ROOM_MODE_DUEL' ? 'ROOM_MODE_DUEL' : 'ROOM_MODE_ALL',
+    enabled: !!roomId && !needsGuestName && !!room,
+    initialLanguage: getMonacoLanguage(room?.language ?? (location.state as { language?: string } | null)?.language ?? ''),
+    onDocSync: handleIncomingDocSync,
     onLeave: useCallback((_userId: string, displayName: string) => {
       addNotification(`${displayName} покинул(-а) комнату`)
     }, [addNotification]),
@@ -291,93 +352,109 @@ export function CodeRoomPage() {
       }
     }, []),
   })
+  sendDocSyncRef.current = ws.sendDocSync
+
+  const schedulePersist = useCallback((code: string) => {
+    currentCodeRef.current = code
+    if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
+    persistTimerRef.current = setTimeout(() => {
+      ws.persistCode(currentCodeRef.current)
+    }, 400)
+  }, [ws.persistCode])
 
   // Fetch initial room data via REST
   useEffect(() => {
     if (!roomId || needsGuestName) return
     const state = location.state as { title?: string; statement?: string; starterCode?: string; language?: string; taskId?: string } | null
-    codeRoomApi.getRoom(roomId, guestNameRef.current)
+    codeRoomApi.joinRoom(roomId, undefined, guestNameRef.current)
       .then(r => {
         if (state?.title && !r.task) r = { ...r, task: state.title }
         setRoom(r)
         if (state?.statement) setTaskStatement(state.statement)
-        // Prefer saved draft > starter code from state > server code
+        // Prefer saved draft > server snapshot > starter code from navigation state
         const draft = state?.taskId ? getSoloDraft(state.taskId) : null
-        const initCode = draft ?? state?.starterCode ?? r.code ?? ''
-        if (initCode) { setLocalCode(initCode); prevLocalCodeRef.current = initCode }
+        const initCode = draft ?? r.code ?? state?.starterCode ?? ''
+        initialCodeRef.current = initCode
+        currentCodeRef.current = initCode
+        const model = editorRef.current?.getModel()
+        if (model && !bindingRef.current && model.getValue() !== initCode) {
+          model.setValue(initCode)
+        }
       })
       .catch(() => navigate('/practice/code-rooms'))
-  }, [roomId, needsGuestName])
+  }, [roomId, needsGuestName, location.state, navigate])
 
-  // Sync WebSocket code -> local (remote changes), preserve local cursor position
   useEffect(() => {
-    if (!ws.code || skipNextWsUpdate.current) {
-      skipNextWsUpdate.current = false
-      return
+    if (!ws.gotSnapshot) return
+    const baseCode = isDuelRoom
+      ? (ws.code || currentCodeRef.current || starterCodeRef.current || '')
+      : (currentCodeRef.current || starterCodeRef.current || ws.code || '')
+    initialCodeRef.current = baseCode
+    currentCodeRef.current = baseCode
+
+    const model = editorRef.current?.getModel()
+    if (model && !bindingRef.current && model.getValue() !== baseCode) {
+      model.setValue(baseCode)
     }
-    skipNextWsUpdate.current = false
-    if (starterCodeRef.current && !sentStarterCode.current) return
+  }, [isDuelRoom, ws.gotSnapshot, ws.code])
+
+  useEffect(() => {
     const editor = editorRef.current
     const model = editor?.getModel()
-    if (model && model.getValue() !== ws.code) {
-      const oldCode = model.getValue()
-      const pos = editor!.getPosition()
-      const sel = editor!.getSelection()
-      const localCursorOffset = pos ? model.getOffsetAt(pos) : null
-      const localSelStart = sel ? model.getOffsetAt({ lineNumber: sel.startLineNumber, column: sel.startColumn }) : null
-      const localSelEnd = sel ? model.getOffsetAt({ lineNumber: sel.endLineNumber, column: sel.endColumn }) : null
+    if (!editor || !model || !ws.connected || !ws.gotSnapshot || bindingRef.current || isDuelRoom) return
 
-      isApplyingRemoteCode.current = true
-      model.setValue(ws.code)
+    const snapshotCode = ws.code || ''
+    const seedCode = currentCodeRef.current || snapshotCode || model.getValue()
+    const hasLocalSeedOverride = seedCode !== snapshotCode
 
-      // Restore cursor + selection while still suppressed, so only ONE awareness
-      // fires (with both position AND selection) after we lift the flag.
-      if (localCursorOffset !== null) {
-        const newOffset = transformCursorOffset(localCursorOffset, oldCode, ws.code)
-        editor!.setPosition(model.getPositionAt(Math.min(newOffset, ws.code.length)))
-      }
-      if (localSelStart !== null && localSelEnd !== null) {
-        const newStart = transformCursorOffset(localSelStart, oldCode, ws.code)
-        const newEnd = transformCursorOffset(localSelEnd, oldCode, ws.code)
-        const s = model.getPositionAt(Math.min(newStart, ws.code.length))
-        const e = model.getPositionAt(Math.min(newEnd, ws.code.length))
-        editor!.setSelection({ startLineNumber: s.lineNumber, startColumn: s.column, endLineNumber: e.lineNumber, endColumn: e.column })
-      }
-      isApplyingRemoteCode.current = false
-
-      // Send one awareness with correct cursor + selection (all intermediate events were suppressed)
-      const finalPos = editor!.getPosition()
-      const finalSel = editor!.getSelection()
-      if (finalPos) {
-        const hasSel = finalSel && !(finalSel.startLineNumber === finalSel.endLineNumber && finalSel.startColumn === finalSel.endColumn)
-        ws.sendAwareness(
-          finalPos.lineNumber,
-          finalPos.column,
-          hasSel && finalSel ? { startLine: finalSel.startLineNumber, startCol: finalSel.startColumn, endLine: finalSel.endLineNumber, endCol: finalSel.endColumn } : undefined,
-          { codeLen: model.getValueLength() },
-        )
-      }
+    const doc = new Y.Doc()
+    const yText = doc.getText('code')
+    if (seedCode) {
+      yText.insert(0, seedCode)
     }
-    setLocalCode(ws.code)
-    prevLocalCodeRef.current = ws.code
-  }, [ws.code, ws.sendAwareness])
 
-  // Push starter code once snapshot arrives, overriding whatever the server has
-  useEffect(() => {
-    if (!ws.gotSnapshot || sentStarterCode.current || !starterCodeRef.current) return
-    sentStarterCode.current = true
-    if (ws.code === starterCodeRef.current) return // already correct, no resend needed
-    const model = editorRef.current?.getModel()
-    if (model) model.setValue(starterCodeRef.current)
-    setLocalCode(starterCodeRef.current)
-    ws.sendUpdate(starterCodeRef.current) // always push — model readiness is irrelevant
-  }, [ws.gotSnapshot, ws.sendUpdate])
+    const binding = new MonacoBinding(yText, model, new Set([editor]))
+    const handleDocUpdate = (update: Uint8Array, origin: unknown) => {
+      if (origin === 'remote') return
+
+      const encoder = encoding.createEncoder()
+      syncProtocol.writeUpdate(encoder, update)
+      ws.sendDocSync(encodeBinaryToBase64(encoding.toUint8Array(encoder)))
+    }
+
+    doc.on('update', handleDocUpdate)
+
+    yDocRef.current = doc
+    bindingRef.current = binding
+    currentCodeRef.current = model.getValue()
+
+    if (hasLocalSeedOverride && seedCode) {
+      const encoder = encoding.createEncoder()
+      syncProtocol.writeUpdate(encoder, Y.encodeStateAsUpdate(doc))
+      ws.sendDocSync(encodeBinaryToBase64(encoding.toUint8Array(encoder)))
+      ws.persistCode(seedCode)
+    }
+
+    const syncEncoder = encoding.createEncoder()
+    syncProtocol.writeSyncStep1(syncEncoder, doc)
+    ws.sendDocSync(encodeBinaryToBase64(encoding.toUint8Array(syncEncoder)))
+    flushQueuedDocMessages()
+
+    return () => {
+      doc.off('update', handleDocUpdate)
+      binding.destroy()
+      doc.destroy()
+      bindingRef.current = null
+      yDocRef.current = null
+    }
+  }, [roomId, ws.connected, ws.gotSnapshot, ws.code, ws.sendDocSync, ws.persistCode, flushQueuedDocMessages, isDuelRoom])
 
   // Update room from room_update WS message (fired on join/leave/status change)
   useEffect(() => {
     if (!ws.lastRoomUpdate) return
     const update = ws.lastRoomUpdate as {
       status?: string
+      language?: string
       participants?: Array<{ id: string; displayName: string; userId?: string; isGuest?: boolean; isReady?: boolean; joinedAt?: string }>
     }
 
@@ -408,6 +485,7 @@ export function CodeRoomPage() {
       return {
         ...prev,
         ...(mappedStatus ? { status: mappedStatus as Room['status'] } : {}),
+        ...(update.language ? { language: update.language as Room['language'] } : {}),
         ...(mappedParticipants ? { participants: mappedParticipants } : {}),
       }
     })
@@ -428,7 +506,7 @@ export function CodeRoomPage() {
 
   // Tab visibility anti-cheat tracking
   useEffect(() => {
-    if (!ws.connected) return
+    if (!ws.connected || isDuelRoom) return
     const handler = () => {
       ws.sendAwareness(
         lastCursorRef.current.line,
@@ -439,10 +517,18 @@ export function CodeRoomPage() {
     }
     document.addEventListener('visibilitychange', handler)
     return () => document.removeEventListener('visibilitychange', handler)
-  }, [ws.connected, ws.sendAwareness])
+  }, [isDuelRoom, ws.connected, ws.sendAwareness])
 
   // Remote cursor widgets — update mutable posRef in-place (no remove/re-add = no flicker)
   useEffect(() => {
+    if (isDuelRoom) {
+      const editor = editorRef.current
+      widgetsRef.current.forEach(w => editor?.removeContentWidget(w))
+      widgetsRef.current.clear()
+      cursorPositionsRef.current.clear()
+      decorationsRef.current?.clear()
+      return
+    }
     const editor = editorRef.current
     const monaco = monacoRef.current
     if (!editor || !monaco) return
@@ -482,7 +568,10 @@ export function CodeRoomPage() {
         range: new monaco.Range(state.cursorLine, col, state.cursorLine, col),
         options: { overviewRuler: { color, position: monaco.editor.OverviewRulerLane.Right } },
       })
+      const localLen = editor.getModel()?.getValueLength()
+      const selIsStale = state.codeLen !== undefined && localLen !== undefined && state.codeLen !== localLen
       if (
+        !selIsStale &&
         state.selStartLine && state.selEndLine &&
         !(state.selStartLine === state.selEndLine && (state.selStartCol ?? 1) === (state.selEndCol ?? 1))
       ) {
@@ -499,7 +588,7 @@ export function CodeRoomPage() {
       decorationsRef.current = editor.createDecorationsCollection(newDecorations)
     }
     // No cleanup on re-run — managed by cursorPositionsRef; only unmount cleans up
-  }, [ws.awareness])
+  }, [isDuelRoom, ws.awareness])
 
   // Unmount cleanup for remote cursor widgets
   useEffect(() => () => {
@@ -508,6 +597,14 @@ export function CodeRoomPage() {
     widgetsRef.current.clear()
     cursorPositionsRef.current.clear()
   }, [])
+
+  useEffect(() => () => {
+    if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
+    if (persistTimerRef.current) clearTimeout(persistTimerRef.current)
+    if (currentCodeRef.current) {
+      ws.persistCode(currentCodeRef.current)
+    }
+  }, [ws.persistCode])
 
   // Sync WebSocket submission results
   useEffect(() => {
@@ -518,58 +615,16 @@ export function CodeRoomPage() {
     }
   }, [ws.lastSubmission])
 
-  const handleCodeChange = useCallback((value: string | undefined) => {
-    if (isApplyingRemoteCode.current) return
-    const oldCode = prevLocalCodeRef.current
-    const v = value ?? ''
-    prevLocalCodeRef.current = v
-    setLocalCode(v)
-    skipNextWsUpdate.current = true
-    ws.sendUpdate(v)
-
-    // OT-transform remote cursor positions so they follow local typing smoothly.
-    // The main source of jumping was onDidChangeCursorSelection firing during model.setValue
-    // (which sent bogus (1,1) awareness). That's now suppressed. OT here is safe.
-    if (cursorPositionsRef.current.size > 0 && oldCode !== v) {
-      const editor = editorRef.current
-      const model = editor?.getModel()
-      if (model) {
-        cursorPositionsRef.current.forEach((posRef, userId) => {
-          const lines = oldCode.split('\n')
-          let offset = 0
-          for (let i = 0; i < posRef.line - 1 && i < lines.length; i++) offset += lines[i].length + 1
-          offset = Math.min(offset + posRef.col - 1, oldCode.length)
-          let start = 0
-          const minLen = Math.min(oldCode.length, v.length)
-          while (start < minLen && oldCode[start] === v[start]) start++
-          if (offset >= start) {
-            let oldTail = oldCode.length; let newTail = v.length
-            while (oldTail > start && newTail > start && oldCode[oldTail - 1] === v[newTail - 1]) { oldTail--; newTail-- }
-            const deleted = oldTail - start; const inserted = newTail - start
-            if (offset >= start + deleted) offset = offset - deleted + inserted
-            else offset = start + inserted
-          }
-          const newPos = model.getPositionAt(Math.min(offset, v.length))
-          posRef.line = newPos.lineNumber
-          posRef.col = newPos.column
-          const widget = widgetsRef.current.get(userId)
-          if (widget) editor!.layoutContentWidget(widget)
-        })
-      }
-    }
-
-    if (soloDraftTaskId) {
-      if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
-      saveDraftTimer.current = setTimeout(() => setSoloDraft(soloDraftTaskId, v), 1000)
-    }
-  }, [ws.sendUpdate, soloDraftTaskId])
+  const getCurrentCode = useCallback(() => {
+    return editorRef.current?.getModel()?.getValue() ?? currentCodeRef.current
+  }, [])
 
   const handleRun = async () => {
     if (!roomId) return
     setRunning(true)
     setSubmitResult(null)
     try {
-      const result = await codeRoomApi.submitCode(roomId, localCode, guestNameRef.current)
+      const result = await codeRoomApi.submitCode(roomId, getCurrentCode(), guestNameRef.current, lang)
       setSubmitResult(result)
       setAiTab('result')
       setShowAiPanel(true)
@@ -591,7 +646,7 @@ export function CodeRoomPage() {
     try {
       const res = await apiClient.post('/api/v1/code-editor/ai-review', {
         language: lang,
-        code: localCode,
+        code: getCurrentCode(),
         task_title: room?.task ?? '',
         statement: customPrompt || (room?.task ? `Реши задачу: ${room.task}` : ''),
       })
@@ -643,6 +698,49 @@ export function CodeRoomPage() {
     monacoRef.current = monaco
     registerDarkTheme(monaco)
     monaco.editor.setTheme(theme === 'dark' ? 'druzya-dark' : 'vs')
+    const model = editor.getModel()
+    if (model && initialCodeRef.current && model.getValue() !== initialCodeRef.current) {
+      model.setValue(initialCodeRef.current)
+      currentCodeRef.current = initialCodeRef.current
+    }
+
+    editor.onDidChangeModelContent(() => {
+      const nextModel = editor.getModel()
+      if (!nextModel) return
+
+      const oldCode = currentCodeRef.current
+      const nextCode = nextModel.getValue()
+      if (oldCode === nextCode) return
+
+      currentCodeRef.current = nextCode
+
+      // Shift remote cursor widgets locally so they stay visually aligned while
+      // the next awareness packet is in flight.
+      if (cursorPositionsRef.current.size > 0) {
+        cursorPositionsRef.current.forEach((posRef, userId) => {
+          const lines = oldCode.split('\n')
+          let offset = 0
+          for (let i = 0; i < posRef.line - 1 && i < lines.length; i++) offset += lines[i].length + 1
+          offset = Math.min(offset + posRef.col - 1, oldCode.length)
+          offset = transformCursorOffset(offset, oldCode, nextCode)
+          const newPos = nextModel.getPositionAt(Math.min(offset, nextCode.length))
+          posRef.line = newPos.lineNumber
+          posRef.col = newPos.column
+          const widget = widgetsRef.current.get(userId)
+          if (widget) editor.layoutContentWidget(widget)
+        })
+      }
+
+      if (soloDraftTaskId) {
+        if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
+        saveDraftTimer.current = setTimeout(() => setSoloDraft(soloDraftTaskId, nextCode), 1000)
+      }
+
+      if (isDuelRoom) {
+        ws.sendUpdate(nextCode)
+      }
+      schedulePersist(nextCode)
+    })
 
     // Send cursor + selection awareness, track last known position
     // Throttle to ~30ms with trailing edge so the LAST position is always sent
@@ -650,10 +748,7 @@ export function CodeRoomPage() {
     let pendingCursorUpdate: (() => void) | null = null
 
     editor.onDidChangeCursorSelection((e) => {
-      // Suppress awareness during model.setValue (remote code application):
-      // Monaco resets cursor to (1,1) on setValue which would broadcast a bogus
-      // position and make remote users see the cursor jump on every keystroke.
-      if (isApplyingRemoteCode.current) return
+      if (isDuelRoom) return
       const sel = e.selection
       lastCursorRef.current = { line: sel.positionLineNumber, col: sel.positionColumn }
       const hasSelection = !(
@@ -694,6 +789,7 @@ export function CodeRoomPage() {
 
     // Detect paste → anti-cheat signal
     editor.onDidPaste(() => {
+      if (isDuelRoom) return
       if (!isCreatorRef.current) {
         ws.sendAwareness(lastCursorRef.current.line, lastCursorRef.current.col, undefined, { pastedCode: true })
         // Clear the flag after a short delay so it can fire again
@@ -702,13 +798,15 @@ export function CodeRoomPage() {
         }, 2000)
       }
     })
-  }, [ws.sendAwareness])
+  }, [theme, schedulePersist, soloDraftTaskId, isDuelRoom, ws.sendAwareness, ws.sendUpdate])
 
   if (needsGuestName) {
     return <GuestNamePrompt onSubmit={handleGuestNameSubmit} />
   }
 
-  const lang = ws.language || 'python'
+  const roomLanguage = getMonacoLanguage(room?.language ?? '')
+  const lang = ws.language || (roomLanguage === 'plaintext' ? 'python' : roomLanguage)
+  const roomLanguages = getAvailableRoomLanguages(room?.mode, lang)
   const status = room ? (STATUS_LABELS[room.status] ?? { label: room.status, variant: 'default' as const }) : null
 
   return (
@@ -739,8 +837,7 @@ export function CodeRoomPage() {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          {/* Realtime participants from awareness */}
-          {Array.from(ws.awareness.values()).map(a => (
+          {!isDuelRoom && Array.from(ws.awareness.values()).map(a => (
             <div key={a.userId} className="relative" title={a.displayName}>
               <Avatar name={a.displayName} size="xs" />
               <span
@@ -749,11 +846,9 @@ export function CodeRoomPage() {
               />
             </div>
           ))}
-          {room?.participants
-            .filter(p => !ws.awareness.has(p.userId || p.name))
-            .map(p => (
-              <Avatar key={p.userId || p.name} name={p.name} size="xs" className="opacity-40" />
-            ))}
+          {(isDuelRoom ? room?.participants : room?.participants?.filter(p => !ws.awareness.has(p.userId || p.name)))?.map(p => (
+            <Avatar key={p.userId || p.name} name={p.name} size="xs" className={!isDuelRoom ? 'opacity-40' : undefined} />
+          ))}
 
           {/* Theme toggle — available to all */}
           <button
@@ -868,7 +963,7 @@ export function CodeRoomPage() {
           <div className="flex-1 flex flex-col rounded-xl overflow-hidden border border-[#2d3748] shadow-md">
             <div className="h-9 bg-[#1e293b] flex items-center px-4 gap-3 flex-shrink-0">
               <span className="text-xs text-[#94a3b8] font-mono">
-                solution.{lang === 'python' ? 'py' : lang === 'javascript' ? 'js' : lang === 'typescript' ? 'ts' : lang === 'go' ? 'go' : lang === 'rust' ? 'rs' : lang === 'java' ? 'java' : 'py'}
+                solution.{lang === 'python' ? 'py' : lang === 'go' ? 'go' : lang === 'sql' ? 'sql' : 'txt'}
               </span>
               <div className="ml-auto relative">
                 <button
@@ -881,7 +976,7 @@ export function CodeRoomPage() {
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowLangDropdown(false)} />
                     <div className="absolute right-0 top-full mt-1 z-50 bg-[#1e293b] border border-[#334155] rounded-lg shadow-xl overflow-hidden min-w-[130px]">
-                      {LANGUAGES.map(l => (
+                      {roomLanguages.map(l => (
                         <button
                           key={l.value}
                           onClick={() => { ws.sendLanguageChange(l.value); setShowLangDropdown(false) }}
@@ -899,8 +994,7 @@ export function CodeRoomPage() {
               <Editor
                 height="100%"
                 language={getMonacoLanguage(lang)}
-                value={localCode}
-                onChange={handleCodeChange}
+                defaultValue={initialCodeRef.current}
                 onMount={handleEditorMount}
                 options={{
                   fontSize: 13,

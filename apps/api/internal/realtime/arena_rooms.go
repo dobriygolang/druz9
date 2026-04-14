@@ -72,6 +72,10 @@ func (h *ArenaHub) handleCodeUpdate(client *arenaClient, msg schema.ArenaMessage
 		h.mu.Unlock()
 		return
 	}
+	if !arenaUserCanEdit(room.match, client.userID, client.spectator) {
+		h.mu.Unlock()
+		return
+	}
 
 	code := schema.ArenaPlayerCode{
 		UserID: client.userID,
@@ -92,11 +96,13 @@ func (h *ArenaHub) handleCodeUpdate(client *arenaClient, msg schema.ArenaMessage
 	h.mu.Unlock()
 
 	for _, other := range targets {
+		codeValue, obfuscated := h.viewerCode(match, &code, other.userID, other.spectator)
 		other.enqueue(schema.ArenaMessage{
-			Type:      schema.ArenaTypeCodeUpdate,
-			UserID:    client.userID,
-			Code:      h.viewerCode(match, &code, other.userID, other.spectator),
-			UpdatedAt: time.Now().UTC().Format(time.RFC3339Nano),
+			Type:       schema.ArenaTypeCodeUpdate,
+			UserID:     client.userID,
+			Code:       codeValue,
+			Obfuscated: obfuscated,
+			UpdatedAt:  time.Now().UTC().Format(time.RFC3339Nano),
 		})
 	}
 }
@@ -157,33 +163,32 @@ func (h *ArenaHub) viewerCodesLocked(room *arenaMatchRoom, viewerUserID string, 
 		if item == nil {
 			continue
 		}
+		codeValue, obfuscated := h.viewerCode(room.match, item, viewerUserID, spectator)
 		result = append(result, &schema.ArenaPlayerCode{
 			UserID:      item.UserID,
 			DisplayName: item.DisplayName,
-			Code:        h.viewerCode(room.match, item, viewerUserID, spectator),
+			Code:        codeValue,
 			IsSelf:      item.UserID == viewerUserID,
+			Obfuscated:  obfuscated,
 		})
 	}
 	return result
 }
 
-func (h *ArenaHub) viewerCode(match *schema.ArenaMatch, item *schema.ArenaPlayerCode, viewerUserID string, spectator bool) string {
+func (h *ArenaHub) viewerCode(match *schema.ArenaMatch, item *schema.ArenaPlayerCode, viewerUserID string, spectator bool) (string, bool) {
 	if item == nil {
-		return ""
+		return "", false
 	}
 	if item.UserID == viewerUserID {
-		return item.Code
-	}
-	if spectator && (match == nil || match.Status != model.ArenaMatchStatusFinished.String()) {
-		return ""
+		return item.Code, false
 	}
 	if match != nil && match.Status == model.ArenaMatchStatusFinished.String() {
-		return item.Code
+		return item.Code, false
 	}
-	if match == nil || !match.ObfuscateOpponent {
-		return item.Code
+	if spectator || viewerUserID == "" {
+		return "", true
 	}
-	return obfuscateCode(item.Code)
+	return "", true
 }
 
 func (h *ArenaHub) bindDisplayName(matchID, userID, displayName string) {
@@ -208,4 +213,19 @@ func (h *ArenaHub) bindDisplayName(matchID, userID, displayName string) {
 	if code := room.codes[userID]; code != nil && code.DisplayName == "" {
 		code.DisplayName = displayName
 	}
+}
+
+func arenaUserCanEdit(match *schema.ArenaMatch, userID string, spectator bool) bool {
+	if spectator || userID == "" {
+		return false
+	}
+	if match == nil {
+		return false
+	}
+	for _, player := range match.Players {
+		if player != nil && player.UserID == userID {
+			return true
+		}
+	}
+	return false
 }

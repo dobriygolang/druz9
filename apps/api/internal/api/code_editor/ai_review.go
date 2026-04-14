@@ -6,6 +6,7 @@ import (
 
 	"api/internal/aireview"
 	v1 "api/pkg/api/code_editor/v1"
+	commonv1 "api/pkg/api/common/v1"
 
 	kratosErrors "github.com/go-kratos/kratos/v2/errors"
 )
@@ -27,7 +28,7 @@ func (i *Implementation) AIReview(ctx context.Context, req *v1.AIReviewRequest) 
 		return nil, err
 	}
 	return &v1.AIReviewResponse{
-		Review: &v1.InterviewSolutionReview{
+		Review: &commonv1.InterviewSolutionReview{
 			Provider:           review.Provider,
 			Model:              review.Model,
 			Score:              int32(review.Score),

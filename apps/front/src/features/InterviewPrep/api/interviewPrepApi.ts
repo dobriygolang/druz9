@@ -23,6 +23,11 @@ type BackendTask = {
   starterCode?: string; isActive?: boolean; createdAt?: string; updatedAt?: string
 }
 
+/** Invert a Record<K,V> into Record<V,K> — single source of truth for bidirectional maps */
+function invertMap(map: Record<string, string>): Record<string, string> {
+  return Object.fromEntries(Object.entries(map).map(([k, v]) => [v, k]))
+}
+
 const LANGUAGE_ENUM_TO_FRIENDLY: Record<string, string> = {
   PROGRAMMING_LANGUAGE_JAVASCRIPT: 'javascript',
   PROGRAMMING_LANGUAGE_TYPESCRIPT: 'typescript',
@@ -34,16 +39,7 @@ const LANGUAGE_ENUM_TO_FRIENDLY: Record<string, string> = {
   PROGRAMMING_LANGUAGE_SQL: 'sql',
 }
 
-const LANGUAGE_FRIENDLY_TO_ENUM: Record<string, string> = {
-  javascript: 'PROGRAMMING_LANGUAGE_JAVASCRIPT',
-  typescript: 'PROGRAMMING_LANGUAGE_TYPESCRIPT',
-  python: 'PROGRAMMING_LANGUAGE_PYTHON',
-  go: 'PROGRAMMING_LANGUAGE_GO',
-  rust: 'PROGRAMMING_LANGUAGE_RUST',
-  cpp: 'PROGRAMMING_LANGUAGE_CPP',
-  java: 'PROGRAMMING_LANGUAGE_JAVA',
-  sql: 'PROGRAMMING_LANGUAGE_SQL',
-}
+const LANGUAGE_FRIENDLY_TO_ENUM = invertMap(LANGUAGE_ENUM_TO_FRIENDLY)
 
 const PREP_TYPE_ENUM_TO_FRIENDLY: Record<string, string> = {
   PREP_TYPE_CODING: 'coding',

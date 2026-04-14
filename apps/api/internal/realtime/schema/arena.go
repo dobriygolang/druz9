@@ -15,6 +15,7 @@ type ArenaMessage struct {
 	DisplayName string             `json:"displayName,omitempty"`
 	Spectator   bool               `json:"spectator,omitempty"`
 	Code        string             `json:"code,omitempty"`
+	Obfuscated  bool               `json:"obfuscated,omitempty"`
 	UpdatedAt   string             `json:"updatedAt,omitempty"`
 	Match       *ArenaMatch        `json:"match,omitempty"`
 	Players     []*ArenaPlayerCode `json:"players,omitempty"`
@@ -25,6 +26,7 @@ type ArenaPlayerCode struct {
 	DisplayName string `json:"displayName"`
 	Code        string `json:"code"`
 	IsSelf      bool   `json:"isSelf"`
+	Obfuscated  bool   `json:"obfuscated,omitempty"`
 }
 
 type ArenaMatch struct {

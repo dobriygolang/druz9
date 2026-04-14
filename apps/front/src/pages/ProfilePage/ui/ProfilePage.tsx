@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, X, Check, Flame, ChevronRight } from 'lucide-react'
+import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, Check, Flame, ChevronRight } from 'lucide-react'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi } from '@/features/Auth/api/authApi'
 import type { User, ProfileProgress } from '@/entities/User/model/types'
@@ -205,12 +205,12 @@ export function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="p-4 md:p-6 animate-pulse space-y-3">
-        <div className="bg-white rounded-2xl border border-[#CBCCC9] h-[140px]" />
-        <div className="grid grid-cols-4 gap-3">
-          {Array.from({ length: 4 }).map((_, i) => <div key={i} className="bg-white rounded-2xl border border-[#CBCCC9] h-16" />)}
+      <div className="animate-pulse space-y-4 px-4 pb-6 pt-4 md:p-6">
+        <div className="h-[220px] rounded-[32px] border border-[#CBCCC9] bg-white" />
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+          {Array.from({ length: 4 }).map((_, i) => <div key={i} className="h-16 rounded-2xl border border-[#CBCCC9] bg-white" />)}
         </div>
-        <div className="bg-white rounded-2xl border border-[#CBCCC9] h-[200px]" />
+        <div className="h-[240px] rounded-[28px] border border-[#CBCCC9] bg-white" />
       </div>
     )
   }
@@ -237,118 +237,129 @@ export function ProfilePage() {
     { id: 'progress', label: 'Прогресс' },
     { id: 'achievements', label: 'Достижения' },
   ]
+  const statsGridClass = stats.length > 2 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2'
 
   return (
-    <div className="p-4 md:p-6 flex flex-col gap-4 max-w-5xl mx-auto w-full">
-      {/* Hero card */}
-      <div className="bg-white rounded-2xl border border-[#CBCCC9] overflow-hidden">
-        {/* Top accent strip */}
-        <div className="h-1.5 bg-gradient-to-r from-[#6366F1] via-[#818CF8] to-[#a78bfa]" />
-        <div className="p-5 flex items-start gap-4">
-          <Avatar name={displayName} src={user.avatarUrl || undefined} size="xl" className="flex-shrink-0" />
-          <div className="flex-1 min-w-0">
-            <div className="flex items-start justify-between gap-2 flex-wrap">
-              <div>
-                <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-lg font-bold text-[#111111]">{displayName}</h1>
-                  {user.isTrusted && <Badge variant="info">Trusted</Badge>}
-                  {user.isAdmin && <Badge variant="warning">Admin</Badge>}
+    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 pb-6 pt-4 md:gap-5 md:p-6">
+      <section className="section-enter relative overflow-hidden rounded-[32px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.94)_44%,_rgba(255,247,237,0.92))] shadow-[0_22px_52px_rgba(15,23,42,0.08)] dark:border-[#1a2540] dark:bg-[linear-gradient(145deg,_rgba(22,28,45,0.98),_rgba(19,25,41,0.92)_52%,_rgba(42,32,10,0.42))]">
+        <div className="pointer-events-none absolute inset-y-0 right-[-12%] w-[46%] rounded-full bg-[radial-gradient(circle,_rgba(99,102,241,0.24),_transparent_70%)] blur-3xl dark:bg-[radial-gradient(circle,_rgba(129,140,248,0.18),_transparent_72%)]" />
+        <div className="relative p-5 md:p-6">
+          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+            <Avatar
+              name={displayName}
+              src={user.avatarUrl || undefined}
+              size="xl"
+              className="ring-4 ring-white/80 shadow-[0_16px_32px_rgba(15,23,42,0.12)] dark:ring-[#121b30]"
+            />
+
+            <div className="min-w-0 flex-1">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div className="min-w-0">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1] dark:text-[#a5b4fc]">
+                    Profile
+                  </p>
+                  <div className="mt-2 flex flex-wrap items-center gap-2">
+                    <h1 className="text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{displayName}</h1>
+                    {user.isTrusted && <Badge variant="info">Trusted</Badge>}
+                    {user.isAdmin && <Badge variant="warning">Admin</Badge>}
+                  </div>
+                  {user.username && <p className="mt-1 text-xs text-[#94a3b8]">@{user.username}</p>}
                 </div>
-                {user.username && <p className="text-xs text-[#94a3b8] mt-0.5">@{user.username}</p>}
+
+                {isOwn && (
+                  <Button variant="secondary" size="sm" className="w-full justify-center rounded-full sm:w-auto" onClick={openEdit}>
+                    <Edit3 className="w-3.5 h-3.5" /> Изменить
+                  </Button>
+                )}
               </div>
-              {isOwn && (
-                <Button variant="secondary" size="sm" className="flex-shrink-0" onClick={openEdit}>
-                  <Edit3 className="w-3.5 h-3.5" /> Изменить
-                </Button>
-              )}
-            </div>
 
-            <div className="flex flex-wrap gap-x-4 gap-y-1 mt-2.5">
-              {user.region && (
-                <span className="flex items-center gap-1 text-xs text-[#666666]">
-                  <MapPin className="w-3 h-3" /> {user.region}
-                </span>
-              )}
-              {user.currentWorkplace && (
-                <span className="flex items-center gap-1 text-xs text-[#666666]">
-                  <Briefcase className="w-3 h-3" /> {user.currentWorkplace}
-                </span>
-              )}
-              {user.createdAt && (
-                <span className="flex items-center gap-1 text-xs text-[#666666]">
-                  <Calendar className="w-3 h-3" /> С {formatJoinDate(user.createdAt)}
-                </span>
-              )}
-            </div>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {user.region && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/76 px-3 py-1 text-xs text-[#475569] backdrop-blur dark:bg-[#10192b]/78 dark:text-[#94a3b8]">
+                    <MapPin className="w-3 h-3" /> {user.region}
+                  </span>
+                )}
+                {user.currentWorkplace && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/76 px-3 py-1 text-xs text-[#475569] backdrop-blur dark:bg-[#10192b]/78 dark:text-[#94a3b8]">
+                    <Briefcase className="w-3 h-3" /> {user.currentWorkplace}
+                  </span>
+                )}
+                {user.createdAt && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-white/76 px-3 py-1 text-xs text-[#475569] backdrop-blur dark:bg-[#10192b]/78 dark:text-[#94a3b8]">
+                    <Calendar className="w-3 h-3" /> С {formatJoinDate(user.createdAt)}
+                  </span>
+                )}
+              </div>
 
-            <div className="flex flex-wrap items-center gap-1.5 mt-2.5">
-              {user.connectedProviders.includes('telegram') && (
-                <span className="px-2 py-0.5 bg-[#e8f4fd] text-[#0088cc] text-[11px] font-medium rounded-full">Telegram</span>
-              )}
-              {user.connectedProviders.includes('yandex') && (
-                <span className="px-2 py-0.5 bg-[#fff7ed] text-[#ea580c] text-[11px] font-medium rounded-full">Яндекс</span>
-              )}
-              {isOwn && !user.connectedProviders.includes('telegram') && (
-                <button
-                  onClick={bindTelegram}
-                  disabled={!!bindingProvider}
-                  className="px-2 py-0.5 bg-[#e8f4fd] text-[#0088cc] text-[11px] font-medium rounded-full border border-[#0088cc]/20 hover:bg-[#cce9fa] transition-colors disabled:opacity-50"
-                >
-                  {bindingProvider === 'telegram' ? 'Открываем...' : '+ Привязать Telegram'}
-                </button>
-              )}
-              {isOwn && !user.connectedProviders.includes('yandex') && (
-                <button
-                  onClick={bindYandex}
-                  disabled={!!bindingProvider}
-                  className="px-2 py-0.5 bg-[#fff7ed] text-[#ea580c] text-[11px] font-medium rounded-full border border-[#ea580c]/20 hover:bg-[#ffe4cc] transition-colors disabled:opacity-50"
-                >
-                  {bindingProvider === 'yandex' ? 'Перенаправляем...' : '+ Привязать Яндекс'}
-                </button>
-              )}
-              {bindError && <span className="text-[11px] text-red-500">{bindError}</span>}
+              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+                {user.connectedProviders.includes('telegram') && (
+                  <span className="rounded-full bg-[#e8f4fd] px-2.5 py-1 text-[11px] font-medium text-[#0088cc]">Telegram</span>
+                )}
+                {user.connectedProviders.includes('yandex') && (
+                  <span className="rounded-full bg-[#fff7ed] px-2.5 py-1 text-[11px] font-medium text-[#ea580c]">Яндекс</span>
+                )}
+                {isOwn && !user.connectedProviders.includes('telegram') && (
+                  <button
+                    onClick={bindTelegram}
+                    disabled={!!bindingProvider}
+                    className="rounded-full border border-[#0088cc]/20 bg-[#e8f4fd] px-2.5 py-1 text-[11px] font-medium text-[#0088cc] transition-colors hover:bg-[#cce9fa] disabled:opacity-50"
+                  >
+                    {bindingProvider === 'telegram' ? 'Открываем...' : '+ Привязать Telegram'}
+                  </button>
+                )}
+                {isOwn && !user.connectedProviders.includes('yandex') && (
+                  <button
+                    onClick={bindYandex}
+                    disabled={!!bindingProvider}
+                    className="rounded-full border border-[#ea580c]/20 bg-[#fff7ed] px-2.5 py-1 text-[11px] font-medium text-[#ea580c] transition-colors hover:bg-[#ffe4cc] disabled:opacity-50"
+                  >
+                    {bindingProvider === 'yandex' ? 'Перенаправляем...' : '+ Привязать Яндекс'}
+                  </button>
+                )}
+                {bindError && <span className="text-[11px] text-red-500">{bindError}</span>}
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Stats strip */}
         {stats.length > 0 && (
-          <div className="border-t border-[#F2F3F0] grid divide-x divide-[#F2F3F0]" style={{ gridTemplateColumns: `repeat(${stats.length}, 1fr)` }}>
+          <div className={`grid ${statsGridClass} gap-px border-t border-[#d8d9d6]/70 bg-[#d8d9d6]/70 dark:border-[#1a2540] dark:bg-[#1a2540]`}>
             {stats.map(s => (
-              <div key={s.label} className="flex flex-col items-center justify-center gap-0.5 py-3">
+              <div key={s.label} className="flex flex-col items-center justify-center gap-1 bg-white/84 px-4 py-4 backdrop-blur dark:bg-[#10192b]/84">
                 <div className="flex items-center gap-1.5">
-                  <div className="w-6 h-6 rounded-lg flex items-center justify-center" style={{ background: s.bg }}>
+                  <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: s.bg }}>
                     {s.icon}
                   </div>
-                  <span className="text-base font-bold text-[#111111] font-mono">{s.value}</span>
+                  <span className="font-mono text-base font-bold text-[#111111] dark:text-[#f8fafc]">{s.value}</span>
                 </div>
                 <span className="text-[11px] text-[#94a3b8]">{s.label}</span>
               </div>
             ))}
           </div>
         )}
-      </div>
+      </section>
 
-      {/* Tabs */}
-      <div className="flex gap-1 bg-[#F2F3F0] p-1 rounded-xl w-fit">
-        {tabs.map(tab => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
-              activeTab === tab.id
-                ? 'bg-white text-[#111111] shadow-sm'
-                : 'text-[#666666] dark:text-[#4d6380] hover:text-[#111111] dark:hover:text-[#e2e8f3]'
-            }`}
-          >
-            {tab.label}
-          </button>
-        ))}
+      <div className="-mx-4 overflow-x-auto px-4 no-scrollbar md:mx-0 md:px-0">
+        <div className="inline-flex min-w-full gap-2 rounded-[24px] border border-[#d8d9d6] bg-white/72 p-1.5 shadow-[0_18px_34px_rgba(15,23,42,0.06)] backdrop-blur dark:border-[#1a2540] dark:bg-[#10192b]/72 md:min-w-0">
+          {tabs.map(tab => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`whitespace-nowrap rounded-[18px] px-4 py-2.5 text-sm font-medium transition-all ${
+                activeTab === tab.id
+                  ? 'bg-[#111111] text-white shadow-[0_14px_24px_rgba(15,23,42,0.14)] dark:bg-white dark:text-[#08101f]'
+                  : 'text-[#666666] dark:text-[#4d6380] hover:bg-white/80 hover:text-[#111111] dark:hover:bg-[#161f34] dark:hover:text-[#e2e8f3]'
+              }`}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Tab content */}
       {activeTab === 'activity' && (
-        <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
+        <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
           <h3 className="text-sm font-semibold text-[#111111] mb-4">Активность за год</h3>
           {activity.length > 0 ? (
             <ActivityHeatmap activity={activity} />
@@ -392,7 +403,7 @@ export function ProfilePage() {
       {activeTab === 'progress' && (
         <div className="flex flex-col gap-4">
           {progress && progress.overview.practiceSessions > 0 && (
-            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
+            <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
               <h3 className="text-sm font-semibold text-[#111111] mb-3">Обзор</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
@@ -411,7 +422,7 @@ export function ProfilePage() {
           )}
 
           {progress && (
-            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
+            <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
               <div className="flex items-start justify-between gap-2 mb-1">
                 <h3 className="text-sm font-semibold text-[#111111]">Компании</h3>
               </div>
@@ -423,8 +434,8 @@ export function ProfilePage() {
                   {progress.mockSessions.map(s => {
                     const isActive = s.status === 'active'
                     const stageKindLabel: Record<string, string> = {
-                      coding: 'Кодинг', slices: 'Срезы', concurrency: 'Многопоточность',
-                      sql: 'SQL', architecture: 'Архитектура', system_design: 'System Design',
+                      coding: 'Кодинг', slices: 'Алгоритмы', concurrency: 'Кодинг',
+                      sql: 'SQL', architecture: 'Code Review', system_design: 'System Design',
                     }
                     const kindLabel = stageKindLabel[s.currentStageKind] ?? s.currentStageKind
                     const stageNum = Math.min(s.currentStageIndex + 1, s.totalStages || 1)
@@ -472,7 +483,7 @@ export function ProfilePage() {
           )}
 
           {progress && progress.checkpoints.length > 0 && (
-            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
+            <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
               <h3 className="text-sm font-semibold text-[#111111] mb-3">Прогресс</h3>
               <div className="flex flex-col gap-2">
                 {progress.checkpoints.map((cp, i) => (
@@ -488,7 +499,7 @@ export function ProfilePage() {
           )}
 
           {progress && progress.recommendations.length > 0 && (
-            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
+            <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
               <h3 className="text-sm font-semibold text-[#111111] mb-3">Рекомендации</h3>
               <ul className="space-y-2">
                 {progress.recommendations.map((r, i) => (
@@ -502,7 +513,7 @@ export function ProfilePage() {
           )}
 
           {(!progress || (progress.companies.length === 0 && progress.checkpoints.length === 0)) && (
-            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-12 flex flex-col items-center text-center">
+            <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-12 flex flex-col items-center text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
               <Zap className="w-8 h-8 text-[#CBCCC9] mb-3" />
               <p className="text-sm text-[#94a3b8]">Данных о прогрессе пока нет</p>
             </div>
@@ -511,7 +522,7 @@ export function ProfilePage() {
       )}
 
       {activeTab === 'achievements' && (
-        <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
+        <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
           {achievements.length > 0 ? (
             <AchievementBadges achievements={achievements} />
           ) : (
@@ -524,52 +535,40 @@ export function ProfilePage() {
       )}
 
       {/* Edit modal */}
-      {editMode && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
-          <div className="bg-white rounded-2xl shadow-xl border border-[#CBCCC9] w-full max-w-sm p-6">
-            <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold text-[#111111]">Редактировать профиль</h2>
-              <button onClick={() => setEditMode(false)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]">
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-            <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label className="text-xs font-medium text-[#666666] mb-1 block">Имя</label>
-                  <input value={editFirstName} onChange={e => setEditFirstName(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-[#666666] mb-1 block">Фамилия</label>
-                  <input value={editLastName} onChange={e => setEditLastName(e.target.value)}
-                    className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
-                </div>
-              </div>
-              <div>
-                <label className="text-xs font-medium text-[#666666] mb-1 block">Место работы</label>
-                <input value={editWorkplace} onChange={e => setEditWorkplace(e.target.value)}
-                  placeholder="Компания"
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
-              </div>
-              <div>
-                <label className="text-xs font-medium text-[#666666] mb-1 block">Регион</label>
-                <input value={editRegion} onChange={e => setEditRegion(e.target.value)}
-                  placeholder="Москва, Санкт-Петербург..."
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
-              </div>
-            </div>
-            <div className="flex gap-2 mt-5">
-              <Button variant="secondary" size="sm" onClick={() => setEditMode(false)} className="flex-1 justify-center">
-                Отмена
-              </Button>
-              <Button variant="orange" size="sm" onClick={saveEdit} loading={saving} className="flex-1 justify-center">
-                <Check className="w-3.5 h-3.5" /> Сохранить
-              </Button>
-            </div>
+      <Modal
+        open={editMode}
+        onClose={() => setEditMode(false)}
+        title="Редактировать профиль"
+        footer={
+          <>
+            <Button variant="secondary" size="sm" onClick={() => setEditMode(false)} className="justify-center sm:min-w-[120px]">
+              Отмена
+            </Button>
+            <Button variant="orange" size="sm" onClick={saveEdit} loading={saving} className="justify-center sm:min-w-[140px]">
+              <Check className="w-3.5 h-3.5" /> Сохранить
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <Input label="Имя" value={editFirstName} onChange={e => setEditFirstName(e.target.value)} />
+            <Input label="Фамилия" value={editLastName} onChange={e => setEditLastName(e.target.value)} />
           </div>
+          <Input
+            label="Место работы"
+            value={editWorkplace}
+            onChange={e => setEditWorkplace(e.target.value)}
+            placeholder="Компания"
+          />
+          <Input
+            label="Регион"
+            value={editRegion}
+            onChange={e => setEditRegion(e.target.value)}
+            placeholder="Москва, Санкт-Петербург..."
+          />
         </div>
-      )}
+      </Modal>
 
       {/* Telegram code modal */}
       <Modal

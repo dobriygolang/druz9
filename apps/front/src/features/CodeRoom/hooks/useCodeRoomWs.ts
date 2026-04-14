@@ -7,10 +7,13 @@ interface CodeEditorMessage {
     | 'hello'
     | 'snapshot'
     | 'update'
+    | 'doc_sync'
+    | 'persist'
     | 'awareness'
     | 'awareness_remove'
     | 'room_update'
     | 'submission'
+    | 'language'
     | 'ping'
     | 'pong'
   clientId?: string
@@ -34,6 +37,7 @@ export interface AwarenessState {
   selEndCol?: number
   tabHidden?: boolean
   pastedCode?: boolean
+  codeLen?: number
 }
 
 export interface SubmissionResult {
@@ -51,8 +55,10 @@ interface UseCodeRoomWsOptions {
   userId: string | undefined
   displayName: string
   guestName?: string
+  mode?: 'ROOM_MODE_ALL' | 'ROOM_MODE_DUEL'
   enabled?: boolean
   initialLanguage?: string
+  onDocSync?: (data: string) => void
   onLeave?: (userId: string, displayName: string) => void
   onBehaviorEvent?: (userId: string, displayName: string, event: BehaviorEventType) => void
   /** Fired synchronously on every cursor position change — use for direct widget updates without React cycle */
@@ -75,12 +81,16 @@ interface UseCodeRoomWsReturn {
   lastSubmission: SubmissionResult | null
   lastRoomUpdate: unknown
   sendUpdate: (code: string) => void
+  sendDocSync: (data: string) => void
+  persistCode: (code: string) => void
   sendLanguageChange: (lang: string) => void
   sendAwareness: (line: number, column: number, selection?: SelectionInfo, meta?: Record<string, unknown>) => void
 }
 
 export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
-  const { roomId, userId, displayName, guestName, enabled = true, initialLanguage, onLeave, onBehaviorEvent, onCursorUpdate } = opts
+  const { roomId, userId, displayName, guestName, mode, enabled = true, initialLanguage, onDocSync, onLeave, onBehaviorEvent, onCursorUpdate } = opts
+  const onDocSyncRef = useRef(onDocSync)
+  onDocSyncRef.current = onDocSync
   const onLeaveRef = useRef(onLeave)
   onLeaveRef.current = onLeave
   const onBehaviorRef = useRef(onBehaviorEvent)
@@ -101,6 +111,9 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   const [lastRoomUpdate, setLastRoomUpdate] = useState<unknown>(null)
 
   const isRemoteUpdate = useRef(false)
+
+  // Fast userId→displayName index — avoids reading React state to resolve names
+  const displayNameIndex = useRef<Map<string, string>>(new Map())
 
   // Batch awareness updates into a single React render per animation frame
   const pendingAwareness = useRef<Map<string, { action: 'set'; state: AwarenessState } | { action: 'delete' }>>(new Map())
@@ -133,6 +146,21 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     }
   }, [flushAwareness])
 
+  useEffect(() => {
+    setConnected(false)
+    setGotSnapshot(false)
+    setCode('')
+    setAwareness(new Map())
+    setLastSubmission(null)
+    setLastRoomUpdate(null)
+  }, [roomId, enabled, mode])
+
+  useEffect(() => {
+    if (initialLanguage) {
+      setLanguage(initialLanguage)
+    }
+  }, [initialLanguage])
+
   const handleMessage = useCallback((raw: unknown) => {
     const msg = raw as CodeEditorMessage
     switch (msg.type) {
@@ -151,7 +179,17 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         isRemoteUpdate.current = false
         break
       }
+      case 'language': {
+        if (msg.language) setLanguage(msg.language)
+        if (msg.plainText !== undefined) setCode(msg.plainText)
+        break
+      }
+      case 'doc_sync': {
+        if (msg.data) onDocSyncRef.current?.(msg.data)
+        break
+      }
       case 'awareness': {
+        if (mode === 'ROOM_MODE_DUEL') break
         if (msg.userId && msg.awarenessId !== undefined) {
           let cursorData: Record<string, unknown> = {}
           if (msg.data) {
@@ -190,6 +228,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
             onCursorUpdateRef.current?.(msg.userId!, cursorLine, cursorColumn ?? 1, remoteCodeLen)
           }
 
+          displayNameIndex.current.set(msg.userId!, incomingDisplayName)
           pendingAwareness.current.set(msg.userId!, {
             action: 'set',
             state: {
@@ -203,6 +242,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
               selEndCol: cursorData.selEndCol as number | undefined,
               tabHidden: cursorData.tabHidden as boolean | undefined,
               pastedCode: cursorData.pastedCode as boolean | undefined,
+              codeLen: cursorData.codeLen as number | undefined,
             },
           })
           scheduleAwarenessFlush()
@@ -210,26 +250,14 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         break
       }
       case 'awareness_remove': {
+        if (mode === 'ROOM_MODE_DUEL') break
         if (msg.userId) {
-          // Check pending batch first, then fall back to committed state via callback
-          const pendingEntry = pendingAwareness.current.get(msg.userId!)
-          const pendingDisplayName = pendingEntry && pendingEntry.action === 'set'
-            ? pendingEntry.state.displayName : undefined
           pendingAwareness.current.set(msg.userId!, { action: 'delete' })
           scheduleAwarenessFlush()
-          // Fire onLeave - if we have a pending displayName use it, otherwise
-          // the callback from the committed state is handled by the flush
-          if (pendingDisplayName) {
-            onLeaveRef.current?.(msg.userId!, pendingDisplayName)
-          } else {
-            // Read from committed state synchronously via a one-off setState
-            setAwareness(prev => {
-              const existing = prev.get(msg.userId!)
-              if (existing) {
-                onLeaveRef.current?.(msg.userId!, existing.displayName)
-              }
-              return prev // no change, flush handles deletion
-            })
+          const name = displayNameIndex.current.get(msg.userId!)
+          if (name) {
+            onLeaveRef.current?.(msg.userId!, name)
+            displayNameIndex.current.delete(msg.userId!)
           }
         }
         break
@@ -243,7 +271,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         break
       }
     }
-  }, [scheduleAwarenessFlush])
+  }, [mode, scheduleAwarenessFlush])
 
   useEffect(() => {
     if (!roomId || !enabled) return
@@ -278,6 +306,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         rafId.current = null
       }
       pendingAwareness.current.clear()
+      displayNameIndex.current.clear()
     }
   }, [roomId, userId, enabled, handleMessage, displayName, guestName])
 
@@ -287,12 +316,34 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       type: 'update',
       clientId: clientId.current,
       plainText: newCode,
+      language,
+    })
+  }, [language])
+
+  const sendDocSync = useCallback((data: string) => {
+    socketRef.current?.send({
+      type: 'doc_sync',
+      clientId: clientId.current,
+      data,
     })
   }, [])
 
+  const persistCode = useCallback((plainText: string) => {
+    socketRef.current?.send({
+      type: 'persist',
+      clientId: clientId.current,
+      plainText,
+      language,
+    })
+  }, [language])
+
   const sendLanguageChange = useCallback((lang: string) => {
     setLanguage(lang)
-    socketRef.current?.send({ type: 'update', language: lang })
+    socketRef.current?.send({
+      type: 'language',
+      clientId: clientId.current,
+      language: lang,
+    })
   }, [])
 
   const sendAwareness = useCallback((
@@ -321,5 +372,18 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     })
   }, [userId, guestName, displayName])
 
-  return { connected, gotSnapshot, code, language, awareness, lastSubmission, lastRoomUpdate, sendUpdate, sendLanguageChange, sendAwareness }
+  return {
+    connected,
+    gotSnapshot,
+    code,
+    language,
+    awareness,
+    lastSubmission,
+    lastRoomUpdate,
+    sendUpdate,
+    sendDocSync,
+    persistCode,
+    sendLanguageChange,
+    sendAwareness,
+  }
 }

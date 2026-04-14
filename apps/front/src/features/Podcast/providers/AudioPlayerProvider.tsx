@@ -34,13 +34,31 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   const [speed, setSpeedState] = useState(1)
 
   const audioRef = useRef<HTMLAudioElement | null>(null)
-  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null)
   const speedRef = useRef(1)
   const playingIdRef = useRef<string | null>(null)
 
-  const clearTimer = () => {
-    if (timerRef.current) { clearInterval(timerRef.current); timerRef.current = null }
-  }
+  const handleTimeUpdate = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio?.duration) return
+    setProgress((audio.currentTime / audio.duration) * 100)
+    setCurrentTime(Math.floor(audio.currentTime))
+    setDuration(Math.floor(audio.duration))
+  }, [])
+
+  const handleEnded = useCallback(() => {
+    setIsPlaying(false)
+    setProgress(0)
+    setCurrentTime(0)
+  }, [])
+
+  const cleanupAudio = useCallback(() => {
+    const audio = audioRef.current
+    if (!audio) return
+    audio.removeEventListener('timeupdate', handleTimeUpdate)
+    audio.removeEventListener('ended', handleEnded)
+    audio.pause()
+    audioRef.current = null
+  }, [handleTimeUpdate, handleEnded])
 
   const play = useCallback(async (podcast: Podcast) => {
     // Toggle pause/resume if same podcast
@@ -56,11 +74,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     }
 
     // Stop previous track
-    clearTimer()
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current = null
-    }
+    cleanupAudio()
     playingIdRef.current = podcast.id
 
     try {
@@ -72,12 +86,8 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       audio.addEventListener('loadedmetadata', () => {
         setDuration(Math.floor(audio.duration) || 0)
       })
-      audio.addEventListener('ended', () => {
-        clearTimer()
-        setIsPlaying(false)
-        setProgress(0)
-        setCurrentTime(0)
-      })
+      audio.addEventListener('timeupdate', handleTimeUpdate)
+      audio.addEventListener('ended', handleEnded)
 
       await audio.play()
       setPlaying(podcast)
@@ -85,18 +95,10 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       setProgress(0)
       setCurrentTime(0)
       setDuration(Math.floor(audio.duration) || 0)
-
-      timerRef.current = setInterval(() => {
-        if (audioRef.current?.duration) {
-          setProgress((audioRef.current.currentTime / audioRef.current.duration) * 100)
-          setCurrentTime(Math.floor(audioRef.current.currentTime))
-          setDuration(Math.floor(audioRef.current.duration))
-        }
-      }, 500)
     } catch {
       playingIdRef.current = null
     }
-  }, [])
+  }, [cleanupAudio, handleTimeUpdate, handleEnded])
 
   const pause = useCallback(() => {
     audioRef.current?.pause()
@@ -109,11 +111,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const stop = useCallback(() => {
-    clearTimer()
-    if (audioRef.current) {
-      audioRef.current.pause()
-      audioRef.current = null
-    }
+    cleanupAudio()
     playingIdRef.current = null
     setPlaying(null)
     setIsPlaying(false)
@@ -122,7 +120,7 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     setDuration(0)
     setSpeedState(1)
     speedRef.current = 1
-  }, [])
+  }, [cleanupAudio])
 
   const seek = useCallback((pct: number) => {
     if (!audioRef.current?.duration) return

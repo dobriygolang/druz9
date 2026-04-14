@@ -4,6 +4,7 @@ package arena.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "common/v1/common.proto";
 
 option go_package = "api/pkg/api/arena/v1;v1";
 
@@ -97,13 +98,6 @@ service ArenaService {
 
 // ── Enums ──────────────────────────────────────────────────────────────────
 
-enum Difficulty {
-  DIFFICULTY_UNSPECIFIED = 0;
-  DIFFICULTY_EASY        = 1;
-  DIFFICULTY_MEDIUM      = 2;
-  DIFFICULTY_HARD        = 3;
-}
-
 enum ArenaMatchStatus {
   ARENA_MATCH_STATUS_UNSPECIFIED = 0;
   ARENA_MATCH_STATUS_WAITING     = 1;
@@ -147,14 +141,6 @@ enum WinnerReason {
   WINNER_REASON_OPPONENT_LEFT   = 7;
 }
 
-enum SubmitFailureKind {
-  SUBMIT_FAILURE_KIND_UNSPECIFIED    = 0;
-  SUBMIT_FAILURE_KIND_COMPILE_ERROR  = 1;
-  SUBMIT_FAILURE_KIND_RUNTIME_ERROR  = 2;
-  SUBMIT_FAILURE_KIND_WRONG_ANSWER   = 3;
-  SUBMIT_FAILURE_KIND_TIMEOUT        = 4;
-}
-
 // AntiCheatEventReason classifies the suspicious behaviour being reported.
 enum AntiCheatEventReason {
   ANTI_CHEAT_EVENT_REASON_UNSPECIFIED    = 0;
@@ -168,7 +154,7 @@ enum AntiCheatEventReason {
 
 message CreateMatchRequest {
   string     topic              = 1;
-  Difficulty difficulty         = 2;
+  common.v1.Difficulty difficulty         = 2;
   bool       obfuscate_opponent = 3;
 }
 
@@ -195,7 +181,7 @@ message GetLeaderboardRequest {
 
 message JoinQueueRequest {
   string     topic              = 1;
-  Difficulty difficulty         = 2;  // was: string
+  common.v1.Difficulty difficulty         = 2;  // was: string
   bool       obfuscate_opponent = 3;
 }
 
@@ -236,7 +222,7 @@ message SubmitCodeResponse {
   google.protobuf.Timestamp freeze_until     = 7;
   ArenaMatch                match            = 8;
   int32                     failed_test_index = 9;
-  SubmitFailureKind          failure_kind     = 10;
+  common.v1.SubmitFailureKind          failure_kind     = 10;
 }
 
 message GetLeaderboardResponse {
@@ -246,7 +232,7 @@ message GetLeaderboardResponse {
 message ArenaQueueStateResponse {
   ArenaQueueStatus          status     = 1;  // was: string
   string                    topic      = 2;
-  Difficulty                difficulty = 3;  // was: string
+  common.v1.Difficulty      difficulty = 3;  // was: string
   int32                     queue_size = 4;
   google.protobuf.Timestamp queued_at  = 5;  // was: string
   ArenaMatch                match      = 6;
@@ -277,7 +263,7 @@ message ArenaMatch {
   string                    task_statement     = 4;
   string                    starter_code       = 5;
   string                    topic              = 6;
-  Difficulty                difficulty         = 7;
+  common.v1.Difficulty      difficulty         = 7;
   ArenaMatchStatus          status             = 8;
   int32                     duration_seconds   = 9;
   bool                      obfuscate_opponent = 10;

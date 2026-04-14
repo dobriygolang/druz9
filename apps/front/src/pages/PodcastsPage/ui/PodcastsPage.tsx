@@ -148,40 +148,39 @@ export function PodcastsPage() {
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchPodcasts() }} />
 
   return (
-    <div className="p-8 flex flex-col gap-6 min-h-full">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+    <div className="flex min-h-full flex-col gap-4 px-4 pb-6 pt-4 md:gap-6 md:p-8">
+      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div>
           <h1 className="font-mono text-2xl font-bold text-[#111111]">Подкасты</h1>
           <p className="text-sm text-[#666666] font-geist mt-1">Слушай и учись у лучших разработчиков</p>
         </div>
-        <div className="flex items-center gap-3">
-        {user?.isAdmin && (
-          <button
-            onClick={() => setShowUpload(true)}
-            className="flex items-center gap-2 px-4 py-2.5 rounded-xl bg-[#6366F1] text-white text-sm font-medium hover:bg-[#4F46E5] transition-colors"
-          >
-            <Upload className="w-4 h-4" /> Загрузить подкаст
-          </button>
-        )}
-        <div className="relative w-[280px]">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
-          <input
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Поиск подкастов..."
-            className="w-full pl-10 pr-4 py-2.5 bg-white border border-[#CBCCC9] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 transition-shadow"
-          />
-        </div>
+        <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center xl:w-auto">
+          {user?.isAdmin && (
+            <button
+              onClick={() => setShowUpload(true)}
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#6366F1] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#4F46E5]"
+            >
+              <Upload className="w-4 h-4" /> Загрузить подкаст
+            </button>
+          )}
+          <div className="relative w-full sm:flex-1 xl:w-[280px]">
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
+            <input
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              placeholder="Поиск подкастов..."
+              className="w-full rounded-xl border border-[#CBCCC9] bg-white py-2.5 pl-10 pr-4 text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
+            />
+          </div>
         </div>
       </div>
 
-      <div className="flex gap-6 flex-1 min-h-0">
+      <div className="flex flex-1 min-h-0 flex-col gap-6 xl:flex-row">
         {/* Left column */}
         <div className="flex-1 flex flex-col gap-5 min-w-0">
           {/* Now Playing */}
           {player.playing && (
-            <div className="bg-[#0f172a] rounded-2xl p-6 flex items-center gap-5 animate-fade-in">
+            <div className="animate-fade-in flex flex-col gap-4 rounded-2xl bg-[#0f172a] p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
               <div
                 className="w-[120px] h-[120px] rounded-xl flex items-center justify-center flex-shrink-0"
                 style={{ background: `linear-gradient(135deg, #6366F1, #f59e0b)` }}
@@ -261,7 +260,7 @@ export function PodcastsPage() {
                   <button
                     key={podcast.id}
                     onClick={() => player.play(podcast)}
-                    className={`stagger-item flex items-center gap-4 p-4 rounded-xl border text-left transition-all duration-200 ${
+                    className={`stagger-item flex flex-col items-start gap-4 rounded-xl border p-4 text-left transition-all duration-200 sm:flex-row sm:items-center ${
                       isCurrentlyPlaying
                         ? 'bg-[#fff7ed] border-[#6366F1]/30'
                         : 'bg-white border-[#CBCCC9] hover:border-[#94a3b8] hover:shadow-sm'
@@ -277,9 +276,9 @@ export function PodcastsPage() {
                         <Play className="w-6 h-6 text-white ml-0.5" />
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
+                    <div className="flex-1 min-w-0 self-stretch">
                       <p className="text-sm font-semibold text-[#111111] font-geist truncate">{podcast.title}</p>
-                      <div className="flex items-center gap-2 mt-0.5">
+                      <div className="mt-0.5 flex flex-wrap items-center gap-2">
                         <span className="text-xs text-[#666666] font-geist">{podcast.authorName}</span>
                         <span className="w-1 h-1 rounded-full bg-[#CBCCC9]" />
                         <span className="text-xs text-[#666666] font-geist">{formatDuration(podcast.durationSeconds)}</span>
@@ -287,7 +286,7 @@ export function PodcastsPage() {
                         <span className="text-xs text-[#666666] font-geist">{formatTimeAgo(podcast.createdAt)}</span>
                       </div>
                     </div>
-                    <div className="flex items-center gap-3 flex-shrink-0">
+                    <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start">
                       {podcast.listensCount > 0 && (
                         <span className="text-xs text-[#94a3b8]">{podcast.listensCount} прослушиваний</span>
                       )}
@@ -307,7 +306,7 @@ export function PodcastsPage() {
         </div>
 
         {/* Right column */}
-        <div className="w-[320px] flex-shrink-0 flex flex-col gap-4">
+        <div className="flex w-full flex-shrink-0 flex-col gap-4 xl:w-[320px]">
           {/* Popular shows */}
           <Card padding="lg" className="flex flex-col gap-4">
             <h3 className="font-mono text-sm font-semibold text-[#111111]">Популярные шоу</h3>

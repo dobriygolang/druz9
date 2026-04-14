@@ -13,7 +13,9 @@ type Repository interface {
 	CreateRoom(ctx context.Context, room *Room) (*Room, error)
 	GetRoom(ctx context.Context, roomID uuid.UUID) (*Room, error)
 	GetRoomByInviteCode(ctx context.Context, inviteCode string) (*Room, error)
-	SaveCodeSnapshot(ctx context.Context, roomID uuid.UUID, code string) error
+	SaveCodeSnapshot(ctx context.Context, roomID uuid.UUID, code string, language model.ProgrammingLanguage) error
+	GetDuelEditorState(ctx context.Context, roomID uuid.UUID, actorKey string) (*DuelEditorState, error)
+	SaveDuelEditorState(ctx context.Context, roomID uuid.UUID, actorKey string, code string, language model.ProgrammingLanguage) error
 	UpdateRoomStatus(ctx context.Context, roomID uuid.UUID, status model.RoomStatus) error
 	AddParticipant(ctx context.Context, roomID uuid.UUID, participant *Participant) (*Room, error)
 	RemoveParticipant(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string) error

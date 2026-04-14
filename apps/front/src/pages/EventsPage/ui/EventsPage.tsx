@@ -10,19 +10,7 @@ import { Modal } from '@/shared/ui/Modal'
 import { Input } from '@/shared/ui/Input'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { useToast } from '@/shared/ui/Toast'
-
-function formatDate(iso: string) {
-  try {
-    const d = new Date(iso)
-    return d.toLocaleDateString('ru-RU', { month: 'long', day: 'numeric', year: 'numeric' })
-  } catch { return iso }
-}
-
-function formatTime(iso: string) {
-  try {
-    return new Date(iso).toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' })
-  } catch { return '' }
-}
+import { formatDate, formatTime } from '@/shared/lib/dateFormat'
 
 function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
   event: Event
@@ -164,7 +152,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 border-t border-[#e2e8f0] flex gap-2">
+        <div className="flex flex-col gap-2 border-t border-[#e2e8f0] px-6 py-4 sm:flex-row">
           <Button variant="secondary" size="sm" onClick={onClose} className="flex-1 justify-center">
             Закрыть
           </Button>
@@ -283,53 +271,110 @@ export function EventsPage() {
 
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchEvents() }} />
 
+  const joinedCount = events.filter(event => event.isJoined).length
+
   return (
-    <div className="px-6 pt-4 pb-6">
-      <div className="grid grid-cols-3 gap-4">
-        {loading
-          ? Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-[180px] bg-white rounded-2xl border border-[#CBCCC9] animate-pulse" />
-          ))
-          : events.map((e) => (
-            <Card
-              key={e.id}
-              padding="md"
-              className="stagger-item flex flex-col gap-3 hover:border-[#6366F1] transition-all cursor-pointer hover:shadow-sm"
-              onClick={() => setSelectedEvent(e)}
-            >
-              <div className="flex items-start justify-between">
-                <div className="w-10 h-10 rounded-xl bg-[#f0f0ff] flex items-center justify-center">
-                  <Calendar className="w-5 h-5 text-[#6366F1]" />
-                </div>
-                {e.isJoined && <Badge variant="success">Вы идёте</Badge>}
+    <div className="px-4 pt-4 pb-6 md:px-6">
+      <section className="section-enter mb-4 overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(239,246,255,0.94)_46%,_rgba(255,247,237,0.95))] p-5 shadow-[0_18px_36px_rgba(15,23,42,0.08)] dark:border-[#1a2540] dark:bg-[linear-gradient(145deg,_rgba(22,28,45,0.98),_rgba(19,25,41,0.92)_54%,_rgba(42,32,10,0.62))] md:p-6">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+          <div className="max-w-2xl">
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1] dark:text-[#a5b4fc]">
+              Events Board
+            </p>
+            <h2 className="mt-2 text-2xl font-semibold text-[#111111] dark:text-[#f8fafc]">
+              Ближайшие встречи сообщества
+            </h2>
+            <p className="mt-2 text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">
+              Открывай карточку, чтобы быстро понять формат, место и кто уже идёт. Создание события теперь не теряется на мобильном экране.
+            </p>
+          </div>
+
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+            <div className="grid grid-cols-2 gap-2">
+              <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/72">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">Всего</p>
+                <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : events.length}</p>
               </div>
-              <div>
-                <h3 className="text-sm font-semibold text-[#111111] line-clamp-2">{e.title}</h3>
-                {e.scheduledAt && (
-                  <p className="text-xs text-[#666666] mt-1">{formatDate(e.scheduledAt)} · {formatTime(e.scheduledAt)}</p>
+              <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/72">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">Вы идёте</p>
+                <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : joinedCount}</p>
+              </div>
+            </div>
+
+            <Button variant="orange" size="lg" onClick={() => setShowCreate(true)} className="justify-center rounded-full px-5">
+              <Plus className="w-4 h-4" />
+              Создать событие
+            </Button>
+          </div>
+        </div>
+      </section>
+
+      {loading ? (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="h-[188px] animate-pulse rounded-[28px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
+          ))}
+        </div>
+      ) : events.length === 0 ? (
+        <div className="section-enter flex flex-col items-center justify-center rounded-[30px] border border-dashed border-[#CBCCC9] bg-white px-6 py-16 text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#EEF2FF] dark:bg-[#1e1e4a]">
+            <Calendar className="h-8 w-8 text-[#6366F1]" />
+          </div>
+          <h3 className="text-lg font-semibold text-[#111111] dark:text-[#f8fafc]">Пока нет событий</h3>
+          <p className="mt-2 max-w-md text-sm leading-6 text-[#667085] dark:text-[#94a3b8]">
+            Собери первую встречу, созвон или локальный мини-митап. На телефоне это теперь можно сделать в пару касаний.
+          </p>
+          <Button variant="orange" size="md" onClick={() => setShowCreate(true)} className="mt-5 rounded-full px-5">
+            <Plus className="w-4 h-4" />
+            Создать первое событие
+          </Button>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+          {events.map((event) => (
+            <Card
+              key={event.id}
+              padding="lg"
+              className="stagger-item flex min-h-[188px] flex-col gap-4 rounded-[28px] border-[#d8d9d6] bg-white/96 shadow-[0_12px_28px_rgba(15,23,42,0.05)] hover:border-[#6366F1] dark:border-[#1a2540] dark:bg-[#161c2d]/96"
+              onClick={() => setSelectedEvent(event)}
+            >
+              <div className="flex items-start justify-between gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#f0f0ff] dark:bg-[#1e1e4a]">
+                  <Calendar className="h-5 w-5 text-[#6366F1]" />
+                </div>
+                {event.isJoined && <Badge variant="success">Вы идёте</Badge>}
+              </div>
+
+              <div className="space-y-2">
+                <h3 className="line-clamp-2 text-base font-semibold leading-snug text-[#111111] dark:text-[#f8fafc]">{event.title}</h3>
+                {event.description && (
+                  <p className="line-clamp-2 text-sm leading-6 text-[#667085] dark:text-[#94a3b8]">
+                    {event.description}
+                  </p>
+                )}
+                {event.scheduledAt && (
+                  <p className="text-xs font-medium text-[#667085] dark:text-[#94a3b8]">
+                    {formatDate(event.scheduledAt)} · {formatTime(event.scheduledAt)}
+                  </p>
                 )}
               </div>
-              <div className="flex items-center gap-3 mt-auto">
-                {(e.city || e.placeLabel) && (
-                  <span className="flex items-center gap-1 text-xs text-[#666666]">
-                    <MapPin className="w-3 h-3" /> {e.city || e.placeLabel}
+
+              <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
+                {(event.city || event.placeLabel) && (
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#F2F3F0] px-2.5 py-1 text-xs text-[#667085] dark:bg-[#1a2236] dark:text-[#94a3b8]">
+                    <MapPin className="h-3 w-3" />
+                    {event.city || event.placeLabel}
                   </span>
                 )}
-                <span className="flex items-center gap-1 text-xs text-[#666666] ml-auto">
-                  <Users className="w-3 h-3" /> {e.participantCount}
+                <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-[#F2F3F0] px-2.5 py-1 text-xs text-[#667085] dark:bg-[#1a2236] dark:text-[#94a3b8]">
+                  <Users className="h-3 w-3" />
+                  {event.participantCount}
                 </span>
               </div>
             </Card>
-          ))
-        }
-        <button
-          onClick={() => setShowCreate(true)}
-          className="h-[180px] border-2 border-dashed border-[#CBCCC9] rounded-2xl flex flex-col items-center justify-center gap-2 text-[#94a3b8] hover:border-[#6366F1] hover:text-[#6366F1] transition-colors"
-        >
-          <Plus className="w-6 h-6" />
-          <span className="text-sm font-medium">Создать событие</span>
-        </button>
-      </div>
+          ))}
+        </div>
+      )}
 
       {/* Event detail */}
       {selectedEvent && (
@@ -384,7 +429,7 @@ export function EventsPage() {
           {/* Invite */}
           <div className="border-t border-[#F2F3F0] pt-4">
             <label className="block text-xs font-medium text-[#475569] mb-1.5">Пригласить участников</label>
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <input
                 value={inviteInput}
                 onChange={e => setInviteInput(e.target.value)}

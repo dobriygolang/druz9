@@ -31,12 +31,8 @@ func (c *TTLCache[V]) Get(key string) (V, bool) {
 	return c.cache.Get(key)
 }
 
-// Set stores a value in cache with TTL.
-func (c *TTLCache[V]) Set(key string, value V, ttl time.Duration) {
-	if ttl <= 0 {
-		ttl = c.defaultTTL
-	}
-	// Since expirable.LRU doesn't have SetWithTTL, we use Add which updates TTL
+// Set stores a value in cache using the default TTL.
+func (c *TTLCache[V]) Set(key string, value V) {
 	_ = c.cache.Remove(key) // Remove existing to reset TTL
 	_ = c.cache.Add(key, value)
 }
@@ -58,11 +54,8 @@ func (c *TTLCache[V]) GetMultiple(keys []string) map[string]V {
 	return result
 }
 
-// SetMultiple stores multiple values in cache with TTL.
-func (c *TTLCache[V]) SetMultiple(values map[string]V, ttl time.Duration) {
-	if ttl <= 0 {
-		ttl = c.defaultTTL
-	}
+// SetMultiple stores multiple values in cache using the default TTL.
+func (c *TTLCache[V]) SetMultiple(values map[string]V) {
 	for key, value := range values {
 		_ = c.cache.Remove(key)
 		_ = c.cache.Add(key, value)

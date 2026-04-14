@@ -7,6 +7,7 @@
 package v1
 
 import (
+	v1 "api/pkg/api/common/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -21,58 +22,6 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
-
-type UserActivityStatus int32
-
-const (
-	UserActivityStatus_USER_ACTIVITY_STATUS_UNSPECIFIED     UserActivityStatus = 0
-	UserActivityStatus_USER_ACTIVITY_STATUS_ONLINE          UserActivityStatus = 1
-	UserActivityStatus_USER_ACTIVITY_STATUS_RECENTLY_ACTIVE UserActivityStatus = 2
-	UserActivityStatus_USER_ACTIVITY_STATUS_OFFLINE         UserActivityStatus = 3
-)
-
-// Enum value maps for UserActivityStatus.
-var (
-	UserActivityStatus_name = map[int32]string{
-		0: "USER_ACTIVITY_STATUS_UNSPECIFIED",
-		1: "USER_ACTIVITY_STATUS_ONLINE",
-		2: "USER_ACTIVITY_STATUS_RECENTLY_ACTIVE",
-		3: "USER_ACTIVITY_STATUS_OFFLINE",
-	}
-	UserActivityStatus_value = map[string]int32{
-		"USER_ACTIVITY_STATUS_UNSPECIFIED":     0,
-		"USER_ACTIVITY_STATUS_ONLINE":          1,
-		"USER_ACTIVITY_STATUS_RECENTLY_ACTIVE": 2,
-		"USER_ACTIVITY_STATUS_OFFLINE":         3,
-	}
-)
-
-func (x UserActivityStatus) Enum() *UserActivityStatus {
-	p := new(UserActivityStatus)
-	*p = x
-	return p
-}
-
-func (x UserActivityStatus) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (UserActivityStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_geo_v1_geo_proto_enumTypes[0].Descriptor()
-}
-
-func (UserActivityStatus) Type() protoreflect.EnumType {
-	return &file_geo_v1_geo_proto_enumTypes[0]
-}
-
-func (x UserActivityStatus) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use UserActivityStatus.Descriptor instead.
-func (UserActivityStatus) EnumDescriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{0}
-}
 
 type ResolveRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -338,7 +287,7 @@ type CommunityMapPoint struct {
 	Username         string                 `protobuf:"bytes,8,opt,name=username,proto3" json:"username,omitempty"`
 	FirstName        string                 `protobuf:"bytes,9,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
 	LastName         string                 `protobuf:"bytes,10,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	ActivityStatus   UserActivityStatus     `protobuf:"varint,11,opt,name=activity_status,json=activityStatus,proto3,enum=geo.v1.UserActivityStatus" json:"activity_status,omitempty"`
+	ActivityStatus   v1.UserActivityStatus  `protobuf:"varint,11,opt,name=activity_status,json=activityStatus,proto3,enum=common.v1.UserActivityStatus" json:"activity_status,omitempty"`
 	TelegramUsername string                 `protobuf:"bytes,12,opt,name=telegram_username,json=telegramUsername,proto3" json:"telegram_username,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
@@ -444,11 +393,11 @@ func (x *CommunityMapPoint) GetLastName() string {
 	return ""
 }
 
-func (x *CommunityMapPoint) GetActivityStatus() UserActivityStatus {
+func (x *CommunityMapPoint) GetActivityStatus() v1.UserActivityStatus {
 	if x != nil {
 		return x.ActivityStatus
 	}
-	return UserActivityStatus_USER_ACTIVITY_STATUS_UNSPECIFIED
+	return v1.UserActivityStatus(0)
 }
 
 func (x *CommunityMapPoint) GetTelegramUsername() string {
@@ -462,7 +411,7 @@ var File_geo_v1_geo_proto protoreflect.FileDescriptor
 
 const file_geo_v1_geo_proto_rawDesc = "" +
 	"\n" +
-	"\x10geo/v1/geo.proto\x12\x06geo.v1\x1a\x1cgoogle/api/annotations.proto\"&\n" +
+	"\x10geo/v1/geo.proto\x12\x06geo.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x16common/v1/common.proto\"&\n" +
 	"\x0eResolveRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\"G\n" +
 	"\x0fResolveResponse\x124\n" +
@@ -478,7 +427,7 @@ const file_geo_v1_geo_proto_rawDesc = "" +
 	"\fdisplay_name\x18\x06 \x01(\tR\vdisplayName\"\x15\n" +
 	"\x13CommunityMapRequest\"I\n" +
 	"\x14CommunityMapResponse\x121\n" +
-	"\x06points\x18\x01 \x03(\v2\x19.geo.v1.CommunityMapPointR\x06points\"\xa5\x03\n" +
+	"\x06points\x18\x01 \x03(\v2\x19.geo.v1.CommunityMapPointR\x06points\"\xa8\x03\n" +
 	"\x11CommunityMapPoint\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12\x16\n" +
@@ -492,14 +441,9 @@ const file_geo_v1_geo_proto_rawDesc = "" +
 	"\n" +
 	"first_name\x18\t \x01(\tR\tfirstName\x12\x1b\n" +
 	"\tlast_name\x18\n" +
-	" \x01(\tR\blastName\x12C\n" +
-	"\x0factivity_status\x18\v \x01(\x0e2\x1a.geo.v1.UserActivityStatusR\x0eactivityStatus\x12+\n" +
-	"\x11telegram_username\x18\f \x01(\tR\x10telegramUsername*\xa7\x01\n" +
-	"\x12UserActivityStatus\x12$\n" +
-	" USER_ACTIVITY_STATUS_UNSPECIFIED\x10\x00\x12\x1f\n" +
-	"\x1bUSER_ACTIVITY_STATUS_ONLINE\x10\x01\x12(\n" +
-	"$USER_ACTIVITY_STATUS_RECENTLY_ACTIVE\x10\x02\x12 \n" +
-	"\x1cUSER_ACTIVITY_STATUS_OFFLINE\x10\x032\xd2\x01\n" +
+	" \x01(\tR\blastName\x12F\n" +
+	"\x0factivity_status\x18\v \x01(\x0e2\x1d.common.v1.UserActivityStatusR\x0eactivityStatus\x12+\n" +
+	"\x11telegram_username\x18\f \x01(\tR\x10telegramUsername2\xd2\x01\n" +
 	"\n" +
 	"GeoService\x12Z\n" +
 	"\aResolve\x12\x16.geo.v1.ResolveRequest\x1a\x17.geo.v1.ResolveResponse\"\x1e\x82\xd3\xe4\x93\x02\x18:\x01*\"\x13/api/v1/geo/resolve\x12h\n" +
@@ -517,25 +461,24 @@ func file_geo_v1_geo_proto_rawDescGZIP() []byte {
 	return file_geo_v1_geo_proto_rawDescData
 }
 
-var file_geo_v1_geo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_geo_v1_geo_proto_msgTypes = make([]protoimpl.MessageInfo, 6)
 var file_geo_v1_geo_proto_goTypes = []any{
-	(UserActivityStatus)(0),      // 0: geo.v1.UserActivityStatus
-	(*ResolveRequest)(nil),       // 1: geo.v1.ResolveRequest
-	(*ResolveResponse)(nil),      // 2: geo.v1.ResolveResponse
-	(*GeoCandidate)(nil),         // 3: geo.v1.GeoCandidate
-	(*CommunityMapRequest)(nil),  // 4: geo.v1.CommunityMapRequest
-	(*CommunityMapResponse)(nil), // 5: geo.v1.CommunityMapResponse
-	(*CommunityMapPoint)(nil),    // 6: geo.v1.CommunityMapPoint
+	(*ResolveRequest)(nil),       // 0: geo.v1.ResolveRequest
+	(*ResolveResponse)(nil),      // 1: geo.v1.ResolveResponse
+	(*GeoCandidate)(nil),         // 2: geo.v1.GeoCandidate
+	(*CommunityMapRequest)(nil),  // 3: geo.v1.CommunityMapRequest
+	(*CommunityMapResponse)(nil), // 4: geo.v1.CommunityMapResponse
+	(*CommunityMapPoint)(nil),    // 5: geo.v1.CommunityMapPoint
+	(v1.UserActivityStatus)(0),   // 6: common.v1.UserActivityStatus
 }
 var file_geo_v1_geo_proto_depIdxs = []int32{
-	3, // 0: geo.v1.ResolveResponse.candidates:type_name -> geo.v1.GeoCandidate
-	6, // 1: geo.v1.CommunityMapResponse.points:type_name -> geo.v1.CommunityMapPoint
-	0, // 2: geo.v1.CommunityMapPoint.activity_status:type_name -> geo.v1.UserActivityStatus
-	1, // 3: geo.v1.GeoService.Resolve:input_type -> geo.v1.ResolveRequest
-	4, // 4: geo.v1.GeoService.CommunityMap:input_type -> geo.v1.CommunityMapRequest
-	2, // 5: geo.v1.GeoService.Resolve:output_type -> geo.v1.ResolveResponse
-	5, // 6: geo.v1.GeoService.CommunityMap:output_type -> geo.v1.CommunityMapResponse
+	2, // 0: geo.v1.ResolveResponse.candidates:type_name -> geo.v1.GeoCandidate
+	5, // 1: geo.v1.CommunityMapResponse.points:type_name -> geo.v1.CommunityMapPoint
+	6, // 2: geo.v1.CommunityMapPoint.activity_status:type_name -> common.v1.UserActivityStatus
+	0, // 3: geo.v1.GeoService.Resolve:input_type -> geo.v1.ResolveRequest
+	3, // 4: geo.v1.GeoService.CommunityMap:input_type -> geo.v1.CommunityMapRequest
+	1, // 5: geo.v1.GeoService.Resolve:output_type -> geo.v1.ResolveResponse
+	4, // 6: geo.v1.GeoService.CommunityMap:output_type -> geo.v1.CommunityMapResponse
 	5, // [5:7] is the sub-list for method output_type
 	3, // [3:5] is the sub-list for method input_type
 	3, // [3:3] is the sub-list for extension type_name
@@ -553,14 +496,13 @@ func file_geo_v1_geo_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_geo_v1_geo_proto_rawDesc), len(file_geo_v1_geo_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   6,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_geo_v1_geo_proto_goTypes,
 		DependencyIndexes: file_geo_v1_geo_proto_depIdxs,
-		EnumInfos:         file_geo_v1_geo_proto_enumTypes,
 		MessageInfos:      file_geo_v1_geo_proto_msgTypes,
 	}.Build()
 	File_geo_v1_geo_proto = out.File

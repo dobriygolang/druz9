@@ -128,8 +128,8 @@ func (i *Implementation) ReviewSystemDesign(ctx context.Context, req *v1.ReviewS
 	if err != nil {
 		return nil, err
 	}
-	if req.Design == nil || len(req.Design.Image) == 0 {
-		return nil, kratoserrors.BadRequest("IMAGE_REQUIRED", "image is required")
+	if req.Design == nil {
+		return nil, kratoserrors.BadRequest("DESIGN_REQUIRED", "design payload is required")
 	}
 
 	review, err := i.service.ReviewSystemDesign(ctx, user, sessionID, req.Design.ImageName, req.Design.ImageContentType, req.Design.Image, appinterviewprep.SystemDesignReviewInput{
@@ -219,8 +219,8 @@ func (i *Implementation) ReviewMockSystemDesign(ctx context.Context, req *v1.Rev
 	if err != nil {
 		return nil, err
 	}
-	if req.Design == nil || len(req.Design.Image) == 0 {
-		return nil, kratoserrors.BadRequest("IMAGE_REQUIRED", "image is required")
+	if req.Design == nil {
+		return nil, kratoserrors.BadRequest("DESIGN_REQUIRED", "design payload is required")
 	}
 
 	result, err := i.service.ReviewMockSystemDesign(ctx, user, sessionID, req.Design.ImageName, req.Design.ImageContentType, req.Design.Image, appinterviewprep.SystemDesignReviewInput{

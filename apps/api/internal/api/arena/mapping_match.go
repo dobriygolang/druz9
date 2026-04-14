@@ -2,12 +2,18 @@ package arena
 
 import (
 	domain "api/internal/domain/arena"
+	"api/internal/model"
 	v1 "api/pkg/api/arena/v1"
 
+	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapArenaMatch(match *domain.Match) *v1.ArenaMatch {
+	return mapArenaMatchForViewer(match, "", true)
+}
+
+func mapArenaMatchForViewer(match *domain.Match, viewerUserID string, spectator bool) *v1.ArenaMatch {
 	if match == nil {
 		return nil
 	}
@@ -47,13 +53,17 @@ func mapArenaMatch(match *domain.Match) *v1.ArenaMatch {
 		if player == nil {
 			continue
 		}
-		result.Players = append(result.Players, mapArenaPlayer(player))
+		result.Players = append(result.Players, mapArenaPlayerForViewer(match, player, viewerUserID, spectator))
 	}
 
 	return result
 }
 
 func mapArenaPlayer(player *domain.Player) *v1.ArenaPlayer {
+	return mapArenaPlayerForViewer(nil, player, "", true)
+}
+
+func mapArenaPlayerForViewer(match *domain.Match, player *domain.Player, viewerUserID string, spectator bool) *v1.ArenaPlayer {
 	if player == nil {
 		return nil
 	}
@@ -65,7 +75,7 @@ func mapArenaPlayer(player *domain.Player) *v1.ArenaPlayer {
 		IsCreator:          player.IsCreator,
 		BestRuntimeMs:      player.BestRuntimeMs,
 		IsWinner:           player.IsWinner,
-		CurrentCode:        player.CurrentCode,
+		CurrentCode:        arenaVisiblePlayerCode(match, player, viewerUserID, spectator),
 		SuspicionCount:     player.SuspicionCount,
 		AntiCheatPenalized: player.AntiCheatPenalized,
 	}
@@ -79,6 +89,47 @@ func mapArenaPlayer(player *domain.Player) *v1.ArenaPlayer {
 		result.JoinedAt = timestamppb.New(player.JoinedAt)
 	}
 	return result
+}
+
+func arenaVisiblePlayerCode(match *domain.Match, player *domain.Player, viewerUserID string, spectator bool) string {
+	if player == nil {
+		return ""
+	}
+
+	if match != nil && match.Status == model.ArenaMatchStatusFinished {
+		return player.CurrentCode
+	}
+
+	if viewerUserID != "" && player.UserID.String() == viewerUserID {
+		return player.CurrentCode
+	}
+
+	if spectator {
+		return ""
+	}
+
+	return ""
+}
+
+func arenaViewerState(match *domain.Match, actor *model.User) (string, bool) {
+	if actor == nil {
+		return "", true
+	}
+
+	viewerUserID := actor.ID.String()
+	return viewerUserID, !arenaViewerParticipates(match, actor.ID)
+}
+
+func arenaViewerParticipates(match *domain.Match, userID uuid.UUID) bool {
+	if match == nil || userID == uuid.Nil {
+		return false
+	}
+	for _, player := range match.Players {
+		if player != nil && player.UserID == userID {
+			return true
+		}
+	}
+	return false
 }
 
 func mapArenaLeaderboard(entries []*domain.LeaderboardEntry) []*v1.ArenaLeaderboardEntry {

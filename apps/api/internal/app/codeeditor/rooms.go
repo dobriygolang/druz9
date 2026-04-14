@@ -22,19 +22,26 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 	inviteCode := generateInviteCode()
 	code := defaultCode()
 	var taskID *uuid.UUID
+	var duelTask *domain.Task
 	nowTime := now()
 
 	if modeEnum == model.RoomModeDuel {
-		task, err := s.repo.PickRandomTask(ctx, topic, difficulty)
+		pickedTask, err := s.repo.PickRandomTask(ctx, topic, difficulty)
 		if err != nil {
 			return nil, err
 		}
-		if task == nil {
+		if pickedTask == nil {
 			return nil, domain.ErrNoAvailableTasks
 		}
-		taskID = &task.ID
-		code = task.StarterCode
-		s.taskCache.Set(task.ID.String(), *task, 0)
+		duelTask = pickedTask
+		taskID = &pickedTask.ID
+		code = pickedTask.StarterCode
+		s.taskCache.Set(pickedTask.ID.String(), *pickedTask)
+	}
+
+	roomLanguage := defaultRoomLanguage(nil, duelTask)
+	if modeEnum != model.RoomModeDuel {
+		roomLanguage = model.ProgrammingLanguageGo
 	}
 
 	room := &domain.Room{
@@ -44,6 +51,7 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 		Status:     model.RoomStatusWaiting,
 		CreatorID:  uuid.Nil,
 		InviteCode: inviteCode,
+		Language:   roomLanguage,
 		Task:       task,
 		TaskID:     taskID,
 		DuelTopic:  topic,
@@ -66,7 +74,21 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 	}
 	room.Participants = []*domain.Participant{participant}
 
-	return s.repo.CreateRoom(ctx, room)
+	createdRoom, err := s.repo.CreateRoom(ctx, room)
+	if err != nil {
+		return nil, err
+	}
+	if createdRoom.Mode == model.RoomModeDuel {
+		initialGuestName := ""
+		if isGuest {
+			initialGuestName = name
+		}
+		if _, err := s.SetEditorLanguage(ctx, createdRoom.ID, creatorID, initialGuestName, createdRoom.Language); err != nil {
+			return nil, err
+		}
+		return s.GetRoomForActor(ctx, createdRoom.ID, creatorID, initialGuestName)
+	}
+	return createdRoom, nil
 }
 
 func (s *Service) SetRoomTask(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, task string) error {
@@ -216,8 +238,11 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 		if cachedGuest, ok := s.guestCache.Get(key); ok {
 			// Гость уже в кэше - обновляем ему время (refresh TTL)
 			cachedGuest.IsReady = false
-			s.guestCache.Set(key, cachedGuest, 0)
+			s.guestCache.Set(key, cachedGuest)
 			room.Participants = s.addCachedGuestsToRoom(room.Participants, roomID)
+			if room.Mode == model.RoomModeDuel {
+				return s.GetRoomForActor(ctx, roomID, userID, name)
+			}
 			return room, nil
 		}
 	}
@@ -225,9 +250,15 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 	// Проверяем существующих участников
 	for _, participant := range room.Participants {
 		if userID != nil && participant.UserID != nil && *participant.UserID == *userID {
+			if room.Mode == model.RoomModeDuel {
+				return s.GetRoomForActor(ctx, roomID, userID, name)
+			}
 			return room, nil
 		}
 		if userID == nil && participant.IsGuest && strings.EqualFold(strings.TrimSpace(participant.Name), strings.TrimSpace(name)) {
+			if room.Mode == model.RoomModeDuel {
+				return s.GetRoomForActor(ctx, roomID, userID, name)
+			}
 			return room, nil
 		}
 	}
@@ -247,7 +278,7 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 			IsReady:  false,
 			JoinedAt: nowTime,
 		}
-		s.guestCache.Set(guestRoomKey(roomID, name), guest, 0)
+		s.guestCache.Set(guestRoomKey(roomID, name), guest)
 	} else {
 		// Авторизованные пользователи добавляются в БД
 		participant := &domain.Participant{
@@ -274,9 +305,12 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 		}
 		room.Status = model.RoomStatusActive
 		room.StartedAt = &startedAt
-		return room, nil
+		return s.GetRoomForActor(ctx, roomID, userID, name)
 	}
 
+	if room.Mode == model.RoomModeDuel {
+		return s.GetRoomForActor(ctx, roomID, userID, name)
+	}
 	return room, nil
 }
 
@@ -308,14 +342,23 @@ func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid
 		return nil, domain.ErrRoomAlreadyClosed
 	}
 
+	editorState, err := s.GetEditorState(ctx, roomID, userID, guestName)
+	if err != nil {
+		return nil, err
+	}
+	selectedLanguage := room.Language
+	if editorState != nil {
+		selectedLanguage = editorState.Language
+	}
+
 	if room.Mode == domain.RoomModeDuel && room.TaskID != nil {
-		return s.submitDuelCode(ctx, room, userID, guestName, code)
+		return s.submitDuelCode(ctx, room, userID, guestName, code, selectedLanguage)
 	}
 
 	result, err := s.sandbox.Execute(ctx, sandbox.ExecutionRequest{
 		Code:       code,
 		Task:       policy.TaskSpecForCodeEditorRun(),
-		Language:   policy.LanguageForProgrammingLanguage(model.ProgrammingLanguageGo),
+		Language:   policy.LanguageForProgrammingLanguage(normalizeRoomLanguage(selectedLanguage)),
 		RunnerMode: model.RunnerModeProgram.String(),
 	})
 	if err != nil {
@@ -366,7 +409,7 @@ func (s *Service) SetReady(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 		key := guestRoomKey(roomID, guestName)
 		if guest, ok := s.guestCache.Get(key); ok {
 			guest.IsReady = ready
-			s.guestCache.Set(key, guest, 0)
+			s.guestCache.Set(key, guest)
 			return nil
 		}
 		return nil // Гость не найден в кэше -可能已经离开

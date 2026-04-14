@@ -5,13 +5,7 @@ import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import type { Task } from '@/entities/CodeRoom/model/types'
 import { Badge } from '@/shared/ui/Badge'
 import { ErrorState } from '@/shared/ui/ErrorState'
-
-const DIFF_LABELS: Record<string, string> = {
-  TASK_DIFFICULTY_EASY: 'Easy', TASK_DIFFICULTY_MEDIUM: 'Medium', TASK_DIFFICULTY_HARD: 'Hard',
-}
-const DIFF_VARIANTS: Record<string, 'success' | 'warning' | 'danger'> = {
-  TASK_DIFFICULTY_EASY: 'success', TASK_DIFFICULTY_MEDIUM: 'warning', TASK_DIFFICULTY_HARD: 'danger',
-}
+import { DIFF_LABELS, DIFF_VARIANTS } from '@/shared/lib/taskLabels'
 
 const DIFFICULTY_FILTERS = [
   { value: '', label: 'Все' },
@@ -59,25 +53,25 @@ export function PracticeSoloPage() {
     })
   }, [tasks, search, topic])
 
-  // Count tasks per topic for badges
-  const topicCounts = useMemo(() => {
-    const counts: Record<string, number> = { '': tasks.length }
-    for (const tf of TOPIC_FILTERS) {
-      if (!tf.value) continue
-      counts[tf.value] = tasks.filter(t => t.topics.some(tp => tp.toLowerCase().includes(tf.value.toLowerCase()))).length
-    }
-    return counts
-  }, [tasks])
-
-  // Count tasks per difficulty for badges
-  const difficultyCounts = useMemo(() => {
+  // Single-pass topic & difficulty counting — O(n) instead of O(n × filters)
+  const { topicCounts, difficultyCounts } = useMemo(() => {
+    const topicSet = new Set(TOPIC_FILTERS.filter(f => f.value).map(f => f.value.toLowerCase()))
+    const tCounts: Record<string, number> = { '': tasks.length }
     const base = topic ? filtered : tasks
-    const counts: Record<string, number> = { '': base.length }
-    for (const df of DIFFICULTY_FILTERS) {
-      if (!df.value) continue
-      counts[df.value] = base.filter(t => t.difficulty === df.value).length
+    const dCounts: Record<string, number> = { '': base.length }
+
+    for (const t of tasks) {
+      for (const tp of t.topics) {
+        const lower = tp.toLowerCase()
+        for (const tv of topicSet) {
+          if (lower.includes(tv)) tCounts[tv] = (tCounts[tv] ?? 0) + 1
+        }
+      }
     }
-    return counts
+    for (const t of base) {
+      if (t.difficulty) dCounts[t.difficulty] = (dCounts[t.difficulty] ?? 0) + 1
+    }
+    return { topicCounts: tCounts, difficultyCounts: dCounts }
   }, [tasks, filtered, topic])
 
   const handleStartSolo = async (task: Task) => {

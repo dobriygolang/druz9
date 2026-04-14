@@ -185,7 +185,7 @@ func (s *Service) buildBotStartURL(token string) string {
 
 // SetUserActivity updates user activity timestamp in cache.
 func (s *Service) SetUserActivity(userID uuid.UUID, at time.Time) {
-	s.activityCache.Set(userID.String(), at, 0)
+	s.activityCache.Set(userID.String(), at)
 }
 
 // GetUserActivity returns user activity timestamp from cache.
@@ -205,7 +205,7 @@ func (s *Service) InvalidateProfileCache(userID uuid.UUID) {
 
 // CacheProfile caches user profile.
 func (s *Service) CacheProfile(userID uuid.UUID, user *model.User) {
-	s.profileCache.Set(userID.String(), user, 0)
+	s.profileCache.Set(userID.String(), user)
 }
 
 // GetCachedProfile returns cached user profile.
@@ -215,7 +215,7 @@ func (s *Service) GetCachedProfile(userID uuid.UUID) (*model.User, bool) {
 
 // CacheSession caches user session.
 func (s *Service) CacheSession(sessionID uuid.UUID, session *model.Session) {
-	s.sessionCache.Set(sessionID.String(), session, 0)
+	s.sessionCache.Set(sessionID.String(), session)
 }
 
 // GetCachedSession returns cached user session.

@@ -3,28 +3,29 @@ package arena
 import (
 	"api/internal/model"
 	v1 "api/pkg/api/arena/v1"
+	commonv1 "api/pkg/api/common/v1"
 )
 
-func mapDifficulty(difficulty model.ArenaDifficulty) v1.Difficulty {
+func mapDifficulty(difficulty model.ArenaDifficulty) commonv1.Difficulty {
 	switch difficulty {
 	case model.ArenaDifficultyEasy:
-		return v1.Difficulty_DIFFICULTY_EASY
+		return commonv1.Difficulty_DIFFICULTY_EASY
 	case model.ArenaDifficultyMedium:
-		return v1.Difficulty_DIFFICULTY_MEDIUM
+		return commonv1.Difficulty_DIFFICULTY_MEDIUM
 	case model.ArenaDifficultyHard:
-		return v1.Difficulty_DIFFICULTY_HARD
+		return commonv1.Difficulty_DIFFICULTY_HARD
 	default:
-		return v1.Difficulty_DIFFICULTY_UNSPECIFIED
+		return commonv1.Difficulty_DIFFICULTY_UNSPECIFIED
 	}
 }
 
-func unmapDifficulty(difficulty v1.Difficulty) model.ArenaDifficulty {
+func unmapDifficulty(difficulty commonv1.Difficulty) model.ArenaDifficulty {
 	switch difficulty {
-	case v1.Difficulty_DIFFICULTY_EASY:
+	case commonv1.Difficulty_DIFFICULTY_EASY:
 		return model.ArenaDifficultyEasy
-	case v1.Difficulty_DIFFICULTY_MEDIUM:
+	case commonv1.Difficulty_DIFFICULTY_MEDIUM:
 		return model.ArenaDifficultyMedium
-	case v1.Difficulty_DIFFICULTY_HARD:
+	case commonv1.Difficulty_DIFFICULTY_HARD:
 		return model.ArenaDifficultyHard
 	default:
 		return model.ArenaDifficultyUnknown
@@ -97,18 +98,18 @@ func mapArenaStatus(status model.ArenaMatchStatus) v1.ArenaMatchStatus {
 	}
 }
 
-func mapSubmitFailureKind(kind model.ArenaSubmissionFailureKind) v1.SubmitFailureKind {
+func mapSubmitFailureKind(kind model.ArenaSubmissionFailureKind) commonv1.SubmitFailureKind {
 	switch kind {
 	case model.ArenaSubmissionFailureKindCompileError:
-		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_COMPILE_ERROR
+		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_COMPILE_ERROR
 	case model.ArenaSubmissionFailureKindRuntimeError:
-		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_RUNTIME_ERROR
+		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_RUNTIME_ERROR
 	case model.ArenaSubmissionFailureKindWrongAnswer:
-		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_WRONG_ANSWER
+		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_WRONG_ANSWER
 	case model.ArenaSubmissionFailureKindTimeout:
-		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_TIMEOUT
+		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_TIMEOUT
 	default:
-		return v1.SubmitFailureKind_SUBMIT_FAILURE_KIND_UNSPECIFIED
+		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_UNSPECIFIED
 	}
 }
 

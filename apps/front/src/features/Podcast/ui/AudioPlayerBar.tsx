@@ -29,7 +29,7 @@ export function AudioPlayerBar() {
   }
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-[#0f172a]/95 backdrop-blur border-t border-[#1e293b] h-[68px] flex items-center gap-3 px-4 md:px-6 mb-[64px] md:mb-0 animate-fade-in">
+    <div className="fixed left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+92px)] z-[52] flex h-[72px] items-center gap-3 rounded-[24px] border border-[#1e293b] bg-[#0f172a]/95 px-4 backdrop-blur-xl animate-fade-in md:left-0 md:right-0 md:bottom-0 md:h-[68px] md:rounded-none md:border-x-0 md:border-b-0 md:px-6">
       {/* Album art + info */}
       <div className="flex items-center gap-3 w-[180px] md:w-[240px] flex-shrink-0 min-w-0">
         <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#6366F1] to-[#f59e0b] flex items-center justify-center flex-shrink-0">

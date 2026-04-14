@@ -28,22 +28,10 @@ func TestTTLCache_SetAndGet(t *testing.T) {
 
 	cache := NewTTLCache[string](10, time.Minute)
 
-	cache.Set("key1", "value1", 0)
+	cache.Set("key1", "value1")
 	value, found := cache.Get("key1")
 
 	assert.True(t, found, "should find the key")
-	assert.Equal(t, "value1", value)
-}
-
-func TestTTLCache_SetWithCustomTTL(t *testing.T) {
-	t.Parallel()
-
-	cache := NewTTLCache[string](10, time.Minute)
-
-	cache.Set("key1", "value1", time.Hour)
-	value, found := cache.Get("key1")
-
-	assert.True(t, found)
 	assert.Equal(t, "value1", value)
 }
 
@@ -52,8 +40,8 @@ func TestTTLCache_SetOverwritesExisting(t *testing.T) {
 
 	cache := NewTTLCache[string](10, time.Minute)
 
-	cache.Set("key1", "value1", 0)
-	cache.Set("key1", "value2", 0)
+	cache.Set("key1", "value1")
+	cache.Set("key1", "value2")
 	value, found := cache.Get("key1")
 
 	assert.True(t, found)
@@ -65,7 +53,7 @@ func TestTTLCache_Delete(t *testing.T) {
 
 	cache := NewTTLCache[string](10, time.Minute)
 
-	cache.Set("key1", "value1", 0)
+	cache.Set("key1", "value1")
 	cache.Delete("key1")
 	_, found := cache.Get("key1")
 
@@ -85,8 +73,8 @@ func TestTTLCache_GetMultiple_SomeKeys(t *testing.T) {
 	t.Parallel()
 
 	cache := NewTTLCache[string](10, time.Minute)
-	cache.Set("key1", "value1", 0)
-	cache.Set("key2", "value2", 0)
+	cache.Set("key1", "value1")
+	cache.Set("key2", "value2")
 
 	result := cache.GetMultiple([]string{"key1", "key2", "missing"})
 
@@ -104,7 +92,7 @@ func TestTTLCache_SetMultiple(t *testing.T) {
 		"key1": "value1",
 		"key2": "value2",
 	}
-	cache.SetMultiple(values, 0)
+	cache.SetMultiple(values)
 
 	v1, found1 := cache.Get("key1")
 	v2, found2 := cache.Get("key2")
@@ -115,39 +103,24 @@ func TestTTLCache_SetMultiple(t *testing.T) {
 	assert.Equal(t, "value2", v2)
 }
 
-func TestTTLCache_SetMultipleWithCustomTTL(t *testing.T) {
-	t.Parallel()
-
-	cache := NewTTLCache[string](10, time.Minute)
-
-	values := map[string]string{
-		"key1": "value1",
-	}
-	cache.SetMultiple(values, time.Hour)
-
-	v, found := cache.Get("key1")
-	assert.True(t, found)
-	assert.Equal(t, "value1", v)
-}
-
 func TestTTLCache_DefaultTTLUsed(t *testing.T) {
 	t.Parallel()
 
 	cache := NewTTLCache[string](10, time.Minute)
 
-	cache.Set("key1", "value1", 0) // zero TTL should use default
+	cache.Set("key1", "value1")
 
 	v, found := cache.Get("key1")
 	assert.True(t, found)
 	assert.Equal(t, "value1", v)
 }
 
-func TestTTLCache_SetMultipleWithZeroTTL(t *testing.T) {
+func TestTTLCache_SetMultipleDefaultTTL(t *testing.T) {
 	t.Parallel()
 
 	cache := NewTTLCache[string](10, time.Minute)
 
-	cache.SetMultiple(map[string]string{"key1": "value1"}, 0) // zero TTL should use default
+	cache.SetMultiple(map[string]string{"key1": "value1"})
 
 	v, found := cache.Get("key1")
 	assert.True(t, found)
@@ -169,10 +142,10 @@ func TestTTLCache_LRUEviction(t *testing.T) {
 
 	cache := NewTTLCache[string](3, time.Minute)
 
-	cache.Set("key1", "value1", 0)
-	cache.Set("key2", "value2", 0)
-	cache.Set("key3", "value3", 0)
-	cache.Set("key4", "value4", 0) // should evict key1
+	cache.Set("key1", "value1")
+	cache.Set("key2", "value2")
+	cache.Set("key3", "value3")
+	cache.Set("key4", "value4") // should evict key1
 
 	_, found1 := cache.Get("key1")
 	_, found2 := cache.Get("key2")

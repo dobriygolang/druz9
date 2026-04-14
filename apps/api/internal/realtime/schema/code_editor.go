@@ -4,12 +4,15 @@ const (
 	CodeEditorTypeHello           = "hello"
 	CodeEditorTypeSnapshot        = "snapshot"
 	CodeEditorTypeUpdate          = "update"
+	CodeEditorTypeDocSync         = "doc_sync"
+	CodeEditorTypePersist         = "persist"
 	CodeEditorTypeAwareness       = "awareness"
 	CodeEditorTypeAwarenessRemove = "awareness_remove"
 	CodeEditorTypePing            = "ping"
 	CodeEditorTypePong            = "pong"
 	CodeEditorTypeRoomUpdate      = "room_update"
 	CodeEditorTypeSubmission      = "submission"
+	CodeEditorTypeLanguage        = "language"
 )
 
 type CodeEditorMessage struct {
@@ -18,8 +21,10 @@ type CodeEditorMessage struct {
 	AwarenessID  uint64                     `json:"awarenessId,omitempty"`
 	AwarenessIDs []uint64                   `json:"awarenessIds,omitempty"`
 	UserID       string                     `json:"userId,omitempty"`
+	GuestName    string                     `json:"guestName,omitempty"`
 	Data         string                     `json:"data,omitempty"`
 	PlainText    string                     `json:"plainText,omitempty"`
+	Language     string                     `json:"language,omitempty"`
 	Room         *CodeEditorRoom            `json:"room,omitempty"`
 	Submission   *CodeEditorSubmissionEvent `json:"submission,omitempty"`
 }
@@ -31,6 +36,7 @@ type CodeEditorRoom struct {
 	CreatorID       string                   `json:"creatorId"`
 	Code            string                   `json:"code"`
 	CodeRevision    int64                    `json:"codeRevision"`
+	Language        string                   `json:"language"`
 	Status          string                   `json:"status"`
 	TaskID          string                   `json:"taskId,omitempty"`
 	MaxParticipants int32                    `json:"maxParticipants"`

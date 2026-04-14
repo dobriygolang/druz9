@@ -4,13 +4,7 @@ import { useAuth } from '@/app/providers/AuthProvider'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Badge } from '@/shared/ui/Badge'
 import { cn } from '@/shared/lib/cn'
-
-const ADMIN_TABS = [
-  { label: 'Code Tasks', href: '/admin/code-tasks' },
-  { label: 'Interview Prep', href: '/admin/interview-prep' },
-  { label: 'Analytics', href: '/admin/analytics' },
-  { label: 'Config', href: '/admin/config' },
-]
+import { ADMIN_NAV } from '@/widgets/AdminSidebar/ui/AdminSidebar'
 
 export function AdminLayout() {
   const location = useLocation()
@@ -29,7 +23,7 @@ export function AdminLayout() {
             <span className="text-sm font-semibold text-[#0f172a]">Друзья Admin</span>
           </div>
           <nav className="flex items-center gap-1">
-            {ADMIN_TABS.map((tab) => (
+            {ADMIN_NAV.map((tab) => (
               <Link
                 key={tab.href}
                 to={tab.href}

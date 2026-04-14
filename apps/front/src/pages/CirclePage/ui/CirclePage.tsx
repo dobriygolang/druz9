@@ -10,27 +10,8 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { Modal } from '@/shared/ui/Modal'
 import { Input } from '@/shared/ui/Input'
 import { useToast } from '@/shared/ui/Toast'
-
-function formatDate(iso: string) {
-  try {
-    return new Date(iso).toLocaleDateString('ru-RU', { month: 'long', day: 'numeric', year: 'numeric' })
-  } catch { return '' }
-}
-
-const CIRCLE_GRADIENTS = [
-  { from: '#6366f1', to: '#8b5cf6' },
-  { from: '#06b6d4', to: '#0ea5e9' },
-  { from: '#f97316', to: '#f59e0b' },
-  { from: '#10b981', to: '#059669' },
-  { from: '#ec4899', to: '#f43f5e' },
-  { from: '#8b5cf6', to: '#6366f1' },
-]
-
-function getCircleGradient(name: string) {
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return CIRCLE_GRADIENTS[Math.abs(hash) % CIRCLE_GRADIENTS.length]
-}
+import { formatDate } from '@/shared/lib/dateFormat'
+import { getCircleGradient } from '@/shared/lib/circleGradient'
 
 type Tab = 'overview' | 'members' | 'events'
 
@@ -73,7 +54,7 @@ export function CirclePage() {
       .then(setMembers)
       .catch(() => {})
       .finally(() => setMembersLoading(false))
-  }, [circleId])
+  }, [circleId, membersLoading])
 
   const loadEvents = useCallback(() => {
     if (!circleId) return
