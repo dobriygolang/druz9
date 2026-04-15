@@ -1,6 +1,6 @@
 import { apiClient } from '@/shared/api/base'
 import { createCache } from '@/shared/api/cache'
-import type { CompleteProfilePayload, ProfileProgress, ProfileResponse, User, UserGoal } from '@/entities/User/model/types'
+import type { CompleteProfilePayload, FeedItem, ProfileProgress, ProfileResponse, User, UserGoal } from '@/entities/User/model/types'
 
 type BackendUser = {
   id: string
@@ -50,6 +50,7 @@ function normalizeUser(user: BackendUser): User {
     currentWorkplace: user.currentWorkplace ?? '',
     connectedProviders: user.connectedProviders ?? [],
     primaryProvider: user.primaryProvider ?? '',
+    pinnedAchievements: (user as any).pinnedAchievements ?? [],
     createdAt: user.createdAt ?? '',
   }
 }

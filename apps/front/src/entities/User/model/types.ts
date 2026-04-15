@@ -16,6 +16,7 @@ export interface User {
   currentWorkplace: string
   connectedProviders: string[]
   primaryProvider: string
+  pinnedAchievements: string[]
   createdAt: string
 }
 
@@ -59,6 +60,7 @@ export interface ProfileCompetency {
   level: SkillLevel
   levelProgress: number
   nextMilestone: string
+  scoreDelta30d: number
 }
 
 export interface NextAction {
@@ -75,6 +77,26 @@ export interface UserGoal {
   company: string
 }
 
+export interface Achievement {
+  id: string
+  title: string
+  description: string
+  icon: string
+  unlocked: boolean
+  category: string
+  tier: 'bronze' | 'silver' | 'gold' | 'diamond'
+  progress: number
+  target: number
+}
+
+export interface FeedItem {
+  type: 'mock_stage' | 'practice' | string
+  title: string
+  description: string
+  score?: number
+  timestamp: string
+}
+
 export interface ProfileProgress {
   overview: {
     practiceSessions: number
@@ -86,6 +108,11 @@ export interface ProfileProgress {
     averageStageScore: number
     averageQuestionScore: number
     currentStreakDays: number
+    level: number
+    levelProgress: number
+    totalXp: number
+    longestStreakDays: number
+    activityPercentile: number
   }
   competencies: ProfileCompetency[]
   strongest: ProfileCompetency[]

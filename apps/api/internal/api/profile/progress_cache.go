@@ -47,3 +47,7 @@ func (c *CachedProgressRepository) GetDailyActivity(ctx context.Context, userID 
 func (c *CachedProgressRepository) SaveUserGoal(ctx context.Context, userID uuid.UUID, goal *model.UserGoal) error {
 	return c.inner.SaveUserGoal(ctx, userID, goal)
 }
+
+func (c *CachedProgressRepository) GetProfileFeed(ctx context.Context, userID uuid.UUID, limit int) ([]*model.FeedItem, error) {
+	return c.inner.GetProfileFeed(ctx, userID, limit)
+}
