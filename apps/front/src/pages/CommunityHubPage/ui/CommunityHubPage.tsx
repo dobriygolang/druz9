@@ -16,6 +16,7 @@ export function CommunityHubPage() {
     { id: 'circles', label: t('community.tab.circles'), href: '/community/circles' },
     { id: 'map', label: t('community.tab.map'), href: '/community/map' },
     { id: 'vacancies', label: t('community.tab.vacancies'), href: '/community/vacancies' },
+    { id: 'podcasts', label: t('community.tab.podcasts'), href: '/community/podcasts' },
   ]
   const active = tabs.find(t => location.pathname.startsWith(`/community/${t.id}`))?.id ?? 'people'
 

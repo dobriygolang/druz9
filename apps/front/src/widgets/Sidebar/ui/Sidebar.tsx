@@ -6,7 +6,7 @@ import { cn } from '@/shared/lib/cn'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { Avatar } from '@/shared/ui/Avatar'
-import { PRIMARY_NAV_ITEMS, SECONDARY_NAV_ITEMS, isFullscreenPath, isNavItemActive } from '@/widgets/navigation/model/navigation'
+import { PRIMARY_NAV_ITEMS, isFullscreenPath, isNavItemActive } from '@/widgets/navigation/model/navigation'
 
 export function Sidebar() {
   const location = useLocation()
@@ -77,7 +77,7 @@ export function Sidebar() {
 
       {/* Navigation */}
       <nav className="flex-1 overflow-y-auto px-2 lg:px-3 flex flex-col gap-0.5">
-        {[...PRIMARY_NAV_ITEMS, ...SECONDARY_NAV_ITEMS].map((item) => {
+        {PRIMARY_NAV_ITEMS.map((item) => {
           const active = isNavItemActive(location.pathname, item)
           const Icon = item.icon
           return (

@@ -1,7 +1,7 @@
 import { useTranslation } from 'react-i18next'
 import type { ProfileProgress } from '@/entities/User/model/types'
 import type { ArenaStats } from '../hooks/useProfileData'
-import { computeLeague } from '../lib/computeLevel'
+import { leagueFromEnum } from '../lib/computeLevel'
 
 interface Props {
   theirProgress: ProfileProgress | null
@@ -31,12 +31,12 @@ export function ProfileComparison({
           <span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.comparison.rating')}</span>{' '}
           {t('profile.comparison.theirs', {
             rating: theirArenaStats?.rating ?? 0,
-            league: t(`profile.leagueLabel.${computeLeague(theirArenaStats?.rating ?? 0)}`),
+            league: t(`profile.leagueLabel.${leagueFromEnum(theirArenaStats?.league)}`),
           })}{' '}
           ·{' '}
           {t('profile.comparison.yours', {
             rating: myArenaStats?.rating ?? 0,
-            league: t(`profile.leagueLabel.${computeLeague(myArenaStats?.rating ?? 0)}`),
+            league: t(`profile.leagueLabel.${leagueFromEnum(myArenaStats?.league)}`),
           })}
         </p>
         <p>

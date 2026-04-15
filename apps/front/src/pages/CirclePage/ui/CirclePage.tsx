@@ -1,22 +1,28 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Users, Hash, UserPlus, UserMinus, Globe, Lock, Calendar, Play, Share2, Check, Plus, ExternalLink, RefreshCw, Trash2 } from 'lucide-react'
+import { ArrowLeft, Users, Hash, UserPlus, UserMinus, Globe, Lock, Calendar, Play, Share2, Check, Plus, ExternalLink, RefreshCw, Trash2, Zap, Trophy, Target } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { circleApi, type CircleMember } from '@/features/Circle/api/circleApi'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { eventApi, type Event, type EventRepeat } from '@/features/Event/api/eventApi'
-import type { Circle } from '@/entities/Circle/model/types'
+import type { Circle, CirclePulse, CircleChallenge, CircleMemberStats } from '@/entities/Circle/model/types'
 import { Button } from '@/shared/ui/Button'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Modal } from '@/shared/ui/Modal'
 import { Input } from '@/shared/ui/Input'
 import { useToast } from '@/shared/ui/Toast'
-import { formatDate } from '@/shared/lib/dateFormat'
 import { getCircleGradient } from '@/shared/lib/circleGradient'
 import { PageMeta } from '@/shared/ui/PageMeta'
 
-type Tab = 'overview' | 'members' | 'events'
+type Tab = 'pulse' | 'members' | 'challenge' | 'events'
+
+const CHALLENGE_TEMPLATES = [
+  { key: 'daily_completion', defaultTarget: 5 },
+  { key: 'streak_days', defaultTarget: 5 },
+  { key: 'duels_count', defaultTarget: 3 },
+  { key: 'mocks_count', defaultTarget: 2 },
+] as const
 
 export function CirclePage() {
   const { t } = useTranslation()
@@ -30,7 +36,7 @@ export function CirclePage() {
   const [membersLoading, setMembersLoading] = useState(false)
   const [actionLoading, setActionLoading] = useState(false)
   const [practiceLoading, setPracticeLoading] = useState(false)
-  const [activeTab, setActiveTab] = useState<Tab>('overview')
+  const [activeTab, setActiveTab] = useState<Tab>('pulse')
   const [copied, setCopied] = useState(false)
   const [events, setEvents] = useState<Event[]>([])
   const [eventsLoading, setEventsLoading] = useState(false)
@@ -44,6 +50,21 @@ export function CirclePage() {
   const [inviting, setInviting] = useState(false)
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
   const [deleting, setDeleting] = useState(false)
+
+  // Pulse state
+  const [pulse, setPulse] = useState<CirclePulse | null>(null)
+  const [pulseLoading, setPulseLoading] = useState(false)
+
+  // Member stats state
+  const [memberStats, setMemberStats] = useState<CircleMemberStats[]>([])
+  const [memberStatsLoading, setMemberStatsLoading] = useState(false)
+
+  // Challenge state
+  const [challenge, setChallenge] = useState<CircleChallenge | null>(null)
+  const [challengeLoading, setChallengeLoading] = useState(false)
+  const [showCreateChallenge, setShowCreateChallenge] = useState(false)
+  const [challengeForm, setChallengeForm] = useState({ templateKey: 'daily_completion', targetValue: 5 })
+  const [creatingChallenge, setCreatingChallenge] = useState(false)
 
   useEffect(() => {
     if (!circleId) return
@@ -74,10 +95,45 @@ export function CirclePage() {
       .finally(() => setEventsLoading(false))
   }, [circleId])
 
+  const pulseLoadingRef = useRef(false)
+  const loadPulse = useCallback(() => {
+    if (!circleId || pulseLoadingRef.current) return
+    pulseLoadingRef.current = true
+    setPulseLoading(true)
+    circleApi.getCirclePulse(circleId)
+      .then(setPulse)
+      .catch(() => {})
+      .finally(() => { pulseLoadingRef.current = false; setPulseLoading(false) })
+  }, [circleId])
+
+  const memberStatsLoadingRef = useRef(false)
+  const loadMemberStats = useCallback(() => {
+    if (!circleId || memberStatsLoadingRef.current) return
+    memberStatsLoadingRef.current = true
+    setMemberStatsLoading(true)
+    circleApi.getCircleMemberStats(circleId)
+      .then(setMemberStats)
+      .catch(() => {})
+      .finally(() => { memberStatsLoadingRef.current = false; setMemberStatsLoading(false) })
+  }, [circleId])
+
+  const challengeLoadingRef = useRef(false)
+  const loadChallenge = useCallback(() => {
+    if (!circleId || challengeLoadingRef.current) return
+    challengeLoadingRef.current = true
+    setChallengeLoading(true)
+    circleApi.getActiveChallenge(circleId)
+      .then(setChallenge)
+      .catch(() => {})
+      .finally(() => { challengeLoadingRef.current = false; setChallengeLoading(false) })
+  }, [circleId])
+
   useEffect(() => {
-    if (activeTab === 'members') loadMembers()
+    if (activeTab === 'pulse') loadPulse()
+    if (activeTab === 'members') { loadMembers(); loadMemberStats() }
     if (activeTab === 'events') loadEvents()
-  }, [activeTab, loadMembers, loadEvents])
+    if (activeTab === 'challenge') loadChallenge()
+  }, [activeTab, loadPulse, loadMembers, loadMemberStats, loadEvents, loadChallenge])
 
   const handleCreateEvent = async () => {
     if (!circleId || !eventForm.title) return
@@ -167,6 +223,19 @@ export function CirclePage() {
     })
   }
 
+  const handleCreateChallenge = async () => {
+    if (!circleId) return
+    setCreatingChallenge(true)
+    try {
+      const created = await circleApi.createChallenge(circleId, challengeForm.templateKey, challengeForm.targetValue)
+      setChallenge(created)
+      setShowCreateChallenge(false)
+      toast(t('circle.challenge.created'), 'success')
+    } catch {
+      toast(t('circle.challenge.createFailed'), 'error')
+    } finally { setCreatingChallenge(false) }
+  }
+
   if (loading) {
     return (
       <div className="min-h-full">
@@ -184,6 +253,7 @@ export function CirclePage() {
 
   const grad = getCircleGradient(circle.name)
   const initials = circle.name.slice(0, 2).toUpperCase()
+  const isCreator = user && circle.creatorId === user.id
 
   return (
     <div className="min-h-full flex flex-col">
@@ -209,7 +279,7 @@ export function CirclePage() {
           >
             {copied ? <Check className="w-4 h-4 text-[#22c55e]" /> : <Share2 className="w-4 h-4" />}
           </button>
-          {user && circle.creatorId === user.id && (
+          {isCreator && (
             <button
               onClick={() => setShowDeleteConfirm(true)}
               className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-[#94a3b8] hover:text-red-500 transition-colors"
@@ -277,6 +347,21 @@ export function CirclePage() {
           </p>
         )}
 
+        {/* Tags */}
+        {circle.tags.length > 0 && (
+          <div className="relative mt-3 flex flex-wrap gap-1.5">
+            {circle.tags.map(tag => (
+              <span
+                key={tag}
+                className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium"
+                style={{ background: `${grad.from}18`, color: grad.from, border: `1px solid ${grad.from}30` }}
+              >
+                <Hash className="w-2.5 h-2.5" />{tag}
+              </span>
+            ))}
+          </div>
+        )}
+
         {/* Start practice CTA */}
         <div className="relative mt-4">
           <Button
@@ -298,19 +383,21 @@ export function CirclePage() {
       {/* Tabs */}
       <div className="px-4 pt-4 flex gap-1 bg-transparent flex-wrap">
         {([
-          { id: 'overview', label: t('circle.tabs.overview') },
-          { id: 'members', label: `${t('circle.tabs.members')} · ${circle.memberCount}` },
-          { id: 'events', label: `${t('circle.tabs.events')}${events.length > 0 ? ` · ${events.length}` : ''}` },
-        ] as { id: Tab; label: string }[]).map(tab => (
+          { id: 'pulse' as Tab, label: t('circle.tabs.pulse'), icon: <Zap className="w-3.5 h-3.5" /> },
+          { id: 'members' as Tab, label: `${t('circle.tabs.members')} · ${circle.memberCount}`, icon: <Users className="w-3.5 h-3.5" /> },
+          { id: 'challenge' as Tab, label: t('circle.tabs.challenge'), icon: <Target className="w-3.5 h-3.5" /> },
+          { id: 'events' as Tab, label: `${t('circle.tabs.events')}${events.length > 0 ? ` · ${events.length}` : ''}`, icon: <Calendar className="w-3.5 h-3.5" /> },
+        ]).map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all ${
+            className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 ${
               activeTab === tab.id
                 ? 'bg-white dark:bg-[#161c2d] text-[#111111] dark:text-[#e2e8f3] shadow-sm border border-[#E7E8E5] dark:border-[#1e3158]'
                 : 'text-[#666666] dark:text-[#7e93b0] hover:text-[#111111] dark:hover:text-[#e2e8f3]'
             }`}
           >
+            {tab.icon}
             {tab.label}
           </button>
         ))}
@@ -318,98 +405,293 @@ export function CirclePage() {
 
       {/* Body */}
       <div className="flex-1 px-4 py-4 flex flex-col gap-3">
-        {activeTab === 'overview' && (
+
+        {/* ===== PULSE TAB ===== */}
+        {activeTab === 'pulse' && (
           <>
-            {/* Tags */}
-            {circle.tags.length > 0 && (
-              <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-4">
-                <p className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-3">{t('circle.topics')}</p>
-                <div className="flex flex-wrap gap-2">
-                  {circle.tags.map(tag => (
-                    <span
-                      key={tag}
-                      className="inline-flex items-center gap-1 px-3 py-1 rounded-full text-xs font-semibold"
-                      style={{ background: `${grad.from}18`, color: grad.from, border: `1px solid ${grad.from}30` }}
+            {pulseLoading ? (
+              <>
+                <div className="h-20 bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] animate-pulse" />
+                <div className="h-40 bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] animate-pulse" />
+              </>
+            ) : pulse ? (
+              <>
+                {/* Active today */}
+                <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-4">
+                  <div className="flex items-center justify-between">
+                    <div>
+                      <p className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider">{t('circle.pulse.activeToday')}</p>
+                      <p className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3] mt-1">
+                        {pulse.activeToday}<span className="text-sm font-normal text-[#94a3b8]">/{pulse.totalMembers}</span>
+                      </p>
+                    </div>
+                    <div
+                      className="w-12 h-12 rounded-xl flex items-center justify-center"
+                      style={{ background: `${grad.from}18` }}
                     >
-                      <Hash className="w-2.5 h-2.5" />{tag}
-                    </span>
+                      <Zap className="w-6 h-6" style={{ color: grad.from }} />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Week activity bars */}
+                {pulse.weekActivity.length > 0 && (
+                  <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-4">
+                    <p className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-3">{t('circle.pulse.weekActivity')}</p>
+                    <div className="flex flex-col gap-2">
+                      {pulse.weekActivity.map(day => {
+                        const total = day.dailyCount + day.duelCount + day.mockCount
+                        const maxBar = Math.max(...pulse.weekActivity.map(d => d.dailyCount + d.duelCount + d.mockCount), 1)
+                        const pct = Math.round((total / maxBar) * 100)
+                        const dayLabel = new Date(day.date + 'T00:00:00').toLocaleDateString(undefined, { weekday: 'short' })
+                        return (
+                          <div key={day.date} className="flex items-center gap-3">
+                            <span className="text-xs text-[#94a3b8] w-10 text-right flex-shrink-0">{dayLabel}</span>
+                            <div className="flex-1 h-5 bg-[#f1f5f9] dark:bg-[#1a2236] rounded-full overflow-hidden relative">
+                              <div
+                                className="h-full rounded-full transition-all duration-500"
+                                style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${grad.from}, ${grad.to})`, minWidth: total > 0 ? '8px' : '0' }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium text-[#666666] dark:text-[#7e93b0] w-6 text-right flex-shrink-0">{total}</span>
+                          </div>
+                        )
+                      })}
+                    </div>
+                    <div className="flex items-center gap-4 mt-3 text-[10px] text-[#94a3b8]">
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#6366f1]" />{t('circle.pulse.daily')}</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#f59e0b]" />{t('circle.pulse.duels')}</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#22c55e]" />{t('circle.pulse.mocks')}</span>
+                    </div>
+                  </div>
+                )}
+
+                {/* Recent actions */}
+                {pulse.recentActions.length > 0 && (
+                  <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] overflow-hidden">
+                    <div className="px-5 pt-4 pb-2">
+                      <p className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider">{t('circle.pulse.recentActions')}</p>
+                    </div>
+                    <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+                      {pulse.recentActions.map((action, idx) => {
+                        const name = [action.firstName, action.lastName].filter(Boolean).join(' ') || t('circle.memberFallback')
+                        const actionColor = action.actionType === 'daily' ? '#6366f1' : action.actionType === 'duel' ? '#f59e0b' : '#22c55e'
+                        return (
+                          <div key={idx} className="flex items-center gap-3 px-5 py-2.5">
+                            <Avatar name={name} src={action.avatarUrl || undefined} size="xs" />
+                            <div className="flex-1 min-w-0">
+                              <p className="text-sm text-[#111111] dark:text-[#e2e8f3] truncate">
+                                <span className="font-medium">{name}</span>
+                                {' '}
+                                <span className="text-[#666666] dark:text-[#7e93b0]">
+                                  {t(`circle.pulse.action.${action.actionType}`, { detail: action.actionDetail })}
+                                </span>
+                              </p>
+                            </div>
+                            <span
+                              className="w-2 h-2 rounded-full flex-shrink-0"
+                              style={{ background: actionColor }}
+                            />
+                          </div>
+                        )
+                      })}
+                    </div>
+                  </div>
+                )}
+
+                {/* Empty pulse state */}
+                {pulse.recentActions.length === 0 && pulse.weekActivity.every(d => d.dailyCount + d.duelCount + d.mockCount === 0) && (
+                  <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-10 text-center">
+                    <Zap className="w-8 h-8 text-[#CBCCC9] mx-auto mb-3" />
+                    <p className="text-sm text-[#94a3b8]">{t('circle.pulse.empty')}</p>
+                  </div>
+                )}
+              </>
+            ) : null}
+          </>
+        )}
+
+        {/* ===== MEMBERS TAB ===== */}
+        {activeTab === 'members' && (
+          <>
+            {circle.isJoined && !circle.isPublic && (
+              <div className="flex justify-end">
+                <Button variant="orange" size="sm" onClick={() => setShowInvite(true)}>
+                  <UserPlus className="w-3.5 h-3.5" /> {t('circle.invite')}
+                </Button>
+              </div>
+            )}
+
+            {/* Stats table */}
+            {memberStatsLoading ? (
+              <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] overflow-hidden">
+                <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <div key={i} className="flex items-center gap-3 px-5 py-3 animate-pulse">
+                      <div className="w-9 h-9 rounded-full bg-[#e2e8f0] dark:bg-[#1e3158]" />
+                      <div className="flex-1">
+                        <div className="h-3 w-32 bg-[#e2e8f0] dark:bg-[#1e3158] rounded mb-1.5" />
+                        <div className="h-2.5 w-48 bg-[#e2e8f0] dark:bg-[#1e3158] rounded" />
+                      </div>
+                    </div>
                   ))}
                 </div>
               </div>
-            )}
-
-            {/* Meta */}
-            {circle.createdAt && (
-              <div className="flex items-center gap-2 px-1 py-1 text-xs text-[#94a3b8]">
-                <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                {t('circle.createdAt', { date: formatDate(circle.createdAt) })}
+            ) : memberStats.length > 0 ? (
+              <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] overflow-hidden">
+                {/* Header */}
+                <div className="hidden sm:grid grid-cols-[1fr_80px_70px_70px_70px_70px] gap-2 px-5 py-2.5 text-[10px] font-semibold text-[#94a3b8] uppercase tracking-wider border-b border-[#F2F3F0] dark:border-[#1e3158]">
+                  <span>{t('circle.stats.name')}</span>
+                  <span className="text-center">{t('circle.stats.rating', 'Rating')}</span>
+                  <span className="text-center">{t('circle.stats.daily')}</span>
+                  <span className="text-center">{t('circle.stats.duels')}</span>
+                  <span className="text-center">{t('circle.stats.mocks')}</span>
+                  <span className="text-center">{t('circle.stats.role')}</span>
+                </div>
+                <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+                  {memberStats.map(s => {
+                    const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || t('circle.memberFallback')
+                    return (
+                      <button
+                        key={s.userId}
+                        onClick={() => navigate(`/profile/${s.userId}`)}
+                        className="w-full flex items-center sm:grid sm:grid-cols-[1fr_80px_70px_70px_70px_70px] gap-2 px-5 py-3 hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] transition-colors text-left"
+                      >
+                        <div className="flex items-center gap-3 min-w-0">
+                          <Avatar name={name} src={s.avatarUrl || undefined} size="sm" />
+                          <div className="min-w-0">
+                            <p className="text-sm font-medium text-[#111111] dark:text-[#e2e8f3] truncate">{name}</p>
+                            {s.role === 'creator' && (
+                              <p className="text-[11px] text-[#6366F1]">{t('circle.creator')}</p>
+                            )}
+                          </div>
+                        </div>
+                        {/* Mobile: inline stats */}
+                        <div className="flex items-center gap-3 sm:contents text-xs text-[#666666] dark:text-[#7e93b0] ml-auto sm:ml-0">
+                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#e2e8f3]">
+                            {s.arenaRating ?? 300}
+                            {s.arenaLeague && <span className="ml-1 text-[10px] text-[#94a3b8]">{s.arenaLeague}</span>}
+                          </span>
+                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#e2e8f3]">{s.dailySolved}</span>
+                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#e2e8f3]">{s.duelsWon}/{s.duelsPlayed}</span>
+                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#e2e8f3]">{s.mocksDone}</span>
+                          <span className="hidden sm:block sm:text-center text-xs text-[#94a3b8]">{s.role}</span>
+                        </div>
+                      </button>
+                    )
+                  })}
+                </div>
               </div>
-            )}
-
-            {/* No tags empty state */}
-            {circle.tags.length === 0 && !circle.description && (
-              <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-8 text-center">
-                <p className="text-sm text-[#94a3b8]">{t('circle.emptyOverview')}</p>
-              </div>
-            )}
-          </>
-        )}
-
-        {activeTab === 'members' && (
-          <>
-          {/* Invite button — visible to creator only (private circles) or anyone for public */}
-          {circle.isJoined && !circle.isPublic && (
-            <div className="flex justify-end">
-              <Button variant="orange" size="sm" onClick={() => setShowInvite(true)}>
-                <UserPlus className="w-3.5 h-3.5" /> {t('circle.invite')}
-              </Button>
-            </div>
-          )}
-          <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] overflow-hidden">
-            {membersLoading ? (
-              <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
-                {Array.from({ length: 4 }).map((_, i) => (
-                  <div key={i} className="flex items-center gap-3 px-5 py-3 animate-pulse">
-                    <div className="w-9 h-9 rounded-full bg-[#e2e8f0] dark:bg-[#1e3158]" />
-                    <div className="flex-1">
-                      <div className="h-3 w-32 bg-[#e2e8f0] dark:bg-[#1e3158] rounded mb-1.5" />
-                      <div className="h-2.5 w-20 bg-[#e2e8f0] dark:bg-[#1e3158] rounded" />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            ) : members.length === 0 ? (
-              <div className="px-5 py-10 text-center">
+            ) : members.length === 0 && !membersLoading ? (
+              <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-10 text-center">
                 <Users className="w-8 h-8 text-[#CBCCC9] mx-auto mb-3" />
                 <p className="text-sm text-[#94a3b8]">{t('circle.noMembers')}</p>
               </div>
-            ) : (
-              <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
-                {members.map(m => {
-                  const name = [m.firstName, m.lastName].filter(Boolean).join(' ') || t('circle.memberFallback')
-                  return (
-                    <button
-                      key={m.userId}
-                      onClick={() => navigate(`/profile/${m.userId}`)}
-                      className="w-full flex items-center gap-3 px-5 py-3 hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] transition-colors text-left"
-                    >
-                      <Avatar name={name} src={m.avatarUrl || undefined} size="sm" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-[#111111] dark:text-[#e2e8f3] truncate">{name}</p>
-                        {m.role === 'creator' && (
-                          <p className="text-[11px] text-[#6366F1]">{t('circle.creator')}</p>
-                        )}
-                      </div>
-                      <span className="text-xs text-[#94a3b8] flex-shrink-0">{formatDate(m.joinedAt)}</span>
-                    </button>
-                  )
-                })}
-              </div>
-            )}
-          </div>
+            ) : null}
           </>
         )}
 
+        {/* ===== CHALLENGE TAB ===== */}
+        {activeTab === 'challenge' && (
+          <>
+            {challengeLoading ? (
+              <div className="h-40 bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] animate-pulse" />
+            ) : challenge ? (
+              <>
+                {/* Challenge header */}
+                <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-4">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${grad.from}18` }}>
+                        <Trophy className="w-4 h-4" style={{ color: grad.from }} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">
+                          {t(`circle.challenge.template.${challenge.templateKey}`)}
+                        </p>
+                        <p className="text-[11px] text-[#94a3b8]">
+                          {t('circle.challenge.target', { value: challenge.targetValue })}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-[10px] text-[#94a3b8] uppercase tracking-wider">{t('circle.challenge.endsIn')}</p>
+                      <p className="text-xs font-medium text-[#111111] dark:text-[#e2e8f3]">
+                        {Math.max(0, Math.ceil((new Date(challenge.endsAt).getTime() - Date.now()) / 86400000))} {t('circle.challenge.days')}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Overall progress bar */}
+                  {(() => {
+                    const completed = challenge.progress.filter(p => p.current >= challenge.targetValue).length
+                    const total = challenge.progress.length
+                    const pct = total > 0 ? Math.round((completed / total) * 100) : 0
+                    return (
+                      <div>
+                        <div className="flex items-center justify-between text-xs mb-1.5">
+                          <span className="text-[#666666] dark:text-[#7e93b0]">{t('circle.challenge.teamProgress')}</span>
+                          <span className="font-medium text-[#111111] dark:text-[#e2e8f3]">{completed}/{total}</span>
+                        </div>
+                        <div className="h-2.5 bg-[#f1f5f9] dark:bg-[#1a2236] rounded-full overflow-hidden">
+                          <div
+                            className="h-full rounded-full transition-all duration-700"
+                            style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${grad.from}, ${grad.to})` }}
+                          />
+                        </div>
+                      </div>
+                    )
+                  })()}
+                </div>
+
+                {/* Per-member progress */}
+                <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] overflow-hidden">
+                  <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+                    {challenge.progress.map(p => {
+                      const name = [p.firstName, p.lastName].filter(Boolean).join(' ') || t('circle.memberFallback')
+                      const done = p.current >= challenge.targetValue
+                      const pct = Math.min(100, Math.round((p.current / challenge.targetValue) * 100))
+                      return (
+                        <div key={p.userId} className="flex items-center gap-3 px-5 py-3">
+                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0 ${done ? 'bg-[#22c55e] text-white' : 'bg-[#f1f5f9] dark:bg-[#1a2236] text-[#94a3b8]'}`}>
+                            {done ? <Check className="w-3 h-3" /> : null}
+                          </span>
+                          <Avatar name={name} src={p.avatarUrl || undefined} size="xs" />
+                          <div className="flex-1 min-w-0">
+                            <p className="text-sm text-[#111111] dark:text-[#e2e8f3] truncate">{name}</p>
+                          </div>
+                          <div className="flex items-center gap-2 flex-shrink-0">
+                            <div className="w-16 h-1.5 bg-[#f1f5f9] dark:bg-[#1a2236] rounded-full overflow-hidden">
+                              <div
+                                className="h-full rounded-full"
+                                style={{ width: `${pct}%`, background: done ? '#22c55e' : grad.from }}
+                              />
+                            </div>
+                            <span className="text-xs font-medium text-[#666666] dark:text-[#7e93b0] w-10 text-right">
+                              {p.current}/{challenge.targetValue}
+                            </span>
+                          </div>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+              </>
+            ) : (
+              <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-10 text-center">
+                <Target className="w-8 h-8 text-[#CBCCC9] mx-auto mb-3" />
+                <p className="text-sm text-[#94a3b8] mb-4">{t('circle.challenge.empty')}</p>
+                {isCreator && (
+                  <Button variant="orange" size="sm" onClick={() => setShowCreateChallenge(true)}>
+                    <Plus className="w-3.5 h-3.5" /> {t('circle.challenge.create')}
+                  </Button>
+                )}
+              </div>
+            )}
+          </>
+        )}
+
+        {/* ===== EVENTS TAB ===== */}
         {activeTab === 'events' && (
           <>
             {circle.isJoined && (
@@ -545,6 +827,64 @@ export function CirclePage() {
           </div>
           <Input label={t('events.form.link')} value={eventForm.meetingLink} onChange={e => setEventForm(f => ({ ...f, meetingLink: e.target.value }))} placeholder="https://meet.google.com/..." />
           <Input label={t('events.form.description')} value={eventForm.description} onChange={e => setEventForm(f => ({ ...f, description: e.target.value }))} placeholder={t('circle.eventDescriptionPlaceholder')} />
+        </div>
+      </Modal>
+
+      {/* Create challenge modal */}
+      <Modal
+        open={showCreateChallenge}
+        onClose={() => setShowCreateChallenge(false)}
+        title={t('circle.challenge.createTitle')}
+        footer={
+          <>
+            <Button variant="secondary" size="sm" onClick={() => setShowCreateChallenge(false)}>{t('common.cancel')}</Button>
+            <Button variant="orange" size="sm" onClick={handleCreateChallenge} loading={creatingChallenge}>
+              {t('common.create')}
+            </Button>
+          </>
+        }
+      >
+        <div className="flex flex-col gap-4">
+          <div>
+            <label className="text-xs font-medium text-[#475569] dark:text-[#94a3b8] mb-2 block">{t('circle.challenge.selectType')}</label>
+            <div className="flex flex-col gap-2">
+              {CHALLENGE_TEMPLATES.map(tmpl => (
+                <button
+                  key={tmpl.key}
+                  onClick={() => setChallengeForm(f => ({ ...f, templateKey: tmpl.key, targetValue: tmpl.defaultTarget }))}
+                  className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left ${
+                    challengeForm.templateKey === tmpl.key
+                      ? 'border-[#6366F1] bg-[#EEF2FF] dark:bg-[#1e1e4a]'
+                      : 'border-[#E7E8E5] dark:border-[#1e3158] hover:border-[#94a3b8]'
+                  }`}
+                >
+                  <div className="flex-1">
+                    <p className="text-sm font-medium text-[#111111] dark:text-[#e2e8f3]">
+                      {t(`circle.challenge.template.${tmpl.key}`)}
+                    </p>
+                    <p className="text-xs text-[#94a3b8] mt-0.5">
+                      {t(`circle.challenge.templateDesc.${tmpl.key}`)}
+                    </p>
+                  </div>
+                  {challengeForm.templateKey === tmpl.key && (
+                    <Check className="w-4 h-4 text-[#6366F1] flex-shrink-0" />
+                  )}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-medium text-[#475569] dark:text-[#94a3b8] mb-1 block">{t('circle.challenge.targetLabel')}</label>
+            <input
+              type="number"
+              min={1}
+              max={100}
+              value={challengeForm.targetValue}
+              onChange={e => setChallengeForm(f => ({ ...f, targetValue: Math.max(1, parseInt(e.target.value) || 1) }))}
+              className="w-full px-3 py-2 rounded-lg border border-[#E7E8E5] dark:border-[#1e3158] bg-white dark:bg-[#0f1117] text-sm text-[#111111] dark:text-[#e2e8f3] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30"
+            />
+            <p className="text-[11px] text-[#94a3b8] mt-1">{t('circle.challenge.duration')}</p>
+          </div>
         </div>
       </Modal>
 

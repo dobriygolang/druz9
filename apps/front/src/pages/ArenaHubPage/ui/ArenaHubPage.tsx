@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Flame, Trophy, Swords, Zap, Users, Copy, Check, Link2 } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { useAuth } from '@/app/providers/AuthProvider'
 import { apiClient } from '@/shared/api/base'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { Card } from '@/shared/ui/Card'
@@ -16,26 +17,36 @@ import { DIFF_LABELS, DIFF_VARIANTS, LANG_LABELS } from '@/shared/lib/taskLabels
 import { PageMeta } from '@/shared/ui/PageMeta'
 
 const LEAGUE_COLORS: Record<string, string> = {
-  ARENA_LEAGUE_BRONZE: 'text-[#cd7f32]',
-  ARENA_LEAGUE_SILVER: 'text-[#94a3b8]',
-  ARENA_LEAGUE_GOLD: 'text-[#f59e0b]',
-  ARENA_LEAGUE_PLATINUM: 'text-[#22c55e]',
-  ARENA_LEAGUE_DIAMOND: 'text-[#6366f1]',
-  ARENA_LEAGUE_MASTER: 'text-[#8b5cf6]',
-  ARENA_LEAGUE_LEGEND: 'text-[#6366F1]',
+  ARENA_LEAGUE_BRONZE: 'text-[#A0785A]',
+  ARENA_LEAGUE_SILVER: 'text-[#8B95A5]',
+  ARENA_LEAGUE_GOLD: 'text-[#D4A017]',
+  ARENA_LEAGUE_PLATINUM: 'text-[#4ECDC4]',
+  ARENA_LEAGUE_DIAMOND: 'text-[#7C6FE0]',
+  ARENA_LEAGUE_MASTER: 'text-[#E64980]',
+}
+const LEAGUE_BG_COLORS: Record<string, string> = {
+  ARENA_LEAGUE_BRONZE: 'bg-[#A0785A]',
+  ARENA_LEAGUE_SILVER: 'bg-[#8B95A5]',
+  ARENA_LEAGUE_GOLD: 'bg-[#D4A017]',
+  ARENA_LEAGUE_PLATINUM: 'bg-[#4ECDC4]',
+  ARENA_LEAGUE_DIAMOND: 'bg-[#7C6FE0]',
+  ARENA_LEAGUE_MASTER: 'bg-[#E64980]',
 }
 const LEAGUE_LABELS: Record<string, string> = {
   ARENA_LEAGUE_BRONZE: 'Bronze', ARENA_LEAGUE_SILVER: 'Silver',
   ARENA_LEAGUE_GOLD: 'Gold', ARENA_LEAGUE_PLATINUM: 'Platinum',
-  ARENA_LEAGUE_DIAMOND: 'Diamond', ARENA_LEAGUE_MASTER: 'Master', ARENA_LEAGUE_LEGEND: 'Legend',
+  ARENA_LEAGUE_DIAMOND: 'Diamond', ARENA_LEAGUE_MASTER: 'Master',
 }
 
 export function ArenaHubPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const isMobile = useIsMobile()
+  const { user: authUser } = useAuth()
   const { toast } = useToast()
   const [leaderboard, setLeaderboard] = useState<any[]>([])
+  const [seasonInfo, setSeasonInfo] = useState<{ seasonNumber: number; endsAt: string } | null>(null)
+  const [myStats, setMyStats] = useState<any>(null)
   const [openMatches, setOpenMatches] = useState<any[]>([])
   const [queueStatus, setQueueStatus] = useState<any>(null)
   const [inQueue, setInQueue] = useState(false)
@@ -65,8 +76,12 @@ export function ArenaHubPage() {
 
   const fetchData = useCallback(() => {
     setError(null)
-    Promise.all([
-      apiClient.get('/api/v1/arena/leaderboard?limit=10').then(r => setLeaderboard((r.data as any).entries ?? [])),
+    const promises: Promise<any>[] = [
+      apiClient.get('/api/v1/arena/leaderboard?limit=10').then(r => {
+        const d = r.data as any
+        setLeaderboard(d.entries ?? [])
+        if (d.season) setSeasonInfo(d.season)
+      }),
       apiClient.get('/api/v1/arena/open-matches?limit=5').then(r => setOpenMatches((r.data as any).matches ?? [])),
       apiClient.get('/api/v1/arena/queue/status').then(r => {
         const d = r.data as any
@@ -74,8 +89,17 @@ export function ArenaHubPage() {
         setInQueue(d.status === 'ARENA_QUEUE_STATUS_QUEUED' || d.status === 'ARENA_QUEUE_STATUS_MATCHED')
         if (d.match?.id) navigate(`/arena/${d.match.id}`)
       }),
-    ]).catch(() => setError(t('common.loadFailed')))
-  }, [navigate, t])
+    ]
+    if (authUser?.id) {
+      promises.push(
+        apiClient.get(`/api/v1/arena/stats/${authUser.id}`).then(r => {
+          const s = (r.data as any)?.stats ?? r.data
+          if (s && typeof s.rating === 'number') setMyStats(s)
+        }).catch(() => {})
+      )
+    }
+    Promise.all(promises).catch(() => setError(t('common.loadFailed')))
+  }, [navigate, t, authUser?.id])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -135,6 +159,10 @@ export function ArenaHubPage() {
       setTimeout(() => setCopiedDuel(false), 2000)
     })
   }
+
+  const seasonDaysLeft = seasonInfo?.endsAt
+    ? Math.max(0, Math.ceil((new Date(seasonInfo.endsAt).getTime() - Date.now()) / 86_400_000))
+    : null
 
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchData() }} />
 
@@ -306,18 +334,65 @@ export function ArenaHubPage() {
       </div>
 
       {/* Right column */}
-      <div className="w-full flex flex-col gap-4 lg:w-[300px] lg:flex-shrink-0">
-        {/* League card */}
-        <Card padding="md">
-          <div className="flex items-center gap-2 mb-3">
-            <Trophy className="w-4 h-4 text-[#6366F1]" />
-            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{t('arena.league.title')}</h3>
+      <div className="w-full flex flex-col gap-4 lg:w-[320px] lg:flex-shrink-0">
+        {/* Season timer */}
+        {seasonInfo && (
+          <div className="flex items-center justify-between rounded-2xl bg-[#0f172a] px-4 py-3 dark:bg-[#1e293b]">
+            <div>
+              <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#94a3b8]">
+                {t('arena.season.label', { number: seasonInfo.seasonNumber })}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="font-mono text-sm font-bold text-white">
+                {seasonDaysLeft != null ? t('arena.season.daysLeft', { days: seasonDaysLeft }) : ''}
+              </p>
+            </div>
           </div>
-          <div className="text-center py-2">
-            <p className="font-mono text-3xl font-bold text-[#6366F1]">Arena</p>
-            <p className="text-xs text-[#666666] dark:text-[#94a3b8] mt-1">{t('arena.league.subtitle')}</p>
-          </div>
-        </Card>
+        )}
+
+        {/* Your league position */}
+        {myStats && (
+          <Card padding="md">
+            <div className="flex items-center gap-2 mb-3">
+              <Trophy className="w-4 h-4 text-[#f59e0b]" />
+              <h3 className="text-sm font-bold text-[#111111] dark:text-[#f8fafc]">
+                {getLeagueLabel(myStats.league)}
+              </h3>
+              <span className={`ml-auto inline-block h-2 w-2 rounded-full ${LEAGUE_BG_COLORS[myStats.league] ?? 'bg-[#94a3b8]'}`} />
+            </div>
+            <div className="space-y-2">
+              <div className="flex items-baseline justify-between">
+                <span className="font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{myStats.rating}</span>
+                {myStats.leagueRank > 0 && myStats.leagueTotal > 0 && (
+                  <span className="text-xs text-[#94a3b8]">
+                    #{myStats.leagueRank} / {myStats.leagueTotal}
+                  </span>
+                )}
+              </div>
+              {myStats.nextLeagueAt > 0 && (
+                <div>
+                  <div className="flex justify-between text-[10px] text-[#94a3b8]">
+                    <span>{myStats.rating}</span>
+                    <span>{myStats.nextLeagueAt}</span>
+                  </div>
+                  <div className="mt-1 h-1.5 rounded-full bg-[#F2F3F0] dark:bg-[#1e293b]">
+                    <div
+                      className={`h-1.5 rounded-full transition-all duration-700 ${LEAGUE_BG_COLORS[myStats.league] ?? 'bg-[#6366F1]'}`}
+                      style={{ width: `${Math.max(5, Math.min(100, ((myStats.rating - (myStats.nextLeagueAt - 450)) / 450) * 100))}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              {myStats.peakRating > myStats.rating && (
+                <p className="text-[10px] text-[#94a3b8]">Peak: {myStats.peakRating}</p>
+              )}
+              {myStats.currentWinStreak > 1 && (
+                <p className="text-[10px] text-[#f59e0b]">{myStats.currentWinStreak} {t('arena.stats.winStreak')}</p>
+              )}
+            </div>
+          </Card>
+        )}
 
         {/* Leaderboard */}
         <Card padding="none">
@@ -334,15 +409,18 @@ export function ArenaHubPage() {
                   <div className="flex-1 h-3 bg-[#E7E8E5] dark:bg-[#1e3158] rounded" />
                 </div>
               ))
-              : leaderboard.slice(0, 8).map((e: any, i: number) => (
+              : leaderboard.slice(0, 10).map((e: any, i: number) => (
                 <div key={e.userId ?? i} className="flex items-center gap-3 px-4 py-2">
                   <span className="w-5 text-xs font-mono text-[#94a3b8] text-right">{i + 1}</span>
-                  <Avatar name={e.displayName ?? '?'} size="xs" />
+                  <div className="relative">
+                    <Avatar name={e.displayName ?? '?'} size="xs" />
+                    <span className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-white dark:border-[#161c2d] ${LEAGUE_BG_COLORS[e.league] ?? 'bg-[#94a3b8]'}`} />
+                  </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-[#111111] dark:text-[#f8fafc] truncate">{e.displayName}</p>
                     <p className={`text-[10px] ${LEAGUE_COLORS[e.league] ?? 'text-[#94a3b8]'}`}>{getLeagueLabel(e.league)}</p>
                   </div>
-                  <span className="text-xs font-mono text-[#666666] dark:text-[#94a3b8]">{e.rating ?? e.wins ?? 0}</span>
+                  <span className="text-xs font-mono text-[#666666] dark:text-[#94a3b8]">{e.rating ?? 0}</span>
                 </div>
               ))
             }

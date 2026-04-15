@@ -5,7 +5,7 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import type { User, ProfileProgress } from '@/entities/User/model/types'
 import type { ArenaStats } from '../hooks/useProfileData'
-import { computeLeague } from '../lib/computeLevel'
+import { leagueFromEnum } from '../lib/computeLevel'
 
 function daysSince(iso: string): number {
   try {
@@ -31,7 +31,7 @@ export function ProfileHero({ user, progress, arenaStats, isOwn, onEdit, onBindT
   const { t } = useTranslation()
   const displayName = `${user.firstName} ${user.lastName}`.trim() || user.username
   const ov = progress?.overview
-  const league = computeLeague(arenaStats?.rating ?? 0)
+  const league = leagueFromEnum(arenaStats?.league)
   const leagueLabel = t(`profile.leagueLabel.${league}`)
   const daysOnPlatform = daysSince(user.createdAt)
 
@@ -140,7 +140,15 @@ export function ProfileHero({ user, progress, arenaStats, isOwn, onEdit, onBindT
                 </div>
                 <span className="font-mono text-base font-bold text-white">{arenaStats.rating}</span>
               </div>
-              <span className="mt-3 text-[11px] uppercase tracking-[0.16em] text-white/60">{leagueLabel} ELO</span>
+              <span className="mt-3 text-[11px] uppercase tracking-[0.16em] text-white/60">
+                {leagueLabel}
+                {arenaStats.leagueRank > 0 && arenaStats.leagueTotal > 0
+                  ? ` · #${arenaStats.leagueRank}/${arenaStats.leagueTotal}`
+                  : ' ELO'}
+              </span>
+              {arenaStats.peakRating > arenaStats.rating && (
+                <span className="mt-1 text-[10px] text-white/40">Peak: {arenaStats.peakRating}</span>
+              )}
             </div>
           )}
           {ov && (

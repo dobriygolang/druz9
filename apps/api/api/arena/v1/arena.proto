@@ -94,6 +94,12 @@ service ArenaService {
       get: "/api/v1/arena/open-matches"
     };
   }
+
+  rpc GetSeasonHistory(GetSeasonHistoryRequest) returns (GetSeasonHistoryResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/arena/seasons/{user_id}"
+    };
+  }
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────
@@ -121,7 +127,7 @@ enum ArenaLeague {
   ARENA_LEAGUE_PLATINUM    = 4;
   ARENA_LEAGUE_DIAMOND     = 5;
   ARENA_LEAGUE_MASTER      = 6;
-  ARENA_LEAGUE_LEGEND      = 7;
+  ARENA_LEAGUE_LEGEND      = 7; // deprecated, kept for wire compat
 }
 
 enum ArenaPlayerSide {
@@ -206,6 +212,26 @@ message ListOpenMatchesRequest {
   int32 limit = 1;
 }
 
+message GetSeasonHistoryRequest {
+  string user_id = 1;
+  int32  limit   = 2;
+}
+
+message ArenaSeasonResultEntry {
+  int32  season_number = 1;
+  int32  final_rating  = 2;
+  string final_league  = 3;
+  int32  league_rank   = 4;
+  int32  peak_rating   = 5;
+  int32  wins          = 6;
+  int32  losses        = 7;
+  int32  matches       = 8;
+}
+
+message GetSeasonHistoryResponse {
+  repeated ArenaSeasonResultEntry seasons = 1;
+}
+
 // ── Response messages ──────────────────────────────────────────────────────
 
 message ArenaMatchResponse {
@@ -228,6 +254,13 @@ message SubmitCodeResponse {
 
 message GetLeaderboardResponse {
   repeated ArenaLeaderboardEntry entries = 1;
+  ArenaSeasonInfo season                 = 2;
+}
+
+message ArenaSeasonInfo {
+  int32                     season_number = 1;
+  google.protobuf.Timestamp starts_at     = 2;
+  google.protobuf.Timestamp ends_at       = 3;
 }
 
 message ArenaQueueStateResponse {
@@ -295,15 +328,21 @@ message ArenaPlayer {
 }
 
 message ArenaPlayerStats {
-  string      user_id      = 1;
-  string      display_name = 2;
-  int32       rating       = 3;
-  ArenaLeague league       = 4;  // was: string (bug fix)
-  int32       wins         = 5;
-  int32       losses       = 6;
-  int32       matches      = 7;
-  double      win_rate     = 8;
-  int64       best_runtime = 9;
+  string      user_id            = 1;
+  string      display_name       = 2;
+  int32       rating             = 3;
+  ArenaLeague league             = 4;
+  int32       wins               = 5;
+  int32       losses             = 6;
+  int32       matches            = 7;
+  double      win_rate           = 8;
+  int64       best_runtime       = 9;
+  int32       peak_rating        = 10;
+  int32       current_win_streak = 11;
+  int32       best_win_streak    = 12;
+  int32       league_rank        = 13;  // position within current league
+  int32       league_total       = 14;  // total players in current league
+  int32       next_league_at     = 15;  // rating needed for next league, -1 if top
 }
 
 message ArenaLeaderboardEntry {
@@ -316,4 +355,5 @@ message ArenaLeaderboardEntry {
   int32       rating       = 7;
   ArenaLeague league       = 8;
   int32       losses       = 9;
+  int32       peak_rating  = 10;
 }

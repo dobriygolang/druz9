@@ -20,8 +20,12 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationCircleServiceCreateCircle = "/circle.v1.CircleService/CreateCircle"
+const OperationCircleServiceCreateCircleChallenge = "/circle.v1.CircleService/CreateCircleChallenge"
 const OperationCircleServiceCreateCircleEvent = "/circle.v1.CircleService/CreateCircleEvent"
 const OperationCircleServiceDeleteCircle = "/circle.v1.CircleService/DeleteCircle"
+const OperationCircleServiceGetActiveCircleChallenge = "/circle.v1.CircleService/GetActiveCircleChallenge"
+const OperationCircleServiceGetCircleMemberStats = "/circle.v1.CircleService/GetCircleMemberStats"
+const OperationCircleServiceGetCirclePulse = "/circle.v1.CircleService/GetCirclePulse"
 const OperationCircleServiceInviteToCircle = "/circle.v1.CircleService/InviteToCircle"
 const OperationCircleServiceJoinCircle = "/circle.v1.CircleService/JoinCircle"
 const OperationCircleServiceLeaveCircle = "/circle.v1.CircleService/LeaveCircle"
@@ -31,8 +35,12 @@ const OperationCircleServiceListCircles = "/circle.v1.CircleService/ListCircles"
 
 type CircleServiceHTTPServer interface {
 	CreateCircle(context.Context, *CreateCircleRequest) (*CircleResponse, error)
+	CreateCircleChallenge(context.Context, *CreateCircleChallengeRequest) (*CreateCircleChallengeResponse, error)
 	CreateCircleEvent(context.Context, *CreateCircleEventRequest) (*CreateCircleEventResponse, error)
 	DeleteCircle(context.Context, *DeleteCircleRequest) (*DeleteCircleResponse, error)
+	GetActiveCircleChallenge(context.Context, *GetActiveCircleChallengeRequest) (*GetActiveCircleChallengeResponse, error)
+	GetCircleMemberStats(context.Context, *GetCircleMemberStatsRequest) (*GetCircleMemberStatsResponse, error)
+	GetCirclePulse(context.Context, *GetCirclePulseRequest) (*GetCirclePulseResponse, error)
 	InviteToCircle(context.Context, *InviteToCircleRequest) (*InviteToCircleResponse, error)
 	JoinCircle(context.Context, *JoinCircleRequest) (*JoinCircleResponse, error)
 	LeaveCircle(context.Context, *LeaveCircleRequest) (*LeaveCircleResponse, error)
@@ -52,6 +60,10 @@ func RegisterCircleServiceHTTPServer(s *http.Server, srv CircleServiceHTTPServer
 	r.GET("/api/v1/circles/{circle_id}/events", _CircleService_ListCircleEvents0_HTTP_Handler(srv))
 	r.POST("/api/v1/circles/{circle_id}/events", _CircleService_CreateCircleEvent0_HTTP_Handler(srv))
 	r.DELETE("/api/v1/circles/{circle_id}", _CircleService_DeleteCircle0_HTTP_Handler(srv))
+	r.GET("/api/v1/circles/{circle_id}/pulse", _CircleService_GetCirclePulse0_HTTP_Handler(srv))
+	r.GET("/api/v1/circles/{circle_id}/member-stats", _CircleService_GetCircleMemberStats0_HTTP_Handler(srv))
+	r.GET("/api/v1/circles/{circle_id}/challenge", _CircleService_GetActiveCircleChallenge0_HTTP_Handler(srv))
+	r.POST("/api/v1/circles/{circle_id}/challenge", _CircleService_CreateCircleChallenge0_HTTP_Handler(srv))
 }
 
 func _CircleService_ListCircles0_HTTP_Handler(srv CircleServiceHTTPServer) func(ctx http.Context) error {
@@ -261,10 +273,105 @@ func _CircleService_DeleteCircle0_HTTP_Handler(srv CircleServiceHTTPServer) func
 	}
 }
 
+func _CircleService_GetCirclePulse0_HTTP_Handler(srv CircleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetCirclePulseRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCircleServiceGetCirclePulse)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetCirclePulse(ctx, req.(*GetCirclePulseRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetCirclePulseResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _CircleService_GetCircleMemberStats0_HTTP_Handler(srv CircleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetCircleMemberStatsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCircleServiceGetCircleMemberStats)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetCircleMemberStats(ctx, req.(*GetCircleMemberStatsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetCircleMemberStatsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _CircleService_GetActiveCircleChallenge0_HTTP_Handler(srv CircleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetActiveCircleChallengeRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCircleServiceGetActiveCircleChallenge)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetActiveCircleChallenge(ctx, req.(*GetActiveCircleChallengeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetActiveCircleChallengeResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _CircleService_CreateCircleChallenge0_HTTP_Handler(srv CircleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateCircleChallengeRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCircleServiceCreateCircleChallenge)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateCircleChallenge(ctx, req.(*CreateCircleChallengeRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateCircleChallengeResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type CircleServiceHTTPClient interface {
 	CreateCircle(ctx context.Context, req *CreateCircleRequest, opts ...http.CallOption) (rsp *CircleResponse, err error)
+	CreateCircleChallenge(ctx context.Context, req *CreateCircleChallengeRequest, opts ...http.CallOption) (rsp *CreateCircleChallengeResponse, err error)
 	CreateCircleEvent(ctx context.Context, req *CreateCircleEventRequest, opts ...http.CallOption) (rsp *CreateCircleEventResponse, err error)
 	DeleteCircle(ctx context.Context, req *DeleteCircleRequest, opts ...http.CallOption) (rsp *DeleteCircleResponse, err error)
+	GetActiveCircleChallenge(ctx context.Context, req *GetActiveCircleChallengeRequest, opts ...http.CallOption) (rsp *GetActiveCircleChallengeResponse, err error)
+	GetCircleMemberStats(ctx context.Context, req *GetCircleMemberStatsRequest, opts ...http.CallOption) (rsp *GetCircleMemberStatsResponse, err error)
+	GetCirclePulse(ctx context.Context, req *GetCirclePulseRequest, opts ...http.CallOption) (rsp *GetCirclePulseResponse, err error)
 	InviteToCircle(ctx context.Context, req *InviteToCircleRequest, opts ...http.CallOption) (rsp *InviteToCircleResponse, err error)
 	JoinCircle(ctx context.Context, req *JoinCircleRequest, opts ...http.CallOption) (rsp *JoinCircleResponse, err error)
 	LeaveCircle(ctx context.Context, req *LeaveCircleRequest, opts ...http.CallOption) (rsp *LeaveCircleResponse, err error)
@@ -294,6 +401,19 @@ func (c *CircleServiceHTTPClientImpl) CreateCircle(ctx context.Context, in *Crea
 	return &out, nil
 }
 
+func (c *CircleServiceHTTPClientImpl) CreateCircleChallenge(ctx context.Context, in *CreateCircleChallengeRequest, opts ...http.CallOption) (*CreateCircleChallengeResponse, error) {
+	var out CreateCircleChallengeResponse
+	pattern := "/api/v1/circles/{circle_id}/challenge"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationCircleServiceCreateCircleChallenge))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *CircleServiceHTTPClientImpl) CreateCircleEvent(ctx context.Context, in *CreateCircleEventRequest, opts ...http.CallOption) (*CreateCircleEventResponse, error) {
 	var out CreateCircleEventResponse
 	pattern := "/api/v1/circles/{circle_id}/events"
@@ -314,6 +434,45 @@ func (c *CircleServiceHTTPClientImpl) DeleteCircle(ctx context.Context, in *Dele
 	opts = append(opts, http.Operation(OperationCircleServiceDeleteCircle))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *CircleServiceHTTPClientImpl) GetActiveCircleChallenge(ctx context.Context, in *GetActiveCircleChallengeRequest, opts ...http.CallOption) (*GetActiveCircleChallengeResponse, error) {
+	var out GetActiveCircleChallengeResponse
+	pattern := "/api/v1/circles/{circle_id}/challenge"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationCircleServiceGetActiveCircleChallenge))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *CircleServiceHTTPClientImpl) GetCircleMemberStats(ctx context.Context, in *GetCircleMemberStatsRequest, opts ...http.CallOption) (*GetCircleMemberStatsResponse, error) {
+	var out GetCircleMemberStatsResponse
+	pattern := "/api/v1/circles/{circle_id}/member-stats"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationCircleServiceGetCircleMemberStats))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *CircleServiceHTTPClientImpl) GetCirclePulse(ctx context.Context, in *GetCirclePulseRequest, opts ...http.CallOption) (*GetCirclePulseResponse, error) {
+	var out GetCirclePulseResponse
+	pattern := "/api/v1/circles/{circle_id}/pulse"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationCircleServiceGetCirclePulse))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

@@ -4,7 +4,7 @@ import { ActivityHeatmap } from '@/shared/ui/ActivityHeatmap'
 import { Badge } from '@/shared/ui/Badge'
 import type { ProfileProgress, FeedItem } from '@/entities/User/model/types'
 import type { ArenaStats } from '../hooks/useProfileData'
-import { computeLeague } from '../lib/computeLevel'
+import { leagueFromEnum } from '../lib/computeLevel'
 
 function timeAgo(iso: string, t: (key: string, options?: Record<string, unknown>) => string): string {
   const diff = Date.now() - new Date(iso).getTime()
@@ -26,7 +26,7 @@ interface Props {
 
 export function ActivitySection({ activity, arenaStats, progress, feed, className }: Props) {
   const { t } = useTranslation()
-  const leagueLabel = t(`profile.leagueLabel.${computeLeague(arenaStats?.rating ?? 0)}`)
+  const leagueLabel = t(`profile.leagueLabel.${leagueFromEnum(arenaStats?.league)}`)
 
   return (
     <div className={`grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(300px,0.7fr)] ${className ?? ''}`}>
@@ -101,12 +101,23 @@ export function ActivitySection({ activity, arenaStats, progress, feed, classNam
                 </div>
                 <Badge variant="info">{leagueLabel}</Badge>
               </div>
-              <div className="mt-4 h-2 rounded-full bg-white/80 dark:bg-white/10">
-                <div
-                  className="h-2 rounded-full bg-[#6366F1]"
-                  style={{ width: `${Math.min((arenaStats.rating / 3000) * 100, 100)}%` }}
-                />
-              </div>
+              {arenaStats.nextLeagueAt > 0 && (
+                <div className="mt-4">
+                  <div className="flex items-center justify-between text-[10px] text-[#94a3b8]">
+                    <span>{arenaStats.rating}</span>
+                    <span>{t(`profile.leagueLabel.${leagueFromEnum(arenaStats.league)}`)} → {arenaStats.nextLeagueAt}</span>
+                  </div>
+                  <div className="mt-1 h-2 rounded-full bg-white/80 dark:bg-white/10">
+                    <div
+                      className="h-2 rounded-full bg-[#6366F1] transition-all duration-700"
+                      style={{ width: `${Math.min(((arenaStats.rating - (arenaStats.nextLeagueAt - 450)) / 450) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+              )}
+              {arenaStats.peakRating > arenaStats.rating && (
+                <p className="mt-2 text-[10px] text-[#94a3b8]">Peak: {arenaStats.peakRating}</p>
+              )}
             </div>
 
             <div className="mt-4 grid grid-cols-2 gap-3">

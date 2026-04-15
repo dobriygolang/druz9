@@ -103,9 +103,8 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   const socketRef = useRef<RealtimeSocket | null>(null)
   const clientId = useRef(`client-${Math.random().toString(36).slice(2, 10)}`)
   const awarenessId = useRef(Math.floor(Math.random() * 0xffffffff))
-  const awarenessTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const pendingAwarenessPayloadRef = useRef<string | null>(null)
-
+  const queuedDocSyncRef = useRef<string[]>([])
+  const queuedAwarenessPayloadRef = useRef<string | null>(null)
   const [connected, setConnected] = useState(false)
   const [gotSnapshot, setGotSnapshot] = useState(false)
   const [snapshotActiveClientCount, setSnapshotActiveClientCount] = useState(0)
@@ -152,6 +151,32 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       rafId.current = requestAnimationFrame(flushAwareness)
     }
   }, [flushAwareness])
+
+  const flushOutboundQueue = useCallback((socket?: RealtimeSocket | null) => {
+    const target = socket ?? socketRef.current
+    if (!target?.isConnected) return
+
+    while (queuedDocSyncRef.current.length > 0) {
+      const data = queuedDocSyncRef.current.shift()
+      if (!data) continue
+      target.send({
+        type: 'doc_sync',
+        clientId: clientId.current,
+        data,
+      })
+    }
+
+    const awarenessPayload = queuedAwarenessPayloadRef.current
+    queuedAwarenessPayloadRef.current = null
+    if (awarenessPayload) {
+      target.send({
+        type: 'awareness',
+        awarenessId: awarenessId.current,
+        userId: userId ?? guestName ?? 'anonymous',
+        data: awarenessPayload,
+      })
+    }
+  }, [guestName, userId])
 
   useEffect(() => {
     setConnected(false)
@@ -298,6 +323,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
           userId: userId ?? undefined,
           guestName: guestName ?? displayName,
         })
+        flushOutboundQueue(socket)
       },
       onClose: () => setConnected(false),
     })
@@ -319,20 +345,17 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       socket.close()
       socketRef.current = null
       setConnected(false)
-      if (awarenessTimerRef.current) {
-        clearTimeout(awarenessTimerRef.current)
-        awarenessTimerRef.current = null
-      }
-      pendingAwarenessPayloadRef.current = null
       // Cancel any pending awareness batch
       if (rafId.current !== null) {
         cancelAnimationFrame(rafId.current)
         rafId.current = null
       }
+      queuedDocSyncRef.current = []
+      queuedAwarenessPayloadRef.current = null
       pendingAwareness.current.clear()
       displayNameIndex.current.clear()
     }
-  }, [roomId, userId, enabled, handleMessage, displayName, guestName])
+  }, [roomId, userId, enabled, handleMessage, displayName, guestName, flushOutboundQueue])
 
   const sendUpdate = useCallback((newCode: string) => {
     if (isRemoteUpdate.current) return
@@ -345,7 +368,15 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   }, [])
 
   const sendDocSync = useCallback((data: string) => {
-    socketRef.current?.send({
+    if (!socketRef.current?.isConnected) {
+      queuedDocSyncRef.current.push(data)
+      if (queuedDocSyncRef.current.length > 200) {
+        queuedDocSyncRef.current.splice(0, queuedDocSyncRef.current.length - 200)
+      }
+      return
+    }
+
+    socketRef.current.send({
       type: 'doc_sync',
       clientId: clientId.current,
       data,
@@ -389,38 +420,17 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       cursorData.selEndCol = selection.endCol
     }
     const payload = JSON.stringify(cursorData)
-    const sendPayload = () => socketRef.current?.send({
+    if (!socketRef.current?.isConnected) {
+      queuedAwarenessPayloadRef.current = payload
+      return
+    }
+
+    socketRef.current.send({
       type: 'awareness',
       awarenessId: awarenessId.current,
       userId: userId ?? guestName ?? 'anonymous',
       data: payload,
     })
-
-    const shouldSendImmediately = meta?.tabHidden !== undefined || meta?.pastedCode !== undefined || meta?.active === false
-    if (shouldSendImmediately) {
-      if (awarenessTimerRef.current) {
-        clearTimeout(awarenessTimerRef.current)
-        awarenessTimerRef.current = null
-      }
-      pendingAwarenessPayloadRef.current = null
-      sendPayload()
-      return
-    }
-
-    pendingAwarenessPayloadRef.current = payload
-    if (awarenessTimerRef.current) return
-    awarenessTimerRef.current = setTimeout(() => {
-      awarenessTimerRef.current = null
-      const queuedPayload = pendingAwarenessPayloadRef.current
-      pendingAwarenessPayloadRef.current = null
-      if (!queuedPayload) return
-      socketRef.current?.send({
-        type: 'awareness',
-        awarenessId: awarenessId.current,
-        userId: userId ?? guestName ?? 'anonymous',
-        data: queuedPayload,
-      })
-    }, 50)
   }, [userId, guestName, displayName])
 
   return {

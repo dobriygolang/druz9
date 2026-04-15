@@ -11,6 +11,12 @@ export interface ArenaStats {
   losses: number
   matches: number
   winRate: number
+  peakRating: number
+  currentWinStreak: number
+  bestWinStreak: number
+  leagueRank: number
+  leagueTotal: number
+  nextLeagueAt: number
 }
 
 export interface ProfileData {

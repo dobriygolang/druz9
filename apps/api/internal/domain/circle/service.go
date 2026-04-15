@@ -29,6 +29,10 @@ type Repository interface {
 	InviteToCircle(ctx context.Context, circleID, inviterID, inviteeID uuid.UUID) error
 	GetCircle(ctx context.Context, circleID uuid.UUID) (*model.Circle, error)
 	DeleteCircle(ctx context.Context, circleID uuid.UUID) error
+	GetCirclePulse(ctx context.Context, circleID uuid.UUID) (*model.CirclePulse, error)
+	GetCircleMemberStats(ctx context.Context, circleID uuid.UUID) ([]*model.CircleMemberStats, error)
+	CreateCircleChallenge(ctx context.Context, req model.CreateCircleChallengeRequest) (*model.CircleChallenge, error)
+	GetActiveCircleChallenge(ctx context.Context, circleID uuid.UUID) (*model.CircleChallenge, error)
 }
 
 // NewService creates new circle domain service.

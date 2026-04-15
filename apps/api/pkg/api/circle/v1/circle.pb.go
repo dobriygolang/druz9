@@ -1112,6 +1112,866 @@ func (x *Circle) GetCreatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
+type GetCirclePulseRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CircleId      string                 `protobuf:"bytes,1,opt,name=circle_id,json=circleId,proto3" json:"circle_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCirclePulseRequest) Reset() {
+	*x = GetCirclePulseRequest{}
+	mi := &file_circle_v1_circle_proto_msgTypes[20]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCirclePulseRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCirclePulseRequest) ProtoMessage() {}
+
+func (x *GetCirclePulseRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[20]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCirclePulseRequest.ProtoReflect.Descriptor instead.
+func (*GetCirclePulseRequest) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{20}
+}
+
+func (x *GetCirclePulseRequest) GetCircleId() string {
+	if x != nil {
+		return x.CircleId
+	}
+	return ""
+}
+
+type CircleDayActivity struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
+	DailyCount    int32                  `protobuf:"varint,2,opt,name=daily_count,json=dailyCount,proto3" json:"daily_count,omitempty"`
+	DuelCount     int32                  `protobuf:"varint,3,opt,name=duel_count,json=duelCount,proto3" json:"duel_count,omitempty"`
+	MockCount     int32                  `protobuf:"varint,4,opt,name=mock_count,json=mockCount,proto3" json:"mock_count,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CircleDayActivity) Reset() {
+	*x = CircleDayActivity{}
+	mi := &file_circle_v1_circle_proto_msgTypes[21]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CircleDayActivity) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CircleDayActivity) ProtoMessage() {}
+
+func (x *CircleDayActivity) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[21]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CircleDayActivity.ProtoReflect.Descriptor instead.
+func (*CircleDayActivity) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{21}
+}
+
+func (x *CircleDayActivity) GetDate() string {
+	if x != nil {
+		return x.Date
+	}
+	return ""
+}
+
+func (x *CircleDayActivity) GetDailyCount() int32 {
+	if x != nil {
+		return x.DailyCount
+	}
+	return 0
+}
+
+func (x *CircleDayActivity) GetDuelCount() int32 {
+	if x != nil {
+		return x.DuelCount
+	}
+	return 0
+}
+
+func (x *CircleDayActivity) GetMockCount() int32 {
+	if x != nil {
+		return x.MockCount
+	}
+	return 0
+}
+
+type CircleMemberAction struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	FirstName     string                 `protobuf:"bytes,2,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName      string                 `protobuf:"bytes,3,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	AvatarUrl     string                 `protobuf:"bytes,4,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	ActionType    string                 `protobuf:"bytes,5,opt,name=action_type,json=actionType,proto3" json:"action_type,omitempty"`
+	ActionDetail  string                 `protobuf:"bytes,6,opt,name=action_detail,json=actionDetail,proto3" json:"action_detail,omitempty"`
+	HappenedAt    *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=happened_at,json=happenedAt,proto3" json:"happened_at,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CircleMemberAction) Reset() {
+	*x = CircleMemberAction{}
+	mi := &file_circle_v1_circle_proto_msgTypes[22]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CircleMemberAction) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CircleMemberAction) ProtoMessage() {}
+
+func (x *CircleMemberAction) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[22]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CircleMemberAction.ProtoReflect.Descriptor instead.
+func (*CircleMemberAction) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{22}
+}
+
+func (x *CircleMemberAction) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CircleMemberAction) GetFirstName() string {
+	if x != nil {
+		return x.FirstName
+	}
+	return ""
+}
+
+func (x *CircleMemberAction) GetLastName() string {
+	if x != nil {
+		return x.LastName
+	}
+	return ""
+}
+
+func (x *CircleMemberAction) GetAvatarUrl() string {
+	if x != nil {
+		return x.AvatarUrl
+	}
+	return ""
+}
+
+func (x *CircleMemberAction) GetActionType() string {
+	if x != nil {
+		return x.ActionType
+	}
+	return ""
+}
+
+func (x *CircleMemberAction) GetActionDetail() string {
+	if x != nil {
+		return x.ActionDetail
+	}
+	return ""
+}
+
+func (x *CircleMemberAction) GetHappenedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.HappenedAt
+	}
+	return nil
+}
+
+type GetCirclePulseResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ActiveToday   int32                  `protobuf:"varint,1,opt,name=active_today,json=activeToday,proto3" json:"active_today,omitempty"`
+	TotalMembers  int32                  `protobuf:"varint,2,opt,name=total_members,json=totalMembers,proto3" json:"total_members,omitempty"`
+	WeekActivity  []*CircleDayActivity   `protobuf:"bytes,3,rep,name=week_activity,json=weekActivity,proto3" json:"week_activity,omitempty"`
+	RecentActions []*CircleMemberAction  `protobuf:"bytes,4,rep,name=recent_actions,json=recentActions,proto3" json:"recent_actions,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCirclePulseResponse) Reset() {
+	*x = GetCirclePulseResponse{}
+	mi := &file_circle_v1_circle_proto_msgTypes[23]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCirclePulseResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCirclePulseResponse) ProtoMessage() {}
+
+func (x *GetCirclePulseResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[23]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCirclePulseResponse.ProtoReflect.Descriptor instead.
+func (*GetCirclePulseResponse) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{23}
+}
+
+func (x *GetCirclePulseResponse) GetActiveToday() int32 {
+	if x != nil {
+		return x.ActiveToday
+	}
+	return 0
+}
+
+func (x *GetCirclePulseResponse) GetTotalMembers() int32 {
+	if x != nil {
+		return x.TotalMembers
+	}
+	return 0
+}
+
+func (x *GetCirclePulseResponse) GetWeekActivity() []*CircleDayActivity {
+	if x != nil {
+		return x.WeekActivity
+	}
+	return nil
+}
+
+func (x *GetCirclePulseResponse) GetRecentActions() []*CircleMemberAction {
+	if x != nil {
+		return x.RecentActions
+	}
+	return nil
+}
+
+type GetCircleMemberStatsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CircleId      string                 `protobuf:"bytes,1,opt,name=circle_id,json=circleId,proto3" json:"circle_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCircleMemberStatsRequest) Reset() {
+	*x = GetCircleMemberStatsRequest{}
+	mi := &file_circle_v1_circle_proto_msgTypes[24]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCircleMemberStatsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCircleMemberStatsRequest) ProtoMessage() {}
+
+func (x *GetCircleMemberStatsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[24]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCircleMemberStatsRequest.ProtoReflect.Descriptor instead.
+func (*GetCircleMemberStatsRequest) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{24}
+}
+
+func (x *GetCircleMemberStatsRequest) GetCircleId() string {
+	if x != nil {
+		return x.CircleId
+	}
+	return ""
+}
+
+type CircleMemberStatsEntry struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	FirstName     string                 `protobuf:"bytes,2,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName      string                 `protobuf:"bytes,3,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	AvatarUrl     string                 `protobuf:"bytes,4,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	Role          string                 `protobuf:"bytes,5,opt,name=role,proto3" json:"role,omitempty"`
+	JoinedAt      *timestamppb.Timestamp `protobuf:"bytes,6,opt,name=joined_at,json=joinedAt,proto3" json:"joined_at,omitempty"`
+	DailySolved   int32                  `protobuf:"varint,7,opt,name=daily_solved,json=dailySolved,proto3" json:"daily_solved,omitempty"`
+	DuelsWon      int32                  `protobuf:"varint,8,opt,name=duels_won,json=duelsWon,proto3" json:"duels_won,omitempty"`
+	DuelsPlayed   int32                  `protobuf:"varint,9,opt,name=duels_played,json=duelsPlayed,proto3" json:"duels_played,omitempty"`
+	MocksDone     int32                  `protobuf:"varint,10,opt,name=mocks_done,json=mocksDone,proto3" json:"mocks_done,omitempty"`
+	ArenaRating   int32                  `protobuf:"varint,11,opt,name=arena_rating,json=arenaRating,proto3" json:"arena_rating,omitempty"`
+	ArenaLeague   string                 `protobuf:"bytes,12,opt,name=arena_league,json=arenaLeague,proto3" json:"arena_league,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CircleMemberStatsEntry) Reset() {
+	*x = CircleMemberStatsEntry{}
+	mi := &file_circle_v1_circle_proto_msgTypes[25]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CircleMemberStatsEntry) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CircleMemberStatsEntry) ProtoMessage() {}
+
+func (x *CircleMemberStatsEntry) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[25]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CircleMemberStatsEntry.ProtoReflect.Descriptor instead.
+func (*CircleMemberStatsEntry) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{25}
+}
+
+func (x *CircleMemberStatsEntry) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CircleMemberStatsEntry) GetFirstName() string {
+	if x != nil {
+		return x.FirstName
+	}
+	return ""
+}
+
+func (x *CircleMemberStatsEntry) GetLastName() string {
+	if x != nil {
+		return x.LastName
+	}
+	return ""
+}
+
+func (x *CircleMemberStatsEntry) GetAvatarUrl() string {
+	if x != nil {
+		return x.AvatarUrl
+	}
+	return ""
+}
+
+func (x *CircleMemberStatsEntry) GetRole() string {
+	if x != nil {
+		return x.Role
+	}
+	return ""
+}
+
+func (x *CircleMemberStatsEntry) GetJoinedAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.JoinedAt
+	}
+	return nil
+}
+
+func (x *CircleMemberStatsEntry) GetDailySolved() int32 {
+	if x != nil {
+		return x.DailySolved
+	}
+	return 0
+}
+
+func (x *CircleMemberStatsEntry) GetDuelsWon() int32 {
+	if x != nil {
+		return x.DuelsWon
+	}
+	return 0
+}
+
+func (x *CircleMemberStatsEntry) GetDuelsPlayed() int32 {
+	if x != nil {
+		return x.DuelsPlayed
+	}
+	return 0
+}
+
+func (x *CircleMemberStatsEntry) GetMocksDone() int32 {
+	if x != nil {
+		return x.MocksDone
+	}
+	return 0
+}
+
+func (x *CircleMemberStatsEntry) GetArenaRating() int32 {
+	if x != nil {
+		return x.ArenaRating
+	}
+	return 0
+}
+
+func (x *CircleMemberStatsEntry) GetArenaLeague() string {
+	if x != nil {
+		return x.ArenaLeague
+	}
+	return ""
+}
+
+type GetCircleMemberStatsResponse struct {
+	state         protoimpl.MessageState    `protogen:"open.v1"`
+	Members       []*CircleMemberStatsEntry `protobuf:"bytes,1,rep,name=members,proto3" json:"members,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetCircleMemberStatsResponse) Reset() {
+	*x = GetCircleMemberStatsResponse{}
+	mi := &file_circle_v1_circle_proto_msgTypes[26]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetCircleMemberStatsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetCircleMemberStatsResponse) ProtoMessage() {}
+
+func (x *GetCircleMemberStatsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[26]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetCircleMemberStatsResponse.ProtoReflect.Descriptor instead.
+func (*GetCircleMemberStatsResponse) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{26}
+}
+
+func (x *GetCircleMemberStatsResponse) GetMembers() []*CircleMemberStatsEntry {
+	if x != nil {
+		return x.Members
+	}
+	return nil
+}
+
+type GetActiveCircleChallengeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CircleId      string                 `protobuf:"bytes,1,opt,name=circle_id,json=circleId,proto3" json:"circle_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetActiveCircleChallengeRequest) Reset() {
+	*x = GetActiveCircleChallengeRequest{}
+	mi := &file_circle_v1_circle_proto_msgTypes[27]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetActiveCircleChallengeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetActiveCircleChallengeRequest) ProtoMessage() {}
+
+func (x *GetActiveCircleChallengeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[27]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetActiveCircleChallengeRequest.ProtoReflect.Descriptor instead.
+func (*GetActiveCircleChallengeRequest) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{27}
+}
+
+func (x *GetActiveCircleChallengeRequest) GetCircleId() string {
+	if x != nil {
+		return x.CircleId
+	}
+	return ""
+}
+
+type ChallengeMemberProgress struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	FirstName     string                 `protobuf:"bytes,2,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
+	LastName      string                 `protobuf:"bytes,3,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
+	AvatarUrl     string                 `protobuf:"bytes,4,opt,name=avatar_url,json=avatarUrl,proto3" json:"avatar_url,omitempty"`
+	Current       int32                  `protobuf:"varint,5,opt,name=current,proto3" json:"current,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ChallengeMemberProgress) Reset() {
+	*x = ChallengeMemberProgress{}
+	mi := &file_circle_v1_circle_proto_msgTypes[28]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ChallengeMemberProgress) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ChallengeMemberProgress) ProtoMessage() {}
+
+func (x *ChallengeMemberProgress) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[28]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ChallengeMemberProgress.ProtoReflect.Descriptor instead.
+func (*ChallengeMemberProgress) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{28}
+}
+
+func (x *ChallengeMemberProgress) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *ChallengeMemberProgress) GetFirstName() string {
+	if x != nil {
+		return x.FirstName
+	}
+	return ""
+}
+
+func (x *ChallengeMemberProgress) GetLastName() string {
+	if x != nil {
+		return x.LastName
+	}
+	return ""
+}
+
+func (x *ChallengeMemberProgress) GetAvatarUrl() string {
+	if x != nil {
+		return x.AvatarUrl
+	}
+	return ""
+}
+
+func (x *ChallengeMemberProgress) GetCurrent() int32 {
+	if x != nil {
+		return x.Current
+	}
+	return 0
+}
+
+type CircleChallengeData struct {
+	state         protoimpl.MessageState     `protogen:"open.v1"`
+	Id            string                     `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	CircleId      string                     `protobuf:"bytes,2,opt,name=circle_id,json=circleId,proto3" json:"circle_id,omitempty"`
+	TemplateKey   string                     `protobuf:"bytes,3,opt,name=template_key,json=templateKey,proto3" json:"template_key,omitempty"`
+	TargetValue   int32                      `protobuf:"varint,4,opt,name=target_value,json=targetValue,proto3" json:"target_value,omitempty"`
+	StartsAt      *timestamppb.Timestamp     `protobuf:"bytes,5,opt,name=starts_at,json=startsAt,proto3" json:"starts_at,omitempty"`
+	EndsAt        *timestamppb.Timestamp     `protobuf:"bytes,6,opt,name=ends_at,json=endsAt,proto3" json:"ends_at,omitempty"`
+	CreatedBy     string                     `protobuf:"bytes,7,opt,name=created_by,json=createdBy,proto3" json:"created_by,omitempty"`
+	Progress      []*ChallengeMemberProgress `protobuf:"bytes,8,rep,name=progress,proto3" json:"progress,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CircleChallengeData) Reset() {
+	*x = CircleChallengeData{}
+	mi := &file_circle_v1_circle_proto_msgTypes[29]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CircleChallengeData) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CircleChallengeData) ProtoMessage() {}
+
+func (x *CircleChallengeData) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[29]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CircleChallengeData.ProtoReflect.Descriptor instead.
+func (*CircleChallengeData) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{29}
+}
+
+func (x *CircleChallengeData) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CircleChallengeData) GetCircleId() string {
+	if x != nil {
+		return x.CircleId
+	}
+	return ""
+}
+
+func (x *CircleChallengeData) GetTemplateKey() string {
+	if x != nil {
+		return x.TemplateKey
+	}
+	return ""
+}
+
+func (x *CircleChallengeData) GetTargetValue() int32 {
+	if x != nil {
+		return x.TargetValue
+	}
+	return 0
+}
+
+func (x *CircleChallengeData) GetStartsAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.StartsAt
+	}
+	return nil
+}
+
+func (x *CircleChallengeData) GetEndsAt() *timestamppb.Timestamp {
+	if x != nil {
+		return x.EndsAt
+	}
+	return nil
+}
+
+func (x *CircleChallengeData) GetCreatedBy() string {
+	if x != nil {
+		return x.CreatedBy
+	}
+	return ""
+}
+
+func (x *CircleChallengeData) GetProgress() []*ChallengeMemberProgress {
+	if x != nil {
+		return x.Progress
+	}
+	return nil
+}
+
+type GetActiveCircleChallengeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Challenge     *CircleChallengeData   `protobuf:"bytes,1,opt,name=challenge,proto3" json:"challenge,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetActiveCircleChallengeResponse) Reset() {
+	*x = GetActiveCircleChallengeResponse{}
+	mi := &file_circle_v1_circle_proto_msgTypes[30]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetActiveCircleChallengeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetActiveCircleChallengeResponse) ProtoMessage() {}
+
+func (x *GetActiveCircleChallengeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[30]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetActiveCircleChallengeResponse.ProtoReflect.Descriptor instead.
+func (*GetActiveCircleChallengeResponse) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{30}
+}
+
+func (x *GetActiveCircleChallengeResponse) GetChallenge() *CircleChallengeData {
+	if x != nil {
+		return x.Challenge
+	}
+	return nil
+}
+
+type CreateCircleChallengeRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CircleId      string                 `protobuf:"bytes,1,opt,name=circle_id,json=circleId,proto3" json:"circle_id,omitempty"`
+	TemplateKey   string                 `protobuf:"bytes,2,opt,name=template_key,json=templateKey,proto3" json:"template_key,omitempty"`
+	TargetValue   int32                  `protobuf:"varint,3,opt,name=target_value,json=targetValue,proto3" json:"target_value,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateCircleChallengeRequest) Reset() {
+	*x = CreateCircleChallengeRequest{}
+	mi := &file_circle_v1_circle_proto_msgTypes[31]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateCircleChallengeRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCircleChallengeRequest) ProtoMessage() {}
+
+func (x *CreateCircleChallengeRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[31]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCircleChallengeRequest.ProtoReflect.Descriptor instead.
+func (*CreateCircleChallengeRequest) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{31}
+}
+
+func (x *CreateCircleChallengeRequest) GetCircleId() string {
+	if x != nil {
+		return x.CircleId
+	}
+	return ""
+}
+
+func (x *CreateCircleChallengeRequest) GetTemplateKey() string {
+	if x != nil {
+		return x.TemplateKey
+	}
+	return ""
+}
+
+func (x *CreateCircleChallengeRequest) GetTargetValue() int32 {
+	if x != nil {
+		return x.TargetValue
+	}
+	return 0
+}
+
+type CreateCircleChallengeResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Challenge     *CircleChallengeData   `protobuf:"bytes,1,opt,name=challenge,proto3" json:"challenge,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateCircleChallengeResponse) Reset() {
+	*x = CreateCircleChallengeResponse{}
+	mi := &file_circle_v1_circle_proto_msgTypes[32]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateCircleChallengeResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateCircleChallengeResponse) ProtoMessage() {}
+
+func (x *CreateCircleChallengeResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_circle_v1_circle_proto_msgTypes[32]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateCircleChallengeResponse.ProtoReflect.Descriptor instead.
+func (*CreateCircleChallengeResponse) Descriptor() ([]byte, []int) {
+	return file_circle_v1_circle_proto_rawDescGZIP(), []int{32}
+}
+
+func (x *CreateCircleChallengeResponse) GetChallenge() *CircleChallengeData {
+	if x != nil {
+		return x.Challenge
+	}
+	return nil
+}
+
 var File_circle_v1_circle_proto protoreflect.FileDescriptor
 
 const file_circle_v1_circle_proto_rawDesc = "" +
@@ -1188,7 +2048,83 @@ const file_circle_v1_circle_proto_rawDesc = "" +
 	"\tis_public\x18\a \x01(\bR\bisPublic\x12\x1b\n" +
 	"\tis_joined\x18\b \x01(\bR\bisJoined\x129\n" +
 	"\n" +
-	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt2\xf6\b\n" +
+	"created_at\x18\t \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\"4\n" +
+	"\x15GetCirclePulseRequest\x12\x1b\n" +
+	"\tcircle_id\x18\x01 \x01(\tR\bcircleId\"\x86\x01\n" +
+	"\x11CircleDayActivity\x12\x12\n" +
+	"\x04date\x18\x01 \x01(\tR\x04date\x12\x1f\n" +
+	"\vdaily_count\x18\x02 \x01(\x05R\n" +
+	"dailyCount\x12\x1d\n" +
+	"\n" +
+	"duel_count\x18\x03 \x01(\x05R\tduelCount\x12\x1d\n" +
+	"\n" +
+	"mock_count\x18\x04 \x01(\x05R\tmockCount\"\x8b\x02\n" +
+	"\x12CircleMemberAction\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"first_name\x18\x02 \x01(\tR\tfirstName\x12\x1b\n" +
+	"\tlast_name\x18\x03 \x01(\tR\blastName\x12\x1d\n" +
+	"\n" +
+	"avatar_url\x18\x04 \x01(\tR\tavatarUrl\x12\x1f\n" +
+	"\vaction_type\x18\x05 \x01(\tR\n" +
+	"actionType\x12#\n" +
+	"\raction_detail\x18\x06 \x01(\tR\factionDetail\x12;\n" +
+	"\vhappened_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\n" +
+	"happenedAt\"\xe9\x01\n" +
+	"\x16GetCirclePulseResponse\x12!\n" +
+	"\factive_today\x18\x01 \x01(\x05R\vactiveToday\x12#\n" +
+	"\rtotal_members\x18\x02 \x01(\x05R\ftotalMembers\x12A\n" +
+	"\rweek_activity\x18\x03 \x03(\v2\x1c.circle.v1.CircleDayActivityR\fweekActivity\x12D\n" +
+	"\x0erecent_actions\x18\x04 \x03(\v2\x1d.circle.v1.CircleMemberActionR\rrecentActions\":\n" +
+	"\x1bGetCircleMemberStatsRequest\x12\x1b\n" +
+	"\tcircle_id\x18\x01 \x01(\tR\bcircleId\"\xa1\x03\n" +
+	"\x16CircleMemberStatsEntry\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"first_name\x18\x02 \x01(\tR\tfirstName\x12\x1b\n" +
+	"\tlast_name\x18\x03 \x01(\tR\blastName\x12\x1d\n" +
+	"\n" +
+	"avatar_url\x18\x04 \x01(\tR\tavatarUrl\x12\x12\n" +
+	"\x04role\x18\x05 \x01(\tR\x04role\x127\n" +
+	"\tjoined_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\bjoinedAt\x12!\n" +
+	"\fdaily_solved\x18\a \x01(\x05R\vdailySolved\x12\x1b\n" +
+	"\tduels_won\x18\b \x01(\x05R\bduelsWon\x12!\n" +
+	"\fduels_played\x18\t \x01(\x05R\vduelsPlayed\x12\x1d\n" +
+	"\n" +
+	"mocks_done\x18\n" +
+	" \x01(\x05R\tmocksDone\x12!\n" +
+	"\farena_rating\x18\v \x01(\x05R\varenaRating\x12!\n" +
+	"\farena_league\x18\f \x01(\tR\varenaLeague\"[\n" +
+	"\x1cGetCircleMemberStatsResponse\x12;\n" +
+	"\amembers\x18\x01 \x03(\v2!.circle.v1.CircleMemberStatsEntryR\amembers\">\n" +
+	"\x1fGetActiveCircleChallengeRequest\x12\x1b\n" +
+	"\tcircle_id\x18\x01 \x01(\tR\bcircleId\"\xa7\x01\n" +
+	"\x17ChallengeMemberProgress\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1d\n" +
+	"\n" +
+	"first_name\x18\x02 \x01(\tR\tfirstName\x12\x1b\n" +
+	"\tlast_name\x18\x03 \x01(\tR\blastName\x12\x1d\n" +
+	"\n" +
+	"avatar_url\x18\x04 \x01(\tR\tavatarUrl\x12\x18\n" +
+	"\acurrent\x18\x05 \x01(\x05R\acurrent\"\xd5\x02\n" +
+	"\x13CircleChallengeData\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1b\n" +
+	"\tcircle_id\x18\x02 \x01(\tR\bcircleId\x12!\n" +
+	"\ftemplate_key\x18\x03 \x01(\tR\vtemplateKey\x12!\n" +
+	"\ftarget_value\x18\x04 \x01(\x05R\vtargetValue\x127\n" +
+	"\tstarts_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\bstartsAt\x123\n" +
+	"\aends_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\x06endsAt\x12\x1d\n" +
+	"\n" +
+	"created_by\x18\a \x01(\tR\tcreatedBy\x12>\n" +
+	"\bprogress\x18\b \x03(\v2\".circle.v1.ChallengeMemberProgressR\bprogress\"`\n" +
+	" GetActiveCircleChallengeResponse\x12<\n" +
+	"\tchallenge\x18\x01 \x01(\v2\x1e.circle.v1.CircleChallengeDataR\tchallenge\"\x81\x01\n" +
+	"\x1cCreateCircleChallengeRequest\x12\x1b\n" +
+	"\tcircle_id\x18\x01 \x01(\tR\bcircleId\x12!\n" +
+	"\ftemplate_key\x18\x02 \x01(\tR\vtemplateKey\x12!\n" +
+	"\ftarget_value\x18\x03 \x01(\x05R\vtargetValue\"]\n" +
+	"\x1dCreateCircleChallengeResponse\x12<\n" +
+	"\tchallenge\x18\x01 \x01(\v2\x1e.circle.v1.CircleChallengeDataR\tchallenge2\xd9\r\n" +
 	"\rCircleService\x12e\n" +
 	"\vListCircles\x12\x1d.circle.v1.ListCirclesRequest\x1a\x1e.circle.v1.ListCirclesResponse\"\x17\x82\xd3\xe4\x93\x02\x11\x12\x0f/api/v1/circles\x12e\n" +
 	"\fCreateCircle\x12\x1e.circle.v1.CreateCircleRequest\x1a\x19.circle.v1.CircleResponse\"\x1a\x82\xd3\xe4\x93\x02\x14:\x01*\"\x0f/api/v1/circles\x12v\n" +
@@ -1199,7 +2135,11 @@ const file_circle_v1_circle_proto_rawDesc = "" +
 	"\x11ListCircleMembers\x12#.circle.v1.ListCircleMembersRequest\x1a$.circle.v1.ListCircleMembersResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1/circles/{circle_id}/members\x12\x87\x01\n" +
 	"\x10ListCircleEvents\x12\".circle.v1.ListCircleEventsRequest\x1a#.circle.v1.ListCircleEventsResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/circles/{circle_id}/events\x12\x8d\x01\n" +
 	"\x11CreateCircleEvent\x12#.circle.v1.CreateCircleEventRequest\x1a$.circle.v1.CreateCircleEventResponse\"-\x82\xd3\xe4\x93\x02':\x01*\"\"/api/v1/circles/{circle_id}/events\x12t\n" +
-	"\fDeleteCircle\x12\x1e.circle.v1.DeleteCircleRequest\x1a\x1f.circle.v1.DeleteCircleResponse\"#\x82\xd3\xe4\x93\x02\x1d*\x1b/api/v1/circles/{circle_id}B\x1aZ\x18api/pkg/api/circle/v1;v1b\x06proto3"
+	"\fDeleteCircle\x12\x1e.circle.v1.DeleteCircleRequest\x1a\x1f.circle.v1.DeleteCircleResponse\"#\x82\xd3\xe4\x93\x02\x1d*\x1b/api/v1/circles/{circle_id}\x12\x80\x01\n" +
+	"\x0eGetCirclePulse\x12 .circle.v1.GetCirclePulseRequest\x1a!.circle.v1.GetCirclePulseResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/circles/{circle_id}/pulse\x12\x99\x01\n" +
+	"\x14GetCircleMemberStats\x12&.circle.v1.GetCircleMemberStatsRequest\x1a'.circle.v1.GetCircleMemberStatsResponse\"0\x82\xd3\xe4\x93\x02*\x12(/api/v1/circles/{circle_id}/member-stats\x12\xa2\x01\n" +
+	"\x18GetActiveCircleChallenge\x12*.circle.v1.GetActiveCircleChallengeRequest\x1a+.circle.v1.GetActiveCircleChallengeResponse\"-\x82\xd3\xe4\x93\x02'\x12%/api/v1/circles/{circle_id}/challenge\x12\x9c\x01\n" +
+	"\x15CreateCircleChallenge\x12'.circle.v1.CreateCircleChallengeRequest\x1a(.circle.v1.CreateCircleChallengeResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/circles/{circle_id}/challengeB\x1aZ\x18api/pkg/api/circle/v1;v1b\x06proto3"
 
 var (
 	file_circle_v1_circle_proto_rawDescOnce sync.Once
@@ -1213,62 +2153,93 @@ func file_circle_v1_circle_proto_rawDescGZIP() []byte {
 	return file_circle_v1_circle_proto_rawDescData
 }
 
-var file_circle_v1_circle_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
+var file_circle_v1_circle_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
 var file_circle_v1_circle_proto_goTypes = []any{
-	(*ListCirclesRequest)(nil),        // 0: circle.v1.ListCirclesRequest
-	(*CreateCircleRequest)(nil),       // 1: circle.v1.CreateCircleRequest
-	(*JoinCircleRequest)(nil),         // 2: circle.v1.JoinCircleRequest
-	(*LeaveCircleRequest)(nil),        // 3: circle.v1.LeaveCircleRequest
-	(*ListCirclesResponse)(nil),       // 4: circle.v1.ListCirclesResponse
-	(*CircleResponse)(nil),            // 5: circle.v1.CircleResponse
-	(*JoinCircleResponse)(nil),        // 6: circle.v1.JoinCircleResponse
-	(*LeaveCircleResponse)(nil),       // 7: circle.v1.LeaveCircleResponse
-	(*InviteToCircleRequest)(nil),     // 8: circle.v1.InviteToCircleRequest
-	(*InviteToCircleResponse)(nil),    // 9: circle.v1.InviteToCircleResponse
-	(*ListCircleMembersRequest)(nil),  // 10: circle.v1.ListCircleMembersRequest
-	(*CircleMember)(nil),              // 11: circle.v1.CircleMember
-	(*ListCircleMembersResponse)(nil), // 12: circle.v1.ListCircleMembersResponse
-	(*ListCircleEventsRequest)(nil),   // 13: circle.v1.ListCircleEventsRequest
-	(*ListCircleEventsResponse)(nil),  // 14: circle.v1.ListCircleEventsResponse
-	(*CreateCircleEventRequest)(nil),  // 15: circle.v1.CreateCircleEventRequest
-	(*CreateCircleEventResponse)(nil), // 16: circle.v1.CreateCircleEventResponse
-	(*DeleteCircleRequest)(nil),       // 17: circle.v1.DeleteCircleRequest
-	(*DeleteCircleResponse)(nil),      // 18: circle.v1.DeleteCircleResponse
-	(*Circle)(nil),                    // 19: circle.v1.Circle
-	(*timestamppb.Timestamp)(nil),     // 20: google.protobuf.Timestamp
-	(*v1.Event)(nil),                  // 21: event.v1.Event
+	(*ListCirclesRequest)(nil),               // 0: circle.v1.ListCirclesRequest
+	(*CreateCircleRequest)(nil),              // 1: circle.v1.CreateCircleRequest
+	(*JoinCircleRequest)(nil),                // 2: circle.v1.JoinCircleRequest
+	(*LeaveCircleRequest)(nil),               // 3: circle.v1.LeaveCircleRequest
+	(*ListCirclesResponse)(nil),              // 4: circle.v1.ListCirclesResponse
+	(*CircleResponse)(nil),                   // 5: circle.v1.CircleResponse
+	(*JoinCircleResponse)(nil),               // 6: circle.v1.JoinCircleResponse
+	(*LeaveCircleResponse)(nil),              // 7: circle.v1.LeaveCircleResponse
+	(*InviteToCircleRequest)(nil),            // 8: circle.v1.InviteToCircleRequest
+	(*InviteToCircleResponse)(nil),           // 9: circle.v1.InviteToCircleResponse
+	(*ListCircleMembersRequest)(nil),         // 10: circle.v1.ListCircleMembersRequest
+	(*CircleMember)(nil),                     // 11: circle.v1.CircleMember
+	(*ListCircleMembersResponse)(nil),        // 12: circle.v1.ListCircleMembersResponse
+	(*ListCircleEventsRequest)(nil),          // 13: circle.v1.ListCircleEventsRequest
+	(*ListCircleEventsResponse)(nil),         // 14: circle.v1.ListCircleEventsResponse
+	(*CreateCircleEventRequest)(nil),         // 15: circle.v1.CreateCircleEventRequest
+	(*CreateCircleEventResponse)(nil),        // 16: circle.v1.CreateCircleEventResponse
+	(*DeleteCircleRequest)(nil),              // 17: circle.v1.DeleteCircleRequest
+	(*DeleteCircleResponse)(nil),             // 18: circle.v1.DeleteCircleResponse
+	(*Circle)(nil),                           // 19: circle.v1.Circle
+	(*GetCirclePulseRequest)(nil),            // 20: circle.v1.GetCirclePulseRequest
+	(*CircleDayActivity)(nil),                // 21: circle.v1.CircleDayActivity
+	(*CircleMemberAction)(nil),               // 22: circle.v1.CircleMemberAction
+	(*GetCirclePulseResponse)(nil),           // 23: circle.v1.GetCirclePulseResponse
+	(*GetCircleMemberStatsRequest)(nil),      // 24: circle.v1.GetCircleMemberStatsRequest
+	(*CircleMemberStatsEntry)(nil),           // 25: circle.v1.CircleMemberStatsEntry
+	(*GetCircleMemberStatsResponse)(nil),     // 26: circle.v1.GetCircleMemberStatsResponse
+	(*GetActiveCircleChallengeRequest)(nil),  // 27: circle.v1.GetActiveCircleChallengeRequest
+	(*ChallengeMemberProgress)(nil),          // 28: circle.v1.ChallengeMemberProgress
+	(*CircleChallengeData)(nil),              // 29: circle.v1.CircleChallengeData
+	(*GetActiveCircleChallengeResponse)(nil), // 30: circle.v1.GetActiveCircleChallengeResponse
+	(*CreateCircleChallengeRequest)(nil),     // 31: circle.v1.CreateCircleChallengeRequest
+	(*CreateCircleChallengeResponse)(nil),    // 32: circle.v1.CreateCircleChallengeResponse
+	(*timestamppb.Timestamp)(nil),            // 33: google.protobuf.Timestamp
+	(*v1.Event)(nil),                         // 34: event.v1.Event
 }
 var file_circle_v1_circle_proto_depIdxs = []int32{
 	19, // 0: circle.v1.ListCirclesResponse.circles:type_name -> circle.v1.Circle
 	19, // 1: circle.v1.CircleResponse.circle:type_name -> circle.v1.Circle
-	20, // 2: circle.v1.CircleMember.joined_at:type_name -> google.protobuf.Timestamp
+	33, // 2: circle.v1.CircleMember.joined_at:type_name -> google.protobuf.Timestamp
 	11, // 3: circle.v1.ListCircleMembersResponse.members:type_name -> circle.v1.CircleMember
-	21, // 4: circle.v1.ListCircleEventsResponse.events:type_name -> event.v1.Event
-	21, // 5: circle.v1.CreateCircleEventResponse.event:type_name -> event.v1.Event
-	20, // 6: circle.v1.Circle.created_at:type_name -> google.protobuf.Timestamp
-	0,  // 7: circle.v1.CircleService.ListCircles:input_type -> circle.v1.ListCirclesRequest
-	1,  // 8: circle.v1.CircleService.CreateCircle:input_type -> circle.v1.CreateCircleRequest
-	2,  // 9: circle.v1.CircleService.JoinCircle:input_type -> circle.v1.JoinCircleRequest
-	3,  // 10: circle.v1.CircleService.LeaveCircle:input_type -> circle.v1.LeaveCircleRequest
-	8,  // 11: circle.v1.CircleService.InviteToCircle:input_type -> circle.v1.InviteToCircleRequest
-	10, // 12: circle.v1.CircleService.ListCircleMembers:input_type -> circle.v1.ListCircleMembersRequest
-	13, // 13: circle.v1.CircleService.ListCircleEvents:input_type -> circle.v1.ListCircleEventsRequest
-	15, // 14: circle.v1.CircleService.CreateCircleEvent:input_type -> circle.v1.CreateCircleEventRequest
-	17, // 15: circle.v1.CircleService.DeleteCircle:input_type -> circle.v1.DeleteCircleRequest
-	4,  // 16: circle.v1.CircleService.ListCircles:output_type -> circle.v1.ListCirclesResponse
-	5,  // 17: circle.v1.CircleService.CreateCircle:output_type -> circle.v1.CircleResponse
-	6,  // 18: circle.v1.CircleService.JoinCircle:output_type -> circle.v1.JoinCircleResponse
-	7,  // 19: circle.v1.CircleService.LeaveCircle:output_type -> circle.v1.LeaveCircleResponse
-	9,  // 20: circle.v1.CircleService.InviteToCircle:output_type -> circle.v1.InviteToCircleResponse
-	12, // 21: circle.v1.CircleService.ListCircleMembers:output_type -> circle.v1.ListCircleMembersResponse
-	14, // 22: circle.v1.CircleService.ListCircleEvents:output_type -> circle.v1.ListCircleEventsResponse
-	16, // 23: circle.v1.CircleService.CreateCircleEvent:output_type -> circle.v1.CreateCircleEventResponse
-	18, // 24: circle.v1.CircleService.DeleteCircle:output_type -> circle.v1.DeleteCircleResponse
-	16, // [16:25] is the sub-list for method output_type
-	7,  // [7:16] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	34, // 4: circle.v1.ListCircleEventsResponse.events:type_name -> event.v1.Event
+	34, // 5: circle.v1.CreateCircleEventResponse.event:type_name -> event.v1.Event
+	33, // 6: circle.v1.Circle.created_at:type_name -> google.protobuf.Timestamp
+	33, // 7: circle.v1.CircleMemberAction.happened_at:type_name -> google.protobuf.Timestamp
+	21, // 8: circle.v1.GetCirclePulseResponse.week_activity:type_name -> circle.v1.CircleDayActivity
+	22, // 9: circle.v1.GetCirclePulseResponse.recent_actions:type_name -> circle.v1.CircleMemberAction
+	33, // 10: circle.v1.CircleMemberStatsEntry.joined_at:type_name -> google.protobuf.Timestamp
+	25, // 11: circle.v1.GetCircleMemberStatsResponse.members:type_name -> circle.v1.CircleMemberStatsEntry
+	33, // 12: circle.v1.CircleChallengeData.starts_at:type_name -> google.protobuf.Timestamp
+	33, // 13: circle.v1.CircleChallengeData.ends_at:type_name -> google.protobuf.Timestamp
+	28, // 14: circle.v1.CircleChallengeData.progress:type_name -> circle.v1.ChallengeMemberProgress
+	29, // 15: circle.v1.GetActiveCircleChallengeResponse.challenge:type_name -> circle.v1.CircleChallengeData
+	29, // 16: circle.v1.CreateCircleChallengeResponse.challenge:type_name -> circle.v1.CircleChallengeData
+	0,  // 17: circle.v1.CircleService.ListCircles:input_type -> circle.v1.ListCirclesRequest
+	1,  // 18: circle.v1.CircleService.CreateCircle:input_type -> circle.v1.CreateCircleRequest
+	2,  // 19: circle.v1.CircleService.JoinCircle:input_type -> circle.v1.JoinCircleRequest
+	3,  // 20: circle.v1.CircleService.LeaveCircle:input_type -> circle.v1.LeaveCircleRequest
+	8,  // 21: circle.v1.CircleService.InviteToCircle:input_type -> circle.v1.InviteToCircleRequest
+	10, // 22: circle.v1.CircleService.ListCircleMembers:input_type -> circle.v1.ListCircleMembersRequest
+	13, // 23: circle.v1.CircleService.ListCircleEvents:input_type -> circle.v1.ListCircleEventsRequest
+	15, // 24: circle.v1.CircleService.CreateCircleEvent:input_type -> circle.v1.CreateCircleEventRequest
+	17, // 25: circle.v1.CircleService.DeleteCircle:input_type -> circle.v1.DeleteCircleRequest
+	20, // 26: circle.v1.CircleService.GetCirclePulse:input_type -> circle.v1.GetCirclePulseRequest
+	24, // 27: circle.v1.CircleService.GetCircleMemberStats:input_type -> circle.v1.GetCircleMemberStatsRequest
+	27, // 28: circle.v1.CircleService.GetActiveCircleChallenge:input_type -> circle.v1.GetActiveCircleChallengeRequest
+	31, // 29: circle.v1.CircleService.CreateCircleChallenge:input_type -> circle.v1.CreateCircleChallengeRequest
+	4,  // 30: circle.v1.CircleService.ListCircles:output_type -> circle.v1.ListCirclesResponse
+	5,  // 31: circle.v1.CircleService.CreateCircle:output_type -> circle.v1.CircleResponse
+	6,  // 32: circle.v1.CircleService.JoinCircle:output_type -> circle.v1.JoinCircleResponse
+	7,  // 33: circle.v1.CircleService.LeaveCircle:output_type -> circle.v1.LeaveCircleResponse
+	9,  // 34: circle.v1.CircleService.InviteToCircle:output_type -> circle.v1.InviteToCircleResponse
+	12, // 35: circle.v1.CircleService.ListCircleMembers:output_type -> circle.v1.ListCircleMembersResponse
+	14, // 36: circle.v1.CircleService.ListCircleEvents:output_type -> circle.v1.ListCircleEventsResponse
+	16, // 37: circle.v1.CircleService.CreateCircleEvent:output_type -> circle.v1.CreateCircleEventResponse
+	18, // 38: circle.v1.CircleService.DeleteCircle:output_type -> circle.v1.DeleteCircleResponse
+	23, // 39: circle.v1.CircleService.GetCirclePulse:output_type -> circle.v1.GetCirclePulseResponse
+	26, // 40: circle.v1.CircleService.GetCircleMemberStats:output_type -> circle.v1.GetCircleMemberStatsResponse
+	30, // 41: circle.v1.CircleService.GetActiveCircleChallenge:output_type -> circle.v1.GetActiveCircleChallengeResponse
+	32, // 42: circle.v1.CircleService.CreateCircleChallenge:output_type -> circle.v1.CreateCircleChallengeResponse
+	30, // [30:43] is the sub-list for method output_type
+	17, // [17:30] is the sub-list for method input_type
+	17, // [17:17] is the sub-list for extension type_name
+	17, // [17:17] is the sub-list for extension extendee
+	0,  // [0:17] is the sub-list for field type_name
 }
 
 func init() { file_circle_v1_circle_proto_init() }
@@ -1282,7 +2253,7 @@ func file_circle_v1_circle_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_circle_v1_circle_proto_rawDesc), len(file_circle_v1_circle_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   20,
+			NumMessages:   33,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

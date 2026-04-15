@@ -80,6 +80,9 @@ func scanLeaderboardEntry(row scanner, item *domain.LeaderboardEntry) error {
 		&item.Matches,
 		&item.WinRate,
 		&item.BestRuntime,
+		&item.PeakRating,
+		new(int32), // current_win_streak — not used in leaderboard entry
+		new(int32), // best_win_streak — not used in leaderboard entry
 	)
 }
 
@@ -93,6 +96,9 @@ func scanPlayerStats(row scanner, item *domain.PlayerStats) error {
 		&item.Matches,
 		&item.WinRate,
 		&item.BestRuntime,
+		&item.PeakRating,
+		&item.CurrentWinStreak,
+		&item.BestWinStreak,
 	)
 }
 

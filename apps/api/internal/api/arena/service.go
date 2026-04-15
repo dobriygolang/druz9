@@ -30,6 +30,9 @@ type Service interface {
 	GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (map[uuid.UUID]*domain.PlayerStats, error)
 	ReportPlayerSuspicion(ctx context.Context, matchID uuid.UUID, user *domain.User, reason string) error
 	ListOpenMatches(ctx context.Context, limit int32) ([]*domain.Match, error)
+	GetActiveSeason(ctx context.Context) (*model.ArenaSeason, error)
+	GetLeaguePosition(ctx context.Context, userID string, rating int32) (rank int32, total int32, err error)
+	GetSeasonHistory(ctx context.Context, userID string, limit int32) ([]*model.ArenaSeasonResult, error)
 }
 
 //go:generate mockery --case underscore --name RealtimePublisher --with-expecter --output mocks

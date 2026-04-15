@@ -9,6 +9,32 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+func mapChallenge(ch *model.CircleChallenge) *v1.CircleChallengeData {
+	if ch == nil {
+		return nil
+	}
+	progress := make([]*v1.ChallengeMemberProgress, 0, len(ch.Progress))
+	for _, p := range ch.Progress {
+		progress = append(progress, &v1.ChallengeMemberProgress{
+			UserId:    p.UserID.String(),
+			FirstName: p.FirstName,
+			LastName:  p.LastName,
+			AvatarUrl: p.AvatarURL,
+			Current:   p.Current,
+		})
+	}
+	return &v1.CircleChallengeData{
+		Id:          ch.ID.String(),
+		CircleId:    ch.CircleID.String(),
+		TemplateKey: ch.TemplateKey,
+		TargetValue: ch.TargetValue,
+		StartsAt:    timestamppb.New(ch.StartsAt),
+		EndsAt:      timestamppb.New(ch.EndsAt),
+		CreatedBy:   ch.CreatedBy.String(),
+		Progress:    progress,
+	}
+}
+
 func mapCircle(item *model.Circle) *v1.Circle {
 	if item == nil {
 		return nil

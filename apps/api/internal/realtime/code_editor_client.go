@@ -9,6 +9,8 @@ import (
 	"github.com/gorilla/websocket"
 )
 
+const codeEditorEnqueueTimeout = 100 * time.Millisecond
+
 func (c *codeEditorClient) writeLoop() {
 	for msg := range c.send {
 		_ = c.ws.SetWriteDeadline(time.Now().Add(10 * time.Second))
@@ -85,14 +87,25 @@ func (c *codeEditorClient) readLoop(h *CodeEditorHub) {
 			}
 			h.handleAwareness(c, msg)
 		case schema.CodeEditorTypePing:
-			c.enqueue(schema.CodeEditorMessage{Type: schema.CodeEditorTypePong})
+			_ = c.enqueue(schema.CodeEditorMessage{Type: schema.CodeEditorTypePong})
 		}
 	}
 }
 
-func (c *codeEditorClient) enqueue(msg schema.CodeEditorMessage) {
+func (c *codeEditorClient) enqueue(msg schema.CodeEditorMessage) (ok bool) {
+	defer func() {
+		if recover() != nil {
+			ok = false
+		}
+	}()
+
+	timer := time.NewTimer(codeEditorEnqueueTimeout)
+	defer timer.Stop()
+
 	select {
 	case c.send <- msg:
-	default:
+		return true
+	case <-timer.C:
+		return false
 	}
 }

@@ -142,3 +142,15 @@ func (s *Service) observeMatchFinished(match *domain.Match, finishedAt time.Time
 	}
 	metrics.IncMatchesFinished(durationSeconds)
 }
+
+func (s *Service) GetActiveSeason(ctx context.Context) (*model.ArenaSeason, error) {
+	return s.repo.GetActiveSeason(ctx)
+}
+
+func (s *Service) GetLeaguePosition(ctx context.Context, userID string, rating int32) (int32, int32, error) {
+	return s.repo.GetLeaguePosition(ctx, userID, rating)
+}
+
+func (s *Service) GetSeasonHistory(ctx context.Context, userID string, limit int32) ([]*model.ArenaSeasonResult, error) {
+	return s.repo.GetSeasonHistory(ctx, userID, limit)
+}

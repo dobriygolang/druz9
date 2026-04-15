@@ -833,6 +833,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/arena.v1.ArenaQueueStateResponse'
+    /api/v1/arena/seasons/{userId}:
+        get:
+            tags:
+                - ArenaService
+            operationId: ArenaService_GetSeasonHistory
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.GetSeasonHistoryResponse'
     /api/v1/arena/stats/batch:
         post:
             tags:
@@ -927,6 +950,47 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/circle.v1.DeleteCircleResponse'
+    /api/v1/circles/{circleId}/challenge:
+        get:
+            tags:
+                - CircleService
+            operationId: CircleService_GetActiveCircleChallenge
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.GetActiveCircleChallengeResponse'
+        post:
+            tags:
+                - CircleService
+            operationId: CircleService_CreateCircleChallenge
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/circle.v1.CreateCircleChallengeRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.CreateCircleChallengeResponse'
     /api/v1/circles/{circleId}/events:
         get:
             tags:
@@ -1044,6 +1108,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/circle.v1.LeaveCircleResponse'
+    /api/v1/circles/{circleId}/member-stats:
+        get:
+            tags:
+                - CircleService
+            operationId: CircleService_GetCircleMemberStats
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.GetCircleMemberStatsResponse'
     /api/v1/circles/{circleId}/members:
         get:
             tags:
@@ -1062,6 +1144,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/circle.v1.ListCircleMembersResponse'
+    /api/v1/circles/{circleId}/pulse:
+        get:
+            tags:
+                - CircleService
+            operationId: CircleService_GetCirclePulse
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.GetCirclePulseResponse'
     /api/v1/code-editor/ai-review:
         post:
             tags:
@@ -2439,6 +2539,9 @@ components:
                 losses:
                     type: integer
                     format: int32
+                peakRating:
+                    type: integer
+                    format: int32
         arena.v1.ArenaMatch:
             type: object
             properties:
@@ -2553,6 +2656,24 @@ components:
                     format: double
                 bestRuntime:
                     type: string
+                peakRating:
+                    type: integer
+                    format: int32
+                currentWinStreak:
+                    type: integer
+                    format: int32
+                bestWinStreak:
+                    type: integer
+                    format: int32
+                leagueRank:
+                    type: integer
+                    format: int32
+                leagueTotal:
+                    type: integer
+                    format: int32
+                nextLeagueAt:
+                    type: integer
+                    format: int32
         arena.v1.ArenaPlayerStatsBatchResponse:
             type: object
             properties:
@@ -2584,6 +2705,44 @@ components:
                     format: date-time
                 match:
                     $ref: '#/components/schemas/arena.v1.ArenaMatch'
+        arena.v1.ArenaSeasonInfo:
+            type: object
+            properties:
+                seasonNumber:
+                    type: integer
+                    format: int32
+                startsAt:
+                    type: string
+                    format: date-time
+                endsAt:
+                    type: string
+                    format: date-time
+        arena.v1.ArenaSeasonResultEntry:
+            type: object
+            properties:
+                seasonNumber:
+                    type: integer
+                    format: int32
+                finalRating:
+                    type: integer
+                    format: int32
+                finalLeague:
+                    type: string
+                leagueRank:
+                    type: integer
+                    format: int32
+                peakRating:
+                    type: integer
+                    format: int32
+                wins:
+                    type: integer
+                    format: int32
+                losses:
+                    type: integer
+                    format: int32
+                matches:
+                    type: integer
+                    format: int32
         arena.v1.ArenaStatusResponse:
             type: object
             properties:
@@ -2606,6 +2765,8 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/arena.v1.ArenaLeaderboardEntry'
+                season:
+                    $ref: '#/components/schemas/arena.v1.ArenaSeasonInfo'
         arena.v1.GetPlayerStatsBatchRequest:
             type: object
             properties:
@@ -2613,6 +2774,13 @@ components:
                     type: array
                     items:
                         type: string
+        arena.v1.GetSeasonHistoryResponse:
+            type: object
+            properties:
+                seasons:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/arena.v1.ArenaSeasonResultEntry'
         arena.v1.JoinMatchRequest:
             type: object
             properties:
@@ -2688,6 +2856,20 @@ components:
                     format: enum
                 submissionId:
                     type: string
+        circle.v1.ChallengeMemberProgress:
+            type: object
+            properties:
+                userId:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                avatarUrl:
+                    type: string
+                current:
+                    type: integer
+                    format: int32
         circle.v1.Circle:
             type: object
             properties:
@@ -2713,6 +2895,44 @@ components:
                 createdAt:
                     type: string
                     format: date-time
+        circle.v1.CircleChallengeData:
+            type: object
+            properties:
+                id:
+                    type: string
+                circleId:
+                    type: string
+                templateKey:
+                    type: string
+                targetValue:
+                    type: integer
+                    format: int32
+                startsAt:
+                    type: string
+                    format: date-time
+                endsAt:
+                    type: string
+                    format: date-time
+                createdBy:
+                    type: string
+                progress:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/circle.v1.ChallengeMemberProgress'
+        circle.v1.CircleDayActivity:
+            type: object
+            properties:
+                date:
+                    type: string
+                dailyCount:
+                    type: integer
+                    format: int32
+                duelCount:
+                    type: integer
+                    format: int32
+                mockCount:
+                    type: integer
+                    format: int32
         circle.v1.CircleMember:
             type: object
             properties:
@@ -2729,11 +2949,77 @@ components:
                 joinedAt:
                     type: string
                     format: date-time
+        circle.v1.CircleMemberAction:
+            type: object
+            properties:
+                userId:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                avatarUrl:
+                    type: string
+                actionType:
+                    type: string
+                actionDetail:
+                    type: string
+                happenedAt:
+                    type: string
+                    format: date-time
+        circle.v1.CircleMemberStatsEntry:
+            type: object
+            properties:
+                userId:
+                    type: string
+                firstName:
+                    type: string
+                lastName:
+                    type: string
+                avatarUrl:
+                    type: string
+                role:
+                    type: string
+                joinedAt:
+                    type: string
+                    format: date-time
+                dailySolved:
+                    type: integer
+                    format: int32
+                duelsWon:
+                    type: integer
+                    format: int32
+                duelsPlayed:
+                    type: integer
+                    format: int32
+                mocksDone:
+                    type: integer
+                    format: int32
+                arenaRating:
+                    type: integer
+                    format: int32
+                arenaLeague:
+                    type: string
         circle.v1.CircleResponse:
             type: object
             properties:
                 circle:
                     $ref: '#/components/schemas/circle.v1.Circle'
+        circle.v1.CreateCircleChallengeRequest:
+            type: object
+            properties:
+                circleId:
+                    type: string
+                templateKey:
+                    type: string
+                targetValue:
+                    type: integer
+                    format: int32
+        circle.v1.CreateCircleChallengeResponse:
+            type: object
+            properties:
+                challenge:
+                    $ref: '#/components/schemas/circle.v1.CircleChallengeData'
         circle.v1.CreateCircleEventRequest:
             type: object
             properties:
@@ -2774,6 +3060,35 @@ components:
             properties:
                 status:
                     type: string
+        circle.v1.GetActiveCircleChallengeResponse:
+            type: object
+            properties:
+                challenge:
+                    $ref: '#/components/schemas/circle.v1.CircleChallengeData'
+        circle.v1.GetCircleMemberStatsResponse:
+            type: object
+            properties:
+                members:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/circle.v1.CircleMemberStatsEntry'
+        circle.v1.GetCirclePulseResponse:
+            type: object
+            properties:
+                activeToday:
+                    type: integer
+                    format: int32
+                totalMembers:
+                    type: integer
+                    format: int32
+                weekActivity:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/circle.v1.CircleDayActivity'
+                recentActions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/circle.v1.CircleMemberAction'
         circle.v1.InviteToCircleRequest:
             type: object
             properties:

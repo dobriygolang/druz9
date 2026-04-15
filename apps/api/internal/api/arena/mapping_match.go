@@ -148,6 +148,7 @@ func mapArenaLeaderboard(entries []*domain.LeaderboardEntry) []*v1.ArenaLeaderbo
 			Matches:     entry.Matches,
 			WinRate:     entry.WinRate,
 			BestRuntime: entry.BestRuntime,
+			PeakRating:  entry.PeakRating,
 		})
 	}
 	return result

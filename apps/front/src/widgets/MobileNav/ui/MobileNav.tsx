@@ -8,13 +8,12 @@ import { useTheme } from '@/app/providers/ThemeProvider'
 import { Avatar } from '@/shared/ui/Avatar'
 import {
   PRIMARY_NAV_ITEMS,
-  SECONDARY_NAV_ITEMS,
   getMobileRouteMeta,
   isFullscreenPath,
   isNavItemActive,
 } from '@/widgets/navigation/model/navigation'
 
-const MENU_ITEMS = [...PRIMARY_NAV_ITEMS, ...SECONDARY_NAV_ITEMS]
+const MENU_ITEMS = PRIMARY_NAV_ITEMS
 
 export function MobileNav() {
   const location = useLocation()
@@ -290,6 +289,14 @@ export function MobileNav() {
               </Link>
             )
           })}
+          <Link
+            to="/profile"
+            className={cn('mobile-dock__item', location.pathname.startsWith('/profile') && 'is-active')}
+            aria-current={location.pathname.startsWith('/profile') ? 'page' : undefined}
+          >
+            <User className="w-[18px] h-[18px]" />
+            <span>{t('nav.profile')}</span>
+          </Link>
         </div>
       </nav>
     </>

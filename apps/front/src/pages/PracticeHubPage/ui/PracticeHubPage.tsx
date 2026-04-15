@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Code2, Swords, Target } from 'lucide-react'
+import { Code2, Flame, Swords, Target } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/shared/ui/Avatar'
 import { apiClient } from '@/shared/api/base'
@@ -46,11 +46,12 @@ export function PracticeHubPage() {
         </div>
 
         <div className="-mx-4 mb-5 overflow-x-auto px-4 pb-1 no-scrollbar md:mx-0 md:px-0">
-          <div className="flex snap-x gap-3 md:grid md:grid-cols-3 md:overflow-visible">
+          <div className="flex snap-x gap-3 md:grid md:grid-cols-4 md:overflow-visible">
           {[
             { icon: Code2, title: 'Code Rooms', sub: t('practice.card.rooms'), href: '/practice/code-rooms' },
             { icon: Swords, title: 'Arena Duels', sub: t('practice.card.arena'), href: '/practice/arena' },
             { icon: Target, title: 'Solo Practice', sub: t('practice.card.solo'), href: '/practice/solo' },
+            { icon: Flame, title: 'Daily Challenge', sub: t('practice.card.daily'), href: '/practice/daily' },
           ].map(f => {
             const Icon = f.icon
             const isAct = location.pathname.startsWith(f.href)

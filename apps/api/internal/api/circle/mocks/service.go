@@ -24,6 +24,68 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
+// CreateChallenge provides a mock function with given fields: _a0, _a1, _a2, _a3, _a4
+func (_m *Service) CreateChallenge(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID, _a3 string, _a4 int32) (*model.CircleChallenge, error) {
+	ret := _m.Called(_a0, _a1, _a2, _a3, _a4)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateChallenge")
+	}
+
+	var r0 *model.CircleChallenge
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, string, int32) (*model.CircleChallenge, error)); ok {
+		return rf(_a0, _a1, _a2, _a3, _a4)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, string, int32) *model.CircleChallenge); ok {
+		r0 = rf(_a0, _a1, _a2, _a3, _a4)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.CircleChallenge)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID, string, int32) error); ok {
+		r1 = rf(_a0, _a1, _a2, _a3, _a4)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_CreateChallenge_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateChallenge'
+type Service_CreateChallenge_Call struct {
+	*mock.Call
+}
+
+// CreateChallenge is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 uuid.UUID
+//   - _a2 uuid.UUID
+//   - _a3 string
+//   - _a4 int32
+func (_e *Service_Expecter) CreateChallenge(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}, _a4 interface{}) *Service_CreateChallenge_Call {
+	return &Service_CreateChallenge_Call{Call: _e.mock.On("CreateChallenge", _a0, _a1, _a2, _a3, _a4)}
+}
+
+func (_c *Service_CreateChallenge_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID, _a3 string, _a4 int32)) *Service_CreateChallenge_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID), args[3].(string), args[4].(int32))
+	})
+	return _c
+}
+
+func (_c *Service_CreateChallenge_Call) Return(_a0 *model.CircleChallenge, _a1 error) *Service_CreateChallenge_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_CreateChallenge_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID, string, int32) (*model.CircleChallenge, error)) *Service_CreateChallenge_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // CreateCircle provides a mock function with given fields: _a0, _a1, _a2, _a3, _a4, _a5
 func (_m *Service) CreateCircle(_a0 context.Context, _a1 uuid.UUID, _a2 string, _a3 string, _a4 []string, _a5 bool) (*model.Circle, error) {
 	ret := _m.Called(_a0, _a1, _a2, _a3, _a4, _a5)
@@ -131,6 +193,186 @@ func (_c *Service_DeleteCircle_Call) Return(_a0 error) *Service_DeleteCircle_Cal
 }
 
 func (_c *Service_DeleteCircle_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID) error) *Service_DeleteCircle_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetActiveChallenge provides a mock function with given fields: _a0, _a1, _a2
+func (_m *Service) GetActiveChallenge(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (*model.CircleChallenge, error) {
+	ret := _m.Called(_a0, _a1, _a2)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetActiveChallenge")
+	}
+
+	var r0 *model.CircleChallenge
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*model.CircleChallenge, error)); ok {
+		return rf(_a0, _a1, _a2)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *model.CircleChallenge); ok {
+		r0 = rf(_a0, _a1, _a2)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.CircleChallenge)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r1 = rf(_a0, _a1, _a2)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_GetActiveChallenge_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetActiveChallenge'
+type Service_GetActiveChallenge_Call struct {
+	*mock.Call
+}
+
+// GetActiveChallenge is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 uuid.UUID
+//   - _a2 uuid.UUID
+func (_e *Service_Expecter) GetActiveChallenge(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_GetActiveChallenge_Call {
+	return &Service_GetActiveChallenge_Call{Call: _e.mock.On("GetActiveChallenge", _a0, _a1, _a2)}
+}
+
+func (_c *Service_GetActiveChallenge_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_GetActiveChallenge_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_GetActiveChallenge_Call) Return(_a0 *model.CircleChallenge, _a1 error) *Service_GetActiveChallenge_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_GetActiveChallenge_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID) (*model.CircleChallenge, error)) *Service_GetActiveChallenge_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetMemberStats provides a mock function with given fields: _a0, _a1, _a2
+func (_m *Service) GetMemberStats(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) ([]*model.CircleMemberStats, error) {
+	ret := _m.Called(_a0, _a1, _a2)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetMemberStats")
+	}
+
+	var r0 []*model.CircleMemberStats
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) ([]*model.CircleMemberStats, error)); ok {
+		return rf(_a0, _a1, _a2)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) []*model.CircleMemberStats); ok {
+		r0 = rf(_a0, _a1, _a2)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).([]*model.CircleMemberStats)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r1 = rf(_a0, _a1, _a2)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_GetMemberStats_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetMemberStats'
+type Service_GetMemberStats_Call struct {
+	*mock.Call
+}
+
+// GetMemberStats is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 uuid.UUID
+//   - _a2 uuid.UUID
+func (_e *Service_Expecter) GetMemberStats(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_GetMemberStats_Call {
+	return &Service_GetMemberStats_Call{Call: _e.mock.On("GetMemberStats", _a0, _a1, _a2)}
+}
+
+func (_c *Service_GetMemberStats_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_GetMemberStats_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_GetMemberStats_Call) Return(_a0 []*model.CircleMemberStats, _a1 error) *Service_GetMemberStats_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_GetMemberStats_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID) ([]*model.CircleMemberStats, error)) *Service_GetMemberStats_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
+// GetPulse provides a mock function with given fields: _a0, _a1, _a2
+func (_m *Service) GetPulse(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (*model.CirclePulse, error) {
+	ret := _m.Called(_a0, _a1, _a2)
+
+	if len(ret) == 0 {
+		panic("no return value specified for GetPulse")
+	}
+
+	var r0 *model.CirclePulse
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*model.CirclePulse, error)); ok {
+		return rf(_a0, _a1, _a2)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *model.CirclePulse); ok {
+		r0 = rf(_a0, _a1, _a2)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.CirclePulse)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r1 = rf(_a0, _a1, _a2)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Service_GetPulse_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'GetPulse'
+type Service_GetPulse_Call struct {
+	*mock.Call
+}
+
+// GetPulse is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 uuid.UUID
+//   - _a2 uuid.UUID
+func (_e *Service_Expecter) GetPulse(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_GetPulse_Call {
+	return &Service_GetPulse_Call{Call: _e.mock.On("GetPulse", _a0, _a1, _a2)}
+}
+
+func (_c *Service_GetPulse_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_GetPulse_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_GetPulse_Call) Return(_a0 *model.CirclePulse, _a1 error) *Service_GetPulse_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Service_GetPulse_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID) (*model.CirclePulse, error)) *Service_GetPulse_Call {
 	_c.Call.Return(run)
 	return _c
 }

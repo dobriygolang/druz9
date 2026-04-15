@@ -15,7 +15,10 @@ const leaderboardSelect = `
 		aps.losses,
 		aps.matches,
 		CASE WHEN aps.matches = 0 THEN 0 ELSE aps.wins::float8 / aps.matches::float8 END AS win_rate,
-		COALESCE(aps.best_runtime_ms, 0)::bigint
+		COALESCE(aps.best_runtime_ms, 0)::bigint,
+		aps.peak_rating,
+		aps.current_win_streak,
+		aps.best_win_streak
 	FROM arena_player_stats aps
 	LEFT JOIN users u ON u.id = aps.user_id
 `

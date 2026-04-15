@@ -227,7 +227,6 @@ const (
 	ArenaLeaguePlatinum
 	ArenaLeagueDiamond
 	ArenaLeagueMaster
-	ArenaLeagueLegend
 )
 
 func (l ArenaLeague) String() string {
@@ -244,8 +243,6 @@ func (l ArenaLeague) String() string {
 		return "diamond"
 	case ArenaLeagueMaster:
 		return "master"
-	case ArenaLeagueLegend:
-		return "legend"
 	default:
 		return ""
 	}
@@ -265,8 +262,6 @@ func ArenaLeagueFromString(s string) ArenaLeague {
 		return ArenaLeagueDiamond
 	case "master":
 		return ArenaLeagueMaster
-	case "legend":
-		return ArenaLeagueLegend
 	default:
 		return ArenaLeagueUnknown
 	}
@@ -339,6 +334,7 @@ type ArenaLeaderboardEntry struct {
 	Matches     int32
 	WinRate     float64
 	BestRuntime int64
+	PeakRating  int32
 }
 
 type ArenaQueueEntry struct {
@@ -360,15 +356,37 @@ type ArenaQueueState struct {
 }
 
 type ArenaPlayerStats struct {
-	UserID      string
-	DisplayName string
-	Rating      int32
-	League      ArenaLeague
-	Wins        int32
-	Losses      int32
-	Matches     int32
-	WinRate     float64
-	BestRuntime int64
+	UserID           string
+	DisplayName      string
+	Rating           int32
+	League           ArenaLeague
+	Wins             int32
+	Losses           int32
+	Matches          int32
+	WinRate          float64
+	BestRuntime      int64
+	PeakRating       int32
+	CurrentWinStreak int32
+	BestWinStreak    int32
+}
+
+type ArenaSeason struct {
+	SeasonNumber int32
+	StartsAt     time.Time
+	EndsAt       time.Time
+	IsActive     bool
+}
+
+type ArenaSeasonResult struct {
+	UserID       string
+	SeasonNumber int32
+	FinalRating  int32
+	FinalLeague  string
+	LeagueRank   int32
+	PeakRating   int32
+	Wins         int32
+	Losses       int32
+	Matches      int32
 }
 
 type ArenaRatingPenalty struct {

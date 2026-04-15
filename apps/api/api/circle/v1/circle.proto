@@ -61,6 +61,25 @@ service CircleService {
       delete: "/api/v1/circles/{circle_id}"
     };
   }
+
+  rpc GetCirclePulse(GetCirclePulseRequest) returns (GetCirclePulseResponse) {
+    option (google.api.http) = { get: "/api/v1/circles/{circle_id}/pulse" };
+  }
+
+  rpc GetCircleMemberStats(GetCircleMemberStatsRequest) returns (GetCircleMemberStatsResponse) {
+    option (google.api.http) = { get: "/api/v1/circles/{circle_id}/member-stats" };
+  }
+
+  rpc GetActiveCircleChallenge(GetActiveCircleChallengeRequest) returns (GetActiveCircleChallengeResponse) {
+    option (google.api.http) = { get: "/api/v1/circles/{circle_id}/challenge" };
+  }
+
+  rpc CreateCircleChallenge(CreateCircleChallengeRequest) returns (CreateCircleChallengeResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/circles/{circle_id}/challenge"
+      body: "*"
+    };
+  }
 }
 
 message ListCirclesRequest {
@@ -167,4 +186,98 @@ message Circle {
   bool is_public = 7;
   bool is_joined = 8;
   google.protobuf.Timestamp created_at = 9;
+}
+
+// Pulse
+
+message GetCirclePulseRequest {
+  string circle_id = 1;
+}
+
+message CircleDayActivity {
+  string date        = 1;
+  int32  daily_count = 2;
+  int32  duel_count  = 3;
+  int32  mock_count  = 4;
+}
+
+message CircleMemberAction {
+  string                    user_id       = 1;
+  string                    first_name    = 2;
+  string                    last_name     = 3;
+  string                    avatar_url    = 4;
+  string                    action_type   = 5;
+  string                    action_detail = 6;
+  google.protobuf.Timestamp happened_at   = 7;
+}
+
+message GetCirclePulseResponse {
+  int32                        active_today   = 1;
+  int32                        total_members  = 2;
+  repeated CircleDayActivity   week_activity  = 3;
+  repeated CircleMemberAction  recent_actions = 4;
+}
+
+// Member stats
+
+message GetCircleMemberStatsRequest {
+  string circle_id = 1;
+}
+
+message CircleMemberStatsEntry {
+  string                    user_id        = 1;
+  string                    first_name     = 2;
+  string                    last_name      = 3;
+  string                    avatar_url     = 4;
+  string                    role           = 5;
+  google.protobuf.Timestamp joined_at      = 6;
+  int32                     daily_solved   = 7;
+  int32                     duels_won      = 8;
+  int32                     duels_played   = 9;
+  int32                     mocks_done     = 10;
+  int32                     arena_rating   = 11;
+  string                    arena_league   = 12;
+}
+
+message GetCircleMemberStatsResponse {
+  repeated CircleMemberStatsEntry members = 1;
+}
+
+// Challenges
+
+message GetActiveCircleChallengeRequest {
+  string circle_id = 1;
+}
+
+message ChallengeMemberProgress {
+  string user_id    = 1;
+  string first_name = 2;
+  string last_name  = 3;
+  string avatar_url = 4;
+  int32  current    = 5;
+}
+
+message CircleChallengeData {
+  string                          id           = 1;
+  string                          circle_id    = 2;
+  string                          template_key = 3;
+  int32                           target_value = 4;
+  google.protobuf.Timestamp       starts_at    = 5;
+  google.protobuf.Timestamp       ends_at      = 6;
+  string                          created_by   = 7;
+  repeated ChallengeMemberProgress progress    = 8;
+}
+
+message GetActiveCircleChallengeResponse {
+  CircleChallengeData challenge = 1;
+}
+
+message CreateCircleChallengeRequest {
+  string circle_id    = 1;
+  string template_key = 2;
+  int32  target_value = 3;
+}
+
+message CreateCircleChallengeResponse {
+  CircleChallengeData challenge = 1;
 }

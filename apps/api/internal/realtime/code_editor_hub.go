@@ -60,6 +60,7 @@ type codeEditorClient struct {
 	authorized          bool
 	ws                  *websocket.Conn
 	send                chan schema.CodeEditorMessage
+	closeOnce           sync.Once
 }
 
 var codeEditorUpgrader = websocket.Upgrader{

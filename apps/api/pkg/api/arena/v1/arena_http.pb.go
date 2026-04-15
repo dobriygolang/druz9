@@ -25,6 +25,7 @@ const OperationArenaServiceGetMatch = "/arena.v1.ArenaService/GetMatch"
 const OperationArenaServiceGetPlayerStats = "/arena.v1.ArenaService/GetPlayerStats"
 const OperationArenaServiceGetPlayerStatsBatch = "/arena.v1.ArenaService/GetPlayerStatsBatch"
 const OperationArenaServiceGetQueueStatus = "/arena.v1.ArenaService/GetQueueStatus"
+const OperationArenaServiceGetSeasonHistory = "/arena.v1.ArenaService/GetSeasonHistory"
 const OperationArenaServiceJoinMatch = "/arena.v1.ArenaService/JoinMatch"
 const OperationArenaServiceJoinQueue = "/arena.v1.ArenaService/JoinQueue"
 const OperationArenaServiceLeaveMatch = "/arena.v1.ArenaService/LeaveMatch"
@@ -40,6 +41,7 @@ type ArenaServiceHTTPServer interface {
 	GetPlayerStats(context.Context, *GetPlayerStatsRequest) (*ArenaPlayerStatsResponse, error)
 	GetPlayerStatsBatch(context.Context, *GetPlayerStatsBatchRequest) (*ArenaPlayerStatsBatchResponse, error)
 	GetQueueStatus(context.Context, *GetQueueStatusRequest) (*ArenaQueueStateResponse, error)
+	GetSeasonHistory(context.Context, *GetSeasonHistoryRequest) (*GetSeasonHistoryResponse, error)
 	JoinMatch(context.Context, *JoinMatchRequest) (*ArenaMatchResponse, error)
 	JoinQueue(context.Context, *JoinQueueRequest) (*ArenaQueueStateResponse, error)
 	LeaveMatch(context.Context, *LeaveMatchRequest) (*ArenaMatchResponse, error)
@@ -64,6 +66,7 @@ func RegisterArenaServiceHTTPServer(s *http.Server, srv ArenaServiceHTTPServer) 
 	r.POST("/api/v1/arena/stats/batch", _ArenaService_GetPlayerStatsBatch0_HTTP_Handler(srv))
 	r.POST("/api/v1/arena/anti-cheat/event", _ArenaService_ReportAntiCheatEvent0_HTTP_Handler(srv))
 	r.GET("/api/v1/arena/open-matches", _ArenaService_ListOpenMatches0_HTTP_Handler(srv))
+	r.GET("/api/v1/arena/seasons/{user_id}", _ArenaService_GetSeasonHistory0_HTTP_Handler(srv))
 }
 
 func _ArenaService_CreateMatch0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
@@ -352,6 +355,28 @@ func _ArenaService_ListOpenMatches0_HTTP_Handler(srv ArenaServiceHTTPServer) fun
 	}
 }
 
+func _ArenaService_GetSeasonHistory0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetSeasonHistoryRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceGetSeasonHistory)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetSeasonHistory(ctx, req.(*GetSeasonHistoryRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetSeasonHistoryResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ArenaServiceHTTPClient interface {
 	CreateMatch(ctx context.Context, req *CreateMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	GetLeaderboard(ctx context.Context, req *GetLeaderboardRequest, opts ...http.CallOption) (rsp *GetLeaderboardResponse, err error)
@@ -359,6 +384,7 @@ type ArenaServiceHTTPClient interface {
 	GetPlayerStats(ctx context.Context, req *GetPlayerStatsRequest, opts ...http.CallOption) (rsp *ArenaPlayerStatsResponse, err error)
 	GetPlayerStatsBatch(ctx context.Context, req *GetPlayerStatsBatchRequest, opts ...http.CallOption) (rsp *ArenaPlayerStatsBatchResponse, err error)
 	GetQueueStatus(ctx context.Context, req *GetQueueStatusRequest, opts ...http.CallOption) (rsp *ArenaQueueStateResponse, err error)
+	GetSeasonHistory(ctx context.Context, req *GetSeasonHistoryRequest, opts ...http.CallOption) (rsp *GetSeasonHistoryResponse, err error)
 	JoinMatch(ctx context.Context, req *JoinMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	JoinQueue(ctx context.Context, req *JoinQueueRequest, opts ...http.CallOption) (rsp *ArenaQueueStateResponse, err error)
 	LeaveMatch(ctx context.Context, req *LeaveMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
@@ -446,6 +472,19 @@ func (c *ArenaServiceHTTPClientImpl) GetQueueStatus(ctx context.Context, in *Get
 	pattern := "/api/v1/arena/queue/status"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationArenaServiceGetQueueStatus))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ArenaServiceHTTPClientImpl) GetSeasonHistory(ctx context.Context, in *GetSeasonHistoryRequest, opts ...http.CallOption) (*GetSeasonHistoryResponse, error) {
+	var out GetSeasonHistoryResponse
+	pattern := "/api/v1/arena/seasons/{user_id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationArenaServiceGetSeasonHistory))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

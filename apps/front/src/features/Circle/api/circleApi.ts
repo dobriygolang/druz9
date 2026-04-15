@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/base'
-import type { Circle } from '@/entities/Circle/model/types'
+import type { Circle, CirclePulse, CircleChallenge, CircleMemberStats } from '@/entities/Circle/model/types'
 
 type BackendCircle = {
   id: string
@@ -92,5 +92,42 @@ export const circleApi = {
 
   deleteCircle: async (circleId: string): Promise<void> => {
     await apiClient.delete(`/api/v1/circles/${circleId}`)
+  },
+
+  getCirclePulse: async (circleId: string): Promise<CirclePulse> => {
+    const r = await apiClient.get<{
+      activeToday?: number
+      totalMembers?: number
+      weekActivity?: CirclePulse['weekActivity']
+      recentActions?: CirclePulse['recentActions']
+    }>(`/api/v1/circles/${circleId}/pulse`)
+    return {
+      activeToday: r.data.activeToday ?? 0,
+      totalMembers: r.data.totalMembers ?? 0,
+      weekActivity: r.data.weekActivity ?? [],
+      recentActions: r.data.recentActions ?? [],
+    }
+  },
+
+  getCircleMemberStats: async (circleId: string): Promise<CircleMemberStats[]> => {
+    const r = await apiClient.get<{ members?: CircleMemberStats[] }>(`/api/v1/circles/${circleId}/member-stats`)
+    return r.data.members ?? []
+  },
+
+  getActiveChallenge: async (circleId: string): Promise<CircleChallenge | null> => {
+    try {
+      const r = await apiClient.get<{ challenge?: CircleChallenge }>(`/api/v1/circles/${circleId}/challenge`)
+      return r.data.challenge ?? null
+    } catch {
+      return null
+    }
+  },
+
+  createChallenge: async (circleId: string, templateKey: string, targetValue: number): Promise<CircleChallenge> => {
+    const r = await apiClient.post<{ challenge: CircleChallenge }>(`/api/v1/circles/${circleId}/challenge`, {
+      templateKey,
+      targetValue,
+    })
+    return r.data.challenge
   },
 }

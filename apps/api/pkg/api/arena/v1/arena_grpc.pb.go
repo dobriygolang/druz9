@@ -32,6 +32,7 @@ const (
 	ArenaService_GetPlayerStatsBatch_FullMethodName  = "/arena.v1.ArenaService/GetPlayerStatsBatch"
 	ArenaService_ReportAntiCheatEvent_FullMethodName = "/arena.v1.ArenaService/ReportAntiCheatEvent"
 	ArenaService_ListOpenMatches_FullMethodName      = "/arena.v1.ArenaService/ListOpenMatches"
+	ArenaService_GetSeasonHistory_FullMethodName     = "/arena.v1.ArenaService/GetSeasonHistory"
 )
 
 // ArenaServiceClient is the client API for ArenaService service.
@@ -51,6 +52,7 @@ type ArenaServiceClient interface {
 	GetPlayerStatsBatch(ctx context.Context, in *GetPlayerStatsBatchRequest, opts ...grpc.CallOption) (*ArenaPlayerStatsBatchResponse, error)
 	ReportAntiCheatEvent(ctx context.Context, in *ReportAntiCheatEventRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error)
 	ListOpenMatches(ctx context.Context, in *ListOpenMatchesRequest, opts ...grpc.CallOption) (*ListOpenMatchesResponse, error)
+	GetSeasonHistory(ctx context.Context, in *GetSeasonHistoryRequest, opts ...grpc.CallOption) (*GetSeasonHistoryResponse, error)
 }
 
 type arenaServiceClient struct {
@@ -191,6 +193,16 @@ func (c *arenaServiceClient) ListOpenMatches(ctx context.Context, in *ListOpenMa
 	return out, nil
 }
 
+func (c *arenaServiceClient) GetSeasonHistory(ctx context.Context, in *GetSeasonHistoryRequest, opts ...grpc.CallOption) (*GetSeasonHistoryResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetSeasonHistoryResponse)
+	err := c.cc.Invoke(ctx, ArenaService_GetSeasonHistory_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArenaServiceServer is the server API for ArenaService service.
 // All implementations must embed UnimplementedArenaServiceServer
 // for forward compatibility.
@@ -208,6 +220,7 @@ type ArenaServiceServer interface {
 	GetPlayerStatsBatch(context.Context, *GetPlayerStatsBatchRequest) (*ArenaPlayerStatsBatchResponse, error)
 	ReportAntiCheatEvent(context.Context, *ReportAntiCheatEventRequest) (*ArenaStatusResponse, error)
 	ListOpenMatches(context.Context, *ListOpenMatchesRequest) (*ListOpenMatchesResponse, error)
+	GetSeasonHistory(context.Context, *GetSeasonHistoryRequest) (*GetSeasonHistoryResponse, error)
 	mustEmbedUnimplementedArenaServiceServer()
 }
 
@@ -256,6 +269,9 @@ func (UnimplementedArenaServiceServer) ReportAntiCheatEvent(context.Context, *Re
 }
 func (UnimplementedArenaServiceServer) ListOpenMatches(context.Context, *ListOpenMatchesRequest) (*ListOpenMatchesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListOpenMatches not implemented")
+}
+func (UnimplementedArenaServiceServer) GetSeasonHistory(context.Context, *GetSeasonHistoryRequest) (*GetSeasonHistoryResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSeasonHistory not implemented")
 }
 func (UnimplementedArenaServiceServer) mustEmbedUnimplementedArenaServiceServer() {}
 func (UnimplementedArenaServiceServer) testEmbeddedByValue()                      {}
@@ -512,6 +528,24 @@ func _ArenaService_ListOpenMatches_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArenaService_GetSeasonHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSeasonHistoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).GetSeasonHistory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_GetSeasonHistory_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).GetSeasonHistory(ctx, req.(*GetSeasonHistoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArenaService_ServiceDesc is the grpc.ServiceDesc for ArenaService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -570,6 +604,10 @@ var ArenaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListOpenMatches",
 			Handler:    _ArenaService_ListOpenMatches_Handler,
+		},
+		{
+			MethodName: "GetSeasonHistory",
+			Handler:    _ArenaService_GetSeasonHistory_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

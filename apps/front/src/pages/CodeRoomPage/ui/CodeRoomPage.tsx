@@ -397,10 +397,13 @@ export function CodeRoomPage() {
       else if (event === 'tab_visible') addNotification(t('codeRoom.notifications.returned', { name: displayName }))
       else if (event === 'pasted') addNotification(t('codeRoom.notifications.pasted', { name: displayName }))
     }, [addNotification, t]),
-    onCursorUpdate: useCallback((userId: string, line: number, col: number) => {
-      // Always apply cursor position immediately — deferring until codeLen matches caused
-      // visible "freezing" during fast typing. The OT transform in onDidChangeModelContent
-      // keeps already-displayed cursors aligned when local edits happen.
+    onCursorUpdate: useCallback((userId: string, line: number, col: number, remoteCodeLen?: number) => {
+      const localCodeLen = editorRef.current?.getModel()?.getValueLength()
+      if (remoteCodeLen !== undefined && localCodeLen !== undefined && remoteCodeLen !== localCodeLen) {
+        pendingCursorUpdatesRef.current.set(userId, { line, col, codeLen: remoteCodeLen })
+        return
+      }
+
       pendingCursorUpdatesRef.current.delete(userId)
       const posRef = cursorPositionsRef.current.get(userId)
       if (posRef && widgetsRef.current.has(userId)) {

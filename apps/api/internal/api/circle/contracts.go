@@ -18,6 +18,10 @@ type Service interface {
 	IsMember(context.Context, uuid.UUID, uuid.UUID) (bool, error)
 	ListCircleMembers(context.Context, uuid.UUID, int32) ([]*model.CircleMemberProfile, error)
 	DeleteCircle(context.Context, uuid.UUID, uuid.UUID) error
+	GetPulse(context.Context, uuid.UUID, uuid.UUID) (*model.CirclePulse, error)
+	GetMemberStats(context.Context, uuid.UUID, uuid.UUID) ([]*model.CircleMemberStats, error)
+	GetActiveChallenge(context.Context, uuid.UUID, uuid.UUID) (*model.CircleChallenge, error)
+	CreateChallenge(context.Context, uuid.UUID, uuid.UUID, string, int32) (*model.CircleChallenge, error)
 }
 
 // EventService handles event operations for circles.

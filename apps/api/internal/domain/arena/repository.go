@@ -39,4 +39,10 @@ type Repository interface {
 	SetMatchRatingState(ctx context.Context, matchID uuid.UUID, isRated bool, unratedReason string) error
 	ApplyAntiCheatPenalty(ctx context.Context, matchID, userID uuid.UUID, delta int32, reason string) error
 	CreateRatingPenalty(ctx context.Context, penalty *RatingPenalty) error
+
+	// Season operations.
+	GetActiveSeason(ctx context.Context) (*model.ArenaSeason, error)
+	GetLeaguePosition(ctx context.Context, userID string, rating int32) (rank int32, total int32, err error)
+	GetSeasonHistory(ctx context.Context, userID string, limit int32) ([]*model.ArenaSeasonResult, error)
+	RunSeasonReset(ctx context.Context, endingSeason int32, newSeason *model.ArenaSeason) error
 }

@@ -36,6 +36,10 @@ func (h *CodeEditorHub) addClient(client *codeEditorClient) {
 }
 
 func (h *CodeEditorHub) removeClient(client *codeEditorClient) {
+	if client == nil {
+		return
+	}
+
 	h.mu.Lock()
 	room := h.rooms[client.roomID]
 	if room != nil {
@@ -69,8 +73,10 @@ func (h *CodeEditorHub) removeClient(client *codeEditorClient) {
 	}
 	h.mu.Unlock()
 
-	close(client.send)
-	_ = client.ws.Close()
+	client.closeOnce.Do(func() {
+		close(client.send)
+		_ = client.ws.Close()
+	})
 
 	if offlineAwareness != nil {
 		h.broadcast(client.roomID, *offlineAwareness, client)
@@ -99,7 +105,9 @@ func (h *CodeEditorHub) sendSnapshot(client *codeEditorClient) {
 				ActiveClientCount: len(room.clients),
 			}
 			h.mu.Unlock()
-			client.enqueue(msg)
+			if !client.enqueue(msg) {
+				h.removeClient(client)
+			}
 			return
 		}
 		h.mu.Unlock()
@@ -130,7 +138,9 @@ func (h *CodeEditorHub) sendSnapshot(client *codeEditorClient) {
 			ActiveClientCount: len(room.clients),
 		}
 		h.mu.Unlock()
-		client.enqueue(msg)
+		if !client.enqueue(msg) {
+			h.removeClient(client)
+		}
 		return
 	}
 
@@ -141,23 +151,33 @@ func (h *CodeEditorHub) sendSnapshot(client *codeEditorClient) {
 		ActiveClientCount: len(room.clients),
 	}
 	h.mu.Unlock()
-	client.enqueue(msg)
+	if !client.enqueue(msg) {
+		h.removeClient(client)
+	}
 }
 
 func (h *CodeEditorHub) sendAwarenessSnapshot(client *codeEditorClient) {
 	h.mu.Lock()
-	defer h.mu.Unlock()
-
 	room := h.rooms[client.roomID]
 	if room == nil || room.mode == model.RoomModeDuel.String() {
+		h.mu.Unlock()
 		return
 	}
 
+	messages := make([]schema.CodeEditorMessage, 0, len(room.awarenessByID))
 	for awarenessID, msg := range room.awarenessByID {
 		if awarenessID == client.awarenessID {
 			continue
 		}
-		client.enqueue(msg)
+		messages = append(messages, msg)
+	}
+	h.mu.Unlock()
+
+	for _, msg := range messages {
+		if !client.enqueue(msg) {
+			h.removeClient(client)
+			return
+		}
 	}
 }
 
@@ -264,11 +284,13 @@ func (h *CodeEditorHub) handleLanguageChange(client *codeEditorClient, msg schem
 		state.initialized = true
 		state.dirty = false
 		h.mu.Unlock()
-		client.enqueue(schema.CodeEditorMessage{
+		if !client.enqueue(schema.CodeEditorMessage{
 			Type:      schema.CodeEditorTypeSnapshot,
 			PlainText: state.plainText,
 			Language:  state.language,
-		})
+		}) {
+			h.removeClient(client)
+		}
 		return
 	}
 
@@ -304,18 +326,25 @@ func (h *CodeEditorHub) handleAwareness(client *codeEditorClient, msg schema.Cod
 
 func (h *CodeEditorHub) broadcast(roomID string, msg schema.CodeEditorMessage, sender *codeEditorClient) {
 	h.mu.Lock()
-	defer h.mu.Unlock()
-
 	room := h.rooms[roomID]
 	if room == nil {
+		h.mu.Unlock()
 		return
 	}
 
+	targets := make([]*codeEditorClient, 0, len(room.clients))
 	for client := range room.clients {
 		if sender != nil && client == sender {
 			continue
 		}
-		client.enqueue(msg)
+		targets = append(targets, client)
+	}
+	h.mu.Unlock()
+
+	for _, client := range targets {
+		if !client.enqueue(msg) {
+			h.removeClient(client)
+		}
 	}
 }
 
@@ -351,13 +380,19 @@ func (h *CodeEditorHub) PublishReviewReady(userID string, review *schema.CodeEdi
 	}
 
 	h.mu.Lock()
-	defer h.mu.Unlock()
-
+	var targets []*codeEditorClient
 	for _, room := range h.rooms {
 		for client := range room.clients {
 			if client.authenticatedUserID == userID {
-				client.enqueue(msg)
+				targets = append(targets, client)
 			}
+		}
+	}
+	h.mu.Unlock()
+
+	for _, client := range targets {
+		if !client.enqueue(msg) {
+			h.removeClient(client)
 		}
 	}
 }

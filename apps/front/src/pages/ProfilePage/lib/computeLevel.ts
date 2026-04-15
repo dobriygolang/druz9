@@ -28,10 +28,27 @@ export function computeUserLevel(totalXP: number): { level: number; progress: nu
   return { level, progress }
 }
 
+/** @deprecated Use leagueFromEnum — league should come from backend. */
 export function computeLeague(rating: number): string {
-  if (rating < 1000) return 'bronze'
-  if (rating < 1500) return 'silver'
-  if (rating < 2000) return 'gold'
-  if (rating < 2500) return 'platinum'
-  return 'diamond'
+  if (rating < 500) return 'bronze'
+  if (rating < 900) return 'silver'
+  if (rating < 1350) return 'gold'
+  if (rating < 1800) return 'platinum'
+  if (rating < 2250) return 'diamond'
+  return 'master'
+}
+
+const LEAGUE_ENUM_MAP: Record<string, string> = {
+  ARENA_LEAGUE_BRONZE: 'bronze',
+  ARENA_LEAGUE_SILVER: 'silver',
+  ARENA_LEAGUE_GOLD: 'gold',
+  ARENA_LEAGUE_PLATINUM: 'platinum',
+  ARENA_LEAGUE_DIAMOND: 'diamond',
+  ARENA_LEAGUE_MASTER: 'master',
+}
+
+/** Maps the proto enum string (e.g. "ARENA_LEAGUE_GOLD") to a lowercase label. */
+export function leagueFromEnum(league?: string): string {
+  if (!league) return 'bronze'
+  return LEAGUE_ENUM_MAP[league] ?? (league.toLowerCase().replace('arena_league_', '') || 'bronze')
 }

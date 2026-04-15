@@ -1,17 +1,14 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Briefcase, Calendar, ChevronRight, Code2, Users, Map, Flame, Target } from 'lucide-react'
+import { Briefcase, Calendar, ChevronRight, Code2, Map, Flame, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi } from '@/features/Auth/api/authApi'
 import { eventApi, type Event } from '@/features/Event/api/eventApi'
 import { geoApi } from '@/features/Geo/api/geoApi'
-import type { ProfileProgress } from '@/entities/User/model/types'
 import { Card } from '@/shared/ui/Card'
 import { Avatar } from '@/shared/ui/Avatar'
 import { ErrorState } from '@/shared/ui/ErrorState'
-import { SkillRing } from '@/shared/ui/SkillRing'
-import { NextActionCard } from '@/shared/ui/NextActionCard'
 import { AnimatedNumber } from '@/shared/ui/AnimatedNumber'
 import { formatDateShort } from '@/shared/lib/dateFormat'
 import { PageMeta } from '@/shared/ui/PageMeta'
@@ -21,7 +18,7 @@ export function HomePage() {
   const { user } = useAuth()
   const [events, setEvents] = useState<Event[]>([])
   const [onlineCount, setOnlineCount] = useState(0)
-  const [progress, setProgress] = useState<ProfileProgress | null>(null)
+  const [streakDays, setStreakDays] = useState(0)
   const [error, setError] = useState<string | null>(null)
 
   const fetchData = useCallback(() => {
@@ -38,9 +35,12 @@ export function HomePage() {
     fetchData()
   }, [fetchData])
 
+  // Fetch only streak — lightweight, no full progress widget
   useEffect(() => {
     if (user?.id) {
-      authApi.getProfileProgress(user.id).then(setProgress).catch(() => {})
+      authApi.getProfileProgress(user.id)
+        .then(p => setStreakDays(p.overview.currentStreakDays))
+        .catch(() => {})
     }
   }, [user?.id])
 
@@ -52,7 +52,6 @@ export function HomePage() {
     <div className="flex min-h-full flex-col gap-4 px-4 pb-6 pt-4 md:gap-6 md:p-8">
       <PageMeta title={t('home.meta.title')} description={t('home.meta.description')} canonicalPath="/home" />
       <section className="section-enter relative rounded-[32px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.92)_48%,_rgba(255,247,237,0.95))] p-5 shadow-[0_24px_60px_rgba(99,102,241,0.12)] dark:border-[#1e3158] dark:bg-[linear-gradient(145deg,_rgba(11,13,22,0.96),_rgba(29,36,63,0.92)_52%,_rgba(46,26,38,0.88))] dark:shadow-[0_28px_70px_rgba(2,6,23,0.45)] md:p-7">
-        {/* Gradient blob clipped in its own layer so buttons can scale freely */}
         <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[32px]">
           <div className="absolute inset-y-0 right-[-14%] w-[58%] rounded-full bg-[radial-gradient(circle,_rgba(99,102,241,0.24),_transparent_66%)] blur-2xl dark:bg-[radial-gradient(circle,_rgba(129,140,248,0.2),_transparent_70%)]" />
         </div>
@@ -75,7 +74,7 @@ export function HomePage() {
             />
           </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center">
             <Link
               to="/community/events"
               className="inline-flex items-center justify-center gap-2 rounded-full bg-[#111111] px-4 py-3 text-sm font-semibold text-white transition-all duration-200 hover:scale-[1.03] hover:shadow-[0_8px_24px_rgba(0,0,0,0.22)] active:scale-[0.97] dark:bg-white dark:text-[#08101f] dark:hover:shadow-[0_8px_24px_rgba(0,0,0,0.5)]"
@@ -97,6 +96,17 @@ export function HomePage() {
               {t('home.mapCta')}
               <Map className="h-4 w-4 text-[#6366F1]" />
             </Link>
+
+            {/* Streak nudge — single retention chip, not a full widget */}
+            {streakDays > 0 && (
+              <Link
+                to="/profile"
+                className="inline-flex items-center gap-1.5 rounded-full border border-[#f59e0b]/20 bg-[#fffbeb] px-3 py-2 text-xs font-semibold text-[#92400e] transition-colors hover:bg-[#fef3c7] dark:border-[#f59e0b]/15 dark:bg-[#2a200a] dark:text-[#fbbf24] dark:hover:bg-[#362a0a]"
+              >
+                <Flame className="h-3.5 w-3.5 text-[#f59e0b]" />
+                {t('home.streakNudge', { days: streakDays })}
+              </Link>
+            )}
           </div>
 
           <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
@@ -122,60 +132,6 @@ export function HomePage() {
           </div>
         </div>
       </section>
-
-      {/* Roadmap Widget */}
-      {progress && (progress.competencies.length > 0 || (progress.nextActions?.length ?? 0) > 0) && (
-        <section className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
-          <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-            <div>
-              <div className="flex items-center gap-2">
-                <Target className="h-4 w-4 text-[#6366F1]" />
-                <h2 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('home.path.title')}</h2>
-              </div>
-              {progress.goal && (
-                <p className="mt-1 text-xs text-[#64748b] dark:text-[#7e93b0]">
-                  {progress.goal.kind === 'company_prep' && progress.goal.company
-                    ? t('home.path.companyPrep', { company: progress.goal.company })
-                    : progress.goal.kind === 'weakest_first'
-                      ? t('home.path.weakAreas')
-                      : t('home.path.generalGrowth')}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center gap-2">
-              {progress.competencies.slice(0, 5).map(c => (
-                <SkillRing key={c.key} score={c.score} level={c.level || 'beginner'} label={c.label} size="sm" />
-              ))}
-            </div>
-          </div>
-
-          {(progress.nextActions?.length ?? 0) > 0 && (
-            <div className="mt-4 flex flex-col gap-2">
-              {progress.nextActions!.slice(0, 2).map((action, i) => (
-                <NextActionCard
-                  key={`${action.skillKey}-${i}`}
-                  title={action.title}
-                  description={action.description}
-                  actionType={action.actionType}
-                  href={action.actionUrl}
-                />
-              ))}
-            </div>
-          )}
-
-          <div className="mt-3 flex items-center gap-4 text-xs text-[#64748b] dark:text-[#7e93b0]">
-            {progress.overview.currentStreakDays > 0 && (
-              <span className="inline-flex items-center gap-1">
-                <Flame className="h-3.5 w-3.5 text-[#f59e0b]" />
-                {t('home.path.streak', { days: progress.overview.currentStreakDays })}
-              </span>
-            )}
-            <Link to={`/profile/${user?.id}`} className="inline-flex items-center gap-1 font-semibold text-[#6366F1] no-underline">
-              {t('home.path.fullProgress')} <ChevronRight className="h-3 w-3" />
-            </Link>
-          </div>
-        </section>
-      )}
 
       <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
         <Card className="section-enter" padding="lg">

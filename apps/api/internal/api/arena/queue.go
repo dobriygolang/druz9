@@ -3,6 +3,7 @@ package arena
 import (
 	"context"
 
+	arenarating "api/internal/arena/rating"
 	arenadomain "api/internal/domain/arena"
 	v1 "api/pkg/api/arena/v1"
 
@@ -68,7 +69,19 @@ func (i *Implementation) GetPlayerStats(ctx context.Context, req *v1.GetPlayerSt
 		return nil, mapErr(err)
 	}
 
-	return &v1.ArenaPlayerStatsResponse{Stats: mapPlayerStats(stats)}, nil
+	result := mapPlayerStats(stats)
+
+	// Enrich with league position (best-effort, don't fail if unavailable).
+	if stats != nil {
+		rank, total, posErr := i.service.GetLeaguePosition(ctx, stats.UserID, stats.Rating)
+		if posErr == nil {
+			result.LeagueRank = rank
+			result.LeagueTotal = total
+		}
+		result.NextLeagueAt = arenarating.NextLeagueThreshold(stats.Rating)
+	}
+
+	return &v1.ArenaPlayerStatsResponse{Stats: result}, nil
 }
 
 func (i *Implementation) GetPlayerStatsBatch(ctx context.Context, req *v1.GetPlayerStatsBatchRequest) (*v1.ArenaPlayerStatsBatchResponse, error) {
@@ -166,14 +179,44 @@ func mapPlayerStats(stats *arenadomain.PlayerStats) *v1.ArenaPlayerStats {
 	}
 
 	return &v1.ArenaPlayerStats{
-		UserId:      stats.UserID,
-		DisplayName: stats.DisplayName,
-		Rating:      stats.Rating,
-		League:      mapArenaLeague(stats.League),
-		Wins:        stats.Wins,
-		Losses:      stats.Losses,
-		Matches:     stats.Matches,
-		WinRate:     stats.WinRate,
-		BestRuntime: stats.BestRuntime,
+		UserId:           stats.UserID,
+		DisplayName:      stats.DisplayName,
+		Rating:           stats.Rating,
+		League:           mapArenaLeague(stats.League),
+		Wins:             stats.Wins,
+		Losses:           stats.Losses,
+		Matches:          stats.Matches,
+		WinRate:          stats.WinRate,
+		BestRuntime:      stats.BestRuntime,
+		PeakRating:       stats.PeakRating,
+		CurrentWinStreak: stats.CurrentWinStreak,
+		BestWinStreak:    stats.BestWinStreak,
 	}
+}
+
+func (i *Implementation) GetSeasonHistory(ctx context.Context, req *v1.GetSeasonHistoryRequest) (*v1.GetSeasonHistoryResponse, error) {
+	if _, err := uuid.Parse(req.UserId); err != nil {
+		return nil, errors.BadRequest("INVALID_USER_ID", "invalid user id")
+	}
+
+	results, err := i.service.GetSeasonHistory(ctx, req.UserId, req.Limit)
+	if err != nil {
+		return nil, mapErr(err)
+	}
+
+	entries := make([]*v1.ArenaSeasonResultEntry, 0, len(results))
+	for _, r := range results {
+		entries = append(entries, &v1.ArenaSeasonResultEntry{
+			SeasonNumber: r.SeasonNumber,
+			FinalRating:  r.FinalRating,
+			FinalLeague:  r.FinalLeague,
+			LeagueRank:   r.LeagueRank,
+			PeakRating:   r.PeakRating,
+			Wins:         r.Wins,
+			Losses:       r.Losses,
+			Matches:      r.Matches,
+		})
+	}
+
+	return &v1.GetSeasonHistoryResponse{Seasons: entries}, nil
 }

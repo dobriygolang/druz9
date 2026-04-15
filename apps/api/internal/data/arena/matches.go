@@ -531,8 +531,8 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 			}
 
 			if _, err := tx.Exec(ctx, `
-				INSERT INTO arena_player_stats (user_id, display_name, rating, wins, losses, matches, best_runtime_ms, updated_at)
-				SELECT u::uuid, d, r, w, l, 1, br, NOW()
+				INSERT INTO arena_player_stats (user_id, display_name, rating, wins, losses, matches, best_runtime_ms, peak_rating, current_win_streak, best_win_streak, updated_at)
+				SELECT u::uuid, d, r, w, l, 1, br, r, w, w, NOW()
 				FROM unnest($1::text[], $2::text[], $3::int4[], $4::int4[], $5::int4[], $6::int8[]) AS uu(u, d, r, w, l, br)
 				ON CONFLICT (user_id) DO UPDATE SET
 				  display_name = EXCLUDED.display_name,
@@ -545,6 +545,16 @@ func (r *Repo) FinishMatch(ctx context.Context, matchID uuid.UUID, winnerUserID 
 				    WHEN EXCLUDED.best_runtime_ms = 0 THEN arena_player_stats.best_runtime_ms
 				    ELSE LEAST(arena_player_stats.best_runtime_ms, EXCLUDED.best_runtime_ms)
 				  END,
+				  peak_rating = GREATEST(arena_player_stats.peak_rating, EXCLUDED.rating),
+				  current_win_streak = CASE
+				    WHEN EXCLUDED.wins > 0 THEN arena_player_stats.current_win_streak + 1
+				    WHEN EXCLUDED.losses > 0 THEN 0
+				    ELSE arena_player_stats.current_win_streak
+				  END,
+				  best_win_streak = GREATEST(
+				    arena_player_stats.best_win_streak,
+				    CASE WHEN EXCLUDED.wins > 0 THEN arena_player_stats.current_win_streak + 1 ELSE arena_player_stats.current_win_streak END
+				  ),
 				  updated_at = NOW()
 			`, userIDs, displayNames, ratings, wins, losses, bestRuntimes); err != nil {
 				return fmt.Errorf("upsert arena player stats batch: %w", err)

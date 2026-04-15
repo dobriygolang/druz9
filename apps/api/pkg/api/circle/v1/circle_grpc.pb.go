@@ -19,15 +19,19 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	CircleService_ListCircles_FullMethodName       = "/circle.v1.CircleService/ListCircles"
-	CircleService_CreateCircle_FullMethodName      = "/circle.v1.CircleService/CreateCircle"
-	CircleService_JoinCircle_FullMethodName        = "/circle.v1.CircleService/JoinCircle"
-	CircleService_LeaveCircle_FullMethodName       = "/circle.v1.CircleService/LeaveCircle"
-	CircleService_InviteToCircle_FullMethodName    = "/circle.v1.CircleService/InviteToCircle"
-	CircleService_ListCircleMembers_FullMethodName = "/circle.v1.CircleService/ListCircleMembers"
-	CircleService_ListCircleEvents_FullMethodName  = "/circle.v1.CircleService/ListCircleEvents"
-	CircleService_CreateCircleEvent_FullMethodName = "/circle.v1.CircleService/CreateCircleEvent"
-	CircleService_DeleteCircle_FullMethodName      = "/circle.v1.CircleService/DeleteCircle"
+	CircleService_ListCircles_FullMethodName              = "/circle.v1.CircleService/ListCircles"
+	CircleService_CreateCircle_FullMethodName             = "/circle.v1.CircleService/CreateCircle"
+	CircleService_JoinCircle_FullMethodName               = "/circle.v1.CircleService/JoinCircle"
+	CircleService_LeaveCircle_FullMethodName              = "/circle.v1.CircleService/LeaveCircle"
+	CircleService_InviteToCircle_FullMethodName           = "/circle.v1.CircleService/InviteToCircle"
+	CircleService_ListCircleMembers_FullMethodName        = "/circle.v1.CircleService/ListCircleMembers"
+	CircleService_ListCircleEvents_FullMethodName         = "/circle.v1.CircleService/ListCircleEvents"
+	CircleService_CreateCircleEvent_FullMethodName        = "/circle.v1.CircleService/CreateCircleEvent"
+	CircleService_DeleteCircle_FullMethodName             = "/circle.v1.CircleService/DeleteCircle"
+	CircleService_GetCirclePulse_FullMethodName           = "/circle.v1.CircleService/GetCirclePulse"
+	CircleService_GetCircleMemberStats_FullMethodName     = "/circle.v1.CircleService/GetCircleMemberStats"
+	CircleService_GetActiveCircleChallenge_FullMethodName = "/circle.v1.CircleService/GetActiveCircleChallenge"
+	CircleService_CreateCircleChallenge_FullMethodName    = "/circle.v1.CircleService/CreateCircleChallenge"
 )
 
 // CircleServiceClient is the client API for CircleService service.
@@ -43,6 +47,10 @@ type CircleServiceClient interface {
 	ListCircleEvents(ctx context.Context, in *ListCircleEventsRequest, opts ...grpc.CallOption) (*ListCircleEventsResponse, error)
 	CreateCircleEvent(ctx context.Context, in *CreateCircleEventRequest, opts ...grpc.CallOption) (*CreateCircleEventResponse, error)
 	DeleteCircle(ctx context.Context, in *DeleteCircleRequest, opts ...grpc.CallOption) (*DeleteCircleResponse, error)
+	GetCirclePulse(ctx context.Context, in *GetCirclePulseRequest, opts ...grpc.CallOption) (*GetCirclePulseResponse, error)
+	GetCircleMemberStats(ctx context.Context, in *GetCircleMemberStatsRequest, opts ...grpc.CallOption) (*GetCircleMemberStatsResponse, error)
+	GetActiveCircleChallenge(ctx context.Context, in *GetActiveCircleChallengeRequest, opts ...grpc.CallOption) (*GetActiveCircleChallengeResponse, error)
+	CreateCircleChallenge(ctx context.Context, in *CreateCircleChallengeRequest, opts ...grpc.CallOption) (*CreateCircleChallengeResponse, error)
 }
 
 type circleServiceClient struct {
@@ -143,6 +151,46 @@ func (c *circleServiceClient) DeleteCircle(ctx context.Context, in *DeleteCircle
 	return out, nil
 }
 
+func (c *circleServiceClient) GetCirclePulse(ctx context.Context, in *GetCirclePulseRequest, opts ...grpc.CallOption) (*GetCirclePulseResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCirclePulseResponse)
+	err := c.cc.Invoke(ctx, CircleService_GetCirclePulse_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *circleServiceClient) GetCircleMemberStats(ctx context.Context, in *GetCircleMemberStatsRequest, opts ...grpc.CallOption) (*GetCircleMemberStatsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetCircleMemberStatsResponse)
+	err := c.cc.Invoke(ctx, CircleService_GetCircleMemberStats_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *circleServiceClient) GetActiveCircleChallenge(ctx context.Context, in *GetActiveCircleChallengeRequest, opts ...grpc.CallOption) (*GetActiveCircleChallengeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetActiveCircleChallengeResponse)
+	err := c.cc.Invoke(ctx, CircleService_GetActiveCircleChallenge_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *circleServiceClient) CreateCircleChallenge(ctx context.Context, in *CreateCircleChallengeRequest, opts ...grpc.CallOption) (*CreateCircleChallengeResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateCircleChallengeResponse)
+	err := c.cc.Invoke(ctx, CircleService_CreateCircleChallenge_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CircleServiceServer is the server API for CircleService service.
 // All implementations must embed UnimplementedCircleServiceServer
 // for forward compatibility.
@@ -156,6 +204,10 @@ type CircleServiceServer interface {
 	ListCircleEvents(context.Context, *ListCircleEventsRequest) (*ListCircleEventsResponse, error)
 	CreateCircleEvent(context.Context, *CreateCircleEventRequest) (*CreateCircleEventResponse, error)
 	DeleteCircle(context.Context, *DeleteCircleRequest) (*DeleteCircleResponse, error)
+	GetCirclePulse(context.Context, *GetCirclePulseRequest) (*GetCirclePulseResponse, error)
+	GetCircleMemberStats(context.Context, *GetCircleMemberStatsRequest) (*GetCircleMemberStatsResponse, error)
+	GetActiveCircleChallenge(context.Context, *GetActiveCircleChallengeRequest) (*GetActiveCircleChallengeResponse, error)
+	CreateCircleChallenge(context.Context, *CreateCircleChallengeRequest) (*CreateCircleChallengeResponse, error)
 	mustEmbedUnimplementedCircleServiceServer()
 }
 
@@ -192,6 +244,18 @@ func (UnimplementedCircleServiceServer) CreateCircleEvent(context.Context, *Crea
 }
 func (UnimplementedCircleServiceServer) DeleteCircle(context.Context, *DeleteCircleRequest) (*DeleteCircleResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method DeleteCircle not implemented")
+}
+func (UnimplementedCircleServiceServer) GetCirclePulse(context.Context, *GetCirclePulseRequest) (*GetCirclePulseResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCirclePulse not implemented")
+}
+func (UnimplementedCircleServiceServer) GetCircleMemberStats(context.Context, *GetCircleMemberStatsRequest) (*GetCircleMemberStatsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetCircleMemberStats not implemented")
+}
+func (UnimplementedCircleServiceServer) GetActiveCircleChallenge(context.Context, *GetActiveCircleChallengeRequest) (*GetActiveCircleChallengeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetActiveCircleChallenge not implemented")
+}
+func (UnimplementedCircleServiceServer) CreateCircleChallenge(context.Context, *CreateCircleChallengeRequest) (*CreateCircleChallengeResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateCircleChallenge not implemented")
 }
 func (UnimplementedCircleServiceServer) mustEmbedUnimplementedCircleServiceServer() {}
 func (UnimplementedCircleServiceServer) testEmbeddedByValue()                       {}
@@ -376,6 +440,78 @@ func _CircleService_DeleteCircle_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CircleService_GetCirclePulse_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCirclePulseRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CircleServiceServer).GetCirclePulse(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CircleService_GetCirclePulse_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CircleServiceServer).GetCirclePulse(ctx, req.(*GetCirclePulseRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CircleService_GetCircleMemberStats_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetCircleMemberStatsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CircleServiceServer).GetCircleMemberStats(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CircleService_GetCircleMemberStats_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CircleServiceServer).GetCircleMemberStats(ctx, req.(*GetCircleMemberStatsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CircleService_GetActiveCircleChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetActiveCircleChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CircleServiceServer).GetActiveCircleChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CircleService_GetActiveCircleChallenge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CircleServiceServer).GetActiveCircleChallenge(ctx, req.(*GetActiveCircleChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CircleService_CreateCircleChallenge_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateCircleChallengeRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CircleServiceServer).CreateCircleChallenge(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CircleService_CreateCircleChallenge_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CircleServiceServer).CreateCircleChallenge(ctx, req.(*CreateCircleChallengeRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CircleService_ServiceDesc is the grpc.ServiceDesc for CircleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -418,6 +554,22 @@ var CircleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "DeleteCircle",
 			Handler:    _CircleService_DeleteCircle_Handler,
+		},
+		{
+			MethodName: "GetCirclePulse",
+			Handler:    _CircleService_GetCirclePulse_Handler,
+		},
+		{
+			MethodName: "GetCircleMemberStats",
+			Handler:    _CircleService_GetCircleMemberStats_Handler,
+		},
+		{
+			MethodName: "GetActiveCircleChallenge",
+			Handler:    _CircleService_GetActiveCircleChallenge_Handler,
+		},
+		{
+			MethodName: "CreateCircleChallenge",
+			Handler:    _CircleService_CreateCircleChallenge_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

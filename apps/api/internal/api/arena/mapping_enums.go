@@ -78,8 +78,6 @@ func mapArenaLeague(league model.ArenaLeague) v1.ArenaLeague {
 		return v1.ArenaLeague_ARENA_LEAGUE_DIAMOND
 	case model.ArenaLeagueMaster:
 		return v1.ArenaLeague_ARENA_LEAGUE_MASTER
-	case model.ArenaLeagueLegend:
-		return v1.ArenaLeague_ARENA_LEAGUE_LEGEND
 	default:
 		return v1.ArenaLeague_ARENA_LEAGUE_UNSPECIFIED
 	}
