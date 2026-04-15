@@ -49,6 +49,10 @@ service InterviewPrepService {
     option (google.api.http) = { post: "/api/v1/interview-prep/mock-sessions/{session_id}/questions/answer" body: "*" };
   }
 
+  rpc AbortMockSession(AbortMockSessionRequest) returns (StatusResponse) {
+    option (google.api.http) = { post: "/api/v1/interview-prep/mock-sessions/{session_id}/abort" body: "*" };
+  }
+
   rpc ListAdminTasks(ListAdminTasksRequest) returns (ListAdminTasksResponse) {
     option (google.api.http) = { get: "/api/admin/interview-prep/tasks" };
   }
@@ -222,6 +226,10 @@ message ReviewMockSystemDesignRequest {
 message AnswerMockQuestionRequest {
   string session_id = 1;
   string answer     = 2;
+}
+
+message AbortMockSessionRequest {
+  string session_id = 1;
 }
 
 message ListAdminTasksRequest {}

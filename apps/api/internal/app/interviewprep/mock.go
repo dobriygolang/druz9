@@ -832,3 +832,22 @@ func defaultMockQuestionTemplates(task *model.InterviewPrepTask, stage *model.In
 		}}
 	}
 }
+
+// AbortMockSession ends an active mock session early without counting completed stages in progress stats.
+// All pending stages remain in their current state (not completed → not counted).
+func (s *Service) AbortMockSession(ctx context.Context, user *model.User, sessionID uuid.UUID) error {
+	if err := ensureTrusted(user); err != nil {
+		return err
+	}
+	session, err := s.repo.GetMockSession(ctx, sessionID)
+	if err != nil {
+		return err
+	}
+	if session == nil || session.UserID != user.ID {
+		return ErrMockSessionNotFound
+	}
+	if session.Status == model.InterviewPrepMockSessionStatusFinished {
+		return nil
+	}
+	return s.repo.FinishMockSession(ctx, session.ID)
+}

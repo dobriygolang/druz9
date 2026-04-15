@@ -368,6 +368,13 @@ func overrideSecretConfigFromEnv(cfg *Bootstrap) {
 			cfg.Sandbox.Timeout = parsed
 		}
 	}
+
+	if value, ok := lookupEnvValue("NOTIFICATION_SERVICE_ADDR"); ok {
+		if cfg.External.NotificationService == nil {
+			cfg.External.NotificationService = &NotificationService{}
+		}
+		cfg.External.NotificationService.Addr = strings.TrimSpace(value)
+	}
 }
 
 func lookupEnvValue(key string) (string, bool) {

@@ -1,7 +1,7 @@
 package circle
 
 import (
-	"api/internal/notification"
+	notif "api/internal/notification"
 	v1 "api/pkg/api/circle/v1"
 
 	"google.golang.org/grpc"
@@ -12,12 +12,12 @@ type Implementation struct {
 	v1.UnimplementedCircleServiceServer
 	service  Service
 	eventSvc EventService
-	notif    *notification.Client
+	notif    notif.Sender
 }
 
 // New returns new instance of Implementation.
-func New(service Service, eventSvc EventService, notif *notification.Client) *Implementation {
-	return &Implementation{service: service, eventSvc: eventSvc, notif: notif}
+func New(service Service, eventSvc EventService, n notif.Sender) *Implementation {
+	return &Implementation{service: service, eventSvc: eventSvc, notif: n}
 }
 
 // GetDescription returns grpc service description.

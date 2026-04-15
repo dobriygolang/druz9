@@ -7,8 +7,16 @@ type telegramAPIResponse[T any] struct {
 }
 
 type telegramUpdate struct {
-	UpdateID int64            `json:"update_id"`
-	Message  *telegramMessage `json:"message"`
+	UpdateID      int64              `json:"update_id"`
+	Message       *telegramMessage   `json:"message"`
+	CallbackQuery *telegramCallback  `json:"callback_query"`
+}
+
+type telegramCallback struct {
+	ID      string           `json:"id"`
+	From    *telegramUser    `json:"from"`
+	Message *telegramMessage `json:"message"`
+	Data    string           `json:"data"`
 }
 
 type telegramMessage struct {

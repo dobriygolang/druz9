@@ -1774,6 +1774,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/interview_prep.v1.MockSessionEnvelope'
+    /api/v1/interview-prep/mock-sessions/{sessionId}/abort:
+        post:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_AbortMockSession
+            parameters:
+                - name: sessionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/interview_prep.v1.AbortMockSessionRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.StatusResponse'
     /api/v1/interview-prep/mock-sessions/{sessionId}/questions/answer:
         post:
             tags:
@@ -3914,6 +3938,11 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/geo.v1.GeoCandidate'
+        interview_prep.v1.AbortMockSessionRequest:
+            type: object
+            properties:
+                sessionId:
+                    type: string
         interview_prep.v1.AdminQuestionEnvelope:
             type: object
             properties:

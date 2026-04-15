@@ -16,6 +16,20 @@ func (s *Service) handleUpdate(ctx context.Context, update telegramUpdate) {
 	}
 
 	command, token := parseStartCommand(update.Message.Text)
+
+	switch command {
+	case "/start":
+		// Auth flow — handled below.
+	case "/settings":
+		s.sendMessage(ctx, update.Message.Chat.ID, "Настрой уведомления в профиле на сайте druz9.online")
+		return
+	case "/stop":
+		s.sendMessage(ctx, update.Message.Chat.ID, "Уведомления отключены. Напиши /start чтобы включить снова.")
+		return
+	default:
+		return
+	}
+
 	if command != "/start" {
 		return
 	}

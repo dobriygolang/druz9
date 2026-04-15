@@ -14,7 +14,7 @@ func (s *Service) getUpdates(ctx context.Context, offset int64) ([]telegramUpdat
 	reqBody := map[string]any{
 		"offset":          offset,
 		"timeout":         50,
-		"allowed_updates": []string{"message"},
+		"allowed_updates": []string{"message", "callback_query"},
 	}
 
 	var resp telegramAPIResponse[[]telegramUpdate]

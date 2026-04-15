@@ -19,6 +19,7 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationInterviewPrepServiceAbortMockSession = "/interview_prep.v1.InterviewPrepService/AbortMockSession"
 const OperationInterviewPrepServiceAnswerMockQuestion = "/interview_prep.v1.InterviewPrepService/AnswerMockQuestion"
 const OperationInterviewPrepServiceAnswerQuestion = "/interview_prep.v1.InterviewPrepService/AnswerQuestion"
 const OperationInterviewPrepServiceCreateAdminQuestion = "/interview_prep.v1.InterviewPrepService/CreateAdminQuestion"
@@ -53,6 +54,7 @@ const OperationInterviewPrepServiceUpdateMockCompanyPreset = "/interview_prep.v1
 const OperationInterviewPrepServiceUpdateMockQuestionPool = "/interview_prep.v1.InterviewPrepService/UpdateMockQuestionPool"
 
 type InterviewPrepServiceHTTPServer interface {
+	AbortMockSession(context.Context, *AbortMockSessionRequest) (*StatusResponse, error)
 	AnswerMockQuestion(context.Context, *AnswerMockQuestionRequest) (*AnswerMockQuestionResponse, error)
 	AnswerQuestion(context.Context, *AnswerQuestionRequest) (*AnswerQuestionResponse, error)
 	CreateAdminQuestion(context.Context, *CreateAdminQuestionRequest) (*AdminQuestionEnvelope, error)
@@ -102,6 +104,7 @@ func RegisterInterviewPrepServiceHTTPServer(s *http.Server, srv InterviewPrepSer
 	r.POST("/api/v1/interview-prep/mock-sessions/{session_id}/submit", _InterviewPrepService_SubmitMockStage0_HTTP_Handler(srv))
 	r.POST("/api/v1/interview-prep/mock-sessions/{session_id}/system-design-review", _InterviewPrepService_ReviewMockSystemDesign0_HTTP_Handler(srv))
 	r.POST("/api/v1/interview-prep/mock-sessions/{session_id}/questions/answer", _InterviewPrepService_AnswerMockQuestion0_HTTP_Handler(srv))
+	r.POST("/api/v1/interview-prep/mock-sessions/{session_id}/abort", _InterviewPrepService_AbortMockSession0_HTTP_Handler(srv))
 	r.GET("/api/admin/interview-prep/tasks", _InterviewPrepService_ListAdminTasks0_HTTP_Handler(srv))
 	r.POST("/api/admin/interview-prep/tasks", _InterviewPrepService_CreateAdminTask0_HTTP_Handler(srv))
 	r.GET("/api/admin/interview-prep/tasks/{task_id}", _InterviewPrepService_GetAdminTask0_HTTP_Handler(srv))
@@ -414,6 +417,31 @@ func _InterviewPrepService_AnswerMockQuestion0_HTTP_Handler(srv InterviewPrepSer
 			return err
 		}
 		reply := out.(*AnswerMockQuestionResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InterviewPrepService_AbortMockSession0_HTTP_Handler(srv InterviewPrepServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AbortMockSessionRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInterviewPrepServiceAbortMockSession)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AbortMockSession(ctx, req.(*AbortMockSessionRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*StatusResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -843,6 +871,7 @@ func _InterviewPrepService_GetCheckpointBySession0_HTTP_Handler(srv InterviewPre
 }
 
 type InterviewPrepServiceHTTPClient interface {
+	AbortMockSession(ctx context.Context, req *AbortMockSessionRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
 	AnswerMockQuestion(ctx context.Context, req *AnswerMockQuestionRequest, opts ...http.CallOption) (rsp *AnswerMockQuestionResponse, err error)
 	AnswerQuestion(ctx context.Context, req *AnswerQuestionRequest, opts ...http.CallOption) (rsp *AnswerQuestionResponse, err error)
 	CreateAdminQuestion(ctx context.Context, req *CreateAdminQuestionRequest, opts ...http.CallOption) (rsp *AdminQuestionEnvelope, err error)
@@ -883,6 +912,19 @@ type InterviewPrepServiceHTTPClientImpl struct {
 
 func NewInterviewPrepServiceHTTPClient(client *http.Client) InterviewPrepServiceHTTPClient {
 	return &InterviewPrepServiceHTTPClientImpl{client}
+}
+
+func (c *InterviewPrepServiceHTTPClientImpl) AbortMockSession(ctx context.Context, in *AbortMockSessionRequest, opts ...http.CallOption) (*StatusResponse, error) {
+	var out StatusResponse
+	pattern := "/api/v1/interview-prep/mock-sessions/{session_id}/abort"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationInterviewPrepServiceAbortMockSession))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *InterviewPrepServiceHTTPClientImpl) AnswerMockQuestion(ctx context.Context, in *AnswerMockQuestionRequest, opts ...http.CallOption) (*AnswerMockQuestionResponse, error) {

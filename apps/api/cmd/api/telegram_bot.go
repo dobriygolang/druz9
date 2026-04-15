@@ -8,7 +8,7 @@ import (
 	"api/internal/telegrambot"
 )
 
-func startTelegramBotWorker(service *profiledomain.Service, notif *notification.Client) func() error {
+func startTelegramBotWorker(service *profiledomain.Service, notif notification.Sender) func() error {
 	bot := telegrambot.New(service.BotToken(), service, notif)
 	if !bot.Enabled() {
 		return func() error { return nil }

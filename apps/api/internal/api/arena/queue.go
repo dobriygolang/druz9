@@ -2,6 +2,7 @@ package arena
 
 import (
 	"context"
+	"fmt"
 
 	arenarating "api/internal/arena/rating"
 	arenadomain "api/internal/domain/arena"
@@ -21,6 +22,23 @@ func (i *Implementation) JoinQueue(ctx context.Context, req *v1.JoinQueueRequest
 	state, err := i.service.EnqueueMatchmaking(ctx, user, req.Topic, unmapDifficulty(req.Difficulty).String(), req.ObfuscateOpponent)
 	if err != nil {
 		return nil, mapErr(err)
+	}
+
+	// Notify: duel_match_found — when matchmaking pairs two players.
+	if i.notif != nil && state.Match != nil {
+		go func() {
+			topic := state.Topic
+			if topic == "" {
+				topic = "Алгоритмы"
+			}
+			body := fmt.Sprintf("Соперник найден! Тема: %s\nМатч начинается", topic)
+			for _, p := range state.Match.Players {
+				i.notif.Send(ctx, p.UserID.String(), "duel_match_found", "Матч найден", body, map[string]any{
+					"match_id": state.Match.ID.String(),
+					"topic":    topic,
+				})
+			}
+		}()
 	}
 
 	return mapQueueState(state), nil

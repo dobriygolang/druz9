@@ -7,7 +7,7 @@ import (
 	"time"
 
 	profiledomain "api/internal/domain/profile"
-	"api/internal/notification"
+	notif "api/internal/notification"
 
 	klog "github.com/go-kratos/kratos/v2/log"
 )
@@ -15,18 +15,18 @@ import (
 const telegramAPIBase = "https://api.telegram.org"
 
 type Service struct {
-	client *http.Client
-	token  string
+	client  *http.Client
+	token   string
 	profile *profiledomain.Service
-	notif   *notification.Client
+	notif   notif.Sender
 }
 
-func New(token string, profile *profiledomain.Service, notif *notification.Client) *Service {
+func New(token string, profile *profiledomain.Service, n notif.Sender) *Service {
 	return &Service{
 		client:  &http.Client{Timeout: 70 * time.Second},
 		token:   strings.TrimSpace(token),
 		profile: profile,
-		notif:   notif,
+		notif:   n,
 	}
 }
 

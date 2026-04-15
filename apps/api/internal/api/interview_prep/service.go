@@ -5,6 +5,7 @@ import (
 
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/model"
+	notif "api/internal/notification"
 	v1 "api/pkg/api/interview_prep/v1"
 
 	"github.com/google/uuid"
@@ -22,6 +23,7 @@ type Service interface {
 	SubmitMockStage(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string, notes string, stageKind string) (*appinterviewprep.MockSubmitResult, error)
 	ReviewMockSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req appinterviewprep.SystemDesignReviewInput) (*appinterviewprep.MockSystemDesignReviewResult, error)
 	AnswerMockQuestion(ctx context.Context, user *model.User, sessionID uuid.UUID, answer string) (*appinterviewprep.MockQuestionAnswerResult, error)
+	AbortMockSession(ctx context.Context, user *model.User, sessionID uuid.UUID) error
 	Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string) (*appinterviewprep.SubmitResult, error)
 	ReviewSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req appinterviewprep.SystemDesignReviewInput) (*appinterviewprep.SystemDesignReviewResult, error)
 	AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string, answer string) (*appinterviewprep.QuestionAnswerResult, error)
@@ -54,11 +56,12 @@ type Implementation struct {
 	v1.UnimplementedInterviewPrepServiceServer
 	service Service
 	admin   AdminRepo
+	notif   notif.Sender
 }
 
 // New returns new instance of Implementation.
-func New(service Service, admin AdminRepo) *Implementation {
-	return &Implementation{service: service, admin: admin}
+func New(service Service, admin AdminRepo, n notif.Sender) *Implementation {
+	return &Implementation{service: service, admin: admin, notif: n}
 }
 
 // GetDescription returns grpc service description.

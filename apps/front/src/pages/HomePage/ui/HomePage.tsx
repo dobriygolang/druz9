@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { Briefcase, Calendar, ChevronRight, Code2, Map, Flame, Users } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -46,6 +46,15 @@ export function HomePage() {
 
   const firstName = user?.firstName || user?.username || t('home.defaultName')
 
+  // Pick a random motivational message once per mount
+  const motd = useMemo(() => {
+    const index = Math.floor(Math.random() * 30)
+    return {
+      greeting: t(`home.motd.${index}.greeting`, { name: firstName }),
+      subtitle: t(`home.motd.${index}.subtitle`),
+    }
+  }, [t, firstName])
+
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchData() }} />
 
   return (
@@ -59,11 +68,11 @@ export function HomePage() {
         <div className="relative flex flex-col gap-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <h1 className="max-w-[20ch] font-mono text-[32px] font-semibold leading-[1.02] text-[#111111] dark:text-[#f8fafc] sm:text-[40px]">
-                {t('home.greeting', { name: firstName })}
+              <h1 className="max-w-[24ch] font-mono text-[32px] font-semibold leading-[1.02] text-[#111111] dark:text-[#f8fafc] sm:text-[40px]">
+                {motd.greeting}
               </h1>
               <p className="mt-3 max-w-[30rem] text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">
-                {t('home.subtitle')}
+                {motd.subtitle}
               </p>
             </div>
             <Avatar

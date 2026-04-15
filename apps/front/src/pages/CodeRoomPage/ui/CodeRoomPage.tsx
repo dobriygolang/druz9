@@ -116,7 +116,7 @@ function buildCursorWidget(
   userId: string,
   displayName: string,
   color: string,
-  posRef: { line: number; col: number },
+  posRef: { line: number; col: number; offset: number },
   monaco: typeof Monaco,
 ): Monaco.editor.IContentWidget {
   const domNode = document.createElement('div')
@@ -245,7 +245,7 @@ export function CodeRoomPage() {
   const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Mutable cursor positions for remote users — updated in-place, no widget re-add needed
-  const cursorPositionsRef = useRef<Map<string, { line: number; col: number }>>(new Map())
+  const cursorPositionsRef = useRef<Map<string, { line: number; col: number; offset: number }>>(new Map())
   const awarenessCodeLenRef = useRef<Map<string, number | undefined>>(new Map())
   const pendingCursorUpdatesRef = useRef<Map<string, { line: number; col: number; codeLen?: number }>>(new Map())
 
@@ -377,6 +377,7 @@ export function CodeRoomPage() {
       if (!posRef || !widget) return
       posRef.line = update.line
       posRef.col = update.col
+      posRef.offset = model.getOffsetAt({ lineNumber: update.line, column: update.col })
       editor.layoutContentWidget(widget)
       pendingCursorUpdatesRef.current.delete(userId)
     })
@@ -417,6 +418,10 @@ export function CodeRoomPage() {
       if (posRef && widgetsRef.current.has(userId)) {
         posRef.line = line
         posRef.col = col
+        const model = editorRef.current?.getModel()
+        if (model) {
+          posRef.offset = model.getOffsetAt({ lineNumber: line, column: col })
+        }
         editorRef.current?.layoutContentWidget(widgetsRef.current.get(userId)!)
       }
     }, []),
@@ -688,7 +693,11 @@ export function CodeRoomPage() {
         // Position updates for existing widgets are handled exclusively by onCursorUpdate
         // (which filters stale awareness via codeLen). This avoids RAF-batched stale
         // awareness overwriting the OT-predicted position during rapid typing.
-        const posRef = { line: state.cursorLine, col }
+        const posRef = {
+          line: state.cursorLine,
+          col,
+          offset: editor.getModel()?.getOffsetAt({ lineNumber: state.cursorLine, column: col }) ?? 0,
+        }
         cursorPositionsRef.current.set(state.userId, posRef)
         const widget = buildCursorWidget(state.userId, state.displayName, color, posRef, monaco)
         editor.addContentWidget(widget)
@@ -857,12 +866,8 @@ export function CodeRoomPage() {
           const posRef = cursorPositionsRef.current.get(senderUserId)
           const widget = widgetsRef.current.get(senderUserId)
           if (posRef && widget) {
-            const lines = oldCode.split('\n')
-            let offset = 0
-            for (let i = 0; i < posRef.line - 1 && i < lines.length; i++) offset += lines[i].length + 1
-            offset = Math.min(offset + posRef.col - 1, oldCode.length)
-            offset = transformCursorOffset(offset, oldCode, nextCode)
-            const newPos = nextModel.getPositionAt(Math.min(offset, nextCode.length))
+            posRef.offset = transformCursorOffset(posRef.offset, oldCode, nextCode)
+            const newPos = nextModel.getPositionAt(Math.min(posRef.offset, nextCode.length))
             posRef.line = newPos.lineNumber
             posRef.col = newPos.column
             editor.layoutContentWidget(widget)
@@ -879,12 +884,8 @@ export function CodeRoomPage() {
           if (remoteCodeLen !== undefined && remoteCodeLen !== oldCode.length) {
             return
           }
-          const lines = oldCode.split('\n')
-          let offset = 0
-          for (let i = 0; i < posRef.line - 1 && i < lines.length; i++) offset += lines[i].length + 1
-          offset = Math.min(offset + posRef.col - 1, oldCode.length)
-          offset = transformCursorOffset(offset, oldCode, nextCode)
-          const newPos = nextModel.getPositionAt(Math.min(offset, nextCode.length))
+          posRef.offset = transformCursorOffset(posRef.offset, oldCode, nextCode)
+          const newPos = nextModel.getPositionAt(Math.min(posRef.offset, nextCode.length))
           posRef.line = newPos.lineNumber
           posRef.col = newPos.column
           const widget = widgetsRef.current.get(userId)

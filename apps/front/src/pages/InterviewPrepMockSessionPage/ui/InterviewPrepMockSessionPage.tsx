@@ -90,6 +90,7 @@ export function InterviewPrepMockSessionPage() {
   const { t } = useTranslation()
   const [session, setSession] = useState<any>(null)
   const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
+  const [aborting, setAborting] = useState(false)
   const [code, setCode] = useState('')
   const [textAnswer, setTextAnswer] = useState('')
   const [designNotes, setDesignNotes] = useState('')
@@ -706,12 +707,24 @@ export function InterviewPrepMockSessionPage() {
         footer={
           <>
             <Button variant="secondary" size="sm" onClick={() => setShowLeaveConfirm(false)}>{t('mock.continue')}</Button>
-            <Button variant="orange" size="sm" onClick={() => { setShowLeaveConfirm(false); navigate('/prepare/interview-prep') }}>{t('mock.finish')}</Button>
+            <Button variant="orange" size="sm" loading={aborting} onClick={async () => {
+              if (!sessionId) return
+              setAborting(true)
+              try {
+                await interviewPrepApi.abortMockSession(sessionId)
+              } catch { /* ignore — best effort */ }
+              setAborting(false)
+              setShowLeaveConfirm(false)
+              navigate('/prepare/interview-prep')
+            }}>{t('mock.finish')}</Button>
           </>
         }
       >
-        <p className="text-sm text-[#475569]">
+        <p className="text-sm text-[#475569] dark:text-[#94a3b8]">
           {t('mock.leaveBody')}
+        </p>
+        <p className="mt-2 text-xs text-[#94a3b8] dark:text-[#4d6380]">
+          {t('mock.leaveNoStats', 'Incomplete stages will not count towards your stats.')}
         </p>
       </Modal>
     </div>

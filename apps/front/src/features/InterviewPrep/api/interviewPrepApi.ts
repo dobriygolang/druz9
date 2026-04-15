@@ -237,4 +237,7 @@ export const interviewPrepApi = {
     if (raw?.result) return normalizeMockEnvelopeResult(raw.result)
     return { ...raw, session: normalizeMockSession(raw.session) }
   },
+  abortMockSession: async (sessionId: string): Promise<void> => {
+    await apiClient.post(`/api/v1/interview-prep/mock-sessions/${sessionId}/abort`)
+  },
 }

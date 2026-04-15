@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback, useMemo } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Search, ChevronRight, BookOpen, Code2, MessageSquare, Play, Database,
@@ -78,12 +78,13 @@ export function InterviewPrepPage() {
   const isMobile = useIsMobile()
   const { toast } = useToast()
   const { user } = useAuth()
+  const [searchParams, setSearchParams] = useSearchParams()
 
   const [tasks, setTasks] = useState<InterviewPrepTask[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
-  const [category, setCategory] = useState('')
+  const [category, setCategory] = useState(() => searchParams.get('category') ?? '')
   const [blueprints, setBlueprints] = useState<MockBlueprint[]>([])
   const [selectedBlueprintSlug, setSelectedBlueprintSlug] = useState('')
   const [mockLoading, setMockLoading] = useState(false)
@@ -391,7 +392,7 @@ export function InterviewPrepPage() {
             {CATEGORIES.map(cat => (
               <button
                 key={cat}
-                onClick={() => setCategory(cat)}
+                onClick={() => { setCategory(cat); setSearchParams(cat ? { category: cat } : {}, { replace: true }) }}
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${isMobile ? 'flex-shrink-0' : ''} ${
                   category === cat
                     ? 'bg-[#111111] text-white shadow-sm dark:bg-white dark:text-[#111111]'

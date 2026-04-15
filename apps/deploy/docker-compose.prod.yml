@@ -270,6 +270,8 @@ services:
         condition: service_completed_successfully
       sandbox-runner:
         condition: service_healthy
+      notification-service:
+        condition: service_started
     environment:
       CONFIG_PROFILE: prod
       RTC_VALUES_PATH: /app/.platform/values_prod.yaml
@@ -285,6 +287,7 @@ services:
       SANDBOX_MODE: remote
       SANDBOX_RUNNER_URL: http://sandbox-runner:8098
       SANDBOX_RUNNER_TIMEOUT: 25s
+      NOTIFICATION_SERVICE_ADDR: notification-service:9000
     volumes:
       - ../api/.platform/values_prod.yaml:/app/.platform/values_prod.yaml:ro
     command: ["/app/bin/api"]
@@ -299,6 +302,32 @@ services:
       - postgres_password
       - minio_root_user
       - minio_root_password
+    networks:
+      - app_network
+
+  notification-service:
+    build:
+      context: ../notification-service
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      RUN_DB_MIGRATIONS: "true"
+      DATABASE_URL_FILE: /run/secrets/notification_service_database_url
+      TELEGRAM_BOT_TOKEN_FILE: /run/secrets/telegram_bot_token
+      GRPC_ADDR: ":9000"
+      HTTP_ADDR: ":8080"
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://localhost:8080/ >/dev/null 2>&1 || exit 0"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 15s
+    secrets:
+      - notification_service_database_url
+      - telegram_bot_token
     networks:
       - app_network
 
@@ -333,3 +362,5 @@ secrets:
     file: ./runtime/secrets/prod/minio_root_password
   yandex_oauth_client_secret:
     file: ./runtime/secrets/prod/yandex_oauth_client_secret
+  notification_service_database_url:
+    file: ./runtime/secrets/prod/notification_service_database_url

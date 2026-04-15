@@ -32,6 +32,7 @@ const (
 	InterviewPrepService_SubmitMockStage_FullMethodName         = "/interview_prep.v1.InterviewPrepService/SubmitMockStage"
 	InterviewPrepService_ReviewMockSystemDesign_FullMethodName  = "/interview_prep.v1.InterviewPrepService/ReviewMockSystemDesign"
 	InterviewPrepService_AnswerMockQuestion_FullMethodName      = "/interview_prep.v1.InterviewPrepService/AnswerMockQuestion"
+	InterviewPrepService_AbortMockSession_FullMethodName        = "/interview_prep.v1.InterviewPrepService/AbortMockSession"
 	InterviewPrepService_ListAdminTasks_FullMethodName          = "/interview_prep.v1.InterviewPrepService/ListAdminTasks"
 	InterviewPrepService_CreateAdminTask_FullMethodName         = "/interview_prep.v1.InterviewPrepService/CreateAdminTask"
 	InterviewPrepService_GetAdminTask_FullMethodName            = "/interview_prep.v1.InterviewPrepService/GetAdminTask"
@@ -70,6 +71,7 @@ type InterviewPrepServiceClient interface {
 	SubmitMockStage(ctx context.Context, in *SubmitMockStageRequest, opts ...grpc.CallOption) (*SubmitMockStageResponse, error)
 	ReviewMockSystemDesign(ctx context.Context, in *ReviewMockSystemDesignRequest, opts ...grpc.CallOption) (*ReviewMockSystemDesignResponse, error)
 	AnswerMockQuestion(ctx context.Context, in *AnswerMockQuestionRequest, opts ...grpc.CallOption) (*AnswerMockQuestionResponse, error)
+	AbortMockSession(ctx context.Context, in *AbortMockSessionRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	ListAdminTasks(ctx context.Context, in *ListAdminTasksRequest, opts ...grpc.CallOption) (*ListAdminTasksResponse, error)
 	CreateAdminTask(ctx context.Context, in *CreateAdminTaskRequest, opts ...grpc.CallOption) (*AdminTaskEnvelope, error)
 	GetAdminTask(ctx context.Context, in *GetAdminTaskRequest, opts ...grpc.CallOption) (*AdminTaskEnvelope, error)
@@ -223,6 +225,16 @@ func (c *interviewPrepServiceClient) AnswerMockQuestion(ctx context.Context, in 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(AnswerMockQuestionResponse)
 	err := c.cc.Invoke(ctx, InterviewPrepService_AnswerMockQuestion_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *interviewPrepServiceClient) AbortMockSession(ctx context.Context, in *AbortMockSessionRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StatusResponse)
+	err := c.cc.Invoke(ctx, InterviewPrepService_AbortMockSession_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -436,6 +448,7 @@ type InterviewPrepServiceServer interface {
 	SubmitMockStage(context.Context, *SubmitMockStageRequest) (*SubmitMockStageResponse, error)
 	ReviewMockSystemDesign(context.Context, *ReviewMockSystemDesignRequest) (*ReviewMockSystemDesignResponse, error)
 	AnswerMockQuestion(context.Context, *AnswerMockQuestionRequest) (*AnswerMockQuestionResponse, error)
+	AbortMockSession(context.Context, *AbortMockSessionRequest) (*StatusResponse, error)
 	ListAdminTasks(context.Context, *ListAdminTasksRequest) (*ListAdminTasksResponse, error)
 	CreateAdminTask(context.Context, *CreateAdminTaskRequest) (*AdminTaskEnvelope, error)
 	GetAdminTask(context.Context, *GetAdminTaskRequest) (*AdminTaskEnvelope, error)
@@ -503,6 +516,9 @@ func (UnimplementedInterviewPrepServiceServer) ReviewMockSystemDesign(context.Co
 }
 func (UnimplementedInterviewPrepServiceServer) AnswerMockQuestion(context.Context, *AnswerMockQuestionRequest) (*AnswerMockQuestionResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method AnswerMockQuestion not implemented")
+}
+func (UnimplementedInterviewPrepServiceServer) AbortMockSession(context.Context, *AbortMockSessionRequest) (*StatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AbortMockSession not implemented")
 }
 func (UnimplementedInterviewPrepServiceServer) ListAdminTasks(context.Context, *ListAdminTasksRequest) (*ListAdminTasksResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListAdminTasks not implemented")
@@ -812,6 +828,24 @@ func _InterviewPrepService_AnswerMockQuestion_Handler(srv interface{}, ctx conte
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InterviewPrepServiceServer).AnswerMockQuestion(ctx, req.(*AnswerMockQuestionRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InterviewPrepService_AbortMockSession_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AbortMockSessionRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InterviewPrepServiceServer).AbortMockSession(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InterviewPrepService_AbortMockSession_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InterviewPrepServiceServer).AbortMockSession(ctx, req.(*AbortMockSessionRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1216,6 +1250,10 @@ var InterviewPrepService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "AnswerMockQuestion",
 			Handler:    _InterviewPrepService_AnswerMockQuestion_Handler,
+		},
+		{
+			MethodName: "AbortMockSession",
+			Handler:    _InterviewPrepService_AbortMockSession_Handler,
 		},
 		{
 			MethodName: "ListAdminTasks",
