@@ -369,16 +369,10 @@ export function CodeRoomPage() {
       else if (event === 'tab_visible') addNotification(`${displayName} вернулся(-ась)`)
       else if (event === 'pasted') addNotification(`⚠️ ${displayName} вставил(-а) код`)
     }, [addNotification]),
-    onCursorUpdate: useCallback((userId: string, line: number, col: number, remoteCodeLen?: number) => {
-      // If the remote side sent a code length that doesn't match ours, their cursor
-      // position was computed on a different code version — defer until our model catches up.
-      if (remoteCodeLen !== undefined) {
-        const localLen = editorRef.current?.getModel()?.getValueLength()
-        if (localLen !== undefined && remoteCodeLen !== localLen) {
-          pendingCursorUpdatesRef.current.set(userId, { line, col, codeLen: remoteCodeLen })
-          return
-        }
-      }
+    onCursorUpdate: useCallback((userId: string, line: number, col: number) => {
+      // Always apply cursor position immediately — deferring until codeLen matches caused
+      // visible "freezing" during fast typing. The OT transform in onDidChangeModelContent
+      // keeps already-displayed cursors aligned when local edits happen.
       pendingCursorUpdatesRef.current.delete(userId)
       const posRef = cursorPositionsRef.current.get(userId)
       if (posRef && widgetsRef.current.has(userId)) {
@@ -666,10 +660,7 @@ export function CodeRoomPage() {
         range: new monaco.Range(state.cursorLine, col, state.cursorLine, col),
         options: { overviewRuler: { color, position: monaco.editor.OverviewRulerLane.Right } },
       })
-      const localLen = editor.getModel()?.getValueLength()
-      const selIsStale = state.codeLen !== undefined && localLen !== undefined && state.codeLen !== localLen
       if (
-        !selIsStale &&
         state.selStartLine && state.selEndLine &&
         !(state.selStartLine === state.selEndLine && (state.selStartCol ?? 1) === (state.selEndCol ?? 1))
       ) {

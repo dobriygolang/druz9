@@ -108,6 +108,7 @@ export function CommunityMapCanvas({
   useEffect(() => {
     let cancelled = false
     let detachMove: (() => void) | null = null
+    let detachResize: (() => void) | null = null
 
     loadMapLibre()
       .then(maplibre => {
@@ -134,6 +135,18 @@ export function CommunityMapCanvas({
         map.on('move', handleMove)
         detachMove = () => map.off('move', handleMove)
         mapRef.current = map
+
+        // The flex layout may not have settled at init time, so the canvas starts tiny.
+        // Resize immediately on the next frame to pick up the correct container size,
+        // then keep watching via ResizeObserver for any subsequent layout changes.
+        requestAnimationFrame(() => {
+          if (!cancelled) map.resize()
+        })
+        if (typeof ResizeObserver !== 'undefined' && containerRef.current) {
+          const ro = new ResizeObserver(() => map.resize())
+          ro.observe(containerRef.current)
+          detachResize = () => ro.disconnect()
+        }
       })
       .catch(() => {
         if (!cancelled) {
@@ -144,6 +157,7 @@ export function CommunityMapCanvas({
     return () => {
       cancelled = true
       detachMove?.()
+      detachResize?.()
       markersRef.current.forEach(marker => marker.remove())
       markersRef.current = []
       mapRef.current?.remove()
