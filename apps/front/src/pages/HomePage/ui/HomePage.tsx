@@ -9,6 +9,7 @@ import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi } from '@/features/Auth/api/authApi'
 import { missionApi } from '@/features/Mission/api/missionApi'
+import { arenaApi } from '@/features/Arena/api/arenaApi'
 import { apiClient } from '@/shared/api/base'
 import { Card } from '@/shared/ui/Card'
 import { PlayerFrame } from '@/shared/ui/PlayerFrame'
@@ -17,21 +18,7 @@ import { PageMeta } from '@/shared/ui/PageMeta'
 import type { ProfileProgress, FeedItem, NextAction } from '@/entities/User/model/types'
 import type { DailyMissionsResponse, DailyMission } from '@/features/Mission/model/types'
 
-const LEAGUE_LABELS: Record<string, string> = {
-  ARENA_LEAGUE_BRONZE: 'Bronze', ARENA_LEAGUE_SILVER: 'Silver',
-  ARENA_LEAGUE_GOLD: 'Gold', ARENA_LEAGUE_PLATINUM: 'Platinum',
-  ARENA_LEAGUE_DIAMOND: 'Diamond', ARENA_LEAGUE_MASTER: 'Master',
-}
-const LEAGUE_DOT_COLORS: Record<string, string> = {
-  ARENA_LEAGUE_BRONZE: 'bg-[#A0785A]', ARENA_LEAGUE_SILVER: 'bg-[#8B95A5]',
-  ARENA_LEAGUE_GOLD: 'bg-[#D4A017]', ARENA_LEAGUE_PLATINUM: 'bg-[#4ECDC4]',
-  ARENA_LEAGUE_DIAMOND: 'bg-[#7C6FE0]', ARENA_LEAGUE_MASTER: 'bg-[#E64980]',
-}
-const LEAGUE_FRAME: Record<string, string> = {
-  ARENA_LEAGUE_BRONZE: 'bronze', ARENA_LEAGUE_SILVER: 'silver',
-  ARENA_LEAGUE_GOLD: 'gold', ARENA_LEAGUE_PLATINUM: 'platinum',
-  ARENA_LEAGUE_DIAMOND: 'diamond', ARENA_LEAGUE_MASTER: 'master',
-}
+import { LEAGUE_LABELS, LEAGUE_BG_COLORS, LEAGUE_FRAME_NAMES } from '@/shared/lib/league'
 
 const MISSION_ICONS: Record<string, React.ElementType> = {
   Code2, Swords, GraduationCap, Flame, Calendar, Send, BookOpen, Trophy, Award, Target,
@@ -55,10 +42,7 @@ export function HomePage() {
     Promise.all([
       authApi.getProfileProgress(user.id).then(p => setProgress(p)),
       missionApi.getDailyMissions().then(m => setMissions(m)).catch(() => {}),
-      apiClient.get(`/api/v1/arena/stats/${user.id}`).then(r => {
-        const s = (r.data as any)?.stats ?? r.data
-        if (s && typeof s.rating === 'number') setArenaStats(s)
-      }).catch(() => {}),
+      arenaApi.getPlayerStats(user.id).then(s => { if (s) setArenaStats(s) }),
       authApi.getProfileFeed(user.id).then(f => setFeed(f.slice(0, 7))).catch(() => {}),
       apiClient.get('/api/v1/challenges/weekly').then(r => setWeeklyBoss(r.data)).catch(() => {}),
     ]).catch(() => setError(t('common.loadFailed')))
@@ -85,7 +69,7 @@ export function HomePage() {
             <PlayerFrame
               name={firstName}
               src={user?.avatarUrl || undefined}
-              league={LEAGUE_FRAME[league]}
+              league={LEAGUE_FRAME_NAMES[league]}
               size="lg"
             />
           </Link>
@@ -115,7 +99,7 @@ export function HomePage() {
               )}
               {leagueLabel && (
                 <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#475569] dark:text-[#94a3b8]">
-                  <span className={`h-2 w-2 rounded-full ${LEAGUE_DOT_COLORS[league] ?? 'bg-[#94a3b8]'}`} />
+                  <span className={`h-2 w-2 rounded-full ${LEAGUE_BG_COLORS[league] ?? 'bg-[#94a3b8]'}`} />
                   {leagueLabel}
                   {arenaStats?.rating ? ` ${arenaStats.rating}` : ''}
                 </span>

@@ -14,6 +14,7 @@ file_env() {
 
   if [[ -n "$file_value" ]]; then
     export "${var_name}=$(tr -d '\r' < "$file_value" | tr -d '\n')"
+    unset "${file_var_name}"
   fi
 }
 

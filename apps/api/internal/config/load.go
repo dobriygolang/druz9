@@ -66,16 +66,6 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 		}
 		cfg.Server.RateLimit.BlockFor = d
 	}
-	if v := manager.GetValue(ctx, rtc.ServerRateLimitMaxWaitTime); v.String() != "" {
-		d, parseErr := time.ParseDuration(v.String())
-		if parseErr != nil {
-			return nil, fmt.Errorf("parse RATE_LIMIT_MAX_WAIT_TIME: %w", parseErr)
-		}
-		if cfg.Server.RateLimit == nil {
-			cfg.Server.RateLimit = &RateLimit{}
-		}
-		cfg.Server.RateLimit.MaxWaitTime = d
-	}
 	if v := manager.GetValue(ctx, rtc.ServerCircuitBreakerRequest); v.String() != "" {
 		parsed, parseErr := strconv.ParseInt(v.String(), 10, 64)
 		if parseErr != nil {

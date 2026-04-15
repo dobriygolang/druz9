@@ -4,7 +4,7 @@ import { Check, Sparkles } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi } from '@/features/Auth/api/authApi'
-import { apiClient } from '@/shared/api/base'
+import { arenaApi } from '@/features/Arena/api/arenaApi'
 import { Button } from '@/shared/ui/Button'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { Input } from '@/shared/ui/Input'
@@ -106,12 +106,7 @@ export function ProfilePage() {
       return
     }
     authApi.getProfileProgress(authUser.id).then(setMyProgress).catch(() => setMyProgress(null))
-    apiClient.get(`/api/v1/arena/stats/${authUser.id}`)
-      .then(res => {
-        const s = res.data?.stats ?? res.data
-        if (s && typeof s.rating === 'number') setMyArenaStats(s)
-      })
-      .catch(() => setMyArenaStats(null))
+    arenaApi.getPlayerStats(authUser.id).then(s => setMyArenaStats(s)).catch(() => setMyArenaStats(null))
   }, [authUser?.id, isOwn])
 
   const readiness = useMemo(() => (progress ? computeCompanyReadiness(progress) : []), [progress])

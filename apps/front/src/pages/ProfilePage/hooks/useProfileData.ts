@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi } from '@/features/Auth/api/authApi'
+import { arenaApi } from '@/features/Arena/api/arenaApi'
 import { apiClient } from '@/shared/api/base'
 import type { User, ProfileProgress, Achievement, FeedItem } from '@/entities/User/model/types'
 
@@ -105,11 +106,8 @@ export function useProfileData(targetUserId: string | undefined): ProfileData {
       })
       .catch(() => { setSectionErrors(prev => ({ ...prev, activity: true })) })
 
-    const arenaReq = apiClient.get(`/api/v1/arena/stats/${effectiveId}`)
-      .then(res => {
-        const s = res.data?.stats ?? res.data
-        if (s && typeof s.rating === 'number') setArenaStats(s)
-      })
+    const arenaReq = arenaApi.getPlayerStats(effectiveId)
+      .then(s => { if (s) setArenaStats(s) })
       .catch(() => { setSectionErrors(prev => ({ ...prev, arena: true })) })
 
     const feedReq = authApi.getProfileFeed(effectiveId)

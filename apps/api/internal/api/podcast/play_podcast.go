@@ -22,7 +22,7 @@ func (i *Implementation) PlayPodcast(ctx context.Context, req *v1.PlayPodcastReq
 	}
 
 	metrics.IncListens()
-	metrics.IncPodcastListen(item.ID.String(), item.Title)
+	metrics.IncPodcastListen(item.ID.String())
 
 	return &v1.PlayPodcastResponse{
 		Podcast:   mapPodcast(item),

@@ -27,10 +27,9 @@ type CircuitBreaker struct {
 }
 
 type RateLimit struct {
-	MaxCalls    int           `json:"max_calls"`     // max requests per window (default: 1000)
-	Window      time.Duration `json:"window"`        // time window (default: 1s)
-	BlockFor    time.Duration `json:"block_for"`     // how long to reject requests when limit exceeded
-	MaxWaitTime time.Duration `json:"max_wait_time"` // max time to wait for permit
+	MaxCalls int           `json:"max_calls"` // max requests per window (default: 1000)
+	Window   time.Duration `json:"window"`    // time window (default: 1s)
+	BlockFor time.Duration `json:"block_for"` // how long to reject requests when limit exceeded
 }
 
 type Server struct {

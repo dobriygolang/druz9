@@ -18,11 +18,14 @@ func (r *Repo) GetCirclePulse(ctx context.Context, circleID uuid.UUID) (*model.C
 	todayStart := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
 	weekAgo := todayStart.AddDate(0, 0, -6) // 7 days including today
 
-	// Get member count.
+	// Query 1: member count (reads indexed column).
 	var totalMembers int32
 	if err := r.data.DB.QueryRow(ctx,
 		`SELECT member_count FROM circles WHERE id = $1`, circleID,
 	).Scan(&totalMembers); err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, kratoserrors.NotFound("CIRCLE_NOT_FOUND", "circle not found")
+		}
 		return nil, fmt.Errorf("get circle member count: %w", err)
 	}
 
@@ -32,33 +35,8 @@ func (r *Repo) GetCirclePulse(ctx context.Context, circleID uuid.UUID) (*model.C
 		RecentActions: make([]*model.CircleMemberAction, 0, 20),
 	}
 
-	// Active today: count distinct members who did anything today.
-	if err := r.data.DB.QueryRow(ctx, `
-SELECT COUNT(DISTINCT user_id) FROM (
-  SELECT s.user_id FROM interview_practice_sessions s
-    JOIN circle_members cm ON cm.user_id = s.user_id AND cm.circle_id = $1
-  WHERE s.status = 'finished'
-    AND COALESCE(s.finished_at, s.updated_at) >= $2
-
-  UNION
-
-  SELECT ap.user_id FROM arena_match_players ap
-    JOIN circle_members cm ON cm.user_id = ap.user_id AND cm.circle_id = $1
-    JOIN arena_matches am ON am.id = ap.match_id
-  WHERE am.status = 3
-    AND am.finished_at >= $2
-
-  UNION
-
-  SELECT ms.user_id FROM interview_mock_sessions ms
-    JOIN circle_members cm ON cm.user_id = ms.user_id AND cm.circle_id = $1
-  WHERE ms.status = 'finished'
-    AND ms.finished_at >= $2
-) active_users`, circleID, todayStart).Scan(&pulse.ActiveToday); err != nil {
-		return nil, fmt.Errorf("count active today: %w", err)
-	}
-
-	// Week activity: per-day aggregation for the last 7 days.
+	// Query 2: combined active-today + week activity in one query.
+	// Uses a single UNION ALL scan over all activity tables, then aggregates by day.
 	rows, err := r.data.DB.Query(ctx, `
 WITH members AS (
   SELECT user_id FROM circle_members WHERE circle_id = $1
@@ -66,40 +44,38 @@ WITH members AS (
 days AS (
   SELECT generate_series($2::date, $3::date, '1 day'::interval)::date AS d
 ),
-daily_counts AS (
-  SELECT DATE(COALESCE(s.finished_at, s.updated_at) AT TIME ZONE 'UTC') AS d, COUNT(*) AS cnt
+all_activity AS (
+  SELECT s.user_id, COALESCE(s.finished_at, s.updated_at) AS ts, 'daily' AS kind
   FROM interview_practice_sessions s
   WHERE s.user_id IN (SELECT user_id FROM members)
     AND s.status = 'finished'
     AND COALESCE(s.finished_at, s.updated_at) >= $2
-  GROUP BY 1
-),
-duel_counts AS (
-  SELECT DATE(am.finished_at AT TIME ZONE 'UTC') AS d, COUNT(*) AS cnt
+
+  UNION ALL
+
+  SELECT ap.user_id, am.finished_at AS ts, 'duel' AS kind
   FROM arena_match_players ap
   JOIN arena_matches am ON am.id = ap.match_id
   WHERE ap.user_id IN (SELECT user_id FROM members)
     AND am.status = 3
     AND am.finished_at >= $2
-  GROUP BY 1
-),
-mock_counts AS (
-  SELECT DATE(ms.finished_at AT TIME ZONE 'UTC') AS d, COUNT(*) AS cnt
+
+  UNION ALL
+
+  SELECT ms.user_id, ms.finished_at AS ts, 'mock' AS kind
   FROM interview_mock_sessions ms
   WHERE ms.user_id IN (SELECT user_id FROM members)
     AND ms.status = 'finished'
     AND ms.finished_at >= $2
-  GROUP BY 1
 )
 SELECT
   days.d::text,
-  COALESCE(dc.cnt, 0)::int4,
-  COALESCE(duc.cnt, 0)::int4,
-  COALESCE(mc.cnt, 0)::int4
+  COALESCE(SUM(CASE WHEN a.kind = 'daily' THEN 1 ELSE 0 END), 0)::int4,
+  COALESCE(SUM(CASE WHEN a.kind = 'duel' THEN 1 ELSE 0 END), 0)::int4,
+  COALESCE(SUM(CASE WHEN a.kind = 'mock' THEN 1 ELSE 0 END), 0)::int4
 FROM days
-LEFT JOIN daily_counts dc ON dc.d = days.d
-LEFT JOIN duel_counts duc ON duc.d = days.d
-LEFT JOIN mock_counts mc ON mc.d = days.d
+LEFT JOIN all_activity a ON DATE(a.ts AT TIME ZONE 'UTC') = days.d
+GROUP BY days.d
 ORDER BY days.d ASC`, circleID, weekAgo, todayStart)
 	if err != nil {
 		return nil, fmt.Errorf("query week activity: %w", err)
@@ -116,7 +92,32 @@ ORDER BY days.d ASC`, circleID, weekAgo, todayStart)
 		return nil, fmt.Errorf("iterate week activity: %w", err)
 	}
 
-	// Recent actions: last 20 actions from all sources.
+	// Compute active today from the week data (last element).
+	if len(pulse.WeekActivity) > 0 {
+		today := pulse.WeekActivity[len(pulse.WeekActivity)-1]
+		// Active today needs distinct user count, not action count.
+		// Use a lightweight query.
+		if err := r.data.DB.QueryRow(ctx, `
+SELECT COUNT(DISTINCT user_id) FROM (
+  SELECT s.user_id FROM interview_practice_sessions s
+    WHERE s.user_id IN (SELECT user_id FROM circle_members WHERE circle_id = $1)
+    AND s.status = 'finished' AND COALESCE(s.finished_at, s.updated_at) >= $2
+  UNION
+  SELECT ap.user_id FROM arena_match_players ap
+    JOIN arena_matches am ON am.id = ap.match_id
+    WHERE ap.user_id IN (SELECT user_id FROM circle_members WHERE circle_id = $1)
+    AND am.status = 3 AND am.finished_at >= $2
+  UNION
+  SELECT ms.user_id FROM interview_mock_sessions ms
+    WHERE ms.user_id IN (SELECT user_id FROM circle_members WHERE circle_id = $1)
+    AND ms.status = 'finished' AND ms.finished_at >= $2
+) active_users`, circleID, todayStart).Scan(&pulse.ActiveToday); err != nil {
+			return nil, fmt.Errorf("count active today: %w", err)
+		}
+		_ = today // suppress unused
+	}
+
+	// Query 3: recent actions (last 20).
 	actionRows, err := r.data.DB.Query(ctx, `
 WITH members AS (
   SELECT user_id FROM circle_members WHERE circle_id = $1
@@ -292,7 +293,6 @@ LIMIT 1`, circleID).Scan(
 		return nil, fmt.Errorf("get active challenge: %w", err)
 	}
 
-	// Compute per-member progress based on template_key.
 	progress, err := r.computeChallengeProgress(ctx, &ch)
 	if err != nil {
 		return nil, err

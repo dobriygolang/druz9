@@ -129,7 +129,7 @@ var (
 			Name: "business_podcast_listen_total",
 			Help: "Total number of listens per podcast",
 		},
-		[]string{"podcast_id", "podcast_title"},
+		[]string{"podcast_id"},
 	)
 )
 
@@ -221,6 +221,6 @@ func IncListens() {
 	listensTotal.Inc()
 }
 
-func IncPodcastListen(podcastID, podcastTitle string) {
-	podcastListenTotal.WithLabelValues(podcastID, podcastTitle).Inc()
+func IncPodcastListen(podcastID string) {
+	podcastListenTotal.WithLabelValues(podcastID).Inc()
 }

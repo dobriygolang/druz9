@@ -133,10 +133,12 @@ function normalizeProfileProgress(progress?: ProfileProgress): ProfileProgress {
 }
 
 const profileByIdCache = createCache<string, ProfileResponse>({ ttl: 5 * 60_000 })
+const profileProgressCache = createCache<string, ProfileProgress>({ ttl: 5 * 60_000 })
+const profileFeedCache = createCache<string, FeedItem[]>({ ttl: 2 * 60_000 })
 
 export function clearProfileByIdCache(userId?: string) {
-  if (userId) profileByIdCache.delete(userId)
-  else profileByIdCache.clear()
+  if (userId) { profileByIdCache.delete(userId); profileProgressCache.delete(userId); profileFeedCache.delete(userId) }
+  else { profileByIdCache.clear(); profileProgressCache.clear(); profileFeedCache.clear() }
 }
 
 export const authApi = {
@@ -181,8 +183,15 @@ export const authApi = {
     return req
   },
   getProfileProgress: async (userId: string): Promise<ProfileProgress> => {
-    const r = await apiClient.get<{ progress?: ProfileProgress }>(`/api/v1/profile/${userId}/progress`)
-    return normalizeProfileProgress(r.data.progress)
+    const cached = profileProgressCache.get(userId)
+    if (cached) return cached
+    const inFlight = profileProgressCache.getInFlight(userId)
+    if (inFlight) return inFlight
+    const req = apiClient.get<{ progress?: ProfileProgress }>(`/api/v1/profile/${userId}/progress`)
+      .then((r) => { const n = normalizeProfileProgress(r.data.progress); profileProgressCache.set(userId, n); return n })
+      .finally(() => profileProgressCache.deleteInFlight(userId))
+    profileProgressCache.setInFlight(userId, req)
+    return req
   },
   updateLocation: async (payload: CompleteProfilePayload): Promise<ProfileResponse> => {
     const r = await apiClient.post<BackendProfileResponse>('/api/v1/profile/location', payload)
@@ -202,14 +211,19 @@ export const authApi = {
     return r.data.goal ? { ...r.data.goal, kind: normalizeGoalKind(r.data.goal.kind) } : { kind: normalizeGoalKind(goal.kind), company: goal.company ?? '' }
   },
   getProfileFeed: async (userId: string, limit = 7): Promise<FeedItem[]> => {
+    const cacheKey = `${userId}:${limit}`
+    const cached = profileFeedCache.get(cacheKey)
+    if (cached) return cached
     const r = await apiClient.get<{ items?: FeedItem[] }>(`/api/v1/profile/${userId}/feed`, { params: { limit } })
-    return (r.data.items ?? []).map(item => ({
+    const items = (r.data.items ?? []).map(item => ({
       type: normalizeFeedType(item.type),
       title: item.title ?? '',
       description: item.description ?? '',
       score: item.score,
       timestamp: item.timestamp ?? '',
     }))
+    profileFeedCache.set(cacheKey, items)
+    return items
   },
   updatePinnedAchievements: async (userId: string, pinnedAchievements: string[]): Promise<void> => {
     await apiClient.patch(`/api/v1/profile/${userId}`, { pinnedAchievements })

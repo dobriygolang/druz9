@@ -9,28 +9,24 @@ import (
 	"github.com/jackc/pgx/v5/pgxpool"
 )
 
-// startStreakWarningWorker runs a periodic check (every hour) for users whose streaks
-// are about to expire. Sends streak_warning notifications.
+// startStreakWarningWorker runs once daily at 20:00 UTC (23:00 Moscow)
+// to warn users whose streaks will break if they don't practice today.
 func startStreakWarningWorker(notif notification.Sender, db *pgxpool.Pool) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
-		// Wait 5 minutes after startup before first check.
-		select {
-		case <-ctx.Done():
-			return
-		case <-time.After(5 * time.Minute):
-		}
-
-		ticker := time.NewTicker(1 * time.Hour)
-		defer ticker.Stop()
-
-		sendStreakWarnings(ctx, notif, db)
 		for {
+			now := time.Now().UTC()
+			// Next 20:00 UTC.
+			next := time.Date(now.Year(), now.Month(), now.Day(), 20, 0, 0, 0, time.UTC)
+			if !next.After(now) {
+				next = next.Add(24 * time.Hour)
+			}
+
 			select {
 			case <-ctx.Done():
 				return
-			case <-ticker.C:
+			case <-time.After(time.Until(next)):
 				sendStreakWarnings(ctx, notif, db)
 			}
 		}
@@ -43,31 +39,23 @@ func startStreakWarningWorker(notif notification.Sender, db *pgxpool.Pool) func(
 }
 
 func sendStreakWarnings(ctx context.Context, notif notification.Sender, db *pgxpool.Pool) {
-	// Find users with consecutive activity streaks >= 3 who are missing today's activity.
-	// Uses the same tables the progress system reads from.
+	// Find users active yesterday but not today — their streak is at risk.
+	// Only scans last 2 days of data (not 90 days like before).
 	rows, err := db.Query(ctx, `
-		WITH recent_activity AS (
-			SELECT user_id, DATE(started_at AT TIME ZONE 'UTC') AS d
-			FROM interview_prep_mock_sessions WHERE status = 'finished'
-			  AND started_at >= CURRENT_DATE - INTERVAL '90 days'
+		WITH activity AS (
+			SELECT user_id, DATE(finished_at AT TIME ZONE 'UTC') AS d
+			FROM interview_mock_sessions WHERE status = 'finished'
+			  AND finished_at >= CURRENT_DATE - 1
 			UNION
-			SELECT user_id, DATE(created_at AT TIME ZONE 'UTC') AS d
-			FROM interview_prep_sessions WHERE status = 'finished'
-			  AND created_at >= CURRENT_DATE - INTERVAL '90 days'
-		),
-		unique_days AS (
-			SELECT DISTINCT user_id, d FROM recent_activity
-		),
-		yesterday_active AS (
-			SELECT user_id FROM unique_days WHERE d = CURRENT_DATE - 1
-		),
-		today_active AS (
-			SELECT user_id FROM unique_days WHERE d = CURRENT_DATE
+			SELECT user_id, DATE(finished_at AT TIME ZONE 'UTC') AS d
+			FROM interview_practice_sessions WHERE status = 'finished'
+			  AND finished_at >= CURRENT_DATE - 1
 		)
-		SELECT ya.user_id
-		FROM yesterday_active ya
-		WHERE ya.user_id NOT IN (SELECT user_id FROM today_active)
-		LIMIT 200
+		SELECT DISTINCT a.user_id
+		FROM activity a
+		WHERE a.d = CURRENT_DATE - 1
+		  AND a.user_id NOT IN (SELECT user_id FROM activity WHERE d = CURRENT_DATE)
+		LIMIT 500
 	`)
 	if err != nil {
 		klog.Errorf("streak warning query: %v", err)
@@ -81,8 +69,9 @@ func sendStreakWarnings(ctx context.Context, notif notification.Sender, db *pgxp
 		if err := rows.Scan(&userID); err != nil {
 			continue
 		}
-		body := "Твой streak под угрозой!\nЗаверши хотя бы одну задачу сегодня, чтобы сохранить его."
-		notif.Send(ctx, userID, "streak_warning", "Streak под угрозой", body, map[string]any{})
+		notif.Send(ctx, userID, "streak_warning", "Streak под угрозой",
+			"Твой streak под угрозой! Заверши хотя бы одну задачу сегодня, чтобы сохранить его.",
+			map[string]any{})
 		count++
 	}
 	if count > 0 {

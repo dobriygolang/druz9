@@ -4,6 +4,7 @@ import { Flame, Trophy, Swords, Zap, Users, Copy, Check, Link2, HelpCircle } fro
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { apiClient } from '@/shared/api/base'
+import { arenaApi } from '@/features/Arena/api/arenaApi'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { Card } from '@/shared/ui/Card'
 import { Button } from '@/shared/ui/Button'
@@ -17,27 +18,7 @@ import { DIFF_LABELS, DIFF_VARIANTS, LANG_LABELS } from '@/shared/lib/taskLabels
 import { PageMeta } from '@/shared/ui/PageMeta'
 import { ArenaInfoModal } from '@/shared/ui/ArenaInfoModal'
 
-const LEAGUE_COLORS: Record<string, string> = {
-  ARENA_LEAGUE_BRONZE: 'text-[#A0785A]',
-  ARENA_LEAGUE_SILVER: 'text-[#8B95A5]',
-  ARENA_LEAGUE_GOLD: 'text-[#D4A017]',
-  ARENA_LEAGUE_PLATINUM: 'text-[#4ECDC4]',
-  ARENA_LEAGUE_DIAMOND: 'text-[#7C6FE0]',
-  ARENA_LEAGUE_MASTER: 'text-[#E64980]',
-}
-const LEAGUE_BG_COLORS: Record<string, string> = {
-  ARENA_LEAGUE_BRONZE: 'bg-[#A0785A]',
-  ARENA_LEAGUE_SILVER: 'bg-[#8B95A5]',
-  ARENA_LEAGUE_GOLD: 'bg-[#D4A017]',
-  ARENA_LEAGUE_PLATINUM: 'bg-[#4ECDC4]',
-  ARENA_LEAGUE_DIAMOND: 'bg-[#7C6FE0]',
-  ARENA_LEAGUE_MASTER: 'bg-[#E64980]',
-}
-const LEAGUE_LABELS: Record<string, string> = {
-  ARENA_LEAGUE_BRONZE: 'Bronze', ARENA_LEAGUE_SILVER: 'Silver',
-  ARENA_LEAGUE_GOLD: 'Gold', ARENA_LEAGUE_PLATINUM: 'Platinum',
-  ARENA_LEAGUE_DIAMOND: 'Diamond', ARENA_LEAGUE_MASTER: 'Master',
-}
+import { LEAGUE_TEXT_COLORS as LEAGUE_COLORS, LEAGUE_BG_COLORS, LEAGUE_LABELS } from '@/shared/lib/league'
 
 export function ArenaHubPage() {
   const { t } = useTranslation()
@@ -95,10 +76,7 @@ export function ArenaHubPage() {
     ]
     if (authUser?.id) {
       promises.push(
-        apiClient.get(`/api/v1/arena/stats/${authUser.id}`).then(r => {
-          const s = (r.data as any)?.stats ?? r.data
-          if (s && typeof s.rating === 'number') setMyStats(s)
-        }).catch(() => {})
+        arenaApi.getPlayerStats(authUser.id).then(s => { if (s) setMyStats(s) })
       )
     }
     Promise.all(promises).catch(() => setError(t('common.loadFailed')))
