@@ -8,6 +8,7 @@ import (
 	"api/internal/app/taskjudge"
 	domain "api/internal/domain/codeeditor"
 
+	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 )
 
@@ -55,11 +56,16 @@ func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID 
 
 	if created.IsCorrect && room.Status == domain.RoomStatusActive {
 		finishedAt := now()
-		if err := s.repo.SetWinner(ctx, room.ID, userID, guestName); err != nil {
-			return nil, err
-		}
+		// FinishDuel first: atomically transitions the room to Finished and records the
+		// winner in code_rooms (authoritative). Must succeed before anything else.
 		if err := s.repo.FinishDuel(ctx, room.ID, userID, guestName, finishedAt); err != nil {
 			return nil, err
+		}
+		// SetWinner updates the denormalized is_winner flag on code_participants.
+		// Best-effort: room is already correctly finished above, so a failure here
+		// is non-fatal — the flag may be stale until the next cleanup pass.
+		if err := s.repo.SetWinner(ctx, room.ID, userID, guestName); err != nil {
+			klog.Errorf("duel: set winner participant flag room=%s: %v", room.ID, err)
 		}
 	}
 

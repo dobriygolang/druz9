@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -90,6 +91,8 @@ func (s *Service) call(ctx context.Context, method string, requestBody any, out 
 	defer resp.Body.Close()
 
 	if resp.StatusCode >= http.StatusBadRequest {
+		// Drain body so the TCP connection can be reused by the pool.
+		_, _ = io.Copy(io.Discard, resp.Body)
 		return fmt.Errorf("telegram api status: %s", resp.Status)
 	}
 

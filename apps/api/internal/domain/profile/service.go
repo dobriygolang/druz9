@@ -64,6 +64,7 @@ type telegramAuthChallengeState struct {
 	expiresAt time.Time
 	confirmed bool
 	loginCode string
+	attempts  int
 }
 
 type yandexAuthStates struct {
@@ -181,6 +182,50 @@ func (s *Service) buildBotStartURL(token string) string {
 		return fmt.Sprintf("https://t.me/%s", url.PathEscape(s.settings.BotUsername))
 	}
 	return fmt.Sprintf("https://t.me/%s?start=%s", url.PathEscape(s.settings.BotUsername), url.QueryEscape(token))
+}
+
+// StartCleanupWorker starts a background goroutine that periodically removes
+// expired Telegram auth challenges to prevent unbounded memory growth.
+// Returns a stop function compatible with closer.AddSync.
+func (s *Service) StartCleanupWorker(ctx context.Context) func() error {
+	ticker := time.NewTicker(s.settings.TelegramAuthMaxAge)
+	go func() {
+		defer ticker.Stop()
+		for {
+			select {
+			case <-ctx.Done():
+				return
+			case <-ticker.C:
+				s.cleanupExpiredChallenges()
+			}
+		}
+	}()
+	return func() error { return nil }
+}
+
+func (s *Service) cleanupExpiredChallenges() {
+	now := s.Now()
+
+	s.auth.mu.Lock()
+	for token, state := range s.auth.byToken {
+		if !state.expiresAt.After(now) {
+			delete(s.auth.byToken, token)
+		}
+	}
+	for code, state := range s.auth.byCode {
+		if !state.expiresAt.After(now) {
+			delete(s.auth.byCode, code)
+		}
+	}
+	s.auth.mu.Unlock()
+
+	s.yandexAuth.mu.Lock()
+	for state, expiresAt := range s.yandexAuth.byState {
+		if !expiresAt.After(now) {
+			delete(s.yandexAuth.byState, state)
+		}
+	}
+	s.yandexAuth.mu.Unlock()
 }
 
 // SetUserActivity updates user activity timestamp in cache.

@@ -73,9 +73,10 @@ func (s *Service) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Matc
 		if err != nil {
 			return nil, err
 		}
-		if refreshed != nil {
-			refreshed.AntiCheatEnabled = s.antiCheatEnabled()
+		if refreshed == nil {
+			return nil, domain.ErrMatchNotFound
 		}
+		refreshed.AntiCheatEnabled = s.antiCheatEnabled()
 		return refreshed, nil
 	}
 	match.AntiCheatEnabled = s.antiCheatEnabled()

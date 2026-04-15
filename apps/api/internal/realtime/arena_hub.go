@@ -18,6 +18,8 @@ const arenaSnapshotFlushInterval = 2 * time.Second
 
 type ArenaHub struct {
 	service arenaStateService
+	ctx     context.Context
+	cancel  context.CancelFunc
 	mu      sync.Mutex
 	matches map[string]*arenaMatchRoom
 }
@@ -52,12 +54,20 @@ var arenaUpgrader = websocket.Upgrader{
 }
 
 func NewArenaHub(service arenaStateService) *ArenaHub {
+	ctx, cancel := context.WithCancel(context.Background())
 	hub := &ArenaHub{
 		service: service,
+		ctx:     ctx,
+		cancel:  cancel,
 		matches: make(map[string]*arenaMatchRoom),
 	}
 	go hub.snapshotLoop()
 	return hub
+}
+
+// Stop shuts down the hub's background goroutine.
+func (h *ArenaHub) Stop() {
+	h.cancel()
 }
 
 func (h *ArenaHub) Handler(matchID string) http.Handler {

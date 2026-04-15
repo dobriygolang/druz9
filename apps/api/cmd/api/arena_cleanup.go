@@ -53,18 +53,22 @@ func startArenaCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, servic
 		}
 	}
 
+	ticker := time.NewTicker(arenaCleanupInterval)
+
 	// Subscribe to config changes
 	_ = rtcManager.WatchValue(ctx, rtc.ArenaIdleTtl, func(oldVar, newVar rtc.Variable) {
 		arenaIdleTTL = newVar.Value().Duration()
 		klog.Infof("arena idle TTL updated to %v", arenaIdleTTL)
 	})
 	_ = rtcManager.WatchValue(ctx, rtc.ArenaCleanupInterval, func(oldVar, newVar rtc.Variable) {
-		arenaCleanupInterval = newVar.Value().Duration()
-		klog.Infof("arena cleanup interval updated to %v", arenaCleanupInterval)
+		if d := newVar.Value().Duration(); d > 0 {
+			arenaCleanupInterval = d
+			ticker.Reset(d)
+			klog.Infof("arena cleanup interval updated to %v", arenaCleanupInterval)
+		}
 	})
 
 	go func() {
-		ticker := time.NewTicker(arenaCleanupInterval)
 		defer ticker.Stop()
 
 		for {

@@ -1,7 +1,6 @@
 package realtime
 
 import (
-	"context"
 	"time"
 
 	"github.com/google/uuid"
@@ -15,7 +14,7 @@ func (h *CodeEditorHub) loadRoomSnapshot(roomID string) {
 		return
 	}
 
-	room, err := h.store.GetRoom(context.Background(), parsedRoomID)
+	room, err := h.store.GetRoom(h.ctx, parsedRoomID)
 	if err != nil {
 		return
 	}
@@ -35,7 +34,12 @@ func (h *CodeEditorHub) snapshotLoop() {
 	ticker := time.NewTicker(snapshotFlushInterval)
 	defer ticker.Stop()
 
-	for range ticker.C {
+	for {
+		select {
+		case <-h.ctx.Done():
+			return
+		case <-ticker.C:
+		}
 		type snapshot struct {
 			roomID string
 			code   string
@@ -64,5 +68,5 @@ func (h *CodeEditorHub) flushSnapshot(roomID, code string) {
 	if err != nil {
 		return
 	}
-	_ = h.store.SaveCodeSnapshot(context.Background(), parsedRoomID, code)
+	_ = h.store.SaveCodeSnapshot(h.ctx, parsedRoomID, code)
 }

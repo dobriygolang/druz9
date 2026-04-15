@@ -91,14 +91,15 @@ func (m *Manager) WatchValue(_ context.Context, key Key, callback VariableChange
 // SetValue updates a config variable value in memory and triggers callbacks.
 func (m *Manager) SetValue(_ context.Context, key Key, value string) error {
 	m.mu.Lock()
-	defer m.mu.Unlock()
 
 	oldVariable, exists := m.variables[key]
 	if !exists {
+		m.mu.Unlock()
 		return fmt.Errorf("config key not found: %s", key)
 	}
 
 	if !oldVariable.Writable {
+		m.mu.Unlock()
 		return fmt.Errorf("config key is not writable: %s", key)
 	}
 
@@ -115,13 +116,14 @@ func (m *Manager) SetValue(_ context.Context, key Key, value string) error {
 
 	m.variables[key] = newVariable
 
-	// Trigger callbacks
+	// Copy callbacks and release the lock before invoking them to avoid
+	// deadlocks if a callback calls back into the Manager (e.g. GetValue).
 	callbacks := append([]VariableChangeCallback(nil), m.callbacks[key]...)
 	m.mu.Unlock()
+
 	for _, callback := range callbacks {
 		callback(oldVariable, newVariable)
 	}
-	m.mu.Lock()
 
 	m.log.Infof("config updated: %s = %s", key, value)
 	return nil

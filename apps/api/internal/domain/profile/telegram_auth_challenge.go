@@ -3,12 +3,15 @@ package profile
 import (
 	"context"
 	"crypto/rand"
+	"crypto/subtle"
 	"fmt"
 	"strings"
 
 	profileerrors "api/internal/errors/profile"
 	"api/internal/model"
 )
+
+const maxLoginCodeAttempts = 5
 
 // CreateTelegramAuthChallenge generates a one-time token for Telegram login.
 func (s *Service) CreateTelegramAuthChallenge(_ context.Context) (*model.TelegramAuthChallenge, error) {
@@ -38,7 +41,7 @@ const telegramLoginCodeLength = 6
 
 // ConfirmTelegramAuth stores Telegram user data for the one-time challenge and returns a one-time website code.
 func (s *Service) ConfirmTelegramAuth(_ context.Context, botToken, challengeToken string, payload model.TelegramAuthPayload) (string, error) {
-	if !s.settings.DevBypass && strings.TrimSpace(botToken) != s.settings.BotToken {
+	if !s.settings.DevBypass && subtle.ConstantTimeCompare([]byte(strings.TrimSpace(botToken)), []byte(s.settings.BotToken)) != 1 {
 		return "", profileerrors.ErrUnauthorized
 	}
 	if payload.ID == 0 {
@@ -125,6 +128,11 @@ func (s *Service) consumeConfirmedTelegramAuthChallenge(challengeToken, loginCod
 	}
 	if state.loginCode != "" {
 		if loginCode == "" || loginCode != state.loginCode {
+			state.attempts++
+			if state.attempts >= maxLoginCodeAttempts {
+				delete(s.auth.byToken, challengeToken)
+				delete(s.auth.byCode, state.loginCode)
+			}
 			return model.TelegramAuthPayload{}, profileerrors.ErrUnauthorized
 		}
 	} else if !state.confirmed {
@@ -138,17 +146,24 @@ func (s *Service) consumeConfirmedTelegramAuthChallenge(challengeToken, loginCod
 	return state.payload, nil
 }
 
+// generateTelegramLoginCode generates a cryptographically random decimal login code.
+// Rejection sampling is used to avoid modulo bias: values >= 250 are discarded
+// because 256 is not evenly divisible by 10 (250 = 25*10 is the largest safe cutoff).
 func generateTelegramLoginCode() (string, error) {
-	bytes := make([]byte, telegramLoginCodeLength)
-	if _, err := rand.Read(bytes); err != nil {
-		return "", fmt.Errorf("generate telegram login code: %w", err)
+	digits := make([]byte, telegramLoginCodeLength)
+	b := [1]byte{}
+	for i := range digits {
+		for {
+			if _, err := rand.Read(b[:]); err != nil {
+				return "", fmt.Errorf("generate telegram login code: %w", err)
+			}
+			if b[0] < 250 {
+				digits[i] = '0' + (b[0] % 10)
+				break
+			}
+		}
 	}
-
-	for index, value := range bytes {
-		bytes[index] = '0' + (value % 10)
-	}
-
-	return string(bytes), nil
+	return string(digits), nil
 }
 
 func normalizeTelegramLoginCode(value string) string {

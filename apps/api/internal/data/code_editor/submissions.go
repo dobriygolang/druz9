@@ -46,6 +46,9 @@ func (r *Repo) GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*codeedi
 		}
 		submissions = append(submissions, &s)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate submissions: %w", err)
+	}
 	return submissions, nil
 }
 

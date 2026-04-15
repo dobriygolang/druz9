@@ -1,7 +1,6 @@
 package realtime
 
 import (
-	"context"
 	"time"
 
 	"api/internal/model"
@@ -27,7 +26,7 @@ func (h *ArenaHub) ensureMatchLoaded(matchID string) {
 	if err != nil {
 		return
 	}
-	match, err := h.service.GetMatch(context.Background(), parsedMatchID)
+	match, err := h.service.GetMatch(h.ctx, parsedMatchID)
 	if err != nil || match == nil {
 		return
 	}
@@ -143,7 +142,12 @@ func (h *ArenaHub) snapshotLoop() {
 	ticker := time.NewTicker(arenaSnapshotFlushInterval)
 	defer ticker.Stop()
 
-	for range ticker.C {
+	for {
+		select {
+		case <-h.ctx.Done():
+			return
+		case <-ticker.C:
+		}
 		type snapshot struct {
 			matchID string
 			codes   map[string]*schema.ArenaPlayerCode
@@ -192,7 +196,7 @@ func (h *ArenaHub) flushSnapshot(matchID string, codes map[string]*schema.ArenaP
 	}
 
 	if len(codesMap) > 0 {
-		_ = h.service.SavePlayerCodes(context.Background(), parsedMatchID, codesMap)
+		_ = h.service.SavePlayerCodes(h.ctx, parsedMatchID, codesMap)
 	}
 }
 

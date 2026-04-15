@@ -26,11 +26,15 @@ func (h *CodeEditorHub) addClient(client *codeEditorClient) {
 }
 
 func (h *CodeEditorHub) removeClient(client *codeEditorClient) {
+	var pendingCode string
+	var pendingFlush bool
+
 	h.mu.Lock()
 	room := h.rooms[client.roomID]
 	if room != nil {
 		if room.dirty {
-			h.flushSnapshot(client.roomID, room.lastPlainText)
+			pendingCode = room.lastPlainText
+			pendingFlush = true
 			room.dirty = false
 		}
 		delete(room.clients, client)
@@ -53,6 +57,10 @@ func (h *CodeEditorHub) removeClient(client *codeEditorClient) {
 		}
 	}
 	h.mu.Unlock()
+
+	if pendingFlush {
+		h.flushSnapshot(client.roomID, pendingCode)
+	}
 
 	close(client.send)
 	_ = client.ws.Close()

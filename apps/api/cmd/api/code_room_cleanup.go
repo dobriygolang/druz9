@@ -48,18 +48,22 @@ func startCodeRoomCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, ser
 		}
 	}
 
+	ticker := time.NewTicker(codeRoomCleanupInterval)
+
 	// Subscribe to config changes
 	_ = rtcManager.WatchValue(ctx, rtc.CodeRoomIdleTtl, func(oldVar, newVar rtc.Variable) {
 		codeRoomIdleTTL = newVar.Value().Duration()
 		klog.Infof("code room idle TTL updated to %v", codeRoomIdleTTL)
 	})
 	_ = rtcManager.WatchValue(ctx, rtc.CodeRoomCleanupInterval, func(oldVar, newVar rtc.Variable) {
-		codeRoomCleanupInterval = newVar.Value().Duration()
-		klog.Infof("code room cleanup interval updated to %v", codeRoomCleanupInterval)
+		if d := newVar.Value().Duration(); d > 0 {
+			codeRoomCleanupInterval = d
+			ticker.Reset(d)
+			klog.Infof("code room cleanup interval updated to %v", codeRoomCleanupInterval)
+		}
 	})
 
 	go func() {
-		ticker := time.NewTicker(codeRoomCleanupInterval)
 		defer ticker.Stop()
 
 		for {

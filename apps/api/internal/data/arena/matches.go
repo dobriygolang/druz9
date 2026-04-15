@@ -108,6 +108,9 @@ func (r *Repo) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, 
 		copyPlayer := player
 		match.Players = append(match.Players, &copyPlayer)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate arena players: %w", err)
+	}
 
 	return &match, nil
 }
@@ -136,6 +139,9 @@ func (r *Repo) ListOpenMatchIDs(ctx context.Context, limit int32) ([]uuid.UUID, 
 			return nil, fmt.Errorf("scan open arena match id: %w", err)
 		}
 		ids = append(ids, id)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate open arena match ids: %w", err)
 	}
 	return ids, nil
 }

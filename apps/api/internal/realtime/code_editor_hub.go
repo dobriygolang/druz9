@@ -1,6 +1,7 @@
 package realtime
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -13,7 +14,9 @@ import (
 )
 
 type CodeEditorHub struct {
-	store codeeditordomain.Repository
+	store  codeeditordomain.Repository
+	ctx    context.Context
+	cancel context.CancelFunc
 
 	mu    sync.Mutex
 	rooms map[string]*codeEditorRoom
@@ -46,12 +49,20 @@ var codeEditorUpgrader = websocket.Upgrader{
 }
 
 func NewCodeEditorHub(store codeeditordomain.Repository) *CodeEditorHub {
+	ctx, cancel := context.WithCancel(context.Background())
 	hub := &CodeEditorHub{
-		store: store,
-		rooms: make(map[string]*codeEditorRoom),
+		store:  store,
+		ctx:    ctx,
+		cancel: cancel,
+		rooms:  make(map[string]*codeEditorRoom),
 	}
 	go hub.snapshotLoop()
 	return hub
+}
+
+// Stop shuts down the hub's background goroutine.
+func (h *CodeEditorHub) Stop() {
+	h.cancel()
 }
 
 func (h *CodeEditorHub) Handler(roomID string) http.Handler {
