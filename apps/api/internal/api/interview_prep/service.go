@@ -4,8 +4,8 @@ import (
 	"context"
 
 	appinterviewprep "api/internal/app/interviewprep"
+	notif "api/internal/clients/notification"
 	"api/internal/model"
-	notif "api/internal/notification"
 	v1 "api/pkg/api/interview_prep/v1"
 
 	"github.com/google/uuid"

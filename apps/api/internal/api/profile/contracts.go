@@ -13,10 +13,10 @@ import (
 type Service interface {
 	CreateTelegramAuthChallenge(context.Context) (*model.TelegramAuthChallenge, error)
 	ConfirmTelegramAuth(context.Context, string, string, model.TelegramAuthPayload) (string, error)
-	TelegramAuth(context.Context, string, string) (*model.ProfileResponse, string, time.Time, error)
+	TelegramAuth(context.Context, string, string) (*model.ProfileResponse, string, time.Time, int64, error)
 	StartYandexAuth(context.Context) (*model.YandexAuthStart, error)
 	YandexAuth(context.Context, string, string) (*model.ProfileResponse, string, time.Time, error)
-	BindTelegram(context.Context, uuid.UUID, string, string) (*model.ProfileResponse, error)
+	BindTelegram(context.Context, uuid.UUID, string, string) (*model.ProfileResponse, int64, error)
 	CompleteRegistration(context.Context, uuid.UUID, model.CompleteRegistrationRequest) (*model.ProfileResponse, string, time.Time, error)
 	GetProfileByID(context.Context, uuid.UUID) (*model.ProfileResponse, error)
 	UpdateLocation(context.Context, uuid.UUID, model.CompleteRegistrationRequest) (*model.ProfileResponse, error)

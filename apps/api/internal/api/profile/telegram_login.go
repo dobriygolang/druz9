@@ -8,9 +8,13 @@ import (
 )
 
 func (i *Implementation) TelegramAuth(ctx context.Context, req *v1.TelegramAuthRequest) (*v1.ProfileResponse, error) {
-	response, rawToken, expiresAt, err := i.service.TelegramAuth(ctx, req.Token, req.Code)
+	response, rawToken, expiresAt, telegramID, err := i.service.TelegramAuth(ctx, req.Token, req.Code)
 	if err != nil {
 		return nil, err
+	}
+
+	if i.notif != nil && response != nil && response.User != nil && telegramID != 0 {
+		i.notif.LinkTelegram(ctx, response.User.ID.String(), telegramID)
 	}
 
 	i.cookie.SetSessionCookie(ctx, rawToken, expiresAt)

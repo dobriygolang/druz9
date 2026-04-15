@@ -5,9 +5,9 @@ import (
 
 	apparena "api/internal/app/arena"
 	"api/internal/app/solutionreview"
+	notif "api/internal/clients/notification"
 	domain "api/internal/domain/arena"
 	"api/internal/model"
-	notif "api/internal/notification"
 	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/arena/v1"
 

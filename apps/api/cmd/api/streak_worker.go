@@ -1,14 +1,12 @@
 package main
 
 import (
+	"api/internal/clients/notification"
 	"context"
-	"fmt"
 	"time"
 
-	"api/internal/notification"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 	klog "github.com/go-kratos/kratos/v2/log"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // startStreakWarningWorker runs a periodic check (every hour) for users whose streaks
@@ -83,7 +81,7 @@ func sendStreakWarnings(ctx context.Context, notif notification.Sender, db *pgxp
 		if err := rows.Scan(&userID); err != nil {
 			continue
 		}
-		body := fmt.Sprintf("Твой streak под угрозой!\nЗаверши хотя бы одну задачу сегодня, чтобы сохранить его.")
+		body := "Твой streak под угрозой!\nЗаверши хотя бы одну задачу сегодня, чтобы сохранить его."
 		notif.Send(ctx, userID, "streak_warning", "Streak под угрозой", body, map[string]any{})
 		count++
 	}

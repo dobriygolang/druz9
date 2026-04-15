@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"api/internal/api/profile/mocks"
+	notif "api/internal/clients/notification"
 	"api/internal/model"
 	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/profile/v1"
@@ -33,12 +34,12 @@ func TestTelegramAuth(t *testing.T) {
 		expiresAt := time.Now().Add(time.Hour)
 
 		mockService := mocks.NewService(t)
-		mockService.On("TelegramAuth", mock.Anything, "", "123456").Return(expectedResponse, rawToken, expiresAt, nil).Once()
+		mockService.On("TelegramAuth", mock.Anything, "", "123456").Return(expectedResponse, rawToken, expiresAt, int64(123), nil).Once()
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 		mockCookie.On("SetSessionCookie", mock.Anything, rawToken, expiresAt).Once()
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 
 		resp, err := impl.TelegramAuth(context.Background(), req)
 		if err != nil {
@@ -57,11 +58,11 @@ func TestTelegramAuth(t *testing.T) {
 
 		expectedErr := errors.New("auth failed")
 		mockService := mocks.NewService(t)
-		mockService.On("TelegramAuth", mock.Anything, "challenge-token", "").Return(nil, "", time.Time{}, expectedErr).Once()
+		mockService.On("TelegramAuth", mock.Anything, "challenge-token", "").Return(nil, "", time.Time{}, int64(0), expectedErr).Once()
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 
 		_, err := impl.TelegramAuth(context.Background(), &v1.TelegramAuthRequest{Token: "challenge-token"})
 		if !errors.Is(err, expectedErr) {
@@ -80,7 +81,7 @@ func TestCreateTelegramAuthChallenge(t *testing.T) {
 		ExpiresAt:   time.Now().Add(time.Minute),
 	}, nil).Once()
 
-	impl := New(mockService, mocks.NewSessionCookieManager(t), nil)
+	impl := New(mockService, mocks.NewSessionCookieManager(t), nil, notif.Noop{})
 
 	resp, err := impl.CreateTelegramAuthChallenge(context.Background(), &v1.CreateTelegramAuthChallengeRequest{})
 	if err != nil {
@@ -103,7 +104,7 @@ func TestConfirmTelegramAuth(t *testing.T) {
 		PhotoURL:  "https://example.com/avatar.jpg",
 	}).Return("123456", nil).Once()
 
-	impl := New(mockService, mocks.NewSessionCookieManager(t), nil)
+	impl := New(mockService, mocks.NewSessionCookieManager(t), nil, notif.Noop{})
 
 	resp, err := impl.ConfirmTelegramAuth(context.Background(), &v1.ConfirmTelegramAuthRequest{
 		Token:      "challenge-token",
@@ -141,7 +142,7 @@ func TestGetProfileByID(t *testing.T) {
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 		req := &v1.GetProfileByIDRequest{UserId: userID.String()}
 
 		resp, err := impl.GetProfileByID(context.Background(), req)
@@ -171,7 +172,7 @@ func TestLogout(t *testing.T) {
 		mockCookie := mocks.NewSessionCookieManager(t)
 		mockCookie.On("ClearSessionCookie", mock.Anything).Once()
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 
 		// Create context with user and session
 		user := &model.User{ID: userID}
@@ -193,7 +194,7 @@ func TestLogout(t *testing.T) {
 		mockService := mocks.NewService(t)
 		mockCookie := mocks.NewSessionCookieManager(t)
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 
 		_, err := impl.Logout(context.Background(), &v1.LogoutRequest{})
 		if err == nil {
@@ -225,7 +226,7 @@ func TestCompleteRegistration(t *testing.T) {
 		mockCookie := mocks.NewSessionCookieManager(t)
 		mockCookie.On("SetSessionCookie", mock.Anything, rawToken, expiresAt).Once()
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 
 		// Create context with user
 		user := &model.User{ID: userID}
@@ -261,7 +262,7 @@ func TestUpdateProfile(t *testing.T) {
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 
 		// Create context with user
 		user := &model.User{ID: userID}
@@ -302,7 +303,7 @@ func TestUpdateLocation(t *testing.T) {
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 
 		user := &model.User{ID: userID}
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
@@ -324,7 +325,7 @@ func TestUpdateLocation(t *testing.T) {
 		mockService := mocks.NewService(t)
 		mockCookie := mocks.NewSessionCookieManager(t)
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 
 		_, err := impl.UpdateLocation(context.Background(), &v1.UpdateLocationRequest{})
 		if err == nil {
@@ -349,11 +350,11 @@ func TestBindTelegram(t *testing.T) {
 		}
 
 		mockService := mocks.NewService(t)
-		mockService.On("BindTelegram", mock.Anything, userID, "challenge-token", "123456").Return(expectedResponse, nil).Once()
+		mockService.On("BindTelegram", mock.Anything, userID, "challenge-token", "123456").Return(expectedResponse, int64(123), nil).Once()
 
 		mockCookie := mocks.NewSessionCookieManager(t)
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 
 		user := &model.User{ID: userID}
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
@@ -375,7 +376,7 @@ func TestBindTelegram(t *testing.T) {
 		mockService := mocks.NewService(t)
 		mockCookie := mocks.NewSessionCookieManager(t)
 
-		impl := New(mockService, mockCookie, nil)
+		impl := New(mockService, mockCookie, nil, notif.Noop{})
 
 		_, err := impl.BindTelegram(context.Background(), &v1.BindTelegramRequest{})
 		if err == nil {

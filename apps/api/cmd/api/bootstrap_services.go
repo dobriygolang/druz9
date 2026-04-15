@@ -5,7 +5,6 @@ import (
 	adminservice "api/internal/api/admin"
 	arenaservice "api/internal/api/arena"
 	circleservice "api/internal/api/circle"
-	"api/internal/notification"
 	codeeditorservice "api/internal/api/code_editor"
 	eventservice "api/internal/api/event"
 	geoservice "api/internal/api/geo"
@@ -17,6 +16,8 @@ import (
 	appcodeeditor "api/internal/app/codeeditor"
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/app/solutionreview"
+	"api/internal/clients/notification"
+	"api/internal/closer"
 	admindomainservice "api/internal/domain/admin"
 	circledomainservice "api/internal/domain/circle"
 	eventdomainservice "api/internal/domain/event"
@@ -107,7 +108,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		ProfileRepository: storage.profileRepo,
 	})
 	geoServiceDomain := geodomainservice.NewGeoService(geodomainservice.Config{
-		Resolver:      storage.geoClient,
+		Resolver:      storage.geoResolver,
 		ActivityCache: profileServiceDomain.ActivityCache(),
 	})
 	circleServiceDomain := circledomainservice.NewService(circledomainservice.Config{
@@ -164,6 +165,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		if adapterErr != nil {
 			return nil, adapterErr
 		}
+		closer.AddSync(adapter.Close)
 		notifSender = adapter
 	}
 
@@ -184,7 +186,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		realtimeHub:             realtimeHub,
 		arenaRealtimeHub:        arenaRealtimeHub,
 		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager, storage.profileRepo, profileServiceDomain),
-		profileService:          profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo)),
+		profileService:          profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo), notifSender),
 		geoService:              geoservice.New(geoServiceDomain),
 		circleService:           circleservice.New(circleServiceDomain, eventServiceDomain, notifSender),
 		eventService:            eventservice.New(eventServiceDomain),

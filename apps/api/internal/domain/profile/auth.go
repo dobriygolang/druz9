@@ -11,10 +11,10 @@ import (
 )
 
 // TelegramAuth authenticates user via Telegram challenge token and one-time code.
-func (s *Service) TelegramAuth(ctx context.Context, challengeToken, loginCode string) (*model.ProfileResponse, string, time.Time, error) {
+func (s *Service) TelegramAuth(ctx context.Context, challengeToken, loginCode string) (*model.ProfileResponse, string, time.Time, int64, error) {
 	payload, err := s.consumeConfirmedTelegramAuthChallenge(challengeToken, loginCode)
 	if err != nil {
-		return nil, "", time.Time{}, err
+		return nil, "", time.Time{}, 0, err
 	}
 
 	user, err := s.repo.UpsertUserByIdentity(ctx, model.IdentityAuthPayload{
@@ -26,18 +26,18 @@ func (s *Service) TelegramAuth(ctx context.Context, challengeToken, loginCode st
 		AvatarURL:      payload.PhotoURL,
 	})
 	if err != nil {
-		return nil, "", time.Time{}, err
+		return nil, "", time.Time{}, 0, err
 	}
 
 	rawToken, session, err := s.NewSession(ctx, user.ID)
 	if err != nil {
-		return nil, "", time.Time{}, err
+		return nil, "", time.Time{}, 0, err
 	}
 
 	return &model.ProfileResponse{
 		User:                 user,
 		NeedsProfileComplete: user.Status == model.UserStatusPendingProfile,
-	}, rawToken, session.ExpiresAt, nil
+	}, rawToken, session.ExpiresAt, payload.ID, nil
 }
 
 // AuthenticateByToken authenticates user by session token.

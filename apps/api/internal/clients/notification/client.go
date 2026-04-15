@@ -14,7 +14,7 @@ type Sender interface {
 // Noop is a no-op implementation used when notifications are disabled.
 type Noop struct{}
 
-func (Noop) Send(context.Context, string, string, string, string, map[string]any) {}
+func (Noop) Send(context.Context, string, string, string, string, map[string]any)        {}
 func (Noop) SendBatch(context.Context, []string, string, string, string, map[string]any) {}
-func (Noop) RegisterChat(context.Context, string, int64)                              {}
-func (Noop) LinkTelegram(context.Context, string, int64)                              {}
+func (Noop) RegisterChat(context.Context, string, int64)                                 {}
+func (Noop) LinkTelegram(context.Context, string, int64)                                 {}

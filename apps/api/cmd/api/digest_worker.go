@@ -1,14 +1,13 @@
 package main
 
 import (
+	"api/internal/clients/notification"
 	"context"
 	"fmt"
 	"time"
 
-	"api/internal/notification"
-
-	"github.com/jackc/pgx/v5/pgxpool"
 	klog "github.com/go-kratos/kratos/v2/log"
+	"github.com/jackc/pgx/v5/pgxpool"
 )
 
 // startCircleDigestWorker sends weekly circle digests every Monday at ~10:00.
@@ -100,7 +99,7 @@ func sendCircleDigests(ctx context.Context, notif notification.Sender, db *pgxpo
 
 		body := fmt.Sprintf("📊 Круг \"%s\" — итоги недели\n👥 Участников: %d", c.name, c.memberCount)
 		notif.SendBatch(ctx, memberIDs, "circle_weekly_digest", "Недельный digest", body, map[string]any{
-			"circle_id": c.id,
+			"circle_id":   c.id,
 			"circle_name": c.name,
 		})
 	}

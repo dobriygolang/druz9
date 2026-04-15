@@ -7,7 +7,7 @@ import (
 	"api/internal/model"
 )
 
-func (c *Client) ListCommunityPoints(ctx context.Context, currentUserID string) ([]*model.CommunityMapPoint, error) {
+func (r *Repo) ListCommunityPoints(ctx context.Context, currentUserID string) ([]*model.CommunityMapPoint, error) {
 	const query = `
 SELECT
   u.id::text,
@@ -32,7 +32,7 @@ ORDER BY COALESCE(u.last_active_at, u.updated_at, u.created_at, NOW()) DESC, u.c
 LIMIT 250
 `
 
-	rows, err := c.data.DB.Query(ctx, query, model.UserStatusActive)
+	rows, err := r.data.DB.Query(ctx, query, model.UserStatusActive)
 	if err != nil {
 		return nil, fmt.Errorf("query community map points: %w", err)
 	}

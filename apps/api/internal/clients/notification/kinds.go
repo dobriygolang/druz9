@@ -26,8 +26,5 @@ var kindToProto = map[string]v1.NotificationKind{
 
 func protoNotificationKind(kind string) (v1.NotificationKind, bool) {
 	value, ok := kindToProto[kind]
-	if !ok {
-		return v1.NotificationKind_NOTIFICATION_KIND_UNSPECIFIED, false
-	}
-	return value, true
+	return value, ok
 }

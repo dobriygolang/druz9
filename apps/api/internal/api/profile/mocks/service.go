@@ -27,7 +27,7 @@ func (_m *Service) EXPECT() *Service_Expecter {
 }
 
 // BindTelegram provides a mock function with given fields: _a0, _a1, _a2, _a3
-func (_m *Service) BindTelegram(_a0 context.Context, _a1 uuid.UUID, _a2 string, _a3 string) (*model.ProfileResponse, error) {
+func (_m *Service) BindTelegram(_a0 context.Context, _a1 uuid.UUID, _a2 string, _a3 string) (*model.ProfileResponse, int64, error) {
 	ret := _m.Called(_a0, _a1, _a2, _a3)
 
 	if len(ret) == 0 {
@@ -35,8 +35,9 @@ func (_m *Service) BindTelegram(_a0 context.Context, _a1 uuid.UUID, _a2 string, 
 	}
 
 	var r0 *model.ProfileResponse
-	var r1 error
-	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, string) (*model.ProfileResponse, error)); ok {
+	var r1 int64
+	var r2 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, string) (*model.ProfileResponse, int64, error)); ok {
 		return rf(_a0, _a1, _a2, _a3)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, string) *model.ProfileResponse); ok {
@@ -47,13 +48,19 @@ func (_m *Service) BindTelegram(_a0 context.Context, _a1 uuid.UUID, _a2 string, 
 		}
 	}
 
-	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string, string) error); ok {
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string, string) int64); ok {
 		r1 = rf(_a0, _a1, _a2, _a3)
 	} else {
-		r1 = ret.Error(1)
+		r1 = ret.Get(1).(int64)
 	}
 
-	return r0, r1
+	if rf, ok := ret.Get(2).(func(context.Context, uuid.UUID, string, string) error); ok {
+		r2 = rf(_a0, _a1, _a2, _a3)
+	} else {
+		r2 = ret.Error(2)
+	}
+
+	return r0, r1, r2
 }
 
 // Service_BindTelegram_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'BindTelegram'
@@ -77,12 +84,12 @@ func (_c *Service_BindTelegram_Call) Run(run func(_a0 context.Context, _a1 uuid.
 	return _c
 }
 
-func (_c *Service_BindTelegram_Call) Return(_a0 *model.ProfileResponse, _a1 error) *Service_BindTelegram_Call {
-	_c.Call.Return(_a0, _a1)
+func (_c *Service_BindTelegram_Call) Return(_a0 *model.ProfileResponse, _a1 int64, _a2 error) *Service_BindTelegram_Call {
+	_c.Call.Return(_a0, _a1, _a2)
 	return _c
 }
 
-func (_c *Service_BindTelegram_Call) RunAndReturn(run func(context.Context, uuid.UUID, string, string) (*model.ProfileResponse, error)) *Service_BindTelegram_Call {
+func (_c *Service_BindTelegram_Call) RunAndReturn(run func(context.Context, uuid.UUID, string, string) (*model.ProfileResponse, int64, error)) *Service_BindTelegram_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -533,7 +540,7 @@ func (_c *Service_StartYandexAuth_Call) RunAndReturn(run func(context.Context) (
 }
 
 // TelegramAuth provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) TelegramAuth(_a0 context.Context, _a1 string, _a2 string) (*model.ProfileResponse, string, time.Time, error) {
+func (_m *Service) TelegramAuth(_a0 context.Context, _a1 string, _a2 string) (*model.ProfileResponse, string, time.Time, int64, error) {
 	ret := _m.Called(_a0, _a1, _a2)
 
 	if len(ret) == 0 {
@@ -543,8 +550,9 @@ func (_m *Service) TelegramAuth(_a0 context.Context, _a1 string, _a2 string) (*m
 	var r0 *model.ProfileResponse
 	var r1 string
 	var r2 time.Time
-	var r3 error
-	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*model.ProfileResponse, string, time.Time, error)); ok {
+	var r3 int64
+	var r4 error
+	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*model.ProfileResponse, string, time.Time, int64, error)); ok {
 		return rf(_a0, _a1, _a2)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) *model.ProfileResponse); ok {
@@ -567,13 +575,19 @@ func (_m *Service) TelegramAuth(_a0 context.Context, _a1 string, _a2 string) (*m
 		r2 = ret.Get(2).(time.Time)
 	}
 
-	if rf, ok := ret.Get(3).(func(context.Context, string, string) error); ok {
+	if rf, ok := ret.Get(3).(func(context.Context, string, string) int64); ok {
 		r3 = rf(_a0, _a1, _a2)
 	} else {
-		r3 = ret.Error(3)
+		r3 = ret.Get(3).(int64)
 	}
 
-	return r0, r1, r2, r3
+	if rf, ok := ret.Get(4).(func(context.Context, string, string) error); ok {
+		r4 = rf(_a0, _a1, _a2)
+	} else {
+		r4 = ret.Error(4)
+	}
+
+	return r0, r1, r2, r3, r4
 }
 
 // Service_TelegramAuth_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'TelegramAuth'
@@ -596,12 +610,12 @@ func (_c *Service_TelegramAuth_Call) Run(run func(_a0 context.Context, _a1 strin
 	return _c
 }
 
-func (_c *Service_TelegramAuth_Call) Return(_a0 *model.ProfileResponse, _a1 string, _a2 time.Time, _a3 error) *Service_TelegramAuth_Call {
-	_c.Call.Return(_a0, _a1, _a2, _a3)
+func (_c *Service_TelegramAuth_Call) Return(_a0 *model.ProfileResponse, _a1 string, _a2 time.Time, _a3 int64, _a4 error) *Service_TelegramAuth_Call {
+	_c.Call.Return(_a0, _a1, _a2, _a3, _a4)
 	return _c
 }
 
-func (_c *Service_TelegramAuth_Call) RunAndReturn(run func(context.Context, string, string) (*model.ProfileResponse, string, time.Time, error)) *Service_TelegramAuth_Call {
+func (_c *Service_TelegramAuth_Call) RunAndReturn(run func(context.Context, string, string) (*model.ProfileResponse, string, time.Time, int64, error)) *Service_TelegramAuth_Call {
 	_c.Call.Return(run)
 	return _c
 }

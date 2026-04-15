@@ -3,8 +3,8 @@ package main
 import (
 	"context"
 
+	"api/internal/clients/notification"
 	profiledomain "api/internal/domain/profile"
-	"api/internal/notification"
 	"api/internal/telegrambot"
 )
 

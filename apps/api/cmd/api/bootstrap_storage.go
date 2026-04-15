@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 
+	"api/internal/clients/geocoder"
 	"api/internal/closer"
 	arenadata "api/internal/data/arena"
 	circledata "api/internal/data/circle"
@@ -14,7 +15,9 @@ import (
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
 	solutionreviewdata "api/internal/data/solution_review"
+	geodomain "api/internal/domain/geo"
 	referraldomainservice "api/internal/domain/referral"
+	"api/internal/model"
 	"api/internal/storage/postgres"
 	s3storage "api/internal/storage/s3"
 )
@@ -22,7 +25,7 @@ import (
 type storageContext struct {
 	store              *postgres.Store
 	storageClient      *s3storage.Service
-	geoClient          *geodata.Client
+	geoResolver        geodomain.Resolver
 	profileRepo        *profiledata.Repo
 	eventRepo          *eventdata.Repo
 	circleRepo         *circledata.Repo
@@ -74,7 +77,7 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 	return &storageContext{
 		store:              store,
 		storageClient:      storageClient,
-		geoClient:          geodata.NewClient(bootstrap.cfg, store, bootstrap.kratosLogger),
+		geoResolver:        newGeoResolver(geocoder.New(bootstrap.cfg, bootstrap.kratosLogger), geodata.NewRepo(store)),
 		profileRepo:        profiledata.NewRepo(store, bootstrap.kratosLogger),
 		eventRepo:          eventdata.NewRepo(store, bootstrap.kratosLogger),
 		circleRepo:         circledata.NewRepo(store, bootstrap.kratosLogger),
@@ -85,4 +88,21 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 		interviewRepo:      interviewprepdata.New(store, bootstrap.kratosLogger),
 		solutionReviewRepo: solutionreviewdata.NewRepo(store),
 	}, nil
+}
+
+type geoResolver struct {
+	geocoder *geocoder.Client
+	repo     *geodata.Repo
+}
+
+func newGeoResolver(geocoderClient *geocoder.Client, repo *geodata.Repo) geodomain.Resolver {
+	return &geoResolver{geocoder: geocoderClient, repo: repo}
+}
+
+func (r *geoResolver) Resolve(ctx context.Context, query string, limit int) ([]*model.GeoCandidate, error) {
+	return r.geocoder.Resolve(ctx, query, limit)
+}
+
+func (r *geoResolver) ListCommunityPoints(ctx context.Context, currentUserID string) ([]*model.CommunityMapPoint, error) {
+	return r.repo.ListCommunityPoints(ctx, currentUserID)
 }

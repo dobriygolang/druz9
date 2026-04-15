@@ -10,10 +10,10 @@ import (
 )
 
 // BindTelegram binds Telegram account to existing user profile.
-func (s *Service) BindTelegram(ctx context.Context, userID uuid.UUID, challengeToken, loginCode string) (*model.ProfileResponse, error) {
+func (s *Service) BindTelegram(ctx context.Context, userID uuid.UUID, challengeToken, loginCode string) (*model.ProfileResponse, int64, error) {
 	payload, err := s.consumeConfirmedTelegramAuthChallenge(challengeToken, loginCode)
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	user, err := s.repo.BindIdentity(ctx, userID, model.IdentityAuthPayload{
@@ -25,11 +25,11 @@ func (s *Service) BindTelegram(ctx context.Context, userID uuid.UUID, challengeT
 		AvatarURL:      payload.PhotoURL,
 	})
 	if err != nil {
-		return nil, err
+		return nil, 0, err
 	}
 
 	return &model.ProfileResponse{
 		User:                 user,
 		NeedsProfileComplete: false,
-	}, nil
+	}, payload.ID, nil
 }

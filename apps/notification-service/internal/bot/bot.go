@@ -79,9 +79,18 @@ func (b *Bot) Run(ctx context.Context) error {
 
 		for _, update := range updates {
 			offset = update.UpdateID + 1
-			b.handleUpdate(ctx, update)
+			b.safeHandleUpdate(ctx, update)
 		}
 	}
+}
+
+func (b *Bot) safeHandleUpdate(ctx context.Context, update telegramUpdate) {
+	defer func() {
+		if recovered := recover(); recovered != nil {
+			klog.Errorf("bot handleUpdate panic: %v", recovered)
+		}
+	}()
+	b.handleUpdate(ctx, update)
 }
 
 func (b *Bot) handleUpdate(ctx context.Context, update telegramUpdate) {
@@ -93,12 +102,14 @@ func (b *Bot) handleUpdate(ctx context.Context, update telegramUpdate) {
 		return
 	}
 
-	text := strings.TrimSpace(update.Message.Text)
-	command := strings.ToLower(strings.Split(strings.Fields(text)[0], "@")[0])
+	command, token := parseCommand(update.Message.Text)
+	if command == "" {
+		return
+	}
 
 	switch command {
 	case "/start":
-		b.handleStart(ctx, update.Message)
+		b.handleStart(ctx, update.Message, token)
 	case "/settings":
 		b.handleSettings(ctx, update.Message)
 	case "/stop":
@@ -106,31 +117,25 @@ func (b *Bot) handleUpdate(ctx context.Context, update telegramUpdate) {
 	}
 }
 
-func (b *Bot) handleStart(ctx context.Context, msg *telegramMessage) {
-	fields := strings.Fields(msg.Text)
-	token := ""
-	if len(fields) >= 2 {
-		token = strings.TrimSpace(fields[1])
-	}
-
+func (b *Bot) handleStart(ctx context.Context, msg *telegramMessage, token string) {
 	if token == "" {
-		b.tg.SendMessage(ctx, msg.Chat.ID, "Привет! Я бот druz9.\n\nДля входа перейди на сайт и нажми «Войти через Telegram».")
+		b.sendMessage(ctx, msg.Chat.ID, "Привет! Я бот druz9.\n\nДля входа перейди на сайт и нажми «Войти через Telegram».")
 		return
 	}
 
 	if b.auth == nil {
-		b.tg.SendMessage(ctx, msg.Chat.ID, "Auth service не настроен.")
+		b.sendMessage(ctx, msg.Chat.ID, "Auth service не настроен.")
 		return
 	}
 
 	code, err := b.auth.ConfirmTelegramAuth(ctx, token, msg.From.ID, msg.From.FirstName, msg.From.LastName, msg.From.Username, "")
 	if err != nil {
 		klog.Errorf("bot confirm auth: %v", err)
-		b.tg.SendMessage(ctx, msg.Chat.ID, "Не удалось подтвердить вход. Вернись в приложение и попробуй ещё раз.")
+		b.sendMessage(ctx, msg.Chat.ID, "Не удалось подтвердить вход. Вернись в приложение и попробуй ещё раз.")
 		return
 	}
 
-	b.tg.SendMessage(ctx, msg.Chat.ID, fmt.Sprintf("Код входа: %s\n\nВернись на сайт и введи его в форме авторизации.", code))
+	b.sendMessage(ctx, msg.Chat.ID, fmt.Sprintf("Код входа: %s\n\nВернись на сайт и введи его в форме авторизации.", code))
 
 	// Register chat_id for future notifications. The user_id will be linked after login.
 	if err := b.repo.RegisterChatByTelegramID(ctx, msg.From.ID, msg.Chat.ID); err != nil {
@@ -140,14 +145,14 @@ func (b *Bot) handleStart(ctx context.Context, msg *telegramMessage) {
 }
 
 func (b *Bot) handleSettings(ctx context.Context, msg *telegramMessage) {
-	b.tg.SendMessage(ctx, msg.Chat.ID,
+	b.sendMessage(ctx, msg.Chat.ID,
 		"Настройки уведомлений:\n\n"+
 			"Управляй уведомлениями в профиле на сайте.\n"+
 			"Чтобы отключить все уведомления, отправь /stop")
 }
 
 func (b *Bot) handleStop(ctx context.Context, msg *telegramMessage) {
-	b.tg.SendMessage(ctx, msg.Chat.ID, "Уведомления отключены. Чтобы включить снова, напиши /start")
+	b.sendMessage(ctx, msg.Chat.ID, "Уведомления отключены. Чтобы включить снова, напиши /start")
 }
 
 func (b *Bot) handleCallback(ctx context.Context, cb *telegramCallback) {
@@ -255,4 +260,23 @@ func (b *Bot) callAndDecode(ctx context.Context, method string, body map[string]
 		return fmt.Errorf("telegram api error: %s", meta.Error)
 	}
 	return json.Unmarshal(bodyBytes, out)
+}
+
+func (b *Bot) sendMessage(ctx context.Context, chatID int64, text string) {
+	if err := b.tg.SendMessage(ctx, chatID, text); err != nil {
+		klog.Errorf("bot sendMessage chat_id=%d: %v", chatID, err)
+	}
+}
+
+func parseCommand(text string) (string, string) {
+	fields := strings.Fields(strings.TrimSpace(text))
+	if len(fields) == 0 {
+		return "", ""
+	}
+
+	command := strings.ToLower(strings.Split(fields[0], "@")[0])
+	if len(fields) < 2 {
+		return command, ""
+	}
+	return command, strings.TrimSpace(fields[1])
 }

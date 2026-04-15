@@ -16,9 +16,12 @@ func (i *Implementation) BindTelegram(ctx context.Context, req *v1.BindTelegramR
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
 	}
 
-	_, err := i.service.BindTelegram(ctx, user.ID, req.Token, req.Code)
+	_, telegramID, err := i.service.BindTelegram(ctx, user.ID, req.Token, req.Code)
 	if err != nil {
 		return nil, err
+	}
+	if i.notif != nil && telegramID != 0 {
+		i.notif.LinkTelegram(ctx, user.ID.String(), telegramID)
 	}
 
 	return &v1.ProfileStatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil

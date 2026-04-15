@@ -402,7 +402,7 @@ func TestTelegramAuth(t *testing.T) {
 			t.Fatal("expected website code")
 		}
 
-		profile, token, expiresAt, err := svc.TelegramAuth(context.Background(), "", code)
+		profile, token, expiresAt, telegramID, err := svc.TelegramAuth(context.Background(), "", code)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -414,6 +414,9 @@ func TestTelegramAuth(t *testing.T) {
 		}
 		if expiresAt.IsZero() {
 			t.Error("expected expiresAt, got zero time")
+		}
+		if telegramID != payload.ID {
+			t.Errorf("expected telegramID %d, got %d", payload.ID, telegramID)
 		}
 
 		mockRepo.AssertExpectations(t)
@@ -430,7 +433,7 @@ func TestTelegramAuth(t *testing.T) {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		_, _, _, err = svc.TelegramAuth(context.Background(), challenge.Token, "")
+		_, _, _, _, err = svc.TelegramAuth(context.Background(), challenge.Token, "")
 		if err == nil {
 			t.Error("expected error for unconfirmed challenge")
 		}
@@ -465,7 +468,7 @@ func TestTelegramAuth(t *testing.T) {
 			t.Fatal("expected website code")
 		}
 
-		_, _, _, err = svc.TelegramAuth(context.Background(), "", code)
+		_, _, _, _, err = svc.TelegramAuth(context.Background(), "", code)
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}

@@ -3,6 +3,7 @@ package realtime
 import (
 	"context"
 	"encoding/json"
+	"strings"
 
 	"api/internal/model"
 	schema "api/internal/realtime/schema"
@@ -25,6 +26,7 @@ func (h *CodeEditorHub) addClient(client *codeEditorClient) {
 	if room.mode == "" {
 		room.mode = client.roomMode
 	}
+	clearAwarenessEntriesForActor(room, client, 0)
 	room.clients[client] = struct{}{}
 	shouldInitialize := !room.initializedFrom
 	room.initializedFrom = true
@@ -65,11 +67,11 @@ func (h *CodeEditorHub) removeClient(client *codeEditorClient) {
 				payload["active"] = false
 				if raw, err := json.Marshal(payload); err == nil {
 					current.Data = string(raw)
-					room.awarenessByID[client.awarenessID] = current
 					offlineAwareness = &current
 				}
 			}
 		}
+		delete(room.awarenessByID, client.awarenessID)
 	}
 	h.mu.Unlock()
 
@@ -326,11 +328,35 @@ func (h *CodeEditorHub) handleAwareness(client *codeEditorClient, msg schema.Cod
 		client.awarenessID = msg.AwarenessID
 	}
 	if client.awarenessID != 0 && msg.Data != "" {
+		clearAwarenessEntriesForActor(room, client, client.awarenessID)
 		room.awarenessByID[client.awarenessID] = msg
 	}
 	h.mu.Unlock()
 
 	h.broadcast(client.roomID, msg, client)
+}
+
+func clearAwarenessEntriesForActor(room *codeEditorRoom, client *codeEditorClient, keepAwarenessID uint64) {
+	if room == nil || client == nil {
+		return
+	}
+
+	actorID := strings.TrimSpace(client.userID)
+	if actorID == "" {
+		actorID = strings.TrimSpace(client.guestName)
+	}
+	if actorID == "" {
+		return
+	}
+
+	for awarenessID, msg := range room.awarenessByID {
+		if awarenessID == keepAwarenessID {
+			continue
+		}
+		if strings.TrimSpace(msg.UserID) == actorID {
+			delete(room.awarenessByID, awarenessID)
+		}
+	}
 }
 
 func (h *CodeEditorHub) broadcast(roomID string, msg schema.CodeEditorMessage, sender *codeEditorClient) {

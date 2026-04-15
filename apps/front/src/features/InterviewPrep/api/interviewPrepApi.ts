@@ -238,6 +238,6 @@ export const interviewPrepApi = {
     return { ...raw, session: normalizeMockSession(raw.session) }
   },
   abortMockSession: async (sessionId: string): Promise<void> => {
-    await apiClient.post(`/api/v1/interview-prep/mock-sessions/${sessionId}/abort`)
+    await apiClient.post(`/api/v1/interview-prep/mock-sessions/${sessionId}/abort`, {})
   },
 }

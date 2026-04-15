@@ -1,4 +1,4 @@
-package geo
+package geocoder
 
 import (
 	"context"
@@ -13,7 +13,6 @@ import (
 	"api/internal/config"
 	geoerrors "api/internal/errors/geo"
 	"api/internal/model"
-	"api/internal/storage/postgres"
 
 	"github.com/go-kratos/kratos/v2/log"
 )
@@ -21,7 +20,6 @@ import (
 const defaultGeocoderURL = "https://nominatim.openstreetmap.org/search"
 
 type Client struct {
-	data       *postgres.Store
 	baseURL    string
 	userAgent  string
 	language   string
@@ -29,7 +27,7 @@ type Client struct {
 	log        *log.Helper
 }
 
-func NewClient(cfg *config.Bootstrap, dataLayer *postgres.Store, logger log.Logger) *Client {
+func New(cfg *config.Bootstrap, logger log.Logger) *Client {
 	baseURL := defaultGeocoderURL
 	userAgent := "druz9-api/1.0"
 	language := "ru,en"
@@ -47,7 +45,6 @@ func NewClient(cfg *config.Bootstrap, dataLayer *postgres.Store, logger log.Logg
 	}
 
 	return &Client{
-		data:      dataLayer,
 		baseURL:   baseURL,
 		userAgent: userAgent,
 		language:  language,

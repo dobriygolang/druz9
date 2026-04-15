@@ -75,8 +75,10 @@ func newApp() (*kratos.App, *appLogger.Logger, error) {
 	notifServer := notificationapi.New(svc)
 	v1.RegisterNotificationServiceServer(grpcServer, notifServer)
 
-	// HTTP server (health checks, future use).
-	httpServer := server.NewHTTPServer(cfg.Server.HTTP.Addr, cfg.Server.HTTP.Timeout, kratosLogger)
+	// HTTP server exposes service health probes.
+	httpServer := server.NewHTTPServer(cfg.Server.HTTP.Addr, cfg.Server.HTTP.Timeout, kratosLogger, func(ctx context.Context) error {
+		return dataLayer.DB.Ping(ctx)
+	})
 
 	// Delivery workers.
 	workerCount := 2

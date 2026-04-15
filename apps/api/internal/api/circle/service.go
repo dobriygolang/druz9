@@ -1,7 +1,7 @@
 package circle
 
 import (
-	notif "api/internal/notification"
+	notif "api/internal/clients/notification"
 	v1 "api/pkg/api/circle/v1"
 
 	"google.golang.org/grpc"

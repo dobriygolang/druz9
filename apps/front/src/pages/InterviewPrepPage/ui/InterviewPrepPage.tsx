@@ -88,12 +88,13 @@ type SoloTask = {
   roomTask?: CodeRoomTask
 }
 
-function isAlgorithmTask(task: CodeRoomTask): boolean {
-  return task.topics.some((topic) => topic.toLowerCase().includes('algorithm'))
-}
-
 function fromCodeRoomLanguageEnum(language: string): string {
   return language.replace('PROGRAMMING_LANGUAGE_', '').toLowerCase()
+}
+
+function getSoloPrepTypeLabel(t: (key: string) => string, prepType: string): string {
+  if (prepType === 'algorithm') return t('interviewPrep.solo.generalAlgorithms')
+  return PREP_TYPE_LABELS[prepType] ?? prepType
 }
 
 export function InterviewPrepPage() {
@@ -131,7 +132,7 @@ export function InterviewPrepPage() {
         setTasks(prepResult.status === 'fulfilled' ? prepResult.value : [])
         setAlgorithmTasks(
           codeRoomResult.status === 'fulfilled'
-            ? codeRoomResult.value.filter(isAlgorithmTask)
+            ? codeRoomResult.value
             : [],
         )
 
@@ -152,6 +153,11 @@ export function InterviewPrepPage() {
   }, [t, user?.id])
 
   useEffect(() => { fetchTasks() }, [fetchTasks])
+
+  useEffect(() => {
+    const nextCategory = searchParams.get('category') ?? ''
+    setCategory(prev => (prev === nextCategory ? prev : nextCategory))
+  }, [searchParams])
 
   const soloTasks = useMemo<SoloTask[]>(() => ([
     ...tasks.map((task) => ({
@@ -412,12 +418,17 @@ export function InterviewPrepPage() {
 
             {/* Active session warning */}
             {mockError && mockError.startsWith('active_session:') && (
-              <div className="mt-4 flex flex-col gap-2 rounded-xl border border-[#fbbf24]/30 bg-[#fbbf24]/10 px-4 py-3">
-                <div className="flex items-center gap-3">
-                  <p className="flex-1 text-sm text-[#fde68a]">{t('interviewPrep.mock.unfinished')}</p>
+              <div className="mt-4 rounded-2xl border border-[#fbbf24]/35 bg-[linear-gradient(135deg,_rgba(251,191,36,0.18),_rgba(120,53,15,0.24))] px-4 py-4 shadow-[0_16px_36px_rgba(120,53,15,0.18)]">
+                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+                  <div className="min-w-0">
+                    <p className="text-sm font-semibold text-[#fde68a]">{t('interviewPrep.mock.unfinished')}</p>
+                    <p className="mt-1 text-xs text-white/65">
+                      {t('interviewPrep.mock.abortHint', 'You can continue the current session or discard it and start from scratch.')}
+                    </p>
+                  </div>
                   <button
                     onClick={() => navigate(`/prepare/interview-prep/mock/${mockError.split(':')[1]}`)}
-                    className="flex items-center gap-1 text-sm font-semibold text-[#fbbf24] hover:text-[#fde68a] transition-colors"
+                    className="inline-flex items-center justify-center gap-1 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/15"
                   >
                     {t('interviewPrep.mock.continue')} <ArrowRight className="h-3.5 w-3.5" />
                   </button>
@@ -425,7 +436,7 @@ export function InterviewPrepPage() {
                 <button
                   onClick={handleAbortAndStartNew}
                   disabled={mockAbortLoading}
-                  className="self-start text-xs text-white/40 hover:text-white/70 transition-colors disabled:opacity-50"
+                  className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-[#fca5a5]/30 bg-[#7f1d1d]/55 px-4 py-3 text-sm font-semibold text-[#fee2e2] transition-colors hover:bg-[#991b1b]/70 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
                 >
                   {mockAbortLoading ? '...' : t('interviewPrep.mock.abortAndStartNew')}
                 </button>
@@ -507,7 +518,7 @@ export function InterviewPrepPage() {
                     : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#6366F1]/40 hover:text-[#111111] dark:bg-[#161c2d] dark:border-[#1a2540] dark:text-[#7e93b0] dark:hover:text-[#c8d8ec]'
                 }`}
               >
-                {cat === '' ? t('interviewPrep.solo.all') : PREP_TYPE_LABELS[cat] ?? cat}
+                {cat === '' ? t('interviewPrep.solo.all') : getSoloPrepTypeLabel(t, cat)}
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                   category === cat ? 'bg-white/20 text-white dark:bg-black/20 dark:text-[#111111]' : 'bg-[#F2F3F0] text-[#94a3b8] dark:bg-[#1a2236]'
                 }`}>
@@ -565,7 +576,7 @@ export function InterviewPrepPage() {
                           : task.prepType === 'system_design' ? 'danger'
                           : 'success'
                       }>
-                        {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
+                        {getSoloPrepTypeLabel(t, task.prepType)}
                       </Badge>
 
                       {task.companyTag && (

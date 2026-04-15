@@ -6,8 +6,8 @@ import (
 	"strings"
 	"time"
 
+	notif "api/internal/clients/notification"
 	profiledomain "api/internal/domain/profile"
-	notif "api/internal/notification"
 
 	klog "github.com/go-kratos/kratos/v2/log"
 )

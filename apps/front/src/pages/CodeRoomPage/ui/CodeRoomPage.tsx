@@ -564,11 +564,20 @@ export function CodeRoomPage() {
 
   useEffect(() => {
     if (!ws.gotSnapshot) return
+    const model = editorRef.current?.getModel()
+    if (!isDuelRoom) {
+      const localCode = currentCodeRef.current || model?.getValue() || starterCodeRef.current || ''
+      if (localCode) {
+        initialCodeRef.current = localCode
+        currentCodeRef.current = localCode
+        return
+      }
+    }
+
     const baseCode = ws.code || currentCodeRef.current || starterCodeRef.current || ''
     initialCodeRef.current = baseCode
     currentCodeRef.current = baseCode
 
-    const model = editorRef.current?.getModel()
     if (model && !bindingRef.current && model.getValue() !== baseCode) {
       model.setValue(baseCode)
     }
