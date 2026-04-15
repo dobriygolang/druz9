@@ -2707,7 +2707,7 @@ components:
             type: object
             properties:
                 review:
-                    $ref: '#/components/schemas/code_editor.v1.InterviewSolutionReview'
+                    $ref: '#/components/schemas/common.v1.InterviewSolutionReview'
         code_editor.v1.CreateRoomRequest:
             type: object
             properties:
@@ -2765,30 +2765,6 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/code_editor.v1.Submission'
-        code_editor.v1.InterviewSolutionReview:
-            type: object
-            properties:
-                provider:
-                    type: string
-                model:
-                    type: string
-                score:
-                    type: integer
-                    format: int32
-                summary:
-                    type: string
-                strengths:
-                    type: array
-                    items:
-                        type: string
-                issues:
-                    type: array
-                    items:
-                        type: string
-                followUpQuestions:
-                    type: array
-                    items:
-                        type: string
         code_editor.v1.JoinRoomByInviteCodeRequest:
             type: object
             properties:
@@ -2895,6 +2871,9 @@ components:
                     type: string
                 isPrivate:
                     type: boolean
+                language:
+                    type: integer
+                    format: enum
         code_editor.v1.SetReadyRequest:
             type: object
             properties:
@@ -2955,6 +2934,9 @@ components:
                     type: string
                 code:
                     type: string
+                language:
+                    type: integer
+                    format: enum
         code_editor.v1.SubmitCodeResponse:
             type: object
             properties:
@@ -3142,6 +3124,30 @@ components:
                     type: string
                 task:
                     $ref: '#/components/schemas/code_editor.v1.TaskPayload'
+        common.v1.InterviewSolutionReview:
+            type: object
+            properties:
+                provider:
+                    type: string
+                model:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                summary:
+                    type: string
+                strengths:
+                    type: array
+                    items:
+                        type: string
+                issues:
+                    type: array
+                    items:
+                        type: string
+                followUpQuestions:
+                    type: array
+                    items:
+                        type: string
         event.v1.CreateEventRequest:
             type: object
             properties:
@@ -3689,30 +3695,6 @@ components:
                 updatedAt:
                     type: string
                     format: date-time
-        interview_prep.v1.InterviewSolutionReview:
-            type: object
-            properties:
-                provider:
-                    type: string
-                model:
-                    type: string
-                score:
-                    type: integer
-                    format: int32
-                summary:
-                    type: string
-                strengths:
-                    type: array
-                    items:
-                        type: string
-                issues:
-                    type: array
-                    items:
-                        type: string
-                followUpQuestions:
-                    type: array
-                    items:
-                        type: string
         interview_prep.v1.ListAdminQuestionsResponse:
             type: object
             properties:
@@ -4063,7 +4045,7 @@ components:
                     type: integer
                     format: enum
                 review:
-                    $ref: '#/components/schemas/interview_prep.v1.InterviewSolutionReview'
+                    $ref: '#/components/schemas/common.v1.InterviewSolutionReview'
                 session:
                     $ref: '#/components/schemas/interview_prep.v1.MockSession'
         interview_prep.v1.SubmitSessionRequest:

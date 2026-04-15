@@ -87,7 +87,7 @@ func registerManualHTTPRoutes(
 	services *serviceContext,
 ) {
 	// Realtime WebSocket endpoints (cannot be expressed as proto RPCs).
-	wshandler.Register(httpServer, services.realtimeHub, services.arenaRealtimeHub)
+	wshandler.Register(httpServer, services.realtimeHub, services.arenaRealtimeHub, services.profileServiceDomain)
 
 	// Manual code-editor room routes not covered by proto HTTP annotations.
 	// Registered via Route() so they don't shadow proto-generated GET/POST/DELETE handlers.

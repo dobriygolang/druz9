@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"api/internal/model"
+	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/interview_prep/v1"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
@@ -403,8 +404,8 @@ func normalizeTaskPayload(req *v1.AdminTaskPayload) *v1.AdminTaskPayload {
 	if req.PrepType == v1.PrepType_PREP_TYPE_UNSPECIFIED {
 		req.PrepType = v1.PrepType_PREP_TYPE_ALGORITHM
 	}
-	if req.Language == v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED {
-		req.Language = v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO
+	if req.Language == commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED {
+		req.Language = commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO
 	}
 	if len(req.SupportedLanguages) == 0 {
 		req.SupportedLanguages = []string{unmapProgrammingLanguage(req.Language)}
@@ -412,11 +413,11 @@ func normalizeTaskPayload(req *v1.AdminTaskPayload) *v1.AdminTaskPayload {
 	for idx := range req.SupportedLanguages {
 		req.SupportedLanguages[idx] = strings.TrimSpace(strings.ToLower(req.SupportedLanguages[idx]))
 	}
-	if req.ExecutionProfile == v1.ExecutionProfile_EXECUTION_PROFILE_UNSPECIFIED {
-		req.ExecutionProfile = v1.ExecutionProfile_EXECUTION_PROFILE_PURE
+	if req.ExecutionProfile == commonv1.ExecutionProfile_EXECUTION_PROFILE_UNSPECIFIED {
+		req.ExecutionProfile = commonv1.ExecutionProfile_EXECUTION_PROFILE_PURE
 	}
-	if req.RunnerMode == v1.RunnerMode_RUNNER_MODE_UNSPECIFIED {
-		req.RunnerMode = v1.RunnerMode_RUNNER_MODE_FUNCTION_IO
+	if req.RunnerMode == commonv1.RunnerMode_RUNNER_MODE_UNSPECIFIED {
+		req.RunnerMode = commonv1.RunnerMode_RUNNER_MODE_FUNCTION_IO
 	}
 	if req.DurationSeconds <= 0 {
 		req.DurationSeconds = 1800
@@ -438,9 +439,9 @@ func validateTaskPayload(req *v1.AdminTaskPayload) string {
 		return "invalid prep type"
 	}
 	switch req.Language {
-	case v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO,
-		v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_PYTHON,
-		v1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_SQL:
+	case commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO,
+		commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_PYTHON,
+		commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_SQL:
 	default:
 		return "unsupported language"
 	}

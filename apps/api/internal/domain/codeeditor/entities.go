@@ -20,6 +20,7 @@ const (
 	ProgrammingLanguageRust       = model.ProgrammingLanguageRust
 	ProgrammingLanguageCpp        = model.ProgrammingLanguageCpp
 	ProgrammingLanguageJava       = model.ProgrammingLanguageJava
+	ProgrammingLanguageSQL        = model.ProgrammingLanguageSQL
 
 	TaskTypeAlgorithm   = model.TaskTypeAlgorithm
 	TaskTypeDebugging   = model.TaskTypeDebugging
@@ -27,6 +28,8 @@ const (
 )
 
 type Room = model.Room
+type RoomEditorState = model.RoomEditorState
+type DuelEditorState = model.DuelEditorState
 type Participant = model.Participant
 type Submission = model.Submission
 type Task = model.CodeTask

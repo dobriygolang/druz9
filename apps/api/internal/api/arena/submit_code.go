@@ -41,7 +41,7 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 		PassedCount:     submission.PassedCount,
 		TotalCount:      submission.TotalCount,
 		RuntimeMs:       submission.RuntimeMs,
-		Match:           mapArenaMatch(match),
+		Match:           mapArenaMatchForViewer(match, user.ID.String(), false),
 		FailedTestIndex: submission.FailedTestIndex,
 		FailureKind:     mapSubmitFailureKind(submission.FailureKind),
 	}

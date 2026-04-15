@@ -146,10 +146,10 @@ func mapQueueState(state *arenadomain.QueueState) *v1.ArenaQueueStateResponse {
 	}
 
 	resp := &v1.ArenaQueueStateResponse{
-		Status:    mapQueueStatus(state.Status, state.Match != nil),
-		Topic:     state.Topic,
+		Status:     mapQueueStatus(state.Status, state.Match != nil),
+		Topic:      state.Topic,
 		Difficulty: mapDifficulty(state.Difficulty),
-		QueueSize: state.QueueSize,
+		QueueSize:  state.QueueSize,
 	}
 	if state.QueuedAt != nil && !state.QueuedAt.IsZero() {
 		resp.QueuedAt = timestamppb.New(*state.QueuedAt)

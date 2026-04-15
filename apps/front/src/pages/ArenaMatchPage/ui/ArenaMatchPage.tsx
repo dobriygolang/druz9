@@ -24,7 +24,7 @@ export function ArenaMatchPage() {
   const { user } = useAuth()
   const [localCode, setLocalCode] = useState('')
   const [submitting, setSubmitting] = useState(false)
-  const [result, setResult] = useState<any>(null)
+  const [result, setResult] = useState<{ isCorrect: boolean; output: string; error: string; passedCount: number; totalCount: number } | null>(null)
   const [timeLeft, setTimeLeft] = useState(0)
   const [antiCheatWarning, setAntiCheatWarning] = useState(false)
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
@@ -61,12 +61,32 @@ export function ArenaMatchPage() {
   // Fetch initial match data via REST
   useEffect(() => {
     if (!matchId) return
-    apiClient.get(`/api/v1/arena/matches/${matchId}`).then(r => {
-      const m = (r.data as any).match
-      if (m?.starter_code) setLocalCode(m.starter_code)
-      if (m?.duration_seconds) setTimeLeft(m.duration_seconds)
-    }).catch(() => navigate('/practice/arena'))
-  }, [matchId, navigate])
+    let cancelled = false
+
+    const loadMatch = async () => {
+      try {
+        const initial = await apiClient.get<{ match?: any }>(`/api/v1/arena/matches/${matchId}`)
+        let match = initial.data.match
+        const players = Array.isArray(match?.players) ? match.players : []
+        const alreadyJoined = !!user?.id && players.some((player: any) => player?.userId === user.id || player?.user_id === user.id)
+        const hasOpenSlot = players.length < 2 && match?.status !== 'MATCH_STATUS_FINISHED'
+
+        if (user?.id && !alreadyJoined && hasOpenSlot) {
+          const joined = await apiClient.post<{ match?: any }>(`/api/v1/arena/matches/${matchId}/join`, {})
+          match = joined.data.match ?? match
+        }
+
+        if (cancelled) return
+        if (match?.starterCode) setLocalCode(match.starterCode)
+        if (match?.durationSeconds) setTimeLeft(match.durationSeconds)
+      } catch {
+        if (!cancelled) navigate('/practice/arena')
+      }
+    }
+
+    void loadMatch()
+    return () => { cancelled = true }
+  }, [matchId, navigate, user?.id])
 
   // Sync timer from WS match state
   useEffect(() => {
@@ -103,8 +123,8 @@ export function ArenaMatchPage() {
     if (!matchId) return
     setSubmitting(true)
     try {
-      const r = await apiClient.post(`/api/v1/arena/matches/${matchId}/submit`, { code: localCode })
-      setResult(r.data)
+      const r = await apiClient.post<{ isCorrect?: boolean; output?: string; error?: string; passedCount?: number; totalCount?: number }>(`/api/v1/arena/matches/${matchId}/submit`, { code: localCode })
+      setResult({ isCorrect: r.data.isCorrect ?? false, output: r.data.output ?? '', error: r.data.error ?? '', passedCount: r.data.passedCount ?? 0, totalCount: r.data.totalCount ?? 0 })
     } catch {} finally { setSubmitting(false) }
   }
 
@@ -177,8 +197,8 @@ export function ArenaMatchPage() {
             </div>
           )}
           {result && (
-            <Badge variant={result.is_correct ? 'success' : 'danger'} dot>
-              {result.is_correct ? 'Принято' : 'Неверно'}
+            <Badge variant={result.isCorrect ? 'success' : 'danger'} dot>
+              {result.isCorrect ? 'Принято' : 'Неверно'}
             </Badge>
           )}
           {ws.matchState?.winnerId && (
@@ -224,9 +244,9 @@ export function ArenaMatchPage() {
           </div>
           <div className="h-9 bg-white border-t border-[#CBCCC9] flex items-center px-4">
             {result ? (
-              <span className={`flex items-center gap-1.5 text-xs font-medium ${result.is_correct ? 'text-[#22c55e]' : 'text-[#ef4444]'}`}>
-                {result.is_correct ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
-                {result.is_correct ? 'Все тесты пройдены' : `${result.passed_count ?? 0}/${result.total_count ?? 0} тестов`}
+              <span className={`flex items-center gap-1.5 text-xs font-medium ${result.isCorrect ? 'text-[#22c55e]' : 'text-[#ef4444]'}`}>
+                {result.isCorrect ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
+                {result.isCorrect ? 'Все тесты пройдены' : `${result.passedCount ?? 0}/${result.totalCount ?? 0} тестов`}
               </span>
             ) : <span className="text-xs text-[#94a3b8]">Ожидание отправки...</span>}
           </div>

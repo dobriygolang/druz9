@@ -7,6 +7,8 @@ import { Spinner } from '@/shared/ui/Spinner'
 import { apiClient } from '@/shared/api/base'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import { DIFF_LABELS, DIFF_VARIANTS } from '@/shared/lib/taskLabels'
+import { formatDateRu } from '@/shared/lib/dateFormat'
 import type * as Monaco from 'monaco-editor'
 
 interface DailyTask {
@@ -22,20 +24,6 @@ interface DailyTask {
   }
   date: string
   expires_at: string
-}
-
-const DIFF_LABELS: Record<string, string> = {
-  TASK_DIFFICULTY_EASY: 'Easy',
-  TASK_DIFFICULTY_MEDIUM: 'Medium',
-  TASK_DIFFICULTY_HARD: 'Hard',
-  '1': 'Easy', '2': 'Medium', '3': 'Hard',
-}
-
-const DIFF_VARIANTS: Record<string, 'success' | 'warning' | 'danger'> = {
-  TASK_DIFFICULTY_EASY: 'success',
-  TASK_DIFFICULTY_MEDIUM: 'warning',
-  TASK_DIFFICULTY_HARD: 'danger',
-  '1': 'success', '2': 'warning', '3': 'danger',
 }
 
 const LANG_MAP: Record<string | number, string> = {
@@ -61,15 +49,6 @@ function normalizeTask(raw: any): DailyTask {
   }
 }
 
-function formatDateRu(dateStr: string): string {
-  const months = [
-    'января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-    'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря',
-  ]
-  const d = dateStr ? new Date(dateStr) : new Date()
-  return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`
-}
-
 export function DailyChallengePage() {
   const { theme } = useTheme()
   const [task, setTask] = useState<DailyTask | null>(null)
@@ -81,6 +60,11 @@ export function DailyChallengePage() {
   const [review, setReview] = useState<any>(null)
   const [submitted, setSubmitted] = useState(false)
   const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  // Clean up draft save timer on unmount
+  useEffect(() => () => {
+    if (saveDraftTimer.current) clearTimeout(saveDraftTimer.current)
+  }, [])
 
   // Fetch daily task, restore draft + review from localStorage
   useEffect(() => {

@@ -5,15 +5,16 @@ import Editor from '@monaco-editor/react'
 import { interviewPrepApi } from '@/features/InterviewPrep/api/interviewPrepApi'
 import { Button } from '@/shared/ui/Button'
 import { Spinner } from '@/shared/ui/Spinner'
+import { getLanguageLabel, getMonacoLanguage } from '@/shared/lib/codeEditorLanguage'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import type * as Monaco from 'monaco-editor'
 
 // Map proto enum names → friendly keys
 const STAGE_KIND_ENUM_MAP: Record<string, string> = {
-  MOCK_STAGE_KIND_SLICES:       'slices',
-  MOCK_STAGE_KIND_CONCURRENCY:  'concurrency',
+  MOCK_STAGE_KIND_SLICES:       'algorithm',
+  MOCK_STAGE_KIND_CONCURRENCY:  'coding',
   MOCK_STAGE_KIND_SQL:          'sql',
-  MOCK_STAGE_KIND_ARCHITECTURE: 'architecture',
+  MOCK_STAGE_KIND_ARCHITECTURE: 'coding',
   MOCK_STAGE_KIND_SYSTEM_DESIGN:'system_design',
 }
 
@@ -23,25 +24,25 @@ function normalizeKind(raw: string | undefined): string {
 }
 
 const STAGE_KIND_LABELS: Record<string, string> = {
-  slices:       'Go: Срезы',
-  concurrency:  'Go: Многопоточность',
+  algorithm:    'Алгоритмы',
+  coding:       'Кодинг',
   sql:          'SQL',
-  architecture: 'Архитектура',
   system_design:'System Design',
-  coding:       'Кодирование',
   behavioral:   'Поведенческий',
   theoretical:  'Теоретический',
 }
 
 // Which kinds use the code editor
-const CODE_KINDS = new Set(['slices', 'concurrency', 'sql', 'coding'])
+const CODE_KINDS = new Set(['algorithm', 'coding', 'sql'])
 
-// Editor language per kind
-const KIND_LANGUAGE: Record<string, string> = {
-  slices:      'go',
-  concurrency: 'go',
-  sql:         'sql',
-  coding:      'python',
+function resolveSupportedLanguages(task: any, fallbackLanguage: string): string[] {
+  const raw = Array.isArray(task?.supportedLanguages) && task.supportedLanguages.length > 0
+    ? task.supportedLanguages
+    : [task?.language, fallbackLanguage].filter(Boolean)
+  const normalized = raw
+    .map((value: string) => getMonacoLanguage(value))
+    .filter((value: string) => value !== 'plaintext')
+  return Array.from(new Set(normalized))
 }
 
 function normalizeStageStatus(raw: string | undefined): string {
@@ -70,19 +71,14 @@ export function InterviewPrepMockSessionPage() {
   const [review, setReview] = useState<any>(null)
   const [testResult, setTestResult] = useState<any>(null)
   const [reviewLoading, setReviewLoading] = useState(false)
+  const [selectedLanguage, setSelectedLanguage] = useState('python')
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
 
-  useEffect(() => {
-    if (!sessionId) return
-    interviewPrepApi.getMockSession(sessionId).then((s: any) => {
-      setSession(s)
-      resetStageState(s)
-    }).catch(() => navigate('/growth/interview-prep'))
-  }, [sessionId]) // eslint-disable-line react-hooks/exhaustive-deps
-
-  const resetStageState = (s: any) => {
+  const resetStageState = useCallback((s: any) => {
     const stage = s?.currentStage ?? s?.current_stage
     setCode(stage?.code ?? stage?.task?.starterCode ?? stage?.task?.starter_code ?? '')
+    const nextLanguage = getMonacoLanguage(stage?.solveLanguage ?? stage?.solve_language ?? stage?.task?.language ?? 'python')
+    setSelectedLanguage(nextLanguage === 'plaintext' ? 'python' : nextLanguage)
     setTextAnswer('')
     setDesignNotes('')
     setDesignComponents('')
@@ -93,7 +89,15 @@ export function InterviewPrepMockSessionPage() {
     const dur = stage?.task?.durationSeconds ?? stage?.task?.duration_seconds
     if (dur) setTimeLeft(dur)
     else setTimeLeft(0)
-  }
+  }, [])
+
+  useEffect(() => {
+    if (!sessionId) return
+    interviewPrepApi.getMockSession(sessionId).then((s: any) => {
+      setSession(s)
+      resetStageState(s)
+    }).catch(() => navigate('/growth/interview-prep'))
+  }, [sessionId, navigate, resetStageState])
 
   const timerActive = timeLeft > 0
   useEffect(() => {
@@ -109,11 +113,12 @@ export function InterviewPrepMockSessionPage() {
   const isInQuestionsPhase = stageStatus === 'questions'
   const currentQuestion = currentStage?.currentQuestion ?? currentStage?.current_question
   const stageKind = normalizeKind(currentStage?.kind)
-  const editorLang = KIND_LANGUAGE[stageKind] ?? (currentStage?.solveLanguage ?? currentStage?.task?.language ?? 'python')
+  const editorLang = selectedLanguage
   const stages: any[] = session?.stages ?? []
   const companyTag = session?.companyTag ?? session?.company_tag ?? ''
   const currentStageIndex = session?.currentStageIndex ?? session?.current_stage_index ?? 0
   const isFinished = session?.status === 'MOCK_SESSION_STATUS_FINISHED' || session?.status === 'finished'
+  const supportedLanguages = resolveSupportedLanguages(currentStage?.task, currentStage?.solveLanguage ?? currentStage?.task?.language ?? 'python')
 
   const handleSubmit = async () => {
     if (!sessionId) return
@@ -326,12 +331,24 @@ export function InterviewPrepMockSessionPage() {
                 <span className="text-xs text-[#94a3b8] font-mono">
                   {editorLang === 'go' ? 'solution.go' : editorLang === 'sql' ? 'solution.sql' : 'solution.py'}
                 </span>
-                <span className="ml-auto text-[10px] text-[#475569] uppercase tracking-wider">{editorLang}</span>
+                {supportedLanguages.length > 1 ? (
+                  <select
+                    value={selectedLanguage}
+                    onChange={e => setSelectedLanguage(e.target.value)}
+                    className="ml-auto h-8 rounded-md border border-[#334155] bg-[#0f172a] px-2 text-xs text-[#cbd5e1] outline-none"
+                  >
+                    {supportedLanguages.map(language => (
+                      <option key={language} value={language}>{getLanguageLabel(language)}</option>
+                    ))}
+                  </select>
+                ) : (
+                  <span className="ml-auto text-[10px] text-[#475569] uppercase tracking-wider">{getLanguageLabel(editorLang)}</span>
+                )}
               </div>
               <div className="flex-1">
                 <Editor
                   height="100%"
-                  language={editorLang}
+                  language={getMonacoLanguage(editorLang)}
                   value={code}
                   onChange={v => setCode(v ?? '')}
                   onMount={handleEditorMount}

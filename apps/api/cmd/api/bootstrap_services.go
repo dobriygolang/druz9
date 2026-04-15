@@ -57,7 +57,6 @@ type serviceContext struct {
 }
 
 func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*serviceContext, error) {
-	realtimeHub := realtime.NewCodeEditorHub(storage.codeEditorRepo)
 	var sandboxService interface {
 		Execute(ctx context.Context, req sandbox.ExecutionRequest) (sandbox.ExecutionResult, error)
 	}
@@ -118,6 +117,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Repository: storage.codeEditorRepo,
 		Sandbox:    sandboxService,
 	})
+	realtimeHub := realtime.NewCodeEditorHub(codeEditorServiceDomain)
 	arenaServiceDomain := apparenа.New(apparenа.Config{
 		Repository: storage.arenaRepo,
 		Sandbox:    sandboxService,
@@ -158,7 +158,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		realtimeHub:             realtimeHub,
 		arenaRealtimeHub:        arenaRealtimeHub,
 		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager, storage.profileRepo, profileServiceDomain),
-		profileService:          profileservice.New(profileServiceDomain, cookies, storage.profileRepo),
+		profileService:          profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo)),
 		geoService:              geoservice.New(geoServiceDomain),
 		circleService:           circleservice.New(circleServiceDomain, eventServiceDomain),
 		eventService:            eventservice.New(eventServiceDomain),

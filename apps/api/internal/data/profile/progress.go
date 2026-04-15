@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 	"math"
-	"sort"
 	"time"
 
+	profiledomain "api/internal/domain/profile"
 	"api/internal/model"
 
 	"github.com/google/uuid"
@@ -14,31 +14,15 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
-type progressSkillMeta struct {
-	label string
-	href  string
-}
-
 type practiceStats struct {
 	sessions       int32
 	passedSessions int32
 	days           int32
 }
 
-var profileProgressSkills = []struct {
-	key  string
-	meta progressSkillMeta
-}{
-	{key: model.InterviewPrepMockStageKindSlices.String(), meta: progressSkillMeta{label: "Slices", href: "/interview-prep?category=coding"}},
-	{key: model.InterviewPrepMockStageKindConcurrency.String(), meta: progressSkillMeta{label: "Concurrency", href: "/interview-prep?category=coding"}},
-	{key: model.InterviewPrepMockStageKindSQL.String(), meta: progressSkillMeta{label: "SQL", href: "/interview-prep?category=sql"}},
-	{key: model.InterviewPrepMockStageKindArchitecture.String(), meta: progressSkillMeta{label: "Architecture", href: "/interview-prep?category=system_design"}},
-	{key: model.InterviewPrepMockStageKindSystemDesign.String(), meta: progressSkillMeta{label: "System Design", href: "/interview-prep?category=system_design"}},
-}
-
 func (r *Repo) GetProfileProgress(ctx context.Context, userID uuid.UUID) (*model.ProfileProgress, error) {
 	progress := &model.ProfileProgress{
-		Competencies: make([]*model.ProfileCompetency, 0, len(profileProgressSkills)),
+		Competencies: make([]*model.ProfileCompetency, 0, len(profiledomain.ProgressSkills)),
 		Strongest:    []*model.ProfileCompetency{},
 		Weakest:      []*model.ProfileCompetency{},
 		Checkpoints:  []*model.ProfileCheckpointProgress{},
@@ -54,8 +38,8 @@ func (r *Repo) GetProfileProgress(ctx context.Context, userID uuid.UUID) (*model
 		return nil, err
 	}
 	progress.Competencies = competencies
-	progress.Strongest, progress.Weakest = splitStrengths(competencies)
-	progress.Recommendations = buildProfileRecommendations(progress.Weakest)
+	progress.Strongest, progress.Weakest = profiledomain.SplitStrengths(competencies)
+	progress.Recommendations = profiledomain.BuildProfileRecommendations(progress.Weakest)
 
 	checkpoints, err := r.loadProfileCheckpointProgress(ctx, userID)
 	if err != nil {
@@ -196,11 +180,11 @@ func (r *Repo) loadProfileCompetencies(ctx context.Context, userID uuid.UUID) ([
 	}
 	defer rows.Close()
 
-	verifiedByKey := make(map[string]*model.ProfileCompetency, len(profileProgressSkills))
-	for _, skill := range profileProgressSkills {
-		verifiedByKey[skill.key] = &model.ProfileCompetency{
-			Key:   skill.key,
-			Label: skill.meta.label,
+	verifiedByKey := make(map[string]*model.ProfileCompetency, len(profiledomain.ProgressSkills))
+	for _, skill := range profiledomain.ProgressSkills {
+		verifiedByKey[skill.Key] = &model.ProfileCompetency{
+			Key:   skill.Key,
+			Label: skill.Meta.Label,
 		}
 	}
 
@@ -220,8 +204,8 @@ func (r *Repo) loadProfileCompetencies(ctx context.Context, userID uuid.UUID) ([
 		}
 		item.StageCount = stageCount
 		item.QuestionCount = questionCount
-		item.AverageScore = roundTenth(resolveAverageScore(averageStage, averageQuestion, stageCount, questionCount))
-		item.VerifiedScore = computeCompetencyScore(averageStage, averageQuestion, stageCount, questionCount)
+		item.AverageScore = profiledomain.RoundTenth(profiledomain.ResolveAverageScore(averageStage, averageQuestion, stageCount, questionCount))
+		item.VerifiedScore = profiledomain.ComputeCompetencyScore(averageStage, averageQuestion, stageCount, questionCount)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("iterate profile competencies: %w", err)
@@ -242,28 +226,28 @@ func (r *Repo) loadProfileCompetencies(ctx context.Context, userID uuid.UUID) ([
 		return nil, err
 	}
 
-	items := make([]*model.ProfileCompetency, 0, len(profileProgressSkills))
-	for _, skill := range profileProgressSkills {
-		item := verifiedByKey[skill.key]
+	items := make([]*model.ProfileCompetency, 0, len(profiledomain.ProgressSkills))
+	for _, skill := range profiledomain.ProgressSkills {
+		item := verifiedByKey[skill.Key]
 		if item == nil {
 			item = &model.ProfileCompetency{
-				Key:   skill.key,
-				Label: skill.meta.label,
+				Key:   skill.Key,
+				Label: skill.Meta.Label,
 			}
 		}
-		stats := practiceByKey[skill.key]
+		stats := practiceByKey[skill.Key]
 		item.PracticeSessions = stats.sessions
 		item.PracticePassedSessions = stats.passedSessions
 		item.PracticeDays = stats.days
-		item.PracticeScore = computePracticeScore(stats.passedSessions, stats.sessions, stats.days)
-		if checkpointScore := checkpointByKey[skill.key]; checkpointScore > item.VerifiedScore {
+		item.PracticeScore = profiledomain.ComputePracticeScore(stats.passedSessions, stats.sessions, stats.days)
+		if checkpointScore := checkpointByKey[skill.Key]; checkpointScore > item.VerifiedScore {
 			item.VerifiedScore = checkpointScore
 		}
-		if item.VerifiedScore == 0 && skill.key == model.InterviewPrepMockStageKindSlices.String() {
+		if item.VerifiedScore == 0 && skill.Key == model.InterviewPrepMockStageKindSlices.String() {
 			item.VerifiedScore = arenaVerifiedScore
 		}
-		item.Score = computeBlendedScore(item.VerifiedScore, item.PracticeScore)
-		item.Confidence = computeConfidence(item.VerifiedScore, item.PracticeDays, item.PracticeSessions)
+		item.Score = profiledomain.ComputeBlendedScore(item.VerifiedScore, item.PracticeScore)
+		item.Confidence = profiledomain.ComputeConfidence(item.VerifiedScore, item.PracticeDays, item.PracticeSessions)
 		items = append(items, item)
 	}
 
@@ -336,7 +320,7 @@ func (r *Repo) loadProfileCheckpointProgress(ctx context.Context, userID uuid.UU
 		if err := rows.Scan(&item.ID, &item.TaskID, &item.TaskTitle, &item.SkillKey, &item.Score, &finishedAt); err != nil {
 			return nil, fmt.Errorf("scan profile checkpoint: %w", err)
 		}
-		item.SkillLabel = profileSkillLabel(item.SkillKey)
+		item.SkillLabel = profiledomain.SkillLabel(item.SkillKey)
 		if finishedAt.Valid {
 			value := finishedAt.Time
 			item.FinishedAt = &value
@@ -386,7 +370,7 @@ func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, 
 		return 0, fmt.Errorf("iterate profile streak dates: %w", err)
 	}
 
-	return computeCurrentStreak(dates, now.UTC()), nil
+	return profiledomain.ComputeCurrentStreak(dates, now.UTC()), nil
 }
 
 func (r *Repo) loadPracticeStatsBySkill(ctx context.Context, userID uuid.UUID) (map[string]practiceStats, error) {
@@ -415,7 +399,7 @@ func (r *Repo) loadPracticeStatsBySkill(ctx context.Context, userID uuid.UUID) (
 		if err := rows.Scan(&prepType, &sessions, &passedSessions, &days); err != nil {
 			return nil, fmt.Errorf("scan practice competency: %w", err)
 		}
-		for _, key := range mapPrepTypeToCompetencyKeys(prepType) {
+		for _, key := range profiledomain.MapPrepTypeToCompetencyKeys(prepType) {
 			stat := items[key]
 			stat.sessions += sessions
 			stat.passedSessions += passedSessions
@@ -487,202 +471,6 @@ func (r *Repo) loadCheckpointScoresBySkill(ctx context.Context, userID uuid.UUID
 	return items, nil
 }
 
-func computeCompetencyScore(avgStage, avgQuestion float64, stageCount, questionCount int32) int32 {
-	weighted := resolveAverageScore(avgStage, avgQuestion, stageCount, questionCount)
-	return int32(math.Round(weighted * 10))
-}
-
-func computePracticeScore(passedSessions, sessions, practiceDays int32) int32 {
-	if sessions == 0 {
-		return 0
-	}
-	passRate := float64(passedSessions) / float64(sessions)
-	volumeFactor := math.Min(1, float64(sessions)/6)
-	dayFactor := math.Min(1, float64(practiceDays)/3)
-	return int32(math.Round((passRate*0.65 + volumeFactor*0.2 + dayFactor*0.15) * 100))
-}
-
-func computeBlendedScore(verifiedScore, practiceScore int32) int32 {
-	switch {
-	case verifiedScore > 0 && practiceScore > 0:
-		return int32(math.Round(float64(verifiedScore)*0.75 + float64(practiceScore)*0.25))
-	case verifiedScore > 0:
-		return verifiedScore
-	case practiceScore > 0:
-		return int32(math.Round(float64(practiceScore) * 0.35))
-	default:
-		return 0
-	}
-}
-
-func computeConfidence(verifiedScore, practiceDays, practiceSessions int32) string {
-	switch {
-	case verifiedScore > 0:
-		return "verified"
-	case practiceDays >= 3:
-		return "medium"
-	case practiceSessions > 0:
-		return "low"
-	default:
-		return "low"
-	}
-}
-
-func resolveAverageScore(avgStage, avgQuestion float64, stageCount, questionCount int32) float64 {
-	switch {
-	case stageCount > 0 && questionCount > 0:
-		return avgStage*0.6 + avgQuestion*0.4
-	case stageCount > 0:
-		return avgStage
-	case questionCount > 0:
-		return avgQuestion
-	default:
-		return 0
-	}
-}
-
-func splitStrengths(items []*model.ProfileCompetency) ([]*model.ProfileCompetency, []*model.ProfileCompetency) {
-	rated := make([]*model.ProfileCompetency, 0, len(items))
-	for _, item := range items {
-		if item == nil {
-			continue
-		}
-		if item.StageCount == 0 && item.QuestionCount == 0 && item.PracticeSessions == 0 {
-			continue
-		}
-		rated = append(rated, item)
-	}
-	if len(rated) == 0 {
-		return []*model.ProfileCompetency{}, []*model.ProfileCompetency{}
-	}
-
-	sort.SliceStable(rated, func(i, j int) bool {
-		if rated[i].Score == rated[j].Score {
-			return rated[i].Label < rated[j].Label
-		}
-		return rated[i].Score > rated[j].Score
-	})
-	strongest := append([]*model.ProfileCompetency(nil), rated[:minInt(3, len(rated))]...)
-
-	sort.SliceStable(rated, func(i, j int) bool {
-		if rated[i].Score == rated[j].Score {
-			return rated[i].Label < rated[j].Label
-		}
-		return rated[i].Score < rated[j].Score
-	})
-	weakest := append([]*model.ProfileCompetency(nil), rated[:minInt(3, len(rated))]...)
-
-	return strongest, weakest
-}
-
-func buildProfileRecommendations(weakest []*model.ProfileCompetency) []*model.ProfileProgressRecommendation {
-	items := make([]*model.ProfileProgressRecommendation, 0, len(weakest))
-	for _, competency := range weakest {
-		if competency == nil || competency.Key == "" {
-			continue
-		}
-		items = append(items, &model.ProfileProgressRecommendation{
-			Key:         competency.Key,
-			Title:       recommendationTitle(competency.Key, competency.Label),
-			Description: recommendationDescription(competency),
-			Href:        recommendationHref(competency.Key),
-		})
-	}
-	return items
-}
-
-func recommendationTitle(key, fallback string) string {
-	switch key {
-	case model.InterviewPrepMockStageKindSQL.String():
-		return "Добить SQL-блок"
-	case model.InterviewPrepMockStageKindConcurrency.String():
-		return "Прокачать concurrency"
-	case model.InterviewPrepMockStageKindArchitecture.String():
-		return "Усилить architecture thinking"
-	case model.InterviewPrepMockStageKindSystemDesign.String():
-		return "Подтянуть system design"
-	case model.InterviewPrepMockStageKindSlices.String():
-		return "Стабилизировать coding flow"
-	default:
-		return "Продолжить " + fallback
-	}
-}
-
-func recommendationDescription(item *model.ProfileCompetency) string {
-	if item == nil {
-		return ""
-	}
-	if item.Confidence != "verified" && item.PracticeSessions > 0 && item.PracticeDays < 3 {
-		return fmt.Sprintf("По зоне %s уже есть practice, но confidence пока %s. Нужны еще независимые дни, чтобы сигнал стал устойчивее.", item.Label, item.Confidence)
-	}
-	if item.Confidence != "verified" && item.PracticeDays >= 3 {
-		return fmt.Sprintf("По зоне %s уже собран practice volume. Следующий mock interview или checkpoint переведет ее в verified skill.", item.Label)
-	}
-	if item.StageCount == 0 && item.QuestionCount == 0 {
-		return "Здесь еще нет попыток. Стоит добавить хотя бы один mock stage, чтобы получить реальный baseline."
-	}
-	return fmt.Sprintf("Текущий confidence по зоне %s: %d/100. Следующий mock или тематическая задача даст самый заметный прирост именно здесь.", item.Label, item.Score)
-}
-
-func recommendationHref(key string) string {
-	for _, skill := range profileProgressSkills {
-		if skill.key == key {
-			return skill.meta.href
-		}
-	}
-	return "/interview-prep"
-}
-
-func profileSkillLabel(key string) string {
-	for _, skill := range profileProgressSkills {
-		if skill.key == key {
-			return skill.meta.label
-		}
-	}
-	return key
-}
-
-func computeCurrentStreak(dates []time.Time, now time.Time) int32 {
-	if len(dates) == 0 {
-		return 0
-	}
-
-	today := truncateDateUTC(now)
-	current := truncateDateUTC(dates[0])
-	if current.Before(today.AddDate(0, 0, -1)) {
-		return 0
-	}
-
-	streak := int32(1)
-	for i := 1; i < len(dates); i++ {
-		prev := truncateDateUTC(dates[i-1])
-		next := truncateDateUTC(dates[i])
-		if prev.AddDate(0, 0, -1).Equal(next) {
-			streak++
-			continue
-		}
-		break
-	}
-
-	return streak
-}
-
-func truncateDateUTC(value time.Time) time.Time {
-	year, month, day := value.UTC().Date()
-	return time.Date(year, month, day, 0, 0, 0, 0, time.UTC)
-}
-
-func roundTenth(value float64) float64 {
-	return math.Round(value*10) / 10
-}
-
-func minInt(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 func (r *Repo) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int) (map[string]int, error) {
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT activity_date, SUM(cnt)::int AS total
@@ -736,17 +524,3 @@ func (r *Repo) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int)
 	return result, nil
 }
 
-func mapPrepTypeToCompetencyKeys(prepType string) []string {
-	switch model.InterviewPrepTypeFromString(prepType) {
-	case model.InterviewPrepTypeCoding, model.InterviewPrepTypeAlgorithm:
-		return []string{model.InterviewPrepMockStageKindSlices.String()}
-	case model.InterviewPrepTypeSQL:
-		return []string{model.InterviewPrepMockStageKindSQL.String()}
-	case model.InterviewPrepTypeSystemDesign:
-		return []string{model.InterviewPrepMockStageKindSystemDesign.String()}
-	case model.InterviewPrepTypeCodeReview:
-		return []string{model.InterviewPrepMockStageKindArchitecture.String()}
-	default:
-		return nil
-	}
-}

@@ -7,6 +7,7 @@
 package v1
 
 import (
+	v1 "api/pkg/api/common/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -22,58 +23,6 @@ const (
 	// Verify that runtime/protoimpl is sufficiently up-to-date.
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
-
-type UserActivityStatus int32
-
-const (
-	UserActivityStatus_USER_ACTIVITY_STATUS_UNSPECIFIED     UserActivityStatus = 0
-	UserActivityStatus_USER_ACTIVITY_STATUS_ONLINE          UserActivityStatus = 1
-	UserActivityStatus_USER_ACTIVITY_STATUS_RECENTLY_ACTIVE UserActivityStatus = 2
-	UserActivityStatus_USER_ACTIVITY_STATUS_OFFLINE         UserActivityStatus = 3
-)
-
-// Enum value maps for UserActivityStatus.
-var (
-	UserActivityStatus_name = map[int32]string{
-		0: "USER_ACTIVITY_STATUS_UNSPECIFIED",
-		1: "USER_ACTIVITY_STATUS_ONLINE",
-		2: "USER_ACTIVITY_STATUS_RECENTLY_ACTIVE",
-		3: "USER_ACTIVITY_STATUS_OFFLINE",
-	}
-	UserActivityStatus_value = map[string]int32{
-		"USER_ACTIVITY_STATUS_UNSPECIFIED":     0,
-		"USER_ACTIVITY_STATUS_ONLINE":          1,
-		"USER_ACTIVITY_STATUS_RECENTLY_ACTIVE": 2,
-		"USER_ACTIVITY_STATUS_OFFLINE":         3,
-	}
-)
-
-func (x UserActivityStatus) Enum() *UserActivityStatus {
-	p := new(UserActivityStatus)
-	*p = x
-	return p
-}
-
-func (x UserActivityStatus) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (UserActivityStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_profile_v1_profile_proto_enumTypes[0].Descriptor()
-}
-
-func (UserActivityStatus) Type() protoreflect.EnumType {
-	return &file_profile_v1_profile_proto_enumTypes[0]
-}
-
-func (x UserActivityStatus) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use UserActivityStatus.Descriptor instead.
-func (UserActivityStatus) EnumDescriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{0}
-}
 
 type CreateTelegramAuthChallengeRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
@@ -1891,7 +1840,7 @@ type User struct {
 	CreatedAt          *timestamppb.Timestamp `protobuf:"bytes,7,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
 	Latitude           float64                `protobuf:"fixed64,8,opt,name=latitude,proto3" json:"latitude,omitempty"`
 	Longitude          float64                `protobuf:"fixed64,9,opt,name=longitude,proto3" json:"longitude,omitempty"`
-	ActivityStatus     UserActivityStatus     `protobuf:"varint,10,opt,name=activity_status,json=activityStatus,proto3,enum=profile.v1.UserActivityStatus" json:"activity_status,omitempty"`
+	ActivityStatus     v1.UserActivityStatus  `protobuf:"varint,10,opt,name=activity_status,json=activityStatus,proto3,enum=common.v1.UserActivityStatus" json:"activity_status,omitempty"`
 	CurrentWorkplace   string                 `protobuf:"bytes,11,opt,name=current_workplace,json=currentWorkplace,proto3" json:"current_workplace,omitempty"`
 	IsAdmin            bool                   `protobuf:"varint,12,opt,name=is_admin,json=isAdmin,proto3" json:"is_admin,omitempty"`
 	IsTrusted          bool                   `protobuf:"varint,13,opt,name=is_trusted,json=isTrusted,proto3" json:"is_trusted,omitempty"`
@@ -1995,11 +1944,11 @@ func (x *User) GetLongitude() float64 {
 	return 0
 }
 
-func (x *User) GetActivityStatus() UserActivityStatus {
+func (x *User) GetActivityStatus() v1.UserActivityStatus {
 	if x != nil {
 		return x.ActivityStatus
 	}
-	return UserActivityStatus_USER_ACTIVITY_STATUS_UNSPECIFIED
+	return v1.UserActivityStatus(0)
 }
 
 func (x *User) GetCurrentWorkplace() string {
@@ -2049,7 +1998,7 @@ var File_profile_v1_profile_proto protoreflect.FileDescriptor
 const file_profile_v1_profile_proto_rawDesc = "" +
 	"\n" +
 	"\x18profile/v1/profile.proto\x12\n" +
-	"profile.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"$\n" +
+	"profile.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16common/v1/common.proto\"$\n" +
 	"\"CreateTelegramAuthChallengeRequest\"\xe5\x01\n" +
 	"\x1aConfirmTelegramAuthRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1b\n" +
@@ -2181,7 +2130,7 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\x04date\x18\x01 \x01(\tR\x04date\x12\x14\n" +
 	"\x05count\x18\x02 \x01(\x05R\x05count\"Q\n" +
 	"\x1aGetProfileActivityResponse\x123\n" +
-	"\bactivity\x18\x01 \x03(\v2\x17.profile.v1.ActivityDayR\bactivity\"\xd3\x04\n" +
+	"\bactivity\x18\x01 \x03(\v2\x17.profile.v1.ActivityDayR\bactivity\"\xd2\x04\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x1d\n" +
@@ -2194,21 +2143,16 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\n" +
 	"created_at\x18\a \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x12\x1a\n" +
 	"\blatitude\x18\b \x01(\x01R\blatitude\x12\x1c\n" +
-	"\tlongitude\x18\t \x01(\x01R\tlongitude\x12G\n" +
+	"\tlongitude\x18\t \x01(\x01R\tlongitude\x12F\n" +
 	"\x0factivity_status\x18\n" +
-	" \x01(\x0e2\x1e.profile.v1.UserActivityStatusR\x0eactivityStatus\x12+\n" +
+	" \x01(\x0e2\x1d.common.v1.UserActivityStatusR\x0eactivityStatus\x12+\n" +
 	"\x11current_workplace\x18\v \x01(\tR\x10currentWorkplace\x12\x19\n" +
 	"\bis_admin\x18\f \x01(\bR\aisAdmin\x12\x1d\n" +
 	"\n" +
 	"is_trusted\x18\r \x01(\bR\tisTrusted\x12/\n" +
 	"\x13connected_providers\x18\x0e \x03(\tR\x12connectedProviders\x12)\n" +
 	"\x10primary_provider\x18\x0f \x01(\tR\x0fprimaryProvider\x12+\n" +
-	"\x11telegram_username\x18\x10 \x01(\tR\x10telegramUsername*\xa7\x01\n" +
-	"\x12UserActivityStatus\x12$\n" +
-	" USER_ACTIVITY_STATUS_UNSPECIFIED\x10\x00\x12\x1f\n" +
-	"\x1bUSER_ACTIVITY_STATUS_ONLINE\x10\x01\x12(\n" +
-	"$USER_ACTIVITY_STATUS_RECENTLY_ACTIVE\x10\x02\x12 \n" +
-	"\x1cUSER_ACTIVITY_STATUS_OFFLINE\x10\x032\xcc\x0f\n" +
+	"\x11telegram_username\x18\x10 \x01(\tR\x10telegramUsername2\xcc\x0f\n" +
 	"\x0eProfileService\x12\xb2\x01\n" +
 	"\x1bCreateTelegramAuthChallenge\x12..profile.v1.CreateTelegramAuthChallengeRequest\x1a/.profile.v1.CreateTelegramAuthChallengeResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/profile/auth/telegram/challenge\x12\x98\x01\n" +
 	"\x13ConfirmTelegramAuth\x12&.profile.v1.ConfirmTelegramAuthRequest\x1a'.profile.v1.ConfirmTelegramAuthResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/profile/auth/telegram/confirm\x12v\n" +
@@ -2240,90 +2184,89 @@ func file_profile_v1_profile_proto_rawDescGZIP() []byte {
 	return file_profile_v1_profile_proto_rawDescData
 }
 
-var file_profile_v1_profile_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_profile_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 31)
 var file_profile_v1_profile_proto_goTypes = []any{
-	(UserActivityStatus)(0),                     // 0: profile.v1.UserActivityStatus
-	(*CreateTelegramAuthChallengeRequest)(nil),  // 1: profile.v1.CreateTelegramAuthChallengeRequest
-	(*ConfirmTelegramAuthRequest)(nil),          // 2: profile.v1.ConfirmTelegramAuthRequest
-	(*TelegramAuthRequest)(nil),                 // 3: profile.v1.TelegramAuthRequest
-	(*StartYandexAuthRequest)(nil),              // 4: profile.v1.StartYandexAuthRequest
-	(*YandexAuthRequest)(nil),                   // 5: profile.v1.YandexAuthRequest
-	(*CompleteRegistrationRequest)(nil),         // 6: profile.v1.CompleteRegistrationRequest
-	(*GetProfileRequest)(nil),                   // 7: profile.v1.GetProfileRequest
-	(*GetProfileByIDRequest)(nil),               // 8: profile.v1.GetProfileByIDRequest
-	(*UpdateLocationRequest)(nil),               // 9: profile.v1.UpdateLocationRequest
-	(*UpdateProfileRequest)(nil),                // 10: profile.v1.UpdateProfileRequest
-	(*LogoutRequest)(nil),                       // 11: profile.v1.LogoutRequest
-	(*BindTelegramRequest)(nil),                 // 12: profile.v1.BindTelegramRequest
-	(*GetProfileProgressRequest)(nil),           // 13: profile.v1.GetProfileProgressRequest
-	(*GetAchievementsRequest)(nil),              // 14: profile.v1.GetAchievementsRequest
-	(*GetProfileActivityRequest)(nil),           // 15: profile.v1.GetProfileActivityRequest
-	(*ProfileStatusResponse)(nil),               // 16: profile.v1.ProfileStatusResponse
-	(*CreateTelegramAuthChallengeResponse)(nil), // 17: profile.v1.CreateTelegramAuthChallengeResponse
-	(*ConfirmTelegramAuthResponse)(nil),         // 18: profile.v1.ConfirmTelegramAuthResponse
-	(*StartYandexAuthResponse)(nil),             // 19: profile.v1.StartYandexAuthResponse
-	(*ProfileResponse)(nil),                     // 20: profile.v1.ProfileResponse
-	(*ProfileProgressOverview)(nil),             // 21: profile.v1.ProfileProgressOverview
-	(*ProfileCompetency)(nil),                   // 22: profile.v1.ProfileCompetency
-	(*ProfileProgressRecommendation)(nil),       // 23: profile.v1.ProfileProgressRecommendation
-	(*ProfileCheckpointProgress)(nil),           // 24: profile.v1.ProfileCheckpointProgress
-	(*ProfileProgress)(nil),                     // 25: profile.v1.ProfileProgress
-	(*ProfileProgressResponse)(nil),             // 26: profile.v1.ProfileProgressResponse
-	(*Achievement)(nil),                         // 27: profile.v1.Achievement
-	(*GetAchievementsResponse)(nil),             // 28: profile.v1.GetAchievementsResponse
-	(*ActivityDay)(nil),                         // 29: profile.v1.ActivityDay
-	(*GetProfileActivityResponse)(nil),          // 30: profile.v1.GetProfileActivityResponse
-	(*User)(nil),                                // 31: profile.v1.User
-	(*timestamppb.Timestamp)(nil),               // 32: google.protobuf.Timestamp
+	(*CreateTelegramAuthChallengeRequest)(nil),  // 0: profile.v1.CreateTelegramAuthChallengeRequest
+	(*ConfirmTelegramAuthRequest)(nil),          // 1: profile.v1.ConfirmTelegramAuthRequest
+	(*TelegramAuthRequest)(nil),                 // 2: profile.v1.TelegramAuthRequest
+	(*StartYandexAuthRequest)(nil),              // 3: profile.v1.StartYandexAuthRequest
+	(*YandexAuthRequest)(nil),                   // 4: profile.v1.YandexAuthRequest
+	(*CompleteRegistrationRequest)(nil),         // 5: profile.v1.CompleteRegistrationRequest
+	(*GetProfileRequest)(nil),                   // 6: profile.v1.GetProfileRequest
+	(*GetProfileByIDRequest)(nil),               // 7: profile.v1.GetProfileByIDRequest
+	(*UpdateLocationRequest)(nil),               // 8: profile.v1.UpdateLocationRequest
+	(*UpdateProfileRequest)(nil),                // 9: profile.v1.UpdateProfileRequest
+	(*LogoutRequest)(nil),                       // 10: profile.v1.LogoutRequest
+	(*BindTelegramRequest)(nil),                 // 11: profile.v1.BindTelegramRequest
+	(*GetProfileProgressRequest)(nil),           // 12: profile.v1.GetProfileProgressRequest
+	(*GetAchievementsRequest)(nil),              // 13: profile.v1.GetAchievementsRequest
+	(*GetProfileActivityRequest)(nil),           // 14: profile.v1.GetProfileActivityRequest
+	(*ProfileStatusResponse)(nil),               // 15: profile.v1.ProfileStatusResponse
+	(*CreateTelegramAuthChallengeResponse)(nil), // 16: profile.v1.CreateTelegramAuthChallengeResponse
+	(*ConfirmTelegramAuthResponse)(nil),         // 17: profile.v1.ConfirmTelegramAuthResponse
+	(*StartYandexAuthResponse)(nil),             // 18: profile.v1.StartYandexAuthResponse
+	(*ProfileResponse)(nil),                     // 19: profile.v1.ProfileResponse
+	(*ProfileProgressOverview)(nil),             // 20: profile.v1.ProfileProgressOverview
+	(*ProfileCompetency)(nil),                   // 21: profile.v1.ProfileCompetency
+	(*ProfileProgressRecommendation)(nil),       // 22: profile.v1.ProfileProgressRecommendation
+	(*ProfileCheckpointProgress)(nil),           // 23: profile.v1.ProfileCheckpointProgress
+	(*ProfileProgress)(nil),                     // 24: profile.v1.ProfileProgress
+	(*ProfileProgressResponse)(nil),             // 25: profile.v1.ProfileProgressResponse
+	(*Achievement)(nil),                         // 26: profile.v1.Achievement
+	(*GetAchievementsResponse)(nil),             // 27: profile.v1.GetAchievementsResponse
+	(*ActivityDay)(nil),                         // 28: profile.v1.ActivityDay
+	(*GetProfileActivityResponse)(nil),          // 29: profile.v1.GetProfileActivityResponse
+	(*User)(nil),                                // 30: profile.v1.User
+	(*timestamppb.Timestamp)(nil),               // 31: google.protobuf.Timestamp
+	(v1.UserActivityStatus)(0),                  // 32: common.v1.UserActivityStatus
 }
 var file_profile_v1_profile_proto_depIdxs = []int32{
-	32, // 0: profile.v1.CreateTelegramAuthChallengeResponse.expires_at:type_name -> google.protobuf.Timestamp
-	32, // 1: profile.v1.StartYandexAuthResponse.expires_at:type_name -> google.protobuf.Timestamp
-	31, // 2: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
-	32, // 3: profile.v1.ProfileProgressOverview.last_activity_at:type_name -> google.protobuf.Timestamp
-	32, // 4: profile.v1.ProfileCheckpointProgress.finished_at:type_name -> google.protobuf.Timestamp
-	21, // 5: profile.v1.ProfileProgress.overview:type_name -> profile.v1.ProfileProgressOverview
-	22, // 6: profile.v1.ProfileProgress.competencies:type_name -> profile.v1.ProfileCompetency
-	22, // 7: profile.v1.ProfileProgress.strongest:type_name -> profile.v1.ProfileCompetency
-	22, // 8: profile.v1.ProfileProgress.weakest:type_name -> profile.v1.ProfileCompetency
-	23, // 9: profile.v1.ProfileProgress.recommendations:type_name -> profile.v1.ProfileProgressRecommendation
-	24, // 10: profile.v1.ProfileProgress.checkpoints:type_name -> profile.v1.ProfileCheckpointProgress
-	25, // 11: profile.v1.ProfileProgressResponse.progress:type_name -> profile.v1.ProfileProgress
-	27, // 12: profile.v1.GetAchievementsResponse.achievements:type_name -> profile.v1.Achievement
-	29, // 13: profile.v1.GetProfileActivityResponse.activity:type_name -> profile.v1.ActivityDay
-	32, // 14: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	0,  // 15: profile.v1.User.activity_status:type_name -> profile.v1.UserActivityStatus
-	1,  // 16: profile.v1.ProfileService.CreateTelegramAuthChallenge:input_type -> profile.v1.CreateTelegramAuthChallengeRequest
-	2,  // 17: profile.v1.ProfileService.ConfirmTelegramAuth:input_type -> profile.v1.ConfirmTelegramAuthRequest
-	3,  // 18: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
-	4,  // 19: profile.v1.ProfileService.StartYandexAuth:input_type -> profile.v1.StartYandexAuthRequest
-	5,  // 20: profile.v1.ProfileService.YandexAuth:input_type -> profile.v1.YandexAuthRequest
-	6,  // 21: profile.v1.ProfileService.CompleteRegistration:input_type -> profile.v1.CompleteRegistrationRequest
-	7,  // 22: profile.v1.ProfileService.GetProfile:input_type -> profile.v1.GetProfileRequest
-	8,  // 23: profile.v1.ProfileService.GetProfileByID:input_type -> profile.v1.GetProfileByIDRequest
-	9,  // 24: profile.v1.ProfileService.UpdateLocation:input_type -> profile.v1.UpdateLocationRequest
-	10, // 25: profile.v1.ProfileService.UpdateProfile:input_type -> profile.v1.UpdateProfileRequest
-	11, // 26: profile.v1.ProfileService.Logout:input_type -> profile.v1.LogoutRequest
-	12, // 27: profile.v1.ProfileService.BindTelegram:input_type -> profile.v1.BindTelegramRequest
-	13, // 28: profile.v1.ProfileService.GetProfileProgress:input_type -> profile.v1.GetProfileProgressRequest
-	14, // 29: profile.v1.ProfileService.GetAchievements:input_type -> profile.v1.GetAchievementsRequest
-	15, // 30: profile.v1.ProfileService.GetProfileActivity:input_type -> profile.v1.GetProfileActivityRequest
-	17, // 31: profile.v1.ProfileService.CreateTelegramAuthChallenge:output_type -> profile.v1.CreateTelegramAuthChallengeResponse
-	18, // 32: profile.v1.ProfileService.ConfirmTelegramAuth:output_type -> profile.v1.ConfirmTelegramAuthResponse
-	20, // 33: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
-	19, // 34: profile.v1.ProfileService.StartYandexAuth:output_type -> profile.v1.StartYandexAuthResponse
-	20, // 35: profile.v1.ProfileService.YandexAuth:output_type -> profile.v1.ProfileResponse
-	20, // 36: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
-	20, // 37: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
-	20, // 38: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
-	20, // 39: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
-	20, // 40: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
-	16, // 41: profile.v1.ProfileService.Logout:output_type -> profile.v1.ProfileStatusResponse
-	16, // 42: profile.v1.ProfileService.BindTelegram:output_type -> profile.v1.ProfileStatusResponse
-	26, // 43: profile.v1.ProfileService.GetProfileProgress:output_type -> profile.v1.ProfileProgressResponse
-	28, // 44: profile.v1.ProfileService.GetAchievements:output_type -> profile.v1.GetAchievementsResponse
-	30, // 45: profile.v1.ProfileService.GetProfileActivity:output_type -> profile.v1.GetProfileActivityResponse
+	31, // 0: profile.v1.CreateTelegramAuthChallengeResponse.expires_at:type_name -> google.protobuf.Timestamp
+	31, // 1: profile.v1.StartYandexAuthResponse.expires_at:type_name -> google.protobuf.Timestamp
+	30, // 2: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
+	31, // 3: profile.v1.ProfileProgressOverview.last_activity_at:type_name -> google.protobuf.Timestamp
+	31, // 4: profile.v1.ProfileCheckpointProgress.finished_at:type_name -> google.protobuf.Timestamp
+	20, // 5: profile.v1.ProfileProgress.overview:type_name -> profile.v1.ProfileProgressOverview
+	21, // 6: profile.v1.ProfileProgress.competencies:type_name -> profile.v1.ProfileCompetency
+	21, // 7: profile.v1.ProfileProgress.strongest:type_name -> profile.v1.ProfileCompetency
+	21, // 8: profile.v1.ProfileProgress.weakest:type_name -> profile.v1.ProfileCompetency
+	22, // 9: profile.v1.ProfileProgress.recommendations:type_name -> profile.v1.ProfileProgressRecommendation
+	23, // 10: profile.v1.ProfileProgress.checkpoints:type_name -> profile.v1.ProfileCheckpointProgress
+	24, // 11: profile.v1.ProfileProgressResponse.progress:type_name -> profile.v1.ProfileProgress
+	26, // 12: profile.v1.GetAchievementsResponse.achievements:type_name -> profile.v1.Achievement
+	28, // 13: profile.v1.GetProfileActivityResponse.activity:type_name -> profile.v1.ActivityDay
+	31, // 14: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	32, // 15: profile.v1.User.activity_status:type_name -> common.v1.UserActivityStatus
+	0,  // 16: profile.v1.ProfileService.CreateTelegramAuthChallenge:input_type -> profile.v1.CreateTelegramAuthChallengeRequest
+	1,  // 17: profile.v1.ProfileService.ConfirmTelegramAuth:input_type -> profile.v1.ConfirmTelegramAuthRequest
+	2,  // 18: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
+	3,  // 19: profile.v1.ProfileService.StartYandexAuth:input_type -> profile.v1.StartYandexAuthRequest
+	4,  // 20: profile.v1.ProfileService.YandexAuth:input_type -> profile.v1.YandexAuthRequest
+	5,  // 21: profile.v1.ProfileService.CompleteRegistration:input_type -> profile.v1.CompleteRegistrationRequest
+	6,  // 22: profile.v1.ProfileService.GetProfile:input_type -> profile.v1.GetProfileRequest
+	7,  // 23: profile.v1.ProfileService.GetProfileByID:input_type -> profile.v1.GetProfileByIDRequest
+	8,  // 24: profile.v1.ProfileService.UpdateLocation:input_type -> profile.v1.UpdateLocationRequest
+	9,  // 25: profile.v1.ProfileService.UpdateProfile:input_type -> profile.v1.UpdateProfileRequest
+	10, // 26: profile.v1.ProfileService.Logout:input_type -> profile.v1.LogoutRequest
+	11, // 27: profile.v1.ProfileService.BindTelegram:input_type -> profile.v1.BindTelegramRequest
+	12, // 28: profile.v1.ProfileService.GetProfileProgress:input_type -> profile.v1.GetProfileProgressRequest
+	13, // 29: profile.v1.ProfileService.GetAchievements:input_type -> profile.v1.GetAchievementsRequest
+	14, // 30: profile.v1.ProfileService.GetProfileActivity:input_type -> profile.v1.GetProfileActivityRequest
+	16, // 31: profile.v1.ProfileService.CreateTelegramAuthChallenge:output_type -> profile.v1.CreateTelegramAuthChallengeResponse
+	17, // 32: profile.v1.ProfileService.ConfirmTelegramAuth:output_type -> profile.v1.ConfirmTelegramAuthResponse
+	19, // 33: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
+	18, // 34: profile.v1.ProfileService.StartYandexAuth:output_type -> profile.v1.StartYandexAuthResponse
+	19, // 35: profile.v1.ProfileService.YandexAuth:output_type -> profile.v1.ProfileResponse
+	19, // 36: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
+	19, // 37: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
+	19, // 38: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
+	19, // 39: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
+	19, // 40: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
+	15, // 41: profile.v1.ProfileService.Logout:output_type -> profile.v1.ProfileStatusResponse
+	15, // 42: profile.v1.ProfileService.BindTelegram:output_type -> profile.v1.ProfileStatusResponse
+	25, // 43: profile.v1.ProfileService.GetProfileProgress:output_type -> profile.v1.ProfileProgressResponse
+	27, // 44: profile.v1.ProfileService.GetAchievements:output_type -> profile.v1.GetAchievementsResponse
+	29, // 45: profile.v1.ProfileService.GetProfileActivity:output_type -> profile.v1.GetProfileActivityResponse
 	31, // [31:46] is the sub-list for method output_type
 	16, // [16:31] is the sub-list for method input_type
 	16, // [16:16] is the sub-list for extension type_name
@@ -2341,14 +2284,13 @@ func file_profile_v1_profile_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_profile_v1_profile_proto_rawDesc), len(file_profile_v1_profile_proto_rawDesc)),
-			NumEnums:      1,
+			NumEnums:      0,
 			NumMessages:   31,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_profile_v1_profile_proto_goTypes,
 		DependencyIndexes: file_profile_v1_profile_proto_depIdxs,
-		EnumInfos:         file_profile_v1_profile_proto_enumTypes,
 		MessageInfos:      file_profile_v1_profile_proto_msgTypes,
 	}.Build()
 	File_profile_v1_profile_proto = out.File

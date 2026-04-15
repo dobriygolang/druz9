@@ -38,17 +38,17 @@ const userSelectColumns = `
   u.updated_at
 `
 
-func (r *Repo) userByIDQuery() string {
+func buildUserSelectQuery(whereClause string) string {
 	return fmt.Sprintf(`
 SELECT `+userSelectColumns+`
 FROM users u
 LEFT JOIN geo g ON g.user_id = u.id
-WHERE u.id = $1
+WHERE `+whereClause+`
 `, "u.is_trusted")
 }
 
 func (r *Repo) selectUserByIDTx(ctx context.Context, tx pgx.Tx, userID uuid.UUID) (*model.User, error) {
-	return scanUser(tx.QueryRow(ctx, r.userByIDQuery(), userID))
+	return scanUser(tx.QueryRow(ctx, buildUserSelectQuery("u.id = $1"), userID))
 }
 
 func parseTelegramProviderID(value string) (int64, error) {
@@ -66,26 +66,14 @@ func (r *Repo) FindUserByProviderIdentity(ctx context.Context, provider model.Au
 		if err != nil {
 			return nil, err
 		}
-		query := fmt.Sprintf(`
-SELECT `+userSelectColumns+`
-FROM users u
-LEFT JOIN geo g ON g.user_id = u.id
-WHERE u.telegram_id = $1
-`, "u.is_trusted")
-		return scanUser(r.data.DB.QueryRow(ctx, query, telegramID))
+		return scanUser(r.data.DB.QueryRow(ctx, buildUserSelectQuery("u.telegram_id = $1"), telegramID))
 	case model.AuthProviderYandex:
-		query := fmt.Sprintf(`
-SELECT `+userSelectColumns+`
-FROM users u
-LEFT JOIN geo g ON g.user_id = u.id
-WHERE u.yandex_id = $1
-`, "u.is_trusted")
-		return scanUser(r.data.DB.QueryRow(ctx, query, providerUserID))
+		return scanUser(r.data.DB.QueryRow(ctx, buildUserSelectQuery("u.yandex_id = $1"), providerUserID))
 	default:
 		return nil, profileerrors.ErrInvalidPayload
 	}
 }
 
 func (r *Repo) FindUserByID(ctx context.Context, id uuid.UUID) (*model.User, error) {
-	return scanUser(r.data.DB.QueryRow(ctx, r.userByIDQuery(), id))
+	return scanUser(r.data.DB.QueryRow(ctx, buildUserSelectQuery("u.id = $1"), id))
 }

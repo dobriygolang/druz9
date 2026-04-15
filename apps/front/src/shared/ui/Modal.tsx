@@ -33,14 +33,14 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
   }
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <div className="fixed inset-0 z-50 flex items-end justify-center p-0 sm:items-center sm:p-4">
       <div
         className="absolute inset-0 bg-[#1e293b]/60 dark:bg-black/70 animate-fade-in"
         onClick={onClose}
       />
       <div
         className={cn(
-          'relative w-full rounded-xl border shadow-modal flex flex-col animate-modal-in',
+          'relative flex max-h-[92vh] w-full flex-col overflow-hidden rounded-t-[28px] border shadow-modal animate-modal-in sm:max-h-[min(90vh,760px)] sm:rounded-xl',
           'bg-white border-[#e2e8f0]',
           'dark:bg-[#161c2d] dark:border-[#1e3158]',
           sizes[size],
@@ -61,9 +61,9 @@ export function Modal({ open, onClose, title, subtitle, children, footer, size =
             </button>
           </div>
         )}
-        <div className="p-5 overflow-y-auto flex-1">{children}</div>
+        <div className="flex-1 overflow-y-auto p-5">{children}</div>
         {footer && (
-          <div className="px-5 py-3.5 border-t border-[#e2e8f0] dark:border-[#1e3158] flex justify-end gap-2">
+          <div className="flex flex-col-reverse justify-end gap-2 border-t border-[#e2e8f0] px-5 py-3.5 dark:border-[#1e3158] sm:flex-row">
             {footer}
           </div>
         )}

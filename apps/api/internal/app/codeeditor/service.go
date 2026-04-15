@@ -2,6 +2,7 @@ package codeeditor
 
 import (
 	"context"
+	"sync"
 	"time"
 
 	"api/internal/cache"
@@ -34,15 +35,26 @@ func guestRoomKey(roomID uuid.UUID, guestName string) string {
 	return roomID.String() + ":" + guestName
 }
 
+type leaderboardSnapshot struct {
+	entries   []*domain.LeaderboardEntry
+	expiresAt time.Time
+}
+
 type Service struct {
 	repo       domain.Repository
 	sandbox    Sandbox
 	taskCache  *cache.TTLCache[domain.Task]
 	guestCache *cache.TTLCache[GuestParticipant]
+
+	leaderboardMu    sync.Mutex
+	leaderboardCache leaderboardSnapshot
 }
 
-const guestTTL = 10 * time.Minute
-const guestCacheMaxEntries = 1000
+const (
+	guestTTL             = 10 * time.Minute
+	guestCacheMaxEntries = 1000
+	leaderboardCacheTTL  = 30 * time.Second
+)
 
 func New(c Config) *Service {
 	return &Service{

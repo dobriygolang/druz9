@@ -23,5 +23,5 @@ func (i *Implementation) LeaveMatch(ctx context.Context, req *v1.LeaveMatchReque
 	}
 
 	i.realtime.PublishMatch(mapArenaRealtimeMatch(match), mapArenaRealtimeCodes(match))
-	return &v1.ArenaMatchResponse{Match: mapArenaMatch(match)}, nil
+	return &v1.ArenaMatchResponse{Match: mapArenaMatchForViewer(match, user.ID.String(), false)}, nil
 }

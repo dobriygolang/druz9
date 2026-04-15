@@ -2,6 +2,17 @@ import { apiClient, withGuestCodeRoomHeaders } from '@/shared/api/base'
 import { createCache } from '@/shared/api/cache'
 import type { Room, Task } from '@/entities/CodeRoom/model/types'
 
+const LANGUAGE_FRIENDLY_TO_ENUM: Record<string, string> = {
+  javascript: 'PROGRAMMING_LANGUAGE_JAVASCRIPT',
+  typescript: 'PROGRAMMING_LANGUAGE_TYPESCRIPT',
+  python: 'PROGRAMMING_LANGUAGE_PYTHON',
+  go: 'PROGRAMMING_LANGUAGE_GO',
+  sql: 'PROGRAMMING_LANGUAGE_SQL',
+  rust: 'PROGRAMMING_LANGUAGE_RUST',
+  cpp: 'PROGRAMMING_LANGUAGE_CPP',
+  java: 'PROGRAMMING_LANGUAGE_JAVA',
+}
+
 type BackendRoom = {
   id: string
   mode?: string
@@ -17,6 +28,7 @@ type BackendRoom = {
   codeRevision?: number
   creatorId?: string
   isPrivate?: boolean
+  language?: string
 }
 
 function normalizeRoom(r: BackendRoom): Room {
@@ -36,7 +48,13 @@ function normalizeRoom(r: BackendRoom): Room {
     codeRevision: r.codeRevision ?? 0,
     creatorId: r.creatorId ?? '',
     isPrivate: r.isPrivate ?? false,
+    language: (r.language as Room['language']) ?? 'PROGRAMMING_LANGUAGE_UNSPECIFIED',
   }
+}
+
+function toLanguageEnum(language?: string): string | undefined {
+  if (!language) return undefined
+  return LANGUAGE_FRIENDLY_TO_ENUM[language] ?? language
 }
 
 const listTasksCache = createCache<string, Task[]>()
@@ -85,10 +103,10 @@ export const codeRoomApi = {
   leaveRoom: async (roomId: string): Promise<void> => {
     await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/leave`, {})
   },
-  submitCode: async (roomId: string, code: string, guestName?: string): Promise<{ output: string; error: string; isCorrect: boolean }> => {
+  submitCode: async (roomId: string, code: string, guestName?: string, language?: string): Promise<{ output: string; error: string; isCorrect: boolean }> => {
     const r = await apiClient.post<{ output?: string; error?: string; isCorrect?: boolean }>(
       `/api/v1/code-editor/rooms/${roomId}/submit`,
-      { code },
+      { code, language: toLanguageEnum(language) },
       { headers: withGuestCodeRoomHeaders(guestName) },
     )
     return { output: r.data.output ?? '', error: r.data.error ?? '', isCorrect: r.data.isCorrect ?? false }

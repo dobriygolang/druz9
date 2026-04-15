@@ -2,6 +2,7 @@ package codeeditor
 
 import (
 	"context"
+	"time"
 
 	domain "api/internal/domain/codeeditor"
 
@@ -21,7 +22,7 @@ func (s *Service) GetTask(ctx context.Context, taskID uuid.UUID) (*domain.Task, 
 	if err != nil {
 		return nil, err
 	}
-	s.taskCache.Set(cacheKey, *task, 0)
+	s.taskCache.Set(cacheKey, *task)
 	return task, nil
 }
 
@@ -53,5 +54,25 @@ func (s *Service) DeleteTask(ctx context.Context, taskID uuid.UUID) error {
 }
 
 func (s *Service) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.LeaderboardEntry, error) {
-	return s.repo.GetLeaderboard(ctx, limit)
+	s.leaderboardMu.Lock()
+	cached := s.leaderboardCache
+	s.leaderboardMu.Unlock()
+
+	if cached.entries != nil && time.Now().Before(cached.expiresAt) {
+		return cached.entries, nil
+	}
+
+	entries, err := s.repo.GetLeaderboard(ctx, limit)
+	if err != nil {
+		return nil, err
+	}
+
+	s.leaderboardMu.Lock()
+	s.leaderboardCache = leaderboardSnapshot{
+		entries:   entries,
+		expiresAt: time.Now().Add(leaderboardCacheTTL),
+	}
+	s.leaderboardMu.Unlock()
+
+	return entries, nil
 }

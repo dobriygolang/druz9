@@ -31,16 +31,20 @@ apiClient.interceptors.response.use(
   },
 )
 
+function encodeNameBase64(name: string): string {
+  return btoa(encodeURIComponent(name).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16))))
+}
+
 export function withGuestArenaHeaders(actorId?: string, guestName?: string) {
   const headers: Record<string, string> = {}
   if (actorId) headers['X-Arena-Guest-Id'] = actorId
-  if (guestName) headers['X-Arena-Guest-Name'] = btoa(encodeURIComponent(guestName).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16))))
+  if (guestName) headers['X-Arena-Guest-Name'] = encodeNameBase64(guestName)
   return headers
 }
 
 export function withGuestCodeRoomHeaders(guestName?: string) {
   if (!guestName) return {}
-  return { 'X-Code-Editor-Guest-Name': btoa(encodeURIComponent(guestName).replace(/%([0-9A-F]{2})/g, (_, p1) => String.fromCharCode(parseInt(p1, 16)))) }
+  return { 'X-Code-Editor-Guest-Name': encodeNameBase64(guestName) }
 }
 
 export interface ListQueryParams {

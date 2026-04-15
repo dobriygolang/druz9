@@ -46,7 +46,6 @@ var mockStageOrder = []model.InterviewPrepMockStageKind{
 	model.InterviewPrepMockStageKindSlices,
 	model.InterviewPrepMockStageKindConcurrency,
 	model.InterviewPrepMockStageKindSQL,
-	model.InterviewPrepMockStageKindArchitecture,
 	model.InterviewPrepMockStageKindSystemDesign,
 }
 
@@ -55,9 +54,6 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 		return nil, err
 	}
 	companyTag = strings.TrimSpace(strings.ToLower(companyTag))
-	if companyTag == "" {
-		return nil, ErrMockCompanyTagRequired
-	}
 
 	// Check if user already has an active session for this exact company → resume it
 	existing, err := s.repo.GetActiveMockSessionByUserAndCompany(ctx, user.ID, companyTag)
@@ -284,6 +280,16 @@ func (s *Service) ReviewMockSystemDesign(
 	if stage.Task == nil {
 		return nil, ErrTaskNotFound
 	}
+	normalizedType := ""
+	if len(imageBytes) > 0 {
+		if int64(len(imageBytes)) > s.maxImageBytes {
+			return nil, ErrReviewImageTooLarge
+		}
+		normalizedType, err = normalizeReviewImageType(contentType, fileName)
+		if err != nil {
+			return nil, err
+		}
+	}
 
 	review, err := s.reviewer.ReviewSystemDesign(ctx, aireview.SystemDesignReviewRequest{
 		ModelOverride:  s.modelOverrideForStage(ctx, session.CompanyTag, stage),
@@ -296,7 +302,7 @@ func (s *Service) ReviewMockSystemDesign(
 		Traffic:        input.Traffic,
 		Reliability:    input.Reliability,
 		ImageBytes:     imageBytes,
-		ImageMIME:      contentType,
+		ImageMIME:      normalizedType,
 		ImageName:      fileName,
 	})
 	if err != nil {
@@ -449,20 +455,15 @@ func selectMockInterviewTasks(tasks []*model.InterviewPrepTask, companyTag strin
 		if task == nil || !task.IsActive {
 			continue
 		}
-		if strings.TrimSpace(strings.ToLower(task.CompanyTag)) != companyTag {
+		normalizedTaskCompany := strings.TrimSpace(strings.ToLower(task.CompanyTag))
+		if companyTag != "" && normalizedTaskCompany != "" && normalizedTaskCompany != companyTag {
 			continue
 		}
 		filtered = append(filtered, task)
 	}
 
 	activePresets := companyPresetsForCompany(companyTag, presets)
-	orderedKinds := mockStageOrder
-	if len(activePresets) > 0 {
-		orderedKinds = make([]model.InterviewPrepMockStageKind, 0, len(activePresets))
-		for _, preset := range activePresets {
-			orderedKinds = append(orderedKinds, preset.StageKind)
-		}
-	}
+	orderedKinds := buildMockStageOrder(activePresets)
 
 	result := make(map[model.InterviewPrepMockStageKind]*model.InterviewPrepTask, len(orderedKinds))
 	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
@@ -488,7 +489,45 @@ func selectMockInterviewTasks(tasks []*model.InterviewPrepTask, companyTag strin
 	return result, orderedKinds, nil
 }
 
+func buildMockStageOrder(presets []*model.InterviewPrepMockCompanyPreset) []model.InterviewPrepMockStageKind {
+	seen := make(map[model.InterviewPrepMockStageKind]struct{}, len(mockStageOrder))
+	ordered := make([]model.InterviewPrepMockStageKind, 0, len(mockStageOrder))
+	for _, preset := range presets {
+		if preset == nil || !preset.IsActive {
+			continue
+		}
+		normalizedKind := normalizeMockStageKind(preset.StageKind)
+		if normalizedKind == model.InterviewPrepMockStageKindUnknown {
+			continue
+		}
+		if _, ok := seen[normalizedKind]; ok {
+			continue
+		}
+		seen[normalizedKind] = struct{}{}
+		ordered = append(ordered, normalizedKind)
+	}
+	for _, kind := range mockStageOrder {
+		normalizedKind := normalizeMockStageKind(kind)
+		if _, ok := seen[normalizedKind]; ok {
+			continue
+		}
+		seen[normalizedKind] = struct{}{}
+		ordered = append(ordered, normalizedKind)
+	}
+	return ordered
+}
+
+func normalizeMockStageKind(kind model.InterviewPrepMockStageKind) model.InterviewPrepMockStageKind {
+	switch kind {
+	case model.InterviewPrepMockStageKindArchitecture:
+		return model.InterviewPrepMockStageKindConcurrency
+	default:
+		return kind
+	}
+}
+
 func mockStageCandidates(kind model.InterviewPrepMockStageKind, tasks []*model.InterviewPrepTask) []*model.InterviewPrepTask {
+	kind = normalizeMockStageKind(kind)
 	result := make([]*model.InterviewPrepTask, 0)
 	for _, task := range tasks {
 		if task == nil {
@@ -496,24 +535,15 @@ func mockStageCandidates(kind model.InterviewPrepMockStageKind, tasks []*model.I
 		}
 		switch kind {
 		case model.InterviewPrepMockStageKindSlices:
-			slug := task.Slug
-			if strings.Contains(slug, "slice") || strings.Contains(slug, "slay") {
+			if task.PrepType == model.InterviewPrepTypeAlgorithm {
 				result = append(result, task)
 			}
 		case model.InterviewPrepMockStageKindConcurrency:
-			slug := task.Slug
-			if strings.Contains(slug, "worker") || strings.Contains(slug, "mutex") || strings.Contains(slug, "concurr") ||
-				strings.Contains(slug, "goroutine") || strings.Contains(slug, "gorutin") ||
-				strings.Contains(slug, "kanal") || strings.Contains(slug, "race") ||
-				strings.Contains(slug, "myuteks") || strings.Contains(slug, "sync") {
+			if task.PrepType == model.InterviewPrepTypeCoding {
 				result = append(result, task)
 			}
 		case model.InterviewPrepMockStageKindSQL:
-			if normalizeSolveLanguage(task.Language) == "sql" {
-				result = append(result, task)
-			}
-		case model.InterviewPrepMockStageKindArchitecture:
-			if !task.IsExecutable && task.PrepType == model.InterviewPrepTypeCoding && normalizeSolveLanguage(task.Language) == "go" {
+			if task.PrepType == model.InterviewPrepTypeSQL || normalizeSolveLanguage(task.Language) == "sql" {
 				result = append(result, task)
 			}
 		case model.InterviewPrepMockStageKindSystemDesign:
@@ -740,11 +770,12 @@ func companyPresetsForCompany(companyTag string, presets []*model.InterviewPrepM
 }
 
 func findCompanyPreset(kind model.InterviewPrepMockStageKind, presets []*model.InterviewPrepMockCompanyPreset) *model.InterviewPrepMockCompanyPreset {
+	kind = normalizeMockStageKind(kind)
 	for _, preset := range presets {
 		if preset == nil || !preset.IsActive {
 			continue
 		}
-		if preset.StageKind == kind {
+		if normalizeMockStageKind(preset.StageKind) == kind {
 			return preset
 		}
 	}

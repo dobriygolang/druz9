@@ -284,7 +284,8 @@ type Room struct {
 	Status       RoomStatus
 	CreatorID    uuid.UUID // creator user ID (nil for guests)
 	InviteCode   string    // public invite code for guests
-	Task         string    // task description for duel
+	Language     ProgrammingLanguage
+	Task         string // task description for duel
 	TaskID       *uuid.UUID
 	DuelTopic    string
 	WinnerUserID *uuid.UUID
@@ -295,6 +296,19 @@ type Room struct {
 	UpdatedAt    time.Time
 	IsPrivate    bool // if true, only joinable via invite code
 	Participants []*Participant
+}
+
+type RoomEditorState struct {
+	Code     string
+	Language ProgrammingLanguage
+}
+
+type DuelEditorState struct {
+	RoomID    uuid.UUID
+	ActorKey  string
+	Code      string
+	Language  ProgrammingLanguage
+	UpdatedAt time.Time
 }
 
 type Participant struct {
@@ -333,7 +347,7 @@ type CodeTask struct {
 	TaskType         TaskType
 	ExecutionProfile ExecutionProfile
 	RunnerMode       RunnerMode
-	DurationSeconds  int32  // Duration in seconds for arena matches (default 15 minutes)
+	DurationSeconds  int32 // Duration in seconds for arena matches (default 15 minutes)
 	FixtureFiles     []string
 	ReadablePaths    []string
 	WritablePaths    []string

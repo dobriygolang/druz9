@@ -37,7 +37,7 @@ export const adminApi = {
   // Config
   getConfig: async () => {
     const r = await apiClient.get<{ configs?: Array<{ key: string; value: string; type: string }> }>('/api/admin/config')
-    const map: Record<string, any> = {}
+    const map: Record<string, string | boolean> = {}
     for (const item of r.data.configs ?? []) {
       map[item.key] = item.type === 'bool' ? item.value === 'true' : item.value
     }

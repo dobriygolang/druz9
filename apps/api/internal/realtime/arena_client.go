@@ -30,7 +30,11 @@ func (c *arenaClient) readLoop(h *ArenaHub) {
 
 		switch msg.Type {
 		case schema.ArenaTypeHello:
-			c.userID = msg.UserID
+			if c.authenticatedUserID != "" {
+				c.userID = c.authenticatedUserID
+			} else {
+				c.userID = msg.UserID
+			}
 			c.spectator = msg.Spectator
 			if msg.DisplayName != "" {
 				h.bindDisplayName(c.matchID, c.userID, msg.DisplayName)

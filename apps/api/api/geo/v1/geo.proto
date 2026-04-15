@@ -3,6 +3,8 @@ syntax = "proto3";
 package geo.v1;
 
 import "google/api/annotations.proto";
+import "common/v1/common.proto";
+
 option go_package = "api/pkg/api/geo/v1;v1";
 
 service GeoService {
@@ -54,13 +56,7 @@ message CommunityMapPoint {
   string username = 8;
   string first_name = 9;
   string last_name = 10;
-  UserActivityStatus activity_status = 11;
+  common.v1.UserActivityStatus activity_status = 11;
   string telegram_username = 12;
 }
 
-enum UserActivityStatus {
-  USER_ACTIVITY_STATUS_UNSPECIFIED = 0;
-  USER_ACTIVITY_STATUS_ONLINE = 1;
-  USER_ACTIVITY_STATUS_RECENTLY_ACTIVE = 2;
-  USER_ACTIVITY_STATUS_OFFLINE = 3;
-}

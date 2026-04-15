@@ -12,13 +12,8 @@ import {
   getDisplayTopics,
   CATEGORY_LABELS,
 } from '@/features/Admin/model/taskCategories'
+import { DIFF_LABELS, DIFF_VARIANTS } from '@/shared/lib/taskLabels'
 
-const DIFF_LABELS: Record<string, string> = {
-  TASK_DIFFICULTY_EASY: 'Easy', TASK_DIFFICULTY_MEDIUM: 'Medium', TASK_DIFFICULTY_HARD: 'Hard',
-}
-const DIFF_VARIANTS: Record<string, 'success' | 'warning' | 'danger'> = {
-  TASK_DIFFICULTY_EASY: 'success', TASK_DIFFICULTY_MEDIUM: 'warning', TASK_DIFFICULTY_HARD: 'danger',
-}
 const LANG_LABELS: Record<string, string> = {
   PROGRAMMING_LANGUAGE_PYTHON: 'Python', PROGRAMMING_LANGUAGE_JAVASCRIPT: 'JS',
   PROGRAMMING_LANGUAGE_TYPESCRIPT: 'TS', PROGRAMMING_LANGUAGE_GO: 'Go',

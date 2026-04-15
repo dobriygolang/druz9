@@ -8,21 +8,7 @@ import { Button } from '@/shared/ui/Button'
 import { Modal } from '@/shared/ui/Modal'
 import { Input } from '@/shared/ui/Input'
 import { useToast } from '@/shared/ui/Toast'
-
-const CIRCLE_GRADIENTS = [
-  { from: '#6366f1', to: '#8b5cf6' },
-  { from: '#06b6d4', to: '#0ea5e9' },
-  { from: '#10b981', to: '#059669' },
-  { from: '#f97316', to: '#ef4444' },
-  { from: '#ec4899', to: '#db2777' },
-  { from: '#f59e0b', to: '#d97706' },
-]
-
-function getCircleGradient(name: string) {
-  let hash = 0
-  for (let i = 0; i < name.length; i++) hash = name.charCodeAt(i) + ((hash << 5) - hash)
-  return CIRCLE_GRADIENTS[Math.abs(hash) % CIRCLE_GRADIENTS.length]
-}
+import { getCircleGradient } from '@/shared/lib/circleGradient'
 
 export function CirclesPage() {
   const { toast } = useToast()

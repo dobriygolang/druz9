@@ -3,19 +3,35 @@ package realtime
 import (
 	"time"
 
+	"api/internal/model"
+
 	"github.com/google/uuid"
 )
 
 const snapshotFlushInterval = 3 * time.Second
 
+type pendingRoomSnapshot struct {
+	roomID   string
+	code     string
+	language string
+}
+
+type pendingActorSnapshot struct {
+	roomID    string
+	userID    *string
+	guestName string
+	code      string
+	language  string
+}
+
 func (h *CodeEditorHub) loadRoomSnapshot(roomID string) {
-	parsedRoomID, err := uuid.Parse(roomID)
-	if err != nil {
+	parsedRoomID := mustParseUUID(roomID)
+	if parsedRoomID == uuid.Nil {
 		return
 	}
 
 	room, err := h.store.GetRoom(h.ctx, parsedRoomID)
-	if err != nil {
+	if err != nil || room == nil {
 		return
 	}
 
@@ -26,7 +42,10 @@ func (h *CodeEditorHub) loadRoomSnapshot(roomID string) {
 	if state == nil {
 		return
 	}
+	state.mode = room.Mode.String()
 	state.lastPlainText = room.Code
+	state.defaultCode = room.Code
+	state.language = room.Language.String()
 	state.creatorID = room.CreatorID.String()
 }
 
@@ -40,33 +59,88 @@ func (h *CodeEditorHub) snapshotLoop() {
 			return
 		case <-ticker.C:
 		}
-		type snapshot struct {
-			roomID string
-			code   string
-		}
 
-		var pending []snapshot
+		var sharedPending []pendingRoomSnapshot
+		var duelPending []pendingActorSnapshot
 
 		h.mu.Lock()
 		for roomID, room := range h.rooms {
+			if room.mode == model.RoomModeDuel.String() {
+				for client := range room.clients {
+					state := room.duelStates[client.actorKey]
+					if state == nil || !state.dirty {
+						continue
+					}
+					var rawUserID *string
+					if client.userID != "" {
+						value := client.userID
+						rawUserID = &value
+					}
+					duelPending = append(duelPending, pendingActorSnapshot{
+						roomID:    roomID,
+						userID:    rawUserID,
+						guestName: client.guestName,
+						code:      state.plainText,
+						language:  state.language,
+					})
+					state.dirty = false
+				}
+				continue
+			}
 			if !room.dirty {
 				continue
 			}
-			pending = append(pending, snapshot{roomID: roomID, code: room.lastPlainText})
+			sharedPending = append(sharedPending, pendingRoomSnapshot{
+				roomID:   roomID,
+				code:     room.lastPlainText,
+				language: room.language,
+			})
 			room.dirty = false
 		}
 		h.mu.Unlock()
 
-		for _, item := range pending {
-			h.flushSnapshot(item.roomID, item.code)
+		for _, item := range sharedPending {
+			h.flushSnapshot(item.roomID, item.code, item.language)
+		}
+		for _, item := range duelPending {
+			h.flushActorSnapshotByState(item)
 		}
 	}
 }
 
-func (h *CodeEditorHub) flushSnapshot(roomID, code string) {
-	parsedRoomID, err := uuid.Parse(roomID)
-	if err != nil {
+func (h *CodeEditorHub) flushSnapshot(roomID, code, language string) {
+	parsedRoomID := mustParseUUID(roomID)
+	if parsedRoomID == uuid.Nil {
 		return
 	}
-	_ = h.store.SaveCodeSnapshot(h.ctx, parsedRoomID, code)
+	_ = h.store.SaveEditorState(
+		h.ctx,
+		parsedRoomID,
+		nil,
+		"",
+		code,
+		model.ProgrammingLanguageFromString(language),
+	)
+}
+
+func (h *CodeEditorHub) flushActorSnapshotByState(item pendingActorSnapshot) {
+	parsedRoomID := mustParseUUID(item.roomID)
+	if parsedRoomID == uuid.Nil {
+		return
+	}
+	_ = h.store.SaveEditorState(
+		h.ctx,
+		parsedRoomID,
+		parseOptionalUUID(derefString(item.userID)),
+		item.guestName,
+		item.code,
+		model.ProgrammingLanguageFromString(item.language),
+	)
+}
+
+func derefString(value *string) string {
+	if value == nil {
+		return ""
+	}
+	return *value
 }

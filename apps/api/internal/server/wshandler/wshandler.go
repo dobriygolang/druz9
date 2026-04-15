@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"api/internal/realtime"
+	server "api/internal/server"
 
 	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
 )
@@ -17,12 +18,12 @@ const (
 )
 
 // Register mounts both WebSocket endpoints on the HTTP server.
-func Register(srv *kratoshttp.Server, codeEditorHub *realtime.CodeEditorHub, arenaHub *realtime.ArenaHub) {
-	srv.HandlePrefix(CodeEditorPrefix, codeEditorHandler(codeEditorHub))
-	srv.HandlePrefix(ArenaPrefix, arenaHandler(arenaHub))
+func Register(srv *kratoshttp.Server, codeEditorHub *realtime.CodeEditorHub, arenaHub *realtime.ArenaHub, auth server.Authorizer) {
+	srv.HandlePrefix(CodeEditorPrefix, codeEditorHandler(codeEditorHub, auth))
+	srv.HandlePrefix(ArenaPrefix, arenaHandler(arenaHub, auth))
 }
 
-func codeEditorHandler(hub *realtime.CodeEditorHub) http.Handler {
+func codeEditorHandler(hub *realtime.CodeEditorHub, auth server.Authorizer) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc(CodeEditorPrefix, func(w http.ResponseWriter, r *http.Request) {
 		roomID := extractID(r.URL.Path, CodeEditorPrefix)
@@ -30,12 +31,16 @@ func codeEditorHandler(hub *realtime.CodeEditorHub) http.Handler {
 			http.NotFound(w, r)
 			return
 		}
-		hub.Handler(roomID).ServeHTTP(w, r)
+		authenticatedUserID := ""
+		if userID, ok := server.Authenticate(r, auth); ok && userID != nil {
+			authenticatedUserID = userID.String()
+		}
+		hub.Handler(roomID, authenticatedUserID).ServeHTTP(w, r)
 	})
 	return mux
 }
 
-func arenaHandler(hub *realtime.ArenaHub) http.Handler {
+func arenaHandler(hub *realtime.ArenaHub, auth server.Authorizer) http.Handler {
 	mux := http.NewServeMux()
 	mux.HandleFunc(ArenaPrefix, func(w http.ResponseWriter, r *http.Request) {
 		matchID := extractID(r.URL.Path, ArenaPrefix)
@@ -43,7 +48,11 @@ func arenaHandler(hub *realtime.ArenaHub) http.Handler {
 			http.NotFound(w, r)
 			return
 		}
-		hub.Handler(matchID).ServeHTTP(w, r)
+		authenticatedUserID := ""
+		if userID, ok := server.Authenticate(r, auth); ok && userID != nil {
+			authenticatedUserID = userID.String()
+		}
+		hub.Handler(matchID, authenticatedUserID).ServeHTTP(w, r)
 	})
 	return mux
 }

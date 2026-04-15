@@ -171,20 +171,25 @@ func (g *geminiReviewer) ReviewSystemDesign(ctx context.Context, req SystemDesig
 	}
 
 	prompt := buildSystemDesignPrompt(req)
+	parts := []map[string]any{
+		{
+			"text": prompt,
+		},
+	}
+	if len(req.ImageBytes) > 0 {
+		parts = append([]map[string]any{
+			{
+				"inline_data": map[string]any{
+					"mime_type": req.ImageMIME,
+					"data":      base64.StdEncoding.EncodeToString(req.ImageBytes),
+				},
+			},
+		}, parts...)
+	}
 	payload := map[string]any{
 		"contents": []map[string]any{
 			{
-				"parts": []map[string]any{
-					{
-						"inline_data": map[string]any{
-							"mime_type": req.ImageMIME,
-							"data":      base64.StdEncoding.EncodeToString(req.ImageBytes),
-						},
-					},
-					{
-						"text": prompt,
-					},
-				},
+				"parts": parts,
 			},
 		},
 		"generationConfig": map[string]any{
@@ -405,25 +410,28 @@ func (o *openAICompatibleReviewer) ReviewSystemDesign(ctx context.Context, req S
 		baseURL = "https://api.openai.com/v1"
 	}
 
-	imageDataURL := "data:" + req.ImageMIME + ";base64," + base64.StdEncoding.EncodeToString(req.ImageBytes)
 	modelName := firstNonEmptyTrimmed(req.ModelOverride, o.model)
+	content := []map[string]any{
+		{
+			"type": "text",
+			"text": buildSystemDesignPrompt(req),
+		},
+	}
+	if len(req.ImageBytes) > 0 {
+		imageDataURL := "data:" + req.ImageMIME + ";base64," + base64.StdEncoding.EncodeToString(req.ImageBytes)
+		content = append(content, map[string]any{
+			"type": "image_url",
+			"image_url": map[string]any{
+				"url": imageDataURL,
+			},
+		})
+	}
 	payload := map[string]any{
 		"model": modelName,
 		"messages": []map[string]any{
 			{
-				"role": "user",
-				"content": []map[string]any{
-					{
-						"type": "text",
-						"text": buildSystemDesignPrompt(req),
-					},
-					{
-						"type": "image_url",
-						"image_url": map[string]any{
-							"url": imageDataURL,
-						},
-					},
-				},
+				"role":    "user",
+				"content": content,
 			},
 		},
 		"temperature": 0.2,
@@ -632,12 +640,13 @@ func (o *openAICompatibleReviewer) ReviewInterviewAnswer(ctx context.Context, re
 func buildSystemDesignPrompt(req SystemDesignReviewRequest) string {
 	var b strings.Builder
 	b.WriteString("Ты проводишь строгий предварительный review ответа кандидата по system design.\n")
-	b.WriteString("На входе есть изображение схемы и структурированные поля с пояснениями кандидата.\n")
+	b.WriteString("На входе могут быть изображение схемы и структурированные поля с пояснениями кандидата.\n")
 	b.WriteString("Верни только валидный JSON с полями: score, summary, strengths, issues, missingTopics, followUpQuestions, disclaimer.\n")
 	b.WriteString("Все строки и элементы массивов должны быть только на русском языке.\n")
 	b.WriteString("Score должен быть целым числом от 1 до 10.\n")
 	b.WriteString("Оценивай архитектурное качество, а не красоту картинки.\n")
 	b.WriteString("Не додумывай детали за кандидата. Если тезис не подтверждается схемой или текстом, считай его отсутствующим.\n")
+	b.WriteString("Если изображения нет, опирайся только на текстовые поля и явно укажи ограничения такой оценки.\n")
 	b.WriteString("Если текстовые поля пустые, шаблонные, бессодержательные или не объясняют решение, считай их отсутствующими.\n")
 	b.WriteString("Не хвали кандидата за сам факт заполнения полей. В strengths должны попадать только подтверждённые инженерные решения.\n")
 	b.WriteString("Если схема нерелевантна задаче или не похожа на архитектурную диаграмму, не выдумывай систему и ставь низкую оценку.\n")
@@ -684,7 +693,7 @@ func buildSystemDesignPrompt(req SystemDesignReviewRequest) string {
 	b.WriteString("6. Безопасность: auth, authz, секреты, PII, сетевые границы, изоляция.\n")
 	b.WriteString("7. Наблюдаемость и эксплуатация: метрики, логи, tracing, alerts, rollout.\n")
 	b.WriteString("8. Явные trade-off и недостающие предположения.\n")
-	b.WriteString("Используй схему как основной источник архитектурных доказательств, а текст кандидата как вспомогательный контекст.\n")
+	b.WriteString("Если схема есть, используй её как основной источник архитектурных доказательств, а текст кандидата как вспомогательный контекст.\n")
 	b.WriteString("Если схема или текст слишком общие, прямо говори, что решение поверхностное и не подтверждает инженерную проработку.\n")
 	b.WriteString("Disclaimer должен явно говорить, что это предварительная AI-оценка, а не финальный вердикт интервьюера.")
 	return b.String()

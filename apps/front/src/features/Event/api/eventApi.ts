@@ -41,6 +41,8 @@ type BackendEvent = {
   participantCount?: number
   description?: string
   meetingLink?: string
+  repeat?: string
+  circleId?: string
 }
 
 function normalizeEvent(e: BackendEvent): Event {
@@ -53,8 +55,8 @@ function normalizeEvent(e: BackendEvent): Event {
     isCreator: e.isCreator ?? false, isJoined: e.isJoined ?? false,
     participantCount: e.participantCount ?? 0,
     description: e.description ?? '', meetingLink: e.meetingLink ?? '',
-    repeat: (e as any).repeat ?? 'none',
-    circleId: (e as any).circleId ?? undefined,
+    repeat: e.repeat ?? 'none',
+    circleId: e.circleId,
   }
 }
 

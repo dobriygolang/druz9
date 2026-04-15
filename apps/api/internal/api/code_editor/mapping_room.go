@@ -38,6 +38,7 @@ func mapRoom(room *codeeditordomain.Room) *v1.Room {
 		Code:         room.Code,
 		Status:       roomStatusToProto(room.Status),
 		InviteCode:   room.InviteCode,
+		Language:     modelLanguageToProto(room.Language),
 		Task:         room.Task,
 		CreatedAt:    timestamppb.New(room.CreatedAt),
 		Participants: participants,
@@ -73,13 +74,19 @@ func mapRealtimeRoom(room *codeeditordomain.Room) *realtime.CodeEditorRoom {
 		maxParticipants = 2
 	}
 
+	realtimeCode := room.Code
+	if room.Mode == codeeditordomain.RoomModeDuel {
+		realtimeCode = ""
+	}
+
 	return &realtime.CodeEditorRoom{
 		ID:              room.ID.String(),
 		Mode:            room.Mode.String(),
 		InviteCode:      room.InviteCode,
 		CreatorID:       room.CreatorID.String(),
-		Code:            room.Code,
+		Code:            realtimeCode,
 		CodeRevision:    room.CodeRevision,
+		Language:        room.Language.String(),
 		Status:          room.Status.String(),
 		TaskID:          userIDToString(room.TaskID),
 		MaxParticipants: maxParticipants,

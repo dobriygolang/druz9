@@ -9,7 +9,7 @@ interface AdminNavItem {
   count?: number
 }
 
-const ADMIN_NAV: AdminNavItem[] = [
+export const ADMIN_NAV: AdminNavItem[] = [
   { label: 'Code Tasks', icon: <Code2 className="w-3.5 h-3.5" />, href: '/admin/code-tasks' },
   { label: 'Interview Prep', icon: <BookOpen className="w-3.5 h-3.5" />, href: '/admin/interview-prep' },
   { label: 'Analytics', icon: <BarChart3 className="w-3.5 h-3.5" />, href: '/admin/analytics' },

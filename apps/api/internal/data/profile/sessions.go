@@ -100,13 +100,7 @@ WHERE s.token_hash = $1
 }
 
 func (r *Repo) TouchSession(ctx context.Context, userID uuid.UUID, sessionID uuid.UUID, expiresAt time.Time, lastActive time.Time) error {
-	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
-	if err != nil {
-		return fmt.Errorf("begin tx: %w", err)
-	}
-	defer func() { _ = tx.Rollback(ctx) }()
-
-	tag, err := tx.Exec(ctx, `
+	tag, err := r.data.DB.Exec(ctx, `
 UPDATE sessions
 SET last_seen_at = GREATEST(last_seen_at, $2),
     expires_at = GREATEST(expires_at, $3)
@@ -117,9 +111,6 @@ WHERE id = $1
 	}
 	if tag.RowsAffected() == 0 {
 		return profileerrors.ErrUnauthorized
-	}
-	if err := tx.Commit(ctx); err != nil {
-		return fmt.Errorf("commit touch session: %w", err)
 	}
 	return nil
 }

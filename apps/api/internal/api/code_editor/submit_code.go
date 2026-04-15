@@ -3,7 +3,9 @@ package code_editor
 import (
 	"context"
 
+	codeeditordomain "api/internal/domain/codeeditor"
 	"api/internal/metrics"
+	"api/internal/model"
 	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/code_editor/v1"
 
@@ -18,6 +20,16 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 	}
 
 	userID, guestName, _ := resolveActor(ctx, "")
+	selectedLanguage := protoLanguageToModel(req.Language)
+	if selectedLanguage != model.ProgrammingLanguageUnknown {
+		if actorService, ok := i.service.(interface {
+			SetEditorLanguage(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, language model.ProgrammingLanguage) (*codeeditordomain.RoomEditorState, error)
+		}); ok {
+			if _, err := actorService.SetEditorLanguage(ctx, roomID, userID, guestName, selectedLanguage); err != nil {
+				return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
+			}
+		}
+	}
 	submission, err := i.service.SubmitCode(ctx, roomID, userID, guestName, req.Code)
 	if err != nil {
 		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())

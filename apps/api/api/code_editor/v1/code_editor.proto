@@ -4,6 +4,7 @@ package code_editor.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "common/v1/common.proto";
 
 option go_package = "api/pkg/api/code_editor/v1;v1";
 
@@ -134,46 +135,11 @@ enum RoomStatus {
   ROOM_STATUS_FINISHED    = 3;  // duel finished
 }
 
-enum TaskDifficulty {
-  TASK_DIFFICULTY_UNSPECIFIED = 0;
-  TASK_DIFFICULTY_EASY        = 1;
-  TASK_DIFFICULTY_MEDIUM      = 2;
-  TASK_DIFFICULTY_HARD        = 3;
-}
-
-enum ProgrammingLanguage {
-  PROGRAMMING_LANGUAGE_UNSPECIFIED = 0;
-  PROGRAMMING_LANGUAGE_JAVASCRIPT  = 1;
-  PROGRAMMING_LANGUAGE_TYPESCRIPT  = 2;
-  PROGRAMMING_LANGUAGE_PYTHON      = 3;
-  PROGRAMMING_LANGUAGE_GO          = 4;
-  PROGRAMMING_LANGUAGE_RUST        = 5;
-  PROGRAMMING_LANGUAGE_CPP         = 6;
-  PROGRAMMING_LANGUAGE_JAVA        = 7;
-  PROGRAMMING_LANGUAGE_SQL         = 8;  // was missing, used as raw int(8) in mapping
-}
-
 enum TaskType {
   TASK_TYPE_UNSPECIFIED  = 0;
   TASK_TYPE_ALGORITHM    = 1;
   TASK_TYPE_DEBUGGING    = 2;
   TASK_TYPE_REFACTORING  = 3;
-}
-
-// ExecutionProfile defines the sandbox environment for code execution.
-enum ExecutionProfile {
-  EXECUTION_PROFILE_UNSPECIFIED          = 0;
-  EXECUTION_PROFILE_PURE                 = 1;  // no I/O, pure computation
-  EXECUTION_PROFILE_FILE_IO              = 2;  // filesystem read/write allowed
-  EXECUTION_PROFILE_HTTP_CLIENT          = 3;  // outbound HTTP allowed
-  EXECUTION_PROFILE_INTERVIEW_REALISTIC  = 4;  // full interview-like environment
-}
-
-// RunnerMode defines how code is invoked inside the sandbox.
-enum RunnerMode {
-  RUNNER_MODE_UNSPECIFIED  = 0;
-  RUNNER_MODE_PROGRAM      = 1;  // full program with main entry point
-  RUNNER_MODE_FUNCTION_IO  = 2;  // single function called with test case args
 }
 
 // ── Request messages ───────────────────────────────────────────────────────
@@ -183,7 +149,7 @@ message CreateRoomRequest {
   string         task       = 2;  // task description for duel
   string         name       = 3;  // creator display name
   string         topic      = 4;  // preferred duel topic
-  TaskDifficulty difficulty = 5;  // preferred duel difficulty
+  common.v1.Difficulty difficulty = 5;  // preferred duel difficulty
   bool           is_private = 6;  // if true, only joinable via invite code
 }
 
@@ -206,8 +172,9 @@ message LeaveRoomRequest {
 }
 
 message SubmitCodeRequest {
-  string room_id = 1;
-  string code    = 2;
+  string                        room_id   = 1;
+  string                        code      = 2;
+  common.v1.ProgrammingLanguage language  = 3;
 }
 
 message SetReadyRequest {
@@ -221,7 +188,7 @@ message GetSubmissionsRequest {
 
 message ListTasksRequest {
   string         topic            = 1;
-  TaskDifficulty difficulty       = 2;
+  common.v1.Difficulty difficulty       = 2;
   bool           include_inactive = 3;
 }
 
@@ -255,18 +222,8 @@ message AIReviewRequest {
   string statement  = 4;
 }
 
-message InterviewSolutionReview {
-  string          provider            = 1;
-  string          model               = 2;
-  int32           score               = 3;
-  string          summary             = 4;
-  repeated string strengths           = 5;
-  repeated string issues              = 6;
-  repeated string follow_up_questions = 7;
-}
-
 message AIReviewResponse {
-  InterviewSolutionReview review = 1;
+  common.v1.InterviewSolutionReview review = 1;
 }
 
 message GetDailyChallengeRequest {}
@@ -352,6 +309,7 @@ message Room {
   int64                     code_revision = 10;
   string                    creator_id    = 11;
   bool                      is_private    = 12;
+  common.v1.ProgrammingLanguage language  = 13;
 }
 
 message Participant {
@@ -392,17 +350,17 @@ message Task {
   string                    title             = 2;
   string                    slug              = 3;
   string                    statement         = 4;
-  TaskDifficulty            difficulty        = 5;
+  common.v1.Difficulty            difficulty        = 5;
   repeated string           topics            = 6;
   string                    starter_code      = 7;
-  ProgrammingLanguage       language          = 8;
+  common.v1.ProgrammingLanguage      language          = 8;
   bool                      is_active         = 9;
   repeated TaskTestCase     public_test_cases  = 10;
   repeated TaskTestCase     hidden_test_cases  = 11;
   google.protobuf.Timestamp created_at        = 12;
   google.protobuf.Timestamp updated_at        = 13;
   TaskType                  task_type         = 14;
-  ExecutionProfile          execution_profile = 15;  // was: string
+  common.v1.ExecutionProfile         execution_profile = 15;  // was: string
   repeated string           fixture_files     = 16;
   repeated string           readable_paths    = 17;
   repeated string           writable_paths    = 18;
@@ -410,7 +368,7 @@ message Task {
   repeated int32            allowed_ports     = 20;
   repeated string           mock_endpoints    = 21;
   bool                      writable_temp_dir = 22;
-  RunnerMode                runner_mode       = 23;  // was: string
+  common.v1.RunnerMode               runner_mode       = 23;  // was: string
   int32                     duration_seconds  = 24;
 }
 
@@ -419,15 +377,15 @@ message TaskPayload {
   string                title             = 1;
   string                slug              = 2;
   string                statement         = 3;
-  TaskDifficulty        difficulty        = 4;
+  common.v1.Difficulty        difficulty        = 4;
   repeated string       topics            = 5;
   string                starter_code      = 6;
-  ProgrammingLanguage   language          = 7;
+  common.v1.ProgrammingLanguage  language          = 7;
   bool                  is_active         = 8;
   repeated TaskTestCase public_test_cases  = 9;
   repeated TaskTestCase hidden_test_cases  = 10;
   TaskType              task_type         = 11;
-  ExecutionProfile      execution_profile = 12;  // was: string
+  common.v1.ExecutionProfile     execution_profile = 12;  // was: string
   repeated string       fixture_files     = 13;
   repeated string       readable_paths    = 14;
   repeated string       writable_paths    = 15;
@@ -435,6 +393,6 @@ message TaskPayload {
   repeated int32        allowed_ports     = 17;
   repeated string       mock_endpoints    = 18;
   bool                  writable_temp_dir = 19;
-  RunnerMode            runner_mode       = 20;  // was: string
+  common.v1.RunnerMode           runner_mode       = 20;  // was: string
   int32                 duration_seconds  = 21;
 }

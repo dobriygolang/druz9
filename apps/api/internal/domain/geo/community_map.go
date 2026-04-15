@@ -34,7 +34,7 @@ func (s *Service) CommunityMap(
 
 	// Cache the result
 	if s.communityCache != nil {
-		s.communityCache.Set(cacheKey, points, 0)
+		s.communityCache.Set(cacheKey, points)
 	}
 
 	// Override activity status from cache (in-memory, more accurate)

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useMemo } from 'react'
 import { cn } from '../lib/cn'
 
 interface ActivityHeatmapProps {
@@ -55,67 +55,50 @@ const DAY_LABELS: { label: string; row: number }[] = [
 ]
 
 export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activity, className }) => {
-  // Build a date→count lookup
-  const lookup = new Map<string, number>()
-  for (const a of activity) {
-    lookup.set(a.date, a.count)
-  }
+  const { cells, monthLabels, totalLabel } = useMemo(() => {
+    const lookup = new Map<string, number>()
+    for (const a of activity) lookup.set(a.date, a.count)
 
-  // Build the grid: last 364 days, aligned to weeks (Mon–Sun)
-  // "today" is the last day we show
-  const today = new Date()
-  today.setHours(0, 0, 0, 0)
+    const today = new Date()
+    today.setHours(0, 0, 0, 0)
+    const endDate = new Date(today)
+    const startDate = new Date(today)
+    startDate.setDate(startDate.getDate() - (WEEKS * DAYS - 1))
 
-  // Find the end of the current week (Sunday) so the last column is complete
-  // We show exactly 52 weeks = 364 days ending at today
-  const endDate = new Date(today)
-  const startDate = new Date(today)
-  startDate.setDate(startDate.getDate() - (WEEKS * DAYS - 1))
-
-  // Build a flat array of { date, count } for each day from startDate to endDate
-  const cells: { date: string; count: number; col: number; row: number }[] = []
-
-  // What day of week is startDate? 0=Sun,1=Mon,...,6=Sat
-  // We want Mon=0, Tue=1, ..., Sun=6
-  const cur = new Date(startDate)
-  // We need to know the first day offset to align columns correctly
-  // Column 0 starts at the same day of week as startDate
-  let dayIndex = 0
-  while (cur <= endDate) {
-    const iso = cur.toISOString().slice(0, 10)
-    const col = Math.floor(dayIndex / DAYS)
-    const row = dayIndex % DAYS
-    cells.push({ date: iso, count: lookup.get(iso) ?? 0, col, row })
-    cur.setDate(cur.getDate() + 1)
-    dayIndex++
-  }
-
-  // Detect month labels: for each column, check if the first day of the week starts a new month
-  const monthLabels: { col: number; label: string }[] = []
-  let lastMonth = -1
-  for (let w = 0; w < WEEKS; w++) {
-    const cellsInWeek = cells.filter(c => c.col === w)
-    if (cellsInWeek.length === 0) continue
-    const firstDay = new Date(cellsInWeek[0].date)
-    const month = firstDay.getMonth()
-    if (month !== lastMonth) {
-      monthLabels.push({ col: w, label: MONTH_NAMES[month] })
-      lastMonth = month
+    const cells: { date: string; count: number; col: number; row: number }[] = []
+    const cur = new Date(startDate)
+    let dayIndex = 0
+    while (cur <= endDate) {
+      const iso = cur.toISOString().slice(0, 10)
+      const col = Math.floor(dayIndex / DAYS)
+      const row = dayIndex % DAYS
+      cells.push({ date: iso, count: lookup.get(iso) ?? 0, col, row })
+      cur.setDate(cur.getDate() + 1)
+      dayIndex++
     }
-  }
 
-  // Total count
-  const total = cells.reduce((sum, c) => sum + c.count, 0)
-  const totalLabel = (() => {
-    const n = total
+    // Month labels — single pass using column-indexed first cell instead of filter per week
+    const monthLabels: { col: number; label: string }[] = []
+    let lastMonth = -1
+    for (const cell of cells) {
+      if (cell.row !== 0) continue // only check first day of each week column
+      const month = new Date(cell.date).getMonth()
+      if (month !== lastMonth) {
+        monthLabels.push({ col: cell.col, label: MONTH_NAMES[month] })
+        lastMonth = month
+      }
+    }
+
+    const total = cells.reduce((sum, c) => sum + c.count, 0)
     const suffix =
-      n % 10 === 1 && n % 100 !== 11
+      total % 10 === 1 && total % 100 !== 11
         ? 'задача'
-        : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)
+        : total % 10 >= 2 && total % 10 <= 4 && (total % 100 < 10 || total % 100 >= 20)
         ? 'задачи'
         : 'задач'
-    return `${n} ${suffix} за последний год`
-  })()
+
+    return { cells, monthLabels, totalLabel: `${total} ${suffix} за последний год` }
+  }, [activity])
 
   const svgWidth = DAY_LABEL_WIDTH + WEEKS * CELL_STEP - CELL_GAP
   const svgHeight = MONTH_LABEL_HEIGHT + DAYS * CELL_STEP - CELL_GAP

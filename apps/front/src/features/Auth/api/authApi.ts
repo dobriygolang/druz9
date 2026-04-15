@@ -1,4 +1,5 @@
 import { apiClient } from '@/shared/api/base'
+import { createCache } from '@/shared/api/cache'
 import type { CompleteProfilePayload, ProfileProgress, ProfileResponse, User } from '@/entities/User/model/types'
 
 type BackendUser = {
@@ -60,8 +61,7 @@ function normalizeProfileResponse(data: BackendProfileResponse): ProfileResponse
   }
 }
 
-const profileByIdCache = new Map<string, ProfileResponse>()
-const profileByIdPromises = new Map<string, Promise<ProfileResponse>>()
+const profileByIdCache = createCache<string, ProfileResponse>({ ttl: 5 * 60_000 })
 
 export function clearProfileByIdCache(userId?: string) {
   if (userId) profileByIdCache.delete(userId)
@@ -101,12 +101,12 @@ export const authApi = {
   getProfileById: async (userId: string): Promise<ProfileResponse> => {
     const cached = profileByIdCache.get(userId)
     if (cached) return cached
-    const inFlight = profileByIdPromises.get(userId)
+    const inFlight = profileByIdCache.getInFlight(userId)
     if (inFlight) return inFlight
     const req = apiClient.get<BackendProfileResponse>(`/api/v1/profile/${userId}`)
       .then((r) => { const n = normalizeProfileResponse(r.data); profileByIdCache.set(userId, n); return n })
-      .finally(() => profileByIdPromises.delete(userId))
-    profileByIdPromises.set(userId, req)
+      .finally(() => profileByIdCache.deleteInFlight(userId))
+    profileByIdCache.setInFlight(userId, req)
     return req
   },
   getProfileProgress: async (userId: string): Promise<ProfileProgress> => {
@@ -129,7 +129,6 @@ export const authApi = {
   logout: async () => {
     await apiClient.post('/api/v1/profile/auth/logout', {})
     profileByIdCache.clear()
-    profileByIdPromises.clear()
     localStorage.removeItem('authToken')
   },
 }

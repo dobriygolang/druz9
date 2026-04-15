@@ -18,41 +18,42 @@ export function CommunityHubPage() {
 
   return (
     <div className="flex flex-col h-full min-h-screen">
-      {/* Header */}
-      <div className="px-6 pt-6 pb-0 bg-[#F2F3F0] dark:bg-[#0b0d16]">
-        <div className="flex items-center justify-between mb-4">
+      <div className="mobile-sticky-surface bg-[#F2F3F0]/88 px-4 pt-4 pb-0 dark:bg-[#0b0d16]/88 md:px-6 md:pt-6">
+        <div className="mb-4 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
           <div>
             <h1 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">Community</h1>
-            <p className="text-sm text-[#666666] dark:text-[#4d6380] mt-0.5">Найди коллег и единомышленников</p>
+            <p className="mt-1 text-sm text-[#666666] dark:text-[#4d6380]">Найди коллег, круги и офлайн-активность рядом</p>
           </div>
+
           {active === 'people' && (
-            <div className="relative">
+            <div className="relative w-full md:w-auto">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Поиск людей..."
-                className="pl-9 pr-4 py-2 w-[280px] bg-white dark:bg-[#161c2d] border border-[#CBCCC9] dark:border-[#1a2540] rounded-lg text-sm text-[#111111] dark:text-[#c8d8ec] placeholder-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
+                className="w-full rounded-2xl border border-[#CBCCC9] bg-white/88 py-3 pl-10 pr-4 text-sm text-[#111111] shadow-[0_10px_26px_rgba(15,23,42,0.06)] backdrop-blur focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20 dark:border-[#1a2540] dark:bg-[#161c2d]/88 dark:text-[#c8d8ec] md:w-[300px]"
               />
             </div>
           )}
         </div>
 
-        {/* Tabs */}
-        <div className="flex items-center gap-0 border-b border-[#CBCCC9] dark:border-[#1a2540]">
-          {TABS.map(tab => (
-            <Link
-              key={tab.id}
-              to={tab.href}
-              className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                active === tab.id
-                  ? 'border-[#6366F1] text-[#111111] dark:text-[#e2e8f3]'
-                  : 'border-transparent text-[#666666] dark:text-[#4d6380] hover:text-[#111111] dark:hover:text-[#c8d8ec]'
-              }`}
-            >
-              {tab.label}
-            </Link>
-          ))}
+        <div className="-mx-4 overflow-x-auto px-4 pb-1 no-scrollbar md:mx-0 md:px-0">
+          <div className="inline-flex min-w-full gap-2 rounded-[24px] border border-[#d8d9d6] bg-white/72 p-1.5 shadow-[0_18px_34px_rgba(15,23,42,0.06)] backdrop-blur dark:border-[#1a2540] dark:bg-[#10192b]/72 md:min-w-0">
+            {TABS.map(tab => (
+              <Link
+                key={tab.id}
+                to={tab.href}
+                className={`whitespace-nowrap rounded-[18px] px-4 py-2.5 text-sm font-medium transition-all ${
+                  active === tab.id
+                    ? 'bg-[#111111] text-white shadow-[0_14px_24px_rgba(15,23,42,0.14)] dark:bg-white dark:text-[#08101f]'
+                    : 'text-[#666666] dark:text-[#4d6380] hover:bg-white/80 hover:text-[#111111] dark:hover:bg-[#161f34] dark:hover:text-[#c8d8ec]'
+                }`}
+              >
+                {tab.label}
+              </Link>
+            ))}
+          </div>
         </div>
       </div>
 

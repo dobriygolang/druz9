@@ -1,9 +1,12 @@
 package realtime
 
 import (
+	"strings"
 	"time"
 
 	schema "api/internal/realtime/schema"
+
+	"github.com/gorilla/websocket"
 )
 
 func (c *codeEditorClient) writeLoop() {
@@ -30,14 +33,56 @@ func (c *codeEditorClient) readLoop(h *CodeEditorHub) {
 
 		switch msg.Type {
 		case schema.CodeEditorTypeHello:
+			if c.authorized {
+				continue
+			}
 			c.clientID = msg.ClientID
 			c.awarenessID = msg.AwarenessID
-			c.userID = msg.UserID
+			if c.authenticatedUserID != "" {
+				c.userID = c.authenticatedUserID
+			} else {
+				c.userID = strings.TrimSpace(msg.UserID)
+			}
+			c.guestName = strings.TrimSpace(msg.GuestName)
+			if !h.authorizeClient(c) {
+				_ = c.ws.WriteControl(
+					websocket.CloseMessage,
+					websocket.FormatCloseMessage(websocket.ClosePolicyViolation, "room access denied"),
+					time.Now().Add(time.Second),
+				)
+				return
+			}
+			c.authorized = true
+			h.addClient(c)
 			h.sendSnapshot(c)
 			h.sendAwarenessSnapshot(c)
+		case schema.CodeEditorTypeDocSync:
+			if !c.authorized {
+				continue
+			}
+			if c.roomMode == "duel" {
+				continue
+			}
+			h.broadcast(c.roomID, msg, c)
 		case schema.CodeEditorTypeUpdate:
+			if !c.authorized {
+				continue
+			}
 			h.handleUpdate(c, msg)
+		case schema.CodeEditorTypePersist:
+			if !c.authorized {
+				continue
+			}
+			h.handlePersist(c, msg)
+		case schema.CodeEditorTypeLanguage:
+			if !c.authorized {
+				continue
+			}
+			h.handleLanguageChange(c, msg)
 		case schema.CodeEditorTypeAwareness:
+			if !c.authorized {
+				continue
+			}
 			h.handleAwareness(c, msg)
 		case schema.CodeEditorTypePing:
 			c.enqueue(schema.CodeEditorMessage{Type: schema.CodeEditorTypePong})

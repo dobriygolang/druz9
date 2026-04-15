@@ -150,7 +150,7 @@ func (s *Service) ListTasks(ctx context.Context, user *model.User) ([]*model.Int
 		return nil, err
 	}
 	if s.taskListCache != nil {
-		s.taskListCache.Set("active", items, time.Minute)
+		s.taskListCache.Set("active", items)
 	}
 	return items, nil
 }
@@ -466,7 +466,7 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 				return nil, err
 			}
 			if s.codeTaskCache != nil && codeTask != nil {
-				s.codeTaskCache.Set(codeTaskID, codeTask, 5*time.Minute)
+				s.codeTaskCache.Set(codeTaskID, codeTask)
 			}
 		}
 		judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, codeTask, code, solveLanguage)
@@ -557,16 +557,15 @@ func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sess
 	if session.Task.PrepType != model.InterviewPrepTypeSystemDesign {
 		return nil, ErrSystemDesignOnly
 	}
-	if len(imageBytes) == 0 {
-		return nil, ErrInvalidReviewImage
-	}
-	if int64(len(imageBytes)) > s.maxImageBytes {
-		return nil, ErrReviewImageTooLarge
-	}
-
-	normalizedType, err := normalizeReviewImageType(contentType, fileName)
-	if err != nil {
-		return nil, err
+	normalizedType := ""
+	if len(imageBytes) > 0 {
+		if int64(len(imageBytes)) > s.maxImageBytes {
+			return nil, ErrReviewImageTooLarge
+		}
+		normalizedType, err = normalizeReviewImageType(contentType, fileName)
+		if err != nil {
+			return nil, err
+		}
 	}
 	if s.reviewer == nil {
 		return nil, aireview.ErrNotConfigured
@@ -720,8 +719,10 @@ func skillKeyForCheckpointTask(task *model.InterviewPrepTask) string {
 		return ""
 	}
 	switch task.PrepType {
-	case model.InterviewPrepTypeCoding, model.InterviewPrepTypeAlgorithm:
+	case model.InterviewPrepTypeAlgorithm:
 		return model.InterviewPrepMockStageKindSlices.String()
+	case model.InterviewPrepTypeCoding:
+		return model.InterviewPrepMockStageKindConcurrency.String()
 	case model.InterviewPrepTypeSQL:
 		return model.InterviewPrepMockStageKindSQL.String()
 	default:

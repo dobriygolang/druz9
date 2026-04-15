@@ -22,9 +22,9 @@ func (r *Repo) CreateRoom(ctx context.Context, room *codeeditordomain.Room) (*co
 
 	_, err = tx.Exec(
 		ctx,
-		`INSERT INTO code_rooms (id, mode, code, code_revision, status, creator_id, invite_code, task, task_id, duel_topic, is_private, created_at, updated_at)
-		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, NOW(), NOW())`,
-		room.ID, room.Mode, room.Code, room.CodeRevision, room.Status, room.CreatorID, room.InviteCode, room.Task, room.TaskID, room.DuelTopic, room.IsPrivate,
+		`INSERT INTO code_rooms (id, mode, code, code_revision, status, creator_id, invite_code, language, task, task_id, duel_topic, is_private, created_at, updated_at)
+		 VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW(), NOW())`,
+		room.ID, room.Mode, room.Code, room.CodeRevision, room.Status, room.CreatorID, room.InviteCode, room.Language, room.Task, room.TaskID, room.DuelTopic, room.IsPrivate,
 	)
 	if err != nil {
 		return nil, fmt.Errorf("insert room: %w", err)
@@ -80,13 +80,13 @@ func (r *Repo) GetRoomByInviteCode(ctx context.Context, inviteCode string) (*cod
 	return room, nil
 }
 
-func (r *Repo) SaveCodeSnapshot(ctx context.Context, roomID uuid.UUID, code string) error {
+func (r *Repo) SaveCodeSnapshot(ctx context.Context, roomID uuid.UUID, code string, language model.ProgrammingLanguage) error {
 	_, err := r.data.DB.Exec(
 		ctx,
 		`UPDATE code_rooms
-		 SET code = $2, code_revision = code_revision + 1, updated_at = NOW()
+		 SET code = $2, language = $3, code_revision = code_revision + 1, updated_at = NOW()
 		 WHERE id = $1`,
-		roomID, code,
+		roomID, code, language,
 	)
 	if err != nil {
 		return fmt.Errorf("save code snapshot: %w", err)

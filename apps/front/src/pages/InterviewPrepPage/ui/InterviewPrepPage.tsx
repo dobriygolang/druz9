@@ -6,6 +6,7 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { useToast } from '@/shared/ui/Toast'
+import { PREP_TYPE_LABELS } from '@/shared/lib/taskLabels'
 
 const PREP_TYPE_ICONS: Record<string, React.ReactNode> = {
   coding:        <Code2 className="w-4 h-4 text-[#6366f1]" />,
@@ -13,10 +14,6 @@ const PREP_TYPE_ICONS: Record<string, React.ReactNode> = {
   sql:           <Database className="w-4 h-4 text-[#a16207]" />,
   system_design: <BookOpen className="w-4 h-4 text-[#6366F1]" />,
   behavioral:    <MessageSquare className="w-4 h-4 text-[#22c55e]" />,
-}
-
-const PREP_TYPE_LABELS: Record<string, string> = {
-  coding: 'Coding', algorithm: 'Алгоритмы', sql: 'SQL', system_design: 'System Design', behavioral: 'Behavioral',
 }
 
 const MOCK_STAGES = [

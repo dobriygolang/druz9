@@ -9,8 +9,7 @@ import { Select } from '@/shared/ui/Select'
 import { Textarea } from '@/shared/ui/Textarea'
 import { Toggle } from '@/shared/ui/Toggle'
 import { ConfirmModal } from '@/shared/ui/ConfirmModal'
-
-const PREP_TYPE_LABELS: Record<string, string> = { coding: 'Coding', system_design: 'System Design', behavioral: 'Behavioral' }
+import { PREP_TYPE_LABELS } from '@/shared/lib/taskLabels'
 
 export function InterviewPrepAdminPage() {
   const [tasks, setTasks] = useState<any[]>([])

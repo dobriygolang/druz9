@@ -7,26 +7,19 @@ import (
 
 	"api/internal/app/taskjudge"
 	domain "api/internal/domain/codeeditor"
+	"api/internal/model"
 
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 )
 
-func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID *uuid.UUID, guestName string, code string) (*domain.Submission, error) {
-	taskIDStr := room.TaskID.String()
-	taskPtr, ok := s.taskCache.Get(taskIDStr)
-	if !ok {
-		task, err := s.repo.GetTask(ctx, *room.TaskID)
-		if err != nil {
-			return nil, err
-		}
-		s.taskCache.Set(taskIDStr, *task, 0)
-		taskPtr = *task
+func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID *uuid.UUID, guestName string, code string, language model.ProgrammingLanguage) (*domain.Submission, error) {
+	task, err := s.getCachedTask(ctx, *room.TaskID)
+	if err != nil {
+		return nil, err
 	}
 
-	task := &taskPtr
-
-	judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, task, code)
+	judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, task, code, normalizeRoomLanguage(language).String())
 	if err != nil {
 		return nil, err
 	}

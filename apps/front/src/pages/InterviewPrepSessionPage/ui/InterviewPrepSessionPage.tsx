@@ -7,10 +7,18 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { useToast } from '@/shared/ui/Toast'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import { PREP_TYPE_LABELS } from '@/shared/lib/taskLabels'
+import { getLanguageLabel, getMonacoLanguage } from '@/shared/lib/codeEditorLanguage'
 import type * as Monaco from 'monaco-editor'
 
-const PREP_TYPE_LABELS: Record<string, string> = {
-  coding: 'Coding', algorithm: 'Алгоритмы', sql: 'SQL', system_design: 'System Design', behavioral: 'Behavioral',
+function resolveSupportedLanguages(task: any): string[] {
+  const raw = Array.isArray(task?.supportedLanguages) && task.supportedLanguages.length > 0
+    ? task.supportedLanguages
+    : [task?.language].filter(Boolean)
+  const normalized = raw
+    .map((value: string) => getMonacoLanguage(value))
+    .filter((value: string) => value !== 'plaintext')
+  return Array.from(new Set(normalized))
 }
 
 export function InterviewPrepSessionPage() {
@@ -24,13 +32,16 @@ export function InterviewPrepSessionPage() {
   const [review, setReview] = useState<any>(null)
   const [activeTab, setActiveTab] = useState<'problem' | 'question' | 'result'>('problem')
   const [timeLeft, setTimeLeft] = useState(0)
+  const [selectedLanguage, setSelectedLanguage] = useState('python')
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
 
   useEffect(() => {
     if (!sessionId) return
     interviewPrepApi.getSession(sessionId).then((s: any) => {
       setSession(s)
-      if (s?.task?.starterCode) setCode(s.task.starterCode)
+      if (s?.code ?? s?.task?.starterCode) setCode(s.code ?? s.task.starterCode)
+      const nextLanguage = getMonacoLanguage(s?.solveLanguage ?? s?.task?.language ?? 'python')
+      setSelectedLanguage(nextLanguage === 'plaintext' ? 'python' : nextLanguage)
       if (s?.task?.durationSeconds) setTimeLeft(s.task.durationSeconds)
       if (s?.currentQuestion) setActiveTab('question')
     }).catch(() => navigate('/growth/interview-prep'))
@@ -49,7 +60,7 @@ export function InterviewPrepSessionPage() {
     if (!sessionId) return
     setSubmitting(true)
     try {
-      const r = await interviewPrepApi.submitSession(sessionId, code, 'python3') as any
+      const r = await interviewPrepApi.submitSession(sessionId, code, selectedLanguage) as any
       setReview(r)
       setActiveTab('result')
     } catch {
@@ -76,6 +87,7 @@ export function InterviewPrepSessionPage() {
   const task = session?.task
   const question = session?.currentQuestion
   const isCodeTask = task?.isExecutable
+  const supportedLanguages = resolveSupportedLanguages(task)
 
   const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
     editorRef.current = editor
@@ -174,8 +186,19 @@ export function InterviewPrepSessionPage() {
         {isCodeTask && (
           <div className="flex-1 flex flex-col min-w-0">
             <div className="h-9 bg-[#1e293b] flex items-center px-4 gap-3 flex-shrink-0">
-              <span className="text-xs text-[#94a3b8] font-mono">solution.py</span>
+              <span className="text-xs text-[#94a3b8] font-mono">solution.{selectedLanguage === 'go' ? 'go' : selectedLanguage === 'sql' ? 'sql' : 'py'}</span>
               <div className="ml-auto flex items-center gap-2">
+                {supportedLanguages.length > 1 && (
+                  <select
+                    value={selectedLanguage}
+                    onChange={e => setSelectedLanguage(e.target.value)}
+                    className="h-8 rounded-md border border-[#334155] bg-[#0f172a] px-2 text-xs text-[#cbd5e1] outline-none"
+                  >
+                    {supportedLanguages.map(language => (
+                      <option key={language} value={language}>{getLanguageLabel(language)}</option>
+                    ))}
+                  </select>
+                )}
                 <Button variant="orange" size="sm" onClick={handleSubmitCode} loading={submitting}>
                   <Send className="w-3.5 h-3.5" /> Отправить
                 </Button>
@@ -184,7 +207,7 @@ export function InterviewPrepSessionPage() {
             <div className="flex-1">
               <Editor
                 height="100%"
-                language="python"
+                language={getMonacoLanguage(selectedLanguage)}
                 value={code}
                 onChange={v => setCode(v ?? '')}
                 onMount={handleEditorMount}

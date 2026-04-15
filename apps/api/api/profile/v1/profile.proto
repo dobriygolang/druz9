@@ -4,6 +4,7 @@ package profile.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "common/v1/common.proto";
 
 option go_package = "api/pkg/api/profile/v1;v1";
 
@@ -91,15 +92,6 @@ service ProfileService {
   rpc GetProfileActivity(GetProfileActivityRequest) returns (GetProfileActivityResponse) {
     option (google.api.http) = { get: "/api/v1/profile/{user_id}/activity" };
   }
-}
-
-// ── Enums ──────────────────────────────────────────────────────────────────
-
-enum UserActivityStatus {
-  USER_ACTIVITY_STATUS_UNSPECIFIED     = 0;
-  USER_ACTIVITY_STATUS_ONLINE          = 1;
-  USER_ACTIVITY_STATUS_RECENTLY_ACTIVE = 2;
-  USER_ACTIVITY_STATUS_OFFLINE         = 3;
 }
 
 // ── Request messages ───────────────────────────────────────────────────────
@@ -295,7 +287,7 @@ message User {
   google.protobuf.Timestamp created_at          = 7;
   double                    latitude            = 8;
   double                    longitude           = 9;
-  UserActivityStatus        activity_status     = 10;
+  common.v1.UserActivityStatus activity_status   = 10;
   string                    current_workplace   = 11;
   bool                      is_admin            = 12;
   bool                      is_trusted          = 13;
