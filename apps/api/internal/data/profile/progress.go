@@ -491,7 +491,7 @@ func (r *Repo) loadActivityPercentile(ctx context.Context, userID uuid.UUID) (in
 					) a
 				) AS active_days
 			FROM users u
-			WHERE u.status = 'active'
+			WHERE u.status = 2
 		)
 		SELECT COALESCE(PERCENT_RANK() OVER (ORDER BY active_days), 0)
 		FROM user_activity
