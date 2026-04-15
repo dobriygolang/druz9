@@ -8,6 +8,7 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { apiClient } from '@/shared/api/base'
 import { useAudioPlayer } from '@/features/Podcast/providers/AudioPlayerProvider'
+import { useTranslation } from 'react-i18next'
 
 
 function formatDuration(seconds: number) {
@@ -16,15 +17,15 @@ function formatDuration(seconds: number) {
   return `${m}:${s.toString().padStart(2, '0')}`
 }
 
-function formatTimeAgo(iso: string) {
+function formatTimeAgo(iso: string, t: (key: string, options?: Record<string, unknown>) => string) {
   try {
     const diff = Date.now() - new Date(iso).getTime()
     const days = Math.floor(diff / 86400000)
-    if (days === 0) return 'today'
-    if (days === 1) return 'yesterday'
-    if (days < 7) return `${days}d ago`
-    if (days < 30) return `${Math.floor(days / 7)}w ago`
-    return `${Math.floor(days / 30)}mo ago`
+    if (days === 0) return t('podcasts.time.today')
+    if (days === 1) return t('podcasts.time.yesterday')
+    if (days < 7) return t('podcasts.time.daysAgo', { count: days })
+    if (days < 30) return t('podcasts.time.weeksAgo', { count: Math.floor(days / 7) })
+    return t('podcasts.time.monthsAgo', { count: Math.floor(days / 30) })
   } catch { return '' }
 }
 
@@ -40,6 +41,7 @@ const GRADIENT_COLORS = [
 export function PodcastsPage() {
   const { user } = useAuth()
   const player = useAudioPlayer()
+  const { t } = useTranslation()
   const [podcasts, setPodcasts] = useState<Podcast[]>([])
   const [search, setSearch] = useState('')
   const [error, setError] = useState<string | null>(null)
@@ -54,8 +56,8 @@ export function PodcastsPage() {
     setError(null)
     podcastApi.list({ limit: 50 })
       .then(r => setPodcasts(r.podcasts))
-      .catch(() => setError('Failed to load data'))
-  }, [])
+      .catch(() => setError(t('common.loadFailed')))
+  }, [t])
 
   useEffect(() => { fetchPodcasts() }, [fetchPodcasts])
 
@@ -143,7 +145,7 @@ export function PodcastsPage() {
       setUploadTitle(''); setUploadAuthor(''); setUploadDesc(''); setUploadFile(null)
       fetchPodcasts()
     } catch {
-      setUploadError('Failed to upload podcast. Try again.')
+      setUploadError(t('podcasts.upload.failed'))
     } finally {
       setUploading(false)
     }
@@ -155,8 +157,8 @@ export function PodcastsPage() {
     <div className="flex min-h-full flex-col gap-4 px-4 pb-6 pt-4 md:gap-6 md:p-8">
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div>
-          <h1 className="font-mono text-2xl font-bold text-[#111111]">Podcasts</h1>
-          <p className="text-sm text-[#666666] font-geist mt-1">Listen and learn from strong engineers</p>
+          <h1 className="font-mono text-2xl font-bold text-[#111111]">{t('podcasts.title')}</h1>
+          <p className="text-sm text-[#666666] font-geist mt-1">{t('podcasts.subtitle')}</p>
         </div>
         <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center xl:w-auto">
           {user?.isAdmin && (
@@ -164,7 +166,7 @@ export function PodcastsPage() {
               onClick={() => setShowUpload(true)}
               className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#6366F1] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#4F46E5]"
             >
-              <Upload className="w-4 h-4" /> Upload podcast
+              <Upload className="w-4 h-4" /> {t('podcasts.upload.button')}
             </button>
           )}
           <div className="relative w-full sm:flex-1 xl:w-[280px]">
@@ -172,7 +174,7 @@ export function PodcastsPage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Search podcasts..."
+              placeholder={t('podcasts.searchPlaceholder')}
               className="w-full rounded-xl border border-[#CBCCC9] bg-white py-2.5 pl-10 pr-4 text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
             />
           </div>
@@ -192,7 +194,7 @@ export function PodcastsPage() {
                 <Mic className="w-12 h-12 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] text-[#6366F1] font-medium tracking-wider font-geist uppercase">Now playing</p>
+                <p className="text-[11px] text-[#6366F1] font-medium tracking-wider font-geist uppercase">{t('podcasts.nowPlaying')}</p>
                 <h3 className="font-mono text-lg font-bold text-white mt-1 truncate">{player.playing.title}</h3>
                 <p className="text-sm text-[#94a3b8] font-geist mt-0.5">
                   {player.playing.authorName} · {formatDuration(player.duration)}
@@ -235,7 +237,7 @@ export function PodcastsPage() {
 
           {/* Episode list header */}
           <h2 className="font-mono text-base font-semibold text-[#111111]">
-            {player.playing ? 'Latest episodes' : 'All podcasts'}
+            {player.playing ? t('podcasts.latestEpisodes') : t('podcasts.all')}
           </h2>
 
           {/* Episode list */}
@@ -254,7 +256,7 @@ export function PodcastsPage() {
             ) : filtered.length === 0 ? (
               <div className="text-center py-12">
                 <Mic className="w-10 h-10 mx-auto mb-3 text-[#CBCCC9]" />
-                <p className="text-sm text-[#94a3b8]">No podcasts found</p>
+                <p className="text-sm text-[#94a3b8]">{t('podcasts.empty')}</p>
               </div>
             ) : (
               filtered.map((podcast, i) => {
@@ -287,12 +289,12 @@ export function PodcastsPage() {
                         <span className="w-1 h-1 rounded-full bg-[#CBCCC9]" />
                         <span className="text-xs text-[#666666] font-geist">{formatDuration(podcast.durationSeconds)}</span>
                         <span className="w-1 h-1 rounded-full bg-[#CBCCC9]" />
-                        <span className="text-xs text-[#666666] font-geist">{formatTimeAgo(podcast.createdAt)}</span>
+                        <span className="text-xs text-[#666666] font-geist">{formatTimeAgo(podcast.createdAt, t)}</span>
                       </div>
                     </div>
                     <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start">
                       {podcast.listensCount > 0 && (
-                        <span className="text-xs text-[#94a3b8]">{podcast.listensCount} listens</span>
+                        <span className="text-xs text-[#94a3b8]">{t('podcasts.listens', { count: podcast.listensCount })}</span>
                       )}
                       <div className="w-9 h-9 rounded-full bg-[#F2F3F0] flex items-center justify-center">
                         {isCurrentlyPlaying && player.isPlaying ? (
@@ -313,7 +315,7 @@ export function PodcastsPage() {
         <div className="flex w-full flex-shrink-0 flex-col gap-4 xl:w-[320px]">
           {/* Popular shows */}
           <Card padding="lg" className="flex flex-col gap-4">
-            <h3 className="font-mono text-sm font-semibold text-[#111111]">Popular shows</h3>
+            <h3 className="font-mono text-sm font-semibold text-[#111111]">{t('podcasts.popularShows')}</h3>
             {(podcasts.length > 0
               ? [...new Map(podcasts.map(p => [p.authorName, p])).values()].slice(0, 3)
               : []
@@ -330,7 +332,7 @@ export function PodcastsPage() {
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-[#111111] font-geist truncate">{show.authorName}</p>
                     <p className="text-xs text-[#666666] font-geist">
-                      {podcasts.filter(p => p.authorName === show.authorName).length} episodes
+                      {t('podcasts.episodes', { count: podcasts.filter(p => p.authorName === show.authorName).length })}
                     </p>
                   </div>
                 </div>
@@ -353,23 +355,23 @@ export function PodcastsPage() {
 
           {/* Stats card */}
           <Card padding="lg" dark>
-            <h3 className="font-mono text-sm font-semibold text-[#CBCCC9] mb-4">Stats</h3>
+            <h3 className="font-mono text-sm font-semibold text-[#CBCCC9] mb-4">{t('podcasts.stats')}</h3>
             <div className="flex gap-4 mb-4">
               <div className="flex-1 text-center">
                 <p className="font-mono text-[28px] font-bold text-[#6366F1] leading-none">{podcasts.length || '—'}</p>
-                <p className="text-[11px] text-[#94a3b8] mt-1 font-geist">Episodes</p>
+                <p className="text-[11px] text-[#94a3b8] mt-1 font-geist">{t('podcasts.statsEpisodes')}</p>
               </div>
               <div className="flex-1 text-center">
                 <p className="font-mono text-[28px] font-bold text-[#6366F1] leading-none">
                   {podcasts.reduce((sum, p) => sum + p.listensCount, 0) || '—'}
                 </p>
-                <p className="text-[11px] text-[#94a3b8] mt-1 font-geist">Listeners</p>
+                <p className="text-[11px] text-[#94a3b8] mt-1 font-geist">{t('podcasts.statsListeners')}</p>
               </div>
             </div>
             <div className="h-px bg-[#1e293b] mb-4" />
             <div className="flex items-center justify-between">
-              <p className="text-xs text-[#666666] font-geist">New episode every Friday</p>
-              <Badge variant="orange">Follow</Badge>
+              <p className="text-xs text-[#666666] font-geist">{t('podcasts.newEpisodeEveryFriday')}</p>
+              <Badge variant="orange">{t('podcasts.follow')}</Badge>
             </div>
           </Card>
         </div>
@@ -380,33 +382,33 @@ export function PodcastsPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
           <div className="bg-white rounded-2xl shadow-xl border border-[#CBCCC9] w-full max-w-sm p-6">
             <div className="flex items-center justify-between mb-5">
-              <h2 className="text-base font-bold text-[#111111]">Upload podcast</h2>
+              <h2 className="text-base font-bold text-[#111111]">{t('podcasts.upload.title')}</h2>
               <button onClick={() => { if (!uploading) setShowUpload(false) }} disabled={uploading} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666] disabled:opacity-30 disabled:cursor-not-allowed">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex flex-col gap-3">
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1 block">Title *</label>
+                <label className="text-xs font-medium text-[#666666] mb-1 block">{t('podcasts.upload.titleLabel')}</label>
                 <input value={uploadTitle} onChange={e => setUploadTitle(e.target.value)}
-                  placeholder="Podcast title"
+                  placeholder={t('podcasts.upload.titlePlaceholder')}
                   className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1 block">Author *</label>
+                <label className="text-xs font-medium text-[#666666] mb-1 block">{t('podcasts.upload.authorLabel')}</label>
                 <input value={uploadAuthor} onChange={e => setUploadAuthor(e.target.value)}
-                  placeholder="Author name"
+                  placeholder={t('podcasts.upload.authorPlaceholder')}
                   className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1 block">Description</label>
+                <label className="text-xs font-medium text-[#666666] mb-1 block">{t('podcasts.upload.descriptionLabel')}</label>
                 <textarea value={uploadDesc} onChange={e => setUploadDesc(e.target.value)}
-                  placeholder="Short description"
+                  placeholder={t('podcasts.upload.descriptionPlaceholder')}
                   rows={2}
                   className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] resize-none" />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1 block">Audio file * (mp3, m4a)</label>
+                <label className="text-xs font-medium text-[#666666] mb-1 block">{t('podcasts.upload.fileLabel')}</label>
                 <input type="file" accept="audio/*"
                   onChange={e => setUploadFile(e.target.files?.[0] ?? null)}
                   className="w-full text-sm text-[#666666] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-[#EEF2FF] file:text-[#6366F1] hover:file:bg-[#E0E7FF]" />
@@ -414,7 +416,7 @@ export function PodcastsPage() {
             </div>
             {uploading && (
               <p className="mt-3 text-xs text-[#f59e0b] font-medium text-center">
-                Uploading. Do not close the page or the modal
+                {t('podcasts.upload.progress')}
               </p>
             )}
             {uploadError && (
@@ -423,11 +425,11 @@ export function PodcastsPage() {
             <div className="flex gap-2 mt-4">
               <button onClick={() => { if (!uploading) setShowUpload(false) }} disabled={uploading}
                 className="flex-1 py-2 text-sm font-medium text-[#666666] bg-[#F2F3F0] rounded-xl hover:bg-[#E7E8E5] transition-colors">
-                Cancel
+                {t('common.cancel')}
               </button>
               <button onClick={handleUpload} disabled={uploading || !uploadTitle || !uploadFile}
                 className="flex-1 py-2 text-sm font-medium text-white bg-[#6366F1] rounded-xl hover:bg-[#4F46E5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
-                {uploading ? 'Uploading...' : 'Upload'}
+                {uploading ? t('podcasts.upload.uploading') : t('podcasts.upload.submit')}
               </button>
             </div>
           </div>

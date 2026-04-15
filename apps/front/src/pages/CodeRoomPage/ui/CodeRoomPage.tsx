@@ -15,8 +15,7 @@ import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { getMonacoLanguage, getLanguageLabel } from '@/shared/lib/codeEditorLanguage'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { apiClient } from '@/shared/api/base'
-import { ReviewCard } from '@/features/SolutionReview/ui/ReviewCard'
-import { useSolutionReview } from '@/features/SolutionReview/hooks/useSolutionReview'
+import { useTranslation } from 'react-i18next'
 import type * as Monaco from 'monaco-editor'
 import * as Y from 'yjs'
 import * as syncProtocol from 'y-protocols/sync'
@@ -158,29 +157,18 @@ function getAvailableRoomLanguages(mode: Room['mode'] | undefined, currentLangua
   return LANGUAGES.filter(item => item.value === 'python' || item.value === 'go')
 }
 
-const AI_HINTS = [
-  'Think about edge cases',
-  'Consider the time complexity of your solution',
-  'Try breaking the task into smaller parts',
-]
-
-const STATUS_LABELS: Record<string, { label: string; variant: 'success' | 'warning' | 'default' }> = {
-  ROOM_STATUS_WAITING: { label: 'Waiting', variant: 'warning' },
-  ROOM_STATUS_ACTIVE: { label: 'Active', variant: 'success' },
-  ROOM_STATUS_FINISHED: { label: 'Finished', variant: 'default' },
-}
-
 function GuestNamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
   const [name, setName] = useState('')
+  const { t } = useTranslation()
   return (
     <div className="flex items-center justify-center h-screen bg-[#F2F3F0]">
       <div className="bg-white rounded-2xl border border-[#CBCCC9] p-8 w-full max-w-sm flex flex-col gap-4">
-        <h2 className="text-lg font-bold text-[#111111]">Enter your name</h2>
-        <p className="text-sm text-[#666666]">To join the room, tell us what to call you.</p>
+        <h2 className="text-lg font-bold text-[#111111]">{t('codeRoom.guest.title')}</h2>
+        <p className="text-sm text-[#666666]">{t('codeRoom.guest.subtitle')}</p>
         <input
           value={name}
           onChange={e => setName(e.target.value)}
-          placeholder="Your name"
+          placeholder={t('codeRoom.guest.placeholder')}
           className="w-full px-4 py-2.5 bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30"
           onKeyDown={e => { if (e.key === 'Enter' && name.trim()) onSubmit(name.trim()) }}
           autoFocus
@@ -190,7 +178,7 @@ function GuestNamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
           disabled={!name.trim()}
           className="w-full py-2.5 bg-[#6366F1] hover:bg-[#4F46E5] text-[#0f172a] font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
         >
-          Join room
+          {t('codeRoom.guest.submit')}
         </button>
       </div>
     </div>
@@ -204,10 +192,10 @@ export function CodeRoomPage() {
   const { user } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const isMobile = useIsMobile()
+  const { t } = useTranslation()
   const [room, setRoom] = useState<Room | null>(null)
   const [running, setRunning] = useState(false)
   const [submitResult, setSubmitResult] = useState<{ isCorrect: boolean; output: string; error: string; submissionId?: string } | null>(null)
-  const { review: solveReview, loading: solveReviewLoading } = useSolutionReview({ submissionId: submitResult?.submissionId })
   const [activeTab, setActiveTab] = useState<'problem' | 'tests'>('problem')
   const [aiTab, setAiTab] = useState<'hints' | 'result' | 'review'>('hints')
   const [hints, setHints] = useState<string[]>([])
@@ -398,14 +386,14 @@ export function CodeRoomPage() {
     initialLanguage: getMonacoLanguage(room?.language ?? (location.state as { language?: string } | null)?.language ?? ''),
     onDocSync: handleIncomingDocSync,
     onLeave: useCallback((_userId: string, displayName: string) => {
-      addNotification(`${displayName} left the room`)
-    }, [addNotification]),
+      addNotification(t('codeRoom.notifications.left', { name: displayName }))
+    }, [addNotification, t]),
     onBehaviorEvent: useCallback((_userId: string, displayName: string, event: import('@/features/CodeRoom/hooks/useCodeRoomWs').BehaviorEventType) => {
       if (!isCreatorRef.current) return
-      if (event === 'tab_hidden') addNotification(`⚠️ ${displayName} hid the tab`)
-      else if (event === 'tab_visible') addNotification(`${displayName} returned`)
-      else if (event === 'pasted') addNotification(`⚠️ ${displayName} pasted code`)
-    }, [addNotification]),
+      if (event === 'tab_hidden') addNotification(t('codeRoom.notifications.tabHidden', { name: displayName }))
+      else if (event === 'tab_visible') addNotification(t('codeRoom.notifications.returned', { name: displayName }))
+      else if (event === 'pasted') addNotification(t('codeRoom.notifications.pasted', { name: displayName }))
+    }, [addNotification, t]),
     onCursorUpdate: useCallback((userId: string, line: number, col: number) => {
       // Always apply cursor position immediately — deferring until codeLen matches caused
       // visible "freezing" during fast typing. The OT transform in onDidChangeModelContent
@@ -591,7 +579,7 @@ export function CodeRoomPage() {
       update.participants.forEach(p => {
         const pid = p.id || p.userId || ''
         if (!prevParticipantIdsRef.current.has(pid) && prevParticipantIdsRef.current.size > 0 && pid !== myId) {
-          addNotification(`${p.displayName} joined the room`)
+          addNotification(t('codeRoom.notifications.joined', { name: p.displayName }))
         }
       })
       prevParticipantIdsRef.current = new Set(update.participants.map(p => p.id || p.userId || ''))
@@ -616,7 +604,7 @@ export function CodeRoomPage() {
         ...(mappedParticipants ? { participants: mappedParticipants } : {}),
       }
     })
-  }, [ws.lastRoomUpdate])
+  }, [ws.lastRoomUpdate, user, t, addNotification])
 
   // Keep isCreatorRef in sync for use inside callbacks
   const isCreator = !!user && !!room && (user.id === room.creatorId || room.participants.some(p => p.userId === user.id && p.isCreator))
@@ -782,7 +770,7 @@ export function CodeRoomPage() {
         language: lang,
         code: getCurrentCode(),
         taskTitle: room?.task ?? '',
-        statement: customPrompt || (room?.task ? `Solve the task: ${room.task}` : ''),
+        statement: customPrompt || (room?.task ? t('codeRoom.solveTaskPrompt', { task: room.task }) : ''),
       })
       const data = res.data
       // The response is an object {provider, model, score, summary, strengths, issues, followUpQuestions}
@@ -790,16 +778,16 @@ export function CodeRoomPage() {
       if (data && typeof data === 'object' && !Array.isArray(data)) {
         const parts: string[] = []
         if (data.summary) parts.push(`📋 ${data.summary}`)
-        if (data.score !== undefined) parts.push(`⭐ Score: ${data.score}/10`)
-        if (data.strengths?.length) parts.push(`✅ Strengths:\n${data.strengths.map((s: string) => `• ${s}`).join('\n')}`)
-        if (data.issues?.length) parts.push(`⚠️ Issues:\n${data.issues.map((i: string) => `• ${i}`).join('\n')}`)
-        if (data.followUpQuestions?.length) parts.push(`❓ Questions:\n${data.followUpQuestions.map((q: string) => `• ${q}`).join('\n')}`)
+        if (data.score !== undefined) parts.push(`⭐ ${t('codeRoom.review.score')}: ${data.score}/10`)
+        if (data.strengths?.length) parts.push(`✅ ${t('codeRoom.review.strengths')}:\n${data.strengths.map((s: string) => `• ${s}`).join('\n')}`)
+        if (data.issues?.length) parts.push(`⚠️ ${t('codeRoom.review.issues')}:\n${data.issues.map((i: string) => `• ${i}`).join('\n')}`)
+        if (data.followUpQuestions?.length) parts.push(`❓ ${t('codeRoom.review.questions')}:\n${data.followUpQuestions.map((q: string) => `• ${q}`).join('\n')}`)
         setAiReview(parts.join('\n\n') || JSON.stringify(data, null, 2))
       } else {
-        setAiReview(String(data?.review ?? data?.feedback ?? data ?? 'No data'))
+        setAiReview(String(data?.review ?? data?.feedback ?? data ?? t('codeRoom.review.noData')))
       }
     } catch {
-      setAiReview('Failed to get a review. Try again later.')
+      setAiReview(t('codeRoom.review.failed'))
     } finally {
       setReviewLoading(false)
     }
@@ -929,7 +917,17 @@ export function CodeRoomPage() {
   const roomLanguage = getMonacoLanguage(room?.language ?? '')
   const lang = ws.language || (roomLanguage === 'plaintext' ? 'python' : roomLanguage)
   const roomLanguages = getAvailableRoomLanguages(room?.mode, lang)
-  const status = room ? (STATUS_LABELS[room.status] ?? { label: room.status, variant: 'default' as const }) : null
+  const aiHints = [
+    t('codeRoom.hints.edgeCases'),
+    t('codeRoom.hints.timeComplexity'),
+    t('codeRoom.hints.breakIntoParts'),
+  ]
+  const statusLabels: Record<string, { label: string; variant: 'success' | 'warning' | 'default' }> = {
+    ROOM_STATUS_WAITING: { label: t('codeRoom.status.waiting'), variant: 'warning' },
+    ROOM_STATUS_ACTIVE: { label: t('codeRoom.status.active'), variant: 'success' },
+    ROOM_STATUS_FINISHED: { label: t('codeRoom.status.finished'), variant: 'default' },
+  }
+  const status = room ? (statusLabels[room.status] ?? { label: room.status, variant: 'default' as const }) : null
 
   if (isMobile) {
     return (
@@ -943,23 +941,23 @@ export function CodeRoomPage() {
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold text-[#0f172a] dark:text-[#e2e8f0]">{room?.task || 'Code Room'}</p>
+              <p className="truncate text-sm font-bold text-[#0f172a] dark:text-[#e2e8f0]">{room?.task || t('codeRoom.title')}</p>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 {status && <Badge variant={status.variant}>{status.label}</Badge>}
                 {ws.connected ? (
                   <span className="flex items-center gap-1 text-[10px] text-[#22c55e]">
-                    <Wifi className="w-3 h-3" /> Live
+                    <Wifi className="w-3 h-3" /> {t('codeRoom.live')}
                   </span>
                 ) : (
                   <span className="flex items-center gap-1 text-[10px] text-[#94a3b8]">
-                    <WifiOff className="w-3 h-3" /> Offline
+                    <WifiOff className="w-3 h-3" /> {t('codeRoom.offline')}
                   </span>
                 )}
               </div>
             </div>
             <button
               onClick={toggleTheme}
-              title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
+              title={theme === 'dark' ? t('codeRoom.theme.light') : t('codeRoom.theme.dark')}
               className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#666666] transition-colors dark:bg-[#1a2236] dark:text-[#94a3b8]"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-[#fbbf24]" /> : <Moon className="w-4 h-4" />}
@@ -985,28 +983,28 @@ export function CodeRoomPage() {
             <button
               onClick={copyInviteLink}
               className="flex flex-shrink-0 items-center gap-1.5 rounded-2xl border border-[#e2e8f0] bg-white px-3 py-2 text-xs font-medium text-[#111111] transition-colors dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f0]"
-              title="Copy invite link"
+              title={t('codeRoom.copyInviteLink')}
             >
               {copied ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Share2 className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Copied' : 'Invite'}</span>
+              <span>{copied ? t('codeRoom.copied') : t('codeRoom.invite')}</span>
             </button>
 
             {isCreator && (
               <button
                 onClick={handleTogglePrivacy}
                 disabled={togglingPrivacy}
-                title={room?.isPrivate ? 'Make public' : 'Make private'}
+                title={room?.isPrivate ? t('codeRoom.makePublic') : t('codeRoom.makePrivate')}
                 className={`flex flex-shrink-0 items-center gap-1.5 rounded-2xl border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50 ${room?.isPrivate ? 'border-[#c7d2fe] bg-[#eef2ff] text-[#6366F1] dark:border-[#312e81] dark:bg-[#1e1b4b]' : 'border-[#e2e8f0] bg-white text-[#667085] dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#94a3b8]'}`}
               >
                 {room?.isPrivate ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                <span>{room?.isPrivate ? 'Private' : 'Public'}</span>
+                <span>{room?.isPrivate ? t('codeRoom.private') : t('codeRoom.public')}</span>
               </button>
             )}
 
             {isCreator && (
               <button
                 onClick={() => setNotificationsEnabled(v => !v)}
-                title={notificationsEnabled ? 'Disable notifications' : 'Enable notifications'}
+                title={notificationsEnabled ? t('codeRoom.notifications.disable') : t('codeRoom.notifications.enable')}
                 className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border transition-colors ${notificationsEnabled ? 'border-[#c7d2fe] bg-[#eef2ff] text-[#6366F1] dark:border-[#312e81] dark:bg-[#1e1b4b]' : 'border-[#e2e8f0] bg-white text-[#94a3b8] dark:border-[#1e3158] dark:bg-[#0f1117]'}`}
               >
                 {notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
@@ -1014,10 +1012,10 @@ export function CodeRoomPage() {
             )}
 
             <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading} className="flex-shrink-0 rounded-2xl">
-              <Bot className="w-3.5 h-3.5" /> AI Review
+              <Bot className="w-3.5 h-3.5" /> {t('codeRoom.aiReview')}
             </Button>
             <Button variant="secondary" size="sm" onClick={handleRun} loading={running} className="flex-shrink-0 rounded-2xl">
-              <Play className="w-3.5 h-3.5" /> Run
+              <Play className="w-3.5 h-3.5" /> {t('codeRoom.run')}
             </Button>
           </div>
         </header>
@@ -1025,9 +1023,9 @@ export function CodeRoomPage() {
         <div className="flex flex-1 flex-col gap-4 px-4 pt-4 pb-24">
           <div className="grid grid-cols-3 gap-2 rounded-[24px] border border-[#d8d9d6] bg-white p-1 shadow-[0_12px_28px_rgba(15,23,42,0.06)] dark:border-[#1e3158] dark:bg-[#161c2d]">
             {[
-              { key: 'problem' as const, label: 'Task' },
-              { key: 'editor' as const, label: 'Editor' },
-              { key: 'ai' as const, label: 'AI' },
+              { key: 'problem' as const, label: t('codeRoom.panel.task') },
+              { key: 'editor' as const, label: t('codeRoom.panel.editor') },
+              { key: 'ai' as const, label: t('codeRoom.panel.ai') },
             ].map(panel => (
               <button
                 key={panel.key}
@@ -1045,7 +1043,7 @@ export function CodeRoomPage() {
           {mobilePanel === 'problem' && (
             <div className="rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
               <div className="flex items-center justify-between border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
-                <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">Task</span>
+                <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.task')}</span>
                 {canEditTask && (
                   <button
                     onClick={openTaskEditor}
@@ -1064,10 +1062,10 @@ export function CodeRoomPage() {
                       <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#475569] dark:text-[#94a3b8]">{taskStatement}</p>
                     ) : canEditTask ? (
                       <button onClick={openTaskEditor} className="text-sm font-medium text-[#6366F1] hover:underline">
-                        + Add description
+                        {t('codeRoom.addDescription')}
                       </button>
                     ) : (
-                      <p className="text-sm text-[#94a3b8]">No description yet</p>
+                      <p className="text-sm text-[#94a3b8]">{t('codeRoom.noDescription')}</p>
                     )}
                   </div>
                 ) : canEditTask ? (
@@ -1078,10 +1076,10 @@ export function CodeRoomPage() {
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-dashed border-[#CBCCC9] dark:border-[#1e3158]">
                       <Pencil className="w-4 h-4" />
                     </div>
-                    <span className="text-sm font-medium">Add task statement</span>
+                    <span className="text-sm font-medium">{t('codeRoom.addTaskStatement')}</span>
                   </button>
                 ) : (
-                  <p className="py-8 text-center text-sm text-[#94a3b8]">No task yet</p>
+                  <p className="py-8 text-center text-sm text-[#94a3b8]">{t('codeRoom.noTask')}</p>
                 )}
               </div>
             </div>
@@ -1141,15 +1139,15 @@ export function CodeRoomPage() {
                     <div className={`rounded-2xl p-3 ${submitResult.isCorrect ? 'border border-[#86efac] bg-[#e8f9ef] dark:border-[#166534] dark:bg-[#0d2a1f]' : 'border border-[#fca5a5] bg-[#fef2f2] dark:border-[#991b1b] dark:bg-[#2a0f0f]'}`}>
                       <div className="mb-2 flex items-center gap-2">
                         {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
-                        <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Accepted' : 'Needs work'}</span>
+                        <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">{submitResult.isCorrect ? t('codeRoom.accepted') : t('codeRoom.needsWork')}</span>
                       </div>
                       {submitResult.output && <pre className="whitespace-pre-wrap text-xs text-[#475569] dark:text-[#94a3b8]">{submitResult.output}</pre>}
                       {submitResult.error && <pre className="mt-2 whitespace-pre-wrap text-xs text-[#ef4444]">{submitResult.error}</pre>}
                     </div>
-                    {submitResult.submissionId && <ReviewCard review={solveReview} loading={solveReviewLoading} showComparison={false} />}
+                    {/* TODO: integrate ReviewCard here after fixing vendor chunk circularity */}
                   </div>
                 ) : (
-                  <p className="text-xs text-[#94a3b8]">Run results will appear here.</p>
+                  <p className="text-xs text-[#94a3b8]">{t('codeRoom.runResultsPlaceholder')}</p>
                 )}
               </div>
             </div>
@@ -1159,7 +1157,7 @@ export function CodeRoomPage() {
             <div className="overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
               <div className="flex items-center gap-2 border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
                 <Sparkles className="w-4 h-4 text-[#6366F1]" />
-                <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">AI Assistant</span>
+                <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.aiAssistant')}</span>
               </div>
               <div className="flex border-b border-[#e2e8f0] dark:border-[#1e3158]">
                 {(['hints', 'result', 'review'] as const).map(tab => (
@@ -1168,7 +1166,7 @@ export function CodeRoomPage() {
                     onClick={() => setAiTab(tab)}
                     className={`px-3 py-2.5 text-xs font-medium transition-colors ${aiTab === tab ? 'border-b-2 border-[#6366F1] text-[#111111] dark:text-[#e2e8f0]' : 'text-[#666666] dark:text-[#64748b]'}`}
                   >
-                    {tab === 'hints' ? 'Hints' : tab === 'result' ? 'Result' : 'AI Review'}
+                    {tab === 'hints' ? t('codeRoom.aiTabs.hints') : tab === 'result' ? t('codeRoom.aiTabs.result') : t('codeRoom.aiTabs.review')}
                   </button>
                 ))}
               </div>
@@ -1178,22 +1176,22 @@ export function CodeRoomPage() {
                     {hints.length === 0 ? (
                       <>
                         <p className="text-sm leading-relaxed text-[#666666] dark:text-[#94a3b8]">
-                          Start solving the task and AI will help if you get stuck
+                          {t('codeRoom.aiHelp')}
                         </p>
                         <Button
                           variant="orange"
                           size="sm"
                           className="w-full rounded-2xl"
-                          onClick={() => setHints(AI_HINTS)}
+                          onClick={() => setHints(aiHints)}
                         >
-                          <Sparkles className="w-3.5 h-3.5" /> Get a hint
+                          <Sparkles className="w-3.5 h-3.5" /> {t('codeRoom.getHint')}
                         </Button>
                       </>
                     ) : (
                       <div className="flex flex-col gap-2">
                         {hints.map((hint, i) => (
                           <div key={i} className="rounded-2xl border border-[#FDBA74] bg-[#FFF7ED] p-3 dark:border-[#78350f] dark:bg-[#2a1a06]">
-                            <p className="mb-0.5 text-xs font-semibold text-[#9a3412] dark:text-[#fbbf24]">Hint {i + 1}</p>
+                            <p className="mb-0.5 text-xs font-semibold text-[#9a3412] dark:text-[#fbbf24]">{t('codeRoom.hintN', { index: i + 1 })}</p>
                             <p className="text-sm text-[#111111] dark:text-[#e2e8f0]">{hint}</p>
                           </div>
                         ))}
@@ -1206,13 +1204,13 @@ export function CodeRoomPage() {
                       <div className={`rounded-2xl p-3 ${submitResult.isCorrect ? 'border border-[#86efac] bg-[#e8f9ef] dark:border-[#166534] dark:bg-[#0d2a1f]' : 'border border-[#fca5a5] bg-[#fef2f2] dark:border-[#991b1b] dark:bg-[#2a0f0f]'}`}>
                         <div className="mb-2 flex items-center gap-2">
                           {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
-                          <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Accepted!' : 'Wrong'}</span>
+                          <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? t('codeRoom.acceptedBang') : t('codeRoom.wrong')}</span>
                         </div>
                         {submitResult.output && <pre className="whitespace-pre-wrap font-mono text-xs text-[#475569] dark:text-[#94a3b8]">{submitResult.output}</pre>}
                         {submitResult.error && <pre className="whitespace-pre-wrap font-mono text-xs text-[#ef4444]">{submitResult.error}</pre>}
                       </div>
                     ) : (
-                      <p className="text-sm text-[#94a3b8]">Run the code to see the results</p>
+                      <p className="text-sm text-[#94a3b8]">{t('codeRoom.runToSeeResults')}</p>
                     )}
                   </div>
                 ) : (
@@ -1220,26 +1218,26 @@ export function CodeRoomPage() {
                     {reviewLoading ? (
                       <div className="flex items-center gap-2">
                         <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#CBCCC9] border-t-[#6366F1] dark:border-[#1e3158]" />
-                        <p className="text-sm text-[#666666] dark:text-[#94a3b8]">Analyzing code...</p>
+                        <p className="text-sm text-[#666666] dark:text-[#94a3b8]">{t('codeRoom.analyzingCode')}</p>
                       </div>
                     ) : aiReview ? (
                       <div className="flex flex-col gap-2">
-                        <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">Review result</p>
+                        <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.reviewResult')}</p>
                         <p className="whitespace-pre-wrap text-xs leading-relaxed text-[#666666] dark:text-[#94a3b8]">{aiReview}</p>
-                        <button onClick={() => setAiReview(null)} className="mt-1 text-left text-xs text-[#6366F1] hover:underline">Run again</button>
+                        <button onClick={() => setAiReview(null)} className="mt-1 text-left text-xs text-[#6366F1] hover:underline">{t('codeRoom.runAgain')}</button>
                       </div>
                     ) : (
                       <div className="flex flex-col gap-3">
-                        <p className="text-xs text-[#666666] dark:text-[#94a3b8]">Optional prompt for AI review:</p>
+                        <p className="text-xs text-[#666666] dark:text-[#94a3b8]">{t('codeRoom.optionalPrompt')}</p>
                         <textarea
                           value={reviewPrompt}
                           onChange={e => setReviewPrompt(e.target.value)}
-                          placeholder="For example: check time complexity..."
+                          placeholder={t('codeRoom.reviewPromptPlaceholder')}
                           rows={4}
                           className="w-full resize-none rounded-2xl border border-[#CBCCC9] bg-[#F2F3F0] px-3 py-2 text-xs focus:outline-none dark:border-[#1e3158] dark:bg-[#0d1117] dark:text-[#e2e8f0]"
                         />
                         <Button variant="primary" size="sm" className="w-full rounded-2xl" onClick={() => handleRunReview(reviewPrompt)} loading={reviewLoading}>
-                          <Bot className="w-3.5 h-3.5" /> Run review
+                          <Bot className="w-3.5 h-3.5" /> {t('codeRoom.runReview')}
                         </Button>
                       </div>
                     )}
@@ -1268,35 +1266,35 @@ export function CodeRoomPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
             <div className="w-full max-w-lg rounded-2xl border border-[#CBCCC9] bg-white shadow-xl dark:border-[#1e3158] dark:bg-[#161c2d]">
               <div className="flex items-center justify-between border-b border-[#CBCCC9] px-5 py-4 dark:border-[#1e3158]">
-                <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">Task statement</h2>
+                <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.taskStatement')}</h2>
                 <button onClick={() => setShowTaskEditor(false)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] hover:bg-[#F2F3F0] dark:text-[#94a3b8] dark:hover:bg-[#1a2236]">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="flex flex-col gap-4 p-5">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">Task title</label>
+                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">{t('codeRoom.taskTitle')}</label>
                   <input
                     value={editTaskTitle}
                     onChange={e => setEditTaskTitle(e.target.value)}
-                    placeholder="For example: Two Sum"
+                    placeholder={t('codeRoom.taskTitlePlaceholder')}
                     className="w-full rounded-lg border border-[#CBCCC9] bg-white px-3 py-2 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f3]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">Task statement</label>
+                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">{t('codeRoom.taskStatement')}</label>
                   <textarea
                     value={editTaskStatement}
                     onChange={e => setEditTaskStatement(e.target.value)}
-                    placeholder="Describe the task, inputs, outputs, and examples..."
+                    placeholder={t('codeRoom.taskStatementPlaceholder')}
                     rows={8}
                     className="w-full resize-none rounded-lg border border-[#CBCCC9] bg-white px-3 py-2 font-mono text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f3]"
                   />
                 </div>
               </div>
               <div className="flex gap-2 px-5 pb-5">
-                <Button variant="secondary" size="sm" onClick={() => setShowTaskEditor(false)}>Cancel</Button>
-                <Button variant="primary" size="sm" onClick={saveTask} disabled={!editTaskTitle.trim()}>Save</Button>
+                <Button variant="secondary" size="sm" onClick={() => setShowTaskEditor(false)}>{t('common.cancel')}</Button>
+                <Button variant="primary" size="sm" onClick={saveTask} disabled={!editTaskTitle.trim()}>{t('common.save')}</Button>
               </div>
             </div>
           </div>
@@ -1317,16 +1315,16 @@ export function CodeRoomPage() {
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <p className="text-sm font-bold text-[#0f172a] dark:text-[#e2e8f0]">{room?.task || 'Code Room'}</p>
+            <p className="text-sm font-bold text-[#0f172a] dark:text-[#e2e8f0]">{room?.task || t('codeRoom.title')}</p>
             <div className="flex items-center gap-2">
               {status && <Badge variant={status.variant}>{status.label}</Badge>}
               {ws.connected ? (
                 <span className="flex items-center gap-1 text-[10px] text-[#22c55e]">
-                  <Wifi className="w-3 h-3" /> Live
+                  <Wifi className="w-3 h-3" /> {t('codeRoom.live')}
                 </span>
               ) : (
                 <span className="flex items-center gap-1 text-[10px] text-[#94a3b8]">
-                  <WifiOff className="w-3 h-3" /> Offline
+                  <WifiOff className="w-3 h-3" /> {t('codeRoom.offline')}
                 </span>
               )}
             </div>
@@ -1349,7 +1347,7 @@ export function CodeRoomPage() {
           {/* Theme toggle — available to all */}
           <button
             onClick={toggleTheme}
-            title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
+            title={theme === 'dark' ? t('codeRoom.theme.light') : t('codeRoom.theme.dark')}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] text-[#666666] dark:text-[#94a3b8] transition-colors"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-[#fbbf24]" /> : <Moon className="w-4 h-4" />}
@@ -1359,37 +1357,37 @@ export function CodeRoomPage() {
           <button
             onClick={copyInviteLink}
             className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#666666] dark:text-[#4d6380] hover:text-[#111111] dark:hover:text-[#c8d8ec] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] rounded-lg transition-colors"
-            title="Copy invite link"
+            title={t('codeRoom.copyInviteLink')}
           >
             {copied ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Share2 className="w-3.5 h-3.5" />}
-            <span>{copied ? 'Copied' : 'Invite'}</span>
+            <span>{copied ? t('codeRoom.copied') : t('codeRoom.invite')}</span>
           </button>
 
           {isCreator && (
             <button
               onClick={handleTogglePrivacy}
               disabled={togglingPrivacy}
-              title={room?.isPrivate ? 'Make public' : 'Make private'}
+              title={room?.isPrivate ? t('codeRoom.makePublic') : t('codeRoom.makePrivate')}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg transition-colors disabled:opacity-50 ${room?.isPrivate ? 'text-[#6366F1] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]' : 'text-[#94a3b8] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]'}`}
             >
               {room?.isPrivate ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-              <span className="hidden sm:inline">{room?.isPrivate ? 'Private' : 'Public'}</span>
+              <span className="hidden sm:inline">{room?.isPrivate ? t('codeRoom.private') : t('codeRoom.public')}</span>
             </button>
           )}
           {isCreator && (
             <button
               onClick={() => setNotificationsEnabled(v => !v)}
-              title={notificationsEnabled ? 'Disable notifications' : 'Enable notifications'}
+              title={notificationsEnabled ? t('codeRoom.notifications.disable') : t('codeRoom.notifications.enable')}
               className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${notificationsEnabled ? 'text-[#6366F1] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]' : 'text-[#94a3b8] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]'}`}
             >
               {notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
             </button>
           )}
           <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading}>
-            <Bot className="w-3.5 h-3.5" /> AI Review
+            <Bot className="w-3.5 h-3.5" /> {t('codeRoom.aiReview')}
           </Button>
           <Button variant="secondary" size="sm" onClick={handleRun} loading={running}>
-            <Play className="w-3.5 h-3.5" /> Run
+            <Play className="w-3.5 h-3.5" /> {t('codeRoom.run')}
           </Button>
         </div>
       </header>
@@ -1403,7 +1401,7 @@ export function CodeRoomPage() {
               onClick={() => setActiveTab('problem')}
               className={`px-3 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'problem' ? 'border-[#6366F1] text-[#111111] dark:text-[#e2e8f0]' : 'border-transparent text-[#666666] dark:text-[#64748b]'}`}
             >
-              Task
+              {t('codeRoom.task')}
             </button>
             {canEditTask && (
               <button
@@ -1426,10 +1424,10 @@ export function CodeRoomPage() {
                     onClick={openTaskEditor}
                     className="text-xs text-[#6366F1] hover:underline"
                   >
-                    + Add description
+                    {t('codeRoom.addDescription')}
                   </button>
                 ) : (
-                  <p className="text-xs text-[#94a3b8]">No description yet</p>
+                  <p className="text-xs text-[#94a3b8]">{t('codeRoom.noDescription')}</p>
                 )}
               </div>
             ) : canEditTask ? (
@@ -1440,10 +1438,10 @@ export function CodeRoomPage() {
                 <div className="w-10 h-10 rounded-xl border-2 border-dashed border-[#CBCCC9] dark:border-[#1e3158] group-hover:border-[#6366F1] flex items-center justify-center transition-colors">
                   <Pencil className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-medium dark:text-[#94a3b8]">Add task statement</span>
+                <span className="text-xs font-medium dark:text-[#94a3b8]">{t('codeRoom.addTaskStatement')}</span>
               </button>
             ) : (
-              <p className="text-sm text-[#94a3b8] text-center py-8">No task yet</p>
+              <p className="text-sm text-[#94a3b8] text-center py-8">{t('codeRoom.noTask')}</p>
             )}
           </div>
         </div>
@@ -1511,7 +1509,7 @@ export function CodeRoomPage() {
           <div className="w-[280px] flex-shrink-0 bg-white dark:bg-[#161c2d] border-l border-[#CBCCC9] dark:border-[#1e3158] flex flex-col">
             <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#6366F1]" />
-              <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">AI Assistant</span>
+                <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.aiAssistant')}</span>
             </div>
             <div className="flex border-b border-[#CBCCC9] dark:border-[#1e3158]">
               {(['hints', 'result', 'review'] as const).map(tab => (
@@ -1520,7 +1518,7 @@ export function CodeRoomPage() {
                   onClick={() => setAiTab(tab)}
                   className={`px-3 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${aiTab === tab ? 'border-[#6366F1] text-[#111111] dark:text-[#e2e8f0]' : 'border-transparent text-[#666666] dark:text-[#64748b]'}`}
                 >
-                  {tab === 'hints' ? 'Hints' : tab === 'result' ? 'Result' : 'AI Review'}
+                  {tab === 'hints' ? t('codeRoom.aiTabs.hints') : tab === 'result' ? t('codeRoom.aiTabs.result') : t('codeRoom.aiTabs.review')}
                 </button>
               ))}
             </div>
@@ -1530,22 +1528,22 @@ export function CodeRoomPage() {
                   {hints.length === 0 ? (
                     <>
                       <p className="text-sm text-[#666666] dark:text-[#94a3b8] leading-relaxed">
-                        Start solving the task and AI will help if you get stuck
+                        {t('codeRoom.aiHelp')}
                       </p>
                       <Button
                         variant="orange"
                         size="sm"
                         className="w-full"
-                        onClick={() => setHints(AI_HINTS)}
+                        onClick={() => setHints(aiHints)}
                       >
-                        <Sparkles className="w-3.5 h-3.5" /> Get a hint
+                        <Sparkles className="w-3.5 h-3.5" /> {t('codeRoom.getHint')}
                       </Button>
                     </>
                   ) : (
                     <div className="flex flex-col gap-2">
                       {hints.map((hint, i) => (
                         <div key={i} className="p-3 bg-[#FFF7ED] dark:bg-[#2a1a06] border border-[#FDBA74] dark:border-[#78350f] rounded-lg">
-                          <p className="text-xs font-semibold text-[#9a3412] dark:text-[#fbbf24] mb-0.5">Hint {i + 1}</p>
+                          <p className="text-xs font-semibold text-[#9a3412] dark:text-[#fbbf24] mb-0.5">{t('codeRoom.hintN', { index: i + 1 })}</p>
                           <p className="text-sm text-[#111111] dark:text-[#e2e8f0]">{hint}</p>
                         </div>
                       ))}
@@ -1558,13 +1556,13 @@ export function CodeRoomPage() {
                     <div className={`p-3 rounded-lg ${submitResult.isCorrect ? 'bg-[#e8f9ef] dark:bg-[#0d2a1f] border border-[#86efac] dark:border-[#166534]' : 'bg-[#fef2f2] dark:bg-[#2a0f0f] border border-[#fca5a5] dark:border-[#991b1b]'}`}>
                       <div className="flex items-center gap-2 mb-2">
                         {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
-                        <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Accepted!' : 'Wrong'}</span>
+                        <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? t('codeRoom.acceptedBang') : t('codeRoom.wrong')}</span>
                       </div>
                       {submitResult.output && <pre className="text-xs text-[#475569] dark:text-[#94a3b8] font-mono whitespace-pre-wrap">{submitResult.output}</pre>}
                       {submitResult.error && <pre className="text-xs text-[#ef4444] font-mono whitespace-pre-wrap">{submitResult.error}</pre>}
                     </div>
                   ) : (
-                    <p className="text-sm text-[#94a3b8]">Run the code to see the results</p>
+                    <p className="text-sm text-[#94a3b8]">{t('codeRoom.runToSeeResults')}</p>
                   )}
                 </div>
               ) : (
@@ -1572,26 +1570,26 @@ export function CodeRoomPage() {
                   {reviewLoading ? (
                     <div className="flex items-center gap-2">
                       <span className="w-3.5 h-3.5 border-2 border-[#CBCCC9] dark:border-[#1e3158] border-t-[#6366F1] rounded-full animate-spin" />
-                      <p className="text-sm text-[#666666] dark:text-[#94a3b8]">Analyzing code...</p>
+                      <p className="text-sm text-[#666666] dark:text-[#94a3b8]">{t('codeRoom.analyzingCode')}</p>
                     </div>
                   ) : aiReview ? (
                     <div className="flex flex-col gap-2">
-                      <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">Review result</p>
+                      <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.reviewResult')}</p>
                       <p className="text-xs text-[#666666] dark:text-[#94a3b8] whitespace-pre-wrap leading-relaxed">{aiReview}</p>
-                      <button onClick={() => setAiReview(null)} className="text-xs text-[#6366F1] hover:underline mt-1">Run again</button>
+                      <button onClick={() => setAiReview(null)} className="text-xs text-[#6366F1] hover:underline mt-1">{t('codeRoom.runAgain')}</button>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-3">
-                      <p className="text-xs text-[#666666] dark:text-[#94a3b8]">Optional prompt for AI review:</p>
+                      <p className="text-xs text-[#666666] dark:text-[#94a3b8]">{t('codeRoom.optionalPrompt')}</p>
                       <textarea
                         value={reviewPrompt}
                         onChange={e => setReviewPrompt(e.target.value)}
-                        placeholder="For example: check time complexity..."
+                        placeholder={t('codeRoom.reviewPromptPlaceholder')}
                         rows={3}
                         className="w-full px-3 py-2 text-xs bg-[#F2F3F0] dark:bg-[#0d1117] dark:text-[#e2e8f0] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none resize-none"
                       />
                       <Button variant="primary" size="sm" className="w-full" onClick={() => handleRunReview(reviewPrompt)} loading={reviewLoading}>
-                        <Bot className="w-3.5 h-3.5" /> Run review
+                        <Bot className="w-3.5 h-3.5" /> {t('codeRoom.runReview')}
                       </Button>
                     </div>
                   )}
@@ -1622,35 +1620,35 @@ export function CodeRoomPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white dark:bg-[#161c2d] rounded-2xl shadow-xl border border-[#CBCCC9] dark:border-[#1e3158] w-full max-w-lg">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#CBCCC9] dark:border-[#1e3158]">
-              <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">Task statement</h2>
+              <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.taskStatement')}</h2>
               <button onClick={() => setShowTaskEditor(false)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] text-[#666666] dark:text-[#94a3b8]">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="p-5 flex flex-col gap-4">
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1.5 block">Task title</label>
+                <label className="text-xs font-medium text-[#666666] mb-1.5 block">{t('codeRoom.taskTitle')}</label>
                 <input
                   value={editTaskTitle}
                   onChange={e => setEditTaskTitle(e.target.value)}
-                  placeholder="For example: Two Sum"
+                  placeholder={t('codeRoom.taskTitlePlaceholder')}
                   className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#6366F1]/10"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1.5 block">Task statement</label>
+                <label className="text-xs font-medium text-[#666666] mb-1.5 block">{t('codeRoom.taskStatement')}</label>
                 <textarea
                   value={editTaskStatement}
                   onChange={e => setEditTaskStatement(e.target.value)}
-                  placeholder="Describe the task, inputs, outputs, and examples..."
+                  placeholder={t('codeRoom.taskStatementPlaceholder')}
                   rows={8}
                   className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#6366F1]/10 resize-none font-mono"
                 />
               </div>
             </div>
             <div className="flex gap-2 px-5 pb-5">
-              <Button variant="secondary" size="sm" onClick={() => setShowTaskEditor(false)}>Cancel</Button>
-              <Button variant="primary" size="sm" onClick={saveTask} disabled={!editTaskTitle.trim()}>Save</Button>
+              <Button variant="secondary" size="sm" onClick={() => setShowTaskEditor(false)}>{t('common.cancel')}</Button>
+              <Button variant="primary" size="sm" onClick={saveTask} disabled={!editTaskTitle.trim()}>{t('common.save')}</Button>
             </div>
           </div>
         </div>
@@ -1660,16 +1658,16 @@ export function CodeRoomPage() {
       <Modal
         open={showLeaveConfirm}
         onClose={() => setShowLeaveConfirm(false)}
-        title="Leave room?"
+        title={t('codeRoom.leave.title')}
         footer={
           <>
-            <Button variant="secondary" size="sm" onClick={() => setShowLeaveConfirm(false)}>Stay</Button>
-            <Button variant="orange" size="sm" onClick={() => handleLeaveRoom(true)}>End and leave</Button>
+            <Button variant="secondary" size="sm" onClick={() => setShowLeaveConfirm(false)}>{t('codeRoom.leave.stay')}</Button>
+            <Button variant="orange" size="sm" onClick={() => handleLeaveRoom(true)}>{t('codeRoom.leave.confirm')}</Button>
           </>
         }
       >
         <p className="text-sm text-[#475569] dark:text-[#94a3b8]">
-          The session will be ended and the room will be removed. Unsaved code will be lost.
+          {t('codeRoom.leave.body')}
         </p>
       </Modal>
     </div>
