@@ -11,6 +11,7 @@ import { Input } from '@/shared/ui/Input'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { useToast } from '@/shared/ui/Toast'
 import { formatDate, formatTime } from '@/shared/lib/dateFormat'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
 
 function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
   event: Event
@@ -186,6 +187,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
 
 export function EventsPage() {
   const { toast } = useToast()
+  const isMobile = useIsMobile()
   const ctx = useOutletContext<{ openCreateEvent?: boolean; setOpenCreateEvent?: (v: boolean) => void } | null>()
   const [events, setEvents] = useState<Event[]>([])
   const [loading, setLoading] = useState(true)
@@ -274,55 +276,81 @@ export function EventsPage() {
   const joinedCount = events.filter(event => event.isJoined).length
 
   return (
-    <div className="px-4 pt-4 pb-6 md:px-6">
-      <section className="section-enter mb-4 overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(239,246,255,0.94)_46%,_rgba(255,247,237,0.95))] p-5 shadow-[0_18px_36px_rgba(15,23,42,0.08)] dark:border-[#1a2540] dark:bg-[linear-gradient(145deg,_rgba(22,28,45,0.98),_rgba(19,25,41,0.92)_54%,_rgba(42,32,10,0.62))] md:p-6">
-        <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
-          <div className="max-w-2xl">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1] dark:text-[#a5b4fc]">
-              Events Board
-            </p>
-            <h2 className="mt-2 text-2xl font-semibold text-[#111111] dark:text-[#f8fafc]">
-              Ближайшие встречи сообщества
-            </h2>
-            <p className="mt-2 text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">
-              Открывай карточку, чтобы быстро понять формат, место и кто уже идёт. Создание события теперь не теряется на мобильном экране.
-            </p>
-          </div>
-
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-            <div className="grid grid-cols-2 gap-2">
-              <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/72">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">Всего</p>
-                <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : events.length}</p>
-              </div>
-              <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/72">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">Вы идёте</p>
-                <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : joinedCount}</p>
-              </div>
+    <div className={isMobile ? 'px-4 pt-4 pb-6' : 'px-6 pt-4 pb-6'}>
+      {isMobile ? (
+        <section className="section-enter mb-4 overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(239,246,255,0.94)_46%,_rgba(255,247,237,0.95))] p-5 shadow-[0_18px_36px_rgba(15,23,42,0.08)] dark:border-[#1a2540] dark:bg-[linear-gradient(145deg,_rgba(22,28,45,0.98),_rgba(19,25,41,0.92)_54%,_rgba(42,32,10,0.62))] md:p-6">
+          <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-2xl">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1] dark:text-[#a5b4fc]">
+                Events Board
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold text-[#111111] dark:text-[#f8fafc]">
+                Ближайшие встречи сообщества
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">
+                Открывай карточку, чтобы быстро понять формат, место и кто уже идёт. Создание события теперь не теряется на мобильном экране.
+              </p>
             </div>
 
-            <Button variant="orange" size="lg" onClick={() => setShowCreate(true)} className="justify-center rounded-full px-5">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+              <div className="grid grid-cols-2 gap-2">
+                <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/72">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">Всего</p>
+                  <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : events.length}</p>
+                </div>
+                <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/72">
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">Вы идёте</p>
+                  <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : joinedCount}</p>
+                </div>
+              </div>
+
+              <Button variant="orange" size="lg" onClick={() => setShowCreate(true)} className="justify-center rounded-full px-5">
+                <Plus className="w-4 h-4" />
+                Создать событие
+              </Button>
+            </div>
+          </div>
+        </section>
+      ) : (
+        <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">Ближайшие встречи сообщества</h2>
+            <p className="mt-1 text-sm text-[#666666] dark:text-[#7e93b0]">Созвоны, офлайн-встречи и локальные мини-митапы.</p>
+          </div>
+
+          <div className="flex items-center gap-4">
+            <div className="flex items-center gap-4 text-sm text-[#666666] dark:text-[#7e93b0]">
+              <span><span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{loading ? '—' : events.length}</span> событий</span>
+              <span className="h-4 w-px bg-[#CBCCC9] dark:bg-[#1e3158]" />
+              <span><span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{loading ? '—' : joinedCount}</span> иду</span>
+            </div>
+            <Button variant="orange" size="md" onClick={() => setShowCreate(true)}>
               <Plus className="w-4 h-4" />
               Создать событие
             </Button>
           </div>
         </div>
-      </section>
+      )}
 
       {loading ? (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className={`grid grid-cols-1 gap-4 ${isMobile ? 'sm:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 xl:grid-cols-3'}`}>
           {Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-[188px] animate-pulse rounded-[28px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
+            <div
+              key={i}
+              className={`h-[188px] animate-pulse border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d] ${isMobile ? 'rounded-[28px]' : 'rounded-2xl'}`}
+            />
           ))}
         </div>
       ) : events.length === 0 ? (
-        <div className="section-enter flex flex-col items-center justify-center rounded-[30px] border border-dashed border-[#CBCCC9] bg-white px-6 py-16 text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
+        <div className={`section-enter flex flex-col items-center justify-center border border-dashed border-[#CBCCC9] bg-white px-6 py-16 text-center dark:border-[#1a2540] dark:bg-[#161c2d] ${isMobile ? 'rounded-[30px]' : 'rounded-2xl'}`}>
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#EEF2FF] dark:bg-[#1e1e4a]">
             <Calendar className="h-8 w-8 text-[#6366F1]" />
           </div>
           <h3 className="text-lg font-semibold text-[#111111] dark:text-[#f8fafc]">Пока нет событий</h3>
           <p className="mt-2 max-w-md text-sm leading-6 text-[#667085] dark:text-[#94a3b8]">
-            Собери первую встречу, созвон или локальный мини-митап. На телефоне это теперь можно сделать в пару касаний.
+            {isMobile
+              ? 'Собери первую встречу, созвон или локальный мини-митап. На телефоне это теперь можно сделать в пару касаний.'
+              : 'Собери первую встречу, созвон или локальный мини-митап для сообщества.'}
           </p>
           <Button variant="orange" size="md" onClick={() => setShowCreate(true)} className="mt-5 rounded-full px-5">
             <Plus className="w-4 h-4" />
@@ -330,12 +358,16 @@ export function EventsPage() {
           </Button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className={`grid grid-cols-1 gap-4 ${isMobile ? 'sm:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 xl:grid-cols-3'}`}>
           {events.map((event) => (
             <Card
               key={event.id}
-              padding="lg"
-              className="stagger-item flex min-h-[188px] flex-col gap-4 rounded-[28px] border-[#d8d9d6] bg-white/96 shadow-[0_12px_28px_rgba(15,23,42,0.05)] hover:border-[#6366F1] dark:border-[#1a2540] dark:bg-[#161c2d]/96"
+              padding={isMobile ? 'lg' : 'md'}
+              className={`stagger-item flex min-h-[188px] flex-col gap-4 border bg-white dark:border-[#1a2540] dark:bg-[#161c2d]/96 ${
+                isMobile
+                  ? 'rounded-[28px] border-[#d8d9d6] bg-white/96 shadow-[0_12px_28px_rgba(15,23,42,0.05)]'
+                  : 'rounded-2xl border-[#CBCCC9] shadow-sm'
+              } hover:border-[#6366F1]`}
               onClick={() => setSelectedEvent(event)}
             >
               <div className="flex items-start justify-between gap-3">

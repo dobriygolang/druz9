@@ -108,7 +108,7 @@ export function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F2F3F0] flex items-start sm:items-center justify-center relative overflow-hidden px-4 pt-10 sm:pt-0">
+    <div className="relative flex min-h-screen items-start justify-center overflow-hidden bg-[#F2F3F0] px-4 py-6 sm:items-center sm:py-0">
 
       {/* Ambient glow */}
       <div className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full pointer-events-none"
@@ -125,10 +125,10 @@ export function LoginPage() {
         }} />
 
       {/* Card */}
-      <div className="relative z-10 w-full max-w-[400px]" style={{ animation: 'fadeSlideUp 0.35s ease both' }}>
+      <div className="relative z-10 w-full max-w-[420px]" style={{ animation: 'fadeSlideUp 0.35s ease both' }}>
 
         {/* Card header — indigo gradient */}
-        <div className="rounded-t-2xl px-8 pt-8 pb-8"
+        <div className="rounded-t-2xl px-6 pt-7 pb-7 sm:px-8 sm:pt-8 sm:pb-8"
           style={{ background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)' }}>
 
           {/* Logo row */}
@@ -152,7 +152,7 @@ export function LoginPage() {
         </div>
 
         {/* Card body — white */}
-        <div className="bg-white rounded-b-2xl px-8 py-7 shadow-[0_12px_48px_rgba(0,0,0,0.08)]">
+        <div className="rounded-b-2xl bg-white px-5 py-6 shadow-[0_12px_48px_rgba(0,0,0,0.08)] sm:px-8 sm:py-7">
 
           {error && (
             <div className="mb-4 px-4 py-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
@@ -241,14 +241,14 @@ export function LoginPage() {
           <div className="h-px bg-[#F2F3F0] my-6" />
 
           {/* Feature grid */}
-          <div className="grid grid-cols-5 gap-2">
+          <div className="grid grid-cols-3 gap-3 sm:grid-cols-5 sm:gap-2">
             {FEATURES.map(({ icon: Icon, label, desc }) => (
               <div key={label} className="flex flex-col items-center gap-1.5 group cursor-default">
                 <div className="w-9 h-9 rounded-xl bg-[#EEF2FF] flex items-center justify-center transition-colors group-hover:bg-[#E0E7FF]">
                   <Icon className="w-4 h-4 text-[#6366F1]" />
                 </div>
                 <p className="text-[9px] font-semibold text-[#0f172a] text-center leading-tight">{label}</p>
-                <p className="text-[8px] text-[#94a3b8] text-center leading-tight hidden sm:block">{desc}</p>
+                <p className="text-[8px] text-[#94a3b8] text-center leading-tight">{desc}</p>
               </div>
             ))}
           </div>

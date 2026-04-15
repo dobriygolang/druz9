@@ -1,17 +1,16 @@
 # Seeds
 
-`scripts/seeds` хранит data-driven seed assets.
+`scripts/seeds` хранит data-driven seed assets для code tasks и SQL.
 
 Структура:
 
 - `*.sql` — SQL сиды, которые применяются runner'ом напрямую.
-- `catalogs/*.json` / `catalogs/*.yaml` — каталоги задач и interview-prep packs.
+- `catalogs/*.json` / `catalogs/*.yaml` — каталоги задач.
 
 Сейчас используется:
 
 - `test_users.sql`
 - `catalogs/blind75.json`
-- `catalogs/interview_prep.json`
 
 Важно:
 
@@ -24,7 +23,6 @@
 - `make seed-up`
 - `make seed-sql`
 - `make seed-blind75`
-- `make seed-interview-prep`
 - `make seed-status`
 
 Формат каталога задач:
@@ -51,4 +49,4 @@
 }
 ```
 
-Новые packs лучше добавлять через `catalogs/*.json` или `catalogs/*.yaml`, а не через большой Go-файл со списком задач.
+Interview Prep больше не сидируется из репозитория: контент авторится через admin API или мигрируется из существующей БД.

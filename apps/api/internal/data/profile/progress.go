@@ -41,12 +41,6 @@ func (r *Repo) GetProfileProgress(ctx context.Context, userID uuid.UUID) (*model
 	progress.Strongest, progress.Weakest = profiledomain.SplitStrengths(competencies)
 	progress.Recommendations = profiledomain.BuildProfileRecommendations(progress.Weakest)
 
-	checkpoints, err := r.loadProfileCheckpointProgress(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-	progress.Checkpoints = checkpoints
-
 	mockSessions, err := r.loadProfileProgressMockSessions(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -78,26 +72,26 @@ func (r *Repo) loadProfileProgressOverview(ctx context.Context, userID uuid.UUID
 	if err := r.data.DB.QueryRow(ctx, `
 		WITH stage_metrics AS (
 			SELECT
-				COUNT(*) FILTER (WHERE s.status = 'completed') AS completed_stages,
-				COALESCE(ROUND((AVG(s.review_score) FILTER (WHERE s.status = 'completed'))::numeric, 1), 0)::float8 AS avg_stage_score
-			FROM interview_prep_mock_stages s
-			JOIN interview_prep_mock_sessions ms ON ms.id = s.session_id
+				COUNT(*) FILTER (WHERE r.status = 'completed') AS completed_stages,
+				COALESCE(ROUND((AVG(r.review_score) FILTER (WHERE r.status = 'completed'))::numeric, 1), 0)::float8 AS avg_stage_score
+			FROM interview_mock_rounds r
+			JOIN interview_mock_sessions ms ON ms.id = r.session_id
 			WHERE ms.user_id = $1
 		),
 		question_metrics AS (
 			SELECT
-				COUNT(*) FILTER (WHERE qr.answered_at IS NOT NULL) AS answered_questions,
-				COALESCE(ROUND((AVG(qr.score) FILTER (WHERE qr.answered_at IS NOT NULL))::numeric, 1), 0)::float8 AS avg_question_score
-			FROM interview_prep_mock_stage_question_results qr
-			JOIN interview_prep_mock_stages s ON s.id = qr.stage_id
-			JOIN interview_prep_mock_sessions ms ON ms.id = s.session_id
+				COUNT(*) FILTER (WHERE f.answered_at IS NOT NULL) AS answered_questions,
+				COALESCE(ROUND((AVG(f.score) FILTER (WHERE f.answered_at IS NOT NULL))::numeric, 1), 0)::float8 AS avg_question_score
+			FROM interview_mock_round_followups f
+			JOIN interview_mock_rounds r ON r.id = f.round_id
+			JOIN interview_mock_sessions ms ON ms.id = r.session_id
 			WHERE ms.user_id = $1
 		),
 		session_metrics AS (
 			SELECT
 				COUNT(*) FILTER (WHERE status = 'finished') AS completed_sessions,
 				MAX(finished_at) FILTER (WHERE finished_at IS NOT NULL) AS last_finished_at
-			FROM interview_prep_mock_sessions
+			FROM interview_mock_sessions
 			WHERE user_id = $1
 		),
 		practice_metrics AS (
@@ -105,24 +99,24 @@ func (r *Repo) loadProfileProgressOverview(ctx context.Context, userID uuid.UUID
 				COUNT(*) FILTER (WHERE s.status = 'finished') AS practice_sessions,
 				COUNT(*) FILTER (WHERE s.status = 'finished' AND s.last_submission_passed) AS practice_passed_sessions,
 				COUNT(DISTINCT DATE(COALESCE(s.finished_at, s.updated_at, s.started_at) AT TIME ZONE 'UTC'))::int4 AS practice_active_days
-			FROM interview_prep_sessions s
+			FROM interview_practice_sessions s
 			WHERE s.user_id = $1
 		),
 		last_activity AS (
 			SELECT MAX(activity_at) AS last_activity_at
 			FROM (
 				SELECT finished_at AS activity_at
-				FROM interview_prep_mock_sessions
+				FROM interview_mock_sessions
 				WHERE user_id = $1 AND finished_at IS NOT NULL
 				UNION ALL
-				SELECT qr.answered_at AS activity_at
-				FROM interview_prep_mock_stage_question_results qr
-				JOIN interview_prep_mock_stages s ON s.id = qr.stage_id
-				JOIN interview_prep_mock_sessions ms ON ms.id = s.session_id
-				WHERE ms.user_id = $1 AND qr.answered_at IS NOT NULL
+				SELECT f.answered_at AS activity_at
+				FROM interview_mock_round_followups f
+				JOIN interview_mock_rounds r ON r.id = f.round_id
+				JOIN interview_mock_sessions ms ON ms.id = r.session_id
+				WHERE ms.user_id = $1 AND f.answered_at IS NOT NULL
 				UNION ALL
 				SELECT COALESCE(s.finished_at, s.updated_at, s.started_at) AS activity_at
-				FROM interview_prep_sessions s
+				FROM interview_practice_sessions s
 				WHERE s.user_id = $1
 			) activity
 		)
@@ -164,16 +158,22 @@ func (r *Repo) loadProfileProgressOverview(ctx context.Context, userID uuid.UUID
 func (r *Repo) loadProfileCompetencies(ctx context.Context, userID uuid.UUID) ([]*model.ProfileCompetency, error) {
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT
-			s.kind,
-			COUNT(*) FILTER (WHERE s.status = 'completed')::int4 AS stage_count,
-			COUNT(qr.id) FILTER (WHERE qr.answered_at IS NOT NULL)::int4 AS question_count,
-			COALESCE((AVG(s.review_score) FILTER (WHERE s.status = 'completed'))::float8, 0) AS average_stage,
-			COALESCE((AVG(qr.score) FILTER (WHERE qr.answered_at IS NOT NULL))::float8, 0) AS average_question
-		FROM interview_prep_mock_stages s
-		JOIN interview_prep_mock_sessions ms ON ms.id = s.session_id
-		LEFT JOIN interview_prep_mock_stage_question_results qr ON qr.stage_id = s.id
+			CASE
+				WHEN r.round_type = 'coding_algorithmic' THEN 'slices'
+				WHEN r.round_type IN ('behavioral', 'code_review') THEN 'architecture'
+				WHEN r.round_type = 'sql' THEN 'sql'
+				WHEN r.round_type = 'system_design' THEN 'system_design'
+				ELSE 'concurrency'
+			END AS skill_key,
+			COUNT(*) FILTER (WHERE r.status = 'completed')::int4 AS stage_count,
+			COUNT(f.id) FILTER (WHERE f.answered_at IS NOT NULL)::int4 AS question_count,
+			COALESCE((AVG(r.review_score) FILTER (WHERE r.status = 'completed'))::float8, 0) AS average_stage,
+			COALESCE((AVG(f.score) FILTER (WHERE f.answered_at IS NOT NULL))::float8, 0) AS average_question
+		FROM interview_mock_rounds r
+		JOIN interview_mock_sessions ms ON ms.id = r.session_id
+		LEFT JOIN interview_mock_round_followups f ON f.round_id = r.id
 		WHERE ms.user_id = $1
-		GROUP BY s.kind
+		GROUP BY 1
 	`, userID)
 	if err != nil {
 		return nil, fmt.Errorf("query profile competencies: %w", err)
@@ -216,11 +216,6 @@ func (r *Repo) loadProfileCompetencies(ctx context.Context, userID uuid.UUID) ([
 		return nil, err
 	}
 
-	checkpointByKey, err := r.loadCheckpointScoresBySkill(ctx, userID)
-	if err != nil {
-		return nil, err
-	}
-
 	arenaVerifiedScore, err := r.loadArenaVerifiedScore(ctx, userID)
 	if err != nil {
 		return nil, err
@@ -240,9 +235,6 @@ func (r *Repo) loadProfileCompetencies(ctx context.Context, userID uuid.UUID) ([
 		item.PracticePassedSessions = stats.passedSessions
 		item.PracticeDays = stats.days
 		item.PracticeScore = profiledomain.ComputePracticeScore(stats.passedSessions, stats.sessions, stats.days)
-		if checkpointScore := checkpointByKey[skill.Key]; checkpointScore > item.VerifiedScore {
-			item.VerifiedScore = checkpointScore
-		}
 		if item.VerifiedScore == 0 && skill.Key == model.InterviewPrepMockStageKindSlices.String() {
 			item.VerifiedScore = arenaVerifiedScore
 		}
@@ -258,22 +250,29 @@ func (r *Repo) loadProfileProgressMockSessions(ctx context.Context, userID uuid.
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT
 			ms.id::text,
-			BTRIM(ms.company_tag)                                           AS company_tag,
+			COALESCE(NULLIF(BTRIM(ms.started_via_alias), ''), b.slug, '')   AS company_tag,
 			ms.status,
-			ms.current_stage_index,
-			COUNT(mst.id)                                                   AS total_stages,
+			ms.current_round_index,
+			COUNT(r.id)                                                     AS total_stages,
 			COALESCE((
-				SELECT mst2.kind
-				FROM interview_prep_mock_stages mst2
-				WHERE mst2.session_id = ms.id
-				ORDER BY mst2.created_at ASC
-				LIMIT 1 OFFSET ms.current_stage_index
+				SELECT CASE
+					WHEN r2.round_type = 'coding_algorithmic' THEN 'slices'
+					WHEN r2.round_type IN ('behavioral', 'code_review') THEN 'architecture'
+					WHEN r2.round_type = 'sql' THEN 'sql'
+					WHEN r2.round_type = 'system_design' THEN 'system_design'
+					ELSE 'concurrency'
+				END
+				FROM interview_mock_rounds r2
+				WHERE r2.session_id = ms.id
+				ORDER BY r2.round_index ASC
+				LIMIT 1 OFFSET ms.current_round_index
 			), '')                                                          AS current_stage_kind
-		FROM interview_prep_mock_sessions ms
-		LEFT JOIN interview_prep_mock_stages mst ON mst.session_id = ms.id
+		FROM interview_mock_sessions ms
+		LEFT JOIN interview_blueprints b ON b.id = ms.blueprint_id
+		LEFT JOIN interview_mock_rounds r ON r.session_id = ms.id
 		WHERE ms.user_id = $1
-		  AND NULLIF(BTRIM(ms.company_tag), '') IS NOT NULL
-		GROUP BY ms.id, ms.company_tag, ms.status, ms.current_stage_index
+		  AND NULLIF(BTRIM(COALESCE(ms.started_via_alias, b.slug, '')), '') IS NOT NULL
+		GROUP BY ms.id, ms.started_via_alias, b.slug, ms.status, ms.current_round_index
 		ORDER BY ms.created_at DESC
 	`, userID)
 	if err != nil {
@@ -293,44 +292,9 @@ func (r *Repo) loadProfileProgressMockSessions(ctx context.Context, userID uuid.
 }
 
 func (r *Repo) loadProfileCheckpointProgress(ctx context.Context, userID uuid.UUID) ([]*model.ProfileCheckpointProgress, error) {
-	rows, err := r.data.DB.Query(ctx, `
-		SELECT
-			c.id::text,
-			c.task_id::text,
-			COALESCE(NULLIF(BTRIM(t.title), ''), 'Untitled checkpoint task') AS task_title,
-			c.skill_key,
-			c.score,
-			c.finished_at
-		FROM interview_prep_checkpoints c
-		JOIN interview_prep_tasks t ON t.id = c.task_id
-		WHERE c.user_id = $1
-		  AND c.status = 'passed'
-		ORDER BY c.finished_at DESC NULLS LAST, c.created_at DESC
-		LIMIT 8
-	`, userID)
-	if err != nil {
-		return nil, fmt.Errorf("query profile checkpoints: %w", err)
-	}
-	defer rows.Close()
-
-	items := make([]*model.ProfileCheckpointProgress, 0, 4)
-	for rows.Next() {
-		item := &model.ProfileCheckpointProgress{}
-		var finishedAt pgtype.Timestamptz
-		if err := rows.Scan(&item.ID, &item.TaskID, &item.TaskTitle, &item.SkillKey, &item.Score, &finishedAt); err != nil {
-			return nil, fmt.Errorf("scan profile checkpoint: %w", err)
-		}
-		item.SkillLabel = profiledomain.SkillLabel(item.SkillKey)
-		if finishedAt.Valid {
-			value := finishedAt.Time
-			item.FinishedAt = &value
-		}
-		items = append(items, item)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate profile checkpoints: %w", err)
-	}
-	return items, nil
+	_ = ctx
+	_ = userID
+	return []*model.ProfileCheckpointProgress{}, nil
 }
 
 func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, now time.Time) (int32, error) {
@@ -338,17 +302,17 @@ func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, 
 		SELECT DISTINCT DATE(activity_at AT TIME ZONE 'UTC') AS activity_date
 		FROM (
 			SELECT finished_at AS activity_at
-			FROM interview_prep_mock_sessions
+			FROM interview_mock_sessions
 			WHERE user_id = $1 AND finished_at IS NOT NULL
 			UNION ALL
-			SELECT qr.answered_at AS activity_at
-			FROM interview_prep_mock_stage_question_results qr
-			JOIN interview_prep_mock_stages s ON s.id = qr.stage_id
-			JOIN interview_prep_mock_sessions ms ON ms.id = s.session_id
-			WHERE ms.user_id = $1 AND qr.answered_at IS NOT NULL
+			SELECT f.answered_at AS activity_at
+			FROM interview_mock_round_followups f
+			JOIN interview_mock_rounds r ON r.id = f.round_id
+			JOIN interview_mock_sessions ms ON ms.id = r.session_id
+			WHERE ms.user_id = $1 AND f.answered_at IS NOT NULL
 			UNION ALL
 			SELECT COALESCE(s.finished_at, s.updated_at, s.started_at) AS activity_at
-			FROM interview_prep_sessions s
+			FROM interview_practice_sessions s
 			WHERE s.user_id = $1
 		) activity
 		ORDER BY activity_date DESC
@@ -376,14 +340,21 @@ func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, 
 func (r *Repo) loadPracticeStatsBySkill(ctx context.Context, userID uuid.UUID) (map[string]practiceStats, error) {
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT
-			t.prep_type,
+			CASE
+				WHEN i.round_type = 'coding_algorithmic' THEN 'algorithm'
+				WHEN i.round_type = 'sql' THEN 'sql'
+				WHEN i.round_type = 'system_design' THEN 'system_design'
+				WHEN i.round_type = 'code_review' THEN 'code_review'
+				WHEN i.round_type = 'behavioral' THEN 'behavioral'
+				ELSE 'coding'
+			END AS prep_type,
 			COUNT(*) FILTER (WHERE s.status = 'finished')::int4 AS sessions,
 			COUNT(*) FILTER (WHERE s.status = 'finished' AND s.last_submission_passed)::int4 AS passed_sessions,
 			COUNT(DISTINCT DATE(COALESCE(s.finished_at, s.updated_at, s.started_at) AT TIME ZONE 'UTC'))::int4 AS active_days
-		FROM interview_prep_sessions s
-		JOIN interview_prep_tasks t ON t.id = s.task_id
+		FROM interview_practice_sessions s
+		JOIN interview_items i ON i.id = s.item_id
 		WHERE s.user_id = $1
-		GROUP BY t.prep_type
+		GROUP BY 1
 	`, userID)
 	if err != nil {
 		return nil, fmt.Errorf("query practice competencies: %w", err)
@@ -442,33 +413,9 @@ func (r *Repo) loadArenaVerifiedScore(ctx context.Context, userID uuid.UUID) (in
 }
 
 func (r *Repo) loadCheckpointScoresBySkill(ctx context.Context, userID uuid.UUID) (map[string]int32, error) {
-	rows, err := r.data.DB.Query(ctx, `
-		SELECT
-			skill_key,
-			COALESCE(ROUND(AVG(score))::int4, 0) AS avg_score
-		FROM interview_prep_checkpoints
-		WHERE user_id = $1
-		  AND status = 'passed'
-		GROUP BY skill_key
-	`, userID)
-	if err != nil {
-		return nil, fmt.Errorf("query checkpoint competencies: %w", err)
-	}
-	defer rows.Close()
-
-	items := make(map[string]int32, 4)
-	for rows.Next() {
-		var skillKey string
-		var score int32
-		if err := rows.Scan(&skillKey, &score); err != nil {
-			return nil, fmt.Errorf("scan checkpoint competency: %w", err)
-		}
-		items[skillKey] = score
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate checkpoint competencies: %w", err)
-	}
-	return items, nil
+	_ = ctx
+	_ = userID
+	return map[string]int32{}, nil
 }
 
 func (r *Repo) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int) (map[string]int, error) {
@@ -476,7 +423,7 @@ func (r *Repo) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int)
 		SELECT activity_date, SUM(cnt)::int AS total
 		FROM (
 			SELECT DATE(finished_at AT TIME ZONE 'UTC') AS activity_date, COUNT(*) AS cnt
-			FROM interview_prep_mock_sessions
+			FROM interview_mock_sessions
 			WHERE user_id = $1
 			  AND finished_at IS NOT NULL
 			  AND finished_at >= NOW() - make_interval(days => $2)
@@ -484,19 +431,19 @@ func (r *Repo) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int)
 
 			UNION ALL
 
-			SELECT DATE(qr.answered_at AT TIME ZONE 'UTC') AS activity_date, COUNT(*) AS cnt
-			FROM interview_prep_mock_stage_question_results qr
-			JOIN interview_prep_mock_stages s ON s.id = qr.stage_id
-			JOIN interview_prep_mock_sessions ms ON ms.id = s.session_id
+			SELECT DATE(f.answered_at AT TIME ZONE 'UTC') AS activity_date, COUNT(*) AS cnt
+			FROM interview_mock_round_followups f
+			JOIN interview_mock_rounds r ON r.id = f.round_id
+			JOIN interview_mock_sessions ms ON ms.id = r.session_id
 			WHERE ms.user_id = $1
-			  AND qr.answered_at IS NOT NULL
-			  AND qr.answered_at >= NOW() - make_interval(days => $2)
+			  AND f.answered_at IS NOT NULL
+			  AND f.answered_at >= NOW() - make_interval(days => $2)
 			GROUP BY 1
 
 			UNION ALL
 
 			SELECT DATE(COALESCE(s.finished_at, s.updated_at, s.started_at) AT TIME ZONE 'UTC') AS activity_date, COUNT(*) AS cnt
-			FROM interview_prep_sessions s
+			FROM interview_practice_sessions s
 			WHERE s.user_id = $1
 			  AND COALESCE(s.finished_at, s.updated_at, s.started_at) >= NOW() - make_interval(days => $2)
 			GROUP BY 1
@@ -523,4 +470,3 @@ func (r *Repo) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int)
 	}
 	return result, nil
 }
-

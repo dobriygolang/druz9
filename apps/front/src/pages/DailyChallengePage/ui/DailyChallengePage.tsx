@@ -9,6 +9,7 @@ import { useTheme } from '@/app/providers/ThemeProvider'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { DIFF_LABELS, DIFF_VARIANTS } from '@/shared/lib/taskLabels'
 import { formatDateRu } from '@/shared/lib/dateFormat'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import type * as Monaco from 'monaco-editor'
 
 interface DailyTask {
@@ -23,7 +24,7 @@ interface DailyTask {
     topics: string[]
   }
   date: string
-  expires_at: string
+  expiresAt: string
 }
 
 const LANG_MAP: Record<string | number, string> = {
@@ -35,7 +36,7 @@ function normalizeTask(raw: any): DailyTask {
   const t = raw.task ?? {}
   return {
     date: raw.date ?? raw.Date ?? '',
-    expires_at: raw.expires_at ?? raw.ExpiresAt ?? '',
+    expiresAt: raw.expiresAt ?? '',
     task: {
       id: t.id ?? t.ID ?? '',
       title: t.title ?? t.Title ?? '',
@@ -51,6 +52,7 @@ function normalizeTask(raw: any): DailyTask {
 
 export function DailyChallengePage() {
   const { theme } = useTheme()
+  const isMobile = useIsMobile()
   const [task, setTask] = useState<DailyTask | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
@@ -124,7 +126,7 @@ export function DailyChallengePage() {
       const res = await apiClient.post('/api/v1/code-editor/ai-review', {
         language: task?.task.language ?? 'python',
         code,
-        task_title: task?.task.title ?? '',
+        taskTitle: task?.task.title ?? '',
         statement: task?.task.statement ?? '',
       })
       const reviewData = res.data?.review ?? res.data
@@ -145,11 +147,12 @@ export function DailyChallengePage() {
   }, [theme])
 
   const today = formatDateRu(task?.date ?? new Date().toISOString())
+  const editorHeight = isMobile ? 340 : 400
 
   return (
-    <div className="px-6 pt-4 pb-6 max-w-4xl mx-auto w-full">
+    <div className="mx-auto w-full max-w-4xl px-4 pt-4 pb-24 md:px-6 md:pb-6">
       {/* Header */}
-      <div className="bg-white rounded-2xl border border-[#CBCCC9] px-5 py-4 mb-4 flex items-center justify-between">
+      <div className={`mb-4 bg-white border px-5 py-4 ${isMobile ? 'flex flex-col items-start gap-4 rounded-[28px] border-[#d8d9d6] shadow-[0_16px_30px_rgba(15,23,42,0.06)]' : 'flex items-center justify-between rounded-2xl border-[#CBCCC9]'}`}>
         <div className="flex items-center gap-2.5">
           <div className="w-8 h-8 bg-[#FFF7ED] rounded-lg flex items-center justify-center">
             <Calendar className="w-4 h-4 text-[#6366F1]" />
@@ -159,7 +162,7 @@ export function DailyChallengePage() {
             <p className="text-xs text-[#666666]">{today}</p>
           </div>
         </div>
-        <div className="flex items-center gap-2 bg-[#F2F3F0] rounded-lg px-3 py-2">
+        <div className={`flex items-center gap-2 rounded-lg bg-[#F2F3F0] px-3 py-2 ${isMobile ? 'self-stretch justify-center' : ''}`}>
           <Clock className="w-3.5 h-3.5 text-[#666666]" />
           <span className="text-sm font-mono font-semibold text-[#111111]">{timeLeft}</span>
         </div>
@@ -193,7 +196,7 @@ export function DailyChallengePage() {
         <div className="flex flex-col gap-4">
           {/* Task info */}
           <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5">
-            <div className="flex items-start justify-between gap-3 mb-3">
+            <div className={`mb-3 gap-3 ${isMobile ? 'flex flex-col items-start' : 'flex items-start justify-between'}`}>
               <h2 className="text-base font-bold text-[#111111]">{task.task.title}</h2>
               {task.task.difficulty && task.task.difficulty !== 'TASK_DIFFICULTY_UNSPECIFIED' && (
                 <Badge variant={DIFF_VARIANTS[task.task.difficulty] ?? 'default'}>
@@ -213,9 +216,9 @@ export function DailyChallengePage() {
                 solution.{task.task.language === 'python' ? 'py' : task.task.language === 'javascript' ? 'js' : task.task.language === 'typescript' ? 'ts' : task.task.language}
               </span>
             </div>
-            <div style={{ minHeight: 400 }}>
+            <div style={{ minHeight: editorHeight }}>
               <Editor
-                height="400px"
+                height={`${editorHeight}px`}
                 language={task.task.language}
                 value={code}
                 onChange={v => {
@@ -250,6 +253,7 @@ export function DailyChallengePage() {
               onClick={handleSubmit}
               loading={reviewing}
               disabled={!code.trim()}
+              className={isMobile ? 'w-full justify-center rounded-2xl' : ''}
             >
               Отправить решение
             </Button>

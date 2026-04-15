@@ -1566,6 +1566,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/interview_prep.v1.ListCompaniesResponse'
+    /api/v1/interview-prep/mock-blueprints:
+        get:
+            tags:
+                - InterviewPrepService
+            operationId: InterviewPrepService_ListMockBlueprints
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.ListMockBlueprintsResponse'
     /api/v1/interview-prep/mock-sessions:
         post:
             tags:
@@ -3716,6 +3728,13 @@ components:
                     type: array
                     items:
                         type: string
+        interview_prep.v1.ListMockBlueprintsResponse:
+            type: object
+            properties:
+                blueprints:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.MockBlueprint'
         interview_prep.v1.ListTasksResponse:
             type: object
             properties:
@@ -3723,6 +3742,32 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/interview_prep.v1.InterviewPrepTask'
+        interview_prep.v1.MockBlueprint:
+            type: object
+            properties:
+                id:
+                    type: string
+                trackSlug:
+                    type: string
+                slug:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                level:
+                    type: string
+                totalDurationSeconds:
+                    type: integer
+                    format: int32
+                publicAliasSlugs:
+                    type: array
+                    items:
+                        type: string
+                publicAliasNames:
+                    type: array
+                    items:
+                        type: string
         interview_prep.v1.MockCompanyPreset:
             type: object
             properties:
@@ -3898,6 +3943,12 @@ components:
                         $ref: '#/components/schemas/interview_prep.v1.MockStage'
                 currentStage:
                     $ref: '#/components/schemas/interview_prep.v1.MockStage'
+                blueprintSlug:
+                    type: string
+                blueprintTitle:
+                    type: string
+                trackSlug:
+                    type: string
         interview_prep.v1.MockSessionEnvelope:
             type: object
             properties:
@@ -3997,6 +4048,8 @@ components:
             type: object
             properties:
                 companyTag:
+                    type: string
+                programSlug:
                     type: string
         interview_prep.v1.StartSessionRequest:
             type: object

@@ -39,24 +39,21 @@ type mockQuestionTemplate struct {
 	Key    string
 	Prompt string
 	Answer string
-	Always bool
 }
 
-var mockStageOrder = []model.InterviewPrepMockStageKind{
-	model.InterviewPrepMockStageKindSlices,
-	model.InterviewPrepMockStageKindConcurrency,
-	model.InterviewPrepMockStageKindSQL,
-	model.InterviewPrepMockStageKindSystemDesign,
-}
-
-func (s *Service) StartMockSession(ctx context.Context, user *model.User, companyTag string) (*model.InterviewPrepMockSession, error) {
+func (s *Service) StartMockSession(ctx context.Context, user *model.User, companyTag string, programSlug string) (*model.InterviewPrepMockSession, error) {
 	if err := ensureTrusted(user); err != nil {
 		return nil, err
 	}
-	companyTag = strings.TrimSpace(strings.ToLower(companyTag))
 
-	// Check if user already has an active session for this exact company → resume it
-	existing, err := s.repo.GetActiveMockSessionByUserAndCompany(ctx, user.ID, companyTag)
+	normalizedCompany := strings.TrimSpace(strings.ToLower(companyTag))
+	normalizedProgram := strings.TrimSpace(strings.ToLower(programSlug))
+	resumeKey := firstNonEmptyLanguage(normalizedProgram, normalizedCompany)
+	if resumeKey == "" {
+		resumeKey = "gma_general_swe_mid"
+	}
+
+	existing, err := s.repo.GetActiveMockSessionByUserAndCompany(ctx, user.ID, resumeKey)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +61,6 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 		return s.GetMockSession(ctx, user, existing.ID)
 	}
 
-	// Block creating a new session if any other active session exists
 	anyActive, err := s.repo.GetAnyActiveMockSessionByUser(ctx, user.ID)
 	if err != nil {
 		return nil, err
@@ -73,25 +69,30 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 		return nil, ErrAnotherMockSessionActive
 	}
 
-	tasks, err := s.ListTasks(ctx, user)
+	blueprint, err := s.repo.ResolveMockBlueprint(ctx, normalizedCompany, normalizedProgram)
 	if err != nil {
 		return nil, err
 	}
-	presets, err := s.repo.ListMockCompanyPresets(ctx)
-	if err != nil {
-		return nil, err
+	if blueprint == nil {
+		return nil, ErrMockTaskPoolIncomplete
 	}
 
-	selectedTasks, orderedKinds, err := selectMockInterviewTasks(tasks, companyTag, presets)
+	rounds, err := s.repo.ListBlueprintRounds(ctx, blueprint.ID)
 	if err != nil {
 		return nil, err
+	}
+	if len(rounds) == 0 {
+		return nil, ErrMockTaskPoolIncomplete
 	}
 
 	nowTime := time.Now().UTC()
 	session := &model.InterviewPrepMockSession{
 		ID:                uuid.New(),
 		UserID:            user.ID,
-		CompanyTag:        companyTag,
+		CompanyTag:        normalizedCompany,
+		BlueprintSlug:     blueprint.Slug,
+		BlueprintTitle:    blueprint.Title,
+		TrackSlug:         blueprint.TrackSlug,
 		Status:            model.InterviewPrepMockSessionStatusActive,
 		CurrentStageIndex: 0,
 		StartedAt:         nowTime,
@@ -99,30 +100,42 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 		UpdatedAt:         nowTime,
 	}
 
-	stages := make([]*model.InterviewPrepMockStage, 0, len(orderedKinds))
-	var questionResults []*model.InterviewPrepMockQuestionResult
-	for index, kind := range orderedKinds {
-		task := selectedTasks[kind]
+	stages := make([]*model.InterviewPrepMockStage, 0, len(rounds))
+	questionResults := make([]*model.InterviewPrepMockQuestionResult, 0, len(rounds)*2)
+	for index, round := range rounds {
+		task, poolID, taskErr := s.repo.SelectTaskForBlueprintRound(ctx, round)
+		if taskErr != nil {
+			return nil, taskErr
+		}
+		if task == nil {
+			return nil, ErrMockTaskPoolIncomplete
+		}
+
+		stageKind := model.InterviewPrepMockStageKindFromRoundType(round.RoundType)
 		stage := &model.InterviewPrepMockStage{
 			ID:                   uuid.New(),
 			SessionID:            session.ID,
 			StageIndex:           int32(index),
-			Kind:                 kind,
+			Kind:                 stageKind,
 			Status:               model.InterviewPrepMockStageStatusPending,
 			TaskID:               task.ID,
-			SolveLanguage:        defaultMockSolveLanguage(task, kind),
-			Code:                 defaultMockCode(task, kind),
+			BlueprintRoundID:     &round.ID,
+			SourcePoolID:         poolID,
+			SolveLanguage:        defaultMockSolveLanguage(task, stageKind),
+			Code:                 defaultMockCode(task, stageKind),
 			LastSubmissionPassed: false,
 			ReviewScore:          0,
 			ReviewSummary:        "",
 			StartedAt:            nowTime,
 			CreatedAt:            nowTime,
 			UpdatedAt:            nowTime,
+			Task:                 task,
 		}
 		if index == 0 {
 			stage.Status = model.InterviewPrepMockStageStatusSolving
 		}
-		stageQuestions, questionsErr := s.buildMockStageQuestions(ctx, session.CompanyTag, task, stage)
+
+		stageQuestions, questionsErr := s.buildMockStageQuestions(ctx, task, stage, round.MaxFollowupCount)
 		if questionsErr != nil {
 			return nil, questionsErr
 		}
@@ -147,6 +160,7 @@ func (s *Service) GetMockSession(ctx context.Context, user *model.User, sessionI
 	if session == nil || session.UserID != user.ID {
 		return nil, ErrMockSessionNotFound
 	}
+
 	for _, stage := range session.Stages {
 		task, taskErr := s.repo.GetTask(ctx, stage.TaskID)
 		if taskErr != nil {
@@ -165,6 +179,7 @@ func (s *Service) GetMockSession(ctx context.Context, user *model.User, sessionI
 			session.CurrentStage = stage
 		}
 	}
+
 	return session, nil
 }
 
@@ -204,6 +219,7 @@ func (s *Service) SubmitMockStage(
 		if err != nil {
 			return nil, err
 		}
+
 		nextStatus := model.InterviewPrepMockStageStatusSolving
 		if judgeResult.Passed {
 			nextStatus = nextMockStageStatus(stage)
@@ -216,6 +232,7 @@ func (s *Service) SubmitMockStage(
 				return nil, err
 			}
 		}
+
 		nextSession, err := s.GetMockSession(ctx, user, session.ID)
 		if err != nil {
 			return nil, err
@@ -232,7 +249,7 @@ func (s *Service) SubmitMockStage(
 	}
 
 	review, err := s.reviewer.ReviewInterviewSolution(ctx, aireview.InterviewSolutionReviewRequest{
-		ModelOverride:     s.modelOverrideForStage(ctx, session.CompanyTag, stage),
+		ModelOverride:     s.modelOverrideForStage(stage),
 		StageKind:         stage.Kind.String(),
 		TaskTitle:         stage.Task.Title,
 		Statement:         stage.Task.Statement,
@@ -250,6 +267,7 @@ func (s *Service) SubmitMockStage(
 	if err := s.advanceMockSessionIfStageReady(ctx, session, stage); err != nil {
 		return nil, err
 	}
+
 	nextSession, err := s.GetMockSession(ctx, user, session.ID)
 	if err != nil {
 		return nil, err
@@ -292,7 +310,7 @@ func (s *Service) ReviewMockSystemDesign(
 	}
 
 	review, err := s.reviewer.ReviewSystemDesign(ctx, aireview.SystemDesignReviewRequest{
-		ModelOverride:  s.modelOverrideForStage(ctx, session.CompanyTag, stage),
+		ModelOverride:  s.modelOverrideForStage(stage),
 		TaskTitle:      stage.Task.Title,
 		Statement:      stage.Task.Statement,
 		Notes:          input.Notes,
@@ -339,7 +357,7 @@ func (s *Service) AnswerMockQuestion(ctx context.Context, user *model.User, sess
 	}
 
 	review, err := s.reviewer.ReviewInterviewAnswer(ctx, aireview.InterviewAnswerReviewRequest{
-		ModelOverride:   s.modelOverrideForFollowup(ctx, session.CompanyTag, stage),
+		ModelOverride:   s.modelOverrideForFollowup(stage),
 		Topic:           stage.Kind.String(),
 		TaskTitle:       stage.Task.Title,
 		QuestionPrompt:  stage.CurrentQuestion.Prompt,
@@ -368,25 +386,28 @@ func (s *Service) AnswerMockQuestion(ctx context.Context, user *model.User, sess
 			return nil, err
 		}
 	}
+
 	return &MockQuestionAnswerResult{
 		Review:  review,
 		Session: updatedSession,
 	}, nil
 }
 
-func (s *Service) buildMockStageQuestions(ctx context.Context, companyTag string, task *model.InterviewPrepTask, stage *model.InterviewPrepMockStage) ([]*model.InterviewPrepMockQuestionResult, error) {
+func (s *Service) buildMockStageQuestions(
+	ctx context.Context,
+	task *model.InterviewPrepTask,
+	stage *model.InterviewPrepMockStage,
+	maxFollowupCount int32,
+) ([]*model.InterviewPrepMockQuestionResult, error) {
 	taskQuestions, err := s.repo.ListQuestionsByTask(ctx, task.ID)
 	if err != nil {
 		return nil, err
 	}
-	poolItems, err := s.repo.ListMockQuestionPools(ctx)
+	templates, err := taskSpecificMockQuestions(task, taskQuestions, maxFollowupCount)
 	if err != nil {
 		return nil, err
 	}
-	templates, err := stageQuestionsForTask(stage.Kind, companyTag, task, taskQuestions, poolItems)
-	if err != nil {
-		return nil, err
-	}
+
 	nowTime := time.Now().UTC()
 	results := make([]*model.InterviewPrepMockQuestionResult, 0, len(templates))
 	for index, template := range templates {
@@ -449,114 +470,11 @@ func nextMockStageStatus(stage *model.InterviewPrepMockStage) model.InterviewPre
 	return model.InterviewPrepMockStageStatusQuestions
 }
 
-func selectMockInterviewTasks(tasks []*model.InterviewPrepTask, companyTag string, presets []*model.InterviewPrepMockCompanyPreset) (map[model.InterviewPrepMockStageKind]*model.InterviewPrepTask, []model.InterviewPrepMockStageKind, error) {
-	filtered := make([]*model.InterviewPrepTask, 0)
-	for _, task := range tasks {
-		if task == nil || !task.IsActive {
-			continue
-		}
-		normalizedTaskCompany := strings.TrimSpace(strings.ToLower(task.CompanyTag))
-		if companyTag != "" && normalizedTaskCompany != "" && normalizedTaskCompany != companyTag {
-			continue
-		}
-		filtered = append(filtered, task)
-	}
-
-	activePresets := companyPresetsForCompany(companyTag, presets)
-	orderedKinds := buildMockStageOrder(activePresets)
-
-	result := make(map[model.InterviewPrepMockStageKind]*model.InterviewPrepTask, len(orderedKinds))
-	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-	for _, kind := range orderedKinds {
-		candidates := mockStageCandidates(kind, filtered)
-		if preset := findCompanyPreset(kind, activePresets); preset != nil && strings.TrimSpace(preset.TaskSlugPattern) != "" {
-			presetCandidates := make([]*model.InterviewPrepTask, 0)
-			pattern := strings.ToLower(strings.TrimSpace(preset.TaskSlugPattern))
-			for _, task := range candidates {
-				if strings.Contains(strings.ToLower(task.Slug), pattern) {
-					presetCandidates = append(presetCandidates, task)
-				}
-			}
-			if len(presetCandidates) > 0 {
-				candidates = presetCandidates
-			}
-		}
-		if len(candidates) == 0 {
-			return nil, nil, ErrMockTaskPoolIncomplete
-		}
-		result[kind] = candidates[rng.Intn(len(candidates))]
-	}
-	return result, orderedKinds, nil
-}
-
-func buildMockStageOrder(presets []*model.InterviewPrepMockCompanyPreset) []model.InterviewPrepMockStageKind {
-	seen := make(map[model.InterviewPrepMockStageKind]struct{}, len(mockStageOrder))
-	ordered := make([]model.InterviewPrepMockStageKind, 0, len(mockStageOrder))
-	for _, preset := range presets {
-		if preset == nil || !preset.IsActive {
-			continue
-		}
-		normalizedKind := normalizeMockStageKind(preset.StageKind)
-		if normalizedKind == model.InterviewPrepMockStageKindUnknown {
-			continue
-		}
-		if _, ok := seen[normalizedKind]; ok {
-			continue
-		}
-		seen[normalizedKind] = struct{}{}
-		ordered = append(ordered, normalizedKind)
-	}
-	for _, kind := range mockStageOrder {
-		normalizedKind := normalizeMockStageKind(kind)
-		if _, ok := seen[normalizedKind]; ok {
-			continue
-		}
-		seen[normalizedKind] = struct{}{}
-		ordered = append(ordered, normalizedKind)
-	}
-	return ordered
-}
-
-func normalizeMockStageKind(kind model.InterviewPrepMockStageKind) model.InterviewPrepMockStageKind {
-	switch kind {
-	case model.InterviewPrepMockStageKindArchitecture:
-		return model.InterviewPrepMockStageKindConcurrency
-	default:
-		return kind
-	}
-}
-
-func mockStageCandidates(kind model.InterviewPrepMockStageKind, tasks []*model.InterviewPrepTask) []*model.InterviewPrepTask {
-	kind = normalizeMockStageKind(kind)
-	result := make([]*model.InterviewPrepTask, 0)
-	for _, task := range tasks {
-		if task == nil {
-			continue
-		}
-		switch kind {
-		case model.InterviewPrepMockStageKindSlices:
-			if task.PrepType == model.InterviewPrepTypeAlgorithm {
-				result = append(result, task)
-			}
-		case model.InterviewPrepMockStageKindConcurrency:
-			if task.PrepType == model.InterviewPrepTypeCoding {
-				result = append(result, task)
-			}
-		case model.InterviewPrepMockStageKindSQL:
-			if task.PrepType == model.InterviewPrepTypeSQL || normalizeSolveLanguage(task.Language) == "sql" {
-				result = append(result, task)
-			}
-		case model.InterviewPrepMockStageKindSystemDesign:
-			if task.PrepType == model.InterviewPrepTypeSystemDesign {
-				result = append(result, task)
-			}
-		}
-	}
-	return result
-}
-
 func defaultMockSolveLanguage(task *model.InterviewPrepTask, kind model.InterviewPrepMockStageKind) string {
-	if kind == model.InterviewPrepMockStageKindSystemDesign {
+	if task == nil {
+		return ""
+	}
+	if kind == model.InterviewPrepMockStageKindSystemDesign || task.PrepType == model.InterviewPrepTypeBehavioral {
 		return ""
 	}
 	if len(task.SupportedLanguages) > 0 {
@@ -566,7 +484,10 @@ func defaultMockSolveLanguage(task *model.InterviewPrepTask, kind model.Intervie
 }
 
 func defaultMockCode(task *model.InterviewPrepTask, kind model.InterviewPrepMockStageKind) string {
-	if kind == model.InterviewPrepMockStageKindSystemDesign {
+	if task == nil {
+		return ""
+	}
+	if kind == model.InterviewPrepMockStageKindSystemDesign || task.PrepType == model.InterviewPrepTypeBehavioral {
 		return ""
 	}
 	return starterForMockTask(task, defaultMockSolveLanguage(task, kind))
@@ -634,27 +555,9 @@ func extractPythonSolveStarter(code string) string {
 	return snippet
 }
 
-func stageQuestionsForTask(kind model.InterviewPrepMockStageKind, companyTag string, task *model.InterviewPrepTask, taskQuestions []*model.InterviewPrepQuestion, poolItems []*model.InterviewPrepMockQuestionPoolItem) ([]mockQuestionTemplate, error) {
-	items := genericMockQuestions(kind, companyTag, poolItems)
-	if len(items) > 0 {
-		return items, nil
-	}
-
-	items = taskSpecificMockQuestions(task, taskQuestions)
-	if len(items) == 0 {
-		return nil, ErrMockQuestionPoolIncomplete
-	}
-	return items, nil
-}
-
-func (s *Service) modelOverrideForStage(ctx context.Context, companyTag string, stage *model.InterviewPrepMockStage) string {
+func (s *Service) modelOverrideForStage(stage *model.InterviewPrepMockStage) string {
 	if stage == nil {
 		return ""
-	}
-	if presets, err := s.repo.ListMockCompanyPresets(ctx); err == nil {
-		if preset := findCompanyPreset(stage.Kind, companyPresetsForCompany(companyTag, presets)); preset != nil && strings.TrimSpace(preset.AIModelOverride) != "" {
-			return strings.TrimSpace(preset.AIModelOverride)
-		}
 	}
 	switch stage.Kind {
 	case model.InterviewPrepMockStageKindSystemDesign:
@@ -666,66 +569,19 @@ func (s *Service) modelOverrideForStage(ctx context.Context, companyTag string, 
 	}
 }
 
-func (s *Service) modelOverrideForFollowup(ctx context.Context, companyTag string, stage *model.InterviewPrepMockStage) string {
+func (s *Service) modelOverrideForFollowup(stage *model.InterviewPrepMockStage) string {
 	if stage == nil {
 		return s.modelFollowup
 	}
 	if s.modelFollowup != "" {
 		return s.modelFollowup
 	}
-	return s.modelOverrideForStage(ctx, companyTag, stage)
+	return s.modelOverrideForStage(stage)
 }
 
-func genericMockQuestions(kind model.InterviewPrepMockStageKind, companyTag string, poolItems []*model.InterviewPrepMockQuestionPoolItem) []mockQuestionTemplate {
-	topic := kind.String()
-	normalizedCompanyTag := strings.TrimSpace(strings.ToLower(companyTag))
-	matched := make([]mockQuestionTemplate, 0)
-	for _, item := range poolItems {
-		if item == nil || !item.IsActive {
-			continue
-		}
-		if strings.TrimSpace(strings.ToLower(item.Topic)) != topic {
-			continue
-		}
-		if tag := strings.TrimSpace(strings.ToLower(item.CompanyTag)); tag != "" && tag != normalizedCompanyTag {
-			continue
-		}
-		matched = append(matched, mockQuestionTemplate{
-			Key:    item.QuestionKey,
-			Prompt: item.Prompt,
-			Answer: item.ReferenceAnswer,
-			Always: item.AlwaysAsk,
-		})
-	}
-	if len(matched) == 0 {
-		return nil
-	}
-	return fallbackSelection(matched)
-}
-
-func fallbackSelection(pool []mockQuestionTemplate) []mockQuestionTemplate {
-	if len(pool) <= 1 {
-		return pool
-	}
-	always := make([]mockQuestionTemplate, 0, len(pool))
-	optional := make([]mockQuestionTemplate, 0, len(pool))
-	for _, item := range pool {
-		if item.Always {
-			always = append(always, item)
-		} else {
-			optional = append(optional, item)
-		}
-	}
-	if len(optional) > 0 {
-		rng := rand.New(rand.NewSource(time.Now().UnixNano()))
-		always = append(always, optional[rng.Intn(len(optional))])
-	}
-	return always
-}
-
-func taskSpecificMockQuestions(task *model.InterviewPrepTask, taskQuestions []*model.InterviewPrepQuestion) []mockQuestionTemplate {
+func taskSpecificMockQuestions(task *model.InterviewPrepTask, taskQuestions []*model.InterviewPrepQuestion, maxCount int32) ([]mockQuestionTemplate, error) {
 	if task == nil {
-		return nil
+		return nil, ErrMockQuestionPoolIncomplete
 	}
 	if len(taskQuestions) > 0 {
 		templates := make([]mockQuestionTemplate, 0, len(taskQuestions))
@@ -734,50 +590,38 @@ func taskSpecificMockQuestions(task *model.InterviewPrepTask, taskQuestions []*m
 				Key:    fmt.Sprintf("%s-q-%d", task.Slug, index+1),
 				Prompt: question.Prompt,
 				Answer: question.Answer,
-				Always: index == 0,
 			})
 		}
-		if len(templates) > 2 {
-			return append([]mockQuestionTemplate{templates[0]}, templates[1+rand.New(rand.NewSource(time.Now().UnixNano())).Intn(len(templates)-1)])
-		}
-		return templates
+		return selectQuestionTemplates(templates, maxCount), nil
 	}
-	templates := make([]mockQuestionTemplate, 0)
-	// Reference solution is used as first anchor question for architecture/system design.
 	if value := strings.TrimSpace(task.ReferenceSolution); value != "" {
-		templates = append(templates, mockQuestionTemplate{
+		return []mockQuestionTemplate{{
 			Key:    task.Slug + "-tradeoffs",
 			Prompt: "Какие главные trade-off и слабые места есть у твоего решения?",
 			Answer: value,
-			Always: true,
-		})
+		}}, nil
 	}
-	return templates
+	return nil, ErrMockQuestionPoolIncomplete
 }
 
-func companyPresetsForCompany(companyTag string, presets []*model.InterviewPrepMockCompanyPreset) []*model.InterviewPrepMockCompanyPreset {
-	items := make([]*model.InterviewPrepMockCompanyPreset, 0)
-	for _, preset := range presets {
-		if preset == nil || !preset.IsActive {
-			continue
-		}
-		if strings.TrimSpace(strings.ToLower(preset.CompanyTag)) != companyTag {
-			continue
-		}
-		items = append(items, preset)
+func selectQuestionTemplates(items []mockQuestionTemplate, maxCount int32) []mockQuestionTemplate {
+	if len(items) == 0 {
+		return nil
 	}
-	return items
-}
-
-func findCompanyPreset(kind model.InterviewPrepMockStageKind, presets []*model.InterviewPrepMockCompanyPreset) *model.InterviewPrepMockCompanyPreset {
-	kind = normalizeMockStageKind(kind)
-	for _, preset := range presets {
-		if preset == nil || !preset.IsActive {
-			continue
-		}
-		if normalizeMockStageKind(preset.StageKind) == kind {
-			return preset
-		}
+	limit := int(maxCount)
+	if limit <= 0 || limit >= len(items) {
+		return items
 	}
-	return nil
+	selected := []mockQuestionTemplate{items[0]}
+	if limit == 1 {
+		return selected
+	}
+	remaining := append([]mockQuestionTemplate{}, items[1:]...)
+	rng := rand.New(rand.NewSource(time.Now().UnixNano()))
+	for len(selected) < limit && len(remaining) > 0 {
+		index := rng.Intn(len(remaining))
+		selected = append(selected, remaining[index])
+		remaining = append(remaining[:index], remaining[index+1:]...)
+	}
+	return selected
 }

@@ -67,7 +67,7 @@ export function AdminAnalyticsPage() {
         let easy = 0, medium = 0, hard = 0, active = 0
 
         for (const t of tasks) {
-          if (t.is_active !== false) active++
+          if (t.isActive !== false) active++
           const cat = getCategoryFromTopics(t.topics)
           if (cat === 'mock') mock++
           else if (cat === 'solo_practice') solo++

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, Check, Flame, ChevronRight } from 'lucide-react'
+import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, Flame, ChevronRight, Check } from 'lucide-react'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi } from '@/features/Auth/api/authApi'
 import type { User, ProfileProgress } from '@/entities/User/model/types'
@@ -109,7 +109,7 @@ export function ProfilePage() {
           icon: a.icon ?? a.Icon ?? '🏅',
           unlocked: a.unlocked ?? a.Unlocked ?? false,
           category: a.category ?? a.Category ?? '',
-          unlocked_at: a.unlocked_at ?? a.UnlockedAt,
+          unlockedAt: a.unlockedAt,
         })))
       })
       .catch((err) => { console.error('ProfilePage achievements fetch error:', err) })
@@ -482,22 +482,6 @@ export function ProfilePage() {
             </div>
           )}
 
-          {progress && progress.checkpoints.length > 0 && (
-            <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
-              <h3 className="text-sm font-semibold text-[#111111] mb-3">Прогресс</h3>
-              <div className="flex flex-col gap-2">
-                {progress.checkpoints.map((cp, i) => (
-                  <div key={i} className="flex items-center gap-3 py-1">
-                    <div className={`w-5 h-5 rounded-full flex-shrink-0 flex items-center justify-center ${cp.done ? 'bg-[#22c55e]' : 'bg-[#E7E8E5]'}`}>
-                      {cp.done && <Check className="w-3 h-3 text-white" />}
-                    </div>
-                    <span className={`text-sm ${cp.done ? 'text-[#111111]' : 'text-[#94a3b8]'}`}>{cp.title}</span>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-
           {progress && progress.recommendations.length > 0 && (
             <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
               <h3 className="text-sm font-semibold text-[#111111] mb-3">Рекомендации</h3>
@@ -512,7 +496,7 @@ export function ProfilePage() {
             </div>
           )}
 
-          {(!progress || (progress.companies.length === 0 && progress.checkpoints.length === 0)) && (
+          {(!progress || progress.companies.length === 0) && (
             <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-12 flex flex-col items-center text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
               <Zap className="w-8 h-8 text-[#CBCCC9] mb-3" />
               <p className="text-sm text-[#94a3b8]">Данных о прогрессе пока нет</p>

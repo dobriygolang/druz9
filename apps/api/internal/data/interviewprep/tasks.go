@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
+	"time"
 
 	"api/internal/model"
 
@@ -13,12 +15,13 @@ import (
 
 func (r *Repo) ListActiveTasks(ctx context.Context) ([]*model.InterviewPrepTask, error) {
 	rows, err := r.data.DB.Query(ctx, `
-		SELECT id, slug, title, statement, prep_type, language, company_tag, supported_languages, is_executable,
+		SELECT id, slug, title, candidate_prompt, round_type, language, legacy_company_tag, supported_languages, is_executable,
 		       execution_profile, runner_mode, duration_seconds, starter_code,
-		       reference_solution, code_task_id, is_active, created_at, updated_at
-		FROM interview_prep_tasks
+		       reference_solution, linked_code_task_id, is_active, created_at, updated_at
+		FROM interview_items
 		WHERE is_active = TRUE
-		ORDER BY created_at DESC
+		  AND is_practice_enabled = TRUE
+		ORDER BY created_at DESC, slug ASC
 	`)
 	if err != nil {
 		return nil, fmt.Errorf("list interview prep tasks: %w", err)
@@ -38,10 +41,10 @@ func (r *Repo) ListActiveTasks(ctx context.Context) ([]*model.InterviewPrepTask,
 
 func (r *Repo) GetTask(ctx context.Context, taskID uuid.UUID) (*model.InterviewPrepTask, error) {
 	row := r.data.DB.QueryRow(ctx, `
-		SELECT id, slug, title, statement, prep_type, language, company_tag, supported_languages, is_executable,
+		SELECT id, slug, title, candidate_prompt, round_type, language, legacy_company_tag, supported_languages, is_executable,
 		       execution_profile, runner_mode, duration_seconds, starter_code,
-		       reference_solution, code_task_id, is_active, created_at, updated_at
-		FROM interview_prep_tasks
+		       reference_solution, linked_code_task_id, is_active, created_at, updated_at
+		FROM interview_items
 		WHERE id = $1
 	`, taskID)
 
@@ -57,11 +60,11 @@ func (r *Repo) GetTask(ctx context.Context, taskID uuid.UUID) (*model.InterviewP
 
 func (r *Repo) ListAllTasks(ctx context.Context) ([]*model.InterviewPrepTask, error) {
 	rows, err := r.data.DB.Query(ctx, `
-		SELECT id, slug, title, statement, prep_type, language, company_tag, supported_languages, is_executable,
+		SELECT id, slug, title, candidate_prompt, round_type, language, legacy_company_tag, supported_languages, is_executable,
 		       execution_profile, runner_mode, duration_seconds, starter_code,
-		       reference_solution, code_task_id, is_active, created_at, updated_at
-		FROM interview_prep_tasks
-		ORDER BY created_at DESC
+		       reference_solution, linked_code_task_id, is_active, created_at, updated_at
+		FROM interview_items
+		ORDER BY created_at DESC, slug ASC
 	`)
 	if err != nil {
 		return nil, fmt.Errorf("list all interview prep tasks: %w", err)
@@ -80,29 +83,34 @@ func (r *Repo) ListAllTasks(ctx context.Context) ([]*model.InterviewPrepTask, er
 }
 
 func (r *Repo) CreateTask(ctx context.Context, task *model.InterviewPrepTask) error {
+	roundType := roundTypeForPrepTask(task.PrepType)
+	deliveryMode := deliveryModeForTask(task)
+	supportedLanguages := normalizeSupportedLanguages(task)
+
 	_, err := r.data.DB.Exec(ctx, `
-		INSERT INTO interview_prep_tasks (
-			id, slug, title, statement, prep_type, language, company_tag, supported_languages, is_executable,
-			execution_profile, runner_mode, duration_seconds, starter_code,
-			reference_solution, code_task_id, is_active, created_at, updated_at
+		INSERT INTO interview_items (
+			id, slug, title, round_type, delivery_mode, difficulty_level, duration_seconds, language, supported_languages, legacy_company_tag,
+			is_practice_enabled, is_mock_enabled, is_executable, execution_profile, runner_mode, linked_code_task_id,
+			candidate_prompt, interviewer_script, reference_solution, starter_code, debrief_template, is_active, created_at, updated_at
 		)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18)
+		VALUES ($1,$2,$3,$4,$5,'mid',$6,$7,$8,$9,TRUE,TRUE,$10,$11,$12,$13,$14,'',$15,$16,'',$17,$18,$19)
 	`,
 		task.ID,
 		task.Slug,
 		task.Title,
-		task.Statement,
-		task.PrepType.String(),
+		roundType,
+		deliveryMode,
+		task.DurationSeconds,
 		task.Language,
-		task.CompanyTag,
-		task.SupportedLanguages,
+		supportedLanguages,
+		strings.TrimSpace(strings.ToLower(task.CompanyTag)),
 		task.IsExecutable,
 		task.ExecutionProfile,
 		task.RunnerMode,
-		task.DurationSeconds,
-		task.StarterCode,
-		task.ReferenceSolution,
 		task.CodeTaskID,
+		task.Statement,
+		task.ReferenceSolution,
+		task.StarterCode,
 		task.IsActive,
 		task.CreatedAt,
 		task.UpdatedAt,
@@ -110,59 +118,188 @@ func (r *Repo) CreateTask(ctx context.Context, task *model.InterviewPrepTask) er
 	if err != nil {
 		return fmt.Errorf("create interview prep task: %w", err)
 	}
+	if err := r.syncDefaultPoolsForTask(ctx, task.ID, roundType, strings.TrimSpace(strings.ToLower(task.CompanyTag))); err != nil {
+		return err
+	}
 	return nil
 }
 
 func (r *Repo) UpdateTask(ctx context.Context, task *model.InterviewPrepTask) error {
+	roundType := roundTypeForPrepTask(task.PrepType)
+	deliveryMode := deliveryModeForTask(task)
+	supportedLanguages := normalizeSupportedLanguages(task)
+
 	_, err := r.data.DB.Exec(ctx, `
-		UPDATE interview_prep_tasks
+		UPDATE interview_items
 		SET slug = $2,
 		    title = $3,
-		    statement = $4,
-		    prep_type = $5,
-		    language = $6,
-		    company_tag = $7,
-		    supported_languages = $8,
-		    is_executable = $9,
-		    execution_profile = $10,
-		    runner_mode = $11,
-		    duration_seconds = $12,
-		    starter_code = $13,
-		    reference_solution = $14,
-		    code_task_id = $15,
-		    is_active = $16,
+		    round_type = $4,
+		    delivery_mode = $5,
+		    duration_seconds = $6,
+		    language = $7,
+		    legacy_company_tag = $8,
+		    supported_languages = $9,
+		    is_executable = $10,
+		    execution_profile = $11,
+		    runner_mode = $12,
+		    linked_code_task_id = $13,
+		    candidate_prompt = $14,
+		    reference_solution = $15,
+		    starter_code = $16,
+		    is_active = $17,
+		    is_practice_enabled = TRUE,
+		    is_mock_enabled = TRUE,
 		    updated_at = NOW()
 		WHERE id = $1
 	`,
 		task.ID,
 		task.Slug,
 		task.Title,
-		task.Statement,
-		task.PrepType.String(),
+		roundType,
+		deliveryMode,
+		task.DurationSeconds,
 		task.Language,
-		task.CompanyTag,
-		task.SupportedLanguages,
+		strings.TrimSpace(strings.ToLower(task.CompanyTag)),
+		supportedLanguages,
 		task.IsExecutable,
 		task.ExecutionProfile,
 		task.RunnerMode,
-		task.DurationSeconds,
-		task.StarterCode,
-		task.ReferenceSolution,
 		task.CodeTaskID,
+		task.Statement,
+		task.ReferenceSolution,
+		task.StarterCode,
 		task.IsActive,
 	)
 	if err != nil {
 		return fmt.Errorf("update interview prep task: %w", err)
+	}
+	if err := r.syncDefaultPoolsForTask(ctx, task.ID, roundType, strings.TrimSpace(strings.ToLower(task.CompanyTag))); err != nil {
+		return err
 	}
 	return nil
 }
 
 func (r *Repo) DeleteTask(ctx context.Context, taskID uuid.UUID) error {
 	_, err := r.data.DB.Exec(ctx, `
-		DELETE FROM interview_prep_tasks WHERE id = $1
+		DELETE FROM interview_items WHERE id = $1
 	`, taskID)
 	if err != nil {
 		return fmt.Errorf("delete interview prep task: %w", err)
 	}
 	return nil
+}
+
+func roundTypeForPrepTask(prepType model.InterviewPrepType) string {
+	switch prepType {
+	case model.InterviewPrepTypeAlgorithm:
+		return "coding_algorithmic"
+	case model.InterviewPrepTypeSQL:
+		return "sql"
+	case model.InterviewPrepTypeSystemDesign:
+		return "system_design"
+	case model.InterviewPrepTypeBehavioral:
+		return "behavioral"
+	case model.InterviewPrepTypeCodeReview:
+		return "code_review"
+	default:
+		return "coding_practical"
+	}
+}
+
+func deliveryModeForTask(task *model.InterviewPrepTask) string {
+	if task == nil {
+		return "text_answer"
+	}
+	switch task.PrepType {
+	case model.InterviewPrepTypeSystemDesign:
+		return "system_design_form"
+	case model.InterviewPrepTypeBehavioral, model.InterviewPrepTypeCodeReview:
+		if !task.IsExecutable {
+			return "text_answer"
+		}
+	}
+	if task.IsExecutable || strings.EqualFold(task.Language, "sql") {
+		return "code_editor"
+	}
+	return "text_answer"
+}
+
+func normalizeSupportedLanguages(task *model.InterviewPrepTask) []string {
+	if task == nil {
+		return []string{}
+	}
+	if len(task.SupportedLanguages) > 0 {
+		return append([]string{}, task.SupportedLanguages...)
+	}
+	if strings.TrimSpace(task.Language) == "" {
+		return []string{}
+	}
+	return []string{strings.TrimSpace(strings.ToLower(task.Language))}
+}
+
+func (r *Repo) syncDefaultPoolsForTask(ctx context.Context, taskID uuid.UUID, roundType string, companyTag string) error {
+	if _, err := r.data.DB.Exec(ctx, `DELETE FROM interview_pool_items WHERE item_id = $1`, taskID); err != nil {
+		return fmt.Errorf("clear task pool membership: %w", err)
+	}
+
+	pools := defaultPoolIDsForTask(roundType, companyTag)
+	for _, poolID := range pools {
+		_, err := r.data.DB.Exec(ctx, `
+			INSERT INTO interview_pool_items (id, pool_id, item_id, position, weight, is_active, created_at, updated_at)
+			VALUES (
+				$1,
+				$2,
+				$3,
+				COALESCE((SELECT MAX(position) + 1 FROM interview_pool_items WHERE pool_id = $2), 1),
+				1,
+				TRUE,
+				$4,
+				$4
+			)
+			ON CONFLICT (pool_id, item_id) DO UPDATE SET
+				is_active = TRUE,
+				updated_at = EXCLUDED.updated_at
+		`, uuid.New(), poolID, taskID, time.Now().UTC())
+		if err != nil {
+			return fmt.Errorf("add task to default pool %s: %w", poolID, err)
+		}
+	}
+
+	return nil
+}
+
+func defaultPoolIDsForTask(roundType string, companyTag string) []string {
+	pools := make([]string, 0, 2)
+
+	switch roundType {
+	case "coding_algorithmic":
+		pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22001")
+	case "coding_practical", "code_review":
+		pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22002")
+	case "system_design":
+		pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22003")
+	case "behavioral":
+		pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22004")
+	}
+
+	switch roundType {
+	case "coding_practical", "code_review":
+		if companyTag == "" || companyTag == "ozon" || companyTag == "avito" || companyTag == "yandex" {
+			pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22005")
+		}
+	case "sql":
+		if companyTag == "" || companyTag == "ozon" || companyTag == "avito" || companyTag == "yandex" {
+			pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22006")
+		}
+	case "system_design":
+		if companyTag == "" || companyTag == "ozon" || companyTag == "avito" || companyTag == "yandex" {
+			pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22007")
+		}
+	case "behavioral":
+		if companyTag == "" || companyTag == "ozon" || companyTag == "avito" || companyTag == "yandex" {
+			pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22008")
+		}
+	}
+
+	return pools
 }

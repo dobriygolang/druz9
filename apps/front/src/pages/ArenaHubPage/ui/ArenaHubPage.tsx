@@ -7,6 +7,7 @@ import { Button } from '@/shared/ui/Button'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Select } from '@/shared/ui/Select'
 import { ErrorState } from '@/shared/ui/ErrorState'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useToast } from '@/shared/ui/Toast'
 
 const LEAGUE_COLORS: Record<string, string> = {
@@ -26,6 +27,7 @@ const LEAGUE_LABELS: Record<string, string> = {
 
 export function ArenaHubPage() {
   const navigate = useNavigate()
+  const isMobile = useIsMobile()
   const { toast } = useToast()
   const [leaderboard, setLeaderboard] = useState<any[]>([])
   const [openMatches, setOpenMatches] = useState<any[]>([])
@@ -99,7 +101,35 @@ export function ArenaHubPage() {
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchData() }} />
 
   return (
-    <div className="px-4 md:px-6 pt-4 pb-4 md:pb-6 flex flex-col lg:flex-row gap-4">
+    <div className={isMobile ? 'px-4 pt-4 pb-24 flex flex-col gap-4' : 'px-4 md:px-6 pt-4 pb-4 md:pb-6 flex flex-col gap-4 lg:flex-row'}>
+      {isMobile && (
+        <div className="section-enter overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(254,243,199,0.94)_48%,_rgba(238,242,255,0.92))] p-5 shadow-[0_18px_34px_rgba(15,23,42,0.08)]">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#92400e]">Arena</p>
+              <h1 className="mt-3 text-[28px] font-bold leading-none text-[#111111]">Дуэли в реальном времени</h1>
+              <p className="mt-3 text-sm leading-6 text-[#475569]">Очередь, live-матчи и рейтинг в одном мобильном потоке без лишних переключений.</p>
+            </div>
+            <div className="rounded-[24px] border border-white/80 bg-white/78 px-4 py-3 text-right shadow-sm backdrop-blur">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">Матчей</p>
+              <p className="mt-2 font-mono text-xl font-bold text-[#111111]">{openMatches.length}</p>
+            </div>
+          </div>
+          <div className="mt-4 grid grid-cols-3 gap-2">
+            {[
+              { label: 'Очередь', value: inQueue ? 'Live' : 'Open' },
+              { label: 'Топ', value: leaderboard.length },
+              { label: 'Матчи', value: openMatches.length },
+            ].map(item => (
+              <div key={item.label} className="rounded-2xl border border-white/80 bg-white/76 px-3 py-3">
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">{item.label}</p>
+                <p className="mt-1 text-base font-bold text-[#111111]">{item.value}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Left column */}
       <div className="flex-1 flex flex-col gap-4">
         {/* Queue card */}
@@ -111,7 +141,7 @@ export function ArenaHubPage() {
           </div>
 
           {inQueue ? (
-            <div className="flex items-center justify-between gap-4">
+            <div className={`gap-4 ${isMobile ? 'flex flex-col items-start' : 'flex items-center justify-between'}`}>
               <div className="flex items-center gap-3">
                 {/* Animated radar rings */}
                 <div className="relative w-10 h-10 flex-shrink-0">
@@ -132,19 +162,19 @@ export function ArenaHubPage() {
                   </div>
                   <p className="text-xs text-[#94a3b8] mt-0.5">
                     В очереди: {(() => {
-                      const n = queueStatus?.queueSize ?? queueStatus?.queue_size
+                      const n = queueStatus?.queueSize
                       return (typeof n === 'number' && n > 0) ? `${n} чел.` : '...'
                     })()}
                   </p>
                 </div>
               </div>
-              <Button variant="secondary" size="sm" onClick={handleLeaveQueue}>
+              <Button variant="secondary" size="sm" onClick={handleLeaveQueue} className={isMobile ? 'w-full justify-center' : ''}>
                 Выйти
               </Button>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
-              <div className="grid grid-cols-2 gap-2">
+              <div className={`grid gap-2 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 <Select
                   options={[{ value: '', label: 'Любая тема' }, { value: 'arrays', label: 'Arrays' }, { value: 'graphs', label: 'Graphs' }, { value: 'dp', label: 'Dynamic Prog.' }]}
                   value={topic}
@@ -173,13 +203,13 @@ export function ArenaHubPage() {
             {openMatches.length === 0 ? (
               <div className="px-4 py-8 text-center text-xs text-[#94a3b8]">Нет открытых матчей</div>
             ) : openMatches.map((m: any, i: number) => (
-              <div key={m.id ?? i} className="flex items-center gap-3 px-4 py-2.5">
+              <div key={m.id ?? i} className={`gap-3 px-4 py-3 ${isMobile ? 'flex flex-col items-start' : 'flex items-center'}`}>
                 <Swords className="w-4 h-4 text-[#666666] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#111111] truncate">{m.task_title ?? 'Задача'}</p>
+                  <p className="text-sm font-medium text-[#111111] truncate">{m.taskTitle ?? 'Задача'}</p>
                   <p className="text-xs text-[#666666]">{m.topic ?? ''} · {m.difficulty ?? ''}</p>
                 </div>
-                <Button size="sm" variant="secondary" onClick={() => navigate(`/arena/${m.id}`)}>
+                <Button size="sm" variant="secondary" className={isMobile ? 'w-full justify-center' : ''} onClick={() => navigate(`/arena/${m.id}`)}>
                   Войти
                 </Button>
               </div>
@@ -189,7 +219,7 @@ export function ArenaHubPage() {
       </div>
 
       {/* Right column */}
-      <div className="w-full lg:w-[300px] lg:flex-shrink-0 flex flex-col gap-4">
+      <div className="w-full flex flex-col gap-4 lg:w-[300px] lg:flex-shrink-0">
         {/* League card */}
         <Card padding="md">
           <div className="flex items-center gap-2 mb-3">
@@ -218,11 +248,11 @@ export function ArenaHubPage() {
                 </div>
               ))
               : leaderboard.slice(0, 8).map((e: any, i: number) => (
-                <div key={e.user_id ?? i} className="flex items-center gap-3 px-4 py-2">
+                <div key={e.userId ?? i} className="flex items-center gap-3 px-4 py-2">
                   <span className="w-5 text-xs font-mono text-[#94a3b8] text-right">{i + 1}</span>
-                  <Avatar name={e.display_name ?? '?'} size="xs" />
+                  <Avatar name={e.displayName ?? '?'} size="xs" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-[#111111] truncate">{e.display_name}</p>
+                    <p className="text-xs font-medium text-[#111111] truncate">{e.displayName}</p>
                     <p className={`text-[10px] ${LEAGUE_COLORS[e.league] ?? 'text-[#94a3b8]'}`}>{LEAGUE_LABELS[e.league] ?? ''}</p>
                   </div>
                   <span className="text-xs font-mono text-[#666666]">{e.rating ?? e.wins ?? 0}</span>

@@ -473,11 +473,31 @@ func mapMockSession(session *model.InterviewPrepMockSession) *v1.MockSession {
 		UpdatedAt:         timestamppb.New(session.UpdatedAt),
 		Stages:            stages,
 		CurrentStage:      mapMockStage(session.CurrentStage),
+		BlueprintSlug:     session.BlueprintSlug,
+		BlueprintTitle:    session.BlueprintTitle,
+		TrackSlug:         session.TrackSlug,
 	}
 	if session.FinishedAt != nil {
 		s.FinishedAt = timestamppb.New(*session.FinishedAt)
 	}
 	return s
+}
+
+func mapMockBlueprint(item *model.InterviewMockBlueprintSummary) *v1.MockBlueprint {
+	if item == nil {
+		return nil
+	}
+	return &v1.MockBlueprint{
+		Id:                   item.ID.String(),
+		TrackSlug:            item.TrackSlug,
+		Slug:                 item.Slug,
+		Title:                item.Title,
+		Description:          item.Description,
+		Level:                item.Level,
+		TotalDurationSeconds: item.TotalDurationSeconds,
+		PublicAliasSlugs:     append([]string{}, item.PublicAliasSlugs...),
+		PublicAliasNames:     append([]string{}, item.PublicAliasNames...),
+	}
 }
 
 func mapMockQuestionPoolItem(item *model.InterviewPrepMockQuestionPoolItem) *v1.MockQuestionPoolItem {

@@ -10,15 +10,16 @@ import type { Room } from '@/entities/CodeRoom/model/types'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Avatar } from '@/shared/ui/Avatar'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { getMonacoLanguage, getLanguageLabel } from '@/shared/lib/codeEditorLanguage'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { apiClient } from '@/shared/api/base'
 import type * as Monaco from 'monaco-editor'
 import * as Y from 'yjs'
-import { MonacoBinding } from 'y-monaco'
 import * as syncProtocol from 'y-protocols/sync'
 import * as encoding from 'lib0/encoding'
 import * as decoding from 'lib0/decoding'
+import { MonacoBinding } from '@/shared/lib/monacoTextBinding'
 
 /* ─── Solo draft storage (LRU, max 10 tasks) ─── */
 const SOLO_DRAFT_MAX = 10
@@ -199,6 +200,7 @@ export function CodeRoomPage() {
   const location = useLocation()
   const { user } = useAuth()
   const { theme, toggleTheme } = useTheme()
+  const isMobile = useIsMobile()
   const [room, setRoom] = useState<Room | null>(null)
   const [running, setRunning] = useState(false)
   const [submitResult, setSubmitResult] = useState<{ isCorrect: boolean; output: string; error: string } | null>(null)
@@ -220,6 +222,7 @@ export function CodeRoomPage() {
   const [showLangDropdown, setShowLangDropdown] = useState(false)
   const [togglingPrivacy, setTogglingPrivacy] = useState(false)
   const [leftWidth, setLeftWidth] = useState(300)
+  const [mobilePanel, setMobilePanel] = useState<'problem' | 'editor' | 'ai'>('editor')
   const isResizingLeft = useRef(false)
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
   const monacoRef = useRef<typeof Monaco | null>(null)
@@ -255,6 +258,12 @@ export function CodeRoomPage() {
     window.addEventListener('mouseup', onUp)
     return () => { window.removeEventListener('mousemove', onMove); window.removeEventListener('mouseup', onUp) }
   }, [])
+
+  useEffect(() => {
+    if (!(isMobile && mobilePanel === 'editor')) return
+    const timer = setTimeout(() => editorRef.current?.layout(), 60)
+    return () => clearTimeout(timer)
+  }, [isMobile, mobilePanel])
 
   // Check if guest name is needed
   useEffect(() => {
@@ -400,8 +409,9 @@ export function CodeRoomPage() {
 
   useEffect(() => {
     const editor = editorRef.current
+    const monaco = monacoRef.current
     const model = editor?.getModel()
-    if (!editor || !model || !ws.connected || !ws.gotSnapshot || bindingRef.current || isDuelRoom) return
+    if (!editor || !monaco || !model || !ws.connected || !ws.gotSnapshot || bindingRef.current || isDuelRoom) return
 
     const snapshotCode = ws.code || ''
     const seedCode = currentCodeRef.current || snapshotCode || model.getValue()
@@ -413,7 +423,7 @@ export function CodeRoomPage() {
       yText.insert(0, seedCode)
     }
 
-    const binding = new MonacoBinding(yText, model, new Set([editor]))
+    const binding = new MonacoBinding(monaco, yText, model, new Set([editor]))
     const handleDocUpdate = (update: Uint8Array, origin: unknown) => {
       if (origin === 'remote') return
 
@@ -612,8 +622,9 @@ export function CodeRoomPage() {
       setSubmitResult(ws.lastSubmission)
       setAiTab('result')
       setShowAiPanel(true)
+      if (isMobile) setMobilePanel('ai')
     }
-  }, [ws.lastSubmission])
+  }, [isMobile, ws.lastSubmission])
 
   const getCurrentCode = useCallback(() => {
     return editorRef.current?.getModel()?.getValue() ?? currentCodeRef.current
@@ -628,10 +639,17 @@ export function CodeRoomPage() {
       setSubmitResult(result)
       setAiTab('result')
       setShowAiPanel(true)
+      if (isMobile) setMobilePanel('ai')
     } catch {} finally { setRunning(false) }
   }
 
   const handleAiReview = () => {
+    if (isMobile) {
+      setShowAiPanel(true)
+      setAiTab('review')
+      setMobilePanel('ai')
+      return
+    }
     if (showAiPanel) {
       setShowAiPanel(false)
       return
@@ -647,7 +665,7 @@ export function CodeRoomPage() {
       const res = await apiClient.post('/api/v1/code-editor/ai-review', {
         language: lang,
         code: getCurrentCode(),
-        task_title: room?.task ?? '',
+        taskTitle: room?.task ?? '',
         statement: customPrompt || (room?.task ? `Реши задачу: ${room.task}` : ''),
       })
       const data = res.data
@@ -808,6 +826,377 @@ export function CodeRoomPage() {
   const lang = ws.language || (roomLanguage === 'plaintext' ? 'python' : roomLanguage)
   const roomLanguages = getAvailableRoomLanguages(room?.mode, lang)
   const status = room ? (STATUS_LABELS[room.status] ?? { label: room.status, variant: 'default' as const }) : null
+
+  if (isMobile) {
+    return (
+      <div className="flex min-h-screen flex-col bg-[#F2F3F0] dark:bg-[#0d1117]">
+        <header className="border-b border-[#d8d9d6] bg-white px-4 pt-3 pb-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] dark:border-[#1e3158] dark:bg-[#161c2d]">
+          <div className="flex items-start gap-3">
+            <button
+              onClick={() => navigate('/practice/code-rooms')}
+              className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#666666] dark:bg-[#1a2236] dark:text-[#94a3b8]"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+            <div className="min-w-0 flex-1">
+              <p className="truncate text-sm font-bold text-[#0f172a] dark:text-[#e2e8f0]">{room?.task || 'Code Room'}</p>
+              <div className="mt-1 flex flex-wrap items-center gap-2">
+                {status && <Badge variant={status.variant}>{status.label}</Badge>}
+                {ws.connected ? (
+                  <span className="flex items-center gap-1 text-[10px] text-[#22c55e]">
+                    <Wifi className="w-3 h-3" /> Live
+                  </span>
+                ) : (
+                  <span className="flex items-center gap-1 text-[10px] text-[#94a3b8]">
+                    <WifiOff className="w-3 h-3" /> Offline
+                  </span>
+                )}
+              </div>
+            </div>
+            <button
+              onClick={toggleTheme}
+              title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#666666] transition-colors dark:bg-[#1a2236] dark:text-[#94a3b8]"
+            >
+              {theme === 'dark' ? <Sun className="w-4 h-4 text-[#fbbf24]" /> : <Moon className="w-4 h-4" />}
+            </button>
+          </div>
+
+          <div className="mt-3 flex items-center gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            {!isDuelRoom && Array.from(ws.awareness.values()).map(a => (
+              <div key={a.userId} className="relative flex-shrink-0" title={a.displayName}>
+                <Avatar name={a.displayName} size="xs" />
+                <span
+                  className="absolute -bottom-0.5 -right-0.5 h-2.5 w-2.5 rounded-full border-2 border-white"
+                  style={{ background: getCursorColor(a.userId) }}
+                />
+              </div>
+            ))}
+            {(isDuelRoom ? room?.participants : room?.participants?.filter(p => !ws.awareness.has(p.userId || p.name)))?.map(p => (
+              <Avatar key={p.userId || p.name} name={p.name} size="xs" className={!isDuelRoom ? 'opacity-40' : undefined} />
+            ))}
+          </div>
+
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+            <button
+              onClick={copyInviteLink}
+              className="flex flex-shrink-0 items-center gap-1.5 rounded-2xl border border-[#e2e8f0] bg-white px-3 py-2 text-xs font-medium text-[#111111] transition-colors dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f0]"
+              title="Скопировать ссылку-приглашение"
+            >
+              {copied ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Share2 className="w-3.5 h-3.5" />}
+              <span>{copied ? 'Скопировано' : 'Инвайт'}</span>
+            </button>
+
+            {isCreator && (
+              <button
+                onClick={handleTogglePrivacy}
+                disabled={togglingPrivacy}
+                title={room?.isPrivate ? 'Сделать публичной' : 'Сделать приватной'}
+                className={`flex flex-shrink-0 items-center gap-1.5 rounded-2xl border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50 ${room?.isPrivate ? 'border-[#c7d2fe] bg-[#eef2ff] text-[#6366F1] dark:border-[#312e81] dark:bg-[#1e1b4b]' : 'border-[#e2e8f0] bg-white text-[#667085] dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#94a3b8]'}`}
+              >
+                {room?.isPrivate ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                <span>{room?.isPrivate ? 'Приватная' : 'Публичная'}</span>
+              </button>
+            )}
+
+            {isCreator && (
+              <button
+                onClick={() => setNotificationsEnabled(v => !v)}
+                title={notificationsEnabled ? 'Выключить уведомления' : 'Включить уведомления'}
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border transition-colors ${notificationsEnabled ? 'border-[#c7d2fe] bg-[#eef2ff] text-[#6366F1] dark:border-[#312e81] dark:bg-[#1e1b4b]' : 'border-[#e2e8f0] bg-white text-[#94a3b8] dark:border-[#1e3158] dark:bg-[#0f1117]'}`}
+              >
+                {notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
+              </button>
+            )}
+
+            <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading} className="flex-shrink-0 rounded-2xl">
+              <Bot className="w-3.5 h-3.5" /> AI Ревью
+            </Button>
+            <Button variant="secondary" size="sm" onClick={handleRun} loading={running} className="flex-shrink-0 rounded-2xl">
+              <Play className="w-3.5 h-3.5" /> Запустить
+            </Button>
+          </div>
+        </header>
+
+        <div className="flex flex-1 flex-col gap-4 px-4 pt-4 pb-24">
+          <div className="grid grid-cols-3 gap-2 rounded-[24px] border border-[#d8d9d6] bg-white p-1 shadow-[0_12px_28px_rgba(15,23,42,0.06)] dark:border-[#1e3158] dark:bg-[#161c2d]">
+            {[
+              { key: 'problem' as const, label: 'Задача' },
+              { key: 'editor' as const, label: 'Редактор' },
+              { key: 'ai' as const, label: 'AI' },
+            ].map(panel => (
+              <button
+                key={panel.key}
+                onClick={() => {
+                  if (panel.key === 'ai') setShowAiPanel(true)
+                  setMobilePanel(panel.key)
+                }}
+                className={`rounded-[18px] px-3 py-2 text-sm font-medium transition-colors ${mobilePanel === panel.key ? 'bg-[#111111] text-white dark:bg-[#0f1117]' : 'text-[#667085] dark:text-[#94a3b8]'}`}
+              >
+                {panel.label}
+              </button>
+            ))}
+          </div>
+
+          {mobilePanel === 'problem' && (
+            <div className="rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
+              <div className="flex items-center justify-between border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
+                <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">Условие</span>
+                {isCreator && (
+                  <button
+                    onClick={openTaskEditor}
+                    title="Редактировать условие задачи"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#F8FAFC] text-[#94a3b8] dark:bg-[#1a2236]"
+                  >
+                    <Pencil className="w-3.5 h-3.5" />
+                  </button>
+                )}
+              </div>
+              <div className="p-4">
+                {room?.task ? (
+                  <div>
+                    <h2 className="mb-3 text-base font-bold text-[#0f172a] dark:text-[#e2e8f0]">{room.task}</h2>
+                    {taskStatement ? (
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#475569] dark:text-[#94a3b8]">{taskStatement}</p>
+                    ) : isCreator ? (
+                      <button onClick={openTaskEditor} className="text-sm font-medium text-[#6366F1] hover:underline">
+                        + Добавить описание
+                      </button>
+                    ) : (
+                      <p className="text-sm text-[#94a3b8]">Описание не добавлено</p>
+                    )}
+                  </div>
+                ) : isCreator ? (
+                  <button
+                    onClick={openTaskEditor}
+                    className="flex w-full flex-col items-center justify-center gap-2 py-8 text-center text-[#94a3b8] transition-colors hover:text-[#6366F1]"
+                  >
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-dashed border-[#CBCCC9] dark:border-[#1e3158]">
+                      <Pencil className="w-4 h-4" />
+                    </div>
+                    <span className="text-sm font-medium">Добавить условие задачи</span>
+                  </button>
+                ) : (
+                  <p className="py-8 text-center text-sm text-[#94a3b8]">Задача не задана</p>
+                )}
+              </div>
+            </div>
+          )}
+
+          <div className={mobilePanel === 'editor' ? '' : 'hidden'}>
+            <div className="overflow-hidden rounded-[30px] border border-[#1e293b] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
+              <div className="flex items-center gap-3 bg-[#1e293b] px-4 py-3">
+                <span className="text-xs font-mono text-[#94a3b8]">
+                  solution.{lang === 'python' ? 'py' : lang === 'go' ? 'go' : lang === 'sql' ? 'sql' : 'txt'}
+                </span>
+                <div className="relative ml-auto">
+                  <button
+                    onClick={() => setShowLangDropdown(v => !v)}
+                    className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-[#94a3b8] transition-colors hover:bg-[#0f172a]"
+                  >
+                    {getLanguageLabel(lang)} <ChevronDown className="w-3 h-3" />
+                  </button>
+                  {showLangDropdown && (
+                    <>
+                      <div className="fixed inset-0 z-40" onClick={() => setShowLangDropdown(false)} />
+                      <div className="absolute right-0 top-full z-50 mt-1 min-w-[130px] overflow-hidden rounded-lg border border-[#334155] bg-[#1e293b] shadow-xl">
+                        {roomLanguages.map(l => (
+                          <button
+                            key={l.value}
+                            onClick={() => { ws.sendLanguageChange(l.value); setShowLangDropdown(false) }}
+                            className={`w-full px-3 py-2 text-left text-xs transition-colors ${lang === l.value ? 'bg-[#0f172a] text-[#6366F1]' : 'text-[#94a3b8] hover:bg-[#0f172a] hover:text-white'}`}
+                          >
+                            {l.label}
+                          </button>
+                        ))}
+                      </div>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="h-[52vh] min-h-[320px]">
+                <Editor
+                  height="100%"
+                  language={getMonacoLanguage(lang)}
+                  defaultValue={initialCodeRef.current}
+                  onMount={handleEditorMount}
+                  options={{
+                    fontSize: 13,
+                    fontFamily: '"JetBrains Mono", monospace',
+                    minimap: { enabled: false },
+                    scrollBeyondLastLine: false,
+                    lineNumbers: 'on',
+                    padding: { top: 12 },
+                    theme: 'druzya-dark',
+                  }}
+                />
+              </div>
+              <div className="border-t border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
+                {submitResult ? (
+                  <div className={`rounded-2xl p-3 ${submitResult.isCorrect ? 'border border-[#86efac] bg-[#e8f9ef] dark:border-[#166534] dark:bg-[#0d2a1f]' : 'border border-[#fca5a5] bg-[#fef2f2] dark:border-[#991b1b] dark:bg-[#2a0f0f]'}`}>
+                    <div className="mb-2 flex items-center gap-2">
+                      {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
+                      <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Принято' : 'Нужно доработать'}</span>
+                    </div>
+                    {submitResult.output && <pre className="whitespace-pre-wrap text-xs text-[#475569] dark:text-[#94a3b8]">{submitResult.output}</pre>}
+                    {submitResult.error && <pre className="mt-2 whitespace-pre-wrap text-xs text-[#ef4444]">{submitResult.error}</pre>}
+                  </div>
+                ) : (
+                  <p className="text-xs text-[#94a3b8]">Результаты запуска появятся здесь.</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          {mobilePanel === 'ai' && (
+            <div className="overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
+              <div className="flex items-center gap-2 border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
+                <Sparkles className="w-4 h-4 text-[#6366F1]" />
+                <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">AI Помощник</span>
+              </div>
+              <div className="flex border-b border-[#e2e8f0] dark:border-[#1e3158]">
+                {(['hints', 'result', 'review'] as const).map(tab => (
+                  <button
+                    key={tab}
+                    onClick={() => setAiTab(tab)}
+                    className={`px-3 py-2.5 text-xs font-medium transition-colors ${aiTab === tab ? 'border-b-2 border-[#6366F1] text-[#111111] dark:text-[#e2e8f0]' : 'text-[#666666] dark:text-[#64748b]'}`}
+                  >
+                    {tab === 'hints' ? 'Подсказки' : tab === 'result' ? 'Результат' : 'AI Ревью'}
+                  </button>
+                ))}
+              </div>
+              <div className="p-4">
+                {aiTab === 'hints' ? (
+                  <div className="flex flex-col gap-3">
+                    {hints.length === 0 ? (
+                      <>
+                        <p className="text-sm leading-relaxed text-[#666666] dark:text-[#94a3b8]">
+                          Начните решать задачу, и AI поможет если застрянете
+                        </p>
+                        <Button
+                          variant="orange"
+                          size="sm"
+                          className="w-full rounded-2xl"
+                          onClick={() => setHints(AI_HINTS)}
+                        >
+                          <Sparkles className="w-3.5 h-3.5" /> Получить подсказку
+                        </Button>
+                      </>
+                    ) : (
+                      <div className="flex flex-col gap-2">
+                        {hints.map((hint, i) => (
+                          <div key={i} className="rounded-2xl border border-[#FDBA74] bg-[#FFF7ED] p-3 dark:border-[#78350f] dark:bg-[#2a1a06]">
+                            <p className="mb-0.5 text-xs font-semibold text-[#9a3412] dark:text-[#fbbf24]">Подсказка {i + 1}</p>
+                            <p className="text-sm text-[#111111] dark:text-[#e2e8f0]">{hint}</p>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                ) : aiTab === 'result' ? (
+                  <div className="flex flex-col gap-3">
+                    {submitResult ? (
+                      <div className={`rounded-2xl p-3 ${submitResult.isCorrect ? 'border border-[#86efac] bg-[#e8f9ef] dark:border-[#166534] dark:bg-[#0d2a1f]' : 'border border-[#fca5a5] bg-[#fef2f2] dark:border-[#991b1b] dark:bg-[#2a0f0f]'}`}>
+                        <div className="mb-2 flex items-center gap-2">
+                          {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
+                          <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Принято!' : 'Неверно'}</span>
+                        </div>
+                        {submitResult.output && <pre className="whitespace-pre-wrap font-mono text-xs text-[#475569] dark:text-[#94a3b8]">{submitResult.output}</pre>}
+                        {submitResult.error && <pre className="whitespace-pre-wrap font-mono text-xs text-[#ef4444]">{submitResult.error}</pre>}
+                      </div>
+                    ) : (
+                      <p className="text-sm text-[#94a3b8]">Запустите код чтобы увидеть результаты</p>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-3">
+                    {reviewLoading ? (
+                      <div className="flex items-center gap-2">
+                        <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#CBCCC9] border-t-[#6366F1] dark:border-[#1e3158]" />
+                        <p className="text-sm text-[#666666] dark:text-[#94a3b8]">Анализируем код...</p>
+                      </div>
+                    ) : aiReview ? (
+                      <div className="flex flex-col gap-2">
+                        <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">Результат ревью</p>
+                        <p className="whitespace-pre-wrap text-xs leading-relaxed text-[#666666] dark:text-[#94a3b8]">{aiReview}</p>
+                        <button onClick={() => setAiReview(null)} className="mt-1 text-left text-xs text-[#6366F1] hover:underline">Запустить заново</button>
+                      </div>
+                    ) : (
+                      <div className="flex flex-col gap-3">
+                        <p className="text-xs text-[#666666] dark:text-[#94a3b8]">Необязательный промпт для AI ревью:</p>
+                        <textarea
+                          value={reviewPrompt}
+                          onChange={e => setReviewPrompt(e.target.value)}
+                          placeholder="Например: уточни временную сложность..."
+                          rows={4}
+                          className="w-full resize-none rounded-2xl border border-[#CBCCC9] bg-[#F2F3F0] px-3 py-2 text-xs focus:outline-none dark:border-[#1e3158] dark:bg-[#0d1117] dark:text-[#e2e8f0]"
+                        />
+                        <Button variant="primary" size="sm" className="w-full rounded-2xl" onClick={() => handleRunReview(reviewPrompt)} loading={reviewLoading}>
+                          <Bot className="w-3.5 h-3.5" /> Запустить ревью
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
+        </div>
+
+        {notifications.length > 0 && (
+          <div className="pointer-events-none fixed inset-x-4 bottom-20 z-50 flex flex-col gap-2">
+            {notifications.map(n => (
+              <div
+                key={n.id}
+                className="flex items-center gap-2 rounded-xl bg-[#1e293b] px-4 py-2.5 text-xs text-white shadow-lg animate-fade-in"
+              >
+                <span className="h-1.5 w-1.5 flex-shrink-0 rounded-full bg-[#94a3b8]" />
+                {n.text}
+              </div>
+            ))}
+          </div>
+        )}
+
+        {showTaskEditor && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+            <div className="w-full max-w-lg rounded-2xl border border-[#CBCCC9] bg-white shadow-xl dark:border-[#1e3158] dark:bg-[#161c2d]">
+              <div className="flex items-center justify-between border-b border-[#CBCCC9] px-5 py-4 dark:border-[#1e3158]">
+                <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">Условие задачи</h2>
+                <button onClick={() => setShowTaskEditor(false)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] hover:bg-[#F2F3F0] dark:text-[#94a3b8] dark:hover:bg-[#1a2236]">
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+              <div className="flex flex-col gap-4 p-5">
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">Название задачи</label>
+                  <input
+                    value={editTaskTitle}
+                    onChange={e => setEditTaskTitle(e.target.value)}
+                    placeholder="Например: Two Sum"
+                    className="w-full rounded-lg border border-[#CBCCC9] bg-white px-3 py-2 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f3]"
+                  />
+                </div>
+                <div>
+                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">Условие задачи</label>
+                  <textarea
+                    value={editTaskStatement}
+                    onChange={e => setEditTaskStatement(e.target.value)}
+                    placeholder="Опишите задачу, входные и выходные данные, примеры..."
+                    rows={8}
+                    className="w-full resize-none rounded-lg border border-[#CBCCC9] bg-white px-3 py-2 font-mono text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f3]"
+                  />
+                </div>
+              </div>
+              <div className="flex gap-2 px-5 pb-5">
+                <Button variant="secondary" size="sm" onClick={() => setShowTaskEditor(false)}>Отмена</Button>
+                <Button variant="primary" size="sm" onClick={saveTask} disabled={!editTaskTitle.trim()}>Сохранить</Button>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col h-screen bg-[#F2F3F0] dark:bg-[#0d1117] overflow-hidden">

@@ -13,9 +13,9 @@ import (
 
 func (r *Repo) ListQuestionsByTask(ctx context.Context, taskID uuid.UUID) ([]*model.InterviewPrepQuestion, error) {
 	rows, err := r.data.DB.Query(ctx, `
-		SELECT id, task_id, position, prompt, answer, created_at, updated_at
-		FROM interview_prep_questions
-		WHERE task_id = $1
+		SELECT id, item_id, position, prompt, reference_answer, created_at, updated_at
+		FROM interview_item_followups
+		WHERE item_id = $1
 		ORDER BY position ASC
 	`, taskID)
 	if err != nil {
@@ -36,8 +36,8 @@ func (r *Repo) ListQuestionsByTask(ctx context.Context, taskID uuid.UUID) ([]*mo
 
 func (r *Repo) GetQuestionByID(ctx context.Context, questionID uuid.UUID) (*model.InterviewPrepQuestion, error) {
 	row := r.data.DB.QueryRow(ctx, `
-		SELECT id, task_id, position, prompt, answer, created_at, updated_at
-		FROM interview_prep_questions
+		SELECT id, item_id, position, prompt, reference_answer, created_at, updated_at
+		FROM interview_item_followups
 		WHERE id = $1
 	`, questionID)
 
@@ -53,9 +53,9 @@ func (r *Repo) GetQuestionByID(ctx context.Context, questionID uuid.UUID) (*mode
 
 func (r *Repo) GetQuestionByTaskAndPosition(ctx context.Context, taskID uuid.UUID, position int32) (*model.InterviewPrepQuestion, error) {
 	row := r.data.DB.QueryRow(ctx, `
-		SELECT id, task_id, position, prompt, answer, created_at, updated_at
-		FROM interview_prep_questions
-		WHERE task_id = $1 AND position = $2
+		SELECT id, item_id, position, prompt, reference_answer, created_at, updated_at
+		FROM interview_item_followups
+		WHERE item_id = $1 AND position = $2 AND is_active = TRUE
 	`, taskID, position)
 
 	item, err := scanQuestion(row)
@@ -70,10 +70,10 @@ func (r *Repo) GetQuestionByTaskAndPosition(ctx context.Context, taskID uuid.UUI
 
 func (r *Repo) CreateQuestion(ctx context.Context, question *model.InterviewPrepQuestion) error {
 	_, err := r.data.DB.Exec(ctx, `
-		INSERT INTO interview_prep_questions (
-			id, task_id, position, prompt, answer, created_at, updated_at
+		INSERT INTO interview_item_followups (
+			id, item_id, position, prompt, interviewer_intent, reference_answer, rubric_hint, trigger_phase, always_ask, is_active, created_at, updated_at
 		)
-		VALUES ($1,$2,$3,$4,$5,$6,$7)
+		VALUES ($1,$2,$3,$4,'',$5,'','after_submission',FALSE,TRUE,$6,$7)
 	`,
 		question.ID,
 		question.TaskID,
@@ -91,10 +91,10 @@ func (r *Repo) CreateQuestion(ctx context.Context, question *model.InterviewPrep
 
 func (r *Repo) UpdateQuestion(ctx context.Context, question *model.InterviewPrepQuestion) error {
 	_, err := r.data.DB.Exec(ctx, `
-		UPDATE interview_prep_questions
+		UPDATE interview_item_followups
 		SET position = $2,
 		    prompt = $3,
-		    answer = $4,
+		    reference_answer = $4,
 		    updated_at = NOW()
 		WHERE id = $1
 	`,
@@ -111,7 +111,7 @@ func (r *Repo) UpdateQuestion(ctx context.Context, question *model.InterviewPrep
 
 func (r *Repo) DeleteQuestion(ctx context.Context, questionID uuid.UUID) error {
 	_, err := r.data.DB.Exec(ctx, `
-		DELETE FROM interview_prep_questions WHERE id = $1
+		DELETE FROM interview_item_followups WHERE id = $1
 	`, questionID)
 	if err != nil {
 		return fmt.Errorf("delete interview prep question: %w", err)

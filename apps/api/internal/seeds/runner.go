@@ -66,11 +66,13 @@ func (r *Runner) Run(ctx context.Context, opts Options) ([]Result, error) {
 		results = append(results, blindResult)
 	}
 	if opts.RunInterviewPrep {
-		interviewPrepResult, err := r.runInterviewPrep(ctx)
-		if err != nil {
-			return nil, err
-		}
-		results = append(results, interviewPrepResult)
+		results = append(results, Result{
+			Name:      "interview_prep_pack",
+			Kind:      seedKindCatalog,
+			Applied:   false,
+			Message:   "interview prep catalog seeding was removed; author content via admin API or migrate existing DB rows",
+			AppliedAt: time.Now().UTC(),
+		})
 	}
 	return results, nil
 }

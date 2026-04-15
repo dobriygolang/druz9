@@ -1,6 +1,10 @@
 package interviewprep
 
-import "api/internal/model"
+import (
+	"fmt"
+
+	"api/internal/model"
+)
 
 func scanTask(s scanner) (*model.InterviewPrepTask, error) {
 	var item model.InterviewPrepTask
@@ -27,7 +31,7 @@ func scanTask(s scanner) (*model.InterviewPrepTask, error) {
 	); err != nil {
 		return nil, err
 	}
-	item.PrepType = model.InterviewPrepTypeFromString(prepType)
+	item.PrepType = model.InterviewPrepTypeFromRoundType(prepType)
 	return &item, nil
 }
 
@@ -77,6 +81,9 @@ func scanQuestionResult(s scanner) (*model.InterviewPrepQuestionResult, error) {
 		&item.ID,
 		&item.SessionID,
 		&item.QuestionID,
+		&item.Position,
+		&item.PromptSnapshot,
+		&item.AnswerSnapshot,
 		&assessment,
 		&item.AnsweredAt,
 	); err != nil {
@@ -118,6 +125,9 @@ func scanMockSession(s scanner) (*model.InterviewPrepMockSession, error) {
 		&item.ID,
 		&item.UserID,
 		&item.CompanyTag,
+		&item.BlueprintSlug,
+		&item.BlueprintTitle,
+		&item.TrackSlug,
 		&status,
 		&item.CurrentStageIndex,
 		&item.StartedAt,
@@ -133,15 +143,17 @@ func scanMockSession(s scanner) (*model.InterviewPrepMockSession, error) {
 
 func scanMockStage(s scanner) (*model.InterviewPrepMockStage, error) {
 	var item model.InterviewPrepMockStage
-	var kind string
+	var roundType string
 	var status string
 	if err := s.Scan(
 		&item.ID,
 		&item.SessionID,
 		&item.StageIndex,
-		&kind,
+		&roundType,
 		&status,
 		&item.TaskID,
+		&item.BlueprintRoundID,
+		&item.SourcePoolID,
 		&item.SolveLanguage,
 		&item.Code,
 		&item.LastSubmissionPassed,
@@ -154,23 +166,68 @@ func scanMockStage(s scanner) (*model.InterviewPrepMockStage, error) {
 	); err != nil {
 		return nil, err
 	}
-	item.Kind = model.InterviewPrepMockStageKindFromString(kind)
+	item.Kind = model.InterviewPrepMockStageKindFromRoundType(roundType)
 	item.Status = model.InterviewPrepMockStageStatusFromString(status)
 	return &item, nil
 }
 
 func scanMockQuestionResult(s scanner) (*model.InterviewPrepMockQuestionResult, error) {
 	var item model.InterviewPrepMockQuestionResult
+	var questionKey string
 	if err := s.Scan(
 		&item.ID,
 		&item.StageID,
 		&item.Position,
-		&item.QuestionKey,
 		&item.Prompt,
 		&item.ReferenceAnswer,
 		&item.Score,
 		&item.Summary,
 		&item.AnsweredAt,
+		&item.CreatedAt,
+		&item.UpdatedAt,
+	); err != nil {
+		return nil, err
+	}
+	questionKey = fmt.Sprintf("followup-%d", item.Position)
+	item.QuestionKey = questionKey
+	return &item, nil
+}
+
+func scanMockBlueprintSummary(s scanner) (*model.InterviewMockBlueprintSummary, error) {
+	var item model.InterviewMockBlueprintSummary
+	if err := s.Scan(
+		&item.ID,
+		&item.TrackSlug,
+		&item.Slug,
+		&item.Title,
+		&item.Description,
+		&item.Level,
+		&item.TotalDurationSeconds,
+		&item.PublicAliasSlugs,
+		&item.PublicAliasNames,
+	); err != nil {
+		return nil, err
+	}
+	return &item, nil
+}
+
+func scanBlueprintRound(s scanner) (*model.InterviewBlueprintRound, error) {
+	var item model.InterviewBlueprintRound
+	if err := s.Scan(
+		&item.ID,
+		&item.BlueprintID,
+		&item.Position,
+		&item.RoundType,
+		&item.Title,
+		&item.SelectionMode,
+		&item.FixedItemID,
+		&item.PoolID,
+		&item.DurationSeconds,
+		&item.EvaluatorMode,
+		&item.MaxFollowupCount,
+		&item.CandidateInstructionsOverride,
+		&item.InterviewerInstructionsOverride,
+		&item.IsActive,
 		&item.CreatedAt,
 		&item.UpdatedAt,
 	); err != nil {

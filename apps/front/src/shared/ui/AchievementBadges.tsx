@@ -8,7 +8,7 @@ export interface Achievement {
   icon: string
   unlocked: boolean
   category: string
-  unlocked_at?: string
+  unlockedAt?: string
 }
 
 interface AchievementBadgesProps {

@@ -130,16 +130,11 @@ func (r *Repo) ListMockCompanyPresets(ctx context.Context) ([]*model.InterviewPr
 
 func (r *Repo) GetAvailableCompanies(ctx context.Context) ([]string, error) {
 	rows, err := r.data.DB.Query(ctx, `
-		SELECT DISTINCT company_tag
-		FROM (
-			SELECT company_tag FROM interview_prep_tasks
-			UNION ALL
-			SELECT company_tag FROM interview_prep_mock_question_pools
-			UNION ALL
-			SELECT company_tag FROM interview_prep_mock_company_presets
-		) sources
-		WHERE NULLIF(BTRIM(company_tag), '') IS NOT NULL
-		ORDER BY company_tag ASC
+		SELECT alias_slug
+		FROM interview_blueprint_aliases
+		WHERE is_public_start = TRUE
+		  AND NULLIF(BTRIM(alias_slug), '') IS NOT NULL
+		ORDER BY sort_order ASC, alias_slug ASC
 	`)
 	if err != nil {
 		return nil, fmt.Errorf("get available companies: %w", err)

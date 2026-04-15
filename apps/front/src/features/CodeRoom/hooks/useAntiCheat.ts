@@ -13,7 +13,7 @@ export function useAntiCheat({ matchId, enabled = true }: UseAntiCheatOptions) {
     if (!matchId || !enabled || reportedRef.current.has(reason)) return
     reportedRef.current.add(reason)
     try {
-      await apiClient.post('/api/v1/arena/anti-cheat/event', { match_id: matchId, reason })
+      await apiClient.post('/api/v1/arena/anti-cheat/event', { matchId, reason })
     } catch {
       // silent
     }

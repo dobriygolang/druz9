@@ -30,6 +30,9 @@ service InterviewPrepService {
   rpc ListCompanies(ListCompaniesRequest) returns (ListCompaniesResponse) {
     option (google.api.http) = { get: "/api/v1/interview-prep/companies" };
   }
+  rpc ListMockBlueprints(ListMockBlueprintsRequest) returns (ListMockBlueprintsResponse) {
+    option (google.api.http) = { get: "/api/v1/interview-prep/mock-blueprints" };
+  }
   rpc StartMockSession(StartMockSessionRequest) returns (MockSessionEnvelope) {
     option (google.api.http) = { post: "/api/v1/interview-prep/mock-sessions" body: "*" };
   }
@@ -196,7 +199,11 @@ message ReviewSystemDesignRequest {
 }
 
 message ListCompaniesRequest {}
-message StartMockSessionRequest { string company_tag = 1; }
+message ListMockBlueprintsRequest {}
+message StartMockSessionRequest {
+  string company_tag  = 1;
+  string program_slug = 2;
+}
 message GetMockSessionRequest { string session_id = 1; }
 
 message SubmitMockStageRequest {
@@ -234,6 +241,7 @@ message SessionEnvelope         { InterviewPrepSession session = 1; }
 message MockSessionEnvelope      { MockSession session = 1; }
 message ListTasksResponse        { repeated InterviewPrepTask tasks = 1; }
 message ListCompaniesResponse    { repeated string companies = 1; }
+message ListMockBlueprintsResponse { repeated MockBlueprint blueprints = 1; }
 
 message SubmitSessionResult {
   bool              passed           = 1;
@@ -457,6 +465,21 @@ message MockSession {
   google.protobuf.Timestamp updated_at          = 9;  // was: string
   repeated MockStage        stages              = 10;
   MockStage                 current_stage       = 11;
+  string                    blueprint_slug      = 12;
+  string                    blueprint_title     = 13;
+  string                    track_slug          = 14;
+}
+
+message MockBlueprint {
+  string          id                     = 1;
+  string          track_slug             = 2;
+  string          slug                   = 3;
+  string          title                  = 4;
+  string          description            = 5;
+  string          level                  = 6;
+  int32           total_duration_seconds = 7;
+  repeated string public_alias_slugs     = 8;
+  repeated string public_alias_names     = 9;
 }
 
 message MockQuestionPoolItem {

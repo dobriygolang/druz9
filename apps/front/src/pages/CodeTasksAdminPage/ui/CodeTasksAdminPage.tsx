@@ -185,8 +185,8 @@ export function CodeTasksAdminPage() {
                   )}
                 </div>
                 <span className="text-[10px] text-[#666666]">{LANG_LABELS[task.language] ?? ''}</span>
-                <Badge variant={task.is_active !== false ? 'success' : 'default'}>
-                  {task.is_active !== false ? 'On' : 'Off'}
+                <Badge variant={task.isActive !== false ? 'success' : 'default'}>
+                  {task.isActive !== false ? 'On' : 'Off'}
                 </Badge>
                 <div className="flex justify-end gap-1">
                   <button

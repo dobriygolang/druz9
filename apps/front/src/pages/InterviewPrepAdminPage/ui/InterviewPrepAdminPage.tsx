@@ -100,13 +100,13 @@ export function InterviewPrepAdminPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#0f172a] truncate">{task.title}</p>
-                  <p className="text-xs text-[#666666]">{task.company_tag ?? 'General'} · {Math.round((task.duration_seconds ?? 0) / 60)} мин</p>
+                  <p className="text-xs text-[#666666]">{task.companyTag ?? 'General'} · {Math.round((task.durationSeconds ?? 0) / 60)} мин</p>
                 </div>
-                <Badge variant={task.prep_type === 'coding' ? 'indigo' : task.prep_type === 'system_design' ? 'orange' : 'success'}>
-                  {PREP_TYPE_LABELS[task.prep_type] ?? task.prep_type}
+                <Badge variant={task.prepType === 'coding' ? 'indigo' : task.prepType === 'system_design' ? 'orange' : 'success'}>
+                  {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
                 </Badge>
-                <Badge variant={task.is_active !== false ? 'success' : 'default'}>
-                  {task.is_active !== false ? 'Active' : 'Inactive'}
+                <Badge variant={task.isActive !== false ? 'success' : 'default'}>
+                  {task.isActive !== false ? 'Active' : 'Inactive'}
                 </Badge>
                 <div className="flex gap-1">
                   <button onClick={() => { setEditTask(task); setShowEdit(true) }} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]">
@@ -151,18 +151,18 @@ export function InterviewPrepAdminPage() {
           <div className="grid grid-cols-2 gap-4">
             <Input label="Название" value={editTask.title ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, title: e.target.value }))} />
             <Input label="Slug" value={editTask.slug ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, slug: e.target.value }))} />
-            <Select label="Тип" options={[{ value: 'coding', label: 'Coding' }, { value: 'system_design', label: 'System Design' }, { value: 'behavioral', label: 'Behavioral' }]} value={editTask.prep_type ?? 'coding'} onChange={v => setEditTask((t: any) => ({ ...t, prep_type: v }))} />
+            <Select label="Тип" options={[{ value: 'coding', label: 'Coding' }, { value: 'system_design', label: 'System Design' }, { value: 'behavioral', label: 'Behavioral' }]} value={editTask.prepType ?? 'coding'} onChange={v => setEditTask((t: any) => ({ ...t, prepType: v }))} />
             <Select label="Язык" options={[{ value: 'python3', label: 'Python 3' }, { value: 'go', label: 'Go' }, { value: 'javascript', label: 'JavaScript' }]} value={editTask.language ?? 'python3'} onChange={v => setEditTask((t: any) => ({ ...t, language: v }))} />
-            <Input label="Компания" value={editTask.company_tag ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, company_tag: e.target.value }))} placeholder="google, yandex, ..." />
-            <Input label="Длительность (сек)" type="number" value={editTask.duration_seconds ?? 2700} onChange={e => setEditTask((t: any) => ({ ...t, duration_seconds: parseInt(e.target.value) }))} />
+            <Input label="Компания" value={editTask.companyTag ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, companyTag: e.target.value }))} placeholder="google, yandex, ..." />
+            <Input label="Длительность (сек)" type="number" value={editTask.durationSeconds ?? 2700} onChange={e => setEditTask((t: any) => ({ ...t, durationSeconds: parseInt(e.target.value) }))} />
             <div className="col-span-2">
               <Textarea label="Описание задачи" value={editTask.statement ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, statement: e.target.value }))} rows={5} />
             </div>
             <div className="flex items-center gap-2">
-              <Toggle checked={editTask.is_active ?? true} onChange={v => setEditTask((t: any) => ({ ...t, is_active: v }))} label="Активна" />
+              <Toggle checked={editTask.isActive ?? true} onChange={v => setEditTask((t: any) => ({ ...t, isActive: v }))} label="Активна" />
             </div>
             <div className="flex items-center gap-2">
-              <Toggle checked={editTask.is_executable ?? false} onChange={v => setEditTask((t: any) => ({ ...t, is_executable: v }))} label="Исполняемая" />
+              <Toggle checked={editTask.isExecutable ?? false} onChange={v => setEditTask((t: any) => ({ ...t, isExecutable: v }))} label="Исполняемая" />
             </div>
           </div>
         )}

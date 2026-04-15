@@ -36,6 +36,7 @@ const OperationInterviewPrepServiceGetSession = "/interview_prep.v1.InterviewPre
 const OperationInterviewPrepServiceListAdminQuestions = "/interview_prep.v1.InterviewPrepService/ListAdminQuestions"
 const OperationInterviewPrepServiceListAdminTasks = "/interview_prep.v1.InterviewPrepService/ListAdminTasks"
 const OperationInterviewPrepServiceListCompanies = "/interview_prep.v1.InterviewPrepService/ListCompanies"
+const OperationInterviewPrepServiceListMockBlueprints = "/interview_prep.v1.InterviewPrepService/ListMockBlueprints"
 const OperationInterviewPrepServiceListMockCompanyPresets = "/interview_prep.v1.InterviewPrepService/ListMockCompanyPresets"
 const OperationInterviewPrepServiceListMockQuestionPools = "/interview_prep.v1.InterviewPrepService/ListMockQuestionPools"
 const OperationInterviewPrepServiceListTasks = "/interview_prep.v1.InterviewPrepService/ListTasks"
@@ -69,6 +70,7 @@ type InterviewPrepServiceHTTPServer interface {
 	ListAdminQuestions(context.Context, *ListAdminQuestionsRequest) (*ListAdminQuestionsResponse, error)
 	ListAdminTasks(context.Context, *ListAdminTasksRequest) (*ListAdminTasksResponse, error)
 	ListCompanies(context.Context, *ListCompaniesRequest) (*ListCompaniesResponse, error)
+	ListMockBlueprints(context.Context, *ListMockBlueprintsRequest) (*ListMockBlueprintsResponse, error)
 	ListMockCompanyPresets(context.Context, *ListMockCompanyPresetsRequest) (*MockCompanyPresetListResponse, error)
 	ListMockQuestionPools(context.Context, *ListMockQuestionPoolsRequest) (*MockQuestionPoolListResponse, error)
 	ListTasks(context.Context, *ListTasksRequest) (*ListTasksResponse, error)
@@ -94,6 +96,7 @@ func RegisterInterviewPrepServiceHTTPServer(s *http.Server, srv InterviewPrepSer
 	r.POST("/api/v1/interview-prep/sessions/{session_id}/questions/{question_id}/answer", _InterviewPrepService_AnswerQuestion0_HTTP_Handler(srv))
 	r.POST("/api/v1/interview-prep/sessions/{session_id}/system-design-review", _InterviewPrepService_ReviewSystemDesign0_HTTP_Handler(srv))
 	r.GET("/api/v1/interview-prep/companies", _InterviewPrepService_ListCompanies0_HTTP_Handler(srv))
+	r.GET("/api/v1/interview-prep/mock-blueprints", _InterviewPrepService_ListMockBlueprints0_HTTP_Handler(srv))
 	r.POST("/api/v1/interview-prep/mock-sessions", _InterviewPrepService_StartMockSession0_HTTP_Handler(srv))
 	r.GET("/api/v1/interview-prep/mock-sessions/{session_id}", _InterviewPrepService_GetMockSession0_HTTP_Handler(srv))
 	r.POST("/api/v1/interview-prep/mock-sessions/{session_id}/submit", _InterviewPrepService_SubmitMockStage0_HTTP_Handler(srv))
@@ -273,6 +276,25 @@ func _InterviewPrepService_ListCompanies0_HTTP_Handler(srv InterviewPrepServiceH
 			return err
 		}
 		reply := out.(*ListCompaniesResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _InterviewPrepService_ListMockBlueprints0_HTTP_Handler(srv InterviewPrepServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListMockBlueprintsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInterviewPrepServiceListMockBlueprints)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListMockBlueprints(ctx, req.(*ListMockBlueprintsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListMockBlueprintsResponse)
 		return ctx.Result(200, reply)
 	}
 }
@@ -838,6 +860,7 @@ type InterviewPrepServiceHTTPClient interface {
 	ListAdminQuestions(ctx context.Context, req *ListAdminQuestionsRequest, opts ...http.CallOption) (rsp *ListAdminQuestionsResponse, err error)
 	ListAdminTasks(ctx context.Context, req *ListAdminTasksRequest, opts ...http.CallOption) (rsp *ListAdminTasksResponse, err error)
 	ListCompanies(ctx context.Context, req *ListCompaniesRequest, opts ...http.CallOption) (rsp *ListCompaniesResponse, err error)
+	ListMockBlueprints(ctx context.Context, req *ListMockBlueprintsRequest, opts ...http.CallOption) (rsp *ListMockBlueprintsResponse, err error)
 	ListMockCompanyPresets(ctx context.Context, req *ListMockCompanyPresetsRequest, opts ...http.CallOption) (rsp *MockCompanyPresetListResponse, err error)
 	ListMockQuestionPools(ctx context.Context, req *ListMockQuestionPoolsRequest, opts ...http.CallOption) (rsp *MockQuestionPoolListResponse, err error)
 	ListTasks(ctx context.Context, req *ListTasksRequest, opts ...http.CallOption) (rsp *ListTasksResponse, err error)
@@ -1075,6 +1098,19 @@ func (c *InterviewPrepServiceHTTPClientImpl) ListCompanies(ctx context.Context, 
 	pattern := "/api/v1/interview-prep/companies"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationInterviewPrepServiceListCompanies))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *InterviewPrepServiceHTTPClientImpl) ListMockBlueprints(ctx context.Context, in *ListMockBlueprintsRequest, opts ...http.CallOption) (*ListMockBlueprintsResponse, error) {
+	var out ListMockBlueprintsResponse
+	pattern := "/api/v1/interview-prep/mock-blueprints"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationInterviewPrepServiceListMockBlueprints))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

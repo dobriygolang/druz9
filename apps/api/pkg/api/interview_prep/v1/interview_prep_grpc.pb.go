@@ -26,6 +26,7 @@ const (
 	InterviewPrepService_AnswerQuestion_FullMethodName          = "/interview_prep.v1.InterviewPrepService/AnswerQuestion"
 	InterviewPrepService_ReviewSystemDesign_FullMethodName      = "/interview_prep.v1.InterviewPrepService/ReviewSystemDesign"
 	InterviewPrepService_ListCompanies_FullMethodName           = "/interview_prep.v1.InterviewPrepService/ListCompanies"
+	InterviewPrepService_ListMockBlueprints_FullMethodName      = "/interview_prep.v1.InterviewPrepService/ListMockBlueprints"
 	InterviewPrepService_StartMockSession_FullMethodName        = "/interview_prep.v1.InterviewPrepService/StartMockSession"
 	InterviewPrepService_GetMockSession_FullMethodName          = "/interview_prep.v1.InterviewPrepService/GetMockSession"
 	InterviewPrepService_SubmitMockStage_FullMethodName         = "/interview_prep.v1.InterviewPrepService/SubmitMockStage"
@@ -63,6 +64,7 @@ type InterviewPrepServiceClient interface {
 	AnswerQuestion(ctx context.Context, in *AnswerQuestionRequest, opts ...grpc.CallOption) (*AnswerQuestionResponse, error)
 	ReviewSystemDesign(ctx context.Context, in *ReviewSystemDesignRequest, opts ...grpc.CallOption) (*ReviewSystemDesignResponse, error)
 	ListCompanies(ctx context.Context, in *ListCompaniesRequest, opts ...grpc.CallOption) (*ListCompaniesResponse, error)
+	ListMockBlueprints(ctx context.Context, in *ListMockBlueprintsRequest, opts ...grpc.CallOption) (*ListMockBlueprintsResponse, error)
 	StartMockSession(ctx context.Context, in *StartMockSessionRequest, opts ...grpc.CallOption) (*MockSessionEnvelope, error)
 	GetMockSession(ctx context.Context, in *GetMockSessionRequest, opts ...grpc.CallOption) (*MockSessionEnvelope, error)
 	SubmitMockStage(ctx context.Context, in *SubmitMockStageRequest, opts ...grpc.CallOption) (*SubmitMockStageResponse, error)
@@ -161,6 +163,16 @@ func (c *interviewPrepServiceClient) ListCompanies(ctx context.Context, in *List
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(ListCompaniesResponse)
 	err := c.cc.Invoke(ctx, InterviewPrepService_ListCompanies_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *interviewPrepServiceClient) ListMockBlueprints(ctx context.Context, in *ListMockBlueprintsRequest, opts ...grpc.CallOption) (*ListMockBlueprintsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListMockBlueprintsResponse)
+	err := c.cc.Invoke(ctx, InterviewPrepService_ListMockBlueprints_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -418,6 +430,7 @@ type InterviewPrepServiceServer interface {
 	AnswerQuestion(context.Context, *AnswerQuestionRequest) (*AnswerQuestionResponse, error)
 	ReviewSystemDesign(context.Context, *ReviewSystemDesignRequest) (*ReviewSystemDesignResponse, error)
 	ListCompanies(context.Context, *ListCompaniesRequest) (*ListCompaniesResponse, error)
+	ListMockBlueprints(context.Context, *ListMockBlueprintsRequest) (*ListMockBlueprintsResponse, error)
 	StartMockSession(context.Context, *StartMockSessionRequest) (*MockSessionEnvelope, error)
 	GetMockSession(context.Context, *GetMockSessionRequest) (*MockSessionEnvelope, error)
 	SubmitMockStage(context.Context, *SubmitMockStageRequest) (*SubmitMockStageResponse, error)
@@ -472,6 +485,9 @@ func (UnimplementedInterviewPrepServiceServer) ReviewSystemDesign(context.Contex
 }
 func (UnimplementedInterviewPrepServiceServer) ListCompanies(context.Context, *ListCompaniesRequest) (*ListCompaniesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListCompanies not implemented")
+}
+func (UnimplementedInterviewPrepServiceServer) ListMockBlueprints(context.Context, *ListMockBlueprintsRequest) (*ListMockBlueprintsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListMockBlueprints not implemented")
 }
 func (UnimplementedInterviewPrepServiceServer) StartMockSession(context.Context, *StartMockSessionRequest) (*MockSessionEnvelope, error) {
 	return nil, status.Error(codes.Unimplemented, "method StartMockSession not implemented")
@@ -688,6 +704,24 @@ func _InterviewPrepService_ListCompanies_Handler(srv interface{}, ctx context.Co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(InterviewPrepServiceServer).ListCompanies(ctx, req.(*ListCompaniesRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _InterviewPrepService_ListMockBlueprints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListMockBlueprintsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InterviewPrepServiceServer).ListMockBlueprints(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InterviewPrepService_ListMockBlueprints_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InterviewPrepServiceServer).ListMockBlueprints(ctx, req.(*ListMockBlueprintsRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -1158,6 +1192,10 @@ var InterviewPrepService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListCompanies",
 			Handler:    _InterviewPrepService_ListCompanies_Handler,
+		},
+		{
+			MethodName: "ListMockBlueprints",
+			Handler:    _InterviewPrepService_ListMockBlueprints_Handler,
 		},
 		{
 			MethodName: "StartMockSession",

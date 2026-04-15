@@ -1,10 +1,11 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, ChevronRight, BookOpen, Code2, MessageSquare, Play, Database, Cpu, Server, Building2 } from 'lucide-react'
-import { interviewPrepApi, type InterviewPrepTask } from '@/features/InterviewPrep/api/interviewPrepApi'
+import { interviewPrepApi, type InterviewPrepTask, type MockBlueprint } from '@/features/InterviewPrep/api/interviewPrepApi'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { ErrorState } from '@/shared/ui/ErrorState'
+import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useToast } from '@/shared/ui/Toast'
 import { PREP_TYPE_LABELS } from '@/shared/lib/taskLabels'
 
@@ -17,23 +18,24 @@ const PREP_TYPE_ICONS: Record<string, React.ReactNode> = {
 }
 
 const MOCK_STAGES = [
-  { icon: <Code2 className="w-4 h-4" />,   label: 'Go: Срезы',          color: 'bg-[#e0f2fe] text-[#0369a1]' },
-  { icon: <Cpu className="w-4 h-4" />,     label: 'Go: Многопоточность', color: 'bg-[#ede9fe] text-[#6d28d9]' },
-  { icon: <Database className="w-4 h-4" />, label: 'SQL',                color: 'bg-[#fef9c3] text-[#a16207]' },
-  { icon: <Server className="w-4 h-4" />,   label: 'Архитектура',        color: 'bg-[#dcfce7] text-[#15803d]' },
-  { icon: <BookOpen className="w-4 h-4" />, label: 'System Design',      color: 'bg-[#fce7f3] text-[#be185d]' },
+  { icon: <Cpu className="w-4 h-4" />,      label: 'Algorithms',       color: 'bg-[#e0f2fe] text-[#0369a1]' },
+  { icon: <Code2 className="w-4 h-4" />,    label: 'Practical Coding', color: 'bg-[#ede9fe] text-[#6d28d9]' },
+  { icon: <Database className="w-4 h-4" />, label: 'SQL / Debugging',  color: 'bg-[#fef9c3] text-[#a16207]' },
+  { icon: <Server className="w-4 h-4" />,   label: 'Behavioral',       color: 'bg-[#dcfce7] text-[#15803d]' },
+  { icon: <BookOpen className="w-4 h-4" />, label: 'System Design',    color: 'bg-[#fce7f3] text-[#be185d]' },
 ]
 
 export function InterviewPrepPage() {
   const navigate = useNavigate()
+  const isMobile = useIsMobile()
   const { toast } = useToast()
   const [tasks, setTasks] = useState<InterviewPrepTask[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
   const [category, setCategory] = useState('')
-  const [companies, setCompanies] = useState<string[]>([])
-  const [selectedCompany, setSelectedCompany] = useState('')
+  const [blueprints, setBlueprints] = useState<MockBlueprint[]>([])
+  const [selectedBlueprintSlug, setSelectedBlueprintSlug] = useState('')
   const [mockLoading, setMockLoading] = useState(false)
   const [mockError, setMockError] = useState('')
 
@@ -44,25 +46,27 @@ export function InterviewPrepPage() {
       .then(ts => setTasks(ts))
       .catch(() => setError('Не удалось загрузить данные'))
       .finally(() => setLoading(false))
-    interviewPrepApi.listCompanies()
-      .then(cs => setCompanies(cs))
-      .catch((err) => { console.error('InterviewPrepPage companies fetch error:', err) })
+    interviewPrepApi.listMockBlueprints()
+      .then(items => {
+        setBlueprints(items)
+        setSelectedBlueprintSlug(prev => prev || items[0]?.slug || '')
+      })
+      .catch((err) => { console.error('InterviewPrepPage blueprints fetch error:', err) })
   }, [])
 
   useEffect(() => { fetchTasks() }, [fetchTasks])
 
   const filtered = tasks.filter(t => {
     if (category && t.prepType !== category) return false
-    if (selectedCompany && t.companyTag !== selectedCompany) return false
     if (search && !t.title.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 
-  const handleStartMock = async (companyTag?: string) => {
+  const handleStartMock = async (programSlug?: string) => {
     setMockLoading(true)
     setMockError('')
     try {
-      const session = await interviewPrepApi.startMockSession(companyTag || selectedCompany || '') as any
+      const session = await interviewPrepApi.startMockSession({ programSlug: programSlug || selectedBlueprintSlug }) as any
       localStorage.setItem('interview:last_mock_session', session?.id ?? '')
       navigate(`/growth/interview-prep/mock/${session?.id}`)
     } catch (e: any) {
@@ -82,12 +86,12 @@ export function InterviewPrepPage() {
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchTasks() }} />
 
   return (
-    <div className="px-4 md:px-6 pt-4 pb-6 flex flex-col gap-5">
+    <div className={isMobile ? 'px-4 pt-4 pb-24 flex flex-col gap-4' : 'px-4 md:px-6 pt-4 pb-6 flex flex-col gap-5'}>
 
       {/* ── Mock Interview hero ─────────────────────────────────────── */}
-      <div className="bg-white rounded-2xl border border-[#CBCCC9] overflow-hidden">
+      <div className={`overflow-hidden border ${isMobile ? 'rounded-[30px] border-[#d8d9d6] shadow-[0_18px_34px_rgba(15,23,42,0.08)]' : 'rounded-2xl border-[#CBCCC9]'}`}>
         <div className="h-1.5 bg-gradient-to-r from-[#6366F1] via-[#8b5cf6] to-[#a78bfa]" />
-        <div className="p-5">
+        <div className={isMobile ? 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.9))] p-5' : 'p-5'}>
           <div className="flex items-start justify-between gap-4 flex-wrap">
             <div className="flex-1 min-w-0">
               <div className="flex items-center gap-2 mb-1">
@@ -95,12 +99,12 @@ export function InterviewPrepPage() {
                 <h2 className="text-base font-bold text-[#111111]">Mock Interview</h2>
               </div>
               <p className="text-sm text-[#666666] mb-4">
-                Пройди симуляцию полного технического собеседования с AI‑оценкой на каждом этапе.
+                Выбери канонический mock-сценарий и пройди его как цельный loop с AI-оценкой по каждому раунду.
               </p>
               {/* Stages */}
-              <div className="flex flex-wrap gap-2 mb-4">
+              <div className={`mb-4 gap-2 ${isMobile ? 'flex overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden' : 'flex flex-wrap'}`}>
                 {MOCK_STAGES.map((s, i) => (
-                  <span key={i} className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${s.color}`}>
+                  <span key={i} className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${s.color} ${isMobile ? 'whitespace-nowrap' : ''}`}>
                     {s.icon} {s.label}
                   </span>
                 ))}
@@ -123,27 +127,19 @@ export function InterviewPrepPage() {
             </div>
           </div>
 
-          {/* Company selector + start */}
-          <div className="flex items-center gap-3 flex-wrap">
-            {companies.length > 0 && (
-              <div className="flex gap-2 flex-wrap">
-                <button
-                  onClick={() => setSelectedCompany('')}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
-                    selectedCompany === '' ? 'bg-[#6366F1] text-white border-[#6366F1]' : 'bg-white border-[#CBCCC9] text-[#666666] hover:border-[#6366F1]/50'
-                  }`}
-                >
-                  Общее
-                </button>
-                {companies.map(c => (
+          {/* Program selector + start */}
+          <div className={`gap-3 ${isMobile ? 'flex flex-col items-stretch' : 'flex items-center flex-wrap'}`}>
+            {blueprints.length > 0 && (
+              <div className={`gap-2 ${isMobile ? 'flex overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden' : 'flex flex-wrap'}`}>
+                {blueprints.map(bp => (
                   <button
-                    key={c}
-                    onClick={() => setSelectedCompany(prev => prev === c ? '' : c)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium rounded-full border transition-colors ${
-                      selectedCompany === c ? 'bg-[#6366F1] text-white border-[#6366F1]' : 'bg-white border-[#CBCCC9] text-[#666666] hover:border-[#6366F1]/50'
-                    }`}
+                    key={bp.slug}
+                    onClick={() => setSelectedBlueprintSlug(bp.slug)}
+                    className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
+                      selectedBlueprintSlug === bp.slug ? 'bg-[#6366F1] text-white border-[#6366F1]' : 'bg-white border-[#CBCCC9] text-[#666666] hover:border-[#6366F1]/50'
+                    } ${isMobile ? 'whitespace-nowrap' : ''}`}
                   >
-                    <Building2 className="w-3 h-3" /> {c}
+                    <Building2 className="w-3 h-3" /> {bp.title}
                   </button>
                 ))}
               </div>
@@ -153,7 +149,7 @@ export function InterviewPrepPage() {
               size="sm"
               loading={mockLoading}
               onClick={() => handleStartMock()}
-              className="flex-shrink-0"
+              className={isMobile ? 'w-full justify-center rounded-2xl' : 'flex-shrink-0'}
             >
               <Play className="w-3.5 h-3.5" />
               Начать Mock Interview
@@ -167,8 +163,8 @@ export function InterviewPrepPage() {
         <h3 className="text-sm font-semibold text-[#111111] mb-3">Задачи для практики</h3>
 
         {/* Filters */}
-        <div className="flex items-center gap-2 mb-3 flex-wrap">
-          <div className="flex-1 min-w-[160px] relative">
+        <div className={`mb-3 gap-2 ${isMobile ? 'flex flex-col' : 'flex items-center flex-wrap'}`}>
+          <div className={`relative ${isMobile ? 'w-full' : 'flex-1 min-w-[160px]'}`}>
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
             <input
               value={search}
@@ -177,14 +173,14 @@ export function InterviewPrepPage() {
               className="w-full pl-9 pr-4 py-2 bg-white border border-[#CBCCC9] rounded-lg text-sm focus:outline-none focus:border-[#6366F1]/50"
             />
           </div>
-          <div className="flex gap-1.5 flex-wrap">
+          <div className={`gap-1.5 ${isMobile ? 'flex overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden' : 'flex flex-wrap'}`}>
             {(['', 'coding', 'algorithm', 'sql', 'system_design', 'behavioral'] as const).map(cat => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-full transition-colors ${
+                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
                   category === cat ? 'bg-[#6366F1] text-white' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
-                }`}
+                } ${isMobile ? 'whitespace-nowrap' : ''}`}
               >
                 {cat === '' ? 'Все' : PREP_TYPE_LABELS[cat] ?? cat}
               </button>
@@ -216,7 +212,7 @@ export function InterviewPrepPage() {
                         toast('Не удалось начать сессию', 'error')
                       }
                     }}
-                    className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#F2F3F0] cursor-pointer transition-colors"
+                    className={`cursor-pointer px-5 py-3.5 transition-colors hover:bg-[#F2F3F0] ${isMobile ? 'flex flex-col items-start gap-3' : 'flex items-center gap-4'}`}
                   >
                     <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center flex-shrink-0">
                       {PREP_TYPE_ICONS[task.prepType] ?? <BookOpen className="w-4 h-4 text-[#94a3b8]" />}
@@ -227,15 +223,17 @@ export function InterviewPrepPage() {
                         {task.companyTag || 'General'} · {Math.round(task.durationSeconds / 60)} мин
                       </p>
                     </div>
-                    <Badge variant={
-                      task.prepType === 'coding' ? 'indigo' :
-                      task.prepType === 'algorithm' ? 'indigo' :
-                      task.prepType === 'sql' ? 'orange' :
-                      task.prepType === 'system_design' ? 'orange' : 'success'
-                    }>
-                      {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
-                    </Badge>
-                    <ChevronRight className="w-4 h-4 text-[#CBCCC9] flex-shrink-0" />
+                    <div className={`flex items-center gap-3 ${isMobile ? 'w-full justify-between' : ''}`}>
+                      <Badge variant={
+                        task.prepType === 'coding' ? 'indigo' :
+                        task.prepType === 'algorithm' ? 'indigo' :
+                        task.prepType === 'sql' ? 'orange' :
+                        task.prepType === 'system_design' ? 'orange' : 'success'
+                      }>
+                        {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
+                      </Badge>
+                      <ChevronRight className="w-4 h-4 text-[#CBCCC9] flex-shrink-0" />
+                    </div>
                   </div>
                 ))
             }
@@ -245,7 +243,7 @@ export function InterviewPrepPage() {
 
       {/* ── Stats row ────────────────────────────────────────────────── */}
       {tasks.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+        <div className={`grid gap-3 ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-6'}`}>
           {[
             { label: 'Всего', value: tasks.length },
             { label: 'Coding', value: tasks.filter(t => t.prepType === 'coding').length },
@@ -254,7 +252,7 @@ export function InterviewPrepPage() {
             { label: 'System Design', value: tasks.filter(t => t.prepType === 'system_design').length },
             { label: 'Behavioral', value: tasks.filter(t => t.prepType === 'behavioral').length },
           ].map(s => (
-            <div key={s.label} className="bg-white rounded-xl border border-[#CBCCC9] px-4 py-3 flex items-center justify-between">
+            <div key={s.label} className={`flex items-center justify-between bg-white border px-4 py-3 ${isMobile ? 'rounded-2xl border-[#d8d9d6] shadow-[0_10px_24px_rgba(15,23,42,0.05)]' : 'rounded-xl border-[#CBCCC9]'}`}>
               <span className="text-xs text-[#666666]">{s.label}</span>
               <span className="text-base font-bold text-[#111111] font-mono">{s.value}</span>
             </div>

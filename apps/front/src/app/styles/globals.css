@@ -64,9 +64,58 @@
     scrollbar-width: none;
   }
 
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.community-map-shell .maplibregl-map,
+.community-map-shell .maplibregl-canvas-container,
+.community-map-shell .maplibregl-canvas,
+.community-map-shell .maplibregl-control-container {
+  height: 100%;
+  width: 100%;
+}
+
+.community-map-shell .maplibregl-map {
+  overflow: hidden;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.community-map-shell .maplibregl-canvas-container {
+  overflow: hidden;
+}
+
+.community-map-shell .maplibregl-canvas {
+  left: 0;
+  position: absolute;
+  top: 0;
+}
+
+.community-map-shell .maplibregl-marker {
+  left: 0;
+  position: absolute;
+  top: 0;
+  will-change: transform;
+}
+
+.community-map-shell .maplibregl-canvas-container.maplibregl-interactive {
+  cursor: grab;
+}
+
+.community-map-shell .maplibregl-canvas-container.maplibregl-interactive:active {
+  cursor: grabbing;
+}
+
+.community-map-shell .maplibregl-canvas-container.maplibregl-touch-zoom-rotate,
+.community-map-shell .maplibregl-canvas-container.maplibregl-touch-zoom-rotate .maplibregl-canvas {
+  touch-action: pan-x pan-y;
+}
+
+.community-map-shell .maplibregl-canvas-container.maplibregl-touch-drag-pan,
+.community-map-shell .maplibregl-canvas-container.maplibregl-touch-drag-pan .maplibregl-canvas {
+  touch-action: pinch-zoom;
+}
 
   .section-enter {
     animation: section-rise 0.55s cubic-bezier(0.22, 1, 0.36, 1) both;

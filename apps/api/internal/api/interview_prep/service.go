@@ -14,9 +14,10 @@ import (
 type Service interface {
 	ListTasks(ctx context.Context, user *model.User) ([]*model.InterviewPrepTask, error)
 	GetAvailableCompanies(ctx context.Context) ([]string, error)
+	ListMockBlueprints(ctx context.Context) ([]*model.InterviewMockBlueprintSummary, error)
 	StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error)
 	GetSession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepSession, error)
-	StartMockSession(ctx context.Context, user *model.User, companyTag string) (*model.InterviewPrepMockSession, error)
+	StartMockSession(ctx context.Context, user *model.User, companyTag string, programSlug string) (*model.InterviewPrepMockSession, error)
 	GetMockSession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepMockSession, error)
 	SubmitMockStage(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string, notes string) (*appinterviewprep.MockSubmitResult, error)
 	ReviewMockSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req appinterviewprep.SystemDesignReviewInput) (*appinterviewprep.MockSystemDesignReviewResult, error)

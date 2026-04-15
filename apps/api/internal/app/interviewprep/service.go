@@ -5,7 +5,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"math"
 	"strings"
 	"time"
 
@@ -87,17 +86,15 @@ type Repository interface {
 	UpdateSessionCode(ctx context.Context, sessionID uuid.UUID, solveLanguage string, code string, passed bool) error
 	AdvanceSessionQuestion(ctx context.Context, sessionID uuid.UUID, nextPosition int32) error
 	FinishSession(ctx context.Context, sessionID uuid.UUID) error
-	CreateCheckpoint(ctx context.Context, checkpoint *model.InterviewPrepCheckpoint) error
-	GetCheckpointBySessionID(ctx context.Context, sessionID uuid.UUID) (*model.InterviewPrepCheckpoint, error)
-	GetActiveCheckpointByUserAndTask(ctx context.Context, userID, taskID uuid.UUID) (*model.InterviewPrepCheckpoint, error)
-	UpdateCheckpointState(ctx context.Context, checkpointID uuid.UUID, status model.InterviewPrepCheckpointStatus, attemptsUsed int32, score int32, finishedAt *time.Time) error
 
 	UpsertQuestionResult(ctx context.Context, result *model.InterviewPrepQuestionResult) error
 	ListQuestionResults(ctx context.Context, sessionID uuid.UUID) ([]*model.InterviewPrepQuestionResult, error)
 	GetCodeTask(ctx context.Context, taskID uuid.UUID) (*model.CodeTask, error)
-	ListMockQuestionPools(ctx context.Context) ([]*model.InterviewPrepMockQuestionPoolItem, error)
-	ListMockCompanyPresets(ctx context.Context) ([]*model.InterviewPrepMockCompanyPreset, error)
 	GetAvailableCompanies(ctx context.Context) ([]string, error)
+	ListMockBlueprints(ctx context.Context) ([]*model.InterviewMockBlueprintSummary, error)
+	ResolveMockBlueprint(ctx context.Context, companyTag string, programSlug string) (*model.InterviewMockBlueprint, error)
+	ListBlueprintRounds(ctx context.Context, blueprintID uuid.UUID) ([]*model.InterviewBlueprintRound, error)
+	SelectTaskForBlueprintRound(ctx context.Context, round *model.InterviewBlueprintRound) (*model.InterviewPrepTask, *uuid.UUID, error)
 
 	CreateMockSession(ctx context.Context, session *model.InterviewPrepMockSession, stages []*model.InterviewPrepMockStage, questionResults []*model.InterviewPrepMockQuestionResult) error
 	GetMockSession(ctx context.Context, sessionID uuid.UUID) (*model.InterviewPrepMockSession, error)
@@ -159,92 +156,22 @@ func (s *Service) GetAvailableCompanies(ctx context.Context) ([]string, error) {
 	return s.repo.GetAvailableCompanies(ctx)
 }
 
+func (s *Service) ListMockBlueprints(ctx context.Context) ([]*model.InterviewMockBlueprintSummary, error) {
+	return s.repo.ListMockBlueprints(ctx)
+}
+
 func (s *Service) StartCheckpointSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, *model.InterviewPrepCheckpoint, error) {
-	task, err := s.repo.GetTask(ctx, taskID)
-	if err != nil {
-		return nil, nil, err
-	}
-	if task == nil || !task.IsActive {
-		return nil, nil, ErrTaskNotFound
-	}
-	if !task.IsExecutable || task.CodeTaskID == nil {
-		return nil, nil, ErrCheckpointUnsupported
-	}
-
-	skillKey := skillKeyForCheckpointTask(task)
-	if skillKey == "" {
-		return nil, nil, ErrCheckpointUnsupported
-	}
-
-	existingCheckpoint, err := s.repo.GetActiveCheckpointByUserAndTask(ctx, user.ID, taskID)
-	if err != nil {
-		return nil, nil, err
-	}
-	if existingCheckpoint != nil {
-		session, err := s.GetSession(ctx, user, existingCheckpoint.SessionID)
-		if err != nil {
-			return nil, nil, err
-		}
-		checkpoint, err := s.GetCheckpointBySession(ctx, user, existingCheckpoint.SessionID)
-		if err != nil {
-			return nil, nil, err
-		}
-		return session, checkpoint, nil
-	}
-
-	nowTime := time.Now().UTC()
-	session := &model.InterviewPrepSession{
-		ID:                      uuid.New(),
-		UserID:                  user.ID,
-		TaskID:                  taskID,
-		Status:                  model.InterviewPrepSessionStatusActive,
-		CurrentQuestionPosition: 0,
-		SolveLanguage:           normalizeSolveLanguage(task.Language),
-		Code:                    task.StarterCode,
-		LastSubmissionPassed:    false,
-		StartedAt:               nowTime,
-		CreatedAt:               nowTime,
-		UpdatedAt:               nowTime,
-	}
-	if err := s.repo.CreateSession(ctx, session); err != nil {
-		return nil, nil, err
-	}
-
-	checkpoint := &model.InterviewPrepCheckpoint{
-		ID:              uuid.New(),
-		UserID:          user.ID,
-		TaskID:          taskID,
-		SessionID:       session.ID,
-		SkillKey:        skillKey,
-		Status:          model.InterviewPrepCheckpointStatusActive,
-		DurationSeconds: checkpointDurationSeconds(task),
-		AttemptsUsed:    0,
-		MaxAttempts:     2,
-		Score:           0,
-		StartedAt:       nowTime,
-		CreatedAt:       nowTime,
-		UpdatedAt:       nowTime,
-	}
-	if err := s.repo.CreateCheckpoint(ctx, checkpoint); err != nil {
-		return nil, nil, err
-	}
-
-	fullSession, err := s.GetSession(ctx, user, session.ID)
-	if err != nil {
-		return nil, nil, err
-	}
-	return fullSession, checkpoint, nil
+	_ = ctx
+	_ = user
+	_ = taskID
+	return nil, nil, ErrCheckpointUnsupported
 }
 
 func (s *Service) GetCheckpointBySession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepCheckpoint, error) {
-	checkpoint, err := s.repo.GetCheckpointBySessionID(ctx, sessionID)
-	if err != nil {
-		return nil, err
-	}
-	if checkpoint == nil || checkpoint.UserID != user.ID {
-		return nil, ErrCheckpointNotFound
-	}
-	return s.resolveCheckpointState(ctx, checkpoint)
+	_ = ctx
+	_ = user
+	_ = sessionID
+	return nil, ErrCheckpointUnsupported
 }
 
 func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error) {
@@ -413,34 +340,6 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 		return nil, ErrTaskNotFound
 	}
 
-	checkpoint, err := s.repo.GetCheckpointBySessionID(ctx, session.ID)
-	if err != nil {
-		return nil, err
-	}
-	if checkpoint != nil {
-		if checkpoint.UserID != user.ID {
-			return nil, ErrCheckpointNotFound
-		}
-		checkpoint, err = s.resolveCheckpointState(ctx, checkpoint)
-		if err != nil {
-			return nil, err
-		}
-		switch checkpoint.Status {
-		case model.InterviewPrepCheckpointStatusExpired:
-			if err := s.repo.FinishSession(ctx, session.ID); err != nil {
-				return nil, err
-			}
-			return nil, ErrCheckpointExpired
-		case model.InterviewPrepCheckpointStatusFailed:
-			if err := s.repo.FinishSession(ctx, session.ID); err != nil {
-				return nil, err
-			}
-			return nil, ErrCheckpointAttemptsExceeded
-		case model.InterviewPrepCheckpointStatusPassed:
-			return nil, ErrSessionFinished
-		}
-	}
-
 	solveLanguage = normalizeSolveLanguage(firstNonEmptyLanguage(solveLanguage, session.SolveLanguage, session.Task.Language))
 	if !isSupportedInterviewPrepLanguage(solveLanguage) {
 		return nil, ErrUnsupportedLanguage
@@ -478,33 +377,7 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 			return nil, err
 		}
 
-		if checkpoint != nil && checkpoint.Status == model.InterviewPrepCheckpointStatusActive {
-			attemptsUsed := checkpoint.AttemptsUsed + 1
-			if judgeResult.Passed {
-				finishedAt := time.Now().UTC()
-				score := computeCheckpointScore(&model.InterviewPrepCheckpoint{
-					StartedAt:       checkpoint.StartedAt,
-					DurationSeconds: checkpoint.DurationSeconds,
-					AttemptsUsed:    attemptsUsed,
-				}, finishedAt)
-				if err := s.repo.UpdateCheckpointState(ctx, checkpoint.ID, model.InterviewPrepCheckpointStatusPassed, attemptsUsed, score, &finishedAt); err != nil {
-					return nil, err
-				}
-				if err := s.repo.FinishSession(ctx, session.ID); err != nil {
-					return nil, err
-				}
-			} else if attemptsUsed >= checkpoint.MaxAttempts {
-				finishedAt := time.Now().UTC()
-				if err := s.repo.UpdateCheckpointState(ctx, checkpoint.ID, model.InterviewPrepCheckpointStatusFailed, attemptsUsed, 0, &finishedAt); err != nil {
-					return nil, err
-				}
-				if err := s.repo.FinishSession(ctx, session.ID); err != nil {
-					return nil, err
-				}
-			} else if err := s.repo.UpdateCheckpointState(ctx, checkpoint.ID, model.InterviewPrepCheckpointStatusActive, attemptsUsed, 0, nil); err != nil {
-				return nil, err
-			}
-		} else if judgeResult.Passed && session.CurrentQuestionPosition == 0 {
+		if judgeResult.Passed && session.CurrentQuestionPosition == 0 {
 			nextQuestion, err := s.repo.GetQuestionByTaskAndPosition(ctx, session.TaskID, 1)
 			if err != nil {
 				return nil, err
@@ -594,11 +467,6 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 	if session.Status == model.InterviewPrepSessionStatusFinished {
 		return nil, ErrSessionFinished
 	}
-	if checkpoint, err := s.repo.GetCheckpointBySessionID(ctx, session.ID); err == nil && checkpoint != nil {
-		return nil, ErrQuestionLocked
-	} else if err != nil {
-		return nil, err
-	}
 
 	if session.CurrentQuestion == nil {
 		return nil, ErrQuestionLocked
@@ -634,6 +502,9 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 		ID:             uuid.New(),
 		SessionID:      session.ID,
 		QuestionID:     questionID,
+		Position:       answeredQuestion.Position,
+		PromptSnapshot: answeredQuestion.Prompt,
+		AnswerSnapshot: answeredQuestion.Answer,
 		SelfAssessment: selfAssessment,
 		AnsweredAt:     nowTime,
 	}
@@ -696,77 +567,6 @@ func normalizeReviewImageType(contentType string, fileName string) (string, erro
 	default:
 		return "", fmt.Errorf("%w", ErrInvalidReviewImage)
 	}
-}
-
-func checkpointDurationSeconds(task *model.InterviewPrepTask) int32 {
-	if task == nil {
-		return 900
-	}
-	if task.DurationSeconds <= 0 {
-		return 900
-	}
-	if task.DurationSeconds < 300 {
-		return task.DurationSeconds
-	}
-	if task.DurationSeconds > 900 {
-		return 900
-	}
-	return task.DurationSeconds
-}
-
-func skillKeyForCheckpointTask(task *model.InterviewPrepTask) string {
-	if task == nil {
-		return ""
-	}
-	switch task.PrepType {
-	case model.InterviewPrepTypeAlgorithm:
-		return model.InterviewPrepMockStageKindSlices.String()
-	case model.InterviewPrepTypeCoding:
-		return model.InterviewPrepMockStageKindConcurrency.String()
-	case model.InterviewPrepTypeSQL:
-		return model.InterviewPrepMockStageKindSQL.String()
-	default:
-		return ""
-	}
-}
-
-func (s *Service) resolveCheckpointState(ctx context.Context, checkpoint *model.InterviewPrepCheckpoint) (*model.InterviewPrepCheckpoint, error) {
-	if checkpoint == nil {
-		return nil, nil
-	}
-	if checkpoint.Status != model.InterviewPrepCheckpointStatusActive {
-		return checkpoint, nil
-	}
-	if time.Now().UTC().After(checkpoint.StartedAt.Add(time.Duration(checkpoint.DurationSeconds) * time.Second)) {
-		finishedAt := time.Now().UTC()
-		if err := s.repo.UpdateCheckpointState(ctx, checkpoint.ID, model.InterviewPrepCheckpointStatusExpired, checkpoint.AttemptsUsed, checkpoint.Score, &finishedAt); err != nil {
-			return nil, err
-		}
-		if err := s.repo.FinishSession(ctx, checkpoint.SessionID); err != nil {
-			return nil, err
-		}
-		checkpoint.Status = model.InterviewPrepCheckpointStatusExpired
-		checkpoint.FinishedAt = &finishedAt
-		checkpoint.UpdatedAt = finishedAt
-	}
-	return checkpoint, nil
-}
-
-func computeCheckpointScore(checkpoint *model.InterviewPrepCheckpoint, finishedAt time.Time) int32 {
-	if checkpoint == nil || checkpoint.DurationSeconds <= 0 {
-		return 100
-	}
-	elapsed := finishedAt.Sub(checkpoint.StartedAt).Seconds()
-	remainingRatio := 1 - math.Min(1, math.Max(0, elapsed/float64(checkpoint.DurationSeconds)))
-	attemptPenalty := math.Max(0, float64(checkpoint.AttemptsUsed)*8)
-	score := 72 + remainingRatio*28 - attemptPenalty
-	if score < 60 {
-		score = 60
-	}
-	if score > 100 {
-		score = 100
-	}
-	return int32(math.Round(score))
 }
 
 func maxImageBytesOrDefault(v int64) int64 {

@@ -17,6 +17,18 @@ export interface InterviewPrepTask {
   updatedAt: string
 }
 
+export interface MockBlueprint {
+  id: string
+  trackSlug: string
+  slug: string
+  title: string
+  description: string
+  level: string
+  totalDurationSeconds: number
+  publicAliasSlugs: string[]
+  publicAliasNames: string[]
+}
+
 type BackendTask = {
   id: string; slug?: string; title?: string; statement?: string; prepType?: string; language?: string
   companyTag?: string; supportedLanguages?: string[]; isExecutable?: boolean; durationSeconds?: number
@@ -92,6 +104,25 @@ function normalizeSession(s: any): any {
   return s
 }
 
+function normalizeMockStage(stage: any): any {
+  if (!stage) return stage
+  if (stage.task) {
+    stage.task = normalizeTask(stage.task)
+  }
+  return stage
+}
+
+function normalizeMockSession(session: any): any {
+  if (!session) return session
+  if (Array.isArray(session.stages)) {
+    session.stages = session.stages.map(normalizeMockStage)
+  }
+  if (session.currentStage) {
+    session.currentStage = normalizeMockStage(session.currentStage)
+  }
+  return session
+}
+
 export interface SystemDesignPayload {
   image?: Uint8Array | string
   imageName?: string
@@ -108,6 +139,10 @@ export const interviewPrepApi = {
   listTasks: async (): Promise<InterviewPrepTask[]> => {
     const r = await apiClient.get<{ tasks?: BackendTask[] }>('/api/v1/interview-prep/tasks')
     return (r.data.tasks ?? []).map(normalizeTask)
+  },
+  listMockBlueprints: async (): Promise<MockBlueprint[]> => {
+    const r = await apiClient.get<{ blueprints?: MockBlueprint[] }>('/api/v1/interview-prep/mock-blueprints')
+    return r.data.blueprints ?? []
   },
   startSession: async (taskId: string) => {
     const r = await apiClient.post<{ session?: unknown }>('/api/v1/interview-prep/sessions', { taskId })
@@ -135,27 +170,35 @@ export const interviewPrepApi = {
     const r = await apiClient.get<{ companies?: string[] }>('/api/v1/interview-prep/companies')
     return r.data.companies ?? []
   },
-  startMockSession: async (companyTag: string) => {
-    const r = await apiClient.post<{ session?: unknown }>('/api/v1/interview-prep/mock-sessions', { companyTag })
-    return r.data.session
+  startMockSession: async (params: { companyTag?: string; programSlug?: string }) => {
+    const r = await apiClient.post<{ session?: unknown }>('/api/v1/interview-prep/mock-sessions', {
+      companyTag: params.companyTag ?? '',
+      programSlug: params.programSlug ?? '',
+    })
+    return normalizeMockSession(r.data.session)
   },
   getMockSession: async (sessionId: string) => {
     const r = await apiClient.get<{ session?: unknown }>(`/api/v1/interview-prep/mock-sessions/${sessionId}`)
-    return r.data.session
+    return normalizeMockSession(r.data.session)
   },
   submitMockSession: async (sessionId: string, code: string, language: string, notes?: string) => {
     const r = await apiClient.post<{ result?: unknown; review?: unknown; session?: unknown }>(
       `/api/v1/interview-prep/mock-sessions/${sessionId}/submit`,
       { code, language: toLanguageEnum(language), notes },
     )
-    return r.data
+    const raw = r.data as any
+    return {
+      ...raw,
+      session: normalizeMockSession(raw?.session),
+      result: raw?.result ? { ...raw.result, session: normalizeMockSession(raw.result?.session) } : undefined,
+    }
   },
   answerMockQuestion: async (sessionId: string, answer: string) => {
     const r = await apiClient.post<{ review?: unknown; session?: unknown }>(
       `/api/v1/interview-prep/mock-sessions/${sessionId}/questions/answer`,
       { answer },
     )
-    return r.data
+    return { ...r.data, session: normalizeMockSession(r.data.session) }
   },
   submitSystemDesignReview: async (sessionId: string, design: SystemDesignPayload) => {
     const r = await apiClient.post<{ review?: unknown }>(
@@ -169,6 +212,6 @@ export const interviewPrepApi = {
       `/api/v1/interview-prep/mock-sessions/${sessionId}/system-design-review`,
       { design },
     )
-    return r.data
+    return { ...r.data, session: normalizeMockSession(r.data.session) }
   },
 }

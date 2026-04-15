@@ -155,12 +155,25 @@ func (i *Implementation) ListCompanies(ctx context.Context, req *v1.ListCompanie
 	return &v1.ListCompaniesResponse{Companies: companies}, nil
 }
 
+func (i *Implementation) ListMockBlueprints(ctx context.Context, req *v1.ListMockBlueprintsRequest) (*v1.ListMockBlueprintsResponse, error) {
+	_ = req
+	blueprints, err := i.service.ListMockBlueprints(ctx)
+	if err != nil {
+		return nil, toHTTPError(err)
+	}
+	items := make([]*v1.MockBlueprint, 0, len(blueprints))
+	for _, blueprint := range blueprints {
+		items = append(items, mapMockBlueprint(blueprint))
+	}
+	return &v1.ListMockBlueprintsResponse{Blueprints: items}, nil
+}
+
 func (i *Implementation) StartMockSession(ctx context.Context, req *v1.StartMockSessionRequest) (*v1.MockSessionEnvelope, error) {
 	user, err := requireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	session, err := i.service.StartMockSession(ctx, user, req.CompanyTag)
+	session, err := i.service.StartMockSession(ctx, user, req.CompanyTag, req.ProgramSlug)
 	if err != nil {
 		return nil, toHTTPError(err)
 	}

@@ -110,16 +110,16 @@ ON CONFLICT (user_id) DO UPDATE SET
 
 	// 9. Interview prep sessions (dedupe + move)
 	batch.Queue(`
-DELETE FROM interview_prep_sessions src
-USING interview_prep_sessions keep
+DELETE FROM interview_practice_sessions src
+USING interview_practice_sessions keep
 WHERE src.user_id = $2
   AND keep.user_id = $1
-  AND src.task_id = keep.task_id
+  AND src.item_id = keep.item_id
   AND src.status = 'active'
   AND keep.status = 'active'
 `, canonicalUserID, secondaryUserID)
-	batch.Queue(`UPDATE interview_prep_sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
-	batch.Queue(`UPDATE interview_prep_mock_sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE interview_practice_sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
+	batch.Queue(`UPDATE interview_mock_sessions SET user_id = $1 WHERE user_id = $2`, canonicalUserID, secondaryUserID)
 
 	// 10. Delete secondary user
 	batch.Queue(`DELETE FROM users WHERE id = $1`, secondaryUserID)

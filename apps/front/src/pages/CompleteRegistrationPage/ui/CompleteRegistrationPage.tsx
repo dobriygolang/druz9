@@ -89,64 +89,67 @@ export function CompleteRegistrationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F2F3F0] flex items-center justify-center">
-      <div className="w-full max-w-[420px] mx-4">
-        <div className="bg-white rounded-2xl border border-[#CBCCC9] p-8">
-          <div className="text-center mb-6">
-            <div className="w-12 h-12 bg-[#6366F1] rounded-2xl flex items-center justify-center mx-auto mb-3">
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
-                <path d="M4 20L12 4L20 20" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
-                <path d="M7 14H17" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
-              </svg>
+    <div className="min-h-screen bg-[#F2F3F0] flex items-center justify-center px-4 py-8">
+      <div className="w-full max-w-[460px]">
+        <div className="overflow-hidden rounded-[28px] border border-[#d8d9d6] bg-white shadow-[0_16px_34px_rgba(15,23,42,0.06)]">
+          <div className="h-1.5 bg-gradient-to-r from-[#6366F1] via-[#8b5cf6] to-[#a78bfa]" />
+          <div className="p-6 sm:p-8">
+            <div className="mb-6 text-center">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#6366F1]">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                  <path d="M4 20L12 4L20 20" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M7 14H17" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
+                </svg>
+              </div>
+              <h2 className="text-xl font-bold text-[#111111]">Завершите регистрацию</h2>
+              <p className="mt-1 text-sm text-[#666666]">Укажите ваше местоположение, чтобы открыть локальное сообщество и карту.</p>
             </div>
-            <h2 className="text-xl font-bold text-[#111111]">Завершите регистрацию</h2>
-            <p className="text-sm text-[#666666] mt-1">Укажите ваше местоположение</p>
-          </div>
-          {error && (
-            <div className="mb-4 p-3 bg-[#fef2f2] border border-[#fca5a5] rounded-lg text-sm text-[#dc2626]">{error}</div>
-          )}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-            <div ref={wrapperRef} className="relative flex flex-col gap-1.5">
-              <label htmlFor="city-input" className="text-xs font-500 text-[#475569]">
-                Город
-              </label>
-              <input
-                id="city-input"
-                type="text"
-                value={query}
-                onChange={e => handleInputChange(e.target.value)}
-                onFocus={() => { if (suggestions.length > 0 && !selected) setShowDropdown(true) }}
-                placeholder="Начните вводить город..."
-                autoComplete="off"
-                className={cn(
-                  'w-full px-3 py-2 text-sm rounded-lg transition-colors',
-                  'bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] placeholder-[#94a3b8]',
-                  'focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20 focus:border-[#6366f1]',
+            {error && (
+              <div className="mb-4 rounded-lg border border-[#fca5a5] bg-[#fef2f2] p-3 text-sm text-[#dc2626]">{error}</div>
+            )}
+            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <div ref={wrapperRef} className="relative flex flex-col gap-1.5">
+                <label htmlFor="city-input" className="text-xs font-500 text-[#475569]">
+                  Город
+                </label>
+                <input
+                  id="city-input"
+                  type="text"
+                  value={query}
+                  onChange={e => handleInputChange(e.target.value)}
+                  onFocus={() => { if (suggestions.length > 0 && !selected) setShowDropdown(true) }}
+                  placeholder="Начните вводить город..."
+                  autoComplete="off"
+                  className={cn(
+                    'w-full px-3 py-3 text-sm rounded-xl transition-colors',
+                    'bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] placeholder-[#94a3b8]',
+                    'focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20 focus:border-[#6366f1]',
+                  )}
+                />
+                {showDropdown && (
+                  <ul className="absolute top-full left-0 right-0 mt-1 max-h-48 overflow-y-auto rounded-xl border border-[#e2e8f0] bg-white shadow-lg z-50">
+                    {suggestions.map((s, i) => (
+                      <li
+                        key={i}
+                        onClick={() => handleSelect(s)}
+                        className="cursor-pointer px-3 py-2 text-sm text-[#0f172a] hover:bg-[#f1f5f9] first:rounded-t-xl last:rounded-b-xl"
+                      >
+                        {s.placeLabel}
+                      </li>
+                    ))}
+                  </ul>
                 )}
-              />
-              {showDropdown && (
-                <ul className="absolute top-full left-0 right-0 mt-1 bg-white border border-[#e2e8f0] rounded-lg shadow-lg max-h-48 overflow-y-auto z-50">
-                  {suggestions.map((s, i) => (
-                    <li
-                      key={i}
-                      onClick={() => handleSelect(s)}
-                      className="px-3 py-2 text-sm text-[#0f172a] hover:bg-[#f1f5f9] cursor-pointer first:rounded-t-lg last:rounded-b-lg"
-                    >
-                      {s.placeLabel}
-                    </li>
-                  ))}
-                </ul>
-              )}
-              {selected && (
-                <p className="text-xs text-[#6366f1]">
-                  {[selected.city, selected.region, selected.country].filter(Boolean).join(', ')}
-                </p>
-              )}
-            </div>
-            <Button type="submit" variant="orange" loading={loading} className="w-full justify-center mt-2">
-              Продолжить
-            </Button>
-          </form>
+                {selected && (
+                  <p className="text-xs text-[#6366f1]">
+                    {[selected.city, selected.region, selected.country].filter(Boolean).join(', ')}
+                  </p>
+                )}
+              </div>
+              <Button type="submit" variant="orange" loading={loading} className="mt-2 w-full justify-center rounded-2xl">
+                Продолжить
+              </Button>
+            </form>
+          </div>
         </div>
       </div>
     </div>

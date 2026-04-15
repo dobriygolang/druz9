@@ -15,7 +15,7 @@ const (
 	InterviewPrepTypeSystemDesign InterviewPrepType = "system_design"
 	InterviewPrepTypeSQL          InterviewPrepType = "sql"
 	InterviewPrepTypeCodeReview   InterviewPrepType = "code_review"
-	InterviewPrepTypeBehavioral  InterviewPrepType = "behavioral"
+	InterviewPrepTypeBehavioral   InterviewPrepType = "behavioral"
 )
 
 func (t InterviewPrepType) String() string {
@@ -32,6 +32,25 @@ func InterviewPrepTypeFromString(v string) InterviewPrepType {
 		return InterviewPrepTypeSystemDesign
 	case "sql":
 		return InterviewPrepTypeSQL
+	case "code_review":
+		return InterviewPrepTypeCodeReview
+	case "behavioral":
+		return InterviewPrepTypeBehavioral
+	default:
+		return InterviewPrepTypeUnknown
+	}
+}
+
+func InterviewPrepTypeFromRoundType(v string) InterviewPrepType {
+	switch v {
+	case "coding_algorithmic":
+		return InterviewPrepTypeAlgorithm
+	case "coding_practical":
+		return InterviewPrepTypeCoding
+	case "sql":
+		return InterviewPrepTypeSQL
+	case "system_design":
+		return InterviewPrepTypeSystemDesign
 	case "code_review":
 		return InterviewPrepTypeCodeReview
 	case "behavioral":
@@ -114,6 +133,23 @@ func InterviewPrepMockStageKindFromString(v string) InterviewPrepMockStageKind {
 		return InterviewPrepMockStageKindArchitecture
 	case "system_design":
 		return InterviewPrepMockStageKindSystemDesign
+	default:
+		return InterviewPrepMockStageKindUnknown
+	}
+}
+
+func InterviewPrepMockStageKindFromRoundType(v string) InterviewPrepMockStageKind {
+	switch v {
+	case "coding_algorithmic":
+		return InterviewPrepMockStageKindSlices
+	case "coding_practical":
+		return InterviewPrepMockStageKindConcurrency
+	case "sql":
+		return InterviewPrepMockStageKindSQL
+	case "system_design":
+		return InterviewPrepMockStageKindSystemDesign
+	case "behavioral", "code_review":
+		return InterviewPrepMockStageKindArchitecture
 	default:
 		return InterviewPrepMockStageKindUnknown
 	}
@@ -235,6 +271,9 @@ type InterviewPrepQuestionResult struct {
 	ID             uuid.UUID
 	SessionID      uuid.UUID
 	QuestionID     uuid.UUID
+	Position       int32
+	PromptSnapshot string
+	AnswerSnapshot string
 	SelfAssessment InterviewPrepSelfAssessment
 	AnsweredAt     time.Time
 }
@@ -297,6 +336,8 @@ type InterviewPrepMockStage struct {
 	Kind                 InterviewPrepMockStageKind
 	Status               InterviewPrepMockStageStatus
 	TaskID               uuid.UUID
+	BlueprintRoundID     *uuid.UUID
+	SourcePoolID         *uuid.UUID
 	SolveLanguage        string
 	Code                 string
 	LastSubmissionPassed bool
@@ -316,6 +357,9 @@ type InterviewPrepMockSession struct {
 	ID                uuid.UUID
 	UserID            uuid.UUID
 	CompanyTag        string
+	BlueprintSlug     string
+	BlueprintTitle    string
+	TrackSlug         string
 	Status            InterviewPrepMockSessionStatus
 	CurrentStageIndex int32
 	StartedAt         time.Time
@@ -351,4 +395,52 @@ type InterviewPrepMockCompanyPreset struct {
 	IsActive        bool
 	CreatedAt       time.Time
 	UpdatedAt       time.Time
+}
+
+type InterviewMockBlueprintSummary struct {
+	ID                   uuid.UUID
+	TrackSlug            string
+	Slug                 string
+	Title                string
+	Description          string
+	Level                string
+	TotalDurationSeconds int32
+	PublicAliasSlugs     []string
+	PublicAliasNames     []string
+}
+
+type InterviewMockBlueprint struct {
+	ID                   uuid.UUID
+	TrackID              uuid.UUID
+	TrackSlug            string
+	Slug                 string
+	Title                string
+	Description          string
+	Level                string
+	RuntimeMode          string
+	TotalDurationSeconds int32
+	IntroText            string
+	ClosingText          string
+	IsActive             bool
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
+}
+
+type InterviewBlueprintRound struct {
+	ID                              uuid.UUID
+	BlueprintID                     uuid.UUID
+	Position                        int32
+	RoundType                       string
+	Title                           string
+	SelectionMode                   string
+	FixedItemID                     *uuid.UUID
+	PoolID                          *uuid.UUID
+	DurationSeconds                 int32
+	EvaluatorMode                   string
+	MaxFollowupCount                int32
+	CandidateInstructionsOverride   string
+	InterviewerInstructionsOverride string
+	IsActive                        bool
+	CreatedAt                       time.Time
+	UpdatedAt                       time.Time
 }

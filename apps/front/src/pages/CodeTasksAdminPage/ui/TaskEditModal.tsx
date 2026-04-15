@@ -50,8 +50,8 @@ const RUNNER_MODES = [
 interface TestCase {
   id?: string
   input: string
-  expected_output: string
-  is_public: boolean
+  expectedOutput: string
+  isPublic: boolean
   weight: number
   order: number
 }
@@ -86,21 +86,21 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
   }
 
   const addTestCase = (isPublic: boolean) => {
-    const field = isPublic ? 'public_test_cases' : 'hidden_test_cases'
+    const field = isPublic ? 'publicTestCases' : 'hiddenTestCases'
     const cases = [...(task[field] ?? [])]
-    cases.push({ input: '', expected_output: '', is_public: isPublic, weight: 1, order: cases.length })
+    cases.push({ input: '', expectedOutput: '', isPublic: isPublic, weight: 1, order: cases.length })
     set(field, cases)
   }
 
   const updateTestCase = (isPublic: boolean, idx: number, patch: Partial<TestCase>) => {
-    const field = isPublic ? 'public_test_cases' : 'hidden_test_cases'
+    const field = isPublic ? 'publicTestCases' : 'hiddenTestCases'
     const cases = [...(task[field] ?? [])]
     cases[idx] = { ...cases[idx], ...patch }
     set(field, cases)
   }
 
   const removeTestCase = (isPublic: boolean, idx: number) => {
-    const field = isPublic ? 'public_test_cases' : 'hidden_test_cases'
+    const field = isPublic ? 'publicTestCases' : 'hiddenTestCases'
     const cases = [...(task[field] ?? [])]
     cases.splice(idx, 1)
     set(field, cases)
@@ -134,10 +134,10 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
             />
             <Select label="Сложность" options={DIFFICULTIES} value={task.difficulty ?? 'TASK_DIFFICULTY_MEDIUM'} onChange={v => set('difficulty', v)} />
             <Select label="Язык" options={LANGUAGES} value={task.language ?? 'PROGRAMMING_LANGUAGE_PYTHON'} onChange={v => set('language', v)} />
-            <Select label="Тип задачи" options={TASK_TYPES} value={task.task_type ?? 'TASK_TYPE_ALGORITHM'} onChange={v => set('task_type', v)} />
-            <Input label="Длительность (сек)" type="number" value={String(task.duration_seconds ?? 0)} onChange={e => set('duration_seconds', parseInt(e.target.value) || 0)} />
+            <Select label="Тип задачи" options={TASK_TYPES} value={task.taskType ?? 'TASK_TYPE_ALGORITHM'} onChange={v => set('taskType', v)} />
+            <Input label="Длительность (сек)" type="number" value={String(task.durationSeconds ?? 0)} onChange={e => set('durationSeconds', parseInt(e.target.value) || 0)} />
             <div className="flex items-end pb-1">
-              <Toggle checked={task.is_active !== false} onChange={v => set('is_active', v)} label="Активна" />
+              <Toggle checked={task.isActive !== false} onChange={v => set('isActive', v)} label="Активна" />
             </div>
           </div>
         </section>
@@ -158,8 +158,8 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
             <div>
               <label className="block text-xs font-medium text-[#475569] mb-1">Стартовый код</label>
               <textarea
-                value={task.starter_code ?? ''}
-                onChange={e => set('starter_code', e.target.value)}
+                value={task.starterCode ?? ''}
+                onChange={e => set('starterCode', e.target.value)}
                 rows={5}
                 className="w-full px-3 py-2 text-sm font-mono bg-[#F2F3F0] dark:bg-[#0f1117] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30 text-[#111111] dark:text-[#e2e8f3] resize-y"
               />
@@ -183,7 +183,7 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
           <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Тест-кейсы</h3>
           {(['public', 'hidden'] as const).map(type => {
             const isPublic = type === 'public'
-            const field = isPublic ? 'public_test_cases' : 'hidden_test_cases'
+            const field = isPublic ? 'publicTestCases' : 'hiddenTestCases'
             const cases: TestCase[] = task[field] ?? []
             return (
               <div key={type} className="mb-4">
@@ -214,8 +214,8 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
                       <div>
                         <label className="block text-[10px] text-[#94a3b8] mb-0.5">Expected</label>
                         <textarea
-                          value={tc.expected_output}
-                          onChange={e => updateTestCase(isPublic, idx, { expected_output: e.target.value })}
+                          value={tc.expectedOutput}
+                          onChange={e => updateTestCase(isPublic, idx, { expectedOutput: e.target.value })}
                           rows={2}
                           className="w-full px-2 py-1 text-xs font-mono bg-white dark:bg-[#161c2d] border border-[#CBCCC9] dark:border-[#1e3158] rounded text-[#111111] dark:text-[#e2e8f3] resize-y"
                         />
@@ -263,16 +263,16 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
           </button>
           {showAdvanced && (
             <div className="grid grid-cols-2 gap-3 mt-3">
-              <Select label="Execution Profile" options={EXEC_PROFILES} value={task.execution_profile ?? 'EXECUTION_PROFILE_PURE'} onChange={v => set('execution_profile', v)} />
-              <Select label="Runner Mode" options={RUNNER_MODES} value={task.runner_mode ?? 'RUNNER_MODE_PROGRAM'} onChange={v => set('runner_mode', v)} />
-              <Input label="Fixture Files" value={(task.fixture_files ?? []).join(', ')} onChange={e => set('fixture_files', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} placeholder="file1.txt, data.json" />
-              <Input label="Readable Paths" value={(task.readable_paths ?? []).join(', ')} onChange={e => set('readable_paths', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} />
-              <Input label="Writable Paths" value={(task.writable_paths ?? []).join(', ')} onChange={e => set('writable_paths', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} />
-              <Input label="Allowed Hosts" value={(task.allowed_hosts ?? []).join(', ')} onChange={e => set('allowed_hosts', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} />
-              <Input label="Allowed Ports" value={(task.allowed_ports ?? []).join(', ')} onChange={e => set('allowed_ports', e.target.value.split(',').map((s: string) => parseInt(s.trim())).filter((n: number) => !isNaN(n)))} />
-              <Input label="Mock Endpoints" value={(task.mock_endpoints ?? []).join(', ')} onChange={e => set('mock_endpoints', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} />
+              <Select label="Execution Profile" options={EXEC_PROFILES} value={task.executionProfile ?? 'EXECUTION_PROFILE_PURE'} onChange={v => set('executionProfile', v)} />
+              <Select label="Runner Mode" options={RUNNER_MODES} value={task.runnerMode ?? 'RUNNER_MODE_PROGRAM'} onChange={v => set('runnerMode', v)} />
+              <Input label="Fixture Files" value={(task.fixtureFiles ?? []).join(', ')} onChange={e => set('fixtureFiles', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} placeholder="file1.txt, data.json" />
+              <Input label="Readable Paths" value={(task.readablePaths ?? []).join(', ')} onChange={e => set('readablePaths', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} />
+              <Input label="Writable Paths" value={(task.writablePaths ?? []).join(', ')} onChange={e => set('writablePaths', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} />
+              <Input label="Allowed Hosts" value={(task.allowedHosts ?? []).join(', ')} onChange={e => set('allowedHosts', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} />
+              <Input label="Allowed Ports" value={(task.allowedPorts ?? []).join(', ')} onChange={e => set('allowedPorts', e.target.value.split(',').map((s: string) => parseInt(s.trim())).filter((n: number) => !isNaN(n)))} />
+              <Input label="Mock Endpoints" value={(task.mockEndpoints ?? []).join(', ')} onChange={e => set('mockEndpoints', e.target.value.split(',').map((s: string) => s.trim()).filter(Boolean))} />
               <div className="flex items-end pb-1">
-                <Toggle checked={task.writable_temp_dir ?? false} onChange={v => set('writable_temp_dir', v)} label="Writable Temp Dir" />
+                <Toggle checked={task.writableTempDir ?? false} onChange={v => set('writableTempDir', v)} label="Writable Temp Dir" />
               </div>
             </div>
           )}

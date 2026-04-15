@@ -1,59 +1,50 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
 
+function getNodeModulePackageName(id: string) {
+  const [, modulePath = ''] = id.split('node_modules/')
+  const parts = modulePath.split('/')
+
+  if (!parts[0]) return null
+  if (parts[0].startsWith('@')) {
+    return `${parts[0]}/${parts[1]}`
+  }
+
+  return parts[0]
+}
+
 function manualChunks(id: string) {
   if (!id.includes('node_modules')) {
     return undefined
   }
 
-  if (
-    id.includes('maplibre-gl') ||
-    id.includes('react-map-gl') ||
-    id.includes('@vis.gl/react-maplibre') ||
-    id.includes('@deck.gl/')
-  ) {
-    return 'map-stack'
-  }
+  const pkg = getNodeModulePackageName(id)
 
-  if (
-    id.includes('@monaco-editor/') ||
-    id.includes('monaco-editor') ||
-    id.includes('yjs') ||
-    id.includes('y-monaco') ||
-    id.includes('y-protocols') ||
-    id.includes('lib0')
-  ) {
-    return 'editor-stack'
-  }
+  if (id.includes('/@deck.gl/')) return 'deck-gl'
 
-  if (id.includes('lucide-react')) {
-    return 'icons'
-  }
+  if (pkg === 'monaco-editor') return 'monaco-core'
+  if (pkg === '@monaco-editor/react' || pkg === '@monaco-editor/loader') return 'monaco-runtime'
+  if (pkg === 'yjs' || pkg === 'y-monaco' || pkg === 'y-protocols' || pkg === 'lib0') return 'editor-collab'
 
-  if (id.includes('axios')) {
-    return 'network-vendor'
-  }
+  if (pkg === 'lucide-react') return 'icons'
 
-  if (
-    id.includes('livekit-client') ||
-    id.includes('@livekit/')
-  ) {
+  if (pkg === 'axios') return 'network-vendor'
+
+  if (pkg === 'livekit-client' || pkg === '@livekit/client' || pkg === '@livekit/components-core' || pkg === '@livekit/components-react') {
     return 'rtc-stack'
   }
 
   if (
-    id.includes('react-dom') ||
-    id.includes('react-router-dom') ||
-    id.includes('scheduler')
+    pkg === 'react' ||
+    pkg === 'react-dom' ||
+    pkg === 'react-router' ||
+    pkg === 'react-router-dom' ||
+    pkg === 'scheduler'
   ) {
     return 'react-runtime'
   }
 
-  if (
-    id.includes('react-image-crop')
-  ) {
-    return 'app-vendor'
-  }
+  if (pkg === 'react-image-crop') return 'app-vendor'
 
   return 'vendor'
 }
