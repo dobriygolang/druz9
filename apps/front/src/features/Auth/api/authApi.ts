@@ -113,7 +113,22 @@ export const authApi = {
   getProfileProgress: async (userId: string): Promise<ProfileProgress> => {
     const r = await apiClient.get<{ progress?: ProfileProgress }>(`/api/v1/profile/${userId}/progress`)
     return r.data.progress ?? {
-      overview: { practiceSessions: 0, practicePassedSessions: 0, practiceActiveDays: 0, completedMockSessions: 0, completedMockStages: 0, answeredQuestions: 0, averageStageScore: 0, averageQuestionScore: 0, currentStreakDays: 0 },
+      overview: {
+        practiceSessions: 0,
+        practicePassedSessions: 0,
+        practiceActiveDays: 0,
+        completedMockSessions: 0,
+        completedMockStages: 0,
+        answeredQuestions: 0,
+        averageStageScore: 0,
+        averageQuestionScore: 0,
+        currentStreakDays: 0,
+        level: 0,
+        levelProgress: 0,
+        totalXp: 0,
+        longestStreakDays: 0,
+        activityPercentile: 0,
+      },
       competencies: [], strongest: [], weakest: [], recommendations: [], checkpoints: [], companies: [],
     }
   },

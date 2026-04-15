@@ -1,20 +1,11 @@
 import { MapPin, Calendar, Briefcase, Edit3, Share2, Trophy, Flame, Sparkles, TrendingUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { i18n } from '@/shared/i18n'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import type { User, ProfileProgress } from '@/entities/User/model/types'
 import type { ArenaStats } from '../hooks/useProfileData'
 import { computeLeague } from '../lib/computeLevel'
-
-function formatJoinDate(iso: string) {
-  try {
-    return new Date(iso).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'ru-RU', { month: 'long', year: 'numeric' })
-  } catch {
-    return ''
-  }
-}
 
 function daysSince(iso: string): number {
   try {
