@@ -68,7 +68,7 @@ export function MapPage() {
     setError(null)
     geoApi.getCommunity()
       .then(setPoints)
-      .catch(() => setError('Failed to load data'))
+      .catch(() => setError(t('common.loadFailed')))
   }, [])
 
   useEffect(() => {
@@ -109,7 +109,7 @@ export function MapPage() {
 
         <div className="pointer-events-none absolute inset-x-0 top-0 z-10 p-4">
           <div className="pointer-events-auto rounded-[24px] border border-white/80 bg-white/88 p-3 shadow-[0_14px_30px_rgba(15,23,42,0.12)] backdrop-blur">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6366F1]">Community map</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6366F1]">{t('map.eyebrow')}</p>
             <div className="relative mt-3">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
               <input

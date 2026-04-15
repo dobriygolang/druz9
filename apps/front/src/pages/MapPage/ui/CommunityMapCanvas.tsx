@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import 'maplibre-gl/dist/maplibre-gl.css'
 import type maplibregl from 'maplibre-gl'
 import type { CommunityPoint } from '@/features/Geo/api/geoApi'
@@ -94,6 +95,7 @@ export function CommunityMapCanvas({
   selectedPointId,
   viewState,
 }: Props) {
+  const { t } = useTranslation()
   const containerRef = useRef<HTMLDivElement | null>(null)
   const mapRef = useRef<maplibregl.Map | null>(null)
   const markersRef = useRef<maplibregl.Marker[]>([])
@@ -150,7 +152,7 @@ export function CommunityMapCanvas({
       })
       .catch(() => {
         if (!cancelled) {
-          setLoadError('Failed to load the map')
+          setLoadError(t('common.loadFailed'))
         }
       })
 
@@ -227,7 +229,7 @@ export function CommunityMapCanvas({
           <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#f8fafc]/88 backdrop-blur">
             <div className="rounded-2xl border border-[#d8d9d6] bg-white px-5 py-4 text-center shadow-lg">
               <p className="text-sm font-semibold text-[#111111]">{loadError}</p>
-              <p className="mt-1 text-xs text-[#667085]">Check your network and try again.</p>
+              <p className="mt-1 text-xs text-[#667085]">{t('error.checkConnection')}</p>
             </div>
           </div>
         )}

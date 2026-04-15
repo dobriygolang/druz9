@@ -11,7 +11,9 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { useAntiCheat } from '@/features/CodeRoom/hooks/useAntiCheat'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
-import { ReviewCard, useSolutionReview } from '@/features/SolutionReview'
+import { ReviewCard } from '@/features/SolutionReview/ui/ReviewCard'
+import { useSolutionReview } from '@/features/SolutionReview/hooks/useSolutionReview'
+import { useTranslation } from 'react-i18next'
 import type * as Monaco from 'monaco-editor'
 
 function formatDuration(seconds: number) {
@@ -36,6 +38,7 @@ function difficultyLabel(difficulty?: number | string) {
 }
 
 export function ArenaMatchPage() {
+  const { t } = useTranslation()
   const { matchId } = useParams<{ matchId: string }>()
   const navigate = useNavigate()
   const { user } = useAuth()
@@ -79,7 +82,7 @@ export function ArenaMatchPage() {
   const ws = useArenaWs({
     matchId,
     userId: user?.id,
-    displayName: user?.firstName ?? 'Player',
+    displayName: user?.firstName ?? t('arena.match.player'),
     enabled: !!matchId,
   })
 
@@ -211,7 +214,7 @@ export function ArenaMatchPage() {
           <div className="flex h-9 flex-shrink-0 items-center justify-center gap-2 border-b border-[#fecaca] bg-[#fef2f2] px-3">
             <ShieldAlert className="w-3.5 h-3.5 text-[#dc2626]" />
             <span className="text-center text-[11px] font-medium text-[#dc2626]">
-              Warning: suspicious activity detected
+              {t('arena.match.warning')}
             </span>
           </div>
         )}
@@ -224,7 +227,7 @@ export function ArenaMatchPage() {
                   <Flame className="w-4.5 h-4.5 text-[#f59e0b]" />
                 </div>
                 <div className="min-w-0">
-                  <p className="truncate text-sm font-bold text-white">Arena Duel</p>
+                  <p className="truncate text-sm font-bold text-white">{t('arena.match.title')}</p>
                   <p className="mt-0.5 truncate text-xs text-[#94a3b8]">
                     {taskTitle} · {levelLabel}
                   </p>
@@ -240,29 +243,29 @@ export function ArenaMatchPage() {
                 )}
                 {result && (
                   <Badge variant={result.isCorrect ? 'success' : 'danger'} dot>
-                    {result.isCorrect ? 'Accepted' : 'Wrong'}
+                    {result.isCorrect ? t('arena.match.accepted') : t('arena.match.wrong')}
                   </Badge>
                 )}
                 {ws.matchState?.winnerId && (
                   <Badge variant={ws.matchState.winnerId === user?.id ? 'success' : 'danger'}>
-                    {ws.matchState.winnerId === user?.id ? 'Victory' : 'Defeat'}
+                    {ws.matchState.winnerId === user?.id ? t('arena.match.victory') : t('arena.match.defeat')}
                   </Badge>
                 )}
-                <Badge variant="danger" dot className="bg-[#fef2f2]">LIVE</Badge>
+                <Badge variant="danger" dot className="bg-[#fef2f2]">{t('arena.match.live')}</Badge>
               </div>
             </div>
             <div className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[11px] font-medium ${ws.connected ? 'bg-[#052e16] text-[#86efac]' : 'bg-[#450a0a] text-[#fca5a5]'}`}>
               {ws.connected ? <Wifi className="w-3 h-3" /> : <WifiOff className="w-3 h-3" />}
-              {ws.connected ? 'Live' : 'Offline'}
+              {ws.connected ? t('arena.match.live') : t('users.status.offline')}
             </div>
           </div>
 
           <div className="mt-4 grid grid-cols-2 gap-2">
             <Button variant="dark" size="sm" onClick={handleForfeit} className="justify-center rounded-2xl">
-              <Flag className="w-3.5 h-3.5 text-[#94a3b8]" /> Forfeit
+              <Flag className="w-3.5 h-3.5 text-[#94a3b8]" /> {t('arena.match.forfeit')}
             </Button>
             <Button variant="orange" size="sm" onClick={handleSubmit} loading={submitting} disabled={editingLocked || submitting} className="justify-center rounded-2xl">
-              <Send className="w-3.5 h-3.5" /> Submit
+              <Send className="w-3.5 h-3.5" /> {t('arena.match.submit')}
             </Button>
           </div>
         </header>
@@ -270,24 +273,24 @@ export function ArenaMatchPage() {
         <div className="flex flex-1 flex-col gap-4 px-4 pt-4 pb-24">
           {waitingForOpponent && (
             <div className="rounded-[26px] border border-[#cbd5e1] bg-[#eff6ff] px-4 py-3 text-sm text-[#1d4ed8] shadow-[0_10px_24px_rgba(59,130,246,0.12)]">
-              Waiting for an opponent. The task will appear when both players join the duel.
+              {t('arena.match.waitingBanner')}
             </div>
           )}
           {freezeSeconds > 0 && (
             <div className="rounded-[26px] border border-[#fed7aa] bg-[#fff7ed] px-4 py-3 text-sm text-[#c2410c] shadow-[0_10px_24px_rgba(249,115,22,0.1)]">
-              Wrong solution. Editing and submission will unlock in {freezeSeconds} sec.
+              {t('arena.match.freeze', { seconds: freezeSeconds })}
             </div>
           )}
           <div className="rounded-[28px] border border-[#d8d9d6] bg-white p-4 shadow-[0_12px_26px_rgba(15,23,42,0.06)]">
             <div className="flex items-center gap-3">
               <div className="flex items-center gap-2">
-                <Avatar name={myPlayer?.displayName ?? 'You'} size="xs" />
-                <span className="text-xs font-medium text-[#0f172a]">{myPlayer?.displayName ?? 'You'}</span>
+                <Avatar name={myPlayer?.displayName ?? t('arena.match.you')} size="xs" />
+                <span className="text-xs font-medium text-[#0f172a]">{myPlayer?.displayName ?? t('arena.match.you')}</span>
               </div>
-              <span className="text-[#CBCCC9]">vs</span>
+              <span className="text-[#CBCCC9]">{t('arena.match.vs')}</span>
               <div className="flex items-center gap-2 min-w-0">
-                <Avatar name={oppPlayer?.displayName ?? 'Opponent'} size="xs" className="bg-[#6366f1]" />
-                <span className="truncate text-xs font-medium text-[#475569]">{oppPlayer?.displayName ?? 'Opponent'}</span>
+                <Avatar name={oppPlayer?.displayName ?? t('arena.match.opponent')} size="xs" className="bg-[#6366f1]" />
+                <span className="truncate text-xs font-medium text-[#475569]">{oppPlayer?.displayName ?? t('arena.match.opponent')}</span>
               </div>
             </div>
             <div className="mt-3 grid grid-cols-2 gap-2 rounded-[20px] bg-[#f8fafc] p-1">
@@ -295,13 +298,13 @@ export function ArenaMatchPage() {
                 onClick={() => setMobilePanel('me')}
                 className={`rounded-2xl px-3 py-2 text-sm font-medium transition-colors ${mobilePanel === 'me' ? 'bg-[#111111] text-white shadow-sm' : 'text-[#667085]'}`}
               >
-                My code
+                {t('arena.match.myCode')}
               </button>
               <button
                 onClick={() => setMobilePanel('opponent')}
                 className={`rounded-2xl px-3 py-2 text-sm font-medium transition-colors ${mobilePanel === 'opponent' ? 'bg-[#111111] text-white shadow-sm' : 'text-[#667085]'}`}
               >
-                Opponent
+                {t('arena.match.opponent')}
               </button>
             </div>
           </div>
@@ -309,8 +312,8 @@ export function ArenaMatchPage() {
           {mobilePanel === 'me' ? (
             <div className="overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)]">
               <div className="flex items-center gap-3 border-b border-[#e2e8f0] px-4 py-3">
-                <Avatar name={myPlayer?.displayName ?? 'You'} size="xs" />
-                <span className="text-sm font-semibold text-[#111111]">{myPlayer?.displayName ?? 'You'}</span>
+                <Avatar name={myPlayer?.displayName ?? t('arena.match.you')} size="xs" />
+                <span className="text-sm font-semibold text-[#111111]">{myPlayer?.displayName ?? t('arena.match.you')}</span>
                 <span className="ml-auto rounded-full bg-[#F2F3F0] px-2 py-0.5 text-[11px] text-[#667085]">Python 3</span>
               </div>
               {waitingForOpponent ? (
@@ -319,15 +322,15 @@ export function ArenaMatchPage() {
                     <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#eef2ff]">
                       <Wifi className="h-5 w-5 text-[#4f46e5]" />
                     </div>
-                    <p className="text-sm font-semibold text-[#0f172a]">Waiting for the duel to start</p>
-                    <p className="mt-1 text-xs text-[#64748b]">Once the second player joins, the task and editor will appear here.</p>
+                    <p className="text-sm font-semibold text-[#0f172a]">{t('arena.match.waitingStart')}</p>
+                    <p className="mt-1 text-xs text-[#64748b]">{t('arena.match.waitingEditor')}</p>
                   </div>
                 </div>
               ) : (
                 <>
                   {taskStatement && (
                     <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-4 py-3">
-                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#64748b]">Task</p>
+                      <p className="text-xs font-semibold uppercase tracking-[0.16em] text-[#64748b]">{t('arena.match.task')}</p>
                       <p className="mt-2 line-clamp-4 text-sm leading-6 text-[#0f172a]">{taskStatement}</p>
                     </div>
                   )}
@@ -353,14 +356,14 @@ export function ArenaMatchPage() {
               )}
               <div className="border-t border-[#e2e8f0] bg-white px-4 py-3 space-y-2">
                 {isSpectator ? (
-                  <span className="text-xs text-[#6366f1]">Spectator mode: editing and submission are disabled.</span>
+                  <span className="text-xs text-[#6366f1]">{t('arena.match.spectatorLocked')}</span>
                 ) : result ? (
                   <span className={`flex items-center gap-1.5 text-xs font-medium ${result.isCorrect ? 'text-[#22c55e]' : 'text-[#ef4444]'}`}>
                     {result.isCorrect ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
-                    {result.isCorrect ? 'All tests passed' : `${result.passedCount ?? 0}/${result.totalCount ?? 0} tests`}
+                    {result.isCorrect ? t('arena.match.allTestsPassed') : t('arena.match.tests', { passed: result.passedCount ?? 0, total: result.totalCount ?? 0 })}
                   </span>
                 ) : (
-                  <span className="text-xs text-[#94a3b8]">Waiting for submission...</span>
+                  <span className="text-xs text-[#94a3b8]">{t('arena.match.waitingSubmission')}</span>
                 )}
                 {lastSubmissionId && <ReviewCard review={review} loading={reviewLoading} showComparison />}
               </div>
@@ -368,13 +371,13 @@ export function ArenaMatchPage() {
           ) : (
             <div className="overflow-hidden rounded-[30px] border border-[#1e293b] bg-[#0f172a] shadow-[0_16px_32px_rgba(15,23,42,0.2)]">
               <div className="flex items-center gap-3 border-b border-[#1e293b] px-4 py-3">
-                <Avatar name={oppPlayer?.displayName ?? 'Opponent'} size="xs" className="bg-[#6366f1]" />
-                <span className="text-sm font-semibold text-[#e2e8f0]">{isSpectator ? 'Player 2' : (oppPlayer?.displayName ?? 'Opponent')}</span>
-                {!isSpectator && !oppPlayer && <Badge variant="warning" className="ml-auto">Waiting...</Badge>}
+                <Avatar name={oppPlayer?.displayName ?? t('arena.match.opponent')} size="xs" className="bg-[#6366f1]" />
+                <span className="text-sm font-semibold text-[#e2e8f0]">{isSpectator ? t('arena.match.playerTwo') : (oppPlayer?.displayName ?? t('arena.match.opponent'))}</span>
+                {!isSpectator && !oppPlayer && <Badge variant="warning" className="ml-auto">{t('arena.match.waiting')}</Badge>}
                 {!isSpectator && oppPlayer && (
                   <span className="ml-auto flex items-center gap-1 text-[10px] text-[#94a3b8]">
                     {ws.opponentHidden ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                    {ws.opponentHidden ? 'Hidden' : 'Visible'}
+                    {ws.opponentHidden ? t('arena.match.hidden') : t('arena.match.visible')}
                   </span>
                 )}
               </div>
@@ -415,23 +418,23 @@ export function ArenaMatchPage() {
                       <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-full bg-[#1e293b]">
                         <Flame className="w-6 h-6 text-[#f59e0b]" />
                       </div>
-                      <p className="text-sm text-[#cbd5e1]">Opponent code is hidden</p>
-                      <p className="mt-1 text-xs text-[#64748b]">The solution will be revealed after the match</p>
+                      <p className="text-sm text-[#cbd5e1]">{t('arena.match.opponentHidden')}</p>
+                      <p className="mt-1 text-xs text-[#64748b]">{t('arena.match.revealAfter')}</p>
                     </div>
                   </div>
                 )}
               </div>
               <div className="border-t border-[#1e293b] bg-[#111827] px-4 py-3">
                 {isSpectator ? (
-                  <span className="text-xs text-[#cbd5e1]">Spectator mode: both editors are read-only.</span>
+                  <span className="text-xs text-[#cbd5e1]">{t('arena.match.spectatorReadonly')}</span>
                 ) : oppPlayer?.submittedAt ? (
                   <span className={`text-xs ${oppPlayer.isCorrect ? 'text-[#22c55e]' : 'text-[#f59e0b]'}`}>
-                    {oppPlayer.isCorrect ? '✓ Opponent solved the task' : '⚡ Opponent submitted a solution'}
+                    {oppPlayer.isCorrect ? t('arena.match.opponentSolved') : t('arena.match.opponentSubmitted')}
                   </span>
                 ) : oppPlayer ? (
-                  <span className="text-xs text-[#f59e0b]">⚡ Opponent is typing...</span>
+                  <span className="text-xs text-[#f59e0b]">{t('arena.match.opponentTyping')}</span>
                 ) : (
-                  <span className="text-xs text-[#64748b]">Waiting for opponent...</span>
+                  <span className="text-xs text-[#64748b]">{t('arena.match.waitingOpponent')}</span>
                 )}
               </div>
             </div>
@@ -448,7 +451,7 @@ export function ArenaMatchPage() {
         <div className="h-8 bg-[#fef2f2] border-b border-[#fecaca] flex items-center justify-center gap-2 flex-shrink-0">
           <ShieldAlert className="w-3.5 h-3.5 text-[#dc2626]" />
           <span className="text-xs font-medium text-[#dc2626]">
-            Warning: suspicious activity detected
+            {t('arena.match.warning')}
           </span>
         </div>
       )}
@@ -457,7 +460,7 @@ export function ArenaMatchPage() {
       <header className="h-[52px] bg-[#0f172a] flex items-center justify-between px-5 flex-shrink-0">
         <div className="flex items-center gap-3">
           <Flame className="w-5 h-5 text-[#f59e0b]" />
-          <span className="text-sm font-bold text-[#F2F3F0]">Arena Duel</span>
+          <span className="text-sm font-bold text-[#F2F3F0]">{t('arena.match.title')}</span>
           {ws.matchState && (
             <div className="px-2.5 py-1 bg-[#1e293b] rounded-lg text-xs text-[#94a3b8] font-medium">
               {taskTitle} · {levelLabel}
@@ -483,20 +486,20 @@ export function ArenaMatchPage() {
           )}
           {result && (
             <Badge variant={result.isCorrect ? 'success' : 'danger'} dot>
-              {result.isCorrect ? 'Accepted' : 'Wrong'}
+              {result.isCorrect ? t('arena.match.accepted') : t('arena.match.wrong')}
             </Badge>
           )}
           {ws.matchState?.winnerId && (
             <Badge variant={ws.matchState.winnerId === user?.id ? 'success' : 'danger'}>
-              {ws.matchState.winnerId === user?.id ? 'Victory!' : 'Defeat'}
+              {ws.matchState.winnerId === user?.id ? t('arena.match.victoryBang') : t('arena.match.defeat')}
             </Badge>
           )}
-          <Badge variant="danger" dot className="bg-[#fef2f2]">LIVE</Badge>
+          <Badge variant="danger" dot className="bg-[#fef2f2]">{t('arena.match.live')}</Badge>
           <Button variant="dark" size="sm" onClick={handleForfeit}>
-            <Flag className="w-3.5 h-3.5 text-[#94a3b8]" /> Forfeit
+            <Flag className="w-3.5 h-3.5 text-[#94a3b8]" /> {t('arena.match.forfeit')}
           </Button>
           <Button variant="orange" size="sm" onClick={handleSubmit} loading={submitting} disabled={editingLocked || submitting}>
-            <Send className="w-3.5 h-3.5" /> Submit solution
+            <Send className="w-3.5 h-3.5" /> {t('arena.match.submitSolution')}
           </Button>
         </div>
       </header>
@@ -505,17 +508,17 @@ export function ArenaMatchPage() {
         <div className="flex flex-wrap items-center gap-3 border-b border-[#d8d9d6] bg-white px-5 py-3 text-sm">
           {waitingForOpponent && (
             <span className="rounded-full bg-[#eff6ff] px-3 py-1 text-[#1d4ed8]">
-              Waiting for an opponent. The task will unlock after both players connect.
+              {t('arena.match.waitingUnlock')}
             </span>
           )}
           {freezeSeconds > 0 && (
             <span className="rounded-full bg-[#fff7ed] px-3 py-1 text-[#c2410c]">
-              Wrong solution. Retry in {freezeSeconds} sec.
+              {t('arena.match.retryIn', { seconds: freezeSeconds })}
             </span>
           )}
           {isSpectator && (
             <span className="rounded-full bg-[#eef2ff] px-3 py-1 text-[#4f46e5]">
-              Spectator mode: both editors are read-only.
+              {t('arena.match.spectatorReadonly')}
             </span>
           )}
         </div>
@@ -526,8 +529,8 @@ export function ArenaMatchPage() {
         {/* My panel */}
         <div className="flex-1 flex flex-col border-r border-[#CBCCC9] min-w-0">
           <div className="h-10 bg-[#F2F3F0] border-b border-[#CBCCC9] flex items-center px-4 gap-3">
-            <Avatar name={myPlayer?.displayName ?? 'You'} size="xs" />
-            <span className="text-xs font-medium text-[#0f172a]">{myPlayer?.displayName ?? 'You'}</span>
+            <Avatar name={myPlayer?.displayName ?? t('arena.match.you')} size="xs" />
+            <span className="text-xs font-medium text-[#0f172a]">{myPlayer?.displayName ?? t('arena.match.you')}</span>
             <span className="ml-auto text-xs text-[#94a3b8] px-2 py-0.5 bg-[#F2F3F0] rounded-full">Python 3</span>
           </div>
           <div className="flex-1">
@@ -537,15 +540,15 @@ export function ArenaMatchPage() {
                   <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-[#eef2ff]">
                     <Wifi className="h-6 w-6 text-[#4f46e5]" />
                   </div>
-                  <p className="text-base font-semibold text-[#0f172a]">Waiting for the duel to start</p>
-                  <p className="mt-2 text-sm leading-6 text-[#64748b]">Once the second player joins, the task and editor will unlock.</p>
+                  <p className="text-base font-semibold text-[#0f172a]">{t('arena.match.waitingStart')}</p>
+                  <p className="mt-2 text-sm leading-6 text-[#64748b]">{t('arena.match.waitingUnlockEditor')}</p>
                 </div>
               </div>
             ) : (
               <div className="flex h-full min-h-0 flex-col">
                 {taskStatement && (
                   <div className="border-b border-[#e2e8f0] bg-[#f8fafc] px-4 py-3">
-                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#64748b]">Task</p>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.16em] text-[#64748b]">{t('arena.match.task')}</p>
                     <p className="mt-2 line-clamp-3 text-sm leading-6 text-[#0f172a]">{taskStatement}</p>
                   </div>
                 )}
@@ -573,13 +576,13 @@ export function ArenaMatchPage() {
           <div className="bg-white border-t border-[#CBCCC9] px-4 py-2 space-y-2">
             <div className="flex items-center h-5">
               {isSpectator ? (
-                <span className="text-xs text-[#6366f1]">Spectator mode: submission is disabled.</span>
+                <span className="text-xs text-[#6366f1]">{t('arena.match.spectatorSubmitDisabled')}</span>
               ) : result ? (
-                <span className={`flex items-center gap-1.5 text-xs font-medium ${result.isCorrect ? 'text-[#22c55e]' : 'text-[#ef4444]'}`}>
+                  <span className={`flex items-center gap-1.5 text-xs font-medium ${result.isCorrect ? 'text-[#22c55e]' : 'text-[#ef4444]'}`}>
                   {result.isCorrect ? <Check className="w-3.5 h-3.5" /> : <X className="w-3.5 h-3.5" />}
-                  {result.isCorrect ? 'All tests passed' : `${result.passedCount ?? 0}/${result.totalCount ?? 0} tests`}
+                  {result.isCorrect ? t('arena.match.allTestsPassed') : t('arena.match.tests', { passed: result.passedCount ?? 0, total: result.totalCount ?? 0 })}
                 </span>
-              ) : <span className="text-xs text-[#94a3b8]">Waiting for submission...</span>}
+              ) : <span className="text-xs text-[#94a3b8]">{t('arena.match.waitingSubmission')}</span>}
             </div>
             {lastSubmissionId && <ReviewCard review={review} loading={reviewLoading} showComparison />}
           </div>
@@ -588,13 +591,13 @@ export function ArenaMatchPage() {
         {/* Opponent panel */}
         <div className="flex-1 flex flex-col min-w-0">
           <div className="h-10 bg-[#0f172a] border-b border-[#1e293b] flex items-center px-4 gap-3">
-            <Avatar name={isSpectator ? (ws.players[1]?.displayName ?? 'Player 2') : (oppPlayer?.displayName ?? 'Opponent')} size="xs" className="bg-[#6366f1]" />
-            <span className="text-xs font-medium text-[#CBCCC9]">{isSpectator ? (ws.players[1]?.displayName ?? 'Player 2') : (oppPlayer?.displayName ?? 'Opponent')}</span>
-            {!isSpectator && !oppPlayer && <Badge variant="warning" className="ml-auto">Waiting...</Badge>}
+            <Avatar name={isSpectator ? (ws.players[1]?.displayName ?? t('arena.match.playerTwo')) : (oppPlayer?.displayName ?? t('arena.match.opponent'))} size="xs" className="bg-[#6366f1]" />
+            <span className="text-xs font-medium text-[#CBCCC9]">{isSpectator ? (ws.players[1]?.displayName ?? t('arena.match.playerTwo')) : (oppPlayer?.displayName ?? t('arena.match.opponent'))}</span>
+            {!isSpectator && !oppPlayer && <Badge variant="warning" className="ml-auto">{t('arena.match.waiting')}</Badge>}
             {!isSpectator && oppPlayer && (
               <span className="ml-auto flex items-center gap-1 text-[10px] text-[#94a3b8]">
                 {ws.opponentHidden ? <EyeOff className="w-3 h-3" /> : <Eye className="w-3 h-3" />}
-                {ws.opponentHidden ? 'Hidden' : 'Visible'}
+                {ws.opponentHidden ? t('arena.match.hidden') : t('arena.match.visible')}
               </span>
             )}
           </div>
@@ -638,23 +641,23 @@ export function ArenaMatchPage() {
                   <div className="w-12 h-12 mx-auto mb-3 rounded-full bg-[#1e293b] flex items-center justify-center">
                     <Flame className="w-6 h-6 text-[#f59e0b]" />
                   </div>
-                  <p className="text-sm">Opponent code is hidden</p>
-                  <p className="text-xs mt-1">The solution will be revealed after the match</p>
+                  <p className="text-sm">{t('arena.match.opponentHidden')}</p>
+                  <p className="text-xs mt-1">{t('arena.match.revealAfter')}</p>
                 </div>
               </div>
             )}
           </div>
           <div className="h-9 bg-[#1e293b] border-t border-[#0f172a] flex items-center px-4">
             {isSpectator ? (
-              <span className="text-xs text-[#cbd5e1]">The second player's code is shown on the right.</span>
+              <span className="text-xs text-[#cbd5e1]">{t('arena.match.playerTwoRight')}</span>
             ) : oppPlayer?.submittedAt ? (
               <span className={`text-xs ${oppPlayer.isCorrect ? 'text-[#22c55e]' : 'text-[#f59e0b]'}`}>
-                {oppPlayer.isCorrect ? '✓ Opponent solved the task' : '⚡ Opponent submitted a solution'}
+                {oppPlayer.isCorrect ? t('arena.match.opponentSolved') : t('arena.match.opponentSubmitted')}
               </span>
             ) : oppPlayer ? (
-              <span className="text-xs text-[#f59e0b]">⚡ Opponent is actively typing...</span>
+              <span className="text-xs text-[#f59e0b]">{t('arena.match.opponentTypingActive')}</span>
             ) : (
-              <span className="text-xs text-[#475569]">Waiting for the opponent...</span>
+              <span className="text-xs text-[#475569]">{t('arena.match.waitingOpponent')}</span>
             )}
           </div>
         </div>

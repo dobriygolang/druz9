@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { authApi } from '@/features/Auth/api/authApi'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { geoApi, type GeoSuggestion } from '@/features/Geo/api/geoApi'
@@ -7,6 +8,7 @@ import { Button } from '@/shared/ui/Button'
 import { cn } from '@/shared/lib/cn'
 
 export function CompleteRegistrationPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const { refresh } = useAuth()
 
@@ -66,7 +68,7 @@ export function CompleteRegistrationPage() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     if (!selected) {
-      setError('Choose a city from the list')
+      setError(t('complete.error.chooseCity'))
       return
     }
     setLoading(true)
@@ -82,7 +84,7 @@ export function CompleteRegistrationPage() {
       await refresh()
       navigate('/home', { replace: true })
     } catch {
-      setError('Failed to save the profile')
+      setError(t('complete.error.saveFailed'))
     } finally {
       setLoading(false)
     }
@@ -101,8 +103,8 @@ export function CompleteRegistrationPage() {
                   <path d="M7 14H17" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
                 </svg>
               </div>
-              <h2 className="text-xl font-bold text-[#111111]">Complete registration</h2>
-              <p className="mt-1 text-sm text-[#666666]">Add your location to unlock the local community and map.</p>
+              <h2 className="text-xl font-bold text-[#111111]">{t('complete.title')}</h2>
+              <p className="mt-1 text-sm text-[#666666]">{t('complete.subtitle')}</p>
             </div>
             {error && (
               <div className="mb-4 rounded-lg border border-[#fca5a5] bg-[#fef2f2] p-3 text-sm text-[#dc2626]">{error}</div>
@@ -110,7 +112,7 @@ export function CompleteRegistrationPage() {
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div ref={wrapperRef} className="relative flex flex-col gap-1.5">
                 <label htmlFor="city-input" className="text-xs font-500 text-[#475569]">
-                  City
+                  {t('complete.city')}
                 </label>
                 <input
                   id="city-input"
@@ -118,7 +120,7 @@ export function CompleteRegistrationPage() {
                   value={query}
                   onChange={e => handleInputChange(e.target.value)}
                   onFocus={() => { if (suggestions.length > 0 && !selected) setShowDropdown(true) }}
-                  placeholder="Start typing a city..."
+                  placeholder={t('complete.cityPlaceholder')}
                   autoComplete="off"
                   className={cn(
                     'w-full px-3 py-3 text-sm rounded-xl transition-colors',
@@ -146,7 +148,7 @@ export function CompleteRegistrationPage() {
                 )}
               </div>
               <Button type="submit" variant="orange" loading={loading} className="mt-2 w-full justify-center rounded-2xl">
-                Continue
+                {t('complete.continue')}
               </Button>
             </form>
           </div>
