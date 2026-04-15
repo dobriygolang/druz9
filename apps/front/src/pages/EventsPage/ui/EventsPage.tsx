@@ -267,10 +267,7 @@ export function EventsPage() {
     if (!form.title || !form.description) return
     setCreating(true)
     try {
-      let scheduledAt = form.scheduledAt ?? ''
-      if (scheduledAt && !scheduledAt.match(/T\d{2}:\d{2}:\d{2}/)) scheduledAt = `${scheduledAt}:00`
-      if (scheduledAt && !/[Z+\-]\d*$/.test(scheduledAt)) scheduledAt = `${scheduledAt}Z`
-      const created = await eventApi.createEvent({ ...form, scheduledAt: scheduledAt || undefined } as CreateEventPayload)
+      const created = await eventApi.createEvent(form as CreateEventPayload)
       setEvents(prev => [created, ...prev])
       // Send invites for collected user IDs (fire-and-forget)
       inviteIds.forEach(uid => eventApi.inviteToEvent(created.id, uid).catch(() => {}))

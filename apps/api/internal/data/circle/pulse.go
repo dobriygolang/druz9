@@ -160,7 +160,7 @@ UNION ALL
     COALESCE(NULLIF(u.last_name,''),'') AS last_name,
     COALESCE(NULLIF(u.yandex_avatar_url,''), NULLIF(u.telegram_avatar_url,''), '') AS avatar_url,
     'mock' AS action_type,
-    COALESCE(b.company_tag, '') AS action_detail,
+    COALESCE(NULLIF(ms.started_via_alias, ''), b.slug, '') AS action_detail,
     ms.finished_at AS happened_at
   FROM interview_mock_sessions ms
   JOIN users u ON u.id = ms.user_id

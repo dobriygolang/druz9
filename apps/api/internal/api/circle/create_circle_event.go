@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"api/internal/model"
+	"api/internal/util/timeutil"
 	circlev1 "api/pkg/api/circle/v1"
 
 	kratosErrors "github.com/go-kratos/kratos/v2/errors"
@@ -32,9 +33,9 @@ func (i *Implementation) CreateCircleEvent(ctx context.Context, req *circlev1.Cr
 	}
 	var scheduledAt *time.Time
 	if req.ScheduledAt != "" {
-		value, err := time.Parse(time.RFC3339, req.ScheduledAt)
-		if err != nil || value.Before(time.Now()) {
-			return nil, kratosErrors.BadRequest("INVALID_SCHEDULED_AT", "scheduledAt must be a future RFC3339 timestamp")
+		value, err := timeutil.ParseMoscowDateTime(req.ScheduledAt)
+		if err != nil || !value.After(time.Now().UTC()) {
+			return nil, kratosErrors.BadRequest("INVALID_SCHEDULED_AT", "scheduledAt must be a future Moscow timestamp")
 		}
 		scheduledAt = &value
 	}

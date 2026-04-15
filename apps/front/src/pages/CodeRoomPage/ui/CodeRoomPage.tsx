@@ -107,6 +107,10 @@ function decodeRelativePositionFromBase64(payload: string): Y.RelativePosition |
   }
 }
 
+function shouldHideDuelTask(room: Room | null): boolean {
+  return room?.mode === 'ROOM_MODE_DUEL' && (room.participants.length ?? 0) < 2
+}
+
 /** posRef is mutable — update it and call layoutContentWidget instead of re-adding */
 function buildCursorWidget(
   userId: string,
@@ -423,6 +427,7 @@ export function CodeRoomPage() {
 
   // WebSocket realtime
   const isDuelRoom = room?.mode === 'ROOM_MODE_DUEL'
+  const duelTaskHidden = shouldHideDuelTask(room)
   const ws = useCodeRoomWs({
     roomId,
     userId: user?.id,
@@ -509,11 +514,12 @@ export function CodeRoomPage() {
     const state = location.state as { title?: string; statement?: string; starterCode?: string; language?: string; taskId?: string } | null
     codeRoomApi.joinRoom(roomId, undefined, guestNameRef.current)
       .then(async r => {
-        if (state?.title && !r.task) r = { ...r, task: state.title }
+        const roomTaskHidden = shouldHideDuelTask(r)
+        if (state?.title && !r.task && !roomTaskHidden) r = { ...r, task: state.title }
         setRoom(r)
 
         // If we have task data from navigation state, use it directly
-        if (state?.statement) {
+        if (state?.statement && !roomTaskHidden) {
           setTaskStatement(state.statement)
           const taskId = state.taskId
           const draft = taskId ? getSoloDraft(taskId) : null
@@ -526,10 +532,13 @@ export function CodeRoomPage() {
           }
           return
         }
+        if (roomTaskHidden) {
+          setTaskStatement('')
+        }
 
         // No navigation state but room has a taskId — fetch task details from API
         const taskId = state?.taskId || r.taskId
-        if (taskId && !state?.statement) {
+        if (taskId && !state?.statement && !roomTaskHidden) {
           try {
             const tasks = await codeRoomApi.listTasks()
             const task = tasks.find(t => t.id === taskId)
@@ -550,7 +559,7 @@ export function CodeRoomPage() {
         }
 
         // Fallback: use whatever the room has
-        const draft = taskId ? getSoloDraft(taskId) : null
+        const draft = !roomTaskHidden && taskId ? getSoloDraft(taskId) : null
         const initCode = draft ?? r.code ?? state?.starterCode ?? ''
         initialCodeRef.current = initCode
         currentCodeRef.current = initCode
@@ -705,7 +714,7 @@ export function CodeRoomPage() {
 
   // Keep isCreatorRef in sync for use inside callbacks
   const isCreator = !!user && !!room && (user.id === room.creatorId || room.participants.some(p => p.userId === user.id && p.isCreator))
-  const hasPredefinedTask = !!(room?.taskId || soloDraftTaskId)
+  const hasPredefinedTask = !duelTaskHidden && !!(room?.taskId || soloDraftTaskId)
   const canEditTask = isCreator && !hasPredefinedTask
   useEffect(() => { isCreatorRef.current = isCreator }, [isCreator])
 

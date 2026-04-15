@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"api/internal/model"
+	"api/internal/util/timeutil"
 	v1 "api/pkg/api/event/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -21,7 +22,7 @@ func (i *Implementation) CreateEvent(ctx context.Context, req *v1.CreateEventReq
 
 	var scheduledAt *time.Time
 	if req.ScheduledAt != nil {
-		value := req.ScheduledAt.AsTime()
+		value := timeutil.NormalizeToUTC(req.ScheduledAt.AsTime())
 		scheduledAt = &value
 	}
 

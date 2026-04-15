@@ -126,6 +126,44 @@ func TestNow(t *testing.T) {
 	assert.True(t, nowTime.Before(after) || nowTime.Equal(after))
 }
 
+func TestShouldHideDuelTask(t *testing.T) {
+	t.Parallel()
+
+	t.Run("hides duel task before opponent joins", func(t *testing.T) {
+		t.Parallel()
+		room := &domain.Room{
+			Mode: model.RoomModeDuel,
+			Participants: []*domain.Participant{
+				{Name: "creator"},
+			},
+		}
+		assert.True(t, shouldHideDuelTask(room))
+	})
+
+	t.Run("reveals duel task after opponent joins", func(t *testing.T) {
+		t.Parallel()
+		room := &domain.Room{
+			Mode: model.RoomModeDuel,
+			Participants: []*domain.Participant{
+				{Name: "creator"},
+				{Name: "opponent"},
+			},
+		}
+		assert.False(t, shouldHideDuelTask(room))
+	})
+
+	t.Run("shared room stays visible", func(t *testing.T) {
+		t.Parallel()
+		room := &domain.Room{
+			Mode: model.RoomModeAll,
+			Participants: []*domain.Participant{
+				{Name: "creator"},
+			},
+		}
+		assert.False(t, shouldHideDuelTask(room))
+	})
+}
+
 func TestCloneStrings(t *testing.T) {
 	t.Parallel()
 

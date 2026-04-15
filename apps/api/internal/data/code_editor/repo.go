@@ -8,7 +8,7 @@ import (
 
 const roomSelectColumns = `
 	cr.id, cr.mode, cr.code, cr.code_revision, cr.status, cr.creator_id, cr.invite_code,
-	cr.language, COALESCE(ct.statement, ''), cr.task_id, COALESCE(cr.duel_topic, ''),
+	cr.language, COALESCE(NULLIF(cr.task, ''), ct.title, ''), cr.task_id, COALESCE(cr.duel_topic, ''),
 	cr.winner_user_id, COALESCE(cr.winner_guest_name, ''), cr.started_at, cr.finished_at, cr.created_at, cr.updated_at,
 	COALESCE(cr.is_private, FALSE)
 `
@@ -18,7 +18,7 @@ const roomSelectColumns = `
 const roomFullQuery = `
 SELECT
 	cr.id, cr.mode, cr.code, cr.code_revision, cr.status, cr.creator_id, cr.invite_code,
-	cr.language, COALESCE(ct.statement, ''), cr.task_id, COALESCE(cr.duel_topic, ''),
+	cr.language, COALESCE(NULLIF(cr.task, ''), ct.title, ''), cr.task_id, COALESCE(cr.duel_topic, ''),
 	cr.winner_user_id, COALESCE(cr.winner_guest_name, ''), cr.started_at, cr.finished_at, cr.created_at, cr.updated_at,
 	COALESCE(cr.is_private, FALSE),
 	COALESCE(

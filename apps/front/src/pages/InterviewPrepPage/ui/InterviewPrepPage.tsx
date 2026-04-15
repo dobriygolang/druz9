@@ -203,6 +203,8 @@ export function InterviewPrepPage() {
     () => blueprints.find(bp => bp.slug === selectedBlueprintSlug) ?? blueprints[0] ?? null,
     [blueprints, selectedBlueprintSlug],
   )
+  const strongestSkill = readiness?.strongestSkill ?? null
+  const weakestSkill = readiness?.weakestSkill?.key === strongestSkill?.key ? null : readiness?.weakestSkill ?? null
 
   const handleStartMock = async (programSlug?: string) => {
     setMockLoading(true)
@@ -313,16 +315,16 @@ export function InterviewPrepPage() {
                   {readiness.streakDays} {t('journey.streak', 'days in a row')}
                 </span>
               ) : null}
-              {readiness?.strongestSkill && (
+              {strongestSkill && (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e8f9ef] px-2.5 py-0.5 text-[11px] font-medium text-[#166534] dark:bg-[#0d2a1f] dark:text-[#4ade80]">
                   <TrendingUp className="h-3 w-3" />
-                  {readiness.strongestSkill.label}: {readiness.strongestSkill.score}
+                  {strongestSkill.label}: {strongestSkill.score}
                 </span>
               )}
-              {readiness?.weakestSkill && (
+              {weakestSkill && (
                 <span className="inline-flex items-center gap-1.5 rounded-full bg-[#fef2f2] px-2.5 py-0.5 text-[11px] font-medium text-[#dc2626] dark:bg-[#2a0f0f] dark:text-[#f87171]">
                   <Target className="h-3 w-3" />
-                  {readiness.weakestSkill.label}: {readiness.weakestSkill.score}
+                  {weakestSkill.label}: {weakestSkill.score}
                 </span>
               )}
             </div>

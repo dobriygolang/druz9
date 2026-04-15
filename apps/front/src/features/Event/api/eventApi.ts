@@ -1,5 +1,6 @@
 import { apiClient, withDefaultListQuery, type ListQueryParams } from '@/shared/api/base'
 import { createCache } from '@/shared/api/cache'
+import { toMoscowApiDateTime } from '@/shared/lib/moscowTime'
 
 export interface Event {
   id: string
@@ -104,7 +105,7 @@ export const eventApi = {
     const r = await apiClient.post<{ event: BackendEvent }>('/api/v1/events', {
       title: payload.title, placeLabel: payload.placeLabel, region: payload.region,
       country: payload.country, city: payload.city, latitude: payload.latitude, longitude: payload.longitude,
-      scheduledAt: payload.scheduledAt, description: payload.description, meetingLink: payload.meetingLink,
+      scheduledAt: toMoscowApiDateTime(payload.scheduledAt), description: payload.description, meetingLink: payload.meetingLink,
       repeat: payload.repeat ?? 'none',
     })
     return normalizeEvent(r.data.event)
@@ -134,7 +135,7 @@ export const eventApi = {
       description: payload.description,
       meetingLink: payload.meetingLink,
       placeLabel: payload.placeLabel,
-      scheduledAt: payload.scheduledAt,
+      scheduledAt: toMoscowApiDateTime(payload.scheduledAt),
       repeat: payload.repeat ?? 'none',
     })
     return normalizeEvent(r.data.event)

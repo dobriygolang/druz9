@@ -45,6 +45,13 @@ func cloneRoom(room *domain.Room) *domain.Room {
 	return &cloned
 }
 
+func shouldHideDuelTask(room *domain.Room) bool {
+	if room == nil || room.Mode != model.RoomModeDuel {
+		return false
+	}
+	return len(room.Participants) < 2
+}
+
 func defaultRoomLanguage(room *domain.Room, task *domain.Task) model.ProgrammingLanguage {
 	if room != nil && room.Language != model.ProgrammingLanguageUnknown {
 		return normalizeRoomLanguage(room.Language)
@@ -296,6 +303,10 @@ func (s *Service) GetRoomForActor(ctx context.Context, roomID uuid.UUID, userID 
 	if state != nil {
 		cloned.Code = state.Code
 		cloned.Language = state.Language
+	}
+	if shouldHideDuelTask(cloned) {
+		cloned.Task = ""
+		cloned.TaskID = nil
 	}
 	return cloned, nil
 }
