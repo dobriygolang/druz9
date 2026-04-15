@@ -36,4 +36,5 @@ type SessionCookieManager interface {
 type ProgressRepository interface {
 	GetProfileProgress(ctx context.Context, userID uuid.UUID) (*model.ProfileProgress, error)
 	GetDailyActivity(ctx context.Context, userID uuid.UUID, days int) (map[string]int, error)
+	SaveUserGoal(ctx context.Context, userID uuid.UUID, goal *model.UserGoal) error
 }

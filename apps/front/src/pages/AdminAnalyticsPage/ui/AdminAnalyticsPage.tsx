@@ -99,13 +99,13 @@ export function AdminAnalyticsPage() {
     <div className="p-6">
       <div className="mb-5">
         <h1 className="text-xl font-bold text-[#0f172a]">Analytics</h1>
-        <p className="text-sm text-[#666666] mt-0.5">Статистика задач платформы</p>
+        <p className="text-sm text-[#666666] mt-0.5">Platform task statistics</p>
       </div>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Всего задач" value={s.total} icon={<Code2 className="w-5 h-5 text-[#6366f1]" />} />
-        <StatCard label="Активных" value={s.active} icon={<CheckCircle className="w-5 h-5 text-[#22c55e]" />} />
+        <StatCard label="Total tasks" value={s.total} icon={<Code2 className="w-5 h-5 text-[#6366f1]" />} />
+        <StatCard label="Active" value={s.active} icon={<CheckCircle className="w-5 h-5 text-[#22c55e]" />} />
         <StatCard label="Mock Interview" value={s.mock} icon={<Layers className="w-5 h-5 text-[#818cf8]" />} />
         <StatCard label="Solo Practice" value={s.solo} icon={<Layers className="w-5 h-5 text-[#f59e0b]" />} />
       </div>
@@ -115,7 +115,7 @@ export function AdminAnalyticsPage() {
         {/* Difficulty Distribution */}
         <div className="bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1e3158] p-5">
           <h3 className="text-sm font-semibold text-[#0f172a] mb-4 flex items-center gap-2">
-            <BarChart2 className="w-4 h-4 text-[#6366f1]" /> Сложность
+            <BarChart2 className="w-4 h-4 text-[#6366f1]" /> Difficulty
           </h3>
           <div className="flex flex-col gap-3">
             <ProgressBar label="Easy" value={s.easy} total={s.total} color="#22c55e" />
@@ -127,19 +127,19 @@ export function AdminAnalyticsPage() {
         {/* Category Distribution */}
         <div className="bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1e3158] p-5">
           <h3 className="text-sm font-semibold text-[#0f172a] mb-4 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#6366f1]" /> Категории
+            <Layers className="w-4 h-4 text-[#6366f1]" /> Categories
           </h3>
           <div className="flex flex-col gap-3">
             <ProgressBar label={CATEGORY_LABELS.mock ?? 'Mock'} value={s.mock} total={s.total} color="#6366f1" />
             <ProgressBar label={CATEGORY_LABELS.solo_practice ?? 'Solo'} value={s.solo} total={s.total} color="#f59e0b" />
-            <ProgressBar label="Без категории" value={s.uncategorized} total={s.total} color="#94a3b8" />
+            <ProgressBar label="No category" value={s.uncategorized} total={s.total} color="#94a3b8" />
           </div>
         </div>
 
         {/* Languages Distribution */}
         <div className="bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1e3158] p-5">
           <h3 className="text-sm font-semibold text-[#0f172a] mb-4 flex items-center gap-2">
-            <Code2 className="w-4 h-4 text-[#6366f1]" /> Языки
+            <Code2 className="w-4 h-4 text-[#6366f1]" /> Languages
           </h3>
           <div className="flex flex-col gap-3">
             {Object.entries(s.languages)
@@ -154,7 +154,7 @@ export function AdminAnalyticsPage() {
                 />
               ))}
             {Object.keys(s.languages).length === 0 && (
-              <p className="text-xs text-[#94a3b8] italic">Нет данных</p>
+              <p className="text-xs text-[#94a3b8] italic">No data</p>
             )}
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Flame, Trophy, Swords, Zap, Users, Copy, Check, Link2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/shared/api/base'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { Card } from '@/shared/ui/Card'
@@ -12,6 +13,7 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useToast } from '@/shared/ui/Toast'
 import { DIFF_LABELS, DIFF_VARIANTS, LANG_LABELS } from '@/shared/lib/taskLabels'
+import { PageMeta } from '@/shared/ui/PageMeta'
 
 const LEAGUE_COLORS: Record<string, string> = {
   ARENA_LEAGUE_BRONZE: 'text-[#cd7f32]',
@@ -29,6 +31,7 @@ const LEAGUE_LABELS: Record<string, string> = {
 }
 
 export function ArenaHubPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const isMobile = useIsMobile()
   const { toast } = useToast()
@@ -67,8 +70,8 @@ export function ArenaHubPage() {
         setInQueue(d.status === 'ARENA_QUEUE_STATUS_QUEUED' || d.status === 'ARENA_QUEUE_STATUS_MATCHED')
         if (d.match?.id) navigate(`/arena/${d.match.id}`)
       }),
-    ]).catch(() => setError('Не удалось загрузить данные'))
-  }, [navigate])
+    ]).catch(() => setError(t('common.loadFailed')))
+  }, [navigate, t])
 
   useEffect(() => { fetchData() }, [fetchData])
 
@@ -87,20 +90,20 @@ export function ArenaHubPage() {
       const r = await apiClient.post('/api/v1/arena/queue/join', { topic, difficulty })
       const d = r.data as any
       setInQueue(true)
-      toast('Вы в очереди', 'success')
+      toast(t('arena.toast.queueJoined'), 'success')
       if (d.match?.id) navigate(`/arena/${d.match.id}`)
       else refreshQueueStatus()
     } catch {
-      toast('Не удалось встать в очередь', 'error')
+      toast(t('arena.toast.queueJoinFailed'), 'error')
     } finally { setJoining(false) }
   }
 
   const handleLeaveQueue = async () => {
     try {
       await apiClient.post('/api/v1/arena/queue/leave', {})
-      toast('Вы вышли из очереди', 'info')
+      toast(t('arena.toast.queueLeft'), 'info')
     } catch {
-      toast('Ошибка выхода из очереди', 'error')
+      toast(t('arena.toast.queueLeaveFailed'), 'error')
     }
     setInQueue(false)
   }
@@ -111,7 +114,7 @@ export function ArenaHubPage() {
       const { room, inviteCode } = await codeRoomApi.createRoom({ mode: 'ROOM_MODE_DUEL', isPrivate: true })
       setDuelRoom({ id: room.id, inviteCode: inviteCode || room.inviteCode })
     } catch {
-      toast('Не удалось создать комнату', 'error')
+      toast(t('arena.toast.duelCreateFailed'), 'error')
     } finally {
       setCreatingDuel(false)
     }
@@ -133,16 +136,17 @@ export function ArenaHubPage() {
 
   return (
     <div className={isMobile ? 'px-4 pt-4 pb-24 flex flex-col gap-4' : 'px-4 md:px-6 pt-4 pb-4 md:pb-6 flex flex-col gap-4 lg:flex-row'}>
+      <PageMeta title={t('arena.meta.title')} description={t('arena.meta.description')} canonicalPath="/practice/arena" />
       {isMobile && (
         <div className="section-enter overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(254,243,199,0.94)_48%,_rgba(238,242,255,0.92))] p-5 shadow-[0_18px_34px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[linear-gradient(135deg,_rgba(11,13,22,0.96),_rgba(46,26,38,0.88)_48%,_rgba(29,36,63,0.92))]">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#92400e] dark:text-[#fbbf24]">Arena</p>
-              <h1 className="mt-3 text-[28px] font-bold leading-none text-[#111111] dark:text-[#f8fafc]">Дуэли в реальном времени</h1>
-              <p className="mt-3 text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">Очередь, live-матчи и рейтинг.</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#92400e] dark:text-[#fbbf24]">{t('arena.hero.eyebrow')}</p>
+              <h1 className="mt-3 text-[28px] font-bold leading-none text-[#111111] dark:text-[#f8fafc]">{t('arena.hero.title')}</h1>
+              <p className="mt-3 text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">{t('arena.hero.subtitle')}</p>
             </div>
             <div className="rounded-[24px] border border-white/80 bg-white/78 px-4 py-3 text-right shadow-sm backdrop-blur dark:border-[#334155] dark:bg-[#1e293b]">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#64748b]">Матчей</p>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#64748b]">{t('arena.hero.matches')}</p>
               <p className="mt-2 font-mono text-xl font-bold text-[#111111] dark:text-[#f8fafc]">{openMatches.length}</p>
             </div>
           </div>
@@ -155,8 +159,8 @@ export function ArenaHubPage() {
         <Card padding="md">
           <div className="flex items-center gap-2 mb-3">
             <Flame className="w-5 h-5 text-[#f59e0b]" />
-            <h3 className="text-sm font-bold text-[#111111] dark:text-[#f8fafc]">Ranked Queue</h3>
-            {inQueue && <span className="px-2 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] text-[11px] font-medium dark:bg-[#422006] dark:text-[#fbbf24]">В очереди</span>}
+            <h3 className="text-sm font-bold text-[#111111] dark:text-[#f8fafc]">{t('arena.queue.title')}</h3>
+            {inQueue && <span className="px-2 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] text-[11px] font-medium dark:bg-[#422006] dark:text-[#fbbf24]">{t('arena.queue.status')}</span>}
             <span className="ml-auto text-[10px] text-[#94a3b8] dark:text-[#64748b]">ELO ±</span>
           </div>
 
@@ -172,7 +176,7 @@ export function ArenaHubPage() {
                 </div>
                 <div>
                   <div className="flex items-center gap-1 text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
-                    Ищем соперника
+                    {t('arena.queue.searching')}
                     <span className="flex gap-0.5 ml-1">
                       <span className="w-1 h-1 rounded-full bg-[#f59e0b] animate-bounce [animation-delay:0ms]" />
                       <span className="w-1 h-1 rounded-full bg-[#f59e0b] animate-bounce [animation-delay:150ms]" />
@@ -180,33 +184,43 @@ export function ArenaHubPage() {
                     </span>
                   </div>
                   <p className="text-xs text-[#94a3b8] mt-0.5">
-                    В очереди: {(() => {
+                    {t('arena.queue.inQueue', {
+                      count: (() => {
                       const n = queueStatus?.queueSize
-                      return (typeof n === 'number' && n > 0) ? `${n} чел.` : '...'
+                      return (typeof n === 'number' && n > 0) ? n : '...'
                     })()}
                   </p>
                 </div>
               </div>
               <Button variant="secondary" size="sm" onClick={handleLeaveQueue} className={isMobile ? 'w-full justify-center' : ''}>
-                Выйти
+                {t('arena.queue.leave')}
               </Button>
             </div>
           ) : (
             <div className="flex flex-col gap-3">
               <div className={`grid gap-2 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 <Select
-                  options={[{ value: '', label: 'Любая тема' }, { value: 'arrays', label: 'Arrays' }, { value: 'graphs', label: 'Graphs' }, { value: 'dp', label: 'Dynamic Prog.' }]}
+                  options={[
+                    { value: '', label: t('arena.topic.any') },
+                    { value: 'arrays', label: t('arena.topic.arrays') },
+                    { value: 'graphs', label: t('arena.topic.graphs') },
+                    { value: 'dp', label: t('arena.topic.dp') },
+                  ]}
                   value={topic}
                   onChange={setTopic}
                 />
                 <Select
-                  options={[{ value: 'DIFFICULTY_EASY', label: 'Easy' }, { value: 'DIFFICULTY_MEDIUM', label: 'Medium' }, { value: 'DIFFICULTY_HARD', label: 'Hard' }]}
+                  options={[
+                    { value: 'DIFFICULTY_EASY', label: t('arena.diff.easy') },
+                    { value: 'DIFFICULTY_MEDIUM', label: t('arena.diff.medium') },
+                    { value: 'DIFFICULTY_HARD', label: t('arena.diff.hard') },
+                  ]}
                   value={difficulty}
                   onChange={setDifficulty}
                 />
               </div>
               <Button variant="orange" size="md" onClick={handleJoinQueue} loading={joining} className="w-full justify-center">
-                <Zap className="w-4 h-4" /> Найти соперника
+                <Zap className="w-4 h-4" /> {t('arena.queue.find')}
               </Button>
             </div>
           )}
@@ -216,12 +230,10 @@ export function ArenaHubPage() {
         <Card padding="md">
           <div className="flex items-center gap-2 mb-3">
             <Users className="w-5 h-5 text-[#6366F1]" />
-            <h3 className="text-sm font-bold text-[#111111] dark:text-[#f8fafc]">Дружеская дуэль</h3>
-            <span className="ml-auto rounded-full bg-[#F2F3F0] px-2 py-0.5 text-[10px] font-medium text-[#94a3b8] dark:bg-[#1e293b] dark:text-[#64748b]">без ELO</span>
+            <h3 className="text-sm font-bold text-[#111111] dark:text-[#f8fafc]">{t('arena.duel.title')}</h3>
+            <span className="ml-auto rounded-full bg-[#F2F3F0] px-2 py-0.5 text-[10px] font-medium text-[#94a3b8] dark:bg-[#1e293b] dark:text-[#64748b]">{t('arena.duel.private')}</span>
           </div>
-          <p className="text-xs text-[#666666] dark:text-[#94a3b8] mb-3">
-            Создай приватную комнату и скинь ссылку другу. Результат не влияет на рейтинг.
-          </p>
+          <p className="text-xs text-[#666666] dark:text-[#94a3b8] mb-3">{t('arena.duel.linkOnly')}</p>
 
           {duelRoom ? (
             <div className="flex flex-col gap-2">
@@ -237,16 +249,16 @@ export function ArenaHubPage() {
               </div>
               <div className="flex gap-2">
                 <Button variant="secondary" size="sm" onClick={() => { setDuelRoom(null); setCopiedDuel(false) }} className="flex-1 justify-center">
-                  Новая
+                  {t('arena.duel.new')}
                 </Button>
                 <Button variant="orange" size="sm" onClick={() => navigate(`/code-rooms/${duelRoom.id}`)} className="flex-1 justify-center">
-                  Войти в комнату
+                  {t('arena.duel.openRoom')}
                 </Button>
               </div>
             </div>
           ) : (
             <Button variant="secondary" size="md" onClick={handleCreateFriendlyDuel} loading={creatingDuel} className="w-full justify-center">
-              <Swords className="w-4 h-4" /> Создать дуэль по ссылке
+              <Swords className="w-4 h-4" /> {t('arena.duel.create')}
             </Button>
           )}
         </Card>
@@ -254,17 +266,17 @@ export function ArenaHubPage() {
         {/* Open matches */}
         <Card padding="none">
           <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">Открытые матчи</h3>
+            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{t('arena.openMatches.title')}</h3>
             <span className="text-xs text-[#94a3b8]">{openMatches.length}</span>
           </div>
           <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
             {openMatches.length === 0 ? (
-              <div className="px-4 py-8 text-center text-xs text-[#94a3b8]">Нет открытых матчей</div>
+              <div className="px-4 py-8 text-center text-xs text-[#94a3b8]">{t('arena.openMatches.empty')}</div>
             ) : openMatches.map((m: any, i: number) => (
               <div key={m.id ?? i} className={`gap-3 px-4 py-3 ${isMobile ? 'flex flex-col items-start' : 'flex items-center'}`}>
                 <Swords className="w-4 h-4 text-[#666666] dark:text-[#94a3b8] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#111111] dark:text-[#f8fafc] truncate">{m.taskTitle ?? 'Задача'}</p>
+                  <p className="text-sm font-medium text-[#111111] dark:text-[#f8fafc] truncate">{m.taskTitle ?? t('arena.openMatches.taskFallback')}</p>
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
                     {m.topic && <span className="text-xs text-[#666666] dark:text-[#94a3b8]">{m.topic}</span>}
                     {m.difficulty && (
@@ -280,7 +292,7 @@ export function ArenaHubPage() {
                   </div>
                 </div>
                 <Button size="sm" variant="secondary" className={isMobile ? 'w-full justify-center' : ''} onClick={() => navigate(`/arena/${m.id}`)}>
-                  Войти
+                  {t('arena.openMatches.join')}
                 </Button>
               </div>
             ))}
@@ -294,18 +306,18 @@ export function ArenaHubPage() {
         <Card padding="md">
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="w-4 h-4 text-[#6366F1]" />
-            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">Лига</h3>
+            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{t('arena.league.title')}</h3>
           </div>
           <div className="text-center py-2">
             <p className="font-mono text-3xl font-bold text-[#6366F1]">Arena</p>
-            <p className="text-xs text-[#666666] dark:text-[#94a3b8] mt-1">Станьте первым в рейтинге</p>
+            <p className="text-xs text-[#666666] dark:text-[#94a3b8] mt-1">{t('arena.league.subtitle')}</p>
           </div>
         </Card>
 
         {/* Leaderboard */}
         <Card padding="none">
           <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">Лидерборд</h3>
+            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{t('arena.leaderboard.title')}</h3>
             <Trophy className="w-4 h-4 text-[#f59e0b]" />
           </div>
           <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
@@ -323,7 +335,7 @@ export function ArenaHubPage() {
                   <Avatar name={e.displayName ?? '?'} size="xs" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-[#111111] dark:text-[#f8fafc] truncate">{e.displayName}</p>
-                    <p className={`text-[10px] ${LEAGUE_COLORS[e.league] ?? 'text-[#94a3b8]'}`}>{LEAGUE_LABELS[e.league] ?? ''}</p>
+                    <p className={`text-[10px] ${LEAGUE_COLORS[e.league] ?? 'text-[#94a3b8]'}`}>{t(`arena.leagueLabel.${(LEAGUE_LABELS[e.league] ?? '').toLowerCase()}`)}</p>
                   </div>
                   <span className="text-xs font-mono text-[#666666] dark:text-[#94a3b8]">{e.rating ?? e.wins ?? 0}</span>
                 </div>

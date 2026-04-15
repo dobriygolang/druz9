@@ -89,4 +89,8 @@ export const circleApi = {
     const r = await apiClient.get<{ members?: CircleMember[] }>(`/api/v1/circles/${circleId}/members`)
     return r.data.members ?? []
   },
+
+  deleteCircle: async (circleId: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/circles/${circleId}`)
+  },
 }

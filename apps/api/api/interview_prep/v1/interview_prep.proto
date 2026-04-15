@@ -211,6 +211,7 @@ message SubmitMockStageRequest {
   string              code       = 2;
   common.v1.ProgrammingLanguage language   = 3;  // was: string
   string              notes      = 4;
+  MockStageKind       stage_kind = 5;
 }
 
 message ReviewMockSystemDesignRequest {

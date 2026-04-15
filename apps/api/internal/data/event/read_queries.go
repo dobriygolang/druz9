@@ -63,21 +63,28 @@ func (r *Repo) ListEvents(
 }
 
 func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, string, []any, error) {
+	hasExplicitWindow := opts.From != nil || opts.To != nil
 	opts = normalizeListEventsWindow(opts, time.Now())
 
 	var args []any
 	argNum := 1
 	conditions := []string{}
 
-	if opts.From != nil {
-		conditions = append(conditions, fmt.Sprintf("e.scheduled_at >= $%d", argNum))
-		args = append(args, *opts.From)
-		argNum++
-	}
-	if opts.To != nil {
-		conditions = append(conditions, fmt.Sprintf("e.scheduled_at <= $%d", argNum))
-		args = append(args, *opts.To)
-		argNum++
+	if opts.From != nil && opts.To != nil && !hasExplicitWindow && opts.Status != "past" {
+		conditions = append(conditions, fmt.Sprintf("(e.scheduled_at IS NULL OR (e.scheduled_at >= $%d AND e.scheduled_at <= $%d))", argNum, argNum+1))
+		args = append(args, *opts.From, *opts.To)
+		argNum += 2
+	} else {
+		if opts.From != nil {
+			conditions = append(conditions, fmt.Sprintf("e.scheduled_at >= $%d", argNum))
+			args = append(args, *opts.From)
+			argNum++
+		}
+		if opts.To != nil {
+			conditions = append(conditions, fmt.Sprintf("e.scheduled_at <= $%d", argNum))
+			args = append(args, *opts.To)
+			argNum++
+		}
 	}
 
 	if opts.From == nil && opts.To == nil {
@@ -127,7 +134,7 @@ SELECT
 FROM events e
 JOIN users cu ON cu.id = e.creator_id
 %s
-ORDER BY e.scheduled_at ASC
+ORDER BY e.scheduled_at IS NULL ASC, e.scheduled_at ASC, e.created_at DESC
 `, whereClause)
 
 	countQuery := fmt.Sprintf(`
@@ -201,7 +208,8 @@ func (r *Repo) fetchEvents(
 	events := make([]*model.Event, 0, 16)
 	for rows.Next() {
 		var event model.Event
-		var scheduledAt, createdAt time.Time
+		var scheduledAt *time.Time
+		var createdAt time.Time
 
 		if err := rows.Scan(
 			&event.ID,
@@ -355,7 +363,8 @@ WHERE e.id = $1
 	defer rows.Close()
 
 	var event model.Event
-	var scheduledAt, createdAt time.Time
+	var scheduledAt *time.Time
+	var createdAt time.Time
 	if !rows.Next() {
 		if err := rows.Err(); err != nil {
 			return nil, fmt.Errorf("iterate event: %w", err)

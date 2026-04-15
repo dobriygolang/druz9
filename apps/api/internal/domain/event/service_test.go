@@ -70,7 +70,24 @@ func TestListEvents(t *testing.T) {
 
 		_, err := svc.CreateEvent(context.Background(), uuid.New(), model.CreateEventRequest{
 			Title:  "Test Event",
-			Repeat: "yearly",
+			Repeat: "invalid",
+		})
+		if err == nil {
+			t.Fatal("expected error")
+		}
+	})
+
+	t.Run("requires schedule for repeating events", func(t *testing.T) {
+		t.Parallel()
+
+		mockRepo := mocks.NewRepository(t)
+		svc := NewEventService(Config{
+			Repository: mockRepo,
+		})
+
+		_, err := svc.CreateEvent(context.Background(), uuid.New(), model.CreateEventRequest{
+			Title:  "Test Event",
+			Repeat: model.EventRepeatWeekly,
 		})
 		if err == nil {
 			t.Fatal("expected error")

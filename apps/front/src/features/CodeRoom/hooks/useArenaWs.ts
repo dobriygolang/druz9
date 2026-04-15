@@ -17,17 +17,23 @@ export interface ArenaPlayerState {
   userId: string
   displayName: string
   code: string
-  /** Backend obfuscates opponent code during active match */
+  currentCode?: string
   obfuscated?: boolean
   submittedAt?: string
   isCorrect?: boolean
+  freezeUntil?: string
+  isCreator?: boolean
+  isWinner?: boolean
 }
 
 export interface ArenaMatchState {
   id: string
   status: string
   taskTitle?: string
-  difficulty?: number
+  taskStatement?: string
+  starterCode?: string
+  difficulty?: number | string
+  difficultyLabel?: string
   durationSeconds?: number
   startedAt?: string
   winnerId?: string
@@ -60,13 +66,18 @@ export function useArenaWs(opts: UseArenaWsOptions): UseArenaWsReturn {
   const [matchState, setMatchState] = useState<ArenaMatchState | null>(null)
   const [players, setPlayers] = useState<ArenaPlayerState[]>([])
 
+  const normalizePlayer = useCallback((player: ArenaPlayerState) => ({
+    ...player,
+    code: player.code ?? player.currentCode ?? '',
+  }), [])
+
   const handleMessage = useCallback((raw: unknown) => {
     const msg = raw as ArenaMessage
 
     switch (msg.type) {
       case 'snapshot': {
         if (msg.match) setMatchState(msg.match)
-        if (msg.players) setPlayers(msg.players)
+        if (msg.players) setPlayers(msg.players.map(normalizePlayer))
         break
       }
       case 'code_update': {
@@ -85,11 +96,11 @@ export function useArenaWs(opts: UseArenaWsOptions): UseArenaWsReturn {
         if (msg.match) {
           setMatchState(msg.match)
         }
-        if (msg.players) setPlayers(msg.players)
+        if (msg.players) setPlayers(msg.players.map(normalizePlayer))
         break
       }
     }
-  }, [])
+  }, [normalizePlayer])
 
   useEffect(() => {
     if (!matchId || !enabled) return

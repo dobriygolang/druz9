@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from 'react'
 import { useOutletContext, useNavigate } from 'react-router-dom'
 import { ChevronRight, MapPin, X, ExternalLink } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Button } from '@/shared/ui/Button'
 import { ErrorState } from '@/shared/ui/ErrorState'
@@ -13,20 +14,20 @@ const STATUS_COLORS: Record<string, string> = {
   offline: 'bg-[#94a3b8]',
 }
 
-const STATUS_LABELS: Record<string, string> = {
-  online: 'Онлайн',
-  recently_active: 'Недавно был',
-  offline: 'Оффлайн',
-}
-
 function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
   user: CommunityPoint
   onClose: () => void
   onNavigate: () => void
   isMobile: boolean
 }) {
+  const { t } = useTranslation()
   const name = `${user.firstName} ${user.lastName}`.trim()
   const status = user.activityStatus ?? 'offline'
+  const statusLabels: Record<string, string> = {
+    online: t('users.status.online'),
+    recently_active: t('users.status.recentlyActive'),
+    offline: t('users.status.offline'),
+  }
 
   if (isMobile) {
     return (
@@ -66,7 +67,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
               'bg-[#f1f5f9] text-[#94a3b8]'
             }`}>
               <span className={`w-1.5 h-1.5 rounded-full ${STATUS_COLORS[status] ?? STATUS_COLORS.offline}`} />
-              {STATUS_LABELS[status] ?? 'Оффлайн'}
+              {statusLabels[status] ?? t('users.status.offline')}
             </span>
           </div>
 
@@ -77,7 +78,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
                   <MapPin className="w-4 h-4 text-[#6366F1]" />
                 </div>
                 <div>
-                  <p className="text-[10px] text-[#94a3b8] uppercase tracking-wide font-medium">Регион</p>
+                  <p className="text-[10px] text-[#94a3b8] uppercase tracking-wide font-medium">{t('users.region')}</p>
                   <p className="text-sm font-medium text-[#111111]">{user.region}</p>
                 </div>
               </div>
@@ -86,7 +87,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
 
           <div className="border-t border-[#f1f5f9] px-6 pb-6 pt-4 flex flex-col gap-2">
             <Button variant="secondary" size="sm" className="justify-center" onClick={onClose}>
-              Закрыть
+              {t('common.close')}
             </Button>
             <Button
               variant="orange"
@@ -95,7 +96,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
               onClick={onNavigate}
             >
               <ExternalLink className="w-4 h-4" />
-              Перейти в профиль
+              {t('users.openProfile')}
             </Button>
           </div>
         </div>
@@ -142,7 +143,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
             'bg-[#f1f5f9] text-[#94a3b8]'
           }`}>
             <span className={`w-1.5 h-1.5 rounded-full ${STATUS_COLORS[status] ?? STATUS_COLORS.offline}`} />
-            {STATUS_LABELS[status] ?? 'Оффлайн'}
+            {statusLabels[status] ?? t('users.status.offline')}
           </span>
         </div>
 
@@ -154,7 +155,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
                 <MapPin className="w-4 h-4 text-[#6366F1]" />
               </div>
               <div>
-                <p className="text-[10px] text-[#94a3b8] uppercase tracking-wide font-medium">Регион</p>
+                <p className="text-[10px] text-[#94a3b8] uppercase tracking-wide font-medium">{t('users.region')}</p>
                 <p className="text-sm font-medium text-[#111111]">{user.region}</p>
               </div>
             </div>
@@ -171,7 +172,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
             onClick={onNavigate}
           >
             <ExternalLink className="w-4 h-4" />
-            Перейти в профиль
+            {t('users.openProfile')}
           </Button>
         </div>
       </div>
@@ -180,6 +181,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
 }
 
 export function UsersPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const isMobile = useIsMobile()
   const { search = '' } = useOutletContext<{ search: string }>()
@@ -191,8 +193,8 @@ export function UsersPage() {
     setError(null)
     geoApi.getCommunity()
       .then(setUsers)
-      .catch(() => setError('Не удалось загрузить данные'))
-  }, [])
+      .catch(() => setError(t('common.loadFailed')))
+  }, [t])
 
   useEffect(() => { fetchUsers() }, [fetchUsers])
 
@@ -209,14 +211,14 @@ export function UsersPage() {
       <div className={isMobile ? 'px-4 pt-4 pb-6' : 'px-6 pt-4 pb-6'}>
         {isMobile && (
           <div className="section-enter mb-4 rounded-[28px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(239,246,255,0.94)_52%,_rgba(255,247,237,0.94))] p-5 shadow-[0_16px_32px_rgba(15,23,42,0.06)]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1]">People Directory</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1]">{t('users.eyebrow')}</p>
             <div className="mt-3 flex items-end justify-between gap-4">
               <div>
                 <p className="text-2xl font-bold text-[#111111]">{filtered.length}</p>
-                <p className="mt-1 text-sm leading-6 text-[#475569]">Открой карточку и быстро проверь, кто рядом и чем живёт.</p>
+                <p className="mt-1 text-sm leading-6 text-[#475569]">{t('users.subtitle')}</p>
               </div>
               <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 text-right shadow-sm backdrop-blur">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">Людей</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">{t('users.people')}</p>
                 <p className="mt-2 font-mono text-xl font-bold text-[#111111]">{users.length}</p>
               </div>
             </div>
@@ -261,7 +263,7 @@ export function UsersPage() {
           )
         })}
         {filtered.length === 0 && (
-          <div className="text-center py-16 text-[#94a3b8] text-sm">Ничего не найдено</div>
+          <div className="text-center py-16 text-[#94a3b8] text-sm">{t('users.empty')}</div>
         )}
       </div>
       </div>

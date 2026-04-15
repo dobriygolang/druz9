@@ -35,10 +35,10 @@ export function RTConfigAdminPage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-xl font-bold text-[#0f172a]">Config</h1>
-          <p className="text-sm text-[#666666] mt-0.5">Настройки приложения</p>
+          <p className="text-sm text-[#666666] mt-0.5">Application settings</p>
         </div>
         <Button variant="orange" onClick={handleSave} loading={saving}>
-          <Save className="w-4 h-4" /> {saved ? 'Сохранено!' : 'Сохранить'}
+          <Save className="w-4 h-4" /> {saved ? 'Saved!' : 'Save'}
         </Button>
       </div>
 
@@ -50,12 +50,12 @@ export function RTConfigAdminPage() {
         <div className="flex flex-col gap-4">
           {/* Auth section */}
           <div className="bg-white rounded-xl border border-[#CBCCC9] p-5">
-            <h2 className="text-sm font-semibold text-[#0f172a] mb-4">Авторизация</h2>
+            <h2 className="text-sm font-semibold text-[#0f172a] mb-4">Authentication</h2>
             <div className="flex flex-col gap-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[#0f172a]">Требовать авторизацию</p>
-                  <p className="text-xs text-[#666666] mt-0.5">Все страницы требуют входа</p>
+                  <p className="text-sm font-medium text-[#0f172a]">Require authentication</p>
+                  <p className="text-xs text-[#666666] mt-0.5">All pages require sign-in</p>
                 </div>
                 <Toggle
                   checked={config.app_require_auth ?? false}
@@ -64,8 +64,8 @@ export function RTConfigAdminPage() {
               </div>
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium text-[#0f172a]">Arena требует авторизацию</p>
-                  <p className="text-xs text-[#666666] mt-0.5">Матчи Arena только для авторизованных</p>
+                  <p className="text-sm font-medium text-[#0f172a]">Arena requires authentication</p>
+                  <p className="text-xs text-[#666666] mt-0.5">Arena matches are available only to signed-in users</p>
                 </div>
                 <Toggle
                   checked={config.arena_require_auth ?? false}
@@ -94,7 +94,7 @@ export function RTConfigAdminPage() {
           {/* Other config */}
           {Object.entries(config).filter(([k]) => !['app_require_auth', 'arena_require_auth', 'enable_podcasts', 'enable_arena', 'enable_mock_interviews', 'enable_community_map'].includes(k) && typeof config[k] === 'string').length > 0 && (
             <div className="bg-white rounded-xl border border-[#CBCCC9] p-5">
-              <h2 className="text-sm font-semibold text-[#0f172a] mb-4">Прочие настройки</h2>
+              <h2 className="text-sm font-semibold text-[#0f172a] mb-4">Other settings</h2>
               <div className="grid grid-cols-2 gap-4">
                 {Object.entries(config).filter(([, v]) => typeof v === 'string').map(([key, value]) => (
                   <Input key={key} label={key} value={String(value)} onChange={e => setVal(key, e.target.value)} />

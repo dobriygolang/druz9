@@ -1,6 +1,7 @@
 import { useEffect, useState, useMemo, useCallback } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Search, ChevronRight, Code2, BookOpen } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import type { Task } from '@/entities/CodeRoom/model/types'
 import { Badge } from '@/shared/ui/Badge'
@@ -9,7 +10,7 @@ import { DIFF_LABELS, DIFF_VARIANTS } from '@/shared/lib/taskLabels'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 
 const DIFFICULTY_FILTERS = [
-  { value: '', label: 'Все' },
+  { value: '', label: 'All' },
   { value: 'TASK_DIFFICULTY_EASY', label: 'Easy' },
   { value: 'TASK_DIFFICULTY_MEDIUM', label: 'Medium' },
   { value: 'TASK_DIFFICULTY_HARD', label: 'Hard' },
@@ -31,6 +32,7 @@ const DIFF_BORDER: Record<string, string> = {
 }
 
 export function PracticeSoloPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const isMobile = useIsMobile()
   const [tasks, setTasks] = useState<Task[]>([])
@@ -45,9 +47,9 @@ export function PracticeSoloPage() {
     setLoading(true)
     codeRoomApi.listTasks({ difficulty: difficulty || undefined })
       .then(ts => setTasks(ts))
-      .catch(() => setError('Не удалось загрузить данные'))
+      .catch(() => setError(t('common.loadFailed')))
       .finally(() => setLoading(false))
-  }, [difficulty])
+  }, [difficulty, t])
 
   useEffect(() => {
     fetchTasks()
@@ -97,13 +99,13 @@ export function PracticeSoloPage() {
       {/* Header */}
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-[#111111] dark:text-[#f8fafc]">Solo Practice</h1>
-          <p className="mt-1 text-sm text-[#667085] dark:text-[#7e93b0]">Выбери задачу и начни тренировку</p>
+          <h1 className="text-xl font-bold text-[#111111] dark:text-[#f8fafc]">{t('solo.title')}</h1>
+          <p className="mt-1 text-sm text-[#667085] dark:text-[#7e93b0]">{t('solo.subtitle')}</p>
         </div>
         <div className="flex items-center gap-2 rounded-2xl border border-[#CBCCC9] bg-white px-4 py-2 dark:border-[#1a2540] dark:bg-[#161c2d]">
           <Code2 className="h-4 w-4 text-[#6366F1]" />
           <span className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : filtered.length}</span>
-          <span className="text-xs text-[#667085] dark:text-[#7e93b0]">задач</span>
+          <span className="text-xs text-[#667085] dark:text-[#7e93b0]">{t('solo.tasks')}</span>
         </div>
       </div>
 
@@ -113,7 +115,7 @@ export function PracticeSoloPage() {
         <input
           value={search}
           onChange={e => setSearch(e.target.value)}
-          placeholder="Поиск по названию или теме..."
+          placeholder={t('solo.searchPlaceholder')}
           className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#CBCCC9] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 dark:bg-[#161c2d] dark:border-[#1a2540] dark:text-[#f8fafc] dark:placeholder-[#4d6380]"
         />
       </div>
@@ -121,7 +123,7 @@ export function PracticeSoloPage() {
       {/* Filters */}
       <div className="flex flex-col gap-3 mb-5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-[#666666] dark:text-[#7e93b0] mr-1">Тема:</span>
+          <span className="text-xs font-medium text-[#666666] dark:text-[#7e93b0] mr-1">{t('solo.topic')}:</span>
           {TOPIC_FILTERS.map(tf => (
             <button
               key={tf.value}
@@ -143,7 +145,7 @@ export function PracticeSoloPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-[#666666] dark:text-[#7e93b0] mr-1">Сложность:</span>
+          <span className="text-xs font-medium text-[#666666] dark:text-[#7e93b0] mr-1">{t('solo.difficulty')}:</span>
           {DIFFICULTY_FILTERS.map(df => (
             <button
               key={df.value}
@@ -183,8 +185,8 @@ export function PracticeSoloPage() {
       ) : filtered.length === 0 ? (
         <div className="rounded-2xl border border-dashed border-[#CBCCC9] bg-white py-16 text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
           <BookOpen className="mx-auto h-10 w-10 text-[#CBCCC9] dark:text-[#4d6380]" />
-          <p className="mt-3 text-sm font-medium text-[#667085] dark:text-[#7e93b0]">Задачи не найдены</p>
-          <p className="mt-1 text-xs text-[#94a3b8]">Попробуйте изменить фильтры</p>
+          <p className="mt-3 text-sm font-medium text-[#667085] dark:text-[#7e93b0]">{t('solo.emptyTitle')}</p>
+          <p className="mt-1 text-xs text-[#94a3b8]">{t('solo.emptyBody')}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-2">

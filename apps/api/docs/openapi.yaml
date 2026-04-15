@@ -909,6 +909,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/circle.v1.CircleResponse'
+    /api/v1/circles/{circleId}:
+        delete:
+            tags:
+                - CircleService
+            operationId: CircleService_DeleteCircle
+            parameters:
+                - name: circleId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/circle.v1.DeleteCircleResponse'
     /api/v1/circles/{circleId}/events:
         get:
             tags:
@@ -1110,6 +1128,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/code_editor.v1.GetLeaderboardResponse'
+    /api/v1/code-editor/reviews/{submissionId}:
+        get:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_GetSolutionReview
+            parameters:
+                - name: submissionId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.SolutionReviewResponse'
     /api/v1/code-editor/rooms:
         get:
             tags:
@@ -1157,6 +1193,30 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/code_editor.v1.GetRoomResponse'
+    /api/v1/code-editor/rooms/{roomId}/close:
+        post:
+            tags:
+                - CodeEditorService
+            operationId: CodeEditorService_CloseRoom
+            parameters:
+                - name: roomId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/code_editor.v1.CloseRoomRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/code_editor.v1.StatusResponse'
     /api/v1/code-editor/rooms/{roomId}/join:
         post:
             tags:
@@ -2023,6 +2083,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileStatusResponse'
+    /api/v1/profile/goal:
+        post:
+            tags:
+                - ProfileService
+            operationId: ProfileService_SetUserGoal
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/profile.v1.SetUserGoalRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.SetUserGoalResponse'
     /api/v1/profile/location:
         post:
             tags:
@@ -2131,6 +2209,24 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileProgressResponse'
+    /api/v1/profile/{userId}/readiness:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetReadiness
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.GetReadinessResponse'
     /api/v1/referrals:
         get:
             tags:
@@ -2567,6 +2663,8 @@ components:
                 failureKind:
                     type: integer
                     format: enum
+                submissionId:
+                    type: string
         circle.v1.Circle:
             type: object
             properties:
@@ -2648,6 +2746,11 @@ components:
                         type: string
                 isPublic:
                     type: boolean
+        circle.v1.DeleteCircleResponse:
+            type: object
+            properties:
+                status:
+                    type: string
         circle.v1.InviteToCircleRequest:
             type: object
             properties:
@@ -2720,6 +2823,11 @@ components:
             properties:
                 review:
                     $ref: '#/components/schemas/common.v1.InterviewSolutionReview'
+        code_editor.v1.CloseRoomRequest:
+            type: object
+            properties:
+                roomId:
+                    type: string
         code_editor.v1.CreateRoomRequest:
             type: object
             properties:
@@ -2893,6 +3001,69 @@ components:
                     type: string
                 ready:
                     type: boolean
+        code_editor.v1.SolutionReview:
+            type: object
+            properties:
+                id:
+                    type: string
+                submissionId:
+                    type: string
+                sourceType:
+                    type: string
+                taskId:
+                    type: string
+                isCorrect:
+                    type: boolean
+                    description: 'Level 1: instant feedback'
+                attemptNumber:
+                    type: integer
+                    format: int32
+                solveTimeMs:
+                    type: string
+                medianTimeMs:
+                    type: string
+                passedCount:
+                    type: integer
+                    format: int32
+                totalCount:
+                    type: integer
+                    format: int32
+                status:
+                    type: string
+                    description: 'Level 2: AI review'
+                aiVerdict:
+                    type: string
+                aiTimeComplexity:
+                    type: string
+                aiSpaceComplexity:
+                    type: string
+                aiPattern:
+                    type: string
+                aiStrengths:
+                    type: array
+                    items:
+                        type: string
+                aiWeaknesses:
+                    type: array
+                    items:
+                        type: string
+                aiHint:
+                    type: string
+                aiSkillSignals:
+                    type: object
+                    additionalProperties:
+                        type: string
+                comparisonSummary:
+                    type: string
+                    description: 'Level 3: duel comparison'
+                createdAt:
+                    type: string
+                    format: date-time
+        code_editor.v1.SolutionReviewResponse:
+            type: object
+            properties:
+                review:
+                    $ref: '#/components/schemas/code_editor.v1.SolutionReview'
         code_editor.v1.StartRoomRequest:
             type: object
             properties:
@@ -2958,6 +3129,8 @@ components:
                     type: string
                 isCorrect:
                     type: boolean
+                submissionId:
+                    type: string
         code_editor.v1.Task:
             type: object
             properties:
@@ -3157,6 +3330,10 @@ components:
                     items:
                         type: string
                 followUpQuestions:
+                    type: array
+                    items:
+                        type: string
+                gaps:
                     type: array
                     items:
                         type: string
@@ -4115,6 +4292,9 @@ components:
                     format: enum
                 notes:
                     type: string
+                stageKind:
+                    type: integer
+                    format: enum
         interview_prep.v1.SubmitMockStageResponse:
             type: object
             properties:
@@ -4414,6 +4594,22 @@ components:
                 code:
                     type: string
             description: BindTelegram links an existing account to a Telegram identity via challenge flow.
+        profile.v1.CompanyReadiness:
+            type: object
+            properties:
+                company:
+                    type: string
+                totalStages:
+                    type: integer
+                    format: int32
+                completedStages:
+                    type: integer
+                    format: int32
+                percent:
+                    type: integer
+                    format: int32
+                hasActive:
+                    type: boolean
         profile.v1.CompleteRegistrationRequest:
             type: object
             properties:
@@ -4483,9 +4679,51 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/profile.v1.ActivityDay'
+        profile.v1.GetReadinessResponse:
+            type: object
+            properties:
+                score:
+                    type: integer
+                    format: int32
+                level:
+                    type: string
+                levelLabel:
+                    type: string
+                weakestSkill:
+                    $ref: '#/components/schemas/profile.v1.ProfileCompetency'
+                strongestSkill:
+                    $ref: '#/components/schemas/profile.v1.ProfileCompetency'
+                nextAction:
+                    $ref: '#/components/schemas/profile.v1.ReadinessNextAction'
+                companyReadiness:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.CompanyReadiness'
+                streakDays:
+                    type: integer
+                    format: int32
+                activeDays:
+                    type: integer
+                    format: int32
         profile.v1.LogoutRequest:
             type: object
             properties: {}
+        profile.v1.NextAction:
+            type: object
+            properties:
+                title:
+                    type: string
+                description:
+                    type: string
+                actionType:
+                    type: string
+                actionUrl:
+                    type: string
+                priority:
+                    type: integer
+                    format: int32
+                skillKey:
+                    type: string
         profile.v1.ProfileCheckpointProgress:
             type: object
             properties:
@@ -4541,6 +4779,13 @@ components:
                 averageScore:
                     type: number
                     format: double
+                level:
+                    type: string
+                levelProgress:
+                    type: number
+                    format: double
+                nextMilestone:
+                    type: string
         profile.v1.ProfileProgress:
             type: object
             properties:
@@ -4570,6 +4815,12 @@ components:
                     type: array
                     items:
                         type: string
+                nextActions:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.NextAction'
+                goal:
+                    $ref: '#/components/schemas/profile.v1.UserGoal'
         profile.v1.ProfileProgressOverview:
             type: object
             properties:
@@ -4632,6 +4883,31 @@ components:
                 status:
                     type: string
             description: ProfileStatusResponse replaces the separate LogoutResponse and BindTelegramResponse.
+        profile.v1.ReadinessNextAction:
+            type: object
+            properties:
+                title:
+                    type: string
+                description:
+                    type: string
+                actionType:
+                    type: string
+                actionUrl:
+                    type: string
+                skillKey:
+                    type: string
+        profile.v1.SetUserGoalRequest:
+            type: object
+            properties:
+                kind:
+                    type: string
+                company:
+                    type: string
+        profile.v1.SetUserGoalResponse:
+            type: object
+            properties:
+                goal:
+                    $ref: '#/components/schemas/profile.v1.UserGoal'
         profile.v1.StartYandexAuthResponse:
             type: object
             properties:
@@ -4710,6 +4986,13 @@ components:
                 primaryProvider:
                     type: string
                 telegramUsername:
+                    type: string
+        profile.v1.UserGoal:
+            type: object
+            properties:
+                kind:
+                    type: string
+                company:
                     type: string
         referral.v1.CreateReferralRequest:
             type: object

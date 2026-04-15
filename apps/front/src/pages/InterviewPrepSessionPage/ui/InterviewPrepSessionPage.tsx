@@ -66,7 +66,7 @@ export function InterviewPrepSessionPage() {
       setReview(r)
       setActiveTab('result')
     } catch {
-      toast('Не удалось отправить решение', 'error')
+      toast('Failed to submit the solution', 'error')
     } finally { setSubmitting(false) }
   }
 
@@ -82,7 +82,7 @@ export function InterviewPrepSessionPage() {
       else if (r.session?.currentQuestion) setActiveTab('question')
       else setActiveTab('result')
     } catch {
-      toast('Не удалось отправить ответ', 'error')
+      toast('Failed to submit the answer', 'error')
     } finally { setSubmitting(false) }
   }
 
@@ -118,7 +118,7 @@ export function InterviewPrepSessionPage() {
               </div>
             ) : <div />}
             <Button variant="secondary" size="sm" onClick={() => navigate('/growth/interview-prep')} className="rounded-2xl">
-              Завершить
+              Finish
             </Button>
           </div>
         </header>
@@ -126,16 +126,16 @@ export function InterviewPrepSessionPage() {
         <div className="flex flex-1 flex-col gap-4 px-4 pt-4 pb-24">
           <div className="flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button onClick={() => setActiveTab('problem')} className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'problem' ? 'bg-[#111111] text-white' : 'bg-white text-[#667085] border border-[#d8d9d6]'}`}>
-              Задача
+              Task
             </button>
             {question && (
               <button onClick={() => setActiveTab('question')} className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'question' ? 'bg-[#111111] text-white' : 'bg-white text-[#667085] border border-[#d8d9d6]'}`}>
-                Вопрос
+                Question
               </button>
             )}
             {review && (
               <button onClick={() => setActiveTab('result')} className={`whitespace-nowrap rounded-full px-4 py-2 text-sm font-medium transition-colors ${activeTab === 'result' ? 'bg-[#111111] text-white' : 'bg-white text-[#667085] border border-[#d8d9d6]'}`}>
-                Оценка
+                Review
               </button>
             )}
           </div>
@@ -155,12 +155,12 @@ export function InterviewPrepSessionPage() {
                 <textarea
                   value={answer}
                   onChange={e => setAnswer(e.target.value)}
-                  placeholder="Ваш ответ..."
+                  placeholder="Your answer..."
                   rows={6}
                   className="w-full resize-none rounded-2xl border border-[#CBCCC9] bg-[#F2F3F0] px-3 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
                 />
                 <Button variant="primary" size="sm" onClick={handleAnswerQuestion} loading={submitting} className="w-full justify-center rounded-2xl">
-                  <Send className="w-3.5 h-3.5" /> Ответить
+                  <Send className="w-3.5 h-3.5" /> Answer
                 </Button>
               </div>
             )}
@@ -168,14 +168,14 @@ export function InterviewPrepSessionPage() {
               <div className="flex flex-col gap-3">
                 <div className="rounded-2xl border border-[#CBCCC9] bg-[#F8FAFC] p-4">
                   <div className="mb-2 flex items-center justify-between">
-                    <span className="text-xs font-semibold uppercase text-[#475569]">Оценка</span>
+                    <span className="text-xs font-semibold uppercase text-[#475569]">Review</span>
                     <span className="font-mono text-lg font-bold text-[#6366f1]">{review.score ?? '--'}/10</span>
                   </div>
                   {review.summary && <p className="text-sm text-[#475569]">{review.summary}</p>}
                 </div>
                 {review.gaps?.length > 0 && (
                   <div>
-                    <p className="mb-2 text-xs font-semibold text-[#475569]">Пробелы:</p>
+                    <p className="mb-2 text-xs font-semibold text-[#475569]">Gaps:</p>
                     {review.gaps.map((g: string, i: number) => (
                       <p key={i} className="flex gap-2 text-xs text-[#666666]"><span className="text-[#ef4444]">•</span>{g}</p>
                     ))}
@@ -202,7 +202,7 @@ export function InterviewPrepSessionPage() {
                     </select>
                   )}
                   <Button variant="orange" size="sm" onClick={handleSubmitCode} loading={submitting} className="rounded-2xl">
-                    <Send className="w-3.5 h-3.5" /> Отправить
+                    <Send className="w-3.5 h-3.5" /> Submit
                   </Button>
                 </div>
               </div>
@@ -221,7 +221,7 @@ export function InterviewPrepSessionPage() {
 
           {!isCodeTask && activeTab === 'problem' && (
             <div className="rounded-[28px] border border-dashed border-[#d8d9d6] bg-white/70 px-4 py-6 text-center text-sm text-[#94a3b8]">
-              Используйте карточки выше, чтобы пройти интервью по шагам.
+              Use the cards above to go through the interview step by step.
             </div>
           )}
         </div>
@@ -241,7 +241,7 @@ export function InterviewPrepSessionPage() {
             <p className="text-sm font-bold text-[#0f172a]">{task?.title ?? 'Interview Session'}</p>
             <p className="text-xs text-[#666666]">{task?.companyTag ?? 'General'} · {PREP_TYPE_LABELS[task?.prepType] ?? task?.prepType ?? ''}</p>
           </div>
-          <Badge variant="success" dot>Идёт интервью</Badge>
+          <Badge variant="success" dot>Interview in progress</Badge>
         </div>
         <div className="flex items-center gap-2">
           {timeLeft > 0 && (
@@ -250,7 +250,7 @@ export function InterviewPrepSessionPage() {
             </div>
           )}
           <Button variant="secondary" size="sm" onClick={() => navigate('/growth/interview-prep')}>
-            Завершить
+            Finish
           </Button>
         </div>
       </header>
@@ -261,13 +261,13 @@ export function InterviewPrepSessionPage() {
         <div className="w-[380px] flex-shrink-0 bg-white border-r border-[#CBCCC9] flex flex-col">
           <div className="flex border-b border-[#CBCCC9]">
             <button onClick={() => setActiveTab('problem')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'problem' ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
-              Задача
+              Task
             </button>
             {question && <button onClick={() => setActiveTab('question')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'question' ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
-              Вопрос
+              Question
             </button>}
             {review && <button onClick={() => setActiveTab('result')} className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px ${activeTab === 'result' ? 'border-[#6366F1] text-[#111111]' : 'border-transparent text-[#666666]'}`}>
-              Оценка
+              Review
             </button>}
           </div>
           <div className="flex-1 overflow-y-auto p-4">
@@ -285,12 +285,12 @@ export function InterviewPrepSessionPage() {
                 <textarea
                   value={answer}
                   onChange={e => setAnswer(e.target.value)}
-                  placeholder="Ваш ответ..."
+                  placeholder="Your answer..."
                   rows={6}
                   className="w-full px-3 py-2 text-sm bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
                 />
                 <Button variant="primary" size="sm" onClick={handleAnswerQuestion} loading={submitting} className="w-full justify-center">
-                  <Send className="w-3.5 h-3.5" /> Ответить
+                  <Send className="w-3.5 h-3.5" /> Answer
                 </Button>
               </div>
             )}
@@ -298,14 +298,14 @@ export function InterviewPrepSessionPage() {
               <div className="flex flex-col gap-3">
                 <div className="p-3 bg-[#F2F3F0] rounded-lg border border-[#CBCCC9]">
                   <div className="flex items-center justify-between mb-2">
-                    <span className="text-xs font-semibold text-[#475569] uppercase">Оценка</span>
+                    <span className="text-xs font-semibold text-[#475569] uppercase">Review</span>
                     <span className="font-mono text-lg font-bold text-[#6366f1]">{review.score ?? '--'}/10</span>
                   </div>
                   {review.summary && <p className="text-sm text-[#475569]">{review.summary}</p>}
                 </div>
                 {review.gaps?.length > 0 && (
                   <div>
-                    <p className="text-xs font-semibold text-[#475569] mb-2">Пробелы:</p>
+                    <p className="text-xs font-semibold text-[#475569] mb-2">Gaps:</p>
                     {review.gaps.map((g: string, i: number) => (
                       <p key={i} className="text-xs text-[#666666] flex gap-2"><span className="text-[#ef4444]">•</span>{g}</p>
                     ))}
@@ -334,7 +334,7 @@ export function InterviewPrepSessionPage() {
                   </select>
                 )}
                 <Button variant="orange" size="sm" onClick={handleSubmitCode} loading={submitting}>
-                  <Send className="w-3.5 h-3.5" /> Отправить
+                  <Send className="w-3.5 h-3.5" /> Submit
                 </Button>
               </div>
             </div>
@@ -355,7 +355,7 @@ export function InterviewPrepSessionPage() {
           <div className="flex-1 flex items-center justify-center bg-[#F2F3F0]">
             <div className="text-center text-[#94a3b8]">
               <MessageSquare className="w-12 h-12 mx-auto mb-3 opacity-30" />
-              <p className="text-sm">Отвечайте на вопросы в левой панели</p>
+              <p className="text-sm">Answer questions in the left panel</p>
             </div>
           </div>
         )}

@@ -233,6 +233,227 @@ func RoundTenth(value float64) float64 {
 	return math.Round(value*10) / 10
 }
 
+// ── Skill levels ──────────────────────────────────────────────────────────
+
+const (
+	LevelBeginner  = "beginner"
+	LevelConfident = "confident"
+	LevelStrong    = "strong"
+	LevelExpert    = "expert"
+)
+
+// ComputeLevel determines the skill level and intra-level progress for a competency.
+func ComputeLevel(c *model.ProfileCompetency) (level string, progress float64) {
+	if c == nil {
+		return LevelBeginner, 0
+	}
+	score := c.Score
+	totalSessions := c.PracticeSessions + c.StageCount
+
+	switch {
+	case c.VerifiedScore >= 85 && c.StageCount >= 5:
+		// Expert: verified 85+ with 5+ mock stages
+		return LevelExpert, clampProgress(float64(score-85) / 15)
+	case c.VerifiedScore >= 60:
+		// Strong: verified 60+
+		return LevelStrong, clampProgress(float64(c.VerifiedScore-60) / 25)
+	case score >= 30 && totalSessions >= 3:
+		// Confident: blended score 30+ and 3+ total sessions
+		return LevelConfident, clampProgress(float64(score-30) / 30)
+	default:
+		// Beginner
+		if totalSessions == 0 {
+			return LevelBeginner, 0
+		}
+		return LevelBeginner, clampProgress(float64(score) / 30)
+	}
+}
+
+// ComputeNextMilestone returns a human-readable string describing what the user
+// needs to do to reach the next level for a given competency.
+func ComputeNextMilestone(c *model.ProfileCompetency) string {
+	if c == nil {
+		return "Реши первую задачу"
+	}
+	level, _ := ComputeLevel(c)
+	switch level {
+	case LevelBeginner:
+		totalSessions := c.PracticeSessions + c.StageCount
+		if totalSessions == 0 {
+			return fmt.Sprintf("Реши первую задачу по %s", c.Label)
+		}
+		if c.Score < 30 {
+			return fmt.Sprintf("Набери 30 баллов по %s (сейчас %d)", c.Label, c.Score)
+		}
+		needed := int32(3) - totalSessions
+		if needed > 0 {
+			return fmt.Sprintf("Реши ещё %d задач по %s", needed, c.Label)
+		}
+		return fmt.Sprintf("Продолжай практику по %s", c.Label)
+	case LevelConfident:
+		if c.VerifiedScore < 60 {
+			return fmt.Sprintf("Пройди mock по %s для перехода в Strong (нужен verified 60+)", c.Label)
+		}
+		return fmt.Sprintf("Продолжай mock-интервью по %s", c.Label)
+	case LevelStrong:
+		if c.VerifiedScore < 85 {
+			return fmt.Sprintf("Подними verified score до 85+ по %s (сейчас %d)", c.Label, c.VerifiedScore)
+		}
+		if c.StageCount < 5 {
+			return fmt.Sprintf("Пройди ещё %d mock-этапов по %s", 5-c.StageCount, c.Label)
+		}
+		return fmt.Sprintf("Продолжай mock-интервью по %s", c.Label)
+	case LevelExpert:
+		return fmt.Sprintf("Поддерживай уровень Expert по %s", c.Label)
+	default:
+		return ""
+	}
+}
+
+// ComputeNextActions generates up to 3 prioritized next actions based on
+// the user's competencies and goal.
+func ComputeNextActions(competencies []*model.ProfileCompetency, goal *model.UserGoal, streakDays int32) []*model.NextAction {
+	actions := make([]*model.NextAction, 0, 3)
+
+	// Find weakest competency (lowest score)
+	var weakest *model.ProfileCompetency
+	for _, c := range competencies {
+		if c == nil {
+			continue
+		}
+		if weakest == nil || c.Score < weakest.Score {
+			weakest = c
+		}
+	}
+
+	// Goal-driven prioritization
+	targetCompetencies := prioritizeByGoal(competencies, goal)
+
+	for _, c := range targetCompetencies {
+		if len(actions) >= 3 {
+			break
+		}
+		action := suggestAction(c, int32(len(actions)+1))
+		if action != nil {
+			actions = append(actions, action)
+		}
+	}
+
+	// If streak is broken and we have room, add a streak action
+	if streakDays == 0 && len(actions) < 3 {
+		actions = append(actions, &model.NextAction{
+			Title:       "Начни серию",
+			Description: "Реши daily challenge чтобы запустить стрик",
+			ActionType:  "daily",
+			ActionURL:   "/daily-challenge",
+			Priority:    int32(len(actions) + 1),
+		})
+	}
+
+	return actions
+}
+
+func prioritizeByGoal(competencies []*model.ProfileCompetency, goal *model.UserGoal) []*model.ProfileCompetency {
+	if len(competencies) == 0 {
+		return competencies
+	}
+
+	// Copy and sort by score ascending (weakest first)
+	sorted := make([]*model.ProfileCompetency, len(competencies))
+	copy(sorted, competencies)
+
+	goalKind := "general_growth"
+	if goal != nil && goal.Kind != "" {
+		goalKind = goal.Kind
+	}
+
+	switch goalKind {
+	case "weakest_first":
+		sort.SliceStable(sorted, func(i, j int) bool {
+			return sorted[i].Score < sorted[j].Score
+		})
+	case "company_prep":
+		// For company prep, focus on skills with lowest verified scores
+		sort.SliceStable(sorted, func(i, j int) bool {
+			return sorted[i].VerifiedScore < sorted[j].VerifiedScore
+		})
+	default: // general_growth
+		// Balance: prioritize by lowest score
+		sort.SliceStable(sorted, func(i, j int) bool {
+			return sorted[i].Score < sorted[j].Score
+		})
+	}
+
+	return sorted
+}
+
+func suggestAction(c *model.ProfileCompetency, priority int32) *model.NextAction {
+	if c == nil {
+		return nil
+	}
+	level, _ := ComputeLevel(c)
+
+	switch {
+	case level == LevelBeginner && c.PracticeSessions == 0 && c.StageCount == 0:
+		return &model.NextAction{
+			Title:       fmt.Sprintf("Начни %s", c.Label),
+			Description: fmt.Sprintf("У тебя пока нет попыток по %s — реши первую задачу", c.Label),
+			ActionType:  "practice",
+			ActionURL:   RecommendationHref(c.Key),
+			Priority:    priority,
+			SkillKey:    c.Key,
+		}
+	case c.Confidence != "verified" && c.PracticeScore > 30:
+		return &model.NextAction{
+			Title:       fmt.Sprintf("Пройди mock по %s", c.Label),
+			Description: fmt.Sprintf("Practice score %d — подтверди уровень через mock-интервью", c.PracticeScore),
+			ActionType:  "mock",
+			ActionURL:   RecommendationHref(c.Key),
+			Priority:    priority,
+			SkillKey:    c.Key,
+		}
+	case level == LevelBeginner:
+		return &model.NextAction{
+			Title:       fmt.Sprintf("Подтяни %s", c.Label),
+			Description: fmt.Sprintf("%s — %d%%, зона роста", c.Label, c.Score),
+			ActionType:  "practice",
+			ActionURL:   RecommendationHref(c.Key),
+			Priority:    priority,
+			SkillKey:    c.Key,
+		}
+	case level == LevelConfident && c.VerifiedScore < 60:
+		return &model.NextAction{
+			Title:       fmt.Sprintf("Пройди mock по %s", c.Label),
+			Description: fmt.Sprintf("Для перехода в Strong нужен verified 60+ (сейчас %d)", c.VerifiedScore),
+			ActionType:  "mock",
+			ActionURL:   RecommendationHref(c.Key),
+			Priority:    priority,
+			SkillKey:    c.Key,
+		}
+	case level == LevelStrong:
+		return &model.NextAction{
+			Title:       fmt.Sprintf("Доведи %s до Expert", c.Label),
+			Description: fmt.Sprintf("Verified %d — нужно 85+ и 5 mock-этапов", c.VerifiedScore),
+			ActionType:  "mock",
+			ActionURL:   RecommendationHref(c.Key),
+			Priority:    priority,
+			SkillKey:    c.Key,
+		}
+	default:
+		return nil
+	}
+}
+
+func clampProgress(v float64) float64 {
+	if v < 0 {
+		return 0
+	}
+	if v > 1 {
+		return 1
+	}
+	return math.Round(v*100) / 100
+}
+
 // MapPrepTypeToCompetencyKeys maps a prep type string to competency keys.
 func MapPrepTypeToCompetencyKeys(prepType string) []string {
 	switch model.InterviewPrepTypeFromString(prepType) {

@@ -19,7 +19,7 @@ type Service interface {
 	GetSession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepSession, error)
 	StartMockSession(ctx context.Context, user *model.User, companyTag string, programSlug string) (*model.InterviewPrepMockSession, error)
 	GetMockSession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepMockSession, error)
-	SubmitMockStage(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string, notes string) (*appinterviewprep.MockSubmitResult, error)
+	SubmitMockStage(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string, notes string, stageKind string) (*appinterviewprep.MockSubmitResult, error)
 	ReviewMockSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req appinterviewprep.SystemDesignReviewInput) (*appinterviewprep.MockSystemDesignReviewResult, error)
 	AnswerMockQuestion(ctx context.Context, user *model.User, sessionID uuid.UUID, answer string) (*appinterviewprep.MockQuestionAnswerResult, error)
 	Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string) (*appinterviewprep.SubmitResult, error)

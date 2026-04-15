@@ -1,0 +1,89 @@
+package profile
+
+import (
+	"context"
+
+	profiledomain "api/internal/domain/profile"
+	"api/internal/model"
+	v1 "api/pkg/api/profile/v1"
+
+	"github.com/go-kratos/kratos/v2/errors"
+	"github.com/google/uuid"
+)
+
+func (i *Implementation) GetReadiness(ctx context.Context, req *v1.GetReadinessRequest) (*v1.GetReadinessResponse, error) {
+	userID, err := uuid.Parse(req.UserId)
+	if err != nil {
+		return nil, errors.BadRequest("INVALID_USER_ID", "invalid user id")
+	}
+
+	progress, err := i.progressRepo.GetProfileProgress(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	readiness := profiledomain.ComputeReadiness(progress)
+
+	resp := &v1.GetReadinessResponse{
+		Score:      readiness.Score,
+		Level:      readiness.Level,
+		LevelLabel: readiness.LevelLabel,
+		StreakDays: readiness.StreakDays,
+		ActiveDays: readiness.ActiveDays,
+	}
+
+	if readiness.WeakestSkill != nil {
+		resp.WeakestSkill = mapReadinessCompetency(readiness.WeakestSkill)
+	}
+	if readiness.StrongestSkill != nil {
+		resp.StrongestSkill = mapReadinessCompetency(readiness.StrongestSkill)
+	}
+	if readiness.NextAction != nil {
+		resp.NextAction = &v1.ReadinessNextAction{
+			Title:       readiness.NextAction.Title,
+			Description: readiness.NextAction.Description,
+			ActionType:  readiness.NextAction.ActionType,
+			ActionUrl:   readiness.NextAction.ActionURL,
+			SkillKey:    readiness.NextAction.SkillKey,
+		}
+	}
+
+	if len(readiness.CompanyReadiness) > 0 {
+		cr := make([]*v1.CompanyReadiness, 0, len(readiness.CompanyReadiness))
+		for _, c := range readiness.CompanyReadiness {
+			if c == nil {
+				continue
+			}
+			cr = append(cr, &v1.CompanyReadiness{
+				Company:         c.Company,
+				TotalStages:     c.TotalStages,
+				CompletedStages: c.CompletedStages,
+				Percent:         c.Percent,
+				HasActive:       c.HasActive,
+			})
+		}
+		resp.CompanyReadiness = cr
+	}
+
+	return resp, nil
+}
+
+func mapReadinessCompetency(c *model.ProfileCompetency) *v1.ProfileCompetency {
+	if c == nil {
+		return nil
+	}
+	return &v1.ProfileCompetency{
+		Key:                    c.Key,
+		Label:                  c.Label,
+		Score:                  c.Score,
+		PracticeScore:          c.PracticeScore,
+		VerifiedScore:          c.VerifiedScore,
+		StageCount:             c.StageCount,
+		QuestionCount:          c.QuestionCount,
+		PracticeSessions:       c.PracticeSessions,
+		PracticePassedSessions: c.PracticePassedSessions,
+		PracticeDays:           c.PracticeDays,
+		Confidence:             c.Confidence,
+		AverageScore:           c.AverageScore,
+	}
+}

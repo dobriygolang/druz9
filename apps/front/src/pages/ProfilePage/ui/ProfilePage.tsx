@@ -1,6 +1,8 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, Flame, ChevronRight, Check } from 'lucide-react'
+import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, Flame, ChevronRight, Check, Sparkles } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
+import i18n from '@/shared/i18n'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { authApi } from '@/features/Auth/api/authApi'
 import type { User, ProfileProgress } from '@/entities/User/model/types'
@@ -14,10 +16,18 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { ActivityHeatmap } from '@/shared/ui/ActivityHeatmap'
 import { AchievementBadges } from '@/shared/ui/AchievementBadges'
 import type { Achievement } from '@/shared/ui/AchievementBadges'
+import { SkillRing } from '@/shared/ui/SkillRing'
+import { NextActionCard } from '@/shared/ui/NextActionCard'
+import { GoalSelector } from '@/shared/ui/GoalSelector'
 import { apiClient } from '@/shared/api/base'
+import { PageMeta } from '@/shared/ui/PageMeta'
 
 function formatJoinDate(iso: string) {
-  try { return new Date(iso).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }) } catch { return '' }
+  try {
+    return new Date(iso).toLocaleDateString(i18n.language === 'en' ? 'en-US' : 'ru-RU', { month: 'long', year: 'numeric' })
+  } catch {
+    return ''
+  }
 }
 
 interface ArenaStats {
@@ -30,16 +40,49 @@ interface ArenaStats {
 }
 
 function computeLeague(rating: number): string {
-  if (rating < 1000) return 'Бронза'
-  if (rating < 1500) return 'Серебро'
-  if (rating < 2000) return 'Золото'
-  if (rating < 2500) return 'Платина'
-  return 'Алмаз'
+  if (rating < 1000) return 'Bronze'
+  if (rating < 1500) return 'Silver'
+  if (rating < 2000) return 'Gold'
+  if (rating < 2500) return 'Platinum'
+  return 'Diamond'
+}
+
+function companyReadiness(progress: ProfileProgress) {
+  const sessions = progress.mockSessions ?? []
+  const byCompany = new Map<string, { name: string; total: number; completed: number; active: number }>()
+
+  for (const name of progress.companies) {
+    byCompany.set(name, { name, total: 0, completed: 0, active: 0 })
+  }
+
+  for (const session of sessions) {
+    const key = session.companyTag || 'Unknown'
+    const existing = byCompany.get(key) ?? { name: key, total: 0, completed: 0, active: 0 }
+    existing.total += Math.max(session.totalStages || 1, 1)
+    existing.completed += Math.min(session.currentStageIndex, Math.max(session.totalStages || 1, 1))
+    if (session.status === 'active') existing.active += 1
+    if (session.status === 'finished') existing.completed = Math.max(existing.completed, Math.max(session.totalStages || 1, 1))
+    byCompany.set(key, existing)
+  }
+
+  return Array.from(byCompany.values())
+    .map(item => {
+      const denominator = Math.max(item.total, item.completed, 1)
+      const percent = Math.min(100, Math.round((item.completed / denominator) * 100))
+      const tone = percent >= 75 ? 'success' : percent >= 40 ? 'warning' : 'danger'
+      return {
+        ...item,
+        percent,
+        tone,
+      }
+    })
+    .sort((a, b) => b.percent - a.percent)
 }
 
 type Tab = 'activity' | 'progress' | 'achievements'
 
 export function ProfilePage() {
+  const { t } = useTranslation()
   const { userId } = useParams()
   const { user: authUser, refresh } = useAuth()
   const { toast } = useToast()
@@ -82,10 +125,10 @@ export function ProfilePage() {
       .then(([p, prog]) => { setUser(p.user); setProgress(prog) })
       .catch(() => {
         if (authUserRef.current) setUser(authUserRef.current)
-        else setError('Не удалось загрузить данные')
+        else setError(t('common.loadFailed'))
       })
       .finally(() => setLoading(false))
-  }, [targetId])
+  }, [targetId, t])
 
   useEffect(() => { fetchProfile() }, [fetchProfile])
 
@@ -141,7 +184,7 @@ export function ProfilePage() {
       window.open(botStartUrl, '_blank')
       setShowTgCodeModal(true)
     } catch {
-      setBindError('Не удалось открыть Telegram. Попробуйте ещё раз.')
+      setBindError(t('profile.bind.telegramOpenFailed'))
     } finally {
       setBindingProvider(null)
     }
@@ -157,9 +200,9 @@ export function ProfilePage() {
       setShowTgCodeModal(false)
       setTgCode('')
       setTgToken('')
-      toast('Telegram привязан', 'success')
+      toast(t('profile.bind.telegramLinked'), 'success')
     } catch {
-      toast('Неверный код. Проверьте и попробуйте снова.', 'error')
+      toast(t('profile.bind.telegramCodeInvalid'), 'error')
     } finally {
       setSubmittingTgCode(false)
     }
@@ -171,7 +214,7 @@ export function ProfilePage() {
       const { authUrl } = await authApi.startYandexAuth()
       window.location.href = authUrl
     } catch {
-      setBindError('Не удалось открыть Яндекс. Попробуйте ещё раз.')
+      setBindError(t('profile.bind.yandexOpenFailed'))
       setBindingProvider(null)
     }
   }
@@ -219,87 +262,110 @@ export function ProfilePage() {
   }
 
   if (!user) return (
-    <div className="flex items-center justify-center h-64 text-[#94a3b8] text-sm">Профиль не найден</div>
+    <div className="flex items-center justify-center h-64 text-[#94a3b8] text-sm">{t('profile.notFound')}</div>
   )
 
   const displayName = `${user.firstName} ${user.lastName}`.trim() || user.username
 
   const stats = [
     ...(progress ? [
-      { label: 'Сессий', value: progress.overview.practiceSessions, icon: <Zap className="w-3.5 h-3.5 text-[#6366F1]" />, bg: '#EEF2FF' },
-      { label: 'Стрик', value: `${progress.overview.currentStreakDays}д`, icon: <Flame className="w-3.5 h-3.5 text-[#f59e0b]" />, bg: '#FFFBEB' },
+      { label: t('profile.stats.sessions'), value: progress.overview.practiceSessions, icon: <Zap className="w-3.5 h-3.5 text-[#6366F1]" />, bg: '#EEF2FF' },
+      { label: t('profile.stats.streak'), value: `${progress.overview.currentStreakDays}d`, icon: <Flame className="w-3.5 h-3.5 text-[#f59e0b]" />, bg: '#FFFBEB' },
     ] : []),
     ...(arenaStats ? [
-      { label: 'Рейтинг', value: arenaStats.rating, icon: <Trophy className="w-3.5 h-3.5 text-[#6366F1]" />, bg: '#EEF2FF' },
-      { label: 'Побед', value: arenaStats.wins, icon: <Swords className="w-3.5 h-3.5 text-[#22c55e]" />, bg: '#F0FDF4' },
+      { label: t('profile.stats.rating'), value: arenaStats.rating, icon: <Trophy className="w-3.5 h-3.5 text-[#6366F1]" />, bg: '#EEF2FF' },
+      { label: t('profile.stats.wins'), value: arenaStats.wins, icon: <Swords className="w-3.5 h-3.5 text-[#22c55e]" />, bg: '#F0FDF4' },
     ] : []),
   ]
 
   const tabs: { id: Tab; label: string }[] = [
-    { id: 'activity', label: 'Активность' },
-    { id: 'progress', label: 'Прогресс' },
-    { id: 'achievements', label: 'Достижения' },
+    { id: 'activity', label: t('profile.tabs.activity') },
+    { id: 'progress', label: t('profile.tabs.progress') },
+    { id: 'achievements', label: t('profile.tabs.achievements') },
   ]
   const statsGridClass = stats.length > 2 ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2'
+  const readiness = progress ? companyReadiness(progress) : []
+  const leagueLabel = t(`profile.leagueLabel.${computeLeague(arenaStats?.rating ?? 0).toLowerCase()}`)
+
+  const handleGoalChange = async (newGoal: { kind: string; company?: string }) => {
+    try {
+      const saved = await authApi.setUserGoal(newGoal)
+      if (progress) {
+        setProgress({ ...progress, goal: saved })
+        authApi.getProfileProgress(targetId).then(setProgress)
+      }
+    } catch { /* ignore */ }
+  }
 
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-4 px-4 pb-6 pt-4 md:gap-5 md:p-6">
-      <section className="section-enter relative overflow-hidden rounded-[32px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.94)_44%,_rgba(255,247,237,0.92))] shadow-[0_22px_52px_rgba(15,23,42,0.08)] dark:border-[#1a2540] dark:bg-[linear-gradient(145deg,_rgba(22,28,45,0.98),_rgba(19,25,41,0.92)_52%,_rgba(42,32,10,0.42))]">
-        <div className="pointer-events-none absolute inset-y-0 right-[-12%] w-[46%] rounded-full bg-[radial-gradient(circle,_rgba(99,102,241,0.24),_transparent_70%)] blur-3xl dark:bg-[radial-gradient(circle,_rgba(129,140,248,0.18),_transparent_72%)]" />
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 pb-6 pt-4 md:gap-5 md:p-6">
+      <PageMeta title={t('profile.meta.title')} description={t('profile.meta.description')} canonicalPath={userId ? `/profile/${userId}` : '/profile'} />
+      <section className="section-enter relative overflow-hidden rounded-[34px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_#0f172a_0%,_#1e1b4b_38%,_#7c2d12_100%)] shadow-[0_26px_64px_rgba(15,23,42,0.16)]">
+        <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.24),_transparent_32%),radial-gradient(circle_at_80%_20%,_rgba(129,140,248,0.35),_transparent_26%),radial-gradient(circle_at_75%_80%,_rgba(251,191,36,0.18),_transparent_28%)]" />
         <div className="relative p-5 md:p-6">
-          <div className="flex flex-col gap-5 sm:flex-row sm:items-start">
+          <div className="flex flex-col gap-6 lg:flex-row lg:items-end">
             <Avatar
               name={displayName}
               src={user.avatarUrl || undefined}
               size="xl"
-              className="ring-4 ring-white/80 shadow-[0_16px_32px_rgba(15,23,42,0.12)] dark:ring-[#121b30]"
+              className="ring-4 ring-white/25 shadow-[0_16px_32px_rgba(15,23,42,0.24)]"
             />
 
             <div className="min-w-0 flex-1">
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+              <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
                 <div className="min-w-0">
-                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1] dark:text-[#a5b4fc]">
-                    Profile
-                  </p>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c7d2fe]">{t('profile.hero.eyebrow')}</p>
                   <div className="mt-2 flex flex-wrap items-center gap-2">
-                    <h1 className="text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{displayName}</h1>
-                    {user.isTrusted && <Badge variant="info">Trusted</Badge>}
-                    {user.isAdmin && <Badge variant="warning">Admin</Badge>}
+                    <h1 className="text-3xl font-bold text-white">{displayName}</h1>
+                    {user.isTrusted && <Badge variant="info">{t('profile.badge.trusted')}</Badge>}
+                    {user.isAdmin && <Badge variant="warning">{t('profile.badge.admin')}</Badge>}
                   </div>
-                  {user.username && <p className="mt-1 text-xs text-[#94a3b8]">@{user.username}</p>}
+                  {user.username && <p className="mt-1 text-xs text-[#cbd5e1]">@{user.username}</p>}
+                  <div className="mt-4 flex flex-wrap items-center gap-2">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur">
+                      <Trophy className="h-3.5 w-3.5 text-[#fbbf24]" />
+                      {t('profile.league')}: {leagueLabel}
+                    </span>
+                    {arenaStats && (
+                      <span className="inline-flex items-center gap-2 rounded-full border border-white/12 bg-white/10 px-3 py-1.5 text-xs font-medium text-white/90 backdrop-blur">
+                        <Sparkles className="h-3.5 w-3.5 text-[#a5b4fc]" />
+                        {arenaStats.rating} ELO
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 {isOwn && (
-                  <Button variant="secondary" size="sm" className="w-full justify-center rounded-full sm:w-auto" onClick={openEdit}>
-                    <Edit3 className="w-3.5 h-3.5" /> Изменить
+                  <Button variant="secondary" size="sm" className="w-full justify-center rounded-full border-white/20 bg-white/12 text-white hover:bg-white/18 sm:w-auto" onClick={openEdit}>
+                    <Edit3 className="w-3.5 h-3.5" /> {t('profile.edit')}
                   </Button>
                 )}
               </div>
 
-              <div className="mt-3 flex flex-wrap gap-2">
+              <div className="mt-4 flex flex-wrap gap-2">
                 {user.region && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/76 px-3 py-1 text-xs text-[#475569] backdrop-blur dark:bg-[#10192b]/78 dark:text-[#94a3b8]">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-white/85 backdrop-blur">
                     <MapPin className="w-3 h-3" /> {user.region}
                   </span>
                 )}
                 {user.currentWorkplace && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/76 px-3 py-1 text-xs text-[#475569] backdrop-blur dark:bg-[#10192b]/78 dark:text-[#94a3b8]">
+                  <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-white/85 backdrop-blur">
                     <Briefcase className="w-3 h-3" /> {user.currentWorkplace}
                   </span>
                 )}
                 {user.createdAt && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-white/76 px-3 py-1 text-xs text-[#475569] backdrop-blur dark:bg-[#10192b]/78 dark:text-[#94a3b8]">
-                    <Calendar className="w-3 h-3" /> С {formatJoinDate(user.createdAt)}
+                  <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-xs text-white/85 backdrop-blur">
+                    <Calendar className="w-3 h-3" /> {t('profile.since', { date: formatJoinDate(user.createdAt) })}
                   </span>
                 )}
               </div>
 
-              <div className="mt-3 flex flex-wrap items-center gap-1.5">
+              <div className="mt-4 flex flex-wrap items-center gap-1.5">
                 {user.connectedProviders.includes('telegram') && (
                   <span className="rounded-full bg-[#e8f4fd] px-2.5 py-1 text-[11px] font-medium text-[#0088cc]">Telegram</span>
                 )}
                 {user.connectedProviders.includes('yandex') && (
-                  <span className="rounded-full bg-[#fff7ed] px-2.5 py-1 text-[11px] font-medium text-[#ea580c]">Яндекс</span>
+                  <span className="rounded-full bg-[#fff7ed] px-2.5 py-1 text-[11px] font-medium text-[#ea580c]">Yandex</span>
                 )}
                 {isOwn && !user.connectedProviders.includes('telegram') && (
                   <button
@@ -307,7 +373,7 @@ export function ProfilePage() {
                     disabled={!!bindingProvider}
                     className="rounded-full border border-[#0088cc]/20 bg-[#e8f4fd] px-2.5 py-1 text-[11px] font-medium text-[#0088cc] transition-colors hover:bg-[#cce9fa] disabled:opacity-50"
                   >
-                    {bindingProvider === 'telegram' ? 'Открываем...' : '+ Привязать Telegram'}
+                    {bindingProvider === 'telegram' ? t('profile.bind.opening') : t('profile.bind.linkTelegram')}
                   </button>
                 )}
                 {isOwn && !user.connectedProviders.includes('yandex') && (
@@ -316,7 +382,7 @@ export function ProfilePage() {
                     disabled={!!bindingProvider}
                     className="rounded-full border border-[#ea580c]/20 bg-[#fff7ed] px-2.5 py-1 text-[11px] font-medium text-[#ea580c] transition-colors hover:bg-[#ffe4cc] disabled:opacity-50"
                   >
-                    {bindingProvider === 'yandex' ? 'Перенаправляем...' : '+ Привязать Яндекс'}
+                    {bindingProvider === 'yandex' ? t('profile.bind.redirecting') : t('profile.bind.linkYandex')}
                   </button>
                 )}
                 {bindError && <span className="text-[11px] text-red-500">{bindError}</span>}
@@ -326,16 +392,16 @@ export function ProfilePage() {
         </div>
 
         {stats.length > 0 && (
-          <div className={`grid ${statsGridClass} gap-px border-t border-[#d8d9d6]/70 bg-[#d8d9d6]/70 dark:border-[#1a2540] dark:bg-[#1a2540]`}>
+          <div className={`grid ${statsGridClass} gap-3 border-t border-white/10 px-5 pb-5 pt-4 md:px-6 md:pb-6`}>
             {stats.map(s => (
-              <div key={s.label} className="flex flex-col items-center justify-center gap-1 bg-white/84 px-4 py-4 backdrop-blur dark:bg-[#10192b]/84">
+              <div key={s.label} className="flex flex-col justify-between rounded-[24px] border border-white/10 bg-white/8 px-4 py-4 backdrop-blur">
                 <div className="flex items-center gap-1.5">
                   <div className="flex h-7 w-7 items-center justify-center rounded-lg" style={{ background: s.bg }}>
                     {s.icon}
                   </div>
-                  <span className="font-mono text-base font-bold text-[#111111] dark:text-[#f8fafc]">{s.value}</span>
+                  <span className="font-mono text-base font-bold text-white">{s.value}</span>
                 </div>
-                <span className="text-[11px] text-[#94a3b8]">{s.label}</span>
+                <span className="mt-3 text-[11px] uppercase tracking-[0.16em] text-white/60">{s.label}</span>
               </div>
             ))}
           </div>
@@ -362,163 +428,237 @@ export function ProfilePage() {
 
       {/* Tab content */}
       {activeTab === 'activity' && (
-        <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
-          <h3 className="text-sm font-semibold text-[#111111] mb-4">Активность за год</h3>
-          {activity.length > 0 ? (
-            <ActivityHeatmap activity={activity} />
-          ) : (
-            <div className="h-20 bg-[#F2F3F0] rounded-xl flex items-center justify-center">
-              <p className="text-xs text-[#94a3b8]">Нет данных об активности</p>
-            </div>
-          )}
-
-          {arenaStats && (
-            <div className="mt-5 pt-5 border-t border-[#F2F3F0]">
-              <h3 className="text-sm font-semibold text-[#111111] mb-3">Арена</h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                {[
-                  { label: 'Матчей', value: arenaStats.matches },
-                  { label: 'Побед', value: arenaStats.wins },
-                  { label: 'Поражений', value: arenaStats.losses },
-                  { label: 'Winrate', value: `${Math.round(arenaStats.winRate * 100)}%` },
-                ].map(s => (
-                  <div key={s.label} className="bg-[#F2F3F0] rounded-xl px-3 py-2.5 text-center">
-                    <p className="text-lg font-bold text-[#111111] font-mono">{s.value}</p>
-                    <p className="text-xs text-[#666666] mt-0.5">{s.label}</p>
-                  </div>
-                ))}
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1.3fr)_minmax(300px,0.7fr)]">
+          <div className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <div>
+                <h3 className="text-sm font-semibold text-[#111111]">{t('profile.activity.title')}</h3>
+                <p className="mt-1 text-xs text-[#94a3b8]">{t('profile.activity.subtitle')}</p>
               </div>
-              <div className="mt-3 flex items-center gap-2">
-                <div className="flex-1 bg-[#F2F3F0] rounded-full h-2">
-                  <div
-                    className="h-2 rounded-full bg-[#6366F1]"
-                    style={{ width: `${Math.min(arenaStats.rating / 3000 * 100, 100)}%` }}
-                  />
+              {progress && (
+                <div className="rounded-2xl bg-[#f8fafc] px-3 py-2 text-right">
+                  <p className="text-[10px] uppercase tracking-[0.14em] text-[#94a3b8]">{t('profile.activity.activeDays')}</p>
+                  <p className="font-mono text-lg font-bold text-[#0f172a]">{progress.overview.practiceActiveDays}</p>
                 </div>
-                <span className="text-xs font-semibold text-[#6366F1] font-mono">{arenaStats.rating} ELO</span>
-                <span className="text-xs text-[#94a3b8]">· {computeLeague(arenaStats.rating)}</span>
-              </div>
+              )}
             </div>
-          )}
+            {activity.length > 0 ? (
+              <ActivityHeatmap activity={activity} />
+            ) : (
+              <div className="flex h-20 items-center justify-center rounded-xl bg-[#F2F3F0]">
+                <p className="text-xs text-[#94a3b8]">{t('profile.activity.empty')}</p>
+              </div>
+            )}
+          </div>
+
+          <div className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
+            <h3 className="text-sm font-semibold text-[#111111]">{t('profile.arena.title')}</h3>
+            <p className="mt-1 text-xs text-[#94a3b8]">{t('profile.arena.subtitle')}</p>
+
+            {arenaStats ? (
+              <>
+                <div className="mt-5 rounded-[24px] bg-[linear-gradient(135deg,_#eef2ff,_#fff7ed)] p-4">
+                  <div className="flex items-end justify-between gap-4">
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.16em] text-[#64748b]">{t('profile.stats.rating')}</p>
+                      <p className="mt-2 font-mono text-3xl font-bold text-[#111827]">{arenaStats.rating}</p>
+                    </div>
+                    <Badge variant="info">{t(`profile.leagueLabel.${computeLeague(arenaStats.rating).toLowerCase()}`)}</Badge>
+                  </div>
+                  <div className="mt-4 h-2 rounded-full bg-white/80">
+                    <div
+                      className="h-2 rounded-full bg-[#6366F1]"
+                      style={{ width: `${Math.min((arenaStats.rating / 3000) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+
+                <div className="mt-4 grid grid-cols-2 gap-3">
+                  {[
+                    { label: t('profile.arena.matches'), value: arenaStats.matches },
+                    { label: t('profile.stats.wins'), value: arenaStats.wins },
+                    { label: t('profile.arena.losses'), value: arenaStats.losses },
+                    { label: t('profile.arena.winrate'), value: `${Math.round(arenaStats.winRate * 100)}%` },
+                  ].map(s => (
+                    <div key={s.label} className="rounded-2xl bg-[#f8fafc] px-4 py-3">
+                      <p className="font-mono text-xl font-bold text-[#0f172a]">{s.value}</p>
+                      <p className="mt-1 text-xs text-[#64748b]">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              <div className="mt-5 flex min-h-[180px] items-center justify-center rounded-[24px] bg-[#F2F3F0] text-center">
+                <p className="text-xs text-[#94a3b8]">{t('profile.arena.empty')}</p>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
       {activeTab === 'progress' && (
         <div className="flex flex-col gap-4">
+          {/* Skill Map */}
+          {progress && progress.competencies.length > 0 && (
+            <div className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
+              <div className="mb-4 flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.progress.skillMap')}</h3>
+                  <p className="mt-1 text-xs text-[#94a3b8]">{t('profile.progress.skillMapSubtitle')}</p>
+                </div>
+                {progress.overview.practiceSessions > 0 && (
+                  <div className="rounded-2xl bg-[#fff7ed] px-3 py-2 text-right dark:bg-[#2a200a]">
+                    <p className="text-[10px] uppercase tracking-[0.14em] text-[#c2410c]">{t('profile.progress.averageScore')}</p>
+                    <p className="font-mono text-lg font-bold text-[#9a3412]">{Math.round(progress.overview.averageStageScore)}</p>
+                  </div>
+                )}
+              </div>
+              <div className="flex flex-wrap justify-center gap-1 sm:justify-start sm:gap-2">
+                {progress.competencies.map(c => (
+                  <SkillRing
+                    key={c.key}
+                    score={c.score}
+                    level={c.level || 'beginner'}
+                    label={c.label}
+                    size="md"
+                  />
+                ))}
+              </div>
+              {isOwn && progress.goal && (
+                <GoalSelector
+                  goal={progress.goal}
+                  companies={progress.companies}
+                  onChange={handleGoalChange}
+                  className="mt-4 border-t border-[#e2e8f0] pt-4 dark:border-[#1e3158]"
+                />
+              )}
+            </div>
+          )}
+
+          {/* Next Actions */}
+          {progress && (progress.nextActions?.length ?? 0) > 0 && (
+            <div className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
+              <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.progress.nextSteps')}</h3>
+              <p className="mt-1 mb-4 text-xs text-[#94a3b8]">{t('profile.progress.nextStepsSubtitle')}</p>
+              <div className="flex flex-col gap-2">
+                {progress.nextActions!.map((action, i) => (
+                  <NextActionCard
+                    key={`${action.skillKey}-${i}`}
+                    title={action.title}
+                    description={action.description}
+                    actionType={action.actionType}
+                    href={action.actionUrl}
+                  />
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Overview metrics */}
           {progress && progress.overview.practiceSessions > 0 && (
-            <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
-              <h3 className="text-sm font-semibold text-[#111111] mb-3">Обзор</h3>
+            <div className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
+              <h3 className="mb-3 text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.progress.overview')}</h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {[
-                  { label: 'Сессий', value: progress.overview.practiceSessions },
-                  { label: 'Пройдено', value: progress.overview.practicePassedSessions },
-                  { label: 'Стрик', value: `${progress.overview.currentStreakDays}д` },
-                  { label: 'Mock', value: progress.overview.completedMockSessions },
+                  { label: t('profile.stats.sessions'), value: progress.overview.practiceSessions },
+                  { label: t('profile.progress.passed'), value: progress.overview.practicePassedSessions },
+                  { label: t('profile.stats.streak'), value: `${progress.overview.currentStreakDays}d` },
+                  { label: t('profile.progress.mock'), value: progress.overview.completedMockSessions },
                 ].map(s => (
-                  <div key={s.label} className="bg-[#F2F3F0] rounded-xl px-3 py-2.5 text-center">
-                    <p className="text-lg font-bold text-[#111111] font-mono">{s.value}</p>
-                    <p className="text-xs text-[#666666] mt-0.5">{s.label}</p>
+                  <div key={s.label} className="rounded-[22px] bg-[#F8FAFC] px-4 py-4 dark:bg-[#0f1117]">
+                    <p className="font-mono text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">{s.value}</p>
+                    <p className="mt-1 text-xs text-[#666666] dark:text-[#7e93b0]">{s.label}</p>
                   </div>
                 ))}
               </div>
             </div>
           )}
 
-          {progress && (
-            <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
-              <div className="flex items-start justify-between gap-2 mb-1">
-                <h3 className="text-sm font-semibold text-[#111111]">Компании</h3>
-              </div>
-              <p className="text-xs text-[#94a3b8] mb-3">
-                Компании, по которым ты проходил mock-интервью. Чтобы добавить — начни сессию в разделе <span className="text-[#6366F1]">Growth Hub</span> и укажи целевую компанию.
-              </p>
-              {(progress.mockSessions && progress.mockSessions.length > 0) ? (
-                <div className="flex flex-col gap-2">
-                  {progress.mockSessions.map(s => {
-                    const isActive = s.status === 'active'
-                    const stageKindLabel: Record<string, string> = {
-                      coding: 'Кодинг', slices: 'Алгоритмы', concurrency: 'Кодинг',
-                      sql: 'SQL', architecture: 'Code Review', system_design: 'System Design',
-                    }
-                    const kindLabel = stageKindLabel[s.currentStageKind] ?? s.currentStageKind
-                    const stageNum = Math.min(s.currentStageIndex + 1, s.totalStages || 1)
-                    return (
-                      <button
-                        key={s.id}
-                        onClick={() => navigate(`/growth/interview-prep/mock/${s.id}`)}
-                        className="flex items-center gap-3 px-4 py-3 bg-[#F2F3F0] rounded-xl hover:bg-[#E7E8E5] transition-colors text-left w-full"
-                      >
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-center gap-2 mb-0.5">
-                            <span className="text-sm font-semibold text-[#111111] capitalize">{s.companyTag}</span>
-                            <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${isActive ? 'bg-[#dcfce7] text-[#16a34a]' : 'bg-[#E7E8E5] text-[#666666]'}`}>
-                              {isActive ? 'В процессе' : 'Завершено'}
-                            </span>
+          {/* Company readiness + Mock sessions */}
+          {progress && (readiness.length > 0 || (progress.mockSessions && progress.mockSessions.length > 0)) && (
+            <div className="grid gap-4 xl:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+              {readiness.length > 0 && (
+                <div className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
+                  <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.progress.companyReadiness')}</h3>
+                  <p className="mb-4 mt-1 text-xs text-[#94a3b8]">{t('profile.progress.companyReadinessSubtitle')}</p>
+                  <div className="space-y-3">
+                    {readiness.map(company => (
+                      <div key={company.name} className="rounded-[22px] border border-[#e2e8f0] bg-[#f8fafc] p-4 dark:border-[#1e3158] dark:bg-[#0f1117]">
+                        <div className="flex items-center justify-between gap-3">
+                          <div>
+                            <p className="text-sm font-semibold capitalize text-[#111111] dark:text-[#e2e8f3]">{company.name}</p>
+                            <p className="mt-1 text-xs text-[#64748b] dark:text-[#7e93b0]">
+                              {t('profile.progress.completedStages', { completed: company.completed, total: Math.max(company.total, 1) })}
+                              {company.active > 0 ? ` · ${t('profile.progress.activeCount', { count: company.active })}` : ''}
+                            </p>
                           </div>
-                          <div className="flex items-center gap-1.5 text-xs text-[#94a3b8]">
-                            {s.totalStages > 0 && (
-                              <>
-                                <span>Этап {stageNum} из {s.totalStages}</span>
-                                {kindLabel && <><span>·</span><span>{kindLabel}</span></>}
-                              </>
-                            )}
-                          </div>
+                          <span className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                            company.tone === 'success' ? 'bg-[#dcfce7] text-[#15803d]' : company.tone === 'warning' ? 'bg-[#fef3c7] text-[#b45309]' : 'bg-[#fee2e2] text-[#dc2626]'
+                          }`}>
+                            {company.percent}%
+                          </span>
                         </div>
-                        <ChevronRight className="w-4 h-4 text-[#94a3b8] flex-shrink-0" />
-                      </button>
-                    )
-                  })}
+                        <div className="mt-3 h-2.5 rounded-full bg-white dark:bg-[#161c2d]">
+                          <div
+                            className={`h-2.5 rounded-full ${company.tone === 'success' ? 'bg-[#22c55e]' : company.tone === 'warning' ? 'bg-[#f59e0b]' : 'bg-[#ef4444]'}`}
+                            style={{ width: `${company.percent}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              ) : progress.companies.length > 0 ? (
-                <div className="flex flex-wrap gap-2">
-                  {progress.companies.map(c => (
-                    <div key={c} className="flex items-center gap-1.5 px-3 py-1.5 bg-[#F2F3F0] rounded-lg">
-                      <span className="text-sm font-medium text-[#111111]">{c}</span>
-                    </div>
-                  ))}
-                </div>
-              ) : (
-                <div className="flex items-center gap-2 px-3 py-2.5 bg-[#F2F3F0] rounded-lg text-xs text-[#94a3b8]">
-                  Пока нет пройденных сессий по компаниям
+              )}
+
+              {progress.mockSessions && progress.mockSessions.length > 0 && (
+                <div className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
+                  <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.progress.latestMocks')}</h3>
+                  <p className="mt-1 mb-3 text-xs text-[#94a3b8]">{t('profile.progress.latestMocksSubtitle')}</p>
+                  <div className="flex flex-col gap-2">
+                    {progress.mockSessions.map(s => {
+                      const isActive = s.status === 'active'
+                      const stageKindLabel: Record<string, string> = {
+                        coding: t('profile.stage.coding'), slices: t('profile.stage.algorithms'), concurrency: t('profile.stage.coding'),
+                        sql: 'SQL', architecture: t('profile.stage.codeReview'), system_design: t('profile.stage.systemDesign'),
+                      }
+                      const kindLabel = stageKindLabel[s.currentStageKind] ?? s.currentStageKind
+                      const stageNum = Math.min(s.currentStageIndex + 1, s.totalStages || 1)
+                      return (
+                        <button
+                          key={s.id}
+                          onClick={() => navigate(`/growth/interview-prep/mock/${s.id}`)}
+                          className="flex w-full items-center gap-3 rounded-[22px] border border-[#e2e8f0] bg-[#F8FAFC] px-4 py-3 text-left transition-colors hover:bg-[#eef2ff] dark:border-[#1e3158] dark:bg-[#0f1117] dark:hover:bg-[#1a2540]"
+                        >
+                          <div className="min-w-0 flex-1">
+                            <div className="mb-1 flex items-center gap-2">
+                              <span className="text-sm font-semibold capitalize text-[#111111] dark:text-[#e2e8f3]">{s.companyTag}</span>
+                              <span className={`rounded-full px-1.5 py-0.5 text-[10px] font-medium ${isActive ? 'bg-[#dcfce7] text-[#16a34a]' : 'bg-[#E7E8E5] text-[#666666] dark:bg-[#1e3158] dark:text-[#94a3b8]'}`}>
+                                {isActive ? t('profile.progress.inProgress') : t('profile.progress.completed')}
+                              </span>
+                            </div>
+                            <div className="flex items-center gap-1.5 text-xs text-[#94a3b8]">
+                              {s.totalStages > 0 && (
+                                <>
+                                  <span>{t('profile.progress.stageOf', { current: stageNum, total: s.totalStages })}</span>
+                                  {kindLabel && <><span>·</span><span>{kindLabel}</span></>}
+                                </>
+                              )}
+                            </div>
+                          </div>
+                          <ChevronRight className="h-4 w-4 flex-shrink-0 text-[#94a3b8]" />
+                        </button>
+                      )
+                    })}
+                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {progress && progress.recommendations.length > 0 && (
-            <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
-              <h3 className="text-sm font-semibold text-[#111111] mb-3">Рекомендации</h3>
-              <ul className="space-y-2">
-                {progress.recommendations.map((r, i) => {
-                  if (typeof r === 'string') {
-                    return (
-                      <li key={i} className="flex items-start gap-2 text-sm text-[#475569]">
-                        <span className="text-[#6366F1] mt-0.5 flex-shrink-0">&rarr;</span>
-                        {r}
-                      </li>
-                    )
-                  }
-                  return (
-                    <li key={r.key ?? i} className="flex items-start gap-2 text-sm text-[#475569]">
-                      <span className="text-[#6366F1] mt-0.5 flex-shrink-0">&rarr;</span>
-                      <div>
-                        {r.title && <span className="font-medium text-[#111111] dark:text-[#f8fafc]">{r.title}</span>}
-                        {r.description && <span className="ml-1">{r.description}</span>}
-                        {r.href && (
-                          <a href={r.href} className="ml-1 text-[#6366F1] underline underline-offset-2">{r.href}</a>
-                        )}
-                      </div>
-                    </li>
-                  )
-                })}
-              </ul>
-            </div>
-          )}
-
-          {(!progress || progress.companies.length === 0) && (
-            <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-12 flex flex-col items-center text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
-              <Zap className="w-8 h-8 text-[#CBCCC9] mb-3" />
-              <p className="text-sm text-[#94a3b8]">Данных о прогрессе пока нет</p>
+          {(!progress || (progress.competencies.length === 0 && readiness.length === 0)) && (
+            <div className="section-enter flex flex-col items-center rounded-[28px] border border-[#CBCCC9] bg-white p-12 text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
+              <Zap className="mb-3 h-8 w-8 text-[#CBCCC9]" />
+              <p className="text-sm text-[#94a3b8]">{t('profile.progress.empty')}</p>
             </div>
           )}
         </div>
@@ -531,7 +671,7 @@ export function ProfilePage() {
           ) : (
             <div className="flex flex-col items-center py-10 text-center">
               <Trophy className="w-8 h-8 text-[#CBCCC9] mb-3" />
-              <p className="text-sm text-[#94a3b8]">Достижения пока не получены</p>
+              <p className="text-sm text-[#94a3b8]">{t('profile.achievements.empty')}</p>
             </div>
           )}
         </div>
@@ -541,34 +681,34 @@ export function ProfilePage() {
       <Modal
         open={editMode}
         onClose={() => setEditMode(false)}
-        title="Редактировать профиль"
+        title={t('profile.editModal.title')}
         footer={
           <>
             <Button variant="secondary" size="sm" onClick={() => setEditMode(false)} className="justify-center sm:min-w-[120px]">
-              Отмена
+              {t('common.cancel')}
             </Button>
             <Button variant="orange" size="sm" onClick={saveEdit} loading={saving} className="justify-center sm:min-w-[140px]">
-              <Check className="w-3.5 h-3.5" /> Сохранить
+              <Check className="w-3.5 h-3.5" /> {t('profile.editModal.save')}
             </Button>
           </>
         }
       >
         <div className="flex flex-col gap-4">
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <Input label="Имя" value={editFirstName} onChange={e => setEditFirstName(e.target.value)} />
-            <Input label="Фамилия" value={editLastName} onChange={e => setEditLastName(e.target.value)} />
+            <Input label={t('profile.editModal.firstName')} value={editFirstName} onChange={e => setEditFirstName(e.target.value)} />
+            <Input label={t('profile.editModal.lastName')} value={editLastName} onChange={e => setEditLastName(e.target.value)} />
           </div>
           <Input
-            label="Место работы"
+            label={t('profile.editModal.workplace')}
             value={editWorkplace}
             onChange={e => setEditWorkplace(e.target.value)}
-            placeholder="Компания"
+            placeholder={t('profile.editModal.workplacePlaceholder')}
           />
           <Input
-            label="Регион"
+            label={t('profile.editModal.region')}
             value={editRegion}
             onChange={e => setEditRegion(e.target.value)}
-            placeholder="Москва, Санкт-Петербург..."
+            placeholder={t('profile.editModal.regionPlaceholder')}
           />
         </div>
       </Modal>
@@ -577,23 +717,23 @@ export function ProfilePage() {
       <Modal
         open={showTgCodeModal}
         onClose={() => { setShowTgCodeModal(false); setTgCode('') }}
-        title="Введите код из Telegram"
+        title={t('profile.telegramModal.title')}
         footer={
           <>
-            <Button variant="secondary" size="sm" onClick={() => { setShowTgCodeModal(false); setTgCode('') }}>Отмена</Button>
-            <Button variant="orange" size="sm" onClick={submitTgCode} loading={submittingTgCode} disabled={!tgCode.trim()}>Подтвердить</Button>
+            <Button variant="secondary" size="sm" onClick={() => { setShowTgCodeModal(false); setTgCode('') }}>{t('common.cancel')}</Button>
+            <Button variant="orange" size="sm" onClick={submitTgCode} loading={submittingTgCode} disabled={!tgCode.trim()}>{t('common.confirm')}</Button>
           </>
         }
       >
         <div className="flex flex-col gap-3">
           <p className="text-sm text-[#666666] dark:text-[#7e93b0]">
-            Бот отправил вам код в Telegram. Введите его ниже для привязки аккаунта.
+            {t('profile.telegramModal.body')}
           </p>
           <Input
-            label="Код"
+            label={t('profile.telegramModal.code')}
             value={tgCode}
             onChange={e => setTgCode(e.target.value)}
-            placeholder="123456"
+            placeholder={t('profile.telegramModal.codePlaceholder')}
             onKeyDown={e => { if (e.key === 'Enter') submitTgCode() }}
           />
         </div>

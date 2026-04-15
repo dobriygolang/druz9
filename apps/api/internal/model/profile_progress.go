@@ -28,6 +28,9 @@ type ProfileCompetency struct {
 	PracticeDays           int32   `json:"practiceDays"`
 	Confidence             string  `json:"confidence"`
 	AverageScore           float64 `json:"averageScore"`
+	Level                  string  `json:"level"`
+	LevelProgress          float64 `json:"levelProgress"`
+	NextMilestone          string  `json:"nextMilestone"`
 }
 
 type ProfileProgressRecommendation struct {
@@ -56,6 +59,20 @@ type ProfileMockSession struct {
 	CurrentStageKind  string `json:"currentStageKind"`
 }
 
+type NextAction struct {
+	Title       string `json:"title"`
+	Description string `json:"description"`
+	ActionType  string `json:"actionType"`
+	ActionURL   string `json:"actionUrl"`
+	Priority    int32  `json:"priority"`
+	SkillKey    string `json:"skillKey"`
+}
+
+type UserGoal struct {
+	Kind    string `json:"kind"`
+	Company string `json:"company"`
+}
+
 type ProfileProgress struct {
 	Overview        ProfileProgressOverview          `json:"overview"`
 	Competencies    []*ProfileCompetency             `json:"competencies"`
@@ -65,4 +82,6 @@ type ProfileProgress struct {
 	Checkpoints     []*ProfileCheckpointProgress     `json:"checkpoints"`
 	Companies       []string                         `json:"companies"`
 	MockSessions    []*ProfileMockSession            `json:"mockSessions"`
+	NextActions     []*NextAction                    `json:"nextActions"`
+	Goal            *UserGoal                        `json:"goal"`
 }

@@ -64,7 +64,7 @@ type Event struct {
 	City             string
 	Latitude         float64
 	Longitude        float64
-	ScheduledAt      time.Time
+	ScheduledAt      *time.Time
 	CreatedAt        time.Time
 	CreatorID        string
 	CreatorName      string
@@ -134,7 +134,7 @@ type CreateEventRequest struct {
 	City           string
 	Latitude       float64
 	Longitude      float64
-	ScheduledAt    time.Time
+	ScheduledAt    *time.Time
 	InvitedUserIDs []string
 	CircleID       *uuid.UUID
 	IsPublic       bool
@@ -150,6 +150,6 @@ type UpdateEventRequest struct {
 	City           string
 	Latitude       float64
 	Longitude      float64
-	ScheduledAt    time.Time
+	ScheduledAt    *time.Time
 	InvitedUserIDs []string
 }

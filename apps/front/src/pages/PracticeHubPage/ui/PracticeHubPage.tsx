@@ -1,8 +1,10 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
 import { Code2, Swords, Target } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/shared/ui/Avatar'
 import { apiClient } from '@/shared/api/base'
+import { PageMeta } from '@/shared/ui/PageMeta'
 
 
 interface LeaderboardUser {
@@ -14,6 +16,7 @@ interface LeaderboardUser {
 
 
 export function PracticeHubPage() {
+  const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
 
@@ -33,20 +36,21 @@ export function PracticeHubPage() {
 
   return (
     <div className="flex flex-col min-h-screen">
+      <PageMeta title={t('practice.meta.title')} description={t('practice.meta.description')} canonicalPath="/practice" />
       <div className="mobile-sticky-surface bg-[#F2F3F0]/88 px-4 pt-4 pb-0 dark:bg-[#0b0d16]/88 md:px-6 md:pt-6">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">Practice</h1>
-            <p className="text-sm text-[#666666] dark:text-[#4d6380] mt-0.5">Практикуйся и соревнуйся с другими</p>
+            <h1 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">{t('practice.title')}</h1>
+            <p className="text-sm text-[#666666] dark:text-[#4d6380] mt-0.5">{t('practice.subtitle')}</p>
           </div>
         </div>
 
         <div className="-mx-4 mb-5 overflow-x-auto px-4 pb-1 no-scrollbar md:mx-0 md:px-0">
           <div className="flex snap-x gap-3 md:grid md:grid-cols-3 md:overflow-visible">
           {[
-            { icon: Code2, title: 'Code Rooms', sub: 'Совместный кодинг', href: '/practice/code-rooms' },
-            { icon: Swords, title: 'Arena Duels', sub: '1-на-1 за ELO', href: '/practice/arena' },
-            { icon: Target, title: 'Solo Practice', sub: 'В своём темпе', href: '/practice/solo' },
+            { icon: Code2, title: 'Code Rooms', sub: t('practice.card.rooms'), href: '/practice/code-rooms' },
+            { icon: Swords, title: 'Arena Duels', sub: t('practice.card.arena'), href: '/practice/arena' },
+            { icon: Target, title: 'Solo Practice', sub: t('practice.card.solo'), href: '/practice/solo' },
           ].map(f => {
             const Icon = f.icon
             const isAct = location.pathname.startsWith(f.href)
@@ -75,7 +79,7 @@ export function PracticeHubPage() {
         </div>
 
         <div className="mb-5">
-          <h2 className="text-sm font-semibold text-[#111111] dark:text-[#c8d8ec] mb-3">Топ игроков</h2>
+          <h2 className="text-sm font-semibold text-[#111111] dark:text-[#c8d8ec] mb-3">{t('practice.leaders')}</h2>
           {leadersLoading ? (
             <div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
               {Array.from({ length: 5 }).map((_, i) => (
@@ -93,13 +97,13 @@ export function PracticeHubPage() {
                   <Avatar name={u.username} src={u.avatarUrl} size="xs" />
                   <div className="min-w-0">
                     <p className="text-sm font-medium text-[#111111] dark:text-[#c8d8ec] truncate">{u.username}</p>
-                    <p className="text-[10px] text-[#666666] dark:text-[#4d6380]">{u.wins} побед</p>
+                    <p className="text-[10px] text-[#666666] dark:text-[#4d6380]">{t('practice.wins', { count: u.wins })}</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-[#666666] dark:text-[#4d6380]">Пока нет данных о лидерах</p>
+            <p className="text-xs text-[#666666] dark:text-[#4d6380]">{t('practice.noLeaders')}</p>
           )}
         </div>
 

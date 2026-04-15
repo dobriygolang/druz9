@@ -110,44 +110,44 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
     <Modal
       open={open}
       onClose={onClose}
-      title={task.id ? 'Редактировать задачу' : 'Новая задача'}
+      title={task.id ? 'Edit task' : 'New task'}
       size="xl"
       footer={
         <>
-          <Button variant="secondary" size="sm" onClick={onClose}>Отмена</Button>
-          <Button variant="orange" size="sm" onClick={() => onSave(task)} loading={saving}>Сохранить</Button>
+          <Button variant="secondary" size="sm" onClick={onClose}>Cancel</Button>
+          <Button variant="orange" size="sm" onClick={() => onSave(task)} loading={saving}>Save</Button>
         </>
       }
     >
       <div className="flex flex-col gap-6 max-h-[70vh] overflow-y-auto pr-1">
         {/* Section 1: Basic Info */}
         <section>
-          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Основное</h3>
+          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Basics</h3>
           <div className="grid grid-cols-2 gap-3">
-            <Input label="Название" value={task.title ?? ''} onChange={e => set('title', e.target.value)} />
+            <Input label="Title" value={task.title ?? ''} onChange={e => set('title', e.target.value)} />
             <Input label="Slug" value={task.slug ?? ''} onChange={e => set('slug', e.target.value)} />
             <Select
-              label="Категория"
-              options={[{ value: '', label: 'Без категории' }, ...TASK_CATEGORIES.map(c => ({ value: c.value, label: c.label }))]}
+              label="Category"
+              options={[{ value: '', label: 'No category' }, ...TASK_CATEGORIES.map(c => ({ value: c.value, label: c.label }))]}
               value={category ?? ''}
               onChange={setCategory}
             />
-            <Select label="Сложность" options={DIFFICULTIES} value={task.difficulty ?? 'TASK_DIFFICULTY_MEDIUM'} onChange={v => set('difficulty', v)} />
-            <Select label="Язык" options={LANGUAGES} value={task.language ?? 'PROGRAMMING_LANGUAGE_PYTHON'} onChange={v => set('language', v)} />
-            <Select label="Тип задачи" options={TASK_TYPES} value={task.taskType ?? 'TASK_TYPE_ALGORITHM'} onChange={v => set('taskType', v)} />
-            <Input label="Длительность (сек)" type="number" value={String(task.durationSeconds ?? 0)} onChange={e => set('durationSeconds', parseInt(e.target.value) || 0)} />
+            <Select label="Difficulty" options={DIFFICULTIES} value={task.difficulty ?? 'TASK_DIFFICULTY_MEDIUM'} onChange={v => set('difficulty', v)} />
+            <Select label="Language" options={LANGUAGES} value={task.language ?? 'PROGRAMMING_LANGUAGE_PYTHON'} onChange={v => set('language', v)} />
+            <Select label="Task type" options={TASK_TYPES} value={task.taskType ?? 'TASK_TYPE_ALGORITHM'} onChange={v => set('taskType', v)} />
+            <Input label="Duration (sec)" type="number" value={String(task.durationSeconds ?? 0)} onChange={e => set('durationSeconds', parseInt(e.target.value) || 0)} />
             <div className="flex items-end pb-1">
-              <Toggle checked={task.isActive !== false} onChange={v => set('isActive', v)} label="Активна" />
+              <Toggle checked={task.isActive !== false} onChange={v => set('isActive', v)} label="Active" />
             </div>
           </div>
         </section>
 
         {/* Section 2: Content */}
         <section>
-          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Контент</h3>
+          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Content</h3>
           <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-xs font-medium text-[#475569] mb-1">Условие задачи</label>
+              <label className="block text-xs font-medium text-[#475569] mb-1">Task statement</label>
               <textarea
                 value={task.statement ?? ''}
                 onChange={e => set('statement', e.target.value)}
@@ -156,7 +156,7 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#475569] mb-1">Стартовый код</label>
+              <label className="block text-xs font-medium text-[#475569] mb-1">Starter code</label>
               <textarea
                 value={task.starterCode ?? ''}
                 onChange={e => set('starterCode', e.target.value)}
@@ -169,9 +169,9 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
 
         {/* Section 3: Topics */}
         <section>
-          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Темы</h3>
+          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Topics</h3>
           <Input
-            label="Через запятую"
+            label="Comma-separated"
             value={displayTopics.join(', ')}
             onChange={e => setDisplayTopics(e.target.value)}
             placeholder="arrays, strings, dp, graphs..."
@@ -180,7 +180,7 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
 
         {/* Section 4: Test Cases */}
         <section>
-          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Тест-кейсы</h3>
+          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Test cases</h3>
           {(['public', 'hidden'] as const).map(type => {
             const isPublic = type === 'public'
             const field = isPublic ? 'publicTestCases' : 'hiddenTestCases'
@@ -193,11 +193,11 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
                     onClick={() => addTestCase(isPublic)}
                     className="flex items-center gap-1 text-xs text-[#6366F1] hover:underline"
                   >
-                    <Plus className="w-3 h-3" /> Добавить
+                    <Plus className="w-3 h-3" /> Add
                   </button>
                 </div>
                 {cases.length === 0 && (
-                  <p className="text-xs text-[#94a3b8] italic">Нет тест-кейсов</p>
+                  <p className="text-xs text-[#94a3b8] italic">No test cases</p>
                 )}
                 <div className="flex flex-col gap-2">
                   {cases.map((tc, idx) => (

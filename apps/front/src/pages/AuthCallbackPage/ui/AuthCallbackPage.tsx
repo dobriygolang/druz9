@@ -28,7 +28,7 @@ export function AuthCallbackPage() {
     <div className="min-h-screen bg-[#F2F3F0] flex items-center justify-center">
       <div className="text-center">
         <Spinner size="lg" className="mx-auto mb-4" />
-        <p className="text-[#666666] text-sm">Авторизация...</p>
+        <p className="text-[#666666] text-sm">Signing you in...</p>
       </div>
     </div>
   )

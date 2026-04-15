@@ -154,19 +154,26 @@ func TestCreateEvent(t *testing.T) {
 		}
 	})
 
-	t.Run("returns error when scheduled_at is nil", func(t *testing.T) {
+	t.Run("allows nil scheduled_at", func(t *testing.T) {
 		t.Parallel()
 
-		user := &model.User{ID: uuid.New()}
-		impl := New(nil)
+		user := &model.User{ID: uuid.New(), IsAdmin: true}
+		expectedEvent := &model.Event{ID: uuid.New(), Title: "Test"}
+		mockService := mocks.NewService(t)
+		mockService.On("CreateEvent", mock.Anything, user.ID, mock.Anything).Return(expectedEvent, nil).Once()
+
+		impl := New(mockService)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
 
-		_, err := impl.CreateEvent(ctx, &v1.CreateEventRequest{
+		resp, err := impl.CreateEvent(ctx, &v1.CreateEventRequest{
 			Title:       "Test",
 			ScheduledAt: nil,
 		})
-		if err == nil {
-			t.Error("expected error when scheduled_at is nil")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if resp == nil || resp.Event == nil {
+			t.Fatal("expected event response")
 		}
 	})
 }

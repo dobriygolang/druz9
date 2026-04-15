@@ -24,6 +24,7 @@ const (
 	CodeEditorService_JoinRoom_FullMethodName             = "/code_editor.v1.CodeEditorService/JoinRoom"
 	CodeEditorService_JoinRoomByInviteCode_FullMethodName = "/code_editor.v1.CodeEditorService/JoinRoomByInviteCode"
 	CodeEditorService_LeaveRoom_FullMethodName            = "/code_editor.v1.CodeEditorService/LeaveRoom"
+	CodeEditorService_CloseRoom_FullMethodName            = "/code_editor.v1.CodeEditorService/CloseRoom"
 	CodeEditorService_SubmitCode_FullMethodName           = "/code_editor.v1.CodeEditorService/SubmitCode"
 	CodeEditorService_SetReady_FullMethodName             = "/code_editor.v1.CodeEditorService/SetReady"
 	CodeEditorService_GetSubmissions_FullMethodName       = "/code_editor.v1.CodeEditorService/GetSubmissions"
@@ -36,6 +37,7 @@ const (
 	CodeEditorService_AIReview_FullMethodName             = "/code_editor.v1.CodeEditorService/AIReview"
 	CodeEditorService_GetDailyChallenge_FullMethodName    = "/code_editor.v1.CodeEditorService/GetDailyChallenge"
 	CodeEditorService_StartRoom_FullMethodName            = "/code_editor.v1.CodeEditorService/StartRoom"
+	CodeEditorService_GetSolutionReview_FullMethodName    = "/code_editor.v1.CodeEditorService/GetSolutionReview"
 )
 
 // CodeEditorServiceClient is the client API for CodeEditorService service.
@@ -47,6 +49,7 @@ type CodeEditorServiceClient interface {
 	JoinRoom(ctx context.Context, in *JoinRoomRequest, opts ...grpc.CallOption) (*JoinRoomResponse, error)
 	JoinRoomByInviteCode(ctx context.Context, in *JoinRoomByInviteCodeRequest, opts ...grpc.CallOption) (*JoinRoomResponse, error)
 	LeaveRoom(ctx context.Context, in *LeaveRoomRequest, opts ...grpc.CallOption) (*StatusResponse, error)
+	CloseRoom(ctx context.Context, in *CloseRoomRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	SubmitCode(ctx context.Context, in *SubmitCodeRequest, opts ...grpc.CallOption) (*SubmitCodeResponse, error)
 	SetReady(ctx context.Context, in *SetReadyRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	GetSubmissions(ctx context.Context, in *GetSubmissionsRequest, opts ...grpc.CallOption) (*GetSubmissionsResponse, error)
@@ -59,6 +62,7 @@ type CodeEditorServiceClient interface {
 	AIReview(ctx context.Context, in *AIReviewRequest, opts ...grpc.CallOption) (*AIReviewResponse, error)
 	GetDailyChallenge(ctx context.Context, in *GetDailyChallengeRequest, opts ...grpc.CallOption) (*GetDailyChallengeResponse, error)
 	StartRoom(ctx context.Context, in *StartRoomRequest, opts ...grpc.CallOption) (*StartRoomResponse, error)
+	GetSolutionReview(ctx context.Context, in *GetSolutionReviewRequest, opts ...grpc.CallOption) (*SolutionReviewResponse, error)
 }
 
 type codeEditorServiceClient struct {
@@ -113,6 +117,16 @@ func (c *codeEditorServiceClient) LeaveRoom(ctx context.Context, in *LeaveRoomRe
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(StatusResponse)
 	err := c.cc.Invoke(ctx, CodeEditorService_LeaveRoom_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *codeEditorServiceClient) CloseRoom(ctx context.Context, in *CloseRoomRequest, opts ...grpc.CallOption) (*StatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StatusResponse)
+	err := c.cc.Invoke(ctx, CodeEditorService_CloseRoom_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -239,6 +253,16 @@ func (c *codeEditorServiceClient) StartRoom(ctx context.Context, in *StartRoomRe
 	return out, nil
 }
 
+func (c *codeEditorServiceClient) GetSolutionReview(ctx context.Context, in *GetSolutionReviewRequest, opts ...grpc.CallOption) (*SolutionReviewResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SolutionReviewResponse)
+	err := c.cc.Invoke(ctx, CodeEditorService_GetSolutionReview_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CodeEditorServiceServer is the server API for CodeEditorService service.
 // All implementations must embed UnimplementedCodeEditorServiceServer
 // for forward compatibility.
@@ -248,6 +272,7 @@ type CodeEditorServiceServer interface {
 	JoinRoom(context.Context, *JoinRoomRequest) (*JoinRoomResponse, error)
 	JoinRoomByInviteCode(context.Context, *JoinRoomByInviteCodeRequest) (*JoinRoomResponse, error)
 	LeaveRoom(context.Context, *LeaveRoomRequest) (*StatusResponse, error)
+	CloseRoom(context.Context, *CloseRoomRequest) (*StatusResponse, error)
 	SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error)
 	SetReady(context.Context, *SetReadyRequest) (*StatusResponse, error)
 	GetSubmissions(context.Context, *GetSubmissionsRequest) (*GetSubmissionsResponse, error)
@@ -260,6 +285,7 @@ type CodeEditorServiceServer interface {
 	AIReview(context.Context, *AIReviewRequest) (*AIReviewResponse, error)
 	GetDailyChallenge(context.Context, *GetDailyChallengeRequest) (*GetDailyChallengeResponse, error)
 	StartRoom(context.Context, *StartRoomRequest) (*StartRoomResponse, error)
+	GetSolutionReview(context.Context, *GetSolutionReviewRequest) (*SolutionReviewResponse, error)
 	mustEmbedUnimplementedCodeEditorServiceServer()
 }
 
@@ -284,6 +310,9 @@ func (UnimplementedCodeEditorServiceServer) JoinRoomByInviteCode(context.Context
 }
 func (UnimplementedCodeEditorServiceServer) LeaveRoom(context.Context, *LeaveRoomRequest) (*StatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method LeaveRoom not implemented")
+}
+func (UnimplementedCodeEditorServiceServer) CloseRoom(context.Context, *CloseRoomRequest) (*StatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CloseRoom not implemented")
 }
 func (UnimplementedCodeEditorServiceServer) SubmitCode(context.Context, *SubmitCodeRequest) (*SubmitCodeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SubmitCode not implemented")
@@ -320,6 +349,9 @@ func (UnimplementedCodeEditorServiceServer) GetDailyChallenge(context.Context, *
 }
 func (UnimplementedCodeEditorServiceServer) StartRoom(context.Context, *StartRoomRequest) (*StartRoomResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method StartRoom not implemented")
+}
+func (UnimplementedCodeEditorServiceServer) GetSolutionReview(context.Context, *GetSolutionReviewRequest) (*SolutionReviewResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetSolutionReview not implemented")
 }
 func (UnimplementedCodeEditorServiceServer) mustEmbedUnimplementedCodeEditorServiceServer() {}
 func (UnimplementedCodeEditorServiceServer) testEmbeddedByValue()                           {}
@@ -428,6 +460,24 @@ func _CodeEditorService_LeaveRoom_Handler(srv interface{}, ctx context.Context, 
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(CodeEditorServiceServer).LeaveRoom(ctx, req.(*LeaveRoomRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _CodeEditorService_CloseRoom_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CloseRoomRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CodeEditorServiceServer).CloseRoom(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CodeEditorService_CloseRoom_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CodeEditorServiceServer).CloseRoom(ctx, req.(*CloseRoomRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -648,6 +698,24 @@ func _CodeEditorService_StartRoom_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CodeEditorService_GetSolutionReview_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetSolutionReviewRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CodeEditorServiceServer).GetSolutionReview(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CodeEditorService_GetSolutionReview_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CodeEditorServiceServer).GetSolutionReview(ctx, req.(*GetSolutionReviewRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CodeEditorService_ServiceDesc is the grpc.ServiceDesc for CodeEditorService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -674,6 +742,10 @@ var CodeEditorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "LeaveRoom",
 			Handler:    _CodeEditorService_LeaveRoom_Handler,
+		},
+		{
+			MethodName: "CloseRoom",
+			Handler:    _CodeEditorService_CloseRoom_Handler,
 		},
 		{
 			MethodName: "SubmitCode",
@@ -722,6 +794,10 @@ var CodeEditorService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "StartRoom",
 			Handler:    _CodeEditorService_StartRoom_Handler,
+		},
+		{
+			MethodName: "GetSolutionReview",
+			Handler:    _CodeEditorService_GetSolutionReview_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

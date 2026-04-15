@@ -17,6 +17,7 @@ type Service interface {
 	InviteToCircle(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) error
 	IsMember(context.Context, uuid.UUID, uuid.UUID) (bool, error)
 	ListCircleMembers(context.Context, uuid.UUID, int32) ([]*model.CircleMemberProfile, error)
+	DeleteCircle(context.Context, uuid.UUID, uuid.UUID) error
 }
 
 // EventService handles event operations for circles.

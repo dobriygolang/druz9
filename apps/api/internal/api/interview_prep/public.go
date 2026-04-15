@@ -205,7 +205,7 @@ func (i *Implementation) SubmitMockStage(ctx context.Context, req *v1.SubmitMock
 	if err != nil {
 		return nil, err
 	}
-	result, err := i.service.SubmitMockStage(ctx, user, sessionID, req.Code, unmapProgrammingLanguage(req.Language), req.Notes)
+	result, err := i.service.SubmitMockStage(ctx, user, sessionID, req.Code, unmapProgrammingLanguage(req.Language), req.Notes, unmapMockStageKind(req.StageKind).String())
 	if err != nil {
 		return nil, toHTTPError(err)
 	}
@@ -304,6 +304,7 @@ func toHTTPError(err error) error {
 	case errors.Is(err, appinterviewprep.ErrAnotherMockSessionActive),
 		errors.Is(err, appinterviewprep.ErrSubmitNotAllowed),
 		errors.Is(err, appinterviewprep.ErrMockStageSubmitNotAllowed),
+		errors.Is(err, appinterviewprep.ErrMockStageKindMismatch),
 		errors.Is(err, appinterviewprep.ErrMockQuestionNotReady),
 		errors.Is(err, appinterviewprep.ErrMockQuestionAnswerRequired),
 		errors.Is(err, appinterviewprep.ErrMockCompanyTagRequired),

@@ -1,6 +1,7 @@
 import { useState, useRef, useEffect } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { User, LogOut, Shield, Moon, Sun } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/shared/lib/cn'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
@@ -12,6 +13,7 @@ export function Sidebar() {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
+  const { t, i18n } = useTranslation()
   const [popoverOpen, setPopoverOpen] = useState(false)
   const popoverRef = useRef<HTMLDivElement>(null)
 
@@ -38,6 +40,9 @@ export function Sidebar() {
 
   const displayName = user ? `${user.firstName} ${user.lastName}`.trim() || user.username : ''
   const email = user?.telegramUsername ? `@${user.telegramUsername}` : ''
+  const toggleLanguage = () => {
+    void i18n.changeLanguage(i18n.language.startsWith('en') ? 'ru' : 'en')
+  }
 
   return (
     <aside className={cn(
@@ -63,7 +68,7 @@ export function Sidebar() {
               className="font-bold text-[13px] text-[#6366F1] dark:text-[#818cf8] tracking-[0.18em] leading-tight uppercase"
               style={{ fontFamily: 'Geist, Inter, system-ui, sans-serif' }}
             >
-              ДРУЗЬЯ
+              DRUZYA
             </span>
             <span className="text-[10px] text-[#94a3b8] dark:text-[#3d5570] leading-tight" style={{ fontFamily: 'Geist, Inter, system-ui, sans-serif' }}>v2.0.0</span>
           </div>
@@ -79,7 +84,7 @@ export function Sidebar() {
             <Link
               key={item.href}
               to={item.href}
-              title={item.label}
+              title={t(item.labelKey ?? item.label)}
               className={cn(
                 'relative flex items-center justify-center lg:justify-start gap-2.5 px-2 lg:px-3 py-2.5 rounded-full text-[13px] font-medium transition-all duration-200 font-geist',
                 active
@@ -91,7 +96,7 @@ export function Sidebar() {
                 <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#6366F1] dark:bg-[#818cf8] rounded-r-full" />
               )}
               <Icon className="w-4 h-4" />
-              <span className="hidden lg:block">{item.label}</span>
+              <span className="hidden lg:block">{t(item.labelKey ?? item.label)}</span>
             </Link>
           )
         })}
@@ -100,7 +105,7 @@ export function Sidebar() {
         <div className="mt-2 pt-2 border-t border-[#CBCCC9] dark:border-[#1a2540]">
           <button
             onClick={toggleTheme}
-            title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+            title={theme === 'dark' ? t('sidebar.theme.light') : t('sidebar.theme.dark')}
             className={cn(
               'w-full flex items-center justify-center lg:justify-start gap-2.5 px-2 lg:px-3 py-2.5 rounded-full text-[13px] font-medium transition-all duration-200 font-geist',
               'text-[#666666] hover:bg-[#D8D9D6] hover:text-[#111111]',
@@ -112,8 +117,20 @@ export function Sidebar() {
               : <Moon className="w-4 h-4" />
             }
             <span className="hidden lg:block">
-              {theme === 'dark' ? 'Светлая' : 'Тёмная'}
+              {theme === 'dark' ? t('sidebar.theme.light') : t('sidebar.theme.dark')}
             </span>
+          </button>
+          <button
+            onClick={toggleLanguage}
+            title={`${t('sidebar.lang.ru')} / ${t('sidebar.lang.en')}`}
+            className={cn(
+              'mt-1 w-full flex items-center justify-center lg:justify-start gap-2.5 px-2 lg:px-3 py-2.5 rounded-full text-[13px] font-medium transition-all duration-200 font-geist',
+              'text-[#666666] hover:bg-[#D8D9D6] hover:text-[#111111]',
+              'dark:text-[#4d6380] dark:hover:bg-[#141d30] dark:hover:text-[#c8d8ec]'
+            )}
+          >
+            <span className="w-4 text-center text-[11px] font-bold">{i18n.language.startsWith('en') ? 'EN' : 'RU'}</span>
+            <span className="hidden lg:block">{t('sidebar.lang.ru')} | {t('sidebar.lang.en')}</span>
           </button>
         </div>
       </nav>
@@ -145,7 +162,7 @@ export function Sidebar() {
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#111111] dark:text-[#c8d8ec] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] transition-colors font-geist"
                 >
                   <User className="w-4 h-4 text-[#666666] dark:text-[#4d6380]" />
-                  Мой профиль
+                  {t('sidebar.profile')}
                 </button>
                 {user.isAdmin && (
                   <button
@@ -153,7 +170,7 @@ export function Sidebar() {
                     className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#6366F1] dark:text-[#818cf8] hover:bg-[#EEF2FF] dark:hover:bg-[#1e1e4a] transition-colors font-geist"
                   >
                     <Shield className="w-4 h-4" />
-                    Админ панель
+                    {t('sidebar.admin')}
                   </button>
                 )}
               </div>
@@ -166,7 +183,7 @@ export function Sidebar() {
                   className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#dc2626] dark:text-[#f87171] hover:bg-[#fef2f2] dark:hover:bg-[#2a0f0f] transition-colors font-geist"
                 >
                   <LogOut className="w-4 h-4" />
-                  Выйти
+                  {t('sidebar.logout')}
                 </button>
               </div>
             </div>

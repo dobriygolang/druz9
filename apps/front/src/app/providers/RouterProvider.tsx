@@ -9,6 +9,7 @@ import { AdminLayout } from '@/widgets/AdminLayout/ui/AdminLayout'
 const LoginPage = lazy(() => import('@/pages/LoginPage/ui/LoginPage').then(m => ({ default: m.LoginPage })))
 const AuthCallbackPage = lazy(() => import('@/pages/AuthCallbackPage/ui/AuthCallbackPage').then(m => ({ default: m.AuthCallbackPage })))
 const CompleteRegistrationPage = lazy(() => import('@/pages/CompleteRegistrationPage/ui/CompleteRegistrationPage').then(m => ({ default: m.CompleteRegistrationPage })))
+const JourneyPage = lazy(() => import('@/pages/JourneyPage/ui/JourneyPage').then(m => ({ default: m.JourneyPage })))
 const HomePage = lazy(() => import('@/pages/HomePage/ui/HomePage').then(m => ({ default: m.HomePage })))
 const CommunityHubPage = lazy(() => import('@/pages/CommunityHubPage/ui/CommunityHubPage').then(m => ({ default: m.CommunityHubPage })))
 const UsersPage = lazy(() => import('@/pages/UsersPage/ui/UsersPage').then(m => ({ default: m.UsersPage })))
@@ -61,10 +62,10 @@ class ErrorBoundary extends React.Component<
       return (
         <div className="flex items-center justify-center h-screen bg-[#F2F3F0]">
           <div className="text-center">
-            <h2 className="text-xl font-semibold mb-2">Что-то пошло не так</h2>
+            <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
             <p className="text-[#666666] mb-4 text-sm">{msg}</p>
             <button className="px-4 py-2 bg-[#6366F1] rounded-lg text-sm font-medium" onClick={() => window.location.reload()}>
-              Перезагрузить страницу
+              Reload page
             </button>
           </div>
         </div>
@@ -90,7 +91,7 @@ export const RouterProvider: React.FC = () => {
           <Route path="/login" element={
             !isAuthenticated ? <LoginPage />
               : needsProfileComplete ? <Navigate to="/complete-registration" replace />
-              : <Navigate to="/home" replace />
+              : <Navigate to="/journey" replace />
           } />
           <Route path="/auth/callback" element={<AuthCallbackPage />} />
           <Route path="/complete-registration" element={
@@ -101,6 +102,11 @@ export const RouterProvider: React.FC = () => {
 
           {/* Main app layout */}
           <Route element={<PageLayout />}>
+            <Route path="/journey" element={
+              !isAuthenticated || needsProfileComplete
+                ? <Navigate to="/login" replace />
+                : <JourneyPage />
+            } />
             <Route path="/home" element={gate ? <Navigate to="/login" replace /> : <HomePage />} />
 
             {/* Community */}
@@ -191,10 +197,10 @@ export const RouterProvider: React.FC = () => {
 
           {/* Root */}
           <Route path="*" element={
-            !appRequireAuth ? <Navigate to="/home" replace />
+            !appRequireAuth ? <Navigate to="/journey" replace />
               : !isAuthenticated ? <Navigate to="/login" replace />
               : needsProfileComplete ? <Navigate to="/complete-registration" replace />
-              : <Navigate to="/home" replace />
+              : <Navigate to="/journey" replace />
           } />
         </Routes>
       </ErrorBoundary>

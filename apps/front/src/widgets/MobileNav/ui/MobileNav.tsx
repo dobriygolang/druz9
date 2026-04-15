@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { ChevronRight, LogOut, Menu, Moon, Shield, Sparkles, Sun, User, X } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/shared/lib/cn'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
@@ -20,6 +21,7 @@ export function MobileNav() {
   const navigate = useNavigate()
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
+  const { t, i18n } = useTranslation()
   const [menuOpen, setMenuOpen] = useState(false)
 
   useEffect(() => {
@@ -52,8 +54,8 @@ export function MobileNav() {
   }
 
   const routeMeta = getMobileRouteMeta(location.pathname)
-  const displayName = user ? `${user.firstName} ${user.lastName}`.trim() || user.username : 'Гость'
-  const userMeta = user?.telegramUsername ? `@${user.telegramUsername}` : 'Открой меню, чтобы быстро перейти по разделам'
+  const displayName = user ? `${user.firstName} ${user.lastName}`.trim() || user.username : t('mobile.guest')
+  const userMeta = user?.telegramUsername ? `@${user.telegramUsername}` : t('mobile.menuHint')
 
   return (
     <>
@@ -65,13 +67,13 @@ export function MobileNav() {
             </div>
             <div className="min-w-0">
               <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#6366F1] dark:text-[#a5b4fc]">
-                ДРУЗЬЯ
+                {t('app.name')}
               </p>
               <p className="truncate text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
-                {routeMeta.title}
+                {t(routeMeta.titleKey ?? routeMeta.title)}
               </p>
               <p className="truncate text-[11px] text-[#667085] dark:text-[#7e93b0]">
-                {routeMeta.subtitle}
+                {t(routeMeta.subtitleKey ?? routeMeta.subtitle)}
               </p>
             </div>
           </Link>
@@ -81,7 +83,7 @@ export function MobileNav() {
               type="button"
               onClick={toggleTheme}
               className="mobile-icon-button"
-              aria-label={theme === 'dark' ? 'Включить светлую тему' : 'Включить тёмную тему'}
+              aria-label={theme === 'dark' ? t('theme.enableLight') : t('theme.enableDark')}
             >
               {theme === 'dark'
                 ? <Sun className="w-4 h-4 text-[#fbbf24]" />
@@ -93,7 +95,7 @@ export function MobileNav() {
               onClick={() => setMenuOpen(true)}
               className="mobile-icon-button mobile-icon-button--accent relative"
               aria-expanded={menuOpen}
-              aria-label="Открыть меню"
+              aria-label={t('mobile.navigation')}
             >
               <Menu className="w-4 h-4 text-white" />
               {user && (
@@ -115,24 +117,24 @@ export function MobileNav() {
           type="button"
           className="mobile-sheet__backdrop"
           onClick={() => setMenuOpen(false)}
-          aria-label="Закрыть меню"
+          aria-label={t('mobile.navigation')}
         />
 
         <aside className="mobile-sheet__panel">
           <div className="flex items-center justify-between gap-3">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6366F1] dark:text-[#a5b4fc]">
-                Navigation
+                {t('mobile.navigation')}
               </p>
               <h2 className="mt-1 text-xl font-semibold text-[#111111] dark:text-[#f8fafc]">
-                Быстрый доступ
+                {t('mobile.quickAccess')}
               </h2>
             </div>
             <button
               type="button"
               onClick={() => setMenuOpen(false)}
               className="mobile-icon-button"
-              aria-label="Закрыть меню"
+              aria-label={t('mobile.navigation')}
             >
               <X className="w-4 h-4 text-[#111111] dark:text-[#e2e8f3]" />
             </button>
@@ -161,7 +163,7 @@ export function MobileNav() {
                 onClick={() => navigate('/login')}
                 className="mobile-sheet__ghost"
               >
-                Войти
+                {t('mobile.login')}
               </button>
             )}
           </div>
@@ -183,10 +185,10 @@ export function MobileNav() {
                   </span>
                   <span className="min-w-0 flex-1">
                     <span className="block truncate text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
-                      {item.label}
+                      {t(item.labelKey ?? item.label)}
                     </span>
                     <span className="mt-0.5 block text-xs leading-relaxed text-[#667085] dark:text-[#7e93b0]">
-                      {item.description}
+                      {t(item.descriptionKey ?? item.description)}
                     </span>
                   </span>
                   <ChevronRight className="w-4 h-4 flex-shrink-0 text-[#94a3b8] dark:text-[#4d6380]" />
@@ -206,8 +208,19 @@ export function MobileNav() {
                 : <Moon className="w-4 h-4 text-[#6366F1]" />
               }
               <span className="flex-1 text-left">
-                {theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+                {theme === 'dark' ? t('sidebar.theme.light') : t('sidebar.theme.dark')}
               </span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => void i18n.changeLanguage(i18n.language.startsWith('en') ? 'ru' : 'en')}
+              className="mobile-sheet__action"
+            >
+              <span className="w-4 text-center text-[11px] font-bold text-[#6366F1] dark:text-[#a5b4fc]">
+                {i18n.language.startsWith('en') ? 'EN' : 'RU'}
+              </span>
+              <span className="flex-1 text-left">{t('sidebar.lang.ru')} | {t('sidebar.lang.en')}</span>
             </button>
 
             {user && (
@@ -220,7 +233,7 @@ export function MobileNav() {
                 className="mobile-sheet__action"
               >
                 <User className="w-4 h-4 text-[#6366F1] dark:text-[#a5b4fc]" />
-                <span className="flex-1 text-left">Мой профиль</span>
+                <span className="flex-1 text-left">{t('sidebar.profile')}</span>
               </button>
             )}
 
@@ -234,7 +247,7 @@ export function MobileNav() {
                 className="mobile-sheet__action"
               >
                 <Shield className="w-4 h-4 text-[#6366F1] dark:text-[#a5b4fc]" />
-                <span className="flex-1 text-left">Админ панель</span>
+                <span className="flex-1 text-left">{t('sidebar.admin')}</span>
               </button>
             )}
 
@@ -248,18 +261,18 @@ export function MobileNav() {
                 className="mobile-sheet__action mobile-sheet__action--danger"
               >
                 <LogOut className="w-4 h-4" />
-                <span className="flex-1 text-left">Выйти</span>
+                <span className="flex-1 text-left">{t('sidebar.logout')}</span>
               </button>
             )}
           </div>
 
           <p className="mt-auto px-1 pt-2 text-[11px] leading-relaxed text-[#94a3b8] dark:text-[#4d6380]">
-            Меню собирает все разделы в одном месте, а нижний dock оставляет быстрые переходы под большим пальцем.
+            {t('mobile.menuFooter')}
           </p>
         </aside>
       </div>
 
-      <nav className="mobile-dock md:hidden" aria-label="Основная навигация">
+      <nav className="mobile-dock md:hidden" aria-label={t('mobile.navigation')}>
         <div className="mobile-dock__rail">
           {PRIMARY_NAV_ITEMS.map((item) => {
             const Icon = item.icon

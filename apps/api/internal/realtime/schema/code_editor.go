@@ -13,6 +13,7 @@ const (
 	CodeEditorTypeRoomUpdate      = "room_update"
 	CodeEditorTypeSubmission      = "submission"
 	CodeEditorTypeLanguage        = "language"
+	CodeEditorTypeReviewReady     = "review_ready"
 )
 
 type CodeEditorMessage struct {
@@ -28,6 +29,7 @@ type CodeEditorMessage struct {
 	Language          string                     `json:"language,omitempty"`
 	Room              *CodeEditorRoom            `json:"room,omitempty"`
 	Submission        *CodeEditorSubmissionEvent `json:"submission,omitempty"`
+	Review            *CodeEditorReviewEvent     `json:"review,omitempty"`
 }
 
 type CodeEditorRoom struct {
@@ -60,4 +62,23 @@ type CodeEditorSubmissionEvent struct {
 	Error       string `json:"error,omitempty"`
 	ExitCode    int32  `json:"exitCode"`
 	SubmittedBy string `json:"submittedBy"`
+}
+
+// CodeEditorReviewEvent is pushed when an AI review completes.
+type CodeEditorReviewEvent struct {
+	ReviewID        string            `json:"reviewId"`
+	SubmissionID    string            `json:"submissionId"`
+	Status          string            `json:"status"`
+	Verdict         string            `json:"verdict,omitempty"`
+	TimeComplexity  string            `json:"timeComplexity,omitempty"`
+	SpaceComplexity string            `json:"spaceComplexity,omitempty"`
+	Pattern         string            `json:"pattern,omitempty"`
+	Strengths       []string          `json:"strengths,omitempty"`
+	Weaknesses      []string          `json:"weaknesses,omitempty"`
+	Hint            string            `json:"hint,omitempty"`
+	SkillSignals    map[string]string `json:"skillSignals,omitempty"`
+	Comparison      string            `json:"comparison,omitempty"`
+	AttemptNumber   int               `json:"attemptNumber"`
+	SolveTimeMs     int64             `json:"solveTimeMs"`
+	MedianTimeMs    int64             `json:"medianTimeMs"`
 }

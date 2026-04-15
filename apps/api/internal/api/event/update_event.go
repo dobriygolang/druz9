@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"time"
 
 	"api/internal/model"
 	v1 "api/pkg/api/event/v1"
@@ -15,13 +16,15 @@ func (i *Implementation) UpdateEvent(ctx context.Context, req *v1.UpdateEventReq
 	if !ok {
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
 	}
-	if req.ScheduledAt == nil {
-		return nil, errors.BadRequest("INVALID_PAYLOAD", "scheduled_at is required")
-	}
-
 	eventID, err := uuid.Parse(req.EventId)
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_EVENT_ID", "invalid event id")
+	}
+
+	var scheduledAt *time.Time
+	if req.ScheduledAt != nil {
+		value := req.ScheduledAt.AsTime()
+		scheduledAt = &value
 	}
 
 	event, err := i.service.UpdateEvent(ctx, eventID, user, model.UpdateEventRequest{
@@ -34,7 +37,7 @@ func (i *Implementation) UpdateEvent(ctx context.Context, req *v1.UpdateEventReq
 		City:           req.City,
 		Latitude:       req.Latitude,
 		Longitude:      req.Longitude,
-		ScheduledAt:    req.ScheduledAt.AsTime(),
+		ScheduledAt:    scheduledAt,
 		InvitedUserIDs: req.InvitedUserIds,
 	})
 	if err != nil {

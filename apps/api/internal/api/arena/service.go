@@ -4,6 +4,7 @@ import (
 	"context"
 
 	apparena "api/internal/app/arena"
+	"api/internal/app/solutionreview"
 	domain "api/internal/domain/arena"
 	"api/internal/model"
 	realtime "api/internal/realtime/schema"
@@ -36,14 +37,20 @@ type RealtimePublisher interface {
 	PublishMatch(match *realtime.ArenaMatch, codes []*realtime.ArenaPlayerCode)
 }
 
+// ArenaReviewService provides post-solve review capabilities for arena matches.
+type ArenaReviewService interface {
+	StartReview(ctx context.Context, input solutionreview.ReviewInput) (uuid.UUID, error)
+}
+
 type Implementation struct {
 	v1.UnimplementedArenaServiceServer
 	service          Service
 	realtime         RealtimePublisher
 	allowGuestAccess func() bool
+	reviewService    ArenaReviewService
 }
 
-func New(service *apparena.Service, realtime RealtimePublisher, allowGuestAccess func() bool) *Implementation {
+func New(service *apparena.Service, realtime RealtimePublisher, allowGuestAccess func() bool, reviewService ArenaReviewService) *Implementation {
 	if allowGuestAccess == nil {
 		allowGuestAccess = func() bool { return false }
 	}
@@ -51,6 +58,7 @@ func New(service *apparena.Service, realtime RealtimePublisher, allowGuestAccess
 		service:          service,
 		realtime:         realtime,
 		allowGuestAccess: allowGuestAccess,
+		reviewService:    reviewService,
 	}
 }
 

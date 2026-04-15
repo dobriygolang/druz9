@@ -27,6 +27,7 @@ const (
 	CircleService_ListCircleMembers_FullMethodName = "/circle.v1.CircleService/ListCircleMembers"
 	CircleService_ListCircleEvents_FullMethodName  = "/circle.v1.CircleService/ListCircleEvents"
 	CircleService_CreateCircleEvent_FullMethodName = "/circle.v1.CircleService/CreateCircleEvent"
+	CircleService_DeleteCircle_FullMethodName      = "/circle.v1.CircleService/DeleteCircle"
 )
 
 // CircleServiceClient is the client API for CircleService service.
@@ -41,6 +42,7 @@ type CircleServiceClient interface {
 	ListCircleMembers(ctx context.Context, in *ListCircleMembersRequest, opts ...grpc.CallOption) (*ListCircleMembersResponse, error)
 	ListCircleEvents(ctx context.Context, in *ListCircleEventsRequest, opts ...grpc.CallOption) (*ListCircleEventsResponse, error)
 	CreateCircleEvent(ctx context.Context, in *CreateCircleEventRequest, opts ...grpc.CallOption) (*CreateCircleEventResponse, error)
+	DeleteCircle(ctx context.Context, in *DeleteCircleRequest, opts ...grpc.CallOption) (*DeleteCircleResponse, error)
 }
 
 type circleServiceClient struct {
@@ -131,6 +133,16 @@ func (c *circleServiceClient) CreateCircleEvent(ctx context.Context, in *CreateC
 	return out, nil
 }
 
+func (c *circleServiceClient) DeleteCircle(ctx context.Context, in *DeleteCircleRequest, opts ...grpc.CallOption) (*DeleteCircleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(DeleteCircleResponse)
+	err := c.cc.Invoke(ctx, CircleService_DeleteCircle_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // CircleServiceServer is the server API for CircleService service.
 // All implementations must embed UnimplementedCircleServiceServer
 // for forward compatibility.
@@ -143,6 +155,7 @@ type CircleServiceServer interface {
 	ListCircleMembers(context.Context, *ListCircleMembersRequest) (*ListCircleMembersResponse, error)
 	ListCircleEvents(context.Context, *ListCircleEventsRequest) (*ListCircleEventsResponse, error)
 	CreateCircleEvent(context.Context, *CreateCircleEventRequest) (*CreateCircleEventResponse, error)
+	DeleteCircle(context.Context, *DeleteCircleRequest) (*DeleteCircleResponse, error)
 	mustEmbedUnimplementedCircleServiceServer()
 }
 
@@ -176,6 +189,9 @@ func (UnimplementedCircleServiceServer) ListCircleEvents(context.Context, *ListC
 }
 func (UnimplementedCircleServiceServer) CreateCircleEvent(context.Context, *CreateCircleEventRequest) (*CreateCircleEventResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateCircleEvent not implemented")
+}
+func (UnimplementedCircleServiceServer) DeleteCircle(context.Context, *DeleteCircleRequest) (*DeleteCircleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method DeleteCircle not implemented")
 }
 func (UnimplementedCircleServiceServer) mustEmbedUnimplementedCircleServiceServer() {}
 func (UnimplementedCircleServiceServer) testEmbeddedByValue()                       {}
@@ -342,6 +358,24 @@ func _CircleService_CreateCircleEvent_Handler(srv interface{}, ctx context.Conte
 	return interceptor(ctx, in, info, handler)
 }
 
+func _CircleService_DeleteCircle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCircleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(CircleServiceServer).DeleteCircle(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: CircleService_DeleteCircle_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(CircleServiceServer).DeleteCircle(ctx, req.(*DeleteCircleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // CircleService_ServiceDesc is the grpc.ServiceDesc for CircleService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -380,6 +414,10 @@ var CircleService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreateCircleEvent",
 			Handler:    _CircleService_CreateCircleEvent_Handler,
+		},
+		{
+			MethodName: "DeleteCircle",
+			Handler:    _CircleService_DeleteCircle_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

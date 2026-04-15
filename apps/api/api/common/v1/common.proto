@@ -67,4 +67,5 @@ message InterviewSolutionReview {
   repeated string strengths           = 5;
   repeated string issues              = 6;
   repeated string follow_up_questions = 7;
+  repeated string gaps                = 8;
 }

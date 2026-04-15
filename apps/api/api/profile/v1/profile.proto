@@ -92,6 +92,17 @@ service ProfileService {
   rpc GetProfileActivity(GetProfileActivityRequest) returns (GetProfileActivityResponse) {
     option (google.api.http) = { get: "/api/v1/profile/{user_id}/activity" };
   }
+
+  rpc SetUserGoal(SetUserGoalRequest) returns (SetUserGoalResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/profile/goal"
+      body: "*"
+    };
+  }
+
+  rpc GetReadiness(GetReadinessRequest) returns (GetReadinessResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}/readiness" };
+  }
 }
 
 // ── Request messages ───────────────────────────────────────────────────────
@@ -163,6 +174,45 @@ message GetProfileProgressRequest  { string user_id = 1; }
 message GetAchievementsRequest     { string user_id = 1; }
 message GetProfileActivityRequest  { string user_id = 1; }
 
+message SetUserGoalRequest {
+  string kind    = 1;
+  string company = 2;
+}
+
+message GetReadinessRequest { string user_id = 1; }
+
+message SetUserGoalResponse {
+  UserGoal goal = 1;
+}
+
+message GetReadinessResponse {
+  int32                        score             = 1;
+  string                       level             = 2;
+  string                       level_label       = 3;
+  ProfileCompetency            weakest_skill     = 4;
+  ProfileCompetency            strongest_skill   = 5;
+  ReadinessNextAction          next_action       = 6;
+  repeated CompanyReadiness    company_readiness = 7;
+  int32                        streak_days       = 8;
+  int32                        active_days       = 9;
+}
+
+message ReadinessNextAction {
+  string title       = 1;
+  string description = 2;
+  string action_type = 3;
+  string action_url  = 4;
+  string skill_key   = 5;
+}
+
+message CompanyReadiness {
+  string company          = 1;
+  int32  total_stages     = 2;
+  int32  completed_stages = 3;
+  int32  percent          = 4;
+  bool   has_active       = 5;
+}
+
 // ── Response messages ──────────────────────────────────────────────────────
 
 // ProfileStatusResponse replaces the separate LogoutResponse and BindTelegramResponse.
@@ -220,6 +270,9 @@ message ProfileCompetency {
   int32  practice_days            = 10;
   string confidence               = 11;
   double average_score            = 12;
+  string level                    = 13;
+  double level_progress           = 14;
+  string next_milestone           = 15;
 }
 
 message ProfileProgressRecommendation {
@@ -239,6 +292,20 @@ message ProfileCheckpointProgress {
   google.protobuf.Timestamp finished_at = 7;
 }
 
+message NextAction {
+  string title       = 1;
+  string description = 2;
+  string action_type = 3;
+  string action_url  = 4;
+  int32  priority    = 5;
+  string skill_key   = 6;
+}
+
+message UserGoal {
+  string kind    = 1;
+  string company = 2;
+}
+
 message ProfileProgress {
   ProfileProgressOverview              overview         = 1;
   repeated ProfileCompetency           competencies     = 2;
@@ -247,6 +314,8 @@ message ProfileProgress {
   repeated ProfileProgressRecommendation recommendations = 5;
   repeated ProfileCheckpointProgress  checkpoints      = 6;
   repeated string                     companies        = 7;
+  repeated NextAction                 next_actions     = 8;
+  UserGoal                            goal             = 9;
 }
 
 message ProfileProgressResponse {

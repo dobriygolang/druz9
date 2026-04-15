@@ -25,7 +25,7 @@ export function CommunityHubPage() {
           <div className="mb-4 flex flex-col gap-3">
             <div>
               <h1 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">Community</h1>
-              <p className="mt-1 text-sm text-[#666666] dark:text-[#4d6380]">Найди коллег, круги и офлайн-активность рядом</p>
+              <p className="mt-1 text-sm text-[#666666] dark:text-[#4d6380]">Find peers, circles, and nearby offline activity</p>
             </div>
 
             {active === 'people' && (
@@ -34,7 +34,7 @@ export function CommunityHubPage() {
                 <input
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  placeholder="Поиск людей..."
+                  placeholder="Search people..."
                   className="w-full rounded-2xl border border-[#CBCCC9] bg-white/88 py-3 pl-10 pr-4 text-sm text-[#111111] shadow-[0_10px_26px_rgba(15,23,42,0.06)] backdrop-blur focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20 dark:border-[#1a2540] dark:bg-[#161c2d]/88 dark:text-[#c8d8ec]"
                 />
               </div>
@@ -64,7 +64,7 @@ export function CommunityHubPage() {
           <div className="flex items-center justify-between mb-4">
             <div>
               <h1 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">Community</h1>
-              <p className="text-sm text-[#666666] dark:text-[#4d6380] mt-0.5">Найди коллег и единомышленников</p>
+              <p className="text-sm text-[#666666] dark:text-[#4d6380] mt-0.5">Find peers and like-minded people</p>
             </div>
             {active === 'people' && (
               <div className="relative">
@@ -72,7 +72,7 @@ export function CommunityHubPage() {
                 <input
                   value={search}
                   onChange={e => setSearch(e.target.value)}
-                  placeholder="Поиск людей..."
+                  placeholder="Search people..."
                   className="pl-9 pr-4 py-2 w-[280px] bg-white dark:bg-[#161c2d] border border-[#CBCCC9] dark:border-[#1a2540] rounded-lg text-sm text-[#111111] dark:text-[#c8d8ec] placeholder-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
                 />
               </div>

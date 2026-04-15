@@ -22,7 +22,7 @@ func (r *Repo) CleanupExpiredEvents(ctx context.Context, olderThan time.Duration
 	}
 	tag, err := r.data.DB.Exec(ctx, `
 DELETE FROM events
-WHERE scheduled_at < NOW() - $1::interval
+WHERE scheduled_at IS NOT NULL AND scheduled_at < NOW() - $1::interval
 `, olderThan.String())
 	if err != nil {
 		return 0, fmt.Errorf("cleanup expired events: %w", err)
@@ -99,7 +99,10 @@ func normalizeRepeatRule(repeat string) string {
 //   weekly  → 8  occurrences (2 months)
 //   monthly → 6  occurrences (6 months)
 //   yearly  → 2  occurrences (2 years)
-func buildCreateEventScheduleTimes(base time.Time, repeat string) []time.Time {
+func buildCreateEventScheduleTimes(base *time.Time, repeat string) []*time.Time {
+	if base == nil {
+		return []*time.Time{nil}
+	}
 	switch repeat {
 	case model.EventRepeatDaily:
 		return buildRepeatedScheduleTimes(base, 14, func(value time.Time, step int) time.Time {
@@ -118,17 +121,18 @@ func buildCreateEventScheduleTimes(base time.Time, repeat string) []time.Time {
 			return value.AddDate(step, 0, 0)
 		})
 	default:
-		return []time.Time{base}
+		return []*time.Time{base}
 	}
 }
 
-func buildRepeatedScheduleTimes(base time.Time, count int, next func(time.Time, int) time.Time) []time.Time {
+func buildRepeatedScheduleTimes(base *time.Time, count int, next func(time.Time, int) time.Time) []*time.Time {
 	if count <= 1 {
-		return []time.Time{base}
+		return []*time.Time{base}
 	}
-	items := make([]time.Time, 0, count)
+	items := make([]*time.Time, 0, count)
 	for step := 0; step < count; step++ {
-		items = append(items, next(base, step))
+		value := next(*base, step)
+		items = append(items, &value)
 	}
 	return items
 }
@@ -235,7 +239,7 @@ func (r *Repo) DeleteEvent(ctx context.Context, eventID uuid.UUID, actor *model.
 	}
 
 	var seriesID *uuid.UUID
-	var scheduledAt time.Time
+	var scheduledAt *time.Time
 	if err := tx.QueryRow(ctx, `SELECT series_id, scheduled_at FROM events WHERE id = $1`, eventID).Scan(&seriesID, &scheduledAt); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return kratoserrors.NotFound("EVENT_NOT_FOUND", "event not found")
@@ -259,7 +263,7 @@ func deleteEventByScope(
 	tx pgx.Tx,
 	eventID uuid.UUID,
 	seriesID *uuid.UUID,
-	scheduledAt time.Time,
+	scheduledAt *time.Time,
 	scope string,
 ) (pgconn.CommandTag, error) {
 	if seriesID == nil {
@@ -270,6 +274,9 @@ func deleteEventByScope(
 	case "all":
 		return tx.Exec(ctx, `DELETE FROM events WHERE series_id = $1`, *seriesID)
 	case "future":
+		if scheduledAt == nil {
+			return tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)
+		}
 		return tx.Exec(ctx, `DELETE FROM events WHERE series_id = $1 AND scheduled_at >= $2`, *seriesID, scheduledAt)
 	default:
 		return tx.Exec(ctx, `DELETE FROM events WHERE id = $1`, eventID)

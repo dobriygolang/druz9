@@ -30,9 +30,13 @@ func (i *Implementation) CreateCircleEvent(ctx context.Context, req *circlev1.Cr
 	if req.Title == "" {
 		return nil, kratosErrors.BadRequest("INVALID_TITLE", "title is required")
 	}
-	scheduledAt, err := time.Parse(time.RFC3339, req.ScheduledAt)
-	if err != nil || scheduledAt.Before(time.Now()) {
-		return nil, kratosErrors.BadRequest("INVALID_SCHEDULED_AT", "scheduledAt must be a future RFC3339 timestamp")
+	var scheduledAt *time.Time
+	if req.ScheduledAt != "" {
+		value, err := time.Parse(time.RFC3339, req.ScheduledAt)
+		if err != nil || value.Before(time.Now()) {
+			return nil, kratosErrors.BadRequest("INVALID_SCHEDULED_AT", "scheduledAt must be a future RFC3339 timestamp")
+		}
+		scheduledAt = &value
 	}
 
 	event, err := i.eventSvc.CreateEvent(ctx, user.ID, model.CreateEventRequest{

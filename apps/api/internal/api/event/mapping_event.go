@@ -40,7 +40,7 @@ func mapEvent(item *model.Event) *v1.Event {
 		}
 	}
 
-	return &v1.Event{
+	event := &v1.Event{
 		Id:               item.ID.String(),
 		Title:            item.Title,
 		PlaceLabel:       item.PlaceLabel,
@@ -51,7 +51,6 @@ func mapEvent(item *model.Event) *v1.Event {
 		City:             item.City,
 		Latitude:         item.Latitude,
 		Longitude:        item.Longitude,
-		ScheduledAt:      timestamppb.New(item.ScheduledAt),
 		CreatedAt:        timestamppb.New(item.CreatedAt),
 		CreatorId:        item.CreatorID,
 		CreatorName:      item.CreatorName,
@@ -61,6 +60,10 @@ func mapEvent(item *model.Event) *v1.Event {
 		ParticipantCount: participantCount,
 		Participants:     participants,
 	}
+	if item.ScheduledAt != nil {
+		event.ScheduledAt = timestamppb.New(*item.ScheduledAt)
+	}
+	return event
 }
 
 func mapListEventsResponse(resp *model.ListEventsResponse) *v1.ListEventsResponse {

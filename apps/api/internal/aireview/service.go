@@ -68,6 +68,7 @@ type InterviewSolutionReview struct {
 	Score             int      `json:"score"`
 	Summary           string   `json:"summary"`
 	Strengths         []string `json:"strengths"`
+	Gaps              []string `json:"gaps"`
 	Issues            []string `json:"issues"`
 	FollowUpQuestions []string `json:"followUpQuestions"`
 	IsRelevant        bool     `json:"isRelevant"`
@@ -234,10 +235,11 @@ func buildSystemDesignPrompt(req SystemDesignReviewRequest) string {
 func buildInterviewSolutionPrompt(req InterviewSolutionReviewRequest) string {
 	var b strings.Builder
 	b.WriteString("Ты проводишь строгое AI-ревью промежуточного решения кандидата на mock interview.\n")
-	b.WriteString("Верни только валидный JSON с полями: score, summary, strengths, issues, followUpQuestions, isRelevant, isPassing.\n")
+	b.WriteString("Верни только валидный JSON с полями: score, summary, strengths, gaps, issues, followUpQuestions, isRelevant, isPassing.\n")
 	b.WriteString("Все поля должны быть только на русском языке. Score — целое число от 1 до 10.\n")
 	b.WriteString("Не хвали кандидата за объём текста или наличие кода. Оценивай только инженерическую состоятельность решения.\n")
 	b.WriteString("Если решение поверхностное, нерелевантное или не доведено до рабочего состояния, прямо скажи это.\n")
+	b.WriteString("В strengths перечисляй только подтверждённые сильные стороны решения. В gaps перечисляй, что кандидат упустил или не раскрыл. В issues перечисляй конкретные ошибки и риски.\n")
 	b.WriteString("Если кандидат отправил бессвязный текст, случайный код, заглушку, комментарии без решения или ответ не по задаче, обязательно выставь isRelevant=false, isPassing=false и score не выше 2.\n")
 	b.WriteString("Если это кодовая задача, особенно важны корректность, структура, граничные случаи, сложность, конкурентная безопасность и trade-off.\n")
 	b.WriteString("Если это архитектурная задача, особенно важны компоненты, потоки данных, надёжность, state management, failure modes и масштабирование.\n\n")
@@ -339,8 +341,8 @@ func parseInterviewSolutionJSON(raw string) (*InterviewSolutionReview, error) {
 	if review.Score > 10 {
 		review.Score = 10
 	}
-	review.IsRelevant = normalizeReviewRelevant(review.IsRelevant, review.Score, review.Summary, review.Issues, review.Strengths)
-	review.IsPassing = normalizeReviewPassing(review.IsPassing, review.IsRelevant, review.Score, review.Summary, review.Issues, review.Strengths)
+	review.IsRelevant = normalizeReviewRelevant(review.IsRelevant, review.Score, review.Summary, review.Issues, review.Gaps, review.Strengths)
+	review.IsPassing = normalizeReviewPassing(review.IsPassing, review.IsRelevant, review.Score, review.Summary, review.Issues, review.Gaps, review.Strengths)
 	return &review, nil
 }
 

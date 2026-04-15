@@ -11,6 +11,7 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useToast } from '@/shared/ui/Toast'
 import { PREP_TYPE_LABELS } from '@/shared/lib/taskLabels'
+import { PageMeta } from '@/shared/ui/PageMeta'
 
 /* ── Constants ─────────────────────────────────────────────────────── */
 
@@ -78,7 +79,7 @@ export function InterviewPrepPage() {
     setLoading(true)
     interviewPrepApi.listTasks()
       .then(ts => setTasks(ts))
-      .catch(() => setError('Не удалось загрузить данные'))
+      .catch(() => setError('Failed to load data'))
       .finally(() => setLoading(false))
     interviewPrepApi.listMockBlueprints()
       .then(items => {
@@ -122,10 +123,10 @@ export function InterviewPrepPage() {
       const msg = e?.response?.data?.message ?? ''
       if (msg.includes('another mock session') || msg.includes('active')) {
         const lastId = localStorage.getItem('interview:last_mock_session')
-        setMockError(lastId ? 'active_session:' + lastId : 'Завершите текущую сессию перед началом новой')
+        setMockError(lastId ? 'active_session:' + lastId : 'Finish the current session before starting a new one')
       } else {
-        setMockError('Не удалось создать сессию')
-        toast('Не удалось создать mock-сессию', 'error')
+        setMockError('Failed to create session')
+        toast('Failed to create mock session', 'error')
       }
     } finally {
       setMockLoading(false)
@@ -137,7 +138,7 @@ export function InterviewPrepPage() {
       const session = await interviewPrepApi.startSession(task.id) as any
       navigate(`/growth/interview-prep/${session?.id ?? task.id}`)
     } catch {
-      toast('Не удалось начать сессию', 'error')
+      toast('Failed to start session', 'error')
     }
   }
 
@@ -145,6 +146,7 @@ export function InterviewPrepPage() {
 
   return (
     <div className={isMobile ? 'px-4 pt-4 pb-24 flex flex-col gap-5' : 'px-4 md:px-6 pt-4 pb-6 flex flex-col gap-6'}>
+      <PageMeta title="Interview Prep" description="Mock interview loops and solo interview practice tasks." canonicalPath="/growth/interview-prep" />
 
       {/* ── Hero ────────────────────────────────────────────────────── */}
       <section className="section-enter relative overflow-hidden rounded-[32px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.94)_40%,_rgba(245,243,255,0.96))] p-6 shadow-[0_24px_60px_rgba(99,102,241,0.10)] dark:border-[#1e3158] dark:bg-[linear-gradient(145deg,_rgba(11,13,22,0.96),_rgba(29,36,63,0.92)_50%,_rgba(46,26,58,0.88))] dark:shadow-[0_28px_70px_rgba(2,6,23,0.45)] md:p-8">
@@ -157,18 +159,18 @@ export function InterviewPrepPage() {
           </div>
 
           <h1 className="mt-4 max-w-[28ch] text-[28px] font-bold leading-[1.1] text-[#111111] dark:text-[#f8fafc] sm:text-[36px]">
-            Подготовка к техническому собеседованию
+            Technical interview preparation
           </h1>
           <p className="mt-3 max-w-[42rem] text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">
-            Выбери конкретный mock-loop компании, пройди реальные раунды с таймером и AI-debrief, либо тренируйся по отдельным темам.
+            Pick a company-specific mock loop, go through realistic timed rounds with AI debrief, or practice separate topics at your own pace.
           </p>
 
           <div className="mt-5 flex items-center gap-4 text-sm text-[#667085] dark:text-[#7e93b0]">
-            <span className="flex items-center gap-1.5"><Zap className="h-3.5 w-3.5 text-[#f59e0b]" /> AI-оценка</span>
+            <span className="flex items-center gap-1.5"><Zap className="h-3.5 w-3.5 text-[#f59e0b]" /> AI review</span>
             <span className="h-3.5 w-px bg-[#CBCCC9] dark:bg-[#1e3158]" />
-            <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-[#6366F1]" /> Таймер</span>
+            <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-[#6366F1]" /> Timer</span>
             <span className="h-3.5 w-px bg-[#CBCCC9] dark:bg-[#1e3158]" />
-            <span className="flex items-center gap-1.5"><Star className="h-3.5 w-3.5 text-[#ec4899]" /> Оценка 1-10</span>
+            <span className="flex items-center gap-1.5"><Star className="h-3.5 w-3.5 text-[#ec4899]" /> Score 1-10</span>
           </div>
         </div>
       </section>
@@ -187,12 +189,12 @@ export function InterviewPrepPage() {
                   </div>
                   <div>
                     <h2 className="text-lg font-bold text-white">{selectedBlueprint?.primaryAliasName || selectedBlueprint?.title || 'Mock Interview'}</h2>
-                    <p className="text-[13px] text-white/60">{selectedBlueprint?.title || 'Полный цикл собеседования'}</p>
+                    <p className="text-[13px] text-white/60">{selectedBlueprint?.title || 'Full interview loop'}</p>
                   </div>
                 </div>
 
                 <p className="mt-4 max-w-[40rem] text-sm leading-6 text-white/75">
-                  {selectedBlueprint?.description || 'Подбери loop под целевую компанию и пройди последовательность раундов в том порядке, в котором они реально идут в mock-сценарии.'}
+                  {selectedBlueprint?.description || 'Choose a target-company loop and go through the rounds in the same order they usually appear in the real mock scenario.'}
                 </p>
 
                 {/* Stage pipeline */}
@@ -233,7 +235,7 @@ export function InterviewPrepPage() {
               {!isMobile && (
                 <div className="flex flex-col items-end gap-1 text-right">
                   <p className="text-3xl font-bold font-mono text-white/90">{selectedBlueprint?.rounds?.length || 5}</p>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-white/40">раундов</p>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-white/40">rounds</p>
                 </div>
               )}
             </div>
@@ -241,12 +243,12 @@ export function InterviewPrepPage() {
             {/* Active session warning */}
             {mockError && mockError.startsWith('active_session:') && (
               <div className="mt-4 flex items-center gap-3 rounded-xl border border-[#fbbf24]/30 bg-[#fbbf24]/10 px-4 py-3">
-                <p className="flex-1 text-sm text-[#fde68a]">Есть незавершённая сессия</p>
+                <p className="flex-1 text-sm text-[#fde68a]">You have an unfinished session</p>
                 <button
                   onClick={() => navigate(`/growth/interview-prep/mock/${mockError.split(':')[1]}`)}
                   className="flex items-center gap-1 text-sm font-semibold text-[#fbbf24] hover:text-[#fde68a] transition-colors"
                 >
-                  Продолжить <ArrowRight className="h-3.5 w-3.5" />
+                  Continue <ArrowRight className="h-3.5 w-3.5" />
                 </button>
               </div>
             )}
@@ -282,7 +284,7 @@ export function InterviewPrepPage() {
                 className={`flex-shrink-0 rounded-xl ${isMobile ? 'w-full justify-center' : ''}`}
               >
                 <Play className="w-4 h-4" />
-                Начать Mock Interview
+                Start Mock Interview
               </Button>
             </div>
           </div>
@@ -293,12 +295,12 @@ export function InterviewPrepPage() {
       <section className="section-enter">
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-[#111111] dark:text-[#f8fafc]">Задачи для практики</h2>
-            <p className="mt-1 text-sm text-[#667085] dark:text-[#7e93b0]">Тренируйся по отдельным темам в своём темпе</p>
+            <h2 className="text-lg font-bold text-[#111111] dark:text-[#f8fafc]">Practice tasks</h2>
+            <p className="mt-1 text-sm text-[#667085] dark:text-[#7e93b0]">Train individual interview topics at your own pace</p>
           </div>
           {!loading && (
             <span className="text-sm text-[#667085] dark:text-[#7e93b0]">
-              <span className="font-semibold text-[#111111] dark:text-[#f8fafc]">{filtered.length}</span> задач
+              <span className="font-semibold text-[#111111] dark:text-[#f8fafc]">{filtered.length}</span> tasks
             </span>
           )}
         </div>
@@ -310,7 +312,7 @@ export function InterviewPrepPage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Поиск по названию задачи..."
+              placeholder="Search by task title..."
               className="w-full rounded-xl border border-[#CBCCC9] bg-white py-2.5 pl-10 pr-4 text-sm text-[#111111] placeholder-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 dark:border-[#1a2540] dark:bg-[#161c2d] dark:text-[#f8fafc] dark:placeholder-[#4d6380]"
             />
           </div>
@@ -326,7 +328,7 @@ export function InterviewPrepPage() {
                     : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#6366F1]/40 hover:text-[#111111] dark:bg-[#161c2d] dark:border-[#1a2540] dark:text-[#7e93b0] dark:hover:text-[#c8d8ec]'
                 }`}
               >
-                {cat === '' ? 'Все' : PREP_TYPE_LABELS[cat] ?? cat}
+                {cat === '' ? 'All' : PREP_TYPE_LABELS[cat] ?? cat}
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
                   category === cat ? 'bg-white/20 text-white dark:bg-black/20 dark:text-[#111111]' : 'bg-[#F2F3F0] text-[#94a3b8] dark:bg-[#1a2236]'
                 }`}>
@@ -355,8 +357,8 @@ export function InterviewPrepPage() {
         ) : filtered.length === 0 ? (
           <div className="rounded-2xl border border-dashed border-[#CBCCC9] bg-white py-16 text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
             <Search className="mx-auto h-10 w-10 text-[#CBCCC9] dark:text-[#4d6380]" />
-            <p className="mt-3 text-sm font-medium text-[#667085] dark:text-[#7e93b0]">Задачи не найдены</p>
-            <p className="mt-1 text-xs text-[#94a3b8]">Попробуйте изменить фильтры или поисковый запрос</p>
+            <p className="mt-3 text-sm font-medium text-[#667085] dark:text-[#7e93b0]">No tasks found</p>
+            <p className="mt-1 text-xs text-[#94a3b8]">Try changing filters or your search query</p>
           </div>
         ) : (
           <div className={`grid gap-3 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'}`}>
@@ -396,7 +398,7 @@ export function InterviewPrepPage() {
 
                       <span className="inline-flex items-center gap-1 text-[11px] text-[#667085] dark:text-[#7e93b0]">
                         <Clock className="h-3 w-3" />
-                        {Math.round(task.durationSeconds / 60)} мин
+                        {Math.round(task.durationSeconds / 60)} min
                       </span>
 
                       {task.language && (

@@ -1,4 +1,5 @@
 import { Modal } from './Modal'
+import { useTranslation } from 'react-i18next'
 import { Button } from './Button'
 
 interface ConfirmModalProps {
@@ -15,8 +16,9 @@ interface ConfirmModalProps {
 
 export function ConfirmModal({
   open, onClose, onConfirm, title, message,
-  confirmLabel = 'Подтвердить', cancelLabel = 'Отмена', danger, loading,
+  confirmLabel = 'Confirm', cancelLabel = 'Cancel', danger, loading,
 }: ConfirmModalProps) {
+  const { t } = useTranslation()
   return (
     <Modal
       open={open}
@@ -24,9 +26,9 @@ export function ConfirmModal({
       title={title}
       footer={
         <>
-          <Button variant="secondary" size="sm" onClick={onClose}>{cancelLabel}</Button>
+          <Button variant="secondary" size="sm" onClick={onClose}>{cancelLabel === 'Cancel' ? t('common.cancel') : cancelLabel}</Button>
           <Button variant={danger ? 'danger' : 'orange'} size="sm" onClick={onConfirm} loading={loading}>
-            {confirmLabel}
+            {confirmLabel === 'Confirm' ? t('common.confirm') : confirmLabel}
           </Button>
         </>
       }

@@ -338,3 +338,26 @@ func (h *CodeEditorHub) PublishSubmission(roomID string, submission *schema.Code
 		Submission: submission,
 	}, nil)
 }
+
+// PublishReviewReady sends a review_ready event to all rooms where the user is connected.
+func (h *CodeEditorHub) PublishReviewReady(userID string, review *schema.CodeEditorReviewEvent) {
+	if userID == "" || review == nil {
+		return
+	}
+
+	msg := schema.CodeEditorMessage{
+		Type:   schema.CodeEditorTypeReviewReady,
+		Review: review,
+	}
+
+	h.mu.Lock()
+	defer h.mu.Unlock()
+
+	for _, room := range h.rooms {
+		for client := range room.clients {
+			if client.authenticatedUserID == userID {
+				client.enqueue(msg)
+			}
+		}
+	}
+}

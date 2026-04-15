@@ -135,6 +135,23 @@ ON CONFLICT (circle_id, user_id) DO NOTHING`, circleID, userID)
 	return tx.Commit(ctx)
 }
 
+func (r *Repo) DeleteCircle(ctx context.Context, circleID uuid.UUID) error {
+	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
+	if err != nil {
+		return fmt.Errorf("begin tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	// Cascade: remove members, then circle itself
+	if _, err := tx.Exec(ctx, `DELETE FROM circle_members WHERE circle_id = $1`, circleID); err != nil {
+		return fmt.Errorf("delete circle members: %w", err)
+	}
+	if _, err := tx.Exec(ctx, `DELETE FROM circles WHERE id = $1`, circleID); err != nil {
+		return fmt.Errorf("delete circle: %w", err)
+	}
+	return tx.Commit(ctx)
+}
+
 func (r *Repo) LeaveCircle(ctx context.Context, circleID, userID uuid.UUID) error {
 	tx, err := r.data.DB.BeginTx(ctx, pgx.TxOptions{})
 	if err != nil {

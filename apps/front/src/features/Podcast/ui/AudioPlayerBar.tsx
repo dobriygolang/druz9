@@ -85,7 +85,7 @@ export function AudioPlayerBar() {
         <button
           onClick={stop}
           className="w-7 h-7 rounded-full hover:bg-[#1e293b] flex items-center justify-center transition-colors"
-          title="Закрыть плеер"
+          title="Close player"
         >
           <X className="w-3.5 h-3.5 text-[#475569] hover:text-white" />
         </button>

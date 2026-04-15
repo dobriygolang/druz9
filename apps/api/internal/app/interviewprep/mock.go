@@ -203,10 +203,14 @@ func (s *Service) SubmitMockStage(
 	code string,
 	solveLanguage string,
 	notes string,
+	stageKind string,
 ) (*MockSubmitResult, error) {
 	session, stage, err := s.getCurrentMockStage(ctx, user, sessionID)
 	if err != nil {
 		return nil, err
+	}
+	if submittedKind := strings.TrimSpace(stageKind); submittedKind != "" && submittedKind != stage.Kind.String() {
+		return nil, ErrMockStageKindMismatch
 	}
 	if stage.Status != model.InterviewPrepMockStageStatusSolving {
 		return nil, ErrMockStageSubmitNotAllowed

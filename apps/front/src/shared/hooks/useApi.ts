@@ -27,10 +27,10 @@ export function useApi<T>(fetcher: () => Promise<T>, deps: unknown[] = []): UseA
       }
     } catch (e: any) {
       if (mountedRef.current) {
-        const msg = e?.response?.status === 404 ? 'Ресурс не найден'
-          : e?.response?.status === 403 ? 'Нет доступа'
-          : e?.response?.status >= 500 ? 'Ошибка сервера'
-          : e?.message || 'Ошибка загрузки'
+        const msg = e?.response?.status === 404 ? 'Resource not found'
+          : e?.response?.status === 403 ? 'Access denied'
+          : e?.response?.status >= 500 ? 'Server error'
+          : e?.message || 'Request failed'
         setError(msg)
       }
     } finally {

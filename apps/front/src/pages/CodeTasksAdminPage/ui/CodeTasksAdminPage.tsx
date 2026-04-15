@@ -100,10 +100,10 @@ export function CodeTasksAdminPage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-xl font-bold text-[#0f172a]">Code Tasks</h1>
-          <p className="text-sm text-[#666666] mt-0.5">{tasks.length} задач</p>
+          <p className="text-sm text-[#666666] mt-0.5">{tasks.length} tasks</p>
         </div>
         <Button variant="orange" onClick={() => { setEditTask({}); setShowEdit(true) }}>
-          <Plus className="w-4 h-4" /> Добавить задачу
+          <Plus className="w-4 h-4" /> Add task
         </Button>
       </div>
 
@@ -114,24 +114,24 @@ export function CodeTasksAdminPage() {
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
-            placeholder="Поиск задач..."
+            placeholder="Search tasks..."
             className="w-full pl-9 pr-3 py-2 text-sm bg-[#F2F3F0] dark:bg-[#0f1117] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none text-[#111111] dark:text-[#e2e8f3]"
           />
         </div>
         <Select
           options={[
-            { value: '', label: 'Все категории' },
+            { value: '', label: 'All categories' },
             ...TASK_CATEGORIES.map(c => ({ value: c.value, label: c.label })),
-            { value: '__none__', label: 'Без категории' },
+            { value: '__none__', label: 'No category' },
           ]}
           value={categoryFilter} onChange={setCategoryFilter} className="w-44"
         />
         <Select
-          options={[{ value: '', label: 'Все темы' }, ...allTopics.map(t => ({ value: t, label: t }))]}
+          options={[{ value: '', label: 'All topics' }, ...allTopics.map(t => ({ value: t, label: t }))]}
           value={topicFilter} onChange={setTopicFilter} className="w-40"
         />
         <Select
-          options={[{ value: '', label: 'Все' }, { value: 'TASK_DIFFICULTY_EASY', label: 'Easy' }, { value: 'TASK_DIFFICULTY_MEDIUM', label: 'Medium' }, { value: 'TASK_DIFFICULTY_HARD', label: 'Hard' }]}
+          options={[{ value: '', label: 'All' }, { value: 'TASK_DIFFICULTY_EASY', label: 'Easy' }, { value: 'TASK_DIFFICULTY_MEDIUM', label: 'Medium' }, { value: 'TASK_DIFFICULTY_HARD', label: 'Hard' }]}
           value={difficultyFilter} onChange={setDifficultyFilter} className="w-32"
         />
       </div>
@@ -140,12 +140,12 @@ export function CodeTasksAdminPage() {
       <div className="bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1e3158] overflow-hidden">
         <div className="grid grid-cols-[40px_1fr_110px_100px_80px_70px_70px_80px] items-center px-5 py-2.5 border-b border-[#CBCCC9] dark:border-[#1e3158] text-[10px] font-semibold text-[#666666] dark:text-[#4d6380] uppercase tracking-wide">
           <span>#</span>
-          <span>Название</span>
-          <span>Категория</span>
-          <span>Темы</span>
-          <span>Сложность</span>
-          <span>Язык</span>
-          <span>Статус</span>
+          <span>Title</span>
+          <span>Category</span>
+          <span>Topics</span>
+          <span>Difficulty</span>
+          <span>Language</span>
+          <span>Status</span>
           <span />
         </div>
         <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
@@ -158,7 +158,7 @@ export function CodeTasksAdminPage() {
               <div className="h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded" />
             </div>
           )) : paginated.length === 0 ? (
-            <div className="px-5 py-12 text-center text-sm text-[#94a3b8] dark:text-[#4d6380]">Задачи не найдены</div>
+            <div className="px-5 py-12 text-center text-sm text-[#94a3b8] dark:text-[#4d6380]">No tasks found</div>
           ) : paginated.map((task, i) => {
             const cat = getCategoryFromTopics(task.topics)
             const topics = getDisplayTopics(task.topics)
@@ -210,7 +210,7 @@ export function CodeTasksAdminPage() {
 
       {/* Pagination */}
       <div className="flex items-center justify-between px-2 py-3 mt-1 text-xs text-[#666666] dark:text-[#4d6380]">
-        <span>{filtered.length} задач</span>
+        <span>{filtered.length} tasks</span>
         {totalPages > 1 && (
           <div className="flex items-center gap-2">
             <button disabled={page === 0} onClick={() => setPage(p => p - 1)} className="p-1 rounded hover:bg-[#F2F3F0] disabled:opacity-30">
@@ -238,9 +238,9 @@ export function CodeTasksAdminPage() {
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
         onConfirm={handleDelete}
-        title="Удалить задачу"
-        message="Это действие нельзя отменить. Задача будет удалена безвозвратно."
-        confirmLabel="Удалить"
+        title="Delete task"
+        message="This action cannot be undone. The task will be deleted permanently."
+        confirmLabel="Delete"
         danger
         loading={deleting}
       />

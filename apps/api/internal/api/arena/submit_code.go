@@ -3,7 +3,9 @@ package arena
 import (
 	"context"
 
+	"api/internal/app/solutionreview"
 	"api/internal/metrics"
+	"api/internal/model"
 	v1 "api/pkg/api/arena/v1"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -34,6 +36,28 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 		metrics.IncSubmissionsRejected()
 	}
 
+	// Trigger post-solve review for arena submissions
+	if i.reviewService != nil && match != nil && match.Task != nil {
+		go func() {
+			input := solutionreview.ReviewInput{
+				SubmissionID:   submission.ID,
+				UserID:         user.ID,
+				TaskID:         match.TaskID,
+				SourceType:     model.ReviewSourceDuel,
+				Code:           req.Code,
+				Language:       "", // arena doesn't track language per-submission
+				IsCorrect:      submission.IsCorrect,
+				SolveTimeMs:    submission.RuntimeMs,
+				PassedCount:    submission.PassedCount,
+				TotalCount:     submission.TotalCount,
+				TaskTitle:      match.Task.Title,
+				TaskStatement:  match.Task.Statement,
+				TaskDifficulty: match.Task.Difficulty.String(),
+			}
+			_, _ = i.reviewService.StartReview(ctx, input)
+		}()
+	}
+
 	resp := &v1.SubmitCodeResponse{
 		Output:          submission.Output,
 		Error:           submission.Error,
@@ -44,6 +68,7 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 		Match:           mapArenaMatchForViewer(match, user.ID.String(), false),
 		FailedTestIndex: submission.FailedTestIndex,
 		FailureKind:     mapSubmitFailureKind(submission.FailureKind),
+		SubmissionId:    submission.ID.String(),
 	}
 	if submission.FreezeUntil != nil && !submission.FreezeUntil.IsZero() {
 		resp.FreezeUntil = timestamppb.New(*submission.FreezeUntil)

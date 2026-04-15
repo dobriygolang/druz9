@@ -10,19 +10,19 @@ export function AdminCodeGamePage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-xl font-bold text-[#0f172a]">Code Game</h1>
-          <p className="text-sm text-[#666666] mt-0.5">Управление игровыми комнатами</p>
+          <p className="text-sm text-[#666666] mt-0.5">Game room management</p>
         </div>
         <Button variant="orange">
-          <Plus className="w-4 h-4" /> Новая комната
+          <Plus className="w-4 h-4" /> New room
         </Button>
       </div>
 
       {/* Stats row */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
         {[
-          { label: 'Активных игроков', value: 0, icon: <Users className="w-5 h-5 text-[#6366f1]" /> },
-          { label: 'Активных комнат', value: rooms.length, icon: <Gamepad2 className="w-5 h-5 text-[#6366F1]" /> },
-          { label: 'Завершённых игр', value: 0, icon: <Trophy className="w-5 h-5 text-[#f59e0b]" /> },
+          { label: 'Active players', value: 0, icon: <Users className="w-5 h-5 text-[#6366f1]" /> },
+          { label: 'Active rooms', value: rooms.length, icon: <Gamepad2 className="w-5 h-5 text-[#6366F1]" /> },
+          { label: 'Finished games', value: 0, icon: <Trophy className="w-5 h-5 text-[#f59e0b]" /> },
         ].map(s => (
           <div key={s.label} className="bg-white rounded-xl border border-[#CBCCC9] p-4 flex items-center gap-4">
             <div className="w-10 h-10 rounded-xl bg-[#F2F3F0] flex items-center justify-center">{s.icon}</div>
@@ -37,12 +37,12 @@ export function AdminCodeGamePage() {
       {/* Rooms table */}
       <div className="bg-white rounded-xl border border-[#CBCCC9] overflow-hidden">
         <div className="px-5 py-3.5 border-b border-[#CBCCC9] flex items-center justify-between">
-          <h3 className="text-sm font-semibold text-[#0f172a]">Активные комнаты</h3>
+          <h3 className="text-sm font-semibold text-[#0f172a]">Active rooms</h3>
         </div>
         {rooms.length === 0 ? (
           <div className="py-16 text-center">
             <Gamepad2 className="w-10 h-10 mx-auto mb-3 text-[#CBCCC9]" />
-            <p className="text-sm text-[#94a3b8]">Нет активных игровых комнат</p>
+            <p className="text-sm text-[#94a3b8]">No active game rooms</p>
           </div>
         ) : (
           <div className="divide-y divide-[#F2F3F0]">

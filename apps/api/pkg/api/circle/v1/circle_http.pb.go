@@ -21,6 +21,7 @@ const _ = http.SupportPackageIsVersion1
 
 const OperationCircleServiceCreateCircle = "/circle.v1.CircleService/CreateCircle"
 const OperationCircleServiceCreateCircleEvent = "/circle.v1.CircleService/CreateCircleEvent"
+const OperationCircleServiceDeleteCircle = "/circle.v1.CircleService/DeleteCircle"
 const OperationCircleServiceInviteToCircle = "/circle.v1.CircleService/InviteToCircle"
 const OperationCircleServiceJoinCircle = "/circle.v1.CircleService/JoinCircle"
 const OperationCircleServiceLeaveCircle = "/circle.v1.CircleService/LeaveCircle"
@@ -31,6 +32,7 @@ const OperationCircleServiceListCircles = "/circle.v1.CircleService/ListCircles"
 type CircleServiceHTTPServer interface {
 	CreateCircle(context.Context, *CreateCircleRequest) (*CircleResponse, error)
 	CreateCircleEvent(context.Context, *CreateCircleEventRequest) (*CreateCircleEventResponse, error)
+	DeleteCircle(context.Context, *DeleteCircleRequest) (*DeleteCircleResponse, error)
 	InviteToCircle(context.Context, *InviteToCircleRequest) (*InviteToCircleResponse, error)
 	JoinCircle(context.Context, *JoinCircleRequest) (*JoinCircleResponse, error)
 	LeaveCircle(context.Context, *LeaveCircleRequest) (*LeaveCircleResponse, error)
@@ -49,6 +51,7 @@ func RegisterCircleServiceHTTPServer(s *http.Server, srv CircleServiceHTTPServer
 	r.GET("/api/v1/circles/{circle_id}/members", _CircleService_ListCircleMembers0_HTTP_Handler(srv))
 	r.GET("/api/v1/circles/{circle_id}/events", _CircleService_ListCircleEvents0_HTTP_Handler(srv))
 	r.POST("/api/v1/circles/{circle_id}/events", _CircleService_CreateCircleEvent0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/circles/{circle_id}", _CircleService_DeleteCircle0_HTTP_Handler(srv))
 }
 
 func _CircleService_ListCircles0_HTTP_Handler(srv CircleServiceHTTPServer) func(ctx http.Context) error {
@@ -236,9 +239,32 @@ func _CircleService_CreateCircleEvent0_HTTP_Handler(srv CircleServiceHTTPServer)
 	}
 }
 
+func _CircleService_DeleteCircle0_HTTP_Handler(srv CircleServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in DeleteCircleRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationCircleServiceDeleteCircle)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.DeleteCircle(ctx, req.(*DeleteCircleRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*DeleteCircleResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type CircleServiceHTTPClient interface {
 	CreateCircle(ctx context.Context, req *CreateCircleRequest, opts ...http.CallOption) (rsp *CircleResponse, err error)
 	CreateCircleEvent(ctx context.Context, req *CreateCircleEventRequest, opts ...http.CallOption) (rsp *CreateCircleEventResponse, err error)
+	DeleteCircle(ctx context.Context, req *DeleteCircleRequest, opts ...http.CallOption) (rsp *DeleteCircleResponse, err error)
 	InviteToCircle(ctx context.Context, req *InviteToCircleRequest, opts ...http.CallOption) (rsp *InviteToCircleResponse, err error)
 	JoinCircle(ctx context.Context, req *JoinCircleRequest, opts ...http.CallOption) (rsp *JoinCircleResponse, err error)
 	LeaveCircle(ctx context.Context, req *LeaveCircleRequest, opts ...http.CallOption) (rsp *LeaveCircleResponse, err error)
@@ -275,6 +301,19 @@ func (c *CircleServiceHTTPClientImpl) CreateCircleEvent(ctx context.Context, in 
 	opts = append(opts, http.Operation(OperationCircleServiceCreateCircleEvent))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *CircleServiceHTTPClientImpl) DeleteCircle(ctx context.Context, in *DeleteCircleRequest, opts ...http.CallOption) (*DeleteCircleResponse, error) {
+	var out DeleteCircleResponse
+	pattern := "/api/v1/circles/{circle_id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationCircleServiceDeleteCircle))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

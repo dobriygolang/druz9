@@ -41,6 +41,40 @@ export interface ProfileMockSession {
   currentStageKind: string
 }
 
+export type SkillLevel = 'beginner' | 'confident' | 'strong' | 'expert'
+
+export interface ProfileCompetency {
+  key: string
+  label: string
+  score: number
+  practiceScore: number
+  verifiedScore: number
+  stageCount: number
+  questionCount: number
+  practiceSessions: number
+  practicePassedSessions: number
+  practiceDays: number
+  confidence: string
+  averageScore: number
+  level: SkillLevel
+  levelProgress: number
+  nextMilestone: string
+}
+
+export interface NextAction {
+  title: string
+  description: string
+  actionType: 'practice' | 'mock' | 'daily' | 'duel' | string
+  actionUrl: string
+  priority: number
+  skillKey: string
+}
+
+export interface UserGoal {
+  kind: 'general_growth' | 'weakest_first' | 'company_prep'
+  company: string
+}
+
 export interface ProfileProgress {
   overview: {
     practiceSessions: number
@@ -53,11 +87,13 @@ export interface ProfileProgress {
     averageQuestionScore: number
     currentStreakDays: number
   }
-  competencies: Array<{ name: string; score: number; total: number }>
-  strongest: string[]
-  weakest: string[]
+  competencies: ProfileCompetency[]
+  strongest: ProfileCompetency[]
+  weakest: ProfileCompetency[]
   recommendations: Array<string | { key?: string; title?: string; description?: string; href?: string }>
   checkpoints: Array<{ title: string; done: boolean }>
   companies: string[]
   mockSessions?: ProfileMockSession[]
+  nextActions?: NextAction[]
+  goal?: UserGoal
 }

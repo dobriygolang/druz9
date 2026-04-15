@@ -51,13 +51,12 @@ func mapCircleEvent(item *model.Event) *eventv1.Event {
 	if item.ParticipantCount > 0 && item.ParticipantCount <= math.MaxUint32 {
 		participantCount = uint32(item.ParticipantCount)
 	}
-	return &eventv1.Event{
+	event := &eventv1.Event{
 		Id:               item.ID.String(),
 		Title:            item.Title,
 		Description:      item.Description,
 		MeetingLink:      item.MeetingLink,
 		PlaceLabel:       item.PlaceLabel,
-		ScheduledAt:      timestamppb.New(item.ScheduledAt),
 		CreatedAt:        timestamppb.New(item.CreatedAt),
 		CreatorId:        item.CreatorID,
 		CreatorName:      item.CreatorName,
@@ -66,4 +65,8 @@ func mapCircleEvent(item *model.Event) *eventv1.Event {
 		IsPublic:         item.IsPublic,
 		ParticipantCount: participantCount,
 	}
+	if item.ScheduledAt != nil {
+		event.ScheduledAt = timestamppb.New(*item.ScheduledAt)
+	}
+	return event
 }

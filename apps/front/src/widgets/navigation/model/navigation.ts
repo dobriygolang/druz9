@@ -1,75 +1,99 @@
 import type { LucideIcon } from 'lucide-react'
-import { Code2, Flame, Home, Mic, TrendingUp, Users } from 'lucide-react'
+import { Code2, Flame, Home, Mic, Rocket, TrendingUp, Users } from 'lucide-react'
 
 export interface AppNavItem {
   label: string
+  labelKey?: string
   shortLabel?: string
   href: string
   matchPrefix?: string
   description: string
+  descriptionKey?: string
   icon: LucideIcon
 }
 
 export const PRIMARY_NAV_ITEMS: AppNavItem[] = [
   {
-    label: 'Главная',
+    label: 'Journey',
+    labelKey: 'nav.journey',
+    shortLabel: 'Journey',
+    href: '/journey',
+    description: 'Your progress and path to the offer.',
+    descriptionKey: 'nav.desc.journey',
+    icon: Rocket,
+  },
+  {
+    label: 'Home',
+    labelKey: 'nav.home',
     shortLabel: 'Home',
     href: '/home',
-    description: 'Пульс сообщества, быстрый обзор и свежие события.',
+    description: 'Community pulse, quick overview, and fresh events.',
+    descriptionKey: 'nav.desc.home',
     icon: Home,
   },
   {
     label: 'Community',
+    labelKey: 'nav.community',
     shortLabel: 'People',
     href: '/community',
     matchPrefix: '/community',
-    description: 'Люди, события, круги и карта вокруг тебя.',
+    description: 'People, events, circles, and the map around you.',
+    descriptionKey: 'nav.desc.community',
     icon: Users,
   },
   {
     label: 'Practice',
+    labelKey: 'nav.practice',
     shortLabel: 'Code',
     href: '/practice',
     matchPrefix: '/practice',
-    description: 'Комнаты, дуэли и тренировки в своём темпе.',
+    description: 'Rooms, duels, and practice at your own pace.',
+    descriptionKey: 'nav.desc.practice',
     icon: Code2,
   },
   {
     label: 'Daily',
+    labelKey: 'nav.daily',
     shortLabel: 'Daily',
     href: '/daily-challenge',
-    description: 'Одна задача на сегодня, чтобы держать темп.',
+    description: 'One task for today to keep the rhythm.',
+    descriptionKey: 'nav.desc.daily',
     icon: Flame,
   },
   {
     label: 'Growth',
+    labelKey: 'nav.growth',
     shortLabel: 'Growth',
     href: '/growth',
     matchPrefix: '/growth',
-    description: 'Интервью, системная подготовка и рост.',
+    description: 'Interviews, system design prep, and growth.',
+    descriptionKey: 'nav.desc.growth',
     icon: TrendingUp,
   },
 ]
 
 export const SECONDARY_NAV_ITEMS: AppNavItem[] = [
   {
-    label: 'Подкасты',
+    label: 'Podcasts',
+    labelKey: 'nav.podcasts',
     shortLabel: 'Audio',
     href: '/podcasts',
-    description: 'Слушай разборы, опыт и полезные разговоры.',
+    description: 'Listen to deep dives, experience, and useful conversations.',
+    descriptionKey: 'nav.desc.podcasts',
     icon: Mic,
   },
 ]
 
 const ROUTE_META = [
-  { match: '/home', title: 'Главная', subtitle: 'Пульс сообщества и ближайшие события' },
-  { match: '/community', title: 'Community', subtitle: 'Люди, события и локальные круги' },
-  { match: '/practice', title: 'Practice', subtitle: 'Комнаты, дуэли и самостоятельная практика' },
-  { match: '/daily-challenge', title: 'Daily Challenge', subtitle: 'Короткий ежедневный челлендж' },
-  { match: '/growth', title: 'Growth', subtitle: 'Подготовка к интервью и системный рост' },
-  { match: '/podcasts', title: 'Подкасты', subtitle: 'Эпизоды, которые можно дослушать позже' },
-  { match: '/profile', title: 'Профиль', subtitle: 'Прогресс, достижения и личные настройки' },
-  { match: '/admin', title: 'Admin', subtitle: 'Управление платформой и модерация' },
+  { match: '/journey', title: 'Journey', titleKey: 'route.journey.title', subtitle: 'Readiness score and the next step', subtitleKey: 'route.journey.subtitle' },
+  { match: '/home', title: 'Home', titleKey: 'route.home.title', subtitle: 'Community pulse and upcoming events', subtitleKey: 'route.home.subtitle' },
+  { match: '/community', title: 'Community', titleKey: 'route.community.title', subtitle: 'People, events, and local circles', subtitleKey: 'route.community.subtitle' },
+  { match: '/practice', title: 'Practice', titleKey: 'route.practice.title', subtitle: 'Rooms, duels, and solo practice', subtitleKey: 'route.practice.subtitle' },
+  { match: '/daily-challenge', title: 'Daily Challenge', titleKey: 'route.daily.title', subtitle: 'A short daily challenge', subtitleKey: 'route.daily.subtitle' },
+  { match: '/growth', title: 'Growth', titleKey: 'route.growth.title', subtitle: 'Interview prep and systematic growth', subtitleKey: 'route.growth.subtitle' },
+  { match: '/podcasts', title: 'Podcasts', titleKey: 'route.podcasts.title', subtitle: 'Episodes you can come back to later', subtitleKey: 'route.podcasts.subtitle' },
+  { match: '/profile', title: 'Profile', titleKey: 'route.profile.title', subtitle: 'Progress, achievements, and personal settings', subtitleKey: 'route.profile.subtitle' },
+  { match: '/admin', title: 'Admin', titleKey: 'route.admin.title', subtitle: 'Platform management and moderation', subtitleKey: 'route.admin.subtitle' },
 ]
 
 const FULLSCREEN_PATHS = ['/code-rooms/', '/arena/', '/growth/interview-prep/mock/']

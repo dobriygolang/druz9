@@ -134,6 +134,14 @@ function normalizeMockSession(session: any): any {
   }
 }
 
+function normalizeMockEnvelopeResult(payload: any) {
+  if (!payload) return payload
+  return {
+    ...payload,
+    session: normalizeMockSession(payload.session),
+  }
+}
+
 export interface SystemDesignPayload {
   image?: Uint8Array | string
   imageName?: string
@@ -192,24 +200,26 @@ export const interviewPrepApi = {
     const r = await apiClient.get<{ session?: unknown }>(`/api/v1/interview-prep/mock-sessions/${sessionId}`)
     return normalizeMockSession(r.data.session)
   },
-  submitMockSession: async (sessionId: string, code: string, language: string, notes?: string) => {
+  submitMockSession: async (sessionId: string, code: string, language: string, notes?: string, stageKind?: string) => {
     const r = await apiClient.post<{ result?: unknown; review?: unknown; session?: unknown }>(
       `/api/v1/interview-prep/mock-sessions/${sessionId}/submit`,
-      { code, language: toLanguageEnum(language), notes },
+      { code, language: toLanguageEnum(language), notes, stageKind: stageKind ?? 'MOCK_STAGE_KIND_UNSPECIFIED' },
     )
     const raw = r.data as any
     return {
       ...raw,
       session: normalizeMockSession(raw?.session),
-      result: raw?.result ? { ...raw.result, session: normalizeMockSession(raw.result?.session) } : undefined,
+      result: raw?.result ? normalizeMockEnvelopeResult(raw.result) : undefined,
     }
   },
   answerMockQuestion: async (sessionId: string, answer: string) => {
-    const r = await apiClient.post<{ review?: unknown; session?: unknown }>(
+    const r = await apiClient.post<{ result?: unknown; review?: unknown; session?: unknown }>(
       `/api/v1/interview-prep/mock-sessions/${sessionId}/questions/answer`,
       { answer },
     )
-    return { ...r.data, session: normalizeMockSession(r.data.session) }
+    const raw = r.data as any
+    if (raw?.result) return normalizeMockEnvelopeResult(raw.result)
+    return { ...raw, session: normalizeMockSession(raw.session) }
   },
   submitSystemDesignReview: async (sessionId: string, design: SystemDesignPayload) => {
     const r = await apiClient.post<{ review?: unknown }>(
@@ -219,10 +229,12 @@ export const interviewPrepApi = {
     return r.data.review
   },
   submitMockSystemDesignReview: async (sessionId: string, design: SystemDesignPayload) => {
-    const r = await apiClient.post<{ review?: unknown; session?: unknown }>(
+    const r = await apiClient.post<{ result?: unknown; review?: unknown; session?: unknown }>(
       `/api/v1/interview-prep/mock-sessions/${sessionId}/system-design-review`,
       { design },
     )
-    return { ...r.data, session: normalizeMockSession(r.data.session) }
+    const raw = r.data as any
+    if (raw?.result) return normalizeMockEnvelopeResult(raw.result)
+    return { ...raw, session: normalizeMockSession(raw.session) }
   },
 }

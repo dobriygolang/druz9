@@ -223,6 +223,7 @@ message SubmitCodeResponse {
   ArenaMatch                match            = 8;
   int32                     failed_test_index = 9;
   common.v1.SubmitFailureKind          failure_kind     = 10;
+  string                    submission_id    = 11;
 }
 
 message GetLeaderboardResponse {

@@ -1,9 +1,11 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
-import { ArrowLeft, Users, Hash, UserPlus, UserMinus, Globe, Lock, Calendar, Play, Share2, Check, Plus, ExternalLink, RefreshCw } from 'lucide-react'
+import { ArrowLeft, Users, Hash, UserPlus, UserMinus, Globe, Lock, Calendar, Play, Share2, Check, Plus, ExternalLink, RefreshCw, Trash2 } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { circleApi, type CircleMember } from '@/features/Circle/api/circleApi'
+import { useAuth } from '@/app/providers/AuthProvider'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
-import { eventApi, type Event, REPEAT_LABELS, type EventRepeat } from '@/features/Event/api/eventApi'
+import { eventApi, type Event, type EventRepeat } from '@/features/Event/api/eventApi'
 import type { Circle } from '@/entities/Circle/model/types'
 import { Button } from '@/shared/ui/Button'
 import { Avatar } from '@/shared/ui/Avatar'
@@ -12,13 +14,16 @@ import { Input } from '@/shared/ui/Input'
 import { useToast } from '@/shared/ui/Toast'
 import { formatDate } from '@/shared/lib/dateFormat'
 import { getCircleGradient } from '@/shared/lib/circleGradient'
+import { PageMeta } from '@/shared/ui/PageMeta'
 
 type Tab = 'overview' | 'members' | 'events'
 
 export function CirclePage() {
+  const { t } = useTranslation()
   const { circleId } = useParams<{ circleId: string }>()
   const navigate = useNavigate()
   const { toast } = useToast()
+  const { user } = useAuth()
   const [circle, setCircle] = useState<Circle | null>(null)
   const [members, setMembers] = useState<CircleMember[]>([])
   const [loading, setLoading] = useState(true)
@@ -37,6 +42,8 @@ export function CirclePage() {
   const [showInvite, setShowInvite] = useState(false)
   const [inviteUserId, setInviteUserId] = useState('')
   const [inviting, setInviting] = useState(false)
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false)
+  const [deleting, setDeleting] = useState(false)
 
   useEffect(() => {
     if (!circleId) return
@@ -73,16 +80,16 @@ export function CirclePage() {
   }, [activeTab, loadMembers, loadEvents])
 
   const handleCreateEvent = async () => {
-    if (!circleId || !eventForm.title || !eventForm.scheduledAt) return
+    if (!circleId || !eventForm.title) return
     setCreatingEvent(true)
     try {
       const created = await eventApi.createCircleEvent(circleId, eventForm)
       setEvents(prev => [created, ...prev])
       setShowCreateEvent(false)
       setEventForm({ title: '', description: '', meetingLink: '', scheduledAt: '', repeat: 'none' })
-      toast('Ивент создан', 'success')
+      toast(t('circle.eventCreated'), 'success')
     } catch {
-      toast('Не удалось создать ивент', 'error')
+      toast(t('circle.eventCreateFailed'), 'error')
     } finally { setCreatingEvent(false) }
   }
 
@@ -92,10 +99,10 @@ export function CirclePage() {
     try {
       await circleApi.joinCircle(circle.id)
       setCircle(c => c ? { ...c, isJoined: true, memberCount: c.memberCount + 1 } : c)
-      toast('Вы вступили в круг', 'success')
+      toast(t('circle.joined'), 'success')
       if (activeTab === 'members') loadMembers()
     } catch {
-      toast('Не удалось вступить', 'error')
+      toast(t('circle.joinFailed'), 'error')
     } finally { setActionLoading(false) }
   }
 
@@ -105,9 +112,9 @@ export function CirclePage() {
     try {
       await circleApi.leaveCircle(circle.id)
       setCircle(c => c ? { ...c, isJoined: false, memberCount: Math.max(c.memberCount - 1, 0) } : c)
-      toast('Вы покинули круг', 'success')
+      toast(t('circle.left'), 'success')
     } catch {
-      toast('Не удалось покинуть круг', 'error')
+      toast(t('circle.leaveFailed'), 'error')
     } finally { setActionLoading(false) }
   }
 
@@ -118,10 +125,10 @@ export function CirclePage() {
       const { room } = await codeRoomApi.createRoom({ mode: 'ROOM_MODE_ALL', name: circle.name })
       const inviteUrl = `${window.location.origin}/code-rooms/${room.id}`
       await navigator.clipboard.writeText(inviteUrl)
-      toast('Комната создана! Ссылка скопирована — отправь участникам круга', 'success')
+      toast(t('circle.practiceCreated'), 'success')
       navigate(`/code-rooms/${room.id}`)
     } catch {
-      toast('Не удалось создать комнату', 'error')
+      toast(t('circle.practiceCreateFailed'), 'error')
     } finally { setPracticeLoading(false) }
   }
 
@@ -130,20 +137,32 @@ export function CirclePage() {
     setInviting(true)
     try {
       await circleApi.inviteMember(circleId, inviteUserId.trim())
-      toast('Пользователь приглашён', 'success')
+      toast(t('circle.invited'), 'success')
       setShowInvite(false)
       setInviteUserId('')
       loadMembers()
     } catch {
-      toast('Не удалось пригласить. Проверьте ID пользователя.', 'error')
+      toast(t('circle.inviteFailed'), 'error')
     } finally { setInviting(false) }
+  }
+
+  const handleDelete = async () => {
+    if (!circleId) return
+    setDeleting(true)
+    try {
+      await circleApi.deleteCircle(circleId)
+      toast(t('circle.deleted'), 'success')
+      navigate('/community/circles', { replace: true })
+    } catch {
+      toast(t('circle.deleteFailed'), 'error')
+    } finally { setDeleting(false) }
   }
 
   const handleShare = () => {
     const url = `${window.location.origin}/community/circles/${circleId}`
     navigator.clipboard.writeText(url).then(() => {
       setCopied(true)
-      toast('Ссылка скопирована', 'success')
+      toast(t('circle.linkCopied'), 'success')
       setTimeout(() => setCopied(false), 2000)
     })
   }
@@ -168,6 +187,11 @@ export function CirclePage() {
 
   return (
     <div className="min-h-full flex flex-col">
+      <PageMeta
+        title={circle.name}
+        description={circle.description || t('circle.meta.description')}
+        canonicalPath={circleId ? `/community/circles/${circleId}` : '/community/circles'}
+      />
       {/* Top navigation bar */}
       <div className="sticky top-0 z-20 bg-white/80 dark:bg-[#0f1117]/80 backdrop-blur-md border-b border-[#E7E8E5] dark:border-[#1e3158] px-4 h-14 flex items-center justify-between flex-shrink-0">
         <button
@@ -175,23 +199,32 @@ export function CirclePage() {
           className="flex items-center gap-1.5 text-sm font-medium text-[#666666] dark:text-[#7e93b0] hover:text-[#111111] dark:hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
-          Круги
+          {t('circles.title')}
         </button>
         <div className="flex items-center gap-2">
           <button
             onClick={handleShare}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1e3158] text-[#666666] dark:text-[#7e93b0] transition-colors"
-            title="Поделиться"
+            title={t('circle.share')}
           >
             {copied ? <Check className="w-4 h-4 text-[#22c55e]" /> : <Share2 className="w-4 h-4" />}
           </button>
+          {user && circle.creatorId === user.id && (
+            <button
+              onClick={() => setShowDeleteConfirm(true)}
+              className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-[#94a3b8] hover:text-red-500 transition-colors"
+              title={t('circle.deleteTitle')}
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
           {circle.isJoined ? (
             <Button variant="secondary" size="sm" onClick={handleLeave} loading={actionLoading}>
-              <UserMinus className="w-3.5 h-3.5" /> Покинуть
+              <UserMinus className="w-3.5 h-3.5" /> {t('circle.leave')}
             </Button>
           ) : (
             <Button variant="orange" size="sm" onClick={handleJoin} loading={actionLoading}>
-              <UserPlus className="w-3.5 h-3.5" /> Вступить
+              <UserPlus className="w-3.5 h-3.5" /> {t('circle.join')}
             </Button>
           )}
         </div>
@@ -220,20 +253,20 @@ export function CirclePage() {
                 style={{ background: circle.isPublic ? `${grad.from}99` : '#64748b99' }}
               >
                 {circle.isPublic
-                  ? <><Globe className="w-2.5 h-2.5" /> Публичный</>
-                  : <><Lock className="w-2.5 h-2.5" /> Закрытый</>
+                  ? <><Globe className="w-2.5 h-2.5" /> {t('circle.public')}</>
+                  : <><Lock className="w-2.5 h-2.5" /> {t('circle.private')}</>
                 }
               </span>
               {circle.isJoined && (
                 <span className="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-semibold bg-[#22c55e]/20 text-[#16a34a] dark:text-[#4ade80]">
-                  Участник
+                  {t('circle.member')}
                 </span>
               )}
             </div>
             <h1 className="text-xl font-bold text-[#0f172a] dark:text-[#e2e8f3] leading-tight truncate">{circle.name}</h1>
             <p className="text-sm text-[#475569] dark:text-[#7e93b0] mt-0.5 flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 flex-shrink-0" />
-              {circle.memberCount} участников
+              {t('circle.membersCount', { count: circle.memberCount })}
             </p>
           </div>
         </div>
@@ -254,10 +287,10 @@ export function CirclePage() {
             className="shadow-sm"
           >
             <Play className="w-3.5 h-3.5" />
-            Начать совместную практику
+            {t('circle.startPractice')}
           </Button>
           <p className="text-[11px] text-[#64748b] dark:text-[#4d6380] mt-1.5">
-            Создаст комнату и скопирует ссылку — отправь участникам
+            {t('circle.startPracticeHint')}
           </p>
         </div>
       </div>
@@ -265,9 +298,9 @@ export function CirclePage() {
       {/* Tabs */}
       <div className="px-4 pt-4 flex gap-1 bg-transparent flex-wrap">
         {([
-          { id: 'overview', label: 'Обзор' },
-          { id: 'members', label: `Участники · ${circle.memberCount}` },
-          { id: 'events', label: `Ивенты${events.length > 0 ? ` · ${events.length}` : ''}` },
+          { id: 'overview', label: t('circle.tabs.overview') },
+          { id: 'members', label: `${t('circle.tabs.members')} · ${circle.memberCount}` },
+          { id: 'events', label: `${t('circle.tabs.events')}${events.length > 0 ? ` · ${events.length}` : ''}` },
         ] as { id: Tab; label: string }[]).map(tab => (
           <button
             key={tab.id}
@@ -290,7 +323,7 @@ export function CirclePage() {
             {/* Tags */}
             {circle.tags.length > 0 && (
               <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-4">
-                <p className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-3">Темы</p>
+                <p className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-3">{t('circle.topics')}</p>
                 <div className="flex flex-wrap gap-2">
                   {circle.tags.map(tag => (
                     <span
@@ -309,14 +342,14 @@ export function CirclePage() {
             {circle.createdAt && (
               <div className="flex items-center gap-2 px-1 py-1 text-xs text-[#94a3b8]">
                 <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
-                Создан {formatDate(circle.createdAt)}
+                {t('circle.createdAt', { date: formatDate(circle.createdAt) })}
               </div>
             )}
 
             {/* No tags empty state */}
             {circle.tags.length === 0 && !circle.description && (
               <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-8 text-center">
-                <p className="text-sm text-[#94a3b8]">Описание и темы не заданы</p>
+                <p className="text-sm text-[#94a3b8]">{t('circle.emptyOverview')}</p>
               </div>
             )}
           </>
@@ -328,7 +361,7 @@ export function CirclePage() {
           {circle.isJoined && !circle.isPublic && (
             <div className="flex justify-end">
               <Button variant="orange" size="sm" onClick={() => setShowInvite(true)}>
-                <UserPlus className="w-3.5 h-3.5" /> Пригласить
+                <UserPlus className="w-3.5 h-3.5" /> {t('circle.invite')}
               </Button>
             </div>
           )}
@@ -348,12 +381,12 @@ export function CirclePage() {
             ) : members.length === 0 ? (
               <div className="px-5 py-10 text-center">
                 <Users className="w-8 h-8 text-[#CBCCC9] mx-auto mb-3" />
-                <p className="text-sm text-[#94a3b8]">Участников пока нет</p>
+                <p className="text-sm text-[#94a3b8]">{t('circle.noMembers')}</p>
               </div>
             ) : (
               <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
                 {members.map(m => {
-                  const name = [m.firstName, m.lastName].filter(Boolean).join(' ') || 'Участник'
+                  const name = [m.firstName, m.lastName].filter(Boolean).join(' ') || t('circle.memberFallback')
                   return (
                     <button
                       key={m.userId}
@@ -364,7 +397,7 @@ export function CirclePage() {
                       <div className="flex-1 min-w-0">
                         <p className="text-sm font-medium text-[#111111] dark:text-[#e2e8f3] truncate">{name}</p>
                         {m.role === 'creator' && (
-                          <p className="text-[11px] text-[#6366F1]">Создатель</p>
+                          <p className="text-[11px] text-[#6366F1]">{t('circle.creator')}</p>
                         )}
                       </div>
                       <span className="text-xs text-[#94a3b8] flex-shrink-0">{formatDate(m.joinedAt)}</span>
@@ -382,7 +415,7 @@ export function CirclePage() {
             {circle.isJoined && (
               <div className="flex justify-end">
                 <Button variant="orange" size="sm" onClick={() => setShowCreateEvent(true)}>
-                  <Plus className="w-3.5 h-3.5" /> Создать ивент
+                  <Plus className="w-3.5 h-3.5" /> {t('circle.createEvent')}
                 </Button>
               </div>
             )}
@@ -394,15 +427,15 @@ export function CirclePage() {
               ) : events.length === 0 ? (
                 <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-10 text-center">
                   <Calendar className="w-8 h-8 text-[#CBCCC9] mx-auto mb-3" />
-                  <p className="text-sm text-[#94a3b8]">Ивентов пока нет</p>
+                  <p className="text-sm text-[#94a3b8]">{t('circle.noEvents')}</p>
                   {circle.isJoined && (
                     <button onClick={() => setShowCreateEvent(true)} className="mt-3 text-xs text-[#6366F1] hover:underline">
-                      Создать первый ивент
+                      {t('circle.createFirstEvent')}
                     </button>
                   )}
                 </div>
               ) : events.map(ev => {
-                const repeatLabel = ev.repeat && ev.repeat !== 'none' ? REPEAT_LABELS[ev.repeat as EventRepeat] : null
+                const repeatLabel = ev.repeat && ev.repeat !== 'none' ? t(`events.repeat.${ev.repeat as EventRepeat}`) : null
                 return (
                   <div key={ev.id} className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] p-4">
                     <div className="flex items-start justify-between gap-3">
@@ -421,7 +454,9 @@ export function CirclePage() {
                         <div className="flex items-center gap-3 mt-2">
                           <span className="flex items-center gap-1 text-xs text-[#94a3b8]">
                             <Calendar className="w-3 h-3" />
-                            {new Date(ev.scheduledAt).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            {ev.scheduledAt
+                              ? new Date(ev.scheduledAt).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })
+                              : t('events.scheduleUnknown')}
                           </span>
                           <span className="flex items-center gap-1 text-xs text-[#94a3b8]">
                             <Users className="w-3 h-3" />{ev.participantCount}
@@ -434,18 +469,18 @@ export function CirclePage() {
                             className="flex items-center gap-1 text-xs text-[#6366F1] hover:underline"
                             onClick={e => e.stopPropagation()}
                           >
-                            <ExternalLink className="w-3 h-3" /> Ссылка
+                            <ExternalLink className="w-3 h-3" /> {t('circle.link')}
                           </a>
                         )}
                         {ev.isJoined ? (
                           <button onClick={() => eventApi.leaveEvent(ev.id).then(loadEvents)}
                             className="text-xs text-[#94a3b8] hover:text-red-500 transition-colors">
-                            Отменить
+                            {t('events.leave')}
                           </button>
                         ) : (
                           <button onClick={() => eventApi.joinEvent(ev.id).then(loadEvents)}
                             className="text-xs font-medium text-[#6366F1] hover:underline">
-                            Участвовать
+                            {t('events.join')}
                           </button>
                         )}
                       </div>
@@ -462,19 +497,19 @@ export function CirclePage() {
       <Modal
         open={showInvite}
         onClose={() => { setShowInvite(false); setInviteUserId('') }}
-        title="Пригласить участника"
+        title={t('circle.inviteMemberTitle')}
         footer={
           <>
-            <Button variant="secondary" size="sm" onClick={() => { setShowInvite(false); setInviteUserId('') }}>Отмена</Button>
-            <Button variant="orange" size="sm" onClick={handleInvite} loading={inviting} disabled={!inviteUserId.trim()}>Пригласить</Button>
+            <Button variant="secondary" size="sm" onClick={() => { setShowInvite(false); setInviteUserId('') }}>{t('common.cancel')}</Button>
+            <Button variant="orange" size="sm" onClick={handleInvite} loading={inviting} disabled={!inviteUserId.trim()}>{t('circle.invite')}</Button>
           </>
         }
       >
         <Input
-          label="ID пользователя"
+          label={t('circle.userId')}
           value={inviteUserId}
           onChange={e => setInviteUserId(e.target.value)}
-          placeholder="UUID пользователя"
+          placeholder={t('circle.userIdPlaceholder')}
         />
       </Modal>
 
@@ -482,35 +517,51 @@ export function CirclePage() {
       <Modal
         open={showCreateEvent}
         onClose={() => setShowCreateEvent(false)}
-        title="Новый ивент"
+        title={t('circle.newEvent')}
         footer={
           <>
-            <Button variant="secondary" size="sm" onClick={() => setShowCreateEvent(false)}>Отмена</Button>
+            <Button variant="secondary" size="sm" onClick={() => setShowCreateEvent(false)}>{t('common.cancel')}</Button>
             <Button variant="orange" size="sm" onClick={handleCreateEvent} loading={creatingEvent}
-              disabled={!eventForm.title || !eventForm.scheduledAt}>
-              Создать
+              disabled={!eventForm.title}>
+              {t('common.create')}
             </Button>
           </>
         }
       >
         <div className="flex flex-col gap-3">
-          <Input label="Название *" value={eventForm.title} onChange={e => setEventForm(f => ({ ...f, title: e.target.value }))} placeholder="Читаем Kafka вместе" />
-          <Input label="Дата и время *" type="datetime-local" value={eventForm.scheduledAt} onChange={e => setEventForm(f => ({ ...f, scheduledAt: e.target.value }))} />
+          <Input label={t('events.form.title')} value={eventForm.title} onChange={e => setEventForm(f => ({ ...f, title: e.target.value }))} placeholder={t('circle.eventTitlePlaceholder')} />
+          <Input label={t('events.form.dateTime')} type="datetime-local" value={eventForm.scheduledAt} onChange={e => setEventForm(f => ({ ...f, scheduledAt: e.target.value }))} />
           <div>
-            <label className="text-xs font-medium text-[#475569] mb-1 block">Повторение</label>
+            <label className="text-xs font-medium text-[#475569] mb-1 block">{t('circle.repeat')}</label>
             <select
               value={eventForm.repeat}
               onChange={e => setEventForm(f => ({ ...f, repeat: e.target.value as EventRepeat }))}
               className="select-field w-full"
             >
-              {(Object.entries(REPEAT_LABELS) as [EventRepeat, string][]).map(([val, label]) => (
-                <option key={val} value={val}>{label}</option>
+              {(['none', 'daily', 'weekly', 'monthly', 'yearly'] as EventRepeat[]).map(val => (
+                <option key={val} value={val}>{t(`events.repeat.${val}`)}</option>
               ))}
             </select>
           </div>
-          <Input label="Ссылка на встречу" value={eventForm.meetingLink} onChange={e => setEventForm(f => ({ ...f, meetingLink: e.target.value }))} placeholder="https://meet.google.com/..." />
-          <Input label="Описание" value={eventForm.description} onChange={e => setEventForm(f => ({ ...f, description: e.target.value }))} placeholder="Что будем обсуждать?" />
+          <Input label={t('events.form.link')} value={eventForm.meetingLink} onChange={e => setEventForm(f => ({ ...f, meetingLink: e.target.value }))} placeholder="https://meet.google.com/..." />
+          <Input label={t('events.form.description')} value={eventForm.description} onChange={e => setEventForm(f => ({ ...f, description: e.target.value }))} placeholder={t('circle.eventDescriptionPlaceholder')} />
         </div>
+      </Modal>
+
+      <Modal
+        open={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        title={t('circle.deleteTitle')}
+        footer={
+          <>
+            <Button variant="secondary" size="sm" onClick={() => setShowDeleteConfirm(false)} disabled={deleting}>{t('common.cancel')}</Button>
+            <Button variant="orange" size="sm" onClick={handleDelete} loading={deleting}>{t('events.delete')}</Button>
+          </>
+        }
+      >
+        <p className="text-sm text-[#475569] dark:text-[#94a3b8]">
+          {t('circle.deleteBody')}
+        </p>
       </Modal>
     </div>
   )

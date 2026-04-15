@@ -44,6 +44,9 @@ func mapProfileProgress(p *model.ProfileProgress) *v1.ProfileProgress {
 			PracticeDays:           c.PracticeDays,
 			Confidence:             c.Confidence,
 			AverageScore:           c.AverageScore,
+			Level:                  c.Level,
+			LevelProgress:          c.LevelProgress,
+			NextMilestone:          c.NextMilestone,
 		}
 	}
 
@@ -92,6 +95,29 @@ func mapProfileProgress(p *model.ProfileProgress) *v1.ProfileProgress {
 		checkpoints = append(checkpoints, item)
 	}
 
+	nextActions := make([]*v1.NextAction, 0, len(p.NextActions))
+	for _, na := range p.NextActions {
+		if na == nil {
+			continue
+		}
+		nextActions = append(nextActions, &v1.NextAction{
+			Title:       na.Title,
+			Description: na.Description,
+			ActionType:  na.ActionType,
+			ActionUrl:   na.ActionURL,
+			Priority:    na.Priority,
+			SkillKey:    na.SkillKey,
+		})
+	}
+
+	var goal *v1.UserGoal
+	if p.Goal != nil {
+		goal = &v1.UserGoal{
+			Kind:    p.Goal.Kind,
+			Company: p.Goal.Company,
+		}
+	}
+
 	return &v1.ProfileProgress{
 		Overview:        overview,
 		Competencies:    competencies,
@@ -100,5 +126,7 @@ func mapProfileProgress(p *model.ProfileProgress) *v1.ProfileProgress {
 		Recommendations: recommendations,
 		Checkpoints:     checkpoints,
 		Companies:       p.Companies,
+		NextActions:     nextActions,
+		Goal:            goal,
 	}
 }

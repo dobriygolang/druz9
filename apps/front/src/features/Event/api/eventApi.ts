@@ -63,11 +63,11 @@ function normalizeEvent(e: BackendEvent): Event {
 export type EventRepeat = 'none' | 'daily' | 'weekly' | 'monthly' | 'yearly'
 
 export const REPEAT_LABELS: Record<EventRepeat, string> = {
-  none: 'Не повторять',
-  daily: 'Каждый день (14 дней)',
-  weekly: 'Каждую неделю (8 нед.)',
-  monthly: 'Каждый месяц (6 мес.)',
-  yearly: 'Каждый год (2 года)',
+  none: 'Do not repeat',
+  daily: 'Daily (14 days)',
+  weekly: 'Weekly (8 weeks)',
+  monthly: 'Monthly (6 months)',
+  yearly: 'Yearly (2 years)',
 }
 
 export interface CreateEventPayload {

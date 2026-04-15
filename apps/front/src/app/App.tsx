@@ -1,4 +1,5 @@
 import { BrowserRouter } from 'react-router-dom'
+import { HelmetProvider } from 'react-helmet-async'
 import { AuthProvider } from './providers/AuthProvider'
 import { RuntimeConfigProvider } from './providers/RuntimeConfigProvider'
 import { RouterProvider } from './providers/RouterProvider'
@@ -8,18 +9,20 @@ import { AudioPlayerProvider } from '@/features/Podcast/providers/AudioPlayerPro
 
 export function App() {
   return (
-    <BrowserRouter>
-      <ThemeProvider>
-        <RuntimeConfigProvider>
-          <AuthProvider>
-            <ToastProvider>
-              <AudioPlayerProvider>
-                <RouterProvider />
-              </AudioPlayerProvider>
-            </ToastProvider>
-          </AuthProvider>
-        </RuntimeConfigProvider>
-      </ThemeProvider>
-    </BrowserRouter>
+    <HelmetProvider>
+      <BrowserRouter>
+        <ThemeProvider>
+          <RuntimeConfigProvider>
+            <AuthProvider>
+              <ToastProvider>
+                <AudioPlayerProvider>
+                  <RouterProvider />
+                </AudioPlayerProvider>
+              </ToastProvider>
+            </AuthProvider>
+          </RuntimeConfigProvider>
+        </ThemeProvider>
+      </BrowserRouter>
+    </HelmetProvider>
   )
 }

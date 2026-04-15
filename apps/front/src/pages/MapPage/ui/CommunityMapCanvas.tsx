@@ -29,7 +29,7 @@ function createMarkerElement(point: CommunityPoint, isSelected: boolean, onSelec
   tooltip.style.cssText = 'position:absolute;bottom:100%;margin-bottom:4px;padding:6px 12px;border:1px solid #CBCCC9;border-radius:12px;background:#ffffff;box-shadow:0 12px 24px rgba(15,23,42,0.12);white-space:nowrap;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity 150ms ease, transform 150ms ease;z-index:20;'
 
   const title = document.createElement('p')
-  title.textContent = `${point.firstName} ${point.lastName}`.trim() || point.username || 'Участник'
+  title.textContent = `${point.firstName} ${point.lastName}`.trim() || point.username || 'Member'
   title.style.cssText = 'margin:0;font-size:12px;font-weight:600;color:#111111;'
   tooltip.appendChild(title)
 
@@ -150,7 +150,7 @@ export function CommunityMapCanvas({
       })
       .catch(() => {
         if (!cancelled) {
-          setLoadError('Не удалось загрузить карту')
+          setLoadError('Failed to load the map')
         }
       })
 
@@ -227,7 +227,7 @@ export function CommunityMapCanvas({
           <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#f8fafc]/88 backdrop-blur">
             <div className="rounded-2xl border border-[#d8d9d6] bg-white px-5 py-4 text-center shadow-lg">
               <p className="text-sm font-semibold text-[#111111]">{loadError}</p>
-              <p className="mt-1 text-xs text-[#667085]">Проверьте сеть и попробуйте снова.</p>
+              <p className="mt-1 text-xs text-[#667085]">Check your network and try again.</p>
             </div>
           </div>
         )}

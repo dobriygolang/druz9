@@ -103,13 +103,13 @@ export const codeRoomApi = {
   leaveRoom: async (roomId: string): Promise<void> => {
     await apiClient.post(`/api/v1/code-editor/rooms/${roomId}/leave`, {})
   },
-  submitCode: async (roomId: string, code: string, guestName?: string, language?: string): Promise<{ output: string; error: string; isCorrect: boolean }> => {
-    const r = await apiClient.post<{ output?: string; error?: string; isCorrect?: boolean }>(
+  submitCode: async (roomId: string, code: string, guestName?: string, language?: string): Promise<{ output: string; error: string; isCorrect: boolean; submissionId?: string }> => {
+    const r = await apiClient.post<{ output?: string; error?: string; isCorrect?: boolean; submissionId?: string }>(
       `/api/v1/code-editor/rooms/${roomId}/submit`,
       { code, language: toLanguageEnum(language) },
       { headers: withGuestCodeRoomHeaders(guestName) },
     )
-    return { output: r.data.output ?? '', error: r.data.error ?? '', isCorrect: r.data.isCorrect ?? false }
+    return { output: r.data.output ?? '', error: r.data.error ?? '', isCorrect: r.data.isCorrect ?? false, submissionId: r.data.submissionId }
   },
   updateRoomTask: async (roomId: string, task: string, taskStatement: string): Promise<void> => {
     await apiClient.patch(`/api/v1/code-editor/rooms/${roomId}`, { task, taskStatement })

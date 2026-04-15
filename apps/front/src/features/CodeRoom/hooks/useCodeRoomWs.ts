@@ -103,6 +103,8 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   const socketRef = useRef<RealtimeSocket | null>(null)
   const clientId = useRef(`client-${Math.random().toString(36).slice(2, 10)}`)
   const awarenessId = useRef(Math.floor(Math.random() * 0xffffffff))
+  const awarenessTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pendingAwarenessPayloadRef = useRef<string | null>(null)
 
   const [connected, setConnected] = useState(false)
   const [gotSnapshot, setGotSnapshot] = useState(false)
@@ -317,6 +319,11 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       socket.close()
       socketRef.current = null
       setConnected(false)
+      if (awarenessTimerRef.current) {
+        clearTimeout(awarenessTimerRef.current)
+        awarenessTimerRef.current = null
+      }
+      pendingAwarenessPayloadRef.current = null
       // Cancel any pending awareness batch
       if (rafId.current !== null) {
         cancelAnimationFrame(rafId.current)
@@ -381,12 +388,39 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       cursorData.selEndLine = selection.endLine
       cursorData.selEndCol = selection.endCol
     }
-    socketRef.current?.send({
+    const payload = JSON.stringify(cursorData)
+    const sendPayload = () => socketRef.current?.send({
       type: 'awareness',
       awarenessId: awarenessId.current,
       userId: userId ?? guestName ?? 'anonymous',
-      data: JSON.stringify(cursorData),
+      data: payload,
     })
+
+    const shouldSendImmediately = meta?.tabHidden !== undefined || meta?.pastedCode !== undefined || meta?.active === false
+    if (shouldSendImmediately) {
+      if (awarenessTimerRef.current) {
+        clearTimeout(awarenessTimerRef.current)
+        awarenessTimerRef.current = null
+      }
+      pendingAwarenessPayloadRef.current = null
+      sendPayload()
+      return
+    }
+
+    pendingAwarenessPayloadRef.current = payload
+    if (awarenessTimerRef.current) return
+    awarenessTimerRef.current = setTimeout(() => {
+      awarenessTimerRef.current = null
+      const queuedPayload = pendingAwarenessPayloadRef.current
+      pendingAwarenessPayloadRef.current = null
+      if (!queuedPayload) return
+      socketRef.current?.send({
+        type: 'awareness',
+        awarenessId: awarenessId.current,
+        userId: userId ?? guestName ?? 'anonymous',
+        data: queuedPayload,
+      })
+    }, 50)
   }, [userId, guestName, displayName])
 
   return {

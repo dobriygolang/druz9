@@ -28,6 +28,7 @@ type Repository interface {
 	ListCircleMembers(ctx context.Context, circleID uuid.UUID, limit int32) ([]*model.CircleMemberProfile, error)
 	InviteToCircle(ctx context.Context, circleID, inviterID, inviteeID uuid.UUID) error
 	GetCircle(ctx context.Context, circleID uuid.UUID) (*model.Circle, error)
+	DeleteCircle(ctx context.Context, circleID uuid.UUID) error
 }
 
 // NewService creates new circle domain service.

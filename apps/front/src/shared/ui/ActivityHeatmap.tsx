@@ -1,5 +1,7 @@
 import React, { useMemo } from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../lib/cn'
+import { i18n } from '@/shared/i18n'
 
 interface ActivityHeatmapProps {
   activity: { date: string; count: number }[]
@@ -33,28 +35,20 @@ function getColor(count: number): string {
 function formatTooltip(dateStr: string, count: number): string {
   try {
     const d = new Date(dateStr)
-    const day = d.toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' })
-    if (count === 0) return `Нет задач · ${day}`
-    const suffix =
-      count % 10 === 1 && count % 100 !== 11
-        ? 'задача'
-        : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20)
-        ? 'задачи'
-        : 'задач'
+    const locale = i18n.resolvedLanguage?.startsWith('en') ? 'en-US' : 'ru-RU'
+    const day = d.toLocaleDateString(locale, { day: 'numeric', month: 'short', year: 'numeric' })
+    const suffix = i18n.resolvedLanguage?.startsWith('en')
+      ? (count === 1 ? 'task' : 'tasks')
+      : (count % 10 === 1 && count % 100 !== 11 ? 'задача' : count % 10 >= 2 && count % 10 <= 4 && (count % 100 < 10 || count % 100 >= 20) ? 'задачи' : 'задач')
+    if (count === 0) return i18n.resolvedLanguage?.startsWith('en') ? `No tasks · ${day}` : `Нет задач · ${day}`
     return `${count} ${suffix} · ${day}`
   } catch {
     return `${count}`
   }
 }
 
-const MONTH_NAMES = ['Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июн', 'Июл', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек']
-const DAY_LABELS: { label: string; row: number }[] = [
-  { label: 'Пн', row: 0 },
-  { label: 'Ср', row: 2 },
-  { label: 'Пт', row: 4 },
-]
-
 export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activity, className }) => {
+  const { t } = useTranslation()
   const { cells, monthLabels, totalLabel } = useMemo(() => {
     const lookup = new Map<string, number>()
     for (const a of activity) lookup.set(a.date, a.count)
@@ -84,21 +78,24 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activity, clas
       if (cell.row !== 0) continue // only check first day of each week column
       const month = new Date(cell.date).getMonth()
       if (month !== lastMonth) {
-        monthLabels.push({ col: cell.col, label: MONTH_NAMES[month] })
+        monthLabels.push({ col: cell.col, label: new Date(cell.date).toLocaleDateString(i18n.resolvedLanguage?.startsWith('en') ? 'en-US' : 'ru-RU', { month: 'short' }) })
         lastMonth = month
       }
     }
 
     const total = cells.reduce((sum, c) => sum + c.count, 0)
-    const suffix =
-      total % 10 === 1 && total % 100 !== 11
-        ? 'задача'
-        : total % 10 >= 2 && total % 10 <= 4 && (total % 100 < 10 || total % 100 >= 20)
-        ? 'задачи'
-        : 'задач'
+    const suffix = i18n.resolvedLanguage?.startsWith('en')
+      ? (total === 1 ? 'task' : 'tasks')
+      : (total % 10 === 1 && total % 100 !== 11 ? 'задача' : total % 10 >= 2 && total % 10 <= 4 && (total % 100 < 10 || total % 100 >= 20) ? 'задачи' : 'задач')
 
-    return { cells, monthLabels, totalLabel: `${total} ${suffix} за последний год` }
-  }, [activity])
+    return { cells, monthLabels, totalLabel: i18n.resolvedLanguage?.startsWith('en') ? `${total} ${suffix} in the last year` : `${total} ${suffix} за последний год` }
+  }, [activity, t])
+
+  const dayLabels = [
+    { label: t('heatmap.mon'), row: 0 },
+    { label: t('heatmap.wed'), row: 2 },
+    { label: t('heatmap.fri'), row: 4 },
+  ]
 
   const svgWidth = DAY_LABEL_WIDTH + WEEKS * CELL_STEP - CELL_GAP
   const svgHeight = MONTH_LABEL_HEIGHT + DAYS * CELL_STEP - CELL_GAP
@@ -124,7 +121,7 @@ export const ActivityHeatmap: React.FC<ActivityHeatmapProps> = ({ activity, clas
         ))}
 
         {/* Day labels */}
-        {DAY_LABELS.map(({ label, row }) => (
+        {dayLabels.map(({ label, row }) => (
           <text
             key={`day-${row}`}
             x={0}

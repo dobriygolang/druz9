@@ -1,4 +1,5 @@
 import React from 'react'
+import { useTranslation } from 'react-i18next'
 import { cn } from '../lib/cn'
 
 export interface Achievement {
@@ -17,6 +18,7 @@ interface AchievementBadgesProps {
 }
 
 export const AchievementBadges: React.FC<AchievementBadgesProps> = ({ achievements, compact = false }) => {
+  const { t } = useTranslation()
   const unlocked = achievements.filter(a => a.unlocked).length
   const total = achievements.length
   const cols = compact ? 'grid-cols-2 sm:grid-cols-3' : 'grid-cols-2 sm:grid-cols-4'
@@ -25,7 +27,7 @@ export const AchievementBadges: React.FC<AchievementBadgesProps> = ({ achievemen
     <div>
       {/* Section title */}
       <div className="flex items-center gap-2 mb-3">
-        <h3 className="text-sm font-semibold text-[#111111]">Достижения</h3>
+        <h3 className="text-sm font-semibold text-[#111111]">{t('common.achievements')}</h3>
         <span className="inline-flex items-center px-2 py-0.5 text-xs font-medium rounded-full bg-[#fff7ed] text-[#6366F1]">
           {unlocked}/{total}
         </span>

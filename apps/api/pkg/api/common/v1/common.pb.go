@@ -363,6 +363,7 @@ type InterviewSolutionReview struct {
 	Strengths         []string               `protobuf:"bytes,5,rep,name=strengths,proto3" json:"strengths,omitempty"`
 	Issues            []string               `protobuf:"bytes,6,rep,name=issues,proto3" json:"issues,omitempty"`
 	FollowUpQuestions []string               `protobuf:"bytes,7,rep,name=follow_up_questions,json=followUpQuestions,proto3" json:"follow_up_questions,omitempty"`
+	Gaps              []string               `protobuf:"bytes,8,rep,name=gaps,proto3" json:"gaps,omitempty"`
 	unknownFields     protoimpl.UnknownFields
 	sizeCache         protoimpl.SizeCache
 }
@@ -446,11 +447,18 @@ func (x *InterviewSolutionReview) GetFollowUpQuestions() []string {
 	return nil
 }
 
+func (x *InterviewSolutionReview) GetGaps() []string {
+	if x != nil {
+		return x.Gaps
+	}
+	return nil
+}
+
 var File_common_v1_common_proto protoreflect.FileDescriptor
 
 const file_common_v1_common_proto_rawDesc = "" +
 	"\n" +
-	"\x16common/v1/common.proto\x12\tcommon.v1\"\xe1\x01\n" +
+	"\x16common/v1/common.proto\x12\tcommon.v1\"\xf5\x01\n" +
 	"\x17InterviewSolutionReview\x12\x1a\n" +
 	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x14\n" +
 	"\x05model\x18\x02 \x01(\tR\x05model\x12\x14\n" +
@@ -458,7 +466,8 @@ const file_common_v1_common_proto_rawDesc = "" +
 	"\asummary\x18\x04 \x01(\tR\asummary\x12\x1c\n" +
 	"\tstrengths\x18\x05 \x03(\tR\tstrengths\x12\x16\n" +
 	"\x06issues\x18\x06 \x03(\tR\x06issues\x12.\n" +
-	"\x13follow_up_questions\x18\a \x03(\tR\x11followUpQuestions*\xa7\x01\n" +
+	"\x13follow_up_questions\x18\a \x03(\tR\x11followUpQuestions\x12\x12\n" +
+	"\x04gaps\x18\b \x03(\tR\x04gaps*\xa7\x01\n" +
 	"\x12UserActivityStatus\x12$\n" +
 	" USER_ACTIVITY_STATUS_UNSPECIFIED\x10\x00\x12\x1f\n" +
 	"\x1bUSER_ACTIVITY_STATUS_ONLINE\x10\x01\x12(\n" +

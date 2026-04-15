@@ -43,6 +43,13 @@ service CodeEditorService {
     };
   }
 
+  rpc CloseRoom(CloseRoomRequest) returns (StatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/code-editor/rooms/{room_id}/close"
+      body: "*"
+    };
+  }
+
   rpc SubmitCode(SubmitCodeRequest) returns (SubmitCodeResponse) {
     option (google.api.http) = {
       post: "/api/v1/code-editor/rooms/{room_id}/submit"
@@ -118,6 +125,12 @@ service CodeEditorService {
       body: "*"
     };
   }
+
+  rpc GetSolutionReview(GetSolutionReviewRequest) returns (SolutionReviewResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/code-editor/reviews/{submission_id}"
+    };
+  }
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────
@@ -168,6 +181,10 @@ message JoinRoomByInviteCodeRequest {
 }
 
 message LeaveRoomRequest {
+  string room_id = 1;
+}
+
+message CloseRoomRequest {
   string room_id = 1;
 }
 
@@ -264,9 +281,10 @@ message JoinRoomResponse {
 }
 
 message SubmitCodeResponse {
-  string output     = 1;
-  string error      = 2;
-  bool   is_correct = 3;
+  string output        = 1;
+  string error         = 2;
+  bool   is_correct    = 3;
+  string submission_id = 4;
 }
 
 message GetSubmissionsResponse {
@@ -395,4 +413,45 @@ message TaskPayload {
   bool                  writable_temp_dir = 19;
   common.v1.RunnerMode           runner_mode       = 20;  // was: string
   int32                 duration_seconds  = 21;
+}
+
+// ── Solution Review ──────────────────────────────────────────────────────
+
+message GetSolutionReviewRequest {
+  string submission_id = 1;
+}
+
+message SolutionReviewResponse {
+  SolutionReview review = 1;
+}
+
+message SolutionReview {
+  string id              = 1;
+  string submission_id   = 2;
+  string source_type     = 3;   // daily, practice, duel, mock
+  string task_id         = 4;
+
+  // Level 1: instant feedback
+  bool   is_correct      = 5;
+  int32  attempt_number  = 6;
+  int64  solve_time_ms   = 7;
+  int64  median_time_ms  = 8;
+  int32  passed_count    = 9;
+  int32  total_count     = 10;
+
+  // Level 2: AI review
+  string status            = 11;  // pending, ready, failed
+  string ai_verdict        = 12;  // optimal, good, suboptimal, brute_force
+  string ai_time_complexity  = 13;
+  string ai_space_complexity = 14;
+  string ai_pattern        = 15;
+  repeated string ai_strengths  = 16;
+  repeated string ai_weaknesses = 17;
+  string ai_hint           = 18;
+  map<string, string> ai_skill_signals = 19;
+
+  // Level 3: duel comparison
+  string comparison_summary = 20;
+
+  google.protobuf.Timestamp created_at = 21;
 }

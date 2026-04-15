@@ -18,9 +18,9 @@ export function AdminLayout() {
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="w-7 h-7 bg-[#6366F1] rounded-lg flex items-center justify-center">
-              <span className="text-xs font-bold text-white">Д</span>
+              <span className="text-xs font-bold text-white">D</span>
             </div>
-            <span className="text-sm font-semibold text-[#0f172a]">Друзья Admin</span>
+            <span className="text-sm font-semibold text-[#0f172a]">Druzya Admin</span>
           </div>
           <nav className="flex items-center gap-1">
             {ADMIN_NAV.map((tab) => (

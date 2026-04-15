@@ -9,11 +9,13 @@ import { useTheme } from '@/app/providers/ThemeProvider'
 import type { Room } from '@/entities/CodeRoom/model/types'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
+import { Modal } from '@/shared/ui/Modal'
 import { Avatar } from '@/shared/ui/Avatar'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { getMonacoLanguage, getLanguageLabel } from '@/shared/lib/codeEditorLanguage'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { apiClient } from '@/shared/api/base'
+import { ReviewCard, useSolutionReview } from '@/features/SolutionReview'
 import type * as Monaco from 'monaco-editor'
 import * as Y from 'yjs'
 import * as syncProtocol from 'y-protocols/sync'
@@ -156,15 +158,15 @@ function getAvailableRoomLanguages(mode: Room['mode'] | undefined, currentLangua
 }
 
 const AI_HINTS = [
-  'Подумайте о граничных случаях',
-  'Рассмотрите временную сложность вашего решения',
-  'Попробуйте разбить задачу на подзадачи',
+  'Think about edge cases',
+  'Consider the time complexity of your solution',
+  'Try breaking the task into smaller parts',
 ]
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'success' | 'warning' | 'default' }> = {
-  ROOM_STATUS_WAITING: { label: 'Ожидание', variant: 'warning' },
-  ROOM_STATUS_ACTIVE: { label: 'Активна', variant: 'success' },
-  ROOM_STATUS_FINISHED: { label: 'Завершена', variant: 'default' },
+  ROOM_STATUS_WAITING: { label: 'Waiting', variant: 'warning' },
+  ROOM_STATUS_ACTIVE: { label: 'Active', variant: 'success' },
+  ROOM_STATUS_FINISHED: { label: 'Finished', variant: 'default' },
 }
 
 function GuestNamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
@@ -172,12 +174,12 @@ function GuestNamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
   return (
     <div className="flex items-center justify-center h-screen bg-[#F2F3F0]">
       <div className="bg-white rounded-2xl border border-[#CBCCC9] p-8 w-full max-w-sm flex flex-col gap-4">
-        <h2 className="text-lg font-bold text-[#111111]">Введите ваше имя</h2>
-        <p className="text-sm text-[#666666]">Чтобы присоединиться к комнате, укажите как вас зовут.</p>
+        <h2 className="text-lg font-bold text-[#111111]">Enter your name</h2>
+        <p className="text-sm text-[#666666]">To join the room, tell us what to call you.</p>
         <input
           value={name}
           onChange={e => setName(e.target.value)}
-          placeholder="Ваше имя"
+          placeholder="Your name"
           className="w-full px-4 py-2.5 bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30"
           onKeyDown={e => { if (e.key === 'Enter' && name.trim()) onSubmit(name.trim()) }}
           autoFocus
@@ -187,7 +189,7 @@ function GuestNamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
           disabled={!name.trim()}
           className="w-full py-2.5 bg-[#6366F1] hover:bg-[#4F46E5] text-[#0f172a] font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
         >
-          Войти в комнату
+          Join room
         </button>
       </div>
     </div>
@@ -203,7 +205,8 @@ export function CodeRoomPage() {
   const isMobile = useIsMobile()
   const [room, setRoom] = useState<Room | null>(null)
   const [running, setRunning] = useState(false)
-  const [submitResult, setSubmitResult] = useState<{ isCorrect: boolean; output: string; error: string } | null>(null)
+  const [submitResult, setSubmitResult] = useState<{ isCorrect: boolean; output: string; error: string; submissionId?: string } | null>(null)
+  const { review: solveReview, loading: solveReviewLoading } = useSolutionReview({ submissionId: submitResult?.submissionId })
   const [activeTab, setActiveTab] = useState<'problem' | 'tests'>('problem')
   const [aiTab, setAiTab] = useState<'hints' | 'result' | 'review'>('hints')
   const [hints, setHints] = useState<string[]>([])
@@ -221,6 +224,7 @@ export function CodeRoomPage() {
   const [notificationsEnabled, setNotificationsEnabled] = useState(true)
   const [showLangDropdown, setShowLangDropdown] = useState(false)
   const [togglingPrivacy, setTogglingPrivacy] = useState(false)
+  const [showLeaveConfirm, setShowLeaveConfirm] = useState(false)
   const [leftWidth, setLeftWidth] = useState(300)
   const [mobilePanel, setMobilePanel] = useState<'problem' | 'editor' | 'ai'>('editor')
   const isResizingLeft = useRef(false)
@@ -289,6 +293,38 @@ export function CodeRoomPage() {
       setTimeout(() => setCopied(false), 2000)
     })
   }
+
+  const leaveRoomAndNavigate = useCallback(async (shouldClose: boolean) => {
+    if (!roomId) {
+      navigate('/practice/code-rooms')
+      return
+    }
+    try {
+      if (shouldClose) await codeRoomApi.closeRoom(roomId)
+      else await codeRoomApi.leaveRoom(roomId)
+    } catch {
+      /* best effort */
+    }
+    navigate('/practice/code-rooms')
+  }, [navigate, roomId])
+
+  const handleLeaveRoom = useCallback(async (confirmed: boolean) => {
+    const participantCount = room?.participants.length ?? 0
+    const isLastParticipant = participantCount <= 1
+    const actorIsCreator = !!user && !!room && (user.id === room.creatorId || room.participants.some(p => p.userId === user.id && p.isCreator))
+
+    if (!confirmed) {
+      if (actorIsCreator && isLastParticipant) {
+        setShowLeaveConfirm(true)
+        return
+      }
+      await leaveRoomAndNavigate(false)
+      return
+    }
+
+    setShowLeaveConfirm(false)
+    await leaveRoomAndNavigate(true)
+  }, [leaveRoomAndNavigate, room, user])
 
   const handleTogglePrivacy = async () => {
     if (!roomId || !room || togglingPrivacy) return
@@ -361,13 +397,13 @@ export function CodeRoomPage() {
     initialLanguage: getMonacoLanguage(room?.language ?? (location.state as { language?: string } | null)?.language ?? ''),
     onDocSync: handleIncomingDocSync,
     onLeave: useCallback((_userId: string, displayName: string) => {
-      addNotification(`${displayName} покинул(-а) комнату`)
+      addNotification(`${displayName} left the room`)
     }, [addNotification]),
     onBehaviorEvent: useCallback((_userId: string, displayName: string, event: import('@/features/CodeRoom/hooks/useCodeRoomWs').BehaviorEventType) => {
       if (!isCreatorRef.current) return
-      if (event === 'tab_hidden') addNotification(`⚠️ ${displayName} скрыл(-а) вкладку`)
-      else if (event === 'tab_visible') addNotification(`${displayName} вернулся(-ась)`)
-      else if (event === 'pasted') addNotification(`⚠️ ${displayName} вставил(-а) код`)
+      if (event === 'tab_hidden') addNotification(`⚠️ ${displayName} hid the tab`)
+      else if (event === 'tab_visible') addNotification(`${displayName} returned`)
+      else if (event === 'pasted') addNotification(`⚠️ ${displayName} pasted code`)
     }, [addNotification]),
     onCursorUpdate: useCallback((userId: string, line: number, col: number) => {
       // Always apply cursor position immediately — deferring until codeLen matches caused
@@ -554,7 +590,7 @@ export function CodeRoomPage() {
       update.participants.forEach(p => {
         const pid = p.id || p.userId || ''
         if (!prevParticipantIdsRef.current.has(pid) && prevParticipantIdsRef.current.size > 0 && pid !== myId) {
-          addNotification(`${p.displayName} присоединился(-ась) к комнате`)
+          addNotification(`${p.displayName} joined the room`)
         }
       })
       prevParticipantIdsRef.current = new Set(update.participants.map(p => p.id || p.userId || ''))
@@ -745,7 +781,7 @@ export function CodeRoomPage() {
         language: lang,
         code: getCurrentCode(),
         taskTitle: room?.task ?? '',
-        statement: customPrompt || (room?.task ? `Реши задачу: ${room.task}` : ''),
+        statement: customPrompt || (room?.task ? `Solve the task: ${room.task}` : ''),
       })
       const data = res.data
       // The response is an object {provider, model, score, summary, strengths, issues, followUpQuestions}
@@ -753,16 +789,16 @@ export function CodeRoomPage() {
       if (data && typeof data === 'object' && !Array.isArray(data)) {
         const parts: string[] = []
         if (data.summary) parts.push(`📋 ${data.summary}`)
-        if (data.score !== undefined) parts.push(`⭐ Оценка: ${data.score}/10`)
-        if (data.strengths?.length) parts.push(`✅ Плюсы:\n${data.strengths.map((s: string) => `• ${s}`).join('\n')}`)
-        if (data.issues?.length) parts.push(`⚠️ Замечания:\n${data.issues.map((i: string) => `• ${i}`).join('\n')}`)
-        if (data.followUpQuestions?.length) parts.push(`❓ Вопросы:\n${data.followUpQuestions.map((q: string) => `• ${q}`).join('\n')}`)
+        if (data.score !== undefined) parts.push(`⭐ Score: ${data.score}/10`)
+        if (data.strengths?.length) parts.push(`✅ Strengths:\n${data.strengths.map((s: string) => `• ${s}`).join('\n')}`)
+        if (data.issues?.length) parts.push(`⚠️ Issues:\n${data.issues.map((i: string) => `• ${i}`).join('\n')}`)
+        if (data.followUpQuestions?.length) parts.push(`❓ Questions:\n${data.followUpQuestions.map((q: string) => `• ${q}`).join('\n')}`)
         setAiReview(parts.join('\n\n') || JSON.stringify(data, null, 2))
       } else {
-        setAiReview(String(data?.review ?? data?.feedback ?? data ?? 'Нет данных'))
+        setAiReview(String(data?.review ?? data?.feedback ?? data ?? 'No data'))
       }
     } catch {
-      setAiReview('Не удалось получить ревью. Попробуйте позже.')
+      setAiReview('Failed to get a review. Try again later.')
     } finally {
       setReviewLoading(false)
     }
@@ -900,7 +936,7 @@ export function CodeRoomPage() {
         <header className="border-b border-[#d8d9d6] bg-white px-4 pt-3 pb-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] dark:border-[#1e3158] dark:bg-[#161c2d]">
           <div className="flex items-start gap-3">
             <button
-              onClick={() => navigate('/practice/code-rooms')}
+              onClick={() => handleLeaveRoom(false)}
               className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#666666] dark:bg-[#1a2236] dark:text-[#94a3b8]"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -922,7 +958,7 @@ export function CodeRoomPage() {
             </div>
             <button
               onClick={toggleTheme}
-              title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+              title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
               className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#666666] transition-colors dark:bg-[#1a2236] dark:text-[#94a3b8]"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-[#fbbf24]" /> : <Moon className="w-4 h-4" />}
@@ -948,28 +984,28 @@ export function CodeRoomPage() {
             <button
               onClick={copyInviteLink}
               className="flex flex-shrink-0 items-center gap-1.5 rounded-2xl border border-[#e2e8f0] bg-white px-3 py-2 text-xs font-medium text-[#111111] transition-colors dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f0]"
-              title="Скопировать ссылку-приглашение"
+              title="Copy invite link"
             >
               {copied ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Share2 className="w-3.5 h-3.5" />}
-              <span>{copied ? 'Скопировано' : 'Инвайт'}</span>
+              <span>{copied ? 'Copied' : 'Invite'}</span>
             </button>
 
             {isCreator && (
               <button
                 onClick={handleTogglePrivacy}
                 disabled={togglingPrivacy}
-                title={room?.isPrivate ? 'Сделать публичной' : 'Сделать приватной'}
+                title={room?.isPrivate ? 'Make public' : 'Make private'}
                 className={`flex flex-shrink-0 items-center gap-1.5 rounded-2xl border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50 ${room?.isPrivate ? 'border-[#c7d2fe] bg-[#eef2ff] text-[#6366F1] dark:border-[#312e81] dark:bg-[#1e1b4b]' : 'border-[#e2e8f0] bg-white text-[#667085] dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#94a3b8]'}`}
               >
                 {room?.isPrivate ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-                <span>{room?.isPrivate ? 'Приватная' : 'Публичная'}</span>
+                <span>{room?.isPrivate ? 'Private' : 'Public'}</span>
               </button>
             )}
 
             {isCreator && (
               <button
                 onClick={() => setNotificationsEnabled(v => !v)}
-                title={notificationsEnabled ? 'Выключить уведомления' : 'Включить уведомления'}
+                title={notificationsEnabled ? 'Disable notifications' : 'Enable notifications'}
                 className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border transition-colors ${notificationsEnabled ? 'border-[#c7d2fe] bg-[#eef2ff] text-[#6366F1] dark:border-[#312e81] dark:bg-[#1e1b4b]' : 'border-[#e2e8f0] bg-white text-[#94a3b8] dark:border-[#1e3158] dark:bg-[#0f1117]'}`}
               >
                 {notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
@@ -977,10 +1013,10 @@ export function CodeRoomPage() {
             )}
 
             <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading} className="flex-shrink-0 rounded-2xl">
-              <Bot className="w-3.5 h-3.5" /> AI Ревью
+              <Bot className="w-3.5 h-3.5" /> AI Review
             </Button>
             <Button variant="secondary" size="sm" onClick={handleRun} loading={running} className="flex-shrink-0 rounded-2xl">
-              <Play className="w-3.5 h-3.5" /> Запустить
+              <Play className="w-3.5 h-3.5" /> Run
             </Button>
           </div>
         </header>
@@ -988,8 +1024,8 @@ export function CodeRoomPage() {
         <div className="flex flex-1 flex-col gap-4 px-4 pt-4 pb-24">
           <div className="grid grid-cols-3 gap-2 rounded-[24px] border border-[#d8d9d6] bg-white p-1 shadow-[0_12px_28px_rgba(15,23,42,0.06)] dark:border-[#1e3158] dark:bg-[#161c2d]">
             {[
-              { key: 'problem' as const, label: 'Задача' },
-              { key: 'editor' as const, label: 'Редактор' },
+              { key: 'problem' as const, label: 'Task' },
+              { key: 'editor' as const, label: 'Editor' },
               { key: 'ai' as const, label: 'AI' },
             ].map(panel => (
               <button
@@ -1008,11 +1044,11 @@ export function CodeRoomPage() {
           {mobilePanel === 'problem' && (
             <div className="rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
               <div className="flex items-center justify-between border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
-                <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">Условие</span>
+                <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">Task</span>
                 {canEditTask && (
                   <button
                     onClick={openTaskEditor}
-                    title="Редактировать условие задачи"
+                    title="Edit task statement"
                     className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#F8FAFC] text-[#94a3b8] dark:bg-[#1a2236]"
                   >
                     <Pencil className="w-3.5 h-3.5" />
@@ -1027,10 +1063,10 @@ export function CodeRoomPage() {
                       <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#475569] dark:text-[#94a3b8]">{taskStatement}</p>
                     ) : canEditTask ? (
                       <button onClick={openTaskEditor} className="text-sm font-medium text-[#6366F1] hover:underline">
-                        + Добавить описание
+                        + Add description
                       </button>
                     ) : (
-                      <p className="text-sm text-[#94a3b8]">Описание не добавлено</p>
+                      <p className="text-sm text-[#94a3b8]">No description yet</p>
                     )}
                   </div>
                 ) : canEditTask ? (
@@ -1041,10 +1077,10 @@ export function CodeRoomPage() {
                     <div className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-dashed border-[#CBCCC9] dark:border-[#1e3158]">
                       <Pencil className="w-4 h-4" />
                     </div>
-                    <span className="text-sm font-medium">Добавить условие задачи</span>
+                    <span className="text-sm font-medium">Add task statement</span>
                   </button>
                 ) : (
-                  <p className="py-8 text-center text-sm text-[#94a3b8]">Задача не задана</p>
+                  <p className="py-8 text-center text-sm text-[#94a3b8]">No task yet</p>
                 )}
               </div>
             </div>
@@ -1100,16 +1136,19 @@ export function CodeRoomPage() {
               </div>
               <div className="border-t border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
                 {submitResult ? (
-                  <div className={`rounded-2xl p-3 ${submitResult.isCorrect ? 'border border-[#86efac] bg-[#e8f9ef] dark:border-[#166534] dark:bg-[#0d2a1f]' : 'border border-[#fca5a5] bg-[#fef2f2] dark:border-[#991b1b] dark:bg-[#2a0f0f]'}`}>
-                    <div className="mb-2 flex items-center gap-2">
-                      {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
-                      <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Принято' : 'Нужно доработать'}</span>
+                  <div className="space-y-3">
+                    <div className={`rounded-2xl p-3 ${submitResult.isCorrect ? 'border border-[#86efac] bg-[#e8f9ef] dark:border-[#166534] dark:bg-[#0d2a1f]' : 'border border-[#fca5a5] bg-[#fef2f2] dark:border-[#991b1b] dark:bg-[#2a0f0f]'}`}>
+                      <div className="mb-2 flex items-center gap-2">
+                        {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
+                        <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Accepted' : 'Needs work'}</span>
+                      </div>
+                      {submitResult.output && <pre className="whitespace-pre-wrap text-xs text-[#475569] dark:text-[#94a3b8]">{submitResult.output}</pre>}
+                      {submitResult.error && <pre className="mt-2 whitespace-pre-wrap text-xs text-[#ef4444]">{submitResult.error}</pre>}
                     </div>
-                    {submitResult.output && <pre className="whitespace-pre-wrap text-xs text-[#475569] dark:text-[#94a3b8]">{submitResult.output}</pre>}
-                    {submitResult.error && <pre className="mt-2 whitespace-pre-wrap text-xs text-[#ef4444]">{submitResult.error}</pre>}
+                    {submitResult.submissionId && <ReviewCard review={solveReview} loading={solveReviewLoading} showComparison={false} />}
                   </div>
                 ) : (
-                  <p className="text-xs text-[#94a3b8]">Результаты запуска появятся здесь.</p>
+                  <p className="text-xs text-[#94a3b8]">Run results will appear here.</p>
                 )}
               </div>
             </div>
@@ -1119,7 +1158,7 @@ export function CodeRoomPage() {
             <div className="overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
               <div className="flex items-center gap-2 border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
                 <Sparkles className="w-4 h-4 text-[#6366F1]" />
-                <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">AI Помощник</span>
+                <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">AI Assistant</span>
               </div>
               <div className="flex border-b border-[#e2e8f0] dark:border-[#1e3158]">
                 {(['hints', 'result', 'review'] as const).map(tab => (
@@ -1128,7 +1167,7 @@ export function CodeRoomPage() {
                     onClick={() => setAiTab(tab)}
                     className={`px-3 py-2.5 text-xs font-medium transition-colors ${aiTab === tab ? 'border-b-2 border-[#6366F1] text-[#111111] dark:text-[#e2e8f0]' : 'text-[#666666] dark:text-[#64748b]'}`}
                   >
-                    {tab === 'hints' ? 'Подсказки' : tab === 'result' ? 'Результат' : 'AI Ревью'}
+                    {tab === 'hints' ? 'Hints' : tab === 'result' ? 'Result' : 'AI Review'}
                   </button>
                 ))}
               </div>
@@ -1138,7 +1177,7 @@ export function CodeRoomPage() {
                     {hints.length === 0 ? (
                       <>
                         <p className="text-sm leading-relaxed text-[#666666] dark:text-[#94a3b8]">
-                          Начните решать задачу, и AI поможет если застрянете
+                          Start solving the task and AI will help if you get stuck
                         </p>
                         <Button
                           variant="orange"
@@ -1146,14 +1185,14 @@ export function CodeRoomPage() {
                           className="w-full rounded-2xl"
                           onClick={() => setHints(AI_HINTS)}
                         >
-                          <Sparkles className="w-3.5 h-3.5" /> Получить подсказку
+                          <Sparkles className="w-3.5 h-3.5" /> Get a hint
                         </Button>
                       </>
                     ) : (
                       <div className="flex flex-col gap-2">
                         {hints.map((hint, i) => (
                           <div key={i} className="rounded-2xl border border-[#FDBA74] bg-[#FFF7ED] p-3 dark:border-[#78350f] dark:bg-[#2a1a06]">
-                            <p className="mb-0.5 text-xs font-semibold text-[#9a3412] dark:text-[#fbbf24]">Подсказка {i + 1}</p>
+                            <p className="mb-0.5 text-xs font-semibold text-[#9a3412] dark:text-[#fbbf24]">Hint {i + 1}</p>
                             <p className="text-sm text-[#111111] dark:text-[#e2e8f0]">{hint}</p>
                           </div>
                         ))}
@@ -1166,13 +1205,13 @@ export function CodeRoomPage() {
                       <div className={`rounded-2xl p-3 ${submitResult.isCorrect ? 'border border-[#86efac] bg-[#e8f9ef] dark:border-[#166534] dark:bg-[#0d2a1f]' : 'border border-[#fca5a5] bg-[#fef2f2] dark:border-[#991b1b] dark:bg-[#2a0f0f]'}`}>
                         <div className="mb-2 flex items-center gap-2">
                           {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
-                          <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Принято!' : 'Неверно'}</span>
+                          <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Accepted!' : 'Wrong'}</span>
                         </div>
                         {submitResult.output && <pre className="whitespace-pre-wrap font-mono text-xs text-[#475569] dark:text-[#94a3b8]">{submitResult.output}</pre>}
                         {submitResult.error && <pre className="whitespace-pre-wrap font-mono text-xs text-[#ef4444]">{submitResult.error}</pre>}
                       </div>
                     ) : (
-                      <p className="text-sm text-[#94a3b8]">Запустите код чтобы увидеть результаты</p>
+                      <p className="text-sm text-[#94a3b8]">Run the code to see the results</p>
                     )}
                   </div>
                 ) : (
@@ -1180,26 +1219,26 @@ export function CodeRoomPage() {
                     {reviewLoading ? (
                       <div className="flex items-center gap-2">
                         <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#CBCCC9] border-t-[#6366F1] dark:border-[#1e3158]" />
-                        <p className="text-sm text-[#666666] dark:text-[#94a3b8]">Анализируем код...</p>
+                        <p className="text-sm text-[#666666] dark:text-[#94a3b8]">Analyzing code...</p>
                       </div>
                     ) : aiReview ? (
                       <div className="flex flex-col gap-2">
-                        <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">Результат ревью</p>
+                        <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">Review result</p>
                         <p className="whitespace-pre-wrap text-xs leading-relaxed text-[#666666] dark:text-[#94a3b8]">{aiReview}</p>
-                        <button onClick={() => setAiReview(null)} className="mt-1 text-left text-xs text-[#6366F1] hover:underline">Запустить заново</button>
+                        <button onClick={() => setAiReview(null)} className="mt-1 text-left text-xs text-[#6366F1] hover:underline">Run again</button>
                       </div>
                     ) : (
                       <div className="flex flex-col gap-3">
-                        <p className="text-xs text-[#666666] dark:text-[#94a3b8]">Необязательный промпт для AI ревью:</p>
+                        <p className="text-xs text-[#666666] dark:text-[#94a3b8]">Optional prompt for AI review:</p>
                         <textarea
                           value={reviewPrompt}
                           onChange={e => setReviewPrompt(e.target.value)}
-                          placeholder="Например: уточни временную сложность..."
+                          placeholder="For example: check time complexity..."
                           rows={4}
                           className="w-full resize-none rounded-2xl border border-[#CBCCC9] bg-[#F2F3F0] px-3 py-2 text-xs focus:outline-none dark:border-[#1e3158] dark:bg-[#0d1117] dark:text-[#e2e8f0]"
                         />
                         <Button variant="primary" size="sm" className="w-full rounded-2xl" onClick={() => handleRunReview(reviewPrompt)} loading={reviewLoading}>
-                          <Bot className="w-3.5 h-3.5" /> Запустить ревью
+                          <Bot className="w-3.5 h-3.5" /> Run review
                         </Button>
                       </div>
                     )}
@@ -1228,35 +1267,35 @@ export function CodeRoomPage() {
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
             <div className="w-full max-w-lg rounded-2xl border border-[#CBCCC9] bg-white shadow-xl dark:border-[#1e3158] dark:bg-[#161c2d]">
               <div className="flex items-center justify-between border-b border-[#CBCCC9] px-5 py-4 dark:border-[#1e3158]">
-                <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">Условие задачи</h2>
+                <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">Task statement</h2>
                 <button onClick={() => setShowTaskEditor(false)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] hover:bg-[#F2F3F0] dark:text-[#94a3b8] dark:hover:bg-[#1a2236]">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="flex flex-col gap-4 p-5">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">Название задачи</label>
+                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">Task title</label>
                   <input
                     value={editTaskTitle}
                     onChange={e => setEditTaskTitle(e.target.value)}
-                    placeholder="Например: Two Sum"
+                    placeholder="For example: Two Sum"
                     className="w-full rounded-lg border border-[#CBCCC9] bg-white px-3 py-2 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f3]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">Условие задачи</label>
+                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">Task statement</label>
                   <textarea
                     value={editTaskStatement}
                     onChange={e => setEditTaskStatement(e.target.value)}
-                    placeholder="Опишите задачу, входные и выходные данные, примеры..."
+                    placeholder="Describe the task, inputs, outputs, and examples..."
                     rows={8}
                     className="w-full resize-none rounded-lg border border-[#CBCCC9] bg-white px-3 py-2 font-mono text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f3]"
                   />
                 </div>
               </div>
               <div className="flex gap-2 px-5 pb-5">
-                <Button variant="secondary" size="sm" onClick={() => setShowTaskEditor(false)}>Отмена</Button>
-                <Button variant="primary" size="sm" onClick={saveTask} disabled={!editTaskTitle.trim()}>Сохранить</Button>
+                <Button variant="secondary" size="sm" onClick={() => setShowTaskEditor(false)}>Cancel</Button>
+                <Button variant="primary" size="sm" onClick={saveTask} disabled={!editTaskTitle.trim()}>Save</Button>
               </div>
             </div>
           </div>
@@ -1271,7 +1310,7 @@ export function CodeRoomPage() {
       <header className="h-[52px] bg-white dark:bg-[#161c2d] border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center justify-between px-5 flex-shrink-0 z-10">
         <div className="flex items-center gap-3">
           <button
-            onClick={() => navigate('/practice/code-rooms')}
+            onClick={() => handleLeaveRoom(false)}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] text-[#666666] dark:text-[#94a3b8]"
           >
             <ArrowLeft className="w-4 h-4" />
@@ -1309,7 +1348,7 @@ export function CodeRoomPage() {
           {/* Theme toggle — available to all */}
           <button
             onClick={toggleTheme}
-            title={theme === 'dark' ? 'Светлая тема' : 'Тёмная тема'}
+            title={theme === 'dark' ? 'Light theme' : 'Dark theme'}
             className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] text-[#666666] dark:text-[#94a3b8] transition-colors"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-[#fbbf24]" /> : <Moon className="w-4 h-4" />}
@@ -1319,37 +1358,37 @@ export function CodeRoomPage() {
           <button
             onClick={copyInviteLink}
             className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#666666] dark:text-[#4d6380] hover:text-[#111111] dark:hover:text-[#c8d8ec] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] rounded-lg transition-colors"
-            title="Скопировать ссылку-приглашение"
+            title="Copy invite link"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Share2 className="w-3.5 h-3.5" />}
-            <span>{copied ? 'Скопировано' : 'Пригласить'}</span>
+            <span>{copied ? 'Copied' : 'Invite'}</span>
           </button>
 
           {isCreator && (
             <button
               onClick={handleTogglePrivacy}
               disabled={togglingPrivacy}
-              title={room?.isPrivate ? 'Сделать публичной' : 'Сделать приватной'}
+              title={room?.isPrivate ? 'Make public' : 'Make private'}
               className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg transition-colors disabled:opacity-50 ${room?.isPrivate ? 'text-[#6366F1] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]' : 'text-[#94a3b8] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]'}`}
             >
               {room?.isPrivate ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
-              <span className="hidden sm:inline">{room?.isPrivate ? 'Приватная' : 'Публичная'}</span>
+              <span className="hidden sm:inline">{room?.isPrivate ? 'Private' : 'Public'}</span>
             </button>
           )}
           {isCreator && (
             <button
               onClick={() => setNotificationsEnabled(v => !v)}
-              title={notificationsEnabled ? 'Выключить уведомления' : 'Включить уведомления'}
+              title={notificationsEnabled ? 'Disable notifications' : 'Enable notifications'}
               className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${notificationsEnabled ? 'text-[#6366F1] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]' : 'text-[#94a3b8] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]'}`}
             >
               {notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
             </button>
           )}
           <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading}>
-            <Bot className="w-3.5 h-3.5" /> AI Ревью
+            <Bot className="w-3.5 h-3.5" /> AI Review
           </Button>
           <Button variant="secondary" size="sm" onClick={handleRun} loading={running}>
-            <Play className="w-3.5 h-3.5" /> Запустить
+            <Play className="w-3.5 h-3.5" /> Run
           </Button>
         </div>
       </header>
@@ -1363,12 +1402,12 @@ export function CodeRoomPage() {
               onClick={() => setActiveTab('problem')}
               className={`px-3 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'problem' ? 'border-[#6366F1] text-[#111111] dark:text-[#e2e8f0]' : 'border-transparent text-[#666666] dark:text-[#64748b]'}`}
             >
-              Задача
+              Task
             </button>
             {canEditTask && (
               <button
                 onClick={openTaskEditor}
-                title="Редактировать условие задачи"
+                title="Edit task statement"
                 className="mr-2 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] text-[#94a3b8] hover:text-[#6366F1] transition-colors"
               >
                 <Pencil className="w-3.5 h-3.5" />
@@ -1386,10 +1425,10 @@ export function CodeRoomPage() {
                     onClick={openTaskEditor}
                     className="text-xs text-[#6366F1] hover:underline"
                   >
-                    + Добавить описание
+                    + Add description
                   </button>
                 ) : (
-                  <p className="text-xs text-[#94a3b8]">Описание не добавлено</p>
+                  <p className="text-xs text-[#94a3b8]">No description yet</p>
                 )}
               </div>
             ) : canEditTask ? (
@@ -1400,10 +1439,10 @@ export function CodeRoomPage() {
                 <div className="w-10 h-10 rounded-xl border-2 border-dashed border-[#CBCCC9] dark:border-[#1e3158] group-hover:border-[#6366F1] flex items-center justify-center transition-colors">
                   <Pencil className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-medium dark:text-[#94a3b8]">Добавить условие задачи</span>
+                <span className="text-xs font-medium dark:text-[#94a3b8]">Add task statement</span>
               </button>
             ) : (
-              <p className="text-sm text-[#94a3b8] text-center py-8">Задача не задана</p>
+              <p className="text-sm text-[#94a3b8] text-center py-8">No task yet</p>
             )}
           </div>
         </div>
@@ -1471,7 +1510,7 @@ export function CodeRoomPage() {
           <div className="w-[280px] flex-shrink-0 bg-white dark:bg-[#161c2d] border-l border-[#CBCCC9] dark:border-[#1e3158] flex flex-col">
             <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#6366F1]" />
-              <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">AI Помощник</span>
+              <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">AI Assistant</span>
             </div>
             <div className="flex border-b border-[#CBCCC9] dark:border-[#1e3158]">
               {(['hints', 'result', 'review'] as const).map(tab => (
@@ -1480,7 +1519,7 @@ export function CodeRoomPage() {
                   onClick={() => setAiTab(tab)}
                   className={`px-3 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${aiTab === tab ? 'border-[#6366F1] text-[#111111] dark:text-[#e2e8f0]' : 'border-transparent text-[#666666] dark:text-[#64748b]'}`}
                 >
-                  {tab === 'hints' ? 'Подсказки' : tab === 'result' ? 'Результат' : 'AI Ревью'}
+                  {tab === 'hints' ? 'Hints' : tab === 'result' ? 'Result' : 'AI Review'}
                 </button>
               ))}
             </div>
@@ -1490,7 +1529,7 @@ export function CodeRoomPage() {
                   {hints.length === 0 ? (
                     <>
                       <p className="text-sm text-[#666666] dark:text-[#94a3b8] leading-relaxed">
-                        Начните решать задачу, и AI поможет если застрянете
+                        Start solving the task and AI will help if you get stuck
                       </p>
                       <Button
                         variant="orange"
@@ -1498,14 +1537,14 @@ export function CodeRoomPage() {
                         className="w-full"
                         onClick={() => setHints(AI_HINTS)}
                       >
-                        <Sparkles className="w-3.5 h-3.5" /> Получить подсказку
+                        <Sparkles className="w-3.5 h-3.5" /> Get a hint
                       </Button>
                     </>
                   ) : (
                     <div className="flex flex-col gap-2">
                       {hints.map((hint, i) => (
                         <div key={i} className="p-3 bg-[#FFF7ED] dark:bg-[#2a1a06] border border-[#FDBA74] dark:border-[#78350f] rounded-lg">
-                          <p className="text-xs font-semibold text-[#9a3412] dark:text-[#fbbf24] mb-0.5">Подсказка {i + 1}</p>
+                          <p className="text-xs font-semibold text-[#9a3412] dark:text-[#fbbf24] mb-0.5">Hint {i + 1}</p>
                           <p className="text-sm text-[#111111] dark:text-[#e2e8f0]">{hint}</p>
                         </div>
                       ))}
@@ -1518,13 +1557,13 @@ export function CodeRoomPage() {
                     <div className={`p-3 rounded-lg ${submitResult.isCorrect ? 'bg-[#e8f9ef] dark:bg-[#0d2a1f] border border-[#86efac] dark:border-[#166534]' : 'bg-[#fef2f2] dark:bg-[#2a0f0f] border border-[#fca5a5] dark:border-[#991b1b]'}`}>
                       <div className="flex items-center gap-2 mb-2">
                         {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
-                        <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Принято!' : 'Неверно'}</span>
+                        <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? 'Accepted!' : 'Wrong'}</span>
                       </div>
                       {submitResult.output && <pre className="text-xs text-[#475569] dark:text-[#94a3b8] font-mono whitespace-pre-wrap">{submitResult.output}</pre>}
                       {submitResult.error && <pre className="text-xs text-[#ef4444] font-mono whitespace-pre-wrap">{submitResult.error}</pre>}
                     </div>
                   ) : (
-                    <p className="text-sm text-[#94a3b8]">Запустите код чтобы увидеть результаты</p>
+                    <p className="text-sm text-[#94a3b8]">Run the code to see the results</p>
                   )}
                 </div>
               ) : (
@@ -1532,26 +1571,26 @@ export function CodeRoomPage() {
                   {reviewLoading ? (
                     <div className="flex items-center gap-2">
                       <span className="w-3.5 h-3.5 border-2 border-[#CBCCC9] dark:border-[#1e3158] border-t-[#6366F1] rounded-full animate-spin" />
-                      <p className="text-sm text-[#666666] dark:text-[#94a3b8]">Анализируем код...</p>
+                      <p className="text-sm text-[#666666] dark:text-[#94a3b8]">Analyzing code...</p>
                     </div>
                   ) : aiReview ? (
                     <div className="flex flex-col gap-2">
-                      <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">Результат ревью</p>
+                      <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">Review result</p>
                       <p className="text-xs text-[#666666] dark:text-[#94a3b8] whitespace-pre-wrap leading-relaxed">{aiReview}</p>
-                      <button onClick={() => setAiReview(null)} className="text-xs text-[#6366F1] hover:underline mt-1">Запустить заново</button>
+                      <button onClick={() => setAiReview(null)} className="text-xs text-[#6366F1] hover:underline mt-1">Run again</button>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-3">
-                      <p className="text-xs text-[#666666] dark:text-[#94a3b8]">Необязательный промпт для AI ревью:</p>
+                      <p className="text-xs text-[#666666] dark:text-[#94a3b8]">Optional prompt for AI review:</p>
                       <textarea
                         value={reviewPrompt}
                         onChange={e => setReviewPrompt(e.target.value)}
-                        placeholder="Например: уточни временную сложность..."
+                        placeholder="For example: check time complexity..."
                         rows={3}
                         className="w-full px-3 py-2 text-xs bg-[#F2F3F0] dark:bg-[#0d1117] dark:text-[#e2e8f0] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none resize-none"
                       />
                       <Button variant="primary" size="sm" className="w-full" onClick={() => handleRunReview(reviewPrompt)} loading={reviewLoading}>
-                        <Bot className="w-3.5 h-3.5" /> Запустить ревью
+                        <Bot className="w-3.5 h-3.5" /> Run review
                       </Button>
                     </div>
                   )}
@@ -1582,39 +1621,56 @@ export function CodeRoomPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
           <div className="bg-white dark:bg-[#161c2d] rounded-2xl shadow-xl border border-[#CBCCC9] dark:border-[#1e3158] w-full max-w-lg">
             <div className="flex items-center justify-between px-5 py-4 border-b border-[#CBCCC9] dark:border-[#1e3158]">
-              <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">Условие задачи</h2>
+              <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">Task statement</h2>
               <button onClick={() => setShowTaskEditor(false)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] text-[#666666] dark:text-[#94a3b8]">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="p-5 flex flex-col gap-4">
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1.5 block">Название задачи</label>
+                <label className="text-xs font-medium text-[#666666] mb-1.5 block">Task title</label>
                 <input
                   value={editTaskTitle}
                   onChange={e => setEditTaskTitle(e.target.value)}
-                  placeholder="Например: Two Sum"
+                  placeholder="For example: Two Sum"
                   className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#6366F1]/10"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1.5 block">Условие задачи</label>
+                <label className="text-xs font-medium text-[#666666] mb-1.5 block">Task statement</label>
                 <textarea
                   value={editTaskStatement}
                   onChange={e => setEditTaskStatement(e.target.value)}
-                  placeholder="Опишите задачу, входные и выходные данные, примеры..."
+                  placeholder="Describe the task, inputs, outputs, and examples..."
                   rows={8}
                   className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#6366F1]/10 resize-none font-mono"
                 />
               </div>
             </div>
             <div className="flex gap-2 px-5 pb-5">
-              <Button variant="secondary" size="sm" onClick={() => setShowTaskEditor(false)}>Отмена</Button>
-              <Button variant="primary" size="sm" onClick={saveTask} disabled={!editTaskTitle.trim()}>Сохранить</Button>
+              <Button variant="secondary" size="sm" onClick={() => setShowTaskEditor(false)}>Cancel</Button>
+              <Button variant="primary" size="sm" onClick={saveTask} disabled={!editTaskTitle.trim()}>Save</Button>
             </div>
           </div>
         </div>
       )}
+
+      {/* Leave / End session confirm modal */}
+      <Modal
+        open={showLeaveConfirm}
+        onClose={() => setShowLeaveConfirm(false)}
+        title="Leave room?"
+        footer={
+          <>
+            <Button variant="secondary" size="sm" onClick={() => setShowLeaveConfirm(false)}>Stay</Button>
+            <Button variant="orange" size="sm" onClick={() => handleLeaveRoom(true)}>End and leave</Button>
+          </>
+        }
+      >
+        <p className="text-sm text-[#475569] dark:text-[#94a3b8]">
+          The session will be ended and the room will be removed. Unsaved code will be lost.
+        </p>
+      </Modal>
     </div>
   )
 }

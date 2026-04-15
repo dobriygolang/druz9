@@ -1022,6 +1022,7 @@ type SubmitCodeResponse struct {
 	Match           *ArenaMatch            `protobuf:"bytes,8,opt,name=match,proto3" json:"match,omitempty"`
 	FailedTestIndex int32                  `protobuf:"varint,9,opt,name=failed_test_index,json=failedTestIndex,proto3" json:"failed_test_index,omitempty"`
 	FailureKind     v1.SubmitFailureKind   `protobuf:"varint,10,opt,name=failure_kind,json=failureKind,proto3,enum=common.v1.SubmitFailureKind" json:"failure_kind,omitempty"`
+	SubmissionId    string                 `protobuf:"bytes,11,opt,name=submission_id,json=submissionId,proto3" json:"submission_id,omitempty"`
 	unknownFields   protoimpl.UnknownFields
 	sizeCache       protoimpl.SizeCache
 }
@@ -1124,6 +1125,13 @@ func (x *SubmitCodeResponse) GetFailureKind() v1.SubmitFailureKind {
 		return x.FailureKind
 	}
 	return v1.SubmitFailureKind(0)
+}
+
+func (x *SubmitCodeResponse) GetSubmissionId() string {
+	if x != nil {
+		return x.SubmissionId
+	}
+	return ""
 }
 
 type GetLeaderboardResponse struct {
@@ -2006,7 +2014,7 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x16ListOpenMatchesRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\"@\n" +
 	"\x12ArenaMatchResponse\x12*\n" +
-	"\x05match\x18\x01 \x01(\v2\x14.arena.v1.ArenaMatchR\x05match\"\x9c\x03\n" +
+	"\x05match\x18\x01 \x01(\v2\x14.arena.v1.ArenaMatchR\x05match\"\xc1\x03\n" +
 	"\x12SubmitCodeResponse\x12\x16\n" +
 	"\x06output\x18\x01 \x01(\tR\x06output\x12\x14\n" +
 	"\x05error\x18\x02 \x01(\tR\x05error\x12\x1d\n" +
@@ -2021,7 +2029,8 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\x05match\x18\b \x01(\v2\x14.arena.v1.ArenaMatchR\x05match\x12*\n" +
 	"\x11failed_test_index\x18\t \x01(\x05R\x0ffailedTestIndex\x12?\n" +
 	"\ffailure_kind\x18\n" +
-	" \x01(\x0e2\x1c.common.v1.SubmitFailureKindR\vfailureKind\"S\n" +
+	" \x01(\x0e2\x1c.common.v1.SubmitFailureKindR\vfailureKind\x12#\n" +
+	"\rsubmission_id\x18\v \x01(\tR\fsubmissionId\"S\n" +
 	"\x16GetLeaderboardResponse\x129\n" +
 	"\aentries\x18\x01 \x03(\v2\x1f.arena.v1.ArenaLeaderboardEntryR\aentries\"\x9e\x02\n" +
 	"\x17ArenaQueueStateResponse\x122\n" +

@@ -60,6 +60,13 @@ func (r *Repo) GetProfileProgress(ctx context.Context, userID uuid.UUID) (*model
 	}
 	progress.Overview.CurrentStreakDays = streakDays
 
+	goal, err := r.LoadUserGoal(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	progress.Goal = goal
+	progress.NextActions = profiledomain.ComputeNextActions(competencies, goal, streakDays)
+
 	return progress, nil
 }
 
@@ -240,6 +247,10 @@ func (r *Repo) loadProfileCompetencies(ctx context.Context, userID uuid.UUID) ([
 		}
 		item.Score = profiledomain.ComputeBlendedScore(item.VerifiedScore, item.PracticeScore)
 		item.Confidence = profiledomain.ComputeConfidence(item.VerifiedScore, item.PracticeDays, item.PracticeSessions)
+		level, levelProgress := profiledomain.ComputeLevel(item)
+		item.Level = level
+		item.LevelProgress = levelProgress
+		item.NextMilestone = profiledomain.ComputeNextMilestone(item)
 		items = append(items, item)
 	}
 
@@ -416,6 +427,33 @@ func (r *Repo) loadCheckpointScoresBySkill(ctx context.Context, userID uuid.UUID
 	_ = ctx
 	_ = userID
 	return map[string]int32{}, nil
+}
+
+// LoadUserGoal reads the user's goal from the users table.
+func (r *Repo) LoadUserGoal(ctx context.Context, userID uuid.UUID) (*model.UserGoal, error) {
+	var kind, company string
+	err := r.data.DB.QueryRow(ctx, `
+		SELECT COALESCE(goal_kind, 'general_growth'), COALESCE(goal_company, '')
+		FROM users WHERE id = $1
+	`, userID).Scan(&kind, &company)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return &model.UserGoal{Kind: "general_growth"}, nil
+		}
+		return nil, fmt.Errorf("load user goal: %w", err)
+	}
+	return &model.UserGoal{Kind: kind, Company: company}, nil
+}
+
+// SaveUserGoal persists the user's goal.
+func (r *Repo) SaveUserGoal(ctx context.Context, userID uuid.UUID, goal *model.UserGoal) error {
+	_, err := r.data.DB.Exec(ctx, `
+		UPDATE users SET goal_kind = $2, goal_company = $3, updated_at = NOW() WHERE id = $1
+	`, userID, goal.Kind, goal.Company)
+	if err != nil {
+		return fmt.Errorf("save user goal: %w", err)
+	}
+	return nil
 }
 
 func (r *Repo) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int) (map[string]int, error) {

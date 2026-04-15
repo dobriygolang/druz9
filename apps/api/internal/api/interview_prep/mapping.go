@@ -89,6 +89,23 @@ func mapMockStageKind(k model.InterviewPrepMockStageKind) v1.MockStageKind {
 	}
 }
 
+func unmapMockStageKind(k v1.MockStageKind) model.InterviewPrepMockStageKind {
+	switch k {
+	case v1.MockStageKind_MOCK_STAGE_KIND_SLICES:
+		return model.InterviewPrepMockStageKindSlices
+	case v1.MockStageKind_MOCK_STAGE_KIND_CONCURRENCY:
+		return model.InterviewPrepMockStageKindConcurrency
+	case v1.MockStageKind_MOCK_STAGE_KIND_SQL:
+		return model.InterviewPrepMockStageKindSQL
+	case v1.MockStageKind_MOCK_STAGE_KIND_ARCHITECTURE:
+		return model.InterviewPrepMockStageKindArchitecture
+	case v1.MockStageKind_MOCK_STAGE_KIND_SYSTEM_DESIGN:
+		return model.InterviewPrepMockStageKindSystemDesign
+	default:
+		return model.InterviewPrepMockStageKindUnknown
+	}
+}
+
 func mapMockStageStatus(s model.InterviewPrepMockStageStatus) v1.MockStageStatus {
 	switch s {
 	case model.InterviewPrepMockStageStatusPending:
@@ -380,6 +397,7 @@ func mapInterviewSolutionReview(review *aireview.InterviewSolutionReview) *commo
 		Strengths:         review.Strengths,
 		Issues:            review.Issues,
 		FollowUpQuestions: review.FollowUpQuestions,
+		Gaps:              review.Gaps,
 	}
 }
 

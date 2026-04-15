@@ -42,6 +42,7 @@ var (
 	ErrCheckpointNotFound          = errors.New("checkpoint not found")
 	ErrCheckpointExpired           = errors.New("checkpoint time expired")
 	ErrCheckpointAttemptsExceeded  = errors.New("checkpoint attempts exceeded")
+	ErrMockStageKindMismatch       = errors.New("submitted mock stage kind does not match current stage")
 )
 
 type Config struct {
@@ -289,6 +290,7 @@ func timeoutInterviewSolutionReview() *aireview.InterviewSolutionReview {
 	return &aireview.InterviewSolutionReview{
 		Score:      1,
 		Summary:    "AI-проверка не успела завершиться. Решение не засчитано, попробуй отправить ещё раз.",
+		Gaps:       []string{"Не удалось получить ответ AI-review в отведённое время."},
 		Issues:     []string{"Не удалось получить ответ AI-review в отведённое время."},
 		IsRelevant: false,
 		IsPassing:  false,

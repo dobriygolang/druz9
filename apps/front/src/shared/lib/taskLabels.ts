@@ -55,7 +55,7 @@ export const LANG_COLORS: Record<string, { bg: string; text: string }> = {
 
 export const PREP_TYPE_LABELS: Record<string, string> = {
   coding: 'Coding',
-  algorithm: 'Алгоритмы',
+  algorithm: 'Algorithms',
   sql: 'SQL',
   system_design: 'System Design',
   code_review: 'Code Review',

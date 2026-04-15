@@ -55,6 +55,12 @@ service CircleService {
       body: "*"
     };
   }
+
+  rpc DeleteCircle(DeleteCircleRequest) returns (DeleteCircleResponse) {
+    option (google.api.http) = {
+      delete: "/api/v1/circles/{circle_id}"
+    };
+  }
 }
 
 message ListCirclesRequest {
@@ -141,6 +147,14 @@ message CreateCircleEventRequest {
 
 message CreateCircleEventResponse {
   event.v1.Event event = 1;
+}
+
+message DeleteCircleRequest {
+  string circle_id = 1;
+}
+
+message DeleteCircleResponse {
+  string status = 1;
 }
 
 message Circle {

@@ -29,13 +29,14 @@ func (i *Implementation) AIReview(ctx context.Context, req *v1.AIReviewRequest) 
 	}
 	return &v1.AIReviewResponse{
 		Review: &commonv1.InterviewSolutionReview{
-			Provider:           review.Provider,
-			Model:              review.Model,
-			Score:              int32(review.Score),
-			Summary:            review.Summary,
-			Strengths:          review.Strengths,
-			Issues:             review.Issues,
-			FollowUpQuestions:  review.FollowUpQuestions,
+			Provider:          review.Provider,
+			Model:             review.Model,
+			Score:             int32(review.Score),
+			Summary:           review.Summary,
+			Strengths:         review.Strengths,
+			Issues:            review.Issues,
+			FollowUpQuestions: review.FollowUpQuestions,
+			Gaps:              review.Gaps,
 		},
 	}, nil
 }

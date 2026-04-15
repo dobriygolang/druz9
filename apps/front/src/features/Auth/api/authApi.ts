@@ -1,6 +1,6 @@
 import { apiClient } from '@/shared/api/base'
 import { createCache } from '@/shared/api/cache'
-import type { CompleteProfilePayload, ProfileProgress, ProfileResponse, User } from '@/entities/User/model/types'
+import type { CompleteProfilePayload, ProfileProgress, ProfileResponse, User, UserGoal } from '@/entities/User/model/types'
 
 type BackendUser = {
   id: string
@@ -125,6 +125,10 @@ export const authApi = {
   updateProfile: async (payload: { currentWorkplace?: string }): Promise<ProfileResponse> => {
     const r = await apiClient.post<BackendProfileResponse>('/api/v1/profile/update', { currentWorkplace: payload.currentWorkplace })
     return normalizeProfileResponse(r.data)
+  },
+  setUserGoal: async (goal: { kind: string; company?: string }): Promise<UserGoal> => {
+    const r = await apiClient.post<{ goal?: UserGoal }>('/api/v1/profile/goal', goal)
+    return r.data.goal ?? { kind: goal.kind as UserGoal['kind'], company: goal.company ?? '' }
   },
   logout: async () => {
     await apiClient.post('/api/v1/profile/auth/logout', {})

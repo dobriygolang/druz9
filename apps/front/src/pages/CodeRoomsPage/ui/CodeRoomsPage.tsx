@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { Code2, Users, Plus, ChevronRight, Copy, Check, EyeOff } from 'lucide-react'
+import { useTranslation } from 'react-i18next'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import type { Room } from '@/entities/CodeRoom/model/types'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
@@ -11,20 +12,22 @@ import { Modal } from '@/shared/ui/Modal'
 import { Select } from '@/shared/ui/Select'
 
 const MODE_LABELS: Record<string, string> = {
-  ROOM_MODE_ALL: 'Совместная',
-  ROOM_MODE_DUEL: 'Дуэль',
+  ROOM_MODE_ALL: 'Collaborative',
+  ROOM_MODE_DUEL: 'Duel',
 }
 
 const STATUS_LABELS: Record<string, { label: string; variant: 'success' | 'warning' | 'default' }> = {
-  ROOM_STATUS_WAITING: { label: 'Ожидание', variant: 'warning' },
-  ROOM_STATUS_ACTIVE: { label: 'Активна', variant: 'success' },
-  ROOM_STATUS_FINISHED: { label: 'Завершена', variant: 'default' },
+  ROOM_STATUS_WAITING: { label: 'Waiting', variant: 'warning' },
+  ROOM_STATUS_ACTIVE: { label: 'Active', variant: 'success' },
+  ROOM_STATUS_FINISHED: { label: 'Finished', variant: 'default' },
 }
 
 export function CodeRoomsPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const isMobile = useIsMobile()
   const [rooms, setRooms] = useState<Room[]>([])
+  const [loadingRooms, setLoadingRooms] = useState(true)
   const [showCreate, setShowCreate] = useState(false)
   const [creating, setCreating] = useState(false)
   const [mode, setMode] = useState('ROOM_MODE_ALL')
@@ -32,11 +35,26 @@ export function CodeRoomsPage() {
   const [createdRoom, setCreatedRoom] = useState<Room | null>(null)
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
-  useEffect(() => {
+  const fetchRooms = (isActive: () => boolean) => {
+    setLoadingRooms(true)
     codeRoomApi.listRooms()
-      .then(all => all.filter(r => !r.taskId))
-      .then(setRooms)
+      .then(all => all.filter(r => !r.taskId && r.status !== 'ROOM_STATUS_FINISHED'))
+      .then(all => {
+        if (isActive()) setRooms(all)
+      })
       .catch((err) => { console.error('CodeRoomsPage fetch error:', err) })
+      .finally(() => {
+        if (isActive()) setLoadingRooms(false)
+      })
+  }
+
+  useEffect(() => {
+    let active = true
+    setRooms([])
+    fetchRooms(() => active)
+    return () => {
+      active = false
+    }
   }, [])
 
   const getRoomShareUrl = (room: Room) =>
@@ -74,10 +92,10 @@ export function CodeRoomsPage() {
           <div className="mt-3 flex items-end justify-between gap-4">
             <div>
               <h1 className="text-[28px] font-bold leading-none text-[#111111]">{rooms.length}</h1>
-              <p className="mt-2 text-sm leading-6 text-[#475569]">Совместное решение задач, дуэли и приватные комнаты с инвайтами.</p>
+              <p className="mt-2 text-sm leading-6 text-[#475569]">{t('rooms.mobileSubtitle')}</p>
             </div>
             <div className="rounded-[24px] border border-white/80 bg-white/78 px-4 py-3 text-right shadow-sm backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">Приватных</p>
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">{t('rooms.privateCount')}</p>
               <p className="mt-2 font-mono text-xl font-bold text-[#111111]">{rooms.filter(room => room.isPrivate).length}</p>
             </div>
           </div>
@@ -87,31 +105,43 @@ export function CodeRoomsPage() {
             className="mt-4 w-full justify-center gap-2 rounded-2xl"
             onClick={() => { setMode('ROOM_MODE_ALL'); setIsPrivate(false); setCreatedRoom(null); setShowCreate(true) }}
           >
-            <Plus className="w-4 h-4" /> Создать комнату
+            <Plus className="w-4 h-4" /> {t('rooms.create')}
           </Button>
         </div>
       ) : (
         <div className="mb-6 flex items-center justify-between">
           <div>
             <h1 className="text-lg font-bold text-[#111111]">Code Rooms</h1>
-            <p className="mt-0.5 text-xs text-[#666666]">Совместное решение задач в реальном времени</p>
+            <p className="mt-0.5 text-xs text-[#666666]">{t('rooms.subtitle')}</p>
           </div>
           <Button variant="orange" size="md" className="gap-2" onClick={() => { setMode('ROOM_MODE_ALL'); setIsPrivate(false); setCreatedRoom(null); setShowCreate(true) }}>
-            <Plus className="w-4 h-4" /> Создать комнату
+            <Plus className="w-4 h-4" /> {t('rooms.create')}
           </Button>
         </div>
       )}
 
       {/* Room list */}
       <div className="flex flex-col gap-3">
-        {rooms.length === 0 && (
+        {loadingRooms ? (
+          <>
+            {[0, 1, 2].map(i => (
+              <div key={i} className="animate-pulse bg-white rounded-2xl border border-[#CBCCC9] p-4 flex gap-4">
+                <div className="h-10 w-10 rounded-xl bg-[#E7E8E5] flex-shrink-0" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-4 w-40 bg-[#E7E8E5] rounded" />
+                  <div className="h-3 w-28 bg-[#E7E8E5] rounded" />
+                </div>
+              </div>
+            ))}
+          </>
+        ) : rooms.length === 0 ? (
           <Card padding="lg" className="text-center py-16">
             <Code2 className="w-10 h-10 mx-auto mb-3 text-[#94a3b8] opacity-40" />
-            <p className="text-sm font-medium text-[#666666]">Нет активных комнат</p>
-            <p className="text-xs text-[#94a3b8] mt-1">Создайте комнату или присоединитесь по ссылке</p>
+            <p className="text-sm font-medium text-[#666666]">{t('rooms.emptyTitle')}</p>
+            <p className="text-xs text-[#94a3b8] mt-1">{t('rooms.emptyBody')}</p>
           </Card>
-        )}
-        {rooms.map((room) => {
+        ) : null}
+        {!loadingRooms && rooms.map((room) => {
           const st = STATUS_LABELS[room.status] ?? { label: room.status, variant: 'default' as const }
           return (
             <div
@@ -131,11 +161,11 @@ export function CodeRoomsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className={`flex gap-2 ${isMobile ? 'flex-wrap' : 'items-center'}`}>
-                    <p className="text-sm font-semibold text-[#111111]">{room.task || `Комната ${room.id.slice(0, 6)}`}</p>
+                    <p className="text-sm font-semibold text-[#111111]">{room.task || `${t('rooms.room')} ${room.id.slice(0, 6)}`}</p>
                     <Badge variant={st.variant}>{st.label}</Badge>
                     {room.isPrivate && (
                       <span className="flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium bg-[#f1f5f9] text-[#64748b] rounded-full">
-                        <EyeOff className="w-3 h-3" /> Приват
+                        <EyeOff className="w-3 h-3" /> {t('rooms.private')}
                       </span>
                     )}
                   </div>
@@ -153,10 +183,10 @@ export function CodeRoomsPage() {
                 className={`flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs text-[#666666] transition-colors hover:bg-[#F2F3F0] hover:text-[#111111] dark:text-[#4d6380] dark:hover:bg-[#1a2236] dark:hover:text-[#c8d8ec] ${
                   isMobile ? 'w-full justify-center border border-[#e2e8f0] bg-[#f8fafc] px-3 py-2.5 font-medium' : ''
                 }`}
-                title="Скопировать ссылку"
+                title={t('rooms.copyLink')}
               >
                 {copiedId === room.id ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Copy className="w-3.5 h-3.5" />}
-                <span className={isMobile ? '' : 'hidden sm:inline'}>{copiedId === room.id ? 'Скопировано' : 'Ссылка'}</span>
+                <span className={isMobile ? '' : 'hidden sm:inline'}>{copiedId === room.id ? t('common.copied') : t('rooms.link')}</span>
               </button>
             </div>
           )
@@ -167,26 +197,26 @@ export function CodeRoomsPage() {
       <Modal
         open={showCreate}
         onClose={() => setShowCreate(false)}
-        title={createdRoom ? 'Комната создана' : 'Новая комната'}
+        title={createdRoom ? t('rooms.createdTitle') : t('rooms.newTitle')}
         footer={
           createdRoom ? (
             <>
               <Button variant="secondary" size="sm" onClick={() => { copyRoomLink(createdRoom); }}>
-                {copiedId === createdRoom.id ? <><Check className="w-3.5 h-3.5" /> Скопировано</> : <><Copy className="w-3.5 h-3.5" /> Скопировать ссылку</>}
+                {copiedId === createdRoom.id ? <><Check className="w-3.5 h-3.5" /> {t('common.copied')}</> : <><Copy className="w-3.5 h-3.5" /> {t('rooms.copyLink')}</>}
               </Button>
-              <Button variant="orange" size="sm" onClick={handleGoToRoom}>Перейти в комнату</Button>
+              <Button variant="orange" size="sm" onClick={handleGoToRoom}>{t('rooms.openRoom')}</Button>
             </>
           ) : (
             <>
-              <Button variant="secondary" size="sm" onClick={() => setShowCreate(false)}>Отмена</Button>
-              <Button variant="orange" size="sm" onClick={handleCreate} loading={creating}>Создать</Button>
+              <Button variant="secondary" size="sm" onClick={() => setShowCreate(false)}>{t('common.cancel')}</Button>
+              <Button variant="orange" size="sm" onClick={handleCreate} loading={creating}>{t('common.create')}</Button>
             </>
           )
         }
       >
         {createdRoom ? (
           <div className="flex flex-col gap-3">
-            <p className="text-sm text-[#666666]">Комната готова. Скопируйте ссылку и отправьте её участникам.</p>
+            <p className="text-sm text-[#666666]">{t('rooms.createdBody')}</p>
             <div className="flex items-center gap-2 p-3 bg-[#F2F3F0] rounded-lg">
               <code className="flex-1 text-xs text-[#111111] font-mono truncate">
                 {getRoomShareUrl(createdRoom)}
@@ -202,8 +232,8 @@ export function CodeRoomsPage() {
         ) : (
           <div className="flex flex-col gap-4">
             <Select
-              label="Режим"
-              options={[{ value: 'ROOM_MODE_ALL', label: 'Совместная' }, { value: 'ROOM_MODE_DUEL', label: 'Дуэль' }]}
+              label={t('rooms.mode')}
+              options={[{ value: 'ROOM_MODE_ALL', label: t('rooms.modeCollaborative') }, { value: 'ROOM_MODE_DUEL', label: t('rooms.modeDuel') }]}
               value={mode}
               onChange={setMode}
             />
@@ -218,8 +248,8 @@ export function CodeRoomsPage() {
                 <EyeOff className={`w-4 h-4 ${isPrivate ? 'text-white' : 'text-[#94a3b8]'}`} />
               </div>
               <div className="flex-1 min-w-0">
-                <p className={`text-sm font-medium ${isPrivate ? 'text-[#4f46e5]' : 'text-[#111111]'}`}>Приватная комната</p>
-                <p className="text-xs text-[#666666] mt-0.5">Войти можно только по инвайт-ссылке</p>
+                <p className={`text-sm font-medium ${isPrivate ? 'text-[#4f46e5]' : 'text-[#111111]'}`}>{t('rooms.privateRoom')}</p>
+                <p className="text-xs text-[#666666] mt-0.5">{t('rooms.privateHint')}</p>
               </div>
               <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${
                 isPrivate ? 'border-[#6366F1] bg-[#6366F1]' : 'border-[#CBCCC9]'

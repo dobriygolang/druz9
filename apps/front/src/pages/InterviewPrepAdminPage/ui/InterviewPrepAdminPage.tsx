@@ -61,10 +61,10 @@ export function InterviewPrepAdminPage() {
       <div className="flex items-center justify-between mb-5">
         <div>
           <h1 className="text-xl font-bold text-[#0f172a]">Interview Prep</h1>
-          <p className="text-sm text-[#666666] mt-0.5">Управление задачами и шаблонами</p>
+          <p className="text-sm text-[#666666] mt-0.5">Task and template management</p>
         </div>
         <Button variant="orange" onClick={() => { setEditTask({}); setShowEdit(true) }}>
-          <Plus className="w-4 h-4" /> Добавить задачу
+          <Plus className="w-4 h-4" /> Add task
         </Button>
       </div>
 
@@ -92,7 +92,7 @@ export function InterviewPrepAdminPage() {
                 <div className="w-20 h-4 bg-[#F2F3F0] rounded" />
               </div>
             )) : tasks.length === 0 ? (
-              <div className="px-5 py-12 text-center text-sm text-[#94a3b8]">Задач не найдено</div>
+              <div className="px-5 py-12 text-center text-sm text-[#94a3b8]">No tasks found</div>
             ) : tasks.map((task, i) => (
               <div key={task.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#F2F3F0]">
                 <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center flex-shrink-0">
@@ -100,7 +100,7 @@ export function InterviewPrepAdminPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#0f172a] truncate">{task.title}</p>
-                  <p className="text-xs text-[#666666]">{task.companyTag ?? 'General'} · {Math.round((task.durationSeconds ?? 0) / 60)} мин</p>
+                  <p className="text-xs text-[#666666]">{task.companyTag ?? 'General'} · {Math.round((task.durationSeconds ?? 0) / 60)} min</p>
                 </div>
                 <Badge variant={task.prepType === 'coding' ? 'indigo' : task.prepType === 'system_design' ? 'orange' : 'success'}>
                   {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
@@ -124,13 +124,13 @@ export function InterviewPrepAdminPage() {
 
       {activeTab === 'pools' && (
         <div className="bg-white rounded-xl border border-[#CBCCC9] p-8 text-center text-[#94a3b8] text-sm">
-          Управление пулами вопросов — скоро
+          Question pool management coming soon
         </div>
       )}
 
       {activeTab === 'presets' && (
         <div className="bg-white rounded-xl border border-[#CBCCC9] p-8 text-center text-[#94a3b8] text-sm">
-          Управление пресетами компаний — скоро
+          Company preset management coming soon
         </div>
       )}
 
@@ -138,21 +138,21 @@ export function InterviewPrepAdminPage() {
       <Modal
         open={showEdit}
         onClose={() => { setShowEdit(false); setEditTask(null) }}
-        title={editTask?.id ? 'Редактировать задачу' : 'Новая задача'}
+        title={editTask?.id ? 'Edit task' : 'New task'}
         size="lg"
         footer={
           <>
-            <Button variant="secondary" size="sm" onClick={() => { setShowEdit(false); setEditTask(null) }}>Отмена</Button>
-            <Button variant="orange" size="sm" onClick={handleSave} loading={saving}>Сохранить</Button>
+            <Button variant="secondary" size="sm" onClick={() => { setShowEdit(false); setEditTask(null) }}>Cancel</Button>
+            <Button variant="orange" size="sm" onClick={handleSave} loading={saving}>Save</Button>
           </>
         }
       >
         {editTask && (
           <div className="grid grid-cols-2 gap-4">
-            <Input label="Название" value={editTask.title ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, title: e.target.value }))} />
+            <Input label="Title" value={editTask.title ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, title: e.target.value }))} />
             <Input label="Slug" value={editTask.slug ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, slug: e.target.value }))} />
             <Select
-              label="Тип"
+              label="Type"
               options={[
                 { value: 'coding', label: 'Coding' },
                 { value: 'algorithm', label: 'Algorithm' },
@@ -165,7 +165,7 @@ export function InterviewPrepAdminPage() {
               onChange={v => setEditTask((t: any) => ({ ...t, prepType: v }))}
             />
             <Select
-              label="Язык"
+              label="Language"
               options={[
                 { value: 'python3', label: 'Python 3' },
                 { value: 'go', label: 'Go' },
@@ -176,16 +176,16 @@ export function InterviewPrepAdminPage() {
               value={editTask.language ?? 'python3'}
               onChange={v => setEditTask((t: any) => ({ ...t, language: v }))}
             />
-            <Input label="Компания" value={editTask.companyTag ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, companyTag: e.target.value }))} placeholder="google, yandex, ..." />
-            <Input label="Длительность (сек)" type="number" value={editTask.durationSeconds ?? 2700} onChange={e => setEditTask((t: any) => ({ ...t, durationSeconds: parseInt(e.target.value) }))} />
+            <Input label="Company" value={editTask.companyTag ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, companyTag: e.target.value }))} placeholder="google, yandex, ..." />
+            <Input label="Duration (sec)" type="number" value={editTask.durationSeconds ?? 2700} onChange={e => setEditTask((t: any) => ({ ...t, durationSeconds: parseInt(e.target.value) }))} />
             <div className="col-span-2">
-              <Textarea label="Описание задачи" value={editTask.statement ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, statement: e.target.value }))} rows={5} />
+              <Textarea label="Task description" value={editTask.statement ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, statement: e.target.value }))} rows={5} />
             </div>
             <div className="flex items-center gap-2">
-              <Toggle checked={editTask.isActive ?? true} onChange={v => setEditTask((t: any) => ({ ...t, isActive: v }))} label="Активна" />
+              <Toggle checked={editTask.isActive ?? true} onChange={v => setEditTask((t: any) => ({ ...t, isActive: v }))} label="Active" />
             </div>
             <div className="flex items-center gap-2">
-              <Toggle checked={editTask.isExecutable ?? false} onChange={v => setEditTask((t: any) => ({ ...t, isExecutable: v }))} label="Исполняемая" />
+              <Toggle checked={editTask.isExecutable ?? false} onChange={v => setEditTask((t: any) => ({ ...t, isExecutable: v }))} label="Executable" />
             </div>
           </div>
         )}
@@ -195,9 +195,9 @@ export function InterviewPrepAdminPage() {
         open={!!deleteId}
         onClose={() => setDeleteId(null)}
         onConfirm={handleDelete}
-        title="Удалить задачу"
-        message="Это действие нельзя отменить."
-        confirmLabel="Удалить"
+        title="Delete task"
+        message="This action cannot be undone."
+        confirmLabel="Delete"
         danger
       />
     </div>

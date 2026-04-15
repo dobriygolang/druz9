@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { Calendar, MapPin, Users, Plus, Link2, User, X, Clock, Trash2 } from 'lucide-react'
 import { useOutletContext } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { eventApi, type Event, type CreateEventPayload } from '@/features/Event/api/eventApi'
 import { Card } from '@/shared/ui/Card'
 import { Badge } from '@/shared/ui/Badge'
@@ -12,6 +13,12 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { useToast } from '@/shared/ui/Toast'
 import { formatDate, formatTime } from '@/shared/lib/dateFormat'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
+import { PageMeta } from '@/shared/ui/PageMeta'
+
+function formatEventScheduleLabel(t: (key: string, params?: Record<string, unknown>) => string, scheduledAt?: string) {
+  if (!scheduledAt) return t('events.scheduleUnknown')
+  return `${formatDate(scheduledAt)} · ${formatTime(scheduledAt)}`
+}
 
 function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
   event: Event
@@ -20,6 +27,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
   onLeave: (id: string) => Promise<void>
   onDelete: (id: string) => Promise<void>
 }) {
+  const { t } = useTranslation()
   const [loading, setLoading] = useState(false)
   const [deleting, setDeleting] = useState(false)
 
@@ -60,7 +68,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
           <h2 className="text-lg font-bold text-white pr-10 leading-snug">{event.title}</h2>
           {event.isJoined && (
             <span className="mt-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-[#22c55e]/20 text-[#86efac]">
-              Вы идёте
+              {t('events.joined')}
             </span>
           )}
         </div>
@@ -68,20 +76,24 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
           {/* Date & time */}
-          {event.scheduledAt && (
-            <div className="flex items-start gap-3">
-              <div className="w-9 h-9 rounded-lg bg-[#f0f0ff] flex items-center justify-center flex-shrink-0">
-                <Clock className="w-4 h-4 text-[#6366F1]" />
-              </div>
-              <div>
-                <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide">Дата и время</p>
-                <p className="text-sm font-semibold text-[#111111] mt-0.5">
-                  {formatDate(event.scheduledAt)}
-                </p>
-                <p className="text-sm text-[#666666]">{formatTime(event.scheduledAt)}</p>
-              </div>
+          <div className="flex items-start gap-3">
+            <div className="w-9 h-9 rounded-lg bg-[#f0f0ff] flex items-center justify-center flex-shrink-0">
+              <Clock className="w-4 h-4 text-[#6366F1]" />
             </div>
-          )}
+            <div>
+              <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide">{t('events.dateTime')}</p>
+              {event.scheduledAt ? (
+                <>
+                  <p className="text-sm font-semibold text-[#111111] mt-0.5">
+                    {formatDate(event.scheduledAt)}
+                  </p>
+                  <p className="text-sm text-[#666666]">{formatTime(event.scheduledAt)}</p>
+                </>
+              ) : (
+                <p className="text-sm text-[#666666] mt-0.5">{t('events.scheduleUnknown')}</p>
+              )}
+            </div>
+          </div>
 
           {/* Location */}
           {(event.city || event.placeLabel) && (
@@ -90,7 +102,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
                 <MapPin className="w-4 h-4 text-[#22c55e]" />
               </div>
               <div>
-                <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide">Место</p>
+                <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide">{t('events.place')}</p>
                 <p className="text-sm font-semibold text-[#111111] mt-0.5">
                   {event.city || event.placeLabel}
                 </p>
@@ -107,7 +119,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
               <Users className="w-4 h-4 text-[#f97316]" />
             </div>
             <div>
-              <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide">Участников</p>
+              <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide">{t('events.participants')}</p>
               <p className="text-sm font-semibold text-[#111111] mt-0.5">{event.participantCount}</p>
             </div>
           </div>
@@ -119,7 +131,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
                 <User className="w-4 h-4 text-[#94a3b8]" />
               </div>
               <div>
-                <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide">Организатор</p>
+                <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide">{t('events.organizer')}</p>
                 <p className="text-sm font-semibold text-[#111111] mt-0.5">{event.creatorName}</p>
               </div>
             </div>
@@ -128,7 +140,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
           {/* Description */}
           {event.description && (
             <div className="p-4 bg-[#f8f9fa] rounded-xl">
-              <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide mb-2">Описание</p>
+              <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide mb-2">{t('events.descriptionLabel')}</p>
               <p className="text-sm text-[#475569] leading-relaxed whitespace-pre-wrap">{event.description}</p>
             </div>
           )}
@@ -145,7 +157,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
                 <Link2 className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-xs text-[#94a3b8] font-medium">Ссылка на встречу</p>
+                <p className="text-xs text-[#94a3b8] font-medium">{t('events.meetingLink')}</p>
                 <p className="text-sm text-[#6366F1] font-medium truncate group-hover:underline">{event.meetingLink}</p>
               </div>
             </a>
@@ -155,7 +167,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
         {/* Footer */}
         <div className="flex flex-col gap-2 border-t border-[#e2e8f0] px-6 py-4 sm:flex-row">
           <Button variant="secondary" size="sm" onClick={onClose} className="flex-1 justify-center">
-            Закрыть
+            {t('events.close')}
           </Button>
           {event.isCreator ? (
             <Button
@@ -165,7 +177,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
               onClick={handleDelete}
               loading={deleting}
             >
-              <Trash2 className="w-4 h-4" /> Удалить
+              <Trash2 className="w-4 h-4" /> {t('events.delete')}
             </Button>
           ) : (
             <Button
@@ -175,7 +187,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
               onClick={handleAction}
               loading={loading}
             >
-              {event.isJoined ? 'Отказаться' : 'Участвовать'}
+              {event.isJoined ? t('events.leave') : t('events.join')}
             </Button>
           )}
         </div>
@@ -186,6 +198,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
 }
 
 export function EventsPage() {
+  const { t } = useTranslation()
   const { toast } = useToast()
   const isMobile = useIsMobile()
   const ctx = useOutletContext<{ openCreateEvent?: boolean; setOpenCreateEvent?: (v: boolean) => void } | null>()
@@ -204,9 +217,9 @@ export function EventsPage() {
     setLoading(true)
     eventApi.listEvents({ limit: 6 })
       .then(r => setEvents(r.events))
-      .catch(() => setError('Не удалось загрузить данные'))
+      .catch(() => setError(t('common.loadFailed')))
       .finally(() => setLoading(false))
-  }, [])
+  }, [t])
 
   useEffect(() => { fetchEvents() }, [fetchEvents])
 
@@ -222,9 +235,9 @@ export function EventsPage() {
       const updated = await eventApi.joinEvent(id)
       setEvents(prev => prev.map(e => e.id === id ? updated : e))
       setSelectedEvent(prev => prev?.id === id ? updated : prev)
-      toast('Вы записались на событие', 'success')
+      toast(t('events.toast.joined'), 'success')
     } catch {
-      toast('Не удалось записаться', 'error')
+      toast(t('events.toast.joinFailed'), 'error')
     }
   }
 
@@ -233,9 +246,9 @@ export function EventsPage() {
       await eventApi.leaveEvent(id)
       setEvents(prev => prev.map(e => e.id === id ? { ...e, isJoined: false, participantCount: Math.max(e.participantCount - 1, 0) } : e))
       setSelectedEvent(prev => prev?.id === id ? { ...prev, isJoined: false, participantCount: Math.max(prev.participantCount - 1, 0) } : prev)
-      toast('Вы отказались от участия', 'success')
+      toast(t('events.toast.left'), 'success')
     } catch {
-      toast('Не удалось отказаться', 'error')
+      toast(t('events.toast.leaveFailed'), 'error')
     }
   }
 
@@ -244,9 +257,9 @@ export function EventsPage() {
       await eventApi.deleteEvent(id)
       setEvents(prev => prev.filter(e => e.id !== id))
       setSelectedEvent(null)
-      toast('Событие удалено', 'success')
+      toast(t('events.toast.deleted'), 'success')
     } catch {
-      toast('Не удалось удалить событие', 'error')
+      toast(t('events.toast.deleteFailed'), 'error')
     }
   }
 
@@ -265,9 +278,9 @@ export function EventsPage() {
       setForm({})
       setInviteIds([])
       setInviteInput('')
-      toast('Событие создано', 'success')
+      toast(t('events.toast.created'), 'success')
     } catch {
-      toast('Не удалось создать событие', 'error')
+      toast(t('events.toast.createFailed'), 'error')
     } finally { setCreating(false) }
   }
 
@@ -277,36 +290,37 @@ export function EventsPage() {
 
   return (
     <div className={isMobile ? 'px-4 pt-4 pb-6' : 'px-6 pt-4 pb-6'}>
+      <PageMeta title={t('events.meta.title')} description={t('events.meta.description')} canonicalPath="/community/events" />
       {isMobile ? (
         <section className="section-enter mb-4 overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(239,246,255,0.94)_46%,_rgba(255,247,237,0.95))] p-5 shadow-[0_18px_36px_rgba(15,23,42,0.08)] dark:border-[#1a2540] dark:bg-[linear-gradient(145deg,_rgba(22,28,45,0.98),_rgba(19,25,41,0.92)_54%,_rgba(42,32,10,0.62))] md:p-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
               <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1] dark:text-[#a5b4fc]">
-                Events Board
+                {t('events.boardEyebrow')}
               </p>
               <h2 className="mt-2 text-2xl font-semibold text-[#111111] dark:text-[#f8fafc]">
-                Ближайшие встречи сообщества
+                {t('events.hero.title')}
               </h2>
               <p className="mt-2 text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">
-                Открывай карточку, чтобы быстро понять формат, место и кто уже идёт. Создание события теперь не теряется на мобильном экране.
+                {t('events.hero.subtitleMobile')}
               </p>
             </div>
 
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="grid grid-cols-2 gap-2">
                 <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/72">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">Всего</p>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">{t('events.total')}</p>
                   <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : events.length}</p>
                 </div>
                 <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/72">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">Вы идёте</p>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">{t('events.going')}</p>
                   <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : joinedCount}</p>
                 </div>
               </div>
 
               <Button variant="orange" size="lg" onClick={() => setShowCreate(true)} className="justify-center rounded-full px-5">
                 <Plus className="w-4 h-4" />
-                Создать событие
+                {t('events.create')}
               </Button>
             </div>
           </div>
@@ -314,19 +328,19 @@ export function EventsPage() {
       ) : (
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">Ближайшие встречи сообщества</h2>
-            <p className="mt-1 text-sm text-[#666666] dark:text-[#7e93b0]">Созвоны, офлайн-встречи и локальные мини-митапы.</p>
+            <h2 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">{t('events.hero.title')}</h2>
+            <p className="mt-1 text-sm text-[#666666] dark:text-[#7e93b0]">{t('events.hero.subtitle')}</p>
           </div>
 
           <div className="flex items-center gap-4">
             <div className="flex items-center gap-4 text-sm text-[#666666] dark:text-[#7e93b0]">
-              <span><span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{loading ? '—' : events.length}</span> событий</span>
+              <span><span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{loading ? '—' : events.length}</span> {t('events.count', { count: events.length })}</span>
               <span className="h-4 w-px bg-[#CBCCC9] dark:bg-[#1e3158]" />
-              <span><span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{loading ? '—' : joinedCount}</span> иду</span>
+              <span><span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{loading ? '—' : joinedCount}</span> {t('events.goingCount', { count: joinedCount })}</span>
             </div>
             <Button variant="orange" size="md" onClick={() => setShowCreate(true)}>
               <Plus className="w-4 h-4" />
-              Создать событие
+              {t('events.create')}
             </Button>
           </div>
         </div>
@@ -346,15 +360,15 @@ export function EventsPage() {
           <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#EEF2FF] dark:bg-[#1e1e4a]">
             <Calendar className="h-8 w-8 text-[#6366F1]" />
           </div>
-          <h3 className="text-lg font-semibold text-[#111111] dark:text-[#f8fafc]">Пока нет событий</h3>
+          <h3 className="text-lg font-semibold text-[#111111] dark:text-[#f8fafc]">{t('events.empty.title')}</h3>
           <p className="mt-2 max-w-md text-sm leading-6 text-[#667085] dark:text-[#94a3b8]">
             {isMobile
-              ? 'Собери первую встречу, созвон или локальный мини-митап. На телефоне это теперь можно сделать в пару касаний.'
-              : 'Собери первую встречу, созвон или локальный мини-митап для сообщества.'}
+              ? t('events.empty.mobile')
+              : t('events.empty.desktop')}
           </p>
           <Button variant="orange" size="md" onClick={() => setShowCreate(true)} className="mt-5 rounded-full px-5">
             <Plus className="w-4 h-4" />
-            Создать первое событие
+            {t('events.emptyCta')}
           </Button>
         </div>
       ) : (
@@ -374,7 +388,7 @@ export function EventsPage() {
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#f0f0ff] dark:bg-[#1e1e4a]">
                   <Calendar className="h-5 w-5 text-[#6366F1]" />
                 </div>
-                {event.isJoined && <Badge variant="success">Вы идёте</Badge>}
+                  {event.isJoined && <Badge variant="success">{t('events.joined')}</Badge>}
               </div>
 
               <div className="space-y-2">
@@ -384,11 +398,9 @@ export function EventsPage() {
                     {event.description}
                   </p>
                 )}
-                {event.scheduledAt && (
-                  <p className="text-xs font-medium text-[#667085] dark:text-[#94a3b8]">
-                    {formatDate(event.scheduledAt)} · {formatTime(event.scheduledAt)}
-                  </p>
-                )}
+                <p className="text-xs font-medium text-[#667085] dark:text-[#94a3b8]">
+                  {formatEventScheduleLabel(t, event.scheduledAt)}
+                </p>
               </div>
 
               <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
@@ -423,28 +435,28 @@ export function EventsPage() {
       <Modal
         open={showCreate}
         onClose={() => { setShowCreate(false); setForm({}); setInviteIds([]); setInviteInput('') }}
-        title="Новое событие"
+        title={t('events.modal.new')}
         footer={
           <>
-            <Button variant="secondary" size="sm" onClick={() => { setShowCreate(false); setForm({}); setInviteIds([]); setInviteInput('') }}>Отмена</Button>
-            <Button variant="orange" size="sm" onClick={handleCreate} loading={creating} disabled={!form.title || !form.description}>Создать</Button>
+            <Button variant="secondary" size="sm" onClick={() => { setShowCreate(false); setForm({}); setInviteIds([]); setInviteInput('') }}>{t('events.modal.cancel')}</Button>
+            <Button variant="orange" size="sm" onClick={handleCreate} loading={creating} disabled={!form.title || !form.description}>{t('events.modal.create')}</Button>
           </>
         }
       >
         <div className="flex flex-col gap-4">
           {/* Required */}
           <Input
-            label="Название *"
+            label={t('events.form.title')}
             value={form.title ?? ''}
             onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
-            placeholder="Название события"
+            placeholder={t('events.form.titlePlaceholder')}
           />
           <div>
-            <label className="block text-xs font-medium text-[#475569] mb-1.5">Описание *</label>
+            <label className="block text-xs font-medium text-[#475569] mb-1.5">{t('events.form.description')}</label>
             <textarea
               value={form.description ?? ''}
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
-              placeholder="Расскажите о событии..."
+              placeholder={t('events.form.descriptionPlaceholder')}
               rows={3}
               className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 placeholder:text-[#94a3b8] resize-none"
             />
@@ -452,15 +464,15 @@ export function EventsPage() {
 
           {/* Optional */}
           <div className="border-t border-[#F2F3F0] pt-4 flex flex-col gap-3">
-            <p className="text-xs text-[#94a3b8] -mb-1">Необязательно</p>
-            <Input label="Дата и время" type="datetime-local" value={form.scheduledAt ?? ''} onChange={e => setForm(f => ({ ...f, scheduledAt: e.target.value }))} />
-            <Input label="Место" value={form.placeLabel ?? ''} onChange={e => setForm(f => ({ ...f, placeLabel: e.target.value }))} placeholder="Город, место" />
-            <Input label="Ссылка на встречу" value={form.meetingLink ?? ''} onChange={e => setForm(f => ({ ...f, meetingLink: e.target.value }))} placeholder="https://..." />
+            <p className="text-xs text-[#94a3b8] -mb-1">{t('events.form.optional')}</p>
+            <Input label={t('events.form.dateTime')} type="datetime-local" value={form.scheduledAt ?? ''} onChange={e => setForm(f => ({ ...f, scheduledAt: e.target.value }))} />
+            <Input label={t('events.form.place')} value={form.placeLabel ?? ''} onChange={e => setForm(f => ({ ...f, placeLabel: e.target.value }))} placeholder={t('events.form.placePlaceholder')} />
+            <Input label={t('events.form.link')} value={form.meetingLink ?? ''} onChange={e => setForm(f => ({ ...f, meetingLink: e.target.value }))} placeholder="https://..." />
           </div>
 
           {/* Invite */}
           <div className="border-t border-[#F2F3F0] pt-4">
-            <label className="block text-xs font-medium text-[#475569] mb-1.5">Пригласить участников</label>
+            <label className="block text-xs font-medium text-[#475569] mb-1.5">{t('events.form.invite')}</label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <input
                 value={inviteInput}
@@ -473,7 +485,7 @@ export function EventsPage() {
                     setInviteInput('')
                   }
                 }}
-                placeholder="ID пользователя, Enter для добавления"
+                placeholder={t('events.form.invitePlaceholder')}
                 className="flex-1 px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
               />
               <button

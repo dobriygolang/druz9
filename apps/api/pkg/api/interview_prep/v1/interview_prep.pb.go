@@ -936,6 +936,7 @@ type SubmitMockStageRequest struct {
 	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
 	Language      v1.ProgrammingLanguage `protobuf:"varint,3,opt,name=language,proto3,enum=common.v1.ProgrammingLanguage" json:"language,omitempty"` // was: string
 	Notes         string                 `protobuf:"bytes,4,opt,name=notes,proto3" json:"notes,omitempty"`
+	StageKind     MockStageKind          `protobuf:"varint,5,opt,name=stage_kind,json=stageKind,proto3,enum=interview_prep.v1.MockStageKind" json:"stage_kind,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -996,6 +997,13 @@ func (x *SubmitMockStageRequest) GetNotes() string {
 		return x.Notes
 	}
 	return ""
+}
+
+func (x *SubmitMockStageRequest) GetStageKind() MockStageKind {
+	if x != nil {
+		return x.StageKind
+	}
+	return MockStageKind_MOCK_STAGE_KIND_UNSPECIFIED
 }
 
 type ReviewMockSystemDesignRequest struct {
@@ -5462,13 +5470,15 @@ const file_interview_prep_v1_interview_prep_proto_rawDesc = "" +
 	"\fprogram_slug\x18\x02 \x01(\tR\vprogramSlug\"6\n" +
 	"\x15GetMockSessionRequest\x12\x1d\n" +
 	"\n" +
-	"session_id\x18\x01 \x01(\tR\tsessionId\"\x9d\x01\n" +
+	"session_id\x18\x01 \x01(\tR\tsessionId\"\xde\x01\n" +
 	"\x16SubmitMockStageRequest\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\tR\x04code\x12:\n" +
 	"\blanguage\x18\x03 \x01(\x0e2\x1e.common.v1.ProgrammingLanguageR\blanguage\x12\x14\n" +
-	"\x05notes\x18\x04 \x01(\tR\x05notes\"~\n" +
+	"\x05notes\x18\x04 \x01(\tR\x05notes\x12?\n" +
+	"\n" +
+	"stage_kind\x18\x05 \x01(\x0e2 .interview_prep.v1.MockStageKindR\tstageKind\"~\n" +
 	"\x1dReviewMockSystemDesignRequest\x12\x1d\n" +
 	"\n" +
 	"session_id\x18\x01 \x01(\tR\tsessionId\x12>\n" +
@@ -6052,165 +6062,166 @@ var file_interview_prep_v1_interview_prep_proto_depIdxs = []int32{
 	5,   // 1: interview_prep.v1.AnswerQuestionRequest.self_assessment:type_name -> interview_prep.v1.SelfAssessment
 	11,  // 2: interview_prep.v1.ReviewSystemDesignRequest.design:type_name -> interview_prep.v1.SystemDesignPayload
 	82,  // 3: interview_prep.v1.SubmitMockStageRequest.language:type_name -> common.v1.ProgrammingLanguage
-	11,  // 4: interview_prep.v1.ReviewMockSystemDesignRequest.design:type_name -> interview_prep.v1.SystemDesignPayload
-	68,  // 5: interview_prep.v1.SessionEnvelope.session:type_name -> interview_prep.v1.InterviewPrepSession
-	73,  // 6: interview_prep.v1.MockSessionEnvelope.session:type_name -> interview_prep.v1.MockSession
-	65,  // 7: interview_prep.v1.ListTasksResponse.tasks:type_name -> interview_prep.v1.InterviewPrepTask
-	75,  // 8: interview_prep.v1.ListMockBlueprintsResponse.blueprints:type_name -> interview_prep.v1.MockBlueprint
-	83,  // 9: interview_prep.v1.SubmitSessionResult.failure_kind:type_name -> common.v1.SubmitFailureKind
-	68,  // 10: interview_prep.v1.SubmitSessionResult.session:type_name -> interview_prep.v1.InterviewPrepSession
-	35,  // 11: interview_prep.v1.SubmitSessionResponse.result:type_name -> interview_prep.v1.SubmitSessionResult
-	68,  // 12: interview_prep.v1.AnswerQuestionResponse.session:type_name -> interview_prep.v1.InterviewPrepSession
-	66,  // 13: interview_prep.v1.AnswerQuestionResponse.answered_question:type_name -> interview_prep.v1.InterviewPrepQuestion
-	70,  // 14: interview_prep.v1.AnswerQuestionResponse.review:type_name -> interview_prep.v1.InterviewAnswerReview
-	69,  // 15: interview_prep.v1.ReviewSystemDesignResponse.review:type_name -> interview_prep.v1.SystemDesignReview
-	83,  // 16: interview_prep.v1.SubmitMockStageResult.failure_kind:type_name -> common.v1.SubmitFailureKind
-	84,  // 17: interview_prep.v1.SubmitMockStageResult.review:type_name -> common.v1.InterviewSolutionReview
-	73,  // 18: interview_prep.v1.SubmitMockStageResult.session:type_name -> interview_prep.v1.MockSession
-	39,  // 19: interview_prep.v1.SubmitMockStageResponse.result:type_name -> interview_prep.v1.SubmitMockStageResult
-	69,  // 20: interview_prep.v1.ReviewMockSystemDesignResult.review:type_name -> interview_prep.v1.SystemDesignReview
-	73,  // 21: interview_prep.v1.ReviewMockSystemDesignResult.session:type_name -> interview_prep.v1.MockSession
-	41,  // 22: interview_prep.v1.ReviewMockSystemDesignResponse.result:type_name -> interview_prep.v1.ReviewMockSystemDesignResult
-	70,  // 23: interview_prep.v1.AnswerMockQuestionResult.review:type_name -> interview_prep.v1.InterviewAnswerReview
-	73,  // 24: interview_prep.v1.AnswerMockQuestionResult.session:type_name -> interview_prep.v1.MockSession
-	43,  // 25: interview_prep.v1.AnswerMockQuestionResponse.result:type_name -> interview_prep.v1.AnswerMockQuestionResult
-	0,   // 26: interview_prep.v1.AdminTaskPayload.prep_type:type_name -> interview_prep.v1.PrepType
-	82,  // 27: interview_prep.v1.AdminTaskPayload.language:type_name -> common.v1.ProgrammingLanguage
-	85,  // 28: interview_prep.v1.AdminTaskPayload.execution_profile:type_name -> common.v1.ExecutionProfile
-	86,  // 29: interview_prep.v1.AdminTaskPayload.runner_mode:type_name -> common.v1.RunnerMode
-	45,  // 30: interview_prep.v1.CreateAdminTaskRequest.task:type_name -> interview_prep.v1.AdminTaskPayload
-	45,  // 31: interview_prep.v1.UpdateAdminTaskRequest.task:type_name -> interview_prep.v1.AdminTaskPayload
-	65,  // 32: interview_prep.v1.ListAdminTasksResponse.tasks:type_name -> interview_prep.v1.InterviewPrepTask
-	65,  // 33: interview_prep.v1.AdminTaskEnvelope.task:type_name -> interview_prep.v1.InterviewPrepTask
-	50,  // 34: interview_prep.v1.CreateAdminQuestionRequest.question:type_name -> interview_prep.v1.AdminQuestionPayload
-	50,  // 35: interview_prep.v1.UpdateAdminQuestionRequest.question:type_name -> interview_prep.v1.AdminQuestionPayload
-	66,  // 36: interview_prep.v1.ListAdminQuestionsResponse.questions:type_name -> interview_prep.v1.InterviewPrepQuestion
-	66,  // 37: interview_prep.v1.AdminQuestionEnvelope.question:type_name -> interview_prep.v1.InterviewPrepQuestion
-	55,  // 38: interview_prep.v1.CreateMockQuestionPoolRequest.item:type_name -> interview_prep.v1.MockQuestionPoolPayload
-	55,  // 39: interview_prep.v1.UpdateMockQuestionPoolRequest.item:type_name -> interview_prep.v1.MockQuestionPoolPayload
-	76,  // 40: interview_prep.v1.MockQuestionPoolListResponse.items:type_name -> interview_prep.v1.MockQuestionPoolItem
-	76,  // 41: interview_prep.v1.MockQuestionPoolEnvelope.item:type_name -> interview_prep.v1.MockQuestionPoolItem
-	60,  // 42: interview_prep.v1.CreateMockCompanyPresetRequest.item:type_name -> interview_prep.v1.MockCompanyPresetPayload
-	60,  // 43: interview_prep.v1.UpdateMockCompanyPresetRequest.item:type_name -> interview_prep.v1.MockCompanyPresetPayload
-	77,  // 44: interview_prep.v1.MockCompanyPresetListResponse.items:type_name -> interview_prep.v1.MockCompanyPreset
-	77,  // 45: interview_prep.v1.MockCompanyPresetEnvelope.item:type_name -> interview_prep.v1.MockCompanyPreset
-	0,   // 46: interview_prep.v1.InterviewPrepTask.prep_type:type_name -> interview_prep.v1.PrepType
-	82,  // 47: interview_prep.v1.InterviewPrepTask.language:type_name -> common.v1.ProgrammingLanguage
-	85,  // 48: interview_prep.v1.InterviewPrepTask.execution_profile:type_name -> common.v1.ExecutionProfile
-	86,  // 49: interview_prep.v1.InterviewPrepTask.runner_mode:type_name -> common.v1.RunnerMode
-	87,  // 50: interview_prep.v1.InterviewPrepTask.created_at:type_name -> google.protobuf.Timestamp
-	87,  // 51: interview_prep.v1.InterviewPrepTask.updated_at:type_name -> google.protobuf.Timestamp
-	87,  // 52: interview_prep.v1.InterviewPrepQuestion.created_at:type_name -> google.protobuf.Timestamp
-	87,  // 53: interview_prep.v1.InterviewPrepQuestion.updated_at:type_name -> google.protobuf.Timestamp
-	5,   // 54: interview_prep.v1.InterviewPrepQuestionResult.self_assessment:type_name -> interview_prep.v1.SelfAssessment
-	87,  // 55: interview_prep.v1.InterviewPrepQuestionResult.answered_at:type_name -> google.protobuf.Timestamp
-	1,   // 56: interview_prep.v1.InterviewPrepSession.status:type_name -> interview_prep.v1.SessionStatus
-	87,  // 57: interview_prep.v1.InterviewPrepSession.started_at:type_name -> google.protobuf.Timestamp
-	87,  // 58: interview_prep.v1.InterviewPrepSession.finished_at:type_name -> google.protobuf.Timestamp
-	87,  // 59: interview_prep.v1.InterviewPrepSession.created_at:type_name -> google.protobuf.Timestamp
-	87,  // 60: interview_prep.v1.InterviewPrepSession.updated_at:type_name -> google.protobuf.Timestamp
-	65,  // 61: interview_prep.v1.InterviewPrepSession.task:type_name -> interview_prep.v1.InterviewPrepTask
-	66,  // 62: interview_prep.v1.InterviewPrepSession.current_question:type_name -> interview_prep.v1.InterviewPrepQuestion
-	67,  // 63: interview_prep.v1.InterviewPrepSession.results:type_name -> interview_prep.v1.InterviewPrepQuestionResult
-	87,  // 64: interview_prep.v1.MockQuestionResult.answered_at:type_name -> google.protobuf.Timestamp
-	87,  // 65: interview_prep.v1.MockQuestionResult.created_at:type_name -> google.protobuf.Timestamp
-	87,  // 66: interview_prep.v1.MockQuestionResult.updated_at:type_name -> google.protobuf.Timestamp
-	3,   // 67: interview_prep.v1.MockStage.kind:type_name -> interview_prep.v1.MockStageKind
-	4,   // 68: interview_prep.v1.MockStage.status:type_name -> interview_prep.v1.MockStageStatus
-	87,  // 69: interview_prep.v1.MockStage.started_at:type_name -> google.protobuf.Timestamp
-	87,  // 70: interview_prep.v1.MockStage.finished_at:type_name -> google.protobuf.Timestamp
-	87,  // 71: interview_prep.v1.MockStage.created_at:type_name -> google.protobuf.Timestamp
-	87,  // 72: interview_prep.v1.MockStage.updated_at:type_name -> google.protobuf.Timestamp
-	65,  // 73: interview_prep.v1.MockStage.task:type_name -> interview_prep.v1.InterviewPrepTask
-	71,  // 74: interview_prep.v1.MockStage.question_results:type_name -> interview_prep.v1.MockQuestionResult
-	71,  // 75: interview_prep.v1.MockStage.current_question:type_name -> interview_prep.v1.MockQuestionResult
-	2,   // 76: interview_prep.v1.MockSession.status:type_name -> interview_prep.v1.MockSessionStatus
-	87,  // 77: interview_prep.v1.MockSession.started_at:type_name -> google.protobuf.Timestamp
-	87,  // 78: interview_prep.v1.MockSession.finished_at:type_name -> google.protobuf.Timestamp
-	87,  // 79: interview_prep.v1.MockSession.created_at:type_name -> google.protobuf.Timestamp
-	87,  // 80: interview_prep.v1.MockSession.updated_at:type_name -> google.protobuf.Timestamp
-	72,  // 81: interview_prep.v1.MockSession.stages:type_name -> interview_prep.v1.MockStage
-	72,  // 82: interview_prep.v1.MockSession.current_stage:type_name -> interview_prep.v1.MockStage
-	74,  // 83: interview_prep.v1.MockBlueprint.rounds:type_name -> interview_prep.v1.MockBlueprintRound
-	87,  // 84: interview_prep.v1.MockQuestionPoolItem.created_at:type_name -> google.protobuf.Timestamp
-	87,  // 85: interview_prep.v1.MockQuestionPoolItem.updated_at:type_name -> google.protobuf.Timestamp
-	87,  // 86: interview_prep.v1.MockCompanyPreset.created_at:type_name -> google.protobuf.Timestamp
-	87,  // 87: interview_prep.v1.MockCompanyPreset.updated_at:type_name -> google.protobuf.Timestamp
-	87,  // 88: interview_prep.v1.CheckpointProgress.started_at:type_name -> google.protobuf.Timestamp
-	87,  // 89: interview_prep.v1.CheckpointProgress.finished_at:type_name -> google.protobuf.Timestamp
-	87,  // 90: interview_prep.v1.CheckpointProgress.created_at:type_name -> google.protobuf.Timestamp
-	87,  // 91: interview_prep.v1.CheckpointProgress.updated_at:type_name -> google.protobuf.Timestamp
-	68,  // 92: interview_prep.v1.CheckpointSessionResponse.session:type_name -> interview_prep.v1.InterviewPrepSession
-	80,  // 93: interview_prep.v1.CheckpointSessionResponse.checkpoint:type_name -> interview_prep.v1.CheckpointProgress
-	6,   // 94: interview_prep.v1.InterviewPrepService.ListTasks:input_type -> interview_prep.v1.ListTasksRequest
-	7,   // 95: interview_prep.v1.InterviewPrepService.StartSession:input_type -> interview_prep.v1.StartSessionRequest
-	8,   // 96: interview_prep.v1.InterviewPrepService.GetSession:input_type -> interview_prep.v1.GetSessionRequest
-	9,   // 97: interview_prep.v1.InterviewPrepService.SubmitSession:input_type -> interview_prep.v1.SubmitSessionRequest
-	10,  // 98: interview_prep.v1.InterviewPrepService.AnswerQuestion:input_type -> interview_prep.v1.AnswerQuestionRequest
-	12,  // 99: interview_prep.v1.InterviewPrepService.ReviewSystemDesign:input_type -> interview_prep.v1.ReviewSystemDesignRequest
-	13,  // 100: interview_prep.v1.InterviewPrepService.ListCompanies:input_type -> interview_prep.v1.ListCompaniesRequest
-	14,  // 101: interview_prep.v1.InterviewPrepService.ListMockBlueprints:input_type -> interview_prep.v1.ListMockBlueprintsRequest
-	15,  // 102: interview_prep.v1.InterviewPrepService.StartMockSession:input_type -> interview_prep.v1.StartMockSessionRequest
-	16,  // 103: interview_prep.v1.InterviewPrepService.GetMockSession:input_type -> interview_prep.v1.GetMockSessionRequest
-	17,  // 104: interview_prep.v1.InterviewPrepService.SubmitMockStage:input_type -> interview_prep.v1.SubmitMockStageRequest
-	18,  // 105: interview_prep.v1.InterviewPrepService.ReviewMockSystemDesign:input_type -> interview_prep.v1.ReviewMockSystemDesignRequest
-	19,  // 106: interview_prep.v1.InterviewPrepService.AnswerMockQuestion:input_type -> interview_prep.v1.AnswerMockQuestionRequest
-	20,  // 107: interview_prep.v1.InterviewPrepService.ListAdminTasks:input_type -> interview_prep.v1.ListAdminTasksRequest
-	46,  // 108: interview_prep.v1.InterviewPrepService.CreateAdminTask:input_type -> interview_prep.v1.CreateAdminTaskRequest
-	21,  // 109: interview_prep.v1.InterviewPrepService.GetAdminTask:input_type -> interview_prep.v1.GetAdminTaskRequest
-	47,  // 110: interview_prep.v1.InterviewPrepService.UpdateAdminTask:input_type -> interview_prep.v1.UpdateAdminTaskRequest
-	22,  // 111: interview_prep.v1.InterviewPrepService.DeleteAdminTask:input_type -> interview_prep.v1.DeleteAdminTaskRequest
-	23,  // 112: interview_prep.v1.InterviewPrepService.ListAdminQuestions:input_type -> interview_prep.v1.ListAdminQuestionsRequest
-	51,  // 113: interview_prep.v1.InterviewPrepService.CreateAdminQuestion:input_type -> interview_prep.v1.CreateAdminQuestionRequest
-	52,  // 114: interview_prep.v1.InterviewPrepService.UpdateAdminQuestion:input_type -> interview_prep.v1.UpdateAdminQuestionRequest
-	24,  // 115: interview_prep.v1.InterviewPrepService.DeleteAdminQuestion:input_type -> interview_prep.v1.DeleteAdminQuestionRequest
-	25,  // 116: interview_prep.v1.InterviewPrepService.ListMockQuestionPools:input_type -> interview_prep.v1.ListMockQuestionPoolsRequest
-	56,  // 117: interview_prep.v1.InterviewPrepService.CreateMockQuestionPool:input_type -> interview_prep.v1.CreateMockQuestionPoolRequest
-	57,  // 118: interview_prep.v1.InterviewPrepService.UpdateMockQuestionPool:input_type -> interview_prep.v1.UpdateMockQuestionPoolRequest
-	26,  // 119: interview_prep.v1.InterviewPrepService.DeleteMockQuestionPool:input_type -> interview_prep.v1.DeleteMockQuestionPoolRequest
-	27,  // 120: interview_prep.v1.InterviewPrepService.ListMockCompanyPresets:input_type -> interview_prep.v1.ListMockCompanyPresetsRequest
-	61,  // 121: interview_prep.v1.InterviewPrepService.CreateMockCompanyPreset:input_type -> interview_prep.v1.CreateMockCompanyPresetRequest
-	62,  // 122: interview_prep.v1.InterviewPrepService.UpdateMockCompanyPreset:input_type -> interview_prep.v1.UpdateMockCompanyPresetRequest
-	28,  // 123: interview_prep.v1.InterviewPrepService.DeleteMockCompanyPreset:input_type -> interview_prep.v1.DeleteMockCompanyPresetRequest
-	78,  // 124: interview_prep.v1.InterviewPrepService.StartCheckpointSession:input_type -> interview_prep.v1.StartCheckpointSessionRequest
-	79,  // 125: interview_prep.v1.InterviewPrepService.GetCheckpointBySession:input_type -> interview_prep.v1.GetCheckpointBySessionRequest
-	32,  // 126: interview_prep.v1.InterviewPrepService.ListTasks:output_type -> interview_prep.v1.ListTasksResponse
-	30,  // 127: interview_prep.v1.InterviewPrepService.StartSession:output_type -> interview_prep.v1.SessionEnvelope
-	30,  // 128: interview_prep.v1.InterviewPrepService.GetSession:output_type -> interview_prep.v1.SessionEnvelope
-	36,  // 129: interview_prep.v1.InterviewPrepService.SubmitSession:output_type -> interview_prep.v1.SubmitSessionResponse
-	37,  // 130: interview_prep.v1.InterviewPrepService.AnswerQuestion:output_type -> interview_prep.v1.AnswerQuestionResponse
-	38,  // 131: interview_prep.v1.InterviewPrepService.ReviewSystemDesign:output_type -> interview_prep.v1.ReviewSystemDesignResponse
-	33,  // 132: interview_prep.v1.InterviewPrepService.ListCompanies:output_type -> interview_prep.v1.ListCompaniesResponse
-	34,  // 133: interview_prep.v1.InterviewPrepService.ListMockBlueprints:output_type -> interview_prep.v1.ListMockBlueprintsResponse
-	31,  // 134: interview_prep.v1.InterviewPrepService.StartMockSession:output_type -> interview_prep.v1.MockSessionEnvelope
-	31,  // 135: interview_prep.v1.InterviewPrepService.GetMockSession:output_type -> interview_prep.v1.MockSessionEnvelope
-	40,  // 136: interview_prep.v1.InterviewPrepService.SubmitMockStage:output_type -> interview_prep.v1.SubmitMockStageResponse
-	42,  // 137: interview_prep.v1.InterviewPrepService.ReviewMockSystemDesign:output_type -> interview_prep.v1.ReviewMockSystemDesignResponse
-	44,  // 138: interview_prep.v1.InterviewPrepService.AnswerMockQuestion:output_type -> interview_prep.v1.AnswerMockQuestionResponse
-	48,  // 139: interview_prep.v1.InterviewPrepService.ListAdminTasks:output_type -> interview_prep.v1.ListAdminTasksResponse
-	49,  // 140: interview_prep.v1.InterviewPrepService.CreateAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
-	49,  // 141: interview_prep.v1.InterviewPrepService.GetAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
-	49,  // 142: interview_prep.v1.InterviewPrepService.UpdateAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
-	29,  // 143: interview_prep.v1.InterviewPrepService.DeleteAdminTask:output_type -> interview_prep.v1.StatusResponse
-	53,  // 144: interview_prep.v1.InterviewPrepService.ListAdminQuestions:output_type -> interview_prep.v1.ListAdminQuestionsResponse
-	54,  // 145: interview_prep.v1.InterviewPrepService.CreateAdminQuestion:output_type -> interview_prep.v1.AdminQuestionEnvelope
-	54,  // 146: interview_prep.v1.InterviewPrepService.UpdateAdminQuestion:output_type -> interview_prep.v1.AdminQuestionEnvelope
-	29,  // 147: interview_prep.v1.InterviewPrepService.DeleteAdminQuestion:output_type -> interview_prep.v1.StatusResponse
-	58,  // 148: interview_prep.v1.InterviewPrepService.ListMockQuestionPools:output_type -> interview_prep.v1.MockQuestionPoolListResponse
-	59,  // 149: interview_prep.v1.InterviewPrepService.CreateMockQuestionPool:output_type -> interview_prep.v1.MockQuestionPoolEnvelope
-	59,  // 150: interview_prep.v1.InterviewPrepService.UpdateMockQuestionPool:output_type -> interview_prep.v1.MockQuestionPoolEnvelope
-	29,  // 151: interview_prep.v1.InterviewPrepService.DeleteMockQuestionPool:output_type -> interview_prep.v1.StatusResponse
-	63,  // 152: interview_prep.v1.InterviewPrepService.ListMockCompanyPresets:output_type -> interview_prep.v1.MockCompanyPresetListResponse
-	64,  // 153: interview_prep.v1.InterviewPrepService.CreateMockCompanyPreset:output_type -> interview_prep.v1.MockCompanyPresetEnvelope
-	64,  // 154: interview_prep.v1.InterviewPrepService.UpdateMockCompanyPreset:output_type -> interview_prep.v1.MockCompanyPresetEnvelope
-	29,  // 155: interview_prep.v1.InterviewPrepService.DeleteMockCompanyPreset:output_type -> interview_prep.v1.StatusResponse
-	81,  // 156: interview_prep.v1.InterviewPrepService.StartCheckpointSession:output_type -> interview_prep.v1.CheckpointSessionResponse
-	81,  // 157: interview_prep.v1.InterviewPrepService.GetCheckpointBySession:output_type -> interview_prep.v1.CheckpointSessionResponse
-	126, // [126:158] is the sub-list for method output_type
-	94,  // [94:126] is the sub-list for method input_type
-	94,  // [94:94] is the sub-list for extension type_name
-	94,  // [94:94] is the sub-list for extension extendee
-	0,   // [0:94] is the sub-list for field type_name
+	3,   // 4: interview_prep.v1.SubmitMockStageRequest.stage_kind:type_name -> interview_prep.v1.MockStageKind
+	11,  // 5: interview_prep.v1.ReviewMockSystemDesignRequest.design:type_name -> interview_prep.v1.SystemDesignPayload
+	68,  // 6: interview_prep.v1.SessionEnvelope.session:type_name -> interview_prep.v1.InterviewPrepSession
+	73,  // 7: interview_prep.v1.MockSessionEnvelope.session:type_name -> interview_prep.v1.MockSession
+	65,  // 8: interview_prep.v1.ListTasksResponse.tasks:type_name -> interview_prep.v1.InterviewPrepTask
+	75,  // 9: interview_prep.v1.ListMockBlueprintsResponse.blueprints:type_name -> interview_prep.v1.MockBlueprint
+	83,  // 10: interview_prep.v1.SubmitSessionResult.failure_kind:type_name -> common.v1.SubmitFailureKind
+	68,  // 11: interview_prep.v1.SubmitSessionResult.session:type_name -> interview_prep.v1.InterviewPrepSession
+	35,  // 12: interview_prep.v1.SubmitSessionResponse.result:type_name -> interview_prep.v1.SubmitSessionResult
+	68,  // 13: interview_prep.v1.AnswerQuestionResponse.session:type_name -> interview_prep.v1.InterviewPrepSession
+	66,  // 14: interview_prep.v1.AnswerQuestionResponse.answered_question:type_name -> interview_prep.v1.InterviewPrepQuestion
+	70,  // 15: interview_prep.v1.AnswerQuestionResponse.review:type_name -> interview_prep.v1.InterviewAnswerReview
+	69,  // 16: interview_prep.v1.ReviewSystemDesignResponse.review:type_name -> interview_prep.v1.SystemDesignReview
+	83,  // 17: interview_prep.v1.SubmitMockStageResult.failure_kind:type_name -> common.v1.SubmitFailureKind
+	84,  // 18: interview_prep.v1.SubmitMockStageResult.review:type_name -> common.v1.InterviewSolutionReview
+	73,  // 19: interview_prep.v1.SubmitMockStageResult.session:type_name -> interview_prep.v1.MockSession
+	39,  // 20: interview_prep.v1.SubmitMockStageResponse.result:type_name -> interview_prep.v1.SubmitMockStageResult
+	69,  // 21: interview_prep.v1.ReviewMockSystemDesignResult.review:type_name -> interview_prep.v1.SystemDesignReview
+	73,  // 22: interview_prep.v1.ReviewMockSystemDesignResult.session:type_name -> interview_prep.v1.MockSession
+	41,  // 23: interview_prep.v1.ReviewMockSystemDesignResponse.result:type_name -> interview_prep.v1.ReviewMockSystemDesignResult
+	70,  // 24: interview_prep.v1.AnswerMockQuestionResult.review:type_name -> interview_prep.v1.InterviewAnswerReview
+	73,  // 25: interview_prep.v1.AnswerMockQuestionResult.session:type_name -> interview_prep.v1.MockSession
+	43,  // 26: interview_prep.v1.AnswerMockQuestionResponse.result:type_name -> interview_prep.v1.AnswerMockQuestionResult
+	0,   // 27: interview_prep.v1.AdminTaskPayload.prep_type:type_name -> interview_prep.v1.PrepType
+	82,  // 28: interview_prep.v1.AdminTaskPayload.language:type_name -> common.v1.ProgrammingLanguage
+	85,  // 29: interview_prep.v1.AdminTaskPayload.execution_profile:type_name -> common.v1.ExecutionProfile
+	86,  // 30: interview_prep.v1.AdminTaskPayload.runner_mode:type_name -> common.v1.RunnerMode
+	45,  // 31: interview_prep.v1.CreateAdminTaskRequest.task:type_name -> interview_prep.v1.AdminTaskPayload
+	45,  // 32: interview_prep.v1.UpdateAdminTaskRequest.task:type_name -> interview_prep.v1.AdminTaskPayload
+	65,  // 33: interview_prep.v1.ListAdminTasksResponse.tasks:type_name -> interview_prep.v1.InterviewPrepTask
+	65,  // 34: interview_prep.v1.AdminTaskEnvelope.task:type_name -> interview_prep.v1.InterviewPrepTask
+	50,  // 35: interview_prep.v1.CreateAdminQuestionRequest.question:type_name -> interview_prep.v1.AdminQuestionPayload
+	50,  // 36: interview_prep.v1.UpdateAdminQuestionRequest.question:type_name -> interview_prep.v1.AdminQuestionPayload
+	66,  // 37: interview_prep.v1.ListAdminQuestionsResponse.questions:type_name -> interview_prep.v1.InterviewPrepQuestion
+	66,  // 38: interview_prep.v1.AdminQuestionEnvelope.question:type_name -> interview_prep.v1.InterviewPrepQuestion
+	55,  // 39: interview_prep.v1.CreateMockQuestionPoolRequest.item:type_name -> interview_prep.v1.MockQuestionPoolPayload
+	55,  // 40: interview_prep.v1.UpdateMockQuestionPoolRequest.item:type_name -> interview_prep.v1.MockQuestionPoolPayload
+	76,  // 41: interview_prep.v1.MockQuestionPoolListResponse.items:type_name -> interview_prep.v1.MockQuestionPoolItem
+	76,  // 42: interview_prep.v1.MockQuestionPoolEnvelope.item:type_name -> interview_prep.v1.MockQuestionPoolItem
+	60,  // 43: interview_prep.v1.CreateMockCompanyPresetRequest.item:type_name -> interview_prep.v1.MockCompanyPresetPayload
+	60,  // 44: interview_prep.v1.UpdateMockCompanyPresetRequest.item:type_name -> interview_prep.v1.MockCompanyPresetPayload
+	77,  // 45: interview_prep.v1.MockCompanyPresetListResponse.items:type_name -> interview_prep.v1.MockCompanyPreset
+	77,  // 46: interview_prep.v1.MockCompanyPresetEnvelope.item:type_name -> interview_prep.v1.MockCompanyPreset
+	0,   // 47: interview_prep.v1.InterviewPrepTask.prep_type:type_name -> interview_prep.v1.PrepType
+	82,  // 48: interview_prep.v1.InterviewPrepTask.language:type_name -> common.v1.ProgrammingLanguage
+	85,  // 49: interview_prep.v1.InterviewPrepTask.execution_profile:type_name -> common.v1.ExecutionProfile
+	86,  // 50: interview_prep.v1.InterviewPrepTask.runner_mode:type_name -> common.v1.RunnerMode
+	87,  // 51: interview_prep.v1.InterviewPrepTask.created_at:type_name -> google.protobuf.Timestamp
+	87,  // 52: interview_prep.v1.InterviewPrepTask.updated_at:type_name -> google.protobuf.Timestamp
+	87,  // 53: interview_prep.v1.InterviewPrepQuestion.created_at:type_name -> google.protobuf.Timestamp
+	87,  // 54: interview_prep.v1.InterviewPrepQuestion.updated_at:type_name -> google.protobuf.Timestamp
+	5,   // 55: interview_prep.v1.InterviewPrepQuestionResult.self_assessment:type_name -> interview_prep.v1.SelfAssessment
+	87,  // 56: interview_prep.v1.InterviewPrepQuestionResult.answered_at:type_name -> google.protobuf.Timestamp
+	1,   // 57: interview_prep.v1.InterviewPrepSession.status:type_name -> interview_prep.v1.SessionStatus
+	87,  // 58: interview_prep.v1.InterviewPrepSession.started_at:type_name -> google.protobuf.Timestamp
+	87,  // 59: interview_prep.v1.InterviewPrepSession.finished_at:type_name -> google.protobuf.Timestamp
+	87,  // 60: interview_prep.v1.InterviewPrepSession.created_at:type_name -> google.protobuf.Timestamp
+	87,  // 61: interview_prep.v1.InterviewPrepSession.updated_at:type_name -> google.protobuf.Timestamp
+	65,  // 62: interview_prep.v1.InterviewPrepSession.task:type_name -> interview_prep.v1.InterviewPrepTask
+	66,  // 63: interview_prep.v1.InterviewPrepSession.current_question:type_name -> interview_prep.v1.InterviewPrepQuestion
+	67,  // 64: interview_prep.v1.InterviewPrepSession.results:type_name -> interview_prep.v1.InterviewPrepQuestionResult
+	87,  // 65: interview_prep.v1.MockQuestionResult.answered_at:type_name -> google.protobuf.Timestamp
+	87,  // 66: interview_prep.v1.MockQuestionResult.created_at:type_name -> google.protobuf.Timestamp
+	87,  // 67: interview_prep.v1.MockQuestionResult.updated_at:type_name -> google.protobuf.Timestamp
+	3,   // 68: interview_prep.v1.MockStage.kind:type_name -> interview_prep.v1.MockStageKind
+	4,   // 69: interview_prep.v1.MockStage.status:type_name -> interview_prep.v1.MockStageStatus
+	87,  // 70: interview_prep.v1.MockStage.started_at:type_name -> google.protobuf.Timestamp
+	87,  // 71: interview_prep.v1.MockStage.finished_at:type_name -> google.protobuf.Timestamp
+	87,  // 72: interview_prep.v1.MockStage.created_at:type_name -> google.protobuf.Timestamp
+	87,  // 73: interview_prep.v1.MockStage.updated_at:type_name -> google.protobuf.Timestamp
+	65,  // 74: interview_prep.v1.MockStage.task:type_name -> interview_prep.v1.InterviewPrepTask
+	71,  // 75: interview_prep.v1.MockStage.question_results:type_name -> interview_prep.v1.MockQuestionResult
+	71,  // 76: interview_prep.v1.MockStage.current_question:type_name -> interview_prep.v1.MockQuestionResult
+	2,   // 77: interview_prep.v1.MockSession.status:type_name -> interview_prep.v1.MockSessionStatus
+	87,  // 78: interview_prep.v1.MockSession.started_at:type_name -> google.protobuf.Timestamp
+	87,  // 79: interview_prep.v1.MockSession.finished_at:type_name -> google.protobuf.Timestamp
+	87,  // 80: interview_prep.v1.MockSession.created_at:type_name -> google.protobuf.Timestamp
+	87,  // 81: interview_prep.v1.MockSession.updated_at:type_name -> google.protobuf.Timestamp
+	72,  // 82: interview_prep.v1.MockSession.stages:type_name -> interview_prep.v1.MockStage
+	72,  // 83: interview_prep.v1.MockSession.current_stage:type_name -> interview_prep.v1.MockStage
+	74,  // 84: interview_prep.v1.MockBlueprint.rounds:type_name -> interview_prep.v1.MockBlueprintRound
+	87,  // 85: interview_prep.v1.MockQuestionPoolItem.created_at:type_name -> google.protobuf.Timestamp
+	87,  // 86: interview_prep.v1.MockQuestionPoolItem.updated_at:type_name -> google.protobuf.Timestamp
+	87,  // 87: interview_prep.v1.MockCompanyPreset.created_at:type_name -> google.protobuf.Timestamp
+	87,  // 88: interview_prep.v1.MockCompanyPreset.updated_at:type_name -> google.protobuf.Timestamp
+	87,  // 89: interview_prep.v1.CheckpointProgress.started_at:type_name -> google.protobuf.Timestamp
+	87,  // 90: interview_prep.v1.CheckpointProgress.finished_at:type_name -> google.protobuf.Timestamp
+	87,  // 91: interview_prep.v1.CheckpointProgress.created_at:type_name -> google.protobuf.Timestamp
+	87,  // 92: interview_prep.v1.CheckpointProgress.updated_at:type_name -> google.protobuf.Timestamp
+	68,  // 93: interview_prep.v1.CheckpointSessionResponse.session:type_name -> interview_prep.v1.InterviewPrepSession
+	80,  // 94: interview_prep.v1.CheckpointSessionResponse.checkpoint:type_name -> interview_prep.v1.CheckpointProgress
+	6,   // 95: interview_prep.v1.InterviewPrepService.ListTasks:input_type -> interview_prep.v1.ListTasksRequest
+	7,   // 96: interview_prep.v1.InterviewPrepService.StartSession:input_type -> interview_prep.v1.StartSessionRequest
+	8,   // 97: interview_prep.v1.InterviewPrepService.GetSession:input_type -> interview_prep.v1.GetSessionRequest
+	9,   // 98: interview_prep.v1.InterviewPrepService.SubmitSession:input_type -> interview_prep.v1.SubmitSessionRequest
+	10,  // 99: interview_prep.v1.InterviewPrepService.AnswerQuestion:input_type -> interview_prep.v1.AnswerQuestionRequest
+	12,  // 100: interview_prep.v1.InterviewPrepService.ReviewSystemDesign:input_type -> interview_prep.v1.ReviewSystemDesignRequest
+	13,  // 101: interview_prep.v1.InterviewPrepService.ListCompanies:input_type -> interview_prep.v1.ListCompaniesRequest
+	14,  // 102: interview_prep.v1.InterviewPrepService.ListMockBlueprints:input_type -> interview_prep.v1.ListMockBlueprintsRequest
+	15,  // 103: interview_prep.v1.InterviewPrepService.StartMockSession:input_type -> interview_prep.v1.StartMockSessionRequest
+	16,  // 104: interview_prep.v1.InterviewPrepService.GetMockSession:input_type -> interview_prep.v1.GetMockSessionRequest
+	17,  // 105: interview_prep.v1.InterviewPrepService.SubmitMockStage:input_type -> interview_prep.v1.SubmitMockStageRequest
+	18,  // 106: interview_prep.v1.InterviewPrepService.ReviewMockSystemDesign:input_type -> interview_prep.v1.ReviewMockSystemDesignRequest
+	19,  // 107: interview_prep.v1.InterviewPrepService.AnswerMockQuestion:input_type -> interview_prep.v1.AnswerMockQuestionRequest
+	20,  // 108: interview_prep.v1.InterviewPrepService.ListAdminTasks:input_type -> interview_prep.v1.ListAdminTasksRequest
+	46,  // 109: interview_prep.v1.InterviewPrepService.CreateAdminTask:input_type -> interview_prep.v1.CreateAdminTaskRequest
+	21,  // 110: interview_prep.v1.InterviewPrepService.GetAdminTask:input_type -> interview_prep.v1.GetAdminTaskRequest
+	47,  // 111: interview_prep.v1.InterviewPrepService.UpdateAdminTask:input_type -> interview_prep.v1.UpdateAdminTaskRequest
+	22,  // 112: interview_prep.v1.InterviewPrepService.DeleteAdminTask:input_type -> interview_prep.v1.DeleteAdminTaskRequest
+	23,  // 113: interview_prep.v1.InterviewPrepService.ListAdminQuestions:input_type -> interview_prep.v1.ListAdminQuestionsRequest
+	51,  // 114: interview_prep.v1.InterviewPrepService.CreateAdminQuestion:input_type -> interview_prep.v1.CreateAdminQuestionRequest
+	52,  // 115: interview_prep.v1.InterviewPrepService.UpdateAdminQuestion:input_type -> interview_prep.v1.UpdateAdminQuestionRequest
+	24,  // 116: interview_prep.v1.InterviewPrepService.DeleteAdminQuestion:input_type -> interview_prep.v1.DeleteAdminQuestionRequest
+	25,  // 117: interview_prep.v1.InterviewPrepService.ListMockQuestionPools:input_type -> interview_prep.v1.ListMockQuestionPoolsRequest
+	56,  // 118: interview_prep.v1.InterviewPrepService.CreateMockQuestionPool:input_type -> interview_prep.v1.CreateMockQuestionPoolRequest
+	57,  // 119: interview_prep.v1.InterviewPrepService.UpdateMockQuestionPool:input_type -> interview_prep.v1.UpdateMockQuestionPoolRequest
+	26,  // 120: interview_prep.v1.InterviewPrepService.DeleteMockQuestionPool:input_type -> interview_prep.v1.DeleteMockQuestionPoolRequest
+	27,  // 121: interview_prep.v1.InterviewPrepService.ListMockCompanyPresets:input_type -> interview_prep.v1.ListMockCompanyPresetsRequest
+	61,  // 122: interview_prep.v1.InterviewPrepService.CreateMockCompanyPreset:input_type -> interview_prep.v1.CreateMockCompanyPresetRequest
+	62,  // 123: interview_prep.v1.InterviewPrepService.UpdateMockCompanyPreset:input_type -> interview_prep.v1.UpdateMockCompanyPresetRequest
+	28,  // 124: interview_prep.v1.InterviewPrepService.DeleteMockCompanyPreset:input_type -> interview_prep.v1.DeleteMockCompanyPresetRequest
+	78,  // 125: interview_prep.v1.InterviewPrepService.StartCheckpointSession:input_type -> interview_prep.v1.StartCheckpointSessionRequest
+	79,  // 126: interview_prep.v1.InterviewPrepService.GetCheckpointBySession:input_type -> interview_prep.v1.GetCheckpointBySessionRequest
+	32,  // 127: interview_prep.v1.InterviewPrepService.ListTasks:output_type -> interview_prep.v1.ListTasksResponse
+	30,  // 128: interview_prep.v1.InterviewPrepService.StartSession:output_type -> interview_prep.v1.SessionEnvelope
+	30,  // 129: interview_prep.v1.InterviewPrepService.GetSession:output_type -> interview_prep.v1.SessionEnvelope
+	36,  // 130: interview_prep.v1.InterviewPrepService.SubmitSession:output_type -> interview_prep.v1.SubmitSessionResponse
+	37,  // 131: interview_prep.v1.InterviewPrepService.AnswerQuestion:output_type -> interview_prep.v1.AnswerQuestionResponse
+	38,  // 132: interview_prep.v1.InterviewPrepService.ReviewSystemDesign:output_type -> interview_prep.v1.ReviewSystemDesignResponse
+	33,  // 133: interview_prep.v1.InterviewPrepService.ListCompanies:output_type -> interview_prep.v1.ListCompaniesResponse
+	34,  // 134: interview_prep.v1.InterviewPrepService.ListMockBlueprints:output_type -> interview_prep.v1.ListMockBlueprintsResponse
+	31,  // 135: interview_prep.v1.InterviewPrepService.StartMockSession:output_type -> interview_prep.v1.MockSessionEnvelope
+	31,  // 136: interview_prep.v1.InterviewPrepService.GetMockSession:output_type -> interview_prep.v1.MockSessionEnvelope
+	40,  // 137: interview_prep.v1.InterviewPrepService.SubmitMockStage:output_type -> interview_prep.v1.SubmitMockStageResponse
+	42,  // 138: interview_prep.v1.InterviewPrepService.ReviewMockSystemDesign:output_type -> interview_prep.v1.ReviewMockSystemDesignResponse
+	44,  // 139: interview_prep.v1.InterviewPrepService.AnswerMockQuestion:output_type -> interview_prep.v1.AnswerMockQuestionResponse
+	48,  // 140: interview_prep.v1.InterviewPrepService.ListAdminTasks:output_type -> interview_prep.v1.ListAdminTasksResponse
+	49,  // 141: interview_prep.v1.InterviewPrepService.CreateAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
+	49,  // 142: interview_prep.v1.InterviewPrepService.GetAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
+	49,  // 143: interview_prep.v1.InterviewPrepService.UpdateAdminTask:output_type -> interview_prep.v1.AdminTaskEnvelope
+	29,  // 144: interview_prep.v1.InterviewPrepService.DeleteAdminTask:output_type -> interview_prep.v1.StatusResponse
+	53,  // 145: interview_prep.v1.InterviewPrepService.ListAdminQuestions:output_type -> interview_prep.v1.ListAdminQuestionsResponse
+	54,  // 146: interview_prep.v1.InterviewPrepService.CreateAdminQuestion:output_type -> interview_prep.v1.AdminQuestionEnvelope
+	54,  // 147: interview_prep.v1.InterviewPrepService.UpdateAdminQuestion:output_type -> interview_prep.v1.AdminQuestionEnvelope
+	29,  // 148: interview_prep.v1.InterviewPrepService.DeleteAdminQuestion:output_type -> interview_prep.v1.StatusResponse
+	58,  // 149: interview_prep.v1.InterviewPrepService.ListMockQuestionPools:output_type -> interview_prep.v1.MockQuestionPoolListResponse
+	59,  // 150: interview_prep.v1.InterviewPrepService.CreateMockQuestionPool:output_type -> interview_prep.v1.MockQuestionPoolEnvelope
+	59,  // 151: interview_prep.v1.InterviewPrepService.UpdateMockQuestionPool:output_type -> interview_prep.v1.MockQuestionPoolEnvelope
+	29,  // 152: interview_prep.v1.InterviewPrepService.DeleteMockQuestionPool:output_type -> interview_prep.v1.StatusResponse
+	63,  // 153: interview_prep.v1.InterviewPrepService.ListMockCompanyPresets:output_type -> interview_prep.v1.MockCompanyPresetListResponse
+	64,  // 154: interview_prep.v1.InterviewPrepService.CreateMockCompanyPreset:output_type -> interview_prep.v1.MockCompanyPresetEnvelope
+	64,  // 155: interview_prep.v1.InterviewPrepService.UpdateMockCompanyPreset:output_type -> interview_prep.v1.MockCompanyPresetEnvelope
+	29,  // 156: interview_prep.v1.InterviewPrepService.DeleteMockCompanyPreset:output_type -> interview_prep.v1.StatusResponse
+	81,  // 157: interview_prep.v1.InterviewPrepService.StartCheckpointSession:output_type -> interview_prep.v1.CheckpointSessionResponse
+	81,  // 158: interview_prep.v1.InterviewPrepService.GetCheckpointBySession:output_type -> interview_prep.v1.CheckpointSessionResponse
+	127, // [127:159] is the sub-list for method output_type
+	95,  // [95:127] is the sub-list for method input_type
+	95,  // [95:95] is the sub-list for extension type_name
+	95,  // [95:95] is the sub-list for extension extendee
+	0,   // [0:95] is the sub-list for field type_name
 }
 
 func init() { file_interview_prep_v1_interview_prep_proto_init() }

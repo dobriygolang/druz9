@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"api/internal/aireview"
+	"api/internal/app/solutionreview"
 	codeeditordomain "api/internal/domain/codeeditor"
+	"api/internal/model"
 	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/code_editor/v1"
 
@@ -39,20 +41,28 @@ type RealtimePublisher interface {
 	PublishSubmission(roomID string, submission *realtime.CodeEditorSubmissionEvent)
 }
 
+// ReviewService provides post-solve review capabilities.
+type ReviewService interface {
+	StartReview(ctx context.Context, input solutionreview.ReviewInput) (uuid.UUID, error)
+	GetReview(ctx context.Context, submissionID uuid.UUID) (*model.SolutionReview, error)
+}
+
 // Implementation of code editor service.
 type Implementation struct {
 	v1.UnimplementedCodeEditorServiceServer
-	service  Service
-	realtime RealtimePublisher
-	reviewer aireview.Reviewer
+	service       Service
+	realtime      RealtimePublisher
+	reviewer      aireview.Reviewer
+	reviewService ReviewService
 }
 
 // New returns new instance of Implementation.
-func New(service Service, realtime RealtimePublisher, reviewer aireview.Reviewer) *Implementation {
+func New(service Service, realtime RealtimePublisher, reviewer aireview.Reviewer, reviewService ReviewService) *Implementation {
 	return &Implementation{
-		service:  service,
-		realtime: realtime,
-		reviewer: reviewer,
+		service:       service,
+		realtime:      realtime,
+		reviewer:      reviewer,
+		reviewService: reviewService,
 	}
 }
 

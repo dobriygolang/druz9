@@ -2,12 +2,14 @@ import { useEffect, useState, useCallback } from 'react'
 import { createPortal } from 'react-dom'
 import { Search, Plus, Minus, X, ExternalLink } from 'lucide-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/shared/ui/Avatar'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { geoApi, type CommunityPoint } from '@/features/Geo/api/geoApi'
 import { ENV } from '@/shared/config/env'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { CommunityMapCanvas } from './CommunityMapCanvas'
+import { PageMeta } from '@/shared/ui/PageMeta'
 
 const BASE_STYLE_URL = ENV.MAPTILER_KEY
   ? `https://api.maptiler.com/maps/streets-v2/style.json?key=${ENV.MAPTILER_KEY}`
@@ -41,6 +43,7 @@ function applyCustomColors(style: Record<string, unknown>): Record<string, unkno
 }
 
 export function MapPage() {
+  const { t } = useTranslation()
   const navigate = useNavigate()
   const isMobile = useIsMobile()
   const [points, setPoints] = useState<CommunityPoint[]>([])
@@ -65,7 +68,7 @@ export function MapPage() {
     setError(null)
     geoApi.getCommunity()
       .then(setPoints)
-      .catch(() => setError('Не удалось загрузить данные'))
+      .catch(() => setError('Failed to load data'))
   }, [])
 
   useEffect(() => {
@@ -93,6 +96,7 @@ export function MapPage() {
   if (isMobile) {
     return (
       <div className="relative h-full min-h-[400px] overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[#edf2f7]">
+        <PageMeta title={t('map.meta.title')} description={t('map.meta.description')} canonicalPath="/community/map" />
         <CommunityMapCanvas
           className="absolute inset-0"
           mapStyle={mapStyle}
@@ -111,7 +115,7 @@ export function MapPage() {
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
-                placeholder="Поиск участников..."
+                placeholder={t('map.searchPlaceholder')}
                 className="w-full rounded-2xl border border-[#d8d9d6] bg-white py-3 pl-10 pr-4 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
               />
             </div>
@@ -154,7 +158,7 @@ export function MapPage() {
                     className="mt-3 inline-flex items-center gap-1.5 rounded-full bg-[#111111] px-3 py-1.5 text-xs font-medium text-white"
                   >
                     <ExternalLink className="w-3.5 h-3.5" />
-                    Перейти в профиль
+                    {t('map.goProfile')}
                   </button>
                 </div>
                 <button
@@ -168,11 +172,11 @@ export function MapPage() {
           ) : (
             <div className="mb-3 flex items-end justify-between gap-4">
               <div>
-                <p className="text-base font-bold text-[#111111]">Люди на карте</p>
-                <p className="mt-1 text-sm text-[#667085]">Нажми на точку, чтобы открыть быстрый профиль.</p>
+                <p className="text-base font-bold text-[#111111]">{t('map.title')}</p>
+                <p className="mt-1 text-sm text-[#667085]">{t('map.subtitle')}</p>
               </div>
               <div className="rounded-2xl border border-[#e2e8f0] bg-white px-4 py-3 text-right">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">Найдено</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">{t('map.found')}</p>
                 <p className="mt-1 font-mono text-xl font-bold text-[#111111]">{filtered.length}</p>
               </div>
             </div>
@@ -199,7 +203,7 @@ export function MapPage() {
                         navigate(`/profile/${p.userId}`)
                       }}
                       className="w-8 h-8 flex items-center justify-center rounded-xl bg-[#F8FAFC] text-[#6366F1]"
-                      title="Перейти в профиль"
+                      title={t('map.goProfile')}
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
                     </button>
@@ -207,7 +211,7 @@ export function MapPage() {
                 )
               })}
               {filtered.length === 0 && (
-                <div className="py-6 text-center text-sm text-[#94a3b8]">Ничего не найдено</div>
+                <div className="py-6 text-center text-sm text-[#94a3b8]">{t('map.empty')}</div>
               )}
             </div>
           </div>
@@ -218,6 +222,7 @@ export function MapPage() {
 
   return (
     <div className="flex h-full min-h-[500px]">
+      <PageMeta title={t('map.meta.title')} description={t('map.meta.description')} canonicalPath="/community/map" />
       {/* Map area */}
       <div className="flex-1 relative">
         <CommunityMapCanvas
@@ -253,7 +258,7 @@ export function MapPage() {
                   onClick={() => navigate(`/profile/${selectedPoint.userId}`)}
                   className="mt-2 flex items-center gap-1.5 text-xs font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" /> Перейти в профиль
+                  <ExternalLink className="w-3.5 h-3.5" /> {t('map.goProfile')}
                 </button>
               </div>
               <button
@@ -292,7 +297,7 @@ export function MapPage() {
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Поиск участников..."
+              placeholder={t('map.searchPlaceholder')}
               className="w-full pl-9 pr-3 py-2 text-sm bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg focus:outline-none"
             />
           </div>
@@ -314,7 +319,7 @@ export function MapPage() {
                 <button
                   onClick={e => { e.stopPropagation(); navigate(`/profile/${p.userId}`) }}
                   className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#E0E7FF] text-[#94a3b8] hover:text-[#6366F1] transition-colors flex-shrink-0"
-                  title="Перейти в профиль"
+                  title={t('map.goProfile')}
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                 </button>
@@ -322,7 +327,7 @@ export function MapPage() {
             )
           })}
           {filtered.length === 0 && (
-            <div className="text-center py-8 text-[#94a3b8] text-sm">Ничего не найдено</div>
+            <div className="text-center py-8 text-[#94a3b8] text-sm">{t('map.empty')}</div>
           )}
         </div>
       </div>

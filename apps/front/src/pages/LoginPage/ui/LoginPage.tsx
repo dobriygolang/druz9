@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'
 import { Spinner } from '@/shared/ui/Spinner'
 import { Swords, Code2, BookOpen, Calendar, Flame, ArrowLeft } from 'lucide-react'
 
-/* ── Логотип-марка (граф связей) ───────────────────────────── */
+/* ── Brand mark (network graph) ───────────────────────────── */
 function LogoMark() {
   return (
     <svg width="26" height="26" viewBox="0 0 20 20" fill="none">
@@ -38,11 +38,11 @@ function TelegramIcon() {
 }
 
 const FEATURES = [
-  { icon: Swords,   label: 'Arena Duels',    desc: '1-на-1 за ELO' },
-  { icon: Code2,    label: 'Code Rooms',     desc: 'Совместный кодинг' },
-  { icon: BookOpen, label: 'Mock Interviews',desc: 'AI-проверка' },
-  { icon: Calendar, label: 'Ивенты',         desc: 'Клубы и встречи' },
-  { icon: Flame,    label: 'Daily',          desc: 'Задача дня' },
+  { icon: Swords,   label: 'Arena Duels',    desc: '1v1 for ELO' },
+  { icon: Code2,    label: 'Code Rooms',     desc: 'Collaborative coding' },
+  { icon: BookOpen, label: 'Mock Interviews',desc: 'AI review' },
+  { icon: Calendar, label: 'Events',         desc: 'Clubs and meetups' },
+  { icon: Flame,    label: 'Daily',          desc: 'Task of the day' },
 ]
 
 export function LoginPage() {
@@ -65,7 +65,7 @@ export function LoginPage() {
       const { authUrl } = await authApi.startYandexAuth()
       window.location.href = authUrl
     } catch {
-      setError('Ошибка авторизации. Попробуйте ещё раз.')
+      setError('Authorization failed. Try again.')
       setLoading(false); setLoadingProvider(null)
     }
   }
@@ -80,7 +80,7 @@ export function LoginPage() {
       setTelegramStep('code')
       setTimeout(() => codeInputRef.current?.focus(), 100)
     } catch {
-      setError('Ошибка авторизации. Попробуйте ещё раз.')
+      setError('Authorization failed. Try again.')
     } finally {
       setLoading(false); setLoadingProvider(null)
     }
@@ -95,7 +95,7 @@ export function LoginPage() {
       await refresh()
       navigate('/home')
     } catch {
-      setError('Неверный код. Попробуйте ещё раз.')
+      setError('Invalid code. Try again.')
       setSubmittingCode(false)
     }
   }
@@ -136,18 +136,18 @@ export function LoginPage() {
             <div className="w-9 h-9 flex items-center justify-center">
               <LogoMark />
             </div>
-            {/* ДРУЗЬЯ — Geist (sans), tight, bold */}
+            {/* DRUZYA — Geist (sans), tight, bold */}
             <span className="text-white font-bold tracking-[0.22em] text-[15px] uppercase"
               style={{ fontFamily: 'Geist, Inter, system-ui, sans-serif', letterSpacing: '0.22em' }}>
-              ДРУЗЬЯ
+              DRUZYA
             </span>
           </div>
 
           <h1 className="text-[21px] font-bold text-white leading-tight mb-1">
-            Добро пожаловать
+            Welcome
           </h1>
           <p className="text-sm text-white/60">
-            Платформа для подготовки к собеседованиям
+            A platform for interview preparation
           </p>
         </div>
 
@@ -168,13 +168,13 @@ export function LoginPage() {
                 className="flex items-center gap-1.5 text-sm text-[#6366F1] hover:text-[#4F46E5] transition-colors self-start -mb-1"
               >
                 <ArrowLeft className="w-4 h-4" />
-                Назад
+                Back
               </button>
 
               <div className="text-sm text-[#0f172a]">
-                <p className="font-medium mb-1">Введите код из Telegram</p>
+                <p className="font-medium mb-1">Enter the code from Telegram</p>
                 <p className="text-[#94a3b8] text-xs">
-                  Мы отправили код в бот. Введите его ниже, чтобы войти.
+                  We sent the code to the bot. Enter it below to sign in.
                 </p>
               </div>
 
@@ -183,7 +183,7 @@ export function LoginPage() {
                 type="text"
                 inputMode="numeric"
                 maxLength={8}
-                placeholder="Код из бота"
+                placeholder="Code from the bot"
                 value={telegramCode}
                 onChange={(e) => setTelegramCode(e.target.value.replace(/\D/g, ''))}
                 onKeyDown={(e) => { if (e.key === 'Enter') handleTelegramCodeSubmit() }}
@@ -198,7 +198,7 @@ export function LoginPage() {
                 style={{ background: 'linear-gradient(135deg, #6366F1 0%, #4F46E5 100%)' }}
               >
                 {submittingCode ? <Spinner size="sm" /> : null}
-                {submittingCode ? 'Проверяем...' : 'Войти'}
+                {submittingCode ? 'Checking...' : 'Sign in'}
               </button>
             </div>
           ) : (
@@ -213,13 +213,13 @@ export function LoginPage() {
                 {loadingProvider === 'yandex'
                   ? <Spinner size="sm" />
                   : <span className="w-5 h-5 flex items-center justify-center flex-shrink-0"><YandexIcon /></span>}
-                <span className="flex-1 text-center">Войти через Яндекс</span>
+                <span className="flex-1 text-center">Continue with Yandex</span>
               </button>
 
               {/* Divider */}
               <div className="flex items-center gap-3">
                 <div className="flex-1 h-px bg-[#E7E8E5]" />
-                <span className="text-[11px] text-[#94a3b8] font-medium tracking-wide">ИЛИ</span>
+                <span className="text-[11px] text-[#94a3b8] font-medium tracking-wide">OR</span>
                 <div className="flex-1 h-px bg-[#E7E8E5]" />
               </div>
 
@@ -232,7 +232,7 @@ export function LoginPage() {
                 {loadingProvider === 'telegram'
                   ? <Spinner size="sm" />
                   : <span className="w-5 h-5 flex items-center justify-center flex-shrink-0"><TelegramIcon /></span>}
-                <span className="flex-1 text-center">Войти через Telegram</span>
+                <span className="flex-1 text-center">Continue with Telegram</span>
               </button>
             </div>
           )}
@@ -255,7 +255,7 @@ export function LoginPage() {
         </div>
 
         <p className="text-center text-[11px] text-[#94a3b8] mt-4">
-          Присоединяйтесь к сообществу разработчиков
+          Join the developer community
         </p>
       </div>
 

@@ -22,7 +22,7 @@ export function AdminSidebar() {
   return (
     <aside className="w-[220px] min-h-screen bg-white border-r border-[#CBCCC9] flex flex-col flex-shrink-0">
       <nav className="flex-1 p-2.5 pt-4">
-        <p className="px-3 mb-2 text-[10px] font-bold text-[#475569] uppercase tracking-widest">Управление</p>
+        <p className="px-3 mb-2 text-[10px] font-bold text-[#475569] uppercase tracking-widest">Management</p>
         {ADMIN_NAV.map((item) => {
           const active = location.pathname === item.href
           return (
