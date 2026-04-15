@@ -127,7 +127,8 @@ type Service struct {
 const (
 	minPassingMockStageReviewScore    = 6
 	minPassingMockQuestionReviewScore = 6
-	defaultAIReviewTimeout            = 20 * time.Second
+	defaultAIReviewTimeout            = 30 * time.Second
+	maxTransientAIReviewAttempts      = 2
 )
 
 func New(c Config) *Service {
@@ -147,7 +148,7 @@ func New(c Config) *Service {
 }
 
 func boundedAIReviewTimeout(value time.Duration) time.Duration {
-	if value <= 0 || value > defaultAIReviewTimeout {
+	if value <= 0 {
 		return defaultAIReviewTimeout
 	}
 	return value
@@ -177,6 +178,90 @@ func passesMockSystemDesignReview(review *aireview.SystemDesignReview) bool {
 func (s *Service) withAIReviewTimeout(ctx context.Context) (context.Context, context.CancelFunc) {
 	timeout := boundedAIReviewTimeout(s.aiReviewTimeout)
 	return context.WithTimeout(ctx, timeout)
+}
+
+func (s *Service) reviewInterviewSolutionWithRetry(
+	ctx context.Context,
+	req aireview.InterviewSolutionReviewRequest,
+) (*aireview.InterviewSolutionReview, error) {
+	var lastErr error
+
+	for attempt := 0; attempt < maxTransientAIReviewAttempts; attempt++ {
+		reviewCtx, cancel := s.withAIReviewTimeout(ctx)
+		review, err := s.reviewer.ReviewInterviewSolution(reviewCtx, req)
+		cancel()
+		if err == nil {
+			return review, nil
+		}
+		if !isTransientAIReviewError(err) {
+			return nil, err
+		}
+		lastErr = err
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
+	}
+
+	if lastErr != nil {
+		return nil, context.DeadlineExceeded
+	}
+	return nil, context.DeadlineExceeded
+}
+
+func (s *Service) reviewInterviewAnswerWithRetry(
+	ctx context.Context,
+	req aireview.InterviewAnswerReviewRequest,
+) (*aireview.InterviewAnswerReview, error) {
+	var lastErr error
+
+	for attempt := 0; attempt < maxTransientAIReviewAttempts; attempt++ {
+		reviewCtx, cancel := s.withAIReviewTimeout(ctx)
+		review, err := s.reviewer.ReviewInterviewAnswer(reviewCtx, req)
+		cancel()
+		if err == nil {
+			return review, nil
+		}
+		if !isTransientAIReviewError(err) {
+			return nil, err
+		}
+		lastErr = err
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
+	}
+
+	if lastErr != nil {
+		return nil, context.DeadlineExceeded
+	}
+	return nil, context.DeadlineExceeded
+}
+
+func (s *Service) reviewSystemDesignWithRetry(
+	ctx context.Context,
+	req aireview.SystemDesignReviewRequest,
+) (*aireview.SystemDesignReview, error) {
+	var lastErr error
+
+	for attempt := 0; attempt < maxTransientAIReviewAttempts; attempt++ {
+		reviewCtx, cancel := s.withAIReviewTimeout(ctx)
+		review, err := s.reviewer.ReviewSystemDesign(reviewCtx, req)
+		cancel()
+		if err == nil {
+			return review, nil
+		}
+		if !isTransientAIReviewError(err) {
+			return nil, err
+		}
+		lastErr = err
+		if ctx.Err() != nil {
+			return nil, ctx.Err()
+		}
+	}
+
+	if lastErr != nil {
+		return nil, context.DeadlineExceeded
+	}
+	return nil, context.DeadlineExceeded
 }
 
 func isTransientAIReviewError(err error) bool {
@@ -584,8 +669,7 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 	answer = strings.TrimSpace(answer)
 	var review *aireview.InterviewAnswerReview
 	if selfAssessment == model.InterviewPrepSelfAssessmentAnswered && answer != "" && s.reviewer != nil {
-		reviewCtx, cancel := s.withAIReviewTimeout(ctx)
-		review, err = s.reviewer.ReviewInterviewAnswer(reviewCtx, aireview.InterviewAnswerReviewRequest{
+		review, err = s.reviewInterviewAnswerWithRetry(ctx, aireview.InterviewAnswerReviewRequest{
 			ModelOverride:   s.modelFollowup,
 			Topic:           session.Task.PrepType.String(),
 			TaskTitle:       session.Task.Title,
@@ -593,7 +677,6 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 			ReferenceAnswer: session.CurrentQuestion.Answer,
 			CandidateAnswer: answer,
 		})
-		cancel()
 		if err != nil {
 			if isTransientAIReviewError(err) {
 				nextSession, sessionErr := s.GetSession(ctx, user, session.ID)

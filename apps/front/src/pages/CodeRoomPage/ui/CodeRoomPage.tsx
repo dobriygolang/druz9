@@ -857,11 +857,9 @@ export function CodeRoomPage() {
       schedulePersist(nextCode)
     })
 
-    // Send cursor + selection awareness, track last known position.
-    // Collapse bursts into a single packet per animation frame to keep cursor lag minimal.
-    let cursorThrottleTimer: number | null = null
-    let pendingCursorUpdate: (() => void) | null = null
-
+    // Send cursor + selection awareness on every position change.
+    // No throttle: at typical typing speed this is ~5-15 sends/sec, which is negligible.
+    // Throttling was causing visible cursor lag for remote users during fast typing.
     editor.onDidChangeCursorSelection((e) => {
       if (isDuelRoom) return
       const sel = e.selection
@@ -870,36 +868,17 @@ export function CodeRoomPage() {
         sel.startLineNumber === sel.endLineNumber &&
         sel.startColumn === sel.endColumn
       )
-
-      const send = () => {
-        ws.sendAwareness(
-          sel.positionLineNumber,
-          sel.positionColumn,
-          hasSelection ? {
-            startLine: sel.startLineNumber,
-            startCol: sel.startColumn,
-            endLine: sel.endLineNumber,
-            endCol: sel.endColumn,
-          } : undefined,
-          { codeLen: editor.getModel()?.getValueLength() },
-        )
-      }
-
-      // If no throttle active, send immediately and defer at most one trailing update
-      // to the next animation frame.
-      if (!cursorThrottleTimer) {
-        send()
-        cursorThrottleTimer = window.requestAnimationFrame(() => {
-          if (pendingCursorUpdate) {
-            pendingCursorUpdate()
-            pendingCursorUpdate = null
-          }
-          cursorThrottleTimer = null
-        })
-      } else {
-        // Store the latest update to fire on trailing edge
-        pendingCursorUpdate = send
-      }
+      ws.sendAwareness(
+        sel.positionLineNumber,
+        sel.positionColumn,
+        hasSelection ? {
+          startLine: sel.startLineNumber,
+          startCol: sel.startColumn,
+          endLine: sel.endLineNumber,
+          endCol: sel.endColumn,
+        } : undefined,
+        { codeLen: editor.getModel()?.getValueLength() },
+      )
     })
 
     // Detect paste → anti-cheat signal

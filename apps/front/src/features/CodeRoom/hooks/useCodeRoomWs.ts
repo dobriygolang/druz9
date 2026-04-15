@@ -304,6 +304,16 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     socket.connect()
 
     return () => {
+      // Graceful departure: proactively signal other clients before the TCP close,
+      // so their cursors are removed without waiting for server-side disconnect detection.
+      if (socket.isConnected) {
+        socket.send({
+          type: 'awareness',
+          awarenessId: awarenessId.current,
+          userId: userId ?? guestName ?? 'anonymous',
+          data: JSON.stringify({ displayName, active: false }),
+        })
+      }
       socket.close()
       socketRef.current = null
       setConnected(false)

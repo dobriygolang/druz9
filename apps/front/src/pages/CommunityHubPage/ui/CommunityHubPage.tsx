@@ -19,7 +19,7 @@ export function CommunityHubPage() {
   const active = TABS.find(t => location.pathname.startsWith(`/community/${t.id}`))?.id ?? 'people'
 
   return (
-    <div className="flex flex-col h-full min-h-screen">
+    <div className="flex flex-col h-full">
       {isMobile ? (
         <div className="mobile-sticky-surface bg-[#F2F3F0]/88 px-4 pt-4 pb-0 dark:bg-[#0b0d16]/88">
           <div className="mb-4 flex flex-col gap-3">
@@ -97,7 +97,7 @@ export function CommunityHubPage() {
         </div>
       )}
 
-      <div className="flex-1">
+      <div className={`flex-1 min-h-0${active === 'map' ? ' overflow-hidden' : ''}`}>
         <Outlet context={{ search, openCreateEvent, setOpenCreateEvent }} />
       </div>
     </div>

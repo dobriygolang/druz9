@@ -61,8 +61,8 @@ func TestBoundedAIReviewTimeout(t *testing.T) {
 	if got := boundedAIReviewTimeout(0); got != defaultAIReviewTimeout {
 		t.Fatalf("expected default timeout for zero value, got %s", got)
 	}
-	if got := boundedAIReviewTimeout(45 * time.Second); got != defaultAIReviewTimeout {
-		t.Fatalf("expected timeout to be clamped, got %s", got)
+	if got := boundedAIReviewTimeout(45 * time.Second); got != 45*time.Second {
+		t.Fatalf("expected custom timeout above default to be kept, got %s", got)
 	}
 	if got := boundedAIReviewTimeout(12 * time.Second); got != 12*time.Second {
 		t.Fatalf("expected custom timeout to be kept, got %s", got)

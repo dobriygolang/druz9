@@ -10,14 +10,14 @@ export function PageLayout() {
   const mainPadding = playing ? 'pb-[198px] md:pb-[76px]' : 'pb-[116px] md:pb-0'
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-[#F2F3F0] dark:bg-[#0f1117] transition-colors duration-300">
+    <div className="relative h-screen overflow-hidden bg-[#F2F3F0] dark:bg-[#0f1117] transition-colors duration-300">
       <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.16),_transparent_62%)] dark:bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.2),_transparent_58%)] md:hidden" />
 
-      <div className="relative mx-auto flex min-h-screen max-w-[1600px]">
+      <div className="relative mx-auto flex h-full max-w-[1600px]">
         <Sidebar />
 
-        <main className={`relative flex-1 min-w-0 overflow-x-hidden overflow-y-auto pt-[104px] md:pt-0 ${mainPadding}`}>
-          <PageTransition className="min-h-full">
+        <main className={`relative flex-1 h-full min-w-0 overflow-x-hidden overflow-y-auto pt-[104px] md:pt-0 ${mainPadding}`}>
+          <PageTransition className="h-full">
             <Outlet />
           </PageTransition>
         </main>

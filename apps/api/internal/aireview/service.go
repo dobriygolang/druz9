@@ -11,6 +11,16 @@ import (
 	"unicode"
 )
 
+const (
+	maxPromptTaskStatementChars    = 3500
+	maxPromptReferenceChars        = 3000
+	maxPromptCandidateNotesChars   = 2500
+	maxPromptCandidateCodeChars    = 9000
+	maxPromptQuestionPromptChars   = 1200
+	maxPromptQuestionAnswerChars   = 1800
+	maxPromptSystemDesignTextChars = 2200
+)
+
 var (
 	ErrNotConfigured       = errors.New("ai review provider is not configured")
 	ErrUnsupportedProvider = errors.New("unsupported ai review provider")
@@ -174,32 +184,32 @@ func buildSystemDesignPrompt(req SystemDesignReviewRequest) string {
 	b.WriteString("Если вход слабый или нерелевантный, прямо скажи это в summary и issues.\n\n")
 	b.WriteString("Если ответ нерелевантен, бессодержателен, состоит из случайного текста или не покрывает задачу, обязательно выставь isRelevant=false, isPassing=false и score не выше 2.\n\n")
 	b.WriteString("Название задачи:\n")
-	b.WriteString(strings.TrimSpace(req.TaskTitle))
+	b.WriteString(truncate(strings.TrimSpace(req.TaskTitle), 300))
 	b.WriteString("\n\nУсловие задачи:\n")
-	b.WriteString(strings.TrimSpace(req.Statement))
+	b.WriteString(truncate(strings.TrimSpace(req.Statement), maxPromptTaskStatementChars))
 	if notes := strings.TrimSpace(req.Notes); notes != "" {
 		b.WriteString("\n\nЗаметки кандидата:\n")
-		b.WriteString(notes)
+		b.WriteString(truncate(notes, maxPromptSystemDesignTextChars))
 	}
 	if components := strings.TrimSpace(req.Components); components != "" {
 		b.WriteString("\n\nЗаявленные компоненты и зоны ответственности:\n")
-		b.WriteString(components)
+		b.WriteString(truncate(components, maxPromptSystemDesignTextChars))
 	}
 	if apis := strings.TrimSpace(req.APIs); apis != "" {
 		b.WriteString("\n\nЗаявленные API, очереди, обработчики и контракты:\n")
-		b.WriteString(apis)
+		b.WriteString(truncate(apis, maxPromptSystemDesignTextChars))
 	}
 	if db := strings.TrimSpace(req.DatabaseSchema); db != "" {
 		b.WriteString("\n\nЗаявленные базы данных, таблицы, индексы и хранение:\n")
-		b.WriteString(db)
+		b.WriteString(truncate(db, maxPromptSystemDesignTextChars))
 	}
 	if traffic := strings.TrimSpace(req.Traffic); traffic != "" {
 		b.WriteString("\n\nНагрузочные и traffic-предположения:\n")
-		b.WriteString(traffic)
+		b.WriteString(truncate(traffic, maxPromptSystemDesignTextChars))
 	}
 	if reliability := strings.TrimSpace(req.Reliability); reliability != "" {
 		b.WriteString("\n\nНадёжность, масштабирование и обработка сбоев:\n")
-		b.WriteString(reliability)
+		b.WriteString(truncate(reliability, maxPromptSystemDesignTextChars))
 	}
 	if lowSignal := lowSignalSections(req); len(lowSignal) > 0 {
 		b.WriteString("\n\nПоля, которые выглядят как заглушки или бессодержательный ввод и должны считаться отсутствующими, если схема явно не компенсирует их:\n")
@@ -232,18 +242,18 @@ func buildInterviewSolutionPrompt(req InterviewSolutionReviewRequest) string {
 	b.WriteString("Если это кодовая задача, особенно важны корректность, структура, граничные случаи, сложность, конкурентная безопасность и trade-off.\n")
 	b.WriteString("Если это архитектурная задача, особенно важны компоненты, потоки данных, надёжность, state management, failure modes и масштабирование.\n\n")
 	b.WriteString("Тип этапа: ")
-	b.WriteString(strings.TrimSpace(req.StageKind))
+	b.WriteString(truncate(strings.TrimSpace(req.StageKind), 120))
 	b.WriteString("\n\nНазвание задачи:\n")
-	b.WriteString(strings.TrimSpace(req.TaskTitle))
+	b.WriteString(truncate(strings.TrimSpace(req.TaskTitle), 300))
 	b.WriteString("\n\nУсловие:\n")
-	b.WriteString(strings.TrimSpace(req.Statement))
+	b.WriteString(truncate(strings.TrimSpace(req.Statement), maxPromptTaskStatementChars))
 	if value := strings.TrimSpace(req.ReferenceSolution); value != "" {
 		b.WriteString("\n\nОжидаемое направление решения / reference notes:\n")
-		b.WriteString(value)
+		b.WriteString(truncate(value, maxPromptReferenceChars))
 	}
 	if value := strings.TrimSpace(req.CandidateNotes); value != "" {
 		b.WriteString("\n\nПояснения кандидата:\n")
-		b.WriteString(value)
+		b.WriteString(truncate(value, maxPromptCandidateNotesChars))
 	}
 	if value := strings.TrimSpace(req.CandidateCode); value != "" {
 		b.WriteString("\n\nРешение кандидата")
@@ -253,7 +263,7 @@ func buildInterviewSolutionPrompt(req InterviewSolutionReviewRequest) string {
 			b.WriteString(")")
 		}
 		b.WriteString(":\n")
-		b.WriteString(value)
+		b.WriteString(truncate(value, maxPromptCandidateCodeChars))
 	}
 	return b.String()
 }
@@ -268,20 +278,20 @@ func buildInterviewAnswerPrompt(req InterviewAnswerReviewRequest) string {
 	b.WriteString("Если ответ нерелевантен вопросу, состоит из общих слов, случайного текста или не содержит содержательного ответа, обязательно выставь isRelevant=false, isPassing=false и score не выше 2.\n\n")
 	if topic := strings.TrimSpace(req.Topic); topic != "" {
 		b.WriteString("Тема:\n")
-		b.WriteString(topic)
+		b.WriteString(truncate(topic, 120))
 		b.WriteString("\n\n")
 	}
 	if taskTitle := strings.TrimSpace(req.TaskTitle); taskTitle != "" {
 		b.WriteString("Контекст задачи:\n")
-		b.WriteString(taskTitle)
+		b.WriteString(truncate(taskTitle, 300))
 		b.WriteString("\n\n")
 	}
 	b.WriteString("Вопрос:\n")
-	b.WriteString(strings.TrimSpace(req.QuestionPrompt))
+	b.WriteString(truncate(strings.TrimSpace(req.QuestionPrompt), maxPromptQuestionPromptChars))
 	b.WriteString("\n\nЭталонный ответ / что важно услышать:\n")
-	b.WriteString(strings.TrimSpace(req.ReferenceAnswer))
+	b.WriteString(truncate(strings.TrimSpace(req.ReferenceAnswer), maxPromptQuestionAnswerChars))
 	b.WriteString("\n\nОтвет кандидата:\n")
-	b.WriteString(strings.TrimSpace(req.CandidateAnswer))
+	b.WriteString(truncate(strings.TrimSpace(req.CandidateAnswer), maxPromptQuestionAnswerChars))
 	return b.String()
 }
 

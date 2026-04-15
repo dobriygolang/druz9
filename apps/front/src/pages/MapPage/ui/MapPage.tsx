@@ -92,7 +92,7 @@ export function MapPage() {
 
   if (isMobile) {
     return (
-      <div className="relative h-[calc(100vh-220px)] min-h-[560px] overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[#edf2f7]">
+      <div className="relative h-full min-h-[400px] overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[#edf2f7]">
         <CommunityMapCanvas
           className="absolute inset-0"
           mapStyle={mapStyle}
@@ -217,7 +217,7 @@ export function MapPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-130px)] min-h-[500px]">
+    <div className="flex h-full min-h-[500px]">
       {/* Map area */}
       <div className="flex-1 relative">
         <CommunityMapCanvas
