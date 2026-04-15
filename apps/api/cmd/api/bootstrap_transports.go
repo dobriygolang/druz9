@@ -75,6 +75,7 @@ func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageCont
 	closer.AddSync(startContentCleanupWorker(bootstrap.kratosLogger, storage))
 	closer.AddSync(startBusinessMetricsWorker(bootstrap.kratosLogger, bootstrap.rtcManager, storage))
 	closer.AddSync(startTelegramBotWorker(services.profileServiceDomain, services.notificationSender))
+	closer.AddSync(startStreakWarningWorker(services.notificationSender, storage.store.DB))
 }
 
 func registerManualHTTPRoutes(

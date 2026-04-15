@@ -2,28 +2,38 @@ package main
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"api/internal/notification"
 
+	"github.com/jackc/pgx/v5/pgxpool"
 	klog "github.com/go-kratos/kratos/v2/log"
 )
 
-// startStreakWarningWorker runs a periodic check for users whose streaks are about to expire.
-// Checks every hour; sends streak_warning to users with streak >= 3 who haven't been active today.
-func startStreakWarningWorker(notif notification.Sender, storage *storageContext) func() error {
+// startStreakWarningWorker runs a periodic check (every hour) for users whose streaks
+// are about to expire. Sends streak_warning notifications.
+func startStreakWarningWorker(notif notification.Sender, db *pgxpool.Pool) func() error {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	go func() {
+		// Wait 5 minutes after startup before first check.
+		select {
+		case <-ctx.Done():
+			return
+		case <-time.After(5 * time.Minute):
+		}
+
 		ticker := time.NewTicker(1 * time.Hour)
 		defer ticker.Stop()
 
+		sendStreakWarnings(ctx, notif, db)
 		for {
 			select {
 			case <-ctx.Done():
 				return
 			case <-ticker.C:
-				sendStreakWarnings(ctx, notif, storage)
+				sendStreakWarnings(ctx, notif, db)
 			}
 		}
 	}()
@@ -34,42 +44,32 @@ func startStreakWarningWorker(notif notification.Sender, storage *storageContext
 	}
 }
 
-func sendStreakWarnings(ctx context.Context, notif notification.Sender, storage *storageContext) {
-	// Query users who have streaks >= 3 but haven't been active today.
-	rows, err := storage.store.DB().Query(ctx, `
-		WITH user_activity AS (
-			SELECT DISTINCT user_id, DATE(created_at AT TIME ZONE 'UTC') AS activity_date
-			FROM (
-				SELECT user_id, created_at FROM interview_prep_mock_sessions WHERE status = 'finished'
-				UNION ALL
-				SELECT user_id, created_at FROM interview_prep_sessions WHERE status = 'finished'
-			) all_activity
+func sendStreakWarnings(ctx context.Context, notif notification.Sender, db *pgxpool.Pool) {
+	// Find users with consecutive activity streaks >= 3 who are missing today's activity.
+	// Uses the same tables the progress system reads from.
+	rows, err := db.Query(ctx, `
+		WITH recent_activity AS (
+			SELECT user_id, DATE(started_at AT TIME ZONE 'UTC') AS d
+			FROM interview_prep_mock_sessions WHERE status = 'finished'
+			  AND started_at >= CURRENT_DATE - INTERVAL '90 days'
+			UNION
+			SELECT user_id, DATE(created_at AT TIME ZONE 'UTC') AS d
+			FROM interview_prep_sessions WHERE status = 'finished'
+			  AND created_at >= CURRENT_DATE - INTERVAL '90 days'
 		),
-		streaks AS (
-			SELECT user_id, COUNT(*) AS streak_days
-			FROM (
-				SELECT user_id, activity_date,
-					   activity_date - ROW_NUMBER() OVER (PARTITION BY user_id ORDER BY activity_date)::int AS grp
-				FROM user_activity
-				WHERE activity_date >= CURRENT_DATE - INTERVAL '60 days'
-			) grouped
-			WHERE grp = (
-				SELECT activity_date - ROW_NUMBER() OVER (ORDER BY activity_date)::int
-				FROM user_activity ua2
-				WHERE ua2.user_id = grouped.user_id
-				ORDER BY activity_date DESC
-				LIMIT 1
-			)
-			GROUP BY user_id, grp
-			HAVING COUNT(*) >= 3
+		unique_days AS (
+			SELECT DISTINCT user_id, d FROM recent_activity
+		),
+		yesterday_active AS (
+			SELECT user_id FROM unique_days WHERE d = CURRENT_DATE - 1
+		),
+		today_active AS (
+			SELECT user_id FROM unique_days WHERE d = CURRENT_DATE
 		)
-		SELECT s.user_id, s.streak_days
-		FROM streaks s
-		WHERE NOT EXISTS (
-			SELECT 1 FROM user_activity ua
-			WHERE ua.user_id = s.user_id AND ua.activity_date = CURRENT_DATE
-		)
-		LIMIT 100
+		SELECT ya.user_id
+		FROM yesterday_active ya
+		WHERE ya.user_id NOT IN (SELECT user_id FROM today_active)
+		LIMIT 200
 	`)
 	if err != nil {
 		klog.Errorf("streak warning query: %v", err)
@@ -80,14 +80,11 @@ func sendStreakWarnings(ctx context.Context, notif notification.Sender, storage 
 	count := 0
 	for rows.Next() {
 		var userID string
-		var streakDays int
-		if err := rows.Scan(&userID, &streakDays); err != nil {
+		if err := rows.Scan(&userID); err != nil {
 			continue
 		}
-		body := fmt.Sprintf("Твой streak %d дней сгорает сегодня!\nЗаверши хотя бы одну задачу, чтобы сохранить его.", streakDays)
-		notif.Send(ctx, userID, "streak_warning", "Streak под угрозой", body, map[string]any{
-			"streak_days": streakDays,
-		})
+		body := fmt.Sprintf("Твой streak под угрозой!\nЗаверши хотя бы одну задачу сегодня, чтобы сохранить его.")
+		notif.Send(ctx, userID, "streak_warning", "Streak под угрозой", body, map[string]any{})
 		count++
 	}
 	if count > 0 {
