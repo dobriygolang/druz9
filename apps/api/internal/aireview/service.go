@@ -60,6 +60,8 @@ type InterviewSolutionReview struct {
 	Strengths         []string `json:"strengths"`
 	Issues            []string `json:"issues"`
 	FollowUpQuestions []string `json:"followUpQuestions"`
+	IsRelevant        bool     `json:"isRelevant"`
+	IsPassing         bool     `json:"isPassing"`
 }
 
 type InterviewAnswerReviewRequest struct {
@@ -72,11 +74,13 @@ type InterviewAnswerReviewRequest struct {
 }
 
 type InterviewAnswerReview struct {
-	Provider string   `json:"provider"`
-	Model    string   `json:"model"`
-	Score    int      `json:"score"`
-	Summary  string   `json:"summary"`
-	Gaps     []string `json:"gaps"`
+	Provider   string   `json:"provider"`
+	Model      string   `json:"model"`
+	Score      int      `json:"score"`
+	Summary    string   `json:"summary"`
+	Gaps       []string `json:"gaps"`
+	IsRelevant bool     `json:"isRelevant"`
+	IsPassing  bool     `json:"isPassing"`
 }
 
 type SystemDesignReview struct {
@@ -89,6 +93,8 @@ type SystemDesignReview struct {
 	MissingTopics     []string `json:"missingTopics"`
 	FollowUpQuestions []string `json:"followUpQuestions"`
 	Disclaimer        string   `json:"disclaimer"`
+	IsRelevant        bool     `json:"isRelevant"`
+	IsPassing         bool     `json:"isPassing"`
 }
 
 type Reviewer interface {
@@ -156,7 +162,7 @@ func buildSystemDesignPrompt(req SystemDesignReviewRequest) string {
 	var b strings.Builder
 	b.WriteString("Ты проводишь строгий предварительный review ответа кандидата по system design.\n")
 	b.WriteString("На входе могут быть изображение схемы и структурированные поля с пояснениями кандидата.\n")
-	b.WriteString("Верни только валидный JSON с полями: score, summary, strengths, issues, missingTopics, followUpQuestions, disclaimer.\n")
+	b.WriteString("Верни только валидный JSON с полями: score, summary, strengths, issues, missingTopics, followUpQuestions, disclaimer, isRelevant, isPassing.\n")
 	b.WriteString("Все строки и элементы массивов должны быть только на русском языке.\n")
 	b.WriteString("Score должен быть целым числом от 1 до 10.\n")
 	b.WriteString("Оценивай архитектурное качество, а не красоту картинки.\n")
@@ -166,6 +172,7 @@ func buildSystemDesignPrompt(req SystemDesignReviewRequest) string {
 	b.WriteString("Не хвали кандидата за сам факт заполнения полей. В strengths должны попадать только подтверждённые инженерные решения.\n")
 	b.WriteString("Если схема нерелевантна задаче или не похожа на архитектурную диаграмму, не выдумывай систему и ставь низкую оценку.\n")
 	b.WriteString("Если вход слабый или нерелевантный, прямо скажи это в summary и issues.\n\n")
+	b.WriteString("Если ответ нерелевантен, бессодержателен, состоит из случайного текста или не покрывает задачу, обязательно выставь isRelevant=false, isPassing=false и score не выше 2.\n\n")
 	b.WriteString("Название задачи:\n")
 	b.WriteString(strings.TrimSpace(req.TaskTitle))
 	b.WriteString("\n\nУсловие задачи:\n")
@@ -217,10 +224,11 @@ func buildSystemDesignPrompt(req SystemDesignReviewRequest) string {
 func buildInterviewSolutionPrompt(req InterviewSolutionReviewRequest) string {
 	var b strings.Builder
 	b.WriteString("Ты проводишь строгое AI-ревью промежуточного решения кандидата на mock interview.\n")
-	b.WriteString("Верни только валидный JSON с полями: score, summary, strengths, issues, followUpQuestions.\n")
+	b.WriteString("Верни только валидный JSON с полями: score, summary, strengths, issues, followUpQuestions, isRelevant, isPassing.\n")
 	b.WriteString("Все поля должны быть только на русском языке. Score — целое число от 1 до 10.\n")
 	b.WriteString("Не хвали кандидата за объём текста или наличие кода. Оценивай только инженерическую состоятельность решения.\n")
 	b.WriteString("Если решение поверхностное, нерелевантное или не доведено до рабочего состояния, прямо скажи это.\n")
+	b.WriteString("Если кандидат отправил бессвязный текст, случайный код, заглушку, комментарии без решения или ответ не по задаче, обязательно выставь isRelevant=false, isPassing=false и score не выше 2.\n")
 	b.WriteString("Если это кодовая задача, особенно важны корректность, структура, граничные случаи, сложность, конкурентная безопасность и trade-off.\n")
 	b.WriteString("Если это архитектурная задача, особенно важны компоненты, потоки данных, надёжность, state management, failure modes и масштабирование.\n\n")
 	b.WriteString("Тип этапа: ")
@@ -253,10 +261,11 @@ func buildInterviewSolutionPrompt(req InterviewSolutionReviewRequest) string {
 func buildInterviewAnswerPrompt(req InterviewAnswerReviewRequest) string {
 	var b strings.Builder
 	b.WriteString("Ты оцениваешь устный ответ кандидата на follow-up вопрос mock interview.\n")
-	b.WriteString("Верни только валидный JSON с полями: score, summary, gaps.\n")
+	b.WriteString("Верни только валидный JSON с полями: score, summary, gaps, isRelevant, isPassing.\n")
 	b.WriteString("Все поля должны быть только на русском языке. Score — целое число от 1 до 10.\n")
 	b.WriteString("Оцени только полноту, точность и глубину ответа. Не додумывай правильные аргументы за кандидата.\n")
 	b.WriteString("Если ответ частичный, расплывчатый или уходит в сторону, прямо скажи это.\n\n")
+	b.WriteString("Если ответ нерелевантен вопросу, состоит из общих слов, случайного текста или не содержит содержательного ответа, обязательно выставь isRelevant=false, isPassing=false и score не выше 2.\n\n")
 	if topic := strings.TrimSpace(req.Topic); topic != "" {
 		b.WriteString("Тема:\n")
 		b.WriteString(topic)
@@ -295,6 +304,8 @@ func parseReviewJSON(raw string) (*SystemDesignReview, error) {
 	if review.Score > 10 {
 		review.Score = 10
 	}
+	review.IsRelevant = normalizeReviewRelevant(review.IsRelevant, review.Score, review.Summary, review.Issues, review.MissingTopics)
+	review.IsPassing = normalizeReviewPassing(review.IsPassing, review.IsRelevant, review.Score, review.Summary, review.Issues, review.MissingTopics)
 	if review.Disclaimer == "" {
 		review.Disclaimer = "Предварительная AI-оценка, а не финальный вердикт интервьюера."
 	}
@@ -318,6 +329,8 @@ func parseInterviewSolutionJSON(raw string) (*InterviewSolutionReview, error) {
 	if review.Score > 10 {
 		review.Score = 10
 	}
+	review.IsRelevant = normalizeReviewRelevant(review.IsRelevant, review.Score, review.Summary, review.Issues, review.Strengths)
+	review.IsPassing = normalizeReviewPassing(review.IsPassing, review.IsRelevant, review.Score, review.Summary, review.Issues, review.Strengths)
 	return &review, nil
 }
 
@@ -333,11 +346,13 @@ func parseInterviewAnswerJSON(raw string) (*InterviewAnswerReview, error) {
 		return nil, fmt.Errorf("%w: %v", ErrInvalidResponse, err)
 	}
 	review := InterviewAnswerReview{
-		Provider: toStringValue(payload["provider"]),
-		Model:    toStringValue(payload["model"]),
-		Score:    toIntValue(payload["score"]),
-		Summary:  strings.TrimSpace(toStringValue(payload["summary"])),
-		Gaps:     normalizeStringList(payload["gaps"]),
+		Provider:   toStringValue(payload["provider"]),
+		Model:      toStringValue(payload["model"]),
+		Score:      toIntValue(payload["score"]),
+		Summary:    strings.TrimSpace(toStringValue(payload["summary"])),
+		Gaps:       normalizeStringList(payload["gaps"]),
+		IsRelevant: toBoolValue(payload["isRelevant"]),
+		IsPassing:  toBoolValue(payload["isPassing"]),
 	}
 	if review.Score < 1 {
 		review.Score = 1
@@ -345,6 +360,8 @@ func parseInterviewAnswerJSON(raw string) (*InterviewAnswerReview, error) {
 	if review.Score > 10 {
 		review.Score = 10
 	}
+	review.IsRelevant = normalizeReviewRelevant(review.IsRelevant, review.Score, review.Summary, review.Gaps)
+	review.IsPassing = normalizeReviewPassing(review.IsPassing, review.IsRelevant, review.Score, review.Summary, review.Gaps)
 	return &review, nil
 }
 
@@ -381,6 +398,22 @@ func toIntValue(value any) int {
 	return 0
 }
 
+func toBoolValue(value any) bool {
+	switch typed := value.(type) {
+	case bool:
+		return typed
+	case string:
+		switch strings.ToLower(strings.TrimSpace(typed)) {
+		case "true", "1", "yes":
+			return true
+		default:
+			return false
+		}
+	default:
+		return false
+	}
+}
+
 func normalizeStringList(value any) []string {
 	switch typed := value.(type) {
 	case []any:
@@ -408,6 +441,64 @@ func normalizeStringList(value any) []string {
 	default:
 		return nil
 	}
+}
+
+func normalizeReviewRelevant(explicit bool, score int, values ...any) bool {
+	text := strings.ToLower(strings.Join(flattenReviewTexts(values...), "\n"))
+	if containsReviewMarker(text, []string{
+		"нерелев", "не по задаче", "не относится к задаче", "не отвечает на вопрос", "не отвечает на задачу",
+		"off-topic", "off topic", "набор слов", "бессмысл", "бессодерж", "случайный текст", "gibber", "рандом",
+	}) {
+		return false
+	}
+	if explicit {
+		return true
+	}
+	return score >= 3
+}
+
+func normalizeReviewPassing(explicit bool, relevant bool, score int, values ...any) bool {
+	if !relevant {
+		return false
+	}
+	text := strings.ToLower(strings.Join(flattenReviewTexts(values...), "\n"))
+	if containsReviewMarker(text, []string{
+		"нерелев", "не по задаче", "не отвечает на вопрос", "не отвечает на задачу", "набор слов", "бессмысл", "gibber",
+	}) {
+		return false
+	}
+	if explicit {
+		return true
+	}
+	return score >= 6
+}
+
+func flattenReviewTexts(values ...any) []string {
+	items := make([]string, 0, len(values)*2)
+	for _, value := range values {
+		switch typed := value.(type) {
+		case string:
+			if trimmed := strings.TrimSpace(typed); trimmed != "" {
+				items = append(items, trimmed)
+			}
+		case []string:
+			for _, item := range typed {
+				if trimmed := strings.TrimSpace(item); trimmed != "" {
+					items = append(items, trimmed)
+				}
+			}
+		}
+	}
+	return items
+}
+
+func containsReviewMarker(text string, markers []string) bool {
+	for _, marker := range markers {
+		if strings.Contains(text, marker) {
+			return true
+		}
+	}
+	return false
 }
 
 func timeoutOrDefault(v time.Duration) time.Duration {

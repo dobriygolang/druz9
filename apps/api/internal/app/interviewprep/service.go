@@ -121,6 +121,11 @@ type Service struct {
 	modelSystemDesign string
 }
 
+const (
+	minPassingMockStageReviewScore    = 6
+	minPassingMockQuestionReviewScore = 6
+)
+
 func New(c Config) *Service {
 	return &Service{
 		repo:              c.Repository,
@@ -134,6 +139,27 @@ func New(c Config) *Service {
 		modelFollowup:     strings.TrimSpace(c.ModelFollowup),
 		modelSystemDesign: strings.TrimSpace(c.ModelSystemDesign),
 	}
+}
+
+func passesMockStageReview(review *aireview.InterviewSolutionReview) bool {
+	if review == nil {
+		return false
+	}
+	return review.IsRelevant && review.IsPassing && review.Score >= minPassingMockStageReviewScore
+}
+
+func passesMockQuestionReview(review *aireview.InterviewAnswerReview) bool {
+	if review == nil {
+		return false
+	}
+	return review.IsRelevant && review.IsPassing && review.Score >= minPassingMockQuestionReviewScore
+}
+
+func passesMockSystemDesignReview(review *aireview.SystemDesignReview) bool {
+	if review == nil {
+		return false
+	}
+	return review.IsRelevant && review.IsPassing && review.Score >= minPassingMockStageReviewScore
 }
 
 func (s *Service) ListTasks(ctx context.Context, user *model.User) ([]*model.InterviewPrepTask, error) {
@@ -496,6 +522,16 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 		})
 		if err != nil {
 			return nil, fmt.Errorf("reviewer.ReviewInterviewAnswer: %w", err)
+		}
+		if !passesMockQuestionReview(review) {
+			nextSession, sessionErr := s.GetSession(ctx, user, session.ID)
+			if sessionErr != nil {
+				return nil, sessionErr
+			}
+			return &QuestionAnswerResult{
+				Review:  review,
+				Session: nextSession,
+			}, nil
 		}
 	}
 

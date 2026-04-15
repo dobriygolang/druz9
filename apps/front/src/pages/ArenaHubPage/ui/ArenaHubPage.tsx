@@ -1,14 +1,17 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Flame, Trophy, Swords, Zap } from 'lucide-react'
+import { Flame, Trophy, Swords, Zap, Users, Copy, Check, Link2 } from 'lucide-react'
 import { apiClient } from '@/shared/api/base'
+import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 import { Card } from '@/shared/ui/Card'
 import { Button } from '@/shared/ui/Button'
+import { Badge } from '@/shared/ui/Badge'
 import { Avatar } from '@/shared/ui/Avatar'
 import { Select } from '@/shared/ui/Select'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useToast } from '@/shared/ui/Toast'
+import { DIFF_LABELS, DIFF_VARIANTS, LANG_LABELS } from '@/shared/lib/taskLabels'
 
 const LEAGUE_COLORS: Record<string, string> = {
   ARENA_LEAGUE_BRONZE: 'text-[#cd7f32]',
@@ -39,6 +42,11 @@ export function ArenaHubPage() {
   const [error, setError] = useState<string | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
 
+  // Friendly duel state
+  const [creatingDuel, setCreatingDuel] = useState(false)
+  const [duelRoom, setDuelRoom] = useState<{ id: string; inviteCode: string } | null>(null)
+  const [copiedDuel, setCopiedDuel] = useState(false)
+
   const refreshQueueStatus = useCallback(() => {
     apiClient.get('/api/v1/arena/queue/status').then(r => {
       const d = r.data as any
@@ -64,7 +72,6 @@ export function ArenaHubPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  // Poll queue status every 3s while in queue
   useEffect(() => {
     if (inQueue) {
       pollRef.current = setInterval(refreshQueueStatus, 3000)
@@ -98,52 +105,64 @@ export function ArenaHubPage() {
     setInQueue(false)
   }
 
+  const handleCreateFriendlyDuel = async () => {
+    setCreatingDuel(true)
+    try {
+      const { room, inviteCode } = await codeRoomApi.createRoom({ mode: 'ROOM_MODE_DUEL', isPrivate: true })
+      setDuelRoom({ id: room.id, inviteCode: inviteCode || room.inviteCode })
+    } catch {
+      toast('Не удалось создать комнату', 'error')
+    } finally {
+      setCreatingDuel(false)
+    }
+  }
+
+  const duelShareUrl = duelRoom
+    ? `${window.location.origin}/code-rooms/join/${duelRoom.inviteCode}`
+    : ''
+
+  const copyDuelLink = () => {
+    if (!duelShareUrl) return
+    navigator.clipboard.writeText(duelShareUrl).then(() => {
+      setCopiedDuel(true)
+      setTimeout(() => setCopiedDuel(false), 2000)
+    })
+  }
+
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchData() }} />
 
   return (
     <div className={isMobile ? 'px-4 pt-4 pb-24 flex flex-col gap-4' : 'px-4 md:px-6 pt-4 pb-4 md:pb-6 flex flex-col gap-4 lg:flex-row'}>
       {isMobile && (
-        <div className="section-enter overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(254,243,199,0.94)_48%,_rgba(238,242,255,0.92))] p-5 shadow-[0_18px_34px_rgba(15,23,42,0.08)]">
+        <div className="section-enter overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(254,243,199,0.94)_48%,_rgba(238,242,255,0.92))] p-5 shadow-[0_18px_34px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[linear-gradient(135deg,_rgba(11,13,22,0.96),_rgba(46,26,38,0.88)_48%,_rgba(29,36,63,0.92))]">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#92400e]">Arena</p>
-              <h1 className="mt-3 text-[28px] font-bold leading-none text-[#111111]">Дуэли в реальном времени</h1>
-              <p className="mt-3 text-sm leading-6 text-[#475569]">Очередь, live-матчи и рейтинг в одном мобильном потоке без лишних переключений.</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#92400e] dark:text-[#fbbf24]">Arena</p>
+              <h1 className="mt-3 text-[28px] font-bold leading-none text-[#111111] dark:text-[#f8fafc]">Дуэли в реальном времени</h1>
+              <p className="mt-3 text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">Очередь, live-матчи и рейтинг.</p>
             </div>
-            <div className="rounded-[24px] border border-white/80 bg-white/78 px-4 py-3 text-right shadow-sm backdrop-blur">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">Матчей</p>
-              <p className="mt-2 font-mono text-xl font-bold text-[#111111]">{openMatches.length}</p>
+            <div className="rounded-[24px] border border-white/80 bg-white/78 px-4 py-3 text-right shadow-sm backdrop-blur dark:border-[#334155] dark:bg-[#1e293b]">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#64748b]">Матчей</p>
+              <p className="mt-2 font-mono text-xl font-bold text-[#111111] dark:text-[#f8fafc]">{openMatches.length}</p>
             </div>
-          </div>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {[
-              { label: 'Очередь', value: inQueue ? 'Live' : 'Open' },
-              { label: 'Топ', value: leaderboard.length },
-              { label: 'Матчи', value: openMatches.length },
-            ].map(item => (
-              <div key={item.label} className="rounded-2xl border border-white/80 bg-white/76 px-3 py-3">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">{item.label}</p>
-                <p className="mt-1 text-base font-bold text-[#111111]">{item.value}</p>
-              </div>
-            ))}
           </div>
         </div>
       )}
 
       {/* Left column */}
       <div className="flex-1 flex flex-col gap-4">
-        {/* Queue card */}
+        {/* Ranked Queue */}
         <Card padding="md">
           <div className="flex items-center gap-2 mb-3">
             <Flame className="w-5 h-5 text-[#f59e0b]" />
-            <h3 className="text-sm font-bold text-[#111111]">Arena Queue</h3>
-            {inQueue && <span className="px-2 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] text-[11px] font-medium">В очереди</span>}
+            <h3 className="text-sm font-bold text-[#111111] dark:text-[#f8fafc]">Ranked Queue</h3>
+            {inQueue && <span className="px-2 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] text-[11px] font-medium dark:bg-[#422006] dark:text-[#fbbf24]">В очереди</span>}
+            <span className="ml-auto text-[10px] text-[#94a3b8] dark:text-[#64748b]">ELO ±</span>
           </div>
 
           {inQueue ? (
             <div className={`gap-4 ${isMobile ? 'flex flex-col items-start' : 'flex items-center justify-between'}`}>
               <div className="flex items-center gap-3">
-                {/* Animated radar rings */}
                 <div className="relative w-10 h-10 flex-shrink-0">
                   <span className="absolute inset-0 rounded-full bg-[#f59e0b]/20 animate-ping" />
                   <span className="absolute inset-1 rounded-full bg-[#f59e0b]/30 animate-ping [animation-delay:0.3s]" />
@@ -152,7 +171,7 @@ export function ArenaHubPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-center gap-1 text-sm font-semibold text-[#111111]">
+                  <div className="flex items-center gap-1 text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
                     Ищем соперника
                     <span className="flex gap-0.5 ml-1">
                       <span className="w-1 h-1 rounded-full bg-[#f59e0b] animate-bounce [animation-delay:0ms]" />
@@ -193,21 +212,72 @@ export function ArenaHubPage() {
           )}
         </Card>
 
+        {/* Friendly Duel */}
+        <Card padding="md">
+          <div className="flex items-center gap-2 mb-3">
+            <Users className="w-5 h-5 text-[#6366F1]" />
+            <h3 className="text-sm font-bold text-[#111111] dark:text-[#f8fafc]">Дружеская дуэль</h3>
+            <span className="ml-auto rounded-full bg-[#F2F3F0] px-2 py-0.5 text-[10px] font-medium text-[#94a3b8] dark:bg-[#1e293b] dark:text-[#64748b]">без ELO</span>
+          </div>
+          <p className="text-xs text-[#666666] dark:text-[#94a3b8] mb-3">
+            Создай приватную комнату и скинь ссылку другу. Результат не влияет на рейтинг.
+          </p>
+
+          {duelRoom ? (
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2 rounded-xl border border-[#CBCCC9] bg-[#F2F3F0] p-2.5 dark:border-[#334155] dark:bg-[#1e293b]">
+                <Link2 className="w-3.5 h-3.5 text-[#94a3b8] flex-shrink-0" />
+                <code className="flex-1 text-xs text-[#111111] dark:text-[#cbd5e1] font-mono truncate">{duelShareUrl}</code>
+                <button
+                  onClick={copyDuelLink}
+                  className="flex-shrink-0 p-1.5 rounded-md hover:bg-[#E7E8E5] dark:hover:bg-[#334155] transition-colors"
+                >
+                  {copiedDuel ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Copy className="w-3.5 h-3.5 text-[#666666] dark:text-[#94a3b8]" />}
+                </button>
+              </div>
+              <div className="flex gap-2">
+                <Button variant="secondary" size="sm" onClick={() => { setDuelRoom(null); setCopiedDuel(false) }} className="flex-1 justify-center">
+                  Новая
+                </Button>
+                <Button variant="orange" size="sm" onClick={() => navigate(`/code-rooms/${duelRoom.id}`)} className="flex-1 justify-center">
+                  Войти в комнату
+                </Button>
+              </div>
+            </div>
+          ) : (
+            <Button variant="secondary" size="md" onClick={handleCreateFriendlyDuel} loading={creatingDuel} className="w-full justify-center">
+              <Swords className="w-4 h-4" /> Создать дуэль по ссылке
+            </Button>
+          )}
+        </Card>
+
         {/* Open matches */}
         <Card padding="none">
-          <div className="px-4 py-3 border-b border-[#CBCCC9] flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-[#111111]">Открытые матчи</h3>
+          <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">Открытые матчи</h3>
             <span className="text-xs text-[#94a3b8]">{openMatches.length}</span>
           </div>
-          <div className="divide-y divide-[#CBCCC9]">
+          <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
             {openMatches.length === 0 ? (
               <div className="px-4 py-8 text-center text-xs text-[#94a3b8]">Нет открытых матчей</div>
             ) : openMatches.map((m: any, i: number) => (
               <div key={m.id ?? i} className={`gap-3 px-4 py-3 ${isMobile ? 'flex flex-col items-start' : 'flex items-center'}`}>
-                <Swords className="w-4 h-4 text-[#666666] flex-shrink-0" />
+                <Swords className="w-4 h-4 text-[#666666] dark:text-[#94a3b8] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#111111] truncate">{m.taskTitle ?? 'Задача'}</p>
-                  <p className="text-xs text-[#666666]">{m.topic ?? ''} · {({ DIFFICULTY_EASY: 'Easy', DIFFICULTY_MEDIUM: 'Medium', DIFFICULTY_HARD: 'Hard' } as Record<string, string>)[m.difficulty] ?? m.difficulty ?? ''}</p>
+                  <p className="text-sm font-medium text-[#111111] dark:text-[#f8fafc] truncate">{m.taskTitle ?? 'Задача'}</p>
+                  <div className="mt-1 flex flex-wrap items-center gap-1.5">
+                    {m.topic && <span className="text-xs text-[#666666] dark:text-[#94a3b8]">{m.topic}</span>}
+                    {m.difficulty && (
+                      <Badge variant={DIFF_VARIANTS[m.difficulty] ?? 'default'}>
+                        {DIFF_LABELS[m.difficulty] ?? m.difficulty}
+                      </Badge>
+                    )}
+                    {m.language && (
+                      <span className="rounded-full bg-[#F2F3F0] px-2 py-0.5 text-[10px] font-medium text-[#475569] dark:bg-[#1e293b] dark:text-[#94a3b8]">
+                        {LANG_LABELS[m.language] ?? m.language}
+                      </span>
+                    )}
+                  </div>
                 </div>
                 <Button size="sm" variant="secondary" className={isMobile ? 'w-full justify-center' : ''} onClick={() => navigate(`/arena/${m.id}`)}>
                   Войти
@@ -224,27 +294,27 @@ export function ArenaHubPage() {
         <Card padding="md">
           <div className="flex items-center gap-2 mb-3">
             <Trophy className="w-4 h-4 text-[#6366F1]" />
-            <h3 className="text-sm font-semibold text-[#111111]">Лига</h3>
+            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">Лига</h3>
           </div>
           <div className="text-center py-2">
             <p className="font-mono text-3xl font-bold text-[#6366F1]">Arena</p>
-            <p className="text-xs text-[#666666] mt-1">Станьте первым в рейтинге</p>
+            <p className="text-xs text-[#666666] dark:text-[#94a3b8] mt-1">Станьте первым в рейтинге</p>
           </div>
         </Card>
 
         {/* Leaderboard */}
         <Card padding="none">
-          <div className="px-4 py-3 border-b border-[#CBCCC9] flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-[#111111]">Лидерборд</h3>
+          <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">Лидерборд</h3>
             <Trophy className="w-4 h-4 text-[#f59e0b]" />
           </div>
-          <div className="divide-y divide-[#CBCCC9]">
+          <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
             {leaderboard.length === 0
               ? Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3 px-4 py-2.5 animate-pulse">
-                  <div className="w-5 h-5 rounded bg-[#E7E8E5]" />
-                  <div className="w-7 h-7 rounded-full bg-[#E7E8E5]" />
-                  <div className="flex-1 h-3 bg-[#E7E8E5] rounded" />
+                  <div className="w-5 h-5 rounded bg-[#E7E8E5] dark:bg-[#1e3158]" />
+                  <div className="w-7 h-7 rounded-full bg-[#E7E8E5] dark:bg-[#1e3158]" />
+                  <div className="flex-1 h-3 bg-[#E7E8E5] dark:bg-[#1e3158] rounded" />
                 </div>
               ))
               : leaderboard.slice(0, 8).map((e: any, i: number) => (
@@ -252,10 +322,10 @@ export function ArenaHubPage() {
                   <span className="w-5 text-xs font-mono text-[#94a3b8] text-right">{i + 1}</span>
                   <Avatar name={e.displayName ?? '?'} size="xs" />
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-[#111111] truncate">{e.displayName}</p>
+                    <p className="text-xs font-medium text-[#111111] dark:text-[#f8fafc] truncate">{e.displayName}</p>
                     <p className={`text-[10px] ${LEAGUE_COLORS[e.league] ?? 'text-[#94a3b8]'}`}>{LEAGUE_LABELS[e.league] ?? ''}</p>
                   </div>
-                  <span className="text-xs font-mono text-[#666666]">{e.rating ?? e.wins ?? 0}</span>
+                  <span className="text-xs font-mono text-[#666666] dark:text-[#94a3b8]">{e.rating ?? e.wins ?? 0}</span>
                 </div>
               ))
             }

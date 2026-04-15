@@ -279,11 +279,18 @@ func (s *Service) SubmitMockStage(
 	if err != nil {
 		return nil, err
 	}
-	if err := s.repo.UpdateMockStageSubmission(ctx, stage.ID, solveLanguage, code, true, int32(review.Score), review.Summary, nextMockStageStatus(stage)); err != nil {
+	passed := passesMockStageReview(review)
+	nextStatus := model.InterviewPrepMockStageStatusSolving
+	if passed {
+		nextStatus = nextMockStageStatus(stage)
+	}
+	if err := s.repo.UpdateMockStageSubmission(ctx, stage.ID, solveLanguage, code, passed, int32(review.Score), review.Summary, nextStatus); err != nil {
 		return nil, err
 	}
-	if err := s.advanceMockSessionIfStageReady(ctx, session, stage); err != nil {
-		return nil, err
+	if passed {
+		if err := s.advanceMockSessionIfStageReady(ctx, session, stage); err != nil {
+			return nil, err
+		}
 	}
 
 	nextSession, err := s.GetMockSession(ctx, user, session.ID)
@@ -291,7 +298,7 @@ func (s *Service) SubmitMockStage(
 		return nil, err
 	}
 	return &MockSubmitResult{
-		Passed:  true,
+		Passed:  passed,
 		Review:  review,
 		Session: nextSession,
 	}, nil
@@ -344,12 +351,18 @@ func (s *Service) ReviewMockSystemDesign(
 	if err != nil {
 		return nil, err
 	}
-
-	if err := s.repo.UpdateMockStageSubmission(ctx, stage.ID, "", "", true, int32(review.Score), review.Summary, nextMockStageStatus(stage)); err != nil {
+	passed := passesMockSystemDesignReview(review)
+	nextStatus := model.InterviewPrepMockStageStatusSolving
+	if passed {
+		nextStatus = nextMockStageStatus(stage)
+	}
+	if err := s.repo.UpdateMockStageSubmission(ctx, stage.ID, "", "", passed, int32(review.Score), review.Summary, nextStatus); err != nil {
 		return nil, err
 	}
-	if err := s.advanceMockSessionIfStageReady(ctx, session, stage); err != nil {
-		return nil, err
+	if passed {
+		if err := s.advanceMockSessionIfStageReady(ctx, session, stage); err != nil {
+			return nil, err
+		}
 	}
 
 	nextSession, err := s.GetMockSession(ctx, user, session.ID)
@@ -391,23 +404,27 @@ func (s *Service) AnswerMockQuestion(ctx context.Context, user *model.User, sess
 	if err != nil {
 		return nil, err
 	}
+	passed := passesMockQuestionReview(review)
 
-	nowTime := time.Now().UTC()
-	if err := s.repo.CompleteMockQuestion(ctx, stage.CurrentQuestion.ID, int32(review.Score), review.Summary, nowTime); err != nil {
-		return nil, err
-	}
-
-	updatedSession, err := s.GetMockSession(ctx, user, session.ID)
-	if err != nil {
-		return nil, err
-	}
-	if updatedSession.CurrentStage != nil && updatedSession.CurrentStage.CurrentQuestion == nil {
-		if err := s.completeAndAdvanceMockStage(ctx, updatedSession, updatedSession.CurrentStage); err != nil {
+	updatedSession := session
+	if passed {
+		nowTime := time.Now().UTC()
+		if err := s.repo.CompleteMockQuestion(ctx, stage.CurrentQuestion.ID, int32(review.Score), review.Summary, nowTime); err != nil {
 			return nil, err
 		}
+
 		updatedSession, err = s.GetMockSession(ctx, user, session.ID)
 		if err != nil {
 			return nil, err
+		}
+		if updatedSession.CurrentStage != nil && updatedSession.CurrentStage.CurrentQuestion == nil {
+			if err := s.completeAndAdvanceMockStage(ctx, updatedSession, updatedSession.CurrentStage); err != nil {
+				return nil, err
+			}
+			updatedSession, err = s.GetMockSession(ctx, user, session.ID)
+			if err != nil {
+				return nil, err
+			}
 		}
 	}
 

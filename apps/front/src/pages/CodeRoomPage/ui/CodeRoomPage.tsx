@@ -376,12 +376,49 @@ export function CodeRoomPage() {
     if (!roomId || needsGuestName) return
     const state = location.state as { title?: string; statement?: string; starterCode?: string; language?: string; taskId?: string } | null
     codeRoomApi.joinRoom(roomId, undefined, guestNameRef.current)
-      .then(r => {
+      .then(async r => {
         if (state?.title && !r.task) r = { ...r, task: state.title }
         setRoom(r)
-        if (state?.statement) setTaskStatement(state.statement)
-        // Prefer saved draft > server snapshot > starter code from navigation state
-        const draft = state?.taskId ? getSoloDraft(state.taskId) : null
+
+        // If we have task data from navigation state, use it directly
+        if (state?.statement) {
+          setTaskStatement(state.statement)
+          const taskId = state.taskId
+          const draft = taskId ? getSoloDraft(taskId) : null
+          const initCode = draft ?? r.code ?? state?.starterCode ?? ''
+          initialCodeRef.current = initCode
+          currentCodeRef.current = initCode
+          const model = editorRef.current?.getModel()
+          if (model && !bindingRef.current && model.getValue() !== initCode) {
+            model.setValue(initCode)
+          }
+          return
+        }
+
+        // No navigation state but room has a taskId — fetch task details from API
+        const taskId = state?.taskId || r.taskId
+        if (taskId && !state?.statement) {
+          try {
+            const tasks = await codeRoomApi.listTasks()
+            const task = tasks.find(t => t.id === taskId)
+            if (task) {
+              if (!r.task && task.title) setRoom(prev => prev ? { ...prev, task: task.title } : prev)
+              if (task.statement) setTaskStatement(task.statement)
+              const draft = getSoloDraft(taskId)
+              const initCode = draft ?? r.code ?? task.starterCode ?? ''
+              initialCodeRef.current = initCode
+              currentCodeRef.current = initCode
+              const model = editorRef.current?.getModel()
+              if (model && !bindingRef.current && model.getValue() !== initCode) {
+                model.setValue(initCode)
+              }
+              return
+            }
+          } catch { /* fallback to room data only */ }
+        }
+
+        // Fallback: use whatever the room has
+        const draft = taskId ? getSoloDraft(taskId) : null
         const initCode = draft ?? r.code ?? state?.starterCode ?? ''
         initialCodeRef.current = initCode
         currentCodeRef.current = initCode

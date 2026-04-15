@@ -217,7 +217,7 @@ export function MapPage() {
   }
 
   return (
-    <div className="flex h-[calc(100vh-180px)] min-h-[500px]">
+    <div className="flex h-[calc(100vh-130px)] min-h-[500px]">
       {/* Map area */}
       <div className="flex-1 relative">
         <CommunityMapCanvas

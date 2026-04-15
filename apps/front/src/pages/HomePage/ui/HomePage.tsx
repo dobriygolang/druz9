@@ -88,7 +88,7 @@ export function HomePage() {
             ].map((metric) => (
               <div
                 key={metric.label}
-                className="rounded-[24px] border border-white/60 bg-white/70 px-4 py-4 backdrop-blur dark:border-[#24324f] dark:bg-[#0f1729]/72"
+                className="rounded-[24px] border border-white/60 bg-white/70 px-4 py-4 backdrop-blur dark:border-[#334155] dark:bg-[#1e293b]"
               >
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-xs font-medium uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">
