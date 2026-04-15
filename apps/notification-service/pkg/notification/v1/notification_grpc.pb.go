@@ -22,6 +22,7 @@ const (
 	NotificationService_Send_FullMethodName                 = "/notification.v1.NotificationService/Send"
 	NotificationService_SendBatch_FullMethodName            = "/notification.v1.NotificationService/SendBatch"
 	NotificationService_RegisterChat_FullMethodName         = "/notification.v1.NotificationService/RegisterChat"
+	NotificationService_LinkTelegram_FullMethodName         = "/notification.v1.NotificationService/LinkTelegram"
 	NotificationService_UpdateSettings_FullMethodName       = "/notification.v1.NotificationService/UpdateSettings"
 	NotificationService_GetSettings_FullMethodName          = "/notification.v1.NotificationService/GetSettings"
 	NotificationService_UpdateCircleSettings_FullMethodName = "/notification.v1.NotificationService/UpdateCircleSettings"
@@ -38,8 +39,10 @@ type NotificationServiceClient interface {
 	Send(ctx context.Context, in *SendRequest, opts ...grpc.CallOption) (*SendResponse, error)
 	// SendBatch enqueues notifications for multiple users (e.g. circle fan-out).
 	SendBatch(ctx context.Context, in *SendBatchRequest, opts ...grpc.CallOption) (*SendBatchResponse, error)
-	// RegisterChat links a Telegram chat ID to a user.
+	// RegisterChat links a Telegram chat ID to a user (by user UUID).
 	RegisterChat(ctx context.Context, in *RegisterChatRequest, opts ...grpc.CallOption) (*RegisterChatResponse, error)
+	// LinkTelegram links a telegram_id to a user UUID (called after login).
+	LinkTelegram(ctx context.Context, in *LinkTelegramRequest, opts ...grpc.CallOption) (*LinkTelegramResponse, error)
 	// UpdateSettings updates a user's notification preferences.
 	UpdateSettings(ctx context.Context, in *UpdateSettingsRequest, opts ...grpc.CallOption) (*UpdateSettingsResponse, error)
 	// GetSettings returns a user's notification preferences.
@@ -80,6 +83,16 @@ func (c *notificationServiceClient) RegisterChat(ctx context.Context, in *Regist
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(RegisterChatResponse)
 	err := c.cc.Invoke(ctx, NotificationService_RegisterChat_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *notificationServiceClient) LinkTelegram(ctx context.Context, in *LinkTelegramRequest, opts ...grpc.CallOption) (*LinkTelegramResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(LinkTelegramResponse)
+	err := c.cc.Invoke(ctx, NotificationService_LinkTelegram_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -127,8 +140,10 @@ type NotificationServiceServer interface {
 	Send(context.Context, *SendRequest) (*SendResponse, error)
 	// SendBatch enqueues notifications for multiple users (e.g. circle fan-out).
 	SendBatch(context.Context, *SendBatchRequest) (*SendBatchResponse, error)
-	// RegisterChat links a Telegram chat ID to a user.
+	// RegisterChat links a Telegram chat ID to a user (by user UUID).
 	RegisterChat(context.Context, *RegisterChatRequest) (*RegisterChatResponse, error)
+	// LinkTelegram links a telegram_id to a user UUID (called after login).
+	LinkTelegram(context.Context, *LinkTelegramRequest) (*LinkTelegramResponse, error)
 	// UpdateSettings updates a user's notification preferences.
 	UpdateSettings(context.Context, *UpdateSettingsRequest) (*UpdateSettingsResponse, error)
 	// GetSettings returns a user's notification preferences.
@@ -153,6 +168,9 @@ func (UnimplementedNotificationServiceServer) SendBatch(context.Context, *SendBa
 }
 func (UnimplementedNotificationServiceServer) RegisterChat(context.Context, *RegisterChatRequest) (*RegisterChatResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RegisterChat not implemented")
+}
+func (UnimplementedNotificationServiceServer) LinkTelegram(context.Context, *LinkTelegramRequest) (*LinkTelegramResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LinkTelegram not implemented")
 }
 func (UnimplementedNotificationServiceServer) UpdateSettings(context.Context, *UpdateSettingsRequest) (*UpdateSettingsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateSettings not implemented")
@@ -238,6 +256,24 @@ func _NotificationService_RegisterChat_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NotificationService_LinkTelegram_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LinkTelegramRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationServiceServer).LinkTelegram(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationService_LinkTelegram_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationServiceServer).LinkTelegram(ctx, req.(*LinkTelegramRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _NotificationService_UpdateSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateSettingsRequest)
 	if err := dec(in); err != nil {
@@ -310,6 +346,10 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RegisterChat",
 			Handler:    _NotificationService_RegisterChat_Handler,
+		},
+		{
+			MethodName: "LinkTelegram",
+			Handler:    _NotificationService_LinkTelegram_Handler,
 		},
 		{
 			MethodName: "UpdateSettings",

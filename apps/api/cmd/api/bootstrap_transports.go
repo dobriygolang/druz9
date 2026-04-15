@@ -74,8 +74,13 @@ func registerBackgroundWorkers(bootstrap *bootstrapContext, storage *storageCont
 	closer.AddSync(startArenaCleanupWorker(bootstrap.kratosLogger, bootstrap.rtcManager, services.arenaServiceDomain))
 	closer.AddSync(startContentCleanupWorker(bootstrap.kratosLogger, storage))
 	closer.AddSync(startBusinessMetricsWorker(bootstrap.kratosLogger, bootstrap.rtcManager, storage))
-	closer.AddSync(startTelegramBotWorker(services.profileServiceDomain, services.notificationSender))
+	// Start the Telegram bot only if notification-service is NOT running its own bot.
+	// When NOTIFICATION_SERVICE_ADDR is set, the bot lives in notification-service.
+	if bootstrap.cfg.External.NotificationService == nil || bootstrap.cfg.External.NotificationService.Addr == "" {
+		closer.AddSync(startTelegramBotWorker(services.profileServiceDomain, services.notificationSender))
+	}
 	closer.AddSync(startStreakWarningWorker(services.notificationSender, storage.store.DB))
+	closer.AddSync(startCircleDigestWorker(services.notificationSender, storage.store.DB))
 }
 
 func registerManualHTTPRoutes(

@@ -210,6 +210,28 @@ func (r *Repo) RegisterChat(ctx context.Context, userID uuid.UUID, chatID int64)
 	return err
 }
 
+// RegisterChatByTelegramID upserts a row by telegram_id with the chat_id.
+// The user_id is a placeholder (null UUID) until login completes.
+func (r *Repo) RegisterChatByTelegramID(ctx context.Context, telegramID, chatID int64) error {
+	_, err := r.db.DB.Exec(ctx, `
+		INSERT INTO user_notification_settings (user_id, telegram_id, telegram_chat_id)
+		VALUES (gen_random_uuid(), $1, $2)
+		ON CONFLICT (telegram_id) WHERE telegram_id IS NOT NULL
+		DO UPDATE SET telegram_chat_id = $2, updated_at = NOW()`,
+		telegramID, chatID,
+	)
+	return err
+}
+
+// LinkTelegramToUser updates the row's user_id once we know the real app user UUID.
+func (r *Repo) LinkTelegramToUser(ctx context.Context, userID uuid.UUID, telegramID int64) error {
+	_, err := r.db.DB.Exec(ctx, `
+		UPDATE user_notification_settings SET user_id = $1, updated_at = NOW()
+		WHERE telegram_id = $2`, userID, telegramID,
+	)
+	return err
+}
+
 // ── Circle Settings ───────────────────────────────────────────
 
 // GetCircleSettings returns per-circle settings, or defaults if none exist.

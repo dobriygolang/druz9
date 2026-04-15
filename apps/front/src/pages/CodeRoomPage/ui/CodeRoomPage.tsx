@@ -116,7 +116,7 @@ function buildCursorWidget(
   userId: string,
   displayName: string,
   color: string,
-  posRef: { line: number; col: number; offset: number },
+  posRef: { line: number; col: number },
   monaco: typeof Monaco,
 ): Monaco.editor.IContentWidget {
   const domNode = document.createElement('div')
@@ -228,15 +228,13 @@ export function CodeRoomPage() {
   const widgetsRef = useRef<Map<string, Monaco.editor.IContentWidget>>(new Map())
   const prevParticipantIdsRef = useRef<Set<string>>(new Set())
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
-  const queuedDocMessagesRef = useRef<Array<{ payload: string; clientId?: string }>>([])
+  const queuedDocMessagesRef = useRef<string[]>([])
   const sendDocSyncRef = useRef<(data: string) => void>(() => {})
   const onDocSyncAppliedRef = useRef<(() => void) | null>(null)
   const currentCodeRef = useRef('')
   const initialCodeRef = useRef('')
   const lastCursorRef = useRef({ line: 1, col: 1 })
   const isApplyingRemoteDocRef = useRef(false)
-  const remoteDocSenderUserIdRef = useRef<string | null>(null)
-  const remoteClientToUserRef = useRef<Map<string, string>>(new Map())
   const isCreatorRef = useRef(false)
   const taskState = (location.state as { starterCode?: string; taskId?: string } | null)
   const soloDraftTaskId = taskState?.taskId ?? null
@@ -245,7 +243,7 @@ export function CodeRoomPage() {
   const saveDraftTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Mutable cursor positions for remote users — updated in-place, no widget re-add needed
-  const cursorPositionsRef = useRef<Map<string, { line: number; col: number; offset: number }>>(new Map())
+  const cursorPositionsRef = useRef<Map<string, { line: number; col: number }>>(new Map())
   const awarenessCodeLenRef = useRef<Map<string, number | undefined>>(new Map())
   const pendingCursorUpdatesRef = useRef<Map<string, { line: number; col: number; codeLen?: number }>>(new Map())
 
@@ -337,14 +335,12 @@ export function CodeRoomPage() {
     setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), 4000)
   }, [notificationsEnabled])
 
-  const handleIncomingDocSync = useCallback((payload: string, clientId?: string) => {
+  const handleIncomingDocSync = useCallback((payload: string) => {
     const doc = yDocRef.current
     if (!doc) {
-      queuedDocMessagesRef.current.push({ payload, clientId })
+      queuedDocMessagesRef.current.push(payload)
       return
     }
-
-    remoteDocSenderUserIdRef.current = clientId ? (remoteClientToUserRef.current.get(clientId) ?? null) : null
 
     const decoder = decoding.createDecoder(decodeBase64ToBinary(payload))
     const encoder = encoding.createEncoder()
@@ -355,13 +351,12 @@ export function CodeRoomPage() {
       sendDocSyncRef.current(encodeBinaryToBase64(reply))
     }
     onDocSyncAppliedRef.current?.()
-    remoteDocSenderUserIdRef.current = null
   }, [])
 
   const flushQueuedDocMessages = useCallback(() => {
     if (!yDocRef.current || queuedDocMessagesRef.current.length === 0) return
     const pending = queuedDocMessagesRef.current.splice(0)
-    pending.forEach(item => handleIncomingDocSync(item.payload, item.clientId))
+    pending.forEach(handleIncomingDocSync)
   }, [handleIncomingDocSync])
 
   const flushPendingCursorUpdates = useCallback(() => {
@@ -377,7 +372,6 @@ export function CodeRoomPage() {
       if (!posRef || !widget) return
       posRef.line = update.line
       posRef.col = update.col
-      posRef.offset = model.getOffsetAt({ lineNumber: update.line, column: update.col })
       editor.layoutContentWidget(widget)
       pendingCursorUpdatesRef.current.delete(userId)
     })
@@ -403,10 +397,7 @@ export function CodeRoomPage() {
       else if (event === 'tab_visible') addNotification(t('codeRoom.notifications.returned', { name: displayName }))
       else if (event === 'pasted') addNotification(t('codeRoom.notifications.pasted', { name: displayName }))
     }, [addNotification, t]),
-    onCursorUpdate: useCallback((userId: string, line: number, col: number, remoteCodeLen?: number, clientId?: string) => {
-      if (clientId) {
-        remoteClientToUserRef.current.set(clientId, userId)
-      }
+    onCursorUpdate: useCallback((userId: string, line: number, col: number, remoteCodeLen?: number) => {
       const localCodeLen = editorRef.current?.getModel()?.getValueLength()
       if (remoteCodeLen !== undefined && localCodeLen !== undefined && remoteCodeLen !== localCodeLen) {
         pendingCursorUpdatesRef.current.set(userId, { line, col, codeLen: remoteCodeLen })
@@ -418,10 +409,6 @@ export function CodeRoomPage() {
       if (posRef && widgetsRef.current.has(userId)) {
         posRef.line = line
         posRef.col = col
-        const model = editorRef.current?.getModel()
-        if (model) {
-          posRef.offset = model.getOffsetAt({ lineNumber: line, column: col })
-        }
         editorRef.current?.layoutContentWidget(widgetsRef.current.get(userId)!)
       }
     }, []),
@@ -693,11 +680,7 @@ export function CodeRoomPage() {
         // Position updates for existing widgets are handled exclusively by onCursorUpdate
         // (which filters stale awareness via codeLen). This avoids RAF-batched stale
         // awareness overwriting the OT-predicted position during rapid typing.
-        const posRef = {
-          line: state.cursorLine,
-          col,
-          offset: editor.getModel()?.getOffsetAt({ lineNumber: state.cursorLine, column: col }) ?? 0,
-        }
+        const posRef = { line: state.cursorLine, col }
         cursorPositionsRef.current.set(state.userId, posRef)
         const widget = buildCursorWidget(state.userId, state.displayName, color, posRef, monaco)
         editor.addContentWidget(widget)
@@ -861,18 +844,6 @@ export function CodeRoomPage() {
       flushPendingCursorUpdates()
 
       if (isApplyingRemoteDocRef.current) {
-        const senderUserId = remoteDocSenderUserIdRef.current
-        if (senderUserId) {
-          const posRef = cursorPositionsRef.current.get(senderUserId)
-          const widget = widgetsRef.current.get(senderUserId)
-          if (posRef && widget) {
-            posRef.offset = transformCursorOffset(posRef.offset, oldCode, nextCode)
-            const newPos = nextModel.getPositionAt(Math.min(posRef.offset, nextCode.length))
-            posRef.line = newPos.lineNumber
-            posRef.col = newPos.column
-            editor.layoutContentWidget(widget)
-          }
-        }
         return
       }
 
@@ -884,8 +855,12 @@ export function CodeRoomPage() {
           if (remoteCodeLen !== undefined && remoteCodeLen !== oldCode.length) {
             return
           }
-          posRef.offset = transformCursorOffset(posRef.offset, oldCode, nextCode)
-          const newPos = nextModel.getPositionAt(Math.min(posRef.offset, nextCode.length))
+          const lines = oldCode.split('\n')
+          let offset = 0
+          for (let i = 0; i < posRef.line - 1 && i < lines.length; i++) offset += lines[i].length + 1
+          offset = Math.min(offset + posRef.col - 1, oldCode.length)
+          offset = transformCursorOffset(offset, oldCode, nextCode)
+          const newPos = nextModel.getPositionAt(Math.min(offset, nextCode.length))
           posRef.line = newPos.lineNumber
           posRef.col = newPos.column
           const widget = widgetsRef.current.get(userId)

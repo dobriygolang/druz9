@@ -91,6 +91,19 @@ func (s *NotificationServer) RegisterChat(ctx context.Context, req *v1.RegisterC
 	return &v1.RegisterChatResponse{}, nil
 }
 
+func (s *NotificationServer) LinkTelegram(ctx context.Context, req *v1.LinkTelegramRequest) (*v1.LinkTelegramResponse, error) {
+	userID, err := uuid.Parse(req.GetUserId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid user_id: %v", err)
+	}
+
+	if err := s.svc.LinkTelegram(ctx, userID, req.GetTelegramId()); err != nil {
+		return nil, status.Errorf(codes.Internal, "link telegram: %v", err)
+	}
+
+	return &v1.LinkTelegramResponse{}, nil
+}
+
 func (s *NotificationServer) UpdateSettings(ctx context.Context, req *v1.UpdateSettingsRequest) (*v1.UpdateSettingsResponse, error) {
 	userID, err := uuid.Parse(req.GetUserId())
 	if err != nil {

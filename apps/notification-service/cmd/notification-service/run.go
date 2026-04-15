@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	"notification-service/internal/bot"
 	"notification-service/internal/closer"
 	"notification-service/internal/config"
 	"notification-service/internal/data"
@@ -89,6 +90,23 @@ func newApp() (*kratos.App, *appLogger.Logger, error) {
 		workerCancel()
 		return nil
 	})
+
+	// Telegram bot listener.
+	if cfg.Telegram.BotToken != "" && cfg.API.GRPCAddr != "" {
+		authAdapter, authErr := bot.NewGRPCAuthAdapter(cfg.API.GRPCAddr, cfg.Telegram.BotToken)
+		if authErr != nil {
+			return nil, nil, authErr
+		}
+		closer.AddSync(authAdapter.Close)
+
+		tgBot := bot.New(cfg.Telegram.BotToken, tgClient, svc, repo, authAdapter)
+		botCtx, botCancel := context.WithCancel(context.Background())
+		go func() { _ = tgBot.Run(botCtx) }()
+		closer.AddSync(func() error {
+			botCancel()
+			return nil
+		})
+	}
 
 	app := kratos.New(
 		kratos.Name("notification-service"),

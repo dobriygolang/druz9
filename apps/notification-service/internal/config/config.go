@@ -6,6 +6,7 @@ type Bootstrap struct {
 	Server   *Server   `json:"server"`
 	Data     *Data     `json:"data"`
 	Telegram *Telegram `json:"telegram"`
+	API      *API      `json:"api"`
 }
 
 type Server struct {
@@ -33,4 +34,8 @@ type Database struct {
 
 type Telegram struct {
 	BotToken string `json:"bot_token"`
+}
+
+type API struct {
+	GRPCAddr string `json:"grpc_addr"`
 }

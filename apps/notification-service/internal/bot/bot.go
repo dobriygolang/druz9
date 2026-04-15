@@ -131,8 +131,10 @@ func (b *Bot) handleStart(ctx context.Context, msg *telegramMessage) {
 
 	b.tg.SendMessage(ctx, msg.Chat.ID, fmt.Sprintf("Код входа: %s\n\nВернись на сайт и введи его в форме авторизации.", code))
 
-	// Register this chat for future notifications (using telegram user ID as string key for now).
-	// The actual user_id mapping will be resolved when the user completes login on the web.
+	// Register chat_id for future notifications. The user_id will be linked after login.
+	if err := b.repo.RegisterChatByTelegramID(ctx, msg.From.ID, msg.Chat.ID); err != nil {
+		klog.Errorf("bot: register chat: %v", err)
+	}
 	klog.Infof("bot: auth confirmed for telegram_id=%d chat_id=%d", msg.From.ID, msg.Chat.ID)
 }
 

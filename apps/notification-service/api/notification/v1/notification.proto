@@ -16,8 +16,11 @@ service NotificationService {
   // SendBatch enqueues notifications for multiple users (e.g. circle fan-out).
   rpc SendBatch(SendBatchRequest) returns (SendBatchResponse);
 
-  // RegisterChat links a Telegram chat ID to a user.
+  // RegisterChat links a Telegram chat ID to a user (by user UUID).
   rpc RegisterChat(RegisterChatRequest) returns (RegisterChatResponse);
+
+  // LinkTelegram links a telegram_id to a user UUID (called after login).
+  rpc LinkTelegram(LinkTelegramRequest) returns (LinkTelegramResponse);
 
   // UpdateSettings updates a user's notification preferences.
   rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse);
@@ -66,6 +69,13 @@ message RegisterChatRequest {
 }
 
 message RegisterChatResponse {}
+
+message LinkTelegramRequest {
+  string user_id = 1;
+  int64 telegram_id = 2;
+}
+
+message LinkTelegramResponse {}
 
 // ── Settings ──────────────────────────────────────────────────
 

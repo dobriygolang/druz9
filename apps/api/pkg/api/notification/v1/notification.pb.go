@@ -359,6 +359,94 @@ func (*RegisterChatResponse) Descriptor() ([]byte, []int) {
 	return file_notification_v1_notification_proto_rawDescGZIP(), []int{5}
 }
 
+type LinkTelegramRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	TelegramId    int64                  `protobuf:"varint,2,opt,name=telegram_id,json=telegramId,proto3" json:"telegram_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LinkTelegramRequest) Reset() {
+	*x = LinkTelegramRequest{}
+	mi := &file_notification_v1_notification_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LinkTelegramRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LinkTelegramRequest) ProtoMessage() {}
+
+func (x *LinkTelegramRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_notification_v1_notification_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LinkTelegramRequest.ProtoReflect.Descriptor instead.
+func (*LinkTelegramRequest) Descriptor() ([]byte, []int) {
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *LinkTelegramRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *LinkTelegramRequest) GetTelegramId() int64 {
+	if x != nil {
+		return x.TelegramId
+	}
+	return 0
+}
+
+type LinkTelegramResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LinkTelegramResponse) Reset() {
+	*x = LinkTelegramResponse{}
+	mi := &file_notification_v1_notification_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LinkTelegramResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LinkTelegramResponse) ProtoMessage() {}
+
+func (x *LinkTelegramResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_notification_v1_notification_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LinkTelegramResponse.ProtoReflect.Descriptor instead.
+func (*LinkTelegramResponse) Descriptor() ([]byte, []int) {
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{7}
+}
+
 type UpdateSettingsRequest struct {
 	state                 protoimpl.MessageState `protogen:"open.v1"`
 	UserId                string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
@@ -375,7 +463,7 @@ type UpdateSettingsRequest struct {
 
 func (x *UpdateSettingsRequest) Reset() {
 	*x = UpdateSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[6]
+	mi := &file_notification_v1_notification_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -387,7 +475,7 @@ func (x *UpdateSettingsRequest) String() string {
 func (*UpdateSettingsRequest) ProtoMessage() {}
 
 func (x *UpdateSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[6]
+	mi := &file_notification_v1_notification_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -400,7 +488,7 @@ func (x *UpdateSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSettingsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{6}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UpdateSettingsRequest) GetUserId() string {
@@ -467,7 +555,7 @@ type UpdateSettingsResponse struct {
 
 func (x *UpdateSettingsResponse) Reset() {
 	*x = UpdateSettingsResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[7]
+	mi := &file_notification_v1_notification_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -479,7 +567,7 @@ func (x *UpdateSettingsResponse) String() string {
 func (*UpdateSettingsResponse) ProtoMessage() {}
 
 func (x *UpdateSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[7]
+	mi := &file_notification_v1_notification_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -492,7 +580,7 @@ func (x *UpdateSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSettingsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{7}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{9}
 }
 
 type GetSettingsRequest struct {
@@ -504,7 +592,7 @@ type GetSettingsRequest struct {
 
 func (x *GetSettingsRequest) Reset() {
 	*x = GetSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[8]
+	mi := &file_notification_v1_notification_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -516,7 +604,7 @@ func (x *GetSettingsRequest) String() string {
 func (*GetSettingsRequest) ProtoMessage() {}
 
 func (x *GetSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[8]
+	mi := &file_notification_v1_notification_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -529,7 +617,7 @@ func (x *GetSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSettingsRequest.ProtoReflect.Descriptor instead.
 func (*GetSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{8}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetSettingsRequest) GetUserId() string {
@@ -555,7 +643,7 @@ type GetSettingsResponse struct {
 
 func (x *GetSettingsResponse) Reset() {
 	*x = GetSettingsResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[9]
+	mi := &file_notification_v1_notification_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -567,7 +655,7 @@ func (x *GetSettingsResponse) String() string {
 func (*GetSettingsResponse) ProtoMessage() {}
 
 func (x *GetSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[9]
+	mi := &file_notification_v1_notification_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -580,7 +668,7 @@ func (x *GetSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSettingsResponse.ProtoReflect.Descriptor instead.
 func (*GetSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{9}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetSettingsResponse) GetDuelsEnabled() bool {
@@ -653,7 +741,7 @@ type UpdateCircleSettingsRequest struct {
 
 func (x *UpdateCircleSettingsRequest) Reset() {
 	*x = UpdateCircleSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[10]
+	mi := &file_notification_v1_notification_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -665,7 +753,7 @@ func (x *UpdateCircleSettingsRequest) String() string {
 func (*UpdateCircleSettingsRequest) ProtoMessage() {}
 
 func (x *UpdateCircleSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[10]
+	mi := &file_notification_v1_notification_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -678,7 +766,7 @@ func (x *UpdateCircleSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCircleSettingsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateCircleSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{10}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *UpdateCircleSettingsRequest) GetUserId() string {
@@ -731,7 +819,7 @@ type UpdateCircleSettingsResponse struct {
 
 func (x *UpdateCircleSettingsResponse) Reset() {
 	*x = UpdateCircleSettingsResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[11]
+	mi := &file_notification_v1_notification_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -743,7 +831,7 @@ func (x *UpdateCircleSettingsResponse) String() string {
 func (*UpdateCircleSettingsResponse) ProtoMessage() {}
 
 func (x *UpdateCircleSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[11]
+	mi := &file_notification_v1_notification_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -756,7 +844,7 @@ func (x *UpdateCircleSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateCircleSettingsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateCircleSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{11}
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{13}
 }
 
 var File_notification_v1_notification_proto protoreflect.FileDescriptor
@@ -785,7 +873,12 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\x13RegisterChatRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12(\n" +
 	"\x10telegram_chat_id\x18\x02 \x01(\x03R\x0etelegramChatId\"\x16\n" +
-	"\x14RegisterChatResponse\"\x82\x04\n" +
+	"\x14RegisterChatResponse\"O\n" +
+	"\x13LinkTelegramRequest\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x1f\n" +
+	"\vtelegram_id\x18\x02 \x01(\x03R\n" +
+	"telegramId\"\x16\n" +
+	"\x14LinkTelegramResponse\"\x82\x04\n" +
 	"\x15UpdateSettingsRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12(\n" +
 	"\rduels_enabled\x18\x02 \x01(\bH\x00R\fduelsEnabled\x88\x01\x01\x12.\n" +
@@ -825,11 +918,12 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\x11_activity_enabledB\x11\n" +
 	"\x0f_digest_enabledB\b\n" +
 	"\x06_muted\"\x1e\n" +
-	"\x1cUpdateCircleSettingsResponse2\xbd\x04\n" +
+	"\x1cUpdateCircleSettingsResponse2\x9a\x05\n" +
 	"\x13NotificationService\x12C\n" +
 	"\x04Send\x12\x1c.notification.v1.SendRequest\x1a\x1d.notification.v1.SendResponse\x12R\n" +
 	"\tSendBatch\x12!.notification.v1.SendBatchRequest\x1a\".notification.v1.SendBatchResponse\x12[\n" +
-	"\fRegisterChat\x12$.notification.v1.RegisterChatRequest\x1a%.notification.v1.RegisterChatResponse\x12a\n" +
+	"\fRegisterChat\x12$.notification.v1.RegisterChatRequest\x1a%.notification.v1.RegisterChatResponse\x12[\n" +
+	"\fLinkTelegram\x12$.notification.v1.LinkTelegramRequest\x1a%.notification.v1.LinkTelegramResponse\x12a\n" +
 	"\x0eUpdateSettings\x12&.notification.v1.UpdateSettingsRequest\x1a'.notification.v1.UpdateSettingsResponse\x12X\n" +
 	"\vGetSettings\x12#.notification.v1.GetSettingsRequest\x1a$.notification.v1.GetSettingsResponse\x12s\n" +
 	"\x14UpdateCircleSettings\x12,.notification.v1.UpdateCircleSettingsRequest\x1a-.notification.v1.UpdateCircleSettingsResponseB Z\x1eapi/pkg/api/notification/v1;v1b\x06proto3"
@@ -846,7 +940,7 @@ func file_notification_v1_notification_proto_rawDescGZIP() []byte {
 	return file_notification_v1_notification_proto_rawDescData
 }
 
-var file_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_notification_v1_notification_proto_goTypes = []any{
 	(*SendRequest)(nil),                  // 0: notification.v1.SendRequest
 	(*SendResponse)(nil),                 // 1: notification.v1.SendResponse
@@ -854,33 +948,37 @@ var file_notification_v1_notification_proto_goTypes = []any{
 	(*SendBatchResponse)(nil),            // 3: notification.v1.SendBatchResponse
 	(*RegisterChatRequest)(nil),          // 4: notification.v1.RegisterChatRequest
 	(*RegisterChatResponse)(nil),         // 5: notification.v1.RegisterChatResponse
-	(*UpdateSettingsRequest)(nil),        // 6: notification.v1.UpdateSettingsRequest
-	(*UpdateSettingsResponse)(nil),       // 7: notification.v1.UpdateSettingsResponse
-	(*GetSettingsRequest)(nil),           // 8: notification.v1.GetSettingsRequest
-	(*GetSettingsResponse)(nil),          // 9: notification.v1.GetSettingsResponse
-	(*UpdateCircleSettingsRequest)(nil),  // 10: notification.v1.UpdateCircleSettingsRequest
-	(*UpdateCircleSettingsResponse)(nil), // 11: notification.v1.UpdateCircleSettingsResponse
-	(*structpb.Struct)(nil),              // 12: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),        // 13: google.protobuf.Timestamp
+	(*LinkTelegramRequest)(nil),          // 6: notification.v1.LinkTelegramRequest
+	(*LinkTelegramResponse)(nil),         // 7: notification.v1.LinkTelegramResponse
+	(*UpdateSettingsRequest)(nil),        // 8: notification.v1.UpdateSettingsRequest
+	(*UpdateSettingsResponse)(nil),       // 9: notification.v1.UpdateSettingsResponse
+	(*GetSettingsRequest)(nil),           // 10: notification.v1.GetSettingsRequest
+	(*GetSettingsResponse)(nil),          // 11: notification.v1.GetSettingsResponse
+	(*UpdateCircleSettingsRequest)(nil),  // 12: notification.v1.UpdateCircleSettingsRequest
+	(*UpdateCircleSettingsResponse)(nil), // 13: notification.v1.UpdateCircleSettingsResponse
+	(*structpb.Struct)(nil),              // 14: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),        // 15: google.protobuf.Timestamp
 }
 var file_notification_v1_notification_proto_depIdxs = []int32{
-	12, // 0: notification.v1.SendRequest.payload:type_name -> google.protobuf.Struct
-	13, // 1: notification.v1.SendRequest.schedule_at:type_name -> google.protobuf.Timestamp
-	12, // 2: notification.v1.SendBatchRequest.payload:type_name -> google.protobuf.Struct
+	14, // 0: notification.v1.SendRequest.payload:type_name -> google.protobuf.Struct
+	15, // 1: notification.v1.SendRequest.schedule_at:type_name -> google.protobuf.Timestamp
+	14, // 2: notification.v1.SendBatchRequest.payload:type_name -> google.protobuf.Struct
 	0,  // 3: notification.v1.NotificationService.Send:input_type -> notification.v1.SendRequest
 	2,  // 4: notification.v1.NotificationService.SendBatch:input_type -> notification.v1.SendBatchRequest
 	4,  // 5: notification.v1.NotificationService.RegisterChat:input_type -> notification.v1.RegisterChatRequest
-	6,  // 6: notification.v1.NotificationService.UpdateSettings:input_type -> notification.v1.UpdateSettingsRequest
-	8,  // 7: notification.v1.NotificationService.GetSettings:input_type -> notification.v1.GetSettingsRequest
-	10, // 8: notification.v1.NotificationService.UpdateCircleSettings:input_type -> notification.v1.UpdateCircleSettingsRequest
-	1,  // 9: notification.v1.NotificationService.Send:output_type -> notification.v1.SendResponse
-	3,  // 10: notification.v1.NotificationService.SendBatch:output_type -> notification.v1.SendBatchResponse
-	5,  // 11: notification.v1.NotificationService.RegisterChat:output_type -> notification.v1.RegisterChatResponse
-	7,  // 12: notification.v1.NotificationService.UpdateSettings:output_type -> notification.v1.UpdateSettingsResponse
-	9,  // 13: notification.v1.NotificationService.GetSettings:output_type -> notification.v1.GetSettingsResponse
-	11, // 14: notification.v1.NotificationService.UpdateCircleSettings:output_type -> notification.v1.UpdateCircleSettingsResponse
-	9,  // [9:15] is the sub-list for method output_type
-	3,  // [3:9] is the sub-list for method input_type
+	6,  // 6: notification.v1.NotificationService.LinkTelegram:input_type -> notification.v1.LinkTelegramRequest
+	8,  // 7: notification.v1.NotificationService.UpdateSettings:input_type -> notification.v1.UpdateSettingsRequest
+	10, // 8: notification.v1.NotificationService.GetSettings:input_type -> notification.v1.GetSettingsRequest
+	12, // 9: notification.v1.NotificationService.UpdateCircleSettings:input_type -> notification.v1.UpdateCircleSettingsRequest
+	1,  // 10: notification.v1.NotificationService.Send:output_type -> notification.v1.SendResponse
+	3,  // 11: notification.v1.NotificationService.SendBatch:output_type -> notification.v1.SendBatchResponse
+	5,  // 12: notification.v1.NotificationService.RegisterChat:output_type -> notification.v1.RegisterChatResponse
+	7,  // 13: notification.v1.NotificationService.LinkTelegram:output_type -> notification.v1.LinkTelegramResponse
+	9,  // 14: notification.v1.NotificationService.UpdateSettings:output_type -> notification.v1.UpdateSettingsResponse
+	11, // 15: notification.v1.NotificationService.GetSettings:output_type -> notification.v1.GetSettingsResponse
+	13, // 16: notification.v1.NotificationService.UpdateCircleSettings:output_type -> notification.v1.UpdateCircleSettingsResponse
+	10, // [10:17] is the sub-list for method output_type
+	3,  // [3:10] is the sub-list for method input_type
 	3,  // [3:3] is the sub-list for extension type_name
 	3,  // [3:3] is the sub-list for extension extendee
 	0,  // [0:3] is the sub-list for field type_name
@@ -891,15 +989,15 @@ func file_notification_v1_notification_proto_init() {
 	if File_notification_v1_notification_proto != nil {
 		return
 	}
-	file_notification_v1_notification_proto_msgTypes[6].OneofWrappers = []any{}
-	file_notification_v1_notification_proto_msgTypes[10].OneofWrappers = []any{}
+	file_notification_v1_notification_proto_msgTypes[8].OneofWrappers = []any{}
+	file_notification_v1_notification_proto_msgTypes[12].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_notification_v1_notification_proto_rawDesc), len(file_notification_v1_notification_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   12,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

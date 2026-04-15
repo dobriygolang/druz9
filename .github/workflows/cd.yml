@@ -86,13 +86,12 @@ jobs:
           AI_REVIEW_API_KEY: ${{ secrets.AI_REVIEW_API_KEY }}
           YANDEX_OAUTH_CLIENT_SECRET: ${{ secrets.YANDEX_OAUTH_CLIENT_SECRET }}
           MAPTILER_KEY: ${{ secrets.MAPTILER_KEY }}
-          NOTIFICATION_SERVICE_DATABASE_URL: ${{ secrets.NOTIFICATION_SERVICE_DATABASE_URL }}
         with:
           host: ${{ env.DEPLOY_HOST }}
           username: ${{ env.DEPLOY_USER }}
           key: ${{ env.DEPLOY_SSH_KEY }}
           port: ${{ env.DEPLOY_SSH_PORT }}
-          envs: APP_HOST,API_HOST,APP_ALIASES,APP_EMAIL,TELEGRAM_BOT_NAME,TELEGRAM_ALERT_CHAT_ID,ARENA_REQUIRE_AUTH,POSTGRES_DB,POSTGRES_USER,S3_BUCKET,S3_REGION,COOKIE_DOMAIN,S3_PUBLIC_ENDPOINT,S3_HOST,MINIO_CONSOLE_HOST,MINIO_CONSOLE_BASIC_AUTH,DATABASE_URL,POSTGRES_PASSWORD,MINIO_ROOT_USER,MINIO_ROOT_PASSWORD,S3_ACCESS_KEY,S3_SECRET_KEY,TELEGRAM_BOT_TOKEN,AI_REVIEW_API_KEY,YANDEX_OAUTH_CLIENT_SECRET,MAPTILER_KEY,NOTIFICATION_SERVICE_DATABASE_URL
+          envs: APP_HOST,API_HOST,APP_ALIASES,APP_EMAIL,TELEGRAM_BOT_NAME,TELEGRAM_ALERT_CHAT_ID,ARENA_REQUIRE_AUTH,POSTGRES_DB,POSTGRES_USER,S3_BUCKET,S3_REGION,COOKIE_DOMAIN,S3_PUBLIC_ENDPOINT,S3_HOST,MINIO_CONSOLE_HOST,MINIO_CONSOLE_BASIC_AUTH,DATABASE_URL,POSTGRES_PASSWORD,MINIO_ROOT_USER,MINIO_ROOT_PASSWORD,S3_ACCESS_KEY,S3_SECRET_KEY,TELEGRAM_BOT_TOKEN,AI_REVIEW_API_KEY,YANDEX_OAUTH_CLIENT_SECRET,MAPTILER_KEY
           script: |
             set -euo pipefail
             cd "${{ env.DEPLOY_APP_DIR }}"
@@ -131,7 +130,6 @@ jobs:
             printf '%s' "${TELEGRAM_BOT_TOKEN}" > apps/deploy/runtime/secrets/prod/telegram_bot_token
             printf '%s' "${AI_REVIEW_API_KEY}" > apps/deploy/runtime/secrets/prod/ai_review_api_key
             printf '%s' "${YANDEX_OAUTH_CLIENT_SECRET}" > apps/deploy/runtime/secrets/prod/yandex_oauth_client_secret
-            printf '%s' "${NOTIFICATION_SERVICE_DATABASE_URL}" > apps/deploy/runtime/secrets/prod/notification_service_database_url
 
             chmod 600 apps/deploy/.env.prod apps/deploy/runtime/secrets/prod/*
 

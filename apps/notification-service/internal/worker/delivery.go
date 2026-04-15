@@ -131,9 +131,16 @@ func (w *DeliveryWorker) deliver(ctx context.Context, n *data.Notification) erro
 		return w.repo.Reschedule(ctx, n.ID, rescheduleAt)
 	}
 
-	// Deliver via Telegram.
-	if err := w.tg.SendMessage(ctx, settings.TelegramChatID, n.Body); err != nil {
-		return w.markFailed(ctx, n.ID, err.Error())
+	// Deliver via Telegram — with inline keyboard for specific kinds.
+	keyboard := buildKeyboard(n)
+	var sendErr error
+	if keyboard != nil {
+		sendErr = w.tg.SendMessageWithKeyboard(ctx, settings.TelegramChatID, n.Body, *keyboard)
+	} else {
+		sendErr = w.tg.SendMessage(ctx, settings.TelegramChatID, n.Body)
+	}
+	if sendErr != nil {
+		return w.markFailed(ctx, n.ID, sendErr.Error())
 	}
 
 	return w.repo.MarkSent(ctx, n.ID)
@@ -144,6 +151,61 @@ func (w *DeliveryWorker) markFailed(ctx context.Context, id uuid.UUID, errMsg st
 		klog.Errorf("mark failed %s: %v", id, err)
 	}
 	return fmt.Errorf("%s", errMsg)
+}
+
+func buildKeyboard(n *data.Notification) *telegram.InlineKeyboardMarkup {
+	switch n.Kind {
+	case service.KindDuelInvite:
+		matchID := extractStringField(n.Payload, "match_id")
+		if matchID == "" {
+			return nil
+		}
+		return &telegram.InlineKeyboardMarkup{
+			InlineKeyboard: [][]telegram.InlineKeyboardButton{
+				{
+					{Text: "Принять", URL: "https://druz9.online/arena/" + matchID},
+				},
+			},
+		}
+	case service.KindCircleInvite:
+		circleID := extractStringField(n.Payload, "circle_id")
+		if circleID == "" {
+			return nil
+		}
+		return &telegram.InlineKeyboardMarkup{
+			InlineKeyboard: [][]telegram.InlineKeyboardButton{
+				{
+					{Text: "Открыть круг", URL: "https://druz9.online/circles/" + circleID},
+				},
+			},
+		}
+	case service.KindDuelMatchFound:
+		matchID := extractStringField(n.Payload, "match_id")
+		if matchID == "" {
+			return nil
+		}
+		return &telegram.InlineKeyboardMarkup{
+			InlineKeyboard: [][]telegram.InlineKeyboardButton{
+				{
+					{Text: "К матчу", URL: "https://druz9.online/arena/" + matchID},
+				},
+			},
+		}
+	default:
+		return nil
+	}
+}
+
+func extractStringField(payload []byte, field string) string {
+	if len(payload) == 0 {
+		return ""
+	}
+	var m map[string]any
+	if err := json.Unmarshal(payload, &m); err != nil {
+		return ""
+	}
+	v, _ := m[field].(string)
+	return v
 }
 
 func extractCircleID(payload []byte) uuid.UUID {

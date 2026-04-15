@@ -12,6 +12,10 @@ func (s *Service) RegisterChat(ctx context.Context, userID uuid.UUID, chatID int
 	return s.repo.RegisterChat(ctx, userID, chatID)
 }
 
+func (s *Service) LinkTelegram(ctx context.Context, userID uuid.UUID, telegramID int64) error {
+	return s.repo.LinkTelegramToUser(ctx, userID, telegramID)
+}
+
 func (s *Service) GetSettings(ctx context.Context, userID uuid.UUID) (*data.UserSettings, error) {
 	return s.repo.GetUserSettings(ctx, userID)
 }

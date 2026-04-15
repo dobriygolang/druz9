@@ -8,6 +8,7 @@ type Sender interface {
 	Send(ctx context.Context, userID, kind, title, body string, payload map[string]any)
 	SendBatch(ctx context.Context, userIDs []string, kind, title, body string, payload map[string]any)
 	RegisterChat(ctx context.Context, userID string, chatID int64)
+	LinkTelegram(ctx context.Context, userID string, telegramID int64)
 }
 
 // Noop is a no-op implementation used when notifications are disabled.
@@ -15,4 +16,5 @@ type Noop struct{}
 
 func (Noop) Send(context.Context, string, string, string, string, map[string]any) {}
 func (Noop) SendBatch(context.Context, []string, string, string, string, map[string]any) {}
-func (Noop) RegisterChat(context.Context, string, int64) {}
+func (Noop) RegisterChat(context.Context, string, int64)                              {}
+func (Noop) LinkTelegram(context.Context, string, int64)                              {}

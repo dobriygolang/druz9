@@ -315,8 +315,9 @@ services:
         condition: service_healthy
     environment:
       RUN_DB_MIGRATIONS: "true"
-      DATABASE_URL_FILE: /run/secrets/notification_service_database_url
+      DATABASE_URL_FILE: /run/secrets/database_url
       TELEGRAM_BOT_TOKEN_FILE: /run/secrets/telegram_bot_token
+      API_GRPC_ADDR: backend:9000
       GRPC_ADDR: ":9000"
       HTTP_ADDR: ":8080"
     healthcheck:
@@ -326,7 +327,7 @@ services:
       retries: 5
       start_period: 15s
     secrets:
-      - notification_service_database_url
+      - database_url
       - telegram_bot_token
     networks:
       - app_network
@@ -362,5 +363,3 @@ secrets:
     file: ./runtime/secrets/prod/minio_root_password
   yandex_oauth_client_secret:
     file: ./runtime/secrets/prod/yandex_oauth_client_secret
-  notification_service_database_url:
-    file: ./runtime/secrets/prod/notification_service_database_url

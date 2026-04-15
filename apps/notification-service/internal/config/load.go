@@ -56,6 +56,12 @@ func Load() (*Bootstrap, error) {
 		cfg.Telegram.BotToken = v
 	}
 
+	if v, err := envOrFile("API_GRPC_ADDR"); err != nil {
+		return nil, err
+	} else if v != "" {
+		cfg.API.GRPCAddr = v
+	}
+
 	return cfg, nil
 }
 
@@ -75,6 +81,7 @@ func defaultBootstrap() *Bootstrap {
 			Database: &Database{},
 		},
 		Telegram: &Telegram{},
+		API:      &API{},
 	}
 }
 

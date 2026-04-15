@@ -94,6 +94,17 @@ func (a *GRPCAdapter) RegisterChat(ctx context.Context, userID string, chatID in
 	}
 }
 
+// LinkTelegram links a telegram_id to a user UUID after login. Fire-and-forget.
+func (a *GRPCAdapter) LinkTelegram(ctx context.Context, userID string, telegramID int64) {
+	_, err := a.client.LinkTelegram(ctx, &v1.LinkTelegramRequest{
+		UserId:     userID,
+		TelegramId: telegramID,
+	})
+	if err != nil {
+		klog.Errorf("notification link telegram (user=%s): %v", userID, err)
+	}
+}
+
 func toStruct(m map[string]any) (*structpb.Struct, error) {
 	if m == nil {
 		return nil, nil
