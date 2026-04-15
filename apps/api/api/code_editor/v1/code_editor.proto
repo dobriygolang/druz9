@@ -155,6 +155,29 @@ enum TaskType {
   TASK_TYPE_REFACTORING  = 3;
 }
 
+enum ReviewSourceType {
+  REVIEW_SOURCE_TYPE_UNSPECIFIED = 0;
+  REVIEW_SOURCE_TYPE_DAILY       = 1;
+  REVIEW_SOURCE_TYPE_PRACTICE    = 2;
+  REVIEW_SOURCE_TYPE_DUEL        = 3;
+  REVIEW_SOURCE_TYPE_MOCK        = 4;
+}
+
+enum ReviewStatus {
+  REVIEW_STATUS_UNSPECIFIED = 0;
+  REVIEW_STATUS_PENDING     = 1;
+  REVIEW_STATUS_READY       = 2;
+  REVIEW_STATUS_FAILED      = 3;
+}
+
+enum AIVerdict {
+  AI_VERDICT_UNSPECIFIED = 0;
+  AI_VERDICT_OPTIMAL     = 1;
+  AI_VERDICT_GOOD        = 2;
+  AI_VERDICT_SUBOPTIMAL  = 3;
+  AI_VERDICT_BRUTE_FORCE = 4;
+}
+
 // ── Request messages ───────────────────────────────────────────────────────
 
 message CreateRoomRequest {
@@ -256,15 +279,15 @@ message StartRoomRequest {
 }
 
 message StartRoomResponse {
-  string status      = 1;
-  string room_status = 2;
+  common.v1.OperationStatus status      = 1;
+  RoomStatus                room_status = 2;
 }
 
 // ── Response messages ──────────────────────────────────────────────────────
 
 // StatusResponse is used for operations that only need to confirm success.
 message StatusResponse {
-  string status = 1;
+  common.v1.OperationStatus status = 1;
 }
 
 message CreateRoomResponse {
@@ -428,7 +451,7 @@ message SolutionReviewResponse {
 message SolutionReview {
   string id              = 1;
   string submission_id   = 2;
-  string source_type     = 3;   // daily, practice, duel, mock
+  ReviewSourceType source_type = 3;
   string task_id         = 4;
 
   // Level 1: instant feedback
@@ -440,8 +463,8 @@ message SolutionReview {
   int32  total_count     = 10;
 
   // Level 2: AI review
-  string status            = 11;  // pending, ready, failed
-  string ai_verdict        = 12;  // optimal, good, suboptimal, brute_force
+  ReviewStatus status      = 11;
+  AIVerdict    ai_verdict  = 12;
   string ai_time_complexity  = 13;
   string ai_space_complexity = 14;
   string ai_pattern        = 15;

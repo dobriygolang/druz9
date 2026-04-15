@@ -34,7 +34,7 @@ func (i *Implementation) GetCircleMemberStats(ctx context.Context, req *v1.GetCi
 			FirstName:   s.FirstName,
 			LastName:    s.LastName,
 			AvatarUrl:   s.AvatarURL,
-			Role:        s.Role,
+			Role:        mapCircleMemberRole(s.Role),
 			JoinedAt:    timestamppb.New(s.JoinedAt),
 			DailySolved: s.DailySolved,
 			DuelsWon:    s.DuelsWon,

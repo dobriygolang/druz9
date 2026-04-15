@@ -354,6 +354,58 @@ func (SubmitFailureKind) EnumDescriptor() ([]byte, []int) {
 	return file_common_v1_common_proto_rawDescGZIP(), []int{5}
 }
 
+type OperationStatus int32
+
+const (
+	OperationStatus_OPERATION_STATUS_UNSPECIFIED OperationStatus = 0
+	OperationStatus_OPERATION_STATUS_OK          OperationStatus = 1
+	OperationStatus_OPERATION_STATUS_INVITED     OperationStatus = 2
+	OperationStatus_OPERATION_STATUS_ABORTED     OperationStatus = 3
+)
+
+// Enum value maps for OperationStatus.
+var (
+	OperationStatus_name = map[int32]string{
+		0: "OPERATION_STATUS_UNSPECIFIED",
+		1: "OPERATION_STATUS_OK",
+		2: "OPERATION_STATUS_INVITED",
+		3: "OPERATION_STATUS_ABORTED",
+	}
+	OperationStatus_value = map[string]int32{
+		"OPERATION_STATUS_UNSPECIFIED": 0,
+		"OPERATION_STATUS_OK":          1,
+		"OPERATION_STATUS_INVITED":     2,
+		"OPERATION_STATUS_ABORTED":     3,
+	}
+)
+
+func (x OperationStatus) Enum() *OperationStatus {
+	p := new(OperationStatus)
+	*p = x
+	return p
+}
+
+func (x OperationStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OperationStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_common_v1_common_proto_enumTypes[6].Descriptor()
+}
+
+func (OperationStatus) Type() protoreflect.EnumType {
+	return &file_common_v1_common_proto_enumTypes[6]
+}
+
+func (x OperationStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OperationStatus.Descriptor instead.
+func (OperationStatus) EnumDescriptor() ([]byte, []int) {
+	return file_common_v1_common_proto_rawDescGZIP(), []int{6}
+}
+
 type InterviewSolutionReview struct {
 	state             protoimpl.MessageState `protogen:"open.v1"`
 	Provider          string                 `protobuf:"bytes,1,opt,name=provider,proto3" json:"provider,omitempty"`
@@ -505,7 +557,12 @@ const file_common_v1_common_proto_rawDesc = "" +
 	"!SUBMIT_FAILURE_KIND_COMPILE_ERROR\x10\x01\x12%\n" +
 	"!SUBMIT_FAILURE_KIND_RUNTIME_ERROR\x10\x02\x12$\n" +
 	" SUBMIT_FAILURE_KIND_WRONG_ANSWER\x10\x03\x12\x1f\n" +
-	"\x1bSUBMIT_FAILURE_KIND_TIMEOUT\x10\x04B\x1aZ\x18api/pkg/api/common/v1;v1b\x06proto3"
+	"\x1bSUBMIT_FAILURE_KIND_TIMEOUT\x10\x04*\x88\x01\n" +
+	"\x0fOperationStatus\x12 \n" +
+	"\x1cOPERATION_STATUS_UNSPECIFIED\x10\x00\x12\x17\n" +
+	"\x13OPERATION_STATUS_OK\x10\x01\x12\x1c\n" +
+	"\x18OPERATION_STATUS_INVITED\x10\x02\x12\x1c\n" +
+	"\x18OPERATION_STATUS_ABORTED\x10\x03B\x1aZ\x18api/pkg/api/common/v1;v1b\x06proto3"
 
 var (
 	file_common_v1_common_proto_rawDescOnce sync.Once
@@ -519,7 +576,7 @@ func file_common_v1_common_proto_rawDescGZIP() []byte {
 	return file_common_v1_common_proto_rawDescData
 }
 
-var file_common_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_common_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
 var file_common_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_common_v1_common_proto_goTypes = []any{
 	(UserActivityStatus)(0),         // 0: common.v1.UserActivityStatus
@@ -528,7 +585,8 @@ var file_common_v1_common_proto_goTypes = []any{
 	(ExecutionProfile)(0),           // 3: common.v1.ExecutionProfile
 	(RunnerMode)(0),                 // 4: common.v1.RunnerMode
 	(SubmitFailureKind)(0),          // 5: common.v1.SubmitFailureKind
-	(*InterviewSolutionReview)(nil), // 6: common.v1.InterviewSolutionReview
+	(OperationStatus)(0),            // 6: common.v1.OperationStatus
+	(*InterviewSolutionReview)(nil), // 7: common.v1.InterviewSolutionReview
 }
 var file_common_v1_common_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
@@ -548,7 +606,7 @@ func file_common_v1_common_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_v1_common_proto_rawDesc), len(file_common_v1_common_proto_rawDesc)),
-			NumEnums:      6,
+			NumEnums:      7,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,

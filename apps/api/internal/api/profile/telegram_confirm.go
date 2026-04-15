@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"api/internal/model"
+	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/profile/v1"
 )
 
@@ -19,5 +20,5 @@ func (i *Implementation) ConfirmTelegramAuth(ctx context.Context, req *v1.Confir
 		return nil, err
 	}
 
-	return &v1.ConfirmTelegramAuthResponse{Status: "ok", Code: code}, nil
+	return &v1.ConfirmTelegramAuthResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK, Code: code}, nil
 }

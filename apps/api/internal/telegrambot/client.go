@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -89,14 +90,27 @@ func (s *Service) call(ctx context.Context, method string, requestBody any, out 
 	}
 	defer resp.Body.Close()
 
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return fmt.Errorf("read telegram response: %w", err)
+	}
+
 	if resp.StatusCode >= http.StatusBadRequest {
 		return fmt.Errorf("telegram api status: %s", resp.Status)
+	}
+
+	var meta telegramAPIResponse[json.RawMessage]
+	if err := json.Unmarshal(responseBody, &meta); err != nil {
+		return fmt.Errorf("decode telegram response: %w", err)
+	}
+	if !meta.OK {
+		return fmt.Errorf("telegram api error: %s", meta.Error)
 	}
 
 	if out == nil {
 		return nil
 	}
-	if err := json.NewDecoder(resp.Body).Decode(out); err != nil {
+	if err := json.Unmarshal(responseBody, out); err != nil {
 		return fmt.Errorf("decode telegram response: %w", err)
 	}
 	return nil

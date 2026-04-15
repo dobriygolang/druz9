@@ -5,9 +5,10 @@ import (
 
 	codeeditordomain "api/internal/domain/codeeditor"
 	v1 "api/pkg/api/code_editor/v1"
+	commonv1 "api/pkg/api/common/v1"
 
-	kratosErrors "github.com/go-kratos/kratos/v2/errors"
 	goerrors "errors"
+	kratosErrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
 )
 
@@ -31,5 +32,8 @@ func (i *Implementation) StartRoom(ctx context.Context, req *v1.StartRoomRequest
 	}
 
 	i.realtime.PublishRoomUpdate(mapRealtimeRoom(room))
-	return &v1.StartRoomResponse{Status: "ok", RoomStatus: room.Status.String()}, nil
+	return &v1.StartRoomResponse{
+		Status:     commonv1.OperationStatus_OPERATION_STATUS_OK,
+		RoomStatus: roomStatusToProto(room.Status),
+	}, nil
 }

@@ -23,10 +23,110 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type NotificationKind int32
+
+const (
+	NotificationKind_NOTIFICATION_KIND_UNSPECIFIED                NotificationKind = 0
+	NotificationKind_NOTIFICATION_KIND_DUEL_INVITE                NotificationKind = 1
+	NotificationKind_NOTIFICATION_KIND_DUEL_MATCH_FOUND           NotificationKind = 2
+	NotificationKind_NOTIFICATION_KIND_DUEL_RESULT                NotificationKind = 3
+	NotificationKind_NOTIFICATION_KIND_DUEL_WIN_STREAK            NotificationKind = 4
+	NotificationKind_NOTIFICATION_KIND_STREAK_WARNING             NotificationKind = 5
+	NotificationKind_NOTIFICATION_KIND_STREAK_MILESTONE           NotificationKind = 6
+	NotificationKind_NOTIFICATION_KIND_RATING_MILESTONE           NotificationKind = 7
+	NotificationKind_NOTIFICATION_KIND_MOCK_RESULT                NotificationKind = 8
+	NotificationKind_NOTIFICATION_KIND_REVIEW_READY               NotificationKind = 9
+	NotificationKind_NOTIFICATION_KIND_CIRCLE_EVENT_CREATED       NotificationKind = 10
+	NotificationKind_NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER      NotificationKind = 11
+	NotificationKind_NOTIFICATION_KIND_CIRCLE_INVITE              NotificationKind = 12
+	NotificationKind_NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED NotificationKind = 13
+	NotificationKind_NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED       NotificationKind = 14
+	NotificationKind_NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS  NotificationKind = 15
+	NotificationKind_NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST       NotificationKind = 16
+	NotificationKind_NOTIFICATION_KIND_DAILY_CHALLENGE            NotificationKind = 17
+	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE       NotificationKind = 18
+	NotificationKind_NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL     NotificationKind = 19
+)
+
+// Enum value maps for NotificationKind.
+var (
+	NotificationKind_name = map[int32]string{
+		0:  "NOTIFICATION_KIND_UNSPECIFIED",
+		1:  "NOTIFICATION_KIND_DUEL_INVITE",
+		2:  "NOTIFICATION_KIND_DUEL_MATCH_FOUND",
+		3:  "NOTIFICATION_KIND_DUEL_RESULT",
+		4:  "NOTIFICATION_KIND_DUEL_WIN_STREAK",
+		5:  "NOTIFICATION_KIND_STREAK_WARNING",
+		6:  "NOTIFICATION_KIND_STREAK_MILESTONE",
+		7:  "NOTIFICATION_KIND_RATING_MILESTONE",
+		8:  "NOTIFICATION_KIND_MOCK_RESULT",
+		9:  "NOTIFICATION_KIND_REVIEW_READY",
+		10: "NOTIFICATION_KIND_CIRCLE_EVENT_CREATED",
+		11: "NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER",
+		12: "NOTIFICATION_KIND_CIRCLE_INVITE",
+		13: "NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED",
+		14: "NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED",
+		15: "NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS",
+		16: "NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST",
+		17: "NOTIFICATION_KIND_DAILY_CHALLENGE",
+		18: "NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE",
+		19: "NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL",
+	}
+	NotificationKind_value = map[string]int32{
+		"NOTIFICATION_KIND_UNSPECIFIED":                0,
+		"NOTIFICATION_KIND_DUEL_INVITE":                1,
+		"NOTIFICATION_KIND_DUEL_MATCH_FOUND":           2,
+		"NOTIFICATION_KIND_DUEL_RESULT":                3,
+		"NOTIFICATION_KIND_DUEL_WIN_STREAK":            4,
+		"NOTIFICATION_KIND_STREAK_WARNING":             5,
+		"NOTIFICATION_KIND_STREAK_MILESTONE":           6,
+		"NOTIFICATION_KIND_RATING_MILESTONE":           7,
+		"NOTIFICATION_KIND_MOCK_RESULT":                8,
+		"NOTIFICATION_KIND_REVIEW_READY":               9,
+		"NOTIFICATION_KIND_CIRCLE_EVENT_CREATED":       10,
+		"NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER":      11,
+		"NOTIFICATION_KIND_CIRCLE_INVITE":              12,
+		"NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED": 13,
+		"NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED":       14,
+		"NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS":  15,
+		"NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST":       16,
+		"NOTIFICATION_KIND_DAILY_CHALLENGE":            17,
+		"NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE":       18,
+		"NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL":     19,
+	}
+)
+
+func (x NotificationKind) Enum() *NotificationKind {
+	p := new(NotificationKind)
+	*p = x
+	return p
+}
+
+func (x NotificationKind) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (NotificationKind) Descriptor() protoreflect.EnumDescriptor {
+	return file_notification_v1_notification_proto_enumTypes[0].Descriptor()
+}
+
+func (NotificationKind) Type() protoreflect.EnumType {
+	return &file_notification_v1_notification_proto_enumTypes[0]
+}
+
+func (x NotificationKind) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use NotificationKind.Descriptor instead.
+func (NotificationKind) EnumDescriptor() ([]byte, []int) {
+	return file_notification_v1_notification_proto_rawDescGZIP(), []int{0}
+}
+
 type SendRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	Kind          string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"`
+	Kind          NotificationKind       `protobuf:"varint,2,opt,name=kind,proto3,enum=notification.v1.NotificationKind" json:"kind,omitempty"`
 	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
 	Body          string                 `protobuf:"bytes,4,opt,name=body,proto3" json:"body,omitempty"`
 	Payload       *structpb.Struct       `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
@@ -72,11 +172,11 @@ func (x *SendRequest) GetUserId() string {
 	return ""
 }
 
-func (x *SendRequest) GetKind() string {
+func (x *SendRequest) GetKind() NotificationKind {
 	if x != nil {
 		return x.Kind
 	}
-	return ""
+	return NotificationKind_NOTIFICATION_KIND_UNSPECIFIED
 }
 
 func (x *SendRequest) GetTitle() string {
@@ -154,7 +254,7 @@ func (x *SendResponse) GetNotificationId() string {
 type SendBatchRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserIds       []string               `protobuf:"bytes,1,rep,name=user_ids,json=userIds,proto3" json:"user_ids,omitempty"`
-	Kind          string                 `protobuf:"bytes,2,opt,name=kind,proto3" json:"kind,omitempty"`
+	Kind          NotificationKind       `protobuf:"varint,2,opt,name=kind,proto3,enum=notification.v1.NotificationKind" json:"kind,omitempty"`
 	Title         string                 `protobuf:"bytes,3,opt,name=title,proto3" json:"title,omitempty"`
 	Body          string                 `protobuf:"bytes,4,opt,name=body,proto3" json:"body,omitempty"`
 	Payload       *structpb.Struct       `protobuf:"bytes,5,opt,name=payload,proto3" json:"payload,omitempty"`
@@ -199,11 +299,11 @@ func (x *SendBatchRequest) GetUserIds() []string {
 	return nil
 }
 
-func (x *SendBatchRequest) GetKind() string {
+func (x *SendBatchRequest) GetKind() NotificationKind {
 	if x != nil {
 		return x.Kind
 	}
-	return ""
+	return NotificationKind_NOTIFICATION_KIND_UNSPECIFIED
 }
 
 func (x *SendBatchRequest) GetTitle() string {
@@ -851,20 +951,20 @@ var File_notification_v1_notification_proto protoreflect.FileDescriptor
 
 const file_notification_v1_notification_proto_rawDesc = "" +
 	"\n" +
-	"\"notification/v1/notification.proto\x12\x0fnotification.v1\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd4\x01\n" +
+	"\"notification/v1/notification.proto\x12\x0fnotification.v1\x1a\x1cgoogle/protobuf/struct.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf7\x01\n" +
 	"\vSendRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x14\n" +
+	"\auser_id\x18\x01 \x01(\tR\x06userId\x125\n" +
+	"\x04kind\x18\x02 \x01(\x0e2!.notification.v1.NotificationKindR\x04kind\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12\x12\n" +
 	"\x04body\x18\x04 \x01(\tR\x04body\x121\n" +
 	"\apayload\x18\x05 \x01(\v2\x17.google.protobuf.StructR\apayload\x12;\n" +
 	"\vschedule_at\x18\x06 \x01(\v2\x1a.google.protobuf.TimestampR\n" +
 	"scheduleAt\"7\n" +
 	"\fSendResponse\x12'\n" +
-	"\x0fnotification_id\x18\x01 \x01(\tR\x0enotificationId\"\x9e\x01\n" +
+	"\x0fnotification_id\x18\x01 \x01(\tR\x0enotificationId\"\xc1\x01\n" +
 	"\x10SendBatchRequest\x12\x19\n" +
-	"\buser_ids\x18\x01 \x03(\tR\auserIds\x12\x12\n" +
-	"\x04kind\x18\x02 \x01(\tR\x04kind\x12\x14\n" +
+	"\buser_ids\x18\x01 \x03(\tR\auserIds\x125\n" +
+	"\x04kind\x18\x02 \x01(\x0e2!.notification.v1.NotificationKindR\x04kind\x12\x14\n" +
 	"\x05title\x18\x03 \x01(\tR\x05title\x12\x12\n" +
 	"\x04body\x18\x04 \x01(\tR\x04body\x121\n" +
 	"\apayload\x18\x05 \x01(\v2\x17.google.protobuf.StructR\apayload\"/\n" +
@@ -918,7 +1018,29 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\x11_activity_enabledB\x11\n" +
 	"\x0f_digest_enabledB\b\n" +
 	"\x06_muted\"\x1e\n" +
-	"\x1cUpdateCircleSettingsResponse2\x9a\x05\n" +
+	"\x1cUpdateCircleSettingsResponse*\xc1\x06\n" +
+	"\x10NotificationKind\x12!\n" +
+	"\x1dNOTIFICATION_KIND_UNSPECIFIED\x10\x00\x12!\n" +
+	"\x1dNOTIFICATION_KIND_DUEL_INVITE\x10\x01\x12&\n" +
+	"\"NOTIFICATION_KIND_DUEL_MATCH_FOUND\x10\x02\x12!\n" +
+	"\x1dNOTIFICATION_KIND_DUEL_RESULT\x10\x03\x12%\n" +
+	"!NOTIFICATION_KIND_DUEL_WIN_STREAK\x10\x04\x12$\n" +
+	" NOTIFICATION_KIND_STREAK_WARNING\x10\x05\x12&\n" +
+	"\"NOTIFICATION_KIND_STREAK_MILESTONE\x10\x06\x12&\n" +
+	"\"NOTIFICATION_KIND_RATING_MILESTONE\x10\a\x12!\n" +
+	"\x1dNOTIFICATION_KIND_MOCK_RESULT\x10\b\x12\"\n" +
+	"\x1eNOTIFICATION_KIND_REVIEW_READY\x10\t\x12*\n" +
+	"&NOTIFICATION_KIND_CIRCLE_EVENT_CREATED\x10\n" +
+	"\x12+\n" +
+	"'NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER\x10\v\x12#\n" +
+	"\x1fNOTIFICATION_KIND_CIRCLE_INVITE\x10\f\x120\n" +
+	",NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED\x10\r\x12*\n" +
+	"&NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED\x10\x0e\x12/\n" +
+	"+NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS\x10\x0f\x12*\n" +
+	"&NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST\x10\x10\x12%\n" +
+	"!NOTIFICATION_KIND_DAILY_CHALLENGE\x10\x11\x12*\n" +
+	"&NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE\x10\x12\x12,\n" +
+	"(NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL\x10\x132\x9a\x05\n" +
 	"\x13NotificationService\x12C\n" +
 	"\x04Send\x12\x1c.notification.v1.SendRequest\x1a\x1d.notification.v1.SendResponse\x12R\n" +
 	"\tSendBatch\x12!.notification.v1.SendBatchRequest\x1a\".notification.v1.SendBatchResponse\x12[\n" +
@@ -940,48 +1062,52 @@ func file_notification_v1_notification_proto_rawDescGZIP() []byte {
 	return file_notification_v1_notification_proto_rawDescData
 }
 
+var file_notification_v1_notification_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_notification_v1_notification_proto_goTypes = []any{
-	(*SendRequest)(nil),                  // 0: notification.v1.SendRequest
-	(*SendResponse)(nil),                 // 1: notification.v1.SendResponse
-	(*SendBatchRequest)(nil),             // 2: notification.v1.SendBatchRequest
-	(*SendBatchResponse)(nil),            // 3: notification.v1.SendBatchResponse
-	(*RegisterChatRequest)(nil),          // 4: notification.v1.RegisterChatRequest
-	(*RegisterChatResponse)(nil),         // 5: notification.v1.RegisterChatResponse
-	(*LinkTelegramRequest)(nil),          // 6: notification.v1.LinkTelegramRequest
-	(*LinkTelegramResponse)(nil),         // 7: notification.v1.LinkTelegramResponse
-	(*UpdateSettingsRequest)(nil),        // 8: notification.v1.UpdateSettingsRequest
-	(*UpdateSettingsResponse)(nil),       // 9: notification.v1.UpdateSettingsResponse
-	(*GetSettingsRequest)(nil),           // 10: notification.v1.GetSettingsRequest
-	(*GetSettingsResponse)(nil),          // 11: notification.v1.GetSettingsResponse
-	(*UpdateCircleSettingsRequest)(nil),  // 12: notification.v1.UpdateCircleSettingsRequest
-	(*UpdateCircleSettingsResponse)(nil), // 13: notification.v1.UpdateCircleSettingsResponse
-	(*structpb.Struct)(nil),              // 14: google.protobuf.Struct
-	(*timestamppb.Timestamp)(nil),        // 15: google.protobuf.Timestamp
+	(NotificationKind)(0),                // 0: notification.v1.NotificationKind
+	(*SendRequest)(nil),                  // 1: notification.v1.SendRequest
+	(*SendResponse)(nil),                 // 2: notification.v1.SendResponse
+	(*SendBatchRequest)(nil),             // 3: notification.v1.SendBatchRequest
+	(*SendBatchResponse)(nil),            // 4: notification.v1.SendBatchResponse
+	(*RegisterChatRequest)(nil),          // 5: notification.v1.RegisterChatRequest
+	(*RegisterChatResponse)(nil),         // 6: notification.v1.RegisterChatResponse
+	(*LinkTelegramRequest)(nil),          // 7: notification.v1.LinkTelegramRequest
+	(*LinkTelegramResponse)(nil),         // 8: notification.v1.LinkTelegramResponse
+	(*UpdateSettingsRequest)(nil),        // 9: notification.v1.UpdateSettingsRequest
+	(*UpdateSettingsResponse)(nil),       // 10: notification.v1.UpdateSettingsResponse
+	(*GetSettingsRequest)(nil),           // 11: notification.v1.GetSettingsRequest
+	(*GetSettingsResponse)(nil),          // 12: notification.v1.GetSettingsResponse
+	(*UpdateCircleSettingsRequest)(nil),  // 13: notification.v1.UpdateCircleSettingsRequest
+	(*UpdateCircleSettingsResponse)(nil), // 14: notification.v1.UpdateCircleSettingsResponse
+	(*structpb.Struct)(nil),              // 15: google.protobuf.Struct
+	(*timestamppb.Timestamp)(nil),        // 16: google.protobuf.Timestamp
 }
 var file_notification_v1_notification_proto_depIdxs = []int32{
-	14, // 0: notification.v1.SendRequest.payload:type_name -> google.protobuf.Struct
-	15, // 1: notification.v1.SendRequest.schedule_at:type_name -> google.protobuf.Timestamp
-	14, // 2: notification.v1.SendBatchRequest.payload:type_name -> google.protobuf.Struct
-	0,  // 3: notification.v1.NotificationService.Send:input_type -> notification.v1.SendRequest
-	2,  // 4: notification.v1.NotificationService.SendBatch:input_type -> notification.v1.SendBatchRequest
-	4,  // 5: notification.v1.NotificationService.RegisterChat:input_type -> notification.v1.RegisterChatRequest
-	6,  // 6: notification.v1.NotificationService.LinkTelegram:input_type -> notification.v1.LinkTelegramRequest
-	8,  // 7: notification.v1.NotificationService.UpdateSettings:input_type -> notification.v1.UpdateSettingsRequest
-	10, // 8: notification.v1.NotificationService.GetSettings:input_type -> notification.v1.GetSettingsRequest
-	12, // 9: notification.v1.NotificationService.UpdateCircleSettings:input_type -> notification.v1.UpdateCircleSettingsRequest
-	1,  // 10: notification.v1.NotificationService.Send:output_type -> notification.v1.SendResponse
-	3,  // 11: notification.v1.NotificationService.SendBatch:output_type -> notification.v1.SendBatchResponse
-	5,  // 12: notification.v1.NotificationService.RegisterChat:output_type -> notification.v1.RegisterChatResponse
-	7,  // 13: notification.v1.NotificationService.LinkTelegram:output_type -> notification.v1.LinkTelegramResponse
-	9,  // 14: notification.v1.NotificationService.UpdateSettings:output_type -> notification.v1.UpdateSettingsResponse
-	11, // 15: notification.v1.NotificationService.GetSettings:output_type -> notification.v1.GetSettingsResponse
-	13, // 16: notification.v1.NotificationService.UpdateCircleSettings:output_type -> notification.v1.UpdateCircleSettingsResponse
-	10, // [10:17] is the sub-list for method output_type
-	3,  // [3:10] is the sub-list for method input_type
-	3,  // [3:3] is the sub-list for extension type_name
-	3,  // [3:3] is the sub-list for extension extendee
-	0,  // [0:3] is the sub-list for field type_name
+	0,  // 0: notification.v1.SendRequest.kind:type_name -> notification.v1.NotificationKind
+	15, // 1: notification.v1.SendRequest.payload:type_name -> google.protobuf.Struct
+	16, // 2: notification.v1.SendRequest.schedule_at:type_name -> google.protobuf.Timestamp
+	0,  // 3: notification.v1.SendBatchRequest.kind:type_name -> notification.v1.NotificationKind
+	15, // 4: notification.v1.SendBatchRequest.payload:type_name -> google.protobuf.Struct
+	1,  // 5: notification.v1.NotificationService.Send:input_type -> notification.v1.SendRequest
+	3,  // 6: notification.v1.NotificationService.SendBatch:input_type -> notification.v1.SendBatchRequest
+	5,  // 7: notification.v1.NotificationService.RegisterChat:input_type -> notification.v1.RegisterChatRequest
+	7,  // 8: notification.v1.NotificationService.LinkTelegram:input_type -> notification.v1.LinkTelegramRequest
+	9,  // 9: notification.v1.NotificationService.UpdateSettings:input_type -> notification.v1.UpdateSettingsRequest
+	11, // 10: notification.v1.NotificationService.GetSettings:input_type -> notification.v1.GetSettingsRequest
+	13, // 11: notification.v1.NotificationService.UpdateCircleSettings:input_type -> notification.v1.UpdateCircleSettingsRequest
+	2,  // 12: notification.v1.NotificationService.Send:output_type -> notification.v1.SendResponse
+	4,  // 13: notification.v1.NotificationService.SendBatch:output_type -> notification.v1.SendBatchResponse
+	6,  // 14: notification.v1.NotificationService.RegisterChat:output_type -> notification.v1.RegisterChatResponse
+	8,  // 15: notification.v1.NotificationService.LinkTelegram:output_type -> notification.v1.LinkTelegramResponse
+	10, // 16: notification.v1.NotificationService.UpdateSettings:output_type -> notification.v1.UpdateSettingsResponse
+	12, // 17: notification.v1.NotificationService.GetSettings:output_type -> notification.v1.GetSettingsResponse
+	14, // 18: notification.v1.NotificationService.UpdateCircleSettings:output_type -> notification.v1.UpdateCircleSettingsResponse
+	12, // [12:19] is the sub-list for method output_type
+	5,  // [5:12] is the sub-list for method input_type
+	5,  // [5:5] is the sub-list for extension type_name
+	5,  // [5:5] is the sub-list for extension extendee
+	0,  // [0:5] is the sub-list for field type_name
 }
 
 func init() { file_notification_v1_notification_proto_init() }
@@ -996,13 +1122,14 @@ func file_notification_v1_notification_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_notification_v1_notification_proto_rawDesc), len(file_notification_v1_notification_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_notification_v1_notification_proto_goTypes,
 		DependencyIndexes: file_notification_v1_notification_proto_depIdxs,
+		EnumInfos:         file_notification_v1_notification_proto_enumTypes,
 		MessageInfos:      file_notification_v1_notification_proto_msgTypes,
 	}.Build()
 	File_notification_v1_notification_proto = out.File

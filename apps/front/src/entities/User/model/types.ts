@@ -66,7 +66,7 @@ export interface ProfileCompetency {
 export interface NextAction {
   title: string
   description: string
-  actionType: 'practice' | 'mock' | 'daily' | 'duel' | string
+  actionType: 'practice' | 'mock' | 'daily' | 'duel' | 'checkpoint' | 'arena' | string
   actionUrl: string
   priority: number
   skillKey: string

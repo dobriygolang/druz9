@@ -4,11 +4,12 @@ import (
 	"context"
 
 	v1 "api/pkg/api/notification/v1"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 )
 
-// UpdateCircleSettings stub. Please implement it.
 func (i *Implementation) UpdateCircleSettings(ctx context.Context, req *v1.UpdateCircleSettingsRequest) (*v1.UpdateCircleSettingsResponse, error) {
 	_ = ctx
 	_ = req
-	panic("TODO: implement UpdateCircleSettings")
+	return nil, status.Error(codes.Unimplemented, "notification rpc is handled by notification-service")
 }

@@ -44,7 +44,7 @@ func (i *Implementation) GetCirclePulse(ctx context.Context, req *v1.GetCirclePu
 			FirstName:    a.FirstName,
 			LastName:     a.LastName,
 			AvatarUrl:    a.AvatarURL,
-			ActionType:   a.ActionType,
+			ActionType:   mapCircleActionType(a.ActionType),
 			ActionDetail: a.ActionDetail,
 			HappenedAt:   timestamppb.New(a.HappenedAt),
 		})

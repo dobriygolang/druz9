@@ -14,6 +14,10 @@ const (
 	CodeEditorTypeSubmission      = "submission"
 	CodeEditorTypeLanguage        = "language"
 	CodeEditorTypeReviewReady     = "review_ready"
+	// CodeEditorTypeDuelProgress is sent to the opponent in a duel room whenever
+	// the other player's code changes; it carries only the code length so the
+	// recipient can display a live progress indicator without seeing the actual code.
+	CodeEditorTypeDuelProgress = "duel_progress"
 )
 
 type CodeEditorMessage struct {
@@ -27,9 +31,12 @@ type CodeEditorMessage struct {
 	Data              string                     `json:"data,omitempty"`
 	PlainText         string                     `json:"plainText,omitempty"`
 	Language          string                     `json:"language,omitempty"`
-	Room              *CodeEditorRoom            `json:"room,omitempty"`
-	Submission        *CodeEditorSubmissionEvent `json:"submission,omitempty"`
-	Review            *CodeEditorReviewEvent     `json:"review,omitempty"`
+	// CodeLen is used in duel_progress messages to convey the opponent's code
+	// character count without revealing the actual content.
+	CodeLen  int                        `json:"codeLen,omitempty"`
+	Room     *CodeEditorRoom            `json:"room,omitempty"`
+	Submission *CodeEditorSubmissionEvent `json:"submission,omitempty"`
+	Review     *CodeEditorReviewEvent     `json:"review,omitempty"`
 }
 
 type CodeEditorRoom struct {

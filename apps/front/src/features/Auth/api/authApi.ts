@@ -62,6 +62,76 @@ function normalizeProfileResponse(data: BackendProfileResponse): ProfileResponse
   }
 }
 
+function normalizeGoalKind(value: unknown): UserGoal['kind'] {
+  if (value === 'USER_GOAL_KIND_WEAKEST_FIRST' || value === 'weakest_first') return 'weakest_first'
+  if (value === 'USER_GOAL_KIND_COMPANY_PREP' || value === 'company_prep') return 'company_prep'
+  return 'general_growth'
+}
+
+function normalizeActionType(value: unknown): 'practice' | 'mock' | 'daily' | 'duel' | 'checkpoint' | 'arena' | string {
+  if (value === 'PROFILE_ACTION_TYPE_MOCK' || value === 'mock') return 'mock'
+  if (value === 'PROFILE_ACTION_TYPE_DAILY' || value === 'daily') return 'daily'
+  if (value === 'PROFILE_ACTION_TYPE_DUEL' || value === 'duel') return 'duel'
+  if (value === 'PROFILE_ACTION_TYPE_CHECKPOINT' || value === 'checkpoint') return 'checkpoint'
+  if (value === 'PROFILE_ACTION_TYPE_ARENA' || value === 'arena') return 'arena'
+  return 'practice'
+}
+
+function normalizeCompetencyConfidence(value: unknown): string {
+  if (value === 'PROFILE_COMPETENCY_CONFIDENCE_MEDIUM' || value === 'medium') return 'medium'
+  if (value === 'PROFILE_COMPETENCY_CONFIDENCE_VERIFIED' || value === 'verified') return 'verified'
+  return 'low'
+}
+
+function normalizeCompetencyLevel(value: unknown): 'beginner' | 'confident' | 'strong' | 'expert' {
+  if (value === 'PROFILE_COMPETENCY_LEVEL_CONFIDENT' || value === 'confident') return 'confident'
+  if (value === 'PROFILE_COMPETENCY_LEVEL_STRONG' || value === 'strong') return 'strong'
+  if (value === 'PROFILE_COMPETENCY_LEVEL_EXPERT' || value === 'expert') return 'expert'
+  return 'beginner'
+}
+
+function normalizeFeedType(value: unknown): 'mock_stage' | 'practice' | string {
+  if (value === 'FEED_ITEM_TYPE_PRACTICE' || value === 'practice') return 'practice'
+  return 'mock_stage'
+}
+
+function goalKindToRequest(kind: string): string {
+  if (kind === 'weakest_first') return 'USER_GOAL_KIND_WEAKEST_FIRST'
+  if (kind === 'company_prep') return 'USER_GOAL_KIND_COMPANY_PREP'
+  return 'USER_GOAL_KIND_GENERAL_GROWTH'
+}
+
+function normalizeProfileProgress(progress?: ProfileProgress): ProfileProgress {
+  const p = progress ?? {
+    overview: {
+      practiceSessions: 0,
+      practicePassedSessions: 0,
+      practiceActiveDays: 0,
+      completedMockSessions: 0,
+      completedMockStages: 0,
+      answeredQuestions: 0,
+      averageStageScore: 0,
+      averageQuestionScore: 0,
+      currentStreakDays: 0,
+      level: 0,
+      levelProgress: 0,
+      totalXp: 0,
+      longestStreakDays: 0,
+      activityPercentile: 0,
+    },
+    competencies: [], strongest: [], weakest: [], recommendations: [], checkpoints: [], companies: [],
+  }
+
+  return {
+    ...p,
+    competencies: (p.competencies ?? []).map((c) => ({ ...c, confidence: normalizeCompetencyConfidence(c.confidence), level: normalizeCompetencyLevel(c.level) })),
+    strongest: (p.strongest ?? []).map((c) => ({ ...c, confidence: normalizeCompetencyConfidence(c.confidence), level: normalizeCompetencyLevel(c.level) })),
+    weakest: (p.weakest ?? []).map((c) => ({ ...c, confidence: normalizeCompetencyConfidence(c.confidence), level: normalizeCompetencyLevel(c.level) })),
+    nextActions: (p.nextActions ?? []).map((a) => ({ ...a, actionType: normalizeActionType(a.actionType) })),
+    goal: p.goal ? { ...p.goal, kind: normalizeGoalKind(p.goal.kind) } : p.goal,
+  }
+}
+
 const profileByIdCache = createCache<string, ProfileResponse>({ ttl: 5 * 60_000 })
 
 export function clearProfileByIdCache(userId?: string) {
@@ -112,25 +182,7 @@ export const authApi = {
   },
   getProfileProgress: async (userId: string): Promise<ProfileProgress> => {
     const r = await apiClient.get<{ progress?: ProfileProgress }>(`/api/v1/profile/${userId}/progress`)
-    return r.data.progress ?? {
-      overview: {
-        practiceSessions: 0,
-        practicePassedSessions: 0,
-        practiceActiveDays: 0,
-        completedMockSessions: 0,
-        completedMockStages: 0,
-        answeredQuestions: 0,
-        averageStageScore: 0,
-        averageQuestionScore: 0,
-        currentStreakDays: 0,
-        level: 0,
-        levelProgress: 0,
-        totalXp: 0,
-        longestStreakDays: 0,
-        activityPercentile: 0,
-      },
-      competencies: [], strongest: [], weakest: [], recommendations: [], checkpoints: [], companies: [],
-    }
+    return normalizeProfileProgress(r.data.progress)
   },
   updateLocation: async (payload: CompleteProfilePayload): Promise<ProfileResponse> => {
     const r = await apiClient.post<BackendProfileResponse>('/api/v1/profile/location', payload)
@@ -143,13 +195,16 @@ export const authApi = {
     return normalizeProfileResponse(r.data)
   },
   setUserGoal: async (goal: { kind: string; company?: string }): Promise<UserGoal> => {
-    const r = await apiClient.post<{ goal?: UserGoal }>('/api/v1/profile/goal', goal)
-    return r.data.goal ?? { kind: goal.kind as UserGoal['kind'], company: goal.company ?? '' }
+    const r = await apiClient.post<{ goal?: UserGoal }>('/api/v1/profile/goal', {
+      kind: goalKindToRequest(goal.kind),
+      company: goal.company ?? '',
+    })
+    return r.data.goal ? { ...r.data.goal, kind: normalizeGoalKind(r.data.goal.kind) } : { kind: normalizeGoalKind(goal.kind), company: goal.company ?? '' }
   },
   getProfileFeed: async (userId: string, limit = 7): Promise<FeedItem[]> => {
     const r = await apiClient.get<{ items?: FeedItem[] }>(`/api/v1/profile/${userId}/feed`, { params: { limit } })
     return (r.data.items ?? []).map(item => ({
-      type: item.type ?? '',
+      type: normalizeFeedType(item.type),
       title: item.title ?? '',
       description: item.description ?? '',
       score: item.score,

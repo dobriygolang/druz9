@@ -2461,7 +2461,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
         admin.v1.ConfigItem:
             type: object
             properties:
@@ -2771,7 +2772,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
         arena.v1.CreateMatchRequest:
             type: object
             properties:
@@ -2969,7 +2971,8 @@ components:
                 avatarUrl:
                     type: string
                 role:
-                    type: string
+                    type: integer
+                    format: enum
                 joinedAt:
                     type: string
                     format: date-time
@@ -2985,7 +2988,8 @@ components:
                 avatarUrl:
                     type: string
                 actionType:
-                    type: string
+                    type: integer
+                    format: enum
                 actionDetail:
                     type: string
                 happenedAt:
@@ -3003,7 +3007,8 @@ components:
                 avatarUrl:
                     type: string
                 role:
-                    type: string
+                    type: integer
+                    format: enum
                 joinedAt:
                     type: string
                     format: date-time
@@ -3083,7 +3088,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
         circle.v1.GetActiveCircleChallengeResponse:
             type: object
             properties:
@@ -3124,7 +3130,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
         circle.v1.JoinCircleRequest:
             type: object
             properties:
@@ -3134,7 +3141,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
         circle.v1.LeaveCircleRequest:
             type: object
             properties:
@@ -3144,7 +3152,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
         circle.v1.ListCircleEventsResponse:
             type: object
             properties:
@@ -3371,7 +3380,8 @@ components:
                 submissionId:
                     type: string
                 sourceType:
-                    type: string
+                    type: integer
+                    format: enum
                 taskId:
                     type: string
                 isCorrect:
@@ -3391,10 +3401,12 @@ components:
                     type: integer
                     format: int32
                 status:
-                    type: string
+                    type: integer
                     description: 'Level 2: AI review'
+                    format: enum
                 aiVerdict:
-                    type: string
+                    type: integer
+                    format: enum
                 aiTimeComplexity:
                     type: string
                 aiSpaceComplexity:
@@ -3435,14 +3447,17 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
                 roomStatus:
-                    type: string
+                    type: integer
+                    format: enum
         code_editor.v1.StatusResponse:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
             description: StatusResponse is used for operations that only need to confirm success.
         code_editor.v1.Submission:
             type: object
@@ -3803,7 +3818,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
             description: EventStatusResponse replaces the separate LeaveEventResponse and DeleteEventResponse.
         event.v1.InviteToEventRequest:
             type: object
@@ -4057,7 +4073,8 @@ components:
                 skillKey:
                     type: string
                 status:
-                    type: string
+                    type: integer
+                    format: enum
                 durationSeconds:
                     type: integer
                     format: int32
@@ -4347,7 +4364,8 @@ components:
                 companyTag:
                     type: string
                 stageKind:
-                    type: string
+                    type: integer
+                    format: enum
                 position:
                     type: integer
                     format: int32
@@ -4381,7 +4399,8 @@ components:
                 companyTag:
                     type: string
                 stageKind:
-                    type: string
+                    type: integer
+                    format: enum
                 position:
                     type: integer
                     format: int32
@@ -4646,7 +4665,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
         interview_prep.v1.SubmitMockStageRequest:
             type: object
             properties:
@@ -4891,7 +4911,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
         podcast.v1.PreparePodcastUploadRequest:
             type: object
             properties:
@@ -4944,9 +4965,11 @@ components:
                 unlocked:
                     type: boolean
                 category:
-                    type: string
+                    type: integer
+                    format: enum
                 tier:
-                    type: string
+                    type: integer
+                    format: enum
                 progress:
                     type: integer
                     format: int32
@@ -5024,7 +5047,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
                 code:
                     type: string
         profile.v1.CreateTelegramAuthChallengeRequest:
@@ -5044,7 +5068,8 @@ components:
             type: object
             properties:
                 type:
-                    type: string
+                    type: integer
+                    format: enum
                 title:
                     type: string
                 description:
@@ -5083,7 +5108,8 @@ components:
                     type: integer
                     format: int32
                 level:
-                    type: string
+                    type: integer
+                    format: enum
                 levelLabel:
                     type: string
                 weakestSkill:
@@ -5113,7 +5139,8 @@ components:
                 description:
                     type: string
                 actionType:
-                    type: string
+                    type: integer
+                    format: enum
                 actionUrl:
                     type: string
                 priority:
@@ -5172,12 +5199,14 @@ components:
                     type: integer
                     format: int32
                 confidence:
-                    type: string
+                    type: integer
+                    format: enum
                 averageScore:
                     type: number
                     format: double
                 level:
-                    type: string
+                    type: integer
+                    format: enum
                 levelProgress:
                     type: number
                     format: double
@@ -5296,7 +5325,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
             description: ProfileStatusResponse replaces the separate LogoutResponse and BindTelegramResponse.
         profile.v1.ReadinessNextAction:
             type: object
@@ -5306,7 +5336,8 @@ components:
                 description:
                     type: string
                 actionType:
-                    type: string
+                    type: integer
+                    format: enum
                 actionUrl:
                     type: string
                 skillKey:
@@ -5315,7 +5346,8 @@ components:
             type: object
             properties:
                 kind:
-                    type: string
+                    type: integer
+                    format: enum
                 company:
                     type: string
         profile.v1.SetUserGoalResponse:
@@ -5410,7 +5442,8 @@ components:
             type: object
             properties:
                 kind:
-                    type: string
+                    type: integer
+                    format: enum
                 company:
                     type: string
         referral.v1.CreateReferralRequest:
@@ -5494,7 +5527,8 @@ components:
             type: object
             properties:
                 status:
-                    type: string
+                    type: integer
+                    format: enum
         referral.v1.UpdateReferralRequest:
             type: object
             properties:

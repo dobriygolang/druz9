@@ -7,6 +7,7 @@
 package v1
 
 import (
+	v1 "api/pkg/api/common/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -208,7 +209,7 @@ func (*GetRuntimeConfigRequest) Descriptor() ([]byte, []int) {
 
 type AdminStatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status        v1.OperationStatus     `protobuf:"varint,1,opt,name=status,proto3,enum=common.v1.OperationStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -243,11 +244,11 @@ func (*AdminStatusResponse) Descriptor() ([]byte, []int) {
 	return file_admin_v1_admin_proto_rawDescGZIP(), []int{4}
 }
 
-func (x *AdminStatusResponse) GetStatus() string {
+func (x *AdminStatusResponse) GetStatus() v1.OperationStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return v1.OperationStatus(0)
 }
 
 type GetConfigRequest struct {
@@ -710,7 +711,7 @@ var File_admin_v1_admin_proto protoreflect.FileDescriptor
 
 const file_admin_v1_admin_proto_rawDesc = "" +
 	"\n" +
-	"\x14admin/v1/admin.proto\x12\badmin.v1\x1a\x1cgoogle/api/annotations.proto\",\n" +
+	"\x14admin/v1/admin.proto\x12\badmin.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x16common/v1/common.proto\",\n" +
 	"\x11DeleteUserRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"P\n" +
 	"\x16UpdateUserTrustRequest\x12\x17\n" +
@@ -720,9 +721,9 @@ const file_admin_v1_admin_proto_rawDesc = "" +
 	"\x16UpdateUserAdminRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x19\n" +
 	"\bis_admin\x18\x02 \x01(\bR\aisAdmin\"\x19\n" +
-	"\x17GetRuntimeConfigRequest\"-\n" +
-	"\x13AdminStatusResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"$\n" +
+	"\x17GetRuntimeConfigRequest\"I\n" +
+	"\x13AdminStatusResponse\x122\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1a.common.v1.OperationStatusR\x06status\"$\n" +
 	"\x10GetConfigRequest\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\"\x97\x01\n" +
 	"\x11GetConfigResponse\x12\x10\n" +
@@ -791,28 +792,30 @@ var file_admin_v1_admin_proto_goTypes = []any{
 	(*UpdateConfigRequest)(nil),      // 10: admin.v1.UpdateConfigRequest
 	(*UpdateConfigResponse)(nil),     // 11: admin.v1.UpdateConfigResponse
 	(*GetRuntimeConfigResponse)(nil), // 12: admin.v1.GetRuntimeConfigResponse
+	(v1.OperationStatus)(0),          // 13: common.v1.OperationStatus
 }
 var file_admin_v1_admin_proto_depIdxs = []int32{
-	9,  // 0: admin.v1.ListConfigResponse.configs:type_name -> admin.v1.ConfigItem
-	0,  // 1: admin.v1.AdminService.DeleteUser:input_type -> admin.v1.DeleteUserRequest
-	1,  // 2: admin.v1.AdminService.UpdateUserTrust:input_type -> admin.v1.UpdateUserTrustRequest
-	2,  // 3: admin.v1.AdminService.UpdateUserAdmin:input_type -> admin.v1.UpdateUserAdminRequest
-	5,  // 4: admin.v1.AdminService.GetConfig:input_type -> admin.v1.GetConfigRequest
-	7,  // 5: admin.v1.AdminService.ListConfig:input_type -> admin.v1.ListConfigRequest
-	10, // 6: admin.v1.AdminService.UpdateConfig:input_type -> admin.v1.UpdateConfigRequest
-	3,  // 7: admin.v1.AdminService.GetRuntimeConfig:input_type -> admin.v1.GetRuntimeConfigRequest
-	4,  // 8: admin.v1.AdminService.DeleteUser:output_type -> admin.v1.AdminStatusResponse
-	4,  // 9: admin.v1.AdminService.UpdateUserTrust:output_type -> admin.v1.AdminStatusResponse
-	4,  // 10: admin.v1.AdminService.UpdateUserAdmin:output_type -> admin.v1.AdminStatusResponse
-	6,  // 11: admin.v1.AdminService.GetConfig:output_type -> admin.v1.GetConfigResponse
-	8,  // 12: admin.v1.AdminService.ListConfig:output_type -> admin.v1.ListConfigResponse
-	11, // 13: admin.v1.AdminService.UpdateConfig:output_type -> admin.v1.UpdateConfigResponse
-	12, // 14: admin.v1.AdminService.GetRuntimeConfig:output_type -> admin.v1.GetRuntimeConfigResponse
-	8,  // [8:15] is the sub-list for method output_type
-	1,  // [1:8] is the sub-list for method input_type
-	1,  // [1:1] is the sub-list for extension type_name
-	1,  // [1:1] is the sub-list for extension extendee
-	0,  // [0:1] is the sub-list for field type_name
+	13, // 0: admin.v1.AdminStatusResponse.status:type_name -> common.v1.OperationStatus
+	9,  // 1: admin.v1.ListConfigResponse.configs:type_name -> admin.v1.ConfigItem
+	0,  // 2: admin.v1.AdminService.DeleteUser:input_type -> admin.v1.DeleteUserRequest
+	1,  // 3: admin.v1.AdminService.UpdateUserTrust:input_type -> admin.v1.UpdateUserTrustRequest
+	2,  // 4: admin.v1.AdminService.UpdateUserAdmin:input_type -> admin.v1.UpdateUserAdminRequest
+	5,  // 5: admin.v1.AdminService.GetConfig:input_type -> admin.v1.GetConfigRequest
+	7,  // 6: admin.v1.AdminService.ListConfig:input_type -> admin.v1.ListConfigRequest
+	10, // 7: admin.v1.AdminService.UpdateConfig:input_type -> admin.v1.UpdateConfigRequest
+	3,  // 8: admin.v1.AdminService.GetRuntimeConfig:input_type -> admin.v1.GetRuntimeConfigRequest
+	4,  // 9: admin.v1.AdminService.DeleteUser:output_type -> admin.v1.AdminStatusResponse
+	4,  // 10: admin.v1.AdminService.UpdateUserTrust:output_type -> admin.v1.AdminStatusResponse
+	4,  // 11: admin.v1.AdminService.UpdateUserAdmin:output_type -> admin.v1.AdminStatusResponse
+	6,  // 12: admin.v1.AdminService.GetConfig:output_type -> admin.v1.GetConfigResponse
+	8,  // 13: admin.v1.AdminService.ListConfig:output_type -> admin.v1.ListConfigResponse
+	11, // 14: admin.v1.AdminService.UpdateConfig:output_type -> admin.v1.UpdateConfigResponse
+	12, // 15: admin.v1.AdminService.GetRuntimeConfig:output_type -> admin.v1.GetRuntimeConfigResponse
+	9,  // [9:16] is the sub-list for method output_type
+	2,  // [2:9] is the sub-list for method input_type
+	2,  // [2:2] is the sub-list for extension type_name
+	2,  // [2:2] is the sub-list for extension extendee
+	0,  // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_admin_v1_admin_proto_init() }

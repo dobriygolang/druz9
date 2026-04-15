@@ -26,7 +26,7 @@ func (i *Implementation) GetReadiness(ctx context.Context, req *v1.GetReadinessR
 
 	resp := &v1.GetReadinessResponse{
 		Score:      readiness.Score,
-		Level:      readiness.Level,
+		Level:      mapReadinessLevel(readiness.Level),
 		LevelLabel: readiness.LevelLabel,
 		StreakDays: readiness.StreakDays,
 		ActiveDays: readiness.ActiveDays,
@@ -42,7 +42,7 @@ func (i *Implementation) GetReadiness(ctx context.Context, req *v1.GetReadinessR
 		resp.NextAction = &v1.ReadinessNextAction{
 			Title:       readiness.NextAction.Title,
 			Description: readiness.NextAction.Description,
-			ActionType:  readiness.NextAction.ActionType,
+			ActionType:  mapProfileActionType(readiness.NextAction.ActionType),
 			ActionUrl:   readiness.NextAction.ActionURL,
 			SkillKey:    readiness.NextAction.SkillKey,
 		}
@@ -72,18 +72,5 @@ func mapReadinessCompetency(c *model.ProfileCompetency) *v1.ProfileCompetency {
 	if c == nil {
 		return nil
 	}
-	return &v1.ProfileCompetency{
-		Key:                    c.Key,
-		Label:                  c.Label,
-		Score:                  c.Score,
-		PracticeScore:          c.PracticeScore,
-		VerifiedScore:          c.VerifiedScore,
-		StageCount:             c.StageCount,
-		QuestionCount:          c.QuestionCount,
-		PracticeSessions:       c.PracticeSessions,
-		PracticePassedSessions: c.PracticePassedSessions,
-		PracticeDays:           c.PracticeDays,
-		Confidence:             c.Confidence,
-		AverageScore:           c.AverageScore,
-	}
+	return mapCompetency(c)
 }

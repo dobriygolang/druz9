@@ -7,6 +7,7 @@ import (
 	arenarating "api/internal/arena/rating"
 	arenadomain "api/internal/domain/arena"
 	v1 "api/pkg/api/arena/v1"
+	commonv1 "api/pkg/api/common/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -143,7 +144,7 @@ func (i *Implementation) ReportAntiCheatEvent(ctx context.Context, req *v1.Repor
 		return nil, errors.BadRequest("ANTI_CHEAT_REPORT_FAILED", err.Error())
 	}
 
-	return &v1.ArenaStatusResponse{Status: "ok"}, nil
+	return &v1.ArenaStatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }
 
 func (i *Implementation) ListOpenMatches(ctx context.Context, req *v1.ListOpenMatchesRequest) (*v1.ListOpenMatchesResponse, error) {

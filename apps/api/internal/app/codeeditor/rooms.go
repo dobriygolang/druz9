@@ -216,22 +216,6 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 		return nil, domain.ErrRoomAlreadyClosed
 	}
 
-	// Private rooms can only be joined via invite code, not by room ID directly.
-	// Allow if user is already the creator.
-	if room.IsPrivate && (userID == nil || room.CreatorID != *userID) {
-		// Check if already a participant.
-		alreadyIn := false
-		for _, p := range room.Participants {
-			if userID != nil && p.UserID != nil && *p.UserID == *userID {
-				alreadyIn = true
-				break
-			}
-		}
-		if !alreadyIn {
-			return nil, domain.ErrRoomNotFound
-		}
-	}
-
 	// Для гостей проверяем кэш
 	if isGuest {
 		key := guestRoomKey(roomID, name)
@@ -424,6 +408,7 @@ func (s *Service) GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*doma
 
 // StartRoom transitions a ROOM_MODE_ALL room from waiting → active.
 // Only the room creator may call this. Idempotent: already-active rooms return nil.
+// Duel rooms auto-start when both players join via JoinRoom — StartRoom is a no-op for them.
 func (s *Service) StartRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) (*domain.Room, error) {
 	room, err := s.repo.GetRoom(ctx, roomID)
 	if err != nil {
@@ -433,6 +418,12 @@ func (s *Service) StartRoom(ctx context.Context, roomID uuid.UUID, callerID *uui
 	// Verify caller is the creator
 	if callerID == nil || room.CreatorID == uuid.Nil || *callerID != room.CreatorID {
 		return nil, domain.ErrForbidden
+	}
+
+	// Duel rooms auto-start when the second player joins — don't force-start them early.
+	if room.Mode == model.RoomModeDuel {
+		room.Participants = s.addCachedGuestsToRoom(room.Participants, roomID)
+		return room, nil
 	}
 
 	// Already active or finished — nothing to do

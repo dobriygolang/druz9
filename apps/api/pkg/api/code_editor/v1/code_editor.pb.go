@@ -177,6 +177,168 @@ func (TaskType) EnumDescriptor() ([]byte, []int) {
 	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{2}
 }
 
+type ReviewSourceType int32
+
+const (
+	ReviewSourceType_REVIEW_SOURCE_TYPE_UNSPECIFIED ReviewSourceType = 0
+	ReviewSourceType_REVIEW_SOURCE_TYPE_DAILY       ReviewSourceType = 1
+	ReviewSourceType_REVIEW_SOURCE_TYPE_PRACTICE    ReviewSourceType = 2
+	ReviewSourceType_REVIEW_SOURCE_TYPE_DUEL        ReviewSourceType = 3
+	ReviewSourceType_REVIEW_SOURCE_TYPE_MOCK        ReviewSourceType = 4
+)
+
+// Enum value maps for ReviewSourceType.
+var (
+	ReviewSourceType_name = map[int32]string{
+		0: "REVIEW_SOURCE_TYPE_UNSPECIFIED",
+		1: "REVIEW_SOURCE_TYPE_DAILY",
+		2: "REVIEW_SOURCE_TYPE_PRACTICE",
+		3: "REVIEW_SOURCE_TYPE_DUEL",
+		4: "REVIEW_SOURCE_TYPE_MOCK",
+	}
+	ReviewSourceType_value = map[string]int32{
+		"REVIEW_SOURCE_TYPE_UNSPECIFIED": 0,
+		"REVIEW_SOURCE_TYPE_DAILY":       1,
+		"REVIEW_SOURCE_TYPE_PRACTICE":    2,
+		"REVIEW_SOURCE_TYPE_DUEL":        3,
+		"REVIEW_SOURCE_TYPE_MOCK":        4,
+	}
+)
+
+func (x ReviewSourceType) Enum() *ReviewSourceType {
+	p := new(ReviewSourceType)
+	*p = x
+	return p
+}
+
+func (x ReviewSourceType) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ReviewSourceType) Descriptor() protoreflect.EnumDescriptor {
+	return file_code_editor_v1_code_editor_proto_enumTypes[3].Descriptor()
+}
+
+func (ReviewSourceType) Type() protoreflect.EnumType {
+	return &file_code_editor_v1_code_editor_proto_enumTypes[3]
+}
+
+func (x ReviewSourceType) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ReviewSourceType.Descriptor instead.
+func (ReviewSourceType) EnumDescriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{3}
+}
+
+type ReviewStatus int32
+
+const (
+	ReviewStatus_REVIEW_STATUS_UNSPECIFIED ReviewStatus = 0
+	ReviewStatus_REVIEW_STATUS_PENDING     ReviewStatus = 1
+	ReviewStatus_REVIEW_STATUS_READY       ReviewStatus = 2
+	ReviewStatus_REVIEW_STATUS_FAILED      ReviewStatus = 3
+)
+
+// Enum value maps for ReviewStatus.
+var (
+	ReviewStatus_name = map[int32]string{
+		0: "REVIEW_STATUS_UNSPECIFIED",
+		1: "REVIEW_STATUS_PENDING",
+		2: "REVIEW_STATUS_READY",
+		3: "REVIEW_STATUS_FAILED",
+	}
+	ReviewStatus_value = map[string]int32{
+		"REVIEW_STATUS_UNSPECIFIED": 0,
+		"REVIEW_STATUS_PENDING":     1,
+		"REVIEW_STATUS_READY":       2,
+		"REVIEW_STATUS_FAILED":      3,
+	}
+)
+
+func (x ReviewStatus) Enum() *ReviewStatus {
+	p := new(ReviewStatus)
+	*p = x
+	return p
+}
+
+func (x ReviewStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (ReviewStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_code_editor_v1_code_editor_proto_enumTypes[4].Descriptor()
+}
+
+func (ReviewStatus) Type() protoreflect.EnumType {
+	return &file_code_editor_v1_code_editor_proto_enumTypes[4]
+}
+
+func (x ReviewStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use ReviewStatus.Descriptor instead.
+func (ReviewStatus) EnumDescriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{4}
+}
+
+type AIVerdict int32
+
+const (
+	AIVerdict_AI_VERDICT_UNSPECIFIED AIVerdict = 0
+	AIVerdict_AI_VERDICT_OPTIMAL     AIVerdict = 1
+	AIVerdict_AI_VERDICT_GOOD        AIVerdict = 2
+	AIVerdict_AI_VERDICT_SUBOPTIMAL  AIVerdict = 3
+	AIVerdict_AI_VERDICT_BRUTE_FORCE AIVerdict = 4
+)
+
+// Enum value maps for AIVerdict.
+var (
+	AIVerdict_name = map[int32]string{
+		0: "AI_VERDICT_UNSPECIFIED",
+		1: "AI_VERDICT_OPTIMAL",
+		2: "AI_VERDICT_GOOD",
+		3: "AI_VERDICT_SUBOPTIMAL",
+		4: "AI_VERDICT_BRUTE_FORCE",
+	}
+	AIVerdict_value = map[string]int32{
+		"AI_VERDICT_UNSPECIFIED": 0,
+		"AI_VERDICT_OPTIMAL":     1,
+		"AI_VERDICT_GOOD":        2,
+		"AI_VERDICT_SUBOPTIMAL":  3,
+		"AI_VERDICT_BRUTE_FORCE": 4,
+	}
+)
+
+func (x AIVerdict) Enum() *AIVerdict {
+	p := new(AIVerdict)
+	*p = x
+	return p
+}
+
+func (x AIVerdict) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (AIVerdict) Descriptor() protoreflect.EnumDescriptor {
+	return file_code_editor_v1_code_editor_proto_enumTypes[5].Descriptor()
+}
+
+func (AIVerdict) Type() protoreflect.EnumType {
+	return &file_code_editor_v1_code_editor_proto_enumTypes[5]
+}
+
+func (x AIVerdict) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use AIVerdict.Descriptor instead.
+func (AIVerdict) EnumDescriptor() ([]byte, []int) {
+	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{5}
+}
+
 type CreateRoomRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Mode          RoomMode               `protobuf:"varint,1,opt,name=mode,proto3,enum=code_editor.v1.RoomMode" json:"mode,omitempty"`
@@ -1231,8 +1393,8 @@ func (x *StartRoomRequest) GetRoomId() string {
 
 type StartRoomResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
-	RoomStatus    string                 `protobuf:"bytes,2,opt,name=room_status,json=roomStatus,proto3" json:"room_status,omitempty"`
+	Status        v1.OperationStatus     `protobuf:"varint,1,opt,name=status,proto3,enum=common.v1.OperationStatus" json:"status,omitempty"`
+	RoomStatus    RoomStatus             `protobuf:"varint,2,opt,name=room_status,json=roomStatus,proto3,enum=code_editor.v1.RoomStatus" json:"room_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1267,24 +1429,24 @@ func (*StartRoomResponse) Descriptor() ([]byte, []int) {
 	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{21}
 }
 
-func (x *StartRoomResponse) GetStatus() string {
+func (x *StartRoomResponse) GetStatus() v1.OperationStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return v1.OperationStatus(0)
 }
 
-func (x *StartRoomResponse) GetRoomStatus() string {
+func (x *StartRoomResponse) GetRoomStatus() RoomStatus {
 	if x != nil {
 		return x.RoomStatus
 	}
-	return ""
+	return RoomStatus_ROOM_STATUS_UNSPECIFIED
 }
 
 // StatusResponse is used for operations that only need to confirm success.
 type StatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status        v1.OperationStatus     `protobuf:"varint,1,opt,name=status,proto3,enum=common.v1.OperationStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1319,11 +1481,11 @@ func (*StatusResponse) Descriptor() ([]byte, []int) {
 	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{22}
 }
 
-func (x *StatusResponse) GetStatus() string {
+func (x *StatusResponse) GetStatus() v1.OperationStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return v1.OperationStatus(0)
 }
 
 type CreateRoomResponse struct {
@@ -2759,7 +2921,7 @@ type SolutionReview struct {
 	state        protoimpl.MessageState `protogen:"open.v1"`
 	Id           string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
 	SubmissionId string                 `protobuf:"bytes,2,opt,name=submission_id,json=submissionId,proto3" json:"submission_id,omitempty"`
-	SourceType   string                 `protobuf:"bytes,3,opt,name=source_type,json=sourceType,proto3" json:"source_type,omitempty"` // daily, practice, duel, mock
+	SourceType   ReviewSourceType       `protobuf:"varint,3,opt,name=source_type,json=sourceType,proto3,enum=code_editor.v1.ReviewSourceType" json:"source_type,omitempty"`
 	TaskId       string                 `protobuf:"bytes,4,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
 	// Level 1: instant feedback
 	IsCorrect     bool  `protobuf:"varint,5,opt,name=is_correct,json=isCorrect,proto3" json:"is_correct,omitempty"`
@@ -2769,8 +2931,8 @@ type SolutionReview struct {
 	PassedCount   int32 `protobuf:"varint,9,opt,name=passed_count,json=passedCount,proto3" json:"passed_count,omitempty"`
 	TotalCount    int32 `protobuf:"varint,10,opt,name=total_count,json=totalCount,proto3" json:"total_count,omitempty"`
 	// Level 2: AI review
-	Status            string            `protobuf:"bytes,11,opt,name=status,proto3" json:"status,omitempty"`                        // pending, ready, failed
-	AiVerdict         string            `protobuf:"bytes,12,opt,name=ai_verdict,json=aiVerdict,proto3" json:"ai_verdict,omitempty"` // optimal, good, suboptimal, brute_force
+	Status            ReviewStatus      `protobuf:"varint,11,opt,name=status,proto3,enum=code_editor.v1.ReviewStatus" json:"status,omitempty"`
+	AiVerdict         AIVerdict         `protobuf:"varint,12,opt,name=ai_verdict,json=aiVerdict,proto3,enum=code_editor.v1.AIVerdict" json:"ai_verdict,omitempty"`
 	AiTimeComplexity  string            `protobuf:"bytes,13,opt,name=ai_time_complexity,json=aiTimeComplexity,proto3" json:"ai_time_complexity,omitempty"`
 	AiSpaceComplexity string            `protobuf:"bytes,14,opt,name=ai_space_complexity,json=aiSpaceComplexity,proto3" json:"ai_space_complexity,omitempty"`
 	AiPattern         string            `protobuf:"bytes,15,opt,name=ai_pattern,json=aiPattern,proto3" json:"ai_pattern,omitempty"`
@@ -2829,11 +2991,11 @@ func (x *SolutionReview) GetSubmissionId() string {
 	return ""
 }
 
-func (x *SolutionReview) GetSourceType() string {
+func (x *SolutionReview) GetSourceType() ReviewSourceType {
 	if x != nil {
 		return x.SourceType
 	}
-	return ""
+	return ReviewSourceType_REVIEW_SOURCE_TYPE_UNSPECIFIED
 }
 
 func (x *SolutionReview) GetTaskId() string {
@@ -2885,18 +3047,18 @@ func (x *SolutionReview) GetTotalCount() int32 {
 	return 0
 }
 
-func (x *SolutionReview) GetStatus() string {
+func (x *SolutionReview) GetStatus() ReviewStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return ReviewStatus_REVIEW_STATUS_UNSPECIFIED
 }
 
-func (x *SolutionReview) GetAiVerdict() string {
+func (x *SolutionReview) GetAiVerdict() AIVerdict {
 	if x != nil {
 		return x.AiVerdict
 	}
-	return ""
+	return AIVerdict_AI_VERDICT_UNSPECIFIED
 }
 
 func (x *SolutionReview) GetAiTimeComplexity() string {
@@ -3032,13 +3194,13 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\n" +
 	"expires_at\x18\x03 \x01(\tR\texpiresAt\"+\n" +
 	"\x10StartRoomRequest\x12\x17\n" +
-	"\aroom_id\x18\x01 \x01(\tR\x06roomId\"L\n" +
-	"\x11StartRoomResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\x12\x1f\n" +
-	"\vroom_status\x18\x02 \x01(\tR\n" +
-	"roomStatus\"(\n" +
-	"\x0eStatusResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"_\n" +
+	"\aroom_id\x18\x01 \x01(\tR\x06roomId\"\x84\x01\n" +
+	"\x11StartRoomResponse\x122\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1a.common.v1.OperationStatusR\x06status\x12;\n" +
+	"\vroom_status\x18\x02 \x01(\x0e2\x1a.code_editor.v1.RoomStatusR\n" +
+	"roomStatus\"D\n" +
+	"\x0eStatusResponse\x122\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1a.common.v1.OperationStatusR\x06status\"_\n" +
 	"\x12CreateRoomResponse\x12(\n" +
 	"\x04room\x18\x01 \x01(\v2\x14.code_editor.v1.RoomR\x04room\x12\x1f\n" +
 	"\vinvite_code\x18\x02 \x01(\tR\n" +
@@ -3181,11 +3343,11 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x18GetSolutionReviewRequest\x12#\n" +
 	"\rsubmission_id\x18\x01 \x01(\tR\fsubmissionId\"P\n" +
 	"\x16SolutionReviewResponse\x126\n" +
-	"\x06review\x18\x01 \x01(\v2\x1e.code_editor.v1.SolutionReviewR\x06review\"\xf3\x06\n" +
+	"\x06review\x18\x01 \x01(\v2\x1e.code_editor.v1.SolutionReviewR\x06review\"\xce\a\n" +
 	"\x0eSolutionReview\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
-	"\rsubmission_id\x18\x02 \x01(\tR\fsubmissionId\x12\x1f\n" +
-	"\vsource_type\x18\x03 \x01(\tR\n" +
+	"\rsubmission_id\x18\x02 \x01(\tR\fsubmissionId\x12A\n" +
+	"\vsource_type\x18\x03 \x01(\x0e2 .code_editor.v1.ReviewSourceTypeR\n" +
 	"sourceType\x12\x17\n" +
 	"\atask_id\x18\x04 \x01(\tR\x06taskId\x12\x1d\n" +
 	"\n" +
@@ -3196,10 +3358,10 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\fpassed_count\x18\t \x01(\x05R\vpassedCount\x12\x1f\n" +
 	"\vtotal_count\x18\n" +
 	" \x01(\x05R\n" +
-	"totalCount\x12\x16\n" +
-	"\x06status\x18\v \x01(\tR\x06status\x12\x1d\n" +
+	"totalCount\x124\n" +
+	"\x06status\x18\v \x01(\x0e2\x1c.code_editor.v1.ReviewStatusR\x06status\x128\n" +
 	"\n" +
-	"ai_verdict\x18\f \x01(\tR\taiVerdict\x12,\n" +
+	"ai_verdict\x18\f \x01(\x0e2\x19.code_editor.v1.AIVerdictR\taiVerdict\x12,\n" +
 	"\x12ai_time_complexity\x18\r \x01(\tR\x10aiTimeComplexity\x12.\n" +
 	"\x13ai_space_complexity\x18\x0e \x01(\tR\x11aiSpaceComplexity\x12\x1d\n" +
 	"\n" +
@@ -3228,7 +3390,24 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x15TASK_TYPE_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13TASK_TYPE_ALGORITHM\x10\x01\x12\x17\n" +
 	"\x13TASK_TYPE_DEBUGGING\x10\x02\x12\x19\n" +
-	"\x15TASK_TYPE_REFACTORING\x10\x032\xef\x13\n" +
+	"\x15TASK_TYPE_REFACTORING\x10\x03*\xaf\x01\n" +
+	"\x10ReviewSourceType\x12\"\n" +
+	"\x1eREVIEW_SOURCE_TYPE_UNSPECIFIED\x10\x00\x12\x1c\n" +
+	"\x18REVIEW_SOURCE_TYPE_DAILY\x10\x01\x12\x1f\n" +
+	"\x1bREVIEW_SOURCE_TYPE_PRACTICE\x10\x02\x12\x1b\n" +
+	"\x17REVIEW_SOURCE_TYPE_DUEL\x10\x03\x12\x1b\n" +
+	"\x17REVIEW_SOURCE_TYPE_MOCK\x10\x04*{\n" +
+	"\fReviewStatus\x12\x1d\n" +
+	"\x19REVIEW_STATUS_UNSPECIFIED\x10\x00\x12\x19\n" +
+	"\x15REVIEW_STATUS_PENDING\x10\x01\x12\x17\n" +
+	"\x13REVIEW_STATUS_READY\x10\x02\x12\x18\n" +
+	"\x14REVIEW_STATUS_FAILED\x10\x03*\x8b\x01\n" +
+	"\tAIVerdict\x12\x1a\n" +
+	"\x16AI_VERDICT_UNSPECIFIED\x10\x00\x12\x16\n" +
+	"\x12AI_VERDICT_OPTIMAL\x10\x01\x12\x13\n" +
+	"\x0fAI_VERDICT_GOOD\x10\x02\x12\x19\n" +
+	"\x15AI_VERDICT_SUBOPTIMAL\x10\x03\x12\x1a\n" +
+	"\x16AI_VERDICT_BRUTE_FORCE\x10\x042\xef\x13\n" +
 	"\x11CodeEditorService\x12y\n" +
 	"\n" +
 	"CreateRoom\x12!.code_editor.v1.CreateRoomRequest\x1a\".code_editor.v1.CreateRoomResponse\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/v1/code-editor/rooms\x12w\n" +
@@ -3267,147 +3446,157 @@ func file_code_editor_v1_code_editor_proto_rawDescGZIP() []byte {
 	return file_code_editor_v1_code_editor_proto_rawDescData
 }
 
-var file_code_editor_v1_code_editor_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_code_editor_v1_code_editor_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
 var file_code_editor_v1_code_editor_proto_msgTypes = make([]protoimpl.MessageInfo, 42)
 var file_code_editor_v1_code_editor_proto_goTypes = []any{
 	(RoomMode)(0),                       // 0: code_editor.v1.RoomMode
 	(RoomStatus)(0),                     // 1: code_editor.v1.RoomStatus
 	(TaskType)(0),                       // 2: code_editor.v1.TaskType
-	(*CreateRoomRequest)(nil),           // 3: code_editor.v1.CreateRoomRequest
-	(*GetRoomRequest)(nil),              // 4: code_editor.v1.GetRoomRequest
-	(*JoinRoomRequest)(nil),             // 5: code_editor.v1.JoinRoomRequest
-	(*JoinRoomByInviteCodeRequest)(nil), // 6: code_editor.v1.JoinRoomByInviteCodeRequest
-	(*LeaveRoomRequest)(nil),            // 7: code_editor.v1.LeaveRoomRequest
-	(*CloseRoomRequest)(nil),            // 8: code_editor.v1.CloseRoomRequest
-	(*SubmitCodeRequest)(nil),           // 9: code_editor.v1.SubmitCodeRequest
-	(*SetReadyRequest)(nil),             // 10: code_editor.v1.SetReadyRequest
-	(*GetSubmissionsRequest)(nil),       // 11: code_editor.v1.GetSubmissionsRequest
-	(*ListTasksRequest)(nil),            // 12: code_editor.v1.ListTasksRequest
-	(*CreateTaskRequest)(nil),           // 13: code_editor.v1.CreateTaskRequest
-	(*UpdateTaskRequest)(nil),           // 14: code_editor.v1.UpdateTaskRequest
-	(*DeleteTaskRequest)(nil),           // 15: code_editor.v1.DeleteTaskRequest
-	(*GetLeaderboardRequest)(nil),       // 16: code_editor.v1.GetLeaderboardRequest
-	(*ListRoomsRequest)(nil),            // 17: code_editor.v1.ListRoomsRequest
-	(*ListRoomsResponse)(nil),           // 18: code_editor.v1.ListRoomsResponse
-	(*AIReviewRequest)(nil),             // 19: code_editor.v1.AIReviewRequest
-	(*AIReviewResponse)(nil),            // 20: code_editor.v1.AIReviewResponse
-	(*GetDailyChallengeRequest)(nil),    // 21: code_editor.v1.GetDailyChallengeRequest
-	(*GetDailyChallengeResponse)(nil),   // 22: code_editor.v1.GetDailyChallengeResponse
-	(*StartRoomRequest)(nil),            // 23: code_editor.v1.StartRoomRequest
-	(*StartRoomResponse)(nil),           // 24: code_editor.v1.StartRoomResponse
-	(*StatusResponse)(nil),              // 25: code_editor.v1.StatusResponse
-	(*CreateRoomResponse)(nil),          // 26: code_editor.v1.CreateRoomResponse
-	(*GetRoomResponse)(nil),             // 27: code_editor.v1.GetRoomResponse
-	(*JoinRoomResponse)(nil),            // 28: code_editor.v1.JoinRoomResponse
-	(*SubmitCodeResponse)(nil),          // 29: code_editor.v1.SubmitCodeResponse
-	(*GetSubmissionsResponse)(nil),      // 30: code_editor.v1.GetSubmissionsResponse
-	(*ListTasksResponse)(nil),           // 31: code_editor.v1.ListTasksResponse
-	(*TaskResponse)(nil),                // 32: code_editor.v1.TaskResponse
-	(*LeaderboardEntry)(nil),            // 33: code_editor.v1.LeaderboardEntry
-	(*GetLeaderboardResponse)(nil),      // 34: code_editor.v1.GetLeaderboardResponse
-	(*Room)(nil),                        // 35: code_editor.v1.Room
-	(*Participant)(nil),                 // 36: code_editor.v1.Participant
-	(*Submission)(nil),                  // 37: code_editor.v1.Submission
-	(*TaskTestCase)(nil),                // 38: code_editor.v1.TaskTestCase
-	(*Task)(nil),                        // 39: code_editor.v1.Task
-	(*TaskPayload)(nil),                 // 40: code_editor.v1.TaskPayload
-	(*GetSolutionReviewRequest)(nil),    // 41: code_editor.v1.GetSolutionReviewRequest
-	(*SolutionReviewResponse)(nil),      // 42: code_editor.v1.SolutionReviewResponse
-	(*SolutionReview)(nil),              // 43: code_editor.v1.SolutionReview
-	nil,                                 // 44: code_editor.v1.SolutionReview.AiSkillSignalsEntry
-	(v1.Difficulty)(0),                  // 45: common.v1.Difficulty
-	(v1.ProgrammingLanguage)(0),         // 46: common.v1.ProgrammingLanguage
-	(*v1.InterviewSolutionReview)(nil),  // 47: common.v1.InterviewSolutionReview
-	(*timestamppb.Timestamp)(nil),       // 48: google.protobuf.Timestamp
-	(v1.ExecutionProfile)(0),            // 49: common.v1.ExecutionProfile
-	(v1.RunnerMode)(0),                  // 50: common.v1.RunnerMode
+	(ReviewSourceType)(0),               // 3: code_editor.v1.ReviewSourceType
+	(ReviewStatus)(0),                   // 4: code_editor.v1.ReviewStatus
+	(AIVerdict)(0),                      // 5: code_editor.v1.AIVerdict
+	(*CreateRoomRequest)(nil),           // 6: code_editor.v1.CreateRoomRequest
+	(*GetRoomRequest)(nil),              // 7: code_editor.v1.GetRoomRequest
+	(*JoinRoomRequest)(nil),             // 8: code_editor.v1.JoinRoomRequest
+	(*JoinRoomByInviteCodeRequest)(nil), // 9: code_editor.v1.JoinRoomByInviteCodeRequest
+	(*LeaveRoomRequest)(nil),            // 10: code_editor.v1.LeaveRoomRequest
+	(*CloseRoomRequest)(nil),            // 11: code_editor.v1.CloseRoomRequest
+	(*SubmitCodeRequest)(nil),           // 12: code_editor.v1.SubmitCodeRequest
+	(*SetReadyRequest)(nil),             // 13: code_editor.v1.SetReadyRequest
+	(*GetSubmissionsRequest)(nil),       // 14: code_editor.v1.GetSubmissionsRequest
+	(*ListTasksRequest)(nil),            // 15: code_editor.v1.ListTasksRequest
+	(*CreateTaskRequest)(nil),           // 16: code_editor.v1.CreateTaskRequest
+	(*UpdateTaskRequest)(nil),           // 17: code_editor.v1.UpdateTaskRequest
+	(*DeleteTaskRequest)(nil),           // 18: code_editor.v1.DeleteTaskRequest
+	(*GetLeaderboardRequest)(nil),       // 19: code_editor.v1.GetLeaderboardRequest
+	(*ListRoomsRequest)(nil),            // 20: code_editor.v1.ListRoomsRequest
+	(*ListRoomsResponse)(nil),           // 21: code_editor.v1.ListRoomsResponse
+	(*AIReviewRequest)(nil),             // 22: code_editor.v1.AIReviewRequest
+	(*AIReviewResponse)(nil),            // 23: code_editor.v1.AIReviewResponse
+	(*GetDailyChallengeRequest)(nil),    // 24: code_editor.v1.GetDailyChallengeRequest
+	(*GetDailyChallengeResponse)(nil),   // 25: code_editor.v1.GetDailyChallengeResponse
+	(*StartRoomRequest)(nil),            // 26: code_editor.v1.StartRoomRequest
+	(*StartRoomResponse)(nil),           // 27: code_editor.v1.StartRoomResponse
+	(*StatusResponse)(nil),              // 28: code_editor.v1.StatusResponse
+	(*CreateRoomResponse)(nil),          // 29: code_editor.v1.CreateRoomResponse
+	(*GetRoomResponse)(nil),             // 30: code_editor.v1.GetRoomResponse
+	(*JoinRoomResponse)(nil),            // 31: code_editor.v1.JoinRoomResponse
+	(*SubmitCodeResponse)(nil),          // 32: code_editor.v1.SubmitCodeResponse
+	(*GetSubmissionsResponse)(nil),      // 33: code_editor.v1.GetSubmissionsResponse
+	(*ListTasksResponse)(nil),           // 34: code_editor.v1.ListTasksResponse
+	(*TaskResponse)(nil),                // 35: code_editor.v1.TaskResponse
+	(*LeaderboardEntry)(nil),            // 36: code_editor.v1.LeaderboardEntry
+	(*GetLeaderboardResponse)(nil),      // 37: code_editor.v1.GetLeaderboardResponse
+	(*Room)(nil),                        // 38: code_editor.v1.Room
+	(*Participant)(nil),                 // 39: code_editor.v1.Participant
+	(*Submission)(nil),                  // 40: code_editor.v1.Submission
+	(*TaskTestCase)(nil),                // 41: code_editor.v1.TaskTestCase
+	(*Task)(nil),                        // 42: code_editor.v1.Task
+	(*TaskPayload)(nil),                 // 43: code_editor.v1.TaskPayload
+	(*GetSolutionReviewRequest)(nil),    // 44: code_editor.v1.GetSolutionReviewRequest
+	(*SolutionReviewResponse)(nil),      // 45: code_editor.v1.SolutionReviewResponse
+	(*SolutionReview)(nil),              // 46: code_editor.v1.SolutionReview
+	nil,                                 // 47: code_editor.v1.SolutionReview.AiSkillSignalsEntry
+	(v1.Difficulty)(0),                  // 48: common.v1.Difficulty
+	(v1.ProgrammingLanguage)(0),         // 49: common.v1.ProgrammingLanguage
+	(*v1.InterviewSolutionReview)(nil),  // 50: common.v1.InterviewSolutionReview
+	(v1.OperationStatus)(0),             // 51: common.v1.OperationStatus
+	(*timestamppb.Timestamp)(nil),       // 52: google.protobuf.Timestamp
+	(v1.ExecutionProfile)(0),            // 53: common.v1.ExecutionProfile
+	(v1.RunnerMode)(0),                  // 54: common.v1.RunnerMode
 }
 var file_code_editor_v1_code_editor_proto_depIdxs = []int32{
 	0,  // 0: code_editor.v1.CreateRoomRequest.mode:type_name -> code_editor.v1.RoomMode
-	45, // 1: code_editor.v1.CreateRoomRequest.difficulty:type_name -> common.v1.Difficulty
-	46, // 2: code_editor.v1.SubmitCodeRequest.language:type_name -> common.v1.ProgrammingLanguage
-	45, // 3: code_editor.v1.ListTasksRequest.difficulty:type_name -> common.v1.Difficulty
-	40, // 4: code_editor.v1.CreateTaskRequest.task:type_name -> code_editor.v1.TaskPayload
-	40, // 5: code_editor.v1.UpdateTaskRequest.task:type_name -> code_editor.v1.TaskPayload
-	35, // 6: code_editor.v1.ListRoomsResponse.rooms:type_name -> code_editor.v1.Room
-	47, // 7: code_editor.v1.AIReviewResponse.review:type_name -> common.v1.InterviewSolutionReview
-	39, // 8: code_editor.v1.GetDailyChallengeResponse.task:type_name -> code_editor.v1.Task
-	35, // 9: code_editor.v1.CreateRoomResponse.room:type_name -> code_editor.v1.Room
-	35, // 10: code_editor.v1.GetRoomResponse.room:type_name -> code_editor.v1.Room
-	35, // 11: code_editor.v1.JoinRoomResponse.room:type_name -> code_editor.v1.Room
-	37, // 12: code_editor.v1.GetSubmissionsResponse.submissions:type_name -> code_editor.v1.Submission
-	39, // 13: code_editor.v1.ListTasksResponse.tasks:type_name -> code_editor.v1.Task
-	39, // 14: code_editor.v1.TaskResponse.task:type_name -> code_editor.v1.Task
-	33, // 15: code_editor.v1.GetLeaderboardResponse.entries:type_name -> code_editor.v1.LeaderboardEntry
-	0,  // 16: code_editor.v1.Room.mode:type_name -> code_editor.v1.RoomMode
-	1,  // 17: code_editor.v1.Room.status:type_name -> code_editor.v1.RoomStatus
-	48, // 18: code_editor.v1.Room.created_at:type_name -> google.protobuf.Timestamp
-	36, // 19: code_editor.v1.Room.participants:type_name -> code_editor.v1.Participant
-	46, // 20: code_editor.v1.Room.language:type_name -> common.v1.ProgrammingLanguage
-	48, // 21: code_editor.v1.Participant.joined_at:type_name -> google.protobuf.Timestamp
-	48, // 22: code_editor.v1.Submission.submitted_at:type_name -> google.protobuf.Timestamp
-	45, // 23: code_editor.v1.Task.difficulty:type_name -> common.v1.Difficulty
-	46, // 24: code_editor.v1.Task.language:type_name -> common.v1.ProgrammingLanguage
-	38, // 25: code_editor.v1.Task.public_test_cases:type_name -> code_editor.v1.TaskTestCase
-	38, // 26: code_editor.v1.Task.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
-	48, // 27: code_editor.v1.Task.created_at:type_name -> google.protobuf.Timestamp
-	48, // 28: code_editor.v1.Task.updated_at:type_name -> google.protobuf.Timestamp
-	2,  // 29: code_editor.v1.Task.task_type:type_name -> code_editor.v1.TaskType
-	49, // 30: code_editor.v1.Task.execution_profile:type_name -> common.v1.ExecutionProfile
-	50, // 31: code_editor.v1.Task.runner_mode:type_name -> common.v1.RunnerMode
-	45, // 32: code_editor.v1.TaskPayload.difficulty:type_name -> common.v1.Difficulty
-	46, // 33: code_editor.v1.TaskPayload.language:type_name -> common.v1.ProgrammingLanguage
-	38, // 34: code_editor.v1.TaskPayload.public_test_cases:type_name -> code_editor.v1.TaskTestCase
-	38, // 35: code_editor.v1.TaskPayload.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
-	2,  // 36: code_editor.v1.TaskPayload.task_type:type_name -> code_editor.v1.TaskType
-	49, // 37: code_editor.v1.TaskPayload.execution_profile:type_name -> common.v1.ExecutionProfile
-	50, // 38: code_editor.v1.TaskPayload.runner_mode:type_name -> common.v1.RunnerMode
-	43, // 39: code_editor.v1.SolutionReviewResponse.review:type_name -> code_editor.v1.SolutionReview
-	44, // 40: code_editor.v1.SolutionReview.ai_skill_signals:type_name -> code_editor.v1.SolutionReview.AiSkillSignalsEntry
-	48, // 41: code_editor.v1.SolutionReview.created_at:type_name -> google.protobuf.Timestamp
-	3,  // 42: code_editor.v1.CodeEditorService.CreateRoom:input_type -> code_editor.v1.CreateRoomRequest
-	4,  // 43: code_editor.v1.CodeEditorService.GetRoom:input_type -> code_editor.v1.GetRoomRequest
-	5,  // 44: code_editor.v1.CodeEditorService.JoinRoom:input_type -> code_editor.v1.JoinRoomRequest
-	6,  // 45: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:input_type -> code_editor.v1.JoinRoomByInviteCodeRequest
-	7,  // 46: code_editor.v1.CodeEditorService.LeaveRoom:input_type -> code_editor.v1.LeaveRoomRequest
-	8,  // 47: code_editor.v1.CodeEditorService.CloseRoom:input_type -> code_editor.v1.CloseRoomRequest
-	9,  // 48: code_editor.v1.CodeEditorService.SubmitCode:input_type -> code_editor.v1.SubmitCodeRequest
-	10, // 49: code_editor.v1.CodeEditorService.SetReady:input_type -> code_editor.v1.SetReadyRequest
-	11, // 50: code_editor.v1.CodeEditorService.GetSubmissions:input_type -> code_editor.v1.GetSubmissionsRequest
-	12, // 51: code_editor.v1.CodeEditorService.ListTasks:input_type -> code_editor.v1.ListTasksRequest
-	13, // 52: code_editor.v1.CodeEditorService.CreateTask:input_type -> code_editor.v1.CreateTaskRequest
-	14, // 53: code_editor.v1.CodeEditorService.UpdateTask:input_type -> code_editor.v1.UpdateTaskRequest
-	15, // 54: code_editor.v1.CodeEditorService.DeleteTask:input_type -> code_editor.v1.DeleteTaskRequest
-	16, // 55: code_editor.v1.CodeEditorService.GetLeaderboard:input_type -> code_editor.v1.GetLeaderboardRequest
-	17, // 56: code_editor.v1.CodeEditorService.ListRooms:input_type -> code_editor.v1.ListRoomsRequest
-	19, // 57: code_editor.v1.CodeEditorService.AIReview:input_type -> code_editor.v1.AIReviewRequest
-	21, // 58: code_editor.v1.CodeEditorService.GetDailyChallenge:input_type -> code_editor.v1.GetDailyChallengeRequest
-	23, // 59: code_editor.v1.CodeEditorService.StartRoom:input_type -> code_editor.v1.StartRoomRequest
-	41, // 60: code_editor.v1.CodeEditorService.GetSolutionReview:input_type -> code_editor.v1.GetSolutionReviewRequest
-	26, // 61: code_editor.v1.CodeEditorService.CreateRoom:output_type -> code_editor.v1.CreateRoomResponse
-	27, // 62: code_editor.v1.CodeEditorService.GetRoom:output_type -> code_editor.v1.GetRoomResponse
-	28, // 63: code_editor.v1.CodeEditorService.JoinRoom:output_type -> code_editor.v1.JoinRoomResponse
-	28, // 64: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:output_type -> code_editor.v1.JoinRoomResponse
-	25, // 65: code_editor.v1.CodeEditorService.LeaveRoom:output_type -> code_editor.v1.StatusResponse
-	25, // 66: code_editor.v1.CodeEditorService.CloseRoom:output_type -> code_editor.v1.StatusResponse
-	29, // 67: code_editor.v1.CodeEditorService.SubmitCode:output_type -> code_editor.v1.SubmitCodeResponse
-	25, // 68: code_editor.v1.CodeEditorService.SetReady:output_type -> code_editor.v1.StatusResponse
-	30, // 69: code_editor.v1.CodeEditorService.GetSubmissions:output_type -> code_editor.v1.GetSubmissionsResponse
-	31, // 70: code_editor.v1.CodeEditorService.ListTasks:output_type -> code_editor.v1.ListTasksResponse
-	32, // 71: code_editor.v1.CodeEditorService.CreateTask:output_type -> code_editor.v1.TaskResponse
-	32, // 72: code_editor.v1.CodeEditorService.UpdateTask:output_type -> code_editor.v1.TaskResponse
-	25, // 73: code_editor.v1.CodeEditorService.DeleteTask:output_type -> code_editor.v1.StatusResponse
-	34, // 74: code_editor.v1.CodeEditorService.GetLeaderboard:output_type -> code_editor.v1.GetLeaderboardResponse
-	18, // 75: code_editor.v1.CodeEditorService.ListRooms:output_type -> code_editor.v1.ListRoomsResponse
-	20, // 76: code_editor.v1.CodeEditorService.AIReview:output_type -> code_editor.v1.AIReviewResponse
-	22, // 77: code_editor.v1.CodeEditorService.GetDailyChallenge:output_type -> code_editor.v1.GetDailyChallengeResponse
-	24, // 78: code_editor.v1.CodeEditorService.StartRoom:output_type -> code_editor.v1.StartRoomResponse
-	42, // 79: code_editor.v1.CodeEditorService.GetSolutionReview:output_type -> code_editor.v1.SolutionReviewResponse
-	61, // [61:80] is the sub-list for method output_type
-	42, // [42:61] is the sub-list for method input_type
-	42, // [42:42] is the sub-list for extension type_name
-	42, // [42:42] is the sub-list for extension extendee
-	0,  // [0:42] is the sub-list for field type_name
+	48, // 1: code_editor.v1.CreateRoomRequest.difficulty:type_name -> common.v1.Difficulty
+	49, // 2: code_editor.v1.SubmitCodeRequest.language:type_name -> common.v1.ProgrammingLanguage
+	48, // 3: code_editor.v1.ListTasksRequest.difficulty:type_name -> common.v1.Difficulty
+	43, // 4: code_editor.v1.CreateTaskRequest.task:type_name -> code_editor.v1.TaskPayload
+	43, // 5: code_editor.v1.UpdateTaskRequest.task:type_name -> code_editor.v1.TaskPayload
+	38, // 6: code_editor.v1.ListRoomsResponse.rooms:type_name -> code_editor.v1.Room
+	50, // 7: code_editor.v1.AIReviewResponse.review:type_name -> common.v1.InterviewSolutionReview
+	42, // 8: code_editor.v1.GetDailyChallengeResponse.task:type_name -> code_editor.v1.Task
+	51, // 9: code_editor.v1.StartRoomResponse.status:type_name -> common.v1.OperationStatus
+	1,  // 10: code_editor.v1.StartRoomResponse.room_status:type_name -> code_editor.v1.RoomStatus
+	51, // 11: code_editor.v1.StatusResponse.status:type_name -> common.v1.OperationStatus
+	38, // 12: code_editor.v1.CreateRoomResponse.room:type_name -> code_editor.v1.Room
+	38, // 13: code_editor.v1.GetRoomResponse.room:type_name -> code_editor.v1.Room
+	38, // 14: code_editor.v1.JoinRoomResponse.room:type_name -> code_editor.v1.Room
+	40, // 15: code_editor.v1.GetSubmissionsResponse.submissions:type_name -> code_editor.v1.Submission
+	42, // 16: code_editor.v1.ListTasksResponse.tasks:type_name -> code_editor.v1.Task
+	42, // 17: code_editor.v1.TaskResponse.task:type_name -> code_editor.v1.Task
+	36, // 18: code_editor.v1.GetLeaderboardResponse.entries:type_name -> code_editor.v1.LeaderboardEntry
+	0,  // 19: code_editor.v1.Room.mode:type_name -> code_editor.v1.RoomMode
+	1,  // 20: code_editor.v1.Room.status:type_name -> code_editor.v1.RoomStatus
+	52, // 21: code_editor.v1.Room.created_at:type_name -> google.protobuf.Timestamp
+	39, // 22: code_editor.v1.Room.participants:type_name -> code_editor.v1.Participant
+	49, // 23: code_editor.v1.Room.language:type_name -> common.v1.ProgrammingLanguage
+	52, // 24: code_editor.v1.Participant.joined_at:type_name -> google.protobuf.Timestamp
+	52, // 25: code_editor.v1.Submission.submitted_at:type_name -> google.protobuf.Timestamp
+	48, // 26: code_editor.v1.Task.difficulty:type_name -> common.v1.Difficulty
+	49, // 27: code_editor.v1.Task.language:type_name -> common.v1.ProgrammingLanguage
+	41, // 28: code_editor.v1.Task.public_test_cases:type_name -> code_editor.v1.TaskTestCase
+	41, // 29: code_editor.v1.Task.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
+	52, // 30: code_editor.v1.Task.created_at:type_name -> google.protobuf.Timestamp
+	52, // 31: code_editor.v1.Task.updated_at:type_name -> google.protobuf.Timestamp
+	2,  // 32: code_editor.v1.Task.task_type:type_name -> code_editor.v1.TaskType
+	53, // 33: code_editor.v1.Task.execution_profile:type_name -> common.v1.ExecutionProfile
+	54, // 34: code_editor.v1.Task.runner_mode:type_name -> common.v1.RunnerMode
+	48, // 35: code_editor.v1.TaskPayload.difficulty:type_name -> common.v1.Difficulty
+	49, // 36: code_editor.v1.TaskPayload.language:type_name -> common.v1.ProgrammingLanguage
+	41, // 37: code_editor.v1.TaskPayload.public_test_cases:type_name -> code_editor.v1.TaskTestCase
+	41, // 38: code_editor.v1.TaskPayload.hidden_test_cases:type_name -> code_editor.v1.TaskTestCase
+	2,  // 39: code_editor.v1.TaskPayload.task_type:type_name -> code_editor.v1.TaskType
+	53, // 40: code_editor.v1.TaskPayload.execution_profile:type_name -> common.v1.ExecutionProfile
+	54, // 41: code_editor.v1.TaskPayload.runner_mode:type_name -> common.v1.RunnerMode
+	46, // 42: code_editor.v1.SolutionReviewResponse.review:type_name -> code_editor.v1.SolutionReview
+	3,  // 43: code_editor.v1.SolutionReview.source_type:type_name -> code_editor.v1.ReviewSourceType
+	4,  // 44: code_editor.v1.SolutionReview.status:type_name -> code_editor.v1.ReviewStatus
+	5,  // 45: code_editor.v1.SolutionReview.ai_verdict:type_name -> code_editor.v1.AIVerdict
+	47, // 46: code_editor.v1.SolutionReview.ai_skill_signals:type_name -> code_editor.v1.SolutionReview.AiSkillSignalsEntry
+	52, // 47: code_editor.v1.SolutionReview.created_at:type_name -> google.protobuf.Timestamp
+	6,  // 48: code_editor.v1.CodeEditorService.CreateRoom:input_type -> code_editor.v1.CreateRoomRequest
+	7,  // 49: code_editor.v1.CodeEditorService.GetRoom:input_type -> code_editor.v1.GetRoomRequest
+	8,  // 50: code_editor.v1.CodeEditorService.JoinRoom:input_type -> code_editor.v1.JoinRoomRequest
+	9,  // 51: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:input_type -> code_editor.v1.JoinRoomByInviteCodeRequest
+	10, // 52: code_editor.v1.CodeEditorService.LeaveRoom:input_type -> code_editor.v1.LeaveRoomRequest
+	11, // 53: code_editor.v1.CodeEditorService.CloseRoom:input_type -> code_editor.v1.CloseRoomRequest
+	12, // 54: code_editor.v1.CodeEditorService.SubmitCode:input_type -> code_editor.v1.SubmitCodeRequest
+	13, // 55: code_editor.v1.CodeEditorService.SetReady:input_type -> code_editor.v1.SetReadyRequest
+	14, // 56: code_editor.v1.CodeEditorService.GetSubmissions:input_type -> code_editor.v1.GetSubmissionsRequest
+	15, // 57: code_editor.v1.CodeEditorService.ListTasks:input_type -> code_editor.v1.ListTasksRequest
+	16, // 58: code_editor.v1.CodeEditorService.CreateTask:input_type -> code_editor.v1.CreateTaskRequest
+	17, // 59: code_editor.v1.CodeEditorService.UpdateTask:input_type -> code_editor.v1.UpdateTaskRequest
+	18, // 60: code_editor.v1.CodeEditorService.DeleteTask:input_type -> code_editor.v1.DeleteTaskRequest
+	19, // 61: code_editor.v1.CodeEditorService.GetLeaderboard:input_type -> code_editor.v1.GetLeaderboardRequest
+	20, // 62: code_editor.v1.CodeEditorService.ListRooms:input_type -> code_editor.v1.ListRoomsRequest
+	22, // 63: code_editor.v1.CodeEditorService.AIReview:input_type -> code_editor.v1.AIReviewRequest
+	24, // 64: code_editor.v1.CodeEditorService.GetDailyChallenge:input_type -> code_editor.v1.GetDailyChallengeRequest
+	26, // 65: code_editor.v1.CodeEditorService.StartRoom:input_type -> code_editor.v1.StartRoomRequest
+	44, // 66: code_editor.v1.CodeEditorService.GetSolutionReview:input_type -> code_editor.v1.GetSolutionReviewRequest
+	29, // 67: code_editor.v1.CodeEditorService.CreateRoom:output_type -> code_editor.v1.CreateRoomResponse
+	30, // 68: code_editor.v1.CodeEditorService.GetRoom:output_type -> code_editor.v1.GetRoomResponse
+	31, // 69: code_editor.v1.CodeEditorService.JoinRoom:output_type -> code_editor.v1.JoinRoomResponse
+	31, // 70: code_editor.v1.CodeEditorService.JoinRoomByInviteCode:output_type -> code_editor.v1.JoinRoomResponse
+	28, // 71: code_editor.v1.CodeEditorService.LeaveRoom:output_type -> code_editor.v1.StatusResponse
+	28, // 72: code_editor.v1.CodeEditorService.CloseRoom:output_type -> code_editor.v1.StatusResponse
+	32, // 73: code_editor.v1.CodeEditorService.SubmitCode:output_type -> code_editor.v1.SubmitCodeResponse
+	28, // 74: code_editor.v1.CodeEditorService.SetReady:output_type -> code_editor.v1.StatusResponse
+	33, // 75: code_editor.v1.CodeEditorService.GetSubmissions:output_type -> code_editor.v1.GetSubmissionsResponse
+	34, // 76: code_editor.v1.CodeEditorService.ListTasks:output_type -> code_editor.v1.ListTasksResponse
+	35, // 77: code_editor.v1.CodeEditorService.CreateTask:output_type -> code_editor.v1.TaskResponse
+	35, // 78: code_editor.v1.CodeEditorService.UpdateTask:output_type -> code_editor.v1.TaskResponse
+	28, // 79: code_editor.v1.CodeEditorService.DeleteTask:output_type -> code_editor.v1.StatusResponse
+	37, // 80: code_editor.v1.CodeEditorService.GetLeaderboard:output_type -> code_editor.v1.GetLeaderboardResponse
+	21, // 81: code_editor.v1.CodeEditorService.ListRooms:output_type -> code_editor.v1.ListRoomsResponse
+	23, // 82: code_editor.v1.CodeEditorService.AIReview:output_type -> code_editor.v1.AIReviewResponse
+	25, // 83: code_editor.v1.CodeEditorService.GetDailyChallenge:output_type -> code_editor.v1.GetDailyChallengeResponse
+	27, // 84: code_editor.v1.CodeEditorService.StartRoom:output_type -> code_editor.v1.StartRoomResponse
+	45, // 85: code_editor.v1.CodeEditorService.GetSolutionReview:output_type -> code_editor.v1.SolutionReviewResponse
+	67, // [67:86] is the sub-list for method output_type
+	48, // [48:67] is the sub-list for method input_type
+	48, // [48:48] is the sub-list for extension type_name
+	48, // [48:48] is the sub-list for extension extendee
+	0,  // [0:48] is the sub-list for field type_name
 }
 
 func init() { file_code_editor_v1_code_editor_proto_init() }
@@ -3420,7 +3609,7 @@ func file_code_editor_v1_code_editor_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_code_editor_v1_code_editor_proto_rawDesc), len(file_code_editor_v1_code_editor_proto_rawDesc)),
-			NumEnums:      3,
+			NumEnums:      6,
 			NumMessages:   42,
 			NumExtensions: 0,
 			NumServices:   1,

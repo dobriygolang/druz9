@@ -437,6 +437,25 @@ func mapMockQuestionResult(result *model.InterviewPrepMockQuestionResult) *v1.Mo
 	return r
 }
 
+// mapMockStageSlim returns only the metadata fields of a stage (index, kind, status,
+// title, roundType). It is used for the `stages` list in MockSession so that only the
+// current_stage carries the full payload (task, code, questions).
+func mapMockStageSlim(stage *model.InterviewPrepMockStage) *v1.MockStage {
+	if stage == nil {
+		return nil
+	}
+	s := &v1.MockStage{
+		Id:         stage.ID.String(),
+		SessionId:  stage.SessionID.String(),
+		StageIndex: stage.StageIndex,
+		Kind:       mapMockStageKind(stage.Kind),
+		RoundType:  stage.RoundType,
+		Title:      stage.Title,
+		Status:     mapMockStageStatus(stage.Status),
+	}
+	return s
+}
+
 func mapMockStage(stage *model.InterviewPrepMockStage) *v1.MockStage {
 	if stage == nil {
 		return nil
@@ -480,9 +499,10 @@ func mapMockSession(session *model.InterviewPrepMockSession) *v1.MockSession {
 	if session == nil {
 		return nil
 	}
+	// Use slim mapping for the list — full details are in current_stage only.
 	stages := make([]*v1.MockStage, 0, len(session.Stages))
 	for _, stage := range session.Stages {
-		stages = append(stages, mapMockStage(stage))
+		stages = append(stages, mapMockStageSlim(stage))
 	}
 
 	s := &v1.MockSession{
@@ -573,7 +593,7 @@ func mapMockCompanyPreset(item *model.InterviewPrepMockCompanyPreset) *v1.MockCo
 	return &v1.MockCompanyPreset{
 		Id:              item.ID.String(),
 		CompanyTag:      item.CompanyTag,
-		StageKind:       item.StageKind.String(),
+		StageKind:       mapMockStageKind(item.StageKind),
 		Position:        item.Position,
 		TaskSlugPattern: item.TaskSlugPattern,
 		AiModelOverride: item.AIModelOverride,

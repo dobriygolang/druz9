@@ -5,6 +5,7 @@ import (
 
 	"api/internal/model"
 	v1 "api/pkg/api/circle/v1"
+	commonv1 "api/pkg/api/common/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -24,5 +25,5 @@ func (i *Implementation) DeleteCircle(ctx context.Context, req *v1.DeleteCircleR
 	if err := i.service.DeleteCircle(ctx, circleID, user.ID); err != nil {
 		return nil, err
 	}
-	return &v1.DeleteCircleResponse{Status: "ok"}, nil
+	return &v1.DeleteCircleResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }

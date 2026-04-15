@@ -4,6 +4,7 @@ import (
 	"context"
 
 	v1 "api/pkg/api/admin/v1"
+	commonv1 "api/pkg/api/common/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -19,5 +20,5 @@ func (i *Implementation) UpdateUserAdmin(ctx context.Context, req *v1.UpdateUser
 		return nil, err
 	}
 	i.cacheInval.InvalidateProfileCache(userID)
-	return &v1.AdminStatusResponse{Status: "ok"}, nil
+	return &v1.AdminStatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }

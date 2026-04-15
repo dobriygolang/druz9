@@ -29,7 +29,7 @@ func (i *Implementation) GetProfileFeed(ctx context.Context, req *v1.GetProfileF
 	out := make([]*v1.FeedItem, 0, len(items))
 	for _, item := range items {
 		fi := &v1.FeedItem{
-			Type:        item.Type,
+			Type:        mapFeedItemType(item.Type),
 			Title:       item.Title,
 			Description: item.Description,
 			Timestamp:   timestamppb.New(item.Timestamp),

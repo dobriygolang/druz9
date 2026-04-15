@@ -10,6 +10,11 @@ service ProfileService {
   rpc ConfirmTelegramAuth(ConfirmTelegramAuthRequest) returns (ConfirmTelegramAuthResponse);
 }
 
+enum OperationStatus {
+  OPERATION_STATUS_UNSPECIFIED = 0;
+  OPERATION_STATUS_OK          = 1;
+}
+
 message ConfirmTelegramAuthRequest {
   string token       = 1;
   string bot_token   = 2;
@@ -21,6 +26,6 @@ message ConfirmTelegramAuthRequest {
 }
 
 message ConfirmTelegramAuthResponse {
-  string status = 1;
+  OperationStatus status = 1;
   string code   = 2;
 }

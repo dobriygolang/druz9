@@ -3,6 +3,7 @@ syntax = "proto3";
 package admin.v1;
 
 import "google/api/annotations.proto";
+import "common/v1/common.proto";
 
 option go_package = "api/pkg/api/admin/v1;v1";
 
@@ -47,7 +48,7 @@ message UpdateUserAdminRequest {
 message GetRuntimeConfigRequest {}
 
 message AdminStatusResponse {
-  string status = 1;
+  common.v1.OperationStatus status = 1;
 }
 
 message GetConfigRequest {

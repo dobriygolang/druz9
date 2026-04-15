@@ -6,6 +6,8 @@ import {
   Cpu, Building2, Clock, Sparkles, ArrowRight, Zap, Target, Star, Flame, TrendingUp,
 } from 'lucide-react'
 import { interviewPrepApi, type InterviewPrepTask, type MockBlueprint } from '@/features/InterviewPrep/api/interviewPrepApi'
+import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
+import type { Task as CodeRoomTask } from '@/entities/CodeRoom/model/types'
 import { journeyApi, type ReadinessResponse } from '@/features/Journey/api/journeyApi'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { Badge } from '@/shared/ui/Badge'
@@ -72,6 +74,28 @@ const LEVEL_VARIANTS: Record<string, 'default' | 'warning' | 'info' | 'success' 
   ready: 'success',
 }
 
+type SoloTask = {
+  id: string
+  sourceTaskId: string
+  source: 'interview' | 'algorithm'
+  title: string
+  prepType: string
+  language: string
+  companyTag: string
+  durationSeconds: number
+  starterCode: string
+  statement: string
+  roomTask?: CodeRoomTask
+}
+
+function isAlgorithmTask(task: CodeRoomTask): boolean {
+  return task.topics.some((topic) => topic.toLowerCase().includes('algorithm'))
+}
+
+function fromCodeRoomLanguageEnum(language: string): string {
+  return language.replace('PROGRAMMING_LANGUAGE_', '').toLowerCase()
+}
+
 export function InterviewPrepPage() {
   const { t } = useTranslation()
   const navigate = useNavigate()
@@ -81,6 +105,7 @@ export function InterviewPrepPage() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [tasks, setTasks] = useState<InterviewPrepTask[]>([])
+  const [algorithmTasks, setAlgorithmTasks] = useState<CodeRoomTask[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
   const [search, setSearch] = useState('')
@@ -88,15 +113,32 @@ export function InterviewPrepPage() {
   const [blueprints, setBlueprints] = useState<MockBlueprint[]>([])
   const [selectedBlueprintSlug, setSelectedBlueprintSlug] = useState('')
   const [mockLoading, setMockLoading] = useState(false)
+  const [mockAbortLoading, setMockAbortLoading] = useState(false)
   const [mockError, setMockError] = useState('')
   const [readiness, setReadiness] = useState<ReadinessResponse | null>(null)
 
   const fetchTasks = useCallback(() => {
     setError(null)
     setLoading(true)
-    interviewPrepApi.listTasks()
-      .then(ts => setTasks(ts))
-      .catch(() => setError(t('common.loadFailed')))
+    Promise.allSettled([
+      interviewPrepApi.listTasks(),
+      codeRoomApi.listTasks(),
+    ])
+      .then(([prepResult, codeRoomResult]) => {
+        const prepFailed = prepResult.status === 'rejected'
+        const codeRoomFailed = codeRoomResult.status === 'rejected'
+
+        setTasks(prepResult.status === 'fulfilled' ? prepResult.value : [])
+        setAlgorithmTasks(
+          codeRoomResult.status === 'fulfilled'
+            ? codeRoomResult.value.filter(isAlgorithmTask)
+            : [],
+        )
+
+        if (prepFailed && codeRoomFailed) {
+          setError(t('common.loadFailed'))
+        }
+      })
       .finally(() => setLoading(false))
     interviewPrepApi.listMockBlueprints()
       .then(items => {
@@ -111,17 +153,45 @@ export function InterviewPrepPage() {
 
   useEffect(() => { fetchTasks() }, [fetchTasks])
 
-  const filtered = useMemo(() => tasks.filter(t => {
-    if (category && t.prepType !== category) return false
-    if (search && !t.title.toLowerCase().includes(search.toLowerCase())) return false
+  const soloTasks = useMemo<SoloTask[]>(() => ([
+    ...tasks.map((task) => ({
+      id: `prep:${task.id}`,
+      sourceTaskId: task.id,
+      source: 'interview' as const,
+      title: task.title,
+      prepType: task.prepType,
+      language: task.language,
+      companyTag: task.companyTag,
+      durationSeconds: task.durationSeconds,
+      starterCode: task.starterCode,
+      statement: task.statement,
+    })),
+    ...algorithmTasks.map((task) => ({
+      id: `algorithm:${task.id}`,
+      sourceTaskId: task.id,
+      source: 'algorithm' as const,
+      title: task.title,
+      prepType: 'algorithm',
+      language: fromCodeRoomLanguageEnum(task.language),
+      companyTag: '',
+      durationSeconds: 0,
+      starterCode: task.starterCode,
+      statement: task.statement,
+      roomTask: task,
+    })),
+  ]), [tasks, algorithmTasks])
+
+  const filtered = useMemo(() => soloTasks.filter((task) => {
+    if (category && task.prepType !== category) return false
+    if (search && !task.title.toLowerCase().includes(search.toLowerCase())) return false
     return true
-  }), [tasks, category, search])
+  }), [soloTasks, category, search])
 
   const categoryCounts = useMemo(() => {
-    const counts: Record<string, number> = { '': tasks.length }
-    for (const t of tasks) counts[t.prepType] = (counts[t.prepType] ?? 0) + 1
+    const counts: Record<string, number> = { '': soloTasks.length }
+    for (const task of soloTasks) counts[task.prepType] = (counts[task.prepType] ?? 0) + 1
     return counts
-  }, [tasks])
+  }, [soloTasks])
 
   const selectedBlueprint = useMemo(
     () => blueprints.find(bp => bp.slug === selectedBlueprintSlug) ?? blueprints[0] ?? null,
@@ -153,10 +223,39 @@ export function InterviewPrepPage() {
     }
   }
 
-  const handleStartSolo = async (task: InterviewPrepTask) => {
+  const handleAbortAndStartNew = async () => {
+    const activeSessionId = mockError.startsWith('active_session:') ? mockError.split(':')[1] : null
+    if (!activeSessionId) return
+    setMockAbortLoading(true)
     try {
-      const session = await interviewPrepApi.startSession(task.id) as any
-      navigate(`/prepare/interview-prep/${session?.id ?? task.id}`)
+      await interviewPrepApi.abortMockSession(activeSessionId)
+      setMockError('')
+      await handleStartMock()
+    } catch {
+      toast(t('interviewPrep.mock.abortFailed'), 'error')
+    } finally {
+      setMockAbortLoading(false)
+    }
+  }
+
+  const handleStartSolo = async (task: SoloTask) => {
+    try {
+      if (task.source === 'algorithm' && task.roomTask) {
+        const { room } = await codeRoomApi.createRoom({ mode: 'ROOM_MODE_ALL', task: task.roomTask.title })
+        navigate(`/code-rooms/${room.id}`, {
+          state: {
+            title: task.roomTask.title,
+            statement: task.roomTask.statement,
+            starterCode: task.roomTask.starterCode,
+            language: fromCodeRoomLanguageEnum(task.roomTask.language),
+            taskId: task.roomTask.id,
+          },
+        })
+        return
+      }
+
+      const session = await interviewPrepApi.startSession(task.sourceTaskId) as any
+      navigate(`/prepare/interview-prep/${session?.id ?? task.sourceTaskId}`)
     } catch {
       toast(t('interviewPrep.solo.startFailed'), 'error')
     }
@@ -313,13 +412,22 @@ export function InterviewPrepPage() {
 
             {/* Active session warning */}
             {mockError && mockError.startsWith('active_session:') && (
-              <div className="mt-4 flex items-center gap-3 rounded-xl border border-[#fbbf24]/30 bg-[#fbbf24]/10 px-4 py-3">
-                <p className="flex-1 text-sm text-[#fde68a]">{t('interviewPrep.mock.unfinished')}</p>
+              <div className="mt-4 flex flex-col gap-2 rounded-xl border border-[#fbbf24]/30 bg-[#fbbf24]/10 px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <p className="flex-1 text-sm text-[#fde68a]">{t('interviewPrep.mock.unfinished')}</p>
+                  <button
+                    onClick={() => navigate(`/prepare/interview-prep/mock/${mockError.split(':')[1]}`)}
+                    className="flex items-center gap-1 text-sm font-semibold text-[#fbbf24] hover:text-[#fde68a] transition-colors"
+                  >
+                    {t('interviewPrep.mock.continue')} <ArrowRight className="h-3.5 w-3.5" />
+                  </button>
+                </div>
                 <button
-                  onClick={() => navigate(`/prepare/interview-prep/mock/${mockError.split(':')[1]}`)}
-                  className="flex items-center gap-1 text-sm font-semibold text-[#fbbf24] hover:text-[#fde68a] transition-colors"
+                  onClick={handleAbortAndStartNew}
+                  disabled={mockAbortLoading}
+                  className="self-start text-xs text-white/40 hover:text-white/70 transition-colors disabled:opacity-50"
                 >
-                  {t('interviewPrep.mock.continue')} <ArrowRight className="h-3.5 w-3.5" />
+                  {mockAbortLoading ? '...' : t('interviewPrep.mock.abortAndStartNew')}
                 </button>
               </div>
             )}

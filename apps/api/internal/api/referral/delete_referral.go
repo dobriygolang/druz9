@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"api/internal/model"
+	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/referral/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -22,5 +23,5 @@ func (i *Implementation) DeleteReferral(ctx context.Context, req *v1.DeleteRefer
 	if err := i.service.DeleteReferral(ctx, referralID, user); err != nil {
 		return nil, err
 	}
-	return &v1.ReferralStatusResponse{Status: "ok"}, nil
+	return &v1.ReferralStatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }

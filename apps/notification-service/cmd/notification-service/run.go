@@ -4,6 +4,7 @@ import (
 	"context"
 	"os"
 
+	notificationapi "notification-service/internal/api/notification"
 	"notification-service/internal/bot"
 	"notification-service/internal/closer"
 	"notification-service/internal/config"
@@ -71,7 +72,7 @@ func newApp() (*kratos.App, *appLogger.Logger, error) {
 
 	// gRPC server with notification service registration.
 	grpcServer := server.NewGRPCServer(cfg.Server.GRPC.Addr, cfg.Server.GRPC.Timeout, kratosLogger)
-	notifServer := server.NewNotificationServer(svc)
+	notifServer := notificationapi.New(svc)
 	v1.RegisterNotificationServiceServer(grpcServer, notifServer)
 
 	// HTTP server (health checks, future use).

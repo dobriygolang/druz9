@@ -16,6 +16,7 @@ interface CodeEditorMessage {
     | 'language'
     | 'ping'
     | 'pong'
+    | 'duel_progress'
   clientId?: string
   awarenessId?: number
   userId?: string
@@ -23,6 +24,8 @@ interface CodeEditorMessage {
   plainText?: string
   data?: string
   language?: string
+  /** Used in duel_progress messages: character count of the sender's code */
+  codeLen?: number
   room?: unknown
   submission?: SubmissionResult
 }
@@ -39,6 +42,9 @@ export interface AwarenessState {
   tabHidden?: boolean
   pastedCode?: boolean
   codeLen?: number
+  relAnchor?: string
+  relHead?: string
+  selectionDirection?: number
 }
 
 export interface SubmissionResult {
@@ -62,8 +68,6 @@ interface UseCodeRoomWsOptions {
   onDocSync?: (data: string) => void
   onLeave?: (userId: string, displayName: string) => void
   onBehaviorEvent?: (userId: string, displayName: string, event: BehaviorEventType) => void
-  /** Fired synchronously on every cursor position change — use for direct widget updates without React cycle */
-  onCursorUpdate?: (userId: string, line: number, col: number, remoteCodeLen?: number) => void
 }
 
 export interface SelectionInfo {
@@ -82,6 +86,7 @@ interface UseCodeRoomWsReturn {
   awareness: Map<string, AwarenessState>
   lastSubmission: SubmissionResult | null
   lastRoomUpdate: unknown
+  opponentCodeLen: number
   sendUpdate: (code: string) => void
   sendDocSync: (data: string) => void
   persistCode: (code: string) => void
@@ -90,15 +95,13 @@ interface UseCodeRoomWsReturn {
 }
 
 export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
-  const { roomId, userId, displayName, guestName, mode, enabled = true, initialLanguage, onDocSync, onLeave, onBehaviorEvent, onCursorUpdate } = opts
+  const { roomId, userId, displayName, guestName, mode, enabled = true, initialLanguage, onDocSync, onLeave, onBehaviorEvent } = opts
   const onDocSyncRef = useRef(onDocSync)
   onDocSyncRef.current = onDocSync
   const onLeaveRef = useRef(onLeave)
   onLeaveRef.current = onLeave
   const onBehaviorRef = useRef(onBehaviorEvent)
   onBehaviorRef.current = onBehaviorEvent
-  const onCursorUpdateRef = useRef(onCursorUpdate)
-  onCursorUpdateRef.current = onCursorUpdate
 
   const socketRef = useRef<RealtimeSocket | null>(null)
   const clientId = useRef(`client-${Math.random().toString(36).slice(2, 10)}`)
@@ -113,6 +116,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   const [awareness, setAwareness] = useState<Map<string, AwarenessState>>(new Map())
   const [lastSubmission, setLastSubmission] = useState<SubmissionResult | null>(null)
   const [lastRoomUpdate, setLastRoomUpdate] = useState<unknown>(null)
+  const [opponentCodeLen, setOpponentCodeLen] = useState(0)
 
   const isRemoteUpdate = useRef(false)
   const languageRef = useRef(language)
@@ -185,6 +189,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     setAwareness(new Map())
     setLastSubmission(null)
     setLastRoomUpdate(null)
+    setOpponentCodeLen(0)
   }, [roomId, enabled, mode])
 
   useEffect(() => {
@@ -253,12 +258,6 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
 
           const cursorLine = cursorData.cursorLine as number | undefined
           const cursorColumn = cursorData.cursorColumn as number | undefined
-          const remoteCodeLen = cursorData.codeLen as number | undefined
-
-          // Fire synchronously — bypasses RAF/React for zero-lag widget repositioning
-          if (cursorLine) {
-            onCursorUpdateRef.current?.(msg.userId!, cursorLine, cursorColumn ?? 1, remoteCodeLen)
-          }
 
           displayNameIndex.current.set(msg.userId!, incomingDisplayName)
           pendingAwareness.current.set(msg.userId!, {
@@ -275,6 +274,9 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
               tabHidden: cursorData.tabHidden as boolean | undefined,
               pastedCode: cursorData.pastedCode as boolean | undefined,
               codeLen: cursorData.codeLen as number | undefined,
+              relAnchor: cursorData.relAnchor as string | undefined,
+              relHead: cursorData.relHead as string | undefined,
+              selectionDirection: cursorData.selectionDirection as number | undefined,
             },
           })
           scheduleAwarenessFlush()
@@ -300,6 +302,10 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       }
       case 'submission': {
         if (msg.submission) setLastSubmission(msg.submission)
+        break
+      }
+      case 'duel_progress': {
+        if (msg.codeLen !== undefined) setOpponentCodeLen(msg.codeLen)
         break
       }
     }
@@ -440,6 +446,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     awareness,
     lastSubmission,
     lastRoomUpdate,
+    opponentCodeLen,
     sendUpdate,
     sendDocSync,
     persistCode,

@@ -9,25 +9,13 @@ import (
 	"github.com/go-kratos/kratos/v2/errors"
 )
 
-var validGoalKinds = map[string]bool{
-	"general_growth": true,
-	"weakest_first":  true,
-	"company_prep":   true,
-}
-
 func (i *Implementation) SetUserGoal(ctx context.Context, req *v1.SetUserGoalRequest) (*v1.SetUserGoalResponse, error) {
 	userFromCtx, ok := model.UserFromContext(ctx)
 	if !ok {
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
 	}
 
-	kind := req.Kind
-	if kind == "" {
-		kind = "general_growth"
-	}
-	if !validGoalKinds[kind] {
-		return nil, errors.BadRequest("INVALID_GOAL_KIND", "goal kind must be one of: general_growth, weakest_first, company_prep")
-	}
+	kind := goalKindOrDefault(req.Kind)
 
 	goal := &model.UserGoal{
 		Kind:    kind,
@@ -40,7 +28,7 @@ func (i *Implementation) SetUserGoal(ctx context.Context, req *v1.SetUserGoalReq
 
 	return &v1.SetUserGoalResponse{
 		Goal: &v1.UserGoal{
-			Kind:    goal.Kind,
+			Kind:    mapUserGoalKind(goal.Kind),
 			Company: goal.Company,
 		},
 	}, nil

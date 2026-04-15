@@ -47,9 +47,15 @@ func (a *GRPCAdapter) Send(ctx context.Context, userID, kind, title, body string
 		return
 	}
 
+	pbKind, ok := protoNotificationKind(kind)
+	if !ok {
+		klog.Errorf("notification send (user=%s): unknown kind %q", userID, kind)
+		return
+	}
+
 	_, err = a.client.Send(ctx, &v1.SendRequest{
 		UserId:  userID,
-		Kind:    kind,
+		Kind:    pbKind,
 		Title:   title,
 		Body:    body,
 		Payload: pbPayload,
@@ -71,9 +77,15 @@ func (a *GRPCAdapter) SendBatch(ctx context.Context, userIDs []string, kind, tit
 		return
 	}
 
+	pbKind, ok := protoNotificationKind(kind)
+	if !ok {
+		klog.Errorf("notification send batch: unknown kind %q", kind)
+		return
+	}
+
 	_, err = a.client.SendBatch(ctx, &v1.SendBatchRequest{
 		UserIds: userIDs,
-		Kind:    kind,
+		Kind:    pbKind,
 		Title:   title,
 		Body:    body,
 		Payload: pbPayload,

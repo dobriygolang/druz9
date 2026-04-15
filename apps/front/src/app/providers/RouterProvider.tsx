@@ -17,7 +17,6 @@ const MapPage = lazy(() => import('@/pages/MapPage/ui/MapPage').then(m => ({ def
 const PracticeHubPage = lazy(() => import('@/pages/PracticeHubPage/ui/PracticeHubPage').then(m => ({ default: m.PracticeHubPage })))
 const CodeRoomsPage = lazy(() => import('@/pages/CodeRoomsPage/ui/CodeRoomsPage').then(m => ({ default: m.CodeRoomsPage })))
 const ArenaHubPage = lazy(() => import('@/pages/ArenaHubPage/ui/ArenaHubPage').then(m => ({ default: m.ArenaHubPage })))
-const PracticeSoloPage = lazy(() => import('@/pages/PracticeSoloPage/ui/PracticeSoloPage').then(m => ({ default: m.PracticeSoloPage })))
 const DailyChallengePage = lazy(() => import('@/pages/DailyChallengePage/ui/DailyChallengePage').then(m => ({ default: m.DailyChallengePage })))
 const GrowthHubPage = lazy(() => import('@/pages/GrowthHubPage/ui/GrowthHubPage').then(m => ({ default: m.GrowthHubPage })))
 const InterviewPrepPage = lazy(() => import('@/pages/InterviewPrepPage/ui/InterviewPrepPage').then(m => ({ default: m.InterviewPrepPage })))
@@ -111,7 +110,7 @@ export const RouterProvider: React.FC = () => {
               <Route index element={<Navigate to="code-rooms" replace />} />
               <Route path="code-rooms" element={<CodeRoomsPage />} />
               <Route path="arena" element={<ArenaHubPage />} />
-              <Route path="solo" element={<PracticeSoloPage />} />
+              <Route path="solo" element={<Navigate to="/prepare/interview-prep?category=algorithm" replace />} />
               <Route path="daily" element={gate ? <Navigate to="/login" replace /> : <DailyChallengePage />} />
             </Route>
 

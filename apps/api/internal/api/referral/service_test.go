@@ -7,6 +7,7 @@ import (
 
 	"api/internal/api/referral/mocks"
 	"api/internal/model"
+	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/referral/v1"
 
 	"github.com/google/uuid"
@@ -90,7 +91,7 @@ func TestDeleteReferral(t *testing.T) {
 		if resp == nil {
 			t.Fatal("expected response, got nil")
 		}
-		if resp.Status != "ok" {
+		if resp.Status != commonv1.OperationStatus_OPERATION_STATUS_OK {
 			t.Errorf("expected status 'ok', got %s", resp.Status)
 		}
 

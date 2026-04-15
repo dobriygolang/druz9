@@ -164,6 +164,14 @@ enum SelfAssessment {
   SELF_ASSESSMENT_SKIPPED     = 2;
 }
 
+enum CheckpointStatus {
+  CHECKPOINT_STATUS_UNSPECIFIED = 0;
+  CHECKPOINT_STATUS_ACTIVE      = 1;
+  CHECKPOINT_STATUS_PASSED      = 2;
+  CHECKPOINT_STATUS_FAILED      = 3;
+  CHECKPOINT_STATUS_EXPIRED     = 4;
+}
+
 // ── Request messages ───────────────────────────────────────────────────────
 
 message ListTasksRequest {}
@@ -244,7 +252,7 @@ message DeleteMockCompanyPresetRequest { string id = 1; }
 
 // ── Response messages ──────────────────────────────────────────────────────
 
-message StatusResponse { string status = 1; }
+message StatusResponse { common.v1.OperationStatus status = 1; }
 
 message SessionEnvelope         { InterviewPrepSession session = 1; }
 message MockSessionEnvelope      { MockSession session = 1; }
@@ -336,7 +344,7 @@ message MockQuestionPoolEnvelope      { MockQuestionPoolItem item = 1; }
 
 message MockCompanyPresetPayload {
   string  company_tag       = 1;
-  string  stage_kind        = 2;
+  MockStageKind  stage_kind = 2;
   int32   position          = 3;
   string  task_slug_pattern = 4;
   string  ai_model_override = 5;
@@ -528,7 +536,7 @@ message MockQuestionPoolItem {
 message MockCompanyPreset {
   string                    id                = 1;
   string                    company_tag       = 2;
-  string                    stage_kind        = 3;
+  MockStageKind             stage_kind        = 3;
   int32                     position          = 4;
   string                    task_slug_pattern = 5;
   string                    ai_model_override = 6;
@@ -553,7 +561,7 @@ message CheckpointProgress {
   string                    task_id          = 3;
   string                    session_id       = 4;
   string                    skill_key        = 5;
-  string                    status           = 6;
+  CheckpointStatus          status           = 6;
   int32                     duration_seconds = 7;
   int32                     attempts_used    = 8;
   int32                     max_attempts     = 9;

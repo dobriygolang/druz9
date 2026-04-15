@@ -57,6 +57,13 @@ enum SubmitFailureKind {
   SUBMIT_FAILURE_KIND_TIMEOUT        = 4;
 }
 
+enum OperationStatus {
+  OPERATION_STATUS_UNSPECIFIED = 0;
+  OPERATION_STATUS_OK          = 1;
+  OPERATION_STATUS_INVITED     = 2;
+  OPERATION_STATUS_ABORTED     = 3;
+}
+
 // ── Shared messages ───────────────────────────────────────────────────────
 
 message InterviewSolutionReview {

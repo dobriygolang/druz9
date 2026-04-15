@@ -75,8 +75,11 @@ export function useProfileData(targetUserId: string | undefined): ProfileData {
           description: a.description ?? a.Description ?? '',
           icon: a.icon ?? a.Icon ?? '',
           unlocked: a.unlocked ?? a.Unlocked ?? false,
-          category: a.category ?? a.Category ?? '',
-          tier: a.tier ?? a.Tier ?? 'bronze',
+          category: a.category === 'ACHIEVEMENT_CATEGORY_STREAK' ? 'streak' : (a.category ?? a.Category ?? 'practice'),
+          tier: a.tier === 'ACHIEVEMENT_TIER_SILVER' ? 'silver'
+            : a.tier === 'ACHIEVEMENT_TIER_GOLD' ? 'gold'
+            : a.tier === 'ACHIEVEMENT_TIER_DIAMOND' ? 'diamond'
+            : (a.tier ?? a.Tier ?? 'bronze'),
           progress: a.progress ?? a.Progress ?? 0,
           target: a.target ?? a.Target ?? 1,
         })))

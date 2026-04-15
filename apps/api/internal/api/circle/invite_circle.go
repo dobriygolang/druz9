@@ -6,6 +6,7 @@ import (
 
 	"api/internal/model"
 	v1 "api/pkg/api/circle/v1"
+	commonv1 "api/pkg/api/common/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -46,5 +47,5 @@ func (i *Implementation) InviteToCircle(ctx context.Context, req *v1.InviteToCir
 		}()
 	}
 
-	return &v1.InviteToCircleResponse{Status: "invited"}, nil
+	return &v1.InviteToCircleResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_INVITED}, nil
 }

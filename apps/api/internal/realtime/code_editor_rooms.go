@@ -203,7 +203,16 @@ func (h *CodeEditorHub) handleUpdate(client *codeEditorClient, msg schema.CodeEd
 		}
 		state.initialized = true
 		state.dirty = true
+		codeLen := len([]rune(msg.PlainText))
+		senderUserID := client.userID
 		h.mu.Unlock()
+
+		// Broadcast code-length progress to the opponent(s) without revealing the code.
+		h.broadcast(client.roomID, schema.CodeEditorMessage{
+			Type:    schema.CodeEditorTypeDuelProgress,
+			UserID:  senderUserID,
+			CodeLen: codeLen,
+		}, client)
 		return
 	}
 

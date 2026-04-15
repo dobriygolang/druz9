@@ -5,6 +5,7 @@ import (
 
 	"api/internal/model"
 	v1 "api/pkg/api/circle/v1"
+	commonv1 "api/pkg/api/common/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -24,5 +25,5 @@ func (i *Implementation) JoinCircle(ctx context.Context, req *v1.JoinCircleReque
 	if err := i.service.JoinCircle(ctx, circleID, user.ID); err != nil {
 		return nil, err
 	}
-	return &v1.JoinCircleResponse{Status: "ok"}, nil
+	return &v1.JoinCircleResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }

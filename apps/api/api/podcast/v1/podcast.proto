@@ -4,6 +4,7 @@ package podcast.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "common/v1/common.proto";
 
 option go_package = "api/pkg/api/podcast/v1;v1";
 
@@ -124,7 +125,7 @@ message PodcastResponse {
 }
 
 message PodcastStatusResponse {
-  string status = 1;
+  common.v1.OperationStatus status = 1;
 }
 
 message PreparePodcastUploadResponse {

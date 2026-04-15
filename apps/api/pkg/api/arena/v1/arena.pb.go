@@ -1616,7 +1616,7 @@ func (x *ArenaPlayerStatsBatchResponse) GetStats() map[string]*ArenaPlayerStats 
 
 type ArenaStatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status        v1.OperationStatus     `protobuf:"varint,1,opt,name=status,proto3,enum=common.v1.OperationStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -1651,11 +1651,11 @@ func (*ArenaStatusResponse) Descriptor() ([]byte, []int) {
 	return file_arena_v1_arena_proto_rawDescGZIP(), []int{23}
 }
 
-func (x *ArenaStatusResponse) GetStatus() string {
+func (x *ArenaStatusResponse) GetStatus() v1.OperationStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return v1.OperationStatus(0)
 }
 
 type ListOpenMatchesResponse struct {
@@ -2391,9 +2391,9 @@ const file_arena_v1_arena_proto_rawDesc = "" +
 	"\n" +
 	"StatsEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x120\n" +
-	"\x05value\x18\x02 \x01(\v2\x1a.arena.v1.ArenaPlayerStatsR\x05value:\x028\x01\"-\n" +
-	"\x13ArenaStatusResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"I\n" +
+	"\x05value\x18\x02 \x01(\v2\x1a.arena.v1.ArenaPlayerStatsR\x05value:\x028\x01\"I\n" +
+	"\x13ArenaStatusResponse\x122\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1a.common.v1.OperationStatusR\x06status\"I\n" +
 	"\x17ListOpenMatchesResponse\x12.\n" +
 	"\amatches\x18\x01 \x03(\v2\x14.arena.v1.ArenaMatchR\amatches\"\xb0\x06\n" +
 	"\n" +
@@ -2583,6 +2583,7 @@ var file_arena_v1_arena_proto_goTypes = []any{
 	(v1.Difficulty)(0),                    // 36: common.v1.Difficulty
 	(*timestamppb.Timestamp)(nil),         // 37: google.protobuf.Timestamp
 	(v1.SubmitFailureKind)(0),             // 38: common.v1.SubmitFailureKind
+	(v1.OperationStatus)(0),               // 39: common.v1.OperationStatus
 }
 var file_arena_v1_arena_proto_depIdxs = []int32{
 	36, // 0: arena.v1.CreateMatchRequest.difficulty:type_name -> common.v1.Difficulty
@@ -2603,54 +2604,55 @@ var file_arena_v1_arena_proto_depIdxs = []int32{
 	31, // 15: arena.v1.ArenaQueueStateResponse.match:type_name -> arena.v1.ArenaMatch
 	33, // 16: arena.v1.ArenaPlayerStatsResponse.stats:type_name -> arena.v1.ArenaPlayerStats
 	35, // 17: arena.v1.ArenaPlayerStatsBatchResponse.stats:type_name -> arena.v1.ArenaPlayerStatsBatchResponse.StatsEntry
-	31, // 18: arena.v1.ListOpenMatchesResponse.matches:type_name -> arena.v1.ArenaMatch
-	36, // 19: arena.v1.ArenaMatch.difficulty:type_name -> common.v1.Difficulty
-	0,  // 20: arena.v1.ArenaMatch.status:type_name -> arena.v1.ArenaMatchStatus
-	4,  // 21: arena.v1.ArenaMatch.winner_reason:type_name -> arena.v1.WinnerReason
-	37, // 22: arena.v1.ArenaMatch.started_at:type_name -> google.protobuf.Timestamp
-	37, // 23: arena.v1.ArenaMatch.finished_at:type_name -> google.protobuf.Timestamp
-	37, // 24: arena.v1.ArenaMatch.created_at:type_name -> google.protobuf.Timestamp
-	32, // 25: arena.v1.ArenaMatch.players:type_name -> arena.v1.ArenaPlayer
-	3,  // 26: arena.v1.ArenaPlayer.side:type_name -> arena.v1.ArenaPlayerSide
-	37, // 27: arena.v1.ArenaPlayer.freeze_until:type_name -> google.protobuf.Timestamp
-	37, // 28: arena.v1.ArenaPlayer.accepted_at:type_name -> google.protobuf.Timestamp
-	37, // 29: arena.v1.ArenaPlayer.joined_at:type_name -> google.protobuf.Timestamp
-	2,  // 30: arena.v1.ArenaPlayerStats.league:type_name -> arena.v1.ArenaLeague
-	2,  // 31: arena.v1.ArenaLeaderboardEntry.league:type_name -> arena.v1.ArenaLeague
-	33, // 32: arena.v1.ArenaPlayerStatsBatchResponse.StatsEntry.value:type_name -> arena.v1.ArenaPlayerStats
-	6,  // 33: arena.v1.ArenaService.CreateMatch:input_type -> arena.v1.CreateMatchRequest
-	7,  // 34: arena.v1.ArenaService.GetMatch:input_type -> arena.v1.GetMatchRequest
-	8,  // 35: arena.v1.ArenaService.JoinMatch:input_type -> arena.v1.JoinMatchRequest
-	10, // 36: arena.v1.ArenaService.SubmitCode:input_type -> arena.v1.SubmitCodeRequest
-	11, // 37: arena.v1.ArenaService.GetLeaderboard:input_type -> arena.v1.GetLeaderboardRequest
-	9,  // 38: arena.v1.ArenaService.LeaveMatch:input_type -> arena.v1.LeaveMatchRequest
-	12, // 39: arena.v1.ArenaService.JoinQueue:input_type -> arena.v1.JoinQueueRequest
-	13, // 40: arena.v1.ArenaService.LeaveQueue:input_type -> arena.v1.LeaveQueueRequest
-	14, // 41: arena.v1.ArenaService.GetQueueStatus:input_type -> arena.v1.GetQueueStatusRequest
-	15, // 42: arena.v1.ArenaService.GetPlayerStats:input_type -> arena.v1.GetPlayerStatsRequest
-	16, // 43: arena.v1.ArenaService.GetPlayerStatsBatch:input_type -> arena.v1.GetPlayerStatsBatchRequest
-	17, // 44: arena.v1.ArenaService.ReportAntiCheatEvent:input_type -> arena.v1.ReportAntiCheatEventRequest
-	18, // 45: arena.v1.ArenaService.ListOpenMatches:input_type -> arena.v1.ListOpenMatchesRequest
-	19, // 46: arena.v1.ArenaService.GetSeasonHistory:input_type -> arena.v1.GetSeasonHistoryRequest
-	22, // 47: arena.v1.ArenaService.CreateMatch:output_type -> arena.v1.ArenaMatchResponse
-	22, // 48: arena.v1.ArenaService.GetMatch:output_type -> arena.v1.ArenaMatchResponse
-	22, // 49: arena.v1.ArenaService.JoinMatch:output_type -> arena.v1.ArenaMatchResponse
-	23, // 50: arena.v1.ArenaService.SubmitCode:output_type -> arena.v1.SubmitCodeResponse
-	24, // 51: arena.v1.ArenaService.GetLeaderboard:output_type -> arena.v1.GetLeaderboardResponse
-	22, // 52: arena.v1.ArenaService.LeaveMatch:output_type -> arena.v1.ArenaMatchResponse
-	26, // 53: arena.v1.ArenaService.JoinQueue:output_type -> arena.v1.ArenaQueueStateResponse
-	26, // 54: arena.v1.ArenaService.LeaveQueue:output_type -> arena.v1.ArenaQueueStateResponse
-	26, // 55: arena.v1.ArenaService.GetQueueStatus:output_type -> arena.v1.ArenaQueueStateResponse
-	27, // 56: arena.v1.ArenaService.GetPlayerStats:output_type -> arena.v1.ArenaPlayerStatsResponse
-	28, // 57: arena.v1.ArenaService.GetPlayerStatsBatch:output_type -> arena.v1.ArenaPlayerStatsBatchResponse
-	29, // 58: arena.v1.ArenaService.ReportAntiCheatEvent:output_type -> arena.v1.ArenaStatusResponse
-	30, // 59: arena.v1.ArenaService.ListOpenMatches:output_type -> arena.v1.ListOpenMatchesResponse
-	21, // 60: arena.v1.ArenaService.GetSeasonHistory:output_type -> arena.v1.GetSeasonHistoryResponse
-	47, // [47:61] is the sub-list for method output_type
-	33, // [33:47] is the sub-list for method input_type
-	33, // [33:33] is the sub-list for extension type_name
-	33, // [33:33] is the sub-list for extension extendee
-	0,  // [0:33] is the sub-list for field type_name
+	39, // 18: arena.v1.ArenaStatusResponse.status:type_name -> common.v1.OperationStatus
+	31, // 19: arena.v1.ListOpenMatchesResponse.matches:type_name -> arena.v1.ArenaMatch
+	36, // 20: arena.v1.ArenaMatch.difficulty:type_name -> common.v1.Difficulty
+	0,  // 21: arena.v1.ArenaMatch.status:type_name -> arena.v1.ArenaMatchStatus
+	4,  // 22: arena.v1.ArenaMatch.winner_reason:type_name -> arena.v1.WinnerReason
+	37, // 23: arena.v1.ArenaMatch.started_at:type_name -> google.protobuf.Timestamp
+	37, // 24: arena.v1.ArenaMatch.finished_at:type_name -> google.protobuf.Timestamp
+	37, // 25: arena.v1.ArenaMatch.created_at:type_name -> google.protobuf.Timestamp
+	32, // 26: arena.v1.ArenaMatch.players:type_name -> arena.v1.ArenaPlayer
+	3,  // 27: arena.v1.ArenaPlayer.side:type_name -> arena.v1.ArenaPlayerSide
+	37, // 28: arena.v1.ArenaPlayer.freeze_until:type_name -> google.protobuf.Timestamp
+	37, // 29: arena.v1.ArenaPlayer.accepted_at:type_name -> google.protobuf.Timestamp
+	37, // 30: arena.v1.ArenaPlayer.joined_at:type_name -> google.protobuf.Timestamp
+	2,  // 31: arena.v1.ArenaPlayerStats.league:type_name -> arena.v1.ArenaLeague
+	2,  // 32: arena.v1.ArenaLeaderboardEntry.league:type_name -> arena.v1.ArenaLeague
+	33, // 33: arena.v1.ArenaPlayerStatsBatchResponse.StatsEntry.value:type_name -> arena.v1.ArenaPlayerStats
+	6,  // 34: arena.v1.ArenaService.CreateMatch:input_type -> arena.v1.CreateMatchRequest
+	7,  // 35: arena.v1.ArenaService.GetMatch:input_type -> arena.v1.GetMatchRequest
+	8,  // 36: arena.v1.ArenaService.JoinMatch:input_type -> arena.v1.JoinMatchRequest
+	10, // 37: arena.v1.ArenaService.SubmitCode:input_type -> arena.v1.SubmitCodeRequest
+	11, // 38: arena.v1.ArenaService.GetLeaderboard:input_type -> arena.v1.GetLeaderboardRequest
+	9,  // 39: arena.v1.ArenaService.LeaveMatch:input_type -> arena.v1.LeaveMatchRequest
+	12, // 40: arena.v1.ArenaService.JoinQueue:input_type -> arena.v1.JoinQueueRequest
+	13, // 41: arena.v1.ArenaService.LeaveQueue:input_type -> arena.v1.LeaveQueueRequest
+	14, // 42: arena.v1.ArenaService.GetQueueStatus:input_type -> arena.v1.GetQueueStatusRequest
+	15, // 43: arena.v1.ArenaService.GetPlayerStats:input_type -> arena.v1.GetPlayerStatsRequest
+	16, // 44: arena.v1.ArenaService.GetPlayerStatsBatch:input_type -> arena.v1.GetPlayerStatsBatchRequest
+	17, // 45: arena.v1.ArenaService.ReportAntiCheatEvent:input_type -> arena.v1.ReportAntiCheatEventRequest
+	18, // 46: arena.v1.ArenaService.ListOpenMatches:input_type -> arena.v1.ListOpenMatchesRequest
+	19, // 47: arena.v1.ArenaService.GetSeasonHistory:input_type -> arena.v1.GetSeasonHistoryRequest
+	22, // 48: arena.v1.ArenaService.CreateMatch:output_type -> arena.v1.ArenaMatchResponse
+	22, // 49: arena.v1.ArenaService.GetMatch:output_type -> arena.v1.ArenaMatchResponse
+	22, // 50: arena.v1.ArenaService.JoinMatch:output_type -> arena.v1.ArenaMatchResponse
+	23, // 51: arena.v1.ArenaService.SubmitCode:output_type -> arena.v1.SubmitCodeResponse
+	24, // 52: arena.v1.ArenaService.GetLeaderboard:output_type -> arena.v1.GetLeaderboardResponse
+	22, // 53: arena.v1.ArenaService.LeaveMatch:output_type -> arena.v1.ArenaMatchResponse
+	26, // 54: arena.v1.ArenaService.JoinQueue:output_type -> arena.v1.ArenaQueueStateResponse
+	26, // 55: arena.v1.ArenaService.LeaveQueue:output_type -> arena.v1.ArenaQueueStateResponse
+	26, // 56: arena.v1.ArenaService.GetQueueStatus:output_type -> arena.v1.ArenaQueueStateResponse
+	27, // 57: arena.v1.ArenaService.GetPlayerStats:output_type -> arena.v1.ArenaPlayerStatsResponse
+	28, // 58: arena.v1.ArenaService.GetPlayerStatsBatch:output_type -> arena.v1.ArenaPlayerStatsBatchResponse
+	29, // 59: arena.v1.ArenaService.ReportAntiCheatEvent:output_type -> arena.v1.ArenaStatusResponse
+	30, // 60: arena.v1.ArenaService.ListOpenMatches:output_type -> arena.v1.ListOpenMatchesResponse
+	21, // 61: arena.v1.ArenaService.GetSeasonHistory:output_type -> arena.v1.GetSeasonHistoryResponse
+	48, // [48:62] is the sub-list for method output_type
+	34, // [34:48] is the sub-list for method input_type
+	34, // [34:34] is the sub-list for extension type_name
+	34, // [34:34] is the sub-list for extension extendee
+	0,  // [0:34] is the sub-list for field type_name
 }
 
 func init() { file_arena_v1_arena_proto_init() }

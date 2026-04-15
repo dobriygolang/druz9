@@ -281,7 +281,7 @@ message ArenaPlayerStatsBatchResponse {
 }
 
 message ArenaStatusResponse {
-  string status = 1;
+  common.v1.OperationStatus status = 1;
 }
 
 message ListOpenMatchesResponse {

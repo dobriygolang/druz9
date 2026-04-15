@@ -265,7 +265,7 @@ export function JourneyPage() {
                 { href: '/daily-challenge', icon: <Flame className="h-4 w-4 text-orange-500" />, label: t('journey.quick.daily', 'Daily Challenge') },
                 { href: '/practice/arena', icon: <Swords className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.arena', 'Duel') },
                 { href: '/prepare/interview-prep', icon: <BookOpen className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.mock', 'Mock Interview') },
-                { href: '/practice/solo', icon: <Code2 className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.practice', 'Practice') },
+                { href: '/prepare/interview-prep?category=algorithm', icon: <Code2 className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.practice', 'Practice') },
               ].map((item) => (
                 <Link
                   key={item.href}

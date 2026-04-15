@@ -24,36 +24,12 @@ func mapProfileProgress(p *model.ProfileProgress) *v1.ProfileProgress {
 		CurrentStreakDays:      ov.CurrentStreakDays,
 		Level:                  ov.Level,
 		LevelProgress:          ov.LevelProgress,
-		TotalXp:               ov.TotalXP,
+		TotalXp:                ov.TotalXP,
 		LongestStreakDays:      ov.LongestStreakDays,
 		ActivityPercentile:     ov.ActivityPercentile,
 	}
 	if ov.LastActivityAt != nil {
 		overview.LastActivityAt = timestamppb.New(*ov.LastActivityAt)
-	}
-
-	mapCompetency := func(c *model.ProfileCompetency) *v1.ProfileCompetency {
-		if c == nil {
-			return nil
-		}
-		return &v1.ProfileCompetency{
-			Key:                    c.Key,
-			Label:                  c.Label,
-			Score:                  c.Score,
-			PracticeScore:          c.PracticeScore,
-			VerifiedScore:          c.VerifiedScore,
-			StageCount:             c.StageCount,
-			QuestionCount:          c.QuestionCount,
-			PracticeSessions:       c.PracticeSessions,
-			PracticePassedSessions: c.PracticePassedSessions,
-			PracticeDays:           c.PracticeDays,
-			Confidence:             c.Confidence,
-			AverageScore:           c.AverageScore,
-			Level:                  c.Level,
-			LevelProgress:          c.LevelProgress,
-			NextMilestone:          c.NextMilestone,
-			ScoreDelta_30D:         c.ScoreDelta30d,
-		}
 	}
 
 	competencies := make([]*v1.ProfileCompetency, 0, len(p.Competencies))
@@ -109,7 +85,7 @@ func mapProfileProgress(p *model.ProfileProgress) *v1.ProfileProgress {
 		nextActions = append(nextActions, &v1.NextAction{
 			Title:       na.Title,
 			Description: na.Description,
-			ActionType:  na.ActionType,
+			ActionType:  mapProfileActionType(na.ActionType),
 			ActionUrl:   na.ActionURL,
 			Priority:    na.Priority,
 			SkillKey:    na.SkillKey,
@@ -119,7 +95,7 @@ func mapProfileProgress(p *model.ProfileProgress) *v1.ProfileProgress {
 	var goal *v1.UserGoal
 	if p.Goal != nil {
 		goal = &v1.UserGoal{
-			Kind:    p.Goal.Kind,
+			Kind:    mapUserGoalKind(p.Goal.Kind),
 			Company: p.Goal.Company,
 		}
 	}

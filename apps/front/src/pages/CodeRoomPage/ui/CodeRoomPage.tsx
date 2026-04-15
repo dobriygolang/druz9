@@ -76,22 +76,6 @@ function injectCursorCSS(safeId: string, hex: string) {
   document.head.appendChild(style)
 }
 
-/** OT-style cursor offset transform: shifts cursor when text changes before it */
-function transformCursorOffset(offset: number, oldCode: string, newCode: string): number {
-  if (oldCode === newCode) return offset
-  let start = 0
-  const minLen = Math.min(oldCode.length, newCode.length)
-  while (start < minLen && oldCode[start] === newCode[start]) start++
-  if (offset < start) return offset
-  let oldTail = oldCode.length
-  let newTail = newCode.length
-  while (oldTail > start && newTail > start && oldCode[oldTail - 1] === newCode[newTail - 1]) { oldTail--; newTail-- }
-  const deleted = oldTail - start
-  const inserted = newTail - start
-  if (offset < start + deleted) return start + inserted
-  return offset - deleted + inserted
-}
-
 function encodeBinaryToBase64(bytes: Uint8Array): string {
   let binary = ''
   const chunkSize = 0x8000
@@ -109,6 +93,18 @@ function decodeBase64ToBinary(payload: string): Uint8Array {
     bytes[i] = binary.charCodeAt(i)
   }
   return bytes
+}
+
+function encodeRelativePositionToBase64(position: Y.RelativePosition): string {
+  return encodeBinaryToBase64(Y.encodeRelativePosition(position))
+}
+
+function decodeRelativePositionFromBase64(payload: string): Y.RelativePosition | null {
+  try {
+    return Y.decodeRelativePosition(decodeBase64ToBinary(payload))
+  } catch {
+    return null
+  }
 }
 
 /** posRef is mutable — update it and call layoutContentWidget instead of re-adding */
@@ -198,6 +194,9 @@ export function CodeRoomPage() {
   const [room, setRoom] = useState<Room | null>(null)
   const [running, setRunning] = useState(false)
   const [submitResult, setSubmitResult] = useState<{ isCorrect: boolean; output: string; error: string; submissionId?: string } | null>(null)
+  // Duel-mode: timestamp until which the editor is locked (wrong-answer penalty)
+  const [editorLockedUntil, setEditorLockedUntil] = useState(0)
+  const [lockCountdown, setLockCountdown] = useState(0)
   const { review: solveReview, loading: solveReviewLoading } = useSolutionReview({ submissionId: submitResult?.submissionId })
   const [activeTab, setActiveTab] = useState<'problem' | 'tests'>('problem')
   const [aiTab, setAiTab] = useState<'hints' | 'result' | 'review'>('hints')
@@ -224,7 +223,9 @@ export function CodeRoomPage() {
   const monacoRef = useRef<typeof Monaco | null>(null)
   const bindingRef = useRef<MonacoBinding | null>(null)
   const yDocRef = useRef<Y.Doc | null>(null)
+  const yTextRef = useRef<Y.Text | null>(null)
   const decorationsRef = useRef<Monaco.editor.IEditorDecorationsCollection | null>(null)
+  const selectionDecorationsSignatureRef = useRef('')
   const widgetsRef = useRef<Map<string, Monaco.editor.IContentWidget>>(new Map())
   const prevParticipantIdsRef = useRef<Set<string>>(new Set())
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
@@ -244,8 +245,9 @@ export function CodeRoomPage() {
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Mutable cursor positions for remote users — updated in-place, no widget re-add needed
   const cursorPositionsRef = useRef<Map<string, { line: number; col: number }>>(new Map())
-  const awarenessCodeLenRef = useRef<Map<string, number | undefined>>(new Map())
-  const pendingCursorUpdatesRef = useRef<Map<string, { line: number; col: number; codeLen?: number }>>(new Map())
+  const pendingWidgetLayoutsRef = useRef<Set<string>>(new Set())
+  const widgetLayoutRafRef = useRef<number | null>(null)
+  const awarenessRef = useRef<Map<string, import('@/features/CodeRoom/hooks/useCodeRoomWs').AwarenessState>>(new Map())
 
   // Left panel resize
   useEffect(() => {
@@ -359,23 +361,65 @@ export function CodeRoomPage() {
     pending.forEach(handleIncomingDocSync)
   }, [handleIncomingDocSync])
 
-  const flushPendingCursorUpdates = useCallback(() => {
+  const flushWidgetLayouts = useCallback(() => {
+    widgetLayoutRafRef.current = null
     const editor = editorRef.current
-    const model = editor?.getModel()
-    if (!editor || !model || pendingCursorUpdatesRef.current.size === 0) return
+    if (!editor || pendingWidgetLayoutsRef.current.size === 0) return
 
-    const localLen = model.getValueLength()
-    pendingCursorUpdatesRef.current.forEach((update, userId) => {
-      if (update.codeLen !== undefined && update.codeLen !== localLen) return
-      const posRef = cursorPositionsRef.current.get(userId)
+    const userIds = Array.from(pendingWidgetLayoutsRef.current)
+    pendingWidgetLayoutsRef.current.clear()
+    userIds.forEach(userId => {
       const widget = widgetsRef.current.get(userId)
-      if (!posRef || !widget) return
-      posRef.line = update.line
-      posRef.col = update.col
-      editor.layoutContentWidget(widget)
-      pendingCursorUpdatesRef.current.delete(userId)
+      if (widget) {
+        editor.layoutContentWidget(widget)
+      }
     })
   }, [])
+
+  const scheduleWidgetLayout = useCallback((userId: string) => {
+    pendingWidgetLayoutsRef.current.add(userId)
+    if (widgetLayoutRafRef.current !== null) return
+    widgetLayoutRafRef.current = requestAnimationFrame(flushWidgetLayouts)
+  }, [flushWidgetLayouts])
+
+  const resolveRemoteCursorPosition = useCallback((
+    state: import('@/features/CodeRoom/hooks/useCodeRoomWs').AwarenessState,
+  ): { line: number; col: number } | null => {
+    const doc = yDocRef.current
+    const yText = yTextRef.current
+    const model = editorRef.current?.getModel()
+    if (doc && yText && model && state.relHead) {
+      const relHead = decodeRelativePositionFromBase64(state.relHead)
+      if (relHead) {
+        const absolute = Y.createAbsolutePositionFromRelativePosition(relHead, doc)
+        if (absolute && absolute.type === yText) {
+          const position = model.getPositionAt(absolute.index)
+          return { line: position.lineNumber, col: position.column }
+        }
+      }
+    }
+    return null
+  }, [])
+
+  const refreshRemoteCursorPositions = useCallback(() => {
+    awarenessRef.current.forEach((state, userId) => {
+      const posRef = cursorPositionsRef.current.get(userId)
+      const resolved = resolveRemoteCursorPosition(state)
+      if (!resolved) {
+        if (widgetsRef.current.has(userId)) {
+          pendingWidgetLayoutsRef.current.delete(userId)
+        }
+        return
+      }
+
+      if (!posRef || !widgetsRef.current.has(userId)) return
+      if (posRef.line !== resolved.line || posRef.col !== resolved.col) {
+        posRef.line = resolved.line
+        posRef.col = resolved.col
+        scheduleWidgetLayout(userId)
+      }
+    })
+  }, [resolveRemoteCursorPosition, scheduleWidgetLayout])
 
   // WebSocket realtime
   const isDuelRoom = room?.mode === 'ROOM_MODE_DUEL'
@@ -397,23 +441,59 @@ export function CodeRoomPage() {
       else if (event === 'tab_visible') addNotification(t('codeRoom.notifications.returned', { name: displayName }))
       else if (event === 'pasted') addNotification(t('codeRoom.notifications.pasted', { name: displayName }))
     }, [addNotification, t]),
-    onCursorUpdate: useCallback((userId: string, line: number, col: number, remoteCodeLen?: number) => {
-      const localCodeLen = editorRef.current?.getModel()?.getValueLength()
-      if (remoteCodeLen !== undefined && localCodeLen !== undefined && remoteCodeLen !== localCodeLen) {
-        pendingCursorUpdatesRef.current.set(userId, { line, col, codeLen: remoteCodeLen })
-        return
-      }
-
-      pendingCursorUpdatesRef.current.delete(userId)
-      const posRef = cursorPositionsRef.current.get(userId)
-      if (posRef && widgetsRef.current.has(userId)) {
-        posRef.line = line
-        posRef.col = col
-        editorRef.current?.layoutContentWidget(widgetsRef.current.get(userId)!)
-      }
-    }, []),
   })
   sendDocSyncRef.current = ws.sendDocSync
+  awarenessRef.current = ws.awareness
+
+  const sendCurrentAwareness = useCallback((meta?: Record<string, unknown>) => {
+    if (isDuelRoom) return
+    const editor = editorRef.current
+    const model = editor?.getModel()
+    const selection = editor?.getSelection()
+    if (!editor || !model || !selection) return
+
+    lastCursorRef.current = { line: selection.positionLineNumber, col: selection.positionColumn }
+    const yText = yTextRef.current
+    const startOffset = model.getOffsetAt({ lineNumber: selection.startLineNumber, column: selection.startColumn })
+    const endOffset = model.getOffsetAt({ lineNumber: selection.endLineNumber, column: selection.endColumn })
+    const relAnchor = yText
+      ? encodeRelativePositionToBase64(Y.createRelativePositionFromTypeIndex(yText, startOffset))
+      : undefined
+    const relHead = yText
+      ? encodeRelativePositionToBase64(Y.createRelativePositionFromTypeIndex(yText, endOffset))
+      : undefined
+    const hasSelection = !(
+      selection.startLineNumber === selection.endLineNumber &&
+      selection.startColumn === selection.endColumn
+    )
+
+    ws.sendAwareness(
+      selection.positionLineNumber,
+      selection.positionColumn,
+      hasSelection ? {
+        startLine: selection.startLineNumber,
+        startCol: selection.startColumn,
+        endLine: selection.endLineNumber,
+        endCol: selection.endColumn,
+      } : undefined,
+      {
+        codeLen: model.getValueLength(),
+        relAnchor,
+        relHead,
+        selectionDirection: selection.getDirection(),
+        ...meta,
+      },
+    )
+  }, [isDuelRoom, ws.sendAwareness])
+
+  useEffect(() => {
+    refreshRemoteCursorPositions()
+  }, [ws.awareness, refreshRemoteCursorPositions])
+
+  useEffect(() => {
+    if (!ws.connected || !ws.gotSnapshot || isDuelRoom) return
+    refreshRemoteCursorPositions()
+  }, [ws.connected, ws.gotSnapshot, isDuelRoom, refreshRemoteCursorPositions])
 
   const schedulePersist = useCallback((code: string) => {
     currentCodeRef.current = code
@@ -506,6 +586,7 @@ export function CodeRoomPage() {
 
     const doc = new Y.Doc()
     const yText = doc.getText('code')
+    yTextRef.current = yText
     if (shouldBootstrapFromSnapshot && seedCode) {
       yText.insert(0, seedCode)
     }
@@ -515,7 +596,10 @@ export function CodeRoomPage() {
       if (binding) return
       binding = new MonacoBinding(monaco, yText, model, new Set([editor]), {
         onRemoteChangeStart: () => { isApplyingRemoteDocRef.current = true },
-        onRemoteChangeEnd: () => { isApplyingRemoteDocRef.current = false },
+        onRemoteChangeEnd: () => {
+          isApplyingRemoteDocRef.current = false
+          refreshRemoteCursorPositions()
+        },
       })
       bindingRef.current = binding
       currentCodeRef.current = model.getValue()
@@ -536,6 +620,7 @@ export function CodeRoomPage() {
       if (!shouldBootstrapFromSnapshot) {
         attachBinding()
       }
+      refreshRemoteCursorPositions()
     }
 
     if (shouldBootstrapFromSnapshot) {
@@ -544,6 +629,7 @@ export function CodeRoomPage() {
         ws.persistCode(seedCode)
       }
     }
+    refreshRemoteCursorPositions()
 
     const syncEncoder = encoding.createEncoder()
     syncProtocol.writeSyncStep1(syncEncoder, doc)
@@ -557,18 +643,14 @@ export function CodeRoomPage() {
       doc.destroy()
       bindingRef.current = null
       yDocRef.current = null
+      yTextRef.current = null
       isApplyingRemoteDocRef.current = false
     }
-  }, [roomId, ws.connected, ws.gotSnapshot, ws.code, ws.snapshotActiveClientCount, ws.sendDocSync, ws.persistCode, flushQueuedDocMessages, isDuelRoom])
+  }, [roomId, ws.connected, ws.gotSnapshot, ws.code, ws.snapshotActiveClientCount, ws.sendDocSync, ws.persistCode, flushQueuedDocMessages, isDuelRoom, refreshRemoteCursorPositions])
 
   useEffect(() => {
-    const next = new Map<string, number | undefined>()
-    ws.awareness.forEach((state, userId) => {
-      next.set(userId, state.codeLen)
-    })
-    awarenessCodeLenRef.current = next
-    flushPendingCursorUpdates()
-  }, [ws.awareness, flushPendingCursorUpdates])
+    refreshRemoteCursorPositions()
+  }, [ws.awareness, refreshRemoteCursorPositions])
 
   // Update room from room_update WS message (fired on join/leave/status change)
   useEffect(() => {
@@ -619,28 +701,24 @@ export function CodeRoomPage() {
   useEffect(() => { isCreatorRef.current = isCreator }, [isCreator])
 
   // Auto-start room: creator's connection triggers waiting→active transition
+  // Duel rooms auto-start when the second player joins (backend handles it) — skip here.
   const startedRoomRef = useRef(false)
   useEffect(() => {
-    if (!ws.connected || !isCreator || startedRoomRef.current) return
+    if (!ws.connected || !isCreator || startedRoomRef.current || isDuelRoom) return
     if (room?.status === 'ROOM_STATUS_ACTIVE' || room?.status === 'ROOM_STATUS_FINISHED') return
     startedRoomRef.current = true
     codeRoomApi.startRoom(roomId!).catch((err) => { startedRoomRef.current = false; console.error('Failed to start room:', err) })
-  }, [ws.connected, isCreator, room?.status, roomId])
+  }, [ws.connected, isCreator, room?.status, roomId, isDuelRoom])
 
   // Tab visibility anti-cheat tracking
   useEffect(() => {
     if (!ws.connected || isDuelRoom) return
     const handler = () => {
-      ws.sendAwareness(
-        lastCursorRef.current.line,
-        lastCursorRef.current.col,
-        undefined,
-        { tabHidden: document.hidden },
-      )
+      sendCurrentAwareness({ tabHidden: document.hidden })
     }
     document.addEventListener('visibilitychange', handler)
     return () => document.removeEventListener('visibilitychange', handler)
-  }, [isDuelRoom, ws.connected, ws.sendAwareness])
+  }, [isDuelRoom, ws.connected, sendCurrentAwareness])
 
   // Remote cursor widgets — update mutable posRef in-place (no remove/re-add = no flicker)
   useEffect(() => {
@@ -650,6 +728,11 @@ export function CodeRoomPage() {
       widgetsRef.current.clear()
       cursorPositionsRef.current.clear()
       decorationsRef.current?.clear()
+      pendingWidgetLayoutsRef.current.clear()
+      if (widgetLayoutRafRef.current !== null) {
+        cancelAnimationFrame(widgetLayoutRafRef.current)
+        widgetLayoutRafRef.current = null
+      }
       return
     }
     const editor = editorRef.current
@@ -663,49 +746,76 @@ export function CodeRoomPage() {
         editor.removeContentWidget(widget)
         widgetsRef.current.delete(userId)
         cursorPositionsRef.current.delete(userId)
+        pendingWidgetLayoutsRef.current.delete(userId)
       }
     })
 
     const newDecorations: Monaco.editor.IModelDeltaDecoration[] = []
+    const selectionSignatureParts: string[] = []
 
     ws.awareness.forEach((state) => {
-      if (!state.cursorLine) return
       const color = getCursorColor(state.userId)
       const safeId = state.userId.replace(/[^a-z0-9]/gi, '_')
       injectCursorCSS(safeId, color)
-      const col = state.cursorColumn ?? 1
+      const cursorPosition = resolveRemoteCursorPosition(state)
+      if (!cursorPosition) return
 
       if (!widgetsRef.current.has(state.userId)) {
-        // New user — create widget at awareness position.
-        // Position updates for existing widgets are handled exclusively by onCursorUpdate
-        // (which filters stale awareness via codeLen). This avoids RAF-batched stale
-        // awareness overwriting the OT-predicted position during rapid typing.
-        const posRef = { line: state.cursorLine, col }
+        const posRef = { line: cursorPosition.line, col: cursorPosition.col }
         cursorPositionsRef.current.set(state.userId, posRef)
         const widget = buildCursorWidget(state.userId, state.displayName, color, posRef, monaco)
         editor.addContentWidget(widget)
         widgetsRef.current.set(state.userId, widget)
+      } else {
+        const posRef = cursorPositionsRef.current.get(state.userId)
+        if (posRef && (posRef.line !== cursorPosition.line || posRef.col !== cursorPosition.col)) {
+          posRef.line = cursorPosition.line
+          posRef.col = cursorPosition.col
+          scheduleWidgetLayout(state.userId)
+        }
       }
 
-      newDecorations.push({
-        range: new monaco.Range(state.cursorLine, col, state.cursorLine, col),
-        options: { overviewRuler: { color, position: monaco.editor.OverviewRulerLane.Right } },
-      })
-      if (
-        state.selStartLine && state.selEndLine &&
-        !(state.selStartLine === state.selEndLine && (state.selStartCol ?? 1) === (state.selEndCol ?? 1))
-      ) {
+      let selectionRange: Monaco.IRange | null = null
+      const doc = yDocRef.current
+      const yText = yTextRef.current
+      const model = editor.getModel()
+      if (doc && yText && model && state.relAnchor && state.relHead) {
+        const relAnchor = decodeRelativePositionFromBase64(state.relAnchor)
+        const relHead = decodeRelativePositionFromBase64(state.relHead)
+        if (relAnchor && relHead) {
+          const anchor = Y.createAbsolutePositionFromRelativePosition(relAnchor, doc)
+          const head = Y.createAbsolutePositionFromRelativePosition(relHead, doc)
+          if (anchor && head && anchor.type === yText && head.type === yText && anchor.index !== head.index) {
+            const start = model.getPositionAt(Math.min(anchor.index, head.index))
+            const end = model.getPositionAt(Math.max(anchor.index, head.index))
+            selectionRange = new monaco.Range(start.lineNumber, start.column, end.lineNumber, end.column)
+          }
+        }
+      }
+
+      if (selectionRange) {
+        selectionSignatureParts.push([
+          state.userId,
+          selectionRange.startLineNumber,
+          selectionRange.startColumn,
+          selectionRange.endLineNumber,
+          selectionRange.endColumn,
+        ].join(':'))
         newDecorations.push({
-          range: new monaco.Range(state.selStartLine, state.selStartCol ?? 1, state.selEndLine, state.selEndCol ?? 1),
+          range: selectionRange,
           options: { className: `remote-sel-${safeId}`, isWholeLine: false },
         })
       }
     })
 
-    if (decorationsRef.current) {
-      decorationsRef.current.set(newDecorations)
-    } else {
-      decorationsRef.current = editor.createDecorationsCollection(newDecorations)
+    const nextSelectionSignature = selectionSignatureParts.sort().join('|')
+    if (selectionDecorationsSignatureRef.current !== nextSelectionSignature) {
+      if (decorationsRef.current) {
+        decorationsRef.current.set(newDecorations)
+      } else {
+        decorationsRef.current = editor.createDecorationsCollection(newDecorations)
+      }
+      selectionDecorationsSignatureRef.current = nextSelectionSignature
     }
     // No cleanup on re-run — managed by cursorPositionsRef; only unmount cleans up
   }, [isDuelRoom, ws.awareness])
@@ -716,6 +826,13 @@ export function CodeRoomPage() {
     widgetsRef.current.forEach(w => editor?.removeContentWidget(w))
     widgetsRef.current.clear()
     cursorPositionsRef.current.clear()
+    decorationsRef.current?.clear()
+    selectionDecorationsSignatureRef.current = ''
+    pendingWidgetLayoutsRef.current.clear()
+    if (widgetLayoutRafRef.current !== null) {
+      cancelAnimationFrame(widgetLayoutRafRef.current)
+      widgetLayoutRafRef.current = null
+    }
   }, [])
 
   useEffect(() => () => {
@@ -736,12 +853,26 @@ export function CodeRoomPage() {
     }
   }, [isMobile, ws.lastSubmission])
 
+  // Duel-mode: countdown timer for editor lockout after wrong answer
+  useEffect(() => {
+    if (!editorLockedUntil) return
+    const tick = () => {
+      const remaining = Math.max(0, Math.ceil((editorLockedUntil - Date.now()) / 1000))
+      setLockCountdown(remaining)
+      if (remaining === 0) setEditorLockedUntil(0)
+    }
+    tick()
+    const id = setInterval(tick, 500)
+    return () => clearInterval(id)
+  }, [editorLockedUntil])
+
   const getCurrentCode = useCallback(() => {
     return editorRef.current?.getModel()?.getValue() ?? currentCodeRef.current
   }, [])
 
   const handleRun = async () => {
     if (!roomId) return
+    if (editorLockedUntil && Date.now() < editorLockedUntil) return
     setRunning(true)
     setSubmitResult(null)
     try {
@@ -750,6 +881,10 @@ export function CodeRoomPage() {
       setAiTab('result')
       setShowAiPanel(true)
       if (isMobile) setMobilePanel('ai')
+      // Duel mode: lock editor for 30 s on wrong answer
+      if (isDuelRoom && !result.isCorrect) {
+        setEditorLockedUntil(Date.now() + 30_000)
+      }
     } catch {} finally { setRunning(false) }
   }
 
@@ -841,31 +976,13 @@ export function CodeRoomPage() {
       if (oldCode === nextCode) return
 
       currentCodeRef.current = nextCode
-      flushPendingCursorUpdates()
 
       if (isApplyingRemoteDocRef.current) {
         return
       }
 
-      // Shift remote cursor widgets locally so they stay visually aligned while
-      // the next awareness packet is in flight.
       if (cursorPositionsRef.current.size > 0) {
-        cursorPositionsRef.current.forEach((posRef, userId) => {
-          const remoteCodeLen = awarenessCodeLenRef.current.get(userId)
-          if (remoteCodeLen !== undefined && remoteCodeLen !== oldCode.length) {
-            return
-          }
-          const lines = oldCode.split('\n')
-          let offset = 0
-          for (let i = 0; i < posRef.line - 1 && i < lines.length; i++) offset += lines[i].length + 1
-          offset = Math.min(offset + posRef.col - 1, oldCode.length)
-          offset = transformCursorOffset(offset, oldCode, nextCode)
-          const newPos = nextModel.getPositionAt(Math.min(offset, nextCode.length))
-          posRef.line = newPos.lineNumber
-          posRef.col = newPos.column
-          const widget = widgetsRef.current.get(userId)
-          if (widget) editor.layoutContentWidget(widget)
-        })
+        refreshRemoteCursorPositions()
       }
 
       if (soloDraftTaskId) {
@@ -882,39 +999,22 @@ export function CodeRoomPage() {
     // Send cursor + selection awareness on every position change.
     // No throttle: at typical typing speed this is ~5-15 sends/sec, which is negligible.
     // Throttling was causing visible cursor lag for remote users during fast typing.
-    editor.onDidChangeCursorSelection((e) => {
-      if (isDuelRoom) return
-      const sel = e.selection
-      lastCursorRef.current = { line: sel.positionLineNumber, col: sel.positionColumn }
-      const hasSelection = !(
-        sel.startLineNumber === sel.endLineNumber &&
-        sel.startColumn === sel.endColumn
-      )
-      ws.sendAwareness(
-        sel.positionLineNumber,
-        sel.positionColumn,
-        hasSelection ? {
-          startLine: sel.startLineNumber,
-          startCol: sel.startColumn,
-          endLine: sel.endLineNumber,
-          endCol: sel.endColumn,
-        } : undefined,
-        { codeLen: editor.getModel()?.getValueLength() },
-      )
+    editor.onDidChangeCursorSelection(() => {
+      sendCurrentAwareness()
     })
 
     // Detect paste → anti-cheat signal
     editor.onDidPaste(() => {
       if (isDuelRoom) return
       if (!isCreatorRef.current) {
-        ws.sendAwareness(lastCursorRef.current.line, lastCursorRef.current.col, undefined, { pastedCode: true })
+        sendCurrentAwareness({ pastedCode: true })
         // Clear the flag after a short delay so it can fire again
         setTimeout(() => {
-          ws.sendAwareness(lastCursorRef.current.line, lastCursorRef.current.col, undefined, { pastedCode: false })
+          sendCurrentAwareness({ pastedCode: false })
         }, 2000)
       }
     })
-  }, [theme, schedulePersist, soloDraftTaskId, isDuelRoom, ws.sendAwareness, ws.sendUpdate, flushPendingCursorUpdates])
+  }, [theme, schedulePersist, soloDraftTaskId, isDuelRoom, ws.sendUpdate, refreshRemoteCursorPositions, sendCurrentAwareness])
 
   if (needsGuestName) {
     return <GuestNamePrompt onSubmit={handleGuestNameSubmit} />
@@ -1017,9 +1117,11 @@ export function CodeRoomPage() {
               </button>
             )}
 
-            <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading} className="flex-shrink-0 rounded-2xl">
-              <Bot className="w-3.5 h-3.5" /> {t('codeRoom.aiReview')}
-            </Button>
+            {!isDuelRoom && (
+              <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading} className="flex-shrink-0 rounded-2xl">
+                <Bot className="w-3.5 h-3.5" /> {t('codeRoom.aiReview')}
+              </Button>
+            )}
             <Button variant="secondary" size="sm" onClick={handleRun} loading={running} className="flex-shrink-0 rounded-2xl">
               <Play className="w-3.5 h-3.5" /> {t('codeRoom.run')}
             </Button>
@@ -1389,9 +1491,11 @@ export function CodeRoomPage() {
               {notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
             </button>
           )}
-          <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading}>
-            <Bot className="w-3.5 h-3.5" /> {t('codeRoom.aiReview')}
-          </Button>
+          {!isDuelRoom && (
+            <Button variant="ghost" size="sm" onClick={handleAiReview} loading={reviewLoading}>
+              <Bot className="w-3.5 h-3.5" /> {t('codeRoom.aiReview')}
+            </Button>
+          )}
           <Button variant="secondary" size="sm" onClick={handleRun} loading={running}>
             <Play className="w-3.5 h-3.5" /> {t('codeRoom.run')}
           </Button>
@@ -1460,11 +1564,32 @@ export function CodeRoomPage() {
 
         {/* Editor — flex-1 (takes remaining space ~70%) */}
         <div className="flex-1 flex flex-col min-w-0 bg-[#F2F3F0] dark:bg-[#0d1117] p-3">
+          {isDuelRoom && room?.status === 'ROOM_STATUS_WAITING' ? (
+            <div className="flex-1 flex flex-col items-center justify-center gap-4 rounded-xl border border-[#2d3748] bg-[#0d1117]">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#334155]">
+                <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#334155] border-t-[#6366F1]" />
+              </div>
+              <p className="text-sm font-semibold text-[#e2e8f0]">{t('codeRoom.duel.waitingForOpponent')}</p>
+              <p className="text-xs text-[#64748b]">{t('codeRoom.duel.duelStartsWhenBothJoin')}</p>
+            </div>
+          ) : (
           <div className="flex-1 flex flex-col rounded-xl overflow-hidden border border-[#2d3748] shadow-md">
             <div className="h-9 bg-[#1e293b] flex items-center px-4 gap-3 flex-shrink-0">
               <span className="text-xs text-[#94a3b8] font-mono">
                 solution.{lang === 'python' ? 'py' : lang === 'go' ? 'go' : lang === 'sql' ? 'sql' : 'txt'}
               </span>
+              {isDuelRoom && (
+                <div className="flex items-center gap-2 ml-2">
+                  <span className="text-[10px] text-[#64748b]">{t('codeRoom.duel.opponent')}</span>
+                  <div className="h-1.5 w-20 rounded-full bg-[#0f172a] border border-[#334155] overflow-hidden">
+                    <div
+                      className="h-full bg-[#f59e0b] transition-all duration-300"
+                      style={{ width: `${Math.min(100, ws.opponentCodeLen > 0 ? Math.round((ws.opponentCodeLen / Math.max(ws.opponentCodeLen, currentCodeRef.current.length || 1)) * 100) : 0)}%` }}
+                    />
+                  </div>
+                  <span className="text-[10px] tabular-nums text-[#64748b]">{ws.opponentCodeLen} ch</span>
+                </div>
+              )}
               <div className="ml-auto relative">
                 <button
                   onClick={() => setShowLangDropdown(v => !v)}
@@ -1490,7 +1615,7 @@ export function CodeRoomPage() {
                 )}
               </div>
             </div>
-            <div className="flex-1">
+            <div className="relative flex-1">
               <Editor
                 height="100%"
                 language={getMonacoLanguage(lang)}
@@ -1504,14 +1629,24 @@ export function CodeRoomPage() {
                   lineNumbers: 'on',
                   padding: { top: 12 },
                   theme: 'druzya-dark',
+                  readOnly: isDuelRoom && lockCountdown > 0,
                 }}
               />
+              {isDuelRoom && lockCountdown > 0 && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/50 pointer-events-none">
+                  <div className="flex flex-col items-center gap-2 rounded-xl bg-[#1e293b] px-6 py-4 shadow-xl">
+                    <span className="text-2xl font-bold tabular-nums text-[#ef4444]">{lockCountdown}s</span>
+                    <span className="text-xs text-[#94a3b8]">{t('codeRoom.duel.editorLocked')}</span>
+                  </div>
+                </div>
+              )}
             </div>
           </div>
+          )}
         </div>
 
-        {/* AI panel — hidden by default, toggle */}
-        {showAiPanel && (
+        {/* AI panel — hidden in duel mode and hidden by default */}
+        {!isDuelRoom && showAiPanel && (
           <div className="w-[280px] flex-shrink-0 bg-white dark:bg-[#161c2d] border-l border-[#CBCCC9] dark:border-[#1e3158] flex flex-col">
             <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#6366F1]" />

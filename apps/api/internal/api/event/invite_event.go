@@ -3,6 +3,7 @@ package event
 import (
 	"context"
 
+	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/event/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -21,5 +22,5 @@ func (i *Implementation) InviteToEvent(ctx context.Context, req *v1.InviteToEven
 	if _, err := i.service.JoinEvent(ctx, eventID, inviteeID); err != nil {
 		return nil, err
 	}
-	return &v1.EventStatusResponse{Status: "invited"}, nil
+	return &v1.EventStatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_INVITED}, nil
 }

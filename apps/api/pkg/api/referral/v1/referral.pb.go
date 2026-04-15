@@ -7,6 +7,7 @@
 package v1
 
 import (
+	v1 "api/pkg/api/common/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -488,7 +489,7 @@ func (x *ReferralResponse) GetReferral() *Referral {
 
 type ReferralStatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status        v1.OperationStatus     `protobuf:"varint,1,opt,name=status,proto3,enum=common.v1.OperationStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -523,11 +524,11 @@ func (*ReferralStatusResponse) Descriptor() ([]byte, []int) {
 	return file_referral_v1_referral_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *ReferralStatusResponse) GetStatus() string {
+func (x *ReferralStatusResponse) GetStatus() v1.OperationStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return v1.OperationStatus(0)
 }
 
 // Note: field numbers 3-5 are reserved — they were removed in a prior revision.
@@ -667,7 +668,7 @@ var File_referral_v1_referral_proto protoreflect.FileDescriptor
 
 const file_referral_v1_referral_proto_rawDesc = "" +
 	"\n" +
-	"\x1areferral/v1/referral.proto\x12\vreferral.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"D\n" +
+	"\x1areferral/v1/referral.proto\x12\vreferral.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16common/v1/common.proto\"D\n" +
 	"\x14ListReferralsRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\x86\x02\n" +
@@ -699,9 +700,9 @@ const file_referral_v1_referral_proto_rawDesc = "" +
 	"totalCount\x12\"\n" +
 	"\rhas_next_page\x18\x05 \x01(\bR\vhasNextPage\"E\n" +
 	"\x10ReferralResponse\x121\n" +
-	"\breferral\x18\x01 \x01(\v2\x15.referral.v1.ReferralR\breferral\"0\n" +
-	"\x16ReferralStatusResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"\xab\x03\n" +
+	"\breferral\x18\x01 \x01(\v2\x15.referral.v1.ReferralR\breferral\"L\n" +
+	"\x16ReferralStatusResponse\x122\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1a.common.v1.OperationStatusR\x06status\"\xab\x03\n" +
 	"\bReferral\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
 	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x1f\n" +
@@ -759,7 +760,8 @@ var file_referral_v1_referral_proto_goTypes = []any{
 	(*ReferralResponse)(nil),       // 7: referral.v1.ReferralResponse
 	(*ReferralStatusResponse)(nil), // 8: referral.v1.ReferralStatusResponse
 	(*Referral)(nil),               // 9: referral.v1.Referral
-	(*timestamppb.Timestamp)(nil),  // 10: google.protobuf.Timestamp
+	(v1.OperationStatus)(0),        // 10: common.v1.OperationStatus
+	(*timestamppb.Timestamp)(nil),  // 11: google.protobuf.Timestamp
 }
 var file_referral_v1_referral_proto_depIdxs = []int32{
 	0,  // 0: referral.v1.ReferralPayload.employment_type:type_name -> referral.v1.EmploymentType
@@ -767,21 +769,22 @@ var file_referral_v1_referral_proto_depIdxs = []int32{
 	2,  // 2: referral.v1.UpdateReferralRequest.referral:type_name -> referral.v1.ReferralPayload
 	9,  // 3: referral.v1.ListReferralsResponse.referrals:type_name -> referral.v1.Referral
 	9,  // 4: referral.v1.ReferralResponse.referral:type_name -> referral.v1.Referral
-	0,  // 5: referral.v1.Referral.employment_type:type_name -> referral.v1.EmploymentType
-	10, // 6: referral.v1.Referral.created_at:type_name -> google.protobuf.Timestamp
-	1,  // 7: referral.v1.ReferralService.ListReferrals:input_type -> referral.v1.ListReferralsRequest
-	3,  // 8: referral.v1.ReferralService.CreateReferral:input_type -> referral.v1.CreateReferralRequest
-	4,  // 9: referral.v1.ReferralService.UpdateReferral:input_type -> referral.v1.UpdateReferralRequest
-	5,  // 10: referral.v1.ReferralService.DeleteReferral:input_type -> referral.v1.DeleteReferralRequest
-	6,  // 11: referral.v1.ReferralService.ListReferrals:output_type -> referral.v1.ListReferralsResponse
-	7,  // 12: referral.v1.ReferralService.CreateReferral:output_type -> referral.v1.ReferralResponse
-	7,  // 13: referral.v1.ReferralService.UpdateReferral:output_type -> referral.v1.ReferralResponse
-	8,  // 14: referral.v1.ReferralService.DeleteReferral:output_type -> referral.v1.ReferralStatusResponse
-	11, // [11:15] is the sub-list for method output_type
-	7,  // [7:11] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	10, // 5: referral.v1.ReferralStatusResponse.status:type_name -> common.v1.OperationStatus
+	0,  // 6: referral.v1.Referral.employment_type:type_name -> referral.v1.EmploymentType
+	11, // 7: referral.v1.Referral.created_at:type_name -> google.protobuf.Timestamp
+	1,  // 8: referral.v1.ReferralService.ListReferrals:input_type -> referral.v1.ListReferralsRequest
+	3,  // 9: referral.v1.ReferralService.CreateReferral:input_type -> referral.v1.CreateReferralRequest
+	4,  // 10: referral.v1.ReferralService.UpdateReferral:input_type -> referral.v1.UpdateReferralRequest
+	5,  // 11: referral.v1.ReferralService.DeleteReferral:input_type -> referral.v1.DeleteReferralRequest
+	6,  // 12: referral.v1.ReferralService.ListReferrals:output_type -> referral.v1.ListReferralsResponse
+	7,  // 13: referral.v1.ReferralService.CreateReferral:output_type -> referral.v1.ReferralResponse
+	7,  // 14: referral.v1.ReferralService.UpdateReferral:output_type -> referral.v1.ReferralResponse
+	8,  // 15: referral.v1.ReferralService.DeleteReferral:output_type -> referral.v1.ReferralStatusResponse
+	12, // [12:16] is the sub-list for method output_type
+	8,  // [8:12] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_referral_v1_referral_proto_init() }

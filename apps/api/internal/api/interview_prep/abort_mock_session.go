@@ -3,6 +3,7 @@ package interview_prep
 import (
 	"context"
 
+	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/interview_prep/v1"
 )
 
@@ -18,5 +19,5 @@ func (i *Implementation) AbortMockSession(ctx context.Context, req *v1.AbortMock
 	if err := i.service.AbortMockSession(ctx, user, sessionID); err != nil {
 		return nil, toHTTPError(err)
 	}
-	return &v1.StatusResponse{Status: "aborted"}, nil
+	return &v1.StatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_ABORTED}, nil
 }

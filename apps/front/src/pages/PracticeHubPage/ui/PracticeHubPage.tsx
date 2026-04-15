@@ -50,7 +50,7 @@ export function PracticeHubPage() {
           {[
             { icon: Code2, title: 'Code Rooms', sub: t('practice.card.rooms'), href: '/practice/code-rooms' },
             { icon: Swords, title: 'Arena Duels', sub: t('practice.card.arena'), href: '/practice/arena' },
-            { icon: Target, title: 'Solo Practice', sub: t('practice.card.solo'), href: '/practice/solo' },
+            { icon: Target, title: 'Algorithm Prep', sub: t('practice.card.solo'), href: '/prepare/interview-prep?category=algorithm' },
             { icon: Flame, title: 'Daily Challenge', sub: t('practice.card.daily'), href: '/practice/daily' },
           ].map(f => {
             const Icon = f.icon

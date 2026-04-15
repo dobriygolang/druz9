@@ -87,6 +87,7 @@ export function ProfilePage() {
   const [pinnedIds, setPinnedIds] = useState<string[]>([])
   const [goalOverride, setGoalOverride] = useState<{ kind: 'general_growth' | 'weakest_first' | 'company_prep'; company: string } | undefined>(undefined)
   const [showGoalSelector, setShowGoalSelector] = useState(false)
+  const [goalSaving, setGoalSaving] = useState(false)
 
   // Load pinned achievements from localStorage
   useEffect(() => {
@@ -115,21 +116,22 @@ export function ProfilePage() {
   const readiness = useMemo(() => (progress ? computeCompanyReadiness(progress) : []), [progress])
 
   // The active goal: use local override if set, otherwise from fetched progress
-  const activeGoal = goalOverride ?? progress?.goal
+  const activeGoal = goalOverride ?? progress?.goal ?? (isOwn ? { kind: 'general_growth' as const, company: '' } : undefined)
 
   // ── Goal selector — optimistic update ──────────────────────────
   const handleGoalChange = async (newGoal: { kind: string; company?: string }) => {
-    // Optimistically update the UI immediately
     const typedGoal = { kind: newGoal.kind as 'general_growth' | 'weakest_first' | 'company_prep', company: newGoal.company ?? '' }
     setGoalOverride(typedGoal)
+    setGoalSaving(true)
+    setShowGoalSelector(false)
     try {
-      await authApi.setUserGoal(newGoal)
-      // Don't refetch here — cache would return stale data.
-      // The local override keeps UI correct until next full load.
+      const savedGoal = await authApi.setUserGoal(newGoal)
+      setGoalOverride(savedGoal)
     } catch {
-      // Revert on failure
       setGoalOverride(undefined)
       toast(t('common.saveFailed'), 'error')
+    } finally {
+      setGoalSaving(false)
     }
   }
 
@@ -268,6 +270,7 @@ export function ProfilePage() {
           ) : (
             <button
               onClick={() => setShowGoalSelector(true)}
+              disabled={goalSaving}
               className="inline-flex items-center gap-2 rounded-full border border-[#E7E8E5] bg-white px-3 py-1.5 text-xs font-medium text-[#475569] transition-colors hover:border-[#6366F1] hover:text-[#6366F1] dark:border-[#1e3158] dark:bg-[#161c2d] dark:text-[#7e93b0] dark:hover:border-[#818cf8] dark:hover:text-[#818cf8]"
             >
               {t('goal.label')}: {t(`goal.${activeGoal.kind === 'general_growth' ? 'generalGrowth' : activeGoal.kind === 'weakest_first' ? 'weakAreas' : 'company'}`)}

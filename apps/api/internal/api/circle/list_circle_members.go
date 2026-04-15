@@ -31,7 +31,7 @@ func (i *Implementation) ListCircleMembers(ctx context.Context, req *v1.ListCirc
 			FirstName: m.FirstName,
 			LastName:  m.LastName,
 			AvatarUrl: m.AvatarURL,
-			Role:      m.Role,
+			Role:      mapCircleMemberRole(m.Role),
 			JoinedAt:  timestamppb.New(m.JoinedAt),
 		})
 	}

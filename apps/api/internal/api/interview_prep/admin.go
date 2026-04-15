@@ -95,7 +95,7 @@ func (i *Implementation) DeleteAdminTask(ctx context.Context, req *v1.DeleteAdmi
 	if err := i.admin.DeleteTask(ctx, taskID); err != nil {
 		return nil, kratoserrors.InternalServer("INTERNAL_ERROR", err.Error())
 	}
-	return &v1.StatusResponse{Status: "ok"}, nil
+	return &v1.StatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }
 
 func (i *Implementation) ListAdminQuestions(ctx context.Context, req *v1.ListAdminQuestionsRequest) (*v1.ListAdminQuestionsResponse, error) {
@@ -172,7 +172,7 @@ func (i *Implementation) DeleteAdminQuestion(ctx context.Context, req *v1.Delete
 	if err := i.admin.DeleteQuestion(ctx, questionID); err != nil {
 		return nil, kratoserrors.InternalServer("INTERNAL_ERROR", err.Error())
 	}
-	return &v1.StatusResponse{Status: "ok"}, nil
+	return &v1.StatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }
 
 func (i *Implementation) ListMockQuestionPools(ctx context.Context, req *v1.ListMockQuestionPoolsRequest) (*v1.MockQuestionPoolListResponse, error) {
@@ -252,7 +252,7 @@ func (i *Implementation) DeleteMockQuestionPool(ctx context.Context, req *v1.Del
 	if err := i.admin.DeleteMockQuestionPool(ctx, itemID); err != nil {
 		return nil, kratoserrors.InternalServer("INTERNAL_ERROR", err.Error())
 	}
-	return &v1.StatusResponse{Status: "ok"}, nil
+	return &v1.StatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }
 
 func (i *Implementation) ListMockCompanyPresets(ctx context.Context, req *v1.ListMockCompanyPresetsRequest) (*v1.MockCompanyPresetListResponse, error) {
@@ -279,7 +279,7 @@ func (i *Implementation) CreateMockCompanyPreset(ctx context.Context, req *v1.Cr
 	item := &model.InterviewPrepMockCompanyPreset{
 		ID:              uuid.New(),
 		CompanyTag:      strings.TrimSpace(strings.ToLower(req.Item.CompanyTag)),
-		StageKind:       model.InterviewPrepMockStageKindFromString(req.Item.StageKind),
+		StageKind:       unmapMockStageKind(req.Item.StageKind),
 		Position:        req.Item.Position,
 		TaskSlugPattern: req.Item.TaskSlugPattern,
 		AIModelOverride: req.Item.AiModelOverride,
@@ -304,7 +304,7 @@ func (i *Implementation) UpdateMockCompanyPreset(ctx context.Context, req *v1.Up
 	item := &model.InterviewPrepMockCompanyPreset{
 		ID:              itemID,
 		CompanyTag:      strings.TrimSpace(strings.ToLower(req.Item.CompanyTag)),
-		StageKind:       model.InterviewPrepMockStageKindFromString(req.Item.StageKind),
+		StageKind:       unmapMockStageKind(req.Item.StageKind),
 		Position:        req.Item.Position,
 		TaskSlugPattern: req.Item.TaskSlugPattern,
 		AIModelOverride: req.Item.AiModelOverride,
@@ -328,7 +328,7 @@ func (i *Implementation) DeleteMockCompanyPreset(ctx context.Context, req *v1.De
 	if err := i.admin.DeleteMockCompanyPreset(ctx, itemID); err != nil {
 		return nil, kratoserrors.InternalServer("INTERNAL_ERROR", err.Error())
 	}
-	return &v1.StatusResponse{Status: "ok"}, nil
+	return &v1.StatusResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }
 
 func requireAdmin(ctx context.Context) error {

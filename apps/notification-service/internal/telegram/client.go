@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"time"
 
@@ -16,6 +17,11 @@ const apiBase = "https://api.telegram.org"
 type Client struct {
 	httpClient *http.Client
 	token      string
+}
+
+type sendMessageAPIResponse struct {
+	OK          bool   `json:"ok"`
+	Description string `json:"description"`
 }
 
 func NewClient(token string) *Client {
@@ -68,9 +74,24 @@ func (c *Client) call(ctx context.Context, method string, requestBody any) error
 	if resp.StatusCode == http.StatusTooManyRequests {
 		return fmt.Errorf("telegram rate limited (429)")
 	}
+	body, readErr := io.ReadAll(resp.Body)
+	if readErr != nil {
+		return fmt.Errorf("read telegram response: %w", readErr)
+	}
 	if resp.StatusCode >= http.StatusBadRequest {
-		klog.Errorf("telegram api %s status: %s", method, resp.Status)
+		klog.Errorf("telegram api %s status: %s body=%s", method, resp.Status, string(body))
 		return fmt.Errorf("telegram api status: %s", resp.Status)
+	}
+
+	var apiResp sendMessageAPIResponse
+	if len(body) > 0 {
+		if err := json.Unmarshal(body, &apiResp); err != nil {
+			return fmt.Errorf("decode telegram response: %w", err)
+		}
+		if !apiResp.OK {
+			klog.Errorf("telegram api %s failed: %s", method, apiResp.Description)
+			return fmt.Errorf("telegram api error: %s", apiResp.Description)
+		}
 	}
 
 	return nil

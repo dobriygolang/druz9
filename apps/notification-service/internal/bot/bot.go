@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"io"
 	"net/http"
 	"strings"
 	"time"
@@ -203,7 +204,22 @@ func (b *Bot) callAPI(ctx context.Context, method string, body map[string]any) e
 	if err != nil {
 		return err
 	}
-	resp.Body.Close()
+	defer resp.Body.Close()
+
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode >= http.StatusBadRequest {
+		return fmt.Errorf("telegram api status: %s", resp.Status)
+	}
+	var respBody apiResponse[json.RawMessage]
+	if err := json.Unmarshal(bodyBytes, &respBody); err != nil {
+		return err
+	}
+	if !respBody.OK {
+		return fmt.Errorf("telegram api error: %s", respBody.Error)
+	}
 	return nil
 }
 
@@ -224,5 +240,19 @@ func (b *Bot) callAndDecode(ctx context.Context, method string, body map[string]
 		return err
 	}
 	defer resp.Body.Close()
-	return json.NewDecoder(resp.Body).Decode(out)
+	bodyBytes, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return err
+	}
+	if resp.StatusCode >= http.StatusBadRequest {
+		return fmt.Errorf("telegram api status: %s", resp.Status)
+	}
+	var meta apiResponse[json.RawMessage]
+	if err := json.Unmarshal(bodyBytes, &meta); err != nil {
+		return err
+	}
+	if !meta.OK {
+		return fmt.Errorf("telegram api error: %s", meta.Error)
+	}
+	return json.Unmarshal(bodyBytes, out)
 }

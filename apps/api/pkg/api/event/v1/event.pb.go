@@ -7,6 +7,7 @@
 package v1
 
 import (
+	v1 "api/pkg/api/common/v1"
 	_ "google.golang.org/genproto/googleapis/api/annotations"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
@@ -768,7 +769,7 @@ func (x *InviteToEventRequest) GetUserId() string {
 // EventStatusResponse replaces the separate LeaveEventResponse and DeleteEventResponse.
 type EventStatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status        v1.OperationStatus     `protobuf:"varint,1,opt,name=status,proto3,enum=common.v1.OperationStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -803,11 +804,11 @@ func (*EventStatusResponse) Descriptor() ([]byte, []int) {
 	return file_event_v1_event_proto_rawDescGZIP(), []int{7}
 }
 
-func (x *EventStatusResponse) GetStatus() string {
+func (x *EventStatusResponse) GetStatus() v1.OperationStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return v1.OperationStatus(0)
 }
 
 type ListEventsResponse struct {
@@ -1190,7 +1191,7 @@ var File_event_v1_event_proto protoreflect.FileDescriptor
 
 const file_event_v1_event_proto_rawDesc = "" +
 	"\n" +
-	"\x14event/v1/event.proto\x12\bevent.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x93\x01\n" +
+	"\x14event/v1/event.proto\x12\bevent.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16common/v1/common.proto\"\x93\x01\n" +
 	"\x11ListEventsRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x05R\x06offset\x121\n" +
@@ -1237,9 +1238,9 @@ const file_event_v1_event_proto_rawDesc = "" +
 	"\fdelete_scope\x18\x02 \x01(\x0e2\x1a.event.v1.DeleteEventScopeR\vdeleteScope\"J\n" +
 	"\x14InviteToEventRequest\x12\x19\n" +
 	"\bevent_id\x18\x01 \x01(\tR\aeventId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\"-\n" +
-	"\x13EventStatusResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\"\xb0\x01\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"I\n" +
+	"\x13EventStatusResponse\x122\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1a.common.v1.OperationStatusR\x06status\"\xb0\x01\n" +
 	"\x12ListEventsResponse\x12'\n" +
 	"\x06events\x18\x01 \x03(\v2\x0f.event.v1.EventR\x06events\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\x12\x16\n" +
@@ -1343,6 +1344,7 @@ var file_event_v1_event_proto_goTypes = []any{
 	(*Event)(nil),                 // 14: event.v1.Event
 	(*EventParticipant)(nil),      // 15: event.v1.EventParticipant
 	(*timestamppb.Timestamp)(nil), // 16: google.protobuf.Timestamp
+	(v1.OperationStatus)(0),       // 17: common.v1.OperationStatus
 }
 var file_event_v1_event_proto_depIdxs = []int32{
 	0,  // 0: event.v1.ListEventsRequest.status:type_name -> event.v1.EventListFilter
@@ -1350,31 +1352,32 @@ var file_event_v1_event_proto_depIdxs = []int32{
 	3,  // 2: event.v1.CreateEventRequest.repeat:type_name -> event.v1.EventRepeat
 	16, // 3: event.v1.UpdateEventRequest.scheduled_at:type_name -> google.protobuf.Timestamp
 	2,  // 4: event.v1.DeleteEventRequest.delete_scope:type_name -> event.v1.DeleteEventScope
-	14, // 5: event.v1.ListEventsResponse.events:type_name -> event.v1.Event
-	14, // 6: event.v1.EventResponse.event:type_name -> event.v1.Event
-	16, // 7: event.v1.Event.scheduled_at:type_name -> google.protobuf.Timestamp
-	16, // 8: event.v1.Event.created_at:type_name -> google.protobuf.Timestamp
-	15, // 9: event.v1.Event.participants:type_name -> event.v1.EventParticipant
-	1,  // 10: event.v1.EventParticipant.status:type_name -> event.v1.ParticipantStatus
-	4,  // 11: event.v1.EventService.ListEvents:input_type -> event.v1.ListEventsRequest
-	5,  // 12: event.v1.EventService.CreateEvent:input_type -> event.v1.CreateEventRequest
-	6,  // 13: event.v1.EventService.JoinEvent:input_type -> event.v1.JoinEventRequest
-	7,  // 14: event.v1.EventService.LeaveEvent:input_type -> event.v1.LeaveEventRequest
-	8,  // 15: event.v1.EventService.UpdateEvent:input_type -> event.v1.UpdateEventRequest
-	9,  // 16: event.v1.EventService.DeleteEvent:input_type -> event.v1.DeleteEventRequest
-	10, // 17: event.v1.EventService.InviteToEvent:input_type -> event.v1.InviteToEventRequest
-	12, // 18: event.v1.EventService.ListEvents:output_type -> event.v1.ListEventsResponse
-	13, // 19: event.v1.EventService.CreateEvent:output_type -> event.v1.EventResponse
-	13, // 20: event.v1.EventService.JoinEvent:output_type -> event.v1.EventResponse
-	11, // 21: event.v1.EventService.LeaveEvent:output_type -> event.v1.EventStatusResponse
-	13, // 22: event.v1.EventService.UpdateEvent:output_type -> event.v1.EventResponse
-	11, // 23: event.v1.EventService.DeleteEvent:output_type -> event.v1.EventStatusResponse
-	11, // 24: event.v1.EventService.InviteToEvent:output_type -> event.v1.EventStatusResponse
-	18, // [18:25] is the sub-list for method output_type
-	11, // [11:18] is the sub-list for method input_type
-	11, // [11:11] is the sub-list for extension type_name
-	11, // [11:11] is the sub-list for extension extendee
-	0,  // [0:11] is the sub-list for field type_name
+	17, // 5: event.v1.EventStatusResponse.status:type_name -> common.v1.OperationStatus
+	14, // 6: event.v1.ListEventsResponse.events:type_name -> event.v1.Event
+	14, // 7: event.v1.EventResponse.event:type_name -> event.v1.Event
+	16, // 8: event.v1.Event.scheduled_at:type_name -> google.protobuf.Timestamp
+	16, // 9: event.v1.Event.created_at:type_name -> google.protobuf.Timestamp
+	15, // 10: event.v1.Event.participants:type_name -> event.v1.EventParticipant
+	1,  // 11: event.v1.EventParticipant.status:type_name -> event.v1.ParticipantStatus
+	4,  // 12: event.v1.EventService.ListEvents:input_type -> event.v1.ListEventsRequest
+	5,  // 13: event.v1.EventService.CreateEvent:input_type -> event.v1.CreateEventRequest
+	6,  // 14: event.v1.EventService.JoinEvent:input_type -> event.v1.JoinEventRequest
+	7,  // 15: event.v1.EventService.LeaveEvent:input_type -> event.v1.LeaveEventRequest
+	8,  // 16: event.v1.EventService.UpdateEvent:input_type -> event.v1.UpdateEventRequest
+	9,  // 17: event.v1.EventService.DeleteEvent:input_type -> event.v1.DeleteEventRequest
+	10, // 18: event.v1.EventService.InviteToEvent:input_type -> event.v1.InviteToEventRequest
+	12, // 19: event.v1.EventService.ListEvents:output_type -> event.v1.ListEventsResponse
+	13, // 20: event.v1.EventService.CreateEvent:output_type -> event.v1.EventResponse
+	13, // 21: event.v1.EventService.JoinEvent:output_type -> event.v1.EventResponse
+	11, // 22: event.v1.EventService.LeaveEvent:output_type -> event.v1.EventStatusResponse
+	13, // 23: event.v1.EventService.UpdateEvent:output_type -> event.v1.EventResponse
+	11, // 24: event.v1.EventService.DeleteEvent:output_type -> event.v1.EventStatusResponse
+	11, // 25: event.v1.EventService.InviteToEvent:output_type -> event.v1.EventStatusResponse
+	19, // [19:26] is the sub-list for method output_type
+	12, // [12:19] is the sub-list for method input_type
+	12, // [12:12] is the sub-list for extension type_name
+	12, // [12:12] is the sub-list for extension extendee
+	0,  // [0:12] is the sub-list for field type_name
 }
 
 func init() { file_event_v1_event_proto_init() }

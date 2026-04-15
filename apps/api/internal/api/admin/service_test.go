@@ -8,6 +8,7 @@ import (
 	"api/internal/api/admin/mocks"
 	"api/internal/rtc"
 	v1 "api/pkg/api/admin/v1"
+	commonv1 "api/pkg/api/common/v1"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -70,7 +71,7 @@ func TestDeleteUser(t *testing.T) {
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
-		if resp.Status != "ok" {
+		if resp.Status != commonv1.OperationStatus_OPERATION_STATUS_OK {
 			t.Errorf("expected status 'ok', got %s", resp.Status)
 		}
 	})

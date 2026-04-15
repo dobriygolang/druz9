@@ -33,8 +33,8 @@ func (i *Implementation) GetAchievements(ctx context.Context, req *v1.GetAchieve
 			Description: a.Description,
 			Icon:        a.Icon,
 			Unlocked:    a.Unlocked,
-			Category:    a.Category,
-			Tier:        a.Tier,
+			Category:    mapAchievementCategory(a.Category),
+			Tier:        mapAchievementTier(a.Tier),
 			Progress:    a.Progress,
 			Target:      a.Target,
 		})

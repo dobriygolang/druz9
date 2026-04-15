@@ -43,6 +43,17 @@ export interface CircleMember {
   joinedAt: string
 }
 
+function normalizeCircleRole(role: unknown): string {
+  if (role === 'CIRCLE_MEMBER_ROLE_CREATOR' || role === 'creator') return 'creator'
+  return 'member'
+}
+
+function normalizeCircleActionType(actionType: unknown): CirclePulse['recentActions'][number]['actionType'] {
+  if (actionType === 'CIRCLE_MEMBER_ACTION_TYPE_DUEL' || actionType === 'duel') return 'duel'
+  if (actionType === 'CIRCLE_MEMBER_ACTION_TYPE_MOCK' || actionType === 'mock') return 'mock'
+  return 'daily'
+}
+
 export const circleApi = {
   getCircle: async (circleId: string): Promise<Circle> => {
     // Backend has no GET /api/v1/circles/{id} — fetch list and find by id
@@ -87,7 +98,7 @@ export const circleApi = {
   },
   listMembers: async (circleId: string): Promise<CircleMember[]> => {
     const r = await apiClient.get<{ members?: CircleMember[] }>(`/api/v1/circles/${circleId}/members`)
-    return r.data.members ?? []
+    return (r.data.members ?? []).map((m) => ({ ...m, role: normalizeCircleRole(m.role) }))
   },
 
   deleteCircle: async (circleId: string): Promise<void> => {
@@ -105,13 +116,13 @@ export const circleApi = {
       activeToday: r.data.activeToday ?? 0,
       totalMembers: r.data.totalMembers ?? 0,
       weekActivity: r.data.weekActivity ?? [],
-      recentActions: r.data.recentActions ?? [],
+      recentActions: (r.data.recentActions ?? []).map((a) => ({ ...a, actionType: normalizeCircleActionType(a.actionType) })),
     }
   },
 
   getCircleMemberStats: async (circleId: string): Promise<CircleMemberStats[]> => {
     const r = await apiClient.get<{ members?: CircleMemberStats[] }>(`/api/v1/circles/${circleId}/member-stats`)
-    return r.data.members ?? []
+    return (r.data.members ?? []).map((m) => ({ ...m, role: normalizeCircleRole(m.role) }))
   },
 
   getActiveChallenge: async (circleId: string): Promise<CircleChallenge | null> => {

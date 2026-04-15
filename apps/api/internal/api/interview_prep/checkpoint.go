@@ -21,7 +21,7 @@ func mapCheckpoint(cp *model.InterviewPrepCheckpoint) *v1.CheckpointProgress {
 		TaskId:          cp.TaskID.String(),
 		SessionId:       cp.SessionID.String(),
 		SkillKey:        cp.SkillKey,
-		Status:          string(cp.Status),
+		Status:          mapCheckpointStatus(cp.Status),
 		DurationSeconds: cp.DurationSeconds,
 		AttemptsUsed:    cp.AttemptsUsed,
 		MaxAttempts:     cp.MaxAttempts,

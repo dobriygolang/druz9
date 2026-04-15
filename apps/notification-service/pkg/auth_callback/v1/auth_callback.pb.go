@@ -24,6 +24,52 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type OperationStatus int32
+
+const (
+	OperationStatus_OPERATION_STATUS_UNSPECIFIED OperationStatus = 0
+	OperationStatus_OPERATION_STATUS_OK          OperationStatus = 1
+)
+
+// Enum value maps for OperationStatus.
+var (
+	OperationStatus_name = map[int32]string{
+		0: "OPERATION_STATUS_UNSPECIFIED",
+		1: "OPERATION_STATUS_OK",
+	}
+	OperationStatus_value = map[string]int32{
+		"OPERATION_STATUS_UNSPECIFIED": 0,
+		"OPERATION_STATUS_OK":          1,
+	}
+)
+
+func (x OperationStatus) Enum() *OperationStatus {
+	p := new(OperationStatus)
+	*p = x
+	return p
+}
+
+func (x OperationStatus) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (OperationStatus) Descriptor() protoreflect.EnumDescriptor {
+	return file_auth_callback_v1_auth_callback_proto_enumTypes[0].Descriptor()
+}
+
+func (OperationStatus) Type() protoreflect.EnumType {
+	return &file_auth_callback_v1_auth_callback_proto_enumTypes[0]
+}
+
+func (x OperationStatus) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use OperationStatus.Descriptor instead.
+func (OperationStatus) EnumDescriptor() ([]byte, []int) {
+	return file_auth_callback_v1_auth_callback_proto_rawDescGZIP(), []int{0}
+}
+
 type ConfirmTelegramAuthRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
@@ -118,7 +164,7 @@ func (x *ConfirmTelegramAuthRequest) GetPhotoUrl() string {
 
 type ConfirmTelegramAuthResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        string                 `protobuf:"bytes,1,opt,name=status,proto3" json:"status,omitempty"`
+	Status        OperationStatus        `protobuf:"varint,1,opt,name=status,proto3,enum=profile.v1.OperationStatus" json:"status,omitempty"`
 	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -154,11 +200,11 @@ func (*ConfirmTelegramAuthResponse) Descriptor() ([]byte, []int) {
 	return file_auth_callback_v1_auth_callback_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *ConfirmTelegramAuthResponse) GetStatus() string {
+func (x *ConfirmTelegramAuthResponse) GetStatus() OperationStatus {
 	if x != nil {
 		return x.Status
 	}
-	return ""
+	return OperationStatus_OPERATION_STATUS_UNSPECIFIED
 }
 
 func (x *ConfirmTelegramAuthResponse) GetCode() string {
@@ -183,10 +229,13 @@ const file_auth_callback_v1_auth_callback_proto_rawDesc = "" +
 	"first_name\x18\x04 \x01(\tR\tfirstName\x12\x1b\n" +
 	"\tlast_name\x18\x05 \x01(\tR\blastName\x12\x1a\n" +
 	"\busername\x18\x06 \x01(\tR\busername\x12\x1b\n" +
-	"\tphoto_url\x18\a \x01(\tR\bphotoUrl\"I\n" +
-	"\x1bConfirmTelegramAuthResponse\x12\x16\n" +
-	"\x06status\x18\x01 \x01(\tR\x06status\x12\x12\n" +
-	"\x04code\x18\x02 \x01(\tR\x04code2x\n" +
+	"\tphoto_url\x18\a \x01(\tR\bphotoUrl\"f\n" +
+	"\x1bConfirmTelegramAuthResponse\x123\n" +
+	"\x06status\x18\x01 \x01(\x0e2\x1b.profile.v1.OperationStatusR\x06status\x12\x12\n" +
+	"\x04code\x18\x02 \x01(\tR\x04code*L\n" +
+	"\x0fOperationStatus\x12 \n" +
+	"\x1cOPERATION_STATUS_UNSPECIFIED\x10\x00\x12\x17\n" +
+	"\x13OPERATION_STATUS_OK\x10\x012x\n" +
 	"\x0eProfileService\x12f\n" +
 	"\x13ConfirmTelegramAuth\x12&.profile.v1.ConfirmTelegramAuthRequest\x1a'.profile.v1.ConfirmTelegramAuthResponseB.Z,notification-service/pkg/auth_callback/v1;v1b\x06proto3"
 
@@ -202,19 +251,22 @@ func file_auth_callback_v1_auth_callback_proto_rawDescGZIP() []byte {
 	return file_auth_callback_v1_auth_callback_proto_rawDescData
 }
 
+var file_auth_callback_v1_auth_callback_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
 var file_auth_callback_v1_auth_callback_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
 var file_auth_callback_v1_auth_callback_proto_goTypes = []any{
-	(*ConfirmTelegramAuthRequest)(nil),  // 0: profile.v1.ConfirmTelegramAuthRequest
-	(*ConfirmTelegramAuthResponse)(nil), // 1: profile.v1.ConfirmTelegramAuthResponse
+	(OperationStatus)(0),                // 0: profile.v1.OperationStatus
+	(*ConfirmTelegramAuthRequest)(nil),  // 1: profile.v1.ConfirmTelegramAuthRequest
+	(*ConfirmTelegramAuthResponse)(nil), // 2: profile.v1.ConfirmTelegramAuthResponse
 }
 var file_auth_callback_v1_auth_callback_proto_depIdxs = []int32{
-	0, // 0: profile.v1.ProfileService.ConfirmTelegramAuth:input_type -> profile.v1.ConfirmTelegramAuthRequest
-	1, // 1: profile.v1.ProfileService.ConfirmTelegramAuth:output_type -> profile.v1.ConfirmTelegramAuthResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	0, // 0: profile.v1.ConfirmTelegramAuthResponse.status:type_name -> profile.v1.OperationStatus
+	1, // 1: profile.v1.ProfileService.ConfirmTelegramAuth:input_type -> profile.v1.ConfirmTelegramAuthRequest
+	2, // 2: profile.v1.ProfileService.ConfirmTelegramAuth:output_type -> profile.v1.ConfirmTelegramAuthResponse
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_auth_callback_v1_auth_callback_proto_init() }
@@ -227,13 +279,14 @@ func file_auth_callback_v1_auth_callback_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_auth_callback_v1_auth_callback_proto_rawDesc), len(file_auth_callback_v1_auth_callback_proto_rawDesc)),
-			NumEnums:      0,
+			NumEnums:      1,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_auth_callback_v1_auth_callback_proto_goTypes,
 		DependencyIndexes: file_auth_callback_v1_auth_callback_proto_depIdxs,
+		EnumInfos:         file_auth_callback_v1_auth_callback_proto_enumTypes,
 		MessageInfos:      file_auth_callback_v1_auth_callback_proto_msgTypes,
 	}.Build()
 	File_auth_callback_v1_auth_callback_proto = out.File

@@ -109,6 +109,67 @@ service ProfileService {
   }
 }
 
+enum UserGoalKind {
+  USER_GOAL_KIND_UNSPECIFIED    = 0;
+  USER_GOAL_KIND_GENERAL_GROWTH = 1;
+  USER_GOAL_KIND_WEAKEST_FIRST  = 2;
+  USER_GOAL_KIND_COMPANY_PREP   = 3;
+}
+
+enum ReadinessLevel {
+  READINESS_LEVEL_UNSPECIFIED  = 0;
+  READINESS_LEVEL_NOVICE       = 1;
+  READINESS_LEVEL_FOUNDATION   = 2;
+  READINESS_LEVEL_PRACTITIONER = 3;
+  READINESS_LEVEL_CANDIDATE    = 4;
+  READINESS_LEVEL_READY        = 5;
+}
+
+enum ProfileActionType {
+  PROFILE_ACTION_TYPE_UNSPECIFIED = 0;
+  PROFILE_ACTION_TYPE_PRACTICE    = 1;
+  PROFILE_ACTION_TYPE_MOCK        = 2;
+  PROFILE_ACTION_TYPE_DAILY       = 3;
+  PROFILE_ACTION_TYPE_DUEL        = 4;
+  PROFILE_ACTION_TYPE_CHECKPOINT  = 5;
+  PROFILE_ACTION_TYPE_ARENA       = 6;
+}
+
+enum ProfileCompetencyConfidence {
+  PROFILE_COMPETENCY_CONFIDENCE_UNSPECIFIED = 0;
+  PROFILE_COMPETENCY_CONFIDENCE_LOW         = 1;
+  PROFILE_COMPETENCY_CONFIDENCE_MEDIUM      = 2;
+  PROFILE_COMPETENCY_CONFIDENCE_VERIFIED    = 3;
+}
+
+enum ProfileCompetencyLevel {
+  PROFILE_COMPETENCY_LEVEL_UNSPECIFIED = 0;
+  PROFILE_COMPETENCY_LEVEL_BEGINNER    = 1;
+  PROFILE_COMPETENCY_LEVEL_CONFIDENT   = 2;
+  PROFILE_COMPETENCY_LEVEL_STRONG      = 3;
+  PROFILE_COMPETENCY_LEVEL_EXPERT      = 4;
+}
+
+enum AchievementCategory {
+  ACHIEVEMENT_CATEGORY_UNSPECIFIED = 0;
+  ACHIEVEMENT_CATEGORY_PRACTICE    = 1;
+  ACHIEVEMENT_CATEGORY_STREAK      = 2;
+}
+
+enum AchievementTier {
+  ACHIEVEMENT_TIER_UNSPECIFIED = 0;
+  ACHIEVEMENT_TIER_BRONZE      = 1;
+  ACHIEVEMENT_TIER_SILVER      = 2;
+  ACHIEVEMENT_TIER_GOLD        = 3;
+  ACHIEVEMENT_TIER_DIAMOND     = 4;
+}
+
+enum FeedItemType {
+  FEED_ITEM_TYPE_UNSPECIFIED = 0;
+  FEED_ITEM_TYPE_MOCK_STAGE  = 1;
+  FEED_ITEM_TYPE_PRACTICE    = 2;
+}
+
 // ── Request messages ───────────────────────────────────────────────────────
 
 message CreateTelegramAuthChallengeRequest {}
@@ -179,7 +240,7 @@ message GetAchievementsRequest     { string user_id = 1; }
 message GetProfileActivityRequest  { string user_id = 1; }
 
 message SetUserGoalRequest {
-  string kind    = 1;
+  UserGoalKind kind    = 1;
   string company = 2;
 }
 
@@ -191,7 +252,7 @@ message SetUserGoalResponse {
 
 message GetReadinessResponse {
   int32                        score             = 1;
-  string                       level             = 2;
+  ReadinessLevel               level             = 2;
   string                       level_label       = 3;
   ProfileCompetency            weakest_skill     = 4;
   ProfileCompetency            strongest_skill   = 5;
@@ -204,7 +265,7 @@ message GetReadinessResponse {
 message ReadinessNextAction {
   string title       = 1;
   string description = 2;
-  string action_type = 3;
+  ProfileActionType action_type = 3;
   string action_url  = 4;
   string skill_key   = 5;
 }
@@ -221,7 +282,7 @@ message CompanyReadiness {
 
 // ProfileStatusResponse replaces the separate LogoutResponse and BindTelegramResponse.
 message ProfileStatusResponse {
-  string status = 1;
+  common.v1.OperationStatus status = 1;
 }
 
 message CreateTelegramAuthChallengeResponse {
@@ -231,7 +292,7 @@ message CreateTelegramAuthChallengeResponse {
 }
 
 message ConfirmTelegramAuthResponse {
-  string status = 1;
+  common.v1.OperationStatus status = 1;
   string code   = 2;
 }
 
@@ -277,9 +338,9 @@ message ProfileCompetency {
   int32  practice_sessions        = 8;
   int32  practice_passed_sessions = 9;
   int32  practice_days            = 10;
-  string confidence               = 11;
+  ProfileCompetencyConfidence confidence = 11;
   double average_score            = 12;
-  string level                    = 13;
+  ProfileCompetencyLevel level    = 13;
   double level_progress           = 14;
   string next_milestone           = 15;
   int32  score_delta_30d          = 16;
@@ -305,14 +366,14 @@ message ProfileCheckpointProgress {
 message NextAction {
   string title       = 1;
   string description = 2;
-  string action_type = 3;
+  ProfileActionType action_type = 3;
   string action_url  = 4;
   int32  priority    = 5;
   string skill_key   = 6;
 }
 
 message UserGoal {
-  string kind    = 1;
+  UserGoalKind kind    = 1;
   string company = 2;
 }
 
@@ -338,14 +399,14 @@ message Achievement {
   string description = 3;
   string icon        = 4;
   bool   unlocked    = 5;
-  string category    = 6;
-  string tier        = 7;
+  AchievementCategory category = 6;
+  AchievementTier     tier     = 7;
   int32  progress    = 8;
   int32  target      = 9;
 }
 
 message FeedItem {
-  string                    type        = 1;
+  FeedItemType              type        = 1;
   string                    title       = 2;
   string                    description = 3;
   int32                     score       = 4;

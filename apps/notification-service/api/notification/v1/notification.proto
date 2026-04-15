@@ -32,11 +32,34 @@ service NotificationService {
   rpc UpdateCircleSettings(UpdateCircleSettingsRequest) returns (UpdateCircleSettingsResponse);
 }
 
+enum NotificationKind {
+  NOTIFICATION_KIND_UNSPECIFIED               = 0;
+  NOTIFICATION_KIND_DUEL_INVITE               = 1;
+  NOTIFICATION_KIND_DUEL_MATCH_FOUND          = 2;
+  NOTIFICATION_KIND_DUEL_RESULT               = 3;
+  NOTIFICATION_KIND_DUEL_WIN_STREAK           = 4;
+  NOTIFICATION_KIND_STREAK_WARNING            = 5;
+  NOTIFICATION_KIND_STREAK_MILESTONE          = 6;
+  NOTIFICATION_KIND_RATING_MILESTONE          = 7;
+  NOTIFICATION_KIND_MOCK_RESULT               = 8;
+  NOTIFICATION_KIND_REVIEW_READY              = 9;
+  NOTIFICATION_KIND_CIRCLE_EVENT_CREATED      = 10;
+  NOTIFICATION_KIND_CIRCLE_EVENT_REMINDER     = 11;
+  NOTIFICATION_KIND_CIRCLE_INVITE             = 12;
+  NOTIFICATION_KIND_CIRCLE_CHALLENGE_COMPLETED = 13;
+  NOTIFICATION_KIND_CIRCLE_MEMBER_JOINED      = 14;
+  NOTIFICATION_KIND_CIRCLE_CHALLENGE_PROGRESS = 15;
+  NOTIFICATION_KIND_CIRCLE_WEEKLY_DIGEST      = 16;
+  NOTIFICATION_KIND_DAILY_CHALLENGE           = 17;
+  NOTIFICATION_KIND_RE_ENGAGEMENT_CIRCLE      = 18;
+  NOTIFICATION_KIND_RE_ENGAGEMENT_PERSONAL    = 19;
+}
+
 // ── Send ──────────────────────────────────────────────────────
 
 message SendRequest {
   string user_id = 1;
-  string kind = 2;
+  NotificationKind kind = 2;
   string title = 3;
   string body = 4;
   google.protobuf.Struct payload = 5;
@@ -51,7 +74,7 @@ message SendResponse {
 
 message SendBatchRequest {
   repeated string user_ids = 1;
-  string kind = 2;
+  NotificationKind kind = 2;
   string title = 3;
   string body = 4;
   google.protobuf.Struct payload = 5;

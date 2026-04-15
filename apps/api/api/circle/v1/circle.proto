@@ -4,6 +4,7 @@ package circle.v1;
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
+import "common/v1/common.proto";
 import "event/v1/event.proto";
 
 option go_package = "api/pkg/api/circle/v1;v1";
@@ -82,6 +83,19 @@ service CircleService {
   }
 }
 
+enum CircleMemberRole {
+  CIRCLE_MEMBER_ROLE_UNSPECIFIED = 0;
+  CIRCLE_MEMBER_ROLE_CREATOR     = 1;
+  CIRCLE_MEMBER_ROLE_MEMBER      = 2;
+}
+
+enum CircleMemberActionType {
+  CIRCLE_MEMBER_ACTION_TYPE_UNSPECIFIED = 0;
+  CIRCLE_MEMBER_ACTION_TYPE_DAILY       = 1;
+  CIRCLE_MEMBER_ACTION_TYPE_DUEL        = 2;
+  CIRCLE_MEMBER_ACTION_TYPE_MOCK        = 3;
+}
+
 message ListCirclesRequest {
   int32 limit = 1;
   int32 offset = 2;
@@ -112,11 +126,11 @@ message CircleResponse {
 }
 
 message JoinCircleResponse {
-  string status = 1;
+  common.v1.OperationStatus status = 1;
 }
 
 message LeaveCircleResponse {
-  string status = 1;
+  common.v1.OperationStatus status = 1;
 }
 
 message InviteToCircleRequest {
@@ -125,7 +139,7 @@ message InviteToCircleRequest {
 }
 
 message InviteToCircleResponse {
-  string status = 1;
+  common.v1.OperationStatus status = 1;
 }
 
 message ListCircleMembersRequest {
@@ -137,7 +151,7 @@ message CircleMember {
   string                    first_name = 2;
   string                    last_name  = 3;
   string                    avatar_url = 4;
-  string                    role       = 5;
+  CircleMemberRole          role       = 5;
   google.protobuf.Timestamp joined_at  = 6;
 }
 
@@ -173,7 +187,7 @@ message DeleteCircleRequest {
 }
 
 message DeleteCircleResponse {
-  string status = 1;
+  common.v1.OperationStatus status = 1;
 }
 
 message Circle {
@@ -206,7 +220,7 @@ message CircleMemberAction {
   string                    first_name    = 2;
   string                    last_name     = 3;
   string                    avatar_url    = 4;
-  string                    action_type   = 5;
+  CircleMemberActionType    action_type   = 5;
   string                    action_detail = 6;
   google.protobuf.Timestamp happened_at   = 7;
 }
@@ -229,7 +243,7 @@ message CircleMemberStatsEntry {
   string                    first_name     = 2;
   string                    last_name      = 3;
   string                    avatar_url     = 4;
-  string                    role           = 5;
+  CircleMemberRole          role           = 5;
   google.protobuf.Timestamp joined_at      = 6;
   int32                     daily_solved   = 7;
   int32                     duels_won      = 8;

@@ -8,6 +8,7 @@ import (
 
 	"api/internal/api/profile/mocks"
 	"api/internal/model"
+	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/profile/v1"
 
 	"github.com/google/uuid"
@@ -116,7 +117,7 @@ func TestConfirmTelegramAuth(t *testing.T) {
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.Status != "ok" {
+	if resp.Status != commonv1.OperationStatus_OPERATION_STATUS_OK {
 		t.Fatalf("expected ok status, got %q", resp.Status)
 	}
 	if resp.Code != "123456" {
