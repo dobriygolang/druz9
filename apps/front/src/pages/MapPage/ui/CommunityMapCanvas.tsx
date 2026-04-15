@@ -220,16 +220,18 @@ export function CommunityMapCanvas({
   }, [mapStyle, onSelectPoint, points, selectedPointId])
 
   return (
-    <div className={`${className ?? ''} relative`}>
-      <div ref={containerRef} className="community-map-shell h-full w-full" />
-      {loadError && (
-        <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#f8fafc]/88 backdrop-blur">
-          <div className="rounded-2xl border border-[#d8d9d6] bg-white px-5 py-4 text-center shadow-lg">
-            <p className="text-sm font-semibold text-[#111111]">{loadError}</p>
-            <p className="mt-1 text-xs text-[#667085]">Проверьте сеть и попробуйте снова.</p>
+    <div className={className ?? ''}>
+      <div className="relative h-full w-full">
+        <div ref={containerRef} className="community-map-shell h-full w-full" />
+        {loadError && (
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#f8fafc]/88 backdrop-blur">
+            <div className="rounded-2xl border border-[#d8d9d6] bg-white px-5 py-4 text-center shadow-lg">
+              <p className="text-sm font-semibold text-[#111111]">{loadError}</p>
+              <p className="mt-1 text-xs text-[#667085]">Проверьте сеть и попробуйте снова.</p>
+            </div>
           </div>
-        </div>
-      )}
+        )}
+      </div>
     </div>
   )
 }
