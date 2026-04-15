@@ -38,6 +38,9 @@ func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.Leade
 		copyItem := item
 		entries = append(entries, &copyItem)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate arena leaderboard rows: %w", err)
+	}
 	return entries, nil
 }
 
@@ -86,6 +89,9 @@ func (r *Repo) GetPlayerStatsBatch(ctx context.Context, userIDs []uuid.UUID) (ma
 			return nil, fmt.Errorf("parse arena player stats user id %q: %w", item.UserID, err)
 		}
 		result[parsedUserID] = &item
+	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate arena player stats rows: %w", err)
 	}
 	return result, nil
 }

@@ -108,6 +108,9 @@ func (r *Repo) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, 
 		copyPlayer := player
 		match.Players = append(match.Players, &copyPlayer)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate arena player rows: %w", err)
+	}
 
 	return &match, nil
 }

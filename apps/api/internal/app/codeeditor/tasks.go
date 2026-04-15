@@ -22,6 +22,9 @@ func (s *Service) GetTask(ctx context.Context, taskID uuid.UUID) (*domain.Task, 
 	if err != nil {
 		return nil, err
 	}
+	if task == nil {
+		return nil, nil
+	}
 	s.taskCache.Set(cacheKey, *task)
 	return task, nil
 }

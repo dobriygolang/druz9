@@ -13,11 +13,14 @@ export function useApi<T>(fetcher: () => Promise<T>, deps: unknown[] = []): UseA
   const [error, setError] = useState<string | null>(null)
   const mountedRef = useRef(true)
 
+  const fetcherRef = useRef(fetcher)
+  fetcherRef.current = fetcher
+
   const fetch = useCallback(async () => {
     setLoading(true)
     setError(null)
     try {
-      const result = await fetcher()
+      const result = await fetcherRef.current()
       if (mountedRef.current) {
         setData(result)
         setError(null)
@@ -33,6 +36,7 @@ export function useApi<T>(fetcher: () => Promise<T>, deps: unknown[] = []): UseA
     } finally {
       if (mountedRef.current) setLoading(false)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, deps)
 
   useEffect(() => {

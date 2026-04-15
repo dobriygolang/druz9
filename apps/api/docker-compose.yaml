@@ -147,6 +147,7 @@ services:
     environment:
       CONFIG_PROFILE: local
       DATABASE_URL: postgresql://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-api}
+      RUN_DB_MIGRATIONS: "false"
     command: ["/app/bin/seed", "-only", "all"]                                                                                                
     networks:
       - api_network

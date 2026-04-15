@@ -96,7 +96,8 @@ export function ArenaMatchPage() {
     if (ws.matchState?.durationSeconds && !timeLeft) {
       setTimeLeft(ws.matchState.durationSeconds)
     }
-  }, [ws.matchState?.durationSeconds])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [ws.matchState?.durationSeconds, timeLeft])
 
   // Navigate away when match ends with a winner
   useEffect(() => {

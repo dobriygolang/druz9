@@ -38,6 +38,9 @@ func (r *Repo) ListTasks(ctx context.Context, filter codeeditordomain.TaskFilter
 		}
 		tasks = append(tasks, &task)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate task rows: %w", err)
+	}
 
 	if len(tasks) > 0 {
 		if err := codetasks.LoadCasesMultiple(ctx, r.data.DB, tasks); err != nil {

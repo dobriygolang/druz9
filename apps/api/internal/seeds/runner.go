@@ -30,9 +30,8 @@ type Record struct {
 }
 
 type Options struct {
-	RunSQL           bool
-	RunBlind75       bool
-	RunInterviewPrep bool
+	RunSQL     bool
+	RunBlind75 bool
 }
 
 type Runner struct {
@@ -64,15 +63,6 @@ func (r *Runner) Run(ctx context.Context, opts Options) ([]Result, error) {
 			return nil, err
 		}
 		results = append(results, blindResult)
-	}
-	if opts.RunInterviewPrep {
-		results = append(results, Result{
-			Name:      "interview_prep_pack",
-			Kind:      seedKindCatalog,
-			Applied:   false,
-			Message:   "interview prep catalog seeding was removed; author content via admin API or migrate existing DB rows",
-			AppliedAt: time.Now().UTC(),
-		})
 	}
 	return results, nil
 }

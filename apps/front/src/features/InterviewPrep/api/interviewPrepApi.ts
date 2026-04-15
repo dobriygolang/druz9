@@ -98,29 +98,27 @@ function normalizeTask(t: BackendTask): InterviewPrepTask {
 /** Normalize session object returned by backend: convert proto enum strings in nested task. */
 function normalizeSession(s: any): any {
   if (!s) return s
-  if (s.task) {
-    s.task = normalizeTask(s.task)
+  return {
+    ...s,
+    task: s.task ? normalizeTask(s.task) : s.task,
   }
-  return s
 }
 
 function normalizeMockStage(stage: any): any {
   if (!stage) return stage
-  if (stage.task) {
-    stage.task = normalizeTask(stage.task)
+  return {
+    ...stage,
+    task: stage.task ? normalizeTask(stage.task) : stage.task,
   }
-  return stage
 }
 
 function normalizeMockSession(session: any): any {
   if (!session) return session
-  if (Array.isArray(session.stages)) {
-    session.stages = session.stages.map(normalizeMockStage)
+  return {
+    ...session,
+    stages: Array.isArray(session.stages) ? session.stages.map(normalizeMockStage) : session.stages,
+    currentStage: session.currentStage ? normalizeMockStage(session.currentStage) : session.currentStage,
   }
-  if (session.currentStage) {
-    session.currentStage = normalizeMockStage(session.currentStage)
-  }
-  return session
 }
 
 export interface SystemDesignPayload {

@@ -105,6 +105,7 @@ export const eventApi = {
       title: payload.title, placeLabel: payload.placeLabel, region: payload.region,
       country: payload.country, city: payload.city, latitude: payload.latitude, longitude: payload.longitude,
       scheduledAt: payload.scheduledAt, description: payload.description, meetingLink: payload.meetingLink,
+      repeat: payload.repeat ?? 'none',
     })
     return normalizeEvent(r.data.event)
   },

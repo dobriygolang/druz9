@@ -92,8 +92,6 @@ func parseOptions(value string) (seeds.Options, error) {
 		opts.RunSQL = true
 	case "blind75":
 		opts.RunBlind75 = true
-	case "interview-prep":
-		opts.RunInterviewPrep = true
 	default:
 		return seeds.Options{}, fmt.Errorf("unsupported -only value %q", value)
 	}

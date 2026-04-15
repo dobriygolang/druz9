@@ -24,6 +24,9 @@ func (r *Repo) getParticipants(ctx context.Context, roomID uuid.UUID) ([]*codeed
 		}
 		participants = append(participants, &p)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate participant rows: %w", err)
+	}
 	return participants, nil
 }
 

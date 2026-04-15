@@ -215,7 +215,7 @@ export function EventsPage() {
       setShowCreate(true)
       ctx.setOpenCreateEvent?.(false)
     }
-  }, [ctx?.openCreateEvent])
+  }, [ctx?.openCreateEvent, ctx?.setOpenCreateEvent])
 
   const handleJoin = async (id: string) => {
     try {

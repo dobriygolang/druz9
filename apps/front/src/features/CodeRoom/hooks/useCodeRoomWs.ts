@@ -111,6 +111,8 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   const [lastRoomUpdate, setLastRoomUpdate] = useState<unknown>(null)
 
   const isRemoteUpdate = useRef(false)
+  const languageRef = useRef(language)
+  languageRef.current = language
 
   // Fast userId→displayName index — avoids reading React state to resolve names
   const displayNameIndex = useRef<Map<string, string>>(new Map())
@@ -316,9 +318,9 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       type: 'update',
       clientId: clientId.current,
       plainText: newCode,
-      language,
+      language: languageRef.current,
     })
-  }, [language])
+  }, [])
 
   const sendDocSync = useCallback((data: string) => {
     socketRef.current?.send({
@@ -333,9 +335,9 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       type: 'persist',
       clientId: clientId.current,
       plainText,
-      language,
+      language: languageRef.current,
     })
-  }, [language])
+  }, [])
 
   const sendLanguageChange = useCallback((lang: string) => {
     setLanguage(lang)

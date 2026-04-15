@@ -3,6 +3,7 @@ package rtc
 import (
 	"context"
 	"encoding/json"
+	stdlog "log"
 	"time"
 )
 
@@ -38,6 +39,7 @@ func SetAndWatch[T any](ctx context.Context, c RealtimeConfig, key Key, callback
 	return SetAndWatchString(ctx, c, key, func(value string) {
 		var parsed T
 		if err := json.Unmarshal([]byte(value), &parsed); err != nil {
+			stdlog.Printf("rtc: failed to unmarshal key %q value %q: %v", key, value, err)
 			return
 		}
 		callback(parsed)

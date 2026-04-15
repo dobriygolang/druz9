@@ -24,8 +24,12 @@ func newFixedWindowLimiter(cfg *config.RateLimit) aegisratelimit.Limiter {
 	window := time.Second
 	blockFor := time.Duration(0)
 	maxWaitTime := time.Duration(0)
+	maxCalls := 100 // sensible default
 
 	if cfg != nil {
+		if cfg.MaxCalls > 0 {
+			maxCalls = cfg.MaxCalls
+		}
 		if cfg.Window > 0 {
 			window = cfg.Window
 		}
@@ -38,7 +42,7 @@ func newFixedWindowLimiter(cfg *config.RateLimit) aegisratelimit.Limiter {
 	}
 
 	return &fixedWindowLimiter{
-		maxCalls:    cfg.MaxCalls,
+		maxCalls:    maxCalls,
 		window:      window,
 		blockFor:    blockFor,
 		maxWaitTime: maxWaitTime,

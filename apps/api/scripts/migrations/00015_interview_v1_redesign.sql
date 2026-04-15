@@ -1,4 +1,5 @@
 -- +goose Up
+-- +goose StatementBegin
 CREATE OR REPLACE FUNCTION stable_uuid(input TEXT)
 RETURNS UUID AS $$
   SELECT (
@@ -9,6 +10,7 @@ RETURNS UUID AS $$
     SUBSTRING(md5(input), 21, 12)
   )::uuid;
 $$ LANGUAGE SQL IMMUTABLE;
+-- +goose StatementEnd
 
 CREATE TABLE interview_tracks (
   id UUID PRIMARY KEY,

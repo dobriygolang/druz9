@@ -79,12 +79,8 @@ func NewService(cfg Config) *Service {
 	if cfg.RuntimeTimeout <= 0 {
 		cfg.RuntimeTimeout = defaultRuntimeTimeout
 	}
-	if !cfg.ReadOnlyRootFS {
-		cfg.ReadOnlyRootFS = true
-	}
-	if !cfg.NoNewPrivileges {
-		cfg.NoNewPrivileges = true
-	}
+	cfg.ReadOnlyRootFS = true
+	cfg.NoNewPrivileges = true
 
 	return &Service{
 		cfg:    cfg,

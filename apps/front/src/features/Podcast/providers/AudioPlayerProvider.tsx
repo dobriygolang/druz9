@@ -51,11 +51,17 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
     setCurrentTime(0)
   }, [])
 
+  const metadataHandlerRef = useRef<(() => void) | null>(null)
+
   const cleanupAudio = useCallback(() => {
     const audio = audioRef.current
     if (!audio) return
     audio.removeEventListener('timeupdate', handleTimeUpdate)
     audio.removeEventListener('ended', handleEnded)
+    if (metadataHandlerRef.current) {
+      audio.removeEventListener('loadedmetadata', metadataHandlerRef.current)
+      metadataHandlerRef.current = null
+    }
     audio.pause()
     audioRef.current = null
   }, [handleTimeUpdate, handleEnded])
@@ -83,9 +89,11 @@ export function AudioPlayerProvider({ children }: { children: ReactNode }) {
       audio.playbackRate = speedRef.current
       audioRef.current = audio
 
-      audio.addEventListener('loadedmetadata', () => {
+      const onMetadata = () => {
         setDuration(Math.floor(audio.duration) || 0)
-      })
+      }
+      metadataHandlerRef.current = onMetadata
+      audio.addEventListener('loadedmetadata', onMetadata)
       audio.addEventListener('timeupdate', handleTimeUpdate)
       audio.addEventListener('ended', handleEnded)
 

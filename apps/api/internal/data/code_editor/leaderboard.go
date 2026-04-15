@@ -65,5 +65,8 @@ func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*codeeditordo
 		}
 		entries = append(entries, &entry)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate leaderboard rows: %w", err)
+	}
 	return entries, nil
 }
