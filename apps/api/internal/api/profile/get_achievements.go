@@ -34,6 +34,9 @@ func (i *Implementation) GetAchievements(ctx context.Context, req *v1.GetAchieve
 			Icon:        a.Icon,
 			Unlocked:    a.Unlocked,
 			Category:    a.Category,
+			Tier:        a.Tier,
+			Progress:    a.Progress,
+			Target:      a.Target,
 		})
 	}
 	return &v1.GetAchievementsResponse{Achievements: out}, nil

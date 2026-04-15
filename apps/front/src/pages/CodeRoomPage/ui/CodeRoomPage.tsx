@@ -15,6 +15,8 @@ import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { getMonacoLanguage, getLanguageLabel } from '@/shared/lib/codeEditorLanguage'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { apiClient } from '@/shared/api/base'
+import { ReviewCard } from '@/features/SolutionReview/ui/ReviewCard'
+import { useSolutionReview } from '@/features/SolutionReview/hooks/useSolutionReview'
 import { useTranslation } from 'react-i18next'
 import type * as Monaco from 'monaco-editor'
 import * as Y from 'yjs'
@@ -196,6 +198,7 @@ export function CodeRoomPage() {
   const [room, setRoom] = useState<Room | null>(null)
   const [running, setRunning] = useState(false)
   const [submitResult, setSubmitResult] = useState<{ isCorrect: boolean; output: string; error: string; submissionId?: string } | null>(null)
+  const { review: solveReview, loading: solveReviewLoading } = useSolutionReview({ submissionId: submitResult?.submissionId })
   const [activeTab, setActiveTab] = useState<'problem' | 'tests'>('problem')
   const [aiTab, setAiTab] = useState<'hints' | 'result' | 'review'>('hints')
   const [hints, setHints] = useState<string[]>([])
@@ -1144,7 +1147,7 @@ export function CodeRoomPage() {
                       {submitResult.output && <pre className="whitespace-pre-wrap text-xs text-[#475569] dark:text-[#94a3b8]">{submitResult.output}</pre>}
                       {submitResult.error && <pre className="mt-2 whitespace-pre-wrap text-xs text-[#ef4444]">{submitResult.error}</pre>}
                     </div>
-                    {/* TODO: integrate ReviewCard here after fixing vendor chunk circularity */}
+                    {submitResult.submissionId && <ReviewCard review={solveReview} loading={solveReviewLoading} showComparison={false} />}
                   </div>
                 ) : (
                   <p className="text-xs text-[#94a3b8]">{t('codeRoom.runResultsPlaceholder')}</p>

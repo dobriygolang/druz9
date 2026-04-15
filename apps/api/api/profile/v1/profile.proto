@@ -103,6 +103,10 @@ service ProfileService {
   rpc GetReadiness(GetReadinessRequest) returns (GetReadinessResponse) {
     option (google.api.http) = { get: "/api/v1/profile/{user_id}/readiness" };
   }
+
+  rpc GetProfileFeed(GetProfileFeedRequest) returns (GetProfileFeedResponse) {
+    option (google.api.http) = { get: "/api/v1/profile/{user_id}/feed" };
+  }
 }
 
 // ── Request messages ───────────────────────────────────────────────────────
@@ -255,6 +259,11 @@ message ProfileProgressOverview {
   double                    average_question_score   = 8;
   int32                     current_streak_days      = 9;
   google.protobuf.Timestamp last_activity_at         = 10;
+  int32                     level                    = 11;
+  double                    level_progress           = 12;
+  int32                     total_xp                 = 13;
+  int32                     longest_streak_days      = 14;
+  int32                     activity_percentile      = 15;
 }
 
 message ProfileCompetency {
@@ -273,6 +282,7 @@ message ProfileCompetency {
   string level                    = 13;
   double level_progress           = 14;
   string next_milestone           = 15;
+  int32  score_delta_30d          = 16;
 }
 
 message ProfileProgressRecommendation {
@@ -329,6 +339,26 @@ message Achievement {
   string icon        = 4;
   bool   unlocked    = 5;
   string category    = 6;
+  string tier        = 7;
+  int32  progress    = 8;
+  int32  target      = 9;
+}
+
+message FeedItem {
+  string                    type        = 1;
+  string                    title       = 2;
+  string                    description = 3;
+  int32                     score       = 4;
+  google.protobuf.Timestamp timestamp   = 5;
+}
+
+message GetProfileFeedRequest {
+  string user_id = 1;
+  int32  limit   = 2;
+}
+
+message GetProfileFeedResponse {
+  repeated FeedItem items = 1;
 }
 
 message GetAchievementsResponse {
@@ -363,4 +393,5 @@ message User {
   repeated string           connected_providers = 14;
   string                    primary_provider    = 15;
   string                    telegram_username   = 16;
+  repeated string           pinned_achievements = 17;
 }

@@ -22,6 +22,11 @@ func mapProfileProgress(p *model.ProfileProgress) *v1.ProfileProgress {
 		AverageStageScore:      ov.AverageStageScore,
 		AverageQuestionScore:   ov.AverageQuestionScore,
 		CurrentStreakDays:      ov.CurrentStreakDays,
+		Level:                  ov.Level,
+		LevelProgress:          ov.LevelProgress,
+		TotalXp:               ov.TotalXP,
+		LongestStreakDays:      ov.LongestStreakDays,
+		ActivityPercentile:     ov.ActivityPercentile,
 	}
 	if ov.LastActivityAt != nil {
 		overview.LastActivityAt = timestamppb.New(*ov.LastActivityAt)
@@ -47,6 +52,7 @@ func mapProfileProgress(p *model.ProfileProgress) *v1.ProfileProgress {
 			Level:                  c.Level,
 			LevelProgress:          c.LevelProgress,
 			NextMilestone:          c.NextMilestone,
+			ScoreDelta_30D:         c.ScoreDelta30d,
 		}
 	}
 

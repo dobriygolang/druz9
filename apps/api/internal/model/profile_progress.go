@@ -13,6 +13,11 @@ type ProfileProgressOverview struct {
 	AverageQuestionScore   float64    `json:"averageQuestionScore"`
 	CurrentStreakDays      int32      `json:"currentStreakDays"`
 	LastActivityAt         *time.Time `json:"lastActivityAt,omitempty"`
+	Level                  int32      `json:"level"`
+	LevelProgress          float64    `json:"levelProgress"`
+	TotalXP                int32      `json:"totalXp"`
+	LongestStreakDays      int32      `json:"longestStreakDays"`
+	ActivityPercentile     int32      `json:"activityPercentile"`
 }
 
 type ProfileCompetency struct {
@@ -31,6 +36,7 @@ type ProfileCompetency struct {
 	Level                  string  `json:"level"`
 	LevelProgress          float64 `json:"levelProgress"`
 	NextMilestone          string  `json:"nextMilestone"`
+	ScoreDelta30d          int32   `json:"scoreDelta30d"`
 }
 
 type ProfileProgressRecommendation struct {
@@ -71,6 +77,15 @@ type NextAction struct {
 type UserGoal struct {
 	Kind    string `json:"kind"`
 	Company string `json:"company"`
+}
+
+// FeedItem represents a single activity event in the user's profile feed.
+type FeedItem struct {
+	Type        string     `json:"type"`
+	Title       string     `json:"title"`
+	Description string     `json:"description"`
+	Score       *int32     `json:"score,omitempty"`
+	Timestamp   time.Time  `json:"timestamp"`
 }
 
 type ProfileProgress struct {

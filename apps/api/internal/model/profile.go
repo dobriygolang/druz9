@@ -90,11 +90,12 @@ type User struct {
 	ActivityStatus     UserActivityStatus
 	IsAdmin            bool
 	IsTrusted          bool
-	ConnectedProviders []string
-	PrimaryProvider    string
-	LastActiveAt       time.Time
-	CreatedAt          time.Time
-	UpdatedAt          time.Time
+	ConnectedProviders   []string
+	PrimaryProvider      string
+	PinnedAchievements   []string
+	LastActiveAt         time.Time
+	CreatedAt            time.Time
+	UpdatedAt            time.Time
 }
 
 type UserGeo struct {

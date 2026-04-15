@@ -54,11 +54,26 @@ func (r *Repo) GetProfileProgress(ctx context.Context, userID uuid.UUID) (*model
 		}
 	}
 
-	streakDays, err := r.loadProfileProgressStreak(ctx, userID, time.Now().UTC())
+	streakDays, longestStreak, err := r.loadProfileProgressStreak(ctx, userID, time.Now().UTC())
 	if err != nil {
 		return nil, err
 	}
 	progress.Overview.CurrentStreakDays = streakDays
+	progress.Overview.LongestStreakDays = longestStreak
+
+	// Compute user-level XP and level
+	totalXP := profiledomain.ComputeUserXP(&progress.Overview)
+	level, levelProgress := profiledomain.ComputeUserLevel(totalXP)
+	progress.Overview.TotalXP = totalXP
+	progress.Overview.Level = level
+	progress.Overview.LevelProgress = levelProgress
+
+	// Compute activity percentile
+	percentile, err := r.loadActivityPercentile(ctx, userID)
+	if err != nil {
+		return nil, err
+	}
+	progress.Overview.ActivityPercentile = percentile
 
 	goal, err := r.LoadUserGoal(ctx, userID)
 	if err != nil {
@@ -308,7 +323,7 @@ func (r *Repo) loadProfileCheckpointProgress(ctx context.Context, userID uuid.UU
 	return []*model.ProfileCheckpointProgress{}, nil
 }
 
-func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, now time.Time) (int32, error) {
+func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, now time.Time) (current int32, longest int32, err error) {
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT DISTINCT DATE(activity_at AT TIME ZONE 'UTC') AS activity_date
 		FROM (
@@ -329,7 +344,7 @@ func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, 
 		ORDER BY activity_date DESC
 	`, userID)
 	if err != nil {
-		return 0, fmt.Errorf("query profile streak: %w", err)
+		return 0, 0, fmt.Errorf("query profile streak: %w", err)
 	}
 	defer rows.Close()
 
@@ -337,15 +352,17 @@ func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, 
 	for rows.Next() {
 		var value time.Time
 		if err := rows.Scan(&value); err != nil {
-			return 0, fmt.Errorf("scan profile streak date: %w", err)
+			return 0, 0, fmt.Errorf("scan profile streak date: %w", err)
 		}
 		dates = append(dates, value.UTC())
 	}
 	if err := rows.Err(); err != nil {
-		return 0, fmt.Errorf("iterate profile streak dates: %w", err)
+		return 0, 0, fmt.Errorf("iterate profile streak dates: %w", err)
 	}
 
-	return profiledomain.ComputeCurrentStreak(dates, now.UTC()), nil
+	current = profiledomain.ComputeCurrentStreak(dates, now.UTC())
+	longest = profiledomain.ComputeLongestStreak(dates)
+	return current, longest, nil
 }
 
 func (r *Repo) loadPracticeStatsBySkill(ctx context.Context, userID uuid.UUID) (map[string]practiceStats, error) {
@@ -454,6 +471,108 @@ func (r *Repo) SaveUserGoal(ctx context.Context, userID uuid.UUID, goal *model.U
 		return fmt.Errorf("save user goal: %w", err)
 	}
 	return nil
+}
+
+// loadActivityPercentile computes the user's 30-day activity percentile among all users.
+func (r *Repo) loadActivityPercentile(ctx context.Context, userID uuid.UUID) (int32, error) {
+	var percentile float64
+	err := r.data.DB.QueryRow(ctx, `
+		WITH user_activity AS (
+			SELECT u.id,
+				(
+					SELECT COUNT(DISTINCT DATE(activity_at AT TIME ZONE 'UTC'))
+					FROM (
+						SELECT finished_at AS activity_at FROM interview_mock_sessions
+						WHERE user_id = u.id AND finished_at IS NOT NULL AND finished_at >= NOW() - INTERVAL '30 days'
+						UNION ALL
+						SELECT COALESCE(s.finished_at, s.updated_at, s.started_at) AS activity_at
+						FROM interview_practice_sessions s
+						WHERE s.user_id = u.id AND COALESCE(s.finished_at, s.updated_at, s.started_at) >= NOW() - INTERVAL '30 days'
+					) a
+				) AS active_days
+			FROM users u
+			WHERE u.status = 'active'
+		)
+		SELECT COALESCE(PERCENT_RANK() OVER (ORDER BY active_days), 0)
+		FROM user_activity
+		WHERE id = $1
+	`, userID).Scan(&percentile)
+	if err != nil {
+		if err == pgx.ErrNoRows {
+			return 0, nil
+		}
+		return 0, fmt.Errorf("load activity percentile: %w", err)
+	}
+	return int32(math.Round(percentile * 100)), nil
+}
+
+// GetProfileFeed returns the most recent activity events for a user.
+func (r *Repo) GetProfileFeed(ctx context.Context, userID uuid.UUID, limit int) ([]*model.FeedItem, error) {
+	if limit <= 0 {
+		limit = 7
+	}
+	rows, err := r.data.DB.Query(ctx, `
+		SELECT type, title, description, score, ts
+		FROM (
+			SELECT
+				'mock_stage' AS type,
+				COALESCE(NULLIF(BTRIM(ms.started_via_alias), ''), b.slug, 'Mock') || ' — ' ||
+					CASE r.round_type
+						WHEN 'coding_algorithmic' THEN 'Algorithms'
+						WHEN 'sql' THEN 'SQL'
+						WHEN 'system_design' THEN 'System Design'
+						WHEN 'code_review' THEN 'Code Review'
+						WHEN 'behavioral' THEN 'Behavioral'
+						ELSE 'Coding'
+					END AS title,
+				'Stage ' || (r.round_index + 1) || '/' || (
+					SELECT COUNT(*) FROM interview_mock_rounds r2 WHERE r2.session_id = ms.id
+				) AS description,
+				r.review_score::int4 AS score,
+				r.updated_at AS ts
+			FROM interview_mock_rounds r
+			JOIN interview_mock_sessions ms ON ms.id = r.session_id
+			LEFT JOIN interview_blueprints b ON b.id = ms.blueprint_id
+			WHERE ms.user_id = $1 AND r.status = 'completed'
+
+			UNION ALL
+
+			SELECT
+				'practice' AS type,
+				CASE i.round_type
+					WHEN 'coding_algorithmic' THEN 'Algorithms'
+					WHEN 'sql' THEN 'SQL'
+					WHEN 'system_design' THEN 'System Design'
+					WHEN 'code_review' THEN 'Code Review'
+					ELSE 'Coding'
+				END || ' practice' AS title,
+				CASE WHEN s.last_submission_passed THEN 'Solved' ELSE 'Attempted' END AS description,
+				NULL::int4 AS score,
+				COALESCE(s.finished_at, s.updated_at) AS ts
+			FROM interview_practice_sessions s
+			JOIN interview_items i ON i.id = s.item_id
+			WHERE s.user_id = $1 AND s.status = 'finished'
+		) feed
+		WHERE ts IS NOT NULL
+		ORDER BY ts DESC
+		LIMIT $2
+	`, userID, limit)
+	if err != nil {
+		return nil, fmt.Errorf("query profile feed: %w", err)
+	}
+	defer rows.Close()
+
+	items := make([]*model.FeedItem, 0, limit)
+	for rows.Next() {
+		var item model.FeedItem
+		var score *int32
+		if err := rows.Scan(&item.Type, &item.Title, &item.Description, &score, &item.Timestamp); err != nil {
+			return nil, fmt.Errorf("scan profile feed item: %w", err)
+		}
+		item.Score = score
+		items = append(items, &item)
+	}
+	return items, rows.Err()
 }
 
 func (r *Repo) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int) (map[string]int, error) {

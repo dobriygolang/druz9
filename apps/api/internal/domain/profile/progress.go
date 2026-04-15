@@ -233,6 +233,62 @@ func RoundTenth(value float64) float64 {
 	return math.Round(value*10) / 10
 }
 
+// ── User-level XP & leveling ─────────────────────────────────────────────
+
+// ComputeUserXP calculates total experience points from the progress overview.
+func ComputeUserXP(ov *model.ProfileProgressOverview) int32 {
+	if ov == nil {
+		return 0
+	}
+	xp := ov.PracticeSessions*10 +
+		ov.PracticePassedSessions*15 +
+		ov.CompletedMockSessions*50 +
+		ov.CompletedMockStages*25 +
+		ov.CurrentStreakDays*5 +
+		ov.PracticeActiveDays*8
+	return xp
+}
+
+// ComputeUserLevel returns the user's level and progress to the next level
+// from the total XP.
+func ComputeUserLevel(totalXP int32) (level int32, progress float64) {
+	if totalXP <= 0 {
+		return 0, 0
+	}
+	level = int32(math.Sqrt(float64(totalXP) / 10))
+	currentThreshold := level * level * 10
+	nextThreshold := (level + 1) * (level + 1) * 10
+	gap := nextThreshold - currentThreshold
+	if gap <= 0 {
+		return level, 0
+	}
+	progress = clampProgress(float64(totalXP-currentThreshold) / float64(gap))
+	return level, progress
+}
+
+// ComputeLongestStreak returns the longest consecutive-day streak from a
+// descending-sorted list of unique activity dates.
+func ComputeLongestStreak(dates []time.Time) int32 {
+	if len(dates) == 0 {
+		return 0
+	}
+	longest := int32(1)
+	current := int32(1)
+	for i := 1; i < len(dates); i++ {
+		prev := TruncateDateUTC(dates[i-1])
+		next := TruncateDateUTC(dates[i])
+		if prev.AddDate(0, 0, -1).Equal(next) {
+			current++
+			if current > longest {
+				longest = current
+			}
+		} else {
+			current = 1
+		}
+	}
+	return longest
+}
+
 // ── Skill levels ──────────────────────────────────────────────────────────
 
 const (

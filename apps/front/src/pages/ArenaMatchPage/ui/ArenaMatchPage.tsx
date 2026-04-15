@@ -11,6 +11,8 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { useAntiCheat } from '@/features/CodeRoom/hooks/useAntiCheat'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
+import { ReviewCard } from '@/features/SolutionReview/ui/ReviewCard'
+import { useSolutionReview } from '@/features/SolutionReview/hooks/useSolutionReview'
 import { useTranslation } from 'react-i18next'
 import type * as Monaco from 'monaco-editor'
 
@@ -44,6 +46,8 @@ export function ArenaMatchPage() {
   const [localCode, setLocalCode] = useState('')
   const [submitting, setSubmitting] = useState(false)
   const [result, setResult] = useState<{ isCorrect: boolean; output: string; error: string; passedCount: number; totalCount: number } | null>(null)
+  const [lastSubmissionId, setLastSubmissionId] = useState<string | undefined>()
+  const { review, loading: reviewLoading } = useSolutionReview({ submissionId: lastSubmissionId })
   const [timeLeft, setTimeLeft] = useState(0)
   const [freezeSeconds, setFreezeSeconds] = useState(0)
   const [antiCheatWarning, setAntiCheatWarning] = useState(false)
@@ -199,6 +203,7 @@ export function ArenaMatchPage() {
     try {
       const r = await apiClient.post<{ isCorrect?: boolean; output?: string; error?: string; passedCount?: number; totalCount?: number; submissionId?: string }>(`/api/v1/arena/matches/${matchId}/submit`, { code: localCode })
       setResult({ isCorrect: r.data.isCorrect ?? false, output: r.data.output ?? '', error: r.data.error ?? '', passedCount: r.data.passedCount ?? 0, totalCount: r.data.totalCount ?? 0 })
+      if (r.data.submissionId) setLastSubmissionId(r.data.submissionId)
     } catch {} finally { setSubmitting(false) }
   }
 
@@ -360,7 +365,7 @@ export function ArenaMatchPage() {
                 ) : (
                   <span className="text-xs text-[#94a3b8]">{t('arena.match.waitingSubmission')}</span>
                 )}
-                {/* TODO: integrate ReviewCard here after fixing vendor chunk circularity */}
+                {lastSubmissionId && <ReviewCard review={review} loading={reviewLoading} showComparison />}
               </div>
             </div>
           ) : (
@@ -579,7 +584,7 @@ export function ArenaMatchPage() {
                 </span>
               ) : <span className="text-xs text-[#94a3b8]">{t('arena.match.waitingSubmission')}</span>}
             </div>
-            {/* TODO: integrate ReviewCard here after fixing vendor chunk circularity */}
+            {lastSubmissionId && <ReviewCard review={review} loading={reviewLoading} showComparison />}
           </div>
         </div>
 

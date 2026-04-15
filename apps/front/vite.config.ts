@@ -35,9 +35,7 @@ function manualChunks(id: string) {
   }
 
   if (
-    pkg === 'react' ||
     pkg === 'react-dom' ||
-    pkg === 'react-router' ||
     pkg === 'react-router-dom' ||
     pkg === 'scheduler'
   ) {
