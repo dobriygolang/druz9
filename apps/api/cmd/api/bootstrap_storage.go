@@ -83,6 +83,6 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 		codeEditorRepo:     codeeditordata.NewRepo(store, bootstrap.kratosLogger),
 		arenaRepo:          arenadata.NewRepo(store, bootstrap.kratosLogger),
 		interviewRepo:      interviewprepdata.New(store, bootstrap.kratosLogger),
-		solutionReviewRepo: solutionreviewdata.NewRepo(store, bootstrap.kratosLogger),
+		solutionReviewRepo: solutionreviewdata.NewRepo(store),
 	}, nil
 }

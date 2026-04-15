@@ -76,6 +76,13 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Model:    bootstrap.cfg.External.AIReview.Model,
 		Timeout:  bootstrap.cfg.External.AIReview.Timeout,
 	})
+	codeReviewService := aireview.NewCodeReviewer(aireview.Config{
+		Provider: bootstrap.cfg.External.AIReview.Provider,
+		BaseURL:  bootstrap.cfg.External.AIReview.BaseURL,
+		APIKey:   bootstrap.cfg.External.AIReview.APIKey,
+		Model:    bootstrap.cfg.External.AIReview.Model,
+		Timeout:  bootstrap.cfg.External.AIReview.Timeout,
+	})
 
 	profileServiceDomain := profiledomainservice.NewProfileService(profiledomainservice.Config{
 		Repository:     storage.profileRepo,
@@ -143,7 +150,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
 	solutionReviewService := solutionreview.New(solutionreview.Config{
 		Repo:      storage.solutionReviewRepo,
-		Reviewer:  aiReviewService,
+		Reviewer:  codeReviewService,
 		Publisher: solutionreview.NewRealtimePublisher(realtimeHub),
 	})
 

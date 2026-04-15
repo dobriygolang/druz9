@@ -6,6 +6,7 @@ import { Button } from '@/shared/ui/Button'
 import { Spinner } from '@/shared/ui/Spinner'
 import { apiClient } from '@/shared/api/base'
 import { useTheme } from '@/app/providers/ThemeProvider'
+import { useTranslation } from 'react-i18next'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
 import { DIFF_LABELS, DIFF_VARIANTS } from '@/shared/lib/taskLabels'
 import { formatDateRu } from '@/shared/lib/dateFormat'
@@ -52,6 +53,7 @@ function normalizeTask(raw: any): DailyTask {
 }
 
 export function DailyChallengePage() {
+  const { t } = useTranslation()
   const { theme } = useTheme()
   const isMobile = useIsMobile()
   const [task, setTask] = useState<DailyTask | null>(null)
@@ -152,7 +154,7 @@ export function DailyChallengePage() {
 
   return (
     <div className="mx-auto w-full max-w-7xl px-4 pt-4 pb-24 md:px-6 md:pb-6">
-      <PageMeta title="Daily Challenge" description="One daily coding task with an editor and AI review." canonicalPath="/daily-challenge" />
+      <PageMeta title={t('daily.meta.title')} description={t('daily.meta.description')} canonicalPath="/daily-challenge" />
       {/* Header bar — full width */}
       <div className={`mb-4 bg-white border dark:bg-[#0f172a] dark:border-[#1e3158] px-5 py-4 ${
         isMobile
@@ -164,7 +166,7 @@ export function DailyChallengePage() {
             <Calendar className="w-4 h-4 text-[#6366F1]" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-[#111111] dark:text-[#f8fafc] leading-tight">Daily Challenge</h1>
+            <h1 className="text-base font-bold text-[#111111] dark:text-[#f8fafc] leading-tight">{t('daily.title')}</h1>
             <p className="text-xs text-[#666666] dark:text-[#94a3b8]">{today}</p>
           </div>
         </div>
@@ -198,7 +200,7 @@ export function DailyChallengePage() {
         </div>
       ) : error ? (
         <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] p-12 text-center">
-          <p className="text-sm text-[#94a3b8]">The daily challenge will appear soon</p>
+          <p className="text-sm text-[#94a3b8]">{t('daily.comingSoon')}</p>
         </div>
       ) : task ? (
         isMobile ? (
@@ -237,7 +239,7 @@ export function DailyChallengePage() {
               />
             </div>
             <Button variant="orange" size="md" onClick={handleSubmit} loading={reviewing} disabled={!code.trim()} className="w-full justify-center rounded-2xl">
-              Submit solution
+              {t('daily.submit')}
             </Button>
             <ReviewPanel review={review} reviewing={reviewing} />
           </div>
@@ -282,7 +284,7 @@ export function DailyChallengePage() {
               </div>
 
               <Button variant="orange" size="md" onClick={handleSubmit} loading={reviewing} disabled={!code.trim()}>
-                Submit solution
+                {t('daily.submit')}
               </Button>
             </div>
 
@@ -299,11 +301,12 @@ export function DailyChallengePage() {
 
 /* ── ReviewPanel sub-component ── */
 function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean }) {
+  const { t } = useTranslation()
   if (reviewing) {
     return (
       <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] p-5 flex items-center gap-3">
         <Spinner size="sm" />
-        <p className="text-sm text-[#666666] dark:text-[#94a3b8]">Analyzing the solution...</p>
+        <p className="text-sm text-[#666666] dark:text-[#94a3b8]">{t('daily.review.analyzing')}</p>
       </div>
     )
   }
@@ -313,15 +316,15 @@ function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean })
         <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] dark:bg-[#1e2a4a] flex items-center justify-center">
           <span className="text-lg">✦</span>
         </div>
-        <p className="text-sm font-medium text-[#111111] dark:text-[#f8fafc]">AI Review</p>
-        <p className="text-xs text-[#94a3b8] leading-relaxed">Submit your solution to receive a detailed code review</p>
+        <p className="text-sm font-medium text-[#111111] dark:text-[#f8fafc]">{t('daily.review.title')}</p>
+        <p className="text-xs text-[#94a3b8] leading-relaxed">{t('daily.review.empty')}</p>
       </div>
     )
   }
   return (
     <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] p-5 flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">AI Review</h3>
+        <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{t('daily.review.title')}</h3>
         {review.score != null && (
           <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
             review.score >= 8 ? 'bg-[#dcfce7] text-[#16a34a]'
@@ -337,7 +340,7 @@ function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean })
       )}
       {Array.isArray(review.strengths) && review.strengths.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold text-[#16a34a] uppercase tracking-widest mb-2">Strengths</p>
+          <p className="text-[10px] font-semibold text-[#16a34a] uppercase tracking-widest mb-2">{t('daily.review.strengths')}</p>
           <ul className="flex flex-col gap-1.5">
             {review.strengths.map((s: string, i: number) => (
               <li key={i} className="text-xs text-[#475569] dark:text-[#94a3b8] flex gap-2">
@@ -349,7 +352,7 @@ function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean })
       )}
       {Array.isArray(review.issues) && review.issues.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold text-[#dc2626] uppercase tracking-widest mb-2">Issues</p>
+          <p className="text-[10px] font-semibold text-[#dc2626] uppercase tracking-widest mb-2">{t('daily.review.issues')}</p>
           <ul className="flex flex-col gap-1.5">
             {review.issues.map((s: string, i: number) => (
               <li key={i} className="text-xs text-[#475569] dark:text-[#94a3b8] flex gap-2">
@@ -361,7 +364,7 @@ function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean })
       )}
       {Array.isArray(review.followUpQuestions) && review.followUpQuestions.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold text-[#6366F1] uppercase tracking-widest mb-2">Follow-up questions</p>
+          <p className="text-[10px] font-semibold text-[#6366F1] uppercase tracking-widest mb-2">{t('daily.review.followups')}</p>
           <ul className="flex flex-col gap-1.5">
             {review.followUpQuestions.map((q: string, i: number) => (
               <li key={i} className="text-xs text-[#475569] dark:text-[#94a3b8] flex gap-2">
