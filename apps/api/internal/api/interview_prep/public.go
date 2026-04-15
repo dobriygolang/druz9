@@ -322,6 +322,8 @@ func toHTTPError(err error) error {
 		errors.Is(err, aireview.ErrInvalidResponse),
 		errors.Is(err, aireview.ErrVisionUnsupported):
 		return kratoserrors.New(502, "AI_REVIEW_FAILED", err.Error())
+	case errors.Is(err, context.DeadlineExceeded):
+		return kratoserrors.New(504, "AI_REVIEW_TIMEOUT", "ai review timed out")
 	default:
 		return kratoserrors.InternalServer("INTERNAL_ERROR", err.Error())
 	}

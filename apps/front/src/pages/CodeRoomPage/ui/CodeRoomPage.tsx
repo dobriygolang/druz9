@@ -249,6 +249,7 @@ export function CodeRoomPage() {
   // Mutable cursor positions for remote users — updated in-place, no widget re-add needed
   const cursorPositionsRef = useRef<Map<string, { line: number; col: number }>>(new Map())
   const awarenessCodeLenRef = useRef<Map<string, number | undefined>>(new Map())
+  const pendingCursorUpdatesRef = useRef<Map<string, { line: number; col: number; codeLen?: number }>>(new Map())
 
   // Left panel resize
   useEffect(() => {
@@ -330,6 +331,24 @@ export function CodeRoomPage() {
     pending.forEach(handleIncomingDocSync)
   }, [handleIncomingDocSync])
 
+  const flushPendingCursorUpdates = useCallback(() => {
+    const editor = editorRef.current
+    const model = editor?.getModel()
+    if (!editor || !model || pendingCursorUpdatesRef.current.size === 0) return
+
+    const localLen = model.getValueLength()
+    pendingCursorUpdatesRef.current.forEach((update, userId) => {
+      if (update.codeLen !== undefined && update.codeLen !== localLen) return
+      const posRef = cursorPositionsRef.current.get(userId)
+      const widget = widgetsRef.current.get(userId)
+      if (!posRef || !widget) return
+      posRef.line = update.line
+      posRef.col = update.col
+      editor.layoutContentWidget(widget)
+      pendingCursorUpdatesRef.current.delete(userId)
+    })
+  }, [])
+
   // WebSocket realtime
   const isDuelRoom = room?.mode === 'ROOM_MODE_DUEL'
   const ws = useCodeRoomWs({
@@ -352,11 +371,15 @@ export function CodeRoomPage() {
     }, [addNotification]),
     onCursorUpdate: useCallback((userId: string, line: number, col: number, remoteCodeLen?: number) => {
       // If the remote side sent a code length that doesn't match ours, their cursor
-      // position was computed on a different code version — skip (stale awareness).
+      // position was computed on a different code version — defer until our model catches up.
       if (remoteCodeLen !== undefined) {
         const localLen = editorRef.current?.getModel()?.getValueLength()
-        if (localLen !== undefined && remoteCodeLen !== localLen) return
+        if (localLen !== undefined && remoteCodeLen !== localLen) {
+          pendingCursorUpdatesRef.current.set(userId, { line, col, codeLen: remoteCodeLen })
+          return
+        }
       }
+      pendingCursorUpdatesRef.current.delete(userId)
       const posRef = cursorPositionsRef.current.get(userId)
       if (posRef && widgetsRef.current.has(userId)) {
         posRef.line = line
@@ -519,7 +542,8 @@ export function CodeRoomPage() {
       next.set(userId, state.codeLen)
     })
     awarenessCodeLenRef.current = next
-  }, [ws.awareness])
+    flushPendingCursorUpdates()
+  }, [ws.awareness, flushPendingCursorUpdates])
 
   // Update room from room_update WS message (fired on join/leave/status change)
   useEffect(() => {
@@ -795,6 +819,7 @@ export function CodeRoomPage() {
       if (oldCode === nextCode) return
 
       currentCodeRef.current = nextCode
+      flushPendingCursorUpdates()
 
       if (isApplyingRemoteDocRef.current) {
         return
@@ -832,9 +857,9 @@ export function CodeRoomPage() {
       schedulePersist(nextCode)
     })
 
-    // Send cursor + selection awareness, track last known position
-    // Throttle to ~30ms with trailing edge so the LAST position is always sent
-    let cursorThrottleTimer: ReturnType<typeof setTimeout> | null = null
+    // Send cursor + selection awareness, track last known position.
+    // Collapse bursts into a single packet per animation frame to keep cursor lag minimal.
+    let cursorThrottleTimer: number | null = null
     let pendingCursorUpdate: (() => void) | null = null
 
     editor.onDidChangeCursorSelection((e) => {
@@ -860,17 +885,17 @@ export function CodeRoomPage() {
         )
       }
 
-      // If no throttle active, send immediately and start cooldown
+      // If no throttle active, send immediately and defer at most one trailing update
+      // to the next animation frame.
       if (!cursorThrottleTimer) {
         send()
-        cursorThrottleTimer = setTimeout(() => {
-          // Fire trailing edge if a newer update arrived during cooldown
+        cursorThrottleTimer = window.requestAnimationFrame(() => {
           if (pendingCursorUpdate) {
             pendingCursorUpdate()
             pendingCursorUpdate = null
           }
           cursorThrottleTimer = null
-        }, 30)
+        })
       } else {
         // Store the latest update to fire on trailing edge
         pendingCursorUpdate = send
@@ -888,7 +913,7 @@ export function CodeRoomPage() {
         }, 2000)
       }
     })
-  }, [theme, schedulePersist, soloDraftTaskId, isDuelRoom, ws.sendAwareness, ws.sendUpdate])
+  }, [theme, schedulePersist, soloDraftTaskId, isDuelRoom, ws.sendAwareness, ws.sendUpdate, flushPendingCursorUpdates])
 
   if (needsGuestName) {
     return <GuestNamePrompt onSubmit={handleGuestNameSubmit} />

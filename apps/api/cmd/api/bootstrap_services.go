@@ -132,6 +132,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Repository:        storage.interviewRepo,
 		Sandbox:           sandboxService,
 		Reviewer:          aiReviewService,
+		AIReviewTimeout:   bootstrap.cfg.External.AIReview.Timeout,
 		MaxImageBytes:     bootstrap.cfg.External.AIReview.MaxImageBytes,
 		ModelCode:         bootstrap.cfg.External.AIReview.ModelCode,
 		ModelArchitecture: bootstrap.cfg.External.AIReview.ModelArchitecture,

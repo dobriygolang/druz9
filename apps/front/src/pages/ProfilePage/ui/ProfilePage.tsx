@@ -489,12 +489,28 @@ export function ProfilePage() {
             <div className="section-enter bg-white rounded-[28px] border border-[#CBCCC9] p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
               <h3 className="text-sm font-semibold text-[#111111] mb-3">Рекомендации</h3>
               <ul className="space-y-2">
-                {progress.recommendations.map((r, i) => (
-                  <li key={i} className="flex items-start gap-2 text-sm text-[#475569]">
-                    <span className="text-[#6366F1] mt-0.5 flex-shrink-0">&rarr;</span>
-                    {r}
-                  </li>
-                ))}
+                {progress.recommendations.map((r, i) => {
+                  if (typeof r === 'string') {
+                    return (
+                      <li key={i} className="flex items-start gap-2 text-sm text-[#475569]">
+                        <span className="text-[#6366F1] mt-0.5 flex-shrink-0">&rarr;</span>
+                        {r}
+                      </li>
+                    )
+                  }
+                  return (
+                    <li key={r.key ?? i} className="flex items-start gap-2 text-sm text-[#475569]">
+                      <span className="text-[#6366F1] mt-0.5 flex-shrink-0">&rarr;</span>
+                      <div>
+                        {r.title && <span className="font-medium text-[#111111] dark:text-[#f8fafc]">{r.title}</span>}
+                        {r.description && <span className="ml-1">{r.description}</span>}
+                        {r.href && (
+                          <a href={r.href} className="ml-1 text-[#6366F1] underline underline-offset-2">{r.href}</a>
+                        )}
+                      </div>
+                    </li>
+                  )
+                })}
               </ul>
             </div>
           )}

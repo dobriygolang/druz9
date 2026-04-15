@@ -5,6 +5,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"net"
 	"strings"
 	"time"
 
@@ -47,6 +48,7 @@ type Config struct {
 	Repository        Repository
 	Sandbox           Sandbox
 	Reviewer          Reviewer
+	AIReviewTimeout   time.Duration
 	MaxImageBytes     int64
 	ModelCode         string
 	ModelArchitecture string
@@ -112,6 +114,7 @@ type Service struct {
 	repo              Repository
 	sandbox           Sandbox
 	reviewer          Reviewer
+	aiReviewTimeout   time.Duration
 	maxImageBytes     int64
 	taskListCache     *cache.TTLCache[[]*model.InterviewPrepTask]
 	codeTaskCache     *cache.TTLCache[*model.CodeTask]
@@ -124,6 +127,7 @@ type Service struct {
 const (
 	minPassingMockStageReviewScore    = 6
 	minPassingMockQuestionReviewScore = 6
+	defaultAIReviewTimeout            = 20 * time.Second
 )
 
 func New(c Config) *Service {
@@ -131,6 +135,7 @@ func New(c Config) *Service {
 		repo:              c.Repository,
 		sandbox:           c.Sandbox,
 		reviewer:          c.Reviewer,
+		aiReviewTimeout:   boundedAIReviewTimeout(c.AIReviewTimeout),
 		maxImageBytes:     maxImageBytesOrDefault(c.MaxImageBytes),
 		taskListCache:     cache.NewTTLCache[[]*model.InterviewPrepTask](8, time.Minute),
 		codeTaskCache:     cache.NewTTLCache[*model.CodeTask](64, 5*time.Minute),
@@ -139,6 +144,13 @@ func New(c Config) *Service {
 		modelFollowup:     strings.TrimSpace(c.ModelFollowup),
 		modelSystemDesign: strings.TrimSpace(c.ModelSystemDesign),
 	}
+}
+
+func boundedAIReviewTimeout(value time.Duration) time.Duration {
+	if value <= 0 || value > defaultAIReviewTimeout {
+		return defaultAIReviewTimeout
+	}
+	return value
 }
 
 func passesMockStageReview(review *aireview.InterviewSolutionReview) bool {
@@ -160,6 +172,66 @@ func passesMockSystemDesignReview(review *aireview.SystemDesignReview) bool {
 		return false
 	}
 	return review.IsRelevant && review.IsPassing && review.Score >= minPassingMockStageReviewScore
+}
+
+func (s *Service) withAIReviewTimeout(ctx context.Context) (context.Context, context.CancelFunc) {
+	timeout := boundedAIReviewTimeout(s.aiReviewTimeout)
+	return context.WithTimeout(ctx, timeout)
+}
+
+func isTransientAIReviewError(err error) bool {
+	if err == nil {
+		return false
+	}
+	if errors.Is(err, context.DeadlineExceeded) {
+		return true
+	}
+	var timeoutErr interface{ Timeout() bool }
+	if errors.As(err, &timeoutErr) && timeoutErr.Timeout() {
+		return true
+	}
+	var netErr net.Error
+	if errors.As(err, &netErr) && netErr.Timeout() {
+		return true
+	}
+	lowerErr := strings.ToLower(err.Error())
+	return strings.Contains(lowerErr, "deadline exceeded") ||
+		strings.Contains(lowerErr, "client.timeout exceeded") ||
+		strings.Contains(lowerErr, "timeout while awaiting")
+}
+
+func timeoutInterviewSolutionReview() *aireview.InterviewSolutionReview {
+	return &aireview.InterviewSolutionReview{
+		Score:      1,
+		Summary:    "AI-проверка не успела завершиться. Решение не засчитано, попробуй отправить ещё раз.",
+		Issues:     []string{"Не удалось получить ответ AI-review в отведённое время."},
+		IsRelevant: false,
+		IsPassing:  false,
+	}
+}
+
+func timeoutInterviewAnswerReview() *aireview.InterviewAnswerReview {
+	return &aireview.InterviewAnswerReview{
+		Score:      1,
+		Summary:    "AI-проверка ответа не успела завершиться. Ответ не засчитан, попробуй отправить его ещё раз.",
+		Gaps:       []string{"Не удалось получить ответ AI-review в отведённое время."},
+		IsRelevant: false,
+		IsPassing:  false,
+	}
+}
+
+func timeoutSystemDesignReview() *aireview.SystemDesignReview {
+	return &aireview.SystemDesignReview{
+		Score:             1,
+		Summary:           "AI-проверка system design не успела завершиться. Этап не засчитан, попробуй отправить ещё раз.",
+		Issues:            []string{"Не удалось получить ответ AI-review в отведённое время."},
+		Disclaimer:        "Предварительная AI-оценка не была получена из-за timeout.",
+		IsRelevant:        false,
+		IsPassing:         false,
+		Strengths:         nil,
+		MissingTopics:     nil,
+		FollowUpQuestions: nil,
+	}
 }
 
 func (s *Service) ListTasks(ctx context.Context, user *model.User) ([]*model.InterviewPrepTask, error) {
@@ -512,7 +584,8 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 	answer = strings.TrimSpace(answer)
 	var review *aireview.InterviewAnswerReview
 	if selfAssessment == model.InterviewPrepSelfAssessmentAnswered && answer != "" && s.reviewer != nil {
-		review, err = s.reviewer.ReviewInterviewAnswer(ctx, aireview.InterviewAnswerReviewRequest{
+		reviewCtx, cancel := s.withAIReviewTimeout(ctx)
+		review, err = s.reviewer.ReviewInterviewAnswer(reviewCtx, aireview.InterviewAnswerReviewRequest{
 			ModelOverride:   s.modelFollowup,
 			Topic:           session.Task.PrepType.String(),
 			TaskTitle:       session.Task.Title,
@@ -520,7 +593,18 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 			ReferenceAnswer: session.CurrentQuestion.Answer,
 			CandidateAnswer: answer,
 		})
+		cancel()
 		if err != nil {
+			if isTransientAIReviewError(err) {
+				nextSession, sessionErr := s.GetSession(ctx, user, session.ID)
+				if sessionErr != nil {
+					return nil, sessionErr
+				}
+				return &QuestionAnswerResult{
+					Review:  timeoutInterviewAnswerReview(),
+					Session: nextSession,
+				}, nil
+			}
 			return nil, fmt.Errorf("reviewer.ReviewInterviewAnswer: %w", err)
 		}
 		if !passesMockQuestionReview(review) {

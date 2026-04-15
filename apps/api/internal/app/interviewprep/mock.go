@@ -266,7 +266,8 @@ func (s *Service) SubmitMockStage(
 	if s.reviewer == nil {
 		return nil, aireview.ErrNotConfigured
 	}
-	review, err := s.reviewer.ReviewInterviewSolution(ctx, aireview.InterviewSolutionReviewRequest{
+	reviewCtx, cancel := s.withAIReviewTimeout(ctx)
+	review, err := s.reviewer.ReviewInterviewSolution(reviewCtx, aireview.InterviewSolutionReviewRequest{
 		ModelOverride:     s.modelOverrideForStage(stage),
 		StageKind:         stage.Kind.String(),
 		TaskTitle:         stage.Task.Title,
@@ -276,7 +277,23 @@ func (s *Service) SubmitMockStage(
 		CandidateCode:     code,
 		CandidateNotes:    notes,
 	})
+	cancel()
 	if err != nil {
+		if isTransientAIReviewError(err) {
+			review = timeoutInterviewSolutionReview()
+			if updateErr := s.repo.UpdateMockStageSubmission(ctx, stage.ID, solveLanguage, code, false, int32(review.Score), review.Summary, model.InterviewPrepMockStageStatusSolving); updateErr != nil {
+				return nil, updateErr
+			}
+			nextSession, sessionErr := s.GetMockSession(ctx, user, session.ID)
+			if sessionErr != nil {
+				return nil, sessionErr
+			}
+			return &MockSubmitResult{
+				Passed:  false,
+				Review:  review,
+				Session: nextSession,
+			}, nil
+		}
 		return nil, err
 	}
 	passed := passesMockStageReview(review)
@@ -334,7 +351,8 @@ func (s *Service) ReviewMockSystemDesign(
 		}
 	}
 
-	review, err := s.reviewer.ReviewSystemDesign(ctx, aireview.SystemDesignReviewRequest{
+	reviewCtx, cancel := s.withAIReviewTimeout(ctx)
+	review, err := s.reviewer.ReviewSystemDesign(reviewCtx, aireview.SystemDesignReviewRequest{
 		ModelOverride:  s.modelOverrideForStage(stage),
 		TaskTitle:      stage.Task.Title,
 		Statement:      stage.Task.Statement,
@@ -348,7 +366,22 @@ func (s *Service) ReviewMockSystemDesign(
 		ImageMIME:      normalizedType,
 		ImageName:      fileName,
 	})
+	cancel()
 	if err != nil {
+		if isTransientAIReviewError(err) {
+			review = timeoutSystemDesignReview()
+			if updateErr := s.repo.UpdateMockStageSubmission(ctx, stage.ID, "", "", false, int32(review.Score), review.Summary, model.InterviewPrepMockStageStatusSolving); updateErr != nil {
+				return nil, updateErr
+			}
+			nextSession, sessionErr := s.GetMockSession(ctx, user, session.ID)
+			if sessionErr != nil {
+				return nil, sessionErr
+			}
+			return &MockSystemDesignReviewResult{
+				Review:  review,
+				Session: nextSession,
+			}, nil
+		}
 		return nil, err
 	}
 	passed := passesMockSystemDesignReview(review)
@@ -393,7 +426,8 @@ func (s *Service) AnswerMockQuestion(ctx context.Context, user *model.User, sess
 	if stage.Task == nil {
 		return nil, ErrTaskNotFound
 	}
-	review, err := s.reviewer.ReviewInterviewAnswer(ctx, aireview.InterviewAnswerReviewRequest{
+	reviewCtx, cancel := s.withAIReviewTimeout(ctx)
+	review, err := s.reviewer.ReviewInterviewAnswer(reviewCtx, aireview.InterviewAnswerReviewRequest{
 		ModelOverride:   s.modelOverrideForFollowup(stage),
 		Topic:           stage.Kind.String(),
 		TaskTitle:       stage.Task.Title,
@@ -401,7 +435,18 @@ func (s *Service) AnswerMockQuestion(ctx context.Context, user *model.User, sess
 		ReferenceAnswer: stage.CurrentQuestion.ReferenceAnswer,
 		CandidateAnswer: answer,
 	})
+	cancel()
 	if err != nil {
+		if isTransientAIReviewError(err) {
+			updatedSession, sessionErr := s.GetMockSession(ctx, user, session.ID)
+			if sessionErr != nil {
+				return nil, sessionErr
+			}
+			return &MockQuestionAnswerResult{
+				Review:  timeoutInterviewAnswerReview(),
+				Session: updatedSession,
+			}, nil
+		}
 		return nil, err
 	}
 	passed := passesMockQuestionReview(review)

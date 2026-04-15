@@ -56,7 +56,7 @@ export interface ProfileProgress {
   competencies: Array<{ name: string; score: number; total: number }>
   strongest: string[]
   weakest: string[]
-  recommendations: string[]
+  recommendations: Array<string | { key?: string; title?: string; description?: string; href?: string }>
   checkpoints: Array<{ title: string; done: boolean }>
   companies: string[]
   mockSessions?: ProfileMockSession[]
