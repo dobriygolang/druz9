@@ -3,14 +3,6 @@ import { Building2 } from 'lucide-react'
 import { Badge } from '@/shared/ui/Badge'
 import type { CompanyReadinessItem } from '../lib/computeReadiness'
 
-const stageKindLabels: Record<string, string> = {
-  slices: 'Algorithms',
-  concurrency: 'Coding',
-  sql: 'SQL',
-  system_design: 'System Design',
-  architecture: 'Code Review',
-}
-
 interface Props {
   readiness: CompanyReadinessItem[]
   className?: string
@@ -40,7 +32,7 @@ export function CompanyReadiness({ readiness, className }: Props) {
         {readiness.map(item => {
           const toneColor = item.tone === 'success' ? '#22c55e' : item.tone === 'warning' ? '#f59e0b' : '#ef4444'
           const toneBg = item.tone === 'success' ? '#F0FDF4' : item.tone === 'warning' ? '#FFFBEB' : '#FEF2F2'
-          const nextLabel = stageKindLabels[item.nextStageKind] || item.nextStageKind
+          const nextLabel = item.nextStageKind ? t(`profile.stage.${item.nextStageKind}`) : ''
           return (
             <div
               key={item.name}

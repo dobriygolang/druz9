@@ -59,8 +59,8 @@ function findClosestMilestone(
 
   if (bestComp) {
     return {
-      icon: <TrendingUp className="h-4 w-4 text-[#6366F1]" />,
-      text: t('profile.milestone.skill', { score: bestComp.comp.score, target: bestComp.targetScore, name: bestComp.comp.label, level: bestComp.label }),
+        icon: <TrendingUp className="h-4 w-4 text-[#6366F1]" />,
+      text: t('profile.milestone.skill', { score: bestComp.comp.score, target: bestComp.targetScore, name: bestComp.comp.label, level: t(`skill.${bestComp.label}`) }),
       progress: bestComp.comp.score,
       total: bestComp.targetScore,
     }

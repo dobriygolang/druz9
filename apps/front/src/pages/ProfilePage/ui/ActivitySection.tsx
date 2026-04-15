@@ -6,14 +6,14 @@ import type { ProfileProgress, FeedItem } from '@/entities/User/model/types'
 import type { ArenaStats } from '../hooks/useProfileData'
 import { computeLeague } from '../lib/computeLevel'
 
-function timeAgo(iso: string): string {
+function timeAgo(iso: string, t: (key: string, options?: Record<string, unknown>) => string): string {
   const diff = Date.now() - new Date(iso).getTime()
   const mins = Math.floor(diff / 60_000)
-  if (mins < 60) return `${mins}m ago`
+  if (mins < 60) return t('profile.feed.minutesAgo', { count: mins })
   const hrs = Math.floor(mins / 60)
-  if (hrs < 24) return `${hrs}h ago`
+  if (hrs < 24) return t('profile.feed.hoursAgo', { count: hrs })
   const days = Math.floor(hrs / 24)
-  return `${days}d ago`
+  return t('profile.feed.daysAgo', { count: days })
 }
 
 interface Props {
@@ -77,7 +77,7 @@ export function ActivitySection({ activity, arenaStats, progress, feed, classNam
                   </div>
                   <span className="shrink-0 text-[10px] text-[#94a3b8]">
                     <Clock className="mr-0.5 inline h-2.5 w-2.5" />
-                    {item.timestamp ? timeAgo(item.timestamp) : ''}
+                    {item.timestamp ? timeAgo(item.timestamp, t) : ''}
                   </span>
                 </div>
               ))}

@@ -50,7 +50,10 @@ export function useProfileData(targetUserId: string | undefined): ProfileData {
 
     const profileReq = authApi.getProfileById(effectiveId)
       .then(p => setUser(p.user))
-      .catch(() => { if (authUserRef.current) setUser(authUserRef.current) })
+      .catch(() => {
+        if (authUserRef.current) setUser(authUserRef.current)
+        else setError('Failed to load profile')
+      })
 
     const progressReq = authApi.getProfileProgress(effectiveId)
       .then(setProgress)
