@@ -2,6 +2,7 @@ package circle
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/model"
 	v1 "api/pkg/api/circle/v1"
@@ -29,5 +30,21 @@ func (i *Implementation) InviteToCircle(ctx context.Context, req *v1.InviteToCir
 	if err := i.service.InviteToCircle(ctx, circleID, user.ID, inviteeID); err != nil {
 		return nil, err
 	}
+
+	// Notify: circle_invite — send to the invitee.
+	if i.notif != nil {
+		go func() {
+			displayName := user.FirstName
+			if displayName == "" {
+				displayName = "Кто-то"
+			}
+			body := fmt.Sprintf("%s пригласил тебя в круг", displayName)
+			i.notif.Send(ctx, inviteeID.String(), "circle_invite", "Приглашение в круг", body, map[string]any{
+				"circle_id":  circleID.String(),
+				"inviter_id": user.ID.String(),
+			})
+		}()
+	}
+
 	return &v1.InviteToCircleResponse{Status: "invited"}, nil
 }

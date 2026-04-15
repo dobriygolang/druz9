@@ -21,11 +21,11 @@ var ProgressSkills = []struct {
 	Key  string
 	Meta ProgressSkillMeta
 }{
-	{Key: model.InterviewPrepMockStageKindSlices.String(), Meta: ProgressSkillMeta{Label: "Algorithms", Href: "/interview-prep?category=algorithm"}},
-	{Key: model.InterviewPrepMockStageKindConcurrency.String(), Meta: ProgressSkillMeta{Label: "Coding", Href: "/interview-prep?category=coding"}},
-	{Key: model.InterviewPrepMockStageKindSQL.String(), Meta: ProgressSkillMeta{Label: "SQL", Href: "/interview-prep?category=sql"}},
-	{Key: model.InterviewPrepMockStageKindArchitecture.String(), Meta: ProgressSkillMeta{Label: "Code Review", Href: "/interview-prep"}},
-	{Key: model.InterviewPrepMockStageKindSystemDesign.String(), Meta: ProgressSkillMeta{Label: "System Design", Href: "/interview-prep?category=system_design"}},
+	{Key: model.InterviewPrepMockStageKindSlices.String(), Meta: ProgressSkillMeta{Label: "Algorithms", Href: "/prepare/interview-prep?category=algorithm"}},
+	{Key: model.InterviewPrepMockStageKindConcurrency.String(), Meta: ProgressSkillMeta{Label: "Coding", Href: "/prepare/interview-prep?category=coding"}},
+	{Key: model.InterviewPrepMockStageKindSQL.String(), Meta: ProgressSkillMeta{Label: "SQL", Href: "/prepare/interview-prep?category=sql"}},
+	{Key: model.InterviewPrepMockStageKindArchitecture.String(), Meta: ProgressSkillMeta{Label: "Code Review", Href: "/prepare/interview-prep"}},
+	{Key: model.InterviewPrepMockStageKindSystemDesign.String(), Meta: ProgressSkillMeta{Label: "System Design", Href: "/prepare/interview-prep?category=system_design"}},
 }
 
 // SkillMetaByKey provides O(1) lookup for skill metadata.
@@ -185,7 +185,7 @@ func RecommendationHref(key string) string {
 	if meta, ok := SkillMetaByKey[key]; ok {
 		return meta.Href
 	}
-	return "/interview-prep"
+	return "/prepare/interview-prep"
 }
 
 // SkillLabel returns the display label for a skill key.

@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Flame, Trophy, Swords, Zap, Users, Copy, Check, Link2 } from 'lucide-react'
+import { Flame, Trophy, Swords, Zap, Users, Copy, Check, Link2, HelpCircle } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { apiClient } from '@/shared/api/base'
@@ -15,6 +15,7 @@ import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useToast } from '@/shared/ui/Toast'
 import { DIFF_LABELS, DIFF_VARIANTS, LANG_LABELS } from '@/shared/lib/taskLabels'
 import { PageMeta } from '@/shared/ui/PageMeta'
+import { ArenaInfoModal } from '@/shared/ui/ArenaInfoModal'
 
 const LEAGUE_COLORS: Record<string, string> = {
   ARENA_LEAGUE_BRONZE: 'text-[#A0785A]',
@@ -55,6 +56,8 @@ export function ArenaHubPage() {
   const [difficulty, setDifficulty] = useState('DIFFICULTY_MEDIUM')
   const [error, setError] = useState<string | null>(null)
   const pollRef = useRef<ReturnType<typeof setInterval> | null>(null)
+
+  const [showInfo, setShowInfo] = useState(false)
 
   // Friendly duel state
   const [creatingDuel, setCreatingDuel] = useState(false)
@@ -398,7 +401,15 @@ export function ArenaHubPage() {
         <Card padding="none">
           <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center justify-between">
             <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{t('arena.leaderboard.title')}</h3>
-            <Trophy className="w-4 h-4 text-[#f59e0b]" />
+            <div className="flex items-center gap-1.5">
+              <button
+                onClick={() => setShowInfo(true)}
+                className="flex h-6 w-6 items-center justify-center rounded-lg text-[#94a3b8] transition-colors hover:bg-[#F2F3F0] hover:text-[#475569] dark:hover:bg-[#1e293b] dark:hover:text-[#e2e8f3]"
+              >
+                <HelpCircle className="w-3.5 h-3.5" />
+              </button>
+              <Trophy className="w-4 h-4 text-[#f59e0b]" />
+            </div>
           </div>
           <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
             {leaderboard.length === 0
@@ -427,6 +438,7 @@ export function ArenaHubPage() {
           </div>
         </Card>
       </div>
+      <ArenaInfoModal open={showInfo} onClose={() => setShowInfo(false)} />
     </div>
   )
 }

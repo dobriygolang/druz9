@@ -99,11 +99,16 @@ type Session struct {
 }
 
 type External struct {
-	Telegram *Telegram `json:"telegram"`
-	Yandex   *Yandex   `json:"yandex"`
-	Geocoder *Geocoder `json:"geocoder"`
-	S3       *S3       `json:"s3"`
-	AIReview *AIReview `json:"ai_review"`
+	Telegram            *Telegram            `json:"telegram"`
+	Yandex              *Yandex              `json:"yandex"`
+	Geocoder            *Geocoder            `json:"geocoder"`
+	S3                  *S3                  `json:"s3"`
+	AIReview            *AIReview            `json:"ai_review"`
+	NotificationService *NotificationService `json:"notification_service"`
+}
+
+type NotificationService struct {
+	Addr string `json:"addr"`
 }
 
 type Telegram struct {

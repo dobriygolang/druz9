@@ -59,11 +59,11 @@ interface UseCodeRoomWsOptions {
   mode?: 'ROOM_MODE_ALL' | 'ROOM_MODE_DUEL'
   enabled?: boolean
   initialLanguage?: string
-  onDocSync?: (data: string) => void
+  onDocSync?: (data: string, clientId?: string) => void
   onLeave?: (userId: string, displayName: string) => void
   onBehaviorEvent?: (userId: string, displayName: string, event: BehaviorEventType) => void
   /** Fired synchronously on every cursor position change — use for direct widget updates without React cycle */
-  onCursorUpdate?: (userId: string, line: number, col: number, remoteCodeLen?: number) => void
+  onCursorUpdate?: (userId: string, line: number, col: number, remoteCodeLen?: number, clientId?: string) => void
 }
 
 export interface SelectionInfo {
@@ -120,6 +120,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
 
   // Fast userId→displayName index — avoids reading React state to resolve names
   const displayNameIndex = useRef<Map<string, string>>(new Map())
+  const clientToUserIndex = useRef<Map<string, string>>(new Map())
 
   // Batch awareness updates into a single React render per animation frame
   const pendingAwareness = useRef<Map<string, { action: 'set'; state: AwarenessState } | { action: 'delete' }>>(new Map())
@@ -171,6 +172,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     if (awarenessPayload) {
       target.send({
         type: 'awareness',
+        clientId: clientId.current,
         awarenessId: awarenessId.current,
         userId: userId ?? guestName ?? 'anonymous',
         data: awarenessPayload,
@@ -219,7 +221,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         break
       }
       case 'doc_sync': {
-        if (msg.data) onDocSyncRef.current?.(msg.data)
+        if (msg.data) onDocSyncRef.current?.(msg.data, msg.clientId)
         break
       }
       case 'awareness': {
@@ -231,6 +233,9 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
           }
 
           const incomingDisplayName = (cursorData.displayName as string) ?? msg.userId!
+          if (msg.clientId) {
+            clientToUserIndex.current.set(msg.clientId, msg.userId!)
+          }
 
           // Explicit disconnect signal
           if (cursorData.active === false) {
@@ -259,7 +264,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
 
           // Fire synchronously — bypasses RAF/React for zero-lag widget repositioning
           if (cursorLine) {
-            onCursorUpdateRef.current?.(msg.userId!, cursorLine, cursorColumn ?? 1, remoteCodeLen)
+            onCursorUpdateRef.current?.(msg.userId!, cursorLine, cursorColumn ?? 1, remoteCodeLen, msg.clientId)
           }
 
           displayNameIndex.current.set(msg.userId!, incomingDisplayName)
@@ -354,6 +359,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       queuedAwarenessPayloadRef.current = null
       pendingAwareness.current.clear()
       displayNameIndex.current.clear()
+      clientToUserIndex.current.clear()
     }
   }, [roomId, userId, enabled, handleMessage, displayName, guestName, flushOutboundQueue])
 
@@ -427,6 +433,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
 
     socketRef.current.send({
       type: 'awareness',
+      clientId: clientId.current,
       awarenessId: awarenessId.current,
       userId: userId ?? guestName ?? 'anonymous',
       data: payload,

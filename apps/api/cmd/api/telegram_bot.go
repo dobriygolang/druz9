@@ -4,11 +4,12 @@ import (
 	"context"
 
 	profiledomain "api/internal/domain/profile"
+	"api/internal/notification"
 	"api/internal/telegrambot"
 )
 
-func startTelegramBotWorker(service *profiledomain.Service) func() error {
-	bot := telegrambot.New(service.BotToken(), service)
+func startTelegramBotWorker(service *profiledomain.Service, notif *notification.Client) func() error {
+	bot := telegrambot.New(service.BotToken(), service, notif)
 	if !bot.Enabled() {
 		return func() error { return nil }
 	}

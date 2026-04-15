@@ -126,7 +126,7 @@ export function InterviewPrepMockSessionPage() {
     interviewPrepApi.getMockSession(sessionId).then((s: any) => {
       setSession(s)
       resetStageState(s)
-    }).catch(() => navigate('/growth/interview-prep'))
+    }).catch(() => navigate('/prepare/interview-prep'))
   }, [sessionId, navigate, resetStageState])
 
   const timerActive = timeLeft > 0
@@ -292,7 +292,7 @@ export function InterviewPrepMockSessionPage() {
           </div>
           <h2 className="text-lg font-bold text-[#f8fafc]">{t('mock.finishedTitle')}</h2>
           <p className="text-sm text-[#94a3b8]">{sessionClosing || t('mock.finishedBody')}</p>
-          <Button variant="secondary" size="sm" onClick={() => isFinished ? navigate('/growth/interview-prep') : setShowLeaveConfirm(true)}>
+          <Button variant="secondary" size="sm" onClick={() => isFinished ? navigate('/prepare/interview-prep') : setShowLeaveConfirm(true)}>
             {t('mock.back')}
           </Button>
         </div>
@@ -419,7 +419,7 @@ export function InterviewPrepMockSessionPage() {
         <PageMeta title={t('mock.meta.title')} description={t('mock.meta.description')} />
         <header className="border-b border-[#1e293b] bg-[#0f172a] px-4 pt-3 pb-4">
           <div className="flex items-start gap-3">
-            <button onClick={() => isFinished ? navigate('/growth/interview-prep') : setShowLeaveConfirm(true)} className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#1e293b] text-[#94a3b8]">
+            <button onClick={() => isFinished ? navigate('/prepare/interview-prep') : setShowLeaveConfirm(true)} className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#1e293b] text-[#94a3b8]">
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="min-w-0 flex-1">
@@ -568,7 +568,7 @@ export function InterviewPrepMockSessionPage() {
       <PageMeta title={t('mock.meta.title')} description={t('mock.meta.description')} />
       <header className="h-[52px] bg-[#0f172a] border-b border-[#1e293b] flex items-center justify-between px-5 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <button onClick={() => isFinished ? navigate('/growth/interview-prep') : setShowLeaveConfirm(true)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#1e293b] text-[#94a3b8] transition-colors">
+          <button onClick={() => isFinished ? navigate('/prepare/interview-prep') : setShowLeaveConfirm(true)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#1e293b] text-[#94a3b8] transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
@@ -706,7 +706,7 @@ export function InterviewPrepMockSessionPage() {
         footer={
           <>
             <Button variant="secondary" size="sm" onClick={() => setShowLeaveConfirm(false)}>{t('mock.continue')}</Button>
-            <Button variant="orange" size="sm" onClick={() => { setShowLeaveConfirm(false); navigate('/growth/interview-prep') }}>{t('mock.finish')}</Button>
+            <Button variant="orange" size="sm" onClick={() => { setShowLeaveConfirm(false); navigate('/prepare/interview-prep') }}>{t('mock.finish')}</Button>
           </>
         }
       >

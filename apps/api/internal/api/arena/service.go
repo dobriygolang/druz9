@@ -7,6 +7,7 @@ import (
 	"api/internal/app/solutionreview"
 	domain "api/internal/domain/arena"
 	"api/internal/model"
+	"api/internal/notification"
 	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/arena/v1"
 
@@ -51,9 +52,10 @@ type Implementation struct {
 	realtime         RealtimePublisher
 	allowGuestAccess func() bool
 	reviewService    ArenaReviewService
+	notif            *notification.Client
 }
 
-func New(service *apparena.Service, realtime RealtimePublisher, allowGuestAccess func() bool, reviewService ArenaReviewService) *Implementation {
+func New(service *apparena.Service, realtime RealtimePublisher, allowGuestAccess func() bool, reviewService ArenaReviewService, notif *notification.Client) *Implementation {
 	if allowGuestAccess == nil {
 		allowGuestAccess = func() bool { return false }
 	}
@@ -62,6 +64,7 @@ func New(service *apparena.Service, realtime RealtimePublisher, allowGuestAccess
 		realtime:         realtime,
 		allowGuestAccess: allowGuestAccess,
 		reviewService:    reviewService,
+		notif:            notif,
 	}
 }
 

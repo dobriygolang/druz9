@@ -170,7 +170,7 @@ func buildNextAction(p *model.ProfileProgress, weakest *model.ProfileCompetency)
 			Title:       "Пройди первый mock interview",
 			Description: "У тебя уже есть базовая практика. Mock interview покажет реальный уровень.",
 			ActionType:  "mock",
-			ActionURL:   "/growth/interview-prep",
+			ActionURL:   "/prepare/interview-prep",
 			SkillKey:    "",
 		}
 	}
@@ -194,7 +194,7 @@ func buildNextAction(p *model.ProfileProgress, weakest *model.ProfileCompetency)
 			Title:       "Подтверди навык: " + weakest.Label,
 			Description: "Practice volume набран — пройди checkpoint, чтобы зафиксировать результат.",
 			ActionType:  "checkpoint",
-			ActionURL:   "/growth/interview-prep",
+			ActionURL:   "/prepare/interview-prep",
 			SkillKey:    weakest.Key,
 		}
 	}

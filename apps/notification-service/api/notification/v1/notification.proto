@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package notification.v1;
+
+option go_package = "notification-service/pkg/notification/v1;v1";
+
+import "google/protobuf/struct.proto";
+import "google/protobuf/timestamp.proto";
+
+// NotificationService is an internal gRPC service for sending notifications.
+// No HTTP annotations — used only for service-to-service communication.
+service NotificationService {
+  // Send enqueues a single notification for delivery.
+  rpc Send(SendRequest) returns (SendResponse);
+
+  // SendBatch enqueues notifications for multiple users (e.g. circle fan-out).
+  rpc SendBatch(SendBatchRequest) returns (SendBatchResponse);
+
+  // RegisterChat links a Telegram chat ID to a user.
+  rpc RegisterChat(RegisterChatRequest) returns (RegisterChatResponse);
+
+  // UpdateSettings updates a user's notification preferences.
+  rpc UpdateSettings(UpdateSettingsRequest) returns (UpdateSettingsResponse);
+
+  // GetSettings returns a user's notification preferences.
+  rpc GetSettings(GetSettingsRequest) returns (GetSettingsResponse);
+
+  // UpdateCircleSettings updates per-circle notification preferences.
+  rpc UpdateCircleSettings(UpdateCircleSettingsRequest) returns (UpdateCircleSettingsResponse);
+}
+
+// ── Send ──────────────────────────────────────────────────────
+
+message SendRequest {
+  string user_id = 1;
+  string kind = 2;
+  string title = 3;
+  string body = 4;
+  google.protobuf.Struct payload = 5;
+  google.protobuf.Timestamp schedule_at = 6;
+}
+
+message SendResponse {
+  string notification_id = 1;
+}
+
+// ── SendBatch ─────────────────────────────────────────────────
+
+message SendBatchRequest {
+  repeated string user_ids = 1;
+  string kind = 2;
+  string title = 3;
+  string body = 4;
+  google.protobuf.Struct payload = 5;
+}
+
+message SendBatchResponse {
+  int32 enqueued = 1;
+}
+
+// ── RegisterChat ──────────────────────────────────────────────
+
+message RegisterChatRequest {
+  string user_id = 1;
+  int64 telegram_chat_id = 2;
+}
+
+message RegisterChatResponse {}
+
+// ── Settings ──────────────────────────────────────────────────
+
+message UpdateSettingsRequest {
+  string user_id = 1;
+  optional bool duels_enabled = 2;
+  optional bool progress_enabled = 3;
+  optional bool circles_enabled = 4;
+  optional bool daily_challenge_enabled = 5;
+  optional int32 quiet_hours_start = 6;
+  optional int32 quiet_hours_end = 7;
+  optional string timezone = 8;
+}
+
+message UpdateSettingsResponse {}
+
+message GetSettingsRequest {
+  string user_id = 1;
+}
+
+message GetSettingsResponse {
+  bool duels_enabled = 1;
+  bool progress_enabled = 2;
+  bool circles_enabled = 3;
+  bool daily_challenge_enabled = 4;
+  int32 quiet_hours_start = 5;
+  int32 quiet_hours_end = 6;
+  string timezone = 7;
+  int64 telegram_chat_id = 8;
+}
+
+// ── Circle Settings ───────────────────────────────────────────
+
+message UpdateCircleSettingsRequest {
+  string user_id = 1;
+  string circle_id = 2;
+  optional bool events_enabled = 3;
+  optional bool activity_enabled = 4;
+  optional bool digest_enabled = 5;
+  optional bool muted = 6;
+}
+
+message UpdateCircleSettingsResponse {}

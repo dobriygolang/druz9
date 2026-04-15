@@ -242,7 +242,7 @@ export function JourneyPage() {
                       </span>
                       {cr.hasActive && (
                         <Link
-                          to="/growth/interview-prep"
+                          to="/prepare/interview-prep"
                           className="text-xs font-semibold text-[#6366F1] hover:underline"
                         >
                           {t('journey.continue', 'Continue')}
@@ -264,7 +264,7 @@ export function JourneyPage() {
               {[
                 { href: '/daily-challenge', icon: <Flame className="h-4 w-4 text-orange-500" />, label: t('journey.quick.daily', 'Daily Challenge') },
                 { href: '/practice/arena', icon: <Swords className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.arena', 'Duel') },
-                { href: '/growth/interview-prep', icon: <BookOpen className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.mock', 'Mock Interview') },
+                { href: '/prepare/interview-prep', icon: <BookOpen className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.mock', 'Mock Interview') },
                 { href: '/practice/solo', icon: <Code2 className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.practice', 'Practice') },
               ].map((item) => (
                 <Link

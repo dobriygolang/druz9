@@ -3,8 +3,9 @@ package config
 import "time"
 
 type Bootstrap struct {
-	Server *Server `json:"server"`
-	Data   *Data   `json:"data"`
+	Server   *Server   `json:"server"`
+	Data     *Data     `json:"data"`
+	Telegram *Telegram `json:"telegram"`
 }
 
 type Server struct {
@@ -28,4 +29,8 @@ type Data struct {
 
 type Database struct {
 	Source string `json:"source"`
+}
+
+type Telegram struct {
+	BotToken string `json:"bot_token"`
 }

@@ -12,25 +12,41 @@ import { Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/ui/Toast'
 import { PageMeta } from '@/shared/ui/PageMeta'
 import { GoalSelector } from '@/shared/ui/GoalSelector'
-import { NextActionCard } from '@/shared/ui/NextActionCard'
 import { useProfileData, type ArenaStats } from '../hooks/useProfileData'
 import { computeCompanyReadiness } from '../lib/computeReadiness'
 import { ProfileHero } from './ProfileHero'
 import { ProfileComparison } from './ProfileComparison'
-import { NextMilestone } from './NextMilestone'
 import { StrengthRadar } from './StrengthRadar'
 import { CompanyReadiness } from './CompanyReadiness'
 import { ActivitySection } from './ActivitySection'
 import { AchievementShowcase } from './AchievementShowcase'
 
+const PINNED_STORAGE_KEY = 'druz9_pinned_achievements'
+
+function loadPinnedIds(userId: string): string[] {
+  try {
+    const raw = localStorage.getItem(`${PINNED_STORAGE_KEY}_${userId}`)
+    if (!raw) return []
+    const parsed = JSON.parse(raw)
+    return Array.isArray(parsed) ? parsed : []
+  } catch {
+    return []
+  }
+}
+
+function savePinnedIds(userId: string, ids: string[]) {
+  try {
+    localStorage.setItem(`${PINNED_STORAGE_KEY}_${userId}`, JSON.stringify(ids))
+  } catch { /* ignore quota errors */ }
+}
+
 function LoadingProfile() {
   return (
     <div className="animate-pulse space-y-4 px-4 pb-6 pt-4 md:p-6">
       <div className="h-[220px] rounded-[32px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
-      <div className="h-16 rounded-[22px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="h-[360px] rounded-[28px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
-        <div className="h-[360px] rounded-[28px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
+        <div className="h-[300px] rounded-[28px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
+        <div className="h-[300px] rounded-[28px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
       </div>
     </div>
   )
@@ -56,6 +72,7 @@ export function ProfilePage() {
     refetch,
   } = useProfileData(userId)
 
+  // ── Local state ────────────────────────────────────────────────
   const [myProgress, setMyProgress] = useState<typeof progress>(null)
   const [myArenaStats, setMyArenaStats] = useState<ArenaStats | null>(null)
   const [editMode, setEditMode] = useState(false)
@@ -68,12 +85,18 @@ export function ProfilePage() {
   const [showTgCodeModal, setShowTgCodeModal] = useState(false)
   const [submittingTgCode, setSubmittingTgCode] = useState(false)
   const [pinnedIds, setPinnedIds] = useState<string[]>([])
+  const [goalOverride, setGoalOverride] = useState<{ kind: 'general_growth' | 'weakest_first' | 'company_prep'; company: string } | undefined>(undefined)
+  const [showGoalSelector, setShowGoalSelector] = useState(false)
 
+  // Load pinned achievements from localStorage
   useEffect(() => {
-    setPinnedIds(user?.pinnedAchievements ?? [])
+    if (user?.id) {
+      setPinnedIds(loadPinnedIds(user.id))
+    }
     setEditWorkplace(user?.currentWorkplace ?? '')
   }, [user])
 
+  // Fetch comparison data for foreign profiles
   useEffect(() => {
     if (isOwn || !authUser?.id) {
       setMyProgress(null)
@@ -91,29 +114,36 @@ export function ProfilePage() {
 
   const readiness = useMemo(() => (progress ? computeCompanyReadiness(progress) : []), [progress])
 
+  // The active goal: use local override if set, otherwise from fetched progress
+  const activeGoal = goalOverride ?? progress?.goal
+
+  // ── Goal selector — optimistic update ──────────────────────────
   const handleGoalChange = async (newGoal: { kind: string; company?: string }) => {
+    // Optimistically update the UI immediately
+    const typedGoal = { kind: newGoal.kind as 'general_growth' | 'weakest_first' | 'company_prep', company: newGoal.company ?? '' }
+    setGoalOverride(typedGoal)
     try {
       await authApi.setUserGoal(newGoal)
-      refetch()
+      // Don't refetch here — cache would return stale data.
+      // The local override keeps UI correct until next full load.
     } catch {
+      // Revert on failure
+      setGoalOverride(undefined)
       toast(t('common.saveFailed'), 'error')
     }
   }
 
-  const handlePinToggle = async (id: string) => {
+  // ── Pin achievements — localStorage backed ─────────────────────
+  const handlePinToggle = (id: string) => {
+    if (!user) return
     const next = pinnedIds.includes(id)
       ? pinnedIds.filter(item => item !== id)
       : [...pinnedIds, id].slice(0, 4)
     setPinnedIds(next)
-    try {
-      if (user) {
-        await authApi.updatePinnedAchievements(user.id, next)
-      }
-    } catch {
-      toast(t('profile.pinSaveFailed'), 'error')
-    }
+    savePinnedIds(user.id, next)
   }
 
+  // ── Edit profile ───────────────────────────────────────────────
   const openEdit = () => {
     setEditWorkplace(user?.currentWorkplace ?? '')
     setEditMode(true)
@@ -133,6 +163,7 @@ export function ProfilePage() {
     }
   }
 
+  // ── Telegram binding ───────────────────────────────────────────
   const bindTelegram = async () => {
     setBindingProvider('telegram')
     setBindError('')
@@ -179,21 +210,15 @@ export function ProfilePage() {
     }
   }
 
-  if (error) {
-    return <ErrorState message={error} onRetry={refetch} />
-  }
+  // ── Render states ──────────────────────────────────────────────
+  if (error) return <ErrorState message={error} onRetry={refetch} />
+  if (loading) return <LoadingProfile />
+  if (!user) return (
+    <div className="flex items-center justify-center h-64 text-[#94a3b8] text-sm">{t('profile.notFound')}</div>
+  )
 
-  if (loading) {
-    return <LoadingProfile />
-  }
-
-  if (!user) {
-    return (
-      <div className="flex items-center justify-center h-64 text-[#94a3b8] text-sm">
-        {t('profile.notFound')}
-      </div>
-    )
-  }
+  const hasCompetencies = (progress?.competencies?.length ?? 0) > 0
+  const hasReadiness = readiness.length > 0
 
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 pb-6 pt-4 md:gap-5 md:p-6">
@@ -203,6 +228,7 @@ export function ProfilePage() {
         canonicalPath={userId ? `/profile/${userId}` : '/profile'}
       />
 
+      {/* ── Hero ──────────────────────────────────────────────── */}
       <ProfileHero
         user={user}
         progress={progress}
@@ -215,6 +241,7 @@ export function ProfilePage() {
         bindError={bindError}
       />
 
+      {/* ── Comparison strip (foreign profile only) ───────────── */}
       {!isOwn && (
         <ProfileComparison
           theirProgress={progress}
@@ -225,43 +252,46 @@ export function ProfilePage() {
         />
       )}
 
-      <NextMilestone achievements={achievements} competencies={progress?.competencies ?? []} isOwn={isOwn} />
-
-      {isOwn && progress?.goal && (
-        <div className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
-          <GoalSelector goal={progress.goal} companies={progress.companies} onChange={handleGoalChange} />
+      {/* ── Goal selector (own profile, collapsible) ──────────── */}
+      {isOwn && activeGoal && (
+        <div className="section-enter">
+          {showGoalSelector ? (
+            <div className="rounded-[20px] border border-[#CBCCC9] bg-white p-4 dark:border-[#1a2540] dark:bg-[#161c2d]">
+              <GoalSelector goal={activeGoal} companies={progress?.companies ?? []} onChange={handleGoalChange} />
+              <button
+                onClick={() => setShowGoalSelector(false)}
+                className="mt-2 text-xs text-[#94a3b8] hover:text-[#475569] dark:hover:text-[#7e93b0]"
+              >
+                {t('common.close')}
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowGoalSelector(true)}
+              className="inline-flex items-center gap-2 rounded-full border border-[#E7E8E5] bg-white px-3 py-1.5 text-xs font-medium text-[#475569] transition-colors hover:border-[#6366F1] hover:text-[#6366F1] dark:border-[#1e3158] dark:bg-[#161c2d] dark:text-[#7e93b0] dark:hover:border-[#818cf8] dark:hover:text-[#818cf8]"
+            >
+              {t('goal.label')}: {t(`goal.${activeGoal.kind === 'general_growth' ? 'generalGrowth' : activeGoal.kind === 'weakest_first' ? 'weakAreas' : 'company'}`)}
+              {activeGoal.kind === 'company_prep' && activeGoal.company ? ` · ${activeGoal.company}` : ''}
+            </button>
+          )}
         </div>
       )}
 
-      <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-        <StrengthRadar
-          competencies={progress?.competencies ?? []}
-          strongest={progress?.strongest ?? []}
-          weakest={progress?.weakest ?? []}
-        />
-        <CompanyReadiness readiness={readiness} />
-      </div>
-
-      {progress?.nextActions && progress.nextActions.length > 0 && (
-        <div className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
-          <div className="mb-4">
-            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.progress.nextSteps')}</h3>
-            <p className="mt-1 text-xs text-[#94a3b8]">{t('profile.progress.nextStepsSubtitle')}</p>
-          </div>
-          <div className="flex flex-col gap-2">
-            {progress.nextActions.map((action, i) => (
-              <NextActionCard
-                key={`${action.skillKey}-${i}`}
-                title={action.title}
-                description={action.description}
-                actionType={action.actionType}
-                href={action.actionUrl}
-              />
-            ))}
-          </div>
+      {/* ── Skills + Readiness (2-column) ─────────────────────── */}
+      {(hasCompetencies || hasReadiness) && (
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+          {hasCompetencies && (
+            <StrengthRadar
+              competencies={progress!.competencies}
+              strongest={progress!.strongest}
+              weakest={progress!.weakest}
+            />
+          )}
+          {hasReadiness && <CompanyReadiness readiness={readiness} />}
         </div>
       )}
 
+      {/* ── Activity + Arena (2-column) ───────────────────────── */}
       <ActivitySection
         activity={activity}
         arenaStats={arenaStats}
@@ -269,13 +299,17 @@ export function ProfilePage() {
         feed={feed}
       />
 
-      <AchievementShowcase
-        achievements={achievements}
-        pinnedIds={pinnedIds}
-        isOwn={isOwn}
-        onTogglePin={isOwn ? handlePinToggle : undefined}
-      />
+      {/* ── Achievements ──────────────────────────────────────── */}
+      {achievements.length > 0 && (
+        <AchievementShowcase
+          achievements={achievements}
+          pinnedIds={pinnedIds}
+          isOwn={isOwn}
+          onTogglePin={isOwn ? handlePinToggle : undefined}
+        />
+      )}
 
+      {/* ── Edit Profile Modal ────────────────────────────────── */}
       <Modal
         open={editMode}
         onClose={() => setEditMode(false)}
@@ -301,12 +335,10 @@ export function ProfilePage() {
         </div>
       </Modal>
 
+      {/* ── Telegram Binding Modal ────────────────────────────── */}
       <Modal
         open={showTgCodeModal}
-        onClose={() => {
-          setShowTgCodeModal(false)
-          setTgCode('')
-        }}
+        onClose={() => { setShowTgCodeModal(false); setTgCode('') }}
         title={t('profile.telegramModal.title')}
         footer={
           <>
@@ -320,9 +352,7 @@ export function ProfilePage() {
         }
       >
         <div className="flex flex-col gap-3">
-          <p className="text-sm text-[#666666] dark:text-[#7e93b0]">
-            {t('profile.telegramModal.body')}
-          </p>
+          <p className="text-sm text-[#666666] dark:text-[#7e93b0]">{t('profile.telegramModal.body')}</p>
           <Input
             label={t('profile.telegramModal.code')}
             value={tgCode}

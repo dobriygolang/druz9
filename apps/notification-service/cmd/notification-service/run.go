@@ -10,6 +10,10 @@ import (
 	appLogger "notification-service/internal/logger"
 	"notification-service/internal/rtc"
 	"notification-service/internal/server"
+	"notification-service/internal/service"
+	"notification-service/internal/telegram"
+	"notification-service/internal/worker"
+	v1 "notification-service/pkg/notification/v1"
 
 	"github.com/go-kratos/kratos/v2"
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -45,7 +49,6 @@ func newApp() (*kratos.App, *appLogger.Logger, error) {
 		rtcCleanup()
 		return nil
 	})
-	_ = realtimeConfig.GetValue(context.Background(), rtc.NotificationDeliveryWorkers)
 
 	dataLayer, cleanup, err := data.NewData(cfg.Data)
 	if err != nil {
@@ -56,16 +59,42 @@ func newApp() (*kratos.App, *appLogger.Logger, error) {
 		return nil
 	})
 
-	httpServer := server.NewHTTPServer(cfg.Server.HTTP.Addr, cfg.Server.HTTP.Timeout, kratosLogger)
+	// Telegram client.
+	tgClient := telegram.NewClient(cfg.Telegram.BotToken)
+
+	// Repository.
+	repo := data.NewRepo(dataLayer)
+
+	// Service.
+	svc := service.New(repo, tgClient)
+
+	// gRPC server with notification service registration.
 	grpcServer := server.NewGRPCServer(cfg.Server.GRPC.Addr, cfg.Server.GRPC.Timeout, kratosLogger)
+	notifServer := server.NewNotificationServer(svc)
+	v1.RegisterNotificationServiceServer(grpcServer, notifServer)
+
+	// HTTP server (health checks, future use).
+	httpServer := server.NewHTTPServer(cfg.Server.HTTP.Addr, cfg.Server.HTTP.Timeout, kratosLogger)
+
+	// Delivery workers.
+	workerCount := 2
+	if wc := realtimeConfig.GetValue(context.Background(), rtc.NotificationDeliveryWorkers).Uint64(); wc > 0 {
+		workerCount = int(wc)
+	}
+
+	deliveryWorker := worker.NewDeliveryWorker(repo, tgClient, svc)
+	workerCtx, workerCancel := context.WithCancel(context.Background())
+	go deliveryWorker.Run(workerCtx, workerCount)
+	closer.AddSync(func() error {
+		workerCancel()
+		return nil
+	})
 
 	app := kratos.New(
 		kratos.Name("notification-service"),
 		kratos.Server(httpServer, grpcServer),
 		kratos.Logger(kratosLogger),
 	)
-
-	_ = dataLayer
 
 	return app, logger, nil
 }

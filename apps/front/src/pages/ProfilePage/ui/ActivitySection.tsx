@@ -1,7 +1,9 @@
+import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Trophy, Swords, Clock } from 'lucide-react'
+import { Trophy, Swords, Clock, HelpCircle } from 'lucide-react'
 import { ActivityHeatmap } from '@/shared/ui/ActivityHeatmap'
 import { Badge } from '@/shared/ui/Badge'
+import { ArenaInfoModal } from '@/shared/ui/ArenaInfoModal'
 import type { ProfileProgress, FeedItem } from '@/entities/User/model/types'
 import type { ArenaStats } from '../hooks/useProfileData'
 import { leagueFromEnum } from '../lib/computeLevel'
@@ -26,6 +28,7 @@ interface Props {
 
 export function ActivitySection({ activity, arenaStats, progress, feed, className }: Props) {
   const { t } = useTranslation()
+  const [showInfo, setShowInfo] = useState(false)
   const leagueLabel = t(`profile.leagueLabel.${leagueFromEnum(arenaStats?.league)}`)
 
   return (
@@ -45,13 +48,7 @@ export function ActivitySection({ activity, arenaStats, progress, feed, classNam
               </div>
             )}
           </div>
-          {activity.length > 0 ? (
-            <ActivityHeatmap activity={activity} />
-          ) : (
-            <div className="flex h-20 items-center justify-center rounded-xl bg-[#F2F3F0] dark:bg-[#0f1629]">
-              <p className="text-xs text-[#94a3b8]">{t('profile.activity.empty')}</p>
-            </div>
-          )}
+          <ActivityHeatmap activity={activity} />
         </div>
 
         {/* Feed */}
@@ -88,7 +85,15 @@ export function ActivitySection({ activity, arenaStats, progress, feed, classNam
 
       {/* Right: Arena summary */}
       <div className="section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
-        <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.arena.title')}</h3>
+        <div className="flex items-center justify-between">
+          <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.arena.title')}</h3>
+          <button
+            onClick={() => setShowInfo(true)}
+            className="flex h-6 w-6 items-center justify-center rounded-lg text-[#94a3b8] transition-colors hover:bg-[#F2F3F0] hover:text-[#475569] dark:hover:bg-[#1e293b] dark:hover:text-[#e2e8f3]"
+          >
+            <HelpCircle className="w-3.5 h-3.5" />
+          </button>
+        </div>
         <p className="mt-1 text-xs text-[#94a3b8]">{t('profile.arena.subtitle')}</p>
 
         {arenaStats ? (
@@ -140,6 +145,7 @@ export function ActivitySection({ activity, arenaStats, progress, feed, classNam
           </div>
         )}
       </div>
+      <ArenaInfoModal open={showInfo} onClose={() => setShowInfo(false)} />
     </div>
   )
 }

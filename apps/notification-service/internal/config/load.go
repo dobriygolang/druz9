@@ -50,6 +50,12 @@ func Load() (*Bootstrap, error) {
 		return nil, fmt.Errorf("DATABASE_URL is required")
 	}
 
+	if v, err := envOrFile("TELEGRAM_BOT_TOKEN"); err != nil {
+		return nil, err
+	} else if v != "" {
+		cfg.Telegram.BotToken = v
+	}
+
 	return cfg, nil
 }
 
@@ -68,6 +74,7 @@ func defaultBootstrap() *Bootstrap {
 		Data: &Data{
 			Database: &Database{},
 		},
+		Telegram: &Telegram{},
 	}
 }
 

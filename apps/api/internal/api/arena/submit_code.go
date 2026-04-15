@@ -2,6 +2,7 @@ package arena
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/app/solutionreview"
 	"api/internal/metrics"
@@ -55,6 +56,27 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 				TaskDifficulty: match.Task.Difficulty.String(),
 			}
 			_, _ = i.reviewService.StartReview(ctx, input)
+		}()
+	}
+
+	// Notify: duel_result — when match finishes, notify both players.
+	if i.notif != nil && match != nil && match.Status == model.ArenaMatchStatusFinished {
+		go func() {
+			for _, p := range match.Players {
+				var body string
+				if match.WinnerUserID != nil && *match.WinnerUserID == p.UserID {
+					body = fmt.Sprintf("Ты победил в дуэли! Тема: %s", match.Topic)
+				} else if match.WinnerUserID != nil {
+					body = fmt.Sprintf("Дуэль завершена. Тема: %s", match.Topic)
+				} else {
+					body = fmt.Sprintf("Дуэль завершена вничью. Тема: %s", match.Topic)
+				}
+				i.notif.Send(ctx, p.UserID.String(), "duel_result", "Результат дуэли", body, map[string]any{
+					"match_id": match.ID.String(),
+					"topic":    match.Topic,
+					"is_winner": match.WinnerUserID != nil && *match.WinnerUserID == p.UserID,
+				})
+			}
 		}()
 	}
 

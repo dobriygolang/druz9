@@ -228,13 +228,15 @@ export function CodeRoomPage() {
   const widgetsRef = useRef<Map<string, Monaco.editor.IContentWidget>>(new Map())
   const prevParticipantIdsRef = useRef<Set<string>>(new Set())
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
-  const queuedDocMessagesRef = useRef<string[]>([])
+  const queuedDocMessagesRef = useRef<Array<{ payload: string; clientId?: string }>>([])
   const sendDocSyncRef = useRef<(data: string) => void>(() => {})
   const onDocSyncAppliedRef = useRef<(() => void) | null>(null)
   const currentCodeRef = useRef('')
   const initialCodeRef = useRef('')
   const lastCursorRef = useRef({ line: 1, col: 1 })
   const isApplyingRemoteDocRef = useRef(false)
+  const remoteDocSenderUserIdRef = useRef<string | null>(null)
+  const remoteClientToUserRef = useRef<Map<string, string>>(new Map())
   const isCreatorRef = useRef(false)
   const taskState = (location.state as { starterCode?: string; taskId?: string } | null)
   const soloDraftTaskId = taskState?.taskId ?? null
@@ -335,12 +337,14 @@ export function CodeRoomPage() {
     setTimeout(() => setNotifications(prev => prev.filter(n => n.id !== id)), 4000)
   }, [notificationsEnabled])
 
-  const handleIncomingDocSync = useCallback((payload: string) => {
+  const handleIncomingDocSync = useCallback((payload: string, clientId?: string) => {
     const doc = yDocRef.current
     if (!doc) {
-      queuedDocMessagesRef.current.push(payload)
+      queuedDocMessagesRef.current.push({ payload, clientId })
       return
     }
+
+    remoteDocSenderUserIdRef.current = clientId ? (remoteClientToUserRef.current.get(clientId) ?? null) : null
 
     const decoder = decoding.createDecoder(decodeBase64ToBinary(payload))
     const encoder = encoding.createEncoder()
@@ -351,12 +355,13 @@ export function CodeRoomPage() {
       sendDocSyncRef.current(encodeBinaryToBase64(reply))
     }
     onDocSyncAppliedRef.current?.()
+    remoteDocSenderUserIdRef.current = null
   }, [])
 
   const flushQueuedDocMessages = useCallback(() => {
     if (!yDocRef.current || queuedDocMessagesRef.current.length === 0) return
     const pending = queuedDocMessagesRef.current.splice(0)
-    pending.forEach(handleIncomingDocSync)
+    pending.forEach(item => handleIncomingDocSync(item.payload, item.clientId))
   }, [handleIncomingDocSync])
 
   const flushPendingCursorUpdates = useCallback(() => {
@@ -397,7 +402,10 @@ export function CodeRoomPage() {
       else if (event === 'tab_visible') addNotification(t('codeRoom.notifications.returned', { name: displayName }))
       else if (event === 'pasted') addNotification(t('codeRoom.notifications.pasted', { name: displayName }))
     }, [addNotification, t]),
-    onCursorUpdate: useCallback((userId: string, line: number, col: number, remoteCodeLen?: number) => {
+    onCursorUpdate: useCallback((userId: string, line: number, col: number, remoteCodeLen?: number, clientId?: string) => {
+      if (clientId) {
+        remoteClientToUserRef.current.set(clientId, userId)
+      }
       const localCodeLen = editorRef.current?.getModel()?.getValueLength()
       if (remoteCodeLen !== undefined && localCodeLen !== undefined && remoteCodeLen !== localCodeLen) {
         pendingCursorUpdatesRef.current.set(userId, { line, col, codeLen: remoteCodeLen })
@@ -844,6 +852,22 @@ export function CodeRoomPage() {
       flushPendingCursorUpdates()
 
       if (isApplyingRemoteDocRef.current) {
+        const senderUserId = remoteDocSenderUserIdRef.current
+        if (senderUserId) {
+          const posRef = cursorPositionsRef.current.get(senderUserId)
+          const widget = widgetsRef.current.get(senderUserId)
+          if (posRef && widget) {
+            const lines = oldCode.split('\n')
+            let offset = 0
+            for (let i = 0; i < posRef.line - 1 && i < lines.length; i++) offset += lines[i].length + 1
+            offset = Math.min(offset + posRef.col - 1, oldCode.length)
+            offset = transformCursorOffset(offset, oldCode, nextCode)
+            const newPos = nextModel.getPositionAt(Math.min(offset, nextCode.length))
+            posRef.line = newPos.lineNumber
+            posRef.col = newPos.column
+            editor.layoutContentWidget(widget)
+          }
+        }
         return
       }
 

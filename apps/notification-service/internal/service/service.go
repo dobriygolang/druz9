@@ -1,7 +1,18 @@
 package service
 
-type Service struct{}
+import (
+	"notification-service/internal/data"
+	"notification-service/internal/telegram"
+)
 
-func New() *Service {
-	return &Service{}
+type Service struct {
+	repo     *data.Repo
+	telegram *telegram.Client
+}
+
+func New(repo *data.Repo, tg *telegram.Client) *Service {
+	return &Service{
+		repo:     repo,
+		telegram: tg,
+	}
 }

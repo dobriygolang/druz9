@@ -5,6 +5,7 @@ import (
 	adminservice "api/internal/api/admin"
 	arenaservice "api/internal/api/arena"
 	circleservice "api/internal/api/circle"
+	"api/internal/notification"
 	codeeditorservice "api/internal/api/code_editor"
 	eventservice "api/internal/api/event"
 	geoservice "api/internal/api/geo"
@@ -32,6 +33,7 @@ import (
 
 type serviceContext struct {
 	cookies                 *server.SessionCookieManager
+	notificationClient      *notification.Client
 	aiReviewService         aireview.Reviewer
 	profileServiceDomain    *profiledomainservice.Service
 	adminServiceDomain      *admindomainservice.Service
@@ -156,8 +158,18 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 
 	cookies := server.NewSessionCookieManager(bootstrap.cfg.Auth.Session)
 
+	var notifAddr string
+	if bootstrap.cfg.External.NotificationService != nil {
+		notifAddr = bootstrap.cfg.External.NotificationService.Addr
+	}
+	notifClient, err := notification.NewClient(notifAddr)
+	if err != nil {
+		return nil, err
+	}
+
 	return &serviceContext{
 		cookies:                 cookies,
+		notificationClient:      notifClient,
 		aiReviewService:         aiReviewService,
 		profileServiceDomain:    profileServiceDomain,
 		adminServiceDomain:      adminServiceDomain,
@@ -174,14 +186,14 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager, storage.profileRepo, profileServiceDomain),
 		profileService:          profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo)),
 		geoService:              geoservice.New(geoServiceDomain),
-		circleService:           circleservice.New(circleServiceDomain, eventServiceDomain),
+		circleService:           circleservice.New(circleServiceDomain, eventServiceDomain, notifClient),
 		eventService:            eventservice.New(eventServiceDomain),
 		podcastService:          podcastservice.New(podcastServiceDomain),
 		referralService:         referralservice.New(referralServiceDomain),
 		codeEditorService:       codeeditorservice.New(codeEditorServiceDomain, realtimeHub, aiReviewService, solutionReviewService),
 		arenaService: arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
-		}, solutionReviewService),
+		}, solutionReviewService, notifClient),
 		interviewPrepService: interviewprepservice.New(interviewPrepDomain, storage.interviewRepo),
 	}, nil
 }
