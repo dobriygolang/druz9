@@ -15,6 +15,7 @@ import (
 	apparenа "api/internal/app/arena"
 	appcodeeditor "api/internal/app/codeeditor"
 	appinterviewprep "api/internal/app/interviewprep"
+	"api/internal/app/solutionreview"
 	admindomainservice "api/internal/domain/admin"
 	circledomainservice "api/internal/domain/circle"
 	eventdomainservice "api/internal/domain/event"
@@ -140,6 +141,11 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		ModelSystemDesign: bootstrap.cfg.External.AIReview.ModelSystemDesign,
 	})
 	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
+	solutionReviewService := solutionreview.New(solutionreview.Config{
+		Repo:      storage.solutionReviewRepo,
+		Reviewer:  aiReviewService,
+		Publisher: solutionreview.NewRealtimePublisher(realtimeHub),
+	})
 
 	cookies := server.NewSessionCookieManager(bootstrap.cfg.Auth.Session)
 
@@ -165,10 +171,10 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		eventService:            eventservice.New(eventServiceDomain),
 		podcastService:          podcastservice.New(podcastServiceDomain),
 		referralService:         referralservice.New(referralServiceDomain),
-		codeEditorService:       codeeditorservice.New(codeEditorServiceDomain, realtimeHub, aiReviewService),
+		codeEditorService:       codeeditorservice.New(codeEditorServiceDomain, realtimeHub, aiReviewService, solutionReviewService),
 		arenaService: arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
-		}),
+		}, solutionReviewService),
 		interviewPrepService: interviewprepservice.New(interviewPrepDomain, storage.interviewRepo),
 	}, nil
 }

@@ -49,6 +49,10 @@ export function ArenaHubPage() {
   const [creatingDuel, setCreatingDuel] = useState(false)
   const [duelRoom, setDuelRoom] = useState<{ id: string; inviteCode: string } | null>(null)
   const [copiedDuel, setCopiedDuel] = useState(false)
+  const getLeagueLabel = (league?: string) => {
+    const raw = LEAGUE_LABELS[league ?? '']
+    return raw ? t(`arena.leagueLabel.${raw.toLowerCase()}`) : ''
+  }
 
   const refreshQueueStatus = useCallback(() => {
     apiClient.get('/api/v1/arena/queue/status').then(r => {
@@ -186,9 +190,10 @@ export function ArenaHubPage() {
                   <p className="text-xs text-[#94a3b8] mt-0.5">
                     {t('arena.queue.inQueue', {
                       count: (() => {
-                      const n = queueStatus?.queueSize
-                      return (typeof n === 'number' && n > 0) ? n : '...'
-                    })()}
+                        const n = queueStatus?.queueSize
+                        return (typeof n === 'number' && n > 0) ? n : '...'
+                      })(),
+                    })}
                   </p>
                 </div>
               </div>
@@ -335,7 +340,7 @@ export function ArenaHubPage() {
                   <Avatar name={e.displayName ?? '?'} size="xs" />
                   <div className="flex-1 min-w-0">
                     <p className="text-xs font-medium text-[#111111] dark:text-[#f8fafc] truncate">{e.displayName}</p>
-                    <p className={`text-[10px] ${LEAGUE_COLORS[e.league] ?? 'text-[#94a3b8]'}`}>{t(`arena.leagueLabel.${(LEAGUE_LABELS[e.league] ?? '').toLowerCase()}`)}</p>
+                    <p className={`text-[10px] ${LEAGUE_COLORS[e.league] ?? 'text-[#94a3b8]'}`}>{getLeagueLabel(e.league)}</p>
                   </div>
                   <span className="text-xs font-mono text-[#666666] dark:text-[#94a3b8]">{e.rating ?? e.wins ?? 0}</span>
                 </div>

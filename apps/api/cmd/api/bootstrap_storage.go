@@ -13,23 +13,25 @@ import (
 	podcastdata "api/internal/data/podcast"
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
+	solutionreviewdata "api/internal/data/solution_review"
 	referraldomainservice "api/internal/domain/referral"
 	"api/internal/storage/postgres"
 	s3storage "api/internal/storage/s3"
 )
 
 type storageContext struct {
-	store          *postgres.Store
-	storageClient  *s3storage.Service
-	geoClient      *geodata.Client
-	profileRepo    *profiledata.Repo
-	eventRepo      *eventdata.Repo
-	circleRepo     *circledata.Repo
-	podcastRepo    *podcastdata.Repo
-	referralRepo   referraldomainservice.Repository
-	codeEditorRepo *codeeditordata.Repo
-	arenaRepo      *arenadata.Repo
-	interviewRepo  *interviewprepdata.Repo
+	store              *postgres.Store
+	storageClient      *s3storage.Service
+	geoClient          *geodata.Client
+	profileRepo        *profiledata.Repo
+	eventRepo          *eventdata.Repo
+	circleRepo         *circledata.Repo
+	podcastRepo        *podcastdata.Repo
+	referralRepo       referraldomainservice.Repository
+	codeEditorRepo     *codeeditordata.Repo
+	arenaRepo          *arenadata.Repo
+	interviewRepo      *interviewprepdata.Repo
+	solutionReviewRepo *solutionreviewdata.Repo
 }
 
 func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
@@ -70,16 +72,17 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 	}
 
 	return &storageContext{
-		store:          store,
-		storageClient:  storageClient,
-		geoClient:      geodata.NewClient(bootstrap.cfg, store, bootstrap.kratosLogger),
-		profileRepo:    profiledata.NewRepo(store, bootstrap.kratosLogger),
-		eventRepo:      eventdata.NewRepo(store, bootstrap.kratosLogger),
-		circleRepo:     circledata.NewRepo(store, bootstrap.kratosLogger),
-		podcastRepo:    podcastdata.NewRepo(store, bootstrap.kratosLogger),
-		referralRepo:   referraldata.NewRepo(store, bootstrap.kratosLogger),
-		codeEditorRepo: codeeditordata.NewRepo(store, bootstrap.kratosLogger),
-		arenaRepo:      arenadata.NewRepo(store, bootstrap.kratosLogger),
-		interviewRepo:  interviewprepdata.New(store, bootstrap.kratosLogger),
+		store:              store,
+		storageClient:      storageClient,
+		geoClient:          geodata.NewClient(bootstrap.cfg, store, bootstrap.kratosLogger),
+		profileRepo:        profiledata.NewRepo(store, bootstrap.kratosLogger),
+		eventRepo:          eventdata.NewRepo(store, bootstrap.kratosLogger),
+		circleRepo:         circledata.NewRepo(store, bootstrap.kratosLogger),
+		podcastRepo:        podcastdata.NewRepo(store, bootstrap.kratosLogger),
+		referralRepo:       referraldata.NewRepo(store, bootstrap.kratosLogger),
+		codeEditorRepo:     codeeditordata.NewRepo(store, bootstrap.kratosLogger),
+		arenaRepo:          arenadata.NewRepo(store, bootstrap.kratosLogger),
+		interviewRepo:      interviewprepdata.New(store, bootstrap.kratosLogger),
+		solutionReviewRepo: solutionreviewdata.NewRepo(store, bootstrap.kratosLogger),
 	}, nil
 }
