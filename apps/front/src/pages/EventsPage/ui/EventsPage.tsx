@@ -385,7 +385,11 @@ export function EventsPage() {
                 <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#f0f0ff] dark:bg-[#1e1e4a]">
                   <Calendar className="h-5 w-5 text-[#6366F1]" />
                 </div>
-                  {event.isJoined && <Badge variant="success">{t('events.joined')}</Badge>}
+                  <div className="flex items-center gap-1.5">
+                    {event.status === 'pending' && <Badge variant="warning">{t('events.pending')}</Badge>}
+                    {event.status === 'rejected' && <Badge variant="danger">{t('events.rejected')}</Badge>}
+                    {event.isJoined && <Badge variant="success">{t('events.joined')}</Badge>}
+                  </div>
               </div>
 
               <div className="space-y-2">

@@ -95,6 +95,12 @@ func newApp() (*kratos.App, *appLogger.Logger, error) {
 	})
 
 	// Telegram bot listener.
+	if cfg.Telegram.BotToken == "" {
+		klog.Warn("TELEGRAM_BOT_TOKEN is not set — bot listener disabled, users cannot register chat_id")
+	}
+	if cfg.API.GRPCAddr == "" {
+		klog.Warn("API_GRPC_ADDR is not set — bot auth callback disabled")
+	}
 	if cfg.Telegram.BotToken != "" && cfg.API.GRPCAddr != "" {
 		authAdapter, authErr := bot.NewGRPCAuthAdapter(cfg.API.GRPCAddr, cfg.Telegram.BotToken)
 		if authErr != nil {

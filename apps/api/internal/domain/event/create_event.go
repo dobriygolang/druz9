@@ -10,7 +10,8 @@ import (
 )
 
 // CreateEvent creates a new event.
-func (s *Service) CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.CreateEventRequest) (*model.Event, error) {
+// Admin-created events are approved immediately; others go to pending.
+func (s *Service) CreateEvent(ctx context.Context, creatorID uuid.UUID, isAdmin bool, req model.CreateEventRequest) (*model.Event, error) {
 	switch req.Repeat {
 	case "", model.EventRepeatNone, model.EventRepeatDaily, model.EventRepeatWeekly, model.EventRepeatMonthly, model.EventRepeatYearly:
 	default:
@@ -19,5 +20,12 @@ func (s *Service) CreateEvent(ctx context.Context, creatorID uuid.UUID, req mode
 	if req.ScheduledAt == nil && req.Repeat != "" && req.Repeat != model.EventRepeatNone {
 		return nil, kratoserrors.BadRequest("INVALID_PAYLOAD", "scheduled_at is required for repeating events")
 	}
+
+	if isAdmin {
+		req.Status = model.EventStatusApproved
+	} else {
+		req.Status = model.EventStatusPending
+	}
+
 	return s.repo.CreateEvent(ctx, creatorID, req)
 }

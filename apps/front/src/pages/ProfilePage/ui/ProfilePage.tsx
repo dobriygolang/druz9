@@ -68,6 +68,7 @@ export function ProfilePage() {
     feed,
     loading,
     error,
+    sectionErrors: _sectionErrors,
     isOwn,
     refetch,
   } = useProfileData(userId)

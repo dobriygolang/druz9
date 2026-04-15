@@ -1,6 +1,6 @@
 import { MapPin, Calendar, Briefcase, Edit3, Share2, Trophy, Flame, Sparkles, TrendingUp } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
-import { Avatar } from '@/shared/ui/Avatar'
+import { PlayerFrame } from '@/shared/ui/PlayerFrame'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import type { User, ProfileProgress } from '@/entities/User/model/types'
@@ -40,11 +40,12 @@ export function ProfileHero({ user, progress, arenaStats, isOwn, onEdit, onBindT
       <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.24),_transparent_32%),radial-gradient(circle_at_80%_20%,_rgba(129,140,248,0.35),_transparent_26%),radial-gradient(circle_at_75%_80%,_rgba(251,191,36,0.18),_transparent_28%)]" />
       <div className="relative p-5 md:p-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end">
-          <Avatar
+          <PlayerFrame
             name={displayName}
             src={user.avatarUrl || undefined}
+            league={league}
             size="xl"
-            className="ring-4 ring-white/25 shadow-[0_16px_32px_rgba(15,23,42,0.24)]"
+            className="shadow-[0_16px_32px_rgba(15,23,42,0.24)]"
           />
 
           <div className="min-w-0 flex-1">

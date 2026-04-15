@@ -59,6 +59,7 @@ func mapEvent(item *model.Event) *v1.Event {
 		IsPublic:         item.IsPublic,
 		ParticipantCount: participantCount,
 		Participants:     participants,
+		Status:           item.Status,
 	}
 	if item.ScheduledAt != nil {
 		event.ScheduledAt = timestamppb.New(*item.ScheduledAt)

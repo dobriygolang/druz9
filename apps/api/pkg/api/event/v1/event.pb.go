@@ -952,6 +952,7 @@ type Event struct {
 	Description      string                 `protobuf:"bytes,17,opt,name=description,proto3" json:"description,omitempty"`
 	MeetingLink      string                 `protobuf:"bytes,18,opt,name=meeting_link,json=meetingLink,proto3" json:"meeting_link,omitempty"`
 	IsPublic         bool                   `protobuf:"varint,19,opt,name=is_public,json=isPublic,proto3" json:"is_public,omitempty"`
+	Status           string                 `protobuf:"bytes,20,opt,name=status,proto3" json:"status,omitempty"`
 	unknownFields    protoimpl.UnknownFields
 	sizeCache        protoimpl.SizeCache
 }
@@ -1117,6 +1118,13 @@ func (x *Event) GetIsPublic() bool {
 		return x.IsPublic
 	}
 	return false
+}
+
+func (x *Event) GetStatus() string {
+	if x != nil {
+		return x.Status
+	}
+	return ""
 }
 
 type EventParticipant struct {

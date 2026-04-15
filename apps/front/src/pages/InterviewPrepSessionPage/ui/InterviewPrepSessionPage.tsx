@@ -9,6 +9,7 @@ import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useToast } from '@/shared/ui/Toast'
 import { useTranslation } from 'react-i18next'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import { registerFormatKeybinding } from '@/shared/lib/editorFormat'
 import { PREP_TYPE_LABELS } from '@/shared/lib/taskLabels'
 import { getLanguageLabel, getMonacoLanguage } from '@/shared/lib/codeEditorLanguage'
 import type * as Monaco from 'monaco-editor'
@@ -98,6 +99,7 @@ export function InterviewPrepSessionPage() {
   const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
     editorRef.current = editor
     registerDarkTheme(monaco)
+    registerFormatKeybinding(editor, monaco)
     monaco.editor.setTheme('druzya-dark')
   }, [])
 

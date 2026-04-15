@@ -109,6 +109,7 @@ type Repository interface {
 	AdvanceMockSession(ctx context.Context, sessionID uuid.UUID, currentStageIndex int32) error
 	CompleteMockStage(ctx context.Context, stageID uuid.UUID) error
 	FinishMockSession(ctx context.Context, sessionID uuid.UUID) error
+	AbortMockSession(ctx context.Context, sessionID uuid.UUID) error
 }
 
 type Service struct {

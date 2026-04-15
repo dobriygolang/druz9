@@ -772,3 +772,17 @@ func (r *Repo) FinishMockSession(ctx context.Context, sessionID uuid.UUID) error
 	}
 	return nil
 }
+
+func (r *Repo) AbortMockSession(ctx context.Context, sessionID uuid.UUID) error {
+	_, err := r.data.DB.Exec(ctx, `
+		UPDATE interview_mock_sessions
+		SET status = $2,
+		    finished_at = NOW(),
+		    updated_at = NOW()
+		WHERE id = $1
+	`, sessionID, model.InterviewPrepMockSessionStatusAborted.String())
+	if err != nil {
+		return fmt.Errorf("abort mock session: %w", err)
+	}
+	return nil
+}

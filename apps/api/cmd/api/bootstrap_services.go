@@ -22,6 +22,8 @@ import (
 	circledomainservice "api/internal/domain/circle"
 	eventdomainservice "api/internal/domain/event"
 	geodomainservice "api/internal/domain/geo"
+	challengedomainservice "api/internal/domain/challenge"
+	missiondomainservice "api/internal/domain/mission"
 	podcastdomainservice "api/internal/domain/podcast"
 	profiledomainservice "api/internal/domain/profile"
 	referraldomainservice "api/internal/domain/referral"
@@ -58,6 +60,8 @@ type serviceContext struct {
 	codeEditorService       *codeeditorservice.Implementation
 	arenaService            *arenaservice.Implementation
 	interviewPrepService    *interviewprepservice.Implementation
+	missionServiceDomain    *missiondomainservice.Service
+	challengeServiceDomain  *challengedomainservice.Service
 }
 
 func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*serviceContext, error) {
@@ -150,6 +154,13 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		ModelFollowup:     bootstrap.cfg.External.AIReview.ModelFollowup,
 		ModelSystemDesign: bootstrap.cfg.External.AIReview.ModelSystemDesign,
 	})
+	missionServiceDomain := missiondomainservice.NewService(missiondomainservice.Config{
+		Repository: storage.missionRepo,
+	})
+	challengeServiceDomain := challengedomainservice.NewService(challengedomainservice.Config{
+		Repository: storage.challengeRepo,
+		Reviewer:   aiReviewService,
+	})
 	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
 	solutionReviewService := solutionreview.New(solutionreview.Config{
 		Repo:      storage.solutionReviewRepo,
@@ -196,6 +207,8 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		arenaService: arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
 		}, solutionReviewService, notifSender),
-		interviewPrepService: interviewprepservice.New(interviewPrepDomain, storage.interviewRepo, notifSender),
+		interviewPrepService:    interviewprepservice.New(interviewPrepDomain, storage.interviewRepo, notifSender),
+		missionServiceDomain:    missionServiceDomain,
+		challengeServiceDomain:  challengeServiceDomain,
 	}, nil
 }

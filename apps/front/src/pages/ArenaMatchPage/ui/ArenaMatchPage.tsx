@@ -9,6 +9,7 @@ import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { Avatar } from '@/shared/ui/Avatar'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import { registerFormatKeybinding } from '@/shared/lib/editorFormat'
 import { useAntiCheat } from '@/features/CodeRoom/hooks/useAntiCheat'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { ReviewCard } from '@/features/SolutionReview/ui/ReviewCard'
@@ -151,6 +152,7 @@ export function ArenaMatchPage() {
   const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
     editorRef.current = editor
     registerDarkTheme(monaco)
+    registerFormatKeybinding(editor, monaco)
     monaco.editor.setTheme('druzya-dark')
     const dom = editor.getDomNode()
     if (dom) {

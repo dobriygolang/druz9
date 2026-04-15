@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Code2, Flame, Swords, Target } from 'lucide-react'
+import { Code2, Crown, Eye, Flame, Swords, Target, Zap } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/shared/ui/Avatar'
 import { apiClient } from '@/shared/api/base'
@@ -46,12 +46,15 @@ export function PracticeHubPage() {
         </div>
 
         <div className="-mx-4 mb-5 overflow-x-auto px-4 pb-1 no-scrollbar md:mx-0 md:px-0">
-          <div className="flex snap-x gap-3 md:grid md:grid-cols-4 md:overflow-visible">
+          <div className="flex snap-x gap-3 md:grid md:grid-cols-4 lg:grid-cols-4 md:overflow-visible">
           {[
             { icon: Code2, title: 'Code Rooms', sub: t('practice.card.rooms'), href: '/practice/code-rooms' },
             { icon: Swords, title: 'Arena Duels', sub: t('practice.card.arena'), href: '/practice/arena' },
-            { icon: Target, title: 'Algorithm Prep', sub: t('practice.card.solo'), href: '/prepare/interview-prep?category=algorithm' },
             { icon: Flame, title: 'Daily Challenge', sub: t('practice.card.daily'), href: '/practice/daily' },
+            { icon: Crown, title: 'Weekly Boss', sub: t('practice.card.weeklyBoss', 'Hard challenge of the week'), href: '/practice/weekly-boss' },
+            { icon: Zap, title: 'Speed Run', sub: t('practice.card.speedRun', 'Beat your personal bests'), href: '/practice/speed-run' },
+            { icon: Eye, title: 'Blind Review', sub: t('practice.card.blindReview', 'Review anonymous code'), href: '/practice/blind-review' },
+            { icon: Target, title: 'Algorithm Prep', sub: t('practice.card.solo'), href: '/prepare/interview-prep?category=algorithm' },
           ].map(f => {
             const Icon = f.icon
             const isAct = location.pathname.startsWith(f.href)

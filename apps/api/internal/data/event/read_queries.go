@@ -105,6 +105,17 @@ func (r *Repo) buildListEventsQueries(opts model.ListEventsOptions) (string, str
 		args = append(args, *opts.CircleID)
 		argNum++
 	}
+
+	// Approval status filter: only show approved events unless admin or creator.
+	if !opts.IncludeAllStatuses {
+		if opts.ViewerID != nil {
+			conditions = append(conditions, fmt.Sprintf("(COALESCE(e.status, 'approved') = 'approved' OR e.creator_id = $%d)", argNum))
+			args = append(args, *opts.ViewerID)
+			argNum++
+		} else {
+			conditions = append(conditions, "COALESCE(e.status, 'approved') = 'approved'")
+		}
+	}
 	_ = argNum
 
 	whereClause := ""
@@ -130,7 +141,8 @@ SELECT
   COALESCE(NULLIF(TRIM(CONCAT_WS(' ', cu.first_name, cu.last_name)), ''), NULLIF(cu.username, ''), ''),
   e.circle_id,
   COALESCE(e.repeat_rule, 'none'),
-  e.is_public
+  e.is_public,
+  COALESCE(e.status, 'approved')
 FROM events e
 JOIN users cu ON cu.id = e.creator_id
 %s
@@ -229,6 +241,7 @@ func (r *Repo) fetchEvents(
 			&event.CircleID,
 			&event.Repeat,
 			&event.IsPublic,
+			&event.Status,
 		); err != nil {
 			return nil, fmt.Errorf("scan event: %w", err)
 		}

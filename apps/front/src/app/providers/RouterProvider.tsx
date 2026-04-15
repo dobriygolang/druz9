@@ -18,6 +18,9 @@ const PracticeHubPage = lazy(() => import('@/pages/PracticeHubPage/ui/PracticeHu
 const CodeRoomsPage = lazy(() => import('@/pages/CodeRoomsPage/ui/CodeRoomsPage').then(m => ({ default: m.CodeRoomsPage })))
 const ArenaHubPage = lazy(() => import('@/pages/ArenaHubPage/ui/ArenaHubPage').then(m => ({ default: m.ArenaHubPage })))
 const DailyChallengePage = lazy(() => import('@/pages/DailyChallengePage/ui/DailyChallengePage').then(m => ({ default: m.DailyChallengePage })))
+const BlindReviewPage = lazy(() => import('@/pages/BlindReviewPage/ui/BlindReviewPage').then(m => ({ default: m.BlindReviewPage })))
+const SpeedRunPage = lazy(() => import('@/pages/SpeedRunPage/ui/SpeedRunPage').then(m => ({ default: m.SpeedRunPage })))
+const WeeklyBossPage = lazy(() => import('@/pages/WeeklyBossPage/ui/WeeklyBossPage').then(m => ({ default: m.WeeklyBossPage })))
 const GrowthHubPage = lazy(() => import('@/pages/GrowthHubPage/ui/GrowthHubPage').then(m => ({ default: m.GrowthHubPage })))
 const InterviewPrepPage = lazy(() => import('@/pages/InterviewPrepPage/ui/InterviewPrepPage').then(m => ({ default: m.InterviewPrepPage })))
 const ProfilePage = lazy(() => import('@/pages/ProfilePage/ui/ProfilePage').then(m => ({ default: m.ProfilePage })))
@@ -112,6 +115,9 @@ export const RouterProvider: React.FC = () => {
               <Route path="arena" element={<ArenaHubPage />} />
               <Route path="solo" element={<Navigate to="/prepare/interview-prep?category=algorithm" replace />} />
               <Route path="daily" element={gate ? <Navigate to="/login" replace /> : <DailyChallengePage />} />
+              <Route path="blind-review" element={gate ? <Navigate to="/login" replace /> : <BlindReviewPage />} />
+              <Route path="speed-run" element={gate ? <Navigate to="/login" replace /> : <SpeedRunPage />} />
+              <Route path="weekly-boss" element={gate ? <Navigate to="/login" replace /> : <WeeklyBossPage />} />
             </Route>
 
             {/* Prepare — mock interviews and structured prep (formerly Growth) */}

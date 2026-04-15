@@ -2,6 +2,7 @@ package main
 
 import (
 	"api/internal/closer"
+	challengedomain "api/internal/domain/challenge"
 	server "api/internal/server"
 	"api/internal/server/wshandler"
 	adminv1 "api/pkg/api/admin/v1"
@@ -19,6 +20,7 @@ import (
 	"net/http"
 
 	"github.com/go-kratos/kratos/v2"
+	"github.com/google/uuid"
 	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
 )
@@ -146,6 +148,264 @@ func registerManualHTTPRoutes(
 			return nil
 		}
 		ctx.Response().WriteHeader(http.StatusNoContent)
+		return nil
+	})
+
+	registerMissionRoutes(r, auth, services)
+	registerChallengeRoutes(r, auth, services)
+}
+
+func registerMissionRoutes(
+	r *kratoshttp.Router,
+	auth server.Authorizer,
+	services *serviceContext,
+) {
+	missionSvc := services.missionServiceDomain
+
+	// GET /api/v1/missions/daily — get today's 3 daily missions with progress.
+	r.GET("/api/v1/missions/daily", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		result, err := missionSvc.GetDailyMissions(req.Context(), *userID)
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			return nil
+		}
+		server.WriteJSON(ctx.Response(), http.StatusOK, result)
+		return nil
+	})
+
+	// POST /api/v1/missions/{mission_key}/complete — explicitly mark a mission as done.
+	r.POST("/api/v1/missions/{mission_key}/complete", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		missionKey := server.PathSegment(req.URL.Path, "missions", 1)
+		if missionKey == "" {
+			ctx.Response().WriteHeader(http.StatusBadRequest)
+			return nil
+		}
+		if err := missionSvc.CompleteMission(req.Context(), *userID, missionKey); err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			return nil
+		}
+		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]bool{"ok": true})
+		return nil
+	})
+}
+
+func registerChallengeRoutes(
+	r *kratoshttp.Router,
+	auth server.Authorizer,
+	services *serviceContext,
+) {
+	svc := services.challengeServiceDomain
+
+	// POST /api/v1/challenges/daily/submit-review — record AI score for daily challenge
+	r.POST("/api/v1/challenges/daily/submit-review", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		var body struct {
+			TaskID  string `json:"taskId"`
+			AIScore int32  `json:"aiScore"`
+		}
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			ctx.Response().WriteHeader(http.StatusBadRequest)
+			return nil
+		}
+		taskUUID, err := uuid.Parse(body.TaskID)
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusBadRequest, map[string]string{"error": "invalid task ID"})
+			return nil
+		}
+		if err := svc.SubmitDailyReview(req.Context(), *userID, taskUUID, body.AIScore); err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			return nil
+		}
+		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]bool{"ok": true})
+		return nil
+	})
+
+	// GET /api/v1/challenges/daily/leaderboard — today's top 10 by AI score
+	r.GET("/api/v1/challenges/daily/leaderboard", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		if _, ok := server.Authenticate(req, auth); !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		results, err := svc.GetDailyLeaderboard(req.Context(), 10)
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			return nil
+		}
+		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{"entries": results})
+		return nil
+	})
+
+	// GET /api/v1/challenges/blind-review — get random code for review
+	r.GET("/api/v1/challenges/blind-review", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		task, err := svc.GetBlindReviewTask(req.Context(), *userID)
+		if err != nil || task == nil {
+			server.WriteJSON(ctx.Response(), http.StatusNotFound, map[string]string{"error": "no tasks available"})
+			return nil
+		}
+		server.WriteJSON(ctx.Response(), http.StatusOK, task)
+		return nil
+	})
+
+	// POST /api/v1/challenges/blind-review/submit — submit code review for AI evaluation
+	r.POST("/api/v1/challenges/blind-review/submit", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		var body struct {
+			SourceReviewID string `json:"sourceReviewId"`
+			TaskID         string `json:"taskId"`
+			SourceCode     string `json:"sourceCode"`
+			SourceLanguage string `json:"sourceLanguage"`
+			UserReview     string `json:"userReview"`
+		}
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			ctx.Response().WriteHeader(http.StatusBadRequest)
+			return nil
+		}
+		srcID, err := uuid.Parse(body.SourceReviewID)
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusBadRequest, map[string]string{"error": "invalid source review ID"})
+			return nil
+		}
+		taskUUID, err := uuid.Parse(body.TaskID)
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusBadRequest, map[string]string{"error": "invalid task ID"})
+			return nil
+		}
+		result, err := svc.SubmitBlindReview(req.Context(), *userID, srcID, taskUUID, body.SourceCode, body.SourceLanguage, body.UserReview)
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": err.Error()})
+			return nil
+		}
+		server.WriteJSON(ctx.Response(), http.StatusOK, result)
+		return nil
+	})
+
+	// GET /api/v1/challenges/speed-run/records — user's personal bests
+	r.GET("/api/v1/challenges/speed-run/records", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		records, err := svc.GetUserRecords(req.Context(), *userID, 20)
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			return nil
+		}
+		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{"records": records})
+		return nil
+	})
+
+	// POST /api/v1/challenges/speed-run/record — record a speed-run attempt
+	r.POST("/api/v1/challenges/speed-run/record", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		var body struct {
+			TaskID  string `json:"taskId"`
+			TimeMs  int64  `json:"timeMs"`
+			AIScore int32  `json:"aiScore"`
+		}
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			ctx.Response().WriteHeader(http.StatusBadRequest)
+			return nil
+		}
+		taskUUID, err := uuid.Parse(body.TaskID)
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusBadRequest, map[string]string{"error": "invalid task ID"})
+			return nil
+		}
+		result, err := svc.RecordSpeedRun(req.Context(), *userID, taskUUID, body.TimeMs, body.AIScore)
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			return nil
+		}
+		server.WriteJSON(ctx.Response(), http.StatusOK, result)
+		return nil
+	})
+
+	// GET /api/v1/challenges/weekly — current weekly boss challenge + leaderboard
+	r.GET("/api/v1/challenges/weekly", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		weekKey := challengedomain.CurrentWeekKey()
+		leaderboard, _ := svc.GetWeeklyLeaderboard(req.Context(), weekKey, 10)
+		userEntry, _ := svc.GetUserWeeklyEntry(req.Context(), *userID, weekKey)
+		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{
+			"weekKey":     weekKey,
+			"endsAt":      challengedomain.WeekEndsAt(),
+			"leaderboard": leaderboard,
+			"myEntry":     userEntry,
+		})
+		return nil
+	})
+
+	// POST /api/v1/challenges/weekly/submit — submit a weekly boss attempt
+	r.POST("/api/v1/challenges/weekly/submit", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		var body struct {
+			TaskID      string `json:"taskId"`
+			AIScore     int32  `json:"aiScore"`
+			SolveTimeMs int64  `json:"solveTimeMs"`
+			Code        string `json:"code"`
+			Language    string `json:"language"`
+		}
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			ctx.Response().WriteHeader(http.StatusBadRequest)
+			return nil
+		}
+		taskUUID, err := uuid.Parse(body.TaskID)
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusBadRequest, map[string]string{"error": "invalid task ID"})
+			return nil
+		}
+		weekKey := challengedomain.CurrentWeekKey()
+		if err := svc.SubmitWeeklyBoss(req.Context(), *userID, weekKey, taskUUID, body.AIScore, body.SolveTimeMs, body.Code, body.Language); err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			return nil
+		}
+		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]bool{"ok": true})
 		return nil
 	})
 }

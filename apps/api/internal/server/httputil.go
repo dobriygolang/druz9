@@ -27,8 +27,8 @@ func wrapKratos(h http.HandlerFunc) func(kratoshttp.Context) error {
 	}
 }
 
-// writeJSON encodes payload as JSON with the given status code.
-func writeJSON(w http.ResponseWriter, status int, payload any) {
+// WriteJSON encodes payload as JSON with the given status code.
+func WriteJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
 	_ = json.NewEncoder(w).Encode(payload)

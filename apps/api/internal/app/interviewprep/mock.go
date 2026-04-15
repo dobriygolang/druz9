@@ -846,8 +846,9 @@ func (s *Service) AbortMockSession(ctx context.Context, user *model.User, sessio
 	if session == nil || session.UserID != user.ID {
 		return ErrMockSessionNotFound
 	}
-	if session.Status == model.InterviewPrepMockSessionStatusFinished {
+	if session.Status == model.InterviewPrepMockSessionStatusFinished ||
+		session.Status == model.InterviewPrepMockSessionStatusAborted {
 		return nil
 	}
-	return s.repo.FinishMockSession(ctx, session.ID)
+	return s.repo.AbortMockSession(ctx, session.ID)
 }

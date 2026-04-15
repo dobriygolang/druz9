@@ -40,7 +40,7 @@ func (i *Implementation) CreateCircleEvent(ctx context.Context, req *circlev1.Cr
 		scheduledAt = &value
 	}
 
-	event, err := i.eventSvc.CreateEvent(ctx, user.ID, model.CreateEventRequest{
+	event, err := i.eventSvc.CreateEvent(ctx, user.ID, user.IsAdmin, model.CreateEventRequest{
 		Title:       req.Title,
 		Description: req.Description,
 		MeetingLink: req.MeetingLink,

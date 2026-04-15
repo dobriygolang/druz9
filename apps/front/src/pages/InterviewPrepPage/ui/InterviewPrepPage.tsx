@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import {
   Search, ChevronRight, BookOpen, Code2, MessageSquare, Play, Database,
-  Cpu, Building2, Clock, Sparkles, ArrowRight, Zap, Target, Star, Flame, TrendingUp,
+  Cpu, Building2, Clock, Sparkles, ArrowRight, Flame,
 } from 'lucide-react'
 import { interviewPrepApi, type InterviewPrepTask, type MockBlueprint } from '@/features/InterviewPrep/api/interviewPrepApi'
 import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
@@ -13,8 +13,6 @@ import { useAuth } from '@/app/providers/AuthProvider'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
 import { ErrorState } from '@/shared/ui/ErrorState'
-import { CircularProgress } from '@/shared/ui/CircularProgress'
-import { AnimatedNumber } from '@/shared/ui/AnimatedNumber'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useToast } from '@/shared/ui/Toast'
 import { PREP_TYPE_LABELS } from '@/shared/lib/taskLabels'
@@ -40,29 +38,7 @@ const PREP_TYPE_COLORS: Record<string, { bg: string; text: string; icon: string;
   behavioral:    { bg: 'bg-[#f0fdf4]', text: 'text-[#15803d]', icon: 'text-[#22c55e]', border: 'border-l-[#22c55e]' },
 }
 
-const MOCK_STAGES = [
-  { icon: <Cpu className="w-3.5 h-3.5" />,      label: 'Algorithms',       num: 1 },
-  { icon: <Code2 className="w-3.5 h-3.5" />,    label: 'Practical Coding', num: 2 },
-  { icon: <Database className="w-3.5 h-3.5" />, label: 'SQL / Debugging',  num: 3 },
-  { icon: <MessageSquare className="w-3.5 h-3.5" />, label: 'Behavioral',  num: 4 },
-  { icon: <BookOpen className="w-3.5 h-3.5" />, label: 'System Design',    num: 5 },
-]
-
 const CATEGORIES = ['', 'coding', 'algorithm', 'sql', 'system_design', 'code_review', 'behavioral'] as const
-
-const ROUND_META: Record<string, { icon: React.ReactNode; color: string }> = {
-  coding_algorithmic: { icon: <Cpu className="w-3.5 h-3.5" />, color: 'border-[#38bdf8]/20 bg-[#0c4a6e]/30 text-[#bae6fd]' },
-  coding_practical:   { icon: <Code2 className="w-3.5 h-3.5" />, color: 'border-[#8b5cf6]/20 bg-[#312e81]/30 text-[#ddd6fe]' },
-  sql:                { icon: <Database className="w-3.5 h-3.5" />, color: 'border-[#f59e0b]/20 bg-[#78350f]/30 text-[#fde68a]' },
-  behavioral:         { icon: <MessageSquare className="w-3.5 h-3.5" />, color: 'border-[#22c55e]/20 bg-[#14532d]/30 text-[#bbf7d0]' },
-  system_design:      { icon: <BookOpen className="w-3.5 h-3.5" />, color: 'border-[#ec4899]/20 bg-[#831843]/30 text-[#fbcfe8]' },
-  code_review:        { icon: <Search className="w-3.5 h-3.5" />, color: 'border-white/15 bg-white/5 text-white/80' },
-}
-
-function formatRoundMinutes(durationSeconds: number): string {
-  const minutes = Math.max(1, Math.round((durationSeconds || 0) / 60))
-  return `${minutes}m`
-}
 
 /* ── Component ─────────────────────────────────────────────────────── */
 
@@ -203,8 +179,6 @@ export function InterviewPrepPage() {
     () => blueprints.find(bp => bp.slug === selectedBlueprintSlug) ?? blueprints[0] ?? null,
     [blueprints, selectedBlueprintSlug],
   )
-  const strongestSkill = readiness?.strongestSkill ?? null
-  const weakestSkill = readiness?.weakestSkill?.key === strongestSkill?.key ? null : readiness?.weakestSkill ?? null
 
   const handleStartMock = async (programSlug?: string) => {
     setMockLoading(true)
@@ -275,211 +249,115 @@ export function InterviewPrepPage() {
     <div className={isMobile ? 'px-4 pt-4 pb-24 flex flex-col gap-5' : 'px-4 md:px-6 pt-4 pb-6 flex flex-col gap-6'}>
       <PageMeta title={t('interviewPrep.meta.title')} description={t('interviewPrep.meta.description')} canonicalPath="/prepare/interview-prep" />
 
-      {/* ── Readiness Hero ─────────────────────────────────────────── */}
-      <section className="section-enter relative overflow-hidden rounded-[32px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.94)_40%,_rgba(245,243,255,0.96))] p-6 shadow-[0_24px_60px_rgba(99,102,241,0.10)] dark:border-[#1e3158] dark:bg-[linear-gradient(145deg,_rgba(11,13,22,0.96),_rgba(29,36,63,0.92)_50%,_rgba(46,26,58,0.88))] dark:shadow-[0_28px_70px_rgba(2,6,23,0.45)] md:p-8">
-        <div className="pointer-events-none absolute inset-y-0 right-[-10%] w-[50%] rounded-full bg-[radial-gradient(circle,_rgba(99,102,241,0.18),_transparent_66%)] blur-2xl dark:bg-[radial-gradient(circle,_rgba(129,140,248,0.14),_transparent_70%)]" />
-
-        <div className="relative flex flex-col gap-6 md:flex-row md:items-center md:gap-10">
-          {/* Readiness ring */}
-          {readiness ? (
-            <div className="shrink-0 self-center">
-              <CircularProgress value={readiness.score} size={isMobile ? 140 : 160} strokeWidth={8}>
-                <span className="font-mono text-[36px] font-bold leading-none text-[#111111] dark:text-[#f8fafc]">
-                  <AnimatedNumber value={readiness.score} />
-                </span>
-                <span className="mt-0.5 text-[10px] font-medium uppercase tracking-widest text-[#667085] dark:text-[#7e93b0]">/ 100</span>
-              </CircularProgress>
-            </div>
-          ) : null}
-
-          <div className="flex-1 min-w-0">
-            <div className="inline-flex items-center gap-2 rounded-full border border-[#6366F1]/20 bg-[#6366F1]/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6366F1] dark:border-[#818cf8]/20 dark:bg-[#818cf8]/10 dark:text-[#a5b4fc]">
-              <Target className="h-3 w-3" />
-              {t('interviewPrep.hero.eyebrow')}
-            </div>
-
-            <h1 className="mt-3 max-w-[28ch] text-[28px] font-bold leading-[1.1] text-[#111111] dark:text-[#f8fafc] sm:text-[32px]">
-              {t('interviewPrep.hero.title')}
-            </h1>
-
-            {/* Readiness meta */}
-            <div className="mt-3 flex flex-wrap items-center gap-2">
-              {readiness && (
-                <Badge variant={LEVEL_VARIANTS[readiness.level] ?? 'default'}>
-                  {readiness.levelLabel}
-                </Badge>
-              )}
-              {readiness?.streakDays ? (
-                <span className="inline-flex items-center gap-1 text-sm font-medium text-[#667085] dark:text-[#7e93b0]">
-                  <Flame className="h-3.5 w-3.5 text-orange-500" />
-                  {readiness.streakDays} {t('journey.streak', 'days in a row')}
-                </span>
-              ) : null}
-              {strongestSkill && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#e8f9ef] px-2.5 py-0.5 text-[11px] font-medium text-[#166534] dark:bg-[#0d2a1f] dark:text-[#4ade80]">
-                  <TrendingUp className="h-3 w-3" />
-                  {strongestSkill.label}: {strongestSkill.score}
-                </span>
-              )}
-              {weakestSkill && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-[#fef2f2] px-2.5 py-0.5 text-[11px] font-medium text-[#dc2626] dark:bg-[#2a0f0f] dark:text-[#f87171]">
-                  <Target className="h-3 w-3" />
-                  {weakestSkill.label}: {weakestSkill.score}
-                </span>
-              )}
-            </div>
-
-            {/* Next action CTA */}
-            {readiness?.nextAction && (
-              <button
-                onClick={() => navigate(readiness.nextAction!.actionUrl)}
-                className="mt-4 inline-flex items-center gap-2 rounded-full bg-[#111111] px-4 py-2.5 text-sm font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] dark:bg-white dark:text-[#111111]"
-              >
-                {readiness.nextAction.title}
-                <ArrowRight className="h-4 w-4" />
-              </button>
+      {/* ── Header ─────────────────────────────────────────── */}
+      <section className="section-enter flex items-center justify-between gap-4">
+        <div>
+          <h1 className="text-xl font-bold text-[#111111] dark:text-[#f8fafc] sm:text-2xl">
+            {t('interviewPrep.hero.title')}
+          </h1>
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[#667085] dark:text-[#7e93b0]">
+            {readiness && (
+              <>
+                <span className="font-mono font-bold text-[#6366F1]">{readiness.score}/100</span>
+                <Badge variant={LEVEL_VARIANTS[readiness.level] ?? 'default'}>{readiness.levelLabel}</Badge>
+              </>
             )}
-
-            {!readiness && (
-              <div className="mt-4 flex items-center gap-4 text-sm text-[#667085] dark:text-[#7e93b0]">
-                <span className="flex items-center gap-1.5"><Zap className="h-3.5 w-3.5 text-[#f59e0b]" /> {t('interviewPrep.hero.aiReview')}</span>
-                <span className="h-3.5 w-px bg-[#CBCCC9] dark:bg-[#1e3158]" />
-                <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-[#6366F1]" /> {t('interviewPrep.hero.timer')}</span>
-                <span className="h-3.5 w-px bg-[#CBCCC9] dark:bg-[#1e3158]" />
-                <span className="flex items-center gap-1.5"><Star className="h-3.5 w-3.5 text-[#ec4899]" /> {t('interviewPrep.hero.score')}</span>
-              </div>
-            )}
+            {readiness?.streakDays ? (
+              <span className="inline-flex items-center gap-1">
+                <Flame className="h-3.5 w-3.5 text-orange-500" />
+                {readiness.streakDays} {t('journey.streak', 'days in a row')}
+              </span>
+            ) : null}
           </div>
         </div>
+        {readiness?.nextAction && (
+          <button
+            onClick={() => navigate(readiness.nextAction!.actionUrl)}
+            className="inline-flex items-center gap-2 rounded-full bg-[#111111] px-4 py-2.5 text-sm font-semibold text-white transition-all hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] dark:bg-white dark:text-[#111111]"
+          >
+            {readiness.nextAction.title}
+            <ArrowRight className="h-4 w-4" />
+          </button>
+        )}
       </section>
 
       {/* ── Mock Interview ─────────────────────────────────────────── */}
-      <section className="section-enter">
-        <div className="relative overflow-hidden rounded-[24px] border border-[#1e1b4b] bg-[linear-gradient(145deg,_#0f0a2e,_#1e1b4b_50%,_#312e81)] p-6 text-white shadow-[0_20px_50px_rgba(99,102,241,0.2)] md:p-8">
-          <div className="pointer-events-none absolute right-[-5%] top-[-20%] h-[200%] w-[40%] rounded-full bg-[radial-gradient(circle,_rgba(139,92,246,0.25),_transparent_65%)] blur-2xl" />
-
-          <div className="relative">
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2.5">
-                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 backdrop-blur">
-                    <Sparkles className="h-4.5 w-4.5 text-[#c4b5fd]" />
-                  </div>
-                  <div>
-                    <h2 className="text-lg font-bold text-white">{selectedBlueprint?.primaryAliasName || selectedBlueprint?.title || t('interviewPrep.mock.titleFallback')}</h2>
-                    <p className="text-[13px] text-white/60">{selectedBlueprint?.title || t('interviewPrep.mock.loopFallback')}</p>
-                  </div>
-                </div>
-
-                <p className="mt-4 max-w-[40rem] text-sm leading-6 text-white/75">
-                  {selectedBlueprint?.description || t('interviewPrep.mock.descriptionFallback')}
-                </p>
-
-                {/* Stage pipeline */}
-                <div className={`mt-5 ${isMobile ? 'flex overflow-x-auto gap-2 pb-1 no-scrollbar' : 'flex flex-wrap gap-2'}`}>
-                  {(selectedBlueprint?.rounds?.length ? selectedBlueprint.rounds : MOCK_STAGES).map((s: any, index: number) => {
-                    const meta = 'roundType' in s ? ROUND_META[s.roundType] : null
-                    const icon = meta?.icon ?? s.icon
-                    const color = meta?.color ?? 'border-white/10 bg-white/5 text-white/80'
-                    const label = 'roundType' in s ? s.title : s.label
-                    const duration = 'durationSeconds' in s ? formatRoundMinutes(s.durationSeconds) : null
-                    return (
-                    <div
-                      key={'roundType' in s ? `${s.roundType}-${s.position}` : s.num}
-                      className={`flex items-center gap-2 rounded-xl border px-3 py-2 backdrop-blur ${color} ${isMobile ? 'flex-shrink-0' : ''}`}
-                    >
-                      <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/10 text-[10px] font-bold">
-                        {'roundType' in s ? index + 1 : s.num}
-                      </span>
-                      <span className="flex items-center gap-1.5 text-xs font-medium">
-                        {icon}
-                        {label}
-                      </span>
-                      {duration && (
-                        <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold text-white/75">
-                          {duration}
-                        </span>
-                      )}
-                    </div>
-                  )})}
-                </div>
-                {selectedBlueprint?.introText && (
-                  <p className="mt-4 max-w-[40rem] text-xs leading-5 text-white/60">
-                    {selectedBlueprint.introText}
-                  </p>
-                )}
-              </div>
-
-              {!isMobile && (
-                <div className="flex flex-col items-end gap-1 text-right">
-                  <p className="text-3xl font-bold font-mono text-white/90">{selectedBlueprint?.rounds?.length || 5}</p>
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-white/40">{t('interviewPrep.mock.rounds')}</p>
-                </div>
-              )}
-            </div>
-
-            {/* Active session warning */}
-            {mockError && mockError.startsWith('active_session:') && (
-              <div className="mt-4 rounded-2xl border border-[#fbbf24]/35 bg-[linear-gradient(135deg,_rgba(251,191,36,0.18),_rgba(120,53,15,0.24))] px-4 py-4 shadow-[0_16px_36px_rgba(120,53,15,0.18)]">
-                <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold text-[#fde68a]">{t('interviewPrep.mock.unfinished')}</p>
-                    <p className="mt-1 text-xs text-white/65">
-                      {t('interviewPrep.mock.abortHint', 'You can continue the current session or discard it and start from scratch.')}
-                    </p>
-                  </div>
-                  <button
-                    onClick={() => navigate(`/prepare/interview-prep/mock/${mockError.split(':')[1]}`)}
-                    className="inline-flex items-center justify-center gap-1 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/15"
-                  >
-                    {t('interviewPrep.mock.continue')} <ArrowRight className="h-3.5 w-3.5" />
-                  </button>
-                </div>
-                <button
-                  onClick={handleAbortAndStartNew}
-                  disabled={mockAbortLoading}
-                  className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-[#fca5a5]/30 bg-[#7f1d1d]/55 px-4 py-3 text-sm font-semibold text-[#fee2e2] transition-colors hover:bg-[#991b1b]/70 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
-                >
-                  {mockAbortLoading ? '...' : t('interviewPrep.mock.abortAndStartNew')}
-                </button>
-              </div>
-            )}
-            {mockError && !mockError.startsWith('active_session:') && (
-              <p className="mt-3 text-sm text-[#fca5a5]">{mockError}</p>
-            )}
-
-            {/* Blueprint selector + CTA */}
-            <div className={`mt-5 ${isMobile ? 'flex flex-col gap-3' : 'flex items-center gap-3'}`}>
-              {blueprints.length > 0 && (
-                <div className={`flex gap-2 ${isMobile ? 'overflow-x-auto pb-1 no-scrollbar' : 'flex-wrap'}`}>
-                  {blueprints.map(bp => (
-                    <button
-                      key={bp.slug}
-                      onClick={() => setSelectedBlueprintSlug(bp.slug)}
-                      className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition-all ${isMobile ? 'flex-shrink-0' : ''} ${
-                        selectedBlueprintSlug === bp.slug
-                          ? 'border-white/30 bg-white/15 text-white shadow-[0_0_20px_rgba(255,255,255,0.06)]'
-                          : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
-                      }`}
-                    >
-                      <Building2 className="w-3 h-3" />
-                      {bp.primaryAliasName || bp.title}
-                    </button>
-                  ))}
-                </div>
-              )}
-              <Button
-                variant="orange"
-                size="md"
-                loading={mockLoading}
-                onClick={() => handleStartMock()}
-                className={`flex-shrink-0 rounded-xl ${isMobile ? 'w-full justify-center' : ''}`}
-              >
-                <Play className="w-4 h-4" />
-                {t('interviewPrep.mock.start')}
-              </Button>
-            </div>
+      <section className="section-enter rounded-[24px] border border-[#1e1b4b] bg-[linear-gradient(145deg,_#0f0a2e,_#1e1b4b_50%,_#312e81)] p-5 text-white shadow-[0_12px_36px_rgba(99,102,241,0.15)] md:p-6">
+        <div className="flex items-center gap-3">
+          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 backdrop-blur">
+            <Sparkles className="h-4.5 w-4.5 text-[#c4b5fd]" />
           </div>
+          <div className="min-w-0 flex-1">
+            <h2 className="text-base font-bold text-white">{t('interviewPrep.mock.titleFallback')}</h2>
+            <p className="text-xs text-white/60">{selectedBlueprint?.description || t('interviewPrep.mock.descriptionFallback')}</p>
+          </div>
+          {!isMobile && (
+            <span className="text-xs text-white/40">
+              {selectedBlueprint?.rounds?.length || 5} {t('interviewPrep.mock.rounds')}
+            </span>
+          )}
+        </div>
+
+        {/* Active session warning */}
+        {mockError && mockError.startsWith('active_session:') && (
+          <div className="mt-4 rounded-xl border border-[#fbbf24]/35 bg-[linear-gradient(135deg,_rgba(251,191,36,0.18),_rgba(120,53,15,0.24))] px-4 py-3">
+            <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+              <div className="min-w-0">
+                <p className="text-sm font-semibold text-[#fde68a]">{t('interviewPrep.mock.unfinished')}</p>
+                <p className="mt-1 text-xs text-white/65">
+                  {t('interviewPrep.mock.abortHint', 'You can continue the current session or discard it and start from scratch.')}
+                </p>
+              </div>
+              <button
+                onClick={() => navigate(`/prepare/interview-prep/mock/${mockError.split(':')[1]}`)}
+                className="inline-flex items-center justify-center gap-1 rounded-xl border border-white/15 bg-white/10 px-3 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/15"
+              >
+                {t('interviewPrep.mock.continue')} <ArrowRight className="h-3.5 w-3.5" />
+              </button>
+            </div>
+            <button
+              onClick={handleAbortAndStartNew}
+              disabled={mockAbortLoading}
+              className="mt-3 inline-flex w-full items-center justify-center rounded-xl border border-[#fca5a5]/30 bg-[#7f1d1d]/55 px-3 py-2 text-sm font-semibold text-[#fee2e2] transition-colors hover:bg-[#991b1b]/70 disabled:cursor-not-allowed disabled:opacity-50 md:w-auto"
+            >
+              {mockAbortLoading ? '...' : t('interviewPrep.mock.abortAndStartNew')}
+            </button>
+          </div>
+        )}
+        {mockError && !mockError.startsWith('active_session:') && (
+          <p className="mt-3 text-sm text-[#fca5a5]">{mockError}</p>
+        )}
+
+        {/* Blueprint selector + CTA */}
+        <div className={`mt-4 ${isMobile ? 'flex flex-col gap-3' : 'flex items-center gap-3'}`}>
+          {blueprints.length > 0 && (
+            <div className={`flex gap-2 ${isMobile ? 'overflow-x-auto pb-1 no-scrollbar' : 'flex-wrap'}`}>
+              {blueprints.map(bp => (
+                <button
+                  key={bp.slug}
+                  onClick={() => setSelectedBlueprintSlug(bp.slug)}
+                  className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition-all ${isMobile ? 'flex-shrink-0' : ''} ${
+                    selectedBlueprintSlug === bp.slug
+                      ? 'border-white/30 bg-white/15 text-white shadow-[0_0_20px_rgba(255,255,255,0.06)]'
+                      : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
+                  }`}
+                >
+                  <Building2 className="w-3 h-3" />
+                  {bp.primaryAliasName || bp.title}
+                </button>
+              ))}
+            </div>
+          )}
+          <Button
+            variant="orange"
+            size="md"
+            loading={mockLoading}
+            onClick={() => handleStartMock()}
+            className={`flex-shrink-0 rounded-xl ${isMobile ? 'w-full justify-center' : ''}`}
+          >
+            <Play className="w-4 h-4" />
+            {t('interviewPrep.mock.start')}
+          </Button>
         </div>
       </section>
 

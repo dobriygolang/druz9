@@ -1,5 +1,5 @@
 import type { LucideIcon } from 'lucide-react'
-import { Code2, Home, TrendingUp, Users } from 'lucide-react'
+import { Code2, Target, TrendingUp, Users } from 'lucide-react'
 
 export interface AppNavItem {
   label: string
@@ -18,9 +18,9 @@ export const PRIMARY_NAV_ITEMS: AppNavItem[] = [
     labelKey: 'nav.home',
     shortLabel: 'Home',
     href: '/home',
-    description: 'Community pulse, quick overview, and fresh events.',
+    description: 'Progress, missions, and next steps.',
     descriptionKey: 'nav.desc.home',
-    icon: Home,
+    icon: Target,
   },
   {
     label: 'Practice',

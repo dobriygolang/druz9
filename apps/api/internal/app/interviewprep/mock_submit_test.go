@@ -323,6 +323,10 @@ func (r *mockSubmitTestRepo) FinishMockSession(context.Context, uuid.UUID) error
 	panic("unexpected call to FinishMockSession")
 }
 
+func (r *mockSubmitTestRepo) AbortMockSession(context.Context, uuid.UUID) error {
+	panic("unexpected call to AbortMockSession")
+}
+
 type mockSubmitTestReviewer struct {
 	calls   int
 	errs    []error

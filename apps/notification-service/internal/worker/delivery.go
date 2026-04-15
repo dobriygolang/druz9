@@ -125,7 +125,11 @@ func (w *DeliveryWorker) deliver(ctx context.Context, n *data.Notification) erro
 
 	switch result {
 	case service.FilterDrop:
-		return w.repo.MarkFailed(ctx, n.ID, "filtered")
+		reason := "filtered"
+		if settings.TelegramChatID == 0 {
+			reason = "no_telegram_chat_id"
+		}
+		return w.repo.MarkFailed(ctx, n.ID, reason)
 	case service.FilterReschedule:
 		rescheduleAt := service.QuietHoursEndTime(settings)
 		return w.repo.Reschedule(ctx, n.ID, rescheduleAt)

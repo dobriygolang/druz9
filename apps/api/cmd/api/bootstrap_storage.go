@@ -11,6 +11,8 @@ import (
 	eventdata "api/internal/data/event"
 	geodata "api/internal/data/geo"
 	interviewprepdata "api/internal/data/interviewprep"
+	challengedata "api/internal/data/challenge"
+	missiondata "api/internal/data/mission"
 	podcastdata "api/internal/data/podcast"
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
@@ -35,6 +37,8 @@ type storageContext struct {
 	arenaRepo          *arenadata.Repo
 	interviewRepo      *interviewprepdata.Repo
 	solutionReviewRepo *solutionreviewdata.Repo
+	missionRepo        *missiondata.Repo
+	challengeRepo      *challengedata.Repo
 }
 
 func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
@@ -87,6 +91,8 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 		arenaRepo:          arenadata.NewRepo(store, bootstrap.kratosLogger),
 		interviewRepo:      interviewprepdata.New(store, bootstrap.kratosLogger),
 		solutionReviewRepo: solutionreviewdata.NewRepo(store),
+		missionRepo:        missiondata.NewRepo(store, bootstrap.kratosLogger),
+		challengeRepo:      challengedata.NewRepo(store, bootstrap.kratosLogger),
 	}, nil
 }
 

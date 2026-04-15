@@ -184,6 +184,7 @@ message Event {
   string                    description       = 17;
   string                    meeting_link      = 18;
   bool                      is_public         = 19;
+  string                    status            = 20;
 }
 
 message EventParticipant {

@@ -14,6 +14,7 @@ import { Avatar } from '@/shared/ui/Avatar'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { getMonacoLanguage, getLanguageLabel } from '@/shared/lib/codeEditorLanguage'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import { formatEditorCode, registerFormatKeybinding } from '@/shared/lib/editorFormat'
 import { apiClient } from '@/shared/api/base'
 import { ReviewCard } from '@/features/SolutionReview/ui/ReviewCard'
 import { useSolutionReview } from '@/features/SolutionReview/hooks/useSolutionReview'
@@ -978,6 +979,7 @@ export function CodeRoomPage() {
     editorRef.current = editor
     monacoRef.current = monaco
     registerDarkTheme(monaco)
+    registerFormatKeybinding(editor, monaco)
     monaco.editor.setTheme(theme === 'dark' ? 'druzya-dark' : 'vs')
     const model = editor.getModel()
     if (model && initialCodeRef.current && model.getValue() !== initialCodeRef.current) {
@@ -1217,7 +1219,14 @@ export function CodeRoomPage() {
                 <span className="text-xs font-mono text-[#94a3b8]">
                   solution.{lang === 'python' ? 'py' : lang === 'go' ? 'go' : lang === 'sql' ? 'sql' : 'txt'}
                 </span>
-                <div className="relative ml-auto">
+                <button
+                  onClick={() => { if (editorRef.current && monacoRef.current) formatEditorCode(editorRef.current, monacoRef.current) }}
+                  className="ml-auto rounded-lg px-2 py-1 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0f172a] hover:text-white"
+                  title="Format (Shift+Alt+F)"
+                >
+                  {t('codeRoom.format', 'Format')}
+                </button>
+                <div className="relative">
                   <button
                     onClick={() => setShowLangDropdown(v => !v)}
                     className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-[#94a3b8] transition-colors hover:bg-[#0f172a]"
@@ -1608,7 +1617,14 @@ export function CodeRoomPage() {
                   <span className="text-[10px] tabular-nums text-[#64748b]">{ws.opponentCodeLen} ch</span>
                 </div>
               )}
-              <div className="ml-auto relative">
+              <button
+                onClick={() => { if (editorRef.current && monacoRef.current) formatEditorCode(editorRef.current, monacoRef.current) }}
+                className="ml-auto rounded px-2 py-1 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0f172a] hover:text-white"
+                title="Format (Shift+Alt+F)"
+              >
+                {t('codeRoom.format', 'Format')}
+              </button>
+              <div className="relative">
                 <button
                   onClick={() => setShowLangDropdown(v => !v)}
                   className="flex items-center gap-1 px-2 py-1 text-xs text-[#94a3b8] rounded hover:bg-[#0f172a] transition-colors"

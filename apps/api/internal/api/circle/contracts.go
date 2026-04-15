@@ -27,5 +27,5 @@ type Service interface {
 // EventService handles event operations for circles.
 type EventService interface {
 	ListEvents(ctx context.Context, currentUserID uuid.UUID, opts model.ListEventsOptions) (*model.ListEventsResponse, error)
-	CreateEvent(ctx context.Context, creatorID uuid.UUID, req model.CreateEventRequest) (*model.Event, error)
+	CreateEvent(ctx context.Context, creatorID uuid.UUID, isAdmin bool, req model.CreateEventRequest) (*model.Event, error)
 }

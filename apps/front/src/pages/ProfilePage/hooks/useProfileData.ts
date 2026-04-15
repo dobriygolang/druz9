@@ -19,6 +19,14 @@ export interface ArenaStats {
   nextLeagueAt: number
 }
 
+export interface SectionErrors {
+  progress?: boolean
+  achievements?: boolean
+  activity?: boolean
+  arena?: boolean
+  feed?: boolean
+}
+
 export interface ProfileData {
   user: User | null
   progress: ProfileProgress | null
@@ -28,6 +36,7 @@ export interface ProfileData {
   feed: FeedItem[]
   loading: boolean
   error: string | null
+  sectionErrors: SectionErrors
   isOwn: boolean
   refetch: () => void
 }
@@ -42,6 +51,7 @@ export function useProfileData(targetUserId: string | undefined): ProfileData {
   const [feed, setFeed] = useState<FeedItem[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const [sectionErrors, setSectionErrors] = useState<SectionErrors>({})
 
   const effectiveId = targetUserId ?? authUser?.id ?? ''
   const isOwn = !targetUserId || targetUserId === authUser?.id
@@ -52,6 +62,7 @@ export function useProfileData(targetUserId: string | undefined): ProfileData {
   const fetchAll = useCallback(() => {
     if (!effectiveId) return
     setError(null)
+    setSectionErrors({})
     setLoading(true)
 
     const profileReq = authApi.getProfileById(effectiveId)
@@ -63,7 +74,7 @@ export function useProfileData(targetUserId: string | undefined): ProfileData {
 
     const progressReq = authApi.getProfileProgress(effectiveId)
       .then(setProgress)
-      .catch(() => {})
+      .catch(() => { setSectionErrors(prev => ({ ...prev, progress: true })) })
 
     const achievementsReq = apiClient.get(`/api/v1/profile/${effectiveId}/achievements`)
       .then(res => {
@@ -84,7 +95,7 @@ export function useProfileData(targetUserId: string | undefined): ProfileData {
           target: a.target ?? a.Target ?? 1,
         })))
       })
-      .catch(() => {})
+      .catch(() => { setSectionErrors(prev => ({ ...prev, achievements: true })) })
 
     const activityReq = apiClient.get(`/api/v1/profile/${effectiveId}/activity`)
       .then(res => {
@@ -92,18 +103,18 @@ export function useProfileData(targetUserId: string | undefined): ProfileData {
         const arr: any[] = Array.isArray(raw) ? raw : Array.isArray(raw?.activity) ? raw.activity : []
         setActivity(arr.map((a: any) => ({ date: a.date ?? '', count: a.count ?? 0 })))
       })
-      .catch(() => {})
+      .catch(() => { setSectionErrors(prev => ({ ...prev, activity: true })) })
 
     const arenaReq = apiClient.get(`/api/v1/arena/stats/${effectiveId}`)
       .then(res => {
         const s = res.data?.stats ?? res.data
         if (s && typeof s.rating === 'number') setArenaStats(s)
       })
-      .catch(() => {})
+      .catch(() => { setSectionErrors(prev => ({ ...prev, arena: true })) })
 
     const feedReq = authApi.getProfileFeed(effectiveId)
       .then(setFeed)
-      .catch(() => {})
+      .catch(() => { setSectionErrors(prev => ({ ...prev, feed: true })) })
 
     Promise.all([profileReq, progressReq, achievementsReq, activityReq, arenaReq, feedReq])
       .finally(() => setLoading(false))
@@ -111,5 +122,5 @@ export function useProfileData(targetUserId: string | undefined): ProfileData {
 
   useEffect(() => { fetchAll() }, [fetchAll])
 
-  return { user, progress, achievements, activity, arenaStats, feed, loading, error, isOwn, refetch: fetchAll }
+  return { user, progress, achievements, activity, arenaStats, feed, loading, error, sectionErrors, isOwn, refetch: fetchAll }
 }

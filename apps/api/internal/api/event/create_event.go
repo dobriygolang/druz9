@@ -16,9 +16,6 @@ func (i *Implementation) CreateEvent(ctx context.Context, req *v1.CreateEventReq
 	if !ok {
 		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
 	}
-	if !user.IsAdmin {
-		return nil, errors.Forbidden("FORBIDDEN", "forbidden")
-	}
 
 	var scheduledAt *time.Time
 	if req.ScheduledAt != nil {
@@ -26,7 +23,7 @@ func (i *Implementation) CreateEvent(ctx context.Context, req *v1.CreateEventReq
 		scheduledAt = &value
 	}
 
-	event, err := i.service.CreateEvent(ctx, user.ID, model.CreateEventRequest{
+	event, err := i.service.CreateEvent(ctx, user.ID, user.IsAdmin, model.CreateEventRequest{
 		Title:          req.Title,
 		PlaceLabel:     req.PlaceLabel,
 		Description:    req.Description,

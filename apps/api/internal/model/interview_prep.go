@@ -89,6 +89,7 @@ const (
 	InterviewPrepMockSessionStatusUnknown  InterviewPrepMockSessionStatus = ""
 	InterviewPrepMockSessionStatusActive   InterviewPrepMockSessionStatus = "active"
 	InterviewPrepMockSessionStatusFinished InterviewPrepMockSessionStatus = "finished"
+	InterviewPrepMockSessionStatusAborted  InterviewPrepMockSessionStatus = "aborted"
 )
 
 func (s InterviewPrepMockSessionStatus) String() string {
@@ -101,6 +102,8 @@ func InterviewPrepMockSessionStatusFromString(v string) InterviewPrepMockSession
 		return InterviewPrepMockSessionStatusActive
 	case "finished":
 		return InterviewPrepMockSessionStatusFinished
+	case "aborted":
+		return InterviewPrepMockSessionStatusAborted
 	default:
 		return InterviewPrepMockSessionStatusUnknown
 	}

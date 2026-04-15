@@ -224,10 +224,25 @@ func (r *Repo) RegisterChatByTelegramID(ctx context.Context, telegramID, chatID 
 }
 
 // LinkTelegramToUser updates the row's user_id once we know the real app user UUID.
+// If no row exists for this telegram_id, creates one using telegram_id as the chat_id
+// (for private chats, telegram user id == chat id).
 func (r *Repo) LinkTelegramToUser(ctx context.Context, userID uuid.UUID, telegramID int64) error {
 	_, err := r.db.DB.Exec(ctx, `
-		UPDATE user_notification_settings SET user_id = $1, updated_at = NOW()
-		WHERE telegram_id = $2`, userID, telegramID,
+		INSERT INTO user_notification_settings (user_id, telegram_id, telegram_chat_id)
+		VALUES ($1, $2, $2)
+		ON CONFLICT (telegram_id) WHERE telegram_id IS NOT NULL
+		DO UPDATE SET user_id = $1, telegram_chat_id = COALESCE(NULLIF(user_notification_settings.telegram_chat_id, 0), $2), updated_at = NOW()`,
+		userID, telegramID,
+	)
+	if err != nil {
+		return err
+	}
+	// Also update by user_id in case there's an existing row without telegram_id.
+	_, err = r.db.DB.Exec(ctx, `
+		UPDATE user_notification_settings
+		SET telegram_chat_id = COALESCE(NULLIF(telegram_chat_id, 0), $2), telegram_id = $2, updated_at = NOW()
+		WHERE user_id = $1 AND (telegram_id IS NULL OR telegram_id = 0)`,
+		userID, telegramID,
 	)
 	return err
 }

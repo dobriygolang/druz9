@@ -10,6 +10,7 @@ import { Spinner } from '@/shared/ui/Spinner'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { getLanguageLabel, getMonacoLanguage } from '@/shared/lib/codeEditorLanguage'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import { formatEditorCode, registerFormatKeybinding } from '@/shared/lib/editorFormat'
 import { PageMeta } from '@/shared/ui/PageMeta'
 import type * as Monaco from 'monaco-editor'
 
@@ -52,12 +53,6 @@ const STAGE_KIND_LABELS: Record<string, string> = {
   theoretical:  'Theoretical',
 }
 
-const EVALUATOR_MODE_LABELS: Record<string, string> = {
-  code_execution: 'Code Execution',
-  ai_review: 'AI Review',
-  answer_review: 'Answer Review',
-  system_design_review: 'Design Review',
-}
 
 // Which kinds use the code editor
 const CODE_KINDS = new Set(['algorithm', 'coding', 'sql'])
@@ -152,7 +147,6 @@ export function InterviewPrepMockSessionPage() {
   const isFinished = session?.status === 'MOCK_SESSION_STATUS_FINISHED' || session?.status === 'finished'
   const supportedLanguages = resolveSupportedLanguages(currentStage?.task, currentStage?.solveLanguage ?? currentStage?.task?.language ?? 'python')
   const stageTitle = currentStage?.title || STAGE_KIND_LABELS[stageKind] || t('mock.stageDefault')
-  const stageInstructions = currentStage?.candidateInstructions ?? ''
   const isCodeReview = stageKind === 'theoretical' && (
     currentStage?.task?.prepType === 'code_review' ||
     currentStage?.roundType === 'code_review'
@@ -161,9 +155,6 @@ export function InterviewPrepMockSessionPage() {
   const codeReviewLanguage = isCodeReview
     ? getMonacoLanguage(currentStage?.task?.language ?? 'go')
     : 'go'
-  const stageEvaluator = currentStage?.evaluatorMode ?? ''
-  const sessionIntro = session?.introText ?? ''
-  const sessionClosing = session?.closingText ?? ''
 
   const handleSubmit = async () => {
     if (!sessionId) return
@@ -219,9 +210,12 @@ export function InterviewPrepMockSessionPage() {
     }
   }
 
+  const monacoRef = useRef<typeof Monaco | null>(null)
   const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof Monaco) => {
     editorRef.current = editor
+    monacoRef.current = monaco
     registerDarkTheme(monaco)
+    registerFormatKeybinding(editor, monaco)
     monaco.editor.setTheme('druzya-dark')
   }, [])
 
@@ -257,29 +251,25 @@ export function InterviewPrepMockSessionPage() {
   )
 
   const InstructionsBanner = () => {
-    if (!stageInstructions && !stageEvaluator) return null
+    if (!stageTitle) return null
     return (
       <div className="mb-4 rounded-xl border border-[#334155] bg-[#1e293b] px-3 py-3">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-semibold uppercase tracking-wide text-[#94a3b8]">{stageTitle}</span>
-          {stageEvaluator && (
-            <span className="rounded-full bg-[#334155] px-2 py-0.5 text-[10px] font-semibold text-[#cbd5e1]">
-              {EVALUATOR_MODE_LABELS[stageEvaluator] ?? stageEvaluator}
-            </span>
-          )}
+          <span className="rounded-full bg-[#334155] px-2 py-0.5 text-[10px] font-semibold text-[#cbd5e1]">
+            {t('mock.stageOf', { current: currentStageIndex + 1, total: stages.length })}
+          </span>
         </div>
-        {stageInstructions && (
-          <p className="mt-2 text-xs leading-5 text-[#94a3b8]">{stageInstructions}</p>
-        )}
       </div>
     )
   }
 
   const IntroBanner = () => {
-    if (!sessionIntro || currentStageIndex !== 0 || isFinished) return null
+    if (currentStageIndex !== 0 || isFinished) return null
+    const label = blueprintTitle || companyTag || t('mock.defaultCompany')
     return (
       <div className="mb-4 rounded-xl border border-[#334155] bg-[#1e293b] px-3 py-2.5 text-xs leading-5 text-[#cbd5e1]">
-        {sessionIntro}
+        {t('mock.introLabel', { company: label })}
       </div>
     )
   }
@@ -292,7 +282,7 @@ export function InterviewPrepMockSessionPage() {
             <CheckCircle className="w-7 h-7 text-white" />
           </div>
           <h2 className="text-lg font-bold text-[#f8fafc]">{t('mock.finishedTitle')}</h2>
-          <p className="text-sm text-[#94a3b8]">{sessionClosing || t('mock.finishedBody')}</p>
+          <p className="text-sm text-[#94a3b8]">{t('mock.finishedBody')}</p>
           <Button variant="secondary" size="sm" onClick={() => isFinished ? navigate('/prepare/interview-prep') : setShowLeaveConfirm(true)}>
             {t('mock.back')}
           </Button>
@@ -362,6 +352,13 @@ export function InterviewPrepMockSessionPage() {
       <span className="text-xs text-[#94a3b8] font-mono">
         {editorLang === 'go' ? 'solution.go' : editorLang === 'sql' ? 'solution.sql' : 'solution.py'}
       </span>
+      <button
+        onClick={() => { if (editorRef.current && monacoRef.current) formatEditorCode(editorRef.current, monacoRef.current) }}
+        className="rounded px-2 py-0.5 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0f172a] hover:text-white"
+        title="Format (Shift+Alt+F)"
+      >
+        Format
+      </button>
       {supportedLanguages.length > 1 ? (
         <select
           value={selectedLanguage}

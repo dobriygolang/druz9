@@ -22,6 +22,7 @@ export interface Event {
   meetingLink: string
   repeat: string
   circleId?: string
+  status: string
 }
 
 type BackendEvent = {
@@ -44,6 +45,7 @@ type BackendEvent = {
   meetingLink?: string
   repeat?: string
   circleId?: string
+  status?: string
 }
 
 function normalizeEvent(e: BackendEvent): Event {
@@ -58,6 +60,7 @@ function normalizeEvent(e: BackendEvent): Event {
     description: e.description ?? '', meetingLink: e.meetingLink ?? '',
     repeat: e.repeat ?? 'none',
     circleId: e.circleId,
+    status: e.status ?? 'approved',
   }
 }
 

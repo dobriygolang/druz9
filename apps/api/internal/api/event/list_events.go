@@ -17,9 +17,11 @@ func (i *Implementation) ListEvents(ctx context.Context, req *v1.ListEventsReque
 	}
 
 	opts := model.ListEventsOptions{
-		Limit:  req.Limit,
-		Offset: req.Offset,
-		Status: mapEventListFilter(req.Status),
+		Limit:              req.Limit,
+		Offset:             req.Offset,
+		Status:             mapEventListFilter(req.Status),
+		IncludeAllStatuses: user.IsAdmin,
+		ViewerID:           &user.ID,
 	}
 
 	if req.CreatorId != "" {

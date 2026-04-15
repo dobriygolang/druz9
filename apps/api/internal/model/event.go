@@ -75,6 +75,7 @@ type Event struct {
 	Participants     []*EventParticipant
 	CircleID         *uuid.UUID
 	Repeat           string
+	Status           string
 }
 
 type eventDeleteScopeContextKey struct{}
@@ -100,6 +101,10 @@ type ListEventsOptions struct {
 	CreatorID *uuid.UUID
 	CircleID  *uuid.UUID
 	Status    string
+	// IncludeAllStatuses bypasses approval filtering (for admins).
+	IncludeAllStatuses bool
+	// ViewerID is the current user — they can see their own pending events.
+	ViewerID *uuid.UUID
 }
 
 const (
@@ -113,6 +118,12 @@ const (
 	EventRepeatWeekly  = "weekly"
 	EventRepeatMonthly = "monthly"
 	EventRepeatYearly  = "yearly"
+)
+
+const (
+	EventStatusPending  = "pending"
+	EventStatusApproved = "approved"
+	EventStatusRejected = "rejected"
 )
 
 type ListEventsResponse struct {
@@ -138,6 +149,7 @@ type CreateEventRequest struct {
 	InvitedUserIDs []string
 	CircleID       *uuid.UUID
 	IsPublic       bool
+	Status         string
 }
 
 type UpdateEventRequest struct {

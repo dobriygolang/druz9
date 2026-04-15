@@ -424,8 +424,8 @@ func (m *MockService) ListEvents(ctx context.Context, userID uuid.UUID, opts mod
 	return args.Get(0).(*model.ListEventsResponse), args.Error(1)
 }
 
-func (m *MockService) CreateEvent(ctx context.Context, userID uuid.UUID, req model.CreateEventRequest) (*model.Event, error) {
-	args := m.Called(ctx, userID, req)
+func (m *MockService) CreateEvent(ctx context.Context, userID uuid.UUID, isAdmin bool, req model.CreateEventRequest) (*model.Event, error) {
+	args := m.Called(ctx, userID, isAdmin, req)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
 	}

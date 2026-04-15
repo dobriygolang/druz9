@@ -8,6 +8,7 @@ import { apiClient } from '@/shared/api/base'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { useTranslation } from 'react-i18next'
 import { registerDarkTheme } from '@/shared/lib/monacoTheme'
+import { registerFormatKeybinding } from '@/shared/lib/editorFormat'
 import { DIFF_LABELS, DIFF_VARIANTS } from '@/shared/lib/taskLabels'
 import { formatDateRu } from '@/shared/lib/dateFormat'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
@@ -141,8 +142,9 @@ export function DailyChallengePage() {
     }
   }
 
-  const handleEditorMount = useCallback((_editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
+  const handleEditorMount = useCallback((editor: Monaco.editor.IStandaloneCodeEditor, monaco: typeof import('monaco-editor')) => {
     registerDarkTheme(monaco)
+    registerFormatKeybinding(editor, monaco)
     monaco.editor.setTheme(theme === 'dark' ? 'druzya-dark' : 'vs')
   }, [theme])
 
