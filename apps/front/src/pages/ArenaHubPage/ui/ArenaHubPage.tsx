@@ -207,7 +207,7 @@ export function ArenaHubPage() {
                 <Swords className="w-4 h-4 text-[#666666] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#111111] truncate">{m.taskTitle ?? 'Задача'}</p>
-                  <p className="text-xs text-[#666666]">{m.topic ?? ''} · {m.difficulty ?? ''}</p>
+                  <p className="text-xs text-[#666666]">{m.topic ?? ''} · {({ DIFFICULTY_EASY: 'Easy', DIFFICULTY_MEDIUM: 'Medium', DIFFICULTY_HARD: 'Hard' } as Record<string, string>)[m.difficulty] ?? m.difficulty ?? ''}</p>
                 </div>
                 <Button size="sm" variant="secondary" className={isMobile ? 'w-full justify-center' : ''} onClick={() => navigate(`/arena/${m.id}`)}>
                   Войти

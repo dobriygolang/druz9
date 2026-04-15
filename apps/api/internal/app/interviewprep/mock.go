@@ -76,6 +76,10 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 	if blueprint == nil {
 		return nil, ErrMockTaskPoolIncomplete
 	}
+	effectiveCompanyTag := normalizedCompany
+	if effectiveCompanyTag == "" {
+		effectiveCompanyTag = strings.TrimSpace(strings.ToLower(blueprint.PrimaryAliasSlug))
+	}
 
 	rounds, err := s.repo.ListBlueprintRounds(ctx, blueprint.ID)
 	if err != nil {
@@ -89,10 +93,12 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 	session := &model.InterviewPrepMockSession{
 		ID:                uuid.New(),
 		UserID:            user.ID,
-		CompanyTag:        normalizedCompany,
+		CompanyTag:        effectiveCompanyTag,
 		BlueprintSlug:     blueprint.Slug,
 		BlueprintTitle:    blueprint.Title,
 		TrackSlug:         blueprint.TrackSlug,
+		IntroText:         blueprint.IntroText,
+		ClosingText:       blueprint.ClosingText,
 		Status:            model.InterviewPrepMockSessionStatusActive,
 		CurrentStageIndex: 0,
 		StartedAt:         nowTime,
@@ -103,7 +109,7 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 	stages := make([]*model.InterviewPrepMockStage, 0, len(rounds))
 	questionResults := make([]*model.InterviewPrepMockQuestionResult, 0, len(rounds)*2)
 	for index, round := range rounds {
-		task, poolID, taskErr := s.repo.SelectTaskForBlueprintRound(ctx, round)
+		task, poolID, taskErr := s.repo.SelectTaskForBlueprintRound(ctx, round, effectiveCompanyTag)
 		if taskErr != nil {
 			return nil, taskErr
 		}
@@ -113,23 +119,29 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 
 		stageKind := model.InterviewPrepMockStageKindFromRoundType(round.RoundType)
 		stage := &model.InterviewPrepMockStage{
-			ID:                   uuid.New(),
-			SessionID:            session.ID,
-			StageIndex:           int32(index),
-			Kind:                 stageKind,
-			Status:               model.InterviewPrepMockStageStatusPending,
-			TaskID:               task.ID,
-			BlueprintRoundID:     &round.ID,
-			SourcePoolID:         poolID,
-			SolveLanguage:        defaultMockSolveLanguage(task, stageKind),
-			Code:                 defaultMockCode(task, stageKind),
-			LastSubmissionPassed: false,
-			ReviewScore:          0,
-			ReviewSummary:        "",
-			StartedAt:            nowTime,
-			CreatedAt:            nowTime,
-			UpdatedAt:            nowTime,
-			Task:                 task,
+			ID:                      uuid.New(),
+			SessionID:               session.ID,
+			StageIndex:              int32(index),
+			Kind:                    stageKind,
+			RoundType:               round.RoundType,
+			Title:                   round.Title,
+			Status:                  model.InterviewPrepMockStageStatusPending,
+			TaskID:                  task.ID,
+			BlueprintRoundID:        &round.ID,
+			SourcePoolID:            poolID,
+			SolveLanguage:           defaultMockSolveLanguage(task, stageKind),
+			Code:                    defaultMockCode(task, stageKind),
+			DurationSeconds:         round.DurationSeconds,
+			EvaluatorMode:           round.EvaluatorMode,
+			CandidateInstructions:   round.CandidateInstructionsOverride,
+			InterviewerInstructions: round.InterviewerInstructionsOverride,
+			LastSubmissionPassed:    false,
+			ReviewScore:             0,
+			ReviewSummary:           "",
+			StartedAt:               nowTime,
+			CreatedAt:               nowTime,
+			UpdatedAt:               nowTime,
+			Task:                    task,
 		}
 		if index == 0 {
 			stage.Status = model.InterviewPrepMockStageStatusSolving
@@ -215,6 +227,9 @@ func (s *Service) SubmitMockStage(
 		if err != nil {
 			return nil, err
 		}
+		if codeTask == nil {
+			return nil, ErrExecutableTaskNotConfigured
+		}
 		judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, codeTask, code, solveLanguage)
 		if err != nil {
 			return nil, err
@@ -248,6 +263,9 @@ func (s *Service) SubmitMockStage(
 		}, nil
 	}
 
+	if s.reviewer == nil {
+		return nil, aireview.ErrNotConfigured
+	}
 	review, err := s.reviewer.ReviewInterviewSolution(ctx, aireview.InterviewSolutionReviewRequest{
 		ModelOverride:     s.modelOverrideForStage(stage),
 		StageKind:         stage.Kind.String(),
@@ -356,6 +374,12 @@ func (s *Service) AnswerMockQuestion(ctx context.Context, user *model.User, sess
 		return nil, ErrMockQuestionAnswerRequired
 	}
 
+	if s.reviewer == nil {
+		return nil, aireview.ErrNotConfigured
+	}
+	if stage.Task == nil {
+		return nil, ErrTaskNotFound
+	}
 	review, err := s.reviewer.ReviewInterviewAnswer(ctx, aireview.InterviewAnswerReviewRequest{
 		ModelOverride:   s.modelOverrideForFollowup(stage),
 		Topic:           stage.Kind.String(),
@@ -403,7 +427,7 @@ func (s *Service) buildMockStageQuestions(
 	if err != nil {
 		return nil, err
 	}
-	templates, err := taskSpecificMockQuestions(task, taskQuestions, maxFollowupCount)
+	templates, err := taskSpecificMockQuestions(task, stage, taskQuestions, maxFollowupCount)
 	if err != nil {
 		return nil, err
 	}
@@ -579,7 +603,7 @@ func (s *Service) modelOverrideForFollowup(stage *model.InterviewPrepMockStage) 
 	return s.modelOverrideForStage(stage)
 }
 
-func taskSpecificMockQuestions(task *model.InterviewPrepTask, taskQuestions []*model.InterviewPrepQuestion, maxCount int32) ([]mockQuestionTemplate, error) {
+func taskSpecificMockQuestions(task *model.InterviewPrepTask, stage *model.InterviewPrepMockStage, taskQuestions []*model.InterviewPrepQuestion, maxCount int32) ([]mockQuestionTemplate, error) {
 	if task == nil {
 		return nil, ErrMockQuestionPoolIncomplete
 	}
@@ -594,12 +618,9 @@ func taskSpecificMockQuestions(task *model.InterviewPrepTask, taskQuestions []*m
 		}
 		return selectQuestionTemplates(templates, maxCount), nil
 	}
-	if value := strings.TrimSpace(task.ReferenceSolution); value != "" {
-		return []mockQuestionTemplate{{
-			Key:    task.Slug + "-tradeoffs",
-			Prompt: "Какие главные trade-off и слабые места есть у твоего решения?",
-			Answer: value,
-		}}, nil
+	templates := defaultMockQuestionTemplates(task, stage)
+	if len(templates) > 0 {
+		return selectQuestionTemplates(templates, maxCount), nil
 	}
 	return nil, ErrMockQuestionPoolIncomplete
 }
@@ -624,4 +645,130 @@ func selectQuestionTemplates(items []mockQuestionTemplate, maxCount int32) []moc
 		remaining = append(remaining[:index], remaining[index+1:]...)
 	}
 	return selected
+}
+
+func defaultMockQuestionTemplates(task *model.InterviewPrepTask, stage *model.InterviewPrepMockStage) []mockQuestionTemplate {
+	if task == nil {
+		return nil
+	}
+	reference := strings.TrimSpace(task.ReferenceSolution)
+	roundType := ""
+	if stage != nil {
+		roundType = stage.RoundType
+	}
+
+	switch roundType {
+	case "coding_algorithmic":
+		return []mockQuestionTemplate{
+			{
+				Key:    task.Slug + "-complexity",
+				Prompt: "Почему выбрана именно такая асимптотика и в каких входах решение станет узким местом?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-edges",
+				Prompt: "Какие edge cases ты бы проверил в первую очередь и как бы убедился, что решение не ломается на них?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-alternatives",
+				Prompt: "Какое альтернативное решение ты рассматривал и почему отказался от него?",
+				Answer: reference,
+			},
+		}
+	case "coding_practical":
+		return []mockQuestionTemplate{
+			{
+				Key:    task.Slug + "-tradeoffs",
+				Prompt: "Какие главные trade-off и слабые места есть у твоего решения?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-failures",
+				Prompt: "Где это решение сломается в проде первым и как бы ты усилил надежность без полного переписывания?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-testing",
+				Prompt: "Какие два-три теста ты бы считал обязательными перед релизом и почему именно их?",
+				Answer: reference,
+			},
+		}
+	case "sql":
+		return []mockQuestionTemplate{
+			{
+				Key:    task.Slug + "-indexes",
+				Prompt: "Какие индексы здесь нужны и чем ты обоснуешь их выбор?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-cardinality",
+				Prompt: "Какой join или фильтр здесь будет самым дорогим на больших объемах данных и почему?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-validation",
+				Prompt: "Как бы ты проверил корректность запроса на реальных данных, если execution plan вызывает сомнения?",
+				Answer: reference,
+			},
+		}
+	case "system_design":
+		return []mockQuestionTemplate{
+			{
+				Key:    task.Slug + "-bottleneck",
+				Prompt: "Какой bottleneck в этой архитектуре появится первым при росте трафика и как ты его снимешь?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-consistency",
+				Prompt: "Где ты выбрал бы weaker consistency, а где нет, и почему?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-reliability",
+				Prompt: "Как бы ты спроектировал деградацию сервиса при partial outage, чтобы продукт оставался usable?",
+				Answer: reference,
+			},
+		}
+	case "behavioral":
+		return []mockQuestionTemplate{
+			{
+				Key:    task.Slug + "-ownership",
+				Prompt: "Что в этой ситуации было лично твоим ownership, а что зависело от команды или контекста?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-outcome",
+				Prompt: "По каким сигналам ты понял, что решение было успешным или неуспешным?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-retrospective",
+				Prompt: "Что бы ты сделал иначе сейчас, если бы заново проходил через ту же ситуацию?",
+				Answer: reference,
+			},
+		}
+	case "code_review":
+		return []mockQuestionTemplate{
+			{
+				Key:    task.Slug + "-bugs",
+				Prompt: "Какой риск correctness или data loss ты бы искал в этом коде первым?",
+				Answer: reference,
+			},
+			{
+				Key:    task.Slug + "-maintainability",
+				Prompt: "Где здесь основная maintainability debt и как бы ты снимал ее поэтапно?",
+				Answer: reference,
+			},
+		}
+	default:
+		if reference == "" {
+			return nil
+		}
+		return []mockQuestionTemplate{{
+			Key:    task.Slug + "-tradeoffs",
+			Prompt: "Какие главные trade-off и слабые места есть у твоего решения?",
+			Answer: reference,
+		}}
+	}
 }

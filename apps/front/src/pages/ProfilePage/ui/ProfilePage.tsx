@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { MapPin, Calendar, Briefcase, Edit3, Trophy, Zap, Swords, Flame, ChevronRight, Check } from 'lucide-react'
 import { useAuth } from '@/app/providers/AuthProvider'
@@ -26,7 +26,7 @@ interface ArenaStats {
   wins: number
   losses: number
   matches: number
-  win_rate: number
+  winRate: number
 }
 
 function computeLeague(rating: number): string {
@@ -68,6 +68,9 @@ export function ProfilePage() {
   const targetId = userId ?? authUser?.id ?? ''
   const isOwn = !userId || userId === authUser?.id
 
+  const authUserRef = useRef(authUser)
+  useEffect(() => { authUserRef.current = authUser }, [authUser])
+
   const fetchProfile = useCallback(() => {
     if (!targetId) return
     setError(null)
@@ -78,11 +81,11 @@ export function ProfilePage() {
     ])
       .then(([p, prog]) => { setUser(p.user); setProgress(prog) })
       .catch(() => {
-        if (authUser) setUser(authUser)
+        if (authUserRef.current) setUser(authUserRef.current)
         else setError('Не удалось загрузить данные')
       })
       .finally(() => setLoading(false))
-  }, [targetId, authUser])
+  }, [targetId])
 
   useEffect(() => { fetchProfile() }, [fetchProfile])
 
@@ -377,7 +380,7 @@ export function ProfilePage() {
                   { label: 'Матчей', value: arenaStats.matches },
                   { label: 'Побед', value: arenaStats.wins },
                   { label: 'Поражений', value: arenaStats.losses },
-                  { label: 'Winrate', value: `${Math.round(arenaStats.win_rate * 100)}%` },
+                  { label: 'Winrate', value: `${Math.round(arenaStats.winRate * 100)}%` },
                 ].map(s => (
                   <div key={s.label} className="bg-[#F2F3F0] rounded-xl px-3 py-2.5 text-center">
                     <p className="text-lg font-bold text-[#111111] font-mono">{s.value}</p>

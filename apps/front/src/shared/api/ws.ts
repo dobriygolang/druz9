@@ -67,7 +67,9 @@ export class RealtimeSocket {
 
     ws.onclose = (ev) => {
       this.stopPing()
-      this.opts.onClose!(ev.code, ev.reason)
+      if (!this.disposed) {
+        this.opts.onClose!(ev.code, ev.reason)
+      }
       if (!this.disposed && this.opts.reconnect) {
         this.scheduleReconnect()
       }

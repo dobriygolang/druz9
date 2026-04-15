@@ -95,7 +95,10 @@ export function VacanciesPage() {
   }
 
   const filtered = referrals.filter(r => {
-    if (filter !== 'Все' && r.employmentType.toLowerCase() !== filter.toLowerCase()) return false
+    if (filter !== 'Все') {
+      const typeLabel = EMPLOYMENT_TYPES.find(t => t.value === r.employmentType)?.label ?? ''
+      if (typeLabel.toLowerCase() !== filter.toLowerCase()) return false
+    }
     if (search) {
       const q = search.toLowerCase()
       return r.title.toLowerCase().includes(q) || r.company.toLowerCase().includes(q) || r.description.toLowerCase().includes(q)
@@ -229,13 +232,13 @@ export function VacanciesPage() {
 
         {/* Grid */}
         {loading ? (
-          <div className={`grid grid-cols-1 gap-4 ${isMobile ? 'sm:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
+          <div className={`mt-6 grid grid-cols-1 gap-4 ${isMobile ? 'sm:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
             {Array.from({ length: 6 }).map((_, i) => (
               <ReferralCardSkeleton key={i} />
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className={`section-enter flex flex-col items-center justify-center border border-dashed border-[#CBCCC9] bg-white py-20 text-center dark:border-[#1a2540] dark:bg-[#161c2d] ${isMobile ? 'rounded-[30px]' : 'rounded-2xl'}`}>
+          <div className={`mt-6 section-enter flex flex-col items-center justify-center border border-dashed border-[#CBCCC9] bg-white py-20 text-center dark:border-[#1a2540] dark:bg-[#161c2d] ${isMobile ? 'rounded-[30px]' : 'rounded-2xl'}`}>
             <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-[#6366F1]/10">
               <Briefcase className="w-8 h-8 text-[#6366F1]" />
             </div>
@@ -247,7 +250,7 @@ export function VacanciesPage() {
             </p>
           </div>
         ) : (
-          <div className={`grid grid-cols-1 gap-4 ${isMobile ? 'sm:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
+          <div className={`mt-6 grid grid-cols-1 gap-4 ${isMobile ? 'sm:grid-cols-2 xl:grid-cols-3' : 'md:grid-cols-2 lg:grid-cols-3'}`}>
             {filtered.map(ref => (
               <Card
                 key={ref.id}
@@ -261,7 +264,7 @@ export function VacanciesPage() {
                   <span className="text-xs font-semibold text-[#666666] font-geist uppercase tracking-wide">
                     {ref.company}
                   </span>
-                  <Badge variant="orange">{ref.employmentType}</Badge>
+                  <Badge variant="orange">{EMPLOYMENT_TYPES.find(t => t.value === ref.employmentType)?.label ?? ref.employmentType}</Badge>
                 </div>
 
                 <h3 className="text-base font-bold text-[#111111] font-geist leading-snug">

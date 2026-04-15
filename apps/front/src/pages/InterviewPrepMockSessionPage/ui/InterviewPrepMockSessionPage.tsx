@@ -19,7 +19,18 @@ const STAGE_KIND_ENUM_MAP: Record<string, string> = {
   MOCK_STAGE_KIND_SYSTEM_DESIGN:'system_design',
 }
 
+const ROUND_TYPE_KIND_MAP: Record<string, string> = {
+  coding_algorithmic: 'algorithm',
+  coding_practical: 'coding',
+  sql: 'sql',
+  system_design: 'system_design',
+  behavioral: 'behavioral',
+  code_review: 'theoretical',
+}
+
 function normalizeKind(raw: string | undefined, stage?: any): string {
+  const roundType = stage?.roundType ?? ''
+  if (roundType && ROUND_TYPE_KIND_MAP[roundType]) return ROUND_TYPE_KIND_MAP[roundType]
   const prepType = stage?.task?.prepType ?? ''
   if (raw === 'MOCK_STAGE_KIND_ARCHITECTURE' || raw === 'architecture') {
     if (prepType === 'code_review') return 'theoretical'
@@ -36,6 +47,13 @@ const STAGE_KIND_LABELS: Record<string, string> = {
   system_design:'System Design',
   behavioral:   'Поведенческий',
   theoretical:  'Теоретический',
+}
+
+const EVALUATOR_MODE_LABELS: Record<string, string> = {
+  code_execution: 'Code Execution',
+  ai_review: 'AI Review',
+  answer_review: 'Answer Review',
+  system_design_review: 'Design Review',
 }
 
 // Which kinds use the code editor
@@ -93,7 +111,7 @@ export function InterviewPrepMockSessionPage() {
     setDesignSchema('')
     setReview(null)
     setTestResult(null)
-    const dur = stage?.task?.durationSeconds
+    const dur = stage?.durationSeconds ?? stage?.task?.durationSeconds
     if (dur) setTimeLeft(dur)
     else setTimeLeft(0)
   }, [])
@@ -127,6 +145,11 @@ export function InterviewPrepMockSessionPage() {
   const currentStageIndex = session?.currentStageIndex ?? 0
   const isFinished = session?.status === 'MOCK_SESSION_STATUS_FINISHED' || session?.status === 'finished'
   const supportedLanguages = resolveSupportedLanguages(currentStage?.task, currentStage?.solveLanguage ?? currentStage?.task?.language ?? 'python')
+  const stageTitle = currentStage?.title || STAGE_KIND_LABELS[stageKind] || 'Этап'
+  const stageInstructions = currentStage?.candidateInstructions ?? ''
+  const stageEvaluator = currentStage?.evaluatorMode ?? ''
+  const sessionIntro = session?.introText ?? ''
+  const sessionClosing = session?.closingText ?? ''
 
   const handleSubmit = async () => {
     if (!sessionId) return
@@ -205,7 +228,7 @@ export function InterviewPrepMockSessionPage() {
               <p className="mt-1 text-xs text-[#666666]">
                 {isFinished
                   ? 'Интервью завершено'
-                  : `Этап ${currentStageIndex + 1} из ${stages.length} · ${STAGE_KIND_LABELS[stageKind] ?? stageKind}`}
+                  : `Этап ${currentStageIndex + 1} из ${stages.length} · ${stageTitle}`}
               </p>
             </div>
             {isFinished ? (
@@ -245,7 +268,7 @@ export function InterviewPrepMockSessionPage() {
                       {isDone ? <CheckCircle className="w-3.5 h-3.5" /> : i + 1}
                     </div>
                     <span className={`whitespace-nowrap text-[11px] font-medium ${isCurrent ? 'text-[#111111]' : 'text-[#94a3b8]'}`}>
-                      {STAGE_KIND_LABELS[kind] ?? kind}
+                      {s.title || STAGE_KIND_LABELS[kind] || kind}
                     </span>
                   </div>
                 )
@@ -254,13 +277,33 @@ export function InterviewPrepMockSessionPage() {
           </div>
 
           <div className="rounded-[30px] border border-[#d8d9d6] bg-white p-4 shadow-[0_14px_30px_rgba(15,23,42,0.06)]">
+            {!isFinished && currentStageIndex === 0 && sessionIntro && (
+              <div className="mb-4 rounded-2xl border border-[#E0E7FF] bg-[#EEF2FF] px-3 py-2.5 text-xs leading-5 text-[#4338CA]">
+                {sessionIntro}
+              </div>
+            )}
+            {!isFinished && (stageInstructions || stageEvaluator) && (
+              <div className="mb-4 flex flex-col gap-2 rounded-2xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-3">
+                <div className="flex flex-wrap items-center gap-2">
+                  <span className="text-[10px] font-semibold uppercase tracking-wide text-[#475569]">{stageTitle}</span>
+                  {stageEvaluator && (
+                    <span className="rounded-full bg-[#E0E7FF] px-2 py-0.5 text-[10px] font-semibold text-[#4338CA]">
+                      {EVALUATOR_MODE_LABELS[stageEvaluator] ?? stageEvaluator}
+                    </span>
+                  )}
+                </div>
+                {stageInstructions && (
+                  <p className="text-xs leading-5 text-[#475569]">{stageInstructions}</p>
+                )}
+              </div>
+            )}
             {isFinished ? (
               <div className="flex flex-col items-center justify-center gap-4 py-4 text-center">
                 <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#22c55e]">
                   <CheckCircle className="w-7 h-7 text-white" />
                 </div>
                 <h2 className="text-lg font-bold text-[#0f172a]">Интервью завершено</h2>
-                <p className="text-sm text-[#666666]">Все этапы пройдены.</p>
+                <p className="text-sm text-[#666666]">{sessionClosing || 'Все этапы пройдены.'}</p>
                 <Button variant="secondary" size="sm" onClick={() => navigate('/growth/interview-prep')} className="rounded-2xl">
                   Вернуться
                 </Button>
@@ -278,8 +321,11 @@ export function InterviewPrepMockSessionPage() {
               </div>
             ) : (
               <div>
-                <h2 className="text-base font-bold text-[#111111]">
-                  {currentStage?.task?.title ?? currentStage?.title ?? 'Задача'}
+                <p className="text-[11px] font-semibold uppercase tracking-wide text-[#6366F1]">
+                  {stageTitle}
+                </p>
+                <h2 className="mt-2 text-base font-bold text-[#111111]">
+                  {currentStage?.task?.title ?? 'Задача'}
                 </h2>
                 <p className="mt-3 whitespace-pre-wrap text-sm leading-relaxed text-[#475569]">
                   {currentStage?.task?.statement ?? currentStage?.statement ?? 'Загружается...'}
@@ -411,7 +457,7 @@ export function InterviewPrepMockSessionPage() {
             <p className="text-xs text-[#666666]">
               {isFinished
                 ? 'Интервью завершено'
-                : `Этап ${currentStageIndex + 1} из ${stages.length} · ${STAGE_KIND_LABELS[stageKind] ?? stageKind}`}
+                : `Этап ${currentStageIndex + 1} из ${stages.length} · ${stageTitle}`}
             </p>
           </div>
           {!isFinished && (
@@ -447,11 +493,11 @@ export function InterviewPrepMockSessionPage() {
               {stages.map((s: any, i: number) => {
                 const isCurrent = i === currentStageIndex
                 const isDone = s.status === 'MOCK_STAGE_STATUS_COMPLETED' || s.status === 'finished' || s.completed === true
-                const kind = normalizeKind(s.kind)
+                const kind = normalizeKind(s.kind, s)
                 return (
                   <div key={s.id ?? i} className="flex items-center gap-1.5">
                     <div
-                      title={STAGE_KIND_LABELS[kind] ?? kind}
+                      title={s.title || STAGE_KIND_LABELS[kind] || kind}
                       className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
                         isDone ? 'bg-[#22c55e] text-white' : isCurrent ? 'bg-[#6366F1] text-white' : 'bg-[#E7E8E5] text-[#666666]'
                       }`}
@@ -468,7 +514,7 @@ export function InterviewPrepMockSessionPage() {
             {currentStage && !isFinished && (
               <div className="flex items-center gap-1.5 mt-1.5">
                 <p className="text-[10px] text-[#94a3b8] font-medium uppercase tracking-wide">
-                  {STAGE_KIND_LABELS[stageKind] ?? stageKind}
+                  {stageTitle}
                 </p>
                 {isInQuestionsPhase && (
                   <span className="flex items-center gap-1 text-[10px] text-[#6366F1] font-medium">
@@ -492,13 +538,33 @@ export function InterviewPrepMockSessionPage() {
                   <CheckCircle className="w-7 h-7 text-white" />
                 </div>
                 <h2 className="text-lg font-bold text-[#0f172a]">Интервью завершено</h2>
-                <p className="text-sm text-[#666666]">Все этапы пройдены.</p>
+                <p className="text-sm text-[#666666]">{sessionClosing || 'Все этапы пройдены.'}</p>
                 <Button variant="secondary" size="sm" onClick={() => navigate('/growth/interview-prep')}>
                   Вернуться
                 </Button>
               </div>
             ) : isInQuestionsPhase && currentQuestion ? (
               <>
+                {currentStageIndex === 0 && sessionIntro && (
+                  <div className="mb-4 rounded-xl border border-[#E0E7FF] bg-[#EEF2FF] px-3 py-2.5 text-xs leading-5 text-[#4338CA]">
+                    {sessionIntro}
+                  </div>
+                )}
+                {(stageInstructions || stageEvaluator) && (
+                  <div className="mb-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-[#475569]">{stageTitle}</span>
+                      {stageEvaluator && (
+                        <span className="rounded-full bg-[#E0E7FF] px-2 py-0.5 text-[10px] font-semibold text-[#4338CA]">
+                          {EVALUATOR_MODE_LABELS[stageEvaluator] ?? stageEvaluator}
+                        </span>
+                      )}
+                    </div>
+                    {stageInstructions && (
+                      <p className="mt-2 text-xs leading-5 text-[#475569]">{stageInstructions}</p>
+                    )}
+                  </div>
+                )}
                 <div className="flex items-center gap-1.5 mb-3">
                   <MessageCircle className="w-3.5 h-3.5 text-[#6366F1]" />
                   <span className="text-xs font-semibold text-[#6366F1] uppercase tracking-wide">Вопрос от интервьюера</span>
@@ -512,8 +578,31 @@ export function InterviewPrepMockSessionPage() {
               </>
             ) : (
               <>
+                {currentStageIndex === 0 && sessionIntro && (
+                  <div className="mb-4 rounded-xl border border-[#E0E7FF] bg-[#EEF2FF] px-3 py-2.5 text-xs leading-5 text-[#4338CA]">
+                    {sessionIntro}
+                  </div>
+                )}
+                {(stageInstructions || stageEvaluator) && (
+                  <div className="mb-4 rounded-xl border border-[#E2E8F0] bg-[#F8FAFC] px-3 py-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-[10px] font-semibold uppercase tracking-wide text-[#475569]">{stageTitle}</span>
+                      {stageEvaluator && (
+                        <span className="rounded-full bg-[#E0E7FF] px-2 py-0.5 text-[10px] font-semibold text-[#4338CA]">
+                          {EVALUATOR_MODE_LABELS[stageEvaluator] ?? stageEvaluator}
+                        </span>
+                      )}
+                    </div>
+                    {stageInstructions && (
+                      <p className="mt-2 text-xs leading-5 text-[#475569]">{stageInstructions}</p>
+                    )}
+                  </div>
+                )}
+                <p className="text-[10px] font-semibold uppercase tracking-wide text-[#6366F1] mb-2">
+                  {stageTitle}
+                </p>
                 <h2 className="text-base font-bold text-[#111111] mb-3">
-                  {currentStage?.task?.title ?? currentStage?.title ?? 'Задача'}
+                  {currentStage?.task?.title ?? 'Задача'}
                 </h2>
                 <p className="text-sm text-[#475569] leading-relaxed whitespace-pre-wrap">
                   {currentStage?.task?.statement ?? currentStage?.statement ?? 'Загружается...'}

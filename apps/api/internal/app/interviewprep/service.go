@@ -94,7 +94,7 @@ type Repository interface {
 	ListMockBlueprints(ctx context.Context) ([]*model.InterviewMockBlueprintSummary, error)
 	ResolveMockBlueprint(ctx context.Context, companyTag string, programSlug string) (*model.InterviewMockBlueprint, error)
 	ListBlueprintRounds(ctx context.Context, blueprintID uuid.UUID) ([]*model.InterviewBlueprintRound, error)
-	SelectTaskForBlueprintRound(ctx context.Context, round *model.InterviewBlueprintRound) (*model.InterviewPrepTask, *uuid.UUID, error)
+	SelectTaskForBlueprintRound(ctx context.Context, round *model.InterviewBlueprintRound, preferredCompanyTag string) (*model.InterviewPrepTask, *uuid.UUID, error)
 
 	CreateMockSession(ctx context.Context, session *model.InterviewPrepMockSession, stages []*model.InterviewPrepMockStage, questionResults []*model.InterviewPrepMockQuestionResult) error
 	GetMockSession(ctx context.Context, sessionID uuid.UUID) (*model.InterviewPrepMockSession, error)
@@ -367,6 +367,9 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 			if s.codeTaskCache != nil && codeTask != nil {
 				s.codeTaskCache.Set(codeTaskID, codeTask)
 			}
+		}
+		if codeTask == nil {
+			return nil, ErrExecutableTaskNotConfigured
 		}
 		judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, codeTask, code, solveLanguage)
 		if err != nil {

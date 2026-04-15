@@ -1,6 +1,9 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Search, ChevronRight, BookOpen, Code2, MessageSquare, Play, Database, Cpu, Server, Building2 } from 'lucide-react'
+import {
+  Search, ChevronRight, BookOpen, Code2, MessageSquare, Play, Database,
+  Cpu, Building2, Clock, Sparkles, ArrowRight, Zap, Target, Star,
+} from 'lucide-react'
 import { interviewPrepApi, type InterviewPrepTask, type MockBlueprint } from '@/features/InterviewPrep/api/interviewPrepApi'
 import { Badge } from '@/shared/ui/Badge'
 import { Button } from '@/shared/ui/Button'
@@ -9,26 +12,57 @@ import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useToast } from '@/shared/ui/Toast'
 import { PREP_TYPE_LABELS } from '@/shared/lib/taskLabels'
 
+/* ── Constants ─────────────────────────────────────────────────────── */
+
 const PREP_TYPE_ICONS: Record<string, React.ReactNode> = {
-  coding:        <Code2 className="w-4 h-4 text-[#6366f1]" />,
-  algorithm:     <Cpu className="w-4 h-4 text-[#8b5cf6]" />,
-  sql:           <Database className="w-4 h-4 text-[#a16207]" />,
-  system_design: <BookOpen className="w-4 h-4 text-[#6366F1]" />,
-  behavioral:    <MessageSquare className="w-4 h-4 text-[#22c55e]" />,
+  coding:        <Code2 className="w-4 h-4" />,
+  algorithm:     <Cpu className="w-4 h-4" />,
+  sql:           <Database className="w-4 h-4" />,
+  system_design: <BookOpen className="w-4 h-4" />,
+  code_review:   <Code2 className="w-4 h-4" />,
+  behavioral:    <MessageSquare className="w-4 h-4" />,
+}
+
+const PREP_TYPE_COLORS: Record<string, { bg: string; text: string; icon: string; border: string }> = {
+  coding:        { bg: 'bg-[#EEF2FF]', text: 'text-[#4338ca]', icon: 'text-[#6366f1]', border: 'border-l-[#6366f1]' },
+  algorithm:     { bg: 'bg-[#f5f3ff]', text: 'text-[#6d28d9]', icon: 'text-[#8b5cf6]', border: 'border-l-[#8b5cf6]' },
+  sql:           { bg: 'bg-[#fffbeb]', text: 'text-[#a16207]', icon: 'text-[#d97706]', border: 'border-l-[#d97706]' },
+  system_design: { bg: 'bg-[#fdf2f8]', text: 'text-[#be185d]', icon: 'text-[#ec4899]', border: 'border-l-[#ec4899]' },
+  code_review:   { bg: 'bg-[#f0fdf4]', text: 'text-[#15803d]', icon: 'text-[#22c55e]', border: 'border-l-[#22c55e]' },
+  behavioral:    { bg: 'bg-[#f0fdf4]', text: 'text-[#15803d]', icon: 'text-[#22c55e]', border: 'border-l-[#22c55e]' },
 }
 
 const MOCK_STAGES = [
-  { icon: <Cpu className="w-4 h-4" />,      label: 'Algorithms',       color: 'bg-[#e0f2fe] text-[#0369a1]' },
-  { icon: <Code2 className="w-4 h-4" />,    label: 'Practical Coding', color: 'bg-[#ede9fe] text-[#6d28d9]' },
-  { icon: <Database className="w-4 h-4" />, label: 'SQL / Debugging',  color: 'bg-[#fef9c3] text-[#a16207]' },
-  { icon: <Server className="w-4 h-4" />,   label: 'Behavioral',       color: 'bg-[#dcfce7] text-[#15803d]' },
-  { icon: <BookOpen className="w-4 h-4" />, label: 'System Design',    color: 'bg-[#fce7f3] text-[#be185d]' },
+  { icon: <Cpu className="w-3.5 h-3.5" />,      label: 'Algorithms',       num: 1 },
+  { icon: <Code2 className="w-3.5 h-3.5" />,    label: 'Practical Coding', num: 2 },
+  { icon: <Database className="w-3.5 h-3.5" />, label: 'SQL / Debugging',  num: 3 },
+  { icon: <MessageSquare className="w-3.5 h-3.5" />, label: 'Behavioral',  num: 4 },
+  { icon: <BookOpen className="w-3.5 h-3.5" />, label: 'System Design',    num: 5 },
 ]
+
+const CATEGORIES = ['', 'coding', 'algorithm', 'sql', 'system_design', 'behavioral'] as const
+
+const ROUND_META: Record<string, { icon: React.ReactNode; color: string }> = {
+  coding_algorithmic: { icon: <Cpu className="w-3.5 h-3.5" />, color: 'border-[#38bdf8]/20 bg-[#0c4a6e]/30 text-[#bae6fd]' },
+  coding_practical:   { icon: <Code2 className="w-3.5 h-3.5" />, color: 'border-[#8b5cf6]/20 bg-[#312e81]/30 text-[#ddd6fe]' },
+  sql:                { icon: <Database className="w-3.5 h-3.5" />, color: 'border-[#f59e0b]/20 bg-[#78350f]/30 text-[#fde68a]' },
+  behavioral:         { icon: <MessageSquare className="w-3.5 h-3.5" />, color: 'border-[#22c55e]/20 bg-[#14532d]/30 text-[#bbf7d0]' },
+  system_design:      { icon: <BookOpen className="w-3.5 h-3.5" />, color: 'border-[#ec4899]/20 bg-[#831843]/30 text-[#fbcfe8]' },
+  code_review:        { icon: <Search className="w-3.5 h-3.5" />, color: 'border-white/15 bg-white/5 text-white/80' },
+}
+
+function formatRoundMinutes(durationSeconds: number): string {
+  const minutes = Math.max(1, Math.round((durationSeconds || 0) / 60))
+  return `${minutes}m`
+}
+
+/* ── Component ─────────────────────────────────────────────────────── */
 
 export function InterviewPrepPage() {
   const navigate = useNavigate()
   const isMobile = useIsMobile()
   const { toast } = useToast()
+
   const [tasks, setTasks] = useState<InterviewPrepTask[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -56,17 +90,32 @@ export function InterviewPrepPage() {
 
   useEffect(() => { fetchTasks() }, [fetchTasks])
 
-  const filtered = tasks.filter(t => {
+  const filtered = useMemo(() => tasks.filter(t => {
     if (category && t.prepType !== category) return false
     if (search && !t.title.toLowerCase().includes(search.toLowerCase())) return false
     return true
-  })
+  }), [tasks, category, search])
+
+  const categoryCounts = useMemo(() => {
+    const counts: Record<string, number> = { '': tasks.length }
+    for (const t of tasks) counts[t.prepType] = (counts[t.prepType] ?? 0) + 1
+    return counts
+  }, [tasks])
+
+  const selectedBlueprint = useMemo(
+    () => blueprints.find(bp => bp.slug === selectedBlueprintSlug) ?? blueprints[0] ?? null,
+    [blueprints, selectedBlueprintSlug],
+  )
 
   const handleStartMock = async (programSlug?: string) => {
     setMockLoading(true)
     setMockError('')
     try {
-      const session = await interviewPrepApi.startMockSession({ programSlug: programSlug || selectedBlueprintSlug }) as any
+      const blueprint = blueprints.find(bp => bp.slug === (programSlug || selectedBlueprintSlug)) ?? selectedBlueprint
+      const session = await interviewPrepApi.startMockSession({
+        programSlug: programSlug || selectedBlueprintSlug,
+        companyTag: blueprint?.primaryAliasSlug || blueprint?.publicAliasSlugs?.[0] || '',
+      }) as any
       localStorage.setItem('interview:last_mock_session', session?.id ?? '')
       navigate(`/growth/interview-prep/mock/${session?.id}`)
     } catch (e: any) {
@@ -83,182 +132,288 @@ export function InterviewPrepPage() {
     }
   }
 
+  const handleStartSolo = async (task: InterviewPrepTask) => {
+    try {
+      const session = await interviewPrepApi.startSession(task.id) as any
+      navigate(`/growth/interview-prep/${session?.id ?? task.id}`)
+    } catch {
+      toast('Не удалось начать сессию', 'error')
+    }
+  }
+
   if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchTasks() }} />
 
   return (
-    <div className={isMobile ? 'px-4 pt-4 pb-24 flex flex-col gap-4' : 'px-4 md:px-6 pt-4 pb-6 flex flex-col gap-5'}>
+    <div className={isMobile ? 'px-4 pt-4 pb-24 flex flex-col gap-5' : 'px-4 md:px-6 pt-4 pb-6 flex flex-col gap-6'}>
 
-      {/* ── Mock Interview hero ─────────────────────────────────────── */}
-      <div className={`overflow-hidden border ${isMobile ? 'rounded-[30px] border-[#d8d9d6] shadow-[0_18px_34px_rgba(15,23,42,0.08)]' : 'rounded-2xl border-[#CBCCC9]'}`}>
-        <div className="h-1.5 bg-gradient-to-r from-[#6366F1] via-[#8b5cf6] to-[#a78bfa]" />
-        <div className={isMobile ? 'bg-[linear-gradient(180deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.9))] p-5' : 'p-5'}>
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-2 mb-1">
-                <Play className="w-4 h-4 text-[#6366F1]" />
-                <h2 className="text-base font-bold text-[#111111]">Mock Interview</h2>
-              </div>
-              <p className="text-sm text-[#666666] mb-4">
-                Выбери канонический mock-сценарий и пройди его как цельный loop с AI-оценкой по каждому раунду.
-              </p>
-              {/* Stages */}
-              <div className={`mb-4 gap-2 ${isMobile ? 'flex overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden' : 'flex flex-wrap'}`}>
-                {MOCK_STAGES.map((s, i) => (
-                  <span key={i} className={`flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-medium ${s.color} ${isMobile ? 'whitespace-nowrap' : ''}`}>
-                    {s.icon} {s.label}
-                  </span>
-                ))}
-              </div>
-              {/* Active session warning */}
-              {mockError && mockError.startsWith('active_session:') && (
-                <div className="mb-3 flex items-center gap-3 px-3 py-2.5 bg-[#FFF7ED] border border-[#FED7AA] rounded-lg">
-                  <p className="text-xs text-[#92400E] flex-1">Есть незавершённая сессия</p>
-                  <button
-                    onClick={() => navigate(`/growth/interview-prep/mock/${mockError.split(':')[1]}`)}
-                    className="text-xs font-semibold text-[#EA580C] hover:underline flex-shrink-0"
-                  >
-                    Продолжить →
-                  </button>
-                </div>
-              )}
-              {mockError && !mockError.startsWith('active_session:') && (
-                <p className="text-xs text-[#ef4444] mb-3">{mockError}</p>
-              )}
-            </div>
+      {/* ── Hero ────────────────────────────────────────────────────── */}
+      <section className="section-enter relative overflow-hidden rounded-[32px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.94)_40%,_rgba(245,243,255,0.96))] p-6 shadow-[0_24px_60px_rgba(99,102,241,0.10)] dark:border-[#1e3158] dark:bg-[linear-gradient(145deg,_rgba(11,13,22,0.96),_rgba(29,36,63,0.92)_50%,_rgba(46,26,58,0.88))] dark:shadow-[0_28px_70px_rgba(2,6,23,0.45)] md:p-8">
+        <div className="pointer-events-none absolute inset-y-0 right-[-10%] w-[50%] rounded-full bg-[radial-gradient(circle,_rgba(99,102,241,0.18),_transparent_66%)] blur-2xl dark:bg-[radial-gradient(circle,_rgba(129,140,248,0.14),_transparent_70%)]" />
+
+        <div className="relative">
+          <div className="inline-flex items-center gap-2 rounded-full border border-[#6366F1]/20 bg-[#6366F1]/8 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6366F1] dark:border-[#818cf8]/20 dark:bg-[#818cf8]/10 dark:text-[#a5b4fc]">
+            <Target className="h-3 w-3" />
+            Interview Prep
           </div>
 
-          {/* Program selector + start */}
-          <div className={`gap-3 ${isMobile ? 'flex flex-col items-stretch' : 'flex items-center flex-wrap'}`}>
-            {blueprints.length > 0 && (
-              <div className={`gap-2 ${isMobile ? 'flex overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden' : 'flex flex-wrap'}`}>
-                {blueprints.map(bp => (
-                  <button
-                    key={bp.slug}
-                    onClick={() => setSelectedBlueprintSlug(bp.slug)}
-                    className={`flex items-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors ${
-                      selectedBlueprintSlug === bp.slug ? 'bg-[#6366F1] text-white border-[#6366F1]' : 'bg-white border-[#CBCCC9] text-[#666666] hover:border-[#6366F1]/50'
-                    } ${isMobile ? 'whitespace-nowrap' : ''}`}
-                  >
-                    <Building2 className="w-3 h-3" /> {bp.title}
-                  </button>
-                ))}
-              </div>
-            )}
-            <Button
-              variant="orange"
-              size="sm"
-              loading={mockLoading}
-              onClick={() => handleStartMock()}
-              className={isMobile ? 'w-full justify-center rounded-2xl' : 'flex-shrink-0'}
-            >
-              <Play className="w-3.5 h-3.5" />
-              Начать Mock Interview
-            </Button>
+          <h1 className="mt-4 max-w-[28ch] text-[28px] font-bold leading-[1.1] text-[#111111] dark:text-[#f8fafc] sm:text-[36px]">
+            Подготовка к техническому собеседованию
+          </h1>
+          <p className="mt-3 max-w-[42rem] text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">
+            Выбери конкретный mock-loop компании, пройди реальные раунды с таймером и AI-debrief, либо тренируйся по отдельным темам.
+          </p>
+
+          <div className="mt-5 flex items-center gap-4 text-sm text-[#667085] dark:text-[#7e93b0]">
+            <span className="flex items-center gap-1.5"><Zap className="h-3.5 w-3.5 text-[#f59e0b]" /> AI-оценка</span>
+            <span className="h-3.5 w-px bg-[#CBCCC9] dark:bg-[#1e3158]" />
+            <span className="flex items-center gap-1.5"><Clock className="h-3.5 w-3.5 text-[#6366F1]" /> Таймер</span>
+            <span className="h-3.5 w-px bg-[#CBCCC9] dark:bg-[#1e3158]" />
+            <span className="flex items-center gap-1.5"><Star className="h-3.5 w-3.5 text-[#ec4899]" /> Оценка 1-10</span>
           </div>
         </div>
-      </div>
+      </section>
 
-      {/* ── Solo practice ───────────────────────────────────────────── */}
-      <div>
-        <h3 className="text-sm font-semibold text-[#111111] mb-3">Задачи для практики</h3>
+      {/* ── Mock Interview ─────────────────────────────────────────── */}
+      <section className="section-enter">
+        <div className="relative overflow-hidden rounded-[24px] border border-[#1e1b4b] bg-[linear-gradient(145deg,_#0f0a2e,_#1e1b4b_50%,_#312e81)] p-6 text-white shadow-[0_20px_50px_rgba(99,102,241,0.2)] md:p-8">
+          <div className="pointer-events-none absolute right-[-5%] top-[-20%] h-[200%] w-[40%] rounded-full bg-[radial-gradient(circle,_rgba(139,92,246,0.25),_transparent_65%)] blur-2xl" />
 
-        {/* Filters */}
-        <div className={`mb-3 gap-2 ${isMobile ? 'flex flex-col' : 'flex items-center flex-wrap'}`}>
-          <div className={`relative ${isMobile ? 'w-full' : 'flex-1 min-w-[160px]'}`}>
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
+          <div className="relative">
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2.5">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 backdrop-blur">
+                    <Sparkles className="h-4.5 w-4.5 text-[#c4b5fd]" />
+                  </div>
+                  <div>
+                    <h2 className="text-lg font-bold text-white">{selectedBlueprint?.primaryAliasName || selectedBlueprint?.title || 'Mock Interview'}</h2>
+                    <p className="text-[13px] text-white/60">{selectedBlueprint?.title || 'Полный цикл собеседования'}</p>
+                  </div>
+                </div>
+
+                <p className="mt-4 max-w-[40rem] text-sm leading-6 text-white/75">
+                  {selectedBlueprint?.description || 'Подбери loop под целевую компанию и пройди последовательность раундов в том порядке, в котором они реально идут в mock-сценарии.'}
+                </p>
+
+                {/* Stage pipeline */}
+                <div className={`mt-5 ${isMobile ? 'flex overflow-x-auto gap-2 pb-1 no-scrollbar' : 'flex flex-wrap gap-2'}`}>
+                  {(selectedBlueprint?.rounds?.length ? selectedBlueprint.rounds : MOCK_STAGES).map((s: any, index: number) => {
+                    const meta = 'roundType' in s ? ROUND_META[s.roundType] : null
+                    const icon = meta?.icon ?? s.icon
+                    const color = meta?.color ?? 'border-white/10 bg-white/5 text-white/80'
+                    const label = 'roundType' in s ? s.title : s.label
+                    const duration = 'durationSeconds' in s ? formatRoundMinutes(s.durationSeconds) : null
+                    return (
+                    <div
+                      key={'roundType' in s ? `${s.roundType}-${s.position}` : s.num}
+                      className={`flex items-center gap-2 rounded-xl border px-3 py-2 backdrop-blur ${color} ${isMobile ? 'flex-shrink-0' : ''}`}
+                    >
+                      <span className="flex h-5 w-5 items-center justify-center rounded-md bg-white/10 text-[10px] font-bold">
+                        {'roundType' in s ? index + 1 : s.num}
+                      </span>
+                      <span className="flex items-center gap-1.5 text-xs font-medium">
+                        {icon}
+                        {label}
+                      </span>
+                      {duration && (
+                        <span className="rounded-full bg-white/10 px-1.5 py-0.5 text-[10px] font-semibold text-white/75">
+                          {duration}
+                        </span>
+                      )}
+                    </div>
+                  )})}
+                </div>
+                {selectedBlueprint?.introText && (
+                  <p className="mt-4 max-w-[40rem] text-xs leading-5 text-white/60">
+                    {selectedBlueprint.introText}
+                  </p>
+                )}
+              </div>
+
+              {!isMobile && (
+                <div className="flex flex-col items-end gap-1 text-right">
+                  <p className="text-3xl font-bold font-mono text-white/90">{selectedBlueprint?.rounds?.length || 5}</p>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-white/40">раундов</p>
+                </div>
+              )}
+            </div>
+
+            {/* Active session warning */}
+            {mockError && mockError.startsWith('active_session:') && (
+              <div className="mt-4 flex items-center gap-3 rounded-xl border border-[#fbbf24]/30 bg-[#fbbf24]/10 px-4 py-3">
+                <p className="flex-1 text-sm text-[#fde68a]">Есть незавершённая сессия</p>
+                <button
+                  onClick={() => navigate(`/growth/interview-prep/mock/${mockError.split(':')[1]}`)}
+                  className="flex items-center gap-1 text-sm font-semibold text-[#fbbf24] hover:text-[#fde68a] transition-colors"
+                >
+                  Продолжить <ArrowRight className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
+            {mockError && !mockError.startsWith('active_session:') && (
+              <p className="mt-3 text-sm text-[#fca5a5]">{mockError}</p>
+            )}
+
+            {/* Blueprint selector + CTA */}
+            <div className={`mt-5 ${isMobile ? 'flex flex-col gap-3' : 'flex items-center gap-3'}`}>
+              {blueprints.length > 0 && (
+                <div className={`flex gap-2 ${isMobile ? 'overflow-x-auto pb-1 no-scrollbar' : 'flex-wrap'}`}>
+                  {blueprints.map(bp => (
+                    <button
+                      key={bp.slug}
+                      onClick={() => setSelectedBlueprintSlug(bp.slug)}
+                      className={`flex items-center gap-1.5 rounded-xl border px-3 py-2 text-xs font-medium transition-all ${isMobile ? 'flex-shrink-0' : ''} ${
+                        selectedBlueprintSlug === bp.slug
+                          ? 'border-white/30 bg-white/15 text-white shadow-[0_0_20px_rgba(255,255,255,0.06)]'
+                          : 'border-white/10 bg-white/5 text-white/60 hover:bg-white/10 hover:text-white/80'
+                      }`}
+                    >
+                      <Building2 className="w-3 h-3" />
+                      {bp.primaryAliasName || bp.title}
+                    </button>
+                  ))}
+                </div>
+              )}
+              <Button
+                variant="orange"
+                size="md"
+                loading={mockLoading}
+                onClick={() => handleStartMock()}
+                className={`flex-shrink-0 rounded-xl ${isMobile ? 'w-full justify-center' : ''}`}
+              >
+                <Play className="w-4 h-4" />
+                Начать Mock Interview
+              </Button>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Solo Practice ──────────────────────────────────────────── */}
+      <section className="section-enter">
+        <div className="mb-4 flex items-end justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-bold text-[#111111] dark:text-[#f8fafc]">Задачи для практики</h2>
+            <p className="mt-1 text-sm text-[#667085] dark:text-[#7e93b0]">Тренируйся по отдельным темам в своём темпе</p>
+          </div>
+          {!loading && (
+            <span className="text-sm text-[#667085] dark:text-[#7e93b0]">
+              <span className="font-semibold text-[#111111] dark:text-[#f8fafc]">{filtered.length}</span> задач
+            </span>
+          )}
+        </div>
+
+        {/* Search + filters */}
+        <div className="flex flex-col gap-3 mb-4">
+          <div className="relative">
+            <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
-              placeholder="Поиск..."
-              className="w-full pl-9 pr-4 py-2 bg-white border border-[#CBCCC9] rounded-lg text-sm focus:outline-none focus:border-[#6366F1]/50"
+              placeholder="Поиск по названию задачи..."
+              className="w-full rounded-xl border border-[#CBCCC9] bg-white py-2.5 pl-10 pr-4 text-sm text-[#111111] placeholder-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 dark:border-[#1a2540] dark:bg-[#161c2d] dark:text-[#f8fafc] dark:placeholder-[#4d6380]"
             />
           </div>
-          <div className={`gap-1.5 ${isMobile ? 'flex overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden' : 'flex flex-wrap'}`}>
-            {(['', 'coding', 'algorithm', 'sql', 'system_design', 'behavioral'] as const).map(cat => (
+
+          <div className={`flex gap-2 ${isMobile ? 'overflow-x-auto pb-1 no-scrollbar' : 'flex-wrap'}`}>
+            {CATEGORIES.map(cat => (
               <button
                 key={cat}
                 onClick={() => setCategory(cat)}
-                className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
-                  category === cat ? 'bg-[#6366F1] text-white' : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#94a3b8]'
-                } ${isMobile ? 'whitespace-nowrap' : ''}`}
+                className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${isMobile ? 'flex-shrink-0' : ''} ${
+                  category === cat
+                    ? 'bg-[#111111] text-white shadow-sm dark:bg-white dark:text-[#111111]'
+                    : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#6366F1]/40 hover:text-[#111111] dark:bg-[#161c2d] dark:border-[#1a2540] dark:text-[#7e93b0] dark:hover:text-[#c8d8ec]'
+                }`}
               >
                 {cat === '' ? 'Все' : PREP_TYPE_LABELS[cat] ?? cat}
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                  category === cat ? 'bg-white/20 text-white dark:bg-black/20 dark:text-[#111111]' : 'bg-[#F2F3F0] text-[#94a3b8] dark:bg-[#1a2236]'
+                }`}>
+                  {categoryCounts[cat] ?? 0}
+                </span>
               </button>
             ))}
           </div>
         </div>
 
-        {/* Task list */}
-        <div className="bg-white rounded-2xl border border-[#CBCCC9] overflow-hidden">
-          <div className="divide-y divide-[#F2F3F0]">
-            {loading
-              ? Array.from({ length: 6 }).map((_, i) => (
-                <div key={i} className="px-5 py-4 flex items-center gap-4 animate-pulse">
-                  <div className="w-8 h-8 rounded-lg bg-[#E7E8E5]" />
-                  <div className="flex-1 h-4 bg-[#E7E8E5] rounded" />
-                  <div className="w-20 h-4 bg-[#E7E8E5] rounded" />
+        {/* Task grid */}
+        {loading ? (
+          <div className={`grid gap-3 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'}`}>
+            {Array.from({ length: 6 }).map((_, i) => (
+              <div key={i} className="animate-pulse rounded-2xl border border-[#CBCCC9] bg-white p-4 dark:border-[#1a2540] dark:bg-[#161c2d]">
+                <div className="flex items-center gap-3">
+                  <div className="h-10 w-10 rounded-xl bg-[#E7E8E5] dark:bg-[#1e3158]" />
+                  <div className="flex-1">
+                    <div className="h-4 w-48 rounded bg-[#E7E8E5] dark:bg-[#1e3158]" />
+                    <div className="mt-2 h-3 w-32 rounded bg-[#E7E8E5] dark:bg-[#1e3158]" />
+                  </div>
                 </div>
-              ))
-              : filtered.length === 0
-                ? <div className="px-5 py-12 text-center text-sm text-[#94a3b8]">Ничего не найдено</div>
-                : filtered.map(task => (
-                  <div
-                    key={task.id}
-                    onClick={async () => {
-                      try {
-                        const session = await interviewPrepApi.startSession(task.id) as any
-                        navigate(`/growth/interview-prep/${session?.id ?? task.id}`)
-                      } catch {
-                        toast('Не удалось начать сессию', 'error')
-                      }
-                    }}
-                    className={`cursor-pointer px-5 py-3.5 transition-colors hover:bg-[#F2F3F0] ${isMobile ? 'flex flex-col items-start gap-3' : 'flex items-center gap-4'}`}
-                  >
-                    <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center flex-shrink-0">
-                      {PREP_TYPE_ICONS[task.prepType] ?? <BookOpen className="w-4 h-4 text-[#94a3b8]" />}
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium text-[#111111] truncate">{task.title}</p>
-                      <p className="text-xs text-[#666666] mt-0.5">
-                        {task.companyTag || 'General'} · {Math.round(task.durationSeconds / 60)} мин
-                      </p>
-                    </div>
-                    <div className={`flex items-center gap-3 ${isMobile ? 'w-full justify-between' : ''}`}>
+              </div>
+            ))}
+          </div>
+        ) : filtered.length === 0 ? (
+          <div className="rounded-2xl border border-dashed border-[#CBCCC9] bg-white py-16 text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
+            <Search className="mx-auto h-10 w-10 text-[#CBCCC9] dark:text-[#4d6380]" />
+            <p className="mt-3 text-sm font-medium text-[#667085] dark:text-[#7e93b0]">Задачи не найдены</p>
+            <p className="mt-1 text-xs text-[#94a3b8]">Попробуйте изменить фильтры или поисковый запрос</p>
+          </div>
+        ) : (
+          <div className={`grid gap-3 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'}`}>
+            {filtered.map(task => {
+              const colors = PREP_TYPE_COLORS[task.prepType] ?? PREP_TYPE_COLORS.coding
+              return (
+                <button
+                  key={task.id}
+                  onClick={() => handleStartSolo(task)}
+                  className={`group flex items-start gap-4 rounded-2xl border border-[#CBCCC9] border-l-[3px] ${colors.border} bg-white p-4 text-left transition-all hover:shadow-md hover:border-[#6366F1]/30 dark:border-[#1a2540] dark:bg-[#161c2d] dark:hover:border-[#6366F1]/30`}
+                >
+                  <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${colors.bg} ${colors.icon} dark:bg-opacity-20`}>
+                    {PREP_TYPE_ICONS[task.prepType] ?? <BookOpen className="w-4 h-4" />}
+                  </div>
+
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc] group-hover:text-[#6366F1] transition-colors line-clamp-1">
+                      {task.title}
+                    </p>
+
+                    <div className="mt-1.5 flex flex-wrap items-center gap-2">
                       <Badge variant={
-                        task.prepType === 'coding' ? 'indigo' :
-                        task.prepType === 'algorithm' ? 'indigo' :
-                        task.prepType === 'sql' ? 'orange' :
-                        task.prepType === 'system_design' ? 'orange' : 'success'
+                        task.prepType === 'coding' || task.prepType === 'algorithm' ? 'indigo'
+                          : task.prepType === 'sql' ? 'warning'
+                          : task.prepType === 'system_design' ? 'danger'
+                          : 'success'
                       }>
                         {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
                       </Badge>
-                      <ChevronRight className="w-4 h-4 text-[#CBCCC9] flex-shrink-0" />
+
+                      {task.companyTag && (
+                        <span className="inline-flex items-center gap-1 text-[11px] text-[#667085] dark:text-[#7e93b0]">
+                          <Building2 className="h-3 w-3" />
+                          {task.companyTag}
+                        </span>
+                      )}
+
+                      <span className="inline-flex items-center gap-1 text-[11px] text-[#667085] dark:text-[#7e93b0]">
+                        <Clock className="h-3 w-3" />
+                        {Math.round(task.durationSeconds / 60)} мин
+                      </span>
+
+                      {task.language && (
+                        <span className="text-[11px] font-medium uppercase tracking-wide text-[#94a3b8] dark:text-[#4d6380]">
+                          {task.language}
+                        </span>
+                      )}
                     </div>
                   </div>
-                ))
-            }
-          </div>
-        </div>
-      </div>
 
-      {/* ── Stats row ────────────────────────────────────────────────── */}
-      {tasks.length > 0 && (
-        <div className={`grid gap-3 ${isMobile ? 'grid-cols-2' : 'grid-cols-2 md:grid-cols-3 lg:grid-cols-6'}`}>
-          {[
-            { label: 'Всего', value: tasks.length },
-            { label: 'Coding', value: tasks.filter(t => t.prepType === 'coding').length },
-            { label: 'Алгоритмы', value: tasks.filter(t => t.prepType === 'algorithm').length },
-            { label: 'SQL', value: tasks.filter(t => t.prepType === 'sql').length },
-            { label: 'System Design', value: tasks.filter(t => t.prepType === 'system_design').length },
-            { label: 'Behavioral', value: tasks.filter(t => t.prepType === 'behavioral').length },
-          ].map(s => (
-            <div key={s.label} className={`flex items-center justify-between bg-white border px-4 py-3 ${isMobile ? 'rounded-2xl border-[#d8d9d6] shadow-[0_10px_24px_rgba(15,23,42,0.05)]' : 'rounded-xl border-[#CBCCC9]'}`}>
-              <span className="text-xs text-[#666666]">{s.label}</span>
-              <span className="text-base font-bold text-[#111111] font-mono">{s.value}</span>
-            </div>
-          ))}
-        </div>
-      )}
+                  <ChevronRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#CBCCC9] group-hover:text-[#6366F1] transition-colors dark:text-[#4d6380]" />
+                </button>
+              )
+            })}
+          </div>
+        )}
+      </section>
     </div>
   )
 }

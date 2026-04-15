@@ -25,14 +25,21 @@ func (r *Repo) ListMockBlueprints(ctx context.Context) ([]*model.InterviewMockBl
 			b.description,
 			b.level,
 			b.total_duration_seconds,
+			b.intro_text,
 			COALESCE(array_remove(array_agg(a.alias_slug ORDER BY a.sort_order) FILTER (WHERE a.is_public_start), NULL), ARRAY[]::text[]),
 			COALESCE(array_remove(array_agg(a.display_name ORDER BY a.sort_order) FILTER (WHERE a.is_public_start), NULL), ARRAY[]::text[])
 		FROM interview_blueprints b
 		JOIN interview_tracks t ON t.id = b.track_id
 		LEFT JOIN interview_blueprint_aliases a ON a.blueprint_id = b.id
 		WHERE b.is_active = TRUE
-		GROUP BY b.id, t.slug, b.slug, b.title, b.description, b.level, b.total_duration_seconds
-		ORDER BY t.slug ASC, b.slug ASC
+		  AND EXISTS (
+			SELECT 1
+			FROM interview_blueprint_aliases visible
+			WHERE visible.blueprint_id = b.id
+			  AND visible.is_public_start = TRUE
+		  )
+		GROUP BY b.id, t.slug, b.slug, b.title, b.description, b.level, b.total_duration_seconds, b.intro_text
+		ORDER BY COALESCE(MIN(a.sort_order) FILTER (WHERE a.is_public_start), 1000) ASC, t.slug ASC, b.slug ASC
 	`)
 	if err != nil {
 		return nil, fmt.Errorf("list mock blueprints: %w", err)
@@ -44,6 +51,16 @@ func (r *Repo) ListMockBlueprints(ctx context.Context) ([]*model.InterviewMockBl
 		item, scanErr := scanMockBlueprintSummary(rows)
 		if scanErr != nil {
 			return nil, fmt.Errorf("scan mock blueprint summary: %w", scanErr)
+		}
+		if len(item.PublicAliasSlugs) > 0 {
+			item.PrimaryAliasSlug = item.PublicAliasSlugs[0]
+		}
+		if len(item.PublicAliasNames) > 0 {
+			item.PrimaryAliasName = item.PublicAliasNames[0]
+		}
+		item.Rounds, scanErr = r.ListBlueprintRounds(ctx, item.ID)
+		if scanErr != nil {
+			return nil, scanErr
 		}
 		items = append(items, item)
 	}
@@ -113,6 +130,20 @@ func (r *Repo) ResolveMockBlueprint(ctx context.Context, companyTag string, prog
 		}
 		return nil, fmt.Errorf("resolve mock blueprint: %w", err)
 	}
+	item.PublicAliasSlugs, item.PublicAliasNames, err = r.listBlueprintAliases(ctx, item.ID)
+	if err != nil {
+		return nil, err
+	}
+	if len(item.PublicAliasSlugs) > 0 {
+		item.PrimaryAliasSlug = item.PublicAliasSlugs[0]
+	}
+	if len(item.PublicAliasNames) > 0 {
+		item.PrimaryAliasName = item.PublicAliasNames[0]
+	}
+	item.Rounds, err = r.ListBlueprintRounds(ctx, item.ID)
+	if err != nil {
+		return nil, err
+	}
 	return &item, nil
 }
 
@@ -151,12 +182,18 @@ func (r *Repo) ListBlueprintRounds(ctx context.Context, blueprintID uuid.UUID) (
 		if scanErr != nil {
 			return nil, fmt.Errorf("scan blueprint round: %w", scanErr)
 		}
+		if strings.TrimSpace(item.CandidateInstructionsOverride) == "" {
+			item.CandidateInstructionsOverride = defaultCandidateInstructions(item.RoundType, item.EvaluatorMode)
+		}
+		if strings.TrimSpace(item.InterviewerInstructionsOverride) == "" {
+			item.InterviewerInstructionsOverride = defaultInterviewerInstructions(item.RoundType, item.EvaluatorMode)
+		}
 		items = append(items, item)
 	}
 	return items, rows.Err()
 }
 
-func (r *Repo) SelectTaskForBlueprintRound(ctx context.Context, round *model.InterviewBlueprintRound) (*model.InterviewPrepTask, *uuid.UUID, error) {
+func (r *Repo) SelectTaskForBlueprintRound(ctx context.Context, round *model.InterviewBlueprintRound, preferredCompanyTag string) (*model.InterviewPrepTask, *uuid.UUID, error) {
 	if round == nil {
 		return nil, nil, nil
 	}
@@ -183,9 +220,16 @@ func (r *Repo) SelectTaskForBlueprintRound(ctx context.Context, round *model.Int
 		  AND pi.is_active = TRUE
 		  AND i.is_active = TRUE
 		  AND i.is_mock_enabled = TRUE
-		ORDER BY (random() * GREATEST(pi.weight, 1)) DESC, pi.position ASC
+		ORDER BY
+			CASE
+				WHEN $2 <> '' AND LOWER(COALESCE(i.legacy_company_tag, '')) = $2 THEN 2
+				WHEN COALESCE(i.legacy_company_tag, '') = '' THEN 1
+				ELSE 0
+			END DESC,
+			(random() * GREATEST(pi.weight, 1)) DESC,
+			pi.position ASC
 		LIMIT 1
-	`, *round.PoolID)
+	`, *round.PoolID, strings.TrimSpace(strings.ToLower(preferredCompanyTag)))
 
 	var poolID uuid.UUID
 	task, err := scanTaskWithPool(row, &poolID)
@@ -196,6 +240,67 @@ func (r *Repo) SelectTaskForBlueprintRound(ctx context.Context, round *model.Int
 		return nil, nil, fmt.Errorf("select task for blueprint round: %w", err)
 	}
 	return task, &poolID, nil
+}
+
+func (r *Repo) listBlueprintAliases(ctx context.Context, blueprintID uuid.UUID) ([]string, []string, error) {
+	row := r.data.DB.QueryRow(ctx, `
+		SELECT
+			COALESCE(array_remove(array_agg(alias_slug ORDER BY sort_order) FILTER (WHERE is_public_start), NULL), ARRAY[]::text[]),
+			COALESCE(array_remove(array_agg(display_name ORDER BY sort_order) FILTER (WHERE is_public_start), NULL), ARRAY[]::text[])
+		FROM interview_blueprint_aliases
+		WHERE blueprint_id = $1
+	`, blueprintID)
+
+	var slugs []string
+	var names []string
+	if err := row.Scan(&slugs, &names); err != nil {
+		return nil, nil, fmt.Errorf("list blueprint aliases: %w", err)
+	}
+	return slugs, names, nil
+}
+
+func defaultCandidateInstructions(roundType string, evaluatorMode string) string {
+	switch roundType {
+	case "coding_algorithmic":
+		return "Начни с clarifying questions, проговори идею вслух, оцени сложность и только потом пиши решение. После базового решения коротко обсуди edge cases и возможную оптимизацию."
+	case "coding_practical":
+		return "Сначала опиши API или структуру решения, затем реализуй рабочий вариант и объясни trade-off между скоростью разработки, читаемостью и надежностью."
+	case "sql":
+		if evaluatorMode == "code_execution" {
+			return "Сформулируй, какие таблицы и условия нужны, затем напиши корректный SQL и коротко объясни, как бы ты проверял его на больших данных."
+		}
+		return "Ответь как на реальном backend SQL-round: объясни запрос, индексы, стоимость join-ов и риски для больших таблиц."
+	case "system_design":
+		return "Структурируй ответ по шагам: scope и assumptions, high-level architecture, data/storage, scaling, reliability и основные trade-off."
+	case "behavioral":
+		return "Отвечай в формате STAR, добавляй конкретный контекст, свою роль, принятые решения, метрики результата и что бы сделал иначе сейчас."
+	case "code_review":
+		return "Сначала обозначь главные correctness и maintainability risks, затем предложи минимальный безопасный план исправления и тесты."
+	default:
+		return ""
+	}
+}
+
+func defaultInterviewerInstructions(roundType string, evaluatorMode string) string {
+	switch roundType {
+	case "coding_algorithmic":
+		return "Проверь структурность мышления, владение asymptotic complexity, работу с edge cases и способность улучшать первое решение."
+	case "coding_practical":
+		return "Смотри на инженерную зрелость кандидата: decomposition, naming, testability, failure handling и объяснение trade-off."
+	case "sql":
+		if evaluatorMode == "code_execution" {
+			return "Проверь не только синтаксис, но и понимание join strategy, indexing и причин возможных performance regressions."
+		}
+		return "Задавай уточнения про cardinality, индексы, сортировки и то, как кандидат проверяет корректность запроса."
+	case "system_design":
+		return "Углубляйся в capacity, bottlenecks, consistency, backpressure, observability и operational trade-offs."
+	case "behavioral":
+		return "Пытайся вывести кандидата на ownership, conflict handling, prioritization, ambiguity tolerance и lessons learned."
+	case "code_review":
+		return "Фокусируйся на correctness bugs, hidden complexity, API sharp edges и покрытии тестами."
+	default:
+		return ""
+	}
 }
 
 func scanTaskWithPool(s scanner, poolID *uuid.UUID) (*model.InterviewPrepTask, error) {
@@ -371,6 +476,8 @@ func (r *Repo) GetMockSession(ctx context.Context, sessionID uuid.UUID) (*model.
 			COALESCE(b.slug, ''),
 			COALESCE(b.title, ''),
 			COALESCE(t.slug, ''),
+			COALESCE(b.intro_text, ''),
+			COALESCE(b.closing_text, ''),
 			ms.status,
 			ms.current_round_index,
 			ms.started_at,
@@ -414,6 +521,8 @@ func (r *Repo) GetAnyActiveMockSessionByUser(ctx context.Context, userID uuid.UU
 			COALESCE(b.slug, ''),
 			COALESCE(b.title, ''),
 			COALESCE(t.slug, ''),
+			COALESCE(b.intro_text, ''),
+			COALESCE(b.closing_text, ''),
 			ms.status,
 			ms.current_round_index,
 			ms.started_at,
@@ -452,6 +561,8 @@ func (r *Repo) GetActiveMockSessionByUserAndCompany(ctx context.Context, userID 
 			COALESCE(b.slug, ''),
 			COALESCE(b.title, ''),
 			COALESCE(t.slug, ''),
+			COALESCE(b.intro_text, ''),
+			COALESCE(b.closing_text, ''),
 			ms.status,
 			ms.current_round_index,
 			ms.started_at,
@@ -484,12 +595,29 @@ func (r *Repo) GetActiveMockSessionByUserAndCompany(ctx context.Context, userID 
 func (r *Repo) listMockStages(ctx context.Context, sessionID uuid.UUID) ([]*model.InterviewPrepMockStage, error) {
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT
-			id, session_id, round_index, round_type, status, COALESCE(source_item_id, '`+zeroUUID+`'::uuid), blueprint_round_id, source_pool_id,
-			solve_language, code, last_submission_passed, review_score, review_summary,
-			started_at, finished_at, created_at, updated_at
-		FROM interview_mock_rounds
-		WHERE session_id = $1
-		ORDER BY round_index ASC
+			mr.id,
+			mr.session_id,
+			mr.round_index,
+			COALESCE(br.round_type, mr.round_type),
+			COALESCE(NULLIF(br.title, ''), initcap(replace(mr.round_type, '_', ' '))),
+			mr.status,
+			COALESCE(mr.source_item_id, '`+zeroUUID+`'::uuid),
+			mr.blueprint_round_id,
+			mr.source_pool_id,
+			mr.solve_language,
+			mr.code,
+			COALESCE(br.duration_seconds, 0),
+			COALESCE(br.evaluator_mode, ''),
+			COALESCE(NULLIF(br.candidate_instructions_override, ''), ''),
+			COALESCE(NULLIF(br.interviewer_instructions_override, ''), ''),
+			mr.last_submission_passed,
+			mr.review_score,
+			mr.review_summary,
+			mr.started_at, mr.finished_at, mr.created_at, mr.updated_at
+		FROM interview_mock_rounds mr
+		LEFT JOIN interview_blueprint_rounds br ON br.id = mr.blueprint_round_id
+		WHERE mr.session_id = $1
+		ORDER BY mr.round_index ASC
 	`, sessionID)
 	if err != nil {
 		return nil, fmt.Errorf("list mock rounds: %w", err)
@@ -501,6 +629,12 @@ func (r *Repo) listMockStages(ctx context.Context, sessionID uuid.UUID) ([]*mode
 		item, scanErr := scanMockStage(rows)
 		if scanErr != nil {
 			return nil, fmt.Errorf("scan mock round: %w", scanErr)
+		}
+		if strings.TrimSpace(item.CandidateInstructions) == "" {
+			item.CandidateInstructions = defaultCandidateInstructions(item.RoundType, item.EvaluatorMode)
+		}
+		if strings.TrimSpace(item.InterviewerInstructions) == "" {
+			item.InterviewerInstructions = defaultInterviewerInstructions(item.RoundType, item.EvaluatorMode)
 		}
 		questions, questionsErr := r.listMockQuestionResults(ctx, item.ID)
 		if questionsErr != nil {

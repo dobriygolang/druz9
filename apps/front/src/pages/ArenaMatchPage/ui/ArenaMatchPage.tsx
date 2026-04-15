@@ -31,12 +31,15 @@ export function ArenaMatchPage() {
   const [antiCheatWarning, setAntiCheatWarning] = useState(false)
   const [mobilePanel, setMobilePanel] = useState<'me' | 'opponent'>('me')
   const editorRef = useRef<Monaco.editor.IStandaloneCodeEditor | null>(null)
+  const timerInitializedRef = useRef(false)
 
   // Anti-cheat monitoring
   const { handleEditorPaste } = useAntiCheat({
     matchId,
     enabled: !!matchId,
   })
+  const handleEditorPasteRef = useRef(handleEditorPaste)
+  handleEditorPasteRef.current = handleEditorPaste
 
   // Show warning banner on anti-cheat events
   useEffect(() => {
@@ -91,13 +94,13 @@ export function ArenaMatchPage() {
     return () => { cancelled = true }
   }, [matchId, navigate, user?.id])
 
-  // Sync timer from WS match state
+  // Sync timer from WS match state — only initialize once to avoid resetting after countdown hits zero
   useEffect(() => {
-    if (ws.matchState?.durationSeconds && !timeLeft) {
+    if (ws.matchState?.durationSeconds && !timerInitializedRef.current) {
+      timerInitializedRef.current = true
       setTimeLeft(ws.matchState.durationSeconds)
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [ws.matchState?.durationSeconds, timeLeft])
+  }, [ws.matchState?.durationSeconds])
 
   // Navigate away when match ends with a winner
   useEffect(() => {
@@ -142,6 +145,10 @@ export function ArenaMatchPage() {
     editorRef.current = editor
     registerDarkTheme(monaco)
     monaco.editor.setTheme('druzya-dark')
+    const dom = editor.getDomNode()
+    if (dom) {
+      dom.addEventListener('paste', (e) => handleEditorPasteRef.current(e as ClipboardEvent))
+    }
   }, [])
 
   // Find my player and opponent from WS state
@@ -149,17 +156,6 @@ export function ArenaMatchPage() {
   const oppPlayer = ws.players.find(p => p.userId !== user?.id) ?? null
   const matchFinished = ws.matchState?.status === 'MATCH_STATUS_FINISHED'
   const difficultyLabel = ws.matchState?.difficulty === 2 ? 'Medium' : ws.matchState?.difficulty === 1 ? 'Easy' : 'Hard'
-
-  // Attach paste handler to editor
-  useEffect(() => {
-    const editor = editorRef.current
-    if (!editor) return
-    const dom = editor.getDomNode()
-    if (!dom) return
-    const handler = (e: Event) => handleEditorPaste(e as ClipboardEvent)
-    dom.addEventListener('paste', handler)
-    return () => dom.removeEventListener('paste', handler)
-  }, [handleEditorPaste])
 
   if (isMobile) {
     return (

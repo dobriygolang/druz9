@@ -33,7 +33,10 @@ export function CodeRoomsPage() {
   const [copiedId, setCopiedId] = useState<string | null>(null)
 
   useEffect(() => {
-    codeRoomApi.listRooms().then(setRooms).catch((err) => { console.error('CodeRoomsPage fetch error:', err) })
+    codeRoomApi.listRooms()
+      .then(all => all.filter(r => !r.taskId))
+      .then(setRooms)
+      .catch((err) => { console.error('CodeRoomsPage fetch error:', err) })
   }, [])
 
   const getRoomShareUrl = (room: Room) =>
@@ -128,7 +131,7 @@ export function CodeRoomsPage() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className={`flex gap-2 ${isMobile ? 'flex-wrap' : 'items-center'}`}>
-                    <p className="text-sm font-semibold text-[#111111]">{room.task || 'Без задачи'}</p>
+                    <p className="text-sm font-semibold text-[#111111]">{room.task || `Комната ${room.id.slice(0, 6)}`}</p>
                     <Badge variant={st.variant}>{st.label}</Badge>
                     {room.isPrivate && (
                       <span className="flex items-center gap-1 px-1.5 py-0.5 text-xs font-medium bg-[#f1f5f9] text-[#64748b] rounded-full">

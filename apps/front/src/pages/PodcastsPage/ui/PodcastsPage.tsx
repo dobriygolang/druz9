@@ -92,7 +92,11 @@ export function PodcastsPage() {
     setUploading(true)
     try {
       // Step 1: Create podcast record
-      const createRes = await apiClient.post<{ podcast: { id: string } }>('/api/admin/podcasts', { title: uploadTitle })
+      const createRes = await apiClient.post<{ podcast: { id: string } }>('/api/admin/podcasts', {
+        title: uploadTitle,
+        author: uploadAuthor || undefined,
+        description: uploadDesc || undefined,
+      })
       const podcastId = createRes.data.podcast.id
 
       // Determine content type enum from MIME type

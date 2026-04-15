@@ -20,6 +20,9 @@ func (i *Implementation) GetAchievements(ctx context.Context, req *v1.GetAchieve
 	if err != nil {
 		return nil, err
 	}
+	if progress == nil {
+		return &v1.GetAchievementsResponse{Achievements: []*v1.Achievement{}}, nil
+	}
 	ov := progress.Overview
 	items := achievement.Compute(ov.PracticeSessions, ov.PracticePassedSessions, ov.CompletedMockSessions, ov.CurrentStreakDays)
 	out := make([]*v1.Achievement, 0, len(items))

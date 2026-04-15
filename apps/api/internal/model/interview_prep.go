@@ -330,23 +330,29 @@ type InterviewPrepMockQuestionResult struct {
 }
 
 type InterviewPrepMockStage struct {
-	ID                   uuid.UUID
-	SessionID            uuid.UUID
-	StageIndex           int32
-	Kind                 InterviewPrepMockStageKind
-	Status               InterviewPrepMockStageStatus
-	TaskID               uuid.UUID
-	BlueprintRoundID     *uuid.UUID
-	SourcePoolID         *uuid.UUID
-	SolveLanguage        string
-	Code                 string
-	LastSubmissionPassed bool
-	ReviewScore          int32
-	ReviewSummary        string
-	StartedAt            time.Time
-	FinishedAt           *time.Time
-	CreatedAt            time.Time
-	UpdatedAt            time.Time
+	ID                      uuid.UUID
+	SessionID               uuid.UUID
+	StageIndex              int32
+	Kind                    InterviewPrepMockStageKind
+	RoundType               string
+	Title                   string
+	Status                  InterviewPrepMockStageStatus
+	TaskID                  uuid.UUID
+	BlueprintRoundID        *uuid.UUID
+	SourcePoolID            *uuid.UUID
+	SolveLanguage           string
+	Code                    string
+	DurationSeconds         int32
+	EvaluatorMode           string
+	CandidateInstructions   string
+	InterviewerInstructions string
+	LastSubmissionPassed    bool
+	ReviewScore             int32
+	ReviewSummary           string
+	StartedAt               time.Time
+	FinishedAt              *time.Time
+	CreatedAt               time.Time
+	UpdatedAt               time.Time
 
 	Task            *InterviewPrepTask
 	QuestionResults []*InterviewPrepMockQuestionResult
@@ -360,6 +366,8 @@ type InterviewPrepMockSession struct {
 	BlueprintSlug     string
 	BlueprintTitle    string
 	TrackSlug         string
+	IntroText         string
+	ClosingText       string
 	Status            InterviewPrepMockSessionStatus
 	CurrentStageIndex int32
 	StartedAt         time.Time
@@ -405,8 +413,12 @@ type InterviewMockBlueprintSummary struct {
 	Description          string
 	Level                string
 	TotalDurationSeconds int32
+	IntroText            string
 	PublicAliasSlugs     []string
 	PublicAliasNames     []string
+	PrimaryAliasSlug     string
+	PrimaryAliasName     string
+	Rounds               []*InterviewBlueprintRound
 }
 
 type InterviewMockBlueprint struct {
@@ -421,6 +433,11 @@ type InterviewMockBlueprint struct {
 	TotalDurationSeconds int32
 	IntroText            string
 	ClosingText          string
+	PublicAliasSlugs     []string
+	PublicAliasNames     []string
+	PrimaryAliasSlug     string
+	PrimaryAliasName     string
+	Rounds               []*InterviewBlueprintRound
 	IsActive             bool
 	CreatedAt            time.Time
 	UpdatedAt            time.Time

@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Briefcase, Calendar, ChevronRight, Code2, Sparkles, Users } from 'lucide-react'
+import { Briefcase, Calendar, ChevronRight, Code2, Users, Map } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useAuth } from '@/app/providers/AuthProvider'
 import { eventApi, type Event } from '@/features/Event/api/eventApi'
@@ -42,15 +42,11 @@ export function HomePage() {
         <div className="relative flex flex-col gap-6">
           <div className="flex items-start justify-between gap-4">
             <div className="min-w-0">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/70 bg-white/70 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.16em] text-[#6366F1] shadow-sm backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/75 dark:text-[#a5b4fc]">
-                <Sparkles className="h-3.5 w-3.5" />
-                Mobile First
-              </div>
-              <h1 className="mt-4 max-w-[14ch] font-mono text-[32px] font-semibold leading-[1.02] text-[#111111] dark:text-[#f8fafc] sm:text-[40px]">
+              <h1 className="max-w-[20ch] font-mono text-[32px] font-semibold leading-[1.02] text-[#111111] dark:text-[#f8fafc] sm:text-[40px]">
                 Добро пожаловать, {firstName}
               </h1>
               <p className="mt-3 max-w-[30rem] text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">
-                Один быстрый экран, чтобы понять, кто онлайн, что происходит в сообществе и куда идти дальше с телефона.
+                Кто онлайн, что происходит в сообществе и куда двигаться дальше.
               </p>
             </div>
             <Avatar
@@ -76,9 +72,16 @@ export function HomePage() {
               В practice
               <Code2 className="h-4 w-4 text-[#6366F1]" />
             </Link>
+            <Link
+              to="/community/map"
+              className="inline-flex items-center justify-center gap-2 rounded-full border border-[#CBCCC9] bg-white/70 px-4 py-3 text-sm font-semibold text-[#111111] backdrop-blur transition-transform duration-200 active:scale-[0.98] dark:border-[#24324f] dark:bg-[#10192b]/70 dark:text-[#f8fafc]"
+            >
+              Карта сообщества
+              <Map className="h-4 w-4 text-[#6366F1]" />
+            </Link>
           </div>
 
-          <div className="grid grid-cols-2 gap-3">
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
             {[
               { label: 'Онлайн', value: onlineCount, icon: <Users className="h-4 w-4 text-[#6366F1]" /> },
               { label: 'Событий', value: events.length, icon: <Calendar className="h-4 w-4 text-[#6366F1]" /> },
@@ -107,7 +110,7 @@ export function HomePage() {
           <div className="mb-4 flex items-center justify-between gap-3">
             <div>
               <h2 className="text-base font-semibold text-[#111111] dark:text-[#f8fafc]">Ближайшие события</h2>
-              <p className="mt-1 text-xs text-[#667085] dark:text-[#7e93b0]">Самое важное, что стоит открыть с телефона прямо сейчас.</p>
+              <p className="mt-1 text-xs text-[#667085] dark:text-[#7e93b0]">Не пропустите самое важное в сообществе.</p>
             </div>
             <Link to="/community/events" className="inline-flex items-center gap-1 text-xs font-semibold text-[#6366F1]">
               Все

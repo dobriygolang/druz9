@@ -37,7 +37,7 @@ func (i *Implementation) LeaveQueue(ctx context.Context, req *v1.LeaveQueueReque
 		return nil, errors.BadRequest("QUEUE_LEAVE_FAILED", err.Error())
 	}
 
-	state, err := i.service.GetQueueStatus(ctx, nil)
+	state, err := i.service.GetQueueStatus(ctx, user)
 	if err != nil {
 		return &v1.ArenaQueueStateResponse{Status: v1.ArenaQueueStatus_ARENA_QUEUE_STATUS_IDLE}, nil
 	}

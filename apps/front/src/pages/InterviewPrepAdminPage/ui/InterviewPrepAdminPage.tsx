@@ -151,8 +151,31 @@ export function InterviewPrepAdminPage() {
           <div className="grid grid-cols-2 gap-4">
             <Input label="Название" value={editTask.title ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, title: e.target.value }))} />
             <Input label="Slug" value={editTask.slug ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, slug: e.target.value }))} />
-            <Select label="Тип" options={[{ value: 'coding', label: 'Coding' }, { value: 'system_design', label: 'System Design' }, { value: 'behavioral', label: 'Behavioral' }]} value={editTask.prepType ?? 'coding'} onChange={v => setEditTask((t: any) => ({ ...t, prepType: v }))} />
-            <Select label="Язык" options={[{ value: 'python3', label: 'Python 3' }, { value: 'go', label: 'Go' }, { value: 'javascript', label: 'JavaScript' }]} value={editTask.language ?? 'python3'} onChange={v => setEditTask((t: any) => ({ ...t, language: v }))} />
+            <Select
+              label="Тип"
+              options={[
+                { value: 'coding', label: 'Coding' },
+                { value: 'algorithm', label: 'Algorithm' },
+                { value: 'sql', label: 'SQL' },
+                { value: 'system_design', label: 'System Design' },
+                { value: 'code_review', label: 'Code Review' },
+                { value: 'behavioral', label: 'Behavioral' },
+              ]}
+              value={editTask.prepType ?? 'coding'}
+              onChange={v => setEditTask((t: any) => ({ ...t, prepType: v }))}
+            />
+            <Select
+              label="Язык"
+              options={[
+                { value: 'python3', label: 'Python 3' },
+                { value: 'go', label: 'Go' },
+                { value: 'javascript', label: 'JavaScript' },
+                { value: 'typescript', label: 'TypeScript' },
+                { value: 'sql', label: 'SQL' },
+              ]}
+              value={editTask.language ?? 'python3'}
+              onChange={v => setEditTask((t: any) => ({ ...t, language: v }))}
+            />
             <Input label="Компания" value={editTask.companyTag ?? ''} onChange={e => setEditTask((t: any) => ({ ...t, companyTag: e.target.value }))} placeholder="google, yandex, ..." />
             <Input label="Длительность (сек)" type="number" value={editTask.durationSeconds ?? 2700} onChange={e => setEditTask((t: any) => ({ ...t, durationSeconds: parseInt(e.target.value) }))} />
             <div className="col-span-2">

@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import 'maplibre-gl/dist/maplibre-gl.css'
 import type maplibregl from 'maplibre-gl'
 import type { CommunityPoint } from '@/features/Geo/api/geoApi'
 import { loadMapLibre } from '@/shared/lib/loadMapLibre'
@@ -202,7 +203,7 @@ export function CommunityMapCanvas({
     return () => {
       cancelled = true
     }
-  }, [onSelectPoint, points, selectedPointId])
+  }, [mapStyle, onSelectPoint, points, selectedPointId])
 
   return (
     <div className={`${className ?? ''} relative`}>

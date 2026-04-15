@@ -27,6 +27,19 @@ export interface MockBlueprint {
   totalDurationSeconds: number
   publicAliasSlugs: string[]
   publicAliasNames: string[]
+  introText: string
+  primaryAliasSlug: string
+  primaryAliasName: string
+  rounds: MockBlueprintRound[]
+}
+
+export interface MockBlueprintRound {
+  position: number
+  roundType: string
+  title: string
+  durationSeconds: number
+  evaluatorMode: string
+  candidateInstructions: string
 }
 
 type BackendTask = {

@@ -128,6 +128,8 @@ func scanMockSession(s scanner) (*model.InterviewPrepMockSession, error) {
 		&item.BlueprintSlug,
 		&item.BlueprintTitle,
 		&item.TrackSlug,
+		&item.IntroText,
+		&item.ClosingText,
 		&status,
 		&item.CurrentStageIndex,
 		&item.StartedAt,
@@ -143,19 +145,23 @@ func scanMockSession(s scanner) (*model.InterviewPrepMockSession, error) {
 
 func scanMockStage(s scanner) (*model.InterviewPrepMockStage, error) {
 	var item model.InterviewPrepMockStage
-	var roundType string
 	var status string
 	if err := s.Scan(
 		&item.ID,
 		&item.SessionID,
 		&item.StageIndex,
-		&roundType,
+		&item.RoundType,
+		&item.Title,
 		&status,
 		&item.TaskID,
 		&item.BlueprintRoundID,
 		&item.SourcePoolID,
 		&item.SolveLanguage,
 		&item.Code,
+		&item.DurationSeconds,
+		&item.EvaluatorMode,
+		&item.CandidateInstructions,
+		&item.InterviewerInstructions,
 		&item.LastSubmissionPassed,
 		&item.ReviewScore,
 		&item.ReviewSummary,
@@ -166,7 +172,7 @@ func scanMockStage(s scanner) (*model.InterviewPrepMockStage, error) {
 	); err != nil {
 		return nil, err
 	}
-	item.Kind = model.InterviewPrepMockStageKindFromRoundType(roundType)
+	item.Kind = model.InterviewPrepMockStageKindFromRoundType(item.RoundType)
 	item.Status = model.InterviewPrepMockStageStatusFromString(status)
 	return &item, nil
 }
@@ -203,6 +209,7 @@ func scanMockBlueprintSummary(s scanner) (*model.InterviewMockBlueprintSummary, 
 		&item.Description,
 		&item.Level,
 		&item.TotalDurationSeconds,
+		&item.IntroText,
 		&item.PublicAliasSlugs,
 		&item.PublicAliasNames,
 	); err != nil {

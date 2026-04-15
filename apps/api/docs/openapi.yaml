@@ -3768,6 +3768,33 @@ components:
                     type: array
                     items:
                         type: string
+                introText:
+                    type: string
+                primaryAliasSlug:
+                    type: string
+                primaryAliasName:
+                    type: string
+                rounds:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.MockBlueprintRound'
+        interview_prep.v1.MockBlueprintRound:
+            type: object
+            properties:
+                position:
+                    type: integer
+                    format: int32
+                roundType:
+                    type: string
+                title:
+                    type: string
+                durationSeconds:
+                    type: integer
+                    format: int32
+                evaluatorMode:
+                    type: string
+                candidateInstructions:
+                    type: string
         interview_prep.v1.MockCompanyPreset:
             type: object
             properties:
@@ -3949,6 +3976,10 @@ components:
                     type: string
                 trackSlug:
                     type: string
+                introText:
+                    type: string
+                closingText:
+                    type: string
         interview_prep.v1.MockSessionEnvelope:
             type: object
             properties:
@@ -4003,6 +4034,17 @@ components:
                         $ref: '#/components/schemas/interview_prep.v1.MockQuestionResult'
                 currentQuestion:
                     $ref: '#/components/schemas/interview_prep.v1.MockQuestionResult'
+                roundType:
+                    type: string
+                title:
+                    type: string
+                durationSeconds:
+                    type: integer
+                    format: int32
+                evaluatorMode:
+                    type: string
+                candidateInstructions:
+                    type: string
         interview_prep.v1.ReviewMockSystemDesignRequest:
             type: object
             properties:

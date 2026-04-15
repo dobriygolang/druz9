@@ -393,10 +393,6 @@ WHERE e.id = $1
 		return nil, err
 	}
 
-	if len(event.Participants) == 0 {
-		return nil, nil
-	}
-
 	return &event, nil
 }
 

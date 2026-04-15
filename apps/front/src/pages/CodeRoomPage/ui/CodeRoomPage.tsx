@@ -503,6 +503,8 @@ export function CodeRoomPage() {
 
   // Keep isCreatorRef in sync for use inside callbacks
   const isCreator = !!user && !!room && (user.id === room.creatorId || room.participants.some(p => p.userId === user.id && p.isCreator))
+  const hasPredefinedTask = !!(room?.taskId || soloDraftTaskId)
+  const canEditTask = isCreator && !hasPredefinedTask
   useEffect(() => { isCreatorRef.current = isCreator }, [isCreator])
 
   // Auto-start room: creator's connection triggers waiting→active transition
@@ -942,7 +944,7 @@ export function CodeRoomPage() {
             <div className="rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
               <div className="flex items-center justify-between border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
                 <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">Условие</span>
-                {isCreator && (
+                {canEditTask && (
                   <button
                     onClick={openTaskEditor}
                     title="Редактировать условие задачи"
@@ -958,7 +960,7 @@ export function CodeRoomPage() {
                     <h2 className="mb-3 text-base font-bold text-[#0f172a] dark:text-[#e2e8f0]">{room.task}</h2>
                     {taskStatement ? (
                       <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#475569] dark:text-[#94a3b8]">{taskStatement}</p>
-                    ) : isCreator ? (
+                    ) : canEditTask ? (
                       <button onClick={openTaskEditor} className="text-sm font-medium text-[#6366F1] hover:underline">
                         + Добавить описание
                       </button>
@@ -966,7 +968,7 @@ export function CodeRoomPage() {
                       <p className="text-sm text-[#94a3b8]">Описание не добавлено</p>
                     )}
                   </div>
-                ) : isCreator ? (
+                ) : canEditTask ? (
                   <button
                     onClick={openTaskEditor}
                     className="flex w-full flex-col items-center justify-center gap-2 py-8 text-center text-[#94a3b8] transition-colors hover:text-[#6366F1]"
@@ -1298,7 +1300,7 @@ export function CodeRoomPage() {
             >
               Задача
             </button>
-            {isCreator && (
+            {canEditTask && (
               <button
                 onClick={openTaskEditor}
                 title="Редактировать условие задачи"
@@ -1314,7 +1316,7 @@ export function CodeRoomPage() {
                 <h2 className="text-sm font-bold text-[#0f172a] dark:text-[#e2e8f0] mb-3">{room.task}</h2>
                 {taskStatement ? (
                   <p className="text-sm text-[#475569] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">{taskStatement}</p>
-                ) : isCreator ? (
+                ) : canEditTask ? (
                   <button
                     onClick={openTaskEditor}
                     className="text-xs text-[#6366F1] hover:underline"
@@ -1325,7 +1327,7 @@ export function CodeRoomPage() {
                   <p className="text-xs text-[#94a3b8]">Описание не добавлено</p>
                 )}
               </div>
-            ) : isCreator ? (
+            ) : canEditTask ? (
               <button
                 onClick={openTaskEditor}
                 className="w-full h-full flex flex-col items-center justify-center gap-2 text-center py-8 text-[#94a3b8] hover:text-[#6366F1] transition-colors group"

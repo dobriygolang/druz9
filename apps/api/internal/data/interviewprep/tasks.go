@@ -270,6 +270,7 @@ func (r *Repo) syncDefaultPoolsForTask(ctx context.Context, taskID uuid.UUID, ro
 
 func defaultPoolIDsForTask(roundType string, companyTag string) []string {
 	pools := make([]string, 0, 2)
+	normalizedCompany := strings.TrimSpace(strings.ToLower(companyTag))
 
 	switch roundType {
 	case "coding_algorithmic":
@@ -284,19 +285,19 @@ func defaultPoolIDsForTask(roundType string, companyTag string) []string {
 
 	switch roundType {
 	case "coding_practical", "code_review":
-		if companyTag == "" || companyTag == "ozon" || companyTag == "avito" || companyTag == "yandex" {
+		if normalizedCompany == "ozon" || normalizedCompany == "avito" || normalizedCompany == "yandex" {
 			pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22005")
 		}
 	case "sql":
-		if companyTag == "" || companyTag == "ozon" || companyTag == "avito" || companyTag == "yandex" {
+		if normalizedCompany == "ozon" || normalizedCompany == "avito" || normalizedCompany == "yandex" {
 			pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22006")
 		}
 	case "system_design":
-		if companyTag == "" || companyTag == "ozon" || companyTag == "avito" || companyTag == "yandex" {
+		if normalizedCompany == "ozon" || normalizedCompany == "avito" || normalizedCompany == "yandex" {
 			pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22007")
 		}
 	case "behavioral":
-		if companyTag == "" || companyTag == "ozon" || companyTag == "avito" || companyTag == "yandex" {
+		if normalizedCompany == "ozon" || normalizedCompany == "avito" || normalizedCompany == "yandex" {
 			pools = append(pools, "47af81aa-7f69-4d1e-8d18-2ccca7c22008")
 		}
 	}

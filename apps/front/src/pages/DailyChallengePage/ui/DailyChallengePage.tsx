@@ -121,7 +121,6 @@ export function DailyChallengePage() {
 
   const handleSubmit = async () => {
     setReviewing(true)
-    setSubmitted(true)
     try {
       const res = await apiClient.post('/api/v1/code-editor/ai-review', {
         language: task?.task.language ?? 'python',
@@ -131,11 +130,12 @@ export function DailyChallengePage() {
       })
       const reviewData = res.data?.review ?? res.data
       setReview(reviewData)
+      setSubmitted(true)
       if (task?.task.id) {
         try { localStorage.setItem(`daily:review:${task.task.id}`, JSON.stringify(reviewData)) } catch { /* quota */ }
       }
     } catch {
-      // keep submitted=true, review stays null
+      setSubmitted(false)
     } finally {
       setReviewing(false)
     }

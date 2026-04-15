@@ -2,6 +2,7 @@ package circle
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"api/internal/model"
@@ -59,6 +60,9 @@ FROM circles WHERE id = $1`, circleID).Scan(
 		&c.MemberCount, &c.Tags, &c.IsPublic, &c.CreatedAt,
 	)
 	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, kratoserrors.NotFound("CIRCLE_NOT_FOUND", "circle not found")
+		}
 		return nil, fmt.Errorf("get circle: %w", err)
 	}
 	return &c, nil

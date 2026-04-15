@@ -429,23 +429,28 @@ func mapMockStage(stage *model.InterviewPrepMockStage) *v1.MockStage {
 	}
 
 	s := &v1.MockStage{
-		Id:                   stage.ID.String(),
-		SessionId:            stage.SessionID.String(),
-		StageIndex:           stage.StageIndex,
-		Kind:                 mapMockStageKind(stage.Kind),
-		Status:               mapMockStageStatus(stage.Status),
-		TaskId:               stage.TaskID.String(),
-		SolveLanguage:        stage.SolveLanguage,
-		Code:                 stage.Code,
-		LastSubmissionPassed: stage.LastSubmissionPassed,
-		ReviewScore:          stage.ReviewScore,
-		ReviewSummary:        stage.ReviewSummary,
-		StartedAt:            timestamppb.New(stage.StartedAt),
-		CreatedAt:            timestamppb.New(stage.CreatedAt),
-		UpdatedAt:            timestamppb.New(stage.UpdatedAt),
-		Task:                 mapTaskPublic(stage.Task),
-		QuestionResults:      questions,
-		CurrentQuestion:      mapMockQuestionResult(stage.CurrentQuestion),
+		Id:                    stage.ID.String(),
+		SessionId:             stage.SessionID.String(),
+		StageIndex:            stage.StageIndex,
+		Kind:                  mapMockStageKind(stage.Kind),
+		RoundType:             stage.RoundType,
+		Title:                 stage.Title,
+		Status:                mapMockStageStatus(stage.Status),
+		TaskId:                stage.TaskID.String(),
+		SolveLanguage:         stage.SolveLanguage,
+		Code:                  stage.Code,
+		DurationSeconds:       stage.DurationSeconds,
+		EvaluatorMode:         stage.EvaluatorMode,
+		CandidateInstructions: stage.CandidateInstructions,
+		LastSubmissionPassed:  stage.LastSubmissionPassed,
+		ReviewScore:           stage.ReviewScore,
+		ReviewSummary:         stage.ReviewSummary,
+		StartedAt:             timestamppb.New(stage.StartedAt),
+		CreatedAt:             timestamppb.New(stage.CreatedAt),
+		UpdatedAt:             timestamppb.New(stage.UpdatedAt),
+		Task:                  mapTaskPublic(stage.Task),
+		QuestionResults:       questions,
+		CurrentQuestion:       mapMockQuestionResult(stage.CurrentQuestion),
 	}
 	if stage.FinishedAt != nil {
 		s.FinishedAt = timestamppb.New(*stage.FinishedAt)
@@ -476,6 +481,8 @@ func mapMockSession(session *model.InterviewPrepMockSession) *v1.MockSession {
 		BlueprintSlug:     session.BlueprintSlug,
 		BlueprintTitle:    session.BlueprintTitle,
 		TrackSlug:         session.TrackSlug,
+		IntroText:         session.IntroText,
+		ClosingText:       session.ClosingText,
 	}
 	if session.FinishedAt != nil {
 		s.FinishedAt = timestamppb.New(*session.FinishedAt)
@@ -487,6 +494,10 @@ func mapMockBlueprint(item *model.InterviewMockBlueprintSummary) *v1.MockBluepri
 	if item == nil {
 		return nil
 	}
+	rounds := make([]*v1.MockBlueprintRound, 0, len(item.Rounds))
+	for _, round := range item.Rounds {
+		rounds = append(rounds, mapMockBlueprintRound(round))
+	}
 	return &v1.MockBlueprint{
 		Id:                   item.ID.String(),
 		TrackSlug:            item.TrackSlug,
@@ -497,6 +508,24 @@ func mapMockBlueprint(item *model.InterviewMockBlueprintSummary) *v1.MockBluepri
 		TotalDurationSeconds: item.TotalDurationSeconds,
 		PublicAliasSlugs:     append([]string{}, item.PublicAliasSlugs...),
 		PublicAliasNames:     append([]string{}, item.PublicAliasNames...),
+		IntroText:            item.IntroText,
+		PrimaryAliasSlug:     item.PrimaryAliasSlug,
+		PrimaryAliasName:     item.PrimaryAliasName,
+		Rounds:               rounds,
+	}
+}
+
+func mapMockBlueprintRound(round *model.InterviewBlueprintRound) *v1.MockBlueprintRound {
+	if round == nil {
+		return nil
+	}
+	return &v1.MockBlueprintRound{
+		Position:              round.Position,
+		RoundType:             round.RoundType,
+		Title:                 round.Title,
+		DurationSeconds:       round.DurationSeconds,
+		EvaluatorMode:         round.EvaluatorMode,
+		CandidateInstructions: round.CandidateInstructionsOverride,
 	}
 }
 

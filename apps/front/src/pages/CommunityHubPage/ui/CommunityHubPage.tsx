@@ -8,7 +8,7 @@ const TABS = [
   { id: 'events', label: 'Events', href: '/community/events' },
   { id: 'circles', label: 'Circles', href: '/community/circles' },
   { id: 'map', label: 'Map', href: '/community/map' },
-  { id: 'vacancies', label: 'Вакансии', href: '/community/vacancies' },
+  { id: 'vacancies', label: 'Vacancies', href: '/community/vacancies' },
 ]
 
 export function CommunityHubPage() {

@@ -299,13 +299,14 @@ func toHTTPError(err error) error {
 		errors.Is(err, appinterviewprep.ErrMockSessionNotFound):
 		return kratoserrors.NotFound("NOT_FOUND", err.Error())
 	case errors.Is(err, appinterviewprep.ErrSessionFinished),
-		errors.Is(err, appinterviewprep.ErrMockSessionFinished),
+		errors.Is(err, appinterviewprep.ErrMockSessionFinished):
+		return kratoserrors.Conflict("CONFLICT", err.Error())
+	case errors.Is(err, appinterviewprep.ErrAnotherMockSessionActive),
 		errors.Is(err, appinterviewprep.ErrSubmitNotAllowed),
 		errors.Is(err, appinterviewprep.ErrMockStageSubmitNotAllowed),
 		errors.Is(err, appinterviewprep.ErrMockQuestionNotReady),
 		errors.Is(err, appinterviewprep.ErrMockQuestionAnswerRequired),
 		errors.Is(err, appinterviewprep.ErrMockCompanyTagRequired),
-		errors.Is(err, appinterviewprep.ErrAnotherMockSessionActive),
 		errors.Is(err, appinterviewprep.ErrMockTaskPoolIncomplete),
 		errors.Is(err, appinterviewprep.ErrMockQuestionPoolIncomplete),
 		errors.Is(err, appinterviewprep.ErrQuestionLocked),

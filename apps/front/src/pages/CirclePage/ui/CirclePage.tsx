@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useRef } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { ArrowLeft, Users, Hash, UserPlus, UserMinus, Globe, Lock, Calendar, Play, Share2, Check, Plus, ExternalLink, RefreshCw } from 'lucide-react'
 import { circleApi, type CircleMember } from '@/features/Circle/api/circleApi'
@@ -47,14 +47,16 @@ export function CirclePage() {
       .finally(() => setLoading(false))
   }, [circleId])
 
+  const membersLoadingRef = useRef(false)
   const loadMembers = useCallback(() => {
-    if (!circleId || membersLoading) return
+    if (!circleId || membersLoadingRef.current) return
+    membersLoadingRef.current = true
     setMembersLoading(true)
     circleApi.listMembers(circleId)
       .then(setMembers)
       .catch(() => {})
-      .finally(() => setMembersLoading(false))
-  }, [circleId, membersLoading])
+      .finally(() => { membersLoadingRef.current = false; setMembersLoading(false) })
+  }, [circleId])
 
   const loadEvents = useCallback(() => {
     if (!circleId) return

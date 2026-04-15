@@ -140,6 +140,9 @@ func (r *Repo) ListOpenMatchIDs(ctx context.Context, limit int32) ([]uuid.UUID, 
 		}
 		ids = append(ids, id)
 	}
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate open arena match ids: %w", err)
+	}
 	return ids, nil
 }
 

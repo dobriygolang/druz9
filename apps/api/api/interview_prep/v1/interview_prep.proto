@@ -451,6 +451,11 @@ message MockStage {
   InterviewPrepTask         task                  = 16;
   repeated MockQuestionResult question_results    = 17;
   MockQuestionResult        current_question      = 18;
+  string                    round_type            = 19;
+  string                    title                 = 20;
+  int32                     duration_seconds      = 21;
+  string                    evaluator_mode        = 22;
+  string                    candidate_instructions = 23;
 }
 
 message MockSession {
@@ -468,6 +473,17 @@ message MockSession {
   string                    blueprint_slug      = 12;
   string                    blueprint_title     = 13;
   string                    track_slug          = 14;
+  string                    intro_text          = 15;
+  string                    closing_text        = 16;
+}
+
+message MockBlueprintRound {
+  int32  position               = 1;
+  string round_type             = 2;
+  string title                  = 3;
+  int32  duration_seconds       = 4;
+  string evaluator_mode         = 5;
+  string candidate_instructions = 6;
 }
 
 message MockBlueprint {
@@ -480,6 +496,10 @@ message MockBlueprint {
   int32           total_duration_seconds = 7;
   repeated string public_alias_slugs     = 8;
   repeated string public_alias_names     = 9;
+  string          intro_text             = 10;
+  string          primary_alias_slug     = 11;
+  string          primary_alias_name     = 12;
+  repeated MockBlueprintRound rounds     = 13;
 }
 
 message MockQuestionPoolItem {

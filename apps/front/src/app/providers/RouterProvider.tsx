@@ -36,7 +36,11 @@ const CirclePage = lazy(() => import('@/pages/CirclePage/ui/CirclePage').then(m 
 const VacanciesPage = lazy(() => import('@/pages/VacanciesPage/ui/VacanciesPage').then(m => ({ default: m.VacanciesPage })))
 const DailyChallengePage = lazy(() => import('@/pages/DailyChallengePage/ui/DailyChallengePage').then(m => ({ default: m.DailyChallengePage })))
 
-const Fallback: React.FC = () => null
+const Fallback: React.FC = () => (
+  <div className="flex min-h-screen items-center justify-center bg-[#F2F3F0] dark:bg-[#0f1117]">
+    <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#CBCCC9] border-t-[#6366F1]" />
+  </div>
+)
 
 class ErrorBoundary extends React.Component<
   { children: React.ReactNode },

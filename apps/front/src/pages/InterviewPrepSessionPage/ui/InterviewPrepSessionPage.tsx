@@ -41,7 +41,7 @@ export function InterviewPrepSessionPage() {
     if (!sessionId) return
     interviewPrepApi.getSession(sessionId).then((s: any) => {
       setSession(s)
-      if (s?.code ?? s?.task?.starterCode) setCode(s.code ?? s.task.starterCode)
+      if (s?.code || s?.task?.starterCode) setCode(s.code || s.task?.starterCode)
       const nextLanguage = getMonacoLanguage(s?.solveLanguage ?? s?.task?.language ?? 'python')
       setSelectedLanguage(nextLanguage === 'plaintext' ? 'python' : nextLanguage)
       if (s?.task?.durationSeconds) setTimeLeft(s.task.durationSeconds)
