@@ -30,12 +30,15 @@ func TestListEvents(t *testing.T) {
 			TotalCount:  1,
 			HasNextPage: false,
 		}
+		expectedOpts := model.ListEventsOptions{
+			Limit:              req.Limit,
+			Offset:             req.Offset,
+			IncludeAllStatuses: true,
+			ViewerID:           &user.ID,
+		}
 
 		mockService := mocks.NewService(t)
-		mockService.On("ListEvents", mock.Anything, user.ID, model.ListEventsOptions{
-			Limit:  req.Limit,
-			Offset: req.Offset,
-		}).Return(expectedResp, nil).Once()
+		mockService.On("ListEvents", mock.Anything, user.ID, expectedOpts).Return(expectedResp, nil).Once()
 		mockService.On("EnrichEventsWithAvatarURLs", mock.Anything, mock.Anything).Return(nil).Once()
 
 		impl := New(mockService)
@@ -91,6 +94,7 @@ func TestCreateEvent(t *testing.T) {
 		t.Parallel()
 
 		user := &model.User{ID: uuid.New(), IsAdmin: true}
+		scheduledAt := timestamppb.Now()
 		req := &v1.CreateEventRequest{
 			Title:       "Test Event",
 			PlaceLabel:  "Conference Room",
@@ -99,7 +103,7 @@ func TestCreateEvent(t *testing.T) {
 			Region:      "EU",
 			Country:     "Germany",
 			City:        "Berlin",
-			ScheduledAt: timestamppb.Now(),
+			ScheduledAt: scheduledAt,
 		}
 		expectedEvent := &model.Event{
 			ID:        uuid.New(),
@@ -107,9 +111,30 @@ func TestCreateEvent(t *testing.T) {
 			CreatorID: user.ID.String(),
 			IsCreator: true,
 		}
+		expectedScheduledAt := scheduledAt.AsTime().UTC()
 
 		mockService := mocks.NewService(t)
-		mockService.On("CreateEvent", mock.Anything, user.ID, mock.Anything).Return(expectedEvent, nil).Once()
+		mockService.On(
+			"CreateEvent",
+			mock.Anything,
+			user.ID,
+			true,
+			mock.MatchedBy(func(actual model.CreateEventRequest) bool {
+				if actual.Title != req.Title || actual.PlaceLabel != req.PlaceLabel || actual.Description != req.Description {
+					return false
+				}
+				if actual.MeetingLink != req.MeetingLink || actual.Region != req.Region || actual.Country != req.Country || actual.City != req.City {
+					return false
+				}
+				if actual.Repeat != model.EventRepeatNone || actual.IsPublic != req.IsPublic {
+					return false
+				}
+				if actual.ScheduledAt == nil {
+					return false
+				}
+				return actual.ScheduledAt.Equal(expectedScheduledAt)
+			}),
+		).Return(expectedEvent, nil).Once()
 
 		impl := New(mockService)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
@@ -128,20 +153,37 @@ func TestCreateEvent(t *testing.T) {
 		mockService.AssertExpectations(t)
 	})
 
-	t.Run("returns forbidden for non admin", func(t *testing.T) {
+	t.Run("passes non admin flag to service", func(t *testing.T) {
 		t.Parallel()
 
 		user := &model.User{ID: uuid.New(), IsAdmin: false}
-		impl := New(nil)
+		expectedEvent := &model.Event{ID: uuid.New(), Title: "Test", CreatorID: user.ID.String()}
+		mockService := mocks.NewService(t)
+		mockService.On(
+			"CreateEvent",
+			mock.Anything,
+			user.ID,
+			false,
+			mock.MatchedBy(func(actual model.CreateEventRequest) bool {
+				return actual.Title == "Test" && actual.ScheduledAt != nil
+			}),
+		).Return(expectedEvent, nil).Once()
+
+		impl := New(mockService)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
 
-		_, err := impl.CreateEvent(ctx, &v1.CreateEventRequest{
+		resp, err := impl.CreateEvent(ctx, &v1.CreateEventRequest{
 			Title:       "Test",
 			ScheduledAt: timestamppb.Now(),
 		})
-		if err == nil {
-			t.Error("expected forbidden for non-admin user")
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
 		}
+		if resp == nil || resp.Event == nil {
+			t.Fatal("expected event response")
+		}
+
+		mockService.AssertExpectations(t)
 	})
 
 	t.Run("returns error when no user in context", func(t *testing.T) {
@@ -161,7 +203,15 @@ func TestCreateEvent(t *testing.T) {
 		user := &model.User{ID: uuid.New(), IsAdmin: true}
 		expectedEvent := &model.Event{ID: uuid.New(), Title: "Test"}
 		mockService := mocks.NewService(t)
-		mockService.On("CreateEvent", mock.Anything, user.ID, mock.Anything).Return(expectedEvent, nil).Once()
+		mockService.On(
+			"CreateEvent",
+			mock.Anything,
+			user.ID,
+			true,
+			mock.MatchedBy(func(actual model.CreateEventRequest) bool {
+				return actual.Title == "Test" && actual.ScheduledAt == nil && actual.Repeat == model.EventRepeatNone
+			}),
+		).Return(expectedEvent, nil).Once()
 
 		impl := New(mockService)
 		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
@@ -176,6 +226,8 @@ func TestCreateEvent(t *testing.T) {
 		if resp == nil || resp.Event == nil {
 			t.Fatal("expected event response")
 		}
+
+		mockService.AssertExpectations(t)
 	})
 }
 

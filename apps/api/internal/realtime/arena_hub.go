@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 	"sync"
+	"sync/atomic"
 	"time"
 
 	domain "api/internal/domain/arena"
@@ -20,6 +21,7 @@ type ArenaHub struct {
 	service arenaStateService
 	mu      sync.Mutex
 	matches map[string]*arenaMatchRoom
+	stopCh  chan struct{}
 }
 
 type arenaStateService interface {
@@ -42,6 +44,8 @@ type arenaClient struct {
 	spectator           bool
 	ws                  *websocket.Conn
 	send                chan schema.ArenaMessage
+	closeOnce           sync.Once
+	closed              atomic.Bool
 }
 
 var arenaUpgrader = websocket.Upgrader{
@@ -56,9 +60,15 @@ func NewArenaHub(service arenaStateService) *ArenaHub {
 	hub := &ArenaHub{
 		service: service,
 		matches: make(map[string]*arenaMatchRoom),
+		stopCh:  make(chan struct{}),
 	}
 	go hub.snapshotLoop()
 	return hub
+}
+
+// Stop gracefully shuts down the snapshot loop.
+func (h *ArenaHub) Stop() {
+	close(h.stopCh)
 }
 
 func (h *ArenaHub) Handler(matchID string, authenticatedUserID string) http.Handler {

@@ -24,8 +24,9 @@ type codeEditorStateService interface {
 type CodeEditorHub struct {
 	store codeEditorStateService
 
-	mu    sync.Mutex
-	rooms map[string]*codeEditorRoom
+	mu     sync.Mutex
+	rooms  map[string]*codeEditorRoom
+	stopCh chan struct{}
 }
 
 type codeEditorRoom struct {
@@ -73,11 +74,17 @@ var codeEditorUpgrader = websocket.Upgrader{
 
 func NewCodeEditorHub(store codeEditorStateService) *CodeEditorHub {
 	hub := &CodeEditorHub{
-		store: store,
-		rooms: make(map[string]*codeEditorRoom),
+		store:  store,
+		rooms:  make(map[string]*codeEditorRoom),
+		stopCh: make(chan struct{}),
 	}
 	go hub.snapshotLoop()
 	return hub
+}
+
+// Stop gracefully shuts down the snapshot loop.
+func (h *CodeEditorHub) Stop() {
+	close(h.stopCh)
 }
 
 func (h *CodeEditorHub) Handler(roomID string, authenticatedUserID string) http.Handler {

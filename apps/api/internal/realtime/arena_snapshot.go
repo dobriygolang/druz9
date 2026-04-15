@@ -7,6 +7,7 @@ import (
 	"api/internal/model"
 	schema "api/internal/realtime/schema"
 
+	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 )
 
@@ -142,7 +143,13 @@ func (h *ArenaHub) snapshotLoop() {
 	ticker := time.NewTicker(arenaSnapshotFlushInterval)
 	defer ticker.Stop()
 
-	for range ticker.C {
+	for {
+		select {
+		case <-h.stopCh:
+			return
+		case <-ticker.C:
+		}
+
 		type snapshot struct {
 			matchID string
 			codes   map[string]*schema.ArenaPlayerCode
@@ -191,7 +198,9 @@ func (h *ArenaHub) flushSnapshot(matchID string, codes map[string]*schema.ArenaP
 	}
 
 	if len(codesMap) > 0 {
-		_ = h.service.SavePlayerCodes(context.Background(), parsedMatchID, codesMap)
+		if err := h.service.SavePlayerCodes(context.Background(), parsedMatchID, codesMap); err != nil {
+			klog.Errorf("arena flush snapshot match=%s: %v", matchID, err)
+		}
 	}
 }
 

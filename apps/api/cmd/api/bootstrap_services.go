@@ -133,6 +133,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Sandbox:    sandboxService,
 	})
 	realtimeHub := realtime.NewCodeEditorHub(codeEditorServiceDomain)
+	closer.AddSync(func() error { realtimeHub.Stop(); return nil })
 	arenaServiceDomain := apparenа.New(apparenа.Config{
 		Repository: storage.arenaRepo,
 		Sandbox:    sandboxService,
@@ -162,6 +163,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Reviewer:   aiReviewService,
 	})
 	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
+	closer.AddSync(func() error { arenaRealtimeHub.Stop(); return nil })
 	solutionReviewService := solutionreview.New(solutionreview.Config{
 		Repo:      storage.solutionReviewRepo,
 		Reviewer:  codeReviewService,

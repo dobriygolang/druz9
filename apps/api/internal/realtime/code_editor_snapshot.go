@@ -54,7 +54,13 @@ func (h *CodeEditorHub) snapshotLoop() {
 	ticker := time.NewTicker(snapshotFlushInterval)
 	defer ticker.Stop()
 
-	for range ticker.C {
+	for {
+		select {
+		case <-h.stopCh:
+			return
+		case <-ticker.C:
+		}
+
 		var sharedPending []pendingRoomSnapshot
 		var duelPending []pendingActorSnapshot
 

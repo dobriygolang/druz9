@@ -43,7 +43,7 @@ func (h *ArenaHub) removeClient(client *arenaClient) {
 		h.flushSnapshot(client.matchID, pending)
 	}
 
-	close(client.send)
+	client.closeSend()
 	_ = client.ws.Close()
 }
 

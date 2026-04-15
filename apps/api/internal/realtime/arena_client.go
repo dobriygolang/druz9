@@ -52,8 +52,18 @@ func (c *arenaClient) readLoop(h *ArenaHub) {
 }
 
 func (c *arenaClient) enqueue(msg schema.ArenaMessage) {
+	if c.closed.Load() {
+		return
+	}
 	select {
 	case c.send <- msg:
 	default:
 	}
+}
+
+func (c *arenaClient) closeSend() {
+	c.closeOnce.Do(func() {
+		c.closed.Store(true)
+		close(c.send)
+	})
 }
