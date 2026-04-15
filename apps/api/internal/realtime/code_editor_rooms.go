@@ -93,9 +93,10 @@ func (h *CodeEditorHub) sendSnapshot(client *codeEditorClient) {
 		state := room.duelStates[client.actorKey]
 		if state != nil && state.initialized {
 			msg := schema.CodeEditorMessage{
-				Type:      schema.CodeEditorTypeSnapshot,
-				PlainText: state.plainText,
-				Language:  state.language,
+				Type:              schema.CodeEditorTypeSnapshot,
+				PlainText:         state.plainText,
+				Language:          state.language,
+				ActiveClientCount: len(room.clients),
 			}
 			h.mu.Unlock()
 			client.enqueue(msg)
@@ -123,9 +124,10 @@ func (h *CodeEditorHub) sendSnapshot(client *codeEditorClient) {
 		state.language = editorState.Language.String()
 		state.initialized = true
 		msg := schema.CodeEditorMessage{
-			Type:      schema.CodeEditorTypeSnapshot,
-			PlainText: state.plainText,
-			Language:  state.language,
+			Type:              schema.CodeEditorTypeSnapshot,
+			PlainText:         state.plainText,
+			Language:          state.language,
+			ActiveClientCount: len(room.clients),
 		}
 		h.mu.Unlock()
 		client.enqueue(msg)
@@ -133,9 +135,10 @@ func (h *CodeEditorHub) sendSnapshot(client *codeEditorClient) {
 	}
 
 	msg := schema.CodeEditorMessage{
-		Type:      schema.CodeEditorTypeSnapshot,
-		PlainText: room.lastPlainText,
-		Language:  room.language,
+		Type:              schema.CodeEditorTypeSnapshot,
+		PlainText:         room.lastPlainText,
+		Language:          room.language,
+		ActiveClientCount: len(room.clients),
 	}
 	h.mu.Unlock()
 	client.enqueue(msg)

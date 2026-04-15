@@ -68,12 +68,18 @@ export class MonacoBinding {
   private readonly yTextObserver: (event: Y.YTextEvent) => void
   private readonly monacoChangeHandler: Monaco.IDisposable
   private readonly monacoDisposeHandler: Monaco.IDisposable
+  private readonly onRemoteChangeStart?: () => void
+  private readonly onRemoteChangeEnd?: () => void
 
   constructor(
     monaco: typeof Monaco,
     yText: Y.Text,
     monacoModel: Monaco.editor.ITextModel,
     editors: Set<Monaco.editor.IStandaloneCodeEditor> = new Set(),
+    opts: {
+      onRemoteChangeStart?: () => void
+      onRemoteChangeEnd?: () => void
+    } = {},
   ) {
     if (!yText.doc) {
       throw new Error('Y.Text must belong to a Y.Doc')
@@ -84,6 +90,8 @@ export class MonacoBinding {
     this.monaco = monaco
     this.monacoModel = monacoModel
     this.editors = editors
+    this.onRemoteChangeStart = opts.onRemoteChangeStart
+    this.onRemoteChangeEnd = opts.onRemoteChangeEnd
 
     this.beforeTransaction = () => {
       this.mutex(() => {
@@ -100,56 +108,61 @@ export class MonacoBinding {
 
     this.yTextObserver = event => {
       this.mutex(() => {
-        let index = 0
+        this.onRemoteChangeStart?.()
+        try {
+          let index = 0
 
-        event.delta.forEach(op => {
-          if (op.retain !== undefined) {
-            index += op.retain
-            return
-          }
+          event.delta.forEach(op => {
+            if (op.retain !== undefined) {
+              index += op.retain
+              return
+            }
 
-          if (op.insert !== undefined) {
-            const position = this.monacoModel.getPositionAt(index)
-            const range = new this.monaco.Selection(
-              position.lineNumber,
-              position.column,
-              position.lineNumber,
-              position.column,
+            if (op.insert !== undefined) {
+              const position = this.monacoModel.getPositionAt(index)
+              const range = new this.monaco.Selection(
+                position.lineNumber,
+                position.column,
+                position.lineNumber,
+                position.column,
+              )
+              this.monacoModel.applyEdits([{ range, text: op.insert as string }])
+              index += (op.insert as string).length
+              return
+            }
+
+            if (op.delete !== undefined) {
+              const start = this.monacoModel.getPositionAt(index)
+              const end = this.monacoModel.getPositionAt(index + op.delete)
+              const range = new this.monaco.Selection(
+                start.lineNumber,
+                start.column,
+                end.lineNumber,
+                end.column,
+              )
+              this.monacoModel.applyEdits([{ range, text: '' }])
+              return
+            }
+
+            unexpectedCase()
+          })
+
+          this.savedSelections.forEach((selection, editor) => {
+            const nextSelection = createMonacoSelectionFromRelativeSelection(
+              this.monaco,
+              editor,
+              this.yText,
+              selection,
+              this.doc,
             )
-            this.monacoModel.applyEdits([{ range, text: op.insert as string }])
-            index += (op.insert as string).length
-            return
-          }
 
-          if (op.delete !== undefined) {
-            const start = this.monacoModel.getPositionAt(index)
-            const end = this.monacoModel.getPositionAt(index + op.delete)
-            const range = new this.monaco.Selection(
-              start.lineNumber,
-              start.column,
-              end.lineNumber,
-              end.column,
-            )
-            this.monacoModel.applyEdits([{ range, text: '' }])
-            return
-          }
-
-          unexpectedCase()
-        })
-
-        this.savedSelections.forEach((selection, editor) => {
-          const nextSelection = createMonacoSelectionFromRelativeSelection(
-            this.monaco,
-            editor,
-            this.yText,
-            selection,
-            this.doc,
-          )
-
-          if (nextSelection) {
-            editor.setSelection(nextSelection)
-          }
-        })
+            if (nextSelection) {
+              editor.setSelection(nextSelection)
+            }
+          })
+        } finally {
+          this.onRemoteChangeEnd?.()
+        }
       })
     }
 

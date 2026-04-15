@@ -19,6 +19,7 @@ interface CodeEditorMessage {
   clientId?: string
   awarenessId?: number
   userId?: string
+  activeClientCount?: number
   plainText?: string
   data?: string
   language?: string
@@ -75,6 +76,7 @@ export interface SelectionInfo {
 interface UseCodeRoomWsReturn {
   connected: boolean
   gotSnapshot: boolean
+  snapshotActiveClientCount: number
   code: string
   language: string
   awareness: Map<string, AwarenessState>
@@ -104,6 +106,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
 
   const [connected, setConnected] = useState(false)
   const [gotSnapshot, setGotSnapshot] = useState(false)
+  const [snapshotActiveClientCount, setSnapshotActiveClientCount] = useState(0)
   const [code, setCode] = useState('')
   const [language, setLanguage] = useState(initialLanguage ?? 'python')
   const [awareness, setAwareness] = useState<Map<string, AwarenessState>>(new Map())
@@ -151,6 +154,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   useEffect(() => {
     setConnected(false)
     setGotSnapshot(false)
+    setSnapshotActiveClientCount(0)
     setCode('')
     setAwareness(new Map())
     setLastSubmission(null)
@@ -171,6 +175,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         if (msg.plainText !== undefined) setCode(msg.plainText)
         if (msg.language) setLanguage(msg.language)
         isRemoteUpdate.current = false
+        setSnapshotActiveClientCount(msg.activeClientCount ?? 0)
         setGotSnapshot(true)
         break
       }
@@ -377,6 +382,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   return {
     connected,
     gotSnapshot,
+    snapshotActiveClientCount,
     code,
     language,
     awareness,

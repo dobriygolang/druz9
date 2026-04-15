@@ -16,17 +16,18 @@ const (
 )
 
 type CodeEditorMessage struct {
-	Type         string                     `json:"type"`
-	ClientID     string                     `json:"clientId,omitempty"`
-	AwarenessID  uint64                     `json:"awarenessId,omitempty"`
-	AwarenessIDs []uint64                   `json:"awarenessIds,omitempty"`
-	UserID       string                     `json:"userId,omitempty"`
-	GuestName    string                     `json:"guestName,omitempty"`
-	Data         string                     `json:"data,omitempty"`
-	PlainText    string                     `json:"plainText,omitempty"`
-	Language     string                     `json:"language,omitempty"`
-	Room         *CodeEditorRoom            `json:"room,omitempty"`
-	Submission   *CodeEditorSubmissionEvent `json:"submission,omitempty"`
+	Type              string                     `json:"type"`
+	ClientID          string                     `json:"clientId,omitempty"`
+	AwarenessID       uint64                     `json:"awarenessId,omitempty"`
+	AwarenessIDs      []uint64                   `json:"awarenessIds,omitempty"`
+	ActiveClientCount int                        `json:"activeClientCount,omitempty"`
+	UserID            string                     `json:"userId,omitempty"`
+	GuestName         string                     `json:"guestName,omitempty"`
+	Data              string                     `json:"data,omitempty"`
+	PlainText         string                     `json:"plainText,omitempty"`
+	Language          string                     `json:"language,omitempty"`
+	Room              *CodeEditorRoom            `json:"room,omitempty"`
+	Submission        *CodeEditorSubmissionEvent `json:"submission,omitempty"`
 }
 
 type CodeEditorRoom struct {

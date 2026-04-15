@@ -234,9 +234,11 @@ export function CodeRoomPage() {
   const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
   const queuedDocMessagesRef = useRef<string[]>([])
   const sendDocSyncRef = useRef<(data: string) => void>(() => {})
+  const onDocSyncAppliedRef = useRef<(() => void) | null>(null)
   const currentCodeRef = useRef('')
   const initialCodeRef = useRef('')
   const lastCursorRef = useRef({ line: 1, col: 1 })
+  const isApplyingRemoteDocRef = useRef(false)
   const isCreatorRef = useRef(false)
   const taskState = (location.state as { starterCode?: string; taskId?: string } | null)
   const soloDraftTaskId = taskState?.taskId ?? null
@@ -246,6 +248,7 @@ export function CodeRoomPage() {
   const persistTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
   // Mutable cursor positions for remote users — updated in-place, no widget re-add needed
   const cursorPositionsRef = useRef<Map<string, { line: number; col: number }>>(new Map())
+  const awarenessCodeLenRef = useRef<Map<string, number | undefined>>(new Map())
 
   // Left panel resize
   useEffect(() => {
@@ -318,6 +321,7 @@ export function CodeRoomPage() {
     if (reply.byteLength > 1) {
       sendDocSyncRef.current(encodeBinaryToBase64(reply))
     }
+    onDocSyncAppliedRef.current?.()
   }, [])
 
   const flushQueuedDocMessages = useCallback(() => {
@@ -432,9 +436,7 @@ export function CodeRoomPage() {
 
   useEffect(() => {
     if (!ws.gotSnapshot) return
-    const baseCode = isDuelRoom
-      ? (ws.code || currentCodeRef.current || starterCodeRef.current || '')
-      : (currentCodeRef.current || starterCodeRef.current || ws.code || '')
+    const baseCode = ws.code || currentCodeRef.current || starterCodeRef.current || ''
     initialCodeRef.current = baseCode
     currentCodeRef.current = baseCode
 
@@ -451,16 +453,26 @@ export function CodeRoomPage() {
     if (!editor || !monaco || !model || !ws.connected || !ws.gotSnapshot || bindingRef.current || isDuelRoom) return
 
     const snapshotCode = ws.code || ''
-    const seedCode = currentCodeRef.current || snapshotCode || model.getValue()
-    const hasLocalSeedOverride = seedCode !== snapshotCode
+    const seedCode = snapshotCode || currentCodeRef.current || model.getValue()
+    const shouldBootstrapFromSnapshot = ws.snapshotActiveClientCount <= 1
 
     const doc = new Y.Doc()
     const yText = doc.getText('code')
-    if (seedCode) {
+    if (shouldBootstrapFromSnapshot && seedCode) {
       yText.insert(0, seedCode)
     }
 
-    const binding = new MonacoBinding(monaco, yText, model, new Set([editor]))
+    let binding: MonacoBinding | null = null
+    const attachBinding = () => {
+      if (binding) return
+      binding = new MonacoBinding(monaco, yText, model, new Set([editor]), {
+        onRemoteChangeStart: () => { isApplyingRemoteDocRef.current = true },
+        onRemoteChangeEnd: () => { isApplyingRemoteDocRef.current = false },
+      })
+      bindingRef.current = binding
+      currentCodeRef.current = model.getValue()
+    }
+
     const handleDocUpdate = (update: Uint8Array, origin: unknown) => {
       if (origin === 'remote') return
 
@@ -472,14 +484,17 @@ export function CodeRoomPage() {
     doc.on('update', handleDocUpdate)
 
     yDocRef.current = doc
-    bindingRef.current = binding
-    currentCodeRef.current = model.getValue()
+    onDocSyncAppliedRef.current = () => {
+      if (!shouldBootstrapFromSnapshot) {
+        attachBinding()
+      }
+    }
 
-    if (hasLocalSeedOverride && seedCode) {
-      const encoder = encoding.createEncoder()
-      syncProtocol.writeUpdate(encoder, Y.encodeStateAsUpdate(doc))
-      ws.sendDocSync(encodeBinaryToBase64(encoding.toUint8Array(encoder)))
-      ws.persistCode(seedCode)
+    if (shouldBootstrapFromSnapshot) {
+      attachBinding()
+      if (seedCode && seedCode !== snapshotCode) {
+        ws.persistCode(seedCode)
+      }
     }
 
     const syncEncoder = encoding.createEncoder()
@@ -488,13 +503,23 @@ export function CodeRoomPage() {
     flushQueuedDocMessages()
 
     return () => {
+      onDocSyncAppliedRef.current = null
       doc.off('update', handleDocUpdate)
-      binding.destroy()
+      binding?.destroy()
       doc.destroy()
       bindingRef.current = null
       yDocRef.current = null
+      isApplyingRemoteDocRef.current = false
     }
-  }, [roomId, ws.connected, ws.gotSnapshot, ws.code, ws.sendDocSync, ws.persistCode, flushQueuedDocMessages, isDuelRoom])
+  }, [roomId, ws.connected, ws.gotSnapshot, ws.code, ws.snapshotActiveClientCount, ws.sendDocSync, ws.persistCode, flushQueuedDocMessages, isDuelRoom])
+
+  useEffect(() => {
+    const next = new Map<string, number | undefined>()
+    ws.awareness.forEach((state, userId) => {
+      next.set(userId, state.codeLen)
+    })
+    awarenessCodeLenRef.current = next
+  }, [ws.awareness])
 
   // Update room from room_update WS message (fired on join/leave/status change)
   useEffect(() => {
@@ -771,10 +796,18 @@ export function CodeRoomPage() {
 
       currentCodeRef.current = nextCode
 
+      if (isApplyingRemoteDocRef.current) {
+        return
+      }
+
       // Shift remote cursor widgets locally so they stay visually aligned while
       // the next awareness packet is in flight.
       if (cursorPositionsRef.current.size > 0) {
         cursorPositionsRef.current.forEach((posRef, userId) => {
+          const remoteCodeLen = awarenessCodeLenRef.current.get(userId)
+          if (remoteCodeLen !== undefined && remoteCodeLen !== oldCode.length) {
+            return
+          }
           const lines = oldCode.split('\n')
           let offset = 0
           for (let i = 0; i < posRef.line - 1 && i < lines.length; i++) offset += lines[i].length + 1
