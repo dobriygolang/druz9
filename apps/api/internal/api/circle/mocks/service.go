@@ -87,6 +87,54 @@ func (_c *Service_CreateCircle_Call) RunAndReturn(run func(context.Context, uuid
 	return _c
 }
 
+// DeleteCircle provides a mock function with given fields: _a0, _a1, _a2
+func (_m *Service) DeleteCircle(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) error {
+	ret := _m.Called(_a0, _a1, _a2)
+
+	if len(ret) == 0 {
+		panic("no return value specified for DeleteCircle")
+	}
+
+	var r0 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
+		r0 = rf(_a0, _a1, _a2)
+	} else {
+		r0 = ret.Error(0)
+	}
+
+	return r0
+}
+
+// Service_DeleteCircle_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'DeleteCircle'
+type Service_DeleteCircle_Call struct {
+	*mock.Call
+}
+
+// DeleteCircle is a helper method to define mock.On call
+//   - _a0 context.Context
+//   - _a1 uuid.UUID
+//   - _a2 uuid.UUID
+func (_e *Service_Expecter) DeleteCircle(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_DeleteCircle_Call {
+	return &Service_DeleteCircle_Call{Call: _e.mock.On("DeleteCircle", _a0, _a1, _a2)}
+}
+
+func (_c *Service_DeleteCircle_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_DeleteCircle_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
+	})
+	return _c
+}
+
+func (_c *Service_DeleteCircle_Call) Return(_a0 error) *Service_DeleteCircle_Call {
+	_c.Call.Return(_a0)
+	return _c
+}
+
+func (_c *Service_DeleteCircle_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID) error) *Service_DeleteCircle_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // InviteToCircle provides a mock function with given fields: _a0, _a1, _a2, _a3
 func (_m *Service) InviteToCircle(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID, _a3 uuid.UUID) error {
 	ret := _m.Called(_a0, _a1, _a2, _a3)

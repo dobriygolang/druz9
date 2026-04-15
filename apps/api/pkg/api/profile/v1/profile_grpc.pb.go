@@ -36,6 +36,7 @@ const (
 	ProfileService_GetProfileActivity_FullMethodName          = "/profile.v1.ProfileService/GetProfileActivity"
 	ProfileService_SetUserGoal_FullMethodName                 = "/profile.v1.ProfileService/SetUserGoal"
 	ProfileService_GetReadiness_FullMethodName                = "/profile.v1.ProfileService/GetReadiness"
+	ProfileService_GetProfileFeed_FullMethodName              = "/profile.v1.ProfileService/GetProfileFeed"
 )
 
 // ProfileServiceClient is the client API for ProfileService service.
@@ -59,6 +60,7 @@ type ProfileServiceClient interface {
 	GetProfileActivity(ctx context.Context, in *GetProfileActivityRequest, opts ...grpc.CallOption) (*GetProfileActivityResponse, error)
 	SetUserGoal(ctx context.Context, in *SetUserGoalRequest, opts ...grpc.CallOption) (*SetUserGoalResponse, error)
 	GetReadiness(ctx context.Context, in *GetReadinessRequest, opts ...grpc.CallOption) (*GetReadinessResponse, error)
+	GetProfileFeed(ctx context.Context, in *GetProfileFeedRequest, opts ...grpc.CallOption) (*GetProfileFeedResponse, error)
 }
 
 type profileServiceClient struct {
@@ -239,6 +241,16 @@ func (c *profileServiceClient) GetReadiness(ctx context.Context, in *GetReadines
 	return out, nil
 }
 
+func (c *profileServiceClient) GetProfileFeed(ctx context.Context, in *GetProfileFeedRequest, opts ...grpc.CallOption) (*GetProfileFeedResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetProfileFeedResponse)
+	err := c.cc.Invoke(ctx, ProfileService_GetProfileFeed_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ProfileServiceServer is the server API for ProfileService service.
 // All implementations must embed UnimplementedProfileServiceServer
 // for forward compatibility.
@@ -260,6 +272,7 @@ type ProfileServiceServer interface {
 	GetProfileActivity(context.Context, *GetProfileActivityRequest) (*GetProfileActivityResponse, error)
 	SetUserGoal(context.Context, *SetUserGoalRequest) (*SetUserGoalResponse, error)
 	GetReadiness(context.Context, *GetReadinessRequest) (*GetReadinessResponse, error)
+	GetProfileFeed(context.Context, *GetProfileFeedRequest) (*GetProfileFeedResponse, error)
 	mustEmbedUnimplementedProfileServiceServer()
 }
 
@@ -320,6 +333,9 @@ func (UnimplementedProfileServiceServer) SetUserGoal(context.Context, *SetUserGo
 }
 func (UnimplementedProfileServiceServer) GetReadiness(context.Context, *GetReadinessRequest) (*GetReadinessResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetReadiness not implemented")
+}
+func (UnimplementedProfileServiceServer) GetProfileFeed(context.Context, *GetProfileFeedRequest) (*GetProfileFeedResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetProfileFeed not implemented")
 }
 func (UnimplementedProfileServiceServer) mustEmbedUnimplementedProfileServiceServer() {}
 func (UnimplementedProfileServiceServer) testEmbeddedByValue()                        {}
@@ -648,6 +664,24 @@ func _ProfileService_GetReadiness_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProfileService_GetProfileFeed_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetProfileFeedRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProfileServiceServer).GetProfileFeed(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ProfileService_GetProfileFeed_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProfileServiceServer).GetProfileFeed(ctx, req.(*GetProfileFeedRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ProfileService_ServiceDesc is the grpc.ServiceDesc for ProfileService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -722,6 +756,10 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetReadiness",
 			Handler:    _ProfileService_GetReadiness_Handler,
+		},
+		{
+			MethodName: "GetProfileFeed",
+			Handler:    _ProfileService_GetProfileFeed_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

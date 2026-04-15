@@ -131,6 +131,19 @@ export const authApi = {
     const r = await apiClient.post<{ goal?: UserGoal }>('/api/v1/profile/goal', goal)
     return r.data.goal ?? { kind: goal.kind as UserGoal['kind'], company: goal.company ?? '' }
   },
+  getProfileFeed: async (userId: string, limit = 7): Promise<FeedItem[]> => {
+    const r = await apiClient.get<{ items?: FeedItem[] }>(`/api/v1/profile/${userId}/feed`, { params: { limit } })
+    return (r.data.items ?? []).map(item => ({
+      type: item.type ?? '',
+      title: item.title ?? '',
+      description: item.description ?? '',
+      score: item.score,
+      timestamp: item.timestamp ?? '',
+    }))
+  },
+  updatePinnedAchievements: async (userId: string, pinnedAchievements: string[]): Promise<void> => {
+    await apiClient.patch(`/api/v1/profile/${userId}`, { pinnedAchievements })
+  },
   logout: async () => {
     await apiClient.post('/api/v1/profile/auth/logout', {})
     profileByIdCache.clear()

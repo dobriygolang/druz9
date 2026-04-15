@@ -2191,6 +2191,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.GetProfileActivityResponse'
+    /api/v1/profile/{userId}/feed:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetProfileFeed
+            parameters:
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.GetProfileFeedResponse'
     /api/v1/profile/{userId}/progress:
         get:
             tags:
@@ -4578,6 +4601,14 @@ components:
                     type: boolean
                 category:
                     type: string
+                tier:
+                    type: string
+                progress:
+                    type: integer
+                    format: int32
+                target:
+                    type: integer
+                    format: int32
         profile.v1.ActivityDay:
             type: object
             properties:
@@ -4665,6 +4696,21 @@ components:
                 expiresAt:
                     type: string
                     format: date-time
+        profile.v1.FeedItem:
+            type: object
+            properties:
+                type:
+                    type: string
+                title:
+                    type: string
+                description:
+                    type: string
+                score:
+                    type: integer
+                    format: int32
+                timestamp:
+                    type: string
+                    format: date-time
         profile.v1.GetAchievementsResponse:
             type: object
             properties:
@@ -4679,6 +4725,13 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/profile.v1.ActivityDay'
+        profile.v1.GetProfileFeedResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/profile.v1.FeedItem'
         profile.v1.GetReadinessResponse:
             type: object
             properties:
@@ -4786,6 +4839,9 @@ components:
                     format: double
                 nextMilestone:
                     type: string
+                scoreDelta30d:
+                    type: integer
+                    format: int32
         profile.v1.ProfileProgress:
             type: object
             properties:
@@ -4854,6 +4910,21 @@ components:
                 lastActivityAt:
                     type: string
                     format: date-time
+                level:
+                    type: integer
+                    format: int32
+                levelProgress:
+                    type: number
+                    format: double
+                totalXp:
+                    type: integer
+                    format: int32
+                longestStreakDays:
+                    type: integer
+                    format: int32
+                activityPercentile:
+                    type: integer
+                    format: int32
         profile.v1.ProfileProgressRecommendation:
             type: object
             properties:
@@ -4987,6 +5058,10 @@ components:
                     type: string
                 telegramUsername:
                     type: string
+                pinnedAchievements:
+                    type: array
+                    items:
+                        type: string
         profile.v1.UserGoal:
             type: object
             properties:

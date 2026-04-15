@@ -27,6 +27,7 @@ const OperationProfileServiceGetAchievements = "/profile.v1.ProfileService/GetAc
 const OperationProfileServiceGetProfile = "/profile.v1.ProfileService/GetProfile"
 const OperationProfileServiceGetProfileActivity = "/profile.v1.ProfileService/GetProfileActivity"
 const OperationProfileServiceGetProfileByID = "/profile.v1.ProfileService/GetProfileByID"
+const OperationProfileServiceGetProfileFeed = "/profile.v1.ProfileService/GetProfileFeed"
 const OperationProfileServiceGetProfileProgress = "/profile.v1.ProfileService/GetProfileProgress"
 const OperationProfileServiceGetReadiness = "/profile.v1.ProfileService/GetReadiness"
 const OperationProfileServiceLogout = "/profile.v1.ProfileService/Logout"
@@ -46,6 +47,7 @@ type ProfileServiceHTTPServer interface {
 	GetProfile(context.Context, *GetProfileRequest) (*ProfileResponse, error)
 	GetProfileActivity(context.Context, *GetProfileActivityRequest) (*GetProfileActivityResponse, error)
 	GetProfileByID(context.Context, *GetProfileByIDRequest) (*ProfileResponse, error)
+	GetProfileFeed(context.Context, *GetProfileFeedRequest) (*GetProfileFeedResponse, error)
 	GetProfileProgress(context.Context, *GetProfileProgressRequest) (*ProfileProgressResponse, error)
 	GetReadiness(context.Context, *GetReadinessRequest) (*GetReadinessResponse, error)
 	Logout(context.Context, *LogoutRequest) (*ProfileStatusResponse, error)
@@ -76,6 +78,7 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.GET("/api/v1/profile/{user_id}/activity", _ProfileService_GetProfileActivity0_HTTP_Handler(srv))
 	r.POST("/api/v1/profile/goal", _ProfileService_SetUserGoal0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/{user_id}/readiness", _ProfileService_GetReadiness0_HTTP_Handler(srv))
+	r.GET("/api/v1/profile/{user_id}/feed", _ProfileService_GetProfileFeed0_HTTP_Handler(srv))
 }
 
 func _ProfileService_CreateTelegramAuthChallenge0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
@@ -443,6 +446,28 @@ func _ProfileService_GetReadiness0_HTTP_Handler(srv ProfileServiceHTTPServer) fu
 	}
 }
 
+func _ProfileService_GetProfileFeed0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetProfileFeedRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationProfileServiceGetProfileFeed)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetProfileFeed(ctx, req.(*GetProfileFeedRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetProfileFeedResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ProfileServiceHTTPClient interface {
 	BindTelegram(ctx context.Context, req *BindTelegramRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
 	CompleteRegistration(ctx context.Context, req *CompleteRegistrationRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
@@ -452,6 +477,7 @@ type ProfileServiceHTTPClient interface {
 	GetProfile(ctx context.Context, req *GetProfileRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
 	GetProfileActivity(ctx context.Context, req *GetProfileActivityRequest, opts ...http.CallOption) (rsp *GetProfileActivityResponse, err error)
 	GetProfileByID(ctx context.Context, req *GetProfileByIDRequest, opts ...http.CallOption) (rsp *ProfileResponse, err error)
+	GetProfileFeed(ctx context.Context, req *GetProfileFeedRequest, opts ...http.CallOption) (rsp *GetProfileFeedResponse, err error)
 	GetProfileProgress(ctx context.Context, req *GetProfileProgressRequest, opts ...http.CallOption) (rsp *ProfileProgressResponse, err error)
 	GetReadiness(ctx context.Context, req *GetReadinessRequest, opts ...http.CallOption) (rsp *GetReadinessResponse, err error)
 	Logout(ctx context.Context, req *LogoutRequest, opts ...http.CallOption) (rsp *ProfileStatusResponse, err error)
@@ -567,6 +593,19 @@ func (c *ProfileServiceHTTPClientImpl) GetProfileByID(ctx context.Context, in *G
 	pattern := "/api/v1/profile/{user_id}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationProfileServiceGetProfileByID))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ProfileServiceHTTPClientImpl) GetProfileFeed(ctx context.Context, in *GetProfileFeedRequest, opts ...http.CallOption) (*GetProfileFeedResponse, error) {
+	var out GetProfileFeedResponse
+	pattern := "/api/v1/profile/{user_id}/feed"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationProfileServiceGetProfileFeed))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
