@@ -34,8 +34,8 @@ export function NotificationSettings() {
 
   if (loading) {
     return (
-      <div className="rounded-[20px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
-        <div className="h-4 w-40 animate-pulse rounded bg-[#e2e8f0] dark:bg-[#1e3158]" />
+      <div className="rounded-[20px] border border-[#C1CFC4] bg-white p-5 dark:border-[#163028] dark:bg-[#132420]">
+        <div className="h-4 w-40 animate-pulse rounded bg-[#e2e8f0] dark:bg-[#1E4035]" />
       </div>
     )
   }
@@ -52,10 +52,10 @@ export function NotificationSettings() {
   const anyEnabled = categories.some(c => settings[c.key])
 
   return (
-    <div className="rounded-[20px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d]">
+    <div className="rounded-[20px] border border-[#C1CFC4] bg-white p-5 dark:border-[#163028] dark:bg-[#132420]">
       <div className="mb-4 flex items-center gap-2">
         {anyEnabled
-          ? <Bell className="w-4 h-4 text-[#6366F1]" />
+          ? <Bell className="w-4 h-4 text-[#059669]" />
           : <BellOff className="w-4 h-4 text-[#94a3b8]" />
         }
         <h3 className="text-sm font-semibold text-[#1e293b] dark:text-white">

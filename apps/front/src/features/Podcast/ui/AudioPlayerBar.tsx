@@ -29,15 +29,15 @@ export function AudioPlayerBar() {
   }
 
   return (
-    <div className="fixed left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+92px)] z-[52] flex h-[72px] items-center gap-3 rounded-[24px] border border-[#1e293b] bg-[#0f172a]/95 px-4 backdrop-blur-xl animate-fade-in md:left-0 md:right-0 md:bottom-0 md:h-[68px] md:rounded-none md:border-x-0 md:border-b-0 md:px-6">
+    <div className="fixed left-3 right-3 bottom-[calc(env(safe-area-inset-bottom)+92px)] z-[52] flex h-[72px] items-center gap-3 rounded-[24px] border border-[#1e293b] bg-[#0B1210]/95 px-4 backdrop-blur-xl animate-fade-in md:left-0 md:right-0 md:bottom-0 md:h-[68px] md:rounded-none md:border-x-0 md:border-b-0 md:px-6">
       {/* Album art + info */}
       <div className="flex items-center gap-3 w-[180px] md:w-[240px] flex-shrink-0 min-w-0">
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#6366F1] to-[#f59e0b] flex items-center justify-center flex-shrink-0">
+        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-[#059669] to-[#f59e0b] flex items-center justify-center flex-shrink-0">
           <Mic className="w-4 h-4 text-white" />
         </div>
         <div className="min-w-0">
           <p className="text-xs font-semibold text-white truncate leading-tight">{playing.title}</p>
-          <p className="text-[11px] text-[#475569] truncate mt-0.5">{playing.authorName}</p>
+          <p className="text-[11px] text-[#4B6B52] truncate mt-0.5">{playing.authorName}</p>
         </div>
       </div>
 
@@ -48,15 +48,15 @@ export function AudioPlayerBar() {
           onClick={handleBarClick}
         >
           <div
-            className="h-full bg-[#6366F1] rounded-full relative transition-all duration-300"
+            className="h-full bg-[#059669] rounded-full relative transition-all duration-300"
             style={{ width: `${progress}%` }}
           >
             <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow-md opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
         </div>
         <div className="flex justify-between">
-          <span className="text-[10px] font-mono text-[#475569]">{fmt(currentTime)}</span>
-          <span className="text-[10px] font-mono text-[#475569]">{fmt(duration)}</span>
+          <span className="text-[10px] font-mono text-[#4B6B52]">{fmt(currentTime)}</span>
+          <span className="text-[10px] font-mono text-[#4B6B52]">{fmt(duration)}</span>
         </div>
       </div>
 
@@ -65,7 +65,7 @@ export function AudioPlayerBar() {
         {/* Speed */}
         <button
           onClick={cycleSpeed}
-          className="px-2 py-1 text-[11px] font-bold text-[#64748b] hover:text-white bg-[#1e293b] hover:bg-[#263148] rounded-md transition-colors min-w-[40px] text-center"
+          className="px-2 py-1 text-[11px] font-bold text-[#7A9982] hover:text-white bg-[#1e293b] hover:bg-[#263148] rounded-md transition-colors min-w-[40px] text-center"
         >
           {speed === 1 ? '1×' : `${speed}×`}
         </button>
@@ -73,7 +73,7 @@ export function AudioPlayerBar() {
         {/* Play / Pause */}
         <button
           onClick={isPlaying ? pause : resume}
-          className="w-9 h-9 rounded-full bg-[#6366F1] hover:bg-[#4F46E5] flex items-center justify-center transition-colors"
+          className="w-9 h-9 rounded-full bg-[#059669] hover:bg-[#047857] flex items-center justify-center transition-colors"
         >
           {isPlaying
             ? <Pause className="w-4 h-4 text-white" />
@@ -87,7 +87,7 @@ export function AudioPlayerBar() {
           className="w-7 h-7 rounded-full hover:bg-[#1e293b] flex items-center justify-center transition-colors"
           title="Close player"
         >
-          <X className="w-3.5 h-3.5 text-[#475569] hover:text-white" />
+          <X className="w-3.5 h-3.5 text-[#4B6B52] hover:text-white" />
         </button>
       </div>
     </div>

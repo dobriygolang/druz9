@@ -30,9 +30,9 @@ const PREP_TYPE_ICONS: Record<string, React.ReactNode> = {
 }
 
 const PREP_TYPE_COLORS: Record<string, { bg: string; text: string; icon: string; border: string }> = {
-  coding:        { bg: 'bg-[#EEF2FF]', text: 'text-[#4338ca]', icon: 'text-[#6366f1]', border: 'border-l-[#6366f1]' },
-  algorithm:     { bg: 'bg-[#f5f3ff]', text: 'text-[#6d28d9]', icon: 'text-[#8b5cf6]', border: 'border-l-[#8b5cf6]' },
-  sql:           { bg: 'bg-[#fffbeb]', text: 'text-[#a16207]', icon: 'text-[#d97706]', border: 'border-l-[#d97706]' },
+  coding:        { bg: 'bg-[#ecfdf5]', text: 'text-[#4338ca]', icon: 'text-[#059669]', border: 'border-l-[#059669]' },
+  algorithm:     { bg: 'bg-[#f5f3ff]', text: 'text-[#6d28d9]', icon: 'text-[#0D9488]', border: 'border-l-[#0D9488]' },
+  sql:           { bg: 'bg-[#ecfdf5]', text: 'text-[#a16207]', icon: 'text-[#d97706]', border: 'border-l-[#d97706]' },
   system_design: { bg: 'bg-[#fdf2f8]', text: 'text-[#be185d]', icon: 'text-[#ec4899]', border: 'border-l-[#ec4899]' },
   code_review:   { bg: 'bg-[#f0fdf4]', text: 'text-[#15803d]', icon: 'text-[#22c55e]', border: 'border-l-[#22c55e]' },
   behavioral:    { bg: 'bg-[#f0fdf4]', text: 'text-[#15803d]', icon: 'text-[#22c55e]', border: 'border-l-[#22c55e]' },
@@ -252,19 +252,19 @@ export function InterviewPrepPage() {
       {/* ── Header ─────────────────────────────────────────── */}
       <section className="section-enter flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-[#111111] dark:text-[#f8fafc] sm:text-2xl">
+          <h1 className="text-xl font-bold text-[#111111] dark:text-[#E2F0E8] sm:text-2xl">
             {t('interviewPrep.hero.title')}
           </h1>
-          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[#667085] dark:text-[#7e93b0]">
+          <div className="mt-2 flex flex-wrap items-center gap-2 text-sm text-[#7A9982] dark:text-[#7BA88A]">
             {readiness && (
               <>
-                <span className="font-mono font-bold text-[#6366F1]">{readiness.score}/100</span>
+                <span className="font-mono font-bold text-[#059669]">{readiness.score}/100</span>
                 <Badge variant={LEVEL_VARIANTS[readiness.level] ?? 'default'}>{readiness.levelLabel}</Badge>
               </>
             )}
             {readiness?.streakDays ? (
               <span className="inline-flex items-center gap-1">
-                <Flame className="h-3.5 w-3.5 text-orange-500" />
+                <Flame className="h-3.5 w-3.5 text-emerald-500" />
                 {readiness.streakDays} {t('journey.streak', 'days in a row')}
               </span>
             ) : null}
@@ -282,7 +282,7 @@ export function InterviewPrepPage() {
       </section>
 
       {/* ── Mock Interview ─────────────────────────────────────────── */}
-      <section className="section-enter rounded-[24px] border border-[#1e1b4b] bg-[linear-gradient(145deg,_#0f0a2e,_#1e1b4b_50%,_#312e81)] p-5 text-white shadow-[0_12px_36px_rgba(99,102,241,0.15)] md:p-6">
+      <section className="section-enter rounded-[24px] border border-[#064E3B] bg-[linear-gradient(145deg,_#0f0a2e,_#064E3B_50%,_#312e81)] p-5 text-white shadow-[0_12px_36px_rgba(5,150,105,0.15)] md:p-6">
         <div className="flex items-center gap-3">
           <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/10 backdrop-blur">
             <Sparkles className="h-4.5 w-4.5 text-[#c4b5fd]" />
@@ -365,12 +365,12 @@ export function InterviewPrepPage() {
       <section className="section-enter">
         <div className="mb-4 flex items-end justify-between gap-4">
           <div>
-            <h2 className="text-lg font-bold text-[#111111] dark:text-[#f8fafc]">{t('interviewPrep.solo.title')}</h2>
-            <p className="mt-1 text-sm text-[#667085] dark:text-[#7e93b0]">{t('interviewPrep.solo.subtitle')}</p>
+            <h2 className="text-lg font-bold text-[#111111] dark:text-[#E2F0E8]">{t('interviewPrep.solo.title')}</h2>
+            <p className="mt-1 text-sm text-[#7A9982] dark:text-[#7BA88A]">{t('interviewPrep.solo.subtitle')}</p>
           </div>
           {!loading && (
-            <span className="text-sm text-[#667085] dark:text-[#7e93b0]">
-              <span className="font-semibold text-[#111111] dark:text-[#f8fafc]">{filtered.length}</span> {t('interviewPrep.solo.tasks')}
+            <span className="text-sm text-[#7A9982] dark:text-[#7BA88A]">
+              <span className="font-semibold text-[#111111] dark:text-[#E2F0E8]">{filtered.length}</span> {t('interviewPrep.solo.tasks')}
             </span>
           )}
         </div>
@@ -383,7 +383,7 @@ export function InterviewPrepPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={t('interviewPrep.solo.searchPlaceholder')}
-              className="w-full rounded-xl border border-[#CBCCC9] bg-white py-2.5 pl-10 pr-4 text-sm text-[#111111] placeholder-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 dark:border-[#1a2540] dark:bg-[#161c2d] dark:text-[#f8fafc] dark:placeholder-[#4d6380]"
+              className="w-full rounded-xl border border-[#C1CFC4] bg-white py-2.5 pl-10 pr-4 text-sm text-[#111111] placeholder-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#059669]/20 dark:border-[#163028] dark:bg-[#132420] dark:text-[#E2F0E8] dark:placeholder-[#4d6380]"
             />
           </div>
 
@@ -395,12 +395,12 @@ export function InterviewPrepPage() {
                 className={`inline-flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${isMobile ? 'flex-shrink-0' : ''} ${
                   category === cat
                     ? 'bg-[#111111] text-white shadow-sm dark:bg-white dark:text-[#111111]'
-                    : 'bg-white border border-[#CBCCC9] text-[#666666] hover:border-[#6366F1]/40 hover:text-[#111111] dark:bg-[#161c2d] dark:border-[#1a2540] dark:text-[#7e93b0] dark:hover:text-[#c8d8ec]'
+                    : 'bg-white border border-[#C1CFC4] text-[#4B6B52] hover:border-[#059669]/40 hover:text-[#111111] dark:bg-[#132420] dark:border-[#163028] dark:text-[#7BA88A] dark:hover:text-[#C1D9CA]'
                 }`}
               >
                 {cat === '' ? t('interviewPrep.solo.all') : getSoloPrepTypeLabel(t, cat)}
                 <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                  category === cat ? 'bg-white/20 text-white dark:bg-black/20 dark:text-[#111111]' : 'bg-[#F2F3F0] text-[#94a3b8] dark:bg-[#1a2236]'
+                  category === cat ? 'bg-white/20 text-white dark:bg-black/20 dark:text-[#111111]' : 'bg-[#F0F5F1] text-[#94a3b8] dark:bg-[#162E24]'
                 }`}>
                   {categoryCounts[cat] ?? 0}
                 </span>
@@ -413,21 +413,21 @@ export function InterviewPrepPage() {
         {loading ? (
           <div className={`grid gap-3 ${isMobile ? 'grid-cols-1' : 'grid-cols-1 lg:grid-cols-2'}`}>
             {Array.from({ length: 6 }).map((_, i) => (
-              <div key={i} className="animate-pulse rounded-2xl border border-[#CBCCC9] bg-white p-4 dark:border-[#1a2540] dark:bg-[#161c2d]">
+              <div key={i} className="animate-pulse rounded-2xl border border-[#C1CFC4] bg-white p-4 dark:border-[#163028] dark:bg-[#132420]">
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-xl bg-[#E7E8E5] dark:bg-[#1e3158]" />
+                  <div className="h-10 w-10 rounded-xl bg-[#E4EBE5] dark:bg-[#1E4035]" />
                   <div className="flex-1">
-                    <div className="h-4 w-48 rounded bg-[#E7E8E5] dark:bg-[#1e3158]" />
-                    <div className="mt-2 h-3 w-32 rounded bg-[#E7E8E5] dark:bg-[#1e3158]" />
+                    <div className="h-4 w-48 rounded bg-[#E4EBE5] dark:bg-[#1E4035]" />
+                    <div className="mt-2 h-3 w-32 rounded bg-[#E4EBE5] dark:bg-[#1E4035]" />
                   </div>
                 </div>
               </div>
             ))}
           </div>
         ) : filtered.length === 0 ? (
-          <div className="rounded-2xl border border-dashed border-[#CBCCC9] bg-white py-16 text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
-            <Search className="mx-auto h-10 w-10 text-[#CBCCC9] dark:text-[#4d6380]" />
-            <p className="mt-3 text-sm font-medium text-[#667085] dark:text-[#7e93b0]">{t('interviewPrep.solo.emptyTitle')}</p>
+          <div className="rounded-2xl border border-dashed border-[#C1CFC4] bg-white py-16 text-center dark:border-[#163028] dark:bg-[#132420]">
+            <Search className="mx-auto h-10 w-10 text-[#C1CFC4] dark:text-[#4A7058]" />
+            <p className="mt-3 text-sm font-medium text-[#7A9982] dark:text-[#7BA88A]">{t('interviewPrep.solo.emptyTitle')}</p>
             <p className="mt-1 text-xs text-[#94a3b8]">{t('interviewPrep.solo.emptyBody')}</p>
           </div>
         ) : (
@@ -438,14 +438,14 @@ export function InterviewPrepPage() {
                 <button
                   key={task.id}
                   onClick={() => handleStartSolo(task)}
-                  className={`group flex items-start gap-4 rounded-2xl border border-[#CBCCC9] border-l-[3px] ${colors.border} bg-white p-4 text-left transition-all hover:shadow-md hover:border-[#6366F1]/30 dark:border-[#1a2540] dark:bg-[#161c2d] dark:hover:border-[#6366F1]/30`}
+                  className={`group flex items-start gap-4 rounded-2xl border border-[#C1CFC4] border-l-[3px] ${colors.border} bg-white p-4 text-left transition-all hover:shadow-md hover:border-[#059669]/30 dark:border-[#163028] dark:bg-[#132420] dark:hover:border-[#059669]/30`}
                 >
                   <div className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl ${colors.bg} ${colors.icon} dark:bg-opacity-20`}>
                     {PREP_TYPE_ICONS[task.prepType] ?? <BookOpen className="w-4 h-4" />}
                   </div>
 
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc] group-hover:text-[#6366F1] transition-colors line-clamp-1">
+                    <p className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8] group-hover:text-[#059669] transition-colors line-clamp-1">
                       {task.title}
                     </p>
 
@@ -460,26 +460,26 @@ export function InterviewPrepPage() {
                       </Badge>
 
                       {task.companyTag && (
-                        <span className="inline-flex items-center gap-1 text-[11px] text-[#667085] dark:text-[#7e93b0]">
+                        <span className="inline-flex items-center gap-1 text-[11px] text-[#7A9982] dark:text-[#7BA88A]">
                           <Building2 className="h-3 w-3" />
                           {task.companyTag}
                         </span>
                       )}
 
-                      <span className="inline-flex items-center gap-1 text-[11px] text-[#667085] dark:text-[#7e93b0]">
+                      <span className="inline-flex items-center gap-1 text-[11px] text-[#7A9982] dark:text-[#7BA88A]">
                         <Clock className="h-3 w-3" />
                         {t('interviewPrep.solo.minutes', { count: Math.round(task.durationSeconds / 60) })}
                       </span>
 
                       {task.language && (
-                        <span className="text-[11px] font-medium uppercase tracking-wide text-[#94a3b8] dark:text-[#4d6380]">
+                        <span className="text-[11px] font-medium uppercase tracking-wide text-[#94a3b8] dark:text-[#4A7058]">
                           {task.language}
                         </span>
                       )}
                     </div>
                   </div>
 
-                  <ChevronRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#CBCCC9] group-hover:text-[#6366F1] transition-colors dark:text-[#4d6380]" />
+                  <ChevronRight className="mt-0.5 h-4 w-4 flex-shrink-0 text-[#C1CFC4] group-hover:text-[#059669] transition-colors dark:text-[#4A7058]" />
                 </button>
               )
             })}

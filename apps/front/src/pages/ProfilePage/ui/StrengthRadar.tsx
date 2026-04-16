@@ -50,14 +50,14 @@ export function StrengthRadar({ competencies, strongest, weakest, className }: P
     <div className="flex flex-col gap-2 sm:hidden">
       {competencies.map(c => (
         <div key={c.key} className="flex items-center gap-3">
-          <span className="w-24 shrink-0 truncate text-xs font-medium text-[#111111] dark:text-[#e2e8f3]">{c.label}</span>
-          <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-[#E7E8E5] dark:bg-[#1e3158]">
+          <span className="w-24 shrink-0 truncate text-xs font-medium text-[#111111] dark:text-[#E2F0E8]">{c.label}</span>
+          <div className="relative h-2 flex-1 overflow-hidden rounded-full bg-[#E4EBE5] dark:bg-[#1E4035]">
             <div
-              className="h-full rounded-full bg-[#6366F1] transition-all duration-700 ease-out"
+              className="h-full rounded-full bg-[#059669] transition-all duration-700 ease-out"
               style={{ width: `${Math.min(c.score, 100)}%` }}
             />
           </div>
-          <span className="w-8 text-right font-mono text-xs font-bold text-[#111111] dark:text-[#e2e8f3]">{c.score}</span>
+          <span className="w-8 text-right font-mono text-xs font-bold text-[#111111] dark:text-[#E2F0E8]">{c.score}</span>
         </div>
       ))}
     </div>
@@ -69,8 +69,8 @@ export function StrengthRadar({ competencies, strongest, weakest, className }: P
       <svg width={RADAR_SIZE} height={RADAR_SIZE} viewBox={`0 0 ${RADAR_SIZE} ${RADAR_SIZE}`} className="overflow-visible">
         <defs>
           <radialGradient id="radar-fill-grad">
-            <stop offset="0%" stopColor="#6366F1" stopOpacity="0.25" />
-            <stop offset="100%" stopColor="#6366F1" stopOpacity="0.08" />
+            <stop offset="0%" stopColor="#059669" stopOpacity="0.25" />
+            <stop offset="100%" stopColor="#059669" stopOpacity="0.08" />
           </radialGradient>
         </defs>
 
@@ -84,7 +84,7 @@ export function StrengthRadar({ competencies, strongest, weakest, className }: P
             fill="none"
             stroke="currentColor"
             strokeWidth={0.5}
-            className="text-[#d8d9d6] dark:text-[#1e3158]"
+            className="text-[#d8d9d6] dark:text-[#1E4035]"
           />
         ))}
 
@@ -100,20 +100,20 @@ export function StrengthRadar({ competencies, strongest, weakest, className }: P
               y2={y}
               stroke="currentColor"
               strokeWidth={0.5}
-              className="text-[#d8d9d6] dark:text-[#1e3158]"
+              className="text-[#d8d9d6] dark:text-[#1E4035]"
             />
           )
         })}
 
         {/* Filled polygon */}
-        <polygon points={polygonPoints} fill="url(#radar-fill-grad)" stroke="#6366F1" strokeWidth={2} strokeLinejoin="round" className="transition-all duration-700" />
+        <polygon points={polygonPoints} fill="url(#radar-fill-grad)" stroke="#059669" strokeWidth={2} strokeLinejoin="round" className="transition-all duration-700" />
 
         {/* Score dots */}
         {axes.map(a => {
           const r = (Math.min(a.score, 100) / 100) * MAX_RADIUS
           const [x, y] = polarToXY(a.angle, r)
           return (
-            <circle key={a.key} cx={x} cy={y} r={4} fill="#6366F1" stroke="white" strokeWidth={2} />
+            <circle key={a.key} cx={x} cy={y} r={4} fill="#059669" stroke="white" strokeWidth={2} />
           )
         })}
 
@@ -127,7 +127,7 @@ export function StrengthRadar({ competencies, strongest, weakest, className }: P
               y={y}
               textAnchor="middle"
               dominantBaseline="central"
-              className="fill-[#475569] dark:fill-[#7e93b0] text-[11px] font-medium"
+              className="fill-[#4B6B52] dark:fill-[#7e93b0] text-[11px] font-medium"
             >
               {a.label}
             </text>
@@ -138,8 +138,8 @@ export function StrengthRadar({ competencies, strongest, weakest, className }: P
   )
 
   return (
-    <div className={`section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d] ${className ?? ''}`}>
-      <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.radar.title')}</h3>
+    <div className={`section-enter rounded-[28px] border border-[#C1CFC4] bg-white p-5 dark:border-[#163028] dark:bg-[#132420] ${className ?? ''}`}>
+      <h3 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('profile.radar.title')}</h3>
       <p className="mt-1 text-xs text-[#94a3b8]">{t('profile.radar.subtitle')}</p>
 
       <div className="mt-5">
@@ -152,8 +152,8 @@ export function StrengthRadar({ competencies, strongest, weakest, className }: P
         {strongest.length > 0 && (
           <div className="flex items-start gap-2">
             <Zap className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#f59e0b]" />
-            <p className="text-xs text-[#475569] dark:text-[#7e93b0]">
-              <span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.radar.strongest')}:</span>{' '}
+            <p className="text-xs text-[#4B6B52] dark:text-[#7BA88A]">
+              <span className="font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('profile.radar.strongest')}:</span>{' '}
               {strongest.map(s => `${s.label} (${t(`skill.${s.level}`)})`).join(' · ')}
             </p>
           </div>
@@ -161,17 +161,17 @@ export function StrengthRadar({ competencies, strongest, weakest, className }: P
         {competencies.some(c => c.scoreDelta30d > 0) && (
           <div className="flex items-start gap-2">
             <TrendingUp className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#22c55e]" />
-            <p className="text-xs text-[#475569] dark:text-[#7e93b0]">
-              <span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.radar.growing')}:</span>{' '}
+            <p className="text-xs text-[#4B6B52] dark:text-[#7BA88A]">
+              <span className="font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('profile.radar.growing')}:</span>{' '}
               {competencies.filter(c => c.scoreDelta30d > 0).map(c => `${c.label} (+${c.scoreDelta30d})`).join(' · ')}
             </p>
           </div>
         )}
         {weakest.length > 0 && (
           <div className="flex items-start gap-2">
-            <Target className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#6366F1]" />
-            <p className="text-xs text-[#475569] dark:text-[#7e93b0]">
-              <span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.radar.focus')}:</span>{' '}
+            <Target className="mt-0.5 h-3.5 w-3.5 shrink-0 text-[#059669]" />
+            <p className="text-xs text-[#4B6B52] dark:text-[#7BA88A]">
+              <span className="font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('profile.radar.focus')}:</span>{' '}
               {weakest.map(w => `${w.label} (${t(`skill.${w.level}`)})`).join(' · ')}
             </p>
           </div>

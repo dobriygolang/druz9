@@ -6,8 +6,8 @@ import type { Achievement } from '@/entities/User/model/types'
 const tierColors: Record<string, { ring: string; bg: string; glow: string }> = {
   bronze: { ring: '#cd7f32', bg: '#fef3e2', glow: 'shadow-[0_0_8px_rgba(205,127,50,0.3)]' },
   silver: { ring: '#94a3b8', bg: '#f1f5f9', glow: 'shadow-[0_0_8px_rgba(148,163,184,0.3)]' },
-  gold: { ring: '#f59e0b', bg: '#fffbeb', glow: 'shadow-[0_0_10px_rgba(245,158,11,0.4)]' },
-  diamond: { ring: '#6366F1', bg: '#eef2ff', glow: 'shadow-[0_0_12px_rgba(99,102,241,0.4)]' },
+  gold: { ring: '#f59e0b', bg: '#ecfdf5', glow: 'shadow-[0_0_10px_rgba(245,158,11,0.4)]' },
+  diamond: { ring: '#059669', bg: '#ecfdf5', glow: 'shadow-[0_0_12px_rgba(5,150,105,0.4)]' },
 }
 
 interface Props {
@@ -28,9 +28,9 @@ export function AchievementShowcase({ achievements, pinnedIds, isOwn, onTogglePi
 
   if (achievements.length === 0) {
     return (
-      <div className={`section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d] ${className ?? ''}`}>
-        <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.tabs.achievements')}</h3>
-        <div className="mt-5 flex min-h-[80px] items-center justify-center rounded-2xl bg-[#F2F3F0] dark:bg-[#0f1629]">
+      <div className={`section-enter rounded-[28px] border border-[#C1CFC4] bg-white p-5 dark:border-[#163028] dark:bg-[#132420] ${className ?? ''}`}>
+        <h3 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('profile.tabs.achievements')}</h3>
+        <div className="mt-5 flex min-h-[80px] items-center justify-center rounded-2xl bg-[#F0F5F1] dark:bg-[#0f1629]">
           <p className="text-xs text-[#94a3b8]">{t('profile.achievements.empty')}</p>
         </div>
       </div>
@@ -55,8 +55,8 @@ export function AchievementShowcase({ achievements, pinnedIds, isOwn, onTogglePi
         <div
           className={`${sizePx} flex items-center justify-center rounded-2xl border-2 transition-all duration-200 ${
             a.unlocked
-              ? `${tc.glow} bg-white dark:bg-[#161c2d]`
-              : 'border-[#E7E8E5] bg-[#F2F3F0] opacity-50 grayscale dark:border-[#1e3158] dark:bg-[#0f1629]'
+              ? `${tc.glow} bg-white dark:bg-[#132420]`
+              : 'border-[#E4EBE5] bg-[#F0F5F1] opacity-50 grayscale dark:border-[#1E4035] dark:bg-[#0f1629]'
           }`}
           style={a.unlocked ? { borderColor: tc.ring } : undefined}
         >
@@ -72,20 +72,20 @@ export function AchievementShowcase({ achievements, pinnedIds, isOwn, onTogglePi
         {isOwn && a.unlocked && isHovered && (
           <button
             onClick={() => onTogglePin?.(a.id)}
-            className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm border border-[#E7E8E5] hover:bg-[#f8fafc] dark:bg-[#161c2d] dark:border-[#1e3158]"
+            className="absolute -left-1 -top-1 flex h-5 w-5 items-center justify-center rounded-full bg-white shadow-sm border border-[#E4EBE5] hover:bg-[#E2F0E8] dark:bg-[#132420] dark:border-[#1E4035]"
           >
-            {isPinned ? <PinOff className="h-2.5 w-2.5 text-[#6366F1]" /> : <Pin className="h-2.5 w-2.5 text-[#94a3b8]" />}
+            {isPinned ? <PinOff className="h-2.5 w-2.5 text-[#059669]" /> : <Pin className="h-2.5 w-2.5 text-[#94a3b8]" />}
           </button>
         )}
 
-        <span className="max-w-[72px] truncate text-center text-[10px] font-medium text-[#475569] dark:text-[#7e93b0]">
+        <span className="max-w-[72px] truncate text-center text-[10px] font-medium text-[#4B6B52] dark:text-[#7BA88A]">
           {a.title}
         </span>
 
         {/* Progress for locked */}
         {!a.unlocked && a.target > 0 && (
           <div className="flex w-14 flex-col items-center gap-0.5">
-            <div className="h-1 w-full rounded-full bg-[#E7E8E5] dark:bg-[#1e3158]">
+            <div className="h-1 w-full rounded-full bg-[#E4EBE5] dark:bg-[#1E4035]">
               <div className="h-1 rounded-full bg-[#94a3b8] transition-all duration-500" style={{ width: `${progressPct}%` }} />
             </div>
             <span className="text-[9px] text-[#94a3b8]">{a.progress}/{a.target}</span>
@@ -96,8 +96,8 @@ export function AchievementShowcase({ achievements, pinnedIds, isOwn, onTogglePi
   }
 
   return (
-    <div className={`section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d] ${className ?? ''}`}>
-      <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.tabs.achievements')}</h3>
+    <div className={`section-enter rounded-[28px] border border-[#C1CFC4] bg-white p-5 dark:border-[#163028] dark:bg-[#132420] ${className ?? ''}`}>
+      <h3 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('profile.tabs.achievements')}</h3>
       <p className="mt-1 text-xs text-[#94a3b8]">
         {t('profile.achievements.count', { unlocked: unlocked.length, total: achievements.length })}
       </p>

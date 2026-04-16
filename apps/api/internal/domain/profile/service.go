@@ -115,9 +115,6 @@ func NewProfileService(c Config) *Service {
 	}
 }
 
-// NewService is an alias for NewProfileService for backward compatibility.
-var NewService = NewProfileService
-
 // CookieName returns the cookie name for sessions.
 func (s *Service) CookieName() string {
 	return s.settings.CookieName

@@ -7,10 +7,11 @@ interface CardProps {
   dark?: boolean
   border?: boolean
   orangeBorder?: boolean
+  notch?: boolean
   onClick?: React.MouseEventHandler<HTMLDivElement>
 }
 
-export function Card({ className, children, padding = 'md', dark, border = true, orangeBorder, onClick }: CardProps) {
+export function Card({ className, children, padding = 'md', dark, border = true, orangeBorder, notch, onClick }: CardProps) {
   const paddings = {
     none: '',
     sm: 'p-3',
@@ -23,12 +24,13 @@ export function Card({ className, children, padding = 'md', dark, border = true,
       onClick={onClick}
       className={cn(
         'rounded-2xl transition-all duration-200',
+        notch && 'card-notch',
         dark
-          ? 'bg-[#0f1629] border-[#1e293b]'
-          : 'bg-white hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] dark:bg-[#161c2d] dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.5)]',
+          ? 'bg-[#070E0C] border-[#1E4035]'
+          : 'bg-white hover:shadow-[0_4px_16px_rgba(0,0,0,0.08)] dark:bg-[#132420] dark:hover:shadow-[0_4px_20px_rgba(0,0,0,0.5)]',
         border && !orangeBorder && 'border',
-        border && !orangeBorder && (dark ? 'border-[#1e293b]' : 'border-[#CBCCC9] dark:border-[#1e3158]'),
-        orangeBorder && 'border border-[#6366F1] dark:border-[#818cf8]',
+        border && !orangeBorder && (dark ? 'border-[#1E4035]' : 'border-[#C1CFC4] dark:border-[#1E4035]'),
+        orangeBorder && 'border border-[#059669] dark:border-[#34D399]',
         onClick && 'cursor-pointer',
         paddings[padding],
         className,

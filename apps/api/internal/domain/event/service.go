@@ -37,26 +37,3 @@ func NewEventService(c Config) *Service {
 	}
 }
 
-// NewService is an alias for NewEventService for backward compatibility.
-var NewService = NewEventService
-
-func (s *Service) EnrichEventsWithAvatarURLs(ctx context.Context, resp *model.ListEventsResponse) error {
-	_ = ctx
-	if resp == nil {
-		return nil
-	}
-	for _, event := range resp.Events {
-		if event == nil {
-			continue
-		}
-		for _, participant := range event.Participants {
-			if participant == nil {
-				continue
-			}
-			if participant.AvatarURL == "" && participant.TelegramAvatarURL != "" {
-				participant.AvatarURL = participant.TelegramAvatarURL
-			}
-		}
-	}
-	return nil
-}

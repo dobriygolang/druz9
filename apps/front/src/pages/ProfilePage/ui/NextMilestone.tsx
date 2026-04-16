@@ -59,7 +59,7 @@ function findClosestMilestone(
 
   if (bestComp) {
     return {
-        icon: <TrendingUp className="h-4 w-4 text-[#6366F1]" />,
+        icon: <TrendingUp className="h-4 w-4 text-[#059669]" />,
       text: t('profile.milestone.skill', { score: bestComp.comp.score, target: bestComp.targetScore, name: bestComp.comp.label, level: t(`skill.${bestComp.label}`) }),
       progress: bestComp.comp.score,
       total: bestComp.targetScore,
@@ -96,15 +96,15 @@ export function NextMilestone({ achievements, competencies, isOwn, className }: 
   const pct = milestone.total > 0 ? Math.round((milestone.progress / milestone.total) * 100) : 0
 
   return (
-    <div className={`section-enter flex items-center gap-3 rounded-[20px] border border-[#d8d9d6] bg-[linear-gradient(90deg,_#fffbeb_0%,_#eef2ff_100%)] px-4 py-3 shadow-sm dark:border-[#1a2540] dark:bg-[linear-gradient(90deg,_#2a200a_0%,_#1e2a4a_100%)] ${className ?? ''}`}>
+    <div className={`section-enter flex items-center gap-3 rounded-[20px] border border-[#d8d9d6] bg-[linear-gradient(90deg,_#ecfdf5_0%,_#ecfdf5_100%)] px-4 py-3 shadow-sm dark:border-[#163028] dark:bg-[linear-gradient(90deg,_#2a200a_0%,_#1e2a4a_100%)] ${className ?? ''}`}>
       {milestone.icon}
       <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-medium text-[#111111] dark:text-[#e2e8f3]">{milestone.text}</p>
+        <p className="truncate text-xs font-medium text-[#111111] dark:text-[#E2F0E8]">{milestone.text}</p>
         <div className="mt-1.5 h-1 rounded-full bg-white/60 dark:bg-white/10">
-          <div className="h-1 rounded-full bg-[#6366F1] transition-all duration-700" style={{ width: `${pct}%` }} />
+          <div className="h-1 rounded-full bg-[#059669] transition-all duration-700" style={{ width: `${pct}%` }} />
         </div>
       </div>
-      <span className="shrink-0 font-mono text-xs font-bold text-[#6366F1]">{pct}%</span>
+      <span className="shrink-0 font-mono text-xs font-bold text-[#059669]">{pct}%</span>
     </div>
   )
 }

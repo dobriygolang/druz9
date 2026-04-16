@@ -109,14 +109,14 @@ export function MapPage() {
 
         <div className="pointer-events-none absolute inset-x-0 top-0 z-10 p-4">
           <div className="pointer-events-auto rounded-[24px] border border-white/80 bg-white/88 p-3 shadow-[0_14px_30px_rgba(15,23,42,0.12)] backdrop-blur">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#6366F1]">{t('map.eyebrow')}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#059669]">{t('map.eyebrow')}</p>
             <div className="relative mt-3">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
               <input
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder={t('map.searchPlaceholder')}
-                className="w-full rounded-2xl border border-[#d8d9d6] bg-white py-3 pl-10 pr-4 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
+                className="w-full rounded-2xl border border-[#d8d9d6] bg-white py-3 pl-10 pr-4 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#059669]/20"
               />
             </div>
           </div>
@@ -139,7 +139,7 @@ export function MapPage() {
 
         <div className="absolute inset-x-0 bottom-0 z-10 rounded-t-[30px] border-t border-white/80 bg-white/92 p-4 shadow-[0_-18px_36px_rgba(15,23,42,0.14)] backdrop-blur">
           {selectedPoint ? (
-            <div className="mb-3 rounded-[24px] border border-[#e2e8f0] bg-[#f8fafc] p-4">
+            <div className="mb-3 rounded-[24px] border border-[#e2e8f0] bg-[#E2F0E8] p-4">
               <div className="flex items-start gap-3">
                 <Avatar
                   name={`${selectedPoint.firstName} ${selectedPoint.lastName}`.trim()}
@@ -151,7 +151,7 @@ export function MapPage() {
                     {`${selectedPoint.firstName} ${selectedPoint.lastName}`.trim() || selectedPoint.username}
                   </p>
                   {selectedPoint.region && (
-                    <p className="mt-1 text-xs text-[#667085]">{selectedPoint.region}</p>
+                    <p className="mt-1 text-xs text-[#7A9982]">{selectedPoint.region}</p>
                   )}
                   <button
                     onClick={() => navigate(`/profile/${selectedPoint.userId}`)}
@@ -173,10 +173,10 @@ export function MapPage() {
             <div className="mb-3 flex items-end justify-between gap-4">
               <div>
                 <p className="text-base font-bold text-[#111111]">{t('map.title')}</p>
-                <p className="mt-1 text-sm text-[#667085]">{t('map.subtitle')}</p>
+                <p className="mt-1 text-sm text-[#7A9982]">{t('map.subtitle')}</p>
               </div>
               <div className="rounded-2xl border border-[#e2e8f0] bg-white px-4 py-3 text-right">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">{t('map.found')}</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#7A9982]">{t('map.found')}</p>
                 <p className="mt-1 font-mono text-xl font-bold text-[#111111]">{filtered.length}</p>
               </div>
             </div>
@@ -189,20 +189,20 @@ export function MapPage() {
                 return (
                   <div
                     key={p.userId}
-                    className={`flex items-center gap-3 rounded-2xl border px-3 py-2.5 transition-colors ${selectedPoint?.userId === p.userId ? 'border-[#6366F1] bg-[#EEF2FF]' : 'border-[#e2e8f0] bg-white'}`}
+                    className={`flex items-center gap-3 rounded-2xl border px-3 py-2.5 transition-colors ${selectedPoint?.userId === p.userId ? 'border-[#059669] bg-[#ecfdf5]' : 'border-[#e2e8f0] bg-white'}`}
                     onClick={() => focusPoint(p)}
                   >
                     <Avatar name={name} src={p.avatarUrl || undefined} size="sm" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-[#111111] truncate">{name}</p>
-                      <p className="text-xs text-[#667085]">{p.region}</p>
+                      <p className="text-xs text-[#7A9982]">{p.region}</p>
                     </div>
                     <button
                       onClick={e => {
                         e.stopPropagation()
                         navigate(`/profile/${p.userId}`)
                       }}
-                      className="w-8 h-8 flex items-center justify-center rounded-xl bg-[#F8FAFC] text-[#6366F1]"
+                      className="w-8 h-8 flex items-center justify-center rounded-xl bg-[#F8FAFC] text-[#059669]"
                       title={t('map.goProfile')}
                     >
                       <ExternalLink className="w-3.5 h-3.5" />
@@ -239,7 +239,7 @@ export function MapPage() {
         {selectedPoint && createPortal(
           <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 animate-modal-in">
             <div className="bg-white rounded-2xl shadow-modal border border-[#e2e8f0] p-4 flex items-center gap-4 min-w-[280px] max-w-[360px]">
-              <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#6366F1]" style={{ background: '#6366F1' }}>
+              <div className="w-14 h-14 rounded-full overflow-hidden flex-shrink-0 border-2 border-[#059669]" style={{ background: '#059669' }}>
                 {selectedPoint.avatarUrl
                   ? <img src={selectedPoint.avatarUrl} alt="" className="w-full h-full object-cover" />
                   : <div className="w-full h-full flex items-center justify-center text-white text-lg font-bold">
@@ -252,18 +252,18 @@ export function MapPage() {
                   {`${selectedPoint.firstName} ${selectedPoint.lastName}`.trim() || selectedPoint.username}
                 </p>
                 {selectedPoint.region && (
-                  <p className="text-xs text-[#666666] mt-0.5">{selectedPoint.region}</p>
+                  <p className="text-xs text-[#4B6B52] mt-0.5">{selectedPoint.region}</p>
                 )}
                 <button
                   onClick={() => navigate(`/profile/${selectedPoint.userId}`)}
-                  className="mt-2 flex items-center gap-1.5 text-xs font-medium text-[#6366F1] hover:text-[#4F46E5] transition-colors"
+                  className="mt-2 flex items-center gap-1.5 text-xs font-medium text-[#059669] hover:text-[#047857] transition-colors"
                 >
                   <ExternalLink className="w-3.5 h-3.5" /> {t('map.goProfile')}
                 </button>
               </div>
               <button
                 onClick={() => setSelectedPoint(null)}
-                className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#F2F3F0] flex-shrink-0"
+                className="w-7 h-7 flex items-center justify-center rounded-full hover:bg-[#F0F5F1] flex-shrink-0"
               >
                 <X className="w-3.5 h-3.5 text-[#94a3b8]" />
               </button>
@@ -276,13 +276,13 @@ export function MapPage() {
         <div className="absolute top-4 right-4 z-10 flex flex-col gap-1">
           <button
             onClick={() => setViewState(v => ({ ...v, zoom: Math.min(v.zoom + 1, 18) }))}
-            className="w-9 h-9 bg-white rounded-xl shadow border border-[#CBCCC9] flex items-center justify-center text-[#111111] hover:bg-[#F2F3F0] hover:border-[#6366F1] transition-colors"
+            className="w-9 h-9 bg-white rounded-xl shadow border border-[#C1CFC4] flex items-center justify-center text-[#111111] hover:bg-[#F0F5F1] hover:border-[#059669] transition-colors"
           >
             <Plus className="w-4 h-4" />
           </button>
           <button
             onClick={() => setViewState(v => ({ ...v, zoom: Math.max(v.zoom - 1, 1) }))}
-            className="w-9 h-9 bg-white rounded-xl shadow border border-[#CBCCC9] flex items-center justify-center text-[#111111] hover:bg-[#F2F3F0] hover:border-[#6366F1] transition-colors"
+            className="w-9 h-9 bg-white rounded-xl shadow border border-[#C1CFC4] flex items-center justify-center text-[#111111] hover:bg-[#F0F5F1] hover:border-[#059669] transition-colors"
           >
             <Minus className="w-4 h-4" />
           </button>
@@ -290,15 +290,15 @@ export function MapPage() {
       </div>
 
       {/* Right panel */}
-      <div className="w-[280px] bg-white border-l border-[#CBCCC9] flex flex-col">
-        <div className="p-4 border-b border-[#CBCCC9]">
+      <div className="w-[280px] bg-white border-l border-[#C1CFC4] flex flex-col">
+        <div className="p-4 border-b border-[#C1CFC4]">
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
             <input
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={t('map.searchPlaceholder')}
-              className="w-full pl-9 pr-3 py-2 text-sm bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg focus:outline-none"
+              className="w-full pl-9 pr-3 py-2 text-sm bg-[#F0F5F1] border border-[#C1CFC4] rounded-lg focus:outline-none"
             />
           </div>
         </div>
@@ -308,17 +308,17 @@ export function MapPage() {
             return (
               <div
                 key={p.userId}
-                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedPoint?.userId === p.userId ? 'bg-[#EEF2FF]' : 'hover:bg-[#F2F3F0]'}`}
+                className={`flex items-center gap-3 p-2 rounded-lg cursor-pointer transition-colors ${selectedPoint?.userId === p.userId ? 'bg-[#ecfdf5]' : 'hover:bg-[#F0F5F1]'}`}
                 onClick={() => focusPoint(p)}
               >
                 <Avatar name={name} src={p.avatarUrl || undefined} size="sm" />
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-medium text-[#111111] truncate">{name}</p>
-                  <p className="text-xs text-[#666666]">{p.region}</p>
+                  <p className="text-xs text-[#4B6B52]">{p.region}</p>
                 </div>
                 <button
                   onClick={e => { e.stopPropagation(); navigate(`/profile/${p.userId}`) }}
-                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#E0E7FF] text-[#94a3b8] hover:text-[#6366F1] transition-colors flex-shrink-0"
+                  className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#d1fae5] text-[#94a3b8] hover:text-[#059669] transition-colors flex-shrink-0"
                   title={t('map.goProfile')}
                 >
                   <ExternalLink className="w-3.5 h-3.5" />

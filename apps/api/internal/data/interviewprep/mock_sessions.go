@@ -404,11 +404,11 @@ func (r *Repo) CreateMockSession(
 		_, err = tx.Exec(ctx, `
 			INSERT INTO interview_mock_rounds (
 				id, session_id, round_index, round_type, status, blueprint_round_id, source_item_id, source_pool_id, title_snapshot,
-				candidate_prompt_snapshot, interviewer_script_snapshot, reference_solution_snapshot, starter_code_snapshot, solve_language, code, answer_text,
+				candidate_prompt_snapshot, interviewer_script_snapshot, reference_solution_snapshot, starter_code_snapshot, solve_language, code,
 				design_notes, design_components, design_apis, design_database_schema, design_traffic, design_reliability,
 				last_submission_passed, review_score, review_summary, started_at, finished_at, created_at, updated_at
 			)
-			VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'',$11,$12,$13,$14,'','','','','','','',$15,$16,$17,$18,$19,$20,$21)
+			VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,'',$11,$12,$13,$14,'','','','','','', $15,$16,$17,$18,$19,$20,$21)
 		`,
 			stage.ID,
 			stage.SessionID,

@@ -39,7 +39,7 @@ export function CircularProgress({
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-[#E7E8E5] dark:text-[#1e3158]"
+          className="text-[#E4EBE5] dark:text-[#1E4035]"
         />
         <circle
           cx={size / 2}
@@ -55,8 +55,8 @@ export function CircularProgress({
         />
         <defs>
           <linearGradient id="readiness-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#6366F1" />
-            <stop offset="100%" stopColor="#818cf8" />
+            <stop offset="0%" stopColor="#059669" />
+            <stop offset="100%" stopColor="#34D399" />
           </linearGradient>
         </defs>
       </svg>

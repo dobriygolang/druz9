@@ -1,5 +1,5 @@
 const CIRCLE_GRADIENTS = [
-  { from: '#6366f1', to: '#8b5cf6' },
+  { from: '#059669', to: '#0D9488' },
   { from: '#06b6d4', to: '#0ea5e9' },
   { from: '#10b981', to: '#059669' },
   { from: '#f97316', to: '#ef4444' },

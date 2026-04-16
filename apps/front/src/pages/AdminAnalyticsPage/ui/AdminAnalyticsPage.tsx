@@ -5,11 +5,11 @@ import { getCategoryFromTopics, CATEGORY_LABELS } from '@/features/Admin/model/t
 
 function StatCard({ label, value, icon }: { label: string; value: string | number; icon: React.ReactNode }) {
   return (
-    <div className="bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1e3158] p-4 flex items-center gap-4">
-      <div className="w-10 h-10 rounded-xl bg-[#F2F3F0] dark:bg-[#1a2236] flex items-center justify-center flex-shrink-0">{icon}</div>
+    <div className="bg-white dark:bg-[#132420] rounded-xl border border-[#C1CFC4] dark:border-[#1E4035] p-4 flex items-center gap-4">
+      <div className="w-10 h-10 rounded-xl bg-[#F0F5F1] dark:bg-[#162E24] flex items-center justify-center flex-shrink-0">{icon}</div>
       <div>
-        <p className="text-2xl font-bold text-[#0f172a] leading-none">{value}</p>
-        <p className="text-xs text-[#666666] mt-0.5">{label}</p>
+        <p className="text-2xl font-bold text-[#0B1210] leading-none">{value}</p>
+        <p className="text-xs text-[#4B6B52] mt-0.5">{label}</p>
       </div>
     </div>
   )
@@ -20,10 +20,10 @@ function ProgressBar({ label, value, total, color }: { label: string; value: num
   return (
     <div>
       <div className="flex justify-between text-xs mb-1">
-        <span className="text-[#666666]">{label}</span>
-        <span className="font-medium text-[#0f172a]">{value} ({pct}%)</span>
+        <span className="text-[#4B6B52]">{label}</span>
+        <span className="font-medium text-[#0B1210]">{value} ({pct}%)</span>
       </div>
-      <div className="h-2 bg-[#F2F3F0] dark:bg-[#1a2236] rounded-full overflow-hidden">
+      <div className="h-2 bg-[#F0F5F1] dark:bg-[#162E24] rounded-full overflow-hidden">
         <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, backgroundColor: color }} />
       </div>
     </div>
@@ -98,24 +98,24 @@ export function AdminAnalyticsPage() {
   return (
     <div className="p-6">
       <div className="mb-5">
-        <h1 className="text-xl font-bold text-[#0f172a]">Analytics</h1>
-        <p className="text-sm text-[#666666] mt-0.5">Platform task statistics</p>
+        <h1 className="text-xl font-bold text-[#0B1210]">Analytics</h1>
+        <p className="text-sm text-[#4B6B52] mt-0.5">Platform task statistics</p>
       </div>
 
       {/* Stats cards */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-        <StatCard label="Total tasks" value={s.total} icon={<Code2 className="w-5 h-5 text-[#6366f1]" />} />
+        <StatCard label="Total tasks" value={s.total} icon={<Code2 className="w-5 h-5 text-[#059669]" />} />
         <StatCard label="Active" value={s.active} icon={<CheckCircle className="w-5 h-5 text-[#22c55e]" />} />
-        <StatCard label="Mock Interview" value={s.mock} icon={<Layers className="w-5 h-5 text-[#818cf8]" />} />
+        <StatCard label="Mock Interview" value={s.mock} icon={<Layers className="w-5 h-5 text-[#34D399]" />} />
         <StatCard label="Solo Practice" value={s.solo} icon={<Layers className="w-5 h-5 text-[#f59e0b]" />} />
       </div>
 
       {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {/* Difficulty Distribution */}
-        <div className="bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1e3158] p-5">
-          <h3 className="text-sm font-semibold text-[#0f172a] mb-4 flex items-center gap-2">
-            <BarChart2 className="w-4 h-4 text-[#6366f1]" /> Difficulty
+        <div className="bg-white dark:bg-[#132420] rounded-xl border border-[#C1CFC4] dark:border-[#1E4035] p-5">
+          <h3 className="text-sm font-semibold text-[#0B1210] mb-4 flex items-center gap-2">
+            <BarChart2 className="w-4 h-4 text-[#059669]" /> Difficulty
           </h3>
           <div className="flex flex-col gap-3">
             <ProgressBar label="Easy" value={s.easy} total={s.total} color="#22c55e" />
@@ -125,21 +125,21 @@ export function AdminAnalyticsPage() {
         </div>
 
         {/* Category Distribution */}
-        <div className="bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1e3158] p-5">
-          <h3 className="text-sm font-semibold text-[#0f172a] mb-4 flex items-center gap-2">
-            <Layers className="w-4 h-4 text-[#6366f1]" /> Categories
+        <div className="bg-white dark:bg-[#132420] rounded-xl border border-[#C1CFC4] dark:border-[#1E4035] p-5">
+          <h3 className="text-sm font-semibold text-[#0B1210] mb-4 flex items-center gap-2">
+            <Layers className="w-4 h-4 text-[#059669]" /> Categories
           </h3>
           <div className="flex flex-col gap-3">
-            <ProgressBar label={CATEGORY_LABELS.mock ?? 'Mock'} value={s.mock} total={s.total} color="#6366f1" />
+            <ProgressBar label={CATEGORY_LABELS.mock ?? 'Mock'} value={s.mock} total={s.total} color="#059669" />
             <ProgressBar label={CATEGORY_LABELS.solo_practice ?? 'Solo'} value={s.solo} total={s.total} color="#f59e0b" />
             <ProgressBar label="No category" value={s.uncategorized} total={s.total} color="#94a3b8" />
           </div>
         </div>
 
         {/* Languages Distribution */}
-        <div className="bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1e3158] p-5">
-          <h3 className="text-sm font-semibold text-[#0f172a] mb-4 flex items-center gap-2">
-            <Code2 className="w-4 h-4 text-[#6366f1]" /> Languages
+        <div className="bg-white dark:bg-[#132420] rounded-xl border border-[#C1CFC4] dark:border-[#1E4035] p-5">
+          <h3 className="text-sm font-semibold text-[#0B1210] mb-4 flex items-center gap-2">
+            <Code2 className="w-4 h-4 text-[#059669]" /> Languages
           </h3>
           <div className="flex flex-col gap-3">
             {Object.entries(s.languages)

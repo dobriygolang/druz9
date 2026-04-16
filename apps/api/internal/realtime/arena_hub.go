@@ -18,10 +18,13 @@ import (
 const arenaSnapshotFlushInterval = 2 * time.Second
 
 type ArenaHub struct {
-	service arenaStateService
-	mu      sync.Mutex
-	matches map[string]*arenaMatchRoom
-	stopCh  chan struct{}
+	service  arenaStateService
+	upgrader websocket.Upgrader
+	mu       sync.Mutex
+	matches  map[string]*arenaMatchRoom
+	stopCh   chan struct{}
+	ctx      context.Context
+	cancel   context.CancelFunc
 }
 
 type arenaStateService interface {
@@ -48,32 +51,33 @@ type arenaClient struct {
 	closed              atomic.Bool
 }
 
-var arenaUpgrader = websocket.Upgrader{
-	ReadBufferSize:  4096,
-	WriteBufferSize: 4096,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-func NewArenaHub(service arenaStateService) *ArenaHub {
+func NewArenaHub(service arenaStateService, allowedOrigins []string) *ArenaHub {
+	ctx, cancel := context.WithCancel(context.Background())
 	hub := &ArenaHub{
 		service: service,
+		upgrader: websocket.Upgrader{
+			ReadBufferSize:  4096,
+			WriteBufferSize: 4096,
+			CheckOrigin:     originChecker(allowedOrigins),
+		},
 		matches: make(map[string]*arenaMatchRoom),
 		stopCh:  make(chan struct{}),
+		ctx:     ctx,
+		cancel:  cancel,
 	}
 	go hub.snapshotLoop()
 	return hub
 }
 
-// Stop gracefully shuts down the snapshot loop.
+// Stop gracefully shuts down the snapshot loop and cancels in-flight DB operations.
 func (h *ArenaHub) Stop() {
 	close(h.stopCh)
+	h.cancel()
 }
 
 func (h *ArenaHub) Handler(matchID string, authenticatedUserID string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ws, err := arenaUpgrader.Upgrade(w, r, nil)
+		ws, err := h.upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			return
 		}

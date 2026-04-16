@@ -158,23 +158,23 @@ export function DailyChallengePage() {
     <div className="mx-auto w-full max-w-7xl px-4 pt-4 pb-24 md:px-6 md:pb-6">
       <PageMeta title={t('daily.meta.title')} description={t('daily.meta.description')} canonicalPath="/daily-challenge" />
       {/* Header bar — full width */}
-      <div className={`mb-4 bg-white border dark:bg-[#0f172a] dark:border-[#1e3158] px-5 py-4 ${
+      <div className={`mb-4 bg-white border dark:bg-[#0B1210] dark:border-[#1E4035] px-5 py-4 ${
         isMobile
           ? 'flex flex-col items-start gap-4 rounded-[28px] border-[#d8d9d6] shadow-[0_16px_30px_rgba(15,23,42,0.06)]'
-          : 'flex items-center justify-between rounded-2xl border-[#CBCCC9]'
+          : 'flex items-center justify-between rounded-2xl border-[#C1CFC4]'
       }`}>
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-[#EEF2FF] dark:bg-[#1e2a4a] rounded-lg flex items-center justify-center">
-            <Calendar className="w-4 h-4 text-[#6366F1]" />
+          <div className="w-8 h-8 bg-[#ecfdf5] dark:bg-[#1e2a4a] rounded-lg flex items-center justify-center">
+            <Calendar className="w-4 h-4 text-[#059669]" />
           </div>
           <div>
-            <h1 className="text-base font-bold text-[#111111] dark:text-[#f8fafc] leading-tight">{t('daily.title')}</h1>
-            <p className="text-xs text-[#666666] dark:text-[#94a3b8]">{today}</p>
+            <h1 className="text-base font-bold text-[#111111] dark:text-[#E2F0E8] leading-tight">{t('daily.title')}</h1>
+            <p className="text-xs text-[#4B6B52] dark:text-[#94a3b8]">{today}</p>
           </div>
         </div>
-        <div className={`flex items-center gap-2 rounded-lg bg-[#F2F3F0] dark:bg-[#1e293b] px-3 py-2 ${isMobile ? 'self-stretch justify-center' : ''}`}>
-          <Clock className="w-3.5 h-3.5 text-[#666666] dark:text-[#94a3b8]" />
-          <span className="text-sm font-mono font-semibold text-[#111111] dark:text-[#f8fafc]">{timeLeft}</span>
+        <div className={`flex items-center gap-2 rounded-lg bg-[#F0F5F1] dark:bg-[#1e293b] px-3 py-2 ${isMobile ? 'self-stretch justify-center' : ''}`}>
+          <Clock className="w-3.5 h-3.5 text-[#4B6B52] dark:text-[#94a3b8]" />
+          <span className="text-sm font-mono font-semibold text-[#111111] dark:text-[#E2F0E8]">{timeLeft}</span>
         </div>
       </div>
 
@@ -182,44 +182,44 @@ export function DailyChallengePage() {
       {loading ? (
         <div className={isMobile ? 'flex flex-col gap-4' : 'grid grid-cols-[1fr_360px] gap-4'}>
           <div className="flex flex-col gap-4">
-            <div className="bg-white rounded-2xl border border-[#CBCCC9] p-5 animate-pulse">
+            <div className="bg-white rounded-2xl border border-[#C1CFC4] p-5 animate-pulse">
               <div className="flex items-center justify-between mb-3">
-                <div className="h-5 w-48 bg-[#E7E8E5] rounded" />
-                <div className="h-5 w-16 bg-[#E7E8E5] rounded-full" />
+                <div className="h-5 w-48 bg-[#E4EBE5] rounded" />
+                <div className="h-5 w-16 bg-[#E4EBE5] rounded-full" />
               </div>
               <div className="space-y-2">
-                <div className="h-3 bg-[#E7E8E5] rounded w-full" />
-                <div className="h-3 bg-[#E7E8E5] rounded w-5/6" />
-                <div className="h-3 bg-[#E7E8E5] rounded w-4/6" />
+                <div className="h-3 bg-[#E4EBE5] rounded w-full" />
+                <div className="h-3 bg-[#E4EBE5] rounded w-5/6" />
+                <div className="h-3 bg-[#E4EBE5] rounded w-4/6" />
               </div>
             </div>
-            <div className="bg-white rounded-2xl border border-[#CBCCC9] animate-pulse">
-              <div className="h-9 bg-[#E7E8E5]" />
-              <div className="h-[400px] bg-[#F2F3F0]" />
+            <div className="bg-white rounded-2xl border border-[#C1CFC4] animate-pulse">
+              <div className="h-9 bg-[#E4EBE5]" />
+              <div className="h-[400px] bg-[#F0F5F1]" />
             </div>
           </div>
-          {!isMobile && <div className="bg-white rounded-2xl border border-[#CBCCC9] animate-pulse h-48" />}
+          {!isMobile && <div className="bg-white rounded-2xl border border-[#C1CFC4] animate-pulse h-48" />}
         </div>
       ) : error ? (
-        <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] p-12 text-center">
+        <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-12 text-center">
           <p className="text-sm text-[#94a3b8]">{t('daily.comingSoon')}</p>
         </div>
       ) : task ? (
         isMobile ? (
           /* ── Mobile: single column ── */
           <div className="flex flex-col gap-4">
-            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] p-5">
+            <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-5">
               <div className="flex flex-col items-start gap-2 mb-3">
-                <h2 className="text-base font-bold text-[#111111] dark:text-[#f8fafc]">{task.task.title}</h2>
+                <h2 className="text-base font-bold text-[#111111] dark:text-[#E2F0E8]">{task.task.title}</h2>
                 {task.task.difficulty && task.task.difficulty !== 'TASK_DIFFICULTY_UNSPECIFIED' && (
                   <Badge variant={DIFF_VARIANTS[task.task.difficulty] ?? 'default'}>
                     {DIFF_LABELS[task.task.difficulty] ?? task.task.difficulty}
                   </Badge>
                 )}
               </div>
-              <p className="text-sm text-[#475569] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">{task.task.statement}</p>
+              <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">{task.task.statement}</p>
             </div>
-            <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] overflow-hidden">
+            <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] overflow-hidden">
               <div className="h-9 bg-[#1e293b] flex items-center px-4">
                 <span className="text-xs text-[#94a3b8] font-mono">solution.{langExt}</span>
               </div>
@@ -250,22 +250,22 @@ export function DailyChallengePage() {
           <div className="grid grid-cols-[1fr_360px] gap-4 items-start">
             {/* Left column: task + editor + submit */}
             <div className="flex flex-col gap-4">
-              <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] p-5">
+              <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-5">
                 <div className="flex items-start justify-between gap-3 mb-3">
-                  <h2 className="text-base font-bold text-[#111111] dark:text-[#f8fafc]">{task.task.title}</h2>
+                  <h2 className="text-base font-bold text-[#111111] dark:text-[#E2F0E8]">{task.task.title}</h2>
                   {task.task.difficulty && task.task.difficulty !== 'TASK_DIFFICULTY_UNSPECIFIED' && (
                     <Badge variant={DIFF_VARIANTS[task.task.difficulty] ?? 'default'}>
                       {DIFF_LABELS[task.task.difficulty] ?? task.task.difficulty}
                     </Badge>
                   )}
                 </div>
-                <p className="text-sm text-[#475569] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">{task.task.statement}</p>
+                <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">{task.task.statement}</p>
               </div>
 
-              <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] overflow-hidden">
+              <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] overflow-hidden">
                 <div className="h-9 bg-[#1e293b] flex items-center justify-between px-4">
                   <span className="text-xs text-[#94a3b8] font-mono">solution.{langExt}</span>
-                  <span className="text-[10px] text-[#475569] uppercase tracking-widest">{task.task.language}</span>
+                  <span className="text-[10px] text-[#4B6B52] uppercase tracking-widest">{task.task.language}</span>
                 </div>
                 <Editor
                   height="460px"
@@ -306,27 +306,27 @@ function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean })
   const { t } = useTranslation()
   if (reviewing) {
     return (
-      <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] p-5 flex items-center gap-3">
+      <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-5 flex items-center gap-3">
         <Spinner size="sm" />
-        <p className="text-sm text-[#666666] dark:text-[#94a3b8]">{t('daily.review.analyzing')}</p>
+        <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8]">{t('daily.review.analyzing')}</p>
       </div>
     )
   }
   if (!review) {
     return (
-      <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] p-6 flex flex-col items-center gap-3 text-center">
-        <div className="w-10 h-10 rounded-xl bg-[#EEF2FF] dark:bg-[#1e2a4a] flex items-center justify-center">
+      <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-6 flex flex-col items-center gap-3 text-center">
+        <div className="w-10 h-10 rounded-xl bg-[#ecfdf5] dark:bg-[#1e2a4a] flex items-center justify-center">
           <span className="text-lg">✦</span>
         </div>
-        <p className="text-sm font-medium text-[#111111] dark:text-[#f8fafc]">{t('daily.review.title')}</p>
+        <p className="text-sm font-medium text-[#111111] dark:text-[#E2F0E8]">{t('daily.review.title')}</p>
         <p className="text-xs text-[#94a3b8] leading-relaxed">{t('daily.review.empty')}</p>
       </div>
     )
   }
   return (
-    <div className="bg-white dark:bg-[#0f172a] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] p-5 flex flex-col gap-4">
+    <div className="bg-white dark:bg-[#0B1210] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] p-5 flex flex-col gap-4">
       <div className="flex items-center justify-between">
-        <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{t('daily.review.title')}</h3>
+        <h3 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('daily.review.title')}</h3>
         {review.score != null && (
           <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
             review.score >= 8 ? 'bg-[#dcfce7] text-[#16a34a]'
@@ -336,7 +336,7 @@ function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean })
         )}
       </div>
       {(review.summary ?? review.review ?? review.feedback) && (
-        <p className="text-xs text-[#475569] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">
+        <p className="text-xs text-[#4B6B52] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">
           {review.summary ?? review.review ?? review.feedback}
         </p>
       )}
@@ -345,7 +345,7 @@ function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean })
           <p className="text-[10px] font-semibold text-[#16a34a] uppercase tracking-widest mb-2">{t('daily.review.strengths')}</p>
           <ul className="flex flex-col gap-1.5">
             {review.strengths.map((s: string, i: number) => (
-              <li key={i} className="text-xs text-[#475569] dark:text-[#94a3b8] flex gap-2">
+              <li key={i} className="text-xs text-[#4B6B52] dark:text-[#94a3b8] flex gap-2">
                 <span className="text-[#16a34a] flex-shrink-0 mt-px">✓</span>{s}
               </li>
             ))}
@@ -357,7 +357,7 @@ function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean })
           <p className="text-[10px] font-semibold text-[#dc2626] uppercase tracking-widest mb-2">{t('daily.review.issues')}</p>
           <ul className="flex flex-col gap-1.5">
             {review.issues.map((s: string, i: number) => (
-              <li key={i} className="text-xs text-[#475569] dark:text-[#94a3b8] flex gap-2">
+              <li key={i} className="text-xs text-[#4B6B52] dark:text-[#94a3b8] flex gap-2">
                 <span className="text-[#dc2626] flex-shrink-0 mt-px">✗</span>{s}
               </li>
             ))}
@@ -366,11 +366,11 @@ function ReviewPanel({ review, reviewing }: { review: any; reviewing: boolean })
       )}
       {Array.isArray(review.followUpQuestions) && review.followUpQuestions.length > 0 && (
         <div>
-          <p className="text-[10px] font-semibold text-[#6366F1] uppercase tracking-widest mb-2">{t('daily.review.followups')}</p>
+          <p className="text-[10px] font-semibold text-[#059669] uppercase tracking-widest mb-2">{t('daily.review.followups')}</p>
           <ul className="flex flex-col gap-1.5">
             {review.followUpQuestions.map((q: string, i: number) => (
-              <li key={i} className="text-xs text-[#475569] dark:text-[#94a3b8] flex gap-2">
-                <span className="text-[#6366F1] flex-shrink-0 mt-px">?</span>{q}
+              <li key={i} className="text-xs text-[#4B6B52] dark:text-[#94a3b8] flex gap-2">
+                <span className="text-[#059669] flex-shrink-0 mt-px">?</span>{q}
               </li>
             ))}
           </ul>

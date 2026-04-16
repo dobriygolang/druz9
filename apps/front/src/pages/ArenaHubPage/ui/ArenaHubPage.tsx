@@ -151,16 +151,16 @@ export function ArenaHubPage() {
     <div className={isMobile ? 'px-4 pt-4 pb-24 flex flex-col gap-4' : 'px-4 md:px-6 pt-4 pb-4 md:pb-6 flex flex-col gap-4 lg:flex-row'}>
       <PageMeta title={t('arena.meta.title')} description={t('arena.meta.description')} canonicalPath="/practice/arena" />
       {isMobile && (
-        <div className="section-enter overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(254,243,199,0.94)_48%,_rgba(238,242,255,0.92))] p-5 shadow-[0_18px_34px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[linear-gradient(135deg,_rgba(11,13,22,0.96),_rgba(46,26,38,0.88)_48%,_rgba(29,36,63,0.92))]">
+        <div className="section-enter overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(254,243,199,0.94)_48%,_rgba(238,242,255,0.92))] p-5 shadow-[0_18px_34px_rgba(15,23,42,0.08)] dark:border-[#1E4035] dark:bg-[linear-gradient(135deg,_rgba(11,13,22,0.96),_rgba(46,26,38,0.88)_48%,_rgba(29,36,63,0.92))]">
           <div className="flex items-start justify-between gap-4">
             <div>
               <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#92400e] dark:text-[#fbbf24]">{t('arena.hero.eyebrow')}</p>
-              <h1 className="mt-3 text-[28px] font-bold leading-none text-[#111111] dark:text-[#f8fafc]">{t('arena.hero.title')}</h1>
-              <p className="mt-3 text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">{t('arena.hero.subtitle')}</p>
+              <h1 className="mt-3 text-[28px] font-bold leading-none text-[#111111] dark:text-[#E2F0E8]">{t('arena.hero.title')}</h1>
+              <p className="mt-3 text-sm leading-6 text-[#4B6B52] dark:text-[#94a3b8]">{t('arena.hero.subtitle')}</p>
             </div>
-            <div className="rounded-[24px] border border-white/80 bg-white/78 px-4 py-3 text-right shadow-sm backdrop-blur dark:border-[#334155] dark:bg-[#1e293b]">
-              <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#64748b]">{t('arena.hero.matches')}</p>
-              <p className="mt-2 font-mono text-xl font-bold text-[#111111] dark:text-[#f8fafc]">{openMatches.length}</p>
+            <div className="rounded-[24px] border border-white/80 bg-white/78 px-4 py-3 text-right shadow-sm backdrop-blur dark:border-[#1E4035] dark:bg-[#1e293b]">
+              <p className="text-[11px] uppercase tracking-[0.18em] text-[#7A9982] dark:text-[#7A9982]">{t('arena.hero.matches')}</p>
+              <p className="mt-2 font-mono text-xl font-bold text-[#111111] dark:text-[#E2F0E8]">{openMatches.length}</p>
             </div>
           </div>
         </div>
@@ -172,9 +172,9 @@ export function ArenaHubPage() {
         <Card padding="md">
           <div className="flex items-center gap-2 mb-3">
             <Flame className="w-5 h-5 text-[#f59e0b]" />
-            <h3 className="text-sm font-bold text-[#111111] dark:text-[#f8fafc]">{t('arena.queue.title')}</h3>
+            <h3 className="text-sm font-bold text-[#111111] dark:text-[#E2F0E8]">{t('arena.queue.title')}</h3>
             {inQueue && <span className="px-2 py-0.5 rounded-full bg-[#fef3c7] text-[#92400e] text-[11px] font-medium dark:bg-[#422006] dark:text-[#fbbf24]">{t('arena.queue.status')}</span>}
-            <span className="ml-auto text-[10px] text-[#94a3b8] dark:text-[#64748b]">ELO ±</span>
+            <span className="ml-auto text-[10px] text-[#94a3b8] dark:text-[#7A9982]">ELO ±</span>
           </div>
 
           {inQueue ? (
@@ -188,7 +188,7 @@ export function ArenaHubPage() {
                   </div>
                 </div>
                 <div>
-                  <div className="flex items-center gap-1 text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
+                  <div className="flex items-center gap-1 text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
                     {t('arena.queue.searching')}
                     <span className="flex gap-0.5 ml-1">
                       <span className="w-1 h-1 rounded-full bg-[#f59e0b] animate-bounce [animation-delay:0ms]" />
@@ -243,22 +243,22 @@ export function ArenaHubPage() {
         {/* Friendly Duel */}
         <Card padding="md">
           <div className="flex items-center gap-2 mb-3">
-            <Users className="w-5 h-5 text-[#6366F1]" />
-            <h3 className="text-sm font-bold text-[#111111] dark:text-[#f8fafc]">{t('arena.duel.title')}</h3>
-            <span className="ml-auto rounded-full bg-[#F2F3F0] px-2 py-0.5 text-[10px] font-medium text-[#94a3b8] dark:bg-[#1e293b] dark:text-[#64748b]">{t('arena.duel.private')}</span>
+            <Users className="w-5 h-5 text-[#059669]" />
+            <h3 className="text-sm font-bold text-[#111111] dark:text-[#E2F0E8]">{t('arena.duel.title')}</h3>
+            <span className="ml-auto rounded-full bg-[#F0F5F1] px-2 py-0.5 text-[10px] font-medium text-[#94a3b8] dark:bg-[#1e293b] dark:text-[#7A9982]">{t('arena.duel.private')}</span>
           </div>
-          <p className="text-xs text-[#666666] dark:text-[#94a3b8] mb-3">{t('arena.duel.linkOnly')}</p>
+          <p className="text-xs text-[#4B6B52] dark:text-[#94a3b8] mb-3">{t('arena.duel.linkOnly')}</p>
 
           {duelRoom ? (
             <div className="flex flex-col gap-2">
-              <div className="flex items-center gap-2 rounded-xl border border-[#CBCCC9] bg-[#F2F3F0] p-2.5 dark:border-[#334155] dark:bg-[#1e293b]">
+              <div className="flex items-center gap-2 rounded-xl border border-[#C1CFC4] bg-[#F0F5F1] p-2.5 dark:border-[#1E4035] dark:bg-[#1e293b]">
                 <Link2 className="w-3.5 h-3.5 text-[#94a3b8] flex-shrink-0" />
-                <code className="flex-1 text-xs text-[#111111] dark:text-[#cbd5e1] font-mono truncate">{duelShareUrl}</code>
+                <code className="flex-1 text-xs text-[#111111] dark:text-[#C1D9CA] font-mono truncate">{duelShareUrl}</code>
                 <button
                   onClick={copyDuelLink}
-                  className="flex-shrink-0 p-1.5 rounded-md hover:bg-[#E7E8E5] dark:hover:bg-[#334155] transition-colors"
+                  className="flex-shrink-0 p-1.5 rounded-md hover:bg-[#E4EBE5] dark:hover:bg-[#1E4035] transition-colors"
                 >
-                  {copiedDuel ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Copy className="w-3.5 h-3.5 text-[#666666] dark:text-[#94a3b8]" />}
+                  {copiedDuel ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Copy className="w-3.5 h-3.5 text-[#4B6B52] dark:text-[#94a3b8]" />}
                 </button>
               </div>
               <div className="flex gap-2">
@@ -279,27 +279,27 @@ export function ArenaHubPage() {
 
         {/* Open matches */}
         <Card padding="none">
-          <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{t('arena.openMatches.title')}</h3>
+          <div className="px-4 py-3 border-b border-[#C1CFC4] dark:border-[#1E4035] flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('arena.openMatches.title')}</h3>
             <span className="text-xs text-[#94a3b8]">{openMatches.length}</span>
           </div>
-          <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+          <div className="divide-y divide-[#F0F5F1] dark:divide-[#1E4035]">
             {openMatches.length === 0 ? (
               <div className="px-4 py-8 text-center text-xs text-[#94a3b8]">{t('arena.openMatches.empty')}</div>
             ) : openMatches.map((m: any, i: number) => (
               <div key={m.id ?? i} className={`gap-3 px-4 py-3 ${isMobile ? 'flex flex-col items-start' : 'flex items-center'}`}>
-                <Swords className="w-4 h-4 text-[#666666] dark:text-[#94a3b8] flex-shrink-0" />
+                <Swords className="w-4 h-4 text-[#4B6B52] dark:text-[#94a3b8] flex-shrink-0" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#111111] dark:text-[#f8fafc] truncate">{m.taskTitle ?? t('arena.openMatches.taskFallback')}</p>
+                  <p className="text-sm font-medium text-[#111111] dark:text-[#E2F0E8] truncate">{m.taskTitle ?? t('arena.openMatches.taskFallback')}</p>
                   <div className="mt-1 flex flex-wrap items-center gap-1.5">
-                    {m.topic && <span className="text-xs text-[#666666] dark:text-[#94a3b8]">{m.topic}</span>}
+                    {m.topic && <span className="text-xs text-[#4B6B52] dark:text-[#94a3b8]">{m.topic}</span>}
                     {m.difficulty && (
                       <Badge variant={DIFF_VARIANTS[m.difficulty] ?? 'default'}>
                         {DIFF_LABELS[m.difficulty] ?? m.difficulty}
                       </Badge>
                     )}
                     {m.language && (
-                      <span className="rounded-full bg-[#F2F3F0] px-2 py-0.5 text-[10px] font-medium text-[#475569] dark:bg-[#1e293b] dark:text-[#94a3b8]">
+                      <span className="rounded-full bg-[#F0F5F1] px-2 py-0.5 text-[10px] font-medium text-[#4B6B52] dark:bg-[#1e293b] dark:text-[#94a3b8]">
                         {LANG_LABELS[m.language] ?? m.language}
                       </span>
                     )}
@@ -318,7 +318,7 @@ export function ArenaHubPage() {
       <div className="w-full flex flex-col gap-4 lg:w-[320px] lg:flex-shrink-0">
         {/* Season timer */}
         {seasonInfo && (
-          <div className="flex items-center justify-between rounded-2xl bg-[#0f172a] px-4 py-3 dark:bg-[#1e293b]">
+          <div className="flex items-center justify-between rounded-2xl bg-[#0B1210] px-4 py-3 dark:bg-[#1e293b]">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#94a3b8]">
                 {t('arena.season.label', { number: seasonInfo.seasonNumber })}
@@ -337,14 +337,14 @@ export function ArenaHubPage() {
           <Card padding="md">
             <div className="flex items-center gap-2 mb-3">
               <Trophy className="w-4 h-4 text-[#f59e0b]" />
-              <h3 className="text-sm font-bold text-[#111111] dark:text-[#f8fafc]">
+              <h3 className="text-sm font-bold text-[#111111] dark:text-[#E2F0E8]">
                 {getLeagueLabel(myStats.league)}
               </h3>
               <span className={`ml-auto inline-block h-2 w-2 rounded-full ${LEAGUE_BG_COLORS[myStats.league] ?? 'bg-[#94a3b8]'}`} />
             </div>
             <div className="space-y-2">
               <div className="flex items-baseline justify-between">
-                <span className="font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{myStats.rating}</span>
+                <span className="font-mono text-2xl font-bold text-[#111111] dark:text-[#E2F0E8]">{myStats.rating}</span>
                 {myStats.leagueRank > 0 && myStats.leagueTotal > 0 && (
                   <span className="text-xs text-[#94a3b8]">
                     #{myStats.leagueRank} / {myStats.leagueTotal}
@@ -357,9 +357,9 @@ export function ArenaHubPage() {
                     <span>{myStats.rating}</span>
                     <span>{myStats.nextLeagueAt}</span>
                   </div>
-                  <div className="mt-1 h-1.5 rounded-full bg-[#F2F3F0] dark:bg-[#1e293b]">
+                  <div className="mt-1 h-1.5 rounded-full bg-[#F0F5F1] dark:bg-[#1e293b]">
                     <div
-                      className={`h-1.5 rounded-full transition-all duration-700 ${LEAGUE_BG_COLORS[myStats.league] ?? 'bg-[#6366F1]'}`}
+                      className={`h-1.5 rounded-full transition-all duration-700 ${LEAGUE_BG_COLORS[myStats.league] ?? 'bg-[#059669]'}`}
                       style={{ width: `${Math.max(5, Math.min(100, ((myStats.rating - (myStats.nextLeagueAt - 450)) / 450) * 100))}%` }}
                     />
                   </div>
@@ -377,25 +377,25 @@ export function ArenaHubPage() {
 
         {/* Leaderboard */}
         <Card padding="none">
-          <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center justify-between">
-            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{t('arena.leaderboard.title')}</h3>
+          <div className="px-4 py-3 border-b border-[#C1CFC4] dark:border-[#1E4035] flex items-center justify-between">
+            <h3 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('arena.leaderboard.title')}</h3>
             <div className="flex items-center gap-1.5">
               <button
                 onClick={() => setShowInfo(true)}
-                className="flex h-6 w-6 items-center justify-center rounded-lg text-[#94a3b8] transition-colors hover:bg-[#F2F3F0] hover:text-[#475569] dark:hover:bg-[#1e293b] dark:hover:text-[#e2e8f3]"
+                className="flex h-6 w-6 items-center justify-center rounded-lg text-[#94a3b8] transition-colors hover:bg-[#F0F5F1] hover:text-[#4B6B52] dark:hover:bg-[#1e293b] dark:hover:text-[#e2e8f3]"
               >
                 <HelpCircle className="w-3.5 h-3.5" />
               </button>
               <Trophy className="w-4 h-4 text-[#f59e0b]" />
             </div>
           </div>
-          <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+          <div className="divide-y divide-[#F0F5F1] dark:divide-[#1E4035]">
             {leaderboard.length === 0
               ? Array.from({ length: 5 }).map((_, i) => (
                 <div key={i} className="flex items-center gap-3 px-4 py-2.5 animate-pulse">
-                  <div className="w-5 h-5 rounded bg-[#E7E8E5] dark:bg-[#1e3158]" />
-                  <div className="w-7 h-7 rounded-full bg-[#E7E8E5] dark:bg-[#1e3158]" />
-                  <div className="flex-1 h-3 bg-[#E7E8E5] dark:bg-[#1e3158] rounded" />
+                  <div className="w-5 h-5 rounded bg-[#E4EBE5] dark:bg-[#1E4035]" />
+                  <div className="w-7 h-7 rounded-full bg-[#E4EBE5] dark:bg-[#1E4035]" />
+                  <div className="flex-1 h-3 bg-[#E4EBE5] dark:bg-[#1E4035] rounded" />
                 </div>
               ))
               : leaderboard.slice(0, 10).map((e: any, i: number) => (
@@ -406,10 +406,10 @@ export function ArenaHubPage() {
                     <span className={`absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full border border-white dark:border-[#161c2d] ${LEAGUE_BG_COLORS[e.league] ?? 'bg-[#94a3b8]'}`} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-xs font-medium text-[#111111] dark:text-[#f8fafc] truncate">{e.displayName}</p>
+                    <p className="text-xs font-medium text-[#111111] dark:text-[#E2F0E8] truncate">{e.displayName}</p>
                     <p className={`text-[10px] ${LEAGUE_COLORS[e.league] ?? 'text-[#94a3b8]'}`}>{getLeagueLabel(e.league)}</p>
                   </div>
-                  <span className="text-xs font-mono text-[#666666] dark:text-[#94a3b8]">{e.rating ?? 0}</span>
+                  <span className="text-xs font-mono text-[#4B6B52] dark:text-[#94a3b8]">{e.rating ?? 0}</span>
                 </div>
               ))
             }

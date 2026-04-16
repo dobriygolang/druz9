@@ -16,7 +16,7 @@ const CELL_STEP = CELL_SIZE + CELL_GAP
 const MONTH_LABEL_HEIGHT = 20
 const DAY_LABEL_WIDTH = 30
 
-const COLOR_EMPTY = '#E7E8E5'
+const COLOR_EMPTY = '#E4EBE5'
 const COLORS = [
   { min: 0, max: 0, color: COLOR_EMPTY },
   { min: 1, max: 2, color: '#d4e8b0' },

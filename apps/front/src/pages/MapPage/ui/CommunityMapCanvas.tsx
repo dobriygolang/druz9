@@ -27,7 +27,7 @@ function createMarkerElement(point: CommunityPoint, isSelected: boolean, onSelec
   root.style.cssText = 'position:relative;display:flex;flex-direction:column;align-items:center;background:transparent;border:0;padding:0;cursor:pointer;'
 
   const tooltip = document.createElement('div')
-  tooltip.style.cssText = 'position:absolute;bottom:100%;margin-bottom:4px;padding:6px 12px;border:1px solid #CBCCC9;border-radius:12px;background:#ffffff;box-shadow:0 12px 24px rgba(15,23,42,0.12);white-space:nowrap;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity 150ms ease, transform 150ms ease;z-index:20;'
+  tooltip.style.cssText = 'position:absolute;bottom:100%;margin-bottom:4px;padding:6px 12px;border:1px solid #C1CFC4;border-radius:12px;background:#ffffff;box-shadow:0 12px 24px rgba(15,23,42,0.12);white-space:nowrap;pointer-events:none;opacity:0;transform:translateY(4px);transition:opacity 150ms ease, transform 150ms ease;z-index:20;'
 
   const title = document.createElement('p')
   title.textContent = `${point.firstName} ${point.lastName}`.trim() || point.username || 'Member'
@@ -42,7 +42,7 @@ function createMarkerElement(point: CommunityPoint, isSelected: boolean, onSelec
   }
 
   const circle = document.createElement('div')
-  circle.style.cssText = `width:40px;height:40px;border-radius:9999px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#6366F1;border:2px solid ${isSelected ? '#6366F1' : '#ffffff'};box-shadow:0 10px 18px rgba(15,23,42,0.2);transform:${isSelected ? 'scale(1.1)' : 'scale(1)'};transition:transform 150ms ease,border-color 150ms ease;`
+  circle.style.cssText = `width:40px;height:40px;border-radius:9999px;overflow:hidden;display:flex;align-items:center;justify-content:center;background:#059669;border:2px solid ${isSelected ? '#059669' : '#ffffff'};box-shadow:0 10px 18px rgba(15,23,42,0.2);transform:${isSelected ? 'scale(1.1)' : 'scale(1)'};transition:transform 150ms ease,border-color 150ms ease;`
 
   if (point.avatarUrl) {
     const image = document.createElement('img')
@@ -58,7 +58,7 @@ function createMarkerElement(point: CommunityPoint, isSelected: boolean, onSelec
   }
 
   const tail = document.createElement('div')
-  tail.style.cssText = `width:0;height:0;margin-top:-1px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:8px solid ${isSelected ? '#6366F1' : '#ffffff'};filter:drop-shadow(0 2px 2px rgba(0,0,0,0.15));`
+  tail.style.cssText = `width:0;height:0;margin-top:-1px;border-left:5px solid transparent;border-right:5px solid transparent;border-top:8px solid ${isSelected ? '#059669' : '#ffffff'};filter:drop-shadow(0 2px 2px rgba(0,0,0,0.15));`
 
   root.addEventListener('mouseenter', () => {
     if (!isSelected) {
@@ -226,10 +226,10 @@ export function CommunityMapCanvas({
       <div className="relative h-full w-full">
         <div ref={containerRef} className="community-map-shell h-full w-full" />
         {loadError && (
-          <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#f8fafc]/88 backdrop-blur">
+          <div className="absolute inset-0 z-20 flex items-center justify-center bg-[#E2F0E8]/88 backdrop-blur">
             <div className="rounded-2xl border border-[#d8d9d6] bg-white px-5 py-4 text-center shadow-lg">
               <p className="text-sm font-semibold text-[#111111]">{loadError}</p>
-              <p className="mt-1 text-xs text-[#667085]">{t('error.checkConnection')}</p>
+              <p className="mt-1 text-xs text-[#7A9982]">{t('error.checkConnection')}</p>
             </div>
           </div>
         )}

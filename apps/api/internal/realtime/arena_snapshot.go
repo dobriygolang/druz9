@@ -28,7 +28,10 @@ func (h *ArenaHub) ensureMatchLoaded(matchID string) {
 	if err != nil {
 		return
 	}
-	match, err := h.service.GetMatch(context.Background(), parsedMatchID)
+	ctx, cancel := context.WithTimeout(h.ctx, 5*time.Second)
+	defer cancel()
+
+	match, err := h.service.GetMatch(ctx, parsedMatchID)
 	if err != nil || match == nil {
 		return
 	}
@@ -198,7 +201,10 @@ func (h *ArenaHub) flushSnapshot(matchID string, codes map[string]*schema.ArenaP
 	}
 
 	if len(codesMap) > 0 {
-		if err := h.service.SavePlayerCodes(context.Background(), parsedMatchID, codesMap); err != nil {
+		ctx, cancel := context.WithTimeout(h.ctx, 5*time.Second)
+		defer cancel()
+
+		if err := h.service.SavePlayerCodes(ctx, parsedMatchID, codesMap); err != nil {
 			klog.Errorf("arena flush snapshot match=%s: %v", matchID, err)
 		}
 	}

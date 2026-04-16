@@ -232,17 +232,17 @@ export function InterviewPrepMockSessionPage() {
         return (
           <div key={s.id ?? i} className="flex items-center gap-1.5">
             <div className={`flex items-center justify-center rounded-full text-xs font-bold transition-colors ${compact ? 'w-7 h-7' : 'h-8 w-8'} ${
-              isDone ? 'bg-[#22c55e] text-white' : isCurrent ? 'bg-[#818cf8] text-white' : 'bg-[#334155] text-[#94a3b8]'
+              isDone ? 'bg-[#22c55e] text-white' : isCurrent ? 'bg-[#34D399] text-white' : 'bg-[#1E4035] text-[#94a3b8]'
             }`}>
               {isDone ? <CheckCircle className="w-3.5 h-3.5" /> : i + 1}
             </div>
             {!compact && (
-              <span className={`whitespace-nowrap text-[11px] font-medium ${isCurrent ? 'text-[#f8fafc]' : 'text-[#64748b]'}`}>
+              <span className={`whitespace-nowrap text-[11px] font-medium ${isCurrent ? 'text-[#E2F0E8]' : 'text-[#7A9982]'}`}>
                 {s.title || STAGE_KIND_LABELS[kind] || kind}
               </span>
             )}
             {compact && i < stages.length - 1 && (
-              <div className={`w-5 h-0.5 ${isDone ? 'bg-[#22c55e]' : 'bg-[#334155]'}`} />
+              <div className={`w-5 h-0.5 ${isDone ? 'bg-[#22c55e]' : 'bg-[#1E4035]'}`} />
             )}
           </div>
         )
@@ -253,10 +253,10 @@ export function InterviewPrepMockSessionPage() {
   const InstructionsBanner = () => {
     if (!stageTitle) return null
     return (
-      <div className="mb-4 rounded-xl border border-[#334155] bg-[#1e293b] px-3 py-3">
+      <div className="mb-4 rounded-xl border border-[#1E4035] bg-[#1e293b] px-3 py-3">
         <div className="flex flex-wrap items-center gap-2">
           <span className="text-[10px] font-semibold uppercase tracking-wide text-[#94a3b8]">{stageTitle}</span>
-          <span className="rounded-full bg-[#334155] px-2 py-0.5 text-[10px] font-semibold text-[#cbd5e1]">
+          <span className="rounded-full bg-[#1E4035] px-2 py-0.5 text-[10px] font-semibold text-[#C1D9CA]">
             {t('mock.stageOf', { current: currentStageIndex + 1, total: stages.length })}
           </span>
         </div>
@@ -268,7 +268,7 @@ export function InterviewPrepMockSessionPage() {
     if (currentStageIndex !== 0 || isFinished) return null
     const label = blueprintTitle || companyTag || t('mock.defaultCompany')
     return (
-      <div className="mb-4 rounded-xl border border-[#334155] bg-[#1e293b] px-3 py-2.5 text-xs leading-5 text-[#cbd5e1]">
+      <div className="mb-4 rounded-xl border border-[#1E4035] bg-[#1e293b] px-3 py-2.5 text-xs leading-5 text-[#C1D9CA]">
         {t('mock.introLabel', { company: label })}
       </div>
     )
@@ -281,7 +281,7 @@ export function InterviewPrepMockSessionPage() {
           <div className="flex h-14 w-14 items-center justify-center rounded-full bg-[#22c55e]">
             <CheckCircle className="w-7 h-7 text-white" />
           </div>
-          <h2 className="text-lg font-bold text-[#f8fafc]">{t('mock.finishedTitle')}</h2>
+          <h2 className="text-lg font-bold text-[#E2F0E8]">{t('mock.finishedTitle')}</h2>
           <p className="text-sm text-[#94a3b8]">{t('mock.finishedBody')}</p>
           <Button variant="secondary" size="sm" onClick={() => isFinished ? navigate('/prepare/interview-prep') : setShowLeaveConfirm(true)}>
             {t('mock.back')}
@@ -298,8 +298,8 @@ export function InterviewPrepMockSessionPage() {
             <MessageCircle className="w-3.5 h-3.5 text-[#fbbf24]" />
             <span className="text-xs font-semibold uppercase tracking-wide text-[#fbbf24]">{t('mock.interviewerQuestion')}</span>
           </div>
-          <p className="text-sm font-medium leading-relaxed text-[#f8fafc]">{currentQuestion.prompt}</p>
-          <p className="mt-3 text-xs leading-relaxed text-[#64748b]">
+          <p className="text-sm font-medium leading-relaxed text-[#E2F0E8]">{currentQuestion.prompt}</p>
+          <p className="mt-3 text-xs leading-relaxed text-[#7A9982]">
             {t('mock.answerHint', { position: isMobile ? t('mock.positionBelow') : t('mock.positionRight') })}
           </p>
         </>
@@ -312,10 +312,10 @@ export function InterviewPrepMockSessionPage() {
         <p className="text-[10px] font-semibold uppercase tracking-wide text-[#94a3b8] mb-2">
           {stageTitle}
         </p>
-        <h2 className="text-base font-bold text-[#f8fafc] mb-3">
+        <h2 className="text-base font-bold text-[#E2F0E8] mb-3">
           {currentStage?.task?.title ?? t('mock.taskTitleFallback')}
         </h2>
-        <p className="text-sm text-[#cbd5e1] leading-relaxed whitespace-pre-wrap">
+        <p className="text-sm text-[#C1D9CA] leading-relaxed whitespace-pre-wrap">
           {currentStage?.task?.statement ?? currentStage?.statement ?? t('mock.loading')}
         </p>
       </>
@@ -336,9 +336,9 @@ export function InterviewPrepMockSessionPage() {
     return (
       <div className="flex flex-col items-center justify-center gap-3 py-6 text-center">
         <div className="w-10 h-10 rounded-full bg-[#1e293b] flex items-center justify-center">
-          <Sparkles className="w-5 h-5 text-[#475569]" />
+          <Sparkles className="w-5 h-5 text-[#4B6B52]" />
         </div>
-        <p className="text-sm text-[#64748b] leading-relaxed">
+        <p className="text-sm text-[#7A9982] leading-relaxed">
           {isInQuestionsPhase
             ? t('mock.answerForReview')
             : t('mock.completeForReview')}
@@ -348,13 +348,13 @@ export function InterviewPrepMockSessionPage() {
   }
 
   const EditorBar = () => (
-    <div className="h-9 bg-[#1e293b] flex items-center px-4 gap-3 flex-shrink-0 border-b border-[#334155]">
+    <div className="h-9 bg-[#1e293b] flex items-center px-4 gap-3 flex-shrink-0 border-b border-[#1E4035]">
       <span className="text-xs text-[#94a3b8] font-mono">
         {editorLang === 'go' ? 'solution.go' : editorLang === 'sql' ? 'solution.sql' : 'solution.py'}
       </span>
       <button
         onClick={() => { if (editorRef.current && monacoRef.current) formatEditorCode(editorRef.current, monacoRef.current) }}
-        className="rounded px-2 py-0.5 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0f172a] hover:text-white"
+        className="rounded px-2 py-0.5 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0B1210] hover:text-white"
         title="Format (Shift+Alt+F)"
       >
         Format
@@ -363,32 +363,32 @@ export function InterviewPrepMockSessionPage() {
         <select
           value={selectedLanguage}
           onChange={e => setSelectedLanguage(e.target.value)}
-          className="ml-auto h-7 rounded-md border border-[#334155] bg-[#0f172a] px-2 text-xs text-[#cbd5e1] outline-none"
+          className="ml-auto h-7 rounded-md border border-[#1E4035] bg-[#0B1210] px-2 text-xs text-[#C1D9CA] outline-none"
         >
           {supportedLanguages.map(language => (
             <option key={language} value={language}>{getLanguageLabel(language)}</option>
           ))}
         </select>
       ) : (
-        <span className="ml-auto text-[10px] text-[#64748b] uppercase tracking-wider">{getLanguageLabel(editorLang)}</span>
+        <span className="ml-auto text-[10px] text-[#7A9982] uppercase tracking-wider">{getLanguageLabel(editorLang)}</span>
       )}
     </div>
   )
 
   const TextAnswerArea = ({ placeholder }: { placeholder: string }) => (
-    <div className="flex-1 flex flex-col p-4 bg-[#0f172a]">
+    <div className="flex-1 flex flex-col p-4 bg-[#0B1210]">
       <label className="text-xs font-semibold text-[#94a3b8] mb-2 block">{t('mock.yourAnswer')}</label>
       <textarea
         value={textAnswer}
         onChange={e => setTextAnswer(e.target.value)}
         placeholder={placeholder}
-        className="flex-1 w-full px-4 py-3 text-sm bg-[#1e293b] border border-[#334155] rounded-xl text-[#f8fafc] placeholder-[#475569] resize-none focus:outline-none focus:border-[#818cf8] leading-relaxed"
+        className="flex-1 w-full px-4 py-3 text-sm bg-[#1e293b] border border-[#1E4035] rounded-xl text-[#E2F0E8] placeholder-[#4B6B52] resize-none focus:outline-none focus:border-[#34D399] leading-relaxed"
       />
     </div>
   )
 
   const SystemDesignForm = () => (
-    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-[#0f172a]">
+    <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-4 bg-[#0B1210]">
       {[
         { label: t('mock.design.architecture'), key: 'notes', value: designNotes, set: setDesignNotes, rows: 6, placeholder: t('mock.design.architecturePlaceholder') },
         { label: t('mock.design.components'), key: 'components', value: designComponents, set: setDesignComponents, rows: 4, placeholder: t('mock.design.componentsPlaceholder') },
@@ -402,7 +402,7 @@ export function InterviewPrepMockSessionPage() {
             onChange={e => set(e.target.value)}
             placeholder={placeholder}
             rows={rows}
-            className="w-full px-3 py-2.5 text-sm bg-[#1e293b] border border-[#334155] rounded-xl text-[#f8fafc] placeholder-[#475569] resize-none focus:outline-none focus:border-[#818cf8]"
+            className="w-full px-3 py-2.5 text-sm bg-[#1e293b] border border-[#1E4035] rounded-xl text-[#E2F0E8] placeholder-[#4B6B52] resize-none focus:outline-none focus:border-[#34D399]"
           />
         </div>
       ))}
@@ -413,23 +413,23 @@ export function InterviewPrepMockSessionPage() {
 
   if (isMobile) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#0f172a]">
+      <div className="flex min-h-screen flex-col bg-[#0B1210]">
         <PageMeta title={t('mock.meta.title')} description={t('mock.meta.description')} />
-        <header className="border-b border-[#1e293b] bg-[#0f172a] px-4 pt-3 pb-4">
+        <header className="border-b border-[#1e293b] bg-[#0B1210] px-4 pt-3 pb-4">
           <div className="flex items-start gap-3">
             <button onClick={() => isFinished ? navigate('/prepare/interview-prep') : setShowLeaveConfirm(true)} className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#1e293b] text-[#94a3b8]">
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold text-[#f8fafc]">Mock · {blueprintTitle || companyTag || t('mock.general')}</p>
-              <p className="mt-1 text-xs text-[#64748b]">
+              <p className="truncate text-sm font-bold text-[#E2F0E8]">Mock · {blueprintTitle || companyTag || t('mock.general')}</p>
+              <p className="mt-1 text-xs text-[#7A9982]">
                 {isFinished
                   ? t('mock.finishedTitle')
                   : t('mock.stageProgress', { current: currentStageIndex + 1, total: stages.length, title: stageTitle })}
               </p>
             </div>
             {isFinished ? (
-              <span className="rounded-full bg-[#1e293b] px-2 py-1 text-[11px] font-medium text-[#64748b]">{t('mock.statusCompleted')}</span>
+              <span className="rounded-full bg-[#1e293b] px-2 py-1 text-[11px] font-medium text-[#7A9982]">{t('mock.statusCompleted')}</span>
             ) : (
               <span className="flex items-center gap-1.5 rounded-full bg-[#14532d] px-2 py-1 text-[11px] font-medium text-[#4ade80]">
                 <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e] animate-pulse" />
@@ -453,7 +453,7 @@ export function InterviewPrepMockSessionPage() {
         </header>
 
         <div className="flex flex-1 flex-col gap-4 px-4 pt-4 pb-24">
-          <div className="rounded-[24px] border border-[#1e293b] bg-[#0f172a] p-4">
+          <div className="rounded-[24px] border border-[#1e293b] bg-[#0B1210] p-4">
             <StageProgress />
           </div>
 
@@ -462,7 +462,7 @@ export function InterviewPrepMockSessionPage() {
           </div>
 
           {isFinished ? (
-            <div className="rounded-[24px] border border-dashed border-[#334155] bg-[#0f172a] px-4 py-6 text-center text-sm text-[#64748b]">
+            <div className="rounded-[24px] border border-dashed border-[#1E4035] bg-[#0B1210] px-4 py-6 text-center text-sm text-[#7A9982]">
               {t('mock.finishedPanel')}
             </div>
           ) : isInQuestionsPhase ? (
@@ -472,11 +472,11 @@ export function InterviewPrepMockSessionPage() {
                 value={textAnswer}
                 onChange={e => setTextAnswer(e.target.value)}
                 placeholder={t('mock.answerQuestionPlaceholder')}
-                className="h-[220px] w-full resize-none rounded-xl border border-[#334155] bg-[#0f172a] px-4 py-3 text-sm text-[#f8fafc] placeholder-[#475569] leading-relaxed focus:outline-none focus:border-[#818cf8]"
+                className="h-[220px] w-full resize-none rounded-xl border border-[#1E4035] bg-[#0B1210] px-4 py-3 text-sm text-[#E2F0E8] placeholder-[#4B6B52] leading-relaxed focus:outline-none focus:border-[#34D399]"
               />
             </div>
           ) : CODE_KINDS.has(stageKind) ? (
-            <div className="overflow-hidden rounded-[24px] border border-[#334155]">
+            <div className="overflow-hidden rounded-[24px] border border-[#1E4035]">
               <EditorBar />
               <div className="h-[48vh] min-h-[320px]">
                 <Editor
@@ -505,7 +505,7 @@ export function InterviewPrepMockSessionPage() {
                       onChange={e => set(e.target.value)}
                       placeholder={placeholder}
                       rows={rows}
-                      className="w-full resize-none rounded-xl border border-[#334155] bg-[#0f172a] px-3 py-3 text-sm text-[#f8fafc] placeholder-[#475569] focus:outline-none focus:border-[#818cf8]"
+                      className="w-full resize-none rounded-xl border border-[#1E4035] bg-[#0B1210] px-3 py-3 text-sm text-[#E2F0E8] placeholder-[#4B6B52] focus:outline-none focus:border-[#34D399]"
                     />
                   </div>
                 ))}
@@ -513,8 +513,8 @@ export function InterviewPrepMockSessionPage() {
             </div>
           ) : isCodeReview && codeReviewCode ? (
             <div className="flex flex-col gap-3">
-              <div className="overflow-hidden rounded-[24px] border border-[#334155]">
-                <div className="h-8 bg-[#0f172a] border-b border-[#334155] flex items-center px-4 gap-2">
+              <div className="overflow-hidden rounded-[24px] border border-[#1E4035]">
+                <div className="h-8 bg-[#0B1210] border-b border-[#1E4035] flex items-center px-4 gap-2">
                   <Code2 className="w-3.5 h-3.5 text-[#94a3b8]" />
                   <span className="text-xs text-[#94a3b8] font-mono">{t('mock.reviewCodeReadonly')}</span>
                 </div>
@@ -531,7 +531,7 @@ export function InterviewPrepMockSessionPage() {
                   value={textAnswer}
                   onChange={e => setTextAnswer(e.target.value)}
                   placeholder={t('mock.codeReviewPlaceholder')}
-                  className="h-[180px] w-full resize-none rounded-xl border border-[#334155] bg-[#0f172a] px-4 py-3 text-sm text-[#f8fafc] placeholder-[#475569] leading-relaxed focus:outline-none focus:border-[#818cf8]"
+                  className="h-[180px] w-full resize-none rounded-xl border border-[#1E4035] bg-[#0B1210] px-4 py-3 text-sm text-[#E2F0E8] placeholder-[#4B6B52] leading-relaxed focus:outline-none focus:border-[#34D399]"
                 />
               </div>
             </div>
@@ -542,7 +542,7 @@ export function InterviewPrepMockSessionPage() {
                 value={textAnswer}
                 onChange={e => setTextAnswer(e.target.value)}
                 placeholder={t('mock.answerPlaceholder')}
-                className="h-[220px] w-full resize-none rounded-xl border border-[#334155] bg-[#0f172a] px-4 py-3 text-sm text-[#f8fafc] placeholder-[#475569] leading-relaxed focus:outline-none focus:border-[#818cf8]"
+                className="h-[220px] w-full resize-none rounded-xl border border-[#1E4035] bg-[#0B1210] px-4 py-3 text-sm text-[#E2F0E8] placeholder-[#4B6B52] leading-relaxed focus:outline-none focus:border-[#34D399]"
               />
             </div>
           )}
@@ -550,7 +550,7 @@ export function InterviewPrepMockSessionPage() {
           <div className="rounded-[24px] border border-[#1e293b] bg-[#1e293b] p-4">
             <div className="mb-3 flex items-center gap-2">
               <Sparkles className="w-4 h-4 text-[#fbbf24]" />
-              <span className="text-sm font-bold text-[#f8fafc]">{t('mock.aiFeedback')}</span>
+              <span className="text-sm font-bold text-[#E2F0E8]">{t('mock.aiFeedback')}</span>
             </div>
             <AIFeedbackContent />
           </div>
@@ -562,16 +562,16 @@ export function InterviewPrepMockSessionPage() {
   /* ── Desktop layout ─── */
 
   return (
-    <div className="flex flex-col h-screen bg-[#0f172a] overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#0B1210] overflow-hidden">
       <PageMeta title={t('mock.meta.title')} description={t('mock.meta.description')} />
-      <header className="h-[52px] bg-[#0f172a] border-b border-[#1e293b] flex items-center justify-between px-5 flex-shrink-0">
+      <header className="h-[52px] bg-[#0B1210] border-b border-[#1e293b] flex items-center justify-between px-5 flex-shrink-0">
         <div className="flex items-center gap-3">
           <button onClick={() => isFinished ? navigate('/prepare/interview-prep') : setShowLeaveConfirm(true)} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#1e293b] text-[#94a3b8] transition-colors">
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <p className="text-sm font-bold text-[#f8fafc]">Mock Interview · {blueprintTitle || companyTag || t('mock.general')}</p>
-            <p className="text-xs text-[#64748b]">
+            <p className="text-sm font-bold text-[#E2F0E8]">Mock Interview · {blueprintTitle || companyTag || t('mock.general')}</p>
+            <p className="text-xs text-[#7A9982]">
               {isFinished
                 ? t('mock.finishedTitle')
                 : t('mock.stageProgress', { current: currentStageIndex + 1, total: stages.length, title: stageTitle })}
@@ -584,7 +584,7 @@ export function InterviewPrepMockSessionPage() {
             </span>
           )}
           {isFinished && (
-            <span className="px-2 py-0.5 rounded-full bg-[#1e293b] text-[#64748b] text-[11px] font-medium">{t('mock.statusCompleted')}</span>
+            <span className="px-2 py-0.5 rounded-full bg-[#1e293b] text-[#7A9982] text-[11px] font-medium">{t('mock.statusCompleted')}</span>
           )}
         </div>
         <div className="flex items-center gap-2">
@@ -603,19 +603,19 @@ export function InterviewPrepMockSessionPage() {
 
       {/* Disclaimer */}
       <div className="flex items-center justify-center gap-1.5 bg-[#0a0f1c] border-b border-[#1e293b] px-5 py-1.5">
-        <span className="text-[10px] text-[#475569] leading-tight text-center">
+        <span className="text-[10px] text-[#4B6B52] leading-tight text-center">
           {t('mock.disclaimer')}
         </span>
       </div>
 
       <div className="flex flex-1 min-h-0">
         {/* Left: Stage progress + problem/question */}
-        <div className="w-[340px] flex-shrink-0 bg-[#1e293b] border-r border-[#334155] flex flex-col">
-          <div className="px-4 py-3 border-b border-[#334155]">
+        <div className="w-[340px] flex-shrink-0 bg-[#1e293b] border-r border-[#1E4035] flex flex-col">
+          <div className="px-4 py-3 border-b border-[#1E4035]">
             <StageProgress compact />
             {currentStage && !isFinished && (
               <div className="flex items-center gap-1.5 mt-1.5">
-                <p className="text-[10px] text-[#64748b] font-medium uppercase tracking-wide">
+                <p className="text-[10px] text-[#7A9982] font-medium uppercase tracking-wide">
                   {stageTitle}
                 </p>
                 {isInQuestionsPhase && (
@@ -624,7 +624,7 @@ export function InterviewPrepMockSessionPage() {
                   </span>
                 )}
                 {!isInQuestionsPhase && CODE_KINDS.has(stageKind) && (
-                  <span className="flex items-center gap-1 text-[10px] text-[#64748b] font-medium">
+                  <span className="flex items-center gap-1 text-[10px] text-[#7A9982] font-medium">
                     <Code2 className="w-2.5 h-2.5" /> {t('mock.coding')}
                   </span>
                 )}
@@ -640,8 +640,8 @@ export function InterviewPrepMockSessionPage() {
         {/* Center: editor or answer area */}
         <div className="flex-1 flex flex-col min-w-0">
           {isFinished ? (
-            <div className="flex-1 flex items-center justify-center bg-[#0f172a]">
-              <p className="text-sm text-[#475569]">{t('mock.allStagesCompleted')}</p>
+            <div className="flex-1 flex items-center justify-center bg-[#0B1210]">
+              <p className="text-sm text-[#4B6B52]">{t('mock.allStagesCompleted')}</p>
             </div>
           ) : isInQuestionsPhase ? (
             <TextAnswerArea placeholder={t('mock.answerQuestionPlaceholder')} />
@@ -664,8 +664,8 @@ export function InterviewPrepMockSessionPage() {
           ) : isCodeReview && codeReviewCode ? (
             <div className="flex flex-col flex-1 min-h-0">
               {/* Read-only code to review */}
-              <div className="flex-1 min-h-0 border-b border-[#334155]">
-                <div className="h-8 bg-[#0f172a] border-b border-[#334155] flex items-center px-4 gap-2">
+              <div className="flex-1 min-h-0 border-b border-[#1E4035]">
+                <div className="h-8 bg-[#0B1210] border-b border-[#1E4035] flex items-center px-4 gap-2">
                   <Code2 className="w-3.5 h-3.5 text-[#94a3b8]" />
                   <span className="text-xs text-[#94a3b8] font-mono">{t('mock.reviewCodeReadonly')}</span>
                 </div>
@@ -685,10 +685,10 @@ export function InterviewPrepMockSessionPage() {
         </div>
 
         {/* Right: AI feedback */}
-        <div className="w-[300px] flex-shrink-0 bg-[#1e293b] border-l border-[#334155] flex flex-col">
-          <div className="px-4 py-3 border-b border-[#334155] flex items-center gap-2">
+        <div className="w-[300px] flex-shrink-0 bg-[#1e293b] border-l border-[#1E4035] flex flex-col">
+          <div className="px-4 py-3 border-b border-[#1E4035] flex items-center gap-2">
             <Sparkles className="w-4 h-4 text-[#fbbf24]" />
-            <span className="text-sm font-bold text-[#f8fafc]">{t('mock.aiFeedback')}</span>
+            <span className="text-sm font-bold text-[#E2F0E8]">{t('mock.aiFeedback')}</span>
           </div>
           <div className="flex-1 overflow-y-auto p-4">
             <AIFeedbackContent />
@@ -717,10 +717,10 @@ export function InterviewPrepMockSessionPage() {
           </>
         }
       >
-        <p className="text-sm text-[#475569] dark:text-[#94a3b8]">
+        <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8]">
           {t('mock.leaveBody')}
         </p>
-        <p className="mt-2 text-xs text-[#94a3b8] dark:text-[#4d6380]">
+        <p className="mt-2 text-xs text-[#94a3b8] dark:text-[#4A7058]">
           {t('mock.leaveNoStats', 'Incomplete stages will not count towards your stats.')}
         </p>
       </Modal>
@@ -746,9 +746,9 @@ function TestResultPanel({ testResult }: { testResult: any }) {
             : <AlertTriangle className="w-6 h-6 text-white" />}
         </div>
         <div>
-          <p className="text-sm font-bold text-[#f8fafc]">{passed ? t('mock.testsPassed') : t('mock.testsFailed')}</p>
+          <p className="text-sm font-bold text-[#E2F0E8]">{passed ? t('mock.testsPassed') : t('mock.testsFailed')}</p>
           {totalCount > 0 && (
-            <p className="text-xs text-[#64748b]">{t('mock.testsCount', { passed: passedCount, total: totalCount })}</p>
+            <p className="text-xs text-[#7A9982]">{t('mock.testsCount', { passed: passedCount, total: totalCount })}</p>
           )}
         </div>
       </div>
@@ -783,15 +783,15 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: string }) 
       {score !== null && (
         <div className="flex items-center gap-3">
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center text-lg font-bold text-white ${
-            score >= 7 ? 'bg-[#22c55e]' : score >= 4 ? 'bg-[#818cf8]' : 'bg-[#ef4444]'
+            score >= 7 ? 'bg-[#22c55e]' : score >= 4 ? 'bg-[#34D399]' : 'bg-[#ef4444]'
           }`}>
             {score}
           </div>
           <div>
-            <p className="text-sm font-bold text-[#f8fafc]">
+            <p className="text-sm font-bold text-[#E2F0E8]">
               {score >= 7 ? t('mock.scoreStrong') : score >= 4 ? t('mock.scoreMedium') : t('mock.scoreWeak')}
             </p>
-            <p className="text-xs text-[#64748b]">{t('mock.outOfTen')}</p>
+            <p className="text-xs text-[#7A9982]">{t('mock.outOfTen')}</p>
           </div>
         </div>
       )}
@@ -799,7 +799,7 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: string }) 
       {summary && (
         <div>
           <p className="text-xs font-semibold text-[#94a3b8] mb-1.5">{t('mock.summary')}</p>
-          <p className="text-sm text-[#cbd5e1] leading-relaxed">{summary}</p>
+          <p className="text-sm text-[#C1D9CA] leading-relaxed">{summary}</p>
         </div>
       )}
 
@@ -811,7 +811,7 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: string }) 
           </div>
           <ul className="flex flex-col gap-1">
             {strengths.map((s: string, i: number) => (
-              <li key={i} className="text-sm text-[#cbd5e1] flex items-start gap-1.5">
+              <li key={i} className="text-sm text-[#C1D9CA] flex items-start gap-1.5">
                 <span className="text-[#4ade80] mt-0.5">+</span> {s}
               </li>
             ))}
@@ -827,7 +827,7 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: string }) 
           </div>
           <ul className="flex flex-col gap-1">
             {gaps.map((g: string, i: number) => (
-              <li key={i} className="text-sm text-[#cbd5e1] flex items-start gap-1.5">
+              <li key={i} className="text-sm text-[#C1D9CA] flex items-start gap-1.5">
                 <span className="text-[#fbbf24] mt-0.5">−</span> {g}
               </li>
             ))}
@@ -843,7 +843,7 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: string }) 
           </div>
           <ul className="flex flex-col gap-1">
             {missingTopics.map((t: string, i: number) => (
-              <li key={i} className="text-sm text-[#cbd5e1] flex items-start gap-1.5">
+              <li key={i} className="text-sm text-[#C1D9CA] flex items-start gap-1.5">
                 <span className="text-[#f87171] mt-0.5">!</span> {t}
               </li>
             ))}
@@ -856,7 +856,7 @@ function ReviewPanel({ review, stageKind }: { review: any; stageKind: string }) 
           <p className="text-xs font-semibold text-[#94a3b8] mb-1.5">{t('mock.followUps')}</p>
           <ul className="flex flex-col gap-1">
             {followUpQuestions.map((q: string, i: number) => (
-              <li key={i} className="text-sm text-[#cbd5e1]">→ {q}</li>
+              <li key={i} className="text-sm text-[#C1D9CA]">→ {q}</li>
             ))}
           </ul>
         </div>

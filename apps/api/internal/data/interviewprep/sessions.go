@@ -14,10 +14,10 @@ import (
 func (r *Repo) CreateSession(ctx context.Context, session *model.InterviewPrepSession) error {
 	_, err := r.data.DB.Exec(ctx, `
 		INSERT INTO interview_practice_sessions (
-			id, user_id, item_id, status, current_followup_position, solve_language, code, answer_text,
+			id, user_id, item_id, status, current_followup_position, solve_language, code,
 			last_submission_passed, review_score, review_summary, started_at, finished_at, created_at, updated_at
 		)
-		VALUES ($1,$2,$3,$4,$5,$6,$7,'',$8,0,'',$9,$10,$11,$12)
+		VALUES ($1,$2,$3,$4,$5,$6,$7,$8,0,'',$9,$10,$11,$12)
 	`,
 		session.ID,
 		session.UserID,

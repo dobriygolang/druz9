@@ -9,6 +9,7 @@ import (
 	"api/internal/notiftext"
 	v1 "api/pkg/api/arena/v1"
 
+	klog "github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -55,7 +56,9 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 				TaskStatement:  match.Task.Statement,
 				TaskDifficulty: match.Task.Difficulty.String(),
 			}
-			_, _ = i.reviewService.StartReview(ctx, input) //nolint:errcheck // fire-and-forget
+			if _, err := i.reviewService.StartReview(ctx, input); err != nil {
+				klog.Errorf("arena post-solve review match=%s submission=%s: %v", matchID, submission.ID, err)
+			}
 		}()
 	}
 

@@ -33,7 +33,7 @@ export function ToastProvider({ children }: { children: React.ReactNode }) {
             <div key={t.id} className={`flex items-center gap-3 px-4 py-3 bg-white rounded-xl shadow-lg border-l-4 ${colors[t.variant]} animate-slide-in min-w-[280px]`}>
               <Icon className={`w-4 h-4 ${iconColors[t.variant]} flex-shrink-0`} />
               <span className="text-sm text-[#111111] flex-1">{t.message}</span>
-              <button onClick={() => setToasts(prev => prev.filter(x => x.id !== t.id))} className="text-[#94a3b8] hover:text-[#666666]">
+              <button onClick={() => setToasts(prev => prev.filter(x => x.id !== t.id))} className="text-[#94a3b8] hover:text-[#4B6B52]">
                 <X className="w-3.5 h-3.5" />
               </button>
             </div>

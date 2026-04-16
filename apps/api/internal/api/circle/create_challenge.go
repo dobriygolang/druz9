@@ -8,6 +8,7 @@ import (
 	v1 "api/pkg/api/circle/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
+	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 )
 
@@ -32,6 +33,7 @@ func (i *Implementation) CreateCircleChallenge(ctx context.Context, req *v1.Crea
 		go func() {
 			members, mErr := i.service.ListCircleMembers(ctx, circleID, 200)
 			if mErr != nil {
+				klog.Errorf("create challenge notify: list members circle=%s: %v", circleID, mErr)
 				return
 			}
 			userIDs := make([]string, 0, len(members))

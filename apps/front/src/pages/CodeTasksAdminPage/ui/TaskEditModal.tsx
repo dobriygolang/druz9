@@ -122,7 +122,7 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
       <div className="flex flex-col gap-6 max-h-[70vh] overflow-y-auto pr-1">
         {/* Section 1: Basic Info */}
         <section>
-          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Basics</h3>
+          <h3 className="text-xs font-semibold text-[#4B6B52] uppercase tracking-wide mb-3">Basics</h3>
           <div className="grid grid-cols-2 gap-3">
             <Input label="Title" value={task.title ?? ''} onChange={e => set('title', e.target.value)} />
             <Input label="Slug" value={task.slug ?? ''} onChange={e => set('slug', e.target.value)} />
@@ -144,24 +144,24 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
 
         {/* Section 2: Content */}
         <section>
-          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Content</h3>
+          <h3 className="text-xs font-semibold text-[#4B6B52] uppercase tracking-wide mb-3">Content</h3>
           <div className="flex flex-col gap-3">
             <div>
-              <label className="block text-xs font-medium text-[#475569] mb-1">Task statement</label>
+              <label className="block text-xs font-medium text-[#4B6B52] mb-1">Task statement</label>
               <textarea
                 value={task.statement ?? ''}
                 onChange={e => set('statement', e.target.value)}
                 rows={6}
-                className="w-full px-3 py-2 text-sm font-mono bg-[#F2F3F0] dark:bg-[#0f1117] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30 text-[#111111] dark:text-[#e2e8f3] resize-y"
+                className="w-full px-3 py-2 text-sm font-mono bg-[#F0F5F1] dark:bg-[#0B1210] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#059669]/30 text-[#111111] dark:text-[#E2F0E8] resize-y"
               />
             </div>
             <div>
-              <label className="block text-xs font-medium text-[#475569] mb-1">Starter code</label>
+              <label className="block text-xs font-medium text-[#4B6B52] mb-1">Starter code</label>
               <textarea
                 value={task.starterCode ?? ''}
                 onChange={e => set('starterCode', e.target.value)}
                 rows={5}
-                className="w-full px-3 py-2 text-sm font-mono bg-[#F2F3F0] dark:bg-[#0f1117] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30 text-[#111111] dark:text-[#e2e8f3] resize-y"
+                className="w-full px-3 py-2 text-sm font-mono bg-[#F0F5F1] dark:bg-[#0B1210] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#059669]/30 text-[#111111] dark:text-[#E2F0E8] resize-y"
               />
             </div>
           </div>
@@ -169,7 +169,7 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
 
         {/* Section 3: Topics */}
         <section>
-          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Topics</h3>
+          <h3 className="text-xs font-semibold text-[#4B6B52] uppercase tracking-wide mb-3">Topics</h3>
           <Input
             label="Comma-separated"
             value={displayTopics.join(', ')}
@@ -180,7 +180,7 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
 
         {/* Section 4: Test Cases */}
         <section>
-          <h3 className="text-xs font-semibold text-[#666666] uppercase tracking-wide mb-3">Test cases</h3>
+          <h3 className="text-xs font-semibold text-[#4B6B52] uppercase tracking-wide mb-3">Test cases</h3>
           {(['public', 'hidden'] as const).map(type => {
             const isPublic = type === 'public'
             const field = isPublic ? 'publicTestCases' : 'hiddenTestCases'
@@ -188,10 +188,10 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
             return (
               <div key={type} className="mb-4">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-medium text-[#475569]">{isPublic ? 'Public' : 'Hidden'} ({cases.length})</span>
+                  <span className="text-xs font-medium text-[#4B6B52]">{isPublic ? 'Public' : 'Hidden'} ({cases.length})</span>
                   <button
                     onClick={() => addTestCase(isPublic)}
-                    className="flex items-center gap-1 text-xs text-[#6366F1] hover:underline"
+                    className="flex items-center gap-1 text-xs text-[#059669] hover:underline"
                   >
                     <Plus className="w-3 h-3" /> Add
                   </button>
@@ -201,14 +201,14 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
                 )}
                 <div className="flex flex-col gap-2">
                   {cases.map((tc, idx) => (
-                    <div key={idx} className="grid grid-cols-[1fr_1fr_60px_60px_32px] gap-2 items-start p-2 bg-[#F2F3F0] dark:bg-[#0f1117] rounded-lg">
+                    <div key={idx} className="grid grid-cols-[1fr_1fr_60px_60px_32px] gap-2 items-start p-2 bg-[#F0F5F1] dark:bg-[#0B1210] rounded-lg">
                       <div>
                         <label className="block text-[10px] text-[#94a3b8] mb-0.5">Input</label>
                         <textarea
                           value={tc.input}
                           onChange={e => updateTestCase(isPublic, idx, { input: e.target.value })}
                           rows={2}
-                          className="w-full px-2 py-1 text-xs font-mono bg-white dark:bg-[#161c2d] border border-[#CBCCC9] dark:border-[#1e3158] rounded text-[#111111] dark:text-[#e2e8f3] resize-y"
+                          className="w-full px-2 py-1 text-xs font-mono bg-white dark:bg-[#132420] border border-[#C1CFC4] dark:border-[#1E4035] rounded text-[#111111] dark:text-[#E2F0E8] resize-y"
                         />
                       </div>
                       <div>
@@ -217,7 +217,7 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
                           value={tc.expectedOutput}
                           onChange={e => updateTestCase(isPublic, idx, { expectedOutput: e.target.value })}
                           rows={2}
-                          className="w-full px-2 py-1 text-xs font-mono bg-white dark:bg-[#161c2d] border border-[#CBCCC9] dark:border-[#1e3158] rounded text-[#111111] dark:text-[#e2e8f3] resize-y"
+                          className="w-full px-2 py-1 text-xs font-mono bg-white dark:bg-[#132420] border border-[#C1CFC4] dark:border-[#1E4035] rounded text-[#111111] dark:text-[#E2F0E8] resize-y"
                         />
                       </div>
                       <div>
@@ -226,7 +226,7 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
                           type="number"
                           value={tc.weight ?? 1}
                           onChange={e => updateTestCase(isPublic, idx, { weight: parseInt(e.target.value) || 1 })}
-                          className="w-full px-2 py-1 text-xs bg-white dark:bg-[#161c2d] border border-[#CBCCC9] dark:border-[#1e3158] rounded text-[#111111] dark:text-[#e2e8f3]"
+                          className="w-full px-2 py-1 text-xs bg-white dark:bg-[#132420] border border-[#C1CFC4] dark:border-[#1E4035] rounded text-[#111111] dark:text-[#E2F0E8]"
                         />
                       </div>
                       <div>
@@ -235,7 +235,7 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
                           type="number"
                           value={tc.order ?? idx}
                           onChange={e => updateTestCase(isPublic, idx, { order: parseInt(e.target.value) || 0 })}
-                          className="w-full px-2 py-1 text-xs bg-white dark:bg-[#161c2d] border border-[#CBCCC9] dark:border-[#1e3158] rounded text-[#111111] dark:text-[#e2e8f3]"
+                          className="w-full px-2 py-1 text-xs bg-white dark:bg-[#132420] border border-[#C1CFC4] dark:border-[#1E4035] rounded text-[#111111] dark:text-[#E2F0E8]"
                         />
                       </div>
                       <button
@@ -256,7 +256,7 @@ export function TaskEditModal({ open, task, saving, onClose, onSave, onChange }:
         <section>
           <button
             onClick={() => setShowAdvanced(!showAdvanced)}
-            className="flex items-center gap-1.5 text-xs font-semibold text-[#666666] uppercase tracking-wide hover:text-[#111111] dark:hover:text-[#e2e8f3] transition-colors"
+            className="flex items-center gap-1.5 text-xs font-semibold text-[#4B6B52] uppercase tracking-wide hover:text-[#111111] dark:hover:text-[#e2e8f3] transition-colors"
           >
             {showAdvanced ? <ChevronDown className="w-3 h-3" /> : <ChevronRight className="w-3 h-3" />}
             Sandbox / Advanced

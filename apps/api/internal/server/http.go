@@ -21,11 +21,12 @@ func NewHTTPServer(
 	kLogger klog.Logger,
 	rateLimitCfg *config.RateLimit,
 	cbCfg *config.CircuitBreaker,
+	allowedOrigins []string,
 ) *kratoshttp.Server {
 	opts := []kratoshttp.ServerOption{
 		kratoshttp.Address(addr),
 		kratoshttp.Timeout(timeout),
-		kratoshttp.Filter(httpCORSFilter()),
+		kratoshttp.Filter(httpCORSFilter(allowedOrigins)),
 		kratoshttp.Middleware(
 			recovery.Recovery(),
 			logging.Server(kLogger),

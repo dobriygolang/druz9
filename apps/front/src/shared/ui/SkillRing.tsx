@@ -17,8 +17,8 @@ const strokeMap = { sm: 3, md: 4, lg: 5 }
 
 const levelColors: Record<SkillLevel, string> = {
   beginner: '#94a3b8',
-  confident: '#6366F1',
-  strong: '#6366F1',
+  confident: '#059669',
+  strong: '#059669',
   expert: '#f59e0b',
 }
 
@@ -51,7 +51,7 @@ export function SkillRing({ score, level, label, size = 'md', className, onClick
       onClick={onClick}
       className={cn(
         'group flex flex-col items-center gap-1.5 rounded-2xl px-2 py-2 transition-colors',
-        onClick && 'hover:bg-[#f8fafc] dark:hover:bg-[#1a2236] cursor-pointer',
+        onClick && 'hover:bg-[#E2F0E8] dark:hover:bg-[#162E24] cursor-pointer',
         !onClick && 'cursor-default',
         className,
       )}
@@ -65,7 +65,7 @@ export function SkillRing({ score, level, label, size = 'md', className, onClick
             fill="none"
             stroke="currentColor"
             strokeWidth={sw}
-            className="text-[#E7E8E5] dark:text-[#1e3158]"
+            className="text-[#E4EBE5] dark:text-[#1E4035]"
           />
           <circle
             cx={px / 2}
@@ -90,7 +90,7 @@ export function SkillRing({ score, level, label, size = 'md', className, onClick
           )}
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
-          <span className="font-mono text-xs font-bold text-[#111111] dark:text-[#e2e8f3]" style={{ fontSize: size === 'sm' ? 9 : size === 'md' ? 11 : 14 }}>
+          <span className="font-mono text-xs font-bold text-[#111111] dark:text-[#E2F0E8]" style={{ fontSize: size === 'sm' ? 9 : size === 'md' ? 11 : 14 }}>
             {score}
           </span>
         </div>
@@ -98,12 +98,12 @@ export function SkillRing({ score, level, label, size = 'md', className, onClick
           <div className="absolute -right-0.5 -top-0.5 h-2.5 w-2.5 rounded-full bg-[#f59e0b] shadow-[0_0_6px_rgba(245,158,11,0.5)]" />
         )}
       </div>
-      <span className="text-[11px] font-medium text-[#111111] dark:text-[#e2e8f3] leading-tight text-center">{label}</span>
+      <span className="text-[11px] font-medium text-[#111111] dark:text-[#E2F0E8] leading-tight text-center">{label}</span>
       <span
         className="rounded-full px-1.5 py-0.5 text-[9px] font-semibold leading-tight"
         style={{
           color,
-          backgroundColor: level === 'expert' ? '#fffbeb' : level === 'beginner' ? '#f1f5f9' : '#eef2ff',
+          backgroundColor: level === 'expert' ? '#ecfdf5' : level === 'beginner' ? '#f1f5f9' : '#ecfdf5',
         }}
       >
         {levelLabels[level]}

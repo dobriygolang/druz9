@@ -108,12 +108,13 @@ func (r *Repo) JoinCircle(ctx context.Context, circleID, userID uuid.UUID) error
 	}
 	defer func() { _ = tx.Rollback(ctx) }()
 
-	var exists, isPublic bool
-	if err := tx.QueryRow(ctx, `SELECT EXISTS(SELECT 1 FROM circles WHERE id = $1), COALESCE((SELECT is_public FROM circles WHERE id = $1), false)`, circleID, circleID).Scan(&exists, &isPublic); err != nil {
-		return fmt.Errorf("check circle exists: %w", err)
-	}
-	if !exists {
-		return kratoserrors.NotFound("CIRCLE_NOT_FOUND", "circle not found")
+	var isPublic bool
+	err = tx.QueryRow(ctx, `SELECT is_public FROM circles WHERE id = $1`, circleID).Scan(&isPublic)
+	if err != nil {
+		if errors.Is(err, pgx.ErrNoRows) {
+			return kratoserrors.NotFound("CIRCLE_NOT_FOUND", "circle not found")
+		}
+		return fmt.Errorf("check circle: %w", err)
 	}
 	if !isPublic {
 		return kratoserrors.Forbidden("CIRCLE_PRIVATE", "this circle is private; you must be invited to join")

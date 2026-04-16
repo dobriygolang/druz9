@@ -77,10 +77,10 @@ export function BlindReviewPage() {
 
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-bold text-[#111111] dark:text-[#f8fafc]">
+          <h1 className="text-lg font-bold text-[#111111] dark:text-[#E2F0E8]">
             {t('blindReview.title', 'Blind Code Review')}
           </h1>
-          <p className="mt-1 text-xs text-[#667085] dark:text-[#7e93b0]">
+          <p className="mt-1 text-xs text-[#7A9982] dark:text-[#7BA88A]">
             {t('blindReview.subtitle', 'Review anonymous code. AI evaluates the quality of your review.')}
           </p>
         </div>
@@ -99,10 +99,10 @@ export function BlindReviewPage() {
       {task && !result && (
         <div className="grid gap-4 lg:grid-cols-2">
           <Card padding="lg">
-            <h2 className="mb-2 text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
+            <h2 className="mb-2 text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
               {task.taskTitle}
             </h2>
-            <p className="mb-3 text-xs text-[#667085] dark:text-[#7e93b0]">
+            <p className="mb-3 text-xs text-[#7A9982] dark:text-[#7BA88A]">
               {task.taskStatement.slice(0, 300)}{task.taskStatement.length > 300 ? '...' : ''}
             </p>
             <pre className="max-h-[400px] overflow-auto rounded-lg bg-[#1e1e1e] p-4 text-xs text-[#d4d4d4]">
@@ -111,17 +111,17 @@ export function BlindReviewPage() {
           </Card>
 
           <Card padding="lg">
-            <h2 className="mb-2 text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
+            <h2 className="mb-2 text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
               {t('blindReview.yourReview', 'Your Code Review')}
             </h2>
             <textarea
               value={review}
               onChange={(e) => setReview(e.target.value)}
               placeholder={t('blindReview.placeholder', 'What issues do you see? What would you improve? Be specific...')}
-              className="h-[300px] w-full rounded-lg border border-[#CBCCC9] bg-white p-3 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:border-[#6366F1] focus:outline-none dark:border-[#1e3158] dark:bg-[#161c2d] dark:text-[#f8fafc]"
+              className="h-[300px] w-full rounded-lg border border-[#C1CFC4] bg-white p-3 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:border-[#059669] focus:outline-none dark:border-[#1E4035] dark:bg-[#132420] dark:text-[#E2F0E8]"
             />
             <div className="mt-3 flex items-center justify-between">
-              <span className="text-[11px] text-[#667085] dark:text-[#7e93b0]">
+              <span className="text-[11px] text-[#7A9982] dark:text-[#7BA88A]">
                 {review.length} {t('blindReview.chars', 'characters')}
               </span>
               <Button variant="primary" size="sm" onClick={submitReview} disabled={loading || review.trim().length < 10}>
@@ -141,13 +141,13 @@ export function BlindReviewPage() {
               <p className={`font-mono text-3xl font-bold ${scoreColor(result.aiScore)}`}>
                 {result.aiScore}/10
               </p>
-              <p className="text-xs text-[#667085] dark:text-[#7e93b0]">
+              <p className="text-xs text-[#7A9982] dark:text-[#7BA88A]">
                 {t('blindReview.reviewScore', 'Review Quality Score')}
               </p>
             </div>
           </div>
           {result.aiFeedback && (
-            <p className="mt-4 text-sm leading-relaxed text-[#475569] dark:text-[#94a3b8]">
+            <p className="mt-4 text-sm leading-relaxed text-[#4B6B52] dark:text-[#94a3b8]">
               {result.aiFeedback}
             </p>
           )}
@@ -159,11 +159,11 @@ export function BlindReviewPage() {
 
       {!task && !error && (
         <Card padding="lg" className="flex flex-col items-center justify-center py-12 text-center">
-          <Eye className="mb-3 h-10 w-10 text-[#CBCCC9] dark:text-[#334155]" />
-          <p className="text-sm font-medium text-[#475569] dark:text-[#94a3b8]">
+          <Eye className="mb-3 h-10 w-10 text-[#C1CFC4] dark:text-[#1E4035]" />
+          <p className="text-sm font-medium text-[#4B6B52] dark:text-[#94a3b8]">
             {t('blindReview.empty', 'Click "Start" to get anonymous code for review')}
           </p>
-          <p className="mt-1 text-xs text-[#667085] dark:text-[#7e93b0]">
+          <p className="mt-1 text-xs text-[#7A9982] dark:text-[#7BA88A]">
             {t('blindReview.emptyHint', 'AI will evaluate the quality of your code review')}
           </p>
         </Card>

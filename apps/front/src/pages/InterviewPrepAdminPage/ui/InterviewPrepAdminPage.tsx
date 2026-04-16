@@ -60,8 +60,8 @@ export function InterviewPrepAdminPage() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-bold text-[#0f172a]">Interview Prep</h1>
-          <p className="text-sm text-[#666666] mt-0.5">Task and template management</p>
+          <h1 className="text-xl font-bold text-[#0B1210]">Interview Prep</h1>
+          <p className="text-sm text-[#4B6B52] mt-0.5">Task and template management</p>
         </div>
         <Button variant="orange" onClick={() => { setEditTask({}); setShowEdit(true) }}>
           <Plus className="w-4 h-4" /> Add task
@@ -69,38 +69,38 @@ export function InterviewPrepAdminPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex border-b border-[#CBCCC9] mb-4">
+      <div className="flex border-b border-[#C1CFC4] mb-4">
         {tabs.map(tab => (
           <button
             key={tab.id}
             onClick={() => setActiveTab(tab.id as any)}
-            className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === tab.id ? 'border-[#6366F1] text-[#0f172a]' : 'border-transparent text-[#666666] hover:text-[#0f172a]'}`}
+            className={`px-4 py-2.5 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === tab.id ? 'border-[#059669] text-[#0B1210]' : 'border-transparent text-[#4B6B52] hover:text-[#0B1210]'}`}
           >
             {tab.label}
-            {tab.count !== undefined && <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-[#F2F3F0] text-[#666666] rounded-full">{tab.count}</span>}
+            {tab.count !== undefined && <span className="ml-1.5 px-1.5 py-0.5 text-[10px] bg-[#F0F5F1] text-[#4B6B52] rounded-full">{tab.count}</span>}
           </button>
         ))}
       </div>
 
       {activeTab === 'tasks' && (
-        <div className="bg-white rounded-xl border border-[#CBCCC9] overflow-hidden">
-          <div className="divide-y divide-[#F2F3F0]">
+        <div className="bg-white rounded-xl border border-[#C1CFC4] overflow-hidden">
+          <div className="divide-y divide-[#F0F5F1]">
             {loading ? Array.from({ length: 5 }).map((_, i) => (
               <div key={i} className="px-5 py-4 flex items-center gap-4 animate-pulse">
-                <div className="w-8 h-8 rounded-lg bg-[#F2F3F0]" />
-                <div className="flex-1 h-4 bg-[#F2F3F0] rounded" />
-                <div className="w-20 h-4 bg-[#F2F3F0] rounded" />
+                <div className="w-8 h-8 rounded-lg bg-[#F0F5F1]" />
+                <div className="flex-1 h-4 bg-[#F0F5F1] rounded" />
+                <div className="w-20 h-4 bg-[#F0F5F1] rounded" />
               </div>
             )) : tasks.length === 0 ? (
               <div className="px-5 py-12 text-center text-sm text-[#94a3b8]">No tasks found</div>
             ) : tasks.map((task, i) => (
-              <div key={task.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#F2F3F0]">
-                <div className="w-8 h-8 rounded-lg bg-[#F2F3F0] flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-mono text-[#666666]">{i + 1}</span>
+              <div key={task.id} className="flex items-center gap-4 px-5 py-3.5 hover:bg-[#F0F5F1]">
+                <div className="w-8 h-8 rounded-lg bg-[#F0F5F1] flex items-center justify-center flex-shrink-0">
+                  <span className="text-xs font-mono text-[#4B6B52]">{i + 1}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#0f172a] truncate">{task.title}</p>
-                  <p className="text-xs text-[#666666]">{task.companyTag ?? 'General'} · {Math.round((task.durationSeconds ?? 0) / 60)} min</p>
+                  <p className="text-sm font-medium text-[#0B1210] truncate">{task.title}</p>
+                  <p className="text-xs text-[#4B6B52]">{task.companyTag ?? 'General'} · {Math.round((task.durationSeconds ?? 0) / 60)} min</p>
                 </div>
                 <Badge variant={task.prepType === 'coding' ? 'indigo' : task.prepType === 'system_design' ? 'orange' : 'success'}>
                   {PREP_TYPE_LABELS[task.prepType] ?? task.prepType}
@@ -109,7 +109,7 @@ export function InterviewPrepAdminPage() {
                   {task.isActive !== false ? 'Active' : 'Inactive'}
                 </Badge>
                 <div className="flex gap-1">
-                  <button onClick={() => { setEditTask(task); setShowEdit(true) }} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]">
+                  <button onClick={() => { setEditTask(task); setShowEdit(true) }} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F0F5F1] text-[#4B6B52]">
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
                   <button onClick={() => setDeleteId(task.id)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#fef2f2] text-[#94a3b8] hover:text-[#ef4444]">
@@ -123,13 +123,13 @@ export function InterviewPrepAdminPage() {
       )}
 
       {activeTab === 'pools' && (
-        <div className="bg-white rounded-xl border border-[#CBCCC9] p-8 text-center text-[#94a3b8] text-sm">
+        <div className="bg-white rounded-xl border border-[#C1CFC4] p-8 text-center text-[#94a3b8] text-sm">
           Question pool management coming soon
         </div>
       )}
 
       {activeTab === 'presets' && (
-        <div className="bg-white rounded-xl border border-[#CBCCC9] p-8 text-center text-[#94a3b8] text-sm">
+        <div className="bg-white rounded-xl border border-[#C1CFC4] p-8 text-center text-[#94a3b8] text-sm">
           Company preset management coming soon
         </div>
       )}

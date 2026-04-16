@@ -11,15 +11,15 @@ export function registerDarkTheme(monaco: typeof Monaco) {
       { token: 'number', foreground: 'f59e0b' },
     ],
     colors: {
-      'editor.background': '#0f172a',
+      'editor.background': '#0B1210',
       'editor.foreground': '#e2e8f0',
-      'editorLineNumber.foreground': '#334155',
+      'editorLineNumber.foreground': '#1E4035',
       'editorLineNumber.activeForeground': '#64748b',
       'editor.selectionBackground': '#1e3a5f',
       'editor.lineHighlightBackground': '#0f1f3d',
-      'editorCursor.foreground': '#6366F1',
+      'editorCursor.foreground': '#059669',
       'editorIndentGuide.background': '#1e293b',
-      'editorIndentGuide.activeBackground': '#334155',
+      'editorIndentGuide.activeBackground': '#1E4035',
     },
   })
 }

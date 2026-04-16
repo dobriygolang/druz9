@@ -33,8 +33,6 @@ SET
   END,
   primary_provider = COALESCE(NULLIF(canonical.primary_provider, ''), NULLIF(secondary.primary_provider, ''), ''),
   yandex_id = COALESCE(NULLIF(canonical.yandex_id, ''), NULLIF(secondary.yandex_id, ''), ''),
-  yandex_login = COALESCE(NULLIF(canonical.yandex_login, ''), NULLIF(secondary.yandex_login, ''), ''),
-  yandex_email = COALESCE(NULLIF(canonical.yandex_email, ''), NULLIF(secondary.yandex_email, ''), ''),
   yandex_avatar_url = COALESCE(NULLIF(canonical.yandex_avatar_url, ''), NULLIF(secondary.yandex_avatar_url, ''), ''),
   telegram_id = COALESCE(canonical.telegram_id, secondary.telegram_id),
   telegram_username = COALESCE(NULLIF(canonical.telegram_username, ''), NULLIF(secondary.telegram_username, ''), ''),

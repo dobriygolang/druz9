@@ -66,6 +66,9 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 		}
 		cfg.Server.RateLimit.BlockFor = d
 	}
+	if v := manager.GetValue(ctx, rtc.ServerAllowedOrigins); v.String() != "" {
+		cfg.Server.AllowedOrigins = splitTrimmed(v.String(), ",")
+	}
 	if v := manager.GetValue(ctx, rtc.ServerCircuitBreakerRequest); v.String() != "" {
 		parsed, parseErr := strconv.ParseInt(v.String(), 10, 64)
 		if parseErr != nil {
@@ -259,6 +262,11 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 
 	overrideSecretConfigFromEnv(cfg)
 
+	// Allow env override for CORS origins.
+	if value, ok := lookupEnvValue("ALLOWED_ORIGINS"); ok && value != "" {
+		cfg.Server.AllowedOrigins = splitTrimmed(value, ",")
+	}
+
 	if cfg.Data.Database.Source == "" {
 		return nil, fmt.Errorf("DATABASE_URL is required")
 	}
@@ -365,6 +373,17 @@ func overrideSecretConfigFromEnv(cfg *Bootstrap) {
 		}
 		cfg.External.NotificationService.Addr = strings.TrimSpace(value)
 	}
+}
+
+func splitTrimmed(s string, sep string) []string {
+	parts := strings.Split(s, sep)
+	result := make([]string, 0, len(parts))
+	for _, p := range parts {
+		if trimmed := strings.TrimSpace(p); trimmed != "" {
+			result = append(result, trimmed)
+		}
+	}
+	return result
 }
 
 func lookupEnvValue(key string) (string, bool) {

@@ -118,7 +118,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 	circleServiceDomain := circledomainservice.NewService(circledomainservice.Config{
 		Repository: storage.circleRepo,
 	})
-	eventServiceDomain := eventdomainservice.NewService(eventdomainservice.Config{
+	eventServiceDomain := eventdomainservice.NewEventService(eventdomainservice.Config{
 		Repository: storage.eventRepo,
 	})
 	podcastServiceDomain := podcastdomainservice.NewPodcastService(podcastdomainservice.Config{
@@ -132,7 +132,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Repository: storage.codeEditorRepo,
 		Sandbox:    sandboxService,
 	})
-	realtimeHub := realtime.NewCodeEditorHub(codeEditorServiceDomain)
+	realtimeHub := realtime.NewCodeEditorHub(codeEditorServiceDomain, bootstrap.cfg.Server.AllowedOrigins)
 	closer.AddSync(func() error { realtimeHub.Stop(); return nil })
 	arenaServiceDomain := apparenа.New(apparenа.Config{
 		Repository: storage.arenaRepo,
@@ -162,7 +162,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Repository: storage.challengeRepo,
 		Reviewer:   aiReviewService,
 	})
-	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain)
+	arenaRealtimeHub := realtime.NewArenaHub(arenaServiceDomain, bootstrap.cfg.Server.AllowedOrigins)
 	closer.AddSync(func() error { arenaRealtimeHub.Stop(); return nil })
 	solutionReviewService := solutionreview.New(solutionreview.Config{
 		Repo:      storage.solutionReviewRepo,

@@ -19,7 +19,7 @@ export function Select({ label, options, value, onChange, placeholder, className
   return (
     <div className="flex flex-col gap-1.5">
       {label && (
-        <label className="text-xs font-medium text-[#475569]">{label}</label>
+        <label className="text-xs font-medium text-[#4B6B52]">{label}</label>
       )}
       <select
         value={value ?? ''}

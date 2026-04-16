@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"strings"
 	"sync"
+	"time"
 
 	codeeditordomain "api/internal/domain/codeeditor"
 	"api/internal/model"
@@ -22,11 +23,14 @@ type codeEditorStateService interface {
 }
 
 type CodeEditorHub struct {
-	store codeEditorStateService
+	store    codeEditorStateService
+	upgrader websocket.Upgrader
 
 	mu     sync.Mutex
 	rooms  map[string]*codeEditorRoom
 	stopCh chan struct{}
+	ctx    context.Context
+	cancel context.CancelFunc
 }
 
 type codeEditorRoom struct {
@@ -64,32 +68,33 @@ type codeEditorClient struct {
 	closeOnce           sync.Once
 }
 
-var codeEditorUpgrader = websocket.Upgrader{
-	ReadBufferSize:  4096,
-	WriteBufferSize: 4096,
-	CheckOrigin: func(r *http.Request) bool {
-		return true
-	},
-}
-
-func NewCodeEditorHub(store codeEditorStateService) *CodeEditorHub {
+func NewCodeEditorHub(store codeEditorStateService, allowedOrigins []string) *CodeEditorHub {
+	ctx, cancel := context.WithCancel(context.Background())
 	hub := &CodeEditorHub{
-		store:  store,
+		store: store,
+		upgrader: websocket.Upgrader{
+			ReadBufferSize:  4096,
+			WriteBufferSize: 4096,
+			CheckOrigin:     originChecker(allowedOrigins),
+		},
 		rooms:  make(map[string]*codeEditorRoom),
 		stopCh: make(chan struct{}),
+		ctx:    ctx,
+		cancel: cancel,
 	}
 	go hub.snapshotLoop()
 	return hub
 }
 
-// Stop gracefully shuts down the snapshot loop.
+// Stop gracefully shuts down the snapshot loop and cancels in-flight DB operations.
 func (h *CodeEditorHub) Stop() {
 	close(h.stopCh)
+	h.cancel()
 }
 
 func (h *CodeEditorHub) Handler(roomID string, authenticatedUserID string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ws, err := codeEditorUpgrader.Upgrade(w, r, nil)
+		ws, err := h.upgrader.Upgrade(w, r, nil)
 		if err != nil {
 			return
 		}
@@ -118,7 +123,10 @@ func (h *CodeEditorHub) authorizeClient(client *codeEditorClient) bool {
 		return false
 	}
 
-	room, err := h.store.GetRoom(context.Background(), parsedRoomID)
+	ctx, cancel := context.WithTimeout(h.ctx, 5*time.Second)
+	defer cancel()
+
+	room, err := h.store.GetRoom(ctx, parsedRoomID)
 	if err != nil || room == nil {
 		return false
 	}

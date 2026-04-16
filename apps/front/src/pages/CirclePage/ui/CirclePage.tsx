@@ -239,11 +239,11 @@ export function CirclePage() {
   if (loading) {
     return (
       <div className="min-h-full">
-        <div className="h-14 bg-white dark:bg-[#0f1117] border-b border-[#E7E8E5] dark:border-[#1e3158] animate-pulse" />
-        <div className="h-52 bg-gradient-to-br from-[#e2e8f0] to-[#cbd5e1] dark:from-[#1a2540] dark:to-[#161c2d] animate-pulse" />
+        <div className="h-14 bg-white dark:bg-[#0B1210] border-b border-[#E4EBE5] dark:border-[#1E4035] animate-pulse" />
+        <div className="h-52 bg-gradient-to-br from-[#e2e8f0] to-[#C1D9CA] dark:from-[#163028] dark:to-[#161c2d] animate-pulse" />
         <div className="px-4 py-4 flex flex-col gap-3">
-          <div className="h-24 bg-[#e2e8f0] dark:bg-[#1e3158] rounded-2xl animate-pulse" />
-          <div className="h-32 bg-[#e2e8f0] dark:bg-[#1e3158] rounded-2xl animate-pulse" />
+          <div className="h-24 bg-[#e2e8f0] dark:bg-[#1E4035] rounded-2xl animate-pulse" />
+          <div className="h-32 bg-[#e2e8f0] dark:bg-[#1E4035] rounded-2xl animate-pulse" />
         </div>
       </div>
     )
@@ -263,10 +263,10 @@ export function CirclePage() {
         canonicalPath={circleId ? `/community/circles/${circleId}` : '/community/circles'}
       />
       {/* Top navigation bar */}
-      <div className="sticky top-0 z-20 bg-white/80 dark:bg-[#0f1117]/80 backdrop-blur-md border-b border-[#E7E8E5] dark:border-[#1e3158] px-4 h-14 flex items-center justify-between flex-shrink-0">
+      <div className="sticky top-0 z-20 bg-white/80 dark:bg-[#0B1210]/80 backdrop-blur-md border-b border-[#E4EBE5] dark:border-[#1E4035] px-4 h-14 flex items-center justify-between flex-shrink-0">
         <button
           onClick={() => navigate('/community/circles')}
-          className="flex items-center gap-1.5 text-sm font-medium text-[#666666] dark:text-[#7e93b0] hover:text-[#111111] dark:hover:text-white transition-colors"
+          className="flex items-center gap-1.5 text-sm font-medium text-[#4B6B52] dark:text-[#7BA88A] hover:text-[#111111] dark:hover:text-white transition-colors"
         >
           <ArrowLeft className="w-4 h-4" />
           {t('circles.title')}
@@ -274,7 +274,7 @@ export function CirclePage() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleShare}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1e3158] text-[#666666] dark:text-[#7e93b0] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F0F5F1] dark:hover:bg-[#1E4035] text-[#4B6B52] dark:text-[#7BA88A] transition-colors"
             title={t('circle.share')}
           >
             {copied ? <Check className="w-4 h-4 text-[#22c55e]" /> : <Share2 className="w-4 h-4" />}
@@ -333,8 +333,8 @@ export function CirclePage() {
                 </span>
               )}
             </div>
-            <h1 className="text-xl font-bold text-[#0f172a] dark:text-[#e2e8f3] leading-tight truncate">{circle.name}</h1>
-            <p className="text-sm text-[#475569] dark:text-[#7e93b0] mt-0.5 flex items-center gap-1.5">
+            <h1 className="text-xl font-bold text-[#0B1210] dark:text-[#E2F0E8] leading-tight truncate">{circle.name}</h1>
+            <p className="text-sm text-[#4B6B52] dark:text-[#7BA88A] mt-0.5 flex items-center gap-1.5">
               <Users className="w-3.5 h-3.5 flex-shrink-0" />
               {t('circle.membersCount', { count: circle.memberCount })}
             </p>
@@ -342,7 +342,7 @@ export function CirclePage() {
         </div>
 
         {circle.description && (
-          <p className="relative mt-5 text-sm text-[#334155] dark:text-[#94a3b8] leading-relaxed bg-white/50 dark:bg-white/5 rounded-xl px-4 py-3 border border-white/60 dark:border-white/10 backdrop-blur-sm">
+          <p className="relative mt-5 text-sm text-[#1E4035] dark:text-[#94a3b8] leading-relaxed bg-white/50 dark:bg-white/5 rounded-xl px-4 py-3 border border-white/60 dark:border-white/10 backdrop-blur-sm">
             {circle.description}
           </p>
         )}
@@ -374,7 +374,7 @@ export function CirclePage() {
             <Play className="w-3.5 h-3.5" />
             {t('circle.startPractice')}
           </Button>
-          <p className="text-[11px] text-[#64748b] dark:text-[#4d6380] mt-1.5">
+          <p className="text-[11px] text-[#7A9982] dark:text-[#4A7058] mt-1.5">
             {t('circle.startPracticeHint')}
           </p>
         </div>
@@ -393,8 +393,8 @@ export function CirclePage() {
             onClick={() => setActiveTab(tab.id)}
             className={`px-4 py-1.5 text-sm font-medium rounded-lg transition-all flex items-center gap-1.5 ${
               activeTab === tab.id
-                ? 'bg-white dark:bg-[#161c2d] text-[#111111] dark:text-[#e2e8f3] shadow-sm border border-[#E7E8E5] dark:border-[#1e3158]'
-                : 'text-[#666666] dark:text-[#7e93b0] hover:text-[#111111] dark:hover:text-[#e2e8f3]'
+                ? 'bg-white dark:bg-[#132420] text-[#111111] dark:text-[#E2F0E8] shadow-sm border border-[#E4EBE5] dark:border-[#1E4035]'
+                : 'text-[#4B6B52] dark:text-[#7BA88A] hover:text-[#111111] dark:hover:text-[#e2e8f3]'
             }`}
           >
             {tab.icon}
@@ -411,17 +411,17 @@ export function CirclePage() {
           <>
             {pulseLoading ? (
               <>
-                <div className="h-20 bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] animate-pulse" />
-                <div className="h-40 bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] animate-pulse" />
+                <div className="h-20 bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] animate-pulse" />
+                <div className="h-40 bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] animate-pulse" />
               </>
             ) : pulse ? (
               <>
                 {/* Active today */}
-                <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-4">
+                <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] px-5 py-4">
                   <div className="flex items-center justify-between">
                     <div>
                       <p className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider">{t('circle.pulse.activeToday')}</p>
-                      <p className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3] mt-1">
+                      <p className="text-2xl font-bold text-[#111111] dark:text-[#E2F0E8] mt-1">
                         {pulse.activeToday}<span className="text-sm font-normal text-[#94a3b8]">/{pulse.totalMembers}</span>
                       </p>
                     </div>
@@ -436,7 +436,7 @@ export function CirclePage() {
 
                 {/* Week activity bars */}
                 {pulse.weekActivity.length > 0 && (
-                  <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-4">
+                  <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] px-5 py-4">
                     <p className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider mb-3">{t('circle.pulse.weekActivity')}</p>
                     <div className="flex flex-col gap-2">
                       {pulse.weekActivity.map(day => {
@@ -447,19 +447,19 @@ export function CirclePage() {
                         return (
                           <div key={day.date} className="flex items-center gap-3">
                             <span className="text-xs text-[#94a3b8] w-10 text-right flex-shrink-0">{dayLabel}</span>
-                            <div className="flex-1 h-5 bg-[#f1f5f9] dark:bg-[#1a2236] rounded-full overflow-hidden relative">
+                            <div className="flex-1 h-5 bg-[#f1f5f9] dark:bg-[#162E24] rounded-full overflow-hidden relative">
                               <div
                                 className="h-full rounded-full transition-all duration-500"
                                 style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${grad.from}, ${grad.to})`, minWidth: total > 0 ? '8px' : '0' }}
                               />
                             </div>
-                            <span className="text-xs font-medium text-[#666666] dark:text-[#7e93b0] w-6 text-right flex-shrink-0">{total}</span>
+                            <span className="text-xs font-medium text-[#4B6B52] dark:text-[#7BA88A] w-6 text-right flex-shrink-0">{total}</span>
                           </div>
                         )
                       })}
                     </div>
                     <div className="flex items-center gap-4 mt-3 text-[10px] text-[#94a3b8]">
-                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#6366f1]" />{t('circle.pulse.daily')}</span>
+                      <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#059669]" />{t('circle.pulse.daily')}</span>
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#f59e0b]" />{t('circle.pulse.duels')}</span>
                       <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-[#22c55e]" />{t('circle.pulse.mocks')}</span>
                     </div>
@@ -468,22 +468,22 @@ export function CirclePage() {
 
                 {/* Recent actions */}
                 {pulse.recentActions.length > 0 && (
-                  <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] overflow-hidden">
+                  <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] overflow-hidden">
                     <div className="px-5 pt-4 pb-2">
                       <p className="text-[11px] font-semibold text-[#94a3b8] uppercase tracking-wider">{t('circle.pulse.recentActions')}</p>
                     </div>
-                    <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+                    <div className="divide-y divide-[#F0F5F1] dark:divide-[#1E4035]">
                       {pulse.recentActions.map((action, idx) => {
                         const name = [action.firstName, action.lastName].filter(Boolean).join(' ') || t('circle.memberFallback')
-                        const actionColor = action.actionType === 'daily' ? '#6366f1' : action.actionType === 'duel' ? '#f59e0b' : '#22c55e'
+                        const actionColor = action.actionType === 'daily' ? '#059669' : action.actionType === 'duel' ? '#f59e0b' : '#22c55e'
                         return (
                           <div key={idx} className="flex items-center gap-3 px-5 py-2.5">
                             <Avatar name={name} src={action.avatarUrl || undefined} size="xs" />
                             <div className="flex-1 min-w-0">
-                              <p className="text-sm text-[#111111] dark:text-[#e2e8f3] truncate">
+                              <p className="text-sm text-[#111111] dark:text-[#E2F0E8] truncate">
                                 <span className="font-medium">{name}</span>
                                 {' '}
-                                <span className="text-[#666666] dark:text-[#7e93b0]">
+                                <span className="text-[#4B6B52] dark:text-[#7BA88A]">
                                   {t(`circle.pulse.action.${action.actionType}`, { detail: action.actionDetail })}
                                 </span>
                               </p>
@@ -501,8 +501,8 @@ export function CirclePage() {
 
                 {/* Empty pulse state */}
                 {pulse.recentActions.length === 0 && pulse.weekActivity.every(d => d.dailyCount + d.duelCount + d.mockCount === 0) && (
-                  <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-10 text-center">
-                    <Zap className="w-8 h-8 text-[#CBCCC9] mx-auto mb-3" />
+                  <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] px-5 py-10 text-center">
+                    <Zap className="w-8 h-8 text-[#C1CFC4] mx-auto mb-3" />
                     <p className="text-sm text-[#94a3b8]">{t('circle.pulse.empty')}</p>
                   </div>
                 )}
@@ -524,23 +524,23 @@ export function CirclePage() {
 
             {/* Stats table */}
             {memberStatsLoading ? (
-              <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] overflow-hidden">
-                <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+              <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] overflow-hidden">
+                <div className="divide-y divide-[#F0F5F1] dark:divide-[#1E4035]">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div key={i} className="flex items-center gap-3 px-5 py-3 animate-pulse">
-                      <div className="w-9 h-9 rounded-full bg-[#e2e8f0] dark:bg-[#1e3158]" />
+                      <div className="w-9 h-9 rounded-full bg-[#e2e8f0] dark:bg-[#1E4035]" />
                       <div className="flex-1">
-                        <div className="h-3 w-32 bg-[#e2e8f0] dark:bg-[#1e3158] rounded mb-1.5" />
-                        <div className="h-2.5 w-48 bg-[#e2e8f0] dark:bg-[#1e3158] rounded" />
+                        <div className="h-3 w-32 bg-[#e2e8f0] dark:bg-[#1E4035] rounded mb-1.5" />
+                        <div className="h-2.5 w-48 bg-[#e2e8f0] dark:bg-[#1E4035] rounded" />
                       </div>
                     </div>
                   ))}
                 </div>
               </div>
             ) : memberStats.length > 0 ? (
-              <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] overflow-hidden">
+              <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] overflow-hidden">
                 {/* Header */}
-                <div className="hidden sm:grid grid-cols-[1fr_80px_70px_70px_70px_70px] gap-2 px-5 py-2.5 text-[10px] font-semibold text-[#94a3b8] uppercase tracking-wider border-b border-[#F2F3F0] dark:border-[#1e3158]">
+                <div className="hidden sm:grid grid-cols-[1fr_80px_70px_70px_70px_70px] gap-2 px-5 py-2.5 text-[10px] font-semibold text-[#94a3b8] uppercase tracking-wider border-b border-[#F2F3F0] dark:border-[#1E4035]">
                   <span>{t('circle.stats.name')}</span>
                   <span className="text-center">{t('circle.stats.rating', 'Rating')}</span>
                   <span className="text-center">{t('circle.stats.daily')}</span>
@@ -548,33 +548,33 @@ export function CirclePage() {
                   <span className="text-center">{t('circle.stats.mocks')}</span>
                   <span className="text-center">{t('circle.stats.role')}</span>
                 </div>
-                <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+                <div className="divide-y divide-[#F0F5F1] dark:divide-[#1E4035]">
                   {memberStats.map(s => {
                     const name = [s.firstName, s.lastName].filter(Boolean).join(' ') || t('circle.memberFallback')
                     return (
                       <button
                         key={s.userId}
                         onClick={() => navigate(`/profile/${s.userId}`)}
-                        className="w-full flex items-center sm:grid sm:grid-cols-[1fr_80px_70px_70px_70px_70px] gap-2 px-5 py-3 hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] transition-colors text-left"
+                        className="w-full flex items-center sm:grid sm:grid-cols-[1fr_80px_70px_70px_70px_70px] gap-2 px-5 py-3 hover:bg-[#F0F5F1] dark:hover:bg-[#162E24] transition-colors text-left"
                       >
                         <div className="flex items-center gap-3 min-w-0">
                           <Avatar name={name} src={s.avatarUrl || undefined} size="sm" />
                           <div className="min-w-0">
-                            <p className="text-sm font-medium text-[#111111] dark:text-[#e2e8f3] truncate">{name}</p>
+                            <p className="text-sm font-medium text-[#111111] dark:text-[#E2F0E8] truncate">{name}</p>
                             {s.role === 'creator' && (
-                              <p className="text-[11px] text-[#6366F1]">{t('circle.creator')}</p>
+                              <p className="text-[11px] text-[#059669]">{t('circle.creator')}</p>
                             )}
                           </div>
                         </div>
                         {/* Mobile: inline stats */}
-                        <div className="flex items-center gap-3 sm:contents text-xs text-[#666666] dark:text-[#7e93b0] ml-auto sm:ml-0">
-                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#e2e8f3]">
+                        <div className="flex items-center gap-3 sm:contents text-xs text-[#4B6B52] dark:text-[#7BA88A] ml-auto sm:ml-0">
+                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#E2F0E8]">
                             {s.arenaRating ?? 300}
                             {s.arenaLeague && <span className="ml-1 text-[10px] text-[#94a3b8]">{s.arenaLeague}</span>}
                           </span>
-                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#e2e8f3]">{s.dailySolved}</span>
-                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#e2e8f3]">{s.duelsWon}/{s.duelsPlayed}</span>
-                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#e2e8f3]">{s.mocksDone}</span>
+                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#E2F0E8]">{s.dailySolved}</span>
+                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#E2F0E8]">{s.duelsWon}/{s.duelsPlayed}</span>
+                          <span className="sm:text-center sm:text-sm sm:font-medium sm:text-[#111111] sm:dark:text-[#E2F0E8]">{s.mocksDone}</span>
                           <span className="hidden sm:block sm:text-center text-xs text-[#94a3b8]">{s.role}</span>
                         </div>
                       </button>
@@ -583,8 +583,8 @@ export function CirclePage() {
                 </div>
               </div>
             ) : members.length === 0 && !membersLoading ? (
-              <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-10 text-center">
-                <Users className="w-8 h-8 text-[#CBCCC9] mx-auto mb-3" />
+              <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] px-5 py-10 text-center">
+                <Users className="w-8 h-8 text-[#C1CFC4] mx-auto mb-3" />
                 <p className="text-sm text-[#94a3b8]">{t('circle.noMembers')}</p>
               </div>
             ) : null}
@@ -595,18 +595,18 @@ export function CirclePage() {
         {activeTab === 'challenge' && (
           <>
             {challengeLoading ? (
-              <div className="h-40 bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] animate-pulse" />
+              <div className="h-40 bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] animate-pulse" />
             ) : challenge ? (
               <>
                 {/* Challenge header */}
-                <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-4">
+                <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] px-5 py-4">
                   <div className="flex items-center justify-between mb-3">
                     <div className="flex items-center gap-2">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: `${grad.from}18` }}>
                         <Trophy className="w-4 h-4" style={{ color: grad.from }} />
                       </div>
                       <div>
-                        <p className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">
+                        <p className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
                           {t(`circle.challenge.template.${challenge.templateKey}`)}
                         </p>
                         <p className="text-[11px] text-[#94a3b8]">
@@ -616,7 +616,7 @@ export function CirclePage() {
                     </div>
                     <div className="text-right">
                       <p className="text-[10px] text-[#94a3b8] uppercase tracking-wider">{t('circle.challenge.endsIn')}</p>
-                      <p className="text-xs font-medium text-[#111111] dark:text-[#e2e8f3]">
+                      <p className="text-xs font-medium text-[#111111] dark:text-[#E2F0E8]">
                         {Math.max(0, Math.ceil((new Date(challenge.endsAt).getTime() - Date.now()) / 86400000))} {t('circle.challenge.days')}
                       </p>
                     </div>
@@ -630,10 +630,10 @@ export function CirclePage() {
                     return (
                       <div>
                         <div className="flex items-center justify-between text-xs mb-1.5">
-                          <span className="text-[#666666] dark:text-[#7e93b0]">{t('circle.challenge.teamProgress')}</span>
-                          <span className="font-medium text-[#111111] dark:text-[#e2e8f3]">{completed}/{total}</span>
+                          <span className="text-[#4B6B52] dark:text-[#7BA88A]">{t('circle.challenge.teamProgress')}</span>
+                          <span className="font-medium text-[#111111] dark:text-[#E2F0E8]">{completed}/{total}</span>
                         </div>
-                        <div className="h-2.5 bg-[#f1f5f9] dark:bg-[#1a2236] rounded-full overflow-hidden">
+                        <div className="h-2.5 bg-[#f1f5f9] dark:bg-[#162E24] rounded-full overflow-hidden">
                           <div
                             className="h-full rounded-full transition-all duration-700"
                             style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${grad.from}, ${grad.to})` }}
@@ -645,29 +645,29 @@ export function CirclePage() {
                 </div>
 
                 {/* Per-member progress */}
-                <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] overflow-hidden">
-                  <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+                <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] overflow-hidden">
+                  <div className="divide-y divide-[#F0F5F1] dark:divide-[#1E4035]">
                     {challenge.progress.map(p => {
                       const name = [p.firstName, p.lastName].filter(Boolean).join(' ') || t('circle.memberFallback')
                       const done = p.current >= challenge.targetValue
                       const pct = Math.min(100, Math.round((p.current / challenge.targetValue) * 100))
                       return (
                         <div key={p.userId} className="flex items-center gap-3 px-5 py-3">
-                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0 ${done ? 'bg-[#22c55e] text-white' : 'bg-[#f1f5f9] dark:bg-[#1a2236] text-[#94a3b8]'}`}>
+                          <span className={`w-5 h-5 rounded-full flex items-center justify-center text-[10px] flex-shrink-0 ${done ? 'bg-[#22c55e] text-white' : 'bg-[#f1f5f9] dark:bg-[#162E24] text-[#94a3b8]'}`}>
                             {done ? <Check className="w-3 h-3" /> : null}
                           </span>
                           <Avatar name={name} src={p.avatarUrl || undefined} size="xs" />
                           <div className="flex-1 min-w-0">
-                            <p className="text-sm text-[#111111] dark:text-[#e2e8f3] truncate">{name}</p>
+                            <p className="text-sm text-[#111111] dark:text-[#E2F0E8] truncate">{name}</p>
                           </div>
                           <div className="flex items-center gap-2 flex-shrink-0">
-                            <div className="w-16 h-1.5 bg-[#f1f5f9] dark:bg-[#1a2236] rounded-full overflow-hidden">
+                            <div className="w-16 h-1.5 bg-[#f1f5f9] dark:bg-[#162E24] rounded-full overflow-hidden">
                               <div
                                 className="h-full rounded-full"
                                 style={{ width: `${pct}%`, background: done ? '#22c55e' : grad.from }}
                               />
                             </div>
-                            <span className="text-xs font-medium text-[#666666] dark:text-[#7e93b0] w-10 text-right">
+                            <span className="text-xs font-medium text-[#4B6B52] dark:text-[#7BA88A] w-10 text-right">
                               {p.current}/{challenge.targetValue}
                             </span>
                           </div>
@@ -678,8 +678,8 @@ export function CirclePage() {
                 </div>
               </>
             ) : (
-              <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-10 text-center">
-                <Target className="w-8 h-8 text-[#CBCCC9] mx-auto mb-3" />
+              <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] px-5 py-10 text-center">
+                <Target className="w-8 h-8 text-[#C1CFC4] mx-auto mb-3" />
                 <p className="text-sm text-[#94a3b8] mb-4">{t('circle.challenge.empty')}</p>
                 {isCreator && (
                   <Button variant="orange" size="sm" onClick={() => setShowCreateChallenge(true)}>
@@ -704,14 +704,14 @@ export function CirclePage() {
             <div className="flex flex-col gap-3">
               {eventsLoading ? (
                 Array.from({ length: 2 }).map((_, i) => (
-                  <div key={i} className="h-24 bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] animate-pulse" />
+                  <div key={i} className="h-24 bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] animate-pulse" />
                 ))
               ) : events.length === 0 ? (
-                <div className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] px-5 py-10 text-center">
-                  <Calendar className="w-8 h-8 text-[#CBCCC9] mx-auto mb-3" />
+                <div className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] px-5 py-10 text-center">
+                  <Calendar className="w-8 h-8 text-[#C1CFC4] mx-auto mb-3" />
                   <p className="text-sm text-[#94a3b8]">{t('circle.noEvents')}</p>
                   {circle.isJoined && (
-                    <button onClick={() => setShowCreateEvent(true)} className="mt-3 text-xs text-[#6366F1] hover:underline">
+                    <button onClick={() => setShowCreateEvent(true)} className="mt-3 text-xs text-[#059669] hover:underline">
                       {t('circle.createFirstEvent')}
                     </button>
                   )}
@@ -719,19 +719,19 @@ export function CirclePage() {
               ) : events.map(ev => {
                 const repeatLabel = ev.repeat && ev.repeat !== 'none' ? t(`events.repeat.${ev.repeat as EventRepeat}`) : null
                 return (
-                  <div key={ev.id} className="bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] p-4">
+                  <div key={ev.id} className="bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] p-4">
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex-1 min-w-0">
                         <div className="flex items-center gap-2 flex-wrap">
-                          <h4 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{ev.title}</h4>
+                          <h4 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{ev.title}</h4>
                           {repeatLabel && (
-                            <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 bg-[#EEF2FF] dark:bg-[#1e1e4a] text-[#6366F1] rounded-full font-medium">
+                            <span className="inline-flex items-center gap-1 text-[10px] px-2 py-0.5 bg-[#ecfdf5] dark:bg-[#0d2a1f] text-[#059669] rounded-full font-medium">
                               <RefreshCw className="w-2.5 h-2.5" />{repeatLabel}
                             </span>
                           )}
                         </div>
                         {ev.description && (
-                          <p className="text-xs text-[#666666] dark:text-[#7e93b0] mt-1 line-clamp-2">{ev.description}</p>
+                          <p className="text-xs text-[#4B6B52] dark:text-[#7BA88A] mt-1 line-clamp-2">{ev.description}</p>
                         )}
                         <div className="flex items-center gap-3 mt-2">
                           <span className="flex items-center gap-1 text-xs text-[#94a3b8]">
@@ -748,7 +748,7 @@ export function CirclePage() {
                       <div className="flex flex-col items-end gap-2 flex-shrink-0">
                         {ev.meetingLink && (
                           <a href={ev.meetingLink} target="_blank" rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-xs text-[#6366F1] hover:underline"
+                            className="flex items-center gap-1 text-xs text-[#059669] hover:underline"
                             onClick={e => e.stopPropagation()}
                           >
                             <ExternalLink className="w-3 h-3" /> {t('circle.link')}
@@ -761,7 +761,7 @@ export function CirclePage() {
                           </button>
                         ) : (
                           <button onClick={() => eventApi.joinEvent(ev.id).then(loadEvents)}
-                            className="text-xs font-medium text-[#6366F1] hover:underline">
+                            className="text-xs font-medium text-[#059669] hover:underline">
                             {t('events.join')}
                           </button>
                         )}
@@ -814,7 +814,7 @@ export function CirclePage() {
           <Input label={t('events.form.title')} value={eventForm.title} onChange={e => setEventForm(f => ({ ...f, title: e.target.value }))} placeholder={t('circle.eventTitlePlaceholder')} />
           <Input label={t('events.form.dateTime')} type="datetime-local" value={eventForm.scheduledAt} onChange={e => setEventForm(f => ({ ...f, scheduledAt: e.target.value }))} />
           <div>
-            <label className="text-xs font-medium text-[#475569] mb-1 block">{t('circle.repeat')}</label>
+            <label className="text-xs font-medium text-[#4B6B52] mb-1 block">{t('circle.repeat')}</label>
             <select
               value={eventForm.repeat}
               onChange={e => setEventForm(f => ({ ...f, repeat: e.target.value as EventRepeat }))}
@@ -846,7 +846,7 @@ export function CirclePage() {
       >
         <div className="flex flex-col gap-4">
           <div>
-            <label className="text-xs font-medium text-[#475569] dark:text-[#94a3b8] mb-2 block">{t('circle.challenge.selectType')}</label>
+            <label className="text-xs font-medium text-[#4B6B52] dark:text-[#94a3b8] mb-2 block">{t('circle.challenge.selectType')}</label>
             <div className="flex flex-col gap-2">
               {CHALLENGE_TEMPLATES.map(tmpl => (
                 <button
@@ -854,12 +854,12 @@ export function CirclePage() {
                   onClick={() => setChallengeForm(f => ({ ...f, templateKey: tmpl.key, targetValue: tmpl.defaultTarget }))}
                   className={`flex items-center gap-3 px-4 py-3 rounded-xl border transition-all text-left ${
                     challengeForm.templateKey === tmpl.key
-                      ? 'border-[#6366F1] bg-[#EEF2FF] dark:bg-[#1e1e4a]'
-                      : 'border-[#E7E8E5] dark:border-[#1e3158] hover:border-[#94a3b8]'
+                      ? 'border-[#059669] bg-[#ecfdf5] dark:bg-[#0d2a1f]'
+                      : 'border-[#E4EBE5] dark:border-[#1E4035] hover:border-[#94a3b8]'
                   }`}
                 >
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-[#111111] dark:text-[#e2e8f3]">
+                    <p className="text-sm font-medium text-[#111111] dark:text-[#E2F0E8]">
                       {t(`circle.challenge.template.${tmpl.key}`)}
                     </p>
                     <p className="text-xs text-[#94a3b8] mt-0.5">
@@ -867,21 +867,21 @@ export function CirclePage() {
                     </p>
                   </div>
                   {challengeForm.templateKey === tmpl.key && (
-                    <Check className="w-4 h-4 text-[#6366F1] flex-shrink-0" />
+                    <Check className="w-4 h-4 text-[#059669] flex-shrink-0" />
                   )}
                 </button>
               ))}
             </div>
           </div>
           <div>
-            <label className="text-xs font-medium text-[#475569] dark:text-[#94a3b8] mb-1 block">{t('circle.challenge.targetLabel')}</label>
+            <label className="text-xs font-medium text-[#4B6B52] dark:text-[#94a3b8] mb-1 block">{t('circle.challenge.targetLabel')}</label>
             <input
               type="number"
               min={1}
               max={100}
               value={challengeForm.targetValue}
               onChange={e => setChallengeForm(f => ({ ...f, targetValue: Math.max(1, parseInt(e.target.value) || 1) }))}
-              className="w-full px-3 py-2 rounded-lg border border-[#E7E8E5] dark:border-[#1e3158] bg-white dark:bg-[#0f1117] text-sm text-[#111111] dark:text-[#e2e8f3] focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30"
+              className="w-full px-3 py-2 rounded-lg border border-[#E4EBE5] dark:border-[#1E4035] bg-white dark:bg-[#0B1210] text-sm text-[#111111] dark:text-[#E2F0E8] focus:outline-none focus:ring-2 focus:ring-[#059669]/30"
             />
             <p className="text-[11px] text-[#94a3b8] mt-1">{t('circle.challenge.duration')}</p>
           </div>
@@ -899,7 +899,7 @@ export function CirclePage() {
           </>
         }
       >
-        <p className="text-sm text-[#475569] dark:text-[#94a3b8]">
+        <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8]">
           {t('circle.deleteBody')}
         </p>
       </Modal>

@@ -15,7 +15,7 @@ export function ErrorState({ message = 'Failed to load data', onRetry }: ErrorSt
         <AlertTriangle className="w-7 h-7 text-[#dc2626]" />
       </div>
       <p className="text-base font-semibold text-[#111111] font-geist mb-1">{message}</p>
-      <p className="text-sm text-[#666666] font-geist mb-4">{t('error.checkConnection')}</p>
+      <p className="text-sm text-[#4B6B52] font-geist mb-4">{t('error.checkConnection')}</p>
       {onRetry && (
         <Button variant="orange" size="sm" onClick={onRetry}>
           {t('common.retry')}

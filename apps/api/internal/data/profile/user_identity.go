@@ -89,8 +89,6 @@ INSERT INTO users (
   first_name,
   last_name,
   yandex_id,
-  yandex_login,
-  yandex_email,
   yandex_avatar_url,
   primary_provider,
   current_workplace,
@@ -105,12 +103,10 @@ VALUES (
   COALESCE(NULLIF($3, ''), ''),
   COALESCE(NULLIF($4, ''), ''),
   $1,
-  COALESCE(NULLIF($2, ''), ''),
-  COALESCE(NULLIF($6, ''), ''),
   COALESCE(NULLIF($5, ''), ''),
   'yandex',
   '',
-  $7,
+  $6,
   NOW(),
   NOW(),
   NOW()
@@ -122,8 +118,6 @@ SET
   username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''), ''),
   first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
   last_name = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
-  yandex_login = COALESCE(NULLIF(EXCLUDED.yandex_login, ''), users.yandex_login, ''),
-  yandex_email = COALESCE(NULLIF(EXCLUDED.yandex_email, ''), users.yandex_email, ''),
   yandex_avatar_url = COALESCE(NULLIF(EXCLUDED.yandex_avatar_url, ''), users.yandex_avatar_url, ''),
   primary_provider = COALESCE(NULLIF(users.primary_provider, ''), 'yandex'),
   last_active_at = NOW(),
@@ -140,7 +134,6 @@ RETURNING id
 		payload.FirstName,
 		payload.LastName,
 		payload.AvatarURL,
-		payload.Email,
 		model.UserStatusPendingProfile,
 	).Scan(&userID); err != nil {
 		return nil, fmt.Errorf("upsert yandex user: %w", err)
@@ -208,12 +201,10 @@ SET username = COALESCE(NULLIF(username, ''), NULLIF($2, ''), ''),
     first_name = COALESCE(NULLIF($3, ''), first_name),
     last_name = COALESCE(NULLIF($4, ''), last_name),
     yandex_id = $6,
-    yandex_login = COALESCE(NULLIF($2, ''), yandex_login, ''),
-    yandex_email = COALESCE(NULLIF($7, ''), yandex_email, ''),
     yandex_avatar_url = COALESCE(NULLIF($5, ''), yandex_avatar_url, ''),
     updated_at = NOW()
 WHERE id = $1
-`, userID, payload.Username, payload.FirstName, payload.LastName, payload.AvatarURL, payload.ProviderUserID, payload.Email)
+`, userID, payload.Username, payload.FirstName, payload.LastName, payload.AvatarURL, payload.ProviderUserID)
 	if err != nil {
 		return fmt.Errorf("bind yandex user: %w", err)
 	}

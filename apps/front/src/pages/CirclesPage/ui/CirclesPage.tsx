@@ -72,11 +72,11 @@ export function CirclesPage() {
   if (error) return (
       <div className="flex flex-col items-center justify-center py-24 text-center px-4">
         <PageMeta title={t('circles.meta.title')} description={t('circles.meta.description')} canonicalPath="/community/circles" />
-        <div className="w-16 h-16 rounded-2xl bg-[#EEF2FF] dark:bg-[#1a2540] flex items-center justify-center mb-4">
-          <Users className="w-8 h-8 text-[#6366F1]" />
+        <div className="w-16 h-16 rounded-2xl bg-[#ecfdf5] dark:bg-[#163028] flex items-center justify-center mb-4">
+          <Users className="w-8 h-8 text-[#059669]" />
         </div>
-      <h2 className="text-base font-bold text-[#111111] dark:text-[#e2e8f3] mb-1">{t('circles.soonTitle')}</h2>
-      <p className="text-sm text-[#666666] dark:text-[#7e93b0]">{t('circles.soonBody')}</p>
+      <h2 className="text-base font-bold text-[#111111] dark:text-[#E2F0E8] mb-1">{t('circles.soonTitle')}</h2>
+      <p className="text-sm text-[#4B6B52] dark:text-[#7BA88A]">{t('circles.soonBody')}</p>
     </div>
   )
 
@@ -87,9 +87,9 @@ export function CirclesPage() {
         <section className="section-enter mb-5 rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(239,246,255,0.94)_48%,_rgba(255,247,237,0.94))] p-5 shadow-[0_18px_34px_rgba(15,23,42,0.07)]">
           <div className="flex items-start justify-between gap-4">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1]">Interest Circles</p>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#059669]">Interest Circles</p>
               <h1 className="mt-2 text-2xl font-bold text-[#111111]">{t('circles.title')}</h1>
-              <p className="mt-2 text-sm leading-6 text-[#475569]">{t('circles.subtitleMobile')}</p>
+              <p className="mt-2 text-sm leading-6 text-[#4B6B52]">{t('circles.subtitleMobile')}</p>
             </div>
             <Button variant="orange" size="sm" onClick={() => setShowCreate(true)} className="shrink-0 rounded-full px-4">
               <Plus className="w-3.5 h-3.5" /> {t('common.create')}
@@ -99,11 +99,11 @@ export function CirclesPage() {
           {!loading && circles.length > 0 && (
             <div className="mt-4 grid grid-cols-2 gap-2">
               <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 shadow-sm backdrop-blur">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">{t('circles.total')}</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#7A9982]">{t('circles.total')}</p>
                 <p className="mt-2 font-mono text-2xl font-bold text-[#111111]">{circles.length}</p>
               </div>
               <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 shadow-sm backdrop-blur">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">{t('circles.members')}</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#7A9982]">{t('circles.members')}</p>
                 <p className="mt-2 font-mono text-2xl font-bold text-[#111111]">{totalMembers}</p>
               </div>
             </div>
@@ -115,7 +115,7 @@ export function CirclesPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={t('circles.searchPlaceholder')}
-              className="pl-10 pr-4 py-3 w-full bg-white/88 border border-white/80 rounded-2xl text-sm text-[#111111] placeholder:text-[#94a3b8] shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
+              className="pl-10 pr-4 py-3 w-full bg-white/88 border border-white/80 rounded-2xl text-sm text-[#111111] placeholder:text-[#94a3b8] shadow-[0_10px_24px_rgba(15,23,42,0.05)] backdrop-blur focus:outline-none focus:ring-2 focus:ring-[#059669]/20"
             />
           </div>
         </section>
@@ -123,8 +123,8 @@ export function CirclesPage() {
         <>
           <div className="flex items-center justify-between mb-5">
             <div>
-              <h1 className="text-xl font-bold text-[#111111] dark:text-[#e2e8f3]">{t('circles.title')}</h1>
-              <p className="text-sm text-[#666666] dark:text-[#7e93b0] mt-0.5">{t('circles.subtitle')}</p>
+              <h1 className="text-xl font-bold text-[#111111] dark:text-[#E2F0E8]">{t('circles.title')}</h1>
+              <p className="text-sm text-[#4B6B52] dark:text-[#7BA88A] mt-0.5">{t('circles.subtitle')}</p>
             </div>
             <Button variant="orange" size="sm" onClick={() => setShowCreate(true)}>
               <Plus className="w-3.5 h-3.5" /> {t('circles.create')}
@@ -133,12 +133,12 @@ export function CirclesPage() {
 
           {!loading && circles.length > 0 && (
             <div className="flex items-center gap-5 mb-4">
-              <span className="text-sm text-[#666666] dark:text-[#7e93b0]">
-                <span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{circles.length}</span> {t('circles.totalShort')}
+              <span className="text-sm text-[#4B6B52] dark:text-[#7BA88A]">
+                <span className="font-semibold text-[#111111] dark:text-[#E2F0E8]">{circles.length}</span> {t('circles.totalShort')}
               </span>
-              <span className="w-px h-3.5 bg-[#CBCCC9] dark:bg-[#1e3158]" />
-              <span className="text-sm text-[#666666] dark:text-[#7e93b0]">
-                <span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{totalMembers}</span> {t('circles.membersShort')}
+              <span className="w-px h-3.5 bg-[#C1CFC4] dark:bg-[#1E4035]" />
+              <span className="text-sm text-[#4B6B52] dark:text-[#7BA88A]">
+                <span className="font-semibold text-[#111111] dark:text-[#E2F0E8]">{totalMembers}</span> {t('circles.membersShort')}
               </span>
             </div>
           )}
@@ -149,7 +149,7 @@ export function CirclesPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={t('circles.searchPlaceholder')}
-              className="pl-9 pr-4 py-2 w-full max-w-sm bg-white dark:bg-[#0f1117] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg text-sm text-[#111111] dark:text-[#e2e8f3] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20"
+              className="pl-9 pr-4 py-2 w-full max-w-sm bg-white dark:bg-[#0B1210] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg text-sm text-[#111111] dark:text-[#E2F0E8] placeholder:text-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#059669]/20"
             />
           </div>
         </>
@@ -159,16 +159,16 @@ export function CirclesPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {loading
           ? Array.from({ length: 6 }).map((_, i) => (
-            <div key={i} className="h-[200px] bg-white dark:bg-[#161c2d] rounded-2xl border border-[#CBCCC9] dark:border-[#1e3158] animate-pulse" />
+            <div key={i} className="h-[200px] bg-white dark:bg-[#132420] rounded-2xl border border-[#C1CFC4] dark:border-[#1E4035] animate-pulse" />
           ))
           : filtered.length === 0
             ? (
               <div className="col-span-1 sm:col-span-2 lg:col-span-3 flex flex-col items-center justify-center py-20 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-[#f0f0ee] dark:bg-[#1a2540] flex items-center justify-center mb-4">
+                <div className="w-14 h-14 rounded-2xl bg-[#E6F0E8] dark:bg-[#163028] flex items-center justify-center mb-4">
                   <Users className="w-7 h-7 text-[#94a3b8]" />
                 </div>
-                <p className="text-base font-semibold text-[#111111] dark:text-[#e2e8f3] mb-1">{t('circles.emptyTitle')}</p>
-                <p className="text-sm text-[#666666] dark:text-[#7e93b0] mb-4">{t('circles.emptyBody')}</p>
+                <p className="text-base font-semibold text-[#111111] dark:text-[#E2F0E8] mb-1">{t('circles.emptyTitle')}</p>
+                <p className="text-sm text-[#4B6B52] dark:text-[#7BA88A] mb-4">{t('circles.emptyBody')}</p>
                 <Button variant="orange" size="sm" onClick={() => setShowCreate(true)}>
                   {t('circles.create')}
                 </Button>
@@ -180,7 +180,7 @@ export function CirclesPage() {
                 <div
                   key={c.id}
                   onClick={() => navigate(`/community/circles/${c.id}`)}
-                  className="group bg-white dark:bg-[#161c2d] rounded-2xl border border-[#E7E8E5] dark:border-[#1e3158] hover:border-[#6366F1] dark:hover:border-[#6366F1] hover:shadow-lg dark:hover:shadow-[0_4px_24px_rgba(99,102,241,0.15)] transition-all duration-200 cursor-pointer overflow-hidden"
+                  className="group bg-white dark:bg-[#132420] rounded-2xl border border-[#E4EBE5] dark:border-[#1E4035] hover:border-[#059669] dark:hover:border-[#059669] hover:shadow-lg dark:hover:shadow-[0_4px_24px_rgba(5,150,105,0.15)] transition-all duration-200 cursor-pointer overflow-hidden"
                 >
                   {/* Colored top accent */}
                   <div className="h-1.5 w-full" style={{ background: `linear-gradient(to right, ${grad.from}, ${grad.to})` }} />
@@ -201,13 +201,13 @@ export function CirclesPage() {
                     </div>
 
                     {/* Name */}
-                    <h3 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f3] line-clamp-1 mb-1">
+                    <h3 className="text-sm font-bold text-[#111111] dark:text-[#E2F0E8] line-clamp-1 mb-1">
                       {c.name}
                     </h3>
 
                     {/* Description */}
                     {c.description ? (
-                      <p className="text-xs text-[#666666] dark:text-[#7e93b0] leading-relaxed line-clamp-2 mb-3">
+                      <p className="text-xs text-[#4B6B52] dark:text-[#7BA88A] leading-relaxed line-clamp-2 mb-3">
                         {c.description}
                       </p>
                     ) : (
@@ -220,7 +220,7 @@ export function CirclesPage() {
                         {c.tags.slice(0, 3).map(tag => (
                           <span
                             key={tag}
-                            className="px-2 py-0.5 bg-[#F2F3F0] dark:bg-[#0f1117] rounded-full text-[10px] text-[#666666] dark:text-[#7e93b0] font-medium"
+                            className="px-2 py-0.5 bg-[#F0F5F1] dark:bg-[#0B1210] rounded-full text-[10px] text-[#4B6B52] dark:text-[#7BA88A] font-medium"
                           >
                             #{tag}
                           </span>
@@ -232,8 +232,8 @@ export function CirclesPage() {
                     )}
 
                     {/* Footer */}
-                    <div className="flex items-center justify-between pt-3 border-t border-[#F2F3F0] dark:border-[#1e3158]">
-                      <span className="flex items-center gap-1.5 text-xs text-[#666666] dark:text-[#7e93b0]">
+                    <div className="flex items-center justify-between pt-3 border-t border-[#F2F3F0] dark:border-[#1E4035]">
+                      <span className="flex items-center gap-1.5 text-xs text-[#4B6B52] dark:text-[#7BA88A]">
                         <Users className="w-3.5 h-3.5" />
                         {t('circle.membersCount', { count: c.memberCount })}
                       </span>
@@ -254,9 +254,9 @@ export function CirclesPage() {
         {!loading && filtered.length > 0 && (
           <button
             onClick={() => setShowCreate(true)}
-            className="h-[200px] border-2 border-dashed border-[#CBCCC9] dark:border-[#1e3158] rounded-2xl flex flex-col items-center justify-center gap-3 text-[#94a3b8] hover:border-[#6366F1] hover:text-[#6366F1] dark:hover:border-[#6366F1] dark:hover:text-[#6366F1] transition-all duration-200 group"
+            className="h-[200px] border-2 border-dashed border-[#C1CFC4] dark:border-[#1E4035] rounded-2xl flex flex-col items-center justify-center gap-3 text-[#94a3b8] hover:border-[#059669] hover:text-[#059669] dark:hover:border-[#059669] dark:hover:text-[#059669] transition-all duration-200 group"
           >
-            <div className="w-10 h-10 rounded-xl bg-[#F2F3F0] dark:bg-[#0f1117] group-hover:bg-[#EEF2FF] dark:group-hover:bg-[#1a2540] flex items-center justify-center transition-colors">
+            <div className="w-10 h-10 rounded-xl bg-[#F0F5F1] dark:bg-[#0B1210] group-hover:bg-[#ecfdf5] dark:group-hover:bg-[#163028] flex items-center justify-center transition-colors">
               <Plus className="w-5 h-5" />
             </div>
             <span className="text-sm font-semibold">{t('circles.create')}</span>
@@ -281,15 +281,15 @@ export function CirclesPage() {
           <Input label={t('circles.form.tags')} value={form.tagsInput ?? ''} onChange={e => setForm(f => ({ ...f, tagsInput: e.target.value }))} placeholder={t('circles.form.tagsPlaceholder')} />
           {/* Privacy toggle */}
           <div className="flex flex-col gap-2">
-            <span className="text-sm font-medium text-[#111111] dark:text-[#e2e8f3]">{t('circles.form.visibility')}</span>
+            <span className="text-sm font-medium text-[#111111] dark:text-[#E2F0E8]">{t('circles.form.visibility')}</span>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setForm(f => ({ ...f, isPublic: true }))}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${
                   (form.isPublic ?? true)
-                    ? 'bg-[#EEF2FF] border-[#6366F1] text-[#6366F1]'
-                    : 'bg-white dark:bg-[#161c2d] border-[#CBCCC9] dark:border-[#1e3158] text-[#666666] dark:text-[#7e93b0] hover:border-[#6366F1]/40'
+                    ? 'bg-[#ecfdf5] border-[#059669] text-[#059669]'
+                    : 'bg-white dark:bg-[#132420] border-[#C1CFC4] dark:border-[#1E4035] text-[#4B6B52] dark:text-[#7BA88A] hover:border-[#059669]/40'
                 }`}
               >
                 <Globe className="w-4 h-4 flex-shrink-0" />
@@ -303,8 +303,8 @@ export function CirclesPage() {
                 onClick={() => setForm(f => ({ ...f, isPublic: false }))}
                 className={`flex items-center gap-2 px-3 py-2.5 rounded-xl border text-sm font-medium transition-all ${
                   !(form.isPublic ?? true)
-                    ? 'bg-[#EEF2FF] border-[#6366F1] text-[#6366F1]'
-                    : 'bg-white dark:bg-[#161c2d] border-[#CBCCC9] dark:border-[#1e3158] text-[#666666] dark:text-[#7e93b0] hover:border-[#6366F1]/40'
+                    ? 'bg-[#ecfdf5] border-[#059669] text-[#059669]'
+                    : 'bg-white dark:bg-[#132420] border-[#C1CFC4] dark:border-[#1E4035] text-[#4B6B52] dark:text-[#7BA88A] hover:border-[#059669]/40'
                 }`}
               >
                 <Lock className="w-4 h-4 flex-shrink-0" />

@@ -21,11 +21,7 @@ func (s *Service) ReplaceSession(ctx context.Context, hash string, session *mode
 
 // DeleteSessionByHash deletes a session by its hash.
 func (s *Service) DeleteSessionByHash(ctx context.Context, hash string) error {
-	err := s.sessions.DeleteSessionByHash(ctx, hash)
-	if err == nil {
-		// Note: we don't have sessionID here, would need to store hash->sessionID mapping
-	}
-	return err
+	return s.sessions.DeleteSessionByHash(ctx, hash)
 }
 
 // FindSessionByHash retrieves session and auth state by hash.

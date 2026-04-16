@@ -25,7 +25,7 @@ export function ProgressRing({ value, max, size = 48, strokeWidth = 4, className
           fill="none"
           stroke="currentColor"
           strokeWidth={strokeWidth}
-          className="text-[#E7E8E5] dark:text-[#1e3158]"
+          className="text-[#E4EBE5] dark:text-[#1E4035]"
         />
         <circle
           cx={size / 2}
@@ -37,7 +37,7 @@ export function ProgressRing({ value, max, size = 48, strokeWidth = 4, className
           strokeDasharray={circumference}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          className="text-[#6366F1] transition-all duration-500"
+          className="text-[#059669] transition-all duration-500"
         />
       </svg>
       {children && (

@@ -35,8 +35,9 @@ func (r *Repo) GetCirclePulse(ctx context.Context, circleID uuid.UUID) (*model.C
 		RecentActions: make([]*model.CircleMemberAction, 0, 20),
 	}
 
-	// Query 2: combined active-today + week activity in one query.
-	// Uses a single UNION ALL scan over all activity tables, then aggregates by day.
+	// Query 2: week activity + active today in a single query.
+	// Uses one UNION ALL scan over all activity tables, aggregates by day,
+	// and computes COUNT(DISTINCT user_id) for today in the same pass.
 	rows, err := r.data.DB.Query(ctx, `
 WITH members AS (
   SELECT user_id FROM circle_members WHERE circle_id = $1
@@ -72,7 +73,8 @@ SELECT
   days.d::text,
   COALESCE(SUM(CASE WHEN a.kind = 'daily' THEN 1 ELSE 0 END), 0)::int4,
   COALESCE(SUM(CASE WHEN a.kind = 'duel' THEN 1 ELSE 0 END), 0)::int4,
-  COALESCE(SUM(CASE WHEN a.kind = 'mock' THEN 1 ELSE 0 END), 0)::int4
+  COALESCE(SUM(CASE WHEN a.kind = 'mock' THEN 1 ELSE 0 END), 0)::int4,
+  COUNT(DISTINCT CASE WHEN days.d = $3::date THEN a.user_id END)::int4
 FROM days
 LEFT JOIN all_activity a ON DATE(a.ts AT TIME ZONE 'UTC') = days.d
 GROUP BY days.d
@@ -83,38 +85,17 @@ ORDER BY days.d ASC`, circleID, weekAgo, todayStart)
 	defer rows.Close()
 	for rows.Next() {
 		var da model.CircleDayActivity
-		if err := rows.Scan(&da.Date, &da.DailyCount, &da.DuelCount, &da.MockCount); err != nil {
+		var activeToday int32
+		if err := rows.Scan(&da.Date, &da.DailyCount, &da.DuelCount, &da.MockCount, &activeToday); err != nil {
 			return nil, fmt.Errorf("scan day activity: %w", err)
+		}
+		if activeToday > 0 {
+			pulse.ActiveToday = activeToday
 		}
 		pulse.WeekActivity = append(pulse.WeekActivity, &da)
 	}
 	if err := rows.Err(); err != nil {
 		return nil, fmt.Errorf("iterate week activity: %w", err)
-	}
-
-	// Compute active today from the week data (last element).
-	if len(pulse.WeekActivity) > 0 {
-		today := pulse.WeekActivity[len(pulse.WeekActivity)-1]
-		// Active today needs distinct user count, not action count.
-		// Use a lightweight query.
-		if err := r.data.DB.QueryRow(ctx, `
-SELECT COUNT(DISTINCT user_id) FROM (
-  SELECT s.user_id FROM interview_practice_sessions s
-    WHERE s.user_id IN (SELECT user_id FROM circle_members WHERE circle_id = $1)
-    AND s.status = 'finished' AND COALESCE(s.finished_at, s.updated_at) >= $2
-  UNION
-  SELECT ap.user_id FROM arena_match_players ap
-    JOIN arena_matches am ON am.id = ap.match_id
-    WHERE ap.user_id IN (SELECT user_id FROM circle_members WHERE circle_id = $1)
-    AND am.status = 3 AND am.finished_at >= $2
-  UNION
-  SELECT ms.user_id FROM interview_mock_sessions ms
-    WHERE ms.user_id IN (SELECT user_id FROM circle_members WHERE circle_id = $1)
-    AND ms.status = 'finished' AND ms.finished_at >= $2
-) active_users`, circleID, todayStart).Scan(&pulse.ActiveToday); err != nil {
-			return nil, fmt.Errorf("count active today: %w", err)
-		}
-		_ = today // suppress unused
 	}
 
 	// Query 3: recent actions (last 20).

@@ -7,33 +7,33 @@ export default {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#FF8400',
-          50: '#fff7ed',
-          100: '#ffedd5',
-          500: '#FF8400',
-          600: '#ea7700',
+          DEFAULT: '#059669',
+          50: '#ecfdf5',
+          100: '#d1fae5',
+          500: '#059669',
+          600: '#047857',
         },
         surface: {
-          DEFAULT: '#F2F3F0',
-          sidebar: '#E7E8E5',
-          border: '#CBCCC9',
+          DEFAULT: '#F0F5F1',
+          sidebar: '#E4EBE5',
+          border: '#C1CFC4',
           white: '#FFFFFF',
         },
         dark: {
-          DEFAULT: '#0f172a',
-          navy: '#0f1629',
-          card: '#1e293b',
+          DEFAULT: '#0B1210',
+          navy: '#070E0C',
+          card: '#132420',
         },
         text: {
           primary: '#18181b',
-          secondary: '#64748b',
-          muted: '#94a3b8',
+          secondary: '#4B6B52',
+          muted: '#7A9982',
         },
-        indigo: {
-          50: '#eff6ff',
-          100: '#dbeafe',
-          500: '#6366f1',
-          700: '#3730a3',
+        emerald: {
+          50: '#ecfdf5',
+          100: '#d1fae5',
+          500: '#10B981',
+          700: '#047857',
         },
         success: {
           DEFAULT: '#22c55e',
@@ -56,6 +56,7 @@ export default {
         sans: ['Manrope', 'system-ui', 'sans-serif'],
         geist: ['Geist', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
+        pixel: ['"Press Start 2P"', 'monospace'],
       },
       borderRadius: {
         '2xl': '14px',

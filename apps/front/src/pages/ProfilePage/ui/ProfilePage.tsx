@@ -12,6 +12,7 @@ import { Modal } from '@/shared/ui/Modal'
 import { useToast } from '@/shared/ui/Toast'
 import { PageMeta } from '@/shared/ui/PageMeta'
 import { GoalSelector } from '@/shared/ui/GoalSelector'
+import { PixelGarden } from '@/shared/ui/PixelGarden'
 import { useProfileData, type ArenaStats } from '../hooks/useProfileData'
 import { computeCompanyReadiness } from '../lib/computeReadiness'
 import { ProfileHero } from './ProfileHero'
@@ -44,10 +45,10 @@ function savePinnedIds(userId: string, ids: string[]) {
 function LoadingProfile() {
   return (
     <div className="animate-pulse space-y-4 px-4 pb-6 pt-4 md:p-6">
-      <div className="h-[220px] rounded-[32px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
+      <div className="h-[220px] rounded-[32px] border border-[#C1CFC4] bg-white dark:border-[#163028] dark:bg-[#132420]" />
       <div className="grid gap-4 lg:grid-cols-2">
-        <div className="h-[300px] rounded-[28px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
-        <div className="h-[300px] rounded-[28px] border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d]" />
+        <div className="h-[300px] rounded-[28px] border border-[#C1CFC4] bg-white dark:border-[#163028] dark:bg-[#132420]" />
+        <div className="h-[300px] rounded-[28px] border border-[#C1CFC4] bg-white dark:border-[#163028] dark:bg-[#132420]" />
       </div>
     </div>
   )
@@ -240,6 +241,24 @@ export function ProfilePage() {
         bindError={bindError}
       />
 
+      {/* ── Pixel Garden ────────────────────────────────────── */}
+      {isOwn && (
+        <section className="section-enter card-notch border border-[#C1CFC4] bg-white p-4 dark:border-[#1E4035] dark:bg-[#132420]">
+          <div className="flex items-center justify-between mb-3">
+            <h2 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('profile.garden.title', 'Your Garden')}</h2>
+            <span className="text-[10px] font-mono text-[#059669] dark:text-[#34D399]">
+              {progress?.competencies?.length ?? 0} {t('profile.garden.skills', 'skills growing')}
+            </span>
+          </div>
+          <PixelGarden
+            treeCount={Math.min(progress?.competencies?.length ?? 2, 8)}
+            streak={progress?.overview?.currentStreakDays ?? 0}
+            level={progress?.overview?.level ?? 1}
+            className="w-full"
+          />
+        </section>
+      )}
+
       {/* ── Comparison strip (foreign profile only) ───────────── */}
       {!isOwn && (
         <ProfileComparison
@@ -255,11 +274,11 @@ export function ProfilePage() {
       {isOwn && activeGoal && (
         <div className="section-enter">
           {showGoalSelector ? (
-            <div className="rounded-[20px] border border-[#CBCCC9] bg-white p-4 dark:border-[#1a2540] dark:bg-[#161c2d]">
+            <div className="rounded-[20px] border border-[#C1CFC4] bg-white p-4 dark:border-[#163028] dark:bg-[#132420]">
               <GoalSelector goal={activeGoal} companies={progress?.companies ?? []} onChange={handleGoalChange} />
               <button
                 onClick={() => setShowGoalSelector(false)}
-                className="mt-2 text-xs text-[#94a3b8] hover:text-[#475569] dark:hover:text-[#7e93b0]"
+                className="mt-2 text-xs text-[#94a3b8] hover:text-[#4B6B52] dark:hover:text-[#7e93b0]"
               >
                 {t('common.close')}
               </button>
@@ -268,7 +287,7 @@ export function ProfilePage() {
             <button
               onClick={() => setShowGoalSelector(true)}
               disabled={goalSaving}
-              className="inline-flex items-center gap-2 rounded-full border border-[#E7E8E5] bg-white px-3 py-1.5 text-xs font-medium text-[#475569] transition-colors hover:border-[#6366F1] hover:text-[#6366F1] dark:border-[#1e3158] dark:bg-[#161c2d] dark:text-[#7e93b0] dark:hover:border-[#818cf8] dark:hover:text-[#818cf8]"
+              className="inline-flex items-center gap-2 rounded-full border border-[#E4EBE5] bg-white px-3 py-1.5 text-xs font-medium text-[#4B6B52] transition-colors hover:border-[#059669] hover:text-[#059669] dark:border-[#1E4035] dark:bg-[#132420] dark:text-[#7BA88A] dark:hover:border-[#34D399] dark:hover:text-[#34D399]"
             >
               {t('goal.label')}: {t(`goal.${activeGoal.kind === 'general_growth' ? 'generalGrowth' : activeGoal.kind === 'weakest_first' ? 'weakAreas' : 'company'}`)}
               {activeGoal.kind === 'company_prep' && activeGoal.company ? ` · ${activeGoal.company}` : ''}
@@ -355,7 +374,7 @@ export function ProfilePage() {
         }
       >
         <div className="flex flex-col gap-3">
-          <p className="text-sm text-[#666666] dark:text-[#7e93b0]">{t('profile.telegramModal.body')}</p>
+          <p className="text-sm text-[#4B6B52] dark:text-[#7BA88A]">{t('profile.telegramModal.body')}</p>
           <Input
             label={t('profile.telegramModal.code')}
             value={tgCode}

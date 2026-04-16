@@ -55,7 +55,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
       <div className="absolute inset-0 bg-[#1e293b]/60 animate-fade-in" onClick={onClose} />
       <div className="relative w-full sm:max-w-lg bg-white sm:rounded-2xl rounded-t-2xl shadow-modal animate-modal-in overflow-hidden flex flex-col max-h-[90vh]">
         {/* Hero */}
-        <div className="relative bg-gradient-to-br from-[#6366F1] to-[#8b5cf6] px-6 pt-6 pb-8">
+        <div className="relative bg-gradient-to-br from-[#059669] to-[#0D9488] px-6 pt-6 pb-8">
           <button
             onClick={onClose}
             className="absolute top-4 right-4 w-8 h-8 flex items-center justify-center rounded-full bg-white/20 hover:bg-white/30 transition-colors"
@@ -77,8 +77,8 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
         <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-4">
           {/* Date & time */}
           <div className="flex items-start gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#f0f0ff] flex items-center justify-center flex-shrink-0">
-              <Clock className="w-4 h-4 text-[#6366F1]" />
+            <div className="w-9 h-9 rounded-lg bg-[#ecfdf5] flex items-center justify-center flex-shrink-0">
+              <Clock className="w-4 h-4 text-[#059669]" />
             </div>
             <div>
               <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide">{t('events.dateTime')}</p>
@@ -87,10 +87,10 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
                   <p className="text-sm font-semibold text-[#111111] mt-0.5">
                     {formatDate(event.scheduledAt)}
                   </p>
-                  <p className="text-sm text-[#666666]">{formatTime(event.scheduledAt)}</p>
+                  <p className="text-sm text-[#4B6B52]">{formatTime(event.scheduledAt)}</p>
                 </>
               ) : (
-                <p className="text-sm text-[#666666] mt-0.5">{t('events.scheduleUnknown')}</p>
+                <p className="text-sm text-[#4B6B52] mt-0.5">{t('events.scheduleUnknown')}</p>
               )}
             </div>
           </div>
@@ -107,7 +107,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
                   {event.city || event.placeLabel}
                 </p>
                 {event.city && event.placeLabel && event.city !== event.placeLabel && (
-                  <p className="text-xs text-[#666666]">{event.placeLabel}</p>
+                  <p className="text-xs text-[#4B6B52]">{event.placeLabel}</p>
                 )}
               </div>
             </div>
@@ -141,7 +141,7 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
           {event.description && (
             <div className="p-4 bg-[#f8f9fa] rounded-xl">
               <p className="text-xs text-[#94a3b8] font-medium uppercase tracking-wide mb-2">{t('events.descriptionLabel')}</p>
-              <p className="text-sm text-[#475569] leading-relaxed whitespace-pre-wrap">{event.description}</p>
+              <p className="text-sm text-[#4B6B52] leading-relaxed whitespace-pre-wrap">{event.description}</p>
             </div>
           )}
 
@@ -153,12 +153,12 @@ function EventDetailModal({ event, onClose, onJoin, onLeave, onDelete }: {
               rel="noopener noreferrer"
               className="flex items-center gap-3 p-3.5 bg-[#eff6ff] rounded-xl hover:bg-[#dbeafe] transition-colors group"
             >
-              <div className="w-8 h-8 rounded-lg bg-[#6366F1] flex items-center justify-center flex-shrink-0">
+              <div className="w-8 h-8 rounded-lg bg-[#059669] flex items-center justify-center flex-shrink-0">
                 <Link2 className="w-4 h-4 text-white" />
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs text-[#94a3b8] font-medium">{t('events.meetingLink')}</p>
-                <p className="text-sm text-[#6366F1] font-medium truncate group-hover:underline">{event.meetingLink}</p>
+                <p className="text-sm text-[#059669] font-medium truncate group-hover:underline">{event.meetingLink}</p>
               </div>
             </a>
           )}
@@ -289,16 +289,16 @@ export function EventsPage() {
     <div className={isMobile ? 'px-4 pt-4 pb-6' : 'px-6 pt-4 pb-6'}>
       <PageMeta title={t('events.meta.title')} description={t('events.meta.description')} canonicalPath="/community/events" />
       {isMobile ? (
-        <section className="section-enter mb-4 overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(239,246,255,0.94)_46%,_rgba(255,247,237,0.95))] p-5 shadow-[0_18px_36px_rgba(15,23,42,0.08)] dark:border-[#1a2540] dark:bg-[linear-gradient(145deg,_rgba(22,28,45,0.98),_rgba(19,25,41,0.92)_54%,_rgba(42,32,10,0.62))] md:p-6">
+        <section className="section-enter mb-4 overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(239,246,255,0.94)_46%,_rgba(255,247,237,0.95))] p-5 shadow-[0_18px_36px_rgba(15,23,42,0.08)] dark:border-[#163028] dark:bg-[linear-gradient(145deg,_rgba(22,28,45,0.98),_rgba(19,25,41,0.92)_54%,_rgba(42,32,10,0.62))] md:p-6">
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
             <div className="max-w-2xl">
-              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1] dark:text-[#a5b4fc]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#059669] dark:text-[#6EE7B7]">
                 {t('events.boardEyebrow')}
               </p>
-              <h2 className="mt-2 text-2xl font-semibold text-[#111111] dark:text-[#f8fafc]">
+              <h2 className="mt-2 text-2xl font-semibold text-[#111111] dark:text-[#E2F0E8]">
                 {t('events.hero.title')}
               </h2>
-              <p className="mt-2 text-sm leading-6 text-[#475569] dark:text-[#94a3b8]">
+              <p className="mt-2 text-sm leading-6 text-[#4B6B52] dark:text-[#94a3b8]">
                 {t('events.hero.subtitleMobile')}
               </p>
             </div>
@@ -306,12 +306,12 @@ export function EventsPage() {
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="grid grid-cols-2 gap-2">
                 <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/72">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">{t('events.total')}</p>
-                  <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : events.length}</p>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#7A9982] dark:text-[#7BA88A]">{t('events.total')}</p>
+                  <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#E2F0E8]">{loading ? '—' : events.length}</p>
                 </div>
                 <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 backdrop-blur dark:border-[#24324f] dark:bg-[#111827]/72">
-                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085] dark:text-[#7e93b0]">{t('events.going')}</p>
-                  <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : joinedCount}</p>
+                  <p className="text-[11px] uppercase tracking-[0.18em] text-[#7A9982] dark:text-[#7BA88A]">{t('events.going')}</p>
+                  <p className="mt-2 font-mono text-2xl font-bold text-[#111111] dark:text-[#E2F0E8]">{loading ? '—' : joinedCount}</p>
                 </div>
               </div>
 
@@ -325,15 +325,15 @@ export function EventsPage() {
       ) : (
         <div className="mb-6 flex flex-wrap items-end justify-between gap-4">
           <div>
-            <h2 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">{t('events.hero.title')}</h2>
-            <p className="mt-1 text-sm text-[#666666] dark:text-[#7e93b0]">{t('events.hero.subtitle')}</p>
+            <h2 className="text-2xl font-bold text-[#111111] dark:text-[#E2F0E8]">{t('events.hero.title')}</h2>
+            <p className="mt-1 text-sm text-[#4B6B52] dark:text-[#7BA88A]">{t('events.hero.subtitle')}</p>
           </div>
 
           <div className="flex items-center gap-4">
-            <div className="flex items-center gap-4 text-sm text-[#666666] dark:text-[#7e93b0]">
-              <span><span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{loading ? '—' : events.length}</span> {t('events.count', { count: events.length })}</span>
-              <span className="h-4 w-px bg-[#CBCCC9] dark:bg-[#1e3158]" />
-              <span><span className="font-semibold text-[#111111] dark:text-[#e2e8f3]">{loading ? '—' : joinedCount}</span> {t('events.goingCount', { count: joinedCount })}</span>
+            <div className="flex items-center gap-4 text-sm text-[#4B6B52] dark:text-[#7BA88A]">
+              <span><span className="font-semibold text-[#111111] dark:text-[#E2F0E8]">{loading ? '—' : events.length}</span> {t('events.count', { count: events.length })}</span>
+              <span className="h-4 w-px bg-[#C1CFC4] dark:bg-[#1E4035]" />
+              <span><span className="font-semibold text-[#111111] dark:text-[#E2F0E8]">{loading ? '—' : joinedCount}</span> {t('events.goingCount', { count: joinedCount })}</span>
             </div>
             <Button variant="orange" size="md" onClick={() => setShowCreate(true)}>
               <Plus className="w-4 h-4" />
@@ -348,17 +348,17 @@ export function EventsPage() {
           {Array.from({ length: 6 }).map((_, i) => (
             <div
               key={i}
-              className={`h-[188px] animate-pulse border border-[#CBCCC9] bg-white dark:border-[#1a2540] dark:bg-[#161c2d] ${isMobile ? 'rounded-[28px]' : 'rounded-2xl'}`}
+              className={`h-[188px] animate-pulse border border-[#C1CFC4] bg-white dark:border-[#163028] dark:bg-[#132420] ${isMobile ? 'rounded-[28px]' : 'rounded-2xl'}`}
             />
           ))}
         </div>
       ) : events.length === 0 ? (
-        <div className={`section-enter flex flex-col items-center justify-center border border-dashed border-[#CBCCC9] bg-white px-6 py-16 text-center dark:border-[#1a2540] dark:bg-[#161c2d] ${isMobile ? 'rounded-[30px]' : 'rounded-2xl'}`}>
-          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#EEF2FF] dark:bg-[#1e1e4a]">
-            <Calendar className="h-8 w-8 text-[#6366F1]" />
+        <div className={`section-enter flex flex-col items-center justify-center border border-dashed border-[#C1CFC4] bg-white px-6 py-16 text-center dark:border-[#163028] dark:bg-[#132420] ${isMobile ? 'rounded-[30px]' : 'rounded-2xl'}`}>
+          <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-[22px] bg-[#ecfdf5] dark:bg-[#0d2a1f]">
+            <Calendar className="h-8 w-8 text-[#059669]" />
           </div>
-          <h3 className="text-lg font-semibold text-[#111111] dark:text-[#f8fafc]">{t('events.empty.title')}</h3>
-          <p className="mt-2 max-w-md text-sm leading-6 text-[#667085] dark:text-[#94a3b8]">
+          <h3 className="text-lg font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('events.empty.title')}</h3>
+          <p className="mt-2 max-w-md text-sm leading-6 text-[#7A9982] dark:text-[#94a3b8]">
             {isMobile
               ? t('events.empty.mobile')
               : t('events.empty.desktop')}
@@ -374,16 +374,16 @@ export function EventsPage() {
             <Card
               key={event.id}
               padding={isMobile ? 'lg' : 'md'}
-              className={`stagger-item flex min-h-[188px] flex-col gap-4 border bg-white dark:border-[#1a2540] dark:bg-[#161c2d]/96 ${
+              className={`stagger-item flex min-h-[188px] flex-col gap-4 border bg-white dark:border-[#163028] dark:bg-[#132420]/96 ${
                 isMobile
                   ? 'rounded-[28px] border-[#d8d9d6] bg-white/96 shadow-[0_12px_28px_rgba(15,23,42,0.05)]'
-                  : 'rounded-2xl border-[#CBCCC9] shadow-sm'
-              } hover:border-[#6366F1]`}
+                  : 'rounded-2xl border-[#C1CFC4] shadow-sm'
+              } hover:border-[#059669]`}
               onClick={() => setSelectedEvent(event)}
             >
               <div className="flex items-start justify-between gap-3">
-                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#f0f0ff] dark:bg-[#1e1e4a]">
-                  <Calendar className="h-5 w-5 text-[#6366F1]" />
+                <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#ecfdf5] dark:bg-[#0d2a1f]">
+                  <Calendar className="h-5 w-5 text-[#059669]" />
                 </div>
                   <div className="flex items-center gap-1.5">
                     {event.status === 'pending' && <Badge variant="warning">{t('events.pending')}</Badge>}
@@ -393,25 +393,25 @@ export function EventsPage() {
               </div>
 
               <div className="space-y-2">
-                <h3 className="line-clamp-2 text-base font-semibold leading-snug text-[#111111] dark:text-[#f8fafc]">{event.title}</h3>
+                <h3 className="line-clamp-2 text-base font-semibold leading-snug text-[#111111] dark:text-[#E2F0E8]">{event.title}</h3>
                 {event.description && (
-                  <p className="line-clamp-2 text-sm leading-6 text-[#667085] dark:text-[#94a3b8]">
+                  <p className="line-clamp-2 text-sm leading-6 text-[#7A9982] dark:text-[#94a3b8]">
                     {event.description}
                   </p>
                 )}
-                <p className="text-xs font-medium text-[#667085] dark:text-[#94a3b8]">
+                <p className="text-xs font-medium text-[#7A9982] dark:text-[#94a3b8]">
                   {formatEventScheduleLabel(t, event.scheduledAt)}
                 </p>
               </div>
 
               <div className="mt-auto flex flex-wrap items-center gap-2 pt-2">
                 {(event.city || event.placeLabel) && (
-                  <span className="inline-flex items-center gap-1 rounded-full bg-[#F2F3F0] px-2.5 py-1 text-xs text-[#667085] dark:bg-[#1a2236] dark:text-[#94a3b8]">
+                  <span className="inline-flex items-center gap-1 rounded-full bg-[#F0F5F1] px-2.5 py-1 text-xs text-[#7A9982] dark:bg-[#162E24] dark:text-[#94a3b8]">
                     <MapPin className="h-3 w-3" />
                     {event.city || event.placeLabel}
                   </span>
                 )}
-                <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-[#F2F3F0] px-2.5 py-1 text-xs text-[#667085] dark:bg-[#1a2236] dark:text-[#94a3b8]">
+                <span className="ml-auto inline-flex items-center gap-1 rounded-full bg-[#F0F5F1] px-2.5 py-1 text-xs text-[#7A9982] dark:bg-[#162E24] dark:text-[#94a3b8]">
                   <Users className="h-3 w-3" />
                   {event.participantCount}
                 </span>
@@ -453,13 +453,13 @@ export function EventsPage() {
             placeholder={t('events.form.titlePlaceholder')}
           />
           <div>
-            <label className="block text-xs font-medium text-[#475569] mb-1.5">{t('events.form.description')}</label>
+            <label className="block text-xs font-medium text-[#4B6B52] mb-1.5">{t('events.form.description')}</label>
             <textarea
               value={form.description ?? ''}
               onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
               placeholder={t('events.form.descriptionPlaceholder')}
               rows={3}
-              className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 placeholder:text-[#94a3b8] resize-none"
+              className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0B1210] text-[#111111] dark:text-[#E2F0E8] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#059669]/20 placeholder:text-[#94a3b8] resize-none"
             />
           </div>
 
@@ -473,7 +473,7 @@ export function EventsPage() {
 
           {/* Invite */}
           <div className="border-t border-[#F2F3F0] pt-4">
-            <label className="block text-xs font-medium text-[#475569] mb-1.5">{t('events.form.invite')}</label>
+            <label className="block text-xs font-medium text-[#4B6B52] mb-1.5">{t('events.form.invite')}</label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <input
                 value={inviteInput}
@@ -487,7 +487,7 @@ export function EventsPage() {
                   }
                 }}
                 placeholder={t('events.form.invitePlaceholder')}
-                className="flex-1 px-3 py-2 text-sm border border-[#CBCCC9] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
+                className="flex-1 px-3 py-2 text-sm border border-[#C1CFC4] rounded-lg focus:outline-none focus:ring-2 focus:ring-[#059669]/20"
               />
               <button
                 type="button"
@@ -497,7 +497,7 @@ export function EventsPage() {
                   setInviteInput('')
                 }}
                 disabled={!inviteInput.trim()}
-                className="px-3 py-2 text-sm bg-[#F2F3F0] hover:bg-[#e2e8f0] rounded-lg transition-colors disabled:opacity-40"
+                className="px-3 py-2 text-sm bg-[#F0F5F1] hover:bg-[#e2e8f0] rounded-lg transition-colors disabled:opacity-40"
               >
                 <Plus className="w-4 h-4" />
               </button>
@@ -505,10 +505,10 @@ export function EventsPage() {
             {inviteIds.length > 0 && (
               <div className="flex flex-wrap gap-1.5 mt-2">
                 {inviteIds.map(id => (
-                  <span key={id} className="flex items-center gap-1 px-2 py-0.5 bg-[#f0f0ff] text-[#6366F1] text-xs rounded-full">
+                  <span key={id} className="flex items-center gap-1 px-2 py-0.5 bg-[#ecfdf5] text-[#059669] text-xs rounded-full">
                     <User className="w-3 h-3" />
                     {id.length > 12 ? `${id.slice(0, 8)}…` : id}
-                    <button type="button" onClick={() => setInviteIds(prev => prev.filter(i => i !== id))} className="ml-0.5 hover:text-[#4F46E5]">
+                    <button type="button" onClick={() => setInviteIds(prev => prev.filter(i => i !== id))} className="ml-0.5 hover:text-[#047857]">
                       <X className="w-3 h-3" />
                     </button>
                   </span>

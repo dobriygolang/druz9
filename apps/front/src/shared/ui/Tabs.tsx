@@ -16,16 +16,16 @@ interface TabsProps {
 
 const VARIANT_STYLES = {
   pill: {
-    container: 'flex items-center gap-1 p-1 bg-[#E7E8E5] border border-[#CBCCC9] rounded-full',
+    container: 'flex items-center gap-1 p-1 bg-[#E4EBE5] border border-[#C1CFC4] rounded-full',
     button: 'px-4 py-1.5 text-sm font-medium rounded-full transition-colors',
     active: 'bg-white text-[#18181b] shadow-sm',
-    inactive: 'text-[#64748b] hover:text-[#18181b]',
+    inactive: 'text-[#7A9982] hover:text-[#18181b]',
   },
   underline: {
-    container: 'flex items-center gap-0 border-b border-[#CBCCC9]',
+    container: 'flex items-center gap-0 border-b border-[#C1CFC4]',
     button: 'px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors',
-    active: 'border-[#6366F1] text-[#18181b]',
-    inactive: 'border-transparent text-[#64748b] hover:text-[#18181b]',
+    active: 'border-[#059669] text-[#18181b]',
+    inactive: 'border-transparent text-[#7A9982] hover:text-[#18181b]',
   },
 } as const
 

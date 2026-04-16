@@ -33,7 +33,7 @@ export function ConfirmModal({
         </>
       }
     >
-      <p className="text-sm text-[#475569]">{message}</p>
+      <p className="text-sm text-[#4B6B52]">{message}</p>
     </Modal>
   )
 }

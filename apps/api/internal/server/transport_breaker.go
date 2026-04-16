@@ -9,7 +9,6 @@ import (
 	"github.com/go-kratos/aegis/circuitbreaker/sre"
 	kratoserrpkg "github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/middleware"
-	"github.com/go-kratos/kratos/v2/transport"
 )
 
 func newHTTPServerCircuitBreaker(cbCfg *config.CircuitBreaker) middleware.Middleware {
@@ -45,9 +44,6 @@ func circuitBreakerMiddleware(breaker circuitbreaker.CircuitBreaker) middleware.
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req any) (any, error) {
 			if err := breaker.Allow(); err != nil {
-				if tr, ok := transport.FromServerContext(ctx); ok {
-					_ = tr
-				}
 				breaker.MarkFailed()
 				return nil, kratoserrpkg.New(503, "CIRCUITBREAKER", "service is temporarily unavailable, circuit open")
 			}

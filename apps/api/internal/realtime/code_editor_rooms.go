@@ -1,7 +1,6 @@
 package realtime
 
 import (
-	"context"
 	"encoding/json"
 	"strings"
 
@@ -114,7 +113,7 @@ func (h *CodeEditorHub) sendSnapshot(client *codeEditorClient) {
 		}
 		h.mu.Unlock()
 
-		editorState, err := h.store.GetEditorState(context.Background(), mustParseUUID(client.roomID), parseOptionalUUID(client.userID), client.guestName)
+		editorState, err := h.store.GetEditorState(h.ctx, mustParseUUID(client.roomID), parseOptionalUUID(client.userID), client.guestName)
 		if err != nil || editorState == nil {
 			return
 		}
@@ -272,7 +271,7 @@ func (h *CodeEditorHub) handleLanguageChange(client *codeEditorClient, msg schem
 		return
 	}
 
-	editorState, err := h.store.SetEditorLanguage(context.Background(), parsedRoomID, parseOptionalUUID(client.userID), client.guestName, language)
+	editorState, err := h.store.SetEditorLanguage(h.ctx, parsedRoomID, parseOptionalUUID(client.userID), client.guestName, language)
 	if err != nil || editorState == nil {
 		return
 	}

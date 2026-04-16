@@ -5,6 +5,7 @@ import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/shared/ui/Avatar'
 import { apiClient } from '@/shared/api/base'
 import { PageMeta } from '@/shared/ui/PageMeta'
+import { PixelHeroScene } from '@/shared/ui/PixelHeroScene'
 
 
 interface LeaderboardUser {
@@ -37,11 +38,12 @@ export function PracticeHubPage() {
   return (
     <div className="flex flex-col min-h-screen">
       <PageMeta title={t('practice.meta.title')} description={t('practice.meta.description')} canonicalPath="/practice" />
-      <div className="mobile-sticky-surface bg-[#F2F3F0]/88 px-4 pt-4 pb-0 dark:bg-[#0b0d16]/88 md:px-6 md:pt-6">
+      <PixelHeroScene scene="practice" className="hidden md:block" />
+      <div className="mobile-sticky-surface bg-[#F0F5F1]/88 px-4 pt-4 pb-0 dark:bg-[#070E0C]/88 md:px-6 md:pt-6">
         <div className="mb-5 flex items-center justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-[#111111] dark:text-[#e2e8f3]">{t('practice.title')}</h1>
-            <p className="text-sm text-[#666666] dark:text-[#4d6380] mt-0.5">{t('practice.subtitle')}</p>
+            <h1 className="text-2xl font-bold text-[#111111] dark:text-[#E2F0E8]">{t('practice.title')}</h1>
+            <p className="text-sm text-[#4B6B52] dark:text-[#4A7058] mt-0.5">{t('practice.subtitle')}</p>
           </div>
         </div>
 
@@ -66,20 +68,20 @@ export function PracticeHubPage() {
               <button
                 key={f.title}
                 onClick={() => navigate(f.href)}
-                className={`section-enter min-w-[280px] snap-center flex items-center gap-3 rounded-[24px] border px-4 py-4 text-left transition-all md:min-w-0 ${
+                className={`section-enter card-notch min-w-[280px] snap-center flex items-center gap-3 border px-4 py-4 text-left transition-all md:min-w-0 ${
                   isAct
-                    ? 'border-[#6366F1] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.98))] shadow-[0_18px_34px_rgba(99,102,241,0.12)] dark:bg-[linear-gradient(145deg,_rgba(22,28,45,0.98),_rgba(30,30,74,0.74))]'
-                    : 'border-[#CBCCC9] bg-white/86 shadow-[0_12px_24px_rgba(15,23,42,0.06)] dark:border-[#1a2540] dark:bg-[#161c2d]/92 dark:hover:border-[#6366F1]/40'
+                    ? 'border-[#059669] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(236,253,245,0.98))] shadow-[0_18px_34px_rgba(5,150,105,0.12)] dark:bg-[linear-gradient(145deg,_rgba(19,36,32,0.98),_rgba(13,42,31,0.74))]'
+                    : 'border-[#C1CFC4] bg-white/86 shadow-[0_12px_24px_rgba(11,18,16,0.06)] dark:border-[#163028] dark:bg-[#132420]/92 dark:hover:border-[#059669]/40'
                 }`}
               >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isAct ? 'bg-[#EEF2FF] dark:bg-[#1e1e4a]' : 'bg-[#F2F3F0] dark:bg-[#1a2236]'}`}>
-                  <Icon className="w-4 h-4 text-[#6366F1]" />
+                <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isAct ? 'bg-[#ecfdf5] dark:bg-[#0d2a1f]' : 'bg-[#F0F5F1] dark:bg-[#162E24]'}`}>
+                  <Icon className="w-4 h-4 text-[#059669]" />
                 </div>
                 <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#111111] dark:text-[#c8d8ec] leading-tight">{f.title}</p>
-                  <p className="text-xs text-[#666666] dark:text-[#4d6380] leading-tight mt-0.5">{f.sub}</p>
+                  <p className="text-sm font-semibold text-[#111111] dark:text-[#C1D9CA] leading-tight">{f.title}</p>
+                  <p className="text-xs text-[#4B6B52] dark:text-[#4A7058] leading-tight mt-0.5">{f.sub}</p>
                 </div>
-                {isAct && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#6366F1] flex-shrink-0" />}
+                {isAct && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#059669] flex-shrink-0" />}
               </button>
             )
           }
@@ -104,11 +106,11 @@ export function PracticeHubPage() {
         })()}
 
         <div className="mb-5">
-          <h2 className="text-sm font-semibold text-[#111111] dark:text-[#c8d8ec] mb-3">{t('practice.leaders')}</h2>
+          <h2 className="text-sm font-semibold text-[#111111] dark:text-[#C1D9CA] mb-3">{t('practice.leaders')}</h2>
           {leadersLoading ? (
             <div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
               {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1a2540] animate-pulse w-40 h-12" />
+                <div key={i} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#132420] rounded-xl border border-[#C1CFC4] dark:border-[#163028] animate-pulse w-40 h-12" />
               ))}
             </div>
           ) : leaders.length > 0 ? (
@@ -116,19 +118,19 @@ export function PracticeHubPage() {
               {leaders.map((u, idx) => (
                 <div
                   key={u.userId}
-                  className="section-enter flex min-w-fit items-center gap-2.5 rounded-2xl border border-[#CBCCC9] bg-white px-4 py-2 shadow-[0_10px_22px_rgba(15,23,42,0.05)] dark:border-[#1a2540] dark:bg-[#161c2d]"
+                  className="section-enter flex min-w-fit items-center gap-2.5 rounded-2xl border border-[#C1CFC4] bg-white px-4 py-2 shadow-[0_10px_22px_rgba(15,23,42,0.05)] dark:border-[#163028] dark:bg-[#132420]"
                 >
-                  <span className="text-xs font-mono font-bold text-[#6366F1] w-4 text-center">{idx + 1}</span>
+                  <span className="text-xs font-mono font-bold text-[#059669] w-4 text-center">{idx + 1}</span>
                   <Avatar name={u.username} src={u.avatarUrl} size="xs" />
                   <div className="min-w-0">
-                    <p className="text-sm font-medium text-[#111111] dark:text-[#c8d8ec] truncate">{u.username}</p>
-                    <p className="text-[10px] text-[#666666] dark:text-[#4d6380]">{t('practice.wins', { count: u.wins })}</p>
+                    <p className="text-sm font-medium text-[#111111] dark:text-[#C1D9CA] truncate">{u.username}</p>
+                    <p className="text-[10px] text-[#4B6B52] dark:text-[#4A7058]">{t('practice.wins', { count: u.wins })}</p>
                   </div>
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-[#666666] dark:text-[#4d6380]">{t('practice.noLeaders')}</p>
+            <p className="text-xs text-[#4B6B52] dark:text-[#4A7058]">{t('practice.noLeaders')}</p>
           )}
         </div>
 

@@ -65,13 +65,13 @@ export function MobileNav() {
               <Sparkles className="w-4 h-4 text-white" />
             </div>
             <div className="min-w-0">
-              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#6366F1] dark:text-[#a5b4fc]">
+              <p className="text-[10px] font-semibold uppercase tracking-[0.24em] text-[#059669] dark:text-[#6EE7B7]">
                 {t('app.name')}
               </p>
-              <p className="truncate text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
+              <p className="truncate text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
                 {t(routeMeta.titleKey ?? routeMeta.title)}
               </p>
-              <p className="truncate text-[11px] text-[#667085] dark:text-[#7e93b0]">
+              <p className="truncate text-[11px] text-[#7A9982] dark:text-[#7BA88A]">
                 {t(routeMeta.subtitleKey ?? routeMeta.subtitle)}
               </p>
             </div>
@@ -86,7 +86,7 @@ export function MobileNav() {
             >
               {theme === 'dark'
                 ? <Sun className="w-4 h-4 text-[#fbbf24]" />
-                : <Moon className="w-4 h-4 text-[#6366F1]" />
+                : <Moon className="w-4 h-4 text-[#059669]" />
               }
             </button>
             <button
@@ -122,10 +122,10 @@ export function MobileNav() {
         <aside className="mobile-sheet__panel">
           <div className="flex items-center justify-between gap-3">
             <div>
-              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#6366F1] dark:text-[#a5b4fc]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.24em] text-[#059669] dark:text-[#6EE7B7]">
                 {t('mobile.navigation')}
               </p>
-              <h2 className="mt-1 text-xl font-semibold text-[#111111] dark:text-[#f8fafc]">
+              <h2 className="mt-1 text-xl font-semibold text-[#111111] dark:text-[#E2F0E8]">
                 {t('mobile.quickAccess')}
               </h2>
             </div>
@@ -135,7 +135,7 @@ export function MobileNav() {
               className="mobile-icon-button"
               aria-label={t('mobile.navigation')}
             >
-              <X className="w-4 h-4 text-[#111111] dark:text-[#e2e8f3]" />
+              <X className="w-4 h-4 text-[#111111] dark:text-[#E2F0E8]" />
             </button>
           </div>
 
@@ -148,10 +148,10 @@ export function MobileNav() {
                 className="ring-2 ring-white/80 dark:ring-[#101a31]"
               />
               <div className="min-w-0">
-                <p className="truncate text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
+                <p className="truncate text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
                   {displayName}
                 </p>
-                <p className="truncate text-xs text-[#667085] dark:text-[#7e93b0]">
+                <p className="truncate text-xs text-[#7A9982] dark:text-[#7BA88A]">
                   {userMeta}
                 </p>
               </div>
@@ -183,14 +183,14 @@ export function MobileNav() {
                     <Icon className="w-4 h-4" />
                   </span>
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
+                    <span className="block truncate text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
                       {t(item.labelKey ?? item.label)}
                     </span>
-                    <span className="mt-0.5 block text-xs leading-relaxed text-[#667085] dark:text-[#7e93b0]">
+                    <span className="mt-0.5 block text-xs leading-relaxed text-[#7A9982] dark:text-[#7BA88A]">
                       {t(item.descriptionKey ?? item.description)}
                     </span>
                   </span>
-                  <ChevronRight className="w-4 h-4 flex-shrink-0 text-[#94a3b8] dark:text-[#4d6380]" />
+                  <ChevronRight className="w-4 h-4 flex-shrink-0 text-[#94a3b8] dark:text-[#4A7058]" />
                 </Link>
               )
             })}
@@ -204,7 +204,7 @@ export function MobileNav() {
             >
               {theme === 'dark'
                 ? <Sun className="w-4 h-4 text-[#fbbf24]" />
-                : <Moon className="w-4 h-4 text-[#6366F1]" />
+                : <Moon className="w-4 h-4 text-[#059669]" />
               }
               <span className="flex-1 text-left">
                 {theme === 'dark' ? t('sidebar.theme.light') : t('sidebar.theme.dark')}
@@ -216,7 +216,7 @@ export function MobileNav() {
               onClick={() => void i18n.changeLanguage(i18n.language.startsWith('en') ? 'ru' : 'en')}
               className="mobile-sheet__action"
             >
-              <span className="w-4 text-center text-[11px] font-bold text-[#6366F1] dark:text-[#a5b4fc]">
+              <span className="w-4 text-center text-[11px] font-bold text-[#059669] dark:text-[#6EE7B7]">
                 {i18n.language.startsWith('en') ? 'EN' : 'RU'}
               </span>
               <span className="flex-1 text-left">{t('sidebar.lang.ru')} | {t('sidebar.lang.en')}</span>
@@ -231,7 +231,7 @@ export function MobileNav() {
                 }}
                 className="mobile-sheet__action"
               >
-                <User className="w-4 h-4 text-[#6366F1] dark:text-[#a5b4fc]" />
+                <User className="w-4 h-4 text-[#059669] dark:text-[#6EE7B7]" />
                 <span className="flex-1 text-left">{t('sidebar.profile')}</span>
               </button>
             )}
@@ -245,7 +245,7 @@ export function MobileNav() {
                 }}
                 className="mobile-sheet__action"
               >
-                <Shield className="w-4 h-4 text-[#6366F1] dark:text-[#a5b4fc]" />
+                <Shield className="w-4 h-4 text-[#059669] dark:text-[#6EE7B7]" />
                 <span className="flex-1 text-left">{t('sidebar.admin')}</span>
               </button>
             )}
@@ -265,7 +265,7 @@ export function MobileNav() {
             )}
           </div>
 
-          <p className="mt-auto px-1 pt-2 text-[11px] leading-relaxed text-[#94a3b8] dark:text-[#4d6380]">
+          <p className="mt-auto px-1 pt-2 text-[11px] leading-relaxed text-[#94a3b8] dark:text-[#4A7058]">
             {t('mobile.menuFooter')}
           </p>
         </aside>

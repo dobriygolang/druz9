@@ -31,7 +31,10 @@ func (h *CodeEditorHub) loadRoomSnapshot(roomID string) {
 		return
 	}
 
-	room, err := h.store.GetRoom(context.Background(), parsedRoomID)
+	ctx, cancel := context.WithTimeout(h.ctx, 5*time.Second)
+	defer cancel()
+
+	room, err := h.store.GetRoom(ctx, parsedRoomID)
 	if err != nil || room == nil {
 		return
 	}
@@ -114,8 +117,12 @@ func (h *CodeEditorHub) flushSnapshot(roomID, code, language string) {
 	if parsedRoomID == uuid.Nil {
 		return
 	}
+
+	ctx, cancel := context.WithTimeout(h.ctx, 5*time.Second)
+	defer cancel()
+
 	_ = h.store.SaveEditorState(
-		context.Background(),
+		ctx,
 		parsedRoomID,
 		nil,
 		"",
@@ -148,8 +155,12 @@ func (h *CodeEditorHub) flushActorSnapshotByState(item pendingActorSnapshot) {
 	if parsedRoomID == uuid.Nil {
 		return
 	}
+
+	ctx, cancel := context.WithTimeout(h.ctx, 5*time.Second)
+	defer cancel()
+
 	_ = h.store.SaveEditorState(
-		context.Background(),
+		ctx,
 		parsedRoomID,
 		parseOptionalUUID(derefString(item.userID)),
 		item.guestName,

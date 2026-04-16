@@ -7,6 +7,10 @@ import (
 )
 
 func (c *arenaClient) writeLoop() {
+	defer func() {
+		recover()
+		c.ws.Close()
+	}()
 	for msg := range c.send {
 		_ = c.ws.SetWriteDeadline(time.Now().Add(10 * time.Second))
 		if err := c.ws.WriteJSON(msg); err != nil {
@@ -52,9 +56,8 @@ func (c *arenaClient) readLoop(h *ArenaHub) {
 }
 
 func (c *arenaClient) enqueue(msg schema.ArenaMessage) {
-	if c.closed.Load() {
-		return
-	}
+	defer func() { recover() }()
+
 	select {
 	case c.send <- msg:
 	default:

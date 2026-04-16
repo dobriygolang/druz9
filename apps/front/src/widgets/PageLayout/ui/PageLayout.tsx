@@ -3,6 +3,7 @@ import { Outlet } from 'react-router-dom'
 import { Sidebar } from '@/widgets/Sidebar/ui/Sidebar'
 import { MobileNav } from '@/widgets/MobileNav/ui/MobileNav'
 import { PageTransition } from '@/shared/ui/PageTransition'
+import { FloatingLeaves } from '@/shared/ui/FloatingLeaves'
 import { AudioPlayerBar } from '@/features/Podcast/ui/AudioPlayerBar'
 import { useAudioPlayer } from '@/features/Podcast/providers/AudioPlayerProvider'
 
@@ -14,8 +15,9 @@ export function PageLayout() {
   const mainPadding = playing ? 'pb-[198px] md:pb-[76px]' : 'pb-[116px] md:pb-0'
 
   return (
-    <div className="relative h-screen overflow-hidden bg-[#F2F3F0] dark:bg-[#0f1117] transition-colors duration-300">
-      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,_rgba(99,102,241,0.16),_transparent_62%)] dark:bg-[radial-gradient(circle_at_top,_rgba(129,140,248,0.2),_transparent_58%)] md:hidden" />
+    <div className="relative h-screen overflow-hidden bg-[#F0F5F1] dark:bg-[#0B1210] transition-colors duration-300">
+      <FloatingLeaves />
+      <div className="pointer-events-none absolute inset-x-0 top-0 h-72 bg-[radial-gradient(circle_at_top,_rgba(5,150,105,0.16),_transparent_62%)] dark:bg-[radial-gradient(circle_at_top,_rgba(52,211,153,0.2),_transparent_58%)] md:hidden" />
 
       <div className="relative mx-auto flex h-full max-w-[1600px]">
         <MemoSidebar />

@@ -33,8 +33,7 @@ func (c *TTLCache[V]) Get(key string) (V, bool) {
 
 // Set stores a value in cache using the default TTL.
 func (c *TTLCache[V]) Set(key string, value V) {
-	_ = c.cache.Remove(key) // Remove existing to reset TTL
-	_ = c.cache.Add(key, value)
+	c.cache.Add(key, value)
 }
 
 // Delete removes a key from cache.
@@ -57,8 +56,7 @@ func (c *TTLCache[V]) GetMultiple(keys []string) map[string]V {
 // SetMultiple stores multiple values in cache using the default TTL.
 func (c *TTLCache[V]) SetMultiple(values map[string]V) {
 	for key, value := range values {
-		_ = c.cache.Remove(key)
-		_ = c.cache.Add(key, value)
+		c.cache.Add(key, value)
 	}
 }
 

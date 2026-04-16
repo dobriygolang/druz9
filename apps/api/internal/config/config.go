@@ -38,6 +38,7 @@ type Server struct {
 	SSE            *SSE            `json:"sse"`
 	RateLimit      *RateLimit      `json:"rate_limit"`
 	CircuitBreaker *CircuitBreaker `json:"circuit_breaker"`
+	AllowedOrigins []string        `json:"allowed_origins"`
 }
 
 type HTTP struct {

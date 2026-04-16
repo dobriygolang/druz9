@@ -9,21 +9,21 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 
 export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
   ({ variant = 'secondary', size = 'md', loading, className, children, disabled, ...props }, ref) => {
-    const base = 'inline-flex items-center gap-2 font-medium rounded-lg transition-all duration-150 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed'
+    const base = 'inline-flex items-center gap-2 font-medium rounded-xl transition-all duration-150 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-offset-1 disabled:opacity-50 disabled:cursor-not-allowed'
 
     const variants = {
-      primary: 'bg-[#6366F1] hover:bg-[#4F46E5] hover:shadow-sm hover:-translate-y-0.5 text-white focus:ring-[#6366F1]',
-      orange:  'bg-[#6366F1] hover:bg-[#4F46E5] hover:shadow-sm hover:-translate-y-0.5 text-white focus:ring-[#6366F1]',
+      primary: 'btn-game btn-ripple bg-[#059669] hover:bg-[#047857] hover:shadow-sm hover:-translate-y-0.5 text-white focus:ring-[#059669]',
+      orange:  'btn-game btn-ripple bg-[#059669] hover:bg-[#047857] hover:shadow-sm hover:-translate-y-0.5 text-white focus:ring-[#059669]',
       secondary: [
-        'bg-white hover:bg-[#F2F3F0] text-[#111111] border border-[#CBCCC9] focus:ring-[#CBCCC9]',
-        'dark:bg-[#1c2436] dark:hover:bg-[#1a2640] dark:text-[#e2e8f3] dark:border-[#1e3158] dark:focus:ring-[#1e3158]',
+        'bg-white hover:bg-[#E6F0E8] text-[#111111] border border-[#C1CFC4] focus:ring-[#C1CFC4]',
+        'dark:bg-[#132420] dark:hover:bg-[#1A3028] dark:text-[#E2F0E8] dark:border-[#1E4035] dark:focus:ring-[#1E4035]',
       ].join(' '),
       ghost: [
-        'bg-transparent hover:bg-[#F2F3F0] text-[#666666] focus:ring-[#CBCCC9]',
-        'dark:hover:bg-[#1a2236] dark:text-[#7e93b0] dark:focus:ring-[#1a2540]',
+        'bg-transparent hover:bg-[#E6F0E8] text-[#4B6B52] focus:ring-[#C1CFC4]',
+        'dark:hover:bg-[#162E24] dark:text-[#7BA88A] dark:focus:ring-[#163028]',
       ].join(' '),
       danger: 'bg-[#ef4444] hover:bg-[#dc2626] hover:shadow-sm text-white focus:ring-[#ef4444]',
-      dark:   'bg-[#1e293b] hover:bg-[#0f172a] text-[#e2e8f0] focus:ring-[#334155]',
+      dark:   'bg-[#1e293b] hover:bg-[#0B1210] text-[#e2e8f0] focus:ring-[#1E4035]',
     }
 
     const sizes = {

@@ -12,15 +12,15 @@ export function AdminLayout() {
   const displayName = user ? `${user.firstName} ${user.lastName}`.trim() || user.username : 'Admin'
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F2F3F0]">
+    <div className="flex flex-col min-h-screen bg-[#F0F5F1]">
       {/* Top bar */}
-      <header className="h-[52px] bg-white border-b border-[#CBCCC9] flex items-center justify-between px-6 flex-shrink-0 z-10">
+      <header className="h-[52px] bg-white border-b border-[#C1CFC4] flex items-center justify-between px-6 flex-shrink-0 z-10">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
-            <div className="w-7 h-7 bg-[#6366F1] rounded-lg flex items-center justify-center">
+            <div className="w-7 h-7 bg-[#059669] rounded-lg flex items-center justify-center">
               <span className="text-xs font-bold text-white">D</span>
             </div>
-            <span className="text-sm font-semibold text-[#0f172a]">Druzya Admin</span>
+            <span className="text-sm font-semibold text-[#0B1210]">Druzya Admin</span>
           </div>
           <nav className="flex items-center gap-1">
             {ADMIN_NAV.map((tab) => (
@@ -30,8 +30,8 @@ export function AdminLayout() {
                 className={cn(
                   'px-3 py-1.5 text-xs font-medium rounded-lg transition-colors',
                   location.pathname === tab.href
-                    ? 'bg-[#6366F1] text-[#0f172a]'
-                    : 'text-[#666666] hover:bg-[#F2F3F0]',
+                    ? 'bg-[#059669] text-[#0B1210]'
+                    : 'text-[#4B6B52] hover:bg-[#F0F5F1]',
                 )}
               >
                 {tab.label}

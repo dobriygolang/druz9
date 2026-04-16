@@ -75,6 +75,8 @@ const (
 	ServerGrpcAddr Key = "server_grpc_addr"
 	// gRPC server request timeout
 	ServerGrpcTimeout Key = "server_grpc_timeout"
+	// Comma-separated list of allowed CORS origins
+	ServerAllowedOrigins Key = "server_allowed_origins"
 	// HTTP server listen address
 	ServerHttpAddr Key = "server_http_addr"
 	// HTTP server request timeout

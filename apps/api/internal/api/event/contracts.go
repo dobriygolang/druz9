@@ -16,5 +16,4 @@ type Service interface {
 	LeaveEvent(context.Context, uuid.UUID, uuid.UUID) error
 	UpdateEvent(context.Context, uuid.UUID, *model.User, model.UpdateEventRequest) (*model.Event, error)
 	DeleteEvent(context.Context, uuid.UUID, *model.User) error
-	EnrichEventsWithAvatarURLs(context.Context, *model.ListEventsResponse) error
 }

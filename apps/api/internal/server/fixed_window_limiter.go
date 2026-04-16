@@ -1,6 +1,7 @@
 package server
 
 import (
+	"net"
 	"sync"
 	"time"
 
@@ -9,19 +10,21 @@ import (
 	aegisratelimit "github.com/go-kratos/aegis/ratelimit"
 )
 
-type fixedWindowLimiter struct {
-	mu           sync.Mutex
-	maxCalls     int
-	window       time.Duration
-	blockFor     time.Duration
-	blockedUntil time.Time
-	windowStart  time.Time
-	calls        int
+type ipBucket struct {
+	calls       int
+	windowStart time.Time
 }
 
-func newFixedWindowLimiter(cfg *config.RateLimit) aegisratelimit.Limiter {
+type perIPLimiter struct {
+	mu       sync.Mutex
+	maxCalls int
+	window   time.Duration
+	buckets  map[string]*ipBucket
+	lastGC   time.Time
+}
+
+func newPerIPLimiter(cfg *config.RateLimit) *perIPLimiter {
 	window := time.Second
-	blockFor := time.Duration(0)
 	maxCalls := 100
 
 	if cfg != nil {
@@ -31,44 +34,56 @@ func newFixedWindowLimiter(cfg *config.RateLimit) aegisratelimit.Limiter {
 		if cfg.Window > 0 {
 			window = cfg.Window
 		}
-		if cfg.BlockFor > 0 {
-			blockFor = cfg.BlockFor
-		}
 	}
 
-	return &fixedWindowLimiter{
+	return &perIPLimiter{
 		maxCalls: maxCalls,
 		window:   window,
-		blockFor: blockFor,
+		buckets:  make(map[string]*ipBucket),
 	}
 }
 
-func (l *fixedWindowLimiter) Allow() (aegisratelimit.DoneFunc, error) {
+func (l *perIPLimiter) Allow(ip string) (aegisratelimit.DoneFunc, error) {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 
 	now := time.Now()
 
-	// If globally blocked, reject immediately.
-	if !l.blockedUntil.IsZero() && now.Before(l.blockedUntil) {
-		return nil, aegisratelimit.ErrLimitExceed
+	// GC expired buckets every 30 seconds to prevent memory growth.
+	if now.Sub(l.lastGC) > 30*time.Second {
+		for key, b := range l.buckets {
+			if now.Sub(b.windowStart) >= 2*l.window {
+				delete(l.buckets, key)
+			}
+		}
+		l.lastGC = now
 	}
-	l.blockedUntil = time.Time{}
+
+	b := l.buckets[ip]
+	if b == nil {
+		b = &ipBucket{windowStart: now}
+		l.buckets[ip] = b
+	}
 
 	// Reset window if expired.
-	if l.windowStart.IsZero() || now.Sub(l.windowStart) >= l.window {
-		l.windowStart = now
-		l.calls = 0
+	if now.Sub(b.windowStart) >= l.window {
+		b.windowStart = now
+		b.calls = 0
 	}
 
-	// If over limit, apply block and reject.
-	if l.calls >= l.maxCalls {
-		if l.blockFor > 0 {
-			l.blockedUntil = now.Add(l.blockFor)
-		}
+	if b.calls >= l.maxCalls {
 		return nil, aegisratelimit.ErrLimitExceed
 	}
 
-	l.calls++
+	b.calls++
 	return func(aegisratelimit.DoneInfo) {}, nil
+}
+
+// extractIP returns the client IP from addr (host:port format).
+func extractIP(addr string) string {
+	host, _, err := net.SplitHostPort(addr)
+	if err != nil {
+		return addr
+	}
+	return host
 }

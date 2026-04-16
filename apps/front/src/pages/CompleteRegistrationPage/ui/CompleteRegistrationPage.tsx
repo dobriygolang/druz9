@@ -91,27 +91,27 @@ export function CompleteRegistrationPage() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F2F3F0] flex items-center justify-center px-4 py-8">
+    <div className="min-h-screen bg-[#F0F5F1] flex items-center justify-center px-4 py-8">
       <div className="w-full max-w-[460px]">
         <div className="overflow-hidden rounded-[28px] border border-[#d8d9d6] bg-white shadow-[0_16px_34px_rgba(15,23,42,0.06)]">
-          <div className="h-1.5 bg-gradient-to-r from-[#6366F1] via-[#8b5cf6] to-[#a78bfa]" />
+          <div className="h-1.5 bg-gradient-to-r from-[#059669] via-[#0D9488] to-[#5EEAD4]" />
           <div className="p-6 sm:p-8">
             <div className="mb-6 text-center">
-              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#6366F1]">
+              <div className="mx-auto mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-[#059669]">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
                   <path d="M4 20L12 4L20 20" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"/>
                   <path d="M7 14H17" stroke="white" strokeWidth="2.5" strokeLinecap="round"/>
                 </svg>
               </div>
               <h2 className="text-xl font-bold text-[#111111]">{t('complete.title')}</h2>
-              <p className="mt-1 text-sm text-[#666666]">{t('complete.subtitle')}</p>
+              <p className="mt-1 text-sm text-[#4B6B52]">{t('complete.subtitle')}</p>
             </div>
             {error && (
               <div className="mb-4 rounded-lg border border-[#fca5a5] bg-[#fef2f2] p-3 text-sm text-[#dc2626]">{error}</div>
             )}
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div ref={wrapperRef} className="relative flex flex-col gap-1.5">
-                <label htmlFor="city-input" className="text-xs font-500 text-[#475569]">
+                <label htmlFor="city-input" className="text-xs font-500 text-[#4B6B52]">
                   {t('complete.city')}
                 </label>
                 <input
@@ -124,8 +124,8 @@ export function CompleteRegistrationPage() {
                   autoComplete="off"
                   className={cn(
                     'w-full px-3 py-3 text-sm rounded-xl transition-colors',
-                    'bg-[#f8fafc] border border-[#e2e8f0] text-[#0f172a] placeholder-[#94a3b8]',
-                    'focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20 focus:border-[#6366f1]',
+                    'bg-[#E2F0E8] border border-[#e2e8f0] text-[#0B1210] placeholder-[#94a3b8]',
+                    'focus:outline-none focus:ring-2 focus:ring-[#059669]/20 focus:border-[#059669]',
                   )}
                 />
                 {showDropdown && (
@@ -134,7 +134,7 @@ export function CompleteRegistrationPage() {
                       <li
                         key={i}
                         onClick={() => handleSelect(s)}
-                        className="cursor-pointer px-3 py-2 text-sm text-[#0f172a] hover:bg-[#f1f5f9] first:rounded-t-xl last:rounded-b-xl"
+                        className="cursor-pointer px-3 py-2 text-sm text-[#0B1210] hover:bg-[#f1f5f9] first:rounded-t-xl last:rounded-b-xl"
                       >
                         {s.placeLabel}
                       </li>
@@ -142,7 +142,7 @@ export function CompleteRegistrationPage() {
                   </ul>
                 )}
                 {selected && (
-                  <p className="text-xs text-[#6366f1]">
+                  <p className="text-xs text-[#059669]">
                     {[selected.city, selected.region, selected.country].filter(Boolean).join(', ')}
                   </p>
                 )}

@@ -13,10 +13,10 @@ export function CompanyReadiness({ readiness, className }: Props) {
 
   if (readiness.length === 0) {
     return (
-      <div className={`section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d] ${className ?? ''}`}>
-        <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.progress.companyReadiness')}</h3>
+      <div className={`section-enter rounded-[28px] border border-[#C1CFC4] bg-white p-5 dark:border-[#163028] dark:bg-[#132420] ${className ?? ''}`}>
+        <h3 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('profile.progress.companyReadiness')}</h3>
         <p className="mt-1 text-xs text-[#94a3b8]">{t('profile.progress.companyReadinessSubtitle')}</p>
-        <div className="mt-5 flex min-h-[100px] items-center justify-center rounded-2xl bg-[#F2F3F0] dark:bg-[#0f1629]">
+        <div className="mt-5 flex min-h-[100px] items-center justify-center rounded-2xl bg-[#F0F5F1] dark:bg-[#0f1629]">
           <p className="text-xs text-[#94a3b8]">{t('profile.company.empty')}</p>
         </div>
       </div>
@@ -24,24 +24,24 @@ export function CompanyReadiness({ readiness, className }: Props) {
   }
 
   return (
-    <div className={`section-enter rounded-[28px] border border-[#CBCCC9] bg-white p-5 dark:border-[#1a2540] dark:bg-[#161c2d] ${className ?? ''}`}>
-      <h3 className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{t('profile.progress.companyReadiness')}</h3>
+    <div className={`section-enter rounded-[28px] border border-[#C1CFC4] bg-white p-5 dark:border-[#163028] dark:bg-[#132420] ${className ?? ''}`}>
+      <h3 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('profile.progress.companyReadiness')}</h3>
       <p className="mt-1 text-xs text-[#94a3b8]">{t('profile.progress.companyReadinessSubtitle')}</p>
 
       <div className="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {readiness.map(item => {
           const toneColor = item.tone === 'success' ? '#22c55e' : item.tone === 'warning' ? '#f59e0b' : '#ef4444'
-          const toneBg = item.tone === 'success' ? '#F0FDF4' : item.tone === 'warning' ? '#FFFBEB' : '#FEF2F2'
+          const toneBg = item.tone === 'success' ? '#F0FDF4' : item.tone === 'warning' ? '#ecfdf5' : '#FEF2F2'
           const nextLabel = item.nextStageKind ? t(`profile.stage.${item.nextStageKind}`) : ''
           return (
             <div
               key={item.name}
-              className="flex flex-col gap-3 rounded-[20px] border border-[#E7E8E5] bg-[#FAFAFA] p-4 dark:border-[#1e3158] dark:bg-[#0f1629]"
+              className="flex flex-col gap-3 rounded-[20px] border border-[#E4EBE5] bg-[#FAFAFA] p-4 dark:border-[#1E4035] dark:bg-[#0f1629]"
             >
               <div className="flex items-center justify-between gap-2">
                 <div className="flex items-center gap-2 min-w-0">
                   <Building2 className="h-4 w-4 shrink-0 text-[#94a3b8]" />
-                  <span className="truncate text-sm font-semibold text-[#111111] dark:text-[#e2e8f3]">{item.name}</span>
+                  <span className="truncate text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{item.name}</span>
                 </div>
                 <Badge variant={item.tone === 'success' ? 'success' : item.tone === 'warning' ? 'warning' : 'danger'}>
                   {item.percent}%
@@ -51,7 +51,7 @@ export function CompanyReadiness({ readiness, className }: Props) {
               {/* Progress ring inline */}
               <div className="flex items-center gap-3">
                 <svg width={40} height={40} viewBox="0 0 40 40">
-                  <circle cx={20} cy={20} r={16} fill="none" stroke="#E7E8E5" strokeWidth={3} className="dark:stroke-[#1e3158]" />
+                  <circle cx={20} cy={20} r={16} fill="none" stroke="#E4EBE5" strokeWidth={3} className="dark:stroke-[#1E4035]" />
                   <circle
                     cx={20} cy={20} r={16} fill="none"
                     stroke={toneColor} strokeWidth={3} strokeLinecap="round"
@@ -60,7 +60,7 @@ export function CompanyReadiness({ readiness, className }: Props) {
                   />
                 </svg>
                 <div className="min-w-0">
-                  <p className="text-xs font-medium text-[#475569] dark:text-[#7e93b0]">
+                  <p className="text-xs font-medium text-[#4B6B52] dark:text-[#7BA88A]">
                     {t('profile.progress.completedStages', { completed: item.completed, total: item.total })}
                   </p>
                   {item.nextStageKind && item.percent < 100 && (

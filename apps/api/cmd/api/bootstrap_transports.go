@@ -42,6 +42,7 @@ func initializeTransports(
 		bootstrap.kratosLogger,
 		bootstrap.cfg.Server.RateLimit,
 		bootstrap.cfg.Server.CircuitBreaker,
+		bootstrap.cfg.Server.AllowedOrigins,
 	)
 	grpcServer := server.NewGRPCServer(
 		bootstrap.cfg.Server.GRPC.Addr,

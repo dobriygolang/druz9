@@ -7,6 +7,7 @@ import { useAuth } from '@/app/providers/AuthProvider'
 import { useTheme } from '@/app/providers/ThemeProvider'
 import { Avatar } from '@/shared/ui/Avatar'
 import { PRIMARY_NAV_ITEMS, isFullscreenPath, isNavItemActive } from '@/widgets/navigation/model/navigation'
+import { PixelSidebarScene } from './PixelSidebarScene'
 
 export function Sidebar() {
   const location = useLocation()
@@ -46,14 +47,17 @@ export function Sidebar() {
 
   return (
     <aside className={cn(
-      'hidden md:flex w-[64px] lg:w-[220px] h-screen sticky top-0 flex-col flex-shrink-0 transition-all duration-200',
-      'bg-[#E7E8E5] border-r border-[#CBCCC9]',
-      'dark:bg-[#0b0d16] dark:border-[#1a2540]',
+      'hidden md:flex w-[64px] lg:w-[220px] h-screen sticky top-0 flex-col flex-shrink-0 transition-all duration-200 relative overflow-hidden',
+      'bg-[#E4EBE5] border-r border-[#C1CFC4]',
+      'dark:bg-[#070E0C] dark:border-[#163028]',
     )}>
-      {/* Logo */}
-      <div className="h-[72px] flex items-center justify-center lg:justify-start px-3 lg:px-5">
+      {/* Pixel scene background */}
+      <PixelSidebarScene compact={false} />
+
+      {/* Logo — pixel style */}
+      <div className="relative z-10 h-[72px] flex items-center justify-center lg:justify-start px-3 lg:px-5">
         <div className="flex items-center gap-2.5">
-          <div className="w-8 h-8 bg-[#6366F1] rounded-lg flex items-center justify-center flex-shrink-0 shadow-[0_2px_8px_rgba(99,102,241,0.35)]">
+          <div className="w-8 h-8 bg-[#059669] flex items-center justify-center flex-shrink-0 pixel-border" style={{ imageRendering: 'pixelated' }}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
               <line x1="5" y1="6" x2="15" y2="6"  stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.6"/>
               <line x1="5" y1="6" x2="10" y2="15" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeOpacity="0.6"/>
@@ -64,19 +68,16 @@ export function Sidebar() {
             </svg>
           </div>
           <div className="hidden lg:flex flex-col">
-            <span
-              className="font-bold text-[13px] text-[#6366F1] dark:text-[#818cf8] tracking-[0.18em] leading-tight uppercase"
-              style={{ fontFamily: 'Geist, Inter, system-ui, sans-serif' }}
-            >
+            <span className="font-pixel text-[8px] text-[#059669] dark:text-[#34D399] tracking-wider leading-tight">
               DRUZYA
             </span>
-            <span className="text-[10px] text-[#94a3b8] dark:text-[#3d5570] leading-tight" style={{ fontFamily: 'Geist, Inter, system-ui, sans-serif' }}>v2.0.0</span>
+            <span className="text-[9px] text-[#7A9982] dark:text-[#3A5A45] leading-tight font-pixel">v2</span>
           </div>
         </div>
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 overflow-y-auto px-2 lg:px-3 flex flex-col gap-0.5">
+      {/* Navigation — wooden signs */}
+      <nav className="relative z-10 flex-1 overflow-y-auto px-2 lg:px-3 flex flex-col gap-1.5 pt-2">
         {PRIMARY_NAV_ITEMS.map((item) => {
           const active = isNavItemActive(location.pathname, item)
           const Icon = item.icon
@@ -86,88 +87,74 @@ export function Sidebar() {
               to={item.href}
               title={t(item.labelKey ?? item.label)}
               className={cn(
-                'relative flex items-center justify-center lg:justify-start gap-2.5 px-2 lg:px-3 py-2.5 rounded-full text-[13px] font-medium transition-all duration-200 font-geist',
-                active
-                  ? 'bg-[#CBCCC9] text-[#111111] dark:bg-[#1a2640] dark:text-[#e2e8f3]'
-                  : 'text-[#666666] hover:bg-[#D8D9D6] hover:text-[#111111] dark:text-[#4d6380] dark:hover:bg-[#141d30] dark:hover:text-[#c8d8ec]',
+                'nav-sign relative flex items-center justify-center lg:justify-start gap-2.5 px-2 lg:px-3 py-2 rounded-none text-[11px] font-medium',
+                active && 'is-active',
               )}
             >
-              {active && (
-                <span className="absolute left-0 top-1/2 -translate-y-1/2 w-[3px] h-4 bg-[#6366F1] dark:bg-[#818cf8] rounded-r-full" />
-              )}
-              <Icon className="w-4 h-4" />
-              <span className="hidden lg:block">{t(item.labelKey ?? item.label)}</span>
+              <Icon className="w-4 h-4 text-white/90" />
+              <span className="hidden lg:block text-white/90 font-pixel text-[7px] tracking-wide">
+                {t(item.labelKey ?? item.label)}
+              </span>
             </Link>
           )
         })}
 
-        {/* Theme toggle */}
-        <div className="mt-2 pt-2 border-t border-[#CBCCC9] dark:border-[#1a2540]">
+        {/* Theme & language toggles — smaller wooden buttons */}
+        <div className="mt-3 pt-2 flex flex-col gap-1">
           <button
             onClick={toggleTheme}
             title={theme === 'dark' ? t('sidebar.theme.light') : t('sidebar.theme.dark')}
-            className={cn(
-              'w-full flex items-center justify-center lg:justify-start gap-2.5 px-2 lg:px-3 py-2.5 rounded-full text-[13px] font-medium transition-all duration-200 font-geist',
-              'text-[#666666] hover:bg-[#D8D9D6] hover:text-[#111111]',
-              'dark:text-[#4d6380] dark:hover:bg-[#141d30] dark:hover:text-[#c8d8ec]',
-            )}
+            className="nav-sign flex items-center justify-center lg:justify-start gap-2.5 px-2 lg:px-3 py-2 rounded-none text-[11px]"
           >
             {theme === 'dark'
-              ? <Sun className="w-4 h-4 text-[#fbbf24]" />
-              : <Moon className="w-4 h-4" />
+              ? <Sun className="w-3.5 h-3.5 text-[#fbbf24]" />
+              : <Moon className="w-3.5 h-3.5 text-white/80" />
             }
-            <span className="hidden lg:block">
+            <span className="hidden lg:block text-white/80 font-pixel text-[7px]">
               {theme === 'dark' ? t('sidebar.theme.light') : t('sidebar.theme.dark')}
             </span>
           </button>
           <button
             onClick={toggleLanguage}
             title={`${t('sidebar.lang.ru')} / ${t('sidebar.lang.en')}`}
-            className={cn(
-              'mt-1 w-full flex items-center justify-center lg:justify-start gap-2.5 px-2 lg:px-3 py-2.5 rounded-full text-[13px] font-medium transition-all duration-200 font-geist',
-              'text-[#666666] hover:bg-[#D8D9D6] hover:text-[#111111]',
-              'dark:text-[#4d6380] dark:hover:bg-[#141d30] dark:hover:text-[#c8d8ec]'
-            )}
+            className="nav-sign flex items-center justify-center lg:justify-start gap-2.5 px-2 lg:px-3 py-2 rounded-none text-[11px]"
           >
-            <span className="w-4 text-center text-[11px] font-bold">{i18n.language.startsWith('en') ? 'EN' : 'RU'}</span>
-            <span className="hidden lg:block">{t('sidebar.lang.ru')} | {t('sidebar.lang.en')}</span>
+            <span className="w-3.5 text-center text-[8px] font-pixel text-white/80">{i18n.language.startsWith('en') ? 'EN' : 'RU'}</span>
+            <span className="hidden lg:block text-white/80 font-pixel text-[7px]">{t('sidebar.lang.ru')} | {t('sidebar.lang.en')}</span>
           </button>
         </div>
       </nav>
 
       {/* Footer with popover menu */}
       {user && (
-        <div className="relative px-2 lg:px-4 py-4 border-t border-[#CBCCC9] dark:border-[#1a2540]" ref={popoverRef}>
+        <div className="relative z-10 px-2 lg:px-4 py-3" ref={popoverRef}>
           {/* Popover */}
           {popoverOpen && (
             <div className={cn(
-              'absolute bottom-full left-3 right-3 mb-2 rounded-xl shadow-lg border z-50 overflow-hidden',
-              'bg-white border-[#CBCCC9]',
-              'dark:bg-[#161c2d] dark:border-[#1e3158]',
+              'absolute bottom-full left-2 right-2 mb-2 shadow-lg border z-50 overflow-hidden card-stone',
             )}>
-              {/* User info */}
               <div className="px-4 py-3 flex items-center gap-3">
                 <Avatar name={displayName} src={user.avatarUrl || undefined} size="sm" />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-medium text-[#111111] dark:text-[#e2e8f3] font-geist truncate">{displayName}</p>
-                  {email && <p className="text-xs text-[#666666] dark:text-[#4d6380] font-geist truncate">{email}</p>}
+                  <p className="text-sm font-medium text-[#111111] dark:text-[#E2F0E8] font-geist truncate">{displayName}</p>
+                  {email && <p className="text-xs text-[#4B6B52] dark:text-[#4A7058] font-geist truncate">{email}</p>}
                 </div>
               </div>
 
-              <div className="h-px bg-[#CBCCC9] dark:bg-[#1a2540]" />
+              <div className="h-px bg-[#B8A898] dark:bg-[#1E4035]" />
 
               <div className="py-1">
                 <button
                   onClick={() => { setPopoverOpen(false); navigate('/profile') }}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#111111] dark:text-[#c8d8ec] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] transition-colors font-geist"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#111111] dark:text-[#C1D9CA] hover:bg-[#E6F0E8] dark:hover:bg-[#162E24] transition-colors font-geist"
                 >
-                  <User className="w-4 h-4 text-[#666666] dark:text-[#4d6380]" />
+                  <User className="w-4 h-4 text-[#4B6B52] dark:text-[#4A7058]" />
                   {t('sidebar.profile')}
                 </button>
                 {user.isAdmin && (
                   <button
                     onClick={() => { setPopoverOpen(false); navigate('/admin') }}
-                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#6366F1] dark:text-[#818cf8] hover:bg-[#EEF2FF] dark:hover:bg-[#1e1e4a] transition-colors font-geist"
+                    className="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-[#059669] dark:text-[#34D399] hover:bg-[#ecfdf5] dark:hover:bg-[#0d2a1f] transition-colors font-geist"
                   >
                     <Shield className="w-4 h-4" />
                     {t('sidebar.admin')}
@@ -175,7 +162,7 @@ export function Sidebar() {
                 )}
               </div>
 
-              <div className="h-px bg-[#CBCCC9] dark:bg-[#1a2540]" />
+              <div className="h-px bg-[#B8A898] dark:bg-[#1E4035]" />
 
               <div className="py-1">
                 <button
@@ -189,15 +176,15 @@ export function Sidebar() {
             </div>
           )}
 
-          {/* Clickable footer area */}
+          {/* Clickable footer area — wooden style */}
           <button
             onClick={() => setPopoverOpen(prev => !prev)}
-            className="w-full flex items-center justify-center lg:justify-start gap-3 text-left rounded-lg hover:bg-[#D8D9D6] dark:hover:bg-[#141d30] p-1 -m-1 transition-colors"
+            className="nav-sign w-full flex items-center justify-center lg:justify-start gap-3 text-left rounded-none p-2 transition-colors"
           >
             <Avatar name={displayName} src={user.avatarUrl || undefined} size="sm" />
             <div className="hidden lg:block flex-1 min-w-0">
-              <p className="text-sm font-medium text-[#111111] dark:text-[#e2e8f3] font-geist truncate">{displayName}</p>
-              {email && <p className="text-xs text-[#666666] dark:text-[#4d6380] font-geist truncate">{email}</p>}
+              <p className="text-xs font-medium text-white/90 font-geist truncate">{displayName}</p>
+              {email && <p className="text-[9px] text-white/60 font-geist truncate">{email}</p>}
             </div>
           </button>
         </div>

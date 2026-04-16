@@ -99,13 +99,13 @@ export function PracticeSoloPage() {
       {/* Header */}
       <div className="mb-5 flex items-start justify-between gap-4">
         <div>
-          <h1 className="text-xl font-bold text-[#111111] dark:text-[#f8fafc]">{t('solo.title')}</h1>
-          <p className="mt-1 text-sm text-[#667085] dark:text-[#7e93b0]">{t('solo.subtitle')}</p>
+          <h1 className="text-xl font-bold text-[#111111] dark:text-[#E2F0E8]">{t('solo.title')}</h1>
+          <p className="mt-1 text-sm text-[#7A9982] dark:text-[#7BA88A]">{t('solo.subtitle')}</p>
         </div>
-        <div className="flex items-center gap-2 rounded-2xl border border-[#CBCCC9] bg-white px-4 py-2 dark:border-[#1a2540] dark:bg-[#161c2d]">
-          <Code2 className="h-4 w-4 text-[#6366F1]" />
-          <span className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">{loading ? '—' : filtered.length}</span>
-          <span className="text-xs text-[#667085] dark:text-[#7e93b0]">{t('solo.tasks')}</span>
+        <div className="flex items-center gap-2 rounded-2xl border border-[#C1CFC4] bg-white px-4 py-2 dark:border-[#163028] dark:bg-[#132420]">
+          <Code2 className="h-4 w-4 text-[#059669]" />
+          <span className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{loading ? '—' : filtered.length}</span>
+          <span className="text-xs text-[#7A9982] dark:text-[#7BA88A]">{t('solo.tasks')}</span>
         </div>
       </div>
 
@@ -116,27 +116,27 @@ export function PracticeSoloPage() {
           value={search}
           onChange={e => setSearch(e.target.value)}
           placeholder={t('solo.searchPlaceholder')}
-          className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#CBCCC9] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20 dark:bg-[#161c2d] dark:border-[#1a2540] dark:text-[#f8fafc] dark:placeholder-[#4d6380]"
+          className="w-full pl-9 pr-4 py-2.5 bg-white border border-[#C1CFC4] rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-[#059669]/20 dark:bg-[#132420] dark:border-[#163028] dark:text-[#E2F0E8] dark:placeholder-[#4d6380]"
         />
       </div>
 
       {/* Filters */}
       <div className="flex flex-col gap-3 mb-5">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-[#666666] dark:text-[#7e93b0] mr-1">{t('solo.topic')}:</span>
+          <span className="text-xs font-medium text-[#4B6B52] dark:text-[#7BA88A] mr-1">{t('solo.topic')}:</span>
           {TOPIC_FILTERS.map(tf => (
             <button
               key={tf.value}
               onClick={() => setTopic(tf.value)}
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 ${
                 topic === tf.value
-                  ? 'bg-[#6366F1] text-white shadow-sm'
-                  : 'bg-[#F2F3F0] dark:bg-[#1a2236] text-[#666666] dark:text-[#4d6380] hover:bg-[#E7E8E5] dark:hover:bg-[#1e2d45] hover:text-[#111111] dark:hover:text-[#c8d8ec]'
+                  ? 'bg-[#059669] text-white shadow-sm'
+                  : 'bg-[#F0F5F1] dark:bg-[#162E24] text-[#4B6B52] dark:text-[#4A7058] hover:bg-[#E4EBE5] dark:hover:bg-[#1e2d45] hover:text-[#111111] dark:hover:text-[#C1D9CA]'
               }`}
             >
               {tf.label}
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                topic === tf.value ? 'bg-white/20 text-white' : 'bg-[#CBCCC9]/50 text-[#94a3b8]'
+                topic === tf.value ? 'bg-white/20 text-white' : 'bg-[#C1CFC4]/50 text-[#94a3b8]'
               }`}>
                 {topicCounts[tf.value] ?? 0}
               </span>
@@ -145,7 +145,7 @@ export function PracticeSoloPage() {
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-medium text-[#666666] dark:text-[#7e93b0] mr-1">{t('solo.difficulty')}:</span>
+          <span className="text-xs font-medium text-[#4B6B52] dark:text-[#7BA88A] mr-1">{t('solo.difficulty')}:</span>
           {DIFFICULTY_FILTERS.map(df => (
             <button
               key={df.value}
@@ -153,12 +153,12 @@ export function PracticeSoloPage() {
               className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-150 ${
                 difficulty === df.value
                   ? 'bg-[#111111] text-white shadow-sm dark:bg-white dark:text-[#111111]'
-                  : 'bg-[#F2F3F0] dark:bg-[#1a2236] text-[#666666] dark:text-[#4d6380] hover:bg-[#E7E8E5] dark:hover:bg-[#1e2d45] hover:text-[#111111] dark:hover:text-[#c8d8ec]'
+                  : 'bg-[#F0F5F1] dark:bg-[#162E24] text-[#4B6B52] dark:text-[#4A7058] hover:bg-[#E4EBE5] dark:hover:bg-[#1e2d45] hover:text-[#111111] dark:hover:text-[#C1D9CA]'
               }`}
             >
               {df.label}
               <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
-                difficulty === df.value ? 'bg-white/20 text-white dark:bg-black/20 dark:text-[#111111]' : 'bg-[#CBCCC9]/50 text-[#94a3b8]'
+                difficulty === df.value ? 'bg-white/20 text-white dark:bg-black/20 dark:text-[#111111]' : 'bg-[#C1CFC4]/50 text-[#94a3b8]'
               }`}>
                 {difficultyCounts[df.value] ?? 0}
               </span>
@@ -171,45 +171,45 @@ export function PracticeSoloPage() {
       {loading ? (
         <div className="flex flex-col gap-3">
           {Array.from({ length: 5 }).map((_, i) => (
-            <div key={i} className="rounded-2xl border border-[#CBCCC9] bg-white p-4 animate-pulse dark:border-[#1a2540] dark:bg-[#161c2d]">
+            <div key={i} className="rounded-2xl border border-[#C1CFC4] bg-white p-4 animate-pulse dark:border-[#163028] dark:bg-[#132420]">
               <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-[#E7E8E5] dark:bg-[#1e3158]" />
+                <div className="w-10 h-10 rounded-xl bg-[#E4EBE5] dark:bg-[#1E4035]" />
                 <div className="flex-1">
-                  <div className="h-4 w-48 bg-[#E7E8E5] rounded dark:bg-[#1e3158]" />
-                  <div className="h-3 w-32 bg-[#E7E8E5] rounded mt-2 dark:bg-[#1e3158]" />
+                  <div className="h-4 w-48 bg-[#E4EBE5] rounded dark:bg-[#1E4035]" />
+                  <div className="h-3 w-32 bg-[#E4EBE5] rounded mt-2 dark:bg-[#1E4035]" />
                 </div>
               </div>
             </div>
           ))}
         </div>
       ) : filtered.length === 0 ? (
-        <div className="rounded-2xl border border-dashed border-[#CBCCC9] bg-white py-16 text-center dark:border-[#1a2540] dark:bg-[#161c2d]">
-          <BookOpen className="mx-auto h-10 w-10 text-[#CBCCC9] dark:text-[#4d6380]" />
-          <p className="mt-3 text-sm font-medium text-[#667085] dark:text-[#7e93b0]">{t('solo.emptyTitle')}</p>
+        <div className="rounded-2xl border border-dashed border-[#C1CFC4] bg-white py-16 text-center dark:border-[#163028] dark:bg-[#132420]">
+          <BookOpen className="mx-auto h-10 w-10 text-[#C1CFC4] dark:text-[#4A7058]" />
+          <p className="mt-3 text-sm font-medium text-[#7A9982] dark:text-[#7BA88A]">{t('solo.emptyTitle')}</p>
           <p className="mt-1 text-xs text-[#94a3b8]">{t('solo.emptyBody')}</p>
         </div>
       ) : (
         <div className="flex flex-col gap-2">
           {filtered.map((task, i) => {
-            const borderColor = DIFF_BORDER[task.difficulty] ?? 'border-l-[#CBCCC9]'
+            const borderColor = DIFF_BORDER[task.difficulty] ?? 'border-l-[#C1CFC4]'
             return (
               <button
                 key={task.id}
                 onClick={() => handleStartSolo(task)}
-                className={`group flex items-center gap-4 rounded-2xl border border-[#CBCCC9] border-l-[3px] ${borderColor} bg-white px-4 py-3.5 text-left transition-all hover:shadow-md hover:border-[#6366F1]/40 dark:border-[#1a2540] dark:bg-[#161c2d] dark:hover:border-[#6366F1]/40 ${isMobile ? 'flex-col items-start gap-3' : ''}`}
+                className={`group flex items-center gap-4 rounded-2xl border border-[#C1CFC4] border-l-[3px] ${borderColor} bg-white px-4 py-3.5 text-left transition-all hover:shadow-md hover:border-[#059669]/40 dark:border-[#163028] dark:bg-[#132420] dark:hover:border-[#059669]/40 ${isMobile ? 'flex-col items-start gap-3' : ''}`}
               >
-                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#F2F3F0] text-sm font-mono font-bold text-[#667085] dark:bg-[#1a2236] dark:text-[#7e93b0]">
+                <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#F0F5F1] text-sm font-mono font-bold text-[#7A9982] dark:bg-[#162E24] dark:text-[#7BA88A]">
                   {i + 1}
                 </div>
 
                 <div className={`flex-1 min-w-0 ${isMobile ? 'w-full' : ''}`}>
-                  <p className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc] group-hover:text-[#6366F1] transition-colors truncate">
+                  <p className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8] group-hover:text-[#059669] transition-colors truncate">
                     {task.title}
                   </p>
                   {task.topics.length > 0 && (
                     <div className="mt-1.5 flex flex-wrap gap-1.5">
                       {task.topics.slice(0, 3).map(tp => (
-                        <span key={tp} className="inline-flex items-center rounded-md bg-[#F2F3F0] px-2 py-0.5 text-[11px] font-medium text-[#475569] dark:bg-[#1a2236] dark:text-[#7e93b0]">
+                        <span key={tp} className="inline-flex items-center rounded-md bg-[#F0F5F1] px-2 py-0.5 text-[11px] font-medium text-[#4B6B52] dark:bg-[#162E24] dark:text-[#7BA88A]">
                           {tp}
                         </span>
                       ))}
@@ -224,11 +224,11 @@ export function PracticeSoloPage() {
                     </Badge>
                   )}
                   {task.language && (
-                    <span className="text-[11px] font-medium text-[#94a3b8] dark:text-[#4d6380] uppercase tracking-wide">
+                    <span className="text-[11px] font-medium text-[#94a3b8] dark:text-[#4A7058] uppercase tracking-wide">
                       {task.language}
                     </span>
                   )}
-                  <ChevronRight className="w-4 h-4 text-[#CBCCC9] group-hover:text-[#6366F1] transition-colors dark:text-[#4d6380]" />
+                  <ChevronRight className="w-4 h-4 text-[#C1CFC4] group-hover:text-[#059669] transition-colors dark:text-[#4A7058]" />
                 </div>
               </button>
             )

@@ -19,14 +19,10 @@ func mapEvent(item *model.Event) *v1.Event {
 		if participant == nil {
 			continue
 		}
-		avatarURL := participant.AvatarURL
-		if avatarURL == "" {
-			avatarURL = participant.TelegramAvatarURL
-		}
 		participants = append(participants, &v1.EventParticipant{
 			UserId:      participant.UserID,
 			DisplayName: participant.Title,
-			AvatarUrl:   avatarURL,
+			AvatarUrl:   participant.AvatarURL,
 			Status:      mapParticipantStatus(participant.Status),
 		})
 	}

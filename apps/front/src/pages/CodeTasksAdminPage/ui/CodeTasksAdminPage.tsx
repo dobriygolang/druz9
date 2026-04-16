@@ -99,8 +99,8 @@ export function CodeTasksAdminPage() {
     <div className="p-6">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h1 className="text-xl font-bold text-[#0f172a]">Code Tasks</h1>
-          <p className="text-sm text-[#666666] mt-0.5">{tasks.length} tasks</p>
+          <h1 className="text-xl font-bold text-[#0B1210]">Code Tasks</h1>
+          <p className="text-sm text-[#4B6B52] mt-0.5">{tasks.length} tasks</p>
         </div>
         <Button variant="orange" onClick={() => { setEditTask({}); setShowEdit(true) }}>
           <Plus className="w-4 h-4" /> Add task
@@ -115,7 +115,7 @@ export function CodeTasksAdminPage() {
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Search tasks..."
-            className="w-full pl-9 pr-3 py-2 text-sm bg-[#F2F3F0] dark:bg-[#0f1117] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none text-[#111111] dark:text-[#e2e8f3]"
+            className="w-full pl-9 pr-3 py-2 text-sm bg-[#F0F5F1] dark:bg-[#0B1210] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none text-[#111111] dark:text-[#E2F0E8]"
           />
         </div>
         <Select
@@ -137,8 +137,8 @@ export function CodeTasksAdminPage() {
       </div>
 
       {/* Table */}
-      <div className="bg-white dark:bg-[#161c2d] rounded-xl border border-[#CBCCC9] dark:border-[#1e3158] overflow-hidden">
-        <div className="grid grid-cols-[40px_1fr_110px_100px_80px_70px_70px_80px] items-center px-5 py-2.5 border-b border-[#CBCCC9] dark:border-[#1e3158] text-[10px] font-semibold text-[#666666] dark:text-[#4d6380] uppercase tracking-wide">
+      <div className="bg-white dark:bg-[#132420] rounded-xl border border-[#C1CFC4] dark:border-[#1E4035] overflow-hidden">
+        <div className="grid grid-cols-[40px_1fr_110px_100px_80px_70px_70px_80px] items-center px-5 py-2.5 border-b border-[#C1CFC4] dark:border-[#1E4035] text-[10px] font-semibold text-[#4B6B52] dark:text-[#4A7058] uppercase tracking-wide">
           <span>#</span>
           <span>Title</span>
           <span>Category</span>
@@ -148,25 +148,25 @@ export function CodeTasksAdminPage() {
           <span>Status</span>
           <span />
         </div>
-        <div className="divide-y divide-[#F2F3F0] dark:divide-[#1e3158]">
+        <div className="divide-y divide-[#F0F5F1] dark:divide-[#1E4035]">
           {loading ? Array.from({ length: 5 }).map((_, i) => (
             <div key={i} className="px-5 py-3 grid grid-cols-[40px_1fr_110px_100px_80px_70px_70px_80px] items-center animate-pulse">
-              <div className="w-5 h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded" />
-              <div className="h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded mr-4" />
-              <div className="h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded" />
-              <div className="h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded" />
-              <div className="h-3 bg-[#F2F3F0] dark:bg-[#1a2236] rounded" />
+              <div className="w-5 h-3 bg-[#F0F5F1] dark:bg-[#162E24] rounded" />
+              <div className="h-3 bg-[#F0F5F1] dark:bg-[#162E24] rounded mr-4" />
+              <div className="h-3 bg-[#F0F5F1] dark:bg-[#162E24] rounded" />
+              <div className="h-3 bg-[#F0F5F1] dark:bg-[#162E24] rounded" />
+              <div className="h-3 bg-[#F0F5F1] dark:bg-[#162E24] rounded" />
             </div>
           )) : paginated.length === 0 ? (
-            <div className="px-5 py-12 text-center text-sm text-[#94a3b8] dark:text-[#4d6380]">No tasks found</div>
+            <div className="px-5 py-12 text-center text-sm text-[#94a3b8] dark:text-[#4A7058]">No tasks found</div>
           ) : paginated.map((task, i) => {
             const cat = getCategoryFromTopics(task.topics)
             const topics = getDisplayTopics(task.topics)
             return (
-              <div key={task.id} className="grid grid-cols-[40px_1fr_110px_100px_80px_70px_70px_80px] items-center px-5 py-3 hover:bg-[#F2F3F0] transition-colors">
+              <div key={task.id} className="grid grid-cols-[40px_1fr_110px_100px_80px_70px_70px_80px] items-center px-5 py-3 hover:bg-[#F0F5F1] transition-colors">
                 <span className="text-xs text-[#94a3b8] font-mono">{page * PAGE_SIZE + i + 1}</span>
                 <div className="min-w-0 pr-2">
-                  <p className="text-sm font-medium text-[#0f172a] truncate">{task.title}</p>
+                  <p className="text-sm font-medium text-[#0B1210] truncate">{task.title}</p>
                   {task.slug && <p className="text-[10px] text-[#94a3b8] font-mono truncate">{task.slug}</p>}
                 </div>
                 <div>
@@ -176,7 +176,7 @@ export function CodeTasksAdminPage() {
                     <span className="text-[10px] text-[#94a3b8]">-</span>
                   )}
                 </div>
-                <p className="text-[10px] text-[#666666] truncate">{topics.slice(0, 2).join(', ')}</p>
+                <p className="text-[10px] text-[#4B6B52] truncate">{topics.slice(0, 2).join(', ')}</p>
                 <div>
                   {task.difficulty && task.difficulty !== 'TASK_DIFFICULTY_UNSPECIFIED' && (
                     <Badge variant={DIFF_VARIANTS[task.difficulty] ?? 'default'}>
@@ -184,14 +184,14 @@ export function CodeTasksAdminPage() {
                     </Badge>
                   )}
                 </div>
-                <span className="text-[10px] text-[#666666]">{LANG_LABELS[task.language] ?? ''}</span>
+                <span className="text-[10px] text-[#4B6B52]">{LANG_LABELS[task.language] ?? ''}</span>
                 <Badge variant={task.isActive !== false ? 'success' : 'default'}>
                   {task.isActive !== false ? 'On' : 'Off'}
                 </Badge>
                 <div className="flex justify-end gap-1">
                   <button
                     onClick={() => { setEditTask({ ...task }); setShowEdit(true) }}
-                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666]"
+                    className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F0F5F1] text-[#4B6B52]"
                   >
                     <Edit2 className="w-3.5 h-3.5" />
                   </button>
@@ -209,15 +209,15 @@ export function CodeTasksAdminPage() {
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between px-2 py-3 mt-1 text-xs text-[#666666] dark:text-[#4d6380]">
+      <div className="flex items-center justify-between px-2 py-3 mt-1 text-xs text-[#4B6B52] dark:text-[#4A7058]">
         <span>{filtered.length} tasks</span>
         {totalPages > 1 && (
           <div className="flex items-center gap-2">
-            <button disabled={page === 0} onClick={() => setPage(p => p - 1)} className="p-1 rounded hover:bg-[#F2F3F0] disabled:opacity-30">
+            <button disabled={page === 0} onClick={() => setPage(p => p - 1)} className="p-1 rounded hover:bg-[#F0F5F1] disabled:opacity-30">
               <ChevronLeft className="w-4 h-4" />
             </button>
             <span className="text-xs">{page + 1} / {totalPages}</span>
-            <button disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)} className="p-1 rounded hover:bg-[#F2F3F0] disabled:opacity-30">
+            <button disabled={page >= totalPages - 1} onClick={() => setPage(p => p + 1)} className="p-1 rounded hover:bg-[#F0F5F1] disabled:opacity-30">
               <ChevronRight className="w-4 h-4" />
             </button>
           </div>

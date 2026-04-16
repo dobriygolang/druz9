@@ -50,7 +50,7 @@ export function ReviewCard({ review, loading, className, showComparison = true }
     return (
       <Card className={cn('flex items-center gap-3', className)}>
         <Spinner size="sm" />
-        <span className="text-sm text-[#64748b] dark:text-[#7e93b0]">Загрузка разбора...</span>
+        <span className="text-sm text-[#7A9982] dark:text-[#7BA88A]">Загрузка разбора...</span>
       </Card>
     )
   }
@@ -71,11 +71,11 @@ export function ReviewCard({ review, loading, className, showComparison = true }
           ) : (
             <Badge variant="danger">Неверно</Badge>
           )}
-          <span className="text-xs text-[#64748b] dark:text-[#7e93b0]">
+          <span className="text-xs text-[#7A9982] dark:text-[#7BA88A]">
             Тесты: {review.passedCount}/{review.totalCount}
           </span>
         </div>
-        <div className="flex items-center gap-3 text-xs text-[#64748b] dark:text-[#7e93b0]">
+        <div className="flex items-center gap-3 text-xs text-[#7A9982] dark:text-[#7BA88A]">
           <span>Время: {formatTime(review.solveTimeMs)}</span>
           {review.medianTimeMs > 0 && (
             <span>Медиана: {formatTime(review.medianTimeMs)}</span>
@@ -88,7 +88,7 @@ export function ReviewCard({ review, loading, className, showComparison = true }
       {isPending && review.isCorrect && (
         <button
           onClick={() => setExpanded(!expanded)}
-          className="flex items-center gap-2 text-sm text-[#6366f1] dark:text-[#818cf8] hover:underline"
+          className="flex items-center gap-2 text-sm text-[#059669] dark:text-[#34D399] hover:underline"
         >
           <Spinner size="sm" />
           Анализируем решение...
@@ -163,7 +163,7 @@ export function ReviewCard({ review, loading, className, showComparison = true }
                   </h4>
                   <ul className="space-y-0.5">
                     {review.aiStrengths.map((s, i) => (
-                      <li key={i} className="text-sm text-[#475569] dark:text-[#94a3b8] flex gap-1.5">
+                      <li key={i} className="text-sm text-[#4B6B52] dark:text-[#94a3b8] flex gap-1.5">
                         <span className="text-[#22c55e] dark:text-[#4ade80] shrink-0">+</span>
                         {s}
                       </li>
@@ -180,7 +180,7 @@ export function ReviewCard({ review, loading, className, showComparison = true }
                   </h4>
                   <ul className="space-y-0.5">
                     {review.aiWeaknesses.map((w, i) => (
-                      <li key={i} className="text-sm text-[#475569] dark:text-[#94a3b8] flex gap-1.5">
+                      <li key={i} className="text-sm text-[#4B6B52] dark:text-[#94a3b8] flex gap-1.5">
                         <span className="text-[#f59e0b] dark:text-[#fbbf24] shrink-0">-</span>
                         {w}
                       </li>
@@ -191,7 +191,7 @@ export function ReviewCard({ review, loading, className, showComparison = true }
 
               {/* Hint */}
               {review.aiHint && (
-                <div className="bg-[#eff6ff] dark:bg-[#0d1e40] rounded-lg px-3 py-2 text-sm text-[#3730a3] dark:text-[#818cf8]">
+                <div className="bg-[#eff6ff] dark:bg-[#0d2a1f] rounded-lg px-3 py-2 text-sm text-[#065F46] dark:text-[#34D399]">
                   <span className="font-medium">Совет: </span>{review.aiHint}
                 </div>
               )}
@@ -212,11 +212,11 @@ export function ReviewCard({ review, loading, className, showComparison = true }
 
               {/* Level 3: Duel Comparison */}
               {showComparison && review.comparisonSummary && (
-                <div className="border-t border-[#e2e8f0] dark:border-[#1e293b] pt-3">
-                  <h4 className="text-xs font-medium text-[#6366f1] dark:text-[#818cf8] mb-1">
+                <div className="border-t border-[#e2e8f0] dark:border-[#1E4035] pt-3">
+                  <h4 className="text-xs font-medium text-[#059669] dark:text-[#34D399] mb-1">
                     Сравнение с соперником
                   </h4>
-                  <p className="text-sm text-[#475569] dark:text-[#94a3b8]">
+                  <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8]">
                     {review.comparisonSummary}
                   </p>
                 </div>

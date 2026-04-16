@@ -12,7 +12,7 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
     return (
       <div className="flex flex-col gap-1.5">
         {label && (
-          <label htmlFor={inputId} className="text-xs font-medium text-[#475569]">
+          <label htmlFor={inputId} className="text-xs font-medium text-[#4B6B52]">
             {label}
           </label>
         )}
@@ -20,8 +20,8 @@ export const Textarea = forwardRef<HTMLTextAreaElement, TextareaProps>(
           ref={ref}
           id={inputId}
           className={cn(
-            'w-full px-3 py-2 text-sm bg-[#f8fafc] border border-[#e2e8f0] rounded-lg text-[#0f172a] placeholder-[#94a3b8] resize-none',
-            'focus:outline-none focus:ring-2 focus:ring-[#6366f1]/20 focus:border-[#6366f1]',
+            'w-full px-3 py-2 text-sm bg-[#E2F0E8] border border-[#e2e8f0] rounded-lg text-[#0B1210] placeholder-[#94a3b8] resize-none',
+            'focus:outline-none focus:ring-2 focus:ring-[#059669]/20 focus:border-[#059669]',
             'transition-colors',
             error && 'border-[#ef4444]',
             className,

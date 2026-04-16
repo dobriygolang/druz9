@@ -12,6 +12,10 @@ import (
 const codeEditorEnqueueTimeout = 100 * time.Millisecond
 
 func (c *codeEditorClient) writeLoop() {
+	defer func() {
+		recover()
+		c.ws.Close()
+	}()
 	for msg := range c.send {
 		_ = c.ws.SetWriteDeadline(time.Now().Add(10 * time.Second))
 		if err := c.ws.WriteJSON(msg); err != nil {

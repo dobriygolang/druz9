@@ -36,8 +36,8 @@ export function ProfileHero({ user, progress, arenaStats, isOwn, onEdit, onBindT
   const daysOnPlatform = daysSince(user.createdAt)
 
   return (
-    <section className="section-enter relative overflow-hidden rounded-[34px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_#0f172a_0%,_#1e1b4b_38%,_#7c2d12_100%)] shadow-[0_26px_64px_rgba(15,23,42,0.16)]">
-      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.24),_transparent_32%),radial-gradient(circle_at_80%_20%,_rgba(129,140,248,0.35),_transparent_26%),radial-gradient(circle_at_75%_80%,_rgba(251,191,36,0.18),_transparent_28%)]" />
+    <section className="section-enter card-notch relative overflow-hidden border border-[#C1CFC4] bg-[linear-gradient(135deg,_#064E3B_0%,_#065F46_38%,_#0D9488_100%)] shadow-[0_26px_64px_rgba(5,150,105,0.16)] dark:border-[#1E4035]">
+      <div className="pointer-events-none absolute inset-0 bg-[radial-gradient(circle_at_top_left,_rgba(255,255,255,0.18),_transparent_32%),radial-gradient(circle_at_80%_20%,_rgba(52,211,153,0.35),_transparent_26%),radial-gradient(circle_at_75%_80%,_rgba(14,165,233,0.15),_transparent_28%)]" />
       <div className="relative p-5 md:p-6">
         <div className="flex flex-col gap-6 lg:flex-row lg:items-end">
           <PlayerFrame
@@ -51,13 +51,13 @@ export function ProfileHero({ user, progress, arenaStats, isOwn, onEdit, onBindT
           <div className="min-w-0 flex-1">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
               <div className="min-w-0">
-                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#c7d2fe]">{t('profile.hero.eyebrow')}</p>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#A7F3D0]">{t('profile.hero.eyebrow')}</p>
                 <div className="mt-2 flex flex-wrap items-center gap-2">
                   <h1 className="text-3xl font-bold text-white">{displayName}</h1>
                   {user.isTrusted && <Badge variant="info">{t('profile.badge.trusted')}</Badge>}
                   {user.isAdmin && <Badge variant="warning">{t('profile.badge.admin')}</Badge>}
                 </div>
-                {user.username && <p className="mt-1 text-xs text-[#cbd5e1]">@{user.username}</p>}
+                {user.username && <p className="mt-1 text-xs text-[#C1D9CA]">@{user.username}</p>}
               </div>
 
               {isOwn && (
@@ -121,14 +121,14 @@ export function ProfileHero({ user, progress, arenaStats, isOwn, onEdit, onBindT
           {ov && (
             <div className="flex flex-col justify-between rounded-[24px] border border-white/10 bg-white/8 px-4 py-4 backdrop-blur">
               <div className="flex items-center gap-1.5">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EEF2FF]">
-                  <TrendingUp className="w-3.5 h-3.5 text-[#6366F1]" />
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ecfdf5]">
+                  <TrendingUp className="w-3.5 h-3.5 text-[#059669]" />
                 </div>
                 <span className="font-mono text-base font-bold text-white">Lv.{ov.level}</span>
               </div>
               {/* Level progress bar */}
               <div className="mt-2 h-1 rounded-full bg-white/15">
-                <div className="h-1 rounded-full bg-[#818cf8] transition-all duration-700" style={{ width: `${Math.round(ov.levelProgress * 100)}%` }} />
+                <div className="h-1 rounded-full bg-[#34D399] transition-all duration-700" style={{ width: `${Math.round(ov.levelProgress * 100)}%` }} />
               </div>
               <span className="mt-2 text-[11px] uppercase tracking-[0.16em] text-white/60">{t('profile.level', { level: ov.level })}</span>
             </div>
@@ -136,7 +136,7 @@ export function ProfileHero({ user, progress, arenaStats, isOwn, onEdit, onBindT
           {arenaStats && (
             <div className="flex flex-col justify-between rounded-[24px] border border-white/10 bg-white/8 px-4 py-4 backdrop-blur">
               <div className="flex items-center gap-1.5">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#EEF2FF]">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ecfdf5]">
                   <Trophy className="h-3.5 w-3.5 text-[#fbbf24]" />
                 </div>
                 <span className="font-mono text-base font-bold text-white">{arenaStats.rating}</span>
@@ -155,7 +155,7 @@ export function ProfileHero({ user, progress, arenaStats, isOwn, onEdit, onBindT
           {ov && (
             <div className="flex flex-col justify-between rounded-[24px] border border-white/10 bg-white/8 px-4 py-4 backdrop-blur">
               <div className="flex items-center gap-1.5">
-                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#FFFBEB]">
+                <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-[#ecfdf5]">
                   <Flame className="w-3.5 h-3.5 text-[#f59e0b]" />
                 </div>
                 <span className="font-mono text-base font-bold text-white">{ov.currentStreakDays}d</span>

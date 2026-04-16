@@ -47,7 +47,7 @@ function setSoloDraft(taskId: string, code: string) {
 }
 
 /* ─── Remote cursor helpers ─── */
-const CURSOR_COLORS = ['#f97316', '#06b6d4', '#8b5cf6', '#10b981', '#f43f5e', '#eab308']
+const CURSOR_COLORS = ['#f97316', '#06b6d4', '#0D9488', '#10b981', '#f43f5e', '#eab308']
 
 function getCursorColor(userId: string): string {
   let hash = 0
@@ -164,22 +164,22 @@ function GuestNamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
   const [name, setName] = useState('')
   const { t } = useTranslation()
   return (
-    <div className="flex items-center justify-center h-screen bg-[#F2F3F0]">
-      <div className="bg-white rounded-2xl border border-[#CBCCC9] p-8 w-full max-w-sm flex flex-col gap-4">
+    <div className="flex items-center justify-center h-screen bg-[#F0F5F1]">
+      <div className="bg-white rounded-2xl border border-[#C1CFC4] p-8 w-full max-w-sm flex flex-col gap-4">
         <h2 className="text-lg font-bold text-[#111111]">{t('codeRoom.guest.title')}</h2>
-        <p className="text-sm text-[#666666]">{t('codeRoom.guest.subtitle')}</p>
+        <p className="text-sm text-[#4B6B52]">{t('codeRoom.guest.subtitle')}</p>
         <input
           value={name}
           onChange={e => setName(e.target.value)}
           placeholder={t('codeRoom.guest.placeholder')}
-          className="w-full px-4 py-2.5 bg-[#F2F3F0] border border-[#CBCCC9] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#6366F1]/30"
+          className="w-full px-4 py-2.5 bg-[#F0F5F1] border border-[#C1CFC4] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#059669]/30"
           onKeyDown={e => { if (e.key === 'Enter' && name.trim()) onSubmit(name.trim()) }}
           autoFocus
         />
         <button
           onClick={() => name.trim() && onSubmit(name.trim())}
           disabled={!name.trim()}
-          className="w-full py-2.5 bg-[#6366F1] hover:bg-[#4F46E5] text-[#0f172a] font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
+          className="w-full py-2.5 bg-[#059669] hover:bg-[#047857] text-[#0B1210] font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
         >
           {t('codeRoom.guest.submit')}
         </button>
@@ -1059,17 +1059,17 @@ export function CodeRoomPage() {
 
   if (isMobile) {
     return (
-      <div className="flex min-h-screen flex-col bg-[#F2F3F0] dark:bg-[#0d1117]">
-        <header className="border-b border-[#d8d9d6] bg-white px-4 pt-3 pb-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] dark:border-[#1e3158] dark:bg-[#161c2d]">
+      <div className="flex min-h-screen flex-col bg-[#F0F5F1] dark:bg-[#0d1117]">
+        <header className="border-b border-[#d8d9d6] bg-white px-4 pt-3 pb-4 shadow-[0_8px_24px_rgba(15,23,42,0.06)] dark:border-[#1E4035] dark:bg-[#132420]">
           <div className="flex items-start gap-3">
             <button
               onClick={() => handleLeaveRoom(false)}
-              className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#666666] dark:bg-[#1a2236] dark:text-[#94a3b8]"
+              className="mt-0.5 flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#4B6B52] dark:bg-[#162E24] dark:text-[#94a3b8]"
             >
               <ArrowLeft className="w-4 h-4" />
             </button>
             <div className="min-w-0 flex-1">
-              <p className="truncate text-sm font-bold text-[#0f172a] dark:text-[#e2e8f0]">{room?.task || t('codeRoom.title')}</p>
+              <p className="truncate text-sm font-bold text-[#0B1210] dark:text-[#e2e8f0]">{room?.task || t('codeRoom.title')}</p>
               <div className="mt-1 flex flex-wrap items-center gap-2">
                 {status && <Badge variant={status.variant}>{status.label}</Badge>}
                 {ws.connected ? (
@@ -1086,7 +1086,7 @@ export function CodeRoomPage() {
             <button
               onClick={toggleTheme}
               title={theme === 'dark' ? t('codeRoom.theme.light') : t('codeRoom.theme.dark')}
-              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#666666] transition-colors dark:bg-[#1a2236] dark:text-[#94a3b8]"
+              className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-2xl bg-[#F8FAFC] text-[#4B6B52] transition-colors dark:bg-[#162E24] dark:text-[#94a3b8]"
             >
               {theme === 'dark' ? <Sun className="w-4 h-4 text-[#fbbf24]" /> : <Moon className="w-4 h-4" />}
             </button>
@@ -1110,7 +1110,7 @@ export function CodeRoomPage() {
           <div className="mt-4 flex gap-2 overflow-x-auto pb-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             <button
               onClick={copyInviteLink}
-              className="flex flex-shrink-0 items-center gap-1.5 rounded-2xl border border-[#e2e8f0] bg-white px-3 py-2 text-xs font-medium text-[#111111] transition-colors dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f0]"
+              className="flex flex-shrink-0 items-center gap-1.5 rounded-2xl border border-[#e2e8f0] bg-white px-3 py-2 text-xs font-medium text-[#111111] transition-colors dark:border-[#1E4035] dark:bg-[#0B1210] dark:text-[#e2e8f0]"
               title={t('codeRoom.copyInviteLink')}
             >
               {copied ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Share2 className="w-3.5 h-3.5" />}
@@ -1122,7 +1122,7 @@ export function CodeRoomPage() {
                 onClick={handleTogglePrivacy}
                 disabled={togglingPrivacy}
                 title={room?.isPrivate ? t('codeRoom.makePublic') : t('codeRoom.makePrivate')}
-                className={`flex flex-shrink-0 items-center gap-1.5 rounded-2xl border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50 ${room?.isPrivate ? 'border-[#c7d2fe] bg-[#eef2ff] text-[#6366F1] dark:border-[#312e81] dark:bg-[#1e1b4b]' : 'border-[#e2e8f0] bg-white text-[#667085] dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#94a3b8]'}`}
+                className={`flex flex-shrink-0 items-center gap-1.5 rounded-2xl border px-3 py-2 text-xs font-medium transition-colors disabled:opacity-50 ${room?.isPrivate ? 'border-[#A7F3D0] bg-[#ecfdf5] text-[#059669] dark:border-[#312e81] dark:bg-[#064E3B]' : 'border-[#e2e8f0] bg-white text-[#7A9982] dark:border-[#1E4035] dark:bg-[#0B1210] dark:text-[#94a3b8]'}`}
               >
                 {room?.isPrivate ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
                 <span>{room?.isPrivate ? t('codeRoom.private') : t('codeRoom.public')}</span>
@@ -1133,7 +1133,7 @@ export function CodeRoomPage() {
               <button
                 onClick={() => setNotificationsEnabled(v => !v)}
                 title={notificationsEnabled ? t('codeRoom.notifications.disable') : t('codeRoom.notifications.enable')}
-                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border transition-colors ${notificationsEnabled ? 'border-[#c7d2fe] bg-[#eef2ff] text-[#6366F1] dark:border-[#312e81] dark:bg-[#1e1b4b]' : 'border-[#e2e8f0] bg-white text-[#94a3b8] dark:border-[#1e3158] dark:bg-[#0f1117]'}`}
+                className={`flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-2xl border transition-colors ${notificationsEnabled ? 'border-[#A7F3D0] bg-[#ecfdf5] text-[#059669] dark:border-[#312e81] dark:bg-[#064E3B]' : 'border-[#e2e8f0] bg-white text-[#94a3b8] dark:border-[#1E4035] dark:bg-[#0B1210]'}`}
               >
                 {notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
               </button>
@@ -1151,7 +1151,7 @@ export function CodeRoomPage() {
         </header>
 
         <div className="flex flex-1 flex-col gap-4 px-4 pt-4 pb-24">
-          <div className="grid grid-cols-3 gap-2 rounded-[24px] border border-[#d8d9d6] bg-white p-1 shadow-[0_12px_28px_rgba(15,23,42,0.06)] dark:border-[#1e3158] dark:bg-[#161c2d]">
+          <div className="grid grid-cols-3 gap-2 rounded-[24px] border border-[#d8d9d6] bg-white p-1 shadow-[0_12px_28px_rgba(15,23,42,0.06)] dark:border-[#1E4035] dark:bg-[#132420]">
             {[
               { key: 'problem' as const, label: t('codeRoom.panel.task') },
               { key: 'editor' as const, label: t('codeRoom.panel.editor') },
@@ -1163,7 +1163,7 @@ export function CodeRoomPage() {
                   if (panel.key === 'ai') setShowAiPanel(true)
                   setMobilePanel(panel.key)
                 }}
-                className={`rounded-[18px] px-3 py-2 text-sm font-medium transition-colors ${mobilePanel === panel.key ? 'bg-[#111111] text-white dark:bg-[#0f1117]' : 'text-[#667085] dark:text-[#94a3b8]'}`}
+                className={`rounded-[18px] px-3 py-2 text-sm font-medium transition-colors ${mobilePanel === panel.key ? 'bg-[#111111] text-white dark:bg-[#0B1210]' : 'text-[#7A9982] dark:text-[#94a3b8]'}`}
               >
                 {panel.label}
               </button>
@@ -1171,14 +1171,14 @@ export function CodeRoomPage() {
           </div>
 
           {mobilePanel === 'problem' && (
-            <div className="rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
-              <div className="flex items-center justify-between border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
+            <div className="rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1E4035] dark:bg-[#132420]">
+              <div className="flex items-center justify-between border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1E4035]">
                 <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.task')}</span>
                 {canEditTask && (
                   <button
                     onClick={openTaskEditor}
                     title="Edit task statement"
-                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#F8FAFC] text-[#94a3b8] dark:bg-[#1a2236]"
+                    className="flex h-8 w-8 items-center justify-center rounded-xl bg-[#F8FAFC] text-[#94a3b8] dark:bg-[#162E24]"
                   >
                     <Pencil className="w-3.5 h-3.5" />
                   </button>
@@ -1187,11 +1187,11 @@ export function CodeRoomPage() {
               <div className="p-4">
                 {room?.task ? (
                   <div>
-                    <h2 className="mb-3 text-base font-bold text-[#0f172a] dark:text-[#e2e8f0]">{room.task}</h2>
+                    <h2 className="mb-3 text-base font-bold text-[#0B1210] dark:text-[#e2e8f0]">{room.task}</h2>
                     {taskStatement ? (
-                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#475569] dark:text-[#94a3b8]">{taskStatement}</p>
+                      <p className="whitespace-pre-wrap text-sm leading-relaxed text-[#4B6B52] dark:text-[#94a3b8]">{taskStatement}</p>
                     ) : canEditTask ? (
-                      <button onClick={openTaskEditor} className="text-sm font-medium text-[#6366F1] hover:underline">
+                      <button onClick={openTaskEditor} className="text-sm font-medium text-[#059669] hover:underline">
                         {t('codeRoom.addDescription')}
                       </button>
                     ) : (
@@ -1201,9 +1201,9 @@ export function CodeRoomPage() {
                 ) : canEditTask ? (
                   <button
                     onClick={openTaskEditor}
-                    className="flex w-full flex-col items-center justify-center gap-2 py-8 text-center text-[#94a3b8] transition-colors hover:text-[#6366F1]"
+                    className="flex w-full flex-col items-center justify-center gap-2 py-8 text-center text-[#94a3b8] transition-colors hover:text-[#059669]"
                   >
-                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-dashed border-[#CBCCC9] dark:border-[#1e3158]">
+                    <div className="flex h-12 w-12 items-center justify-center rounded-2xl border-2 border-dashed border-[#C1CFC4] dark:border-[#1E4035]">
                       <Pencil className="w-4 h-4" />
                     </div>
                     <span className="text-sm font-medium">{t('codeRoom.addTaskStatement')}</span>
@@ -1216,14 +1216,14 @@ export function CodeRoomPage() {
           )}
 
           <div className={mobilePanel === 'editor' ? '' : 'hidden'}>
-            <div className="overflow-hidden rounded-[30px] border border-[#1e293b] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
+            <div className="overflow-hidden rounded-[30px] border border-[#1e293b] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1E4035] dark:bg-[#132420]">
               <div className="flex items-center gap-3 bg-[#1e293b] px-4 py-3">
                 <span className="text-xs font-mono text-[#94a3b8]">
                   solution.{lang === 'python' ? 'py' : lang === 'go' ? 'go' : lang === 'sql' ? 'sql' : 'txt'}
                 </span>
                 <button
                   onClick={() => { if (editorRef.current && monacoRef.current) formatEditorCode(editorRef.current, monacoRef.current) }}
-                  className="ml-auto rounded-lg px-2 py-1 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0f172a] hover:text-white"
+                  className="ml-auto rounded-lg px-2 py-1 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0B1210] hover:text-white"
                   title="Format (Shift+Alt+F)"
                 >
                   {t('codeRoom.format', 'Format')}
@@ -1231,19 +1231,19 @@ export function CodeRoomPage() {
                 <div className="relative">
                   <button
                     onClick={() => setShowLangDropdown(v => !v)}
-                    className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-[#94a3b8] transition-colors hover:bg-[#0f172a]"
+                    className="flex items-center gap-1 rounded-lg px-2 py-1 text-xs text-[#94a3b8] transition-colors hover:bg-[#0B1210]"
                   >
                     {getLanguageLabel(lang)} <ChevronDown className="w-3 h-3" />
                   </button>
                   {showLangDropdown && (
                     <>
                       <div className="fixed inset-0 z-40" onClick={() => setShowLangDropdown(false)} />
-                      <div className="absolute right-0 top-full z-50 mt-1 min-w-[130px] overflow-hidden rounded-lg border border-[#334155] bg-[#1e293b] shadow-xl">
+                      <div className="absolute right-0 top-full z-50 mt-1 min-w-[130px] overflow-hidden rounded-lg border border-[#1E4035] bg-[#1e293b] shadow-xl">
                         {roomLanguages.map(l => (
                           <button
                             key={l.value}
                             onClick={() => { ws.sendLanguageChange(l.value); setShowLangDropdown(false) }}
-                            className={`w-full px-3 py-2 text-left text-xs transition-colors ${lang === l.value ? 'bg-[#0f172a] text-[#6366F1]' : 'text-[#94a3b8] hover:bg-[#0f172a] hover:text-white'}`}
+                            className={`w-full px-3 py-2 text-left text-xs transition-colors ${lang === l.value ? 'bg-[#0B1210] text-[#059669]' : 'text-[#94a3b8] hover:bg-[#0B1210] hover:text-white'}`}
                           >
                             {l.label}
                           </button>
@@ -1270,7 +1270,7 @@ export function CodeRoomPage() {
                   }}
                 />
               </div>
-              <div className="border-t border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
+              <div className="border-t border-[#e2e8f0] px-4 py-3 dark:border-[#1E4035]">
                 {submitResult ? (
                   <div className="space-y-3">
                     <div className={`rounded-2xl p-3 ${submitResult.isCorrect ? 'border border-[#86efac] bg-[#e8f9ef] dark:border-[#166534] dark:bg-[#0d2a1f]' : 'border border-[#fca5a5] bg-[#fef2f2] dark:border-[#991b1b] dark:bg-[#2a0f0f]'}`}>
@@ -1278,7 +1278,7 @@ export function CodeRoomPage() {
                         {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
                         <span className="text-sm font-semibold text-[#111111] dark:text-[#e2e8f0]">{submitResult.isCorrect ? t('codeRoom.accepted') : t('codeRoom.needsWork')}</span>
                       </div>
-                      {submitResult.output && <pre className="whitespace-pre-wrap text-xs text-[#475569] dark:text-[#94a3b8]">{submitResult.output}</pre>}
+                      {submitResult.output && <pre className="whitespace-pre-wrap text-xs text-[#4B6B52] dark:text-[#94a3b8]">{submitResult.output}</pre>}
                       {submitResult.error && <pre className="mt-2 whitespace-pre-wrap text-xs text-[#ef4444]">{submitResult.error}</pre>}
                     </div>
                     {submitResult.submissionId && <ReviewCard review={solveReview} loading={solveReviewLoading} showComparison={false} />}
@@ -1291,17 +1291,17 @@ export function CodeRoomPage() {
           </div>
 
           {mobilePanel === 'ai' && (
-            <div className="overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1e3158] dark:bg-[#161c2d]">
-              <div className="flex items-center gap-2 border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1e3158]">
-                <Sparkles className="w-4 h-4 text-[#6366F1]" />
+            <div className="overflow-hidden rounded-[30px] border border-[#d8d9d6] bg-white shadow-[0_16px_32px_rgba(15,23,42,0.08)] dark:border-[#1E4035] dark:bg-[#132420]">
+              <div className="flex items-center gap-2 border-b border-[#e2e8f0] px-4 py-3 dark:border-[#1E4035]">
+                <Sparkles className="w-4 h-4 text-[#059669]" />
                 <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.aiAssistant')}</span>
               </div>
-              <div className="flex border-b border-[#e2e8f0] dark:border-[#1e3158]">
+              <div className="flex border-b border-[#e2e8f0] dark:border-[#1E4035]">
                 {(['hints', 'result', 'review'] as const).map(tab => (
                   <button
                     key={tab}
                     onClick={() => setAiTab(tab)}
-                    className={`px-3 py-2.5 text-xs font-medium transition-colors ${aiTab === tab ? 'border-b-2 border-[#6366F1] text-[#111111] dark:text-[#e2e8f0]' : 'text-[#666666] dark:text-[#64748b]'}`}
+                    className={`px-3 py-2.5 text-xs font-medium transition-colors ${aiTab === tab ? 'border-b-2 border-[#059669] text-[#111111] dark:text-[#e2e8f0]' : 'text-[#4B6B52] dark:text-[#7A9982]'}`}
                   >
                     {tab === 'hints' ? t('codeRoom.aiTabs.hints') : tab === 'result' ? t('codeRoom.aiTabs.result') : t('codeRoom.aiTabs.review')}
                   </button>
@@ -1312,7 +1312,7 @@ export function CodeRoomPage() {
                   <div className="flex flex-col gap-3">
                     {hints.length === 0 ? (
                       <>
-                        <p className="text-sm leading-relaxed text-[#666666] dark:text-[#94a3b8]">
+                        <p className="text-sm leading-relaxed text-[#4B6B52] dark:text-[#94a3b8]">
                           {t('codeRoom.aiHelp')}
                         </p>
                         <Button
@@ -1343,7 +1343,7 @@ export function CodeRoomPage() {
                           {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
                           <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? t('codeRoom.acceptedBang') : t('codeRoom.wrong')}</span>
                         </div>
-                        {submitResult.output && <pre className="whitespace-pre-wrap font-mono text-xs text-[#475569] dark:text-[#94a3b8]">{submitResult.output}</pre>}
+                        {submitResult.output && <pre className="whitespace-pre-wrap font-mono text-xs text-[#4B6B52] dark:text-[#94a3b8]">{submitResult.output}</pre>}
                         {submitResult.error && <pre className="whitespace-pre-wrap font-mono text-xs text-[#ef4444]">{submitResult.error}</pre>}
                       </div>
                     ) : (
@@ -1354,24 +1354,24 @@ export function CodeRoomPage() {
                   <div className="flex flex-col gap-3">
                     {reviewLoading ? (
                       <div className="flex items-center gap-2">
-                        <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#CBCCC9] border-t-[#6366F1] dark:border-[#1e3158]" />
-                        <p className="text-sm text-[#666666] dark:text-[#94a3b8]">{t('codeRoom.analyzingCode')}</p>
+                        <span className="h-3.5 w-3.5 animate-spin rounded-full border-2 border-[#C1CFC4] border-t-[#059669] dark:border-[#1E4035]" />
+                        <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8]">{t('codeRoom.analyzingCode')}</p>
                       </div>
                     ) : aiReview ? (
                       <div className="flex flex-col gap-2">
                         <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.reviewResult')}</p>
-                        <p className="whitespace-pre-wrap text-xs leading-relaxed text-[#666666] dark:text-[#94a3b8]">{aiReview}</p>
-                        <button onClick={() => setAiReview(null)} className="mt-1 text-left text-xs text-[#6366F1] hover:underline">{t('codeRoom.runAgain')}</button>
+                        <p className="whitespace-pre-wrap text-xs leading-relaxed text-[#4B6B52] dark:text-[#94a3b8]">{aiReview}</p>
+                        <button onClick={() => setAiReview(null)} className="mt-1 text-left text-xs text-[#059669] hover:underline">{t('codeRoom.runAgain')}</button>
                       </div>
                     ) : (
                       <div className="flex flex-col gap-3">
-                        <p className="text-xs text-[#666666] dark:text-[#94a3b8]">{t('codeRoom.optionalPrompt')}</p>
+                        <p className="text-xs text-[#4B6B52] dark:text-[#94a3b8]">{t('codeRoom.optionalPrompt')}</p>
                         <textarea
                           value={reviewPrompt}
                           onChange={e => setReviewPrompt(e.target.value)}
                           placeholder={t('codeRoom.reviewPromptPlaceholder')}
                           rows={4}
-                          className="w-full resize-none rounded-2xl border border-[#CBCCC9] bg-[#F2F3F0] px-3 py-2 text-xs focus:outline-none dark:border-[#1e3158] dark:bg-[#0d1117] dark:text-[#e2e8f0]"
+                          className="w-full resize-none rounded-2xl border border-[#C1CFC4] bg-[#F0F5F1] px-3 py-2 text-xs focus:outline-none dark:border-[#1E4035] dark:bg-[#0d1117] dark:text-[#e2e8f0]"
                         />
                         <Button variant="primary" size="sm" className="w-full rounded-2xl" onClick={() => handleRunReview(reviewPrompt)} loading={reviewLoading}>
                           <Bot className="w-3.5 h-3.5" /> {t('codeRoom.runReview')}
@@ -1401,31 +1401,31 @@ export function CodeRoomPage() {
 
         {showTaskEditor && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-            <div className="w-full max-w-lg rounded-2xl border border-[#CBCCC9] bg-white shadow-xl dark:border-[#1e3158] dark:bg-[#161c2d]">
-              <div className="flex items-center justify-between border-b border-[#CBCCC9] px-5 py-4 dark:border-[#1e3158]">
+            <div className="w-full max-w-lg rounded-2xl border border-[#C1CFC4] bg-white shadow-xl dark:border-[#1E4035] dark:bg-[#132420]">
+              <div className="flex items-center justify-between border-b border-[#C1CFC4] px-5 py-4 dark:border-[#1E4035]">
                 <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.taskStatement')}</h2>
-                <button onClick={() => setShowTaskEditor(false)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[#666666] hover:bg-[#F2F3F0] dark:text-[#94a3b8] dark:hover:bg-[#1a2236]">
+                <button onClick={() => setShowTaskEditor(false)} className="flex h-7 w-7 items-center justify-center rounded-lg text-[#4B6B52] hover:bg-[#F0F5F1] dark:text-[#94a3b8] dark:hover:bg-[#162E24]">
                   <X className="w-4 h-4" />
                 </button>
               </div>
               <div className="flex flex-col gap-4 p-5">
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">{t('codeRoom.taskTitle')}</label>
+                  <label className="mb-1.5 block text-xs font-medium text-[#4B6B52]">{t('codeRoom.taskTitle')}</label>
                   <input
                     value={editTaskTitle}
                     onChange={e => setEditTaskTitle(e.target.value)}
                     placeholder={t('codeRoom.taskTitlePlaceholder')}
-                    className="w-full rounded-lg border border-[#CBCCC9] bg-white px-3 py-2 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f3]"
+                    className="w-full rounded-lg border border-[#C1CFC4] bg-white px-3 py-2 text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/10 dark:border-[#1E4035] dark:bg-[#0B1210] dark:text-[#E2F0E8]"
                   />
                 </div>
                 <div>
-                  <label className="mb-1.5 block text-xs font-medium text-[#666666]">{t('codeRoom.taskStatement')}</label>
+                  <label className="mb-1.5 block text-xs font-medium text-[#4B6B52]">{t('codeRoom.taskStatement')}</label>
                   <textarea
                     value={editTaskStatement}
                     onChange={e => setEditTaskStatement(e.target.value)}
                     placeholder={t('codeRoom.taskStatementPlaceholder')}
                     rows={8}
-                    className="w-full resize-none rounded-lg border border-[#CBCCC9] bg-white px-3 py-2 font-mono text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#6366F1] focus:ring-2 focus:ring-[#6366F1]/10 dark:border-[#1e3158] dark:bg-[#0f1117] dark:text-[#e2e8f3]"
+                    className="w-full resize-none rounded-lg border border-[#C1CFC4] bg-white px-3 py-2 font-mono text-sm text-[#111111] placeholder:text-[#94a3b8] focus:outline-none focus:border-[#059669] focus:ring-2 focus:ring-[#059669]/10 dark:border-[#1E4035] dark:bg-[#0B1210] dark:text-[#E2F0E8]"
                   />
                 </div>
               </div>
@@ -1441,18 +1441,18 @@ export function CodeRoomPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen bg-[#F2F3F0] dark:bg-[#0d1117] overflow-hidden">
+    <div className="flex flex-col h-screen bg-[#F0F5F1] dark:bg-[#0d1117] overflow-hidden">
       {/* Top bar */}
-      <header className="h-[52px] bg-white dark:bg-[#161c2d] border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center justify-between px-5 flex-shrink-0 z-10">
+      <header className="h-[52px] bg-white dark:bg-[#132420] border-b border-[#C1CFC4] dark:border-[#1E4035] flex items-center justify-between px-5 flex-shrink-0 z-10">
         <div className="flex items-center gap-3">
           <button
             onClick={() => handleLeaveRoom(false)}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] text-[#666666] dark:text-[#94a3b8]"
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F0F5F1] dark:hover:bg-[#162E24] text-[#4B6B52] dark:text-[#94a3b8]"
           >
             <ArrowLeft className="w-4 h-4" />
           </button>
           <div>
-            <p className="text-sm font-bold text-[#0f172a] dark:text-[#e2e8f0]">{room?.task || t('codeRoom.title')}</p>
+            <p className="text-sm font-bold text-[#0B1210] dark:text-[#e2e8f0]">{room?.task || t('codeRoom.title')}</p>
             <div className="flex items-center gap-2">
               {status && <Badge variant={status.variant}>{status.label}</Badge>}
               {ws.connected ? (
@@ -1485,7 +1485,7 @@ export function CodeRoomPage() {
           <button
             onClick={toggleTheme}
             title={theme === 'dark' ? t('codeRoom.theme.light') : t('codeRoom.theme.dark')}
-            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] text-[#666666] dark:text-[#94a3b8] transition-colors"
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F0F5F1] dark:hover:bg-[#162E24] text-[#4B6B52] dark:text-[#94a3b8] transition-colors"
           >
             {theme === 'dark' ? <Sun className="w-4 h-4 text-[#fbbf24]" /> : <Moon className="w-4 h-4" />}
           </button>
@@ -1493,7 +1493,7 @@ export function CodeRoomPage() {
           {/* Copy invite link */}
           <button
             onClick={copyInviteLink}
-            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#666666] dark:text-[#4d6380] hover:text-[#111111] dark:hover:text-[#c8d8ec] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] rounded-lg transition-colors"
+            className="flex items-center gap-1.5 px-2.5 py-1.5 text-xs text-[#4B6B52] dark:text-[#4A7058] hover:text-[#111111] dark:hover:text-[#C1D9CA] hover:bg-[#F0F5F1] dark:hover:bg-[#162E24] rounded-lg transition-colors"
             title={t('codeRoom.copyInviteLink')}
           >
             {copied ? <Check className="w-3.5 h-3.5 text-[#22c55e]" /> : <Share2 className="w-3.5 h-3.5" />}
@@ -1505,7 +1505,7 @@ export function CodeRoomPage() {
               onClick={handleTogglePrivacy}
               disabled={togglingPrivacy}
               title={room?.isPrivate ? t('codeRoom.makePublic') : t('codeRoom.makePrivate')}
-              className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg transition-colors disabled:opacity-50 ${room?.isPrivate ? 'text-[#6366F1] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]' : 'text-[#94a3b8] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]'}`}
+              className={`flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg transition-colors disabled:opacity-50 ${room?.isPrivate ? 'text-[#059669] hover:bg-[#F0F5F1] dark:hover:bg-[#162E24]' : 'text-[#94a3b8] hover:bg-[#F0F5F1] dark:hover:bg-[#162E24]'}`}
             >
               {room?.isPrivate ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               <span className="hidden sm:inline">{room?.isPrivate ? t('codeRoom.private') : t('codeRoom.public')}</span>
@@ -1515,7 +1515,7 @@ export function CodeRoomPage() {
             <button
               onClick={() => setNotificationsEnabled(v => !v)}
               title={notificationsEnabled ? t('codeRoom.notifications.disable') : t('codeRoom.notifications.enable')}
-              className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${notificationsEnabled ? 'text-[#6366F1] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]' : 'text-[#94a3b8] hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236]'}`}
+              className={`w-8 h-8 flex items-center justify-center rounded-lg transition-colors ${notificationsEnabled ? 'text-[#059669] hover:bg-[#F0F5F1] dark:hover:bg-[#162E24]' : 'text-[#94a3b8] hover:bg-[#F0F5F1] dark:hover:bg-[#162E24]'}`}
             >
               {notificationsEnabled ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4" />}
             </button>
@@ -1532,13 +1532,13 @@ export function CodeRoomPage() {
       </header>
 
       {/* 3-panel layout */}
-      <div className="flex flex-1 min-h-0 bg-[#F2F3F0] dark:bg-[#0d1117]">
+      <div className="flex flex-1 min-h-0 bg-[#F0F5F1] dark:bg-[#0d1117]">
         {/* Problem panel — resizable */}
-        <div className="flex-shrink-0 bg-white dark:bg-[#161c2d] border-r border-[#CBCCC9] dark:border-[#1e3158] flex flex-col" style={{ width: leftWidth }}>
-          <div className="flex items-center justify-between border-b border-[#CBCCC9] dark:border-[#1e3158] px-1">
+        <div className="flex-shrink-0 bg-white dark:bg-[#132420] border-r border-[#C1CFC4] dark:border-[#1E4035] flex flex-col" style={{ width: leftWidth }}>
+          <div className="flex items-center justify-between border-b border-[#C1CFC4] dark:border-[#1E4035] px-1">
             <button
               onClick={() => setActiveTab('problem')}
-              className={`px-3 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'problem' ? 'border-[#6366F1] text-[#111111] dark:text-[#e2e8f0]' : 'border-transparent text-[#666666] dark:text-[#64748b]'}`}
+              className={`px-3 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${activeTab === 'problem' ? 'border-[#059669] text-[#111111] dark:text-[#e2e8f0]' : 'border-transparent text-[#4B6B52] dark:text-[#7A9982]'}`}
             >
               {t('codeRoom.task')}
             </button>
@@ -1546,7 +1546,7 @@ export function CodeRoomPage() {
               <button
                 onClick={openTaskEditor}
                 title="Edit task statement"
-                className="mr-2 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] text-[#94a3b8] hover:text-[#6366F1] transition-colors"
+                className="mr-2 w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F0F5F1] dark:hover:bg-[#162E24] text-[#94a3b8] hover:text-[#059669] transition-colors"
               >
                 <Pencil className="w-3.5 h-3.5" />
               </button>
@@ -1555,13 +1555,13 @@ export function CodeRoomPage() {
           <div className="flex-1 overflow-y-auto p-4">
             {room?.task ? (
               <div>
-                <h2 className="text-sm font-bold text-[#0f172a] dark:text-[#e2e8f0] mb-3">{room.task}</h2>
+                <h2 className="text-sm font-bold text-[#0B1210] dark:text-[#e2e8f0] mb-3">{room.task}</h2>
                 {taskStatement ? (
-                  <p className="text-sm text-[#475569] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">{taskStatement}</p>
+                  <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8] leading-relaxed whitespace-pre-wrap">{taskStatement}</p>
                 ) : canEditTask ? (
                   <button
                     onClick={openTaskEditor}
-                    className="text-xs text-[#6366F1] hover:underline"
+                    className="text-xs text-[#059669] hover:underline"
                   >
                     {t('codeRoom.addDescription')}
                   </button>
@@ -1572,9 +1572,9 @@ export function CodeRoomPage() {
             ) : canEditTask ? (
               <button
                 onClick={openTaskEditor}
-                className="w-full h-full flex flex-col items-center justify-center gap-2 text-center py-8 text-[#94a3b8] hover:text-[#6366F1] transition-colors group"
+                className="w-full h-full flex flex-col items-center justify-center gap-2 text-center py-8 text-[#94a3b8] hover:text-[#059669] transition-colors group"
               >
-                <div className="w-10 h-10 rounded-xl border-2 border-dashed border-[#CBCCC9] dark:border-[#1e3158] group-hover:border-[#6366F1] flex items-center justify-center transition-colors">
+                <div className="w-10 h-10 rounded-xl border-2 border-dashed border-[#C1CFC4] dark:border-[#1E4035] group-hover:border-[#059669] flex items-center justify-center transition-colors">
                   <Pencil className="w-4 h-4" />
                 </div>
                 <span className="text-xs font-medium dark:text-[#94a3b8]">{t('codeRoom.addTaskStatement')}</span>
@@ -1587,19 +1587,19 @@ export function CodeRoomPage() {
 
         {/* Drag handle */}
         <div
-          className="w-1 flex-shrink-0 cursor-col-resize bg-transparent hover:bg-[#6366F1]/40 transition-colors active:bg-[#6366F1]/60"
+          className="w-1 flex-shrink-0 cursor-col-resize bg-transparent hover:bg-[#059669]/40 transition-colors active:bg-[#059669]/60"
           onMouseDown={() => { isResizingLeft.current = true; document.body.style.cursor = 'col-resize' }}
         />
 
         {/* Editor — flex-1 (takes remaining space ~70%) */}
-        <div className="flex-1 flex flex-col min-w-0 bg-[#F2F3F0] dark:bg-[#0d1117] p-3">
+        <div className="flex-1 flex flex-col min-w-0 bg-[#F0F5F1] dark:bg-[#0d1117] p-3">
           {isDuelRoom && room?.status === 'ROOM_STATUS_WAITING' ? (
             <div className="flex-1 flex flex-col items-center justify-center gap-4 rounded-xl border border-[#2d3748] bg-[#0d1117]">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#334155]">
-                <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#334155] border-t-[#6366F1]" />
+              <div className="flex h-12 w-12 items-center justify-center rounded-full border-2 border-[#1E4035]">
+                <span className="h-5 w-5 animate-spin rounded-full border-2 border-[#1E4035] border-t-[#059669]" />
               </div>
               <p className="text-sm font-semibold text-[#e2e8f0]">{t('codeRoom.duel.waitingForOpponent')}</p>
-              <p className="text-xs text-[#64748b]">{t('codeRoom.duel.duelStartsWhenBothJoin')}</p>
+              <p className="text-xs text-[#7A9982]">{t('codeRoom.duel.duelStartsWhenBothJoin')}</p>
             </div>
           ) : (
           <div className="flex-1 flex flex-col rounded-xl overflow-hidden border border-[#2d3748] shadow-md">
@@ -1609,19 +1609,19 @@ export function CodeRoomPage() {
               </span>
               {isDuelRoom && (
                 <div className="flex items-center gap-2 ml-2">
-                  <span className="text-[10px] text-[#64748b]">{t('codeRoom.duel.opponent')}</span>
-                  <div className="h-1.5 w-20 rounded-full bg-[#0f172a] border border-[#334155] overflow-hidden">
+                  <span className="text-[10px] text-[#7A9982]">{t('codeRoom.duel.opponent')}</span>
+                  <div className="h-1.5 w-20 rounded-full bg-[#0B1210] border border-[#1E4035] overflow-hidden">
                     <div
                       className="h-full bg-[#f59e0b] transition-all duration-300"
                       style={{ width: `${Math.min(100, ws.opponentCodeLen > 0 ? Math.round((ws.opponentCodeLen / Math.max(ws.opponentCodeLen, currentCodeRef.current.length || 1)) * 100) : 0)}%` }}
                     />
                   </div>
-                  <span className="text-[10px] tabular-nums text-[#64748b]">{ws.opponentCodeLen} ch</span>
+                  <span className="text-[10px] tabular-nums text-[#7A9982]">{ws.opponentCodeLen} ch</span>
                 </div>
               )}
               <button
                 onClick={() => { if (editorRef.current && monacoRef.current) formatEditorCode(editorRef.current, monacoRef.current) }}
-                className="ml-auto rounded px-2 py-1 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0f172a] hover:text-white"
+                className="ml-auto rounded px-2 py-1 text-[10px] font-medium text-[#94a3b8] transition-colors hover:bg-[#0B1210] hover:text-white"
                 title="Format (Shift+Alt+F)"
               >
                 {t('codeRoom.format', 'Format')}
@@ -1629,19 +1629,19 @@ export function CodeRoomPage() {
               <div className="relative">
                 <button
                   onClick={() => setShowLangDropdown(v => !v)}
-                  className="flex items-center gap-1 px-2 py-1 text-xs text-[#94a3b8] rounded hover:bg-[#0f172a] transition-colors"
+                  className="flex items-center gap-1 px-2 py-1 text-xs text-[#94a3b8] rounded hover:bg-[#0B1210] transition-colors"
                 >
                   {getLanguageLabel(lang)} <ChevronDown className="w-3 h-3" />
                 </button>
                 {showLangDropdown && (
                   <>
                     <div className="fixed inset-0 z-40" onClick={() => setShowLangDropdown(false)} />
-                    <div className="absolute right-0 top-full mt-1 z-50 bg-[#1e293b] border border-[#334155] rounded-lg shadow-xl overflow-hidden min-w-[130px]">
+                    <div className="absolute right-0 top-full mt-1 z-50 bg-[#1e293b] border border-[#1E4035] rounded-lg shadow-xl overflow-hidden min-w-[130px]">
                       {roomLanguages.map(l => (
                         <button
                           key={l.value}
                           onClick={() => { ws.sendLanguageChange(l.value); setShowLangDropdown(false) }}
-                          className={`w-full text-left px-3 py-2 text-xs transition-colors ${lang === l.value ? 'text-[#6366F1] bg-[#0f172a]' : 'text-[#94a3b8] hover:bg-[#0f172a] hover:text-white'}`}
+                          className={`w-full text-left px-3 py-2 text-xs transition-colors ${lang === l.value ? 'text-[#059669] bg-[#0B1210]' : 'text-[#94a3b8] hover:bg-[#0B1210] hover:text-white'}`}
                         >
                           {l.label}
                         </button>
@@ -1683,17 +1683,17 @@ export function CodeRoomPage() {
 
         {/* AI panel — hidden in duel mode and hidden by default */}
         {!isDuelRoom && showAiPanel && (
-          <div className="w-[280px] flex-shrink-0 bg-white dark:bg-[#161c2d] border-l border-[#CBCCC9] dark:border-[#1e3158] flex flex-col">
-            <div className="px-4 py-3 border-b border-[#CBCCC9] dark:border-[#1e3158] flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-[#6366F1]" />
+          <div className="w-[280px] flex-shrink-0 bg-white dark:bg-[#132420] border-l border-[#C1CFC4] dark:border-[#1E4035] flex flex-col">
+            <div className="px-4 py-3 border-b border-[#C1CFC4] dark:border-[#1E4035] flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-[#059669]" />
                 <span className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.aiAssistant')}</span>
             </div>
-            <div className="flex border-b border-[#CBCCC9] dark:border-[#1e3158]">
+            <div className="flex border-b border-[#C1CFC4] dark:border-[#1E4035]">
               {(['hints', 'result', 'review'] as const).map(tab => (
                 <button
                   key={tab}
                   onClick={() => setAiTab(tab)}
-                  className={`px-3 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${aiTab === tab ? 'border-[#6366F1] text-[#111111] dark:text-[#e2e8f0]' : 'border-transparent text-[#666666] dark:text-[#64748b]'}`}
+                  className={`px-3 py-2.5 text-xs font-medium border-b-2 -mb-px transition-colors ${aiTab === tab ? 'border-[#059669] text-[#111111] dark:text-[#e2e8f0]' : 'border-transparent text-[#4B6B52] dark:text-[#7A9982]'}`}
                 >
                   {tab === 'hints' ? t('codeRoom.aiTabs.hints') : tab === 'result' ? t('codeRoom.aiTabs.result') : t('codeRoom.aiTabs.review')}
                 </button>
@@ -1704,7 +1704,7 @@ export function CodeRoomPage() {
                 <div className="flex flex-col gap-3">
                   {hints.length === 0 ? (
                     <>
-                      <p className="text-sm text-[#666666] dark:text-[#94a3b8] leading-relaxed">
+                      <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8] leading-relaxed">
                         {t('codeRoom.aiHelp')}
                       </p>
                       <Button
@@ -1735,7 +1735,7 @@ export function CodeRoomPage() {
                         {submitResult.isCorrect ? <Check className="w-4 h-4 text-[#22c55e]" /> : <X className="w-4 h-4 text-[#ef4444]" />}
                         <span className="text-sm font-semibold dark:text-[#e2e8f0]">{submitResult.isCorrect ? t('codeRoom.acceptedBang') : t('codeRoom.wrong')}</span>
                       </div>
-                      {submitResult.output && <pre className="text-xs text-[#475569] dark:text-[#94a3b8] font-mono whitespace-pre-wrap">{submitResult.output}</pre>}
+                      {submitResult.output && <pre className="text-xs text-[#4B6B52] dark:text-[#94a3b8] font-mono whitespace-pre-wrap">{submitResult.output}</pre>}
                       {submitResult.error && <pre className="text-xs text-[#ef4444] font-mono whitespace-pre-wrap">{submitResult.error}</pre>}
                     </div>
                   ) : (
@@ -1746,24 +1746,24 @@ export function CodeRoomPage() {
                 <div className="flex flex-col gap-3">
                   {reviewLoading ? (
                     <div className="flex items-center gap-2">
-                      <span className="w-3.5 h-3.5 border-2 border-[#CBCCC9] dark:border-[#1e3158] border-t-[#6366F1] rounded-full animate-spin" />
-                      <p className="text-sm text-[#666666] dark:text-[#94a3b8]">{t('codeRoom.analyzingCode')}</p>
+                      <span className="w-3.5 h-3.5 border-2 border-[#C1CFC4] dark:border-[#1E4035] border-t-[#059669] rounded-full animate-spin" />
+                      <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8]">{t('codeRoom.analyzingCode')}</p>
                     </div>
                   ) : aiReview ? (
                     <div className="flex flex-col gap-2">
                       <p className="text-xs font-semibold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.reviewResult')}</p>
-                      <p className="text-xs text-[#666666] dark:text-[#94a3b8] whitespace-pre-wrap leading-relaxed">{aiReview}</p>
-                      <button onClick={() => setAiReview(null)} className="text-xs text-[#6366F1] hover:underline mt-1">{t('codeRoom.runAgain')}</button>
+                      <p className="text-xs text-[#4B6B52] dark:text-[#94a3b8] whitespace-pre-wrap leading-relaxed">{aiReview}</p>
+                      <button onClick={() => setAiReview(null)} className="text-xs text-[#059669] hover:underline mt-1">{t('codeRoom.runAgain')}</button>
                     </div>
                   ) : (
                     <div className="flex flex-col gap-3">
-                      <p className="text-xs text-[#666666] dark:text-[#94a3b8]">{t('codeRoom.optionalPrompt')}</p>
+                      <p className="text-xs text-[#4B6B52] dark:text-[#94a3b8]">{t('codeRoom.optionalPrompt')}</p>
                       <textarea
                         value={reviewPrompt}
                         onChange={e => setReviewPrompt(e.target.value)}
                         placeholder={t('codeRoom.reviewPromptPlaceholder')}
                         rows={3}
-                        className="w-full px-3 py-2 text-xs bg-[#F2F3F0] dark:bg-[#0d1117] dark:text-[#e2e8f0] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none resize-none"
+                        className="w-full px-3 py-2 text-xs bg-[#F0F5F1] dark:bg-[#0d1117] dark:text-[#e2e8f0] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none resize-none"
                       />
                       <Button variant="primary" size="sm" className="w-full" onClick={() => handleRunReview(reviewPrompt)} loading={reviewLoading}>
                         <Bot className="w-3.5 h-3.5" /> {t('codeRoom.runReview')}
@@ -1795,31 +1795,31 @@ export function CodeRoomPage() {
       {/* Task editor modal — creator only */}
       {showTaskEditor && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
-          <div className="bg-white dark:bg-[#161c2d] rounded-2xl shadow-xl border border-[#CBCCC9] dark:border-[#1e3158] w-full max-w-lg">
-            <div className="flex items-center justify-between px-5 py-4 border-b border-[#CBCCC9] dark:border-[#1e3158]">
+          <div className="bg-white dark:bg-[#132420] rounded-2xl shadow-xl border border-[#C1CFC4] dark:border-[#1E4035] w-full max-w-lg">
+            <div className="flex items-center justify-between px-5 py-4 border-b border-[#C1CFC4] dark:border-[#1E4035]">
               <h2 className="text-sm font-bold text-[#111111] dark:text-[#e2e8f0]">{t('codeRoom.taskStatement')}</h2>
-              <button onClick={() => setShowTaskEditor(false)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] dark:hover:bg-[#1a2236] text-[#666666] dark:text-[#94a3b8]">
+              <button onClick={() => setShowTaskEditor(false)} className="w-7 h-7 flex items-center justify-center rounded-lg hover:bg-[#F0F5F1] dark:hover:bg-[#162E24] text-[#4B6B52] dark:text-[#94a3b8]">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="p-5 flex flex-col gap-4">
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1.5 block">{t('codeRoom.taskTitle')}</label>
+                <label className="text-xs font-medium text-[#4B6B52] mb-1.5 block">{t('codeRoom.taskTitle')}</label>
                 <input
                   value={editTaskTitle}
                   onChange={e => setEditTaskTitle(e.target.value)}
                   placeholder={t('codeRoom.taskTitlePlaceholder')}
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#6366F1]/10"
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0B1210] text-[#111111] dark:text-[#E2F0E8] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:border-[#059669] dark:focus:border-[#059669] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#059669]/10"
                 />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1.5 block">{t('codeRoom.taskStatement')}</label>
+                <label className="text-xs font-medium text-[#4B6B52] mb-1.5 block">{t('codeRoom.taskStatement')}</label>
                 <textarea
                   value={editTaskStatement}
                   onChange={e => setEditTaskStatement(e.target.value)}
                   placeholder={t('codeRoom.taskStatementPlaceholder')}
                   rows={8}
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#6366F1]/10 resize-none font-mono"
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0B1210] text-[#111111] dark:text-[#E2F0E8] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:border-[#059669] dark:focus:border-[#059669] placeholder:text-[#94a3b8] focus:ring-2 focus:ring-[#059669]/10 resize-none font-mono"
                 />
               </div>
             </div>
@@ -1843,7 +1843,7 @@ export function CodeRoomPage() {
           </>
         }
       >
-        <p className="text-sm text-[#475569] dark:text-[#94a3b8]">
+        <p className="text-sm text-[#4B6B52] dark:text-[#94a3b8]">
           {t('codeRoom.leave.body')}
         </p>
       </Modal>

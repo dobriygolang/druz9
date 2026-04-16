@@ -47,7 +47,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
             <X className="w-4 h-4 text-[#94a3b8]" />
           </button>
 
-          <div className="bg-gradient-to-br from-[#6366F1]/12 to-[#8b5cf6]/8 px-6 pt-6 pb-5 flex flex-col items-center text-center border-b border-[#f1f5f9]">
+          <div className="bg-gradient-to-br from-[#059669]/12 to-[#0D9488]/8 px-6 pt-6 pb-5 flex flex-col items-center text-center border-b border-[#f1f5f9]">
             <div className="relative mb-3">
               <Avatar name={name} src={user.avatarUrl || undefined} size="xl" />
               <span
@@ -58,7 +58,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
             <div className="mt-1 flex flex-col items-center gap-0.5">
               {user.username && <p className="text-sm text-[#94a3b8]">@{user.username}</p>}
               {user.telegramUsername && (
-                <p className="text-xs text-[#64748b]">TG: @{user.telegramUsername}</p>
+                <p className="text-xs text-[#7A9982]">TG: @{user.telegramUsername}</p>
               )}
             </div>
             <span className={`mt-3 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -73,9 +73,9 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
 
           <div className="flex-1 overflow-y-auto px-6 py-5 flex flex-col gap-3">
             {user.region && (
-              <div className="flex items-center gap-3 text-sm rounded-2xl bg-[#f8fafc] px-4 py-3">
-                <div className="w-9 h-9 rounded-xl bg-[#f0f0ff] flex items-center justify-center flex-shrink-0">
-                  <MapPin className="w-4 h-4 text-[#6366F1]" />
+              <div className="flex items-center gap-3 text-sm rounded-2xl bg-[#E2F0E8] px-4 py-3">
+                <div className="w-9 h-9 rounded-xl bg-[#ecfdf5] flex items-center justify-center flex-shrink-0">
+                  <MapPin className="w-4 h-4 text-[#059669]" />
                 </div>
                 <div>
                   <p className="text-[10px] text-[#94a3b8] uppercase tracking-wide font-medium">{t('users.region')}</p>
@@ -123,7 +123,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
         </button>
 
         {/* Header gradient */}
-        <div className="bg-gradient-to-br from-[#6366F1]/10 to-[#8b5cf6]/5 pt-10 pb-6 px-6 flex flex-col items-center text-center border-b border-[#f1f5f9]">
+        <div className="bg-gradient-to-br from-[#059669]/10 to-[#0D9488]/5 pt-10 pb-6 px-6 flex flex-col items-center text-center border-b border-[#f1f5f9]">
           <div className="relative mb-3">
             <Avatar name={name} src={user.avatarUrl || undefined} size="xl" />
             <span
@@ -134,7 +134,7 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
           <div className="flex flex-col items-center gap-0.5 mt-0.5">
             {user.username && <p className="text-sm text-[#94a3b8]">@{user.username}</p>}
             {user.telegramUsername && (
-              <p className="text-xs text-[#64748b]">TG: @{user.telegramUsername}</p>
+              <p className="text-xs text-[#7A9982]">TG: @{user.telegramUsername}</p>
             )}
           </div>
           <span className={`mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium ${
@@ -151,8 +151,8 @@ function UserMiniProfile({ user, onClose, onNavigate, isMobile }: {
         <div className="flex-1 px-6 py-5 flex flex-col gap-3">
           {user.region && (
             <div className="flex items-center gap-3 text-sm">
-              <div className="w-8 h-8 rounded-lg bg-[#f0f0ff] flex items-center justify-center flex-shrink-0">
-                <MapPin className="w-4 h-4 text-[#6366F1]" />
+              <div className="w-8 h-8 rounded-lg bg-[#ecfdf5] flex items-center justify-center flex-shrink-0">
+                <MapPin className="w-4 h-4 text-[#059669]" />
               </div>
               <div>
                 <p className="text-[10px] text-[#94a3b8] uppercase tracking-wide font-medium">{t('users.region')}</p>
@@ -211,14 +211,14 @@ export function UsersPage() {
       <div className={isMobile ? 'px-4 pt-4 pb-6' : 'px-6 pt-4 pb-6'}>
         {isMobile && (
           <div className="section-enter mb-4 rounded-[28px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(239,246,255,0.94)_52%,_rgba(255,247,237,0.94))] p-5 shadow-[0_16px_32px_rgba(15,23,42,0.06)]">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#6366F1]">{t('users.eyebrow')}</p>
+            <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#059669]">{t('users.eyebrow')}</p>
             <div className="mt-3 flex items-end justify-between gap-4">
               <div>
                 <p className="text-2xl font-bold text-[#111111]">{filtered.length}</p>
-                <p className="mt-1 text-sm leading-6 text-[#475569]">{t('users.subtitle')}</p>
+                <p className="mt-1 text-sm leading-6 text-[#4B6B52]">{t('users.subtitle')}</p>
               </div>
               <div className="rounded-2xl border border-white/70 bg-white/72 px-4 py-3 text-right shadow-sm backdrop-blur">
-                <p className="text-[11px] uppercase tracking-[0.18em] text-[#667085]">{t('users.people')}</p>
+                <p className="text-[11px] uppercase tracking-[0.18em] text-[#7A9982]">{t('users.people')}</p>
                 <p className="mt-2 font-mono text-xl font-bold text-[#111111]">{users.length}</p>
               </div>
             </div>
@@ -235,7 +235,7 @@ export function UsersPage() {
               className={`stagger-item flex items-center gap-3.5 px-4 py-3 cursor-pointer transition-colors ${
                 isMobile
                   ? 'rounded-[22px] border border-[#d8d9d6] bg-white/94 shadow-[0_10px_24px_rgba(15,23,42,0.05)] active:scale-[0.99]'
-                  : 'bg-white rounded-xl border border-[#CBCCC9] hover:border-[#6366F1]'
+                  : 'bg-white rounded-xl border border-[#C1CFC4] hover:border-[#059669]'
               }`}
             >
               <div className="relative">
@@ -248,17 +248,17 @@ export function UsersPage() {
                 <div className="flex items-center gap-2 flex-wrap">
                   <p className="text-sm font-semibold text-[#111111]">{name}</p>
                   {user.username && <span className="text-xs text-[#94a3b8]">@{user.username}</span>}
-                  {user.telegramUsername && <span className="text-xs text-[#64748b]">TG: @{user.telegramUsername}</span>}
+                  {user.telegramUsername && <span className="text-xs text-[#7A9982]">TG: @{user.telegramUsername}</span>}
                 </div>
                 <div className="flex items-center gap-3 mt-0.5">
                   {user.region && (
-                    <span className="flex items-center gap-1 text-xs text-[#666666]">
+                    <span className="flex items-center gap-1 text-xs text-[#4B6B52]">
                       <MapPin className="w-3 h-3" /> {user.region}
                     </span>
                   )}
                 </div>
               </div>
-              <ChevronRight className="w-4 h-4 text-[#CBCCC9] flex-shrink-0" />
+              <ChevronRight className="w-4 h-4 text-[#C1CFC4] flex-shrink-0" />
             </div>
           )
         })}

@@ -24,10 +24,10 @@ import { ErrorState } from '@/shared/ui/ErrorState'
 import { PageMeta } from '@/shared/ui/PageMeta'
 
 const ACTION_ICONS: Record<string, React.ReactNode> = {
-  mock: <BookOpen className="h-5 w-5 text-[#6366F1]" />,
-  practice: <Code2 className="h-5 w-5 text-[#6366F1]" />,
-  checkpoint: <Award className="h-5 w-5 text-[#6366F1]" />,
-  arena: <Swords className="h-5 w-5 text-[#6366F1]" />,
+  mock: <BookOpen className="h-5 w-5 text-[#059669]" />,
+  practice: <Code2 className="h-5 w-5 text-[#059669]" />,
+  checkpoint: <Award className="h-5 w-5 text-[#059669]" />,
+  arena: <Swords className="h-5 w-5 text-[#059669]" />,
 }
 
 const LEVEL_VARIANTS: Record<string, 'default' | 'warning' | 'info' | 'success' | 'indigo'> = {
@@ -79,22 +79,22 @@ export function JourneyPage() {
       />
 
       {/* Hero: Readiness Score */}
-      <section className="section-enter relative rounded-[32px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.92)_48%,_rgba(255,247,237,0.95))] p-5 shadow-[0_24px_60px_rgba(99,102,241,0.12)] dark:border-[#1e3158] dark:bg-[linear-gradient(145deg,_rgba(11,13,22,0.96),_rgba(29,36,63,0.92)_52%,_rgba(46,26,38,0.88))] dark:shadow-[0_28px_70px_rgba(2,6,23,0.45)] md:p-7">
+      <section className="section-enter relative rounded-[32px] border border-[#d8d9d6] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(238,242,255,0.92)_48%,_rgba(255,247,237,0.95))] p-5 shadow-[0_24px_60px_rgba(5,150,105,0.12)] dark:border-[#1E4035] dark:bg-[linear-gradient(145deg,_rgba(11,13,22,0.96),_rgba(29,36,63,0.92)_52%,_rgba(46,26,38,0.88))] dark:shadow-[0_28px_70px_rgba(2,6,23,0.45)] md:p-7">
         <div className="pointer-events-none absolute inset-0 overflow-hidden rounded-[32px]">
-          <div className="absolute inset-y-0 right-[-14%] w-[58%] rounded-full bg-[radial-gradient(circle,_rgba(99,102,241,0.24),_transparent_66%)] blur-2xl dark:bg-[radial-gradient(circle,_rgba(129,140,248,0.2),_transparent_70%)]" />
+          <div className="absolute inset-y-0 right-[-14%] w-[58%] rounded-full bg-[radial-gradient(circle,_rgba(5,150,105,0.24),_transparent_66%)] blur-2xl dark:bg-[radial-gradient(circle,_rgba(52,211,153,0.2),_transparent_70%)]" />
         </div>
 
         <div className="relative flex flex-col items-center gap-6 md:flex-row md:items-start md:gap-10">
           {/* Circular progress */}
           <div className="shrink-0">
             {loading ? (
-              <div className="h-[180px] w-[180px] animate-pulse rounded-full bg-[#E7E8E5] dark:bg-[#1e3158]" />
+              <div className="h-[180px] w-[180px] animate-pulse rounded-full bg-[#E4EBE5] dark:bg-[#1E4035]" />
             ) : (
               <CircularProgress value={data?.score ?? 0} size={180} strokeWidth={10}>
-                <span className="font-mono text-[42px] font-bold leading-none text-[#111111] dark:text-[#f8fafc]">
+                <span className="font-mono text-[42px] font-bold leading-none text-[#111111] dark:text-[#E2F0E8]">
                   <AnimatedNumber value={data?.score ?? 0} />
                 </span>
-                <span className="mt-1 text-xs font-medium uppercase tracking-widest text-[#667085] dark:text-[#7e93b0]">
+                <span className="mt-1 text-xs font-medium uppercase tracking-widest text-[#7A9982] dark:text-[#7BA88A]">
                   / 100
                 </span>
               </CircularProgress>
@@ -105,13 +105,13 @@ export function JourneyPage() {
           <div className="flex flex-1 flex-col items-center gap-4 text-center md:items-start md:text-left">
             {loading ? (
               <div className="space-y-3">
-                <div className="h-8 w-48 rounded bg-[#E7E8E5] dark:bg-[#1e3158]" />
-                <div className="h-5 w-32 rounded bg-[#E7E8E5] dark:bg-[#1e3158]" />
+                <div className="h-8 w-48 rounded bg-[#E4EBE5] dark:bg-[#1E4035]" />
+                <div className="h-5 w-32 rounded bg-[#E4EBE5] dark:bg-[#1E4035]" />
               </div>
             ) : (
               <>
                 <div>
-                  <h1 className="font-mono text-[28px] font-semibold leading-tight text-[#111111] dark:text-[#f8fafc] sm:text-[36px]">
+                  <h1 className="font-mono text-[28px] font-semibold leading-tight text-[#111111] dark:text-[#E2F0E8] sm:text-[36px]">
                     {firstName ? `${firstName}, ` : ''}
                     {t('journey.title', 'your path to the offer')}
                   </h1>
@@ -120,13 +120,13 @@ export function JourneyPage() {
                       {data?.levelLabel ?? t('journey.level.novice', 'Novice')}
                     </Badge>
                     {data?.streakDays ? (
-                      <span className="inline-flex items-center gap-1 text-sm font-medium text-[#667085] dark:text-[#7e93b0]">
-                        <Flame className="h-4 w-4 text-orange-500" />
+                      <span className="inline-flex items-center gap-1 text-sm font-medium text-[#7A9982] dark:text-[#7BA88A]">
+                        <Flame className="h-4 w-4 text-emerald-500" />
                         {data.streakDays} {t('journey.streak', 'days in a row')}
                       </span>
                     ) : null}
                     {data?.activeDays ? (
-                      <span className="inline-flex items-center gap-1 text-sm text-[#667085] dark:text-[#7e93b0]">
+                      <span className="inline-flex items-center gap-1 text-sm text-[#7A9982] dark:text-[#7BA88A]">
                         <Calendar className="h-3.5 w-3.5" />
                         {data.activeDays} {t('journey.activeDays', 'active days')}
                       </span>
@@ -161,25 +161,25 @@ export function JourneyPage() {
           {!loading && data?.nextAction && (
             <Link to={data.nextAction.actionUrl} className="no-underline">
               <Card
-                className="section-enter group border-[#6366F1]/30 hover:border-[#6366F1] dark:border-[#4338ca]/40 dark:hover:border-[#818cf8]"
+                className="section-enter group border-[#059669]/30 hover:border-[#059669] dark:border-[#4338ca]/40 dark:hover:border-[#34D399]"
                 padding="lg"
               >
                 <div className="flex items-start gap-4">
-                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#eef2ff] dark:bg-[#1e1e4a]">
-                    {ACTION_ICONS[data.nextAction.actionType] ?? <Target className="h-5 w-5 text-[#6366F1]" />}
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl bg-[#ecfdf5] dark:bg-[#0d2a1f]">
+                    {ACTION_ICONS[data.nextAction.actionType] ?? <Target className="h-5 w-5 text-[#059669]" />}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-xs font-semibold uppercase tracking-widest text-[#6366F1] dark:text-[#818cf8]">
+                    <p className="text-xs font-semibold uppercase tracking-widest text-[#059669] dark:text-[#34D399]">
                       {t('journey.nextStep', 'Next step')}
                     </p>
-                    <p className="mt-1 text-base font-semibold text-[#111111] dark:text-[#f8fafc]">
+                    <p className="mt-1 text-base font-semibold text-[#111111] dark:text-[#E2F0E8]">
                       {data.nextAction.title}
                     </p>
-                    <p className="mt-1 text-sm text-[#667085] dark:text-[#7e93b0]">
+                    <p className="mt-1 text-sm text-[#7A9982] dark:text-[#7BA88A]">
                       {data.nextAction.description}
                     </p>
                   </div>
-                  <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-[#6366F1] transition-transform group-hover:translate-x-1" />
+                  <ArrowRight className="mt-1 h-5 w-5 shrink-0 text-[#059669] transition-transform group-hover:translate-x-1" />
                 </div>
               </Card>
             </Link>
@@ -187,16 +187,16 @@ export function JourneyPage() {
 
           {/* Competency Breakdown */}
           <Card className="section-enter" padding="lg">
-            <h2 className="mb-4 text-base font-semibold text-[#111111] dark:text-[#f8fafc]">
+            <h2 className="mb-4 text-base font-semibold text-[#111111] dark:text-[#E2F0E8]">
               {t('journey.competencies', 'Skills')}
             </h2>
             {loading ? (
               <div className="space-y-3">
                 {Array.from({ length: 5 }).map((_, i) => (
                   <div key={i} className="flex items-center gap-3">
-                    <div className="h-3 w-24 rounded bg-[#E7E8E5] dark:bg-[#1e3158]" />
-                    <div className="h-2 flex-1 rounded-full bg-[#E7E8E5] dark:bg-[#1e3158]" />
-                    <div className="h-3 w-6 rounded bg-[#E7E8E5] dark:bg-[#1e3158]" />
+                    <div className="h-3 w-24 rounded bg-[#E4EBE5] dark:bg-[#1E4035]" />
+                    <div className="h-2 flex-1 rounded-full bg-[#E4EBE5] dark:bg-[#1E4035]" />
+                    <div className="h-3 w-6 rounded bg-[#E4EBE5] dark:bg-[#1E4035]" />
                   </div>
                 ))}
               </div>
@@ -214,7 +214,7 @@ export function JourneyPage() {
           {/* Company Readiness */}
           {!loading && data?.companyReadiness && data.companyReadiness.length > 0 && (
             <Card className="section-enter" padding="lg">
-              <h2 className="mb-4 text-base font-semibold text-[#111111] dark:text-[#f8fafc]">
+              <h2 className="mb-4 text-base font-semibold text-[#111111] dark:text-[#E2F0E8]">
                 {t('journey.companies', 'Company readiness')}
               </h2>
               <div className="flex flex-col gap-3">
@@ -222,10 +222,10 @@ export function JourneyPage() {
                   const tone = companyTone(cr.percent)
                   return (
                     <div key={cr.company} className="flex items-center gap-3">
-                      <span className="w-20 shrink-0 truncate text-sm font-medium text-[#111111] dark:text-[#f8fafc]">
+                      <span className="w-20 shrink-0 truncate text-sm font-medium text-[#111111] dark:text-[#E2F0E8]">
                         {cr.company}
                       </span>
-                      <div className="flex-1 h-2 rounded-full bg-[#E7E8E5] dark:bg-[#1e3158] overflow-hidden">
+                      <div className="flex-1 h-2 rounded-full bg-[#E4EBE5] dark:bg-[#1E4035] overflow-hidden">
                         <div
                           className={`h-full rounded-full transition-all duration-700 ${
                             tone === 'success'
@@ -237,13 +237,13 @@ export function JourneyPage() {
                           style={{ width: `${cr.percent}%` }}
                         />
                       </div>
-                      <span className="w-10 text-right text-xs font-mono tabular-nums text-[#667085] dark:text-[#7e93b0]">
+                      <span className="w-10 text-right text-xs font-mono tabular-nums text-[#7A9982] dark:text-[#7BA88A]">
                         {cr.percent}%
                       </span>
                       {cr.hasActive && (
                         <Link
                           to="/prepare/interview-prep"
-                          className="text-xs font-semibold text-[#6366F1] hover:underline"
+                          className="text-xs font-semibold text-[#059669] hover:underline"
                         >
                           {t('journey.continue', 'Continue')}
                         </Link>
@@ -257,24 +257,24 @@ export function JourneyPage() {
 
           {/* Quick links */}
           <Card className="section-enter" padding="lg">
-            <h2 className="mb-3 text-base font-semibold text-[#111111] dark:text-[#f8fafc]">
+            <h2 className="mb-3 text-base font-semibold text-[#111111] dark:text-[#E2F0E8]">
               {t('journey.quickActions', 'Quick actions')}
             </h2>
             <div className="flex flex-col gap-2">
               {[
-                { href: '/daily-challenge', icon: <Flame className="h-4 w-4 text-orange-500" />, label: t('journey.quick.daily', 'Daily Challenge') },
-                { href: '/practice/arena', icon: <Swords className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.arena', 'Duel') },
-                { href: '/prepare/interview-prep', icon: <BookOpen className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.mock', 'Mock Interview') },
-                { href: '/prepare/interview-prep?category=algorithm', icon: <Code2 className="h-4 w-4 text-[#6366F1]" />, label: t('journey.quick.practice', 'Practice') },
+                { href: '/daily-challenge', icon: <Flame className="h-4 w-4 text-emerald-500" />, label: t('journey.quick.daily', 'Daily Challenge') },
+                { href: '/practice/arena', icon: <Swords className="h-4 w-4 text-[#059669]" />, label: t('journey.quick.arena', 'Duel') },
+                { href: '/prepare/interview-prep', icon: <BookOpen className="h-4 w-4 text-[#059669]" />, label: t('journey.quick.mock', 'Mock Interview') },
+                { href: '/prepare/interview-prep?category=algorithm', icon: <Code2 className="h-4 w-4 text-[#059669]" />, label: t('journey.quick.practice', 'Practice') },
               ].map((item) => (
                 <Link
                   key={item.href}
                   to={item.href}
-                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#111111] transition-colors hover:bg-[#f1f5f9] dark:text-[#f8fafc] dark:hover:bg-[#1c2436]"
+                  className="flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-[#111111] transition-colors hover:bg-[#f1f5f9] dark:text-[#E2F0E8] dark:hover:bg-[#1c2436]"
                 >
                   {item.icon}
                   <span className="flex-1">{item.label}</span>
-                  <ChevronRight className="h-4 w-4 text-[#CBCCC9] dark:text-[#334155]" />
+                  <ChevronRight className="h-4 w-4 text-[#C1CFC4] dark:text-[#1E4035]" />
                 </Link>
               ))}
             </div>

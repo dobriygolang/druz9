@@ -30,9 +30,9 @@ function formatTimeAgo(iso: string, t: (key: string, options?: Record<string, un
 }
 
 const GRADIENT_COLORS = [
-  ['#6366f1', '#8b5cf6'],
+  ['#059669', '#0D9488'],
   ['#22c55e', '#16a34a'],
-  ['#f59e0b', '#6366F1'],
+  ['#f59e0b', '#059669'],
   ['#ec4899', '#be185d'],
   ['#3b82f6', '#1d4ed8'],
   ['#14b8a6', '#0d9488'],
@@ -158,13 +158,13 @@ export function PodcastsPage() {
       <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
         <div>
           <h1 className="font-mono text-2xl font-bold text-[#111111]">{t('podcasts.title')}</h1>
-          <p className="text-sm text-[#666666] font-geist mt-1">{t('podcasts.subtitle')}</p>
+          <p className="text-sm text-[#4B6B52] font-geist mt-1">{t('podcasts.subtitle')}</p>
         </div>
         <div className="flex w-full flex-col gap-3 sm:flex-row sm:items-center xl:w-auto">
           {user?.isAdmin && (
             <button
               onClick={() => setShowUpload(true)}
-              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#6366F1] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#4F46E5]"
+              className="inline-flex items-center justify-center gap-2 rounded-xl bg-[#059669] px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-[#047857]"
             >
               <Upload className="w-4 h-4" /> {t('podcasts.upload.button')}
             </button>
@@ -175,7 +175,7 @@ export function PodcastsPage() {
               value={search}
               onChange={e => setSearch(e.target.value)}
               placeholder={t('podcasts.searchPlaceholder')}
-              className="w-full rounded-xl border border-[#CBCCC9] bg-white py-2.5 pl-10 pr-4 text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-[#6366F1]/20"
+              className="w-full rounded-xl border border-[#C1CFC4] bg-white py-2.5 pl-10 pr-4 text-sm transition-shadow focus:outline-none focus:ring-2 focus:ring-[#059669]/20"
             />
           </div>
         </div>
@@ -186,15 +186,15 @@ export function PodcastsPage() {
         <div className="flex-1 flex flex-col gap-5 min-w-0">
           {/* Now Playing */}
           {player.playing && (
-            <div className="animate-fade-in flex flex-col gap-4 rounded-2xl bg-[#0f172a] p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
+            <div className="animate-fade-in flex flex-col gap-4 rounded-2xl bg-[#0B1210] p-5 sm:flex-row sm:items-center sm:gap-5 sm:p-6">
               <div
                 className="w-[120px] h-[120px] rounded-xl flex items-center justify-center flex-shrink-0"
-                style={{ background: `linear-gradient(135deg, #6366F1, #f59e0b)` }}
+                style={{ background: `linear-gradient(135deg, #059669, #f59e0b)` }}
               >
                 <Mic className="w-12 h-12 text-white" />
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-[11px] text-[#6366F1] font-medium tracking-wider font-geist uppercase">{t('podcasts.nowPlaying')}</p>
+                <p className="text-[11px] text-[#059669] font-medium tracking-wider font-geist uppercase">{t('podcasts.nowPlaying')}</p>
                 <h3 className="font-mono text-lg font-bold text-white mt-1 truncate">{player.playing.title}</h3>
                 <p className="text-sm text-[#94a3b8] font-geist mt-0.5">
                   {player.playing.authorName} · {formatDuration(player.duration)}
@@ -202,14 +202,14 @@ export function PodcastsPage() {
                 <div className="flex items-center gap-3 mt-3">
                   <button
                     onClick={player.isPlaying ? player.pause : player.resume}
-                    className="w-10 h-10 rounded-full bg-[#6366F1] flex items-center justify-center hover:bg-[#ea7700] transition-colors"
+                    className="w-10 h-10 rounded-full bg-[#059669] flex items-center justify-center hover:bg-[#047857] transition-colors"
                   >
                     {player.isPlaying ? <Pause className="w-[18px] h-[18px] text-white" /> : <Play className="w-[18px] h-[18px] text-white ml-0.5" />}
                   </button>
                   {/* Speed */}
                   <button
                     onClick={cycleSpeed}
-                    className="px-2 py-1 text-[11px] font-bold text-[#64748b] hover:text-white bg-[#1e293b] hover:bg-[#263148] rounded-md transition-colors min-w-[40px] text-center"
+                    className="px-2 py-1 text-[11px] font-bold text-[#7A9982] hover:text-white bg-[#1e293b] hover:bg-[#263148] rounded-md transition-colors min-w-[40px] text-center"
                   >
                     {player.speed === 1 ? '1×' : `${player.speed}×`}
                   </button>
@@ -220,13 +220,13 @@ export function PodcastsPage() {
                       onClick={handleSeek}
                     >
                       <div
-                        className="h-full bg-[#6366F1] rounded-full relative transition-all duration-300"
+                        className="h-full bg-[#059669] rounded-full relative transition-all duration-300"
                         style={{ width: `${player.progress}%` }}
                       >
                         <div className="absolute right-0 top-1/2 -translate-y-1/2 w-3 h-3 bg-white rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity" />
                       </div>
                     </div>
-                    <span className="text-[11px] font-mono text-[#666666] w-[90px] text-right flex-shrink-0">
+                    <span className="text-[11px] font-mono text-[#4B6B52] w-[90px] text-right flex-shrink-0">
                       {formatDuration(player.currentTime)} / {formatDuration(player.duration)}
                     </span>
                   </div>
@@ -245,17 +245,17 @@ export function PodcastsPage() {
             {filtered.length === 0 && podcasts.length === 0 ? (
               // Skeleton
               Array.from({ length: 4 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-4 p-4 bg-white rounded-xl border border-[#CBCCC9] animate-pulse">
-                  <div className="w-14 h-14 rounded-xl bg-[#E7E8E5]" />
+                <div key={i} className="flex items-center gap-4 p-4 bg-white rounded-xl border border-[#C1CFC4] animate-pulse">
+                  <div className="w-14 h-14 rounded-xl bg-[#E4EBE5]" />
                   <div className="flex-1">
-                    <div className="h-4 bg-[#E7E8E5] rounded w-48 mb-2" />
-                    <div className="h-3 bg-[#E7E8E5] rounded w-32" />
+                    <div className="h-4 bg-[#E4EBE5] rounded w-48 mb-2" />
+                    <div className="h-3 bg-[#E4EBE5] rounded w-32" />
                   </div>
                 </div>
               ))
             ) : filtered.length === 0 ? (
               <div className="text-center py-12">
-                <Mic className="w-10 h-10 mx-auto mb-3 text-[#CBCCC9]" />
+                <Mic className="w-10 h-10 mx-auto mb-3 text-[#C1CFC4]" />
                 <p className="text-sm text-[#94a3b8]">{t('podcasts.empty')}</p>
               </div>
             ) : (
@@ -268,8 +268,8 @@ export function PodcastsPage() {
                     onClick={() => player.play(podcast)}
                     className={`stagger-item flex flex-col items-start gap-4 rounded-xl border p-4 text-left transition-all duration-200 sm:flex-row sm:items-center ${
                       isCurrentlyPlaying
-                        ? 'bg-[#fff7ed] border-[#6366F1]/30'
-                        : 'bg-white border-[#CBCCC9] hover:border-[#94a3b8] hover:shadow-sm'
+                        ? 'bg-[#fff7ed] border-[#059669]/30'
+                        : 'bg-white border-[#C1CFC4] hover:border-[#94a3b8] hover:shadow-sm'
                     }`}
                   >
                     <div
@@ -285,18 +285,18 @@ export function PodcastsPage() {
                     <div className="flex-1 min-w-0 self-stretch">
                       <p className="text-sm font-semibold text-[#111111] font-geist truncate">{podcast.title}</p>
                       <div className="mt-0.5 flex flex-wrap items-center gap-2">
-                        <span className="text-xs text-[#666666] font-geist">{podcast.authorName}</span>
-                        <span className="w-1 h-1 rounded-full bg-[#CBCCC9]" />
-                        <span className="text-xs text-[#666666] font-geist">{formatDuration(podcast.durationSeconds)}</span>
-                        <span className="w-1 h-1 rounded-full bg-[#CBCCC9]" />
-                        <span className="text-xs text-[#666666] font-geist">{formatTimeAgo(podcast.createdAt, t)}</span>
+                        <span className="text-xs text-[#4B6B52] font-geist">{podcast.authorName}</span>
+                        <span className="w-1 h-1 rounded-full bg-[#C1CFC4]" />
+                        <span className="text-xs text-[#4B6B52] font-geist">{formatDuration(podcast.durationSeconds)}</span>
+                        <span className="w-1 h-1 rounded-full bg-[#C1CFC4]" />
+                        <span className="text-xs text-[#4B6B52] font-geist">{formatTimeAgo(podcast.createdAt, t)}</span>
                       </div>
                     </div>
                     <div className="flex w-full items-center justify-between gap-3 sm:w-auto sm:justify-start">
                       {podcast.listensCount > 0 && (
                         <span className="text-xs text-[#94a3b8]">{t('podcasts.listens', { count: podcast.listensCount })}</span>
                       )}
-                      <div className="w-9 h-9 rounded-full bg-[#F2F3F0] flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-full bg-[#F0F5F1] flex items-center justify-center">
                         {isCurrentlyPlaying && player.isPlaying ? (
                           <Pause className="w-4 h-4 text-[#111111]" />
                         ) : (
@@ -331,7 +331,7 @@ export function PodcastsPage() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-sm font-semibold text-[#111111] font-geist truncate">{show.authorName}</p>
-                    <p className="text-xs text-[#666666] font-geist">
+                    <p className="text-xs text-[#4B6B52] font-geist">
                       {t('podcasts.episodes', { count: podcasts.filter(p => p.authorName === show.authorName).length })}
                     </p>
                   </div>
@@ -342,10 +342,10 @@ export function PodcastsPage() {
               <div className="flex flex-col gap-3">
                 {[1, 2, 3].map(i => (
                   <div key={i} className="flex items-center gap-3 animate-pulse">
-                    <div className="w-11 h-11 rounded-xl bg-[#E7E8E5]" />
+                    <div className="w-11 h-11 rounded-xl bg-[#E4EBE5]" />
                     <div className="flex-1">
-                      <div className="h-3.5 bg-[#E7E8E5] rounded w-28 mb-1.5" />
-                      <div className="h-3 bg-[#E7E8E5] rounded w-20" />
+                      <div className="h-3.5 bg-[#E4EBE5] rounded w-28 mb-1.5" />
+                      <div className="h-3 bg-[#E4EBE5] rounded w-20" />
                     </div>
                   </div>
                 ))}
@@ -355,14 +355,14 @@ export function PodcastsPage() {
 
           {/* Stats card */}
           <Card padding="lg" dark>
-            <h3 className="font-mono text-sm font-semibold text-[#CBCCC9] mb-4">{t('podcasts.stats')}</h3>
+            <h3 className="font-mono text-sm font-semibold text-[#C1CFC4] mb-4">{t('podcasts.stats')}</h3>
             <div className="flex gap-4 mb-4">
               <div className="flex-1 text-center">
-                <p className="font-mono text-[28px] font-bold text-[#6366F1] leading-none">{podcasts.length || '—'}</p>
+                <p className="font-mono text-[28px] font-bold text-[#059669] leading-none">{podcasts.length || '—'}</p>
                 <p className="text-[11px] text-[#94a3b8] mt-1 font-geist">{t('podcasts.statsEpisodes')}</p>
               </div>
               <div className="flex-1 text-center">
-                <p className="font-mono text-[28px] font-bold text-[#6366F1] leading-none">
+                <p className="font-mono text-[28px] font-bold text-[#059669] leading-none">
                   {podcasts.reduce((sum, p) => sum + p.listensCount, 0) || '—'}
                 </p>
                 <p className="text-[11px] text-[#94a3b8] mt-1 font-geist">{t('podcasts.statsListeners')}</p>
@@ -370,7 +370,7 @@ export function PodcastsPage() {
             </div>
             <div className="h-px bg-[#1e293b] mb-4" />
             <div className="flex items-center justify-between">
-              <p className="text-xs text-[#666666] font-geist">{t('podcasts.newEpisodeEveryFriday')}</p>
+              <p className="text-xs text-[#4B6B52] font-geist">{t('podcasts.newEpisodeEveryFriday')}</p>
               <Badge variant="orange">{t('podcasts.follow')}</Badge>
             </div>
           </Card>
@@ -380,38 +380,38 @@ export function PodcastsPage() {
       {/* Upload modal */}
       {showUpload && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30">
-          <div className="bg-white rounded-2xl shadow-xl border border-[#CBCCC9] w-full max-w-sm p-6">
+          <div className="bg-white rounded-2xl shadow-xl border border-[#C1CFC4] w-full max-w-sm p-6">
             <div className="flex items-center justify-between mb-5">
               <h2 className="text-base font-bold text-[#111111]">{t('podcasts.upload.title')}</h2>
-              <button onClick={() => { if (!uploading) setShowUpload(false) }} disabled={uploading} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F2F3F0] text-[#666666] disabled:opacity-30 disabled:cursor-not-allowed">
+              <button onClick={() => { if (!uploading) setShowUpload(false) }} disabled={uploading} className="w-8 h-8 flex items-center justify-center rounded-lg hover:bg-[#F0F5F1] text-[#4B6B52] disabled:opacity-30 disabled:cursor-not-allowed">
                 <X className="w-4 h-4" />
               </button>
             </div>
             <div className="flex flex-col gap-3">
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1 block">{t('podcasts.upload.titleLabel')}</label>
+                <label className="text-xs font-medium text-[#4B6B52] mb-1 block">{t('podcasts.upload.titleLabel')}</label>
                 <input value={uploadTitle} onChange={e => setUploadTitle(e.target.value)}
                   placeholder={t('podcasts.upload.titlePlaceholder')}
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0B1210] text-[#111111] dark:text-[#E2F0E8] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:border-[#059669] dark:focus:border-[#059669] placeholder:text-[#94a3b8]" />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1 block">{t('podcasts.upload.authorLabel')}</label>
+                <label className="text-xs font-medium text-[#4B6B52] mb-1 block">{t('podcasts.upload.authorLabel')}</label>
                 <input value={uploadAuthor} onChange={e => setUploadAuthor(e.target.value)}
                   placeholder={t('podcasts.upload.authorPlaceholder')}
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8]" />
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0B1210] text-[#111111] dark:text-[#E2F0E8] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:border-[#059669] dark:focus:border-[#059669] placeholder:text-[#94a3b8]" />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1 block">{t('podcasts.upload.descriptionLabel')}</label>
+                <label className="text-xs font-medium text-[#4B6B52] mb-1 block">{t('podcasts.upload.descriptionLabel')}</label>
                 <textarea value={uploadDesc} onChange={e => setUploadDesc(e.target.value)}
                   placeholder={t('podcasts.upload.descriptionPlaceholder')}
                   rows={2}
-                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0f1117] text-[#111111] dark:text-[#e2e8f3] border border-[#CBCCC9] dark:border-[#1e3158] rounded-lg focus:outline-none focus:border-[#6366F1] dark:focus:border-[#6366F1] placeholder:text-[#94a3b8] resize-none" />
+                  className="w-full px-3 py-2 text-sm bg-white dark:bg-[#0B1210] text-[#111111] dark:text-[#E2F0E8] border border-[#C1CFC4] dark:border-[#1E4035] rounded-lg focus:outline-none focus:border-[#059669] dark:focus:border-[#059669] placeholder:text-[#94a3b8] resize-none" />
               </div>
               <div>
-                <label className="text-xs font-medium text-[#666666] mb-1 block">{t('podcasts.upload.fileLabel')}</label>
+                <label className="text-xs font-medium text-[#4B6B52] mb-1 block">{t('podcasts.upload.fileLabel')}</label>
                 <input type="file" accept="audio/*"
                   onChange={e => setUploadFile(e.target.files?.[0] ?? null)}
-                  className="w-full text-sm text-[#666666] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-[#EEF2FF] file:text-[#6366F1] hover:file:bg-[#E0E7FF]" />
+                  className="w-full text-sm text-[#4B6B52] file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-medium file:bg-[#ecfdf5] file:text-[#059669] hover:file:bg-[#d1fae5]" />
               </div>
             </div>
             {uploading && (
@@ -424,11 +424,11 @@ export function PodcastsPage() {
             )}
             <div className="flex gap-2 mt-4">
               <button onClick={() => { if (!uploading) setShowUpload(false) }} disabled={uploading}
-                className="flex-1 py-2 text-sm font-medium text-[#666666] bg-[#F2F3F0] rounded-xl hover:bg-[#E7E8E5] transition-colors">
+                className="flex-1 py-2 text-sm font-medium text-[#4B6B52] bg-[#F0F5F1] rounded-xl hover:bg-[#E4EBE5] transition-colors">
                 {t('common.cancel')}
               </button>
               <button onClick={handleUpload} disabled={uploading || !uploadTitle || !uploadFile}
-                className="flex-1 py-2 text-sm font-medium text-white bg-[#6366F1] rounded-xl hover:bg-[#4F46E5] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                className="flex-1 py-2 text-sm font-medium text-white bg-[#059669] rounded-xl hover:bg-[#047857] transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
                 {uploading ? t('podcasts.upload.uploading') : t('podcasts.upload.submit')}
               </button>
             </div>

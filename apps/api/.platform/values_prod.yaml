@@ -5,6 +5,13 @@ app_require_auth:
   type: "bool"
   writable: true
 
+server_allowed_origins:
+  usage: "Comma-separated list of allowed CORS origins"
+  group: "server"
+  value: "https://druz9.online,https://druz9.ru"
+  type: "string"
+  writable: false
+
 server_http_addr:
   usage: "HTTP server listen address"
   group: "server"

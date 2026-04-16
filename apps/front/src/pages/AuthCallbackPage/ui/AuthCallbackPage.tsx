@@ -25,10 +25,10 @@ export function AuthCallbackPage() {
   }, [params, navigate, refresh])
 
   return (
-    <div className="min-h-screen bg-[#F2F3F0] flex items-center justify-center">
+    <div className="min-h-screen bg-[#F0F5F1] flex items-center justify-center">
       <div className="text-center">
         <Spinner size="lg" className="mx-auto mb-4" />
-        <p className="text-[#666666] text-sm">Signing you in...</p>
+        <p className="text-[#4B6B52] text-sm">Signing you in...</p>
       </div>
     </div>
   )

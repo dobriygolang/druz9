@@ -39,8 +39,8 @@ const CirclePage = lazy(() => import('@/pages/CirclePage/ui/CirclePage').then(m 
 const VacanciesPage = lazy(() => import('@/pages/VacanciesPage/ui/VacanciesPage').then(m => ({ default: m.VacanciesPage })))
 
 const Fallback: React.FC = () => (
-  <div className="flex min-h-screen items-center justify-center bg-[#F2F3F0] dark:bg-[#0f1117]">
-    <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#CBCCC9] border-t-[#6366F1]" />
+  <div className="flex min-h-screen items-center justify-center bg-[#F0F5F1] dark:bg-[#0B1210]">
+    <div className="h-6 w-6 animate-spin rounded-full border-2 border-[#C1CFC4] border-t-[#059669]" />
   </div>
 )
 
@@ -61,11 +61,11 @@ class ErrorBoundary extends React.Component<
         return null
       }
       return (
-        <div className="flex items-center justify-center h-screen bg-[#F2F3F0]">
+        <div className="flex items-center justify-center h-screen bg-[#F0F5F1]">
           <div className="text-center">
             <h2 className="text-xl font-semibold mb-2">Something went wrong</h2>
-            <p className="text-[#666666] mb-4 text-sm">{msg}</p>
-            <button className="px-4 py-2 bg-[#6366F1] rounded-lg text-sm font-medium" onClick={() => window.location.reload()}>
+            <p className="text-[#4B6B52] mb-4 text-sm">{msg}</p>
+            <button className="px-4 py-2 bg-[#059669] rounded-lg text-sm font-medium" onClick={() => window.location.reload()}>
               Reload page
             </button>
           </div>
