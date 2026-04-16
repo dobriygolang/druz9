@@ -70,14 +70,89 @@ export function HomePage() {
   const leagueLabel  = LEAGUE_LABELS[league] ?? ''
   const levelProgress = ov?.levelProgress ?? 0
   const primaryAction = progress?.nextActions?.[0]
+  const locale = i18n.language.startsWith('ru') ? 'ru-RU' : 'en-US'
+  const todayLabel = new Intl.DateTimeFormat(locale, {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+  }).format(new Date())
 
   const daysLeft = weeklyBoss?.endsAt
     ? Math.max(0, Math.floor((new Date(weeklyBoss.endsAt).getTime() - Date.now()) / 86_400_000))
     : null
 
+  const worldLinks = [
+    {
+      to: '/community/events',
+      icon: Calendar,
+      label: t('home.quick.events', 'Events'),
+      eyebrow: t('home.quick.events.eyebrow', 'Guild Hall'),
+      sub: t('home.quick.events.sub', 'Track gatherings, circles, and live rituals.'),
+      cue: t('home.quick.events.cue', 'Open board'),
+    },
+    {
+      to: '/community/vacancies',
+      icon: Briefcase,
+      label: t('home.quick.vacancies', 'Vacancies'),
+      eyebrow: t('home.quick.vacancies.eyebrow', 'Work Tavern'),
+      sub: t('home.quick.vacancies.sub', 'Follow roles worth joining and teams worth meeting.'),
+      cue: t('home.quick.vacancies.cue', 'See openings'),
+    },
+    {
+      to: '/community/podcasts',
+      icon: Headphones,
+      label: t('home.quick.podcasts', 'Podcasts'),
+      eyebrow: t('home.quick.podcasts.eyebrow', 'Listening Room'),
+      sub: t('home.quick.podcasts.sub', 'Save voices, stories, and hard-earned field notes.'),
+      cue: t('home.quick.podcasts.cue', 'Start listening'),
+    },
+    {
+      to: '/community/map',
+      icon: Map,
+      label: t('home.quick.map', 'Map'),
+      eyebrow: t('home.quick.map.eyebrow', 'World Atlas'),
+      sub: t('home.quick.map.sub', 'Trace where the community gathers across cities.'),
+      cue: t('home.quick.map.cue', 'View map'),
+    },
+  ]
+
   return (
     <div className="flex min-h-full flex-col gap-4 px-4 pb-6 pt-4 md:gap-5 md:px-6 md:py-5">
       <PageMeta title={t('home.meta.title')} description={t('home.meta.description')} canonicalPath="/home" />
+
+      <section className="home-top-layer section-enter px-4 py-3 md:px-5">
+        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="min-w-0">
+            <p className="home-top-layer__eyebrow">
+              {t('home.topLayer.eyebrow', 'Home Screen')}
+            </p>
+            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+              <p className="home-top-layer__title">
+                {t('home.topLayer.title', 'Quiet camp, clear route.')}
+              </p>
+              <span className="home-top-layer__date">{todayLabel}</span>
+            </div>
+            <p className="home-top-layer__subtitle">
+              {t('home.topLayer.subtitle', 'A calm layer over your progress, quests, and the world around you.')}
+            </p>
+          </div>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {(ov?.currentStreakDays ?? 0) > 0 && (
+              <div className="home-top-layer__token">
+                <Flame className="h-3.5 w-3.5 text-[#EA580C]" />
+                <span>{t('home.topLayer.streak', '{{count}} day streak', { count: ov!.currentStreakDays })}</span>
+              </div>
+            )}
+            {daysLeft !== null && (
+              <div className="home-top-layer__token">
+                <Clock className="h-3.5 w-3.5 text-[#D97706] dark:text-[#FBBF24]" />
+                <span>{t('home.topLayer.weeklyBoss', 'Weekly boss closes in {{count}} days', { count: daysLeft })}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      </section>
 
       {/* ══ CHARACTER PANEL ════════════════════════════════════════════════ */}
       <section className="char-panel section-enter p-4 md:p-5">
@@ -140,7 +215,7 @@ export function HomePage() {
                   <Flame className="h-3.5 w-3.5 text-[#EA580C] flex-shrink-0" />
                   <div className="flex flex-col">
                     <span className="char-stat-val">{ov!.currentStreakDays}d</span>
-                    <span className="char-stat-lbl">streak</span>
+                    <span className="char-stat-lbl">{t('home.hero.stats.streak', 'streak')}</span>
                   </div>
                 </div>
               )}
@@ -149,7 +224,7 @@ export function HomePage() {
                   <Trophy className="h-3.5 w-3.5 text-[#D97706] flex-shrink-0" />
                   <div className="flex flex-col">
                     <span className="char-stat-val">{arenaStats.rating}</span>
-                    <span className="char-stat-lbl">rating</span>
+                    <span className="char-stat-lbl">{t('home.hero.stats.rating', 'rating')}</span>
                   </div>
                 </div>
               )}
@@ -158,7 +233,7 @@ export function HomePage() {
                   <Target className="h-3.5 w-3.5 text-[#6B5A47] dark:text-[#7BA88A] flex-shrink-0" />
                   <div className="flex flex-col">
                     <span className="char-stat-val">{missions.completedCount}/{missions.missions.length}</span>
-                    <span className="char-stat-lbl">quests</span>
+                    <span className="char-stat-lbl">{t('home.hero.stats.quests', 'quests')}</span>
                   </div>
                 </div>
               )}
@@ -179,53 +254,81 @@ export function HomePage() {
           </div>
 
           {/* ── Right: Current Focus (desktop only) ── */}
-          <div className="hidden lg:flex flex-col gap-3 w-[152px] flex-shrink-0 pl-4 self-stretch border-l border-[#C8AC7E]/22 dark:border-[#3A5038]/28">
-            <div>
-              <p className="font-pixel text-[6px] uppercase tracking-[0.14em] text-[#8B7355] dark:text-[#7BA88A] mb-2">
-                {t('home.hero.focus', 'Current Focus')}
-              </p>
-              {primaryAction ? (
-                <Link
-                  to={primaryAction.actionUrl}
-                  className="block rounded-lg bg-white/42 dark:bg-black/18 border border-[#C8AC7E]/26 dark:border-[#3A5038]/28 p-2.5 hover:bg-white/65 dark:hover:bg-black/28 transition-colors"
-                >
-                  <div className="flex items-start gap-1.5 mb-1">
-                    <div className="mt-0.5 w-4 h-4 rounded-sm bg-[#16A34A]/14 border border-[#16A34A]/22 flex items-center justify-center flex-shrink-0">
-                      <ArrowRight className="w-2.5 h-2.5 text-[#16A34A] dark:text-[#34D399]" />
-                    </div>
-                    <p className="text-[10px] font-semibold text-[#2C1810] dark:text-[#E2F0E8] leading-tight line-clamp-2">
-                      {primaryAction.title}
-                    </p>
-                  </div>
-                  {primaryAction.description && (
-                    <p className="text-[9px] text-[#7A6550] dark:text-[#5A8068] leading-snug line-clamp-2 pl-[22px]">
-                      {primaryAction.description}
-                    </p>
-                  )}
-                </Link>
-              ) : (
-                <div className="rounded-lg bg-white/30 dark:bg-black/12 border border-[#C8AC7E]/18 dark:border-[#3A5038]/20 p-2.5">
-                  <p className="text-[9px] text-[#8B7355] dark:text-[#7BA88A] leading-snug">
-                    {t('home.hero.noFocus', 'Pick a quest to begin')}
+          <div className="hidden lg:flex w-[188px] flex-shrink-0 pl-4 self-stretch border-l border-[#C8AC7E]/22 dark:border-[#3A5038]/28">
+            <div className="hero-side-panel w-full">
+              <div className="hero-side-panel__header">
+                <div>
+                  <p className="hero-side-panel__eyebrow">
+                    {t('home.hero.focus', 'Current Focus')}
+                  </p>
+                  <p className="hero-side-panel__title">
+                    {t('home.hero.focusTitle', 'Today in the camp')}
                   </p>
                 </div>
-              )}
-            </div>
+                <Target className="h-4 w-4 text-[#16A34A] dark:text-[#34D399]" />
+              </div>
 
-            {/* Pixel sword — subtle world accent */}
-            <div className="mt-auto flex justify-center opacity-[0.22] dark:opacity-[0.16]">
-              <svg width="22" height="42" viewBox="0 0 11 21" style={{ imageRendering: 'pixelated' }} xmlns="http://www.w3.org/2000/svg">
-                <rect x="4" y="0" width="3" height="2" fill="#A08848"/>
-                <rect x="3" y="2" width="5" height="1" fill="#C4A060"/>
-                <rect x="4" y="3" width="3" height="1" fill="#B89050"/>
-                <rect x="5" y="4" width="1" height="8" fill="#A07840"/>
-                <rect x="4" y="4" width="3" height="8" fill="#B89050"/>
-                <rect x="1" y="11" width="9" height="2" fill="#8B6A30"/>
-                <rect x="4" y="13" width="3" height="1" fill="#7A5C28"/>
-                <rect x="5" y="14" width="1" height="7" fill="#5A4020"/>
-                <rect x="4" y="14" width="3" height="7" fill="#6B4E28"/>
-                <rect x="3" y="20" width="5" height="1" fill="#4A3418"/>
-              </svg>
+              {primaryAction ? (
+                <Link to={primaryAction.actionUrl} className="hero-focus-card">
+                  <div className="hero-focus-card__marker">
+                    <ArrowRight className="h-3 w-3 text-[#16A34A] dark:text-[#34D399]" />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="hero-focus-card__label">
+                      {t('home.hero.focusLabel', 'Primary route')}
+                    </p>
+                    <p className="hero-focus-card__title">
+                      {primaryAction.title}
+                    </p>
+                    {primaryAction.description && (
+                      <p className="hero-focus-card__desc">
+                        {primaryAction.description}
+                      </p>
+                    )}
+                  </div>
+                </Link>
+              ) : (
+                <div className="hero-focus-card hero-focus-card--idle">
+                  <div className="min-w-0 flex-1">
+                    <p className="hero-focus-card__label">
+                      {t('home.hero.focusLabel', 'Primary route')}
+                    </p>
+                    <p className="hero-focus-card__desc !pl-0">
+                      {t('home.hero.noFocus', 'Pick a quest to begin')}
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              <div className="hero-side-glance">
+                <div className="hero-side-glance__row">
+                  <span>{t('home.hero.glance.league', 'League')}</span>
+                  <strong>{leagueLabel || t('home.hero.glance.unranked', 'Wanderer')}</strong>
+                </div>
+                <div className="hero-side-glance__row">
+                  <span>{t('home.hero.glance.weekly', 'Weekly boss')}</span>
+                  <strong>
+                    {daysLeft !== null
+                      ? t('home.hero.glance.daysLeft', '{{count}} days left', { count: daysLeft })
+                      : t('home.hero.glance.awaiting', 'Awaiting signal')}
+                  </strong>
+                </div>
+              </div>
+
+              <div className="mt-auto flex justify-center opacity-[0.22] dark:opacity-[0.16]">
+                <svg width="22" height="42" viewBox="0 0 11 21" style={{ imageRendering: 'pixelated' }} xmlns="http://www.w3.org/2000/svg">
+                  <rect x="4" y="0" width="3" height="2" fill="#A08848"/>
+                  <rect x="3" y="2" width="5" height="1" fill="#C4A060"/>
+                  <rect x="4" y="3" width="3" height="1" fill="#B89050"/>
+                  <rect x="5" y="4" width="1" height="8" fill="#A07840"/>
+                  <rect x="4" y="4" width="3" height="8" fill="#B89050"/>
+                  <rect x="1" y="11" width="9" height="2" fill="#8B6A30"/>
+                  <rect x="4" y="13" width="3" height="1" fill="#7A5C28"/>
+                  <rect x="5" y="14" width="1" height="7" fill="#5A4020"/>
+                  <rect x="4" y="14" width="3" height="7" fill="#6B4E28"/>
+                  <rect x="3" y="20" width="5" height="1" fill="#4A3418"/>
+                </svg>
+              </div>
             </div>
           </div>
         </div>
@@ -306,7 +409,7 @@ export function HomePage() {
                   <span className="xp-reward-badge">+{mission.xpReward} XP</span>
                   {!mission.completed && (
                     <Link to={mission.actionUrl} className="btn-quest-rpg">
-                      Go →
+                      {t('home.missions.open', 'Open')} →
                     </Link>
                   )}
                 </div>
@@ -363,7 +466,7 @@ export function HomePage() {
                       </p>
                       {i === 0 && (
                         <span className="flex-shrink-0 rounded-sm bg-[#16A34A]/12 dark:bg-[#34D399]/10 border border-[#16A34A]/20 dark:border-[#34D399]/15 px-1 py-px text-[7px] font-bold uppercase tracking-wider text-[#15803D] dark:text-[#34D399]">
-                          Next
+                          {t('home.nextActions.next', 'Next')}
                         </span>
                       )}
                     </div>
@@ -458,14 +561,14 @@ export function HomePage() {
 
               {/* Timer + CTA */}
               <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                {daysLeft !== null && (
-                  <span className="flex items-center gap-1 font-mono text-[10px] font-bold tabular-nums text-[#92400E] dark:text-[#FBBF24]">
-                    <Clock className="h-3 w-3" />
-                    {daysLeft}d left
-                  </span>
-                )}
+                  {daysLeft !== null && (
+                    <span className="flex items-center gap-1 font-mono text-[10px] font-bold tabular-nums text-[#92400E] dark:text-[#FBBF24]">
+                      <Clock className="h-3 w-3" />
+                    {t('home.weeklyBoss.daysLeft', '{{count}}d left', { count: daysLeft })}
+                    </span>
+                  )}
                 <div className="btn-event">
-                  Enter <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+                  {t('home.weeklyBoss.enter', 'Enter')} <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                 </div>
               </div>
             </div>
@@ -475,21 +578,22 @@ export function HomePage() {
 
       {/* ══ WORLD MAP — Quick nav ═══════════════════════════════════════════ */}
       <div className="section-enter grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {[
-          { to: '/community/events',    icon: Calendar,   label: t('home.quick.events',    'Events'),   sub: t('home.quick.events.sub',    'Guild Events') },
-          { to: '/community/vacancies', icon: Briefcase,  label: t('home.quick.vacancies', 'Jobs'),     sub: t('home.quick.vacancies.sub', 'Find Roles') },
-          { to: '/community/podcasts',  icon: Headphones, label: t('home.quick.podcasts',  'Podcasts'), sub: t('home.quick.podcasts.sub',  'Tune In') },
-          { to: '/community/map',       icon: Map,        label: t('home.quick.map',       'Map'),      sub: t('home.quick.map.sub',       'Explore World') },
-        ].map(({ to, icon: Icon, label, sub }) => (
+        {worldLinks.map(({ to, icon: Icon, label, eyebrow, sub, cue }) => (
           <Link key={to} to={to} className="world-tile group">
-            <div className="world-tile-icon">
-              <Icon className="h-5 w-5 text-[#16A34A] dark:text-[#34D399]" />
+            <div className="world-tile__topline">
+              <span className="world-tile__eyebrow">{eyebrow}</span>
+              <div className="world-tile-icon">
+                <Icon className="h-5 w-5 text-[#16A34A] dark:text-[#34D399]" />
+              </div>
             </div>
             <div className="min-w-0 flex-1">
-              <p className="text-xs font-semibold text-[#2C1810] dark:text-[#E2F0E8] truncate">{label}</p>
-              <p className="text-[9px] text-[#7A6550] dark:text-[#6A9880] truncate">{sub}</p>
+              <p className="world-tile__title">{label}</p>
+              <p className="world-tile__desc">{sub}</p>
             </div>
-            <ChevronRight className="h-3.5 w-3.5 text-[#C8AC7E]/55 dark:text-[#3A5038]/70 flex-shrink-0 transition-transform group-hover:translate-x-0.5" />
+            <div className="world-tile__footer">
+              <span className="world-tile__cue">{cue}</span>
+              <ChevronRight className="h-3.5 w-3.5 text-[#C8AC7E]/55 dark:text-[#3A5038]/70 flex-shrink-0 transition-transform group-hover:translate-x-0.5" />
+            </div>
           </Link>
         ))}
       </div>
