@@ -1,5 +1,5 @@
 -- +goose Up
--- +goose StatementBegin
+-- +goose NO TRANSACTION
 
 -- circle_members is frequently joined by circle_id in pulse and digest queries
 CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_circle_members_circle
@@ -22,12 +22,8 @@ CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_arena_matches_finished
   ON arena_matches(status, finished_at DESC)
   WHERE status = 3;
 
--- +goose StatementEnd
-
 -- +goose Down
--- +goose StatementBegin
 DROP INDEX CONCURRENTLY IF EXISTS idx_circle_members_circle;
 DROP INDEX CONCURRENTLY IF EXISTS idx_interview_mock_sessions_finished;
 DROP INDEX CONCURRENTLY IF EXISTS idx_interview_practice_sessions_finished;
 DROP INDEX CONCURRENTLY IF EXISTS idx_arena_matches_finished;
--- +goose StatementEnd
