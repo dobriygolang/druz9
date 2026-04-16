@@ -26,6 +26,10 @@ func originChecker(allowedOrigins []string) func(r *http.Request) bool {
 			return true
 		}
 		normalized := normalizeOrigin(origin)
+		requestOrigin := normalizeRequestOrigin(r)
+		if requestOrigin != "" && normalized == requestOrigin {
+			return true
+		}
 		_, ok := allowed[normalized]
 		return ok
 	}
@@ -43,6 +47,21 @@ func normalizeOrigin(raw string) string {
 	}
 
 	return strings.TrimRight(strings.ToLower(trimmed), "/")
+}
+
+func normalizeRequestOrigin(r *http.Request) string {
+	if r == nil || r.Host == "" {
+		return ""
+	}
+
+	scheme := "http"
+	if r.TLS != nil {
+		scheme = "https"
+	} else if forwardedProto := strings.TrimSpace(r.Header.Get("X-Forwarded-Proto")); forwardedProto != "" {
+		scheme = strings.ToLower(forwardedProto)
+	}
+
+	return strings.ToLower(scheme + "://" + r.Host)
 }
 
 func mustParseUUID(raw string) uuid.UUID {
