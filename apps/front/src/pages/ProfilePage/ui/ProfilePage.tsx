@@ -13,8 +13,10 @@ import { useToast } from '@/shared/ui/Toast'
 import { PageMeta } from '@/shared/ui/PageMeta'
 import { GoalSelector } from '@/shared/ui/GoalSelector'
 import { PixelGarden } from '@/shared/ui/PixelGarden'
-import { PixelHeroScene } from '@/shared/ui/PixelHeroScene'
+import { Sprite } from '@/shared/ui/Sprite'
+import { LANTERN_P, LANTERN_D, BARREL_P, BARREL_D } from '@/shared/lib/sprites'
 import { useProfileData, type ArenaStats } from '../hooks/useProfileData'
+import './character-sheet.css'
 import { computeCompanyReadiness } from '../lib/computeReadiness'
 import { ProfileHero } from './ProfileHero'
 import { ProfileComparison } from './ProfileComparison'
@@ -222,13 +224,33 @@ export function ProfilePage() {
   const hasReadiness = readiness.length > 0
 
   return (
-    <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 pb-6 pt-4 md:gap-5 md:p-6">
+    <div className="cs-page mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 pb-6 pt-0 md:gap-5 md:px-6 md:pb-6 md:pt-0">
       <PageMeta
         title={t('profile.meta.title')}
         description={t('profile.meta.description')}
         canonicalPath={userId ? `/profile/${userId}` : '/profile'}
       />
-      <PixelHeroScene scene="profile" className="section-enter -mx-4 -mt-4 md:-mx-6 md:-mt-6 mb-1" />
+
+      {/* ── Character Quarters Scene Header ── */}
+      <div className="cs-header section-enter -mx-4 md:-mx-6">
+        <div className="cs-header-bg" />
+        <div className="cs-header-beam cs-header-beam-1" />
+        <div className="cs-header-shelf" />
+        <div className="cs-header-lantern cs-header-lantern-l">
+          <Sprite data={LANTERN_D} palette={LANTERN_P} pixel={3} />
+        </div>
+        <div className="cs-header-lantern cs-header-lantern-r">
+          <Sprite data={LANTERN_D} palette={LANTERN_P} pixel={3} />
+        </div>
+        <div style={{ position: 'absolute', left: '15%', bottom: '20%', zIndex: 4, opacity: 0.6 }}>
+          <Sprite data={BARREL_D} palette={BARREL_P} pixel={3} />
+        </div>
+        <div style={{ position: 'absolute', right: '12%', bottom: '18%', zIndex: 4, opacity: 0.5 }}>
+          <Sprite data={BARREL_D} palette={BARREL_P} pixel={2} />
+        </div>
+        <span className="cs-header-title">{t('profile.hero.eyebrow')}</span>
+        <div className="cs-header-beam cs-header-beam-2" />
+      </div>
 
       {/* ── Hero ──────────────────────────────────────────────── */}
       <ProfileHero
@@ -245,9 +267,9 @@ export function ProfilePage() {
 
       {/* ── Pixel Garden ────────────────────────────────────── */}
       {isOwn && (
-        <section className="section-enter card-notch border border-[#C1CFC4] bg-white p-4 dark:border-[#1E4035] dark:bg-[#132420]">
+        <section className="section-enter cs-panel cs-panel-garden p-4">
           <div className="flex items-center justify-between mb-3">
-            <h2 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">{t('profile.garden.title', 'Your Garden')}</h2>
+            <h2 className="cs-panel-eyebrow">{t('profile.garden.title', 'Your Garden')}</h2>
             <span className="text-[10px] font-mono text-[#059669] dark:text-[#34D399]">
               {progress?.competencies?.length ?? 0} {t('profile.garden.skills', 'skills growing')}
             </span>

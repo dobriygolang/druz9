@@ -1,12 +1,144 @@
 import { useEffect, useState } from 'react'
-import { Outlet, useLocation, useNavigate } from 'react-router-dom'
-import { Code2, Crown, Eye, Flame, Swords, Target, Zap } from 'lucide-react'
+import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/shared/ui/Avatar'
 import { apiClient } from '@/shared/api/base'
 import { PageMeta } from '@/shared/ui/PageMeta'
-import { PixelHeroScene } from '@/shared/ui/PixelHeroScene'
+import { Sprite } from '@/shared/ui/Sprite'
+import {
+  TREE_OAK_P, TREE_OAK_D, TREE_PINE_P, TREE_PINE_D,
+  CLOUD_P, CLOUD_D, LANTERN_P, LANTERN_D,
+  PORTAL_P, PORTAL_D, SIGN_P, SIGN_D,
+  FLOWERS_P, FLOWERS_D, BARREL_P, BARREL_D,
+  PLAYER_P, PLAYER_D, NPC_P, NPC_D,
+  FIRE_P, FIRE_D,
+} from '@/shared/lib/sprites'
+import './practice-scene.css'
 
+/* ═══════════════════════════════════════════════════════
+   Training Grounds — unique sprites
+   ═══════════════════════════════════════════════════════ */
+
+// ── Forge Building (16w × 16h) ──
+const FORGE_P: Record<string, string> = {
+  S: '#808080', s: '#666666', B: '#5C3A1E', b: '#7A5833',
+  W: '#A07828', w: '#8B6914', R: '#DD5500', r: '#FF8800',
+  Y: '#FFAA33', D: '#4A2E14', G: '#999999', P: '#555555',
+}
+const FORGE_D = [
+  '     SSSSSS     ',
+  '    SSGGGGSS    ',
+  '   SSGGGGGGSS   ',
+  '  SSSSSSSSSSSS  ',
+  '  BWWWWWWWWWWb  ',
+  '  BWWRrWWWWWWb  ',
+  '  BWWrYWWWWWWb  ',
+  '  BWWRrWWWWWWb  ',
+  '  BWWWWWWDWWWB  ',
+  '  BWWPPWWDDWWb  ',
+  '  BWWPPWWDDWWB  ',
+  '  BSSSSSSSSSSB  ',
+  '  PPPPPPPPPPP   ',
+  '  SSSSSSSSSSS   ',
+  '                ',
+  '    ww    ww    ',
+]
+
+// ── Colosseum Arch (18w × 16h) ──
+const COLO_P: Record<string, string> = {
+  S: '#808888', s: '#6A7278', W: '#A0A8B0', w: '#B0B8C0',
+  G: '#999999', D: '#5C3A1E', B: '#4A3418', P: '#707070',
+}
+const COLO_D = [
+  '    SSSSSSSSSS    ',
+  '   SSWWWWWWWWSS   ',
+  '  SSWWWWWWWWWWSS  ',
+  '  SWWWWWWWWWWWWS  ',
+  '  SW    WW    WS  ',
+  '  SW    WW    WS  ',
+  '  SW    WW    WS  ',
+  '  SW    WW    WS  ',
+  '  SW    WW    WS  ',
+  '  SWWW      WWWS  ',
+  '  SSWW      WWSS  ',
+  '   SS        SS   ',
+  '   SS        SS   ',
+  '  PPPP      PPPP  ',
+  '  PPPP      PPPP  ',
+  ' PPPPPP    PPPPPP ',
+]
+
+// ── Training Dummy (6w × 10h) ──
+const DUMMY_P: Record<string, string> = {
+  W: '#A07828', w: '#8B6914', D: '#6B4E11', S: '#C4A46C',
+  H: '#D4B47C',
+}
+const DUMMY_D = [
+  '  HH  ',
+  ' HSHH ',
+  '  HH  ',
+  ' DWWD ',
+  'DDWWDD',
+  '  WW  ',
+  '  WW  ',
+  '  wW  ',
+  '  WW  ',
+  ' DDDD ',
+]
+
+// ── Weapon Rack (8w × 8h) ──
+const RACK_P: Record<string, string> = {
+  W: '#8B6914', D: '#6B4E11', M: '#94A3B8', m: '#808890',
+  S: '#B0B8C0',
+}
+const RACK_D = [
+  ' M  S   ',
+  ' M  S m ',
+  ' M  S m ',
+  'DDDDDDDD',
+  ' W  W   ',
+  ' W  W   ',
+  ' W  W   ',
+  ' DD DD  ',
+]
+
+// ── Flag / Speed Track Marker (6w × 12h) ──
+const FLAG_P: Record<string, string> = {
+  W: '#A07828', w: '#8B6914', R: '#E74C3C', r: '#FF6B6B',
+  Y: '#FFD700', D: '#6B4E11',
+}
+const FLAG_D = [
+  ' RRRR ',
+  ' RrrR ',
+  ' RRRR ',
+  ' RR   ',
+  '  W   ',
+  '  W   ',
+  '  w   ',
+  '  W   ',
+  '  w   ',
+  '  W   ',
+  ' DWD  ',
+  'DDDDD ',
+]
+
+// ── Review Altar (10w × 10h) ──
+const ALTAR_P: Record<string, string> = {
+  S: '#808888', s: '#6A7278', G: '#4499CC', g: '#66BBEE',
+  P: '#8B5CF6', p: '#A78BFA', W: '#A0A8B0', B: '#555555',
+}
+const ALTAR_D = [
+  '   GgG    ',
+  '   gPg    ',
+  '   GPG    ',
+  '  SSSSS   ',
+  ' SSWWWSS  ',
+  ' SWWWWWS  ',
+  ' SSWWWSS  ',
+  '  SSSSS   ',
+  ' BBBBBBB  ',
+  'BBBBBBBBB ',
+]
 
 interface LeaderboardUser {
   userId: string
@@ -15,14 +147,12 @@ interface LeaderboardUser {
   wins: number
 }
 
-
 export function PracticeHubPage() {
   const { t } = useTranslation()
   const location = useLocation()
   const navigate = useNavigate()
 
   const [leaders, setLeaders] = useState<LeaderboardUser[]>([])
-  const [leadersLoading, setLeadersLoading] = useState(true)
 
   useEffect(() => {
     apiClient
@@ -32,112 +162,193 @@ export function PracticeHubPage() {
         setLeaders(Array.isArray(data) ? data.slice(0, 5) : [])
       })
       .catch(() => setLeaders([]))
-      .finally(() => setLeadersLoading(false))
   }, [])
+
+  const isSubPage = location.pathname !== '/practice' && location.pathname !== '/practice/'
 
   return (
     <div className="flex flex-col min-h-screen">
       <PageMeta title={t('practice.meta.title')} description={t('practice.meta.description')} canonicalPath="/practice" />
-      <PixelHeroScene scene="practice" className="hidden md:block" />
-      <div className="mobile-sticky-surface bg-[#F0F5F1]/88 px-4 pt-4 pb-0 dark:bg-[#070E0C]/88 md:px-6 md:pt-6">
-        <div className="mb-5 flex items-center justify-between">
-          <div>
-            <h1 className="text-2xl font-bold text-[#111111] dark:text-[#E2F0E8]">{t('practice.title')}</h1>
-            <p className="text-sm text-[#4B6B52] dark:text-[#4A7058] mt-0.5">{t('practice.subtitle')}</p>
+
+      {/* ═══════ TRAINING GROUNDS SCENE ═══════ */}
+      {!isSubPage && (
+        <div className="tg">
+          <div className="tg-scene">
+
+            {/* Sky */}
+            <div className="tg-sky" />
+
+            {/* Stars (dark mode) */}
+            <div className="tg-stars">
+              {Array.from({ length: 16 }).map((_, i) => (
+                <div key={i} className="tg-star"
+                  style={{ left: `${7 + (i * 41) % 86}%`, top: `${4 + (i * 19) % 32}%` }} />
+              ))}
+            </div>
+
+            {/* Clouds */}
+            <Sprite data={CLOUD_D} palette={CLOUD_P} pixel={4} className="tg-cloud tg-cloud-1" />
+            <Sprite data={CLOUD_D} palette={CLOUD_P} pixel={5} className="tg-cloud tg-cloud-2" />
+
+            {/* Mountains */}
+            <div className="tg-mountains">
+              <div className="tg-mtn tg-mtn-1" />
+              <div className="tg-mtn tg-mtn-2" />
+              <div className="tg-mtn tg-mtn-3" />
+              <div className="tg-mtn tg-mtn-4" />
+            </div>
+
+            {/* Background Trees */}
+            <Sprite data={TREE_PINE_D} palette={TREE_PINE_P} pixel={4} className="tg-bg-tree tg-bg-tree-1" />
+            <Sprite data={TREE_OAK_D} palette={TREE_OAK_P} pixel={3} className="tg-bg-tree tg-bg-tree-2" />
+            <Sprite data={TREE_PINE_D} palette={TREE_PINE_P} pixel={3} className="tg-bg-tree tg-bg-tree-3" />
+            <Sprite data={TREE_OAK_D} palette={TREE_OAK_P} pixel={3} className="tg-bg-tree tg-bg-tree-4" />
+
+            {/* Ground & Path */}
+            <div className="tg-ground" />
+            <div className="tg-arena-floor" />
+            <div className="tg-path" />
+
+            {/* ═══ BUILDINGS & ZONES ═══ */}
+
+            {/* Forge (Code Rooms) */}
+            <Link to="/practice/code-rooms" className="tg-zone tg-forge">
+              <div style={{ position: 'relative' }}>
+                <div className="tg-forge-glow" />
+                <Sprite data={FORGE_D} palette={FORGE_P} pixel={5} />
+              </div>
+              <span className="tg-label">⚒ {t('practice.card.rooms.title', 'Forge')}</span>
+            </Link>
+
+            {/* Colosseum (Arena) */}
+            <Link to="/practice/arena" className="tg-zone tg-colosseum">
+              <Sprite data={COLO_D} palette={COLO_P} pixel={4} />
+              <span className="tg-label">⚔ {t('practice.card.arena.title', 'Arena')}</span>
+            </Link>
+
+            {/* Quest Post (Daily Quest) */}
+            <Link to="/practice/daily" className="tg-zone tg-quest-post">
+              <Sprite data={SIGN_D} palette={SIGN_P} pixel={5} />
+              <span className="tg-label tg-label-active">📜 {t('practice.card.daily.title', 'Daily Quest')}</span>
+            </Link>
+
+            {/* Boss Portal (Weekly Boss) */}
+            <Link to="/practice/weekly-boss" className="tg-zone tg-boss-portal">
+              <div style={{ position: 'relative' }}>
+                <div className="tg-forge-glow" style={{ background: 'radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%)' }} />
+                <Sprite data={PORTAL_D} palette={PORTAL_P} pixel={4} />
+              </div>
+              <span className="tg-label">👑 {t('practice.card.weeklyBoss.title', 'Weekly Boss')}</span>
+            </Link>
+
+            {/* Speed Track (Speed Trial) */}
+            <Link to="/practice/speed-run" className="tg-zone tg-speed-track">
+              <Sprite data={FLAG_D} palette={FLAG_P} pixel={4} />
+              <span className="tg-label">⚡ {t('practice.card.speedRun.title', 'Speed Trial')}</span>
+            </Link>
+
+            {/* Review Altar (Blind Review) */}
+            <Link to="/practice/blind-review" className="tg-zone tg-review-altar">
+              <Sprite data={ALTAR_D} palette={ALTAR_P} pixel={4} />
+              <span className="tg-label">👁 {t('practice.card.blindReview.title', 'Blind Review')}</span>
+            </Link>
+
+            {/* ═══ PROPS ═══ */}
+
+            {/* Training Dummies */}
+            <div className="tg-dummy tg-dummy-1">
+              <Sprite data={DUMMY_D} palette={DUMMY_P} pixel={4} />
+            </div>
+            <div className="tg-dummy tg-dummy-2">
+              <Sprite data={DUMMY_D} palette={DUMMY_P} pixel={3} />
+            </div>
+
+            {/* Weapon Rack */}
+            <div className="tg-weapon-rack">
+              <Sprite data={RACK_D} palette={RACK_P} pixel={4} />
+            </div>
+
+            {/* Torches */}
+            <div className="tg-torch tg-torch-1">
+              <Sprite data={LANTERN_D} palette={LANTERN_P} pixel={3} />
+            </div>
+            <div className="tg-torch tg-torch-2">
+              <Sprite data={LANTERN_D} palette={LANTERN_P} pixel={3} />
+            </div>
+            <div className="tg-torch tg-torch-3">
+              <Sprite data={LANTERN_D} palette={LANTERN_P} pixel={3} />
+            </div>
+
+            {/* Barrels */}
+            <div style={{ position: 'absolute', left: '14%', bottom: '28%', zIndex: 18, pointerEvents: 'none' }}>
+              <Sprite data={BARREL_D} palette={BARREL_P} pixel={3} />
+            </div>
+
+            {/* Campfire in arena center */}
+            <div style={{ position: 'absolute', left: '46%', bottom: '24%', zIndex: 22, pointerEvents: 'none' }}>
+              <Sprite data={FIRE_D} palette={FIRE_P} pixel={4} />
+            </div>
+
+            {/* Flowers */}
+            <Sprite data={FLOWERS_D} palette={FLOWERS_P} pixel={3}
+              style={{ position: 'absolute', left: '18%', bottom: '16%', zIndex: 13, pointerEvents: 'none' }} />
+            <Sprite data={FLOWERS_D} palette={FLOWERS_P} pixel={3}
+              style={{ position: 'absolute', left: '75%', bottom: '15%', zIndex: 13, pointerEvents: 'none' }} />
+
+            {/* ═══ CHARACTERS ═══ */}
+
+            {/* Sparring fighters */}
+            <div className="tg-sparrer tg-sparrer-1">
+              <Sprite data={PLAYER_D} palette={PLAYER_P} pixel={3} />
+            </div>
+            <div className="tg-sparrer tg-sparrer-2">
+              <Sprite data={NPC_D} palette={NPC_P} pixel={3} />
+            </div>
+
+            {/* Foreground trees */}
+            <Sprite data={TREE_OAK_D} palette={TREE_OAK_P} pixel={7}
+              className="tg-fg-tree tg-fg-tree-1" />
+            <Sprite data={TREE_PINE_D} palette={TREE_PINE_P} pixel={7}
+              className="tg-fg-tree tg-fg-tree-2" />
+
+            {/* Fireflies (dark mode) */}
+            <div className="tg-fireflies">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="tg-firefly" />
+              ))}
+            </div>
           </div>
-        </div>
 
-        {(() => {
-          const modeCards = [
-            { icon: Code2, title: 'Code Rooms', sub: t('practice.card.rooms'), href: '/practice/code-rooms' },
-            { icon: Swords, title: 'Arena Duels', sub: t('practice.card.arena'), href: '/practice/arena' },
-            { icon: Flame, title: 'Daily Challenge', sub: t('practice.card.daily'), href: '/practice/daily' },
-          ]
-          const challengeCards = [
-            { icon: Crown, title: 'Weekly Boss', sub: t('practice.card.weeklyBoss'), href: '/practice/weekly-boss' },
-            { icon: Zap, title: 'Speed Run', sub: t('practice.card.speedRun'), href: '/practice/speed-run' },
-            { icon: Eye, title: 'Blind Review', sub: t('practice.card.blindReview'), href: '/practice/blind-review' },
-            { icon: Target, title: 'Algorithm Prep', sub: t('practice.card.solo'), href: '/prepare/interview-prep?category=algorithm' },
-          ]
-          const allCards = [...modeCards, ...challengeCards]
-
-          const renderCard = (f: typeof allCards[number]) => {
-            const Icon = f.icon
-            const isAct = location.pathname.startsWith(f.href)
-            return (
-              <button
-                key={f.title}
-                onClick={() => navigate(f.href)}
-                className={`section-enter card-notch min-w-[280px] snap-center flex items-center gap-3 border px-4 py-4 text-left transition-all md:min-w-0 ${
-                  isAct
-                    ? 'border-[#059669] bg-[linear-gradient(135deg,_rgba(255,255,255,0.98),_rgba(236,253,245,0.98))] shadow-[0_18px_34px_rgba(5,150,105,0.12)] dark:bg-[linear-gradient(145deg,_rgba(19,36,32,0.98),_rgba(13,42,31,0.74))]'
-                    : 'border-[#C1CFC4] bg-white/86 shadow-[0_12px_24px_rgba(11,18,16,0.06)] dark:border-[#163028] dark:bg-[#132420]/92 dark:hover:border-[#059669]/40'
-                }`}
-              >
-                <div className={`w-9 h-9 rounded-lg flex items-center justify-center flex-shrink-0 ${isAct ? 'bg-[#ecfdf5] dark:bg-[#0d2a1f]' : 'bg-[#F0F5F1] dark:bg-[#162E24]'}`}>
-                  <Icon className="w-4 h-4 text-[#059669]" />
-                </div>
-                <div className="min-w-0">
-                  <p className="text-sm font-semibold text-[#111111] dark:text-[#C1D9CA] leading-tight">{f.title}</p>
-                  <p className="text-xs text-[#4B6B52] dark:text-[#4A7058] leading-tight mt-0.5">{f.sub}</p>
-                </div>
-                {isAct && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#059669] flex-shrink-0" />}
-              </button>
-            )
-          }
-
-          return (
-            <div className="-mx-4 mb-5 overflow-x-auto px-4 pb-1 no-scrollbar md:mx-0 md:px-0 md:overflow-visible">
-              {/* Mobile: single horizontal scroll row */}
-              <div className="flex snap-x gap-3 md:hidden">
-                {allCards.map(renderCard)}
-              </div>
-              {/* Desktop: two rows — 3 modes + 4 challenges */}
-              <div className="hidden md:flex md:flex-col md:gap-3">
-                <div className="grid grid-cols-3 gap-3">
-                  {modeCards.map(renderCard)}
-                </div>
-                <div className="grid grid-cols-4 gap-3">
-                  {challengeCards.map(renderCard)}
-                </div>
-              </div>
-            </div>
-          )
-        })()}
-
-        <div className="mb-5">
-          <h2 className="text-sm font-semibold text-[#111111] dark:text-[#C1D9CA] mb-3">{t('practice.leaders')}</h2>
-          {leadersLoading ? (
-            <div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar">
-              {Array.from({ length: 5 }).map((_, i) => (
-                <div key={i} className="flex items-center gap-2 px-4 py-2 bg-white dark:bg-[#132420] rounded-xl border border-[#C1CFC4] dark:border-[#163028] animate-pulse w-40 h-12" />
-              ))}
-            </div>
-          ) : leaders.length > 0 ? (
-            <div className="flex gap-3 overflow-x-auto pb-1 no-scrollbar md:flex-wrap md:overflow-visible">
+          {/* ═══ HUD: Leaderboard ═══ */}
+          {leaders.length > 0 && (
+            <div className="tg-hud tg-hud-leaders">
+              <div className="tg-leaders-title">🏆 {t('practice.leaders')}</div>
               {leaders.map((u, idx) => (
-                <div
-                  key={u.userId}
-                  className="section-enter flex min-w-fit items-center gap-2.5 rounded-2xl border border-[#C1CFC4] bg-white px-4 py-2 shadow-[0_10px_22px_rgba(15,23,42,0.05)] dark:border-[#163028] dark:bg-[#132420]"
-                >
-                  <span className="text-xs font-mono font-bold text-[#059669] w-4 text-center">{idx + 1}</span>
+                <div key={u.userId} className="tg-leader">
+                  <span className="tg-leader-rank">{idx + 1}</span>
                   <Avatar name={u.username} src={u.avatarUrl} size="xs" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-medium text-[#111111] dark:text-[#C1D9CA] truncate">{u.username}</p>
-                    <p className="text-[10px] text-[#4B6B52] dark:text-[#4A7058]">{t('practice.wins', { count: u.wins })}</p>
-                  </div>
+                  <span className="tg-leader-name">{u.username}</span>
+                  <span className="tg-leader-wins">{t('practice.wins', { count: u.wins })}</span>
                 </div>
               ))}
             </div>
-          ) : (
-            <p className="text-xs text-[#4B6B52] dark:text-[#4A7058]">{t('practice.noLeaders')}</p>
           )}
         </div>
+      )}
 
-      </div>
-      <div className="flex-1">
-        <Outlet />
-      </div>
+      {/* ═══ SUB-PAGE CONTENT ═══ */}
+      {isSubPage && (
+        <div className="tg-outlet flex-1">
+          <Outlet />
+        </div>
+      )}
+
+      {/* When on hub page, still mount Outlet for preloading */}
+      {!isSubPage && (
+        <div style={{ display: 'none' }}>
+          <Outlet />
+        </div>
+      )}
     </div>
   )
 }

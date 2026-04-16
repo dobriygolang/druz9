@@ -1,109 +1,299 @@
 import { Outlet, useLocation, Link } from 'react-router-dom'
-import { Search } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useIsMobile } from '@/shared/hooks/useIsMobile'
-import { PixelHeroScene } from '@/shared/ui/PixelHeroScene'
+import { Sprite } from '@/shared/ui/Sprite'
+import {
+  BOARD_P, BOARD_D, BARREL_P, BARREL_D,
+  LANTERN_P, LANTERN_D, NPC_P, NPC_D,
+  PLAYER_P, PLAYER_D, FIRE_P, FIRE_D,
+} from '@/shared/lib/sprites'
+import './guild-scene.css'
+
+/* ═══════════════════════════════════════════════════════
+   Guild Hall — unique sprites
+   ═══════════════════════════════════════════════════════ */
+
+// ── Long Table (16w × 6h) ──
+const TABLE_P: Record<string, string> = {
+  W: '#8B6914', w: '#A07828', D: '#6B4E11', B: '#5C3A1E',
+}
+const TABLE_D = [
+  'WWWWWWWWWWWWWWWW',
+  'WwwwwwwwwwwwwwwW',
+  'WWWWWWWWWWWWWWWW',
+  ' BB          BB ',
+  ' BB          BB ',
+  ' DD          DD ',
+]
+
+// ── Bar Counter (14w × 8h) ──
+const BAR_P: Record<string, string> = {
+  W: '#A07828', w: '#8B6914', D: '#6B4E11', B: '#5C3A1E',
+  G: '#FFD700', P: '#F5E6C8', M: '#808080',
+}
+const BAR_D = [
+  'WWWWWWWWWWWWWW',
+  'WPPPGPPGPPPPW ',
+  'WWWWWWWWWWWWWW',
+  'BWwwwwwwwwwwBW',
+  'BWwwwwwwwwwwBW',
+  'BWwwwwwwwwwwBW',
+  'BDDDDDDDDDDDBW',
+  ' DDDDDDDDDDDD ',
+]
+
+// ── Globe / Map Table (10w × 10h) ──
+const GLOBE_P: Record<string, string> = {
+  W: '#8B6914', D: '#6B4E11', B: '#5C3A1E',
+  G: '#4499CC', g: '#66BBEE', S: '#3388BB',
+  F: '#FFD700',
+}
+const GLOBE_D = [
+  '    GgG     ',
+  '   GgSgG    ',
+  '  GgSgSgG   ',
+  '   GgSgG    ',
+  '    GgG     ',
+  '     F      ',
+  '    FFF     ',
+  '  WWWWWWW   ',
+  '  WwwwwwW   ',
+  '   BBBBB    ',
+]
+
+// ── Bard Chair + Lute (8w × 10h) ──
+const BARD_P: Record<string, string> = {
+  W: '#8B6914', w: '#A07828', D: '#6B4E11',
+  S: '#C4A46C', L: '#B85030',
+}
+const BARD_D = [
+  '   L        ',
+  '   LL       ',
+  '   L L      ',
+  '   L  L     ',
+  '  WWWW      ',
+  ' WSSSSW     ',
+  ' WSSSSW     ',
+  ' WSSSSW     ',
+  '  WWWW      ',
+  '  DD DD     ',
+]
+
+// ── Shield / Banner (6w × 8h) ──
+const SHIELD_P: Record<string, string> = {
+  S: '#808080', G: '#FFD700', R: '#8B3513', B: '#059669', b: '#047857',
+}
+const SHIELD1_D = [
+  ' SSSS ',
+  'SGGGRS',
+  'SGRRGS',
+  'SGRGGS',
+  'SGGRRS',
+  ' SGRS ',
+  '  SS  ',
+  '  SS  ',
+]
+const SHIELD2_D = [
+  ' SSSS ',
+  'SBBBGS',
+  'SBGBbS',
+  'SBbBGS',
+  'SBBGBS',
+  ' SbBS ',
+  '  SS  ',
+  '  SS  ',
+]
+
+// ── Chandelier (8w × 6h) ──
+const CHAN_P: Record<string, string> = {
+  M: '#808080', W: '#5C3A1E', G: '#FFD700', g: '#FFC000', F: '#FFAA33',
+}
+const CHAN_D = [
+  '   MM   ',
+  '  MWWM  ',
+  ' MWWWWM ',
+  'GFGWWGFG',
+  ' gFggFg ',
+  '  g  g  ',
+]
+
+// ── Fireplace (12w × 10h) ──
+const FPLACE_P: Record<string, string> = {
+  S: '#6A6060', s: '#808080', W: '#5C3A1E',
+  R: '#DD5500', r: '#FF8800', Y: '#FFAA33', y: '#FFD700',
+  B: '#4A3418',
+}
+const FPLACE_D = [
+  '  SSSSSSSS  ',
+  ' SssSSSSssS ',
+  ' S        S ',
+  ' S  yYYy  S ',
+  ' S  YrRY  S ',
+  ' S RrYrR  S ',
+  ' S  RrR   S ',
+  ' SSSSSSSSSS ',
+  ' BBBBBBBBBB ',
+  'BBBBBBBBBBBB',
+]
 
 export function CommunityHubPage() {
   const { t } = useTranslation()
   const location = useLocation()
-  const isMobile = useIsMobile()
   const [search, setSearch] = useState('')
   const [openCreateEvent, setOpenCreateEvent] = useState(false)
-  const tabs = [
-    { id: 'people', label: t('community.tab.people'), href: '/community/people' },
-    { id: 'events', label: t('community.tab.events'), href: '/community/events' },
-    { id: 'circles', label: t('community.tab.circles'), href: '/community/circles' },
-    { id: 'map', label: t('community.tab.map'), href: '/community/map' },
-    { id: 'vacancies', label: t('community.tab.vacancies'), href: '/community/vacancies' },
-    { id: 'podcasts', label: t('community.tab.podcasts'), href: '/community/podcasts' },
-  ]
-  const active = tabs.find(t => location.pathname.startsWith(`/community/${t.id}`))?.id ?? 'people'
+
+  const isSubPage = location.pathname !== '/community' && location.pathname !== '/community/'
 
   return (
     <div className="flex flex-col h-full">
-      <PixelHeroScene scene="community" className="hidden md:block" />
-      {isMobile ? (
-        <div className="mobile-sticky-surface bg-[#F0F5F1]/88 px-4 pt-4 pb-0 dark:bg-[#070E0C]/88">
-          <div className="mb-4 flex flex-col gap-3">
-            <div>
-              <h1 className="text-2xl font-bold text-[#111111] dark:text-[#E2F0E8]">{t('community.title')}</h1>
-              <p className="mt-1 text-sm text-[#4B6B52] dark:text-[#4A7058]">{t('community.subtitleMobile')}</p>
+
+      {/* ═══════ GUILD HALL SCENE ═══════ */}
+      {!isSubPage && (
+        <div className="gh">
+          <div className="gh-scene">
+
+            {/* Walls */}
+            <div className="gh-walls" />
+            <div className="gh-stone-wall" />
+            <div className="gh-floor" />
+
+            {/* Wooden beams */}
+            <div className="gh-beam gh-beam-h gh-beam-1" />
+            <div className="gh-beam gh-beam-h gh-beam-2" />
+            <div className="gh-beam gh-beam-v gh-beam-3" />
+            <div className="gh-beam gh-beam-v gh-beam-4" />
+
+            {/* Fireplace (center wall) */}
+            <div className="gh-fireplace">
+              <div className="gh-fireplace-glow" />
+              <Sprite data={FPLACE_D} palette={FPLACE_P} pixel={5} />
             </div>
 
-            {active === 'people' && (
-              <div className="relative w-full">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
-                <input
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder={t('community.searchPlaceholder')}
-                  className="w-full rounded-2xl border border-[#C1CFC4] bg-white/88 py-3 pl-10 pr-4 text-sm text-[#111111] shadow-[0_10px_26px_rgba(15,23,42,0.06)] backdrop-blur focus:outline-none focus:ring-2 focus:ring-[#059669]/20 dark:border-[#163028] dark:bg-[#132420]/88 dark:text-[#C1D9CA]"
-                />
-              </div>
-            )}
-          </div>
+            {/* Chandeliers */}
+            <div className="gh-chandelier gh-chandelier-1">
+              <Sprite data={CHAN_D} palette={CHAN_P} pixel={4} />
+            </div>
+            <div className="gh-chandelier gh-chandelier-2">
+              <Sprite data={CHAN_D} palette={CHAN_P} pixel={4} />
+            </div>
 
-          <div className="-mx-4 overflow-x-auto px-4 pb-1 no-scrollbar">
-            <div className="inline-flex min-w-full gap-2 rounded-[24px] border border-[#d8d9d6] bg-white/72 p-1.5 shadow-[0_18px_34px_rgba(15,23,42,0.06)] backdrop-blur dark:border-[#163028] dark:bg-[#10192b]/72">
-              {tabs.map(tab => (
-                <Link
-                  key={tab.id}
-                  to={tab.href}
-                  className={`whitespace-nowrap rounded-[18px] px-4 py-2.5 text-sm font-medium transition-all ${
-                    active === tab.id
-                      ? 'bg-[#111111] text-white shadow-[0_14px_24px_rgba(15,23,42,0.14)] dark:bg-white dark:text-[#08101f]'
-                      : 'text-[#4B6B52] dark:text-[#4A7058] hover:bg-white/80 hover:text-[#111111] dark:hover:bg-[#161f34] dark:hover:text-[#C1D9CA]'
-                  }`}
-                >
-                  {tab.label}
-                </Link>
+            {/* Shields / Banners on wall */}
+            <div className="gh-banner gh-banner-1">
+              <Sprite data={SHIELD1_D} palette={SHIELD_P} pixel={4} />
+            </div>
+            <div className="gh-banner gh-banner-2">
+              <Sprite data={SHIELD2_D} palette={SHIELD_P} pixel={4} />
+            </div>
+            <div className="gh-banner gh-banner-3">
+              <Sprite data={SHIELD2_D} palette={SHIELD_P} pixel={3} />
+            </div>
+            <div className="gh-banner gh-banner-4">
+              <Sprite data={SHIELD1_D} palette={SHIELD_P} pixel={3} />
+            </div>
+
+            {/* ═══ INTERACTIVE ZONES ═══ */}
+
+            {/* Long Table (Companions) */}
+            <Link to="/community/people" className="gh-zone gh-companions">
+              <Sprite data={TABLE_D} palette={TABLE_P} pixel={5} />
+              <span className="gh-label">👥 {t('community.tab.people')}</span>
+            </Link>
+
+            {/* Notice Board (Council / Events) */}
+            <Link to="/community/events" className="gh-zone gh-council">
+              <Sprite data={BOARD_D} palette={BOARD_P} pixel={5} />
+              <span className="gh-label">📋 {t('community.tab.events')}</span>
+            </Link>
+
+            {/* Shield Wall (Orders / Circles) */}
+            <Link to="/community/circles" className="gh-zone gh-orders">
+              <Sprite data={SHIELD1_D} palette={SHIELD_P} pixel={6} />
+              <span className="gh-label">🛡 {t('community.tab.circles')}</span>
+            </Link>
+
+            {/* Globe Table (Atlas / Map) */}
+            <Link to="/community/map" className="gh-zone gh-atlas">
+              <Sprite data={GLOBE_D} palette={GLOBE_P} pixel={5} />
+              <span className="gh-label">🗺️ {t('community.tab.map')}</span>
+            </Link>
+
+            {/* Bar Counter (Tavern / Vacancies) */}
+            <Link to="/community/vacancies" className="gh-zone gh-tavern-bar">
+              <Sprite data={BAR_D} palette={BAR_P} pixel={4} />
+              <span className="gh-label">🍺 {t('community.tab.vacancies')}</span>
+            </Link>
+
+            {/* Bard's Corner (Hall of Stories / Podcasts) */}
+            <Link to="/community/podcasts" className="gh-zone gh-stories">
+              <Sprite data={BARD_D} palette={BARD_P} pixel={4} />
+              <span className="gh-label">🎵 {t('community.tab.podcasts')}</span>
+            </Link>
+
+            {/* ═══ CHARACTERS ═══ */}
+
+            {/* Barkeeper NPC */}
+            <div className="gh-npc gh-barkeep">
+              <Sprite data={NPC_D} palette={NPC_P} pixel={3} />
+            </div>
+
+            {/* Bard NPC (near stories) */}
+            <div className="gh-npc gh-bard">
+              <Sprite data={PLAYER_D} palette={PLAYER_P} pixel={3} />
+            </div>
+
+            {/* Seated companions */}
+            <div className="gh-npc gh-seated-1">
+              <Sprite data={PLAYER_D} palette={PLAYER_P} pixel={3} />
+            </div>
+            <div className="gh-npc gh-seated-2">
+              <Sprite data={NPC_D} palette={NPC_P} pixel={3} />
+            </div>
+
+            {/* ═══ PROPS ═══ */}
+
+            {/* Lanterns on walls */}
+            <div className="gh-prop" style={{ left: '10%', top: '18%' }}>
+              <Sprite data={LANTERN_D} palette={LANTERN_P} pixel={3} />
+            </div>
+            <div className="gh-prop" style={{ right: '10%', top: '18%' }}>
+              <Sprite data={LANTERN_D} palette={LANTERN_P} pixel={3} />
+            </div>
+
+            {/* Barrels near bar */}
+            <div className="gh-prop" style={{ right: '2%', bottom: '28%' }}>
+              <Sprite data={BARREL_D} palette={BARREL_P} pixel={4} />
+            </div>
+            <div className="gh-prop" style={{ right: '7%', bottom: '26%' }}>
+              <Sprite data={BARREL_D} palette={BARREL_P} pixel={3} />
+            </div>
+
+            {/* Small campfire near bard */}
+            <div className="gh-prop" style={{ left: '8%', bottom: '26%' }}>
+              <Sprite data={FIRE_D} palette={FIRE_P} pixel={3} />
+            </div>
+
+            {/* Dust motes */}
+            <div className="gh-dust">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <div key={i} className="gh-dust-mote" />
               ))}
             </div>
           </div>
         </div>
-      ) : (
-        <div className="px-6 pt-6 pb-0 bg-[#F0F5F1] dark:bg-[#070E0C]">
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h1 className="text-2xl font-bold text-[#111111] dark:text-[#E2F0E8]">{t('community.title')}</h1>
-              <p className="text-sm text-[#4B6B52] dark:text-[#4A7058] mt-0.5">{t('community.subtitleDesktop')}</p>
-            </div>
-            {active === 'people' && (
-              <div className="relative">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#94a3b8]" />
-                <input
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  placeholder={t('community.searchPlaceholder')}
-                  className="pl-9 pr-4 py-2 w-[280px] bg-white dark:bg-[#132420] border border-[#C1CFC4] dark:border-[#163028] rounded-lg text-sm text-[#111111] dark:text-[#C1D9CA] placeholder-[#94a3b8] focus:outline-none focus:ring-2 focus:ring-[#059669]/20"
-                />
-              </div>
-            )}
-          </div>
+      )}
 
-          <div className="flex items-center gap-0 border-b border-[#C1CFC4] dark:border-[#163028]">
-            {tabs.map(tab => (
-              <Link
-                key={tab.id}
-                to={tab.href}
-                className={`px-4 py-3 text-sm font-medium border-b-2 -mb-px transition-colors ${
-                  active === tab.id
-                    ? 'border-[#059669] text-[#111111] dark:text-[#E2F0E8]'
-                    : 'border-transparent text-[#4B6B52] dark:text-[#4A7058] hover:text-[#111111] dark:hover:text-[#C1D9CA]'
-                }`}
-              >
-                {tab.label}
-              </Link>
-            ))}
-          </div>
+      {/* ═══ SUB-PAGE CONTENT ═══ */}
+      {isSubPage && (
+        <div className="gh-outlet flex-1 min-h-0">
+          <Outlet context={{ search, openCreateEvent, setOpenCreateEvent }} />
         </div>
       )}
 
-      <div className={`flex-1 min-h-0${active === 'map' ? ' overflow-hidden' : ''}`}>
-        <Outlet context={{ search, openCreateEvent, setOpenCreateEvent }} />
-      </div>
+      {!isSubPage && (
+        <div style={{ display: 'none' }}>
+          <Outlet context={{ search, openCreateEvent, setOpenCreateEvent }} />
+        </div>
+      )}
     </div>
   )
 }

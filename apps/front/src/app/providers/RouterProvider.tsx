@@ -110,7 +110,7 @@ export const RouterProvider: React.FC = () => {
 
             {/* Practice — code rooms, arena, solo, daily challenge */}
             <Route path="/practice" element={<PracticeHubPage />}>
-              <Route index element={<Navigate to="code-rooms" replace />} />
+              {/* Hub scene renders at /practice index — no redirect */}
               <Route path="code-rooms" element={<CodeRoomsPage />} />
               <Route path="arena" element={<ArenaHubPage />} />
               <Route path="solo" element={<Navigate to="/prepare/interview-prep?category=algorithm" replace />} />
@@ -122,13 +122,13 @@ export const RouterProvider: React.FC = () => {
 
             {/* Prepare — mock interviews and structured prep (formerly Growth) */}
             <Route path="/prepare" element={gate ? <Navigate to="/login" replace /> : <GrowthHubPage />}>
-              <Route index element={<Navigate to="interview-prep" replace />} />
+              {/* Academy scene renders at /prepare index — no redirect */}
               <Route path="interview-prep" element={<InterviewPrepPage />} />
             </Route>
 
             {/* Community — people, events, circles, map, vacancies, podcasts */}
             <Route path="/community" element={gate ? <Navigate to="/login" replace /> : <CommunityHubPage />}>
-              <Route index element={<Navigate to="people" replace />} />
+              {/* Guild scene renders at /community index — no redirect */}
               <Route path="people" element={<UsersPage />} />
               <Route path="events" element={<EventsPage />} />
               <Route path="circles" element={<CirclesPage />} />

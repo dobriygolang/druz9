@@ -1,0 +1,256 @@
+/* ═══════════════════════════════════════════════════════
+   DRUZ9 — Academy Scene (Prepare Hub)
+   A magical library / academy interior
+   ═══════════════════════════════════════════════════════ */
+
+.ac {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background: #3A3050;
+  user-select: none;
+}
+.dark .ac { background: #0E0A18; }
+
+.ac-scene {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  overflow: hidden;
+}
+
+/* ─── Walls ─── */
+.ac-walls {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    #2A2040 0%,
+    #3A3050 10%,
+    #4A4060 20%,
+    #5A5070 35%,
+    #4A4060 50%,
+    #3A3050 65%,
+    #2A2040 80%,
+    #1A1030 100%
+  );
+}
+.dark .ac-walls {
+  background: linear-gradient(
+    180deg,
+    #08060E 0%,
+    #0E0A18 10%,
+    #141020 20%,
+    #1A1428 35%,
+    #141020 50%,
+    #0E0A18 65%,
+    #08060E 80%,
+    #040308 100%
+  );
+}
+
+/* ─── Stone Floor ─── */
+.ac-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 45%;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 62px, rgba(0,0,0,0.04) 62px, rgba(0,0,0,0.04) 64px),
+    repeating-linear-gradient(180deg, transparent, transparent 62px, rgba(0,0,0,0.03) 62px, rgba(0,0,0,0.03) 64px),
+    linear-gradient(180deg, #5A5060 0%, #4A4050 30%, #3A3040 60%, #2A2030 100%);
+}
+.dark .ac-floor {
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 62px, rgba(0,0,0,0.06) 62px, rgba(0,0,0,0.06) 64px),
+    repeating-linear-gradient(180deg, transparent, transparent 62px, rgba(0,0,0,0.04) 62px, rgba(0,0,0,0.04) 64px),
+    linear-gradient(180deg, #141020 0%, #100C18 30%, #0C0A14 60%, #080610 100%);
+}
+
+/* ─── Stained Glass Window ─── */
+.ac-window {
+  position: absolute;
+  top: 5%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 12%;
+  height: 25%;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(180deg, #6A8CCC 0%, #8AACEE 30%, #6A8CCC 50%, #4A6CAA 100%);
+  border: 4px solid #4A4060;
+  border-radius: 50% 50% 0 0;
+  box-shadow: 0 0 30px rgba(106,140,204,0.3);
+}
+.dark .ac-window {
+  background: linear-gradient(180deg, #1A2840 0%, #2A3850 30%, #1A2840 50%, #0A1828 100%);
+  border-color: #1A1428;
+  box-shadow: 0 0 20px rgba(40,60,100,0.2);
+}
+
+/* ─── Scene Zones ─── */
+.ac-zone {
+  position: absolute;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.3));
+}
+.ac-zone:hover {
+  transform: translateY(-5px) scale(1.06);
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.4));
+}
+
+.ac-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 4px 12px;
+  background: rgba(60,50,80,0.94);
+  border: 2px solid rgba(139,92,246,0.4);
+  border-radius: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #DDD6FE;
+  white-space: nowrap;
+  box-shadow: 0 2px 12px rgba(139,92,246,0.2);
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.2s;
+}
+.ac-zone:hover .ac-label { opacity: 1; transform: translateY(-2px); }
+.ac-label-main {
+  opacity: 1 !important;
+  background: rgba(139,92,246,0.88) !important;
+  border-color: #8B5CF6 !important;
+  color: #FFF !important;
+  font-size: 8px;
+  padding: 5px 14px;
+  animation: ac-pulse 2.5s ease-in-out infinite;
+}
+@keyframes ac-pulse {
+  0%, 100% { box-shadow: 0 2px 8px rgba(139,92,246,0.3); }
+  50% { box-shadow: 0 2px 24px rgba(139,92,246,0.6); }
+}
+
+/* ─── Zone Positions ─── */
+.ac-bookshelf-l { left: 3%; bottom: 35%; }
+.ac-bookshelf-r { right: 3%; bottom: 35%; }
+.ac-desk        { left: 40%; bottom: 30%; }
+.ac-gate        { right: 20%; bottom: 32%; }
+.ac-scrolls     { left: 18%; bottom: 28%; }
+.ac-crystal     { left: 50%; bottom: 42%; transform: translateX(-50%); }
+
+/* ─── Crystal Ball glow ─── */
+.ac-crystal-glow {
+  position: absolute;
+  inset: -40%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(139,92,246,0.25) 0%, transparent 70%);
+  animation: ac-crystal-pulse 3s ease-in-out infinite;
+  pointer-events: none;
+}
+.dark .ac-crystal-glow {
+  background: radial-gradient(circle, rgba(139,92,246,0.4) 0%, transparent 70%);
+}
+@keyframes ac-crystal-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.15); opacity: 1; }
+}
+
+/* ─── Trial Gate glow ─── */
+.ac-gate-glow {
+  position: absolute;
+  inset: -25%;
+  border-radius: 30%;
+  background: radial-gradient(circle, rgba(99,102,241,0.2) 0%, transparent 70%);
+  animation: ac-gate-glow 2.5s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes ac-gate-glow {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}
+
+/* ─── Props ─── */
+.ac-prop {
+  position: absolute;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* ─── Characters ─── */
+.ac-npc {
+  position: absolute;
+  z-index: 28;
+  pointer-events: none;
+}
+.ac-librarian { left: 25%; bottom: 32%; }
+.ac-student   { right: 30%; bottom: 28%; }
+
+/* ─── Floating books ─── */
+.ac-floating-book {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+  animation: ac-book-float 6s ease-in-out infinite;
+}
+.ac-floating-book:nth-child(1) { left: 15%; top: 20%; animation-delay: 0s; }
+.ac-floating-book:nth-child(2) { right: 20%; top: 25%; animation-delay: -2s; animation-duration: 8s; }
+.ac-floating-book:nth-child(3) { left: 45%; top: 15%; animation-delay: -4s; animation-duration: 7s; }
+@keyframes ac-book-float {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(3deg); }
+}
+
+/* ─── Magical particles ─── */
+.ac-particles {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+}
+.ac-particle {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #8B5CF6;
+  border-radius: 50%;
+  box-shadow: 0 0 8px 2px rgba(139,92,246,0.5);
+  animation: ac-sparkle 5s ease-in-out infinite;
+}
+.ac-particle:nth-child(1) { left: 30%; top: 35%; animation-delay: 0s; }
+.ac-particle:nth-child(2) { left: 50%; top: 30%; animation-delay: -1.5s; animation-duration: 4s; }
+.ac-particle:nth-child(3) { left: 70%; top: 40%; animation-delay: -3s; animation-duration: 6s; }
+.ac-particle:nth-child(4) { left: 20%; top: 45%; animation-delay: -2s; animation-duration: 7s; }
+.ac-particle:nth-child(5) { left: 60%; top: 25%; animation-delay: -4s; }
+@keyframes ac-sparkle {
+  0%   { transform: translate(0, 0) scale(1); opacity: 0; }
+  20%  { opacity: 1; }
+  50%  { transform: translate(8px, -15px) scale(0.5); opacity: 0.4; }
+  80%  { opacity: 0.8; }
+  100% { transform: translate(-5px, 10px) scale(0); opacity: 0; }
+}
+
+/* ─── Outlet ─── */
+.ac-outlet {
+  position: relative;
+  z-index: 60;
+  background: var(--bg-page, #F0F5F1);
+}
+.dark .ac-outlet { background: var(--bg-page, #0B1210); }
+
+@media (max-width: 768px) {
+  .ac-scene { min-height: calc(100vh - 120px); }
+  .ac-label { font-size: 6px; padding: 3px 8px; }
+}

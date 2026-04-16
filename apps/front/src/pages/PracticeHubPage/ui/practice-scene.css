@@ -1,0 +1,479 @@
+/* ═══════════════════════════════════════════════════════
+   DRUZ9 — Training Grounds Scene (Practice Hub)
+   An outdoor training area with forge, arena, quest posts
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Root ─── */
+.tg {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background: #7DBCE6;
+  user-select: none;
+}
+.dark .tg { background: #0F1A2E; }
+
+/* ─── Scene Canvas ─── */
+.tg-scene {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  overflow: hidden;
+}
+
+/* ─── Sky ─── */
+.tg-sky {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, #5A9FD4 0%, #7DBCE6 20%, #A0D0EC 40%, #C8DDB0 60%, #8BB870 72%, #6AA050 80%, #4A8838 100%);
+  z-index: 0;
+}
+.dark .tg-sky {
+  background: linear-gradient(180deg, #08101A 0%, #0F1A2E 20%, #152540 40%, #1A3328 60%, #152B1F 75%, #0F2018 100%);
+}
+
+/* ─── Ground ─── */
+.tg-ground {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48%;
+  z-index: 10;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(0,0,0,0.02) 60px, rgba(0,0,0,0.02) 61px),
+    linear-gradient(180deg, #6AA050 0%, #5A9040 25%, #4A8030 50%, #3D7028 80%, #306020 100%);
+}
+.dark .tg-ground {
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 60px, rgba(0,0,0,0.05) 60px, rgba(0,0,0,0.05) 61px),
+    linear-gradient(180deg, #1A3520 0%, #152B1C 25%, #112218 50%, #0E1C14 100%);
+}
+
+/* ─── Sandy Arena Floor (center) ─── */
+.tg-arena-floor {
+  position: absolute;
+  bottom: 15%;
+  left: 30%;
+  width: 35%;
+  height: 20%;
+  z-index: 11;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, #D4B47C 0%, #C4A46C 40%, #6AA050 80%);
+  border-radius: 50%;
+  opacity: 0.7;
+}
+.dark .tg-arena-floor {
+  background: radial-gradient(ellipse at center, #3D3020 0%, #2A2010 40%, #1A3520 80%);
+}
+
+/* ─── Path ─── */
+.tg-path {
+  position: absolute;
+  bottom: 22%;
+  left: 0;
+  right: 0;
+  height: 6%;
+  z-index: 12;
+  pointer-events: none;
+  background: linear-gradient(180deg, #C4A46C 0%, #B09456 50%, #A08848 100%);
+  border-top: 2px solid rgba(212,180,124,0.5);
+  border-bottom: 2px solid rgba(138,112,64,0.5);
+}
+.dark .tg-path {
+  background: linear-gradient(180deg, #3D3020 0%, #332818 50%, #2A2010 100%);
+  border-top-color: rgba(80,65,40,0.4);
+  border-bottom-color: rgba(30,22,10,0.4);
+}
+
+/* ─── Fence ─── */
+.tg-fence {
+  position: absolute;
+  bottom: 28%;
+  left: 25%;
+  width: 45%;
+  height: 6%;
+  z-index: 13;
+  pointer-events: none;
+  display: flex;
+  gap: 3%;
+  align-items: flex-end;
+}
+.tg-fence-post {
+  width: 3px;
+  height: 100%;
+  background: #8B6914;
+  border-radius: 1px;
+}
+.tg-fence-rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: #A07828;
+  border-radius: 1px;
+}
+.tg-fence-rail:nth-child(1) { top: 25%; }
+.tg-fence-rail:nth-child(2) { top: 60%; }
+
+.dark .tg-fence-post { background: #3D2E18; }
+.dark .tg-fence-rail { background: #4A3818; }
+
+/* ─── Scene Zones ─── */
+.tg-zone {
+  position: absolute;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.18));
+}
+.tg-zone:hover {
+  transform: translateY(-5px) scale(1.06);
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.25));
+}
+
+/* ─── Zone Labels ─── */
+.tg-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 4px 12px;
+  background: rgba(245,230,200,0.94);
+  border: 2px solid #C8AC7E;
+  border-radius: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #5C3A1E;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.2s;
+}
+.tg-zone:hover .tg-label { opacity: 1; transform: translateY(-2px); }
+.dark .tg-label {
+  background: rgba(30,40,28,0.94);
+  border-color: #3A5038;
+  color: #C4D8CC;
+}
+.tg-label-active {
+  opacity: 1 !important;
+  background: rgba(5,150,105,0.92) !important;
+  border-color: #059669 !important;
+  color: #FFF !important;
+  font-size: 8px;
+  padding: 5px 14px;
+}
+
+/* ─── Zone Positions ─── */
+.tg-forge       { left: 8%;  bottom: 32%; }
+.tg-colosseum   { left: 55%; bottom: 34%; }
+.tg-quest-post  { left: 30%; bottom: 30%; }
+.tg-boss-portal { right: 5%; bottom: 30%; }
+.tg-speed-track { right: 20%; bottom: 28%; }
+.tg-review-altar { left: 3%;  bottom: 26%; }
+
+/* ─── Props ─── */
+.tg-dummy {
+  position: absolute;
+  z-index: 20;
+  pointer-events: none;
+}
+.tg-dummy-1 { left: 42%; bottom: 30%; }
+.tg-dummy-2 { left: 48%; bottom: 32%; }
+
+.tg-torch {
+  position: absolute;
+  z-index: 22;
+  pointer-events: none;
+}
+.tg-torch::after {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: -100%;
+  right: -100%;
+  bottom: -20%;
+  background: radial-gradient(circle, rgba(255,170,51,0.2) 0%, transparent 70%);
+  border-radius: 50%;
+  animation: torch-glow 1.5s ease-in-out infinite;
+  pointer-events: none;
+}
+.dark .tg-torch::after {
+  background: radial-gradient(circle, rgba(255,170,51,0.4) 0%, transparent 70%);
+}
+@keyframes torch-glow {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.12); }
+}
+.tg-torch-1 { left: 52%; bottom: 36%; }
+.tg-torch-2 { left: 62%; bottom: 35%; }
+.tg-torch-3 { left: 25%; bottom: 33%; }
+
+/* ─── Characters ─── */
+.tg-sparrer {
+  position: absolute;
+  z-index: 25;
+  pointer-events: none;
+}
+.tg-sparrer-1 { left: 44%; bottom: 26%; animation: spar-bounce 2s ease-in-out infinite; }
+.tg-sparrer-2 { left: 50%; bottom: 26%; animation: spar-bounce 2s ease-in-out infinite 0.3s; }
+
+@keyframes spar-bounce {
+  0%, 100% { transform: translateY(0); }
+  30% { transform: translateY(-4px); }
+}
+
+/* ─── Weapon Rack ─── */
+.tg-weapon-rack {
+  position: absolute;
+  left: 38%;
+  bottom: 35%;
+  z-index: 18;
+  pointer-events: none;
+}
+
+/* ─── Background elements ─── */
+.tg-bg-tree {
+  position: absolute;
+  z-index: 6;
+  pointer-events: none;
+  opacity: 0.6;
+}
+.dark .tg-bg-tree { opacity: 0.25; filter: brightness(0.5); }
+.tg-bg-tree-1 { left: 2%; bottom: 50%; }
+.tg-bg-tree-2 { right: 3%; bottom: 48%; }
+.tg-bg-tree-3 { left: 45%; bottom: 52%; opacity: 0.4; }
+.tg-bg-tree-4 { right: 25%; bottom: 50%; opacity: 0.45; }
+
+/* ─── Foreground trees ─── */
+.tg-fg-tree {
+  position: absolute;
+  z-index: 40;
+  pointer-events: none;
+  opacity: 0.3;
+}
+.tg-fg-tree-1 { left: -2%; bottom: 10%; }
+.tg-fg-tree-2 { right: -2%; bottom: 12%; }
+
+/* ─── Mountains ─── */
+.tg-mountains {
+  position: absolute;
+  bottom: 48%;
+  left: 0;
+  right: 0;
+  height: 20%;
+  z-index: 3;
+  pointer-events: none;
+}
+.tg-mtn {
+  position: absolute;
+  bottom: 0;
+  background: linear-gradient(180deg, #7D8F9D 0%, #8FA1AD 60%, #A0B0B8 100%);
+}
+.tg-mtn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 35%;
+  height: 22%;
+  background: rgba(232,240,245,0.6);
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+}
+.dark .tg-mtn { background: linear-gradient(180deg, #1A2535 0%, #243040 60%, #2A3848 100%); }
+.dark .tg-mtn::after { background: rgba(200,220,240,0.06); }
+
+.tg-mtn-1 { left: 10%; width: 20%; height: 90%; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+.tg-mtn-2 { left: 35%; width: 15%; height: 65%; clip-path: polygon(45% 0%, 0% 100%, 100% 100%); }
+.tg-mtn-3 { right: 15%; width: 25%; height: 100%; clip-path: polygon(50% 0%, 0% 100%, 100% 100%); }
+.tg-mtn-4 { right: 0%; width: 15%; height: 70%; clip-path: polygon(45% 0%, 0% 100%, 100% 100%); }
+
+/* ─── Stars ─── */
+.tg-stars {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  opacity: 0;
+  pointer-events: none;
+}
+.dark .tg-stars { opacity: 1; }
+.tg-star {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: #FFF;
+  border-radius: 50%;
+  animation: tg-twinkle 3s ease-in-out infinite;
+}
+.tg-star:nth-child(2n) { animation-delay: -1s; width: 2px; height: 2px; opacity: 0.5; }
+.tg-star:nth-child(3n) { animation-delay: -2s; opacity: 0.4; }
+@keyframes tg-twinkle {
+  0%, 100% { opacity: 0.3; }
+  50% { opacity: 1; }
+}
+
+/* ─── Clouds ─── */
+.tg-cloud {
+  position: absolute;
+  z-index: 2;
+  opacity: 0.8;
+  animation: tg-cloud-drift linear infinite;
+  pointer-events: none;
+}
+.tg-cloud-1 { top: 8%; left: -10%; animation-duration: 95s; }
+.tg-cloud-2 { top: 14%; left: -14%; animation-duration: 115s; animation-delay: -50s; }
+.dark .tg-cloud { opacity: 0.12; }
+@keyframes tg-cloud-drift {
+  from { transform: translateX(0); }
+  to { transform: translateX(calc(100vw + 200px)); }
+}
+
+/* ─── Fireflies ─── */
+.tg-fireflies {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+  opacity: 0;
+}
+.dark .tg-fireflies { opacity: 1; }
+.tg-firefly {
+  position: absolute;
+  width: 4px;
+  height: 4px;
+  background: #FBBF24;
+  border-radius: 50%;
+  box-shadow: 0 0 8px 2px rgba(251,191,36,0.6);
+  animation: tg-ff 6s ease-in-out infinite;
+}
+.tg-firefly:nth-child(1) { left: 20%; top: 45%; animation-delay: 0s; }
+.tg-firefly:nth-child(2) { left: 40%; top: 50%; animation-delay: -2s; animation-duration: 5s; }
+.tg-firefly:nth-child(3) { left: 60%; top: 42%; animation-delay: -4s; animation-duration: 7s; }
+.tg-firefly:nth-child(4) { left: 80%; top: 48%; animation-delay: -1s; animation-duration: 6s; }
+.tg-firefly:nth-child(5) { left: 35%; top: 55%; animation-delay: -3s; }
+.tg-firefly:nth-child(6) { left: 70%; top: 52%; animation-delay: -5s; animation-duration: 8s; }
+@keyframes tg-ff {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  15%  { opacity: 1; }
+  50%  { transform: translate(15px, -10px); opacity: 0.5; }
+  85%  { opacity: 1; }
+  100% { transform: translate(-8px, 8px); opacity: 0; }
+}
+
+/* ─── Forge Glow ─── */
+.tg-forge-glow {
+  position: absolute;
+  inset: -20%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,100,20,0.2) 0%, transparent 70%);
+  animation: forge-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+.dark .tg-forge-glow {
+  background: radial-gradient(circle, rgba(255,100,20,0.35) 0%, transparent 70%);
+}
+@keyframes forge-pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   HUD — Leaderboard & Sub-content
+   ═══════════════════════════════════════════════════════ */
+
+.tg-hud {
+  position: absolute;
+  z-index: 50;
+  pointer-events: auto;
+}
+
+.tg-hud-leaders {
+  top: 16px;
+  right: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(135deg, rgba(245,230,200,0.92) 0%, rgba(232,216,185,0.88) 100%);
+  border: 2px solid #C8AC7E;
+  border-radius: 12px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+  backdrop-filter: blur(8px);
+  max-width: 220px;
+}
+.dark .tg-hud-leaders {
+  background: linear-gradient(135deg, rgba(26,40,28,0.92) 0%, rgba(20,32,22,0.88) 100%);
+  border-color: #3A5038;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+}
+
+.tg-leaders-title {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #6B4D28;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+.dark .tg-leaders-title { color: #C4A878; }
+
+.tg-leader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 4px 0;
+}
+
+.tg-leader-rank {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #059669;
+  width: 16px;
+  text-align: center;
+}
+.dark .tg-leader-rank { color: #34D399; }
+
+.tg-leader-name {
+  flex: 1;
+  min-width: 0;
+  font-size: 11px;
+  font-weight: 500;
+  color: #2C1810;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.dark .tg-leader-name { color: #C1D9CA; }
+
+.tg-leader-wins {
+  font-size: 9px;
+  color: #8B7355;
+}
+.dark .tg-leader-wins { color: #7BA88A; }
+
+/* ─── Sub-content below scene ─── */
+.tg-outlet {
+  position: relative;
+  z-index: 60;
+  background: var(--bg-page, #F0F5F1);
+}
+.dark .tg-outlet {
+  background: var(--bg-page, #0B1210);
+}
+
+/* ═══════════════════════════════════════════════════════
+   Responsive
+   ═══════════════════════════════════════════════════════ */
+@media (max-width: 768px) {
+  .tg-scene { min-height: calc(100vh - 120px); }
+  .tg-hud-leaders { display: none; }
+  .tg-fg-tree { display: none; }
+  .tg-label { font-size: 6px; padding: 3px 8px; }
+}

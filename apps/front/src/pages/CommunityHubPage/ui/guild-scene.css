@@ -1,0 +1,300 @@
+/* ═══════════════════════════════════════════════════════
+   DRUZ9 — Guild Hall Scene (Community Hub)
+   Interior of a cozy guild hall / tavern
+   ═══════════════════════════════════════════════════════ */
+
+.gh {
+  position: relative;
+  width: 100%;
+  min-height: 100%;
+  overflow: hidden;
+  background: #4A3828;
+  user-select: none;
+}
+.dark .gh { background: #1A1410; }
+
+.gh-scene {
+  position: relative;
+  width: 100%;
+  min-height: calc(100vh - 60px);
+  overflow: hidden;
+}
+
+/* ─── Walls & Ceiling ─── */
+.gh-walls {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: linear-gradient(
+    180deg,
+    #3A2818 0%,
+    #4A3828 8%,
+    #5A4838 12%,
+    #6A5848 18%,
+    #7A6858 30%,
+    #8A7868 45%,
+    #7A6858 55%,
+    #6A5040 65%,
+    #5A4030 75%,
+    #4A3020 85%,
+    #3A2818 100%
+  );
+}
+.dark .gh-walls {
+  background: linear-gradient(
+    180deg,
+    #0A0808 0%,
+    #141010 8%,
+    #1E1814 12%,
+    #282018 18%,
+    #322820 30%,
+    #3C3028 45%,
+    #322820 55%,
+    #282018 65%,
+    #1E1814 75%,
+    #141010 85%,
+    #0A0808 100%
+  );
+}
+
+/* ─── Stone Wall Top ─── */
+.gh-stone-wall {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 35%;
+  z-index: 1;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 58px, rgba(0,0,0,0.06) 58px, rgba(0,0,0,0.06) 60px),
+    repeating-linear-gradient(180deg, transparent, transparent 28px, rgba(0,0,0,0.04) 28px, rgba(0,0,0,0.04) 30px),
+    linear-gradient(180deg, #6A6060 0%, #7A7070 40%, #8A7868 80%, #7A6858 100%);
+}
+.dark .gh-stone-wall {
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 58px, rgba(0,0,0,0.1) 58px, rgba(0,0,0,0.1) 60px),
+    repeating-linear-gradient(180deg, transparent, transparent 28px, rgba(0,0,0,0.08) 28px, rgba(0,0,0,0.08) 30px),
+    linear-gradient(180deg, #1A1818 0%, #242020 40%, #2E2820 80%, #282018 100%);
+}
+
+/* ─── Wooden Floor ─── */
+.gh-floor {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 48%;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 78px, rgba(0,0,0,0.04) 78px, rgba(0,0,0,0.04) 80px),
+    linear-gradient(180deg, #8B6914 0%, #7A5C10 30%, #6B4E11 60%, #5C4010 100%);
+}
+.dark .gh-floor {
+  background:
+    repeating-linear-gradient(90deg, transparent, transparent 78px, rgba(0,0,0,0.08) 78px, rgba(0,0,0,0.08) 80px),
+    linear-gradient(180deg, #2A1E0A 0%, #221808 30%, #1A1206 60%, #140E04 100%);
+}
+
+/* ─── Wooden Beams ─── */
+.gh-beam {
+  position: absolute;
+  z-index: 3;
+  pointer-events: none;
+  background: linear-gradient(90deg, #5C3A1E 0%, #6B4E28 50%, #5C3A1E 100%);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.3);
+}
+.dark .gh-beam {
+  background: linear-gradient(90deg, #1E1208 0%, #2A1E10 50%, #1E1208 100%);
+}
+.gh-beam-h {
+  height: 8px;
+  left: 0;
+  right: 0;
+  border-radius: 2px;
+}
+.gh-beam-1 { top: 8%; }
+.gh-beam-2 { top: 35%; }
+.gh-beam-v {
+  width: 10px;
+  top: 0;
+  bottom: 0;
+  border-radius: 2px;
+}
+.gh-beam-3 { left: 15%; }
+.gh-beam-4 { right: 15%; }
+
+/* ─── Fireplace ─── */
+.gh-fireplace {
+  position: absolute;
+  left: 50%;
+  top: 12%;
+  transform: translateX(-50%);
+  z-index: 5;
+  pointer-events: none;
+}
+.gh-fireplace-glow {
+  position: absolute;
+  inset: -60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,170,51,0.15) 0%, transparent 70%);
+  animation: gh-fire-glow 2s ease-in-out infinite;
+  pointer-events: none;
+}
+.dark .gh-fireplace-glow {
+  background: radial-gradient(circle, rgba(255,170,51,0.3) 0%, transparent 70%);
+}
+@keyframes gh-fire-glow {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.08); }
+}
+
+/* ─── Chandelier ─── */
+.gh-chandelier {
+  position: absolute;
+  top: 2%;
+  z-index: 6;
+  pointer-events: none;
+}
+.gh-chandelier-1 { left: 25%; }
+.gh-chandelier-2 { right: 25%; }
+.gh-chandelier::after {
+  content: '';
+  position: absolute;
+  top: 80%;
+  left: -60%;
+  right: -60%;
+  bottom: -100%;
+  background: radial-gradient(circle, rgba(255,215,0,0.1) 0%, transparent 70%);
+  pointer-events: none;
+}
+.dark .gh-chandelier::after {
+  background: radial-gradient(circle, rgba(255,215,0,0.2) 0%, transparent 70%);
+}
+
+/* ─── Banner / Flags ─── */
+.gh-banner {
+  position: absolute;
+  top: 10%;
+  z-index: 4;
+  pointer-events: none;
+}
+.gh-banner-1 { left: 5%; }
+.gh-banner-2 { right: 5%; }
+.gh-banner-3 { left: 35%; }
+.gh-banner-4 { right: 35%; }
+
+/* ─── Scene Zones ─── */
+.gh-zone {
+  position: absolute;
+  z-index: 30;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-decoration: none;
+  cursor: pointer;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.25s;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.25));
+}
+.gh-zone:hover {
+  transform: translateY(-4px) scale(1.05);
+  filter: drop-shadow(0 8px 18px rgba(0,0,0,0.35));
+}
+
+.gh-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-top: 6px;
+  padding: 4px 12px;
+  background: rgba(245,230,200,0.94);
+  border: 2px solid #C8AC7E;
+  border-radius: 8px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #5C3A1E;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+  pointer-events: none;
+  opacity: 0;
+  transition: all 0.2s;
+}
+.gh-zone:hover .gh-label { opacity: 1; transform: translateY(-2px); }
+.dark .gh-label {
+  background: rgba(30,25,20,0.94);
+  border-color: #4A3828;
+  color: #D4C4A8;
+}
+
+/* ─── Zone Positions ─── */
+.gh-companions  { left: 35%; bottom: 35%; }
+.gh-council     { left: 5%;  bottom: 40%; }
+.gh-orders      { left: 20%; top: 12%; }
+.gh-atlas       { right: 15%; bottom: 38%; }
+.gh-tavern-bar  { right: 3%;  bottom: 35%; }
+.gh-stories     { left: 3%;  bottom: 30%; }
+
+/* ─── Characters ─── */
+.gh-npc {
+  position: absolute;
+  z-index: 28;
+  pointer-events: none;
+}
+.gh-barkeep { right: 8%; bottom: 38%; }
+.gh-bard    { left: 6%;  bottom: 33%; }
+.gh-seated-1 { left: 38%; bottom: 30%; }
+.gh-seated-2 { left: 44%; bottom: 30%; }
+
+/* ─── Props ─── */
+.gh-prop {
+  position: absolute;
+  z-index: 15;
+  pointer-events: none;
+}
+
+/* ─── Ambient particles ─── */
+.gh-dust {
+  position: absolute;
+  inset: 0;
+  z-index: 35;
+  pointer-events: none;
+  overflow: hidden;
+}
+.gh-dust-mote {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: rgba(255,215,0,0.3);
+  border-radius: 50%;
+  animation: gh-float 8s ease-in-out infinite;
+}
+.dark .gh-dust-mote { background: rgba(255,215,0,0.15); }
+.gh-dust-mote:nth-child(1) { left: 20%; top: 30%; animation-delay: 0s; }
+.gh-dust-mote:nth-child(2) { left: 45%; top: 25%; animation-delay: -2s; animation-duration: 6s; }
+.gh-dust-mote:nth-child(3) { left: 65%; top: 35%; animation-delay: -4s; animation-duration: 10s; }
+.gh-dust-mote:nth-child(4) { left: 80%; top: 20%; animation-delay: -1s; animation-duration: 7s; }
+.gh-dust-mote:nth-child(5) { left: 35%; top: 40%; animation-delay: -3s; animation-duration: 9s; }
+.gh-dust-mote:nth-child(6) { left: 55%; top: 15%; animation-delay: -5s; animation-duration: 11s; }
+@keyframes gh-float {
+  0%   { transform: translate(0, 0); opacity: 0; }
+  20%  { opacity: 0.8; }
+  50%  { transform: translate(10px, -20px); opacity: 0.4; }
+  80%  { opacity: 0.7; }
+  100% { transform: translate(-5px, -40px); opacity: 0; }
+}
+
+/* ─── Sub-content below scene ─── */
+.gh-outlet {
+  position: relative;
+  z-index: 60;
+  background: var(--bg-page, #F0F5F1);
+}
+.dark .gh-outlet { background: var(--bg-page, #0B1210); }
+
+/* ─── Responsive ─── */
+@media (max-width: 768px) {
+  .gh-scene { min-height: calc(100vh - 120px); }
+  .gh-beam-v { display: none; }
+  .gh-label { font-size: 6px; padding: 3px 8px; }
+}
