@@ -1,9 +1,4 @@
 import { useEffect, useState, useCallback } from 'react'
-import {
-  Flame, ChevronRight, Target, Calendar, Briefcase, Headphones, Map,
-  Swords, GraduationCap, Code2, Send, BookOpen, Trophy, Award, CheckCircle2,
-  Crown, Clock, ArrowRight, Zap, Star, BookMarked, Scroll,
-} from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '@/app/providers/AuthProvider'
@@ -12,36 +7,454 @@ import { missionApi } from '@/features/Mission/api/missionApi'
 import { arenaApi } from '@/features/Arena/api/arenaApi'
 import { apiClient } from '@/shared/api/base'
 import { PlayerFrame } from '@/shared/ui/PlayerFrame'
-import { PixelGardener } from '@/shared/ui/PixelGardener'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { PageMeta } from '@/shared/ui/PageMeta'
-import type { ProfileProgress, FeedItem } from '@/entities/User/model/types'
+import type { ProfileProgress } from '@/entities/User/model/types'
 import type { DailyMissionsResponse } from '@/features/Mission/model/types'
-import { LEAGUE_LABELS, LEAGUE_BG_COLORS, LEAGUE_FRAME_NAMES } from '@/shared/lib/league'
+import { LEAGUE_LABELS, LEAGUE_FRAME_NAMES } from '@/shared/lib/league'
+import './home-scene.css'
 
-const MISSION_ICONS: Record<string, React.ElementType> = {
-  Code2, Swords, GraduationCap, Flame, Calendar, Send, BookOpen, Trophy, Award, Target,
+/* ═══════════════════════════════════════════════════════════════
+   Pixel Sprite Renderer
+   ═══════════════════════════════════════════════════════════════ */
+
+function Sprite({
+  data, palette, pixel = 4, className, style,
+}: {
+  data: string[]; palette: Record<string, string>; pixel?: number
+  className?: string; style?: React.CSSProperties
+}) {
+  const w = Math.max(...data.map(r => r.length))
+  const h = data.length
+  const rects: React.ReactNode[] = []
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < data[y].length; x++) {
+      const c = palette[data[y][x]]
+      if (c) rects.push(
+        <rect key={`${x}.${y}`} x={x * pixel} y={y * pixel}
+          width={pixel} height={pixel} fill={c} />,
+      )
+    }
+  }
+  return (
+    <svg width={w * pixel} height={h * pixel}
+      viewBox={`0 0 ${w * pixel} ${h * pixel}`}
+      className={className} style={{ imageRendering: 'pixelated', ...style }}>
+      {rects}
+    </svg>
+  )
 }
 
-// Infer icon for feed entries based on title keywords
-function feedIcon(title: string): React.ElementType {
-  const l = title.toLowerCase()
-  if (l.includes('code') || l.includes('задач') || l.includes('алгоритм')) return Code2
-  if (l.includes('interview') || l.includes('mock') || l.includes('собес') || l.includes('boss')) return Swords
-  if (l.includes('quiz') || l.includes('тест') || l.includes('quiz')) return BookOpen
-  if (l.includes('practic') || l.includes('arena') || l.includes('practice')) return Trophy
-  return Scroll
+/* ═══════════════════════════════════════════════════════════════
+   Sprite Data — palettes & pixel rows
+   ═══════════════════════════════════════════════════════════════ */
+
+// ── Tavern (16w × 14h) ──
+const TP: Record<string, string> = {
+  R: '#8B3513', r: '#A04020', q: '#B85030',
+  W: '#D4A574', w: '#E8C99A', B: '#5C3A1E', b: '#7A5833',
+  D: '#4A2E14', d: '#3C2410', G: '#FFD700', g: '#FFC000',
+  P: '#808080', p: '#999999', C: '#5A5A6A', c: '#707080',
+}
+const TD = [
+  '       CC       ',
+  '       Cc       ',
+  '    RRRRRRRR    ',
+  '   RRRRqrRRRR   ',
+  '  RRRRRqrRRRRR  ',
+  ' RRRRRRRRRRRRRR ',
+  'RRRRRRRRRRRRRRRq',
+  '  BWWGWWWWGWWb  ',
+  '  BWWgWWWWgWWB  ',
+  '  BWWWWWWWWWWB  ',
+  '  BWGWWddWWGWb  ',
+  '  BWgWWDDWWgWB  ',
+  '  BPPPPDDPPPPP  ',
+  '  PPpPPDDPPpPPp ',
+]
+
+// ── Tower (12w × 19h) ──
+const XP: Record<string, string> = {
+  S: '#808888', s: '#6A7278', W: '#A0A8B0', w: '#B0B8C0',
+  G: '#4499CC', g: '#66BBEE', F: '#FFD700', f: '#FFA500',
+  D: '#5C3A1E', M: '#3388BB', m: '#5599CC',
+}
+const XD = [
+  '     Ff     ',
+  '    FmmF    ',
+  '    FMMF    ',
+  '     Ff     ',
+  '    SssS    ',
+  '   SSWWSS   ',
+  '   SWgWWS   ',
+  '   SSWWSS   ',
+  '   SSWWSS   ',
+  '   SWgWWS   ',
+  '   SSWWSS   ',
+  '   SSWWSS   ',
+  '   SWgWWS   ',
+  '   SSWWSS   ',
+  '  SSWDWSS   ',
+  '  SSSDsSS   ',
+  ' SSSSSSSSSS ',
+  'SSSSSSSSSSSS',
+]
+
+// ── Player Character (12w × 16h) ──
+const PP: Record<string, string> = {
+  H: '#5C3A1E', h: '#7A5033', S: '#F4C99B', s: '#E8B88C',
+  E: '#1E1E1E', C: '#E8A87C', A: '#059669', a: '#047857',
+  T: '#34D399', t: '#2AB880', P: '#5B4A3F',
+  B: '#3D2E24', b: '#2E2018',
+}
+const PD = [
+  '    HHH     ',
+  '   HHHHH    ',
+  '   HhHhH    ',
+  '   SSSSS    ',
+  '   SESESS   ',
+  '   SSCCSS   ',
+  '    SSS     ',
+  '   aTTTa    ',
+  '  saTTTas   ',
+  '   TTTTT    ',
+  '   aTTTa    ',
+  '    PPP     ',
+  '   PP PP    ',
+  '   PP PP    ',
+  '   BB BB    ',
+  '   Bb Bb    ',
+]
+
+// ── NPC Merchant (12w × 16h) ──
+const NP: Record<string, string> = {
+  H: '#D97706', h: '#B45309', S: '#F4C99B', s: '#E8B88C',
+  E: '#1E1E1E', C: '#E8A87C', R: '#8B3513', r: '#A04020',
+  T: '#C4A46C', t: '#B08C4A', P: '#5B4A3F',
+  B: '#3D2E24', b: '#2E2018',
+}
+const ND = [
+  '   HhHHH    ',
+  '   HHHHH    ',
+  '   HhHhH    ',
+  '   SSSSS    ',
+  '   SESESS   ',
+  '   SSCCSS   ',
+  '    SSS     ',
+  '   RTTTTR   ',
+  '  rRTTTRr   ',
+  '   RTTTTR   ',
+  '   rTTTr    ',
+  '    PPP     ',
+  '   PP PP    ',
+  '   PP PP    ',
+  '   BB BB    ',
+  '   Bb Bb    ',
+]
+
+// ── Companion Cat (8w × 6h) ──
+const CP: Record<string, string> = {
+  O: '#FF8C00', o: '#E67E00', E: '#1E1E1E', N: '#FFB366', T: '#CC7000',
+}
+const CD = [
+  ' O    O ',
+  ' OO  OO ',
+  ' OEOOEO ',
+  'OONNNOOO',
+  ' OOOOOOT',
+  '  OOOO  ',
+]
+
+// ── Oak Tree (10w × 15h) ──
+const KP: Record<string, string> = {
+  L: '#2D5A27', l: '#3A7A32', k: '#4E9A44', K: '#60B855',
+  T: '#6B4E28', t: '#5A3E1E',
+}
+const KD = [
+  '   llll   ',
+  '  lLlLll  ',
+  ' llKlkLll ',
+  ' lLlklLLl ',
+  'llkKlLlkll',
+  'lLllklLlLl',
+  ' llLKlLll ',
+  '  lllLll  ',
+  '   llll   ',
+  '    TT    ',
+  '    TT    ',
+  '    TT    ',
+  '    Tt    ',
+  '   tTTt   ',
+  '  ttTTtt  ',
+]
+
+// ── Pine Tree (8w × 15h) ──
+const IP: Record<string, string> = {
+  L: '#1A4D2E', l: '#2D6A3F', k: '#3D8A4F',
+  T: '#5A3E1E', t: '#4A3018',
+}
+const ID = [
+  '   lL   ',
+  '  llLl  ',
+  '  lkLl  ',
+  ' lllLll ',
+  '  llLl  ',
+  ' llLkll ',
+  ' lkLlkl ',
+  'lllLlkll',
+  '  lLkl  ',
+  ' llLkll ',
+  'lkLlklkl',
+  '   TT   ',
+  '   Tt   ',
+  '   TT   ',
+  '  tTTt  ',
+]
+
+// ── Quest Board (12w × 13h) ──
+const BP: Record<string, string> = {
+  W: '#8B6914', w: '#A07828', D: '#6B4E11',
+  P: '#F5E6C8', p: '#E5D0A8', N: '#CD5C5C', I: '#2C1810',
+}
+const BD = [
+  '  DWWWWWWD  ',
+  '  WPPPPPW   ',
+  '  WNPIPNW   ',
+  '  WPPPPPW   ',
+  '  WPIPPIW   ',
+  '  WPPPPPW   ',
+  '  WPIPpPW   ',
+  '  WPPPPPW   ',
+  '  DWWWWWWD  ',
+  '   WWWWWW   ',
+  '    wW      ',
+  '    WW      ',
+  '    DD      ',
+]
+
+// ── Signpost (8w × 14h) ──
+const SP: Record<string, string> = {
+  W: '#A07828', w: '#8B6914', D: '#6B4E11',
+  A: '#059669', a: '#047857',
+}
+const SD = [
+  ' AAAAAA ',
+  ' AaAAAA ',
+  ' AAAAAA ',
+  '   WW   ',
+  '  DDDD  ',
+  '  DWWD  ',
+  '   WW   ',
+  '   wW   ',
+  '   WW   ',
+  '   Ww   ',
+  '   WW   ',
+  '   wW   ',
+  '  DWWD  ',
+  ' DDDDDD ',
+]
+
+// ── Boss Portal (14w × 16h) ──
+const OP: Record<string, string> = {
+  S: '#808080', s: '#666666', G: '#8B5CF6', g: '#6D28D9',
+  P: '#C4B5FD', p: '#A78BFA', F: '#DDD6FE',
+  K: '#555555', k: '#444444',
+}
+const OD = [
+  '    PPPP      ',
+  '  PPGggGPP    ',
+  ' PGg    gGP   ',
+  ' Pg  FF  gP   ',
+  'SG  FPPF  GS  ',
+  'Sg   PP   gS  ',
+  'SG        GS  ',
+  'Sg        gS  ',
+  'SG        GS  ',
+  'SG  FPPF  GS  ',
+  ' Sg  FF  gS   ',
+  ' SGg    gGS   ',
+  '  SSGggGSS    ',
+  '    SSSS      ',
+  ' KKKKKKKKKK   ',
+  'kKKKKKKKKKKk  ',
+]
+
+// ── Campfire (8w × 8h) ──
+const FP: Record<string, string> = {
+  S: '#808080', s: '#666666', R: '#DD5500', r: '#FF8800',
+  Y: '#FFAA33', y: '#FFD700', G: '#555555',
+}
+const FD = [
+  '   Yy   ',
+  '  yYRy  ',
+  '  RyrR  ',
+  ' RrYrR  ',
+  ' yRYRr  ',
+  '  RrR   ',
+  ' SGSGS  ',
+  'sSSSSSSs',
+]
+
+// ── Waterfall (6w × 16h) ──
+const WP: Record<string, string> = {
+  S: '#808080', s: '#666666', W: '#4499CC', w: '#66BBEE',
+  F: '#AADDEE', f: '#88CCDD',
+}
+const WD = [
+  'SSSSS ',
+  'SwwwS ',
+  ' WwW  ',
+  ' wWFw ',
+  ' WwwW ',
+  ' wWww ',
+  ' WFwW ',
+  ' wWww ',
+  ' WwFW ',
+  ' wWww ',
+  ' WwwW ',
+  'FwWwwF',
+  'FfWwfF',
+  'FFfwFF',
+  ' FFFF ',
+  '  FF  ',
+]
+
+// ── Lantern (4w × 8h) ──
+const LP: Record<string, string> = {
+  W: '#5C3A1E', G: '#FFD700', g: '#FFC000', M: '#808080', F: '#FFAA33',
+}
+const LD = [
+  ' MM ',
+  ' MW ',
+  'WGGW',
+  'WgFW',
+  'WGGW',
+  ' WW ',
+  ' WW ',
+  ' WW ',
+]
+
+// ── Flowers (8w × 4h) ──
+const RP: Record<string, string> = {
+  R: '#E74C3C', r: '#FF6B6B', Y: '#FFD700', y: '#FBBF24',
+  P: '#D946EF', p: '#F0ABFC', G: '#3A7A32', g: '#4E9A44',
+}
+const RD = [
+  ' R  Yp  ',
+  'rRg yPg ',
+  ' gG gG  ',
+  ' g   g  ',
+]
+
+// ── Barrel (6w × 6h) ──
+const AP: Record<string, string> = {
+  W: '#8B6914', w: '#A07828', D: '#6B4E11', M: '#555555',
+}
+const AD = [
+  ' WWWW ',
+  'DWWWWD',
+  'MWWWWM',
+  'DWWWWD',
+  'MWWWWM',
+  ' DDDD ',
+]
+
+// ── Cloud (10w × 4h) ──
+const QP: Record<string, string> = { C: '#F0F4F8', c: '#E2E8F0' }
+const QD = [
+  '   CCC    ',
+  ' CCCCcCC  ',
+  'CCcCCCcCCC',
+  ' cCCCCCCc ',
+]
+
+// ── Progress Garden stages ──
+const GP: Record<string, string> = {
+  G: '#3A7A32', g: '#4E9A44', K: '#60B855',
+  T: '#6B4E28', t: '#5A3E1E',
+  R: '#E74C3C', Y: '#FFD700', P: '#D946EF', B: '#8B6914',
+}
+
+// Stage 0: sprout
+const G0 = [
+  ' g  ',
+  ' gG ',
+  ' Tg ',
+  ' T  ',
+]
+
+// Stage 1: small plant
+const G1 = [
+  '  gg  ',
+  ' gGg  ',
+  ' gKg  ',
+  '  Tg  ',
+  '  T   ',
+  ' tTt  ',
+]
+
+// Stage 2: small tree
+const G2 = [
+  '  ggg   ',
+  ' gGgGg  ',
+  ' gKgKg  ',
+  '  ggg   ',
+  '   T    ',
+  '   T    ',
+  '   T    ',
+  '  tTt   ',
+]
+
+// Stage 3: blooming tree
+const G3 = [
+  '  R ggg   ',
+  ' gRGgGg   ',
+  ' gKRKgY   ',
+  ' gGgGKg   ',
+  '  gggPg   ',
+  '   ggg    ',
+  '    T     ',
+  '    T     ',
+  '    T     ',
+  '   tTt    ',
+]
+
+// Stage 4: grand tree
+const G4 = [
+  '   YRggg    ',
+  '  gRGRGgP   ',
+  ' gKRKgRYPg  ',
+  ' gGgGKgPgK  ',
+  ' ggRggPgRg  ',
+  '  gggYggg   ',
+  '   ggggg    ',
+  '    ggg     ',
+  '    TT      ',
+  '    TT      ',
+  '    TT      ',
+  '   tTTt     ',
+]
+
+function gardenStage(streak: number) {
+  if (streak <= 0) return G0
+  if (streak <= 3) return G1
+  if (streak <= 7) return G2
+  if (streak <= 14) return G3
+  return G4
 }
 
 type ArenaStats = { rating?: number; league?: string; currentWinStreak?: number }
 
+/* ═══════════════════════════════════════════════════════════════
+   Home Page Component
+   ═══════════════════════════════════════════════════════════════ */
+
 export function HomePage() {
   const { t, i18n } = useTranslation()
   const { user } = useAuth()
-  const [progress, setProgress]   = useState<ProfileProgress | null>(null)
-  const [missions, setMissions]   = useState<DailyMissionsResponse | null>(null)
+  const [progress, setProgress] = useState<ProfileProgress | null>(null)
+  const [missions, setMissions] = useState<DailyMissionsResponse | null>(null)
   const [arenaStats, setArenaStats] = useState<ArenaStats | null>(null)
-  const [feed, setFeed]           = useState<FeedItem[]>([])
   const [weeklyBoss, setWeeklyBoss] = useState<{
     weekKey: string; endsAt: string
     myEntry: { aiScore: number; solveTimeMs: number } | null
@@ -55,560 +468,323 @@ export function HomePage() {
       authApi.getProfileProgress(user.id).then(p => setProgress(p)),
       missionApi.getDailyMissions().then(m => setMissions(m)).catch(() => {}),
       arenaApi.getPlayerStats(user.id).then(s => { if (s) setArenaStats(s) }),
-      authApi.getProfileFeed(user.id).then(f => setFeed(f.slice(0, 5))).catch(() => {}),
       apiClient.get('/api/v1/challenges/weekly').then(r => setWeeklyBoss(r.data)).catch(() => {}),
     ]).catch(() => setError(t('common.loadFailed')))
   }, [user?.id, t])
 
   useEffect(() => { fetchData() }, [fetchData])
 
-  if (error) return <ErrorState message={error} onRetry={() => { setError(null); fetchData() }} />
+  if (error) {
+    return <ErrorState message={error} onRetry={() => { setError(null); fetchData() }} />
+  }
 
-  const firstName    = user?.firstName || user?.username || t('home.defaultName')
-  const ov           = progress?.overview
-  const league       = arenaStats?.league ?? ''
-  const leagueLabel  = LEAGUE_LABELS[league] ?? ''
+  const firstName = user?.firstName || user?.username || t('home.defaultName')
+  const ov = progress?.overview
+  const league = arenaStats?.league ?? ''
+  const leagueLabel = LEAGUE_LABELS[league] ?? ''
   const levelProgress = ov?.levelProgress ?? 0
   const primaryAction = progress?.nextActions?.[0]
-  const nextActions = progress?.nextActions?.slice(0, 3) ?? []
   const locale = i18n.language.startsWith('ru') ? 'ru-RU' : 'en-US'
-  const todayLabel = new Intl.DateTimeFormat(locale, {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-  }).format(new Date())
+  const streakDays = ov?.currentStreakDays ?? 0
 
   const daysLeft = weeklyBoss?.endsAt
     ? Math.max(0, Math.floor((new Date(weeklyBoss.endsAt).getTime() - Date.now()) / 86_400_000))
     : null
 
+  const todayLabel = new Intl.DateTimeFormat(locale, {
+    weekday: 'long', day: 'numeric', month: 'long',
+  }).format(new Date())
+
   const worldLinks = [
-    {
-      to: '/community/events',
-      icon: Calendar,
-      label: t('home.quick.events', 'Events'),
-      eyebrow: t('home.quick.events.eyebrow', 'Guild Hall'),
-      sub: t('home.quick.events.sub', 'Track gatherings, circles, and live rituals.'),
-      cue: t('home.quick.events.cue', 'Open board'),
-    },
-    {
-      to: '/community/vacancies',
-      icon: Briefcase,
-      label: t('home.quick.vacancies', 'Vacancies'),
-      eyebrow: t('home.quick.vacancies.eyebrow', 'Work Tavern'),
-      sub: t('home.quick.vacancies.sub', 'Follow roles worth joining and teams worth meeting.'),
-      cue: t('home.quick.vacancies.cue', 'See openings'),
-    },
-    {
-      to: '/community/podcasts',
-      icon: Headphones,
-      label: t('home.quick.podcasts', 'Podcasts'),
-      eyebrow: t('home.quick.podcasts.eyebrow', 'Listening Room'),
-      sub: t('home.quick.podcasts.sub', 'Save voices, stories, and hard-earned field notes.'),
-      cue: t('home.quick.podcasts.cue', 'Start listening'),
-    },
-    {
-      to: '/community/map',
-      icon: Map,
-      label: t('home.quick.map', 'Map'),
-      eyebrow: t('home.quick.map.eyebrow', 'World Atlas'),
-      sub: t('home.quick.map.sub', 'Trace where the community gathers across cities.'),
-      cue: t('home.quick.map.cue', 'View map'),
-    },
+    { to: '/community/events', label: t('home.quick.events', 'Events'), eyebrow: t('home.quick.events.eyebrow', 'Guild Hall') },
+    { to: '/community/vacancies', label: t('home.quick.vacancies', 'Vacancies'), eyebrow: t('home.quick.vacancies.eyebrow', 'Work Tavern') },
+    { to: '/community/podcasts', label: t('home.quick.podcasts', 'Podcasts'), eyebrow: t('home.quick.podcasts.eyebrow', 'Listening Room') },
+    { to: '/community/map', label: t('home.quick.map', 'Map'), eyebrow: t('home.quick.map.eyebrow', 'World Atlas') },
   ]
 
   return (
-    <div className="home-hub-screen flex min-h-full flex-col gap-4 px-4 pb-6 pt-4 md:gap-5 md:px-6 md:py-5">
+    <div className="gw">
       <PageMeta title={t('home.meta.title')} description={t('home.meta.description')} canonicalPath="/home" />
 
-      <section className="camp-entrance section-enter">
-        <div className="camp-entrance__copy">
-          <p className="camp-entrance__eyebrow">
-            {t('home.topLayer.eyebrow', 'Home Screen')}
-          </p>
-          <h1 className="camp-entrance__title">
-            {t('home.topLayer.title', 'Quiet camp, clear route.')}
-          </h1>
-          <p className="camp-entrance__subtitle">
-            {t('home.topLayer.subtitle', 'A calm layer over your progress, quests, and the world around you.')}
-          </p>
+      {/* ═══════ SCENE CANVAS ═══════ */}
+      <div className="gw-scene">
+
+        {/* ── Sky ── */}
+        <div className="gw-sky" />
+
+        {/* ── Stars (dark mode only) ── */}
+        <div className="gw-stars">
+          {Array.from({ length: 20 }).map((_, i) => (
+            <div key={i} className="gw-star"
+              style={{ left: `${5 + (i * 37) % 90}%`, top: `${3 + (i * 23) % 35}%` }} />
+          ))}
         </div>
 
-        <div className="camp-entrance__signals">
-          <div className="camp-signal">
-            <span className="camp-signal__label">{todayLabel}</span>
-            <strong className="camp-signal__value">{t('home.hero.focusTitle', 'Today in the camp')}</strong>
-          </div>
-          {(ov?.currentStreakDays ?? 0) > 0 && (
-            <div className="camp-signal">
-              <Flame className="h-3.5 w-3.5 text-[#EA580C]" />
-              <strong className="camp-signal__value">{t('home.topLayer.streak', '{{count}} day streak', { count: ov!.currentStreakDays })}</strong>
-            </div>
-          )}
-          {daysLeft !== null && (
-            <div className="camp-signal">
-              <Clock className="h-3.5 w-3.5 text-[#D97706] dark:text-[#FBBF24]" />
-              <strong className="camp-signal__value">{t('home.topLayer.weeklyBoss', 'Weekly boss closes in {{count}} days', { count: daysLeft })}</strong>
-            </div>
+        {/* ── Clouds ── */}
+        <Sprite data={QD} palette={QP} pixel={4} className="gw-cloud gw-cloud-1" />
+        <Sprite data={QD} palette={QP} pixel={5} className="gw-cloud gw-cloud-2" />
+        <Sprite data={QD} palette={QP} pixel={3} className="gw-cloud gw-cloud-3" />
+
+        {/* ── Mountains ── */}
+        <div className="gw-mountains">
+          <div className="gw-mtn gw-mtn-1" />
+          <div className="gw-mtn gw-mtn-2" />
+          <div className="gw-mtn gw-mtn-3" />
+          <div className="gw-mtn gw-mtn-4" />
+          <div className="gw-mtn gw-mtn-5" />
+        </div>
+
+        {/* ── Background Trees ── */}
+        <Sprite data={ID} palette={IP} pixel={4} className="gw-tree gw-tree-bg-1" />
+        <Sprite data={KD} palette={KP} pixel={3} className="gw-tree gw-tree-bg-2" />
+        <Sprite data={ID} palette={IP} pixel={4} className="gw-tree gw-tree-bg-3" />
+        <Sprite data={KD} palette={KP} pixel={3} className="gw-tree gw-tree-bg-4" />
+
+        {/* ── Ground & Path ── */}
+        <div className="gw-ground" />
+        <div className="gw-path" />
+
+        {/* ── Water Zone ── */}
+        <div className="gw-water-zone" />
+
+        {/* ── Bridge ── */}
+        <div className="gw-bridge">
+          <div className="gw-bridge-rail" />
+          <div className="gw-bridge-plank" />
+          <div className="gw-bridge-plank" />
+          <div className="gw-bridge-plank" />
+          <div className="gw-bridge-rail" />
+        </div>
+
+        {/* ═══════ BUILDINGS & OBJECTS ═══════ */}
+
+        {/* Atlas Tower (world map) */}
+        <Link to="/community/map" className="gw-zone gw-tower"
+          title={t('home.quick.map', 'Map')}>
+          <Sprite data={XD} palette={XP} pixel={5} />
+          <span className="gw-label">🗺️ {t('home.quick.map.eyebrow', 'World Atlas')}</span>
+        </Link>
+
+        {/* Progress Garden */}
+        <div className="gw-zone gw-garden">
+          <Sprite data={gardenStage(streakDays)} palette={GP} pixel={5} />
+          {streakDays > 3 && (
+            <Sprite data={gardenStage(Math.max(0, streakDays - 5))} palette={GP} pixel={4}
+              className="gw-garden-flowers" />
           )}
         </div>
-      </section>
 
-      <section className="char-panel character-sheet-rpg section-enter p-4 md:p-5">
-        <div className="character-sheet-rpg__header">
-          <div>
-            <p className="character-sheet-rpg__eyebrow">
-              {t('home.profile.eyebrow', 'Character Sheet')}
-            </p>
-            <p className="character-sheet-rpg__heading">
-              {t('home.profile.heading', 'Your role in the camp')}
-            </p>
-          </div>
-          <Link to="/profile" className="character-sheet-rpg__link">
-            {t('sidebar.profile')}
-            <ChevronRight className="h-3.5 w-3.5" />
+        {/* Quest Board */}
+        <div className="gw-zone gw-questboard">
+          <Sprite data={BD} palette={BP} pixel={5} />
+        </div>
+
+        {/* Continue Journey Signpost */}
+        <Link to={primaryAction?.actionUrl ?? '/practice'}
+          className="gw-zone gw-signpost"
+          title={t('home.hero.continue', 'Continue Journey')}>
+          <Sprite data={SD} palette={SP} pixel={5} />
+          <span className="gw-label gw-label-cta">
+            ▶ {primaryAction
+              ? t('home.hero.continue', 'Continue Journey')
+              : t('home.hero.start', 'Start Training')}
+          </span>
+        </Link>
+
+        {/* Tavern / Guild */}
+        <Link to="/community" className="gw-zone gw-tavern"
+          title={t('home.quick.events.eyebrow', 'Guild Hall')}>
+          <Sprite data={TD} palette={TP} pixel={5} />
+          <span className="gw-label">🏠 {t('home.quick.events.eyebrow', 'Guild Hall')}</span>
+        </Link>
+
+        {/* Weekly Boss Portal */}
+        {weeklyBoss ? (
+          <Link to="/practice/weekly-boss" className="gw-zone gw-portal">
+            <div style={{ position: 'relative' }}>
+              <div className="gw-portal-glow" />
+              <Sprite data={OD} palette={OP} pixel={4} />
+            </div>
+            <span className="gw-label gw-label-boss">
+              ⚔ {t('home.weeklyBoss.title', 'Weekly Boss')}
+              {daysLeft !== null ? ` · ${daysLeft}d` : ''}
+            </span>
           </Link>
+        ) : (
+          <div className="gw-zone gw-portal" style={{ cursor: 'default', opacity: 0.5 }}>
+            <Sprite data={OD} palette={OP} pixel={4} />
+          </div>
+        )}
+
+        {/* ═══════ PROPS ═══════ */}
+
+        {/* Campfire */}
+        <div className="gw-campfire">
+          <Sprite data={FD} palette={FP} pixel={4} />
         </div>
 
-        <div className="flex items-start gap-4 md:gap-5">
-          <div className="flex flex-col items-center gap-2 flex-shrink-0">
-            <Link to="/profile">
-              <PlayerFrame
-                name={firstName}
-                src={user?.avatarUrl || undefined}
-                league={LEAGUE_FRAME_NAMES[league]}
-                size="lg"
-              />
-            </Link>
-            <PixelGardener
-              mood={(ov?.currentStreakDays ?? 0) > 0 ? 'watering' : 'idle'}
-              size={38}
-              className="hidden md:block"
-            />
-          </div>
-
-          <div className="min-w-0 flex-1">
-            <div className="flex flex-wrap items-center gap-2 mb-2">
-              <div className="char-level-badge">LV.{ov?.level ?? 0}</div>
-              <h1 className="text-[15px] font-bold text-[#2C1810] dark:text-[#E2F0E8] truncate">
-                {firstName}
-              </h1>
-              {leagueLabel && (
-                <span className="inline-flex items-center gap-1.5 rounded-full bg-white/55 dark:bg-white/5 border border-[#C4A878]/40 dark:border-[#3A5038]/50 px-2.5 py-0.5 text-[9px] font-semibold uppercase tracking-wider text-[#6B5A47] dark:text-[#7BA88A]">
-                  <span className={`h-1.5 w-1.5 rounded-full ${LEAGUE_BG_COLORS[league] ?? 'bg-[#8B7355]'}`} />
-                  {leagueLabel}
-                  {arenaStats?.rating != null && ` · ${arenaStats.rating}`}
-                </span>
-              )}
-            </div>
-
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="xp-bar flex-1 max-w-[220px]">
-                {Array.from({ length: 10 }, (_, i) => (
-                  <div
-                    key={i}
-                    className={`xp-bar-segment ${i / 10 < levelProgress ? 'filled' : ''}`}
-                  />
-                ))}
-              </div>
-              <span className="font-mono text-[10px] font-bold tabular-nums text-[#15803D] dark:text-[#34D399]">
-                {ov?.totalXp ?? 0} XP
-              </span>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2 mb-3.5">
-              {(ov?.currentStreakDays ?? 0) > 0 && (
-                <div className="char-stat-chip">
-                  <Flame className="h-3.5 w-3.5 text-[#EA580C] flex-shrink-0" />
-                  <div className="flex flex-col">
-                    <span className="char-stat-val">{ov!.currentStreakDays}d</span>
-                    <span className="char-stat-lbl">{t('home.hero.stats.streak', 'streak')}</span>
-                  </div>
-                </div>
-              )}
-              {arenaStats?.rating != null && (
-                <div className="char-stat-chip">
-                  <Trophy className="h-3.5 w-3.5 text-[#D97706] flex-shrink-0" />
-                  <div className="flex flex-col">
-                    <span className="char-stat-val">{arenaStats.rating}</span>
-                    <span className="char-stat-lbl">{t('home.hero.stats.rating', 'rating')}</span>
-                  </div>
-                </div>
-              )}
-              {missions && (
-                <div className="char-stat-chip">
-                  <Target className="h-3.5 w-3.5 text-[#6B5A47] dark:text-[#7BA88A] flex-shrink-0" />
-                  <div className="flex flex-col">
-                    <span className="char-stat-val">{missions.completedCount}/{missions.missions.length}</span>
-                    <span className="char-stat-lbl">{t('home.hero.stats.quests', 'quests')}</span>
-                  </div>
-                </div>
-              )}
-            </div>
-
-            {primaryAction ? (
-              <Link to={primaryAction.actionUrl} className="btn-journey">
-                ▶ {t('home.hero.continue', 'Continue Journey')}
-                <ArrowRight className="h-4 w-4" />
-              </Link>
-            ) : (
-              <Link to="/practice" className="btn-journey">
-                ▶ {t('home.hero.start', 'Start Training')}
-                <Zap className="h-4 w-4" />
-              </Link>
-            )}
-          </div>
-
-          <div className="hidden lg:flex w-[188px] flex-shrink-0 pl-4 self-stretch border-l border-[#C8AC7E]/22 dark:border-[#3A5038]/28">
-            <div className="hero-side-panel w-full">
-              <div className="hero-side-panel__header">
-                <div>
-                  <p className="hero-side-panel__eyebrow">
-                    {t('home.hero.focus', 'Current Focus')}
-                  </p>
-                  <p className="hero-side-panel__title">
-                    {t('home.hero.focusTitle', 'Today in the camp')}
-                  </p>
-                </div>
-                <Target className="h-4 w-4 text-[#16A34A] dark:text-[#34D399]" />
-              </div>
-
-              {primaryAction ? (
-                <Link to={primaryAction.actionUrl} className="hero-focus-card">
-                  <div className="hero-focus-card__marker">
-                    <ArrowRight className="h-3 w-3 text-[#16A34A] dark:text-[#34D399]" />
-                  </div>
-                  <div className="min-w-0 flex-1">
-                    <p className="hero-focus-card__label">
-                      {t('home.hero.focusLabel', 'Primary route')}
-                    </p>
-                    <p className="hero-focus-card__title">
-                      {primaryAction.title}
-                    </p>
-                    {primaryAction.description && (
-                      <p className="hero-focus-card__desc">
-                        {primaryAction.description}
-                      </p>
-                    )}
-                  </div>
-                </Link>
-              ) : (
-                <div className="hero-focus-card hero-focus-card--idle">
-                  <div className="min-w-0 flex-1">
-                    <p className="hero-focus-card__label">
-                      {t('home.hero.focusLabel', 'Primary route')}
-                    </p>
-                    <p className="hero-focus-card__desc !pl-0">
-                      {t('home.hero.noFocus', 'Pick a quest to begin')}
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              <div className="hero-side-glance">
-                <div className="hero-side-glance__row">
-                  <span>{t('home.hero.glance.league', 'League')}</span>
-                  <strong>{leagueLabel || t('home.hero.glance.unranked', 'Wanderer')}</strong>
-                </div>
-                <div className="hero-side-glance__row">
-                  <span>{t('home.hero.glance.weekly', 'Weekly boss')}</span>
-                  <strong>
-                    {daysLeft !== null
-                      ? t('home.hero.glance.daysLeft', '{{count}} days left', { count: daysLeft })
-                      : t('home.hero.glance.awaiting', 'Awaiting signal')}
-                  </strong>
-                </div>
-              </div>
-
-              <div className="mt-auto flex justify-center opacity-[0.22] dark:opacity-[0.16]">
-                <svg width="22" height="42" viewBox="0 0 11 21" style={{ imageRendering: 'pixelated' }} xmlns="http://www.w3.org/2000/svg">
-                  <rect x="4" y="0" width="3" height="2" fill="#A08848"/>
-                  <rect x="3" y="2" width="5" height="1" fill="#C4A060"/>
-                  <rect x="4" y="3" width="3" height="1" fill="#B89050"/>
-                  <rect x="5" y="4" width="1" height="8" fill="#A07840"/>
-                  <rect x="4" y="4" width="3" height="8" fill="#B89050"/>
-                  <rect x="1" y="11" width="9" height="2" fill="#8B6A30"/>
-                  <rect x="4" y="13" width="3" height="1" fill="#7A5C28"/>
-                  <rect x="5" y="14" width="1" height="7" fill="#5A4020"/>
-                  <rect x="4" y="14" width="3" height="7" fill="#6B4E28"/>
-                  <rect x="3" y="20" width="5" height="1" fill="#4A3418"/>
-                </svg>
-              </div>
-            </div>
-          </div>
+        {/* Waterfall */}
+        <div className="gw-waterfall">
+          <Sprite data={WD} palette={WP} pixel={4} />
         </div>
-      </section>
 
-      <div className="hub-main-stage">
-        <section className="quest-board-rpg home-quest-board section-enter">
-          <div className="quest-board-rpg-hdr">
-            <div className="flex items-center gap-2">
-              <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] shadow-sm flex-shrink-0" style={{ boxShadow: '0 1px 3px rgba(245,158,11,0.45)' }} />
-              <div>
-                <h2 className="font-pixel text-[8px] text-[#6B4D28] dark:text-[#C4A878] tracking-wider uppercase">
-                  {t('home.missions.title', 'Daily Quests')}
-                </h2>
-                <p className="home-quest-board__subtitle">
-                  {t('home.missions.subtitle', 'Pinned tasks for the road ahead.')}
-                </p>
-              </div>
-            </div>
-            {missions && (
-              <div className="flex items-center gap-2">
-                <div className="quest-board-prog-track">
-                  <div
-                    className="quest-board-prog-fill"
-                    style={{ width: `${missions.missions.length > 0 ? (missions.completedCount / missions.missions.length) * 100 : 0}%` }}
-                  />
-                </div>
-                <span className="font-mono text-[10px] font-bold tabular-nums text-[#15803D] dark:text-[#34D399]">
-                  {missions.completedCount}/{missions.missions.length}
-                </span>
-              </div>
-            )}
-          </div>
+        {/* Lanterns */}
+        <div className="gw-lantern gw-lantern-1">
+          <Sprite data={LD} palette={LP} pixel={3} />
+        </div>
+        <div className="gw-lantern gw-lantern-2">
+          <Sprite data={LD} palette={LP} pixel={3} />
+        </div>
 
-          <div className="flex flex-col gap-2 p-3">
-            {missions?.missions.map((mission) => {
-              const Icon = MISSION_ICONS[mission.icon] ?? Target
-              const hasBar = mission.targetValue > 1
-              const fillPct = hasBar
-                ? Math.min(mission.current / mission.targetValue, 1) * 100
-                : mission.completed ? 100 : 0
+        {/* Barrel */}
+        <div className="gw-barrel">
+          <Sprite data={AD} palette={AP} pixel={4} />
+        </div>
 
-              return (
-                <div key={mission.key} className={`quest-item-rpg ${mission.completed ? 'is-done' : ''}`}>
-                  <div className={`quest-icon-rpg ${mission.completed ? 'done' : ''}`}>
-                    {mission.completed
-                      ? <CheckCircle2 className="h-4 w-4 text-[#16A34A] dark:text-[#34D399]" />
-                      : <Icon className="h-4 w-4 text-[#8B7355] dark:text-[#7BA88A]" />
-                    }
-                  </div>
+        {/* Flowers */}
+        <Sprite data={RD} palette={RP} pixel={3} className="gw-flowers gw-flowers-1" />
+        <Sprite data={RD} palette={RP} pixel={3} className="gw-flowers gw-flowers-2" />
+        <Sprite data={RD} palette={RP} pixel={4} className="gw-flowers gw-flowers-3" />
+        <Sprite data={RD} palette={RP} pixel={3} className="gw-flowers gw-flowers-4" />
 
-                  <div className="min-w-0 flex-1">
-                    <p className={`text-xs font-semibold leading-tight ${
-                      mission.completed
-                        ? 'text-[#16A34A] dark:text-[#34D399] line-through decoration-[#16A34A]/30'
-                        : 'text-[#2C1810] dark:text-[#E2F0E8]'
-                    }`}>
-                      {mission.title}
-                    </p>
-                    {hasBar && (
-                      <>
-                        <div className="quest-bar-rpg">
-                          <div className="quest-bar-fill-rpg" style={{ width: `${fillPct}%` }} />
-                        </div>
-                        {!mission.completed && (
-                          <span className="text-[9px] tabular-nums text-[#8B7355] dark:text-[#7BA88A]">
-                            {Math.min(mission.current, mission.targetValue)}/{mission.targetValue}
-                          </span>
-                        )}
-                      </>
-                    )}
-                  </div>
+        {/* ═══════ CHARACTERS ═══════ */}
 
-                  <div className="flex items-center gap-2 flex-shrink-0">
-                    <span className="xp-reward-badge">+{mission.xpReward} XP</span>
-                    {!mission.completed && (
-                      <Link to={mission.actionUrl} className="btn-quest-rpg">
-                        {t('home.missions.open', 'Open')} →
-                      </Link>
-                    )}
-                  </div>
-                </div>
-              )
-            }) ?? (
-              Array.from({ length: 3 }).map((_, i) => (
-                <div key={i} className="quest-item-rpg h-14 animate-pulse" />
-              ))
-            )}
-          </div>
+        {/* Player */}
+        <div className="gw-player">
+          <Sprite data={PD} palette={PP} pixel={4} />
+        </div>
 
-          {missions?.allComplete && (
-            <div className="quest-done-bar mx-3 mb-3">
-              <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-              <span>
-                {t('home.missions.allDone', 'All quests complete! Bonus: +{{xp}} XP', { xp: missions.bonusXp })}
-              </span>
-            </div>
-          )}
-        </section>
+        {/* NPC near tavern */}
+        <div className="gw-npc">
+          <Sprite data={ND} palette={NP} pixel={3} />
+        </div>
 
-        <aside className="hub-side-stage">
-          {nextActions.length > 0 && (
-            <div className="adventure-path journey-scroll section-enter p-4">
-              <div className="mb-4 flex items-center gap-2">
-                <BookMarked className="h-3.5 w-3.5 text-[#16A34A] dark:text-[#34D399] flex-shrink-0" />
-                <div>
-                  <h2 className="text-xs font-bold uppercase tracking-widest text-[#15803D] dark:text-[#34D399]">
-                    {t('home.nextActions.title', 'Training Path')}
-                  </h2>
-                  <p className="journey-scroll__subtitle">
-                    {t('home.nextActions.subtitle', 'A short route from camp to your next milestone.')}
-                  </p>
-                </div>
-              </div>
+        {/* Companion pet */}
+        <div className="gw-pet">
+          <Sprite data={CD} palette={CP} pixel={4} />
+        </div>
 
-              <div className="flex flex-col">
-                {nextActions.map((action, i, arr) => (
-                  <Link key={i} to={action.actionUrl} className="path-step group">
-                    <div className="path-step-track">
-                      <div className={`path-node ${i === 0 ? 'active' : ''}`}>
-                        {i === 0 ? '▶' : String(i + 1)}
-                      </div>
-                      {i < arr.length - 1 && <div className="path-connector" />}
-                    </div>
-                    <div className="path-content pb-2">
-                      <div className="flex items-center gap-1.5">
-                        <p className={`text-xs font-semibold truncate transition-colors ${
-                          i === 0
-                            ? 'text-[#2C1810] dark:text-[#E2F0E8] group-hover:text-[#16A34A] dark:group-hover:text-[#34D399]'
-                            : 'text-[#5A4A40] dark:text-[#9ABAA8]'
-                        }`}>
-                          {action.title}
-                        </p>
-                        {i === 0 && (
-                          <span className="flex-shrink-0 rounded-sm bg-[#16A34A]/12 dark:bg-[#34D399]/10 border border-[#16A34A]/20 dark:border-[#34D399]/15 px-1 py-px text-[7px] font-bold uppercase tracking-wider text-[#15803D] dark:text-[#34D399]">
-                            {t('home.nextActions.next', 'Next')}
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-[10px] text-[#7A6550] dark:text-[#6A9880] truncate mt-0.5">
-                        {action.description}
-                      </p>
-                    </div>
-                    {i === 0 && (
-                      <ArrowRight className="h-3 w-3 flex-shrink-0 mt-1 text-[#16A34A] dark:text-[#34D399] opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-0.5" />
-                    )}
-                  </Link>
-                ))}
-              </div>
-            </div>
-          )}
+        {/* ── Foreground Trees (parallax blur) ── */}
+        <Sprite data={KD} palette={KP} pixel={7} className="gw-tree gw-tree-fg-1" />
+        <Sprite data={ID} palette={IP} pixel={7} className="gw-tree gw-tree-fg-2" />
 
-          {feed.length > 0 && (
-            <div className="guild-log journal-log section-enter p-4">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Star className="h-3.5 w-3.5 text-[#D97706] dark:text-[#FBBF24] flex-shrink-0" />
-                  <div>
-                    <h2 className="text-xs font-bold uppercase tracking-widest text-[#6B4D28] dark:text-[#C4A878]">
-                      {t('home.feed.title', 'Adventure Log')}
-                    </h2>
-                    <p className="journal-log__subtitle">
-                      {t('home.feed.subtitle', 'Notes, wins, and recent marks left on the trail.')}
-                    </p>
-                  </div>
-                </div>
-                <Link
-                  to="/profile"
-                  className="text-[10px] font-semibold text-[#15803D] dark:text-[#34D399] hover:underline"
-                >
-                  {t('home.feed.viewAll', 'All entries →')}
-                </Link>
-              </div>
-              <div className="flex flex-col gap-0.5">
-                {feed.map((item, i) => {
-                  const EntryIcon = feedIcon(item.title)
-                  const pips = item.score != null ? Math.round(item.score / 2) : 0
-                  return (
-                    <div key={i} className="guild-log-entry">
-                      <div className="guild-log-icon">
-                        <EntryIcon className="h-3 w-3 text-[#16A34A] dark:text-[#34D399]" />
-                      </div>
-                      <p className="min-w-0 flex-1 truncate text-xs text-[#2C1810] dark:text-[#C1D9CA]">
-                        {item.title}
-                      </p>
-                      {item.score != null && (
-                        <div className="flex items-center gap-1.5 flex-shrink-0">
-                          <div className="guild-log-score-bar">
-                            {Array.from({ length: 5 }, (_, j) => (
-                              <div
-                                key={j}
-                                className={`guild-log-score-pip ${j < pips ? 'active' : ''}`}
-                              />
-                            ))}
-                          </div>
-                          <span className="guild-log-score">{item.score}/10</span>
-                        </div>
-                      )}
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          )}
-        </aside>
+        {/* ── Fireflies (dark mode) ── */}
+        <div className="gw-fireflies">
+          {Array.from({ length: 8 }).map((_, i) => (
+            <div key={i} className={`gw-firefly gw-firefly-${i}`} />
+          ))}
+        </div>
       </div>
 
-      {weeklyBoss && (
-        <Link to="/practice/weekly-boss" className="section-enter block group">
-          <div className="event-banner special-quest-banner">
-            <div className="relative z-10 flex items-center gap-4 p-4 md:p-5">
-              <div className="event-boss-icon">
-                <Crown className="h-6 w-6 text-[#D97706] dark:text-[#FBBF24]" />
-              </div>
+      {/* ═══════ HUD OVERLAYS ═══════ */}
 
-              <div className="min-w-0 flex-1">
-                <p className="font-pixel text-[7px] text-[#92400E] dark:text-[#FBBF24] tracking-widest uppercase mb-1">
-                  ⚔ {t('home.weeklyBoss.title', 'Weekly Challenge')} ⚔
-                </p>
-                <p className="text-sm font-bold text-[#2C1810] dark:text-[#E2F0E8] mb-0.5 truncate">
-                  {t('home.weeklyBoss.name', 'Weekly Boss Fight')}
-                </p>
-                <p className="text-xs text-[#8B7355] dark:text-[#7BA88A]">
-                  {weeklyBoss.myEntry
-                    ? t('home.weeklyBoss.yourScore', 'Your best: {{score}}/10 — challenge again?', { score: weeklyBoss.myEntry.aiScore })
-                    : t('home.weeklyBoss.notAttempted', 'Not attempted yet — take on the challenge!')}
-                </p>
-              </div>
-
-              <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                {daysLeft !== null && (
-                  <span className="flex items-center gap-1 font-mono text-[10px] font-bold tabular-nums text-[#92400E] dark:text-[#FBBF24]">
-                    <Clock className="h-3 w-3" />
-                    {t('home.weeklyBoss.daysLeft', '{{count}}d left', { count: daysLeft })}
-                  </span>
-                )}
-                <div className="btn-event">
-                  {t('home.weeklyBoss.enter', 'Enter')} <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-                </div>
-              </div>
-            </div>
+      {/* ── Character HUD ── */}
+      <div className="hud hud-character">
+        <div className="hud-avatar">
+          <PlayerFrame
+            name={firstName}
+            src={user?.avatarUrl || undefined}
+            league={LEAGUE_FRAME_NAMES[league]}
+            size="md"
+          />
+        </div>
+        <div className="hud-stats">
+          <div className="hud-name-row">
+            <span className="hud-level">LV.{ov?.level ?? 0}</span>
+            <span className="hud-name">{firstName}</span>
+            {leagueLabel && <span className="hud-league">{leagueLabel}</span>}
           </div>
+          <div className="hud-xp-row">
+            <div className="hud-xp-bar">
+              <div className="hud-xp-fill" style={{ width: `${levelProgress * 100}%` }} />
+            </div>
+            <span className="hud-xp-text">{ov?.totalXp ?? 0} XP</span>
+          </div>
+          <div className="hud-meta-row">
+            {streakDays > 0 && (
+              <span className="hud-chip hud-chip-streak">🔥 {streakDays}d</span>
+            )}
+            {arenaStats?.rating != null && (
+              <span className="hud-chip hud-chip-rating">⚔ {arenaStats.rating}</span>
+            )}
+            <span className="hud-chip" style={{ opacity: 0.6, fontSize: 9, border: 'none', padding: '2px 4px' }}>
+              {todayLabel}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Quest Scroll ── */}
+      <div className="hud hud-quests">
+        <div className="hud-quests-header">
+          <span className="hud-quests-title">📜 {t('home.missions.title', 'Daily Quests')}</span>
+          {missions && (
+            <span className="hud-quests-count">
+              {missions.completedCount}/{missions.missions.length}
+            </span>
+          )}
+        </div>
+        <div className="hud-quests-list">
+          {missions?.missions.map(mission => (
+            <Link key={mission.key} to={mission.actionUrl}
+              className={`hud-quest ${mission.completed ? 'done' : ''}`}>
+              <span className="hud-quest-check">{mission.completed ? '✓' : '○'}</span>
+              <span className="hud-quest-title">{mission.title}</span>
+              <span className="hud-quest-xp">+{mission.xpReward}</span>
+            </Link>
+          )) ?? (
+            Array.from({ length: 3 }).map((_, i) => (
+              <div key={i} className="hud-quest hud-quest-skeleton" />
+            ))
+          )}
+        </div>
+        {missions?.allComplete && (
+          <div className="hud-quests-bonus">
+            ✨ {t('home.missions.allDone', 'All complete! +{{xp}} XP', { xp: missions.bonusXp })}
+          </div>
+        )}
+      </div>
+
+      {/* ── Weekly Boss Banner ── */}
+      {weeklyBoss && (
+        <Link to="/practice/weekly-boss" className="hud hud-boss">
+          <span className="hud-boss-icon">⚔</span>
+          <div className="hud-boss-info">
+            <span className="hud-boss-title">{t('home.weeklyBoss.title', 'Weekly Boss')}</span>
+            <span className="hud-boss-sub">
+              {weeklyBoss.myEntry
+                ? t('home.weeklyBoss.yourScore', 'Your best: {{score}}/10', { score: weeklyBoss.myEntry.aiScore })
+                : t('home.weeklyBoss.notAttempted', 'Not attempted yet')}
+            </span>
+          </div>
+          {daysLeft !== null && (
+            <span className="hud-boss-timer">{daysLeft}d</span>
+          )}
         </Link>
       )}
 
-      <section className="world-locations section-enter">
-        <div className="world-locations__head">
-          <div>
-            <p className="world-locations__eyebrow">{t('home.world.eyebrow', 'World Hub')}</p>
-            <h2 className="world-locations__title">{t('home.world.title', 'Locations around the camp')}</h2>
-          </div>
-          <p className="world-locations__subtitle">
-            {t('home.world.subtitle', 'Travel to places, not product modules.')}
-          </p>
+      {/* ── Garden Info ── */}
+      <Link to="/profile" className="hud hud-garden">
+        <Sprite data={gardenStage(streakDays)} palette={GP} pixel={3} />
+        <div className="hud-garden-info">
+          <span className="hud-garden-title">🌱 {t('home.garden.title', 'Progress Garden')}</span>
+          <span className="hud-garden-sub">
+            {streakDays > 0
+              ? t('home.topLayer.streak', '{{count}} day streak', { count: streakDays })
+              : t('home.garden.noStreak', 'Start a streak to grow!')}
+          </span>
         </div>
+      </Link>
 
-        <div className="world-locations__trail">
-          {worldLinks.map(({ to, icon: Icon, label, eyebrow, sub, cue }, index) => (
-            <Link key={to} to={to} className={`world-location-stop group ${index % 2 === 1 ? 'is-offset' : ''}`}>
-              <div className="world-location-stop__crest">
-                <Icon className="h-5 w-5 text-[#16A34A] dark:text-[#34D399]" />
-              </div>
-              <div className="min-w-0 flex-1">
-                <p className="world-location-stop__eyebrow">{eyebrow}</p>
-                <p className="world-location-stop__title">{label}</p>
-                <p className="world-location-stop__desc">{sub}</p>
-              </div>
-              <div className="world-location-stop__cue">
-                <span>{cue}</span>
-                <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
-              </div>
-            </Link>
-          ))}
-        </div>
-      </section>
+      {/* ── World Locations Bar ── */}
+      <div className="hud hud-locations">
+        {worldLinks.map(({ to, label, eyebrow }) => (
+          <Link key={to} to={to} className="hud-loc">
+            <span className="hud-loc-eyebrow">{eyebrow}</span>
+            <span className="hud-loc-label">{label}</span>
+          </Link>
+        ))}
+      </div>
     </div>
   )
 }
