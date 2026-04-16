@@ -70,6 +70,7 @@ export function HomePage() {
   const leagueLabel  = LEAGUE_LABELS[league] ?? ''
   const levelProgress = ov?.levelProgress ?? 0
   const primaryAction = progress?.nextActions?.[0]
+  const nextActions = progress?.nextActions?.slice(0, 3) ?? []
   const locale = i18n.language.startsWith('ru') ? 'ru-RU' : 'en-US'
   const todayLabel = new Intl.DateTimeFormat(locale, {
     weekday: 'long',
@@ -117,48 +118,59 @@ export function HomePage() {
   ]
 
   return (
-    <div className="flex min-h-full flex-col gap-4 px-4 pb-6 pt-4 md:gap-5 md:px-6 md:py-5">
+    <div className="home-hub-screen flex min-h-full flex-col gap-4 px-4 pb-6 pt-4 md:gap-5 md:px-6 md:py-5">
       <PageMeta title={t('home.meta.title')} description={t('home.meta.description')} canonicalPath="/home" />
 
-      <section className="home-top-layer section-enter px-4 py-3 md:px-5">
-        <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-          <div className="min-w-0">
-            <p className="home-top-layer__eyebrow">
-              {t('home.topLayer.eyebrow', 'Home Screen')}
-            </p>
-            <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
-              <p className="home-top-layer__title">
-                {t('home.topLayer.title', 'Quiet camp, clear route.')}
-              </p>
-              <span className="home-top-layer__date">{todayLabel}</span>
-            </div>
-            <p className="home-top-layer__subtitle">
-              {t('home.topLayer.subtitle', 'A calm layer over your progress, quests, and the world around you.')}
-            </p>
-          </div>
+      <section className="camp-entrance section-enter">
+        <div className="camp-entrance__copy">
+          <p className="camp-entrance__eyebrow">
+            {t('home.topLayer.eyebrow', 'Home Screen')}
+          </p>
+          <h1 className="camp-entrance__title">
+            {t('home.topLayer.title', 'Quiet camp, clear route.')}
+          </h1>
+          <p className="camp-entrance__subtitle">
+            {t('home.topLayer.subtitle', 'A calm layer over your progress, quests, and the world around you.')}
+          </p>
+        </div>
 
-          <div className="flex flex-wrap items-center gap-2">
-            {(ov?.currentStreakDays ?? 0) > 0 && (
-              <div className="home-top-layer__token">
-                <Flame className="h-3.5 w-3.5 text-[#EA580C]" />
-                <span>{t('home.topLayer.streak', '{{count}} day streak', { count: ov!.currentStreakDays })}</span>
-              </div>
-            )}
-            {daysLeft !== null && (
-              <div className="home-top-layer__token">
-                <Clock className="h-3.5 w-3.5 text-[#D97706] dark:text-[#FBBF24]" />
-                <span>{t('home.topLayer.weeklyBoss', 'Weekly boss closes in {{count}} days', { count: daysLeft })}</span>
-              </div>
-            )}
+        <div className="camp-entrance__signals">
+          <div className="camp-signal">
+            <span className="camp-signal__label">{todayLabel}</span>
+            <strong className="camp-signal__value">{t('home.hero.focusTitle', 'Today in the camp')}</strong>
           </div>
+          {(ov?.currentStreakDays ?? 0) > 0 && (
+            <div className="camp-signal">
+              <Flame className="h-3.5 w-3.5 text-[#EA580C]" />
+              <strong className="camp-signal__value">{t('home.topLayer.streak', '{{count}} day streak', { count: ov!.currentStreakDays })}</strong>
+            </div>
+          )}
+          {daysLeft !== null && (
+            <div className="camp-signal">
+              <Clock className="h-3.5 w-3.5 text-[#D97706] dark:text-[#FBBF24]" />
+              <strong className="camp-signal__value">{t('home.topLayer.weeklyBoss', 'Weekly boss closes in {{count}} days', { count: daysLeft })}</strong>
+            </div>
+          )}
         </div>
       </section>
 
-      {/* ══ CHARACTER PANEL ════════════════════════════════════════════════ */}
-      <section className="char-panel section-enter p-4 md:p-5">
-        <div className="flex items-start gap-4 md:gap-5">
+      <section className="char-panel character-sheet-rpg section-enter p-4 md:p-5">
+        <div className="character-sheet-rpg__header">
+          <div>
+            <p className="character-sheet-rpg__eyebrow">
+              {t('home.profile.eyebrow', 'Character Sheet')}
+            </p>
+            <p className="character-sheet-rpg__heading">
+              {t('home.profile.heading', 'Your role in the camp')}
+            </p>
+          </div>
+          <Link to="/profile" className="character-sheet-rpg__link">
+            {t('sidebar.profile')}
+            <ChevronRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
 
-          {/* Avatar + mascot */}
+        <div className="flex items-start gap-4 md:gap-5">
           <div className="flex flex-col items-center gap-2 flex-shrink-0">
             <Link to="/profile">
               <PlayerFrame
@@ -175,10 +187,7 @@ export function HomePage() {
             />
           </div>
 
-          {/* Character info */}
           <div className="min-w-0 flex-1">
-
-            {/* Name + level badge */}
             <div className="flex flex-wrap items-center gap-2 mb-2">
               <div className="char-level-badge">LV.{ov?.level ?? 0}</div>
               <h1 className="text-[15px] font-bold text-[#2C1810] dark:text-[#E2F0E8] truncate">
@@ -193,7 +202,6 @@ export function HomePage() {
               )}
             </div>
 
-            {/* XP bar */}
             <div className="flex items-center gap-2.5 mb-3">
               <div className="xp-bar flex-1 max-w-[220px]">
                 {Array.from({ length: 10 }, (_, i) => (
@@ -208,7 +216,6 @@ export function HomePage() {
               </span>
             </div>
 
-            {/* Stat chips */}
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               {(ov?.currentStreakDays ?? 0) > 0 && (
                 <div className="char-stat-chip">
@@ -239,7 +246,6 @@ export function HomePage() {
               )}
             </div>
 
-            {/* CTA */}
             {primaryAction ? (
               <Link to={primaryAction.actionUrl} className="btn-journey">
                 ▶ {t('home.hero.continue', 'Continue Journey')}
@@ -253,7 +259,6 @@ export function HomePage() {
             )}
           </div>
 
-          {/* ── Right: Current Focus (desktop only) ── */}
           <div className="hidden lg:flex w-[188px] flex-shrink-0 pl-4 self-stretch border-l border-[#C8AC7E]/22 dark:border-[#3A5038]/28">
             <div className="hero-side-panel w-full">
               <div className="hero-side-panel__header">
@@ -334,217 +339,216 @@ export function HomePage() {
         </div>
       </section>
 
-      {/* ══ QUEST BOARD ════════════════════════════════════════════════════ */}
-      <section className="quest-board-rpg section-enter">
-
-        {/* Board header — pinned notice style */}
-        <div className="quest-board-rpg-hdr">
-          <div className="flex items-center gap-2">
-            {/* Pin tack */}
-            <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] shadow-sm flex-shrink-0" style={{ boxShadow: '0 1px 3px rgba(245,158,11,0.45)' }} />
-            <h2 className="font-pixel text-[8px] text-[#6B4D28] dark:text-[#C4A878] tracking-wider uppercase">
-              {t('home.missions.title', 'Daily Quests')}
-            </h2>
-          </div>
-          {missions && (
+      <div className="hub-main-stage">
+        <section className="quest-board-rpg home-quest-board section-enter">
+          <div className="quest-board-rpg-hdr">
             <div className="flex items-center gap-2">
-              <div className="quest-board-prog-track">
-                <div
-                  className="quest-board-prog-fill"
-                  style={{ width: `${missions.missions.length > 0 ? (missions.completedCount / missions.missions.length) * 100 : 0}%` }}
-                />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#F59E0B] shadow-sm flex-shrink-0" style={{ boxShadow: '0 1px 3px rgba(245,158,11,0.45)' }} />
+              <div>
+                <h2 className="font-pixel text-[8px] text-[#6B4D28] dark:text-[#C4A878] tracking-wider uppercase">
+                  {t('home.missions.title', 'Daily Quests')}
+                </h2>
+                <p className="home-quest-board__subtitle">
+                  {t('home.missions.subtitle', 'Pinned tasks for the road ahead.')}
+                </p>
               </div>
-              <span className="font-mono text-[10px] font-bold tabular-nums text-[#15803D] dark:text-[#34D399]">
-                {missions.completedCount}/{missions.missions.length}
+            </div>
+            {missions && (
+              <div className="flex items-center gap-2">
+                <div className="quest-board-prog-track">
+                  <div
+                    className="quest-board-prog-fill"
+                    style={{ width: `${missions.missions.length > 0 ? (missions.completedCount / missions.missions.length) * 100 : 0}%` }}
+                  />
+                </div>
+                <span className="font-mono text-[10px] font-bold tabular-nums text-[#15803D] dark:text-[#34D399]">
+                  {missions.completedCount}/{missions.missions.length}
+                </span>
+              </div>
+            )}
+          </div>
+
+          <div className="flex flex-col gap-2 p-3">
+            {missions?.missions.map((mission) => {
+              const Icon = MISSION_ICONS[mission.icon] ?? Target
+              const hasBar = mission.targetValue > 1
+              const fillPct = hasBar
+                ? Math.min(mission.current / mission.targetValue, 1) * 100
+                : mission.completed ? 100 : 0
+
+              return (
+                <div key={mission.key} className={`quest-item-rpg ${mission.completed ? 'is-done' : ''}`}>
+                  <div className={`quest-icon-rpg ${mission.completed ? 'done' : ''}`}>
+                    {mission.completed
+                      ? <CheckCircle2 className="h-4 w-4 text-[#16A34A] dark:text-[#34D399]" />
+                      : <Icon className="h-4 w-4 text-[#8B7355] dark:text-[#7BA88A]" />
+                    }
+                  </div>
+
+                  <div className="min-w-0 flex-1">
+                    <p className={`text-xs font-semibold leading-tight ${
+                      mission.completed
+                        ? 'text-[#16A34A] dark:text-[#34D399] line-through decoration-[#16A34A]/30'
+                        : 'text-[#2C1810] dark:text-[#E2F0E8]'
+                    }`}>
+                      {mission.title}
+                    </p>
+                    {hasBar && (
+                      <>
+                        <div className="quest-bar-rpg">
+                          <div className="quest-bar-fill-rpg" style={{ width: `${fillPct}%` }} />
+                        </div>
+                        {!mission.completed && (
+                          <span className="text-[9px] tabular-nums text-[#8B7355] dark:text-[#7BA88A]">
+                            {Math.min(mission.current, mission.targetValue)}/{mission.targetValue}
+                          </span>
+                        )}
+                      </>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 flex-shrink-0">
+                    <span className="xp-reward-badge">+{mission.xpReward} XP</span>
+                    {!mission.completed && (
+                      <Link to={mission.actionUrl} className="btn-quest-rpg">
+                        {t('home.missions.open', 'Open')} →
+                      </Link>
+                    )}
+                  </div>
+                </div>
+              )
+            }) ?? (
+              Array.from({ length: 3 }).map((_, i) => (
+                <div key={i} className="quest-item-rpg h-14 animate-pulse" />
+              ))
+            )}
+          </div>
+
+          {missions?.allComplete && (
+            <div className="quest-done-bar mx-3 mb-3">
+              <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
+              <span>
+                {t('home.missions.allDone', 'All quests complete! Bonus: +{{xp}} XP', { xp: missions.bonusXp })}
               </span>
             </div>
           )}
-        </div>
+        </section>
 
-        {/* Quest items */}
-        <div className="flex flex-col gap-2 p-3">
-          {missions?.missions.map((mission) => {
-            const Icon = MISSION_ICONS[mission.icon] ?? Target
-            const hasBar = mission.targetValue > 1
-            const fillPct = hasBar
-              ? Math.min(mission.current / mission.targetValue, 1) * 100
-              : mission.completed ? 100 : 0
-
-            return (
-              <div key={mission.key} className={`quest-item-rpg ${mission.completed ? 'is-done' : ''}`}>
-
-                {/* Icon container */}
-                <div className={`quest-icon-rpg ${mission.completed ? 'done' : ''}`}>
-                  {mission.completed
-                    ? <CheckCircle2 className="h-4 w-4 text-[#16A34A] dark:text-[#34D399]" />
-                    : <Icon className="h-4 w-4 text-[#8B7355] dark:text-[#7BA88A]" />
-                  }
-                </div>
-
-                {/* Title + progress */}
-                <div className="min-w-0 flex-1">
-                  <p className={`text-xs font-semibold leading-tight ${
-                    mission.completed
-                      ? 'text-[#16A34A] dark:text-[#34D399] line-through decoration-[#16A34A]/30'
-                      : 'text-[#2C1810] dark:text-[#E2F0E8]'
-                  }`}>
-                    {mission.title}
+        <aside className="hub-side-stage">
+          {nextActions.length > 0 && (
+            <div className="adventure-path journey-scroll section-enter p-4">
+              <div className="mb-4 flex items-center gap-2">
+                <BookMarked className="h-3.5 w-3.5 text-[#16A34A] dark:text-[#34D399] flex-shrink-0" />
+                <div>
+                  <h2 className="text-xs font-bold uppercase tracking-widest text-[#15803D] dark:text-[#34D399]">
+                    {t('home.nextActions.title', 'Training Path')}
+                  </h2>
+                  <p className="journey-scroll__subtitle">
+                    {t('home.nextActions.subtitle', 'A short route from camp to your next milestone.')}
                   </p>
-                  {hasBar && (
-                    <>
-                      <div className="quest-bar-rpg">
-                        <div className="quest-bar-fill-rpg" style={{ width: `${fillPct}%` }} />
-                      </div>
-                      {!mission.completed && (
-                        <span className="text-[9px] tabular-nums text-[#8B7355] dark:text-[#7BA88A]">
-                          {Math.min(mission.current, mission.targetValue)}/{mission.targetValue}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </div>
-
-                {/* Reward + action */}
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <span className="xp-reward-badge">+{mission.xpReward} XP</span>
-                  {!mission.completed && (
-                    <Link to={mission.actionUrl} className="btn-quest-rpg">
-                      {t('home.missions.open', 'Open')} →
-                    </Link>
-                  )}
                 </div>
               </div>
-            )
-          }) ?? (
-            Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="quest-item-rpg h-14 animate-pulse" />
-            ))
-          )}
-        </div>
 
-        {/* All done! */}
-        {missions?.allComplete && (
-          <div className="quest-done-bar mx-3 mb-3">
-            <CheckCircle2 className="h-4 w-4 flex-shrink-0" />
-            <span>
-              {t('home.missions.allDone', 'All quests complete! Bonus: +{{xp}} XP', { xp: missions.bonusXp })}
-            </span>
-          </div>
-        )}
-      </section>
-
-      {/* ══ ADVENTURE PATH + GUILD LOG ═════════════════════════════════════ */}
-      <div className="grid gap-4 lg:grid-cols-2">
-
-        {/* Adventure Path — where to go next */}
-        {(progress?.nextActions?.length ?? 0) > 0 && (
-          <div className="adventure-path section-enter p-4">
-            <div className="flex items-center gap-2 mb-4">
-              <BookMarked className="h-3.5 w-3.5 text-[#16A34A] dark:text-[#34D399] flex-shrink-0" />
-              <h2 className="text-xs font-bold uppercase tracking-widest text-[#15803D] dark:text-[#34D399]">
-                {t('home.nextActions.title', 'Training Path')}
-              </h2>
-            </div>
-
-            <div className="flex flex-col">
-              {progress!.nextActions!.slice(0, 3).map((action, i, arr) => (
-                <Link key={i} to={action.actionUrl} className="path-step group">
-                  <div className="path-step-track">
-                    <div className={`path-node ${i === 0 ? 'active' : ''}`}>
-                      {i === 0 ? '▶' : String(i + 1)}
+              <div className="flex flex-col">
+                {nextActions.map((action, i, arr) => (
+                  <Link key={i} to={action.actionUrl} className="path-step group">
+                    <div className="path-step-track">
+                      <div className={`path-node ${i === 0 ? 'active' : ''}`}>
+                        {i === 0 ? '▶' : String(i + 1)}
+                      </div>
+                      {i < arr.length - 1 && <div className="path-connector" />}
                     </div>
-                    {i < arr.length - 1 && <div className="path-connector" />}
-                  </div>
-                  <div className="path-content pb-2">
-                    <div className="flex items-center gap-1.5">
-                      <p className={`text-xs font-semibold truncate transition-colors ${
-                        i === 0
-                          ? 'text-[#2C1810] dark:text-[#E2F0E8] group-hover:text-[#16A34A] dark:group-hover:text-[#34D399]'
-                          : 'text-[#5A4A40] dark:text-[#9ABAA8]'
-                      }`}>
-                        {action.title}
+                    <div className="path-content pb-2">
+                      <div className="flex items-center gap-1.5">
+                        <p className={`text-xs font-semibold truncate transition-colors ${
+                          i === 0
+                            ? 'text-[#2C1810] dark:text-[#E2F0E8] group-hover:text-[#16A34A] dark:group-hover:text-[#34D399]'
+                            : 'text-[#5A4A40] dark:text-[#9ABAA8]'
+                        }`}>
+                          {action.title}
+                        </p>
+                        {i === 0 && (
+                          <span className="flex-shrink-0 rounded-sm bg-[#16A34A]/12 dark:bg-[#34D399]/10 border border-[#16A34A]/20 dark:border-[#34D399]/15 px-1 py-px text-[7px] font-bold uppercase tracking-wider text-[#15803D] dark:text-[#34D399]">
+                            {t('home.nextActions.next', 'Next')}
+                          </span>
+                        )}
+                      </div>
+                      <p className="text-[10px] text-[#7A6550] dark:text-[#6A9880] truncate mt-0.5">
+                        {action.description}
                       </p>
-                      {i === 0 && (
-                        <span className="flex-shrink-0 rounded-sm bg-[#16A34A]/12 dark:bg-[#34D399]/10 border border-[#16A34A]/20 dark:border-[#34D399]/15 px-1 py-px text-[7px] font-bold uppercase tracking-wider text-[#15803D] dark:text-[#34D399]">
-                          {t('home.nextActions.next', 'Next')}
-                        </span>
+                    </div>
+                    {i === 0 && (
+                      <ArrowRight className="h-3 w-3 flex-shrink-0 mt-1 text-[#16A34A] dark:text-[#34D399] opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-0.5" />
+                    )}
+                  </Link>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {feed.length > 0 && (
+            <div className="guild-log journal-log section-enter p-4">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Star className="h-3.5 w-3.5 text-[#D97706] dark:text-[#FBBF24] flex-shrink-0" />
+                  <div>
+                    <h2 className="text-xs font-bold uppercase tracking-widest text-[#6B4D28] dark:text-[#C4A878]">
+                      {t('home.feed.title', 'Adventure Log')}
+                    </h2>
+                    <p className="journal-log__subtitle">
+                      {t('home.feed.subtitle', 'Notes, wins, and recent marks left on the trail.')}
+                    </p>
+                  </div>
+                </div>
+                <Link
+                  to="/profile"
+                  className="text-[10px] font-semibold text-[#15803D] dark:text-[#34D399] hover:underline"
+                >
+                  {t('home.feed.viewAll', 'All entries →')}
+                </Link>
+              </div>
+              <div className="flex flex-col gap-0.5">
+                {feed.map((item, i) => {
+                  const EntryIcon = feedIcon(item.title)
+                  const pips = item.score != null ? Math.round(item.score / 2) : 0
+                  return (
+                    <div key={i} className="guild-log-entry">
+                      <div className="guild-log-icon">
+                        <EntryIcon className="h-3 w-3 text-[#16A34A] dark:text-[#34D399]" />
+                      </div>
+                      <p className="min-w-0 flex-1 truncate text-xs text-[#2C1810] dark:text-[#C1D9CA]">
+                        {item.title}
+                      </p>
+                      {item.score != null && (
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          <div className="guild-log-score-bar">
+                            {Array.from({ length: 5 }, (_, j) => (
+                              <div
+                                key={j}
+                                className={`guild-log-score-pip ${j < pips ? 'active' : ''}`}
+                              />
+                            ))}
+                          </div>
+                          <span className="guild-log-score">{item.score}/10</span>
+                        </div>
                       )}
                     </div>
-                    <p className="text-[10px] text-[#7A6550] dark:text-[#6A9880] truncate mt-0.5">
-                      {action.description}
-                    </p>
-                  </div>
-                  {i === 0 && (
-                    <ArrowRight className="h-3 w-3 flex-shrink-0 mt-1 text-[#16A34A] dark:text-[#34D399] opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-0.5" />
-                  )}
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Guild Log — recent activity */}
-        {feed.length > 0 && (
-          <div className="guild-log section-enter p-4">
-            <div className="mb-3 flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Star className="h-3.5 w-3.5 text-[#D97706] dark:text-[#FBBF24] flex-shrink-0" />
-                <h2 className="text-xs font-bold uppercase tracking-widest text-[#6B4D28] dark:text-[#C4A878]">
-                  {t('home.feed.title', 'Adventure Log')}
-                </h2>
+                  )
+                })}
               </div>
-              <Link
-                to="/profile"
-                className="text-[10px] font-semibold text-[#15803D] dark:text-[#34D399] hover:underline"
-              >
-                {t('home.feed.viewAll', 'All entries →')}
-              </Link>
             </div>
-            <div className="flex flex-col gap-0.5">
-              {feed.map((item, i) => {
-                const EntryIcon = feedIcon(item.title)
-                const pips = item.score != null ? Math.round(item.score / 2) : 0
-                return (
-                  <div key={i} className="guild-log-entry">
-                    <div className="guild-log-icon">
-                      <EntryIcon className="h-3 w-3 text-[#16A34A] dark:text-[#34D399]" />
-                    </div>
-                    <p className="min-w-0 flex-1 truncate text-xs text-[#2C1810] dark:text-[#C1D9CA]">
-                      {item.title}
-                    </p>
-                    {item.score != null && (
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        <div className="guild-log-score-bar">
-                          {Array.from({ length: 5 }, (_, j) => (
-                            <div
-                              key={j}
-                              className={`guild-log-score-pip ${j < pips ? 'active' : ''}`}
-                            />
-                          ))}
-                        </div>
-                        <span className="guild-log-score">{item.score}/10</span>
-                      </div>
-                    )}
-                  </div>
-                )
-              })}
-            </div>
-          </div>
-        )}
+          )}
+        </aside>
       </div>
 
-      {/* ══ WEEKLY EVENT BANNER ════════════════════════════════════════════ */}
       {weeklyBoss && (
         <Link to="/practice/weekly-boss" className="section-enter block group">
-          <div className="event-banner">
+          <div className="event-banner special-quest-banner">
             <div className="relative z-10 flex items-center gap-4 p-4 md:p-5">
-
-              {/* Boss icon */}
               <div className="event-boss-icon">
                 <Crown className="h-6 w-6 text-[#D97706] dark:text-[#FBBF24]" />
               </div>
 
-              {/* Info */}
               <div className="min-w-0 flex-1">
                 <p className="font-pixel text-[7px] text-[#92400E] dark:text-[#FBBF24] tracking-widest uppercase mb-1">
                   ⚔ {t('home.weeklyBoss.title', 'Weekly Challenge')} ⚔
@@ -559,14 +563,13 @@ export function HomePage() {
                 </p>
               </div>
 
-              {/* Timer + CTA */}
               <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                  {daysLeft !== null && (
-                    <span className="flex items-center gap-1 font-mono text-[10px] font-bold tabular-nums text-[#92400E] dark:text-[#FBBF24]">
-                      <Clock className="h-3 w-3" />
+                {daysLeft !== null && (
+                  <span className="flex items-center gap-1 font-mono text-[10px] font-bold tabular-nums text-[#92400E] dark:text-[#FBBF24]">
+                    <Clock className="h-3 w-3" />
                     {t('home.weeklyBoss.daysLeft', '{{count}}d left', { count: daysLeft })}
-                    </span>
-                  )}
+                  </span>
+                )}
                 <div className="btn-event">
                   {t('home.weeklyBoss.enter', 'Enter')} <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
                 </div>
@@ -576,27 +579,36 @@ export function HomePage() {
         </Link>
       )}
 
-      {/* ══ WORLD MAP — Quick nav ═══════════════════════════════════════════ */}
-      <div className="section-enter grid grid-cols-2 gap-2 sm:grid-cols-4">
-        {worldLinks.map(({ to, icon: Icon, label, eyebrow, sub, cue }) => (
-          <Link key={to} to={to} className="world-tile group">
-            <div className="world-tile__topline">
-              <span className="world-tile__eyebrow">{eyebrow}</span>
-              <div className="world-tile-icon">
+      <section className="world-locations section-enter">
+        <div className="world-locations__head">
+          <div>
+            <p className="world-locations__eyebrow">{t('home.world.eyebrow', 'World Hub')}</p>
+            <h2 className="world-locations__title">{t('home.world.title', 'Locations around the camp')}</h2>
+          </div>
+          <p className="world-locations__subtitle">
+            {t('home.world.subtitle', 'Travel to places, not product modules.')}
+          </p>
+        </div>
+
+        <div className="world-locations__trail">
+          {worldLinks.map(({ to, icon: Icon, label, eyebrow, sub, cue }, index) => (
+            <Link key={to} to={to} className={`world-location-stop group ${index % 2 === 1 ? 'is-offset' : ''}`}>
+              <div className="world-location-stop__crest">
                 <Icon className="h-5 w-5 text-[#16A34A] dark:text-[#34D399]" />
               </div>
-            </div>
-            <div className="min-w-0 flex-1">
-              <p className="world-tile__title">{label}</p>
-              <p className="world-tile__desc">{sub}</p>
-            </div>
-            <div className="world-tile__footer">
-              <span className="world-tile__cue">{cue}</span>
-              <ChevronRight className="h-3.5 w-3.5 text-[#C8AC7E]/55 dark:text-[#3A5038]/70 flex-shrink-0 transition-transform group-hover:translate-x-0.5" />
-            </div>
-          </Link>
-        ))}
-      </div>
+              <div className="min-w-0 flex-1">
+                <p className="world-location-stop__eyebrow">{eyebrow}</p>
+                <p className="world-location-stop__title">{label}</p>
+                <p className="world-location-stop__desc">{sub}</p>
+              </div>
+              <div className="world-location-stop__cue">
+                <span>{cue}</span>
+                <ChevronRight className="h-3.5 w-3.5 transition-transform group-hover:translate-x-0.5" />
+              </div>
+            </Link>
+          ))}
+        </div>
+      </section>
     </div>
   )
 }
