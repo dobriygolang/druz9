@@ -247,6 +247,41 @@ func (r *Repo) LinkTelegramToUser(ctx context.Context, userID uuid.UUID, telegra
 	return err
 }
 
+// GetSettingsByTelegramChatID returns settings for the user identified by their Telegram chat ID.
+func (r *Repo) GetSettingsByTelegramChatID(ctx context.Context, chatID int64) (*UserSettings, error) {
+	s := &UserSettings{
+		TelegramChatID:  chatID,
+		DuelsEnabled:    true,
+		ProgressEnabled: true,
+		CirclesEnabled:  true,
+		QuietHoursStart: 23,
+		QuietHoursEnd:   8,
+		Timezone:        "Europe/Moscow",
+	}
+	err := r.db.DB.QueryRow(ctx, `
+		SELECT user_id, duels_enabled, progress_enabled, circles_enabled, daily_challenge_enabled,
+		       quiet_hours_start, quiet_hours_end, timezone
+		FROM user_notification_settings WHERE telegram_chat_id = $1`, chatID).Scan(
+		&s.UserID, &s.DuelsEnabled, &s.ProgressEnabled, &s.CirclesEnabled, &s.DailyChallengeEnabled,
+		&s.QuietHoursStart, &s.QuietHoursEnd, &s.Timezone,
+	)
+	if err == pgx.ErrNoRows {
+		return s, nil
+	}
+	return s, err
+}
+
+// EnableAllByTelegramChatID turns on all notification categories for the user
+// identified by their Telegram chat ID. No-ops if no row exists yet.
+func (r *Repo) EnableAllByTelegramChatID(ctx context.Context, chatID int64) error {
+	_, err := r.db.DB.Exec(ctx, `
+		UPDATE user_notification_settings
+		SET duels_enabled = true, progress_enabled = true, circles_enabled = true,
+		    daily_challenge_enabled = true, updated_at = NOW()
+		WHERE telegram_chat_id = $1`, chatID)
+	return err
+}
+
 // DisableAllByTelegramChatID turns off all notification categories for the user
 // identified by their Telegram chat ID.
 func (r *Repo) DisableAllByTelegramChatID(ctx context.Context, chatID int64) error {

@@ -20,6 +20,7 @@ import { StrengthRadar } from './StrengthRadar'
 import { CompanyReadiness } from './CompanyReadiness'
 import { ActivitySection } from './ActivitySection'
 import { AchievementShowcase } from './AchievementShowcase'
+import { NotificationSettings } from './NotificationSettings'
 
 const PINNED_STORAGE_KEY = 'druz9_pinned_achievements'
 
@@ -307,6 +308,9 @@ export function ProfilePage() {
           onTogglePin={isOwn ? handlePinToggle : undefined}
         />
       )}
+
+      {/* ── Notification settings (own profile only) ──────────── */}
+      {isOwn && <NotificationSettings />}
 
       {/* ── Edit Profile Modal ────────────────────────────────── */}
       <Modal

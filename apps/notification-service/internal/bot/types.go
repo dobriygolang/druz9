@@ -7,9 +7,10 @@ type telegramUpdate struct {
 }
 
 type telegramMessage struct {
-	Text string        `json:"text"`
-	Chat telegramChat  `json:"chat"`
-	From *telegramUser `json:"from"`
+	MessageID int64         `json:"message_id"`
+	Text      string        `json:"text"`
+	Chat      telegramChat  `json:"chat"`
+	From      *telegramUser `json:"from"`
 }
 
 type telegramChat struct {

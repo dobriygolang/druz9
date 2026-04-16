@@ -45,17 +45,21 @@ export function PracticeHubPage() {
           </div>
         </div>
 
-        <div className="-mx-4 mb-5 overflow-x-auto px-4 pb-1 no-scrollbar md:mx-0 md:px-0">
-          <div className="flex snap-x gap-3 md:grid md:grid-cols-4 lg:grid-cols-4 md:overflow-visible">
-          {[
+        {(() => {
+          const modeCards = [
             { icon: Code2, title: 'Code Rooms', sub: t('practice.card.rooms'), href: '/practice/code-rooms' },
             { icon: Swords, title: 'Arena Duels', sub: t('practice.card.arena'), href: '/practice/arena' },
             { icon: Flame, title: 'Daily Challenge', sub: t('practice.card.daily'), href: '/practice/daily' },
+          ]
+          const challengeCards = [
             { icon: Crown, title: 'Weekly Boss', sub: t('practice.card.weeklyBoss'), href: '/practice/weekly-boss' },
             { icon: Zap, title: 'Speed Run', sub: t('practice.card.speedRun'), href: '/practice/speed-run' },
             { icon: Eye, title: 'Blind Review', sub: t('practice.card.blindReview'), href: '/practice/blind-review' },
             { icon: Target, title: 'Algorithm Prep', sub: t('practice.card.solo'), href: '/prepare/interview-prep?category=algorithm' },
-          ].map(f => {
+          ]
+          const allCards = [...modeCards, ...challengeCards]
+
+          const renderCard = (f: typeof allCards[number]) => {
             const Icon = f.icon
             const isAct = location.pathname.startsWith(f.href)
             return (
@@ -78,9 +82,26 @@ export function PracticeHubPage() {
                 {isAct && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-[#6366F1] flex-shrink-0" />}
               </button>
             )
-          })}
-        </div>
-        </div>
+          }
+
+          return (
+            <div className="-mx-4 mb-5 overflow-x-auto px-4 pb-1 no-scrollbar md:mx-0 md:px-0 md:overflow-visible">
+              {/* Mobile: single horizontal scroll row */}
+              <div className="flex snap-x gap-3 md:hidden">
+                {allCards.map(renderCard)}
+              </div>
+              {/* Desktop: two rows — 3 modes + 4 challenges */}
+              <div className="hidden md:flex md:flex-col md:gap-3">
+                <div className="grid grid-cols-3 gap-3">
+                  {modeCards.map(renderCard)}
+                </div>
+                <div className="grid grid-cols-4 gap-3">
+                  {challengeCards.map(renderCard)}
+                </div>
+              </div>
+            </div>
+          )
+        })()}
 
         <div className="mb-5">
           <h2 className="text-sm font-semibold text-[#111111] dark:text-[#c8d8ec] mb-3">{t('practice.leaders')}</h2>

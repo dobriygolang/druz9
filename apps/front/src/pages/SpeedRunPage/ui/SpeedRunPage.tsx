@@ -43,7 +43,7 @@ export function SpeedRunPage() {
   useEffect(() => { fetchRecords() }, [fetchRecords])
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 px-4 pt-4 pb-6 md:px-6">
       <PageMeta title={t('speedRun.meta.title', 'Speed Run')} description={t('speedRun.meta.desc', 'Beat your personal bests')} canonicalPath="/practice/speed-run" />
 
       <div>

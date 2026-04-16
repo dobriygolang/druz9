@@ -2,6 +2,7 @@ package main
 
 import (
 	"api/internal/closer"
+	notifclient "api/internal/clients/notification"
 	challengedomain "api/internal/domain/challenge"
 	server "api/internal/server"
 	"api/internal/server/wshandler"
@@ -153,6 +154,7 @@ func registerManualHTTPRoutes(
 
 	registerMissionRoutes(r, auth, services)
 	registerChallengeRoutes(r, auth, services)
+	registerNotificationRoutes(r, auth, services)
 }
 
 func registerMissionRoutes(
@@ -408,6 +410,72 @@ func registerChallengeRoutes(
 			return nil
 		}
 		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]bool{"ok": true})
+		return nil
+	})
+}
+
+func registerNotificationRoutes(
+	r *kratoshttp.Router,
+	auth server.Authorizer,
+	services *serviceContext,
+) {
+	notif := services.notificationSender
+
+	// GET /api/v1/notifications/settings — get current notification preferences
+	r.GET("/api/v1/notifications/settings", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		settings, err := notif.GetNotificationSettings(req.Context(), userID.String())
+		if err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			return nil
+		}
+		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{
+			"duelsEnabled":          settings.DuelsEnabled,
+			"progressEnabled":       settings.ProgressEnabled,
+			"circlesEnabled":        settings.CirclesEnabled,
+			"dailyChallengeEnabled": settings.DailyChallengeEnabled,
+			"quietHoursStart":       settings.QuietHoursStart,
+			"quietHoursEnd":         settings.QuietHoursEnd,
+			"timezone":              settings.Timezone,
+			"telegramLinked":        settings.TelegramLinked,
+		})
+		return nil
+	})
+
+	// PATCH /api/v1/notifications/settings — update notification preferences
+	r.PATCH("/api/v1/notifications/settings", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, ok := server.Authenticate(req, auth)
+		if !ok {
+			ctx.Response().WriteHeader(http.StatusUnauthorized)
+			return nil
+		}
+		var body struct {
+			DuelsEnabled          *bool `json:"duelsEnabled"`
+			ProgressEnabled       *bool `json:"progressEnabled"`
+			CirclesEnabled        *bool `json:"circlesEnabled"`
+			DailyChallengeEnabled *bool `json:"dailyChallengeEnabled"`
+		}
+		if err := json.NewDecoder(req.Body).Decode(&body); err != nil {
+			ctx.Response().WriteHeader(http.StatusBadRequest)
+			return nil
+		}
+		upd := notifclient.SettingsUpdate{
+			DuelsEnabled:          body.DuelsEnabled,
+			ProgressEnabled:       body.ProgressEnabled,
+			CirclesEnabled:        body.CirclesEnabled,
+			DailyChallengeEnabled: body.DailyChallengeEnabled,
+		}
+		if err := notif.UpdateNotificationSettings(req.Context(), userID.String(), upd); err != nil {
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			return nil
+		}
+		ctx.Response().WriteHeader(http.StatusNoContent)
 		return nil
 	})
 }

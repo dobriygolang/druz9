@@ -110,16 +110,28 @@ func (b *Bot) handleUpdate(ctx context.Context, update telegramUpdate) {
 	switch command {
 	case "/start":
 		b.handleStart(ctx, update.Message, token)
-	case "/settings":
-		b.handleSettings(ctx, update.Message)
 	case "/stop":
 		b.handleStop(ctx, update.Message)
+	case "/settings":
+		b.handleSettings(ctx, update.Message)
+	case "/help":
+		b.handleHelp(ctx, update.Message)
 	}
 }
 
+// ── Command handlers ──────────────────────────────────────────
+
 func (b *Bot) handleStart(ctx context.Context, msg *telegramMessage, token string) {
+	// Re-enable all notifications when user explicitly starts the bot.
+	if err := b.repo.EnableAllByTelegramChatID(ctx, msg.Chat.ID); err != nil {
+		klog.Errorf("bot: re-enable notifications chat_id=%d: %v", msg.Chat.ID, err)
+	}
+
 	if token == "" {
-		b.sendMessage(ctx, msg.Chat.ID, "Привет! Я бот druz9.\n\nДля входа перейди на сайт и нажми «Войти через Telegram».")
+		b.sendMessage(ctx, msg.Chat.ID,
+			"👋 Привет! Я бот <b>druz9</b>.\n\n"+
+				"Уведомления включены. Используй /settings чтобы управлять ими.\n\n"+
+				"Для входа перейди на сайт и нажми «Войти через Telegram».")
 		return
 	}
 
@@ -135,7 +147,7 @@ func (b *Bot) handleStart(ctx context.Context, msg *telegramMessage, token strin
 		return
 	}
 
-	b.sendMessage(ctx, msg.Chat.ID, fmt.Sprintf("Код входа: %s\n\nВернись на сайт и введи его в форме авторизации.", code))
+	b.sendMessage(ctx, msg.Chat.ID, fmt.Sprintf("Код входа: <b>%s</b>\n\nВернись на сайт и введи его в форме авторизации.", code))
 
 	// Register chat_id for future notifications. The user_id will be linked after login.
 	if err := b.repo.RegisterChatByTelegramID(ctx, msg.From.ID, msg.Chat.ID); err != nil {
@@ -144,24 +156,51 @@ func (b *Bot) handleStart(ctx context.Context, msg *telegramMessage, token strin
 	klog.Infof("bot: auth confirmed for telegram_id=%d chat_id=%d", msg.From.ID, msg.Chat.ID)
 }
 
-func (b *Bot) handleSettings(ctx context.Context, msg *telegramMessage) {
-	b.sendMessage(ctx, msg.Chat.ID,
-		"Настройки уведомлений:\n\n"+
-			"Управляй уведомлениями в профиле на сайте.\n"+
-			"Чтобы отключить все уведомления, отправь /stop")
-}
-
 func (b *Bot) handleStop(ctx context.Context, msg *telegramMessage) {
 	if err := b.repo.DisableAllByTelegramChatID(ctx, msg.Chat.ID); err != nil {
 		klog.Errorf("bot: disable notifications chat_id=%d: %v", msg.Chat.ID, err)
 		b.sendMessage(ctx, msg.Chat.ID, "Не удалось отключить уведомления. Попробуй ещё раз.")
 		return
 	}
-	b.sendMessage(ctx, msg.Chat.ID, "Уведомления отключены. Чтобы включить снова, напиши /start")
+	b.sendMessage(ctx, msg.Chat.ID,
+		"🔕 Все уведомления отключены.\n\n"+
+			"Чтобы включить снова — отправь /start\n"+
+			"Настроить отдельные категории — /settings")
 }
 
+func (b *Bot) handleHelp(ctx context.Context, msg *telegramMessage) {
+	b.sendMessage(ctx, msg.Chat.ID,
+		"<b>Команды бота druz9</b>\n\n"+
+			"/settings — показать и изменить настройки уведомлений\n"+
+			"/stop — отключить все уведомления\n"+
+			"/start — включить уведомления (после /stop)\n"+
+			"/help — это сообщение\n\n"+
+			"<b>Категории уведомлений:</b>\n"+
+			"⚔️ Дуэли — вызовы и результаты дуэлей\n"+
+			"📈 Прогресс — стрики, уровни, результаты\n"+
+			"👥 Круги — активность в кругах\n"+
+			"🗓 Daily — ежедневные задачи\n\n"+
+			"Управлять уведомлениями также можно в профиле на сайте.")
+}
+
+func (b *Bot) handleSettings(ctx context.Context, msg *telegramMessage) {
+	settings, err := b.repo.GetSettingsByTelegramChatID(ctx, msg.Chat.ID)
+	if err != nil {
+		klog.Errorf("bot: get settings chat_id=%d: %v", msg.Chat.ID, err)
+		b.sendMessage(ctx, msg.Chat.ID, "Не удалось загрузить настройки. Попробуй ещё раз.")
+		return
+	}
+
+	text, keyboard := buildSettingsMessage(settings)
+	if err := b.tg.SendMessageWithKeyboard(ctx, msg.Chat.ID, text, keyboard); err != nil {
+		klog.Errorf("bot: send settings chat_id=%d: %v", msg.Chat.ID, err)
+	}
+}
+
+// ── Callback handler ──────────────────────────────────────────
+
 func (b *Bot) handleCallback(ctx context.Context, cb *telegramCallback) {
-	// Answer callback to remove loading indicator.
+	// Answer callback to remove the loading spinner.
 	_ = b.callAPI(ctx, "answerCallbackQuery", map[string]any{"callback_query_id": cb.ID})
 
 	parts := strings.SplitN(cb.Data, ":", 2)
@@ -170,10 +209,89 @@ func (b *Bot) handleCallback(ctx context.Context, cb *telegramCallback) {
 	}
 
 	switch parts[0] {
+	case "toggle":
+		b.handleToggle(ctx, cb, parts[1])
 	case "mute":
-		// mute:<circle_id> — mute circle notifications
 		klog.Infof("bot: mute circle %s for user %d", parts[1], cb.From.ID)
 	}
+}
+
+func (b *Bot) handleToggle(ctx context.Context, cb *telegramCallback, category string) {
+	if cb.Message == nil {
+		return
+	}
+	chatID := cb.Message.Chat.ID
+
+	settings, err := b.repo.GetSettingsByTelegramChatID(ctx, chatID)
+	if err != nil {
+		klog.Errorf("bot: toggle get settings chat_id=%d: %v", chatID, err)
+		return
+	}
+
+	switch category {
+	case "duels":
+		settings.DuelsEnabled = !settings.DuelsEnabled
+	case "progress":
+		settings.ProgressEnabled = !settings.ProgressEnabled
+	case "circles":
+		settings.CirclesEnabled = !settings.CirclesEnabled
+	case "daily":
+		settings.DailyChallengeEnabled = !settings.DailyChallengeEnabled
+	default:
+		return
+	}
+
+	if err := b.repo.UpsertUserSettings(ctx, settings); err != nil {
+		klog.Errorf("bot: toggle upsert settings chat_id=%d: %v", chatID, err)
+		return
+	}
+
+	text, keyboard := buildSettingsMessage(settings)
+	keyboardJSON, err := json.Marshal(keyboard)
+	if err != nil {
+		klog.Errorf("bot: marshal keyboard: %v", err)
+		return
+	}
+	_ = b.callAPI(ctx, "editMessageText", map[string]any{
+		"chat_id":      chatID,
+		"message_id":   cb.Message.MessageID,
+		"text":         text,
+		"parse_mode":   "HTML",
+		"reply_markup": string(keyboardJSON),
+	})
+}
+
+// ── Helpers ───────────────────────────────────────────────────
+
+func buildSettingsMessage(s *data.UserSettings) (string, telegram.InlineKeyboardMarkup) {
+	on := func(v bool) string {
+		if v {
+			return "✅"
+		}
+		return "❌"
+	}
+
+	text := "<b>Настройки уведомлений</b>\n\n" +
+		"Нажми на категорию, чтобы включить или отключить:\n\n" +
+		fmt.Sprintf("%s Дуэли — вызовы и результаты\n", on(s.DuelsEnabled)) +
+		fmt.Sprintf("%s Прогресс — стрики, уровни\n", on(s.ProgressEnabled)) +
+		fmt.Sprintf("%s Круги — активность в кругах\n", on(s.CirclesEnabled)) +
+		fmt.Sprintf("%s Daily — ежедневные задачи\n", on(s.DailyChallengeEnabled))
+
+	keyboard := telegram.InlineKeyboardMarkup{
+		InlineKeyboard: [][]telegram.InlineKeyboardButton{
+			{
+				{Text: on(s.DuelsEnabled) + " Дуэли", CallbackData: "toggle:duels"},
+				{Text: on(s.ProgressEnabled) + " Прогресс", CallbackData: "toggle:progress"},
+			},
+			{
+				{Text: on(s.CirclesEnabled) + " Круги", CallbackData: "toggle:circles"},
+				{Text: on(s.DailyChallengeEnabled) + " Daily", CallbackData: "toggle:daily"},
+			},
+		},
+	}
+
+	return text, keyboard
 }
 
 // ── Telegram API helpers ──────────────────────────────────────

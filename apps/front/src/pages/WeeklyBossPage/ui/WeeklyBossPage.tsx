@@ -92,7 +92,7 @@ export function WeeklyBossPage() {
   const weeklyTask = data?.weeklyTask
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 px-4 pt-4 pb-6 md:px-6">
       <PageMeta title={t('weeklyBoss.meta.title', 'Weekly Boss')} description={t('weeklyBoss.meta.desc', 'Weekly hard challenge with community leaderboard')} canonicalPath="/practice/weekly-boss" />
 
       {/* Header */}

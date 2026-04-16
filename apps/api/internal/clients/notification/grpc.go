@@ -117,6 +117,35 @@ func (a *GRPCAdapter) LinkTelegram(ctx context.Context, userID string, telegramI
 	}
 }
 
+// GetNotificationSettings fetches notification preferences for a user.
+func (a *GRPCAdapter) GetNotificationSettings(ctx context.Context, userID string) (*Settings, error) {
+	resp, err := a.client.GetSettings(ctx, &v1.GetSettingsRequest{UserId: userID})
+	if err != nil {
+		return nil, err
+	}
+	return &Settings{
+		DuelsEnabled:          resp.GetDuelsEnabled(),
+		ProgressEnabled:       resp.GetProgressEnabled(),
+		CirclesEnabled:        resp.GetCirclesEnabled(),
+		DailyChallengeEnabled: resp.GetDailyChallengeEnabled(),
+		QuietHoursStart:       resp.GetQuietHoursStart(),
+		QuietHoursEnd:         resp.GetQuietHoursEnd(),
+		Timezone:              resp.GetTimezone(),
+		TelegramLinked:        resp.GetTelegramChatId() != 0,
+	}, nil
+}
+
+// UpdateNotificationSettings applies partial setting changes for a user.
+func (a *GRPCAdapter) UpdateNotificationSettings(ctx context.Context, userID string, upd SettingsUpdate) error {
+	req := &v1.UpdateSettingsRequest{UserId: userID}
+	req.DuelsEnabled = upd.DuelsEnabled
+	req.ProgressEnabled = upd.ProgressEnabled
+	req.CirclesEnabled = upd.CirclesEnabled
+	req.DailyChallengeEnabled = upd.DailyChallengeEnabled
+	_, err := a.client.UpdateSettings(ctx, req)
+	return err
+}
+
 func toStruct(m map[string]any) (*structpb.Struct, error) {
 	if m == nil {
 		return nil, nil

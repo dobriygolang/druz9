@@ -72,7 +72,7 @@ export function BlindReviewPage() {
   }
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 px-4 pt-4 pb-6 md:px-6">
       <PageMeta title={t('blindReview.meta.title', 'Blind Review')} description={t('blindReview.meta.desc', 'Review anonymous code and get AI feedback')} canonicalPath="/practice/blind-review" />
 
       <div className="flex items-center justify-between">
