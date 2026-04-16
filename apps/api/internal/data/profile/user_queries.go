@@ -14,11 +14,13 @@ import (
 
 const userSelectColumns = `
   u.id,
+  COALESCE(u.telegram_id, 0),
   COALESCE(NULLIF(u.username, ''), ''),
   NULLIF(u.telegram_username, ''),
   NULLIF(u.first_name, ''),
   NULLIF(u.last_name, ''),
-  COALESCE(NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), ''),
+  COALESCE(NULLIF(u.yandex_avatar_url, ''), ''),
+  COALESCE(NULLIF(u.yandex_avatar_url, ''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, ''),
   NULLIF(u.current_workplace, ''),
   g.region,
   g.country,

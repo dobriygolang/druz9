@@ -315,6 +315,7 @@ services:
         condition: service_healthy
     environment:
       RUN_DB_MIGRATIONS: "true"
+      GOOSE_TABLE: notification_goose_db_version
       DATABASE_URL_FILE: /run/secrets/database_url
       TELEGRAM_BOT_TOKEN_FILE: /run/secrets/telegram_bot_token
       RTC_VALUES_PATH: /app/.platform/values.yaml

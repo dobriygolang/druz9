@@ -22,7 +22,7 @@ func (s *Service) BindTelegram(ctx context.Context, userID uuid.UUID, challengeT
 		Username:       payload.Username,
 		FirstName:      payload.FirstName,
 		LastName:       payload.LastName,
-		AvatarURL:      payload.PhotoURL,
+		AvatarURL:      normalizeAvatarURL(payload.PhotoURL),
 	})
 	if err != nil {
 		return nil, 0, err

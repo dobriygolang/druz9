@@ -15,7 +15,7 @@ SELECT
   g.region,
   g.latitude,
   g.longitude,
-  COALESCE(NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), ''),
+  COALESCE(NULLIF(u.yandex_avatar_url, ''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, ''),
   COALESCE(u.username, ''),
   COALESCE(u.first_name, ''),
   COALESCE(u.last_name, ''),

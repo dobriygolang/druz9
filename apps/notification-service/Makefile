@@ -2,6 +2,7 @@ VERSION=$(shell git describe --tags --always)
 DOCKER_GOOSE_IMAGE=golang:1.25
 GOCACHE_DIR ?= /tmp/notification-service-go-build
 GOLANGCI_LINT_CACHE_DIR ?= /tmp/notification-service-golangci-lint
+GOOSE_TABLE ?= notification_goose_db_version
 
 .PHONY: build
 # build
@@ -28,12 +29,12 @@ lint:
 .PHONY: migrate-up
 # apply goose migrations to local database
 migrate-up:
-	set -a && . ./.env && set +a && GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations postgres "$$DATABASE_URL" up
+	set -a && . ./.env && set +a && GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -table $(GOOSE_TABLE) -dir ./scripts/migrations postgres "$$DATABASE_URL" up
 
 .PHONY: migrate-down
 # rollback latest goose migration from local database
 migrate-down:
-	set -a && . ./.env && set +a && GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations postgres "$$DATABASE_URL" down
+	set -a && . ./.env && set +a && GOCACHE=$(GOCACHE_DIR) go run github.com/pressly/goose/v3/cmd/goose@latest -table $(GOOSE_TABLE) -dir ./scripts/migrations postgres "$$DATABASE_URL" down
 
 .PHONY: docker-migrate-up
 # apply goose migrations through docker network
@@ -44,7 +45,7 @@ docker-migrate-up:
 		-w /workspace \
 		-e DATABASE_URL="postgres://$$POSTGRES_USER:$$POSTGRES_PASSWORD@postgres:5432/$$POSTGRES_DB?sslmode=disable" \
 		$(DOCKER_GOOSE_IMAGE) \
-		sh -lc '/usr/local/go/bin/go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations postgres "$$DATABASE_URL" up'
+		sh -lc '/usr/local/go/bin/go run github.com/pressly/goose/v3/cmd/goose@latest -table $(GOOSE_TABLE) -dir ./scripts/migrations postgres "$$DATABASE_URL" up'
 
 .PHONY: docker-migrate-down
 # rollback latest goose migration through docker network
@@ -55,7 +56,7 @@ docker-migrate-down:
 		-w /workspace \
 		-e DATABASE_URL="postgres://$$POSTGRES_USER:$$POSTGRES_PASSWORD@postgres:5432/$$POSTGRES_DB?sslmode=disable" \
 		$(DOCKER_GOOSE_IMAGE) \
-		sh -lc '/usr/local/go/bin/go run github.com/pressly/goose/v3/cmd/goose@latest -dir ./scripts/migrations postgres "$$DATABASE_URL" down'
+		sh -lc '/usr/local/go/bin/go run github.com/pressly/goose/v3/cmd/goose@latest -table $(GOOSE_TABLE) -dir ./scripts/migrations postgres "$$DATABASE_URL" down'
 
 .PHONY: docker-up
 # start docker-compose locally and apply migrations

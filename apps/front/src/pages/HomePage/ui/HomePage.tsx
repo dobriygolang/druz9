@@ -36,7 +36,7 @@ function feedIcon(title: string): React.ElementType {
 type ArenaStats = { rating?: number; league?: string; currentWinStreak?: number }
 
 export function HomePage() {
-  const { t } = useTranslation()
+  const { t, i18n } = useTranslation()
   const { user } = useAuth()
   const [progress, setProgress]   = useState<ProfileProgress | null>(null)
   const [missions, setMissions]   = useState<DailyMissionsResponse | null>(null)

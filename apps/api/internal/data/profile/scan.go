@@ -18,7 +18,7 @@ func scanUser(scanner userScanner) (*model.User, error) {
 	var connectedProviders []string
 
 	if err := scanner.Scan(
-		&user.ID, &username, &telegramUsername, &firstName, &lastName, &avatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.IsTrusted, &connectedProviders, &primaryProvider, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &user.TelegramID, &username, &telegramUsername, &firstName, &lastName, &user.YandexAvatarURL, &avatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.IsTrusted, &connectedProviders, &primaryProvider, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
 	); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, profileerrors.ErrUserNotFound

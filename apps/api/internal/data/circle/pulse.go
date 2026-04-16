@@ -107,7 +107,7 @@ WITH members AS (
   SELECT s.user_id,
     COALESCE(NULLIF(u.first_name,''),'') AS first_name,
     COALESCE(NULLIF(u.last_name,''),'') AS last_name,
-    COALESCE(NULLIF(u.yandex_avatar_url,''), NULLIF(u.telegram_avatar_url,''), '') AS avatar_url,
+    COALESCE(NULLIF(u.yandex_avatar_url,''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, '') AS avatar_url,
     'daily' AS action_type,
     '' AS action_detail,
     COALESCE(s.finished_at, s.updated_at) AS happened_at
@@ -123,7 +123,7 @@ UNION ALL
   SELECT ap.user_id,
     COALESCE(NULLIF(u.first_name,''),'') AS first_name,
     COALESCE(NULLIF(u.last_name,''),'') AS last_name,
-    COALESCE(NULLIF(u.yandex_avatar_url,''), NULLIF(u.telegram_avatar_url,''), '') AS avatar_url,
+    COALESCE(NULLIF(u.yandex_avatar_url,''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, '') AS avatar_url,
     'duel' AS action_type,
     CASE WHEN ap.is_winner THEN 'won' ELSE 'played' END AS action_detail,
     am.finished_at AS happened_at
@@ -140,7 +140,7 @@ UNION ALL
   SELECT ms.user_id,
     COALESCE(NULLIF(u.first_name,''),'') AS first_name,
     COALESCE(NULLIF(u.last_name,''),'') AS last_name,
-    COALESCE(NULLIF(u.yandex_avatar_url,''), NULLIF(u.telegram_avatar_url,''), '') AS avatar_url,
+    COALESCE(NULLIF(u.yandex_avatar_url,''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, '') AS avatar_url,
     'mock' AS action_type,
     COALESCE(NULLIF(ms.started_via_alias, ''), b.slug, '') AS action_detail,
     ms.finished_at AS happened_at
@@ -181,7 +181,7 @@ SELECT
   cm.user_id,
   COALESCE(NULLIF(u.first_name,''),'') AS first_name,
   COALESCE(NULLIF(u.last_name,''),'') AS last_name,
-  COALESCE(NULLIF(u.yandex_avatar_url,''), NULLIF(u.telegram_avatar_url,''), '') AS avatar_url,
+  COALESCE(NULLIF(u.yandex_avatar_url,''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, '') AS avatar_url,
   cm.role,
   cm.joined_at,
   COALESCE(daily.solved, 0)::int4 AS daily_solved,
@@ -290,7 +290,7 @@ func (r *Repo) computeChallengeProgress(ctx context.Context, ch *model.CircleCha
 SELECT cm.user_id,
   COALESCE(NULLIF(u.first_name,''),''),
   COALESCE(NULLIF(u.last_name,''),''),
-  COALESCE(NULLIF(u.yandex_avatar_url,''), NULLIF(u.telegram_avatar_url,''), ''),
+  COALESCE(NULLIF(u.yandex_avatar_url,''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, ''),
   COUNT(s.id)::int4 AS current
 FROM circle_members cm
 JOIN users u ON u.id = cm.user_id
@@ -299,14 +299,14 @@ LEFT JOIN interview_practice_sessions s
   AND s.status = 'finished'
   AND COALESCE(s.finished_at, s.updated_at) BETWEEN $2 AND $3
 WHERE cm.circle_id = $1
-GROUP BY cm.user_id, u.first_name, u.last_name, u.yandex_avatar_url, u.telegram_avatar_url
+GROUP BY cm.user_id, u.id, u.first_name, u.last_name, u.yandex_avatar_url, u.telegram_id
 ORDER BY current DESC`
 	case "duels_count":
 		query = `
 SELECT cm.user_id,
   COALESCE(NULLIF(u.first_name,''),''),
   COALESCE(NULLIF(u.last_name,''),''),
-  COALESCE(NULLIF(u.yandex_avatar_url,''), NULLIF(u.telegram_avatar_url,''), ''),
+  COALESCE(NULLIF(u.yandex_avatar_url,''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, ''),
   COUNT(ap.match_id)::int4 AS current
 FROM circle_members cm
 JOIN users u ON u.id = cm.user_id
@@ -314,14 +314,14 @@ LEFT JOIN arena_match_players ap ON ap.user_id = cm.user_id
 LEFT JOIN arena_matches am ON am.id = ap.match_id AND am.status = 3
   AND am.finished_at BETWEEN $2 AND $3
 WHERE cm.circle_id = $1
-GROUP BY cm.user_id, u.first_name, u.last_name, u.yandex_avatar_url, u.telegram_avatar_url
+GROUP BY cm.user_id, u.id, u.first_name, u.last_name, u.yandex_avatar_url, u.telegram_id
 ORDER BY current DESC`
 	case "mocks_count":
 		query = `
 SELECT cm.user_id,
   COALESCE(NULLIF(u.first_name,''),''),
   COALESCE(NULLIF(u.last_name,''),''),
-  COALESCE(NULLIF(u.yandex_avatar_url,''), NULLIF(u.telegram_avatar_url,''), ''),
+  COALESCE(NULLIF(u.yandex_avatar_url,''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, ''),
   COUNT(ms.id)::int4 AS current
 FROM circle_members cm
 JOIN users u ON u.id = cm.user_id
@@ -330,14 +330,14 @@ LEFT JOIN interview_mock_sessions ms
   AND ms.status = 'finished'
   AND ms.finished_at BETWEEN $2 AND $3
 WHERE cm.circle_id = $1
-GROUP BY cm.user_id, u.first_name, u.last_name, u.yandex_avatar_url, u.telegram_avatar_url
+GROUP BY cm.user_id, u.id, u.first_name, u.last_name, u.yandex_avatar_url, u.telegram_id
 ORDER BY current DESC`
 	case "streak_days":
 		query = `
 SELECT cm.user_id,
   COALESCE(NULLIF(u.first_name,''),''),
   COALESCE(NULLIF(u.last_name,''),''),
-  COALESCE(NULLIF(u.yandex_avatar_url,''), NULLIF(u.telegram_avatar_url,''), ''),
+  COALESCE(NULLIF(u.yandex_avatar_url,''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, ''),
   COUNT(DISTINCT DATE(COALESCE(s.finished_at, s.updated_at) AT TIME ZONE 'UTC'))::int4 AS current
 FROM circle_members cm
 JOIN users u ON u.id = cm.user_id
@@ -346,7 +346,7 @@ LEFT JOIN interview_practice_sessions s
   AND s.status = 'finished'
   AND COALESCE(s.finished_at, s.updated_at) BETWEEN $2 AND $3
 WHERE cm.circle_id = $1
-GROUP BY cm.user_id, u.first_name, u.last_name, u.yandex_avatar_url, u.telegram_avatar_url
+GROUP BY cm.user_id, u.id, u.first_name, u.last_name, u.yandex_avatar_url, u.telegram_id
 ORDER BY current DESC`
 	default:
 		return nil, fmt.Errorf("unknown challenge template: %s", ch.TemplateKey)

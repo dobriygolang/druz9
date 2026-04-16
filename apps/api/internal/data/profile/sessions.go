@@ -82,7 +82,7 @@ WHERE s.token_hash = $1
 
 	err := r.data.DB.QueryRow(ctx, query, tokenHash).Scan(
 		&session.ID, &session.UserID, &session.TokenHash, &session.LastSeenAt, &session.ExpiresAt,
-		&user.ID, &username, &telegramUsername, &firstName, &lastName, &avatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.IsTrusted, &connectedProviders, &primaryProvider, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
+		&user.ID, &user.TelegramID, &username, &telegramUsername, &firstName, &lastName, &user.YandexAvatarURL, &avatarURL, &currentWorkplace, &region, &country, &city, &latitude, &longitude, &user.Status, &user.IsAdmin, &user.IsTrusted, &connectedProviders, &primaryProvider, &user.LastActiveAt, &user.CreatedAt, &user.UpdatedAt,
 	)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {

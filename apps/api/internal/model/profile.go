@@ -78,11 +78,13 @@ func UserStatusFromString(str string) UserStatus {
 
 type User struct {
 	ID                 uuid.UUID
+	TelegramID         int64
 	Username           string
 	TelegramUsername   string
 	FirstName          string
 	LastName           string
 	AvatarURL          string
+	YandexAvatarURL    string
 	CurrentWorkplace   string
 	Region             string
 	Geo                UserGeo
@@ -90,12 +92,12 @@ type User struct {
 	ActivityStatus     UserActivityStatus
 	IsAdmin            bool
 	IsTrusted          bool
-	ConnectedProviders   []string
-	PrimaryProvider      string
-	PinnedAchievements   []string
-	LastActiveAt         time.Time
-	CreatedAt            time.Time
-	UpdatedAt            time.Time
+	ConnectedProviders []string
+	PrimaryProvider    string
+	PinnedAchievements []string
+	LastActiveAt       time.Time
+	CreatedAt          time.Time
+	UpdatedAt          time.Time
 }
 
 type UserGeo struct {

@@ -20,6 +20,7 @@ file_env() {
 
 file_env DATABASE_URL
 RUN_DB_MIGRATIONS="${RUN_DB_MIGRATIONS:-true}"
+GOOSE_TABLE="${GOOSE_TABLE:-notification_goose_db_version}"
 
 echo "Waiting for PostgreSQL to be ready..."
 until psql "$DATABASE_URL" -c "\q" >/dev/null 2>&1; do
@@ -30,8 +31,8 @@ done
 echo "✓ PostgreSQL is ready"
 
 if [[ "$RUN_DB_MIGRATIONS" == "true" ]]; then
-  echo "Running goose migrations..."
-  goose -dir /app/scripts/migrations postgres "$DATABASE_URL" up
+  echo "Running goose migrations (table: ${GOOSE_TABLE})..."
+  goose -table "$GOOSE_TABLE" -dir /app/scripts/migrations postgres "$DATABASE_URL" up
 fi
 
 echo "Starting application..."

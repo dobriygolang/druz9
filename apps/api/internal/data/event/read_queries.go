@@ -279,7 +279,7 @@ SELECT
   ep.event_id::text,
   ep.user_id::text,
   COALESCE(NULLIF(TRIM(CONCAT_WS(' ', pu.first_name, pu.last_name)), ''), NULLIF(pu.username, ''), ''),
-  COALESCE(NULLIF(pu.yandex_avatar_url, ''), NULLIF(pu.telegram_avatar_url, ''), ''),
+  COALESCE(NULLIF(pu.yandex_avatar_url, ''), CASE WHEN pu.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || pu.id::text END, ''),
   COALESCE(pu.telegram_username, ''),
   COALESCE(pu.first_name, ''),
   COALESCE(pu.last_name, ''),

@@ -153,6 +153,31 @@ func registerManualHTTPRoutes(
 		return nil
 	})
 
+	// GET /api/v1/profile/avatar/{user_id} — serve a fresh Telegram avatar without exposing bot file URLs.
+	r.GET("/api/v1/profile/avatar/{user_id}", func(ctx kratoshttp.Context) error {
+		req := ctx.Request()
+		userID, err := uuid.Parse(server.PathSegment(req.URL.Path, "avatar", 1))
+		if err != nil {
+			ctx.Response().WriteHeader(http.StatusBadRequest)
+			return nil
+		}
+
+		body, contentType, err := services.profileServiceDomain.FetchTelegramAvatar(req.Context(), userID)
+		if err != nil {
+			ctx.Response().WriteHeader(http.StatusNotFound)
+			return nil
+		}
+
+		if contentType == "" {
+			contentType = "image/jpeg"
+		}
+		ctx.Response().Header().Set("Content-Type", contentType)
+		ctx.Response().Header().Set("Cache-Control", "private, max-age=300")
+		ctx.Response().WriteHeader(http.StatusOK)
+		_, _ = ctx.Response().Write(body)
+		return nil
+	})
+
 	registerMissionRoutes(r, auth, services)
 	registerChallengeRoutes(r, auth, services)
 	registerNotificationRoutes(r, auth, services)
@@ -432,23 +457,8 @@ func registerNotificationRoutes(
 		}
 		settings, err := notif.GetNotificationSettings(req.Context(), userID.String())
 		if err != nil {
-			settings = &notifclient.Settings{
-				DuelsEnabled:          true,
-				ProgressEnabled:       true,
-				CirclesEnabled:        true,
-				DailyChallengeEnabled: false,
-				QuietHoursStart:       23,
-				QuietHoursEnd:         8,
-				Timezone:              "Europe/Moscow",
-			}
-			if user, userErr := services.profileServiceDomain.FindUserByID(req.Context(), *userID); userErr == nil && user != nil {
-				for _, provider := range user.ConnectedProviders {
-					if provider == "telegram" {
-						settings.TelegramLinked = true
-						break
-					}
-				}
-			}
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			return nil
 		}
 		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{
 			"duelsEnabled":          settings.DuelsEnabled,
@@ -488,7 +498,7 @@ func registerNotificationRoutes(
 			DailyChallengeEnabled: body.DailyChallengeEnabled,
 		}
 		if err := notif.UpdateNotificationSettings(req.Context(), userID.String(), upd); err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusServiceUnavailable, map[string]string{"error": "notification_service_unavailable"})
+			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
 			return nil
 		}
 		ctx.Response().WriteHeader(http.StatusNoContent)

@@ -94,7 +94,7 @@ SELECT
   u.id,
   COALESCE(NULLIF(u.first_name, ''), '') AS first_name,
   COALESCE(NULLIF(u.last_name, ''), '') AS last_name,
-  COALESCE(NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), '') AS avatar_url,
+  COALESCE(NULLIF(u.yandex_avatar_url, ''), CASE WHEN u.telegram_id IS NOT NULL THEN '/api/v1/profile/avatar/' || u.id::text END, '') AS avatar_url,
   cm.role,
   cm.joined_at
 FROM circle_members cm

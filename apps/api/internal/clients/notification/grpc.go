@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"time"
 
 	v1 "api/pkg/api/notification/v1"
 
@@ -21,7 +22,15 @@ type GRPCAdapter struct {
 
 // NewGRPCAdapter creates a gRPC adapter to the notification service.
 func NewGRPCAdapter(addr string) (*GRPCAdapter, error) {
-	conn, err := grpc.NewClient(addr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	conn, err := grpc.DialContext(
+		ctx,
+		addr,
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+		grpc.WithBlock(),
+	)
 	if err != nil {
 		return nil, fmt.Errorf("connect notification service: %w", err)
 	}

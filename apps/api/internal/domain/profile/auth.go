@@ -23,7 +23,7 @@ func (s *Service) TelegramAuth(ctx context.Context, challengeToken, loginCode st
 		Username:       payload.Username,
 		FirstName:      payload.FirstName,
 		LastName:       payload.LastName,
-		AvatarURL:      payload.PhotoURL,
+		AvatarURL:      normalizeAvatarURL(payload.PhotoURL),
 	})
 	if err != nil {
 		return nil, "", time.Time{}, 0, err

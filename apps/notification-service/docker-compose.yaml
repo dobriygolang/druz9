@@ -27,6 +27,7 @@ services:
       - .env
     environment:
       DATABASE_URL: postgres://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-postgres}@postgres:5432/${POSTGRES_DB:-notification_service}?sslmode=disable
+      GOOSE_TABLE: ${GOOSE_TABLE:-notification_goose_db_version}
     depends_on:
       postgres:
         condition: service_healthy
