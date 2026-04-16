@@ -104,7 +104,7 @@ type ArenaStats = { rating?: number; league?: string; currentWinStreak?: number 
    ═══════════════════════════════════════════════════════ */
 
 export function HomePage() {
-  const { t, i18n } = useTranslation()
+  const { t } = useTranslation()
   const { user } = useAuth()
   const navigate = useNavigate()
   const sceneRef = useRef<HTMLDivElement>(null)

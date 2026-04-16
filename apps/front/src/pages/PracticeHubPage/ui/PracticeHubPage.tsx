@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Outlet, useLocation, useNavigate, Link } from 'react-router-dom'
+import { Outlet, useLocation, Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Avatar } from '@/shared/ui/Avatar'
 import { apiClient } from '@/shared/api/base'
@@ -150,8 +150,6 @@ interface LeaderboardUser {
 export function PracticeHubPage() {
   const { t } = useTranslation()
   const location = useLocation()
-  const navigate = useNavigate()
-
   const [leaders, setLeaders] = useState<LeaderboardUser[]>([])
 
   useEffect(() => {

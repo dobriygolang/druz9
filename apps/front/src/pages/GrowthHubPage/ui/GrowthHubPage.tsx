@@ -3,7 +3,6 @@ import { useTranslation } from 'react-i18next'
 import { Sprite } from '@/shared/ui/Sprite'
 import {
   LANTERN_P, LANTERN_D, NPC_P, NPC_D, PLAYER_P, PLAYER_D,
-  PORTAL_P, PORTAL_D, BARREL_P, BARREL_D,
 } from '@/shared/lib/sprites'
 import { PageMeta } from '@/shared/ui/PageMeta'
 import './academy-scene.css'

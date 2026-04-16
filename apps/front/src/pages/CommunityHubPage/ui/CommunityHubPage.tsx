@@ -139,7 +139,7 @@ const FPLACE_D = [
 export function CommunityHubPage() {
   const { t } = useTranslation()
   const location = useLocation()
-  const [search, setSearch] = useState('')
+  const [search] = useState('')
   const [openCreateEvent, setOpenCreateEvent] = useState(false)
 
   const isSubPage = location.pathname !== '/community' && location.pathname !== '/community/'
