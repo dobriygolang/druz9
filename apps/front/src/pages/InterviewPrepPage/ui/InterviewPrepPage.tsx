@@ -17,6 +17,7 @@ import { useIsMobile } from '@/shared/hooks/useIsMobile'
 import { useToast } from '@/shared/ui/Toast'
 import { PREP_TYPE_LABELS } from '@/shared/lib/taskLabels'
 import { PageMeta } from '@/shared/ui/PageMeta'
+import { PixelHeroScene } from '@/shared/ui/PixelHeroScene'
 
 /* ── Constants ─────────────────────────────────────────────────────── */
 
@@ -248,6 +249,7 @@ export function InterviewPrepPage() {
   return (
     <div className={isMobile ? 'px-4 pt-4 pb-24 flex flex-col gap-5' : 'px-4 md:px-6 pt-4 pb-6 flex flex-col gap-6'}>
       <PageMeta title={t('interviewPrep.meta.title')} description={t('interviewPrep.meta.description')} canonicalPath="/prepare/interview-prep" />
+      <PixelHeroScene scene="prepare" className="hidden md:block -mx-4 md:-mx-6 -mt-4 mb-1" />
 
       {/* ── Header ─────────────────────────────────────────── */}
       <section className="section-enter flex items-center justify-between gap-4">

@@ -5,6 +5,7 @@ import { useAuth } from '@/app/providers/AuthProvider'
 import { useNavigate } from 'react-router-dom'
 import { Spinner } from '@/shared/ui/Spinner'
 import { PixelGardener } from '@/shared/ui/PixelGardener'
+import { PixelHeroScene } from '@/shared/ui/PixelHeroScene'
 import { Swords, Code2, BookOpen, Calendar, Flame, ArrowLeft } from 'lucide-react'
 
 /* ── Brand mark (network graph) ───────────────────────────── */
@@ -129,19 +130,13 @@ export function LoginPage() {
   }
 
   return (
-    <div className="relative flex min-h-screen items-start justify-center overflow-hidden bg-[#F0F5F1] dark:bg-[#0B1210] px-4 py-6 sm:items-center sm:py-0">
+    <div className="relative flex min-h-screen flex-col items-center overflow-hidden bg-[#F0F5F1] dark:bg-[#0B1210]">
 
-      {/* Ambient glows — breathing animation */}
-      <div className="absolute -top-32 -right-32 w-[520px] h-[520px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(5,150,105,0.12) 0%, transparent 65%)', animation: 'glow-breathe 6s ease-in-out infinite' }} />
-      <div className="absolute -bottom-32 -left-32 w-[440px] h-[440px] rounded-full pointer-events-none"
-        style={{ background: 'radial-gradient(circle, rgba(13,148,136,0.08) 0%, transparent 60%)', animation: 'glow-breathe 8s ease-in-out infinite 2s' }} />
-
-      {/* Leaf pattern instead of dots */}
-      <LeafPattern />
+      {/* Full-width pixel garden scene at top */}
+      <PixelHeroScene scene="home" className="w-full !h-[160px] sm:!h-[200px]" />
 
       {/* Main content — mascot + card */}
-      <div className="relative z-10 flex items-center gap-8 w-full max-w-[640px]">
+      <div className="relative z-10 flex items-center gap-8 w-full max-w-[640px] px-4 py-6 sm:py-8">
 
         {/* Pixel gardener mascot — desktop only */}
         <div className="hidden md:flex flex-col items-center gap-3 flex-shrink-0">

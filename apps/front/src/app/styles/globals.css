@@ -663,6 +663,157 @@
   animation: torch-flicker 0.4s ease-in-out infinite;
 }
 
+/* ─── Game panel system ────────────────────────────────────────────────── */
+
+/* Base game panel — semi-transparent, integrated into world */
+.panel-game {
+  background: rgba(240, 245, 241, 0.55);
+  border: 1px solid rgba(193, 207, 196, 0.45);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 8px rgba(0,0,0,0.04);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.dark .panel-game {
+  background: rgba(19, 36, 32, 0.45);
+  border-color: rgba(30, 64, 53, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 2px 12px rgba(0,0,0,0.15);
+}
+
+/* Hero panel — character + stats, gradient integrated */
+.panel-hero {
+  background: linear-gradient(135deg, rgba(5,150,105,0.12) 0%, rgba(13,148,136,0.08) 50%, rgba(240,245,241,0.5) 100%);
+  border: 1px solid rgba(5,150,105,0.2);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.12), 0 4px 16px rgba(5,150,105,0.08);
+  backdrop-filter: blur(10px);
+  border-radius: 14px;
+}
+.dark .panel-hero {
+  background: linear-gradient(135deg, rgba(5,150,105,0.15) 0%, rgba(13,148,136,0.1) 50%, rgba(19,36,32,0.5) 100%);
+  border-color: rgba(52,211,153,0.15);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.04), 0 4px 20px rgba(5,150,105,0.1);
+}
+
+/* Quest board — parchment-like, warm tint */
+.panel-quest {
+  background: rgba(242, 238, 230, 0.6);
+  border: 1px solid rgba(184, 168, 152, 0.4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2), 0 2px 8px rgba(139,115,85,0.06);
+  backdrop-filter: blur(8px);
+  border-radius: 12px;
+}
+.dark .panel-quest {
+  background: rgba(42, 48, 40, 0.5);
+  border-color: rgba(90, 74, 58, 0.3);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 2px 12px rgba(0,0,0,0.12);
+}
+
+/* Activity log — recessed, darker */
+.panel-log {
+  background: rgba(230, 240, 232, 0.4);
+  border: 1px solid rgba(193, 207, 196, 0.35);
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.04);
+  backdrop-filter: blur(6px);
+  border-radius: 12px;
+}
+.dark .panel-log {
+  background: rgba(11, 18, 16, 0.5);
+  border-color: rgba(30, 64, 53, 0.3);
+  box-shadow: inset 0 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Boss challenge — dramatic amber glow */
+.panel-boss {
+  background: rgba(240, 245, 241, 0.55);
+  border: 1px solid rgba(251, 191, 36, 0.35);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 0 20px rgba(251,191,36,0.06), 0 2px 8px rgba(0,0,0,0.04);
+  backdrop-filter: blur(10px);
+  border-radius: 12px;
+}
+.dark .panel-boss {
+  background: rgba(42, 32, 10, 0.4);
+  border-color: rgba(251, 191, 36, 0.25);
+  box-shadow: inset 0 1px 0 rgba(251,191,36,0.08), 0 0 24px rgba(251,191,36,0.08), 0 2px 12px rgba(0,0,0,0.15);
+}
+
+/* Quest item — individual mission row */
+.quest-item {
+  background: rgba(255,255,255,0.35);
+  border: 1px solid rgba(193, 207, 196, 0.3);
+  border-radius: 8px;
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
+}
+.quest-item:hover {
+  background: rgba(255,255,255,0.5);
+  border-color: rgba(5, 150, 105, 0.3);
+}
+.quest-item.is-done {
+  background: rgba(5, 150, 105, 0.08);
+  border-color: rgba(5, 150, 105, 0.2);
+}
+.dark .quest-item {
+  background: rgba(19, 36, 32, 0.35);
+  border-color: rgba(30, 64, 53, 0.3);
+}
+.dark .quest-item:hover {
+  background: rgba(19, 36, 32, 0.55);
+  border-color: rgba(52, 211, 153, 0.25);
+}
+.dark .quest-item.is-done {
+  background: rgba(5, 150, 105, 0.1);
+  border-color: rgba(52, 211, 153, 0.15);
+}
+
+/* Nav tile — quick navigation */
+.nav-tile {
+  background: rgba(240, 245, 241, 0.5);
+  border: 1px solid rgba(193, 207, 196, 0.4);
+  border-radius: 10px;
+  backdrop-filter: blur(6px);
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease;
+}
+.nav-tile:hover {
+  transform: translateY(-2px);
+  background: rgba(240, 245, 241, 0.7);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.dark .nav-tile {
+  background: rgba(19, 36, 32, 0.4);
+  border-color: rgba(30, 64, 53, 0.35);
+}
+.dark .nav-tile:hover {
+  background: rgba(19, 36, 32, 0.6);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+}
+
+/* XP progress bar — segmented pixel style */
+.xp-bar {
+  display: flex;
+  gap: 2px;
+  height: 10px;
+}
+.xp-bar-segment {
+  flex: 1;
+  background: rgba(193, 207, 196, 0.4);
+  transition: background 0.3s ease;
+}
+.xp-bar-segment.filled {
+  background: #059669;
+}
+.dark .xp-bar-segment {
+  background: rgba(30, 64, 53, 0.5);
+}
+.dark .xp-bar-segment.filled {
+  background: #34D399;
+}
+
+/* Subtle page grain texture */
+.bg-grain {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.015'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 200px 200px;
+}
+
 /* ─── Game UI styles ───────────────────────────────────────────────────── */
 .font-pixel {
   font-family: 'Press Start 2P', monospace;

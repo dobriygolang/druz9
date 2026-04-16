@@ -7,7 +7,7 @@ export function PixelSidebarScene({ compact }: { compact?: boolean }) {
   const px = compact ? 3 : 4
 
   return (
-    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none" aria-hidden="true">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none select-none opacity-60" aria-hidden="true">
       {/* Sky gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-[#87CEEB]/20 via-transparent to-transparent dark:from-[#0D4A3B]/30" />
 

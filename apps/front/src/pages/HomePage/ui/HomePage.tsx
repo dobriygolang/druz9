@@ -1,8 +1,8 @@
-import { useEffect, useState, useCallback } from 'react'
+import { useEffect, useState, useCallback, useMemo } from 'react'
 import {
   Flame, ChevronRight, Target, Calendar, Briefcase, Headphones, Map,
   Swords, GraduationCap, Code2, Send, BookOpen, Trophy, Award, CheckCircle2,
-  Crown, Clock,
+  Crown, Clock, ArrowRight,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -11,10 +11,8 @@ import { authApi } from '@/features/Auth/api/authApi'
 import { missionApi } from '@/features/Mission/api/missionApi'
 import { arenaApi } from '@/features/Arena/api/arenaApi'
 import { apiClient } from '@/shared/api/base'
-import { Card } from '@/shared/ui/Card'
 import { PlayerFrame } from '@/shared/ui/PlayerFrame'
 import { PixelGardener } from '@/shared/ui/PixelGardener'
-import { PixelHeroScene } from '@/shared/ui/PixelHeroScene'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { PageMeta } from '@/shared/ui/PageMeta'
 import type { ProfileProgress, FeedItem, NextAction } from '@/entities/User/model/types'
@@ -45,7 +43,7 @@ export function HomePage() {
       authApi.getProfileProgress(user.id).then(p => setProgress(p)),
       missionApi.getDailyMissions().then(m => setMissions(m)).catch(() => {}),
       arenaApi.getPlayerStats(user.id).then(s => { if (s) setArenaStats(s) }),
-      authApi.getProfileFeed(user.id).then(f => setFeed(f.slice(0, 7))).catch(() => {}),
+      authApi.getProfileFeed(user.id).then(f => setFeed(f.slice(0, 5))).catch(() => {}),
       apiClient.get('/api/v1/challenges/weekly').then(r => setWeeklyBoss(r.data)).catch(() => {}),
     ]).catch(() => setError(t('common.loadFailed')))
   }, [user?.id, t])
@@ -59,271 +57,271 @@ export function HomePage() {
   const ov = progress?.overview
   const league = arenaStats?.league ?? ''
   const leagueLabel = LEAGUE_LABELS[league] ?? ''
+  const levelProgress = ov?.levelProgress ?? 0
+  const xpSegments = 10
+
+  // Best next action for hero CTA
+  const primaryAction = progress?.nextActions?.[0]
 
   return (
-    <div className="flex min-h-full flex-col gap-4 px-4 pb-6 pt-4 md:gap-6 md:p-8">
+    <div className="flex min-h-full flex-col gap-5 px-4 pb-6 pt-4 md:gap-6 md:px-8 md:py-6">
       <PageMeta title={t('home.meta.title')} description={t('home.meta.description')} canonicalPath="/home" />
 
-      {/* ── Pixel Hero Scene ───────────────────────────────────────── */}
-      <PixelHeroScene scene="home" className="section-enter -mx-4 -mt-4 md:-mx-8 md:-mt-8 mb-2" />
-
-      {/* ── Player Card Strip ────────────────────────────────────────── */}
-      <section className="section-enter card-notch border border-[#C1CFC4] bg-white p-4 dark:border-[#1E4035] dark:bg-[#132420] md:p-5">
-        <div className="flex items-center gap-4">
-          <Link to="/profile" className="flex-shrink-0">
-            <PlayerFrame
-              name={firstName}
-              src={user?.avatarUrl || undefined}
-              league={LEAGUE_FRAME_NAMES[league]}
-              size="lg"
+      {/* ═══ HERO PANEL ═══════════════════════════════════════════════ */}
+      <section className="panel-hero section-enter p-4 md:p-5">
+        <div className="flex items-start gap-4 md:gap-5">
+          {/* Gardener + avatar */}
+          <div className="flex flex-col items-center gap-2 flex-shrink-0">
+            <Link to="/profile">
+              <PlayerFrame
+                name={firstName}
+                src={user?.avatarUrl || undefined}
+                league={LEAGUE_FRAME_NAMES[league]}
+                size="lg"
+              />
+            </Link>
+            <PixelGardener
+              mood={(ov?.currentStreakDays ?? 0) > 0 ? 'watering' : 'idle'}
+              size={40}
+              className="hidden md:block"
             />
-          </Link>
+          </div>
 
+          {/* Stats column */}
           <div className="min-w-0 flex-1">
-            <div className="flex items-center gap-2">
-              <span className="font-mono text-sm font-bold text-[#111111] dark:text-[#E2F0E8]">
-                Lv.{ov?.level ?? 0}
+            {/* Name + level */}
+            <div className="flex items-center gap-2 mb-1">
+              <span className="font-pixel text-[9px] text-[#059669] dark:text-[#34D399]">
+                LV.{ov?.level ?? 0}
               </span>
-              <div className="h-2 flex-1 max-w-[160px] rounded-full bg-[#E4EBE5] dark:bg-[#1E4035]">
-                <div
-                  className="h-2 rounded-full bg-[#059669] transition-all duration-500"
-                  style={{ width: `${(ov?.levelProgress ?? 0) * 100}%` }}
-                />
+              <span className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8] truncate">
+                {firstName}
+              </span>
+            </div>
+
+            {/* XP bar — segmented pixel style */}
+            <div className="flex items-center gap-2 mb-2">
+              <div className="xp-bar flex-1 max-w-[200px]">
+                {Array.from({ length: xpSegments }, (_, i) => (
+                  <div
+                    key={i}
+                    className={`xp-bar-segment ${i / xpSegments < levelProgress ? 'filled' : ''}`}
+                  />
+                ))}
               </div>
-              <span className="text-[11px] tabular-nums text-[#7A9982] dark:text-[#7BA88A]">
+              <span className="font-mono text-[10px] font-bold tabular-nums text-[#059669] dark:text-[#34D399]">
                 {ov?.totalXp ?? 0} XP
               </span>
             </div>
 
-            <div className="mt-1.5 flex flex-wrap items-center gap-x-3 gap-y-1">
+            {/* Stat chips */}
+            <div className="flex flex-wrap items-center gap-2">
               {(ov?.currentStreakDays ?? 0) > 0 && (
-                <span className="inline-flex items-center gap-1 text-xs font-semibold text-[#92400e] dark:text-[#fbbf24]">
-                  <Flame className="h-3.5 w-3.5 text-[#f59e0b]" />
-                  {ov?.currentStreakDays}d
+                <span className="inline-flex items-center gap-1 rounded-lg bg-[#f59e0b]/10 px-2 py-0.5 text-[10px] font-bold text-[#92400e] dark:bg-[#f59e0b]/15 dark:text-[#fbbf24]">
+                  <Flame className="h-3 w-3" />
+                  {ov?.currentStreakDays}d streak
                 </span>
               )}
               {leagueLabel && (
-                <span className="inline-flex items-center gap-1.5 text-xs font-medium text-[#4B6B52] dark:text-[#94a3b8]">
-                  <span className={`h-2 w-2 rounded-full ${LEAGUE_BG_COLORS[league] ?? 'bg-[#94a3b8]'}`} />
-                  {leagueLabel}
-                  {arenaStats?.rating ? ` ${arenaStats.rating}` : ''}
+                <span className="inline-flex items-center gap-1 rounded-lg bg-white/40 px-2 py-0.5 text-[10px] font-medium text-[#4B6B52] dark:bg-white/5 dark:text-[#7BA88A]">
+                  <span className={`h-1.5 w-1.5 rounded-full ${LEAGUE_BG_COLORS[league] ?? 'bg-[#7A9982]'}`} />
+                  {leagueLabel}{arenaStats?.rating ? ` ${arenaStats.rating}` : ''}
                 </span>
               )}
             </div>
-          </div>
 
-          {/* Pixel gardener greeting — desktop */}
-          <div className="hidden md:flex flex-shrink-0 items-end">
-            <PixelGardener mood={(ov?.currentStreakDays ?? 0) > 0 ? 'watering' : 'idle'} size={48} />
+            {/* Primary CTA */}
+            {primaryAction && (
+              <Link
+                to={primaryAction.actionUrl}
+                className="mt-3 inline-flex items-center gap-2 btn-wood !text-[8px] !py-2 !px-4"
+              >
+                {t('home.hero.continue', 'Continue')}
+                <ArrowRight className="h-3 w-3" />
+              </Link>
+            )}
           </div>
         </div>
       </section>
 
-      {/* ── Daily Missions ───────────────────────────────────────────── */}
-      <section className="section-enter">
+      {/* ═══ QUEST BOARD — Daily Missions ═════════════════════════════ */}
+      <section className="panel-quest section-enter p-4 md:p-5">
         <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
+          <h2 className="font-pixel text-[8px] text-[#5A4A3A] dark:text-[#C1D9CA] tracking-wider uppercase">
             {t('home.missions.title', 'Daily Missions')}
           </h2>
           {missions && (
-            <span className="text-xs tabular-nums text-[#7A9982] dark:text-[#7BA88A]">
+            <span className="font-mono text-[11px] font-bold tabular-nums text-[#059669] dark:text-[#34D399]">
               {missions.completedCount}/{missions.missions.length}
             </span>
           )}
         </div>
 
         <div className="flex flex-col gap-2">
-          {missions?.missions.map((mission) => (
-            <MissionRow key={mission.key} mission={mission} />
-          )) ?? (
-            // Skeleton
+          {missions?.missions.map((mission) => {
+            const Icon = MISSION_ICONS[mission.icon] ?? Target
+            const prog = mission.targetValue > 1
+              ? `${Math.min(mission.current, mission.targetValue)}/${mission.targetValue}`
+              : undefined
+
+            return (
+              <div
+                key={mission.key}
+                className={`quest-item flex items-center gap-3 px-3 py-2.5 ${mission.completed ? 'is-done' : ''}`}
+              >
+                <div className={`flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-lg ${
+                  mission.completed
+                    ? 'bg-[#059669]/15 dark:bg-[#059669]/20'
+                    : 'bg-white/40 dark:bg-white/5'
+                }`}>
+                  {mission.completed ? (
+                    <CheckCircle2 className="h-3.5 w-3.5 text-[#059669] dark:text-[#34D399]" />
+                  ) : (
+                    <Icon className="h-3.5 w-3.5 text-[#7A9982] dark:text-[#7BA88A]" />
+                  )}
+                </div>
+
+                <div className="min-w-0 flex-1">
+                  <p className={`text-xs font-medium leading-tight ${
+                    mission.completed
+                      ? 'text-[#059669] dark:text-[#34D399] line-through decoration-[#059669]/30'
+                      : 'text-[#111111] dark:text-[#E2F0E8]'
+                  }`}>
+                    {mission.title}
+                  </p>
+                  {prog && !mission.completed && (
+                    <p className="text-[10px] tabular-nums text-[#7A9982] dark:text-[#7BA88A]">{prog}</p>
+                  )}
+                </div>
+
+                <span className="flex-shrink-0 font-mono text-[10px] font-bold tabular-nums text-[#059669] dark:text-[#34D399]">
+                  +{mission.xpReward}
+                </span>
+
+                {!mission.completed && (
+                  <Link to={mission.actionUrl} className="flex-shrink-0 btn-wood !py-1 !px-2.5 !text-[7px]">
+                    GO
+                  </Link>
+                )}
+              </div>
+            )
+          }) ?? (
             Array.from({ length: 3 }).map((_, i) => (
-              <div key={i} className="h-14 animate-pulse rounded-xl bg-[#F0F5F1] dark:bg-[#162E24]" />
+              <div key={i} className="quest-item h-12 animate-pulse" />
             ))
           )}
         </div>
 
         {missions?.allComplete && (
-          <div className="mt-2 flex items-center gap-2 rounded-xl border border-[#059669]/20 bg-[#ecfdf5] px-3 py-2 dark:border-[#059669]/15 dark:bg-[#0d2a1f]">
-            <CheckCircle2 className="h-4 w-4 text-[#059669]" />
-            <span className="text-xs font-semibold text-[#059669]">
+          <div className="mt-3 flex items-center gap-2 rounded-lg bg-[#059669]/10 px-3 py-2 dark:bg-[#059669]/15">
+            <CheckCircle2 className="h-3.5 w-3.5 text-[#059669] dark:text-[#34D399]" />
+            <span className="font-pixel text-[7px] text-[#059669] dark:text-[#34D399]">
               {t('home.missions.allDone', 'All done! +{{xp}} XP bonus', { xp: missions.bonusXp })}
             </span>
           </div>
         )}
       </section>
 
-      {/* ── Next Actions + Feed ──────────────────────────────────────── */}
+      {/* ═══ NEXT QUEST + ACTIVITY LOG ════════════════════════════════ */}
       <div className="grid gap-4 lg:grid-cols-2">
-        {/* Next Actions */}
+        {/* Next Quest */}
         {(progress?.nextActions?.length ?? 0) > 0 && (
-          <Card className="section-enter" padding="lg">
-            <h2 className="mb-3 text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
-              {t('home.nextActions.title', 'What to do next')}
+          <div className="panel-game section-enter p-4">
+            <h2 className="mb-3 font-pixel text-[8px] text-[#4B6B52] dark:text-[#7BA88A] tracking-wider uppercase">
+              {t('home.nextActions.title', 'Next Quest')}
             </h2>
-            <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-1.5">
               {progress!.nextActions!.slice(0, 3).map((action, i) => (
-                <NextActionRow key={i} action={action} />
+                <Link
+                  key={i}
+                  to={action.actionUrl}
+                  className="group flex items-center gap-2.5 rounded-lg px-2.5 py-2 transition-colors hover:bg-white/30 dark:hover:bg-white/5"
+                >
+                  <ArrowRight className="h-3 w-3 flex-shrink-0 text-[#059669] dark:text-[#34D399] transition-transform group-hover:translate-x-0.5" />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-medium text-[#111111] dark:text-[#E2F0E8] truncate">{action.title}</p>
+                    <p className="text-[10px] text-[#7A9982] dark:text-[#4A7058] truncate">{action.description}</p>
+                  </div>
+                </Link>
               ))}
             </div>
-          </Card>
+          </div>
         )}
 
-        {/* Activity Feed */}
+        {/* Activity Log */}
         {feed.length > 0 && (
-          <Card className="section-enter" padding="lg">
+          <div className="panel-log section-enter p-4">
             <div className="mb-3 flex items-center justify-between">
-              <h2 className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
-                {t('home.feed.title', 'Recent Activity')}
+              <h2 className="font-pixel text-[8px] text-[#4B6B52] dark:text-[#7BA88A] tracking-wider uppercase">
+                {t('home.feed.title', 'Activity Log')}
               </h2>
-              <Link to="/profile" className="text-xs font-semibold text-[#059669]">
+              <Link to="/profile" className="text-[10px] font-medium text-[#059669] dark:text-[#34D399] hover:underline">
                 {t('home.feed.viewAll', 'View all')}
               </Link>
             </div>
-            <div className="flex flex-col divide-y divide-[#E4EBE5] dark:divide-[#1E4035]">
+            <div className="flex flex-col gap-1">
               {feed.map((item, i) => (
-                <div key={i} className="flex items-center gap-3 py-2">
+                <div key={i} className="flex items-center gap-2.5 rounded-lg px-2.5 py-1.5">
+                  <div className="h-1 w-1 rounded-full bg-[#059669]/40 dark:bg-[#34D399]/40 flex-shrink-0" />
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-xs font-medium text-[#111111] dark:text-[#E2F0E8]">
-                      {item.title}
-                    </p>
-                    {item.description && (
-                      <p className="truncate text-[11px] text-[#7A9982] dark:text-[#7BA88A]">
-                        {item.description}
-                      </p>
-                    )}
+                    <p className="truncate text-xs text-[#111111] dark:text-[#C1D9CA]">{item.title}</p>
                   </div>
                   {item.score != null && (
-                    <span className="flex-shrink-0 rounded-full bg-[#ecfdf5] px-2 py-0.5 text-[10px] font-semibold text-[#059669] dark:bg-[#0d2a1f]">
+                    <span className="flex-shrink-0 font-mono text-[10px] font-bold text-[#059669] dark:text-[#34D399]">
                       {item.score}/10
                     </span>
                   )}
                 </div>
               ))}
             </div>
-          </Card>
+          </div>
         )}
       </div>
 
-      {/* ── Weekly Boss ────────────────────────────────────────────── */}
+      {/* ═══ WEEKLY BOSS ══════════════════════════════════════════════ */}
       {weeklyBoss && (
-        <Link to="/practice/weekly-boss" className="section-enter block">
-          <Card padding="md" className="group border-[#f59e0b]/20 hover:border-[#f59e0b]/40">
+        <Link to="/practice/weekly-boss" className="section-enter block group">
+          <div className="panel-boss p-4 md:p-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-[#ecfdf5] dark:bg-[#2a200a]">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-lg bg-[#f59e0b]/15 dark:bg-[#f59e0b]/10">
                 <Crown className="h-5 w-5 text-[#f59e0b]" />
               </div>
               <div className="min-w-0 flex-1">
-                <p className="text-sm font-semibold text-[#111111] dark:text-[#E2F0E8]">
-                  {t('home.weeklyBoss.title', 'Weekly Boss Challenge')}
+                <p className="font-pixel text-[8px] text-[#92400e] dark:text-[#fbbf24] tracking-wider uppercase mb-0.5">
+                  {t('home.weeklyBoss.title', 'Weekly Boss')}
                 </p>
-                <p className="text-xs text-[#7A9982] dark:text-[#7BA88A]">
+                <p className="text-xs text-[#4B6B52] dark:text-[#7BA88A]">
                   {weeklyBoss.myEntry
                     ? t('home.weeklyBoss.yourScore', 'Your best: {{score}}/10', { score: weeklyBoss.myEntry.aiScore })
-                    : t('home.weeklyBoss.notAttempted', 'Not attempted yet — take on the hard challenge')}
+                    : t('home.weeklyBoss.notAttempted', 'Not attempted yet')}
                 </p>
               </div>
               {weeklyBoss.endsAt && (
-                <span className="flex-shrink-0 text-[10px] font-semibold text-[#92400e] dark:text-[#fbbf24]">
+                <span className="flex-shrink-0 font-mono text-[10px] font-bold text-[#92400e] dark:text-[#fbbf24]">
                   <Clock className="mr-1 inline h-3 w-3" />
-                  {Math.max(0, Math.floor((new Date(weeklyBoss.endsAt).getTime() - Date.now()) / 86_400_000))}d left
+                  {Math.max(0, Math.floor((new Date(weeklyBoss.endsAt).getTime() - Date.now()) / 86_400_000))}d
                 </span>
               )}
-              <ChevronRight className="h-4 w-4 flex-shrink-0 text-[#7A9982] transition-transform group-hover:translate-x-0.5 dark:text-[#7BA88A]" />
+              <ChevronRight className="h-4 w-4 flex-shrink-0 text-[#7A9982] transition-transform group-hover:translate-x-1 dark:text-[#7BA88A]" />
             </div>
-          </Card>
+          </div>
         </Link>
       )}
 
-      {/* ── Quick Links ──────────────────────────────────────────────── */}
-      <div className="section-enter flex flex-wrap gap-2">
-        <QuickLink to="/community/events" icon={Calendar} label={t('home.quick.events', 'Events')} />
-        <QuickLink to="/community/vacancies" icon={Briefcase} label={t('home.quick.vacancies', 'Vacancies')} />
-        <QuickLink to="/community/podcasts" icon={Headphones} label={t('home.quick.podcasts', 'Podcasts')} />
-        <QuickLink to="/community/map" icon={Map} label={t('home.quick.map', 'Map')} />
+      {/* ═══ QUICK NAV TILES ══════════════════════════════════════════ */}
+      <div className="section-enter grid grid-cols-2 gap-2 sm:grid-cols-4">
+        {[
+          { to: '/community/events', icon: Calendar, label: t('home.quick.events', 'Events') },
+          { to: '/community/vacancies', icon: Briefcase, label: t('home.quick.vacancies', 'Jobs') },
+          { to: '/community/podcasts', icon: Headphones, label: t('home.quick.podcasts', 'Podcasts') },
+          { to: '/community/map', icon: Map, label: t('home.quick.map', 'Map') },
+        ].map(({ to, icon: Icon, label }) => (
+          <Link key={to} to={to} className="nav-tile flex items-center gap-2.5 px-3 py-3">
+            <Icon className="h-4 w-4 text-[#059669] dark:text-[#34D399] flex-shrink-0" />
+            <span className="text-xs font-medium text-[#4B6B52] dark:text-[#7BA88A]">{label}</span>
+          </Link>
+        ))}
       </div>
     </div>
-  )
-}
-
-/* ── Sub-components ─────────────────────────────────────────────────── */
-
-function MissionRow({ mission }: { mission: DailyMission }) {
-  const Icon = MISSION_ICONS[mission.icon] ?? Target
-  const progress = mission.targetValue > 1
-    ? `${Math.min(mission.current, mission.targetValue)}/${mission.targetValue}`
-    : undefined
-
-  return (
-    <div className={`flex items-center gap-3 rounded-xl border px-3 py-2.5 transition-colors ${
-      mission.completed
-        ? 'mission-complete border-[#059669]/20 bg-[#ecfdf5] dark:border-[#059669]/15 dark:bg-[#0d2a1f]'
-        : 'border-[#C1CFC4] bg-white hover:border-[#059669]/40 dark:border-[#1E4035] dark:bg-[#132420] dark:hover:border-[#059669]/30'
-    }`}>
-      <div className={`flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg ${
-        mission.completed
-          ? 'bg-[#059669]/10 dark:bg-[#059669]/20'
-          : 'bg-[#F0F5F1] dark:bg-[#162E24]'
-      }`}>
-        {mission.completed ? (
-          <CheckCircle2 className="h-4 w-4 text-[#059669]" />
-        ) : (
-          <Icon className="h-4 w-4 text-[#7A9982] dark:text-[#7BA88A]" />
-        )}
-      </div>
-
-      <div className="min-w-0 flex-1">
-        <p className={`text-xs font-medium ${
-          mission.completed
-            ? 'text-[#059669] line-through decoration-[#059669]/40'
-            : 'text-[#111111] dark:text-[#E2F0E8]'
-        }`}>
-          {mission.title}
-        </p>
-        {progress && !mission.completed && (
-          <p className="text-[10px] tabular-nums text-[#7A9982] dark:text-[#7BA88A]">{progress}</p>
-        )}
-      </div>
-
-      <span className="flex-shrink-0 text-[10px] font-semibold tabular-nums text-[#059669]">
-        +{mission.xpReward} XP
-      </span>
-
-      {!mission.completed && (
-        <Link
-          to={mission.actionUrl}
-          className="flex-shrink-0 rounded-lg bg-[#111111] px-2.5 py-1.5 text-[10px] font-semibold text-white transition-colors hover:bg-[#333] dark:bg-white dark:text-[#111111] dark:hover:bg-[#e5e5e5]"
-        >
-          Go
-        </Link>
-      )}
-    </div>
-  )
-}
-
-function NextActionRow({ action }: { action: NextAction }) {
-  return (
-    <Link
-      to={action.actionUrl}
-      className="group flex items-center gap-3 rounded-xl border border-[#C1CFC4] bg-white px-3 py-2.5 transition-colors hover:border-[#059669]/40 dark:border-[#1E4035] dark:bg-[#132420] dark:hover:border-[#059669]/30"
-    >
-      <div className="min-w-0 flex-1">
-        <p className="text-xs font-medium text-[#111111] dark:text-[#E2F0E8]">{action.title}</p>
-        <p className="truncate text-[10px] text-[#7A9982] dark:text-[#7BA88A]">{action.description}</p>
-      </div>
-      <ChevronRight className="h-4 w-4 flex-shrink-0 text-[#7A9982] transition-transform group-hover:translate-x-0.5 dark:text-[#7BA88A]" />
-    </Link>
-  )
-}
-
-function QuickLink({ to, icon: Icon, label }: { to: string; icon: React.ElementType; label: string }) {
-  return (
-    <Link
-      to={to}
-      className="inline-flex items-center gap-1.5 rounded-full border border-[#C1CFC4] bg-white px-3 py-1.5 text-xs font-medium text-[#4B6B52] transition-colors hover:border-[#059669] hover:text-[#059669] dark:border-[#1E4035] dark:bg-[#132420] dark:text-[#94a3b8] dark:hover:border-[#059669] dark:hover:text-[#34D399]"
-    >
-      <Icon className="h-3.5 w-3.5" />
-      {label}
-    </Link>
   )
 }

@@ -3,6 +3,7 @@ import { Search } from 'lucide-react'
 import { useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useIsMobile } from '@/shared/hooks/useIsMobile'
+import { PixelHeroScene } from '@/shared/ui/PixelHeroScene'
 
 export function CommunityHubPage() {
   const { t } = useTranslation()
@@ -22,6 +23,7 @@ export function CommunityHubPage() {
 
   return (
     <div className="flex flex-col h-full">
+      <PixelHeroScene scene="community" className="hidden md:block" />
       {isMobile ? (
         <div className="mobile-sticky-surface bg-[#F0F5F1]/88 px-4 pt-4 pb-0 dark:bg-[#070E0C]/88">
           <div className="mb-4 flex flex-col gap-3">

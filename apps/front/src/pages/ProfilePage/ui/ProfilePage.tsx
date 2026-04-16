@@ -13,6 +13,7 @@ import { useToast } from '@/shared/ui/Toast'
 import { PageMeta } from '@/shared/ui/PageMeta'
 import { GoalSelector } from '@/shared/ui/GoalSelector'
 import { PixelGarden } from '@/shared/ui/PixelGarden'
+import { PixelHeroScene } from '@/shared/ui/PixelHeroScene'
 import { useProfileData, type ArenaStats } from '../hooks/useProfileData'
 import { computeCompanyReadiness } from '../lib/computeReadiness'
 import { ProfileHero } from './ProfileHero'
@@ -227,6 +228,7 @@ export function ProfilePage() {
         description={t('profile.meta.description')}
         canonicalPath={userId ? `/profile/${userId}` : '/profile'}
       />
+      <PixelHeroScene scene="profile" className="section-enter -mx-4 -mt-4 md:-mx-6 md:-mt-6 mb-1" />
 
       {/* ── Hero ──────────────────────────────────────────────── */}
       <ProfileHero
