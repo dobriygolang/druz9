@@ -2,6 +2,7 @@ package main
 
 import (
 	"api/internal/clients/notification"
+	"api/internal/notiftext"
 	"context"
 	"time"
 
@@ -69,9 +70,8 @@ func sendStreakWarnings(ctx context.Context, notif notification.Sender, db *pgxp
 		if err := rows.Scan(&userID); err != nil {
 			continue
 		}
-		notif.Send(ctx, userID, "streak_warning", "Streak под угрозой",
-			"Твой streak под угрозой! Заверши хотя бы одну задачу сегодня, чтобы сохранить его.",
-			map[string]any{})
+		notif.Send(ctx, userID, "streak_warning",
+			notiftext.StreakWarningTitle(), notiftext.StreakWarningBody(), map[string]any{})
 		count++
 	}
 	if count > 0 {

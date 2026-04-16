@@ -367,11 +367,13 @@ func registerChallengeRoutes(
 		weekKey := challengedomain.CurrentWeekKey()
 		leaderboard, _ := svc.GetWeeklyLeaderboard(req.Context(), weekKey, 10)
 		userEntry, _ := svc.GetUserWeeklyEntry(req.Context(), *userID, weekKey)
+		weeklyTask, _ := svc.GetWeeklyTask(req.Context(), weekKey)
 		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{
 			"weekKey":     weekKey,
 			"endsAt":      challengedomain.WeekEndsAt(),
 			"leaderboard": leaderboard,
 			"myEntry":     userEntry,
+			"weeklyTask":  weeklyTask,
 		})
 		return nil
 	})

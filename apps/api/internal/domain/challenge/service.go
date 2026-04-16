@@ -133,6 +133,28 @@ func WeekEndsAt() time.Time {
 	return time.Date(now.Year(), now.Month(), now.Day()+daysUntilMonday, 0, 0, 0, 0, time.UTC)
 }
 
+// GetWeeklyTask returns the deterministically selected task for the current week.
+// Returns nil if no hard tasks are configured.
+func (s *Service) GetWeeklyTask(ctx context.Context, weekKey string) (*challengedata.WeeklyInfo, error) {
+	ids, err := s.repo.GetHardTaskIDs(ctx)
+	if err != nil || len(ids) == 0 {
+		return nil, err
+	}
+	taskID := SelectWeeklyTask(ids, weekKey)
+	title, slug, err := s.repo.GetTaskInfo(ctx, taskID)
+	if err != nil {
+		return nil, err
+	}
+	return &challengedata.WeeklyInfo{
+		WeekKey:    weekKey,
+		TaskID:     taskID,
+		TaskTitle:  title,
+		TaskSlug:   slug,
+		Difficulty: "hard",
+		EndsAt:     WeekEndsAt(),
+	}, nil
+}
+
 // SubmitWeeklyBoss records a weekly boss attempt.
 func (s *Service) SubmitWeeklyBoss(ctx context.Context, userID uuid.UUID, weekKey string, taskID uuid.UUID, aiScore int32, solveTimeMs int64, code, language string) error {
 	return s.repo.UpsertWeeklyEntry(ctx, userID, weekKey, taskID, aiScore, solveTimeMs, code, language)

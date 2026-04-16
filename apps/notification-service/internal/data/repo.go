@@ -247,6 +247,17 @@ func (r *Repo) LinkTelegramToUser(ctx context.Context, userID uuid.UUID, telegra
 	return err
 }
 
+// DisableAllByTelegramChatID turns off all notification categories for the user
+// identified by their Telegram chat ID.
+func (r *Repo) DisableAllByTelegramChatID(ctx context.Context, chatID int64) error {
+	_, err := r.db.DB.Exec(ctx, `
+		UPDATE user_notification_settings
+		SET duels_enabled = false, progress_enabled = false, circles_enabled = false,
+		    daily_challenge_enabled = false, updated_at = NOW()
+		WHERE telegram_chat_id = $1`, chatID)
+	return err
+}
+
 // ── Circle Settings ───────────────────────────────────────────
 
 // GetCircleSettings returns per-circle settings, or defaults if none exist.

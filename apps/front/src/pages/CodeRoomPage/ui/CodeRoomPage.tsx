@@ -211,7 +211,9 @@ export function CodeRoomPage() {
   const [reviewLoading, setReviewLoading] = useState(false)
   const [reviewPrompt, setReviewPrompt] = useState('')
   const [copied, setCopied] = useState(false)
-  const [needsGuestName, setNeedsGuestName] = useState(false)
+  const [needsGuestName, setNeedsGuestName] = useState(
+    !user && (typeof window === 'undefined' || !localStorage.getItem('guestCodeRoomName'))
+  )
   const [taskStatement, setTaskStatement] = useState('')
   const [showTaskEditor, setShowTaskEditor] = useState(false)
   const [editTaskTitle, setEditTaskTitle] = useState('')

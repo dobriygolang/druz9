@@ -2,11 +2,11 @@ package arena
 
 import (
 	"context"
-	"fmt"
 
 	"api/internal/app/solutionreview"
 	"api/internal/metrics"
 	"api/internal/model"
+	"api/internal/notiftext"
 	v1 "api/pkg/api/arena/v1"
 
 	"google.golang.org/protobuf/types/known/timestamppb"
@@ -55,7 +55,7 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 				TaskStatement:  match.Task.Statement,
 				TaskDifficulty: match.Task.Difficulty.String(),
 			}
-			_, _ = i.reviewService.StartReview(ctx, input)
+			_, _ = i.reviewService.StartReview(ctx, input) //nolint:errcheck // fire-and-forget
 		}()
 	}
 
@@ -63,19 +63,12 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 	if i.notif != nil && match != nil && match.Status == model.ArenaMatchStatusFinished {
 		go func() {
 			for _, p := range match.Players {
-				var body string
-				if match.WinnerUserID != nil && *match.WinnerUserID == p.UserID {
-					body = fmt.Sprintf("Ты победил в дуэли! Тема: %s", match.Topic)
-				} else if match.WinnerUserID != nil {
-					body = fmt.Sprintf("Дуэль завершена. Тема: %s", match.Topic)
-				} else {
-					body = fmt.Sprintf("Дуэль завершена вничью. Тема: %s", match.Topic)
-				}
-				i.notif.Send(ctx, p.UserID.String(), "duel_result", "Результат дуэли", body, map[string]any{
-					"match_id": match.ID.String(),
-					"topic":    match.Topic,
-					"is_winner": match.WinnerUserID != nil && *match.WinnerUserID == p.UserID,
-				})
+				isWinner := match.WinnerUserID != nil && *match.WinnerUserID == p.UserID
+				isDraw := match.WinnerUserID == nil
+				i.notif.Send(ctx, p.UserID.String(), "duel_result",
+					notiftext.DuelResultTitle(),
+					notiftext.DuelResultBody(match.Topic, isWinner, isDraw),
+					map[string]any{"match_id": match.ID.String(), "topic": match.Topic, "is_winner": isWinner})
 			}
 		}()
 	}

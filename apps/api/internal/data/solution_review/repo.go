@@ -32,10 +32,12 @@ func (r *Repo) Create(ctx context.Context, review *model.SolutionReview) error {
 	_, err := r.data.DB.Exec(ctx, `
 		INSERT INTO solution_reviews (
 			id, user_id, submission_id, source_type, task_id,
+			source_code, language,
 			is_correct, attempt_number, solve_time_ms, median_time_ms, passed_count, total_count,
 			status, created_at
-		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, NOW())`,
+		) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14, NOW())`,
 		review.ID, review.UserID, review.SubmissionID, review.SourceType, review.TaskID,
+		review.SourceCode, review.Language,
 		review.IsCorrect, review.AttemptNumber, review.SolveTimeMs, review.MedianTimeMs, review.PassedCount, review.TotalCount,
 		review.Status,
 	)
@@ -193,6 +195,7 @@ func (r *Repo) ListByUser(ctx context.Context, userID uuid.UUID, limit int) ([]*
 
 const reviewColumns = `
 	id, user_id, submission_id, source_type, task_id,
+	source_code, language,
 	is_correct, attempt_number, solve_time_ms, median_time_ms, passed_count, total_count,
 	status,
 	ai_verdict, ai_time_complexity, ai_space_complexity, ai_pattern,
@@ -213,6 +216,7 @@ func scanReview(s scannable) (*model.SolutionReview, error) {
 
 	err := s.Scan(
 		&rev.ID, &rev.UserID, &rev.SubmissionID, &rev.SourceType, &rev.TaskID,
+		&rev.SourceCode, &rev.Language,
 		&rev.IsCorrect, &rev.AttemptNumber, &rev.SolveTimeMs, &rev.MedianTimeMs, &rev.PassedCount, &rev.TotalCount,
 		&rev.Status,
 		&aiVerdict, &aiTimeC, &aiSpaceC, &aiPattern,

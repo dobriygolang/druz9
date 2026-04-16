@@ -32,15 +32,15 @@ func (r *Repo) GetRandomBlindReviewTask(ctx context.Context, userID uuid.UUID) (
 	var t BlindReviewTask
 	err := r.data.DB.QueryRow(ctx, `
 		SELECT sr.id, sr.task_id, ct.title, ct.statement,
-		       COALESCE(cs.output, ''), COALESCE(sr.ai_verdict, '')
+		       sr.source_code, sr.language
 		FROM solution_reviews sr
 		JOIN code_tasks ct ON ct.id = sr.task_id
-		LEFT JOIN code_submissions cs ON cs.id = sr.submission_id
 		WHERE sr.is_correct = true
 		  AND sr.user_id != $1
 		  AND sr.status = 'ready'
 		  AND sr.ai_verdict IS NOT NULL
 		  AND sr.ai_verdict != 'optimal'
+		  AND sr.source_code != ''
 		ORDER BY RANDOM()
 		LIMIT 1
 	`, userID).Scan(&t.SourceReviewID, &t.TaskID, &t.TaskTitle, &t.TaskStatement, &t.Code, &t.Language)

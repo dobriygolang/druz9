@@ -2,8 +2,8 @@ package main
 
 import (
 	"api/internal/clients/notification"
+	"api/internal/notiftext"
 	"context"
-	"fmt"
 	"time"
 
 	klog "github.com/go-kratos/kratos/v2/log"
@@ -91,11 +91,10 @@ func sendCircleDigests(ctx context.Context, notif notification.Sender, db *pgxpo
 		if len(cd.memberIDs) == 0 {
 			continue
 		}
-		body := fmt.Sprintf("Круг \"%s\" — итоги недели\nУчастников: %d", cd.name, cd.count)
-		notif.SendBatch(ctx, cd.memberIDs, "circle_weekly_digest", "Недельный digest", body, map[string]any{
-			"circle_id":   circleID,
-			"circle_name": cd.name,
-		})
+		notif.SendBatch(ctx, cd.memberIDs, "circle_weekly_digest",
+			notiftext.CircleDigestTitle(),
+			notiftext.CircleDigestBody(cd.name, cd.count),
+			map[string]any{"circle_id": circleID, "circle_name": cd.name})
 	}
 
 	klog.Infof("circle digests sent for %d circles", len(circles))

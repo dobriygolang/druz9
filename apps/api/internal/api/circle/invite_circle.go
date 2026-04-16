@@ -2,9 +2,9 @@ package circle
 
 import (
 	"context"
-	"fmt"
 
 	"api/internal/model"
+	"api/internal/notiftext"
 	v1 "api/pkg/api/circle/v1"
 	commonv1 "api/pkg/api/common/v1"
 
@@ -35,15 +35,10 @@ func (i *Implementation) InviteToCircle(ctx context.Context, req *v1.InviteToCir
 	// Notify: circle_invite — send to the invitee.
 	if i.notif != nil {
 		go func() {
-			displayName := user.FirstName
-			if displayName == "" {
-				displayName = "Кто-то"
-			}
-			body := fmt.Sprintf("%s пригласил тебя в круг", displayName)
-			i.notif.Send(ctx, inviteeID.String(), "circle_invite", "Приглашение в круг", body, map[string]any{
-				"circle_id":  circleID.String(),
-				"inviter_id": user.ID.String(),
-			})
+			i.notif.Send(ctx, inviteeID.String(), "circle_invite",
+				notiftext.CircleInviteTitle(),
+				notiftext.CircleInviteBody(user.FirstName),
+				map[string]any{"circle_id": circleID.String(), "inviter_id": user.ID.String()})
 		}()
 	}
 

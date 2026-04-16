@@ -51,9 +51,9 @@ export function PracticeHubPage() {
             { icon: Code2, title: 'Code Rooms', sub: t('practice.card.rooms'), href: '/practice/code-rooms' },
             { icon: Swords, title: 'Arena Duels', sub: t('practice.card.arena'), href: '/practice/arena' },
             { icon: Flame, title: 'Daily Challenge', sub: t('practice.card.daily'), href: '/practice/daily' },
-            { icon: Crown, title: 'Weekly Boss', sub: t('practice.card.weeklyBoss', 'Hard challenge of the week'), href: '/practice/weekly-boss' },
-            { icon: Zap, title: 'Speed Run', sub: t('practice.card.speedRun', 'Beat your personal bests'), href: '/practice/speed-run' },
-            { icon: Eye, title: 'Blind Review', sub: t('practice.card.blindReview', 'Review anonymous code'), href: '/practice/blind-review' },
+            { icon: Crown, title: 'Weekly Boss', sub: t('practice.card.weeklyBoss'), href: '/practice/weekly-boss' },
+            { icon: Zap, title: 'Speed Run', sub: t('practice.card.speedRun'), href: '/practice/speed-run' },
+            { icon: Eye, title: 'Blind Review', sub: t('practice.card.blindReview'), href: '/practice/blind-review' },
             { icon: Target, title: 'Algorithm Prep', sub: t('practice.card.solo'), href: '/prepare/interview-prep?category=algorithm' },
           ].map(f => {
             const Icon = f.icon

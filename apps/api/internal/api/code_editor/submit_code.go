@@ -124,7 +124,6 @@ func (i *Implementation) triggerReview(ctx context.Context, submission *codeedit
 	}
 
 	if _, err := i.reviewService.StartReview(ctx, input); err != nil {
-		// Non-fatal: review failure should never block submission
-		_ = err
+		// Non-fatal: review failure should never block submission.
 	}
 }

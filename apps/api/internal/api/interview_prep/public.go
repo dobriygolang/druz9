@@ -3,11 +3,11 @@ package interview_prep
 import (
 	"context"
 	"errors"
-	"fmt"
 
 	"api/internal/aireview"
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/model"
+	"api/internal/notiftext"
 	v1 "api/pkg/api/interview_prep/v1"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
@@ -214,12 +214,10 @@ func (i *Implementation) SubmitMockStage(ctx context.Context, req *v1.SubmitMock
 	// Notify: mock_result — when mock session finishes.
 	if i.notif != nil && result.Session != nil && result.Session.Status == model.InterviewPrepMockSessionStatusFinished {
 		go func() {
-			body := fmt.Sprintf("Mock interview завершён!\nПрограмма: %s", result.Session.BlueprintTitle)
-			i.notif.Send(ctx, user.ID.String(), "mock_result", "Mock interview", body, map[string]any{
-				"session_id":      result.Session.ID.String(),
-				"blueprint_title": result.Session.BlueprintTitle,
-				"company_tag":     result.Session.CompanyTag,
-			})
+			i.notif.Send(ctx, user.ID.String(), "mock_result",
+				notiftext.MockResultTitle(),
+				notiftext.MockResultBody(result.Session.BlueprintTitle),
+				map[string]any{"session_id": result.Session.ID.String(), "blueprint_title": result.Session.BlueprintTitle, "company_tag": result.Session.CompanyTag})
 		}()
 	}
 

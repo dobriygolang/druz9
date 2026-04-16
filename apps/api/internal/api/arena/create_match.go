@@ -2,9 +2,9 @@ package arena
 
 import (
 	"context"
-	"fmt"
 
 	"api/internal/metrics"
+	"api/internal/notiftext"
 	v1 "api/pkg/api/arena/v1"
 )
 
@@ -27,19 +27,10 @@ func (i *Implementation) CreateMatch(ctx context.Context, req *v1.CreateMatchReq
 		go func() {
 			for _, p := range match.Players {
 				if p.UserID != user.ID {
-					displayName := user.FirstName
-					if displayName == "" {
-						displayName = "Кто-то"
-					}
-					topic := match.Topic
-					if topic == "" {
-						topic = "Алгоритмы"
-					}
-					body := fmt.Sprintf("%s вызвал тебя на дуэль!\nТема: %s | ~15 мин", displayName, topic)
-					i.notif.Send(ctx, p.UserID.String(), "duel_invite", "Дуэль", body, map[string]any{
-						"match_id": match.ID.String(),
-						"topic":    topic,
-					})
+					i.notif.Send(ctx, p.UserID.String(), "duel_invite",
+						notiftext.DuelInviteTitle(),
+						notiftext.DuelInviteBody(user.FirstName, match.Topic),
+						map[string]any{"match_id": match.ID.String(), "topic": match.Topic})
 				}
 			}
 		}()

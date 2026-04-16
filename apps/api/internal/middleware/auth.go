@@ -39,55 +39,80 @@ type SessionCookieManager interface {
 	ClearSessionCookie(context.Context)
 }
 
+// tryDevBypass attempts dev bypass authentication. Returns the enriched context
+// and true if bypass was applied, or the original context and false otherwise.
+func tryDevBypass(ctx context.Context, authorizer ProfileAuthorizer) (context.Context, bool) {
+	if !authorizer.DevBypass() {
+		return ctx, false
+	}
+	devUserID := authorizer.DevUserID()
+	if devUserID == "" {
+		return ctx, true
+	}
+	userID, err := uuid.Parse(devUserID)
+	if err != nil {
+		return ctx, true
+	}
+	user, findErr := authorizer.FindUserByID(ctx, userID)
+	if findErr != nil || user == nil {
+		return ctx, true
+	}
+	authorizer.SetUserActivity(userID, time.Now().UTC())
+	ctx = model.ContextWithAuth(ctx, &model.AuthState{User: user})
+	return ctx, true
+}
+
+// authenticateFromToken extracts and validates a session token from the request transport.
+// On success, returns the enriched context. On failure, returns an error.
+// If extendSession is true and the session was extended, updates the cookie.
+func authenticateFromToken(ctx context.Context, authorizer ProfileAuthorizer, cookies SessionCookieManager) (context.Context, error) {
+	tr, ok := transport.FromServerContext(ctx)
+	if !ok {
+		return ctx, errors.Unauthorized("UNAUTHORIZED", "no transport")
+	}
+
+	rawToken, err := extractSessionToken(tr, authorizer.CookieName())
+	if err != nil {
+		return ctx, err
+	}
+
+	authState, err := authorizer.AuthenticateByToken(ctx, rawToken)
+	if err != nil {
+		if stdErrors.Is(err, profileerrors.ErrUnauthorized) {
+			cookies.ClearSessionCookie(ctx)
+			return ctx, profileerrors.ErrUnauthorized
+		}
+		return ctx, errors.InternalServer("INTERNAL", "internal server error")
+	}
+
+	if authState.SessionExtended {
+		cookies.SetSessionCookie(ctx, authState.RawToken, authState.Session.ExpiresAt)
+	}
+
+	authorizer.SetUserActivity(authState.User.ID, time.Now().UTC())
+	ctx = model.ContextWithAuth(ctx, authState)
+	return ctx, nil
+}
+
 func RequireAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager, shouldRequireAuth func() bool) middleware.Middleware {
 	return func(handler middleware.Handler) middleware.Handler {
 		return func(ctx context.Context, req interface{}) (interface{}, error) {
 			if shouldRequireAuth != nil && !shouldRequireAuth() {
 				return handler(ctx, req)
 			}
-			// DevBypass: use dev user in development
-			if authorizer.DevBypass() {
-				devUserID := authorizer.DevUserID()
-				if devUserID != "" {
-					userID, err := uuid.Parse(devUserID)
-					if err == nil {
-						user, findErr := authorizer.FindUserByID(ctx, userID)
-						if findErr == nil && user != nil {
-							// Update activity in cache
-							authorizer.SetUserActivity(userID, time.Now().UTC())
-							authState := &model.AuthState{User: user}
-							ctx = model.ContextWithAuth(ctx, authState)
-						}
-					}
-				}
-				return handler(ctx, req)
+
+			if enriched, bypassed := tryDevBypass(ctx, authorizer); bypassed {
+				return handler(enriched, req)
 			}
 
-			if tr, ok := transport.FromServerContext(ctx); ok {
-				rawToken, err := extractSessionToken(tr, authorizer.CookieName())
-				if err != nil {
-					return nil, errors.Unauthorized("UNAUTHORIZED", "missing session")
+			enriched, err := authenticateFromToken(ctx, authorizer, cookies)
+			if err != nil {
+				if stdErrors.Is(err, profileerrors.ErrUnauthorized) {
+					return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
 				}
-
-				authState, err := authorizer.AuthenticateByToken(ctx, rawToken)
-				if err != nil {
-					if stdErrors.Is(err, profileerrors.ErrUnauthorized) {
-						cookies.ClearSessionCookie(ctx)
-						return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
-					}
-					return nil, errors.InternalServer("INTERNAL", "internal server error")
-				}
-
-				if authState.SessionExtended {
-					cookies.SetSessionCookie(ctx, authState.RawToken, authState.Session.ExpiresAt)
-				}
-
-				// Update activity in cache
-				authorizer.SetUserActivity(authState.User.ID, time.Now().UTC())
-
-				ctx = model.ContextWithAuth(ctx, authState)
+				return nil, err
 			}
-			return handler(ctx, req)
+			return handler(enriched, req)
 		}
 	}
 }
@@ -99,52 +124,16 @@ func OptionalAuth(authorizer ProfileAuthorizer, cookies SessionCookieManager) mi
 				return handler(ctx, req)
 			}
 
-			// DevBypass: use dev user in development.
-			if authorizer.DevBypass() {
-				devUserID := authorizer.DevUserID()
-				if devUserID != "" {
-					userID, err := uuid.Parse(devUserID)
-					if err == nil {
-						user, findErr := authorizer.FindUserByID(ctx, userID)
-						if findErr == nil && user != nil {
-							// Update activity in cache
-							authorizer.SetUserActivity(userID, time.Now().UTC())
-							authState := &model.AuthState{User: user}
-							ctx = model.ContextWithAuth(ctx, authState)
-						}
-					}
-				}
-				return handler(ctx, req)
+			if enriched, bypassed := tryDevBypass(ctx, authorizer); bypassed {
+				return handler(enriched, req)
 			}
 
-			tr, ok := transport.FromServerContext(ctx)
-			if !ok {
-				return handler(ctx, req)
-			}
-
-			rawToken, err := extractSessionToken(tr, authorizer.CookieName())
+			enriched, err := authenticateFromToken(ctx, authorizer, cookies)
 			if err != nil {
+				// Optional auth: proceed unauthenticated on any error.
 				return handler(ctx, req)
 			}
-
-			authState, err := authorizer.AuthenticateByToken(ctx, rawToken)
-			if err != nil {
-				if stdErrors.Is(err, profileerrors.ErrUnauthorized) {
-					cookies.ClearSessionCookie(ctx)
-					return handler(ctx, req)
-				}
-				return nil, errors.InternalServer("INTERNAL", "internal server error")
-			}
-
-			if authState.SessionExtended {
-				cookies.SetSessionCookie(ctx, authState.RawToken, authState.Session.ExpiresAt)
-			}
-
-			// Update activity in cache
-			authorizer.SetUserActivity(authState.User.ID, time.Now().UTC())
-
-			ctx = model.ContextWithAuth(ctx, authState)
-			return handler(ctx, req)
+			return handler(enriched, req)
 		}
 	}
 }

@@ -60,11 +60,7 @@ func parseStartCommand(text string) (string, string) {
 		return "", ""
 	}
 
-	command := strings.ToLower(fields[0])
-	command = strings.Split(command, "@")[0]
-	if command != "/start" {
-		return "", ""
-	}
+	command := strings.ToLower(strings.Split(fields[0], "@")[0])
 	if len(fields) < 2 {
 		return command, ""
 	}

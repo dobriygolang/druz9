@@ -118,6 +118,8 @@ func (s *Service) StartReview(ctx context.Context, input ReviewInput) (uuid.UUID
 		SubmissionID:  input.SubmissionID,
 		SourceType:    input.SourceType,
 		TaskID:        input.TaskID,
+		SourceCode:    input.Code,
+		Language:      input.Language,
 		IsCorrect:     input.IsCorrect,
 		AttemptNumber: attemptNumber,
 		SolveTimeMs:   input.SolveTimeMs,

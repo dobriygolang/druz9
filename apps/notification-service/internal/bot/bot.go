@@ -152,6 +152,11 @@ func (b *Bot) handleSettings(ctx context.Context, msg *telegramMessage) {
 }
 
 func (b *Bot) handleStop(ctx context.Context, msg *telegramMessage) {
+	if err := b.repo.DisableAllByTelegramChatID(ctx, msg.Chat.ID); err != nil {
+		klog.Errorf("bot: disable notifications chat_id=%d: %v", msg.Chat.ID, err)
+		b.sendMessage(ctx, msg.Chat.ID, "Не удалось отключить уведомления. Попробуй ещё раз.")
+		return
+	}
 	b.sendMessage(ctx, msg.Chat.ID, "Уведомления отключены. Чтобы включить снова, напиши /start")
 }
 

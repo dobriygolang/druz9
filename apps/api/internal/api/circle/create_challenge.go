@@ -2,9 +2,9 @@ package circle
 
 import (
 	"context"
-	"fmt"
 
 	"api/internal/model"
+	"api/internal/notiftext"
 	v1 "api/pkg/api/circle/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -43,13 +43,10 @@ func (i *Implementation) CreateCircleChallenge(ctx context.Context, req *v1.Crea
 			if len(userIDs) == 0 {
 				return
 			}
-			body := fmt.Sprintf("Новый challenge: %s (цель: %d)\nСтарт сейчас, 7 дней", req.TemplateKey, req.TargetValue)
-			i.notif.SendBatch(ctx, userIDs, "circle_event_created", "Challenge в круге", body, map[string]any{
-				"circle_id":    circleID.String(),
-				"challenge_id": challenge.ID.String(),
-				"template_key": req.TemplateKey,
-				"target_value": req.TargetValue,
-			})
+			i.notif.SendBatch(ctx, userIDs, "circle_event_created",
+				notiftext.ChallengeCreatedTitle(),
+				notiftext.ChallengeCreatedBody(req.TemplateKey, req.TargetValue),
+				map[string]any{"circle_id": circleID.String(), "challenge_id": challenge.ID.String(), "template_key": req.TemplateKey, "target_value": req.TargetValue})
 		}()
 	}
 

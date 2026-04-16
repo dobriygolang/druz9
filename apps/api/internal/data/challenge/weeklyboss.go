@@ -28,6 +28,40 @@ type WeeklyInfo struct {
 	EndsAt    time.Time `json:"endsAt"`
 }
 
+// GetHardTaskIDs returns the IDs of all active hard tasks.
+func (r *Repo) GetHardTaskIDs(ctx context.Context) ([]uuid.UUID, error) {
+	rows, err := r.data.DB.Query(ctx, `
+		SELECT id FROM code_tasks
+		WHERE difficulty = 3 AND is_active = true
+		ORDER BY id
+	`)
+	if err != nil {
+		return nil, fmt.Errorf("get hard task ids: %w", err)
+	}
+	defer rows.Close()
+
+	var ids []uuid.UUID
+	for rows.Next() {
+		var id uuid.UUID
+		if err := rows.Scan(&id); err != nil {
+			return nil, fmt.Errorf("scan task id: %w", err)
+		}
+		ids = append(ids, id)
+	}
+	return ids, rows.Err()
+}
+
+// GetTaskInfo returns the title and slug of a task by ID.
+func (r *Repo) GetTaskInfo(ctx context.Context, taskID uuid.UUID) (title, slug string, err error) {
+	err = r.data.DB.QueryRow(ctx, `
+		SELECT title, slug FROM code_tasks WHERE id = $1
+	`, taskID).Scan(&title, &slug)
+	if err != nil {
+		return "", "", fmt.Errorf("get task info: %w", err)
+	}
+	return title, slug, nil
+}
+
 // UpsertWeeklyEntry records or updates a weekly boss attempt (keeps the best score).
 func (r *Repo) UpsertWeeklyEntry(ctx context.Context, userID uuid.UUID, weekKey string, taskID uuid.UUID, aiScore int32, solveTimeMs int64, code, language string) error {
 	_, err := r.data.DB.Exec(ctx, `

@@ -1,11 +1,12 @@
 import { useEffect, useState, useCallback } from 'react'
-import { Crown, Clock, Star, ChevronRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Crown, Clock, Star, ChevronRight, Loader2 } from 'lucide-react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { apiClient } from '@/shared/api/base'
 import { Card } from '@/shared/ui/Card'
 import { Avatar } from '@/shared/ui/Avatar'
 import { PageMeta } from '@/shared/ui/PageMeta'
+import { codeRoomApi } from '@/features/CodeRoom/api/codeRoomApi'
 
 interface WeeklyEntry {
   userId: string
@@ -16,11 +17,19 @@ interface WeeklyEntry {
   submittedAt: string
 }
 
+interface WeeklyTask {
+  taskId: string
+  taskTitle: string
+  taskSlug: string
+  difficulty: string
+}
+
 interface WeeklyData {
   weekKey: string
   endsAt: string
   leaderboard: WeeklyEntry[] | null
   myEntry: WeeklyEntry | null
+  weeklyTask: WeeklyTask | null
 }
 
 function formatTime(ms: number): string {
@@ -42,8 +51,10 @@ function timeRemaining(endsAt: string): string {
 
 export function WeeklyBossPage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [data, setData] = useState<WeeklyData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [starting, setStarting] = useState(false)
 
   const fetchData = useCallback(async () => {
     setLoading(true)
@@ -59,8 +70,26 @@ export function WeeklyBossPage() {
 
   useEffect(() => { fetchData() }, [fetchData])
 
+  const handleStartChallenge = useCallback(async () => {
+    const task = data?.weeklyTask
+    if (!task) {
+      navigate('/practice/code-rooms')
+      return
+    }
+    setStarting(true)
+    try {
+      const { room } = await codeRoomApi.createRoom({ mode: 'ROOM_MODE_ALL', task: task.taskTitle })
+      navigate(`/code-rooms/${room.id}`)
+    } catch {
+      navigate('/practice/code-rooms')
+    } finally {
+      setStarting(false)
+    }
+  }, [data, navigate])
+
   const leaderboard = data?.leaderboard ?? []
   const myEntry = data?.myEntry
+  const weeklyTask = data?.weeklyTask
 
   return (
     <div className="flex flex-col gap-4">
@@ -99,24 +128,33 @@ export function WeeklyBossPage() {
             </div>
           </div>
         </Card>
-      ) : (
-        <Link
-          to="/practice/code-rooms"
-          className="flex items-center justify-between rounded-xl border border-[#f59e0b]/30 bg-[#fffbeb] px-4 py-3 transition-colors hover:border-[#f59e0b] dark:border-[#f59e0b]/15 dark:bg-[#2a200a] dark:hover:border-[#f59e0b]/40"
+      ) : weeklyTask ? (
+        <button
+          onClick={handleStartChallenge}
+          disabled={starting}
+          className="flex w-full items-center justify-between rounded-xl border border-[#f59e0b]/30 bg-[#fffbeb] px-4 py-3 text-left transition-colors hover:border-[#f59e0b] disabled:opacity-60 dark:border-[#f59e0b]/15 dark:bg-[#2a200a] dark:hover:border-[#f59e0b]/40"
         >
           <div className="flex items-center gap-3">
-            <Crown className="h-6 w-6 text-[#f59e0b]" />
+            {starting ? (
+              <Loader2 className="h-6 w-6 animate-spin text-[#f59e0b]" />
+            ) : (
+              <Crown className="h-6 w-6 text-[#f59e0b]" />
+            )}
             <div>
               <p className="text-sm font-semibold text-[#111111] dark:text-[#f8fafc]">
-                {t('weeklyBoss.startChallenge', 'Take on the Weekly Boss')}
+                {weeklyTask.taskTitle}
               </p>
               <p className="text-xs text-[#667085] dark:text-[#7e93b0]">
-                {t('weeklyBoss.startDesc', 'Solve the hard task and compete for the top spot')}
+                {t('weeklyBoss.startDesc')}
               </p>
             </div>
           </div>
           <ChevronRight className="h-5 w-5 text-[#f59e0b]" />
-        </Link>
+        </button>
+      ) : (
+        <Card padding="md" className="text-center text-sm text-[#667085] dark:text-[#7e93b0]">
+          {t('weeklyBoss.noTask')}
+        </Card>
       )}
 
       {/* Leaderboard */}

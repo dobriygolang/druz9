@@ -43,6 +43,10 @@ type SolutionReview struct {
 	SourceType   ReviewSourceType
 	TaskID       uuid.UUID
 
+	// Submission source (populated on creation, used by blind-review mode)
+	SourceCode string
+	Language   string
+
 	// Level 1: instant feedback
 	IsCorrect     bool
 	AttemptNumber int
