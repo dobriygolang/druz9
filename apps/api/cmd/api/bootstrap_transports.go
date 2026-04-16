@@ -1,8 +1,8 @@
 package main
 
 import (
-	"api/internal/closer"
 	notifclient "api/internal/clients/notification"
+	"api/internal/closer"
 	challengedomain "api/internal/domain/challenge"
 	server "api/internal/server"
 	"api/internal/server/wshandler"
@@ -21,9 +21,9 @@ import (
 	"net/http"
 
 	"github.com/go-kratos/kratos/v2"
-	"github.com/google/uuid"
 	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/google/uuid"
 )
 
 func initializeTransports(
@@ -432,8 +432,23 @@ func registerNotificationRoutes(
 		}
 		settings, err := notif.GetNotificationSettings(req.Context(), userID.String())
 		if err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
-			return nil
+			settings = &notifclient.Settings{
+				DuelsEnabled:          true,
+				ProgressEnabled:       true,
+				CirclesEnabled:        true,
+				DailyChallengeEnabled: false,
+				QuietHoursStart:       23,
+				QuietHoursEnd:         8,
+				Timezone:              "Europe/Moscow",
+			}
+			if user, userErr := services.profileServiceDomain.FindUserByID(req.Context(), *userID); userErr == nil && user != nil {
+				for _, provider := range user.ConnectedProviders {
+					if provider == "telegram" {
+						settings.TelegramLinked = true
+						break
+					}
+				}
+			}
 		}
 		server.WriteJSON(ctx.Response(), http.StatusOK, map[string]any{
 			"duelsEnabled":          settings.DuelsEnabled,
@@ -473,7 +488,7 @@ func registerNotificationRoutes(
 			DailyChallengeEnabled: body.DailyChallengeEnabled,
 		}
 		if err := notif.UpdateNotificationSettings(req.Context(), userID.String(), upd); err != nil {
-			server.WriteJSON(ctx.Response(), http.StatusInternalServerError, map[string]string{"error": "internal"})
+			server.WriteJSON(ctx.Response(), http.StatusServiceUnavailable, map[string]string{"error": "notification_service_unavailable"})
 			return nil
 		}
 		ctx.Response().WriteHeader(http.StatusNoContent)

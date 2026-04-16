@@ -2,7 +2,7 @@ import { useEffect, useState, useCallback } from 'react'
 import {
   Flame, ChevronRight, Target, Calendar, Briefcase, Headphones, Map,
   Swords, GraduationCap, Code2, Send, BookOpen, Trophy, Award, CheckCircle2,
-  Crown, Clock, ArrowRight, Zap, Star, BookMarked,
+  Crown, Clock, ArrowRight, Zap, Star, BookMarked, Scroll,
 } from 'lucide-react'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
@@ -21,6 +21,16 @@ import { LEAGUE_LABELS, LEAGUE_BG_COLORS, LEAGUE_FRAME_NAMES } from '@/shared/li
 
 const MISSION_ICONS: Record<string, React.ElementType> = {
   Code2, Swords, GraduationCap, Flame, Calendar, Send, BookOpen, Trophy, Award, Target,
+}
+
+// Infer icon for feed entries based on title keywords
+function feedIcon(title: string): React.ElementType {
+  const l = title.toLowerCase()
+  if (l.includes('code') || l.includes('задач') || l.includes('алгоритм')) return Code2
+  if (l.includes('interview') || l.includes('mock') || l.includes('собес') || l.includes('boss')) return Swords
+  if (l.includes('quiz') || l.includes('тест') || l.includes('quiz')) return BookOpen
+  if (l.includes('practic') || l.includes('arena') || l.includes('practice')) return Trophy
+  return Scroll
 }
 
 type ArenaStats = { rating?: number; league?: string; currentWinStreak?: number }
@@ -123,7 +133,7 @@ export function HomePage() {
               </span>
             </div>
 
-            {/* Stat chips — friendly, not HUD-techy */}
+            {/* Stat chips */}
             <div className="flex flex-wrap items-center gap-2 mb-3.5">
               {(ov?.currentStreakDays ?? 0) > 0 && (
                 <div className="char-stat-chip">
@@ -154,18 +164,69 @@ export function HomePage() {
               )}
             </div>
 
-            {/* Continue Journey CTA */}
+            {/* CTA */}
             {primaryAction ? (
               <Link to={primaryAction.actionUrl} className="btn-journey">
-                ▶ Continue Journey
+                ▶ {t('home.hero.continue', 'Continue Journey')}
                 <ArrowRight className="h-4 w-4" />
               </Link>
             ) : (
               <Link to="/practice" className="btn-journey">
-                ▶ Start Training
+                ▶ {t('home.hero.start', 'Start Training')}
                 <Zap className="h-4 w-4" />
               </Link>
             )}
+          </div>
+
+          {/* ── Right: Current Focus (desktop only) ── */}
+          <div className="hidden lg:flex flex-col gap-3 w-[152px] flex-shrink-0 pl-4 self-stretch border-l border-[#C8AC7E]/22 dark:border-[#3A5038]/28">
+            <div>
+              <p className="font-pixel text-[6px] uppercase tracking-[0.14em] text-[#8B7355] dark:text-[#7BA88A] mb-2">
+                {t('home.hero.focus', 'Current Focus')}
+              </p>
+              {primaryAction ? (
+                <Link
+                  to={primaryAction.actionUrl}
+                  className="block rounded-lg bg-white/42 dark:bg-black/18 border border-[#C8AC7E]/26 dark:border-[#3A5038]/28 p-2.5 hover:bg-white/65 dark:hover:bg-black/28 transition-colors"
+                >
+                  <div className="flex items-start gap-1.5 mb-1">
+                    <div className="mt-0.5 w-4 h-4 rounded-sm bg-[#16A34A]/14 border border-[#16A34A]/22 flex items-center justify-center flex-shrink-0">
+                      <ArrowRight className="w-2.5 h-2.5 text-[#16A34A] dark:text-[#34D399]" />
+                    </div>
+                    <p className="text-[10px] font-semibold text-[#2C1810] dark:text-[#E2F0E8] leading-tight line-clamp-2">
+                      {primaryAction.title}
+                    </p>
+                  </div>
+                  {primaryAction.description && (
+                    <p className="text-[9px] text-[#7A6550] dark:text-[#5A8068] leading-snug line-clamp-2 pl-[22px]">
+                      {primaryAction.description}
+                    </p>
+                  )}
+                </Link>
+              ) : (
+                <div className="rounded-lg bg-white/30 dark:bg-black/12 border border-[#C8AC7E]/18 dark:border-[#3A5038]/20 p-2.5">
+                  <p className="text-[9px] text-[#8B7355] dark:text-[#7BA88A] leading-snug">
+                    {t('home.hero.noFocus', 'Pick a quest to begin')}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* Pixel sword — subtle world accent */}
+            <div className="mt-auto flex justify-center opacity-[0.22] dark:opacity-[0.16]">
+              <svg width="22" height="42" viewBox="0 0 11 21" style={{ imageRendering: 'pixelated' }} xmlns="http://www.w3.org/2000/svg">
+                <rect x="4" y="0" width="3" height="2" fill="#A08848"/>
+                <rect x="3" y="2" width="5" height="1" fill="#C4A060"/>
+                <rect x="4" y="3" width="3" height="1" fill="#B89050"/>
+                <rect x="5" y="4" width="1" height="8" fill="#A07840"/>
+                <rect x="4" y="4" width="3" height="8" fill="#B89050"/>
+                <rect x="1" y="11" width="9" height="2" fill="#8B6A30"/>
+                <rect x="4" y="13" width="3" height="1" fill="#7A5C28"/>
+                <rect x="5" y="14" width="1" height="7" fill="#5A4020"/>
+                <rect x="4" y="14" width="3" height="7" fill="#6B4E28"/>
+                <rect x="3" y="20" width="5" height="1" fill="#4A3418"/>
+              </svg>
+            </div>
           </div>
         </div>
       </section>
@@ -291,15 +352,22 @@ export function HomePage() {
                     </div>
                     {i < arr.length - 1 && <div className="path-connector" />}
                   </div>
-                  <div className={`path-content pb-2 ${i < arr.length - 1 ? '' : ''}`}>
-                    <p className={`text-xs font-semibold truncate transition-colors ${
-                      i === 0
-                        ? 'text-[#2C1810] dark:text-[#E2F0E8] group-hover:text-[#16A34A] dark:group-hover:text-[#34D399]'
-                        : 'text-[#6B5A47] dark:text-[#7BA88A]'
-                    }`}>
-                      {action.title}
-                    </p>
-                    <p className="text-[10px] text-[#8B7355] dark:text-[#4A7058] truncate">
+                  <div className="path-content pb-2">
+                    <div className="flex items-center gap-1.5">
+                      <p className={`text-xs font-semibold truncate transition-colors ${
+                        i === 0
+                          ? 'text-[#2C1810] dark:text-[#E2F0E8] group-hover:text-[#16A34A] dark:group-hover:text-[#34D399]'
+                          : 'text-[#5A4A40] dark:text-[#9ABAA8]'
+                      }`}>
+                        {action.title}
+                      </p>
+                      {i === 0 && (
+                        <span className="flex-shrink-0 rounded-sm bg-[#16A34A]/12 dark:bg-[#34D399]/10 border border-[#16A34A]/20 dark:border-[#34D399]/15 px-1 py-px text-[7px] font-bold uppercase tracking-wider text-[#15803D] dark:text-[#34D399]">
+                          Next
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[10px] text-[#7A6550] dark:text-[#6A9880] truncate mt-0.5">
                       {action.description}
                     </p>
                   </div>
@@ -326,21 +394,37 @@ export function HomePage() {
                 to="/profile"
                 className="text-[10px] font-semibold text-[#15803D] dark:text-[#34D399] hover:underline"
               >
-                {t('home.feed.viewAll', 'View all')}
+                {t('home.feed.viewAll', 'All entries →')}
               </Link>
             </div>
             <div className="flex flex-col gap-0.5">
-              {feed.map((item, i) => (
-                <div key={i} className="guild-log-entry">
-                  <div className="guild-log-dot" />
-                  <p className="min-w-0 flex-1 truncate text-xs text-[#2C1810] dark:text-[#C1D9CA]">
-                    {item.title}
-                  </p>
-                  {item.score != null && (
-                    <span className="guild-log-score">{item.score}/10</span>
-                  )}
-                </div>
-              ))}
+              {feed.map((item, i) => {
+                const EntryIcon = feedIcon(item.title)
+                const pips = item.score != null ? Math.round(item.score / 2) : 0
+                return (
+                  <div key={i} className="guild-log-entry">
+                    <div className="guild-log-icon">
+                      <EntryIcon className="h-3 w-3 text-[#16A34A] dark:text-[#34D399]" />
+                    </div>
+                    <p className="min-w-0 flex-1 truncate text-xs text-[#2C1810] dark:text-[#C1D9CA]">
+                      {item.title}
+                    </p>
+                    {item.score != null && (
+                      <div className="flex items-center gap-1.5 flex-shrink-0">
+                        <div className="guild-log-score-bar">
+                          {Array.from({ length: 5 }, (_, j) => (
+                            <div
+                              key={j}
+                              className={`guild-log-score-pip ${j < pips ? 'active' : ''}`}
+                            />
+                          ))}
+                        </div>
+                        <span className="guild-log-score">{item.score}/10</span>
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
             </div>
           </div>
         )}
@@ -363,7 +447,7 @@ export function HomePage() {
                   ⚔ {t('home.weeklyBoss.title', 'Weekly Challenge')} ⚔
                 </p>
                 <p className="text-sm font-bold text-[#2C1810] dark:text-[#E2F0E8] mb-0.5 truncate">
-                  Senior Engineer Boss Fight
+                  {t('home.weeklyBoss.name', 'Weekly Boss Fight')}
                 </p>
                 <p className="text-xs text-[#8B7355] dark:text-[#7BA88A]">
                   {weeklyBoss.myEntry
@@ -392,19 +476,20 @@ export function HomePage() {
       {/* ══ WORLD MAP — Quick nav ═══════════════════════════════════════════ */}
       <div className="section-enter grid grid-cols-2 gap-2 sm:grid-cols-4">
         {[
-          { to: '/community/events',    icon: Calendar,   label: t('home.quick.events',    'Events'),   sub: 'Community' },
-          { to: '/community/vacancies', icon: Briefcase,  label: t('home.quick.vacancies', 'Jobs'),     sub: 'Vacancies' },
-          { to: '/community/podcasts',  icon: Headphones, label: t('home.quick.podcasts',  'Podcasts'), sub: 'Listen' },
-          { to: '/community/map',       icon: Map,        label: t('home.quick.map',       'Map'),      sub: 'World' },
+          { to: '/community/events',    icon: Calendar,   label: t('home.quick.events',    'Events'),   sub: t('home.quick.events.sub',    'Guild Events') },
+          { to: '/community/vacancies', icon: Briefcase,  label: t('home.quick.vacancies', 'Jobs'),     sub: t('home.quick.vacancies.sub', 'Find Roles') },
+          { to: '/community/podcasts',  icon: Headphones, label: t('home.quick.podcasts',  'Podcasts'), sub: t('home.quick.podcasts.sub',  'Tune In') },
+          { to: '/community/map',       icon: Map,        label: t('home.quick.map',       'Map'),      sub: t('home.quick.map.sub',       'Explore World') },
         ].map(({ to, icon: Icon, label, sub }) => (
-          <Link key={to} to={to} className="world-tile">
+          <Link key={to} to={to} className="world-tile group">
             <div className="world-tile-icon">
-              <Icon className="h-4 w-4 text-[#16A34A] dark:text-[#34D399]" />
+              <Icon className="h-5 w-5 text-[#16A34A] dark:text-[#34D399]" />
             </div>
-            <div className="min-w-0">
+            <div className="min-w-0 flex-1">
               <p className="text-xs font-semibold text-[#2C1810] dark:text-[#E2F0E8] truncate">{label}</p>
-              <p className="text-[9px] text-[#8B7355] dark:text-[#7BA88A]">{sub}</p>
+              <p className="text-[9px] text-[#7A6550] dark:text-[#6A9880] truncate">{sub}</p>
             </div>
+            <ChevronRight className="h-3.5 w-3.5 text-[#C8AC7E]/55 dark:text-[#3A5038]/70 flex-shrink-0 transition-transform group-hover:translate-x-0.5" />
           </Link>
         ))}
       </div>

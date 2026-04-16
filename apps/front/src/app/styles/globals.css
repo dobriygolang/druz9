@@ -860,31 +860,31 @@
 
 /* Wooden sign for nav items */
 .nav-sign {
-  background: linear-gradient(180deg, rgba(160, 132, 92, 0.85) 0%, rgba(139, 115, 85, 0.9) 100%);
-  border: 2px solid #5A4A3A;
-  box-shadow: inset 0 1px 0 rgba(196, 168, 124, 0.5), 1px 2px 0 #3D2E24;
+  background: linear-gradient(180deg, rgba(160, 132, 92, 0.78) 0%, rgba(139, 115, 85, 0.84) 100%);
+  border: 1.5px solid rgba(100, 78, 50, 0.36);
+  box-shadow: inset 0 1px 0 rgba(196, 168, 124, 0.4);
   backdrop-filter: blur(4px);
-  transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
 }
 .nav-sign:hover {
-  transform: scale(1.03);
-  background: linear-gradient(180deg, rgba(170, 142, 102, 0.9) 0%, rgba(149, 125, 95, 0.95) 100%);
+  background: linear-gradient(180deg, rgba(170, 142, 102, 0.88) 0%, rgba(149, 125, 95, 0.92) 100%);
+  box-shadow: inset 0 1px 0 rgba(196, 168, 124, 0.5), 0 2px 8px rgba(100,76,40,0.1);
 }
 .nav-sign.is-active {
-  background: linear-gradient(180deg, rgba(5, 150, 105, 0.85) 0%, rgba(4, 120, 87, 0.9) 100%);
-  border-color: #047857;
-  box-shadow: inset 0 1px 0 rgba(52, 211, 153, 0.4), 1px 2px 0 #065F46, 0 0 12px rgba(52, 211, 153, 0.3);
+  background: linear-gradient(180deg, rgba(22, 163, 74, 0.82) 0%, rgba(15, 130, 60, 0.88) 100%);
+  border-color: rgba(21, 128, 61, 0.7);
+  box-shadow: inset 0 1px 0 rgba(52, 211, 153, 0.35), 0 2px 10px rgba(22, 163, 74, 0.18);
 }
 
 .dark .nav-sign {
-  background: linear-gradient(180deg, rgba(107, 91, 69, 0.7) 0%, rgba(90, 74, 58, 0.75) 100%);
-  border-color: #3D2E24;
-  box-shadow: inset 0 1px 0 rgba(139, 115, 85, 0.3), 1px 2px 0 #1A1008;
+  background: linear-gradient(180deg, rgba(90, 74, 55, 0.65) 0%, rgba(74, 60, 44, 0.7) 100%);
+  border-color: rgba(90, 70, 46, 0.35);
+  box-shadow: inset 0 1px 0 rgba(139, 115, 85, 0.25);
 }
 .dark .nav-sign.is-active {
-  background: linear-gradient(180deg, rgba(5, 150, 105, 0.7) 0%, rgba(4, 120, 87, 0.75) 100%);
-  border-color: #059669;
-  box-shadow: inset 0 1px 0 rgba(52, 211, 153, 0.3), 1px 2px 0 #064E3B, 0 0 16px rgba(52, 211, 153, 0.2);
+  background: linear-gradient(180deg, rgba(22, 163, 74, 0.7) 0%, rgba(15, 130, 60, 0.75) 100%);
+  border-color: rgba(52, 211, 153, 0.4);
+  box-shadow: inset 0 1px 0 rgba(52, 211, 153, 0.28), 0 2px 12px rgba(52, 211, 153, 0.14);
 }
 
 /* ─── Game UI: Notch shapes ─────────────────────────────────────────────── */
@@ -1111,14 +1111,15 @@
   padding: 11px 13px;
   background: rgba(255,255,255,0.72);
   border: 1.5px solid rgba(196,168,120,0.26);
+  border-left: 3px solid rgba(196,168,120,0.35);
   border-radius: 9px;
   transition: background 0.15s, border-color 0.15s;
 }
-.quest-item-rpg:hover { background: rgba(255,255,255,0.94); border-color: rgba(22,163,74,0.32); }
-.quest-item-rpg.is-done { background: rgba(22,163,74,0.06); border-color: rgba(22,163,74,0.18); }
-.dark .quest-item-rpg { background: rgba(30,46,34,0.52); border-color: rgba(58,80,48,0.28); }
-.dark .quest-item-rpg:hover { background: rgba(30,46,34,0.8); border-color: rgba(52,211,153,0.24); }
-.dark .quest-item-rpg.is-done { background: rgba(22,163,74,0.08); border-color: rgba(52,211,153,0.14); }
+.quest-item-rpg:hover { background: rgba(255,255,255,0.94); border-color: rgba(22,163,74,0.28); border-left-color: rgba(22,163,74,0.55); }
+.quest-item-rpg.is-done { background: rgba(22,163,74,0.06); border-color: rgba(22,163,74,0.18); border-left-color: rgba(22,163,74,0.4); }
+.dark .quest-item-rpg { background: rgba(30,46,34,0.52); border-color: rgba(58,80,48,0.28); border-left-color: rgba(58,80,48,0.45); }
+.dark .quest-item-rpg:hover { background: rgba(30,46,34,0.8); border-color: rgba(52,211,153,0.2); border-left-color: rgba(52,211,153,0.45); }
+.dark .quest-item-rpg.is-done { background: rgba(22,163,74,0.08); border-color: rgba(52,211,153,0.14); border-left-color: rgba(52,211,153,0.35); }
 
 .quest-icon-rpg {
   display: flex;
@@ -1293,27 +1294,46 @@
 .guild-log-entry {
   display: flex;
   align-items: center;
-  gap: 10px;
-  padding: 7px 8px;
+  gap: 9px;
+  padding: 6px 8px;
   border-radius: 7px;
   transition: background 0.15s;
 }
 .guild-log-entry:hover { background: rgba(255,255,255,0.52); }
 .dark .guild-log-entry:hover { background: rgba(255,255,255,0.03); }
 
-.guild-log-dot {
-  width: 7px;
-  height: 7px;
-  border-radius: 50%;
-  background: rgba(22,163,74,0.4);
-  border: 1px solid rgba(22,163,74,0.2);
+.guild-log-icon {
+  display: flex;
+  width: 24px;
+  height: 24px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  background: rgba(22,163,74,0.09);
+  border: 1px solid rgba(22,163,74,0.16);
   flex-shrink: 0;
 }
-.dark .guild-log-dot { background: rgba(52,211,153,0.3); border-color: rgba(52,211,153,0.14); }
+.dark .guild-log-icon { background: rgba(52,211,153,0.07); border-color: rgba(52,211,153,0.12); }
+
+.guild-log-score-bar {
+  display: flex;
+  align-items: center;
+  gap: 1.5px;
+  flex-shrink: 0;
+}
+.guild-log-score-pip {
+  width: 3px;
+  height: 10px;
+  border-radius: 2px;
+  background: rgba(200,180,140,0.35);
+}
+.dark .guild-log-score-pip { background: rgba(58,80,48,0.45); }
+.guild-log-score-pip.active { background: #16A34A; }
+.dark .guild-log-score-pip.active { background: #34D399; }
 
 .guild-log-score {
   font-family: 'JetBrains Mono', monospace;
-  font-size: 10px;
+  font-size: 9px;
   font-weight: 700;
   color: #15803D;
   flex-shrink: 0;
@@ -1403,16 +1423,19 @@
 
 .world-tile-icon {
   display: flex;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   align-items: center;
   justify-content: center;
-  border-radius: 10px;
+  border-radius: 11px;
   background: rgba(22,163,74,0.1);
-  border: 1px solid rgba(22,163,74,0.2);
+  border: 1.5px solid rgba(22,163,74,0.2);
   flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
 }
+.world-tile:hover .world-tile-icon { background: rgba(22,163,74,0.16); border-color: rgba(22,163,74,0.32); }
 .dark .world-tile-icon { background: rgba(52,211,153,0.07); border-color: rgba(52,211,153,0.14); }
+.dark .world-tile:hover .world-tile-icon { background: rgba(52,211,153,0.12); border-color: rgba(52,211,153,0.26); }
 
 /* ─── Seasonal design overrides ─────────────────────────────────────────── */
 /* Spring (default) — green palette, already the base */
