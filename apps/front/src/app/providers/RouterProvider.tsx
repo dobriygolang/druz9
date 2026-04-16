@@ -10,6 +10,7 @@ const LoginPage = lazy(() => import('@/pages/LoginPage/ui/LoginPage').then(m => 
 const AuthCallbackPage = lazy(() => import('@/pages/AuthCallbackPage/ui/AuthCallbackPage').then(m => ({ default: m.AuthCallbackPage })))
 const CompleteRegistrationPage = lazy(() => import('@/pages/CompleteRegistrationPage/ui/CompleteRegistrationPage').then(m => ({ default: m.CompleteRegistrationPage })))
 const HomePage = lazy(() => import('@/pages/HomePage/ui/HomePage').then(m => ({ default: m.HomePage })))
+const AtlasPage = lazy(() => import('@/pages/AtlasPage/ui/AtlasPage').then(m => ({ default: m.AtlasPage })))
 const CommunityHubPage = lazy(() => import('@/pages/CommunityHubPage/ui/CommunityHubPage').then(m => ({ default: m.CommunityHubPage })))
 const UsersPage = lazy(() => import('@/pages/UsersPage/ui/UsersPage').then(m => ({ default: m.UsersPage })))
 const EventsPage = lazy(() => import('@/pages/EventsPage/ui/EventsPage').then(m => ({ default: m.EventsPage })))
@@ -107,6 +108,7 @@ export const RouterProvider: React.FC = () => {
 
             {/* Home — community pulse */}
             <Route path="/home" element={gate ? <Navigate to="/login" replace /> : <HomePage />} />
+            <Route path="/atlas" element={gate ? <Navigate to="/login" replace /> : <AtlasPage />} />
 
             {/* Practice — code rooms, arena, solo, daily challenge */}
             <Route path="/practice" element={<PracticeHubPage />}>
