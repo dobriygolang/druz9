@@ -7,7 +7,7 @@
 .gw {
   position: relative;
   width: 100%;
-  height: calc(100vh - 56px);
+  height: 100vh;
   overflow: hidden;
   background: #87CEEB;
   font-family: inherit;
@@ -276,23 +276,7 @@
 @keyframes prompt-in { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 @keyframes key-bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-3px)} }
 
-/* ═══════════════════════════════════════════════════════
-   INTERACTIVE OBJECT HIGHLIGHT
-   ═══════════════════════════════════════════════════════ */
-
-.gw-obj-highlight {
-  position: absolute;
-  inset: -4px;
-  border: 2px solid rgba(255,215,0,.5);
-  border-radius: 6px;
-  pointer-events: none;
-  animation: obj-glow 1.5s ease-in-out infinite;
-}
-
-@keyframes obj-glow {
-  0%, 100% { border-color: rgba(255,215,0,.3); box-shadow: 0 0 8px rgba(255,215,0,.1); }
-  50% { border-color: rgba(255,215,0,.7); box-shadow: 0 0 16px rgba(255,215,0,.3); }
-}
+/* obj-glow and gw-obj-highlight — defined below in the polishing section */
 
 /* ═══════════════════════════════════════════════════════
    GAME MODALS
@@ -411,7 +395,7 @@
 
 /* ─── Character HUD ─── */
 .hud-character {
-  top: 12px; left: 12px;
+  top: 48px; left: 12px;
   display: flex; align-items: center; gap: 10px;
   padding: 10px 14px;
   background: linear-gradient(135deg, rgba(245,230,200,.92), rgba(232,216,185,.88));
@@ -532,12 +516,182 @@
 }
 
 /* ═══════════════════════════════════════════════════════
+   OBJECT NAMEPLATES — RPG-style world labels
+   ═══════════════════════════════════════════════════════ */
+
+.gw-nameplate {
+  position: absolute;
+  bottom: calc(100% + 5px);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 45;
+  pointer-events: none;
+
+  padding: 3px 8px;
+  background: rgba(8, 5, 2, 0.82);
+  border: 1px solid rgba(165, 138, 65, 0.4);
+  border-radius: 2px;
+
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5px;
+  color: #C8A86A;
+  white-space: nowrap;
+  letter-spacing: 0.07em;
+  line-height: 1.4;
+
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 215, 100, 0.06);
+}
+
+.dark .gw-nameplate {
+  background: rgba(4, 10, 4, 0.88);
+  border-color: rgba(90, 140, 70, 0.35);
+  color: #7AB86A;
+}
+
+/* ═══════════════════════════════════════════════════════
+   INTERACTIVE OBJECT BASE GLOW — subtle passive indicator
+   ═══════════════════════════════════════════════════════ */
+
+.gw-obj-base-glow {
+  position: absolute;
+  inset: -6px;
+  border-radius: 6px;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center 80%, rgba(255, 210, 80, 0.06) 0%, transparent 70%);
+  transition: opacity 0.3s;
+}
+.gw-obj-base-glow.active {
+  background: radial-gradient(ellipse at center 80%, rgba(255, 210, 80, 0.18) 0%, transparent 70%);
+}
+.dark .gw-obj-base-glow {
+  background: radial-gradient(ellipse at center 80%, rgba(100, 200, 80, 0.06) 0%, transparent 70%);
+}
+.dark .gw-obj-base-glow.active {
+  background: radial-gradient(ellipse at center 80%, rgba(100, 200, 80, 0.18) 0%, transparent 70%);
+}
+
+/* ═══════════════════════════════════════════════════════
+   ENHANCED OBJECT HIGHLIGHT — stronger on proximity
+   ═══════════════════════════════════════════════════════ */
+
+.gw-obj-highlight {
+  position: absolute;
+  inset: -5px;
+  border: 2px solid rgba(255, 220, 80, 0.65);
+  border-radius: 6px;
+  pointer-events: none;
+  animation: obj-glow 1.2s ease-in-out infinite;
+  box-shadow: inset 0 0 10px rgba(255, 220, 80, 0.08);
+}
+
+@keyframes obj-glow {
+  0%, 100% { border-color: rgba(255, 220, 80, 0.4); box-shadow: 0 0 10px rgba(255, 220, 80, 0.12), inset 0 0 8px rgba(255,220,80,0.05); }
+  50% { border-color: rgba(255, 220, 80, 0.85); box-shadow: 0 0 22px rgba(255, 220, 80, 0.35), inset 0 0 12px rgba(255,220,80,0.1); }
+}
+
+/* ═══════════════════════════════════════════════════════
+   CSS PROPS — fence, stones, crates, torches
+   ═══════════════════════════════════════════════════════ */
+
+.gw-fence-post {
+  position: absolute;
+  width: 5px;
+  background: linear-gradient(180deg, #A07840 0%, #6A4820 100%);
+  border: 1px solid #4A3018;
+  border-radius: 1px 1px 0 0;
+  z-index: 14;
+}
+
+.gw-fence-h {
+  position: absolute;
+  height: 5px;
+  background: linear-gradient(180deg, #A07840 0%, #7A5830 100%);
+  border: 1px solid #5A3820;
+  border-radius: 1px;
+  z-index: 14;
+}
+
+.dark .gw-fence-post {
+  background: linear-gradient(180deg, #5A4020 0%, #3A2810 100%);
+  border-color: #2A1808;
+}
+.dark .gw-fence-h {
+  background: linear-gradient(180deg, #5A4020 0%, #3A2810 100%);
+  border-color: #2A1808;
+}
+
+.gw-stone {
+  position: absolute;
+  background: linear-gradient(135deg, #808878 0%, #5A6050 60%, #4A5040 100%);
+  border-radius: 45% 50% 40% 55%;
+  border: 1px solid rgba(0,0,0,0.25);
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+.dark .gw-stone {
+  background: linear-gradient(135deg, #404840 0%, #303830 60%, #282E28 100%);
+  border-color: rgba(0,0,0,0.5);
+  box-shadow: 1px 2px 4px rgba(0,0,0,0.5);
+}
+
+.gw-crate {
+  position: absolute;
+  background: linear-gradient(135deg, #C08840 0%, #8A5E28 70%, #6A4018 100%);
+  border: 1.5px solid #5C3E18;
+  border-radius: 2px;
+  box-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+.gw-crate::before {
+  content: '';
+  position: absolute;
+  inset: 3px;
+  border: 1px solid rgba(200, 160, 80, 0.2);
+  border-radius: 1px;
+}
+.gw-crate::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0; right: 0;
+  height: 1.5px;
+  background: rgba(90,60,20,0.6);
+}
+.dark .gw-crate {
+  background: linear-gradient(135deg, #6A5028 0%, #4A3818 70%, #3A2810 100%);
+  border-color: #2A1808;
+}
+
+.gw-torch {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  background: linear-gradient(180deg, #8B5E28, #5C3A1E);
+  border: 1px solid #3A2010;
+  border-radius: 1px;
+}
+.gw-torch-flame {
+  position: absolute;
+  bottom: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 8px;
+  height: 10px;
+  background: radial-gradient(ellipse at 50% 80%, #FF6B00 0%, #FFD700 55%, transparent 100%);
+  border-radius: 50% 50% 20% 20%;
+  animation: fg 1.1s ease-in-out infinite;
+  filter: blur(0.5px);
+}
+.dark .gw-torch-flame {
+  background: radial-gradient(ellipse at 50% 80%, #FF8C00 0%, #FFE040 55%, transparent 100%);
+}
+
+/* ═══════════════════════════════════════════════════════
    Responsive
    ═══════════════════════════════════════════════════════ */
 @media (max-width: 768px) {
-  .gw { height: calc(100vh - 120px); }
-  .hud-character { max-width: 220px; padding: 8px 10px; gap: 8px; }
+  .gw { height: 100vh; }
+  .hud-character { top: 12px; max-width: 220px; padding: 8px 10px; gap: 8px; }
   .hud-quests { top: 90px; width: 220px; }
   .hud-controls { display: none; }
   .gw-fg-tree { display: none; }
+  .gw-nameplate { display: none; }
 }

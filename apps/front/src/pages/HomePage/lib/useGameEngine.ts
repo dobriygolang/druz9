@@ -25,7 +25,7 @@ export interface GameState {
   interacting: string | null      // modal id currently open
 }
 
-const SPEED = 2.8          // pixels per frame
+const SPEED = 3.5          // pixels per frame
 const TICK = 1000 / 60     // ~60fps
 const INTERACT_KEY = 'KeyE'
 const PX = 48              // player hitbox width

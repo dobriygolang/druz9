@@ -94,8 +94,8 @@ const JOBS_D = [
 
 const WORLD_W = 1200
 const WORLD_H = 700
-const PLAYER_START_X = 540
-const PLAYER_START_Y = 420
+const PLAYER_START_X = 300
+const PLAYER_START_Y = 450
 
 type ArenaStats = { rating?: number; league?: string; currentWinStreak?: number }
 
@@ -145,28 +145,28 @@ export function HomePage() {
 
   // ── World objects (interactive zones) ──
   const worldObjects: WorldObject[] = useMemo(() => [
+    // ── Buildings (solid — physically block movement) ──
     { id: 'home', x: 160, y: 370, w: 70, h: 65, interactRadius: 80,
       prompt: `E — ${t('nav.profile', 'Character Sheet')}`, action: '/profile', solid: true },
-    { id: 'questboard', x: 400, y: 360, w: 60, h: 65, interactRadius: 80,
-      prompt: `E — ${t('home.missions.title', 'Daily Quests')}`, action: 'modal:quests', solid: true },
-    { id: 'signpost', x: 570, y: 390, w: 40, h: 70, interactRadius: 75,
-      prompt: `E — ${primaryAction ? t('home.hero.continue', 'Continue Journey') : t('home.hero.start', 'Start Training')}`,
-      action: primaryAction?.actionUrl ?? '/practice', solid: true },
     { id: 'tavern', x: 760, y: 360, w: 80, h: 70, interactRadius: 90,
       prompt: `E — ${t('nav.community', 'Guild')}`, action: '/community', solid: true },
+    { id: 'tower', x: 60, y: 350, w: 60, h: 90, interactRadius: 80,
+      prompt: `E — ${t('home.quick.map.eyebrow', 'World Atlas')}`, action: '/community/map', solid: true },
     { id: 'portal', x: 1050, y: 370, w: 56, h: 64, interactRadius: 80,
       prompt: `E — ${t('home.weeklyBoss.title', 'Weekly Boss')}`,
       action: weeklyBoss ? 'modal:boss' : undefined, solid: true },
-    { id: 'tower', x: 60, y: 350, w: 60, h: 90, interactRadius: 80,
-      prompt: `E — ${t('home.quick.map.eyebrow', 'World Atlas')}`, action: '/community/map', solid: true },
+    // ── Interactive props (walkable — player approaches and presses E) ──
+    { id: 'questboard', x: 400, y: 360, w: 60, h: 65, interactRadius: 85,
+      prompt: `E — ${t('home.missions.title', 'Daily Quests')}`, action: 'modal:quests' },
+    { id: 'signpost', x: 570, y: 390, w: 40, h: 70, interactRadius: 80,
+      prompt: `E — ${primaryAction ? t('home.hero.continue', 'Continue Journey') : t('home.hero.start', 'Start Training')}`,
+      action: primaryAction?.actionUrl ?? '/practice' },
     { id: 'garden', x: 280, y: 380, w: 50, h: 40, interactRadius: 70,
       prompt: `E — ${t('home.garden.title', 'Progress Garden')}`, action: 'modal:garden' },
-    { id: 'jobs', x: 900, y: 375, w: 50, h: 60, interactRadius: 75,
-      prompt: `E — ${t('home.quick.vacancies.eyebrow', 'Tavern')}`, action: '/community/vacancies', solid: true },
+    { id: 'jobs', x: 900, y: 375, w: 50, h: 60, interactRadius: 80,
+      prompt: `E — ${t('home.quick.vacancies.eyebrow', 'Jobs Board')}`, action: '/community/vacancies' },
     { id: 'echo', x: 50, y: 440, w: 36, h: 40, interactRadius: 65,
       prompt: `E — ${t('home.quick.podcasts.eyebrow', 'Hall of Stories')}`, action: '/community/podcasts' },
-    // Solid-only (no interaction)
-    { id: 'campfire', x: 500, y: 430, w: 32, h: 32, interactRadius: 0, solid: true },
   ], [t, primaryAction, weeklyBoss])
 
   // ── Game engine ──
@@ -242,78 +242,110 @@ export function HomePage() {
 
         {/* ═══ WORLD OBJECTS ═══ */}
 
-        {/* Player's House */}
-        <div className="gw-obj" style={{ left: 95, top: 300 }}
-          onClick={(e) => { e.stopPropagation(); handleObjectClick(worldObjects.find(o => o.id === 'home')!) }}>
-          <Sprite data={HOUSE_D} palette={HOUSE_P} pixel={5} />
-          {state.nearObject?.id === 'home' && <div className="gw-obj-highlight" />}
+        {/* Atlas Tower */}
+        <div className="gw-obj" style={{ left: 10, top: 260 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-nameplate">{t('home.zone.atlas', 'Атлас')}</div>
+            <div className={`gw-obj-base-glow${state.nearObject?.id === 'tower' ? ' active' : ''}`} />
+            <Sprite data={TOWER_D} palette={TOWER_P} pixel={5} />
+            {state.nearObject?.id === 'tower' && <div className="gw-obj-highlight" />}
+          </div>
         </div>
 
-        {/* Atlas Tower */}
-        <div className="gw-obj" style={{ left: 10, top: 260 }}
-          onClick={(e) => { e.stopPropagation(); handleObjectClick(worldObjects.find(o => o.id === 'tower')!) }}>
-          <Sprite data={TOWER_D} palette={TOWER_P} pixel={5} />
-          {state.nearObject?.id === 'tower' && <div className="gw-obj-highlight" />}
+        {/* Player's House */}
+        <div className="gw-obj" style={{ left: 95, top: 300 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-nameplate">{t('home.zone.camp', 'Лагерь')}</div>
+            <div className={`gw-obj-base-glow${state.nearObject?.id === 'home' ? ' active' : ''}`} />
+            <Sprite data={HOUSE_D} palette={HOUSE_P} pixel={5} />
+            {state.nearObject?.id === 'home' && <div className="gw-obj-highlight" />}
+          </div>
+        </div>
+
+        {/* Fence near house */}
+        <div className="gw-fence-post" style={{ left: 200, top: 354, height: 30, zIndex: 15 }} />
+        <div className="gw-fence-post" style={{ left: 215, top: 354, height: 30, zIndex: 15 }} />
+        <div className="gw-fence-post" style={{ left: 230, top: 354, height: 30, zIndex: 15 }} />
+        <div className="gw-fence-h" style={{ left: 200, top: 362, width: 36, zIndex: 15 }} />
+        <div className="gw-fence-h" style={{ left: 200, top: 372, width: 36, zIndex: 15 }} />
+
+        {/* Echo Stone (Podcasts) */}
+        <div className="gw-obj" style={{ left: 18, top: 412 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-nameplate">{t('home.zone.echo', 'Эхо-камень')}</div>
+            <div className={`gw-obj-base-glow${state.nearObject?.id === 'echo' ? ' active' : ''}`} />
+            <Sprite data={ECHO_D} palette={ECHO_P} pixel={4} />
+            {state.nearObject?.id === 'echo' && <div className="gw-obj-highlight" />}
+          </div>
         </div>
 
         {/* Progress Garden */}
-        <div className="gw-obj" style={{ left: 240, top: 355 }}
-          onClick={(e) => { e.stopPropagation(); handleObjectClick(worldObjects.find(o => o.id === 'garden')!) }}>
-          <Sprite data={gardenStage(streakDays)} palette={GARDEN_P} pixel={5} />
-          {streakDays > 3 && <Sprite data={gardenStage(Math.max(0, streakDays - 5))} palette={GARDEN_P} pixel={4} style={{ marginLeft: 8 }} />}
-          {state.nearObject?.id === 'garden' && <div className="gw-obj-highlight" />}
+        <div className="gw-obj" style={{ left: 240, top: 355 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-nameplate">{t('home.zone.garden', 'Сад прогресса')}</div>
+            <div className={`gw-obj-base-glow${state.nearObject?.id === 'garden' ? ' active' : ''}`} />
+            <Sprite data={gardenStage(streakDays)} palette={GARDEN_P} pixel={5} />
+            {streakDays > 3 && <Sprite data={gardenStage(Math.max(0, streakDays - 5))} palette={GARDEN_P} pixel={4} style={{ marginLeft: 8 }} />}
+            {state.nearObject?.id === 'garden' && <div className="gw-obj-highlight" />}
+          </div>
         </div>
 
         {/* Quest Board */}
-        <div className="gw-obj" style={{ left: 365, top: 305 }}
-          onClick={(e) => { e.stopPropagation(); handleObjectClick(worldObjects.find(o => o.id === 'questboard')!) }}>
-          <Sprite data={BOARD_D} palette={BOARD_P} pixel={5} />
-          {state.nearObject?.id === 'questboard' && <div className="gw-obj-highlight" />}
+        <div className="gw-obj" style={{ left: 365, top: 305 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-nameplate">{t('home.zone.quests', 'Доска квестов')}</div>
+            <div className={`gw-obj-base-glow${state.nearObject?.id === 'questboard' ? ' active' : ''}`} />
+            <Sprite data={BOARD_D} palette={BOARD_P} pixel={5} />
+            {state.nearObject?.id === 'questboard' && <div className="gw-obj-highlight" />}
+          </div>
         </div>
 
         {/* Signpost (Continue Journey) */}
-        <div className="gw-obj" style={{ left: 545, top: 320 }}
-          onClick={(e) => { e.stopPropagation(); handleObjectClick(worldObjects.find(o => o.id === 'signpost')!) }}>
-          <Sprite data={SIGN_D} palette={SIGN_P} pixel={5} />
-          {state.nearObject?.id === 'signpost' && <div className="gw-obj-highlight" />}
+        <div className="gw-obj" style={{ left: 545, top: 320 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-nameplate">{primaryAction ? t('home.zone.journey', 'В путь') : t('home.zone.training', 'Полигон')}</div>
+            <div className={`gw-obj-base-glow${state.nearObject?.id === 'signpost' ? ' active' : ''}`} />
+            <Sprite data={SIGN_D} palette={SIGN_P} pixel={5} />
+            {state.nearObject?.id === 'signpost' && <div className="gw-obj-highlight" />}
+          </div>
         </div>
 
         {/* Tavern / Guild */}
-        <div className="gw-obj" style={{ left: 690, top: 290 }}
-          onClick={(e) => { e.stopPropagation(); handleObjectClick(worldObjects.find(o => o.id === 'tavern')!) }}>
-          <Sprite data={TAVERN_D} palette={TAVERN_P} pixel={5} />
-          {state.nearObject?.id === 'tavern' && <div className="gw-obj-highlight" />}
+        <div className="gw-obj" style={{ left: 690, top: 290 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-nameplate">{t('home.zone.guild', 'Гильдия')}</div>
+            <div className={`gw-obj-base-glow${state.nearObject?.id === 'tavern' ? ' active' : ''}`} />
+            <Sprite data={TAVERN_D} palette={TAVERN_P} pixel={5} />
+            {state.nearObject?.id === 'tavern' && <div className="gw-obj-highlight" />}
+          </div>
         </div>
 
         {/* Jobs Board */}
-        <div className="gw-obj" style={{ left: 860, top: 312 }}
-          onClick={(e) => { e.stopPropagation(); handleObjectClick(worldObjects.find(o => o.id === 'jobs')!) }}>
-          <Sprite data={JOBS_D} palette={JOBS_P} pixel={5} />
-          {state.nearObject?.id === 'jobs' && <div className="gw-obj-highlight" />}
+        <div className="gw-obj" style={{ left: 860, top: 312 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-nameplate">{t('home.zone.jobs', 'Доска заданий')}</div>
+            <div className={`gw-obj-base-glow${state.nearObject?.id === 'jobs' ? ' active' : ''}`} />
+            <Sprite data={JOBS_D} palette={JOBS_P} pixel={5} />
+            {state.nearObject?.id === 'jobs' && <div className="gw-obj-highlight" />}
+          </div>
         </div>
 
         {/* Weekly Boss Portal */}
-        <div className="gw-obj" style={{ left: 1010, top: 310 }}
-          onClick={(e) => { e.stopPropagation(); handleObjectClick(worldObjects.find(o => o.id === 'portal')!) }}>
-          <div style={{ position: 'relative' }}>
+        <div className="gw-obj" style={{ left: 1010, top: 305 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-nameplate">{t('home.zone.boss', 'Врата босса')}</div>
             <div className="gw-glow-portal" />
+            <div className={`gw-obj-base-glow${state.nearObject?.id === 'portal' ? ' active' : ''}`} />
             <Sprite data={PORTAL_D} palette={PORTAL_P} pixel={4} />
+            {state.nearObject?.id === 'portal' && <div className="gw-obj-highlight" />}
           </div>
-          {state.nearObject?.id === 'portal' && <div className="gw-obj-highlight" />}
-        </div>
-
-        {/* Echo Stone (Podcasts) */}
-        <div className="gw-obj" style={{ left: 20, top: 415 }}
-          onClick={(e) => { e.stopPropagation(); handleObjectClick(worldObjects.find(o => o.id === 'echo')!) }}>
-          <Sprite data={ECHO_D} palette={ECHO_P} pixel={4} />
-          {state.nearObject?.id === 'echo' && <div className="gw-obj-highlight" />}
         </div>
 
         {/* ═══ PROPS ═══ */}
 
         {/* Campfire */}
-        <div className="gw-obj" style={{ left: 480, top: 410 }}>
-          <div style={{ position: 'relative' }}>
+        <div className="gw-obj" style={{ left: 478, top: 408 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
             <div className="gw-glow-fire" />
             <Sprite data={FIRE_D} palette={FIRE_P} pixel={4} />
           </div>
@@ -324,22 +356,56 @@ export function HomePage() {
           <Sprite data={WATERFALL_D} palette={WATERFALL_P} pixel={4} />
         </div>
 
-        {/* Lanterns */}
-        {[{ l: 680, t: 340 }, { l: 850, t: 335 }, { l: 530, t: 310 }].map((p, i) => (
+        {/* Lanterns — more spread out */}
+        {[
+          { l: 680, t: 338 }, { l: 852, t: 333 }, { l: 528, t: 308 },
+          { l: 340, t: 310 }, { l: 175, t: 305 }, { l: 980, t: 320 },
+        ].map((p, i) => (
           <div key={i} className="gw-obj" style={{ left: p.l, top: p.t }}>
-            <div style={{ position: 'relative' }}>
+            <div style={{ position: 'relative', display: 'inline-block' }}>
               <div className="gw-glow-lantern" />
               <Sprite data={LANTERN_D} palette={LANTERN_P} pixel={3} />
             </div>
           </div>
         ))}
 
-        {/* Barrels */}
-        <div className="gw-obj" style={{ left: 800, top: 400 }}>
+        {/* Barrels — near tavern */}
+        <div className="gw-obj" style={{ left: 800, top: 395 }}>
           <Sprite data={BARREL_D} palette={BARREL_P} pixel={4} />
         </div>
-        <div className="gw-obj" style={{ left: 825, top: 410 }}>
+        <div className="gw-obj" style={{ left: 822, top: 405 }}>
           <Sprite data={BARREL_D} palette={BARREL_P} pixel={3} />
+        </div>
+        <div className="gw-obj" style={{ left: 840, top: 398 }}>
+          <Sprite data={BARREL_D} palette={BARREL_P} pixel={4} />
+        </div>
+
+        {/* Crates near tavern */}
+        <div className="gw-crate" style={{ left: 670, top: 390, width: 22, height: 20, zIndex: 21 }} />
+        <div className="gw-crate" style={{ left: 694, top: 396, width: 16, height: 15, zIndex: 21 }} />
+
+        {/* Stones scattered mid-field */}
+        <div className="gw-stone" style={{ left: 452, top: 445, width: 16, height: 11, zIndex: 15 }} />
+        <div className="gw-stone" style={{ left: 464, top: 452, width: 10, height: 8, zIndex: 15 }} />
+        <div className="gw-stone" style={{ left: 320, top: 440, width: 13, height: 9, zIndex: 15 }} />
+        <div className="gw-stone" style={{ left: 600, top: 448, width: 12, height: 8, zIndex: 15 }} />
+        <div className="gw-stone" style={{ left: 1000, top: 440, width: 15, height: 10, zIndex: 15 }} />
+
+        {/* Wall torches near house */}
+        <div className="gw-obj" style={{ left: 168, top: 326, zIndex: 22 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-torch" style={{ height: 10, width: 5 }} />
+            <div className="gw-torch-flame" />
+            <div className="gw-glow-fire" style={{ opacity: 0.5 }} />
+          </div>
+        </div>
+        {/* Wall torch near tavern */}
+        <div className="gw-obj" style={{ left: 766, top: 318, zIndex: 22 }}>
+          <div style={{ position: 'relative', display: 'inline-block' }}>
+            <div className="gw-torch" style={{ height: 10, width: 5 }} />
+            <div className="gw-torch-flame" />
+            <div className="gw-glow-fire" style={{ opacity: 0.5 }} />
+          </div>
         </div>
 
         {/* Flowers */}
@@ -347,12 +413,18 @@ export function HomePage() {
         <Sprite data={FLOWERS_D} palette={FLOWERS_P} pixel={3} className="gw-flowers" style={{ left: 620, bottom: 90 }} />
         <Sprite data={FLOWERS_D} palette={FLOWERS_P} pixel={4} className="gw-flowers" style={{ left: 950, bottom: 110 }} />
         <Sprite data={FLOWERS_D} palette={FLOWERS_P} pixel={3} className="gw-flowers" style={{ left: 420, bottom: 80 }} />
+        <Sprite data={FLOWERS_D} palette={FLOWERS_P} pixel={3} className="gw-flowers" style={{ left: 760, bottom: 95 }} />
+        <Sprite data={FLOWERS_D} palette={FLOWERS_P} pixel={2} className="gw-flowers" style={{ left: 130, bottom: 85 }} />
+        <Sprite data={FLOWERS_D} palette={FLOWERS_P} pixel={2} className="gw-flowers" style={{ left: 500, bottom: 75 }} />
 
         {/* ═══ NPCs ═══ */}
-        <div className="gw-obj" style={{ left: 720, top: 400, zIndex: 25 }}>
+        <div className="gw-obj" style={{ left: 720, top: 398, zIndex: 25 }}>
           <Sprite data={NPC_D} palette={NPC_P} pixel={3} />
         </div>
-        <div className="gw-obj" style={{ left: 380, top: 410, zIndex: 25 }}>
+        <div className="gw-obj" style={{ left: 748, top: 404, zIndex: 24 }}>
+          <Sprite data={NPC_D} palette={NPC_P} pixel={3} style={{ transform: 'scaleX(-1)' }} />
+        </div>
+        <div className="gw-obj" style={{ left: 378, top: 408, zIndex: 25 }}>
           <Sprite data={NPC_D} palette={NPC_P} pixel={3} style={{ transform: 'scaleX(-1)' }} />
         </div>
 
