@@ -1,4 +1,4 @@
-import { useEffect, useState, useCallback, useMemo } from 'react'
+import { useEffect, useState, useCallback } from 'react'
 import {
   Flame, ChevronRight, Target, Calendar, Briefcase, Headphones, Map,
   Swords, GraduationCap, Code2, Send, BookOpen, Trophy, Award, CheckCircle2,
@@ -15,8 +15,8 @@ import { PlayerFrame } from '@/shared/ui/PlayerFrame'
 import { PixelGardener } from '@/shared/ui/PixelGardener'
 import { ErrorState } from '@/shared/ui/ErrorState'
 import { PageMeta } from '@/shared/ui/PageMeta'
-import type { ProfileProgress, FeedItem, NextAction } from '@/entities/User/model/types'
-import type { DailyMissionsResponse, DailyMission } from '@/features/Mission/model/types'
+import type { ProfileProgress, FeedItem } from '@/entities/User/model/types'
+import type { DailyMissionsResponse } from '@/features/Mission/model/types'
 
 import { LEAGUE_LABELS, LEAGUE_BG_COLORS, LEAGUE_FRAME_NAMES } from '@/shared/lib/league'
 

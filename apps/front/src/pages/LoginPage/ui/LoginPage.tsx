@@ -40,25 +40,6 @@ function TelegramIcon() {
   )
 }
 
-/* ── Leaf pattern SVG for background ─────────────────────── */
-function LeafPattern() {
-  return (
-    <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-[0.04]">
-      <svg width="100%" height="100%">
-        <defs>
-          <pattern id="leaf-grid" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
-            <path d="M20 10C14 14 12 22 10 30l2 1 1-3c2 0 6-4 8-10 0-2-0.5-3-1-3s-1 1-1 1"
-              fill="currentColor" transform="rotate(30, 20, 20)" />
-            <path d="M60 50C54 54 52 62 50 70l2 1 1-3c2 0 6-4 8-10 0-2-0.5-3-1-3s-1 1-1 1"
-              fill="currentColor" transform="rotate(-15, 60, 60)" />
-          </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#leaf-grid)" />
-      </svg>
-    </div>
-  )
-}
-
 export function LoginPage() {
   const { t } = useTranslation()
   const { refresh } = useAuth()
