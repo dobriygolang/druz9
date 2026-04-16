@@ -1,9 +1,18 @@
 import type * as Monaco from 'monaco-editor'
+import { createContext, type FormatterContext } from '@dprint/formatter'
+import initGoFmt, { format as formatGoWithWasm } from '@wasm-fmt/gofmt/vite'
+import ruffWasmUrl from '@dprint/ruff/plugin.wasm?url'
+import sqlWasmUrl from '@dprint/sql/plugin.wasm?url'
+
+let gofmtInitPromise: Promise<void> | null = null
+let pythonFormatterContext: FormatterContext | null = null
+let sqlFormatterContext: FormatterContext | null = null
+let ruffPluginBufferPromise: Promise<ArrayBuffer> | null = null
+let sqlPluginBufferPromise: Promise<ArrayBuffer> | null = null
 
 /**
- * Formats the document in the given editor.
- * Uses Monaco's built-in formatting if a provider is registered for the language,
- * otherwise falls back to a basic re-indentation pass.
+ * Formats the document in the given editor using language-native formatters.
+ * Supported languages: Go, Python, SQL.
  */
 export async function formatEditorCode(
   editor: Monaco.editor.IStandaloneCodeEditor,
@@ -12,29 +21,20 @@ export async function formatEditorCode(
   const model = editor.getModel()
   if (!model) return
 
-  // Try built-in format action first (works for JS/TS/JSON/HTML/CSS).
-  const formatAction = editor.getAction('editor.action.formatDocument')
-  if (formatAction) {
-    try {
-      await formatAction.run()
-      return
-    } catch {
-      // No formatting provider registered — fall through to basic formatter.
-    }
-  }
-
-  // Fallback: basic re-indentation.
   const language = model.getLanguageId()
-  const text = model.getValue()
-  const formatted = basicReindent(text, language)
-  if (formatted !== text) {
-    editor.executeEdits('format', [
-      {
-        range: model.getFullModelRange(),
-        text: formatted,
-      },
-    ])
-  }
+  const formatter = getFormatter(language)
+  if (!formatter) return
+
+  const source = model.getValue()
+  const formatted = await formatter(source)
+  if (formatted === source) return
+
+  editor.executeEdits('format', [
+    {
+      range: model.getFullModelRange(),
+      text: formatted,
+    },
+  ])
 }
 
 /**
@@ -54,32 +54,69 @@ export function registerFormatKeybinding(
   })
 }
 
-function basicReindent(text: string, language: string): string {
-  const lines = text.split('\n')
-  const indent = language === 'python' ? '    ' : '  '
-  const openers = /[{(\[]\s*$/
-  const closers = /^\s*[})\]]/
+type AsyncFormatter = (source: string) => Promise<string>
 
-  let level = 0
-  const result: string[] = []
-
-  for (const raw of lines) {
-    const trimmed = raw.trim()
-    if (trimmed === '') {
-      result.push('')
-      continue
-    }
-
-    if (closers.test(trimmed)) {
-      level = Math.max(0, level - 1)
-    }
-
-    result.push(indent.repeat(level) + trimmed)
-
-    if (openers.test(trimmed)) {
-      level++
-    }
+function getFormatter(language: string): AsyncFormatter | null {
+  switch (language) {
+    case 'go':
+      return formatGo
+    case 'python':
+      return formatPython
+    case 'sql':
+      return formatSql
+    default:
+      return null
   }
+}
 
-  return result.join('\n')
+async function formatGo(source: string): Promise<string> {
+  if (!gofmtInitPromise) {
+    gofmtInitPromise = initGoFmt().then(() => {})
+  }
+  await gofmtInitPromise
+  return formatGoWithWasm(source)
+}
+
+async function formatPython(source: string): Promise<string> {
+  if (!pythonFormatterContext) {
+    pythonFormatterContext = createContext({
+      lineWidth: 88,
+      useTabs: false,
+      newLineKind: 'lf',
+    })
+    pythonFormatterContext.addPlugin(await getRuffPluginBuffer())
+  }
+  return pythonFormatterContext.formatText({
+    filePath: 'main.py',
+    fileText: source,
+  })
+}
+
+async function formatSql(source: string): Promise<string> {
+  if (!sqlFormatterContext) {
+    sqlFormatterContext = createContext({
+      indentWidth: 2,
+      useTabs: false,
+      newLineKind: 'lf',
+    })
+    sqlFormatterContext.addPlugin(await getSqlPluginBuffer())
+  }
+  return sqlFormatterContext.formatText({
+    filePath: 'query.sql',
+    fileText: source,
+  })
+}
+
+async function getRuffPluginBuffer(): Promise<ArrayBuffer> {
+  if (!ruffPluginBufferPromise) {
+    ruffPluginBufferPromise = fetch(ruffWasmUrl).then(response => response.arrayBuffer())
+  }
+  return ruffPluginBufferPromise
+}
+
+async function getSqlPluginBuffer(): Promise<ArrayBuffer> {
+  if (!sqlPluginBufferPromise) {
+    sqlPluginBufferPromise = fetch(sqlWasmUrl).then(response => response.arrayBuffer())
+  }
+  return sqlPluginBufferPromise
 }

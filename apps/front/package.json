@@ -12,7 +12,11 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@dprint/formatter": "^0.5.1",
+    "@dprint/ruff": "^0.7.9",
+    "@dprint/sql": "^0.3.0",
     "@monaco-editor/react": "^4.7.0",
+    "@wasm-fmt/gofmt": "^0.7.3",
     "axios": "^1.6.2",
     "clsx": "^2.1.1",
     "i18next": "^26.0.4",
