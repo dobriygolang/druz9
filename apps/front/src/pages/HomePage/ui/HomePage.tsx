@@ -170,7 +170,7 @@ export function HomePage() {
   ], [t, primaryAction, weeklyBoss])
 
   // ── Game engine ──
-  const { state, handleSceneClick, handleObjectClick, closeModal } = useGameEngine(
+  const { state, handleSceneClick, closeModal } = useGameEngine(
     worldObjects, WORLD_W, WORLD_H, PLAYER_START_X, PLAYER_START_Y, navigate,
   )
 
