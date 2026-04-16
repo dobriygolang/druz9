@@ -970,6 +970,476 @@
   image-rendering: pixelated;
 }
 
+/* ─── Player HUD (Game status bar) ──────────────────────────────────────── */
+.player-hud {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(5,150,105,0.18) 0%, rgba(13,148,136,0.10) 45%, rgba(240,245,241,0.6) 100%);
+  border: 1px solid rgba(5, 150, 105, 0.28);
+  border-bottom: 3px solid rgba(5, 150, 105, 0.22);
+  border-radius: 16px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.5), 0 8px 24px rgba(5,150,105,0.08), 0 2px 8px rgba(0,0,0,0.04);
+}
+.dark .player-hud {
+  background: linear-gradient(135deg, rgba(5,150,105,0.24) 0%, rgba(13,148,136,0.16) 45%, rgba(11,18,16,0.8) 100%);
+  border-color: rgba(52, 211, 153, 0.2);
+  border-bottom-color: rgba(52, 211, 153, 0.28);
+  box-shadow: inset 0 1px 0 rgba(52,211,153,0.07), 0 8px 32px rgba(0,0,0,0.28), 0 0 50px rgba(5,150,105,0.05);
+}
+
+.level-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 7px;
+  background: rgba(5, 150, 105, 0.14);
+  border: 1px solid rgba(5, 150, 105, 0.4);
+  border-radius: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #059669;
+  letter-spacing: 0.05em;
+  flex-shrink: 0;
+  line-height: 1.6;
+}
+.dark .level-badge {
+  background: rgba(52, 211, 153, 0.1);
+  border-color: rgba(52, 211, 153, 0.32);
+  color: #34D399;
+}
+
+.hud-stat {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 9px 4px 7px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1px solid rgba(193, 207, 196, 0.5);
+  backdrop-filter: blur(4px);
+}
+.dark .hud-stat {
+  background: rgba(11, 18, 16, 0.45);
+  border-color: rgba(30, 64, 53, 0.5);
+}
+.hud-stat-inner {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+.hud-stat-value {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  font-weight: 700;
+  color: #111111;
+  line-height: 1.2;
+}
+.dark .hud-stat-value { color: #E2F0E8; }
+.hud-stat-label {
+  font-family: 'Press Start 2P', monospace;
+  font-size: 5.5px;
+  color: #7A9982;
+  letter-spacing: 0.08em;
+  line-height: 1.4;
+}
+.dark .hud-stat-label { color: #4A7058; }
+
+.btn-continue {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 16px;
+  background: linear-gradient(180deg, #10B981 0%, #059669 55%, #047857 100%);
+  border: 1px solid #047857;
+  border-bottom: 3px solid #065F46;
+  border-radius: 6px;
+  color: #ffffff;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 8px;
+  cursor: pointer;
+  transition: transform 0.1s ease, box-shadow 0.1s ease;
+  box-shadow: 0 4px 14px rgba(5, 150, 105, 0.32), inset 0 1px 0 rgba(255,255,255,0.15);
+  text-decoration: none;
+  letter-spacing: 0.04em;
+}
+.btn-continue:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 18px rgba(5, 150, 105, 0.42), inset 0 1px 0 rgba(255,255,255,0.15);
+}
+.btn-continue:active {
+  transform: translateY(1px);
+  box-shadow: 0 2px 8px rgba(5, 150, 105, 0.24), inset 0 1px 0 rgba(255,255,255,0.1);
+}
+
+/* ─── Quest Board panel ──────────────────────────────────────────────────── */
+.quest-board-panel {
+  background: rgba(242, 238, 228, 0.72);
+  border: 1px solid rgba(184, 168, 148, 0.5);
+  border-top: 3px solid rgba(160, 132, 88, 0.72);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.45), 0 2px 12px rgba(139,115,80,0.08);
+  overflow: hidden;
+}
+.dark .quest-board-panel {
+  background: rgba(26, 30, 24, 0.72);
+  border-color: rgba(90, 74, 54, 0.42);
+  border-top-color: rgba(110, 90, 65, 0.65);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.03), 0 2px 16px rgba(0,0,0,0.2);
+}
+
+.quest-board-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px 9px;
+  background: rgba(160, 132, 88, 0.1);
+  border-bottom: 1px solid rgba(184, 168, 148, 0.3);
+}
+.dark .quest-board-header {
+  background: rgba(90, 74, 54, 0.1);
+  border-bottom-color: rgba(90, 74, 54, 0.25);
+}
+
+.board-pin {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: #f59e0b;
+  box-shadow: 0 1px 4px rgba(245,158,11,0.5);
+  flex-shrink: 0;
+}
+
+.board-progress-track {
+  width: 72px;
+  height: 5px;
+  background: rgba(193, 207, 196, 0.4);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.dark .board-progress-track { background: rgba(30, 64, 53, 0.5); }
+.board-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #059669, #10B981);
+  border-radius: 3px;
+  transition: width 0.5s ease;
+}
+
+.quest-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.48);
+  border: 1px solid rgba(193, 207, 196, 0.35);
+  border-radius: 8px;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+.quest-card:hover { background: rgba(255,255,255,0.66); border-color: rgba(5,150,105,0.28); }
+.quest-card.is-done { background: rgba(5,150,105,0.06); border-color: rgba(5,150,105,0.18); }
+.dark .quest-card { background: rgba(19,36,32,0.4); border-color: rgba(30,64,53,0.35); }
+.dark .quest-card:hover { background: rgba(19,36,32,0.6); border-color: rgba(52,211,153,0.24); }
+.dark .quest-card.is-done { background: rgba(5,150,105,0.09); border-color: rgba(52,211,153,0.14); }
+
+.quest-icon-wrap {
+  display: flex;
+  flex-shrink: 0;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255,255,255,0.55);
+  border: 1px solid rgba(193,207,196,0.4);
+}
+.quest-icon-wrap.done { background: rgba(5,150,105,0.1); border-color: rgba(5,150,105,0.25); }
+.dark .quest-icon-wrap { background: rgba(19,36,32,0.5); border-color: rgba(30,64,53,0.4); }
+.dark .quest-icon-wrap.done { background: rgba(5,150,105,0.14); border-color: rgba(52,211,153,0.2); }
+
+.quest-mini-progress {
+  width: 100%;
+  max-width: 130px;
+  height: 4px;
+  background: rgba(193,207,196,0.4);
+  border-radius: 2px;
+  overflow: hidden;
+  margin: 3px 0 2px;
+}
+.dark .quest-mini-progress { background: rgba(30,64,53,0.5); }
+.quest-mini-fill {
+  height: 100%;
+  background: #059669;
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.dark .quest-mini-fill { background: #34D399; }
+
+.xp-badge {
+  display: inline-flex;
+  padding: 2px 6px;
+  background: rgba(5,150,105,0.11);
+  border: 1px solid rgba(5,150,105,0.25);
+  border-radius: 4px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 9px;
+  font-weight: 700;
+  color: #059669;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.dark .xp-badge { background: rgba(52,211,153,0.09); border-color: rgba(52,211,153,0.2); color: #34D399; }
+
+.quest-go-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 10px;
+  background: linear-gradient(180deg, #A0845C 0%, #8B7355 100%);
+  border: 1px solid #5A4A3A;
+  border-bottom: 2px solid #3D2E24;
+  border-radius: 4px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #FFF7ED;
+  cursor: pointer;
+  transition: transform 0.1s;
+  text-decoration: none;
+  flex-shrink: 0;
+  line-height: 1.6;
+}
+.quest-go-btn:hover { transform: translateY(-1px); }
+.quest-go-btn:active { transform: translateY(1px); }
+.dark .quest-go-btn { background: linear-gradient(180deg, #6B5B45 0%, #5A4A3A 100%); border-color: #2D1F14; border-bottom-color: #1A1008; }
+
+.quest-board-complete {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: rgba(5,150,105,0.1);
+  border: 1px solid rgba(5,150,105,0.22);
+  border-radius: 8px;
+  color: #059669;
+}
+.dark .quest-board-complete { background: rgba(52,211,153,0.07); border-color: rgba(52,211,153,0.15); color: #34D399; }
+
+/* ─── Journey / Training Route panel ────────────────────────────────────── */
+.journey-panel {
+  background: rgba(240,245,241,0.6);
+  border: 1px solid rgba(193,207,196,0.4);
+  border-left: 3px solid rgba(5,150,105,0.5);
+  border-radius: 12px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.25);
+}
+.dark .journey-panel {
+  background: rgba(19,36,32,0.4);
+  border-color: rgba(30,64,53,0.35);
+  border-left-color: rgba(52,211,153,0.3);
+}
+
+.journey-step {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 7px 4px;
+  text-decoration: none;
+}
+
+.journey-step-track {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex-shrink: 0;
+  width: 22px;
+}
+
+.journey-node {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  background: rgba(193,207,196,0.3);
+  border: 2px solid rgba(193,207,196,0.55);
+  font-family: 'Press Start 2P', monospace;
+  font-size: 6px;
+  color: #7A9982;
+  flex-shrink: 0;
+}
+.journey-node.active {
+  background: rgba(5,150,105,0.14);
+  border-color: #059669;
+  color: #059669;
+  animation: node-pulse 2.2s ease-in-out infinite;
+}
+.dark .journey-node { background: rgba(19,36,32,0.55); border-color: rgba(30,64,53,0.65); color: #4A7058; }
+.dark .journey-node.active { background: rgba(52,211,153,0.1); border-color: #34D399; color: #34D399; animation: node-pulse-dark 2.2s ease-in-out infinite; }
+
+@keyframes node-pulse {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(5,150,105,0.12); }
+  50%       { box-shadow: 0 0 0 6px rgba(5,150,105,0.04); }
+}
+@keyframes node-pulse-dark {
+  0%, 100% { box-shadow: 0 0 0 3px rgba(52,211,153,0.1); }
+  50%       { box-shadow: 0 0 0 6px rgba(52,211,153,0.03); }
+}
+
+.journey-connector {
+  width: 2px;
+  flex: 1;
+  min-height: 14px;
+  background: rgba(193,207,196,0.4);
+}
+.dark .journey-connector { background: rgba(30,64,53,0.5); }
+
+.journey-step-content {
+  flex: 1;
+  min-width: 0;
+  padding-top: 1px;
+}
+
+/* ─── Expedition Log panel ───────────────────────────────────────────────── */
+.expedition-log {
+  background: rgba(230,240,232,0.45);
+  border: 1px solid rgba(193,207,196,0.35);
+  border-left: 3px solid rgba(5,150,105,0.2);
+  border-radius: 12px;
+  box-shadow: inset 0 2px 4px rgba(0,0,0,0.03);
+}
+.dark .expedition-log {
+  background: rgba(11,18,16,0.55);
+  border-color: rgba(30,64,53,0.3);
+  border-left-color: rgba(52,211,153,0.15);
+}
+
+.log-entry {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  transition: background 0.15s ease;
+}
+.log-entry:hover { background: rgba(255,255,255,0.32); }
+.dark .log-entry:hover { background: rgba(255,255,255,0.03); }
+
+.log-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(5,150,105,0.4);
+  flex-shrink: 0;
+}
+.dark .log-dot { background: rgba(52,211,153,0.3); }
+
+.log-score {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  color: #059669;
+  flex-shrink: 0;
+}
+.dark .log-score { color: #34D399; }
+
+/* ─── Raid Banner (Weekly Boss) ──────────────────────────────────────────── */
+.raid-banner {
+  position: relative;
+  overflow: hidden;
+  background: linear-gradient(135deg, rgba(255,249,232,0.94) 0%, rgba(255,245,215,0.97) 55%, rgba(255,249,232,0.94) 100%);
+  border: 1px solid rgba(245,158,11,0.38);
+  border-top: 3px solid rgba(245,158,11,0.55);
+  border-radius: 14px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 4px 16px rgba(245,158,11,0.08), 0 2px 8px rgba(0,0,0,0.04);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.raid-banner:hover {
+  border-color: rgba(245,158,11,0.55);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.7), 0 6px 20px rgba(245,158,11,0.14), 0 2px 8px rgba(0,0,0,0.05);
+}
+.dark .raid-banner {
+  background: linear-gradient(135deg, rgba(24,14,4,0.98) 0%, rgba(44,27,7,0.96) 55%, rgba(28,16,4,0.98) 100%);
+  border-color: rgba(251,191,36,0.28);
+  border-top-color: rgba(251,191,36,0.5);
+  box-shadow: inset 0 1px 0 rgba(251,191,36,0.07), 0 0 40px rgba(251,191,36,0.06), 0 4px 20px rgba(0,0,0,0.3);
+}
+.dark .raid-banner:hover {
+  border-color: rgba(251,191,36,0.42);
+  box-shadow: inset 0 1px 0 rgba(251,191,36,0.09), 0 0 50px rgba(251,191,36,0.1), 0 6px 24px rgba(0,0,0,0.35);
+}
+
+.raid-banner-glow {
+  position: absolute;
+  top: -30px;
+  right: 60px;
+  width: 180px;
+  height: 110px;
+  background: radial-gradient(ellipse, rgba(251,191,36,0.14) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.raid-boss-icon {
+  display: flex;
+  width: 54px;
+  height: 54px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 12px;
+  background: rgba(245,158,11,0.12);
+  border: 1px solid rgba(245,158,11,0.3);
+  flex-shrink: 0;
+}
+.dark .raid-boss-icon { background: rgba(251,191,36,0.1); border-color: rgba(251,191,36,0.28); }
+
+.raid-enter-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: linear-gradient(180deg, #fbbf24 0%, #f59e0b 55%, #d97706 100%);
+  border: 1px solid #b45309;
+  border-bottom: 2px solid #92400e;
+  border-radius: 5px;
+  font-family: 'Press Start 2P', monospace;
+  font-size: 7px;
+  color: #ffffff;
+  white-space: nowrap;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+  line-height: 1.6;
+}
+
+/* ─── World Portals (Quick nav tiles) ────────────────────────────────────── */
+.world-portal {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px;
+  background: rgba(240,245,241,0.55);
+  border: 1px solid rgba(193,207,196,0.4);
+  border-radius: 12px;
+  text-decoration: none;
+  transition: transform 0.15s ease, background 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
+  backdrop-filter: blur(6px);
+}
+.world-portal:hover {
+  transform: translateY(-2px);
+  background: rgba(240,245,241,0.78);
+  border-color: rgba(5,150,105,0.28);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+}
+.dark .world-portal { background: rgba(19,36,32,0.45); border-color: rgba(30,64,53,0.35); }
+.dark .world-portal:hover { background: rgba(19,36,32,0.65); border-color: rgba(52,211,153,0.24); box-shadow: 0 6px 20px rgba(0,0,0,0.25); }
+
+.portal-icon {
+  display: flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(5,150,105,0.1);
+  border: 1px solid rgba(5,150,105,0.2);
+  flex-shrink: 0;
+}
+.dark .portal-icon { background: rgba(52,211,153,0.07); border-color: rgba(52,211,153,0.15); }
+
 /* ─── Seasonal design overrides ─────────────────────────────────────────── */
 /* Spring (default) — green palette, already the base */
 
