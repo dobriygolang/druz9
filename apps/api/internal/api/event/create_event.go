@@ -4,17 +4,16 @@ import (
 	"context"
 	"time"
 
+	"api/internal/apihelpers"
 	"api/internal/model"
 	"api/internal/util/timeutil"
 	v1 "api/pkg/api/event/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) CreateEvent(ctx context.Context, req *v1.CreateEventRequest) (*v1.EventResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	var scheduledAt *time.Time

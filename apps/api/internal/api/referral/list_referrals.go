@@ -3,12 +3,13 @@ package referral
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	"api/internal/model"
 	v1 "api/pkg/api/referral/v1"
 )
 
 func (i *Implementation) ListReferrals(ctx context.Context, req *v1.ListReferralsRequest) (*v1.ListReferralsResponse, error) {
-	user, _ := model.UserFromContext(ctx)
+	user := apihelpers.OptionalUser(ctx)
 
 	opts := model.ListReferralsOptions{
 		Limit:  req.Limit,

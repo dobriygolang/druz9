@@ -3,11 +3,11 @@ package podcast
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	"api/internal/model"
 	v1 "api/pkg/api/podcast/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 )
 
 const maxInlinePodcastUploadSize = 20 * 1024 * 1024
@@ -17,9 +17,9 @@ func (i *Implementation) UploadPodcast(ctx context.Context, req *v1.UploadPodcas
 		return nil, err
 	}
 
-	podcastID, err := uuid.Parse(req.PodcastId)
+	podcastID, err := apihelpers.ParseUUID(req.PodcastId, "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_PODCAST_ID", "invalid podcast id")
+		return nil, err
 	}
 	if len(req.Content) > maxInlinePodcastUploadSize {
 		return nil, errors.BadRequest(

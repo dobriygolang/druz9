@@ -4,23 +4,23 @@ import (
 	"context"
 	"time"
 
+	"api/internal/apihelpers"
 	"api/internal/model"
 	"api/internal/util/timeutil"
 	guildv1 "api/pkg/api/guild/v1"
 
 	kratosErrors "github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) CreateGuildEvent(ctx context.Context, req *guildv1.CreateGuildEventRequest) (*guildv1.CreateGuildEventResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, kratosErrors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	guildID, err := uuid.Parse(req.GuildId)
+	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, kratosErrors.BadRequest("INVALID_GUILD_ID", "invalid guild_id")
+		return nil, err
 	}
 
 	isMember, err := i.service.IsMember(ctx, guildID, user.ID)

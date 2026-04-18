@@ -5,15 +5,15 @@ import (
 
 	"github.com/go-kratos/kratos/v2/errors"
 
+	"api/internal/apihelpers"
 	notifclient "api/internal/clients/notification"
-	"api/internal/model"
 	v1 "api/pkg/api/notification/v1"
 )
 
 func (i *SettingsImplementation) UpdateNotificationSettings(ctx context.Context, req *v1.UpdateNotificationSettingsRequest) (*v1.UpdateNotificationSettingsResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	upd := notifclient.SettingsUpdate{

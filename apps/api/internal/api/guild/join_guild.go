@@ -3,23 +3,20 @@ package guild
 import (
 	"context"
 
-	"api/internal/model"
-	v1 "api/pkg/api/guild/v1"
+	"api/internal/apihelpers"
 	commonv1 "api/pkg/api/common/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
+	v1 "api/pkg/api/guild/v1"
 )
 
 func (i *Implementation) JoinGuild(ctx context.Context, req *v1.JoinGuildRequest) (*v1.JoinGuildResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	guildID, err := uuid.Parse(req.GuildId)
+	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_GUILD_ID", "invalid guild id")
+		return nil, err
 	}
 
 	if err := i.service.JoinGuild(ctx, guildID, user.ID); err != nil {

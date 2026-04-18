@@ -3,22 +3,20 @@ package podcast
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/podcast/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) DeletePodcast(ctx context.Context, req *v1.DeletePodcastRequest) (*v1.PodcastStatusResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	podcastID, err := uuid.Parse(req.PodcastId)
+	podcastID, err := apihelpers.ParseUUID(req.PodcastId, "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_PODCAST_ID", "invalid podcast id")
+		return nil, err
 	}
 	if _, err := i.service.DeletePodcast(ctx, podcastID, user); err != nil {
 		return nil, err

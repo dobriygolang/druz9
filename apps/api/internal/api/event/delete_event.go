@@ -3,23 +3,21 @@ package event
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	"api/internal/model"
 	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/event/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) DeleteEvent(ctx context.Context, req *v1.DeleteEventRequest) (*v1.EventStatusResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	eventID, err := uuid.Parse(req.EventId)
+	eventID, err := apihelpers.ParseUUID(req.EventId, "INVALID_EVENT_ID", "event_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_EVENT_ID", "invalid event id")
+		return nil, err
 	}
 	ctx = model.ContextWithEventDeleteScope(ctx, unmapDeleteEventScope(req.DeleteScope))
 	if err := i.service.DeleteEvent(ctx, eventID, user); err != nil {

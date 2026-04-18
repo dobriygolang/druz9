@@ -4,16 +4,15 @@ import (
 	"context"
 
 	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 
-	"api/internal/model"
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/challenge/v1"
 )
 
 func (i *Implementation) GetBlindReviewTask(ctx context.Context, _ *v1.GetBlindReviewTaskRequest) (*v1.BlindReviewTask, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 	task, err := i.service.GetBlindReviewTask(ctx, user.ID)
 	if err != nil || task == nil {
@@ -23,17 +22,17 @@ func (i *Implementation) GetBlindReviewTask(ctx context.Context, _ *v1.GetBlindR
 }
 
 func (i *Implementation) SubmitBlindReview(ctx context.Context, req *v1.SubmitBlindReviewRequest) (*v1.BlindReviewResult, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
-	}
-	srcID, err := uuid.Parse(req.GetSourceReviewId())
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_SOURCE_REVIEW_ID", "invalid source review id")
+		return nil, err
 	}
-	taskID, err := uuid.Parse(req.GetTaskId())
+	srcID, err := apihelpers.ParseUUID(req.GetSourceReviewId(), "INVALID_SOURCE_REVIEW_ID", "source_review_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_TASK_ID", "invalid task id")
+		return nil, err
+	}
+	taskID, err := apihelpers.ParseUUID(req.GetTaskId(), "INVALID_TASK_ID", "task_id")
+	if err != nil {
+		return nil, err
 	}
 	result, err := i.service.SubmitBlindReview(ctx, user.ID, srcID, taskID, req.GetSourceCode(), req.GetSourceLanguage(), req.GetUserReview())
 	if err != nil {

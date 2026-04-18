@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"api/internal/apihelpers"
 	streakdomain "api/internal/domain/streak"
 	"api/internal/model"
 	v1 "api/pkg/api/streak/v1"
@@ -32,7 +33,7 @@ func (i *Implementation) GetDescription() grpc.ServiceDesc {
 }
 
 func (i *Implementation) GetStreak(ctx context.Context, _ *v1.GetStreakRequest) (*v1.GetStreakResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -44,7 +45,7 @@ func (i *Implementation) GetStreak(ctx context.Context, _ *v1.GetStreakRequest) 
 }
 
 func (i *Implementation) UseShield(ctx context.Context, _ *v1.UseShieldRequest) (*v1.UseShieldResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +57,7 @@ func (i *Implementation) UseShield(ctx context.Context, _ *v1.UseShieldRequest) 
 }
 
 func (i *Implementation) PurchaseShield(ctx context.Context, req *v1.PurchaseShieldRequest) (*v1.PurchaseShieldResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -72,14 +73,6 @@ func (i *Implementation) PurchaseShield(ctx context.Context, req *v1.PurchaseShi
 }
 
 // ---------- helpers ----------
-
-func requireUser(ctx context.Context) (*model.User, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
-	}
-	return user, nil
-}
 
 func mapState(s *model.StreakState) *v1.StreakState {
 	if s == nil {

@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"api/internal/apihelpers"
 	socialdomain "api/internal/domain/social"
 	"api/internal/model"
 	v1 "api/pkg/api/social/v1"
@@ -34,7 +35,7 @@ func (i *Implementation) GetDescription() grpc.ServiceDesc { return v1.SocialSer
 // ---------- handlers ----------
 
 func (i *Implementation) ListFriends(ctx context.Context, req *v1.ListFriendsRequest) (*v1.ListFriendsResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -50,7 +51,7 @@ func (i *Implementation) ListFriends(ctx context.Context, req *v1.ListFriendsReq
 }
 
 func (i *Implementation) ListPendingRequests(ctx context.Context, _ *v1.ListPendingRequestsRequest) (*v1.ListPendingRequestsResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -65,7 +66,7 @@ func (i *Implementation) ListPendingRequests(ctx context.Context, _ *v1.ListPend
 }
 
 func (i *Implementation) SendFriendRequest(ctx context.Context, req *v1.SendFriendRequestRequest) (*v1.SendFriendRequestResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -77,13 +78,13 @@ func (i *Implementation) SendFriendRequest(ctx context.Context, req *v1.SendFrie
 }
 
 func (i *Implementation) AcceptFriendRequest(ctx context.Context, req *v1.AcceptFriendRequestRequest) (*v1.AcceptFriendRequestResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	id, perr := uuid.Parse(req.GetRequestId())
+	id, perr := apihelpers.ParseUUID(req.GetRequestId(), "INVALID_REQUEST_ID", "request_id")
 	if perr != nil {
-		return nil, errors.BadRequest("INVALID_REQUEST_ID", "request_id must be a UUID")
+		return nil, perr
 	}
 	f, err := i.service.AcceptFriendRequest(ctx, user.ID, id)
 	if err != nil {
@@ -93,13 +94,13 @@ func (i *Implementation) AcceptFriendRequest(ctx context.Context, req *v1.Accept
 }
 
 func (i *Implementation) DeclineFriendRequest(ctx context.Context, req *v1.DeclineFriendRequestRequest) (*v1.DeclineFriendRequestResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	id, perr := uuid.Parse(req.GetRequestId())
+	id, perr := apihelpers.ParseUUID(req.GetRequestId(), "INVALID_REQUEST_ID", "request_id")
 	if perr != nil {
-		return nil, errors.BadRequest("INVALID_REQUEST_ID", "request_id must be a UUID")
+		return nil, perr
 	}
 	if err := i.service.DeclineFriendRequest(ctx, user.ID, id); err != nil {
 		return nil, mapAcceptErr(err)
@@ -108,13 +109,13 @@ func (i *Implementation) DeclineFriendRequest(ctx context.Context, req *v1.Decli
 }
 
 func (i *Implementation) RemoveFriend(ctx context.Context, req *v1.RemoveFriendRequest) (*v1.RemoveFriendResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	other, perr := uuid.Parse(req.GetUserId())
+	other, perr := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if perr != nil {
-		return nil, errors.BadRequest("INVALID_USER_ID", "user_id must be a UUID")
+		return nil, perr
 	}
 	if err := i.service.RemoveFriend(ctx, user.ID, other); err != nil {
 		if goerr.Is(err, socialdomain.ErrNotFriends) {
@@ -126,14 +127,6 @@ func (i *Implementation) RemoveFriend(ctx context.Context, req *v1.RemoveFriendR
 }
 
 // ---------- helpers ----------
-
-func requireUser(ctx context.Context) (*model.User, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
-	}
-	return user, nil
-}
 
 func mapFriend(f *model.Friend) *v1.Friend {
 	if f == nil {

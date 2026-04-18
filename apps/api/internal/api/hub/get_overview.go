@@ -3,7 +3,7 @@ package hub
 import (
 	"context"
 
-	"api/internal/model"
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/hub/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -12,9 +12,9 @@ import (
 func (i *Implementation) GetOverview(ctx context.Context, req *v1.GetOverviewRequest) (*v1.GetOverviewResponse, error) {
 	_ = req
 
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	fullUser, err := i.service.profiles.FindUserByID(ctx, user.ID)

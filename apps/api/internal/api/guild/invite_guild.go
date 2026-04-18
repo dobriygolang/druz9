@@ -3,29 +3,26 @@ package guild
 import (
 	"context"
 
-	"api/internal/model"
+	"api/internal/apihelpers"
 	"api/internal/notiftext"
-	v1 "api/pkg/api/guild/v1"
 	commonv1 "api/pkg/api/common/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
+	v1 "api/pkg/api/guild/v1"
 )
 
 func (i *Implementation) InviteToGuild(ctx context.Context, req *v1.InviteToGuildRequest) (*v1.InviteToGuildResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	guildID, err := uuid.Parse(req.GuildId)
+	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_GUILD_ID", "invalid guild id")
+		return nil, err
 	}
 
-	inviteeID, err := uuid.Parse(req.UserId)
+	inviteeID, err := apihelpers.ParseUUID(req.UserId, "INVALID_USER_ID", "user_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_USER_ID", "invalid user id")
+		return nil, err
 	}
 
 	if err := i.service.InviteToGuild(ctx, guildID, user.ID, inviteeID); err != nil {

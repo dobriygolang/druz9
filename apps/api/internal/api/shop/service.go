@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"api/internal/apihelpers"
 	shopdomain "api/internal/domain/shop"
 	"api/internal/model"
 	v1 "api/pkg/api/shop/v1"
@@ -68,7 +69,7 @@ func (i *Implementation) ListItems(ctx context.Context, req *v1.ListItemsRequest
 
 func (i *Implementation) GetItem(ctx context.Context, req *v1.GetItemRequest) (*v1.GetItemResponse, error) {
 	var viewerID uuid.UUID
-	if user, ok := model.UserFromContext(ctx); ok && user != nil {
+	if user := apihelpers.OptionalUser(ctx); user != nil {
 		viewerID = user.ID
 	}
 	itemID, err := i.service.ResolveItem(ctx, req.GetItemId())
@@ -89,7 +90,7 @@ func (i *Implementation) GetItem(ctx context.Context, req *v1.GetItemRequest) (*
 }
 
 func (i *Implementation) GetInventory(ctx context.Context, _ *v1.GetInventoryRequest) (*v1.GetInventoryResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +106,7 @@ func (i *Implementation) GetInventory(ctx context.Context, _ *v1.GetInventoryReq
 }
 
 func (i *Implementation) Purchase(ctx context.Context, req *v1.PurchaseRequest) (*v1.PurchaseResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -143,14 +144,6 @@ func (i *Implementation) Purchase(ctx context.Context, req *v1.PurchaseRequest) 
 }
 
 // ---------- mapping ----------
-
-func requireUser(ctx context.Context) (*model.User, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
-	}
-	return user, nil
-}
 
 func mapItem(it *model.ShopItem) *v1.ShopItem {
 	if it == nil {

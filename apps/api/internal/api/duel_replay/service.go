@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"api/internal/apihelpers"
 	duelreplaydomain "api/internal/domain/duel_replay"
 	"api/internal/model"
 	v1 "api/pkg/api/duel_replay/v1"
@@ -33,13 +34,13 @@ func (i *Implementation) GetDescription() grpc.ServiceDesc {
 }
 
 func (i *Implementation) GetReplay(ctx context.Context, req *v1.GetReplayRequest) (*v1.GetReplayResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	id, parseErr := uuid.Parse(req.GetReplayId())
+	id, parseErr := apihelpers.ParseUUID(req.GetReplayId(), "INVALID_REPLAY_ID", "replay_id")
 	if parseErr != nil {
-		return nil, errors.BadRequest("INVALID_REPLAY_ID", "replay_id must be a valid UUID")
+		return nil, parseErr
 	}
 	viewer := user.ID
 	result, err := i.service.GetReplay(ctx, id, &viewer)
@@ -65,7 +66,7 @@ func (i *Implementation) GetReplay(ctx context.Context, req *v1.GetReplayRequest
 }
 
 func (i *Implementation) ListMyReplays(ctx context.Context, req *v1.ListMyReplaysRequest) (*v1.ListReplaysResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -81,13 +82,13 @@ func (i *Implementation) ListMyReplays(ctx context.Context, req *v1.ListMyReplay
 }
 
 func (i *Implementation) RecordEvent(ctx context.Context, req *v1.RecordEventRequest) (*v1.RecordEventResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	replayID, parseErr := uuid.Parse(req.GetReplayId())
+	replayID, parseErr := apihelpers.ParseUUID(req.GetReplayId(), "INVALID_REPLAY_ID", "replay_id")
 	if parseErr != nil {
-		return nil, errors.BadRequest("INVALID_REPLAY_ID", "replay_id must be a valid UUID")
+		return nil, parseErr
 	}
 	var linesCount *int32
 	if req.GetLinesCount() != 0 {
@@ -120,14 +121,6 @@ func (i *Implementation) RecordEvent(ctx context.Context, req *v1.RecordEventReq
 }
 
 // ---------- helpers ----------
-
-func requireUser(ctx context.Context) (*model.User, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
-	}
-	return user, nil
-}
 
 func mapSummary(s *model.DuelReplaySummary) *v1.ReplaySummary {
 	if s == nil {

@@ -3,23 +3,21 @@ package guild
 import (
 	"context"
 
-	"api/internal/model"
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/guild/v1"
 
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (i *Implementation) GetGuildPulse(ctx context.Context, req *v1.GetGuildPulseRequest) (*v1.GetGuildPulseResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	guildID, err := uuid.Parse(req.GuildId)
+	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_GUILD_ID", "invalid guild_id")
+		return nil, err
 	}
 
 	pulse, err := i.service.GetPulse(ctx, guildID, user.ID)

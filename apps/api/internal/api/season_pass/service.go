@@ -9,6 +9,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"api/internal/apihelpers"
 	seasonpassdomain "api/internal/domain/season_pass"
 	"api/internal/model"
 	v1 "api/pkg/api/season_pass/v1"
@@ -32,7 +33,7 @@ func (i *Implementation) GetDescription() grpc.ServiceDesc {
 }
 
 func (i *Implementation) GetActive(ctx context.Context, _ *v1.GetActiveRequest) (*v1.GetActiveResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -55,7 +56,7 @@ func (i *Implementation) GetActive(ctx context.Context, _ *v1.GetActiveRequest) 
 }
 
 func (i *Implementation) ClaimTierReward(ctx context.Context, req *v1.ClaimTierRewardRequest) (*v1.ClaimTierRewardResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -75,7 +76,7 @@ func (i *Implementation) ClaimTierReward(ctx context.Context, req *v1.ClaimTierR
 }
 
 func (i *Implementation) PurchasePremium(ctx context.Context, _ *v1.PurchasePremiumRequest) (*v1.PurchasePremiumResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -96,14 +97,6 @@ func (i *Implementation) PurchasePremium(ctx context.Context, _ *v1.PurchasePrem
 }
 
 // ---------- helpers ----------
-
-func requireUser(ctx context.Context) (*model.User, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
-	}
-	return user, nil
-}
 
 func mapPass(p *model.SeasonPass) *v1.SeasonPass {
 	if p == nil {

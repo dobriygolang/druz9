@@ -5,14 +5,14 @@ import (
 
 	"github.com/go-kratos/kratos/v2/errors"
 
-	"api/internal/model"
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/mission/v1"
 )
 
 func (i *Implementation) CompleteMission(ctx context.Context, req *v1.CompleteMissionRequest) (*v1.CompleteMissionResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 	if req.GetMissionKey() == "" {
 		return nil, errors.BadRequest("INVALID_MISSION_KEY", "mission_key is required")

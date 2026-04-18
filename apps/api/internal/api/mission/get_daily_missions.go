@@ -5,14 +5,15 @@ import (
 
 	"github.com/go-kratos/kratos/v2/errors"
 
+	"api/internal/apihelpers"
 	"api/internal/model"
 	v1 "api/pkg/api/mission/v1"
 )
 
 func (i *Implementation) GetDailyMissions(ctx context.Context, _ *v1.GetDailyMissionsRequest) (*v1.GetDailyMissionsResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	result, err := i.service.GetDailyMissions(ctx, user.ID)

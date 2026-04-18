@@ -3,7 +3,7 @@ package training
 import (
 	"context"
 
-	"api/internal/model"
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/training/v1"
 
 	"github.com/go-kratos/kratos/v2/errors"
@@ -12,9 +12,9 @@ import (
 func (i *Implementation) GetSkillTree(ctx context.Context, req *v1.GetSkillTreeRequest) (*v1.GetSkillTreeResponse, error) {
 	_ = req
 
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	resp, err := i.service.GetSkillTree(ctx, user.ID)
@@ -25,9 +25,9 @@ func (i *Implementation) GetSkillTree(ctx context.Context, req *v1.GetSkillTreeR
 }
 
 func (i *Implementation) GetTask(ctx context.Context, req *v1.GetTaskRequest) (*v1.GetTaskResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	task, err := i.service.GetTask(ctx, user.ID, req.GetModuleId())
@@ -57,9 +57,9 @@ func (i *Implementation) GetTask(ctx context.Context, req *v1.GetTaskRequest) (*
 }
 
 func (i *Implementation) EvaluateTaskSolution(ctx context.Context, req *v1.EvaluateTaskSolutionRequest) (*v1.EvaluateTaskSolutionResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	result, err := i.service.EvaluateTaskSolution(ctx, user.ID, req.GetModuleId(), req.GetLanguage(), req.GetCode(), req.GetMode())

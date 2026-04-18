@@ -3,13 +3,14 @@ package podcast
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	"api/internal/metrics"
 	"api/internal/model"
 	v1 "api/pkg/api/podcast/v1"
 )
 
 func (i *Implementation) CreatePodcast(ctx context.Context, req *v1.CreatePodcastRequest) (*v1.PodcastResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}

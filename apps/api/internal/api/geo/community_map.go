@@ -3,18 +3,16 @@ package geo
 import (
 	"context"
 
-	"api/internal/model"
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/geo/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) CommunityMap(ctx context.Context, req *v1.CommunityMapRequest) (*v1.CommunityMapResponse, error) {
 	_ = req
 
-	user, ok := model.UserFromContext(ctx)
-	if !ok {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	response, err := i.service.CommunityMap(ctx, user.ID.String())

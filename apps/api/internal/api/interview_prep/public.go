@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"api/internal/aireview"
+	"api/internal/apihelpers"
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/model"
 	"api/internal/notiftext"
@@ -16,7 +17,7 @@ import (
 
 func (i *Implementation) ListTasks(ctx context.Context, req *v1.ListTasksRequest) (*v1.ListTasksResponse, error) {
 	_ = req
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -34,7 +35,7 @@ func (i *Implementation) ListTasks(ctx context.Context, req *v1.ListTasksRequest
 }
 
 func (i *Implementation) StartSession(ctx context.Context, req *v1.StartSessionRequest) (*v1.SessionEnvelope, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -51,7 +52,7 @@ func (i *Implementation) StartSession(ctx context.Context, req *v1.StartSessionR
 }
 
 func (i *Implementation) GetSession(ctx context.Context, req *v1.GetSessionRequest) (*v1.SessionEnvelope, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -68,7 +69,7 @@ func (i *Implementation) GetSession(ctx context.Context, req *v1.GetSessionReque
 }
 
 func (i *Implementation) SubmitSession(ctx context.Context, req *v1.SubmitSessionRequest) (*v1.SubmitSessionResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -96,7 +97,7 @@ func (i *Implementation) SubmitSession(ctx context.Context, req *v1.SubmitSessio
 }
 
 func (i *Implementation) AnswerQuestion(ctx context.Context, req *v1.AnswerQuestionRequest) (*v1.AnswerQuestionResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -121,7 +122,7 @@ func (i *Implementation) AnswerQuestion(ctx context.Context, req *v1.AnswerQuest
 }
 
 func (i *Implementation) ReviewSystemDesign(ctx context.Context, req *v1.ReviewSystemDesignRequest) (*v1.ReviewSystemDesignResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +171,7 @@ func (i *Implementation) ListMockBlueprints(ctx context.Context, req *v1.ListMoc
 }
 
 func (i *Implementation) StartMockSession(ctx context.Context, req *v1.StartMockSessionRequest) (*v1.MockSessionEnvelope, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -182,7 +183,7 @@ func (i *Implementation) StartMockSession(ctx context.Context, req *v1.StartMock
 }
 
 func (i *Implementation) GetMockSession(ctx context.Context, req *v1.GetMockSessionRequest) (*v1.MockSessionEnvelope, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -198,7 +199,7 @@ func (i *Implementation) GetMockSession(ctx context.Context, req *v1.GetMockSess
 }
 
 func (i *Implementation) SubmitMockStage(ctx context.Context, req *v1.SubmitMockStageRequest) (*v1.SubmitMockStageResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -236,7 +237,7 @@ func (i *Implementation) SubmitMockStage(ctx context.Context, req *v1.SubmitMock
 }
 
 func (i *Implementation) ReviewMockSystemDesign(ctx context.Context, req *v1.ReviewMockSystemDesignRequest) (*v1.ReviewMockSystemDesignResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -268,7 +269,7 @@ func (i *Implementation) ReviewMockSystemDesign(ctx context.Context, req *v1.Rev
 }
 
 func (i *Implementation) AnswerMockQuestion(ctx context.Context, req *v1.AnswerMockQuestionRequest) (*v1.AnswerMockQuestionResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -286,14 +287,6 @@ func (i *Implementation) AnswerMockQuestion(ctx context.Context, req *v1.AnswerM
 			Session: mapMockSession(result.Session),
 		},
 	}, nil
-}
-
-func requireUser(ctx context.Context) (*model.User, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, kratoserrors.Unauthorized("UNAUTHORIZED", "unauthorized")
-	}
-	return user, nil
 }
 
 func parseUUID(raw string, reason string, message string) (uuid.UUID, error) {

@@ -12,6 +12,7 @@ import (
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
 
+	"api/internal/apihelpers"
 	friendchallengedomain "api/internal/domain/friend_challenge"
 	"api/internal/model"
 	v1 "api/pkg/api/friend_challenge/v1"
@@ -49,7 +50,7 @@ func (i *Implementation) GetDescription() grpc.ServiceDesc {
 // ---------- handlers ----------
 
 func (i *Implementation) ListIncoming(ctx context.Context, req *v1.ListIncomingRequest) (*v1.ListChallengesResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +62,7 @@ func (i *Implementation) ListIncoming(ctx context.Context, req *v1.ListIncomingR
 }
 
 func (i *Implementation) ListSent(ctx context.Context, req *v1.ListSentRequest) (*v1.ListChallengesResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -73,7 +74,7 @@ func (i *Implementation) ListSent(ctx context.Context, req *v1.ListSentRequest) 
 }
 
 func (i *Implementation) ListHistory(ctx context.Context, req *v1.ListHistoryRequest) (*v1.ListChallengesResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +86,7 @@ func (i *Implementation) ListHistory(ctx context.Context, req *v1.ListHistoryReq
 }
 
 func (i *Implementation) SendChallenge(ctx context.Context, req *v1.SendChallengeRequest) (*v1.SendChallengeResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
@@ -101,13 +102,13 @@ func (i *Implementation) SendChallenge(ctx context.Context, req *v1.SendChalleng
 }
 
 func (i *Implementation) SubmitSolution(ctx context.Context, req *v1.SubmitSolutionRequest) (*v1.SubmitSolutionResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	challengeID, parseErr := uuid.Parse(req.GetChallengeId())
+	challengeID, parseErr := apihelpers.ParseUUID(req.GetChallengeId(), "INVALID_CHALLENGE_ID", "challenge_id")
 	if parseErr != nil {
-		return nil, errors.BadRequest("INVALID_CHALLENGE_ID", "challenge_id must be a valid UUID")
+		return nil, parseErr
 	}
 	ch, err := i.service.SubmitSolution(ctx, user.ID, challengeID, req.GetTimeMs(), req.GetScore())
 	if err != nil {
@@ -117,13 +118,13 @@ func (i *Implementation) SubmitSolution(ctx context.Context, req *v1.SubmitSolut
 }
 
 func (i *Implementation) Decline(ctx context.Context, req *v1.DeclineRequest) (*v1.DeclineResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}
-	challengeID, parseErr := uuid.Parse(req.GetChallengeId())
+	challengeID, parseErr := apihelpers.ParseUUID(req.GetChallengeId(), "INVALID_CHALLENGE_ID", "challenge_id")
 	if parseErr != nil {
-		return nil, errors.BadRequest("INVALID_CHALLENGE_ID", "challenge_id must be a valid UUID")
+		return nil, parseErr
 	}
 	ch, err := i.service.Decline(ctx, user.ID, challengeID)
 	if err != nil {
@@ -133,14 +134,6 @@ func (i *Implementation) Decline(ctx context.Context, req *v1.DeclineRequest) (*
 }
 
 // ---------- helpers ----------
-
-func requireUser(ctx context.Context) (*model.User, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
-	}
-	return user, nil
-}
 
 func mapList(list *model.ChallengeList) *v1.ListChallengesResponse {
 	out := make([]*v1.FriendChallenge, 0, len(list.Challenges))

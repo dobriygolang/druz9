@@ -3,16 +3,15 @@ package guild
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	"api/internal/model"
 	v1 "api/pkg/api/guild/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) ListGuilds(ctx context.Context, req *v1.ListGuildsRequest) (*v1.ListGuildsResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "unauthorized")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	opts := model.ListGuildsOptions{

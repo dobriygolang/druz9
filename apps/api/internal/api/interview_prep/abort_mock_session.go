@@ -3,12 +3,13 @@ package interview_prep
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/interview_prep/v1"
 )
 
 func (i *Implementation) AbortMockSession(ctx context.Context, req *v1.AbortMockSessionRequest) (*v1.StatusResponse, error) {
-	user, err := requireUser(ctx)
+	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
 		return nil, err
 	}

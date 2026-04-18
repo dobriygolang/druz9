@@ -3,17 +3,16 @@ package guild
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/guild/v1"
 
-	kratosErrors "github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (i *Implementation) ListGuildMembers(ctx context.Context, req *v1.ListGuildMembersRequest) (*v1.ListGuildMembersResponse, error) {
-	guildID, err := uuid.Parse(req.GuildId)
+	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, kratosErrors.BadRequest("INVALID_GUILD_ID", "invalid guild_id")
+		return nil, err
 	}
 
 	members, err := i.service.ListGuildMembers(ctx, guildID, 100)

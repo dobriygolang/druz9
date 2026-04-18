@@ -5,14 +5,14 @@ import (
 
 	"github.com/go-kratos/kratos/v2/errors"
 
-	"api/internal/model"
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/notification/v1"
 )
 
 func (i *SettingsImplementation) GetNotificationSettings(ctx context.Context, _ *v1.GetNotificationSettingsRequest) (*v1.NotificationSettings, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, errors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
 	settings, err := i.sender.GetNotificationSettings(ctx, user.ID.String())

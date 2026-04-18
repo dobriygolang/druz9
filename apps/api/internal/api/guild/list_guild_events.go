@@ -4,12 +4,11 @@ import (
 	"context"
 	"math"
 
+	"api/internal/apihelpers"
 	"api/internal/model"
 	eventv1 "api/pkg/api/event/v1"
 	guildv1 "api/pkg/api/guild/v1"
 
-	kratosErrors "github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -29,14 +28,14 @@ func guildEventsFilterToString(f eventv1.EventListFilter) string {
 }
 
 func (i *Implementation) ListGuildEvents(ctx context.Context, req *guildv1.ListGuildEventsRequest) (*guildv1.ListGuildEventsResponse, error) {
-	user, ok := model.UserFromContext(ctx)
-	if !ok || user == nil {
-		return nil, kratosErrors.Unauthorized("UNAUTHORIZED", "authentication required")
+	user, err := apihelpers.RequireUser(ctx)
+	if err != nil {
+		return nil, err
 	}
 
-	guildID, err := uuid.Parse(req.GuildId)
+	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
-		return nil, kratosErrors.BadRequest("INVALID_GUILD_ID", "invalid guild_id")
+		return nil, err
 	}
 
 	resp, err := i.eventSvc.ListEvents(ctx, user.ID, model.ListEventsOptions{

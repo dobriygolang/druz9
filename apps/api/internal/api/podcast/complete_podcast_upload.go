@@ -3,21 +3,19 @@ package podcast
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	"api/internal/model"
 	v1 "api/pkg/api/podcast/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) CompletePodcastUpload(ctx context.Context, req *v1.CompletePodcastUploadRequest) (*v1.PodcastResponse, error) {
-	if _, err := requireUser(ctx); err != nil {
+	if _, err := apihelpers.RequireUser(ctx); err != nil {
 		return nil, err
 	}
 
-	podcastID, err := uuid.Parse(req.PodcastId)
+	podcastID, err := apihelpers.ParseUUID(req.PodcastId, "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_PODCAST_ID", "invalid podcast id")
+		return nil, err
 	}
 
 	item, err := i.service.CompletePodcastUpload(ctx, podcastID, model.CompletePodcastUploadRequest{
