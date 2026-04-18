@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: referral/v1/referral.proto
+// source: social/referral/v1/referral.proto
 
 package v1
 
@@ -231,5 +231,5 @@ var ReferralService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "referral/v1/referral.proto",
+	Metadata: "social/referral/v1/referral.proto",
 }

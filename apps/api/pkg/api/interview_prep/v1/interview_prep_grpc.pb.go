@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: interview_prep/v1/interview_prep.proto
+// source: learning/interview_prep/v1/interview_prep.proto
 
 package v1
 
@@ -1257,5 +1257,5 @@ var InterviewPrepService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "interview_prep/v1/interview_prep.proto",
+	Metadata: "learning/interview_prep/v1/interview_prep.proto",
 }

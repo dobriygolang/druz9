@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: podcast/v1/podcast.proto
+// source: social/podcast/v1/podcast.proto
 
 package v1
 

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: streak/v1/streak.proto
+// source: game/streak/v1/streak.proto
 
 package v1
 
@@ -215,5 +215,5 @@ var StreakService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "streak/v1/streak.proto",
+	Metadata: "game/streak/v1/streak.proto",
 }

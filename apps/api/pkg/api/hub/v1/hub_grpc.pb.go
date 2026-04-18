@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: hub/v1/hub.proto
+// source: core/hub/v1/hub.proto
 
 package v1
 
@@ -117,5 +117,5 @@ var HubService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "hub/v1/hub.proto",
+	Metadata: "core/hub/v1/hub.proto",
 }

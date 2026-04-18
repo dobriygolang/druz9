@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: common/v1/common.proto
+// source: core/common/v1/common.proto
 
 package v1
 
@@ -57,11 +57,11 @@ func (x UserActivityStatus) String() string {
 }
 
 func (UserActivityStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_v1_common_proto_enumTypes[0].Descriptor()
+	return file_core_common_v1_common_proto_enumTypes[0].Descriptor()
 }
 
 func (UserActivityStatus) Type() protoreflect.EnumType {
-	return &file_common_v1_common_proto_enumTypes[0]
+	return &file_core_common_v1_common_proto_enumTypes[0]
 }
 
 func (x UserActivityStatus) Number() protoreflect.EnumNumber {
@@ -70,7 +70,7 @@ func (x UserActivityStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use UserActivityStatus.Descriptor instead.
 func (UserActivityStatus) EnumDescriptor() ([]byte, []int) {
-	return file_common_v1_common_proto_rawDescGZIP(), []int{0}
+	return file_core_common_v1_common_proto_rawDescGZIP(), []int{0}
 }
 
 type Difficulty int32
@@ -109,11 +109,11 @@ func (x Difficulty) String() string {
 }
 
 func (Difficulty) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_v1_common_proto_enumTypes[1].Descriptor()
+	return file_core_common_v1_common_proto_enumTypes[1].Descriptor()
 }
 
 func (Difficulty) Type() protoreflect.EnumType {
-	return &file_common_v1_common_proto_enumTypes[1]
+	return &file_core_common_v1_common_proto_enumTypes[1]
 }
 
 func (x Difficulty) Number() protoreflect.EnumNumber {
@@ -122,7 +122,7 @@ func (x Difficulty) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use Difficulty.Descriptor instead.
 func (Difficulty) EnumDescriptor() ([]byte, []int) {
-	return file_common_v1_common_proto_rawDescGZIP(), []int{1}
+	return file_core_common_v1_common_proto_rawDescGZIP(), []int{1}
 }
 
 type ProgrammingLanguage int32
@@ -176,11 +176,11 @@ func (x ProgrammingLanguage) String() string {
 }
 
 func (ProgrammingLanguage) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_v1_common_proto_enumTypes[2].Descriptor()
+	return file_core_common_v1_common_proto_enumTypes[2].Descriptor()
 }
 
 func (ProgrammingLanguage) Type() protoreflect.EnumType {
-	return &file_common_v1_common_proto_enumTypes[2]
+	return &file_core_common_v1_common_proto_enumTypes[2]
 }
 
 func (x ProgrammingLanguage) Number() protoreflect.EnumNumber {
@@ -189,7 +189,7 @@ func (x ProgrammingLanguage) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ProgrammingLanguage.Descriptor instead.
 func (ProgrammingLanguage) EnumDescriptor() ([]byte, []int) {
-	return file_common_v1_common_proto_rawDescGZIP(), []int{2}
+	return file_core_common_v1_common_proto_rawDescGZIP(), []int{2}
 }
 
 // ExecutionProfile defines the sandbox environment for code execution.
@@ -232,11 +232,11 @@ func (x ExecutionProfile) String() string {
 }
 
 func (ExecutionProfile) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_v1_common_proto_enumTypes[3].Descriptor()
+	return file_core_common_v1_common_proto_enumTypes[3].Descriptor()
 }
 
 func (ExecutionProfile) Type() protoreflect.EnumType {
-	return &file_common_v1_common_proto_enumTypes[3]
+	return &file_core_common_v1_common_proto_enumTypes[3]
 }
 
 func (x ExecutionProfile) Number() protoreflect.EnumNumber {
@@ -245,7 +245,7 @@ func (x ExecutionProfile) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ExecutionProfile.Descriptor instead.
 func (ExecutionProfile) EnumDescriptor() ([]byte, []int) {
-	return file_common_v1_common_proto_rawDescGZIP(), []int{3}
+	return file_core_common_v1_common_proto_rawDescGZIP(), []int{3}
 }
 
 // RunnerMode defines how code is invoked inside the sandbox.
@@ -282,11 +282,11 @@ func (x RunnerMode) String() string {
 }
 
 func (RunnerMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_v1_common_proto_enumTypes[4].Descriptor()
+	return file_core_common_v1_common_proto_enumTypes[4].Descriptor()
 }
 
 func (RunnerMode) Type() protoreflect.EnumType {
-	return &file_common_v1_common_proto_enumTypes[4]
+	return &file_core_common_v1_common_proto_enumTypes[4]
 }
 
 func (x RunnerMode) Number() protoreflect.EnumNumber {
@@ -295,7 +295,7 @@ func (x RunnerMode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use RunnerMode.Descriptor instead.
 func (RunnerMode) EnumDescriptor() ([]byte, []int) {
-	return file_common_v1_common_proto_rawDescGZIP(), []int{4}
+	return file_core_common_v1_common_proto_rawDescGZIP(), []int{4}
 }
 
 // SubmitFailureKind classifies why code submission failed.
@@ -338,11 +338,11 @@ func (x SubmitFailureKind) String() string {
 }
 
 func (SubmitFailureKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_v1_common_proto_enumTypes[5].Descriptor()
+	return file_core_common_v1_common_proto_enumTypes[5].Descriptor()
 }
 
 func (SubmitFailureKind) Type() protoreflect.EnumType {
-	return &file_common_v1_common_proto_enumTypes[5]
+	return &file_core_common_v1_common_proto_enumTypes[5]
 }
 
 func (x SubmitFailureKind) Number() protoreflect.EnumNumber {
@@ -351,7 +351,7 @@ func (x SubmitFailureKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SubmitFailureKind.Descriptor instead.
 func (SubmitFailureKind) EnumDescriptor() ([]byte, []int) {
-	return file_common_v1_common_proto_rawDescGZIP(), []int{5}
+	return file_core_common_v1_common_proto_rawDescGZIP(), []int{5}
 }
 
 type OperationStatus int32
@@ -390,11 +390,11 @@ func (x OperationStatus) String() string {
 }
 
 func (OperationStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_common_v1_common_proto_enumTypes[6].Descriptor()
+	return file_core_common_v1_common_proto_enumTypes[6].Descriptor()
 }
 
 func (OperationStatus) Type() protoreflect.EnumType {
-	return &file_common_v1_common_proto_enumTypes[6]
+	return &file_core_common_v1_common_proto_enumTypes[6]
 }
 
 func (x OperationStatus) Number() protoreflect.EnumNumber {
@@ -403,7 +403,7 @@ func (x OperationStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use OperationStatus.Descriptor instead.
 func (OperationStatus) EnumDescriptor() ([]byte, []int) {
-	return file_common_v1_common_proto_rawDescGZIP(), []int{6}
+	return file_core_common_v1_common_proto_rawDescGZIP(), []int{6}
 }
 
 type InterviewSolutionReview struct {
@@ -422,7 +422,7 @@ type InterviewSolutionReview struct {
 
 func (x *InterviewSolutionReview) Reset() {
 	*x = InterviewSolutionReview{}
-	mi := &file_common_v1_common_proto_msgTypes[0]
+	mi := &file_core_common_v1_common_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -434,7 +434,7 @@ func (x *InterviewSolutionReview) String() string {
 func (*InterviewSolutionReview) ProtoMessage() {}
 
 func (x *InterviewSolutionReview) ProtoReflect() protoreflect.Message {
-	mi := &file_common_v1_common_proto_msgTypes[0]
+	mi := &file_core_common_v1_common_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -447,7 +447,7 @@ func (x *InterviewSolutionReview) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InterviewSolutionReview.ProtoReflect.Descriptor instead.
 func (*InterviewSolutionReview) Descriptor() ([]byte, []int) {
-	return file_common_v1_common_proto_rawDescGZIP(), []int{0}
+	return file_core_common_v1_common_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *InterviewSolutionReview) GetProvider() string {
@@ -506,11 +506,11 @@ func (x *InterviewSolutionReview) GetGaps() []string {
 	return nil
 }
 
-var File_common_v1_common_proto protoreflect.FileDescriptor
+var File_core_common_v1_common_proto protoreflect.FileDescriptor
 
-const file_common_v1_common_proto_rawDesc = "" +
+const file_core_common_v1_common_proto_rawDesc = "" +
 	"\n" +
-	"\x16common/v1/common.proto\x12\tcommon.v1\"\xf5\x01\n" +
+	"\x1bcore/common/v1/common.proto\x12\tcommon.v1\"\xf5\x01\n" +
 	"\x17InterviewSolutionReview\x12\x1a\n" +
 	"\bprovider\x18\x01 \x01(\tR\bprovider\x12\x14\n" +
 	"\x05model\x18\x02 \x01(\tR\x05model\x12\x14\n" +
@@ -565,20 +565,20 @@ const file_common_v1_common_proto_rawDesc = "" +
 	"\x18OPERATION_STATUS_ABORTED\x10\x03B\x1aZ\x18api/pkg/api/common/v1;v1b\x06proto3"
 
 var (
-	file_common_v1_common_proto_rawDescOnce sync.Once
-	file_common_v1_common_proto_rawDescData []byte
+	file_core_common_v1_common_proto_rawDescOnce sync.Once
+	file_core_common_v1_common_proto_rawDescData []byte
 )
 
-func file_common_v1_common_proto_rawDescGZIP() []byte {
-	file_common_v1_common_proto_rawDescOnce.Do(func() {
-		file_common_v1_common_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_common_v1_common_proto_rawDesc), len(file_common_v1_common_proto_rawDesc)))
+func file_core_common_v1_common_proto_rawDescGZIP() []byte {
+	file_core_common_v1_common_proto_rawDescOnce.Do(func() {
+		file_core_common_v1_common_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_core_common_v1_common_proto_rawDesc), len(file_core_common_v1_common_proto_rawDesc)))
 	})
-	return file_common_v1_common_proto_rawDescData
+	return file_core_common_v1_common_proto_rawDescData
 }
 
-var file_common_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
-var file_common_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
-var file_common_v1_common_proto_goTypes = []any{
+var file_core_common_v1_common_proto_enumTypes = make([]protoimpl.EnumInfo, 7)
+var file_core_common_v1_common_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
+var file_core_common_v1_common_proto_goTypes = []any{
 	(UserActivityStatus)(0),         // 0: common.v1.UserActivityStatus
 	(Difficulty)(0),                 // 1: common.v1.Difficulty
 	(ProgrammingLanguage)(0),        // 2: common.v1.ProgrammingLanguage
@@ -588,7 +588,7 @@ var file_common_v1_common_proto_goTypes = []any{
 	(OperationStatus)(0),            // 6: common.v1.OperationStatus
 	(*InterviewSolutionReview)(nil), // 7: common.v1.InterviewSolutionReview
 }
-var file_common_v1_common_proto_depIdxs = []int32{
+var file_core_common_v1_common_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -596,27 +596,27 @@ var file_common_v1_common_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_common_v1_common_proto_init() }
-func file_common_v1_common_proto_init() {
-	if File_common_v1_common_proto != nil {
+func init() { file_core_common_v1_common_proto_init() }
+func file_core_common_v1_common_proto_init() {
+	if File_core_common_v1_common_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_common_v1_common_proto_rawDesc), len(file_common_v1_common_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_common_v1_common_proto_rawDesc), len(file_core_common_v1_common_proto_rawDesc)),
 			NumEnums:      7,
 			NumMessages:   1,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_common_v1_common_proto_goTypes,
-		DependencyIndexes: file_common_v1_common_proto_depIdxs,
-		EnumInfos:         file_common_v1_common_proto_enumTypes,
-		MessageInfos:      file_common_v1_common_proto_msgTypes,
+		GoTypes:           file_core_common_v1_common_proto_goTypes,
+		DependencyIndexes: file_core_common_v1_common_proto_depIdxs,
+		EnumInfos:         file_core_common_v1_common_proto_enumTypes,
+		MessageInfos:      file_core_common_v1_common_proto_msgTypes,
 	}.Build()
-	File_common_v1_common_proto = out.File
-	file_common_v1_common_proto_goTypes = nil
-	file_common_v1_common_proto_depIdxs = nil
+	File_core_common_v1_common_proto = out.File
+	file_core_common_v1_common_proto_goTypes = nil
+	file_core_common_v1_common_proto_depIdxs = nil
 }

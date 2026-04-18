@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: training/v1/training.proto
+// source: learning/training/v1/training.proto
 
 package v1
 
@@ -58,11 +58,11 @@ func (x TrainingTaskDifficulty) String() string {
 }
 
 func (TrainingTaskDifficulty) Descriptor() protoreflect.EnumDescriptor {
-	return file_training_v1_training_proto_enumTypes[0].Descriptor()
+	return file_learning_training_v1_training_proto_enumTypes[0].Descriptor()
 }
 
 func (TrainingTaskDifficulty) Type() protoreflect.EnumType {
-	return &file_training_v1_training_proto_enumTypes[0]
+	return &file_learning_training_v1_training_proto_enumTypes[0]
 }
 
 func (x TrainingTaskDifficulty) Number() protoreflect.EnumNumber {
@@ -71,7 +71,7 @@ func (x TrainingTaskDifficulty) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TrainingTaskDifficulty.Descriptor instead.
 func (TrainingTaskDifficulty) EnumDescriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{0}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{0}
 }
 
 type TrainingProgrammingLanguage int32
@@ -107,11 +107,11 @@ func (x TrainingProgrammingLanguage) String() string {
 }
 
 func (TrainingProgrammingLanguage) Descriptor() protoreflect.EnumDescriptor {
-	return file_training_v1_training_proto_enumTypes[1].Descriptor()
+	return file_learning_training_v1_training_proto_enumTypes[1].Descriptor()
 }
 
 func (TrainingProgrammingLanguage) Type() protoreflect.EnumType {
-	return &file_training_v1_training_proto_enumTypes[1]
+	return &file_learning_training_v1_training_proto_enumTypes[1]
 }
 
 func (x TrainingProgrammingLanguage) Number() protoreflect.EnumNumber {
@@ -120,7 +120,7 @@ func (x TrainingProgrammingLanguage) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TrainingProgrammingLanguage.Descriptor instead.
 func (TrainingProgrammingLanguage) EnumDescriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{1}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{1}
 }
 
 type TrainingEvaluationMode int32
@@ -156,11 +156,11 @@ func (x TrainingEvaluationMode) String() string {
 }
 
 func (TrainingEvaluationMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_training_v1_training_proto_enumTypes[2].Descriptor()
+	return file_learning_training_v1_training_proto_enumTypes[2].Descriptor()
 }
 
 func (TrainingEvaluationMode) Type() protoreflect.EnumType {
-	return &file_training_v1_training_proto_enumTypes[2]
+	return &file_learning_training_v1_training_proto_enumTypes[2]
 }
 
 func (x TrainingEvaluationMode) Number() protoreflect.EnumNumber {
@@ -169,7 +169,7 @@ func (x TrainingEvaluationMode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TrainingEvaluationMode.Descriptor instead.
 func (TrainingEvaluationMode) EnumDescriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{2}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{2}
 }
 
 type TrainingTestStatus int32
@@ -205,11 +205,11 @@ func (x TrainingTestStatus) String() string {
 }
 
 func (TrainingTestStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_training_v1_training_proto_enumTypes[3].Descriptor()
+	return file_learning_training_v1_training_proto_enumTypes[3].Descriptor()
 }
 
 func (TrainingTestStatus) Type() protoreflect.EnumType {
-	return &file_training_v1_training_proto_enumTypes[3]
+	return &file_learning_training_v1_training_proto_enumTypes[3]
 }
 
 func (x TrainingTestStatus) Number() protoreflect.EnumNumber {
@@ -218,7 +218,7 @@ func (x TrainingTestStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TrainingTestStatus.Descriptor instead.
 func (TrainingTestStatus) EnumDescriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{3}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{3}
 }
 
 type GetSkillTreeRequest struct {
@@ -229,7 +229,7 @@ type GetSkillTreeRequest struct {
 
 func (x *GetSkillTreeRequest) Reset() {
 	*x = GetSkillTreeRequest{}
-	mi := &file_training_v1_training_proto_msgTypes[0]
+	mi := &file_learning_training_v1_training_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -241,7 +241,7 @@ func (x *GetSkillTreeRequest) String() string {
 func (*GetSkillTreeRequest) ProtoMessage() {}
 
 func (x *GetSkillTreeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[0]
+	mi := &file_learning_training_v1_training_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -254,7 +254,7 @@ func (x *GetSkillTreeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSkillTreeRequest.ProtoReflect.Descriptor instead.
 func (*GetSkillTreeRequest) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{0}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{0}
 }
 
 type GetSkillTreeResponse struct {
@@ -270,7 +270,7 @@ type GetSkillTreeResponse struct {
 
 func (x *GetSkillTreeResponse) Reset() {
 	*x = GetSkillTreeResponse{}
-	mi := &file_training_v1_training_proto_msgTypes[1]
+	mi := &file_learning_training_v1_training_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -282,7 +282,7 @@ func (x *GetSkillTreeResponse) String() string {
 func (*GetSkillTreeResponse) ProtoMessage() {}
 
 func (x *GetSkillTreeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[1]
+	mi := &file_learning_training_v1_training_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -295,7 +295,7 @@ func (x *GetSkillTreeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSkillTreeResponse.ProtoReflect.Descriptor instead.
 func (*GetSkillTreeResponse) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{1}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetSkillTreeResponse) GetSelectedNodeId() string {
@@ -346,7 +346,7 @@ type TrainingBranchStat struct {
 
 func (x *TrainingBranchStat) Reset() {
 	*x = TrainingBranchStat{}
-	mi := &file_training_v1_training_proto_msgTypes[2]
+	mi := &file_learning_training_v1_training_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -358,7 +358,7 @@ func (x *TrainingBranchStat) String() string {
 func (*TrainingBranchStat) ProtoMessage() {}
 
 func (x *TrainingBranchStat) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[2]
+	mi := &file_learning_training_v1_training_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -371,7 +371,7 @@ func (x *TrainingBranchStat) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrainingBranchStat.ProtoReflect.Descriptor instead.
 func (*TrainingBranchStat) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{2}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *TrainingBranchStat) GetBranch() string {
@@ -424,7 +424,7 @@ type TrainingNode struct {
 
 func (x *TrainingNode) Reset() {
 	*x = TrainingNode{}
-	mi := &file_training_v1_training_proto_msgTypes[3]
+	mi := &file_learning_training_v1_training_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -436,7 +436,7 @@ func (x *TrainingNode) String() string {
 func (*TrainingNode) ProtoMessage() {}
 
 func (x *TrainingNode) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[3]
+	mi := &file_learning_training_v1_training_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -449,7 +449,7 @@ func (x *TrainingNode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrainingNode.ProtoReflect.Descriptor instead.
 func (*TrainingNode) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{3}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *TrainingNode) GetId() string {
@@ -511,7 +511,7 @@ type TrainingEdge struct {
 
 func (x *TrainingEdge) Reset() {
 	*x = TrainingEdge{}
-	mi := &file_training_v1_training_proto_msgTypes[4]
+	mi := &file_learning_training_v1_training_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -523,7 +523,7 @@ func (x *TrainingEdge) String() string {
 func (*TrainingEdge) ProtoMessage() {}
 
 func (x *TrainingEdge) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[4]
+	mi := &file_learning_training_v1_training_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -536,7 +536,7 @@ func (x *TrainingEdge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrainingEdge.ProtoReflect.Descriptor instead.
 func (*TrainingEdge) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{4}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *TrainingEdge) GetFromNodeId() string {
@@ -574,7 +574,7 @@ type TrainingModule struct {
 
 func (x *TrainingModule) Reset() {
 	*x = TrainingModule{}
-	mi := &file_training_v1_training_proto_msgTypes[5]
+	mi := &file_learning_training_v1_training_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -586,7 +586,7 @@ func (x *TrainingModule) String() string {
 func (*TrainingModule) ProtoMessage() {}
 
 func (x *TrainingModule) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[5]
+	mi := &file_learning_training_v1_training_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -599,7 +599,7 @@ func (x *TrainingModule) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrainingModule.ProtoReflect.Descriptor instead.
 func (*TrainingModule) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{5}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *TrainingModule) GetNodeId() string {
@@ -702,7 +702,7 @@ type GetTaskRequest struct {
 
 func (x *GetTaskRequest) Reset() {
 	*x = GetTaskRequest{}
-	mi := &file_training_v1_training_proto_msgTypes[6]
+	mi := &file_learning_training_v1_training_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -714,7 +714,7 @@ func (x *GetTaskRequest) String() string {
 func (*GetTaskRequest) ProtoMessage() {}
 
 func (x *GetTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[6]
+	mi := &file_learning_training_v1_training_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -727,7 +727,7 @@ func (x *GetTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskRequest.ProtoReflect.Descriptor instead.
 func (*GetTaskRequest) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{6}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetTaskRequest) GetModuleId() string {
@@ -746,7 +746,7 @@ type GetTaskResponse struct {
 
 func (x *GetTaskResponse) Reset() {
 	*x = GetTaskResponse{}
-	mi := &file_training_v1_training_proto_msgTypes[7]
+	mi := &file_learning_training_v1_training_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -758,7 +758,7 @@ func (x *GetTaskResponse) String() string {
 func (*GetTaskResponse) ProtoMessage() {}
 
 func (x *GetTaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[7]
+	mi := &file_learning_training_v1_training_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -771,7 +771,7 @@ func (x *GetTaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetTaskResponse.ProtoReflect.Descriptor instead.
 func (*GetTaskResponse) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{7}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetTaskResponse) GetTask() *TrainingTask {
@@ -793,7 +793,7 @@ type EvaluateTaskSolutionRequest struct {
 
 func (x *EvaluateTaskSolutionRequest) Reset() {
 	*x = EvaluateTaskSolutionRequest{}
-	mi := &file_training_v1_training_proto_msgTypes[8]
+	mi := &file_learning_training_v1_training_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -805,7 +805,7 @@ func (x *EvaluateTaskSolutionRequest) String() string {
 func (*EvaluateTaskSolutionRequest) ProtoMessage() {}
 
 func (x *EvaluateTaskSolutionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[8]
+	mi := &file_learning_training_v1_training_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -818,7 +818,7 @@ func (x *EvaluateTaskSolutionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EvaluateTaskSolutionRequest.ProtoReflect.Descriptor instead.
 func (*EvaluateTaskSolutionRequest) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{8}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *EvaluateTaskSolutionRequest) GetModuleId() string {
@@ -864,7 +864,7 @@ type EvaluateTaskSolutionResponse struct {
 
 func (x *EvaluateTaskSolutionResponse) Reset() {
 	*x = EvaluateTaskSolutionResponse{}
-	mi := &file_training_v1_training_proto_msgTypes[9]
+	mi := &file_learning_training_v1_training_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -876,7 +876,7 @@ func (x *EvaluateTaskSolutionResponse) String() string {
 func (*EvaluateTaskSolutionResponse) ProtoMessage() {}
 
 func (x *EvaluateTaskSolutionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[9]
+	mi := &file_learning_training_v1_training_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -889,7 +889,7 @@ func (x *EvaluateTaskSolutionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EvaluateTaskSolutionResponse.ProtoReflect.Descriptor instead.
 func (*EvaluateTaskSolutionResponse) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{9}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *EvaluateTaskSolutionResponse) GetTestResults() []*TrainingTestResult {
@@ -961,7 +961,7 @@ type TrainingTask struct {
 
 func (x *TrainingTask) Reset() {
 	*x = TrainingTask{}
-	mi := &file_training_v1_training_proto_msgTypes[10]
+	mi := &file_learning_training_v1_training_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -973,7 +973,7 @@ func (x *TrainingTask) String() string {
 func (*TrainingTask) ProtoMessage() {}
 
 func (x *TrainingTask) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[10]
+	mi := &file_learning_training_v1_training_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -986,7 +986,7 @@ func (x *TrainingTask) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrainingTask.ProtoReflect.Descriptor instead.
 func (*TrainingTask) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{10}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *TrainingTask) GetModuleId() string {
@@ -1084,7 +1084,7 @@ type TrainingTaskExample struct {
 
 func (x *TrainingTaskExample) Reset() {
 	*x = TrainingTaskExample{}
-	mi := &file_training_v1_training_proto_msgTypes[11]
+	mi := &file_learning_training_v1_training_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1096,7 +1096,7 @@ func (x *TrainingTaskExample) String() string {
 func (*TrainingTaskExample) ProtoMessage() {}
 
 func (x *TrainingTaskExample) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[11]
+	mi := &file_learning_training_v1_training_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1109,7 +1109,7 @@ func (x *TrainingTaskExample) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrainingTaskExample.ProtoReflect.Descriptor instead.
 func (*TrainingTaskExample) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{11}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *TrainingTaskExample) GetInput() string {
@@ -1143,7 +1143,7 @@ type TrainingStarterCode struct {
 
 func (x *TrainingStarterCode) Reset() {
 	*x = TrainingStarterCode{}
-	mi := &file_training_v1_training_proto_msgTypes[12]
+	mi := &file_learning_training_v1_training_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1155,7 +1155,7 @@ func (x *TrainingStarterCode) String() string {
 func (*TrainingStarterCode) ProtoMessage() {}
 
 func (x *TrainingStarterCode) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[12]
+	mi := &file_learning_training_v1_training_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1168,7 +1168,7 @@ func (x *TrainingStarterCode) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrainingStarterCode.ProtoReflect.Descriptor instead.
 func (*TrainingStarterCode) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{12}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *TrainingStarterCode) GetLanguage() TrainingProgrammingLanguage {
@@ -1197,7 +1197,7 @@ type TrainingTestCase struct {
 
 func (x *TrainingTestCase) Reset() {
 	*x = TrainingTestCase{}
-	mi := &file_training_v1_training_proto_msgTypes[13]
+	mi := &file_learning_training_v1_training_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1209,7 +1209,7 @@ func (x *TrainingTestCase) String() string {
 func (*TrainingTestCase) ProtoMessage() {}
 
 func (x *TrainingTestCase) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[13]
+	mi := &file_learning_training_v1_training_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1222,7 +1222,7 @@ func (x *TrainingTestCase) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrainingTestCase.ProtoReflect.Descriptor instead.
 func (*TrainingTestCase) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{13}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *TrainingTestCase) GetId() string {
@@ -1268,7 +1268,7 @@ type TrainingTestResult struct {
 
 func (x *TrainingTestResult) Reset() {
 	*x = TrainingTestResult{}
-	mi := &file_training_v1_training_proto_msgTypes[14]
+	mi := &file_learning_training_v1_training_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1280,7 +1280,7 @@ func (x *TrainingTestResult) String() string {
 func (*TrainingTestResult) ProtoMessage() {}
 
 func (x *TrainingTestResult) ProtoReflect() protoreflect.Message {
-	mi := &file_training_v1_training_proto_msgTypes[14]
+	mi := &file_learning_training_v1_training_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1293,7 +1293,7 @@ func (x *TrainingTestResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TrainingTestResult.ProtoReflect.Descriptor instead.
 func (*TrainingTestResult) Descriptor() ([]byte, []int) {
-	return file_training_v1_training_proto_rawDescGZIP(), []int{14}
+	return file_learning_training_v1_training_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *TrainingTestResult) GetId() string {
@@ -1345,11 +1345,11 @@ func (x *TrainingTestResult) GetActual() string {
 	return ""
 }
 
-var File_training_v1_training_proto protoreflect.FileDescriptor
+var File_learning_training_v1_training_proto protoreflect.FileDescriptor
 
-const file_training_v1_training_proto_rawDesc = "" +
+const file_learning_training_v1_training_proto_rawDesc = "" +
 	"\n" +
-	"\x1atraining/v1/training.proto\x12\vtraining.v1\x1a\x1cgoogle/api/annotations.proto\"\x15\n" +
+	"#learning/training/v1/training.proto\x12\vtraining.v1\x1a\x1cgoogle/api/annotations.proto\"\x15\n" +
 	"\x13GetSkillTreeRequest\"\x9d\x02\n" +
 	"\x14GetSkillTreeResponse\x12(\n" +
 	"\x10selected_node_id\x18\x01 \x01(\tR\x0eselectedNodeId\x12B\n" +
@@ -1472,20 +1472,20 @@ const file_training_v1_training_proto_rawDesc = "" +
 	"\x14EvaluateTaskSolution\x12(.training.v1.EvaluateTaskSolutionRequest\x1a).training.v1.EvaluateTaskSolutionResponse\"6\x82\xd3\xe4\x93\x020:\x01*\"+/api/v1/training/tasks/{module_id}/evaluateB\x1cZ\x1aapi/pkg/api/training/v1;v1b\x06proto3"
 
 var (
-	file_training_v1_training_proto_rawDescOnce sync.Once
-	file_training_v1_training_proto_rawDescData []byte
+	file_learning_training_v1_training_proto_rawDescOnce sync.Once
+	file_learning_training_v1_training_proto_rawDescData []byte
 )
 
-func file_training_v1_training_proto_rawDescGZIP() []byte {
-	file_training_v1_training_proto_rawDescOnce.Do(func() {
-		file_training_v1_training_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_training_v1_training_proto_rawDesc), len(file_training_v1_training_proto_rawDesc)))
+func file_learning_training_v1_training_proto_rawDescGZIP() []byte {
+	file_learning_training_v1_training_proto_rawDescOnce.Do(func() {
+		file_learning_training_v1_training_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_learning_training_v1_training_proto_rawDesc), len(file_learning_training_v1_training_proto_rawDesc)))
 	})
-	return file_training_v1_training_proto_rawDescData
+	return file_learning_training_v1_training_proto_rawDescData
 }
 
-var file_training_v1_training_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
-var file_training_v1_training_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
-var file_training_v1_training_proto_goTypes = []any{
+var file_learning_training_v1_training_proto_enumTypes = make([]protoimpl.EnumInfo, 4)
+var file_learning_training_v1_training_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_learning_training_v1_training_proto_goTypes = []any{
 	(TrainingTaskDifficulty)(0),          // 0: training.v1.TrainingTaskDifficulty
 	(TrainingProgrammingLanguage)(0),     // 1: training.v1.TrainingProgrammingLanguage
 	(TrainingEvaluationMode)(0),          // 2: training.v1.TrainingEvaluationMode
@@ -1506,7 +1506,7 @@ var file_training_v1_training_proto_goTypes = []any{
 	(*TrainingTestCase)(nil),             // 17: training.v1.TrainingTestCase
 	(*TrainingTestResult)(nil),           // 18: training.v1.TrainingTestResult
 }
-var file_training_v1_training_proto_depIdxs = []int32{
+var file_learning_training_v1_training_proto_depIdxs = []int32{
 	6,  // 0: training.v1.GetSkillTreeResponse.branch_stats:type_name -> training.v1.TrainingBranchStat
 	7,  // 1: training.v1.GetSkillTreeResponse.nodes:type_name -> training.v1.TrainingNode
 	8,  // 2: training.v1.GetSkillTreeResponse.edges:type_name -> training.v1.TrainingEdge
@@ -1534,28 +1534,28 @@ var file_training_v1_training_proto_depIdxs = []int32{
 	0,  // [0:14] is the sub-list for field type_name
 }
 
-func init() { file_training_v1_training_proto_init() }
-func file_training_v1_training_proto_init() {
-	if File_training_v1_training_proto != nil {
+func init() { file_learning_training_v1_training_proto_init() }
+func file_learning_training_v1_training_proto_init() {
+	if File_learning_training_v1_training_proto != nil {
 		return
 	}
-	file_training_v1_training_proto_msgTypes[5].OneofWrappers = []any{}
+	file_learning_training_v1_training_proto_msgTypes[5].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_training_v1_training_proto_rawDesc), len(file_training_v1_training_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_learning_training_v1_training_proto_rawDesc), len(file_learning_training_v1_training_proto_rawDesc)),
 			NumEnums:      4,
 			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_training_v1_training_proto_goTypes,
-		DependencyIndexes: file_training_v1_training_proto_depIdxs,
-		EnumInfos:         file_training_v1_training_proto_enumTypes,
-		MessageInfos:      file_training_v1_training_proto_msgTypes,
+		GoTypes:           file_learning_training_v1_training_proto_goTypes,
+		DependencyIndexes: file_learning_training_v1_training_proto_depIdxs,
+		EnumInfos:         file_learning_training_v1_training_proto_enumTypes,
+		MessageInfos:      file_learning_training_v1_training_proto_msgTypes,
 	}.Build()
-	File_training_v1_training_proto = out.File
-	file_training_v1_training_proto_goTypes = nil
-	file_training_v1_training_proto_depIdxs = nil
+	File_learning_training_v1_training_proto = out.File
+	file_learning_training_v1_training_proto_goTypes = nil
+	file_learning_training_v1_training_proto_depIdxs = nil
 }

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: geo/v1/geo.proto
+// source: social/geo/v1/geo.proto
 
 package v1
 
@@ -59,11 +59,11 @@ func (x WorldPinKind) String() string {
 }
 
 func (WorldPinKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_geo_v1_geo_proto_enumTypes[0].Descriptor()
+	return file_social_geo_v1_geo_proto_enumTypes[0].Descriptor()
 }
 
 func (WorldPinKind) Type() protoreflect.EnumType {
-	return &file_geo_v1_geo_proto_enumTypes[0]
+	return &file_social_geo_v1_geo_proto_enumTypes[0]
 }
 
 func (x WorldPinKind) Number() protoreflect.EnumNumber {
@@ -72,7 +72,7 @@ func (x WorldPinKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use WorldPinKind.Descriptor instead.
 func (WorldPinKind) EnumDescriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{0}
+	return file_social_geo_v1_geo_proto_rawDescGZIP(), []int{0}
 }
 
 type ResolveRequest struct {
@@ -84,7 +84,7 @@ type ResolveRequest struct {
 
 func (x *ResolveRequest) Reset() {
 	*x = ResolveRequest{}
-	mi := &file_geo_v1_geo_proto_msgTypes[0]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -96,7 +96,7 @@ func (x *ResolveRequest) String() string {
 func (*ResolveRequest) ProtoMessage() {}
 
 func (x *ResolveRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_geo_v1_geo_proto_msgTypes[0]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -109,7 +109,7 @@ func (x *ResolveRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResolveRequest.ProtoReflect.Descriptor instead.
 func (*ResolveRequest) Descriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{0}
+	return file_social_geo_v1_geo_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ResolveRequest) GetQuery() string {
@@ -128,7 +128,7 @@ type ResolveResponse struct {
 
 func (x *ResolveResponse) Reset() {
 	*x = ResolveResponse{}
-	mi := &file_geo_v1_geo_proto_msgTypes[1]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -140,7 +140,7 @@ func (x *ResolveResponse) String() string {
 func (*ResolveResponse) ProtoMessage() {}
 
 func (x *ResolveResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_geo_v1_geo_proto_msgTypes[1]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -153,7 +153,7 @@ func (x *ResolveResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ResolveResponse.ProtoReflect.Descriptor instead.
 func (*ResolveResponse) Descriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{1}
+	return file_social_geo_v1_geo_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ResolveResponse) GetCandidates() []*GeoCandidate {
@@ -177,7 +177,7 @@ type GeoCandidate struct {
 
 func (x *GeoCandidate) Reset() {
 	*x = GeoCandidate{}
-	mi := &file_geo_v1_geo_proto_msgTypes[2]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -189,7 +189,7 @@ func (x *GeoCandidate) String() string {
 func (*GeoCandidate) ProtoMessage() {}
 
 func (x *GeoCandidate) ProtoReflect() protoreflect.Message {
-	mi := &file_geo_v1_geo_proto_msgTypes[2]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -202,7 +202,7 @@ func (x *GeoCandidate) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GeoCandidate.ProtoReflect.Descriptor instead.
 func (*GeoCandidate) Descriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{2}
+	return file_social_geo_v1_geo_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GeoCandidate) GetRegion() string {
@@ -255,7 +255,7 @@ type CommunityMapRequest struct {
 
 func (x *CommunityMapRequest) Reset() {
 	*x = CommunityMapRequest{}
-	mi := &file_geo_v1_geo_proto_msgTypes[3]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -267,7 +267,7 @@ func (x *CommunityMapRequest) String() string {
 func (*CommunityMapRequest) ProtoMessage() {}
 
 func (x *CommunityMapRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_geo_v1_geo_proto_msgTypes[3]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -280,7 +280,7 @@ func (x *CommunityMapRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunityMapRequest.ProtoReflect.Descriptor instead.
 func (*CommunityMapRequest) Descriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{3}
+	return file_social_geo_v1_geo_proto_rawDescGZIP(), []int{3}
 }
 
 type CommunityMapResponse struct {
@@ -292,7 +292,7 @@ type CommunityMapResponse struct {
 
 func (x *CommunityMapResponse) Reset() {
 	*x = CommunityMapResponse{}
-	mi := &file_geo_v1_geo_proto_msgTypes[4]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -304,7 +304,7 @@ func (x *CommunityMapResponse) String() string {
 func (*CommunityMapResponse) ProtoMessage() {}
 
 func (x *CommunityMapResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_geo_v1_geo_proto_msgTypes[4]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -317,7 +317,7 @@ func (x *CommunityMapResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunityMapResponse.ProtoReflect.Descriptor instead.
 func (*CommunityMapResponse) Descriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{4}
+	return file_social_geo_v1_geo_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CommunityMapResponse) GetPoints() []*CommunityMapPoint {
@@ -347,7 +347,7 @@ type CommunityMapPoint struct {
 
 func (x *CommunityMapPoint) Reset() {
 	*x = CommunityMapPoint{}
-	mi := &file_geo_v1_geo_proto_msgTypes[5]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -359,7 +359,7 @@ func (x *CommunityMapPoint) String() string {
 func (*CommunityMapPoint) ProtoMessage() {}
 
 func (x *CommunityMapPoint) ProtoReflect() protoreflect.Message {
-	mi := &file_geo_v1_geo_proto_msgTypes[5]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -372,7 +372,7 @@ func (x *CommunityMapPoint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CommunityMapPoint.ProtoReflect.Descriptor instead.
 func (*CommunityMapPoint) Descriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{5}
+	return file_social_geo_v1_geo_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CommunityMapPoint) GetUserId() string {
@@ -477,7 +477,7 @@ type WorldPin struct {
 
 func (x *WorldPin) Reset() {
 	*x = WorldPin{}
-	mi := &file_geo_v1_geo_proto_msgTypes[6]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -489,7 +489,7 @@ func (x *WorldPin) String() string {
 func (*WorldPin) ProtoMessage() {}
 
 func (x *WorldPin) ProtoReflect() protoreflect.Message {
-	mi := &file_geo_v1_geo_proto_msgTypes[6]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -502,7 +502,7 @@ func (x *WorldPin) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorldPin.ProtoReflect.Descriptor instead.
 func (*WorldPin) Descriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{6}
+	return file_social_geo_v1_geo_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *WorldPin) GetId() string {
@@ -583,7 +583,7 @@ type WorldPinsRequest struct {
 
 func (x *WorldPinsRequest) Reset() {
 	*x = WorldPinsRequest{}
-	mi := &file_geo_v1_geo_proto_msgTypes[7]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -595,7 +595,7 @@ func (x *WorldPinsRequest) String() string {
 func (*WorldPinsRequest) ProtoMessage() {}
 
 func (x *WorldPinsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_geo_v1_geo_proto_msgTypes[7]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -608,7 +608,7 @@ func (x *WorldPinsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorldPinsRequest.ProtoReflect.Descriptor instead.
 func (*WorldPinsRequest) Descriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{7}
+	return file_social_geo_v1_geo_proto_rawDescGZIP(), []int{7}
 }
 
 type WorldPinsResponse struct {
@@ -620,7 +620,7 @@ type WorldPinsResponse struct {
 
 func (x *WorldPinsResponse) Reset() {
 	*x = WorldPinsResponse{}
-	mi := &file_geo_v1_geo_proto_msgTypes[8]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -632,7 +632,7 @@ func (x *WorldPinsResponse) String() string {
 func (*WorldPinsResponse) ProtoMessage() {}
 
 func (x *WorldPinsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_geo_v1_geo_proto_msgTypes[8]
+	mi := &file_social_geo_v1_geo_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -645,7 +645,7 @@ func (x *WorldPinsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WorldPinsResponse.ProtoReflect.Descriptor instead.
 func (*WorldPinsResponse) Descriptor() ([]byte, []int) {
-	return file_geo_v1_geo_proto_rawDescGZIP(), []int{8}
+	return file_social_geo_v1_geo_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *WorldPinsResponse) GetPins() []*WorldPin {
@@ -655,11 +655,11 @@ func (x *WorldPinsResponse) GetPins() []*WorldPin {
 	return nil
 }
 
-var File_geo_v1_geo_proto protoreflect.FileDescriptor
+var File_social_geo_v1_geo_proto protoreflect.FileDescriptor
 
-const file_geo_v1_geo_proto_rawDesc = "" +
+const file_social_geo_v1_geo_proto_rawDesc = "" +
 	"\n" +
-	"\x10geo/v1/geo.proto\x12\x06geo.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x16common/v1/common.proto\"&\n" +
+	"\x17social/geo/v1/geo.proto\x12\x06geo.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bcore/common/v1/common.proto\"&\n" +
 	"\x0eResolveRequest\x12\x14\n" +
 	"\x05query\x18\x01 \x01(\tR\x05query\"G\n" +
 	"\x0fResolveResponse\x124\n" +
@@ -719,20 +719,20 @@ const file_geo_v1_geo_proto_rawDesc = "" +
 	"\tWorldPins\x12\x18.geo.v1.WorldPinsRequest\x1a\x19.geo.v1.WorldPinsResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/geo/world-pinsB\x17Z\x15api/pkg/api/geo/v1;v1b\x06proto3"
 
 var (
-	file_geo_v1_geo_proto_rawDescOnce sync.Once
-	file_geo_v1_geo_proto_rawDescData []byte
+	file_social_geo_v1_geo_proto_rawDescOnce sync.Once
+	file_social_geo_v1_geo_proto_rawDescData []byte
 )
 
-func file_geo_v1_geo_proto_rawDescGZIP() []byte {
-	file_geo_v1_geo_proto_rawDescOnce.Do(func() {
-		file_geo_v1_geo_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_geo_v1_geo_proto_rawDesc), len(file_geo_v1_geo_proto_rawDesc)))
+func file_social_geo_v1_geo_proto_rawDescGZIP() []byte {
+	file_social_geo_v1_geo_proto_rawDescOnce.Do(func() {
+		file_social_geo_v1_geo_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_social_geo_v1_geo_proto_rawDesc), len(file_social_geo_v1_geo_proto_rawDesc)))
 	})
-	return file_geo_v1_geo_proto_rawDescData
+	return file_social_geo_v1_geo_proto_rawDescData
 }
 
-var file_geo_v1_geo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_geo_v1_geo_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_geo_v1_geo_proto_goTypes = []any{
+var file_social_geo_v1_geo_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_social_geo_v1_geo_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_social_geo_v1_geo_proto_goTypes = []any{
 	(WorldPinKind)(0),            // 0: geo.v1.WorldPinKind
 	(*ResolveRequest)(nil),       // 1: geo.v1.ResolveRequest
 	(*ResolveResponse)(nil),      // 2: geo.v1.ResolveResponse
@@ -745,7 +745,7 @@ var file_geo_v1_geo_proto_goTypes = []any{
 	(*WorldPinsResponse)(nil),    // 9: geo.v1.WorldPinsResponse
 	(v1.UserActivityStatus)(0),   // 10: common.v1.UserActivityStatus
 }
-var file_geo_v1_geo_proto_depIdxs = []int32{
+var file_social_geo_v1_geo_proto_depIdxs = []int32{
 	3,  // 0: geo.v1.ResolveResponse.candidates:type_name -> geo.v1.GeoCandidate
 	6,  // 1: geo.v1.CommunityMapResponse.points:type_name -> geo.v1.CommunityMapPoint
 	10, // 2: geo.v1.CommunityMapPoint.activity_status:type_name -> common.v1.UserActivityStatus
@@ -764,27 +764,27 @@ var file_geo_v1_geo_proto_depIdxs = []int32{
 	0,  // [0:5] is the sub-list for field type_name
 }
 
-func init() { file_geo_v1_geo_proto_init() }
-func file_geo_v1_geo_proto_init() {
-	if File_geo_v1_geo_proto != nil {
+func init() { file_social_geo_v1_geo_proto_init() }
+func file_social_geo_v1_geo_proto_init() {
+	if File_social_geo_v1_geo_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_geo_v1_geo_proto_rawDesc), len(file_geo_v1_geo_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_geo_v1_geo_proto_rawDesc), len(file_social_geo_v1_geo_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_geo_v1_geo_proto_goTypes,
-		DependencyIndexes: file_geo_v1_geo_proto_depIdxs,
-		EnumInfos:         file_geo_v1_geo_proto_enumTypes,
-		MessageInfos:      file_geo_v1_geo_proto_msgTypes,
+		GoTypes:           file_social_geo_v1_geo_proto_goTypes,
+		DependencyIndexes: file_social_geo_v1_geo_proto_depIdxs,
+		EnumInfos:         file_social_geo_v1_geo_proto_enumTypes,
+		MessageInfos:      file_social_geo_v1_geo_proto_msgTypes,
 	}.Build()
-	File_geo_v1_geo_proto = out.File
-	file_geo_v1_geo_proto_goTypes = nil
-	file_geo_v1_geo_proto_depIdxs = nil
+	File_social_geo_v1_geo_proto = out.File
+	file_social_geo_v1_geo_proto_goTypes = nil
+	file_social_geo_v1_geo_proto_depIdxs = nil
 }

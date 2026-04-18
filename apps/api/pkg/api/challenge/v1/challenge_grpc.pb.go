@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: challenge/v1/challenge.proto
+// source: game/challenge/v1/challenge.proto
 
 package v1
 
@@ -245,5 +245,5 @@ var ChallengeService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "challenge/v1/challenge.proto",
+	Metadata: "game/challenge/v1/challenge.proto",
 }

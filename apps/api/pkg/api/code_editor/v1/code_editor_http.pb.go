@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: code_editor/v1/code_editor.proto
+// source: learning/code_editor/v1/code_editor.proto
 
 package v1
 

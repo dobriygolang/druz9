@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: arena/v1/arena.proto
+// source: game/arena/v1/arena.proto
 
 package v1
 
@@ -467,5 +467,5 @@ var ArenaService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "arena/v1/arena.proto",
+	Metadata: "game/arena/v1/arena.proto",
 }

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: inbox/v1/inbox.proto
+// source: social/inbox/v1/inbox.proto
 
 package v1
 
@@ -67,11 +67,11 @@ func (x ThreadKind) String() string {
 }
 
 func (ThreadKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_inbox_v1_inbox_proto_enumTypes[0].Descriptor()
+	return file_social_inbox_v1_inbox_proto_enumTypes[0].Descriptor()
 }
 
 func (ThreadKind) Type() protoreflect.EnumType {
-	return &file_inbox_v1_inbox_proto_enumTypes[0]
+	return &file_social_inbox_v1_inbox_proto_enumTypes[0]
 }
 
 func (x ThreadKind) Number() protoreflect.EnumNumber {
@@ -80,7 +80,7 @@ func (x ThreadKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ThreadKind.Descriptor instead.
 func (ThreadKind) EnumDescriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{0}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{0}
 }
 
 type SenderKind int32
@@ -122,11 +122,11 @@ func (x SenderKind) String() string {
 }
 
 func (SenderKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_inbox_v1_inbox_proto_enumTypes[1].Descriptor()
+	return file_social_inbox_v1_inbox_proto_enumTypes[1].Descriptor()
 }
 
 func (SenderKind) Type() protoreflect.EnumType {
-	return &file_inbox_v1_inbox_proto_enumTypes[1]
+	return &file_social_inbox_v1_inbox_proto_enumTypes[1]
 }
 
 func (x SenderKind) Number() protoreflect.EnumNumber {
@@ -135,7 +135,7 @@ func (x SenderKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SenderKind.Descriptor instead.
 func (SenderKind) EnumDescriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{1}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{1}
 }
 
 type InboxThread struct {
@@ -155,7 +155,7 @@ type InboxThread struct {
 
 func (x *InboxThread) Reset() {
 	*x = InboxThread{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[0]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -167,7 +167,7 @@ func (x *InboxThread) String() string {
 func (*InboxThread) ProtoMessage() {}
 
 func (x *InboxThread) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[0]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -180,7 +180,7 @@ func (x *InboxThread) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InboxThread.ProtoReflect.Descriptor instead.
 func (*InboxThread) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{0}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *InboxThread) GetId() string {
@@ -262,7 +262,7 @@ type InboxMessage struct {
 
 func (x *InboxMessage) Reset() {
 	*x = InboxMessage{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[1]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -274,7 +274,7 @@ func (x *InboxMessage) String() string {
 func (*InboxMessage) ProtoMessage() {}
 
 func (x *InboxMessage) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[1]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -287,7 +287,7 @@ func (x *InboxMessage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InboxMessage.ProtoReflect.Descriptor instead.
 func (*InboxMessage) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{1}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *InboxMessage) GetId() string {
@@ -356,7 +356,7 @@ type ListThreadsRequest struct {
 
 func (x *ListThreadsRequest) Reset() {
 	*x = ListThreadsRequest{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[2]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -368,7 +368,7 @@ func (x *ListThreadsRequest) String() string {
 func (*ListThreadsRequest) ProtoMessage() {}
 
 func (x *ListThreadsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[2]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -381,7 +381,7 @@ func (x *ListThreadsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListThreadsRequest.ProtoReflect.Descriptor instead.
 func (*ListThreadsRequest) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{2}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ListThreadsRequest) GetLimit() int32 {
@@ -409,7 +409,7 @@ type ListThreadsResponse struct {
 
 func (x *ListThreadsResponse) Reset() {
 	*x = ListThreadsResponse{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[3]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -421,7 +421,7 @@ func (x *ListThreadsResponse) String() string {
 func (*ListThreadsResponse) ProtoMessage() {}
 
 func (x *ListThreadsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[3]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -434,7 +434,7 @@ func (x *ListThreadsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListThreadsResponse.ProtoReflect.Descriptor instead.
 func (*ListThreadsResponse) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{3}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListThreadsResponse) GetThreads() []*InboxThread {
@@ -467,7 +467,7 @@ type GetThreadRequest struct {
 
 func (x *GetThreadRequest) Reset() {
 	*x = GetThreadRequest{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[4]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -479,7 +479,7 @@ func (x *GetThreadRequest) String() string {
 func (*GetThreadRequest) ProtoMessage() {}
 
 func (x *GetThreadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[4]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -492,7 +492,7 @@ func (x *GetThreadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetThreadRequest.ProtoReflect.Descriptor instead.
 func (*GetThreadRequest) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{4}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetThreadRequest) GetThreadId() string {
@@ -512,7 +512,7 @@ type GetThreadResponse struct {
 
 func (x *GetThreadResponse) Reset() {
 	*x = GetThreadResponse{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[5]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -524,7 +524,7 @@ func (x *GetThreadResponse) String() string {
 func (*GetThreadResponse) ProtoMessage() {}
 
 func (x *GetThreadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[5]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -537,7 +537,7 @@ func (x *GetThreadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetThreadResponse.ProtoReflect.Descriptor instead.
 func (*GetThreadResponse) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{5}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetThreadResponse) GetThread() *InboxThread {
@@ -563,7 +563,7 @@ type MarkThreadReadRequest struct {
 
 func (x *MarkThreadReadRequest) Reset() {
 	*x = MarkThreadReadRequest{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[6]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -575,7 +575,7 @@ func (x *MarkThreadReadRequest) String() string {
 func (*MarkThreadReadRequest) ProtoMessage() {}
 
 func (x *MarkThreadReadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[6]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -588,7 +588,7 @@ func (x *MarkThreadReadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MarkThreadReadRequest.ProtoReflect.Descriptor instead.
 func (*MarkThreadReadRequest) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{6}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *MarkThreadReadRequest) GetThreadId() string {
@@ -608,7 +608,7 @@ type MarkThreadReadResponse struct {
 
 func (x *MarkThreadReadResponse) Reset() {
 	*x = MarkThreadReadResponse{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[7]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -620,7 +620,7 @@ func (x *MarkThreadReadResponse) String() string {
 func (*MarkThreadReadResponse) ProtoMessage() {}
 
 func (x *MarkThreadReadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[7]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -633,7 +633,7 @@ func (x *MarkThreadReadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MarkThreadReadResponse.ProtoReflect.Descriptor instead.
 func (*MarkThreadReadResponse) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{7}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *MarkThreadReadResponse) GetOk() bool {
@@ -660,7 +660,7 @@ type SendMessageRequest struct {
 
 func (x *SendMessageRequest) Reset() {
 	*x = SendMessageRequest{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[8]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -672,7 +672,7 @@ func (x *SendMessageRequest) String() string {
 func (*SendMessageRequest) ProtoMessage() {}
 
 func (x *SendMessageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[8]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -685,7 +685,7 @@ func (x *SendMessageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendMessageRequest.ProtoReflect.Descriptor instead.
 func (*SendMessageRequest) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{8}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SendMessageRequest) GetThreadId() string {
@@ -711,7 +711,7 @@ type SendMessageResponse struct {
 
 func (x *SendMessageResponse) Reset() {
 	*x = SendMessageResponse{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[9]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -723,7 +723,7 @@ func (x *SendMessageResponse) String() string {
 func (*SendMessageResponse) ProtoMessage() {}
 
 func (x *SendMessageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[9]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -736,7 +736,7 @@ func (x *SendMessageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendMessageResponse.ProtoReflect.Descriptor instead.
 func (*SendMessageResponse) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{9}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *SendMessageResponse) GetMessage() *InboxMessage {
@@ -754,7 +754,7 @@ type GetUnreadCountRequest struct {
 
 func (x *GetUnreadCountRequest) Reset() {
 	*x = GetUnreadCountRequest{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[10]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -766,7 +766,7 @@ func (x *GetUnreadCountRequest) String() string {
 func (*GetUnreadCountRequest) ProtoMessage() {}
 
 func (x *GetUnreadCountRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[10]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -779,7 +779,7 @@ func (x *GetUnreadCountRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUnreadCountRequest.ProtoReflect.Descriptor instead.
 func (*GetUnreadCountRequest) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{10}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{10}
 }
 
 type GetUnreadCountResponse struct {
@@ -791,7 +791,7 @@ type GetUnreadCountResponse struct {
 
 func (x *GetUnreadCountResponse) Reset() {
 	*x = GetUnreadCountResponse{}
-	mi := &file_inbox_v1_inbox_proto_msgTypes[11]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -803,7 +803,7 @@ func (x *GetUnreadCountResponse) String() string {
 func (*GetUnreadCountResponse) ProtoMessage() {}
 
 func (x *GetUnreadCountResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_inbox_v1_inbox_proto_msgTypes[11]
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -816,7 +816,7 @@ func (x *GetUnreadCountResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetUnreadCountResponse.ProtoReflect.Descriptor instead.
 func (*GetUnreadCountResponse) Descriptor() ([]byte, []int) {
-	return file_inbox_v1_inbox_proto_rawDescGZIP(), []int{11}
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetUnreadCountResponse) GetUnreadTotal() int32 {
@@ -826,11 +826,11 @@ func (x *GetUnreadCountResponse) GetUnreadTotal() int32 {
 	return 0
 }
 
-var File_inbox_v1_inbox_proto protoreflect.FileDescriptor
+var File_social_inbox_v1_inbox_proto protoreflect.FileDescriptor
 
-const file_inbox_v1_inbox_proto_rawDesc = "" +
+const file_social_inbox_v1_inbox_proto_rawDesc = "" +
 	"\n" +
-	"\x14inbox/v1/inbox.proto\x12\binbox.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbd\x02\n" +
+	"\x1bsocial/inbox/v1/inbox.proto\x12\binbox.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xbd\x02\n" +
 	"\vInboxThread\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12(\n" +
 	"\x04kind\x18\x02 \x01(\x0e2\x14.inbox.v1.ThreadKindR\x04kind\x12\x18\n" +
@@ -902,20 +902,20 @@ const file_inbox_v1_inbox_proto_rawDesc = "" +
 	"\x0eGetUnreadCount\x12\x1f.inbox.v1.GetUnreadCountRequest\x1a .inbox.v1.GetUnreadCountResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/inbox/unreadB\x19Z\x17api/pkg/api/inbox/v1;v1b\x06proto3"
 
 var (
-	file_inbox_v1_inbox_proto_rawDescOnce sync.Once
-	file_inbox_v1_inbox_proto_rawDescData []byte
+	file_social_inbox_v1_inbox_proto_rawDescOnce sync.Once
+	file_social_inbox_v1_inbox_proto_rawDescData []byte
 )
 
-func file_inbox_v1_inbox_proto_rawDescGZIP() []byte {
-	file_inbox_v1_inbox_proto_rawDescOnce.Do(func() {
-		file_inbox_v1_inbox_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_inbox_v1_inbox_proto_rawDesc), len(file_inbox_v1_inbox_proto_rawDesc)))
+func file_social_inbox_v1_inbox_proto_rawDescGZIP() []byte {
+	file_social_inbox_v1_inbox_proto_rawDescOnce.Do(func() {
+		file_social_inbox_v1_inbox_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_social_inbox_v1_inbox_proto_rawDesc), len(file_social_inbox_v1_inbox_proto_rawDesc)))
 	})
-	return file_inbox_v1_inbox_proto_rawDescData
+	return file_social_inbox_v1_inbox_proto_rawDescData
 }
 
-var file_inbox_v1_inbox_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_inbox_v1_inbox_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
-var file_inbox_v1_inbox_proto_goTypes = []any{
+var file_social_inbox_v1_inbox_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_social_inbox_v1_inbox_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_social_inbox_v1_inbox_proto_goTypes = []any{
 	(ThreadKind)(0),                // 0: inbox.v1.ThreadKind
 	(SenderKind)(0),                // 1: inbox.v1.SenderKind
 	(*InboxThread)(nil),            // 2: inbox.v1.InboxThread
@@ -932,7 +932,7 @@ var file_inbox_v1_inbox_proto_goTypes = []any{
 	(*GetUnreadCountResponse)(nil), // 13: inbox.v1.GetUnreadCountResponse
 	(*timestamppb.Timestamp)(nil),  // 14: google.protobuf.Timestamp
 }
-var file_inbox_v1_inbox_proto_depIdxs = []int32{
+var file_social_inbox_v1_inbox_proto_depIdxs = []int32{
 	0,  // 0: inbox.v1.InboxThread.kind:type_name -> inbox.v1.ThreadKind
 	14, // 1: inbox.v1.InboxThread.last_message_at:type_name -> google.protobuf.Timestamp
 	1,  // 2: inbox.v1.InboxMessage.sender_kind:type_name -> inbox.v1.SenderKind
@@ -958,27 +958,27 @@ var file_inbox_v1_inbox_proto_depIdxs = []int32{
 	0,  // [0:8] is the sub-list for field type_name
 }
 
-func init() { file_inbox_v1_inbox_proto_init() }
-func file_inbox_v1_inbox_proto_init() {
-	if File_inbox_v1_inbox_proto != nil {
+func init() { file_social_inbox_v1_inbox_proto_init() }
+func file_social_inbox_v1_inbox_proto_init() {
+	if File_social_inbox_v1_inbox_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_inbox_v1_inbox_proto_rawDesc), len(file_inbox_v1_inbox_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_inbox_v1_inbox_proto_rawDesc), len(file_social_inbox_v1_inbox_proto_rawDesc)),
 			NumEnums:      2,
 			NumMessages:   12,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_inbox_v1_inbox_proto_goTypes,
-		DependencyIndexes: file_inbox_v1_inbox_proto_depIdxs,
-		EnumInfos:         file_inbox_v1_inbox_proto_enumTypes,
-		MessageInfos:      file_inbox_v1_inbox_proto_msgTypes,
+		GoTypes:           file_social_inbox_v1_inbox_proto_goTypes,
+		DependencyIndexes: file_social_inbox_v1_inbox_proto_depIdxs,
+		EnumInfos:         file_social_inbox_v1_inbox_proto_enumTypes,
+		MessageInfos:      file_social_inbox_v1_inbox_proto_msgTypes,
 	}.Build()
-	File_inbox_v1_inbox_proto = out.File
-	file_inbox_v1_inbox_proto_goTypes = nil
-	file_inbox_v1_inbox_proto_depIdxs = nil
+	File_social_inbox_v1_inbox_proto = out.File
+	file_social_inbox_v1_inbox_proto_goTypes = nil
+	file_social_inbox_v1_inbox_proto_depIdxs = nil
 }

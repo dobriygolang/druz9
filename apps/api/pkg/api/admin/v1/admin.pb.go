@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: admin/v1/admin.proto
+// source: core/admin/v1/admin.proto
 
 package v1
 
@@ -32,7 +32,7 @@ type DeleteUserRequest struct {
 
 func (x *DeleteUserRequest) Reset() {
 	*x = DeleteUserRequest{}
-	mi := &file_admin_v1_admin_proto_msgTypes[0]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -44,7 +44,7 @@ func (x *DeleteUserRequest) String() string {
 func (*DeleteUserRequest) ProtoMessage() {}
 
 func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[0]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -57,7 +57,7 @@ func (x *DeleteUserRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteUserRequest.ProtoReflect.Descriptor instead.
 func (*DeleteUserRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{0}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *DeleteUserRequest) GetUserId() string {
@@ -77,7 +77,7 @@ type UpdateUserTrustRequest struct {
 
 func (x *UpdateUserTrustRequest) Reset() {
 	*x = UpdateUserTrustRequest{}
-	mi := &file_admin_v1_admin_proto_msgTypes[1]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -89,7 +89,7 @@ func (x *UpdateUserTrustRequest) String() string {
 func (*UpdateUserTrustRequest) ProtoMessage() {}
 
 func (x *UpdateUserTrustRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[1]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -102,7 +102,7 @@ func (x *UpdateUserTrustRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserTrustRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserTrustRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{1}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *UpdateUserTrustRequest) GetUserId() string {
@@ -129,7 +129,7 @@ type UpdateUserAdminRequest struct {
 
 func (x *UpdateUserAdminRequest) Reset() {
 	*x = UpdateUserAdminRequest{}
-	mi := &file_admin_v1_admin_proto_msgTypes[2]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -141,7 +141,7 @@ func (x *UpdateUserAdminRequest) String() string {
 func (*UpdateUserAdminRequest) ProtoMessage() {}
 
 func (x *UpdateUserAdminRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[2]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -154,7 +154,7 @@ func (x *UpdateUserAdminRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateUserAdminRequest.ProtoReflect.Descriptor instead.
 func (*UpdateUserAdminRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{2}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *UpdateUserAdminRequest) GetUserId() string {
@@ -179,7 +179,7 @@ type GetRuntimeConfigRequest struct {
 
 func (x *GetRuntimeConfigRequest) Reset() {
 	*x = GetRuntimeConfigRequest{}
-	mi := &file_admin_v1_admin_proto_msgTypes[3]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -191,7 +191,7 @@ func (x *GetRuntimeConfigRequest) String() string {
 func (*GetRuntimeConfigRequest) ProtoMessage() {}
 
 func (x *GetRuntimeConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[3]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -204,7 +204,7 @@ func (x *GetRuntimeConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRuntimeConfigRequest.ProtoReflect.Descriptor instead.
 func (*GetRuntimeConfigRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{3}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{3}
 }
 
 type AdminStatusResponse struct {
@@ -216,7 +216,7 @@ type AdminStatusResponse struct {
 
 func (x *AdminStatusResponse) Reset() {
 	*x = AdminStatusResponse{}
-	mi := &file_admin_v1_admin_proto_msgTypes[4]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -228,7 +228,7 @@ func (x *AdminStatusResponse) String() string {
 func (*AdminStatusResponse) ProtoMessage() {}
 
 func (x *AdminStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[4]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -241,7 +241,7 @@ func (x *AdminStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminStatusResponse.ProtoReflect.Descriptor instead.
 func (*AdminStatusResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{4}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AdminStatusResponse) GetStatus() v1.OperationStatus {
@@ -260,7 +260,7 @@ type GetConfigRequest struct {
 
 func (x *GetConfigRequest) Reset() {
 	*x = GetConfigRequest{}
-	mi := &file_admin_v1_admin_proto_msgTypes[5]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -272,7 +272,7 @@ func (x *GetConfigRequest) String() string {
 func (*GetConfigRequest) ProtoMessage() {}
 
 func (x *GetConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[5]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -285,7 +285,7 @@ func (x *GetConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetConfigRequest.ProtoReflect.Descriptor instead.
 func (*GetConfigRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{5}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetConfigRequest) GetKey() string {
@@ -309,7 +309,7 @@ type GetConfigResponse struct {
 
 func (x *GetConfigResponse) Reset() {
 	*x = GetConfigResponse{}
-	mi := &file_admin_v1_admin_proto_msgTypes[6]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -321,7 +321,7 @@ func (x *GetConfigResponse) String() string {
 func (*GetConfigResponse) ProtoMessage() {}
 
 func (x *GetConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[6]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -334,7 +334,7 @@ func (x *GetConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetConfigResponse.ProtoReflect.Descriptor instead.
 func (*GetConfigResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{6}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetConfigResponse) GetKey() string {
@@ -387,7 +387,7 @@ type ListConfigRequest struct {
 
 func (x *ListConfigRequest) Reset() {
 	*x = ListConfigRequest{}
-	mi := &file_admin_v1_admin_proto_msgTypes[7]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -399,7 +399,7 @@ func (x *ListConfigRequest) String() string {
 func (*ListConfigRequest) ProtoMessage() {}
 
 func (x *ListConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[7]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -412,7 +412,7 @@ func (x *ListConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListConfigRequest.ProtoReflect.Descriptor instead.
 func (*ListConfigRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{7}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{7}
 }
 
 type ListConfigResponse struct {
@@ -424,7 +424,7 @@ type ListConfigResponse struct {
 
 func (x *ListConfigResponse) Reset() {
 	*x = ListConfigResponse{}
-	mi := &file_admin_v1_admin_proto_msgTypes[8]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -436,7 +436,7 @@ func (x *ListConfigResponse) String() string {
 func (*ListConfigResponse) ProtoMessage() {}
 
 func (x *ListConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[8]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -449,7 +449,7 @@ func (x *ListConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListConfigResponse.ProtoReflect.Descriptor instead.
 func (*ListConfigResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{8}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListConfigResponse) GetConfigs() []*ConfigItem {
@@ -473,7 +473,7 @@ type ConfigItem struct {
 
 func (x *ConfigItem) Reset() {
 	*x = ConfigItem{}
-	mi := &file_admin_v1_admin_proto_msgTypes[9]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -485,7 +485,7 @@ func (x *ConfigItem) String() string {
 func (*ConfigItem) ProtoMessage() {}
 
 func (x *ConfigItem) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[9]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -498,7 +498,7 @@ func (x *ConfigItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ConfigItem.ProtoReflect.Descriptor instead.
 func (*ConfigItem) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{9}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ConfigItem) GetKey() string {
@@ -553,7 +553,7 @@ type UpdateConfigRequest struct {
 
 func (x *UpdateConfigRequest) Reset() {
 	*x = UpdateConfigRequest{}
-	mi := &file_admin_v1_admin_proto_msgTypes[10]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -565,7 +565,7 @@ func (x *UpdateConfigRequest) String() string {
 func (*UpdateConfigRequest) ProtoMessage() {}
 
 func (x *UpdateConfigRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[10]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -578,7 +578,7 @@ func (x *UpdateConfigRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateConfigRequest.ProtoReflect.Descriptor instead.
 func (*UpdateConfigRequest) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{10}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *UpdateConfigRequest) GetKey() string {
@@ -606,7 +606,7 @@ type UpdateConfigResponse struct {
 
 func (x *UpdateConfigResponse) Reset() {
 	*x = UpdateConfigResponse{}
-	mi := &file_admin_v1_admin_proto_msgTypes[11]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -618,7 +618,7 @@ func (x *UpdateConfigResponse) String() string {
 func (*UpdateConfigResponse) ProtoMessage() {}
 
 func (x *UpdateConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[11]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -631,7 +631,7 @@ func (x *UpdateConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateConfigResponse.ProtoReflect.Descriptor instead.
 func (*UpdateConfigResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{11}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UpdateConfigResponse) GetKey() string {
@@ -665,7 +665,7 @@ type GetRuntimeConfigResponse struct {
 
 func (x *GetRuntimeConfigResponse) Reset() {
 	*x = GetRuntimeConfigResponse{}
-	mi := &file_admin_v1_admin_proto_msgTypes[12]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -677,7 +677,7 @@ func (x *GetRuntimeConfigResponse) String() string {
 func (*GetRuntimeConfigResponse) ProtoMessage() {}
 
 func (x *GetRuntimeConfigResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_admin_v1_admin_proto_msgTypes[12]
+	mi := &file_core_admin_v1_admin_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -690,7 +690,7 @@ func (x *GetRuntimeConfigResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRuntimeConfigResponse.ProtoReflect.Descriptor instead.
 func (*GetRuntimeConfigResponse) Descriptor() ([]byte, []int) {
-	return file_admin_v1_admin_proto_rawDescGZIP(), []int{12}
+	return file_core_admin_v1_admin_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetRuntimeConfigResponse) GetAppRequireAuth() bool {
@@ -707,11 +707,11 @@ func (x *GetRuntimeConfigResponse) GetArenaRequireAuth() bool {
 	return false
 }
 
-var File_admin_v1_admin_proto protoreflect.FileDescriptor
+var File_core_admin_v1_admin_proto protoreflect.FileDescriptor
 
-const file_admin_v1_admin_proto_rawDesc = "" +
+const file_core_admin_v1_admin_proto_rawDesc = "" +
 	"\n" +
-	"\x14admin/v1/admin.proto\x12\badmin.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x16common/v1/common.proto\",\n" +
+	"\x19core/admin/v1/admin.proto\x12\badmin.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1bcore/common/v1/common.proto\",\n" +
 	"\x11DeleteUserRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"P\n" +
 	"\x16UpdateUserTrustRequest\x12\x17\n" +
@@ -766,19 +766,19 @@ const file_admin_v1_admin_proto_rawDesc = "" +
 	"\x10GetRuntimeConfig\x12!.admin.v1.GetRuntimeConfigRequest\x1a\".admin.v1.GetRuntimeConfigResponse\"\"\x82\xd3\xe4\x93\x02\x1c\x12\x1a/api/public/runtime-configB\x19Z\x17api/pkg/api/admin/v1;v1b\x06proto3"
 
 var (
-	file_admin_v1_admin_proto_rawDescOnce sync.Once
-	file_admin_v1_admin_proto_rawDescData []byte
+	file_core_admin_v1_admin_proto_rawDescOnce sync.Once
+	file_core_admin_v1_admin_proto_rawDescData []byte
 )
 
-func file_admin_v1_admin_proto_rawDescGZIP() []byte {
-	file_admin_v1_admin_proto_rawDescOnce.Do(func() {
-		file_admin_v1_admin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_admin_v1_admin_proto_rawDesc), len(file_admin_v1_admin_proto_rawDesc)))
+func file_core_admin_v1_admin_proto_rawDescGZIP() []byte {
+	file_core_admin_v1_admin_proto_rawDescOnce.Do(func() {
+		file_core_admin_v1_admin_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_core_admin_v1_admin_proto_rawDesc), len(file_core_admin_v1_admin_proto_rawDesc)))
 	})
-	return file_admin_v1_admin_proto_rawDescData
+	return file_core_admin_v1_admin_proto_rawDescData
 }
 
-var file_admin_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
-var file_admin_v1_admin_proto_goTypes = []any{
+var file_core_admin_v1_admin_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_core_admin_v1_admin_proto_goTypes = []any{
 	(*DeleteUserRequest)(nil),        // 0: admin.v1.DeleteUserRequest
 	(*UpdateUserTrustRequest)(nil),   // 1: admin.v1.UpdateUserTrustRequest
 	(*UpdateUserAdminRequest)(nil),   // 2: admin.v1.UpdateUserAdminRequest
@@ -794,7 +794,7 @@ var file_admin_v1_admin_proto_goTypes = []any{
 	(*GetRuntimeConfigResponse)(nil), // 12: admin.v1.GetRuntimeConfigResponse
 	(v1.OperationStatus)(0),          // 13: common.v1.OperationStatus
 }
-var file_admin_v1_admin_proto_depIdxs = []int32{
+var file_core_admin_v1_admin_proto_depIdxs = []int32{
 	13, // 0: admin.v1.AdminStatusResponse.status:type_name -> common.v1.OperationStatus
 	9,  // 1: admin.v1.ListConfigResponse.configs:type_name -> admin.v1.ConfigItem
 	0,  // 2: admin.v1.AdminService.DeleteUser:input_type -> admin.v1.DeleteUserRequest
@@ -818,26 +818,26 @@ var file_admin_v1_admin_proto_depIdxs = []int32{
 	0,  // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_admin_v1_admin_proto_init() }
-func file_admin_v1_admin_proto_init() {
-	if File_admin_v1_admin_proto != nil {
+func init() { file_core_admin_v1_admin_proto_init() }
+func file_core_admin_v1_admin_proto_init() {
+	if File_core_admin_v1_admin_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_admin_v1_admin_proto_rawDesc), len(file_admin_v1_admin_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_admin_v1_admin_proto_rawDesc), len(file_core_admin_v1_admin_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_admin_v1_admin_proto_goTypes,
-		DependencyIndexes: file_admin_v1_admin_proto_depIdxs,
-		MessageInfos:      file_admin_v1_admin_proto_msgTypes,
+		GoTypes:           file_core_admin_v1_admin_proto_goTypes,
+		DependencyIndexes: file_core_admin_v1_admin_proto_depIdxs,
+		MessageInfos:      file_core_admin_v1_admin_proto_msgTypes,
 	}.Build()
-	File_admin_v1_admin_proto = out.File
-	file_admin_v1_admin_proto_goTypes = nil
-	file_admin_v1_admin_proto_depIdxs = nil
+	File_core_admin_v1_admin_proto = out.File
+	file_core_admin_v1_admin_proto_goTypes = nil
+	file_core_admin_v1_admin_proto_depIdxs = nil
 }

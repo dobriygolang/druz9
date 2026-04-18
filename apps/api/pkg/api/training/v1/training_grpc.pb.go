@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: training/v1/training.proto
+// source: learning/training/v1/training.proto
 
 package v1
 
@@ -29,6 +29,11 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type TrainingServiceClient interface {
 	GetSkillTree(ctx context.Context, in *GetSkillTreeRequest, opts ...grpc.CallOption) (*GetSkillTreeResponse, error)
+	// GetTask and EvaluateTaskSolution are implemented with full sandbox
+	// execution, season-pass XP awarding and AI review. They are not yet
+	// wired into the primary frontend flow (the training page only renders
+	// the skill tree), but they are production-ready and kept here for the
+	// upcoming in-tree task-solving feature.
 	GetTask(ctx context.Context, in *GetTaskRequest, opts ...grpc.CallOption) (*GetTaskResponse, error)
 	EvaluateTaskSolution(ctx context.Context, in *EvaluateTaskSolutionRequest, opts ...grpc.CallOption) (*EvaluateTaskSolutionResponse, error)
 }
@@ -76,6 +81,11 @@ func (c *trainingServiceClient) EvaluateTaskSolution(ctx context.Context, in *Ev
 // for forward compatibility.
 type TrainingServiceServer interface {
 	GetSkillTree(context.Context, *GetSkillTreeRequest) (*GetSkillTreeResponse, error)
+	// GetTask and EvaluateTaskSolution are implemented with full sandbox
+	// execution, season-pass XP awarding and AI review. They are not yet
+	// wired into the primary frontend flow (the training page only renders
+	// the skill tree), but they are production-ready and kept here for the
+	// upcoming in-tree task-solving feature.
 	GetTask(context.Context, *GetTaskRequest) (*GetTaskResponse, error)
 	EvaluateTaskSolution(context.Context, *EvaluateTaskSolutionRequest) (*EvaluateTaskSolutionResponse, error)
 	mustEmbedUnimplementedTrainingServiceServer()
@@ -193,5 +203,5 @@ var TrainingService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "training/v1/training.proto",
+	Metadata: "learning/training/v1/training.proto",
 }

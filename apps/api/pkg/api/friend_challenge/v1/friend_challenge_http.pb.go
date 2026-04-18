@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: friend_challenge/v1/friend_challenge.proto
+// source: game/friend_challenge/v1/friend_challenge.proto
 
 package v1
 

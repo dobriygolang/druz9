@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: code_editor/v1/code_editor.proto
+// source: learning/code_editor/v1/code_editor.proto
 
 package v1
 
@@ -57,11 +57,11 @@ func (x RoomMode) String() string {
 }
 
 func (RoomMode) Descriptor() protoreflect.EnumDescriptor {
-	return file_code_editor_v1_code_editor_proto_enumTypes[0].Descriptor()
+	return file_learning_code_editor_v1_code_editor_proto_enumTypes[0].Descriptor()
 }
 
 func (RoomMode) Type() protoreflect.EnumType {
-	return &file_code_editor_v1_code_editor_proto_enumTypes[0]
+	return &file_learning_code_editor_v1_code_editor_proto_enumTypes[0]
 }
 
 func (x RoomMode) Number() protoreflect.EnumNumber {
@@ -70,7 +70,7 @@ func (x RoomMode) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use RoomMode.Descriptor instead.
 func (RoomMode) EnumDescriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{0}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{0}
 }
 
 type RoomStatus int32
@@ -109,11 +109,11 @@ func (x RoomStatus) String() string {
 }
 
 func (RoomStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_code_editor_v1_code_editor_proto_enumTypes[1].Descriptor()
+	return file_learning_code_editor_v1_code_editor_proto_enumTypes[1].Descriptor()
 }
 
 func (RoomStatus) Type() protoreflect.EnumType {
-	return &file_code_editor_v1_code_editor_proto_enumTypes[1]
+	return &file_learning_code_editor_v1_code_editor_proto_enumTypes[1]
 }
 
 func (x RoomStatus) Number() protoreflect.EnumNumber {
@@ -122,7 +122,7 @@ func (x RoomStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use RoomStatus.Descriptor instead.
 func (RoomStatus) EnumDescriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{1}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{1}
 }
 
 type TaskType int32
@@ -161,11 +161,11 @@ func (x TaskType) String() string {
 }
 
 func (TaskType) Descriptor() protoreflect.EnumDescriptor {
-	return file_code_editor_v1_code_editor_proto_enumTypes[2].Descriptor()
+	return file_learning_code_editor_v1_code_editor_proto_enumTypes[2].Descriptor()
 }
 
 func (TaskType) Type() protoreflect.EnumType {
-	return &file_code_editor_v1_code_editor_proto_enumTypes[2]
+	return &file_learning_code_editor_v1_code_editor_proto_enumTypes[2]
 }
 
 func (x TaskType) Number() protoreflect.EnumNumber {
@@ -174,7 +174,7 @@ func (x TaskType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use TaskType.Descriptor instead.
 func (TaskType) EnumDescriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{2}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{2}
 }
 
 type ReviewSourceType int32
@@ -216,11 +216,11 @@ func (x ReviewSourceType) String() string {
 }
 
 func (ReviewSourceType) Descriptor() protoreflect.EnumDescriptor {
-	return file_code_editor_v1_code_editor_proto_enumTypes[3].Descriptor()
+	return file_learning_code_editor_v1_code_editor_proto_enumTypes[3].Descriptor()
 }
 
 func (ReviewSourceType) Type() protoreflect.EnumType {
-	return &file_code_editor_v1_code_editor_proto_enumTypes[3]
+	return &file_learning_code_editor_v1_code_editor_proto_enumTypes[3]
 }
 
 func (x ReviewSourceType) Number() protoreflect.EnumNumber {
@@ -229,7 +229,7 @@ func (x ReviewSourceType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ReviewSourceType.Descriptor instead.
 func (ReviewSourceType) EnumDescriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{3}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{3}
 }
 
 type ReviewStatus int32
@@ -268,11 +268,11 @@ func (x ReviewStatus) String() string {
 }
 
 func (ReviewStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_code_editor_v1_code_editor_proto_enumTypes[4].Descriptor()
+	return file_learning_code_editor_v1_code_editor_proto_enumTypes[4].Descriptor()
 }
 
 func (ReviewStatus) Type() protoreflect.EnumType {
-	return &file_code_editor_v1_code_editor_proto_enumTypes[4]
+	return &file_learning_code_editor_v1_code_editor_proto_enumTypes[4]
 }
 
 func (x ReviewStatus) Number() protoreflect.EnumNumber {
@@ -281,7 +281,7 @@ func (x ReviewStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ReviewStatus.Descriptor instead.
 func (ReviewStatus) EnumDescriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{4}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{4}
 }
 
 type AIVerdict int32
@@ -323,11 +323,11 @@ func (x AIVerdict) String() string {
 }
 
 func (AIVerdict) Descriptor() protoreflect.EnumDescriptor {
-	return file_code_editor_v1_code_editor_proto_enumTypes[5].Descriptor()
+	return file_learning_code_editor_v1_code_editor_proto_enumTypes[5].Descriptor()
 }
 
 func (AIVerdict) Type() protoreflect.EnumType {
-	return &file_code_editor_v1_code_editor_proto_enumTypes[5]
+	return &file_learning_code_editor_v1_code_editor_proto_enumTypes[5]
 }
 
 func (x AIVerdict) Number() protoreflect.EnumNumber {
@@ -336,7 +336,7 @@ func (x AIVerdict) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use AIVerdict.Descriptor instead.
 func (AIVerdict) EnumDescriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{5}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{5}
 }
 
 type CreateRoomRequest struct {
@@ -353,7 +353,7 @@ type CreateRoomRequest struct {
 
 func (x *CreateRoomRequest) Reset() {
 	*x = CreateRoomRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[0]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -365,7 +365,7 @@ func (x *CreateRoomRequest) String() string {
 func (*CreateRoomRequest) ProtoMessage() {}
 
 func (x *CreateRoomRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[0]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -378,7 +378,7 @@ func (x *CreateRoomRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateRoomRequest.ProtoReflect.Descriptor instead.
 func (*CreateRoomRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{0}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *CreateRoomRequest) GetMode() RoomMode {
@@ -432,7 +432,7 @@ type GetRoomRequest struct {
 
 func (x *GetRoomRequest) Reset() {
 	*x = GetRoomRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[1]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -444,7 +444,7 @@ func (x *GetRoomRequest) String() string {
 func (*GetRoomRequest) ProtoMessage() {}
 
 func (x *GetRoomRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[1]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -457,7 +457,7 @@ func (x *GetRoomRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRoomRequest.ProtoReflect.Descriptor instead.
 func (*GetRoomRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{1}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetRoomRequest) GetRoomId() string {
@@ -477,7 +477,7 @@ type JoinRoomRequest struct {
 
 func (x *JoinRoomRequest) Reset() {
 	*x = JoinRoomRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[2]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -489,7 +489,7 @@ func (x *JoinRoomRequest) String() string {
 func (*JoinRoomRequest) ProtoMessage() {}
 
 func (x *JoinRoomRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[2]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -502,7 +502,7 @@ func (x *JoinRoomRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JoinRoomRequest.ProtoReflect.Descriptor instead.
 func (*JoinRoomRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{2}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *JoinRoomRequest) GetRoomId() string {
@@ -529,7 +529,7 @@ type JoinRoomByInviteCodeRequest struct {
 
 func (x *JoinRoomByInviteCodeRequest) Reset() {
 	*x = JoinRoomByInviteCodeRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[3]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -541,7 +541,7 @@ func (x *JoinRoomByInviteCodeRequest) String() string {
 func (*JoinRoomByInviteCodeRequest) ProtoMessage() {}
 
 func (x *JoinRoomByInviteCodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[3]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -554,7 +554,7 @@ func (x *JoinRoomByInviteCodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JoinRoomByInviteCodeRequest.ProtoReflect.Descriptor instead.
 func (*JoinRoomByInviteCodeRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{3}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *JoinRoomByInviteCodeRequest) GetInviteCode() string {
@@ -580,7 +580,7 @@ type LeaveRoomRequest struct {
 
 func (x *LeaveRoomRequest) Reset() {
 	*x = LeaveRoomRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[4]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -592,7 +592,7 @@ func (x *LeaveRoomRequest) String() string {
 func (*LeaveRoomRequest) ProtoMessage() {}
 
 func (x *LeaveRoomRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[4]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -605,7 +605,7 @@ func (x *LeaveRoomRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LeaveRoomRequest.ProtoReflect.Descriptor instead.
 func (*LeaveRoomRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{4}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *LeaveRoomRequest) GetRoomId() string {
@@ -624,7 +624,7 @@ type CloseRoomRequest struct {
 
 func (x *CloseRoomRequest) Reset() {
 	*x = CloseRoomRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[5]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -636,7 +636,7 @@ func (x *CloseRoomRequest) String() string {
 func (*CloseRoomRequest) ProtoMessage() {}
 
 func (x *CloseRoomRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[5]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -649,7 +649,7 @@ func (x *CloseRoomRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloseRoomRequest.ProtoReflect.Descriptor instead.
 func (*CloseRoomRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{5}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CloseRoomRequest) GetRoomId() string {
@@ -670,7 +670,7 @@ type UpdateRoomRequest struct {
 
 func (x *UpdateRoomRequest) Reset() {
 	*x = UpdateRoomRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[6]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -682,7 +682,7 @@ func (x *UpdateRoomRequest) String() string {
 func (*UpdateRoomRequest) ProtoMessage() {}
 
 func (x *UpdateRoomRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[6]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -695,7 +695,7 @@ func (x *UpdateRoomRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateRoomRequest.ProtoReflect.Descriptor instead.
 func (*UpdateRoomRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{6}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *UpdateRoomRequest) GetRoomId() string {
@@ -730,7 +730,7 @@ type SubmitCodeRequest struct {
 
 func (x *SubmitCodeRequest) Reset() {
 	*x = SubmitCodeRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[7]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -742,7 +742,7 @@ func (x *SubmitCodeRequest) String() string {
 func (*SubmitCodeRequest) ProtoMessage() {}
 
 func (x *SubmitCodeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[7]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -755,7 +755,7 @@ func (x *SubmitCodeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitCodeRequest.ProtoReflect.Descriptor instead.
 func (*SubmitCodeRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{7}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *SubmitCodeRequest) GetRoomId() string {
@@ -789,7 +789,7 @@ type SetReadyRequest struct {
 
 func (x *SetReadyRequest) Reset() {
 	*x = SetReadyRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[8]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -801,7 +801,7 @@ func (x *SetReadyRequest) String() string {
 func (*SetReadyRequest) ProtoMessage() {}
 
 func (x *SetReadyRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[8]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -814,7 +814,7 @@ func (x *SetReadyRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetReadyRequest.ProtoReflect.Descriptor instead.
 func (*SetReadyRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{8}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SetReadyRequest) GetRoomId() string {
@@ -842,7 +842,7 @@ type ListTasksRequest struct {
 
 func (x *ListTasksRequest) Reset() {
 	*x = ListTasksRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[9]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -854,7 +854,7 @@ func (x *ListTasksRequest) String() string {
 func (*ListTasksRequest) ProtoMessage() {}
 
 func (x *ListTasksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[9]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -867,7 +867,7 @@ func (x *ListTasksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTasksRequest.ProtoReflect.Descriptor instead.
 func (*ListTasksRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{9}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *ListTasksRequest) GetTopic() string {
@@ -900,7 +900,7 @@ type CreateTaskRequest struct {
 
 func (x *CreateTaskRequest) Reset() {
 	*x = CreateTaskRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[10]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -912,7 +912,7 @@ func (x *CreateTaskRequest) String() string {
 func (*CreateTaskRequest) ProtoMessage() {}
 
 func (x *CreateTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[10]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -925,7 +925,7 @@ func (x *CreateTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateTaskRequest.ProtoReflect.Descriptor instead.
 func (*CreateTaskRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{10}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *CreateTaskRequest) GetTask() *TaskPayload {
@@ -945,7 +945,7 @@ type UpdateTaskRequest struct {
 
 func (x *UpdateTaskRequest) Reset() {
 	*x = UpdateTaskRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[11]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -957,7 +957,7 @@ func (x *UpdateTaskRequest) String() string {
 func (*UpdateTaskRequest) ProtoMessage() {}
 
 func (x *UpdateTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[11]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -970,7 +970,7 @@ func (x *UpdateTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateTaskRequest.ProtoReflect.Descriptor instead.
 func (*UpdateTaskRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{11}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *UpdateTaskRequest) GetTaskId() string {
@@ -996,7 +996,7 @@ type DeleteTaskRequest struct {
 
 func (x *DeleteTaskRequest) Reset() {
 	*x = DeleteTaskRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[12]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1008,7 +1008,7 @@ func (x *DeleteTaskRequest) String() string {
 func (*DeleteTaskRequest) ProtoMessage() {}
 
 func (x *DeleteTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[12]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1021,7 +1021,7 @@ func (x *DeleteTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteTaskRequest.ProtoReflect.Descriptor instead.
 func (*DeleteTaskRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{12}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *DeleteTaskRequest) GetTaskId() string {
@@ -1040,7 +1040,7 @@ type GetLeaderboardRequest struct {
 
 func (x *GetLeaderboardRequest) Reset() {
 	*x = GetLeaderboardRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[13]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1052,7 +1052,7 @@ func (x *GetLeaderboardRequest) String() string {
 func (*GetLeaderboardRequest) ProtoMessage() {}
 
 func (x *GetLeaderboardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[13]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1065,7 +1065,7 @@ func (x *GetLeaderboardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLeaderboardRequest.ProtoReflect.Descriptor instead.
 func (*GetLeaderboardRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{13}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetLeaderboardRequest) GetLimit() int32 {
@@ -1083,7 +1083,7 @@ type ListRoomsRequest struct {
 
 func (x *ListRoomsRequest) Reset() {
 	*x = ListRoomsRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[14]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1095,7 +1095,7 @@ func (x *ListRoomsRequest) String() string {
 func (*ListRoomsRequest) ProtoMessage() {}
 
 func (x *ListRoomsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[14]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1108,7 +1108,7 @@ func (x *ListRoomsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRoomsRequest.ProtoReflect.Descriptor instead.
 func (*ListRoomsRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{14}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{14}
 }
 
 type ListRoomsResponse struct {
@@ -1120,7 +1120,7 @@ type ListRoomsResponse struct {
 
 func (x *ListRoomsResponse) Reset() {
 	*x = ListRoomsResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[15]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1132,7 +1132,7 @@ func (x *ListRoomsResponse) String() string {
 func (*ListRoomsResponse) ProtoMessage() {}
 
 func (x *ListRoomsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[15]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1145,7 +1145,7 @@ func (x *ListRoomsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListRoomsResponse.ProtoReflect.Descriptor instead.
 func (*ListRoomsResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{15}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *ListRoomsResponse) GetRooms() []*Room {
@@ -1167,7 +1167,7 @@ type AIReviewRequest struct {
 
 func (x *AIReviewRequest) Reset() {
 	*x = AIReviewRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[16]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1179,7 +1179,7 @@ func (x *AIReviewRequest) String() string {
 func (*AIReviewRequest) ProtoMessage() {}
 
 func (x *AIReviewRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[16]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1192,7 +1192,7 @@ func (x *AIReviewRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AIReviewRequest.ProtoReflect.Descriptor instead.
 func (*AIReviewRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{16}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *AIReviewRequest) GetLanguage() string {
@@ -1232,7 +1232,7 @@ type AIReviewResponse struct {
 
 func (x *AIReviewResponse) Reset() {
 	*x = AIReviewResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[17]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1244,7 +1244,7 @@ func (x *AIReviewResponse) String() string {
 func (*AIReviewResponse) ProtoMessage() {}
 
 func (x *AIReviewResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[17]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1257,7 +1257,7 @@ func (x *AIReviewResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AIReviewResponse.ProtoReflect.Descriptor instead.
 func (*AIReviewResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{17}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *AIReviewResponse) GetReview() *v1.InterviewSolutionReview {
@@ -1275,7 +1275,7 @@ type GetDailyChallengeRequest struct {
 
 func (x *GetDailyChallengeRequest) Reset() {
 	*x = GetDailyChallengeRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[18]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1287,7 +1287,7 @@ func (x *GetDailyChallengeRequest) String() string {
 func (*GetDailyChallengeRequest) ProtoMessage() {}
 
 func (x *GetDailyChallengeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[18]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1300,7 +1300,7 @@ func (x *GetDailyChallengeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDailyChallengeRequest.ProtoReflect.Descriptor instead.
 func (*GetDailyChallengeRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{18}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{18}
 }
 
 type GetDailyChallengeResponse struct {
@@ -1314,7 +1314,7 @@ type GetDailyChallengeResponse struct {
 
 func (x *GetDailyChallengeResponse) Reset() {
 	*x = GetDailyChallengeResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[19]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1326,7 +1326,7 @@ func (x *GetDailyChallengeResponse) String() string {
 func (*GetDailyChallengeResponse) ProtoMessage() {}
 
 func (x *GetDailyChallengeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[19]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1339,7 +1339,7 @@ func (x *GetDailyChallengeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDailyChallengeResponse.ProtoReflect.Descriptor instead.
 func (*GetDailyChallengeResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{19}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *GetDailyChallengeResponse) GetTask() *Task {
@@ -1372,7 +1372,7 @@ type StartRoomRequest struct {
 
 func (x *StartRoomRequest) Reset() {
 	*x = StartRoomRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[20]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1384,7 +1384,7 @@ func (x *StartRoomRequest) String() string {
 func (*StartRoomRequest) ProtoMessage() {}
 
 func (x *StartRoomRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[20]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1397,7 +1397,7 @@ func (x *StartRoomRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartRoomRequest.ProtoReflect.Descriptor instead.
 func (*StartRoomRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{20}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *StartRoomRequest) GetRoomId() string {
@@ -1417,7 +1417,7 @@ type StartRoomResponse struct {
 
 func (x *StartRoomResponse) Reset() {
 	*x = StartRoomResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[21]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1429,7 +1429,7 @@ func (x *StartRoomResponse) String() string {
 func (*StartRoomResponse) ProtoMessage() {}
 
 func (x *StartRoomResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[21]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1442,7 +1442,7 @@ func (x *StartRoomResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartRoomResponse.ProtoReflect.Descriptor instead.
 func (*StartRoomResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{21}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *StartRoomResponse) GetStatus() v1.OperationStatus {
@@ -1469,7 +1469,7 @@ type StatusResponse struct {
 
 func (x *StatusResponse) Reset() {
 	*x = StatusResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[22]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1481,7 +1481,7 @@ func (x *StatusResponse) String() string {
 func (*StatusResponse) ProtoMessage() {}
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[22]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1494,7 +1494,7 @@ func (x *StatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
 func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{22}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *StatusResponse) GetStatus() v1.OperationStatus {
@@ -1514,7 +1514,7 @@ type CreateRoomResponse struct {
 
 func (x *CreateRoomResponse) Reset() {
 	*x = CreateRoomResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[23]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1526,7 +1526,7 @@ func (x *CreateRoomResponse) String() string {
 func (*CreateRoomResponse) ProtoMessage() {}
 
 func (x *CreateRoomResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[23]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1539,7 +1539,7 @@ func (x *CreateRoomResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateRoomResponse.ProtoReflect.Descriptor instead.
 func (*CreateRoomResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{23}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *CreateRoomResponse) GetRoom() *Room {
@@ -1565,7 +1565,7 @@ type GetRoomResponse struct {
 
 func (x *GetRoomResponse) Reset() {
 	*x = GetRoomResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[24]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1577,7 +1577,7 @@ func (x *GetRoomResponse) String() string {
 func (*GetRoomResponse) ProtoMessage() {}
 
 func (x *GetRoomResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[24]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1590,7 +1590,7 @@ func (x *GetRoomResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetRoomResponse.ProtoReflect.Descriptor instead.
 func (*GetRoomResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{24}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GetRoomResponse) GetRoom() *Room {
@@ -1609,7 +1609,7 @@ type JoinRoomResponse struct {
 
 func (x *JoinRoomResponse) Reset() {
 	*x = JoinRoomResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[25]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1621,7 +1621,7 @@ func (x *JoinRoomResponse) String() string {
 func (*JoinRoomResponse) ProtoMessage() {}
 
 func (x *JoinRoomResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[25]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1634,7 +1634,7 @@ func (x *JoinRoomResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JoinRoomResponse.ProtoReflect.Descriptor instead.
 func (*JoinRoomResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{25}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *JoinRoomResponse) GetRoom() *Room {
@@ -1656,7 +1656,7 @@ type SubmitCodeResponse struct {
 
 func (x *SubmitCodeResponse) Reset() {
 	*x = SubmitCodeResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[26]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1668,7 +1668,7 @@ func (x *SubmitCodeResponse) String() string {
 func (*SubmitCodeResponse) ProtoMessage() {}
 
 func (x *SubmitCodeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[26]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1681,7 +1681,7 @@ func (x *SubmitCodeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitCodeResponse.ProtoReflect.Descriptor instead.
 func (*SubmitCodeResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{26}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *SubmitCodeResponse) GetOutput() string {
@@ -1721,7 +1721,7 @@ type ListTasksResponse struct {
 
 func (x *ListTasksResponse) Reset() {
 	*x = ListTasksResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[27]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1733,7 +1733,7 @@ func (x *ListTasksResponse) String() string {
 func (*ListTasksResponse) ProtoMessage() {}
 
 func (x *ListTasksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[27]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1746,7 +1746,7 @@ func (x *ListTasksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTasksResponse.ProtoReflect.Descriptor instead.
 func (*ListTasksResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{27}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ListTasksResponse) GetTasks() []*Task {
@@ -1765,7 +1765,7 @@ type TaskResponse struct {
 
 func (x *TaskResponse) Reset() {
 	*x = TaskResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[28]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1777,7 +1777,7 @@ func (x *TaskResponse) String() string {
 func (*TaskResponse) ProtoMessage() {}
 
 func (x *TaskResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[28]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1790,7 +1790,7 @@ func (x *TaskResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskResponse.ProtoReflect.Descriptor instead.
 func (*TaskResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{28}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *TaskResponse) GetTask() *Task {
@@ -1814,7 +1814,7 @@ type LeaderboardEntry struct {
 
 func (x *LeaderboardEntry) Reset() {
 	*x = LeaderboardEntry{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[29]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1826,7 +1826,7 @@ func (x *LeaderboardEntry) String() string {
 func (*LeaderboardEntry) ProtoMessage() {}
 
 func (x *LeaderboardEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[29]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1839,7 +1839,7 @@ func (x *LeaderboardEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LeaderboardEntry.ProtoReflect.Descriptor instead.
 func (*LeaderboardEntry) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{29}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *LeaderboardEntry) GetUserId() string {
@@ -1893,7 +1893,7 @@ type GetLeaderboardResponse struct {
 
 func (x *GetLeaderboardResponse) Reset() {
 	*x = GetLeaderboardResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[30]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1905,7 +1905,7 @@ func (x *GetLeaderboardResponse) String() string {
 func (*GetLeaderboardResponse) ProtoMessage() {}
 
 func (x *GetLeaderboardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[30]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1918,7 +1918,7 @@ func (x *GetLeaderboardResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetLeaderboardResponse.ProtoReflect.Descriptor instead.
 func (*GetLeaderboardResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{30}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetLeaderboardResponse) GetEntries() []*LeaderboardEntry {
@@ -1949,7 +1949,7 @@ type Room struct {
 
 func (x *Room) Reset() {
 	*x = Room{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[31]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1961,7 +1961,7 @@ func (x *Room) String() string {
 func (*Room) ProtoMessage() {}
 
 func (x *Room) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[31]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1974,7 +1974,7 @@ func (x *Room) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Room.ProtoReflect.Descriptor instead.
 func (*Room) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{31}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *Room) GetId() string {
@@ -2083,7 +2083,7 @@ type Participant struct {
 
 func (x *Participant) Reset() {
 	*x = Participant{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[32]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2095,7 +2095,7 @@ func (x *Participant) String() string {
 func (*Participant) ProtoMessage() {}
 
 func (x *Participant) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[32]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2108,7 +2108,7 @@ func (x *Participant) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Participant.ProtoReflect.Descriptor instead.
 func (*Participant) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{32}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *Participant) GetUserId() string {
@@ -2174,7 +2174,7 @@ type TaskTestCase struct {
 
 func (x *TaskTestCase) Reset() {
 	*x = TaskTestCase{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[33]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2186,7 +2186,7 @@ func (x *TaskTestCase) String() string {
 func (*TaskTestCase) ProtoMessage() {}
 
 func (x *TaskTestCase) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[33]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2199,7 +2199,7 @@ func (x *TaskTestCase) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskTestCase.ProtoReflect.Descriptor instead.
 func (*TaskTestCase) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{33}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *TaskTestCase) GetId() string {
@@ -2276,7 +2276,7 @@ type Task struct {
 
 func (x *Task) Reset() {
 	*x = Task{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[34]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2288,7 +2288,7 @@ func (x *Task) String() string {
 func (*Task) ProtoMessage() {}
 
 func (x *Task) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[34]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2301,7 +2301,7 @@ func (x *Task) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Task.ProtoReflect.Descriptor instead.
 func (*Task) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{34}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *Task) GetId() string {
@@ -2502,7 +2502,7 @@ type TaskPayload struct {
 
 func (x *TaskPayload) Reset() {
 	*x = TaskPayload{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[35]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2514,7 +2514,7 @@ func (x *TaskPayload) String() string {
 func (*TaskPayload) ProtoMessage() {}
 
 func (x *TaskPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[35]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2527,7 +2527,7 @@ func (x *TaskPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskPayload.ProtoReflect.Descriptor instead.
 func (*TaskPayload) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{35}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *TaskPayload) GetTitle() string {
@@ -2686,7 +2686,7 @@ type GetSolutionReviewRequest struct {
 
 func (x *GetSolutionReviewRequest) Reset() {
 	*x = GetSolutionReviewRequest{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[36]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2698,7 +2698,7 @@ func (x *GetSolutionReviewRequest) String() string {
 func (*GetSolutionReviewRequest) ProtoMessage() {}
 
 func (x *GetSolutionReviewRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[36]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2711,7 +2711,7 @@ func (x *GetSolutionReviewRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSolutionReviewRequest.ProtoReflect.Descriptor instead.
 func (*GetSolutionReviewRequest) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{36}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *GetSolutionReviewRequest) GetSubmissionId() string {
@@ -2730,7 +2730,7 @@ type SolutionReviewResponse struct {
 
 func (x *SolutionReviewResponse) Reset() {
 	*x = SolutionReviewResponse{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[37]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2742,7 +2742,7 @@ func (x *SolutionReviewResponse) String() string {
 func (*SolutionReviewResponse) ProtoMessage() {}
 
 func (x *SolutionReviewResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[37]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2755,7 +2755,7 @@ func (x *SolutionReviewResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SolutionReviewResponse.ProtoReflect.Descriptor instead.
 func (*SolutionReviewResponse) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{37}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *SolutionReviewResponse) GetReview() *SolutionReview {
@@ -2797,7 +2797,7 @@ type SolutionReview struct {
 
 func (x *SolutionReview) Reset() {
 	*x = SolutionReview{}
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[38]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2809,7 +2809,7 @@ func (x *SolutionReview) String() string {
 func (*SolutionReview) ProtoMessage() {}
 
 func (x *SolutionReview) ProtoReflect() protoreflect.Message {
-	mi := &file_code_editor_v1_code_editor_proto_msgTypes[38]
+	mi := &file_learning_code_editor_v1_code_editor_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2822,7 +2822,7 @@ func (x *SolutionReview) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SolutionReview.ProtoReflect.Descriptor instead.
 func (*SolutionReview) Descriptor() ([]byte, []int) {
-	return file_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{38}
+	return file_learning_code_editor_v1_code_editor_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *SolutionReview) GetId() string {
@@ -2972,11 +2972,11 @@ func (x *SolutionReview) GetCreatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-var File_code_editor_v1_code_editor_proto protoreflect.FileDescriptor
+var File_learning_code_editor_v1_code_editor_proto protoreflect.FileDescriptor
 
-const file_code_editor_v1_code_editor_proto_rawDesc = "" +
+const file_learning_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\n" +
-	" code_editor/v1/code_editor.proto\x12\x0ecode_editor.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16common/v1/common.proto\"\xd5\x01\n" +
+	")learning/code_editor/v1/code_editor.proto\x12\x0ecode_editor.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bcore/common/v1/common.proto\"\xd5\x01\n" +
 	"\x11CreateRoomRequest\x12,\n" +
 	"\x04mode\x18\x01 \x01(\x0e2\x18.code_editor.v1.RoomModeR\x04mode\x12\x12\n" +
 	"\x04task\x18\x02 \x01(\tR\x04task\x12\x12\n" +
@@ -3269,20 +3269,20 @@ const file_code_editor_v1_code_editor_proto_rawDesc = "" +
 	"\x11GetSolutionReview\x12(.code_editor.v1.GetSolutionReviewRequest\x1a&.code_editor.v1.SolutionReviewResponse\"3\x82\xd3\xe4\x93\x02-\x12+/api/v1/code-editor/reviews/{submission_id}B\x1fZ\x1dapi/pkg/api/code_editor/v1;v1b\x06proto3"
 
 var (
-	file_code_editor_v1_code_editor_proto_rawDescOnce sync.Once
-	file_code_editor_v1_code_editor_proto_rawDescData []byte
+	file_learning_code_editor_v1_code_editor_proto_rawDescOnce sync.Once
+	file_learning_code_editor_v1_code_editor_proto_rawDescData []byte
 )
 
-func file_code_editor_v1_code_editor_proto_rawDescGZIP() []byte {
-	file_code_editor_v1_code_editor_proto_rawDescOnce.Do(func() {
-		file_code_editor_v1_code_editor_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_code_editor_v1_code_editor_proto_rawDesc), len(file_code_editor_v1_code_editor_proto_rawDesc)))
+func file_learning_code_editor_v1_code_editor_proto_rawDescGZIP() []byte {
+	file_learning_code_editor_v1_code_editor_proto_rawDescOnce.Do(func() {
+		file_learning_code_editor_v1_code_editor_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_learning_code_editor_v1_code_editor_proto_rawDesc), len(file_learning_code_editor_v1_code_editor_proto_rawDesc)))
 	})
-	return file_code_editor_v1_code_editor_proto_rawDescData
+	return file_learning_code_editor_v1_code_editor_proto_rawDescData
 }
 
-var file_code_editor_v1_code_editor_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_code_editor_v1_code_editor_proto_msgTypes = make([]protoimpl.MessageInfo, 40)
-var file_code_editor_v1_code_editor_proto_goTypes = []any{
+var file_learning_code_editor_v1_code_editor_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_learning_code_editor_v1_code_editor_proto_msgTypes = make([]protoimpl.MessageInfo, 40)
+var file_learning_code_editor_v1_code_editor_proto_goTypes = []any{
 	(RoomMode)(0),                       // 0: code_editor.v1.RoomMode
 	(RoomStatus)(0),                     // 1: code_editor.v1.RoomStatus
 	(TaskType)(0),                       // 2: code_editor.v1.TaskType
@@ -3337,7 +3337,7 @@ var file_code_editor_v1_code_editor_proto_goTypes = []any{
 	(v1.ExecutionProfile)(0),            // 51: common.v1.ExecutionProfile
 	(v1.RunnerMode)(0),                  // 52: common.v1.RunnerMode
 }
-var file_code_editor_v1_code_editor_proto_depIdxs = []int32{
+var file_learning_code_editor_v1_code_editor_proto_depIdxs = []int32{
 	0,  // 0: code_editor.v1.CreateRoomRequest.mode:type_name -> code_editor.v1.RoomMode
 	46, // 1: code_editor.v1.CreateRoomRequest.difficulty:type_name -> common.v1.Difficulty
 	47, // 2: code_editor.v1.SubmitCodeRequest.language:type_name -> common.v1.ProgrammingLanguage
@@ -3429,28 +3429,28 @@ var file_code_editor_v1_code_editor_proto_depIdxs = []int32{
 	0,  // [0:46] is the sub-list for field type_name
 }
 
-func init() { file_code_editor_v1_code_editor_proto_init() }
-func file_code_editor_v1_code_editor_proto_init() {
-	if File_code_editor_v1_code_editor_proto != nil {
+func init() { file_learning_code_editor_v1_code_editor_proto_init() }
+func file_learning_code_editor_v1_code_editor_proto_init() {
+	if File_learning_code_editor_v1_code_editor_proto != nil {
 		return
 	}
-	file_code_editor_v1_code_editor_proto_msgTypes[6].OneofWrappers = []any{}
+	file_learning_code_editor_v1_code_editor_proto_msgTypes[6].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_code_editor_v1_code_editor_proto_rawDesc), len(file_code_editor_v1_code_editor_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_learning_code_editor_v1_code_editor_proto_rawDesc), len(file_learning_code_editor_v1_code_editor_proto_rawDesc)),
 			NumEnums:      6,
 			NumMessages:   40,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_code_editor_v1_code_editor_proto_goTypes,
-		DependencyIndexes: file_code_editor_v1_code_editor_proto_depIdxs,
-		EnumInfos:         file_code_editor_v1_code_editor_proto_enumTypes,
-		MessageInfos:      file_code_editor_v1_code_editor_proto_msgTypes,
+		GoTypes:           file_learning_code_editor_v1_code_editor_proto_goTypes,
+		DependencyIndexes: file_learning_code_editor_v1_code_editor_proto_depIdxs,
+		EnumInfos:         file_learning_code_editor_v1_code_editor_proto_enumTypes,
+		MessageInfos:      file_learning_code_editor_v1_code_editor_proto_msgTypes,
 	}.Build()
-	File_code_editor_v1_code_editor_proto = out.File
-	file_code_editor_v1_code_editor_proto_goTypes = nil
-	file_code_editor_v1_code_editor_proto_depIdxs = nil
+	File_learning_code_editor_v1_code_editor_proto = out.File
+	file_learning_code_editor_v1_code_editor_proto_goTypes = nil
+	file_learning_code_editor_v1_code_editor_proto_depIdxs = nil
 }

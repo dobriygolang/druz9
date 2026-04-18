@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: season_pass/v1/season_pass.proto
+// source: game/season_pass/v1/season_pass.proto
 
 package v1
 

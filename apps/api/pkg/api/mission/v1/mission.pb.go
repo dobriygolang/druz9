@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: mission/v1/mission.proto
+// source: learning/mission/v1/mission.proto
 
 package v1
 
@@ -30,7 +30,7 @@ type GetDailyMissionsRequest struct {
 
 func (x *GetDailyMissionsRequest) Reset() {
 	*x = GetDailyMissionsRequest{}
-	mi := &file_mission_v1_mission_proto_msgTypes[0]
+	mi := &file_learning_mission_v1_mission_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *GetDailyMissionsRequest) String() string {
 func (*GetDailyMissionsRequest) ProtoMessage() {}
 
 func (x *GetDailyMissionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_v1_mission_proto_msgTypes[0]
+	mi := &file_learning_mission_v1_mission_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *GetDailyMissionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDailyMissionsRequest.ProtoReflect.Descriptor instead.
 func (*GetDailyMissionsRequest) Descriptor() ([]byte, []int) {
-	return file_mission_v1_mission_proto_rawDescGZIP(), []int{0}
+	return file_learning_mission_v1_mission_proto_rawDescGZIP(), []int{0}
 }
 
 type GetDailyMissionsResponse struct {
@@ -71,7 +71,7 @@ type GetDailyMissionsResponse struct {
 
 func (x *GetDailyMissionsResponse) Reset() {
 	*x = GetDailyMissionsResponse{}
-	mi := &file_mission_v1_mission_proto_msgTypes[1]
+	mi := &file_learning_mission_v1_mission_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -83,7 +83,7 @@ func (x *GetDailyMissionsResponse) String() string {
 func (*GetDailyMissionsResponse) ProtoMessage() {}
 
 func (x *GetDailyMissionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_v1_mission_proto_msgTypes[1]
+	mi := &file_learning_mission_v1_mission_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -96,7 +96,7 @@ func (x *GetDailyMissionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetDailyMissionsResponse.ProtoReflect.Descriptor instead.
 func (*GetDailyMissionsResponse) Descriptor() ([]byte, []int) {
-	return file_mission_v1_mission_proto_rawDescGZIP(), []int{1}
+	return file_learning_mission_v1_mission_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetDailyMissionsResponse) GetMissions() []*DailyMission {
@@ -151,7 +151,7 @@ type DailyMission struct {
 
 func (x *DailyMission) Reset() {
 	*x = DailyMission{}
-	mi := &file_mission_v1_mission_proto_msgTypes[2]
+	mi := &file_learning_mission_v1_mission_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -163,7 +163,7 @@ func (x *DailyMission) String() string {
 func (*DailyMission) ProtoMessage() {}
 
 func (x *DailyMission) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_v1_mission_proto_msgTypes[2]
+	mi := &file_learning_mission_v1_mission_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -176,7 +176,7 @@ func (x *DailyMission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DailyMission.ProtoReflect.Descriptor instead.
 func (*DailyMission) Descriptor() ([]byte, []int) {
-	return file_mission_v1_mission_proto_rawDescGZIP(), []int{2}
+	return file_learning_mission_v1_mission_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *DailyMission) GetKey() string {
@@ -251,7 +251,7 @@ type CompleteMissionRequest struct {
 
 func (x *CompleteMissionRequest) Reset() {
 	*x = CompleteMissionRequest{}
-	mi := &file_mission_v1_mission_proto_msgTypes[3]
+	mi := &file_learning_mission_v1_mission_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -263,7 +263,7 @@ func (x *CompleteMissionRequest) String() string {
 func (*CompleteMissionRequest) ProtoMessage() {}
 
 func (x *CompleteMissionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_v1_mission_proto_msgTypes[3]
+	mi := &file_learning_mission_v1_mission_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -276,7 +276,7 @@ func (x *CompleteMissionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteMissionRequest.ProtoReflect.Descriptor instead.
 func (*CompleteMissionRequest) Descriptor() ([]byte, []int) {
-	return file_mission_v1_mission_proto_rawDescGZIP(), []int{3}
+	return file_learning_mission_v1_mission_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *CompleteMissionRequest) GetMissionKey() string {
@@ -295,7 +295,7 @@ type CompleteMissionResponse struct {
 
 func (x *CompleteMissionResponse) Reset() {
 	*x = CompleteMissionResponse{}
-	mi := &file_mission_v1_mission_proto_msgTypes[4]
+	mi := &file_learning_mission_v1_mission_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -307,7 +307,7 @@ func (x *CompleteMissionResponse) String() string {
 func (*CompleteMissionResponse) ProtoMessage() {}
 
 func (x *CompleteMissionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_mission_v1_mission_proto_msgTypes[4]
+	mi := &file_learning_mission_v1_mission_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -320,7 +320,7 @@ func (x *CompleteMissionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteMissionResponse.ProtoReflect.Descriptor instead.
 func (*CompleteMissionResponse) Descriptor() ([]byte, []int) {
-	return file_mission_v1_mission_proto_rawDescGZIP(), []int{4}
+	return file_learning_mission_v1_mission_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CompleteMissionResponse) GetOk() bool {
@@ -330,11 +330,11 @@ func (x *CompleteMissionResponse) GetOk() bool {
 	return false
 }
 
-var File_mission_v1_mission_proto protoreflect.FileDescriptor
+var File_learning_mission_v1_mission_proto protoreflect.FileDescriptor
 
-const file_mission_v1_mission_proto_rawDesc = "" +
+const file_learning_mission_v1_mission_proto_rawDesc = "" +
 	"\n" +
-	"\x18mission/v1/mission.proto\x12\n" +
+	"!learning/mission/v1/mission.proto\x12\n" +
 	"mission.v1\x1a\x1cgoogle/api/annotations.proto\"\x19\n" +
 	"\x17GetDailyMissionsRequest\"\xdf\x01\n" +
 	"\x18GetDailyMissionsResponse\x124\n" +
@@ -364,26 +364,26 @@ const file_mission_v1_mission_proto_rawDesc = "" +
 	"\x0fCompleteMission\x12\".mission.v1.CompleteMissionRequest\x1a#.mission.v1.CompleteMissionResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/missions/{mission_key}/completeB\x1bZ\x19api/pkg/api/mission/v1;v1b\x06proto3"
 
 var (
-	file_mission_v1_mission_proto_rawDescOnce sync.Once
-	file_mission_v1_mission_proto_rawDescData []byte
+	file_learning_mission_v1_mission_proto_rawDescOnce sync.Once
+	file_learning_mission_v1_mission_proto_rawDescData []byte
 )
 
-func file_mission_v1_mission_proto_rawDescGZIP() []byte {
-	file_mission_v1_mission_proto_rawDescOnce.Do(func() {
-		file_mission_v1_mission_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_mission_v1_mission_proto_rawDesc), len(file_mission_v1_mission_proto_rawDesc)))
+func file_learning_mission_v1_mission_proto_rawDescGZIP() []byte {
+	file_learning_mission_v1_mission_proto_rawDescOnce.Do(func() {
+		file_learning_mission_v1_mission_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_learning_mission_v1_mission_proto_rawDesc), len(file_learning_mission_v1_mission_proto_rawDesc)))
 	})
-	return file_mission_v1_mission_proto_rawDescData
+	return file_learning_mission_v1_mission_proto_rawDescData
 }
 
-var file_mission_v1_mission_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
-var file_mission_v1_mission_proto_goTypes = []any{
+var file_learning_mission_v1_mission_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
+var file_learning_mission_v1_mission_proto_goTypes = []any{
 	(*GetDailyMissionsRequest)(nil),  // 0: mission.v1.GetDailyMissionsRequest
 	(*GetDailyMissionsResponse)(nil), // 1: mission.v1.GetDailyMissionsResponse
 	(*DailyMission)(nil),             // 2: mission.v1.DailyMission
 	(*CompleteMissionRequest)(nil),   // 3: mission.v1.CompleteMissionRequest
 	(*CompleteMissionResponse)(nil),  // 4: mission.v1.CompleteMissionResponse
 }
-var file_mission_v1_mission_proto_depIdxs = []int32{
+var file_learning_mission_v1_mission_proto_depIdxs = []int32{
 	2, // 0: mission.v1.GetDailyMissionsResponse.missions:type_name -> mission.v1.DailyMission
 	0, // 1: mission.v1.MissionService.GetDailyMissions:input_type -> mission.v1.GetDailyMissionsRequest
 	3, // 2: mission.v1.MissionService.CompleteMission:input_type -> mission.v1.CompleteMissionRequest
@@ -396,26 +396,26 @@ var file_mission_v1_mission_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_mission_v1_mission_proto_init() }
-func file_mission_v1_mission_proto_init() {
-	if File_mission_v1_mission_proto != nil {
+func init() { file_learning_mission_v1_mission_proto_init() }
+func file_learning_mission_v1_mission_proto_init() {
+	if File_learning_mission_v1_mission_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_mission_v1_mission_proto_rawDesc), len(file_mission_v1_mission_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_learning_mission_v1_mission_proto_rawDesc), len(file_learning_mission_v1_mission_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_mission_v1_mission_proto_goTypes,
-		DependencyIndexes: file_mission_v1_mission_proto_depIdxs,
-		MessageInfos:      file_mission_v1_mission_proto_msgTypes,
+		GoTypes:           file_learning_mission_v1_mission_proto_goTypes,
+		DependencyIndexes: file_learning_mission_v1_mission_proto_depIdxs,
+		MessageInfos:      file_learning_mission_v1_mission_proto_msgTypes,
 	}.Build()
-	File_mission_v1_mission_proto = out.File
-	file_mission_v1_mission_proto_goTypes = nil
-	file_mission_v1_mission_proto_depIdxs = nil
+	File_learning_mission_v1_mission_proto = out.File
+	file_learning_mission_v1_mission_proto_goTypes = nil
+	file_learning_mission_v1_mission_proto_depIdxs = nil
 }

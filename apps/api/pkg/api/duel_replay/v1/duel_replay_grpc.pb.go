@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: duel_replay/v1/duel_replay.proto
+// source: game/duel_replay/v1/duel_replay.proto
 
 package v1
 
@@ -213,5 +213,5 @@ var DuelReplayService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "duel_replay/v1/duel_replay.proto",
+	Metadata: "game/duel_replay/v1/duel_replay.proto",
 }

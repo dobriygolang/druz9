@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: inbox/v1/inbox.proto
+// source: social/inbox/v1/inbox.proto
 
 package v1
 
@@ -297,5 +297,5 @@ var InboxService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "inbox/v1/inbox.proto",
+	Metadata: "social/inbox/v1/inbox.proto",
 }

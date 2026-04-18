@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: friend_challenge/v1/friend_challenge.proto
+// source: game/friend_challenge/v1/friend_challenge.proto
 
 package v1
 
@@ -67,11 +67,11 @@ func (x ChallengeStatus) String() string {
 }
 
 func (ChallengeStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_friend_challenge_v1_friend_challenge_proto_enumTypes[0].Descriptor()
+	return file_game_friend_challenge_v1_friend_challenge_proto_enumTypes[0].Descriptor()
 }
 
 func (ChallengeStatus) Type() protoreflect.EnumType {
-	return &file_friend_challenge_v1_friend_challenge_proto_enumTypes[0]
+	return &file_game_friend_challenge_v1_friend_challenge_proto_enumTypes[0]
 }
 
 func (x ChallengeStatus) Number() protoreflect.EnumNumber {
@@ -80,7 +80,7 @@ func (x ChallengeStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ChallengeStatus.Descriptor instead.
 func (ChallengeStatus) EnumDescriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{0}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{0}
 }
 
 // ChallengeDifficulty mirrors the training task difficulty enum values.
@@ -120,11 +120,11 @@ func (x ChallengeDifficulty) String() string {
 }
 
 func (ChallengeDifficulty) Descriptor() protoreflect.EnumDescriptor {
-	return file_friend_challenge_v1_friend_challenge_proto_enumTypes[1].Descriptor()
+	return file_game_friend_challenge_v1_friend_challenge_proto_enumTypes[1].Descriptor()
 }
 
 func (ChallengeDifficulty) Type() protoreflect.EnumType {
-	return &file_friend_challenge_v1_friend_challenge_proto_enumTypes[1]
+	return &file_game_friend_challenge_v1_friend_challenge_proto_enumTypes[1]
 }
 
 func (x ChallengeDifficulty) Number() protoreflect.EnumNumber {
@@ -133,7 +133,7 @@ func (x ChallengeDifficulty) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ChallengeDifficulty.Descriptor instead.
 func (ChallengeDifficulty) EnumDescriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{1}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{1}
 }
 
 // FriendChallenge is the full row as the server sees it. Clients render
@@ -167,7 +167,7 @@ type FriendChallenge struct {
 
 func (x *FriendChallenge) Reset() {
 	*x = FriendChallenge{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[0]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -179,7 +179,7 @@ func (x *FriendChallenge) String() string {
 func (*FriendChallenge) ProtoMessage() {}
 
 func (x *FriendChallenge) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[0]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -192,7 +192,7 @@ func (x *FriendChallenge) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FriendChallenge.ProtoReflect.Descriptor instead.
 func (*FriendChallenge) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{0}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *FriendChallenge) GetId() string {
@@ -352,7 +352,7 @@ type ListIncomingRequest struct {
 
 func (x *ListIncomingRequest) Reset() {
 	*x = ListIncomingRequest{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[1]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -364,7 +364,7 @@ func (x *ListIncomingRequest) String() string {
 func (*ListIncomingRequest) ProtoMessage() {}
 
 func (x *ListIncomingRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[1]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -377,7 +377,7 @@ func (x *ListIncomingRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListIncomingRequest.ProtoReflect.Descriptor instead.
 func (*ListIncomingRequest) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{1}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ListIncomingRequest) GetLimit() int32 {
@@ -404,7 +404,7 @@ type ListSentRequest struct {
 
 func (x *ListSentRequest) Reset() {
 	*x = ListSentRequest{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[2]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -416,7 +416,7 @@ func (x *ListSentRequest) String() string {
 func (*ListSentRequest) ProtoMessage() {}
 
 func (x *ListSentRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[2]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -429,7 +429,7 @@ func (x *ListSentRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListSentRequest.ProtoReflect.Descriptor instead.
 func (*ListSentRequest) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{2}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *ListSentRequest) GetLimit() int32 {
@@ -456,7 +456,7 @@ type ListHistoryRequest struct {
 
 func (x *ListHistoryRequest) Reset() {
 	*x = ListHistoryRequest{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[3]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -468,7 +468,7 @@ func (x *ListHistoryRequest) String() string {
 func (*ListHistoryRequest) ProtoMessage() {}
 
 func (x *ListHistoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[3]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -481,7 +481,7 @@ func (x *ListHistoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListHistoryRequest.ProtoReflect.Descriptor instead.
 func (*ListHistoryRequest) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{3}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListHistoryRequest) GetLimit() int32 {
@@ -508,7 +508,7 @@ type ListChallengesResponse struct {
 
 func (x *ListChallengesResponse) Reset() {
 	*x = ListChallengesResponse{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[4]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -520,7 +520,7 @@ func (x *ListChallengesResponse) String() string {
 func (*ListChallengesResponse) ProtoMessage() {}
 
 func (x *ListChallengesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[4]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -533,7 +533,7 @@ func (x *ListChallengesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListChallengesResponse.ProtoReflect.Descriptor instead.
 func (*ListChallengesResponse) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{4}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListChallengesResponse) GetChallenges() []*FriendChallenge {
@@ -564,7 +564,7 @@ type SendChallengeRequest struct {
 
 func (x *SendChallengeRequest) Reset() {
 	*x = SendChallengeRequest{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[5]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -576,7 +576,7 @@ func (x *SendChallengeRequest) String() string {
 func (*SendChallengeRequest) ProtoMessage() {}
 
 func (x *SendChallengeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[5]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -589,7 +589,7 @@ func (x *SendChallengeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendChallengeRequest.ProtoReflect.Descriptor instead.
 func (*SendChallengeRequest) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{5}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SendChallengeRequest) GetOpponentUsername() string {
@@ -643,7 +643,7 @@ type SendChallengeResponse struct {
 
 func (x *SendChallengeResponse) Reset() {
 	*x = SendChallengeResponse{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[6]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -655,7 +655,7 @@ func (x *SendChallengeResponse) String() string {
 func (*SendChallengeResponse) ProtoMessage() {}
 
 func (x *SendChallengeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[6]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -668,7 +668,7 @@ func (x *SendChallengeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendChallengeResponse.ProtoReflect.Descriptor instead.
 func (*SendChallengeResponse) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{6}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *SendChallengeResponse) GetChallenge() *FriendChallenge {
@@ -689,7 +689,7 @@ type SubmitSolutionRequest struct {
 
 func (x *SubmitSolutionRequest) Reset() {
 	*x = SubmitSolutionRequest{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[7]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -701,7 +701,7 @@ func (x *SubmitSolutionRequest) String() string {
 func (*SubmitSolutionRequest) ProtoMessage() {}
 
 func (x *SubmitSolutionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[7]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -714,7 +714,7 @@ func (x *SubmitSolutionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitSolutionRequest.ProtoReflect.Descriptor instead.
 func (*SubmitSolutionRequest) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{7}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *SubmitSolutionRequest) GetChallengeId() string {
@@ -747,7 +747,7 @@ type SubmitSolutionResponse struct {
 
 func (x *SubmitSolutionResponse) Reset() {
 	*x = SubmitSolutionResponse{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[8]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -759,7 +759,7 @@ func (x *SubmitSolutionResponse) String() string {
 func (*SubmitSolutionResponse) ProtoMessage() {}
 
 func (x *SubmitSolutionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[8]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -772,7 +772,7 @@ func (x *SubmitSolutionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitSolutionResponse.ProtoReflect.Descriptor instead.
 func (*SubmitSolutionResponse) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{8}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *SubmitSolutionResponse) GetChallenge() *FriendChallenge {
@@ -791,7 +791,7 @@ type DeclineRequest struct {
 
 func (x *DeclineRequest) Reset() {
 	*x = DeclineRequest{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[9]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -803,7 +803,7 @@ func (x *DeclineRequest) String() string {
 func (*DeclineRequest) ProtoMessage() {}
 
 func (x *DeclineRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[9]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -816,7 +816,7 @@ func (x *DeclineRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeclineRequest.ProtoReflect.Descriptor instead.
 func (*DeclineRequest) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{9}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *DeclineRequest) GetChallengeId() string {
@@ -835,7 +835,7 @@ type DeclineResponse struct {
 
 func (x *DeclineResponse) Reset() {
 	*x = DeclineResponse{}
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[10]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -847,7 +847,7 @@ func (x *DeclineResponse) String() string {
 func (*DeclineResponse) ProtoMessage() {}
 
 func (x *DeclineResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_friend_challenge_v1_friend_challenge_proto_msgTypes[10]
+	mi := &file_game_friend_challenge_v1_friend_challenge_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -860,7 +860,7 @@ func (x *DeclineResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeclineResponse.ProtoReflect.Descriptor instead.
 func (*DeclineResponse) Descriptor() ([]byte, []int) {
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{10}
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *DeclineResponse) GetChallenge() *FriendChallenge {
@@ -870,11 +870,11 @@ func (x *DeclineResponse) GetChallenge() *FriendChallenge {
 	return nil
 }
 
-var File_friend_challenge_v1_friend_challenge_proto protoreflect.FileDescriptor
+var File_game_friend_challenge_v1_friend_challenge_proto protoreflect.FileDescriptor
 
-const file_friend_challenge_v1_friend_challenge_proto_rawDesc = "" +
+const file_game_friend_challenge_v1_friend_challenge_proto_rawDesc = "" +
 	"\n" +
-	"*friend_challenge/v1/friend_challenge.proto\x12\x13friend_challenge.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe5\a\n" +
+	"/game/friend_challenge/v1/friend_challenge.proto\x12\x13friend_challenge.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xe5\a\n" +
 	"\x0fFriendChallenge\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
 	"\rchallenger_id\x18\x02 \x01(\tR\fchallengerId\x12/\n" +
@@ -959,20 +959,20 @@ const file_friend_challenge_v1_friend_challenge_proto_rawDesc = "" +
 	"\aDecline\x12#.friend_challenge.v1.DeclineRequest\x1a$.friend_challenge.v1.DeclineResponse\"4\x82\xd3\xe4\x93\x02.:\x01*\")/api/v1/challenges/{challenge_id}/declineB$Z\"api/pkg/api/friend_challenge/v1;v1b\x06proto3"
 
 var (
-	file_friend_challenge_v1_friend_challenge_proto_rawDescOnce sync.Once
-	file_friend_challenge_v1_friend_challenge_proto_rawDescData []byte
+	file_game_friend_challenge_v1_friend_challenge_proto_rawDescOnce sync.Once
+	file_game_friend_challenge_v1_friend_challenge_proto_rawDescData []byte
 )
 
-func file_friend_challenge_v1_friend_challenge_proto_rawDescGZIP() []byte {
-	file_friend_challenge_v1_friend_challenge_proto_rawDescOnce.Do(func() {
-		file_friend_challenge_v1_friend_challenge_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_friend_challenge_v1_friend_challenge_proto_rawDesc), len(file_friend_challenge_v1_friend_challenge_proto_rawDesc)))
+func file_game_friend_challenge_v1_friend_challenge_proto_rawDescGZIP() []byte {
+	file_game_friend_challenge_v1_friend_challenge_proto_rawDescOnce.Do(func() {
+		file_game_friend_challenge_v1_friend_challenge_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_game_friend_challenge_v1_friend_challenge_proto_rawDesc), len(file_game_friend_challenge_v1_friend_challenge_proto_rawDesc)))
 	})
-	return file_friend_challenge_v1_friend_challenge_proto_rawDescData
+	return file_game_friend_challenge_v1_friend_challenge_proto_rawDescData
 }
 
-var file_friend_challenge_v1_friend_challenge_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_friend_challenge_v1_friend_challenge_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_friend_challenge_v1_friend_challenge_proto_goTypes = []any{
+var file_game_friend_challenge_v1_friend_challenge_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_game_friend_challenge_v1_friend_challenge_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_game_friend_challenge_v1_friend_challenge_proto_goTypes = []any{
 	(ChallengeStatus)(0),           // 0: friend_challenge.v1.ChallengeStatus
 	(ChallengeDifficulty)(0),       // 1: friend_challenge.v1.ChallengeDifficulty
 	(*FriendChallenge)(nil),        // 2: friend_challenge.v1.FriendChallenge
@@ -988,7 +988,7 @@ var file_friend_challenge_v1_friend_challenge_proto_goTypes = []any{
 	(*DeclineResponse)(nil),        // 12: friend_challenge.v1.DeclineResponse
 	(*timestamppb.Timestamp)(nil),  // 13: google.protobuf.Timestamp
 }
-var file_friend_challenge_v1_friend_challenge_proto_depIdxs = []int32{
+var file_game_friend_challenge_v1_friend_challenge_proto_depIdxs = []int32{
 	1,  // 0: friend_challenge.v1.FriendChallenge.task_difficulty:type_name -> friend_challenge.v1.ChallengeDifficulty
 	0,  // 1: friend_challenge.v1.FriendChallenge.status:type_name -> friend_challenge.v1.ChallengeStatus
 	13, // 2: friend_challenge.v1.FriendChallenge.challenger_submitted_at:type_name -> google.protobuf.Timestamp
@@ -1020,27 +1020,27 @@ var file_friend_challenge_v1_friend_challenge_proto_depIdxs = []int32{
 	0,  // [0:12] is the sub-list for field type_name
 }
 
-func init() { file_friend_challenge_v1_friend_challenge_proto_init() }
-func file_friend_challenge_v1_friend_challenge_proto_init() {
-	if File_friend_challenge_v1_friend_challenge_proto != nil {
+func init() { file_game_friend_challenge_v1_friend_challenge_proto_init() }
+func file_game_friend_challenge_v1_friend_challenge_proto_init() {
+	if File_game_friend_challenge_v1_friend_challenge_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_friend_challenge_v1_friend_challenge_proto_rawDesc), len(file_friend_challenge_v1_friend_challenge_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_friend_challenge_v1_friend_challenge_proto_rawDesc), len(file_game_friend_challenge_v1_friend_challenge_proto_rawDesc)),
 			NumEnums:      2,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_friend_challenge_v1_friend_challenge_proto_goTypes,
-		DependencyIndexes: file_friend_challenge_v1_friend_challenge_proto_depIdxs,
-		EnumInfos:         file_friend_challenge_v1_friend_challenge_proto_enumTypes,
-		MessageInfos:      file_friend_challenge_v1_friend_challenge_proto_msgTypes,
+		GoTypes:           file_game_friend_challenge_v1_friend_challenge_proto_goTypes,
+		DependencyIndexes: file_game_friend_challenge_v1_friend_challenge_proto_depIdxs,
+		EnumInfos:         file_game_friend_challenge_v1_friend_challenge_proto_enumTypes,
+		MessageInfos:      file_game_friend_challenge_v1_friend_challenge_proto_msgTypes,
 	}.Build()
-	File_friend_challenge_v1_friend_challenge_proto = out.File
-	file_friend_challenge_v1_friend_challenge_proto_goTypes = nil
-	file_friend_challenge_v1_friend_challenge_proto_depIdxs = nil
+	File_game_friend_challenge_v1_friend_challenge_proto = out.File
+	file_game_friend_challenge_v1_friend_challenge_proto_goTypes = nil
+	file_game_friend_challenge_v1_friend_challenge_proto_depIdxs = nil
 }

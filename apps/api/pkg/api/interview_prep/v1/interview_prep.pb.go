@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: interview_prep/v1/interview_prep.proto
+// source: learning/interview_prep/v1/interview_prep.proto
 
 package v1
 
@@ -70,11 +70,11 @@ func (x PrepType) String() string {
 }
 
 func (PrepType) Descriptor() protoreflect.EnumDescriptor {
-	return file_interview_prep_v1_interview_prep_proto_enumTypes[0].Descriptor()
+	return file_learning_interview_prep_v1_interview_prep_proto_enumTypes[0].Descriptor()
 }
 
 func (PrepType) Type() protoreflect.EnumType {
-	return &file_interview_prep_v1_interview_prep_proto_enumTypes[0]
+	return &file_learning_interview_prep_v1_interview_prep_proto_enumTypes[0]
 }
 
 func (x PrepType) Number() protoreflect.EnumNumber {
@@ -83,7 +83,7 @@ func (x PrepType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use PrepType.Descriptor instead.
 func (PrepType) EnumDescriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{0}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{0}
 }
 
 type SessionStatus int32
@@ -119,11 +119,11 @@ func (x SessionStatus) String() string {
 }
 
 func (SessionStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_interview_prep_v1_interview_prep_proto_enumTypes[1].Descriptor()
+	return file_learning_interview_prep_v1_interview_prep_proto_enumTypes[1].Descriptor()
 }
 
 func (SessionStatus) Type() protoreflect.EnumType {
-	return &file_interview_prep_v1_interview_prep_proto_enumTypes[1]
+	return &file_learning_interview_prep_v1_interview_prep_proto_enumTypes[1]
 }
 
 func (x SessionStatus) Number() protoreflect.EnumNumber {
@@ -132,7 +132,7 @@ func (x SessionStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SessionStatus.Descriptor instead.
 func (SessionStatus) EnumDescriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{1}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{1}
 }
 
 type MockSessionStatus int32
@@ -168,11 +168,11 @@ func (x MockSessionStatus) String() string {
 }
 
 func (MockSessionStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_interview_prep_v1_interview_prep_proto_enumTypes[2].Descriptor()
+	return file_learning_interview_prep_v1_interview_prep_proto_enumTypes[2].Descriptor()
 }
 
 func (MockSessionStatus) Type() protoreflect.EnumType {
-	return &file_interview_prep_v1_interview_prep_proto_enumTypes[2]
+	return &file_learning_interview_prep_v1_interview_prep_proto_enumTypes[2]
 }
 
 func (x MockSessionStatus) Number() protoreflect.EnumNumber {
@@ -181,7 +181,7 @@ func (x MockSessionStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MockSessionStatus.Descriptor instead.
 func (MockSessionStatus) EnumDescriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{2}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{2}
 }
 
 // MockStageKind classifies the interview stage topic.
@@ -227,11 +227,11 @@ func (x MockStageKind) String() string {
 }
 
 func (MockStageKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_interview_prep_v1_interview_prep_proto_enumTypes[3].Descriptor()
+	return file_learning_interview_prep_v1_interview_prep_proto_enumTypes[3].Descriptor()
 }
 
 func (MockStageKind) Type() protoreflect.EnumType {
-	return &file_interview_prep_v1_interview_prep_proto_enumTypes[3]
+	return &file_learning_interview_prep_v1_interview_prep_proto_enumTypes[3]
 }
 
 func (x MockStageKind) Number() protoreflect.EnumNumber {
@@ -240,7 +240,7 @@ func (x MockStageKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MockStageKind.Descriptor instead.
 func (MockStageKind) EnumDescriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{3}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{3}
 }
 
 type MockStageStatus int32
@@ -282,11 +282,11 @@ func (x MockStageStatus) String() string {
 }
 
 func (MockStageStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_interview_prep_v1_interview_prep_proto_enumTypes[4].Descriptor()
+	return file_learning_interview_prep_v1_interview_prep_proto_enumTypes[4].Descriptor()
 }
 
 func (MockStageStatus) Type() protoreflect.EnumType {
-	return &file_interview_prep_v1_interview_prep_proto_enumTypes[4]
+	return &file_learning_interview_prep_v1_interview_prep_proto_enumTypes[4]
 }
 
 func (x MockStageStatus) Number() protoreflect.EnumNumber {
@@ -295,7 +295,7 @@ func (x MockStageStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MockStageStatus.Descriptor instead.
 func (MockStageStatus) EnumDescriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{4}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{4}
 }
 
 // SelfAssessment captures whether the candidate answered or skipped a question.
@@ -332,11 +332,11 @@ func (x SelfAssessment) String() string {
 }
 
 func (SelfAssessment) Descriptor() protoreflect.EnumDescriptor {
-	return file_interview_prep_v1_interview_prep_proto_enumTypes[5].Descriptor()
+	return file_learning_interview_prep_v1_interview_prep_proto_enumTypes[5].Descriptor()
 }
 
 func (SelfAssessment) Type() protoreflect.EnumType {
-	return &file_interview_prep_v1_interview_prep_proto_enumTypes[5]
+	return &file_learning_interview_prep_v1_interview_prep_proto_enumTypes[5]
 }
 
 func (x SelfAssessment) Number() protoreflect.EnumNumber {
@@ -345,7 +345,7 @@ func (x SelfAssessment) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use SelfAssessment.Descriptor instead.
 func (SelfAssessment) EnumDescriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{5}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{5}
 }
 
 type ListTasksRequest struct {
@@ -356,7 +356,7 @@ type ListTasksRequest struct {
 
 func (x *ListTasksRequest) Reset() {
 	*x = ListTasksRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[0]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -368,7 +368,7 @@ func (x *ListTasksRequest) String() string {
 func (*ListTasksRequest) ProtoMessage() {}
 
 func (x *ListTasksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[0]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -381,7 +381,7 @@ func (x *ListTasksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTasksRequest.ProtoReflect.Descriptor instead.
 func (*ListTasksRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{0}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{0}
 }
 
 type StartSessionRequest struct {
@@ -393,7 +393,7 @@ type StartSessionRequest struct {
 
 func (x *StartSessionRequest) Reset() {
 	*x = StartSessionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[1]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -405,7 +405,7 @@ func (x *StartSessionRequest) String() string {
 func (*StartSessionRequest) ProtoMessage() {}
 
 func (x *StartSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[1]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -418,7 +418,7 @@ func (x *StartSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartSessionRequest.ProtoReflect.Descriptor instead.
 func (*StartSessionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{1}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *StartSessionRequest) GetTaskId() string {
@@ -437,7 +437,7 @@ type GetSessionRequest struct {
 
 func (x *GetSessionRequest) Reset() {
 	*x = GetSessionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[2]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -449,7 +449,7 @@ func (x *GetSessionRequest) String() string {
 func (*GetSessionRequest) ProtoMessage() {}
 
 func (x *GetSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[2]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -462,7 +462,7 @@ func (x *GetSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSessionRequest.ProtoReflect.Descriptor instead.
 func (*GetSessionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{2}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetSessionRequest) GetSessionId() string {
@@ -483,7 +483,7 @@ type SubmitSessionRequest struct {
 
 func (x *SubmitSessionRequest) Reset() {
 	*x = SubmitSessionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[3]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -495,7 +495,7 @@ func (x *SubmitSessionRequest) String() string {
 func (*SubmitSessionRequest) ProtoMessage() {}
 
 func (x *SubmitSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[3]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -508,7 +508,7 @@ func (x *SubmitSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitSessionRequest.ProtoReflect.Descriptor instead.
 func (*SubmitSessionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{3}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SubmitSessionRequest) GetSessionId() string {
@@ -544,7 +544,7 @@ type AnswerQuestionRequest struct {
 
 func (x *AnswerQuestionRequest) Reset() {
 	*x = AnswerQuestionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[4]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -556,7 +556,7 @@ func (x *AnswerQuestionRequest) String() string {
 func (*AnswerQuestionRequest) ProtoMessage() {}
 
 func (x *AnswerQuestionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[4]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -569,7 +569,7 @@ func (x *AnswerQuestionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AnswerQuestionRequest.ProtoReflect.Descriptor instead.
 func (*AnswerQuestionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{4}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *AnswerQuestionRequest) GetSessionId() string {
@@ -619,7 +619,7 @@ type SystemDesignPayload struct {
 
 func (x *SystemDesignPayload) Reset() {
 	*x = SystemDesignPayload{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[5]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -631,7 +631,7 @@ func (x *SystemDesignPayload) String() string {
 func (*SystemDesignPayload) ProtoMessage() {}
 
 func (x *SystemDesignPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[5]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -644,7 +644,7 @@ func (x *SystemDesignPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SystemDesignPayload.ProtoReflect.Descriptor instead.
 func (*SystemDesignPayload) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{5}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *SystemDesignPayload) GetImage() []byte {
@@ -720,7 +720,7 @@ type ReviewSystemDesignRequest struct {
 
 func (x *ReviewSystemDesignRequest) Reset() {
 	*x = ReviewSystemDesignRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[6]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -732,7 +732,7 @@ func (x *ReviewSystemDesignRequest) String() string {
 func (*ReviewSystemDesignRequest) ProtoMessage() {}
 
 func (x *ReviewSystemDesignRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[6]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -745,7 +745,7 @@ func (x *ReviewSystemDesignRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReviewSystemDesignRequest.ProtoReflect.Descriptor instead.
 func (*ReviewSystemDesignRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{6}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ReviewSystemDesignRequest) GetSessionId() string {
@@ -770,7 +770,7 @@ type ListCompaniesRequest struct {
 
 func (x *ListCompaniesRequest) Reset() {
 	*x = ListCompaniesRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[7]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -782,7 +782,7 @@ func (x *ListCompaniesRequest) String() string {
 func (*ListCompaniesRequest) ProtoMessage() {}
 
 func (x *ListCompaniesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[7]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -795,7 +795,7 @@ func (x *ListCompaniesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCompaniesRequest.ProtoReflect.Descriptor instead.
 func (*ListCompaniesRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{7}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{7}
 }
 
 type ListMockBlueprintsRequest struct {
@@ -806,7 +806,7 @@ type ListMockBlueprintsRequest struct {
 
 func (x *ListMockBlueprintsRequest) Reset() {
 	*x = ListMockBlueprintsRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[8]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -818,7 +818,7 @@ func (x *ListMockBlueprintsRequest) String() string {
 func (*ListMockBlueprintsRequest) ProtoMessage() {}
 
 func (x *ListMockBlueprintsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[8]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -831,7 +831,7 @@ func (x *ListMockBlueprintsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMockBlueprintsRequest.ProtoReflect.Descriptor instead.
 func (*ListMockBlueprintsRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{8}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{8}
 }
 
 type StartMockSessionRequest struct {
@@ -844,7 +844,7 @@ type StartMockSessionRequest struct {
 
 func (x *StartMockSessionRequest) Reset() {
 	*x = StartMockSessionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[9]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -856,7 +856,7 @@ func (x *StartMockSessionRequest) String() string {
 func (*StartMockSessionRequest) ProtoMessage() {}
 
 func (x *StartMockSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[9]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -869,7 +869,7 @@ func (x *StartMockSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartMockSessionRequest.ProtoReflect.Descriptor instead.
 func (*StartMockSessionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{9}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *StartMockSessionRequest) GetCompanyTag() string {
@@ -895,7 +895,7 @@ type GetMockSessionRequest struct {
 
 func (x *GetMockSessionRequest) Reset() {
 	*x = GetMockSessionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[10]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -907,7 +907,7 @@ func (x *GetMockSessionRequest) String() string {
 func (*GetMockSessionRequest) ProtoMessage() {}
 
 func (x *GetMockSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[10]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -920,7 +920,7 @@ func (x *GetMockSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetMockSessionRequest.ProtoReflect.Descriptor instead.
 func (*GetMockSessionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{10}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *GetMockSessionRequest) GetSessionId() string {
@@ -943,7 +943,7 @@ type SubmitMockStageRequest struct {
 
 func (x *SubmitMockStageRequest) Reset() {
 	*x = SubmitMockStageRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[11]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -955,7 +955,7 @@ func (x *SubmitMockStageRequest) String() string {
 func (*SubmitMockStageRequest) ProtoMessage() {}
 
 func (x *SubmitMockStageRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[11]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -968,7 +968,7 @@ func (x *SubmitMockStageRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitMockStageRequest.ProtoReflect.Descriptor instead.
 func (*SubmitMockStageRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{11}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *SubmitMockStageRequest) GetSessionId() string {
@@ -1016,7 +1016,7 @@ type ReviewMockSystemDesignRequest struct {
 
 func (x *ReviewMockSystemDesignRequest) Reset() {
 	*x = ReviewMockSystemDesignRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[12]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1028,7 +1028,7 @@ func (x *ReviewMockSystemDesignRequest) String() string {
 func (*ReviewMockSystemDesignRequest) ProtoMessage() {}
 
 func (x *ReviewMockSystemDesignRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[12]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1041,7 +1041,7 @@ func (x *ReviewMockSystemDesignRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReviewMockSystemDesignRequest.ProtoReflect.Descriptor instead.
 func (*ReviewMockSystemDesignRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{12}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ReviewMockSystemDesignRequest) GetSessionId() string {
@@ -1068,7 +1068,7 @@ type AnswerMockQuestionRequest struct {
 
 func (x *AnswerMockQuestionRequest) Reset() {
 	*x = AnswerMockQuestionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[13]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1080,7 +1080,7 @@ func (x *AnswerMockQuestionRequest) String() string {
 func (*AnswerMockQuestionRequest) ProtoMessage() {}
 
 func (x *AnswerMockQuestionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[13]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1093,7 +1093,7 @@ func (x *AnswerMockQuestionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AnswerMockQuestionRequest.ProtoReflect.Descriptor instead.
 func (*AnswerMockQuestionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{13}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *AnswerMockQuestionRequest) GetSessionId() string {
@@ -1119,7 +1119,7 @@ type AbortMockSessionRequest struct {
 
 func (x *AbortMockSessionRequest) Reset() {
 	*x = AbortMockSessionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[14]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1131,7 +1131,7 @@ func (x *AbortMockSessionRequest) String() string {
 func (*AbortMockSessionRequest) ProtoMessage() {}
 
 func (x *AbortMockSessionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[14]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1144,7 +1144,7 @@ func (x *AbortMockSessionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AbortMockSessionRequest.ProtoReflect.Descriptor instead.
 func (*AbortMockSessionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{14}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *AbortMockSessionRequest) GetSessionId() string {
@@ -1162,7 +1162,7 @@ type ListAdminTasksRequest struct {
 
 func (x *ListAdminTasksRequest) Reset() {
 	*x = ListAdminTasksRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[15]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1174,7 +1174,7 @@ func (x *ListAdminTasksRequest) String() string {
 func (*ListAdminTasksRequest) ProtoMessage() {}
 
 func (x *ListAdminTasksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[15]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1187,7 +1187,7 @@ func (x *ListAdminTasksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAdminTasksRequest.ProtoReflect.Descriptor instead.
 func (*ListAdminTasksRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{15}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{15}
 }
 
 type GetAdminTaskRequest struct {
@@ -1199,7 +1199,7 @@ type GetAdminTaskRequest struct {
 
 func (x *GetAdminTaskRequest) Reset() {
 	*x = GetAdminTaskRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[16]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1211,7 +1211,7 @@ func (x *GetAdminTaskRequest) String() string {
 func (*GetAdminTaskRequest) ProtoMessage() {}
 
 func (x *GetAdminTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[16]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1224,7 +1224,7 @@ func (x *GetAdminTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetAdminTaskRequest.ProtoReflect.Descriptor instead.
 func (*GetAdminTaskRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{16}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *GetAdminTaskRequest) GetTaskId() string {
@@ -1243,7 +1243,7 @@ type DeleteAdminTaskRequest struct {
 
 func (x *DeleteAdminTaskRequest) Reset() {
 	*x = DeleteAdminTaskRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[17]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1255,7 +1255,7 @@ func (x *DeleteAdminTaskRequest) String() string {
 func (*DeleteAdminTaskRequest) ProtoMessage() {}
 
 func (x *DeleteAdminTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[17]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1268,7 +1268,7 @@ func (x *DeleteAdminTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAdminTaskRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAdminTaskRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{17}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *DeleteAdminTaskRequest) GetTaskId() string {
@@ -1287,7 +1287,7 @@ type ListAdminQuestionsRequest struct {
 
 func (x *ListAdminQuestionsRequest) Reset() {
 	*x = ListAdminQuestionsRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[18]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1299,7 +1299,7 @@ func (x *ListAdminQuestionsRequest) String() string {
 func (*ListAdminQuestionsRequest) ProtoMessage() {}
 
 func (x *ListAdminQuestionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[18]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1312,7 +1312,7 @@ func (x *ListAdminQuestionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAdminQuestionsRequest.ProtoReflect.Descriptor instead.
 func (*ListAdminQuestionsRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{18}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ListAdminQuestionsRequest) GetTaskId() string {
@@ -1332,7 +1332,7 @@ type DeleteAdminQuestionRequest struct {
 
 func (x *DeleteAdminQuestionRequest) Reset() {
 	*x = DeleteAdminQuestionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[19]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1344,7 +1344,7 @@ func (x *DeleteAdminQuestionRequest) String() string {
 func (*DeleteAdminQuestionRequest) ProtoMessage() {}
 
 func (x *DeleteAdminQuestionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[19]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1357,7 +1357,7 @@ func (x *DeleteAdminQuestionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteAdminQuestionRequest.ProtoReflect.Descriptor instead.
 func (*DeleteAdminQuestionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{19}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *DeleteAdminQuestionRequest) GetTaskId() string {
@@ -1382,7 +1382,7 @@ type ListMockQuestionPoolsRequest struct {
 
 func (x *ListMockQuestionPoolsRequest) Reset() {
 	*x = ListMockQuestionPoolsRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[20]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1394,7 +1394,7 @@ func (x *ListMockQuestionPoolsRequest) String() string {
 func (*ListMockQuestionPoolsRequest) ProtoMessage() {}
 
 func (x *ListMockQuestionPoolsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[20]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1407,7 +1407,7 @@ func (x *ListMockQuestionPoolsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMockQuestionPoolsRequest.ProtoReflect.Descriptor instead.
 func (*ListMockQuestionPoolsRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{20}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{20}
 }
 
 type DeleteMockQuestionPoolRequest struct {
@@ -1419,7 +1419,7 @@ type DeleteMockQuestionPoolRequest struct {
 
 func (x *DeleteMockQuestionPoolRequest) Reset() {
 	*x = DeleteMockQuestionPoolRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[21]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1431,7 +1431,7 @@ func (x *DeleteMockQuestionPoolRequest) String() string {
 func (*DeleteMockQuestionPoolRequest) ProtoMessage() {}
 
 func (x *DeleteMockQuestionPoolRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[21]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1444,7 +1444,7 @@ func (x *DeleteMockQuestionPoolRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMockQuestionPoolRequest.ProtoReflect.Descriptor instead.
 func (*DeleteMockQuestionPoolRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{21}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *DeleteMockQuestionPoolRequest) GetId() string {
@@ -1462,7 +1462,7 @@ type ListMockCompanyPresetsRequest struct {
 
 func (x *ListMockCompanyPresetsRequest) Reset() {
 	*x = ListMockCompanyPresetsRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[22]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1474,7 +1474,7 @@ func (x *ListMockCompanyPresetsRequest) String() string {
 func (*ListMockCompanyPresetsRequest) ProtoMessage() {}
 
 func (x *ListMockCompanyPresetsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[22]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1487,7 +1487,7 @@ func (x *ListMockCompanyPresetsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMockCompanyPresetsRequest.ProtoReflect.Descriptor instead.
 func (*ListMockCompanyPresetsRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{22}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{22}
 }
 
 type DeleteMockCompanyPresetRequest struct {
@@ -1499,7 +1499,7 @@ type DeleteMockCompanyPresetRequest struct {
 
 func (x *DeleteMockCompanyPresetRequest) Reset() {
 	*x = DeleteMockCompanyPresetRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[23]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1511,7 +1511,7 @@ func (x *DeleteMockCompanyPresetRequest) String() string {
 func (*DeleteMockCompanyPresetRequest) ProtoMessage() {}
 
 func (x *DeleteMockCompanyPresetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[23]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1524,7 +1524,7 @@ func (x *DeleteMockCompanyPresetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteMockCompanyPresetRequest.ProtoReflect.Descriptor instead.
 func (*DeleteMockCompanyPresetRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{23}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *DeleteMockCompanyPresetRequest) GetId() string {
@@ -1543,7 +1543,7 @@ type StatusResponse struct {
 
 func (x *StatusResponse) Reset() {
 	*x = StatusResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[24]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1555,7 +1555,7 @@ func (x *StatusResponse) String() string {
 func (*StatusResponse) ProtoMessage() {}
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[24]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1568,7 +1568,7 @@ func (x *StatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
 func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{24}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *StatusResponse) GetStatus() v1.OperationStatus {
@@ -1587,7 +1587,7 @@ type SessionEnvelope struct {
 
 func (x *SessionEnvelope) Reset() {
 	*x = SessionEnvelope{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[25]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1599,7 +1599,7 @@ func (x *SessionEnvelope) String() string {
 func (*SessionEnvelope) ProtoMessage() {}
 
 func (x *SessionEnvelope) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[25]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1612,7 +1612,7 @@ func (x *SessionEnvelope) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SessionEnvelope.ProtoReflect.Descriptor instead.
 func (*SessionEnvelope) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{25}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *SessionEnvelope) GetSession() *InterviewPrepSession {
@@ -1631,7 +1631,7 @@ type MockSessionEnvelope struct {
 
 func (x *MockSessionEnvelope) Reset() {
 	*x = MockSessionEnvelope{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[26]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1643,7 +1643,7 @@ func (x *MockSessionEnvelope) String() string {
 func (*MockSessionEnvelope) ProtoMessage() {}
 
 func (x *MockSessionEnvelope) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[26]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1656,7 +1656,7 @@ func (x *MockSessionEnvelope) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockSessionEnvelope.ProtoReflect.Descriptor instead.
 func (*MockSessionEnvelope) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{26}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *MockSessionEnvelope) GetSession() *MockSession {
@@ -1675,7 +1675,7 @@ type ListTasksResponse struct {
 
 func (x *ListTasksResponse) Reset() {
 	*x = ListTasksResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[27]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1687,7 +1687,7 @@ func (x *ListTasksResponse) String() string {
 func (*ListTasksResponse) ProtoMessage() {}
 
 func (x *ListTasksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[27]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1700,7 +1700,7 @@ func (x *ListTasksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListTasksResponse.ProtoReflect.Descriptor instead.
 func (*ListTasksResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{27}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *ListTasksResponse) GetTasks() []*InterviewPrepTask {
@@ -1719,7 +1719,7 @@ type ListCompaniesResponse struct {
 
 func (x *ListCompaniesResponse) Reset() {
 	*x = ListCompaniesResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[28]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1731,7 +1731,7 @@ func (x *ListCompaniesResponse) String() string {
 func (*ListCompaniesResponse) ProtoMessage() {}
 
 func (x *ListCompaniesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[28]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1744,7 +1744,7 @@ func (x *ListCompaniesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCompaniesResponse.ProtoReflect.Descriptor instead.
 func (*ListCompaniesResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{28}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ListCompaniesResponse) GetCompanies() []string {
@@ -1763,7 +1763,7 @@ type ListMockBlueprintsResponse struct {
 
 func (x *ListMockBlueprintsResponse) Reset() {
 	*x = ListMockBlueprintsResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[29]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1775,7 +1775,7 @@ func (x *ListMockBlueprintsResponse) String() string {
 func (*ListMockBlueprintsResponse) ProtoMessage() {}
 
 func (x *ListMockBlueprintsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[29]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1788,7 +1788,7 @@ func (x *ListMockBlueprintsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMockBlueprintsResponse.ProtoReflect.Descriptor instead.
 func (*ListMockBlueprintsResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{29}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ListMockBlueprintsResponse) GetBlueprints() []*MockBlueprint {
@@ -1813,7 +1813,7 @@ type SubmitSessionResult struct {
 
 func (x *SubmitSessionResult) Reset() {
 	*x = SubmitSessionResult{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[30]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1825,7 +1825,7 @@ func (x *SubmitSessionResult) String() string {
 func (*SubmitSessionResult) ProtoMessage() {}
 
 func (x *SubmitSessionResult) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[30]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1838,7 +1838,7 @@ func (x *SubmitSessionResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitSessionResult.ProtoReflect.Descriptor instead.
 func (*SubmitSessionResult) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{30}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *SubmitSessionResult) GetPassed() bool {
@@ -1899,7 +1899,7 @@ type SubmitSessionResponse struct {
 
 func (x *SubmitSessionResponse) Reset() {
 	*x = SubmitSessionResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[31]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1911,7 +1911,7 @@ func (x *SubmitSessionResponse) String() string {
 func (*SubmitSessionResponse) ProtoMessage() {}
 
 func (x *SubmitSessionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[31]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1924,7 +1924,7 @@ func (x *SubmitSessionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitSessionResponse.ProtoReflect.Descriptor instead.
 func (*SubmitSessionResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{31}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *SubmitSessionResponse) GetResult() *SubmitSessionResult {
@@ -1945,7 +1945,7 @@ type AnswerQuestionResponse struct {
 
 func (x *AnswerQuestionResponse) Reset() {
 	*x = AnswerQuestionResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[32]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1957,7 +1957,7 @@ func (x *AnswerQuestionResponse) String() string {
 func (*AnswerQuestionResponse) ProtoMessage() {}
 
 func (x *AnswerQuestionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[32]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1970,7 +1970,7 @@ func (x *AnswerQuestionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AnswerQuestionResponse.ProtoReflect.Descriptor instead.
 func (*AnswerQuestionResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{32}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *AnswerQuestionResponse) GetSession() *InterviewPrepSession {
@@ -2003,7 +2003,7 @@ type ReviewSystemDesignResponse struct {
 
 func (x *ReviewSystemDesignResponse) Reset() {
 	*x = ReviewSystemDesignResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[33]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2015,7 +2015,7 @@ func (x *ReviewSystemDesignResponse) String() string {
 func (*ReviewSystemDesignResponse) ProtoMessage() {}
 
 func (x *ReviewSystemDesignResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[33]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2028,7 +2028,7 @@ func (x *ReviewSystemDesignResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReviewSystemDesignResponse.ProtoReflect.Descriptor instead.
 func (*ReviewSystemDesignResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{33}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *ReviewSystemDesignResponse) GetReview() *SystemDesignReview {
@@ -2054,7 +2054,7 @@ type SubmitMockStageResult struct {
 
 func (x *SubmitMockStageResult) Reset() {
 	*x = SubmitMockStageResult{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[34]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[34]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2066,7 +2066,7 @@ func (x *SubmitMockStageResult) String() string {
 func (*SubmitMockStageResult) ProtoMessage() {}
 
 func (x *SubmitMockStageResult) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[34]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[34]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2079,7 +2079,7 @@ func (x *SubmitMockStageResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitMockStageResult.ProtoReflect.Descriptor instead.
 func (*SubmitMockStageResult) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{34}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{34}
 }
 
 func (x *SubmitMockStageResult) GetPassed() bool {
@@ -2147,7 +2147,7 @@ type SubmitMockStageResponse struct {
 
 func (x *SubmitMockStageResponse) Reset() {
 	*x = SubmitMockStageResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[35]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[35]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2159,7 +2159,7 @@ func (x *SubmitMockStageResponse) String() string {
 func (*SubmitMockStageResponse) ProtoMessage() {}
 
 func (x *SubmitMockStageResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[35]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[35]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2172,7 +2172,7 @@ func (x *SubmitMockStageResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitMockStageResponse.ProtoReflect.Descriptor instead.
 func (*SubmitMockStageResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{35}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{35}
 }
 
 func (x *SubmitMockStageResponse) GetResult() *SubmitMockStageResult {
@@ -2192,7 +2192,7 @@ type ReviewMockSystemDesignResult struct {
 
 func (x *ReviewMockSystemDesignResult) Reset() {
 	*x = ReviewMockSystemDesignResult{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[36]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[36]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2204,7 +2204,7 @@ func (x *ReviewMockSystemDesignResult) String() string {
 func (*ReviewMockSystemDesignResult) ProtoMessage() {}
 
 func (x *ReviewMockSystemDesignResult) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[36]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[36]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2217,7 +2217,7 @@ func (x *ReviewMockSystemDesignResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReviewMockSystemDesignResult.ProtoReflect.Descriptor instead.
 func (*ReviewMockSystemDesignResult) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{36}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{36}
 }
 
 func (x *ReviewMockSystemDesignResult) GetReview() *SystemDesignReview {
@@ -2243,7 +2243,7 @@ type ReviewMockSystemDesignResponse struct {
 
 func (x *ReviewMockSystemDesignResponse) Reset() {
 	*x = ReviewMockSystemDesignResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[37]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[37]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2255,7 +2255,7 @@ func (x *ReviewMockSystemDesignResponse) String() string {
 func (*ReviewMockSystemDesignResponse) ProtoMessage() {}
 
 func (x *ReviewMockSystemDesignResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[37]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[37]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2268,7 +2268,7 @@ func (x *ReviewMockSystemDesignResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReviewMockSystemDesignResponse.ProtoReflect.Descriptor instead.
 func (*ReviewMockSystemDesignResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{37}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{37}
 }
 
 func (x *ReviewMockSystemDesignResponse) GetResult() *ReviewMockSystemDesignResult {
@@ -2288,7 +2288,7 @@ type AnswerMockQuestionResult struct {
 
 func (x *AnswerMockQuestionResult) Reset() {
 	*x = AnswerMockQuestionResult{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[38]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[38]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2300,7 +2300,7 @@ func (x *AnswerMockQuestionResult) String() string {
 func (*AnswerMockQuestionResult) ProtoMessage() {}
 
 func (x *AnswerMockQuestionResult) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[38]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[38]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2313,7 +2313,7 @@ func (x *AnswerMockQuestionResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AnswerMockQuestionResult.ProtoReflect.Descriptor instead.
 func (*AnswerMockQuestionResult) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{38}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{38}
 }
 
 func (x *AnswerMockQuestionResult) GetReview() *InterviewAnswerReview {
@@ -2339,7 +2339,7 @@ type AnswerMockQuestionResponse struct {
 
 func (x *AnswerMockQuestionResponse) Reset() {
 	*x = AnswerMockQuestionResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[39]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[39]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2351,7 +2351,7 @@ func (x *AnswerMockQuestionResponse) String() string {
 func (*AnswerMockQuestionResponse) ProtoMessage() {}
 
 func (x *AnswerMockQuestionResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[39]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[39]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2364,7 +2364,7 @@ func (x *AnswerMockQuestionResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AnswerMockQuestionResponse.ProtoReflect.Descriptor instead.
 func (*AnswerMockQuestionResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{39}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{39}
 }
 
 func (x *AnswerMockQuestionResponse) GetResult() *AnswerMockQuestionResult {
@@ -2397,7 +2397,7 @@ type AdminTaskPayload struct {
 
 func (x *AdminTaskPayload) Reset() {
 	*x = AdminTaskPayload{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[40]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[40]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2409,7 +2409,7 @@ func (x *AdminTaskPayload) String() string {
 func (*AdminTaskPayload) ProtoMessage() {}
 
 func (x *AdminTaskPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[40]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[40]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2422,7 +2422,7 @@ func (x *AdminTaskPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminTaskPayload.ProtoReflect.Descriptor instead.
 func (*AdminTaskPayload) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{40}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{40}
 }
 
 func (x *AdminTaskPayload) GetSlug() string {
@@ -2539,7 +2539,7 @@ type CreateAdminTaskRequest struct {
 
 func (x *CreateAdminTaskRequest) Reset() {
 	*x = CreateAdminTaskRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[41]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[41]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2551,7 +2551,7 @@ func (x *CreateAdminTaskRequest) String() string {
 func (*CreateAdminTaskRequest) ProtoMessage() {}
 
 func (x *CreateAdminTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[41]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[41]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2564,7 +2564,7 @@ func (x *CreateAdminTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAdminTaskRequest.ProtoReflect.Descriptor instead.
 func (*CreateAdminTaskRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{41}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{41}
 }
 
 func (x *CreateAdminTaskRequest) GetTask() *AdminTaskPayload {
@@ -2584,7 +2584,7 @@ type UpdateAdminTaskRequest struct {
 
 func (x *UpdateAdminTaskRequest) Reset() {
 	*x = UpdateAdminTaskRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[42]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2596,7 +2596,7 @@ func (x *UpdateAdminTaskRequest) String() string {
 func (*UpdateAdminTaskRequest) ProtoMessage() {}
 
 func (x *UpdateAdminTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[42]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2609,7 +2609,7 @@ func (x *UpdateAdminTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAdminTaskRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAdminTaskRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{42}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *UpdateAdminTaskRequest) GetTaskId() string {
@@ -2635,7 +2635,7 @@ type ListAdminTasksResponse struct {
 
 func (x *ListAdminTasksResponse) Reset() {
 	*x = ListAdminTasksResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[43]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2647,7 +2647,7 @@ func (x *ListAdminTasksResponse) String() string {
 func (*ListAdminTasksResponse) ProtoMessage() {}
 
 func (x *ListAdminTasksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[43]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2660,7 +2660,7 @@ func (x *ListAdminTasksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAdminTasksResponse.ProtoReflect.Descriptor instead.
 func (*ListAdminTasksResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{43}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ListAdminTasksResponse) GetTasks() []*InterviewPrepTask {
@@ -2679,7 +2679,7 @@ type AdminTaskEnvelope struct {
 
 func (x *AdminTaskEnvelope) Reset() {
 	*x = AdminTaskEnvelope{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[44]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2691,7 +2691,7 @@ func (x *AdminTaskEnvelope) String() string {
 func (*AdminTaskEnvelope) ProtoMessage() {}
 
 func (x *AdminTaskEnvelope) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[44]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2704,7 +2704,7 @@ func (x *AdminTaskEnvelope) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminTaskEnvelope.ProtoReflect.Descriptor instead.
 func (*AdminTaskEnvelope) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{44}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *AdminTaskEnvelope) GetTask() *InterviewPrepTask {
@@ -2725,7 +2725,7 @@ type AdminQuestionPayload struct {
 
 func (x *AdminQuestionPayload) Reset() {
 	*x = AdminQuestionPayload{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[45]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2737,7 +2737,7 @@ func (x *AdminQuestionPayload) String() string {
 func (*AdminQuestionPayload) ProtoMessage() {}
 
 func (x *AdminQuestionPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[45]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2750,7 +2750,7 @@ func (x *AdminQuestionPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminQuestionPayload.ProtoReflect.Descriptor instead.
 func (*AdminQuestionPayload) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{45}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *AdminQuestionPayload) GetPosition() int32 {
@@ -2784,7 +2784,7 @@ type CreateAdminQuestionRequest struct {
 
 func (x *CreateAdminQuestionRequest) Reset() {
 	*x = CreateAdminQuestionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[46]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2796,7 +2796,7 @@ func (x *CreateAdminQuestionRequest) String() string {
 func (*CreateAdminQuestionRequest) ProtoMessage() {}
 
 func (x *CreateAdminQuestionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[46]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2809,7 +2809,7 @@ func (x *CreateAdminQuestionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateAdminQuestionRequest.ProtoReflect.Descriptor instead.
 func (*CreateAdminQuestionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{46}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *CreateAdminQuestionRequest) GetTaskId() string {
@@ -2837,7 +2837,7 @@ type UpdateAdminQuestionRequest struct {
 
 func (x *UpdateAdminQuestionRequest) Reset() {
 	*x = UpdateAdminQuestionRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[47]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2849,7 +2849,7 @@ func (x *UpdateAdminQuestionRequest) String() string {
 func (*UpdateAdminQuestionRequest) ProtoMessage() {}
 
 func (x *UpdateAdminQuestionRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[47]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2862,7 +2862,7 @@ func (x *UpdateAdminQuestionRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateAdminQuestionRequest.ProtoReflect.Descriptor instead.
 func (*UpdateAdminQuestionRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{47}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *UpdateAdminQuestionRequest) GetTaskId() string {
@@ -2895,7 +2895,7 @@ type ListAdminQuestionsResponse struct {
 
 func (x *ListAdminQuestionsResponse) Reset() {
 	*x = ListAdminQuestionsResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[48]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2907,7 +2907,7 @@ func (x *ListAdminQuestionsResponse) String() string {
 func (*ListAdminQuestionsResponse) ProtoMessage() {}
 
 func (x *ListAdminQuestionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[48]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2920,7 +2920,7 @@ func (x *ListAdminQuestionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListAdminQuestionsResponse.ProtoReflect.Descriptor instead.
 func (*ListAdminQuestionsResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{48}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *ListAdminQuestionsResponse) GetQuestions() []*InterviewPrepQuestion {
@@ -2939,7 +2939,7 @@ type AdminQuestionEnvelope struct {
 
 func (x *AdminQuestionEnvelope) Reset() {
 	*x = AdminQuestionEnvelope{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[49]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2951,7 +2951,7 @@ func (x *AdminQuestionEnvelope) String() string {
 func (*AdminQuestionEnvelope) ProtoMessage() {}
 
 func (x *AdminQuestionEnvelope) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[49]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2964,7 +2964,7 @@ func (x *AdminQuestionEnvelope) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use AdminQuestionEnvelope.ProtoReflect.Descriptor instead.
 func (*AdminQuestionEnvelope) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{49}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *AdminQuestionEnvelope) GetQuestion() *InterviewPrepQuestion {
@@ -2990,7 +2990,7 @@ type MockQuestionPoolPayload struct {
 
 func (x *MockQuestionPoolPayload) Reset() {
 	*x = MockQuestionPoolPayload{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[50]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3002,7 +3002,7 @@ func (x *MockQuestionPoolPayload) String() string {
 func (*MockQuestionPoolPayload) ProtoMessage() {}
 
 func (x *MockQuestionPoolPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[50]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3015,7 +3015,7 @@ func (x *MockQuestionPoolPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockQuestionPoolPayload.ProtoReflect.Descriptor instead.
 func (*MockQuestionPoolPayload) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{50}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *MockQuestionPoolPayload) GetTopic() string {
@@ -3083,7 +3083,7 @@ type CreateMockQuestionPoolRequest struct {
 
 func (x *CreateMockQuestionPoolRequest) Reset() {
 	*x = CreateMockQuestionPoolRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[51]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[51]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3095,7 +3095,7 @@ func (x *CreateMockQuestionPoolRequest) String() string {
 func (*CreateMockQuestionPoolRequest) ProtoMessage() {}
 
 func (x *CreateMockQuestionPoolRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[51]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[51]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3108,7 +3108,7 @@ func (x *CreateMockQuestionPoolRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMockQuestionPoolRequest.ProtoReflect.Descriptor instead.
 func (*CreateMockQuestionPoolRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{51}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{51}
 }
 
 func (x *CreateMockQuestionPoolRequest) GetItem() *MockQuestionPoolPayload {
@@ -3128,7 +3128,7 @@ type UpdateMockQuestionPoolRequest struct {
 
 func (x *UpdateMockQuestionPoolRequest) Reset() {
 	*x = UpdateMockQuestionPoolRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[52]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[52]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3140,7 +3140,7 @@ func (x *UpdateMockQuestionPoolRequest) String() string {
 func (*UpdateMockQuestionPoolRequest) ProtoMessage() {}
 
 func (x *UpdateMockQuestionPoolRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[52]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[52]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3153,7 +3153,7 @@ func (x *UpdateMockQuestionPoolRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMockQuestionPoolRequest.ProtoReflect.Descriptor instead.
 func (*UpdateMockQuestionPoolRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{52}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{52}
 }
 
 func (x *UpdateMockQuestionPoolRequest) GetId() string {
@@ -3179,7 +3179,7 @@ type MockQuestionPoolListResponse struct {
 
 func (x *MockQuestionPoolListResponse) Reset() {
 	*x = MockQuestionPoolListResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[53]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[53]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3191,7 +3191,7 @@ func (x *MockQuestionPoolListResponse) String() string {
 func (*MockQuestionPoolListResponse) ProtoMessage() {}
 
 func (x *MockQuestionPoolListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[53]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[53]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3204,7 +3204,7 @@ func (x *MockQuestionPoolListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockQuestionPoolListResponse.ProtoReflect.Descriptor instead.
 func (*MockQuestionPoolListResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{53}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{53}
 }
 
 func (x *MockQuestionPoolListResponse) GetItems() []*MockQuestionPoolItem {
@@ -3223,7 +3223,7 @@ type MockQuestionPoolEnvelope struct {
 
 func (x *MockQuestionPoolEnvelope) Reset() {
 	*x = MockQuestionPoolEnvelope{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[54]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[54]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3235,7 +3235,7 @@ func (x *MockQuestionPoolEnvelope) String() string {
 func (*MockQuestionPoolEnvelope) ProtoMessage() {}
 
 func (x *MockQuestionPoolEnvelope) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[54]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[54]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3248,7 +3248,7 @@ func (x *MockQuestionPoolEnvelope) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockQuestionPoolEnvelope.ProtoReflect.Descriptor instead.
 func (*MockQuestionPoolEnvelope) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{54}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{54}
 }
 
 func (x *MockQuestionPoolEnvelope) GetItem() *MockQuestionPoolItem {
@@ -3272,7 +3272,7 @@ type MockCompanyPresetPayload struct {
 
 func (x *MockCompanyPresetPayload) Reset() {
 	*x = MockCompanyPresetPayload{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[55]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[55]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3284,7 +3284,7 @@ func (x *MockCompanyPresetPayload) String() string {
 func (*MockCompanyPresetPayload) ProtoMessage() {}
 
 func (x *MockCompanyPresetPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[55]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[55]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3297,7 +3297,7 @@ func (x *MockCompanyPresetPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockCompanyPresetPayload.ProtoReflect.Descriptor instead.
 func (*MockCompanyPresetPayload) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{55}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{55}
 }
 
 func (x *MockCompanyPresetPayload) GetCompanyTag() string {
@@ -3351,7 +3351,7 @@ type CreateMockCompanyPresetRequest struct {
 
 func (x *CreateMockCompanyPresetRequest) Reset() {
 	*x = CreateMockCompanyPresetRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[56]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[56]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3363,7 +3363,7 @@ func (x *CreateMockCompanyPresetRequest) String() string {
 func (*CreateMockCompanyPresetRequest) ProtoMessage() {}
 
 func (x *CreateMockCompanyPresetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[56]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[56]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3376,7 +3376,7 @@ func (x *CreateMockCompanyPresetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateMockCompanyPresetRequest.ProtoReflect.Descriptor instead.
 func (*CreateMockCompanyPresetRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{56}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{56}
 }
 
 func (x *CreateMockCompanyPresetRequest) GetItem() *MockCompanyPresetPayload {
@@ -3396,7 +3396,7 @@ type UpdateMockCompanyPresetRequest struct {
 
 func (x *UpdateMockCompanyPresetRequest) Reset() {
 	*x = UpdateMockCompanyPresetRequest{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[57]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[57]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3408,7 +3408,7 @@ func (x *UpdateMockCompanyPresetRequest) String() string {
 func (*UpdateMockCompanyPresetRequest) ProtoMessage() {}
 
 func (x *UpdateMockCompanyPresetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[57]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[57]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3421,7 +3421,7 @@ func (x *UpdateMockCompanyPresetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateMockCompanyPresetRequest.ProtoReflect.Descriptor instead.
 func (*UpdateMockCompanyPresetRequest) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{57}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{57}
 }
 
 func (x *UpdateMockCompanyPresetRequest) GetId() string {
@@ -3447,7 +3447,7 @@ type MockCompanyPresetListResponse struct {
 
 func (x *MockCompanyPresetListResponse) Reset() {
 	*x = MockCompanyPresetListResponse{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[58]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[58]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3459,7 +3459,7 @@ func (x *MockCompanyPresetListResponse) String() string {
 func (*MockCompanyPresetListResponse) ProtoMessage() {}
 
 func (x *MockCompanyPresetListResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[58]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[58]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3472,7 +3472,7 @@ func (x *MockCompanyPresetListResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockCompanyPresetListResponse.ProtoReflect.Descriptor instead.
 func (*MockCompanyPresetListResponse) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{58}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{58}
 }
 
 func (x *MockCompanyPresetListResponse) GetItems() []*MockCompanyPreset {
@@ -3491,7 +3491,7 @@ type MockCompanyPresetEnvelope struct {
 
 func (x *MockCompanyPresetEnvelope) Reset() {
 	*x = MockCompanyPresetEnvelope{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[59]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[59]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3503,7 +3503,7 @@ func (x *MockCompanyPresetEnvelope) String() string {
 func (*MockCompanyPresetEnvelope) ProtoMessage() {}
 
 func (x *MockCompanyPresetEnvelope) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[59]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[59]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3516,7 +3516,7 @@ func (x *MockCompanyPresetEnvelope) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockCompanyPresetEnvelope.ProtoReflect.Descriptor instead.
 func (*MockCompanyPresetEnvelope) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{59}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{59}
 }
 
 func (x *MockCompanyPresetEnvelope) GetItem() *MockCompanyPreset {
@@ -3552,7 +3552,7 @@ type InterviewPrepTask struct {
 
 func (x *InterviewPrepTask) Reset() {
 	*x = InterviewPrepTask{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[60]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[60]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3564,7 +3564,7 @@ func (x *InterviewPrepTask) String() string {
 func (*InterviewPrepTask) ProtoMessage() {}
 
 func (x *InterviewPrepTask) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[60]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[60]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3577,7 +3577,7 @@ func (x *InterviewPrepTask) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InterviewPrepTask.ProtoReflect.Descriptor instead.
 func (*InterviewPrepTask) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{60}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{60}
 }
 
 func (x *InterviewPrepTask) GetId() string {
@@ -3721,7 +3721,7 @@ type InterviewPrepQuestion struct {
 
 func (x *InterviewPrepQuestion) Reset() {
 	*x = InterviewPrepQuestion{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[61]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[61]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3733,7 +3733,7 @@ func (x *InterviewPrepQuestion) String() string {
 func (*InterviewPrepQuestion) ProtoMessage() {}
 
 func (x *InterviewPrepQuestion) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[61]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[61]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3746,7 +3746,7 @@ func (x *InterviewPrepQuestion) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InterviewPrepQuestion.ProtoReflect.Descriptor instead.
 func (*InterviewPrepQuestion) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{61}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{61}
 }
 
 func (x *InterviewPrepQuestion) GetId() string {
@@ -3811,7 +3811,7 @@ type InterviewPrepQuestionResult struct {
 
 func (x *InterviewPrepQuestionResult) Reset() {
 	*x = InterviewPrepQuestionResult{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[62]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[62]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3823,7 +3823,7 @@ func (x *InterviewPrepQuestionResult) String() string {
 func (*InterviewPrepQuestionResult) ProtoMessage() {}
 
 func (x *InterviewPrepQuestionResult) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[62]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[62]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3836,7 +3836,7 @@ func (x *InterviewPrepQuestionResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InterviewPrepQuestionResult.ProtoReflect.Descriptor instead.
 func (*InterviewPrepQuestionResult) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{62}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{62}
 }
 
 func (x *InterviewPrepQuestionResult) GetId() string {
@@ -3897,7 +3897,7 @@ type InterviewPrepSession struct {
 
 func (x *InterviewPrepSession) Reset() {
 	*x = InterviewPrepSession{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[63]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[63]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3909,7 +3909,7 @@ func (x *InterviewPrepSession) String() string {
 func (*InterviewPrepSession) ProtoMessage() {}
 
 func (x *InterviewPrepSession) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[63]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[63]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3922,7 +3922,7 @@ func (x *InterviewPrepSession) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InterviewPrepSession.ProtoReflect.Descriptor instead.
 func (*InterviewPrepSession) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{63}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{63}
 }
 
 func (x *InterviewPrepSession) GetId() string {
@@ -4047,7 +4047,7 @@ type SystemDesignReview struct {
 
 func (x *SystemDesignReview) Reset() {
 	*x = SystemDesignReview{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[64]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[64]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4059,7 +4059,7 @@ func (x *SystemDesignReview) String() string {
 func (*SystemDesignReview) ProtoMessage() {}
 
 func (x *SystemDesignReview) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[64]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[64]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4072,7 +4072,7 @@ func (x *SystemDesignReview) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SystemDesignReview.ProtoReflect.Descriptor instead.
 func (*SystemDesignReview) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{64}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{64}
 }
 
 func (x *SystemDesignReview) GetProvider() string {
@@ -4151,7 +4151,7 @@ type InterviewAnswerReview struct {
 
 func (x *InterviewAnswerReview) Reset() {
 	*x = InterviewAnswerReview{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[65]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[65]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4163,7 +4163,7 @@ func (x *InterviewAnswerReview) String() string {
 func (*InterviewAnswerReview) ProtoMessage() {}
 
 func (x *InterviewAnswerReview) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[65]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[65]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4176,7 +4176,7 @@ func (x *InterviewAnswerReview) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InterviewAnswerReview.ProtoReflect.Descriptor instead.
 func (*InterviewAnswerReview) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{65}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{65}
 }
 
 func (x *InterviewAnswerReview) GetProvider() string {
@@ -4233,7 +4233,7 @@ type MockQuestionResult struct {
 
 func (x *MockQuestionResult) Reset() {
 	*x = MockQuestionResult{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[66]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[66]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4245,7 +4245,7 @@ func (x *MockQuestionResult) String() string {
 func (*MockQuestionResult) ProtoMessage() {}
 
 func (x *MockQuestionResult) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[66]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[66]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4258,7 +4258,7 @@ func (x *MockQuestionResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockQuestionResult.ProtoReflect.Descriptor instead.
 func (*MockQuestionResult) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{66}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{66}
 }
 
 func (x *MockQuestionResult) GetId() string {
@@ -4369,7 +4369,7 @@ type MockStage struct {
 
 func (x *MockStage) Reset() {
 	*x = MockStage{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[67]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[67]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4381,7 +4381,7 @@ func (x *MockStage) String() string {
 func (*MockStage) ProtoMessage() {}
 
 func (x *MockStage) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[67]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[67]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4394,7 +4394,7 @@ func (x *MockStage) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockStage.ProtoReflect.Descriptor instead.
 func (*MockStage) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{67}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{67}
 }
 
 func (x *MockStage) GetId() string {
@@ -4582,7 +4582,7 @@ type MockSession struct {
 
 func (x *MockSession) Reset() {
 	*x = MockSession{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[68]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[68]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4594,7 +4594,7 @@ func (x *MockSession) String() string {
 func (*MockSession) ProtoMessage() {}
 
 func (x *MockSession) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[68]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[68]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4607,7 +4607,7 @@ func (x *MockSession) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockSession.ProtoReflect.Descriptor instead.
 func (*MockSession) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{68}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{68}
 }
 
 func (x *MockSession) GetId() string {
@@ -4736,7 +4736,7 @@ type MockBlueprintRound struct {
 
 func (x *MockBlueprintRound) Reset() {
 	*x = MockBlueprintRound{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[69]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[69]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4748,7 +4748,7 @@ func (x *MockBlueprintRound) String() string {
 func (*MockBlueprintRound) ProtoMessage() {}
 
 func (x *MockBlueprintRound) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[69]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[69]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4761,7 +4761,7 @@ func (x *MockBlueprintRound) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockBlueprintRound.ProtoReflect.Descriptor instead.
 func (*MockBlueprintRound) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{69}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{69}
 }
 
 func (x *MockBlueprintRound) GetPosition() int32 {
@@ -4827,7 +4827,7 @@ type MockBlueprint struct {
 
 func (x *MockBlueprint) Reset() {
 	*x = MockBlueprint{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[70]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[70]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4839,7 +4839,7 @@ func (x *MockBlueprint) String() string {
 func (*MockBlueprint) ProtoMessage() {}
 
 func (x *MockBlueprint) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[70]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[70]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4852,7 +4852,7 @@ func (x *MockBlueprint) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockBlueprint.ProtoReflect.Descriptor instead.
 func (*MockBlueprint) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{70}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{70}
 }
 
 func (x *MockBlueprint) GetId() string {
@@ -4965,7 +4965,7 @@ type MockQuestionPoolItem struct {
 
 func (x *MockQuestionPoolItem) Reset() {
 	*x = MockQuestionPoolItem{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[71]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[71]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -4977,7 +4977,7 @@ func (x *MockQuestionPoolItem) String() string {
 func (*MockQuestionPoolItem) ProtoMessage() {}
 
 func (x *MockQuestionPoolItem) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[71]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[71]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -4990,7 +4990,7 @@ func (x *MockQuestionPoolItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockQuestionPoolItem.ProtoReflect.Descriptor instead.
 func (*MockQuestionPoolItem) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{71}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{71}
 }
 
 func (x *MockQuestionPoolItem) GetId() string {
@@ -5087,7 +5087,7 @@ type MockCompanyPreset struct {
 
 func (x *MockCompanyPreset) Reset() {
 	*x = MockCompanyPreset{}
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[72]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[72]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -5099,7 +5099,7 @@ func (x *MockCompanyPreset) String() string {
 func (*MockCompanyPreset) ProtoMessage() {}
 
 func (x *MockCompanyPreset) ProtoReflect() protoreflect.Message {
-	mi := &file_interview_prep_v1_interview_prep_proto_msgTypes[72]
+	mi := &file_learning_interview_prep_v1_interview_prep_proto_msgTypes[72]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -5112,7 +5112,7 @@ func (x *MockCompanyPreset) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use MockCompanyPreset.ProtoReflect.Descriptor instead.
 func (*MockCompanyPreset) Descriptor() ([]byte, []int) {
-	return file_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{72}
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP(), []int{72}
 }
 
 func (x *MockCompanyPreset) GetId() string {
@@ -5178,11 +5178,11 @@ func (x *MockCompanyPreset) GetUpdatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-var File_interview_prep_v1_interview_prep_proto protoreflect.FileDescriptor
+var File_learning_interview_prep_v1_interview_prep_proto protoreflect.FileDescriptor
 
-const file_interview_prep_v1_interview_prep_proto_rawDesc = "" +
+const file_learning_interview_prep_v1_interview_prep_proto_rawDesc = "" +
 	"\n" +
-	"&interview_prep/v1/interview_prep.proto\x12\x11interview_prep.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16common/v1/common.proto\"\x12\n" +
+	"/learning/interview_prep/v1/interview_prep.proto\x12\x11interview_prep.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bcore/common/v1/common.proto\"\x12\n" +
 	"\x10ListTasksRequest\".\n" +
 	"\x13StartSessionRequest\x12\x17\n" +
 	"\atask_id\x18\x01 \x01(\tR\x06taskId\"2\n" +
@@ -5681,20 +5681,20 @@ const file_interview_prep_v1_interview_prep_proto_rawDesc = "" +
 	"\x17DeleteMockCompanyPreset\x121.interview_prep.v1.DeleteMockCompanyPresetRequest\x1a!.interview_prep.v1.StatusResponse\";\x82\xd3\xe4\x93\x025*3/api/admin/interview-prep/mock-company-presets/{id}B\"Z api/pkg/api/interview_prep/v1;v1b\x06proto3"
 
 var (
-	file_interview_prep_v1_interview_prep_proto_rawDescOnce sync.Once
-	file_interview_prep_v1_interview_prep_proto_rawDescData []byte
+	file_learning_interview_prep_v1_interview_prep_proto_rawDescOnce sync.Once
+	file_learning_interview_prep_v1_interview_prep_proto_rawDescData []byte
 )
 
-func file_interview_prep_v1_interview_prep_proto_rawDescGZIP() []byte {
-	file_interview_prep_v1_interview_prep_proto_rawDescOnce.Do(func() {
-		file_interview_prep_v1_interview_prep_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_interview_prep_v1_interview_prep_proto_rawDesc), len(file_interview_prep_v1_interview_prep_proto_rawDesc)))
+func file_learning_interview_prep_v1_interview_prep_proto_rawDescGZIP() []byte {
+	file_learning_interview_prep_v1_interview_prep_proto_rawDescOnce.Do(func() {
+		file_learning_interview_prep_v1_interview_prep_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_learning_interview_prep_v1_interview_prep_proto_rawDesc), len(file_learning_interview_prep_v1_interview_prep_proto_rawDesc)))
 	})
-	return file_interview_prep_v1_interview_prep_proto_rawDescData
+	return file_learning_interview_prep_v1_interview_prep_proto_rawDescData
 }
 
-var file_interview_prep_v1_interview_prep_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
-var file_interview_prep_v1_interview_prep_proto_msgTypes = make([]protoimpl.MessageInfo, 73)
-var file_interview_prep_v1_interview_prep_proto_goTypes = []any{
+var file_learning_interview_prep_v1_interview_prep_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_learning_interview_prep_v1_interview_prep_proto_msgTypes = make([]protoimpl.MessageInfo, 73)
+var file_learning_interview_prep_v1_interview_prep_proto_goTypes = []any{
 	(PrepType)(0),                          // 0: interview_prep.v1.PrepType
 	(SessionStatus)(0),                     // 1: interview_prep.v1.SessionStatus
 	(MockSessionStatus)(0),                 // 2: interview_prep.v1.MockSessionStatus
@@ -5782,7 +5782,7 @@ var file_interview_prep_v1_interview_prep_proto_goTypes = []any{
 	(v1.RunnerMode)(0),                     // 84: common.v1.RunnerMode
 	(*timestamppb.Timestamp)(nil),          // 85: google.protobuf.Timestamp
 }
-var file_interview_prep_v1_interview_prep_proto_depIdxs = []int32{
+var file_learning_interview_prep_v1_interview_prep_proto_depIdxs = []int32{
 	79,  // 0: interview_prep.v1.SubmitSessionRequest.language:type_name -> common.v1.ProgrammingLanguage
 	5,   // 1: interview_prep.v1.AnswerQuestionRequest.self_assessment:type_name -> interview_prep.v1.SelfAssessment
 	11,  // 2: interview_prep.v1.ReviewSystemDesignRequest.design:type_name -> interview_prep.v1.SystemDesignPayload
@@ -5944,27 +5944,27 @@ var file_interview_prep_v1_interview_prep_proto_depIdxs = []int32{
 	0,   // [0:92] is the sub-list for field type_name
 }
 
-func init() { file_interview_prep_v1_interview_prep_proto_init() }
-func file_interview_prep_v1_interview_prep_proto_init() {
-	if File_interview_prep_v1_interview_prep_proto != nil {
+func init() { file_learning_interview_prep_v1_interview_prep_proto_init() }
+func file_learning_interview_prep_v1_interview_prep_proto_init() {
+	if File_learning_interview_prep_v1_interview_prep_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_interview_prep_v1_interview_prep_proto_rawDesc), len(file_interview_prep_v1_interview_prep_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_learning_interview_prep_v1_interview_prep_proto_rawDesc), len(file_learning_interview_prep_v1_interview_prep_proto_rawDesc)),
 			NumEnums:      6,
 			NumMessages:   73,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_interview_prep_v1_interview_prep_proto_goTypes,
-		DependencyIndexes: file_interview_prep_v1_interview_prep_proto_depIdxs,
-		EnumInfos:         file_interview_prep_v1_interview_prep_proto_enumTypes,
-		MessageInfos:      file_interview_prep_v1_interview_prep_proto_msgTypes,
+		GoTypes:           file_learning_interview_prep_v1_interview_prep_proto_goTypes,
+		DependencyIndexes: file_learning_interview_prep_v1_interview_prep_proto_depIdxs,
+		EnumInfos:         file_learning_interview_prep_v1_interview_prep_proto_enumTypes,
+		MessageInfos:      file_learning_interview_prep_v1_interview_prep_proto_msgTypes,
 	}.Build()
-	File_interview_prep_v1_interview_prep_proto = out.File
-	file_interview_prep_v1_interview_prep_proto_goTypes = nil
-	file_interview_prep_v1_interview_prep_proto_depIdxs = nil
+	File_learning_interview_prep_v1_interview_prep_proto = out.File
+	file_learning_interview_prep_v1_interview_prep_proto_goTypes = nil
+	file_learning_interview_prep_v1_interview_prep_proto_depIdxs = nil
 }

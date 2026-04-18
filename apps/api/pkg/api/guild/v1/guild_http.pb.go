@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: guild/v1/guild.proto
+// source: social/guild/v1/guild.proto
 
 package v1
 

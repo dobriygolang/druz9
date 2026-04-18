@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: profile/v1/profile.proto
+// source: core/profile/v1/profile.proto
 
 package v1
 
@@ -20,7 +20,6 @@ const _ = grpc.SupportPackageIsVersion9
 
 const (
 	ProfileService_CreateTelegramAuthChallenge_FullMethodName = "/profile.v1.ProfileService/CreateTelegramAuthChallenge"
-	ProfileService_ConfirmTelegramAuth_FullMethodName         = "/profile.v1.ProfileService/ConfirmTelegramAuth"
 	ProfileService_TelegramAuth_FullMethodName                = "/profile.v1.ProfileService/TelegramAuth"
 	ProfileService_StartYandexAuth_FullMethodName             = "/profile.v1.ProfileService/StartYandexAuth"
 	ProfileService_YandexAuth_FullMethodName                  = "/profile.v1.ProfileService/YandexAuth"
@@ -32,8 +31,6 @@ const (
 	ProfileService_Logout_FullMethodName                      = "/profile.v1.ProfileService/Logout"
 	ProfileService_BindTelegram_FullMethodName                = "/profile.v1.ProfileService/BindTelegram"
 	ProfileService_GetProfileProgress_FullMethodName          = "/profile.v1.ProfileService/GetProfileProgress"
-	ProfileService_GetAchievements_FullMethodName             = "/profile.v1.ProfileService/GetAchievements"
-	ProfileService_GetProfileActivity_FullMethodName          = "/profile.v1.ProfileService/GetProfileActivity"
 	ProfileService_SetUserGoal_FullMethodName                 = "/profile.v1.ProfileService/SetUserGoal"
 	ProfileService_GetReadiness_FullMethodName                = "/profile.v1.ProfileService/GetReadiness"
 	ProfileService_GetProfileFeed_FullMethodName              = "/profile.v1.ProfileService/GetProfileFeed"
@@ -44,7 +41,6 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ProfileServiceClient interface {
 	CreateTelegramAuthChallenge(ctx context.Context, in *CreateTelegramAuthChallengeRequest, opts ...grpc.CallOption) (*CreateTelegramAuthChallengeResponse, error)
-	ConfirmTelegramAuth(ctx context.Context, in *ConfirmTelegramAuthRequest, opts ...grpc.CallOption) (*ConfirmTelegramAuthResponse, error)
 	TelegramAuth(ctx context.Context, in *TelegramAuthRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
 	StartYandexAuth(ctx context.Context, in *StartYandexAuthRequest, opts ...grpc.CallOption) (*StartYandexAuthResponse, error)
 	YandexAuth(ctx context.Context, in *YandexAuthRequest, opts ...grpc.CallOption) (*ProfileResponse, error)
@@ -56,8 +52,6 @@ type ProfileServiceClient interface {
 	Logout(ctx context.Context, in *LogoutRequest, opts ...grpc.CallOption) (*ProfileStatusResponse, error)
 	BindTelegram(ctx context.Context, in *BindTelegramRequest, opts ...grpc.CallOption) (*ProfileStatusResponse, error)
 	GetProfileProgress(ctx context.Context, in *GetProfileProgressRequest, opts ...grpc.CallOption) (*ProfileProgressResponse, error)
-	GetAchievements(ctx context.Context, in *GetAchievementsRequest, opts ...grpc.CallOption) (*GetAchievementsResponse, error)
-	GetProfileActivity(ctx context.Context, in *GetProfileActivityRequest, opts ...grpc.CallOption) (*GetProfileActivityResponse, error)
 	SetUserGoal(ctx context.Context, in *SetUserGoalRequest, opts ...grpc.CallOption) (*SetUserGoalResponse, error)
 	GetReadiness(ctx context.Context, in *GetReadinessRequest, opts ...grpc.CallOption) (*GetReadinessResponse, error)
 	GetProfileFeed(ctx context.Context, in *GetProfileFeedRequest, opts ...grpc.CallOption) (*GetProfileFeedResponse, error)
@@ -75,16 +69,6 @@ func (c *profileServiceClient) CreateTelegramAuthChallenge(ctx context.Context, 
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(CreateTelegramAuthChallengeResponse)
 	err := c.cc.Invoke(ctx, ProfileService_CreateTelegramAuthChallenge_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *profileServiceClient) ConfirmTelegramAuth(ctx context.Context, in *ConfirmTelegramAuthRequest, opts ...grpc.CallOption) (*ConfirmTelegramAuthResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ConfirmTelegramAuthResponse)
-	err := c.cc.Invoke(ctx, ProfileService_ConfirmTelegramAuth_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -201,26 +185,6 @@ func (c *profileServiceClient) GetProfileProgress(ctx context.Context, in *GetPr
 	return out, nil
 }
 
-func (c *profileServiceClient) GetAchievements(ctx context.Context, in *GetAchievementsRequest, opts ...grpc.CallOption) (*GetAchievementsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetAchievementsResponse)
-	err := c.cc.Invoke(ctx, ProfileService_GetAchievements_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *profileServiceClient) GetProfileActivity(ctx context.Context, in *GetProfileActivityRequest, opts ...grpc.CallOption) (*GetProfileActivityResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetProfileActivityResponse)
-	err := c.cc.Invoke(ctx, ProfileService_GetProfileActivity_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
 func (c *profileServiceClient) SetUserGoal(ctx context.Context, in *SetUserGoalRequest, opts ...grpc.CallOption) (*SetUserGoalResponse, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
 	out := new(SetUserGoalResponse)
@@ -256,7 +220,6 @@ func (c *profileServiceClient) GetProfileFeed(ctx context.Context, in *GetProfil
 // for forward compatibility.
 type ProfileServiceServer interface {
 	CreateTelegramAuthChallenge(context.Context, *CreateTelegramAuthChallengeRequest) (*CreateTelegramAuthChallengeResponse, error)
-	ConfirmTelegramAuth(context.Context, *ConfirmTelegramAuthRequest) (*ConfirmTelegramAuthResponse, error)
 	TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error)
 	StartYandexAuth(context.Context, *StartYandexAuthRequest) (*StartYandexAuthResponse, error)
 	YandexAuth(context.Context, *YandexAuthRequest) (*ProfileResponse, error)
@@ -268,8 +231,6 @@ type ProfileServiceServer interface {
 	Logout(context.Context, *LogoutRequest) (*ProfileStatusResponse, error)
 	BindTelegram(context.Context, *BindTelegramRequest) (*ProfileStatusResponse, error)
 	GetProfileProgress(context.Context, *GetProfileProgressRequest) (*ProfileProgressResponse, error)
-	GetAchievements(context.Context, *GetAchievementsRequest) (*GetAchievementsResponse, error)
-	GetProfileActivity(context.Context, *GetProfileActivityRequest) (*GetProfileActivityResponse, error)
 	SetUserGoal(context.Context, *SetUserGoalRequest) (*SetUserGoalResponse, error)
 	GetReadiness(context.Context, *GetReadinessRequest) (*GetReadinessResponse, error)
 	GetProfileFeed(context.Context, *GetProfileFeedRequest) (*GetProfileFeedResponse, error)
@@ -285,9 +246,6 @@ type UnimplementedProfileServiceServer struct{}
 
 func (UnimplementedProfileServiceServer) CreateTelegramAuthChallenge(context.Context, *CreateTelegramAuthChallengeRequest) (*CreateTelegramAuthChallengeResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method CreateTelegramAuthChallenge not implemented")
-}
-func (UnimplementedProfileServiceServer) ConfirmTelegramAuth(context.Context, *ConfirmTelegramAuthRequest) (*ConfirmTelegramAuthResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ConfirmTelegramAuth not implemented")
 }
 func (UnimplementedProfileServiceServer) TelegramAuth(context.Context, *TelegramAuthRequest) (*ProfileResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method TelegramAuth not implemented")
@@ -321,12 +279,6 @@ func (UnimplementedProfileServiceServer) BindTelegram(context.Context, *BindTele
 }
 func (UnimplementedProfileServiceServer) GetProfileProgress(context.Context, *GetProfileProgressRequest) (*ProfileProgressResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetProfileProgress not implemented")
-}
-func (UnimplementedProfileServiceServer) GetAchievements(context.Context, *GetAchievementsRequest) (*GetAchievementsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetAchievements not implemented")
-}
-func (UnimplementedProfileServiceServer) GetProfileActivity(context.Context, *GetProfileActivityRequest) (*GetProfileActivityResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method GetProfileActivity not implemented")
 }
 func (UnimplementedProfileServiceServer) SetUserGoal(context.Context, *SetUserGoalRequest) (*SetUserGoalResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method SetUserGoal not implemented")
@@ -372,24 +324,6 @@ func _ProfileService_CreateTelegramAuthChallenge_Handler(srv interface{}, ctx co
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(ProfileServiceServer).CreateTelegramAuthChallenge(ctx, req.(*CreateTelegramAuthChallengeRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ProfileService_ConfirmTelegramAuth_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ConfirmTelegramAuthRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProfileServiceServer).ConfirmTelegramAuth(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ProfileService_ConfirmTelegramAuth_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceServer).ConfirmTelegramAuth(ctx, req.(*ConfirmTelegramAuthRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -592,42 +526,6 @@ func _ProfileService_GetProfileProgress_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
-func _ProfileService_GetAchievements_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAchievementsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProfileServiceServer).GetAchievements(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ProfileService_GetAchievements_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceServer).GetAchievements(ctx, req.(*GetAchievementsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _ProfileService_GetProfileActivity_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetProfileActivityRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(ProfileServiceServer).GetProfileActivity(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: ProfileService_GetProfileActivity_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProfileServiceServer).GetProfileActivity(ctx, req.(*GetProfileActivityRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
 func _ProfileService_SetUserGoal_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(SetUserGoalRequest)
 	if err := dec(in); err != nil {
@@ -694,10 +592,6 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ProfileService_CreateTelegramAuthChallenge_Handler,
 		},
 		{
-			MethodName: "ConfirmTelegramAuth",
-			Handler:    _ProfileService_ConfirmTelegramAuth_Handler,
-		},
-		{
 			MethodName: "TelegramAuth",
 			Handler:    _ProfileService_TelegramAuth_Handler,
 		},
@@ -742,14 +636,6 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 			Handler:    _ProfileService_GetProfileProgress_Handler,
 		},
 		{
-			MethodName: "GetAchievements",
-			Handler:    _ProfileService_GetAchievements_Handler,
-		},
-		{
-			MethodName: "GetProfileActivity",
-			Handler:    _ProfileService_GetProfileActivity_Handler,
-		},
-		{
 			MethodName: "SetUserGoal",
 			Handler:    _ProfileService_SetUserGoal_Handler,
 		},
@@ -763,5 +649,5 @@ var ProfileService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "profile/v1/profile.proto",
+	Metadata: "core/profile/v1/profile.proto",
 }

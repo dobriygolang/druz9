@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: mission/v1/mission.proto
+// source: learning/mission/v1/mission.proto
 
 package v1
 

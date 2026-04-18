@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: profile/v1/profile.proto
+// source: core/profile/v1/profile.proto
 
 package v1
 
@@ -60,11 +60,11 @@ func (x UserGoalKind) String() string {
 }
 
 func (UserGoalKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_profile_v1_profile_proto_enumTypes[0].Descriptor()
+	return file_core_profile_v1_profile_proto_enumTypes[0].Descriptor()
 }
 
 func (UserGoalKind) Type() protoreflect.EnumType {
-	return &file_profile_v1_profile_proto_enumTypes[0]
+	return &file_core_profile_v1_profile_proto_enumTypes[0]
 }
 
 func (x UserGoalKind) Number() protoreflect.EnumNumber {
@@ -73,7 +73,7 @@ func (x UserGoalKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use UserGoalKind.Descriptor instead.
 func (UserGoalKind) EnumDescriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{0}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{0}
 }
 
 type ReadinessLevel int32
@@ -118,11 +118,11 @@ func (x ReadinessLevel) String() string {
 }
 
 func (ReadinessLevel) Descriptor() protoreflect.EnumDescriptor {
-	return file_profile_v1_profile_proto_enumTypes[1].Descriptor()
+	return file_core_profile_v1_profile_proto_enumTypes[1].Descriptor()
 }
 
 func (ReadinessLevel) Type() protoreflect.EnumType {
-	return &file_profile_v1_profile_proto_enumTypes[1]
+	return &file_core_profile_v1_profile_proto_enumTypes[1]
 }
 
 func (x ReadinessLevel) Number() protoreflect.EnumNumber {
@@ -131,7 +131,7 @@ func (x ReadinessLevel) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ReadinessLevel.Descriptor instead.
 func (ReadinessLevel) EnumDescriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{1}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{1}
 }
 
 type ProfileActionType int32
@@ -179,11 +179,11 @@ func (x ProfileActionType) String() string {
 }
 
 func (ProfileActionType) Descriptor() protoreflect.EnumDescriptor {
-	return file_profile_v1_profile_proto_enumTypes[2].Descriptor()
+	return file_core_profile_v1_profile_proto_enumTypes[2].Descriptor()
 }
 
 func (ProfileActionType) Type() protoreflect.EnumType {
-	return &file_profile_v1_profile_proto_enumTypes[2]
+	return &file_core_profile_v1_profile_proto_enumTypes[2]
 }
 
 func (x ProfileActionType) Number() protoreflect.EnumNumber {
@@ -192,7 +192,7 @@ func (x ProfileActionType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ProfileActionType.Descriptor instead.
 func (ProfileActionType) EnumDescriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{2}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{2}
 }
 
 type ProfileCompetencyConfidence int32
@@ -231,11 +231,11 @@ func (x ProfileCompetencyConfidence) String() string {
 }
 
 func (ProfileCompetencyConfidence) Descriptor() protoreflect.EnumDescriptor {
-	return file_profile_v1_profile_proto_enumTypes[3].Descriptor()
+	return file_core_profile_v1_profile_proto_enumTypes[3].Descriptor()
 }
 
 func (ProfileCompetencyConfidence) Type() protoreflect.EnumType {
-	return &file_profile_v1_profile_proto_enumTypes[3]
+	return &file_core_profile_v1_profile_proto_enumTypes[3]
 }
 
 func (x ProfileCompetencyConfidence) Number() protoreflect.EnumNumber {
@@ -244,7 +244,7 @@ func (x ProfileCompetencyConfidence) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ProfileCompetencyConfidence.Descriptor instead.
 func (ProfileCompetencyConfidence) EnumDescriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{3}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{3}
 }
 
 type ProfileCompetencyLevel int32
@@ -286,11 +286,11 @@ func (x ProfileCompetencyLevel) String() string {
 }
 
 func (ProfileCompetencyLevel) Descriptor() protoreflect.EnumDescriptor {
-	return file_profile_v1_profile_proto_enumTypes[4].Descriptor()
+	return file_core_profile_v1_profile_proto_enumTypes[4].Descriptor()
 }
 
 func (ProfileCompetencyLevel) Type() protoreflect.EnumType {
-	return &file_profile_v1_profile_proto_enumTypes[4]
+	return &file_core_profile_v1_profile_proto_enumTypes[4]
 }
 
 func (x ProfileCompetencyLevel) Number() protoreflect.EnumNumber {
@@ -299,111 +299,7 @@ func (x ProfileCompetencyLevel) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ProfileCompetencyLevel.Descriptor instead.
 func (ProfileCompetencyLevel) EnumDescriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{4}
-}
-
-type AchievementCategory int32
-
-const (
-	AchievementCategory_ACHIEVEMENT_CATEGORY_UNSPECIFIED AchievementCategory = 0
-	AchievementCategory_ACHIEVEMENT_CATEGORY_PRACTICE    AchievementCategory = 1
-	AchievementCategory_ACHIEVEMENT_CATEGORY_STREAK      AchievementCategory = 2
-)
-
-// Enum value maps for AchievementCategory.
-var (
-	AchievementCategory_name = map[int32]string{
-		0: "ACHIEVEMENT_CATEGORY_UNSPECIFIED",
-		1: "ACHIEVEMENT_CATEGORY_PRACTICE",
-		2: "ACHIEVEMENT_CATEGORY_STREAK",
-	}
-	AchievementCategory_value = map[string]int32{
-		"ACHIEVEMENT_CATEGORY_UNSPECIFIED": 0,
-		"ACHIEVEMENT_CATEGORY_PRACTICE":    1,
-		"ACHIEVEMENT_CATEGORY_STREAK":      2,
-	}
-)
-
-func (x AchievementCategory) Enum() *AchievementCategory {
-	p := new(AchievementCategory)
-	*p = x
-	return p
-}
-
-func (x AchievementCategory) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (AchievementCategory) Descriptor() protoreflect.EnumDescriptor {
-	return file_profile_v1_profile_proto_enumTypes[5].Descriptor()
-}
-
-func (AchievementCategory) Type() protoreflect.EnumType {
-	return &file_profile_v1_profile_proto_enumTypes[5]
-}
-
-func (x AchievementCategory) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use AchievementCategory.Descriptor instead.
-func (AchievementCategory) EnumDescriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{5}
-}
-
-type AchievementTier int32
-
-const (
-	AchievementTier_ACHIEVEMENT_TIER_UNSPECIFIED AchievementTier = 0
-	AchievementTier_ACHIEVEMENT_TIER_BRONZE      AchievementTier = 1
-	AchievementTier_ACHIEVEMENT_TIER_SILVER      AchievementTier = 2
-	AchievementTier_ACHIEVEMENT_TIER_GOLD        AchievementTier = 3
-	AchievementTier_ACHIEVEMENT_TIER_DIAMOND     AchievementTier = 4
-)
-
-// Enum value maps for AchievementTier.
-var (
-	AchievementTier_name = map[int32]string{
-		0: "ACHIEVEMENT_TIER_UNSPECIFIED",
-		1: "ACHIEVEMENT_TIER_BRONZE",
-		2: "ACHIEVEMENT_TIER_SILVER",
-		3: "ACHIEVEMENT_TIER_GOLD",
-		4: "ACHIEVEMENT_TIER_DIAMOND",
-	}
-	AchievementTier_value = map[string]int32{
-		"ACHIEVEMENT_TIER_UNSPECIFIED": 0,
-		"ACHIEVEMENT_TIER_BRONZE":      1,
-		"ACHIEVEMENT_TIER_SILVER":      2,
-		"ACHIEVEMENT_TIER_GOLD":        3,
-		"ACHIEVEMENT_TIER_DIAMOND":     4,
-	}
-)
-
-func (x AchievementTier) Enum() *AchievementTier {
-	p := new(AchievementTier)
-	*p = x
-	return p
-}
-
-func (x AchievementTier) String() string {
-	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
-}
-
-func (AchievementTier) Descriptor() protoreflect.EnumDescriptor {
-	return file_profile_v1_profile_proto_enumTypes[6].Descriptor()
-}
-
-func (AchievementTier) Type() protoreflect.EnumType {
-	return &file_profile_v1_profile_proto_enumTypes[6]
-}
-
-func (x AchievementTier) Number() protoreflect.EnumNumber {
-	return protoreflect.EnumNumber(x)
-}
-
-// Deprecated: Use AchievementTier.Descriptor instead.
-func (AchievementTier) EnumDescriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{6}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{4}
 }
 
 type FeedItemType int32
@@ -439,11 +335,11 @@ func (x FeedItemType) String() string {
 }
 
 func (FeedItemType) Descriptor() protoreflect.EnumDescriptor {
-	return file_profile_v1_profile_proto_enumTypes[7].Descriptor()
+	return file_core_profile_v1_profile_proto_enumTypes[5].Descriptor()
 }
 
 func (FeedItemType) Type() protoreflect.EnumType {
-	return &file_profile_v1_profile_proto_enumTypes[7]
+	return &file_core_profile_v1_profile_proto_enumTypes[5]
 }
 
 func (x FeedItemType) Number() protoreflect.EnumNumber {
@@ -452,7 +348,7 @@ func (x FeedItemType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use FeedItemType.Descriptor instead.
 func (FeedItemType) EnumDescriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{7}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{5}
 }
 
 type CreateTelegramAuthChallengeRequest struct {
@@ -463,7 +359,7 @@ type CreateTelegramAuthChallengeRequest struct {
 
 func (x *CreateTelegramAuthChallengeRequest) Reset() {
 	*x = CreateTelegramAuthChallengeRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[0]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -475,7 +371,7 @@ func (x *CreateTelegramAuthChallengeRequest) String() string {
 func (*CreateTelegramAuthChallengeRequest) ProtoMessage() {}
 
 func (x *CreateTelegramAuthChallengeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[0]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -488,99 +384,7 @@ func (x *CreateTelegramAuthChallengeRequest) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use CreateTelegramAuthChallengeRequest.ProtoReflect.Descriptor instead.
 func (*CreateTelegramAuthChallengeRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{0}
-}
-
-type ConfirmTelegramAuthRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Token         string                 `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
-	BotToken      string                 `protobuf:"bytes,2,opt,name=bot_token,json=botToken,proto3" json:"bot_token,omitempty"`
-	TelegramId    int64                  `protobuf:"varint,3,opt,name=telegram_id,json=telegramId,proto3" json:"telegram_id,omitempty"`
-	FirstName     string                 `protobuf:"bytes,4,opt,name=first_name,json=firstName,proto3" json:"first_name,omitempty"`
-	LastName      string                 `protobuf:"bytes,5,opt,name=last_name,json=lastName,proto3" json:"last_name,omitempty"`
-	Username      string                 `protobuf:"bytes,6,opt,name=username,proto3" json:"username,omitempty"`
-	PhotoUrl      string                 `protobuf:"bytes,7,opt,name=photo_url,json=photoUrl,proto3" json:"photo_url,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ConfirmTelegramAuthRequest) Reset() {
-	*x = ConfirmTelegramAuthRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[1]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ConfirmTelegramAuthRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ConfirmTelegramAuthRequest) ProtoMessage() {}
-
-func (x *ConfirmTelegramAuthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[1]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ConfirmTelegramAuthRequest.ProtoReflect.Descriptor instead.
-func (*ConfirmTelegramAuthRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{1}
-}
-
-func (x *ConfirmTelegramAuthRequest) GetToken() string {
-	if x != nil {
-		return x.Token
-	}
-	return ""
-}
-
-func (x *ConfirmTelegramAuthRequest) GetBotToken() string {
-	if x != nil {
-		return x.BotToken
-	}
-	return ""
-}
-
-func (x *ConfirmTelegramAuthRequest) GetTelegramId() int64 {
-	if x != nil {
-		return x.TelegramId
-	}
-	return 0
-}
-
-func (x *ConfirmTelegramAuthRequest) GetFirstName() string {
-	if x != nil {
-		return x.FirstName
-	}
-	return ""
-}
-
-func (x *ConfirmTelegramAuthRequest) GetLastName() string {
-	if x != nil {
-		return x.LastName
-	}
-	return ""
-}
-
-func (x *ConfirmTelegramAuthRequest) GetUsername() string {
-	if x != nil {
-		return x.Username
-	}
-	return ""
-}
-
-func (x *ConfirmTelegramAuthRequest) GetPhotoUrl() string {
-	if x != nil {
-		return x.PhotoUrl
-	}
-	return ""
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{0}
 }
 
 type TelegramAuthRequest struct {
@@ -593,7 +397,7 @@ type TelegramAuthRequest struct {
 
 func (x *TelegramAuthRequest) Reset() {
 	*x = TelegramAuthRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[2]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -605,7 +409,7 @@ func (x *TelegramAuthRequest) String() string {
 func (*TelegramAuthRequest) ProtoMessage() {}
 
 func (x *TelegramAuthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[2]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -618,7 +422,7 @@ func (x *TelegramAuthRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TelegramAuthRequest.ProtoReflect.Descriptor instead.
 func (*TelegramAuthRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{2}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *TelegramAuthRequest) GetToken() string {
@@ -643,7 +447,7 @@ type StartYandexAuthRequest struct {
 
 func (x *StartYandexAuthRequest) Reset() {
 	*x = StartYandexAuthRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[3]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -655,7 +459,7 @@ func (x *StartYandexAuthRequest) String() string {
 func (*StartYandexAuthRequest) ProtoMessage() {}
 
 func (x *StartYandexAuthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[3]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -668,7 +472,7 @@ func (x *StartYandexAuthRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartYandexAuthRequest.ProtoReflect.Descriptor instead.
 func (*StartYandexAuthRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{3}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{2}
 }
 
 type YandexAuthRequest struct {
@@ -681,7 +485,7 @@ type YandexAuthRequest struct {
 
 func (x *YandexAuthRequest) Reset() {
 	*x = YandexAuthRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[4]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -693,7 +497,7 @@ func (x *YandexAuthRequest) String() string {
 func (*YandexAuthRequest) ProtoMessage() {}
 
 func (x *YandexAuthRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[4]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -706,7 +510,7 @@ func (x *YandexAuthRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use YandexAuthRequest.ProtoReflect.Descriptor instead.
 func (*YandexAuthRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{4}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *YandexAuthRequest) GetState() string {
@@ -738,7 +542,7 @@ type CompleteRegistrationRequest struct {
 
 func (x *CompleteRegistrationRequest) Reset() {
 	*x = CompleteRegistrationRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[5]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -750,7 +554,7 @@ func (x *CompleteRegistrationRequest) String() string {
 func (*CompleteRegistrationRequest) ProtoMessage() {}
 
 func (x *CompleteRegistrationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[5]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -763,7 +567,7 @@ func (x *CompleteRegistrationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompleteRegistrationRequest.ProtoReflect.Descriptor instead.
 func (*CompleteRegistrationRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{5}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *CompleteRegistrationRequest) GetRegion() string {
@@ -809,7 +613,7 @@ type GetProfileRequest struct {
 
 func (x *GetProfileRequest) Reset() {
 	*x = GetProfileRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[6]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -821,7 +625,7 @@ func (x *GetProfileRequest) String() string {
 func (*GetProfileRequest) ProtoMessage() {}
 
 func (x *GetProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[6]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -834,7 +638,7 @@ func (x *GetProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProfileRequest.ProtoReflect.Descriptor instead.
 func (*GetProfileRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{6}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{5}
 }
 
 type GetProfileByIDRequest struct {
@@ -846,7 +650,7 @@ type GetProfileByIDRequest struct {
 
 func (x *GetProfileByIDRequest) Reset() {
 	*x = GetProfileByIDRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[7]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -858,7 +662,7 @@ func (x *GetProfileByIDRequest) String() string {
 func (*GetProfileByIDRequest) ProtoMessage() {}
 
 func (x *GetProfileByIDRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[7]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -871,7 +675,7 @@ func (x *GetProfileByIDRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProfileByIDRequest.ProtoReflect.Descriptor instead.
 func (*GetProfileByIDRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{7}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetProfileByIDRequest) GetUserId() string {
@@ -895,7 +699,7 @@ type UpdateLocationRequest struct {
 
 func (x *UpdateLocationRequest) Reset() {
 	*x = UpdateLocationRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[8]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -907,7 +711,7 @@ func (x *UpdateLocationRequest) String() string {
 func (*UpdateLocationRequest) ProtoMessage() {}
 
 func (x *UpdateLocationRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[8]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -920,7 +724,7 @@ func (x *UpdateLocationRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateLocationRequest.ProtoReflect.Descriptor instead.
 func (*UpdateLocationRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{8}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *UpdateLocationRequest) GetRegion() string {
@@ -967,7 +771,7 @@ type UpdateProfileRequest struct {
 
 func (x *UpdateProfileRequest) Reset() {
 	*x = UpdateProfileRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[9]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -979,7 +783,7 @@ func (x *UpdateProfileRequest) String() string {
 func (*UpdateProfileRequest) ProtoMessage() {}
 
 func (x *UpdateProfileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[9]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -992,7 +796,7 @@ func (x *UpdateProfileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateProfileRequest.ProtoReflect.Descriptor instead.
 func (*UpdateProfileRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{9}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *UpdateProfileRequest) GetCurrentWorkplace() string {
@@ -1010,7 +814,7 @@ type LogoutRequest struct {
 
 func (x *LogoutRequest) Reset() {
 	*x = LogoutRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[10]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1022,7 +826,7 @@ func (x *LogoutRequest) String() string {
 func (*LogoutRequest) ProtoMessage() {}
 
 func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[10]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1035,7 +839,7 @@ func (x *LogoutRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LogoutRequest.ProtoReflect.Descriptor instead.
 func (*LogoutRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{10}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{9}
 }
 
 // BindTelegram links an existing account to a Telegram identity via challenge flow.
@@ -1049,7 +853,7 @@ type BindTelegramRequest struct {
 
 func (x *BindTelegramRequest) Reset() {
 	*x = BindTelegramRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[11]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1061,7 +865,7 @@ func (x *BindTelegramRequest) String() string {
 func (*BindTelegramRequest) ProtoMessage() {}
 
 func (x *BindTelegramRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[11]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1074,7 +878,7 @@ func (x *BindTelegramRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BindTelegramRequest.ProtoReflect.Descriptor instead.
 func (*BindTelegramRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{11}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *BindTelegramRequest) GetToken() string {
@@ -1100,7 +904,7 @@ type GetProfileProgressRequest struct {
 
 func (x *GetProfileProgressRequest) Reset() {
 	*x = GetProfileProgressRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[12]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1112,7 +916,7 @@ func (x *GetProfileProgressRequest) String() string {
 func (*GetProfileProgressRequest) ProtoMessage() {}
 
 func (x *GetProfileProgressRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[12]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1125,98 +929,10 @@ func (x *GetProfileProgressRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProfileProgressRequest.ProtoReflect.Descriptor instead.
 func (*GetProfileProgressRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{12}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetProfileProgressRequest) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-type GetAchievementsRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetAchievementsRequest) Reset() {
-	*x = GetAchievementsRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[13]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetAchievementsRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAchievementsRequest) ProtoMessage() {}
-
-func (x *GetAchievementsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[13]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAchievementsRequest.ProtoReflect.Descriptor instead.
-func (*GetAchievementsRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{13}
-}
-
-func (x *GetAchievementsRequest) GetUserId() string {
-	if x != nil {
-		return x.UserId
-	}
-	return ""
-}
-
-type GetProfileActivityRequest struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        string                 `protobuf:"bytes,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetProfileActivityRequest) Reset() {
-	*x = GetProfileActivityRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[14]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetProfileActivityRequest) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetProfileActivityRequest) ProtoMessage() {}
-
-func (x *GetProfileActivityRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[14]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetProfileActivityRequest.ProtoReflect.Descriptor instead.
-func (*GetProfileActivityRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{14}
-}
-
-func (x *GetProfileActivityRequest) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
@@ -1233,7 +949,7 @@ type SetUserGoalRequest struct {
 
 func (x *SetUserGoalRequest) Reset() {
 	*x = SetUserGoalRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[15]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1245,7 +961,7 @@ func (x *SetUserGoalRequest) String() string {
 func (*SetUserGoalRequest) ProtoMessage() {}
 
 func (x *SetUserGoalRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[15]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1258,7 +974,7 @@ func (x *SetUserGoalRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetUserGoalRequest.ProtoReflect.Descriptor instead.
 func (*SetUserGoalRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{15}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SetUserGoalRequest) GetKind() UserGoalKind {
@@ -1284,7 +1000,7 @@ type GetReadinessRequest struct {
 
 func (x *GetReadinessRequest) Reset() {
 	*x = GetReadinessRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[16]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1296,7 +1012,7 @@ func (x *GetReadinessRequest) String() string {
 func (*GetReadinessRequest) ProtoMessage() {}
 
 func (x *GetReadinessRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[16]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1309,7 +1025,7 @@ func (x *GetReadinessRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetReadinessRequest.ProtoReflect.Descriptor instead.
 func (*GetReadinessRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{16}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *GetReadinessRequest) GetUserId() string {
@@ -1328,7 +1044,7 @@ type SetUserGoalResponse struct {
 
 func (x *SetUserGoalResponse) Reset() {
 	*x = SetUserGoalResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[17]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1340,7 +1056,7 @@ func (x *SetUserGoalResponse) String() string {
 func (*SetUserGoalResponse) ProtoMessage() {}
 
 func (x *SetUserGoalResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[17]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1353,7 +1069,7 @@ func (x *SetUserGoalResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetUserGoalResponse.ProtoReflect.Descriptor instead.
 func (*SetUserGoalResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{17}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *SetUserGoalResponse) GetGoal() *UserGoal {
@@ -1380,7 +1096,7 @@ type GetReadinessResponse struct {
 
 func (x *GetReadinessResponse) Reset() {
 	*x = GetReadinessResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[18]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1392,7 +1108,7 @@ func (x *GetReadinessResponse) String() string {
 func (*GetReadinessResponse) ProtoMessage() {}
 
 func (x *GetReadinessResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[18]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1405,7 +1121,7 @@ func (x *GetReadinessResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetReadinessResponse.ProtoReflect.Descriptor instead.
 func (*GetReadinessResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{18}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *GetReadinessResponse) GetScore() int32 {
@@ -1484,7 +1200,7 @@ type ReadinessNextAction struct {
 
 func (x *ReadinessNextAction) Reset() {
 	*x = ReadinessNextAction{}
-	mi := &file_profile_v1_profile_proto_msgTypes[19]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1496,7 +1212,7 @@ func (x *ReadinessNextAction) String() string {
 func (*ReadinessNextAction) ProtoMessage() {}
 
 func (x *ReadinessNextAction) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[19]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1509,7 +1225,7 @@ func (x *ReadinessNextAction) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReadinessNextAction.ProtoReflect.Descriptor instead.
 func (*ReadinessNextAction) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{19}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *ReadinessNextAction) GetTitle() string {
@@ -1560,7 +1276,7 @@ type CompanyReadiness struct {
 
 func (x *CompanyReadiness) Reset() {
 	*x = CompanyReadiness{}
-	mi := &file_profile_v1_profile_proto_msgTypes[20]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1572,7 +1288,7 @@ func (x *CompanyReadiness) String() string {
 func (*CompanyReadiness) ProtoMessage() {}
 
 func (x *CompanyReadiness) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[20]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1585,7 +1301,7 @@ func (x *CompanyReadiness) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompanyReadiness.ProtoReflect.Descriptor instead.
 func (*CompanyReadiness) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{20}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *CompanyReadiness) GetCompany() string {
@@ -1633,7 +1349,7 @@ type ProfileStatusResponse struct {
 
 func (x *ProfileStatusResponse) Reset() {
 	*x = ProfileStatusResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[21]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1645,7 +1361,7 @@ func (x *ProfileStatusResponse) String() string {
 func (*ProfileStatusResponse) ProtoMessage() {}
 
 func (x *ProfileStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[21]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1658,7 +1374,7 @@ func (x *ProfileStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileStatusResponse.ProtoReflect.Descriptor instead.
 func (*ProfileStatusResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{21}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *ProfileStatusResponse) GetStatus() v1.OperationStatus {
@@ -1679,7 +1395,7 @@ type CreateTelegramAuthChallengeResponse struct {
 
 func (x *CreateTelegramAuthChallengeResponse) Reset() {
 	*x = CreateTelegramAuthChallengeResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[22]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1691,7 +1407,7 @@ func (x *CreateTelegramAuthChallengeResponse) String() string {
 func (*CreateTelegramAuthChallengeResponse) ProtoMessage() {}
 
 func (x *CreateTelegramAuthChallengeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[22]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1704,7 +1420,7 @@ func (x *CreateTelegramAuthChallengeResponse) ProtoReflect() protoreflect.Messag
 
 // Deprecated: Use CreateTelegramAuthChallengeResponse.ProtoReflect.Descriptor instead.
 func (*CreateTelegramAuthChallengeResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{22}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *CreateTelegramAuthChallengeResponse) GetToken() string {
@@ -1728,58 +1444,6 @@ func (x *CreateTelegramAuthChallengeResponse) GetExpiresAt() *timestamppb.Timest
 	return nil
 }
 
-type ConfirmTelegramAuthResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        v1.OperationStatus     `protobuf:"varint,1,opt,name=status,proto3,enum=common.v1.OperationStatus" json:"status,omitempty"`
-	Code          string                 `protobuf:"bytes,2,opt,name=code,proto3" json:"code,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ConfirmTelegramAuthResponse) Reset() {
-	*x = ConfirmTelegramAuthResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[23]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ConfirmTelegramAuthResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ConfirmTelegramAuthResponse) ProtoMessage() {}
-
-func (x *ConfirmTelegramAuthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[23]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ConfirmTelegramAuthResponse.ProtoReflect.Descriptor instead.
-func (*ConfirmTelegramAuthResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{23}
-}
-
-func (x *ConfirmTelegramAuthResponse) GetStatus() v1.OperationStatus {
-	if x != nil {
-		return x.Status
-	}
-	return v1.OperationStatus(0)
-}
-
-func (x *ConfirmTelegramAuthResponse) GetCode() string {
-	if x != nil {
-		return x.Code
-	}
-	return ""
-}
-
 type StartYandexAuthResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	State         string                 `protobuf:"bytes,1,opt,name=state,proto3" json:"state,omitempty"`
@@ -1791,7 +1455,7 @@ type StartYandexAuthResponse struct {
 
 func (x *StartYandexAuthResponse) Reset() {
 	*x = StartYandexAuthResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[24]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1803,7 +1467,7 @@ func (x *StartYandexAuthResponse) String() string {
 func (*StartYandexAuthResponse) ProtoMessage() {}
 
 func (x *StartYandexAuthResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[24]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1816,7 +1480,7 @@ func (x *StartYandexAuthResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StartYandexAuthResponse.ProtoReflect.Descriptor instead.
 func (*StartYandexAuthResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{24}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *StartYandexAuthResponse) GetState() string {
@@ -1850,7 +1514,7 @@ type ProfileResponse struct {
 
 func (x *ProfileResponse) Reset() {
 	*x = ProfileResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[25]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1862,7 +1526,7 @@ func (x *ProfileResponse) String() string {
 func (*ProfileResponse) ProtoMessage() {}
 
 func (x *ProfileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[25]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1875,7 +1539,7 @@ func (x *ProfileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileResponse.ProtoReflect.Descriptor instead.
 func (*ProfileResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{25}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *ProfileResponse) GetUser() *User {
@@ -1915,7 +1579,7 @@ type ProfileProgressOverview struct {
 
 func (x *ProfileProgressOverview) Reset() {
 	*x = ProfileProgressOverview{}
-	mi := &file_profile_v1_profile_proto_msgTypes[26]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1927,7 +1591,7 @@ func (x *ProfileProgressOverview) String() string {
 func (*ProfileProgressOverview) ProtoMessage() {}
 
 func (x *ProfileProgressOverview) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[26]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1940,7 +1604,7 @@ func (x *ProfileProgressOverview) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileProgressOverview.ProtoReflect.Descriptor instead.
 func (*ProfileProgressOverview) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{26}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *ProfileProgressOverview) GetPracticeSessions() int32 {
@@ -2072,7 +1736,7 @@ type ProfileCompetency struct {
 
 func (x *ProfileCompetency) Reset() {
 	*x = ProfileCompetency{}
-	mi := &file_profile_v1_profile_proto_msgTypes[27]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2084,7 +1748,7 @@ func (x *ProfileCompetency) String() string {
 func (*ProfileCompetency) ProtoMessage() {}
 
 func (x *ProfileCompetency) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[27]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2097,7 +1761,7 @@ func (x *ProfileCompetency) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileCompetency.ProtoReflect.Descriptor instead.
 func (*ProfileCompetency) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{27}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *ProfileCompetency) GetKey() string {
@@ -2224,7 +1888,7 @@ type ProfileProgressRecommendation struct {
 
 func (x *ProfileProgressRecommendation) Reset() {
 	*x = ProfileProgressRecommendation{}
-	mi := &file_profile_v1_profile_proto_msgTypes[28]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2236,7 +1900,7 @@ func (x *ProfileProgressRecommendation) String() string {
 func (*ProfileProgressRecommendation) ProtoMessage() {}
 
 func (x *ProfileProgressRecommendation) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[28]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2249,7 +1913,7 @@ func (x *ProfileProgressRecommendation) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileProgressRecommendation.ProtoReflect.Descriptor instead.
 func (*ProfileProgressRecommendation) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{28}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *ProfileProgressRecommendation) GetKey() string {
@@ -2295,7 +1959,7 @@ type ProfileCheckpointProgress struct {
 
 func (x *ProfileCheckpointProgress) Reset() {
 	*x = ProfileCheckpointProgress{}
-	mi := &file_profile_v1_profile_proto_msgTypes[29]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2307,7 +1971,7 @@ func (x *ProfileCheckpointProgress) String() string {
 func (*ProfileCheckpointProgress) ProtoMessage() {}
 
 func (x *ProfileCheckpointProgress) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[29]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2320,7 +1984,7 @@ func (x *ProfileCheckpointProgress) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileCheckpointProgress.ProtoReflect.Descriptor instead.
 func (*ProfileCheckpointProgress) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{29}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *ProfileCheckpointProgress) GetId() string {
@@ -2386,7 +2050,7 @@ type NextAction struct {
 
 func (x *NextAction) Reset() {
 	*x = NextAction{}
-	mi := &file_profile_v1_profile_proto_msgTypes[30]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2398,7 +2062,7 @@ func (x *NextAction) String() string {
 func (*NextAction) ProtoMessage() {}
 
 func (x *NextAction) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[30]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2411,7 +2075,7 @@ func (x *NextAction) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NextAction.ProtoReflect.Descriptor instead.
 func (*NextAction) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{30}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *NextAction) GetTitle() string {
@@ -2466,7 +2130,7 @@ type UserGoal struct {
 
 func (x *UserGoal) Reset() {
 	*x = UserGoal{}
-	mi := &file_profile_v1_profile_proto_msgTypes[31]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2478,7 +2142,7 @@ func (x *UserGoal) String() string {
 func (*UserGoal) ProtoMessage() {}
 
 func (x *UserGoal) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[31]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2491,7 +2155,7 @@ func (x *UserGoal) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UserGoal.ProtoReflect.Descriptor instead.
 func (*UserGoal) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{31}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *UserGoal) GetKind() UserGoalKind {
@@ -2525,7 +2189,7 @@ type ProfileProgress struct {
 
 func (x *ProfileProgress) Reset() {
 	*x = ProfileProgress{}
-	mi := &file_profile_v1_profile_proto_msgTypes[32]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2537,7 +2201,7 @@ func (x *ProfileProgress) String() string {
 func (*ProfileProgress) ProtoMessage() {}
 
 func (x *ProfileProgress) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[32]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2550,7 +2214,7 @@ func (x *ProfileProgress) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileProgress.ProtoReflect.Descriptor instead.
 func (*ProfileProgress) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{32}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ProfileProgress) GetOverview() *ProfileProgressOverview {
@@ -2625,7 +2289,7 @@ type ProfileProgressResponse struct {
 
 func (x *ProfileProgressResponse) Reset() {
 	*x = ProfileProgressResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[33]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2637,7 +2301,7 @@ func (x *ProfileProgressResponse) String() string {
 func (*ProfileProgressResponse) ProtoMessage() {}
 
 func (x *ProfileProgressResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[33]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2650,7 +2314,7 @@ func (x *ProfileProgressResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ProfileProgressResponse.ProtoReflect.Descriptor instead.
 func (*ProfileProgressResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{33}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *ProfileProgressResponse) GetProgress() *ProfileProgress {
@@ -2658,114 +2322,6 @@ func (x *ProfileProgressResponse) GetProgress() *ProfileProgress {
 		return x.Progress
 	}
 	return nil
-}
-
-type Achievement struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Title         string                 `protobuf:"bytes,2,opt,name=title,proto3" json:"title,omitempty"`
-	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	Icon          string                 `protobuf:"bytes,4,opt,name=icon,proto3" json:"icon,omitempty"`
-	Unlocked      bool                   `protobuf:"varint,5,opt,name=unlocked,proto3" json:"unlocked,omitempty"`
-	Category      AchievementCategory    `protobuf:"varint,6,opt,name=category,proto3,enum=profile.v1.AchievementCategory" json:"category,omitempty"`
-	Tier          AchievementTier        `protobuf:"varint,7,opt,name=tier,proto3,enum=profile.v1.AchievementTier" json:"tier,omitempty"`
-	Progress      int32                  `protobuf:"varint,8,opt,name=progress,proto3" json:"progress,omitempty"`
-	Target        int32                  `protobuf:"varint,9,opt,name=target,proto3" json:"target,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *Achievement) Reset() {
-	*x = Achievement{}
-	mi := &file_profile_v1_profile_proto_msgTypes[34]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *Achievement) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*Achievement) ProtoMessage() {}
-
-func (x *Achievement) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[34]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use Achievement.ProtoReflect.Descriptor instead.
-func (*Achievement) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{34}
-}
-
-func (x *Achievement) GetId() string {
-	if x != nil {
-		return x.Id
-	}
-	return ""
-}
-
-func (x *Achievement) GetTitle() string {
-	if x != nil {
-		return x.Title
-	}
-	return ""
-}
-
-func (x *Achievement) GetDescription() string {
-	if x != nil {
-		return x.Description
-	}
-	return ""
-}
-
-func (x *Achievement) GetIcon() string {
-	if x != nil {
-		return x.Icon
-	}
-	return ""
-}
-
-func (x *Achievement) GetUnlocked() bool {
-	if x != nil {
-		return x.Unlocked
-	}
-	return false
-}
-
-func (x *Achievement) GetCategory() AchievementCategory {
-	if x != nil {
-		return x.Category
-	}
-	return AchievementCategory_ACHIEVEMENT_CATEGORY_UNSPECIFIED
-}
-
-func (x *Achievement) GetTier() AchievementTier {
-	if x != nil {
-		return x.Tier
-	}
-	return AchievementTier_ACHIEVEMENT_TIER_UNSPECIFIED
-}
-
-func (x *Achievement) GetProgress() int32 {
-	if x != nil {
-		return x.Progress
-	}
-	return 0
-}
-
-func (x *Achievement) GetTarget() int32 {
-	if x != nil {
-		return x.Target
-	}
-	return 0
 }
 
 type FeedItem struct {
@@ -2781,7 +2337,7 @@ type FeedItem struct {
 
 func (x *FeedItem) Reset() {
 	*x = FeedItem{}
-	mi := &file_profile_v1_profile_proto_msgTypes[35]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2793,7 +2349,7 @@ func (x *FeedItem) String() string {
 func (*FeedItem) ProtoMessage() {}
 
 func (x *FeedItem) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[35]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2806,7 +2362,7 @@ func (x *FeedItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FeedItem.ProtoReflect.Descriptor instead.
 func (*FeedItem) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{35}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *FeedItem) GetType() FeedItemType {
@@ -2854,7 +2410,7 @@ type GetProfileFeedRequest struct {
 
 func (x *GetProfileFeedRequest) Reset() {
 	*x = GetProfileFeedRequest{}
-	mi := &file_profile_v1_profile_proto_msgTypes[36]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2866,7 +2422,7 @@ func (x *GetProfileFeedRequest) String() string {
 func (*GetProfileFeedRequest) ProtoMessage() {}
 
 func (x *GetProfileFeedRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[36]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2879,7 +2435,7 @@ func (x *GetProfileFeedRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProfileFeedRequest.ProtoReflect.Descriptor instead.
 func (*GetProfileFeedRequest) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{36}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *GetProfileFeedRequest) GetUserId() string {
@@ -2905,7 +2461,7 @@ type GetProfileFeedResponse struct {
 
 func (x *GetProfileFeedResponse) Reset() {
 	*x = GetProfileFeedResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[37]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2917,7 +2473,7 @@ func (x *GetProfileFeedResponse) String() string {
 func (*GetProfileFeedResponse) ProtoMessage() {}
 
 func (x *GetProfileFeedResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[37]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2930,152 +2486,12 @@ func (x *GetProfileFeedResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetProfileFeedResponse.ProtoReflect.Descriptor instead.
 func (*GetProfileFeedResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{37}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *GetProfileFeedResponse) GetItems() []*FeedItem {
 	if x != nil {
 		return x.Items
-	}
-	return nil
-}
-
-type GetAchievementsResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Achievements  []*Achievement         `protobuf:"bytes,1,rep,name=achievements,proto3" json:"achievements,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetAchievementsResponse) Reset() {
-	*x = GetAchievementsResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[38]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetAchievementsResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetAchievementsResponse) ProtoMessage() {}
-
-func (x *GetAchievementsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[38]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetAchievementsResponse.ProtoReflect.Descriptor instead.
-func (*GetAchievementsResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{38}
-}
-
-func (x *GetAchievementsResponse) GetAchievements() []*Achievement {
-	if x != nil {
-		return x.Achievements
-	}
-	return nil
-}
-
-type ActivityDay struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Date          string                 `protobuf:"bytes,1,opt,name=date,proto3" json:"date,omitempty"`
-	Count         int32                  `protobuf:"varint,2,opt,name=count,proto3" json:"count,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *ActivityDay) Reset() {
-	*x = ActivityDay{}
-	mi := &file_profile_v1_profile_proto_msgTypes[39]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *ActivityDay) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*ActivityDay) ProtoMessage() {}
-
-func (x *ActivityDay) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[39]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use ActivityDay.ProtoReflect.Descriptor instead.
-func (*ActivityDay) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{39}
-}
-
-func (x *ActivityDay) GetDate() string {
-	if x != nil {
-		return x.Date
-	}
-	return ""
-}
-
-func (x *ActivityDay) GetCount() int32 {
-	if x != nil {
-		return x.Count
-	}
-	return 0
-}
-
-type GetProfileActivityResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Activity      []*ActivityDay         `protobuf:"bytes,1,rep,name=activity,proto3" json:"activity,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetProfileActivityResponse) Reset() {
-	*x = GetProfileActivityResponse{}
-	mi := &file_profile_v1_profile_proto_msgTypes[40]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetProfileActivityResponse) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetProfileActivityResponse) ProtoMessage() {}
-
-func (x *GetProfileActivityResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[40]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetProfileActivityResponse.ProtoReflect.Descriptor instead.
-func (*GetProfileActivityResponse) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{40}
-}
-
-func (x *GetProfileActivityResponse) GetActivity() []*ActivityDay {
-	if x != nil {
-		return x.Activity
 	}
 	return nil
 }
@@ -3105,7 +2521,7 @@ type User struct {
 
 func (x *User) Reset() {
 	*x = User{}
-	mi := &file_profile_v1_profile_proto_msgTypes[41]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[33]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3117,7 +2533,7 @@ func (x *User) String() string {
 func (*User) ProtoMessage() {}
 
 func (x *User) ProtoReflect() protoreflect.Message {
-	mi := &file_profile_v1_profile_proto_msgTypes[41]
+	mi := &file_core_profile_v1_profile_proto_msgTypes[33]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3130,7 +2546,7 @@ func (x *User) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use User.ProtoReflect.Descriptor instead.
 func (*User) Descriptor() ([]byte, []int) {
-	return file_profile_v1_profile_proto_rawDescGZIP(), []int{41}
+	return file_core_profile_v1_profile_proto_rawDescGZIP(), []int{33}
 }
 
 func (x *User) GetId() string {
@@ -3252,23 +2668,13 @@ func (x *User) GetPinnedAchievements() []string {
 	return nil
 }
 
-var File_profile_v1_profile_proto protoreflect.FileDescriptor
+var File_core_profile_v1_profile_proto protoreflect.FileDescriptor
 
-const file_profile_v1_profile_proto_rawDesc = "" +
+const file_core_profile_v1_profile_proto_rawDesc = "" +
 	"\n" +
-	"\x18profile/v1/profile.proto\x12\n" +
-	"profile.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16common/v1/common.proto\"$\n" +
-	"\"CreateTelegramAuthChallengeRequest\"\xe5\x01\n" +
-	"\x1aConfirmTelegramAuthRequest\x12\x14\n" +
-	"\x05token\x18\x01 \x01(\tR\x05token\x12\x1b\n" +
-	"\tbot_token\x18\x02 \x01(\tR\bbotToken\x12\x1f\n" +
-	"\vtelegram_id\x18\x03 \x01(\x03R\n" +
-	"telegramId\x12\x1d\n" +
-	"\n" +
-	"first_name\x18\x04 \x01(\tR\tfirstName\x12\x1b\n" +
-	"\tlast_name\x18\x05 \x01(\tR\blastName\x12\x1a\n" +
-	"\busername\x18\x06 \x01(\tR\busername\x12\x1b\n" +
-	"\tphoto_url\x18\a \x01(\tR\bphotoUrl\"?\n" +
+	"\x1dcore/profile/v1/profile.proto\x12\n" +
+	"profile.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bcore/common/v1/common.proto\"$\n" +
+	"\"CreateTelegramAuthChallengeRequest\"?\n" +
 	"\x13TelegramAuthRequest\x12\x14\n" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\tR\x04code\"\x18\n" +
@@ -3298,10 +2704,6 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\x12\n" +
 	"\x04code\x18\x02 \x01(\tR\x04code\"4\n" +
 	"\x19GetProfileProgressRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"1\n" +
-	"\x16GetAchievementsRequest\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\tR\x06userId\"4\n" +
-	"\x19GetProfileActivityRequest\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\"\\\n" +
 	"\x12SetUserGoalRequest\x12,\n" +
 	"\x04kind\x18\x01 \x01(\x0e2\x18.profile.v1.UserGoalKindR\x04kind\x12\x18\n" +
@@ -3345,10 +2747,7 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\x05token\x18\x01 \x01(\tR\x05token\x12\"\n" +
 	"\rbot_start_url\x18\x02 \x01(\tR\vbotStartUrl\x129\n" +
 	"\n" +
-	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"e\n" +
-	"\x1bConfirmTelegramAuthResponse\x122\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x1a.common.v1.OperationStatusR\x06status\x12\x12\n" +
-	"\x04code\x18\x02 \x01(\tR\x04code\"\x85\x01\n" +
+	"expires_at\x18\x03 \x01(\v2\x1a.google.protobuf.TimestampR\texpiresAt\"\x85\x01\n" +
 	"\x17StartYandexAuthResponse\x12\x14\n" +
 	"\x05state\x18\x01 \x01(\tR\x05state\x12\x19\n" +
 	"\bauth_url\x18\x02 \x01(\tR\aauthUrl\x129\n" +
@@ -3435,17 +2834,7 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\fnext_actions\x18\b \x03(\v2\x16.profile.v1.NextActionR\vnextActions\x12(\n" +
 	"\x04goal\x18\t \x01(\v2\x14.profile.v1.UserGoalR\x04goal\"R\n" +
 	"\x17ProfileProgressResponse\x127\n" +
-	"\bprogress\x18\x01 \x01(\v2\x1b.profile.v1.ProfileProgressR\bprogress\"\xa7\x02\n" +
-	"\vAchievement\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\x12\x14\n" +
-	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x12\n" +
-	"\x04icon\x18\x04 \x01(\tR\x04icon\x12\x1a\n" +
-	"\bunlocked\x18\x05 \x01(\bR\bunlocked\x12;\n" +
-	"\bcategory\x18\x06 \x01(\x0e2\x1f.profile.v1.AchievementCategoryR\bcategory\x12/\n" +
-	"\x04tier\x18\a \x01(\x0e2\x1b.profile.v1.AchievementTierR\x04tier\x12\x1a\n" +
-	"\bprogress\x18\b \x01(\x05R\bprogress\x12\x16\n" +
-	"\x06target\x18\t \x01(\x05R\x06target\"\xc0\x01\n" +
+	"\bprogress\x18\x01 \x01(\v2\x1b.profile.v1.ProfileProgressR\bprogress\"\xc0\x01\n" +
 	"\bFeedItem\x12,\n" +
 	"\x04type\x18\x01 \x01(\x0e2\x18.profile.v1.FeedItemTypeR\x04type\x12\x14\n" +
 	"\x05title\x18\x02 \x01(\tR\x05title\x12 \n" +
@@ -3456,14 +2845,7 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\tR\x06userId\x12\x14\n" +
 	"\x05limit\x18\x02 \x01(\x05R\x05limit\"D\n" +
 	"\x16GetProfileFeedResponse\x12*\n" +
-	"\x05items\x18\x01 \x03(\v2\x14.profile.v1.FeedItemR\x05items\"V\n" +
-	"\x17GetAchievementsResponse\x12;\n" +
-	"\fachievements\x18\x01 \x03(\v2\x17.profile.v1.AchievementR\fachievements\"7\n" +
-	"\vActivityDay\x12\x12\n" +
-	"\x04date\x18\x01 \x01(\tR\x04date\x12\x14\n" +
-	"\x05count\x18\x02 \x01(\x05R\x05count\"Q\n" +
-	"\x1aGetProfileActivityResponse\x123\n" +
-	"\bactivity\x18\x01 \x03(\v2\x17.profile.v1.ActivityDayR\bactivity\"\x83\x05\n" +
+	"\x05items\x18\x01 \x03(\v2\x14.profile.v1.FeedItemR\x05items\"\x83\x05\n" +
 	"\x04User\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x1a\n" +
 	"\busername\x18\x02 \x01(\tR\busername\x12\x1d\n" +
@@ -3517,24 +2899,13 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"!PROFILE_COMPETENCY_LEVEL_BEGINNER\x10\x01\x12&\n" +
 	"\"PROFILE_COMPETENCY_LEVEL_CONFIDENT\x10\x02\x12#\n" +
 	"\x1fPROFILE_COMPETENCY_LEVEL_STRONG\x10\x03\x12#\n" +
-	"\x1fPROFILE_COMPETENCY_LEVEL_EXPERT\x10\x04*\x7f\n" +
-	"\x13AchievementCategory\x12$\n" +
-	" ACHIEVEMENT_CATEGORY_UNSPECIFIED\x10\x00\x12!\n" +
-	"\x1dACHIEVEMENT_CATEGORY_PRACTICE\x10\x01\x12\x1f\n" +
-	"\x1bACHIEVEMENT_CATEGORY_STREAK\x10\x02*\xa6\x01\n" +
-	"\x0fAchievementTier\x12 \n" +
-	"\x1cACHIEVEMENT_TIER_UNSPECIFIED\x10\x00\x12\x1b\n" +
-	"\x17ACHIEVEMENT_TIER_BRONZE\x10\x01\x12\x1b\n" +
-	"\x17ACHIEVEMENT_TIER_SILVER\x10\x02\x12\x19\n" +
-	"\x15ACHIEVEMENT_TIER_GOLD\x10\x03\x12\x1c\n" +
-	"\x18ACHIEVEMENT_TIER_DIAMOND\x10\x04*j\n" +
+	"\x1fPROFILE_COMPETENCY_LEVEL_EXPERT\x10\x04*j\n" +
 	"\fFeedItemType\x12\x1e\n" +
 	"\x1aFEED_ITEM_TYPE_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19FEED_ITEM_TYPE_MOCK_STAGE\x10\x01\x12\x1b\n" +
-	"\x17FEED_ITEM_TYPE_PRACTICE\x10\x022\xbe\x12\n" +
+	"\x17FEED_ITEM_TYPE_PRACTICE\x10\x022\x84\x0f\n" +
 	"\x0eProfileService\x12\xb2\x01\n" +
-	"\x1bCreateTelegramAuthChallenge\x12..profile.v1.CreateTelegramAuthChallengeRequest\x1a/.profile.v1.CreateTelegramAuthChallengeResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/profile/auth/telegram/challenge\x12\x98\x01\n" +
-	"\x13ConfirmTelegramAuth\x12&.profile.v1.ConfirmTelegramAuthRequest\x1a'.profile.v1.ConfirmTelegramAuthResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/profile/auth/telegram/confirm\x12v\n" +
+	"\x1bCreateTelegramAuthChallenge\x12..profile.v1.CreateTelegramAuthChallengeRequest\x1a/.profile.v1.CreateTelegramAuthChallengeResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/profile/auth/telegram/challenge\x12v\n" +
 	"\fTelegramAuth\x12\x1f.profile.v1.TelegramAuthRequest\x1a\x1b.profile.v1.ProfileResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/profile/auth/telegram\x12\x85\x01\n" +
 	"\x0fStartYandexAuth\x12\".profile.v1.StartYandexAuthRequest\x1a#.profile.v1.StartYandexAuthResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/profile/auth/yandex/start\x12v\n" +
 	"\n" +
@@ -3547,184 +2918,161 @@ const file_profile_v1_profile_proto_rawDesc = "" +
 	"\rUpdateProfile\x12 .profile.v1.UpdateProfileRequest\x1a\x1b.profile.v1.ProfileResponse\"!\x82\xd3\xe4\x93\x02\x1b:\x01*\"\x16/api/v1/profile/update\x12n\n" +
 	"\x06Logout\x12\x19.profile.v1.LogoutRequest\x1a!.profile.v1.ProfileStatusResponse\"&\x82\xd3\xe4\x93\x02 :\x01*\"\x1b/api/v1/profile/auth/logout\x12|\n" +
 	"\fBindTelegram\x12\x1f.profile.v1.BindTelegramRequest\x1a!.profile.v1.ProfileStatusResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/profile/bind-telegram\x12\x8c\x01\n" +
-	"\x12GetProfileProgress\x12%.profile.v1.GetProfileProgressRequest\x1a#.profile.v1.ProfileProgressResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/profile/{user_id}/progress\x12\x8a\x01\n" +
-	"\x0fGetAchievements\x12\".profile.v1.GetAchievementsRequest\x1a#.profile.v1.GetAchievementsResponse\".\x82\xd3\xe4\x93\x02(\x12&/api/v1/profile/{user_id}/achievements\x12\x8f\x01\n" +
-	"\x12GetProfileActivity\x12%.profile.v1.GetProfileActivityRequest\x1a&.profile.v1.GetProfileActivityResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/profile/{user_id}/activity\x12o\n" +
+	"\x12GetProfileProgress\x12%.profile.v1.GetProfileProgressRequest\x1a#.profile.v1.ProfileProgressResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/profile/{user_id}/progress\x12o\n" +
 	"\vSetUserGoal\x12\x1e.profile.v1.SetUserGoalRequest\x1a\x1f.profile.v1.SetUserGoalResponse\"\x1f\x82\xd3\xe4\x93\x02\x19:\x01*\"\x14/api/v1/profile/goal\x12~\n" +
 	"\fGetReadiness\x12\x1f.profile.v1.GetReadinessRequest\x1a .profile.v1.GetReadinessResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1/profile/{user_id}/readiness\x12\x7f\n" +
 	"\x0eGetProfileFeed\x12!.profile.v1.GetProfileFeedRequest\x1a\".profile.v1.GetProfileFeedResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/profile/{user_id}/feedB\x1bZ\x19api/pkg/api/profile/v1;v1b\x06proto3"
 
 var (
-	file_profile_v1_profile_proto_rawDescOnce sync.Once
-	file_profile_v1_profile_proto_rawDescData []byte
+	file_core_profile_v1_profile_proto_rawDescOnce sync.Once
+	file_core_profile_v1_profile_proto_rawDescData []byte
 )
 
-func file_profile_v1_profile_proto_rawDescGZIP() []byte {
-	file_profile_v1_profile_proto_rawDescOnce.Do(func() {
-		file_profile_v1_profile_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_profile_v1_profile_proto_rawDesc), len(file_profile_v1_profile_proto_rawDesc)))
+func file_core_profile_v1_profile_proto_rawDescGZIP() []byte {
+	file_core_profile_v1_profile_proto_rawDescOnce.Do(func() {
+		file_core_profile_v1_profile_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_core_profile_v1_profile_proto_rawDesc), len(file_core_profile_v1_profile_proto_rawDesc)))
 	})
-	return file_profile_v1_profile_proto_rawDescData
+	return file_core_profile_v1_profile_proto_rawDescData
 }
 
-var file_profile_v1_profile_proto_enumTypes = make([]protoimpl.EnumInfo, 8)
-var file_profile_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 42)
-var file_profile_v1_profile_proto_goTypes = []any{
+var file_core_profile_v1_profile_proto_enumTypes = make([]protoimpl.EnumInfo, 6)
+var file_core_profile_v1_profile_proto_msgTypes = make([]protoimpl.MessageInfo, 34)
+var file_core_profile_v1_profile_proto_goTypes = []any{
 	(UserGoalKind)(0),                           // 0: profile.v1.UserGoalKind
 	(ReadinessLevel)(0),                         // 1: profile.v1.ReadinessLevel
 	(ProfileActionType)(0),                      // 2: profile.v1.ProfileActionType
 	(ProfileCompetencyConfidence)(0),            // 3: profile.v1.ProfileCompetencyConfidence
 	(ProfileCompetencyLevel)(0),                 // 4: profile.v1.ProfileCompetencyLevel
-	(AchievementCategory)(0),                    // 5: profile.v1.AchievementCategory
-	(AchievementTier)(0),                        // 6: profile.v1.AchievementTier
-	(FeedItemType)(0),                           // 7: profile.v1.FeedItemType
-	(*CreateTelegramAuthChallengeRequest)(nil),  // 8: profile.v1.CreateTelegramAuthChallengeRequest
-	(*ConfirmTelegramAuthRequest)(nil),          // 9: profile.v1.ConfirmTelegramAuthRequest
-	(*TelegramAuthRequest)(nil),                 // 10: profile.v1.TelegramAuthRequest
-	(*StartYandexAuthRequest)(nil),              // 11: profile.v1.StartYandexAuthRequest
-	(*YandexAuthRequest)(nil),                   // 12: profile.v1.YandexAuthRequest
-	(*CompleteRegistrationRequest)(nil),         // 13: profile.v1.CompleteRegistrationRequest
-	(*GetProfileRequest)(nil),                   // 14: profile.v1.GetProfileRequest
-	(*GetProfileByIDRequest)(nil),               // 15: profile.v1.GetProfileByIDRequest
-	(*UpdateLocationRequest)(nil),               // 16: profile.v1.UpdateLocationRequest
-	(*UpdateProfileRequest)(nil),                // 17: profile.v1.UpdateProfileRequest
-	(*LogoutRequest)(nil),                       // 18: profile.v1.LogoutRequest
-	(*BindTelegramRequest)(nil),                 // 19: profile.v1.BindTelegramRequest
-	(*GetProfileProgressRequest)(nil),           // 20: profile.v1.GetProfileProgressRequest
-	(*GetAchievementsRequest)(nil),              // 21: profile.v1.GetAchievementsRequest
-	(*GetProfileActivityRequest)(nil),           // 22: profile.v1.GetProfileActivityRequest
-	(*SetUserGoalRequest)(nil),                  // 23: profile.v1.SetUserGoalRequest
-	(*GetReadinessRequest)(nil),                 // 24: profile.v1.GetReadinessRequest
-	(*SetUserGoalResponse)(nil),                 // 25: profile.v1.SetUserGoalResponse
-	(*GetReadinessResponse)(nil),                // 26: profile.v1.GetReadinessResponse
-	(*ReadinessNextAction)(nil),                 // 27: profile.v1.ReadinessNextAction
-	(*CompanyReadiness)(nil),                    // 28: profile.v1.CompanyReadiness
-	(*ProfileStatusResponse)(nil),               // 29: profile.v1.ProfileStatusResponse
-	(*CreateTelegramAuthChallengeResponse)(nil), // 30: profile.v1.CreateTelegramAuthChallengeResponse
-	(*ConfirmTelegramAuthResponse)(nil),         // 31: profile.v1.ConfirmTelegramAuthResponse
-	(*StartYandexAuthResponse)(nil),             // 32: profile.v1.StartYandexAuthResponse
-	(*ProfileResponse)(nil),                     // 33: profile.v1.ProfileResponse
-	(*ProfileProgressOverview)(nil),             // 34: profile.v1.ProfileProgressOverview
-	(*ProfileCompetency)(nil),                   // 35: profile.v1.ProfileCompetency
-	(*ProfileProgressRecommendation)(nil),       // 36: profile.v1.ProfileProgressRecommendation
-	(*ProfileCheckpointProgress)(nil),           // 37: profile.v1.ProfileCheckpointProgress
-	(*NextAction)(nil),                          // 38: profile.v1.NextAction
-	(*UserGoal)(nil),                            // 39: profile.v1.UserGoal
-	(*ProfileProgress)(nil),                     // 40: profile.v1.ProfileProgress
-	(*ProfileProgressResponse)(nil),             // 41: profile.v1.ProfileProgressResponse
-	(*Achievement)(nil),                         // 42: profile.v1.Achievement
-	(*FeedItem)(nil),                            // 43: profile.v1.FeedItem
-	(*GetProfileFeedRequest)(nil),               // 44: profile.v1.GetProfileFeedRequest
-	(*GetProfileFeedResponse)(nil),              // 45: profile.v1.GetProfileFeedResponse
-	(*GetAchievementsResponse)(nil),             // 46: profile.v1.GetAchievementsResponse
-	(*ActivityDay)(nil),                         // 47: profile.v1.ActivityDay
-	(*GetProfileActivityResponse)(nil),          // 48: profile.v1.GetProfileActivityResponse
-	(*User)(nil),                                // 49: profile.v1.User
-	(v1.OperationStatus)(0),                     // 50: common.v1.OperationStatus
-	(*timestamppb.Timestamp)(nil),               // 51: google.protobuf.Timestamp
-	(v1.UserActivityStatus)(0),                  // 52: common.v1.UserActivityStatus
+	(FeedItemType)(0),                           // 5: profile.v1.FeedItemType
+	(*CreateTelegramAuthChallengeRequest)(nil),  // 6: profile.v1.CreateTelegramAuthChallengeRequest
+	(*TelegramAuthRequest)(nil),                 // 7: profile.v1.TelegramAuthRequest
+	(*StartYandexAuthRequest)(nil),              // 8: profile.v1.StartYandexAuthRequest
+	(*YandexAuthRequest)(nil),                   // 9: profile.v1.YandexAuthRequest
+	(*CompleteRegistrationRequest)(nil),         // 10: profile.v1.CompleteRegistrationRequest
+	(*GetProfileRequest)(nil),                   // 11: profile.v1.GetProfileRequest
+	(*GetProfileByIDRequest)(nil),               // 12: profile.v1.GetProfileByIDRequest
+	(*UpdateLocationRequest)(nil),               // 13: profile.v1.UpdateLocationRequest
+	(*UpdateProfileRequest)(nil),                // 14: profile.v1.UpdateProfileRequest
+	(*LogoutRequest)(nil),                       // 15: profile.v1.LogoutRequest
+	(*BindTelegramRequest)(nil),                 // 16: profile.v1.BindTelegramRequest
+	(*GetProfileProgressRequest)(nil),           // 17: profile.v1.GetProfileProgressRequest
+	(*SetUserGoalRequest)(nil),                  // 18: profile.v1.SetUserGoalRequest
+	(*GetReadinessRequest)(nil),                 // 19: profile.v1.GetReadinessRequest
+	(*SetUserGoalResponse)(nil),                 // 20: profile.v1.SetUserGoalResponse
+	(*GetReadinessResponse)(nil),                // 21: profile.v1.GetReadinessResponse
+	(*ReadinessNextAction)(nil),                 // 22: profile.v1.ReadinessNextAction
+	(*CompanyReadiness)(nil),                    // 23: profile.v1.CompanyReadiness
+	(*ProfileStatusResponse)(nil),               // 24: profile.v1.ProfileStatusResponse
+	(*CreateTelegramAuthChallengeResponse)(nil), // 25: profile.v1.CreateTelegramAuthChallengeResponse
+	(*StartYandexAuthResponse)(nil),             // 26: profile.v1.StartYandexAuthResponse
+	(*ProfileResponse)(nil),                     // 27: profile.v1.ProfileResponse
+	(*ProfileProgressOverview)(nil),             // 28: profile.v1.ProfileProgressOverview
+	(*ProfileCompetency)(nil),                   // 29: profile.v1.ProfileCompetency
+	(*ProfileProgressRecommendation)(nil),       // 30: profile.v1.ProfileProgressRecommendation
+	(*ProfileCheckpointProgress)(nil),           // 31: profile.v1.ProfileCheckpointProgress
+	(*NextAction)(nil),                          // 32: profile.v1.NextAction
+	(*UserGoal)(nil),                            // 33: profile.v1.UserGoal
+	(*ProfileProgress)(nil),                     // 34: profile.v1.ProfileProgress
+	(*ProfileProgressResponse)(nil),             // 35: profile.v1.ProfileProgressResponse
+	(*FeedItem)(nil),                            // 36: profile.v1.FeedItem
+	(*GetProfileFeedRequest)(nil),               // 37: profile.v1.GetProfileFeedRequest
+	(*GetProfileFeedResponse)(nil),              // 38: profile.v1.GetProfileFeedResponse
+	(*User)(nil),                                // 39: profile.v1.User
+	(v1.OperationStatus)(0),                     // 40: common.v1.OperationStatus
+	(*timestamppb.Timestamp)(nil),               // 41: google.protobuf.Timestamp
+	(v1.UserActivityStatus)(0),                  // 42: common.v1.UserActivityStatus
 }
-var file_profile_v1_profile_proto_depIdxs = []int32{
+var file_core_profile_v1_profile_proto_depIdxs = []int32{
 	0,  // 0: profile.v1.SetUserGoalRequest.kind:type_name -> profile.v1.UserGoalKind
-	39, // 1: profile.v1.SetUserGoalResponse.goal:type_name -> profile.v1.UserGoal
+	33, // 1: profile.v1.SetUserGoalResponse.goal:type_name -> profile.v1.UserGoal
 	1,  // 2: profile.v1.GetReadinessResponse.level:type_name -> profile.v1.ReadinessLevel
-	35, // 3: profile.v1.GetReadinessResponse.weakest_skill:type_name -> profile.v1.ProfileCompetency
-	35, // 4: profile.v1.GetReadinessResponse.strongest_skill:type_name -> profile.v1.ProfileCompetency
-	27, // 5: profile.v1.GetReadinessResponse.next_action:type_name -> profile.v1.ReadinessNextAction
-	28, // 6: profile.v1.GetReadinessResponse.company_readiness:type_name -> profile.v1.CompanyReadiness
+	29, // 3: profile.v1.GetReadinessResponse.weakest_skill:type_name -> profile.v1.ProfileCompetency
+	29, // 4: profile.v1.GetReadinessResponse.strongest_skill:type_name -> profile.v1.ProfileCompetency
+	22, // 5: profile.v1.GetReadinessResponse.next_action:type_name -> profile.v1.ReadinessNextAction
+	23, // 6: profile.v1.GetReadinessResponse.company_readiness:type_name -> profile.v1.CompanyReadiness
 	2,  // 7: profile.v1.ReadinessNextAction.action_type:type_name -> profile.v1.ProfileActionType
-	50, // 8: profile.v1.ProfileStatusResponse.status:type_name -> common.v1.OperationStatus
-	51, // 9: profile.v1.CreateTelegramAuthChallengeResponse.expires_at:type_name -> google.protobuf.Timestamp
-	50, // 10: profile.v1.ConfirmTelegramAuthResponse.status:type_name -> common.v1.OperationStatus
-	51, // 11: profile.v1.StartYandexAuthResponse.expires_at:type_name -> google.protobuf.Timestamp
-	49, // 12: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
-	51, // 13: profile.v1.ProfileProgressOverview.last_activity_at:type_name -> google.protobuf.Timestamp
-	3,  // 14: profile.v1.ProfileCompetency.confidence:type_name -> profile.v1.ProfileCompetencyConfidence
-	4,  // 15: profile.v1.ProfileCompetency.level:type_name -> profile.v1.ProfileCompetencyLevel
-	51, // 16: profile.v1.ProfileCheckpointProgress.finished_at:type_name -> google.protobuf.Timestamp
-	2,  // 17: profile.v1.NextAction.action_type:type_name -> profile.v1.ProfileActionType
-	0,  // 18: profile.v1.UserGoal.kind:type_name -> profile.v1.UserGoalKind
-	34, // 19: profile.v1.ProfileProgress.overview:type_name -> profile.v1.ProfileProgressOverview
-	35, // 20: profile.v1.ProfileProgress.competencies:type_name -> profile.v1.ProfileCompetency
-	35, // 21: profile.v1.ProfileProgress.strongest:type_name -> profile.v1.ProfileCompetency
-	35, // 22: profile.v1.ProfileProgress.weakest:type_name -> profile.v1.ProfileCompetency
-	36, // 23: profile.v1.ProfileProgress.recommendations:type_name -> profile.v1.ProfileProgressRecommendation
-	37, // 24: profile.v1.ProfileProgress.checkpoints:type_name -> profile.v1.ProfileCheckpointProgress
-	38, // 25: profile.v1.ProfileProgress.next_actions:type_name -> profile.v1.NextAction
-	39, // 26: profile.v1.ProfileProgress.goal:type_name -> profile.v1.UserGoal
-	40, // 27: profile.v1.ProfileProgressResponse.progress:type_name -> profile.v1.ProfileProgress
-	5,  // 28: profile.v1.Achievement.category:type_name -> profile.v1.AchievementCategory
-	6,  // 29: profile.v1.Achievement.tier:type_name -> profile.v1.AchievementTier
-	7,  // 30: profile.v1.FeedItem.type:type_name -> profile.v1.FeedItemType
-	51, // 31: profile.v1.FeedItem.timestamp:type_name -> google.protobuf.Timestamp
-	43, // 32: profile.v1.GetProfileFeedResponse.items:type_name -> profile.v1.FeedItem
-	42, // 33: profile.v1.GetAchievementsResponse.achievements:type_name -> profile.v1.Achievement
-	47, // 34: profile.v1.GetProfileActivityResponse.activity:type_name -> profile.v1.ActivityDay
-	51, // 35: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
-	52, // 36: profile.v1.User.activity_status:type_name -> common.v1.UserActivityStatus
-	8,  // 37: profile.v1.ProfileService.CreateTelegramAuthChallenge:input_type -> profile.v1.CreateTelegramAuthChallengeRequest
-	9,  // 38: profile.v1.ProfileService.ConfirmTelegramAuth:input_type -> profile.v1.ConfirmTelegramAuthRequest
-	10, // 39: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
-	11, // 40: profile.v1.ProfileService.StartYandexAuth:input_type -> profile.v1.StartYandexAuthRequest
-	12, // 41: profile.v1.ProfileService.YandexAuth:input_type -> profile.v1.YandexAuthRequest
-	13, // 42: profile.v1.ProfileService.CompleteRegistration:input_type -> profile.v1.CompleteRegistrationRequest
-	14, // 43: profile.v1.ProfileService.GetProfile:input_type -> profile.v1.GetProfileRequest
-	15, // 44: profile.v1.ProfileService.GetProfileByID:input_type -> profile.v1.GetProfileByIDRequest
-	16, // 45: profile.v1.ProfileService.UpdateLocation:input_type -> profile.v1.UpdateLocationRequest
-	17, // 46: profile.v1.ProfileService.UpdateProfile:input_type -> profile.v1.UpdateProfileRequest
-	18, // 47: profile.v1.ProfileService.Logout:input_type -> profile.v1.LogoutRequest
-	19, // 48: profile.v1.ProfileService.BindTelegram:input_type -> profile.v1.BindTelegramRequest
-	20, // 49: profile.v1.ProfileService.GetProfileProgress:input_type -> profile.v1.GetProfileProgressRequest
-	21, // 50: profile.v1.ProfileService.GetAchievements:input_type -> profile.v1.GetAchievementsRequest
-	22, // 51: profile.v1.ProfileService.GetProfileActivity:input_type -> profile.v1.GetProfileActivityRequest
-	23, // 52: profile.v1.ProfileService.SetUserGoal:input_type -> profile.v1.SetUserGoalRequest
-	24, // 53: profile.v1.ProfileService.GetReadiness:input_type -> profile.v1.GetReadinessRequest
-	44, // 54: profile.v1.ProfileService.GetProfileFeed:input_type -> profile.v1.GetProfileFeedRequest
-	30, // 55: profile.v1.ProfileService.CreateTelegramAuthChallenge:output_type -> profile.v1.CreateTelegramAuthChallengeResponse
-	31, // 56: profile.v1.ProfileService.ConfirmTelegramAuth:output_type -> profile.v1.ConfirmTelegramAuthResponse
-	33, // 57: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
-	32, // 58: profile.v1.ProfileService.StartYandexAuth:output_type -> profile.v1.StartYandexAuthResponse
-	33, // 59: profile.v1.ProfileService.YandexAuth:output_type -> profile.v1.ProfileResponse
-	33, // 60: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
-	33, // 61: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
-	33, // 62: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
-	33, // 63: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
-	33, // 64: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
-	29, // 65: profile.v1.ProfileService.Logout:output_type -> profile.v1.ProfileStatusResponse
-	29, // 66: profile.v1.ProfileService.BindTelegram:output_type -> profile.v1.ProfileStatusResponse
-	41, // 67: profile.v1.ProfileService.GetProfileProgress:output_type -> profile.v1.ProfileProgressResponse
-	46, // 68: profile.v1.ProfileService.GetAchievements:output_type -> profile.v1.GetAchievementsResponse
-	48, // 69: profile.v1.ProfileService.GetProfileActivity:output_type -> profile.v1.GetProfileActivityResponse
-	25, // 70: profile.v1.ProfileService.SetUserGoal:output_type -> profile.v1.SetUserGoalResponse
-	26, // 71: profile.v1.ProfileService.GetReadiness:output_type -> profile.v1.GetReadinessResponse
-	45, // 72: profile.v1.ProfileService.GetProfileFeed:output_type -> profile.v1.GetProfileFeedResponse
-	55, // [55:73] is the sub-list for method output_type
-	37, // [37:55] is the sub-list for method input_type
-	37, // [37:37] is the sub-list for extension type_name
-	37, // [37:37] is the sub-list for extension extendee
-	0,  // [0:37] is the sub-list for field type_name
+	40, // 8: profile.v1.ProfileStatusResponse.status:type_name -> common.v1.OperationStatus
+	41, // 9: profile.v1.CreateTelegramAuthChallengeResponse.expires_at:type_name -> google.protobuf.Timestamp
+	41, // 10: profile.v1.StartYandexAuthResponse.expires_at:type_name -> google.protobuf.Timestamp
+	39, // 11: profile.v1.ProfileResponse.user:type_name -> profile.v1.User
+	41, // 12: profile.v1.ProfileProgressOverview.last_activity_at:type_name -> google.protobuf.Timestamp
+	3,  // 13: profile.v1.ProfileCompetency.confidence:type_name -> profile.v1.ProfileCompetencyConfidence
+	4,  // 14: profile.v1.ProfileCompetency.level:type_name -> profile.v1.ProfileCompetencyLevel
+	41, // 15: profile.v1.ProfileCheckpointProgress.finished_at:type_name -> google.protobuf.Timestamp
+	2,  // 16: profile.v1.NextAction.action_type:type_name -> profile.v1.ProfileActionType
+	0,  // 17: profile.v1.UserGoal.kind:type_name -> profile.v1.UserGoalKind
+	28, // 18: profile.v1.ProfileProgress.overview:type_name -> profile.v1.ProfileProgressOverview
+	29, // 19: profile.v1.ProfileProgress.competencies:type_name -> profile.v1.ProfileCompetency
+	29, // 20: profile.v1.ProfileProgress.strongest:type_name -> profile.v1.ProfileCompetency
+	29, // 21: profile.v1.ProfileProgress.weakest:type_name -> profile.v1.ProfileCompetency
+	30, // 22: profile.v1.ProfileProgress.recommendations:type_name -> profile.v1.ProfileProgressRecommendation
+	31, // 23: profile.v1.ProfileProgress.checkpoints:type_name -> profile.v1.ProfileCheckpointProgress
+	32, // 24: profile.v1.ProfileProgress.next_actions:type_name -> profile.v1.NextAction
+	33, // 25: profile.v1.ProfileProgress.goal:type_name -> profile.v1.UserGoal
+	34, // 26: profile.v1.ProfileProgressResponse.progress:type_name -> profile.v1.ProfileProgress
+	5,  // 27: profile.v1.FeedItem.type:type_name -> profile.v1.FeedItemType
+	41, // 28: profile.v1.FeedItem.timestamp:type_name -> google.protobuf.Timestamp
+	36, // 29: profile.v1.GetProfileFeedResponse.items:type_name -> profile.v1.FeedItem
+	41, // 30: profile.v1.User.created_at:type_name -> google.protobuf.Timestamp
+	42, // 31: profile.v1.User.activity_status:type_name -> common.v1.UserActivityStatus
+	6,  // 32: profile.v1.ProfileService.CreateTelegramAuthChallenge:input_type -> profile.v1.CreateTelegramAuthChallengeRequest
+	7,  // 33: profile.v1.ProfileService.TelegramAuth:input_type -> profile.v1.TelegramAuthRequest
+	8,  // 34: profile.v1.ProfileService.StartYandexAuth:input_type -> profile.v1.StartYandexAuthRequest
+	9,  // 35: profile.v1.ProfileService.YandexAuth:input_type -> profile.v1.YandexAuthRequest
+	10, // 36: profile.v1.ProfileService.CompleteRegistration:input_type -> profile.v1.CompleteRegistrationRequest
+	11, // 37: profile.v1.ProfileService.GetProfile:input_type -> profile.v1.GetProfileRequest
+	12, // 38: profile.v1.ProfileService.GetProfileByID:input_type -> profile.v1.GetProfileByIDRequest
+	13, // 39: profile.v1.ProfileService.UpdateLocation:input_type -> profile.v1.UpdateLocationRequest
+	14, // 40: profile.v1.ProfileService.UpdateProfile:input_type -> profile.v1.UpdateProfileRequest
+	15, // 41: profile.v1.ProfileService.Logout:input_type -> profile.v1.LogoutRequest
+	16, // 42: profile.v1.ProfileService.BindTelegram:input_type -> profile.v1.BindTelegramRequest
+	17, // 43: profile.v1.ProfileService.GetProfileProgress:input_type -> profile.v1.GetProfileProgressRequest
+	18, // 44: profile.v1.ProfileService.SetUserGoal:input_type -> profile.v1.SetUserGoalRequest
+	19, // 45: profile.v1.ProfileService.GetReadiness:input_type -> profile.v1.GetReadinessRequest
+	37, // 46: profile.v1.ProfileService.GetProfileFeed:input_type -> profile.v1.GetProfileFeedRequest
+	25, // 47: profile.v1.ProfileService.CreateTelegramAuthChallenge:output_type -> profile.v1.CreateTelegramAuthChallengeResponse
+	27, // 48: profile.v1.ProfileService.TelegramAuth:output_type -> profile.v1.ProfileResponse
+	26, // 49: profile.v1.ProfileService.StartYandexAuth:output_type -> profile.v1.StartYandexAuthResponse
+	27, // 50: profile.v1.ProfileService.YandexAuth:output_type -> profile.v1.ProfileResponse
+	27, // 51: profile.v1.ProfileService.CompleteRegistration:output_type -> profile.v1.ProfileResponse
+	27, // 52: profile.v1.ProfileService.GetProfile:output_type -> profile.v1.ProfileResponse
+	27, // 53: profile.v1.ProfileService.GetProfileByID:output_type -> profile.v1.ProfileResponse
+	27, // 54: profile.v1.ProfileService.UpdateLocation:output_type -> profile.v1.ProfileResponse
+	27, // 55: profile.v1.ProfileService.UpdateProfile:output_type -> profile.v1.ProfileResponse
+	24, // 56: profile.v1.ProfileService.Logout:output_type -> profile.v1.ProfileStatusResponse
+	24, // 57: profile.v1.ProfileService.BindTelegram:output_type -> profile.v1.ProfileStatusResponse
+	35, // 58: profile.v1.ProfileService.GetProfileProgress:output_type -> profile.v1.ProfileProgressResponse
+	20, // 59: profile.v1.ProfileService.SetUserGoal:output_type -> profile.v1.SetUserGoalResponse
+	21, // 60: profile.v1.ProfileService.GetReadiness:output_type -> profile.v1.GetReadinessResponse
+	38, // 61: profile.v1.ProfileService.GetProfileFeed:output_type -> profile.v1.GetProfileFeedResponse
+	47, // [47:62] is the sub-list for method output_type
+	32, // [32:47] is the sub-list for method input_type
+	32, // [32:32] is the sub-list for extension type_name
+	32, // [32:32] is the sub-list for extension extendee
+	0,  // [0:32] is the sub-list for field type_name
 }
 
-func init() { file_profile_v1_profile_proto_init() }
-func file_profile_v1_profile_proto_init() {
-	if File_profile_v1_profile_proto != nil {
+func init() { file_core_profile_v1_profile_proto_init() }
+func file_core_profile_v1_profile_proto_init() {
+	if File_core_profile_v1_profile_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_profile_v1_profile_proto_rawDesc), len(file_profile_v1_profile_proto_rawDesc)),
-			NumEnums:      8,
-			NumMessages:   42,
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_profile_v1_profile_proto_rawDesc), len(file_core_profile_v1_profile_proto_rawDesc)),
+			NumEnums:      6,
+			NumMessages:   34,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_profile_v1_profile_proto_goTypes,
-		DependencyIndexes: file_profile_v1_profile_proto_depIdxs,
-		EnumInfos:         file_profile_v1_profile_proto_enumTypes,
-		MessageInfos:      file_profile_v1_profile_proto_msgTypes,
+		GoTypes:           file_core_profile_v1_profile_proto_goTypes,
+		DependencyIndexes: file_core_profile_v1_profile_proto_depIdxs,
+		EnumInfos:         file_core_profile_v1_profile_proto_enumTypes,
+		MessageInfos:      file_core_profile_v1_profile_proto_msgTypes,
 	}.Build()
-	File_profile_v1_profile_proto = out.File
-	file_profile_v1_profile_proto_goTypes = nil
-	file_profile_v1_profile_proto_depIdxs = nil
+	File_core_profile_v1_profile_proto = out.File
+	file_core_profile_v1_profile_proto_goTypes = nil
+	file_core_profile_v1_profile_proto_depIdxs = nil
 }

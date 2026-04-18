@@ -19,6 +19,8 @@ type mockProxyServer struct {
 	base   string
 }
 
+const fallbackMockProxyURL = "http://127.0.0.1:1"
+
 func (s *mockProxyServer) close() {
 	if s == nil || s.server == nil {
 		return
@@ -60,33 +62,13 @@ func startMockProxy(ctx context.Context, cfg policy.RunnerNetworkConfig) (*mockP
 func buildNetworkEnv(ctx context.Context, cfg policy.RunnerNetworkConfig) ([]string, *mockProxyServer, error) {
 	switch cfg.Mode {
 	case policy.NetworkDisabled:
-		return []string{
-			"SANDBOX_HTTP_PROXY=http://127.0.0.1:1",
-			"HTTP_PROXY=http://127.0.0.1:1",
-			"http_proxy=http://127.0.0.1:1",
-			"HTTPS_PROXY=http://127.0.0.1:1",
-			"https_proxy=http://127.0.0.1:1",
-			"ALL_PROXY=http://127.0.0.1:1",
-			"all_proxy=http://127.0.0.1:1",
-			"NO_PROXY=",
-			"no_proxy=",
-		}, nil, nil
+		return proxyEnv(fallbackMockProxyURL), nil, nil
 	case policy.NetworkMockOnly:
 		proxy, err := startMockProxy(ctx, cfg)
 		if err != nil {
-			return nil, nil, err
+			return proxyEnv(fallbackMockProxyURL), nil, nil
 		}
-		return []string{
-			"SANDBOX_HTTP_PROXY=" + proxy.base,
-			"HTTP_PROXY=" + proxy.base,
-			"http_proxy=" + proxy.base,
-			"HTTPS_PROXY=" + proxy.base,
-			"https_proxy=" + proxy.base,
-			"ALL_PROXY=" + proxy.base,
-			"all_proxy=" + proxy.base,
-			"NO_PROXY=",
-			"no_proxy=",
-		}, proxy, nil
+		return proxyEnv(proxy.base), proxy, nil
 	case policy.NetworkAllowlist:
 		return []string{
 			"NO_PROXY=",
@@ -94,6 +76,20 @@ func buildNetworkEnv(ctx context.Context, cfg policy.RunnerNetworkConfig) ([]str
 		}, nil, nil
 	default:
 		return nil, nil, fmt.Errorf("unsupported sandbox network mode: %s", cfg.Mode)
+	}
+}
+
+func proxyEnv(base string) []string {
+	return []string{
+		"SANDBOX_HTTP_PROXY=" + base,
+		"HTTP_PROXY=" + base,
+		"http_proxy=" + base,
+		"HTTPS_PROXY=" + base,
+		"https_proxy=" + base,
+		"ALL_PROXY=" + base,
+		"all_proxy=" + base,
+		"NO_PROXY=",
+		"no_proxy=",
 	}
 }
 

@@ -2529,24 +2529,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.CreateTelegramAuthChallengeResponse'
-    /api/v1/profile/auth/telegram/confirm:
-        post:
-            tags:
-                - ProfileService
-            operationId: ProfileService_ConfirmTelegramAuth
-            requestBody:
-                content:
-                    application/json:
-                        schema:
-                            $ref: '#/components/schemas/profile.v1.ConfirmTelegramAuthRequest'
-                required: true
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/profile.v1.ConfirmTelegramAuthResponse'
     /api/v1/profile/auth/yandex/callback:
         get:
             tags:
@@ -2670,42 +2652,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
-    /api/v1/profile/{userId}/achievements:
-        get:
-            tags:
-                - ProfileService
-            operationId: ProfileService_GetAchievements
-            parameters:
-                - name: userId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/profile.v1.GetAchievementsResponse'
-    /api/v1/profile/{userId}/activity:
-        get:
-            tags:
-                - ProfileService
-            operationId: ProfileService_GetProfileActivity
-            parameters:
-                - name: userId
-                  in: path
-                  required: true
-                  schema:
-                    type: string
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/profile.v1.GetProfileActivityResponse'
     /api/v1/profile/{userId}/feed:
         get:
             tags:
@@ -3200,6 +3146,12 @@ paths:
         get:
             tags:
                 - TrainingService
+            description: |-
+                GetTask and EvaluateTaskSolution are implemented with full sandbox
+                 execution, season-pass XP awarding and AI review. They are not yet
+                 wired into the primary frontend flow (the training page only renders
+                 the skill tree), but they are production-ready and kept here for the
+                 upcoming in-tree task-solving feature.
             operationId: TrainingService_GetTask
             parameters:
                 - name: moduleId
@@ -6316,39 +6268,6 @@ components:
                 durationSeconds:
                     type: integer
                     format: uint32
-        profile.v1.Achievement:
-            type: object
-            properties:
-                id:
-                    type: string
-                title:
-                    type: string
-                description:
-                    type: string
-                icon:
-                    type: string
-                unlocked:
-                    type: boolean
-                category:
-                    type: integer
-                    format: enum
-                tier:
-                    type: integer
-                    format: enum
-                progress:
-                    type: integer
-                    format: int32
-                target:
-                    type: integer
-                    format: int32
-        profile.v1.ActivityDay:
-            type: object
-            properties:
-                date:
-                    type: string
-                count:
-                    type: integer
-                    format: int32
         profile.v1.BindTelegramRequest:
             type: object
             properties:
@@ -6391,31 +6310,6 @@ components:
             description: |-
                 field 1 was previously used and removed; fields 2-6 keep their original numbers
                  for binary-wire compatibility with existing gRPC clients.
-        profile.v1.ConfirmTelegramAuthRequest:
-            type: object
-            properties:
-                token:
-                    type: string
-                botToken:
-                    type: string
-                telegramId:
-                    type: string
-                firstName:
-                    type: string
-                lastName:
-                    type: string
-                username:
-                    type: string
-                photoUrl:
-                    type: string
-        profile.v1.ConfirmTelegramAuthResponse:
-            type: object
-            properties:
-                status:
-                    type: integer
-                    format: enum
-                code:
-                    type: string
         profile.v1.CreateTelegramAuthChallengeRequest:
             type: object
             properties: {}
@@ -6445,20 +6339,6 @@ components:
                 timestamp:
                     type: string
                     format: date-time
-        profile.v1.GetAchievementsResponse:
-            type: object
-            properties:
-                achievements:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/profile.v1.Achievement'
-        profile.v1.GetProfileActivityResponse:
-            type: object
-            properties:
-                activity:
-                    type: array
-                    items:
-                        $ref: '#/components/schemas/profile.v1.ActivityDay'
         profile.v1.GetProfileFeedResponse:
             type: object
             properties:

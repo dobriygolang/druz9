@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: season_pass/v1/season_pass.proto
+// source: game/season_pass/v1/season_pass.proto
 
 package v1
 
@@ -77,11 +77,11 @@ func (x RewardKind) String() string {
 }
 
 func (RewardKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_season_pass_v1_season_pass_proto_enumTypes[0].Descriptor()
+	return file_game_season_pass_v1_season_pass_proto_enumTypes[0].Descriptor()
 }
 
 func (RewardKind) Type() protoreflect.EnumType {
-	return &file_season_pass_v1_season_pass_proto_enumTypes[0]
+	return &file_game_season_pass_v1_season_pass_proto_enumTypes[0]
 }
 
 func (x RewardKind) Number() protoreflect.EnumNumber {
@@ -90,7 +90,7 @@ func (x RewardKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use RewardKind.Descriptor instead.
 func (RewardKind) EnumDescriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{0}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{0}
 }
 
 type RewardTrack int32
@@ -126,11 +126,11 @@ func (x RewardTrack) String() string {
 }
 
 func (RewardTrack) Descriptor() protoreflect.EnumDescriptor {
-	return file_season_pass_v1_season_pass_proto_enumTypes[1].Descriptor()
+	return file_game_season_pass_v1_season_pass_proto_enumTypes[1].Descriptor()
 }
 
 func (RewardTrack) Type() protoreflect.EnumType {
-	return &file_season_pass_v1_season_pass_proto_enumTypes[1]
+	return &file_game_season_pass_v1_season_pass_proto_enumTypes[1]
 }
 
 func (x RewardTrack) Number() protoreflect.EnumNumber {
@@ -139,7 +139,7 @@ func (x RewardTrack) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use RewardTrack.Descriptor instead.
 func (RewardTrack) EnumDescriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{1}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{1}
 }
 
 type SeasonPass struct {
@@ -159,7 +159,7 @@ type SeasonPass struct {
 
 func (x *SeasonPass) Reset() {
 	*x = SeasonPass{}
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[0]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -171,7 +171,7 @@ func (x *SeasonPass) String() string {
 func (*SeasonPass) ProtoMessage() {}
 
 func (x *SeasonPass) ProtoReflect() protoreflect.Message {
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[0]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -184,7 +184,7 @@ func (x *SeasonPass) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SeasonPass.ProtoReflect.Descriptor instead.
 func (*SeasonPass) Descriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{0}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *SeasonPass) GetId() string {
@@ -265,7 +265,7 @@ type SeasonPassTier struct {
 
 func (x *SeasonPassTier) Reset() {
 	*x = SeasonPassTier{}
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[1]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -277,7 +277,7 @@ func (x *SeasonPassTier) String() string {
 func (*SeasonPassTier) ProtoMessage() {}
 
 func (x *SeasonPassTier) ProtoReflect() protoreflect.Message {
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[1]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -290,7 +290,7 @@ func (x *SeasonPassTier) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SeasonPassTier.ProtoReflect.Descriptor instead.
 func (*SeasonPassTier) Descriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{1}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *SeasonPassTier) GetTier() int32 {
@@ -355,7 +355,7 @@ type SeasonPassProgress struct {
 
 func (x *SeasonPassProgress) Reset() {
 	*x = SeasonPassProgress{}
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[2]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -367,7 +367,7 @@ func (x *SeasonPassProgress) String() string {
 func (*SeasonPassProgress) ProtoMessage() {}
 
 func (x *SeasonPassProgress) ProtoReflect() protoreflect.Message {
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[2]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -380,7 +380,7 @@ func (x *SeasonPassProgress) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SeasonPassProgress.ProtoReflect.Descriptor instead.
 func (*SeasonPassProgress) Descriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{2}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SeasonPassProgress) GetXp() int32 {
@@ -426,7 +426,7 @@ type GetActiveRequest struct {
 
 func (x *GetActiveRequest) Reset() {
 	*x = GetActiveRequest{}
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[3]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -438,7 +438,7 @@ func (x *GetActiveRequest) String() string {
 func (*GetActiveRequest) ProtoMessage() {}
 
 func (x *GetActiveRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[3]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -451,7 +451,7 @@ func (x *GetActiveRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetActiveRequest.ProtoReflect.Descriptor instead.
 func (*GetActiveRequest) Descriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{3}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{3}
 }
 
 type GetActiveResponse struct {
@@ -465,7 +465,7 @@ type GetActiveResponse struct {
 
 func (x *GetActiveResponse) Reset() {
 	*x = GetActiveResponse{}
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[4]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -477,7 +477,7 @@ func (x *GetActiveResponse) String() string {
 func (*GetActiveResponse) ProtoMessage() {}
 
 func (x *GetActiveResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[4]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -490,7 +490,7 @@ func (x *GetActiveResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetActiveResponse.ProtoReflect.Descriptor instead.
 func (*GetActiveResponse) Descriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{4}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *GetActiveResponse) GetPass() *SeasonPass {
@@ -524,7 +524,7 @@ type ClaimTierRewardRequest struct {
 
 func (x *ClaimTierRewardRequest) Reset() {
 	*x = ClaimTierRewardRequest{}
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[5]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -536,7 +536,7 @@ func (x *ClaimTierRewardRequest) String() string {
 func (*ClaimTierRewardRequest) ProtoMessage() {}
 
 func (x *ClaimTierRewardRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[5]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -549,7 +549,7 @@ func (x *ClaimTierRewardRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClaimTierRewardRequest.ProtoReflect.Descriptor instead.
 func (*ClaimTierRewardRequest) Descriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{5}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ClaimTierRewardRequest) GetTier() int32 {
@@ -578,7 +578,7 @@ type ClaimTierRewardResponse struct {
 
 func (x *ClaimTierRewardResponse) Reset() {
 	*x = ClaimTierRewardResponse{}
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[6]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -590,7 +590,7 @@ func (x *ClaimTierRewardResponse) String() string {
 func (*ClaimTierRewardResponse) ProtoMessage() {}
 
 func (x *ClaimTierRewardResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[6]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -603,7 +603,7 @@ func (x *ClaimTierRewardResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ClaimTierRewardResponse.ProtoReflect.Descriptor instead.
 func (*ClaimTierRewardResponse) Descriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{6}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ClaimTierRewardResponse) GetProgress() *SeasonPassProgress {
@@ -642,7 +642,7 @@ type PurchasePremiumRequest struct {
 
 func (x *PurchasePremiumRequest) Reset() {
 	*x = PurchasePremiumRequest{}
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[7]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -654,7 +654,7 @@ func (x *PurchasePremiumRequest) String() string {
 func (*PurchasePremiumRequest) ProtoMessage() {}
 
 func (x *PurchasePremiumRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[7]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -667,7 +667,7 @@ func (x *PurchasePremiumRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurchasePremiumRequest.ProtoReflect.Descriptor instead.
 func (*PurchasePremiumRequest) Descriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{7}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{7}
 }
 
 type PurchasePremiumResponse struct {
@@ -679,7 +679,7 @@ type PurchasePremiumResponse struct {
 
 func (x *PurchasePremiumResponse) Reset() {
 	*x = PurchasePremiumResponse{}
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[8]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -691,7 +691,7 @@ func (x *PurchasePremiumResponse) String() string {
 func (*PurchasePremiumResponse) ProtoMessage() {}
 
 func (x *PurchasePremiumResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_season_pass_v1_season_pass_proto_msgTypes[8]
+	mi := &file_game_season_pass_v1_season_pass_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -704,7 +704,7 @@ func (x *PurchasePremiumResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurchasePremiumResponse.ProtoReflect.Descriptor instead.
 func (*PurchasePremiumResponse) Descriptor() ([]byte, []int) {
-	return file_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{8}
+	return file_game_season_pass_v1_season_pass_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *PurchasePremiumResponse) GetProgress() *SeasonPassProgress {
@@ -714,11 +714,11 @@ func (x *PurchasePremiumResponse) GetProgress() *SeasonPassProgress {
 	return nil
 }
 
-var File_season_pass_v1_season_pass_proto protoreflect.FileDescriptor
+var File_game_season_pass_v1_season_pass_proto protoreflect.FileDescriptor
 
-const file_season_pass_v1_season_pass_proto_rawDesc = "" +
+const file_game_season_pass_v1_season_pass_proto_rawDesc = "" +
 	"\n" +
-	" season_pass/v1/season_pass.proto\x12\x0eseason_pass.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xca\x02\n" +
+	"%game/season_pass/v1/season_pass.proto\x12\x0eseason_pass.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xca\x02\n" +
 	"\n" +
 	"SeasonPass\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12#\n" +
@@ -783,20 +783,20 @@ const file_season_pass_v1_season_pass_proto_rawDesc = "" +
 	"\x0fPurchasePremium\x12&.season_pass.v1.PurchasePremiumRequest\x1a'.season_pass.v1.PurchasePremiumResponse\"/\x82\xd3\xe4\x93\x02):\x01*\"$/api/v1/season-pass/purchase-premiumB\x1fZ\x1dapi/pkg/api/season_pass/v1;v1b\x06proto3"
 
 var (
-	file_season_pass_v1_season_pass_proto_rawDescOnce sync.Once
-	file_season_pass_v1_season_pass_proto_rawDescData []byte
+	file_game_season_pass_v1_season_pass_proto_rawDescOnce sync.Once
+	file_game_season_pass_v1_season_pass_proto_rawDescData []byte
 )
 
-func file_season_pass_v1_season_pass_proto_rawDescGZIP() []byte {
-	file_season_pass_v1_season_pass_proto_rawDescOnce.Do(func() {
-		file_season_pass_v1_season_pass_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_season_pass_v1_season_pass_proto_rawDesc), len(file_season_pass_v1_season_pass_proto_rawDesc)))
+func file_game_season_pass_v1_season_pass_proto_rawDescGZIP() []byte {
+	file_game_season_pass_v1_season_pass_proto_rawDescOnce.Do(func() {
+		file_game_season_pass_v1_season_pass_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_game_season_pass_v1_season_pass_proto_rawDesc), len(file_game_season_pass_v1_season_pass_proto_rawDesc)))
 	})
-	return file_season_pass_v1_season_pass_proto_rawDescData
+	return file_game_season_pass_v1_season_pass_proto_rawDescData
 }
 
-var file_season_pass_v1_season_pass_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_season_pass_v1_season_pass_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_season_pass_v1_season_pass_proto_goTypes = []any{
+var file_game_season_pass_v1_season_pass_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_game_season_pass_v1_season_pass_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_game_season_pass_v1_season_pass_proto_goTypes = []any{
 	(RewardKind)(0),                 // 0: season_pass.v1.RewardKind
 	(RewardTrack)(0),                // 1: season_pass.v1.RewardTrack
 	(*SeasonPass)(nil),              // 2: season_pass.v1.SeasonPass
@@ -810,7 +810,7 @@ var file_season_pass_v1_season_pass_proto_goTypes = []any{
 	(*PurchasePremiumResponse)(nil), // 10: season_pass.v1.PurchasePremiumResponse
 	(*timestamppb.Timestamp)(nil),   // 11: google.protobuf.Timestamp
 }
-var file_season_pass_v1_season_pass_proto_depIdxs = []int32{
+var file_game_season_pass_v1_season_pass_proto_depIdxs = []int32{
 	11, // 0: season_pass.v1.SeasonPass.starts_at:type_name -> google.protobuf.Timestamp
 	11, // 1: season_pass.v1.SeasonPass.ends_at:type_name -> google.protobuf.Timestamp
 	0,  // 2: season_pass.v1.SeasonPassTier.free_reward_kind:type_name -> season_pass.v1.RewardKind
@@ -835,27 +835,27 @@ var file_season_pass_v1_season_pass_proto_depIdxs = []int32{
 	0,  // [0:11] is the sub-list for field type_name
 }
 
-func init() { file_season_pass_v1_season_pass_proto_init() }
-func file_season_pass_v1_season_pass_proto_init() {
-	if File_season_pass_v1_season_pass_proto != nil {
+func init() { file_game_season_pass_v1_season_pass_proto_init() }
+func file_game_season_pass_v1_season_pass_proto_init() {
+	if File_game_season_pass_v1_season_pass_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_season_pass_v1_season_pass_proto_rawDesc), len(file_season_pass_v1_season_pass_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_season_pass_v1_season_pass_proto_rawDesc), len(file_game_season_pass_v1_season_pass_proto_rawDesc)),
 			NumEnums:      2,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_season_pass_v1_season_pass_proto_goTypes,
-		DependencyIndexes: file_season_pass_v1_season_pass_proto_depIdxs,
-		EnumInfos:         file_season_pass_v1_season_pass_proto_enumTypes,
-		MessageInfos:      file_season_pass_v1_season_pass_proto_msgTypes,
+		GoTypes:           file_game_season_pass_v1_season_pass_proto_goTypes,
+		DependencyIndexes: file_game_season_pass_v1_season_pass_proto_depIdxs,
+		EnumInfos:         file_game_season_pass_v1_season_pass_proto_enumTypes,
+		MessageInfos:      file_game_season_pass_v1_season_pass_proto_msgTypes,
 	}.Build()
-	File_season_pass_v1_season_pass_proto = out.File
-	file_season_pass_v1_season_pass_proto_goTypes = nil
-	file_season_pass_v1_season_pass_proto_depIdxs = nil
+	File_game_season_pass_v1_season_pass_proto = out.File
+	file_game_season_pass_v1_season_pass_proto_goTypes = nil
+	file_game_season_pass_v1_season_pass_proto_depIdxs = nil
 }

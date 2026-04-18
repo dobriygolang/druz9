@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: social/v1/social.proto
+// source: social/social/v1/social.proto
 
 package v1
 

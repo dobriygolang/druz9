@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: guild/v1/guild.proto
+// source: social/guild/v1/guild.proto
 
 package v1
 
@@ -58,11 +58,11 @@ func (x GuildMemberRole) String() string {
 }
 
 func (GuildMemberRole) Descriptor() protoreflect.EnumDescriptor {
-	return file_guild_v1_guild_proto_enumTypes[0].Descriptor()
+	return file_social_guild_v1_guild_proto_enumTypes[0].Descriptor()
 }
 
 func (GuildMemberRole) Type() protoreflect.EnumType {
-	return &file_guild_v1_guild_proto_enumTypes[0]
+	return &file_social_guild_v1_guild_proto_enumTypes[0]
 }
 
 func (x GuildMemberRole) Number() protoreflect.EnumNumber {
@@ -71,7 +71,7 @@ func (x GuildMemberRole) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GuildMemberRole.Descriptor instead.
 func (GuildMemberRole) EnumDescriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{0}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{0}
 }
 
 type GuildMemberActionType int32
@@ -110,11 +110,11 @@ func (x GuildMemberActionType) String() string {
 }
 
 func (GuildMemberActionType) Descriptor() protoreflect.EnumDescriptor {
-	return file_guild_v1_guild_proto_enumTypes[1].Descriptor()
+	return file_social_guild_v1_guild_proto_enumTypes[1].Descriptor()
 }
 
 func (GuildMemberActionType) Type() protoreflect.EnumType {
-	return &file_guild_v1_guild_proto_enumTypes[1]
+	return &file_social_guild_v1_guild_proto_enumTypes[1]
 }
 
 func (x GuildMemberActionType) Number() protoreflect.EnumNumber {
@@ -123,7 +123,7 @@ func (x GuildMemberActionType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use GuildMemberActionType.Descriptor instead.
 func (GuildMemberActionType) EnumDescriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{1}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{1}
 }
 
 type ListGuildsRequest struct {
@@ -136,7 +136,7 @@ type ListGuildsRequest struct {
 
 func (x *ListGuildsRequest) Reset() {
 	*x = ListGuildsRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[0]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -148,7 +148,7 @@ func (x *ListGuildsRequest) String() string {
 func (*ListGuildsRequest) ProtoMessage() {}
 
 func (x *ListGuildsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[0]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -161,7 +161,7 @@ func (x *ListGuildsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListGuildsRequest.ProtoReflect.Descriptor instead.
 func (*ListGuildsRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{0}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ListGuildsRequest) GetLimit() int32 {
@@ -190,7 +190,7 @@ type CreateGuildRequest struct {
 
 func (x *CreateGuildRequest) Reset() {
 	*x = CreateGuildRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[1]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -202,7 +202,7 @@ func (x *CreateGuildRequest) String() string {
 func (*CreateGuildRequest) ProtoMessage() {}
 
 func (x *CreateGuildRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[1]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -215,7 +215,7 @@ func (x *CreateGuildRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateGuildRequest.ProtoReflect.Descriptor instead.
 func (*CreateGuildRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{1}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CreateGuildRequest) GetName() string {
@@ -255,7 +255,7 @@ type JoinGuildRequest struct {
 
 func (x *JoinGuildRequest) Reset() {
 	*x = JoinGuildRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[2]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -267,7 +267,7 @@ func (x *JoinGuildRequest) String() string {
 func (*JoinGuildRequest) ProtoMessage() {}
 
 func (x *JoinGuildRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[2]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -280,7 +280,7 @@ func (x *JoinGuildRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JoinGuildRequest.ProtoReflect.Descriptor instead.
 func (*JoinGuildRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{2}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *JoinGuildRequest) GetGuildId() string {
@@ -299,7 +299,7 @@ type LeaveGuildRequest struct {
 
 func (x *LeaveGuildRequest) Reset() {
 	*x = LeaveGuildRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[3]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -311,7 +311,7 @@ func (x *LeaveGuildRequest) String() string {
 func (*LeaveGuildRequest) ProtoMessage() {}
 
 func (x *LeaveGuildRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[3]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -324,7 +324,7 @@ func (x *LeaveGuildRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LeaveGuildRequest.ProtoReflect.Descriptor instead.
 func (*LeaveGuildRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{3}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *LeaveGuildRequest) GetGuildId() string {
@@ -344,7 +344,7 @@ type ListGuildsResponse struct {
 
 func (x *ListGuildsResponse) Reset() {
 	*x = ListGuildsResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[4]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -356,7 +356,7 @@ func (x *ListGuildsResponse) String() string {
 func (*ListGuildsResponse) ProtoMessage() {}
 
 func (x *ListGuildsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[4]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -369,7 +369,7 @@ func (x *ListGuildsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListGuildsResponse.ProtoReflect.Descriptor instead.
 func (*ListGuildsResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{4}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListGuildsResponse) GetGuilds() []*Guild {
@@ -395,7 +395,7 @@ type GuildResponse struct {
 
 func (x *GuildResponse) Reset() {
 	*x = GuildResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[5]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -407,7 +407,7 @@ func (x *GuildResponse) String() string {
 func (*GuildResponse) ProtoMessage() {}
 
 func (x *GuildResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[5]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -420,7 +420,7 @@ func (x *GuildResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GuildResponse.ProtoReflect.Descriptor instead.
 func (*GuildResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{5}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GuildResponse) GetGuild() *Guild {
@@ -439,7 +439,7 @@ type JoinGuildResponse struct {
 
 func (x *JoinGuildResponse) Reset() {
 	*x = JoinGuildResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[6]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -451,7 +451,7 @@ func (x *JoinGuildResponse) String() string {
 func (*JoinGuildResponse) ProtoMessage() {}
 
 func (x *JoinGuildResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[6]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -464,7 +464,7 @@ func (x *JoinGuildResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use JoinGuildResponse.ProtoReflect.Descriptor instead.
 func (*JoinGuildResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{6}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *JoinGuildResponse) GetStatus() v1.OperationStatus {
@@ -483,7 +483,7 @@ type LeaveGuildResponse struct {
 
 func (x *LeaveGuildResponse) Reset() {
 	*x = LeaveGuildResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[7]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -495,7 +495,7 @@ func (x *LeaveGuildResponse) String() string {
 func (*LeaveGuildResponse) ProtoMessage() {}
 
 func (x *LeaveGuildResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[7]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -508,7 +508,7 @@ func (x *LeaveGuildResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LeaveGuildResponse.ProtoReflect.Descriptor instead.
 func (*LeaveGuildResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{7}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *LeaveGuildResponse) GetStatus() v1.OperationStatus {
@@ -528,7 +528,7 @@ type InviteToGuildRequest struct {
 
 func (x *InviteToGuildRequest) Reset() {
 	*x = InviteToGuildRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[8]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -540,7 +540,7 @@ func (x *InviteToGuildRequest) String() string {
 func (*InviteToGuildRequest) ProtoMessage() {}
 
 func (x *InviteToGuildRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[8]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -553,7 +553,7 @@ func (x *InviteToGuildRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InviteToGuildRequest.ProtoReflect.Descriptor instead.
 func (*InviteToGuildRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{8}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *InviteToGuildRequest) GetGuildId() string {
@@ -579,7 +579,7 @@ type InviteToGuildResponse struct {
 
 func (x *InviteToGuildResponse) Reset() {
 	*x = InviteToGuildResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[9]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -591,7 +591,7 @@ func (x *InviteToGuildResponse) String() string {
 func (*InviteToGuildResponse) ProtoMessage() {}
 
 func (x *InviteToGuildResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[9]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -604,7 +604,7 @@ func (x *InviteToGuildResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InviteToGuildResponse.ProtoReflect.Descriptor instead.
 func (*InviteToGuildResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{9}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *InviteToGuildResponse) GetStatus() v1.OperationStatus {
@@ -623,7 +623,7 @@ type ListGuildMembersRequest struct {
 
 func (x *ListGuildMembersRequest) Reset() {
 	*x = ListGuildMembersRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[10]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -635,7 +635,7 @@ func (x *ListGuildMembersRequest) String() string {
 func (*ListGuildMembersRequest) ProtoMessage() {}
 
 func (x *ListGuildMembersRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[10]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -648,7 +648,7 @@ func (x *ListGuildMembersRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListGuildMembersRequest.ProtoReflect.Descriptor instead.
 func (*ListGuildMembersRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{10}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ListGuildMembersRequest) GetGuildId() string {
@@ -672,7 +672,7 @@ type GuildMember struct {
 
 func (x *GuildMember) Reset() {
 	*x = GuildMember{}
-	mi := &file_guild_v1_guild_proto_msgTypes[11]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -684,7 +684,7 @@ func (x *GuildMember) String() string {
 func (*GuildMember) ProtoMessage() {}
 
 func (x *GuildMember) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[11]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -697,7 +697,7 @@ func (x *GuildMember) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GuildMember.ProtoReflect.Descriptor instead.
 func (*GuildMember) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{11}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GuildMember) GetUserId() string {
@@ -751,7 +751,7 @@ type ListGuildMembersResponse struct {
 
 func (x *ListGuildMembersResponse) Reset() {
 	*x = ListGuildMembersResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[12]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -763,7 +763,7 @@ func (x *ListGuildMembersResponse) String() string {
 func (*ListGuildMembersResponse) ProtoMessage() {}
 
 func (x *ListGuildMembersResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[12]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -776,7 +776,7 @@ func (x *ListGuildMembersResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListGuildMembersResponse.ProtoReflect.Descriptor instead.
 func (*ListGuildMembersResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{12}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ListGuildMembersResponse) GetMembers() []*GuildMember {
@@ -796,7 +796,7 @@ type ListGuildEventsRequest struct {
 
 func (x *ListGuildEventsRequest) Reset() {
 	*x = ListGuildEventsRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[13]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -808,7 +808,7 @@ func (x *ListGuildEventsRequest) String() string {
 func (*ListGuildEventsRequest) ProtoMessage() {}
 
 func (x *ListGuildEventsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[13]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -821,7 +821,7 @@ func (x *ListGuildEventsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListGuildEventsRequest.ProtoReflect.Descriptor instead.
 func (*ListGuildEventsRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{13}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *ListGuildEventsRequest) GetGuildId() string {
@@ -847,7 +847,7 @@ type ListGuildEventsResponse struct {
 
 func (x *ListGuildEventsResponse) Reset() {
 	*x = ListGuildEventsResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[14]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -859,7 +859,7 @@ func (x *ListGuildEventsResponse) String() string {
 func (*ListGuildEventsResponse) ProtoMessage() {}
 
 func (x *ListGuildEventsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[14]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -872,7 +872,7 @@ func (x *ListGuildEventsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListGuildEventsResponse.ProtoReflect.Descriptor instead.
 func (*ListGuildEventsResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{14}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *ListGuildEventsResponse) GetEvents() []*v11.Event {
@@ -897,7 +897,7 @@ type CreateGuildEventRequest struct {
 
 func (x *CreateGuildEventRequest) Reset() {
 	*x = CreateGuildEventRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[15]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -909,7 +909,7 @@ func (x *CreateGuildEventRequest) String() string {
 func (*CreateGuildEventRequest) ProtoMessage() {}
 
 func (x *CreateGuildEventRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[15]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -922,7 +922,7 @@ func (x *CreateGuildEventRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateGuildEventRequest.ProtoReflect.Descriptor instead.
 func (*CreateGuildEventRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{15}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *CreateGuildEventRequest) GetGuildId() string {
@@ -983,7 +983,7 @@ type CreateGuildEventResponse struct {
 
 func (x *CreateGuildEventResponse) Reset() {
 	*x = CreateGuildEventResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[16]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -995,7 +995,7 @@ func (x *CreateGuildEventResponse) String() string {
 func (*CreateGuildEventResponse) ProtoMessage() {}
 
 func (x *CreateGuildEventResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[16]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1008,7 +1008,7 @@ func (x *CreateGuildEventResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateGuildEventResponse.ProtoReflect.Descriptor instead.
 func (*CreateGuildEventResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{16}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *CreateGuildEventResponse) GetEvent() *v11.Event {
@@ -1027,7 +1027,7 @@ type DeleteGuildRequest struct {
 
 func (x *DeleteGuildRequest) Reset() {
 	*x = DeleteGuildRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[17]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1039,7 +1039,7 @@ func (x *DeleteGuildRequest) String() string {
 func (*DeleteGuildRequest) ProtoMessage() {}
 
 func (x *DeleteGuildRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[17]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1052,7 +1052,7 @@ func (x *DeleteGuildRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteGuildRequest.ProtoReflect.Descriptor instead.
 func (*DeleteGuildRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{17}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *DeleteGuildRequest) GetGuildId() string {
@@ -1071,7 +1071,7 @@ type DeleteGuildResponse struct {
 
 func (x *DeleteGuildResponse) Reset() {
 	*x = DeleteGuildResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[18]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1083,7 +1083,7 @@ func (x *DeleteGuildResponse) String() string {
 func (*DeleteGuildResponse) ProtoMessage() {}
 
 func (x *DeleteGuildResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[18]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1096,7 +1096,7 @@ func (x *DeleteGuildResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteGuildResponse.ProtoReflect.Descriptor instead.
 func (*DeleteGuildResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{18}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *DeleteGuildResponse) GetStatus() v1.OperationStatus {
@@ -1123,7 +1123,7 @@ type Guild struct {
 
 func (x *Guild) Reset() {
 	*x = Guild{}
-	mi := &file_guild_v1_guild_proto_msgTypes[19]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1135,7 +1135,7 @@ func (x *Guild) String() string {
 func (*Guild) ProtoMessage() {}
 
 func (x *Guild) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[19]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1148,7 +1148,7 @@ func (x *Guild) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Guild.ProtoReflect.Descriptor instead.
 func (*Guild) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{19}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *Guild) GetId() string {
@@ -1223,7 +1223,7 @@ type GetGuildPulseRequest struct {
 
 func (x *GetGuildPulseRequest) Reset() {
 	*x = GetGuildPulseRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[20]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1235,7 +1235,7 @@ func (x *GetGuildPulseRequest) String() string {
 func (*GetGuildPulseRequest) ProtoMessage() {}
 
 func (x *GetGuildPulseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[20]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1248,7 +1248,7 @@ func (x *GetGuildPulseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetGuildPulseRequest.ProtoReflect.Descriptor instead.
 func (*GetGuildPulseRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{20}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{20}
 }
 
 func (x *GetGuildPulseRequest) GetGuildId() string {
@@ -1270,7 +1270,7 @@ type GuildDayActivity struct {
 
 func (x *GuildDayActivity) Reset() {
 	*x = GuildDayActivity{}
-	mi := &file_guild_v1_guild_proto_msgTypes[21]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[21]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1282,7 +1282,7 @@ func (x *GuildDayActivity) String() string {
 func (*GuildDayActivity) ProtoMessage() {}
 
 func (x *GuildDayActivity) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[21]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[21]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1295,7 +1295,7 @@ func (x *GuildDayActivity) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GuildDayActivity.ProtoReflect.Descriptor instead.
 func (*GuildDayActivity) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{21}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{21}
 }
 
 func (x *GuildDayActivity) GetDate() string {
@@ -1341,7 +1341,7 @@ type GuildMemberAction struct {
 
 func (x *GuildMemberAction) Reset() {
 	*x = GuildMemberAction{}
-	mi := &file_guild_v1_guild_proto_msgTypes[22]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[22]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1353,7 +1353,7 @@ func (x *GuildMemberAction) String() string {
 func (*GuildMemberAction) ProtoMessage() {}
 
 func (x *GuildMemberAction) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[22]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[22]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1366,7 +1366,7 @@ func (x *GuildMemberAction) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GuildMemberAction.ProtoReflect.Descriptor instead.
 func (*GuildMemberAction) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{22}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{22}
 }
 
 func (x *GuildMemberAction) GetUserId() string {
@@ -1430,7 +1430,7 @@ type GetGuildPulseResponse struct {
 
 func (x *GetGuildPulseResponse) Reset() {
 	*x = GetGuildPulseResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[23]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[23]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1442,7 +1442,7 @@ func (x *GetGuildPulseResponse) String() string {
 func (*GetGuildPulseResponse) ProtoMessage() {}
 
 func (x *GetGuildPulseResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[23]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[23]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1455,7 +1455,7 @@ func (x *GetGuildPulseResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetGuildPulseResponse.ProtoReflect.Descriptor instead.
 func (*GetGuildPulseResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{23}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{23}
 }
 
 func (x *GetGuildPulseResponse) GetActiveToday() int32 {
@@ -1495,7 +1495,7 @@ type GetGuildMemberStatsRequest struct {
 
 func (x *GetGuildMemberStatsRequest) Reset() {
 	*x = GetGuildMemberStatsRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[24]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[24]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1507,7 +1507,7 @@ func (x *GetGuildMemberStatsRequest) String() string {
 func (*GetGuildMemberStatsRequest) ProtoMessage() {}
 
 func (x *GetGuildMemberStatsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[24]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[24]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1520,7 +1520,7 @@ func (x *GetGuildMemberStatsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetGuildMemberStatsRequest.ProtoReflect.Descriptor instead.
 func (*GetGuildMemberStatsRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{24}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{24}
 }
 
 func (x *GetGuildMemberStatsRequest) GetGuildId() string {
@@ -1550,7 +1550,7 @@ type GuildMemberStatsEntry struct {
 
 func (x *GuildMemberStatsEntry) Reset() {
 	*x = GuildMemberStatsEntry{}
-	mi := &file_guild_v1_guild_proto_msgTypes[25]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[25]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1562,7 +1562,7 @@ func (x *GuildMemberStatsEntry) String() string {
 func (*GuildMemberStatsEntry) ProtoMessage() {}
 
 func (x *GuildMemberStatsEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[25]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[25]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1575,7 +1575,7 @@ func (x *GuildMemberStatsEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GuildMemberStatsEntry.ProtoReflect.Descriptor instead.
 func (*GuildMemberStatsEntry) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{25}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{25}
 }
 
 func (x *GuildMemberStatsEntry) GetUserId() string {
@@ -1671,7 +1671,7 @@ type GetGuildMemberStatsResponse struct {
 
 func (x *GetGuildMemberStatsResponse) Reset() {
 	*x = GetGuildMemberStatsResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[26]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[26]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1683,7 +1683,7 @@ func (x *GetGuildMemberStatsResponse) String() string {
 func (*GetGuildMemberStatsResponse) ProtoMessage() {}
 
 func (x *GetGuildMemberStatsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[26]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[26]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1696,7 +1696,7 @@ func (x *GetGuildMemberStatsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetGuildMemberStatsResponse.ProtoReflect.Descriptor instead.
 func (*GetGuildMemberStatsResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{26}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{26}
 }
 
 func (x *GetGuildMemberStatsResponse) GetMembers() []*GuildMemberStatsEntry {
@@ -1715,7 +1715,7 @@ type GetActiveGuildChallengeRequest struct {
 
 func (x *GetActiveGuildChallengeRequest) Reset() {
 	*x = GetActiveGuildChallengeRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[27]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[27]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1727,7 +1727,7 @@ func (x *GetActiveGuildChallengeRequest) String() string {
 func (*GetActiveGuildChallengeRequest) ProtoMessage() {}
 
 func (x *GetActiveGuildChallengeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[27]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[27]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1740,7 +1740,7 @@ func (x *GetActiveGuildChallengeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetActiveGuildChallengeRequest.ProtoReflect.Descriptor instead.
 func (*GetActiveGuildChallengeRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{27}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{27}
 }
 
 func (x *GetActiveGuildChallengeRequest) GetGuildId() string {
@@ -1763,7 +1763,7 @@ type ChallengeMemberProgress struct {
 
 func (x *ChallengeMemberProgress) Reset() {
 	*x = ChallengeMemberProgress{}
-	mi := &file_guild_v1_guild_proto_msgTypes[28]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[28]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1775,7 +1775,7 @@ func (x *ChallengeMemberProgress) String() string {
 func (*ChallengeMemberProgress) ProtoMessage() {}
 
 func (x *ChallengeMemberProgress) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[28]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[28]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1788,7 +1788,7 @@ func (x *ChallengeMemberProgress) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ChallengeMemberProgress.ProtoReflect.Descriptor instead.
 func (*ChallengeMemberProgress) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{28}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{28}
 }
 
 func (x *ChallengeMemberProgress) GetUserId() string {
@@ -1842,7 +1842,7 @@ type GuildChallengeData struct {
 
 func (x *GuildChallengeData) Reset() {
 	*x = GuildChallengeData{}
-	mi := &file_guild_v1_guild_proto_msgTypes[29]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[29]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1854,7 +1854,7 @@ func (x *GuildChallengeData) String() string {
 func (*GuildChallengeData) ProtoMessage() {}
 
 func (x *GuildChallengeData) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[29]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[29]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1867,7 +1867,7 @@ func (x *GuildChallengeData) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GuildChallengeData.ProtoReflect.Descriptor instead.
 func (*GuildChallengeData) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{29}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{29}
 }
 
 func (x *GuildChallengeData) GetId() string {
@@ -1935,7 +1935,7 @@ type GetActiveGuildChallengeResponse struct {
 
 func (x *GetActiveGuildChallengeResponse) Reset() {
 	*x = GetActiveGuildChallengeResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[30]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[30]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1947,7 +1947,7 @@ func (x *GetActiveGuildChallengeResponse) String() string {
 func (*GetActiveGuildChallengeResponse) ProtoMessage() {}
 
 func (x *GetActiveGuildChallengeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[30]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[30]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1960,7 +1960,7 @@ func (x *GetActiveGuildChallengeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetActiveGuildChallengeResponse.ProtoReflect.Descriptor instead.
 func (*GetActiveGuildChallengeResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{30}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{30}
 }
 
 func (x *GetActiveGuildChallengeResponse) GetChallenge() *GuildChallengeData {
@@ -1981,7 +1981,7 @@ type CreateGuildChallengeRequest struct {
 
 func (x *CreateGuildChallengeRequest) Reset() {
 	*x = CreateGuildChallengeRequest{}
-	mi := &file_guild_v1_guild_proto_msgTypes[31]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[31]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1993,7 +1993,7 @@ func (x *CreateGuildChallengeRequest) String() string {
 func (*CreateGuildChallengeRequest) ProtoMessage() {}
 
 func (x *CreateGuildChallengeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[31]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[31]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2006,7 +2006,7 @@ func (x *CreateGuildChallengeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateGuildChallengeRequest.ProtoReflect.Descriptor instead.
 func (*CreateGuildChallengeRequest) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{31}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{31}
 }
 
 func (x *CreateGuildChallengeRequest) GetGuildId() string {
@@ -2039,7 +2039,7 @@ type CreateGuildChallengeResponse struct {
 
 func (x *CreateGuildChallengeResponse) Reset() {
 	*x = CreateGuildChallengeResponse{}
-	mi := &file_guild_v1_guild_proto_msgTypes[32]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[32]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2051,7 +2051,7 @@ func (x *CreateGuildChallengeResponse) String() string {
 func (*CreateGuildChallengeResponse) ProtoMessage() {}
 
 func (x *CreateGuildChallengeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_guild_v1_guild_proto_msgTypes[32]
+	mi := &file_social_guild_v1_guild_proto_msgTypes[32]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2064,7 +2064,7 @@ func (x *CreateGuildChallengeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateGuildChallengeResponse.ProtoReflect.Descriptor instead.
 func (*CreateGuildChallengeResponse) Descriptor() ([]byte, []int) {
-	return file_guild_v1_guild_proto_rawDescGZIP(), []int{32}
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{32}
 }
 
 func (x *CreateGuildChallengeResponse) GetChallenge() *GuildChallengeData {
@@ -2074,11 +2074,11 @@ func (x *CreateGuildChallengeResponse) GetChallenge() *GuildChallengeData {
 	return nil
 }
 
-var File_guild_v1_guild_proto protoreflect.FileDescriptor
+var File_social_guild_v1_guild_proto protoreflect.FileDescriptor
 
-const file_guild_v1_guild_proto_rawDesc = "" +
+const file_social_guild_v1_guild_proto_rawDesc = "" +
 	"\n" +
-	"\x14guild/v1/guild.proto\x12\bguild.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16common/v1/common.proto\x1a\x14event/v1/event.proto\"A\n" +
+	"\x1bsocial/guild/v1/guild.proto\x12\bguild.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bcore/common/v1/common.proto\x1a\x1bsocial/event/v1/event.proto\"A\n" +
 	"\x11ListGuildsRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x05R\x06offset\"{\n" +
@@ -2254,20 +2254,20 @@ const file_guild_v1_guild_proto_rawDesc = "" +
 	"\x14CreateGuildChallenge\x12%.guild.v1.CreateGuildChallengeRequest\x1a&.guild.v1.CreateGuildChallengeResponse\".\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/guilds/{guild_id}/challengeB\x19Z\x17api/pkg/api/guild/v1;v1b\x06proto3"
 
 var (
-	file_guild_v1_guild_proto_rawDescOnce sync.Once
-	file_guild_v1_guild_proto_rawDescData []byte
+	file_social_guild_v1_guild_proto_rawDescOnce sync.Once
+	file_social_guild_v1_guild_proto_rawDescData []byte
 )
 
-func file_guild_v1_guild_proto_rawDescGZIP() []byte {
-	file_guild_v1_guild_proto_rawDescOnce.Do(func() {
-		file_guild_v1_guild_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_guild_v1_guild_proto_rawDesc), len(file_guild_v1_guild_proto_rawDesc)))
+func file_social_guild_v1_guild_proto_rawDescGZIP() []byte {
+	file_social_guild_v1_guild_proto_rawDescOnce.Do(func() {
+		file_social_guild_v1_guild_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_social_guild_v1_guild_proto_rawDesc), len(file_social_guild_v1_guild_proto_rawDesc)))
 	})
-	return file_guild_v1_guild_proto_rawDescData
+	return file_social_guild_v1_guild_proto_rawDescData
 }
 
-var file_guild_v1_guild_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_guild_v1_guild_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
-var file_guild_v1_guild_proto_goTypes = []any{
+var file_social_guild_v1_guild_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_social_guild_v1_guild_proto_msgTypes = make([]protoimpl.MessageInfo, 33)
+var file_social_guild_v1_guild_proto_goTypes = []any{
 	(GuildMemberRole)(0),                    // 0: guild.v1.GuildMemberRole
 	(GuildMemberActionType)(0),              // 1: guild.v1.GuildMemberActionType
 	(*ListGuildsRequest)(nil),               // 2: guild.v1.ListGuildsRequest
@@ -2308,7 +2308,7 @@ var file_guild_v1_guild_proto_goTypes = []any{
 	(v11.EventListFilter)(0),                // 37: event.v1.EventListFilter
 	(*v11.Event)(nil),                       // 38: event.v1.Event
 }
-var file_guild_v1_guild_proto_depIdxs = []int32{
+var file_social_guild_v1_guild_proto_depIdxs = []int32{
 	21, // 0: guild.v1.ListGuildsResponse.guilds:type_name -> guild.v1.Guild
 	21, // 1: guild.v1.GuildResponse.guild:type_name -> guild.v1.Guild
 	35, // 2: guild.v1.JoinGuildResponse.status:type_name -> common.v1.OperationStatus
@@ -2367,27 +2367,27 @@ var file_guild_v1_guild_proto_depIdxs = []int32{
 	0,  // [0:25] is the sub-list for field type_name
 }
 
-func init() { file_guild_v1_guild_proto_init() }
-func file_guild_v1_guild_proto_init() {
-	if File_guild_v1_guild_proto != nil {
+func init() { file_social_guild_v1_guild_proto_init() }
+func file_social_guild_v1_guild_proto_init() {
+	if File_social_guild_v1_guild_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_guild_v1_guild_proto_rawDesc), len(file_guild_v1_guild_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_guild_v1_guild_proto_rawDesc), len(file_social_guild_v1_guild_proto_rawDesc)),
 			NumEnums:      2,
 			NumMessages:   33,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_guild_v1_guild_proto_goTypes,
-		DependencyIndexes: file_guild_v1_guild_proto_depIdxs,
-		EnumInfos:         file_guild_v1_guild_proto_enumTypes,
-		MessageInfos:      file_guild_v1_guild_proto_msgTypes,
+		GoTypes:           file_social_guild_v1_guild_proto_goTypes,
+		DependencyIndexes: file_social_guild_v1_guild_proto_depIdxs,
+		EnumInfos:         file_social_guild_v1_guild_proto_enumTypes,
+		MessageInfos:      file_social_guild_v1_guild_proto_msgTypes,
 	}.Build()
-	File_guild_v1_guild_proto = out.File
-	file_guild_v1_guild_proto_goTypes = nil
-	file_guild_v1_guild_proto_depIdxs = nil
+	File_social_guild_v1_guild_proto = out.File
+	file_social_guild_v1_guild_proto_goTypes = nil
+	file_social_guild_v1_guild_proto_depIdxs = nil
 }

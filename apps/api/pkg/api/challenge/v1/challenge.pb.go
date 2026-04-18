@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: challenge/v1/challenge.proto
+// source: game/challenge/v1/challenge.proto
 
 package v1
 
@@ -31,7 +31,7 @@ type GetBlindReviewTaskRequest struct {
 
 func (x *GetBlindReviewTaskRequest) Reset() {
 	*x = GetBlindReviewTaskRequest{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[0]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *GetBlindReviewTaskRequest) String() string {
 func (*GetBlindReviewTaskRequest) ProtoMessage() {}
 
 func (x *GetBlindReviewTaskRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[0]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *GetBlindReviewTaskRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetBlindReviewTaskRequest.ProtoReflect.Descriptor instead.
 func (*GetBlindReviewTaskRequest) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{0}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{0}
 }
 
 type BlindReviewTask struct {
@@ -73,7 +73,7 @@ type BlindReviewTask struct {
 
 func (x *BlindReviewTask) Reset() {
 	*x = BlindReviewTask{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[1]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -85,7 +85,7 @@ func (x *BlindReviewTask) String() string {
 func (*BlindReviewTask) ProtoMessage() {}
 
 func (x *BlindReviewTask) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[1]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -98,7 +98,7 @@ func (x *BlindReviewTask) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlindReviewTask.ProtoReflect.Descriptor instead.
 func (*BlindReviewTask) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{1}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *BlindReviewTask) GetSourceReviewId() string {
@@ -156,7 +156,7 @@ type SubmitBlindReviewRequest struct {
 
 func (x *SubmitBlindReviewRequest) Reset() {
 	*x = SubmitBlindReviewRequest{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[2]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -168,7 +168,7 @@ func (x *SubmitBlindReviewRequest) String() string {
 func (*SubmitBlindReviewRequest) ProtoMessage() {}
 
 func (x *SubmitBlindReviewRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[2]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -181,7 +181,7 @@ func (x *SubmitBlindReviewRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SubmitBlindReviewRequest.ProtoReflect.Descriptor instead.
 func (*SubmitBlindReviewRequest) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{2}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SubmitBlindReviewRequest) GetSourceReviewId() string {
@@ -231,7 +231,7 @@ type BlindReviewResult struct {
 
 func (x *BlindReviewResult) Reset() {
 	*x = BlindReviewResult{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[3]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -243,7 +243,7 @@ func (x *BlindReviewResult) String() string {
 func (*BlindReviewResult) ProtoMessage() {}
 
 func (x *BlindReviewResult) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[3]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -256,7 +256,7 @@ func (x *BlindReviewResult) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use BlindReviewResult.ProtoReflect.Descriptor instead.
 func (*BlindReviewResult) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{3}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *BlindReviewResult) GetId() string {
@@ -295,7 +295,7 @@ type GetSpeedRunRecordsRequest struct {
 
 func (x *GetSpeedRunRecordsRequest) Reset() {
 	*x = GetSpeedRunRecordsRequest{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[4]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -307,7 +307,7 @@ func (x *GetSpeedRunRecordsRequest) String() string {
 func (*GetSpeedRunRecordsRequest) ProtoMessage() {}
 
 func (x *GetSpeedRunRecordsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[4]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -320,7 +320,7 @@ func (x *GetSpeedRunRecordsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSpeedRunRecordsRequest.ProtoReflect.Descriptor instead.
 func (*GetSpeedRunRecordsRequest) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{4}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{4}
 }
 
 type GetSpeedRunRecordsResponse struct {
@@ -332,7 +332,7 @@ type GetSpeedRunRecordsResponse struct {
 
 func (x *GetSpeedRunRecordsResponse) Reset() {
 	*x = GetSpeedRunRecordsResponse{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[5]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -344,7 +344,7 @@ func (x *GetSpeedRunRecordsResponse) String() string {
 func (*GetSpeedRunRecordsResponse) ProtoMessage() {}
 
 func (x *GetSpeedRunRecordsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[5]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -357,7 +357,7 @@ func (x *GetSpeedRunRecordsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSpeedRunRecordsResponse.ProtoReflect.Descriptor instead.
 func (*GetSpeedRunRecordsResponse) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{5}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *GetSpeedRunRecordsResponse) GetRecords() []*TaskRecord {
@@ -381,7 +381,7 @@ type TaskRecord struct {
 
 func (x *TaskRecord) Reset() {
 	*x = TaskRecord{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[6]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -393,7 +393,7 @@ func (x *TaskRecord) String() string {
 func (*TaskRecord) ProtoMessage() {}
 
 func (x *TaskRecord) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[6]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -406,7 +406,7 @@ func (x *TaskRecord) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use TaskRecord.ProtoReflect.Descriptor instead.
 func (*TaskRecord) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{6}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *TaskRecord) GetTaskId() string {
@@ -459,7 +459,7 @@ type GetWeeklyChallengeRequest struct {
 
 func (x *GetWeeklyChallengeRequest) Reset() {
 	*x = GetWeeklyChallengeRequest{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[7]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -471,7 +471,7 @@ func (x *GetWeeklyChallengeRequest) String() string {
 func (*GetWeeklyChallengeRequest) ProtoMessage() {}
 
 func (x *GetWeeklyChallengeRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[7]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -484,7 +484,7 @@ func (x *GetWeeklyChallengeRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWeeklyChallengeRequest.ProtoReflect.Descriptor instead.
 func (*GetWeeklyChallengeRequest) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{7}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{7}
 }
 
 type GetWeeklyChallengeResponse struct {
@@ -500,7 +500,7 @@ type GetWeeklyChallengeResponse struct {
 
 func (x *GetWeeklyChallengeResponse) Reset() {
 	*x = GetWeeklyChallengeResponse{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[8]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -512,7 +512,7 @@ func (x *GetWeeklyChallengeResponse) String() string {
 func (*GetWeeklyChallengeResponse) ProtoMessage() {}
 
 func (x *GetWeeklyChallengeResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[8]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -525,7 +525,7 @@ func (x *GetWeeklyChallengeResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetWeeklyChallengeResponse.ProtoReflect.Descriptor instead.
 func (*GetWeeklyChallengeResponse) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{8}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *GetWeeklyChallengeResponse) GetWeekKey() string {
@@ -577,7 +577,7 @@ type WeeklyEntry struct {
 
 func (x *WeeklyEntry) Reset() {
 	*x = WeeklyEntry{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[9]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -589,7 +589,7 @@ func (x *WeeklyEntry) String() string {
 func (*WeeklyEntry) ProtoMessage() {}
 
 func (x *WeeklyEntry) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[9]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -602,7 +602,7 @@ func (x *WeeklyEntry) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WeeklyEntry.ProtoReflect.Descriptor instead.
 func (*WeeklyEntry) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{9}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *WeeklyEntry) GetUserId() string {
@@ -661,7 +661,7 @@ type WeeklyInfo struct {
 
 func (x *WeeklyInfo) Reset() {
 	*x = WeeklyInfo{}
-	mi := &file_challenge_v1_challenge_proto_msgTypes[10]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -673,7 +673,7 @@ func (x *WeeklyInfo) String() string {
 func (*WeeklyInfo) ProtoMessage() {}
 
 func (x *WeeklyInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_challenge_v1_challenge_proto_msgTypes[10]
+	mi := &file_game_challenge_v1_challenge_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -686,7 +686,7 @@ func (x *WeeklyInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use WeeklyInfo.ProtoReflect.Descriptor instead.
 func (*WeeklyInfo) Descriptor() ([]byte, []int) {
-	return file_challenge_v1_challenge_proto_rawDescGZIP(), []int{10}
+	return file_game_challenge_v1_challenge_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *WeeklyInfo) GetWeekKey() string {
@@ -731,11 +731,11 @@ func (x *WeeklyInfo) GetEndsAt() *timestamppb.Timestamp {
 	return nil
 }
 
-var File_challenge_v1_challenge_proto protoreflect.FileDescriptor
+var File_game_challenge_v1_challenge_proto protoreflect.FileDescriptor
 
-const file_challenge_v1_challenge_proto_rawDesc = "" +
+const file_game_challenge_v1_challenge_proto_rawDesc = "" +
 	"\n" +
-	"\x1cchallenge/v1/challenge.proto\x12\fchallenge.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x1b\n" +
+	"!game/challenge/v1/challenge.proto\x12\fchallenge.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x1b\n" +
 	"\x19GetBlindReviewTaskRequest\"\xca\x01\n" +
 	"\x0fBlindReviewTask\x12(\n" +
 	"\x10source_review_id\x18\x01 \x01(\tR\x0esourceReviewId\x12\x17\n" +
@@ -806,19 +806,19 @@ const file_challenge_v1_challenge_proto_rawDesc = "" +
 	"\x12GetWeeklyChallenge\x12'.challenge.v1.GetWeeklyChallengeRequest\x1a(.challenge.v1.GetWeeklyChallengeResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/v1/challenges/weeklyB\x1dZ\x1bapi/pkg/api/challenge/v1;v1b\x06proto3"
 
 var (
-	file_challenge_v1_challenge_proto_rawDescOnce sync.Once
-	file_challenge_v1_challenge_proto_rawDescData []byte
+	file_game_challenge_v1_challenge_proto_rawDescOnce sync.Once
+	file_game_challenge_v1_challenge_proto_rawDescData []byte
 )
 
-func file_challenge_v1_challenge_proto_rawDescGZIP() []byte {
-	file_challenge_v1_challenge_proto_rawDescOnce.Do(func() {
-		file_challenge_v1_challenge_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_challenge_v1_challenge_proto_rawDesc), len(file_challenge_v1_challenge_proto_rawDesc)))
+func file_game_challenge_v1_challenge_proto_rawDescGZIP() []byte {
+	file_game_challenge_v1_challenge_proto_rawDescOnce.Do(func() {
+		file_game_challenge_v1_challenge_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_game_challenge_v1_challenge_proto_rawDesc), len(file_game_challenge_v1_challenge_proto_rawDesc)))
 	})
-	return file_challenge_v1_challenge_proto_rawDescData
+	return file_game_challenge_v1_challenge_proto_rawDescData
 }
 
-var file_challenge_v1_challenge_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_challenge_v1_challenge_proto_goTypes = []any{
+var file_game_challenge_v1_challenge_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_game_challenge_v1_challenge_proto_goTypes = []any{
 	(*GetBlindReviewTaskRequest)(nil),  // 0: challenge.v1.GetBlindReviewTaskRequest
 	(*BlindReviewTask)(nil),            // 1: challenge.v1.BlindReviewTask
 	(*SubmitBlindReviewRequest)(nil),   // 2: challenge.v1.SubmitBlindReviewRequest
@@ -832,7 +832,7 @@ var file_challenge_v1_challenge_proto_goTypes = []any{
 	(*WeeklyInfo)(nil),                 // 10: challenge.v1.WeeklyInfo
 	(*timestamppb.Timestamp)(nil),      // 11: google.protobuf.Timestamp
 }
-var file_challenge_v1_challenge_proto_depIdxs = []int32{
+var file_game_challenge_v1_challenge_proto_depIdxs = []int32{
 	11, // 0: challenge.v1.BlindReviewResult.submitted_at:type_name -> google.protobuf.Timestamp
 	6,  // 1: challenge.v1.GetSpeedRunRecordsResponse.records:type_name -> challenge.v1.TaskRecord
 	11, // 2: challenge.v1.TaskRecord.last_at:type_name -> google.protobuf.Timestamp
@@ -857,26 +857,26 @@ var file_challenge_v1_challenge_proto_depIdxs = []int32{
 	0,  // [0:9] is the sub-list for field type_name
 }
 
-func init() { file_challenge_v1_challenge_proto_init() }
-func file_challenge_v1_challenge_proto_init() {
-	if File_challenge_v1_challenge_proto != nil {
+func init() { file_game_challenge_v1_challenge_proto_init() }
+func file_game_challenge_v1_challenge_proto_init() {
+	if File_game_challenge_v1_challenge_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_challenge_v1_challenge_proto_rawDesc), len(file_challenge_v1_challenge_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_challenge_v1_challenge_proto_rawDesc), len(file_game_challenge_v1_challenge_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_challenge_v1_challenge_proto_goTypes,
-		DependencyIndexes: file_challenge_v1_challenge_proto_depIdxs,
-		MessageInfos:      file_challenge_v1_challenge_proto_msgTypes,
+		GoTypes:           file_game_challenge_v1_challenge_proto_goTypes,
+		DependencyIndexes: file_game_challenge_v1_challenge_proto_depIdxs,
+		MessageInfos:      file_game_challenge_v1_challenge_proto_msgTypes,
 	}.Build()
-	File_challenge_v1_challenge_proto = out.File
-	file_challenge_v1_challenge_proto_goTypes = nil
-	file_challenge_v1_challenge_proto_depIdxs = nil
+	File_game_challenge_v1_challenge_proto = out.File
+	file_game_challenge_v1_challenge_proto_goTypes = nil
+	file_game_challenge_v1_challenge_proto_depIdxs = nil
 }

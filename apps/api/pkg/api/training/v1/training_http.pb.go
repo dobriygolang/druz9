@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: training/v1/training.proto
+// source: learning/training/v1/training.proto
 
 package v1
 
@@ -26,6 +26,11 @@ const OperationTrainingServiceGetTask = "/training.v1.TrainingService/GetTask"
 type TrainingServiceHTTPServer interface {
 	EvaluateTaskSolution(context.Context, *EvaluateTaskSolutionRequest) (*EvaluateTaskSolutionResponse, error)
 	GetSkillTree(context.Context, *GetSkillTreeRequest) (*GetSkillTreeResponse, error)
+	// GetTask GetTask and EvaluateTaskSolution are implemented with full sandbox
+	// execution, season-pass XP awarding and AI review. They are not yet
+	// wired into the primary frontend flow (the training page only renders
+	// the skill tree), but they are production-ready and kept here for the
+	// upcoming in-tree task-solving feature.
 	GetTask(context.Context, *GetTaskRequest) (*GetTaskResponse, error)
 }
 
@@ -105,6 +110,11 @@ func _TrainingService_EvaluateTaskSolution0_HTTP_Handler(srv TrainingServiceHTTP
 type TrainingServiceHTTPClient interface {
 	EvaluateTaskSolution(ctx context.Context, req *EvaluateTaskSolutionRequest, opts ...http.CallOption) (rsp *EvaluateTaskSolutionResponse, err error)
 	GetSkillTree(ctx context.Context, req *GetSkillTreeRequest, opts ...http.CallOption) (rsp *GetSkillTreeResponse, err error)
+	// GetTask GetTask and EvaluateTaskSolution are implemented with full sandbox
+	// execution, season-pass XP awarding and AI review. They are not yet
+	// wired into the primary frontend flow (the training page only renders
+	// the skill tree), but they are production-ready and kept here for the
+	// upcoming in-tree task-solving feature.
 	GetTask(ctx context.Context, req *GetTaskRequest, opts ...http.CallOption) (rsp *GetTaskResponse, err error)
 }
 
@@ -142,6 +152,11 @@ func (c *TrainingServiceHTTPClientImpl) GetSkillTree(ctx context.Context, in *Ge
 	return &out, nil
 }
 
+// GetTask GetTask and EvaluateTaskSolution are implemented with full sandbox
+// execution, season-pass XP awarding and AI review. They are not yet
+// wired into the primary frontend flow (the training page only renders
+// the skill tree), but they are production-ready and kept here for the
+// upcoming in-tree task-solving feature.
 func (c *TrainingServiceHTTPClientImpl) GetTask(ctx context.Context, in *GetTaskRequest, opts ...http.CallOption) (*GetTaskResponse, error) {
 	var out GetTaskResponse
 	pattern := "/api/v1/training/tasks/{module_id}"

@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: season_pass/v1/season_pass.proto
+// source: game/season_pass/v1/season_pass.proto
 
 package v1
 
@@ -213,5 +213,5 @@ var SeasonPassService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "season_pass/v1/season_pass.proto",
+	Metadata: "game/season_pass/v1/season_pass.proto",
 }

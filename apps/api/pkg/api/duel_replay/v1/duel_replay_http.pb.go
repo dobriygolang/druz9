@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: duel_replay/v1/duel_replay.proto
+// source: game/duel_replay/v1/duel_replay.proto
 
 package v1
 

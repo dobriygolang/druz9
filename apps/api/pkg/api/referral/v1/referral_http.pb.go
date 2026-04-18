@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: referral/v1/referral.proto
+// source: social/referral/v1/referral.proto
 
 package v1
 

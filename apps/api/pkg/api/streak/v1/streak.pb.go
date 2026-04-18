@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: streak/v1/streak.proto
+// source: game/streak/v1/streak.proto
 
 package v1
 
@@ -39,7 +39,7 @@ type StreakState struct {
 
 func (x *StreakState) Reset() {
 	*x = StreakState{}
-	mi := &file_streak_v1_streak_proto_msgTypes[0]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -51,7 +51,7 @@ func (x *StreakState) String() string {
 func (*StreakState) ProtoMessage() {}
 
 func (x *StreakState) ProtoReflect() protoreflect.Message {
-	mi := &file_streak_v1_streak_proto_msgTypes[0]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -64,7 +64,7 @@ func (x *StreakState) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StreakState.ProtoReflect.Descriptor instead.
 func (*StreakState) Descriptor() ([]byte, []int) {
-	return file_streak_v1_streak_proto_rawDescGZIP(), []int{0}
+	return file_game_streak_v1_streak_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *StreakState) GetCurrentDays() int32 {
@@ -131,7 +131,7 @@ type GetStreakRequest struct {
 
 func (x *GetStreakRequest) Reset() {
 	*x = GetStreakRequest{}
-	mi := &file_streak_v1_streak_proto_msgTypes[1]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -143,7 +143,7 @@ func (x *GetStreakRequest) String() string {
 func (*GetStreakRequest) ProtoMessage() {}
 
 func (x *GetStreakRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_streak_v1_streak_proto_msgTypes[1]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -156,7 +156,7 @@ func (x *GetStreakRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStreakRequest.ProtoReflect.Descriptor instead.
 func (*GetStreakRequest) Descriptor() ([]byte, []int) {
-	return file_streak_v1_streak_proto_rawDescGZIP(), []int{1}
+	return file_game_streak_v1_streak_proto_rawDescGZIP(), []int{1}
 }
 
 type GetStreakResponse struct {
@@ -168,7 +168,7 @@ type GetStreakResponse struct {
 
 func (x *GetStreakResponse) Reset() {
 	*x = GetStreakResponse{}
-	mi := &file_streak_v1_streak_proto_msgTypes[2]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -180,7 +180,7 @@ func (x *GetStreakResponse) String() string {
 func (*GetStreakResponse) ProtoMessage() {}
 
 func (x *GetStreakResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_streak_v1_streak_proto_msgTypes[2]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -193,7 +193,7 @@ func (x *GetStreakResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetStreakResponse.ProtoReflect.Descriptor instead.
 func (*GetStreakResponse) Descriptor() ([]byte, []int) {
-	return file_streak_v1_streak_proto_rawDescGZIP(), []int{2}
+	return file_game_streak_v1_streak_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetStreakResponse) GetState() *StreakState {
@@ -211,7 +211,7 @@ type UseShieldRequest struct {
 
 func (x *UseShieldRequest) Reset() {
 	*x = UseShieldRequest{}
-	mi := &file_streak_v1_streak_proto_msgTypes[3]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -223,7 +223,7 @@ func (x *UseShieldRequest) String() string {
 func (*UseShieldRequest) ProtoMessage() {}
 
 func (x *UseShieldRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_streak_v1_streak_proto_msgTypes[3]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -236,7 +236,7 @@ func (x *UseShieldRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UseShieldRequest.ProtoReflect.Descriptor instead.
 func (*UseShieldRequest) Descriptor() ([]byte, []int) {
-	return file_streak_v1_streak_proto_rawDescGZIP(), []int{3}
+	return file_game_streak_v1_streak_proto_rawDescGZIP(), []int{3}
 }
 
 type UseShieldResponse struct {
@@ -249,7 +249,7 @@ type UseShieldResponse struct {
 
 func (x *UseShieldResponse) Reset() {
 	*x = UseShieldResponse{}
-	mi := &file_streak_v1_streak_proto_msgTypes[4]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -261,7 +261,7 @@ func (x *UseShieldResponse) String() string {
 func (*UseShieldResponse) ProtoMessage() {}
 
 func (x *UseShieldResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_streak_v1_streak_proto_msgTypes[4]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -274,7 +274,7 @@ func (x *UseShieldResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UseShieldResponse.ProtoReflect.Descriptor instead.
 func (*UseShieldResponse) Descriptor() ([]byte, []int) {
-	return file_streak_v1_streak_proto_rawDescGZIP(), []int{4}
+	return file_game_streak_v1_streak_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *UseShieldResponse) GetState() *StreakState {
@@ -300,7 +300,7 @@ type PurchaseShieldRequest struct {
 
 func (x *PurchaseShieldRequest) Reset() {
 	*x = PurchaseShieldRequest{}
-	mi := &file_streak_v1_streak_proto_msgTypes[5]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -312,7 +312,7 @@ func (x *PurchaseShieldRequest) String() string {
 func (*PurchaseShieldRequest) ProtoMessage() {}
 
 func (x *PurchaseShieldRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_streak_v1_streak_proto_msgTypes[5]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -325,7 +325,7 @@ func (x *PurchaseShieldRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurchaseShieldRequest.ProtoReflect.Descriptor instead.
 func (*PurchaseShieldRequest) Descriptor() ([]byte, []int) {
-	return file_streak_v1_streak_proto_rawDescGZIP(), []int{5}
+	return file_game_streak_v1_streak_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *PurchaseShieldRequest) GetCount() int32 {
@@ -346,7 +346,7 @@ type PurchaseShieldResponse struct {
 
 func (x *PurchaseShieldResponse) Reset() {
 	*x = PurchaseShieldResponse{}
-	mi := &file_streak_v1_streak_proto_msgTypes[6]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -358,7 +358,7 @@ func (x *PurchaseShieldResponse) String() string {
 func (*PurchaseShieldResponse) ProtoMessage() {}
 
 func (x *PurchaseShieldResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_streak_v1_streak_proto_msgTypes[6]
+	mi := &file_game_streak_v1_streak_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -371,7 +371,7 @@ func (x *PurchaseShieldResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurchaseShieldResponse.ProtoReflect.Descriptor instead.
 func (*PurchaseShieldResponse) Descriptor() ([]byte, []int) {
-	return file_streak_v1_streak_proto_rawDescGZIP(), []int{6}
+	return file_game_streak_v1_streak_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *PurchaseShieldResponse) GetState() *StreakState {
@@ -395,11 +395,11 @@ func (x *PurchaseShieldResponse) GetTotalCostGold() int32 {
 	return 0
 }
 
-var File_streak_v1_streak_proto protoreflect.FileDescriptor
+var File_game_streak_v1_streak_proto protoreflect.FileDescriptor
 
-const file_streak_v1_streak_proto_rawDesc = "" +
+const file_game_streak_v1_streak_proto_rawDesc = "" +
 	"\n" +
-	"\x16streak/v1/streak.proto\x12\tstreak.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xef\x02\n" +
+	"\x1bgame/streak/v1/streak.proto\x12\tstreak.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xef\x02\n" +
 	"\vStreakState\x12!\n" +
 	"\fcurrent_days\x18\x01 \x01(\x05R\vcurrentDays\x12!\n" +
 	"\flongest_days\x18\x02 \x01(\x05R\vlongestDays\x12#\n" +
@@ -429,19 +429,19 @@ const file_streak_v1_streak_proto_rawDesc = "" +
 	"\x0ePurchaseShield\x12 .streak.v1.PurchaseShieldRequest\x1a!.streak.v1.PurchaseShieldResponse\")\x82\xd3\xe4\x93\x02#:\x01*\"\x1e/api/v1/streak/shield/purchaseB\x1aZ\x18api/pkg/api/streak/v1;v1b\x06proto3"
 
 var (
-	file_streak_v1_streak_proto_rawDescOnce sync.Once
-	file_streak_v1_streak_proto_rawDescData []byte
+	file_game_streak_v1_streak_proto_rawDescOnce sync.Once
+	file_game_streak_v1_streak_proto_rawDescData []byte
 )
 
-func file_streak_v1_streak_proto_rawDescGZIP() []byte {
-	file_streak_v1_streak_proto_rawDescOnce.Do(func() {
-		file_streak_v1_streak_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_streak_v1_streak_proto_rawDesc), len(file_streak_v1_streak_proto_rawDesc)))
+func file_game_streak_v1_streak_proto_rawDescGZIP() []byte {
+	file_game_streak_v1_streak_proto_rawDescOnce.Do(func() {
+		file_game_streak_v1_streak_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_game_streak_v1_streak_proto_rawDesc), len(file_game_streak_v1_streak_proto_rawDesc)))
 	})
-	return file_streak_v1_streak_proto_rawDescData
+	return file_game_streak_v1_streak_proto_rawDescData
 }
 
-var file_streak_v1_streak_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
-var file_streak_v1_streak_proto_goTypes = []any{
+var file_game_streak_v1_streak_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_game_streak_v1_streak_proto_goTypes = []any{
 	(*StreakState)(nil),            // 0: streak.v1.StreakState
 	(*GetStreakRequest)(nil),       // 1: streak.v1.GetStreakRequest
 	(*GetStreakResponse)(nil),      // 2: streak.v1.GetStreakResponse
@@ -451,7 +451,7 @@ var file_streak_v1_streak_proto_goTypes = []any{
 	(*PurchaseShieldResponse)(nil), // 6: streak.v1.PurchaseShieldResponse
 	(*timestamppb.Timestamp)(nil),  // 7: google.protobuf.Timestamp
 }
-var file_streak_v1_streak_proto_depIdxs = []int32{
+var file_game_streak_v1_streak_proto_depIdxs = []int32{
 	7, // 0: streak.v1.StreakState.last_active_at:type_name -> google.protobuf.Timestamp
 	7, // 1: streak.v1.StreakState.last_shield_used_at:type_name -> google.protobuf.Timestamp
 	0, // 2: streak.v1.GetStreakResponse.state:type_name -> streak.v1.StreakState
@@ -470,26 +470,26 @@ var file_streak_v1_streak_proto_depIdxs = []int32{
 	0, // [0:5] is the sub-list for field type_name
 }
 
-func init() { file_streak_v1_streak_proto_init() }
-func file_streak_v1_streak_proto_init() {
-	if File_streak_v1_streak_proto != nil {
+func init() { file_game_streak_v1_streak_proto_init() }
+func file_game_streak_v1_streak_proto_init() {
+	if File_game_streak_v1_streak_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_streak_v1_streak_proto_rawDesc), len(file_streak_v1_streak_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_streak_v1_streak_proto_rawDesc), len(file_game_streak_v1_streak_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   7,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_streak_v1_streak_proto_goTypes,
-		DependencyIndexes: file_streak_v1_streak_proto_depIdxs,
-		MessageInfos:      file_streak_v1_streak_proto_msgTypes,
+		GoTypes:           file_game_streak_v1_streak_proto_goTypes,
+		DependencyIndexes: file_game_streak_v1_streak_proto_depIdxs,
+		MessageInfos:      file_game_streak_v1_streak_proto_msgTypes,
 	}.Build()
-	File_streak_v1_streak_proto = out.File
-	file_streak_v1_streak_proto_goTypes = nil
-	file_streak_v1_streak_proto_depIdxs = nil
+	File_game_streak_v1_streak_proto = out.File
+	file_game_streak_v1_streak_proto_goTypes = nil
+	file_game_streak_v1_streak_proto_depIdxs = nil
 }

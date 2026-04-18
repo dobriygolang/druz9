@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: geo/v1/geo.proto
+// source: social/geo/v1/geo.proto
 
 package v1
 
@@ -197,5 +197,5 @@ var GeoService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "geo/v1/geo.proto",
+	Metadata: "social/geo/v1/geo.proto",
 }

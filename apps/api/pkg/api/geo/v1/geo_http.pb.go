@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: geo/v1/geo.proto
+// source: social/geo/v1/geo.proto
 
 package v1
 

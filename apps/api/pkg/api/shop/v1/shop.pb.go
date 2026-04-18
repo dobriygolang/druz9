@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: shop/v1/shop.proto
+// source: game/shop/v1/shop.proto
 
 package v1
 
@@ -70,11 +70,11 @@ func (x ItemCategory) String() string {
 }
 
 func (ItemCategory) Descriptor() protoreflect.EnumDescriptor {
-	return file_shop_v1_shop_proto_enumTypes[0].Descriptor()
+	return file_game_shop_v1_shop_proto_enumTypes[0].Descriptor()
 }
 
 func (ItemCategory) Type() protoreflect.EnumType {
-	return &file_shop_v1_shop_proto_enumTypes[0]
+	return &file_game_shop_v1_shop_proto_enumTypes[0]
 }
 
 func (x ItemCategory) Number() protoreflect.EnumNumber {
@@ -83,7 +83,7 @@ func (x ItemCategory) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ItemCategory.Descriptor instead.
 func (ItemCategory) EnumDescriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{0}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{0}
 }
 
 // Rarity drives the border and price curve.
@@ -129,11 +129,11 @@ func (x ItemRarity) String() string {
 }
 
 func (ItemRarity) Descriptor() protoreflect.EnumDescriptor {
-	return file_shop_v1_shop_proto_enumTypes[1].Descriptor()
+	return file_game_shop_v1_shop_proto_enumTypes[1].Descriptor()
 }
 
 func (ItemRarity) Type() protoreflect.EnumType {
-	return &file_shop_v1_shop_proto_enumTypes[1]
+	return &file_game_shop_v1_shop_proto_enumTypes[1]
 }
 
 func (x ItemRarity) Number() protoreflect.EnumNumber {
@@ -142,7 +142,7 @@ func (x ItemRarity) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ItemRarity.Descriptor instead.
 func (ItemRarity) EnumDescriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{1}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{1}
 }
 
 // Currency the item is priced in.
@@ -182,11 +182,11 @@ func (x ItemCurrency) String() string {
 }
 
 func (ItemCurrency) Descriptor() protoreflect.EnumDescriptor {
-	return file_shop_v1_shop_proto_enumTypes[2].Descriptor()
+	return file_game_shop_v1_shop_proto_enumTypes[2].Descriptor()
 }
 
 func (ItemCurrency) Type() protoreflect.EnumType {
-	return &file_shop_v1_shop_proto_enumTypes[2]
+	return &file_game_shop_v1_shop_proto_enumTypes[2]
 }
 
 func (x ItemCurrency) Number() protoreflect.EnumNumber {
@@ -195,7 +195,7 @@ func (x ItemCurrency) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ItemCurrency.Descriptor instead.
 func (ItemCurrency) EnumDescriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{2}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{2}
 }
 
 type ShopItem struct {
@@ -219,7 +219,7 @@ type ShopItem struct {
 
 func (x *ShopItem) Reset() {
 	*x = ShopItem{}
-	mi := &file_shop_v1_shop_proto_msgTypes[0]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -231,7 +231,7 @@ func (x *ShopItem) String() string {
 func (*ShopItem) ProtoMessage() {}
 
 func (x *ShopItem) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[0]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -244,7 +244,7 @@ func (x *ShopItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ShopItem.ProtoReflect.Descriptor instead.
 func (*ShopItem) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{0}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ShopItem) GetId() string {
@@ -349,7 +349,7 @@ type CategoryInfo struct {
 
 func (x *CategoryInfo) Reset() {
 	*x = CategoryInfo{}
-	mi := &file_shop_v1_shop_proto_msgTypes[1]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -361,7 +361,7 @@ func (x *CategoryInfo) String() string {
 func (*CategoryInfo) ProtoMessage() {}
 
 func (x *CategoryInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[1]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -374,7 +374,7 @@ func (x *CategoryInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CategoryInfo.ProtoReflect.Descriptor instead.
 func (*CategoryInfo) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{1}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *CategoryInfo) GetCategory() ItemCategory {
@@ -406,7 +406,7 @@ type ListCategoriesRequest struct {
 
 func (x *ListCategoriesRequest) Reset() {
 	*x = ListCategoriesRequest{}
-	mi := &file_shop_v1_shop_proto_msgTypes[2]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -418,7 +418,7 @@ func (x *ListCategoriesRequest) String() string {
 func (*ListCategoriesRequest) ProtoMessage() {}
 
 func (x *ListCategoriesRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[2]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -431,7 +431,7 @@ func (x *ListCategoriesRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCategoriesRequest.ProtoReflect.Descriptor instead.
 func (*ListCategoriesRequest) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{2}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{2}
 }
 
 type ListCategoriesResponse struct {
@@ -443,7 +443,7 @@ type ListCategoriesResponse struct {
 
 func (x *ListCategoriesResponse) Reset() {
 	*x = ListCategoriesResponse{}
-	mi := &file_shop_v1_shop_proto_msgTypes[3]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -455,7 +455,7 @@ func (x *ListCategoriesResponse) String() string {
 func (*ListCategoriesResponse) ProtoMessage() {}
 
 func (x *ListCategoriesResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[3]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -468,7 +468,7 @@ func (x *ListCategoriesResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListCategoriesResponse.ProtoReflect.Descriptor instead.
 func (*ListCategoriesResponse) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{3}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *ListCategoriesResponse) GetCategories() []*CategoryInfo {
@@ -490,7 +490,7 @@ type ListItemsRequest struct {
 
 func (x *ListItemsRequest) Reset() {
 	*x = ListItemsRequest{}
-	mi := &file_shop_v1_shop_proto_msgTypes[4]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -502,7 +502,7 @@ func (x *ListItemsRequest) String() string {
 func (*ListItemsRequest) ProtoMessage() {}
 
 func (x *ListItemsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[4]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -515,7 +515,7 @@ func (x *ListItemsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListItemsRequest.ProtoReflect.Descriptor instead.
 func (*ListItemsRequest) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{4}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListItemsRequest) GetCategory() ItemCategory {
@@ -556,7 +556,7 @@ type ListItemsResponse struct {
 
 func (x *ListItemsResponse) Reset() {
 	*x = ListItemsResponse{}
-	mi := &file_shop_v1_shop_proto_msgTypes[5]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -568,7 +568,7 @@ func (x *ListItemsResponse) String() string {
 func (*ListItemsResponse) ProtoMessage() {}
 
 func (x *ListItemsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[5]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -581,7 +581,7 @@ func (x *ListItemsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListItemsResponse.ProtoReflect.Descriptor instead.
 func (*ListItemsResponse) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{5}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListItemsResponse) GetItems() []*ShopItem {
@@ -607,7 +607,7 @@ type GetItemRequest struct {
 
 func (x *GetItemRequest) Reset() {
 	*x = GetItemRequest{}
-	mi := &file_shop_v1_shop_proto_msgTypes[6]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -619,7 +619,7 @@ func (x *GetItemRequest) String() string {
 func (*GetItemRequest) ProtoMessage() {}
 
 func (x *GetItemRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[6]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -632,7 +632,7 @@ func (x *GetItemRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetItemRequest.ProtoReflect.Descriptor instead.
 func (*GetItemRequest) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{6}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *GetItemRequest) GetItemId() string {
@@ -652,7 +652,7 @@ type GetItemResponse struct {
 
 func (x *GetItemResponse) Reset() {
 	*x = GetItemResponse{}
-	mi := &file_shop_v1_shop_proto_msgTypes[7]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -664,7 +664,7 @@ func (x *GetItemResponse) String() string {
 func (*GetItemResponse) ProtoMessage() {}
 
 func (x *GetItemResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[7]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -677,7 +677,7 @@ func (x *GetItemResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetItemResponse.ProtoReflect.Descriptor instead.
 func (*GetItemResponse) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{7}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *GetItemResponse) GetItem() *ShopItem {
@@ -702,7 +702,7 @@ type GetInventoryRequest struct {
 
 func (x *GetInventoryRequest) Reset() {
 	*x = GetInventoryRequest{}
-	mi := &file_shop_v1_shop_proto_msgTypes[8]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -714,7 +714,7 @@ func (x *GetInventoryRequest) String() string {
 func (*GetInventoryRequest) ProtoMessage() {}
 
 func (x *GetInventoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[8]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -727,7 +727,7 @@ func (x *GetInventoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetInventoryRequest.ProtoReflect.Descriptor instead.
 func (*GetInventoryRequest) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{8}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{8}
 }
 
 type GetInventoryResponse struct {
@@ -739,7 +739,7 @@ type GetInventoryResponse struct {
 
 func (x *GetInventoryResponse) Reset() {
 	*x = GetInventoryResponse{}
-	mi := &file_shop_v1_shop_proto_msgTypes[9]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -751,7 +751,7 @@ func (x *GetInventoryResponse) String() string {
 func (*GetInventoryResponse) ProtoMessage() {}
 
 func (x *GetInventoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[9]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -764,7 +764,7 @@ func (x *GetInventoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetInventoryResponse.ProtoReflect.Descriptor instead.
 func (*GetInventoryResponse) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{9}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *GetInventoryResponse) GetItems() []*OwnedItem {
@@ -785,7 +785,7 @@ type OwnedItem struct {
 
 func (x *OwnedItem) Reset() {
 	*x = OwnedItem{}
-	mi := &file_shop_v1_shop_proto_msgTypes[10]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -797,7 +797,7 @@ func (x *OwnedItem) String() string {
 func (*OwnedItem) ProtoMessage() {}
 
 func (x *OwnedItem) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[10]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -810,7 +810,7 @@ func (x *OwnedItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OwnedItem.ProtoReflect.Descriptor instead.
 func (*OwnedItem) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{10}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *OwnedItem) GetItem() *ShopItem {
@@ -843,7 +843,7 @@ type PurchaseRequest struct {
 
 func (x *PurchaseRequest) Reset() {
 	*x = PurchaseRequest{}
-	mi := &file_shop_v1_shop_proto_msgTypes[11]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -855,7 +855,7 @@ func (x *PurchaseRequest) String() string {
 func (*PurchaseRequest) ProtoMessage() {}
 
 func (x *PurchaseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[11]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -868,7 +868,7 @@ func (x *PurchaseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurchaseRequest.ProtoReflect.Descriptor instead.
 func (*PurchaseRequest) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{11}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *PurchaseRequest) GetItemId() string {
@@ -889,7 +889,7 @@ type PurchaseResponse struct {
 
 func (x *PurchaseResponse) Reset() {
 	*x = PurchaseResponse{}
-	mi := &file_shop_v1_shop_proto_msgTypes[12]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -901,7 +901,7 @@ func (x *PurchaseResponse) String() string {
 func (*PurchaseResponse) ProtoMessage() {}
 
 func (x *PurchaseResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_shop_v1_shop_proto_msgTypes[12]
+	mi := &file_game_shop_v1_shop_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -914,7 +914,7 @@ func (x *PurchaseResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PurchaseResponse.ProtoReflect.Descriptor instead.
 func (*PurchaseResponse) Descriptor() ([]byte, []int) {
-	return file_shop_v1_shop_proto_rawDescGZIP(), []int{12}
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *PurchaseResponse) GetItem() *OwnedItem {
@@ -938,11 +938,11 @@ func (x *PurchaseResponse) GetRemainingGems() int32 {
 	return 0
 }
 
-var File_shop_v1_shop_proto protoreflect.FileDescriptor
+var File_game_shop_v1_shop_proto protoreflect.FileDescriptor
 
-const file_shop_v1_shop_proto_rawDesc = "" +
+const file_game_shop_v1_shop_proto_rawDesc = "" +
 	"\n" +
-	"\x12shop/v1/shop.proto\x12\ashop.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc4\x03\n" +
+	"\x17game/shop/v1/shop.proto\x12\ashop.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc4\x03\n" +
 	"\bShopItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04slug\x18\x02 \x01(\tR\x04slug\x12\x12\n" +
@@ -1026,20 +1026,20 @@ const file_shop_v1_shop_proto_rawDesc = "" +
 	"\bPurchase\x12\x18.shop.v1.PurchaseRequest\x1a\x19.shop.v1.PurchaseResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/shop/purchaseB\x18Z\x16api/pkg/api/shop/v1;v1b\x06proto3"
 
 var (
-	file_shop_v1_shop_proto_rawDescOnce sync.Once
-	file_shop_v1_shop_proto_rawDescData []byte
+	file_game_shop_v1_shop_proto_rawDescOnce sync.Once
+	file_game_shop_v1_shop_proto_rawDescData []byte
 )
 
-func file_shop_v1_shop_proto_rawDescGZIP() []byte {
-	file_shop_v1_shop_proto_rawDescOnce.Do(func() {
-		file_shop_v1_shop_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_shop_v1_shop_proto_rawDesc), len(file_shop_v1_shop_proto_rawDesc)))
+func file_game_shop_v1_shop_proto_rawDescGZIP() []byte {
+	file_game_shop_v1_shop_proto_rawDescOnce.Do(func() {
+		file_game_shop_v1_shop_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_game_shop_v1_shop_proto_rawDesc), len(file_game_shop_v1_shop_proto_rawDesc)))
 	})
-	return file_shop_v1_shop_proto_rawDescData
+	return file_game_shop_v1_shop_proto_rawDescData
 }
 
-var file_shop_v1_shop_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_shop_v1_shop_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
-var file_shop_v1_shop_proto_goTypes = []any{
+var file_game_shop_v1_shop_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
+var file_game_shop_v1_shop_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_game_shop_v1_shop_proto_goTypes = []any{
 	(ItemCategory)(0),              // 0: shop.v1.ItemCategory
 	(ItemRarity)(0),                // 1: shop.v1.ItemRarity
 	(ItemCurrency)(0),              // 2: shop.v1.ItemCurrency
@@ -1058,7 +1058,7 @@ var file_shop_v1_shop_proto_goTypes = []any{
 	(*PurchaseResponse)(nil),       // 15: shop.v1.PurchaseResponse
 	(*timestamppb.Timestamp)(nil),  // 16: google.protobuf.Timestamp
 }
-var file_shop_v1_shop_proto_depIdxs = []int32{
+var file_game_shop_v1_shop_proto_depIdxs = []int32{
 	0,  // 0: shop.v1.ShopItem.category:type_name -> shop.v1.ItemCategory
 	1,  // 1: shop.v1.ShopItem.rarity:type_name -> shop.v1.ItemRarity
 	2,  // 2: shop.v1.ShopItem.currency:type_name -> shop.v1.ItemCurrency
@@ -1090,27 +1090,27 @@ var file_shop_v1_shop_proto_depIdxs = []int32{
 	0,  // [0:14] is the sub-list for field type_name
 }
 
-func init() { file_shop_v1_shop_proto_init() }
-func file_shop_v1_shop_proto_init() {
-	if File_shop_v1_shop_proto != nil {
+func init() { file_game_shop_v1_shop_proto_init() }
+func file_game_shop_v1_shop_proto_init() {
+	if File_game_shop_v1_shop_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_shop_v1_shop_proto_rawDesc), len(file_shop_v1_shop_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_shop_v1_shop_proto_rawDesc), len(file_game_shop_v1_shop_proto_rawDesc)),
 			NumEnums:      3,
 			NumMessages:   13,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_shop_v1_shop_proto_goTypes,
-		DependencyIndexes: file_shop_v1_shop_proto_depIdxs,
-		EnumInfos:         file_shop_v1_shop_proto_enumTypes,
-		MessageInfos:      file_shop_v1_shop_proto_msgTypes,
+		GoTypes:           file_game_shop_v1_shop_proto_goTypes,
+		DependencyIndexes: file_game_shop_v1_shop_proto_depIdxs,
+		EnumInfos:         file_game_shop_v1_shop_proto_enumTypes,
+		MessageInfos:      file_game_shop_v1_shop_proto_msgTypes,
 	}.Build()
-	File_shop_v1_shop_proto = out.File
-	file_shop_v1_shop_proto_goTypes = nil
-	file_shop_v1_shop_proto_depIdxs = nil
+	File_game_shop_v1_shop_proto = out.File
+	file_game_shop_v1_shop_proto_goTypes = nil
+	file_game_shop_v1_shop_proto_depIdxs = nil
 }

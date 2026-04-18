@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: challenge/v1/challenge.proto
+// source: game/challenge/v1/challenge.proto
 
 package v1
 

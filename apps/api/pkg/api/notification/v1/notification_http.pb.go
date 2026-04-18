@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: notification/v1/notification.proto
+// source: social/notification/v1/notification.proto
 
 package v1
 

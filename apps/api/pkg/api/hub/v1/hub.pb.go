@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: hub/v1/hub.proto
+// source: core/hub/v1/hub.proto
 
 package v1
 
@@ -30,7 +30,7 @@ type GetOverviewRequest struct {
 
 func (x *GetOverviewRequest) Reset() {
 	*x = GetOverviewRequest{}
-	mi := &file_hub_v1_hub_proto_msgTypes[0]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +42,7 @@ func (x *GetOverviewRequest) String() string {
 func (*GetOverviewRequest) ProtoMessage() {}
 
 func (x *GetOverviewRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[0]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +55,7 @@ func (x *GetOverviewRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetOverviewRequest.ProtoReflect.Descriptor instead.
 func (*GetOverviewRequest) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{0}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{0}
 }
 
 type GetOverviewResponse struct {
@@ -73,7 +73,7 @@ type GetOverviewResponse struct {
 
 func (x *GetOverviewResponse) Reset() {
 	*x = GetOverviewResponse{}
-	mi := &file_hub_v1_hub_proto_msgTypes[1]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -85,7 +85,7 @@ func (x *GetOverviewResponse) String() string {
 func (*GetOverviewResponse) ProtoMessage() {}
 
 func (x *GetOverviewResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[1]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -98,7 +98,7 @@ func (x *GetOverviewResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetOverviewResponse.ProtoReflect.Descriptor instead.
 func (*GetOverviewResponse) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{1}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetOverviewResponse) GetPlayer() *HubPlayer {
@@ -164,7 +164,7 @@ type HubPlayer struct {
 
 func (x *HubPlayer) Reset() {
 	*x = HubPlayer{}
-	mi := &file_hub_v1_hub_proto_msgTypes[2]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -176,7 +176,7 @@ func (x *HubPlayer) String() string {
 func (*HubPlayer) ProtoMessage() {}
 
 func (x *HubPlayer) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[2]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -189,7 +189,7 @@ func (x *HubPlayer) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubPlayer.ProtoReflect.Descriptor instead.
 func (*HubPlayer) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{2}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *HubPlayer) GetId() string {
@@ -244,7 +244,7 @@ type HubAchievements struct {
 
 func (x *HubAchievements) Reset() {
 	*x = HubAchievements{}
-	mi := &file_hub_v1_hub_proto_msgTypes[3]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -256,7 +256,7 @@ func (x *HubAchievements) String() string {
 func (*HubAchievements) ProtoMessage() {}
 
 func (x *HubAchievements) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[3]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -269,7 +269,7 @@ func (x *HubAchievements) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubAchievements.ProtoReflect.Descriptor instead.
 func (*HubAchievements) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{3}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *HubAchievements) GetUnlocked() int32 {
@@ -303,7 +303,7 @@ type HubDailyMission struct {
 
 func (x *HubDailyMission) Reset() {
 	*x = HubDailyMission{}
-	mi := &file_hub_v1_hub_proto_msgTypes[4]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -315,7 +315,7 @@ func (x *HubDailyMission) String() string {
 func (*HubDailyMission) ProtoMessage() {}
 
 func (x *HubDailyMission) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[4]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -328,7 +328,7 @@ func (x *HubDailyMission) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubDailyMission.ProtoReflect.Descriptor instead.
 func (*HubDailyMission) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{4}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *HubDailyMission) GetKey() string {
@@ -407,7 +407,7 @@ type HubQuest struct {
 
 func (x *HubQuest) Reset() {
 	*x = HubQuest{}
-	mi := &file_hub_v1_hub_proto_msgTypes[5]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -419,7 +419,7 @@ func (x *HubQuest) String() string {
 func (*HubQuest) ProtoMessage() {}
 
 func (x *HubQuest) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[5]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -432,7 +432,7 @@ func (x *HubQuest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubQuest.ProtoReflect.Descriptor instead.
 func (*HubQuest) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{5}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *HubQuest) GetTitle() string {
@@ -479,7 +479,7 @@ type HubArena struct {
 
 func (x *HubArena) Reset() {
 	*x = HubArena{}
-	mi := &file_hub_v1_hub_proto_msgTypes[6]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -491,7 +491,7 @@ func (x *HubArena) String() string {
 func (*HubArena) ProtoMessage() {}
 
 func (x *HubArena) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[6]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -504,7 +504,7 @@ func (x *HubArena) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubArena.ProtoReflect.Descriptor instead.
 func (*HubArena) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{6}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *HubArena) GetItems() []*HubArenaItem {
@@ -525,7 +525,7 @@ type HubArenaItem struct {
 
 func (x *HubArenaItem) Reset() {
 	*x = HubArenaItem{}
-	mi := &file_hub_v1_hub_proto_msgTypes[7]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -537,7 +537,7 @@ func (x *HubArenaItem) String() string {
 func (*HubArenaItem) ProtoMessage() {}
 
 func (x *HubArenaItem) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[7]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -550,7 +550,7 @@ func (x *HubArenaItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubArenaItem.ProtoReflect.Descriptor instead.
 func (*HubArenaItem) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{7}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *HubArenaItem) GetLabel() string {
@@ -587,7 +587,7 @@ type HubEvent struct {
 
 func (x *HubEvent) Reset() {
 	*x = HubEvent{}
-	mi := &file_hub_v1_hub_proto_msgTypes[8]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -599,7 +599,7 @@ func (x *HubEvent) String() string {
 func (*HubEvent) ProtoMessage() {}
 
 func (x *HubEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[8]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -612,7 +612,7 @@ func (x *HubEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubEvent.ProtoReflect.Descriptor instead.
 func (*HubEvent) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{8}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *HubEvent) GetId() string {
@@ -662,7 +662,7 @@ type HubGuild struct {
 
 func (x *HubGuild) Reset() {
 	*x = HubGuild{}
-	mi := &file_hub_v1_hub_proto_msgTypes[9]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -674,7 +674,7 @@ func (x *HubGuild) String() string {
 func (*HubGuild) ProtoMessage() {}
 
 func (x *HubGuild) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[9]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -687,7 +687,7 @@ func (x *HubGuild) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubGuild.ProtoReflect.Descriptor instead.
 func (*HubGuild) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{9}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *HubGuild) GetId() string {
@@ -731,7 +731,7 @@ type HubMerchantPick struct {
 
 func (x *HubMerchantPick) Reset() {
 	*x = HubMerchantPick{}
-	mi := &file_hub_v1_hub_proto_msgTypes[10]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -743,7 +743,7 @@ func (x *HubMerchantPick) String() string {
 func (*HubMerchantPick) ProtoMessage() {}
 
 func (x *HubMerchantPick) ProtoReflect() protoreflect.Message {
-	mi := &file_hub_v1_hub_proto_msgTypes[10]
+	mi := &file_core_hub_v1_hub_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -756,7 +756,7 @@ func (x *HubMerchantPick) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use HubMerchantPick.ProtoReflect.Descriptor instead.
 func (*HubMerchantPick) Descriptor() ([]byte, []int) {
-	return file_hub_v1_hub_proto_rawDescGZIP(), []int{10}
+	return file_core_hub_v1_hub_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *HubMerchantPick) GetId() string {
@@ -794,11 +794,11 @@ func (x *HubMerchantPick) GetActionUrl() string {
 	return ""
 }
 
-var File_hub_v1_hub_proto protoreflect.FileDescriptor
+var File_core_hub_v1_hub_proto protoreflect.FileDescriptor
 
-const file_hub_v1_hub_proto_rawDesc = "" +
+const file_core_hub_v1_hub_proto_rawDesc = "" +
 	"\n" +
-	"\x10hub/v1/hub.proto\x12\x06hub.v1\x1a\x1cgoogle/api/annotations.proto\"\x14\n" +
+	"\x15core/hub/v1/hub.proto\x12\x06hub.v1\x1a\x1cgoogle/api/annotations.proto\"\x14\n" +
 	"\x12GetOverviewRequest\"\xe2\x02\n" +
 	"\x13GetOverviewResponse\x12)\n" +
 	"\x06player\x18\x01 \x01(\v2\x11.hub.v1.HubPlayerR\x06player\x12>\n" +
@@ -871,19 +871,19 @@ const file_hub_v1_hub_proto_rawDesc = "" +
 	"\vGetOverview\x12\x1a.hub.v1.GetOverviewRequest\x1a\x1b.hub.v1.GetOverviewResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/hub/overviewB\x17Z\x15api/pkg/api/hub/v1;v1b\x06proto3"
 
 var (
-	file_hub_v1_hub_proto_rawDescOnce sync.Once
-	file_hub_v1_hub_proto_rawDescData []byte
+	file_core_hub_v1_hub_proto_rawDescOnce sync.Once
+	file_core_hub_v1_hub_proto_rawDescData []byte
 )
 
-func file_hub_v1_hub_proto_rawDescGZIP() []byte {
-	file_hub_v1_hub_proto_rawDescOnce.Do(func() {
-		file_hub_v1_hub_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_hub_v1_hub_proto_rawDesc), len(file_hub_v1_hub_proto_rawDesc)))
+func file_core_hub_v1_hub_proto_rawDescGZIP() []byte {
+	file_core_hub_v1_hub_proto_rawDescOnce.Do(func() {
+		file_core_hub_v1_hub_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_core_hub_v1_hub_proto_rawDesc), len(file_core_hub_v1_hub_proto_rawDesc)))
 	})
-	return file_hub_v1_hub_proto_rawDescData
+	return file_core_hub_v1_hub_proto_rawDescData
 }
 
-var file_hub_v1_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
-var file_hub_v1_hub_proto_goTypes = []any{
+var file_core_hub_v1_hub_proto_msgTypes = make([]protoimpl.MessageInfo, 11)
+var file_core_hub_v1_hub_proto_goTypes = []any{
 	(*GetOverviewRequest)(nil),  // 0: hub.v1.GetOverviewRequest
 	(*GetOverviewResponse)(nil), // 1: hub.v1.GetOverviewResponse
 	(*HubPlayer)(nil),           // 2: hub.v1.HubPlayer
@@ -896,7 +896,7 @@ var file_hub_v1_hub_proto_goTypes = []any{
 	(*HubGuild)(nil),            // 9: hub.v1.HubGuild
 	(*HubMerchantPick)(nil),     // 10: hub.v1.HubMerchantPick
 }
-var file_hub_v1_hub_proto_depIdxs = []int32{
+var file_core_hub_v1_hub_proto_depIdxs = []int32{
 	2,  // 0: hub.v1.GetOverviewResponse.player:type_name -> hub.v1.HubPlayer
 	4,  // 1: hub.v1.GetOverviewResponse.daily_missions:type_name -> hub.v1.HubDailyMission
 	5,  // 2: hub.v1.GetOverviewResponse.quest:type_name -> hub.v1.HubQuest
@@ -915,26 +915,26 @@ var file_hub_v1_hub_proto_depIdxs = []int32{
 	0,  // [0:9] is the sub-list for field type_name
 }
 
-func init() { file_hub_v1_hub_proto_init() }
-func file_hub_v1_hub_proto_init() {
-	if File_hub_v1_hub_proto != nil {
+func init() { file_core_hub_v1_hub_proto_init() }
+func file_core_hub_v1_hub_proto_init() {
+	if File_core_hub_v1_hub_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_hub_v1_hub_proto_rawDesc), len(file_hub_v1_hub_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_hub_v1_hub_proto_rawDesc), len(file_core_hub_v1_hub_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   11,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_hub_v1_hub_proto_goTypes,
-		DependencyIndexes: file_hub_v1_hub_proto_depIdxs,
-		MessageInfos:      file_hub_v1_hub_proto_msgTypes,
+		GoTypes:           file_core_hub_v1_hub_proto_goTypes,
+		DependencyIndexes: file_core_hub_v1_hub_proto_depIdxs,
+		MessageInfos:      file_core_hub_v1_hub_proto_msgTypes,
 	}.Build()
-	File_hub_v1_hub_proto = out.File
-	file_hub_v1_hub_proto_goTypes = nil
-	file_hub_v1_hub_proto_depIdxs = nil
+	File_core_hub_v1_hub_proto = out.File
+	file_core_hub_v1_hub_proto_goTypes = nil
+	file_core_hub_v1_hub_proto_depIdxs = nil
 }

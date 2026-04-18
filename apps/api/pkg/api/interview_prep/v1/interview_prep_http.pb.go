@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: interview_prep/v1/interview_prep.proto
+// source: learning/interview_prep/v1/interview_prep.proto
 
 package v1
 

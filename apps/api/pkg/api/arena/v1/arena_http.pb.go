@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-http v2.9.2
 // - protoc             v7.34.0
-// source: arena/v1/arena.proto
+// source: game/arena/v1/arena.proto
 
 package v1
 

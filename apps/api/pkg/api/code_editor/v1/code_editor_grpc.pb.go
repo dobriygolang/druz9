@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: code_editor/v1/code_editor.proto
+// source: learning/code_editor/v1/code_editor.proto
 
 package v1
 
@@ -803,5 +803,5 @@ var CodeEditorService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "code_editor/v1/code_editor.proto",
+	Metadata: "learning/code_editor/v1/code_editor.proto",
 }

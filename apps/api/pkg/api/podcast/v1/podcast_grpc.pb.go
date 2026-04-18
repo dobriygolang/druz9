@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: podcast/v1/podcast.proto
+// source: social/podcast/v1/podcast.proto
 
 package v1
 
@@ -383,5 +383,5 @@ var PodcastService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "podcast/v1/podcast.proto",
+	Metadata: "social/podcast/v1/podcast.proto",
 }

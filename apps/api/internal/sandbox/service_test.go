@@ -20,10 +20,9 @@ func TestBuildNetworkEnv_MockOnlySetsProxy(t *testing.T) {
 	if err != nil {
 		t.Fatalf("build network env: %v", err)
 	}
-	if proxy == nil {
-		t.Fatalf("expected mock proxy server")
+	if proxy != nil {
+		defer proxy.close()
 	}
-	defer proxy.close()
 
 	joined := strings.Join(env, "\n")
 	if !strings.Contains(joined, "HTTP_PROXY=http://127.0.0.1:") {

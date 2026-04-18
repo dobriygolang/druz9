@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: podcast/v1/podcast.proto
+// source: social/podcast/v1/podcast.proto
 
 package v1
 
@@ -63,11 +63,11 @@ func (x MediaContentType) String() string {
 }
 
 func (MediaContentType) Descriptor() protoreflect.EnumDescriptor {
-	return file_podcast_v1_podcast_proto_enumTypes[0].Descriptor()
+	return file_social_podcast_v1_podcast_proto_enumTypes[0].Descriptor()
 }
 
 func (MediaContentType) Type() protoreflect.EnumType {
-	return &file_podcast_v1_podcast_proto_enumTypes[0]
+	return &file_social_podcast_v1_podcast_proto_enumTypes[0]
 }
 
 func (x MediaContentType) Number() protoreflect.EnumNumber {
@@ -76,7 +76,7 @@ func (x MediaContentType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use MediaContentType.Descriptor instead.
 func (MediaContentType) EnumDescriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{0}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{0}
 }
 
 type ListPodcastsRequest struct {
@@ -89,7 +89,7 @@ type ListPodcastsRequest struct {
 
 func (x *ListPodcastsRequest) Reset() {
 	*x = ListPodcastsRequest{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[0]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -101,7 +101,7 @@ func (x *ListPodcastsRequest) String() string {
 func (*ListPodcastsRequest) ProtoMessage() {}
 
 func (x *ListPodcastsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[0]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -114,7 +114,7 @@ func (x *ListPodcastsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPodcastsRequest.ProtoReflect.Descriptor instead.
 func (*ListPodcastsRequest) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{0}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ListPodcastsRequest) GetLimit() int32 {
@@ -140,7 +140,7 @@ type GetPodcastRequest struct {
 
 func (x *GetPodcastRequest) Reset() {
 	*x = GetPodcastRequest{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[1]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -152,7 +152,7 @@ func (x *GetPodcastRequest) String() string {
 func (*GetPodcastRequest) ProtoMessage() {}
 
 func (x *GetPodcastRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[1]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -165,7 +165,7 @@ func (x *GetPodcastRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetPodcastRequest.ProtoReflect.Descriptor instead.
 func (*GetPodcastRequest) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{1}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *GetPodcastRequest) GetPodcastId() string {
@@ -184,7 +184,7 @@ type CreatePodcastRequest struct {
 
 func (x *CreatePodcastRequest) Reset() {
 	*x = CreatePodcastRequest{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[2]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -196,7 +196,7 @@ func (x *CreatePodcastRequest) String() string {
 func (*CreatePodcastRequest) ProtoMessage() {}
 
 func (x *CreatePodcastRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[2]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -209,7 +209,7 @@ func (x *CreatePodcastRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreatePodcastRequest.ProtoReflect.Descriptor instead.
 func (*CreatePodcastRequest) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{2}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreatePodcastRequest) GetTitle() string {
@@ -232,7 +232,7 @@ type UploadPodcastRequest struct {
 
 func (x *UploadPodcastRequest) Reset() {
 	*x = UploadPodcastRequest{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[3]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -244,7 +244,7 @@ func (x *UploadPodcastRequest) String() string {
 func (*UploadPodcastRequest) ProtoMessage() {}
 
 func (x *UploadPodcastRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[3]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -257,7 +257,7 @@ func (x *UploadPodcastRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UploadPodcastRequest.ProtoReflect.Descriptor instead.
 func (*UploadPodcastRequest) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{3}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *UploadPodcastRequest) GetPodcastId() string {
@@ -307,7 +307,7 @@ type PreparePodcastUploadRequest struct {
 
 func (x *PreparePodcastUploadRequest) Reset() {
 	*x = PreparePodcastUploadRequest{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[4]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -319,7 +319,7 @@ func (x *PreparePodcastUploadRequest) String() string {
 func (*PreparePodcastUploadRequest) ProtoMessage() {}
 
 func (x *PreparePodcastUploadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[4]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -332,7 +332,7 @@ func (x *PreparePodcastUploadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PreparePodcastUploadRequest.ProtoReflect.Descriptor instead.
 func (*PreparePodcastUploadRequest) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{4}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *PreparePodcastUploadRequest) GetPodcastId() string {
@@ -376,7 +376,7 @@ type CompletePodcastUploadRequest struct {
 
 func (x *CompletePodcastUploadRequest) Reset() {
 	*x = CompletePodcastUploadRequest{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[5]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -388,7 +388,7 @@ func (x *CompletePodcastUploadRequest) String() string {
 func (*CompletePodcastUploadRequest) ProtoMessage() {}
 
 func (x *CompletePodcastUploadRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[5]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -401,7 +401,7 @@ func (x *CompletePodcastUploadRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CompletePodcastUploadRequest.ProtoReflect.Descriptor instead.
 func (*CompletePodcastUploadRequest) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{5}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CompletePodcastUploadRequest) GetPodcastId() string {
@@ -448,7 +448,7 @@ type DeletePodcastRequest struct {
 
 func (x *DeletePodcastRequest) Reset() {
 	*x = DeletePodcastRequest{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[6]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -460,7 +460,7 @@ func (x *DeletePodcastRequest) String() string {
 func (*DeletePodcastRequest) ProtoMessage() {}
 
 func (x *DeletePodcastRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[6]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -473,7 +473,7 @@ func (x *DeletePodcastRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeletePodcastRequest.ProtoReflect.Descriptor instead.
 func (*DeletePodcastRequest) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{6}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *DeletePodcastRequest) GetPodcastId() string {
@@ -492,7 +492,7 @@ type PlayPodcastRequest struct {
 
 func (x *PlayPodcastRequest) Reset() {
 	*x = PlayPodcastRequest{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[7]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -504,7 +504,7 @@ func (x *PlayPodcastRequest) String() string {
 func (*PlayPodcastRequest) ProtoMessage() {}
 
 func (x *PlayPodcastRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[7]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -517,7 +517,7 @@ func (x *PlayPodcastRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlayPodcastRequest.ProtoReflect.Descriptor instead.
 func (*PlayPodcastRequest) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{7}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *PlayPodcastRequest) GetPodcastId() string {
@@ -540,7 +540,7 @@ type ListPodcastsResponse struct {
 
 func (x *ListPodcastsResponse) Reset() {
 	*x = ListPodcastsResponse{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[8]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -552,7 +552,7 @@ func (x *ListPodcastsResponse) String() string {
 func (*ListPodcastsResponse) ProtoMessage() {}
 
 func (x *ListPodcastsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[8]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -565,7 +565,7 @@ func (x *ListPodcastsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListPodcastsResponse.ProtoReflect.Descriptor instead.
 func (*ListPodcastsResponse) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{8}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ListPodcastsResponse) GetPodcasts() []*Podcast {
@@ -612,7 +612,7 @@ type PodcastResponse struct {
 
 func (x *PodcastResponse) Reset() {
 	*x = PodcastResponse{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[9]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -624,7 +624,7 @@ func (x *PodcastResponse) String() string {
 func (*PodcastResponse) ProtoMessage() {}
 
 func (x *PodcastResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[9]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -637,7 +637,7 @@ func (x *PodcastResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PodcastResponse.ProtoReflect.Descriptor instead.
 func (*PodcastResponse) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{9}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *PodcastResponse) GetPodcast() *Podcast {
@@ -656,7 +656,7 @@ type PodcastStatusResponse struct {
 
 func (x *PodcastStatusResponse) Reset() {
 	*x = PodcastStatusResponse{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[10]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -668,7 +668,7 @@ func (x *PodcastStatusResponse) String() string {
 func (*PodcastStatusResponse) ProtoMessage() {}
 
 func (x *PodcastStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[10]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -681,7 +681,7 @@ func (x *PodcastStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PodcastStatusResponse.ProtoReflect.Descriptor instead.
 func (*PodcastStatusResponse) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{10}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *PodcastStatusResponse) GetStatus() v1.OperationStatus {
@@ -702,7 +702,7 @@ type PreparePodcastUploadResponse struct {
 
 func (x *PreparePodcastUploadResponse) Reset() {
 	*x = PreparePodcastUploadResponse{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[11]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -714,7 +714,7 @@ func (x *PreparePodcastUploadResponse) String() string {
 func (*PreparePodcastUploadResponse) ProtoMessage() {}
 
 func (x *PreparePodcastUploadResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[11]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -727,7 +727,7 @@ func (x *PreparePodcastUploadResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PreparePodcastUploadResponse.ProtoReflect.Descriptor instead.
 func (*PreparePodcastUploadResponse) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{11}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *PreparePodcastUploadResponse) GetUploadUrl() string {
@@ -761,7 +761,7 @@ type PlayPodcastResponse struct {
 
 func (x *PlayPodcastResponse) Reset() {
 	*x = PlayPodcastResponse{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[12]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -773,7 +773,7 @@ func (x *PlayPodcastResponse) String() string {
 func (*PlayPodcastResponse) ProtoMessage() {}
 
 func (x *PlayPodcastResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[12]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -786,7 +786,7 @@ func (x *PlayPodcastResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use PlayPodcastResponse.ProtoReflect.Descriptor instead.
 func (*PlayPodcastResponse) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{12}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *PlayPodcastResponse) GetPodcast() *Podcast {
@@ -821,7 +821,7 @@ type Podcast struct {
 
 func (x *Podcast) Reset() {
 	*x = Podcast{}
-	mi := &file_podcast_v1_podcast_proto_msgTypes[13]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -833,7 +833,7 @@ func (x *Podcast) String() string {
 func (*Podcast) ProtoMessage() {}
 
 func (x *Podcast) ProtoReflect() protoreflect.Message {
-	mi := &file_podcast_v1_podcast_proto_msgTypes[13]
+	mi := &file_social_podcast_v1_podcast_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -846,7 +846,7 @@ func (x *Podcast) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Podcast.ProtoReflect.Descriptor instead.
 func (*Podcast) Descriptor() ([]byte, []int) {
-	return file_podcast_v1_podcast_proto_rawDescGZIP(), []int{13}
+	return file_social_podcast_v1_podcast_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *Podcast) GetId() string {
@@ -919,12 +919,12 @@ func (x *Podcast) GetCreatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-var File_podcast_v1_podcast_proto protoreflect.FileDescriptor
+var File_social_podcast_v1_podcast_proto protoreflect.FileDescriptor
 
-const file_podcast_v1_podcast_proto_rawDesc = "" +
+const file_social_podcast_v1_podcast_proto_rawDesc = "" +
 	"\n" +
-	"\x18podcast/v1/podcast.proto\x12\n" +
-	"podcast.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16common/v1/common.proto\"C\n" +
+	"\x1fsocial/podcast/v1/podcast.proto\x12\n" +
+	"podcast.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bcore/common/v1/common.proto\"C\n" +
 	"\x13ListPodcastsRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x05R\x06offset\"2\n" +
@@ -1014,20 +1014,20 @@ const file_podcast_v1_podcast_proto_rawDesc = "" +
 	"\vPlayPodcast\x12\x1e.podcast.v1.PlayPodcastRequest\x1a\x1f.podcast.v1.PlayPodcastResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/podcasts/{podcast_id}/playB\x1bZ\x19api/pkg/api/podcast/v1;v1b\x06proto3"
 
 var (
-	file_podcast_v1_podcast_proto_rawDescOnce sync.Once
-	file_podcast_v1_podcast_proto_rawDescData []byte
+	file_social_podcast_v1_podcast_proto_rawDescOnce sync.Once
+	file_social_podcast_v1_podcast_proto_rawDescData []byte
 )
 
-func file_podcast_v1_podcast_proto_rawDescGZIP() []byte {
-	file_podcast_v1_podcast_proto_rawDescOnce.Do(func() {
-		file_podcast_v1_podcast_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_podcast_v1_podcast_proto_rawDesc), len(file_podcast_v1_podcast_proto_rawDesc)))
+func file_social_podcast_v1_podcast_proto_rawDescGZIP() []byte {
+	file_social_podcast_v1_podcast_proto_rawDescOnce.Do(func() {
+		file_social_podcast_v1_podcast_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_social_podcast_v1_podcast_proto_rawDesc), len(file_social_podcast_v1_podcast_proto_rawDesc)))
 	})
-	return file_podcast_v1_podcast_proto_rawDescData
+	return file_social_podcast_v1_podcast_proto_rawDescData
 }
 
-var file_podcast_v1_podcast_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_podcast_v1_podcast_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
-var file_podcast_v1_podcast_proto_goTypes = []any{
+var file_social_podcast_v1_podcast_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_social_podcast_v1_podcast_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
+var file_social_podcast_v1_podcast_proto_goTypes = []any{
 	(MediaContentType)(0),                // 0: podcast.v1.MediaContentType
 	(*ListPodcastsRequest)(nil),          // 1: podcast.v1.ListPodcastsRequest
 	(*GetPodcastRequest)(nil),            // 2: podcast.v1.GetPodcastRequest
@@ -1046,7 +1046,7 @@ var file_podcast_v1_podcast_proto_goTypes = []any{
 	(v1.OperationStatus)(0),              // 15: common.v1.OperationStatus
 	(*timestamppb.Timestamp)(nil),        // 16: google.protobuf.Timestamp
 }
-var file_podcast_v1_podcast_proto_depIdxs = []int32{
+var file_social_podcast_v1_podcast_proto_depIdxs = []int32{
 	0,  // 0: podcast.v1.UploadPodcastRequest.content_type:type_name -> podcast.v1.MediaContentType
 	0,  // 1: podcast.v1.PreparePodcastUploadRequest.content_type:type_name -> podcast.v1.MediaContentType
 	0,  // 2: podcast.v1.CompletePodcastUploadRequest.content_type:type_name -> podcast.v1.MediaContentType
@@ -1080,27 +1080,27 @@ var file_podcast_v1_podcast_proto_depIdxs = []int32{
 	0,  // [0:10] is the sub-list for field type_name
 }
 
-func init() { file_podcast_v1_podcast_proto_init() }
-func file_podcast_v1_podcast_proto_init() {
-	if File_podcast_v1_podcast_proto != nil {
+func init() { file_social_podcast_v1_podcast_proto_init() }
+func file_social_podcast_v1_podcast_proto_init() {
+	if File_social_podcast_v1_podcast_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_podcast_v1_podcast_proto_rawDesc), len(file_podcast_v1_podcast_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_podcast_v1_podcast_proto_rawDesc), len(file_social_podcast_v1_podcast_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_podcast_v1_podcast_proto_goTypes,
-		DependencyIndexes: file_podcast_v1_podcast_proto_depIdxs,
-		EnumInfos:         file_podcast_v1_podcast_proto_enumTypes,
-		MessageInfos:      file_podcast_v1_podcast_proto_msgTypes,
+		GoTypes:           file_social_podcast_v1_podcast_proto_goTypes,
+		DependencyIndexes: file_social_podcast_v1_podcast_proto_depIdxs,
+		EnumInfos:         file_social_podcast_v1_podcast_proto_enumTypes,
+		MessageInfos:      file_social_podcast_v1_podcast_proto_msgTypes,
 	}.Build()
-	File_podcast_v1_podcast_proto = out.File
-	file_podcast_v1_podcast_proto_goTypes = nil
-	file_podcast_v1_podcast_proto_depIdxs = nil
+	File_social_podcast_v1_podcast_proto = out.File
+	file_social_podcast_v1_podcast_proto_goTypes = nil
+	file_social_podcast_v1_podcast_proto_depIdxs = nil
 }

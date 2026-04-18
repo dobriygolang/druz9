@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: referral/v1/referral.proto
+// source: social/referral/v1/referral.proto
 
 package v1
 
@@ -66,11 +66,11 @@ func (x EmploymentType) String() string {
 }
 
 func (EmploymentType) Descriptor() protoreflect.EnumDescriptor {
-	return file_referral_v1_referral_proto_enumTypes[0].Descriptor()
+	return file_social_referral_v1_referral_proto_enumTypes[0].Descriptor()
 }
 
 func (EmploymentType) Type() protoreflect.EnumType {
-	return &file_referral_v1_referral_proto_enumTypes[0]
+	return &file_social_referral_v1_referral_proto_enumTypes[0]
 }
 
 func (x EmploymentType) Number() protoreflect.EnumNumber {
@@ -79,7 +79,7 @@ func (x EmploymentType) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use EmploymentType.Descriptor instead.
 func (EmploymentType) EnumDescriptor() ([]byte, []int) {
-	return file_referral_v1_referral_proto_rawDescGZIP(), []int{0}
+	return file_social_referral_v1_referral_proto_rawDescGZIP(), []int{0}
 }
 
 type ListReferralsRequest struct {
@@ -92,7 +92,7 @@ type ListReferralsRequest struct {
 
 func (x *ListReferralsRequest) Reset() {
 	*x = ListReferralsRequest{}
-	mi := &file_referral_v1_referral_proto_msgTypes[0]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -104,7 +104,7 @@ func (x *ListReferralsRequest) String() string {
 func (*ListReferralsRequest) ProtoMessage() {}
 
 func (x *ListReferralsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_referral_v1_referral_proto_msgTypes[0]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -117,7 +117,7 @@ func (x *ListReferralsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListReferralsRequest.ProtoReflect.Descriptor instead.
 func (*ListReferralsRequest) Descriptor() ([]byte, []int) {
-	return file_referral_v1_referral_proto_rawDescGZIP(), []int{0}
+	return file_social_referral_v1_referral_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ListReferralsRequest) GetLimit() int32 {
@@ -150,7 +150,7 @@ type ReferralPayload struct {
 
 func (x *ReferralPayload) Reset() {
 	*x = ReferralPayload{}
-	mi := &file_referral_v1_referral_proto_msgTypes[1]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -162,7 +162,7 @@ func (x *ReferralPayload) String() string {
 func (*ReferralPayload) ProtoMessage() {}
 
 func (x *ReferralPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_referral_v1_referral_proto_msgTypes[1]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -175,7 +175,7 @@ func (x *ReferralPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReferralPayload.ProtoReflect.Descriptor instead.
 func (*ReferralPayload) Descriptor() ([]byte, []int) {
-	return file_referral_v1_referral_proto_rawDescGZIP(), []int{1}
+	return file_social_referral_v1_referral_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ReferralPayload) GetTitle() string {
@@ -236,7 +236,7 @@ type CreateReferralRequest struct {
 
 func (x *CreateReferralRequest) Reset() {
 	*x = CreateReferralRequest{}
-	mi := &file_referral_v1_referral_proto_msgTypes[2]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -248,7 +248,7 @@ func (x *CreateReferralRequest) String() string {
 func (*CreateReferralRequest) ProtoMessage() {}
 
 func (x *CreateReferralRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_referral_v1_referral_proto_msgTypes[2]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -261,7 +261,7 @@ func (x *CreateReferralRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateReferralRequest.ProtoReflect.Descriptor instead.
 func (*CreateReferralRequest) Descriptor() ([]byte, []int) {
-	return file_referral_v1_referral_proto_rawDescGZIP(), []int{2}
+	return file_social_referral_v1_referral_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *CreateReferralRequest) GetReferral() *ReferralPayload {
@@ -281,7 +281,7 @@ type UpdateReferralRequest struct {
 
 func (x *UpdateReferralRequest) Reset() {
 	*x = UpdateReferralRequest{}
-	mi := &file_referral_v1_referral_proto_msgTypes[3]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -293,7 +293,7 @@ func (x *UpdateReferralRequest) String() string {
 func (*UpdateReferralRequest) ProtoMessage() {}
 
 func (x *UpdateReferralRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_referral_v1_referral_proto_msgTypes[3]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -306,7 +306,7 @@ func (x *UpdateReferralRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateReferralRequest.ProtoReflect.Descriptor instead.
 func (*UpdateReferralRequest) Descriptor() ([]byte, []int) {
-	return file_referral_v1_referral_proto_rawDescGZIP(), []int{3}
+	return file_social_referral_v1_referral_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *UpdateReferralRequest) GetReferralId() string {
@@ -332,7 +332,7 @@ type DeleteReferralRequest struct {
 
 func (x *DeleteReferralRequest) Reset() {
 	*x = DeleteReferralRequest{}
-	mi := &file_referral_v1_referral_proto_msgTypes[4]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -344,7 +344,7 @@ func (x *DeleteReferralRequest) String() string {
 func (*DeleteReferralRequest) ProtoMessage() {}
 
 func (x *DeleteReferralRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_referral_v1_referral_proto_msgTypes[4]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -357,7 +357,7 @@ func (x *DeleteReferralRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DeleteReferralRequest.ProtoReflect.Descriptor instead.
 func (*DeleteReferralRequest) Descriptor() ([]byte, []int) {
-	return file_referral_v1_referral_proto_rawDescGZIP(), []int{4}
+	return file_social_referral_v1_referral_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *DeleteReferralRequest) GetReferralId() string {
@@ -380,7 +380,7 @@ type ListReferralsResponse struct {
 
 func (x *ListReferralsResponse) Reset() {
 	*x = ListReferralsResponse{}
-	mi := &file_referral_v1_referral_proto_msgTypes[5]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -392,7 +392,7 @@ func (x *ListReferralsResponse) String() string {
 func (*ListReferralsResponse) ProtoMessage() {}
 
 func (x *ListReferralsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_referral_v1_referral_proto_msgTypes[5]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -405,7 +405,7 @@ func (x *ListReferralsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListReferralsResponse.ProtoReflect.Descriptor instead.
 func (*ListReferralsResponse) Descriptor() ([]byte, []int) {
-	return file_referral_v1_referral_proto_rawDescGZIP(), []int{5}
+	return file_social_referral_v1_referral_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListReferralsResponse) GetReferrals() []*Referral {
@@ -452,7 +452,7 @@ type ReferralResponse struct {
 
 func (x *ReferralResponse) Reset() {
 	*x = ReferralResponse{}
-	mi := &file_referral_v1_referral_proto_msgTypes[6]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -464,7 +464,7 @@ func (x *ReferralResponse) String() string {
 func (*ReferralResponse) ProtoMessage() {}
 
 func (x *ReferralResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_referral_v1_referral_proto_msgTypes[6]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -477,7 +477,7 @@ func (x *ReferralResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReferralResponse.ProtoReflect.Descriptor instead.
 func (*ReferralResponse) Descriptor() ([]byte, []int) {
-	return file_referral_v1_referral_proto_rawDescGZIP(), []int{6}
+	return file_social_referral_v1_referral_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ReferralResponse) GetReferral() *Referral {
@@ -496,7 +496,7 @@ type ReferralStatusResponse struct {
 
 func (x *ReferralStatusResponse) Reset() {
 	*x = ReferralStatusResponse{}
-	mi := &file_referral_v1_referral_proto_msgTypes[7]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -508,7 +508,7 @@ func (x *ReferralStatusResponse) String() string {
 func (*ReferralStatusResponse) ProtoMessage() {}
 
 func (x *ReferralStatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_referral_v1_referral_proto_msgTypes[7]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -521,7 +521,7 @@ func (x *ReferralStatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReferralStatusResponse.ProtoReflect.Descriptor instead.
 func (*ReferralStatusResponse) Descriptor() ([]byte, []int) {
-	return file_referral_v1_referral_proto_rawDescGZIP(), []int{7}
+	return file_social_referral_v1_referral_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ReferralStatusResponse) GetStatus() v1.OperationStatus {
@@ -552,7 +552,7 @@ type Referral struct {
 
 func (x *Referral) Reset() {
 	*x = Referral{}
-	mi := &file_referral_v1_referral_proto_msgTypes[8]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -564,7 +564,7 @@ func (x *Referral) String() string {
 func (*Referral) ProtoMessage() {}
 
 func (x *Referral) ProtoReflect() protoreflect.Message {
-	mi := &file_referral_v1_referral_proto_msgTypes[8]
+	mi := &file_social_referral_v1_referral_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -577,7 +577,7 @@ func (x *Referral) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Referral.ProtoReflect.Descriptor instead.
 func (*Referral) Descriptor() ([]byte, []int) {
-	return file_referral_v1_referral_proto_rawDescGZIP(), []int{8}
+	return file_social_referral_v1_referral_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Referral) GetId() string {
@@ -664,11 +664,11 @@ func (x *Referral) GetCreatedAt() *timestamppb.Timestamp {
 	return nil
 }
 
-var File_referral_v1_referral_proto protoreflect.FileDescriptor
+var File_social_referral_v1_referral_proto protoreflect.FileDescriptor
 
-const file_referral_v1_referral_proto_rawDesc = "" +
+const file_social_referral_v1_referral_proto_rawDesc = "" +
 	"\n" +
-	"\x1areferral/v1/referral.proto\x12\vreferral.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x16common/v1/common.proto\"D\n" +
+	"!social/referral/v1/referral.proto\x12\vreferral.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\x1a\x1bcore/common/v1/common.proto\"D\n" +
 	"\x14ListReferralsRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
 	"\x06offset\x18\x02 \x01(\x05R\x06offset\"\x86\x02\n" +
@@ -736,20 +736,20 @@ const file_referral_v1_referral_proto_rawDesc = "" +
 	"\x0eDeleteReferral\x12\".referral.v1.DeleteReferralRequest\x1a#.referral.v1.ReferralStatusResponse\"'\x82\xd3\xe4\x93\x02!*\x1f/api/v1/referrals/{referral_id}B\x1cZ\x1aapi/pkg/api/referral/v1;v1b\x06proto3"
 
 var (
-	file_referral_v1_referral_proto_rawDescOnce sync.Once
-	file_referral_v1_referral_proto_rawDescData []byte
+	file_social_referral_v1_referral_proto_rawDescOnce sync.Once
+	file_social_referral_v1_referral_proto_rawDescData []byte
 )
 
-func file_referral_v1_referral_proto_rawDescGZIP() []byte {
-	file_referral_v1_referral_proto_rawDescOnce.Do(func() {
-		file_referral_v1_referral_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_referral_v1_referral_proto_rawDesc), len(file_referral_v1_referral_proto_rawDesc)))
+func file_social_referral_v1_referral_proto_rawDescGZIP() []byte {
+	file_social_referral_v1_referral_proto_rawDescOnce.Do(func() {
+		file_social_referral_v1_referral_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_social_referral_v1_referral_proto_rawDesc), len(file_social_referral_v1_referral_proto_rawDesc)))
 	})
-	return file_referral_v1_referral_proto_rawDescData
+	return file_social_referral_v1_referral_proto_rawDescData
 }
 
-var file_referral_v1_referral_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_referral_v1_referral_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
-var file_referral_v1_referral_proto_goTypes = []any{
+var file_social_referral_v1_referral_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_social_referral_v1_referral_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_social_referral_v1_referral_proto_goTypes = []any{
 	(EmploymentType)(0),            // 0: referral.v1.EmploymentType
 	(*ListReferralsRequest)(nil),   // 1: referral.v1.ListReferralsRequest
 	(*ReferralPayload)(nil),        // 2: referral.v1.ReferralPayload
@@ -763,7 +763,7 @@ var file_referral_v1_referral_proto_goTypes = []any{
 	(v1.OperationStatus)(0),        // 10: common.v1.OperationStatus
 	(*timestamppb.Timestamp)(nil),  // 11: google.protobuf.Timestamp
 }
-var file_referral_v1_referral_proto_depIdxs = []int32{
+var file_social_referral_v1_referral_proto_depIdxs = []int32{
 	0,  // 0: referral.v1.ReferralPayload.employment_type:type_name -> referral.v1.EmploymentType
 	2,  // 1: referral.v1.CreateReferralRequest.referral:type_name -> referral.v1.ReferralPayload
 	2,  // 2: referral.v1.UpdateReferralRequest.referral:type_name -> referral.v1.ReferralPayload
@@ -787,27 +787,27 @@ var file_referral_v1_referral_proto_depIdxs = []int32{
 	0,  // [0:8] is the sub-list for field type_name
 }
 
-func init() { file_referral_v1_referral_proto_init() }
-func file_referral_v1_referral_proto_init() {
-	if File_referral_v1_referral_proto != nil {
+func init() { file_social_referral_v1_referral_proto_init() }
+func file_social_referral_v1_referral_proto_init() {
+	if File_social_referral_v1_referral_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_referral_v1_referral_proto_rawDesc), len(file_referral_v1_referral_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_referral_v1_referral_proto_rawDesc), len(file_social_referral_v1_referral_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   9,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_referral_v1_referral_proto_goTypes,
-		DependencyIndexes: file_referral_v1_referral_proto_depIdxs,
-		EnumInfos:         file_referral_v1_referral_proto_enumTypes,
-		MessageInfos:      file_referral_v1_referral_proto_msgTypes,
+		GoTypes:           file_social_referral_v1_referral_proto_goTypes,
+		DependencyIndexes: file_social_referral_v1_referral_proto_depIdxs,
+		EnumInfos:         file_social_referral_v1_referral_proto_enumTypes,
+		MessageInfos:      file_social_referral_v1_referral_proto_msgTypes,
 	}.Build()
-	File_referral_v1_referral_proto = out.File
-	file_referral_v1_referral_proto_goTypes = nil
-	file_referral_v1_referral_proto_depIdxs = nil
+	File_social_referral_v1_referral_proto = out.File
+	file_social_referral_v1_referral_proto_goTypes = nil
+	file_social_referral_v1_referral_proto_depIdxs = nil
 }

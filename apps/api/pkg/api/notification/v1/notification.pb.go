@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: notification/v1/notification.proto
+// source: social/notification/v1/notification.proto
 
 package v1
 
@@ -107,11 +107,11 @@ func (x NotificationKind) String() string {
 }
 
 func (NotificationKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_notification_v1_notification_proto_enumTypes[0].Descriptor()
+	return file_social_notification_v1_notification_proto_enumTypes[0].Descriptor()
 }
 
 func (NotificationKind) Type() protoreflect.EnumType {
-	return &file_notification_v1_notification_proto_enumTypes[0]
+	return &file_social_notification_v1_notification_proto_enumTypes[0]
 }
 
 func (x NotificationKind) Number() protoreflect.EnumNumber {
@@ -120,7 +120,7 @@ func (x NotificationKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use NotificationKind.Descriptor instead.
 func (NotificationKind) EnumDescriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{0}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{0}
 }
 
 // NotificationPayload carries typed deep-link context for a
@@ -149,7 +149,7 @@ type NotificationPayload struct {
 
 func (x *NotificationPayload) Reset() {
 	*x = NotificationPayload{}
-	mi := &file_notification_v1_notification_proto_msgTypes[0]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -161,7 +161,7 @@ func (x *NotificationPayload) String() string {
 func (*NotificationPayload) ProtoMessage() {}
 
 func (x *NotificationPayload) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[0]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -174,7 +174,7 @@ func (x *NotificationPayload) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationPayload.ProtoReflect.Descriptor instead.
 func (*NotificationPayload) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{0}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *NotificationPayload) GetMatchId() string {
@@ -275,7 +275,7 @@ type SendRequest struct {
 
 func (x *SendRequest) Reset() {
 	*x = SendRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[1]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -287,7 +287,7 @@ func (x *SendRequest) String() string {
 func (*SendRequest) ProtoMessage() {}
 
 func (x *SendRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[1]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -300,7 +300,7 @@ func (x *SendRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendRequest.ProtoReflect.Descriptor instead.
 func (*SendRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{1}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *SendRequest) GetUserId() string {
@@ -354,7 +354,7 @@ type SendResponse struct {
 
 func (x *SendResponse) Reset() {
 	*x = SendResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[2]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -366,7 +366,7 @@ func (x *SendResponse) String() string {
 func (*SendResponse) ProtoMessage() {}
 
 func (x *SendResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[2]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -379,7 +379,7 @@ func (x *SendResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendResponse.ProtoReflect.Descriptor instead.
 func (*SendResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{2}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *SendResponse) GetNotificationId() string {
@@ -402,7 +402,7 @@ type SendBatchRequest struct {
 
 func (x *SendBatchRequest) Reset() {
 	*x = SendBatchRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[3]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -414,7 +414,7 @@ func (x *SendBatchRequest) String() string {
 func (*SendBatchRequest) ProtoMessage() {}
 
 func (x *SendBatchRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[3]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -427,7 +427,7 @@ func (x *SendBatchRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendBatchRequest.ProtoReflect.Descriptor instead.
 func (*SendBatchRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{3}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *SendBatchRequest) GetUserIds() []string {
@@ -474,7 +474,7 @@ type SendBatchResponse struct {
 
 func (x *SendBatchResponse) Reset() {
 	*x = SendBatchResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[4]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -486,7 +486,7 @@ func (x *SendBatchResponse) String() string {
 func (*SendBatchResponse) ProtoMessage() {}
 
 func (x *SendBatchResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[4]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -499,7 +499,7 @@ func (x *SendBatchResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SendBatchResponse.ProtoReflect.Descriptor instead.
 func (*SendBatchResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{4}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *SendBatchResponse) GetEnqueued() int32 {
@@ -519,7 +519,7 @@ type RegisterChatRequest struct {
 
 func (x *RegisterChatRequest) Reset() {
 	*x = RegisterChatRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[5]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -531,7 +531,7 @@ func (x *RegisterChatRequest) String() string {
 func (*RegisterChatRequest) ProtoMessage() {}
 
 func (x *RegisterChatRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[5]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -544,7 +544,7 @@ func (x *RegisterChatRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterChatRequest.ProtoReflect.Descriptor instead.
 func (*RegisterChatRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{5}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *RegisterChatRequest) GetUserId() string {
@@ -569,7 +569,7 @@ type RegisterChatResponse struct {
 
 func (x *RegisterChatResponse) Reset() {
 	*x = RegisterChatResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[6]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -581,7 +581,7 @@ func (x *RegisterChatResponse) String() string {
 func (*RegisterChatResponse) ProtoMessage() {}
 
 func (x *RegisterChatResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[6]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -594,7 +594,7 @@ func (x *RegisterChatResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RegisterChatResponse.ProtoReflect.Descriptor instead.
 func (*RegisterChatResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{6}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{6}
 }
 
 type LinkTelegramRequest struct {
@@ -607,7 +607,7 @@ type LinkTelegramRequest struct {
 
 func (x *LinkTelegramRequest) Reset() {
 	*x = LinkTelegramRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[7]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -619,7 +619,7 @@ func (x *LinkTelegramRequest) String() string {
 func (*LinkTelegramRequest) ProtoMessage() {}
 
 func (x *LinkTelegramRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[7]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -632,7 +632,7 @@ func (x *LinkTelegramRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LinkTelegramRequest.ProtoReflect.Descriptor instead.
 func (*LinkTelegramRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{7}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *LinkTelegramRequest) GetUserId() string {
@@ -657,7 +657,7 @@ type LinkTelegramResponse struct {
 
 func (x *LinkTelegramResponse) Reset() {
 	*x = LinkTelegramResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[8]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -669,7 +669,7 @@ func (x *LinkTelegramResponse) String() string {
 func (*LinkTelegramResponse) ProtoMessage() {}
 
 func (x *LinkTelegramResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[8]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -682,7 +682,7 @@ func (x *LinkTelegramResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use LinkTelegramResponse.ProtoReflect.Descriptor instead.
 func (*LinkTelegramResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{8}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{8}
 }
 
 type UpdateSettingsRequest struct {
@@ -701,7 +701,7 @@ type UpdateSettingsRequest struct {
 
 func (x *UpdateSettingsRequest) Reset() {
 	*x = UpdateSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[9]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -713,7 +713,7 @@ func (x *UpdateSettingsRequest) String() string {
 func (*UpdateSettingsRequest) ProtoMessage() {}
 
 func (x *UpdateSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[9]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -726,7 +726,7 @@ func (x *UpdateSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSettingsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{9}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *UpdateSettingsRequest) GetUserId() string {
@@ -793,7 +793,7 @@ type UpdateSettingsResponse struct {
 
 func (x *UpdateSettingsResponse) Reset() {
 	*x = UpdateSettingsResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[10]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -805,7 +805,7 @@ func (x *UpdateSettingsResponse) String() string {
 func (*UpdateSettingsResponse) ProtoMessage() {}
 
 func (x *UpdateSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[10]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -818,7 +818,7 @@ func (x *UpdateSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateSettingsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{10}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{10}
 }
 
 type GetSettingsRequest struct {
@@ -830,7 +830,7 @@ type GetSettingsRequest struct {
 
 func (x *GetSettingsRequest) Reset() {
 	*x = GetSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[11]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -842,7 +842,7 @@ func (x *GetSettingsRequest) String() string {
 func (*GetSettingsRequest) ProtoMessage() {}
 
 func (x *GetSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[11]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -855,7 +855,7 @@ func (x *GetSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSettingsRequest.ProtoReflect.Descriptor instead.
 func (*GetSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{11}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *GetSettingsRequest) GetUserId() string {
@@ -881,7 +881,7 @@ type GetSettingsResponse struct {
 
 func (x *GetSettingsResponse) Reset() {
 	*x = GetSettingsResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[12]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -893,7 +893,7 @@ func (x *GetSettingsResponse) String() string {
 func (*GetSettingsResponse) ProtoMessage() {}
 
 func (x *GetSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[12]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -906,7 +906,7 @@ func (x *GetSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetSettingsResponse.ProtoReflect.Descriptor instead.
 func (*GetSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{12}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *GetSettingsResponse) GetDuelsEnabled() bool {
@@ -979,7 +979,7 @@ type UpdateGuildSettingsRequest struct {
 
 func (x *UpdateGuildSettingsRequest) Reset() {
 	*x = UpdateGuildSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[13]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -991,7 +991,7 @@ func (x *UpdateGuildSettingsRequest) String() string {
 func (*UpdateGuildSettingsRequest) ProtoMessage() {}
 
 func (x *UpdateGuildSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[13]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1004,7 +1004,7 @@ func (x *UpdateGuildSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateGuildSettingsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateGuildSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{13}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *UpdateGuildSettingsRequest) GetUserId() string {
@@ -1057,7 +1057,7 @@ type UpdateGuildSettingsResponse struct {
 
 func (x *UpdateGuildSettingsResponse) Reset() {
 	*x = UpdateGuildSettingsResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[14]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1069,7 +1069,7 @@ func (x *UpdateGuildSettingsResponse) String() string {
 func (*UpdateGuildSettingsResponse) ProtoMessage() {}
 
 func (x *UpdateGuildSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[14]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1082,7 +1082,7 @@ func (x *UpdateGuildSettingsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use UpdateGuildSettingsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateGuildSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{14}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{14}
 }
 
 type GetNotificationSettingsRequest struct {
@@ -1093,7 +1093,7 @@ type GetNotificationSettingsRequest struct {
 
 func (x *GetNotificationSettingsRequest) Reset() {
 	*x = GetNotificationSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[15]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1105,7 +1105,7 @@ func (x *GetNotificationSettingsRequest) String() string {
 func (*GetNotificationSettingsRequest) ProtoMessage() {}
 
 func (x *GetNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[15]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1118,7 +1118,7 @@ func (x *GetNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNotificationSettingsRequest.ProtoReflect.Descriptor instead.
 func (*GetNotificationSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{15}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{15}
 }
 
 type NotificationSettings struct {
@@ -1137,7 +1137,7 @@ type NotificationSettings struct {
 
 func (x *NotificationSettings) Reset() {
 	*x = NotificationSettings{}
-	mi := &file_notification_v1_notification_proto_msgTypes[16]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1149,7 +1149,7 @@ func (x *NotificationSettings) String() string {
 func (*NotificationSettings) ProtoMessage() {}
 
 func (x *NotificationSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[16]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1162,7 +1162,7 @@ func (x *NotificationSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationSettings.ProtoReflect.Descriptor instead.
 func (*NotificationSettings) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{16}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{16}
 }
 
 func (x *NotificationSettings) GetDuelsEnabled() bool {
@@ -1233,7 +1233,7 @@ type UpdateNotificationSettingsRequest struct {
 
 func (x *UpdateNotificationSettingsRequest) Reset() {
 	*x = UpdateNotificationSettingsRequest{}
-	mi := &file_notification_v1_notification_proto_msgTypes[17]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1245,7 +1245,7 @@ func (x *UpdateNotificationSettingsRequest) String() string {
 func (*UpdateNotificationSettingsRequest) ProtoMessage() {}
 
 func (x *UpdateNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[17]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1258,7 +1258,7 @@ func (x *UpdateNotificationSettingsRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use UpdateNotificationSettingsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateNotificationSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{17}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{17}
 }
 
 func (x *UpdateNotificationSettingsRequest) GetDuelsEnabled() bool {
@@ -1297,7 +1297,7 @@ type UpdateNotificationSettingsResponse struct {
 
 func (x *UpdateNotificationSettingsResponse) Reset() {
 	*x = UpdateNotificationSettingsResponse{}
-	mi := &file_notification_v1_notification_proto_msgTypes[18]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1309,7 +1309,7 @@ func (x *UpdateNotificationSettingsResponse) String() string {
 func (*UpdateNotificationSettingsResponse) ProtoMessage() {}
 
 func (x *UpdateNotificationSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_notification_v1_notification_proto_msgTypes[18]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1322,14 +1322,14 @@ func (x *UpdateNotificationSettingsResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use UpdateNotificationSettingsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateNotificationSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_notification_v1_notification_proto_rawDescGZIP(), []int{18}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{18}
 }
 
-var File_notification_v1_notification_proto protoreflect.FileDescriptor
+var File_social_notification_v1_notification_proto protoreflect.FileDescriptor
 
-const file_notification_v1_notification_proto_rawDesc = "" +
+const file_social_notification_v1_notification_proto_rawDesc = "" +
 	"\n" +
-	"\"notification/v1/notification.proto\x12\x0fnotification.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8a\x03\n" +
+	")social/notification/v1/notification.proto\x12\x0fnotification.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\x8a\x03\n" +
 	"\x13NotificationPayload\x12\x19\n" +
 	"\bmatch_id\x18\x01 \x01(\tR\amatchId\x12\x14\n" +
 	"\x05topic\x18\x02 \x01(\tR\x05topic\x12\x1b\n" +
@@ -1469,20 +1469,20 @@ const file_notification_v1_notification_proto_rawDesc = "" +
 	"\x1aUpdateNotificationSettings\x122.notification.v1.UpdateNotificationSettingsRequest\x1a3.notification.v1.UpdateNotificationSettingsResponse\")\x82\xd3\xe4\x93\x02#:\x01*2\x1e/api/v1/notifications/settingsB Z\x1eapi/pkg/api/notification/v1;v1b\x06proto3"
 
 var (
-	file_notification_v1_notification_proto_rawDescOnce sync.Once
-	file_notification_v1_notification_proto_rawDescData []byte
+	file_social_notification_v1_notification_proto_rawDescOnce sync.Once
+	file_social_notification_v1_notification_proto_rawDescData []byte
 )
 
-func file_notification_v1_notification_proto_rawDescGZIP() []byte {
-	file_notification_v1_notification_proto_rawDescOnce.Do(func() {
-		file_notification_v1_notification_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_notification_v1_notification_proto_rawDesc), len(file_notification_v1_notification_proto_rawDesc)))
+func file_social_notification_v1_notification_proto_rawDescGZIP() []byte {
+	file_social_notification_v1_notification_proto_rawDescOnce.Do(func() {
+		file_social_notification_v1_notification_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_social_notification_v1_notification_proto_rawDesc), len(file_social_notification_v1_notification_proto_rawDesc)))
 	})
-	return file_notification_v1_notification_proto_rawDescData
+	return file_social_notification_v1_notification_proto_rawDescData
 }
 
-var file_notification_v1_notification_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
-var file_notification_v1_notification_proto_goTypes = []any{
+var file_social_notification_v1_notification_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_social_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_social_notification_v1_notification_proto_goTypes = []any{
 	(NotificationKind)(0),                      // 0: notification.v1.NotificationKind
 	(*NotificationPayload)(nil),                // 1: notification.v1.NotificationPayload
 	(*SendRequest)(nil),                        // 2: notification.v1.SendRequest
@@ -1505,7 +1505,7 @@ var file_notification_v1_notification_proto_goTypes = []any{
 	(*UpdateNotificationSettingsResponse)(nil), // 19: notification.v1.UpdateNotificationSettingsResponse
 	(*timestamppb.Timestamp)(nil),              // 20: google.protobuf.Timestamp
 }
-var file_notification_v1_notification_proto_depIdxs = []int32{
+var file_social_notification_v1_notification_proto_depIdxs = []int32{
 	0,  // 0: notification.v1.SendRequest.kind:type_name -> notification.v1.NotificationKind
 	1,  // 1: notification.v1.SendRequest.payload:type_name -> notification.v1.NotificationPayload
 	20, // 2: notification.v1.SendRequest.schedule_at:type_name -> google.protobuf.Timestamp
@@ -1536,30 +1536,30 @@ var file_notification_v1_notification_proto_depIdxs = []int32{
 	0,  // [0:5] is the sub-list for field type_name
 }
 
-func init() { file_notification_v1_notification_proto_init() }
-func file_notification_v1_notification_proto_init() {
-	if File_notification_v1_notification_proto != nil {
+func init() { file_social_notification_v1_notification_proto_init() }
+func file_social_notification_v1_notification_proto_init() {
+	if File_social_notification_v1_notification_proto != nil {
 		return
 	}
-	file_notification_v1_notification_proto_msgTypes[9].OneofWrappers = []any{}
-	file_notification_v1_notification_proto_msgTypes[13].OneofWrappers = []any{}
-	file_notification_v1_notification_proto_msgTypes[17].OneofWrappers = []any{}
+	file_social_notification_v1_notification_proto_msgTypes[9].OneofWrappers = []any{}
+	file_social_notification_v1_notification_proto_msgTypes[13].OneofWrappers = []any{}
+	file_social_notification_v1_notification_proto_msgTypes[17].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_notification_v1_notification_proto_rawDesc), len(file_notification_v1_notification_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_notification_v1_notification_proto_rawDesc), len(file_social_notification_v1_notification_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   19,
 			NumExtensions: 0,
 			NumServices:   2,
 		},
-		GoTypes:           file_notification_v1_notification_proto_goTypes,
-		DependencyIndexes: file_notification_v1_notification_proto_depIdxs,
-		EnumInfos:         file_notification_v1_notification_proto_enumTypes,
-		MessageInfos:      file_notification_v1_notification_proto_msgTypes,
+		GoTypes:           file_social_notification_v1_notification_proto_goTypes,
+		DependencyIndexes: file_social_notification_v1_notification_proto_depIdxs,
+		EnumInfos:         file_social_notification_v1_notification_proto_enumTypes,
+		MessageInfos:      file_social_notification_v1_notification_proto_msgTypes,
 	}.Build()
-	File_notification_v1_notification_proto = out.File
-	file_notification_v1_notification_proto_goTypes = nil
-	file_notification_v1_notification_proto_depIdxs = nil
+	File_social_notification_v1_notification_proto = out.File
+	file_social_notification_v1_notification_proto_goTypes = nil
+	file_social_notification_v1_notification_proto_depIdxs = nil
 }

@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: duel_replay/v1/duel_replay.proto
+// source: game/duel_replay/v1/duel_replay.proto
 
 package v1
 
@@ -58,11 +58,11 @@ func (x ReplaySourceKind) String() string {
 }
 
 func (ReplaySourceKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_duel_replay_v1_duel_replay_proto_enumTypes[0].Descriptor()
+	return file_game_duel_replay_v1_duel_replay_proto_enumTypes[0].Descriptor()
 }
 
 func (ReplaySourceKind) Type() protoreflect.EnumType {
-	return &file_duel_replay_v1_duel_replay_proto_enumTypes[0]
+	return &file_game_duel_replay_v1_duel_replay_proto_enumTypes[0]
 }
 
 func (x ReplaySourceKind) Number() protoreflect.EnumNumber {
@@ -71,7 +71,7 @@ func (x ReplaySourceKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ReplaySourceKind.Descriptor instead.
 func (ReplaySourceKind) EnumDescriptor() ([]byte, []int) {
-	return file_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{0}
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{0}
 }
 
 // EventKind is the palette the replay viewer renders as coloured markers.
@@ -120,11 +120,11 @@ func (x EventKind) String() string {
 }
 
 func (EventKind) Descriptor() protoreflect.EnumDescriptor {
-	return file_duel_replay_v1_duel_replay_proto_enumTypes[1].Descriptor()
+	return file_game_duel_replay_v1_duel_replay_proto_enumTypes[1].Descriptor()
 }
 
 func (EventKind) Type() protoreflect.EnumType {
-	return &file_duel_replay_v1_duel_replay_proto_enumTypes[1]
+	return &file_game_duel_replay_v1_duel_replay_proto_enumTypes[1]
 }
 
 func (x EventKind) Number() protoreflect.EnumNumber {
@@ -133,7 +133,7 @@ func (x EventKind) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use EventKind.Descriptor instead.
 func (EventKind) EnumDescriptor() ([]byte, []int) {
-	return file_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{1}
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{1}
 }
 
 // ReplaySummary is the lightweight list item.
@@ -158,7 +158,7 @@ type ReplaySummary struct {
 
 func (x *ReplaySummary) Reset() {
 	*x = ReplaySummary{}
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[0]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -170,7 +170,7 @@ func (x *ReplaySummary) String() string {
 func (*ReplaySummary) ProtoMessage() {}
 
 func (x *ReplaySummary) ProtoReflect() protoreflect.Message {
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[0]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -183,7 +183,7 @@ func (x *ReplaySummary) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplaySummary.ProtoReflect.Descriptor instead.
 func (*ReplaySummary) Descriptor() ([]byte, []int) {
-	return file_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{0}
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ReplaySummary) GetId() string {
@@ -292,7 +292,7 @@ type ReplayEvent struct {
 
 func (x *ReplayEvent) Reset() {
 	*x = ReplayEvent{}
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[1]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -304,7 +304,7 @@ func (x *ReplayEvent) String() string {
 func (*ReplayEvent) ProtoMessage() {}
 
 func (x *ReplayEvent) ProtoReflect() protoreflect.Message {
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[1]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -317,7 +317,7 @@ func (x *ReplayEvent) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ReplayEvent.ProtoReflect.Descriptor instead.
 func (*ReplayEvent) Descriptor() ([]byte, []int) {
-	return file_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{1}
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ReplayEvent) GetId() string {
@@ -371,7 +371,7 @@ type GetReplayRequest struct {
 
 func (x *GetReplayRequest) Reset() {
 	*x = GetReplayRequest{}
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[2]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -383,7 +383,7 @@ func (x *GetReplayRequest) String() string {
 func (*GetReplayRequest) ProtoMessage() {}
 
 func (x *GetReplayRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[2]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -396,7 +396,7 @@ func (x *GetReplayRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetReplayRequest.ProtoReflect.Descriptor instead.
 func (*GetReplayRequest) Descriptor() ([]byte, []int) {
-	return file_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{2}
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *GetReplayRequest) GetReplayId() string {
@@ -416,7 +416,7 @@ type GetReplayResponse struct {
 
 func (x *GetReplayResponse) Reset() {
 	*x = GetReplayResponse{}
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[3]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -428,7 +428,7 @@ func (x *GetReplayResponse) String() string {
 func (*GetReplayResponse) ProtoMessage() {}
 
 func (x *GetReplayResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[3]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -441,7 +441,7 @@ func (x *GetReplayResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetReplayResponse.ProtoReflect.Descriptor instead.
 func (*GetReplayResponse) Descriptor() ([]byte, []int) {
-	return file_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{3}
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{3}
 }
 
 func (x *GetReplayResponse) GetSummary() *ReplaySummary {
@@ -468,7 +468,7 @@ type ListMyReplaysRequest struct {
 
 func (x *ListMyReplaysRequest) Reset() {
 	*x = ListMyReplaysRequest{}
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[4]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -480,7 +480,7 @@ func (x *ListMyReplaysRequest) String() string {
 func (*ListMyReplaysRequest) ProtoMessage() {}
 
 func (x *ListMyReplaysRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[4]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -493,7 +493,7 @@ func (x *ListMyReplaysRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListMyReplaysRequest.ProtoReflect.Descriptor instead.
 func (*ListMyReplaysRequest) Descriptor() ([]byte, []int) {
-	return file_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{4}
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *ListMyReplaysRequest) GetLimit() int32 {
@@ -520,7 +520,7 @@ type ListReplaysResponse struct {
 
 func (x *ListReplaysResponse) Reset() {
 	*x = ListReplaysResponse{}
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[5]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -532,7 +532,7 @@ func (x *ListReplaysResponse) String() string {
 func (*ListReplaysResponse) ProtoMessage() {}
 
 func (x *ListReplaysResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[5]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -545,7 +545,7 @@ func (x *ListReplaysResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListReplaysResponse.ProtoReflect.Descriptor instead.
 func (*ListReplaysResponse) Descriptor() ([]byte, []int) {
-	return file_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{5}
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *ListReplaysResponse) GetReplays() []*ReplaySummary {
@@ -575,7 +575,7 @@ type RecordEventRequest struct {
 
 func (x *RecordEventRequest) Reset() {
 	*x = RecordEventRequest{}
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[6]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -587,7 +587,7 @@ func (x *RecordEventRequest) String() string {
 func (*RecordEventRequest) ProtoMessage() {}
 
 func (x *RecordEventRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[6]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -600,7 +600,7 @@ func (x *RecordEventRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecordEventRequest.ProtoReflect.Descriptor instead.
 func (*RecordEventRequest) Descriptor() ([]byte, []int) {
-	return file_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{6}
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *RecordEventRequest) GetReplayId() string {
@@ -647,7 +647,7 @@ type RecordEventResponse struct {
 
 func (x *RecordEventResponse) Reset() {
 	*x = RecordEventResponse{}
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[7]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -659,7 +659,7 @@ func (x *RecordEventResponse) String() string {
 func (*RecordEventResponse) ProtoMessage() {}
 
 func (x *RecordEventResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_duel_replay_v1_duel_replay_proto_msgTypes[7]
+	mi := &file_game_duel_replay_v1_duel_replay_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -672,7 +672,7 @@ func (x *RecordEventResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RecordEventResponse.ProtoReflect.Descriptor instead.
 func (*RecordEventResponse) Descriptor() ([]byte, []int) {
-	return file_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{7}
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *RecordEventResponse) GetEvent() *ReplayEvent {
@@ -682,11 +682,11 @@ func (x *RecordEventResponse) GetEvent() *ReplayEvent {
 	return nil
 }
 
-var File_duel_replay_v1_duel_replay_proto protoreflect.FileDescriptor
+var File_game_duel_replay_v1_duel_replay_proto protoreflect.FileDescriptor
 
-const file_duel_replay_v1_duel_replay_proto_rawDesc = "" +
+const file_game_duel_replay_v1_duel_replay_proto_rawDesc = "" +
 	"\n" +
-	" duel_replay/v1/duel_replay.proto\x12\x0eduel_replay.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf7\x03\n" +
+	"%game/duel_replay/v1/duel_replay.proto\x12\x0eduel_replay.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xf7\x03\n" +
 	"\rReplaySummary\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12A\n" +
 	"\vsource_kind\x18\x02 \x01(\x0e2 .duel_replay.v1.ReplaySourceKindR\n" +
@@ -754,20 +754,20 @@ const file_duel_replay_v1_duel_replay_proto_rawDesc = "" +
 	"\vRecordEvent\x12\".duel_replay.v1.RecordEventRequest\x1a#.duel_replay.v1.RecordEventResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/duel-replays/{replay_id}/eventsB\x1fZ\x1dapi/pkg/api/duel_replay/v1;v1b\x06proto3"
 
 var (
-	file_duel_replay_v1_duel_replay_proto_rawDescOnce sync.Once
-	file_duel_replay_v1_duel_replay_proto_rawDescData []byte
+	file_game_duel_replay_v1_duel_replay_proto_rawDescOnce sync.Once
+	file_game_duel_replay_v1_duel_replay_proto_rawDescData []byte
 )
 
-func file_duel_replay_v1_duel_replay_proto_rawDescGZIP() []byte {
-	file_duel_replay_v1_duel_replay_proto_rawDescOnce.Do(func() {
-		file_duel_replay_v1_duel_replay_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_duel_replay_v1_duel_replay_proto_rawDesc), len(file_duel_replay_v1_duel_replay_proto_rawDesc)))
+func file_game_duel_replay_v1_duel_replay_proto_rawDescGZIP() []byte {
+	file_game_duel_replay_v1_duel_replay_proto_rawDescOnce.Do(func() {
+		file_game_duel_replay_v1_duel_replay_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_game_duel_replay_v1_duel_replay_proto_rawDesc), len(file_game_duel_replay_v1_duel_replay_proto_rawDesc)))
 	})
-	return file_duel_replay_v1_duel_replay_proto_rawDescData
+	return file_game_duel_replay_v1_duel_replay_proto_rawDescData
 }
 
-var file_duel_replay_v1_duel_replay_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_duel_replay_v1_duel_replay_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
-var file_duel_replay_v1_duel_replay_proto_goTypes = []any{
+var file_game_duel_replay_v1_duel_replay_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
+var file_game_duel_replay_v1_duel_replay_proto_msgTypes = make([]protoimpl.MessageInfo, 8)
+var file_game_duel_replay_v1_duel_replay_proto_goTypes = []any{
 	(ReplaySourceKind)(0),         // 0: duel_replay.v1.ReplaySourceKind
 	(EventKind)(0),                // 1: duel_replay.v1.EventKind
 	(*ReplaySummary)(nil),         // 2: duel_replay.v1.ReplaySummary
@@ -780,7 +780,7 @@ var file_duel_replay_v1_duel_replay_proto_goTypes = []any{
 	(*RecordEventResponse)(nil),   // 9: duel_replay.v1.RecordEventResponse
 	(*timestamppb.Timestamp)(nil), // 10: google.protobuf.Timestamp
 }
-var file_duel_replay_v1_duel_replay_proto_depIdxs = []int32{
+var file_game_duel_replay_v1_duel_replay_proto_depIdxs = []int32{
 	0,  // 0: duel_replay.v1.ReplaySummary.source_kind:type_name -> duel_replay.v1.ReplaySourceKind
 	10, // 1: duel_replay.v1.ReplaySummary.completed_at:type_name -> google.protobuf.Timestamp
 	1,  // 2: duel_replay.v1.ReplayEvent.kind:type_name -> duel_replay.v1.EventKind
@@ -802,27 +802,27 @@ var file_duel_replay_v1_duel_replay_proto_depIdxs = []int32{
 	0,  // [0:8] is the sub-list for field type_name
 }
 
-func init() { file_duel_replay_v1_duel_replay_proto_init() }
-func file_duel_replay_v1_duel_replay_proto_init() {
-	if File_duel_replay_v1_duel_replay_proto != nil {
+func init() { file_game_duel_replay_v1_duel_replay_proto_init() }
+func file_game_duel_replay_v1_duel_replay_proto_init() {
+	if File_game_duel_replay_v1_duel_replay_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_duel_replay_v1_duel_replay_proto_rawDesc), len(file_duel_replay_v1_duel_replay_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_duel_replay_v1_duel_replay_proto_rawDesc), len(file_game_duel_replay_v1_duel_replay_proto_rawDesc)),
 			NumEnums:      2,
 			NumMessages:   8,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_duel_replay_v1_duel_replay_proto_goTypes,
-		DependencyIndexes: file_duel_replay_v1_duel_replay_proto_depIdxs,
-		EnumInfos:         file_duel_replay_v1_duel_replay_proto_enumTypes,
-		MessageInfos:      file_duel_replay_v1_duel_replay_proto_msgTypes,
+		GoTypes:           file_game_duel_replay_v1_duel_replay_proto_goTypes,
+		DependencyIndexes: file_game_duel_replay_v1_duel_replay_proto_depIdxs,
+		EnumInfos:         file_game_duel_replay_v1_duel_replay_proto_enumTypes,
+		MessageInfos:      file_game_duel_replay_v1_duel_replay_proto_msgTypes,
 	}.Build()
-	File_duel_replay_v1_duel_replay_proto = out.File
-	file_duel_replay_v1_duel_replay_proto_goTypes = nil
-	file_duel_replay_v1_duel_replay_proto_depIdxs = nil
+	File_game_duel_replay_v1_duel_replay_proto = out.File
+	file_game_duel_replay_v1_duel_replay_proto_goTypes = nil
+	file_game_duel_replay_v1_duel_replay_proto_depIdxs = nil
 }

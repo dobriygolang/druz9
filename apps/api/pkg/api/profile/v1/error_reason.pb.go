@@ -2,7 +2,7 @@
 // versions:
 // 	protoc-gen-go v1.36.11
 // 	protoc        v7.34.0
-// source: profile/v1/error_reason.proto
+// source: core/profile/v1/error_reason.proto
 
 package v1
 
@@ -57,11 +57,11 @@ func (x ErrorReason) String() string {
 }
 
 func (ErrorReason) Descriptor() protoreflect.EnumDescriptor {
-	return file_profile_v1_error_reason_proto_enumTypes[0].Descriptor()
+	return file_core_profile_v1_error_reason_proto_enumTypes[0].Descriptor()
 }
 
 func (ErrorReason) Type() protoreflect.EnumType {
-	return &file_profile_v1_error_reason_proto_enumTypes[0]
+	return &file_core_profile_v1_error_reason_proto_enumTypes[0]
 }
 
 func (x ErrorReason) Number() protoreflect.EnumNumber {
@@ -70,14 +70,14 @@ func (x ErrorReason) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use ErrorReason.Descriptor instead.
 func (ErrorReason) EnumDescriptor() ([]byte, []int) {
-	return file_profile_v1_error_reason_proto_rawDescGZIP(), []int{0}
+	return file_core_profile_v1_error_reason_proto_rawDescGZIP(), []int{0}
 }
 
-var File_profile_v1_error_reason_proto protoreflect.FileDescriptor
+var File_core_profile_v1_error_reason_proto protoreflect.FileDescriptor
 
-const file_profile_v1_error_reason_proto_rawDesc = "" +
+const file_core_profile_v1_error_reason_proto_rawDesc = "" +
 	"\n" +
-	"\x1dprofile/v1/error_reason.proto\x12\n" +
+	"\"core/profile/v1/error_reason.proto\x12\n" +
 	"profile.v1*f\n" +
 	"\vErrorReason\x12\x1c\n" +
 	"\x18ERROR_REASON_UNSPECIFIED\x10\x00\x12\x10\n" +
@@ -87,22 +87,22 @@ const file_profile_v1_error_reason_proto_rawDesc = "" +
 	"\x19dev.kratos.api.profile.v1B\x19ProfileErrorReasonProtoV1P\x01Z\x19api/pkg/api/profile/v1;v1b\x06proto3"
 
 var (
-	file_profile_v1_error_reason_proto_rawDescOnce sync.Once
-	file_profile_v1_error_reason_proto_rawDescData []byte
+	file_core_profile_v1_error_reason_proto_rawDescOnce sync.Once
+	file_core_profile_v1_error_reason_proto_rawDescData []byte
 )
 
-func file_profile_v1_error_reason_proto_rawDescGZIP() []byte {
-	file_profile_v1_error_reason_proto_rawDescOnce.Do(func() {
-		file_profile_v1_error_reason_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_profile_v1_error_reason_proto_rawDesc), len(file_profile_v1_error_reason_proto_rawDesc)))
+func file_core_profile_v1_error_reason_proto_rawDescGZIP() []byte {
+	file_core_profile_v1_error_reason_proto_rawDescOnce.Do(func() {
+		file_core_profile_v1_error_reason_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_core_profile_v1_error_reason_proto_rawDesc), len(file_core_profile_v1_error_reason_proto_rawDesc)))
 	})
-	return file_profile_v1_error_reason_proto_rawDescData
+	return file_core_profile_v1_error_reason_proto_rawDescData
 }
 
-var file_profile_v1_error_reason_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_profile_v1_error_reason_proto_goTypes = []any{
+var file_core_profile_v1_error_reason_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_core_profile_v1_error_reason_proto_goTypes = []any{
 	(ErrorReason)(0), // 0: profile.v1.ErrorReason
 }
-var file_profile_v1_error_reason_proto_depIdxs = []int32{
+var file_core_profile_v1_error_reason_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for method output_type
 	0, // [0:0] is the sub-list for method input_type
 	0, // [0:0] is the sub-list for extension type_name
@@ -110,26 +110,26 @@ var file_profile_v1_error_reason_proto_depIdxs = []int32{
 	0, // [0:0] is the sub-list for field type_name
 }
 
-func init() { file_profile_v1_error_reason_proto_init() }
-func file_profile_v1_error_reason_proto_init() {
-	if File_profile_v1_error_reason_proto != nil {
+func init() { file_core_profile_v1_error_reason_proto_init() }
+func file_core_profile_v1_error_reason_proto_init() {
+	if File_core_profile_v1_error_reason_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_profile_v1_error_reason_proto_rawDesc), len(file_profile_v1_error_reason_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_core_profile_v1_error_reason_proto_rawDesc), len(file_core_profile_v1_error_reason_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   0,
 			NumExtensions: 0,
 			NumServices:   0,
 		},
-		GoTypes:           file_profile_v1_error_reason_proto_goTypes,
-		DependencyIndexes: file_profile_v1_error_reason_proto_depIdxs,
-		EnumInfos:         file_profile_v1_error_reason_proto_enumTypes,
+		GoTypes:           file_core_profile_v1_error_reason_proto_goTypes,
+		DependencyIndexes: file_core_profile_v1_error_reason_proto_depIdxs,
+		EnumInfos:         file_core_profile_v1_error_reason_proto_enumTypes,
 	}.Build()
-	File_profile_v1_error_reason_proto = out.File
-	file_profile_v1_error_reason_proto_goTypes = nil
-	file_profile_v1_error_reason_proto_depIdxs = nil
+	File_core_profile_v1_error_reason_proto = out.File
+	file_core_profile_v1_error_reason_proto_goTypes = nil
+	file_core_profile_v1_error_reason_proto_depIdxs = nil
 }

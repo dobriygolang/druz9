@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: friend_challenge/v1/friend_challenge.proto
+// source: game/friend_challenge/v1/friend_challenge.proto
 
 package v1
 
@@ -338,5 +338,5 @@ var FriendChallengeService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "friend_challenge/v1/friend_challenge.proto",
+	Metadata: "game/friend_challenge/v1/friend_challenge.proto",
 }

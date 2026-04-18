@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.1
 // - protoc             v7.34.0
-// source: mission/v1/mission.proto
+// source: learning/mission/v1/mission.proto
 
 package v1
 
@@ -163,5 +163,5 @@ var MissionService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "mission/v1/mission.proto",
+	Metadata: "learning/mission/v1/mission.proto",
 }
