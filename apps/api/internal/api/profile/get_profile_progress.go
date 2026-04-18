@@ -3,16 +3,14 @@ package profile
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/profile/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) GetProfileProgress(ctx context.Context, req *v1.GetProfileProgressRequest) (*v1.ProfileProgressResponse, error) {
-	userID, err := uuid.Parse(req.UserId)
+	userID, err := apihelpers.ParseUUID(req.UserId, "INVALID_USER_ID", "user_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_USER_ID", "invalid user id")
+		return nil, err
 	}
 	progress, err := i.progressRepo.GetProfileProgress(ctx, userID)
 	if err != nil {

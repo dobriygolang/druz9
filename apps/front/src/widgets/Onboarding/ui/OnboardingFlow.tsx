@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { Hero, SlimePet, RavenPet, SpiritOrb, Fireflies, Trophy } from '@/shared/ui/sprites'
 import { RpgButton, Badge } from '@/shared/ui/pixel'
 import { emitGameEvent } from '@/shared/lib/gamification/store'
+import { useAuth } from '@/app/providers/AuthProvider'
 
 const CLASSES = [
   { id: 'frontend',  t: 'Arcane Weaver',    s: 'Фронтенд · верстает миры из CSS',     c: '#7aa6c8', stat: 'CSS +3 · react +2 · a11y +2' },
@@ -104,7 +105,7 @@ function TutorialDuel({ name, klassLabel, onWin }: TutorialDuelProps) {
         <div
           className="font-silkscreen uppercase"
           style={{ color: 'var(--ember-1)', letterSpacing: '0.1em', marginBottom: 4 }}
-        >STEP 5 · FIRST TRIAL</div>
+        >STEP 4 · FIRST TRIAL</div>
         <h2 className="font-display" style={{ whiteSpace: 'normal', fontSize: 28, margin: '0 0 8px' }}>
           Обучающая дуэль
         </h2>
@@ -325,7 +326,11 @@ function TutorialDuel({ name, klassLabel, onWin }: TutorialDuelProps) {
 
 // ── Onboarding steps ────────────────────────────────────────────────────────
 
-const STEPS = ['welcome', 'name', 'class', 'pet', 'goal', 'tutorial', 'done'] as const
+// `name` step used to ask for a hero-name (defaulted to "Thornmoss"), but
+// it caused accounts to identify as Thornmoss everywhere. We now pull
+// the display name straight from the authenticated user (Yandex /
+// Telegram profile) so this flow is identity-free.
+const STEPS = ['welcome', 'class', 'pet', 'goal', 'tutorial', 'done'] as const
 type Step = typeof STEPS[number]
 
 const PET_SPRITE: Record<string, React.ComponentType<{ scale?: number }>> = {
@@ -335,11 +340,17 @@ const PET_SPRITE: Record<string, React.ComponentType<{ scale?: number }>> = {
 }
 
 export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
+  const { user } = useAuth()
   const [step, setStep] = useState(0)
-  const [name, setName] = useState('Thornmoss')
   const [klass, setKlass] = useState('frontend')
   const [pet, setPet] = useState('slime')
   const [goal, setGoal] = useState('interviews')
+  // Displayed hero name — always taken from the authenticated identity.
+  const name =
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() ||
+    user?.username ||
+    user?.telegramUsername ||
+    'Hero'
 
   const cur: Step = STEPS[step]
   const progress = (step / (STEPS.length - 1)) * 100
@@ -478,78 +489,12 @@ export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
             </div>
           )}
 
-          {cur === 'name' && (
-            <div>
-              <div
-                className="font-silkscreen uppercase"
-                style={{ color: 'var(--ember-1)', letterSpacing: '0.1em', marginBottom: 4 }}
-              >STEP 1 · IDENTITY</div>
-              <h2 className="font-display" style={{ whiteSpace: 'normal', fontSize: 28, margin: '0 0 8px' }}>
-                Как тебя звать, путник?
-              </h2>
-              <div style={{ color: 'var(--ink-2)', marginBottom: 20, fontSize: 13 }}>
-                Это имя увидят соперники в дуэлях. Можно изменить в Settings.
-              </div>
-              <div style={{ display: 'flex', gap: 16, alignItems: 'center' }}>
-                <div
-                  style={{
-                    width: 90,
-                    height: 90,
-                    background: 'var(--parch-2)',
-                    border: '3px solid var(--ink-0)',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    flexShrink: 0,
-                  }}
-                >
-                  <Hero scale={3} pose="idle" />
-                </div>
-                <div style={{ flex: 1 }}>
-                  <div
-                    className="font-silkscreen uppercase"
-                    style={{ fontSize: 10, color: 'var(--ink-2)', marginBottom: 8, letterSpacing: '0.08em' }}
-                  >HERO NAME</div>
-                  <input
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    maxLength={18}
-                    style={{
-                      width: '100%',
-                      padding: '10px 12px',
-                      border: '3px solid var(--ink-0)',
-                      background: 'var(--parch-2)',
-                      fontFamily: 'Pixelify Sans, monospace',
-                      fontSize: 22,
-                      boxShadow: '3px 3px 0 var(--ink-0)',
-                      outline: 'none',
-                      color: 'var(--ink-0)',
-                    }}
-                  />
-                  <div style={{ fontSize: 10, color: 'var(--ink-2)', marginTop: 6 }}>
-                    {18 - name.length} символов · a-z, 0-9, -_
-                  </div>
-                </div>
-              </div>
-              <div className="rpg-divider" style={{ margin: '20px 0' }} />
-              <div
-                className="font-silkscreen uppercase"
-                style={{ fontSize: 10, color: 'var(--ink-2)', marginBottom: 8, letterSpacing: '0.08em' }}
-              >PICK A STARTER BANNER</div>
-              <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-                {['mossveil', 'ember', 'dusk', 'stone', 'frost'].map((b) => (
-                  <span key={b} className="rpg-tweak-chip rpg-tweak-chip--on">{b}</span>
-                ))}
-              </div>
-            </div>
-          )}
-
           {cur === 'class' && (
             <div>
               <div
                 className="font-silkscreen uppercase"
                 style={{ color: 'var(--ember-1)', letterSpacing: '0.1em', marginBottom: 4 }}
-              >STEP 2 · CLASS</div>
+              >STEP 1 · CLASS</div>
               <h2 className="font-display" style={{ whiteSpace: 'normal', fontSize: 28, margin: '0 0 8px' }}>
                 Выбери путь
               </h2>
@@ -605,7 +550,7 @@ export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
               <div
                 className="font-silkscreen uppercase"
                 style={{ color: 'var(--ember-1)', letterSpacing: '0.1em', marginBottom: 4 }}
-              >STEP 3 · COMPANION</div>
+              >STEP 2 · COMPANION</div>
               <h2 className="font-display" style={{ whiteSpace: 'normal', fontSize: 28, margin: '0 0 8px' }}>
                 Кто составит компанию?
               </h2>
@@ -669,7 +614,7 @@ export function OnboardingFlow({ onFinish }: { onFinish: () => void }) {
               <div
                 className="font-silkscreen uppercase"
                 style={{ color: 'var(--ember-1)', letterSpacing: '0.1em', marginBottom: 4 }}
-              >STEP 4 · INTENT</div>
+              >STEP 3 · INTENT</div>
               <h2 className="font-display" style={{ whiteSpace: 'normal', fontSize: 28, margin: '0 0 8px' }}>
                 Зачем ты здесь?
               </h2>

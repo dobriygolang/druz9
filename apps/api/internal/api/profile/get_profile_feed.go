@@ -3,17 +3,16 @@ package profile
 import (
 	"context"
 
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/profile/v1"
 
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (i *Implementation) GetProfileFeed(ctx context.Context, req *v1.GetProfileFeedRequest) (*v1.GetProfileFeedResponse, error) {
-	userID, err := uuid.Parse(req.UserId)
+	userID, err := apihelpers.ParseUUID(req.UserId, "INVALID_USER_ID", "user_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_USER_ID", "invalid user id")
+		return nil, err
 	}
 	limit := int(req.Limit)
 	if limit <= 0 {

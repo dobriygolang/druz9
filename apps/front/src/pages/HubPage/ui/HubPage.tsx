@@ -125,7 +125,13 @@ export function HubPage() {
             <RpgButton
               size="sm"
               variant="primary"
-              onClick={() => navigate(quest?.actionUrl ?? '/training')}
+              onClick={() => {
+                // quest.actionUrl sometimes arrives empty from the backend
+                // (no next_actions + no non-completed missions). Fall back
+                // to /atlas so the button always does something.
+                const href = quest?.actionUrl && quest.actionUrl.trim() !== '' ? quest.actionUrl : '/atlas'
+                navigate(href)
+              }}
             >
               {quest?.actionLabel ?? t('hub.continueQuest')}
             </RpgButton>
@@ -197,7 +203,13 @@ export function HubPage() {
               >
                 {quest?.progressPct ?? 0}%
               </span>
-              <RpgButton size="sm" variant="primary" onClick={() => navigate(quest?.actionUrl ?? '/training')}>
+              <RpgButton size="sm" variant="primary" onClick={() => {
+                // quest.actionUrl sometimes arrives empty from the backend
+                // (no next_actions + no non-completed missions). Fall back
+                // to /atlas so the button always does something.
+                const href = quest?.actionUrl && quest.actionUrl.trim() !== '' ? quest.actionUrl : '/atlas'
+                navigate(href)
+              }}>
                 {quest?.actionLabel ?? t('hub.resume')}
               </RpgButton>
             </div>
@@ -295,7 +307,7 @@ export function HubPage() {
             overview.dailyMissions.map((mission) => (
               <button
                 key={mission.key}
-                onClick={() => navigate(mission.actionUrl ?? '/training')}
+                onClick={() => navigate(mission.actionUrl && mission.actionUrl.trim() !== '' ? mission.actionUrl : '/atlas')}
                 className={`rpg-quest ${mission.completed ? 'rpg-quest--done' : ''}`}
                 style={{ width: '100%', textAlign: 'left', cursor: 'pointer' }}
               >
@@ -481,7 +493,7 @@ export function HubPage() {
           </svg>
           <div className="rpg-divider" />
           <div style={{ display: 'flex', gap: 10, alignItems: 'center', flexWrap: 'wrap' }}>
-            <RpgButton size="sm" onClick={() => navigate('/training')}>
+            <RpgButton size="sm" onClick={() => navigate('/atlas')}>
               {t('hub.openRoadmap')}
             </RpgButton>
             <RpgButton size="sm" variant="ghost" onClick={() => navigate('/interview')}>

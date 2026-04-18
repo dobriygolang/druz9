@@ -607,17 +607,22 @@ export function CodeRoomPage() {
 
     yDocRef.current = doc
     onDocSyncAppliedRef.current = () => {
-      if (!shouldBootstrapFromSnapshot) {
-        attachBinding()
-      }
+      // Keep calling attachBinding() here too for the "bootstrapped via
+      // a peer's doc_sync" case — attachBinding() is idempotent.
+      attachBinding()
       refreshRemoteCursorPositions()
     }
 
-    if (shouldBootstrapFromSnapshot) {
-      attachBinding()
-      if (seedCode && seedCode !== snapshotCode) {
-        ws.persistCode(seedCode)
-      }
+    // Attach the Monaco↔Yjs binding immediately on mount. The previous
+    // version deferred this when a peer was already in the room, which
+    // meant cursors/selections/typing from the guest were invisible
+    // until *something* (like the AI-review trigger) nudged a doc_sync
+    // through — see CodeRoom bug #12. Attaching early is safe: if a
+    // peer's snapshot lands after, the Yjs CRDT merges cleanly, and if
+    // no peer arrives the binding still drives local edits correctly.
+    attachBinding()
+    if (shouldBootstrapFromSnapshot && seedCode && seedCode !== snapshotCode) {
+      ws.persistCode(seedCode)
     }
     refreshRemoteCursorPositions()
 

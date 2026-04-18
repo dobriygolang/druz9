@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Panel, RpgButton, Badge, PageHeader } from '@/shared/ui/pixel'
 import {
@@ -28,6 +29,7 @@ import type { ProfileProgress } from '@/entities/User/model/types'
 
 export function ProfilePage() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const { user } = useAuth()
   const [tweaks] = useTweaks()
   const [visitorMode, setVisitorMode] = useState(false)
@@ -110,9 +112,7 @@ export function ProfilePage() {
               <RpgButton size="sm" onClick={() => setVisitorMode(false)}>
                 {t('profile.exitVisitor')}
               </RpgButton>
-              <RpgButton size="sm">{t('profile.sendGift')}</RpgButton>
-              <RpgButton size="sm">{t('profile.follow')}</RpgButton>
-              <RpgButton size="sm" variant="primary">
+              <RpgButton size="sm" variant="primary" onClick={() => navigate('/inbox?tab=friends')}>
                 {t('profile.challenge')}
               </RpgButton>
             </div>
@@ -121,12 +121,8 @@ export function ProfilePage() {
               <RpgButton size="sm" onClick={() => setVisitorMode(true)}>
                 {t('profile.viewAsVisitor')}
               </RpgButton>
-              <RpgButton
-                size="sm"
-                variant={editRoom ? 'primary' : 'default'}
-                onClick={() => setEditRoom((v) => !v)}
-              >
-                {editRoom ? t('profile.doneEditing') : t('profile.customize')}
+              <RpgButton size="sm" variant="primary" onClick={() => navigate('/settings?tab=tweaks')}>
+                {t('profile.customize', { defaultValue: 'Customize avatar' })}
               </RpgButton>
             </div>
           )
@@ -227,8 +223,12 @@ export function ProfilePage() {
           >
             {editRoom ? (
               <>
-                <RpgButton size="sm">{t('profile.saveLayout')}</RpgButton>
-                <RpgButton size="sm">{t('profile.reset')}</RpgButton>
+                <RpgButton size="sm" onClick={() => setEditRoom(false)}>
+                  {t('profile.saveLayout')}
+                </RpgButton>
+                <RpgButton size="sm" onClick={() => setInventoryFallback(buildInventory(t))}>
+                  {t('profile.reset')}
+                </RpgButton>
               </>
             ) : (
               !visitorMode && (
@@ -236,7 +236,9 @@ export function ProfilePage() {
                   <RpgButton size="sm" onClick={() => setEditRoom(true)}>
                     {t('profile.editLayout')}
                   </RpgButton>
-                  <RpgButton size="sm">{t('profile.changeTheme')}</RpgButton>
+                  <RpgButton size="sm" onClick={() => navigate('/settings?tab=tweaks')}>
+                    {t('profile.changeTheme')}
+                  </RpgButton>
                 </>
               )
             )}
@@ -405,12 +407,20 @@ export function ProfilePage() {
           ))}
           <div className="rpg-divider" />
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
-            <Badge variant="ember">{t('profile.streakDays')}</Badge>
+            <Badge variant="ember">
+              {t('profile.streakDaysLive', {
+                count: progress?.overview.currentStreakDays ?? 0,
+                defaultValue: `streak ${progress?.overview.currentStreakDays ?? 0}d`,
+              })}
+            </Badge>
             <span
               className="font-silkscreen uppercase"
               style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
             >
-              {t('profile.longestDays')}
+              {t('profile.longestDaysLive', {
+                count: progress?.overview.longestStreakDays ?? 0,
+                defaultValue: `best ${progress?.overview.longestStreakDays ?? 0}d`,
+              })}
             </span>
           </div>
         </Panel>
@@ -432,7 +442,9 @@ export function ProfilePage() {
               className="font-silkscreen uppercase"
               style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}
             >
-              128/240
+              {achievements
+                ? `${achievements.filter((a) => a.progress >= 100).length}/${achievements.length}`
+                : '—'}
             </span>
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
@@ -562,37 +574,27 @@ export function ProfilePage() {
   )
 }
 
+// Zero-state stats for new users (before the progress endpoint responds).
+// The hardcoded "214h 30m / 1,248 / 86 / 54 / 42 / 73 / 38" fixture lived
+// here and made fresh accounts look like long-time veterans — removed.
 function buildStats(t: (key: string) => string): Array<[string, string]> {
   return [
-    [t('profile.stat.timeInWorld'), '214h 30m'],
-    [t('profile.stat.tasksSolved'), '1,248'],
-    [t('profile.stat.duelsWon'), '86 / 54'],
-    [t('profile.stat.mockInterviews'), '42'],
-    [t('profile.stat.podcastsHeard'), '73'],
-    [t('profile.stat.trophies'), '38'],
+    [t('profile.stat.tasksSolved'), '0'],
+    [t('profile.stat.duelsWon'), '0 / 0'],
+    [t('profile.stat.mockInterviews'), '0'],
+    [t('profile.stat.trophies'), '0'],
   ]
 }
 
-function buildAchievements(t: (key: string) => string) {
-  return [
-    { t: t('profile.ach.firstBlood'), d: t('profile.ach.firstBloodDesc'), rare: 'common' as const },
-    { t: t('profile.ach.nightOwl'), d: t('profile.ach.nightOwlDesc'), rare: 'uncommon' as const },
-    { t: t('profile.ach.ravenWhisperer'), d: t('profile.ach.ravenWhispererDesc'), rare: 'rare' as const },
-    { t: t('profile.ach.emberBearer'), d: t('profile.ach.emberBearerDesc'), rare: 'epic' as const },
-    { t: t('profile.ach.siegebreaker'), d: t('profile.ach.siegebreakerDesc'), rare: 'epic' as const },
-    { t: t('profile.ach.archmage'), d: t('profile.ach.archmageDesc'), rare: 'legendary' as const },
-  ]
+// Empty arrays — real data comes from the achievements + activity API.
+// Having hardcoded demo content leak onto a fresh account is exactly the
+// "it looks like I have progress I haven't earned" complaint from staging.
+function buildAchievements(_: (key: string) => string) {
+  return [] as Array<{ t: string; d: string; rare: 'common' | 'uncommon' | 'rare' | 'epic' | 'legendary' }>
 }
 
-function buildTimeline(t: (key: string) => string) {
-  return [
-    { t: t('profile.tl.wonDuelWhen'), e: t('profile.tl.wonDuel'), meta: t('profile.tl.wonDuelMeta'), tag: 'arena' },
-    { t: t('profile.tl.graphModuleWhen'), e: t('profile.tl.graphModule'), meta: t('profile.tl.graphModuleMeta'), tag: 'training' },
-    { t: t('profile.tl.mockInterviewWhen'), e: t('profile.tl.mockInterview'), meta: t('profile.tl.mockInterviewMeta'), tag: 'mentor' },
-    { t: t('profile.tl.equippedAuraWhen'), e: t('profile.tl.equippedAura'), meta: t('profile.tl.equippedAuraMeta'), tag: 'shop' },
-    { t: t('profile.tl.guildRankWhen'), e: t('profile.tl.guildRank'), meta: t('profile.tl.guildRankMeta'), tag: 'guild' },
-    { t: t('profile.tl.unlockedRavenWhen'), e: t('profile.tl.unlockedRaven'), meta: t('profile.tl.unlockedRavenMeta'), tag: 'trophy' },
-  ]
+function buildTimeline(_: (key: string) => string) {
+  return [] as Array<{ t: string; e: string; meta: string; tag: string }>
 }
 
 function buildCosmetics(t: (key: string) => string) {

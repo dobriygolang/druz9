@@ -18,7 +18,7 @@ import {
   Trophy,
   Fireflies,
 } from '@/shared/ui/sprites'
-import { useTweaks } from '@/shared/lib/gameState'
+import { useTweaks, useLiveStats } from '@/shared/lib/gameState'
 import { addToast } from '@/shared/lib/toasts'
 import {
   shopApi,
@@ -71,6 +71,7 @@ export function ShopPage() {
   // `tweaks` is kept for a future room-preview that renders the selected
   // item on the user's chosen layout — wire when the preview lands.
   useTweaks()
+  const live = useLiveStats()
   const [categories, setCategories] = useState<ShopCategoryInfo[]>([])
   const [currentCategory, setCurrentCategory] = useState<ItemCategory>(ItemCategory.DECOR)
   const [items, setItems] = useState<ShopItem[]>([])
@@ -154,8 +155,10 @@ export function ShopPage() {
           <div style={{ display: 'flex', gap: 10, alignItems: 'center' }}>
             <div className="rpg-coin" style={{ fontSize: 14 }}>
               <span className="rpg-coin-icon" />
-              {/* Wallet balance should come from profile progress — see stats wiring TODO. */}
-              8,420
+              {live.gold.toLocaleString()}
+            </div>
+            <div className="rpg-coin" style={{ fontSize: 14 }}>
+              💎 {live.gems.toLocaleString()}
             </div>
             <Badge variant="ember">{t('shop.inventoryCount', { count: ownedIds.size })}</Badge>
           </div>

@@ -1,23 +1,23 @@
 import { useEffect, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Panel, RpgButton, PageHeader } from '@/shared/ui/pixel'
+import { Panel, PageHeader } from '@/shared/ui/pixel'
 import { Hero } from '@/shared/ui/sprites'
-import { isSoundEnabled, setSoundEnabled, play } from '@/shared/lib/sound'
 import { notificationApi, type NotificationSettings } from '@/features/Notification/api/notificationApi'
 import { addToast } from '@/shared/lib/toasts'
 import { useTweaks, type RoomLayout, type HeroPose, type Pet, type Season, type Density } from '@/shared/lib/gameState'
+import { useAuth } from '@/app/providers/AuthProvider'
 
-type Section = 'account' | 'display' | 'tweaks' | 'notifs' | 'gameplay' | 'privacy' | 'keys' | 'access' | 'language'
+// Gameplay / Privacy / Keybindings / Accessibility tabs were removed —
+// the toggles didn't persist anywhere (no backend, no local storage).
+// Leaving them in would keep suggesting to users that preferences are
+// being saved when they aren't. They'll come back when each has a
+// real UserPreferences RPC backing it.
+type Section = 'account' | 'tweaks' | 'notifs' | 'language'
 
 const ICONS: Record<Section, string> = {
   account:  '◎',
-  display:  '▦',
   tweaks:   '✦',
   notifs:   '✉',
-  gameplay: '⚔',
-  privacy:  '⛨',
-  keys:     '⌨',
-  access:   '◑',
   language: '◈',
 }
 
@@ -27,13 +27,8 @@ export function SettingsPage() {
 
   const TABS: Array<[Section, string]> = [
     ['account',  t('settings.tab.account')],
-    ['display',  t('settings.tab.display')],
     ['tweaks',   t('settings.tab.tweaks', { defaultValue: 'Flavour & tweaks' })],
     ['notifs',   t('settings.tab.notifications')],
-    ['gameplay', t('settings.tab.gameplay')],
-    ['privacy',  t('settings.tab.privacy')],
-    ['keys',     t('settings.tab.keybindings')],
-    ['access',   t('settings.tab.accessibility')],
     ['language', t('settings.tab.language')],
   ]
 
@@ -84,13 +79,8 @@ export function SettingsPage() {
           </div>
           <div style={{ padding: 24 }}>
             {tab === 'account'  && <SettingsAccount />}
-            {tab === 'display'  && <SettingsDisplay />}
             {tab === 'tweaks'   && <SettingsTweaks />}
             {tab === 'notifs'   && <SettingsNotifs />}
-            {tab === 'gameplay' && <SettingsGameplay />}
-            {tab === 'privacy'  && <SettingsPrivacy />}
-            {tab === 'keys'     && <SettingsKeybindings />}
-            {tab === 'access'   && <SettingsAccessibility />}
             {tab === 'language' && <SettingsLanguage />}
           </div>
         </div>
@@ -195,6 +185,11 @@ function ChipGroup({
 
 function SettingsAccount() {
   const { t } = useTranslation()
+  const { user } = useAuth()
+  const displayName =
+    [user?.firstName, user?.lastName].filter(Boolean).join(' ').trim() ||
+    user?.username || user?.telegramUsername || 'Hero'
+  const joinedAt = user?.createdAt ? new Date(user.createdAt).toLocaleDateString() : '—'
   return (
     <>
       <h3 className="font-display" style={{ fontSize: 17, marginBottom: 16 }}>
@@ -215,109 +210,33 @@ function SettingsAccount() {
           <Hero scale={3} pose="wave" />
         </div>
         <div>
-          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 22 }}>Thornmoss</div>
+          <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 22 }}>{displayName}</div>
           <div
             className="font-silkscreen uppercase"
             style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
           >
-            {t('settings.account.joined')}
+            {t('settings.account.joinedOn', { date: joinedAt, defaultValue: `joined ${joinedAt}` })}
           </div>
-          <div style={{ display: 'flex', gap: 8, marginTop: 10 }}>
-            <RpgButton size="sm">{t('settings.account.changeName')}</RpgButton>
-            <RpgButton size="sm">{t('settings.account.changeAvatar')}</RpgButton>
+          <div
+            className="font-silkscreen uppercase"
+            style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.08em', marginTop: 4 }}
+          >
+            {user?.primaryProvider ? `via ${user.primaryProvider}` : ''}
           </div>
         </div>
       </div>
-      <Setting label={t('settings.account.email')} help={t('settings.account.emailHelp')}>
-        <input
-          defaultValue="thornmoss@druz9.world"
-          readOnly
-          style={{
-            width: '100%',
-            padding: '6px 8px',
-            border: '2px solid var(--ink-0)',
-            background: 'var(--parch-2)',
-            fontFamily: 'JetBrains Mono, monospace',
-            fontSize: 11,
-            color: 'var(--ink-0)',
-          }}
-        />
-      </Setting>
-      <Setting label={t('settings.account.twoFactor')} help={t('settings.account.twoFactorHelp')}>
-        <Toggle on />
-      </Setting>
       <Setting label={t('settings.account.connected')} help={t('settings.account.connectedHelp')}>
-        <RpgButton size="sm">{t('settings.account.manage')}</RpgButton>
-      </Setting>
-      <Setting label={t('settings.account.danger')} help={t('settings.account.dangerHelp')}>
-        <RpgButton
-          size="sm"
-          style={{
-            background: 'var(--rpg-danger, #a23a2a)',
-            color: 'var(--parch-0)',
-            boxShadow:
-              'inset -3px -3px 0 #7a2a1a, inset 3px 3px 0 #c94a3a, 3px 3px 0 var(--ink-0)',
-          }}
-        >
-          {t('settings.account.delete')}
-        </RpgButton>
+        <span className="font-silkscreen uppercase" style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.08em' }}>
+          {user?.connectedProviders?.length ? user.connectedProviders.join(' · ') : '—'}
+        </span>
       </Setting>
     </>
   )
 }
 
-function SettingsDisplay() {
-  const { t } = useTranslation()
-  return (
-    <>
-      <h3 className="font-display" style={{ fontSize: 17, marginBottom: 16 }}>
-        {t('settings.display.title')}
-      </h3>
-      <Setting label={t('settings.display.pixelScale')} help={t('settings.display.pixelScaleHelp')}>
-        <ChipGroup options={['1×', '2×', '3×', '4×']} active="2×" />
-      </Setting>
-      <Setting label={t('settings.display.reduceMotion')} help={t('settings.display.reduceMotionHelp')}>
-        <Toggle />
-      </Setting>
-      <Setting label={t('settings.display.ambientSound')} help={t('settings.display.ambientSoundHelp')}>
-        <Toggle on />
-      </Setting>
-      <Setting label={t('settings.display.uiSound')} help={t('settings.display.uiSoundHelp')}>
-        <Toggle on />
-      </Setting>
-      <Setting label={t('settings.display.fontDensity')} help={t('settings.display.fontDensityHelp')}>
-        <ChipGroup options={['S', 'M', 'L', 'XL']} active="M" />
-      </Setting>
-      <Setting
-        label={t('settings.display.colourPalette')}
-        help={t('settings.display.colourPaletteHelp')}
-      >
-        <div style={{ display: 'flex', gap: 8 }}>
-          {(
-            [
-              ['parchment', 'var(--parch-0)'],
-              ['ironveil', '#2a2a38'],
-              ['ember', '#7a3d12'],
-            ] as const
-          ).map(([n, c]) => (
-            <div
-              key={n}
-              style={{
-                width: 56,
-                height: 38,
-                background: c,
-                border: '3px solid var(--ink-0)',
-                boxShadow:
-                  n === 'parchment' ? '2px 2px 0 var(--ember-1)' : '2px 2px 0 var(--ink-3)',
-                cursor: 'pointer',
-              }}
-            />
-          ))}
-        </div>
-      </Setting>
-    </>
-  )
-}
+// SettingsDisplay was removed together with the Display tab — every
+// control in it was non-persisting. Tweaks tab covers actual visual
+// knobs (pixel scale, colour palette are folded into season/density).
 
 function SettingsNotifs() {
   const { t } = useTranslation()
@@ -382,184 +301,9 @@ function SettingsNotifs() {
   )
 }
 
-function SettingsGameplay() {
-  const { t } = useTranslation()
-  return (
-    <>
-      <h3 className="font-display" style={{ fontSize: 17, marginBottom: 16 }}>
-        {t('settings.gameplay.title')}
-      </h3>
-      <Setting label={t('settings.gameplay.defaultDiff')} help={t('settings.gameplay.defaultDiffHelp')}>
-        <ChipGroup options={[t('settings.option.easy'), t('settings.option.medium'), t('settings.option.hard'), t('settings.option.mythic')]} active={t('settings.option.medium')} />
-      </Setting>
-      <Setting label={t('settings.gameplay.autoRaid')} help={t('settings.gameplay.autoRaidHelp')}>
-        <Toggle />
-      </Setting>
-      <Setting
-        label={t('settings.gameplay.streakShield')}
-        help={t('settings.gameplay.streakShieldHelp')}
-      >
-        <Toggle on />
-      </Setting>
-      <Setting label={t('settings.gameplay.ideTheme')} help={t('settings.gameplay.ideThemeHelp')}>
-        <ChipGroup options={[t('settings.option.ember'), t('settings.option.moss'), t('settings.option.dusk')]} active={t('settings.option.ember')} />
-      </Setting>
-      <Setting
-        label={t('settings.gameplay.showOpponent')}
-        help={t('settings.gameplay.showOpponentHelp')}
-      >
-        <Toggle on />
-      </Setting>
-      <Setting label={t('settings.gameplay.hintFreq')} help={t('settings.gameplay.hintFreqHelp')}>
-        <ChipGroup options={[t('settings.option.none'), t('settings.option.rare'), t('settings.option.normal'), t('settings.option.often')]} active={t('settings.option.normal')} />
-      </Setting>
-    </>
-  )
-}
-
-function SettingsPrivacy() {
-  const { t } = useTranslation()
-  return (
-    <>
-      <h3 className="font-display" style={{ fontSize: 17, marginBottom: 16 }}>
-        {t('settings.privacy.title')}
-      </h3>
-      <Setting label={t('settings.privacy.leaderboard')} help={t('settings.privacy.leaderboardHelp')}>
-        <Toggle on />
-      </Setting>
-      <Setting label={t('settings.privacy.profileVisits')} help={t('settings.privacy.profileVisitsHelp')}>
-        <ChipGroup options={[t('settings.option.nobody'), t('settings.option.friends'), t('settings.option.guild'), t('settings.option.anyone')]} active={t('settings.option.guild')} />
-      </Setting>
-      <Setting label={t('settings.privacy.duelInvites')} help={t('settings.privacy.duelInvitesHelp')}>
-        <ChipGroup
-          options={[t('settings.option.friends'), t('settings.option.guild'), t('settings.option.rankRange'), t('settings.option.anyone')]}
-          active={t('settings.option.rankRange')}
-        />
-      </Setting>
-      <Setting label={t('settings.privacy.showOnline')}>
-        <Toggle on />
-      </Setting>
-      <Setting label={t('settings.privacy.chatFilter')} help={t('settings.privacy.chatFilterHelp')}>
-        <ChipGroup options={[t('settings.option.off'), t('settings.option.mild'), t('settings.option.strict')]} active={t('settings.option.mild')} />
-      </Setting>
-      <Setting
-        label={t('settings.privacy.exportData')}
-        help={t('settings.privacy.exportDataHelp')}
-      >
-        <RpgButton size="sm">{t('settings.privacy.requestExport')}</RpgButton>
-      </Setting>
-    </>
-  )
-}
-
-/* ---- Keybindings ---- */
-const DEFAULT_KEYS: Array<[string, string, string]> = [
-  ['hub', 'g h', 'nav'],
-  ['training', 'g t', 'nav'],
-  ['arena', 'g a', 'nav'],
-  ['profile', 'g p', 'nav'],
-  ['guild', 'g g', 'nav'],
-  ['search', '/', 'global'],
-  ['showHints', '?', 'global'],
-  ['submitCode', '⌘↵', 'editor'],
-  ['runTests', '⌘r', 'editor'],
-  ['toggleHint', '⌘h', 'editor'],
-  ['nextHint', '⌘]', 'editor'],
-]
-
-function SettingsKeybindings() {
-  const { t } = useTranslation()
-  return (
-    <>
-      <h3 className="font-display" style={{ fontSize: 17, marginBottom: 4 }}>{t('settings.keys.title')}</h3>
-      <div style={{ color: 'var(--ink-2)', fontSize: 12, marginBottom: 16 }}>
-        {t('settings.keys.rebindHint')}
-      </div>
-      <div style={{ display: 'flex', gap: 8, marginBottom: 14, flexWrap: 'wrap' }}>
-        {(['all', 'nav', 'global', 'editor'] as const).map((cat) => (
-          <span key={cat} className={`rpg-tweak-chip ${cat === 'all' ? 'rpg-tweak-chip--on' : ''}`}>{t(`settings.keys.cat.${cat}`)}</span>
-        ))}
-      </div>
-      {DEFAULT_KEYS.map(([label, key, cat]) => (
-        <div
-          key={label}
-          style={{
-            display: 'grid',
-            gridTemplateColumns: '1fr auto auto',
-            alignItems: 'center',
-            gap: 12,
-            padding: '10px 0',
-            borderBottom: '1px dashed var(--ink-3)',
-          }}
-        >
-          <div style={{ fontSize: 13 }}>{t(`settings.keys.label.${label}`)}</div>
-          <span
-            className="font-silkscreen uppercase"
-            style={{ fontSize: 8, color: 'var(--ink-3)', letterSpacing: '0.08em' }}
-          >{t(`settings.keys.cat.${cat}`)}</span>
-          <span
-            className="font-silkscreen"
-            style={{
-              background: 'var(--ink-0)',
-              color: 'var(--parch-0)',
-              padding: '3px 10px',
-              fontSize: 10,
-              border: '2px solid var(--ink-1)',
-              boxShadow: '2px 2px 0 var(--ember-1)',
-              cursor: 'pointer',
-              minWidth: 52,
-              textAlign: 'center',
-            }}
-          >{key}</span>
-        </div>
-      ))}
-      <RpgButton size="sm" style={{ marginTop: 16 }}>{t('settings.keys.resetDefaults')}</RpgButton>
-    </>
-  )
-}
-
-/* ---- Accessibility ---- */
-function SettingsAccessibility() {
-  const { t } = useTranslation()
-  const [soundOn, setSoundOn] = useState(() => isSoundEnabled())
-  return (
-    <>
-      <h3 className="font-display" style={{ fontSize: 17, marginBottom: 16 }}>{t('settings.access.title')}</h3>
-      <Setting label={t('settings.access.soundEffects')} help={t('settings.access.soundEffectsHelp')}>
-        <Toggle
-          on={soundOn}
-          onClick={() => {
-            const next = !soundOn
-            setSoundEnabled(next)
-            setSoundOn(next)
-            if (next) play('click')
-          }}
-        />
-      </Setting>
-      <Setting label={t('settings.access.reduceMotion')} help={t('settings.access.reduceMotionHelp')}>
-        <Toggle />
-      </Setting>
-      <Setting label={t('settings.access.highContrast')} help={t('settings.access.highContrastHelp')}>
-        <Toggle />
-      </Setting>
-      <Setting label={t('settings.access.largeText')} help={t('settings.access.largeTextHelp')}>
-        <Toggle />
-      </Setting>
-      <Setting label={t('settings.access.keyboardOnly')} help={t('settings.access.keyboardOnlyHelp')}>
-        <Toggle />
-      </Setting>
-      <Setting label={t('settings.access.screenReader')} help={t('settings.access.screenReaderHelp')}>
-        <Toggle on />
-      </Setting>
-      <Setting label={t('settings.access.colourBlind')} help={t('settings.access.colourBlindHelp')}>
-        <ChipGroup options={[t('settings.option.off'), t('settings.option.deuteranopia'), t('settings.option.protanopia'), t('settings.option.tritanopia')]} active={t('settings.option.off')} />
-      </Setting>
-      <Setting label={t('settings.access.contrastLevel')} help={t('settings.access.contrastLevelHelp')}>
-        <ChipGroup options={['AA', 'AAA']} active="AA" />
-      </Setting>
-    </>
-  )
-}
+// SettingsGameplay / SettingsPrivacy / SettingsKeybindings /
+// SettingsAccessibility were removed — none of their controls persisted.
+// They'll come back when each ships on top of a real UserPreferences RPC.
 
 /* ---- Language ---- */
 const LANGS = [

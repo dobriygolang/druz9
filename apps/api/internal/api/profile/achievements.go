@@ -5,10 +5,9 @@ import (
 	"fmt"
 	"time"
 
+	"api/internal/apihelpers"
 	v1 "api/pkg/api/profile/v1"
 
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
@@ -122,9 +121,9 @@ var achievementCatalog = []achievementDef{
 }
 
 func (i *Implementation) ListProfileAchievements(ctx context.Context, req *v1.ListProfileAchievementsRequest) (*v1.ListProfileAchievementsResponse, error) {
-	userID, err := uuid.Parse(req.UserId)
+	userID, err := apihelpers.ParseUUID(req.UserId, "INVALID_USER_ID", "user_id")
 	if err != nil {
-		return nil, errors.BadRequest("INVALID_USER_ID", "invalid user id")
+		return nil, err
 	}
 
 	progress, err := i.progressRepo.GetProfileProgress(ctx, userID)

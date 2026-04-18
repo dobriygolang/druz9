@@ -41,7 +41,16 @@ func OptionalUser(ctx context.Context) *model.User {
 // ParseUUID turns a request field into a uuid, returning a 400 kratos
 // error with a caller-provided code. The `fieldLabel` flows into the
 // message so clients see "invalid guild_id" not a generic "invalid id".
+//
+// Empty input is treated specially: a blank string coming off the wire
+// almost always means "client forgot to send the value" (e.g. fired a
+// request before useAuth() resolved) rather than "malformed UUID", so
+// we surface 401 Unauthorized instead of 400. Clients react by
+// redirecting to /login rather than showing a red error toast.
 func ParseUUID(raw, errCode, fieldLabel string) (uuid.UUID, error) {
+	if raw == "" {
+		return uuid.Nil, errors.Unauthorized("UNAUTHORIZED", "missing "+fieldLabel)
+	}
 	id, err := uuid.Parse(raw)
 	if err != nil {
 		return uuid.Nil, errors.BadRequest(errCode, "invalid "+fieldLabel)

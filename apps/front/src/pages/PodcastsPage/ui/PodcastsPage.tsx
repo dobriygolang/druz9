@@ -98,7 +98,10 @@ export function PodcastsPage() {
         }
       />
 
-      {/* Player bar */}
+      {/* Player bar — only visible once the user actually picks an
+          episode; the previous "NOW PLAYING · —" skeleton made the
+          tavern look like something was playing when nothing was. */}
+      {playing && (
       <Panel variant="dark" style={{ padding: 0, overflow: 'hidden', marginBottom: 14 }}>
         <div
           style={{
@@ -205,6 +208,7 @@ export function PodcastsPage() {
           </div>
         </div>
       </Panel>
+      )}
 
       <div className="rpg-tabs">
         {(
