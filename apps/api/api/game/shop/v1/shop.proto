@@ -52,6 +52,32 @@ service ShopService {
       body: "*"
     };
   }
+
+  // --- Admin CRUD (requires IsAdmin=true) ----------------------------------
+
+  // AdminListItems returns all items including inactive ones — so admins
+  // can un-retire a hidden item without re-creating it.
+  rpc AdminListItems(AdminListItemsRequest) returns (ListItemsResponse) {
+    option (google.api.http) = { get: "/api/v1/admin/shop/items" };
+  }
+
+  rpc AdminCreateItem(AdminCreateItemRequest) returns (ShopItem) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/shop/items"
+      body: "*"
+    };
+  }
+
+  rpc AdminUpdateItem(AdminUpdateItemRequest) returns (ShopItem) {
+    option (google.api.http) = {
+      put: "/api/v1/admin/shop/items/{id}"
+      body: "*"
+    };
+  }
+
+  rpc AdminDeleteItem(AdminDeleteItemRequest) returns (AdminDeleteItemResponse) {
+    option (google.api.http) = { delete: "/api/v1/admin/shop/items/{id}" };
+  }
 }
 
 // ItemCategory tracks the high-level tab the item belongs to. Admin can
@@ -166,4 +192,52 @@ message EquipCosmeticResponse {
   // Full refreshed inventory, so the client can update equipped badges
   // in one network round-trip.
   repeated OwnedItem items = 1;
+}
+
+// --- Admin messages -------------------------------------------------------
+
+message AdminListItemsRequest {
+  // UNSPECIFIED → all. Admin view includes inactive items regardless.
+  ItemCategory category = 1;
+  ItemRarity   rarity   = 2;
+  int32        limit    = 3;
+  int32        offset   = 4;
+}
+
+message AdminCreateItemRequest {
+  string       slug         = 1;
+  string       name         = 2;
+  string       description  = 3;
+  ItemCategory category     = 4;
+  ItemRarity   rarity       = 5;
+  ItemCurrency currency     = 6;
+  int32        price        = 7;
+  string       icon_ref     = 8;
+  string       accent_color = 9;
+  bool         is_active    = 10;
+  bool         is_seasonal  = 11;
+  string       slot         = 12;
+}
+
+message AdminUpdateItemRequest {
+  string       id           = 1;
+  string       slug         = 2;
+  string       name         = 3;
+  string       description  = 4;
+  ItemCategory category     = 5;
+  ItemRarity   rarity       = 6;
+  ItemCurrency currency     = 7;
+  int32        price        = 8;
+  string       icon_ref     = 9;
+  string       accent_color = 10;
+  bool         is_active    = 11;
+  bool         is_seasonal  = 12;
+  string       slot         = 13;
+}
+
+message AdminDeleteItemRequest {
+  string id = 1;
+}
+message AdminDeleteItemResponse {
+  bool ok = 1;
 }

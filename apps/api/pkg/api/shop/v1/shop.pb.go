@@ -1052,6 +1052,435 @@ func (x *EquipCosmeticResponse) GetItems() []*OwnedItem {
 	return nil
 }
 
+type AdminListItemsRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// UNSPECIFIED → all. Admin view includes inactive items regardless.
+	Category      ItemCategory `protobuf:"varint,1,opt,name=category,proto3,enum=shop.v1.ItemCategory" json:"category,omitempty"`
+	Rarity        ItemRarity   `protobuf:"varint,2,opt,name=rarity,proto3,enum=shop.v1.ItemRarity" json:"rarity,omitempty"`
+	Limit         int32        `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	Offset        int32        `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminListItemsRequest) Reset() {
+	*x = AdminListItemsRequest{}
+	mi := &file_game_shop_v1_shop_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminListItemsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminListItemsRequest) ProtoMessage() {}
+
+func (x *AdminListItemsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_shop_v1_shop_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminListItemsRequest.ProtoReflect.Descriptor instead.
+func (*AdminListItemsRequest) Descriptor() ([]byte, []int) {
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *AdminListItemsRequest) GetCategory() ItemCategory {
+	if x != nil {
+		return x.Category
+	}
+	return ItemCategory_ITEM_CATEGORY_UNSPECIFIED
+}
+
+func (x *AdminListItemsRequest) GetRarity() ItemRarity {
+	if x != nil {
+		return x.Rarity
+	}
+	return ItemRarity_ITEM_RARITY_UNSPECIFIED
+}
+
+func (x *AdminListItemsRequest) GetLimit() int32 {
+	if x != nil {
+		return x.Limit
+	}
+	return 0
+}
+
+func (x *AdminListItemsRequest) GetOffset() int32 {
+	if x != nil {
+		return x.Offset
+	}
+	return 0
+}
+
+type AdminCreateItemRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Slug          string                 `protobuf:"bytes,1,opt,name=slug,proto3" json:"slug,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	Category      ItemCategory           `protobuf:"varint,4,opt,name=category,proto3,enum=shop.v1.ItemCategory" json:"category,omitempty"`
+	Rarity        ItemRarity             `protobuf:"varint,5,opt,name=rarity,proto3,enum=shop.v1.ItemRarity" json:"rarity,omitempty"`
+	Currency      ItemCurrency           `protobuf:"varint,6,opt,name=currency,proto3,enum=shop.v1.ItemCurrency" json:"currency,omitempty"`
+	Price         int32                  `protobuf:"varint,7,opt,name=price,proto3" json:"price,omitempty"`
+	IconRef       string                 `protobuf:"bytes,8,opt,name=icon_ref,json=iconRef,proto3" json:"icon_ref,omitempty"`
+	AccentColor   string                 `protobuf:"bytes,9,opt,name=accent_color,json=accentColor,proto3" json:"accent_color,omitempty"`
+	IsActive      bool                   `protobuf:"varint,10,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	IsSeasonal    bool                   `protobuf:"varint,11,opt,name=is_seasonal,json=isSeasonal,proto3" json:"is_seasonal,omitempty"`
+	Slot          string                 `protobuf:"bytes,12,opt,name=slot,proto3" json:"slot,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminCreateItemRequest) Reset() {
+	*x = AdminCreateItemRequest{}
+	mi := &file_game_shop_v1_shop_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminCreateItemRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminCreateItemRequest) ProtoMessage() {}
+
+func (x *AdminCreateItemRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_shop_v1_shop_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminCreateItemRequest.ProtoReflect.Descriptor instead.
+func (*AdminCreateItemRequest) Descriptor() ([]byte, []int) {
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *AdminCreateItemRequest) GetSlug() string {
+	if x != nil {
+		return x.Slug
+	}
+	return ""
+}
+
+func (x *AdminCreateItemRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *AdminCreateItemRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *AdminCreateItemRequest) GetCategory() ItemCategory {
+	if x != nil {
+		return x.Category
+	}
+	return ItemCategory_ITEM_CATEGORY_UNSPECIFIED
+}
+
+func (x *AdminCreateItemRequest) GetRarity() ItemRarity {
+	if x != nil {
+		return x.Rarity
+	}
+	return ItemRarity_ITEM_RARITY_UNSPECIFIED
+}
+
+func (x *AdminCreateItemRequest) GetCurrency() ItemCurrency {
+	if x != nil {
+		return x.Currency
+	}
+	return ItemCurrency_ITEM_CURRENCY_UNSPECIFIED
+}
+
+func (x *AdminCreateItemRequest) GetPrice() int32 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+func (x *AdminCreateItemRequest) GetIconRef() string {
+	if x != nil {
+		return x.IconRef
+	}
+	return ""
+}
+
+func (x *AdminCreateItemRequest) GetAccentColor() string {
+	if x != nil {
+		return x.AccentColor
+	}
+	return ""
+}
+
+func (x *AdminCreateItemRequest) GetIsActive() bool {
+	if x != nil {
+		return x.IsActive
+	}
+	return false
+}
+
+func (x *AdminCreateItemRequest) GetIsSeasonal() bool {
+	if x != nil {
+		return x.IsSeasonal
+	}
+	return false
+}
+
+func (x *AdminCreateItemRequest) GetSlot() string {
+	if x != nil {
+		return x.Slot
+	}
+	return ""
+}
+
+type AdminUpdateItemRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Slug          string                 `protobuf:"bytes,2,opt,name=slug,proto3" json:"slug,omitempty"`
+	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Category      ItemCategory           `protobuf:"varint,5,opt,name=category,proto3,enum=shop.v1.ItemCategory" json:"category,omitempty"`
+	Rarity        ItemRarity             `protobuf:"varint,6,opt,name=rarity,proto3,enum=shop.v1.ItemRarity" json:"rarity,omitempty"`
+	Currency      ItemCurrency           `protobuf:"varint,7,opt,name=currency,proto3,enum=shop.v1.ItemCurrency" json:"currency,omitempty"`
+	Price         int32                  `protobuf:"varint,8,opt,name=price,proto3" json:"price,omitempty"`
+	IconRef       string                 `protobuf:"bytes,9,opt,name=icon_ref,json=iconRef,proto3" json:"icon_ref,omitempty"`
+	AccentColor   string                 `protobuf:"bytes,10,opt,name=accent_color,json=accentColor,proto3" json:"accent_color,omitempty"`
+	IsActive      bool                   `protobuf:"varint,11,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	IsSeasonal    bool                   `protobuf:"varint,12,opt,name=is_seasonal,json=isSeasonal,proto3" json:"is_seasonal,omitempty"`
+	Slot          string                 `protobuf:"bytes,13,opt,name=slot,proto3" json:"slot,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminUpdateItemRequest) Reset() {
+	*x = AdminUpdateItemRequest{}
+	mi := &file_game_shop_v1_shop_proto_msgTypes[17]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminUpdateItemRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminUpdateItemRequest) ProtoMessage() {}
+
+func (x *AdminUpdateItemRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_shop_v1_shop_proto_msgTypes[17]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminUpdateItemRequest.ProtoReflect.Descriptor instead.
+func (*AdminUpdateItemRequest) Descriptor() ([]byte, []int) {
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{17}
+}
+
+func (x *AdminUpdateItemRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *AdminUpdateItemRequest) GetSlug() string {
+	if x != nil {
+		return x.Slug
+	}
+	return ""
+}
+
+func (x *AdminUpdateItemRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *AdminUpdateItemRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *AdminUpdateItemRequest) GetCategory() ItemCategory {
+	if x != nil {
+		return x.Category
+	}
+	return ItemCategory_ITEM_CATEGORY_UNSPECIFIED
+}
+
+func (x *AdminUpdateItemRequest) GetRarity() ItemRarity {
+	if x != nil {
+		return x.Rarity
+	}
+	return ItemRarity_ITEM_RARITY_UNSPECIFIED
+}
+
+func (x *AdminUpdateItemRequest) GetCurrency() ItemCurrency {
+	if x != nil {
+		return x.Currency
+	}
+	return ItemCurrency_ITEM_CURRENCY_UNSPECIFIED
+}
+
+func (x *AdminUpdateItemRequest) GetPrice() int32 {
+	if x != nil {
+		return x.Price
+	}
+	return 0
+}
+
+func (x *AdminUpdateItemRequest) GetIconRef() string {
+	if x != nil {
+		return x.IconRef
+	}
+	return ""
+}
+
+func (x *AdminUpdateItemRequest) GetAccentColor() string {
+	if x != nil {
+		return x.AccentColor
+	}
+	return ""
+}
+
+func (x *AdminUpdateItemRequest) GetIsActive() bool {
+	if x != nil {
+		return x.IsActive
+	}
+	return false
+}
+
+func (x *AdminUpdateItemRequest) GetIsSeasonal() bool {
+	if x != nil {
+		return x.IsSeasonal
+	}
+	return false
+}
+
+func (x *AdminUpdateItemRequest) GetSlot() string {
+	if x != nil {
+		return x.Slot
+	}
+	return ""
+}
+
+type AdminDeleteItemRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminDeleteItemRequest) Reset() {
+	*x = AdminDeleteItemRequest{}
+	mi := &file_game_shop_v1_shop_proto_msgTypes[18]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminDeleteItemRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminDeleteItemRequest) ProtoMessage() {}
+
+func (x *AdminDeleteItemRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_shop_v1_shop_proto_msgTypes[18]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminDeleteItemRequest.ProtoReflect.Descriptor instead.
+func (*AdminDeleteItemRequest) Descriptor() ([]byte, []int) {
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{18}
+}
+
+func (x *AdminDeleteItemRequest) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+type AdminDeleteItemResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Ok            bool                   `protobuf:"varint,1,opt,name=ok,proto3" json:"ok,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminDeleteItemResponse) Reset() {
+	*x = AdminDeleteItemResponse{}
+	mi := &file_game_shop_v1_shop_proto_msgTypes[19]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminDeleteItemResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminDeleteItemResponse) ProtoMessage() {}
+
+func (x *AdminDeleteItemResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_game_shop_v1_shop_proto_msgTypes[19]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminDeleteItemResponse.ProtoReflect.Descriptor instead.
+func (*AdminDeleteItemResponse) Descriptor() ([]byte, []int) {
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{19}
+}
+
+func (x *AdminDeleteItemResponse) GetOk() bool {
+	if x != nil {
+		return x.Ok
+	}
+	return false
+}
+
 var File_game_shop_v1_shop_proto protoreflect.FileDescriptor
 
 const file_game_shop_v1_shop_proto_rawDesc = "" +
@@ -1116,7 +1545,47 @@ const file_game_shop_v1_shop_proto_rawDesc = "" +
 	"\aitem_id\x18\x01 \x01(\tR\x06itemId\x12\x18\n" +
 	"\aunequip\x18\x02 \x01(\bR\aunequip\"A\n" +
 	"\x15EquipCosmeticResponse\x12(\n" +
-	"\x05items\x18\x01 \x03(\v2\x12.shop.v1.OwnedItemR\x05items*\xcb\x01\n" +
+	"\x05items\x18\x01 \x03(\v2\x12.shop.v1.OwnedItemR\x05items\"\xa5\x01\n" +
+	"\x15AdminListItemsRequest\x121\n" +
+	"\bcategory\x18\x01 \x01(\x0e2\x15.shop.v1.ItemCategoryR\bcategory\x12+\n" +
+	"\x06rarity\x18\x02 \x01(\x0e2\x13.shop.v1.ItemRarityR\x06rarity\x12\x14\n" +
+	"\x05limit\x18\x03 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x04 \x01(\x05R\x06offset\"\x9b\x03\n" +
+	"\x16AdminCreateItemRequest\x12\x12\n" +
+	"\x04slug\x18\x01 \x01(\tR\x04slug\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x121\n" +
+	"\bcategory\x18\x04 \x01(\x0e2\x15.shop.v1.ItemCategoryR\bcategory\x12+\n" +
+	"\x06rarity\x18\x05 \x01(\x0e2\x13.shop.v1.ItemRarityR\x06rarity\x121\n" +
+	"\bcurrency\x18\x06 \x01(\x0e2\x15.shop.v1.ItemCurrencyR\bcurrency\x12\x14\n" +
+	"\x05price\x18\a \x01(\x05R\x05price\x12\x19\n" +
+	"\bicon_ref\x18\b \x01(\tR\aiconRef\x12!\n" +
+	"\faccent_color\x18\t \x01(\tR\vaccentColor\x12\x1b\n" +
+	"\tis_active\x18\n" +
+	" \x01(\bR\bisActive\x12\x1f\n" +
+	"\vis_seasonal\x18\v \x01(\bR\n" +
+	"isSeasonal\x12\x12\n" +
+	"\x04slot\x18\f \x01(\tR\x04slot\"\xab\x03\n" +
+	"\x16AdminUpdateItemRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
+	"\x04slug\x18\x02 \x01(\tR\x04slug\x12\x12\n" +
+	"\x04name\x18\x03 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x04 \x01(\tR\vdescription\x121\n" +
+	"\bcategory\x18\x05 \x01(\x0e2\x15.shop.v1.ItemCategoryR\bcategory\x12+\n" +
+	"\x06rarity\x18\x06 \x01(\x0e2\x13.shop.v1.ItemRarityR\x06rarity\x121\n" +
+	"\bcurrency\x18\a \x01(\x0e2\x15.shop.v1.ItemCurrencyR\bcurrency\x12\x14\n" +
+	"\x05price\x18\b \x01(\x05R\x05price\x12\x19\n" +
+	"\bicon_ref\x18\t \x01(\tR\aiconRef\x12!\n" +
+	"\faccent_color\x18\n" +
+	" \x01(\tR\vaccentColor\x12\x1b\n" +
+	"\tis_active\x18\v \x01(\bR\bisActive\x12\x1f\n" +
+	"\vis_seasonal\x18\f \x01(\bR\n" +
+	"isSeasonal\x12\x12\n" +
+	"\x04slot\x18\r \x01(\tR\x04slot\"(\n" +
+	"\x16AdminDeleteItemRequest\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\")\n" +
+	"\x17AdminDeleteItemResponse\x12\x0e\n" +
+	"\x02ok\x18\x01 \x01(\bR\x02ok*\xcb\x01\n" +
 	"\fItemCategory\x12\x1d\n" +
 	"\x19ITEM_CATEGORY_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13ITEM_CATEGORY_DECOR\x10\x01\x12\x1b\n" +
@@ -1137,14 +1606,18 @@ const file_game_shop_v1_shop_proto_rawDesc = "" +
 	"\x19ITEM_CURRENCY_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12ITEM_CURRENCY_GOLD\x10\x01\x12\x16\n" +
 	"\x12ITEM_CURRENCY_GEMS\x10\x02\x12\x18\n" +
-	"\x14ITEM_CURRENCY_SHARDS\x10\x032\x84\x05\n" +
+	"\x14ITEM_CURRENCY_SHARDS\x10\x032\xce\b\n" +
 	"\vShopService\x12r\n" +
 	"\x0eListCategories\x12\x1e.shop.v1.ListCategoriesRequest\x1a\x1f.shop.v1.ListCategoriesResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/shop/categories\x12^\n" +
 	"\tListItems\x12\x19.shop.v1.ListItemsRequest\x1a\x1a.shop.v1.ListItemsResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/shop/items\x12b\n" +
 	"\aGetItem\x12\x17.shop.v1.GetItemRequest\x1a\x18.shop.v1.GetItemResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/shop/items/{item_id}\x12k\n" +
 	"\fGetInventory\x12\x1c.shop.v1.GetInventoryRequest\x1a\x1d.shop.v1.GetInventoryResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/shop/inventory\x12a\n" +
 	"\bPurchase\x12\x18.shop.v1.PurchaseRequest\x1a\x19.shop.v1.PurchaseResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/shop/purchase\x12m\n" +
-	"\rEquipCosmetic\x12\x1d.shop.v1.EquipCosmeticRequest\x1a\x1e.shop.v1.EquipCosmeticResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/shop/equipB\x18Z\x16api/pkg/api/shop/v1;v1b\x06proto3"
+	"\rEquipCosmetic\x12\x1d.shop.v1.EquipCosmeticRequest\x1a\x1e.shop.v1.EquipCosmeticResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/shop/equip\x12n\n" +
+	"\x0eAdminListItems\x12\x1e.shop.v1.AdminListItemsRequest\x1a\x1a.shop.v1.ListItemsResponse\" \x82\xd3\xe4\x93\x02\x1a\x12\x18/api/v1/admin/shop/items\x12j\n" +
+	"\x0fAdminCreateItem\x12\x1f.shop.v1.AdminCreateItemRequest\x1a\x11.shop.v1.ShopItem\"#\x82\xd3\xe4\x93\x02\x1d:\x01*\"\x18/api/v1/admin/shop/items\x12o\n" +
+	"\x0fAdminUpdateItem\x12\x1f.shop.v1.AdminUpdateItemRequest\x1a\x11.shop.v1.ShopItem\"(\x82\xd3\xe4\x93\x02\":\x01*\x1a\x1d/api/v1/admin/shop/items/{id}\x12{\n" +
+	"\x0fAdminDeleteItem\x12\x1f.shop.v1.AdminDeleteItemRequest\x1a .shop.v1.AdminDeleteItemResponse\"%\x82\xd3\xe4\x93\x02\x1f*\x1d/api/v1/admin/shop/items/{id}B\x18Z\x16api/pkg/api/shop/v1;v1b\x06proto3"
 
 var (
 	file_game_shop_v1_shop_proto_rawDescOnce sync.Once
@@ -1159,33 +1632,38 @@ func file_game_shop_v1_shop_proto_rawDescGZIP() []byte {
 }
 
 var file_game_shop_v1_shop_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_game_shop_v1_shop_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
+var file_game_shop_v1_shop_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_game_shop_v1_shop_proto_goTypes = []any{
-	(ItemCategory)(0),              // 0: shop.v1.ItemCategory
-	(ItemRarity)(0),                // 1: shop.v1.ItemRarity
-	(ItemCurrency)(0),              // 2: shop.v1.ItemCurrency
-	(*ShopItem)(nil),               // 3: shop.v1.ShopItem
-	(*CategoryInfo)(nil),           // 4: shop.v1.CategoryInfo
-	(*ListCategoriesRequest)(nil),  // 5: shop.v1.ListCategoriesRequest
-	(*ListCategoriesResponse)(nil), // 6: shop.v1.ListCategoriesResponse
-	(*ListItemsRequest)(nil),       // 7: shop.v1.ListItemsRequest
-	(*ListItemsResponse)(nil),      // 8: shop.v1.ListItemsResponse
-	(*GetItemRequest)(nil),         // 9: shop.v1.GetItemRequest
-	(*GetItemResponse)(nil),        // 10: shop.v1.GetItemResponse
-	(*GetInventoryRequest)(nil),    // 11: shop.v1.GetInventoryRequest
-	(*GetInventoryResponse)(nil),   // 12: shop.v1.GetInventoryResponse
-	(*OwnedItem)(nil),              // 13: shop.v1.OwnedItem
-	(*PurchaseRequest)(nil),        // 14: shop.v1.PurchaseRequest
-	(*PurchaseResponse)(nil),       // 15: shop.v1.PurchaseResponse
-	(*EquipCosmeticRequest)(nil),   // 16: shop.v1.EquipCosmeticRequest
-	(*EquipCosmeticResponse)(nil),  // 17: shop.v1.EquipCosmeticResponse
-	(*timestamppb.Timestamp)(nil),  // 18: google.protobuf.Timestamp
+	(ItemCategory)(0),               // 0: shop.v1.ItemCategory
+	(ItemRarity)(0),                 // 1: shop.v1.ItemRarity
+	(ItemCurrency)(0),               // 2: shop.v1.ItemCurrency
+	(*ShopItem)(nil),                // 3: shop.v1.ShopItem
+	(*CategoryInfo)(nil),            // 4: shop.v1.CategoryInfo
+	(*ListCategoriesRequest)(nil),   // 5: shop.v1.ListCategoriesRequest
+	(*ListCategoriesResponse)(nil),  // 6: shop.v1.ListCategoriesResponse
+	(*ListItemsRequest)(nil),        // 7: shop.v1.ListItemsRequest
+	(*ListItemsResponse)(nil),       // 8: shop.v1.ListItemsResponse
+	(*GetItemRequest)(nil),          // 9: shop.v1.GetItemRequest
+	(*GetItemResponse)(nil),         // 10: shop.v1.GetItemResponse
+	(*GetInventoryRequest)(nil),     // 11: shop.v1.GetInventoryRequest
+	(*GetInventoryResponse)(nil),    // 12: shop.v1.GetInventoryResponse
+	(*OwnedItem)(nil),               // 13: shop.v1.OwnedItem
+	(*PurchaseRequest)(nil),         // 14: shop.v1.PurchaseRequest
+	(*PurchaseResponse)(nil),        // 15: shop.v1.PurchaseResponse
+	(*EquipCosmeticRequest)(nil),    // 16: shop.v1.EquipCosmeticRequest
+	(*EquipCosmeticResponse)(nil),   // 17: shop.v1.EquipCosmeticResponse
+	(*AdminListItemsRequest)(nil),   // 18: shop.v1.AdminListItemsRequest
+	(*AdminCreateItemRequest)(nil),  // 19: shop.v1.AdminCreateItemRequest
+	(*AdminUpdateItemRequest)(nil),  // 20: shop.v1.AdminUpdateItemRequest
+	(*AdminDeleteItemRequest)(nil),  // 21: shop.v1.AdminDeleteItemRequest
+	(*AdminDeleteItemResponse)(nil), // 22: shop.v1.AdminDeleteItemResponse
+	(*timestamppb.Timestamp)(nil),   // 23: google.protobuf.Timestamp
 }
 var file_game_shop_v1_shop_proto_depIdxs = []int32{
 	0,  // 0: shop.v1.ShopItem.category:type_name -> shop.v1.ItemCategory
 	1,  // 1: shop.v1.ShopItem.rarity:type_name -> shop.v1.ItemRarity
 	2,  // 2: shop.v1.ShopItem.currency:type_name -> shop.v1.ItemCurrency
-	18, // 3: shop.v1.ShopItem.rotates_at:type_name -> google.protobuf.Timestamp
+	23, // 3: shop.v1.ShopItem.rotates_at:type_name -> google.protobuf.Timestamp
 	0,  // 4: shop.v1.CategoryInfo.category:type_name -> shop.v1.ItemCategory
 	4,  // 5: shop.v1.ListCategoriesResponse.categories:type_name -> shop.v1.CategoryInfo
 	0,  // 6: shop.v1.ListItemsRequest.category:type_name -> shop.v1.ItemCategory
@@ -1194,26 +1672,42 @@ var file_game_shop_v1_shop_proto_depIdxs = []int32{
 	3,  // 9: shop.v1.GetItemResponse.item:type_name -> shop.v1.ShopItem
 	13, // 10: shop.v1.GetInventoryResponse.items:type_name -> shop.v1.OwnedItem
 	3,  // 11: shop.v1.OwnedItem.item:type_name -> shop.v1.ShopItem
-	18, // 12: shop.v1.OwnedItem.acquired_at:type_name -> google.protobuf.Timestamp
+	23, // 12: shop.v1.OwnedItem.acquired_at:type_name -> google.protobuf.Timestamp
 	13, // 13: shop.v1.PurchaseResponse.item:type_name -> shop.v1.OwnedItem
 	13, // 14: shop.v1.EquipCosmeticResponse.items:type_name -> shop.v1.OwnedItem
-	5,  // 15: shop.v1.ShopService.ListCategories:input_type -> shop.v1.ListCategoriesRequest
-	7,  // 16: shop.v1.ShopService.ListItems:input_type -> shop.v1.ListItemsRequest
-	9,  // 17: shop.v1.ShopService.GetItem:input_type -> shop.v1.GetItemRequest
-	11, // 18: shop.v1.ShopService.GetInventory:input_type -> shop.v1.GetInventoryRequest
-	14, // 19: shop.v1.ShopService.Purchase:input_type -> shop.v1.PurchaseRequest
-	16, // 20: shop.v1.ShopService.EquipCosmetic:input_type -> shop.v1.EquipCosmeticRequest
-	6,  // 21: shop.v1.ShopService.ListCategories:output_type -> shop.v1.ListCategoriesResponse
-	8,  // 22: shop.v1.ShopService.ListItems:output_type -> shop.v1.ListItemsResponse
-	10, // 23: shop.v1.ShopService.GetItem:output_type -> shop.v1.GetItemResponse
-	12, // 24: shop.v1.ShopService.GetInventory:output_type -> shop.v1.GetInventoryResponse
-	15, // 25: shop.v1.ShopService.Purchase:output_type -> shop.v1.PurchaseResponse
-	17, // 26: shop.v1.ShopService.EquipCosmetic:output_type -> shop.v1.EquipCosmeticResponse
-	21, // [21:27] is the sub-list for method output_type
-	15, // [15:21] is the sub-list for method input_type
-	15, // [15:15] is the sub-list for extension type_name
-	15, // [15:15] is the sub-list for extension extendee
-	0,  // [0:15] is the sub-list for field type_name
+	0,  // 15: shop.v1.AdminListItemsRequest.category:type_name -> shop.v1.ItemCategory
+	1,  // 16: shop.v1.AdminListItemsRequest.rarity:type_name -> shop.v1.ItemRarity
+	0,  // 17: shop.v1.AdminCreateItemRequest.category:type_name -> shop.v1.ItemCategory
+	1,  // 18: shop.v1.AdminCreateItemRequest.rarity:type_name -> shop.v1.ItemRarity
+	2,  // 19: shop.v1.AdminCreateItemRequest.currency:type_name -> shop.v1.ItemCurrency
+	0,  // 20: shop.v1.AdminUpdateItemRequest.category:type_name -> shop.v1.ItemCategory
+	1,  // 21: shop.v1.AdminUpdateItemRequest.rarity:type_name -> shop.v1.ItemRarity
+	2,  // 22: shop.v1.AdminUpdateItemRequest.currency:type_name -> shop.v1.ItemCurrency
+	5,  // 23: shop.v1.ShopService.ListCategories:input_type -> shop.v1.ListCategoriesRequest
+	7,  // 24: shop.v1.ShopService.ListItems:input_type -> shop.v1.ListItemsRequest
+	9,  // 25: shop.v1.ShopService.GetItem:input_type -> shop.v1.GetItemRequest
+	11, // 26: shop.v1.ShopService.GetInventory:input_type -> shop.v1.GetInventoryRequest
+	14, // 27: shop.v1.ShopService.Purchase:input_type -> shop.v1.PurchaseRequest
+	16, // 28: shop.v1.ShopService.EquipCosmetic:input_type -> shop.v1.EquipCosmeticRequest
+	18, // 29: shop.v1.ShopService.AdminListItems:input_type -> shop.v1.AdminListItemsRequest
+	19, // 30: shop.v1.ShopService.AdminCreateItem:input_type -> shop.v1.AdminCreateItemRequest
+	20, // 31: shop.v1.ShopService.AdminUpdateItem:input_type -> shop.v1.AdminUpdateItemRequest
+	21, // 32: shop.v1.ShopService.AdminDeleteItem:input_type -> shop.v1.AdminDeleteItemRequest
+	6,  // 33: shop.v1.ShopService.ListCategories:output_type -> shop.v1.ListCategoriesResponse
+	8,  // 34: shop.v1.ShopService.ListItems:output_type -> shop.v1.ListItemsResponse
+	10, // 35: shop.v1.ShopService.GetItem:output_type -> shop.v1.GetItemResponse
+	12, // 36: shop.v1.ShopService.GetInventory:output_type -> shop.v1.GetInventoryResponse
+	15, // 37: shop.v1.ShopService.Purchase:output_type -> shop.v1.PurchaseResponse
+	17, // 38: shop.v1.ShopService.EquipCosmetic:output_type -> shop.v1.EquipCosmeticResponse
+	8,  // 39: shop.v1.ShopService.AdminListItems:output_type -> shop.v1.ListItemsResponse
+	3,  // 40: shop.v1.ShopService.AdminCreateItem:output_type -> shop.v1.ShopItem
+	3,  // 41: shop.v1.ShopService.AdminUpdateItem:output_type -> shop.v1.ShopItem
+	22, // 42: shop.v1.ShopService.AdminDeleteItem:output_type -> shop.v1.AdminDeleteItemResponse
+	33, // [33:43] is the sub-list for method output_type
+	23, // [23:33] is the sub-list for method input_type
+	23, // [23:23] is the sub-list for extension type_name
+	23, // [23:23] is the sub-list for extension extendee
+	0,  // [0:23] is the sub-list for field type_name
 }
 
 func init() { file_game_shop_v1_shop_proto_init() }
@@ -1227,7 +1721,7 @@ func file_game_shop_v1_shop_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_shop_v1_shop_proto_rawDesc), len(file_game_shop_v1_shop_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   15,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

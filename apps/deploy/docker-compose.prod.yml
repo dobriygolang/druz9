@@ -288,8 +288,10 @@ services:
       SANDBOX_RUNNER_URL: http://sandbox-runner:8098
       SANDBOX_RUNNER_TIMEOUT: 25s
       NOTIFICATION_SERVICE_ADDR: notification-service:9000
+      DOCKER_LOGS_PROJECT: ${COMPOSE_PROJECT_NAME:-druz9}
     volumes:
       - ../api/.platform/values_prod.yaml:/app/.platform/values_prod.yaml:ro
+      - /var/run/docker.sock:/var/run/docker.sock
     command: ["/app/bin/api"]
     ports:
       - "127.0.0.1:8080:8080"

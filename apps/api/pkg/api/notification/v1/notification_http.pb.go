@@ -19,10 +19,15 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationNotificationSettingsServiceAdminBroadcast = "/notification.v1.NotificationSettingsService/AdminBroadcast"
 const OperationNotificationSettingsServiceGetNotificationSettings = "/notification.v1.NotificationSettingsService/GetNotificationSettings"
 const OperationNotificationSettingsServiceUpdateNotificationSettings = "/notification.v1.NotificationSettingsService/UpdateNotificationSettings"
 
 type NotificationSettingsServiceHTTPServer interface {
+	// AdminBroadcast AdminBroadcast sends an in-app notification to a target audience.
+	// If target_user_ids is empty, fan-out is "all users". Requires admin
+	// rights — 403 otherwise.
+	AdminBroadcast(context.Context, *AdminBroadcastRequest) (*AdminBroadcastResponse, error)
 	GetNotificationSettings(context.Context, *GetNotificationSettingsRequest) (*NotificationSettings, error)
 	UpdateNotificationSettings(context.Context, *UpdateNotificationSettingsRequest) (*UpdateNotificationSettingsResponse, error)
 }
@@ -31,6 +36,7 @@ func RegisterNotificationSettingsServiceHTTPServer(s *http.Server, srv Notificat
 	r := s.Route("/")
 	r.GET("/api/v1/notifications/settings", _NotificationSettingsService_GetNotificationSettings0_HTTP_Handler(srv))
 	r.PATCH("/api/v1/notifications/settings", _NotificationSettingsService_UpdateNotificationSettings0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/notifications/broadcast", _NotificationSettingsService_AdminBroadcast0_HTTP_Handler(srv))
 }
 
 func _NotificationSettingsService_GetNotificationSettings0_HTTP_Handler(srv NotificationSettingsServiceHTTPServer) func(ctx http.Context) error {
@@ -74,7 +80,33 @@ func _NotificationSettingsService_UpdateNotificationSettings0_HTTP_Handler(srv N
 	}
 }
 
+func _NotificationSettingsService_AdminBroadcast0_HTTP_Handler(srv NotificationSettingsServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminBroadcastRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationNotificationSettingsServiceAdminBroadcast)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminBroadcast(ctx, req.(*AdminBroadcastRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminBroadcastResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type NotificationSettingsServiceHTTPClient interface {
+	// AdminBroadcast AdminBroadcast sends an in-app notification to a target audience.
+	// If target_user_ids is empty, fan-out is "all users". Requires admin
+	// rights — 403 otherwise.
+	AdminBroadcast(ctx context.Context, req *AdminBroadcastRequest, opts ...http.CallOption) (rsp *AdminBroadcastResponse, err error)
 	GetNotificationSettings(ctx context.Context, req *GetNotificationSettingsRequest, opts ...http.CallOption) (rsp *NotificationSettings, err error)
 	UpdateNotificationSettings(ctx context.Context, req *UpdateNotificationSettingsRequest, opts ...http.CallOption) (rsp *UpdateNotificationSettingsResponse, err error)
 }
@@ -85,6 +117,22 @@ type NotificationSettingsServiceHTTPClientImpl struct {
 
 func NewNotificationSettingsServiceHTTPClient(client *http.Client) NotificationSettingsServiceHTTPClient {
 	return &NotificationSettingsServiceHTTPClientImpl{client}
+}
+
+// AdminBroadcast AdminBroadcast sends an in-app notification to a target audience.
+// If target_user_ids is empty, fan-out is "all users". Requires admin
+// rights — 403 otherwise.
+func (c *NotificationSettingsServiceHTTPClientImpl) AdminBroadcast(ctx context.Context, in *AdminBroadcastRequest, opts ...http.CallOption) (*AdminBroadcastResponse, error) {
+	var out AdminBroadcastResponse
+	pattern := "/api/v1/admin/notifications/broadcast"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationNotificationSettingsServiceAdminBroadcast))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 func (c *NotificationSettingsServiceHTTPClientImpl) GetNotificationSettings(ctx context.Context, in *GetNotificationSettingsRequest, opts ...http.CallOption) (*NotificationSettings, error) {

@@ -33,6 +33,12 @@ type Repository interface {
 	// the user and optionally sets equipItemID to equipped. Pass uuid.Nil
 	// to just clear the slot.
 	SetEquippedForSlot(ctx context.Context, userID uuid.UUID, slot string, equipItemID uuid.UUID) ([]*model.ShopOwnedItem, error)
+
+	// Admin surface.
+	AdminListItems(ctx context.Context, category model.ItemCategory, rarity model.ItemRarity, limit, offset int32) ([]*model.ShopItem, int32, error)
+	InsertItem(ctx context.Context, item *model.ShopItem) (*model.ShopItem, error)
+	UpdateItem(ctx context.Context, item *model.ShopItem) (*model.ShopItem, error)
+	DeleteItem(ctx context.Context, id uuid.UUID) error
 }
 
 //go:generate mockery --case underscore --name Wallet --with-expecter --output mocks
@@ -247,6 +253,56 @@ func (s *Service) Equip(
 		target = uuid.Nil
 	}
 	return s.repo.SetEquippedForSlot(ctx, userID, item.Slot, target)
+}
+
+// AdminListItems mirrors ListItems but surfaces inactive rows too.
+func (s *Service) AdminListItems(
+	ctx context.Context, category model.ItemCategory, rarity model.ItemRarity, limit, offset int32,
+) (*model.ShopItemList, error) {
+	if limit <= 0 {
+		limit = defaultListLimit
+	}
+	if limit > maxListLimit {
+		limit = maxListLimit
+	}
+	if offset < 0 {
+		offset = 0
+	}
+	items, total, err := s.repo.AdminListItems(ctx, category, rarity, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	if items == nil {
+		items = []*model.ShopItem{}
+	}
+	return &model.ShopItemList{Items: items, Total: total}, nil
+}
+
+func (s *Service) AdminCreateItem(ctx context.Context, item *model.ShopItem) (*model.ShopItem, error) {
+	if item == nil {
+		return nil, errors.New("shop: nil item")
+	}
+	if strings.TrimSpace(item.Slug) == "" {
+		return nil, errors.New("shop: slug is required")
+	}
+	if item.ID == uuid.Nil {
+		item.ID = uuid.New()
+	}
+	return s.repo.InsertItem(ctx, item)
+}
+
+func (s *Service) AdminUpdateItem(ctx context.Context, item *model.ShopItem) (*model.ShopItem, error) {
+	if item == nil || item.ID == uuid.Nil {
+		return nil, ErrItemNotFound
+	}
+	return s.repo.UpdateItem(ctx, item)
+}
+
+func (s *Service) AdminDeleteItem(ctx context.Context, id uuid.UUID) error {
+	if id == uuid.Nil {
+		return ErrItemNotFound
+	}
+	return s.repo.DeleteItem(ctx, id)
 }
 
 // Used by API layer if a client passes a slug instead of a UUID.

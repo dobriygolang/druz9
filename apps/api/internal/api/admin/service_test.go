@@ -3,6 +3,8 @@ package admin
 import (
 	"context"
 	"errors"
+	"slices"
+	"strings"
 	"testing"
 
 	"api/internal/api/admin/mocks"
@@ -13,6 +15,22 @@ import (
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
 )
+
+type fakeDockerLogsRunner struct {
+	calls [][]string
+	err   error
+}
+
+func (r *fakeDockerLogsRunner) Run(_ context.Context, _ []byte, args []string) ([]byte, error) {
+	r.calls = append(r.calls, slices.Clone(args))
+	if r.err != nil {
+		return nil, r.err
+	}
+	if len(args) > 0 && args[0] == "ps" {
+		return []byte("container123\n"), nil
+	}
+	return []byte("2026-04-18T10:00:00Z backend started\n"), nil
+}
 
 type stubConfigService struct {
 	variables map[rtc.Key]rtc.Variable
@@ -169,6 +187,67 @@ func TestConfigMethods(t *testing.T) {
 		}
 		if kratoserrors.Reason(err) != "CONFIG_NOT_FOUND" {
 			t.Fatalf("unexpected error reason: %s", kratoserrors.Reason(err))
+		}
+	})
+}
+
+func TestGetDockerLogs(t *testing.T) {
+	t.Setenv("DOCKER_LOGS_PROJECT", "druz9")
+
+	t.Run("returns logs for allowed service", func(t *testing.T) {
+		runner := &fakeDockerLogsRunner{}
+		impl := New(nil, nil, nil, nil)
+		impl.dockerLogsRunner = runner
+
+		resp, err := impl.GetDockerLogs(context.Background(), &DockerLogsRequest{
+			Service: "backend",
+			Tail:    100,
+			Since:   "10m",
+		})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if resp.ContainerID != "container123" {
+			t.Fatalf("unexpected container id: %s", resp.ContainerID)
+		}
+		if resp.Tail != 100 {
+			t.Fatalf("unexpected tail: %d", resp.Tail)
+		}
+		if !strings.Contains(resp.Logs, "backend started") {
+			t.Fatalf("unexpected logs: %q", resp.Logs)
+		}
+		if len(runner.calls) != 2 {
+			t.Fatalf("expected 2 docker calls, got %d", len(runner.calls))
+		}
+		if got := runner.calls[1]; !slices.Contains(got, "--since") || !slices.Contains(got, "10m") {
+			t.Fatalf("expected docker logs call to include --since 10m, got %v", got)
+		}
+	})
+
+	t.Run("rejects unknown service", func(t *testing.T) {
+		impl := New(nil, nil, nil, nil)
+		impl.dockerLogsRunner = &fakeDockerLogsRunner{}
+
+		_, err := impl.GetDockerLogs(context.Background(), &DockerLogsRequest{Service: "unknown", Tail: 100})
+		if err == nil {
+			t.Fatal("expected error")
+		}
+		if kratoserrors.Reason(err) != "UNKNOWN_DOCKER_SERVICE" {
+			t.Fatalf("unexpected error reason: %s", kratoserrors.Reason(err))
+		}
+	})
+
+	t.Run("caps large tail", func(t *testing.T) {
+		runner := &fakeDockerLogsRunner{}
+		impl := New(nil, nil, nil, nil)
+		impl.dockerLogsRunner = runner
+
+		resp, err := impl.GetDockerLogs(context.Background(), &DockerLogsRequest{Service: "backend", Tail: 9000})
+		if err != nil {
+			t.Fatalf("unexpected error: %v", err)
+		}
+		if resp.Tail != maxDockerLogsTail {
+			t.Fatalf("expected tail cap %d, got %d", maxDockerLogsTail, resp.Tail)
 		}
 	})
 }

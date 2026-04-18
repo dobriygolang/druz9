@@ -156,6 +156,11 @@ const AdminAnalyticsPage = lazy(() =>
     default: m.AdminAnalyticsPage,
   })),
 )
+const AdminLogsPage = lazy(() =>
+  import('@/pages/AdminLogsPage/ui/AdminLogsPage').then((m) => ({
+    default: m.AdminLogsPage,
+  })),
+)
 const AdminCodeGamePage = lazy(() =>
   import('@/pages/AdminCodeGamePage/ui/AdminCodeGamePage').then((m) => ({
     default: m.AdminCodeGamePage,
@@ -165,6 +170,15 @@ const AdminDashboardPage = lazy(() =>
   import('@/pages/AdminDashboardPage/ui/AdminDashboardPage').then((m) => ({
     default: m.AdminDashboardPage,
   })),
+)
+const AdminShopPage = lazy(() =>
+  import('@/pages/AdminShopPage/ui/AdminShopPage').then((m) => ({ default: m.AdminShopPage })),
+)
+const AdminNotificationsPage = lazy(() =>
+  import('@/pages/AdminNotificationsPage/ui/AdminNotificationsPage').then((m) => ({ default: m.AdminNotificationsPage })),
+)
+const AdminPodcastsPage = lazy(() =>
+  import('@/pages/AdminPodcastsPage/ui/AdminPodcastsPage').then((m) => ({ default: m.AdminPodcastsPage })),
 )
 
 const Fallback: React.FC = () => (
@@ -389,15 +403,16 @@ export const RouterProvider: React.FC = () => {
             <Route path="/admin/config" element={<RTConfigAdminPage />} />
             <Route path="/admin/interview-prep" element={<InterviewPrepAdminPage />} />
             <Route path="/admin/analytics" element={<AdminAnalyticsPage />} />
+            <Route path="/admin/logs" element={<AdminLogsPage />} />
             <Route path="/admin/code-game" element={<AdminCodeGamePage />} />
             {/* Stubs for the Wave E sections that don't have UI yet — the
                 dashboard links land here; each will get a real page as
                 the corresponding admin RPCs ship. */}
-            <Route path="/admin/podcasts"     element={<AdminStub title="Podcasts admin" />} />
-            <Route path="/admin/shop"         element={<AdminStub title="Shop admin" />} />
+            <Route path="/admin/podcasts"     element={<AdminPodcastsPage />} />
+            <Route path="/admin/shop"         element={<AdminShopPage />} />
             <Route path="/admin/seasonpass"   element={<AdminStub title="Season pass admin" />} />
             <Route path="/admin/ai-bots"      element={<AdminStub title="AI mentors admin" />} />
-            <Route path="/admin/notifications" element={<AdminStub title="Notifications admin" />} />
+            <Route path="/admin/notifications" element={<AdminNotificationsPage />} />
           </Route>
 
           {/* Catch-all */}

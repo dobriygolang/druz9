@@ -2,6 +2,7 @@ package main
 
 import (
 	authcallbackadapter "api/internal/adapter/authcallback"
+	adminapi "api/internal/api/admin"
 	interviewlive "api/internal/api/interview_live"
 	"api/internal/closer"
 	server "api/internal/server"
@@ -20,6 +21,7 @@ import (
 	interviewprepv1 "api/pkg/api/interview_prep/v1"
 	missionv1 "api/pkg/api/mission/v1"
 	notificationv1 "api/pkg/api/notification/v1"
+	peermockv1 "api/pkg/api/peer_mock/v1"
 	podcastv1 "api/pkg/api/podcast/v1"
 	profilev1 "api/pkg/api/profile/v1"
 	referralv1 "api/pkg/api/referral/v1"
@@ -27,7 +29,6 @@ import (
 	shopv1 "api/pkg/api/shop/v1"
 	skillsv1 "api/pkg/api/skills/v1"
 	socialv1 "api/pkg/api/social/v1"
-	peermockv1 "api/pkg/api/peer_mock/v1"
 	streakv1 "api/pkg/api/streak/v1"
 	trainingv1 "api/pkg/api/training/v1"
 
@@ -112,6 +113,7 @@ func registerManualHTTPRoutes(
 	wshandler.Register(httpServer, services.realtimeHub, services.arenaRealtimeHub, services.profileServiceDomain)
 
 	liveChatHandler := interviewlive.New(services.aiReviewer)
+	adminapi.RegisterDockerLogsHTTPRoute(httpServer, services.adminService)
 
 	r := httpServer.Route("/")
 

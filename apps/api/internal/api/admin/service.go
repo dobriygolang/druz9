@@ -35,10 +35,11 @@ type CacheInvalidator interface {
 // Implementation of admin service.
 type Implementation struct {
 	v1.UnimplementedAdminServiceServer
-	service       Service
-	configService ConfigService
-	userManager   UserManager
-	cacheInval    CacheInvalidator
+	service          Service
+	configService    ConfigService
+	userManager      UserManager
+	cacheInval       CacheInvalidator
+	dockerLogsRunner dockerLogsRunner
 }
 
 // New returns new instance of Implementation.

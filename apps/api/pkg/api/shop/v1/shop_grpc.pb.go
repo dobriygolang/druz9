@@ -19,12 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ShopService_ListCategories_FullMethodName = "/shop.v1.ShopService/ListCategories"
-	ShopService_ListItems_FullMethodName      = "/shop.v1.ShopService/ListItems"
-	ShopService_GetItem_FullMethodName        = "/shop.v1.ShopService/GetItem"
-	ShopService_GetInventory_FullMethodName   = "/shop.v1.ShopService/GetInventory"
-	ShopService_Purchase_FullMethodName       = "/shop.v1.ShopService/Purchase"
-	ShopService_EquipCosmetic_FullMethodName  = "/shop.v1.ShopService/EquipCosmetic"
+	ShopService_ListCategories_FullMethodName  = "/shop.v1.ShopService/ListCategories"
+	ShopService_ListItems_FullMethodName       = "/shop.v1.ShopService/ListItems"
+	ShopService_GetItem_FullMethodName         = "/shop.v1.ShopService/GetItem"
+	ShopService_GetInventory_FullMethodName    = "/shop.v1.ShopService/GetInventory"
+	ShopService_Purchase_FullMethodName        = "/shop.v1.ShopService/Purchase"
+	ShopService_EquipCosmetic_FullMethodName   = "/shop.v1.ShopService/EquipCosmetic"
+	ShopService_AdminListItems_FullMethodName  = "/shop.v1.ShopService/AdminListItems"
+	ShopService_AdminCreateItem_FullMethodName = "/shop.v1.ShopService/AdminCreateItem"
+	ShopService_AdminUpdateItem_FullMethodName = "/shop.v1.ShopService/AdminUpdateItem"
+	ShopService_AdminDeleteItem_FullMethodName = "/shop.v1.ShopService/AdminDeleteItem"
 )
 
 // ShopServiceClient is the client API for ShopService service.
@@ -53,6 +57,12 @@ type ShopServiceClient interface {
 	// unequip=true to clear the slot without equipping anything new (item_id
 	// still required so we know which slot to target).
 	EquipCosmetic(ctx context.Context, in *EquipCosmeticRequest, opts ...grpc.CallOption) (*EquipCosmeticResponse, error)
+	// AdminListItems returns all items including inactive ones — so admins
+	// can un-retire a hidden item without re-creating it.
+	AdminListItems(ctx context.Context, in *AdminListItemsRequest, opts ...grpc.CallOption) (*ListItemsResponse, error)
+	AdminCreateItem(ctx context.Context, in *AdminCreateItemRequest, opts ...grpc.CallOption) (*ShopItem, error)
+	AdminUpdateItem(ctx context.Context, in *AdminUpdateItemRequest, opts ...grpc.CallOption) (*ShopItem, error)
+	AdminDeleteItem(ctx context.Context, in *AdminDeleteItemRequest, opts ...grpc.CallOption) (*AdminDeleteItemResponse, error)
 }
 
 type shopServiceClient struct {
@@ -123,6 +133,46 @@ func (c *shopServiceClient) EquipCosmetic(ctx context.Context, in *EquipCosmetic
 	return out, nil
 }
 
+func (c *shopServiceClient) AdminListItems(ctx context.Context, in *AdminListItemsRequest, opts ...grpc.CallOption) (*ListItemsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListItemsResponse)
+	err := c.cc.Invoke(ctx, ShopService_AdminListItems_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *shopServiceClient) AdminCreateItem(ctx context.Context, in *AdminCreateItemRequest, opts ...grpc.CallOption) (*ShopItem, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShopItem)
+	err := c.cc.Invoke(ctx, ShopService_AdminCreateItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *shopServiceClient) AdminUpdateItem(ctx context.Context, in *AdminUpdateItemRequest, opts ...grpc.CallOption) (*ShopItem, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ShopItem)
+	err := c.cc.Invoke(ctx, ShopService_AdminUpdateItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *shopServiceClient) AdminDeleteItem(ctx context.Context, in *AdminDeleteItemRequest, opts ...grpc.CallOption) (*AdminDeleteItemResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminDeleteItemResponse)
+	err := c.cc.Invoke(ctx, ShopService_AdminDeleteItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ShopServiceServer is the server API for ShopService service.
 // All implementations must embed UnimplementedShopServiceServer
 // for forward compatibility.
@@ -149,6 +199,12 @@ type ShopServiceServer interface {
 	// unequip=true to clear the slot without equipping anything new (item_id
 	// still required so we know which slot to target).
 	EquipCosmetic(context.Context, *EquipCosmeticRequest) (*EquipCosmeticResponse, error)
+	// AdminListItems returns all items including inactive ones — so admins
+	// can un-retire a hidden item without re-creating it.
+	AdminListItems(context.Context, *AdminListItemsRequest) (*ListItemsResponse, error)
+	AdminCreateItem(context.Context, *AdminCreateItemRequest) (*ShopItem, error)
+	AdminUpdateItem(context.Context, *AdminUpdateItemRequest) (*ShopItem, error)
+	AdminDeleteItem(context.Context, *AdminDeleteItemRequest) (*AdminDeleteItemResponse, error)
 	mustEmbedUnimplementedShopServiceServer()
 }
 
@@ -176,6 +232,18 @@ func (UnimplementedShopServiceServer) Purchase(context.Context, *PurchaseRequest
 }
 func (UnimplementedShopServiceServer) EquipCosmetic(context.Context, *EquipCosmeticRequest) (*EquipCosmeticResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method EquipCosmetic not implemented")
+}
+func (UnimplementedShopServiceServer) AdminListItems(context.Context, *AdminListItemsRequest) (*ListItemsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminListItems not implemented")
+}
+func (UnimplementedShopServiceServer) AdminCreateItem(context.Context, *AdminCreateItemRequest) (*ShopItem, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminCreateItem not implemented")
+}
+func (UnimplementedShopServiceServer) AdminUpdateItem(context.Context, *AdminUpdateItemRequest) (*ShopItem, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminUpdateItem not implemented")
+}
+func (UnimplementedShopServiceServer) AdminDeleteItem(context.Context, *AdminDeleteItemRequest) (*AdminDeleteItemResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminDeleteItem not implemented")
 }
 func (UnimplementedShopServiceServer) mustEmbedUnimplementedShopServiceServer() {}
 func (UnimplementedShopServiceServer) testEmbeddedByValue()                     {}
@@ -306,6 +374,78 @@ func _ShopService_EquipCosmetic_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ShopService_AdminListItems_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminListItemsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShopServiceServer).AdminListItems(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ShopService_AdminListItems_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShopServiceServer).AdminListItems(ctx, req.(*AdminListItemsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ShopService_AdminCreateItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminCreateItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShopServiceServer).AdminCreateItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ShopService_AdminCreateItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShopServiceServer).AdminCreateItem(ctx, req.(*AdminCreateItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ShopService_AdminUpdateItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminUpdateItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShopServiceServer).AdminUpdateItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ShopService_AdminUpdateItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShopServiceServer).AdminUpdateItem(ctx, req.(*AdminUpdateItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ShopService_AdminDeleteItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminDeleteItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShopServiceServer).AdminDeleteItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ShopService_AdminDeleteItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShopServiceServer).AdminDeleteItem(ctx, req.(*AdminDeleteItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ShopService_ServiceDesc is the grpc.ServiceDesc for ShopService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -336,6 +476,22 @@ var ShopService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "EquipCosmetic",
 			Handler:    _ShopService_EquipCosmetic_Handler,
+		},
+		{
+			MethodName: "AdminListItems",
+			Handler:    _ShopService_AdminListItems_Handler,
+		},
+		{
+			MethodName: "AdminCreateItem",
+			Handler:    _ShopService_AdminCreateItem_Handler,
+		},
+		{
+			MethodName: "AdminUpdateItem",
+			Handler:    _ShopService_AdminUpdateItem_Handler,
+		},
+		{
+			MethodName: "AdminDeleteItem",
+			Handler:    _ShopService_AdminDeleteItem_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

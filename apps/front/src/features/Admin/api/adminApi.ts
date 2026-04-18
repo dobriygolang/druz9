@@ -1,5 +1,14 @@
 import { apiClient } from '@/shared/api/base'
 
+export interface DockerLogsResponse {
+  service: string
+  containerId: string
+  logs: string
+  tail: number
+  since?: string
+  availableServices: string[]
+}
+
 export const adminApi = {
   listCodeTasks: async (params?: { topic?: string; difficulty?: string; includeInactive?: boolean }) => {
     const r = await apiClient.get<{ tasks?: unknown[] }>('/api/v1/code-editor/tasks', {
@@ -47,6 +56,18 @@ export const adminApi = {
     await apiClient.put(`/api/admin/config/${key}`, { value: String(value) })
   },
 
+  getDockerLogs: async (params: { service: string; tail?: number; since?: string }) => {
+    const r = await apiClient.get<DockerLogsResponse>('/api/admin/docker/logs', {
+      params: {
+        service: params.service,
+        tail: params.tail ?? 300,
+        since: params.since || undefined,
+      },
+      silent: true,
+    })
+    return r.data
+  },
+
   // Mock question pools
   listMockQuestionPools: async () => {
     const r = await apiClient.get<{ items?: unknown[] }>('/api/admin/interview-prep/mock-question-pools')
@@ -79,5 +100,42 @@ export const adminApi = {
   },
   deleteCompanyPreset: async (id: string) => {
     await apiClient.delete(`/api/admin/interview-prep/mock-company-presets/${id}`)
+  },
+
+  // Shop — Wave E.1. Admin list includes inactive rows; public ListItems
+  // hides them.
+  listShopItems: async (): Promise<unknown[]> => {
+    const r = await apiClient.get<{ items?: unknown[] }>('/api/v1/admin/shop/items', { params: { limit: 200 } })
+    return r.data.items ?? []
+  },
+  createShopItem: async (payload: Record<string, unknown>): Promise<unknown> => {
+    const r = await apiClient.post<unknown>('/api/v1/admin/shop/items', payload)
+    return r.data
+  },
+  updateShopItem: async (id: string, payload: Record<string, unknown>): Promise<unknown> => {
+    const r = await apiClient.put<unknown>(`/api/v1/admin/shop/items/${id}`, { ...payload, id })
+    return r.data
+  },
+  deleteShopItem: async (id: string): Promise<void> => {
+    await apiClient.delete(`/api/v1/admin/shop/items/${id}`)
+  },
+
+  // Notifications broadcast — Wave E.4.
+  broadcastNotification: async (
+    title: string, body: string, deepLink: string, targetUserIds: string[]
+  ): Promise<{ delivered: number }> => {
+    const r = await apiClient.post<{ delivered?: number }>('/api/v1/admin/notifications/broadcast', {
+      title, body, deepLink, targetUserIds,
+    })
+    return { delivered: r.data.delivered ?? 0 }
+  },
+
+  // Podcasts admin — uses existing public ListPodcasts + admin CreatePodcast/DeletePodcast.
+  listAllPodcasts: async (): Promise<unknown[]> => {
+    const r = await apiClient.get<{ podcasts?: unknown[] }>('/api/v1/podcasts', { params: { limit: 200 } })
+    return r.data.podcasts ?? []
+  },
+  deletePodcast: async (podcastId: string): Promise<void> => {
+    await apiClient.delete(`/api/admin/podcasts/${podcastId}`)
   },
 }

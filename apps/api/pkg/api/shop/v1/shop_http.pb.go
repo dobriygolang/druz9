@@ -19,6 +19,10 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationShopServiceAdminCreateItem = "/shop.v1.ShopService/AdminCreateItem"
+const OperationShopServiceAdminDeleteItem = "/shop.v1.ShopService/AdminDeleteItem"
+const OperationShopServiceAdminListItems = "/shop.v1.ShopService/AdminListItems"
+const OperationShopServiceAdminUpdateItem = "/shop.v1.ShopService/AdminUpdateItem"
 const OperationShopServiceEquipCosmetic = "/shop.v1.ShopService/EquipCosmetic"
 const OperationShopServiceGetInventory = "/shop.v1.ShopService/GetInventory"
 const OperationShopServiceGetItem = "/shop.v1.ShopService/GetItem"
@@ -27,6 +31,12 @@ const OperationShopServiceListItems = "/shop.v1.ShopService/ListItems"
 const OperationShopServicePurchase = "/shop.v1.ShopService/Purchase"
 
 type ShopServiceHTTPServer interface {
+	AdminCreateItem(context.Context, *AdminCreateItemRequest) (*ShopItem, error)
+	AdminDeleteItem(context.Context, *AdminDeleteItemRequest) (*AdminDeleteItemResponse, error)
+	// AdminListItems AdminListItems returns all items including inactive ones — so admins
+	// can un-retire a hidden item without re-creating it.
+	AdminListItems(context.Context, *AdminListItemsRequest) (*ListItemsResponse, error)
+	AdminUpdateItem(context.Context, *AdminUpdateItemRequest) (*ShopItem, error)
 	// EquipCosmetic EquipCosmetic marks an owned item as equipped. If another item in the
 	// same slot is already equipped it's atomically unequipped. Pass
 	// unequip=true to clear the slot without equipping anything new (item_id
@@ -54,6 +64,10 @@ func RegisterShopServiceHTTPServer(s *http.Server, srv ShopServiceHTTPServer) {
 	r.GET("/api/v1/shop/inventory", _ShopService_GetInventory0_HTTP_Handler(srv))
 	r.POST("/api/v1/shop/purchase", _ShopService_Purchase0_HTTP_Handler(srv))
 	r.POST("/api/v1/shop/equip", _ShopService_EquipCosmetic0_HTTP_Handler(srv))
+	r.GET("/api/v1/admin/shop/items", _ShopService_AdminListItems0_HTTP_Handler(srv))
+	r.POST("/api/v1/admin/shop/items", _ShopService_AdminCreateItem0_HTTP_Handler(srv))
+	r.PUT("/api/v1/admin/shop/items/{id}", _ShopService_AdminUpdateItem0_HTTP_Handler(srv))
+	r.DELETE("/api/v1/admin/shop/items/{id}", _ShopService_AdminDeleteItem0_HTTP_Handler(srv))
 }
 
 func _ShopService_ListCategories0_HTTP_Handler(srv ShopServiceHTTPServer) func(ctx http.Context) error {
@@ -179,7 +193,101 @@ func _ShopService_EquipCosmetic0_HTTP_Handler(srv ShopServiceHTTPServer) func(ct
 	}
 }
 
+func _ShopService_AdminListItems0_HTTP_Handler(srv ShopServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminListItemsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationShopServiceAdminListItems)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminListItems(ctx, req.(*AdminListItemsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListItemsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ShopService_AdminCreateItem0_HTTP_Handler(srv ShopServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminCreateItemRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationShopServiceAdminCreateItem)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminCreateItem(ctx, req.(*AdminCreateItemRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ShopItem)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ShopService_AdminUpdateItem0_HTTP_Handler(srv ShopServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminUpdateItemRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationShopServiceAdminUpdateItem)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminUpdateItem(ctx, req.(*AdminUpdateItemRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ShopItem)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ShopService_AdminDeleteItem0_HTTP_Handler(srv ShopServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in AdminDeleteItemRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationShopServiceAdminDeleteItem)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.AdminDeleteItem(ctx, req.(*AdminDeleteItemRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*AdminDeleteItemResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ShopServiceHTTPClient interface {
+	AdminCreateItem(ctx context.Context, req *AdminCreateItemRequest, opts ...http.CallOption) (rsp *ShopItem, err error)
+	AdminDeleteItem(ctx context.Context, req *AdminDeleteItemRequest, opts ...http.CallOption) (rsp *AdminDeleteItemResponse, err error)
+	// AdminListItems AdminListItems returns all items including inactive ones — so admins
+	// can un-retire a hidden item without re-creating it.
+	AdminListItems(ctx context.Context, req *AdminListItemsRequest, opts ...http.CallOption) (rsp *ListItemsResponse, err error)
+	AdminUpdateItem(ctx context.Context, req *AdminUpdateItemRequest, opts ...http.CallOption) (rsp *ShopItem, err error)
 	// EquipCosmetic EquipCosmetic marks an owned item as equipped. If another item in the
 	// same slot is already equipped it's atomically unequipped. Pass
 	// unequip=true to clear the slot without equipping anything new (item_id
@@ -205,6 +313,60 @@ type ShopServiceHTTPClientImpl struct {
 
 func NewShopServiceHTTPClient(client *http.Client) ShopServiceHTTPClient {
 	return &ShopServiceHTTPClientImpl{client}
+}
+
+func (c *ShopServiceHTTPClientImpl) AdminCreateItem(ctx context.Context, in *AdminCreateItemRequest, opts ...http.CallOption) (*ShopItem, error) {
+	var out ShopItem
+	pattern := "/api/v1/admin/shop/items"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationShopServiceAdminCreateItem))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ShopServiceHTTPClientImpl) AdminDeleteItem(ctx context.Context, in *AdminDeleteItemRequest, opts ...http.CallOption) (*AdminDeleteItemResponse, error) {
+	var out AdminDeleteItemResponse
+	pattern := "/api/v1/admin/shop/items/{id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationShopServiceAdminDeleteItem))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "DELETE", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// AdminListItems AdminListItems returns all items including inactive ones — so admins
+// can un-retire a hidden item without re-creating it.
+func (c *ShopServiceHTTPClientImpl) AdminListItems(ctx context.Context, in *AdminListItemsRequest, opts ...http.CallOption) (*ListItemsResponse, error) {
+	var out ListItemsResponse
+	pattern := "/api/v1/admin/shop/items"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationShopServiceAdminListItems))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ShopServiceHTTPClientImpl) AdminUpdateItem(ctx context.Context, in *AdminUpdateItemRequest, opts ...http.CallOption) (*ShopItem, error) {
+	var out ShopItem
+	pattern := "/api/v1/admin/shop/items/{id}"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationShopServiceAdminUpdateItem))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 // EquipCosmetic EquipCosmetic marks an owned item as equipped. If another item in the

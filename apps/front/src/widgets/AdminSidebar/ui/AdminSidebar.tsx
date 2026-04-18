@@ -20,6 +20,7 @@ export const ADMIN_NAV: AdminNavItem[] = [
   { labelKey: 'admin.nav.aiBots',       icon: '◉', href: '/admin/ai-bots' },
   { labelKey: 'admin.nav.notifications', icon: '✉', href: '/admin/notifications' },
   { labelKey: 'admin.nav.analytics',    icon: '▨', href: '/admin/analytics' },
+  { labelKey: 'admin.nav.logs',         icon: '▤', href: '/admin/logs' },
   { labelKey: 'admin.nav.config',       icon: '⚙', href: '/admin/config' },
 ]
 

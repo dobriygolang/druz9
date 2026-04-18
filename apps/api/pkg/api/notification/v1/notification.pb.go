@@ -1085,6 +1085,122 @@ func (*UpdateGuildSettingsResponse) Descriptor() ([]byte, []int) {
 	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{14}
 }
 
+type AdminBroadcastRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	Title string                 `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
+	Body  string                 `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`
+	// deep_link is attached as notification payload; clients route to it
+	// when the user taps the banner (e.g. "/events/current").
+	DeepLink string `protobuf:"bytes,3,opt,name=deep_link,json=deepLink,proto3" json:"deep_link,omitempty"`
+	// When empty → broadcast to ALL users. When set, only those users
+	// receive the message.
+	TargetUserIds []string `protobuf:"bytes,4,rep,name=target_user_ids,json=targetUserIds,proto3" json:"target_user_ids,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminBroadcastRequest) Reset() {
+	*x = AdminBroadcastRequest{}
+	mi := &file_social_notification_v1_notification_proto_msgTypes[15]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminBroadcastRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminBroadcastRequest) ProtoMessage() {}
+
+func (x *AdminBroadcastRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_notification_v1_notification_proto_msgTypes[15]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminBroadcastRequest.ProtoReflect.Descriptor instead.
+func (*AdminBroadcastRequest) Descriptor() ([]byte, []int) {
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{15}
+}
+
+func (x *AdminBroadcastRequest) GetTitle() string {
+	if x != nil {
+		return x.Title
+	}
+	return ""
+}
+
+func (x *AdminBroadcastRequest) GetBody() string {
+	if x != nil {
+		return x.Body
+	}
+	return ""
+}
+
+func (x *AdminBroadcastRequest) GetDeepLink() string {
+	if x != nil {
+		return x.DeepLink
+	}
+	return ""
+}
+
+func (x *AdminBroadcastRequest) GetTargetUserIds() []string {
+	if x != nil {
+		return x.TargetUserIds
+	}
+	return nil
+}
+
+type AdminBroadcastResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Delivered     int32                  `protobuf:"varint,1,opt,name=delivered,proto3" json:"delivered,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AdminBroadcastResponse) Reset() {
+	*x = AdminBroadcastResponse{}
+	mi := &file_social_notification_v1_notification_proto_msgTypes[16]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AdminBroadcastResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AdminBroadcastResponse) ProtoMessage() {}
+
+func (x *AdminBroadcastResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_social_notification_v1_notification_proto_msgTypes[16]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AdminBroadcastResponse.ProtoReflect.Descriptor instead.
+func (*AdminBroadcastResponse) Descriptor() ([]byte, []int) {
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{16}
+}
+
+func (x *AdminBroadcastResponse) GetDelivered() int32 {
+	if x != nil {
+		return x.Delivered
+	}
+	return 0
+}
+
 type GetNotificationSettingsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -1093,7 +1209,7 @@ type GetNotificationSettingsRequest struct {
 
 func (x *GetNotificationSettingsRequest) Reset() {
 	*x = GetNotificationSettingsRequest{}
-	mi := &file_social_notification_v1_notification_proto_msgTypes[15]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1105,7 +1221,7 @@ func (x *GetNotificationSettingsRequest) String() string {
 func (*GetNotificationSettingsRequest) ProtoMessage() {}
 
 func (x *GetNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_social_notification_v1_notification_proto_msgTypes[15]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1118,7 +1234,7 @@ func (x *GetNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use GetNotificationSettingsRequest.ProtoReflect.Descriptor instead.
 func (*GetNotificationSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{15}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{17}
 }
 
 type NotificationSettings struct {
@@ -1137,7 +1253,7 @@ type NotificationSettings struct {
 
 func (x *NotificationSettings) Reset() {
 	*x = NotificationSettings{}
-	mi := &file_social_notification_v1_notification_proto_msgTypes[16]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1149,7 +1265,7 @@ func (x *NotificationSettings) String() string {
 func (*NotificationSettings) ProtoMessage() {}
 
 func (x *NotificationSettings) ProtoReflect() protoreflect.Message {
-	mi := &file_social_notification_v1_notification_proto_msgTypes[16]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1162,7 +1278,7 @@ func (x *NotificationSettings) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use NotificationSettings.ProtoReflect.Descriptor instead.
 func (*NotificationSettings) Descriptor() ([]byte, []int) {
-	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{16}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{18}
 }
 
 func (x *NotificationSettings) GetDuelsEnabled() bool {
@@ -1233,7 +1349,7 @@ type UpdateNotificationSettingsRequest struct {
 
 func (x *UpdateNotificationSettingsRequest) Reset() {
 	*x = UpdateNotificationSettingsRequest{}
-	mi := &file_social_notification_v1_notification_proto_msgTypes[17]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[19]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1245,7 +1361,7 @@ func (x *UpdateNotificationSettingsRequest) String() string {
 func (*UpdateNotificationSettingsRequest) ProtoMessage() {}
 
 func (x *UpdateNotificationSettingsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_social_notification_v1_notification_proto_msgTypes[17]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[19]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1258,7 +1374,7 @@ func (x *UpdateNotificationSettingsRequest) ProtoReflect() protoreflect.Message 
 
 // Deprecated: Use UpdateNotificationSettingsRequest.ProtoReflect.Descriptor instead.
 func (*UpdateNotificationSettingsRequest) Descriptor() ([]byte, []int) {
-	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{17}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{19}
 }
 
 func (x *UpdateNotificationSettingsRequest) GetDuelsEnabled() bool {
@@ -1297,7 +1413,7 @@ type UpdateNotificationSettingsResponse struct {
 
 func (x *UpdateNotificationSettingsResponse) Reset() {
 	*x = UpdateNotificationSettingsResponse{}
-	mi := &file_social_notification_v1_notification_proto_msgTypes[18]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[20]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -1309,7 +1425,7 @@ func (x *UpdateNotificationSettingsResponse) String() string {
 func (*UpdateNotificationSettingsResponse) ProtoMessage() {}
 
 func (x *UpdateNotificationSettingsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_social_notification_v1_notification_proto_msgTypes[18]
+	mi := &file_social_notification_v1_notification_proto_msgTypes[20]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1322,7 +1438,7 @@ func (x *UpdateNotificationSettingsResponse) ProtoReflect() protoreflect.Message
 
 // Deprecated: Use UpdateNotificationSettingsResponse.ProtoReflect.Descriptor instead.
 func (*UpdateNotificationSettingsResponse) Descriptor() ([]byte, []int) {
-	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{18}
+	return file_social_notification_v1_notification_proto_rawDescGZIP(), []int{20}
 }
 
 var File_social_notification_v1_notification_proto protoreflect.FileDescriptor
@@ -1413,7 +1529,14 @@ const file_social_notification_v1_notification_proto_rawDesc = "" +
 	"\x11_activity_enabledB\x11\n" +
 	"\x0f_digest_enabledB\b\n" +
 	"\x06_muted\"\x1d\n" +
-	"\x1bUpdateGuildSettingsResponse\" \n" +
+	"\x1bUpdateGuildSettingsResponse\"\x86\x01\n" +
+	"\x15AdminBroadcastRequest\x12\x14\n" +
+	"\x05title\x18\x01 \x01(\tR\x05title\x12\x12\n" +
+	"\x04body\x18\x02 \x01(\tR\x04body\x12\x1b\n" +
+	"\tdeep_link\x18\x03 \x01(\tR\bdeepLink\x12&\n" +
+	"\x0ftarget_user_ids\x18\x04 \x03(\tR\rtargetUserIds\"6\n" +
+	"\x16AdminBroadcastResponse\x12\x1c\n" +
+	"\tdelivered\x18\x01 \x01(\x05R\tdelivered\" \n" +
 	"\x1eGetNotificationSettingsRequest\"\xde\x02\n" +
 	"\x14NotificationSettings\x12#\n" +
 	"\rduels_enabled\x18\x01 \x01(\bR\fduelsEnabled\x12)\n" +
@@ -1463,10 +1586,11 @@ const file_social_notification_v1_notification_proto_rawDesc = "" +
 	"\fLinkTelegram\x12$.notification.v1.LinkTelegramRequest\x1a%.notification.v1.LinkTelegramResponse\x12a\n" +
 	"\x0eUpdateSettings\x12&.notification.v1.UpdateSettingsRequest\x1a'.notification.v1.UpdateSettingsResponse\x12X\n" +
 	"\vGetSettings\x12#.notification.v1.GetSettingsRequest\x1a$.notification.v1.GetSettingsResponse\x12p\n" +
-	"\x13UpdateGuildSettings\x12+.notification.v1.UpdateGuildSettingsRequest\x1a,.notification.v1.UpdateGuildSettingsResponse2\xec\x02\n" +
+	"\x13UpdateGuildSettings\x12+.notification.v1.UpdateGuildSettingsRequest\x1a,.notification.v1.UpdateGuildSettingsResponse2\x82\x04\n" +
 	"\x1bNotificationSettingsService\x12\x99\x01\n" +
 	"\x17GetNotificationSettings\x12/.notification.v1.GetNotificationSettingsRequest\x1a%.notification.v1.NotificationSettings\"&\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/notifications/settings\x12\xb0\x01\n" +
-	"\x1aUpdateNotificationSettings\x122.notification.v1.UpdateNotificationSettingsRequest\x1a3.notification.v1.UpdateNotificationSettingsResponse\")\x82\xd3\xe4\x93\x02#:\x01*2\x1e/api/v1/notifications/settingsB Z\x1eapi/pkg/api/notification/v1;v1b\x06proto3"
+	"\x1aUpdateNotificationSettings\x122.notification.v1.UpdateNotificationSettingsRequest\x1a3.notification.v1.UpdateNotificationSettingsResponse\")\x82\xd3\xe4\x93\x02#:\x01*2\x1e/api/v1/notifications/settings\x12\x93\x01\n" +
+	"\x0eAdminBroadcast\x12&.notification.v1.AdminBroadcastRequest\x1a'.notification.v1.AdminBroadcastResponse\"0\x82\xd3\xe4\x93\x02*:\x01*\"%/api/v1/admin/notifications/broadcastB Z\x1eapi/pkg/api/notification/v1;v1b\x06proto3"
 
 var (
 	file_social_notification_v1_notification_proto_rawDescOnce sync.Once
@@ -1481,7 +1605,7 @@ func file_social_notification_v1_notification_proto_rawDescGZIP() []byte {
 }
 
 var file_social_notification_v1_notification_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_social_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_social_notification_v1_notification_proto_msgTypes = make([]protoimpl.MessageInfo, 21)
 var file_social_notification_v1_notification_proto_goTypes = []any{
 	(NotificationKind)(0),                      // 0: notification.v1.NotificationKind
 	(*NotificationPayload)(nil),                // 1: notification.v1.NotificationPayload
@@ -1499,16 +1623,18 @@ var file_social_notification_v1_notification_proto_goTypes = []any{
 	(*GetSettingsResponse)(nil),                // 13: notification.v1.GetSettingsResponse
 	(*UpdateGuildSettingsRequest)(nil),         // 14: notification.v1.UpdateGuildSettingsRequest
 	(*UpdateGuildSettingsResponse)(nil),        // 15: notification.v1.UpdateGuildSettingsResponse
-	(*GetNotificationSettingsRequest)(nil),     // 16: notification.v1.GetNotificationSettingsRequest
-	(*NotificationSettings)(nil),               // 17: notification.v1.NotificationSettings
-	(*UpdateNotificationSettingsRequest)(nil),  // 18: notification.v1.UpdateNotificationSettingsRequest
-	(*UpdateNotificationSettingsResponse)(nil), // 19: notification.v1.UpdateNotificationSettingsResponse
-	(*timestamppb.Timestamp)(nil),              // 20: google.protobuf.Timestamp
+	(*AdminBroadcastRequest)(nil),              // 16: notification.v1.AdminBroadcastRequest
+	(*AdminBroadcastResponse)(nil),             // 17: notification.v1.AdminBroadcastResponse
+	(*GetNotificationSettingsRequest)(nil),     // 18: notification.v1.GetNotificationSettingsRequest
+	(*NotificationSettings)(nil),               // 19: notification.v1.NotificationSettings
+	(*UpdateNotificationSettingsRequest)(nil),  // 20: notification.v1.UpdateNotificationSettingsRequest
+	(*UpdateNotificationSettingsResponse)(nil), // 21: notification.v1.UpdateNotificationSettingsResponse
+	(*timestamppb.Timestamp)(nil),              // 22: google.protobuf.Timestamp
 }
 var file_social_notification_v1_notification_proto_depIdxs = []int32{
 	0,  // 0: notification.v1.SendRequest.kind:type_name -> notification.v1.NotificationKind
 	1,  // 1: notification.v1.SendRequest.payload:type_name -> notification.v1.NotificationPayload
-	20, // 2: notification.v1.SendRequest.schedule_at:type_name -> google.protobuf.Timestamp
+	22, // 2: notification.v1.SendRequest.schedule_at:type_name -> google.protobuf.Timestamp
 	0,  // 3: notification.v1.SendBatchRequest.kind:type_name -> notification.v1.NotificationKind
 	1,  // 4: notification.v1.SendBatchRequest.payload:type_name -> notification.v1.NotificationPayload
 	2,  // 5: notification.v1.NotificationService.Send:input_type -> notification.v1.SendRequest
@@ -1518,19 +1644,21 @@ var file_social_notification_v1_notification_proto_depIdxs = []int32{
 	10, // 9: notification.v1.NotificationService.UpdateSettings:input_type -> notification.v1.UpdateSettingsRequest
 	12, // 10: notification.v1.NotificationService.GetSettings:input_type -> notification.v1.GetSettingsRequest
 	14, // 11: notification.v1.NotificationService.UpdateGuildSettings:input_type -> notification.v1.UpdateGuildSettingsRequest
-	16, // 12: notification.v1.NotificationSettingsService.GetNotificationSettings:input_type -> notification.v1.GetNotificationSettingsRequest
-	18, // 13: notification.v1.NotificationSettingsService.UpdateNotificationSettings:input_type -> notification.v1.UpdateNotificationSettingsRequest
-	3,  // 14: notification.v1.NotificationService.Send:output_type -> notification.v1.SendResponse
-	5,  // 15: notification.v1.NotificationService.SendBatch:output_type -> notification.v1.SendBatchResponse
-	7,  // 16: notification.v1.NotificationService.RegisterChat:output_type -> notification.v1.RegisterChatResponse
-	9,  // 17: notification.v1.NotificationService.LinkTelegram:output_type -> notification.v1.LinkTelegramResponse
-	11, // 18: notification.v1.NotificationService.UpdateSettings:output_type -> notification.v1.UpdateSettingsResponse
-	13, // 19: notification.v1.NotificationService.GetSettings:output_type -> notification.v1.GetSettingsResponse
-	15, // 20: notification.v1.NotificationService.UpdateGuildSettings:output_type -> notification.v1.UpdateGuildSettingsResponse
-	17, // 21: notification.v1.NotificationSettingsService.GetNotificationSettings:output_type -> notification.v1.NotificationSettings
-	19, // 22: notification.v1.NotificationSettingsService.UpdateNotificationSettings:output_type -> notification.v1.UpdateNotificationSettingsResponse
-	14, // [14:23] is the sub-list for method output_type
-	5,  // [5:14] is the sub-list for method input_type
+	18, // 12: notification.v1.NotificationSettingsService.GetNotificationSettings:input_type -> notification.v1.GetNotificationSettingsRequest
+	20, // 13: notification.v1.NotificationSettingsService.UpdateNotificationSettings:input_type -> notification.v1.UpdateNotificationSettingsRequest
+	16, // 14: notification.v1.NotificationSettingsService.AdminBroadcast:input_type -> notification.v1.AdminBroadcastRequest
+	3,  // 15: notification.v1.NotificationService.Send:output_type -> notification.v1.SendResponse
+	5,  // 16: notification.v1.NotificationService.SendBatch:output_type -> notification.v1.SendBatchResponse
+	7,  // 17: notification.v1.NotificationService.RegisterChat:output_type -> notification.v1.RegisterChatResponse
+	9,  // 18: notification.v1.NotificationService.LinkTelegram:output_type -> notification.v1.LinkTelegramResponse
+	11, // 19: notification.v1.NotificationService.UpdateSettings:output_type -> notification.v1.UpdateSettingsResponse
+	13, // 20: notification.v1.NotificationService.GetSettings:output_type -> notification.v1.GetSettingsResponse
+	15, // 21: notification.v1.NotificationService.UpdateGuildSettings:output_type -> notification.v1.UpdateGuildSettingsResponse
+	19, // 22: notification.v1.NotificationSettingsService.GetNotificationSettings:output_type -> notification.v1.NotificationSettings
+	21, // 23: notification.v1.NotificationSettingsService.UpdateNotificationSettings:output_type -> notification.v1.UpdateNotificationSettingsResponse
+	17, // 24: notification.v1.NotificationSettingsService.AdminBroadcast:output_type -> notification.v1.AdminBroadcastResponse
+	15, // [15:25] is the sub-list for method output_type
+	5,  // [5:15] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -1543,14 +1671,14 @@ func file_social_notification_v1_notification_proto_init() {
 	}
 	file_social_notification_v1_notification_proto_msgTypes[9].OneofWrappers = []any{}
 	file_social_notification_v1_notification_proto_msgTypes[13].OneofWrappers = []any{}
-	file_social_notification_v1_notification_proto_msgTypes[17].OneofWrappers = []any{}
+	file_social_notification_v1_notification_proto_msgTypes[19].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_notification_v1_notification_proto_rawDesc), len(file_social_notification_v1_notification_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   19,
+			NumMessages:   21,
 			NumExtensions: 0,
 			NumServices:   2,
 		},

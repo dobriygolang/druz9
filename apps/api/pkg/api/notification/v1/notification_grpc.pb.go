@@ -371,6 +371,7 @@ var NotificationService_ServiceDesc = grpc.ServiceDesc{
 const (
 	NotificationSettingsService_GetNotificationSettings_FullMethodName    = "/notification.v1.NotificationSettingsService/GetNotificationSettings"
 	NotificationSettingsService_UpdateNotificationSettings_FullMethodName = "/notification.v1.NotificationSettingsService/UpdateNotificationSettings"
+	NotificationSettingsService_AdminBroadcast_FullMethodName             = "/notification.v1.NotificationSettingsService/AdminBroadcast"
 )
 
 // NotificationSettingsServiceClient is the client API for NotificationSettingsService service.
@@ -379,6 +380,10 @@ const (
 type NotificationSettingsServiceClient interface {
 	GetNotificationSettings(ctx context.Context, in *GetNotificationSettingsRequest, opts ...grpc.CallOption) (*NotificationSettings, error)
 	UpdateNotificationSettings(ctx context.Context, in *UpdateNotificationSettingsRequest, opts ...grpc.CallOption) (*UpdateNotificationSettingsResponse, error)
+	// AdminBroadcast sends an in-app notification to a target audience.
+	// If target_user_ids is empty, fan-out is "all users". Requires admin
+	// rights — 403 otherwise.
+	AdminBroadcast(ctx context.Context, in *AdminBroadcastRequest, opts ...grpc.CallOption) (*AdminBroadcastResponse, error)
 }
 
 type notificationSettingsServiceClient struct {
@@ -409,12 +414,26 @@ func (c *notificationSettingsServiceClient) UpdateNotificationSettings(ctx conte
 	return out, nil
 }
 
+func (c *notificationSettingsServiceClient) AdminBroadcast(ctx context.Context, in *AdminBroadcastRequest, opts ...grpc.CallOption) (*AdminBroadcastResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(AdminBroadcastResponse)
+	err := c.cc.Invoke(ctx, NotificationSettingsService_AdminBroadcast_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // NotificationSettingsServiceServer is the server API for NotificationSettingsService service.
 // All implementations must embed UnimplementedNotificationSettingsServiceServer
 // for forward compatibility.
 type NotificationSettingsServiceServer interface {
 	GetNotificationSettings(context.Context, *GetNotificationSettingsRequest) (*NotificationSettings, error)
 	UpdateNotificationSettings(context.Context, *UpdateNotificationSettingsRequest) (*UpdateNotificationSettingsResponse, error)
+	// AdminBroadcast sends an in-app notification to a target audience.
+	// If target_user_ids is empty, fan-out is "all users". Requires admin
+	// rights — 403 otherwise.
+	AdminBroadcast(context.Context, *AdminBroadcastRequest) (*AdminBroadcastResponse, error)
 	mustEmbedUnimplementedNotificationSettingsServiceServer()
 }
 
@@ -430,6 +449,9 @@ func (UnimplementedNotificationSettingsServiceServer) GetNotificationSettings(co
 }
 func (UnimplementedNotificationSettingsServiceServer) UpdateNotificationSettings(context.Context, *UpdateNotificationSettingsRequest) (*UpdateNotificationSettingsResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method UpdateNotificationSettings not implemented")
+}
+func (UnimplementedNotificationSettingsServiceServer) AdminBroadcast(context.Context, *AdminBroadcastRequest) (*AdminBroadcastResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method AdminBroadcast not implemented")
 }
 func (UnimplementedNotificationSettingsServiceServer) mustEmbedUnimplementedNotificationSettingsServiceServer() {
 }
@@ -489,6 +511,24 @@ func _NotificationSettingsService_UpdateNotificationSettings_Handler(srv interfa
 	return interceptor(ctx, in, info, handler)
 }
 
+func _NotificationSettingsService_AdminBroadcast_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AdminBroadcastRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(NotificationSettingsServiceServer).AdminBroadcast(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: NotificationSettingsService_AdminBroadcast_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(NotificationSettingsServiceServer).AdminBroadcast(ctx, req.(*AdminBroadcastRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // NotificationSettingsService_ServiceDesc is the grpc.ServiceDesc for NotificationSettingsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -503,6 +543,10 @@ var NotificationSettingsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "UpdateNotificationSettings",
 			Handler:    _NotificationSettingsService_UpdateNotificationSettings_Handler,
+		},
+		{
+			MethodName: "AdminBroadcast",
+			Handler:    _NotificationSettingsService_AdminBroadcast_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

@@ -31,6 +31,20 @@ func RequireUser(ctx context.Context) (*model.User, error) {
 	return user, nil
 }
 
+// RequireAdmin returns the authenticated user iff they have IsAdmin=true,
+// otherwise 401 UNAUTHORIZED (no user) or 403 FORBIDDEN. Centralises the
+// admin-gate pattern that each domain used to inline.
+func RequireAdmin(ctx context.Context) (*model.User, error) {
+	user, err := RequireUser(ctx)
+	if err != nil {
+		return nil, err
+	}
+	if !user.IsAdmin {
+		return nil, errors.Forbidden("FORBIDDEN", "admin access required")
+	}
+	return user, nil
+}
+
 // OptionalUser returns the authenticated user (or nil) — used by endpoints
 // that allow both guests and signed-in callers (e.g. public profile view).
 func OptionalUser(ctx context.Context) *model.User {

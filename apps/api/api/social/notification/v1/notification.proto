@@ -179,6 +179,30 @@ service NotificationSettingsService {
       body: "*"
     };
   }
+
+  // AdminBroadcast sends an in-app notification to a target audience.
+  // If target_user_ids is empty, fan-out is "all users". Requires admin
+  // rights — 403 otherwise.
+  rpc AdminBroadcast(AdminBroadcastRequest) returns (AdminBroadcastResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/admin/notifications/broadcast"
+      body: "*"
+    };
+  }
+}
+
+message AdminBroadcastRequest {
+  string          title           = 1;
+  string          body            = 2;
+  // deep_link is attached as notification payload; clients route to it
+  // when the user taps the banner (e.g. "/events/current").
+  string          deep_link       = 3;
+  // When empty → broadcast to ALL users. When set, only those users
+  // receive the message.
+  repeated string target_user_ids = 4;
+}
+message AdminBroadcastResponse {
+  int32 delivered = 1;
 }
 
 message GetNotificationSettingsRequest {}

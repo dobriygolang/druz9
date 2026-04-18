@@ -259,6 +259,96 @@ func (r *Repo) SetEquippedForSlot(
 	return r.GetInventory(ctx, userID)
 }
 
+// AdminListItems is like ListItems but also returns inactive items so
+// admins can un-retire them without re-creating.
+func (r *Repo) AdminListItems(
+	ctx context.Context,
+	category model.ItemCategory, rarity model.ItemRarity,
+	limit, offset int32,
+) ([]*model.ShopItem, int32, error) {
+	where := "TRUE"
+	args := []any{}
+	idx := 1
+	if category != model.ItemCategoryUnspecified {
+		where += fmt.Sprintf(" AND category = $%d", idx)
+		args = append(args, int16(category))
+		idx++
+	}
+	if rarity != model.ItemRarityUnspecified {
+		where += fmt.Sprintf(" AND rarity = $%d", idx)
+		args = append(args, int16(rarity))
+		idx++
+	}
+	listArgs := append([]any{}, args...)
+	listArgs = append(listArgs, limit, offset)
+	query := fmt.Sprintf(`
+        SELECT %s FROM shop_items WHERE %s
+        ORDER BY is_active DESC, rarity DESC, created_at DESC
+        LIMIT $%d OFFSET $%d
+    `, itemSelectCols, where, idx, idx+1)
+	rows, err := r.data.DB.Query(ctx, query, listArgs...)
+	if err != nil {
+		return nil, 0, fmt.Errorf("admin list items: %w", err)
+	}
+	defer rows.Close()
+	items := make([]*model.ShopItem, 0, limit)
+	for rows.Next() {
+		it, err := scanItem(rows)
+		if err != nil {
+			return nil, 0, err
+		}
+		items = append(items, it)
+	}
+	var total int32
+	if err := r.data.DB.QueryRow(ctx, fmt.Sprintf(`SELECT COUNT(*) FROM shop_items WHERE %s`, where), args...).Scan(&total); err != nil {
+		return nil, 0, fmt.Errorf("admin count items: %w", err)
+	}
+	return items, total, nil
+}
+
+// InsertItem creates a new shop item with the provided fields.
+func (r *Repo) InsertItem(ctx context.Context, it *model.ShopItem) (*model.ShopItem, error) {
+	_, err := r.data.DB.Exec(ctx, `
+        INSERT INTO shop_items (
+            id, slug, name, description, category, rarity, currency, price,
+            icon_ref, accent_color, is_active, is_seasonal, slot
+        ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13)
+    `, it.ID, it.Slug, it.Name, it.Description, int16(it.Category), int16(it.Rarity),
+		int16(it.Currency), it.Price, it.IconRef, it.AccentColor, it.IsActive, it.IsSeasonal, it.Slot)
+	if err != nil {
+		return nil, fmt.Errorf("insert item: %w", err)
+	}
+	return r.GetItemByID(ctx, it.ID)
+}
+
+// UpdateItem overwrites every editable field; admin UI always sends the
+// full row so partial-update gymnastics aren't needed.
+func (r *Repo) UpdateItem(ctx context.Context, it *model.ShopItem) (*model.ShopItem, error) {
+	_, err := r.data.DB.Exec(ctx, `
+        UPDATE shop_items SET
+            slug = $2, name = $3, description = $4, category = $5, rarity = $6,
+            currency = $7, price = $8, icon_ref = $9, accent_color = $10,
+            is_active = $11, is_seasonal = $12, slot = $13
+        WHERE id = $1
+    `, it.ID, it.Slug, it.Name, it.Description, int16(it.Category), int16(it.Rarity),
+		int16(it.Currency), it.Price, it.IconRef, it.AccentColor, it.IsActive, it.IsSeasonal, it.Slot)
+	if err != nil {
+		return nil, fmt.Errorf("update item: %w", err)
+	}
+	return r.GetItemByID(ctx, it.ID)
+}
+
+// DeleteItem hard-deletes a catalog row. user_shop_inventory rows linked
+// to it are kept (ON DELETE CASCADE isn't set) — admin UI should prefer
+// is_active=FALSE over DELETE unless the item was a mistake.
+func (r *Repo) DeleteItem(ctx context.Context, id uuid.UUID) error {
+	_, err := r.data.DB.Exec(ctx, `DELETE FROM shop_items WHERE id = $1`, id)
+	if err != nil {
+		return fmt.Errorf("delete item: %w", err)
+	}
+	return nil
+}
+
 type scanner interface{ Scan(dest ...any) error }
 
 func scanItem(s scanner) (*model.ShopItem, error) {

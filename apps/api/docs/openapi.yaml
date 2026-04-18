@@ -623,6 +623,123 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/admin.v1.GetRuntimeConfigResponse'
+    /api/v1/admin/notifications/broadcast:
+        post:
+            tags:
+                - NotificationSettingsService
+            description: |-
+                AdminBroadcast sends an in-app notification to a target audience.
+                 If target_user_ids is empty, fan-out is "all users". Requires admin
+                 rights — 403 otherwise.
+            operationId: NotificationSettingsService_AdminBroadcast
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/notification.v1.AdminBroadcastRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/notification.v1.AdminBroadcastResponse'
+    /api/v1/admin/shop/items:
+        get:
+            tags:
+                - ShopService
+            description: |-
+                AdminListItems returns all items including inactive ones — so admins
+                 can un-retire a hidden item without re-creating it.
+            operationId: ShopService_AdminListItems
+            parameters:
+                - name: category
+                  in: query
+                  description: UNSPECIFIED → all. Admin view includes inactive items regardless.
+                  schema:
+                    type: integer
+                    format: enum
+                - name: rarity
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/shop.v1.ListItemsResponse'
+        post:
+            tags:
+                - ShopService
+            operationId: ShopService_AdminCreateItem
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/shop.v1.AdminCreateItemRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/shop.v1.ShopItem'
+    /api/v1/admin/shop/items/{id}:
+        put:
+            tags:
+                - ShopService
+            operationId: ShopService_AdminUpdateItem
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/shop.v1.AdminUpdateItemRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/shop.v1.ShopItem'
+        delete:
+            tags:
+                - ShopService
+            operationId: ShopService_AdminDeleteItem
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/shop.v1.AdminDeleteItemResponse'
     /api/v1/arena/anti-cheat/event:
         post:
             tags:
@@ -6596,6 +6713,31 @@ components:
                 totalXpEarned:
                     type: integer
                     format: int32
+        notification.v1.AdminBroadcastRequest:
+            type: object
+            properties:
+                title:
+                    type: string
+                body:
+                    type: string
+                deepLink:
+                    type: string
+                    description: |-
+                        deep_link is attached as notification payload; clients route to it
+                         when the user taps the banner (e.g. "/events/current").
+                targetUserIds:
+                    type: array
+                    items:
+                        type: string
+                    description: |-
+                        When empty → broadcast to ALL users. When set, only those users
+                         receive the message.
+        notification.v1.AdminBroadcastResponse:
+            type: object
+            properties:
+                delivered:
+                    type: integer
+                    format: int32
         notification.v1.NotificationSettings:
             type: object
             properties:
@@ -7616,6 +7758,75 @@ components:
                     type: integer
                     format: int32
                 premiumRewardLabel:
+                    type: string
+        shop.v1.AdminCreateItemRequest:
+            type: object
+            properties:
+                slug:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                category:
+                    type: integer
+                    format: enum
+                rarity:
+                    type: integer
+                    format: enum
+                currency:
+                    type: integer
+                    format: enum
+                price:
+                    type: integer
+                    format: int32
+                iconRef:
+                    type: string
+                accentColor:
+                    type: string
+                isActive:
+                    type: boolean
+                isSeasonal:
+                    type: boolean
+                slot:
+                    type: string
+        shop.v1.AdminDeleteItemResponse:
+            type: object
+            properties:
+                ok:
+                    type: boolean
+        shop.v1.AdminUpdateItemRequest:
+            type: object
+            properties:
+                id:
+                    type: string
+                slug:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                category:
+                    type: integer
+                    format: enum
+                rarity:
+                    type: integer
+                    format: enum
+                currency:
+                    type: integer
+                    format: enum
+                price:
+                    type: integer
+                    format: int32
+                iconRef:
+                    type: string
+                accentColor:
+                    type: string
+                isActive:
+                    type: boolean
+                isSeasonal:
+                    type: boolean
+                slot:
                     type: string
         shop.v1.CategoryInfo:
             type: object
