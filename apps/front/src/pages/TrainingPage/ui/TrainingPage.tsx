@@ -148,9 +148,14 @@ export function TrainingPage() {
           </div>
 
           <div className="rpg-grid-2col rpg-skill-tree-wrap" style={{ display: 'grid', gridTemplateColumns: '1fr 340px', gap: 18 }}>
-            <div className="rpg-skill-canvas" style={{ height: 620 }}>
+            {/* Canvas expanded to 1320×1000 to fit the five clusters:
+                algo (center) + Go (right-top) + SQL (right-bottom) +
+                Behavioral (bottom-left) + System design (top). If
+                you're adding more nodes, keep them inside this viewbox
+                or bump both values together. */}
+            <div className="rpg-skill-canvas" style={{ height: 780 }}>
               <svg
-                viewBox="0 0 1100 760"
+                viewBox="0 0 1320 1000"
                 preserveAspectRatio="none"
                 style={{ position: 'absolute', inset: 0, width: '100%', height: '100%' }}
               >
