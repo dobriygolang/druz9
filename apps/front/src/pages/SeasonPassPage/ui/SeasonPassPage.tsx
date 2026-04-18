@@ -9,21 +9,14 @@ import {
   type SeasonPassProgress,
   type SeasonPass,
 } from '@/features/SeasonPass'
+import { RewardIcon } from '@/features/SeasonPass/ui/RewardIcon'
 
 // ---------- visual tokens ----------
 
-const KIND_COLOR: Record<RewardKind, string> = {
-  [RewardKind.UNSPECIFIED]: 'var(--ink-3)',
-  [RewardKind.GOLD]:        '#dcc690',
-  [RewardKind.GEMS]:        '#8fb8d4',
-  [RewardKind.XP]:          '#9fb89a',
-  [RewardKind.FRAME]:       '#b8692a',
-  [RewardKind.PET]:         '#3d6149',
-  [RewardKind.EMOTE]:       '#a27ac8',
-  [RewardKind.BANNER]:      '#a23a2a',
-  [RewardKind.AURA]:        '#e9b866',
-  [RewardKind.COSMETIC]:    '#c7ab6e',
-}
+// (Per-kind color was used when the tier preview was a flat rectangle;
+// now RewardIcon draws the full pixel glyph so a single-color swatch is
+// no longer needed. The label map below still drives the empty-label
+// fallback and the tooltip title.)
 
 const KIND_LABEL: Record<RewardKind, string> = {
   [RewardKind.UNSPECIFIED]: '—',
@@ -398,14 +391,7 @@ function TierCell({
         fontFamily: 'inherit',
       }}
     >
-      <div
-        style={{
-          width: 22,
-          height: 22,
-          background: KIND_COLOR[kind] ?? 'var(--ink-3)',
-          border: '2px solid var(--ink-0)',
-        }}
-      />
+      <RewardIcon kind={kind} size={22} />
       <div
         className="font-silkscreen uppercase"
         style={{
