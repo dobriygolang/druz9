@@ -24,7 +24,7 @@ func NewRepo(store *postgres.Store, logger log.Logger) *Repo {
 
 const itemSelectCols = `
     id, slug, name, description, category, rarity, currency, price,
-    icon_ref, accent_color, is_active, is_seasonal, rotates_at, created_at
+    icon_ref, accent_color, is_active, is_seasonal, rotates_at, created_at, slot
 `
 
 // Same column list but fully qualified with `shop_items.` — for queries
@@ -34,7 +34,7 @@ const itemSelectColsQualified = `
     shop_items.id, shop_items.slug, shop_items.name, shop_items.description,
     shop_items.category, shop_items.rarity, shop_items.currency, shop_items.price,
     shop_items.icon_ref, shop_items.accent_color, shop_items.is_active,
-    shop_items.is_seasonal, shop_items.rotates_at, shop_items.created_at
+    shop_items.is_seasonal, shop_items.rotates_at, shop_items.created_at, shop_items.slot
 `
 
 // ListItems returns active items filtered by category + rarity. Both
@@ -164,7 +164,7 @@ func (r *Repo) GetInventory(ctx context.Context, userID uuid.UUID) ([]*model.Sho
 		// Scan order matches itemSelectCols + (acquired_at, equipped).
 		if err := rows.Scan(
 			&it.ID, &it.Slug, &it.Name, &it.Description, &category, &rarity, &currency,
-			&it.Price, &it.IconRef, &it.AccentColor, &it.IsActive, &it.IsSeasonal, &it.RotatesAt, &it.CreatedAt,
+			&it.Price, &it.IconRef, &it.AccentColor, &it.IsActive, &it.IsSeasonal, &it.RotatesAt, &it.CreatedAt, &it.Slot,
 			&owned.AcquiredAt, &owned.Equipped,
 		); err != nil {
 			return nil, fmt.Errorf("scan inventory row: %w", err)
@@ -218,6 +218,47 @@ func (r *Repo) InsertOwnership(
 	return owned, nil
 }
 
+// SetEquippedForSlot atomically unequips every item owned by the user in
+// `slot` and, if equipItemID != uuid.Nil, sets that row to equipped=TRUE.
+// Returns the fresh inventory after the change.
+func (r *Repo) SetEquippedForSlot(
+	ctx context.Context, userID uuid.UUID, slot string, equipItemID uuid.UUID,
+) ([]*model.ShopOwnedItem, error) {
+	if slot == "" {
+		return nil, fmt.Errorf("set equipped: empty slot")
+	}
+	tx, err := r.data.DB.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("begin tx: %w", err)
+	}
+	defer tx.Rollback(ctx) //nolint:errcheck // best-effort rollback; commit path clears it
+	// Clear any previously-equipped item in this slot for the user.
+	if _, err := tx.Exec(ctx, `
+        UPDATE user_shop_inventory inv
+        SET equipped = FALSE
+        FROM shop_items si
+        WHERE inv.item_id = si.id
+          AND inv.user_id = $1
+          AND si.slot = $2
+          AND inv.equipped = TRUE
+    `, userID, slot); err != nil {
+		return nil, fmt.Errorf("clear slot: %w", err)
+	}
+	if equipItemID != uuid.Nil {
+		if _, err := tx.Exec(ctx, `
+            UPDATE user_shop_inventory
+            SET equipped = TRUE
+            WHERE user_id = $1 AND item_id = $2
+        `, userID, equipItemID); err != nil {
+			return nil, fmt.Errorf("set equipped: %w", err)
+		}
+	}
+	if err := tx.Commit(ctx); err != nil {
+		return nil, fmt.Errorf("commit equip tx: %w", err)
+	}
+	return r.GetInventory(ctx, userID)
+}
+
 type scanner interface{ Scan(dest ...any) error }
 
 func scanItem(s scanner) (*model.ShopItem, error) {
@@ -225,7 +266,7 @@ func scanItem(s scanner) (*model.ShopItem, error) {
 	var category, rarity, currency int16
 	err := s.Scan(
 		&it.ID, &it.Slug, &it.Name, &it.Description, &category, &rarity, &currency,
-		&it.Price, &it.IconRef, &it.AccentColor, &it.IsActive, &it.IsSeasonal, &it.RotatesAt, &it.CreatedAt,
+		&it.Price, &it.IconRef, &it.AccentColor, &it.IsActive, &it.IsSeasonal, &it.RotatesAt, &it.CreatedAt, &it.Slot,
 	)
 	if err != nil {
 		return nil, err

@@ -29,6 +29,10 @@ type Repository interface {
 	GetInventory(ctx context.Context, userID uuid.UUID) ([]*model.ShopOwnedItem, error)
 	IsOwned(ctx context.Context, userID, itemID uuid.UUID) (bool, error)
 	InsertOwnership(ctx context.Context, userID, itemID uuid.UUID, pricePaid int32, currency model.ItemCurrency) (*model.ShopOwnedItem, error)
+	// SetEquippedForSlot clears any previously-equipped item in `slot` for
+	// the user and optionally sets equipItemID to equipped. Pass uuid.Nil
+	// to just clear the slot.
+	SetEquippedForSlot(ctx context.Context, userID uuid.UUID, slot string, equipItemID uuid.UUID) ([]*model.ShopOwnedItem, error)
 }
 
 //go:generate mockery --case underscore --name Wallet --with-expecter --output mocks
@@ -59,6 +63,8 @@ var (
 	ErrUnsupportedCurrency = errors.New("shop: unsupported currency")
 	ErrInsufficientFunds  = errors.New("shop: insufficient funds")
 	ErrNotForSale         = errors.New("shop: item has no price (event drop)")
+	ErrNotEquippable      = errors.New("shop: item has no slot — cannot be equipped")
+	ErrNotOwned           = errors.New("shop: user does not own this item")
 )
 
 // CATEGORY_NAMES maps the enum to its canonical name for the
@@ -209,6 +215,38 @@ func (s *Service) Purchase(ctx context.Context, userID uuid.UUID, itemID uuid.UU
 		outcome.RemainingGems = gems
 	}
 	return outcome, nil
+}
+
+// Equip sets the chosen item as equipped in its slot for the user. If
+// another item occupies the same slot it's unequipped atomically. When
+// unequip=true the slot is cleared without equipping anything new (the
+// item only serves to identify the slot, so it still must be owned).
+// Returns the fresh inventory.
+func (s *Service) Equip(
+	ctx context.Context, userID, itemID uuid.UUID, unequip bool,
+) ([]*model.ShopOwnedItem, error) {
+	item, err := s.repo.GetItemByID(ctx, itemID)
+	if err != nil {
+		return nil, err
+	}
+	if item == nil {
+		return nil, ErrItemNotFound
+	}
+	if item.Slot == "" {
+		return nil, ErrNotEquippable
+	}
+	owned, err := s.repo.IsOwned(ctx, userID, itemID)
+	if err != nil {
+		return nil, err
+	}
+	if !owned {
+		return nil, ErrNotOwned
+	}
+	target := itemID
+	if unequip {
+		target = uuid.Nil
+	}
+	return s.repo.SetEquippedForSlot(ctx, userID, item.Slot, target)
 }
 
 // Used by API layer if a client passes a slug instead of a UUID.

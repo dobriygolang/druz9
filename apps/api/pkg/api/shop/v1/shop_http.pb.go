@@ -19,6 +19,7 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationShopServiceEquipCosmetic = "/shop.v1.ShopService/EquipCosmetic"
 const OperationShopServiceGetInventory = "/shop.v1.ShopService/GetInventory"
 const OperationShopServiceGetItem = "/shop.v1.ShopService/GetItem"
 const OperationShopServiceListCategories = "/shop.v1.ShopService/ListCategories"
@@ -26,6 +27,11 @@ const OperationShopServiceListItems = "/shop.v1.ShopService/ListItems"
 const OperationShopServicePurchase = "/shop.v1.ShopService/Purchase"
 
 type ShopServiceHTTPServer interface {
+	// EquipCosmetic EquipCosmetic marks an owned item as equipped. If another item in the
+	// same slot is already equipped it's atomically unequipped. Pass
+	// unequip=true to clear the slot without equipping anything new (item_id
+	// still required so we know which slot to target).
+	EquipCosmetic(context.Context, *EquipCosmeticRequest) (*EquipCosmeticResponse, error)
 	// GetInventory GetInventory returns items the authenticated user owns.
 	GetInventory(context.Context, *GetInventoryRequest) (*GetInventoryResponse, error)
 	// GetItem GetItem returns a single item's full detail (art, lore, price).
@@ -47,6 +53,7 @@ func RegisterShopServiceHTTPServer(s *http.Server, srv ShopServiceHTTPServer) {
 	r.GET("/api/v1/shop/items/{item_id}", _ShopService_GetItem0_HTTP_Handler(srv))
 	r.GET("/api/v1/shop/inventory", _ShopService_GetInventory0_HTTP_Handler(srv))
 	r.POST("/api/v1/shop/purchase", _ShopService_Purchase0_HTTP_Handler(srv))
+	r.POST("/api/v1/shop/equip", _ShopService_EquipCosmetic0_HTTP_Handler(srv))
 }
 
 func _ShopService_ListCategories0_HTTP_Handler(srv ShopServiceHTTPServer) func(ctx http.Context) error {
@@ -150,7 +157,34 @@ func _ShopService_Purchase0_HTTP_Handler(srv ShopServiceHTTPServer) func(ctx htt
 	}
 }
 
+func _ShopService_EquipCosmetic0_HTTP_Handler(srv ShopServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in EquipCosmeticRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationShopServiceEquipCosmetic)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.EquipCosmetic(ctx, req.(*EquipCosmeticRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*EquipCosmeticResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ShopServiceHTTPClient interface {
+	// EquipCosmetic EquipCosmetic marks an owned item as equipped. If another item in the
+	// same slot is already equipped it's atomically unequipped. Pass
+	// unequip=true to clear the slot without equipping anything new (item_id
+	// still required so we know which slot to target).
+	EquipCosmetic(ctx context.Context, req *EquipCosmeticRequest, opts ...http.CallOption) (rsp *EquipCosmeticResponse, err error)
 	// GetInventory GetInventory returns items the authenticated user owns.
 	GetInventory(ctx context.Context, req *GetInventoryRequest, opts ...http.CallOption) (rsp *GetInventoryResponse, err error)
 	// GetItem GetItem returns a single item's full detail (art, lore, price).
@@ -171,6 +205,23 @@ type ShopServiceHTTPClientImpl struct {
 
 func NewShopServiceHTTPClient(client *http.Client) ShopServiceHTTPClient {
 	return &ShopServiceHTTPClientImpl{client}
+}
+
+// EquipCosmetic EquipCosmetic marks an owned item as equipped. If another item in the
+// same slot is already equipped it's atomically unequipped. Pass
+// unequip=true to clear the slot without equipping anything new (item_id
+// still required so we know which slot to target).
+func (c *ShopServiceHTTPClientImpl) EquipCosmetic(ctx context.Context, in *EquipCosmeticRequest, opts ...http.CallOption) (*EquipCosmeticResponse, error) {
+	var out EquipCosmeticResponse
+	pattern := "/api/v1/shop/equip"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationShopServiceEquipCosmetic))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 // GetInventory GetInventory returns items the authenticated user owns.

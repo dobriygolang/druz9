@@ -41,6 +41,17 @@ service ShopService {
       body: "*"
     };
   }
+
+  // EquipCosmetic marks an owned item as equipped. If another item in the
+  // same slot is already equipped it's atomically unequipped. Pass
+  // unequip=true to clear the slot without equipping anything new (item_id
+  // still required so we know which slot to target).
+  rpc EquipCosmetic(EquipCosmeticRequest) returns (EquipCosmeticResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/shop/equip"
+      body: "*"
+    };
+  }
 }
 
 // ItemCategory tracks the high-level tab the item belongs to. Admin can
@@ -87,6 +98,10 @@ message ShopItem {
   bool         is_active        = 11;   // sold right now?
   bool         is_seasonal      = 12;
   google.protobuf.Timestamp rotates_at = 13; // when the item cycles out
+  // slot declares which cosmetic slot the item occupies when equipped
+  // (pose/pet/room/ambience/head/body/back/aura/frame). Empty = legacy /
+  // non-equippable — shown in inventory but no equip button.
+  string slot = 14;
 }
 
 message CategoryInfo {
@@ -136,4 +151,19 @@ message PurchaseResponse {
   OwnedItem item               = 1;
   int32     remaining_gold     = 2;
   int32     remaining_gems     = 3;
+}
+
+message EquipCosmeticRequest {
+  // item_id accepts either a UUID or a slug (e.g. "pose:wave") so the
+  // client can equip without first resolving the id.
+  string item_id = 1;
+  // unequip=true clears the slot containing item_id without equipping
+  // anything new. The item's slot is read from the catalog, so the user
+  // only needs to own the item (or the slot is a no-op).
+  bool   unequip = 2;
+}
+message EquipCosmeticResponse {
+  // Full refreshed inventory, so the client can update equipped badges
+  // in one network round-trip.
+  repeated OwnedItem items = 1;
 }

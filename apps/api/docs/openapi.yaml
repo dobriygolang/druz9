@@ -3124,6 +3124,29 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/shop.v1.ListCategoriesResponse'
+    /api/v1/shop/equip:
+        post:
+            tags:
+                - ShopService
+            description: |-
+                EquipCosmetic marks an owned item as equipped. If another item in the
+                 same slot is already equipped it's atomically unequipped. Pass
+                 unequip=true to clear the slot without equipping anything new (item_id
+                 still required so we know which slot to target).
+            operationId: ShopService_EquipCosmetic
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/shop.v1.EquipCosmeticRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/shop.v1.EquipCosmeticResponse'
     /api/v1/shop/inventory:
         get:
             tags:
@@ -7605,6 +7628,30 @@ components:
                 itemCount:
                     type: integer
                     format: int32
+        shop.v1.EquipCosmeticRequest:
+            type: object
+            properties:
+                itemId:
+                    type: string
+                    description: |-
+                        item_id accepts either a UUID or a slug (e.g. "pose:wave") so the
+                         client can equip without first resolving the id.
+                unequip:
+                    type: boolean
+                    description: |-
+                        unequip=true clears the slot containing item_id without equipping
+                         anything new. The item's slot is read from the catalog, so the user
+                         only needs to own the item (or the slot is a no-op).
+        shop.v1.EquipCosmeticResponse:
+            type: object
+            properties:
+                items:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/shop.v1.OwnedItem'
+                    description: |-
+                        Full refreshed inventory, so the client can update equipped badges
+                         in one network round-trip.
         shop.v1.GetInventoryResponse:
             type: object
             properties:
@@ -7696,6 +7743,12 @@ components:
                 rotatesAt:
                     type: string
                     format: date-time
+                slot:
+                    type: string
+                    description: |-
+                        slot declares which cosmetic slot the item occupies when equipped
+                         (pose/pet/room/ambience/head/body/back/aura/frame). Empty = legacy /
+                         non-equippable — shown in inventory but no equip button.
         skills.v1.AllocateSkillRequest:
             type: object
             properties:

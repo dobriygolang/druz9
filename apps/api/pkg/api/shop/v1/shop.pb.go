@@ -199,20 +199,24 @@ func (ItemCurrency) EnumDescriptor() ([]byte, []int) {
 }
 
 type ShopItem struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
-	Slug          string                 `protobuf:"bytes,2,opt,name=slug,proto3" json:"slug,omitempty"`
-	Name          string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
-	Description   string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
-	Category      ItemCategory           `protobuf:"varint,5,opt,name=category,proto3,enum=shop.v1.ItemCategory" json:"category,omitempty"`
-	Rarity        ItemRarity             `protobuf:"varint,6,opt,name=rarity,proto3,enum=shop.v1.ItemRarity" json:"rarity,omitempty"`
-	Currency      ItemCurrency           `protobuf:"varint,7,opt,name=currency,proto3,enum=shop.v1.ItemCurrency" json:"currency,omitempty"`
-	Price         int32                  `protobuf:"varint,8,opt,name=price,proto3" json:"price,omitempty"`                                // 0 means not-for-sale (event drop)
-	IconRef       string                 `protobuf:"bytes,9,opt,name=icon_ref,json=iconRef,proto3" json:"icon_ref,omitempty"`              // sprite name used by the client
-	AccentColor   string                 `protobuf:"bytes,10,opt,name=accent_color,json=accentColor,proto3" json:"accent_color,omitempty"` // hex color — client tinting
-	IsActive      bool                   `protobuf:"varint,11,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`         // sold right now?
-	IsSeasonal    bool                   `protobuf:"varint,12,opt,name=is_seasonal,json=isSeasonal,proto3" json:"is_seasonal,omitempty"`
-	RotatesAt     *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=rotates_at,json=rotatesAt,proto3" json:"rotates_at,omitempty"` // when the item cycles out
+	state       protoimpl.MessageState `protogen:"open.v1"`
+	Id          string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	Slug        string                 `protobuf:"bytes,2,opt,name=slug,proto3" json:"slug,omitempty"`
+	Name        string                 `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	Description string                 `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
+	Category    ItemCategory           `protobuf:"varint,5,opt,name=category,proto3,enum=shop.v1.ItemCategory" json:"category,omitempty"`
+	Rarity      ItemRarity             `protobuf:"varint,6,opt,name=rarity,proto3,enum=shop.v1.ItemRarity" json:"rarity,omitempty"`
+	Currency    ItemCurrency           `protobuf:"varint,7,opt,name=currency,proto3,enum=shop.v1.ItemCurrency" json:"currency,omitempty"`
+	Price       int32                  `protobuf:"varint,8,opt,name=price,proto3" json:"price,omitempty"`                                // 0 means not-for-sale (event drop)
+	IconRef     string                 `protobuf:"bytes,9,opt,name=icon_ref,json=iconRef,proto3" json:"icon_ref,omitempty"`              // sprite name used by the client
+	AccentColor string                 `protobuf:"bytes,10,opt,name=accent_color,json=accentColor,proto3" json:"accent_color,omitempty"` // hex color — client tinting
+	IsActive    bool                   `protobuf:"varint,11,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`         // sold right now?
+	IsSeasonal  bool                   `protobuf:"varint,12,opt,name=is_seasonal,json=isSeasonal,proto3" json:"is_seasonal,omitempty"`
+	RotatesAt   *timestamppb.Timestamp `protobuf:"bytes,13,opt,name=rotates_at,json=rotatesAt,proto3" json:"rotates_at,omitempty"` // when the item cycles out
+	// slot declares which cosmetic slot the item occupies when equipped
+	// (pose/pet/room/ambience/head/body/back/aura/frame). Empty = legacy /
+	// non-equippable — shown in inventory but no equip button.
+	Slot          string `protobuf:"bytes,14,opt,name=slot,proto3" json:"slot,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -336,6 +340,13 @@ func (x *ShopItem) GetRotatesAt() *timestamppb.Timestamp {
 		return x.RotatesAt
 	}
 	return nil
+}
+
+func (x *ShopItem) GetSlot() string {
+	if x != nil {
+		return x.Slot
+	}
+	return ""
 }
 
 type CategoryInfo struct {
@@ -938,11 +949,114 @@ func (x *PurchaseResponse) GetRemainingGems() int32 {
 	return 0
 }
 
+type EquipCosmeticRequest struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// item_id accepts either a UUID or a slug (e.g. "pose:wave") so the
+	// client can equip without first resolving the id.
+	ItemId string `protobuf:"bytes,1,opt,name=item_id,json=itemId,proto3" json:"item_id,omitempty"`
+	// unequip=true clears the slot containing item_id without equipping
+	// anything new. The item's slot is read from the catalog, so the user
+	// only needs to own the item (or the slot is a no-op).
+	Unequip       bool `protobuf:"varint,2,opt,name=unequip,proto3" json:"unequip,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipCosmeticRequest) Reset() {
+	*x = EquipCosmeticRequest{}
+	mi := &file_game_shop_v1_shop_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipCosmeticRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipCosmeticRequest) ProtoMessage() {}
+
+func (x *EquipCosmeticRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_game_shop_v1_shop_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipCosmeticRequest.ProtoReflect.Descriptor instead.
+func (*EquipCosmeticRequest) Descriptor() ([]byte, []int) {
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *EquipCosmeticRequest) GetItemId() string {
+	if x != nil {
+		return x.ItemId
+	}
+	return ""
+}
+
+func (x *EquipCosmeticRequest) GetUnequip() bool {
+	if x != nil {
+		return x.Unequip
+	}
+	return false
+}
+
+type EquipCosmeticResponse struct {
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Full refreshed inventory, so the client can update equipped badges
+	// in one network round-trip.
+	Items         []*OwnedItem `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *EquipCosmeticResponse) Reset() {
+	*x = EquipCosmeticResponse{}
+	mi := &file_game_shop_v1_shop_proto_msgTypes[14]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *EquipCosmeticResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*EquipCosmeticResponse) ProtoMessage() {}
+
+func (x *EquipCosmeticResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_game_shop_v1_shop_proto_msgTypes[14]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use EquipCosmeticResponse.ProtoReflect.Descriptor instead.
+func (*EquipCosmeticResponse) Descriptor() ([]byte, []int) {
+	return file_game_shop_v1_shop_proto_rawDescGZIP(), []int{14}
+}
+
+func (x *EquipCosmeticResponse) GetItems() []*OwnedItem {
+	if x != nil {
+		return x.Items
+	}
+	return nil
+}
+
 var File_game_shop_v1_shop_proto protoreflect.FileDescriptor
 
 const file_game_shop_v1_shop_proto_rawDesc = "" +
 	"\n" +
-	"\x17game/shop/v1/shop.proto\x12\ashop.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc4\x03\n" +
+	"\x17game/shop/v1/shop.proto\x12\ashop.v1\x1a\x1cgoogle/api/annotations.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xd8\x03\n" +
 	"\bShopItem\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04slug\x18\x02 \x01(\tR\x04slug\x12\x12\n" +
@@ -959,7 +1073,8 @@ const file_game_shop_v1_shop_proto_rawDesc = "" +
 	"\vis_seasonal\x18\f \x01(\bR\n" +
 	"isSeasonal\x129\n" +
 	"\n" +
-	"rotates_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\trotatesAt\"t\n" +
+	"rotates_at\x18\r \x01(\v2\x1a.google.protobuf.TimestampR\trotatesAt\x12\x12\n" +
+	"\x04slot\x18\x0e \x01(\tR\x04slot\"t\n" +
 	"\fCategoryInfo\x121\n" +
 	"\bcategory\x18\x01 \x01(\x0e2\x15.shop.v1.ItemCategoryR\bcategory\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12\x1d\n" +
@@ -996,7 +1111,12 @@ const file_game_shop_v1_shop_proto_rawDesc = "" +
 	"\x10PurchaseResponse\x12&\n" +
 	"\x04item\x18\x01 \x01(\v2\x12.shop.v1.OwnedItemR\x04item\x12%\n" +
 	"\x0eremaining_gold\x18\x02 \x01(\x05R\rremainingGold\x12%\n" +
-	"\x0eremaining_gems\x18\x03 \x01(\x05R\rremainingGems*\xcb\x01\n" +
+	"\x0eremaining_gems\x18\x03 \x01(\x05R\rremainingGems\"I\n" +
+	"\x14EquipCosmeticRequest\x12\x17\n" +
+	"\aitem_id\x18\x01 \x01(\tR\x06itemId\x12\x18\n" +
+	"\aunequip\x18\x02 \x01(\bR\aunequip\"A\n" +
+	"\x15EquipCosmeticResponse\x12(\n" +
+	"\x05items\x18\x01 \x03(\v2\x12.shop.v1.OwnedItemR\x05items*\xcb\x01\n" +
 	"\fItemCategory\x12\x1d\n" +
 	"\x19ITEM_CATEGORY_UNSPECIFIED\x10\x00\x12\x17\n" +
 	"\x13ITEM_CATEGORY_DECOR\x10\x01\x12\x1b\n" +
@@ -1017,13 +1137,14 @@ const file_game_shop_v1_shop_proto_rawDesc = "" +
 	"\x19ITEM_CURRENCY_UNSPECIFIED\x10\x00\x12\x16\n" +
 	"\x12ITEM_CURRENCY_GOLD\x10\x01\x12\x16\n" +
 	"\x12ITEM_CURRENCY_GEMS\x10\x02\x12\x18\n" +
-	"\x14ITEM_CURRENCY_SHARDS\x10\x032\x95\x04\n" +
+	"\x14ITEM_CURRENCY_SHARDS\x10\x032\x84\x05\n" +
 	"\vShopService\x12r\n" +
 	"\x0eListCategories\x12\x1e.shop.v1.ListCategoriesRequest\x1a\x1f.shop.v1.ListCategoriesResponse\"\x1f\x82\xd3\xe4\x93\x02\x19\x12\x17/api/v1/shop/categories\x12^\n" +
 	"\tListItems\x12\x19.shop.v1.ListItemsRequest\x1a\x1a.shop.v1.ListItemsResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/shop/items\x12b\n" +
 	"\aGetItem\x12\x17.shop.v1.GetItemRequest\x1a\x18.shop.v1.GetItemResponse\"$\x82\xd3\xe4\x93\x02\x1e\x12\x1c/api/v1/shop/items/{item_id}\x12k\n" +
 	"\fGetInventory\x12\x1c.shop.v1.GetInventoryRequest\x1a\x1d.shop.v1.GetInventoryResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/shop/inventory\x12a\n" +
-	"\bPurchase\x12\x18.shop.v1.PurchaseRequest\x1a\x19.shop.v1.PurchaseResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/shop/purchaseB\x18Z\x16api/pkg/api/shop/v1;v1b\x06proto3"
+	"\bPurchase\x12\x18.shop.v1.PurchaseRequest\x1a\x19.shop.v1.PurchaseResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/shop/purchase\x12m\n" +
+	"\rEquipCosmetic\x12\x1d.shop.v1.EquipCosmeticRequest\x1a\x1e.shop.v1.EquipCosmeticResponse\"\x1d\x82\xd3\xe4\x93\x02\x17:\x01*\"\x12/api/v1/shop/equipB\x18Z\x16api/pkg/api/shop/v1;v1b\x06proto3"
 
 var (
 	file_game_shop_v1_shop_proto_rawDescOnce sync.Once
@@ -1038,7 +1159,7 @@ func file_game_shop_v1_shop_proto_rawDescGZIP() []byte {
 }
 
 var file_game_shop_v1_shop_proto_enumTypes = make([]protoimpl.EnumInfo, 3)
-var file_game_shop_v1_shop_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_game_shop_v1_shop_proto_msgTypes = make([]protoimpl.MessageInfo, 15)
 var file_game_shop_v1_shop_proto_goTypes = []any{
 	(ItemCategory)(0),              // 0: shop.v1.ItemCategory
 	(ItemRarity)(0),                // 1: shop.v1.ItemRarity
@@ -1056,13 +1177,15 @@ var file_game_shop_v1_shop_proto_goTypes = []any{
 	(*OwnedItem)(nil),              // 13: shop.v1.OwnedItem
 	(*PurchaseRequest)(nil),        // 14: shop.v1.PurchaseRequest
 	(*PurchaseResponse)(nil),       // 15: shop.v1.PurchaseResponse
-	(*timestamppb.Timestamp)(nil),  // 16: google.protobuf.Timestamp
+	(*EquipCosmeticRequest)(nil),   // 16: shop.v1.EquipCosmeticRequest
+	(*EquipCosmeticResponse)(nil),  // 17: shop.v1.EquipCosmeticResponse
+	(*timestamppb.Timestamp)(nil),  // 18: google.protobuf.Timestamp
 }
 var file_game_shop_v1_shop_proto_depIdxs = []int32{
 	0,  // 0: shop.v1.ShopItem.category:type_name -> shop.v1.ItemCategory
 	1,  // 1: shop.v1.ShopItem.rarity:type_name -> shop.v1.ItemRarity
 	2,  // 2: shop.v1.ShopItem.currency:type_name -> shop.v1.ItemCurrency
-	16, // 3: shop.v1.ShopItem.rotates_at:type_name -> google.protobuf.Timestamp
+	18, // 3: shop.v1.ShopItem.rotates_at:type_name -> google.protobuf.Timestamp
 	0,  // 4: shop.v1.CategoryInfo.category:type_name -> shop.v1.ItemCategory
 	4,  // 5: shop.v1.ListCategoriesResponse.categories:type_name -> shop.v1.CategoryInfo
 	0,  // 6: shop.v1.ListItemsRequest.category:type_name -> shop.v1.ItemCategory
@@ -1071,23 +1194,26 @@ var file_game_shop_v1_shop_proto_depIdxs = []int32{
 	3,  // 9: shop.v1.GetItemResponse.item:type_name -> shop.v1.ShopItem
 	13, // 10: shop.v1.GetInventoryResponse.items:type_name -> shop.v1.OwnedItem
 	3,  // 11: shop.v1.OwnedItem.item:type_name -> shop.v1.ShopItem
-	16, // 12: shop.v1.OwnedItem.acquired_at:type_name -> google.protobuf.Timestamp
+	18, // 12: shop.v1.OwnedItem.acquired_at:type_name -> google.protobuf.Timestamp
 	13, // 13: shop.v1.PurchaseResponse.item:type_name -> shop.v1.OwnedItem
-	5,  // 14: shop.v1.ShopService.ListCategories:input_type -> shop.v1.ListCategoriesRequest
-	7,  // 15: shop.v1.ShopService.ListItems:input_type -> shop.v1.ListItemsRequest
-	9,  // 16: shop.v1.ShopService.GetItem:input_type -> shop.v1.GetItemRequest
-	11, // 17: shop.v1.ShopService.GetInventory:input_type -> shop.v1.GetInventoryRequest
-	14, // 18: shop.v1.ShopService.Purchase:input_type -> shop.v1.PurchaseRequest
-	6,  // 19: shop.v1.ShopService.ListCategories:output_type -> shop.v1.ListCategoriesResponse
-	8,  // 20: shop.v1.ShopService.ListItems:output_type -> shop.v1.ListItemsResponse
-	10, // 21: shop.v1.ShopService.GetItem:output_type -> shop.v1.GetItemResponse
-	12, // 22: shop.v1.ShopService.GetInventory:output_type -> shop.v1.GetInventoryResponse
-	15, // 23: shop.v1.ShopService.Purchase:output_type -> shop.v1.PurchaseResponse
-	19, // [19:24] is the sub-list for method output_type
-	14, // [14:19] is the sub-list for method input_type
-	14, // [14:14] is the sub-list for extension type_name
-	14, // [14:14] is the sub-list for extension extendee
-	0,  // [0:14] is the sub-list for field type_name
+	13, // 14: shop.v1.EquipCosmeticResponse.items:type_name -> shop.v1.OwnedItem
+	5,  // 15: shop.v1.ShopService.ListCategories:input_type -> shop.v1.ListCategoriesRequest
+	7,  // 16: shop.v1.ShopService.ListItems:input_type -> shop.v1.ListItemsRequest
+	9,  // 17: shop.v1.ShopService.GetItem:input_type -> shop.v1.GetItemRequest
+	11, // 18: shop.v1.ShopService.GetInventory:input_type -> shop.v1.GetInventoryRequest
+	14, // 19: shop.v1.ShopService.Purchase:input_type -> shop.v1.PurchaseRequest
+	16, // 20: shop.v1.ShopService.EquipCosmetic:input_type -> shop.v1.EquipCosmeticRequest
+	6,  // 21: shop.v1.ShopService.ListCategories:output_type -> shop.v1.ListCategoriesResponse
+	8,  // 22: shop.v1.ShopService.ListItems:output_type -> shop.v1.ListItemsResponse
+	10, // 23: shop.v1.ShopService.GetItem:output_type -> shop.v1.GetItemResponse
+	12, // 24: shop.v1.ShopService.GetInventory:output_type -> shop.v1.GetInventoryResponse
+	15, // 25: shop.v1.ShopService.Purchase:output_type -> shop.v1.PurchaseResponse
+	17, // 26: shop.v1.ShopService.EquipCosmetic:output_type -> shop.v1.EquipCosmeticResponse
+	21, // [21:27] is the sub-list for method output_type
+	15, // [15:21] is the sub-list for method input_type
+	15, // [15:15] is the sub-list for extension type_name
+	15, // [15:15] is the sub-list for extension extendee
+	0,  // [0:15] is the sub-list for field type_name
 }
 
 func init() { file_game_shop_v1_shop_proto_init() }
@@ -1101,7 +1227,7 @@ func file_game_shop_v1_shop_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_game_shop_v1_shop_proto_rawDesc), len(file_game_shop_v1_shop_proto_rawDesc)),
 			NumEnums:      3,
-			NumMessages:   13,
+			NumMessages:   15,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

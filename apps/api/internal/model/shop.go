@@ -72,6 +72,10 @@ type ShopItem struct {
 	IsSeasonal  bool         `json:"isSeasonal"`
 	RotatesAt   *time.Time   `json:"rotatesAt,omitempty"`
 	CreatedAt   time.Time    `json:"createdAt"`
+	// Slot declares which cosmetic slot the item occupies when equipped
+	// (pose/pet/room/ambience/head/body/back/aura/frame). Empty = not
+	// equippable.
+	Slot        string       `json:"slot"`
 }
 
 // ShopCategoryInfo is one tab on the tavern page with its item count.

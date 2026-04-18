@@ -16,4 +16,5 @@ type Service interface {
 	GetInventory(ctx context.Context, userID uuid.UUID) ([]*model.ShopOwnedItem, error)
 	Purchase(ctx context.Context, userID, itemID uuid.UUID) (*model.ShopPurchaseOutcome, error)
 	ResolveItem(ctx context.Context, ref string) (uuid.UUID, error)
+	Equip(ctx context.Context, userID, itemID uuid.UUID, unequip bool) ([]*model.ShopOwnedItem, error)
 }

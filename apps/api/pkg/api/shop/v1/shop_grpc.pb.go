@@ -24,6 +24,7 @@ const (
 	ShopService_GetItem_FullMethodName        = "/shop.v1.ShopService/GetItem"
 	ShopService_GetInventory_FullMethodName   = "/shop.v1.ShopService/GetInventory"
 	ShopService_Purchase_FullMethodName       = "/shop.v1.ShopService/Purchase"
+	ShopService_EquipCosmetic_FullMethodName  = "/shop.v1.ShopService/EquipCosmetic"
 )
 
 // ShopServiceClient is the client API for ShopService service.
@@ -47,6 +48,11 @@ type ShopServiceClient interface {
 	// Purchase buys an item with the user's gold/gems. Idempotent on a
 	// per-item basis (re-purchasing an owned item returns AlreadyOwned).
 	Purchase(ctx context.Context, in *PurchaseRequest, opts ...grpc.CallOption) (*PurchaseResponse, error)
+	// EquipCosmetic marks an owned item as equipped. If another item in the
+	// same slot is already equipped it's atomically unequipped. Pass
+	// unequip=true to clear the slot without equipping anything new (item_id
+	// still required so we know which slot to target).
+	EquipCosmetic(ctx context.Context, in *EquipCosmeticRequest, opts ...grpc.CallOption) (*EquipCosmeticResponse, error)
 }
 
 type shopServiceClient struct {
@@ -107,6 +113,16 @@ func (c *shopServiceClient) Purchase(ctx context.Context, in *PurchaseRequest, o
 	return out, nil
 }
 
+func (c *shopServiceClient) EquipCosmetic(ctx context.Context, in *EquipCosmeticRequest, opts ...grpc.CallOption) (*EquipCosmeticResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EquipCosmeticResponse)
+	err := c.cc.Invoke(ctx, ShopService_EquipCosmetic_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ShopServiceServer is the server API for ShopService service.
 // All implementations must embed UnimplementedShopServiceServer
 // for forward compatibility.
@@ -128,6 +144,11 @@ type ShopServiceServer interface {
 	// Purchase buys an item with the user's gold/gems. Idempotent on a
 	// per-item basis (re-purchasing an owned item returns AlreadyOwned).
 	Purchase(context.Context, *PurchaseRequest) (*PurchaseResponse, error)
+	// EquipCosmetic marks an owned item as equipped. If another item in the
+	// same slot is already equipped it's atomically unequipped. Pass
+	// unequip=true to clear the slot without equipping anything new (item_id
+	// still required so we know which slot to target).
+	EquipCosmetic(context.Context, *EquipCosmeticRequest) (*EquipCosmeticResponse, error)
 	mustEmbedUnimplementedShopServiceServer()
 }
 
@@ -152,6 +173,9 @@ func (UnimplementedShopServiceServer) GetInventory(context.Context, *GetInventor
 }
 func (UnimplementedShopServiceServer) Purchase(context.Context, *PurchaseRequest) (*PurchaseResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method Purchase not implemented")
+}
+func (UnimplementedShopServiceServer) EquipCosmetic(context.Context, *EquipCosmeticRequest) (*EquipCosmeticResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method EquipCosmetic not implemented")
 }
 func (UnimplementedShopServiceServer) mustEmbedUnimplementedShopServiceServer() {}
 func (UnimplementedShopServiceServer) testEmbeddedByValue()                     {}
@@ -264,6 +288,24 @@ func _ShopService_Purchase_Handler(srv interface{}, ctx context.Context, dec fun
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ShopService_EquipCosmetic_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EquipCosmeticRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ShopServiceServer).EquipCosmetic(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ShopService_EquipCosmetic_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ShopServiceServer).EquipCosmetic(ctx, req.(*EquipCosmeticRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ShopService_ServiceDesc is the grpc.ServiceDesc for ShopService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -290,6 +332,10 @@ var ShopService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "Purchase",
 			Handler:    _ShopService_Purchase_Handler,
+		},
+		{
+			MethodName: "EquipCosmetic",
+			Handler:    _ShopService_EquipCosmetic_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

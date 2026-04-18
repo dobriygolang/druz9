@@ -24,6 +24,7 @@ func mapItem(it *model.ShopItem) *v1.ShopItem {
 		AccentColor: it.AccentColor,
 		IsActive:    it.IsActive,
 		IsSeasonal:  it.IsSeasonal,
+		Slot:        it.Slot,
 	}
 	if it.RotatesAt != nil {
 		out.RotatesAt = timestamppb.New(*it.RotatesAt)
