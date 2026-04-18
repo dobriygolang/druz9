@@ -73,6 +73,65 @@ service ArenaService {
       body: "*"
     };
   }
+
+  // EnqueueForMatch puts the caller into the matchmaking queue for `mode`.
+  // If another player is already waiting, a match is created immediately
+  // and both players receive status=MATCHED on the next GetQueueStatus
+  // call. Queue state is in-memory per backend instance — fine for a
+  // single-replica deploy, needs Redis for multi-replica.
+  rpc EnqueueForMatch(EnqueueForMatchRequest) returns (EnqueueForMatchResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/queue/enqueue"
+      body: "*"
+    };
+  }
+
+  // GetQueueStatus is polled by the client (typically every 2s). Status
+  // goes WAITING → MATCHED (with match_id) or WAITING → TIMEOUT after 30s.
+  // On TIMEOUT the client offers the solo-timed fallback UI.
+  rpc GetQueueStatus(GetQueueStatusRequest) returns (GetQueueStatusResponse) {
+    option (google.api.http) = { get: "/api/v1/arena/queue/status/{queue_id}" };
+  }
+
+  rpc LeaveQueue(LeaveQueueRequest) returns (ArenaStatusResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/arena/queue/leave"
+      body: "*"
+    };
+  }
+}
+
+enum QueueStatus {
+  QUEUE_STATUS_UNSPECIFIED = 0;
+  QUEUE_STATUS_WAITING     = 1;
+  QUEUE_STATUS_MATCHED     = 2;
+  QUEUE_STATUS_TIMEOUT     = 3;
+  QUEUE_STATUS_CANCELLED   = 4;
+}
+
+message EnqueueForMatchRequest {
+  // Game mode key, e.g. "ranked_1v1", "casual_1v1", "team_2v2".
+  string mode = 1;
+}
+message EnqueueForMatchResponse {
+  // queue_id is the ticket the client uses in subsequent GetQueueStatus
+  // and LeaveQueue calls.
+  string queue_id                = 1;
+  int32  estimated_wait_seconds  = 2;
+}
+
+message GetQueueStatusRequest {
+  string queue_id = 1;
+}
+message GetQueueStatusResponse {
+  QueueStatus status          = 1;
+  // match_id is filled when status = MATCHED.
+  string      match_id        = 2;
+  int32       waited_seconds  = 3;
+}
+
+message LeaveQueueRequest {
+  string queue_id = 1;
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────

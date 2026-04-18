@@ -29,6 +29,9 @@ const (
 	ArenaService_LeaveMatch_FullMethodName           = "/arena.v1.ArenaService/LeaveMatch"
 	ArenaService_GetPlayerStats_FullMethodName       = "/arena.v1.ArenaService/GetPlayerStats"
 	ArenaService_ReportAntiCheatEvent_FullMethodName = "/arena.v1.ArenaService/ReportAntiCheatEvent"
+	ArenaService_EnqueueForMatch_FullMethodName      = "/arena.v1.ArenaService/EnqueueForMatch"
+	ArenaService_GetQueueStatus_FullMethodName       = "/arena.v1.ArenaService/GetQueueStatus"
+	ArenaService_LeaveQueue_FullMethodName           = "/arena.v1.ArenaService/LeaveQueue"
 )
 
 // ArenaServiceClient is the client API for ArenaService service.
@@ -49,6 +52,17 @@ type ArenaServiceClient interface {
 	LeaveMatch(ctx context.Context, in *LeaveMatchRequest, opts ...grpc.CallOption) (*ArenaMatchResponse, error)
 	GetPlayerStats(ctx context.Context, in *GetPlayerStatsRequest, opts ...grpc.CallOption) (*ArenaPlayerStatsResponse, error)
 	ReportAntiCheatEvent(ctx context.Context, in *ReportAntiCheatEventRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error)
+	// EnqueueForMatch puts the caller into the matchmaking queue for `mode`.
+	// If another player is already waiting, a match is created immediately
+	// and both players receive status=MATCHED on the next GetQueueStatus
+	// call. Queue state is in-memory per backend instance — fine for a
+	// single-replica deploy, needs Redis for multi-replica.
+	EnqueueForMatch(ctx context.Context, in *EnqueueForMatchRequest, opts ...grpc.CallOption) (*EnqueueForMatchResponse, error)
+	// GetQueueStatus is polled by the client (typically every 2s). Status
+	// goes WAITING → MATCHED (with match_id) or WAITING → TIMEOUT after 30s.
+	// On TIMEOUT the client offers the solo-timed fallback UI.
+	GetQueueStatus(ctx context.Context, in *GetQueueStatusRequest, opts ...grpc.CallOption) (*GetQueueStatusResponse, error)
+	LeaveQueue(ctx context.Context, in *LeaveQueueRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error)
 }
 
 type arenaServiceClient struct {
@@ -159,6 +173,36 @@ func (c *arenaServiceClient) ReportAntiCheatEvent(ctx context.Context, in *Repor
 	return out, nil
 }
 
+func (c *arenaServiceClient) EnqueueForMatch(ctx context.Context, in *EnqueueForMatchRequest, opts ...grpc.CallOption) (*EnqueueForMatchResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(EnqueueForMatchResponse)
+	err := c.cc.Invoke(ctx, ArenaService_EnqueueForMatch_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) GetQueueStatus(ctx context.Context, in *GetQueueStatusRequest, opts ...grpc.CallOption) (*GetQueueStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetQueueStatusResponse)
+	err := c.cc.Invoke(ctx, ArenaService_GetQueueStatus_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *arenaServiceClient) LeaveQueue(ctx context.Context, in *LeaveQueueRequest, opts ...grpc.CallOption) (*ArenaStatusResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ArenaStatusResponse)
+	err := c.cc.Invoke(ctx, ArenaService_LeaveQueue_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ArenaServiceServer is the server API for ArenaService service.
 // All implementations must embed UnimplementedArenaServiceServer
 // for forward compatibility.
@@ -177,6 +221,17 @@ type ArenaServiceServer interface {
 	LeaveMatch(context.Context, *LeaveMatchRequest) (*ArenaMatchResponse, error)
 	GetPlayerStats(context.Context, *GetPlayerStatsRequest) (*ArenaPlayerStatsResponse, error)
 	ReportAntiCheatEvent(context.Context, *ReportAntiCheatEventRequest) (*ArenaStatusResponse, error)
+	// EnqueueForMatch puts the caller into the matchmaking queue for `mode`.
+	// If another player is already waiting, a match is created immediately
+	// and both players receive status=MATCHED on the next GetQueueStatus
+	// call. Queue state is in-memory per backend instance — fine for a
+	// single-replica deploy, needs Redis for multi-replica.
+	EnqueueForMatch(context.Context, *EnqueueForMatchRequest) (*EnqueueForMatchResponse, error)
+	// GetQueueStatus is polled by the client (typically every 2s). Status
+	// goes WAITING → MATCHED (with match_id) or WAITING → TIMEOUT after 30s.
+	// On TIMEOUT the client offers the solo-timed fallback UI.
+	GetQueueStatus(context.Context, *GetQueueStatusRequest) (*GetQueueStatusResponse, error)
+	LeaveQueue(context.Context, *LeaveQueueRequest) (*ArenaStatusResponse, error)
 	mustEmbedUnimplementedArenaServiceServer()
 }
 
@@ -216,6 +271,15 @@ func (UnimplementedArenaServiceServer) GetPlayerStats(context.Context, *GetPlaye
 }
 func (UnimplementedArenaServiceServer) ReportAntiCheatEvent(context.Context, *ReportAntiCheatEventRequest) (*ArenaStatusResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ReportAntiCheatEvent not implemented")
+}
+func (UnimplementedArenaServiceServer) EnqueueForMatch(context.Context, *EnqueueForMatchRequest) (*EnqueueForMatchResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method EnqueueForMatch not implemented")
+}
+func (UnimplementedArenaServiceServer) GetQueueStatus(context.Context, *GetQueueStatusRequest) (*GetQueueStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetQueueStatus not implemented")
+}
+func (UnimplementedArenaServiceServer) LeaveQueue(context.Context, *LeaveQueueRequest) (*ArenaStatusResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method LeaveQueue not implemented")
 }
 func (UnimplementedArenaServiceServer) mustEmbedUnimplementedArenaServiceServer() {}
 func (UnimplementedArenaServiceServer) testEmbeddedByValue()                      {}
@@ -418,6 +482,60 @@ func _ArenaService_ReportAntiCheatEvent_Handler(srv interface{}, ctx context.Con
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ArenaService_EnqueueForMatch_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EnqueueForMatchRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).EnqueueForMatch(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_EnqueueForMatch_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).EnqueueForMatch(ctx, req.(*EnqueueForMatchRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_GetQueueStatus_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetQueueStatusRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).GetQueueStatus(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_GetQueueStatus_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).GetQueueStatus(ctx, req.(*GetQueueStatusRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ArenaService_LeaveQueue_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LeaveQueueRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ArenaServiceServer).LeaveQueue(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ArenaService_LeaveQueue_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ArenaServiceServer).LeaveQueue(ctx, req.(*LeaveQueueRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ArenaService_ServiceDesc is the grpc.ServiceDesc for ArenaService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -464,6 +582,18 @@ var ArenaService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ReportAntiCheatEvent",
 			Handler:    _ArenaService_ReportAntiCheatEvent_Handler,
+		},
+		{
+			MethodName: "EnqueueForMatch",
+			Handler:    _ArenaService_EnqueueForMatch_Handler,
+		},
+		{
+			MethodName: "GetQueueStatus",
+			Handler:    _ArenaService_GetQueueStatus_Handler,
+		},
+		{
+			MethodName: "LeaveQueue",
+			Handler:    _ArenaService_LeaveQueue_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

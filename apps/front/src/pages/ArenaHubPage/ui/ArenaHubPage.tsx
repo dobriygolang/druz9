@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Panel, RpgButton, Badge, PageHeader, SkeletonRow } from '@/shared/ui/pixel'
 import { Sword, Banner, Hero } from '@/shared/ui/sprites'
 import { useAuth } from '@/app/providers/AuthProvider'
-import { arenaApi, type ArenaLeaderboardEntry, type ArenaStats } from '@/features/Arena/api/arenaApi'
+import { arenaApi, arenaMatchmaking, type ArenaLeaderboardEntry, type ArenaStats } from '@/features/Arena/api/arenaApi'
 import { duelReplayApi, type ReplaySummary } from '@/features/DuelReplay'
 import { useActiveSeason } from '@/features/Hub/api/useActiveSeason'
 
@@ -101,9 +101,64 @@ export function ArenaHubPage() {
     setTimeout(() => { setTeamMatchmaking(false); navigate('/duel?mode=team2v2') }, 3000)
   }
 
-  const enterDuel = () => {
+  const [queueId, setQueueId] = useState<string | null>(null)
+  const [queueWait, setQueueWait] = useState(0)
+  const [soloOffer, setSoloOffer] = useState(false)
+
+  // Poll the backend queue every 2s while waiting. On MATCHED, route to
+  // the assigned match; on TIMEOUT surface the solo-timed fallback.
+  useEffect(() => {
+    if (!queueId) return
+    let cancelled = false
+    const tick = async () => {
+      try {
+        const s = await arenaMatchmaking.status(queueId)
+        if (cancelled) return
+        setQueueWait(s.waitedSeconds)
+        if (s.status === 'MATCHED' && s.matchId) {
+          setQueueId(null)
+          setMatchmaking(false)
+          navigate(`/arena/match/${s.matchId}`)
+        } else if (s.status === 'TIMEOUT' || s.status === 'CANCELLED') {
+          setQueueId(null)
+          setMatchmaking(false)
+          if (s.status === 'TIMEOUT') setSoloOffer(true)
+        }
+      } catch {
+        // Keep polling on transient errors; client-side timeout handled
+        // separately by the backend's 30s TIMEOUT status.
+      }
+    }
+    const iv = setInterval(tick, 2000)
+    void tick()
+    return () => { cancelled = true; clearInterval(iv) }
+  }, [queueId, navigate])
+
+  const enterDuel = async () => {
     setMatchmaking(true)
-    setTimeout(() => navigate('/duel?mode=ranked'), 2200)
+    setSoloOffer(false)
+    try {
+      const { queueId: qid } = await arenaMatchmaking.enqueue('ranked_1v1')
+      setQueueId(qid)
+    } catch {
+      // Fallback to the legacy client-side redirect so staging doesn't
+      // deadlock if the queue RPC is unreachable.
+      setMatchmaking(false)
+      navigate('/duel?mode=ranked')
+    }
+  }
+
+  const cancelQueue = async () => {
+    if (queueId) {
+      try { await arenaMatchmaking.leave(queueId) } catch { /* best-effort */ }
+    }
+    setQueueId(null)
+    setMatchmaking(false)
+  }
+
+  const acceptSolo = () => {
+    setSoloOffer(false)
+    navigate('/duel?mode=solo_timed')
   }
 
   return (
@@ -116,10 +171,31 @@ export function ArenaHubPage() {
               {t('arenaHub.matchmaking')}
             </div>
             <h3 className="font-display" style={{ fontSize: 20, marginBottom: 4 }}>{t('arenaHub.searching')}</h3>
-            <div style={{ color: 'var(--ink-2)', fontSize: 12, marginBottom: 24 }}>{t('arenaHub.eloInfo')}</div>
+            <div style={{ color: 'var(--ink-2)', fontSize: 12, marginBottom: 16 }}>
+              {t('arenaHub.eloInfo')} · {queueWait}s
+            </div>
             <SkeletonRow />
             <SkeletonRow />
             <SkeletonRow />
+            <div style={{ marginTop: 16 }}>
+              <RpgButton size="sm" variant="ghost" onClick={cancelQueue}>Cancel</RpgButton>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {soloOffer && (
+        <div className="rpg-modal-backdrop" onClick={() => setSoloOffer(false)}>
+          <div className="rpg-panel rpg-panel--nailed" onClick={(e) => e.stopPropagation()}
+            style={{ padding: 28, maxWidth: 420, textAlign: 'center' }}>
+            <h3 className="font-display" style={{ fontSize: 18, marginBottom: 8 }}>No opponents online</h3>
+            <div style={{ color: 'var(--ink-2)', fontSize: 12, marginBottom: 20 }}>
+              Solo-timed mode — race the clock, results posted to the solo leaderboard.
+            </div>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center' }}>
+              <RpgButton size="sm" variant="ghost" onClick={() => setSoloOffer(false)}>Not now</RpgButton>
+              <RpgButton size="sm" variant="primary" onClick={acceptSolo}>Play solo</RpgButton>
+            </div>
           </div>
         </div>
       )}

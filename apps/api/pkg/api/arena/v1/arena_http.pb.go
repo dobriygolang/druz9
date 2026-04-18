@@ -20,26 +20,40 @@ var _ = binding.EncodeURL
 const _ = http.SupportPackageIsVersion1
 
 const OperationArenaServiceCreateMatch = "/arena.v1.ArenaService/CreateMatch"
+const OperationArenaServiceEnqueueForMatch = "/arena.v1.ArenaService/EnqueueForMatch"
 const OperationArenaServiceGetLeaderboard = "/arena.v1.ArenaService/GetLeaderboard"
 const OperationArenaServiceGetMatch = "/arena.v1.ArenaService/GetMatch"
 const OperationArenaServiceGetPlayerStats = "/arena.v1.ArenaService/GetPlayerStats"
+const OperationArenaServiceGetQueueStatus = "/arena.v1.ArenaService/GetQueueStatus"
 const OperationArenaServiceGuildsLeaderboard = "/arena.v1.ArenaService/GuildsLeaderboard"
 const OperationArenaServiceJoinMatch = "/arena.v1.ArenaService/JoinMatch"
 const OperationArenaServiceLeaveMatch = "/arena.v1.ArenaService/LeaveMatch"
+const OperationArenaServiceLeaveQueue = "/arena.v1.ArenaService/LeaveQueue"
 const OperationArenaServiceReportAntiCheatEvent = "/arena.v1.ArenaService/ReportAntiCheatEvent"
 const OperationArenaServiceSeasonXPLeaderboard = "/arena.v1.ArenaService/SeasonXPLeaderboard"
 const OperationArenaServiceSubmitCode = "/arena.v1.ArenaService/SubmitCode"
 
 type ArenaServiceHTTPServer interface {
 	CreateMatch(context.Context, *CreateMatchRequest) (*ArenaMatchResponse, error)
+	// EnqueueForMatch EnqueueForMatch puts the caller into the matchmaking queue for `mode`.
+	// If another player is already waiting, a match is created immediately
+	// and both players receive status=MATCHED on the next GetQueueStatus
+	// call. Queue state is in-memory per backend instance — fine for a
+	// single-replica deploy, needs Redis for multi-replica.
+	EnqueueForMatch(context.Context, *EnqueueForMatchRequest) (*EnqueueForMatchResponse, error)
 	GetLeaderboard(context.Context, *GetLeaderboardRequest) (*GetLeaderboardResponse, error)
 	GetMatch(context.Context, *GetMatchRequest) (*ArenaMatchResponse, error)
 	GetPlayerStats(context.Context, *GetPlayerStatsRequest) (*ArenaPlayerStatsResponse, error)
+	// GetQueueStatus GetQueueStatus is polled by the client (typically every 2s). Status
+	// goes WAITING → MATCHED (with match_id) or WAITING → TIMEOUT after 30s.
+	// On TIMEOUT the client offers the solo-timed fallback UI.
+	GetQueueStatus(context.Context, *GetQueueStatusRequest) (*GetQueueStatusResponse, error)
 	// GuildsLeaderboard GuildsLeaderboard ranks guilds by aggregate wins + member average
 	// rating. Powers the /leaderboards "guilds" tab.
 	GuildsLeaderboard(context.Context, *GuildsLeaderboardRequest) (*GuildsLeaderboardResponse, error)
 	JoinMatch(context.Context, *JoinMatchRequest) (*ArenaMatchResponse, error)
 	LeaveMatch(context.Context, *LeaveMatchRequest) (*ArenaMatchResponse, error)
+	LeaveQueue(context.Context, *LeaveQueueRequest) (*ArenaStatusResponse, error)
 	ReportAntiCheatEvent(context.Context, *ReportAntiCheatEventRequest) (*ArenaStatusResponse, error)
 	// SeasonXPLeaderboard SeasonXPLeaderboard ranks users by their current season-pass XP.
 	// Powers the /leaderboards "season" tab.
@@ -59,6 +73,9 @@ func RegisterArenaServiceHTTPServer(s *http.Server, srv ArenaServiceHTTPServer) 
 	r.POST("/api/v1/arena/matches/{match_id}/leave", _ArenaService_LeaveMatch0_HTTP_Handler(srv))
 	r.GET("/api/v1/arena/stats/{user_id}", _ArenaService_GetPlayerStats0_HTTP_Handler(srv))
 	r.POST("/api/v1/arena/anti-cheat/event", _ArenaService_ReportAntiCheatEvent0_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/queue/enqueue", _ArenaService_EnqueueForMatch0_HTTP_Handler(srv))
+	r.GET("/api/v1/arena/queue/status/{queue_id}", _ArenaService_GetQueueStatus0_HTTP_Handler(srv))
+	r.POST("/api/v1/arena/queue/leave", _ArenaService_LeaveQueue0_HTTP_Handler(srv))
 }
 
 func _ArenaService_CreateMatch0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
@@ -281,16 +298,93 @@ func _ArenaService_ReportAntiCheatEvent0_HTTP_Handler(srv ArenaServiceHTTPServer
 	}
 }
 
+func _ArenaService_EnqueueForMatch0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in EnqueueForMatchRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceEnqueueForMatch)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.EnqueueForMatch(ctx, req.(*EnqueueForMatchRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*EnqueueForMatchResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_GetQueueStatus0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetQueueStatusRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceGetQueueStatus)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetQueueStatus(ctx, req.(*GetQueueStatusRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetQueueStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _ArenaService_LeaveQueue0_HTTP_Handler(srv ArenaServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in LeaveQueueRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationArenaServiceLeaveQueue)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.LeaveQueue(ctx, req.(*LeaveQueueRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ArenaStatusResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type ArenaServiceHTTPClient interface {
 	CreateMatch(ctx context.Context, req *CreateMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
+	// EnqueueForMatch EnqueueForMatch puts the caller into the matchmaking queue for `mode`.
+	// If another player is already waiting, a match is created immediately
+	// and both players receive status=MATCHED on the next GetQueueStatus
+	// call. Queue state is in-memory per backend instance — fine for a
+	// single-replica deploy, needs Redis for multi-replica.
+	EnqueueForMatch(ctx context.Context, req *EnqueueForMatchRequest, opts ...http.CallOption) (rsp *EnqueueForMatchResponse, err error)
 	GetLeaderboard(ctx context.Context, req *GetLeaderboardRequest, opts ...http.CallOption) (rsp *GetLeaderboardResponse, err error)
 	GetMatch(ctx context.Context, req *GetMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	GetPlayerStats(ctx context.Context, req *GetPlayerStatsRequest, opts ...http.CallOption) (rsp *ArenaPlayerStatsResponse, err error)
+	// GetQueueStatus GetQueueStatus is polled by the client (typically every 2s). Status
+	// goes WAITING → MATCHED (with match_id) or WAITING → TIMEOUT after 30s.
+	// On TIMEOUT the client offers the solo-timed fallback UI.
+	GetQueueStatus(ctx context.Context, req *GetQueueStatusRequest, opts ...http.CallOption) (rsp *GetQueueStatusResponse, err error)
 	// GuildsLeaderboard GuildsLeaderboard ranks guilds by aggregate wins + member average
 	// rating. Powers the /leaderboards "guilds" tab.
 	GuildsLeaderboard(ctx context.Context, req *GuildsLeaderboardRequest, opts ...http.CallOption) (rsp *GuildsLeaderboardResponse, err error)
 	JoinMatch(ctx context.Context, req *JoinMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
 	LeaveMatch(ctx context.Context, req *LeaveMatchRequest, opts ...http.CallOption) (rsp *ArenaMatchResponse, err error)
+	LeaveQueue(ctx context.Context, req *LeaveQueueRequest, opts ...http.CallOption) (rsp *ArenaStatusResponse, err error)
 	ReportAntiCheatEvent(ctx context.Context, req *ReportAntiCheatEventRequest, opts ...http.CallOption) (rsp *ArenaStatusResponse, err error)
 	// SeasonXPLeaderboard SeasonXPLeaderboard ranks users by their current season-pass XP.
 	// Powers the /leaderboards "season" tab.
@@ -311,6 +405,24 @@ func (c *ArenaServiceHTTPClientImpl) CreateMatch(ctx context.Context, in *Create
 	pattern := "/api/v1/arena/matches"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationArenaServiceCreateMatch))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// EnqueueForMatch EnqueueForMatch puts the caller into the matchmaking queue for `mode`.
+// If another player is already waiting, a match is created immediately
+// and both players receive status=MATCHED on the next GetQueueStatus
+// call. Queue state is in-memory per backend instance — fine for a
+// single-replica deploy, needs Redis for multi-replica.
+func (c *ArenaServiceHTTPClientImpl) EnqueueForMatch(ctx context.Context, in *EnqueueForMatchRequest, opts ...http.CallOption) (*EnqueueForMatchResponse, error) {
+	var out EnqueueForMatchResponse
+	pattern := "/api/v1/arena/queue/enqueue"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceEnqueueForMatch))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {
@@ -358,6 +470,22 @@ func (c *ArenaServiceHTTPClientImpl) GetPlayerStats(ctx context.Context, in *Get
 	return &out, nil
 }
 
+// GetQueueStatus GetQueueStatus is polled by the client (typically every 2s). Status
+// goes WAITING → MATCHED (with match_id) or WAITING → TIMEOUT after 30s.
+// On TIMEOUT the client offers the solo-timed fallback UI.
+func (c *ArenaServiceHTTPClientImpl) GetQueueStatus(ctx context.Context, in *GetQueueStatusRequest, opts ...http.CallOption) (*GetQueueStatusResponse, error) {
+	var out GetQueueStatusResponse
+	pattern := "/api/v1/arena/queue/status/{queue_id}"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationArenaServiceGetQueueStatus))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 // GuildsLeaderboard GuildsLeaderboard ranks guilds by aggregate wins + member average
 // rating. Powers the /leaderboards "guilds" tab.
 func (c *ArenaServiceHTTPClientImpl) GuildsLeaderboard(ctx context.Context, in *GuildsLeaderboardRequest, opts ...http.CallOption) (*GuildsLeaderboardResponse, error) {
@@ -391,6 +519,19 @@ func (c *ArenaServiceHTTPClientImpl) LeaveMatch(ctx context.Context, in *LeaveMa
 	pattern := "/api/v1/arena/matches/{match_id}/leave"
 	path := binding.EncodeURL(pattern, in, false)
 	opts = append(opts, http.Operation(OperationArenaServiceLeaveMatch))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+func (c *ArenaServiceHTTPClientImpl) LeaveQueue(ctx context.Context, in *LeaveQueueRequest, opts ...http.CallOption) (*ArenaStatusResponse, error) {
+	var out ArenaStatusResponse
+	pattern := "/api/v1/arena/queue/leave"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationArenaServiceLeaveQueue))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
 	if err != nil {

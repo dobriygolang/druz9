@@ -106,3 +106,46 @@ export interface SeasonXPEntry {
   currentTier: number
   trophies: number
 }
+
+// --- Matchmaking (Wave B.3) ---------------------------------------------
+
+export type QueueStatus = 'UNSPECIFIED' | 'WAITING' | 'MATCHED' | 'TIMEOUT' | 'CANCELLED'
+
+// Backend returns status as the proto enum int, but grpc-gateway
+// serialises it as the full name. Client uses the name; this helper
+// keeps us resilient to either representation.
+function normaliseQueueStatus(raw: unknown): QueueStatus {
+  if (typeof raw === 'string') {
+    if (raw.endsWith('_WAITING')) return 'WAITING'
+    if (raw.endsWith('_MATCHED')) return 'MATCHED'
+    if (raw.endsWith('_TIMEOUT')) return 'TIMEOUT'
+    if (raw.endsWith('_CANCELLED')) return 'CANCELLED'
+    return (raw as QueueStatus) ?? 'UNSPECIFIED'
+  }
+  if (typeof raw === 'number') {
+    return (['UNSPECIFIED', 'WAITING', 'MATCHED', 'TIMEOUT', 'CANCELLED'][raw] as QueueStatus) ?? 'UNSPECIFIED'
+  }
+  return 'UNSPECIFIED'
+}
+
+export const arenaMatchmaking = {
+  enqueue: async (mode: string): Promise<{ queueId: string; estimatedWaitSeconds: number }> => {
+    const r = await apiClient.post<{ queueId?: string; estimatedWaitSeconds?: number }>(
+      '/api/v1/arena/queue/enqueue', { mode },
+    )
+    return { queueId: r.data.queueId ?? '', estimatedWaitSeconds: r.data.estimatedWaitSeconds ?? 0 }
+  },
+  status: async (queueId: string): Promise<{ status: QueueStatus; matchId: string; waitedSeconds: number }> => {
+    const r = await apiClient.get<{ status?: unknown; matchId?: string; waitedSeconds?: number }>(
+      `/api/v1/arena/queue/status/${queueId}`,
+    )
+    return {
+      status: normaliseQueueStatus(r.data.status),
+      matchId: r.data.matchId ?? '',
+      waitedSeconds: r.data.waitedSeconds ?? 0,
+    }
+  },
+  leave: async (queueId: string): Promise<void> => {
+    await apiClient.post('/api/v1/arena/queue/leave', { queueId })
+  },
+}

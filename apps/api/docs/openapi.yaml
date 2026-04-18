@@ -926,6 +926,70 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/arena.v1.SubmitCodeResponse'
+    /api/v1/arena/queue/enqueue:
+        post:
+            tags:
+                - ArenaService
+            description: |-
+                EnqueueForMatch puts the caller into the matchmaking queue for `mode`.
+                 If another player is already waiting, a match is created immediately
+                 and both players receive status=MATCHED on the next GetQueueStatus
+                 call. Queue state is in-memory per backend instance — fine for a
+                 single-replica deploy, needs Redis for multi-replica.
+            operationId: ArenaService_EnqueueForMatch
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.EnqueueForMatchRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.EnqueueForMatchResponse'
+    /api/v1/arena/queue/leave:
+        post:
+            tags:
+                - ArenaService
+            operationId: ArenaService_LeaveQueue
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/arena.v1.LeaveQueueRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.ArenaStatusResponse'
+    /api/v1/arena/queue/status/{queueId}:
+        get:
+            tags:
+                - ArenaService
+            description: |-
+                GetQueueStatus is polled by the client (typically every 2s). Status
+                 goes WAITING → MATCHED (with match_id) or WAITING → TIMEOUT after 30s.
+                 On TIMEOUT the client offers the solo-timed fallback UI.
+            operationId: ArenaService_GetQueueStatus
+            parameters:
+                - name: queueId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/arena.v1.GetQueueStatusResponse'
     /api/v1/arena/stats/{userId}:
         get:
             tags:
@@ -3953,6 +4017,23 @@ components:
                     format: enum
                 obfuscateOpponent:
                     type: boolean
+        arena.v1.EnqueueForMatchRequest:
+            type: object
+            properties:
+                mode:
+                    type: string
+                    description: Game mode key, e.g. "ranked_1v1", "casual_1v1", "team_2v2".
+        arena.v1.EnqueueForMatchResponse:
+            type: object
+            properties:
+                queueId:
+                    type: string
+                    description: |-
+                        queue_id is the ticket the client uses in subsequent GetQueueStatus
+                         and LeaveQueue calls.
+                estimatedWaitSeconds:
+                    type: integer
+                    format: int32
         arena.v1.GetLeaderboardResponse:
             type: object
             properties:
@@ -3962,6 +4043,18 @@ components:
                         $ref: '#/components/schemas/arena.v1.ArenaLeaderboardEntry'
                 season:
                     $ref: '#/components/schemas/arena.v1.ArenaSeasonInfo'
+        arena.v1.GetQueueStatusResponse:
+            type: object
+            properties:
+                status:
+                    type: integer
+                    format: enum
+                matchId:
+                    type: string
+                    description: match_id is filled when status = MATCHED.
+                waitedSeconds:
+                    type: integer
+                    format: int32
         arena.v1.GuildLeaderboardEntry:
             type: object
             properties:
@@ -4000,6 +4093,11 @@ components:
             type: object
             properties:
                 matchId:
+                    type: string
+        arena.v1.LeaveQueueRequest:
+            type: object
+            properties:
+                queueId:
                     type: string
         arena.v1.ReportAntiCheatEventRequest:
             type: object

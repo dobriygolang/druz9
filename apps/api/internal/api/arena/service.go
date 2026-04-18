@@ -56,6 +56,7 @@ type Implementation struct {
 	allowGuestAccess func() bool
 	reviewService    ReviewService
 	notif            notif.Sender
+	matchmaker       *Matchmaker
 }
 
 func New(service *apparena.Service, realtime RealtimePublisher, allowGuestAccess func() bool, reviewService ReviewService, n notif.Sender) *Implementation {
@@ -68,6 +69,7 @@ func New(service *apparena.Service, realtime RealtimePublisher, allowGuestAccess
 		allowGuestAccess: allowGuestAccess,
 		reviewService:    reviewService,
 		notif:            n,
+		matchmaker:       NewMatchmaker(),
 	}
 }
 
