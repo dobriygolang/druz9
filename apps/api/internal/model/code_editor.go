@@ -387,13 +387,3 @@ type CodeLeaderboardEntry struct {
 	BestSolveMs int64
 }
 
-type CodeUpdatedEvent struct {
-	Type   string // "code_updated", "participant_joined", "participant_left", "duel_started", "duel_finished"
-	Code   string
-	RoomID string
-}
-
-type ParticipantEvent struct {
-	Type        string
-	Participant *Participant
-}

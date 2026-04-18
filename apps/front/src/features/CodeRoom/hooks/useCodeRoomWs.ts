@@ -121,6 +121,12 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
   const isRemoteUpdate = useRef(false)
   const languageRef = useRef(language)
   languageRef.current = language
+  const userIdRef = useRef(userId)
+  userIdRef.current = userId
+  const guestNameRef = useRef(guestName)
+  guestNameRef.current = guestName
+  const displayNameRef = useRef(displayName)
+  displayNameRef.current = displayName
 
   // Fast userId→displayName index — avoids reading React state to resolve names
   const displayNameIndex = useRef<Map<string, string>>(new Map())
@@ -175,11 +181,11 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       target.send({
         type: 'awareness',
         awarenessId: awarenessId.current,
-        userId: userId ?? guestName ?? 'anonymous',
+        userId: userIdRef.current ?? guestNameRef.current ?? 'anonymous',
         data: awarenessPayload,
       })
     }
-  }, [guestName, userId])
+  }, [])
 
   useEffect(() => {
     setConnected(false)
@@ -324,8 +330,8 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
           type: 'hello',
           clientId: clientId.current,
           awarenessId: awarenessId.current,
-          userId: userId ?? undefined,
-          guestName: guestName ?? displayName,
+          userId: userIdRef.current ?? undefined,
+          guestName: guestNameRef.current ?? displayNameRef.current,
         })
         flushOutboundQueue(socket)
       },
@@ -342,8 +348,8 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
         socket.send({
           type: 'awareness',
           awarenessId: awarenessId.current,
-          userId: userId ?? guestName ?? 'anonymous',
-          data: JSON.stringify({ displayName, active: false }),
+          userId: userIdRef.current ?? guestNameRef.current ?? 'anonymous',
+          data: JSON.stringify({ displayName: displayNameRef.current, active: false }),
         })
       }
       socket.close()
@@ -359,7 +365,7 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
       pendingAwareness.current.clear()
       displayNameIndex.current.clear()
     }
-  }, [roomId, userId, enabled, handleMessage, displayName, guestName, flushOutboundQueue])
+  }, [roomId, enabled, handleMessage, flushOutboundQueue])
 
   const sendUpdate = useCallback((newCode: string) => {
     if (isRemoteUpdate.current) return
@@ -432,10 +438,10 @@ export function useCodeRoomWs(opts: UseCodeRoomWsOptions): UseCodeRoomWsReturn {
     socketRef.current.send({
       type: 'awareness',
       awarenessId: awarenessId.current,
-      userId: userId ?? guestName ?? 'anonymous',
+      userId: userIdRef.current ?? guestNameRef.current ?? 'anonymous',
       data: payload,
     })
-  }, [userId, guestName, displayName])
+  }, [displayName])
 
   return {
     connected,

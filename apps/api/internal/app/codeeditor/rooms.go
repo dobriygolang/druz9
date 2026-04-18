@@ -113,14 +113,6 @@ func (s *Service) CloseRoom(ctx context.Context, roomID uuid.UUID, callerID *uui
 	return s.repo.UpdateRoomStatus(ctx, roomID, model.RoomStatusFinished)
 }
 
-func (s *Service) SetRoomTaskByString(ctx context.Context, roomIDStr string, callerID *uuid.UUID, task string) error {
-	roomID, err := uuid.Parse(roomIDStr)
-	if err != nil {
-		return domain.ErrRoomNotFound
-	}
-	return s.SetRoomTask(ctx, roomID, callerID, task)
-}
-
 func (s *Service) SetRoomPrivacy(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, isPrivate bool) error {
 	room, err := s.repo.GetRoom(ctx, roomID)
 	if err != nil {
@@ -130,22 +122,6 @@ func (s *Service) SetRoomPrivacy(ctx context.Context, roomID uuid.UUID, callerID
 		return domain.ErrNotRoomCreator
 	}
 	return s.repo.UpdateRoomPrivacy(ctx, roomID, isPrivate)
-}
-
-func (s *Service) SetRoomPrivacyByString(ctx context.Context, roomIDStr string, callerID *uuid.UUID, isPrivate bool) error {
-	roomID, err := uuid.Parse(roomIDStr)
-	if err != nil {
-		return domain.ErrRoomNotFound
-	}
-	return s.SetRoomPrivacy(ctx, roomID, callerID, isPrivate)
-}
-
-func (s *Service) CloseRoomByString(ctx context.Context, roomIDStr string, callerID *uuid.UUID) error {
-	roomID, err := uuid.Parse(roomIDStr)
-	if err != nil {
-		return domain.ErrRoomNotFound
-	}
-	return s.CloseRoom(ctx, roomID, callerID)
 }
 
 func (s *Service) GetRoom(ctx context.Context, roomID uuid.UUID) (*domain.Room, error) {

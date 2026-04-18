@@ -9,7 +9,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// GetProfileProgress stub. Please implement it.
 func (i *Implementation) GetProfileProgress(ctx context.Context, req *v1.GetProfileProgressRequest) (*v1.ProfileProgressResponse, error) {
 	userID, err := uuid.Parse(req.UserId)
 	if err != nil {

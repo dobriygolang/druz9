@@ -2,7 +2,7 @@ package main
 
 import (
 	"api/internal/clients/notification"
-	"api/internal/notiftext"
+	"api/internal/clients/notification/notiftext"
 	"context"
 	"time"
 

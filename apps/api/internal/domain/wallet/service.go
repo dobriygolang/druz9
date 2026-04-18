@@ -136,6 +136,16 @@ func (a *StreakAdapter) DebitGold(ctx context.Context, userID uuid.UUID, amount 
 	return mapFundsErr(err)
 }
 
+// SkillsAdapter satisfies skills.WalletService without leaking the full Service type.
+type SkillsAdapter struct{ s *Service }
+
+func NewSkillsAdapter(s *Service) *SkillsAdapter { return &SkillsAdapter{s: s} }
+
+func (a *SkillsAdapter) DeductGold(ctx context.Context, userID uuid.UUID, amount int32) error {
+	_, err := a.s.Debit(ctx, userID, CurrencyGold, amount, model.WalletTxKindShop, "", "skill refund")
+	return mapFundsErr(err)
+}
+
 // mapFundsErr translates the domain-specific ErrInsufficientFunds into
 // the error type each caller domain already defines so wrapper code stays
 // minimal.

@@ -1,9 +1,5 @@
 package model
 
-type GeoResolveRequest struct {
-	Query string
-}
-
 type GeoCandidate struct {
 	Region      string
 	Country     string

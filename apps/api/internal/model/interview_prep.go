@@ -172,35 +172,6 @@ func (s InterviewPrepMockStageStatus) String() string {
 	return string(s)
 }
 
-type InterviewPrepCheckpointStatus string
-
-const (
-	InterviewPrepCheckpointStatusUnknown InterviewPrepCheckpointStatus = ""
-	InterviewPrepCheckpointStatusActive  InterviewPrepCheckpointStatus = "active"
-	InterviewPrepCheckpointStatusPassed  InterviewPrepCheckpointStatus = "passed"
-	InterviewPrepCheckpointStatusFailed  InterviewPrepCheckpointStatus = "failed"
-	InterviewPrepCheckpointStatusExpired InterviewPrepCheckpointStatus = "expired"
-)
-
-func (s InterviewPrepCheckpointStatus) String() string {
-	return string(s)
-}
-
-func InterviewPrepCheckpointStatusFromString(v string) InterviewPrepCheckpointStatus {
-	switch v {
-	case "active":
-		return InterviewPrepCheckpointStatusActive
-	case "passed":
-		return InterviewPrepCheckpointStatusPassed
-	case "failed":
-		return InterviewPrepCheckpointStatusFailed
-	case "expired":
-		return InterviewPrepCheckpointStatusExpired
-	default:
-		return InterviewPrepCheckpointStatusUnknown
-	}
-}
-
 func InterviewPrepMockStageStatusFromString(v string) InterviewPrepMockStageStatus {
 	switch v {
 	case "pending":
@@ -299,23 +270,6 @@ type InterviewPrepSession struct {
 	Questions       []*InterviewPrepQuestion
 	CurrentQuestion *InterviewPrepQuestion
 	Results         []*InterviewPrepQuestionResult
-}
-
-type InterviewPrepCheckpoint struct {
-	ID              uuid.UUID
-	UserID          uuid.UUID
-	TaskID          uuid.UUID
-	SessionID       uuid.UUID
-	SkillKey        string
-	Status          InterviewPrepCheckpointStatus
-	DurationSeconds int32
-	AttemptsUsed    int32
-	MaxAttempts     int32
-	Score           int32
-	StartedAt       time.Time
-	FinishedAt      *time.Time
-	CreatedAt       time.Time
-	UpdatedAt       time.Time
 }
 
 type InterviewPrepMockQuestionResult struct {

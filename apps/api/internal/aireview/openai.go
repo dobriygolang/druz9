@@ -138,6 +138,72 @@ func (o *openAICompatibleReviewer) ReviewInterviewSolution(ctx context.Context, 
 	return review, nil
 }
 
+func (o *openAICompatibleReviewer) Chat(ctx context.Context, req LiveChatRequest) (string, error) {
+	modelName := firstNonEmptyTrimmed(req.ModelOverride, o.model)
+	if o.apiKey == "" || modelName == "" {
+		return "", ErrNotConfigured
+	}
+
+	baseURL := o.baseURL
+	if baseURL == "" {
+		baseURL = "https://api.openai.com/v1"
+	}
+
+	apiMessages := make([]map[string]any, 0, len(req.Messages))
+	for _, m := range req.Messages {
+		apiMessages = append(apiMessages, map[string]any{
+			"role":    m.Role,
+			"content": m.Content,
+		})
+	}
+
+	payload := map[string]any{
+		"model":       modelName,
+		"messages":    apiMessages,
+		"temperature": 0.7,
+	}
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, baseURL+"/chat/completions", bytes.NewReader(body))
+	if err != nil {
+		return "", err
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+	httpReq.Header.Set("Authorization", "Bearer "+o.apiKey)
+
+	resp, err := o.client.Do(httpReq)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	if resp.StatusCode >= 400 {
+		return "", mapProviderError(resp.StatusCode, respBody)
+	}
+
+	var parsed struct {
+		Choices []struct {
+			Message struct {
+				Content string `json:"content"`
+			} `json:"message"`
+		} `json:"choices"`
+	}
+	if err := json.Unmarshal(respBody, &parsed); err != nil {
+		return "", err
+	}
+	if len(parsed.Choices) == 0 || strings.TrimSpace(parsed.Choices[0].Message.Content) == "" {
+		return "", ErrInvalidResponse
+	}
+	return strings.TrimSpace(parsed.Choices[0].Message.Content), nil
+}
+
 func (o *openAICompatibleReviewer) ReviewInterviewAnswer(ctx context.Context, req InterviewAnswerReviewRequest) (*InterviewAnswerReview, error) {
 	modelName := firstNonEmptyTrimmed(req.ModelOverride, o.model)
 	content := []map[string]any{

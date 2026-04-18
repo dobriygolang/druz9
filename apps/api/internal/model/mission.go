@@ -1,7 +1,5 @@
 package model
 
-import "time"
-
 // DailyMission represents a single daily mission with current progress.
 type DailyMission struct {
 	Key         string `json:"key"`
@@ -24,10 +22,3 @@ type DailyMissionsResponse struct {
 	TotalXPEarned  int32           `json:"totalXpEarned"`
 }
 
-// MissionCompletion tracks that a user completed a specific mission in a period.
-type MissionCompletion struct {
-	UserID      string    `json:"userId"`
-	MissionKey  string    `json:"missionKey"`
-	PeriodKey   string    `json:"periodKey"`
-	CompletedAt time.Time `json:"completedAt"`
-}

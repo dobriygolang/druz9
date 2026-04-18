@@ -1,0 +1,111 @@
+syntax = "proto3";
+
+package skills.v1;
+
+import "google/api/annotations.proto";
+
+option go_package = "api/pkg/api/skills/v1;v1";
+
+service SkillsService {
+  rpc GetSkillTree(GetSkillTreeRequest) returns (GetSkillTreeResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/skills/tree"
+    };
+  }
+
+  rpc GetSkillPoints(GetSkillPointsRequest) returns (GetSkillPointsResponse) {
+    option (google.api.http) = {
+      get: "/api/v1/skills/points"
+    };
+  }
+
+  rpc AllocateSkill(AllocateSkillRequest) returns (AllocateSkillResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/skills/{skill_id}/allocate"
+      body: "*"
+    };
+  }
+
+  rpc RefundSkill(RefundSkillRequest) returns (RefundSkillResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/skills/{skill_id}/refund"
+      body: "*"
+    };
+  }
+}
+
+// ── Requests / Responses ─────────────────────────────────────────────────────
+
+message GetSkillTreeRequest {}
+
+message GetSkillTreeResponse {
+  repeated SkillNode  nodes         = 1;
+  repeated SkillEdge  edges         = 2;
+  int32               points_available = 3;
+  int32               points_earned    = 4;
+  int32               points_spent     = 5;
+}
+
+message GetSkillPointsRequest {}
+
+message GetSkillPointsResponse {
+  int32 available = 1;
+  int32 earned    = 2;
+  int32 spent     = 3;
+}
+
+message AllocateSkillRequest {
+  string skill_id = 1;
+}
+
+message AllocateSkillResponse {
+  bool  success         = 1;
+  string error_message  = 2;
+  int32  points_remaining = 3;
+}
+
+message RefundSkillRequest {
+  string skill_id   = 1;
+}
+
+message RefundSkillResponse {
+  bool   success          = 1;
+  string error_message    = 2;
+  int32  gold_cost        = 3;
+  int32  points_returned  = 4;
+}
+
+// ── Domain messages ───────────────────────────────────────────────────────────
+
+message SkillNode {
+  string skill_id     = 1;
+  string label        = 2;
+  string description  = 3;
+  string branch       = 4;
+  bool   keystone     = 5;
+  // Canvas coordinates (1100×760 viewBox)
+  int32  x            = 6;
+  int32  y            = 7;
+  // "locked" | "available" | "allocated"
+  string state        = 8;
+  // Effect this node grants when allocated
+  SkillEffect effect  = 9;
+  // Refund cost in gold (0 when not allocated)
+  int32  refund_gold  = 10;
+}
+
+message SkillEdge {
+  string from_skill_id = 1;
+  string to_skill_id   = 2;
+}
+
+message SkillEffect {
+  // e.g. "xp_multiplier", "gold_multiplier", "arena_time_bonus_pct",
+  //       "streak_grace_hours", "hint_count", "free_ai_review_daily",
+  //       "streak_floor", "shop_discount_pct"
+  string type  = 1;
+  // Numeric value; interpretation depends on type
+  double value = 2;
+  // Human-readable label shown in the UI ("+ 10% training XP")
+  string label = 3;
+}

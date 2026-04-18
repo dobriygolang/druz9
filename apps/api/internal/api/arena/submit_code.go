@@ -6,7 +6,7 @@ import (
 	"api/internal/app/solutionreview"
 	"api/internal/metrics"
 	"api/internal/model"
-	"api/internal/notiftext"
+	"api/internal/clients/notification/notiftext"
 	v1 "api/pkg/api/arena/v1"
 
 	klog "github.com/go-kratos/kratos/v2/log"

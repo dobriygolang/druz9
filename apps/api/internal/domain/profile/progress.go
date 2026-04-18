@@ -188,14 +188,6 @@ func RecommendationHref(key string) string {
 	return "/prepare/interview-prep"
 }
 
-// SkillLabel returns the display label for a skill key.
-func SkillLabel(key string) string {
-	if meta, ok := SkillMetaByKey[key]; ok {
-		return meta.Label
-	}
-	return key
-}
-
 // ComputeCurrentStreak counts consecutive activity days from today backwards.
 func ComputeCurrentStreak(dates []time.Time, now time.Time) int32 {
 	if len(dates) == 0 {

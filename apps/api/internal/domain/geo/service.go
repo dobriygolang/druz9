@@ -46,15 +46,6 @@ func NewService(c Config) *Service {
 	}
 }
 
-// NewGeoService is an alias for NewService for backward compatibility.
-var NewGeoService = NewService
-
-func (s *Service) EnrichCommunityMapWithAvatarURLs(ctx context.Context, response *model.CommunityMapResponse) error {
-	_ = ctx
-	_ = response
-	return nil
-}
-
 // WorldPins proxies to the resolver. Kept as a domain method so callers
 // depend on geodomain.Service (not directly on the data layer).
 func (s *Service) WorldPins(ctx context.Context) ([]*model.WorldPin, error) {

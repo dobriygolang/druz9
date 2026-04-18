@@ -103,13 +103,6 @@ var (
 	)
 
 	// Podcast metrics
-	podcastsTotal = prometheus.NewCounter(
-		prometheus.CounterOpts{
-			Name: "business_podcasts_total",
-			Help: "Total number of podcasts",
-		},
-	)
-
 	podcastCreatedTotal = prometheus.NewCounter(
 		prometheus.CounterOpts{
 			Name: "business_podcast_created_total",
@@ -148,7 +141,6 @@ func init() {
 		usersTotal,
 		userRegisteredTotal,
 		activeUsers,
-		podcastsTotal,
 		podcastCreatedTotal,
 		listensTotal,
 		podcastListenTotal,
@@ -209,10 +201,6 @@ func SetActiveUsers(n int) {
 }
 
 // Podcast metrics
-func IncPodcasts() {
-	podcastsTotal.Inc()
-}
-
 func IncPodcastCreated() {
 	podcastCreatedTotal.Inc()
 }

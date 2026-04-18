@@ -8,7 +8,7 @@ import (
 	"api/internal/apihelpers"
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/model"
-	"api/internal/notiftext"
+	"api/internal/clients/notification/notiftext"
 	v1 "api/pkg/api/interview_prep/v1"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"

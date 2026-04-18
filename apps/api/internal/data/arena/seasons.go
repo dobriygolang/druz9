@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	arenarating "api/internal/arena/rating"
+	arenarating "api/internal/domain/arena/rating"
 	"api/internal/model"
 
 	"github.com/jackc/pgx/v5"

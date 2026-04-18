@@ -32,6 +32,9 @@ const GuildPage = lazy(() =>
 const ArenaHubPage = lazy(() =>
   import('@/pages/ArenaHubPage/ui/ArenaHubPage').then((m) => ({ default: m.ArenaHubPage })),
 )
+const SkillsPage = lazy(() =>
+  import('@/pages/SkillsPage/ui/SkillsPage').then((m) => ({ default: m.SkillsPage })),
+)
 const TrainingPage = lazy(() =>
   import('@/pages/TrainingPage/ui/TrainingPage').then((m) => ({ default: m.TrainingPage })),
 )
@@ -277,6 +280,10 @@ export const RouterProvider: React.FC = () => {
                   <ArenaMatchPage />
                 )
               }
+            />
+            <Route
+              path="/skills"
+              element={gate ? <Navigate to="/login" replace /> : <SkillsPage />}
             />
             <Route
               path="/training"

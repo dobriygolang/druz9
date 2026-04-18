@@ -187,7 +187,3 @@ func buildPayload(m map[string]any) *v1.NotificationPayload {
 	}
 	return p
 }
-
-// Ensure the import is used even if buildPayload returns nil everywhere
-// (fmt is imported by the adapter for error formatting).
-var _ = fmt.Errorf

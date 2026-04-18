@@ -93,31 +93,6 @@ func scanQuestionResult(s scanner) (*model.InterviewPrepQuestionResult, error) {
 	return &item, nil
 }
 
-func scanCheckpoint(s scanner) (*model.InterviewPrepCheckpoint, error) {
-	var item model.InterviewPrepCheckpoint
-	var status string
-	if err := s.Scan(
-		&item.ID,
-		&item.UserID,
-		&item.TaskID,
-		&item.SessionID,
-		&item.SkillKey,
-		&status,
-		&item.DurationSeconds,
-		&item.AttemptsUsed,
-		&item.MaxAttempts,
-		&item.Score,
-		&item.StartedAt,
-		&item.FinishedAt,
-		&item.CreatedAt,
-		&item.UpdatedAt,
-	); err != nil {
-		return nil, err
-	}
-	item.Status = model.InterviewPrepCheckpointStatusFromString(status)
-	return &item, nil
-}
-
 func scanMockSession(s scanner) (*model.InterviewPrepMockSession, error) {
 	var item model.InterviewPrepMockSession
 	var status string

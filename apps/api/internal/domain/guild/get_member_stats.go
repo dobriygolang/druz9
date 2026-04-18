@@ -3,7 +3,7 @@ package guild
 import (
 	"context"
 
-	arenarating "api/internal/arena/rating"
+	arenarating "api/internal/domain/arena/rating"
 	"api/internal/model"
 
 	"github.com/google/uuid"

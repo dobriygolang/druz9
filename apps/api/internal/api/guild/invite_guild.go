@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"api/internal/apihelpers"
-	"api/internal/notiftext"
+	"api/internal/clients/notification/notiftext"
 	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/guild/v1"
 )

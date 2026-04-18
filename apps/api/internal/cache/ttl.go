@@ -53,13 +53,6 @@ func (c *TTLCache[V]) GetMultiple(keys []string) map[string]V {
 	return result
 }
 
-// SetMultiple stores multiple values in cache using the default TTL.
-func (c *TTLCache[V]) SetMultiple(values map[string]V) {
-	for key, value := range values {
-		c.cache.Add(key, value)
-	}
-}
-
 // Keys returns all keys currently in the cache.
 func (c *TTLCache[V]) Keys() []string {
 	return c.cache.Keys()

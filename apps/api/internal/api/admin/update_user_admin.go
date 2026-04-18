@@ -10,7 +10,6 @@ import (
 	"github.com/google/uuid"
 )
 
-// UpdateUserAdmin stub. Please implement it.
 func (i *Implementation) UpdateUserAdmin(ctx context.Context, req *v1.UpdateUserAdminRequest) (*v1.AdminStatusResponse, error) {
 	userID, err := uuid.Parse(req.UserId)
 	if err != nil {

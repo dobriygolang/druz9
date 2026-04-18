@@ -3,10 +3,11 @@ import { useNavigate, useParams } from 'react-router-dom'
 import Editor, { type Monaco } from '@monaco-editor/react'
 import type * as MonacoTypes from 'monaco-editor'
 import { useTranslation } from 'react-i18next'
-import { Panel, RpgButton, Badge, usePixelToast } from '@/shared/ui/pixel'
+import { Panel, RpgButton, Badge, Modal, usePixelToast } from '@/shared/ui/pixel'
 import { Hero, Fireflies } from '@/shared/ui/sprites'
 import { PageMeta } from '@/shared/ui/PageMeta'
 import { i18n } from '@/shared/i18n'
+import { chatWithMentor, type LiveChatMessage } from '@/features/InterviewPrep/api/interviewLiveApi'
 
 type Speaker = 'mentor' | 'you'
 
@@ -111,33 +112,79 @@ export function InterviewLiveSessionPage() {
   const [code, setCode] = useState(scenario.starterCode)
   const [seconds, setSeconds] = useState(0)
   const [ended, setEnded] = useState(false)
+  const [paused, setPaused] = useState(false)
+  const [showEndModal, setShowEndModal] = useState(false)
+  const [nudgeCount, setNudgeCount] = useState(0)
+  const [mentorTyping, setMentorTyping] = useState(false)
   const nextId = useRef(4)
 
   useEffect(() => {
-    if (ended) return
+    if (ended || paused) return
     const id = setInterval(() => setSeconds((s) => s + 1), 1000)
     return () => clearInterval(id)
-  }, [ended])
+  }, [ended, paused])
 
   const mm = String(Math.floor(seconds / 60)).padStart(2, '0')
   const ss = String(seconds % 60).padStart(2, '0')
 
-  const send = () => {
+  const buildSystemPrompt = (currentCode: string) => {
+    const codeBlock = currentCode.trim()
+      ? `\n\nCandidate's current code:\n\`\`\`python\n${currentCode.slice(0, 2000)}\n\`\`\``
+      : ''
+    return `You are ${mentor}, an expert technical interviewer conducting a live coding interview.
+
+Topic: ${scenario.topic}
+Problem: ${scenario.title}
+Statement: ${scenario.starterQuestion}${codeBlock}
+
+Guidelines:
+- Keep responses concise (2–4 sentences)
+- Ask probing follow-up questions to test understanding
+- Do NOT solve the problem for the candidate
+- If the candidate asks for a hint, give a nudge toward the right approach without revealing the solution
+- Stay in character as ${mentor}
+- Match the language of the candidate's messages (Russian or English)`
+  }
+
+  const callMentor = async (currentMessages: ChatMessage[], userText: string, currentCode: string, hintMode = false) => {
+    const systemContent = hintMode
+      ? buildSystemPrompt(currentCode) + '\n\nThe candidate is explicitly asking for a hint. Give a helpful nudge without revealing the complete solution.'
+      : buildSystemPrompt(currentCode)
+
+    const apiMessages: LiveChatMessage[] = [
+      { role: 'system', content: systemContent },
+      ...currentMessages.map((m) => ({
+        role: (m.speaker === 'mentor' ? 'assistant' : 'user') as 'assistant' | 'user',
+        content: m.text,
+      })),
+      { role: 'user', content: userText },
+    ]
+
+    const { reply } = await chatWithMentor(apiMessages)
+    return reply
+  }
+
+  const send = async () => {
     const text = draft.trim()
-    if (!text) return
+    if (!text || mentorTyping) return
     const time = `${mm}:${ss}`
+
     setMessages((m) => [...m, { id: nextId.current++, speaker: 'you', text, timeAt: time }])
     setDraft('')
-    // Mentor auto-reply from follow-up list
-    setTimeout(() => {
-      setMessages((m) => {
-        const used = m.filter((x) => x.speaker === 'mentor').length - 3
-        const next =
-          scenario.followUps[used % scenario.followUps.length] ??
-          t('interviewLive.followUps.constraints')
-        return [...m, { id: nextId.current++, speaker: 'mentor', text: next, timeAt: `${mm}:${ss}` }]
-      })
-    }, 900)
+    setMentorTyping(true)
+
+    const snapshot = [...messages]
+    const currentCode = code
+    try {
+      const reply = await callMentor(snapshot, text, currentCode)
+      setMessages((m) => [...m, { id: nextId.current++, speaker: 'mentor', text: reply, timeAt: `${mm}:${ss}` }])
+    } catch {
+      const used = snapshot.filter((x) => x.speaker === 'mentor').length - 3
+      const fallback = scenario.followUps[used % scenario.followUps.length] ?? t('interviewLive.followUps.constraints')
+      setMessages((m) => [...m, { id: nextId.current++, speaker: 'mentor', text: fallback, timeAt: `${mm}:${ss}` }])
+    } finally {
+      setMentorTyping(false)
+    }
   }
 
   const handleMount = (_e: MonacoTypes.editor.IStandaloneCodeEditor, monaco: Monaco) => {
@@ -164,8 +211,33 @@ export function InterviewLiveSessionPage() {
   }
 
   const endSession = () => {
+    setShowEndModal(false)
     setEnded(true)
     toast({ kind: 'success', message: t('interviewLive.toast.ended') })
+  }
+
+  const requestNudge = async () => {
+    if (mentorTyping) return
+    const time = `${mm}:${ss}`
+    const hintText = t('interviewLive.hint.request')
+    const idx = nudgeCount % 3
+    setNudgeCount((n) => n + 1)
+
+    setMessages((m) => [...m, { id: nextId.current++, speaker: 'you', text: hintText, timeAt: time }])
+    setMentorTyping(true)
+
+    const snapshot = [...messages]
+    try {
+      const reply = await callMentor(snapshot, hintText, code, true)
+      setMessages((m) => [...m, { id: nextId.current++, speaker: 'mentor', text: reply, timeAt: time }])
+    } catch {
+      setMessages((m) => [
+        ...m,
+        { id: nextId.current++, speaker: 'mentor', text: t(`interviewLive.hint.response${idx}`), timeAt: time },
+      ])
+    } finally {
+      setMentorTyping(false)
+    }
   }
 
   return (
@@ -280,15 +352,18 @@ export function InterviewLiveSessionPage() {
             }}
           >
             <div style={{ display: 'flex', gap: 6, flexWrap: 'wrap', justifyContent: 'flex-end' }}>
-              <Badge variant="ember">{t('interviewLive.badge.live')}</Badge>
+              {paused
+                ? <Badge variant="dark">{t('interviewLive.badge.paused')}</Badge>
+                : <Badge variant="ember">{t('interviewLive.badge.live')}</Badge>
+              }
               <Badge variant="moss">{t('interviewLive.badge.recording')}</Badge>
               <Badge variant="dark">{t('interviewLive.badge.aiPacing')}</Badge>
             </div>
             <div style={{ display: 'flex', gap: 8 }}>
-              <RpgButton size="sm" variant="ghost" disabled={ended}>
-                {t('interviewLive.action.pause')}
+              <RpgButton size="sm" variant="ghost" disabled={ended} onClick={() => setPaused((p) => !p)}>
+                {paused ? t('interviewLive.action.resume') : t('interviewLive.action.pause')}
               </RpgButton>
-              <RpgButton size="sm" variant="primary" onClick={endSession} disabled={ended}>
+              <RpgButton size="sm" variant="primary" onClick={() => setShowEndModal(true)} disabled={ended}>
                 {t('interviewLive.action.finish')}
               </RpgButton>
             </div>
@@ -300,7 +375,7 @@ export function InterviewLiveSessionPage() {
       <div
         style={{
           display: 'grid',
-          gridTemplateColumns: '380px 1fr 280px',
+          gridTemplateColumns: '300px 1fr 220px',
           gap: 14,
         }}
       >
@@ -316,6 +391,29 @@ export function InterviewLiveSessionPage() {
             {messages.map((m) => (
               <Bubble key={m.id} msg={m} mentorName={mentor} />
             ))}
+            {mentorTyping && (
+              <div style={{ marginBottom: 10 }}>
+                <div
+                  className="font-silkscreen uppercase"
+                  style={{ fontSize: 9, color: 'var(--ember-1)', letterSpacing: '0.08em', marginBottom: 3 }}
+                >
+                  {mentor}
+                </div>
+                <div
+                  style={{
+                    padding: '8px 10px',
+                    background: 'var(--parch-0)',
+                    border: '2px solid var(--ink-0)',
+                    borderLeft: '6px solid var(--ember-1)',
+                    fontSize: 18,
+                    color: 'var(--ember-2)',
+                    letterSpacing: '0.2em',
+                  }}
+                >
+                  •••
+                </div>
+              </div>
+            )}
             {ended && (
               <div
                 className="rpg-panel rpg-panel--recessed"
@@ -378,7 +476,7 @@ export function InterviewLiveSessionPage() {
                 color: 'var(--ink-0)',
               }}
             />
-            <RpgButton variant="primary" onClick={send} disabled={ended || !draft.trim()}>
+            <RpgButton variant="primary" onClick={send} disabled={ended || !draft.trim() || mentorTyping}>
               {t('interviewLive.action.send')}
             </RpgButton>
           </div>
@@ -457,7 +555,7 @@ export function InterviewLiveSessionPage() {
             <div style={{ fontSize: 12, color: 'var(--ink-2)', marginBottom: 8 }}>
               {t('interviewLive.panel.hintsBody')}
             </div>
-            <RpgButton size="sm" variant="ghost" disabled={ended}>
+            <RpgButton size="sm" variant="ghost" disabled={ended || mentorTyping} onClick={requestNudge}>
               {t('interviewLive.action.nudge')}
             </RpgButton>
           </Panel>
@@ -476,6 +574,28 @@ export function InterviewLiveSessionPage() {
           </Panel>
         </div>
       </div>
+
+      <Modal open={showEndModal} onClose={() => setShowEndModal(false)}>
+        <div style={{ padding: 24, minWidth: 300 }}>
+          <div
+            className="font-silkscreen uppercase"
+            style={{ fontSize: 12, color: 'var(--ember-1)', letterSpacing: '0.08em', marginBottom: 12 }}
+          >
+            {t('interviewLive.modal.finish.title')}
+          </div>
+          <div style={{ fontSize: 13, color: 'var(--ink-1)', marginBottom: 20, lineHeight: 1.5 }}>
+            {t('interviewLive.modal.finish.body')}
+          </div>
+          <div style={{ display: 'flex', gap: 10, justifyContent: 'flex-end' }}>
+            <RpgButton size="sm" variant="ghost" onClick={() => setShowEndModal(false)}>
+              {t('interviewLive.modal.finish.cancel')}
+            </RpgButton>
+            <RpgButton size="sm" variant="primary" onClick={endSession}>
+              {t('interviewLive.modal.finish.confirm')}
+            </RpgButton>
+          </div>
+        </div>
+      </Modal>
     </div>
   )
 }

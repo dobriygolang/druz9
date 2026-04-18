@@ -5,12 +5,12 @@ import (
 	adminservice "api/internal/api/admin"
 	arenaservice "api/internal/api/arena"
 	challengeservice "api/internal/api/challenge"
-	guildservice "api/internal/api/guild"
 	codeeditorservice "api/internal/api/code_editor"
-	eventservice "api/internal/api/event"
-	geoservice "api/internal/api/geo"
 	duelreplayservice "api/internal/api/duel_replay"
+	eventservice "api/internal/api/event"
 	friendchallengeservice "api/internal/api/friend_challenge"
+	geoservice "api/internal/api/geo"
+	guildservice "api/internal/api/guild"
 	hubservice "api/internal/api/hub"
 	inboxservice "api/internal/api/inbox"
 	interviewprepservice "api/internal/api/interview_prep"
@@ -23,8 +23,9 @@ import (
 	shopservice "api/internal/api/shop"
 	socialservice "api/internal/api/social"
 	streakservice "api/internal/api/streak"
+	skillsservice "api/internal/api/skills"
 	trainingservice "api/internal/api/training"
-	apparenа "api/internal/app/arena"
+	apparena "api/internal/app/arena"
 	appcodeeditor "api/internal/app/codeeditor"
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/app/solutionreview"
@@ -32,11 +33,11 @@ import (
 	"api/internal/closer"
 	admindomainservice "api/internal/domain/admin"
 	challengedomainservice "api/internal/domain/challenge"
-	guilddomainservice "api/internal/domain/guild"
 	duelreplaydomain "api/internal/domain/duel_replay"
 	eventdomainservice "api/internal/domain/event"
 	friendchallengedomain "api/internal/domain/friend_challenge"
 	geodomainservice "api/internal/domain/geo"
+	guilddomainservice "api/internal/domain/guild"
 	inboxdomainservice "api/internal/domain/inbox"
 	missiondomainservice "api/internal/domain/mission"
 	podcastdomainservice "api/internal/domain/podcast"
@@ -47,6 +48,7 @@ import (
 	socialdomain "api/internal/domain/social"
 	streakdomain "api/internal/domain/streak"
 	walletdomain "api/internal/domain/wallet"
+
 	arenart "api/internal/realtime/arena"
 	codeeditorrt "api/internal/realtime/codeeditor"
 	"api/internal/sandbox"
@@ -55,54 +57,45 @@ import (
 	"strings"
 )
 
+// serviceContext holds only the services that are accessed from outside
+// initializeServices (transport registration, background workers, HTTP routes).
+// Intermediate domain services used solely to wire up handlers stay as local
+// variables inside initializeServices.
 type serviceContext struct {
-	cookies                 *server.SessionCookieManager
-	notificationSender      notification.Sender
-	aiReviewService         aireview.Reviewer
-	profileServiceDomain    *profiledomainservice.Service
-	adminServiceDomain      *admindomainservice.Service
-	geoServiceDomain        *geodomainservice.Service
-	guildServiceDomain     *guilddomainservice.Service
-	eventServiceDomain      *eventdomainservice.Service
-	podcastServiceDomain    *podcastdomainservice.Service
-	referralServiceDomain   *referraldomainservice.Service
+	cookies              *server.SessionCookieManager
+	notificationSender   notification.Sender
+	profileServiceDomain *profiledomainservice.Service
 	codeEditorServiceDomain *appcodeeditor.Service
-	arenaServiceDomain      *apparenа.Service
-	interviewPrepDomain     *appinterviewprep.Service
-	realtimeHub             *codeeditorrt.Hub
-	arenaRealtimeHub        *arenart.Hub
-	adminService            *adminservice.Implementation
-	profileService          *profileservice.Implementation
-	geoService              *geoservice.Implementation
-	hubService              *hubservice.Implementation
-	guildService           *guildservice.Implementation
-	eventService            *eventservice.Implementation
-	podcastService          *podcastservice.Implementation
-	referralService         *referralservice.Implementation
-	trainingService         *trainingservice.Implementation
-	codeEditorService       *codeeditorservice.Implementation
-	arenaService            *arenaservice.Implementation
-	interviewPrepService    *interviewprepservice.Implementation
-	missionServiceDomain    *missiondomainservice.Service
-	missionService          *missionservice.Implementation
-	notificationSettings    *notificationservice.SettingsImplementation
-	challengeServiceDomain  *challengedomainservice.Service
-	challengeService        *challengeservice.Implementation
-	inboxServiceDomain      *inboxdomainservice.Service
-	inboxService            *inboxservice.Implementation
-	friendChallengeDomain   *friendchallengedomain.Service
-	friendChallengeService  *friendchallengeservice.Implementation
-	duelReplayDomain        *duelreplaydomain.Service
-	duelReplayService       *duelreplayservice.Implementation
-	seasonPassDomain        *seasonpassdomain.Service
-	seasonPassService       *seasonpassservice.Implementation
-	streakDomain            *streakdomain.Service
-	streakService           *streakservice.Implementation
-	shopDomain              *shopdomain.Service
-	shopService             *shopservice.Implementation
-	socialDomain            *socialdomain.Service
-	socialService           *socialservice.Implementation
-	walletDomain            *walletdomain.Service
+	arenaServiceDomain   *apparena.Service
+	friendChallengeDomain *friendchallengedomain.Service
+	realtimeHub          *codeeditorrt.Hub
+	arenaRealtimeHub     *arenart.Hub
+
+	aiReviewer           aireview.Reviewer
+
+	adminService         *adminservice.Implementation
+	profileService       *profileservice.Implementation
+	geoService           *geoservice.Implementation
+	hubService           *hubservice.Implementation
+	guildService         *guildservice.Implementation
+	eventService         *eventservice.Implementation
+	podcastService       *podcastservice.Implementation
+	referralService      *referralservice.Implementation
+	skillsService        *skillsservice.Implementation
+	trainingService      *trainingservice.Implementation
+	codeEditorService    *codeeditorservice.Implementation
+	arenaService         *arenaservice.Implementation
+	interviewPrepService *interviewprepservice.Implementation
+	missionService       *missionservice.Implementation
+	notificationSettings *notificationservice.SettingsImplementation
+	challengeService     *challengeservice.Implementation
+	inboxService         *inboxservice.Implementation
+	friendChallengeService *friendchallengeservice.Implementation
+	duelReplayService    *duelreplayservice.Implementation
+	seasonPassService    *seasonpassservice.Implementation
+	streakService        *streakservice.Implementation
+	shopService          *shopservice.Implementation
+	socialService        *socialservice.Implementation
 }
 
 func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*serviceContext, error) {
@@ -117,6 +110,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 	} else {
 		sandboxService = sandbox.New()
 	}
+
 	aiReviewService := aireview.New(aireview.Config{
 		Provider: bootstrap.cfg.External.AIReview.Provider,
 		BaseURL:  bootstrap.cfg.External.AIReview.BaseURL,
@@ -152,7 +146,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 	adminServiceDomain := admindomainservice.NewService(admindomainservice.Config{
 		ProfileRepository: storage.profileRepo,
 	})
-	geoServiceDomain := geodomainservice.NewGeoService(geodomainservice.Config{
+	geoServiceDomain := geodomainservice.NewService(geodomainservice.Config{
 		Resolver:      storage.geoResolver,
 		ActivityCache: profileServiceDomain.ActivityCache(),
 	})
@@ -175,6 +169,7 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 	})
 	realtimeHub := codeeditorrt.NewHub(codeEditorServiceDomain, bootstrap.cfg.Server.AllowedOrigins)
 	closer.AddSync(func() error { realtimeHub.Stop(); return nil })
+
 	// Wallet + SeasonPass are declared first so downstream services
 	// (arena, interview, training) can receive a SeasonPassAwarder and
 	// credit XP on match/session completion.
@@ -185,12 +180,14 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		Repository: storage.seasonPassRepo,
 		Wallet:     walletdomain.NewSeasonPassAdapter(walletDomain),
 	})
+	skillsDomain := skillsservice.NewService(storage.skillsRepo, walletdomain.NewSkillsAdapter(walletDomain))
+
 	// duel_replay is declared next so arena can record a replay header
 	// when matches finish.
 	duelReplayDomain := duelreplaydomain.NewService(duelreplaydomain.Config{
 		Repository: storage.duelReplayRepo,
 	})
-	arenaServiceDomain := apparenа.New(apparenа.Config{
+	arenaServiceDomain := apparena.New(apparena.Config{
 		Repository: storage.arenaRepo,
 		Sandbox:    sandboxService,
 		SeasonPass: seasonPassDomain,
@@ -264,52 +261,39 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 	return &serviceContext{
 		cookies:                 cookies,
 		notificationSender:      notifSender,
-		aiReviewService:         aiReviewService,
 		profileServiceDomain:    profileServiceDomain,
-		adminServiceDomain:      adminServiceDomain,
-		geoServiceDomain:        geoServiceDomain,
-		guildServiceDomain:     guildServiceDomain,
-		eventServiceDomain:      eventServiceDomain,
-		podcastServiceDomain:    podcastServiceDomain,
-		referralServiceDomain:   referralServiceDomain,
 		codeEditorServiceDomain: codeEditorServiceDomain,
 		arenaServiceDomain:      arenaServiceDomain,
-		interviewPrepDomain:     interviewPrepDomain,
+		friendChallengeDomain:   friendChallengeDomain,
 		realtimeHub:             realtimeHub,
 		arenaRealtimeHub:        arenaRealtimeHub,
+
+		aiReviewer:              aiReviewService,
+
 		adminService:            adminservice.New(adminServiceDomain, bootstrap.rtcManager, storage.profileRepo, profileServiceDomain),
 		profileService:          profileservice.New(profileServiceDomain, cookies, profileservice.NewCachedProgressRepository(storage.profileRepo), notifSender),
 		geoService:              geoservice.New(geoServiceDomain),
 		hubService:              hubservice.New(storage.profileRepo, missionServiceDomain, eventServiceDomain, arenaServiceDomain, guildServiceDomain),
-		guildService:           guildservice.New(guildServiceDomain, eventServiceDomain, notifSender),
+		guildService:            guildservice.New(guildServiceDomain, eventServiceDomain, notifSender),
 		eventService:            eventservice.New(eventServiceDomain),
 		podcastService:          podcastservice.New(podcastServiceDomain),
 		referralService:         referralservice.New(referralServiceDomain),
+		skillsService:           skillsservice.New(skillsDomain),
 		trainingService:         trainingservice.New(trainingservice.NewService(storage.profileRepo, codeEditorServiceDomain, sandboxService, solutionReviewService, seasonPassDomain)),
 		codeEditorService:       codeeditorservice.New(codeEditorServiceDomain, realtimeHub, aiReviewService, solutionReviewService),
 		arenaService: arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
 		}, solutionReviewService, notifSender),
 		interviewPrepService:   interviewprepservice.New(interviewPrepDomain, storage.interviewRepo, notifSender),
-		missionServiceDomain:   missionServiceDomain,
 		missionService:         missionservice.New(missionServiceDomain),
 		notificationSettings:   notificationservice.NewSettings(notifSender),
-		challengeServiceDomain: challengeServiceDomain,
 		challengeService:       challengeservice.New(challengeServiceDomain),
-		inboxServiceDomain:     inboxServiceDomain,
 		inboxService:           inboxservice.New(inboxServiceDomain),
-		friendChallengeDomain:  friendChallengeDomain,
 		friendChallengeService: friendchallengeservice.New(friendChallengeDomain),
-		duelReplayDomain:       duelReplayDomain,
 		duelReplayService:      duelreplayservice.New(duelReplayDomain),
-		seasonPassDomain:       seasonPassDomain,
 		seasonPassService:      seasonpassservice.New(seasonPassDomain),
-		streakDomain:           streakDomain,
 		streakService:          streakservice.New(streakDomain),
-		shopDomain:             shopDomain,
 		shopService:            shopservice.New(shopDomain),
-		socialDomain:           socialDomain,
 		socialService:          socialservice.New(socialDomain),
-		walletDomain:           walletDomain,
 	}, nil
 }

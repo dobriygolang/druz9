@@ -377,18 +377,6 @@ type ArenaSeason struct {
 	IsActive     bool
 }
 
-type ArenaSeasonResult struct {
-	UserID       string
-	SeasonNumber int32
-	FinalRating  int32
-	FinalLeague  string
-	LeagueRank   int32
-	PeakRating   int32
-	Wins         int32
-	Losses       int32
-	Matches      int32
-}
-
 type ArenaRatingPenalty struct {
 	ID          uuid.UUID
 	MatchID     uuid.UUID

@@ -38,10 +38,6 @@ var (
 	ErrSystemDesignOnly            = errors.New("ai review is available only for system design tasks")
 	ErrInvalidReviewImage          = errors.New("invalid review image: only png, jpeg, webp are supported")
 	ErrReviewImageTooLarge         = errors.New("review image is too large")
-	ErrCheckpointUnsupported       = errors.New("checkpoint is available only for executable tasks")
-	ErrCheckpointNotFound          = errors.New("checkpoint not found")
-	ErrCheckpointExpired           = errors.New("checkpoint time expired")
-	ErrCheckpointAttemptsExceeded  = errors.New("checkpoint attempts exceeded")
 	ErrMockStageKindMismatch       = errors.New("submitted mock stage kind does not match current stage")
 )
 
@@ -358,20 +354,6 @@ func (s *Service) GetAvailableCompanies(ctx context.Context) ([]string, error) {
 
 func (s *Service) ListMockBlueprints(ctx context.Context) ([]*model.InterviewMockBlueprintSummary, error) {
 	return s.repo.ListMockBlueprints(ctx)
-}
-
-func (s *Service) StartCheckpointSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, *model.InterviewPrepCheckpoint, error) {
-	_ = ctx
-	_ = user
-	_ = taskID
-	return nil, nil, ErrCheckpointUnsupported
-}
-
-func (s *Service) GetCheckpointBySession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepCheckpoint, error) {
-	_ = ctx
-	_ = user
-	_ = sessionID
-	return nil, ErrCheckpointUnsupported
 }
 
 func (s *Service) StartSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, error) {

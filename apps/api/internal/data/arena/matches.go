@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	arenarating "api/internal/arena/rating"
+	arenarating "api/internal/domain/arena/rating"
 	"api/internal/data/codetasks"
 	domain "api/internal/domain/arena"
 	"api/internal/model"

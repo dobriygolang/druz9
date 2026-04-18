@@ -27,8 +27,6 @@ type Service interface {
 	Submit(ctx context.Context, user *model.User, sessionID uuid.UUID, code string, solveLanguage string) (*appinterviewprep.SubmitResult, error)
 	ReviewSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req appinterviewprep.SystemDesignReviewInput) (*appinterviewprep.SystemDesignReviewResult, error)
 	AnswerQuestion(ctx context.Context, user *model.User, sessionID, questionID uuid.UUID, assessment string, answer string) (*appinterviewprep.QuestionAnswerResult, error)
-	StartCheckpointSession(ctx context.Context, user *model.User, taskID uuid.UUID) (*model.InterviewPrepSession, *model.InterviewPrepCheckpoint, error)
-	GetCheckpointBySession(ctx context.Context, user *model.User, sessionID uuid.UUID) (*model.InterviewPrepCheckpoint, error)
 }
 
 type AdminRepo interface {

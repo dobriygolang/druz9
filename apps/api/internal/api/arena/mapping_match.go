@@ -9,10 +9,6 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
-func mapArenaMatch(match *domain.Match) *v1.ArenaMatch {
-	return mapArenaMatchForViewer(match, "", true)
-}
-
 func mapArenaMatchForViewer(match *domain.Match, viewerUserID string, spectator bool) *v1.ArenaMatch {
 	if match == nil {
 		return nil
@@ -57,10 +53,6 @@ func mapArenaMatchForViewer(match *domain.Match, viewerUserID string, spectator 
 	}
 
 	return result
-}
-
-func mapArenaPlayer(player *domain.Player) *v1.ArenaPlayer {
-	return mapArenaPlayerForViewer(nil, player, "", true)
 }
 
 func mapArenaPlayerForViewer(match *domain.Match, player *domain.Player, viewerUserID string, spectator bool) *v1.ArenaPlayer {

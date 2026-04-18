@@ -97,14 +97,10 @@ func ComputeReadiness(p *model.ProfileProgress) *Readiness {
 	// 3. Practice consistency (15% weight)
 	consistency := computeConsistency(p.Overview)
 
-	// 4. Checkpoint coverage (15% weight)
-	checkpointCov := computeCheckpointCoverage(p.Checkpoints)
-
 	score := int32(math.Round(
 		competencyAvg*0.4 +
 			mockPerf*0.3 +
-			consistency*0.15 +
-			checkpointCov*0.15,
+			consistency*0.15,
 	))
 	if score > 100 {
 		score = 100
@@ -178,20 +174,6 @@ func computeMockPerformance(ov model.ProfileProgressOverview) float64 {
 func computeConsistency(ov model.ProfileProgressOverview) float64 {
 	// practiceActiveDays / 30 * 100, capped at 100
 	return math.Min(100, float64(ov.PracticeActiveDays)/30.0*100)
-}
-
-func computeCheckpointCoverage(checkpoints []*model.ProfileCheckpointProgress) float64 {
-	totalSkills := len(ProgressSkills)
-	if totalSkills == 0 {
-		return 0
-	}
-	passed := make(map[string]bool)
-	for _, cp := range checkpoints {
-		if cp != nil && cp.Score >= 50 {
-			passed[cp.SkillKey] = true
-		}
-	}
-	return float64(len(passed)) / float64(totalSkills) * 100
 }
 
 func buildNextAction(p *model.ProfileProgress, weakest *model.ProfileCompetency) *ReadinessNextAction {

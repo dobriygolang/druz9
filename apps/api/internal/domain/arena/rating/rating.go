@@ -56,16 +56,6 @@ func NextRating(self, opponent int32, score float64, difficulty string) int32 {
 	return int32(math.Round(next))
 }
 
-// SeasonResetRating computes the soft-reset rating for a new season.
-// Formula: 75% current + 25% default — compresses the spread without full reset.
-func SeasonResetRating(current int32) int32 {
-	reset := float64(current)*0.75 + float64(DefaultRating)*0.25
-	if reset < float64(MinimumRating) {
-		reset = float64(MinimumRating)
-	}
-	return int32(math.Round(reset))
-}
-
 // LeagueIndex returns the 0-based index of the league for a given rating.
 func LeagueIndex(rating int32) int {
 	idx := 0
@@ -77,11 +67,3 @@ func LeagueIndex(rating int32) int {
 	return idx
 }
 
-// NextLeagueThreshold returns the min rating for the next league, or -1 if already at top.
-func NextLeagueThreshold(rating int32) int32 {
-	idx := LeagueIndex(rating)
-	if idx >= len(Leagues)-1 {
-		return -1
-	}
-	return Leagues[idx+1].MinRating
-}

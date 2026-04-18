@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"net/http"
+	"strings"
 )
 
 type geminiReviewer struct {
@@ -128,6 +129,91 @@ func (g *geminiReviewer) ReviewInterviewSolution(ctx context.Context, req Interv
 	review.Provider = "gemini"
 	review.Model = modelName
 	return review, nil
+}
+
+func (g *geminiReviewer) Chat(ctx context.Context, req LiveChatRequest) (string, error) {
+	modelName := firstNonEmptyTrimmed(req.ModelOverride, g.model)
+	if g.apiKey == "" || modelName == "" {
+		return "", ErrNotConfigured
+	}
+
+	baseURL := g.baseURL
+	if baseURL == "" {
+		baseURL = "https://generativelanguage.googleapis.com"
+	}
+
+	var systemParts []map[string]any
+	contents := make([]map[string]any, 0, len(req.Messages))
+
+	for _, m := range req.Messages {
+		switch m.Role {
+		case "system":
+			systemParts = append(systemParts, map[string]any{"text": m.Content})
+		case "user":
+			contents = append(contents, map[string]any{
+				"role":  "user",
+				"parts": []map[string]any{{"text": m.Content}},
+			})
+		case "assistant":
+			contents = append(contents, map[string]any{
+				"role":  "model",
+				"parts": []map[string]any{{"text": m.Content}},
+			})
+		}
+	}
+
+	payload := map[string]any{
+		"contents": contents,
+		"generationConfig": map[string]any{
+			"temperature": 0.7,
+		},
+	}
+	if len(systemParts) > 0 {
+		payload["systemInstruction"] = map[string]any{"parts": systemParts}
+	}
+
+	body, err := json.Marshal(payload)
+	if err != nil {
+		return "", err
+	}
+
+	url := fmt.Sprintf("%s/v1beta/models/%s:generateContent?key=%s", baseURL, modelName, g.apiKey)
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(body))
+	if err != nil {
+		return "", err
+	}
+	httpReq.Header.Set("Content-Type", "application/json")
+
+	resp, err := g.client.Do(httpReq)
+	if err != nil {
+		return "", err
+	}
+	defer resp.Body.Close()
+
+	respBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return "", err
+	}
+	if resp.StatusCode >= 400 {
+		return "", mapProviderError(resp.StatusCode, respBody)
+	}
+
+	var parsed struct {
+		Candidates []struct {
+			Content struct {
+				Parts []struct {
+					Text string `json:"text"`
+				} `json:"parts"`
+			} `json:"content"`
+		} `json:"candidates"`
+	}
+	if err := json.Unmarshal(respBody, &parsed); err != nil {
+		return "", err
+	}
+	if len(parsed.Candidates) == 0 || len(parsed.Candidates[0].Content.Parts) == 0 {
+		return "", ErrInvalidResponse
+	}
+	return strings.TrimSpace(parsed.Candidates[0].Content.Parts[0].Text), nil
 }
 
 func (g *geminiReviewer) ReviewInterviewAnswer(ctx context.Context, req InterviewAnswerReviewRequest) (*InterviewAnswerReview, error) {

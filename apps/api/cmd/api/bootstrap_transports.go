@@ -2,6 +2,7 @@ package main
 
 import (
 	"api/internal/closer"
+	interviewlive "api/internal/api/interview_live"
 	server "api/internal/server"
 	"api/internal/server/wshandler"
 	adminv1 "api/pkg/api/admin/v1"
@@ -25,6 +26,7 @@ import (
 	shopv1 "api/pkg/api/shop/v1"
 	socialv1 "api/pkg/api/social/v1"
 	streakv1 "api/pkg/api/streak/v1"
+	skillsv1 "api/pkg/api/skills/v1"
 	trainingv1 "api/pkg/api/training/v1"
 
 	"net/http"
@@ -106,7 +108,12 @@ func registerManualHTTPRoutes(
 	// Realtime WebSocket endpoints (cannot be expressed as proto RPCs).
 	wshandler.Register(httpServer, services.realtimeHub, services.arenaRealtimeHub, services.profileServiceDomain)
 
+	liveChatHandler := interviewlive.New(services.aiReviewer)
+
 	r := httpServer.Route("/")
+
+	// POST /api/v1/interview/live/chat — live interview AI mentor chat.
+	r.POST("/api/v1/interview/live/chat", liveChatHandler.Chat)
 
 	// GET /api/v1/profile/avatar/{user_id} — serves a fresh Telegram avatar.
 	// Stays manual: response is a binary image, not a JSON proto message.
@@ -165,6 +172,9 @@ func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.S
 
 	referralv1.RegisterReferralServiceHTTPServer(httpServer, services.referralService)
 	referralv1.RegisterReferralServiceServer(grpcServer, services.referralService)
+
+	skillsv1.RegisterSkillsServiceHTTPServer(httpServer, services.skillsService)
+	skillsv1.RegisterSkillsServiceServer(grpcServer, services.skillsService)
 
 	trainingv1.RegisterTrainingServiceHTTPServer(httpServer, services.trainingService)
 	trainingv1.RegisterTrainingServiceServer(grpcServer, services.trainingService)

@@ -161,32 +161,13 @@ function getAvailableRoomLanguages(mode: Room['mode'] | undefined, currentLangua
   return LANGUAGES.filter(item => item.value === 'python' || item.value === 'go')
 }
 
-function GuestNamePrompt({ onSubmit }: { onSubmit: (name: string) => void }) {
-  const [name, setName] = useState('')
-  const { t } = useTranslation()
-  return (
-    <div className="code-room-pixel flex items-center justify-center h-screen bg-[#F0F5F1]">
-      <div className="bg-white rounded-2xl border border-[#C1CFC4] p-8 w-full max-w-sm flex flex-col gap-4">
-        <h2 className="text-lg font-bold text-[#111111]">{t('codeRoom.guest.title')}</h2>
-        <p className="text-sm text-[#4B6B52]">{t('codeRoom.guest.subtitle')}</p>
-        <input
-          value={name}
-          onChange={e => setName(e.target.value)}
-          placeholder={t('codeRoom.guest.placeholder')}
-          className="w-full px-4 py-2.5 bg-[#F0F5F1] border border-[#C1CFC4] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#059669]/30"
-          onKeyDown={e => { if (e.key === 'Enter' && name.trim()) onSubmit(name.trim()) }}
-          autoFocus
-        />
-        <button
-          onClick={() => name.trim() && onSubmit(name.trim())}
-          disabled={!name.trim()}
-          className="w-full py-2.5 bg-[#059669] hover:bg-[#047857] text-[#0B1210] font-medium rounded-lg text-sm transition-colors disabled:opacity-50"
-        >
-          {t('codeRoom.guest.submit')}
-        </button>
-      </div>
-    </div>
-  )
+function getOrCreateGuestName(): string {
+  if (typeof window === 'undefined') return `Guest-${Math.random().toString(36).slice(2, 6)}`
+  const existing = localStorage.getItem('guestCodeRoomName')
+  if (existing) return existing
+  const name = `Guest-${Math.random().toString(36).slice(2, 6)}`
+  localStorage.setItem('guestCodeRoomName', name)
+  return name
 }
 
 export function CodeRoomPage() {
@@ -212,9 +193,6 @@ export function CodeRoomPage() {
   const [reviewLoading, setReviewLoading] = useState(false)
   const [reviewPrompt, setReviewPrompt] = useState('')
   const [copied, setCopied] = useState(false)
-  const [needsGuestName, setNeedsGuestName] = useState(
-    !user && (typeof window === 'undefined' || !localStorage.getItem('guestCodeRoomName'))
-  )
   const [taskStatement, setTaskStatement] = useState('')
   const [showTaskEditor, setShowTaskEditor] = useState(false)
   const [editTaskTitle, setEditTaskTitle] = useState('')
@@ -236,9 +214,10 @@ export function CodeRoomPage() {
   const selectionDecorationsSignatureRef = useRef('')
   const widgetsRef = useRef<Map<string, Monaco.editor.IContentWidget>>(new Map())
   const prevParticipantIdsRef = useRef<Set<string>>(new Set())
-  const guestNameRef = useRef(typeof window !== 'undefined' ? localStorage.getItem('guestCodeRoomName') ?? undefined : undefined)
+  const guestNameRef = useRef(!user ? getOrCreateGuestName() : undefined)
   const queuedDocMessagesRef = useRef<string[]>([])
   const sendDocSyncRef = useRef<(data: string) => void>(() => {})
+  const wsCodeRef = useRef('')
   const onDocSyncAppliedRef = useRef<(() => void) | null>(null)
   const currentCodeRef = useRef('')
   const initialCodeRef = useRef('')
@@ -275,18 +254,6 @@ export function CodeRoomPage() {
     return () => clearTimeout(timer)
   }, [isMobile, mobilePanel])
 
-  // Check if guest name is needed
-  useEffect(() => {
-    if (!user && !guestNameRef.current) {
-      setNeedsGuestName(true)
-    }
-  }, [user])
-
-  const handleGuestNameSubmit = (name: string) => {
-    localStorage.setItem('guestCodeRoomName', name)
-    guestNameRef.current = name
-    setNeedsGuestName(false)
-  }
 
   const copyInviteLink = () => {
     const url = `${window.location.origin}/code-rooms/${roomId}`
@@ -438,7 +405,7 @@ export function CodeRoomPage() {
     displayName: user?.firstName ?? guestNameRef.current ?? t('codeRoom.guest.fallback'),
     guestName: guestNameRef.current,
     mode: room?.mode === 'ROOM_MODE_DUEL' ? 'ROOM_MODE_DUEL' : 'ROOM_MODE_ALL',
-    enabled: !!roomId && !needsGuestName && !!room,
+    enabled: !!roomId && !!room,
     initialLanguage: getMonacoLanguage(room?.language ?? (location.state as { language?: string } | null)?.language ?? ''),
     onDocSync: handleIncomingDocSync,
     onLeave: useCallback((_userId: string, displayName: string) => {
@@ -453,6 +420,7 @@ export function CodeRoomPage() {
   })
   sendDocSyncRef.current = ws.sendDocSync
   awarenessRef.current = ws.awareness
+  wsCodeRef.current = ws.code
 
   const sendCurrentAwareness = useCallback((meta?: Record<string, unknown>) => {
     if (isDuelRoom) return
@@ -514,7 +482,7 @@ export function CodeRoomPage() {
 
   // Fetch initial room data via REST
   useEffect(() => {
-    if (!roomId || needsGuestName) return
+    if (!roomId) return
     const state = location.state as { title?: string; statement?: string; starterCode?: string; language?: string; taskId?: string } | null
     codeRoomApi.joinRoom(roomId, undefined, guestNameRef.current)
       .then(async r => {
@@ -573,7 +541,7 @@ export function CodeRoomPage() {
         }
       })
       .catch(() => navigate('/practice/code-rooms'))
-  }, [roomId, needsGuestName, location.state, navigate])
+  }, [roomId, location.state, navigate])
 
   useEffect(() => {
     if (!ws.gotSnapshot) return
@@ -587,14 +555,14 @@ export function CodeRoomPage() {
       }
     }
 
-    const baseCode = ws.code || currentCodeRef.current || starterCodeRef.current || ''
+    const baseCode = wsCodeRef.current || currentCodeRef.current || starterCodeRef.current || ''
     initialCodeRef.current = baseCode
     currentCodeRef.current = baseCode
 
     if (model && !bindingRef.current && model.getValue() !== baseCode) {
       model.setValue(baseCode)
     }
-  }, [isDuelRoom, ws.gotSnapshot, ws.code])
+  }, [isDuelRoom, ws.gotSnapshot])
 
   useEffect(() => {
     const editor = editorRef.current
@@ -602,7 +570,7 @@ export function CodeRoomPage() {
     const model = editor?.getModel()
     if (!editor || !monaco || !model || !ws.connected || !ws.gotSnapshot || bindingRef.current || isDuelRoom) return
 
-    const snapshotCode = ws.code || ''
+    const snapshotCode = wsCodeRef.current || ''
     const seedCode = snapshotCode || currentCodeRef.current || model.getValue()
     const shouldBootstrapFromSnapshot = ws.snapshotActiveClientCount <= 1
 
@@ -668,7 +636,7 @@ export function CodeRoomPage() {
       yTextRef.current = null
       isApplyingRemoteDocRef.current = false
     }
-  }, [roomId, ws.connected, ws.gotSnapshot, ws.code, ws.snapshotActiveClientCount, ws.sendDocSync, ws.persistCode, flushQueuedDocMessages, isDuelRoom, refreshRemoteCursorPositions])
+  }, [roomId, ws.connected, ws.gotSnapshot, ws.snapshotActiveClientCount, ws.sendDocSync, ws.persistCode, flushQueuedDocMessages, isDuelRoom, refreshRemoteCursorPositions])
 
   useEffect(() => {
     refreshRemoteCursorPositions()
@@ -1038,10 +1006,6 @@ export function CodeRoomPage() {
       }
     })
   }, [theme, schedulePersist, soloDraftTaskId, isDuelRoom, ws.sendUpdate, refreshRemoteCursorPositions, sendCurrentAwareness])
-
-  if (needsGuestName) {
-    return <GuestNamePrompt onSubmit={handleGuestNameSubmit} />
-  }
 
   const roomLanguage = getMonacoLanguage(room?.language ?? '')
   const lang = ws.language || (roomLanguage === 'plaintext' ? 'python' : roomLanguage)

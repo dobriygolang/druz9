@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"api/internal/metrics"
-	"api/internal/notiftext"
+	"api/internal/clients/notification/notiftext"
 	v1 "api/pkg/api/arena/v1"
 )
 

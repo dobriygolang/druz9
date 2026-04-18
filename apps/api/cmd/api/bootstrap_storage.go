@@ -27,6 +27,7 @@ import (
 	socialdata "api/internal/data/social"
 	solutionreviewdata "api/internal/data/solution_review"
 	streakdata "api/internal/data/streak"
+	skillsdata "api/internal/data/skills"
 	walletdata "api/internal/data/wallet"
 	geodomain "api/internal/domain/geo"
 	referraldomainservice "api/internal/domain/referral"
@@ -61,6 +62,7 @@ type storageContext struct {
 	socialRepo         *socialdata.Repo
 	socialUsers        *socialdata.UserLookupAdapter
 	walletRepo         *walletdata.Repo
+	skillsRepo         *skillsdata.Repo
 }
 
 func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
@@ -136,6 +138,7 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 			return u.ID, u.Username, nil
 		}),
 		walletRepo: walletdata.NewRepo(store, bootstrap.kratosLogger),
+		skillsRepo: skillsdata.NewRepo(store),
 	}, nil
 }
 

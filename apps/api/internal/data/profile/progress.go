@@ -317,12 +317,6 @@ func (r *Repo) loadProfileProgressMockSessions(ctx context.Context, userID uuid.
 	return items, rows.Err()
 }
 
-func (r *Repo) loadProfileCheckpointProgress(ctx context.Context, userID uuid.UUID) ([]*model.ProfileCheckpointProgress, error) {
-	_ = ctx
-	_ = userID
-	return []*model.ProfileCheckpointProgress{}, nil
-}
-
 // GetStreakStats exposes the streak computation (used by the streak
 // package's shield-protection layer) without dragging in the full
 // ProfileProgress pipeline.
@@ -513,12 +507,6 @@ func (r *Repo) loadArenaVerifiedScore(ctx context.Context, userID uuid.UUID) (in
 	return int32(math.Round(math.Min(100, float64(matches)*6+winRate*40))), nil
 }
 
-func (r *Repo) loadCheckpointScoresBySkill(ctx context.Context, userID uuid.UUID) (map[string]int32, error) {
-	_ = ctx
-	_ = userID
-	return map[string]int32{}, nil
-}
-
 // LoadUserGoal reads the user's goal from the users table.
 func (r *Repo) LoadUserGoal(ctx context.Context, userID uuid.UUID) (*model.UserGoal, error) {
 	var kind, company string
@@ -648,55 +636,3 @@ func (r *Repo) GetProfileFeed(ctx context.Context, userID uuid.UUID, limit int) 
 	return items, rows.Err()
 }
 
-func (r *Repo) GetDailyActivity(ctx context.Context, userID uuid.UUID, days int) (map[string]int, error) {
-	rows, err := r.data.DB.Query(ctx, `
-		SELECT activity_date, SUM(cnt)::int AS total
-		FROM (
-			SELECT DATE(finished_at AT TIME ZONE 'UTC') AS activity_date, COUNT(*) AS cnt
-			FROM interview_mock_sessions
-			WHERE user_id = $1
-			  AND finished_at IS NOT NULL
-			  AND finished_at >= NOW() - make_interval(days => $2)
-			GROUP BY 1
-
-			UNION ALL
-
-			SELECT DATE(f.answered_at AT TIME ZONE 'UTC') AS activity_date, COUNT(*) AS cnt
-			FROM interview_mock_round_followups f
-			JOIN interview_mock_rounds r ON r.id = f.round_id
-			JOIN interview_mock_sessions ms ON ms.id = r.session_id
-			WHERE ms.user_id = $1
-			  AND f.answered_at IS NOT NULL
-			  AND f.answered_at >= NOW() - make_interval(days => $2)
-			GROUP BY 1
-
-			UNION ALL
-
-			SELECT DATE(COALESCE(s.finished_at, s.updated_at, s.started_at) AT TIME ZONE 'UTC') AS activity_date, COUNT(*) AS cnt
-			FROM interview_practice_sessions s
-			WHERE s.user_id = $1
-			  AND COALESCE(s.finished_at, s.updated_at, s.started_at) >= NOW() - make_interval(days => $2)
-			GROUP BY 1
-		) activity
-		GROUP BY activity_date
-		ORDER BY activity_date
-	`, userID, days)
-	if err != nil {
-		return nil, fmt.Errorf("query daily activity: %w", err)
-	}
-	defer rows.Close()
-
-	result := make(map[string]int, days)
-	for rows.Next() {
-		var date time.Time
-		var count int
-		if err := rows.Scan(&date, &count); err != nil {
-			return nil, fmt.Errorf("scan daily activity: %w", err)
-		}
-		result[date.Format("2006-01-02")] = count
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate daily activity: %w", err)
-	}
-	return result, nil
-}

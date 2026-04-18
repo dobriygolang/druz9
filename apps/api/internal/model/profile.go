@@ -123,17 +123,6 @@ const (
 	AuthProviderYandex   AuthProvider = "yandex"
 )
 
-type UserIdentity struct {
-	UserID         uuid.UUID
-	Provider       AuthProvider
-	ProviderUserID string
-	Username       string
-	Email          string
-	AvatarURL      string
-	IsPrimary      bool
-	CreatedAt      time.Time
-	UpdatedAt      time.Time
-}
 
 type IdentityAuthPayload struct {
 	Provider       AuthProvider

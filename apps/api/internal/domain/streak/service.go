@@ -10,7 +10,6 @@ import (
 	"fmt"
 	"time"
 
-	walletdomain "api/internal/domain/wallet"
 	"api/internal/model"
 
 	"github.com/google/uuid"
@@ -170,7 +169,7 @@ func (s *Service) PurchaseShield(ctx context.Context, userID uuid.UUID, count in
 		return nil, 0, 0, fmt.Errorf("purchase shield: wallet is nil")
 	}
 	if err := s.wallet.DebitGold(ctx, userID, ShieldPriceGold*count); err != nil {
-		if errors.Is(err, walletdomain.ErrInsufficientFunds) || errors.Is(err, ErrInsufficientGold) || err.Error() == "insufficient funds" || containsInsufficientFunds(err) {
+		if errors.Is(err, ErrInsufficientGold) || containsInsufficientFunds(err) {
 			return nil, 0, 0, ErrInsufficientGold
 		}
 		return nil, 0, 0, fmt.Errorf("debit gold: %w", err)

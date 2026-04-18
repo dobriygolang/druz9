@@ -60,13 +60,3 @@ type ChallengeList struct {
 	Total      int32              `json:"total"`
 }
 
-// CreateFriendChallengeInput is what the domain service needs to create a row.
-type CreateFriendChallengeInput struct {
-	ChallengerID   uuid.UUID
-	OpponentID     uuid.UUID
-	TaskTitle      string
-	TaskTopic      string
-	TaskDifficulty ChallengeDifficulty
-	TaskRef        string
-	Note           string
-}

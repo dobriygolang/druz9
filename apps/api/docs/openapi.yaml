@@ -2949,6 +2949,78 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/shop.v1.PurchaseResponse'
+    /api/v1/skills/points:
+        get:
+            tags:
+                - SkillsService
+            operationId: SkillsService_GetSkillPoints
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/skills.v1.GetSkillPointsResponse'
+    /api/v1/skills/tree:
+        get:
+            tags:
+                - SkillsService
+            operationId: SkillsService_GetSkillTree
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/skills.v1.GetSkillTreeResponse'
+    /api/v1/skills/{skillId}/allocate:
+        post:
+            tags:
+                - SkillsService
+            operationId: SkillsService_AllocateSkill
+            parameters:
+                - name: skillId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/skills.v1.AllocateSkillRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/skills.v1.AllocateSkillResponse'
+    /api/v1/skills/{skillId}/refund:
+        post:
+            tags:
+                - SkillsService
+            operationId: SkillsService_RefundSkill
+            parameters:
+                - name: skillId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/skills.v1.RefundSkillRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/skills.v1.RefundSkillResponse'
     /api/v1/social/friends:
         get:
             tags:
@@ -6994,6 +7066,125 @@ components:
                 rotatesAt:
                     type: string
                     format: date-time
+        skills.v1.AllocateSkillRequest:
+            type: object
+            properties:
+                skillId:
+                    type: string
+        skills.v1.AllocateSkillResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                errorMessage:
+                    type: string
+                pointsRemaining:
+                    type: integer
+                    format: int32
+        skills.v1.GetSkillPointsResponse:
+            type: object
+            properties:
+                available:
+                    type: integer
+                    format: int32
+                earned:
+                    type: integer
+                    format: int32
+                spent:
+                    type: integer
+                    format: int32
+        skills.v1.GetSkillTreeResponse:
+            type: object
+            properties:
+                nodes:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/skills.v1.SkillNode'
+                edges:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/skills.v1.SkillEdge'
+                pointsAvailable:
+                    type: integer
+                    format: int32
+                pointsEarned:
+                    type: integer
+                    format: int32
+                pointsSpent:
+                    type: integer
+                    format: int32
+        skills.v1.RefundSkillRequest:
+            type: object
+            properties:
+                skillId:
+                    type: string
+        skills.v1.RefundSkillResponse:
+            type: object
+            properties:
+                success:
+                    type: boolean
+                errorMessage:
+                    type: string
+                goldCost:
+                    type: integer
+                    format: int32
+                pointsReturned:
+                    type: integer
+                    format: int32
+        skills.v1.SkillEdge:
+            type: object
+            properties:
+                fromSkillId:
+                    type: string
+                toSkillId:
+                    type: string
+        skills.v1.SkillEffect:
+            type: object
+            properties:
+                type:
+                    type: string
+                    description: |-
+                        e.g. "xp_multiplier", "gold_multiplier", "arena_time_bonus_pct",
+                               "streak_grace_hours", "hint_count", "free_ai_review_daily",
+                               "streak_floor", "shop_discount_pct"
+                value:
+                    type: number
+                    description: Numeric value; interpretation depends on type
+                    format: double
+                label:
+                    type: string
+                    description: Human-readable label shown in the UI ("+ 10% training XP")
+        skills.v1.SkillNode:
+            type: object
+            properties:
+                skillId:
+                    type: string
+                label:
+                    type: string
+                description:
+                    type: string
+                branch:
+                    type: string
+                keystone:
+                    type: boolean
+                x:
+                    type: integer
+                    description: Canvas coordinates (1100×760 viewBox)
+                    format: int32
+                y:
+                    type: integer
+                    format: int32
+                state:
+                    type: string
+                    description: '"locked" | "available" | "allocated"'
+                effect:
+                    allOf:
+                        - $ref: '#/components/schemas/skills.v1.SkillEffect'
+                    description: Effect this node grants when allocated
+                refundGold:
+                    type: integer
+                    description: Refund cost in gold (0 when not allocated)
+                    format: int32
         social.v1.AcceptFriendRequestRequest:
             type: object
             properties:
@@ -7441,6 +7632,7 @@ tags:
          per-user inventory of what's been purchased. Prices are paid in gold or
          gems; both balances live on the profile (not yet debited from this
          service — Debit* is a follow-up when the profile wallet API is ready).
+    - name: SkillsService
     - name: SocialService
       description: |-
         SocialService manages the friends graph: sending/accepting requests,

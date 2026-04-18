@@ -108,10 +108,21 @@ type SystemDesignReview struct {
 	IsPassing         bool     `json:"isPassing"`
 }
 
+type ChatMessage struct {
+	Role    string // "system", "user", "assistant"
+	Content string
+}
+
+type LiveChatRequest struct {
+	ModelOverride string
+	Messages      []ChatMessage
+}
+
 type Reviewer interface {
 	ReviewSystemDesign(ctx context.Context, req SystemDesignReviewRequest) (*SystemDesignReview, error)
 	ReviewInterviewSolution(ctx context.Context, req InterviewSolutionReviewRequest) (*InterviewSolutionReview, error)
 	ReviewInterviewAnswer(ctx context.Context, req InterviewAnswerReviewRequest) (*InterviewAnswerReview, error)
+	Chat(ctx context.Context, req LiveChatRequest) (string, error)
 }
 
 func New(cfg Config) Reviewer {
@@ -151,6 +162,10 @@ func (noopReviewer) ReviewInterviewAnswer(context.Context, InterviewAnswerReview
 	return nil, ErrNotConfigured
 }
 
+func (noopReviewer) Chat(context.Context, LiveChatRequest) (string, error) {
+	return "", ErrNotConfigured
+}
+
 type unsupportedReviewer struct {
 	provider string
 }
@@ -165,6 +180,10 @@ func (u unsupportedReviewer) ReviewInterviewSolution(context.Context, InterviewS
 
 func (u unsupportedReviewer) ReviewInterviewAnswer(context.Context, InterviewAnswerReviewRequest) (*InterviewAnswerReview, error) {
 	return nil, fmt.Errorf("%w: %s", ErrUnsupportedProvider, u.provider)
+}
+
+func (u unsupportedReviewer) Chat(context.Context, LiveChatRequest) (string, error) {
+	return "", fmt.Errorf("%w: %s", ErrUnsupportedProvider, u.provider)
 }
 
 // --- Prompt builders ---

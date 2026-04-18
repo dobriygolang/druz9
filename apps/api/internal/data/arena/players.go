@@ -6,7 +6,7 @@ import (
 	"strings"
 	"time"
 
-	arenarating "api/internal/arena/rating"
+	arenarating "api/internal/domain/arena/rating"
 	domain "api/internal/domain/arena"
 	"api/internal/model"
 

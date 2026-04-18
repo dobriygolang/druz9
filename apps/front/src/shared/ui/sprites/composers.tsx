@@ -94,6 +94,7 @@ export type NavIconKind =
   | 'settings'
   | 'coderoom'
   | 'war'
+  | 'skills'
 
 const NAV_MAPS: Record<NavIconKind, string> = {
   hub: `
@@ -264,6 +265,15 @@ FF...FF
 .FF.FF.
 FF...FF
 F.....F
+`,
+  skills: `
+...F...
+..FFF..
+.F.F.F.
+FFFFFFF
+.F.F.F.
+..FFF..
+...F...
 `,
 }
 

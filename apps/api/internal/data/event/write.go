@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"api/internal/model"
-	slicestools "api/internal/tools/slices"
+	slicestools "api/internal/util/slices"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"

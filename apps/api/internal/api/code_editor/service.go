@@ -26,7 +26,6 @@ type Service interface {
 	LeaveRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string) error
 	SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, code string) (*codeeditordomain.Submission, error)
 	SetReady(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, ready bool) error
-	GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*codeeditordomain.Submission, error)
 	ListTasks(ctx context.Context, filter codeeditordomain.TaskFilter) ([]*codeeditordomain.Task, error)
 	CreateTask(ctx context.Context, task *codeeditordomain.Task) (*codeeditordomain.Task, error)
 	UpdateTask(ctx context.Context, task *codeeditordomain.Task) (*codeeditordomain.Task, error)

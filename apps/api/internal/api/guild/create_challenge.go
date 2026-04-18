@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"api/internal/apihelpers"
-	"api/internal/notiftext"
+	"api/internal/clients/notification/notiftext"
 	v1 "api/pkg/api/guild/v1"
 
 	klog "github.com/go-kratos/kratos/v2/log"

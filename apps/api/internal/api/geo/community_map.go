@@ -20,9 +20,5 @@ func (i *Implementation) CommunityMap(ctx context.Context, req *v1.CommunityMapR
 		return nil, err
 	}
 
-	if err := i.service.EnrichCommunityMapWithAvatarURLs(ctx, response); err != nil {
-		return nil, err
-	}
-
 	return mapCommunityMapResponse(response), nil
 }
