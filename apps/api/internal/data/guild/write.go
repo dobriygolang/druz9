@@ -20,6 +20,13 @@ func (r *Repo) CreateGuild(ctx context.Context, creatorID uuid.UUID, name, descr
 	defer func() { _ = tx.Rollback(ctx) }()
 
 	guildID := uuid.New()
+	// `tags` column is NOT NULL on the table — a nil Go slice turns
+	// into SQL NULL (not `{}`), which violates the constraint. Coerce
+	// to an empty slice so the row inserts cleanly when the caller
+	// passed no tags.
+	if tags == nil {
+		tags = []string{}
+	}
 	if _, err := tx.Exec(ctx, `
 INSERT INTO guilds (id, name, description, creator_id, tags, member_count, is_public)
 VALUES ($1, $2, $3, $4, $5, 1, $6)`,

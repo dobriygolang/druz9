@@ -41,12 +41,12 @@ function toEpisode(p: Podcast, i: number): Episode {
   }
 }
 
-const SERIES: Array<[string, number, string]> = [
-  ["Algorithmist's Codex", 24, '#3d6149'],
-  ['Systems Scrolls', 18, '#b8692a'],
-  ['Guild Chronicles', 12, '#a23a2a'],
-  ['Career Trail', 30, '#3b6a8f'],
-]
+// SERIES array (Algorithmist's Codex / Systems Scrolls / Guild
+// Chronicles / Career Trail with fake 24/18/12/30 episode counts) was
+// removed — it was pure decoration, never connected to real podcast
+// grouping. The Series tab tile in the UI was also dropped. When the
+// backend gains a series-grouping concept (Podcast.series_id) this
+// section comes back driven by that.
 
 // Listener queue lives in-memory only for now — we track it client-side
 // until the backend grows a /podcasts/queue endpoint.
@@ -341,50 +341,11 @@ export function PodcastsPage() {
             ))}
           </div>
 
-          {tab !== 'history' && tab !== 'saved' && (<>
-          <h3 className="font-display" style={{ fontSize: 17, marginTop: 16, marginBottom: 12 }}>
-            Series
-          </h3>
-          <div className="rpg-podcasts-grid" style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: 10 }}>
-            {SERIES.map(([n, c, col]) => (
-              <div
-                key={String(n)}
-                style={{
-                  padding: 10,
-                  border: '3px solid var(--ink-0)',
-                  background: 'var(--parch-0)',
-                  boxShadow: '3px 3px 0 var(--ink-0)',
-                }}
-              >
-                <div
-                  style={{
-                    height: 60,
-                    background: col,
-                    border: '2px solid var(--ink-0)',
-                    marginBottom: 6,
-                  }}
-                />
-                <div
-                  style={{
-                    fontFamily: 'Pixelify Sans, monospace',
-                    fontSize: 12,
-                    whiteSpace: 'nowrap',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                  }}
-                >
-                  {n}
-                </div>
-                <div
-                  className="font-silkscreen uppercase"
-                  style={{ fontSize: 9, color: 'var(--ink-2)', letterSpacing: '0.08em' }}
-                >
-                  {c} episodes
-                </div>
-              </div>
-            ))}
-          </div>
-          </>)}
+          {/* Series grid used to hardcode "Algorithmist's Codex / Systems
+              Scrolls / Guild Chronicles / Career Trail" with fake episode
+              counts. Series are not yet a backend concept — removed
+              entirely rather than keep the lie. When the podcast service
+              learns series-grouping we'll rebuild this from the API. */}
         </div>
 
         <div>

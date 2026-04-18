@@ -7,6 +7,7 @@ import { interviewPrepApi, type MockBlueprint } from '@/features/InterviewPrep/a
 import { authApi } from '@/features/Auth/api/authApi'
 import { useAuth } from '@/app/providers/AuthProvider'
 import type { FeedItem } from '@/entities/User/model/types'
+import { addToast } from '@/shared/lib/toasts'
 
 const READINESS = 78
 
@@ -147,11 +148,30 @@ export function InterviewHubPage() {
                     navigate(`/interview/mock/${session.id}`)
                     return
                   }
-                  // No blueprint for this company yet — fall back to the
-                  // hub-level picker so the user sees the actual list
-                  // of available programs instead of a dead click.
-                  navigate(`/interview?company=${c.key}`)
-                } catch {
+                  // No blueprint for this company yet — surface a toast
+                  // pointing the admin at the content editor, and the
+                  // non-admin at peer mocks which always work.
+                  addToast({
+                    kind: 'QUEST',
+                    title: `No ${c.label} pool yet`,
+                    body: 'Try peer mocks while we add this company\'s question pool.',
+                    icon: '!',
+                    color: 'var(--ember-1)',
+                  })
+                  setStartingCompany(null)
+                } catch (e: any) {
+                  // Backend can return 400 BAD_REQUEST "mock interview
+                  // task pool is incomplete for selected company" when
+                  // the admin hasn't filled a blueprint yet. Show that
+                  // reason plainly instead of a red 500 toast.
+                  const msg = e?.response?.data?.message ?? 'Could not start session'
+                  addToast({
+                    kind: 'QUEST',
+                    title: `${c.label} · mock unavailable`,
+                    body: msg,
+                    icon: '!',
+                    color: 'var(--rpg-danger)',
+                  })
                   setStartingCompany(null)
                 }
               }}
