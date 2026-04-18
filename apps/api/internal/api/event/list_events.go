@@ -3,11 +3,11 @@ package event
 import (
 	"context"
 
+	"github.com/google/uuid"
+
 	"api/internal/apihelpers"
 	"api/internal/model"
 	v1 "api/pkg/api/event/v1"
-
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) ListEvents(ctx context.Context, req *v1.ListEventsRequest) (*v1.ListEventsResponse, error) {
@@ -17,15 +17,15 @@ func (i *Implementation) ListEvents(ctx context.Context, req *v1.ListEventsReque
 	}
 
 	opts := model.ListEventsOptions{
-		Limit:              req.Limit,
-		Offset:             req.Offset,
-		Status:             mapEventListFilter(req.Status),
+		Limit:              req.GetLimit(),
+		Offset:             req.GetOffset(),
+		Status:             mapEventListFilter(req.GetStatus()),
 		IncludeAllStatuses: user.IsAdmin,
 		ViewerID:           &user.ID,
 	}
 
-	if req.CreatorId != "" {
-		creatorID, perr := uuid.Parse(req.CreatorId)
+	if req.GetCreatorId() != "" {
+		creatorID, perr := uuid.Parse(req.GetCreatorId())
 		if perr == nil {
 			opts.CreatorID = &creatorID
 		}

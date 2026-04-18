@@ -3,12 +3,13 @@ package interview_live
 import (
 	"encoding/json"
 	"errors"
+	"fmt"
 	"net/http"
+
+	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
 
 	"api/internal/aireview"
 	"api/internal/model"
-
-	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
 )
 
 type Handler struct {
@@ -44,6 +45,7 @@ func (h *Handler) Chat(ctx kratoshttp.Context) error {
 	var req chatRequest
 	if err := json.NewDecoder(ctx.Request().Body).Decode(&req); err != nil {
 		writeErr(ctx.Response(), http.StatusBadRequest, "BAD_REQUEST", "invalid request body")
+		//nolint:nilerr // The HTTP error response has already been written.
 		return nil
 	}
 	if len(req.Messages) == 0 {
@@ -78,12 +80,16 @@ func (h *Handler) Chat(ctx kratoshttp.Context) error {
 
 	ctx.Response().Header().Set("Content-Type", "application/json")
 	ctx.Response().WriteHeader(http.StatusOK)
-	_ = json.NewEncoder(ctx.Response()).Encode(chatResponse{Reply: reply})
+	if err := json.NewEncoder(ctx.Response()).Encode(chatResponse{Reply: reply}); err != nil {
+		return fmt.Errorf("encode live chat response: %w", err)
+	}
 	return nil
 }
 
 func writeErr(w http.ResponseWriter, status int, code, message string) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(map[string]string{"code": code, "message": message})
+	if err := json.NewEncoder(w).Encode(map[string]string{"code": code, "message": message}); err != nil {
+		return
+	}
 }

@@ -8,12 +8,13 @@ import (
 	"fmt"
 	"time"
 
-	"api/internal/model"
-	"api/internal/storage/postgres"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	friendchallengedomain "api/internal/domain/friend_challenge"
+	"api/internal/model"
+	"api/internal/storage/postgres"
 )
 
 // Repo is the pgx-backed implementation.
@@ -65,7 +66,7 @@ func (r *Repo) GetByID(ctx context.Context, id uuid.UUID) (*model.FriendChalleng
 	ch, err := scanOne(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, friendchallengedomain.ErrChallengeNotFound
 		}
 		return nil, fmt.Errorf("get challenge: %w", err)
 	}

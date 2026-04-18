@@ -1,7 +1,6 @@
 package interviewprep
 
 import (
-	"api/internal/cache"
 	"context"
 	"errors"
 	"fmt"
@@ -9,12 +8,13 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
+
 	"api/internal/aireview"
 	"api/internal/app/taskjudge"
+	"api/internal/cache"
 	"api/internal/model"
 	"api/internal/sandbox"
-
-	"github.com/google/uuid"
 )
 
 var (
@@ -198,7 +198,7 @@ func (s *Service) reviewInterviewSolutionWithRetry(
 ) (*aireview.InterviewSolutionReview, error) {
 	var lastErr error
 
-	for attempt := 0; attempt < maxTransientAIReviewAttempts; attempt++ {
+	for range maxTransientAIReviewAttempts {
 		reviewCtx, cancel := s.withAIReviewTimeout(ctx)
 		review, err := s.reviewer.ReviewInterviewSolution(reviewCtx, req)
 		cancel()
@@ -226,7 +226,7 @@ func (s *Service) reviewInterviewAnswerWithRetry(
 ) (*aireview.InterviewAnswerReview, error) {
 	var lastErr error
 
-	for attempt := 0; attempt < maxTransientAIReviewAttempts; attempt++ {
+	for range maxTransientAIReviewAttempts {
 		reviewCtx, cancel := s.withAIReviewTimeout(ctx)
 		review, err := s.reviewer.ReviewInterviewAnswer(reviewCtx, req)
 		cancel()
@@ -254,7 +254,7 @@ func (s *Service) reviewSystemDesignWithRetry(
 ) (*aireview.SystemDesignReview, error) {
 	var lastErr error
 
-	for attempt := 0; attempt < maxTransientAIReviewAttempts; attempt++ {
+	for range maxTransientAIReviewAttempts {
 		reviewCtx, cancel := s.withAIReviewTimeout(ctx)
 		review, err := s.reviewer.ReviewSystemDesign(reviewCtx, req)
 		cancel()
@@ -295,17 +295,6 @@ func isTransientAIReviewError(err error) bool {
 	return strings.Contains(lowerErr, "deadline exceeded") ||
 		strings.Contains(lowerErr, "client.timeout exceeded") ||
 		strings.Contains(lowerErr, "timeout while awaiting")
-}
-
-func timeoutInterviewSolutionReview() *aireview.InterviewSolutionReview {
-	return &aireview.InterviewSolutionReview{
-		Score:      1,
-		Summary:    "AI-проверка не успела завершиться. Решение не засчитано, попробуй отправить ещё раз.",
-		Gaps:       []string{"Не удалось получить ответ AI-review в отведённое время."},
-		Issues:     []string{"Не удалось получить ответ AI-review в отведённое время."},
-		IsRelevant: false,
-		IsPassing:  false,
-	}
 }
 
 func timeoutInterviewAnswerReview() *aireview.InterviewAnswerReview {

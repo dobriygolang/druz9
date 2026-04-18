@@ -1,10 +1,10 @@
 package code_editor
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	codeeditordomain "api/internal/domain/codeeditor"
 	v1 "api/pkg/api/code_editor/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapTask(task *codeeditordomain.Task) *v1.Task {

@@ -1,18 +1,17 @@
 package profile
 
 import (
-	"context"
 	"errors"
 	"testing"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/mock"
 
 	"api/internal/api/profile/mocks"
 	notif "api/internal/clients/notification"
 	"api/internal/model"
 	v1 "api/pkg/api/profile/v1"
-
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/mock"
 )
 
 func TestTelegramAuth(t *testing.T) {
@@ -40,7 +39,7 @@ func TestTelegramAuth(t *testing.T) {
 
 		impl := New(mockService, mockCookie, nil, nil, notif.Noop{})
 
-		resp, err := impl.TelegramAuth(context.Background(), req)
+		resp, err := impl.TelegramAuth(t.Context(), req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -63,7 +62,7 @@ func TestTelegramAuth(t *testing.T) {
 
 		impl := New(mockService, mockCookie, nil, nil, notif.Noop{})
 
-		_, err := impl.TelegramAuth(context.Background(), &v1.TelegramAuthRequest{Token: "challenge-token"})
+		_, err := impl.TelegramAuth(t.Context(), &v1.TelegramAuthRequest{Token: "challenge-token"})
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -82,11 +81,11 @@ func TestCreateTelegramAuthChallenge(t *testing.T) {
 
 	impl := New(mockService, mocks.NewSessionCookieManager(t), nil, nil, notif.Noop{})
 
-	resp, err := impl.CreateTelegramAuthChallenge(context.Background(), &v1.CreateTelegramAuthChallengeRequest{})
+	resp, err := impl.CreateTelegramAuthChallenge(t.Context(), &v1.CreateTelegramAuthChallengeRequest{})
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
-	if resp.BotStartUrl == "" || resp.ExpiresAt == nil {
+	if resp.GetBotStartUrl() == "" || resp.GetExpiresAt() == nil {
 		t.Fatalf("expected filled challenge response, got %+v", resp)
 	}
 }
@@ -110,7 +109,7 @@ func TestGetProfileByID(t *testing.T) {
 		impl := New(mockService, mockCookie, nil, nil, notif.Noop{})
 		req := &v1.GetProfileByIDRequest{UserId: userID.String()}
 
-		resp, err := impl.GetProfileByID(context.Background(), req)
+		resp, err := impl.GetProfileByID(t.Context(), req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -142,7 +141,7 @@ func TestLogout(t *testing.T) {
 		// Create context with user and session
 		user := &model.User{ID: userID}
 		session := &model.Session{TokenHash: tokenHash, UserID: userID}
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user, Session: session})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user, Session: session})
 
 		_, err := impl.Logout(ctx, &v1.LogoutRequest{})
 		if err != nil {
@@ -161,7 +160,7 @@ func TestLogout(t *testing.T) {
 
 		impl := New(mockService, mockCookie, nil, nil, notif.Noop{})
 
-		_, err := impl.Logout(context.Background(), &v1.LogoutRequest{})
+		_, err := impl.Logout(t.Context(), &v1.LogoutRequest{})
 		if err == nil {
 			t.Error("expected error when no session in context")
 		}
@@ -195,7 +194,7 @@ func TestCompleteRegistration(t *testing.T) {
 
 		// Create context with user
 		user := &model.User{ID: userID}
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.CompleteRegistration(ctx, req)
 		if err != nil {
@@ -231,7 +230,7 @@ func TestUpdateProfile(t *testing.T) {
 
 		// Create context with user
 		user := &model.User{ID: userID}
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.UpdateProfile(ctx, req)
 		if err != nil {
@@ -271,7 +270,7 @@ func TestUpdateLocation(t *testing.T) {
 		impl := New(mockService, mockCookie, nil, nil, notif.Noop{})
 
 		user := &model.User{ID: userID}
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.UpdateLocation(ctx, req)
 		if err != nil {
@@ -292,7 +291,7 @@ func TestUpdateLocation(t *testing.T) {
 
 		impl := New(mockService, mockCookie, nil, nil, notif.Noop{})
 
-		_, err := impl.UpdateLocation(context.Background(), &v1.UpdateLocationRequest{})
+		_, err := impl.UpdateLocation(t.Context(), &v1.UpdateLocationRequest{})
 		if err == nil {
 			t.Error("expected error when no user in context")
 		}
@@ -322,7 +321,7 @@ func TestBindTelegram(t *testing.T) {
 		impl := New(mockService, mockCookie, nil, nil, notif.Noop{})
 
 		user := &model.User{ID: userID}
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.BindTelegram(ctx, req)
 		if err != nil {
@@ -343,7 +342,7 @@ func TestBindTelegram(t *testing.T) {
 
 		impl := New(mockService, mockCookie, nil, nil, notif.Noop{})
 
-		_, err := impl.BindTelegram(context.Background(), &v1.BindTelegramRequest{})
+		_, err := impl.BindTelegram(t.Context(), &v1.BindTelegramRequest{})
 		if err == nil {
 			t.Error("expected error when no user in context")
 		}

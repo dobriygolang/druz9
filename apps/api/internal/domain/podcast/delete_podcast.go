@@ -1,10 +1,11 @@
 package podcast
 
 import (
-	"api/internal/model"
 	"context"
 
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // DeletePodcast deletes a podcast.

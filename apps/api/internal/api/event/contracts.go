@@ -3,9 +3,9 @@ package event
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks

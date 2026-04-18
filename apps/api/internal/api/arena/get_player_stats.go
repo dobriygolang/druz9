@@ -3,18 +3,18 @@ package arena
 import (
 	"context"
 
+	"github.com/google/uuid"
+
 	"api/internal/apihelpers"
 	"api/internal/model"
 	v1 "api/pkg/api/arena/v1"
-
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) GetPlayerStats(ctx context.Context, req *v1.GetPlayerStatsRequest) (*v1.ArenaPlayerStatsResponse, error) {
 	var targetID uuid.UUID
 
-	if req.UserId != "" {
-		id, err := apihelpers.ParseUUID(req.UserId, "INVALID_USER_ID", "invalid user id")
+	if req.GetUserId() != "" {
+		id, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "invalid user id")
 		if err != nil {
 			return nil, err
 		}

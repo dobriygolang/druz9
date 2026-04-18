@@ -2,6 +2,7 @@ package config
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
@@ -268,11 +269,11 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 	}
 
 	if cfg.Data.Database.Source == "" {
-		return nil, fmt.Errorf("DATABASE_URL is required")
+		return nil, errors.New("DATABASE_URL is required")
 	}
 	// Telegram token is optional - bot will not start if empty
 	if cfg.External.S3.Endpoint == "" || cfg.External.S3.Bucket == "" || cfg.External.S3.AccessKey == "" || cfg.External.S3.SecretKey == "" {
-		return nil, fmt.Errorf("S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY and S3_SECRET_KEY are required")
+		return nil, errors.New("S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY and S3_SECRET_KEY are required")
 	}
 
 	// Register watchers for config changes
@@ -320,6 +321,9 @@ func overrideSecretConfigFromEnv(cfg *Bootstrap) {
 	}
 	if value, ok := lookupEnvValue("S3_SECRET_KEY"); ok {
 		cfg.External.S3.SecretKey = value
+	}
+	if value, ok := lookupEnvValue("S3_SKIP_VERIFY"); ok {
+		cfg.External.S3.SkipVerify = strings.EqualFold(value, "true") || value == "1"
 	}
 	if value, ok := lookupEnvValue("AI_REVIEW_PROVIDER"); ok {
 		cfg.External.AIReview.Provider = value

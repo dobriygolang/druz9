@@ -2,12 +2,13 @@ package codetasks
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
-	"api/internal/model"
-
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
 )
 
 const SelectColumns = `
@@ -80,7 +81,7 @@ type Queryer interface {
 
 func ScanTask(scanner Scanner, task *model.CodeTask) error {
 	if task == nil {
-		return fmt.Errorf("scan code task: nil task")
+		return errors.New("scan code task: nil task")
 	}
 
 	var difficultyValue int
@@ -128,7 +129,7 @@ func ScanTask(scanner Scanner, task *model.CodeTask) error {
 
 func LoadCases(ctx context.Context, db Queryer, task *model.CodeTask) error {
 	if task == nil {
-		return fmt.Errorf("load code task cases: nil task")
+		return errors.New("load code task cases: nil task")
 	}
 	return LoadCasesMultiple(ctx, db, []*model.CodeTask{task})
 }

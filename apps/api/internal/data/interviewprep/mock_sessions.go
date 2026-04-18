@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
 )
 
 const zeroUUID = "00000000-0000-0000-0000-000000000000"

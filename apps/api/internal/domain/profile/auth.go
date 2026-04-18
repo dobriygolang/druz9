@@ -2,7 +2,7 @@ package profile
 
 import (
 	"context"
-	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -19,7 +19,7 @@ func (s *Service) TelegramAuth(ctx context.Context, challengeToken, loginCode st
 
 	user, err := s.repo.UpsertUserByIdentity(ctx, model.IdentityAuthPayload{
 		Provider:       model.AuthProviderTelegram,
-		ProviderUserID: fmt.Sprintf("%d", payload.ID),
+		ProviderUserID: strconv.FormatInt(payload.ID, 10),
 		Username:       payload.Username,
 		FirstName:      payload.FirstName,
 		LastName:       payload.LastName,

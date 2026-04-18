@@ -24,6 +24,7 @@ func validateGoImports(code string, cfg policy.RunnerConfig, runnerMode string) 
 
 	file, err := parser.ParseFile(token.NewFileSet(), "candidate.go", source, parser.ImportsOnly)
 	if err != nil {
+		//nolint:nilerr // Syntax errors are reported by the runner; this guard only blocks imports in parseable code.
 		return nil
 	}
 

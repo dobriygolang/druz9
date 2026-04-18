@@ -4,31 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	codeeditordomain "api/internal/domain/codeeditor"
-
 	"github.com/google/uuid"
+
+	codeeditordomain "api/internal/domain/codeeditor"
 )
-
-func (r *Repo) getParticipants(ctx context.Context, roomID uuid.UUID) ([]*codeeditordomain.Participant, error) {
-	rows, err := r.data.DB.Query(ctx, `SELECT user_id, name, is_guest, is_ready, is_winner, joined_at FROM code_participants WHERE room_id = $1`, roomID)
-	if err != nil {
-		return nil, fmt.Errorf("get participants: %w", err)
-	}
-	defer rows.Close()
-
-	var participants []*codeeditordomain.Participant
-	for rows.Next() {
-		var p codeeditordomain.Participant
-		if err := scanParticipant(rows, &p); err != nil {
-			return nil, fmt.Errorf("scan participant: %w", err)
-		}
-		participants = append(participants, &p)
-	}
-	if err := rows.Err(); err != nil {
-		return nil, fmt.Errorf("iterate participant rows: %w", err)
-	}
-	return participants, nil
-}
 
 func (r *Repo) AddParticipant(ctx context.Context, roomID uuid.UUID, participant *codeeditordomain.Participant) (*codeeditordomain.Room, error) {
 	if participant.UserID != nil {

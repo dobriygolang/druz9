@@ -6,14 +6,16 @@ import (
 	"strings"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
-const blind75SeedName = "blind75_pack"
-const blind75CatalogPath = "scripts/seeds/catalogs/blind75.json"
-const blind75SeedVersion = "v2-function-io"
+const (
+	blind75SeedName    = "blind75_pack"
+	blind75CatalogPath = "scripts/seeds/catalogs/blind75.json"
+	blind75SeedVersion = "v2-function-io"
+)
 
 func (r *Runner) runBlind75(ctx context.Context) (Result, error) {
 	catalog, rawCatalog, err := loadCatalog(blind75CatalogPath)

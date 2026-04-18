@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 func (r *Repo) ListMockQuestionPools(ctx context.Context) ([]*model.InterviewPrepMockQuestionPoolItem, error) {

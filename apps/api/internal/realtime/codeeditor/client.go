@@ -4,9 +4,9 @@ import (
 	"strings"
 	"time"
 
-	schema "api/internal/realtime/schema"
-
 	"github.com/gorilla/websocket"
+
+	schema "api/internal/realtime/schema"
 )
 
 const codeEditorEnqueueTimeout = 100 * time.Millisecond

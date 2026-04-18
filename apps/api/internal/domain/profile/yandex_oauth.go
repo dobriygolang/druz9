@@ -123,7 +123,7 @@ func (s *Service) fetchYandexUser(ctx context.Context, code string) (*model.Yand
 		return nil, err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, yandexUserInfoURL+"?format=json", nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, yandexUserInfoURL+"?format=json", http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("create yandex userinfo request: %w", err)
 	}

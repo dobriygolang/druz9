@@ -14,7 +14,7 @@ func (i *Implementation) DeleteGuild(ctx context.Context, req *v1.DeleteGuildReq
 		return nil, err
 	}
 
-	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
+	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
 		return nil, err
 	}

@@ -5,10 +5,10 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/jackc/pgx/v5"
+
 	arenarating "api/internal/domain/arena/rating"
 	"api/internal/model"
-
-	"github.com/jackc/pgx/v5"
 )
 
 func (r *Repo) GetActiveSeason(ctx context.Context) (*model.ArenaSeason, error) {

@@ -1,13 +1,14 @@
 package main
 
 import (
-	"api/internal/clients/notification"
-	"api/internal/clients/notification/notiftext"
 	"context"
 	"time"
 
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"api/internal/clients/notification"
+	"api/internal/clients/notification/notiftext"
 )
 
 // startGuildDigestWorker sends weekly guild digests every Monday at ~10:00.

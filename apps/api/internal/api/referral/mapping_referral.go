@@ -1,10 +1,10 @@
 package referral
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/model"
 	v1 "api/pkg/api/referral/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapReferral(item *model.Referral) *v1.Referral {

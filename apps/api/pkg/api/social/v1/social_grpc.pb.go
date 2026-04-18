@@ -25,6 +25,7 @@ const (
 	SocialService_AcceptFriendRequest_FullMethodName  = "/social.v1.SocialService/AcceptFriendRequest"
 	SocialService_DeclineFriendRequest_FullMethodName = "/social.v1.SocialService/DeclineFriendRequest"
 	SocialService_RemoveFriend_FullMethodName         = "/social.v1.SocialService/RemoveFriend"
+	SocialService_SearchUsers_FullMethodName          = "/social.v1.SocialService/SearchUsers"
 )
 
 // SocialServiceClient is the client API for SocialService service.
@@ -42,6 +43,11 @@ type SocialServiceClient interface {
 	AcceptFriendRequest(ctx context.Context, in *AcceptFriendRequestRequest, opts ...grpc.CallOption) (*AcceptFriendRequestResponse, error)
 	DeclineFriendRequest(ctx context.Context, in *DeclineFriendRequestRequest, opts ...grpc.CallOption) (*DeclineFriendRequestResponse, error)
 	RemoveFriend(ctx context.Context, in *RemoveFriendRequest, opts ...grpc.CallOption) (*RemoveFriendResponse, error)
+	// SearchUsers is a typeahead for the "add friend" UI — matches
+	// username / first_name / last_name by case-insensitive ILIKE on the
+	// supplied query prefix. Returns up to 20 users ordered by last
+	// activity.
+	SearchUsers(ctx context.Context, in *SearchUsersRequest, opts ...grpc.CallOption) (*SearchUsersResponse, error)
 }
 
 type socialServiceClient struct {
@@ -112,6 +118,16 @@ func (c *socialServiceClient) RemoveFriend(ctx context.Context, in *RemoveFriend
 	return out, nil
 }
 
+func (c *socialServiceClient) SearchUsers(ctx context.Context, in *SearchUsersRequest, opts ...grpc.CallOption) (*SearchUsersResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SearchUsersResponse)
+	err := c.cc.Invoke(ctx, SocialService_SearchUsers_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // SocialServiceServer is the server API for SocialService service.
 // All implementations must embed UnimplementedSocialServiceServer
 // for forward compatibility.
@@ -127,6 +143,11 @@ type SocialServiceServer interface {
 	AcceptFriendRequest(context.Context, *AcceptFriendRequestRequest) (*AcceptFriendRequestResponse, error)
 	DeclineFriendRequest(context.Context, *DeclineFriendRequestRequest) (*DeclineFriendRequestResponse, error)
 	RemoveFriend(context.Context, *RemoveFriendRequest) (*RemoveFriendResponse, error)
+	// SearchUsers is a typeahead for the "add friend" UI — matches
+	// username / first_name / last_name by case-insensitive ILIKE on the
+	// supplied query prefix. Returns up to 20 users ordered by last
+	// activity.
+	SearchUsers(context.Context, *SearchUsersRequest) (*SearchUsersResponse, error)
 	mustEmbedUnimplementedSocialServiceServer()
 }
 
@@ -154,6 +175,9 @@ func (UnimplementedSocialServiceServer) DeclineFriendRequest(context.Context, *D
 }
 func (UnimplementedSocialServiceServer) RemoveFriend(context.Context, *RemoveFriendRequest) (*RemoveFriendResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method RemoveFriend not implemented")
+}
+func (UnimplementedSocialServiceServer) SearchUsers(context.Context, *SearchUsersRequest) (*SearchUsersResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SearchUsers not implemented")
 }
 func (UnimplementedSocialServiceServer) mustEmbedUnimplementedSocialServiceServer() {}
 func (UnimplementedSocialServiceServer) testEmbeddedByValue()                       {}
@@ -284,6 +308,24 @@ func _SocialService_RemoveFriend_Handler(srv interface{}, ctx context.Context, d
 	return interceptor(ctx, in, info, handler)
 }
 
+func _SocialService_SearchUsers_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SearchUsersRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SocialServiceServer).SearchUsers(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SocialService_SearchUsers_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SocialServiceServer).SearchUsers(ctx, req.(*SearchUsersRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // SocialService_ServiceDesc is the grpc.ServiceDesc for SocialService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -314,6 +356,10 @@ var SocialService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "RemoveFriend",
 			Handler:    _SocialService_RemoveFriend_Handler,
+		},
+		{
+			MethodName: "SearchUsers",
+			Handler:    _SocialService_SearchUsers_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

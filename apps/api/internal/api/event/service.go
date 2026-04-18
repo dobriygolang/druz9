@@ -1,9 +1,9 @@
 package event
 
 import (
-	v1 "api/pkg/api/event/v1"
-
 	"google.golang.org/grpc"
+
+	v1 "api/pkg/api/event/v1"
 )
 
 // Implementation of event service.

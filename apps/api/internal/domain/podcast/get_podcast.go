@@ -3,9 +3,9 @@ package podcast
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // GetPodcast retrieves a specific podcast.

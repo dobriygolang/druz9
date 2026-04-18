@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"strings"
 
-	"api/internal/model"
-
 	klog "github.com/go-kratos/kratos/v2/log"
+
+	"api/internal/model"
 )
 
 func (s *Service) handleUpdate(ctx context.Context, update telegramUpdate) {

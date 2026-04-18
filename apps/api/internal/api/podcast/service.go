@@ -1,9 +1,9 @@
 package podcast
 
 import (
-	v1 "api/pkg/api/podcast/v1"
-
 	"google.golang.org/grpc"
+
+	v1 "api/pkg/api/podcast/v1"
 )
 
 // Implementation of podcast service.

@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
+
 	"api/internal/model"
 	v1 "api/pkg/api/hub/v1"
-
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) buildPlayer(user *model.User, progress *model.ProfileProgress) *v1.HubPlayer {
@@ -25,7 +25,7 @@ func (i *Implementation) buildPlayer(user *model.User, progress *model.ProfilePr
 			player.Achievements = &v1.HubAchievements{Unlocked: int32(n)}
 		}
 	}
-	if player.Title == "" && strings.TrimSpace(user.CurrentWorkplace) != "" {
+	if player.GetTitle() == "" && strings.TrimSpace(user.CurrentWorkplace) != "" {
 		player.Title = strings.TrimSpace(user.CurrentWorkplace)
 	}
 	return player
@@ -104,7 +104,7 @@ func (i *Implementation) loadArenaItems(ctx context.Context) []*v1.HubArenaItem 
 			items = append(items, &v1.HubArenaItem{
 				Label:     arenaMatchLabel(match),
 				Meta:      arenaMatchMeta(match),
-				ActionUrl: fmt.Sprintf("/arena/%s", match.ID.String()),
+				ActionUrl: "/arena/" + match.ID.String(),
 			})
 		}
 		if len(items) > 0 {

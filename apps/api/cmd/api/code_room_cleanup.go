@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	klog "github.com/go-kratos/kratos/v2/log"
+
 	appcodeeditor "api/internal/app/codeeditor"
 	"api/internal/rtc"
-
-	klog "github.com/go-kratos/kratos/v2/log"
 )
 
 func startCodeRoomCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, service *appcodeeditor.Service) func() error {

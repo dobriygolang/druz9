@@ -4,18 +4,12 @@ import (
 	"testing"
 	"time"
 
+	"github.com/stretchr/testify/assert"
+
 	domain "api/internal/domain/codeeditor"
 	"api/internal/model"
 	"api/internal/policy"
-
-	"github.com/stretchr/testify/assert"
 )
-
-// TTLCache interface for testing
-type cacheInterface interface {
-	Get(key string) (interface{}, bool)
-	Set(key string, value interface{})
-}
 
 func TestService_New(t *testing.T) {
 	t.Parallel()
@@ -98,7 +92,7 @@ func TestGenerateInviteCode_DifferentCodes(t *testing.T) {
 
 	// Generate multiple codes and verify they're different
 	codes := make(map[string]bool)
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		code := generateInviteCode()
 		assert.False(t, codes[code], "generated code should be unique: %s", code)
 		codes[code] = true
@@ -200,14 +194,14 @@ func TestNormalizeStringSlice(t *testing.T) {
 		t.Parallel()
 		result := normalizeStringSlice(nil)
 		assert.NotNil(t, result)
-		assert.Len(t, result, 0)
+		assert.Empty(t, result)
 	})
 
 	t.Run("returns empty slice for zero-length", func(t *testing.T) {
 		t.Parallel()
 		result := normalizeStringSlice([]string{})
 		assert.NotNil(t, result)
-		assert.Len(t, result, 0)
+		assert.Empty(t, result)
 	})
 
 	t.Run("copies slice with values", func(t *testing.T) {

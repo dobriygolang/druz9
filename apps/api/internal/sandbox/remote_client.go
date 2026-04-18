@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -37,7 +38,7 @@ func NewRemote(cfg RemoteConfig) *RemoteClient {
 
 func (c *RemoteClient) Execute(ctx context.Context, req ExecutionRequest) (ExecutionResult, error) {
 	if c == nil || c.baseURL == "" {
-		return ExecutionResult{}, fmt.Errorf("sandbox remote base URL is not configured")
+		return ExecutionResult{}, errors.New("sandbox remote base URL is not configured")
 	}
 
 	payload, err := json.Marshal(ExecuteEnvelope{Request: req})
@@ -83,7 +84,7 @@ func (c *RemoteClient) Execute(ctx context.Context, req ExecutionRequest) (Execu
 		return ExecutionResult{}, fmt.Errorf("%s", strings.TrimSpace(envelope.Error))
 	}
 	if envelope.Result == nil {
-		return ExecutionResult{}, fmt.Errorf("sandbox runner returned empty result")
+		return ExecutionResult{}, errors.New("sandbox runner returned empty result")
 	}
 	return *envelope.Result, nil
 }

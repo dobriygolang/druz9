@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -42,7 +43,7 @@ func (s *Service) FetchTelegramAvatar(ctx context.Context, userID uuid.UUID) ([]
 		return nil, "", err
 	}
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fileURL, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, fileURL, http.NoBody)
 	if err != nil {
 		return nil, "", fmt.Errorf("build telegram avatar request: %w", err)
 	}
@@ -72,7 +73,7 @@ func (s *Service) FetchTelegramAvatar(ctx context.Context, userID uuid.UUID) ([]
 
 func (s *Service) resolveTelegramAvatarFileURL(ctx context.Context, userID uuid.UUID) (string, error) {
 	if s.settings.BotToken == "" {
-		return "", fmt.Errorf("telegram bot token is empty")
+		return "", errors.New("telegram bot token is empty")
 	}
 
 	user, err := s.repo.FindUserByID(ctx, userID)
@@ -80,7 +81,7 @@ func (s *Service) resolveTelegramAvatarFileURL(ctx context.Context, userID uuid.
 		return "", err
 	}
 	if user == nil || user.TelegramID == 0 {
-		return "", fmt.Errorf("telegram avatar is not available")
+		return "", errors.New("telegram avatar is not available")
 	}
 
 	var photosResp telegramAPIResponse[telegramUserProfilePhotos]
@@ -91,7 +92,7 @@ func (s *Service) resolveTelegramAvatarFileURL(ctx context.Context, userID uuid.
 		return "", err
 	}
 	if len(photosResp.Result.Photos) == 0 || len(photosResp.Result.Photos[0]) == 0 {
-		return "", fmt.Errorf("telegram avatar is not available")
+		return "", errors.New("telegram avatar is not available")
 	}
 
 	sizes := photosResp.Result.Photos[0]
@@ -102,7 +103,7 @@ func (s *Service) resolveTelegramAvatarFileURL(ctx context.Context, userID uuid.
 		return "", err
 	}
 	if fileResp.Result.FilePath == "" {
-		return "", fmt.Errorf("telegram file path is empty")
+		return "", errors.New("telegram file path is empty")
 	}
 
 	return fmt.Sprintf("%s/file/bot%s/%s", telegramAPIBase, s.settings.BotToken, fileResp.Result.FilePath), nil

@@ -3,9 +3,9 @@ package social
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // ListFriends paginates the viewer's friends.

@@ -3,14 +3,14 @@ package guild
 import (
 	"context"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/apihelpers"
 	v1 "api/pkg/api/guild/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (i *Implementation) ListGuildMembers(ctx context.Context, req *v1.ListGuildMembersRequest) (*v1.ListGuildMembersResponse, error) {
-	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
+	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
 		return nil, err
 	}

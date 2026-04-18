@@ -3,11 +3,11 @@ package code_editor
 import (
 	"context"
 
-	v1 "api/pkg/api/code_editor/v1"
-
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	v1 "api/pkg/api/code_editor/v1"
 )
 
 func (i *Implementation) GetSolutionReview(ctx context.Context, req *v1.GetSolutionReviewRequest) (*v1.SolutionReviewResponse, error) {
@@ -15,7 +15,7 @@ func (i *Implementation) GetSolutionReview(ctx context.Context, req *v1.GetSolut
 		return nil, errors.NotFound("REVIEW_NOT_AVAILABLE", "review service is not configured")
 	}
 
-	submissionID, err := uuid.Parse(req.SubmissionId)
+	submissionID, err := uuid.Parse(req.GetSubmissionId())
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_SUBMISSION_ID", "invalid submission id")
 	}

@@ -5,12 +5,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+
 	domain "api/internal/domain/arena"
 	"api/internal/model"
 	"api/internal/realtime/schema"
 	"api/internal/sandbox"
-
-	"github.com/google/uuid"
 )
 
 type Sandbox interface {

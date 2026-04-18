@@ -6,14 +6,14 @@ import (
 	"fmt"
 	"strings"
 
-	referraldomain "api/internal/domain/referral"
-	"api/internal/model"
-	"api/internal/storage/postgres"
-
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	referraldomain "api/internal/domain/referral"
+	"api/internal/model"
+	"api/internal/storage/postgres"
 )
 
 type Repo struct {
@@ -191,7 +191,7 @@ func scanReferral(scanner referralScanner, currentUser *model.User) (*model.Refe
 		&item.CreatedAt,
 		&item.UpdatedAt,
 	); err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, kratoserrors.NotFound("REFERRAL_NOT_FOUND", "referral not found")
 		}
 		return nil, fmt.Errorf("scan referral: %w", err)

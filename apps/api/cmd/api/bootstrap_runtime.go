@@ -1,12 +1,12 @@
 package main
 
 import (
+	klog "github.com/go-kratos/kratos/v2/log"
+
 	"api/internal/closer"
 	"api/internal/config"
 	appLogger "api/internal/logger"
 	"api/internal/rtc"
-
-	klog "github.com/go-kratos/kratos/v2/log"
 )
 
 type bootstrapContext struct {

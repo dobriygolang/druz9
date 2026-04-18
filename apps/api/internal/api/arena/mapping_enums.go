@@ -110,20 +110,3 @@ func mapSubmitFailureKind(kind model.ArenaSubmissionFailureKind) commonv1.Submit
 		return commonv1.SubmitFailureKind_SUBMIT_FAILURE_KIND_UNSPECIFIED
 	}
 }
-
-
-// unmapAntiCheatReason converts the proto enum to the string used by the domain.
-func unmapAntiCheatReason(reason v1.AntiCheatEventReason) string {
-	switch reason {
-	case v1.AntiCheatEventReason_ANTI_CHEAT_EVENT_REASON_TAB_SWITCH:
-		return "tab_switch"
-	case v1.AntiCheatEventReason_ANTI_CHEAT_EVENT_REASON_COPY_PASTE:
-		return "copy_paste"
-	case v1.AntiCheatEventReason_ANTI_CHEAT_EVENT_REASON_EXTERNAL_CODE:
-		return "external_code"
-	case v1.AntiCheatEventReason_ANTI_CHEAT_EVENT_REASON_OTHER:
-		return "other"
-	default:
-		return ""
-	}
-}

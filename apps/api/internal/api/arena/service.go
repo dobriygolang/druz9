@@ -3,6 +3,9 @@ package arena
 import (
 	"context"
 
+	"github.com/google/uuid"
+	"google.golang.org/grpc"
+
 	apparena "api/internal/app/arena"
 	"api/internal/app/solutionreview"
 	notif "api/internal/clients/notification"
@@ -10,18 +13,15 @@ import (
 	"api/internal/model"
 	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/arena/v1"
-
-	"github.com/google/uuid"
-	"google.golang.org/grpc"
 )
 
-//go:generate mockery --case underscore --name Service --with-expecter --output mocks
-//
 // Service is the transport contract the arena handler speaks to. We
 // removed queue/matchmaking, PlayerStatsBatch and SeasonHistory methods
 // when their RPCs went away; the app-service methods for those were
 // also deleted. If matchmaking returns, add both the RPC and the
 // method back with explicit tests.
+//
+//go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
 	CreateMatch(ctx context.Context, creator *domain.User, topic string, difficulty model.ArenaDifficulty, obfuscateOpponent bool) (*domain.Match, error)
 	GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, error)

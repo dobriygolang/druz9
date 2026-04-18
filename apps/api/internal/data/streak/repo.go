@@ -2,13 +2,14 @@ package streak
 
 import (
 	"context"
+	"errors"
 	"fmt"
-
-	streakdomain "api/internal/domain/streak"
-	"api/internal/storage/postgres"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
+
+	streakdomain "api/internal/domain/streak"
+	"api/internal/storage/postgres"
 )
 
 type Repo struct {
@@ -74,7 +75,7 @@ func (r *Repo) UseShield(ctx context.Context, userID uuid.UUID, restoredTo int32
 		return fmt.Errorf("use shield: %w", err)
 	}
 	if tag.RowsAffected() == 0 {
-		return fmt.Errorf("use shield: no shields owned")
+		return errors.New("use shield: no shields owned")
 	}
 	return nil
 }

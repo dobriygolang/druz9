@@ -1,16 +1,15 @@
 package profile
 
 import (
-	"context"
 	"errors"
 	"testing"
 	"time"
 
-	"api/internal/domain/profile/mocks"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
+
+	"api/internal/domain/profile/mocks"
+	"api/internal/model"
 )
 
 const testSessionHash = "test-hash"
@@ -25,14 +24,14 @@ func TestGetProfileByID(t *testing.T) {
 		expectedUser := &model.User{ID: userID}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("FindUserByID", context.Background(), userID).Return(expectedUser, nil).Once()
+		mockRepo.On("FindUserByID", t.Context(), userID).Return(expectedUser, nil).Once()
 
 		svc := NewProfileService(Config{
 			Repository: mockRepo,
 			Settings:   Settings{},
 		})
 
-		profile, err := svc.GetProfileByID(context.Background(), userID)
+		profile, err := svc.GetProfileByID(t.Context(), userID)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -50,14 +49,14 @@ func TestGetProfileByID(t *testing.T) {
 		mockRepo := mocks.NewRepository(t)
 		userID := uuid.New()
 
-		mockRepo.On("FindUserByID", context.Background(), userID).Return(nil, expectedErr).Once()
+		mockRepo.On("FindUserByID", t.Context(), userID).Return(nil, expectedErr).Once()
 
 		svc := NewProfileService(Config{
 			Repository: mockRepo,
 			Settings:   Settings{},
 		})
 
-		_, err := svc.GetProfileByID(context.Background(), userID)
+		_, err := svc.GetProfileByID(t.Context(), userID)
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -77,14 +76,14 @@ func TestUpdateProfile(t *testing.T) {
 		expectedUser := &model.User{ID: userID, FirstName: "John", LastName: "Doe"}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("UpdateProfile", context.Background(), userID, name).Return(expectedUser, nil).Once()
+		mockRepo.On("UpdateProfile", t.Context(), userID, name).Return(expectedUser, nil).Once()
 
 		svc := NewProfileService(Config{
 			Repository: mockRepo,
 			Settings:   Settings{},
 		})
 
-		profile, err := svc.UpdateProfile(context.Background(), userID, name)
+		profile, err := svc.UpdateProfile(t.Context(), userID, name)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -105,14 +104,14 @@ func TestCreateSession(t *testing.T) {
 		session := &model.Session{ID: uuid.New(), UserID: uuid.New()}
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
-		mockSessionStorage.On("CreateSession", context.Background(), session).Return(nil).Once()
+		mockSessionStorage.On("CreateSession", t.Context(), session).Return(nil).Once()
 
 		svc := NewProfileService(Config{
 			SessionStorage: mockSessionStorage,
 			Settings:       Settings{},
 		})
 
-		err := svc.CreateSession(context.Background(), session)
+		err := svc.CreateSession(t.Context(), session)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -127,14 +126,14 @@ func TestCreateSession(t *testing.T) {
 		mockSessionStorage := mocks.NewSessionStorage(t)
 		session := &model.Session{ID: uuid.New()}
 
-		mockSessionStorage.On("CreateSession", context.Background(), session).Return(expectedErr).Once()
+		mockSessionStorage.On("CreateSession", t.Context(), session).Return(expectedErr).Once()
 
 		svc := NewProfileService(Config{
 			SessionStorage: mockSessionStorage,
 			Settings:       Settings{},
 		})
 
-		err := svc.CreateSession(context.Background(), session)
+		err := svc.CreateSession(t.Context(), session)
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -152,14 +151,14 @@ func TestDeleteSessionByHash(t *testing.T) {
 		hash := testSessionHash
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
-		mockSessionStorage.On("DeleteSessionByHash", context.Background(), hash).Return(nil).Once()
+		mockSessionStorage.On("DeleteSessionByHash", t.Context(), hash).Return(nil).Once()
 
 		svc := NewProfileService(Config{
 			SessionStorage: mockSessionStorage,
 			Settings:       Settings{},
 		})
 
-		err := svc.DeleteSessionByHash(context.Background(), hash)
+		err := svc.DeleteSessionByHash(t.Context(), hash)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -179,14 +178,14 @@ func TestFindSessionByHash(t *testing.T) {
 		expectedAuthState := &model.AuthState{User: expectedUser}
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
-		mockSessionStorage.On("FindSessionByHash", context.Background(), hash).Return(expectedAuthState, nil).Once()
+		mockSessionStorage.On("FindSessionByHash", t.Context(), hash).Return(expectedAuthState, nil).Once()
 
 		svc := NewProfileService(Config{
 			SessionStorage: mockSessionStorage,
 			Settings:       Settings{},
 		})
 
-		authState, err := svc.FindSessionByHash(context.Background(), hash)
+		authState, err := svc.FindSessionByHash(t.Context(), hash)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -207,14 +206,14 @@ func TestLogout(t *testing.T) {
 		hash := testSessionHash
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
-		mockSessionStorage.On("DeleteSessionByHash", context.Background(), hash).Return(nil).Once()
+		mockSessionStorage.On("DeleteSessionByHash", t.Context(), hash).Return(nil).Once()
 
 		svc := NewProfileService(Config{
 			SessionStorage: mockSessionStorage,
 			Settings:       Settings{},
 		})
 
-		err := svc.Logout(context.Background(), hash)
+		err := svc.Logout(t.Context(), hash)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -311,7 +310,7 @@ func TestTelegramAuthChallenge(t *testing.T) {
 			},
 		})
 
-		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
+		challenge, err := svc.CreateTelegramAuthChallenge(t.Context())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -333,7 +332,7 @@ func TestTelegramAuthChallenge(t *testing.T) {
 			},
 		})
 
-		code, err := svc.ConfirmTelegramAuth(context.Background(), "bot-secret", "", model.TelegramAuthPayload{ID: 123})
+		code, err := svc.ConfirmTelegramAuth(t.Context(), "bot-secret", "", model.TelegramAuthPayload{ID: 123})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -352,7 +351,7 @@ func TestTelegramAuthChallenge(t *testing.T) {
 			},
 		})
 
-		code, err := svc.ConfirmTelegramAuth(context.Background(), "bot-secret", "", model.TelegramAuthPayload{ID: 123})
+		code, err := svc.ConfirmTelegramAuth(t.Context(), "bot-secret", "", model.TelegramAuthPayload{ID: 123})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
@@ -371,7 +370,7 @@ func TestTelegramAuthChallenge(t *testing.T) {
 			},
 		})
 
-		_, err := svc.ConfirmTelegramAuth(context.Background(), "wrong-secret", "", model.TelegramAuthPayload{ID: 123})
+		_, err := svc.ConfirmTelegramAuth(t.Context(), "wrong-secret", "", model.TelegramAuthPayload{ID: 123})
 		if err == nil {
 			t.Fatal("expected error for invalid bot secret")
 		}
@@ -388,7 +387,7 @@ func TestTelegramAuth(t *testing.T) {
 		user := &model.User{ID: uuid.New(), Username: "sergey"}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("UpsertUserByIdentity", context.Background(), model.IdentityAuthPayload{
+		mockRepo.On("UpsertUserByIdentity", t.Context(), model.IdentityAuthPayload{
 			Provider:       model.AuthProviderTelegram,
 			ProviderUserID: "123",
 			Username:       "",
@@ -409,11 +408,11 @@ func TestTelegramAuth(t *testing.T) {
 			},
 		})
 
-		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
+		challenge, err := svc.CreateTelegramAuthChallenge(t.Context())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		code, err := svc.ConfirmTelegramAuth(context.Background(), "", challenge.Token, payload)
+		code, err := svc.ConfirmTelegramAuth(t.Context(), "", challenge.Token, payload)
 		if err != nil {
 			t.Fatalf("unexpected confirm error: %v", err)
 		}
@@ -421,7 +420,7 @@ func TestTelegramAuth(t *testing.T) {
 			t.Fatal("expected website code")
 		}
 
-		profile, token, expiresAt, telegramID, err := svc.TelegramAuth(context.Background(), "", code)
+		profile, token, expiresAt, telegramID, err := svc.TelegramAuth(t.Context(), "", code)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -447,12 +446,12 @@ func TestTelegramAuth(t *testing.T) {
 
 		svc := NewProfileService(Config{Settings: Settings{TelegramAuthMaxAge: time.Minute}})
 
-		challenge, err := svc.CreateTelegramAuthChallenge(context.Background())
+		challenge, err := svc.CreateTelegramAuthChallenge(t.Context())
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
 
-		_, _, _, _, err = svc.TelegramAuth(context.Background(), challenge.Token, "")
+		_, _, _, _, err = svc.TelegramAuth(t.Context(), challenge.Token, "")
 		if err == nil {
 			t.Error("expected error for unconfirmed challenge")
 		}
@@ -463,7 +462,7 @@ func TestTelegramAuth(t *testing.T) {
 
 		expectedErr := errors.New("database error")
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("UpsertUserByIdentity", context.Background(), model.IdentityAuthPayload{
+		mockRepo.On("UpsertUserByIdentity", t.Context(), model.IdentityAuthPayload{
 			Provider:       model.AuthProviderTelegram,
 			ProviderUserID: "123",
 			Username:       "",
@@ -479,7 +478,7 @@ func TestTelegramAuth(t *testing.T) {
 			},
 		})
 
-		code, err := svc.ConfirmTelegramAuth(context.Background(), "", "", model.TelegramAuthPayload{ID: 123})
+		code, err := svc.ConfirmTelegramAuth(t.Context(), "", "", model.TelegramAuthPayload{ID: 123})
 		if err != nil {
 			t.Fatalf("unexpected confirm error: %v", err)
 		}
@@ -487,7 +486,7 @@ func TestTelegramAuth(t *testing.T) {
 			t.Fatal("expected website code")
 		}
 
-		_, _, _, _, err = svc.TelegramAuth(context.Background(), "", code)
+		_, _, _, _, err = svc.TelegramAuth(t.Context(), "", code)
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -504,7 +503,7 @@ func TestAuthenticateByToken(t *testing.T) {
 			Settings: Settings{},
 		})
 
-		_, err := svc.AuthenticateByToken(context.Background(), "")
+		_, err := svc.AuthenticateByToken(t.Context(), "")
 		if err == nil {
 			t.Error("expected error for empty token")
 		}
@@ -517,7 +516,7 @@ func TestAuthenticateByToken(t *testing.T) {
 			Settings: Settings{},
 		})
 
-		_, err := svc.AuthenticateByToken(context.Background(), "   ")
+		_, err := svc.AuthenticateByToken(t.Context(), "   ")
 		if err == nil {
 			t.Error("expected error for whitespace token")
 		}
@@ -544,8 +543,8 @@ func TestAuthenticateByToken(t *testing.T) {
 		}
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
-		mockSessionStorage.On("FindSessionByHash", context.Background(), mock.AnythingOfType("string")).Return(authState, nil).Once()
-		mockSessionStorage.On("TouchSession", context.Background(), userID, sessionID, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).Return(nil).Once()
+		mockSessionStorage.On("FindSessionByHash", t.Context(), mock.AnythingOfType("string")).Return(authState, nil).Once()
+		mockSessionStorage.On("TouchSession", t.Context(), userID, sessionID, mock.AnythingOfType("time.Time"), mock.AnythingOfType("time.Time")).Return(nil).Once()
 
 		svc := NewProfileService(Config{
 			SessionStorage: mockSessionStorage,
@@ -555,7 +554,7 @@ func TestAuthenticateByToken(t *testing.T) {
 			},
 		})
 
-		result, err := svc.AuthenticateByToken(context.Background(), rawToken)
+		result, err := svc.AuthenticateByToken(t.Context(), rawToken)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -584,15 +583,15 @@ func TestAuthenticateByToken(t *testing.T) {
 		}
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
-		mockSessionStorage.On("FindSessionByHash", context.Background(), mock.AnythingOfType("string")).Return(authState, nil).Once()
-		mockSessionStorage.On("DeleteSessionByHash", context.Background(), "hashed-token").Return(nil).Once()
+		mockSessionStorage.On("FindSessionByHash", t.Context(), mock.AnythingOfType("string")).Return(authState, nil).Once()
+		mockSessionStorage.On("DeleteSessionByHash", t.Context(), "hashed-token").Return(nil).Once()
 
 		svc := NewProfileService(Config{
 			SessionStorage: mockSessionStorage,
 			Settings:       Settings{},
 		})
 
-		_, err := svc.AuthenticateByToken(context.Background(), "expired-token")
+		_, err := svc.AuthenticateByToken(t.Context(), "expired-token")
 		if err == nil {
 			t.Error("expected error for expired session")
 		}
@@ -612,7 +611,7 @@ func TestCompleteRegistration(t *testing.T) {
 		user := &model.User{ID: userID, Status: model.UserStatusActive}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("CompleteRegistration", context.Background(), userID, req).Return(user, nil).Once()
+		mockRepo.On("CompleteRegistration", t.Context(), userID, req).Return(user, nil).Once()
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
 		mockSessionStorage.On("CreateSession", mock.Anything, mock.Anything).Return(nil).Once()
@@ -625,7 +624,7 @@ func TestCompleteRegistration(t *testing.T) {
 			},
 		})
 
-		profile, token, _, err := svc.CompleteRegistration(context.Background(), userID, req)
+		profile, token, _, err := svc.CompleteRegistration(t.Context(), userID, req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -648,14 +647,14 @@ func TestCompleteRegistration(t *testing.T) {
 
 		expectedErr := errors.New("database error")
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("CompleteRegistration", context.Background(), mock.AnythingOfType("uuid.UUID"), mock.AnythingOfType("model.CompleteRegistrationRequest")).Return(nil, expectedErr).Once()
+		mockRepo.On("CompleteRegistration", t.Context(), mock.AnythingOfType("uuid.UUID"), mock.AnythingOfType("model.CompleteRegistrationRequest")).Return(nil, expectedErr).Once()
 
 		svc := NewProfileService(Config{
 			Repository: mockRepo,
 			Settings:   Settings{},
 		})
 
-		_, _, _, err := svc.CompleteRegistration(context.Background(), uuid.New(), model.CompleteRegistrationRequest{})
+		_, _, _, err := svc.CompleteRegistration(t.Context(), uuid.New(), model.CompleteRegistrationRequest{})
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -680,7 +679,7 @@ func TestNewSession(t *testing.T) {
 			},
 		})
 
-		rawToken, session, err := svc.NewSession(context.Background(), userID)
+		rawToken, session, err := svc.NewSession(t.Context(), userID)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -712,7 +711,7 @@ func TestNewSession(t *testing.T) {
 			Settings:       Settings{},
 		})
 
-		_, _, err := svc.NewSession(context.Background(), uuid.New())
+		_, _, err := svc.NewSession(t.Context(), uuid.New())
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -729,7 +728,7 @@ func TestRotateSession(t *testing.T) {
 		oldHash := "old-hash"
 
 		mockSessionStorage := mocks.NewSessionStorage(t)
-		mockSessionStorage.On("ReplaceSession", context.Background(), oldHash, mock.Anything, mock.Anything).Return(nil).Once()
+		mockSessionStorage.On("ReplaceSession", t.Context(), oldHash, mock.Anything, mock.Anything).Return(nil).Once()
 
 		svc := NewProfileService(Config{
 			SessionStorage: mockSessionStorage,
@@ -738,7 +737,7 @@ func TestRotateSession(t *testing.T) {
 			},
 		})
 
-		rawToken, session, err := svc.RotateSession(context.Background(), oldHash, userID)
+		rawToken, session, err := svc.RotateSession(t.Context(), oldHash, userID)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}

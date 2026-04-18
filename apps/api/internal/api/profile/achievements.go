@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/apihelpers"
 	v1 "api/pkg/api/profile/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // achievementDef is the static catalog entry for a single achievement.
@@ -121,7 +121,7 @@ var achievementCatalog = []achievementDef{
 }
 
 func (i *Implementation) ListProfileAchievements(ctx context.Context, req *v1.ListProfileAchievementsRequest) (*v1.ListProfileAchievementsResponse, error) {
-	userID, err := apihelpers.ParseUUID(req.UserId, "INVALID_USER_ID", "user_id")
+	userID, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if err != nil {
 		return nil, err
 	}

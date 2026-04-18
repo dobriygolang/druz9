@@ -4,14 +4,14 @@ import (
 	"context"
 	stdErrors "errors"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	geoerrors "api/internal/errors/geo"
 	v1 "api/pkg/api/geo/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) Resolve(ctx context.Context, req *v1.ResolveRequest) (*v1.ResolveResponse, error) {
-	resp, err := i.service.Resolve(ctx, req.Query)
+	resp, err := i.service.Resolve(ctx, req.GetQuery())
 	if err != nil {
 		switch {
 		case stdErrors.Is(err, geoerrors.ErrInvalidQuery):

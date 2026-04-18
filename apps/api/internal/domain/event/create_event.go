@@ -3,10 +3,10 @@ package event
 import (
 	"context"
 
-	"api/internal/model"
-
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // CreateEvent creates a new event.

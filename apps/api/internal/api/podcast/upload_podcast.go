@@ -3,11 +3,11 @@ package podcast
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	"api/internal/apihelpers"
 	"api/internal/model"
 	v1 "api/pkg/api/podcast/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 const maxInlinePodcastUploadSize = 20 * 1024 * 1024
@@ -17,11 +17,11 @@ func (i *Implementation) UploadPodcast(ctx context.Context, req *v1.UploadPodcas
 		return nil, err
 	}
 
-	podcastID, err := apihelpers.ParseUUID(req.PodcastId, "INVALID_PODCAST_ID", "podcast_id")
+	podcastID, err := apihelpers.ParseUUID(req.GetPodcastId(), "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
 		return nil, err
 	}
-	if len(req.Content) > maxInlinePodcastUploadSize {
+	if len(req.GetContent()) > maxInlinePodcastUploadSize {
 		return nil, errors.BadRequest(
 			"INLINE_UPLOAD_TOO_LARGE",
 			"podcast file is too large for inline upload, use prepare/complete upload flow",
@@ -29,10 +29,10 @@ func (i *Implementation) UploadPodcast(ctx context.Context, req *v1.UploadPodcas
 	}
 
 	item, err := i.service.UploadPodcast(ctx, podcastID, model.UploadPodcastRequest{
-		FileName:        req.FileName,
-		ContentType:     unmapContentType(req.ContentType),
-		Content:         req.Content,
-		DurationSeconds: req.DurationSeconds,
+		FileName:        req.GetFileName(),
+		ContentType:     unmapContentType(req.GetContentType()),
+		Content:         req.GetContent(),
+		DurationSeconds: req.GetDurationSeconds(),
 	})
 	if err != nil {
 		if kratosErr := errors.FromError(err); kratosErr.Reason != "UNKNOWN" {

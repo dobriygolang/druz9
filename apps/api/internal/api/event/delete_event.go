@@ -15,11 +15,11 @@ func (i *Implementation) DeleteEvent(ctx context.Context, req *v1.DeleteEventReq
 		return nil, err
 	}
 
-	eventID, err := apihelpers.ParseUUID(req.EventId, "INVALID_EVENT_ID", "event_id")
+	eventID, err := apihelpers.ParseUUID(req.GetEventId(), "INVALID_EVENT_ID", "event_id")
 	if err != nil {
 		return nil, err
 	}
-	ctx = model.ContextWithEventDeleteScope(ctx, unmapDeleteEventScope(req.DeleteScope))
+	ctx = model.ContextWithEventDeleteScope(ctx, unmapDeleteEventScope(req.GetDeleteScope()))
 	if err := i.service.DeleteEvent(ctx, eventID, user); err != nil {
 		return nil, err
 	}

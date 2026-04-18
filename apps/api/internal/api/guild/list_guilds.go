@@ -15,8 +15,8 @@ func (i *Implementation) ListGuilds(ctx context.Context, req *v1.ListGuildsReque
 	}
 
 	opts := model.ListGuildsOptions{
-		Limit:  req.Limit,
-		Offset: req.Offset,
+		Limit:  req.GetLimit(),
+		Offset: req.GetOffset(),
 	}
 
 	resp, err := i.service.ListGuilds(ctx, user.ID, opts)

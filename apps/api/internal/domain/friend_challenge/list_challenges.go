@@ -3,9 +3,9 @@ package friend_challenge
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // ListIncoming returns challenges where the user is the opponent and still

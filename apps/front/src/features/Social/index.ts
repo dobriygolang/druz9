@@ -5,4 +5,5 @@ export {
   type FriendRequest,
   type ListFriendsResponse,
   type ListPendingRequestsResponse,
+  type UserHit,
 } from './model/types'

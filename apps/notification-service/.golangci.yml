@@ -97,11 +97,14 @@ linters-settings:
 
   forbidigo:
     forbid:
-      - pattern: ^fmt\.Print.*$
+      - p: ^fmt\.Print.*$
+        pkg: ^fmt$
         msg: use structured logger instead of fmt.Print*
-      - pattern: ^log\.Print.*$
+      - p: ^log\.Print.*$
+        pkg: ^log$
         msg: use structured logger instead of log.Print*
-      - pattern: ^log\.Fatal.*$
+      - p: ^log\.Fatal.*$
+        pkg: ^log$
         msg: return an error and let the application boundary decide how to exit
 
   gci:

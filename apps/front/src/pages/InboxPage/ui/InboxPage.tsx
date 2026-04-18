@@ -14,6 +14,7 @@ import {
   PresenceStatus,
   type Friend,
   type FriendRequest,
+  type UserHit,
 } from '@/features/Social'
 
 const KIND_COLOR: Record<ThreadKind, string> = {
@@ -515,17 +516,46 @@ function FriendsPanel() {
 
 function ComposeFriendModal({ onClose, onSent }: { onClose: () => void; onSent: () => Promise<void> }) {
   const { t } = useTranslation()
-  const [username, setUsername] = useState('')
+  const [query, setQuery] = useState('')
+  const [selected, setSelected] = useState<UserHit | null>(null)
   const [message, setMessage] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [sending, setSending] = useState(false)
+  const [hits, setHits] = useState<UserHit[]>([])
+  const [searching, setSearching] = useState(false)
+  const debounceRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+  const handleQueryChange = (val: string) => {
+    setQuery(val)
+    setSelected(null)
+    if (debounceRef.current) clearTimeout(debounceRef.current)
+    if (val.trim().length < 2) { setHits([]); return }
+    debounceRef.current = setTimeout(async () => {
+      setSearching(true)
+      try {
+        const results = await socialApi.searchUsers(val.trim(), 8)
+        setHits(results)
+      } catch {
+        setHits([])
+      } finally {
+        setSearching(false)
+      }
+    }, 300)
+  }
+
+  const pick = (hit: UserHit) => {
+    setSelected(hit)
+    setQuery(hit.username || hit.displayName)
+    setHits([])
+  }
 
   const submit = async () => {
-    if (!username.trim()) return
+    const target = selected?.username || query.trim()
+    if (!target) return
     setSending(true)
     setError(null)
     try {
-      await socialApi.sendRequest(username.trim(), message)
+      await socialApi.sendRequest(target, message)
       await onSent()
       onClose()
     } catch (e: unknown) {
@@ -544,21 +574,83 @@ function ComposeFriendModal({ onClose, onSent }: { onClose: () => void; onSent: 
         onClick={(e) => e.stopPropagation()}
       >
         <h3 className="font-display" style={{ fontSize: 18, margin: '0 0 12px' }}>{t('inbox.addToCircle')}</h3>
-        <input
-          value={username}
-          onChange={(e) => setUsername(e.target.value)}
-          placeholder={t('inbox.username')}
-          style={{
-            width: '100%',
-            padding: '8px 10px',
-            border: '3px solid var(--ink-0)',
-            background: 'var(--parch-0)',
-            fontFamily: 'Pixelify Sans, monospace',
-            fontSize: 14,
-            marginBottom: 10,
-            boxSizing: 'border-box',
-          }}
-        />
+
+        {/* Search field with typeahead */}
+        <div style={{ position: 'relative', marginBottom: 10 }}>
+          <input
+            value={query}
+            onChange={(e) => handleQueryChange(e.target.value)}
+            placeholder={t('inbox.searchByName', { defaultValue: 'Search by name or username…' })}
+            autoFocus
+            style={{
+              width: '100%',
+              padding: '8px 10px',
+              border: '3px solid var(--ink-0)',
+              background: 'var(--parch-0)',
+              fontFamily: 'Pixelify Sans, monospace',
+              fontSize: 14,
+              boxSizing: 'border-box',
+            }}
+          />
+          {(hits.length > 0 || searching) && (
+            <div
+              style={{
+                position: 'absolute',
+                top: '100%',
+                left: 0,
+                right: 0,
+                background: 'var(--parch-0)',
+                border: '3px solid var(--ink-0)',
+                borderTop: 'none',
+                zIndex: 100,
+                maxHeight: 220,
+                overflowY: 'auto',
+              }}
+            >
+              {searching && (
+                <div style={{ padding: '8px 12px', fontSize: 11, color: 'var(--ink-2)' }}>
+                  {t('common.searching', { defaultValue: 'Searching…' })}
+                </div>
+              )}
+              {hits.map((hit) => (
+                <div
+                  key={hit.userId}
+                  onClick={() => pick(hit)}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 10,
+                    padding: '8px 12px',
+                    cursor: 'pointer',
+                    background: 'var(--parch-0)',
+                    borderBottom: '1px solid var(--ink-3)',
+                  }}
+                  onMouseEnter={(e) => (e.currentTarget.style.background = 'var(--parch-2)')}
+                  onMouseLeave={(e) => (e.currentTarget.style.background = 'var(--parch-0)')}
+                >
+                  {hit.avatarUrl ? (
+                    <img src={hit.avatarUrl} alt="" style={{ width: 28, height: 28, borderRadius: 2, border: '2px solid var(--ink-0)' }} />
+                  ) : (
+                    <div style={{ width: 28, height: 28, background: 'var(--moss-1)', border: '2px solid var(--ink-0)' }} />
+                  )}
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ fontFamily: 'Pixelify Sans, monospace', fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                      {hit.displayName || hit.username}
+                    </div>
+                    <div style={{ fontSize: 10, color: 'var(--ink-2)' }}>@{hit.username}</div>
+                  </div>
+                  {hit.isFriend && (
+                    <span className="rpg-badge rpg-badge--moss" style={{ fontSize: 9 }}>друг</span>
+                  )}
+                  {hit.requestSent && !hit.isFriend && (
+                    <span className="rpg-badge" style={{ fontSize: 9 }}>отправлено</span>
+                  )}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         <textarea
           value={message}
           onChange={(e) => setMessage(e.target.value)}
@@ -581,7 +673,7 @@ function ComposeFriendModal({ onClose, onSent }: { onClose: () => void; onSent: 
         )}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end', marginTop: 14 }}>
           <RpgButton size="sm" variant="ghost" onClick={onClose} disabled={sending}>{t('common.cancel')}</RpgButton>
-          <RpgButton size="sm" variant="primary" onClick={() => void submit()} disabled={sending}>
+          <RpgButton size="sm" variant="primary" onClick={() => void submit()} disabled={sending || (!query.trim() && !selected)}>
             {sending ? t('inbox.sending') : t('inbox.send')}
           </RpgButton>
         </div>

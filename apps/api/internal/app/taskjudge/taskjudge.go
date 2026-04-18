@@ -64,7 +64,7 @@ func EvaluateCodeTask(ctx context.Context, executor Executor, task *model.CodeTa
 			if result.LastError == "" {
 				result.LastError = "sandbox execution failed"
 			}
-			result.FailedTestIndex = int32(i + 1) //nolint:gosec // test case index is bounded by small TestCases slice
+			result.FailedTestIndex = int32(i + 1)
 			result.FailureKind = detectFailureKind(result.LastError)
 			if result.FailureKind == model.ArenaSubmissionFailureKindCompileError {
 				result.FailedTestIndex = 0
@@ -80,7 +80,7 @@ func EvaluateCodeTask(ctx context.Context, executor Executor, task *model.CodeTa
 		}
 
 		result.LastError = "wrong answer"
-		result.FailedTestIndex = int32(i + 1) //nolint:gosec // test case index is bounded by small TestCases slice
+		result.FailedTestIndex = int32(i + 1)
 		result.FailureKind = model.ArenaSubmissionFailureKindWrongAnswer
 		result.RuntimeMs = time.Since(startedAt).Milliseconds()
 		return result, nil

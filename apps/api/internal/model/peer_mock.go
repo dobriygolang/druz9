@@ -40,14 +40,14 @@ const (
 type BookingStatus int16
 
 const (
-	BookingStatusUnspecified         BookingStatus = 0
-	BookingStatusScheduled           BookingStatus = 1
-	BookingStatusInProgress          BookingStatus = 2
-	BookingStatusCompleted           BookingStatus = 3
-	BookingStatusCancelledByBooker   BookingStatus = 4
-	BookingStatusCancelledByOfferer  BookingStatus = 5
-	BookingStatusNoShowBooker        BookingStatus = 6
-	BookingStatusNoShowOfferer       BookingStatus = 7
+	BookingStatusUnspecified        BookingStatus = 0
+	BookingStatusScheduled          BookingStatus = 1
+	BookingStatusInProgress         BookingStatus = 2
+	BookingStatusCompleted          BookingStatus = 3
+	BookingStatusCancelledByBooker  BookingStatus = 4
+	BookingStatusCancelledByOfferer BookingStatus = 5
+	BookingStatusNoShowBooker       BookingStatus = 6
+	BookingStatusNoShowOfferer      BookingStatus = 7
 )
 
 type MockSlot struct {

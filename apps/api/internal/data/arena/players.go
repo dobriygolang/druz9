@@ -2,17 +2,18 @@ package arena
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
 
-	arenarating "api/internal/domain/arena/rating"
-	domain "api/internal/domain/arena"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+
+	domain "api/internal/domain/arena"
+	arenarating "api/internal/domain/arena/rating"
+	"api/internal/model"
 )
 
 const antiCheatDuplicateWindow = 2 * time.Second
@@ -335,7 +336,7 @@ func (r *Repo) GetPlayer(ctx context.Context, matchID, userID uuid.UUID) (*domai
 	var freezeUntil, acceptedAt pgtype.Timestamptz
 	var updatedAt, joinedAt pgtype.Timestamptz
 	err := scanPlayerWithTimestamps(row, &player, &freezeUntil, &acceptedAt, &joinedAt, &updatedAt)
-	if err == pgx.ErrNoRows {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return nil, nil
 	}
 	if err != nil {
@@ -352,23 +353,6 @@ func (r *Repo) GetPlayer(ctx context.Context, matchID, userID uuid.UUID) (*domai
 	player.UpdatedAt = updatedAt.Time
 
 	return &player, nil
-}
-
-func resolveArenaDisplayName(user *domain.User) string {
-	if user == nil {
-		return "Игрок"
-	}
-	value := user.FirstName
-	if user.LastName != "" {
-		value = strings.TrimSpace(value + " " + user.LastName)
-	}
-	if value != "" {
-		return value
-	}
-	if user.Username != "" {
-		return user.Username
-	}
-	return "Игрок"
 }
 
 func arenaNextRating(self, opponent int32, score float64, difficulty string) int32 {

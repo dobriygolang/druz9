@@ -3,12 +3,12 @@ package code_editor
 import (
 	"time"
 
+	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	codeeditordomain "api/internal/domain/codeeditor"
 	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/code_editor/v1"
-
-	"github.com/google/uuid"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapRoom(room *codeeditordomain.Room) *v1.Room {

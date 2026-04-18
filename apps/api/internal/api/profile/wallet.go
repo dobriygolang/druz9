@@ -3,11 +3,11 @@ package profile
 import (
 	"context"
 
-	"api/internal/apihelpers"
-	v1 "api/pkg/api/profile/v1"
-
 	"github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
+
+	"api/internal/apihelpers"
+	v1 "api/pkg/api/profile/v1"
 )
 
 func (i *Implementation) GetWallet(ctx context.Context, _ *v1.GetWalletRequest) (*v1.GetWalletResponse, error) {

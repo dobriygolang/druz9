@@ -6,13 +6,13 @@ import (
 	"testing"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 type fakeRepo struct {
-	stored map[uuid.UUID]*model.FriendChallenge
+	stored    map[uuid.UUID]*model.FriendChallenge
 	insertErr error
 	updateErr error
 }
@@ -29,6 +29,7 @@ func (f *fakeRepo) Insert(_ context.Context, ch *model.FriendChallenge) error {
 	f.stored[ch.ID] = &cp
 	return nil
 }
+
 func (f *fakeRepo) GetByID(_ context.Context, id uuid.UUID) (*model.FriendChallenge, error) {
 	ch, ok := f.stored[id]
 	if !ok {
@@ -37,6 +38,7 @@ func (f *fakeRepo) GetByID(_ context.Context, id uuid.UUID) (*model.FriendChalle
 	cp := *ch
 	return &cp, nil
 }
+
 func (f *fakeRepo) Update(_ context.Context, ch *model.FriendChallenge) error {
 	if f.updateErr != nil {
 		return f.updateErr
@@ -45,12 +47,15 @@ func (f *fakeRepo) Update(_ context.Context, ch *model.FriendChallenge) error {
 	f.stored[ch.ID] = &cp
 	return nil
 }
+
 func (f *fakeRepo) ListIncoming(context.Context, uuid.UUID, int32, int32) ([]*model.FriendChallenge, int32, error) {
 	return nil, 0, nil
 }
+
 func (f *fakeRepo) ListSent(context.Context, uuid.UUID, int32, int32) ([]*model.FriendChallenge, int32, error) {
 	return nil, 0, nil
 }
+
 func (f *fakeRepo) ListHistory(context.Context, uuid.UUID, int32, int32) ([]*model.FriendChallenge, int32, error) {
 	return nil, 0, nil
 }
@@ -115,7 +120,7 @@ func TestSendChallenge_HappyPath(t *testing.T) {
 	svc := NewService(Config{Repository: repo, Users: users, Clock: clock})
 
 	ch, err := svc.SendChallenge(
-		context.Background(), challengerID,
+		t.Context(), challengerID,
 		"lunarfox", "Reverse an array", "arrays", "training:graph-dfs", "bring it on",
 		model.ChallengeDifficultyMedium,
 	)
@@ -145,7 +150,7 @@ func TestSendChallenge_RejectsSelf(t *testing.T) {
 	id := users.add("thornmoss")
 	svc := NewService(Config{Repository: newFakeRepo(), Users: users, Clock: &frozenClock{}})
 
-	_, err := svc.SendChallenge(context.Background(), id, "thornmoss", "task", "topic", "", "", 1)
+	_, err := svc.SendChallenge(t.Context(), id, "thornmoss", "task", "topic", "", "", 1)
 	if !errors.Is(err, ErrCannotChallengeSelf) {
 		t.Fatalf("expected ErrCannotChallengeSelf, got %v", err)
 	}
@@ -157,7 +162,7 @@ func TestSendChallenge_RejectsMissingTitle(t *testing.T) {
 	challengerID := users.add("a")
 	users.add("b")
 	svc := NewService(Config{Repository: newFakeRepo(), Users: users, Clock: &frozenClock{}})
-	_, err := svc.SendChallenge(context.Background(), challengerID, "b", "   ", "topic", "", "", 1)
+	_, err := svc.SendChallenge(t.Context(), challengerID, "b", "   ", "topic", "", "", 1)
 	if !errors.Is(err, ErrTaskTitleMissing) {
 		t.Fatalf("expected ErrTaskTitleMissing, got %v", err)
 	}
@@ -173,7 +178,7 @@ func TestSendChallenge_RejectsLongNote(t *testing.T) {
 		long[i] = 'x'
 	}
 	svc := NewService(Config{Repository: newFakeRepo(), Users: users, Clock: &frozenClock{}})
-	_, err := svc.SendChallenge(context.Background(), cid, "b", "title", "topic", "", string(long), 1)
+	_, err := svc.SendChallenge(t.Context(), cid, "b", "title", "topic", "", string(long), 1)
 	if !errors.Is(err, ErrNoteTooLong) {
 		t.Fatalf("expected ErrNoteTooLong, got %v", err)
 	}
@@ -206,7 +211,7 @@ func TestSubmitSolution_FirstMoverTransitionsToInProgress(t *testing.T) {
 	id := seedChallenge(repo, cID, oID, clock)
 
 	svc := NewService(Config{Repository: repo, Users: users, Clock: clock})
-	ch, err := svc.SubmitSolution(context.Background(), cID, id, 60_000, 5)
+	ch, err := svc.SubmitSolution(t.Context(), cID, id, 60_000, 5)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -233,11 +238,11 @@ func TestSubmitSolution_BothSubmittedPicksHigherScore(t *testing.T) {
 	svc := NewService(Config{Repository: repo, Users: users, Clock: clock})
 
 	// Challenger submits first with score 3.
-	if _, err := svc.SubmitSolution(context.Background(), cID, id, 90_000, 3); err != nil {
+	if _, err := svc.SubmitSolution(t.Context(), cID, id, 90_000, 3); err != nil {
 		t.Fatal(err)
 	}
 	// Opponent submits with score 5 → they should win.
-	ch, err := svc.SubmitSolution(context.Background(), oID, id, 120_000, 5)
+	ch, err := svc.SubmitSolution(t.Context(), oID, id, 120_000, 5)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -259,10 +264,10 @@ func TestSubmitSolution_TieBreakByTime(t *testing.T) {
 	id := seedChallenge(repo, cID, oID, clock)
 
 	svc := NewService(Config{Repository: repo, Users: users, Clock: clock})
-	if _, err := svc.SubmitSolution(context.Background(), cID, id, 50_000, 5); err != nil {
+	if _, err := svc.SubmitSolution(t.Context(), cID, id, 50_000, 5); err != nil {
 		t.Fatal(err)
 	}
-	ch, err := svc.SubmitSolution(context.Background(), oID, id, 90_000, 5)
+	ch, err := svc.SubmitSolution(t.Context(), oID, id, 90_000, 5)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -281,8 +286,8 @@ func TestSubmitSolution_PerfectTieNoWinner(t *testing.T) {
 	id := seedChallenge(repo, cID, oID, clock)
 
 	svc := NewService(Config{Repository: repo, Users: users, Clock: clock})
-	_, _ = svc.SubmitSolution(context.Background(), cID, id, 60_000, 5)
-	ch, err := svc.SubmitSolution(context.Background(), oID, id, 60_000, 5)
+	_, _ = svc.SubmitSolution(t.Context(), cID, id, 60_000, 5)
+	ch, err := svc.SubmitSolution(t.Context(), oID, id, 60_000, 5)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -304,8 +309,8 @@ func TestSubmitSolution_DoubleSubmissionRejected(t *testing.T) {
 	id := seedChallenge(repo, cID, oID, clock)
 
 	svc := NewService(Config{Repository: repo, Users: users, Clock: clock})
-	_, _ = svc.SubmitSolution(context.Background(), cID, id, 60_000, 5)
-	_, err := svc.SubmitSolution(context.Background(), cID, id, 10_000, 5)
+	_, _ = svc.SubmitSolution(t.Context(), cID, id, 60_000, 5)
+	_, err := svc.SubmitSolution(t.Context(), cID, id, 10_000, 5)
 	if !errors.Is(err, ErrAlreadySubmitted) {
 		t.Fatalf("expected ErrAlreadySubmitted, got %v", err)
 	}
@@ -321,7 +326,7 @@ func TestSubmitSolution_NonParticipantRejected(t *testing.T) {
 	id := seedChallenge(repo, cID, oID, clock)
 
 	svc := NewService(Config{Repository: repo, Users: users, Clock: clock})
-	_, err := svc.SubmitSolution(context.Background(), uuid.New(), id, 60_000, 5)
+	_, err := svc.SubmitSolution(t.Context(), uuid.New(), id, 60_000, 5)
 	if !errors.Is(err, ErrNotParticipant) {
 		t.Fatalf("expected ErrNotParticipant, got %v", err)
 	}
@@ -340,7 +345,7 @@ func TestSubmitSolution_PastDeadlineMarksExpired(t *testing.T) {
 	// fast-forward clock past deadline
 	clock.t = clock.t.Add(DefaultDeadline + time.Second)
 
-	_, err := svc.SubmitSolution(context.Background(), cID, id, 60_000, 5)
+	_, err := svc.SubmitSolution(t.Context(), cID, id, 60_000, 5)
 	if !errors.Is(err, ErrAlreadyExpired) {
 		t.Fatalf("expected ErrAlreadyExpired, got %v", err)
 	}
@@ -353,11 +358,11 @@ func TestSubmitSolution_PastDeadlineMarksExpired(t *testing.T) {
 func TestSubmitSolution_ValidatesScoreAndTime(t *testing.T) {
 	t.Parallel()
 	svc := NewService(Config{Repository: newFakeRepo(), Users: newFakeUsers(), Clock: &frozenClock{}})
-	_, err := svc.SubmitSolution(context.Background(), uuid.New(), uuid.New(), -1, 3)
+	_, err := svc.SubmitSolution(t.Context(), uuid.New(), uuid.New(), -1, 3)
 	if !errors.Is(err, ErrBadTime) {
 		t.Fatalf("expected ErrBadTime, got %v", err)
 	}
-	_, err = svc.SubmitSolution(context.Background(), uuid.New(), uuid.New(), 1000, 99)
+	_, err = svc.SubmitSolution(t.Context(), uuid.New(), uuid.New(), 1000, 99)
 	if !errors.Is(err, ErrBadScore) {
 		t.Fatalf("expected ErrBadScore, got %v", err)
 	}
@@ -375,12 +380,12 @@ func TestDecline_OnlyOpponent(t *testing.T) {
 	id := seedChallenge(repo, cID, oID, clock)
 
 	svc := NewService(Config{Repository: repo, Users: users, Clock: clock})
-	_, err := svc.Decline(context.Background(), cID, id)
+	_, err := svc.Decline(t.Context(), cID, id)
 	if !errors.Is(err, ErrOnlyOpponentCanDecline) {
 		t.Fatalf("expected ErrOnlyOpponentCanDecline, got %v", err)
 	}
 
-	ch, err := svc.Decline(context.Background(), oID, id)
+	ch, err := svc.Decline(t.Context(), oID, id)
 	if err != nil {
 		t.Fatalf("opponent decline failed: %v", err)
 	}

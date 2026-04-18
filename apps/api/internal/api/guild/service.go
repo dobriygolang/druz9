@@ -1,11 +1,11 @@
 package guild
 
 import (
+	"google.golang.org/grpc"
+
 	notif "api/internal/clients/notification"
 	guilddata "api/internal/data/guild"
 	v1 "api/pkg/api/guild/v1"
-
-	"google.golang.org/grpc"
 )
 
 // Implementation of guild service.

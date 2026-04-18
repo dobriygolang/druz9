@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	appcodeeditor "api/internal/app/codeeditor"
-
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	appcodeeditor "api/internal/app/codeeditor"
 )
 
 const (

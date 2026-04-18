@@ -3,10 +3,10 @@ package guild
 import (
 	"math"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/model"
 	v1 "api/pkg/api/guild/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapChallenge(ch *model.GuildChallenge) *v1.GuildChallengeData {
@@ -25,7 +25,7 @@ func mapChallenge(ch *model.GuildChallenge) *v1.GuildChallengeData {
 	}
 	return &v1.GuildChallengeData{
 		Id:          ch.ID.String(),
-		GuildId:    ch.GuildID.String(),
+		GuildId:     ch.GuildID.String(),
 		TemplateKey: ch.TemplateKey,
 		TargetValue: ch.TargetValue,
 		StartsAt:    timestamppb.New(ch.StartsAt),
@@ -76,7 +76,7 @@ func mapListGuildsResponse(resp *model.ListGuildsResponse) *v1.ListGuildsRespons
 	}
 
 	return &v1.ListGuildsResponse{
-		Guilds:    guilds,
+		Guilds:     guilds,
 		TotalCount: resp.TotalCount,
 	}
 }

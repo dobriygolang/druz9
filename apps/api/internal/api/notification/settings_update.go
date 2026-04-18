@@ -19,7 +19,7 @@ func (i *SettingsImplementation) UpdateNotificationSettings(ctx context.Context,
 	upd := notifclient.SettingsUpdate{
 		DuelsEnabled:          req.DuelsEnabled,
 		ProgressEnabled:       req.ProgressEnabled,
-		GuildsEnabled:        req.GuildsEnabled,
+		GuildsEnabled:         req.GuildsEnabled,
 		DailyChallengeEnabled: req.DailyChallengeEnabled,
 	}
 

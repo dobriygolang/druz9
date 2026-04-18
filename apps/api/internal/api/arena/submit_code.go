@@ -3,14 +3,14 @@ package arena
 import (
 	"context"
 
-	"api/internal/app/solutionreview"
-	"api/internal/metrics"
-	"api/internal/model"
-	"api/internal/clients/notification/notiftext"
-	v1 "api/pkg/api/arena/v1"
-
 	klog "github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"api/internal/app/solutionreview"
+	"api/internal/clients/notification/notiftext"
+	"api/internal/metrics"
+	"api/internal/model"
+	v1 "api/pkg/api/arena/v1"
 )
 
 func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeRequest) (*v1.SubmitCodeResponse, error) {
@@ -19,12 +19,12 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 		return nil, err
 	}
 
-	matchID, err := parseArenaMatchID(req.MatchId)
+	matchID, err := parseArenaMatchID(req.GetMatchId())
 	if err != nil {
 		return nil, err
 	}
 
-	submission, match, err := i.service.SubmitCode(ctx, matchID, user, req.Code)
+	submission, match, err := i.service.SubmitCode(ctx, matchID, user, req.GetCode())
 	if err != nil {
 		return nil, mapErr(err)
 	}
@@ -46,7 +46,7 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 				UserID:         user.ID,
 				TaskID:         match.TaskID,
 				SourceType:     model.ReviewSourceDuel,
-				Code:           req.Code,
+				Code:           req.GetCode(),
 				Language:       "", // arena doesn't track language per-submission
 				IsCorrect:      submission.IsCorrect,
 				SolveTimeMs:    submission.RuntimeMs,

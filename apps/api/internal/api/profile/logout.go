@@ -3,11 +3,11 @@ package profile
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	"api/internal/model"
 	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/profile/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) Logout(ctx context.Context, _ *v1.LogoutRequest) (*v1.ProfileStatusResponse, error) {

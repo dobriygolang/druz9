@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 
-	"api/internal/model"
-
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
 )
 
 func (r *Repo) CreateGuild(ctx context.Context, creatorID uuid.UUID, name, description string, tags []string, isPublic bool) (*model.Guild, error) {
@@ -173,7 +173,7 @@ func (r *Repo) LeaveGuild(ctx context.Context, guildID, userID uuid.UUID) error 
 		guildID, userID,
 	).Scan(&role)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return kratoserrors.NotFound("NOT_A_MEMBER", "not a member of this guild")
 		}
 		return fmt.Errorf("check membership: %w", err)

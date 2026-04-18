@@ -10,7 +10,7 @@ import (
 )
 
 func (i *Implementation) GetReadiness(ctx context.Context, req *v1.GetReadinessRequest) (*v1.GetReadinessResponse, error) {
-	userID, err := apihelpers.ParseUUID(req.UserId, "INVALID_USER_ID", "user_id")
+	userID, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if err != nil {
 		return nil, err
 	}

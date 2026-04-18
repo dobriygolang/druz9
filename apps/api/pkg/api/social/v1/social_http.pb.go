@@ -24,6 +24,7 @@ const OperationSocialServiceDeclineFriendRequest = "/social.v1.SocialService/Dec
 const OperationSocialServiceListFriends = "/social.v1.SocialService/ListFriends"
 const OperationSocialServiceListPendingRequests = "/social.v1.SocialService/ListPendingRequests"
 const OperationSocialServiceRemoveFriend = "/social.v1.SocialService/RemoveFriend"
+const OperationSocialServiceSearchUsers = "/social.v1.SocialService/SearchUsers"
 const OperationSocialServiceSendFriendRequest = "/social.v1.SocialService/SendFriendRequest"
 
 type SocialServiceHTTPServer interface {
@@ -32,6 +33,11 @@ type SocialServiceHTTPServer interface {
 	ListFriends(context.Context, *ListFriendsRequest) (*ListFriendsResponse, error)
 	ListPendingRequests(context.Context, *ListPendingRequestsRequest) (*ListPendingRequestsResponse, error)
 	RemoveFriend(context.Context, *RemoveFriendRequest) (*RemoveFriendResponse, error)
+	// SearchUsers SearchUsers is a typeahead for the "add friend" UI — matches
+	// username / first_name / last_name by case-insensitive ILIKE on the
+	// supplied query prefix. Returns up to 20 users ordered by last
+	// activity.
+	SearchUsers(context.Context, *SearchUsersRequest) (*SearchUsersResponse, error)
 	SendFriendRequest(context.Context, *SendFriendRequestRequest) (*SendFriendRequestResponse, error)
 }
 
@@ -43,6 +49,7 @@ func RegisterSocialServiceHTTPServer(s *http.Server, srv SocialServiceHTTPServer
 	r.POST("/api/v1/social/requests/{request_id}/accept", _SocialService_AcceptFriendRequest0_HTTP_Handler(srv))
 	r.POST("/api/v1/social/requests/{request_id}/decline", _SocialService_DeclineFriendRequest0_HTTP_Handler(srv))
 	r.POST("/api/v1/social/friends/{user_id}/remove", _SocialService_RemoveFriend0_HTTP_Handler(srv))
+	r.GET("/api/v1/social/search", _SocialService_SearchUsers0_HTTP_Handler(srv))
 }
 
 func _SocialService_ListFriends0_HTTP_Handler(srv SocialServiceHTTPServer) func(ctx http.Context) error {
@@ -180,12 +187,36 @@ func _SocialService_RemoveFriend0_HTTP_Handler(srv SocialServiceHTTPServer) func
 	}
 }
 
+func _SocialService_SearchUsers0_HTTP_Handler(srv SocialServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SearchUsersRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationSocialServiceSearchUsers)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SearchUsers(ctx, req.(*SearchUsersRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SearchUsersResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type SocialServiceHTTPClient interface {
 	AcceptFriendRequest(ctx context.Context, req *AcceptFriendRequestRequest, opts ...http.CallOption) (rsp *AcceptFriendRequestResponse, err error)
 	DeclineFriendRequest(ctx context.Context, req *DeclineFriendRequestRequest, opts ...http.CallOption) (rsp *DeclineFriendRequestResponse, err error)
 	ListFriends(ctx context.Context, req *ListFriendsRequest, opts ...http.CallOption) (rsp *ListFriendsResponse, err error)
 	ListPendingRequests(ctx context.Context, req *ListPendingRequestsRequest, opts ...http.CallOption) (rsp *ListPendingRequestsResponse, err error)
 	RemoveFriend(ctx context.Context, req *RemoveFriendRequest, opts ...http.CallOption) (rsp *RemoveFriendResponse, err error)
+	// SearchUsers SearchUsers is a typeahead for the "add friend" UI — matches
+	// username / first_name / last_name by case-insensitive ILIKE on the
+	// supplied query prefix. Returns up to 20 users ordered by last
+	// activity.
+	SearchUsers(ctx context.Context, req *SearchUsersRequest, opts ...http.CallOption) (rsp *SearchUsersResponse, err error)
 	SendFriendRequest(ctx context.Context, req *SendFriendRequestRequest, opts ...http.CallOption) (rsp *SendFriendRequestResponse, err error)
 }
 
@@ -256,6 +287,23 @@ func (c *SocialServiceHTTPClientImpl) RemoveFriend(ctx context.Context, in *Remo
 	opts = append(opts, http.Operation(OperationSocialServiceRemoveFriend))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// SearchUsers SearchUsers is a typeahead for the "add friend" UI — matches
+// username / first_name / last_name by case-insensitive ILIKE on the
+// supplied query prefix. Returns up to 20 users ordered by last
+// activity.
+func (c *SocialServiceHTTPClientImpl) SearchUsers(ctx context.Context, in *SearchUsersRequest, opts ...http.CallOption) (*SearchUsersResponse, error) {
+	var out SearchUsersResponse
+	pattern := "/api/v1/social/search"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationSocialServiceSearchUsers))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

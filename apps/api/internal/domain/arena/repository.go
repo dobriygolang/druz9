@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // Repository is the persistence contract arena's app-service speaks to.

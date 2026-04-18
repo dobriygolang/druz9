@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"time"
 
-	"api/internal/model"
-	"api/internal/storage/postgres"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
+	"api/internal/storage/postgres"
 )
 
 type Repo struct {

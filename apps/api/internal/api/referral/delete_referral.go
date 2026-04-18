@@ -13,7 +13,7 @@ func (i *Implementation) DeleteReferral(ctx context.Context, req *v1.DeleteRefer
 	if err != nil {
 		return nil, err
 	}
-	referralID, err := apihelpers.ParseUUID(req.ReferralId, "INVALID_REFERRAL_ID", "referral_id")
+	referralID, err := apihelpers.ParseUUID(req.GetReferralId(), "INVALID_REFERRAL_ID", "referral_id")
 	if err != nil {
 		return nil, err
 	}

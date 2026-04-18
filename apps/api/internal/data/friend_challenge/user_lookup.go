@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/google/uuid"
+
 	profiledata "api/internal/data/profile"
 	friendchallengedomain "api/internal/domain/friend_challenge"
-
-	"github.com/google/uuid"
 )
 
 // UserLookupAdapter implements the friend_challenge.UserLookup interface using

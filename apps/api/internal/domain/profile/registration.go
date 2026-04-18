@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // CompleteRegistration completes user registration and returns profile response with session.

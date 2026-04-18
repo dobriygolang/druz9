@@ -12,7 +12,7 @@ func (i *Implementation) LeaveMatch(ctx context.Context, req *v1.LeaveMatchReque
 		return nil, err
 	}
 
-	matchID, err := parseArenaMatchID(req.MatchId)
+	matchID, err := parseArenaMatchID(req.GetMatchId())
 	if err != nil {
 		return nil, err
 	}

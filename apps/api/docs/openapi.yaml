@@ -3766,6 +3766,33 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/social.v1.DeclineFriendRequestResponse'
+    /api/v1/social/search:
+        get:
+            tags:
+                - SocialService
+            description: |-
+                SearchUsers is a typeahead for the "add friend" UI — matches
+                 username / first_name / last_name by case-insensitive ILIKE on the
+                 supplied query prefix. Returns up to 20 users ordered by last
+                 activity.
+            operationId: SocialService_SearchUsers
+            parameters:
+                - name: query
+                  in: query
+                  schema:
+                    type: string
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/social.v1.SearchUsersResponse'
     /api/v1/streak:
         get:
             tags:
@@ -8613,6 +8640,13 @@ components:
             properties:
                 ok:
                     type: boolean
+        social.v1.SearchUsersResponse:
+            type: object
+            properties:
+                users:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/social.v1.UserHit'
         social.v1.SendFriendRequestRequest:
             type: object
             properties:
@@ -8625,6 +8659,21 @@ components:
             properties:
                 request:
                     $ref: '#/components/schemas/social.v1.FriendRequest'
+        social.v1.UserHit:
+            type: object
+            properties:
+                userId:
+                    type: string
+                username:
+                    type: string
+                displayName:
+                    type: string
+                avatarUrl:
+                    type: string
+                isFriend:
+                    type: boolean
+                requestSent:
+                    type: boolean
         streak.v1.GetStreakResponse:
             type: object
             properties:

@@ -37,14 +37,16 @@ const (
 	ArenaLeagueMaster   = model.ArenaLeagueMaster
 )
 
-type Match = model.ArenaMatch
-type Player = model.ArenaPlayer
-type Submission = model.ArenaSubmission
-type LeaderboardEntry = model.ArenaLeaderboardEntry
-type QueueEntry = model.ArenaQueueEntry
-type QueueState = model.ArenaQueueState
-type PlayerStats = model.ArenaPlayerStats
-type Task = model.CodeTask
-type TestCase = model.CodeTestCase
-type User = model.User
-type RatingPenalty = model.ArenaRatingPenalty
+type (
+	Match            = model.ArenaMatch
+	Player           = model.ArenaPlayer
+	Submission       = model.ArenaSubmission
+	LeaderboardEntry = model.ArenaLeaderboardEntry
+	QueueEntry       = model.ArenaQueueEntry
+	QueueState       = model.ArenaQueueState
+	PlayerStats      = model.ArenaPlayerStats
+	Task             = model.CodeTask
+	TestCase         = model.CodeTestCase
+	User             = model.User
+	RatingPenalty    = model.ArenaRatingPenalty
+)

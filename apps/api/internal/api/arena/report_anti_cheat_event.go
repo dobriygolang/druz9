@@ -3,8 +3,8 @@ package arena
 import (
 	"context"
 
-	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/arena/v1"
+	commonv1 "api/pkg/api/common/v1"
 )
 
 func (i *Implementation) ReportAntiCheatEvent(ctx context.Context, req *v1.ReportAntiCheatEventRequest) (*v1.ArenaStatusResponse, error) {
@@ -13,12 +13,12 @@ func (i *Implementation) ReportAntiCheatEvent(ctx context.Context, req *v1.Repor
 		return nil, err
 	}
 
-	matchID, err := parseArenaMatchID(req.MatchId)
+	matchID, err := parseArenaMatchID(req.GetMatchId())
 	if err != nil {
 		return nil, err
 	}
 
-	reason := req.Reason.String()
+	reason := req.GetReason().String()
 	if err := i.service.ReportPlayerSuspicion(ctx, matchID, user, reason); err != nil {
 		return nil, mapErr(err)
 	}

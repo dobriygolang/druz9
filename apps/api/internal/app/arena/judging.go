@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
+
 	"api/internal/app/taskjudge"
 	domain "api/internal/domain/arena"
-
-	"github.com/google/uuid"
 )
 
 func (s *Service) SubmitCode(ctx context.Context, matchID uuid.UUID, user *domain.User, code string) (*domain.Submission, *domain.Match, error) {

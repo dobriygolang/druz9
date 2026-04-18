@@ -5,14 +5,14 @@ import (
 	"errors"
 	"testing"
 
+	"github.com/google/uuid"
+	"github.com/stretchr/testify/mock"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/api/event/mocks"
 	"api/internal/model"
 	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/event/v1"
-
-	"github.com/google/uuid"
-	"github.com/stretchr/testify/mock"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func TestListEvents(t *testing.T) {
@@ -31,8 +31,8 @@ func TestListEvents(t *testing.T) {
 			HasNextPage: false,
 		}
 		expectedOpts := model.ListEventsOptions{
-			Limit:              req.Limit,
-			Offset:             req.Offset,
+			Limit:              req.GetLimit(),
+			Offset:             req.GetOffset(),
 			IncludeAllStatuses: true,
 			ViewerID:           &user.ID,
 		}
@@ -40,7 +40,7 @@ func TestListEvents(t *testing.T) {
 		mockService := mocks.NewService(t)
 		mockService.On("ListEvents", mock.Anything, user.ID, expectedOpts).Return(expectedResp, nil).Once()
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.ListEvents(ctx, req)
 		if err != nil {
@@ -49,8 +49,8 @@ func TestListEvents(t *testing.T) {
 		if resp == nil {
 			t.Fatal("expected response, got nil")
 		}
-		if len(resp.Events) != 1 {
-			t.Errorf("expected 1 event, got %d", len(resp.Events))
+		if len(resp.GetEvents()) != 1 {
+			t.Errorf("expected 1 event, got %d", len(resp.GetEvents()))
 		}
 
 		mockService.AssertExpectations(t)
@@ -61,7 +61,7 @@ func TestListEvents(t *testing.T) {
 
 		impl := New(nil)
 
-		_, err := impl.ListEvents(context.Background(), &v1.ListEventsRequest{})
+		_, err := impl.ListEvents(t.Context(), &v1.ListEventsRequest{})
 		if err == nil {
 			t.Error("expected error when no user in context")
 		}
@@ -76,7 +76,7 @@ func TestListEvents(t *testing.T) {
 		mockService.On("ListEvents", mock.Anything, user.ID, mock.Anything).Return(nil, expectedErr).Once()
 
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		_, err := impl.ListEvents(ctx, &v1.ListEventsRequest{})
 		if !errors.Is(err, expectedErr) {
@@ -105,7 +105,7 @@ func TestCreateEvent(t *testing.T) {
 		}
 		expectedEvent := &model.Event{
 			ID:        uuid.New(),
-			Title:     req.Title,
+			Title:     req.GetTitle(),
 			CreatorID: user.ID.String(),
 			IsCreator: true,
 		}
@@ -118,13 +118,13 @@ func TestCreateEvent(t *testing.T) {
 			user.ID,
 			true,
 			mock.MatchedBy(func(actual model.CreateEventRequest) bool {
-				if actual.Title != req.Title || actual.PlaceLabel != req.PlaceLabel || actual.Description != req.Description {
+				if actual.Title != req.GetTitle() || actual.PlaceLabel != req.GetPlaceLabel() || actual.Description != req.GetDescription() {
 					return false
 				}
-				if actual.MeetingLink != req.MeetingLink || actual.Region != req.Region || actual.Country != req.Country || actual.City != req.City {
+				if actual.MeetingLink != req.GetMeetingLink() || actual.Region != req.GetRegion() || actual.Country != req.GetCountry() || actual.City != req.GetCity() {
 					return false
 				}
-				if actual.Repeat != model.EventRepeatNone || actual.IsPublic != req.IsPublic {
+				if actual.Repeat != model.EventRepeatNone || actual.IsPublic != req.GetIsPublic() {
 					return false
 				}
 				if actual.ScheduledAt == nil {
@@ -135,7 +135,7 @@ func TestCreateEvent(t *testing.T) {
 		).Return(expectedEvent, nil).Once()
 
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.CreateEvent(ctx, req)
 		if err != nil {
@@ -144,7 +144,7 @@ func TestCreateEvent(t *testing.T) {
 		if resp == nil {
 			t.Fatal("expected response, got nil")
 		}
-		if resp.Event == nil {
+		if resp.GetEvent() == nil {
 			t.Fatal("expected event, got nil")
 		}
 
@@ -168,7 +168,7 @@ func TestCreateEvent(t *testing.T) {
 		).Return(expectedEvent, nil).Once()
 
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.CreateEvent(ctx, &v1.CreateEventRequest{
 			Title:       "Test",
@@ -177,7 +177,7 @@ func TestCreateEvent(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if resp == nil || resp.Event == nil {
+		if resp == nil || resp.GetEvent() == nil {
 			t.Fatal("expected event response")
 		}
 
@@ -189,7 +189,7 @@ func TestCreateEvent(t *testing.T) {
 
 		impl := New(nil)
 
-		_, err := impl.CreateEvent(context.Background(), &v1.CreateEventRequest{})
+		_, err := impl.CreateEvent(t.Context(), &v1.CreateEventRequest{})
 		if err == nil {
 			t.Error("expected error when no user in context")
 		}
@@ -212,7 +212,7 @@ func TestCreateEvent(t *testing.T) {
 		).Return(expectedEvent, nil).Once()
 
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.CreateEvent(ctx, &v1.CreateEventRequest{
 			Title:       "Test",
@@ -221,7 +221,7 @@ func TestCreateEvent(t *testing.T) {
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
 		}
-		if resp == nil || resp.Event == nil {
+		if resp == nil || resp.GetEvent() == nil {
 			t.Fatal("expected event response")
 		}
 
@@ -247,7 +247,7 @@ func TestJoinEvent(t *testing.T) {
 		mockService.On("JoinEvent", mock.Anything, eventID, user.ID).Return(expectedEvent, nil).Once()
 
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.JoinEvent(ctx, req)
 		if err != nil {
@@ -265,7 +265,7 @@ func TestJoinEvent(t *testing.T) {
 
 		impl := New(nil)
 
-		_, err := impl.JoinEvent(context.Background(), &v1.JoinEventRequest{})
+		_, err := impl.JoinEvent(t.Context(), &v1.JoinEventRequest{})
 		if err == nil {
 			t.Error("expected error when no user in context")
 		}
@@ -285,7 +285,7 @@ func TestLeaveEvent(t *testing.T) {
 		mockService.On("LeaveEvent", mock.Anything, eventID, user.ID).Return(nil).Once()
 
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.LeaveEvent(ctx, &v1.LeaveEventRequest{EventId: eventID.String()})
 		if err != nil {
@@ -303,7 +303,7 @@ func TestLeaveEvent(t *testing.T) {
 
 		impl := New(nil)
 
-		_, err := impl.LeaveEvent(context.Background(), &v1.LeaveEventRequest{})
+		_, err := impl.LeaveEvent(t.Context(), &v1.LeaveEventRequest{})
 		if err == nil {
 			t.Error("expected error when no user in context")
 		}
@@ -327,7 +327,7 @@ func TestUpdateEvent(t *testing.T) {
 		}
 		expectedEvent := &model.Event{
 			ID:        eventID,
-			Title:     req.Title,
+			Title:     req.GetTitle(),
 			IsCreator: true,
 		}
 
@@ -335,7 +335,7 @@ func TestUpdateEvent(t *testing.T) {
 		mockService.On("UpdateEvent", mock.Anything, eventID, user, mock.Anything).Return(expectedEvent, nil).Once()
 
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.UpdateEvent(ctx, req)
 		if err != nil {
@@ -352,7 +352,7 @@ func TestUpdateEvent(t *testing.T) {
 		t.Parallel()
 
 		impl := New(nil)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: &model.User{ID: uuid.New()}})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: &model.User{ID: uuid.New()}})
 
 		_, err := impl.UpdateEvent(ctx, &v1.UpdateEventRequest{EventId: "invalid-uuid"})
 		if err == nil {
@@ -365,7 +365,7 @@ func TestUpdateEvent(t *testing.T) {
 
 		impl := New(nil)
 
-		_, err := impl.UpdateEvent(context.Background(), &v1.UpdateEventRequest{EventId: uuid.New().String()})
+		_, err := impl.UpdateEvent(t.Context(), &v1.UpdateEventRequest{EventId: uuid.New().String()})
 		if err == nil {
 			t.Error("expected error when no user in context")
 		}
@@ -381,7 +381,7 @@ func TestUpdateEvent(t *testing.T) {
 		mockService.On("UpdateEvent", mock.Anything, eventID, user, mock.Anything).Return(nil, expectedErr).Once()
 
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		_, err := impl.UpdateEvent(ctx, &v1.UpdateEventRequest{EventId: eventID.String(), ScheduledAt: timestamppb.Now()})
 		if !errors.Is(err, expectedErr) {
@@ -403,7 +403,7 @@ func TestDeleteEvent(t *testing.T) {
 		mockService.On("DeleteEvent", mock.Anything, eventID, user).Return(nil).Once()
 
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		resp, err := impl.DeleteEvent(ctx, &v1.DeleteEventRequest{EventId: eventID.String()})
 		if err != nil {
@@ -412,8 +412,8 @@ func TestDeleteEvent(t *testing.T) {
 		if resp == nil {
 			t.Fatal("expected response, got nil")
 		}
-		if resp.Status != commonv1.OperationStatus_OPERATION_STATUS_OK {
-			t.Errorf("expected status 'ok', got %s", resp.Status)
+		if resp.GetStatus() != commonv1.OperationStatus_OPERATION_STATUS_OK {
+			t.Errorf("expected status 'ok', got %s", resp.GetStatus())
 		}
 
 		mockService.AssertExpectations(t)
@@ -423,7 +423,7 @@ func TestDeleteEvent(t *testing.T) {
 		t.Parallel()
 
 		impl := New(nil)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: &model.User{ID: uuid.New()}})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: &model.User{ID: uuid.New()}})
 
 		_, err := impl.DeleteEvent(ctx, &v1.DeleteEventRequest{EventId: "invalid-uuid"})
 		if err == nil {
@@ -436,7 +436,7 @@ func TestDeleteEvent(t *testing.T) {
 
 		impl := New(nil)
 
-		_, err := impl.DeleteEvent(context.Background(), &v1.DeleteEventRequest{EventId: uuid.New().String()})
+		_, err := impl.DeleteEvent(t.Context(), &v1.DeleteEventRequest{EventId: uuid.New().String()})
 		if err == nil {
 			t.Error("expected error when no user in context")
 		}
@@ -452,7 +452,7 @@ func TestDeleteEvent(t *testing.T) {
 		mockService.On("DeleteEvent", mock.Anything, eventID, user).Return(expectedErr).Once()
 
 		impl := New(mockService)
-		ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+		ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 		_, err := impl.DeleteEvent(ctx, &v1.DeleteEventRequest{EventId: eventID.String()})
 		if !errors.Is(err, expectedErr) {

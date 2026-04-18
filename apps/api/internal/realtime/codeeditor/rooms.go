@@ -4,10 +4,10 @@ import (
 	"encoding/json"
 	"strings"
 
+	"github.com/google/uuid"
+
 	"api/internal/model"
 	schema "api/internal/realtime/schema"
-
-	"github.com/google/uuid"
 )
 
 func (h *Hub) addClient(client *codeEditorClient) {

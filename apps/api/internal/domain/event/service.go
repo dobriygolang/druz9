@@ -3,9 +3,9 @@ package event
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // Config represents event domain service configuration.

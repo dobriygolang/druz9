@@ -1,9 +1,9 @@
 package challenge
 
 import (
-	"api/internal/storage/postgres"
-
 	"github.com/go-kratos/kratos/v2/log"
+
+	"api/internal/storage/postgres"
 )
 
 // Repo handles all challenge-related data operations.

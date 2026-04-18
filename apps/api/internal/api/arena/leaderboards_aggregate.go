@@ -3,11 +3,11 @@ package arena
 import (
 	"context"
 
-	"api/internal/model"
-	v1 "api/pkg/api/arena/v1"
-
 	"github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
+
+	"api/internal/model"
+	v1 "api/pkg/api/arena/v1"
 )
 
 // Pure protobuf-mapping handlers for the guild + season-XP leaderboards.

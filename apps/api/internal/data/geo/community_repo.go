@@ -27,12 +27,13 @@ SELECT
   END
 FROM geo g
 JOIN users u ON u.id = g.user_id
-WHERE u.status = $1
+WHERE u.status = 2
 ORDER BY COALESCE(u.last_active_at, u.updated_at, u.created_at, NOW()) DESC, u.created_at DESC
 LIMIT 250
 `
 
-	rows, err := r.data.DB.Query(ctx, query, model.UserStatusActive)
+	// users.status is an INT column (2 = active). Pass the constant directly.
+	rows, err := r.data.DB.Query(ctx, query)
 	if err != nil {
 		return nil, fmt.Errorf("query community map points: %w", err)
 	}

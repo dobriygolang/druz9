@@ -3,9 +3,9 @@ package profile
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // GetProfileByID retrieves user profile by ID.

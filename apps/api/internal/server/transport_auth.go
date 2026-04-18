@@ -4,13 +4,13 @@ import (
 	"context"
 	"strings"
 
+	"github.com/go-kratos/kratos/v2/middleware"
+	"github.com/go-kratos/kratos/v2/middleware/selector"
+
 	authmiddleware "api/internal/middleware"
 	authcallbackv1 "api/pkg/adapter/auth_callback/v1"
 	codeeditorv1 "api/pkg/api/code_editor/v1"
 	profilev1 "api/pkg/api/profile/v1"
-
-	"github.com/go-kratos/kratos/v2/middleware"
-	"github.com/go-kratos/kratos/v2/middleware/selector"
 )
 
 // Auth model (per product decision, 2026-Q2):

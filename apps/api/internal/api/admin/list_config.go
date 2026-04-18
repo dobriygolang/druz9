@@ -4,10 +4,10 @@ import (
 	"context"
 	"sort"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	"api/internal/rtc"
 	v1 "api/pkg/api/admin/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) ListConfig(ctx context.Context, req *v1.ListConfigRequest) (*v1.ListConfigResponse, error) {

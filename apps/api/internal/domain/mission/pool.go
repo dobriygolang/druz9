@@ -1,10 +1,11 @@
 package mission
 
 import (
-	"api/internal/model"
 	"crypto/sha256"
 	"encoding/binary"
 	"time"
+
+	"api/internal/model"
 )
 
 // Def defines a mission template in the static pool.
@@ -134,13 +135,13 @@ func SelectDailyMissions(userID string, date time.Time) []Def {
 	selected := make([]Def, 0, MissionsPerDay)
 	used := make(map[int]bool, MissionsPerDay)
 
-	for i := 0; i < MissionsPerDay; i++ {
+	for i := range MissionsPerDay {
 		// Derive a sub-seed for each slot to avoid collisions.
-		slotSeed := seed + uint64(i)*7919       //nolint:gosec // i is bounded by small constant MissionsPerDay
-		idx := int(slotSeed % uint64(poolSize)) //nolint:gosec // modulo result fits in int by construction
+		slotSeed := seed + uint64(i)*7919
+		idx := int(slotSeed % uint64(poolSize))
 
 		// Linear probe to find an unused slot.
-		for attempts := 0; attempts < poolSize; attempts++ {
+		for attempts := range poolSize {
 			candidate := (idx + attempts) % poolSize
 			if !used[candidate] && !categorySaturated(selected, dailyPool[candidate].Category) {
 				used[candidate] = true
@@ -204,7 +205,7 @@ func BuildDailyMissions(userID string, date time.Time, counts *ActivityCounts, c
 		})
 	}
 
-	allComplete := completedCount == int32(len(missions)) //nolint:gosec // missions len is bounded by MissionsPerDay constant
+	allComplete := completedCount == int32(len(missions))
 	bonusXP := int32(0)
 	if allComplete {
 		bonusXP = AllCompleteBonusXP

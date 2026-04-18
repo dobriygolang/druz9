@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
+
 	"api/internal/aireview"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 func TestSubmitMockStageRetriesTransientAIReviewAndSucceeds(t *testing.T) {
@@ -35,7 +35,7 @@ func TestSubmitMockStageRetriesTransientAIReviewAndSucceeds(t *testing.T) {
 		Reviewer:   reviewer,
 	})
 
-	result, err := service.SubmitMockStage(context.Background(), user, sessionID, "SELECT 1", "sql", "", "")
+	result, err := service.SubmitMockStage(t.Context(), user, sessionID, "SELECT 1", "sql", "", "")
 	if err != nil {
 		t.Fatalf("SubmitMockStage returned error: %v", err)
 	}
@@ -82,7 +82,7 @@ func TestSubmitMockStageTimeoutPreservesPreviousStageState(t *testing.T) {
 		Reviewer:   reviewer,
 	})
 
-	_, err := service.SubmitMockStage(context.Background(), user, sessionID, "SELECT 42", "sql", "", "")
+	_, err := service.SubmitMockStage(t.Context(), user, sessionID, "SELECT 42", "sql", "", "")
 	if !errors.Is(err, context.DeadlineExceeded) {
 		t.Fatalf("expected deadline exceeded, got %v", err)
 	}

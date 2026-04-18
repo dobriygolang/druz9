@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
+
 	profiledata "api/internal/data/profile"
 	streakdomain "api/internal/domain/streak"
-
-	"github.com/google/uuid"
 )
 
 // StatsAdapter wires profile.Repo.GetStreakStats into the streak domain.

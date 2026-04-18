@@ -6,10 +6,10 @@ import (
 	"strings"
 	"time"
 
+	klog "github.com/go-kratos/kratos/v2/log"
+
 	notif "api/internal/clients/notification"
 	profiledomain "api/internal/domain/profile"
-
-	klog "github.com/go-kratos/kratos/v2/log"
 )
 
 const telegramAPIBase = "https://api.telegram.org"
@@ -53,6 +53,7 @@ func (s *Service) Run(ctx context.Context) error {
 		updates, err := s.getUpdates(ctx, offset)
 		if err != nil {
 			if ctx.Err() != nil {
+				//nolint:nilerr // Context cancellation is the normal shutdown path for polling.
 				return nil
 			}
 			klog.Errorf("telegram bot getUpdates error: %v", err)

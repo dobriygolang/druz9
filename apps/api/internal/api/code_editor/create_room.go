@@ -8,11 +8,11 @@ import (
 )
 
 func (i *Implementation) CreateRoom(ctx context.Context, req *v1.CreateRoomRequest) (*v1.CreateRoomResponse, error) {
-	userID, name, isGuest := resolveActor(ctx, req.Name)
+	userID, name, isGuest := resolveActor(ctx, req.GetName())
 
-	mode := protoRoomModeToModel(req.Mode)
-	difficulty := protoDifficultyToModel(req.Difficulty)
-	room, err := i.service.CreateRoom(ctx, userID, name, isGuest, mode.String(), req.Topic, difficulty.String(), req.Task, req.IsPrivate)
+	mode := protoRoomModeToModel(req.GetMode())
+	difficulty := protoDifficultyToModel(req.GetDifficulty())
+	room, err := i.service.CreateRoom(ctx, userID, name, isGuest, mode.String(), req.GetTopic(), difficulty.String(), req.GetTask(), req.GetIsPrivate())
 	if err != nil {
 		return nil, mapErr(err)
 	}

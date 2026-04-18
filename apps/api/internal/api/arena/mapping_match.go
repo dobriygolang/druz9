@@ -1,12 +1,12 @@
 package arena
 
 import (
+	"github.com/google/uuid"
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	domain "api/internal/domain/arena"
 	"api/internal/model"
 	v1 "api/pkg/api/arena/v1"
-
-	"github.com/google/uuid"
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapArenaMatchForViewer(match *domain.Match, viewerUserID string, spectator bool) *v1.ArenaMatch {

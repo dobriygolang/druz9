@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"log"
 	"net/http"
 	"os"
@@ -37,7 +38,7 @@ func main() {
 	}
 
 	log.Printf("sandbox runner listening on %s", addr)
-	if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+	if err := server.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 		log.Fatalf("sandbox runner stopped: %v", err)
 	}
 }

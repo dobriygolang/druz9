@@ -154,7 +154,7 @@ func parseCodeReviewJSON(raw string) (*CodeReview, error) {
 
 	var payload map[string]any
 	if err := json.Unmarshal([]byte(cleaned), &payload); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrInvalidResponse, err)
+		return nil, fmt.Errorf("%w: %w", ErrInvalidResponse, err)
 	}
 
 	review := CodeReview{

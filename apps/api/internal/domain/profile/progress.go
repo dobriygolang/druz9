@@ -328,7 +328,7 @@ func ComputeNextMilestone(c *model.ProfileCompetency) string {
 	case LevelBeginner:
 		totalSessions := c.PracticeSessions + c.StageCount
 		if totalSessions == 0 {
-			return fmt.Sprintf("Реши первую задачу по %s", c.Label)
+			return "Реши первую задачу по " + c.Label
 		}
 		if c.Score < 30 {
 			return fmt.Sprintf("Набери 30 баллов по %s (сейчас %d)", c.Label, c.Score)
@@ -337,12 +337,12 @@ func ComputeNextMilestone(c *model.ProfileCompetency) string {
 		if needed > 0 {
 			return fmt.Sprintf("Реши ещё %d задач по %s", needed, c.Label)
 		}
-		return fmt.Sprintf("Продолжай практику по %s", c.Label)
+		return "Продолжай практику по " + c.Label
 	case LevelConfident:
 		if c.VerifiedScore < 60 {
 			return fmt.Sprintf("Пройди mock по %s для перехода в Strong (нужен verified 60+)", c.Label)
 		}
-		return fmt.Sprintf("Продолжай mock-интервью по %s", c.Label)
+		return "Продолжай mock-интервью по " + c.Label
 	case LevelStrong:
 		if c.VerifiedScore < 85 {
 			return fmt.Sprintf("Подними verified score до 85+ по %s (сейчас %d)", c.Label, c.VerifiedScore)
@@ -350,9 +350,9 @@ func ComputeNextMilestone(c *model.ProfileCompetency) string {
 		if c.StageCount < 5 {
 			return fmt.Sprintf("Пройди ещё %d mock-этапов по %s", 5-c.StageCount, c.Label)
 		}
-		return fmt.Sprintf("Продолжай mock-интервью по %s", c.Label)
+		return "Продолжай mock-интервью по " + c.Label
 	case LevelExpert:
-		return fmt.Sprintf("Поддерживай уровень Expert по %s", c.Label)
+		return "Поддерживай уровень Expert по " + c.Label
 	default:
 		return ""
 	}
@@ -444,7 +444,7 @@ func suggestAction(c *model.ProfileCompetency, priority int32) *model.NextAction
 	switch {
 	case level == LevelBeginner && c.PracticeSessions == 0 && c.StageCount == 0:
 		return &model.NextAction{
-			Title:       fmt.Sprintf("Начни %s", c.Label),
+			Title:       "Начни " + c.Label,
 			Description: fmt.Sprintf("У тебя пока нет попыток по %s — реши первую задачу", c.Label),
 			ActionType:  "practice",
 			ActionURL:   RecommendationHref(c.Key),
@@ -453,7 +453,7 @@ func suggestAction(c *model.ProfileCompetency, priority int32) *model.NextAction
 		}
 	case c.Confidence != "verified" && c.PracticeScore > 30:
 		return &model.NextAction{
-			Title:       fmt.Sprintf("Пройди mock по %s", c.Label),
+			Title:       "Пройди mock по " + c.Label,
 			Description: fmt.Sprintf("Practice score %d — подтверди уровень через mock-интервью", c.PracticeScore),
 			ActionType:  "mock",
 			ActionURL:   RecommendationHref(c.Key),
@@ -462,7 +462,7 @@ func suggestAction(c *model.ProfileCompetency, priority int32) *model.NextAction
 		}
 	case level == LevelBeginner:
 		return &model.NextAction{
-			Title:       fmt.Sprintf("Подтяни %s", c.Label),
+			Title:       "Подтяни " + c.Label,
 			Description: fmt.Sprintf("%s — %d%%, зона роста", c.Label, c.Score),
 			ActionType:  "practice",
 			ActionURL:   RecommendationHref(c.Key),
@@ -471,7 +471,7 @@ func suggestAction(c *model.ProfileCompetency, priority int32) *model.NextAction
 		}
 	case level == LevelConfident && c.VerifiedScore < 60:
 		return &model.NextAction{
-			Title:       fmt.Sprintf("Пройди mock по %s", c.Label),
+			Title:       "Пройди mock по " + c.Label,
 			Description: fmt.Sprintf("Для перехода в Strong нужен verified 60+ (сейчас %d)", c.VerifiedScore),
 			ActionType:  "mock",
 			ActionURL:   RecommendationHref(c.Key),

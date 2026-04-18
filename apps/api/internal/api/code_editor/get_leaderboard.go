@@ -7,7 +7,7 @@ import (
 )
 
 func (i *Implementation) GetLeaderboard(ctx context.Context, req *v1.GetLeaderboardRequest) (*v1.GetLeaderboardResponse, error) {
-	entries, err := i.service.GetLeaderboard(ctx, req.Limit)
+	entries, err := i.service.GetLeaderboard(ctx, req.GetLimit())
 	if err != nil {
 		return nil, mapErr(err)
 	}

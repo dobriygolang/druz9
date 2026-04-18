@@ -5,9 +5,9 @@ import (
 	"sync"
 	"time"
 
-	"api/internal/config"
-
 	aegisratelimit "github.com/go-kratos/aegis/ratelimit"
+
+	"api/internal/config"
 )
 
 type ipBucket struct {

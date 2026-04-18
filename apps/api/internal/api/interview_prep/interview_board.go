@@ -34,17 +34,17 @@ func (i *Implementation) PostInterviewExperience(ctx context.Context, req *v1.Po
 		rating = 5
 	}
 	row := &interviewprepdata.InterviewExperienceRow{
-		UserID:            user.ID,
-		CompanyTag:        company,
-		Role:              req.GetRole(),
-		Level:             req.GetLevel(),
-		OverallRating:     rating,
-		LoopStructure:     req.GetLoopStructure(),
-		Questions:         req.GetQuestions(),
-		FeedbackReceived:  req.GetFeedbackReceived(),
-		Outcome:           req.GetOutcome(),
-		IsAnonymous:       req.GetIsAnonymous(),
-		ModerationStatus:  "approved", // see comment above
+		UserID:           user.ID,
+		CompanyTag:       company,
+		Role:             req.GetRole(),
+		Level:            req.GetLevel(),
+		OverallRating:    rating,
+		LoopStructure:    req.GetLoopStructure(),
+		Questions:        req.GetQuestions(),
+		FeedbackReceived: req.GetFeedbackReceived(),
+		Outcome:          req.GetOutcome(),
+		IsAnonymous:      req.GetIsAnonymous(),
+		ModerationStatus: "approved", // see comment above
 	}
 	saved, err := i.admin.InsertInterviewExperience(ctx, row)
 	if err != nil {
@@ -83,18 +83,18 @@ func mapExperience(r *interviewprepdata.InterviewExperienceRow) *v1.InterviewExp
 		uid = ""
 	}
 	return &v1.InterviewExperience{
-		Id:                r.ID.String(),
-		UserId:            uid,
-		CompanyTag:        r.CompanyTag,
-		Role:              r.Role,
-		Level:             r.Level,
-		OverallRating:     r.OverallRating,
-		LoopStructure:     r.LoopStructure,
-		Questions:         r.Questions,
-		FeedbackReceived:  r.FeedbackReceived,
-		Outcome:           r.Outcome,
-		IsAnonymous:       r.IsAnonymous,
-		ModerationStatus:  r.ModerationStatus,
-		PostedAt:          timestamppb.New(r.PostedAt),
+		Id:               r.ID.String(),
+		UserId:           uid,
+		CompanyTag:       r.CompanyTag,
+		Role:             r.Role,
+		Level:            r.Level,
+		OverallRating:    r.OverallRating,
+		LoopStructure:    r.LoopStructure,
+		Questions:        r.Questions,
+		FeedbackReceived: r.FeedbackReceived,
+		Outcome:          r.Outcome,
+		IsAnonymous:      r.IsAnonymous,
+		ModerationStatus: r.ModerationStatus,
+		PostedAt:         timestamppb.New(r.PostedAt),
 	}
 }

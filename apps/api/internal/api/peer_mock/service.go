@@ -9,16 +9,16 @@ import (
 	"errors"
 	"time"
 
-	"api/internal/apihelpers"
-	pmdata "api/internal/data/peer_mock"
-	"api/internal/model"
-	v1 "api/pkg/api/peer_mock/v1"
-
 	kerrs "github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	"api/internal/apihelpers"
+	pmdata "api/internal/data/peer_mock"
+	"api/internal/model"
+	v1 "api/pkg/api/peer_mock/v1"
 )
 
 // Penalty policy — matches Round 5 plan "Peer Mock Interview System".
@@ -56,11 +56,11 @@ func (i *Implementation) CreateSlot(ctx context.Context, req *v1.CreateSlotReque
 	if err := i.ensureNotBanned(ctx, user.ID); err != nil {
 		return nil, err
 	}
-	if req.StartsAt == nil || req.EndsAt == nil {
+	if req.GetStartsAt() == nil || req.GetEndsAt() == nil {
 		return nil, kerrs.BadRequest("INVALID_SLOT", "starts_at and ends_at are required")
 	}
-	starts := req.StartsAt.AsTime()
-	ends := req.EndsAt.AsTime()
+	starts := req.GetStartsAt().AsTime()
+	ends := req.GetEndsAt().AsTime()
 	if ends.Before(starts) {
 		return nil, kerrs.BadRequest("INVALID_SLOT", "ends_at must be after starts_at")
 	}
@@ -318,6 +318,7 @@ func (i *Implementation) GetMyReliability(ctx context.Context, _ *v1.GetMyReliab
 func (i *Implementation) ensureNotBanned(ctx context.Context, userID uuid.UUID) error {
 	rel, err := i.repo.GetReliability(ctx, userID)
 	if err != nil {
+		//nolint:nilerr // Reliability lookup failures should not block peer mock access.
 		return nil // don't block on read error
 	}
 	if rel.BanUntil != nil && rel.BanUntil.After(time.Now()) {
@@ -329,6 +330,7 @@ func (i *Implementation) ensureNotBanned(ctx context.Context, userID uuid.UUID) 
 func (i *Implementation) recentPenaltyCount(ctx context.Context, userID uuid.UUID) (int, error) {
 	rel, err := i.repo.GetReliability(ctx, userID)
 	if err != nil || rel.LastPenaltyAt == nil {
+		//nolint:nilerr // Missing reliability data is treated as zero recent penalties.
 		return 0, nil
 	}
 	// Very rough: use total penalty_count if last penalty is within banWindow.
@@ -362,17 +364,17 @@ func mapBooking(b *model.MockBooking) *v1.Booking {
 		return nil
 	}
 	out := &v1.Booking{
-		Id:               b.ID.String(),
-		SlotId:           b.SlotID.String(),
-		InterviewerId:    b.InterviewerID.String(),
-		InterviewerName:  b.InterviewerName,
-		IntervieweeId:    b.IntervieweeID.String(),
-		IntervieweeName:  b.IntervieweeName,
-		StartsAt:         timestamppb.New(b.StartsAt),
-		EndsAt:           timestamppb.New(b.EndsAt),
-		Status:           v1.BookingStatus(b.Status),
-		PriceGold:        b.PriceGold,
-		ReviewedByMe:     b.ReviewedByMe,
+		Id:              b.ID.String(),
+		SlotId:          b.SlotID.String(),
+		InterviewerId:   b.InterviewerID.String(),
+		InterviewerName: b.InterviewerName,
+		IntervieweeId:   b.IntervieweeID.String(),
+		IntervieweeName: b.IntervieweeName,
+		StartsAt:        timestamppb.New(b.StartsAt),
+		EndsAt:          timestamppb.New(b.EndsAt),
+		Status:          v1.BookingStatus(b.Status),
+		PriceGold:       b.PriceGold,
+		ReviewedByMe:    b.ReviewedByMe,
 	}
 	if b.RoomID != uuid.Nil {
 		out.RoomId = b.RoomID.String()

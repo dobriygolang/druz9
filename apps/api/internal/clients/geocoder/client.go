@@ -10,11 +10,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/go-kratos/kratos/v2/log"
+
 	"api/internal/config"
 	geoerrors "api/internal/errors/geo"
 	"api/internal/model"
-
-	"github.com/go-kratos/kratos/v2/log"
 )
 
 const defaultGeocoderURL = "https://nominatim.openstreetmap.org/search"
@@ -72,7 +72,7 @@ func (c *Client) Resolve(ctx context.Context, query string, limit int) ([]*model
 	params.Set("limit", strconv.Itoa(limit))
 	reqURL.RawQuery = params.Encode()
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL.String(), nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, reqURL.String(), http.NoBody)
 	if err != nil {
 		return nil, fmt.Errorf("build geocoder request: %w", err)
 	}
@@ -82,7 +82,7 @@ func (c *Client) Resolve(ctx context.Context, query string, limit int) ([]*model
 
 	resp, err := c.httpClient.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("%w: %v", geoerrors.ErrResolve, err)
+		return nil, fmt.Errorf("%w: %w", geoerrors.ErrResolve, err)
 	}
 	defer resp.Body.Close()
 

@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	kratosErrors "github.com/go-kratos/kratos/v2/errors"
+
 	codeeditordomain "api/internal/domain/codeeditor"
 	v1 "api/pkg/api/code_editor/v1"
-
-	kratosErrors "github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) GetDailyChallenge(ctx context.Context, _ *v1.GetDailyChallengeRequest) (*v1.GetDailyChallengeResponse, error) {

@@ -7,10 +7,10 @@ import (
 	"os"
 	"strings"
 
+	klog "github.com/go-kratos/kratos/v2/log"
+
 	"api/internal/config"
 	"api/internal/rtc"
-
-	klog "github.com/go-kratos/kratos/v2/log"
 )
 
 func main() {

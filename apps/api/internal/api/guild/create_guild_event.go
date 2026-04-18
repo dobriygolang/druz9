@@ -4,12 +4,12 @@ import (
 	"context"
 	"time"
 
+	kratosErrors "github.com/go-kratos/kratos/v2/errors"
+
 	"api/internal/apihelpers"
 	"api/internal/model"
 	"api/internal/util/timeutil"
 	guildv1 "api/pkg/api/guild/v1"
-
-	kratosErrors "github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) CreateGuildEvent(ctx context.Context, req *guildv1.CreateGuildEventRequest) (*guildv1.CreateGuildEventResponse, error) {
@@ -18,7 +18,7 @@ func (i *Implementation) CreateGuildEvent(ctx context.Context, req *guildv1.Crea
 		return nil, err
 	}
 
-	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
+	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
 		return nil, err
 	}
@@ -28,12 +28,12 @@ func (i *Implementation) CreateGuildEvent(ctx context.Context, req *guildv1.Crea
 		return nil, kratosErrors.Forbidden("NOT_A_MEMBER", "must be a guild member")
 	}
 
-	if req.Title == "" {
+	if req.GetTitle() == "" {
 		return nil, kratosErrors.BadRequest("INVALID_TITLE", "title is required")
 	}
 	var scheduledAt *time.Time
-	if req.ScheduledAt != "" {
-		value, err := timeutil.ParseMoscowDateTime(req.ScheduledAt)
+	if req.GetScheduledAt() != "" {
+		value, err := timeutil.ParseMoscowDateTime(req.GetScheduledAt())
 		if err != nil || !value.After(time.Now().UTC()) {
 			return nil, kratosErrors.BadRequest("INVALID_SCHEDULED_AT", "scheduledAt must be a future Moscow timestamp")
 		}
@@ -41,13 +41,13 @@ func (i *Implementation) CreateGuildEvent(ctx context.Context, req *guildv1.Crea
 	}
 
 	event, err := i.eventSvc.CreateEvent(ctx, user.ID, user.IsAdmin, model.CreateEventRequest{
-		Title:       req.Title,
-		Description: req.Description,
-		MeetingLink: req.MeetingLink,
-		PlaceLabel:  req.PlaceLabel,
+		Title:       req.GetTitle(),
+		Description: req.GetDescription(),
+		MeetingLink: req.GetMeetingLink(),
+		PlaceLabel:  req.GetPlaceLabel(),
 		ScheduledAt: scheduledAt,
-		Repeat:      req.Repeat,
-		GuildID:    &guildID,
+		Repeat:      req.GetRepeat(),
+		GuildID:     &guildID,
 	})
 	if err != nil {
 		return nil, err

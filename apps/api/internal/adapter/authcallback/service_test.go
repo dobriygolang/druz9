@@ -30,7 +30,7 @@ func TestConfirmTelegramAuth(t *testing.T) {
 	svc := &fakeService{code: "123456"}
 	server := New(svc)
 
-	resp, err := server.ConfirmTelegramAuth(context.Background(), &v1.ConfirmTelegramAuthRequest{
+	resp, err := server.ConfirmTelegramAuth(t.Context(), &v1.ConfirmTelegramAuthRequest{
 		Token:      "challenge-token",
 		BotToken:   "bot-secret",
 		TelegramId: 42,
@@ -62,7 +62,7 @@ func TestConfirmTelegramAuthError(t *testing.T) {
 	expectedErr := errors.New("boom")
 	server := New(&fakeService{err: expectedErr})
 
-	_, err := server.ConfirmTelegramAuth(context.Background(), &v1.ConfirmTelegramAuthRequest{})
+	_, err := server.ConfirmTelegramAuth(t.Context(), &v1.ConfirmTelegramAuthRequest{})
 	if !errors.Is(err, expectedErr) {
 		t.Fatalf("expected %v, got %v", expectedErr, err)
 	}

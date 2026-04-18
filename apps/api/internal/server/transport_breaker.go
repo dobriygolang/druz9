@@ -3,12 +3,12 @@ package server
 import (
 	"context"
 
-	"api/internal/config"
-
 	"github.com/go-kratos/aegis/circuitbreaker"
 	"github.com/go-kratos/aegis/circuitbreaker/sre"
 	kratoserrpkg "github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/middleware"
+
+	"api/internal/config"
 )
 
 func newHTTPServerCircuitBreaker(cbCfg *config.CircuitBreaker) middleware.Middleware {

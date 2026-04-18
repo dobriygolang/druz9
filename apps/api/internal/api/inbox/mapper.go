@@ -1,10 +1,10 @@
 package inbox
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/model"
 	v1 "api/pkg/api/inbox/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapThread(t *model.InboxThread) *v1.InboxThread {
@@ -16,15 +16,15 @@ func mapThread(t *model.InboxThread) *v1.InboxThread {
 		externalID = t.ExternalID.String()
 	}
 	return &v1.InboxThread{
-		Id:             t.ID.String(),
-		Kind:           v1.ThreadKind(t.Kind),
-		Subject:        t.Subject,
-		Avatar:         t.Avatar,
-		Preview:        t.Preview,
-		UnreadCount:    t.UnreadCount,
-		LastMessageAt:  timestamppb.New(t.LastMessageAt),
-		ExternalId:     externalID,
-		Interactive:    t.Interactive,
+		Id:            t.ID.String(),
+		Kind:          v1.ThreadKind(t.Kind),
+		Subject:       t.Subject,
+		Avatar:        t.Avatar,
+		Preview:       t.Preview,
+		UnreadCount:   t.UnreadCount,
+		LastMessageAt: timestamppb.New(t.LastMessageAt),
+		ExternalId:    externalID,
+		Interactive:   t.Interactive,
 	}
 }
 

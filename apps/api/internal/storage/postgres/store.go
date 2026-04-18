@@ -2,12 +2,13 @@ package postgres
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
-	"api/internal/config"
-
 	"github.com/jackc/pgx/v5/pgxpool"
+
+	"api/internal/config"
 )
 
 type Store struct {
@@ -36,7 +37,7 @@ func DefaultPoolConfig() PoolConfig {
 
 func New(cfg *config.Data, poolCfg PoolConfig) (*Store, func(), error) {
 	if cfg == nil || cfg.Database == nil || cfg.Database.Source == "" {
-		return nil, nil, fmt.Errorf("database source is required")
+		return nil, nil, errors.New("database source is required")
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

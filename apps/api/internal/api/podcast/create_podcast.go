@@ -15,7 +15,7 @@ func (i *Implementation) CreatePodcast(ctx context.Context, req *v1.CreatePodcas
 		return nil, err
 	}
 
-	item, err := i.service.CreatePodcast(ctx, user, model.CreatePodcastRequest{Title: req.Title})
+	item, err := i.service.CreatePodcast(ctx, user, model.CreatePodcastRequest{Title: req.GetTitle()})
 	if err != nil {
 		return nil, err
 	}

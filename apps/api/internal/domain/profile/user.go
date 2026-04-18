@@ -3,9 +3,9 @@ package profile
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // FindUserByID retrieves a user by ID.

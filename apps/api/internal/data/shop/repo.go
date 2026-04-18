@@ -5,12 +5,12 @@ import (
 	"errors"
 	"fmt"
 
-	"api/internal/model"
-	"api/internal/storage/postgres"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
+	"api/internal/storage/postgres"
 )
 
 type Repo struct {
@@ -85,7 +85,7 @@ func (r *Repo) ListItems(
 	}
 
 	var total int32
-	countQuery := fmt.Sprintf(`SELECT COUNT(*) FROM shop_items WHERE %s`, where)
+	countQuery := "SELECT COUNT(*) FROM shop_items WHERE " + where
 	if err := r.data.DB.QueryRow(ctx, countQuery, args...).Scan(&total); err != nil {
 		return nil, 0, fmt.Errorf("count items: %w", err)
 	}
@@ -225,7 +225,7 @@ func (r *Repo) SetEquippedForSlot(
 	ctx context.Context, userID uuid.UUID, slot string, equipItemID uuid.UUID,
 ) ([]*model.ShopOwnedItem, error) {
 	if slot == "" {
-		return nil, fmt.Errorf("set equipped: empty slot")
+		return nil, errors.New("set equipped: empty slot")
 	}
 	tx, err := r.data.DB.Begin(ctx)
 	if err != nil {
@@ -300,7 +300,7 @@ func (r *Repo) AdminListItems(
 		items = append(items, it)
 	}
 	var total int32
-	if err := r.data.DB.QueryRow(ctx, fmt.Sprintf(`SELECT COUNT(*) FROM shop_items WHERE %s`, where), args...).Scan(&total); err != nil {
+	if err := r.data.DB.QueryRow(ctx, "SELECT COUNT(*) FROM shop_items WHERE "+where, args...).Scan(&total); err != nil {
 		return nil, 0, fmt.Errorf("admin count items: %w", err)
 	}
 	return items, total, nil

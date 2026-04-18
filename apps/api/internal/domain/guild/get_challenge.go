@@ -3,9 +3,9 @@ package guild
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // GetActiveChallenge returns the currently active challenge for a guild, if any.

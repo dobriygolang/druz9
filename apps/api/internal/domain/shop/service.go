@@ -8,9 +8,9 @@ import (
 	"errors"
 	"strings"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 const (
@@ -63,14 +63,14 @@ type Service struct {
 func NewService(c Config) *Service { return &Service{repo: c.Repository, wallet: c.Wallet} }
 
 var (
-	ErrItemNotFound       = errors.New("shop: item not found")
-	ErrItemInactive       = errors.New("shop: item is no longer for sale")
-	ErrAlreadyOwned       = errors.New("shop: item already owned")
+	ErrItemNotFound        = errors.New("shop: item not found")
+	ErrItemInactive        = errors.New("shop: item is no longer for sale")
+	ErrAlreadyOwned        = errors.New("shop: item already owned")
 	ErrUnsupportedCurrency = errors.New("shop: unsupported currency")
-	ErrInsufficientFunds  = errors.New("shop: insufficient funds")
-	ErrNotForSale         = errors.New("shop: item has no price (event drop)")
-	ErrNotEquippable      = errors.New("shop: item has no slot — cannot be equipped")
-	ErrNotOwned           = errors.New("shop: user does not own this item")
+	ErrInsufficientFunds   = errors.New("shop: insufficient funds")
+	ErrNotForSale          = errors.New("shop: item has no price (event drop)")
+	ErrNotEquippable       = errors.New("shop: item has no slot — cannot be equipped")
+	ErrNotOwned            = errors.New("shop: user does not own this item")
 )
 
 // CATEGORY_NAMES maps the enum to its canonical name for the

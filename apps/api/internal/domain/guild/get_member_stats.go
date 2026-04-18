@@ -3,10 +3,10 @@ package guild
 import (
 	"context"
 
+	"github.com/google/uuid"
+
 	arenarating "api/internal/domain/arena/rating"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 // GetMemberStats returns enriched member stats for a guild.

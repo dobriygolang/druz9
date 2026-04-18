@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"api/internal/config"
-
 	"github.com/go-kratos/kratos/v2/transport"
+
+	"api/internal/config"
 )
 
 type SessionCookieManager struct {

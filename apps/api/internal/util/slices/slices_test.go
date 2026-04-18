@@ -11,7 +11,7 @@ func TestContains(t *testing.T) {
 
 	assert.True(t, Contains(s, "c"))
 	assert.False(t, Contains(s, "z"))
-	assert.True(t, Contains([]string{}, "a") == false)
+	assert.False(t, Contains([]string{}, "a"))
 }
 
 func TestContainsSet(t *testing.T) {
@@ -88,7 +88,8 @@ func TestGroupBy(t *testing.T) {
 	result := GroupBy(s, func(v struct {
 		Name string
 		Age  int
-	}) int {
+	},
+	) int {
 		return v.Age
 	})
 

@@ -1,11 +1,10 @@
 package profile
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/model"
 	profilev1 "api/pkg/api/profile/v1"
-	"fmt"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapProfileResponse(resp *model.ProfileResponse) *profilev1.ProfileResponse {
@@ -51,7 +50,7 @@ func mapAvatarURL(user *model.User) string {
 		return normalizeMappedAvatarURL(user.YandexAvatarURL)
 	}
 	if user.TelegramID != 0 {
-		return fmt.Sprintf("/api/v1/profile/avatar/%s", user.ID.String())
+		return "/api/v1/profile/avatar/" + user.ID.String()
 	}
 	return normalizeMappedAvatarURL(user.AvatarURL)
 }

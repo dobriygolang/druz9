@@ -386,4 +386,3 @@ type CodeLeaderboardEntry struct {
 	WinRate     float64
 	BestSolveMs int64
 }
-

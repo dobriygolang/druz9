@@ -3,13 +3,14 @@ package solution_review
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
-
-	"api/internal/model"
-	"api/internal/storage/postgres"
 
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
+	"api/internal/storage/postgres"
 )
 
 // Repo provides data access for solution reviews.
@@ -45,12 +46,15 @@ func (r *Repo) Create(ctx context.Context, review *model.SolutionReview) error {
 
 // UpdateAIReview fills in the Level 2 AI review fields.
 func (r *Repo) UpdateAIReview(ctx context.Context, reviewID uuid.UUID, ai *model.SolutionReview) error {
-	skillSignals, _ := json.Marshal(ai.AISkillSignals)
+	skillSignals, err := json.Marshal(ai.AISkillSignals)
+	if err != nil {
+		return fmt.Errorf("marshal ai skill signals: %w", err)
+	}
 	if string(skillSignals) == "null" {
 		skillSignals = []byte("{}")
 	}
 
-	_, err := r.data.DB.Exec(ctx, `
+	_, err = r.data.DB.Exec(ctx, `
 		UPDATE solution_reviews SET
 			status = $2,
 			ai_verdict = $3,
@@ -130,7 +134,7 @@ func (r *Repo) GetTaskStats(ctx context.Context, taskID uuid.UUID) (*model.TaskS
 		`SELECT task_id, median_solve_time_ms, total_solves, updated_at FROM task_stats WHERE task_id = $1`,
 		taskID,
 	).Scan(&stats.TaskID, &stats.MedianSolveTimeMs, &stats.TotalSolves, &stats.UpdatedAt)
-	if err == pgx.ErrNoRows {
+	if errors.Is(err, pgx.ErrNoRows) {
 		return &model.TaskStats{TaskID: taskID}, nil
 	}
 	if err != nil {
@@ -222,7 +226,7 @@ func scanReview(s scannable) (*model.SolutionReview, error) {
 		&rev.CreatedAt,
 	)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, nil
 		}
 		return nil, fmt.Errorf("scan review: %w", err)

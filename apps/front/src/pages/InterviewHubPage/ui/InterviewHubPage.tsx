@@ -159,19 +159,12 @@ export function InterviewHubPage() {
                     color: 'var(--ember-1)',
                   })
                   setStartingCompany(null)
-                } catch (e: any) {
-                  // Backend can return 400 BAD_REQUEST "mock interview
-                  // task pool is incomplete for selected company" when
-                  // the admin hasn't filled a blueprint yet. Show that
-                  // reason plainly instead of a red 500 toast.
-                  const msg = e?.response?.data?.message ?? 'Could not start session'
-                  addToast({
-                    kind: 'QUEST',
-                    title: `${c.label} · mock unavailable`,
-                    body: msg,
-                    icon: '!',
-                    color: 'var(--rpg-danger)',
-                  })
+                } catch {
+                  // Global axios interceptor already surfaces the
+                  // server's message (e.g. "mock interview task pool is
+                  // incomplete"). Previously we also fired a local
+                  // "<Company> · mock unavailable" toast → duplicate
+                  // pair. Let the interceptor handle it.
                   setStartingCompany(null)
                 }
               }}
@@ -393,6 +386,44 @@ export function InterviewHubPage() {
           )}
         </Panel>
       </div>
+
+      {/* Solo Practice — topic picker for self-paced, timed sessions */}
+      <Panel data-hub-section="solo-practice" style={{ marginBottom: 18 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 10 }}>
+          <h3 className="font-display" style={{ fontSize: 17 }}>
+            {t('interviewHub.soloPractice', { defaultValue: 'Solo Practice' })}
+          </h3>
+          <span className="font-silkscreen uppercase" style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em' }}>
+            {t('interviewHub.soloDesc', { defaultValue: 'Self-paced · no opponent · timed' })}
+          </span>
+        </div>
+        <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+          {[
+            { key: 'algorithms', label: 'Алгоритмы', icon: '⚡' },
+            { key: 'system-design', label: 'System Design', icon: '🏛' },
+            { key: 'sql', label: 'SQL', icon: '🗄' },
+            { key: 'golang', label: 'Go', icon: '🐹' },
+            { key: 'behavioral', label: 'Behavioral', icon: '🎭' },
+          ].map((topic) => (
+            <button
+              key={topic.key}
+              className="rpg-btn"
+              onClick={() => navigate(`/interview/live/new?mode=solo&focus=${topic.key}`)}
+              style={{
+                padding: '10px 16px',
+                fontFamily: 'Pixelify Sans, monospace',
+                fontSize: 13,
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+              }}
+            >
+              <span>{topic.icon}</span>
+              {topic.label}
+            </button>
+          ))}
+        </div>
+      </Panel>
 
       {/* Past + mentor suggests */}
       <div style={{ display: 'grid', gridTemplateColumns: '1.3fr 1fr', gap: 18 }}>

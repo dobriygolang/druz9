@@ -1,14 +1,13 @@
 package geo
 
 import (
-	"context"
 	"errors"
 	"testing"
 
+	"github.com/google/uuid"
+
 	"api/internal/domain/geo/mocks"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 func TestResolve(t *testing.T) {
@@ -21,13 +20,13 @@ func TestResolve(t *testing.T) {
 		expectedCandidates := []*model.GeoCandidate{{City: "Moscow", DisplayName: "Moscow, Russia"}}
 
 		mockResolver := mocks.NewResolver(t)
-		mockResolver.On("Resolve", context.Background(), query, 5).Return(expectedCandidates, nil).Once()
+		mockResolver.On("Resolve", t.Context(), query, 5).Return(expectedCandidates, nil).Once()
 
 		svc := NewService(Config{
 			Resolver: mockResolver,
 		})
 
-		resp, err := svc.Resolve(context.Background(), query)
+		resp, err := svc.Resolve(t.Context(), query)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -45,7 +44,7 @@ func TestResolve(t *testing.T) {
 			Resolver: nil,
 		})
 
-		_, err := svc.Resolve(context.Background(), "Moscow")
+		_, err := svc.Resolve(t.Context(), "Moscow")
 		if err == nil {
 			t.Error("expected error, got nil")
 		}
@@ -59,7 +58,7 @@ func TestResolve(t *testing.T) {
 			Resolver: mockResolver,
 		})
 
-		_, err := svc.Resolve(context.Background(), "   ")
+		_, err := svc.Resolve(t.Context(), "   ")
 		if err == nil {
 			t.Error("expected error for empty query")
 		}
@@ -70,13 +69,13 @@ func TestResolve(t *testing.T) {
 
 		expectedErr := errors.New("resolver error")
 		mockResolver := mocks.NewResolver(t)
-		mockResolver.On("Resolve", context.Background(), "Moscow", 5).Return(nil, expectedErr).Once()
+		mockResolver.On("Resolve", t.Context(), "Moscow", 5).Return(nil, expectedErr).Once()
 
 		svc := NewService(Config{
 			Resolver: mockResolver,
 		})
 
-		_, err := svc.Resolve(context.Background(), "Moscow")
+		_, err := svc.Resolve(t.Context(), "Moscow")
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -88,13 +87,13 @@ func TestResolve(t *testing.T) {
 		t.Parallel()
 
 		mockResolver := mocks.NewResolver(t)
-		mockResolver.On("Resolve", context.Background(), "UnknownCity12345", 5).Return([]*model.GeoCandidate{}, nil).Once()
+		mockResolver.On("Resolve", t.Context(), "UnknownCity12345", 5).Return([]*model.GeoCandidate{}, nil).Once()
 
 		svc := NewService(Config{
 			Resolver: mockResolver,
 		})
 
-		_, err := svc.Resolve(context.Background(), "UnknownCity12345")
+		_, err := svc.Resolve(t.Context(), "UnknownCity12345")
 		if err == nil {
 			t.Error("expected error for no candidates")
 		}
@@ -113,13 +112,13 @@ func TestCommunityMap(t *testing.T) {
 		expectedPoints := []*model.CommunityMapPoint{{UserID: userID, Title: "Test Point"}}
 
 		mockResolver := mocks.NewResolver(t)
-		mockResolver.On("ListCommunityPoints", context.Background(), userID).Return(expectedPoints, nil).Once()
+		mockResolver.On("ListCommunityPoints", t.Context(), userID).Return(expectedPoints, nil).Once()
 
 		svc := NewService(Config{
 			Resolver: mockResolver,
 		})
 
-		resp, err := svc.CommunityMap(context.Background(), userID)
+		resp, err := svc.CommunityMap(t.Context(), userID)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -137,7 +136,7 @@ func TestCommunityMap(t *testing.T) {
 			Resolver: nil,
 		})
 
-		_, err := svc.CommunityMap(context.Background(), uuid.New().String())
+		_, err := svc.CommunityMap(t.Context(), uuid.New().String())
 		if err == nil {
 			t.Error("expected error, got nil")
 		}
@@ -150,13 +149,13 @@ func TestCommunityMap(t *testing.T) {
 		mockResolver := mocks.NewResolver(t)
 		userID := uuid.New().String()
 
-		mockResolver.On("ListCommunityPoints", context.Background(), userID).Return(nil, expectedErr).Once()
+		mockResolver.On("ListCommunityPoints", t.Context(), userID).Return(nil, expectedErr).Once()
 
 		svc := NewService(Config{
 			Resolver: mockResolver,
 		})
 
-		_, err := svc.CommunityMap(context.Background(), userID)
+		_, err := svc.CommunityMap(t.Context(), userID)
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -164,4 +163,3 @@ func TestCommunityMap(t *testing.T) {
 		mockResolver.AssertExpectations(t)
 	})
 }
-

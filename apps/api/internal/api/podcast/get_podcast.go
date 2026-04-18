@@ -8,7 +8,7 @@ import (
 )
 
 func (i *Implementation) GetPodcast(ctx context.Context, req *v1.GetPodcastRequest) (*v1.PodcastResponse, error) {
-	podcastID, err := apihelpers.ParseUUID(req.PodcastId, "INVALID_PODCAST_ID", "podcast_id")
+	podcastID, err := apihelpers.ParseUUID(req.GetPodcastId(), "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
 		return nil, err
 	}

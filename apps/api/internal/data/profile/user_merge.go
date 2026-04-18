@@ -4,10 +4,10 @@ import (
 	"context"
 	"fmt"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
 )
 
 func (r *Repo) mergeUsersTx(ctx context.Context, tx pgx.Tx, canonicalUserID, secondaryUserID uuid.UUID) error {

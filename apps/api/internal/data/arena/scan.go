@@ -1,9 +1,9 @@
 package arena
 
 import (
-	domain "api/internal/domain/arena"
-
 	"github.com/jackc/pgx/v5/pgtype"
+
+	domain "api/internal/domain/arena"
 )
 
 func scanMatchWithTask(row scanner, match *domain.Match, task *domain.Task, executionProfile *string, runnerMode *int) error {

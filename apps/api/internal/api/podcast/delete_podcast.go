@@ -14,7 +14,7 @@ func (i *Implementation) DeletePodcast(ctx context.Context, req *v1.DeletePodcas
 		return nil, err
 	}
 
-	podcastID, err := apihelpers.ParseUUID(req.PodcastId, "INVALID_PODCAST_ID", "podcast_id")
+	podcastID, err := apihelpers.ParseUUID(req.GetPodcastId(), "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
 		return nil, err
 	}

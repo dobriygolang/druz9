@@ -37,3 +37,12 @@ export interface ListPendingRequestsResponse {
   incoming: FriendRequest[]
   outgoing: FriendRequest[]
 }
+
+export interface UserHit {
+  userId: string
+  username: string
+  displayName: string
+  avatarUrl: string
+  isFriend: boolean
+  requestSent: boolean
+}

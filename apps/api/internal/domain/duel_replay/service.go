@@ -10,14 +10,14 @@ import (
 	"errors"
 	"strings"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 const (
-	maxLabelLen   = 200
-	maxListLimit  = 100
+	maxLabelLen      = 200
+	maxListLimit     = 100
 	defaultListLimit = 50
 	// maxEventTMs is an absurdly long match ceiling; keeps recorder from
 	// passing nonsense timestamps (e.g. 10 hours on a 10-minute match).

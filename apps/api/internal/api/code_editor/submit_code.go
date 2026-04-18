@@ -3,25 +3,25 @@ package code_editor
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
+	"github.com/google/uuid"
+
 	"api/internal/app/solutionreview"
 	codeeditordomain "api/internal/domain/codeeditor"
 	"api/internal/metrics"
 	"api/internal/model"
 	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/code_editor/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeRequest) (*v1.SubmitCodeResponse, error) {
-	roomID, err := uuid.Parse(req.RoomId)
+	roomID, err := uuid.Parse(req.GetRoomId())
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_ROOM_ID", "invalid room id")
 	}
 
 	userID, guestName, _ := resolveActor(ctx, "")
-	selectedLanguage := protoLanguageToModel(req.Language)
+	selectedLanguage := protoLanguageToModel(req.GetLanguage())
 	if selectedLanguage != model.ProgrammingLanguageUnknown {
 		if actorService, ok := i.service.(interface {
 			SetEditorLanguage(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, language model.ProgrammingLanguage) (*codeeditordomain.RoomEditorState, error)
@@ -31,7 +31,7 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 			}
 		}
 	}
-	submission, err := i.service.SubmitCode(ctx, roomID, userID, guestName, req.Code)
+	submission, err := i.service.SubmitCode(ctx, roomID, userID, guestName, req.GetCode())
 	if err != nil {
 		return nil, errors.InternalServer("INTERNAL_ERROR", err.Error())
 	}
@@ -65,7 +65,7 @@ func (i *Implementation) SubmitCode(ctx context.Context, req *v1.SubmitCodeReque
 
 	// Trigger post-solve review for authenticated users with a task
 	if i.reviewService != nil && userID != nil && room != nil && room.TaskID != nil {
-		go i.triggerReview(ctx, submission, room, *userID, req.Code, selectedLanguage)
+		go i.triggerReview(ctx, submission, room, *userID, req.GetCode(), selectedLanguage)
 	}
 
 	return &v1.SubmitCodeResponse{

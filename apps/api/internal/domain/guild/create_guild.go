@@ -3,10 +3,10 @@ package guild
 import (
 	"context"
 
-	"api/internal/model"
-
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // CreateGuild creates a new guild.

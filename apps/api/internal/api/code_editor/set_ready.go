@@ -3,21 +3,21 @@ package code_editor
 import (
 	"context"
 
-	v1 "api/pkg/api/code_editor/v1"
-	commonv1 "api/pkg/api/common/v1"
-
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
+
+	v1 "api/pkg/api/code_editor/v1"
+	commonv1 "api/pkg/api/common/v1"
 )
 
 func (i *Implementation) SetReady(ctx context.Context, req *v1.SetReadyRequest) (*v1.StatusResponse, error) {
-	roomID, err := uuid.Parse(req.RoomId)
+	roomID, err := uuid.Parse(req.GetRoomId())
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_ROOM_ID", "invalid room id")
 	}
 
 	userID, guestName, _ := resolveActor(ctx, "")
-	if err := i.service.SetReady(ctx, roomID, userID, guestName, req.Ready); err != nil {
+	if err := i.service.SetReady(ctx, roomID, userID, guestName, req.GetReady()); err != nil {
 		return nil, mapErr(err)
 	}
 

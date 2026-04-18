@@ -3,15 +3,15 @@ package code_editor
 import (
 	"context"
 
-	v1 "api/pkg/api/code_editor/v1"
-	commonv1 "api/pkg/api/common/v1"
-
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
+
+	v1 "api/pkg/api/code_editor/v1"
+	commonv1 "api/pkg/api/common/v1"
 )
 
 func (i *Implementation) DeleteTask(ctx context.Context, req *v1.DeleteTaskRequest) (*v1.StatusResponse, error) {
-	taskID, err := uuid.Parse(req.TaskId)
+	taskID, err := uuid.Parse(req.GetTaskId())
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_TASK_ID", "invalid task id")
 	}

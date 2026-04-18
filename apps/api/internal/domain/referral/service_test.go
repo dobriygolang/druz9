@@ -1,14 +1,13 @@
 package referral
 
 import (
-	"context"
 	"errors"
 	"testing"
 
+	"github.com/google/uuid"
+
 	"api/internal/domain/referral/mocks"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 func TestListReferrals(t *testing.T) {
@@ -22,13 +21,13 @@ func TestListReferrals(t *testing.T) {
 		expectedResp := &model.ListReferralsResponse{Referrals: []*model.Referral{}}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("ListReferrals", context.Background(), user, opts).Return(expectedResp, nil).Once()
+		mockRepo.On("ListReferrals", t.Context(), user, opts).Return(expectedResp, nil).Once()
 
 		svc := NewReferralService(Config{
 			Repository: mockRepo,
 		})
 
-		resp, err := svc.ListReferrals(context.Background(), user, opts)
+		resp, err := svc.ListReferrals(t.Context(), user, opts)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -46,13 +45,13 @@ func TestListReferrals(t *testing.T) {
 		mockRepo := mocks.NewRepository(t)
 		userID := uuid.New()
 
-		mockRepo.On("ListReferrals", context.Background(), &model.User{ID: userID}, model.ListReferralsOptions{}).Return(nil, expectedErr).Once()
+		mockRepo.On("ListReferrals", t.Context(), &model.User{ID: userID}, model.ListReferralsOptions{}).Return(nil, expectedErr).Once()
 
 		svc := NewReferralService(Config{
 			Repository: mockRepo,
 		})
 
-		_, err := svc.ListReferrals(context.Background(), &model.User{ID: userID}, model.ListReferralsOptions{})
+		_, err := svc.ListReferrals(t.Context(), &model.User{ID: userID}, model.ListReferralsOptions{})
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -72,13 +71,13 @@ func TestCreateReferral(t *testing.T) {
 		expectedReferral := &model.Referral{ID: uuid.New()}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("CreateReferral", context.Background(), user, req).Return(expectedReferral, nil).Once()
+		mockRepo.On("CreateReferral", t.Context(), user, req).Return(expectedReferral, nil).Once()
 
 		svc := NewReferralService(Config{
 			Repository: mockRepo,
 		})
 
-		referral, err := svc.CreateReferral(context.Background(), user, req)
+		referral, err := svc.CreateReferral(t.Context(), user, req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -96,13 +95,13 @@ func TestCreateReferral(t *testing.T) {
 		mockRepo := mocks.NewRepository(t)
 		userID := uuid.New()
 
-		mockRepo.On("CreateReferral", context.Background(), &model.User{ID: userID}, model.CreateReferralRequest{}).Return(nil, expectedErr).Once()
+		mockRepo.On("CreateReferral", t.Context(), &model.User{ID: userID}, model.CreateReferralRequest{}).Return(nil, expectedErr).Once()
 
 		svc := NewReferralService(Config{
 			Repository: mockRepo,
 		})
 
-		_, err := svc.CreateReferral(context.Background(), &model.User{ID: userID}, model.CreateReferralRequest{})
+		_, err := svc.CreateReferral(t.Context(), &model.User{ID: userID}, model.CreateReferralRequest{})
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -123,13 +122,13 @@ func TestUpdateReferral(t *testing.T) {
 		expectedReferral := &model.Referral{ID: referralID}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("UpdateReferral", context.Background(), referralID, user, req).Return(expectedReferral, nil).Once()
+		mockRepo.On("UpdateReferral", t.Context(), referralID, user, req).Return(expectedReferral, nil).Once()
 
 		svc := NewReferralService(Config{
 			Repository: mockRepo,
 		})
 
-		referral, err := svc.UpdateReferral(context.Background(), referralID, user, req)
+		referral, err := svc.UpdateReferral(t.Context(), referralID, user, req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -151,13 +150,13 @@ func TestDeleteReferral(t *testing.T) {
 		user := &model.User{ID: uuid.New()}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("DeleteReferral", context.Background(), referralID, user).Return(nil).Once()
+		mockRepo.On("DeleteReferral", t.Context(), referralID, user).Return(nil).Once()
 
 		svc := NewReferralService(Config{
 			Repository: mockRepo,
 		})
 
-		err := svc.DeleteReferral(context.Background(), referralID, user)
+		err := svc.DeleteReferral(t.Context(), referralID, user)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -173,13 +172,13 @@ func TestDeleteReferral(t *testing.T) {
 		referralID := uuid.New()
 		userID := uuid.New()
 
-		mockRepo.On("DeleteReferral", context.Background(), referralID, &model.User{ID: userID}).Return(expectedErr).Once()
+		mockRepo.On("DeleteReferral", t.Context(), referralID, &model.User{ID: userID}).Return(expectedErr).Once()
 
 		svc := NewReferralService(Config{
 			Repository: mockRepo,
 		})
 
-		err := svc.DeleteReferral(context.Background(), referralID, &model.User{ID: userID})
+		err := svc.DeleteReferral(t.Context(), referralID, &model.User{ID: userID})
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}

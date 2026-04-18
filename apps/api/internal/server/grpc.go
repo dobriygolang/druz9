@@ -3,13 +3,13 @@ package server
 import (
 	"time"
 
-	"api/internal/config"
-	authmiddleware "api/internal/middleware"
-
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/go-kratos/kratos/v2/middleware/logging"
 	"github.com/go-kratos/kratos/v2/middleware/recovery"
 	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
+
+	"api/internal/config"
+	authmiddleware "api/internal/middleware"
 )
 
 func NewGRPCServer(

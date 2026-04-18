@@ -5,12 +5,12 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
+
 	domain "api/internal/domain/codeeditor"
 	"api/internal/model"
 	"api/internal/policy"
 	"api/internal/sandbox"
-
-	"github.com/google/uuid"
 )
 
 func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string, isPrivate bool) (*domain.Room, error) {
@@ -147,8 +147,7 @@ func (s *Service) addCachedGuestsToRoom(participants []*domain.Participant, room
 	}
 
 	// Добавляем гостей из кэша
-	result := make([]*domain.Participant, len(participants))
-	copy(result, participants)
+	result := append([]*domain.Participant(nil), participants...)
 
 	// Получаем все ключи из кэша и фильтруем по roomID
 	keys := s.guestCache.Keys()

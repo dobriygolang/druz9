@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"api/internal/model"
-	schema "api/internal/realtime/schema"
-
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
+
+	"api/internal/model"
+	schema "api/internal/realtime/schema"
 )
 
 func (h *Hub) ensureMatchLoaded(matchID string) {
@@ -208,17 +208,4 @@ func (h *Hub) flushSnapshot(matchID string, codes map[string]*schema.ArenaPlayer
 			klog.Errorf("arena flush snapshot match=%s: %v", matchID, err)
 		}
 	}
-}
-
-func obfuscateCode(value string) string {
-	runes := []rune(value)
-	for i, r := range runes {
-		switch {
-		case r == '\n' || r == '\r' || r == '\t' || r == ' ':
-			continue
-		default:
-			runes[i] = '•'
-		}
-	}
-	return string(runes)
 }

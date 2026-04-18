@@ -9,9 +9,9 @@ import (
 
 func (i *Implementation) ListTasks(ctx context.Context, req *v1.ListTasksRequest) (*v1.ListTasksResponse, error) {
 	tasks, err := i.service.ListTasks(ctx, codeeditordomain.TaskFilter{
-		Topic:           req.Topic,
-		Difficulty:      protoDifficultyToModel(req.Difficulty).String(),
-		IncludeInactive: req.IncludeInactive,
+		Topic:           req.GetTopic(),
+		Difficulty:      protoDifficultyToModel(req.GetDifficulty()).String(),
+		IncludeInactive: req.GetIncludeInactive(),
 	})
 	if err != nil {
 		return nil, mapErr(err)

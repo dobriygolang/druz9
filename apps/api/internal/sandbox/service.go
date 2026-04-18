@@ -1,7 +1,6 @@
 package sandbox
 
 import (
-	"api/internal/policy"
 	"bytes"
 	"context"
 	"errors"
@@ -12,6 +11,8 @@ import (
 	"regexp"
 	"strings"
 	"time"
+
+	"api/internal/policy"
 )
 
 const (
@@ -138,7 +139,7 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 
 		outputStr := strings.TrimSpace(string(output))
 		if outputStr == "" {
-			return "", false, fmt.Errorf("go run failed: %v", err)
+			return "", false, fmt.Errorf("go run failed: %w", err)
 		}
 		return "", false, fmt.Errorf("%s", outputStr)
 	}
@@ -476,7 +477,7 @@ func effectiveExecutionTimeout(ctx context.Context, requested time.Duration) (ti
 
 	remaining := time.Until(deadline) - requestHeadroom
 	if remaining < minExecBudget {
-		return 0, fmt.Errorf("not enough time remaining to execute code")
+		return 0, errors.New("not enough time remaining to execute code")
 	}
 	if remaining < requested {
 		return remaining, nil
@@ -493,7 +494,7 @@ func buildExecutionEnv(root string, base []string, extra []string) ([]string, er
 	xdgCacheDir := filepath.Join(homeDir, ".cache")
 
 	for _, dir := range []string{homeDir, xdgCacheDir, cacheDir} {
-		if err := os.MkdirAll(dir, 0755); err != nil {
+		if err := os.MkdirAll(dir, 0o755); err != nil {
 			return nil, fmt.Errorf("prepare sandbox env dir %q: %w", dir, err)
 		}
 	}
@@ -521,7 +522,7 @@ func sharedGoCacheDir() (string, error) {
 		cacheRoot = os.TempDir()
 	}
 	if cacheRoot == "" {
-		return "", fmt.Errorf("resolve go build cache root")
+		return "", errors.New("resolve go build cache root")
 	}
 	return filepath.Join(cacheRoot, "druz-sandbox-go-build"), nil
 }
@@ -531,7 +532,7 @@ func materializeFiles(root string, files map[string]string, fs policy.RunnerFile
 		return nil
 	}
 	if fs.Mode == policy.FilesystemNone {
-		return fmt.Errorf("policy forbids filesystem fixtures")
+		return errors.New("policy forbids filesystem fixtures")
 	}
 
 	allowed := make(map[string]struct{}, len(fs.FixtureFiles))
@@ -550,7 +551,7 @@ func materializeFiles(root string, files map[string]string, fs policy.RunnerFile
 			}
 		}
 		target := filepath.Join(root, cleaned)
-		if err := os.MkdirAll(filepath.Dir(target), 0755); err != nil {
+		if err := os.MkdirAll(filepath.Dir(target), 0o755); err != nil {
 			return fmt.Errorf("create fixture dir: %w", err)
 		}
 		if fs.MaxFileSizeBytes > 0 && int64(len(content)) > fs.MaxFileSizeBytes {
@@ -566,7 +567,7 @@ func materializeFiles(root string, files map[string]string, fs policy.RunnerFile
 
 func validateMaterializedPath(path string, fs policy.RunnerFilesystemConfig) error {
 	if path == "" {
-		return fmt.Errorf("fixture path cannot be empty")
+		return errors.New("fixture path cannot be empty")
 	}
 	if filepath.IsAbs(path) {
 		return fmt.Errorf("fixture path %q must be relative", path)

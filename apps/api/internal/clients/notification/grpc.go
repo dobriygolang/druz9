@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	v1 "api/pkg/api/notification/v1"
-
 	klog "github.com/go-kratos/kratos/v2/log"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
+
+	v1 "api/pkg/api/notification/v1"
 )
 
 // GRPCAdapter implements Sender via gRPC to the notification-service.
@@ -118,7 +118,7 @@ func (a *GRPCAdapter) GetNotificationSettings(ctx context.Context, userID string
 	return &Settings{
 		DuelsEnabled:          resp.GetDuelsEnabled(),
 		ProgressEnabled:       resp.GetProgressEnabled(),
-		GuildsEnabled:        resp.GetGuildsEnabled(),
+		GuildsEnabled:         resp.GetGuildsEnabled(),
 		DailyChallengeEnabled: resp.GetDailyChallengeEnabled(),
 		QuietHoursStart:       resp.GetQuietHoursStart(),
 		QuietHoursEnd:         resp.GetQuietHoursEnd(),

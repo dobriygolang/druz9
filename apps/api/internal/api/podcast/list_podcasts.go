@@ -9,8 +9,8 @@ import (
 
 func (i *Implementation) ListPodcasts(ctx context.Context, req *v1.ListPodcastsRequest) (*v1.ListPodcastsResponse, error) {
 	opts := model.ListPodcastsOptions{
-		Limit:  req.Limit,
-		Offset: req.Offset,
+		Limit:  req.GetLimit(),
+		Offset: req.GetOffset(),
 	}
 
 	resp, err := i.service.ListPodcasts(ctx, opts)

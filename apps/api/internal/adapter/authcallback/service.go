@@ -3,10 +3,10 @@ package authcallback
 import (
 	"context"
 
+	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
+
 	"api/internal/model"
 	v1 "api/pkg/adapter/auth_callback/v1"
-
-	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 )
 
 type Service interface {

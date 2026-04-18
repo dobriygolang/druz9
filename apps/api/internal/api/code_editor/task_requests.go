@@ -1,18 +1,18 @@
 package code_editor
 
 import (
+	"github.com/google/uuid"
+
 	codeeditordomain "api/internal/domain/codeeditor"
 	v1 "api/pkg/api/code_editor/v1"
-
-	"github.com/google/uuid"
 )
 
 func taskFromCreateRequest(req *v1.CreateTaskRequest) *codeeditordomain.Task {
-	return buildTaskFromPayload(uuid.New(), req.Task)
+	return buildTaskFromPayload(uuid.New(), req.GetTask())
 }
 
 func taskFromUpdateRequest(taskID uuid.UUID, req *v1.UpdateTaskRequest) *codeeditordomain.Task {
-	return buildTaskFromPayload(taskID, req.Task)
+	return buildTaskFromPayload(taskID, req.GetTask())
 }
 
 func buildTaskFromPayload(taskID uuid.UUID, p *v1.TaskPayload) *codeeditordomain.Task {
@@ -21,27 +21,27 @@ func buildTaskFromPayload(taskID uuid.UUID, p *v1.TaskPayload) *codeeditordomain
 	}
 	return &codeeditordomain.Task{
 		ID:               taskID,
-		Title:            p.Title,
-		Slug:             p.Slug,
-		Statement:        p.Statement,
-		Difficulty:       protoDifficultyToModel(p.Difficulty),
-		Topics:           p.Topics,
-		StarterCode:      p.StarterCode,
-		Language:         protoLanguageToModel(p.Language),
-		TaskType:         protoTaskTypeToModel(p.TaskType),
-		ExecutionProfile: protoExecutionProfileToModel(p.ExecutionProfile),
-		RunnerMode:       protoRunnerModeToModel(p.RunnerMode),
-		DurationSeconds:  p.DurationSeconds,
-		FixtureFiles:     p.FixtureFiles,
-		ReadablePaths:    p.ReadablePaths,
-		WritablePaths:    p.WritablePaths,
-		AllowedHosts:     p.AllowedHosts,
-		AllowedPorts:     p.AllowedPorts,
-		MockEndpoints:    p.MockEndpoints,
-		WritableTempDir:  p.WritableTempDir,
-		IsActive:         p.IsActive,
-		PublicTestCases:  taskCasesFromProto(p.PublicTestCases),
-		HiddenTestCases:  taskCasesFromProto(p.HiddenTestCases),
+		Title:            p.GetTitle(),
+		Slug:             p.GetSlug(),
+		Statement:        p.GetStatement(),
+		Difficulty:       protoDifficultyToModel(p.GetDifficulty()),
+		Topics:           p.GetTopics(),
+		StarterCode:      p.GetStarterCode(),
+		Language:         protoLanguageToModel(p.GetLanguage()),
+		TaskType:         protoTaskTypeToModel(p.GetTaskType()),
+		ExecutionProfile: protoExecutionProfileToModel(p.GetExecutionProfile()),
+		RunnerMode:       protoRunnerModeToModel(p.GetRunnerMode()),
+		DurationSeconds:  p.GetDurationSeconds(),
+		FixtureFiles:     p.GetFixtureFiles(),
+		ReadablePaths:    p.GetReadablePaths(),
+		WritablePaths:    p.GetWritablePaths(),
+		AllowedHosts:     p.GetAllowedHosts(),
+		AllowedPorts:     p.GetAllowedPorts(),
+		MockEndpoints:    p.GetMockEndpoints(),
+		WritableTempDir:  p.GetWritableTempDir(),
+		IsActive:         p.GetIsActive(),
+		PublicTestCases:  taskCasesFromProto(p.GetPublicTestCases()),
+		HiddenTestCases:  taskCasesFromProto(p.GetHiddenTestCases()),
 	}
 }
 
@@ -53,19 +53,19 @@ func taskCasesFromProto(cases []*v1.TaskTestCase) []*codeeditordomain.TestCase {
 		}
 
 		id := uuid.Nil
-		if testCase.Id != "" {
-			if parsedID, err := uuid.Parse(testCase.Id); err == nil {
+		if testCase.GetId() != "" {
+			if parsedID, err := uuid.Parse(testCase.GetId()); err == nil {
 				id = parsedID
 			}
 		}
 
 		result = append(result, &codeeditordomain.TestCase{
 			ID:             id,
-			Input:          testCase.Input,
-			ExpectedOutput: testCase.ExpectedOutput,
-			IsPublic:       testCase.IsPublic,
-			Weight:         testCase.Weight,
-			Order:          testCase.Order,
+			Input:          testCase.GetInput(),
+			ExpectedOutput: testCase.GetExpectedOutput(),
+			IsPublic:       testCase.GetIsPublic(),
+			Weight:         testCase.GetWeight(),
+			Order:          testCase.GetOrder(),
 		})
 	}
 	return result

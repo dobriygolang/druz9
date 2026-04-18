@@ -14,10 +14,10 @@ package apihelpers
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // RequireUser returns the authenticated user or a 401 kratos error.

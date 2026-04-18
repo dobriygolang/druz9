@@ -9,11 +9,11 @@ import (
 )
 
 func (i *Implementation) InviteToEvent(ctx context.Context, req *v1.InviteToEventRequest) (*v1.EventStatusResponse, error) {
-	eventID, err := apihelpers.ParseUUID(req.EventId, "INVALID_EVENT_ID", "event_id")
+	eventID, err := apihelpers.ParseUUID(req.GetEventId(), "INVALID_EVENT_ID", "event_id")
 	if err != nil {
 		return nil, err
 	}
-	inviteeID, err := apihelpers.ParseUUID(req.UserId, "INVALID_USER_ID", "user_id")
+	inviteeID, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if err != nil {
 		return nil, err
 	}

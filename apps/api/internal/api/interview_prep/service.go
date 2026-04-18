@@ -3,14 +3,14 @@ package interview_prep
 import (
 	"context"
 
+	"github.com/google/uuid"
+	"google.golang.org/grpc"
+
 	appinterviewprep "api/internal/app/interviewprep"
 	notif "api/internal/clients/notification"
 	interviewprepdata "api/internal/data/interviewprep"
 	"api/internal/model"
 	v1 "api/pkg/api/interview_prep/v1"
-
-	"github.com/google/uuid"
-	"google.golang.org/grpc"
 )
 
 type Service interface {

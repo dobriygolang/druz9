@@ -3,10 +3,10 @@ package arena
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	arenadomain "api/internal/domain/arena"
 	v1 "api/pkg/api/arena/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) JoinMatch(ctx context.Context, req *v1.JoinMatchRequest) (*v1.ArenaMatchResponse, error) {
@@ -15,7 +15,7 @@ func (i *Implementation) JoinMatch(ctx context.Context, req *v1.JoinMatchRequest
 		return nil, err
 	}
 
-	matchID, err := parseArenaMatchID(req.MatchId)
+	matchID, err := parseArenaMatchID(req.GetMatchId())
 	if err != nil {
 		return nil, err
 	}

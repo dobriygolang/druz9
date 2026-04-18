@@ -1,10 +1,10 @@
 package notification
 
 import (
+	"google.golang.org/grpc"
+
 	notifclient "api/internal/clients/notification"
 	v1 "api/pkg/api/notification/v1"
-
-	"google.golang.org/grpc"
 )
 
 // SettingsImplementation exposes notification preferences to the frontend over HTTP/gRPC.

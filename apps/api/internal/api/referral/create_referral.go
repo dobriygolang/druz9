@@ -14,13 +14,13 @@ func (i *Implementation) CreateReferral(ctx context.Context, req *v1.CreateRefer
 		return nil, err
 	}
 	item, err := i.service.CreateReferral(ctx, user, model.CreateReferralRequest{
-		Title:          req.Referral.Title,
-		Company:        req.Referral.Company,
-		VacancyURL:     req.Referral.VacancyUrl,
-		Description:    req.Referral.Description,
-		Experience:     req.Referral.Experience,
-		Location:       req.Referral.Location,
-		EmploymentType: unmapEmploymentType(req.Referral.EmploymentType),
+		Title:          req.GetReferral().GetTitle(),
+		Company:        req.GetReferral().GetCompany(),
+		VacancyURL:     req.GetReferral().GetVacancyUrl(),
+		Description:    req.GetReferral().GetDescription(),
+		Experience:     req.GetReferral().GetExperience(),
+		Location:       req.GetReferral().GetLocation(),
+		EmploymentType: unmapEmploymentType(req.GetReferral().GetEmploymentType()),
 	})
 	if err != nil {
 		return nil, err

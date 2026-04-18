@@ -2,12 +2,13 @@ package codeeditor
 
 import (
 	"context"
+	"errors"
 	"strings"
+
+	"github.com/google/uuid"
 
 	domain "api/internal/domain/codeeditor"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 func normalizeRoomLanguage(language model.ProgrammingLanguage) model.ProgrammingLanguage {
@@ -211,7 +212,9 @@ func (s *Service) GetEditorState(ctx context.Context, roomID uuid.UUID, userID *
 	}
 
 	storedState, err := s.repo.GetDuelEditorState(ctx, roomID, actorKey)
-	if err != nil {
+	if errors.Is(err, domain.ErrDuelStateNotFound) {
+		storedState = nil
+	} else if err != nil {
 		return nil, err
 	}
 	if storedState == nil {

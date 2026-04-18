@@ -1,10 +1,10 @@
 package profile
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/model"
 	v1 "api/pkg/api/profile/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapProfileProgress(p *model.ProfileProgress) *v1.ProfileProgress {

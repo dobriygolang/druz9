@@ -27,12 +27,14 @@ const (
 	TaskTypeRefactoring = model.TaskTypeRefactoring
 )
 
-type Room = model.Room
-type RoomEditorState = model.RoomEditorState
-type DuelEditorState = model.DuelEditorState
-type Participant = model.Participant
-type Submission = model.Submission
-type Task = model.CodeTask
-type TestCase = model.CodeTestCase
-type TaskFilter = model.CodeTaskFilter
-type LeaderboardEntry = model.CodeLeaderboardEntry
+type (
+	Room             = model.Room
+	RoomEditorState  = model.RoomEditorState
+	DuelEditorState  = model.DuelEditorState
+	Participant      = model.Participant
+	Submission       = model.Submission
+	Task             = model.CodeTask
+	TestCase         = model.CodeTestCase
+	TaskFilter       = model.CodeTaskFilter
+	LeaderboardEntry = model.CodeLeaderboardEntry
+)

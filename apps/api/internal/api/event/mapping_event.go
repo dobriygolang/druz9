@@ -3,10 +3,10 @@ package event
 import (
 	"math"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/model"
 	v1 "api/pkg/api/event/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapEvent(item *model.Event) *v1.Event {

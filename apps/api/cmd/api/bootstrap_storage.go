@@ -10,25 +10,25 @@ import (
 	"api/internal/closer"
 	arenadata "api/internal/data/arena"
 	challengedata "api/internal/data/challenge"
-	guilddata "api/internal/data/guild"
 	codeeditordata "api/internal/data/code_editor"
 	duelreplaydata "api/internal/data/duel_replay"
 	eventdata "api/internal/data/event"
 	friendchallengedata "api/internal/data/friend_challenge"
 	geodata "api/internal/data/geo"
+	guilddata "api/internal/data/guild"
 	inboxdata "api/internal/data/inbox"
 	interviewprepdata "api/internal/data/interviewprep"
 	missiondata "api/internal/data/mission"
+	peermockdata "api/internal/data/peer_mock"
 	podcastdata "api/internal/data/podcast"
 	profiledata "api/internal/data/profile"
 	referraldata "api/internal/data/referral"
 	seasonpassdata "api/internal/data/season_pass"
 	shopdata "api/internal/data/shop"
+	skillsdata "api/internal/data/skills"
 	socialdata "api/internal/data/social"
 	solutionreviewdata "api/internal/data/solution_review"
 	streakdata "api/internal/data/streak"
-	peermockdata "api/internal/data/peer_mock"
-	skillsdata "api/internal/data/skills"
 	walletdata "api/internal/data/wallet"
 	geodomain "api/internal/domain/geo"
 	referraldomainservice "api/internal/domain/referral"
@@ -38,33 +38,33 @@ import (
 )
 
 type storageContext struct {
-	store              *postgres.Store
-	storageClient      *s3storage.Service
-	geoResolver        geodomain.Resolver
-	profileRepo        *profiledata.Repo
-	eventRepo          *eventdata.Repo
-	guildRepo         *guilddata.Repo
-	podcastRepo        *podcastdata.Repo
-	referralRepo       referraldomainservice.Repository
-	codeEditorRepo     *codeeditordata.Repo
-	arenaRepo          *arenadata.Repo
-	interviewRepo      *interviewprepdata.Repo
-	solutionReviewRepo *solutionreviewdata.Repo
-	missionRepo        *missiondata.Repo
-	challengeRepo      *challengedata.Repo
-	inboxRepo          *inboxdata.Repo
-	friendChallengeRepo *friendchallengedata.Repo
+	store                *postgres.Store
+	storageClient        *s3storage.Service
+	geoResolver          geodomain.Resolver
+	profileRepo          *profiledata.Repo
+	eventRepo            *eventdata.Repo
+	guildRepo            *guilddata.Repo
+	podcastRepo          *podcastdata.Repo
+	referralRepo         referraldomainservice.Repository
+	codeEditorRepo       *codeeditordata.Repo
+	arenaRepo            *arenadata.Repo
+	interviewRepo        *interviewprepdata.Repo
+	solutionReviewRepo   *solutionreviewdata.Repo
+	missionRepo          *missiondata.Repo
+	challengeRepo        *challengedata.Repo
+	inboxRepo            *inboxdata.Repo
+	friendChallengeRepo  *friendchallengedata.Repo
 	friendChallengeUsers *friendchallengedata.UserLookupAdapter
-	duelReplayRepo     *duelreplaydata.Repo
-	seasonPassRepo     *seasonpassdata.Repo
-	streakRepo         *streakdata.Repo
-	streakStats        *streakdata.StatsAdapter
-	shopRepo           *shopdata.Repo
-	socialRepo         *socialdata.Repo
-	socialUsers        *socialdata.UserLookupAdapter
-	walletRepo         *walletdata.Repo
-	skillsRepo         *skillsdata.Repo
-	peerMockRepo       *peermockdata.Repo
+	duelReplayRepo       *duelreplaydata.Repo
+	seasonPassRepo       *seasonpassdata.Repo
+	streakRepo           *streakdata.Repo
+	streakStats          *streakdata.StatsAdapter
+	shopRepo             *shopdata.Repo
+	socialRepo           *socialdata.Repo
+	socialUsers          *socialdata.UserLookupAdapter
+	walletRepo           *walletdata.Repo
+	skillsRepo           *skillsdata.Repo
+	peerMockRepo         *peermockdata.Repo
 }
 
 func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
@@ -105,29 +105,29 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 	}
 
 	return &storageContext{
-		store:              store,
-		storageClient:      storageClient,
-		geoResolver:        newGeoResolver(geocoder.New(bootstrap.cfg, bootstrap.kratosLogger), geodata.NewRepo(store)),
-		profileRepo:        profiledata.NewRepo(store, bootstrap.kratosLogger),
-		eventRepo:          eventdata.NewRepo(store, bootstrap.kratosLogger),
-		guildRepo:         guilddata.NewRepo(store, bootstrap.kratosLogger),
-		podcastRepo:        podcastdata.NewRepo(store, bootstrap.kratosLogger),
-		referralRepo:       referraldata.NewRepo(store, bootstrap.kratosLogger),
-		codeEditorRepo:     codeeditordata.NewRepo(store, bootstrap.kratosLogger),
-		arenaRepo:          arenadata.NewRepo(store, bootstrap.kratosLogger),
-		interviewRepo:      interviewprepdata.New(store, bootstrap.kratosLogger),
-		solutionReviewRepo: solutionreviewdata.NewRepo(store),
-		missionRepo:        missiondata.NewRepo(store, bootstrap.kratosLogger),
-		challengeRepo:      challengedata.NewRepo(store, bootstrap.kratosLogger),
-		inboxRepo:          inboxdata.NewRepo(store, bootstrap.kratosLogger),
-		friendChallengeRepo: friendchallengedata.NewRepo(store, bootstrap.kratosLogger),
+		store:                store,
+		storageClient:        storageClient,
+		geoResolver:          newGeoResolver(geocoder.New(bootstrap.cfg, bootstrap.kratosLogger), geodata.NewRepo(store)),
+		profileRepo:          profiledata.NewRepo(store, bootstrap.kratosLogger),
+		eventRepo:            eventdata.NewRepo(store, bootstrap.kratosLogger),
+		guildRepo:            guilddata.NewRepo(store, bootstrap.kratosLogger),
+		podcastRepo:          podcastdata.NewRepo(store, bootstrap.kratosLogger),
+		referralRepo:         referraldata.NewRepo(store, bootstrap.kratosLogger),
+		codeEditorRepo:       codeeditordata.NewRepo(store, bootstrap.kratosLogger),
+		arenaRepo:            arenadata.NewRepo(store, bootstrap.kratosLogger),
+		interviewRepo:        interviewprepdata.New(store, bootstrap.kratosLogger),
+		solutionReviewRepo:   solutionreviewdata.NewRepo(store),
+		missionRepo:          missiondata.NewRepo(store, bootstrap.kratosLogger),
+		challengeRepo:        challengedata.NewRepo(store, bootstrap.kratosLogger),
+		inboxRepo:            inboxdata.NewRepo(store, bootstrap.kratosLogger),
+		friendChallengeRepo:  friendchallengedata.NewRepo(store, bootstrap.kratosLogger),
 		friendChallengeUsers: friendchallengedata.NewUserLookupAdapter(profiledata.NewRepo(store, bootstrap.kratosLogger)),
-		duelReplayRepo:     duelreplaydata.NewRepo(store, bootstrap.kratosLogger),
-		seasonPassRepo:     seasonpassdata.NewRepo(store, bootstrap.kratosLogger),
-		streakRepo:         streakdata.NewRepo(store, bootstrap.kratosLogger),
-		streakStats:        streakdata.NewStatsAdapter(profiledata.NewRepo(store, bootstrap.kratosLogger)),
-		shopRepo:           shopdata.NewRepo(store, bootstrap.kratosLogger),
-		socialRepo:         socialdata.NewRepo(store, bootstrap.kratosLogger),
+		duelReplayRepo:       duelreplaydata.NewRepo(store, bootstrap.kratosLogger),
+		seasonPassRepo:       seasonpassdata.NewRepo(store, bootstrap.kratosLogger),
+		streakRepo:           streakdata.NewRepo(store, bootstrap.kratosLogger),
+		streakStats:          streakdata.NewStatsAdapter(profiledata.NewRepo(store, bootstrap.kratosLogger)),
+		shopRepo:             shopdata.NewRepo(store, bootstrap.kratosLogger),
+		socialRepo:           socialdata.NewRepo(store, bootstrap.kratosLogger),
 		socialUsers: socialdata.NewUserLookupAdapter(func(ctx context.Context, username string) (uuid.UUID, string, error) {
 			pr := profiledata.NewRepo(store, bootstrap.kratosLogger)
 			u, err := pr.FindUserByUsername(ctx, username)

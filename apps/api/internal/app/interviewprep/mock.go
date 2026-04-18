@@ -8,11 +8,11 @@ import (
 	"strings"
 	"time"
 
+	"github.com/google/uuid"
+
 	"api/internal/aireview"
 	"api/internal/app/taskjudge"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 type MockSubmitResult struct {
@@ -122,7 +122,7 @@ func (s *Service) StartMockSession(ctx context.Context, user *model.User, compan
 		stage := &model.InterviewPrepMockStage{
 			ID:         uuid.New(),
 			SessionID:  session.ID,
-			StageIndex: int32(index), //nolint:gosec // stage index is bounded by small Rounds slice
+			StageIndex: int32(index),
 
 			Kind:                    stageKind,
 			RoundType:               round.RoundType,

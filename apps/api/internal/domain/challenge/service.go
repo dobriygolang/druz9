@@ -4,14 +4,15 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/binary"
+	"errors"
 	"fmt"
 	"time"
+
+	"github.com/google/uuid"
 
 	"api/internal/aireview"
 	challengedata "api/internal/data/challenge"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 // Service implements all challenge game mode logic.
@@ -50,7 +51,7 @@ func (s *Service) GetBlindReviewTask(ctx context.Context, userID uuid.UUID) (*mo
 // SubmitBlindReview evaluates the user's code review using AI and stores the result.
 func (s *Service) SubmitBlindReview(ctx context.Context, userID uuid.UUID, sourceReviewID uuid.UUID, taskID uuid.UUID, sourceCode, sourceLang, userReview string) (*model.BlindReviewResult, error) {
 	if len(userReview) < 10 {
-		return nil, fmt.Errorf("review too short")
+		return nil, errors.New("review too short")
 	}
 	if len(userReview) > 5000 {
 		userReview = userReview[:5000]
@@ -70,7 +71,7 @@ func (s *Service) SubmitBlindReview(ctx context.Context, userID uuid.UUID, sourc
 	aiScore := int32(0)
 	aiFeedback := ""
 	if err == nil && review != nil {
-		aiScore = int32(review.Score) //nolint:gosec // AI score is a small bounded rating (0-100)
+		aiScore = int32(review.Score)
 		aiFeedback = review.Summary
 	}
 

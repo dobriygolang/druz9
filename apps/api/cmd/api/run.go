@@ -4,9 +4,9 @@ import (
 	// #nosec G108 -- pprof is intentionally exposed on dedicated metrics endpoint in non-public ops context.
 	_ "net/http/pprof"
 
-	appLogger "api/internal/logger"
-
 	"github.com/go-kratos/kratos/v2"
+
+	appLogger "api/internal/logger"
 )
 
 // Run starts the API server.

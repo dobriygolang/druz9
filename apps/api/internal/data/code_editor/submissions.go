@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"time"
 
-	codeeditordomain "api/internal/domain/codeeditor"
-
 	"github.com/google/uuid"
+
+	codeeditordomain "api/internal/domain/codeeditor"
 )
 
 const maxStoredSubmissionTextBytes = 16 * 1024

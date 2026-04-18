@@ -84,42 +84,60 @@ var trainingNodes = []nodeDefinition{
 	// ── Go cluster — backend language track. User asked for Go-specific
 	// nodes on the atlas; these hang off `arrays` so players get to
 	// them early via the core path. Branch "go".
-	{ID: "go-basics",      X: 1020, Y: 620, Label: "go\nbasics",       Branch: "go",       Topics: []string{"go", "golang", "go-basics", "go_basics"},                Prereq: []string{"arrays"},     Unlocks: []string{"go-slices", "go-concurrency"}, Title: "Go · Basics & types",        Projects: 2, Hours: "4–6h", Hints: []string{"Prefer composition over inheritance.", "Name return values only when it clarifies intent."}},
-	{ID: "go-slices",      X: 1140, Y: 540, Label: "slices\n& maps",   Branch: "go",       Topics: []string{"go-slices", "go_slices", "go-maps", "go_maps"},          Prereq: []string{"go-basics"}, Unlocks: []string{"go-interfaces"}, Title: "Go · Slices & maps",            Projects: 2, Hours: "4–6h", Hints: []string{"Watch for append aliasing when you reslice.", "Maps are unordered by design — assert invariants explicitly."}},
-	{ID: "go-concurrency", X: 1020, Y: 460, Label: "goroutines\n& chans", Branch: "go",    Topics: []string{"goroutines", "channels", "concurrency-go"},              Prereq: []string{"go-basics"}, Unlocks: []string{"go-context"},    Title: "Go · Goroutines & channels",    Projects: 3, Hours: "6–8h", Hints: []string{"Close a channel from the producer side only.", "Use select with default for non-blocking polls."}},
-	{ID: "go-interfaces",  X: 1200, Y: 420, Label: "interfaces",       Branch: "go",       Topics: []string{"interfaces", "go-interfaces"},                           Prereq: []string{"go-slices"}, Unlocks: []string{"go-testing"},    Title: "Go · Interfaces & generics",    Projects: 2, Hours: "5–7h", Hints: []string{"Accept interfaces, return structs.", "Keep interfaces small — one or two methods is common."}},
-	{ID: "go-context",     X: 1080, Y: 360, Label: "context\n& errors", Branch: "go", Keystone: true, Topics: []string{"context", "errors", "go-errors"},            Prereq: []string{"go-concurrency"}, Title: "Go · Context & error handling", Projects: 2, Hours: "5–7h", Hints: []string{"Never store context in a struct — pass it explicitly.", "Wrap errors with %w so callers can Is / As them."}},
-	{ID: "go-testing",     X: 1220, Y: 320, Label: "testing\n& pprof", Branch: "go",       Topics: []string{"testing", "pprof", "benchmarks"},                        Prereq: []string{"go-interfaces"},                          Title: "Go · Testing & profiling",      Projects: 2, Hours: "5–7h", Hints: []string{"Table-driven tests scale better than ad-hoc.", "Profile before optimising — measure, don't guess."}},
+	{ID: "go-basics", X: 1020, Y: 620, Label: "go\nbasics", Branch: "go", Topics: []string{"go", "golang", "go-basics", "go_basics"}, Prereq: []string{"arrays"}, Unlocks: []string{"go-slices", "go-concurrency"}, Title: "Go · Basics & types", Projects: 2, Hours: "4–6h", Hints: []string{"Prefer composition over inheritance.", "Name return values only when it clarifies intent."}},
+	{ID: "go-slices", X: 1140, Y: 540, Label: "slices\n& maps", Branch: "go", Topics: []string{"go-slices", "go_slices", "go-maps", "go_maps"}, Prereq: []string{"go-basics"}, Unlocks: []string{"go-interfaces"}, Title: "Go · Slices & maps", Projects: 2, Hours: "4–6h", Hints: []string{"Watch for append aliasing when you reslice.", "Maps are unordered by design — assert invariants explicitly."}},
+	{ID: "go-concurrency", X: 1020, Y: 460, Label: "goroutines\n& chans", Branch: "go", Topics: []string{"goroutines", "channels", "concurrency-go"}, Prereq: []string{"go-basics"}, Unlocks: []string{"go-context"}, Title: "Go · Goroutines & channels", Projects: 3, Hours: "6–8h", Hints: []string{"Close a channel from the producer side only.", "Use select with default for non-blocking polls."}},
+	{ID: "go-interfaces", X: 1200, Y: 420, Label: "interfaces", Branch: "go", Topics: []string{"interfaces", "go-interfaces"}, Prereq: []string{"go-slices"}, Unlocks: []string{"go-testing"}, Title: "Go · Interfaces & generics", Projects: 2, Hours: "5–7h", Hints: []string{"Accept interfaces, return structs.", "Keep interfaces small — one or two methods is common."}},
+	{ID: "go-context", X: 1080, Y: 360, Label: "context\n& errors", Branch: "go", Keystone: true, Topics: []string{"context", "errors", "go-errors"}, Prereq: []string{"go-concurrency"}, Title: "Go · Context & error handling", Projects: 2, Hours: "5–7h", Hints: []string{"Never store context in a struct — pass it explicitly.", "Wrap errors with %w so callers can Is / As them."}},
+	{ID: "go-testing", X: 1220, Y: 320, Label: "testing\n& pprof", Branch: "go", Topics: []string{"testing", "pprof", "benchmarks"}, Prereq: []string{"go-interfaces"}, Title: "Go · Testing & profiling", Projects: 2, Hours: "5–7h", Hints: []string{"Table-driven tests scale better than ad-hoc.", "Profile before optimising — measure, don't guess."}},
 
 	// ── SQL cluster. Hangs off `hashmap` (data-shape intuition transfers).
 	// Branch "sql".
-	{ID: "sql-basics",      X: 1020, Y: 760, Label: "SQL\nbasics",  Branch: "sql", Topics: []string{"sql", "sql-basics"},                    Prereq: []string{"hashmap"},    Unlocks: []string{"sql-joins"},                  Title: "SQL · Basics & SELECT",      Projects: 2, Hours: "4–6h", Hints: []string{"Aliases keep long queries readable.", "NULL is not a value — comparisons with it return UNKNOWN."}},
-	{ID: "sql-joins",       X: 1140, Y: 820, Label: "joins\n& CTEs", Branch: "sql", Topics: []string{"joins", "cte", "sql-cte"},            Prereq: []string{"sql-basics"}, Unlocks: []string{"sql-indexing", "sql-window"}, Title: "SQL · Joins and CTEs",       Projects: 2, Hours: "5–7h", Hints: []string{"Write the JOIN condition before the SELECT columns.", "CTEs are fences for readability, not always for performance."}},
-	{ID: "sql-indexing",    X: 1040, Y: 880, Label: "indexing",     Branch: "sql", Topics: []string{"indexing", "sql-index", "btree"},     Prereq: []string{"sql-joins"}, Unlocks: []string{"sql-explain"},                Title: "SQL · Indexing",             Projects: 2, Hours: "5–7h", Hints: []string{"Leftmost-prefix rule governs composite indexes.", "Index only columns that filter, join or sort."}},
-	{ID: "sql-explain",     X: 1180, Y: 900, Label: "EXPLAIN\nanalyze", Branch: "sql", Keystone: true, Topics: []string{"explain", "query-plan", "sql-explain"},            Prereq: []string{"sql-indexing"},                              Title: "SQL · EXPLAIN & plan reading", Projects: 2, Hours: "6–8h", Hints: []string{"Seq scan isn't always bad — small tables love it.", "Actual vs estimated rows tells you where stats are stale."}},
-	{ID: "sql-window",      X: 1220, Y: 800, Label: "window\nfuncs", Branch: "sql",                                    Topics: []string{"window", "sql-window"},               Prereq: []string{"sql-joins"},                                                                  Title: "SQL · Window functions",     Projects: 2, Hours: "5–7h", Hints: []string{"PARTITION BY groups without collapsing rows.", "Frame clauses (ROWS BETWEEN …) are more common than you think."}},
+	{ID: "sql-basics", X: 1020, Y: 760, Label: "SQL\nbasics", Branch: "sql", Topics: []string{"sql", "sql-basics"}, Prereq: []string{"hashmap"}, Unlocks: []string{"sql-joins"}, Title: "SQL · Basics & SELECT", Projects: 2, Hours: "4–6h", Hints: []string{"Aliases keep long queries readable.", "NULL is not a value — comparisons with it return UNKNOWN."}},
+	{ID: "sql-joins", X: 1140, Y: 820, Label: "joins\n& CTEs", Branch: "sql", Topics: []string{"joins", "cte", "sql-cte"}, Prereq: []string{"sql-basics"}, Unlocks: []string{"sql-indexing", "sql-window"}, Title: "SQL · Joins and CTEs", Projects: 2, Hours: "5–7h", Hints: []string{"Write the JOIN condition before the SELECT columns.", "CTEs are fences for readability, not always for performance."}},
+	{ID: "sql-indexing", X: 1040, Y: 880, Label: "indexing", Branch: "sql", Topics: []string{"indexing", "sql-index", "btree"}, Prereq: []string{"sql-joins"}, Unlocks: []string{"sql-explain"}, Title: "SQL · Indexing", Projects: 2, Hours: "5–7h", Hints: []string{"Leftmost-prefix rule governs composite indexes.", "Index only columns that filter, join or sort."}},
+	{ID: "sql-explain", X: 1180, Y: 900, Label: "EXPLAIN\nanalyze", Branch: "sql", Keystone: true, Topics: []string{"explain", "query-plan", "sql-explain"}, Prereq: []string{"sql-indexing"}, Title: "SQL · EXPLAIN & plan reading", Projects: 2, Hours: "6–8h", Hints: []string{"Seq scan isn't always bad — small tables love it.", "Actual vs estimated rows tells you where stats are stale."}},
+	{ID: "sql-window", X: 1220, Y: 800, Label: "window\nfuncs", Branch: "sql", Topics: []string{"window", "sql-window"}, Prereq: []string{"sql-joins"}, Title: "SQL · Window functions", Projects: 2, Hours: "5–7h", Hints: []string{"PARTITION BY groups without collapsing rows.", "Frame clauses (ROWS BETWEEN …) are more common than you think."}},
 
 	// ── Behavioral cluster — interview soft-skills. Hangs off `strings`
 	// (the "communication" intuition is loosely text-shaped). Branch "behavior".
-	{ID: "behavior-basics",  X: 200, Y: 820, Label: "behavioral\nbasics", Branch: "behavior",                  Topics: []string{"behavioral"},                          Prereq: []string{"strings"}, Unlocks: []string{"star-method"},           Title: "Behavior · Interview basics",  Projects: 1, Hours: "2–3h", Hints: []string{"Pick stories from the last 2 years — interviewers calibrate on recency.", "Be the protagonist in every story — never passive."}},
-	{ID: "star-method",      X: 320, Y: 880, Label: "STAR\nmethod",       Branch: "behavior",                  Topics: []string{"star", "star-method"},                 Prereq: []string{"behavior-basics"}, Unlocks: []string{"conflict", "leadership"},  Title: "Behavior · STAR method",       Projects: 1, Hours: "3–4h", Hints: []string{"Situation and Task should take 20s combined, not 2min.", "Action is where you spend 60% of the story — specific, technical, owned."}},
-	{ID: "conflict",         X: 240, Y: 940, Label: "conflict\nstories",  Branch: "behavior",                  Topics: []string{"conflict"},                            Prereq: []string{"star-method"},                                                              Title: "Behavior · Handling conflict", Projects: 1, Hours: "2–3h", Hints: []string{"Always end with resolution + what you learned.", "Attack the problem, not the person — even in retelling."}},
-	{ID: "leadership",       X: 420, Y: 940, Label: "leadership\n& influence", Branch: "behavior", Keystone: true, Topics: []string{"leadership"},                  Prereq: []string{"star-method"},                                                              Title: "Behavior · Leadership",        Projects: 1, Hours: "3–4h", Hints: []string{"Influence without authority is the senior-level test.", "Tie every leadership story to a measurable outcome."}},
+	{ID: "behavior-basics", X: 200, Y: 820, Label: "behavioral\nbasics", Branch: "behavior", Topics: []string{"behavioral"}, Prereq: []string{"strings"}, Unlocks: []string{"star-method"}, Title: "Behavior · Interview basics", Projects: 1, Hours: "2–3h", Hints: []string{"Pick stories from the last 2 years — interviewers calibrate on recency.", "Be the protagonist in every story — never passive."}},
+	{ID: "star-method", X: 320, Y: 880, Label: "STAR\nmethod", Branch: "behavior", Topics: []string{"star", "star-method"}, Prereq: []string{"behavior-basics"}, Unlocks: []string{"conflict", "leadership"}, Title: "Behavior · STAR method", Projects: 1, Hours: "3–4h", Hints: []string{"Situation and Task should take 20s combined, not 2min.", "Action is where you spend 60% of the story — specific, technical, owned."}},
+	{ID: "conflict", X: 240, Y: 940, Label: "conflict\nstories", Branch: "behavior", Topics: []string{"conflict"}, Prereq: []string{"star-method"}, Title: "Behavior · Handling conflict", Projects: 1, Hours: "2–3h", Hints: []string{"Always end with resolution + what you learned.", "Attack the problem, not the person — even in retelling."}},
+	{ID: "leadership", X: 420, Y: 940, Label: "leadership\n& influence", Branch: "behavior", Keystone: true, Topics: []string{"leadership"}, Prereq: []string{"star-method"}, Title: "Behavior · Leadership", Projects: 1, Hours: "3–4h", Hints: []string{"Influence without authority is the senior-level test.", "Tie every leadership story to a measurable outcome."}},
 }
 
 var trainingEdges = []edgeDefinition{
-	{From: "arrays", To: "strings"}, {From: "arrays", To: "hashmap"}, {From: "arrays", To: "two-ptr"},
-	{From: "strings", To: "sorting"}, {From: "strings", To: "two-ptr"},
-	{From: "hashmap", To: "sliding"}, {From: "two-ptr", To: "sliding"},
-	{From: "sorting", To: "tree-basics"}, {From: "tree-basics", To: "bst"}, {From: "tree-basics", To: "heap"},
-	{From: "bst", To: "segment"}, {From: "bst", To: "tree-dp"}, {From: "heap", To: "lca"},
-	{From: "two-ptr", To: "graph-basics"}, {From: "graph-basics", To: "graph-bfs"}, {From: "graph-basics", To: "graph-dfs"},
-	{From: "graph-bfs", To: "dijkstra"}, {From: "graph-dfs", To: "dijkstra"}, {From: "graph-dfs", To: "union-find"},
+	{From: "arrays", To: "strings"},
+	{From: "arrays", To: "hashmap"},
+	{From: "arrays", To: "two-ptr"},
+	{From: "strings", To: "sorting"},
+	{From: "strings", To: "two-ptr"},
+	{From: "hashmap", To: "sliding"},
+	{From: "two-ptr", To: "sliding"},
+	{From: "sorting", To: "tree-basics"},
+	{From: "tree-basics", To: "bst"},
+	{From: "tree-basics", To: "heap"},
+	{From: "bst", To: "segment"},
+	{From: "bst", To: "tree-dp"},
+	{From: "heap", To: "lca"},
+	{From: "two-ptr", To: "graph-basics"},
+	{From: "graph-basics", To: "graph-bfs"},
+	{From: "graph-basics", To: "graph-dfs"},
+	{From: "graph-bfs", To: "dijkstra"},
+	{From: "graph-dfs", To: "dijkstra"},
+	{From: "graph-dfs", To: "union-find"},
 	{From: "dijkstra", To: "flow"},
-	{From: "sliding", To: "dp-basics"}, {From: "dp-basics", To: "knapsack"}, {From: "dp-basics", To: "dp-strings"},
-	{From: "knapsack", To: "bitmask"}, {From: "dp-strings", To: "digit-dp"},
-	{From: "flow", To: "systems"}, {From: "flow", To: "concurrency"}, {From: "knapsack", To: "distributed"},
-	{From: "systems", To: "concurrency"}, {From: "systems", To: "distributed"},
+	{From: "sliding", To: "dp-basics"},
+	{From: "dp-basics", To: "knapsack"},
+	{From: "dp-basics", To: "dp-strings"},
+	{From: "knapsack", To: "bitmask"},
+	{From: "dp-strings", To: "digit-dp"},
+	{From: "flow", To: "systems"},
+	{From: "flow", To: "concurrency"},
+	{From: "knapsack", To: "distributed"},
+	{From: "systems", To: "concurrency"},
+	{From: "systems", To: "distributed"},
 }
 
 func buildSkillTree(progress *model.ProfileProgress, tasks, solved []*codeeditordomain.Task) *v1.GetSkillTreeResponse {
@@ -133,8 +151,8 @@ func buildSkillTree(progress *model.ProfileProgress, tasks, solved []*codeeditor
 		Edges:          buildEdges(),
 		Modules:        buildModules(progress, moduleProgress, currentNodeID),
 	}
-	if resp.SelectedNodeId == "" && len(resp.Nodes) > 0 {
-		resp.SelectedNodeId = resp.Nodes[0].GetId()
+	if resp.GetSelectedNodeId() == "" && len(resp.GetNodes()) > 0 {
+		resp.SelectedNodeId = resp.GetNodes()[0].GetId()
 	}
 	return resp
 }
@@ -317,7 +335,7 @@ func buildModules(progressData *model.ProfileProgress, progress map[string]nodeP
 			derived := int32(minInt(95, int(progressData.Overview.LevelProgress*100)))
 			if derived > 0 {
 				progressPct = &derived
-				projectsDone = minInt32(node.Projects, maxInt32(1, int32((derived*node.Projects)/100)))
+				projectsDone = minInt32(node.Projects, maxInt32(1, (derived*node.Projects)/100))
 			}
 		}
 		modules = append(modules, &v1.TrainingModule{

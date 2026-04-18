@@ -16,4 +16,5 @@ type Service interface {
 	AcceptFriendRequest(ctx context.Context, viewerID, requestID uuid.UUID) (*model.Friend, error)
 	DeclineFriendRequest(ctx context.Context, viewerID, requestID uuid.UUID) error
 	RemoveFriend(ctx context.Context, viewerID, otherID uuid.UUID) error
+	SearchUsers(ctx context.Context, viewerID uuid.UUID, query string, limit int32) ([]*model.UserHit, error)
 }

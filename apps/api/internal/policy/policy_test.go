@@ -3,9 +3,9 @@ package policy
 import (
 	"testing"
 
-	"api/internal/model"
-
 	"github.com/stretchr/testify/assert"
+
+	"api/internal/model"
 )
 
 func TestDefaultPolicies(t *testing.T) {

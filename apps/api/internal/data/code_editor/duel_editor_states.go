@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 
-	codeeditordomain "api/internal/domain/codeeditor"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	codeeditordomain "api/internal/domain/codeeditor"
+	"api/internal/model"
 )
 
 func (r *Repo) GetDuelEditorState(ctx context.Context, roomID uuid.UUID, actorKey string) (*codeeditordomain.DuelEditorState, error) {
@@ -24,14 +24,14 @@ func (r *Repo) GetDuelEditorState(ctx context.Context, roomID uuid.UUID, actorKe
 	var state codeeditordomain.DuelEditorState
 	if err := row.Scan(&state.RoomID, &state.ActorKey, &state.Code, &state.Language, &state.UpdatedAt); err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
-			return nil, nil
+			return nil, codeeditordomain.ErrDuelStateNotFound
 		}
 		return nil, fmt.Errorf("get duel editor state: %w", err)
 	}
 	return &state, nil
 }
 
-func (r *Repo) SaveDuelEditorState(ctx context.Context, roomID uuid.UUID, actorKey string, code string, language model.ProgrammingLanguage) error {
+func (r *Repo) SaveDuelEditorState(ctx context.Context, roomID uuid.UUID, actorKey, code string, language model.ProgrammingLanguage) error {
 	_, err := r.data.DB.Exec(
 		ctx,
 		`INSERT INTO code_duel_editor_states (room_id, actor_key, code, language, updated_at)

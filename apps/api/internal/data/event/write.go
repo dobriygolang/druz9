@@ -7,13 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"api/internal/model"
-	slicestools "api/internal/util/slices"
-
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
+
+	"api/internal/model"
+	slicestools "api/internal/util/slices"
 )
 
 func (r *Repo) CleanupExpiredEvents(ctx context.Context, olderThan time.Duration) (int64, error) {
@@ -135,7 +135,7 @@ func buildRepeatedScheduleTimes(base *time.Time, count int, next func(time.Time,
 		return []*time.Time{base}
 	}
 	items := make([]*time.Time, 0, count)
-	for step := 0; step < count; step++ {
+	for step := range count {
 		value := next(*base, step)
 		items = append(items, &value)
 	}

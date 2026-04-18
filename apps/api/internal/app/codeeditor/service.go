@@ -5,11 +5,11 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+
 	"api/internal/cache"
 	domain "api/internal/domain/codeeditor"
 	"api/internal/sandbox"
-
-	"github.com/google/uuid"
 )
 
 type Config struct {

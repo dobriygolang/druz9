@@ -1,10 +1,10 @@
 package podcast
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/model"
 	v1 "api/pkg/api/podcast/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func mapPodcast(item *model.Podcast) *v1.Podcast {

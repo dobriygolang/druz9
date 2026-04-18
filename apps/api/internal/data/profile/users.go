@@ -4,11 +4,11 @@ import (
 	"context"
 	"fmt"
 
-	profileerrors "api/internal/errors/profile"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	profileerrors "api/internal/errors/profile"
+	"api/internal/model"
 )
 
 func (r *Repo) UpdateProfile(ctx context.Context, userID uuid.UUID, currentWorkplace string) (*model.User, error) {

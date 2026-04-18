@@ -6,7 +6,7 @@ import "context"
 type Settings struct {
 	DuelsEnabled          bool
 	ProgressEnabled       bool
-	GuildsEnabled        bool
+	GuildsEnabled         bool
 	DailyChallengeEnabled bool
 	QuietHoursStart       int32
 	QuietHoursEnd         int32
@@ -19,7 +19,7 @@ type Settings struct {
 type SettingsUpdate struct {
 	DuelsEnabled          *bool
 	ProgressEnabled       *bool
-	GuildsEnabled        *bool
+	GuildsEnabled         *bool
 	DailyChallengeEnabled *bool
 }
 
@@ -45,7 +45,7 @@ func (Noop) GetNotificationSettings(_ context.Context, _ string) (*Settings, err
 	return &Settings{
 		DuelsEnabled:    true,
 		ProgressEnabled: true,
-		GuildsEnabled:  true,
+		GuildsEnabled:   true,
 	}, nil
 }
 func (Noop) UpdateNotificationSettings(context.Context, string, SettingsUpdate) error { return nil }

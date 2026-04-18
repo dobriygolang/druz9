@@ -31,12 +31,12 @@ func DuelResultTitle() string { return "Результат дуэли" }
 
 func DuelResultBody(topic string, isWinner bool, isDraw bool) string {
 	if isDraw {
-		return fmt.Sprintf("Дуэль завершена вничью. Тема: %s", topic)
+		return "Дуэль завершена вничью. Тема: " + topic
 	}
 	if isWinner {
-		return fmt.Sprintf("Ты победил в дуэли! Тема: %s", topic)
+		return "Ты победил в дуэли! Тема: " + topic
 	}
-	return fmt.Sprintf("Дуэль завершена. Тема: %s", topic)
+	return "Дуэль завершена. Тема: " + topic
 }
 
 // ── Guilds ──────────────────────────────────────────────────────
@@ -47,7 +47,7 @@ func GuildInviteBody(displayName string) string {
 	if displayName == "" {
 		displayName = "Кто-то"
 	}
-	return fmt.Sprintf("%s пригласил тебя в круг", displayName)
+	return displayName + " пригласил тебя в круг"
 }
 
 func ChallengeCreatedTitle() string { return "Challenge в круге" }
@@ -67,7 +67,7 @@ func GuildDigestBody(guildName string, memberCount int) string {
 func MockResultTitle() string { return "Mock interview" }
 
 func MockResultBody(blueprintTitle string) string {
-	return fmt.Sprintf("Mock interview завершён!\nПрограмма: %s", blueprintTitle)
+	return "Mock interview завершён!\nПрограмма: " + blueprintTitle
 }
 
 // ── Streaks ──────────────────────────────────────────────────────

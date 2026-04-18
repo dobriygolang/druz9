@@ -7,9 +7,9 @@ import (
 	"context"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 const maxMessageLen = 280
@@ -28,6 +28,7 @@ type Repository interface {
 	InsertFriendship(ctx context.Context, a, b uuid.UUID) (time.Time, error)
 
 	GetFriendByID(ctx context.Context, viewerID, friendID uuid.UUID) (*model.Friend, error)
+	SearchUsers(ctx context.Context, viewerID uuid.UUID, query string, limit int32) ([]*model.UserHit, error)
 }
 
 //go:generate mockery --case underscore --name UserLookup --with-expecter --output mocks

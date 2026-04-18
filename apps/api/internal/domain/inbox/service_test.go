@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // fakeRepo is a handcrafted mock avoiding mockery as a build-time requirement.
@@ -26,21 +26,27 @@ type fakeRepo struct {
 func (f *fakeRepo) ListThreads(ctx context.Context, userID uuid.UUID, limit, offset int32) ([]*model.InboxThread, int32, int32, error) {
 	return f.listThreadsFn(ctx, userID, limit, offset)
 }
+
 func (f *fakeRepo) GetThread(ctx context.Context, userID, threadID uuid.UUID) (*model.InboxThread, error) {
 	return f.getThreadFn(ctx, userID, threadID)
 }
+
 func (f *fakeRepo) ListMessages(ctx context.Context, threadID uuid.UUID) ([]*model.InboxMessage, error) {
 	return f.listMessagesFn(ctx, threadID)
 }
+
 func (f *fakeRepo) InsertMessage(ctx context.Context, msg *model.InboxMessage) error {
 	return f.insertMessageFn(ctx, msg)
 }
+
 func (f *fakeRepo) MarkThreadRead(ctx context.Context, userID, threadID uuid.UUID) error {
 	return f.markReadFn(ctx, userID, threadID)
 }
+
 func (f *fakeRepo) GetUnreadTotal(ctx context.Context, userID uuid.UUID) (int32, error) {
 	return f.getUnreadTotalFn(ctx, userID)
 }
+
 func (f *fakeRepo) BumpThread(ctx context.Context, threadID uuid.UUID, preview string, incrementUnread bool) error {
 	return f.bumpThreadFn(ctx, threadID, preview, incrementUnread)
 }
@@ -69,9 +75,8 @@ func TestListThreads_DefaultsAndClamping(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		c := c
 		t.Run(c.name, func(t *testing.T) {
-			_, err := svc.ListThreads(context.Background(), uuid.New(), c.input, 0)
+			_, err := svc.ListThreads(t.Context(), uuid.New(), c.input, 0)
 			if err != nil {
 				t.Fatalf("unexpected error: %v", err)
 			}
@@ -90,7 +95,7 @@ func TestGetThread_NotFound(t *testing.T) {
 		},
 	}
 	svc := NewService(Config{Repository: repo})
-	_, err := svc.GetThread(context.Background(), uuid.New(), uuid.New())
+	_, err := svc.GetThread(t.Context(), uuid.New(), uuid.New())
 	if !errors.Is(err, ErrThreadNotFound) {
 		t.Fatalf("expected ErrThreadNotFound, got %v", err)
 	}
@@ -106,7 +111,7 @@ func TestGetThread_Forbidden(t *testing.T) {
 		},
 	}
 	svc := NewService(Config{Repository: repo})
-	_, err := svc.GetThread(context.Background(), owner, uuid.New())
+	_, err := svc.GetThread(t.Context(), owner, uuid.New())
 	if !errors.Is(err, ErrThreadNotOwned) {
 		t.Fatalf("expected ErrThreadNotOwned, got %v", err)
 	}
@@ -131,7 +136,7 @@ func TestGetThread_HappyPath(t *testing.T) {
 		},
 	}
 	svc := NewService(Config{Repository: repo})
-	result, err := svc.GetThread(context.Background(), owner, threadID)
+	result, err := svc.GetThread(t.Context(), owner, threadID)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -155,7 +160,7 @@ func TestSendMessage_RejectsNonInteractive(t *testing.T) {
 		},
 	}
 	svc := NewService(Config{Repository: repo})
-	_, err := svc.SendMessage(context.Background(), owner, threadID, "thornmoss", "hi")
+	_, err := svc.SendMessage(t.Context(), owner, threadID, "thornmoss", "hi")
 	if !errors.Is(err, ErrNotInteractive) {
 		t.Fatalf("expected ErrNotInteractive, got %v", err)
 	}
@@ -164,7 +169,7 @@ func TestSendMessage_RejectsNonInteractive(t *testing.T) {
 func TestSendMessage_RejectsEmptyBody(t *testing.T) {
 	t.Parallel()
 	svc := NewService(Config{Repository: &fakeRepo{}})
-	_, err := svc.SendMessage(context.Background(), uuid.New(), uuid.New(), "me", "   ")
+	_, err := svc.SendMessage(t.Context(), uuid.New(), uuid.New(), "me", "   ")
 	if !errors.Is(err, ErrMessageEmpty) {
 		t.Fatalf("expected ErrMessageEmpty, got %v", err)
 	}
@@ -177,7 +182,7 @@ func TestSendMessage_RejectsTooLong(t *testing.T) {
 		body[i] = 'a'
 	}
 	svc := NewService(Config{Repository: &fakeRepo{}})
-	_, err := svc.SendMessage(context.Background(), uuid.New(), uuid.New(), "me", string(body))
+	_, err := svc.SendMessage(t.Context(), uuid.New(), uuid.New(), "me", string(body))
 	if !errors.Is(err, ErrMessageTooLong) {
 		t.Fatalf("expected ErrMessageTooLong, got %v", err)
 	}
@@ -212,7 +217,7 @@ func TestSendMessage_HappyPath(t *testing.T) {
 	}
 	svc := NewService(Config{Repository: repo})
 
-	msg, err := svc.SendMessage(context.Background(), owner, threadID, "thornmoss", "  hello there  ")
+	msg, err := svc.SendMessage(t.Context(), owner, threadID, "thornmoss", "  hello there  ")
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -251,7 +256,7 @@ func TestMarkThreadRead_ReturnsUpdatedTotal(t *testing.T) {
 		getUnreadTotalFn: func(context.Context, uuid.UUID) (int32, error) { return 7, nil },
 	}
 	svc := NewService(Config{Repository: repo})
-	total, err := svc.MarkThreadRead(context.Background(), owner, threadID)
+	total, err := svc.MarkThreadRead(t.Context(), owner, threadID)
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}

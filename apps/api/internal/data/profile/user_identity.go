@@ -5,11 +5,11 @@ import (
 	"errors"
 	"fmt"
 
-	profileerrors "api/internal/errors/profile"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	profileerrors "api/internal/errors/profile"
+	"api/internal/model"
 )
 
 func (r *Repo) upsertTelegramUserTx(ctx context.Context, tx pgx.Tx, payload model.IdentityAuthPayload) (*model.User, error) {
@@ -18,51 +18,7 @@ func (r *Repo) upsertTelegramUserTx(ctx context.Context, tx pgx.Tx, payload mode
 		return nil, err
 	}
 
-	query := `
-INSERT INTO users (
-  id,
-  username,
-  first_name,
-  last_name,
-  telegram_id,
-  telegram_username,
-  telegram_avatar_url,
-  primary_provider,
-  current_workplace,
-  status,
-  last_active_at,
-  created_at,
-  updated_at
-)
-VALUES (
-  gen_random_uuid(),
-  COALESCE(NULLIF($2, ''), ''),
-  COALESCE(NULLIF($3, ''), ''),
-  COALESCE(NULLIF($4, ''), ''),
-  $1,
-  COALESCE(NULLIF($2, ''), ''),
-  COALESCE(NULLIF($5, ''), ''),
-  'telegram',
-  '',
-  $6,
-  NOW(),
-  NOW(),
-  NOW()
-)
-ON CONFLICT (telegram_id)
-WHERE telegram_id IS NOT NULL
-DO UPDATE
-SET
-  username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''), ''),
-  first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
-  last_name = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
-  telegram_username = COALESCE(NULLIF(EXCLUDED.telegram_username, ''), users.telegram_username, ''),
-  telegram_avatar_url = COALESCE(NULLIF(EXCLUDED.telegram_avatar_url, ''), users.telegram_avatar_url, ''),
-  primary_provider = COALESCE(NULLIF(users.primary_provider, ''), 'telegram'),
-  last_active_at = NOW(),
-  updated_at = NOW()
-RETURNING id
-`
+	query := "\nINSERT INTO users (\n  id,\n  username,\n  first_name,\n  last_name,\n  telegram_id,\n  telegram_username,\n  telegram_avatar_url,\n  primary_provider,\n  current_workplace,\n  status,\n  last_active_at,\n  created_at,\n  updated_at\n)\nVALUES (\n  gen_random_uuid(),\n  COALESCE(NULLIF($2, ''),\n  COALESCE(NULLIF($3, ''),\n  COALESCE(NULLIF($4, ''),\n  $1,\n  COALESCE(NULLIF($2, ''),\n  COALESCE(NULLIF($5, ''),\n  'telegram',\n  '',\n  $6,\n  NOW(),\n  NOW()\n)\nON CONFLICT (telegram_id)\nWHERE telegram_id IS NOT NULL\nDO UPDATE\nSET\n  username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''),\n  first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),\n  last_name = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),\n  telegram_username = COALESCE(NULLIF(EXCLUDED.telegram_username, ''), users.telegram_username, ''),\n  telegram_avatar_url = COALESCE(NULLIF(EXCLUDED.telegram_avatar_url, ''), users.telegram_avatar_url, ''),\n  primary_provider = COALESCE(NULLIF(users.primary_provider, ''), 'telegram'),\n  last_active_at = NOW(),\n  updated_at = NOW()\nRETURNING"
 
 	var userID uuid.UUID
 	if err := tx.QueryRow(
@@ -82,48 +38,7 @@ RETURNING id
 }
 
 func (r *Repo) upsertYandexUserTx(ctx context.Context, tx pgx.Tx, payload model.IdentityAuthPayload) (*model.User, error) {
-	query := `
-INSERT INTO users (
-  id,
-  username,
-  first_name,
-  last_name,
-  yandex_id,
-  yandex_avatar_url,
-  primary_provider,
-  current_workplace,
-  status,
-  last_active_at,
-  created_at,
-  updated_at
-)
-VALUES (
-  gen_random_uuid(),
-  COALESCE(NULLIF($2, ''), ''),
-  COALESCE(NULLIF($3, ''), ''),
-  COALESCE(NULLIF($4, ''), ''),
-  $1,
-  COALESCE(NULLIF($5, ''), ''),
-  'yandex',
-  '',
-  $6,
-  NOW(),
-  NOW(),
-  NOW()
-)
-ON CONFLICT (yandex_id)
-WHERE yandex_id IS NOT NULL AND yandex_id <> ''
-DO UPDATE
-SET
-  username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''), ''),
-  first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),
-  last_name = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),
-  yandex_avatar_url = COALESCE(NULLIF(EXCLUDED.yandex_avatar_url, ''), users.yandex_avatar_url, ''),
-  primary_provider = COALESCE(NULLIF(users.primary_provider, ''), 'yandex'),
-  last_active_at = NOW(),
-  updated_at = NOW()
-RETURNING id
-`
+	query := "\nINSERT INTO users (\n  id,\n  username,\n  first_name,\n  last_name,\n  yandex_id,\n  yandex_avatar_url,\n  primary_provider,\n  current_workplace,\n  status,\n  last_active_at,\n  created_at,\n  updated_at\n)\nVALUES (\n  gen_random_uuid(),\n  COALESCE(NULLIF($2, ''),\n  COALESCE(NULLIF($3, ''),\n  COALESCE(NULLIF($4, ''),\n  $1,\n  COALESCE(NULLIF($5, ''),\n  'yandex',\n  '',\n  $6,\n  NOW(),\n  NOW()\n)\nON CONFLICT (yandex_id)\nWHERE yandex_id IS NOT NULL AND yandex_id <> ''\nDO UPDATE\nSET\n  username = COALESCE(NULLIF(users.username, ''), NULLIF(EXCLUDED.username, ''),\n  first_name = COALESCE(NULLIF(EXCLUDED.first_name, ''), users.first_name),\n  last_name = COALESCE(NULLIF(EXCLUDED.last_name, ''), users.last_name),\n  yandex_avatar_url = COALESCE(NULLIF(EXCLUDED.yandex_avatar_url, ''), users.yandex_avatar_url, ''),\n  primary_provider = COALESCE(NULLIF(users.primary_provider, ''), 'yandex'),\n  last_active_at = NOW(),\n  updated_at = NOW()\nRETURNING"
 
 	var userID uuid.UUID
 	if err := tx.QueryRow(

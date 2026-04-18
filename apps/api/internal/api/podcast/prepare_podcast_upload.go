@@ -13,15 +13,15 @@ func (i *Implementation) PreparePodcastUpload(ctx context.Context, req *v1.Prepa
 		return nil, err
 	}
 
-	podcastID, err := apihelpers.ParseUUID(req.PodcastId, "INVALID_PODCAST_ID", "podcast_id")
+	podcastID, err := apihelpers.ParseUUID(req.GetPodcastId(), "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
 		return nil, err
 	}
 
 	item, uploadURL, objectKey, err := i.service.PreparePodcastUpload(ctx, podcastID, model.PreparePodcastUploadRequest{
-		FileName:        req.FileName,
-		ContentType:     unmapContentType(req.ContentType),
-		DurationSeconds: req.DurationSeconds,
+		FileName:        req.GetFileName(),
+		ContentType:     unmapContentType(req.GetContentType()),
+		DurationSeconds: req.GetDurationSeconds(),
 	})
 	if err != nil {
 		return nil, err

@@ -6,10 +6,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+
 	"api/internal/aireview"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 // ReviewRepository persists solution reviews and task stats.

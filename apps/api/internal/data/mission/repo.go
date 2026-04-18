@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
-	missiondomain "api/internal/domain/mission"
-	"api/internal/storage/postgres"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
+
+	missiondomain "api/internal/domain/mission"
+	"api/internal/storage/postgres"
 )
 
 // Repo implements mission data operations using existing tables.

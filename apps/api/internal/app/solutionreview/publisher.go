@@ -15,7 +15,8 @@ type RealtimeReviewPublisher struct {
 // NewRealtimePublisher creates a publisher that sends reviews via WebSocket.
 func NewRealtimePublisher(hub interface {
 	PublishReviewReady(userID string, review *schema.CodeEditorReviewEvent)
-}) *RealtimeReviewPublisher {
+},
+) *RealtimeReviewPublisher {
 	return &RealtimeReviewPublisher{hub: hub}
 }
 

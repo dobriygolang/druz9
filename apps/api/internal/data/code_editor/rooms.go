@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	codeeditordomain "api/internal/domain/codeeditor"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	codeeditordomain "api/internal/domain/codeeditor"
+	"api/internal/model"
 )
 
 func (r *Repo) CreateRoom(ctx context.Context, room *codeeditordomain.Room) (*codeeditordomain.Room, error) {

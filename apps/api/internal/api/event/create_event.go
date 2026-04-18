@@ -17,25 +17,25 @@ func (i *Implementation) CreateEvent(ctx context.Context, req *v1.CreateEventReq
 	}
 
 	var scheduledAt *time.Time
-	if req.ScheduledAt != nil {
-		value := timeutil.NormalizeToUTC(req.ScheduledAt.AsTime())
+	if req.GetScheduledAt() != nil {
+		value := timeutil.NormalizeToUTC(req.GetScheduledAt().AsTime())
 		scheduledAt = &value
 	}
 
 	event, err := i.service.CreateEvent(ctx, user.ID, user.IsAdmin, model.CreateEventRequest{
-		Title:          req.Title,
-		PlaceLabel:     req.PlaceLabel,
-		Description:    req.Description,
-		Repeat:         unmapEventRepeat(req.Repeat),
-		MeetingLink:    req.MeetingLink,
-		Region:         req.Region,
-		Country:        req.Country,
-		City:           req.City,
-		Latitude:       req.Latitude,
-		Longitude:      req.Longitude,
+		Title:          req.GetTitle(),
+		PlaceLabel:     req.GetPlaceLabel(),
+		Description:    req.GetDescription(),
+		Repeat:         unmapEventRepeat(req.GetRepeat()),
+		MeetingLink:    req.GetMeetingLink(),
+		Region:         req.GetRegion(),
+		Country:        req.GetCountry(),
+		City:           req.GetCity(),
+		Latitude:       req.GetLatitude(),
+		Longitude:      req.GetLongitude(),
 		ScheduledAt:    scheduledAt,
-		InvitedUserIDs: req.InvitedUserIds,
-		IsPublic:       req.IsPublic,
+		InvitedUserIDs: req.GetInvitedUserIds(),
+		IsPublic:       req.GetIsPublic(),
 	})
 	if err != nil {
 		return nil, err

@@ -7,15 +7,14 @@ import (
 	"strings"
 	"time"
 
-	"api/internal/model"
-	"api/internal/storage/postgres"
-
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 
 	socialdomain "api/internal/domain/social"
+	"api/internal/model"
+	"api/internal/storage/postgres"
 )
 
 type Repo struct {

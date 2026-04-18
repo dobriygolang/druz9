@@ -20,7 +20,7 @@ type Guild struct {
 }
 
 type GuildMember struct {
-	GuildID uuid.UUID
+	GuildID  uuid.UUID
 	UserID   uuid.UUID
 	Role     string
 	JoinedAt time.Time
@@ -46,7 +46,7 @@ const (
 )
 
 type ListGuildsResponse struct {
-	Guilds    []*Guild
+	Guilds     []*Guild
 	TotalCount int32
 }
 
@@ -80,7 +80,7 @@ type GuildMemberAction struct {
 // GuildChallenge is a time-boxed group goal for a guild.
 type GuildChallenge struct {
 	ID          uuid.UUID
-	GuildID    uuid.UUID
+	GuildID     uuid.UUID
 	TemplateKey string // streak_days, daily_completion, duels_count, mocks_count
 	TargetValue int32
 	StartsAt    time.Time
@@ -119,7 +119,7 @@ type GuildMemberStats struct {
 
 // CreateGuildChallengeRequest holds parameters for creating a guild challenge.
 type CreateGuildChallengeRequest struct {
-	GuildID    uuid.UUID
+	GuildID     uuid.UUID
 	TemplateKey string
 	TargetValue int32
 	StartsAt    time.Time

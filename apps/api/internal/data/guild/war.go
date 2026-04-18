@@ -13,33 +13,33 @@ import (
 // WarRow is the persistent guild-war state. Fronts, contributions and
 // territories live in sibling tables accessed via the helpers below.
 type WarRow struct {
-	ID              uuid.UUID
-	WeekNumber      int32
-	OurGuildID      uuid.UUID
-	TheirGuildName  string
-	TheirGuildID    *uuid.UUID
-	Status          string
-	StartsAt        time.Time
-	EndsAt          time.Time
-	ResolvedWinner  string
+	ID             uuid.UUID
+	WeekNumber     int32
+	OurGuildID     uuid.UUID
+	TheirGuildName string
+	TheirGuildID   *uuid.UUID
+	Status         string
+	StartsAt       time.Time
+	EndsAt         time.Time
+	ResolvedWinner string
 }
 
 type FrontRow struct {
-	ID           uuid.UUID
-	WarID        uuid.UUID
-	Name         string
-	OurRounds    int32
-	TheirRounds  int32
-	CapturedBy   string // "", "ours", "theirs"
-	SortOrder    int32
+	ID          uuid.UUID
+	WarID       uuid.UUID
+	Name        string
+	OurRounds   int32
+	TheirRounds int32
+	CapturedBy  string // "", "ours", "theirs"
+	SortOrder   int32
 }
 
 type TerritoryRow struct {
-	ID          uuid.UUID
-	GuildID     uuid.UUID
-	Name        string
-	Buff        string
-	CapturedAt  time.Time
+	ID         uuid.UUID
+	GuildID    uuid.UUID
+	Name       string
+	Buff       string
+	CapturedAt time.Time
 }
 
 // GetActiveWarForGuild returns the "active" war row (status='active') for

@@ -3,9 +3,9 @@ package profile
 import (
 	"context"
 
-	v1 "api/pkg/api/profile/v1"
-
 	"google.golang.org/protobuf/types/known/timestamppb"
+
+	v1 "api/pkg/api/profile/v1"
 )
 
 func (i *Implementation) StartYandexAuth(ctx context.Context, _ *v1.StartYandexAuthRequest) (*v1.StartYandexAuthResponse, error) {

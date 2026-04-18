@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // PreparePodcastUpload prepares podcast upload by creating presigned URL and updating podcast.

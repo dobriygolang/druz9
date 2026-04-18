@@ -72,7 +72,7 @@ type Event struct {
 	IsPublic         bool
 	ParticipantCount int
 	Participants     []*EventParticipant
-	GuildID         *uuid.UUID
+	GuildID          *uuid.UUID
 	Repeat           string
 	Status           string
 }
@@ -98,7 +98,7 @@ type ListEventsOptions struct {
 	From      *time.Time
 	To        *time.Time
 	CreatorID *uuid.UUID
-	GuildID  *uuid.UUID
+	GuildID   *uuid.UUID
 	Status    string
 	// IncludeAllStatuses bypasses approval filtering (for admins).
 	IncludeAllStatuses bool
@@ -146,7 +146,7 @@ type CreateEventRequest struct {
 	Longitude      float64
 	ScheduledAt    *time.Time
 	InvitedUserIDs []string
-	GuildID       *uuid.UUID
+	GuildID        *uuid.UUID
 	IsPublic       bool
 	Status         string
 }

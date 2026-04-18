@@ -5,10 +5,10 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/jackc/pgx/v5"
+
 	profileerrors "api/internal/errors/profile"
 	"api/internal/model"
-
-	"github.com/jackc/pgx/v5"
 )
 
 func scanUser(scanner userScanner) (*model.User, error) {

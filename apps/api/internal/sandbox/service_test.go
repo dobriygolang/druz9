@@ -1,7 +1,6 @@
 package sandbox
 
 import (
-	"context"
 	"strings"
 	"testing"
 
@@ -11,7 +10,7 @@ import (
 func TestBuildNetworkEnv_MockOnlySetsProxy(t *testing.T) {
 	t.Parallel()
 
-	env, proxy, err := buildNetworkEnv(context.Background(), policy.RunnerNetworkConfig{
+	env, proxy, err := buildNetworkEnv(t.Context(), policy.RunnerNetworkConfig{
 		Enabled:       true,
 		Mode:          policy.NetworkMockOnly,
 		AllowedHosts:  []string{"mock.local"},
@@ -62,7 +61,7 @@ func TestExecute_MockHTTPGetUsesSandboxProxy(t *testing.T) {
 	t.Parallel()
 
 	svc := New()
-	result, err := svc.Execute(context.Background(), ExecutionRequest{
+	result, err := svc.Execute(t.Context(), ExecutionRequest{
 		Code: `package main
 
 import (

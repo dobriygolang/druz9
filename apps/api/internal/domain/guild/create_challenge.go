@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
-	"api/internal/model"
-
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // CreateChallenge creates a new weekly challenge for a guild. Only the creator can do this.
@@ -43,7 +43,7 @@ func (s *Service) CreateChallenge(
 	endsAt := now.AddDate(0, 0, 7)
 
 	return s.repo.CreateGuildChallenge(ctx, model.CreateGuildChallengeRequest{
-		GuildID:    guildID,
+		GuildID:     guildID,
 		TemplateKey: templateKey,
 		TargetValue: targetValue,
 		StartsAt:    startsAt,

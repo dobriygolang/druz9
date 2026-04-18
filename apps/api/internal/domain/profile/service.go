@@ -12,10 +12,10 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+
 	"api/internal/cache"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 // Config represents profile domain service configuration.
@@ -175,7 +175,7 @@ func (s *Service) buildBotStartURL(token string) string {
 		return ""
 	}
 	if token == "" {
-		return fmt.Sprintf("https://t.me/%s", url.PathEscape(s.settings.BotUsername))
+		return "https://t.me/" + url.PathEscape(s.settings.BotUsername)
 	}
 	return fmt.Sprintf("https://t.me/%s?start=%s", url.PathEscape(s.settings.BotUsername), url.QueryEscape(token))
 }

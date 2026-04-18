@@ -1,17 +1,10 @@
 package code_editor
 
 import (
-	"api/internal/storage/postgres"
-
 	"github.com/go-kratos/kratos/v2/log"
-)
 
-const roomSelectColumns = `
-	cr.id, cr.mode, cr.code, cr.code_revision, cr.status, cr.creator_id, cr.invite_code,
-	cr.language, COALESCE(NULLIF(cr.task, ''), ct.title, ''), cr.task_id, COALESCE(cr.duel_topic, ''),
-	cr.winner_user_id, COALESCE(cr.winner_guest_name, ''), cr.started_at, cr.finished_at, cr.created_at, cr.updated_at,
-	COALESCE(cr.is_private, FALSE)
-`
+	"api/internal/storage/postgres"
+)
 
 // roomFullQuery returns room + all participants in a single query using JSON_AGG.
 // Callers must append WHERE and GROUP BY cr.id, ct.id.

@@ -1,13 +1,13 @@
 package interview_prep
 
 import (
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/aireview"
 	appinterviewprep "api/internal/app/interviewprep"
 	"api/internal/model"
 	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/interview_prep/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // ── Enum mappings ──────────────────────────────────────────────────────────

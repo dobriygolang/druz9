@@ -9,7 +9,7 @@ func BenchmarkContains(b *testing.B) {
 
 	b.Run("linear search", func(b *testing.B) {
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			_ = Contains(s, "j")
 		}
 	})
@@ -17,7 +17,7 @@ func BenchmarkContains(b *testing.B) {
 	b.Run("set lookup", func(b *testing.B) {
 		set := NewSet(s)
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			_ = ContainsSet(set, "j")
 		}
 	})
@@ -28,7 +28,7 @@ func BenchmarkUnique(b *testing.B) {
 
 	b.Run("unique", func(b *testing.B) {
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			_ = Unique(s)
 		}
 	})
@@ -39,14 +39,14 @@ func BenchmarkMap(b *testing.B) {
 
 	b.Run("map strings", func(b *testing.B) {
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			_ = Map(s, func(s string) string { return s + "_" })
 		}
 	})
 
 	b.Run("map to bool", func(b *testing.B) {
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			_ = Map(s, func(s string) bool { return len(s) > 0 })
 		}
 	})
@@ -57,7 +57,7 @@ func BenchmarkFilter(b *testing.B) {
 
 	b.Run("filter", func(b *testing.B) {
 		b.ReportAllocs()
-		for i := 0; i < b.N; i++ {
+		for range b.N {
 			_ = Filter(s, func(s string) bool { return len(s) > 2 })
 		}
 	})

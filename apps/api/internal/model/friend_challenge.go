@@ -59,4 +59,3 @@ type ChallengeList struct {
 	Challenges []*FriendChallenge `json:"challenges"`
 	Total      int32              `json:"total"`
 }
-

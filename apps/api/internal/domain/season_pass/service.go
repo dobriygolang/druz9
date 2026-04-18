@@ -7,9 +7,9 @@ import (
 	"errors"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 //go:generate mockery --case underscore --name Repository --with-expecter --output mocks
@@ -44,8 +44,10 @@ type Wallet interface {
 }
 
 // Clock is mockable "now" for tests.
-type Clock interface{ Now() time.Time }
-type systemClock struct{}
+type (
+	Clock       interface{ Now() time.Time }
+	systemClock struct{}
+)
 
 func (systemClock) Now() time.Time { return time.Now().UTC() }
 
@@ -74,15 +76,15 @@ func NewService(c Config) *Service {
 
 // Domain errors.
 var (
-	ErrNoActivePass      = errors.New("season_pass: no active pass")
-	ErrTierNotFound      = errors.New("season_pass: tier not found")
-	ErrTierNotReached    = errors.New("season_pass: tier not yet reached")
-	ErrAlreadyClaimed    = errors.New("season_pass: tier already claimed")
-	ErrPremiumRequired   = errors.New("season_pass: premium track requires pass purchase")
-	ErrNoRewardOnTrack   = errors.New("season_pass: no reward defined for this tier/track")
-	ErrAlreadyPurchased  = errors.New("season_pass: premium already purchased")
-	ErrInsufficientGems  = errors.New("season_pass: insufficient gems")
-	ErrInvalidTrack      = errors.New("season_pass: invalid track")
+	ErrNoActivePass     = errors.New("season_pass: no active pass")
+	ErrTierNotFound     = errors.New("season_pass: tier not found")
+	ErrTierNotReached   = errors.New("season_pass: tier not yet reached")
+	ErrAlreadyClaimed   = errors.New("season_pass: tier already claimed")
+	ErrPremiumRequired  = errors.New("season_pass: premium track requires pass purchase")
+	ErrNoRewardOnTrack  = errors.New("season_pass: no reward defined for this tier/track")
+	ErrAlreadyPurchased = errors.New("season_pass: premium already purchased")
+	ErrInsufficientGems = errors.New("season_pass: insufficient gems")
+	ErrInvalidTrack     = errors.New("season_pass: invalid track")
 )
 
 // GetActivePass returns just the currently-live pass (or nil) — a thin
@@ -120,6 +122,7 @@ func (s *Service) GetActive(ctx context.Context, userID uuid.UUID) (*model.Seaso
 //   - user must have reached the tier (xp / xp_per_tier ≥ tier),
 //   - the (tier, track) pair must not already be in the claimed arrays,
 //   - premium track requires has_premium.
+//
 // Domain does not actually grant the reward to the wallet yet — in this
 // iteration we just bookkeep. A follow-up can wire wallets + cosmetics.
 func (s *Service) ClaimTierReward(

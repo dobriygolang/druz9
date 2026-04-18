@@ -3,11 +3,11 @@ package event
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	"api/internal/apihelpers"
 	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/event/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) LeaveEvent(ctx context.Context, req *v1.LeaveEventRequest) (*v1.EventStatusResponse, error) {
@@ -16,7 +16,7 @@ func (i *Implementation) LeaveEvent(ctx context.Context, req *v1.LeaveEventReque
 		return nil, err
 	}
 
-	eventID, err := apihelpers.ParseUUID(req.EventId, "INVALID_EVENT_ID", "event_id")
+	eventID, err := apihelpers.ParseUUID(req.GetEventId(), "INVALID_EVENT_ID", "event_id")
 	if err != nil {
 		return nil, err
 	}

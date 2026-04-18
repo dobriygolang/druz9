@@ -66,4 +66,3 @@ func LeagueIndex(rating int32) int {
 	}
 	return idx
 }
-

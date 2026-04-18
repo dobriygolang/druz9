@@ -6,18 +6,18 @@ import (
 	"testing"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 type fakeRepo struct {
-	pass      *model.SeasonPass
-	tiers     map[int32]*model.SeasonPassTier
-	progress  map[uuid.UUID]*model.SeasonPassProgress
-	claimLog  []string
+	pass             *model.SeasonPass
+	tiers            map[int32]*model.SeasonPassTier
+	progress         map[uuid.UUID]*model.SeasonPassProgress
+	claimLog         []string
 	setPremiumCalled bool
-	xpDeltas  []int32
+	xpDeltas         []int32
 }
 
 func newFakeRepo(pass *model.SeasonPass) *fakeRepo {
@@ -28,7 +28,10 @@ func newFakeRepo(pass *model.SeasonPass) *fakeRepo {
 	}
 }
 
-func (f *fakeRepo) GetActive(context.Context, time.Time) (*model.SeasonPass, error) { return f.pass, nil }
+func (f *fakeRepo) GetActive(context.Context, time.Time) (*model.SeasonPass, error) {
+	return f.pass, nil
+}
+
 func (f *fakeRepo) ListTiers(context.Context, uuid.UUID) ([]*model.SeasonPassTier, error) {
 	out := make([]*model.SeasonPassTier, 0, len(f.tiers))
 	for _, t := range f.tiers {
@@ -36,13 +39,15 @@ func (f *fakeRepo) ListTiers(context.Context, uuid.UUID) ([]*model.SeasonPassTie
 	}
 	return out, nil
 }
+
 func (f *fakeRepo) GetTier(_ context.Context, _ uuid.UUID, tier int32) (*model.SeasonPassTier, error) {
 	t, ok := f.tiers[tier]
 	if !ok {
-		return nil, nil
+		return nil, ErrTierNotFound
 	}
 	return t, nil
 }
+
 func (f *fakeRepo) GetOrCreateProgress(_ context.Context, userID, _ uuid.UUID) (*model.SeasonPassProgress, error) {
 	if p, ok := f.progress[userID]; ok {
 		// return a copy so caller mutations don't leak into storage
@@ -55,6 +60,7 @@ func (f *fakeRepo) GetOrCreateProgress(_ context.Context, userID, _ uuid.UUID) (
 	f.progress[userID] = p
 	return p, nil
 }
+
 func (f *fakeRepo) MarkClaimed(_ context.Context, userID, _ uuid.UUID, tier int32, track model.RewardTrack) error {
 	p := f.progress[userID]
 	if track == model.RewardTrackPremium {
@@ -65,12 +71,14 @@ func (f *fakeRepo) MarkClaimed(_ context.Context, userID, _ uuid.UUID, tier int3
 	f.claimLog = append(f.claimLog, "ok")
 	return nil
 }
+
 func (f *fakeRepo) SetPremium(_ context.Context, userID, _ uuid.UUID) error {
 	f.setPremiumCalled = true
 	p := f.progress[userID]
 	p.HasPremium = true
 	return nil
 }
+
 func (f *fakeRepo) AddXP(_ context.Context, userID, _ uuid.UUID, delta int32) error {
 	p, ok := f.progress[userID]
 	if !ok {
@@ -135,7 +143,7 @@ func TestCurrentTierFor(t *testing.T) {
 func TestGetActive_NoActive(t *testing.T) {
 	t.Parallel()
 	svc := NewService(Config{Repository: newFakeRepo(nil)})
-	_, err := svc.GetActive(context.Background(), uuid.New())
+	_, err := svc.GetActive(t.Context(), uuid.New())
 	if !errors.Is(err, ErrNoActivePass) {
 		t.Fatalf("expected ErrNoActivePass, got %v", err)
 	}
@@ -149,7 +157,7 @@ func TestGetActive_PopulatesProgress(t *testing.T) {
 	repo.progress[userID] = &model.SeasonPassProgress{XP: 1400, ClaimedFree: []int32{}, ClaimedPremium: []int32{}}
 
 	svc := NewService(Config{Repository: repo})
-	snap, err := svc.GetActive(context.Background(), userID)
+	snap, err := svc.GetActive(t.Context(), userID)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -169,7 +177,7 @@ func TestClaim_TierNotReached(t *testing.T) {
 	repo.progress[userID] = &model.SeasonPassProgress{XP: 0}
 
 	svc := NewService(Config{Repository: repo})
-	_, err := svc.ClaimTierReward(context.Background(), userID, 5, model.RewardTrackFree)
+	_, err := svc.ClaimTierReward(t.Context(), userID, 5, model.RewardTrackFree)
 	if !errors.Is(err, ErrTierNotReached) {
 		t.Fatalf("expected ErrTierNotReached, got %v", err)
 	}
@@ -186,7 +194,7 @@ func TestClaim_AlreadyClaimed(t *testing.T) {
 	}
 
 	svc := NewService(Config{Repository: repo})
-	_, err := svc.ClaimTierReward(context.Background(), userID, 1, model.RewardTrackFree)
+	_, err := svc.ClaimTierReward(t.Context(), userID, 1, model.RewardTrackFree)
 	if !errors.Is(err, ErrAlreadyClaimed) {
 		t.Fatalf("expected ErrAlreadyClaimed, got %v", err)
 	}
@@ -197,7 +205,7 @@ func TestClaim_PremiumRequiresPurchase(t *testing.T) {
 	pass := activePass()
 	repo := newFakeRepo(pass)
 	repo.tiers[1] = &model.SeasonPassTier{
-		Tier: 1,
+		Tier:           1,
 		FreeRewardKind: model.RewardKindGold, FreeRewardAmount: 100,
 		PremiumRewardKind: model.RewardKindGems, PremiumRewardAmount: 50,
 	}
@@ -205,7 +213,7 @@ func TestClaim_PremiumRequiresPurchase(t *testing.T) {
 	repo.progress[userID] = &model.SeasonPassProgress{XP: 500, HasPremium: false}
 
 	svc := NewService(Config{Repository: repo})
-	_, err := svc.ClaimTierReward(context.Background(), userID, 1, model.RewardTrackPremium)
+	_, err := svc.ClaimTierReward(t.Context(), userID, 1, model.RewardTrackPremium)
 	if !errors.Is(err, ErrPremiumRequired) {
 		t.Fatalf("expected ErrPremiumRequired, got %v", err)
 	}
@@ -223,7 +231,7 @@ func TestClaim_HappyPath(t *testing.T) {
 	repo.progress[userID] = &model.SeasonPassProgress{XP: 2000, ClaimedFree: []int32{}, ClaimedPremium: []int32{}}
 
 	svc := NewService(Config{Repository: repo})
-	out, err := svc.ClaimTierReward(context.Background(), userID, 3, model.RewardTrackFree)
+	out, err := svc.ClaimTierReward(t.Context(), userID, 3, model.RewardTrackFree)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -249,7 +257,7 @@ func TestPurchasePremium_DebitsGems(t *testing.T) {
 	repo.progress[userID] = &model.SeasonPassProgress{}
 
 	svc := NewService(Config{Repository: repo, Wallet: wallet})
-	if _, err := svc.PurchasePremium(context.Background(), userID); err != nil {
+	if _, err := svc.PurchasePremium(t.Context(), userID); err != nil {
 		t.Fatal(err)
 	}
 	if !repo.setPremiumCalled {
@@ -267,7 +275,7 @@ func TestPurchasePremium_AlreadyPurchased(t *testing.T) {
 	userID := uuid.New()
 	repo.progress[userID] = &model.SeasonPassProgress{HasPremium: true}
 	svc := NewService(Config{Repository: repo})
-	_, err := svc.PurchasePremium(context.Background(), userID)
+	_, err := svc.PurchasePremium(t.Context(), userID)
 	if !errors.Is(err, ErrAlreadyPurchased) {
 		t.Fatalf("expected ErrAlreadyPurchased, got %v", err)
 	}
@@ -279,7 +287,7 @@ func TestAddXP_NoOpWithoutActivePass(t *testing.T) {
 	t.Parallel()
 	repo := newFakeRepo(nil)
 	svc := NewService(Config{Repository: repo})
-	if err := svc.AddXP(context.Background(), uuid.New(), 100); err != nil {
+	if err := svc.AddXP(t.Context(), uuid.New(), 100); err != nil {
 		t.Fatal(err)
 	}
 	if len(repo.xpDeltas) != 0 {
@@ -291,7 +299,7 @@ func TestAddXP_IgnoresNonPositive(t *testing.T) {
 	t.Parallel()
 	repo := newFakeRepo(activePass())
 	svc := NewService(Config{Repository: repo})
-	if err := svc.AddXP(context.Background(), uuid.New(), 0); err != nil {
+	if err := svc.AddXP(t.Context(), uuid.New(), 0); err != nil {
 		t.Fatal(err)
 	}
 	if len(repo.xpDeltas) != 0 {
@@ -303,7 +311,7 @@ func TestAddXP_HappyPath(t *testing.T) {
 	t.Parallel()
 	repo := newFakeRepo(activePass())
 	svc := NewService(Config{Repository: repo})
-	if err := svc.AddXP(context.Background(), uuid.New(), 250); err != nil {
+	if err := svc.AddXP(t.Context(), uuid.New(), 250); err != nil {
 		t.Fatal(err)
 	}
 	if len(repo.xpDeltas) != 1 || repo.xpDeltas[0] != 250 {

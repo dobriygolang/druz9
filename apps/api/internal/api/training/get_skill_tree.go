@@ -3,10 +3,10 @@ package training
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	"api/internal/apihelpers"
 	v1 "api/pkg/api/training/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) GetSkillTree(ctx context.Context, req *v1.GetSkillTreeRequest) (*v1.GetSkillTreeResponse, error) {

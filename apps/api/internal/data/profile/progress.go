@@ -2,16 +2,17 @@ package profile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 	"time"
 
-	profiledomain "api/internal/domain/profile"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgtype"
+
+	profiledomain "api/internal/domain/profile"
+	"api/internal/model"
 )
 
 type practiceStats struct {
@@ -494,7 +495,7 @@ func (r *Repo) loadArenaVerifiedScore(ctx context.Context, userID uuid.UUID) (in
 		FROM arena_player_stats
 		WHERE user_id = $1
 	`, userID).Scan(&matches, &winRate); err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return 0, nil
 		}
 		return 0, fmt.Errorf("query arena verified score: %w", err)
@@ -515,7 +516,7 @@ func (r *Repo) LoadUserGoal(ctx context.Context, userID uuid.UUID) (*model.UserG
 		FROM users WHERE id = $1
 	`, userID).Scan(&kind, &company)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return &model.UserGoal{Kind: "general_growth"}, nil
 		}
 		return nil, fmt.Errorf("load user goal: %w", err)
@@ -559,7 +560,7 @@ func (r *Repo) loadActivityPercentile(ctx context.Context, userID uuid.UUID) (in
 		WHERE id = $1
 	`, userID).Scan(&percentile)
 	if err != nil {
-		if err == pgx.ErrNoRows {
+		if errors.Is(err, pgx.ErrNoRows) {
 			return 0, nil
 		}
 		return 0, fmt.Errorf("load activity percentile: %w", err)
@@ -635,4 +636,3 @@ func (r *Repo) GetProfileFeed(ctx context.Context, userID uuid.UUID, limit int) 
 	}
 	return items, rows.Err()
 }
-

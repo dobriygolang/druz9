@@ -13,7 +13,7 @@ func (i *Implementation) JoinEvent(ctx context.Context, req *v1.JoinEventRequest
 		return nil, err
 	}
 
-	eventID, err := apihelpers.ParseUUID(req.EventId, "INVALID_EVENT_ID", "event_id")
+	eventID, err := apihelpers.ParseUUID(req.GetEventId(), "INVALID_EVENT_ID", "event_id")
 	if err != nil {
 		return nil, err
 	}

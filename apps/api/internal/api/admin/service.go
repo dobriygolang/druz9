@@ -3,11 +3,11 @@ package admin
 import (
 	"context"
 
-	"api/internal/rtc"
-	v1 "api/pkg/api/admin/v1"
-
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
+
+	"api/internal/rtc"
+	v1 "api/pkg/api/admin/v1"
 )
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks

@@ -13,7 +13,7 @@ func (i *Implementation) CreateGuild(ctx context.Context, req *v1.CreateGuildReq
 		return nil, err
 	}
 
-	guild, err := i.service.CreateGuild(ctx, user.ID, req.Name, req.Description, req.Tags, req.IsPublic)
+	guild, err := i.service.CreateGuild(ctx, user.ID, req.GetName(), req.GetDescription(), req.GetTags(), req.GetIsPublic())
 	if err != nil {
 		return nil, err
 	}

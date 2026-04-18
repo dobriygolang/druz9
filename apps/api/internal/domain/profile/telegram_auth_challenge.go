@@ -3,6 +3,7 @@ package profile
 import (
 	"context"
 	"crypto/rand"
+	"encoding/hex"
 	"fmt"
 	"strings"
 
@@ -17,7 +18,7 @@ func (s *Service) CreateTelegramAuthChallenge(_ context.Context) (*model.Telegra
 		return nil, fmt.Errorf("generate challenge token: %w", err)
 	}
 
-	token := fmt.Sprintf("%x", bytes)
+	token := hex.EncodeToString(bytes)
 	expiresAt := s.Now().Add(s.settings.TelegramAuthMaxAge)
 
 	s.auth.mu.Lock()

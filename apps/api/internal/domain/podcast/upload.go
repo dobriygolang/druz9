@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // CompletePodcastUpload completes podcast upload by updating the record with file metadata.

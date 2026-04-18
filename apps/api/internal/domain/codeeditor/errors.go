@@ -7,6 +7,7 @@ var (
 	ErrRoomFull          = errors.New("room is full")
 	ErrInvalidMode       = errors.New("invalid room mode")
 	ErrTaskNotFound      = errors.New("task not found")
+	ErrDuelStateNotFound = errors.New("duel editor state not found")
 	ErrNoAvailableTasks  = errors.New("no available tasks")
 	ErrRoomAlreadyClosed = errors.New("room already finished")
 	ErrForbidden         = errors.New("forbidden")

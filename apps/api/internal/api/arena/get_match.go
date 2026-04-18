@@ -8,7 +8,7 @@ import (
 )
 
 func (i *Implementation) GetMatch(ctx context.Context, req *v1.GetMatchRequest) (*v1.ArenaMatchResponse, error) {
-	matchID, err := parseArenaMatchID(req.MatchId)
+	matchID, err := parseArenaMatchID(req.GetMatchId())
 	if err != nil {
 		return nil, err
 	}

@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
+
 	"api/internal/cache"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 // CachedProgressRepository wraps ProgressRepository with TTL caching

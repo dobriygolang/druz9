@@ -6,9 +6,9 @@ import (
 	"strings"
 	"time"
 
-	"api/internal/sandbox"
-
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"api/internal/sandbox"
 )
 
 func NewHTTPHandler(service *Service) http.Handler {

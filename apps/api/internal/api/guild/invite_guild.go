@@ -15,12 +15,12 @@ func (i *Implementation) InviteToGuild(ctx context.Context, req *v1.InviteToGuil
 		return nil, err
 	}
 
-	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
+	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
 		return nil, err
 	}
 
-	inviteeID, err := apihelpers.ParseUUID(req.UserId, "INVALID_USER_ID", "user_id")
+	inviteeID, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if err != nil {
 		return nil, err
 	}

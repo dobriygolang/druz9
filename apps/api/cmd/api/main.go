@@ -4,9 +4,9 @@ import (
 	"context"
 	"log"
 
-	"api/internal/closer"
-
 	"go.uber.org/zap"
+
+	"api/internal/closer"
 )
 
 func main() {

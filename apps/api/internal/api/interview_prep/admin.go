@@ -6,12 +6,12 @@ import (
 	"strings"
 	"time"
 
+	kratoserrors "github.com/go-kratos/kratos/v2/errors"
+	"github.com/google/uuid"
+
 	"api/internal/model"
 	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/interview_prep/v1"
-
-	kratoserrors "github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) ListAdminTasks(ctx context.Context, req *v1.ListAdminTasksRequest) (*v1.ListAdminTasksResponse, error) {
@@ -41,7 +41,7 @@ func (i *Implementation) BulkCreateAdminTasks(ctx context.Context, req *v1.BulkC
 	for _, payload := range req.GetTasks() {
 		slug := ""
 		if payload != nil {
-			slug = payload.Slug
+			slug = payload.GetSlug()
 		}
 		task, err := buildTask(payload, uuid.New())
 		if err != nil {
@@ -82,7 +82,7 @@ func (i *Implementation) CreateAdminTask(ctx context.Context, req *v1.CreateAdmi
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	task, err := buildTask(req.Task, uuid.New())
+	task, err := buildTask(req.GetTask(), uuid.New())
 	if err != nil {
 		return nil, err
 	}
@@ -99,7 +99,7 @@ func (i *Implementation) GetAdminTask(ctx context.Context, req *v1.GetAdminTaskR
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	taskID, err := parseUUID(req.TaskId, "INVALID_TASK_ID", "invalid task id")
+	taskID, err := parseUUID(req.GetTaskId(), "INVALID_TASK_ID", "invalid task id")
 	if err != nil {
 		return nil, err
 	}
@@ -117,11 +117,11 @@ func (i *Implementation) UpdateAdminTask(ctx context.Context, req *v1.UpdateAdmi
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	taskID, err := parseUUID(req.TaskId, "INVALID_TASK_ID", "invalid task id")
+	taskID, err := parseUUID(req.GetTaskId(), "INVALID_TASK_ID", "invalid task id")
 	if err != nil {
 		return nil, err
 	}
-	task, err := buildTask(req.Task, taskID)
+	task, err := buildTask(req.GetTask(), taskID)
 	if err != nil {
 		return nil, err
 	}
@@ -136,7 +136,7 @@ func (i *Implementation) DeleteAdminTask(ctx context.Context, req *v1.DeleteAdmi
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	taskID, err := parseUUID(req.TaskId, "INVALID_TASK_ID", "invalid task id")
+	taskID, err := parseUUID(req.GetTaskId(), "INVALID_TASK_ID", "invalid task id")
 	if err != nil {
 		return nil, err
 	}
@@ -150,7 +150,7 @@ func (i *Implementation) ListAdminQuestions(ctx context.Context, req *v1.ListAdm
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	taskID, err := parseUUID(req.TaskId, "INVALID_TASK_ID", "invalid task id")
+	taskID, err := parseUUID(req.GetTaskId(), "INVALID_TASK_ID", "invalid task id")
 	if err != nil {
 		return nil, err
 	}
@@ -169,11 +169,11 @@ func (i *Implementation) CreateAdminQuestion(ctx context.Context, req *v1.Create
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	taskID, err := parseUUID(req.TaskId, "INVALID_TASK_ID", "invalid task id")
+	taskID, err := parseUUID(req.GetTaskId(), "INVALID_TASK_ID", "invalid task id")
 	if err != nil {
 		return nil, err
 	}
-	question, err := buildQuestion(req.Question, taskID, uuid.New())
+	question, err := buildQuestion(req.GetQuestion(), taskID, uuid.New())
 	if err != nil {
 		return nil, err
 	}
@@ -190,15 +190,15 @@ func (i *Implementation) UpdateAdminQuestion(ctx context.Context, req *v1.Update
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	taskID, err := parseUUID(req.TaskId, "INVALID_TASK_ID", "invalid task id")
+	taskID, err := parseUUID(req.GetTaskId(), "INVALID_TASK_ID", "invalid task id")
 	if err != nil {
 		return nil, err
 	}
-	questionID, err := parseUUID(req.QuestionId, "INVALID_QUESTION_ID", "invalid question id")
+	questionID, err := parseUUID(req.GetQuestionId(), "INVALID_QUESTION_ID", "invalid question id")
 	if err != nil {
 		return nil, err
 	}
-	question, err := buildQuestion(req.Question, taskID, questionID)
+	question, err := buildQuestion(req.GetQuestion(), taskID, questionID)
 	if err != nil {
 		return nil, err
 	}
@@ -213,7 +213,7 @@ func (i *Implementation) DeleteAdminQuestion(ctx context.Context, req *v1.Delete
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	questionID, err := parseUUID(req.QuestionId, "INVALID_QUESTION_ID", "invalid question id")
+	questionID, err := parseUUID(req.GetQuestionId(), "INVALID_QUESTION_ID", "invalid question id")
 	if err != nil {
 		return nil, err
 	}
@@ -246,14 +246,14 @@ func (i *Implementation) CreateMockQuestionPool(ctx context.Context, req *v1.Cre
 	now := time.Now().UTC()
 	item := &model.InterviewPrepMockQuestionPoolItem{
 		ID:              uuid.New(),
-		Topic:           req.Item.Topic,
-		CompanyTag:      strings.TrimSpace(strings.ToLower(req.Item.CompanyTag)),
-		QuestionKey:     req.Item.QuestionKey,
-		Prompt:          req.Item.Prompt,
-		ReferenceAnswer: req.Item.ReferenceAnswer,
-		Position:        req.Item.Position,
-		AlwaysAsk:       req.Item.AlwaysAsk,
-		IsActive:        req.Item.IsActive,
+		Topic:           req.GetItem().GetTopic(),
+		CompanyTag:      strings.TrimSpace(strings.ToLower(req.GetItem().GetCompanyTag())),
+		QuestionKey:     req.GetItem().GetQuestionKey(),
+		Prompt:          req.GetItem().GetPrompt(),
+		ReferenceAnswer: req.GetItem().GetReferenceAnswer(),
+		Position:        req.GetItem().GetPosition(),
+		AlwaysAsk:       req.GetItem().GetAlwaysAsk(),
+		IsActive:        req.GetItem().GetIsActive(),
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
@@ -267,20 +267,20 @@ func (i *Implementation) UpdateMockQuestionPool(ctx context.Context, req *v1.Upd
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	itemID, err := parseUUID(req.Id, "INVALID_ITEM_ID", "invalid item id")
+	itemID, err := parseUUID(req.GetId(), "INVALID_ITEM_ID", "invalid item id")
 	if err != nil {
 		return nil, err
 	}
 	item := &model.InterviewPrepMockQuestionPoolItem{
 		ID:              itemID,
-		Topic:           req.Item.Topic,
-		CompanyTag:      strings.TrimSpace(strings.ToLower(req.Item.CompanyTag)),
-		QuestionKey:     req.Item.QuestionKey,
-		Prompt:          req.Item.Prompt,
-		ReferenceAnswer: req.Item.ReferenceAnswer,
-		Position:        req.Item.Position,
-		AlwaysAsk:       req.Item.AlwaysAsk,
-		IsActive:        req.Item.IsActive,
+		Topic:           req.GetItem().GetTopic(),
+		CompanyTag:      strings.TrimSpace(strings.ToLower(req.GetItem().GetCompanyTag())),
+		QuestionKey:     req.GetItem().GetQuestionKey(),
+		Prompt:          req.GetItem().GetPrompt(),
+		ReferenceAnswer: req.GetItem().GetReferenceAnswer(),
+		Position:        req.GetItem().GetPosition(),
+		AlwaysAsk:       req.GetItem().GetAlwaysAsk(),
+		IsActive:        req.GetItem().GetIsActive(),
 		UpdatedAt:       time.Now().UTC(),
 	}
 	if err := i.admin.UpdateMockQuestionPool(ctx, item); err != nil {
@@ -293,7 +293,7 @@ func (i *Implementation) DeleteMockQuestionPool(ctx context.Context, req *v1.Del
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	itemID, err := parseUUID(req.Id, "INVALID_ITEM_ID", "invalid item id")
+	itemID, err := parseUUID(req.GetId(), "INVALID_ITEM_ID", "invalid item id")
 	if err != nil {
 		return nil, err
 	}
@@ -326,12 +326,12 @@ func (i *Implementation) CreateMockCompanyPreset(ctx context.Context, req *v1.Cr
 	now := time.Now().UTC()
 	item := &model.InterviewPrepMockCompanyPreset{
 		ID:              uuid.New(),
-		CompanyTag:      strings.TrimSpace(strings.ToLower(req.Item.CompanyTag)),
-		StageKind:       unmapMockStageKind(req.Item.StageKind),
-		Position:        req.Item.Position,
-		TaskSlugPattern: req.Item.TaskSlugPattern,
-		AIModelOverride: req.Item.AiModelOverride,
-		IsActive:        req.Item.IsActive,
+		CompanyTag:      strings.TrimSpace(strings.ToLower(req.GetItem().GetCompanyTag())),
+		StageKind:       unmapMockStageKind(req.GetItem().GetStageKind()),
+		Position:        req.GetItem().GetPosition(),
+		TaskSlugPattern: req.GetItem().GetTaskSlugPattern(),
+		AIModelOverride: req.GetItem().GetAiModelOverride(),
+		IsActive:        req.GetItem().GetIsActive(),
 		CreatedAt:       now,
 		UpdatedAt:       now,
 	}
@@ -345,18 +345,18 @@ func (i *Implementation) UpdateMockCompanyPreset(ctx context.Context, req *v1.Up
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	itemID, err := parseUUID(req.Id, "INVALID_ITEM_ID", "invalid item id")
+	itemID, err := parseUUID(req.GetId(), "INVALID_ITEM_ID", "invalid item id")
 	if err != nil {
 		return nil, err
 	}
 	item := &model.InterviewPrepMockCompanyPreset{
 		ID:              itemID,
-		CompanyTag:      strings.TrimSpace(strings.ToLower(req.Item.CompanyTag)),
-		StageKind:       unmapMockStageKind(req.Item.StageKind),
-		Position:        req.Item.Position,
-		TaskSlugPattern: req.Item.TaskSlugPattern,
-		AIModelOverride: req.Item.AiModelOverride,
-		IsActive:        req.Item.IsActive,
+		CompanyTag:      strings.TrimSpace(strings.ToLower(req.GetItem().GetCompanyTag())),
+		StageKind:       unmapMockStageKind(req.GetItem().GetStageKind()),
+		Position:        req.GetItem().GetPosition(),
+		TaskSlugPattern: req.GetItem().GetTaskSlugPattern(),
+		AIModelOverride: req.GetItem().GetAiModelOverride(),
+		IsActive:        req.GetItem().GetIsActive(),
 		UpdatedAt:       time.Now().UTC(),
 	}
 	if err := i.admin.UpdateMockCompanyPreset(ctx, item); err != nil {
@@ -369,7 +369,7 @@ func (i *Implementation) DeleteMockCompanyPreset(ctx context.Context, req *v1.De
 	if err := requireAdmin(ctx); err != nil {
 		return nil, err
 	}
-	itemID, err := parseUUID(req.Id, "INVALID_ITEM_ID", "invalid item id")
+	itemID, err := parseUUID(req.GetId(), "INVALID_ITEM_ID", "invalid item id")
 	if err != nil {
 		return nil, err
 	}
@@ -402,24 +402,24 @@ func buildTask(payload *v1.AdminTaskPayload, taskID uuid.UUID) (*model.Interview
 
 	return &model.InterviewPrepTask{
 		ID:                 taskID,
-		Slug:               req.Slug,
-		Title:              req.Title,
-		Statement:          req.Statement,
-		PrepType:           unmapPrepType(req.PrepType),
-		Language:           unmapProgrammingLanguage(req.Language),
-		CompanyTag:         req.CompanyTag,
-		SupportedLanguages: append([]string{}, req.SupportedLanguages...),
-		IsExecutable:       req.IsExecutable,
-		ExecutionProfile:   unmapExecutionProfile(req.ExecutionProfile),
-		RunnerMode:         unmapRunnerMode(req.RunnerMode),
-		DurationSeconds:    req.DurationSeconds,
-		StarterCode:        req.StarterCode,
-		ReferenceSolution:  req.ReferenceSolution,
-		CodeTaskID:         parseOptionalUUID(req.CodeTaskId),
-		IsActive:           req.IsActive,
-		AIReviewPrompt:     strings.TrimSpace(req.AiReviewPrompt),
-		IsPracticeEnabled:  req.IsPracticeEnabled,
-		IsMockEnabled:      req.IsMockEnabled,
+		Slug:               req.GetSlug(),
+		Title:              req.GetTitle(),
+		Statement:          req.GetStatement(),
+		PrepType:           unmapPrepType(req.GetPrepType()),
+		Language:           unmapProgrammingLanguage(req.GetLanguage()),
+		CompanyTag:         req.GetCompanyTag(),
+		SupportedLanguages: append([]string{}, req.GetSupportedLanguages()...),
+		IsExecutable:       req.GetIsExecutable(),
+		ExecutionProfile:   unmapExecutionProfile(req.GetExecutionProfile()),
+		RunnerMode:         unmapRunnerMode(req.GetRunnerMode()),
+		DurationSeconds:    req.GetDurationSeconds(),
+		StarterCode:        req.GetStarterCode(),
+		ReferenceSolution:  req.GetReferenceSolution(),
+		CodeTaskID:         parseOptionalUUID(req.GetCodeTaskId()),
+		IsActive:           req.GetIsActive(),
+		AIReviewPrompt:     strings.TrimSpace(req.GetAiReviewPrompt()),
+		IsPracticeEnabled:  req.GetIsPracticeEnabled(),
+		IsMockEnabled:      req.GetIsMockEnabled(),
 	}, nil
 }
 
@@ -427,9 +427,9 @@ func buildQuestion(payload *v1.AdminQuestionPayload, taskID uuid.UUID, questionI
 	if payload == nil {
 		return nil, kratoserrors.BadRequest("BAD_REQUEST", "question payload is required")
 	}
-	prompt := strings.TrimSpace(payload.Prompt)
-	answer := strings.TrimSpace(payload.Answer)
-	if payload.Position < 1 {
+	prompt := strings.TrimSpace(payload.GetPrompt())
+	answer := strings.TrimSpace(payload.GetAnswer())
+	if payload.GetPosition() < 1 {
 		return nil, kratoserrors.BadRequest("BAD_REQUEST", "position must be >= 1")
 	}
 	if prompt == "" || answer == "" {
@@ -438,76 +438,76 @@ func buildQuestion(payload *v1.AdminQuestionPayload, taskID uuid.UUID, questionI
 	return &model.InterviewPrepQuestion{
 		ID:       questionID,
 		TaskID:   taskID,
-		Position: payload.Position,
+		Position: payload.GetPosition(),
 		Prompt:   prompt,
 		Answer:   answer,
 	}, nil
 }
 
 func normalizeTaskPayload(req *v1.AdminTaskPayload) *v1.AdminTaskPayload {
-	req.Title = strings.TrimSpace(req.Title)
-	req.Statement = strings.TrimSpace(req.Statement)
-	req.CompanyTag = strings.TrimSpace(strings.ToLower(req.CompanyTag))
-	req.StarterCode = strings.TrimSpace(req.StarterCode)
-	req.ReferenceSolution = strings.TrimSpace(req.ReferenceSolution)
-	req.CodeTaskId = strings.TrimSpace(req.CodeTaskId)
-	req.Slug = normalizeSlug(req.Slug, req.Title)
-	if req.PrepType == v1.PrepType_PREP_TYPE_UNSPECIFIED {
+	req.Title = strings.TrimSpace(req.GetTitle())
+	req.Statement = strings.TrimSpace(req.GetStatement())
+	req.CompanyTag = strings.TrimSpace(strings.ToLower(req.GetCompanyTag()))
+	req.StarterCode = strings.TrimSpace(req.GetStarterCode())
+	req.ReferenceSolution = strings.TrimSpace(req.GetReferenceSolution())
+	req.CodeTaskId = strings.TrimSpace(req.GetCodeTaskId())
+	req.Slug = normalizeSlug(req.GetSlug(), req.GetTitle())
+	if req.GetPrepType() == v1.PrepType_PREP_TYPE_UNSPECIFIED {
 		req.PrepType = v1.PrepType_PREP_TYPE_ALGORITHM
 	}
-	if req.Language == commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED {
+	if req.GetLanguage() == commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_UNSPECIFIED {
 		req.Language = commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO
 	}
-	if len(req.SupportedLanguages) == 0 {
-		req.SupportedLanguages = []string{unmapProgrammingLanguage(req.Language)}
+	if len(req.GetSupportedLanguages()) == 0 {
+		req.SupportedLanguages = []string{unmapProgrammingLanguage(req.GetLanguage())}
 	}
-	for idx := range req.SupportedLanguages {
-		req.SupportedLanguages[idx] = strings.TrimSpace(strings.ToLower(req.SupportedLanguages[idx]))
+	for idx := range req.GetSupportedLanguages() {
+		req.SupportedLanguages[idx] = strings.TrimSpace(strings.ToLower(req.GetSupportedLanguages()[idx]))
 	}
-	if req.ExecutionProfile == commonv1.ExecutionProfile_EXECUTION_PROFILE_UNSPECIFIED {
+	if req.GetExecutionProfile() == commonv1.ExecutionProfile_EXECUTION_PROFILE_UNSPECIFIED {
 		req.ExecutionProfile = commonv1.ExecutionProfile_EXECUTION_PROFILE_PURE
 	}
-	if req.RunnerMode == commonv1.RunnerMode_RUNNER_MODE_UNSPECIFIED {
+	if req.GetRunnerMode() == commonv1.RunnerMode_RUNNER_MODE_UNSPECIFIED {
 		req.RunnerMode = commonv1.RunnerMode_RUNNER_MODE_FUNCTION_IO
 	}
-	if req.DurationSeconds <= 0 {
+	if req.GetDurationSeconds() <= 0 {
 		req.DurationSeconds = 1800
 	}
 	return req
 }
 
 func validateTaskPayload(req *v1.AdminTaskPayload) string {
-	if req.Title == "" {
+	if req.GetTitle() == "" {
 		return "title is required"
 	}
-	if req.Slug == "" {
+	if req.GetSlug() == "" {
 		return "slug is required"
 	}
-	if req.Statement == "" {
+	if req.GetStatement() == "" {
 		return "statement is required"
 	}
-	if req.PrepType == v1.PrepType_PREP_TYPE_UNSPECIFIED {
+	if req.GetPrepType() == v1.PrepType_PREP_TYPE_UNSPECIFIED {
 		return "invalid prep type"
 	}
-	switch req.Language {
+	switch req.GetLanguage() {
 	case commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_GO,
 		commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_PYTHON,
 		commonv1.ProgrammingLanguage_PROGRAMMING_LANGUAGE_SQL:
 	default:
 		return "unsupported language"
 	}
-	for _, language := range req.SupportedLanguages {
+	for _, language := range req.GetSupportedLanguages() {
 		switch language {
 		case "go", "python", "sql":
 		default:
 			return "unsupported supported language"
 		}
 	}
-	if req.IsExecutable && req.CodeTaskId == "" {
+	if req.GetIsExecutable() && req.GetCodeTaskId() == "" {
 		return "codeTaskId is required for executable tasks"
 	}
-	if req.CodeTaskId != "" {
-		if _, err := uuid.Parse(req.CodeTaskId); err != nil {
+	if req.GetCodeTaskId() != "" {
+		if _, err := uuid.Parse(req.GetCodeTaskId()); err != nil {
 			return "invalid codeTaskId"
 		}
 	}

@@ -75,7 +75,7 @@ type ShopItem struct {
 	// Slot declares which cosmetic slot the item occupies when equipped
 	// (pose/pet/room/ambience/head/body/back/aura/frame). Empty = not
 	// equippable.
-	Slot        string       `json:"slot"`
+	Slot string `json:"slot"`
 }
 
 // ShopCategoryInfo is one tab on the tavern page with its item count.
@@ -101,7 +101,7 @@ type ShopItemList struct {
 // ShopPurchaseOutcome is what Purchase returns: ownership record + what's
 // left in the wallet afterwards.
 type ShopPurchaseOutcome struct {
-	Owned          *ShopOwnedItem `json:"owned"`
-	RemainingGold  int32          `json:"remainingGold"`
-	RemainingGems  int32          `json:"remainingGems"`
+	Owned         *ShopOwnedItem `json:"owned"`
+	RemainingGold int32          `json:"remainingGold"`
+	RemainingGems int32          `json:"remainingGems"`
 }

@@ -12,8 +12,8 @@ import (
 	"api/internal/apihelpers"
 	domain "api/internal/domain/arena"
 	"api/internal/model"
-	commonv1 "api/pkg/api/common/v1"
 	v1 "api/pkg/api/arena/v1"
+	commonv1 "api/pkg/api/common/v1"
 )
 
 // matchmakerTicket tracks one player waiting in the queue.
@@ -33,10 +33,10 @@ type matchmakerTicket struct {
 // arena match. State lives only in this struct — good enough for a
 // single-replica staging deploy; multi-replica would need Redis/PG.
 type Matchmaker struct {
-	mu       sync.Mutex
-	byID     map[uuid.UUID]*matchmakerTicket
-	byMode   map[string][]*matchmakerTicket
-	timeout  time.Duration
+	mu      sync.Mutex
+	byID    map[uuid.UUID]*matchmakerTicket
+	byMode  map[string][]*matchmakerTicket
+	timeout time.Duration
 }
 
 func NewMatchmaker() *Matchmaker {
@@ -111,8 +111,8 @@ func (i *Implementation) EnqueueForMatch(ctx context.Context, req *v1.EnqueueFor
 		mm.byMode[mode] = append(mm.byMode[mode], ticket)
 		mm.mu.Unlock()
 		return &v1.EnqueueForMatchResponse{
-			QueueId:               ticket.id.String(),
-			EstimatedWaitSeconds:  10,
+			QueueId:              ticket.id.String(),
+			EstimatedWaitSeconds: 10,
 		}, nil
 	}
 	mm.mu.Unlock()
@@ -131,8 +131,8 @@ func (i *Implementation) EnqueueForMatch(ctx context.Context, req *v1.EnqueueFor
 		mm.mu.Unlock()
 		klog.Errorf("matchmaker: CreateMatch mode=%s: %v", mode, err)
 		return &v1.EnqueueForMatchResponse{
-			QueueId:               ticket.id.String(),
-			EstimatedWaitSeconds:  15,
+			QueueId:              ticket.id.String(),
+			EstimatedWaitSeconds: 15,
 		}, nil
 	}
 	// Second caller (this request) joins the match so both players are
@@ -152,8 +152,8 @@ func (i *Implementation) EnqueueForMatch(ctx context.Context, req *v1.EnqueueFor
 	ticket.mu.Unlock()
 
 	return &v1.EnqueueForMatchResponse{
-		QueueId:               ticket.id.String(),
-		EstimatedWaitSeconds:  0,
+		QueueId:              ticket.id.String(),
+		EstimatedWaitSeconds: 0,
 	}, nil
 }
 
@@ -186,8 +186,8 @@ func (i *Implementation) GetQueueStatus(ctx context.Context, req *v1.GetQueueSta
 		ticket.status = v1.QueueStatus_QUEUE_STATUS_TIMEOUT
 	}
 	resp := &v1.GetQueueStatusResponse{
-		Status:         ticket.status,
-		WaitedSeconds:  waited,
+		Status:        ticket.status,
+		WaitedSeconds: waited,
 	}
 	if ticket.matchID != uuid.Nil {
 		resp.MatchId = ticket.matchID.String()

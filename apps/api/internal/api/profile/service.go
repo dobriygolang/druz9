@@ -1,10 +1,10 @@
 package profile
 
 import (
+	"google.golang.org/grpc"
+
 	notif "api/internal/clients/notification"
 	v1 "api/pkg/api/profile/v1"
-
-	"google.golang.org/grpc"
 )
 
 // Implementation of profile service.

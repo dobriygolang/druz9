@@ -2,14 +2,15 @@ package profile
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strconv"
 
-	profileerrors "api/internal/errors/profile"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	profileerrors "api/internal/errors/profile"
+	"api/internal/model"
 )
 
 const userSelectColumns = `
@@ -87,7 +88,7 @@ func (r *Repo) FindUserByUsername(ctx context.Context, username string) (*model.
 	user, err := scanUser(r.data.DB.QueryRow(ctx, buildUserSelectQuery("LOWER(u.username) = LOWER($1)"), username))
 	if err != nil {
 		// scanUser wraps pgx.ErrNoRows as profileerrors.ErrUserNotFound.
-		if err == profileerrors.ErrUserNotFound {
+		if errors.Is(err, profileerrors.ErrUserNotFound) {
 			return nil, nil
 		}
 		return nil, err

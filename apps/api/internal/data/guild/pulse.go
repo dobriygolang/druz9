@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	"api/internal/model"
-
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
 )
 
 func (r *Repo) GetGuildPulse(ctx context.Context, guildID uuid.UUID) (*model.GuildPulse, error) {
@@ -247,7 +247,7 @@ VALUES ($1, $2, $3, $4, $5, $6, $7)`,
 	}
 	return &model.GuildChallenge{
 		ID:          id,
-		GuildID:    req.GuildID,
+		GuildID:     req.GuildID,
 		TemplateKey: req.TemplateKey,
 		TargetValue: req.TargetValue,
 		StartsAt:    req.StartsAt,

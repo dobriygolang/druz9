@@ -3,17 +3,20 @@ package s3
 import (
 	"bytes"
 	"context"
+	"crypto/tls"
+	"errors"
 	"fmt"
+	"net/http"
 	"net/url"
 	"path"
 	"strings"
 	"time"
 
-	"api/internal/config"
-	"api/internal/model"
-
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
+
+	"api/internal/config"
+	"api/internal/model"
 )
 
 type Service struct {
@@ -25,12 +28,12 @@ type Service struct {
 
 func New(cfg *config.S3) (*Service, error) {
 	if cfg == nil {
-		return nil, fmt.Errorf("s3 config is required")
+		return nil, errors.New("s3 config is required")
 	}
 
 	endpoint := strings.TrimSpace(cfg.Endpoint)
 	if endpoint == "" {
-		return nil, fmt.Errorf("s3 endpoint is required")
+		return nil, errors.New("s3 endpoint is required")
 	}
 
 	publicEndpoint, err := parsePublicEndpoint(cfg.PublicEndpoint)
@@ -41,13 +44,16 @@ func New(cfg *config.S3) (*Service, error) {
 	endpoint = strings.TrimPrefix(endpoint, "http://")
 	endpoint = strings.TrimPrefix(endpoint, "https://")
 
-	client, err := minio.New(endpoint, &minio.Options{
-		Creds: credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
-		Secure: strings.HasPrefix(
-			strings.TrimSpace(cfg.Endpoint),
-			"https://",
-		),
-	})
+	clientOpts := &minio.Options{
+		Creds:  credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
+		Secure: strings.HasPrefix(strings.TrimSpace(cfg.Endpoint), "https://"),
+	}
+	if cfg.SkipVerify {
+		clientOpts.Transport = &http.Transport{
+			TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+		}
+	}
+	client, err := minio.New(endpoint, clientOpts)
 	if err != nil {
 		return nil, fmt.Errorf("create minio client: %w", err)
 	}
@@ -91,7 +97,7 @@ func (s *Service) UploadObject(
 ) error {
 	key := normalizeObjectKey(input.Key)
 	if key == "" {
-		return fmt.Errorf("object key is required")
+		return errors.New("object key is required")
 	}
 
 	contentType := strings.TrimSpace(input.ContentType)
@@ -136,7 +142,7 @@ func (s *Service) PresignGetObject(
 ) (string, error) {
 	key := normalizeObjectKey(objectKey)
 	if key == "" {
-		return "", fmt.Errorf("object key is required")
+		return "", errors.New("object key is required")
 	}
 
 	expiry := options.Expiry
@@ -166,7 +172,7 @@ func (s *Service) PresignPutObject(
 ) (string, error) {
 	key := normalizeObjectKey(objectKey)
 	if key == "" {
-		return "", fmt.Errorf("object key is required")
+		return "", errors.New("object key is required")
 	}
 
 	expiry := options.Expiry
@@ -209,7 +215,7 @@ func parsePublicEndpoint(raw string) (*url.URL, error) {
 		return nil, fmt.Errorf("parse S3_PUBLIC_ENDPOINT: %w", err)
 	}
 	if u.Scheme == "" || u.Host == "" {
-		return nil, fmt.Errorf("S3_PUBLIC_ENDPOINT must include scheme and host")
+		return nil, errors.New("S3_PUBLIC_ENDPOINT must include scheme and host")
 	}
 	return u, nil
 }

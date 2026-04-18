@@ -8,7 +8,7 @@ import (
 )
 
 func (i *Implementation) YandexAuth(ctx context.Context, req *v1.YandexAuthRequest) (*v1.ProfileResponse, error) {
-	response, rawToken, expiresAt, err := i.service.YandexAuth(ctx, req.State, req.Code)
+	response, rawToken, expiresAt, err := i.service.YandexAuth(ctx, req.GetState(), req.GetCode())
 	if err != nil {
 		return nil, err
 	}

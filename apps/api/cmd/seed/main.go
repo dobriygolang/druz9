@@ -8,6 +8,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	klog "github.com/go-kratos/kratos/v2/log"
+
 	appcodeeditor "api/internal/app/codeeditor"
 	"api/internal/config"
 	codeeditordata "api/internal/data/code_editor"
@@ -15,8 +17,6 @@ import (
 	"api/internal/sandbox"
 	"api/internal/seeds"
 	"api/internal/storage/postgres"
-
-	klog "github.com/go-kratos/kratos/v2/log"
 )
 
 func main() {

@@ -4,15 +4,15 @@ import (
 	"context"
 	"strings"
 
-	codeeditordomain "api/internal/domain/codeeditor"
-	v1 "api/pkg/api/code_editor/v1"
-
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
+
+	codeeditordomain "api/internal/domain/codeeditor"
+	v1 "api/pkg/api/code_editor/v1"
 )
 
 func (i *Implementation) GetRoom(ctx context.Context, req *v1.GetRoomRequest) (*v1.GetRoomResponse, error) {
-	roomID, err := uuid.Parse(req.RoomId)
+	roomID, err := uuid.Parse(req.GetRoomId())
 	if err != nil {
 		return nil, errors.BadRequest("INVALID_ROOM_ID", "invalid room id")
 	}

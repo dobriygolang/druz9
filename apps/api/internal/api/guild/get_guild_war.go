@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"time"
 
+	"google.golang.org/protobuf/types/known/timestamppb"
+
 	"api/internal/apihelpers"
 	"api/internal/model"
 	v1 "api/pkg/api/guild/v1"
-
-	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 // GetGuildWar returns the current guild-war snapshot for the caller's
@@ -37,7 +37,7 @@ func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarReque
 	// Find the user's guild. ListGuilds returns is_joined=true for them.
 	list, err := i.service.ListGuilds(ctx, user.ID, model.ListGuildsOptions{Limit: 50})
 	if err != nil {
-		return &v1.GetGuildWarResponse{}, nil
+		return nil, fmt.Errorf("list guilds for war: %w", err)
 	}
 
 	var ours *model.Guild
@@ -75,16 +75,6 @@ func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarReque
 		roster = int32(len(members))
 	}
 
-	// Curated fronts — these correspond to the visual layout the page
-	// was hardcoded to. Scores are deterministic from the guild UUID so
-	// they don't flap between requests.
-	seed := int32(0)
-	for _, b := range ours.ID[:4] {
-		seed = seed*31 + int32(b)
-	}
-	if seed < 0 {
-		seed = -seed
-	}
 	var front []*v1.GuildWarFront
 	// Prefer persistent war state when the repo is wired (Wave B.5).
 	// Fronts carry a real id so the client can invoke ContributeToFront.
@@ -114,8 +104,8 @@ func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarReque
 	ourScore := int32(0)
 	theirScore := int32(0)
 	for _, f := range front {
-		ourScore += f.OurRounds
-		theirScore += f.TheirRounds
+		ourScore += f.GetOurRounds()
+		theirScore += f.GetTheirRounds()
 	}
 
 	// MVPs derive from the top members of the user's guild + a fixed
@@ -148,9 +138,9 @@ func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarReque
 	// Recent feed — relative timestamps so the UI can format naturally.
 	now := time.Now().UTC()
 	feed := []*v1.GuildWarFeed{
-		{At: timestamppb.New(now.Add(-2 * time.Minute)), Text: fmt.Sprintf("%s captured Graphs Bastion round 3", ours.Name)},
-		{At: timestamppb.New(now.Add(-8 * time.Minute)), Text: fmt.Sprintf("%s took DP Canyon +2", theirName)},
-		{At: timestamppb.New(now.Add(-14 * time.Minute)), Text: fmt.Sprintf("%s reinforced Systems Tower", ours.Name)},
+		{At: timestamppb.New(now.Add(-2 * time.Minute)), Text: ours.Name + " captured Graphs Bastion round 3"},
+		{At: timestamppb.New(now.Add(-8 * time.Minute)), Text: theirName + " took DP Canyon +2"},
+		{At: timestamppb.New(now.Add(-14 * time.Minute)), Text: ours.Name + " reinforced Systems Tower"},
 		{At: timestamppb.New(now.Add(-20 * time.Minute)), Text: "glowbeacon duel won +60 ELO"},
 		{At: timestamppb.New(now.Add(-27 * time.Minute)), Text: "Algo Plaza established"},
 	}

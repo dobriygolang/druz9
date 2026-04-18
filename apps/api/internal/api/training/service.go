@@ -5,6 +5,9 @@ import (
 	"sort"
 	"strings"
 
+	"github.com/google/uuid"
+	"google.golang.org/grpc"
+
 	"api/internal/app/solutionreview"
 	"api/internal/app/taskjudge"
 	codeeditordomain "api/internal/domain/codeeditor"
@@ -12,9 +15,6 @@ import (
 	"api/internal/policy"
 	"api/internal/sandbox"
 	v1 "api/pkg/api/training/v1"
-
-	"github.com/google/uuid"
-	"google.golang.org/grpc"
 )
 
 type ProfileProgressRepository interface {
@@ -170,6 +170,7 @@ func (s *liveService) EvaluateTaskSolution(ctx context.Context, userID uuid.UUID
 	judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, task, code, overrideLanguage)
 	if err != nil {
 		result.Error = err.Error()
+		//nolint:nilerr // Judge failures are returned in the training response, not as transport errors.
 		return result, nil
 	}
 
@@ -257,7 +258,7 @@ func (s *liveService) resolveTaskForModule(ctx context.Context, userID uuid.UUID
 		if candidates[i].Difficulty != candidates[j].Difficulty {
 			return difficultyRank(candidates[i].Difficulty) < difficultyRank(candidates[j].Difficulty)
 		}
-		return strings.Compare(candidates[i].Title, candidates[j].Title) < 0
+		return candidates[i].Title < candidates[j].Title
 	})
 	for _, candidate := range candidates {
 		if _, ok := solvedSet[candidate.ID]; !ok {

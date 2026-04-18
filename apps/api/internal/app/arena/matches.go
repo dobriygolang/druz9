@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	"github.com/google/uuid"
+
 	domain "api/internal/domain/arena"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 func (s *Service) CreateMatch(ctx context.Context, creator *domain.User, topic string, difficulty model.ArenaDifficulty, obfuscateOpponent bool) (*domain.Match, error) {

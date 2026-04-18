@@ -14,7 +14,7 @@ func (i *Implementation) JoinGuild(ctx context.Context, req *v1.JoinGuildRequest
 		return nil, err
 	}
 
-	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
+	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
 		return nil, err
 	}

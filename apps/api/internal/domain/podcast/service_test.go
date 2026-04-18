@@ -1,16 +1,15 @@
 package podcast
 
 import (
-	"context"
 	"errors"
 	"testing"
 	"time"
 
-	"api/internal/domain/podcast/mocks"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
+
+	"api/internal/domain/podcast/mocks"
+	"api/internal/model"
 )
 
 func TestListPodcasts(t *testing.T) {
@@ -23,13 +22,13 @@ func TestListPodcasts(t *testing.T) {
 		expectedResp := &model.ListPodcastsResponse{Podcasts: []*model.Podcast{}}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("ListPodcasts", context.Background(), opts).Return(expectedResp, nil).Once()
+		mockRepo.On("ListPodcasts", t.Context(), opts).Return(expectedResp, nil).Once()
 
 		svc := NewPodcastService(Config{
 			Repository: mockRepo,
 		})
 
-		resp, err := svc.ListPodcasts(context.Background(), opts)
+		resp, err := svc.ListPodcasts(t.Context(), opts)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -46,13 +45,13 @@ func TestListPodcasts(t *testing.T) {
 		expectedErr := errors.New("database error")
 		mockRepo := mocks.NewRepository(t)
 
-		mockRepo.On("ListPodcasts", context.Background(), model.ListPodcastsOptions{}).Return(nil, expectedErr).Once()
+		mockRepo.On("ListPodcasts", t.Context(), model.ListPodcastsOptions{}).Return(nil, expectedErr).Once()
 
 		svc := NewPodcastService(Config{
 			Repository: mockRepo,
 		})
 
-		_, err := svc.ListPodcasts(context.Background(), model.ListPodcastsOptions{})
+		_, err := svc.ListPodcasts(t.Context(), model.ListPodcastsOptions{})
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -71,13 +70,13 @@ func TestGetPodcast(t *testing.T) {
 		expectedPodcast := &model.Podcast{ID: podcastID}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("GetPodcast", context.Background(), podcastID).Return(expectedPodcast, nil).Once()
+		mockRepo.On("GetPodcast", t.Context(), podcastID).Return(expectedPodcast, nil).Once()
 
 		svc := NewPodcastService(Config{
 			Repository: mockRepo,
 		})
 
-		podcast, err := svc.GetPodcast(context.Background(), podcastID)
+		podcast, err := svc.GetPodcast(t.Context(), podcastID)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -95,13 +94,13 @@ func TestGetPodcast(t *testing.T) {
 		mockRepo := mocks.NewRepository(t)
 		podcastID := uuid.New()
 
-		mockRepo.On("GetPodcast", context.Background(), podcastID).Return(nil, expectedErr).Once()
+		mockRepo.On("GetPodcast", t.Context(), podcastID).Return(nil, expectedErr).Once()
 
 		svc := NewPodcastService(Config{
 			Repository: mockRepo,
 		})
 
-		_, err := svc.GetPodcast(context.Background(), podcastID)
+		_, err := svc.GetPodcast(t.Context(), podcastID)
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -121,13 +120,13 @@ func TestCreatePodcast(t *testing.T) {
 		expectedPodcast := &model.Podcast{ID: uuid.New()}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("CreatePodcast", context.Background(), user, req).Return(expectedPodcast, nil).Once()
+		mockRepo.On("CreatePodcast", t.Context(), user, req).Return(expectedPodcast, nil).Once()
 
 		svc := NewPodcastService(Config{
 			Repository: mockRepo,
 		})
 
-		podcast, err := svc.CreatePodcast(context.Background(), user, req)
+		podcast, err := svc.CreatePodcast(t.Context(), user, req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -149,13 +148,13 @@ func TestDeletePodcast(t *testing.T) {
 		actor := &model.User{ID: uuid.New()}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("DeletePodcast", context.Background(), podcastID, actor).Return("", nil).Once()
+		mockRepo.On("DeletePodcast", t.Context(), podcastID, actor).Return("", nil).Once()
 
 		svc := NewPodcastService(Config{
 			Repository: mockRepo,
 		})
 
-		_, err := svc.DeletePodcast(context.Background(), podcastID, actor)
+		_, err := svc.DeletePodcast(t.Context(), podcastID, actor)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -174,13 +173,13 @@ func TestIncrementListens(t *testing.T) {
 		expectedPodcast := &model.Podcast{ID: podcastID, ListensCount: 1}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("IncrementListens", context.Background(), podcastID).Return(expectedPodcast, nil).Once()
+		mockRepo.On("IncrementListens", t.Context(), podcastID).Return(expectedPodcast, nil).Once()
 
 		svc := NewPodcastService(Config{
 			Repository: mockRepo,
 		})
 
-		podcast, err := svc.IncrementListens(context.Background(), podcastID)
+		podcast, err := svc.IncrementListens(t.Context(), podcastID)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -207,13 +206,13 @@ func TestPreparePodcastUpload(t *testing.T) {
 		uploadURL := "https://storage.example.com/upload/test.mp3"
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("AttachUpload", context.Background(), podcastID, model.UploadPodcastRequest{
+		mockRepo.On("AttachUpload", t.Context(), podcastID, model.UploadPodcastRequest{
 			FileName:    req.FileName,
 			ContentType: req.ContentType,
 		}, mock.AnythingOfType("string")).Return(expectedPodcast, nil).Once()
 
 		mockStorage := mocks.NewStorage(t)
-		mockStorage.On("PresignPutObject", context.Background(), mock.AnythingOfType("string"), model.PresignOptions{
+		mockStorage.On("PresignPutObject", t.Context(), mock.AnythingOfType("string"), model.PresignOptions{
 			Expiry:      time.Hour,
 			ContentType: req.ContentType,
 		}).Return(uploadURL, nil).Once()
@@ -223,7 +222,7 @@ func TestPreparePodcastUpload(t *testing.T) {
 			Storage:    mockStorage,
 		})
 
-		podcast, presignedURL, objectKey, err := svc.PreparePodcastUpload(context.Background(), podcastID, req)
+		podcast, presignedURL, objectKey, err := svc.PreparePodcastUpload(t.Context(), podcastID, req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -246,13 +245,13 @@ func TestPreparePodcastUpload(t *testing.T) {
 
 		expectedErr := errors.New("storage error")
 		mockStorage := mocks.NewStorage(t)
-		mockStorage.On("PresignPutObject", context.Background(), mock.AnythingOfType("string"), mock.AnythingOfType("model.PresignOptions")).Return("", expectedErr).Once()
+		mockStorage.On("PresignPutObject", t.Context(), mock.AnythingOfType("string"), mock.AnythingOfType("model.PresignOptions")).Return("", expectedErr).Once()
 
 		svc := NewPodcastService(Config{
 			Storage: mockStorage,
 		})
 
-		_, _, _, err := svc.PreparePodcastUpload(context.Background(), uuid.New(), model.PreparePodcastUploadRequest{})
+		_, _, _, err := svc.PreparePodcastUpload(t.Context(), uuid.New(), model.PreparePodcastUploadRequest{})
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -273,10 +272,10 @@ func TestUploadPodcast(t *testing.T) {
 		expectedPodcast := &model.Podcast{ID: podcastID}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("AttachUpload", context.Background(), podcastID, req, mock.AnythingOfType("string")).Return(expectedPodcast, nil).Once()
+		mockRepo.On("AttachUpload", t.Context(), podcastID, req, mock.AnythingOfType("string")).Return(expectedPodcast, nil).Once()
 
 		mockStorage := mocks.NewStorage(t)
-		mockStorage.On("PresignPutObject", context.Background(), mock.AnythingOfType("string"), model.PresignOptions{
+		mockStorage.On("PresignPutObject", t.Context(), mock.AnythingOfType("string"), model.PresignOptions{
 			Expiry:        time.Hour,
 			ContentType:   req.ContentType,
 			ContentLength: req.ContentLength,
@@ -287,7 +286,7 @@ func TestUploadPodcast(t *testing.T) {
 			Storage:    mockStorage,
 		})
 
-		podcast, err := svc.UploadPodcast(context.Background(), podcastID, req)
+		podcast, err := svc.UploadPodcast(t.Context(), podcastID, req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -316,7 +315,7 @@ func TestCompletePodcastUpload(t *testing.T) {
 		expectedPodcast := &model.Podcast{ID: podcastID, ObjectKey: req.ObjectKey}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("AttachUpload", context.Background(), podcastID, model.UploadPodcastRequest{
+		mockRepo.On("AttachUpload", t.Context(), podcastID, model.UploadPodcastRequest{
 			FileName:        req.FileName,
 			ContentType:     req.ContentType,
 			DurationSeconds: req.DurationSeconds,
@@ -326,7 +325,7 @@ func TestCompletePodcastUpload(t *testing.T) {
 			Repository: mockRepo,
 		})
 
-		podcast, err := svc.CompletePodcastUpload(context.Background(), podcastID, req)
+		podcast, err := svc.CompletePodcastUpload(t.Context(), podcastID, req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -349,10 +348,10 @@ func TestPlayPodcast(t *testing.T) {
 		signedURL := "https://storage.example.com/download/test.mp3"
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("IncrementListens", context.Background(), podcastID).Return(expectedPodcast, nil).Once()
+		mockRepo.On("IncrementListens", t.Context(), podcastID).Return(expectedPodcast, nil).Once()
 
 		mockStorage := mocks.NewStorage(t)
-		mockStorage.On("PresignGetObject", context.Background(), "podcasts/test.mp3", model.PresignOptions{
+		mockStorage.On("PresignGetObject", t.Context(), "podcasts/test.mp3", model.PresignOptions{
 			Expiry: 24 * time.Hour,
 		}).Return(signedURL, nil).Once()
 
@@ -361,7 +360,7 @@ func TestPlayPodcast(t *testing.T) {
 			Storage:    mockStorage,
 		})
 
-		podcast, url, err := svc.PlayPodcast(context.Background(), podcastID)
+		podcast, url, err := svc.PlayPodcast(t.Context(), podcastID)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -383,13 +382,13 @@ func TestPlayPodcast(t *testing.T) {
 		expectedPodcast := &model.Podcast{ID: podcastID, ObjectKey: ""}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("IncrementListens", context.Background(), podcastID).Return(expectedPodcast, nil).Once()
+		mockRepo.On("IncrementListens", t.Context(), podcastID).Return(expectedPodcast, nil).Once()
 
 		svc := NewPodcastService(Config{
 			Repository: mockRepo,
 		})
 
-		_, url, err := svc.PlayPodcast(context.Background(), podcastID)
+		_, url, err := svc.PlayPodcast(t.Context(), podcastID)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -403,13 +402,13 @@ func TestPlayPodcast(t *testing.T) {
 
 		expectedErr := errors.New("not found")
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("IncrementListens", context.Background(), mock.AnythingOfType("uuid.UUID")).Return(nil, expectedErr).Once()
+		mockRepo.On("IncrementListens", t.Context(), mock.AnythingOfType("uuid.UUID")).Return(nil, expectedErr).Once()
 
 		svc := NewPodcastService(Config{
 			Repository: mockRepo,
 		})
 
-		_, _, err := svc.PlayPodcast(context.Background(), uuid.New())
+		_, _, err := svc.PlayPodcast(t.Context(), uuid.New())
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}

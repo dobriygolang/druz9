@@ -4,6 +4,7 @@ import type {
   FriendRequest,
   ListFriendsResponse,
   ListPendingRequestsResponse,
+  UserHit,
 } from '../model/types'
 
 export const socialApi = {
@@ -42,5 +43,12 @@ export const socialApi = {
 
   removeFriend: async (userId: string): Promise<void> => {
     await apiClient.post(`/api/v1/social/friends/${userId}/remove`, {})
+  },
+
+  searchUsers: async (query: string, limit = 10): Promise<UserHit[]> => {
+    const { data } = await apiClient.get<{ users: UserHit[] }>('/api/v1/social/search', {
+      params: { query, limit },
+    })
+    return data.users ?? []
   },
 }

@@ -36,7 +36,7 @@ func TestServiceBuildsIsolatedDockerCommand(t *testing.T) {
 	})
 	svc.docker = fake
 
-	_, err := svc.Execute(context.Background(), sandbox.ExecutionRequest{
+	_, err := svc.Execute(t.Context(), sandbox.ExecutionRequest{
 		Code:       "package main\nfunc main() {}",
 		Language:   policy.LanguageGo,
 		RunnerMode: "program",
@@ -72,7 +72,7 @@ func TestServiceReturnsExecutorError(t *testing.T) {
 	svc := NewService(Config{ExecImage: "druz9-sandbox-runner:local"})
 	svc.docker = fake
 
-	_, err := svc.Execute(context.Background(), sandbox.ExecutionRequest{})
+	_, err := svc.Execute(t.Context(), sandbox.ExecutionRequest{})
 	if err == nil || !strings.Contains(err.Error(), "blocked") {
 		t.Fatalf("expected executor error, got %v", err)
 	}

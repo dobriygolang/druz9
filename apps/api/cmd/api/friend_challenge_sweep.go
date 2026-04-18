@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	friendchallengedomain "api/internal/domain/friend_challenge"
-
 	klog "github.com/go-kratos/kratos/v2/log"
+
+	friendchallengedomain "api/internal/domain/friend_challenge"
 )
 
 // Sweeps PENDING/IN_PROGRESS friend_challenges whose deadline has passed

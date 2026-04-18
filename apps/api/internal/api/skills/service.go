@@ -177,6 +177,7 @@ func (s *liveService) RefundSkill(ctx context.Context, userID uuid.UUID, skillID
 
 	if s.wallet != nil {
 		if err := s.wallet.DeductGold(ctx, userID, goldCost); err != nil {
+			//nolint:nilerr // Insufficient funds is represented as a domain response, not a transport error.
 			return &v1.RefundSkillResponse{Success: false, ErrorMessage: "insufficient gold"}, nil
 		}
 	}
@@ -186,8 +187,8 @@ func (s *liveService) RefundSkill(ctx context.Context, userID uuid.UUID, skillID
 	}
 
 	return &v1.RefundSkillResponse{
-		Success:       true,
-		GoldCost:      goldCost,
+		Success:        true,
+		GoldCost:       goldCost,
 		PointsReturned: 1,
 	}, nil
 }

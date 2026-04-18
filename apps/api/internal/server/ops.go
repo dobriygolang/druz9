@@ -1,13 +1,14 @@
 package server
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
-	"api/internal/config"
-
 	klog "github.com/go-kratos/kratos/v2/log"
 	"github.com/prometheus/client_golang/prometheus/promhttp"
+
+	"api/internal/config"
 )
 
 func NewOpsServer(cfg *config.Metrics) *http.Server {
@@ -31,7 +32,7 @@ func StartOpsServer(logger klog.Logger, srv *http.Server) {
 	}
 
 	go func() {
-		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		if err := srv.ListenAndServe(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			klog.Errorf("ops server error: %v", err)
 		}
 	}()

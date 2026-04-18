@@ -131,15 +131,12 @@ export function ShopPage() {
         icon: '◈',
         color: 'var(--r-epic)',
       })
-    } catch (e: unknown) {
-      const msg = (e as { response?: { data?: { message?: string } } })?.response?.data?.message
-      addToast({
-        kind: 'QUEST',
-        title: t('shop.toast.failedTitle'),
-        body: msg ?? t('shop.toast.failedBody'),
-        icon: '!',
-        color: 'var(--rpg-danger)',
-      })
+    } catch {
+      // The global axios interceptor already surfaces a toast with the
+      // server-provided message (e.g. "not enough currency"). Previously
+      // we also fired a local "Покупка не удалась" toast, producing a
+      // duplicate pair. Swallow here — the interceptor is the single
+      // source of truth for failure toasts.
     } finally {
       setPurchasing(null)
     }

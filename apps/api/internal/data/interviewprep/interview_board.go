@@ -10,19 +10,19 @@ import (
 
 // InterviewExperienceRow mirrors interview_experiences (00018).
 type InterviewExperienceRow struct {
-	ID                uuid.UUID
-	UserID            uuid.UUID
-	CompanyTag        string
-	Role              string
-	Level             string
-	OverallRating     int32
-	LoopStructure     string
-	Questions         string
-	FeedbackReceived  string
-	Outcome           string
-	IsAnonymous       bool
-	ModerationStatus  string
-	PostedAt          time.Time
+	ID               uuid.UUID
+	UserID           uuid.UUID
+	CompanyTag       string
+	Role             string
+	Level            string
+	OverallRating    int32
+	LoopStructure    string
+	Questions        string
+	FeedbackReceived string
+	Outcome          string
+	IsAnonymous      bool
+	ModerationStatus string
+	PostedAt         time.Time
 }
 
 func (r *Repo) InsertInterviewExperience(ctx context.Context, row *InterviewExperienceRow) (*InterviewExperienceRow, error) {
@@ -102,7 +102,7 @@ func (r *Repo) ListApprovedExperiences(ctx context.Context, companyTag string, l
 		out = append(out, e)
 	}
 	var total int32
-	if err := r.data.DB.QueryRow(ctx, fmt.Sprintf(`SELECT COUNT(*) FROM interview_experiences WHERE %s`, where), args...).Scan(&total); err != nil {
+	if err := r.data.DB.QueryRow(ctx, "SELECT COUNT(*) FROM interview_experiences WHERE "+where, args...).Scan(&total); err != nil {
 		return nil, 0, fmt.Errorf("count experiences: %w", err)
 	}
 	return out, total, nil

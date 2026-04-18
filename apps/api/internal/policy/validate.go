@@ -1,6 +1,7 @@
 package policy
 
 import (
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -176,7 +177,7 @@ func validateProfileInvariants(p SandboxPolicy) []string {
 
 func validateSafeRelativePath(path string) error {
 	if path == "" {
-		return fmt.Errorf("empty path is not allowed")
+		return errors.New("empty path is not allowed")
 	}
 	if filepath.IsAbs(path) {
 		return fmt.Errorf("path %q must be relative", path)

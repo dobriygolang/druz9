@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 func resolveActor(ctx context.Context, fallbackName string) (*uuid.UUID, string, bool) {

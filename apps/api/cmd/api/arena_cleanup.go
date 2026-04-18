@@ -4,10 +4,10 @@ import (
 	"context"
 	"time"
 
+	klog "github.com/go-kratos/kratos/v2/log"
+
 	apparena "api/internal/app/arena"
 	"api/internal/rtc"
-
-	klog "github.com/go-kratos/kratos/v2/log"
 )
 
 func startArenaCleanupWorker(logger klog.Logger, rtcManager *rtc.Manager, service *apparena.Service) func() error {

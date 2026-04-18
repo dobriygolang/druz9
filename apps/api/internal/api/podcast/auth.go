@@ -3,10 +3,10 @@ package podcast
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	"api/internal/apihelpers"
 	"api/internal/model"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func requireAdmin(ctx context.Context) (*model.User, error) {

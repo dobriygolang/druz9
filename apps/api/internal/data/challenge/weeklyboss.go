@@ -2,12 +2,16 @@ package challenge
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
 
 	"api/internal/model"
 )
+
+var errWeeklyEntryNotFound = errors.New("weekly entry not found")
 
 // GetHardTaskIDs returns the IDs of all active hard tasks.
 func (r *Repo) GetHardTaskIDs(ctx context.Context) ([]uuid.UUID, error) {
@@ -88,8 +92,10 @@ func (r *Repo) GetUserWeeklyEntry(ctx context.Context, userID uuid.UUID, weekKey
 		WHERE user_id = $1 AND week_key = $2
 	`, userID, weekKey).Scan(&e.UserID, &e.DisplayName, &e.AvatarURL, &e.AIScore, &e.SolveTimeMs, &e.SubmittedAt)
 	if err != nil {
-		return nil, nil
+		if errors.Is(err, pgx.ErrNoRows) {
+			return nil, errWeeklyEntryNotFound
+		}
+		return nil, fmt.Errorf("get user weekly entry: %w", err)
 	}
 	return &e, nil
 }
-

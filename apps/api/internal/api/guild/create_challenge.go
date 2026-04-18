@@ -3,11 +3,11 @@ package guild
 import (
 	"context"
 
+	klog "github.com/go-kratos/kratos/v2/log"
+
 	"api/internal/apihelpers"
 	"api/internal/clients/notification/notiftext"
 	v1 "api/pkg/api/guild/v1"
-
-	klog "github.com/go-kratos/kratos/v2/log"
 )
 
 func (i *Implementation) CreateGuildChallenge(ctx context.Context, req *v1.CreateGuildChallengeRequest) (*v1.CreateGuildChallengeResponse, error) {
@@ -16,12 +16,12 @@ func (i *Implementation) CreateGuildChallenge(ctx context.Context, req *v1.Creat
 		return nil, err
 	}
 
-	guildID, err := apihelpers.ParseUUID(req.GuildId, "INVALID_GUILD_ID", "guild_id")
+	guildID, err := apihelpers.ParseUUID(req.GetGuildId(), "INVALID_GUILD_ID", "guild_id")
 	if err != nil {
 		return nil, err
 	}
 
-	challenge, err := i.service.CreateChallenge(ctx, guildID, user.ID, req.TemplateKey, req.TargetValue)
+	challenge, err := i.service.CreateChallenge(ctx, guildID, user.ID, req.GetTemplateKey(), req.GetTargetValue())
 	if err != nil {
 		return nil, err
 	}
@@ -45,8 +45,8 @@ func (i *Implementation) CreateGuildChallenge(ctx context.Context, req *v1.Creat
 			}
 			i.notif.SendBatch(ctx, userIDs, "guild_event_created",
 				notiftext.ChallengeCreatedTitle(),
-				notiftext.ChallengeCreatedBody(req.TemplateKey, req.TargetValue),
-				map[string]any{"guild_id": guildID.String(), "challenge_id": challenge.ID.String(), "template_key": req.TemplateKey, "target_value": req.TargetValue})
+				notiftext.ChallengeCreatedBody(req.GetTemplateKey(), req.GetTargetValue()),
+				map[string]any{"guild_id": guildID.String(), "challenge_id": challenge.ID.String(), "template_key": req.GetTemplateKey(), "target_value": req.GetTargetValue()})
 		}()
 	}
 

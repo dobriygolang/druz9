@@ -1,6 +1,7 @@
 package timeutil
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -39,7 +40,7 @@ func NormalizeToUTC(value time.Time) time.Time {
 func ParseMoscowDateTime(value string) (time.Time, error) {
 	trimmed := strings.TrimSpace(value)
 	if trimmed == "" {
-		return time.Time{}, fmt.Errorf("empty datetime")
+		return time.Time{}, errors.New("empty datetime")
 	}
 
 	for _, layout := range []string{time.RFC3339Nano, time.RFC3339} {

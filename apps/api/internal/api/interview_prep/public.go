@@ -4,15 +4,15 @@ import (
 	"context"
 	"errors"
 
+	kratoserrors "github.com/go-kratos/kratos/v2/errors"
+	"github.com/google/uuid"
+
 	"api/internal/aireview"
 	"api/internal/apihelpers"
 	appinterviewprep "api/internal/app/interviewprep"
-	"api/internal/model"
 	"api/internal/clients/notification/notiftext"
+	"api/internal/model"
 	v1 "api/pkg/api/interview_prep/v1"
-
-	kratoserrors "github.com/go-kratos/kratos/v2/errors"
-	"github.com/google/uuid"
 )
 
 func (i *Implementation) ListTasks(ctx context.Context, req *v1.ListTasksRequest) (*v1.ListTasksResponse, error) {
@@ -39,7 +39,7 @@ func (i *Implementation) StartSession(ctx context.Context, req *v1.StartSessionR
 	if err != nil {
 		return nil, err
 	}
-	taskID, err := parseUUID(req.TaskId, "INVALID_TASK_ID", "invalid task id")
+	taskID, err := parseUUID(req.GetTaskId(), "INVALID_TASK_ID", "invalid task id")
 	if err != nil {
 		return nil, err
 	}
@@ -56,7 +56,7 @@ func (i *Implementation) GetSession(ctx context.Context, req *v1.GetSessionReque
 	if err != nil {
 		return nil, err
 	}
-	sessionID, err := parseUUID(req.SessionId, "INVALID_SESSION_ID", "invalid session id")
+	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
 		return nil, err
 	}
@@ -73,12 +73,12 @@ func (i *Implementation) SubmitSession(ctx context.Context, req *v1.SubmitSessio
 	if err != nil {
 		return nil, err
 	}
-	sessionID, err := parseUUID(req.SessionId, "INVALID_SESSION_ID", "invalid session id")
+	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := i.service.Submit(ctx, user, sessionID, req.Code, unmapProgrammingLanguage(req.Language))
+	result, err := i.service.Submit(ctx, user, sessionID, req.GetCode(), unmapProgrammingLanguage(req.GetLanguage()))
 	if err != nil {
 		return nil, toHTTPError(err)
 	}
@@ -101,16 +101,16 @@ func (i *Implementation) AnswerQuestion(ctx context.Context, req *v1.AnswerQuest
 	if err != nil {
 		return nil, err
 	}
-	sessionID, err := parseUUID(req.SessionId, "INVALID_SESSION_ID", "invalid session id")
+	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
 		return nil, err
 	}
-	questionID, err := parseUUID(req.QuestionId, "INVALID_QUESTION_ID", "invalid question id")
+	questionID, err := parseUUID(req.GetQuestionId(), "INVALID_QUESTION_ID", "invalid question id")
 	if err != nil {
 		return nil, err
 	}
 
-	result, err := i.service.AnswerQuestion(ctx, user, sessionID, questionID, string(unmapSelfAssessment(req.SelfAssessment)), req.Answer)
+	result, err := i.service.AnswerQuestion(ctx, user, sessionID, questionID, string(unmapSelfAssessment(req.GetSelfAssessment())), req.GetAnswer())
 	if err != nil {
 		return nil, toHTTPError(err)
 	}
@@ -126,21 +126,21 @@ func (i *Implementation) ReviewSystemDesign(ctx context.Context, req *v1.ReviewS
 	if err != nil {
 		return nil, err
 	}
-	sessionID, err := parseUUID(req.SessionId, "INVALID_SESSION_ID", "invalid session id")
+	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
 		return nil, err
 	}
-	if req.Design == nil {
+	if req.GetDesign() == nil {
 		return nil, kratoserrors.BadRequest("DESIGN_REQUIRED", "design payload is required")
 	}
 
-	review, err := i.service.ReviewSystemDesign(ctx, user, sessionID, req.Design.ImageName, req.Design.ImageContentType, req.Design.Image, appinterviewprep.SystemDesignReviewInput{
-		Notes:          req.Design.Notes,
-		Components:     req.Design.Components,
-		APIs:           req.Design.Apis,
-		DatabaseSchema: req.Design.DatabaseSchema,
-		Traffic:        req.Design.Traffic,
-		Reliability:    req.Design.Reliability,
+	review, err := i.service.ReviewSystemDesign(ctx, user, sessionID, req.GetDesign().GetImageName(), req.GetDesign().GetImageContentType(), req.GetDesign().GetImage(), appinterviewprep.SystemDesignReviewInput{
+		Notes:          req.GetDesign().GetNotes(),
+		Components:     req.GetDesign().GetComponents(),
+		APIs:           req.GetDesign().GetApis(),
+		DatabaseSchema: req.GetDesign().GetDatabaseSchema(),
+		Traffic:        req.GetDesign().GetTraffic(),
+		Reliability:    req.GetDesign().GetReliability(),
 	})
 	if err != nil {
 		return nil, toHTTPError(err)
@@ -175,7 +175,7 @@ func (i *Implementation) StartMockSession(ctx context.Context, req *v1.StartMock
 	if err != nil {
 		return nil, err
 	}
-	session, err := i.service.StartMockSession(ctx, user, req.CompanyTag, req.ProgramSlug)
+	session, err := i.service.StartMockSession(ctx, user, req.GetCompanyTag(), req.GetProgramSlug())
 	if err != nil {
 		return nil, toHTTPError(err)
 	}
@@ -187,7 +187,7 @@ func (i *Implementation) GetMockSession(ctx context.Context, req *v1.GetMockSess
 	if err != nil {
 		return nil, err
 	}
-	sessionID, err := parseUUID(req.SessionId, "INVALID_SESSION_ID", "invalid session id")
+	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
 		return nil, err
 	}
@@ -203,11 +203,11 @@ func (i *Implementation) SubmitMockStage(ctx context.Context, req *v1.SubmitMock
 	if err != nil {
 		return nil, err
 	}
-	sessionID, err := parseUUID(req.SessionId, "INVALID_SESSION_ID", "invalid session id")
+	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
 		return nil, err
 	}
-	result, err := i.service.SubmitMockStage(ctx, user, sessionID, req.Code, unmapProgrammingLanguage(req.Language), req.Notes, unmapMockStageKind(req.StageKind).String())
+	result, err := i.service.SubmitMockStage(ctx, user, sessionID, req.GetCode(), unmapProgrammingLanguage(req.GetLanguage()), req.GetNotes(), unmapMockStageKind(req.GetStageKind()).String())
 	if err != nil {
 		return nil, toHTTPError(err)
 	}
@@ -241,21 +241,21 @@ func (i *Implementation) ReviewMockSystemDesign(ctx context.Context, req *v1.Rev
 	if err != nil {
 		return nil, err
 	}
-	sessionID, err := parseUUID(req.SessionId, "INVALID_SESSION_ID", "invalid session id")
+	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
 		return nil, err
 	}
-	if req.Design == nil {
+	if req.GetDesign() == nil {
 		return nil, kratoserrors.BadRequest("DESIGN_REQUIRED", "design payload is required")
 	}
 
-	result, err := i.service.ReviewMockSystemDesign(ctx, user, sessionID, req.Design.ImageName, req.Design.ImageContentType, req.Design.Image, appinterviewprep.SystemDesignReviewInput{
-		Notes:          req.Design.Notes,
-		Components:     req.Design.Components,
-		APIs:           req.Design.Apis,
-		DatabaseSchema: req.Design.DatabaseSchema,
-		Traffic:        req.Design.Traffic,
-		Reliability:    req.Design.Reliability,
+	result, err := i.service.ReviewMockSystemDesign(ctx, user, sessionID, req.GetDesign().GetImageName(), req.GetDesign().GetImageContentType(), req.GetDesign().GetImage(), appinterviewprep.SystemDesignReviewInput{
+		Notes:          req.GetDesign().GetNotes(),
+		Components:     req.GetDesign().GetComponents(),
+		APIs:           req.GetDesign().GetApis(),
+		DatabaseSchema: req.GetDesign().GetDatabaseSchema(),
+		Traffic:        req.GetDesign().GetTraffic(),
+		Reliability:    req.GetDesign().GetReliability(),
 	})
 	if err != nil {
 		return nil, toHTTPError(err)
@@ -273,11 +273,11 @@ func (i *Implementation) AnswerMockQuestion(ctx context.Context, req *v1.AnswerM
 	if err != nil {
 		return nil, err
 	}
-	sessionID, err := parseUUID(req.SessionId, "INVALID_SESSION_ID", "invalid session id")
+	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
 		return nil, err
 	}
-	result, err := i.service.AnswerMockQuestion(ctx, user, sessionID, req.Answer)
+	result, err := i.service.AnswerMockQuestion(ctx, user, sessionID, req.GetAnswer())
 	if err != nil {
 		return nil, toHTTPError(err)
 	}

@@ -3,15 +3,15 @@ package code_editor
 import (
 	"context"
 
+	"github.com/google/uuid"
+	"google.golang.org/grpc"
+
 	"api/internal/aireview"
 	"api/internal/app/solutionreview"
 	codeeditordomain "api/internal/domain/codeeditor"
 	"api/internal/model"
 	realtime "api/internal/realtime/schema"
 	v1 "api/pkg/api/code_editor/v1"
-
-	"github.com/google/uuid"
-	"google.golang.org/grpc"
 )
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks

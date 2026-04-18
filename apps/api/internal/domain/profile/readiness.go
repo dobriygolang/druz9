@@ -259,9 +259,9 @@ func itoa(n int32) string {
 		return "-" + itoa(-n)
 	}
 	if n < 10 {
-		return string(rune('0' + n))
+		return string('0' + n)
 	}
-	return itoa(n/10) + string(rune('0'+n%10))
+	return itoa(n/10) + string('0'+n%10)
 }
 
 func buildCompanyReadiness(p *model.ProfileProgress) []*CompanyReadiness {

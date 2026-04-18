@@ -1,14 +1,13 @@
 package event
 
 import (
-	"context"
 	"errors"
 	"testing"
 
+	"github.com/google/uuid"
+
 	"api/internal/domain/event/mocks"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 func TestListEvents(t *testing.T) {
@@ -22,13 +21,13 @@ func TestListEvents(t *testing.T) {
 		expectedResp := &model.ListEventsResponse{Events: []*model.Event{}}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("ListEvents", context.Background(), userID, opts).Return(expectedResp, nil).Once()
+		mockRepo.On("ListEvents", t.Context(), userID, opts).Return(expectedResp, nil).Once()
 
 		svc := NewEventService(Config{
 			Repository: mockRepo,
 		})
 
-		resp, err := svc.ListEvents(context.Background(), userID, opts)
+		resp, err := svc.ListEvents(t.Context(), userID, opts)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -46,13 +45,13 @@ func TestListEvents(t *testing.T) {
 		mockRepo := mocks.NewRepository(t)
 		userID := uuid.New()
 
-		mockRepo.On("ListEvents", context.Background(), userID, model.ListEventsOptions{}).Return(nil, expectedErr).Once()
+		mockRepo.On("ListEvents", t.Context(), userID, model.ListEventsOptions{}).Return(nil, expectedErr).Once()
 
 		svc := NewEventService(Config{
 			Repository: mockRepo,
 		})
 
-		_, err := svc.ListEvents(context.Background(), userID, model.ListEventsOptions{})
+		_, err := svc.ListEvents(t.Context(), userID, model.ListEventsOptions{})
 		if !errors.Is(err, expectedErr) {
 			t.Errorf("expected error %v, got %v", expectedErr, err)
 		}
@@ -68,7 +67,7 @@ func TestListEvents(t *testing.T) {
 			Repository: mockRepo,
 		})
 
-		_, err := svc.CreateEvent(context.Background(), uuid.New(), false, model.CreateEventRequest{
+		_, err := svc.CreateEvent(t.Context(), uuid.New(), false, model.CreateEventRequest{
 			Title:  "Test Event",
 			Repeat: "invalid",
 		})
@@ -85,7 +84,7 @@ func TestListEvents(t *testing.T) {
 			Repository: mockRepo,
 		})
 
-		_, err := svc.CreateEvent(context.Background(), uuid.New(), false, model.CreateEventRequest{
+		_, err := svc.CreateEvent(t.Context(), uuid.New(), false, model.CreateEventRequest{
 			Title:  "Test Event",
 			Repeat: model.EventRepeatWeekly,
 		})
@@ -109,13 +108,13 @@ func TestCreateEvent(t *testing.T) {
 		expectedReq := req
 		expectedReq.Status = model.EventStatusApproved
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("CreateEvent", context.Background(), creatorID, expectedReq).Return(expectedEvent, nil).Once()
+		mockRepo.On("CreateEvent", t.Context(), creatorID, expectedReq).Return(expectedEvent, nil).Once()
 
 		svc := NewEventService(Config{
 			Repository: mockRepo,
 		})
 
-		event, err := svc.CreateEvent(context.Background(), creatorID, true, req)
+		event, err := svc.CreateEvent(t.Context(), creatorID, true, req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -138,13 +137,13 @@ func TestJoinEvent(t *testing.T) {
 		expectedEvent := &model.Event{ID: eventID}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("JoinEvent", context.Background(), eventID, userID).Return(expectedEvent, nil).Once()
+		mockRepo.On("JoinEvent", t.Context(), eventID, userID).Return(expectedEvent, nil).Once()
 
 		svc := NewEventService(Config{
 			Repository: mockRepo,
 		})
 
-		event, err := svc.JoinEvent(context.Background(), eventID, userID)
+		event, err := svc.JoinEvent(t.Context(), eventID, userID)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -166,13 +165,13 @@ func TestLeaveEvent(t *testing.T) {
 		userID := uuid.New()
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("LeaveEvent", context.Background(), eventID, userID).Return(nil).Once()
+		mockRepo.On("LeaveEvent", t.Context(), eventID, userID).Return(nil).Once()
 
 		svc := NewEventService(Config{
 			Repository: mockRepo,
 		})
 
-		err := svc.LeaveEvent(context.Background(), eventID, userID)
+		err := svc.LeaveEvent(t.Context(), eventID, userID)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -194,13 +193,13 @@ func TestUpdateEvent(t *testing.T) {
 		expectedEvent := &model.Event{ID: eventID}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("UpdateEvent", context.Background(), eventID, actor, req).Return(expectedEvent, nil).Once()
+		mockRepo.On("UpdateEvent", t.Context(), eventID, actor, req).Return(expectedEvent, nil).Once()
 
 		svc := NewEventService(Config{
 			Repository: mockRepo,
 		})
 
-		event, err := svc.UpdateEvent(context.Background(), eventID, actor, req)
+		event, err := svc.UpdateEvent(t.Context(), eventID, actor, req)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}
@@ -223,13 +222,13 @@ func TestDeleteEvent(t *testing.T) {
 		actor := &model.User{ID: actorID}
 
 		mockRepo := mocks.NewRepository(t)
-		mockRepo.On("DeleteEvent", context.Background(), eventID, actor).Return(nil).Once()
+		mockRepo.On("DeleteEvent", t.Context(), eventID, actor).Return(nil).Once()
 
 		svc := NewEventService(Config{
 			Repository: mockRepo,
 		})
 
-		err := svc.DeleteEvent(context.Background(), eventID, actor)
+		err := svc.DeleteEvent(t.Context(), eventID, actor)
 		if err != nil {
 			t.Errorf("unexpected error: %v", err)
 		}

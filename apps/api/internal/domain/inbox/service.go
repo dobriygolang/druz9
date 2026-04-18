@@ -9,9 +9,9 @@ import (
 	"errors"
 	"strings"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 const (
@@ -51,11 +51,11 @@ func NewService(c Config) *Service {
 
 // Common domain errors. API layer maps these to kratos error codes.
 var (
-	ErrThreadNotFound    = errors.New("inbox: thread not found")
-	ErrThreadNotOwned    = errors.New("inbox: thread does not belong to user")
-	ErrNotInteractive    = errors.New("inbox: thread does not accept user replies")
-	ErrMessageEmpty      = errors.New("inbox: message body is empty")
-	ErrMessageTooLong    = errors.New("inbox: message body exceeds 4000 chars")
+	ErrThreadNotFound = errors.New("inbox: thread not found")
+	ErrThreadNotOwned = errors.New("inbox: thread does not belong to user")
+	ErrNotInteractive = errors.New("inbox: thread does not accept user replies")
+	ErrMessageEmpty   = errors.New("inbox: message body is empty")
+	ErrMessageTooLong = errors.New("inbox: message body exceeds 4000 chars")
 )
 
 // ListThreads returns the user's threads newest-first with a running unread total.

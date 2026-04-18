@@ -49,9 +49,33 @@ func (r *Repo) ListWorldPins(ctx context.Context) ([]*model.WorldPin, error) {
             WHERE e.latitude IS NOT NULL AND e.longitude IS NOT NULL
               AND e.latitude <> 0 AND e.longitude <> 0
               AND (e.scheduled_at IS NULL OR e.scheduled_at >= NOW() - INTERVAL '1 day')
+
+            UNION ALL
+
+            -- Users with an active profile and a geo row. Capped at 300 so
+            -- a dense metropolis doesn't dominate the pin layer. Online
+            -- users are flagged is_hot so they render in the accent color.
+            (SELECT
+                'user:' || u.id::text                                            AS id,
+                3                                                                AS kind,
+                COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), NULLIF(u.username, ''), 'druz9 hero') AS title,
+                COALESCE(g2.region, '')                                          AS subtitle,
+                g2.latitude                                                      AS latitude,
+                g2.longitude                                                     AS longitude,
+                COALESCE(g2.region, '')                                          AS region,
+                'hero'                                                           AS icon_ref,
+                '/profile/' || u.id::text                                        AS link_path,
+                (COALESCE(u.last_active_at, u.updated_at, u.created_at) >= NOW() - INTERVAL '2 minutes') AS is_hot
+            FROM users u
+            JOIN geo g2 ON g2.user_id = u.id
+            WHERE u.status = 2
+              AND g2.latitude IS NOT NULL AND g2.longitude IS NOT NULL
+              AND g2.latitude <> 0 AND g2.longitude <> 0
+            ORDER BY COALESCE(u.last_active_at, u.updated_at, u.created_at) DESC NULLS LAST
+            LIMIT 300)
         ) t
         ORDER BY is_hot DESC, kind ASC
-        LIMIT 500
+        LIMIT 800
     `)
 	if err != nil {
 		return nil, fmt.Errorf("list world pins: %w", err)
@@ -70,4 +94,3 @@ func (r *Repo) ListWorldPins(ctx context.Context) ([]*model.WorldPin, error) {
 	}
 	return pins, rows.Err()
 }
-

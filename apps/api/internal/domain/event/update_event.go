@@ -3,9 +3,9 @@ package event
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // UpdateEvent updates an existing event.

@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // SendChallenge creates a new row after validating the inputs and resolving

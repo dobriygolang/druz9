@@ -3,9 +3,9 @@ package podcast
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // AttachUpload attaches an uploaded file to a podcast.

@@ -5,12 +5,12 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+
 	"api/internal/data/codetasks"
 	domain "api/internal/domain/arena"
 	"api/internal/model"
-
-	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 )
 
 func (r *Repo) PickRandomTask(ctx context.Context, topic, difficulty string) (*domain.Task, error) {

@@ -48,4 +48,3 @@ func (r *Repo) InsertBlindReviewSession(ctx context.Context, userID uuid.UUID, s
 	}
 	return &result, nil
 }
-

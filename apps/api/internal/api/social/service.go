@@ -13,5 +13,5 @@ type Implementation struct {
 	service Service
 }
 
-func New(s Service) *Implementation                         { return &Implementation{service: s} }
+func New(s Service) *Implementation                        { return &Implementation{service: s} }
 func (i *Implementation) GetDescription() grpc.ServiceDesc { return v1.SocialService_ServiceDesc }

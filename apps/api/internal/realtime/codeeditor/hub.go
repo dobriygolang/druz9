@@ -7,12 +7,12 @@ import (
 	"sync"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
+
 	codeeditordomain "api/internal/domain/codeeditor"
 	"api/internal/model"
 	schema "api/internal/realtime/schema"
-
-	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
 )
 
 type codeEditorStateService interface {

@@ -9,9 +9,9 @@ import (
 	"errors"
 	"fmt"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 //go:generate mockery --case underscore --name Repository --with-expecter --output mocks
@@ -104,10 +104,12 @@ func (a *ShopAdapter) DebitGold(ctx context.Context, userID uuid.UUID, amount in
 	_, err := a.s.Debit(ctx, userID, CurrencyGold, amount, model.WalletTxKindShop, "", "shop purchase")
 	return mapFundsErr(err)
 }
+
 func (a *ShopAdapter) DebitGems(ctx context.Context, userID uuid.UUID, amount int32) error {
 	_, err := a.s.Debit(ctx, userID, CurrencyGems, amount, model.WalletTxKindShop, "", "shop purchase")
 	return mapFundsErr(err)
 }
+
 func (a *ShopAdapter) GetBalance(ctx context.Context, userID uuid.UUID) (int32, int32, error) {
 	b, err := a.s.GetBalance(ctx, userID)
 	if err != nil {

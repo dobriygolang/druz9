@@ -5,12 +5,12 @@ import (
 	"strings"
 	"time"
 
-	arenarating "api/internal/domain/arena/rating"
+	"github.com/google/uuid"
+
 	domain "api/internal/domain/arena"
+	arenarating "api/internal/domain/arena/rating"
 	"api/internal/metrics"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 const (
@@ -209,4 +209,3 @@ func (s *Service) GetActiveSeason(ctx context.Context) (*model.ArenaSeason, erro
 func (s *Service) GetLeaguePosition(ctx context.Context, userID string, rating int32) (int32, int32, error) {
 	return s.repo.GetLeaguePosition(ctx, userID, rating)
 }
-

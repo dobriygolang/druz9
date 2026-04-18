@@ -7,16 +7,15 @@ import (
 	"strings"
 	"time"
 
-	profileerrors "api/internal/errors/profile"
-	"api/internal/model"
-
 	"github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/transport"
 	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
 	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
-
 	"github.com/google/uuid"
+
+	profileerrors "api/internal/errors/profile"
+	"api/internal/model"
 )
 
 const (

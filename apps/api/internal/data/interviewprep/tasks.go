@@ -7,10 +7,10 @@ import (
 	"strings"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
 )
 
 func (r *Repo) ListActiveTasks(ctx context.Context) ([]*model.InterviewPrepTask, error) {
@@ -105,7 +105,6 @@ func (r *Repo) ListTasksFiltered(ctx context.Context, companyTag, prepTypeFilter
 	if q := strings.TrimSpace(search); q != "" {
 		where += fmt.Sprintf(" AND (title ILIKE $%d OR slug ILIKE $%d OR candidate_prompt ILIKE $%d)", idx, idx, idx)
 		args = append(args, "%"+q+"%")
-		idx++
 	}
 	// pool_count via correlated subquery — keeps the row set small vs a LEFT JOIN + GROUP BY.
 	query := fmt.Sprintf(`

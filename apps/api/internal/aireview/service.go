@@ -64,7 +64,7 @@ type InterviewSolutionReviewRequest struct {
 	// (interview_items.ai_review_prompt). When non-empty it's appended to
 	// the default prompt as additional instructions so the evaluator
 	// focuses on the axes the task cares about.
-	CustomRubric      string
+	CustomRubric string
 }
 
 type InterviewSolutionReview struct {
@@ -341,7 +341,7 @@ func parseReviewJSON(raw string) (*SystemDesignReview, error) {
 
 	var review SystemDesignReview
 	if err := json.Unmarshal([]byte(cleaned), &review); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrInvalidResponse, err)
+		return nil, fmt.Errorf("%w: %w", ErrInvalidResponse, err)
 	}
 	if review.Score < 1 {
 		review.Score = 1
@@ -366,7 +366,7 @@ func parseInterviewSolutionJSON(raw string) (*InterviewSolutionReview, error) {
 
 	var review InterviewSolutionReview
 	if err := json.Unmarshal([]byte(cleaned), &review); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrInvalidResponse, err)
+		return nil, fmt.Errorf("%w: %w", ErrInvalidResponse, err)
 	}
 	if review.Score < 1 {
 		review.Score = 1
@@ -388,7 +388,7 @@ func parseInterviewAnswerJSON(raw string) (*InterviewAnswerReview, error) {
 
 	var payload map[string]any
 	if err := json.Unmarshal([]byte(cleaned), &payload); err != nil {
-		return nil, fmt.Errorf("%w: %v", ErrInvalidResponse, err)
+		return nil, fmt.Errorf("%w: %w", ErrInvalidResponse, err)
 	}
 	review := InterviewAnswerReview{
 		Provider:   toStringValue(payload["provider"]),

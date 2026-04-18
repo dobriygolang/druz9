@@ -9,11 +9,11 @@ import (
 	"fmt"
 	"time"
 
-	"api/internal/model"
-	"api/internal/storage/postgres"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
+	"api/internal/storage/postgres"
 )
 
 type Repo struct {
@@ -23,13 +23,13 @@ type Repo struct {
 func NewRepo(store *postgres.Store) *Repo { return &Repo{data: store} }
 
 var (
-	ErrSlotNotFound     = errors.New("peer_mock: slot not found")
-	ErrSlotNotOpen      = errors.New("peer_mock: slot is not open")
-	ErrSlotPast         = errors.New("peer_mock: slot is in the past")
-	ErrBookingNotFound  = errors.New("peer_mock: booking not found")
-	ErrAlreadyReviewed  = errors.New("peer_mock: review already submitted")
-	ErrCannotSelfBook   = errors.New("peer_mock: cannot book your own slot")
-	ErrBanned           = errors.New("peer_mock: user is banned from peer mocks")
+	ErrSlotNotFound      = errors.New("peer_mock: slot not found")
+	ErrSlotNotOpen       = errors.New("peer_mock: slot is not open")
+	ErrSlotPast          = errors.New("peer_mock: slot is in the past")
+	ErrBookingNotFound   = errors.New("peer_mock: booking not found")
+	ErrAlreadyReviewed   = errors.New("peer_mock: review already submitted")
+	ErrCannotSelfBook    = errors.New("peer_mock: cannot book your own slot")
+	ErrBanned            = errors.New("peer_mock: user is banned from peer mocks")
 	ErrSlotWindowTooLong = errors.New("peer_mock: slot window too long (max 3h)")
 )
 
@@ -351,7 +351,7 @@ func (r *Repo) CancelBooking(ctx context.Context, bookingID, actorID uuid.UUID) 
 
 func (r *Repo) SubmitReview(ctx context.Context, bookingID, reviewerID, targetID uuid.UUID, rating int16, notes string) error {
 	if rating < 1 || rating > 5 {
-		return fmt.Errorf("peer_mock: rating out of range")
+		return errors.New("peer_mock: rating out of range")
 	}
 	_, err := r.data.DB.Exec(ctx, `
         INSERT INTO mock_reviews (booking_id, reviewer_id, target_id, rating, notes)

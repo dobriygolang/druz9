@@ -63,3 +63,13 @@ type FriendRequestBuckets struct {
 	Incoming []*FriendRequest `json:"incoming"`
 	Outgoing []*FriendRequest `json:"outgoing"`
 }
+
+// UserHit is a typeahead result for the friend-search UI.
+type UserHit struct {
+	UserID      string `json:"userId"`
+	Username    string `json:"username"`
+	DisplayName string `json:"displayName"`
+	AvatarURL   string `json:"avatarUrl"`
+	IsFriend    bool   `json:"isFriend"`
+	RequestSent bool   `json:"requestSent"`
+}

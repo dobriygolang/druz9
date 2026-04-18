@@ -134,6 +134,10 @@ type S3 struct {
 	Bucket         string `json:"bucket"`
 	AccessKey      string `json:"access_key"`
 	SecretKey      string `json:"secret_key"`
+	// SkipVerify disables TLS certificate verification for the internal
+	// MinIO client. Use when the backend endpoint uses a self-signed cert
+	// or a wildcard cert that doesn't cover the S3 subdomain.
+	SkipVerify bool `json:"skip_verify"`
 }
 
 type AIReview struct {

@@ -3,7 +3,6 @@ package sandbox
 import (
 	"context"
 	"fmt"
-	"io"
 	"net"
 	"net/http"
 	"net/http/httputil"
@@ -44,7 +43,7 @@ func startMockProxy(ctx context.Context, cfg policy.RunnerNetworkConfig) (*mockP
 
 	go func() {
 		<-ctx.Done()
-		shutdownCtx, cancel := context.WithTimeout(context.Background(), time.Second)
+		shutdownCtx, cancel := context.WithTimeout(context.WithoutCancel(ctx), time.Second)
 		defer cancel()
 		_ = srv.Shutdown(shutdownCtx)
 	}()
@@ -66,6 +65,7 @@ func buildNetworkEnv(ctx context.Context, cfg policy.RunnerNetworkConfig) ([]str
 	case policy.NetworkMockOnly:
 		proxy, err := startMockProxy(ctx, cfg)
 		if err != nil {
+			//nolint:nilerr // The sandbox can still run safely with a closed fallback proxy.
 			return proxyEnv(fallbackMockProxyURL), nil, nil
 		}
 		return proxyEnv(proxy.base), proxy, nil
@@ -118,7 +118,7 @@ func (h *mockProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if !h.isAllowed(target) {
-		http.Error(w, fmt.Sprintf("outbound network is blocked for %s", target.String()), http.StatusForbidden)
+		http.Error(w, "outbound network is blocked for "+target.String(), http.StatusForbidden)
 		return
 	}
 
@@ -126,7 +126,7 @@ func (h *mockProxyHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 	w.Header().Set("X-Sandbox-Mock", "true")
 	w.WriteHeader(http.StatusOK)
-	_, _ = io.WriteString(w, fmt.Sprintf(`{"mock":true,"url":%q,"method":%q,"body":%q}`, target.String(), r.Method, string(dump)))
+	_, _ = fmt.Fprintf(w, `{"mock":true,"url":%q,"method":%q,"body":%q}`, target.String(), r.Method, string(dump))
 }
 
 func (h *mockProxyHandler) isAllowed(target *url.URL) bool {

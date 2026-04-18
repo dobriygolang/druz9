@@ -13,18 +13,18 @@ func (i *Implementation) UpdateReferral(ctx context.Context, req *v1.UpdateRefer
 	if err != nil {
 		return nil, err
 	}
-	referralID, err := apihelpers.ParseUUID(req.ReferralId, "INVALID_REFERRAL_ID", "referral_id")
+	referralID, err := apihelpers.ParseUUID(req.GetReferralId(), "INVALID_REFERRAL_ID", "referral_id")
 	if err != nil {
 		return nil, err
 	}
 	item, err := i.service.UpdateReferral(ctx, referralID, user, model.UpdateReferralRequest{
-		Title:          req.Referral.Title,
-		Company:        req.Referral.Company,
-		VacancyURL:     req.Referral.VacancyUrl,
-		Description:    req.Referral.Description,
-		Experience:     req.Referral.Experience,
-		Location:       req.Referral.Location,
-		EmploymentType: unmapEmploymentType(req.Referral.EmploymentType),
+		Title:          req.GetReferral().GetTitle(),
+		Company:        req.GetReferral().GetCompany(),
+		VacancyURL:     req.GetReferral().GetVacancyUrl(),
+		Description:    req.GetReferral().GetDescription(),
+		Experience:     req.GetReferral().GetExperience(),
+		Location:       req.GetReferral().GetLocation(),
+		EmploymentType: unmapEmploymentType(req.GetReferral().GetEmploymentType()),
 	})
 	if err != nil {
 		return nil, err

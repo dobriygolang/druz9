@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // Repository defines the data-layer interface for mission queries.

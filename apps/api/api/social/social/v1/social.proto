@@ -42,6 +42,30 @@ service SocialService {
       body: "*"
     };
   }
+
+  // SearchUsers is a typeahead for the "add friend" UI — matches
+  // username / first_name / last_name by case-insensitive ILIKE on the
+  // supplied query prefix. Returns up to 20 users ordered by last
+  // activity.
+  rpc SearchUsers(SearchUsersRequest) returns (SearchUsersResponse) {
+    option (google.api.http) = { get: "/api/v1/social/search" };
+  }
+}
+
+message SearchUsersRequest {
+  string query = 1;  // min 2 chars server-side
+  int32  limit = 2;
+}
+message UserHit {
+  string user_id      = 1;
+  string username     = 2;
+  string display_name = 3;
+  string avatar_url   = 4;
+  bool   is_friend    = 5;
+  bool   request_sent = 6;
+}
+message SearchUsersResponse {
+  repeated UserHit users = 1;
 }
 
 enum PresenceStatus {

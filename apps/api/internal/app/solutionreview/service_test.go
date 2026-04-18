@@ -6,10 +6,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/google/uuid"
+
 	"api/internal/aireview"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 // --- Mock Repository ---
@@ -124,7 +124,7 @@ func TestStartReview_CreatesLevel1Immediately(t *testing.T) {
 	taskID := uuid.New()
 	subID := uuid.New()
 
-	reviewID, err := svc.StartReview(context.Background(), ReviewInput{
+	reviewID, err := svc.StartReview(t.Context(), ReviewInput{
 		SubmissionID: subID,
 		UserID:       userID,
 		TaskID:       taskID,
@@ -134,7 +134,6 @@ func TestStartReview_CreatesLevel1Immediately(t *testing.T) {
 		PassedCount:  8,
 		TotalCount:   15,
 	})
-
 	if err != nil {
 		t.Fatalf("unexpected error: %v", err)
 	}
@@ -143,7 +142,7 @@ func TestStartReview_CreatesLevel1Immediately(t *testing.T) {
 	}
 
 	// Check review was persisted
-	review, _ := repo.GetBySubmission(context.Background(), subID)
+	review, _ := repo.GetBySubmission(t.Context(), subID)
 	if review == nil {
 		t.Fatal("review should exist in repo")
 	}
@@ -183,7 +182,7 @@ func TestStartReview_TriggersAIForAccepted(t *testing.T) {
 	taskID := uuid.New()
 	subID := uuid.New()
 
-	_, err := svc.StartReview(context.Background(), ReviewInput{
+	_, err := svc.StartReview(t.Context(), ReviewInput{
 		SubmissionID:  subID,
 		UserID:        userID,
 		TaskID:        taskID,
@@ -204,7 +203,7 @@ func TestStartReview_TriggersAIForAccepted(t *testing.T) {
 	// Wait for async review goroutine
 	time.Sleep(200 * time.Millisecond)
 
-	review, _ := repo.GetBySubmission(context.Background(), subID)
+	review, _ := repo.GetBySubmission(t.Context(), subID)
 	if review == nil {
 		t.Fatal("review should exist")
 	}
@@ -228,7 +227,7 @@ func TestRateLimiting(t *testing.T) {
 	userID := uuid.New()
 
 	// First 5 should be allowed
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		if !svc.isRateAllowed(userID) {
 			t.Errorf("attempt %d should be allowed", i+1)
 		}
@@ -248,7 +247,7 @@ func TestAttemptCounting(t *testing.T) {
 	taskID := uuid.New()
 
 	// First attempt
-	_, _ = svc.StartReview(context.Background(), ReviewInput{
+	_, _ = svc.StartReview(t.Context(), ReviewInput{
 		SubmissionID: uuid.New(),
 		UserID:       userID,
 		TaskID:       taskID,
@@ -257,7 +256,7 @@ func TestAttemptCounting(t *testing.T) {
 	})
 
 	// Second attempt
-	_, _ = svc.StartReview(context.Background(), ReviewInput{
+	_, _ = svc.StartReview(t.Context(), ReviewInput{
 		SubmissionID: uuid.New(),
 		UserID:       userID,
 		TaskID:       taskID,

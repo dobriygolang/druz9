@@ -7,12 +7,12 @@ import (
 	"sync/atomic"
 	"time"
 
+	"github.com/google/uuid"
+	"github.com/gorilla/websocket"
+
 	domain "api/internal/domain/arena"
 	"api/internal/model"
 	schema "api/internal/realtime/schema"
-
-	"github.com/google/uuid"
-	"github.com/gorilla/websocket"
 )
 
 const arenaSnapshotFlushInterval = 2 * time.Second

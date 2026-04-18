@@ -3,9 +3,9 @@ package guild
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // ListGuildMembers returns member profiles for a guild.

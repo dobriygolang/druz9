@@ -1,8 +1,9 @@
 package notification
 
 import (
-	v1 "api/pkg/api/notification/v1"
 	"google.golang.org/grpc"
+
+	v1 "api/pkg/api/notification/v1"
 )
 
 type Service interface{}

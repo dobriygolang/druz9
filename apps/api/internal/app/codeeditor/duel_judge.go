@@ -5,11 +5,11 @@ import (
 	"fmt"
 	"math"
 
+	"github.com/google/uuid"
+
 	"api/internal/app/taskjudge"
 	domain "api/internal/domain/codeeditor"
 	"api/internal/model"
-
-	"github.com/google/uuid"
 )
 
 func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID *uuid.UUID, guestName string, code string, language model.ProgrammingLanguage) (*domain.Submission, error) {
@@ -57,17 +57,6 @@ func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID 
 	}
 
 	return created, nil
-}
-
-func safeInt32(value int) int32 {
-	switch {
-	case value > math.MaxInt32:
-		return math.MaxInt32
-	case value < math.MinInt32:
-		return math.MinInt32
-	default:
-		return int32(value)
-	}
 }
 
 func safePortInt32(value int) (int32, error) {

@@ -3,10 +3,10 @@ package geo
 import (
 	"context"
 
+	"google.golang.org/grpc"
+
 	"api/internal/model"
 	v1 "api/pkg/api/geo/v1"
-
-	"google.golang.org/grpc"
 )
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks

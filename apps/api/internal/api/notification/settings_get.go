@@ -23,7 +23,7 @@ func (i *SettingsImplementation) GetNotificationSettings(ctx context.Context, _ 
 	return &v1.NotificationSettings{
 		DuelsEnabled:          settings.DuelsEnabled,
 		ProgressEnabled:       settings.ProgressEnabled,
-		GuildsEnabled:        settings.GuildsEnabled,
+		GuildsEnabled:         settings.GuildsEnabled,
 		DailyChallengeEnabled: settings.DailyChallengeEnabled,
 		QuietHoursStart:       settings.QuietHoursStart,
 		QuietHoursEnd:         settings.QuietHoursEnd,

@@ -6,11 +6,11 @@ import (
 	"fmt"
 	"time"
 
-	profileerrors "api/internal/errors/profile"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	profileerrors "api/internal/errors/profile"
+	"api/internal/model"
 )
 
 func (r *Repo) CreateSession(ctx context.Context, session *model.Session) error {

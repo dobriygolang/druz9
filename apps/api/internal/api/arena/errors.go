@@ -1,9 +1,9 @@
 package arena
 
 import (
-	arenadomain "api/internal/domain/arena"
-
 	"github.com/go-kratos/kratos/v2/errors"
+
+	arenadomain "api/internal/domain/arena"
 )
 
 func mapErr(err error) error {

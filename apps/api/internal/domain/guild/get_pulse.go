@@ -3,9 +3,9 @@ package guild
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // GetPulse returns aggregated activity data for a guild.

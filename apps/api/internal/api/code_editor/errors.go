@@ -1,9 +1,9 @@
 package code_editor
 
 import (
-	codeeditordomain "api/internal/domain/codeeditor"
-
 	"github.com/go-kratos/kratos/v2/errors"
+
+	codeeditordomain "api/internal/domain/codeeditor"
 )
 
 func mapErr(err error) error {

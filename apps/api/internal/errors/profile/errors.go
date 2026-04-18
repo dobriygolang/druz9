@@ -1,9 +1,9 @@
 package profile
 
 import (
-	v1 "api/pkg/api/profile/v1"
-
 	"github.com/go-kratos/kratos/v2/errors"
+
+	v1 "api/pkg/api/profile/v1"
 )
 
 var (

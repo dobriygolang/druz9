@@ -1,7 +1,6 @@
 package sandbox
 
 import (
-	"context"
 	"encoding/json"
 	"io"
 	"net/http"
@@ -37,7 +36,7 @@ func TestRemoteClientExecute(t *testing.T) {
 	})}
 
 	remote := NewRemote(RemoteConfig{BaseURL: "http://sandbox.local", Client: client})
-	result, err := remote.Execute(context.Background(), ExecutionRequest{})
+	result, err := remote.Execute(t.Context(), ExecutionRequest{})
 	if err != nil {
 		t.Fatalf("execute: %v", err)
 	}

@@ -6,12 +6,12 @@ import (
 	"sync"
 	"time"
 
-	"api/internal/model"
-
 	kratoserrpkg "github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/middleware"
 	"github.com/go-kratos/kratos/v2/middleware/selector"
 	"github.com/go-kratos/kratos/v2/transport"
+
+	"api/internal/model"
 )
 
 // mutateLimiter is a per-user, per-operation-family rate limiter for
@@ -48,25 +48,31 @@ type rule struct {
 
 var mutateRules = []rule{
 	// Social: friend requests — easy to spam without a limit.
-	{prefix: "/social.v1.SocialService/SendFriendRequest",   maxCalls: 20,  window: time.Hour,   hint: "слишком много приглашений в друзья"},
-	{prefix: "/social.v1.SocialService/AcceptFriendRequest", maxCalls: 60,  window: time.Minute, hint: "слишком частые действия с дружбой"},
-	{prefix: "/social.v1.SocialService/DeclineFriendRequest",maxCalls: 60,  window: time.Minute, hint: "слишком частые действия с дружбой"},
+	{prefix: "/social.v1.SocialService/SendFriendRequest", maxCalls: 20, window: time.Hour, hint: "слишком много приглашений в друзья"},
+	{prefix: "/social.v1.SocialService/AcceptFriendRequest", maxCalls: 60, window: time.Minute, hint: "слишком частые действия с дружбой"},
+	{prefix: "/social.v1.SocialService/DeclineFriendRequest", maxCalls: 60, window: time.Minute, hint: "слишком частые действия с дружбой"},
 	// Shop: purchases — cheap per call but could drain a compromised wallet.
-	{prefix: "/shop.v1.ShopService/Purchase",                maxCalls: 30,  window: time.Minute, hint: "слишком частые покупки"},
+	{prefix: "/shop.v1.ShopService/Purchase", maxCalls: 30, window: time.Minute, hint: "слишком частые покупки"},
 	// Friend challenges: outbound invites.
-	{prefix: "/friend_challenge.v1.FriendChallengeService/SendChallenge",
-		maxCalls: 30, window: time.Hour, hint: "слишком много вызовов"},
+	{
+		prefix:   "/friend_challenge.v1.FriendChallengeService/SendChallenge",
+		maxCalls: 30, window: time.Hour, hint: "слишком много вызовов",
+	},
 	// Inbox: outbound messages.
-	{prefix: "/inbox.v1.InboxService/SendMessage",           maxCalls: 120, window: time.Minute, hint: "слишком частые сообщения"},
+	{prefix: "/inbox.v1.InboxService/SendMessage", maxCalls: 120, window: time.Minute, hint: "слишком частые сообщения"},
 	// Season pass claims (just in case; cheap but worth capping).
-	{prefix: "/season_pass.v1.SeasonPassService/ClaimTierReward",
-		maxCalls: 240, window: time.Minute, hint: "слишком частые клеймы"},
+	{
+		prefix:   "/season_pass.v1.SeasonPassService/ClaimTierReward",
+		maxCalls: 240, window: time.Minute, hint: "слишком частые клеймы",
+	},
 	// Streak shield use/purchase.
-	{prefix: "/streak.v1.StreakService/UseShield",           maxCalls: 10,  window: time.Minute, hint: "слишком частое использование щита"},
-	{prefix: "/streak.v1.StreakService/PurchaseShield",      maxCalls: 20,  window: time.Minute, hint: "слишком частые покупки щитов"},
+	{prefix: "/streak.v1.StreakService/UseShield", maxCalls: 10, window: time.Minute, hint: "слишком частое использование щита"},
+	{prefix: "/streak.v1.StreakService/PurchaseShield", maxCalls: 20, window: time.Minute, hint: "слишком частые покупки щитов"},
 	// Duel replays: record event during a match — moderately high ceiling.
-	{prefix: "/duel_replay.v1.DuelReplayService/RecordEvent",
-		maxCalls: 600, window: time.Minute, hint: "запись реплея"},
+	{
+		prefix:   "/duel_replay.v1.DuelReplayService/RecordEvent",
+		maxCalls: 600, window: time.Minute, hint: "запись реплея",
+	},
 }
 
 // actorKey identifies the caller for bucketing. Prefers user ID (stable

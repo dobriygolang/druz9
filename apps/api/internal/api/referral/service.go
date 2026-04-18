@@ -1,9 +1,9 @@
 package referral
 
 import (
-	v1 "api/pkg/api/referral/v1"
-
 	"google.golang.org/grpc"
+
+	v1 "api/pkg/api/referral/v1"
 )
 
 // Implementation of referral service.

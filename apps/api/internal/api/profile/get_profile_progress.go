@@ -8,7 +8,7 @@ import (
 )
 
 func (i *Implementation) GetProfileProgress(ctx context.Context, req *v1.GetProfileProgressRequest) (*v1.ProfileProgressResponse, error) {
-	userID, err := apihelpers.ParseUUID(req.UserId, "INVALID_USER_ID", "user_id")
+	userID, err := apihelpers.ParseUUID(req.GetUserId(), "INVALID_USER_ID", "user_id")
 	if err != nil {
 		return nil, err
 	}

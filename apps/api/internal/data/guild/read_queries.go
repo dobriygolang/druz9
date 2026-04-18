@@ -4,9 +4,9 @@ import (
 	"context"
 	"fmt"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 const (
@@ -80,7 +80,7 @@ LIMIT $2 OFFSET $3
 	}
 
 	return &model.ListGuildsResponse{
-		Guilds:    guilds,
+		Guilds:     guilds,
 		TotalCount: totalCount,
 	}, nil
 }

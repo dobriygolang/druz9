@@ -6,12 +6,12 @@ import (
 	"fmt"
 	"strings"
 
+	"github.com/google/uuid"
+	"github.com/jackc/pgx/v5"
+
 	"api/internal/data/codetasks"
 	codeeditordomain "api/internal/domain/codeeditor"
 	"api/internal/model"
-
-	"github.com/google/uuid"
-	"github.com/jackc/pgx/v5"
 )
 
 func (r *Repo) ListTasks(ctx context.Context, filter codeeditordomain.TaskFilter) ([]*codeeditordomain.Task, error) {

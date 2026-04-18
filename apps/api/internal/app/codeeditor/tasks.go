@@ -4,9 +4,9 @@ import (
 	"context"
 	"time"
 
-	domain "api/internal/domain/codeeditor"
-
 	"github.com/google/uuid"
+
+	domain "api/internal/domain/codeeditor"
 )
 
 func (s *Service) ListTasks(ctx context.Context, filter domain.TaskFilter) ([]*domain.Task, error) {

@@ -3,10 +3,10 @@ package profile
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	"api/internal/model"
 	v1 "api/pkg/api/profile/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) GetProfile(ctx context.Context, _ *v1.GetProfileRequest) (*v1.ProfileResponse, error) {

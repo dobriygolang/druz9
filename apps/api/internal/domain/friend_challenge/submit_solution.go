@@ -3,9 +3,9 @@ package friend_challenge
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // SubmitSolution records a participant's time + score. If the counterparty

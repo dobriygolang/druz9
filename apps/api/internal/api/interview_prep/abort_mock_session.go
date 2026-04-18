@@ -13,7 +13,7 @@ func (i *Implementation) AbortMockSession(ctx context.Context, req *v1.AbortMock
 	if err != nil {
 		return nil, err
 	}
-	sessionID, err := parseUUID(req.SessionId, "INVALID_SESSION_ID", "invalid session id")
+	sessionID, err := parseUUID(req.GetSessionId(), "INVALID_SESSION_ID", "invalid session id")
 	if err != nil {
 		return nil, err
 	}

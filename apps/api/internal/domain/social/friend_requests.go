@@ -5,9 +5,9 @@ import (
 	"strings"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // ListPendingRequests returns incoming + outgoing buckets.

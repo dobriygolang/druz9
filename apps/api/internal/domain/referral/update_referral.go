@@ -3,9 +3,9 @@ package referral
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // UpdateReferral updates an existing referral.

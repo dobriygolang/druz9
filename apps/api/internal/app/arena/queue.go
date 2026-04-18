@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 
-	domain "api/internal/domain/arena"
-
 	"github.com/google/uuid"
+
+	domain "api/internal/domain/arena"
 )
 
 // Matchmaking queue (EnqueueMatchmaking / LeaveQueue / GetQueueStatus)

@@ -6,10 +6,10 @@ import (
 	"math"
 	"time"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	"api/internal/apihelpers"
 	v1 "api/pkg/api/hub/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) GetOverview(ctx context.Context, req *v1.GetOverviewRequest) (*v1.GetOverviewResponse, error) {
@@ -43,7 +43,7 @@ func (i *Implementation) GetOverview(ctx context.Context, req *v1.GetOverviewReq
 		resp.DailyMissions = i.mapDailyMissions(missions)
 	}
 
-	resp.Quest = i.buildQuest(progress, resp.DailyMissions)
+	resp.Quest = i.buildQuest(progress, resp.GetDailyMissions())
 	resp.Arena.Items = i.loadArenaItems(ctx)
 	resp.Events = i.loadEvents(ctx, user.ID)
 	resp.Guild = i.loadGuild(ctx, user.ID)
@@ -65,10 +65,10 @@ func (i *Implementation) loadActiveSeason(ctx context.Context) *v1.HubSeason {
 		daysLeft = 0
 	}
 	return &v1.HubSeason{
-		Number:         pass.SeasonNumber,
-		Title:          pass.Title,
-		Roman:          toRoman(pass.SeasonNumber),
-		DaysLeftLabel:  fmt.Sprintf("%d days left", daysLeft),
+		Number:        pass.SeasonNumber,
+		Title:         pass.Title,
+		Roman:         toRoman(pass.SeasonNumber),
+		DaysLeftLabel: fmt.Sprintf("%d days left", daysLeft),
 	}
 }
 
@@ -82,9 +82,19 @@ func toRoman(n int32) string {
 		v int32
 		s string
 	}{
-		{1000, "M"}, {900, "CM"}, {500, "D"}, {400, "CD"},
-		{100, "C"}, {90, "XC"}, {50, "L"}, {40, "XL"},
-		{10, "X"}, {9, "IX"}, {5, "V"}, {4, "IV"}, {1, "I"},
+		{1000, "M"},
+		{900, "CM"},
+		{500, "D"},
+		{400, "CD"},
+		{100, "C"},
+		{90, "XC"},
+		{50, "L"},
+		{40, "XL"},
+		{10, "X"},
+		{9, "IX"},
+		{5, "V"},
+		{4, "IV"},
+		{1, "I"},
 	}
 	out := ""
 	for _, p := range vals {

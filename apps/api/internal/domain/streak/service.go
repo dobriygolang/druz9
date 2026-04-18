@@ -10,9 +10,9 @@ import (
 	"fmt"
 	"time"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 const (
@@ -69,8 +69,10 @@ type ShieldRow struct {
 }
 
 // Clock is mockable "now" for tests.
-type Clock interface{ Now() time.Time }
-type systemClock struct{}
+type (
+	Clock       interface{ Now() time.Time }
+	systemClock struct{}
+)
 
 func (systemClock) Now() time.Time { return time.Now().UTC() }
 
@@ -166,7 +168,7 @@ func (s *Service) PurchaseShield(ctx context.Context, userID uuid.UUID, count in
 		return nil, 0, 0, ErrInvalidCount
 	}
 	if s.wallet == nil {
-		return nil, 0, 0, fmt.Errorf("purchase shield: wallet is nil")
+		return nil, 0, 0, errors.New("purchase shield: wallet is nil")
 	}
 	if err := s.wallet.DebitGold(ctx, userID, ShieldPriceGold*count); err != nil {
 		if errors.Is(err, ErrInsufficientGold) || containsInsufficientFunds(err) {

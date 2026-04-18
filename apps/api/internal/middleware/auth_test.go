@@ -4,11 +4,10 @@ import (
 	"context"
 	"testing"
 
-	"api/internal/model"
-
-	"github.com/go-kratos/kratos/v2/transport"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/assert"
+
+	"api/internal/model"
 )
 
 func TestRequireAdmin_WithAdminUser(t *testing.T) {
@@ -20,7 +19,7 @@ func TestRequireAdmin_WithAdminUser(t *testing.T) {
 		ID:      userID,
 		IsAdmin: true,
 	}
-	ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+	ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 	middleware := RequireAdmin()
 	handler := middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
@@ -41,7 +40,7 @@ func TestRequireAdmin_WithNonAdminUser(t *testing.T) {
 		ID:      userID,
 		IsAdmin: false,
 	}
-	ctx := model.ContextWithAuth(context.Background(), &model.AuthState{User: user})
+	ctx := model.ContextWithAuth(t.Context(), &model.AuthState{User: user})
 
 	middleware := RequireAdmin()
 	handler := middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
@@ -56,7 +55,7 @@ func TestRequireAdmin_WithNonAdminUser(t *testing.T) {
 func TestRequireAdmin_WithoutUser(t *testing.T) {
 	t.Parallel()
 
-	ctx := context.Background()
+	ctx := t.Context()
 
 	middleware := RequireAdmin()
 	handler := middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
@@ -89,21 +88,7 @@ func TestHasExplicitGuestOverride_WithoutHeaders(t *testing.T) {
 	t.Parallel()
 
 	// Test without transport context
-	ctx := context.Background()
+	ctx := t.Context()
 	result := hasExplicitGuestOverride(ctx)
 	assert.False(t, result)
 }
-
-// mockTransporter for testing
-type mockTransporter struct {
-	transport.Transporter
-	kind      transport.Kind
-	operation string
-}
-
-func (m *mockTransporter) Kind() transport.Kind            { return m.kind }
-func (m *mockTransporter) Operation() string               { return m.operation }
-func (m *mockTransporter) RequestHeader() transport.Header { return nil }
-func (m *mockTransporter) ReplyHeader() transport.Header   { return nil }
-func (m *mockTransporter) PathTemplate() string            { return "" }
-func (m *mockTransporter) PathVars() map[string]string     { return nil }

@@ -1,13 +1,11 @@
 package codetasks
 
 import (
-	"context"
-	"fmt"
 	"testing"
 
-	"api/internal/model"
-
 	"github.com/stretchr/testify/assert"
+
+	"api/internal/model"
 )
 
 func TestLoadCasesMultiple_EmptyTasks(t *testing.T) {
@@ -92,7 +90,7 @@ func TestSelectColumnsWithAlias_ContainsAllFields(t *testing.T) {
 func TestLoadCases_NilTask(t *testing.T) {
 	t.Parallel()
 
-	err := LoadCases(context.Background(), nil, nil)
+	err := LoadCases(t.Context(), nil, nil)
 	assert.Error(t, err)
 	assert.Contains(t, err.Error(), "nil task")
 }
@@ -102,7 +100,7 @@ func TestLoadCasesMultiple_NilInSlice(t *testing.T) {
 
 	// Test with nil element in slice - should skip it
 	tasks := []*model.CodeTask{nil, nil}
-	err := LoadCasesMultiple(context.Background(), nil, tasks)
+	err := LoadCasesMultiple(t.Context(), nil, tasks)
 	// Should return nil as there are no valid tasks
 	assert.NoError(t, err)
 }
@@ -111,7 +109,7 @@ func TestLoadCasesMultiple_EmptySlice(t *testing.T) {
 	t.Parallel()
 
 	tasks := []*model.CodeTask{}
-	err := LoadCasesMultiple(context.Background(), nil, tasks)
+	err := LoadCasesMultiple(t.Context(), nil, tasks)
 	assert.NoError(t, err)
 }
 
@@ -139,18 +137,6 @@ func TestScanPlayerTask_TrimsSensitiveFields(t *testing.T) {
 	assert.Equal(t, []int32{8080}, task.AllowedPorts)
 	assert.Equal(t, []string{"/api"}, task.MockEndpoints)
 	assert.True(t, task.WritableTempDir)
-}
-
-// Mock scanner for testing ScanTask
-type mockScanner struct {
-	shouldFail bool
-}
-
-func (m *mockScanner) Scan(dest ...any) error {
-	if m.shouldFail {
-		return fmt.Errorf("scan failed")
-	}
-	return nil
 }
 
 func TestScanTask_ConvertsEnums(t *testing.T) {

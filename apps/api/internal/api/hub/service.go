@@ -4,11 +4,11 @@ import (
 	"context"
 	"time"
 
-	"api/internal/model"
-	v1 "api/pkg/api/hub/v1"
-
 	"github.com/google/uuid"
 	"google.golang.org/grpc"
+
+	"api/internal/model"
+	v1 "api/pkg/api/hub/v1"
 )
 
 type ProfileRepository interface {

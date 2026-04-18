@@ -5,12 +5,12 @@ import (
 	"errors"
 	"fmt"
 
-	arenarating "api/internal/domain/arena/rating"
-	domain "api/internal/domain/arena"
-	"api/internal/model"
-
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	domain "api/internal/domain/arena"
+	arenarating "api/internal/domain/arena/rating"
+	"api/internal/model"
 )
 
 func (r *Repo) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.LeaderboardEntry, error) {

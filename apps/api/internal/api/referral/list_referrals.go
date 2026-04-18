@@ -12,8 +12,8 @@ func (i *Implementation) ListReferrals(ctx context.Context, req *v1.ListReferral
 	user := apihelpers.OptionalUser(ctx)
 
 	opts := model.ListReferralsOptions{
-		Limit:  req.Limit,
-		Offset: req.Offset,
+		Limit:  req.GetLimit(),
+		Offset: req.GetOffset(),
 	}
 
 	resp, err := i.service.ListReferrals(ctx, user, opts)

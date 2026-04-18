@@ -6,11 +6,11 @@ import (
 	"net/http"
 	"strings"
 
+	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
+
 	arenart "api/internal/realtime/arena"
 	codeeditorrt "api/internal/realtime/codeeditor"
 	server "api/internal/server"
-
-	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
 )
 
 const (

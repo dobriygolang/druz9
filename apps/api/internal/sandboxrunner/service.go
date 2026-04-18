@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os/exec"
 	"strconv"
@@ -90,7 +91,7 @@ func NewService(cfg Config) *Service {
 
 func (s *Service) Execute(ctx context.Context, req sandbox.ExecutionRequest) (sandbox.ExecutionResult, error) {
 	if strings.TrimSpace(s.cfg.ExecImage) == "" {
-		return sandbox.ExecutionResult{}, fmt.Errorf("sandbox exec image is not configured")
+		return sandbox.ExecutionResult{}, errors.New("sandbox exec image is not configured")
 	}
 
 	payload, err := json.Marshal(sandbox.ExecuteEnvelope{Request: req})
@@ -118,7 +119,7 @@ func (s *Service) Execute(ctx context.Context, req sandbox.ExecutionRequest) (sa
 		return sandbox.ExecutionResult{}, fmt.Errorf("%s", strings.TrimSpace(envelope.Error))
 	}
 	if envelope.Result == nil {
-		return sandbox.ExecutionResult{}, fmt.Errorf("sandbox executor returned empty result")
+		return sandbox.ExecutionResult{}, errors.New("sandbox executor returned empty result")
 	}
 	return *envelope.Result, nil
 }
@@ -139,8 +140,8 @@ func (s *Service) buildDockerArgs() []string {
 		"--pids-limit", strconv.Itoa(s.cfg.PidsLimit),
 		"--cap-drop", "ALL",
 		"--security-opt", "no-new-privileges=true",
-		"--tmpfs", fmt.Sprintf("/tmp:rw,exec,nosuid,size=%s", s.cfg.TmpfsSize),
-		"--tmpfs", fmt.Sprintf("/var/tmp:rw,exec,nosuid,size=%s", s.cfg.TmpfsSize),
+		"--tmpfs", "/tmp:rw,exec,nosuid,size=" + s.cfg.TmpfsSize,
+		"--tmpfs", "/var/tmp:rw,exec,nosuid,size=" + s.cfg.TmpfsSize,
 		"-e", "HOME=/tmp",
 		"-e", "TMPDIR=/tmp",
 	}

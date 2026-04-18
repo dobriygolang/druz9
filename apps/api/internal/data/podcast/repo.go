@@ -7,13 +7,13 @@ import (
 	"strings"
 	"time"
 
-	"api/internal/model"
-	"api/internal/storage/postgres"
-
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
 	"github.com/jackc/pgx/v5"
+
+	"api/internal/model"
+	"api/internal/storage/postgres"
 )
 
 type Repo struct {
@@ -101,10 +101,7 @@ WHERE id = $1`, podcastColumns), podcastID))
 }
 
 func (r *Repo) CreatePodcast(ctx context.Context, user *model.User, req model.CreatePodcastRequest) (*model.Podcast, error) {
-	return scanPodcast(r.data.DB.QueryRow(ctx, fmt.Sprintf(`
-INSERT INTO podcasts (id, title, author_id, author_name, duration_seconds, listens_count, created_at, updated_at)
-VALUES ($1, $2, $3, $4, 0, 0, NOW(), NOW())
-RETURNING %s`, podcastColumns),
+	return scanPodcast(r.data.DB.QueryRow(ctx, "\nINSERT INTO podcasts (id, title, author_id, author_name, duration_seconds, listens_count, created_at, updated_at)\nVALUES ($1, $2, $3, $4, 0, 0, NOW(), NOW())\nRETURNING "+podcastColumns,
 		uuid.New(),
 		req.Title,
 		user.ID,
@@ -113,15 +110,7 @@ RETURNING %s`, podcastColumns),
 }
 
 func (r *Repo) AttachUpload(ctx context.Context, podcastID uuid.UUID, req model.UploadPodcastRequest, objectKey string) (*model.Podcast, error) {
-	return scanPodcast(r.data.DB.QueryRow(ctx, fmt.Sprintf(`
-UPDATE podcasts
-SET file_name = $2,
-    content_type = $3,
-    object_key = $4,
-    duration_seconds = $5,
-    updated_at = NOW()
-WHERE id = $1
-	RETURNING %s`, podcastColumns),
+	return scanPodcast(r.data.DB.QueryRow(ctx, "\nUPDATE podcasts\nSET file_name = $2,\n    content_type = $3,\n    object_key = $4,\n    duration_seconds = $5,\n    updated_at = NOW()\nWHERE id = $1\n\tRETURNING "+podcastColumns,
 		podcastID,
 		req.FileName,
 		model.PodcastContentTypeFromString(req.ContentType),
@@ -150,12 +139,7 @@ RETURNING COALESCE(object_key, '')
 }
 
 func (r *Repo) IncrementListens(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, error) {
-	return scanPodcast(r.data.DB.QueryRow(ctx, fmt.Sprintf(`
-UPDATE podcasts
-SET listens_count = listens_count + 1,
-    updated_at = NOW()
-WHERE id = $1
-RETURNING %s`, podcastColumns),
+	return scanPodcast(r.data.DB.QueryRow(ctx, "\nUPDATE podcasts\nSET listens_count = listens_count + 1,\n    updated_at = NOW()\nWHERE id = $1\nRETURNING "+podcastColumns,
 		podcastID,
 	))
 }

@@ -6,9 +6,9 @@ import (
 	"net/http"
 	"strings"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // Authorizer validates session tokens used by manual HTTP route handlers.
@@ -22,7 +22,9 @@ type Authorizer interface {
 func WriteJSON(w http.ResponseWriter, status int, payload any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	_ = json.NewEncoder(w).Encode(payload)
+	if err := json.NewEncoder(w).Encode(payload); err != nil {
+		return
+	}
 }
 
 // PathSegment returns the URL segment that appears `offset` positions after `key`.
@@ -70,4 +72,3 @@ func sessionToken(r *http.Request, cookieName string) string {
 	}
 	return ""
 }
-

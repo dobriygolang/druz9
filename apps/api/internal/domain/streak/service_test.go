@@ -22,6 +22,7 @@ func (f *fakeRepo) GetOrCreate(context.Context, uuid.UUID) (*ShieldRow, error) {
 	cp := *f.row
 	return &cp, nil
 }
+
 func (f *fakeRepo) AddShields(_ context.Context, _ uuid.UUID, delta int32) error {
 	f.addCalls = append(f.addCalls, delta)
 	if f.row == nil {
@@ -30,6 +31,7 @@ func (f *fakeRepo) AddShields(_ context.Context, _ uuid.UUID, delta int32) error
 	f.row.OwnedCount += delta
 	return nil
 }
+
 func (f *fakeRepo) UseShield(_ context.Context, _ uuid.UUID, restoredTo int32) error {
 	f.useCalled = true
 	f.row.OwnedCount--
@@ -68,7 +70,7 @@ func TestGetStreak_NotBroken(t *testing.T) {
 	stats := &fakeStats{stats: StreakStats{CurrentDays: 5, LongestDays: 12, LastActiveAt: &active}}
 	svc := NewService(Config{Repository: repo, Stats: stats, Clock: fixedClock{t: now}})
 
-	st, err := svc.GetStreak(context.Background(), uuid.New())
+	st, err := svc.GetStreak(t.Context(), uuid.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -91,7 +93,7 @@ func TestGetStreak_BrokenInWindow(t *testing.T) {
 	stats := &fakeStats{stats: StreakStats{CurrentDays: 0, LongestDays: 12, LastActiveAt: &active}}
 	svc := NewService(Config{Repository: repo, Stats: stats, Clock: fixedClock{t: now}})
 
-	st, _ := svc.GetStreak(context.Background(), uuid.New())
+	st, _ := svc.GetStreak(t.Context(), uuid.New())
 	if !st.IsBroken {
 		t.Fatal("26h gap should be broken")
 	}
@@ -108,7 +110,7 @@ func TestGetStreak_BrokenOutsideWindow(t *testing.T) {
 	stats := &fakeStats{stats: StreakStats{CurrentDays: 0, LongestDays: 12, LastActiveAt: &active}}
 	svc := NewService(Config{Repository: repo, Stats: stats, Clock: fixedClock{t: now}})
 
-	st, _ := svc.GetStreak(context.Background(), uuid.New())
+	st, _ := svc.GetStreak(t.Context(), uuid.New())
 	if !st.IsBroken {
 		t.Fatal("48h gap should be broken")
 	}
@@ -125,7 +127,7 @@ func TestUseShield_RequiresBreak(t *testing.T) {
 	stats := &fakeStats{stats: StreakStats{CurrentDays: 5, LongestDays: 5, LastActiveAt: &active}}
 	svc := NewService(Config{Repository: repo, Stats: stats, Clock: fixedClock{t: now}})
 
-	_, _, err := svc.UseShield(context.Background(), uuid.New())
+	_, _, err := svc.UseShield(t.Context(), uuid.New())
 	if !errors.Is(err, ErrStreakNotBroken) {
 		t.Fatalf("expected ErrStreakNotBroken, got %v", err)
 	}
@@ -139,7 +141,7 @@ func TestUseShield_RequiresShields(t *testing.T) {
 	stats := &fakeStats{stats: StreakStats{CurrentDays: 0, LongestDays: 5, LastActiveAt: &active}}
 	svc := NewService(Config{Repository: repo, Stats: stats, Clock: fixedClock{t: now}})
 
-	_, _, err := svc.UseShield(context.Background(), uuid.New())
+	_, _, err := svc.UseShield(t.Context(), uuid.New())
 	if !errors.Is(err, ErrNoShieldsOwned) {
 		t.Fatalf("expected ErrNoShieldsOwned, got %v", err)
 	}
@@ -153,7 +155,7 @@ func TestUseShield_HappyPath(t *testing.T) {
 	stats := &fakeStats{stats: StreakStats{CurrentDays: 0, LongestDays: 12, LastActiveAt: &active}}
 	svc := NewService(Config{Repository: repo, Stats: stats, Clock: fixedClock{t: now}})
 
-	state, restoredTo, err := svc.UseShield(context.Background(), uuid.New())
+	state, restoredTo, err := svc.UseShield(t.Context(), uuid.New())
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -175,7 +177,7 @@ func TestPurchaseShield_DebitsGold(t *testing.T) {
 	stats := &fakeStats{}
 	svc := NewService(Config{Repository: repo, Stats: stats, Wallet: wallet})
 
-	state, count, cost, err := svc.PurchaseShield(context.Background(), uuid.New(), 3)
+	state, count, cost, err := svc.PurchaseShield(t.Context(), uuid.New(), 3)
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -202,7 +204,7 @@ func TestPurchaseShield_RejectsOversizedCount(t *testing.T) {
 		Repository: &fakeRepo{},
 		Stats:      &fakeStats{},
 	})
-	_, _, _, err := svc.PurchaseShield(context.Background(), uuid.New(), 99)
+	_, _, _, err := svc.PurchaseShield(t.Context(), uuid.New(), 99)
 	if !errors.Is(err, ErrInvalidCount) {
 		t.Fatalf("expected ErrInvalidCount, got %v", err)
 	}

@@ -46,13 +46,13 @@ type SeasonPass struct {
 
 // SeasonPassTier is one row on the reward ladder.
 type SeasonPassTier struct {
-	Tier                 int32      `json:"tier"`
-	FreeRewardKind       RewardKind `json:"freeRewardKind"`
-	FreeRewardAmount     int32      `json:"freeRewardAmount"`
-	FreeRewardLabel      string     `json:"freeRewardLabel"`
-	PremiumRewardKind    RewardKind `json:"premiumRewardKind"`
-	PremiumRewardAmount  int32      `json:"premiumRewardAmount"`
-	PremiumRewardLabel   string     `json:"premiumRewardLabel"`
+	Tier                int32      `json:"tier"`
+	FreeRewardKind      RewardKind `json:"freeRewardKind"`
+	FreeRewardAmount    int32      `json:"freeRewardAmount"`
+	FreeRewardLabel     string     `json:"freeRewardLabel"`
+	PremiumRewardKind   RewardKind `json:"premiumRewardKind"`
+	PremiumRewardAmount int32      `json:"premiumRewardAmount"`
+	PremiumRewardLabel  string     `json:"premiumRewardLabel"`
 }
 
 // SeasonPassProgress is a user's progress against a season pass.
@@ -66,9 +66,9 @@ type SeasonPassProgress struct {
 
 // SeasonPassSnapshot bundles pass + ladder + user progress for GetActive.
 type SeasonPassSnapshot struct {
-	Pass     *SeasonPass          `json:"pass"`
-	Tiers    []*SeasonPassTier    `json:"tiers"`
-	Progress *SeasonPassProgress  `json:"progress"`
+	Pass     *SeasonPass         `json:"pass"`
+	Tiers    []*SeasonPassTier   `json:"tiers"`
+	Progress *SeasonPassProgress `json:"progress"`
 }
 
 // ClaimOutcome is returned from ClaimTierReward.

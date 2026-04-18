@@ -3,10 +3,10 @@ package admin
 import (
 	"context"
 
+	"github.com/go-kratos/kratos/v2/errors"
+
 	"api/internal/rtc"
 	v1 "api/pkg/api/admin/v1"
-
-	"github.com/go-kratos/kratos/v2/errors"
 )
 
 func (i *Implementation) GetConfig(ctx context.Context, req *v1.GetConfigRequest) (*v1.GetConfigResponse, error) {
@@ -14,7 +14,7 @@ func (i *Implementation) GetConfig(ctx context.Context, req *v1.GetConfigRequest
 		return nil, errors.InternalServer("CONFIG_SERVICE_UNAVAILABLE", "config service is not configured")
 	}
 
-	variable, ok := i.configService.ListVariables(ctx)[rtc.Key(req.Key)]
+	variable, ok := i.configService.ListVariables(ctx)[rtc.Key(req.GetKey())]
 	if !ok {
 		return nil, errors.NotFound("CONFIG_NOT_FOUND", "config key not found")
 	}

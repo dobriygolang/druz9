@@ -1,6 +1,13 @@
 package main
 
 import (
+	"net/http"
+
+	"github.com/go-kratos/kratos/v2"
+	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
+	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
+	"github.com/google/uuid"
+
 	authcallbackadapter "api/internal/adapter/authcallback"
 	adminapi "api/internal/api/admin"
 	interviewlive "api/internal/api/interview_live"
@@ -31,13 +38,6 @@ import (
 	socialv1 "api/pkg/api/social/v1"
 	streakv1 "api/pkg/api/streak/v1"
 	trainingv1 "api/pkg/api/training/v1"
-
-	"net/http"
-
-	"github.com/go-kratos/kratos/v2"
-	kratosgrpc "github.com/go-kratos/kratos/v2/transport/grpc"
-	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
-	"github.com/google/uuid"
 )
 
 func initializeTransports(
@@ -127,12 +127,14 @@ func registerManualHTTPRoutes(
 		userID, err := uuid.Parse(server.PathSegment(req.URL.Path, "avatar", 1))
 		if err != nil {
 			ctx.Response().WriteHeader(http.StatusBadRequest)
+			//nolint:nilerr // Manual binary endpoint writes HTTP status directly.
 			return nil
 		}
 
 		body, contentType, err := services.profileServiceDomain.FetchTelegramAvatar(req.Context(), userID)
 		if err != nil {
 			ctx.Response().WriteHeader(http.StatusNotFound)
+			//nolint:nilerr // Manual binary endpoint writes HTTP status directly.
 			return nil
 		}
 

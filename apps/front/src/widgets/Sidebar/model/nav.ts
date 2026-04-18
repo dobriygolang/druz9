@@ -24,78 +24,90 @@ export interface NavGroup {
 // item, pick a distinct NavIconKind or add one in shared/ui/sprites.
 export const NAV_GROUPS: NavGroup[] = [
   {
-    labelKey: 'sidebar.group.questLog',
+    // Home — personal hub and profile are the user's "base".
+    labelKey: 'sidebar.group.home',
     items: [
-      { id: 'hub', labelKey: 'sidebar.nav.hub', hintKey: 'sidebar.hint.hub', icon: 'hub', path: '/hub' },
+      { id: 'hub',     labelKey: 'sidebar.nav.hub',     hintKey: 'sidebar.hint.hub',     icon: 'hub',     path: '/hub' },
       { id: 'profile', labelKey: 'sidebar.nav.profile', hintKey: 'sidebar.hint.profile', icon: 'profile', path: '/profile' },
-      { id: 'guild', labelKey: 'sidebar.nav.guild', hintKey: 'sidebar.hint.guild', icon: 'guild', path: '/guild' },
+    ],
+  },
+  {
+    // Practice — solo and guided learning: skill tree, interviews, coding.
+    labelKey: 'sidebar.group.practice',
+    items: [
+      { id: 'atlas',     labelKey: 'sidebar.nav.atlas',     hintKey: 'sidebar.hint.atlas',     icon: 'skills',    path: '/atlas' },
+      { id: 'interview', labelKey: 'sidebar.nav.interview', hintKey: 'sidebar.hint.interview', icon: 'interview', path: '/interview' },
+      { id: 'coderooms', labelKey: 'sidebar.nav.coderooms', hintKey: 'sidebar.hint.coderooms', icon: 'coderoom',  path: '/practice/code-rooms' },
+    ],
+  },
+  {
+    // Games & Rankings — competitive features: arena duels, guild war, boards.
+    labelKey: 'sidebar.group.games',
+    items: [
       {
         id: 'arena',
         labelKey: 'sidebar.nav.arena',
-        hintKey: 'sidebar.hint.arena',
-        icon: 'arena',
-        path: '/arena',
+        hintKey:  'sidebar.hint.arena',
+        icon:     'arena',
+        path:     '/arena',
         badgeKey: 'arenaOpen',
       },
+      { id: 'war',          labelKey: 'sidebar.nav.war',          hintKey: 'sidebar.hint.war',          icon: 'war',         path: '/war' },
+      { id: 'leaderboards', labelKey: 'sidebar.nav.leaderboards', hintKey: 'sidebar.hint.leaderboards', icon: 'leaderboard', path: '/leaderboards' },
     ],
   },
   {
-    labelKey: 'sidebar.group.practice',
+    // Guild — collective space, hall, and war management.
+    labelKey: 'sidebar.group.guild',
     items: [
-      // Atlas is the merged skill-tree (ex-/training + ex-/skills). The
-      // two used to be separate sidebar entries, which meant two near-
-      // identical node graphs competing for attention.
-      { id: 'atlas', labelKey: 'sidebar.nav.atlas', hintKey: 'sidebar.hint.atlas', icon: 'skills', path: '/atlas' },
-      { id: 'coderooms', labelKey: 'sidebar.nav.coderooms', hintKey: 'sidebar.hint.coderooms', icon: 'coderoom', path: '/practice/code-rooms' },
-      { id: 'interview', labelKey: 'sidebar.nav.interview', hintKey: 'sidebar.hint.interview', icon: 'interview', path: '/interview' },
-      { id: 'leaderboards', labelKey: 'sidebar.nav.leaderboards', hintKey: 'sidebar.hint.leaderboards', icon: 'leaderboard', path: '/leaderboards' },
+      { id: 'guild', labelKey: 'sidebar.nav.guild', hintKey: 'sidebar.hint.guild', icon: 'guild', path: '/guild' },
+    ],
+  },
+  {
+    // Community — social inbox, live events, world map, podcasts.
+    labelKey: 'sidebar.group.community',
+    items: [
       {
-        // The friends list lives as a tab inside /inbox — one place for
-        // all your social activity (chats + contacts).
         id: 'inbox',
         labelKey: 'sidebar.nav.inbox',
-        hintKey: 'sidebar.hint.inbox',
-        icon: 'inbox',
-        path: '/inbox',
+        hintKey:  'sidebar.hint.inbox',
+        icon:     'inbox',
+        path:     '/inbox',
         badgeKey: 'inboxUnread',
       },
-      // Challenges used to live here; the feature is reachable via the
-      // Herald's Desk bell (duel_challenge notifications) and the Inbox
-      // tab. Having a dedicated sidebar entry duplicated that surface.
-    ],
-  },
-  {
-    labelKey: 'sidebar.group.world',
-    items: [
       {
         id: 'events',
         labelKey: 'sidebar.nav.events',
-        hintKey: 'sidebar.hint.events',
-        icon: 'events',
-        path: '/events',
-        badge: { kind: 'ember', textKey: 'sidebar.badge.new' },
+        hintKey:  'sidebar.hint.events',
+        icon:     'events',
+        path:     '/events',
+        badge:    { kind: 'ember', textKey: 'sidebar.badge.new' },
       },
+      { id: 'map',      labelKey: 'sidebar.nav.map',      hintKey: 'sidebar.hint.map',      icon: 'map',      path: '/map' },
       { id: 'podcasts', labelKey: 'sidebar.nav.podcasts', hintKey: 'sidebar.hint.podcasts', icon: 'podcasts', path: '/podcasts' },
-      { id: 'map', labelKey: 'sidebar.nav.map', hintKey: 'sidebar.hint.map', icon: 'map', path: '/map' },
-      { id: 'tavern', labelKey: 'sidebar.nav.tavern', hintKey: 'sidebar.hint.tavern', icon: 'shop', path: '/tavern' },
-      { id: 'seasonpass', labelKey: 'sidebar.nav.seasonpass', hintKey: 'sidebar.hint.seasonpass', icon: 'seasonpass', path: '/seasonpass' },
-      { id: 'war', labelKey: 'sidebar.nav.war', hintKey: 'sidebar.hint.war', icon: 'war', path: '/war' },
     ],
   },
   {
+    // Shop — tavern items, season pass rewards.
+    labelKey: 'sidebar.group.shop',
+    items: [
+      { id: 'tavern',     labelKey: 'sidebar.nav.tavern',     hintKey: 'sidebar.hint.tavern',     icon: 'shop',       path: '/tavern' },
+      { id: 'seasonpass', labelKey: 'sidebar.nav.seasonpass', hintKey: 'sidebar.hint.seasonpass', icon: 'seasonpass', path: '/seasonpass' },
+    ],
+  },
+  {
+    // System — settings and admin panel.
     labelKey: 'sidebar.group.system',
     items: [
       { id: 'settings', labelKey: 'sidebar.nav.settings', hintKey: 'sidebar.hint.settings', icon: 'settings', path: '/settings' },
-      // Admin entry — only rendered for admins. The Sidebar filters by
-      // user.isAdmin so other roles don't even see the link.
       {
-        id: 'admin',
-        labelKey: 'sidebar.nav.admin',
-        hintKey: 'sidebar.hint.admin',
-        icon: 'settings',
-        path: '/admin',
+        id:        'admin',
+        labelKey:  'sidebar.nav.admin',
+        hintKey:   'sidebar.hint.admin',
+        icon:      'settings',
+        path:      '/admin',
         adminOnly: true,
-        badge: { kind: 'ember', textKey: 'sidebar.badge.admin' },
+        badge:     { kind: 'ember', textKey: 'sidebar.badge.admin' },
       },
     ],
   },

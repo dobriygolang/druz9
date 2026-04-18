@@ -3,9 +3,9 @@ package podcast
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // IncrementListens increments the listen count for a podcast.

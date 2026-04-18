@@ -143,11 +143,11 @@ func (i *Implementation) ListTerritories(ctx context.Context, req *v1.ListTerrit
 	out := make([]*v1.GuildTerritory, 0, len(rows))
 	for _, t := range rows {
 		out = append(out, &v1.GuildTerritory{
-			Id:          t.ID.String(),
-			GuildId:     t.GuildID.String(),
-			Name:        t.Name,
-			Buff:        t.Buff,
-			CapturedAt:  timestamppb.New(t.CapturedAt),
+			Id:         t.ID.String(),
+			GuildId:    t.GuildID.String(),
+			Name:       t.Name,
+			Buff:       t.Buff,
+			CapturedAt: timestamppb.New(t.CapturedAt),
 		})
 	}
 	return &v1.ListTerritoriesResponse{Territories: out}, nil

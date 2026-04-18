@@ -21,4 +21,3 @@ type DailyMissionsResponse struct {
 	BonusXP        int32           `json:"bonusXp"`
 	TotalXPEarned  int32           `json:"totalXpEarned"`
 }
-

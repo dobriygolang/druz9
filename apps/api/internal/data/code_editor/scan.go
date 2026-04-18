@@ -5,33 +5,10 @@ import (
 	"fmt"
 	"time"
 
-	codeeditordomain "api/internal/domain/codeeditor"
-
 	"github.com/google/uuid"
-)
 
-func scanRoom(row scanner, room *codeeditordomain.Room) error {
-	return row.Scan(
-		&room.ID,
-		&room.Mode,
-		&room.Code,
-		&room.CodeRevision,
-		&room.Status,
-		&room.CreatorID,
-		&room.InviteCode,
-		&room.Language,
-		&room.Task,
-		&room.TaskID,
-		&room.DuelTopic,
-		&room.WinnerUserID,
-		&room.WinnerGuest,
-		&room.StartedAt,
-		&room.FinishedAt,
-		&room.CreatedAt,
-		&room.UpdatedAt,
-		&room.IsPrivate,
-	)
-}
+	codeeditordomain "api/internal/domain/codeeditor"
+)
 
 type participantRow struct {
 	UserID   *string   `json:"user_id"`
@@ -95,17 +72,6 @@ func scanRoomFull(row scanner) (*codeeditordomain.Room, error) {
 	}
 
 	return &room, nil
-}
-
-func scanParticipant(row scanner, participant *codeeditordomain.Participant) error {
-	return row.Scan(
-		&participant.UserID,
-		&participant.Name,
-		&participant.IsGuest,
-		&participant.IsReady,
-		&participant.IsWinner,
-		&participant.JoinedAt,
-	)
 }
 
 func scanSubmission(row scanner, submission *codeeditordomain.Submission) error {

@@ -7,9 +7,9 @@ import (
 )
 
 func (i *Implementation) JoinRoomByInviteCode(ctx context.Context, req *v1.JoinRoomByInviteCodeRequest) (*v1.JoinRoomResponse, error) {
-	userID, name, isGuest := resolveActor(ctx, req.Name)
+	userID, name, isGuest := resolveActor(ctx, req.GetName())
 
-	room, err := i.service.JoinRoomByInviteCode(ctx, req.InviteCode, userID, name, isGuest)
+	room, err := i.service.JoinRoomByInviteCode(ctx, req.GetInviteCode(), userID, name, isGuest)
 	if err != nil {
 		return nil, mapErr(err)
 	}

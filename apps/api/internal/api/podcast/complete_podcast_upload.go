@@ -13,16 +13,16 @@ func (i *Implementation) CompletePodcastUpload(ctx context.Context, req *v1.Comp
 		return nil, err
 	}
 
-	podcastID, err := apihelpers.ParseUUID(req.PodcastId, "INVALID_PODCAST_ID", "podcast_id")
+	podcastID, err := apihelpers.ParseUUID(req.GetPodcastId(), "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
 		return nil, err
 	}
 
 	item, err := i.service.CompletePodcastUpload(ctx, podcastID, model.CompletePodcastUploadRequest{
-		FileName:        req.FileName,
-		ContentType:     unmapContentType(req.ContentType),
-		DurationSeconds: req.DurationSeconds,
-		ObjectKey:       req.ObjectKey,
+		FileName:        req.GetFileName(),
+		ContentType:     unmapContentType(req.GetContentType()),
+		DurationSeconds: req.GetDurationSeconds(),
+		ObjectKey:       req.GetObjectKey(),
 	})
 	if err != nil {
 		return nil, err

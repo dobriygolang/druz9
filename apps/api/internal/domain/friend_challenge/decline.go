@@ -3,9 +3,9 @@ package friend_challenge
 import (
 	"context"
 
-	"api/internal/model"
-
 	"github.com/google/uuid"
+
+	"api/internal/model"
 )
 
 // Decline is only callable by the opponent while the challenge is PENDING
