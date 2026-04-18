@@ -32,10 +32,12 @@ const GuildPage = lazy(() =>
 const ArenaHubPage = lazy(() =>
   import('@/pages/ArenaHubPage/ui/ArenaHubPage').then((m) => ({ default: m.ArenaHubPage })),
 )
-const SkillsPage = lazy(() =>
-  import('@/pages/SkillsPage/ui/SkillsPage').then((m) => ({ default: m.SkillsPage })),
+// /atlas uses the TrainingPage layout (the card design the user prefers).
+// SkillsPage stayed around briefly as the candidate but we ended up on
+// Training's cleaner node cards.
+const TrainingPage = lazy(() =>
+  import('@/pages/TrainingPage/ui/TrainingPage').then((m) => ({ default: m.TrainingPage })),
 )
-// /training root now redirects to /atlas; TrainingPage import removed.
 const TrainingTaskPage = lazy(() =>
   import('@/pages/TrainingTaskPage/ui/TrainingTaskPage').then((m) => ({
     default: m.TrainingTaskPage,
