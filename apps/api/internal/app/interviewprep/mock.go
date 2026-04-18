@@ -42,7 +42,7 @@ type mockQuestionTemplate struct {
 	Answer string
 }
 
-func (s *Service) StartMockSession(ctx context.Context, user *model.User, companyTag string, programSlug string) (*model.InterviewPrepMockSession, error) {
+func (s *Service) StartMockSession(ctx context.Context, user *model.User, companyTag, programSlug string) (*model.InterviewPrepMockSession, error) {
 	if err := ensureTrusted(user); err != nil {
 		return nil, err
 	}

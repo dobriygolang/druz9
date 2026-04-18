@@ -419,7 +419,7 @@ func (r *Repo) queryProfileStreakDates(ctx context.Context, userID uuid.UUID) ([
 	return dates, nil
 }
 
-func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, now time.Time) (current int32, longest int32, err error) {
+func (r *Repo) loadProfileProgressStreak(ctx context.Context, userID uuid.UUID, now time.Time) (current, longest int32, err error) {
 	dates, err := r.queryProfileStreakDates(ctx, userID)
 	if err != nil {
 		return 0, 0, err

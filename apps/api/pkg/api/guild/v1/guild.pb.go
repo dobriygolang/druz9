@@ -31,6 +31,7 @@ const (
 	GuildMemberRole_GUILD_MEMBER_ROLE_UNSPECIFIED GuildMemberRole = 0
 	GuildMemberRole_GUILD_MEMBER_ROLE_CREATOR     GuildMemberRole = 1
 	GuildMemberRole_GUILD_MEMBER_ROLE_MEMBER      GuildMemberRole = 2
+	GuildMemberRole_GUILD_MEMBER_ROLE_OFFICER     GuildMemberRole = 3
 )
 
 // Enum value maps for GuildMemberRole.
@@ -39,11 +40,13 @@ var (
 		0: "GUILD_MEMBER_ROLE_UNSPECIFIED",
 		1: "GUILD_MEMBER_ROLE_CREATOR",
 		2: "GUILD_MEMBER_ROLE_MEMBER",
+		3: "GUILD_MEMBER_ROLE_OFFICER",
 	}
 	GuildMemberRole_value = map[string]int32{
 		"GUILD_MEMBER_ROLE_UNSPECIFIED": 0,
 		"GUILD_MEMBER_ROLE_CREATOR":     1,
 		"GUILD_MEMBER_ROLE_MEMBER":      2,
+		"GUILD_MEMBER_ROLE_OFFICER":     3,
 	}
 )
 
@@ -2796,6 +2799,310 @@ func (x *GuildWarFeed) GetText() string {
 	return ""
 }
 
+type GetMyGuildRoleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GuildId       string                 `protobuf:"bytes,1,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMyGuildRoleRequest) Reset() {
+	*x = GetMyGuildRoleRequest{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[44]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMyGuildRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMyGuildRoleRequest) ProtoMessage() {}
+
+func (x *GetMyGuildRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[44]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMyGuildRoleRequest.ProtoReflect.Descriptor instead.
+func (*GetMyGuildRoleRequest) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{44}
+}
+
+func (x *GetMyGuildRoleRequest) GetGuildId() string {
+	if x != nil {
+		return x.GuildId
+	}
+	return ""
+}
+
+type GetMyGuildRoleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Role          GuildMemberRole        `protobuf:"varint,1,opt,name=role,proto3,enum=guild.v1.GuildMemberRole" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *GetMyGuildRoleResponse) Reset() {
+	*x = GetMyGuildRoleResponse{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[45]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *GetMyGuildRoleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*GetMyGuildRoleResponse) ProtoMessage() {}
+
+func (x *GetMyGuildRoleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[45]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use GetMyGuildRoleResponse.ProtoReflect.Descriptor instead.
+func (*GetMyGuildRoleResponse) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{45}
+}
+
+func (x *GetMyGuildRoleResponse) GetRole() GuildMemberRole {
+	if x != nil {
+		return x.Role
+	}
+	return GuildMemberRole_GUILD_MEMBER_ROLE_UNSPECIFIED
+}
+
+type UpdateGuildSettingsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GuildId       string                 `protobuf:"bytes,1,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
+	Name          string                 `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
+	Description   string                 `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
+	IsPublic      bool                   `protobuf:"varint,4,opt,name=is_public,json=isPublic,proto3" json:"is_public,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateGuildSettingsRequest) Reset() {
+	*x = UpdateGuildSettingsRequest{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[46]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateGuildSettingsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateGuildSettingsRequest) ProtoMessage() {}
+
+func (x *UpdateGuildSettingsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[46]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateGuildSettingsRequest.ProtoReflect.Descriptor instead.
+func (*UpdateGuildSettingsRequest) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{46}
+}
+
+func (x *UpdateGuildSettingsRequest) GetGuildId() string {
+	if x != nil {
+		return x.GuildId
+	}
+	return ""
+}
+
+func (x *UpdateGuildSettingsRequest) GetName() string {
+	if x != nil {
+		return x.Name
+	}
+	return ""
+}
+
+func (x *UpdateGuildSettingsRequest) GetDescription() string {
+	if x != nil {
+		return x.Description
+	}
+	return ""
+}
+
+func (x *UpdateGuildSettingsRequest) GetIsPublic() bool {
+	if x != nil {
+		return x.IsPublic
+	}
+	return false
+}
+
+type UpdateGuildSettingsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Guild         *Guild                 `protobuf:"bytes,1,opt,name=guild,proto3" json:"guild,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UpdateGuildSettingsResponse) Reset() {
+	*x = UpdateGuildSettingsResponse{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[47]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UpdateGuildSettingsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UpdateGuildSettingsResponse) ProtoMessage() {}
+
+func (x *UpdateGuildSettingsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[47]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UpdateGuildSettingsResponse.ProtoReflect.Descriptor instead.
+func (*UpdateGuildSettingsResponse) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{47}
+}
+
+func (x *UpdateGuildSettingsResponse) GetGuild() *Guild {
+	if x != nil {
+		return x.Guild
+	}
+	return nil
+}
+
+type SetMemberRoleRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	GuildId       string                 `protobuf:"bytes,1,opt,name=guild_id,json=guildId,proto3" json:"guild_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Role          GuildMemberRole        `protobuf:"varint,3,opt,name=role,proto3,enum=guild.v1.GuildMemberRole" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetMemberRoleRequest) Reset() {
+	*x = SetMemberRoleRequest{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[48]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetMemberRoleRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetMemberRoleRequest) ProtoMessage() {}
+
+func (x *SetMemberRoleRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[48]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetMemberRoleRequest.ProtoReflect.Descriptor instead.
+func (*SetMemberRoleRequest) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{48}
+}
+
+func (x *SetMemberRoleRequest) GetGuildId() string {
+	if x != nil {
+		return x.GuildId
+	}
+	return ""
+}
+
+func (x *SetMemberRoleRequest) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *SetMemberRoleRequest) GetRole() GuildMemberRole {
+	if x != nil {
+		return x.Role
+	}
+	return GuildMemberRole_GUILD_MEMBER_ROLE_UNSPECIFIED
+}
+
+type SetMemberRoleResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Role          GuildMemberRole        `protobuf:"varint,1,opt,name=role,proto3,enum=guild.v1.GuildMemberRole" json:"role,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *SetMemberRoleResponse) Reset() {
+	*x = SetMemberRoleResponse{}
+	mi := &file_social_guild_v1_guild_proto_msgTypes[49]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *SetMemberRoleResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*SetMemberRoleResponse) ProtoMessage() {}
+
+func (x *SetMemberRoleResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_social_guild_v1_guild_proto_msgTypes[49]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use SetMemberRoleResponse.ProtoReflect.Descriptor instead.
+func (*SetMemberRoleResponse) Descriptor() ([]byte, []int) {
+	return file_social_guild_v1_guild_proto_rawDescGZIP(), []int{49}
+}
+
+func (x *SetMemberRoleResponse) GetRole() GuildMemberRole {
+	if x != nil {
+		return x.Role
+	}
+	return GuildMemberRole_GUILD_MEMBER_ROLE_UNSPECIFIED
+}
+
 var File_social_guild_v1_guild_proto protoreflect.FileDescriptor
 
 const file_social_guild_v1_guild_proto_rawDesc = "" +
@@ -3007,16 +3314,34 @@ const file_social_guild_v1_guild_proto_rawDesc = "" +
 	"\x04side\x18\x05 \x01(\tR\x04side\"N\n" +
 	"\fGuildWarFeed\x12*\n" +
 	"\x02at\x18\x01 \x01(\v2\x1a.google.protobuf.TimestampR\x02at\x12\x12\n" +
-	"\x04text\x18\x02 \x01(\tR\x04text*q\n" +
+	"\x04text\x18\x02 \x01(\tR\x04text\"2\n" +
+	"\x15GetMyGuildRoleRequest\x12\x19\n" +
+	"\bguild_id\x18\x01 \x01(\tR\aguildId\"G\n" +
+	"\x16GetMyGuildRoleResponse\x12-\n" +
+	"\x04role\x18\x01 \x01(\x0e2\x19.guild.v1.GuildMemberRoleR\x04role\"\x8a\x01\n" +
+	"\x1aUpdateGuildSettingsRequest\x12\x19\n" +
+	"\bguild_id\x18\x01 \x01(\tR\aguildId\x12\x12\n" +
+	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1b\n" +
+	"\tis_public\x18\x04 \x01(\bR\bisPublic\"D\n" +
+	"\x1bUpdateGuildSettingsResponse\x12%\n" +
+	"\x05guild\x18\x01 \x01(\v2\x0f.guild.v1.GuildR\x05guild\"y\n" +
+	"\x14SetMemberRoleRequest\x12\x19\n" +
+	"\bguild_id\x18\x01 \x01(\tR\aguildId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12-\n" +
+	"\x04role\x18\x03 \x01(\x0e2\x19.guild.v1.GuildMemberRoleR\x04role\"F\n" +
+	"\x15SetMemberRoleResponse\x12-\n" +
+	"\x04role\x18\x01 \x01(\x0e2\x19.guild.v1.GuildMemberRoleR\x04role*\x90\x01\n" +
 	"\x0fGuildMemberRole\x12!\n" +
 	"\x1dGUILD_MEMBER_ROLE_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19GUILD_MEMBER_ROLE_CREATOR\x10\x01\x12\x1c\n" +
-	"\x18GUILD_MEMBER_ROLE_MEMBER\x10\x02*\xab\x01\n" +
+	"\x18GUILD_MEMBER_ROLE_MEMBER\x10\x02\x12\x1d\n" +
+	"\x19GUILD_MEMBER_ROLE_OFFICER\x10\x03*\xab\x01\n" +
 	"\x15GuildMemberActionType\x12(\n" +
 	"$GUILD_MEMBER_ACTION_TYPE_UNSPECIFIED\x10\x00\x12\"\n" +
 	"\x1eGUILD_MEMBER_ACTION_TYPE_DAILY\x10\x01\x12!\n" +
 	"\x1dGUILD_MEMBER_ACTION_TYPE_DUEL\x10\x02\x12!\n" +
-	"\x1dGUILD_MEMBER_ACTION_TYPE_MOCK\x10\x032\x88\x10\n" +
+	"\x1dGUILD_MEMBER_ACTION_TYPE_MOCK\x10\x032\xac\x13\n" +
 	"\fGuildService\x12_\n" +
 	"\n" +
 	"ListGuilds\x12\x1b.guild.v1.ListGuildsRequest\x1a\x1c.guild.v1.ListGuildsResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/guilds\x12_\n" +
@@ -3035,7 +3360,10 @@ const file_social_guild_v1_guild_proto_rawDesc = "" +
 	"\x14CreateGuildChallenge\x12%.guild.v1.CreateGuildChallengeRequest\x1a&.guild.v1.CreateGuildChallengeResponse\".\x82\xd3\xe4\x93\x02(:\x01*\"#/api/v1/guilds/{guild_id}/challenge\x12f\n" +
 	"\vGetGuildWar\x12\x1c.guild.v1.GetGuildWarRequest\x1a\x1d.guild.v1.GetGuildWarResponse\"\x1a\x82\xd3\xe4\x93\x02\x14\x12\x12/api/v1/guilds/war\x12\x98\x01\n" +
 	"\x11ContributeToFront\x12\".guild.v1.ContributeToFrontRequest\x1a#.guild.v1.ContributeToFrontResponse\":\x82\xd3\xe4\x93\x024:\x01*\"//api/v1/guilds/war/fronts/{front_id}/contribute\x12\x85\x01\n" +
-	"\x0fListTerritories\x12 .guild.v1.ListTerritoriesRequest\x1a!.guild.v1.ListTerritoriesResponse\"-\x82\xd3\xe4\x93\x02'\x12%/api/v1/guilds/{guild_id}/territoriesB\x19Z\x17api/pkg/api/guild/v1;v1b\x06proto3"
+	"\x0fListTerritories\x12 .guild.v1.ListTerritoriesRequest\x1a!.guild.v1.ListTerritoriesResponse\"-\x82\xd3\xe4\x93\x02'\x12%/api/v1/guilds/{guild_id}/territories\x12~\n" +
+	"\x0eGetMyGuildRole\x12\x1f.guild.v1.GetMyGuildRoleRequest\x1a .guild.v1.GetMyGuildRoleResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/guilds/{guild_id}/my-role\x12\x91\x01\n" +
+	"\x13UpdateGuildSettings\x12$.guild.v1.UpdateGuildSettingsRequest\x1a%.guild.v1.UpdateGuildSettingsResponse\"-\x82\xd3\xe4\x93\x02':\x01*\x1a\"/api/v1/guilds/{guild_id}/settings\x12\x8d\x01\n" +
+	"\rSetMemberRole\x12\x1e.guild.v1.SetMemberRoleRequest\x1a\x1f.guild.v1.SetMemberRoleResponse\";\x82\xd3\xe4\x93\x025:\x01*\"0/api/v1/guilds/{guild_id}/members/{user_id}/roleB\x19Z\x17api/pkg/api/guild/v1;v1b\x06proto3"
 
 var (
 	file_social_guild_v1_guild_proto_rawDescOnce sync.Once
@@ -3050,7 +3378,7 @@ func file_social_guild_v1_guild_proto_rawDescGZIP() []byte {
 }
 
 var file_social_guild_v1_guild_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_social_guild_v1_guild_proto_msgTypes = make([]protoimpl.MessageInfo, 44)
+var file_social_guild_v1_guild_proto_msgTypes = make([]protoimpl.MessageInfo, 50)
 var file_social_guild_v1_guild_proto_goTypes = []any{
 	(GuildMemberRole)(0),                    // 0: guild.v1.GuildMemberRole
 	(GuildMemberActionType)(0),              // 1: guild.v1.GuildMemberActionType
@@ -3098,83 +3426,99 @@ var file_social_guild_v1_guild_proto_goTypes = []any{
 	(*GuildWarFront)(nil),                   // 43: guild.v1.GuildWarFront
 	(*GuildWarMvp)(nil),                     // 44: guild.v1.GuildWarMvp
 	(*GuildWarFeed)(nil),                    // 45: guild.v1.GuildWarFeed
-	(*timestamppb.Timestamp)(nil),           // 46: google.protobuf.Timestamp
-	(v1.OperationStatus)(0),                 // 47: common.v1.OperationStatus
-	(v11.EventListFilter)(0),                // 48: event.v1.EventListFilter
-	(*v11.Event)(nil),                       // 49: event.v1.Event
+	(*GetMyGuildRoleRequest)(nil),           // 46: guild.v1.GetMyGuildRoleRequest
+	(*GetMyGuildRoleResponse)(nil),          // 47: guild.v1.GetMyGuildRoleResponse
+	(*UpdateGuildSettingsRequest)(nil),      // 48: guild.v1.UpdateGuildSettingsRequest
+	(*UpdateGuildSettingsResponse)(nil),     // 49: guild.v1.UpdateGuildSettingsResponse
+	(*SetMemberRoleRequest)(nil),            // 50: guild.v1.SetMemberRoleRequest
+	(*SetMemberRoleResponse)(nil),           // 51: guild.v1.SetMemberRoleResponse
+	(*timestamppb.Timestamp)(nil),           // 52: google.protobuf.Timestamp
+	(v1.OperationStatus)(0),                 // 53: common.v1.OperationStatus
+	(v11.EventListFilter)(0),                // 54: event.v1.EventListFilter
+	(*v11.Event)(nil),                       // 55: event.v1.Event
 }
 var file_social_guild_v1_guild_proto_depIdxs = []int32{
 	43, // 0: guild.v1.ContributeToFrontResponse.front:type_name -> guild.v1.GuildWarFront
-	46, // 1: guild.v1.GuildTerritory.captured_at:type_name -> google.protobuf.Timestamp
+	52, // 1: guild.v1.GuildTerritory.captured_at:type_name -> google.protobuf.Timestamp
 	5,  // 2: guild.v1.ListTerritoriesResponse.territories:type_name -> guild.v1.GuildTerritory
 	26, // 3: guild.v1.ListGuildsResponse.guilds:type_name -> guild.v1.Guild
 	26, // 4: guild.v1.GuildResponse.guild:type_name -> guild.v1.Guild
-	47, // 5: guild.v1.JoinGuildResponse.status:type_name -> common.v1.OperationStatus
-	47, // 6: guild.v1.LeaveGuildResponse.status:type_name -> common.v1.OperationStatus
-	47, // 7: guild.v1.InviteToGuildResponse.status:type_name -> common.v1.OperationStatus
+	53, // 5: guild.v1.JoinGuildResponse.status:type_name -> common.v1.OperationStatus
+	53, // 6: guild.v1.LeaveGuildResponse.status:type_name -> common.v1.OperationStatus
+	53, // 7: guild.v1.InviteToGuildResponse.status:type_name -> common.v1.OperationStatus
 	0,  // 8: guild.v1.GuildMember.role:type_name -> guild.v1.GuildMemberRole
-	46, // 9: guild.v1.GuildMember.joined_at:type_name -> google.protobuf.Timestamp
+	52, // 9: guild.v1.GuildMember.joined_at:type_name -> google.protobuf.Timestamp
 	18, // 10: guild.v1.ListGuildMembersResponse.members:type_name -> guild.v1.GuildMember
-	48, // 11: guild.v1.ListGuildEventsRequest.status:type_name -> event.v1.EventListFilter
-	49, // 12: guild.v1.ListGuildEventsResponse.events:type_name -> event.v1.Event
-	49, // 13: guild.v1.CreateGuildEventResponse.event:type_name -> event.v1.Event
-	47, // 14: guild.v1.DeleteGuildResponse.status:type_name -> common.v1.OperationStatus
-	46, // 15: guild.v1.Guild.created_at:type_name -> google.protobuf.Timestamp
+	54, // 11: guild.v1.ListGuildEventsRequest.status:type_name -> event.v1.EventListFilter
+	55, // 12: guild.v1.ListGuildEventsResponse.events:type_name -> event.v1.Event
+	55, // 13: guild.v1.CreateGuildEventResponse.event:type_name -> event.v1.Event
+	53, // 14: guild.v1.DeleteGuildResponse.status:type_name -> common.v1.OperationStatus
+	52, // 15: guild.v1.Guild.created_at:type_name -> google.protobuf.Timestamp
 	1,  // 16: guild.v1.GuildMemberAction.action_type:type_name -> guild.v1.GuildMemberActionType
-	46, // 17: guild.v1.GuildMemberAction.happened_at:type_name -> google.protobuf.Timestamp
+	52, // 17: guild.v1.GuildMemberAction.happened_at:type_name -> google.protobuf.Timestamp
 	28, // 18: guild.v1.GetGuildPulseResponse.week_activity:type_name -> guild.v1.GuildDayActivity
 	29, // 19: guild.v1.GetGuildPulseResponse.recent_actions:type_name -> guild.v1.GuildMemberAction
 	0,  // 20: guild.v1.GuildMemberStatsEntry.role:type_name -> guild.v1.GuildMemberRole
-	46, // 21: guild.v1.GuildMemberStatsEntry.joined_at:type_name -> google.protobuf.Timestamp
+	52, // 21: guild.v1.GuildMemberStatsEntry.joined_at:type_name -> google.protobuf.Timestamp
 	32, // 22: guild.v1.GetGuildMemberStatsResponse.members:type_name -> guild.v1.GuildMemberStatsEntry
-	46, // 23: guild.v1.GuildChallengeData.starts_at:type_name -> google.protobuf.Timestamp
-	46, // 24: guild.v1.GuildChallengeData.ends_at:type_name -> google.protobuf.Timestamp
+	52, // 23: guild.v1.GuildChallengeData.starts_at:type_name -> google.protobuf.Timestamp
+	52, // 24: guild.v1.GuildChallengeData.ends_at:type_name -> google.protobuf.Timestamp
 	35, // 25: guild.v1.GuildChallengeData.progress:type_name -> guild.v1.ChallengeMemberProgress
 	36, // 26: guild.v1.GetActiveGuildChallengeResponse.challenge:type_name -> guild.v1.GuildChallengeData
 	36, // 27: guild.v1.CreateGuildChallengeResponse.challenge:type_name -> guild.v1.GuildChallengeData
 	42, // 28: guild.v1.GetGuildWarResponse.war:type_name -> guild.v1.GuildWarSnapshot
-	46, // 29: guild.v1.GuildWarSnapshot.ends_at:type_name -> google.protobuf.Timestamp
+	52, // 29: guild.v1.GuildWarSnapshot.ends_at:type_name -> google.protobuf.Timestamp
 	43, // 30: guild.v1.GuildWarSnapshot.front:type_name -> guild.v1.GuildWarFront
 	44, // 31: guild.v1.GuildWarSnapshot.mvps:type_name -> guild.v1.GuildWarMvp
 	45, // 32: guild.v1.GuildWarSnapshot.feed:type_name -> guild.v1.GuildWarFeed
-	46, // 33: guild.v1.GuildWarFeed.at:type_name -> google.protobuf.Timestamp
-	7,  // 34: guild.v1.GuildService.ListGuilds:input_type -> guild.v1.ListGuildsRequest
-	8,  // 35: guild.v1.GuildService.CreateGuild:input_type -> guild.v1.CreateGuildRequest
-	9,  // 36: guild.v1.GuildService.JoinGuild:input_type -> guild.v1.JoinGuildRequest
-	10, // 37: guild.v1.GuildService.LeaveGuild:input_type -> guild.v1.LeaveGuildRequest
-	15, // 38: guild.v1.GuildService.InviteToGuild:input_type -> guild.v1.InviteToGuildRequest
-	17, // 39: guild.v1.GuildService.ListGuildMembers:input_type -> guild.v1.ListGuildMembersRequest
-	20, // 40: guild.v1.GuildService.ListGuildEvents:input_type -> guild.v1.ListGuildEventsRequest
-	22, // 41: guild.v1.GuildService.CreateGuildEvent:input_type -> guild.v1.CreateGuildEventRequest
-	24, // 42: guild.v1.GuildService.DeleteGuild:input_type -> guild.v1.DeleteGuildRequest
-	27, // 43: guild.v1.GuildService.GetGuildPulse:input_type -> guild.v1.GetGuildPulseRequest
-	31, // 44: guild.v1.GuildService.GetGuildMemberStats:input_type -> guild.v1.GetGuildMemberStatsRequest
-	34, // 45: guild.v1.GuildService.GetActiveGuildChallenge:input_type -> guild.v1.GetActiveGuildChallengeRequest
-	38, // 46: guild.v1.GuildService.CreateGuildChallenge:input_type -> guild.v1.CreateGuildChallengeRequest
-	40, // 47: guild.v1.GuildService.GetGuildWar:input_type -> guild.v1.GetGuildWarRequest
-	2,  // 48: guild.v1.GuildService.ContributeToFront:input_type -> guild.v1.ContributeToFrontRequest
-	4,  // 49: guild.v1.GuildService.ListTerritories:input_type -> guild.v1.ListTerritoriesRequest
-	11, // 50: guild.v1.GuildService.ListGuilds:output_type -> guild.v1.ListGuildsResponse
-	12, // 51: guild.v1.GuildService.CreateGuild:output_type -> guild.v1.GuildResponse
-	13, // 52: guild.v1.GuildService.JoinGuild:output_type -> guild.v1.JoinGuildResponse
-	14, // 53: guild.v1.GuildService.LeaveGuild:output_type -> guild.v1.LeaveGuildResponse
-	16, // 54: guild.v1.GuildService.InviteToGuild:output_type -> guild.v1.InviteToGuildResponse
-	19, // 55: guild.v1.GuildService.ListGuildMembers:output_type -> guild.v1.ListGuildMembersResponse
-	21, // 56: guild.v1.GuildService.ListGuildEvents:output_type -> guild.v1.ListGuildEventsResponse
-	23, // 57: guild.v1.GuildService.CreateGuildEvent:output_type -> guild.v1.CreateGuildEventResponse
-	25, // 58: guild.v1.GuildService.DeleteGuild:output_type -> guild.v1.DeleteGuildResponse
-	30, // 59: guild.v1.GuildService.GetGuildPulse:output_type -> guild.v1.GetGuildPulseResponse
-	33, // 60: guild.v1.GuildService.GetGuildMemberStats:output_type -> guild.v1.GetGuildMemberStatsResponse
-	37, // 61: guild.v1.GuildService.GetActiveGuildChallenge:output_type -> guild.v1.GetActiveGuildChallengeResponse
-	39, // 62: guild.v1.GuildService.CreateGuildChallenge:output_type -> guild.v1.CreateGuildChallengeResponse
-	41, // 63: guild.v1.GuildService.GetGuildWar:output_type -> guild.v1.GetGuildWarResponse
-	3,  // 64: guild.v1.GuildService.ContributeToFront:output_type -> guild.v1.ContributeToFrontResponse
-	6,  // 65: guild.v1.GuildService.ListTerritories:output_type -> guild.v1.ListTerritoriesResponse
-	50, // [50:66] is the sub-list for method output_type
-	34, // [34:50] is the sub-list for method input_type
-	34, // [34:34] is the sub-list for extension type_name
-	34, // [34:34] is the sub-list for extension extendee
-	0,  // [0:34] is the sub-list for field type_name
+	52, // 33: guild.v1.GuildWarFeed.at:type_name -> google.protobuf.Timestamp
+	0,  // 34: guild.v1.GetMyGuildRoleResponse.role:type_name -> guild.v1.GuildMemberRole
+	26, // 35: guild.v1.UpdateGuildSettingsResponse.guild:type_name -> guild.v1.Guild
+	0,  // 36: guild.v1.SetMemberRoleRequest.role:type_name -> guild.v1.GuildMemberRole
+	0,  // 37: guild.v1.SetMemberRoleResponse.role:type_name -> guild.v1.GuildMemberRole
+	7,  // 38: guild.v1.GuildService.ListGuilds:input_type -> guild.v1.ListGuildsRequest
+	8,  // 39: guild.v1.GuildService.CreateGuild:input_type -> guild.v1.CreateGuildRequest
+	9,  // 40: guild.v1.GuildService.JoinGuild:input_type -> guild.v1.JoinGuildRequest
+	10, // 41: guild.v1.GuildService.LeaveGuild:input_type -> guild.v1.LeaveGuildRequest
+	15, // 42: guild.v1.GuildService.InviteToGuild:input_type -> guild.v1.InviteToGuildRequest
+	17, // 43: guild.v1.GuildService.ListGuildMembers:input_type -> guild.v1.ListGuildMembersRequest
+	20, // 44: guild.v1.GuildService.ListGuildEvents:input_type -> guild.v1.ListGuildEventsRequest
+	22, // 45: guild.v1.GuildService.CreateGuildEvent:input_type -> guild.v1.CreateGuildEventRequest
+	24, // 46: guild.v1.GuildService.DeleteGuild:input_type -> guild.v1.DeleteGuildRequest
+	27, // 47: guild.v1.GuildService.GetGuildPulse:input_type -> guild.v1.GetGuildPulseRequest
+	31, // 48: guild.v1.GuildService.GetGuildMemberStats:input_type -> guild.v1.GetGuildMemberStatsRequest
+	34, // 49: guild.v1.GuildService.GetActiveGuildChallenge:input_type -> guild.v1.GetActiveGuildChallengeRequest
+	38, // 50: guild.v1.GuildService.CreateGuildChallenge:input_type -> guild.v1.CreateGuildChallengeRequest
+	40, // 51: guild.v1.GuildService.GetGuildWar:input_type -> guild.v1.GetGuildWarRequest
+	2,  // 52: guild.v1.GuildService.ContributeToFront:input_type -> guild.v1.ContributeToFrontRequest
+	4,  // 53: guild.v1.GuildService.ListTerritories:input_type -> guild.v1.ListTerritoriesRequest
+	46, // 54: guild.v1.GuildService.GetMyGuildRole:input_type -> guild.v1.GetMyGuildRoleRequest
+	48, // 55: guild.v1.GuildService.UpdateGuildSettings:input_type -> guild.v1.UpdateGuildSettingsRequest
+	50, // 56: guild.v1.GuildService.SetMemberRole:input_type -> guild.v1.SetMemberRoleRequest
+	11, // 57: guild.v1.GuildService.ListGuilds:output_type -> guild.v1.ListGuildsResponse
+	12, // 58: guild.v1.GuildService.CreateGuild:output_type -> guild.v1.GuildResponse
+	13, // 59: guild.v1.GuildService.JoinGuild:output_type -> guild.v1.JoinGuildResponse
+	14, // 60: guild.v1.GuildService.LeaveGuild:output_type -> guild.v1.LeaveGuildResponse
+	16, // 61: guild.v1.GuildService.InviteToGuild:output_type -> guild.v1.InviteToGuildResponse
+	19, // 62: guild.v1.GuildService.ListGuildMembers:output_type -> guild.v1.ListGuildMembersResponse
+	21, // 63: guild.v1.GuildService.ListGuildEvents:output_type -> guild.v1.ListGuildEventsResponse
+	23, // 64: guild.v1.GuildService.CreateGuildEvent:output_type -> guild.v1.CreateGuildEventResponse
+	25, // 65: guild.v1.GuildService.DeleteGuild:output_type -> guild.v1.DeleteGuildResponse
+	30, // 66: guild.v1.GuildService.GetGuildPulse:output_type -> guild.v1.GetGuildPulseResponse
+	33, // 67: guild.v1.GuildService.GetGuildMemberStats:output_type -> guild.v1.GetGuildMemberStatsResponse
+	37, // 68: guild.v1.GuildService.GetActiveGuildChallenge:output_type -> guild.v1.GetActiveGuildChallengeResponse
+	39, // 69: guild.v1.GuildService.CreateGuildChallenge:output_type -> guild.v1.CreateGuildChallengeResponse
+	41, // 70: guild.v1.GuildService.GetGuildWar:output_type -> guild.v1.GetGuildWarResponse
+	3,  // 71: guild.v1.GuildService.ContributeToFront:output_type -> guild.v1.ContributeToFrontResponse
+	6,  // 72: guild.v1.GuildService.ListTerritories:output_type -> guild.v1.ListTerritoriesResponse
+	47, // 73: guild.v1.GuildService.GetMyGuildRole:output_type -> guild.v1.GetMyGuildRoleResponse
+	49, // 74: guild.v1.GuildService.UpdateGuildSettings:output_type -> guild.v1.UpdateGuildSettingsResponse
+	51, // 75: guild.v1.GuildService.SetMemberRole:output_type -> guild.v1.SetMemberRoleResponse
+	57, // [57:76] is the sub-list for method output_type
+	38, // [38:57] is the sub-list for method input_type
+	38, // [38:38] is the sub-list for extension type_name
+	38, // [38:38] is the sub-list for extension extendee
+	0,  // [0:38] is the sub-list for field type_name
 }
 
 func init() { file_social_guild_v1_guild_proto_init() }
@@ -3188,7 +3532,7 @@ func file_social_guild_v1_guild_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_guild_v1_guild_proto_rawDesc), len(file_social_guild_v1_guild_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   44,
+			NumMessages:   50,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

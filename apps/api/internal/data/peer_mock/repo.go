@@ -16,6 +16,8 @@ import (
 	"api/internal/storage/postgres"
 )
 
+var errRatingOutOfRange = errors.New("peer_mock: rating out of range")
+
 type Repo struct {
 	data *postgres.Store
 }
@@ -351,7 +353,7 @@ func (r *Repo) CancelBooking(ctx context.Context, bookingID, actorID uuid.UUID) 
 
 func (r *Repo) SubmitReview(ctx context.Context, bookingID, reviewerID, targetID uuid.UUID, rating int16, notes string) error {
 	if rating < 1 || rating > 5 {
-		return errors.New("peer_mock: rating out of range")
+		return errRatingOutOfRange
 	}
 	_, err := r.data.DB.Exec(ctx, `
         INSERT INTO mock_reviews (booking_id, reviewer_id, target_id, rating, notes)

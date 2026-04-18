@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	kratosErrors "github.com/go-kratos/kratos/v2/errors"
@@ -24,7 +25,10 @@ func (i *Implementation) CreateGuildEvent(ctx context.Context, req *guildv1.Crea
 	}
 
 	isMember, err := i.service.IsMember(ctx, guildID, user.ID)
-	if err != nil || !isMember {
+	if err != nil {
+		return nil, fmt.Errorf("check guild membership: %w", err)
+	}
+	if !isMember {
 		return nil, kratosErrors.Forbidden("NOT_A_MEMBER", "must be a guild member")
 	}
 
@@ -50,7 +54,7 @@ func (i *Implementation) CreateGuildEvent(ctx context.Context, req *guildv1.Crea
 		GuildID:     &guildID,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create guild event: %w", err)
 	}
 	return &guildv1.CreateGuildEventResponse{Event: mapGuildEvent(event)}, nil
 }

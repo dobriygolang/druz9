@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"fmt"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
 	"github.com/google/uuid"
@@ -27,5 +28,9 @@ func (s *Service) CreateEvent(ctx context.Context, creatorID uuid.UUID, isAdmin 
 		req.Status = model.EventStatusPending
 	}
 
-	return s.repo.CreateEvent(ctx, creatorID, req)
+	event, err := s.repo.CreateEvent(ctx, creatorID, req)
+	if err != nil {
+		return nil, fmt.Errorf("create event: %w", err)
+	}
+	return event, nil
 }

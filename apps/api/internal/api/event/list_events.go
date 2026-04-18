@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -13,7 +14,7 @@ import (
 func (i *Implementation) ListEvents(ctx context.Context, req *v1.ListEventsRequest) (*v1.ListEventsResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	opts := model.ListEventsOptions{
@@ -33,7 +34,7 @@ func (i *Implementation) ListEvents(ctx context.Context, req *v1.ListEventsReque
 
 	resp, err := i.service.ListEvents(ctx, user.ID, opts)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list events: %w", err)
 	}
 
 	return mapListEventsResponse(resp), nil

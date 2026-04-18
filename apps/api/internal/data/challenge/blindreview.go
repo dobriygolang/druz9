@@ -34,7 +34,7 @@ func (r *Repo) GetRandomBlindReviewTask(ctx context.Context, userID uuid.UUID) (
 }
 
 // InsertBlindReviewSession stores a completed blind review session.
-func (r *Repo) InsertBlindReviewSession(ctx context.Context, userID uuid.UUID, sourceReviewID uuid.UUID, taskID uuid.UUID, sourceCode, sourceLang, userReview string, aiScore int32, aiFeedback string) (*model.BlindReviewResult, error) {
+func (r *Repo) InsertBlindReviewSession(ctx context.Context, userID, sourceReviewID, taskID uuid.UUID, sourceCode, sourceLang, userReview string, aiScore int32, aiFeedback string) (*model.BlindReviewResult, error) {
 	var result model.BlindReviewResult
 	err := r.data.DB.QueryRow(ctx, `
 		INSERT INTO blind_review_sessions (user_id, source_review_id, task_id, source_code, source_language, user_review, ai_score, ai_feedback)

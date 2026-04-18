@@ -34,6 +34,7 @@ const (
 	ThreadKind_THREAD_KIND_SYSTEM      ThreadKind = 3 // Level-up, achievement, season events
 	ThreadKind_THREAD_KIND_DUEL        ThreadKind = 4 // Post-match chat with opponent
 	ThreadKind_THREAD_KIND_CHALLENGE   ThreadKind = 5 // Async friend challenge conversation
+	ThreadKind_THREAD_KIND_FRIEND      ThreadKind = 6 // Direct friend-to-friend mail
 )
 
 // Enum value maps for ThreadKind.
@@ -45,6 +46,7 @@ var (
 		3: "THREAD_KIND_SYSTEM",
 		4: "THREAD_KIND_DUEL",
 		5: "THREAD_KIND_CHALLENGE",
+		6: "THREAD_KIND_FRIEND",
 	}
 	ThreadKind_value = map[string]int32{
 		"THREAD_KIND_UNSPECIFIED": 0,
@@ -53,6 +55,7 @@ var (
 		"THREAD_KIND_SYSTEM":      3,
 		"THREAD_KIND_DUEL":        4,
 		"THREAD_KIND_CHALLENGE":   5,
+		"THREAD_KIND_FRIEND":      6,
 	}
 )
 
@@ -826,6 +829,94 @@ func (x *GetUnreadCountResponse) GetUnreadTotal() int32 {
 	return 0
 }
 
+type CreateDirectThreadRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	RecipientId   string                 `protobuf:"bytes,1,opt,name=recipient_id,json=recipientId,proto3" json:"recipient_id,omitempty"` // UUID of the target user
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDirectThreadRequest) Reset() {
+	*x = CreateDirectThreadRequest{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDirectThreadRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDirectThreadRequest) ProtoMessage() {}
+
+func (x *CreateDirectThreadRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDirectThreadRequest.ProtoReflect.Descriptor instead.
+func (*CreateDirectThreadRequest) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *CreateDirectThreadRequest) GetRecipientId() string {
+	if x != nil {
+		return x.RecipientId
+	}
+	return ""
+}
+
+type CreateDirectThreadResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	ThreadId      string                 `protobuf:"bytes,1,opt,name=thread_id,json=threadId,proto3" json:"thread_id,omitempty"` // sender-side thread UUID
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CreateDirectThreadResponse) Reset() {
+	*x = CreateDirectThreadResponse{}
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[13]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CreateDirectThreadResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CreateDirectThreadResponse) ProtoMessage() {}
+
+func (x *CreateDirectThreadResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_social_inbox_v1_inbox_proto_msgTypes[13]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CreateDirectThreadResponse.ProtoReflect.Descriptor instead.
+func (*CreateDirectThreadResponse) Descriptor() ([]byte, []int) {
+	return file_social_inbox_v1_inbox_proto_rawDescGZIP(), []int{13}
+}
+
+func (x *CreateDirectThreadResponse) GetThreadId() string {
+	if x != nil {
+		return x.ThreadId
+	}
+	return ""
+}
+
 var File_social_inbox_v1_inbox_proto protoreflect.FileDescriptor
 
 const file_social_inbox_v1_inbox_proto_rawDesc = "" +
@@ -878,7 +969,11 @@ const file_social_inbox_v1_inbox_proto_rawDesc = "" +
 	"\amessage\x18\x01 \x01(\v2\x16.inbox.v1.InboxMessageR\amessage\"\x17\n" +
 	"\x15GetUnreadCountRequest\";\n" +
 	"\x16GetUnreadCountResponse\x12!\n" +
-	"\funread_total\x18\x01 \x01(\x05R\vunreadTotal*\xa1\x01\n" +
+	"\funread_total\x18\x01 \x01(\x05R\vunreadTotal\">\n" +
+	"\x19CreateDirectThreadRequest\x12!\n" +
+	"\frecipient_id\x18\x01 \x01(\tR\vrecipientId\"9\n" +
+	"\x1aCreateDirectThreadResponse\x12\x1b\n" +
+	"\tthread_id\x18\x01 \x01(\tR\bthreadId*\xb9\x01\n" +
 	"\n" +
 	"ThreadKind\x12\x1b\n" +
 	"\x17THREAD_KIND_UNSPECIFIED\x10\x00\x12\x16\n" +
@@ -886,20 +981,22 @@ const file_social_inbox_v1_inbox_proto_rawDesc = "" +
 	"\x11THREAD_KIND_GUILD\x10\x02\x12\x16\n" +
 	"\x12THREAD_KIND_SYSTEM\x10\x03\x12\x14\n" +
 	"\x10THREAD_KIND_DUEL\x10\x04\x12\x19\n" +
-	"\x15THREAD_KIND_CHALLENGE\x10\x05*\x8e\x01\n" +
+	"\x15THREAD_KIND_CHALLENGE\x10\x05\x12\x16\n" +
+	"\x12THREAD_KIND_FRIEND\x10\x06*\x8e\x01\n" +
 	"\n" +
 	"SenderKind\x12\x1b\n" +
 	"\x17SENDER_KIND_UNSPECIFIED\x10\x00\x12\x14\n" +
 	"\x10SENDER_KIND_USER\x10\x01\x12\x16\n" +
 	"\x12SENDER_KIND_SYSTEM\x10\x02\x12\x1a\n" +
 	"\x16SENDER_KIND_MENTOR_BOT\x10\x03\x12\x19\n" +
-	"\x15SENDER_KIND_GUILD_BOT\x10\x042\xea\x04\n" +
+	"\x15SENDER_KIND_GUILD_BOT\x10\x042\xee\x05\n" +
 	"\fInboxService\x12i\n" +
 	"\vListThreads\x12\x1c.inbox.v1.ListThreadsRequest\x1a\x1d.inbox.v1.ListThreadsResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/v1/inbox/threads\x12o\n" +
 	"\tGetThread\x12\x1a.inbox.v1.GetThreadRequest\x1a\x1b.inbox.v1.GetThreadResponse\")\x82\xd3\xe4\x93\x02#\x12!/api/v1/inbox/threads/{thread_id}\x12\x86\x01\n" +
 	"\x0eMarkThreadRead\x12\x1f.inbox.v1.MarkThreadReadRequest\x1a .inbox.v1.MarkThreadReadResponse\"1\x82\xd3\xe4\x93\x02+:\x01*\"&/api/v1/inbox/threads/{thread_id}/read\x12\x81\x01\n" +
 	"\vSendMessage\x12\x1c.inbox.v1.SendMessageRequest\x1a\x1d.inbox.v1.SendMessageResponse\"5\x82\xd3\xe4\x93\x02/:\x01*\"*/api/v1/inbox/threads/{thread_id}/messages\x12q\n" +
-	"\x0eGetUnreadCount\x12\x1f.inbox.v1.GetUnreadCountRequest\x1a .inbox.v1.GetUnreadCountResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/inbox/unreadB\x19Z\x17api/pkg/api/inbox/v1;v1b\x06proto3"
+	"\x0eGetUnreadCount\x12\x1f.inbox.v1.GetUnreadCountRequest\x1a .inbox.v1.GetUnreadCountResponse\"\x1c\x82\xd3\xe4\x93\x02\x16\x12\x14/api/v1/inbox/unread\x12\x81\x01\n" +
+	"\x12CreateDirectThread\x12#.inbox.v1.CreateDirectThreadRequest\x1a$.inbox.v1.CreateDirectThreadResponse\" \x82\xd3\xe4\x93\x02\x1a:\x01*\"\x15/api/v1/inbox/threadsB\x19Z\x17api/pkg/api/inbox/v1;v1b\x06proto3"
 
 var (
 	file_social_inbox_v1_inbox_proto_rawDescOnce sync.Once
@@ -914,29 +1011,31 @@ func file_social_inbox_v1_inbox_proto_rawDescGZIP() []byte {
 }
 
 var file_social_inbox_v1_inbox_proto_enumTypes = make([]protoimpl.EnumInfo, 2)
-var file_social_inbox_v1_inbox_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_social_inbox_v1_inbox_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_social_inbox_v1_inbox_proto_goTypes = []any{
-	(ThreadKind)(0),                // 0: inbox.v1.ThreadKind
-	(SenderKind)(0),                // 1: inbox.v1.SenderKind
-	(*InboxThread)(nil),            // 2: inbox.v1.InboxThread
-	(*InboxMessage)(nil),           // 3: inbox.v1.InboxMessage
-	(*ListThreadsRequest)(nil),     // 4: inbox.v1.ListThreadsRequest
-	(*ListThreadsResponse)(nil),    // 5: inbox.v1.ListThreadsResponse
-	(*GetThreadRequest)(nil),       // 6: inbox.v1.GetThreadRequest
-	(*GetThreadResponse)(nil),      // 7: inbox.v1.GetThreadResponse
-	(*MarkThreadReadRequest)(nil),  // 8: inbox.v1.MarkThreadReadRequest
-	(*MarkThreadReadResponse)(nil), // 9: inbox.v1.MarkThreadReadResponse
-	(*SendMessageRequest)(nil),     // 10: inbox.v1.SendMessageRequest
-	(*SendMessageResponse)(nil),    // 11: inbox.v1.SendMessageResponse
-	(*GetUnreadCountRequest)(nil),  // 12: inbox.v1.GetUnreadCountRequest
-	(*GetUnreadCountResponse)(nil), // 13: inbox.v1.GetUnreadCountResponse
-	(*timestamppb.Timestamp)(nil),  // 14: google.protobuf.Timestamp
+	(ThreadKind)(0),                    // 0: inbox.v1.ThreadKind
+	(SenderKind)(0),                    // 1: inbox.v1.SenderKind
+	(*InboxThread)(nil),                // 2: inbox.v1.InboxThread
+	(*InboxMessage)(nil),               // 3: inbox.v1.InboxMessage
+	(*ListThreadsRequest)(nil),         // 4: inbox.v1.ListThreadsRequest
+	(*ListThreadsResponse)(nil),        // 5: inbox.v1.ListThreadsResponse
+	(*GetThreadRequest)(nil),           // 6: inbox.v1.GetThreadRequest
+	(*GetThreadResponse)(nil),          // 7: inbox.v1.GetThreadResponse
+	(*MarkThreadReadRequest)(nil),      // 8: inbox.v1.MarkThreadReadRequest
+	(*MarkThreadReadResponse)(nil),     // 9: inbox.v1.MarkThreadReadResponse
+	(*SendMessageRequest)(nil),         // 10: inbox.v1.SendMessageRequest
+	(*SendMessageResponse)(nil),        // 11: inbox.v1.SendMessageResponse
+	(*GetUnreadCountRequest)(nil),      // 12: inbox.v1.GetUnreadCountRequest
+	(*GetUnreadCountResponse)(nil),     // 13: inbox.v1.GetUnreadCountResponse
+	(*CreateDirectThreadRequest)(nil),  // 14: inbox.v1.CreateDirectThreadRequest
+	(*CreateDirectThreadResponse)(nil), // 15: inbox.v1.CreateDirectThreadResponse
+	(*timestamppb.Timestamp)(nil),      // 16: google.protobuf.Timestamp
 }
 var file_social_inbox_v1_inbox_proto_depIdxs = []int32{
 	0,  // 0: inbox.v1.InboxThread.kind:type_name -> inbox.v1.ThreadKind
-	14, // 1: inbox.v1.InboxThread.last_message_at:type_name -> google.protobuf.Timestamp
+	16, // 1: inbox.v1.InboxThread.last_message_at:type_name -> google.protobuf.Timestamp
 	1,  // 2: inbox.v1.InboxMessage.sender_kind:type_name -> inbox.v1.SenderKind
-	14, // 3: inbox.v1.InboxMessage.created_at:type_name -> google.protobuf.Timestamp
+	16, // 3: inbox.v1.InboxMessage.created_at:type_name -> google.protobuf.Timestamp
 	2,  // 4: inbox.v1.ListThreadsResponse.threads:type_name -> inbox.v1.InboxThread
 	2,  // 5: inbox.v1.GetThreadResponse.thread:type_name -> inbox.v1.InboxThread
 	3,  // 6: inbox.v1.GetThreadResponse.messages:type_name -> inbox.v1.InboxMessage
@@ -946,13 +1045,15 @@ var file_social_inbox_v1_inbox_proto_depIdxs = []int32{
 	8,  // 10: inbox.v1.InboxService.MarkThreadRead:input_type -> inbox.v1.MarkThreadReadRequest
 	10, // 11: inbox.v1.InboxService.SendMessage:input_type -> inbox.v1.SendMessageRequest
 	12, // 12: inbox.v1.InboxService.GetUnreadCount:input_type -> inbox.v1.GetUnreadCountRequest
-	5,  // 13: inbox.v1.InboxService.ListThreads:output_type -> inbox.v1.ListThreadsResponse
-	7,  // 14: inbox.v1.InboxService.GetThread:output_type -> inbox.v1.GetThreadResponse
-	9,  // 15: inbox.v1.InboxService.MarkThreadRead:output_type -> inbox.v1.MarkThreadReadResponse
-	11, // 16: inbox.v1.InboxService.SendMessage:output_type -> inbox.v1.SendMessageResponse
-	13, // 17: inbox.v1.InboxService.GetUnreadCount:output_type -> inbox.v1.GetUnreadCountResponse
-	13, // [13:18] is the sub-list for method output_type
-	8,  // [8:13] is the sub-list for method input_type
+	14, // 13: inbox.v1.InboxService.CreateDirectThread:input_type -> inbox.v1.CreateDirectThreadRequest
+	5,  // 14: inbox.v1.InboxService.ListThreads:output_type -> inbox.v1.ListThreadsResponse
+	7,  // 15: inbox.v1.InboxService.GetThread:output_type -> inbox.v1.GetThreadResponse
+	9,  // 16: inbox.v1.InboxService.MarkThreadRead:output_type -> inbox.v1.MarkThreadReadResponse
+	11, // 17: inbox.v1.InboxService.SendMessage:output_type -> inbox.v1.SendMessageResponse
+	13, // 18: inbox.v1.InboxService.GetUnreadCount:output_type -> inbox.v1.GetUnreadCountResponse
+	15, // 19: inbox.v1.InboxService.CreateDirectThread:output_type -> inbox.v1.CreateDirectThreadResponse
+	14, // [14:20] is the sub-list for method output_type
+	8,  // [8:14] is the sub-list for method input_type
 	8,  // [8:8] is the sub-list for extension type_name
 	8,  // [8:8] is the sub-list for extension extendee
 	0,  // [0:8] is the sub-list for field type_name
@@ -969,7 +1070,7 @@ func file_social_inbox_v1_inbox_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_social_inbox_v1_inbox_proto_rawDesc), len(file_social_inbox_v1_inbox_proto_rawDesc)),
 			NumEnums:      2,
-			NumMessages:   12,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

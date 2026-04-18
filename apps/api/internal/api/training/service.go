@@ -2,6 +2,7 @@ package training
 
 import (
 	"context"
+	"fmt"
 	"sort"
 	"strings"
 
@@ -124,7 +125,7 @@ func (s *liveService) GetSkillTree(ctx context.Context, userID uuid.UUID) (*v1.G
 	progress, _ := s.profiles.GetProfileProgress(ctx, userID)
 	tasks, err := s.codeEditor.ListTasks(ctx, codeeditordomain.TaskFilter{})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list tasks: %w", err)
 	}
 	solvedTasks, err := s.codeEditor.ListSolvedTasks(ctx, userID)
 	if err != nil {

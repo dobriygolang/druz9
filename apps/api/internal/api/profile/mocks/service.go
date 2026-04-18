@@ -26,9 +26,9 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
-// BindTelegram provides a mock function with given fields: _a0, _a1, _a2, _a3
-func (_m *Service) BindTelegram(_a0 context.Context, _a1 uuid.UUID, _a2 string, _a3 string) (*model.ProfileResponse, int64, error) {
-	ret := _m.Called(_a0, _a1, _a2, _a3)
+// BindTelegram provides a mock function with given fields: ctx, userID, botToken, username
+func (_m *Service) BindTelegram(ctx context.Context, userID uuid.UUID, botToken string, username string) (*model.ProfileResponse, int64, error) {
+	ret := _m.Called(ctx, userID, botToken, username)
 
 	if len(ret) == 0 {
 		panic("no return value specified for BindTelegram")
@@ -38,10 +38,10 @@ func (_m *Service) BindTelegram(_a0 context.Context, _a1 uuid.UUID, _a2 string, 
 	var r1 int64
 	var r2 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, string) (*model.ProfileResponse, int64, error)); ok {
-		return rf(_a0, _a1, _a2, _a3)
+		return rf(ctx, userID, botToken, username)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, string) *model.ProfileResponse); ok {
-		r0 = rf(_a0, _a1, _a2, _a3)
+		r0 = rf(ctx, userID, botToken, username)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ProfileResponse)
@@ -49,13 +49,13 @@ func (_m *Service) BindTelegram(_a0 context.Context, _a1 uuid.UUID, _a2 string, 
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string, string) int64); ok {
-		r1 = rf(_a0, _a1, _a2, _a3)
+		r1 = rf(ctx, userID, botToken, username)
 	} else {
 		r1 = ret.Get(1).(int64)
 	}
 
 	if rf, ok := ret.Get(2).(func(context.Context, uuid.UUID, string, string) error); ok {
-		r2 = rf(_a0, _a1, _a2, _a3)
+		r2 = rf(ctx, userID, botToken, username)
 	} else {
 		r2 = ret.Error(2)
 	}
@@ -69,15 +69,15 @@ type Service_BindTelegram_Call struct {
 }
 
 // BindTelegram is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 string
-//   - _a3 string
-func (_e *Service_Expecter) BindTelegram(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}) *Service_BindTelegram_Call {
-	return &Service_BindTelegram_Call{Call: _e.mock.On("BindTelegram", _a0, _a1, _a2, _a3)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - botToken string
+//   - username string
+func (_e *Service_Expecter) BindTelegram(ctx interface{}, userID interface{}, botToken interface{}, username interface{}) *Service_BindTelegram_Call {
+	return &Service_BindTelegram_Call{Call: _e.mock.On("BindTelegram", ctx, userID, botToken, username)}
 }
 
-func (_c *Service_BindTelegram_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 string, _a3 string)) *Service_BindTelegram_Call {
+func (_c *Service_BindTelegram_Call) Run(run func(ctx context.Context, userID uuid.UUID, botToken string, username string)) *Service_BindTelegram_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string), args[3].(string))
 	})
@@ -94,9 +94,9 @@ func (_c *Service_BindTelegram_Call) RunAndReturn(run func(context.Context, uuid
 	return _c
 }
 
-// CompleteRegistration provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) CompleteRegistration(_a0 context.Context, _a1 uuid.UUID, _a2 model.CompleteRegistrationRequest) (*model.ProfileResponse, string, time.Time, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// CompleteRegistration provides a mock function with given fields: ctx, userID, req
+func (_m *Service) CompleteRegistration(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.ProfileResponse, string, time.Time, error) {
+	ret := _m.Called(ctx, userID, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CompleteRegistration")
@@ -107,10 +107,10 @@ func (_m *Service) CompleteRegistration(_a0 context.Context, _a1 uuid.UUID, _a2 
 	var r2 time.Time
 	var r3 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.CompleteRegistrationRequest) (*model.ProfileResponse, string, time.Time, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, userID, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.CompleteRegistrationRequest) *model.ProfileResponse); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, req)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ProfileResponse)
@@ -118,19 +118,19 @@ func (_m *Service) CompleteRegistration(_a0 context.Context, _a1 uuid.UUID, _a2 
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, model.CompleteRegistrationRequest) string); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, userID, req)
 	} else {
 		r1 = ret.Get(1).(string)
 	}
 
 	if rf, ok := ret.Get(2).(func(context.Context, uuid.UUID, model.CompleteRegistrationRequest) time.Time); ok {
-		r2 = rf(_a0, _a1, _a2)
+		r2 = rf(ctx, userID, req)
 	} else {
 		r2 = ret.Get(2).(time.Time)
 	}
 
 	if rf, ok := ret.Get(3).(func(context.Context, uuid.UUID, model.CompleteRegistrationRequest) error); ok {
-		r3 = rf(_a0, _a1, _a2)
+		r3 = rf(ctx, userID, req)
 	} else {
 		r3 = ret.Error(3)
 	}
@@ -144,14 +144,14 @@ type Service_CompleteRegistration_Call struct {
 }
 
 // CompleteRegistration is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 model.CompleteRegistrationRequest
-func (_e *Service_Expecter) CompleteRegistration(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_CompleteRegistration_Call {
-	return &Service_CompleteRegistration_Call{Call: _e.mock.On("CompleteRegistration", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - req model.CompleteRegistrationRequest
+func (_e *Service_Expecter) CompleteRegistration(ctx interface{}, userID interface{}, req interface{}) *Service_CompleteRegistration_Call {
+	return &Service_CompleteRegistration_Call{Call: _e.mock.On("CompleteRegistration", ctx, userID, req)}
 }
 
-func (_c *Service_CompleteRegistration_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 model.CompleteRegistrationRequest)) *Service_CompleteRegistration_Call {
+func (_c *Service_CompleteRegistration_Call) Run(run func(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest)) *Service_CompleteRegistration_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(model.CompleteRegistrationRequest))
 	})
@@ -168,9 +168,9 @@ func (_c *Service_CompleteRegistration_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
-// CreateTelegramAuthChallenge provides a mock function with given fields: _a0
-func (_m *Service) CreateTelegramAuthChallenge(_a0 context.Context) (*model.TelegramAuthChallenge, error) {
-	ret := _m.Called(_a0)
+// CreateTelegramAuthChallenge provides a mock function with given fields: ctx
+func (_m *Service) CreateTelegramAuthChallenge(ctx context.Context) (*model.TelegramAuthChallenge, error) {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateTelegramAuthChallenge")
@@ -179,10 +179,10 @@ func (_m *Service) CreateTelegramAuthChallenge(_a0 context.Context) (*model.Tele
 	var r0 *model.TelegramAuthChallenge
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context) (*model.TelegramAuthChallenge, error)); ok {
-		return rf(_a0)
+		return rf(ctx)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context) *model.TelegramAuthChallenge); ok {
-		r0 = rf(_a0)
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.TelegramAuthChallenge)
@@ -190,7 +190,7 @@ func (_m *Service) CreateTelegramAuthChallenge(_a0 context.Context) (*model.Tele
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(_a0)
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -204,12 +204,12 @@ type Service_CreateTelegramAuthChallenge_Call struct {
 }
 
 // CreateTelegramAuthChallenge is a helper method to define mock.On call
-//   - _a0 context.Context
-func (_e *Service_Expecter) CreateTelegramAuthChallenge(_a0 interface{}) *Service_CreateTelegramAuthChallenge_Call {
-	return &Service_CreateTelegramAuthChallenge_Call{Call: _e.mock.On("CreateTelegramAuthChallenge", _a0)}
+//   - ctx context.Context
+func (_e *Service_Expecter) CreateTelegramAuthChallenge(ctx interface{}) *Service_CreateTelegramAuthChallenge_Call {
+	return &Service_CreateTelegramAuthChallenge_Call{Call: _e.mock.On("CreateTelegramAuthChallenge", ctx)}
 }
 
-func (_c *Service_CreateTelegramAuthChallenge_Call) Run(run func(_a0 context.Context)) *Service_CreateTelegramAuthChallenge_Call {
+func (_c *Service_CreateTelegramAuthChallenge_Call) Run(run func(ctx context.Context)) *Service_CreateTelegramAuthChallenge_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context))
 	})
@@ -316,9 +316,9 @@ func (_c *Service_DevUserID_Call) RunAndReturn(run func() string) *Service_DevUs
 	return _c
 }
 
-// GetProfileByID provides a mock function with given fields: _a0, _a1
-func (_m *Service) GetProfileByID(_a0 context.Context, _a1 uuid.UUID) (*model.ProfileResponse, error) {
-	ret := _m.Called(_a0, _a1)
+// GetProfileByID provides a mock function with given fields: ctx, userID
+func (_m *Service) GetProfileByID(ctx context.Context, userID uuid.UUID) (*model.ProfileResponse, error) {
+	ret := _m.Called(ctx, userID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetProfileByID")
@@ -327,10 +327,10 @@ func (_m *Service) GetProfileByID(_a0 context.Context, _a1 uuid.UUID) (*model.Pr
 	var r0 *model.ProfileResponse
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*model.ProfileResponse, error)); ok {
-		return rf(_a0, _a1)
+		return rf(ctx, userID)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *model.ProfileResponse); ok {
-		r0 = rf(_a0, _a1)
+		r0 = rf(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ProfileResponse)
@@ -338,7 +338,7 @@ func (_m *Service) GetProfileByID(_a0 context.Context, _a1 uuid.UUID) (*model.Pr
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
-		r1 = rf(_a0, _a1)
+		r1 = rf(ctx, userID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -352,13 +352,13 @@ type Service_GetProfileByID_Call struct {
 }
 
 // GetProfileByID is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-func (_e *Service_Expecter) GetProfileByID(_a0 interface{}, _a1 interface{}) *Service_GetProfileByID_Call {
-	return &Service_GetProfileByID_Call{Call: _e.mock.On("GetProfileByID", _a0, _a1)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+func (_e *Service_Expecter) GetProfileByID(ctx interface{}, userID interface{}) *Service_GetProfileByID_Call {
+	return &Service_GetProfileByID_Call{Call: _e.mock.On("GetProfileByID", ctx, userID)}
 }
 
-func (_c *Service_GetProfileByID_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID)) *Service_GetProfileByID_Call {
+func (_c *Service_GetProfileByID_Call) Run(run func(ctx context.Context, userID uuid.UUID)) *Service_GetProfileByID_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID))
 	})
@@ -375,9 +375,9 @@ func (_c *Service_GetProfileByID_Call) RunAndReturn(run func(context.Context, uu
 	return _c
 }
 
-// Logout provides a mock function with given fields: _a0, _a1
-func (_m *Service) Logout(_a0 context.Context, _a1 string) error {
-	ret := _m.Called(_a0, _a1)
+// Logout provides a mock function with given fields: ctx, sessionToken
+func (_m *Service) Logout(ctx context.Context, sessionToken string) error {
+	ret := _m.Called(ctx, sessionToken)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Logout")
@@ -385,7 +385,7 @@ func (_m *Service) Logout(_a0 context.Context, _a1 string) error {
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, string) error); ok {
-		r0 = rf(_a0, _a1)
+		r0 = rf(ctx, sessionToken)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -399,13 +399,13 @@ type Service_Logout_Call struct {
 }
 
 // Logout is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 string
-func (_e *Service_Expecter) Logout(_a0 interface{}, _a1 interface{}) *Service_Logout_Call {
-	return &Service_Logout_Call{Call: _e.mock.On("Logout", _a0, _a1)}
+//   - ctx context.Context
+//   - sessionToken string
+func (_e *Service_Expecter) Logout(ctx interface{}, sessionToken interface{}) *Service_Logout_Call {
+	return &Service_Logout_Call{Call: _e.mock.On("Logout", ctx, sessionToken)}
 }
 
-func (_c *Service_Logout_Call) Run(run func(_a0 context.Context, _a1 string)) *Service_Logout_Call {
+func (_c *Service_Logout_Call) Run(run func(ctx context.Context, sessionToken string)) *Service_Logout_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string))
 	})
@@ -422,9 +422,9 @@ func (_c *Service_Logout_Call) RunAndReturn(run func(context.Context, string) er
 	return _c
 }
 
-// StartYandexAuth provides a mock function with given fields: _a0
-func (_m *Service) StartYandexAuth(_a0 context.Context) (*model.YandexAuthStart, error) {
-	ret := _m.Called(_a0)
+// StartYandexAuth provides a mock function with given fields: ctx
+func (_m *Service) StartYandexAuth(ctx context.Context) (*model.YandexAuthStart, error) {
+	ret := _m.Called(ctx)
 
 	if len(ret) == 0 {
 		panic("no return value specified for StartYandexAuth")
@@ -433,10 +433,10 @@ func (_m *Service) StartYandexAuth(_a0 context.Context) (*model.YandexAuthStart,
 	var r0 *model.YandexAuthStart
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context) (*model.YandexAuthStart, error)); ok {
-		return rf(_a0)
+		return rf(ctx)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context) *model.YandexAuthStart); ok {
-		r0 = rf(_a0)
+		r0 = rf(ctx)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.YandexAuthStart)
@@ -444,7 +444,7 @@ func (_m *Service) StartYandexAuth(_a0 context.Context) (*model.YandexAuthStart,
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context) error); ok {
-		r1 = rf(_a0)
+		r1 = rf(ctx)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -458,12 +458,12 @@ type Service_StartYandexAuth_Call struct {
 }
 
 // StartYandexAuth is a helper method to define mock.On call
-//   - _a0 context.Context
-func (_e *Service_Expecter) StartYandexAuth(_a0 interface{}) *Service_StartYandexAuth_Call {
-	return &Service_StartYandexAuth_Call{Call: _e.mock.On("StartYandexAuth", _a0)}
+//   - ctx context.Context
+func (_e *Service_Expecter) StartYandexAuth(ctx interface{}) *Service_StartYandexAuth_Call {
+	return &Service_StartYandexAuth_Call{Call: _e.mock.On("StartYandexAuth", ctx)}
 }
 
-func (_c *Service_StartYandexAuth_Call) Run(run func(_a0 context.Context)) *Service_StartYandexAuth_Call {
+func (_c *Service_StartYandexAuth_Call) Run(run func(ctx context.Context)) *Service_StartYandexAuth_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context))
 	})
@@ -480,9 +480,9 @@ func (_c *Service_StartYandexAuth_Call) RunAndReturn(run func(context.Context) (
 	return _c
 }
 
-// TelegramAuth provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) TelegramAuth(_a0 context.Context, _a1 string, _a2 string) (*model.ProfileResponse, string, time.Time, int64, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// TelegramAuth provides a mock function with given fields: ctx, botToken, authData
+func (_m *Service) TelegramAuth(ctx context.Context, botToken string, authData string) (*model.ProfileResponse, string, time.Time, int64, error) {
+	ret := _m.Called(ctx, botToken, authData)
 
 	if len(ret) == 0 {
 		panic("no return value specified for TelegramAuth")
@@ -494,10 +494,10 @@ func (_m *Service) TelegramAuth(_a0 context.Context, _a1 string, _a2 string) (*m
 	var r3 int64
 	var r4 error
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*model.ProfileResponse, string, time.Time, int64, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, botToken, authData)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) *model.ProfileResponse); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, botToken, authData)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ProfileResponse)
@@ -505,25 +505,25 @@ func (_m *Service) TelegramAuth(_a0 context.Context, _a1 string, _a2 string) (*m
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string, string) string); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, botToken, authData)
 	} else {
 		r1 = ret.Get(1).(string)
 	}
 
 	if rf, ok := ret.Get(2).(func(context.Context, string, string) time.Time); ok {
-		r2 = rf(_a0, _a1, _a2)
+		r2 = rf(ctx, botToken, authData)
 	} else {
 		r2 = ret.Get(2).(time.Time)
 	}
 
 	if rf, ok := ret.Get(3).(func(context.Context, string, string) int64); ok {
-		r3 = rf(_a0, _a1, _a2)
+		r3 = rf(ctx, botToken, authData)
 	} else {
 		r3 = ret.Get(3).(int64)
 	}
 
 	if rf, ok := ret.Get(4).(func(context.Context, string, string) error); ok {
-		r4 = rf(_a0, _a1, _a2)
+		r4 = rf(ctx, botToken, authData)
 	} else {
 		r4 = ret.Error(4)
 	}
@@ -537,14 +537,14 @@ type Service_TelegramAuth_Call struct {
 }
 
 // TelegramAuth is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 string
-//   - _a2 string
-func (_e *Service_Expecter) TelegramAuth(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_TelegramAuth_Call {
-	return &Service_TelegramAuth_Call{Call: _e.mock.On("TelegramAuth", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - botToken string
+//   - authData string
+func (_e *Service_Expecter) TelegramAuth(ctx interface{}, botToken interface{}, authData interface{}) *Service_TelegramAuth_Call {
+	return &Service_TelegramAuth_Call{Call: _e.mock.On("TelegramAuth", ctx, botToken, authData)}
 }
 
-func (_c *Service_TelegramAuth_Call) Run(run func(_a0 context.Context, _a1 string, _a2 string)) *Service_TelegramAuth_Call {
+func (_c *Service_TelegramAuth_Call) Run(run func(ctx context.Context, botToken string, authData string)) *Service_TelegramAuth_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string), args[2].(string))
 	})
@@ -561,9 +561,9 @@ func (_c *Service_TelegramAuth_Call) RunAndReturn(run func(context.Context, stri
 	return _c
 }
 
-// UpdateLocation provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) UpdateLocation(_a0 context.Context, _a1 uuid.UUID, _a2 model.CompleteRegistrationRequest) (*model.ProfileResponse, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// UpdateLocation provides a mock function with given fields: ctx, userID, req
+func (_m *Service) UpdateLocation(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.ProfileResponse, error) {
+	ret := _m.Called(ctx, userID, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateLocation")
@@ -572,10 +572,10 @@ func (_m *Service) UpdateLocation(_a0 context.Context, _a1 uuid.UUID, _a2 model.
 	var r0 *model.ProfileResponse
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.CompleteRegistrationRequest) (*model.ProfileResponse, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, userID, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.CompleteRegistrationRequest) *model.ProfileResponse); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, req)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ProfileResponse)
@@ -583,7 +583,7 @@ func (_m *Service) UpdateLocation(_a0 context.Context, _a1 uuid.UUID, _a2 model.
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, model.CompleteRegistrationRequest) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, userID, req)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -597,14 +597,14 @@ type Service_UpdateLocation_Call struct {
 }
 
 // UpdateLocation is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 model.CompleteRegistrationRequest
-func (_e *Service_Expecter) UpdateLocation(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_UpdateLocation_Call {
-	return &Service_UpdateLocation_Call{Call: _e.mock.On("UpdateLocation", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - req model.CompleteRegistrationRequest
+func (_e *Service_Expecter) UpdateLocation(ctx interface{}, userID interface{}, req interface{}) *Service_UpdateLocation_Call {
+	return &Service_UpdateLocation_Call{Call: _e.mock.On("UpdateLocation", ctx, userID, req)}
 }
 
-func (_c *Service_UpdateLocation_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 model.CompleteRegistrationRequest)) *Service_UpdateLocation_Call {
+func (_c *Service_UpdateLocation_Call) Run(run func(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest)) *Service_UpdateLocation_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(model.CompleteRegistrationRequest))
 	})
@@ -621,9 +621,9 @@ func (_c *Service_UpdateLocation_Call) RunAndReturn(run func(context.Context, uu
 	return _c
 }
 
-// UpdateProfile provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) UpdateProfile(_a0 context.Context, _a1 uuid.UUID, _a2 string) (*model.ProfileResponse, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// UpdateProfile provides a mock function with given fields: ctx, userID, username
+func (_m *Service) UpdateProfile(ctx context.Context, userID uuid.UUID, username string) (*model.ProfileResponse, error) {
+	ret := _m.Called(ctx, userID, username)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateProfile")
@@ -632,10 +632,10 @@ func (_m *Service) UpdateProfile(_a0 context.Context, _a1 uuid.UUID, _a2 string)
 	var r0 *model.ProfileResponse
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) (*model.ProfileResponse, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, userID, username)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string) *model.ProfileResponse); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, username)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ProfileResponse)
@@ -643,7 +643,7 @@ func (_m *Service) UpdateProfile(_a0 context.Context, _a1 uuid.UUID, _a2 string)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, userID, username)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -657,14 +657,14 @@ type Service_UpdateProfile_Call struct {
 }
 
 // UpdateProfile is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 string
-func (_e *Service_Expecter) UpdateProfile(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_UpdateProfile_Call {
-	return &Service_UpdateProfile_Call{Call: _e.mock.On("UpdateProfile", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - username string
+func (_e *Service_Expecter) UpdateProfile(ctx interface{}, userID interface{}, username interface{}) *Service_UpdateProfile_Call {
+	return &Service_UpdateProfile_Call{Call: _e.mock.On("UpdateProfile", ctx, userID, username)}
 }
 
-func (_c *Service_UpdateProfile_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 string)) *Service_UpdateProfile_Call {
+func (_c *Service_UpdateProfile_Call) Run(run func(ctx context.Context, userID uuid.UUID, username string)) *Service_UpdateProfile_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string))
 	})
@@ -681,9 +681,9 @@ func (_c *Service_UpdateProfile_Call) RunAndReturn(run func(context.Context, uui
 	return _c
 }
 
-// YandexAuth provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) YandexAuth(_a0 context.Context, _a1 string, _a2 string) (*model.ProfileResponse, string, time.Time, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// YandexAuth provides a mock function with given fields: ctx, code, state
+func (_m *Service) YandexAuth(ctx context.Context, code string, state string) (*model.ProfileResponse, string, time.Time, error) {
+	ret := _m.Called(ctx, code, state)
 
 	if len(ret) == 0 {
 		panic("no return value specified for YandexAuth")
@@ -694,10 +694,10 @@ func (_m *Service) YandexAuth(_a0 context.Context, _a1 string, _a2 string) (*mod
 	var r2 time.Time
 	var r3 error
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) (*model.ProfileResponse, string, time.Time, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, code, state)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string, string) *model.ProfileResponse); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, code, state)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ProfileResponse)
@@ -705,19 +705,19 @@ func (_m *Service) YandexAuth(_a0 context.Context, _a1 string, _a2 string) (*mod
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string, string) string); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, code, state)
 	} else {
 		r1 = ret.Get(1).(string)
 	}
 
 	if rf, ok := ret.Get(2).(func(context.Context, string, string) time.Time); ok {
-		r2 = rf(_a0, _a1, _a2)
+		r2 = rf(ctx, code, state)
 	} else {
 		r2 = ret.Get(2).(time.Time)
 	}
 
 	if rf, ok := ret.Get(3).(func(context.Context, string, string) error); ok {
-		r3 = rf(_a0, _a1, _a2)
+		r3 = rf(ctx, code, state)
 	} else {
 		r3 = ret.Error(3)
 	}
@@ -731,14 +731,14 @@ type Service_YandexAuth_Call struct {
 }
 
 // YandexAuth is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 string
-//   - _a2 string
-func (_e *Service_Expecter) YandexAuth(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_YandexAuth_Call {
-	return &Service_YandexAuth_Call{Call: _e.mock.On("YandexAuth", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - code string
+//   - state string
+func (_e *Service_Expecter) YandexAuth(ctx interface{}, code interface{}, state interface{}) *Service_YandexAuth_Call {
+	return &Service_YandexAuth_Call{Call: _e.mock.On("YandexAuth", ctx, code, state)}
 }
 
-func (_c *Service_YandexAuth_Call) Run(run func(_a0 context.Context, _a1 string, _a2 string)) *Service_YandexAuth_Call {
+func (_c *Service_YandexAuth_Call) Run(run func(ctx context.Context, code string, state string)) *Service_YandexAuth_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string), args[2].(string))
 	})

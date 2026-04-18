@@ -14,6 +14,15 @@ import (
 
 const telegramAPIBase = "https://api.telegram.org"
 
+var (
+	errDownloadAvatarStatus   = errors.New("download telegram avatar status error")
+	errTelegramBotTokenEmpty  = errors.New("telegram bot token is empty")
+	errTelegramAvatarNA       = errors.New("telegram avatar is not available")
+	errTelegramFilePathEmpty  = errors.New("telegram file path is empty")
+	errTelegramAPIStatus      = errors.New("telegram api status error")
+	errTelegramAPIError       = errors.New("telegram api error")
+)
+
 type telegramAPIResponse[T any] struct {
 	OK          bool   `json:"ok"`
 	Result      T      `json:"result"`
@@ -55,7 +64,7 @@ func (s *Service) FetchTelegramAvatar(ctx context.Context, userID uuid.UUID) ([]
 	defer resp.Body.Close()
 
 	if resp.StatusCode != http.StatusOK {
-		return nil, "", fmt.Errorf("download telegram avatar status: %s", resp.Status)
+		return nil, "", fmt.Errorf("%w: %s", errDownloadAvatarStatus, resp.Status)
 	}
 
 	body, err := io.ReadAll(resp.Body)
@@ -73,7 +82,7 @@ func (s *Service) FetchTelegramAvatar(ctx context.Context, userID uuid.UUID) ([]
 
 func (s *Service) resolveTelegramAvatarFileURL(ctx context.Context, userID uuid.UUID) (string, error) {
 	if s.settings.BotToken == "" {
-		return "", errors.New("telegram bot token is empty")
+		return "", errTelegramBotTokenEmpty
 	}
 
 	user, err := s.repo.FindUserByID(ctx, userID)
@@ -81,7 +90,7 @@ func (s *Service) resolveTelegramAvatarFileURL(ctx context.Context, userID uuid.
 		return "", err
 	}
 	if user == nil || user.TelegramID == 0 {
-		return "", errors.New("telegram avatar is not available")
+		return "", errTelegramAvatarNA
 	}
 
 	var photosResp telegramAPIResponse[telegramUserProfilePhotos]
@@ -92,7 +101,7 @@ func (s *Service) resolveTelegramAvatarFileURL(ctx context.Context, userID uuid.
 		return "", err
 	}
 	if len(photosResp.Result.Photos) == 0 || len(photosResp.Result.Photos[0]) == 0 {
-		return "", errors.New("telegram avatar is not available")
+		return "", errTelegramAvatarNA
 	}
 
 	sizes := photosResp.Result.Photos[0]
@@ -103,13 +112,13 @@ func (s *Service) resolveTelegramAvatarFileURL(ctx context.Context, userID uuid.
 		return "", err
 	}
 	if fileResp.Result.FilePath == "" {
-		return "", errors.New("telegram file path is empty")
+		return "", errTelegramFilePathEmpty
 	}
 
 	return fmt.Sprintf("%s/file/bot%s/%s", telegramAPIBase, s.settings.BotToken, fileResp.Result.FilePath), nil
 }
 
-func (s *Service) callTelegram(ctx context.Context, method string, requestBody any, out any) error {
+func (s *Service) callTelegram(ctx context.Context, method string, requestBody, out any) error {
 	body, err := json.Marshal(requestBody)
 	if err != nil {
 		return fmt.Errorf("marshal telegram request: %w", err)
@@ -132,7 +141,7 @@ func (s *Service) callTelegram(ctx context.Context, method string, requestBody a
 		return fmt.Errorf("read telegram response: %w", err)
 	}
 	if resp.StatusCode >= http.StatusBadRequest {
-		return fmt.Errorf("telegram api status: %s", resp.Status)
+		return fmt.Errorf("%w: %s", errTelegramAPIStatus, resp.Status)
 	}
 
 	var meta telegramAPIMeta
@@ -140,7 +149,7 @@ func (s *Service) callTelegram(ctx context.Context, method string, requestBody a
 		return fmt.Errorf("decode telegram response: %w", err)
 	}
 	if !meta.OK {
-		return fmt.Errorf("telegram api error: %s", meta.Description)
+		return fmt.Errorf("%w: %s", errTelegramAPIError, meta.Description)
 	}
 
 	if out == nil {

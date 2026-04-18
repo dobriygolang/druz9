@@ -6,6 +6,7 @@ package shop
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/google/uuid"
@@ -71,6 +72,8 @@ var (
 	ErrNotForSale          = errors.New("shop: item has no price (event drop)")
 	ErrNotEquippable       = errors.New("shop: item has no slot — cannot be equipped")
 	ErrNotOwned            = errors.New("shop: user does not own this item")
+	ErrNilItem             = errors.New("shop: nil item")
+	ErrSlugRequired        = errors.New("shop: slug is required")
 )
 
 // CATEGORY_NAMES maps the enum to its canonical name for the
@@ -89,7 +92,7 @@ var categoryNames = map[model.ItemCategory]string{
 func (s *Service) ListCategories(ctx context.Context) ([]*model.ShopCategoryInfo, error) {
 	counts, err := s.repo.ListCategoryCounts(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list category counts: %w", err)
 	}
 	out := make([]*model.ShopCategoryInfo, 0, len(categoryNames))
 	for cat := model.ItemCategoryDecor; cat <= model.ItemCategorySeasonal; cat++ {
@@ -123,7 +126,7 @@ func (s *Service) ListItems(
 	}
 	items, total, err := s.repo.ListItems(ctx, category, rarity, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list items: %w", err)
 	}
 	if items == nil {
 		items = []*model.ShopItem{}
@@ -135,7 +138,7 @@ func (s *Service) ListItems(
 func (s *Service) GetItem(ctx context.Context, itemID, userID uuid.UUID) (*model.ShopItem, bool, error) {
 	item, err := s.repo.GetItemByID(ctx, itemID)
 	if err != nil {
-		return nil, false, err
+		return nil, false, fmt.Errorf("get item by id: %w", err)
 	}
 	if item == nil {
 		return nil, false, ErrItemNotFound
@@ -144,7 +147,7 @@ func (s *Service) GetItem(ctx context.Context, itemID, userID uuid.UUID) (*model
 	if userID != uuid.Nil {
 		owned, err = s.repo.IsOwned(ctx, userID, itemID)
 		if err != nil {
-			return nil, false, err
+			return nil, false, fmt.Errorf("is owned: %w", err)
 		}
 	}
 	return item, owned, nil
@@ -154,7 +157,7 @@ func (s *Service) GetItem(ctx context.Context, itemID, userID uuid.UUID) (*model
 func (s *Service) GetInventory(ctx context.Context, userID uuid.UUID) ([]*model.ShopOwnedItem, error) {
 	rows, err := s.repo.GetInventory(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get inventory: %w", err)
 	}
 	if rows == nil {
 		rows = []*model.ShopOwnedItem{}
@@ -164,10 +167,10 @@ func (s *Service) GetInventory(ctx context.Context, userID uuid.UUID) ([]*model.
 
 // Purchase buys one item: validates it's for-sale, checks owners, debits
 // the wallet (when wired), records ownership.
-func (s *Service) Purchase(ctx context.Context, userID uuid.UUID, itemID uuid.UUID) (*model.ShopPurchaseOutcome, error) {
+func (s *Service) Purchase(ctx context.Context, userID, itemID uuid.UUID) (*model.ShopPurchaseOutcome, error) {
 	item, err := s.repo.GetItemByID(ctx, itemID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get item by id: %w", err)
 	}
 	if item == nil {
 		return nil, ErrItemNotFound
@@ -181,7 +184,7 @@ func (s *Service) Purchase(ctx context.Context, userID uuid.UUID, itemID uuid.UU
 
 	owned, err := s.repo.IsOwned(ctx, userID, itemID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("is owned: %w", err)
 	}
 	if owned {
 		return nil, ErrAlreadyOwned
@@ -195,11 +198,11 @@ func (s *Service) Purchase(ctx context.Context, userID uuid.UUID, itemID uuid.UU
 		switch item.Currency {
 		case model.ItemCurrencyGold:
 			if err := s.wallet.DebitGold(ctx, userID, item.Price); err != nil {
-				return nil, err
+				return nil, fmt.Errorf("debit gold: %w", err)
 			}
 		case model.ItemCurrencyGems:
 			if err := s.wallet.DebitGems(ctx, userID, item.Price); err != nil {
-				return nil, err
+				return nil, fmt.Errorf("debit gems: %w", err)
 			}
 		case model.ItemCurrencyShards:
 			// Shards aren't on the profile wallet yet; treat as free while
@@ -211,7 +214,7 @@ func (s *Service) Purchase(ctx context.Context, userID uuid.UUID, itemID uuid.UU
 
 	owner, err := s.repo.InsertOwnership(ctx, userID, itemID, item.Price, item.Currency)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("insert ownership: %w", err)
 	}
 
 	outcome := &model.ShopPurchaseOutcome{Owned: owner}
@@ -233,7 +236,7 @@ func (s *Service) Equip(
 ) ([]*model.ShopOwnedItem, error) {
 	item, err := s.repo.GetItemByID(ctx, itemID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get item by id: %w", err)
 	}
 	if item == nil {
 		return nil, ErrItemNotFound
@@ -243,7 +246,7 @@ func (s *Service) Equip(
 	}
 	owned, err := s.repo.IsOwned(ctx, userID, itemID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("is owned: %w", err)
 	}
 	if !owned {
 		return nil, ErrNotOwned
@@ -270,7 +273,7 @@ func (s *Service) AdminListItems(
 	}
 	items, total, err := s.repo.AdminListItems(ctx, category, rarity, limit, offset)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("admin list items: %w", err)
 	}
 	if items == nil {
 		items = []*model.ShopItem{}
@@ -280,29 +283,40 @@ func (s *Service) AdminListItems(
 
 func (s *Service) AdminCreateItem(ctx context.Context, item *model.ShopItem) (*model.ShopItem, error) {
 	if item == nil {
-		return nil, errors.New("shop: nil item")
+		return nil, fmt.Errorf("%w", ErrNilItem)
 	}
 	if strings.TrimSpace(item.Slug) == "" {
-		return nil, errors.New("shop: slug is required")
+		return nil, fmt.Errorf("%w", ErrSlugRequired)
 	}
 	if item.ID == uuid.Nil {
 		item.ID = uuid.New()
 	}
-	return s.repo.InsertItem(ctx, item)
+	res, err := s.repo.InsertItem(ctx, item)
+	if err != nil {
+		return nil, fmt.Errorf("insert item: %w", err)
+	}
+	return res, nil
 }
 
 func (s *Service) AdminUpdateItem(ctx context.Context, item *model.ShopItem) (*model.ShopItem, error) {
 	if item == nil || item.ID == uuid.Nil {
 		return nil, ErrItemNotFound
 	}
-	return s.repo.UpdateItem(ctx, item)
+	res, err := s.repo.UpdateItem(ctx, item)
+	if err != nil {
+		return nil, fmt.Errorf("update item: %w", err)
+	}
+	return res, nil
 }
 
 func (s *Service) AdminDeleteItem(ctx context.Context, id uuid.UUID) error {
 	if id == uuid.Nil {
 		return ErrItemNotFound
 	}
-	return s.repo.DeleteItem(ctx, id)
+	if err := s.repo.DeleteItem(ctx, id); err != nil {
+		return fmt.Errorf("delete item: %w", err)
+	}
+	return nil
 }
 
 // Used by API layer if a client passes a slug instead of a UUID.
@@ -315,7 +329,7 @@ func (s *Service) ResolveItem(ctx context.Context, ref string) (uuid.UUID, error
 	}
 	item, err := s.repo.GetItemBySlug(ctx, ref)
 	if err != nil {
-		return uuid.Nil, err
+		return uuid.Nil, fmt.Errorf("get item by slug: %w", err)
 	}
 	if item == nil {
 		return uuid.Nil, ErrItemNotFound

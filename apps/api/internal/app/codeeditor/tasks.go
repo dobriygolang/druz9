@@ -2,6 +2,7 @@ package codeeditor
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -10,11 +11,19 @@ import (
 )
 
 func (s *Service) ListTasks(ctx context.Context, filter domain.TaskFilter) ([]*domain.Task, error) {
-	return s.repo.ListTasks(ctx, filter)
+	tasks, err := s.repo.ListTasks(ctx, filter)
+	if err != nil {
+		return nil, fmt.Errorf("list tasks: %w", err)
+	}
+	return tasks, nil
 }
 
 func (s *Service) ListSolvedTasks(ctx context.Context, userID uuid.UUID) ([]*domain.Task, error) {
-	return s.repo.ListSolvedTasks(ctx, userID)
+	tasks, err := s.repo.ListSolvedTasks(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("list solved tasks: %w", err)
+	}
+	return tasks, nil
 }
 
 func (s *Service) GetTask(ctx context.Context, taskID uuid.UUID) (*domain.Task, error) {
@@ -24,7 +33,7 @@ func (s *Service) GetTask(ctx context.Context, taskID uuid.UUID) (*domain.Task, 
 	}
 	task, err := s.repo.GetTask(ctx, taskID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get task: %w", err)
 	}
 	if task == nil {
 		return nil, nil
@@ -35,18 +44,22 @@ func (s *Service) GetTask(ctx context.Context, taskID uuid.UUID) (*domain.Task, 
 
 func (s *Service) CreateTask(ctx context.Context, task *domain.Task) (*domain.Task, error) {
 	if err := normalizeTaskPolicy(task); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("normalize task policy: %w", err)
 	}
-	return s.repo.CreateTask(ctx, task)
+	created, err := s.repo.CreateTask(ctx, task)
+	if err != nil {
+		return nil, fmt.Errorf("create task: %w", err)
+	}
+	return created, nil
 }
 
 func (s *Service) UpdateTask(ctx context.Context, task *domain.Task) (*domain.Task, error) {
 	if err := normalizeTaskPolicy(task); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("normalize task policy: %w", err)
 	}
 	updated, err := s.repo.UpdateTask(ctx, task)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update task: %w", err)
 	}
 	s.taskCache.Delete(updated.ID.String())
 	return updated, nil
@@ -54,7 +67,7 @@ func (s *Service) UpdateTask(ctx context.Context, task *domain.Task) (*domain.Ta
 
 func (s *Service) DeleteTask(ctx context.Context, taskID uuid.UUID) error {
 	if err := s.repo.DeleteTask(ctx, taskID); err != nil {
-		return err
+		return fmt.Errorf("delete task: %w", err)
 	}
 	s.taskCache.Delete(taskID.String())
 	return nil
@@ -71,7 +84,7 @@ func (s *Service) GetLeaderboard(ctx context.Context, limit int32) ([]*domain.Le
 
 	entries, err := s.repo.GetLeaderboard(ctx, limit)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get leaderboard: %w", err)
 	}
 
 	s.leaderboardMu.Lock()

@@ -30,7 +30,7 @@ func (s *Service) FindSessionByHash(ctx context.Context, hash string) (*model.Au
 }
 
 // TouchSession updates session activity timestamps.
-func (s *Service) TouchSession(ctx context.Context, userID uuid.UUID, sessionID uuid.UUID, expiresAt time.Time, lastActive time.Time) error {
+func (s *Service) TouchSession(ctx context.Context, userID, sessionID uuid.UUID, expiresAt, lastActive time.Time) error {
 	err := s.sessions.TouchSession(ctx, userID, sessionID, expiresAt, lastActive)
 	if err == nil {
 		// Update session cache

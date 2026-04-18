@@ -47,7 +47,7 @@ func init() {
 	)
 }
 
-func observeRequest(path string, status string, started time.Time) {
+func observeRequest(path, status string, started time.Time) {
 	runnerRequestsTotal.WithLabelValues(path, status).Inc()
 	runnerRequestDuration.WithLabelValues(path).Observe(time.Since(started).Seconds())
 }

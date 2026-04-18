@@ -14,7 +14,7 @@ import (
 // Authorizer validates session tokens used by manual HTTP route handlers.
 // Proto-based handlers rely on the kratos middleware instead.
 type Authorizer interface {
-	AuthenticateByToken(context.Context, string) (*model.AuthState, error)
+	AuthenticateByToken(ctx context.Context, token string) (*model.AuthState, error)
 	CookieName() string
 }
 

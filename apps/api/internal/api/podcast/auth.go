@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -12,7 +13,7 @@ import (
 func requireAdmin(ctx context.Context) (*model.User, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("context: %w", err)
 	}
 	if !user.IsAdmin {
 		return nil, errors.Forbidden("FORBIDDEN", "admin access required")

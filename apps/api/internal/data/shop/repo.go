@@ -13,6 +13,8 @@ import (
 	"api/internal/storage/postgres"
 )
 
+var errEmptySlot = errors.New("set equipped: empty slot")
+
 type Repo struct {
 	data *postgres.Store
 	log  *log.Helper
@@ -225,7 +227,7 @@ func (r *Repo) SetEquippedForSlot(
 	ctx context.Context, userID uuid.UUID, slot string, equipItemID uuid.UUID,
 ) ([]*model.ShopOwnedItem, error) {
 	if slot == "" {
-		return nil, errors.New("set equipped: empty slot")
+		return nil, errEmptySlot
 	}
 	tx, err := r.data.DB.Begin(ctx)
 	if err != nil {

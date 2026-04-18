@@ -3,20 +3,14 @@ import { useNavigate } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import { Panel, RpgButton, Badge, PageHeader } from '@/shared/ui/pixel'
 import { Hero, Trophy } from '@/shared/ui/sprites'
-import { interviewPrepApi, type MockBlueprint } from '@/features/InterviewPrep/api/interviewPrepApi'
+import { interviewPrepApi, type MockBlueprint, type AIMentor } from '@/features/InterviewPrep/api/interviewPrepApi'
 import { authApi } from '@/features/Auth/api/authApi'
+import { journeyApi, type ReadinessResponse } from '@/features/Journey/api/journeyApi'
 import { useAuth } from '@/app/providers/AuthProvider'
 import type { FeedItem } from '@/entities/User/model/types'
 import { addToast } from '@/shared/lib/toasts'
 
-const READINESS = 78
-
-const READINESS_BREAKDOWN: Array<[string, number]> = [
-  ['algorithms', 82],
-  ['systemDesign', 64],
-  ['communication', 88],
-  ['behavioral', 74],
-]
+const BREAKDOWN_KEYS = ['algorithms', 'systemDesign', 'communication', 'behavioral'] as const
 
 // Companies we support for mock-style prep. Order matches the order we
 // want on the landing bar. Clicking pushes the key into the live-session
@@ -63,19 +57,19 @@ export function InterviewHubPage() {
   const { user } = useAuth()
 
   const [mentors, setMentors] = useState<MockBlueprint[]>([])
+  const [aiMentors, setAiMentors] = useState<AIMentor[]>([])
+  const [selectedAiMentorId, setSelectedAiMentorId] = useState<string | null>(null)
   const [past, setPast] = useState<FeedItem[]>([])
   const [weakest, setWeakest] = useState<Array<{ key: string; label: string; score: number }>>([])
+  const [readiness, setReadiness] = useState<ReadinessResponse | null>(null)
   const [loading, setLoading] = useState(true)
-  // Which company chip is currently kicking off a mock session (null = none).
-  // Prevents double-click from spawning two sessions.
   const [startingCompany, setStartingCompany] = useState<string | null>(null)
 
   useEffect(() => {
     let alive = true
-    // Mentors + past sessions + weakest-skills load in parallel; each
-    // swallows its own error so a dead endpoint doesn't wipe the others.
     Promise.all([
       interviewPrepApi.listMockBlueprints().catch(() => []),
+      interviewPrepApi.listAIMentors().catch(() => []),
       user?.id
         ? authApi.getProfileFeed(user.id, 20).catch(() => []).then((items) =>
             items.filter((it) => it.type === 'mock_stage'),
@@ -90,11 +84,17 @@ export function InterviewHubPage() {
             })),
           ).catch(() => [])
         : Promise.resolve([] as Array<{ key: string; label: string; score: number }>),
-    ]).then(([blueprints, feed, weak]) => {
+      user?.id
+        ? journeyApi.getReadiness(user.id).catch(() => null)
+        : Promise.resolve(null),
+    ]).then(([blueprints, ais, feed, weak, rd]) => {
       if (!alive) return
       setMentors(blueprints)
+      setAiMentors(ais)
+      if (ais.length > 0) setSelectedAiMentorId(ais[0].id)
       setPast(feed)
       setWeakest(weak)
+      setReadiness(rd)
       setLoading(false)
     })
     return () => {
@@ -121,6 +121,46 @@ export function InterviewHubPage() {
           </div>
         }
       />
+
+      {/* AI Mentor selector — choose which neural network to talk to */}
+      {aiMentors.length > 0 && (
+        <Panel data-hub-section="ai-mentor" style={{ marginBottom: 18 }}>
+          <div
+            className="font-silkscreen uppercase"
+            style={{ fontSize: 10, color: 'var(--ink-2)', letterSpacing: '0.1em', marginBottom: 10 }}
+          >
+            {t('interviewHub.pickAiMentor', { defaultValue: 'Выбери ИИ-ментора' })}
+          </div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+            {aiMentors.map((m) => {
+              const isFree = m.tier === 0
+              const isSelected = selectedAiMentorId === m.id
+              return (
+                <button
+                  key={m.id}
+                  className="rpg-btn"
+                  onClick={() => setSelectedAiMentorId(m.id)}
+                  style={{
+                    padding: '8px 14px',
+                    outline: isSelected ? '2px solid var(--ember-3)' : '2px solid transparent',
+                    outlineOffset: 2,
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: 6,
+                  }}
+                >
+                  <span>{m.name}</span>
+                  {isFree ? (
+                    <Badge variant="success" style={{ fontSize: 9 }}>Free</Badge>
+                  ) : (
+                    <Badge variant="warning" style={{ fontSize: 9 }}>✦ Premium</Badge>
+                  )}
+                </button>
+              )
+            })}
+          </div>
+        </Panel>
+      )}
 
       {/* Company picker — kicks off a real mock-session bound to the
           chosen company's question pool (StartMockSession RPC). The
@@ -208,76 +248,93 @@ export function InterviewHubPage() {
           >
             {t('interviewHub.avgSessions')}
           </div>
-          <div style={{ textAlign: 'center', padding: '10px 0' }}>
-            <svg viewBox="0 0 120 120" style={{ width: 180, height: 180 }}>
-              <circle cx="60" cy="60" r="50" fill="none" stroke="#3a3028" strokeWidth="10" />
-              <circle
-                cx="60"
-                cy="60"
-                r="50"
-                fill="none"
-                stroke="#e9b866"
-                strokeWidth="10"
-                strokeDasharray={`${2 * Math.PI * 50}`}
-                strokeDashoffset={`${2 * Math.PI * 50 * (1 - READINESS / 100)}`}
-                transform="rotate(-90 60 60)"
-                strokeLinecap="butt"
-              />
-              <text
-                x="60"
-                y="62"
-                textAnchor="middle"
-                fontFamily="Pixelify Sans, monospace"
-                fontSize="28"
-                fill="#f6ead0"
-              >
-                {READINESS}%
-              </text>
-              <text
-                x="60"
-                y="78"
-                textAnchor="middle"
-                fontFamily="Silkscreen, monospace"
-                fontSize="8"
-                fill="#dcc690"
-              >
-                {t('interviewHub.ready')}
-              </text>
-            </svg>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
-            {READINESS_BREAKDOWN.map(([k, v]) => (
-              <div
-                key={k}
-                style={{
-                  padding: 8,
-                  background: 'rgba(246,234,208,0.06)',
-                  border: '2px solid rgba(246,234,208,0.15)',
-                }}
-              >
-                <div
-                  className="font-silkscreen uppercase"
-                  style={{
-                    color: 'var(--parch-2)',
-                    opacity: 0.7,
-                    fontSize: 9,
-                    letterSpacing: '0.08em',
-                  }}
-                >
-                  {t(`interviewHub.breakdown.${k}`)}
+          {(() => {
+            const score = readiness?.score ?? 0
+            const competencies = readiness
+              ? ([
+                  readiness.weakestSkill,
+                  readiness.strongestSkill,
+                ].filter(Boolean) as NonNullable<typeof readiness.weakestSkill>[])
+              : []
+            const breakdown: Array<[string, number]> = BREAKDOWN_KEYS.map((k) => {
+              const c = competencies.find((x) => x.key === k)
+              return [k, c?.score ?? 0]
+            })
+            return (
+              <>
+                <div style={{ textAlign: 'center', padding: '10px 0' }}>
+                  <svg viewBox="0 0 120 120" style={{ width: 180, height: 180 }}>
+                    <circle cx="60" cy="60" r="50" fill="none" stroke="#3a3028" strokeWidth="10" />
+                    <circle
+                      cx="60"
+                      cy="60"
+                      r="50"
+                      fill="none"
+                      stroke="#e9b866"
+                      strokeWidth="10"
+                      strokeDasharray={`${2 * Math.PI * 50}`}
+                      strokeDashoffset={`${2 * Math.PI * 50 * (1 - score / 100)}`}
+                      transform="rotate(-90 60 60)"
+                      strokeLinecap="butt"
+                    />
+                    <text
+                      x="60"
+                      y="62"
+                      textAnchor="middle"
+                      fontFamily="Pixelify Sans, monospace"
+                      fontSize="28"
+                      fill="#f6ead0"
+                    >
+                      {score}%
+                    </text>
+                    <text
+                      x="60"
+                      y="78"
+                      textAnchor="middle"
+                      fontFamily="Silkscreen, monospace"
+                      fontSize="8"
+                      fill="#dcc690"
+                    >
+                      {readiness?.levelLabel ?? t('interviewHub.ready')}
+                    </text>
+                  </svg>
                 </div>
-                <div
-                  style={{
-                    fontFamily: 'Pixelify Sans, monospace',
-                    fontSize: 20,
-                    color: 'var(--ember-3)',
-                  }}
-                >
-                  {v}
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8 }}>
+                  {breakdown.map(([k, v]) => (
+                    <div
+                      key={k}
+                      style={{
+                        padding: 8,
+                        background: 'rgba(246,234,208,0.06)',
+                        border: '2px solid rgba(246,234,208,0.15)',
+                      }}
+                    >
+                      <div
+                        className="font-silkscreen uppercase"
+                        style={{
+                          color: 'var(--parch-2)',
+                          opacity: 0.7,
+                          fontSize: 9,
+                          letterSpacing: '0.08em',
+                        }}
+                      >
+                        {t(`interviewHub.breakdown.${k}`)}
+                      </div>
+                      <div
+                        style={{
+                          fontFamily: 'Pixelify Sans, monospace',
+                          fontSize: 20,
+                          color: 'var(--ember-3)',
+                        }}
+                      >
+                        {v}
+                      </div>
+                    </div>
+                  ))}
                 </div>
-              </div>
-            ))}
-          </div>
+              </>
+            )
+          })()}
         </Panel>
 
         {/* Mentors — one card per mock blueprint */}

@@ -4,11 +4,17 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
 
 	klog "github.com/go-kratos/kratos/v2/log"
+)
+
+var (
+	errTelegramAPIStatus = errors.New("telegram api status error")
+	errTelegramAPIError  = errors.New("telegram api error")
 )
 
 func (s *Service) getUpdates(ctx context.Context, offset int64) ([]telegramUpdate, error) {
@@ -72,7 +78,7 @@ func (s *Service) getUserPhotoURL(ctx context.Context, userID int64) string {
 	return fmt.Sprintf("%s/file/bot%s/%s", telegramAPIBase, s.token, fileResp.Result.FilePath)
 }
 
-func (s *Service) call(ctx context.Context, method string, requestBody any, out any) error {
+func (s *Service) call(ctx context.Context, method string, requestBody, out any) error {
 	body, err := json.Marshal(requestBody)
 	if err != nil {
 		return fmt.Errorf("marshal telegram request: %w", err)
@@ -96,7 +102,7 @@ func (s *Service) call(ctx context.Context, method string, requestBody any, out 
 	}
 
 	if resp.StatusCode >= http.StatusBadRequest {
-		return fmt.Errorf("telegram api status: %s", resp.Status)
+		return fmt.Errorf("%w: %s", errTelegramAPIStatus, resp.Status)
 	}
 
 	var meta telegramAPIResponse[json.RawMessage]
@@ -104,7 +110,7 @@ func (s *Service) call(ctx context.Context, method string, requestBody any, out 
 		return fmt.Errorf("decode telegram response: %w", err)
 	}
 	if !meta.OK {
-		return fmt.Errorf("telegram api error: %s", meta.Error)
+		return fmt.Errorf("%w: %s", errTelegramAPIError, meta.Error)
 	}
 
 	if out == nil {

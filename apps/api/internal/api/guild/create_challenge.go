@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 
 	klog "github.com/go-kratos/kratos/v2/log"
 
@@ -23,7 +24,7 @@ func (i *Implementation) CreateGuildChallenge(ctx context.Context, req *v1.Creat
 
 	challenge, err := i.service.CreateChallenge(ctx, guildID, user.ID, req.GetTemplateKey(), req.GetTargetValue())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create guild challenge: %w", err)
 	}
 
 	// Notify: guild_event_created — notify all guild members about the new challenge.
@@ -31,7 +32,7 @@ func (i *Implementation) CreateGuildChallenge(ctx context.Context, req *v1.Creat
 		go func() {
 			members, mErr := i.service.ListGuildMembers(ctx, guildID, 200)
 			if mErr != nil {
-				klog.Errorf("create challenge notify: list members guild=%s: %v", guildID, mErr)
+				klog.Errorf("create challenge notify: list members guild=%s: %v", guildID, fmt.Errorf("list guild members: %w", mErr))
 				return
 			}
 			userIDs := make([]string, 0, len(members))

@@ -13,6 +13,12 @@ import (
 	v1 "api/pkg/api/inbox/v1"
 )
 
+// UserResolver looks up a user by ID — used to resolve recipient display
+// names when creating direct threads without a full profile service dep.
+type UserResolver interface {
+	FindUserByID(ctx context.Context, id uuid.UUID) (*model.User, error)
+}
+
 // Service is the interface that the transport layer expects from the
 // inbox domain service. Only what the handlers call is listed here.
 type Service interface {
@@ -21,17 +27,19 @@ type Service interface {
 	MarkThreadRead(ctx context.Context, userID, threadID uuid.UUID) (int32, error)
 	SendMessage(ctx context.Context, userID, threadID uuid.UUID, senderName, body string) (*model.InboxMessage, error)
 	GetUnreadCount(ctx context.Context, userID uuid.UUID) (int32, error)
+	CreateDirectThread(ctx context.Context, senderID, recipientID uuid.UUID, senderName, recipientName, subject string) (*model.InboxThread, error)
 }
 
 // Implementation is the gRPC/HTTP handler for InboxService.
 type Implementation struct {
 	v1.UnimplementedInboxServiceServer
-	service Service
+	service      Service
+	userResolver UserResolver
 }
 
 // New constructs the inbox service Implementation.
-func New(service Service) *Implementation {
-	return &Implementation{service: service}
+func New(service Service, userResolver UserResolver) *Implementation {
+	return &Implementation{service: service, userResolver: userResolver}
 }
 
 // GetDescription returns gRPC service description for registration helpers.

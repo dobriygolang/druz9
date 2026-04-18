@@ -29,7 +29,7 @@ func (r *Repo) GetActiveSeason(ctx context.Context) (*model.ArenaSeason, error) 
 	return &s, nil
 }
 
-func (r *Repo) GetLeaguePosition(ctx context.Context, userID string, rating int32) (rank int32, total int32, err error) {
+func (r *Repo) GetLeaguePosition(ctx context.Context, userID string, rating int32) (rank, total int32, err error) {
 	leagueName := arenarating.LeagueName(rating)
 	league := leagueByName(leagueName)
 	minRating := league.MinRating
@@ -160,5 +160,8 @@ func (r *Repo) RunSeasonReset(ctx context.Context, endingSeason int32, newSeason
 		return fmt.Errorf("create new season: %w", err)
 	}
 
-	return tx.Commit(ctx)
+	if err := tx.Commit(ctx); err != nil {
+		return fmt.Errorf("commit season reset: %w", err)
+	}
+	return nil
 }

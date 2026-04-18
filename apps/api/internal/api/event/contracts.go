@@ -10,10 +10,10 @@ import (
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
-	ListEvents(context.Context, uuid.UUID, model.ListEventsOptions) (*model.ListEventsResponse, error)
-	CreateEvent(context.Context, uuid.UUID, bool, model.CreateEventRequest) (*model.Event, error)
-	JoinEvent(context.Context, uuid.UUID, uuid.UUID) (*model.Event, error)
-	LeaveEvent(context.Context, uuid.UUID, uuid.UUID) error
-	UpdateEvent(context.Context, uuid.UUID, *model.User, model.UpdateEventRequest) (*model.Event, error)
-	DeleteEvent(context.Context, uuid.UUID, *model.User) error
+	ListEvents(ctx context.Context, userID uuid.UUID, opts model.ListEventsOptions) (*model.ListEventsResponse, error)
+	CreateEvent(ctx context.Context, userID uuid.UUID, isAdmin bool, req model.CreateEventRequest) (*model.Event, error)
+	JoinEvent(ctx context.Context, userID, eventID uuid.UUID) (*model.Event, error)
+	LeaveEvent(ctx context.Context, userID, eventID uuid.UUID) error
+	UpdateEvent(ctx context.Context, eventID uuid.UUID, user *model.User, req model.UpdateEventRequest) (*model.Event, error)
+	DeleteEvent(ctx context.Context, eventID uuid.UUID, user *model.User) error
 }

@@ -2351,6 +2351,55 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/guild.v1.ListGuildMembersResponse'
+    /api/v1/guilds/{guildId}/members/{userId}/role:
+        post:
+            tags:
+                - GuildService
+            description: SetMemberRole promotes or demotes a guild member (creator/officer only).
+            operationId: GuildService_SetMemberRole
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+                - name: userId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.SetMemberRoleRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.SetMemberRoleResponse'
+    /api/v1/guilds/{guildId}/my-role:
+        get:
+            tags:
+                - GuildService
+            description: GetMyGuildRole returns the caller's role in the given guild.
+            operationId: GuildService_GetMyGuildRole
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.GetMyGuildRoleResponse'
     /api/v1/guilds/{guildId}/pulse:
         get:
             tags:
@@ -2369,6 +2418,31 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/guild.v1.GetGuildPulseResponse'
+    /api/v1/guilds/{guildId}/settings:
+        put:
+            tags:
+                - GuildService
+            description: UpdateGuildSettings lets a guild creator/officer rename and configure the guild.
+            operationId: GuildService_UpdateGuildSettings
+            parameters:
+                - name: guildId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/guild.v1.UpdateGuildSettingsRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/guild.v1.UpdateGuildSettingsResponse'
     /api/v1/guilds/{guildId}/territories:
         get:
             tags:
@@ -2423,6 +2497,26 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/inbox.v1.ListThreadsResponse'
+        post:
+            tags:
+                - InboxService
+            description: |-
+                CreateDirectThread opens (or returns existing) a bidirectional friend-mail
+                 thread between the caller and the given recipient. Idempotent.
+            operationId: InboxService_CreateDirectThread
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/inbox.v1.CreateDirectThreadRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/inbox.v1.CreateDirectThreadResponse'
     /api/v1/inbox/threads/{threadId}:
         get:
             tags:
@@ -2556,6 +2650,21 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/interview_prep.v1.InterviewExperience'
+    /api/v1/interview-prep/ai-mentors:
+        get:
+            tags:
+                - InterviewPrepService
+            description: |-
+                ListAIMentors returns the public catalogue of active AI mentor models.
+                 Only id, name, and tier are exposed — keys and prompts stay server-side.
+            operationId: InterviewPrepService_ListAIMentors
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/interview_prep.v1.ListAIMentorsResponse'
     /api/v1/interview-prep/companies:
         get:
             tags:
@@ -5844,6 +5953,12 @@ components:
             properties:
                 war:
                     $ref: '#/components/schemas/guild.v1.GuildWarSnapshot'
+        guild.v1.GetMyGuildRoleResponse:
+            type: object
+            properties:
+                role:
+                    type: integer
+                    format: enum
         guild.v1.Guild:
             type: object
             properties:
@@ -6156,6 +6271,38 @@ components:
                     type: array
                     items:
                         $ref: '#/components/schemas/guild.v1.GuildTerritory'
+        guild.v1.SetMemberRoleRequest:
+            type: object
+            properties:
+                guildId:
+                    type: string
+                userId:
+                    type: string
+                role:
+                    type: integer
+                    format: enum
+        guild.v1.SetMemberRoleResponse:
+            type: object
+            properties:
+                role:
+                    type: integer
+                    format: enum
+        guild.v1.UpdateGuildSettingsRequest:
+            type: object
+            properties:
+                guildId:
+                    type: string
+                name:
+                    type: string
+                description:
+                    type: string
+                isPublic:
+                    type: boolean
+        guild.v1.UpdateGuildSettingsResponse:
+            type: object
+            properties:
+                guild:
+                    $ref: '#/components/schemas/guild.v1.Guild'
         hub.v1.GetOverviewResponse:
             type: object
             properties:
@@ -6317,6 +6464,16 @@ components:
             description: |-
                 HubSeason describes the currently-live season pass (number, title and
                  a short "days left" label). `number == 0` means no active season.
+        inbox.v1.CreateDirectThreadRequest:
+            type: object
+            properties:
+                recipientId:
+                    type: string
+        inbox.v1.CreateDirectThreadResponse:
+            type: object
+            properties:
+                threadId:
+                    type: string
         inbox.v1.GetThreadResponse:
             type: object
             properties:
@@ -6415,6 +6572,16 @@ components:
             properties:
                 message:
                     $ref: '#/components/schemas/inbox.v1.InboxMessage'
+        interview_prep.v1.AIMentor:
+            type: object
+            properties:
+                id:
+                    type: string
+                name:
+                    type: string
+                tier:
+                    type: integer
+                    format: int32
         interview_prep.v1.AbortMockSessionRequest:
             type: object
             properties:
@@ -6766,6 +6933,13 @@ components:
                          task. 0 = task is tagged but hidden from mock sessions because no
                          pool includes it. Purely informational, not stored.
                     format: int32
+        interview_prep.v1.ListAIMentorsResponse:
+            type: object
+            properties:
+                mentors:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/interview_prep.v1.AIMentor'
         interview_prep.v1.ListAdminQuestionsResponse:
             type: object
             properties:

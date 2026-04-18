@@ -216,3 +216,78 @@ func scanThread(s scanner) (*model.InboxThread, error) {
 	t.ExternalID = externalID
 	return &t, nil
 }
+
+// CreateDirectThread opens a bidirectional friend mail thread between two users.
+// Creates one inbox_threads row per participant. The shared external_id links
+// the two sides so either participant can reply into each other's inbox.
+// If a thread between the pair already exists, the existing sender-side thread
+// is returned (idempotent).
+func (r *Repo) CreateDirectThread(ctx context.Context, senderID, recipientID uuid.UUID, senderName, recipientName, subject string) (*model.InboxThread, error) {
+	// Idempotency: return existing thread if one already exists for this pair.
+	var existing model.InboxThread
+	var extID *uuid.UUID
+	err := r.data.DB.QueryRow(ctx, `
+		SELECT id, user_id, kind, subject, avatar, preview, unread_count,
+		       last_message_at, external_id, interactive, created_at
+		FROM inbox_threads
+		WHERE user_id = $1 AND kind = $2 AND external_id IN (
+			SELECT external_id FROM inbox_threads
+			WHERE user_id = $3 AND kind = $2 AND external_id IS NOT NULL
+		) AND external_id IS NOT NULL
+		LIMIT 1
+	`, senderID, model.ThreadKindFriend, recipientID).Scan(
+		&existing.ID, &existing.UserID, &existing.Kind, &existing.Subject, &existing.Avatar,
+		&existing.Preview, &existing.UnreadCount, &existing.LastMessageAt, &extID,
+		&existing.Interactive, &existing.CreatedAt,
+	)
+	if err == nil {
+		existing.ExternalID = extID
+		return &existing, nil
+	}
+	if !errors.Is(err, pgx.ErrNoRows) {
+		return nil, fmt.Errorf("check existing direct thread: %w", err)
+	}
+
+	conversationID := uuid.New()
+	now := make([]interface{}, 0)
+	_ = now
+
+	tx, err := r.data.DB.Begin(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("begin direct thread tx: %w", err)
+	}
+	defer func() { _ = tx.Rollback(ctx) }()
+
+	senderThreadID := uuid.New()
+	if _, err := tx.Exec(ctx, `
+		INSERT INTO inbox_threads (id, user_id, kind, subject, avatar, preview, unread_count,
+		                           last_message_at, external_id, interactive, created_at)
+		VALUES ($1, $2, $3, $4, '', '', 0, NOW(), $5, TRUE, NOW())
+	`, senderThreadID, senderID, model.ThreadKindFriend, subject, conversationID); err != nil {
+		return nil, fmt.Errorf("insert sender thread: %w", err)
+	}
+
+	recipientSubject := "📬 " + senderName
+	if _, err := tx.Exec(ctx, `
+		INSERT INTO inbox_threads (id, user_id, kind, subject, avatar, preview, unread_count,
+		                           last_message_at, external_id, interactive, created_at)
+		VALUES ($1, $2, $3, $4, '', '', 0, NOW(), $5, TRUE, NOW())
+	`, uuid.New(), recipientID, model.ThreadKindFriend, recipientSubject, conversationID); err != nil {
+		return nil, fmt.Errorf("insert recipient thread: %w", err)
+	}
+
+	if err := tx.Commit(ctx); err != nil {
+		return nil, fmt.Errorf("commit direct thread tx: %w", err)
+	}
+
+	thread := &model.InboxThread{
+		ID:          senderThreadID,
+		UserID:      senderID,
+		Kind:        model.ThreadKindFriend,
+		Subject:     subject,
+		Interactive: true,
+		ExternalID:  &conversationID,
+	}
+	return thread, nil
+}
+

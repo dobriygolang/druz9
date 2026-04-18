@@ -25,9 +25,9 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
-// CreateEvent provides a mock function with given fields: _a0, _a1, _a2, _a3
-func (_m *Service) CreateEvent(_a0 context.Context, _a1 uuid.UUID, _a2 bool, _a3 model.CreateEventRequest) (*model.Event, error) {
-	ret := _m.Called(_a0, _a1, _a2, _a3)
+// CreateEvent provides a mock function with given fields: ctx, userID, isAdmin, req
+func (_m *Service) CreateEvent(ctx context.Context, userID uuid.UUID, isAdmin bool, req model.CreateEventRequest) (*model.Event, error) {
+	ret := _m.Called(ctx, userID, isAdmin, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateEvent")
@@ -36,10 +36,10 @@ func (_m *Service) CreateEvent(_a0 context.Context, _a1 uuid.UUID, _a2 bool, _a3
 	var r0 *model.Event
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, bool, model.CreateEventRequest) (*model.Event, error)); ok {
-		return rf(_a0, _a1, _a2, _a3)
+		return rf(ctx, userID, isAdmin, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, bool, model.CreateEventRequest) *model.Event); ok {
-		r0 = rf(_a0, _a1, _a2, _a3)
+		r0 = rf(ctx, userID, isAdmin, req)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Event)
@@ -47,7 +47,7 @@ func (_m *Service) CreateEvent(_a0 context.Context, _a1 uuid.UUID, _a2 bool, _a3
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, bool, model.CreateEventRequest) error); ok {
-		r1 = rf(_a0, _a1, _a2, _a3)
+		r1 = rf(ctx, userID, isAdmin, req)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -61,15 +61,15 @@ type Service_CreateEvent_Call struct {
 }
 
 // CreateEvent is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 bool
-//   - _a3 model.CreateEventRequest
-func (_e *Service_Expecter) CreateEvent(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}) *Service_CreateEvent_Call {
-	return &Service_CreateEvent_Call{Call: _e.mock.On("CreateEvent", _a0, _a1, _a2, _a3)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - isAdmin bool
+//   - req model.CreateEventRequest
+func (_e *Service_Expecter) CreateEvent(ctx interface{}, userID interface{}, isAdmin interface{}, req interface{}) *Service_CreateEvent_Call {
+	return &Service_CreateEvent_Call{Call: _e.mock.On("CreateEvent", ctx, userID, isAdmin, req)}
 }
 
-func (_c *Service_CreateEvent_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 bool, _a3 model.CreateEventRequest)) *Service_CreateEvent_Call {
+func (_c *Service_CreateEvent_Call) Run(run func(ctx context.Context, userID uuid.UUID, isAdmin bool, req model.CreateEventRequest)) *Service_CreateEvent_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(bool), args[3].(model.CreateEventRequest))
 	})
@@ -86,9 +86,9 @@ func (_c *Service_CreateEvent_Call) RunAndReturn(run func(context.Context, uuid.
 	return _c
 }
 
-// DeleteEvent provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) DeleteEvent(_a0 context.Context, _a1 uuid.UUID, _a2 *model.User) error {
-	ret := _m.Called(_a0, _a1, _a2)
+// DeleteEvent provides a mock function with given fields: ctx, eventID, user
+func (_m *Service) DeleteEvent(ctx context.Context, eventID uuid.UUID, user *model.User) error {
+	ret := _m.Called(ctx, eventID, user)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeleteEvent")
@@ -96,7 +96,7 @@ func (_m *Service) DeleteEvent(_a0 context.Context, _a1 uuid.UUID, _a2 *model.Us
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User) error); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, eventID, user)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -110,14 +110,14 @@ type Service_DeleteEvent_Call struct {
 }
 
 // DeleteEvent is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 *model.User
-func (_e *Service_Expecter) DeleteEvent(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_DeleteEvent_Call {
-	return &Service_DeleteEvent_Call{Call: _e.mock.On("DeleteEvent", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - eventID uuid.UUID
+//   - user *model.User
+func (_e *Service_Expecter) DeleteEvent(ctx interface{}, eventID interface{}, user interface{}) *Service_DeleteEvent_Call {
+	return &Service_DeleteEvent_Call{Call: _e.mock.On("DeleteEvent", ctx, eventID, user)}
 }
 
-func (_c *Service_DeleteEvent_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 *model.User)) *Service_DeleteEvent_Call {
+func (_c *Service_DeleteEvent_Call) Run(run func(ctx context.Context, eventID uuid.UUID, user *model.User)) *Service_DeleteEvent_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*model.User))
 	})
@@ -134,9 +134,9 @@ func (_c *Service_DeleteEvent_Call) RunAndReturn(run func(context.Context, uuid.
 	return _c
 }
 
-// JoinEvent provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) JoinEvent(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (*model.Event, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// JoinEvent provides a mock function with given fields: ctx, userID, eventID
+func (_m *Service) JoinEvent(ctx context.Context, userID uuid.UUID, eventID uuid.UUID) (*model.Event, error) {
+	ret := _m.Called(ctx, userID, eventID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for JoinEvent")
@@ -145,10 +145,10 @@ func (_m *Service) JoinEvent(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) 
 	var r0 *model.Event
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*model.Event, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, userID, eventID)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *model.Event); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, eventID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Event)
@@ -156,7 +156,7 @@ func (_m *Service) JoinEvent(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) 
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, userID, eventID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -170,14 +170,14 @@ type Service_JoinEvent_Call struct {
 }
 
 // JoinEvent is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-func (_e *Service_Expecter) JoinEvent(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_JoinEvent_Call {
-	return &Service_JoinEvent_Call{Call: _e.mock.On("JoinEvent", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - eventID uuid.UUID
+func (_e *Service_Expecter) JoinEvent(ctx interface{}, userID interface{}, eventID interface{}) *Service_JoinEvent_Call {
+	return &Service_JoinEvent_Call{Call: _e.mock.On("JoinEvent", ctx, userID, eventID)}
 }
 
-func (_c *Service_JoinEvent_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_JoinEvent_Call {
+func (_c *Service_JoinEvent_Call) Run(run func(ctx context.Context, userID uuid.UUID, eventID uuid.UUID)) *Service_JoinEvent_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
 	})
@@ -194,9 +194,9 @@ func (_c *Service_JoinEvent_Call) RunAndReturn(run func(context.Context, uuid.UU
 	return _c
 }
 
-// LeaveEvent provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) LeaveEvent(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) error {
-	ret := _m.Called(_a0, _a1, _a2)
+// LeaveEvent provides a mock function with given fields: ctx, userID, eventID
+func (_m *Service) LeaveEvent(ctx context.Context, userID uuid.UUID, eventID uuid.UUID) error {
+	ret := _m.Called(ctx, userID, eventID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for LeaveEvent")
@@ -204,7 +204,7 @@ func (_m *Service) LeaveEvent(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, eventID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -218,14 +218,14 @@ type Service_LeaveEvent_Call struct {
 }
 
 // LeaveEvent is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-func (_e *Service_Expecter) LeaveEvent(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_LeaveEvent_Call {
-	return &Service_LeaveEvent_Call{Call: _e.mock.On("LeaveEvent", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - eventID uuid.UUID
+func (_e *Service_Expecter) LeaveEvent(ctx interface{}, userID interface{}, eventID interface{}) *Service_LeaveEvent_Call {
+	return &Service_LeaveEvent_Call{Call: _e.mock.On("LeaveEvent", ctx, userID, eventID)}
 }
 
-func (_c *Service_LeaveEvent_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_LeaveEvent_Call {
+func (_c *Service_LeaveEvent_Call) Run(run func(ctx context.Context, userID uuid.UUID, eventID uuid.UUID)) *Service_LeaveEvent_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
 	})
@@ -242,9 +242,9 @@ func (_c *Service_LeaveEvent_Call) RunAndReturn(run func(context.Context, uuid.U
 	return _c
 }
 
-// ListEvents provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) ListEvents(_a0 context.Context, _a1 uuid.UUID, _a2 model.ListEventsOptions) (*model.ListEventsResponse, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// ListEvents provides a mock function with given fields: ctx, userID, opts
+func (_m *Service) ListEvents(ctx context.Context, userID uuid.UUID, opts model.ListEventsOptions) (*model.ListEventsResponse, error) {
+	ret := _m.Called(ctx, userID, opts)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListEvents")
@@ -253,10 +253,10 @@ func (_m *Service) ListEvents(_a0 context.Context, _a1 uuid.UUID, _a2 model.List
 	var r0 *model.ListEventsResponse
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.ListEventsOptions) (*model.ListEventsResponse, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, userID, opts)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.ListEventsOptions) *model.ListEventsResponse); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, opts)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ListEventsResponse)
@@ -264,7 +264,7 @@ func (_m *Service) ListEvents(_a0 context.Context, _a1 uuid.UUID, _a2 model.List
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, model.ListEventsOptions) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, userID, opts)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -278,14 +278,14 @@ type Service_ListEvents_Call struct {
 }
 
 // ListEvents is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 model.ListEventsOptions
-func (_e *Service_Expecter) ListEvents(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_ListEvents_Call {
-	return &Service_ListEvents_Call{Call: _e.mock.On("ListEvents", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - opts model.ListEventsOptions
+func (_e *Service_Expecter) ListEvents(ctx interface{}, userID interface{}, opts interface{}) *Service_ListEvents_Call {
+	return &Service_ListEvents_Call{Call: _e.mock.On("ListEvents", ctx, userID, opts)}
 }
 
-func (_c *Service_ListEvents_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 model.ListEventsOptions)) *Service_ListEvents_Call {
+func (_c *Service_ListEvents_Call) Run(run func(ctx context.Context, userID uuid.UUID, opts model.ListEventsOptions)) *Service_ListEvents_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(model.ListEventsOptions))
 	})
@@ -302,9 +302,9 @@ func (_c *Service_ListEvents_Call) RunAndReturn(run func(context.Context, uuid.U
 	return _c
 }
 
-// UpdateEvent provides a mock function with given fields: _a0, _a1, _a2, _a3
-func (_m *Service) UpdateEvent(_a0 context.Context, _a1 uuid.UUID, _a2 *model.User, _a3 model.UpdateEventRequest) (*model.Event, error) {
-	ret := _m.Called(_a0, _a1, _a2, _a3)
+// UpdateEvent provides a mock function with given fields: ctx, eventID, user, req
+func (_m *Service) UpdateEvent(ctx context.Context, eventID uuid.UUID, user *model.User, req model.UpdateEventRequest) (*model.Event, error) {
+	ret := _m.Called(ctx, eventID, user, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateEvent")
@@ -313,10 +313,10 @@ func (_m *Service) UpdateEvent(_a0 context.Context, _a1 uuid.UUID, _a2 *model.Us
 	var r0 *model.Event
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User, model.UpdateEventRequest) (*model.Event, error)); ok {
-		return rf(_a0, _a1, _a2, _a3)
+		return rf(ctx, eventID, user, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User, model.UpdateEventRequest) *model.Event); ok {
-		r0 = rf(_a0, _a1, _a2, _a3)
+		r0 = rf(ctx, eventID, user, req)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Event)
@@ -324,7 +324,7 @@ func (_m *Service) UpdateEvent(_a0 context.Context, _a1 uuid.UUID, _a2 *model.Us
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, *model.User, model.UpdateEventRequest) error); ok {
-		r1 = rf(_a0, _a1, _a2, _a3)
+		r1 = rf(ctx, eventID, user, req)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -338,15 +338,15 @@ type Service_UpdateEvent_Call struct {
 }
 
 // UpdateEvent is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 *model.User
-//   - _a3 model.UpdateEventRequest
-func (_e *Service_Expecter) UpdateEvent(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}) *Service_UpdateEvent_Call {
-	return &Service_UpdateEvent_Call{Call: _e.mock.On("UpdateEvent", _a0, _a1, _a2, _a3)}
+//   - ctx context.Context
+//   - eventID uuid.UUID
+//   - user *model.User
+//   - req model.UpdateEventRequest
+func (_e *Service_Expecter) UpdateEvent(ctx interface{}, eventID interface{}, user interface{}, req interface{}) *Service_UpdateEvent_Call {
+	return &Service_UpdateEvent_Call{Call: _e.mock.On("UpdateEvent", ctx, eventID, user, req)}
 }
 
-func (_c *Service_UpdateEvent_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 *model.User, _a3 model.UpdateEventRequest)) *Service_UpdateEvent_Call {
+func (_c *Service_UpdateEvent_Call) Run(run func(ctx context.Context, eventID uuid.UUID, user *model.User, req model.UpdateEventRequest)) *Service_UpdateEvent_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*model.User), args[3].(model.UpdateEventRequest))
 	})

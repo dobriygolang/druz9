@@ -1,13 +1,15 @@
 package arena
 
 import (
+	"fmt"
+
 	"github.com/jackc/pgx/v5/pgtype"
 
 	domain "api/internal/domain/arena"
 )
 
 func scanMatchWithTask(row scanner, match *domain.Match, task *domain.Task, executionProfile *string, runnerMode *int) error {
-	return row.Scan(
+	if err := row.Scan(
 		&match.ID,
 		&match.CreatorUserID,
 		&match.TaskID,
@@ -48,11 +50,14 @@ func scanMatchWithTask(row scanner, match *domain.Match, task *domain.Task, exec
 		&task.IsActive,
 		&task.CreatedAt,
 		&task.UpdatedAt,
-	)
+	); err != nil {
+		return fmt.Errorf("scan match with task: %w", err)
+	}
+	return nil
 }
 
 func scanPlayerWithCode(row scanner, player *domain.Player) error {
-	return row.Scan(
+	if err := row.Scan(
 		&player.MatchID,
 		&player.UserID,
 		&player.DisplayName,
@@ -67,11 +72,14 @@ func scanPlayerWithCode(row scanner, player *domain.Player) error {
 		&player.JoinedAt,
 		&player.UpdatedAt,
 		&player.CurrentCode,
-	)
+	); err != nil {
+		return fmt.Errorf("scan player with code: %w", err)
+	}
+	return nil
 }
 
 func scanLeaderboardEntry(row scanner, item *domain.LeaderboardEntry) error {
-	return row.Scan(
+	if err := row.Scan(
 		&item.UserID,
 		&item.DisplayName,
 		&item.Rating,
@@ -83,7 +91,10 @@ func scanLeaderboardEntry(row scanner, item *domain.LeaderboardEntry) error {
 		&item.PeakRating,
 		new(int32), // current_win_streak — not used in leaderboard entry
 		new(int32), // best_win_streak — not used in leaderboard entry
-	)
+	); err != nil {
+		return fmt.Errorf("scan leaderboard entry: %w", err)
+	}
+	return nil
 }
 
 func scanPlayerStats(row scanner, item *domain.PlayerStats) error {

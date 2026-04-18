@@ -2,6 +2,7 @@ package interview_prep
 
 import (
 	"context"
+	"fmt"
 	"strings"
 
 	kerrs "github.com/go-kratos/kratos/v2/errors"
@@ -20,7 +21,7 @@ import (
 func (i *Implementation) PostInterviewExperience(ctx context.Context, req *v1.PostInterviewExperienceRequest) (*v1.InterviewExperience, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	company := strings.TrimSpace(strings.ToLower(req.GetCompanyTag()))
 	if company == "" {
@@ -56,7 +57,7 @@ func (i *Implementation) PostInterviewExperience(ctx context.Context, req *v1.Po
 
 func (i *Implementation) ListInterviewExperiences(ctx context.Context, req *v1.ListInterviewExperiencesRequest) (*v1.ListInterviewExperiencesResponse, error) {
 	if _, err := apihelpers.RequireUser(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	p := apihelpers.ClampPage(req.GetLimit(), req.GetOffset(), 20, 100)
 	company := strings.TrimSpace(strings.ToLower(req.GetCompanyTag()))

@@ -2,8 +2,8 @@ package shop
 
 import (
 	"context"
+	"fmt"
 
-	"github.com/go-kratos/kratos/v2/errors"
 	klog "github.com/go-kratos/kratos/v2/log"
 
 	"api/internal/apihelpers"
@@ -22,7 +22,7 @@ func (i *Implementation) AdminListItems(ctx context.Context, req *v1.AdminListIt
 	list, err := i.service.AdminListItems(ctx, model.ItemCategory(req.GetCategory()), model.ItemRarity(req.GetRarity()), p.Limit, p.Offset)
 	if err != nil {
 		klog.Errorf("shop: admin list items: %v", err)
-		return nil, errors.InternalServer("INTERNAL", "failed to load items")
+		return nil, fmt.Errorf("admin list items: %w", err)
 	}
 	out := make([]*v1.ShopItem, 0, len(list.Items))
 	for _, it := range list.Items {
@@ -52,7 +52,7 @@ func (i *Implementation) AdminCreateItem(ctx context.Context, req *v1.AdminCreat
 	created, err := i.service.AdminCreateItem(ctx, item)
 	if err != nil {
 		klog.Errorf("shop: admin create item slug=%q: %v", req.GetSlug(), err)
-		return nil, errors.InternalServer("INTERNAL", "failed to create item")
+		return nil, fmt.Errorf("admin create item: %w", err)
 	}
 	return mapItem(created), nil
 }
@@ -83,7 +83,7 @@ func (i *Implementation) AdminUpdateItem(ctx context.Context, req *v1.AdminUpdat
 	updated, err := i.service.AdminUpdateItem(ctx, item)
 	if err != nil {
 		klog.Errorf("shop: admin update item id=%s: %v", id, err)
-		return nil, errors.InternalServer("INTERNAL", "failed to update item")
+		return nil, fmt.Errorf("admin update item: %w", err)
 	}
 	return mapItem(updated), nil
 }
@@ -98,7 +98,7 @@ func (i *Implementation) AdminDeleteItem(ctx context.Context, req *v1.AdminDelet
 	}
 	if err := i.service.AdminDeleteItem(ctx, id); err != nil {
 		klog.Errorf("shop: admin delete item id=%s: %v", id, err)
-		return nil, errors.InternalServer("INTERNAL", "failed to delete item")
+		return nil, fmt.Errorf("admin delete item: %w", err)
 	}
 	return &v1.AdminDeleteItemResponse{Ok: true}, nil
 }

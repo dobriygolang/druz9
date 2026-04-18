@@ -310,7 +310,7 @@ func normalizeSupportedLanguages(task *model.InterviewPrepTask) []string {
 	return []string{strings.TrimSpace(strings.ToLower(task.Language))}
 }
 
-func (r *Repo) syncDefaultPoolsForTask(ctx context.Context, taskID uuid.UUID, roundType string, companyTag string) error {
+func (r *Repo) syncDefaultPoolsForTask(ctx context.Context, taskID uuid.UUID, roundType, companyTag string) error {
 	if _, err := r.data.DB.Exec(ctx, `DELETE FROM interview_pool_items WHERE item_id = $1`, taskID); err != nil {
 		return fmt.Errorf("clear task pool membership: %w", err)
 	}

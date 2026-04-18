@@ -2,6 +2,7 @@ package referral
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/apihelpers"
 	"api/internal/model"
@@ -18,7 +19,7 @@ func (i *Implementation) ListReferrals(ctx context.Context, req *v1.ListReferral
 
 	resp, err := i.service.ListReferrals(ctx, user, opts)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list referrals: %w", err)
 	}
 
 	referrals := make([]*v1.Referral, 0, len(resp.Referrals))

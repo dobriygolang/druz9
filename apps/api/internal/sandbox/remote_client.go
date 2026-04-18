@@ -12,6 +12,12 @@ import (
 	"time"
 )
 
+var (
+	errRemoteBaseURLNotConfigured = errors.New("sandbox remote base URL is not configured")
+	errRunnerEmptyResult          = errors.New("sandbox runner returned empty result")
+	errRunnerError                = errors.New("sandbox runner error")
+)
+
 type RemoteConfig struct {
 	BaseURL string
 	Timeout time.Duration
@@ -38,7 +44,7 @@ func NewRemote(cfg RemoteConfig) *RemoteClient {
 
 func (c *RemoteClient) Execute(ctx context.Context, req ExecutionRequest) (ExecutionResult, error) {
 	if c == nil || c.baseURL == "" {
-		return ExecutionResult{}, errors.New("sandbox remote base URL is not configured")
+		return ExecutionResult{}, errRemoteBaseURLNotConfigured
 	}
 
 	payload, err := json.Marshal(ExecuteEnvelope{Request: req})
@@ -73,7 +79,7 @@ func (c *RemoteClient) Execute(ctx context.Context, req ExecutionRequest) (Execu
 		if message == "" {
 			message = resp.Status
 		}
-		return ExecutionResult{}, fmt.Errorf("sandbox runner returned %s: %s", resp.Status, message)
+		return ExecutionResult{}, fmt.Errorf("%w: %s %s", errRunnerEmptyResult, resp.Status, message)
 	}
 
 	var envelope ExecuteResponseEnvelope
@@ -81,10 +87,10 @@ func (c *RemoteClient) Execute(ctx context.Context, req ExecutionRequest) (Execu
 		return ExecutionResult{}, fmt.Errorf("decode sandbox runner response: %w", err)
 	}
 	if strings.TrimSpace(envelope.Error) != "" {
-		return ExecutionResult{}, fmt.Errorf("%s", strings.TrimSpace(envelope.Error))
+		return ExecutionResult{}, fmt.Errorf("%w: %s", errRunnerError, strings.TrimSpace(envelope.Error))
 	}
 	if envelope.Result == nil {
-		return ExecutionResult{}, errors.New("sandbox runner returned empty result")
+		return ExecutionResult{}, errRunnerEmptyResult
 	}
 	return *envelope.Result, nil
 }

@@ -34,6 +34,7 @@ const OperationInterviewPrepServiceDeleteMockQuestionPool = "/interview_prep.v1.
 const OperationInterviewPrepServiceGetAdminTask = "/interview_prep.v1.InterviewPrepService/GetAdminTask"
 const OperationInterviewPrepServiceGetMockSession = "/interview_prep.v1.InterviewPrepService/GetMockSession"
 const OperationInterviewPrepServiceGetSession = "/interview_prep.v1.InterviewPrepService/GetSession"
+const OperationInterviewPrepServiceListAIMentors = "/interview_prep.v1.InterviewPrepService/ListAIMentors"
 const OperationInterviewPrepServiceListAdminQuestions = "/interview_prep.v1.InterviewPrepService/ListAdminQuestions"
 const OperationInterviewPrepServiceListAdminTasks = "/interview_prep.v1.InterviewPrepService/ListAdminTasks"
 const OperationInterviewPrepServiceListCompanies = "/interview_prep.v1.InterviewPrepService/ListCompanies"
@@ -73,6 +74,9 @@ type InterviewPrepServiceHTTPServer interface {
 	GetAdminTask(context.Context, *GetAdminTaskRequest) (*AdminTaskEnvelope, error)
 	GetMockSession(context.Context, *GetMockSessionRequest) (*MockSessionEnvelope, error)
 	GetSession(context.Context, *GetSessionRequest) (*SessionEnvelope, error)
+	// ListAIMentors ListAIMentors returns the public catalogue of active AI mentor models.
+	// Only id, name, and tier are exposed — keys and prompts stay server-side.
+	ListAIMentors(context.Context, *ListAIMentorsRequest) (*ListAIMentorsResponse, error)
 	ListAdminQuestions(context.Context, *ListAdminQuestionsRequest) (*ListAdminQuestionsResponse, error)
 	ListAdminTasks(context.Context, *ListAdminTasksRequest) (*ListAdminTasksResponse, error)
 	ListCompanies(context.Context, *ListCompaniesRequest) (*ListCompaniesResponse, error)
@@ -130,6 +134,7 @@ func RegisterInterviewPrepServiceHTTPServer(s *http.Server, srv InterviewPrepSer
 	r.DELETE("/api/admin/interview-prep/mock-company-presets/{id}", _InterviewPrepService_DeleteMockCompanyPreset0_HTTP_Handler(srv))
 	r.POST("/api/v1/interview-board", _InterviewPrepService_PostInterviewExperience0_HTTP_Handler(srv))
 	r.GET("/api/v1/interview-board", _InterviewPrepService_ListInterviewExperiences0_HTTP_Handler(srv))
+	r.GET("/api/v1/interview-prep/ai-mentors", _InterviewPrepService_ListAIMentors1_HTTP_Handler(srv))
 }
 
 func _InterviewPrepService_ListTasks1_HTTP_Handler(srv InterviewPrepServiceHTTPServer) func(ctx http.Context) error {
@@ -895,6 +900,25 @@ func _InterviewPrepService_ListInterviewExperiences0_HTTP_Handler(srv InterviewP
 	}
 }
 
+func _InterviewPrepService_ListAIMentors1_HTTP_Handler(srv InterviewPrepServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in ListAIMentorsRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInterviewPrepServiceListAIMentors)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.ListAIMentors(ctx, req.(*ListAIMentorsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*ListAIMentorsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type InterviewPrepServiceHTTPClient interface {
 	AbortMockSession(ctx context.Context, req *AbortMockSessionRequest, opts ...http.CallOption) (rsp *StatusResponse, err error)
 	AnswerMockQuestion(ctx context.Context, req *AnswerMockQuestionRequest, opts ...http.CallOption) (rsp *AnswerMockQuestionResponse, err error)
@@ -914,6 +938,9 @@ type InterviewPrepServiceHTTPClient interface {
 	GetAdminTask(ctx context.Context, req *GetAdminTaskRequest, opts ...http.CallOption) (rsp *AdminTaskEnvelope, err error)
 	GetMockSession(ctx context.Context, req *GetMockSessionRequest, opts ...http.CallOption) (rsp *MockSessionEnvelope, err error)
 	GetSession(ctx context.Context, req *GetSessionRequest, opts ...http.CallOption) (rsp *SessionEnvelope, err error)
+	// ListAIMentors ListAIMentors returns the public catalogue of active AI mentor models.
+	// Only id, name, and tier are exposed — keys and prompts stay server-side.
+	ListAIMentors(ctx context.Context, req *ListAIMentorsRequest, opts ...http.CallOption) (rsp *ListAIMentorsResponse, err error)
 	ListAdminQuestions(ctx context.Context, req *ListAdminQuestionsRequest, opts ...http.CallOption) (rsp *ListAdminQuestionsResponse, err error)
 	ListAdminTasks(ctx context.Context, req *ListAdminTasksRequest, opts ...http.CallOption) (rsp *ListAdminTasksResponse, err error)
 	ListCompanies(ctx context.Context, req *ListCompaniesRequest, opts ...http.CallOption) (rsp *ListCompaniesResponse, err error)
@@ -1133,6 +1160,21 @@ func (c *InterviewPrepServiceHTTPClientImpl) GetSession(ctx context.Context, in 
 	pattern := "/api/v1/interview-prep/sessions/{session_id}"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationInterviewPrepServiceGetSession))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// ListAIMentors ListAIMentors returns the public catalogue of active AI mentor models.
+// Only id, name, and tier are exposed — keys and prompts stay server-side.
+func (c *InterviewPrepServiceHTTPClientImpl) ListAIMentors(ctx context.Context, in *ListAIMentorsRequest, opts ...http.CallOption) (*ListAIMentorsResponse, error) {
+	var out ListAIMentorsResponse
+	pattern := "/api/v1/interview-prep/ai-mentors"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationInterviewPrepServiceListAIMentors))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
 	if err != nil {

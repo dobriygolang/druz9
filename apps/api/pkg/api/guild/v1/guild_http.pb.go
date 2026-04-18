@@ -28,6 +28,7 @@ const OperationGuildServiceGetActiveGuildChallenge = "/guild.v1.GuildService/Get
 const OperationGuildServiceGetGuildMemberStats = "/guild.v1.GuildService/GetGuildMemberStats"
 const OperationGuildServiceGetGuildPulse = "/guild.v1.GuildService/GetGuildPulse"
 const OperationGuildServiceGetGuildWar = "/guild.v1.GuildService/GetGuildWar"
+const OperationGuildServiceGetMyGuildRole = "/guild.v1.GuildService/GetMyGuildRole"
 const OperationGuildServiceInviteToGuild = "/guild.v1.GuildService/InviteToGuild"
 const OperationGuildServiceJoinGuild = "/guild.v1.GuildService/JoinGuild"
 const OperationGuildServiceLeaveGuild = "/guild.v1.GuildService/LeaveGuild"
@@ -35,6 +36,8 @@ const OperationGuildServiceListGuildEvents = "/guild.v1.GuildService/ListGuildEv
 const OperationGuildServiceListGuildMembers = "/guild.v1.GuildService/ListGuildMembers"
 const OperationGuildServiceListGuilds = "/guild.v1.GuildService/ListGuilds"
 const OperationGuildServiceListTerritories = "/guild.v1.GuildService/ListTerritories"
+const OperationGuildServiceSetMemberRole = "/guild.v1.GuildService/SetMemberRole"
+const OperationGuildServiceUpdateGuildSettings = "/guild.v1.GuildService/UpdateGuildSettings"
 
 type GuildServiceHTTPServer interface {
 	// ContributeToFront ContributeToFront adds rounds to a front's our_rounds counter. The
@@ -54,6 +57,8 @@ type GuildServiceHTTPServer interface {
 	// nil war field so the client can render a "no active war" state rather
 	// than 404.
 	GetGuildWar(context.Context, *GetGuildWarRequest) (*GetGuildWarResponse, error)
+	// GetMyGuildRole GetMyGuildRole returns the caller's role in the given guild.
+	GetMyGuildRole(context.Context, *GetMyGuildRoleRequest) (*GetMyGuildRoleResponse, error)
 	InviteToGuild(context.Context, *InviteToGuildRequest) (*InviteToGuildResponse, error)
 	JoinGuild(context.Context, *JoinGuildRequest) (*JoinGuildResponse, error)
 	LeaveGuild(context.Context, *LeaveGuildRequest) (*LeaveGuildResponse, error)
@@ -61,6 +66,10 @@ type GuildServiceHTTPServer interface {
 	ListGuildMembers(context.Context, *ListGuildMembersRequest) (*ListGuildMembersResponse, error)
 	ListGuilds(context.Context, *ListGuildsRequest) (*ListGuildsResponse, error)
 	ListTerritories(context.Context, *ListTerritoriesRequest) (*ListTerritoriesResponse, error)
+	// SetMemberRole SetMemberRole promotes or demotes a guild member (creator/officer only).
+	SetMemberRole(context.Context, *SetMemberRoleRequest) (*SetMemberRoleResponse, error)
+	// UpdateGuildSettings UpdateGuildSettings lets a guild creator/officer rename and configure the guild.
+	UpdateGuildSettings(context.Context, *UpdateGuildSettingsRequest) (*UpdateGuildSettingsResponse, error)
 }
 
 func RegisterGuildServiceHTTPServer(s *http.Server, srv GuildServiceHTTPServer) {
@@ -81,6 +90,9 @@ func RegisterGuildServiceHTTPServer(s *http.Server, srv GuildServiceHTTPServer) 
 	r.GET("/api/v1/guilds/war", _GuildService_GetGuildWar0_HTTP_Handler(srv))
 	r.POST("/api/v1/guilds/war/fronts/{front_id}/contribute", _GuildService_ContributeToFront0_HTTP_Handler(srv))
 	r.GET("/api/v1/guilds/{guild_id}/territories", _GuildService_ListTerritories0_HTTP_Handler(srv))
+	r.GET("/api/v1/guilds/{guild_id}/my-role", _GuildService_GetMyGuildRole0_HTTP_Handler(srv))
+	r.PUT("/api/v1/guilds/{guild_id}/settings", _GuildService_UpdateGuildSettings0_HTTP_Handler(srv))
+	r.POST("/api/v1/guilds/{guild_id}/members/{user_id}/role", _GuildService_SetMemberRole0_HTTP_Handler(srv))
 }
 
 func _GuildService_ListGuilds0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
@@ -447,6 +459,78 @@ func _GuildService_ListTerritories0_HTTP_Handler(srv GuildServiceHTTPServer) fun
 	}
 }
 
+func _GuildService_GetMyGuildRole0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in GetMyGuildRoleRequest
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceGetMyGuildRole)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.GetMyGuildRole(ctx, req.(*GetMyGuildRoleRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*GetMyGuildRoleResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GuildService_UpdateGuildSettings0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in UpdateGuildSettingsRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceUpdateGuildSettings)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.UpdateGuildSettings(ctx, req.(*UpdateGuildSettingsRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*UpdateGuildSettingsResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
+func _GuildService_SetMemberRole0_HTTP_Handler(srv GuildServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in SetMemberRoleRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindVars(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationGuildServiceSetMemberRole)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.SetMemberRole(ctx, req.(*SetMemberRoleRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*SetMemberRoleResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type GuildServiceHTTPClient interface {
 	// ContributeToFront ContributeToFront adds rounds to a front's our_rounds counter. The
 	// caller must be a member of the war's owning guild; the backend
@@ -465,6 +549,8 @@ type GuildServiceHTTPClient interface {
 	// nil war field so the client can render a "no active war" state rather
 	// than 404.
 	GetGuildWar(ctx context.Context, req *GetGuildWarRequest, opts ...http.CallOption) (rsp *GetGuildWarResponse, err error)
+	// GetMyGuildRole GetMyGuildRole returns the caller's role in the given guild.
+	GetMyGuildRole(ctx context.Context, req *GetMyGuildRoleRequest, opts ...http.CallOption) (rsp *GetMyGuildRoleResponse, err error)
 	InviteToGuild(ctx context.Context, req *InviteToGuildRequest, opts ...http.CallOption) (rsp *InviteToGuildResponse, err error)
 	JoinGuild(ctx context.Context, req *JoinGuildRequest, opts ...http.CallOption) (rsp *JoinGuildResponse, err error)
 	LeaveGuild(ctx context.Context, req *LeaveGuildRequest, opts ...http.CallOption) (rsp *LeaveGuildResponse, err error)
@@ -472,6 +558,10 @@ type GuildServiceHTTPClient interface {
 	ListGuildMembers(ctx context.Context, req *ListGuildMembersRequest, opts ...http.CallOption) (rsp *ListGuildMembersResponse, err error)
 	ListGuilds(ctx context.Context, req *ListGuildsRequest, opts ...http.CallOption) (rsp *ListGuildsResponse, err error)
 	ListTerritories(ctx context.Context, req *ListTerritoriesRequest, opts ...http.CallOption) (rsp *ListTerritoriesResponse, err error)
+	// SetMemberRole SetMemberRole promotes or demotes a guild member (creator/officer only).
+	SetMemberRole(ctx context.Context, req *SetMemberRoleRequest, opts ...http.CallOption) (rsp *SetMemberRoleResponse, err error)
+	// UpdateGuildSettings UpdateGuildSettings lets a guild creator/officer rename and configure the guild.
+	UpdateGuildSettings(ctx context.Context, req *UpdateGuildSettingsRequest, opts ...http.CallOption) (rsp *UpdateGuildSettingsResponse, err error)
 }
 
 type GuildServiceHTTPClientImpl struct {
@@ -607,6 +697,20 @@ func (c *GuildServiceHTTPClientImpl) GetGuildWar(ctx context.Context, in *GetGui
 	return &out, nil
 }
 
+// GetMyGuildRole GetMyGuildRole returns the caller's role in the given guild.
+func (c *GuildServiceHTTPClientImpl) GetMyGuildRole(ctx context.Context, in *GetMyGuildRoleRequest, opts ...http.CallOption) (*GetMyGuildRoleResponse, error) {
+	var out GetMyGuildRoleResponse
+	pattern := "/api/v1/guilds/{guild_id}/my-role"
+	path := binding.EncodeURL(pattern, in, true)
+	opts = append(opts, http.Operation(OperationGuildServiceGetMyGuildRole))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
 func (c *GuildServiceHTTPClientImpl) InviteToGuild(ctx context.Context, in *InviteToGuildRequest, opts ...http.CallOption) (*InviteToGuildResponse, error) {
 	var out InviteToGuildResponse
 	pattern := "/api/v1/guilds/{guild_id}/invite"
@@ -692,6 +796,34 @@ func (c *GuildServiceHTTPClientImpl) ListTerritories(ctx context.Context, in *Li
 	opts = append(opts, http.Operation(OperationGuildServiceListTerritories))
 	opts = append(opts, http.PathTemplate(pattern))
 	err := c.cc.Invoke(ctx, "GET", path, nil, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// SetMemberRole SetMemberRole promotes or demotes a guild member (creator/officer only).
+func (c *GuildServiceHTTPClientImpl) SetMemberRole(ctx context.Context, in *SetMemberRoleRequest, opts ...http.CallOption) (*SetMemberRoleResponse, error) {
+	var out SetMemberRoleResponse
+	pattern := "/api/v1/guilds/{guild_id}/members/{user_id}/role"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationGuildServiceSetMemberRole))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
+}
+
+// UpdateGuildSettings UpdateGuildSettings lets a guild creator/officer rename and configure the guild.
+func (c *GuildServiceHTTPClientImpl) UpdateGuildSettings(ctx context.Context, in *UpdateGuildSettingsRequest, opts ...http.CallOption) (*UpdateGuildSettingsResponse, error) {
+	var out UpdateGuildSettingsResponse
+	pattern := "/api/v1/guilds/{guild_id}/settings"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationGuildServiceUpdateGuildSettings))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "PUT", path, in, &out, opts...)
 	if err != nil {
 		return nil, err
 	}

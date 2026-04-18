@@ -181,7 +181,10 @@ func (r *Repo) GetCompletions(ctx context.Context, userID uuid.UUID, periodKey s
 		}
 		result[key] = true
 	}
-	return result, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate rows: %w", err)
+	}
+	return result, nil
 }
 
 // RecordCompletion inserts a mission completion record (idempotent via ON CONFLICT).

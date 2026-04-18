@@ -75,7 +75,7 @@ func (h *Hub) Stop() {
 	h.cancel()
 }
 
-func (h *Hub) Handler(matchID string, authenticatedUserID string) http.Handler {
+func (h *Hub) Handler(matchID, authenticatedUserID string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ws, err := h.upgrader.Upgrade(w, r, nil)
 		if err != nil {

@@ -114,11 +114,11 @@ func containsAny(s string, needles []string) bool {
 func (i *Implementation) GetCoachReport(ctx context.Context, req *v1.GetCoachReportRequest) (*v1.GetCoachReportResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	bookingID, err := apihelpers.ParseUUID(req.GetBookingId(), "INVALID_BOOKING_ID", "booking_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse booking id: %w", err)
 	}
 	booking, err := i.repo.GetBooking(ctx, bookingID, user.ID)
 	if err != nil {

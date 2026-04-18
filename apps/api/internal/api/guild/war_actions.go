@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 	goerr "errors"
 
 	kerrs "github.com/go-kratos/kratos/v2/errors"
@@ -35,7 +36,7 @@ func (i *Implementation) ensureActiveWar(ctx context.Context, userID any) (*guil
 	_ = userID
 	list, err := i.service.ListGuilds(ctx, user.ID, model.ListGuildsOptions{Limit: 50})
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("list guilds: %w", err)
 	}
 	var ours *model.Guild
 	for _, g := range list.Guilds {
@@ -98,7 +99,7 @@ func (i *Implementation) ContributeToFront(ctx context.Context, req *v1.Contribu
 	}
 	fronts, err := i.warRepo.ListFronts(ctx, war.ID)
 	if err != nil {
-		return nil, kerrs.InternalServer("INTERNAL", "failed to load fronts")
+		return nil, fmt.Errorf("list fronts: %w", err)
 	}
 	var belongs bool
 	for _, f := range fronts {
@@ -138,7 +139,7 @@ func (i *Implementation) ListTerritories(ctx context.Context, req *v1.ListTerrit
 	rows, err := i.warRepo.ListTerritories(ctx, guildID)
 	if err != nil {
 		klog.Errorf("guild_war: list territories: %v", err)
-		return nil, kerrs.InternalServer("INTERNAL", "failed to load territories")
+		return nil, fmt.Errorf("list territories: %w", err)
 	}
 	out := make([]*v1.GuildTerritory, 0, len(rows))
 	for _, t := range rows {

@@ -12,6 +12,8 @@ import (
 	"api/internal/storage/postgres"
 )
 
+var errNoShieldsOwned = errors.New("use shield: no shields owned")
+
 type Repo struct {
 	data *postgres.Store
 	log  *log.Helper
@@ -75,7 +77,7 @@ func (r *Repo) UseShield(ctx context.Context, userID uuid.UUID, restoredTo int32
 		return fmt.Errorf("use shield: %w", err)
 	}
 	if tag.RowsAffected() == 0 {
-		return errors.New("use shield: no shields owned")
+		return errNoShieldsOwned
 	}
 	return nil
 }

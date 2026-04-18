@@ -289,7 +289,7 @@ func (i *Implementation) AnswerMockQuestion(ctx context.Context, req *v1.AnswerM
 	}, nil
 }
 
-func parseUUID(raw string, reason string, message string) (uuid.UUID, error) {
+func parseUUID(raw, reason, message string) (uuid.UUID, error) {
 	id, err := uuid.Parse(raw)
 	if err != nil {
 		return uuid.Nil, kratoserrors.BadRequest(reason, message)

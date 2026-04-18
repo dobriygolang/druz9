@@ -32,6 +32,7 @@ type Repository interface {
 	MarkThreadRead(ctx context.Context, userID, threadID uuid.UUID) error
 	GetUnreadTotal(ctx context.Context, userID uuid.UUID) (int32, error)
 	BumpThread(ctx context.Context, threadID uuid.UUID, preview string, incrementUnread bool) error
+	CreateDirectThread(ctx context.Context, senderID, recipientID uuid.UUID, senderName, recipientName, subject string) (*model.InboxThread, error)
 }
 
 // Config bundles domain dependencies.
@@ -178,6 +179,12 @@ func (s *Service) SendMessage(
 // GetUnreadCount returns the total across all threads for badge rendering.
 func (s *Service) GetUnreadCount(ctx context.Context, userID uuid.UUID) (int32, error) {
 	return s.repo.GetUnreadTotal(ctx, userID)
+}
+
+// CreateDirectThread opens (or returns existing) a bidirectional friend-mail
+// thread. Names are resolved by the caller before invoking this method.
+func (s *Service) CreateDirectThread(ctx context.Context, senderID, recipientID uuid.UUID, senderName, recipientName, subject string) (*model.InboxThread, error) {
+	return s.repo.CreateDirectThread(ctx, senderID, recipientID, senderName, recipientName, subject)
 }
 
 // previewOf collapses newlines and trims to previewLen for the thread preview.

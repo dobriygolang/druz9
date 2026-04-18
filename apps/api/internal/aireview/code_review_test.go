@@ -5,6 +5,7 @@ import (
 )
 
 func TestBuildCodeReviewPrompt(t *testing.T) {
+	t.Parallel()
 	req := CodeReviewRequest{
 		TaskTitle:         "Two Sum",
 		TaskStatement:     "Given an array of integers nums and an integer target, return indices of the two numbers such that they add up to target.",
@@ -44,6 +45,7 @@ func TestBuildCodeReviewPrompt(t *testing.T) {
 }
 
 func TestBuildCodeReviewPrompt_WithOpponent(t *testing.T) {
+	t.Parallel()
 	req := CodeReviewRequest{
 		TaskTitle:         "Two Sum",
 		TaskStatement:     "Given an array...",
@@ -68,6 +70,7 @@ func TestBuildCodeReviewPrompt_WithOpponent(t *testing.T) {
 }
 
 func TestBuildCodeReviewPrompt_NoOpponent(t *testing.T) {
+	t.Parallel()
 	req := CodeReviewRequest{
 		TaskTitle:         "Two Sum",
 		TaskStatement:     "Given an array...",
@@ -87,6 +90,7 @@ func TestBuildCodeReviewPrompt_NoOpponent(t *testing.T) {
 }
 
 func TestParseCodeReviewJSON_ValidResponse(t *testing.T) {
+	t.Parallel()
 	raw := `{
 		"verdict": "suboptimal",
 		"timeComplexity": "O(n^2)",
@@ -128,6 +132,7 @@ func TestParseCodeReviewJSON_ValidResponse(t *testing.T) {
 }
 
 func TestParseCodeReviewJSON_WithMarkdown(t *testing.T) {
+	t.Parallel()
 	raw := "```json\n{\"verdict\":\"optimal\",\"timeComplexity\":\"O(n)\",\"spaceComplexity\":\"O(n)\",\"pattern\":\"hashing\",\"strengths\":[],\"weaknesses\":[],\"hint\":\"\",\"skillSignals\":{},\"comparison\":\"\"}\n```"
 
 	review, err := parseCodeReviewJSON(raw)
@@ -140,6 +145,7 @@ func TestParseCodeReviewJSON_WithMarkdown(t *testing.T) {
 }
 
 func TestParseCodeReviewJSON_InvalidJSON(t *testing.T) {
+	t.Parallel()
 	_, err := parseCodeReviewJSON("not json")
 	if err == nil {
 		t.Error("expected error for invalid JSON")
@@ -147,6 +153,7 @@ func TestParseCodeReviewJSON_InvalidJSON(t *testing.T) {
 }
 
 func TestNormalizeVerdict(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		input string
 		want  string
@@ -167,6 +174,7 @@ func TestNormalizeVerdict(t *testing.T) {
 }
 
 func TestNormalizePattern(t *testing.T) {
+	t.Parallel()
 	tests := []struct {
 		input string
 		want  string
@@ -185,7 +193,7 @@ func TestNormalizePattern(t *testing.T) {
 }
 
 func containsSubstring(s, substr string) bool {
-	return len(s) > 0 && len(substr) > 0 && contains(s, substr)
+	return s != "" && substr != "" && contains(s, substr)
 }
 
 func contains(s, sub string) bool {

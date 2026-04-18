@@ -154,7 +154,17 @@ export interface SystemDesignPayload {
   reliability?: string
 }
 
+export interface AIMentor {
+  id: string
+  name: string
+  tier: number
+}
+
 export const interviewPrepApi = {
+  listAIMentors: async (): Promise<AIMentor[]> => {
+    const r = await apiClient.get<{ mentors?: AIMentor[] }>('/api/v1/interview-prep/ai-mentors')
+    return r.data.mentors ?? []
+  },
   listTasks: async (): Promise<InterviewPrepTask[]> => {
     const r = await apiClient.get<{ tasks?: BackendTask[] }>('/api/v1/interview-prep/tasks')
     return (r.data.tasks ?? []).map(normalizeTask)

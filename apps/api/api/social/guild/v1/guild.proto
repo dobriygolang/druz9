@@ -104,6 +104,27 @@ service GuildService {
   rpc ListTerritories(ListTerritoriesRequest) returns (ListTerritoriesResponse) {
     option (google.api.http) = { get: "/api/v1/guilds/{guild_id}/territories" };
   }
+
+  // GetMyGuildRole returns the caller's role in the given guild.
+  rpc GetMyGuildRole(GetMyGuildRoleRequest) returns (GetMyGuildRoleResponse) {
+    option (google.api.http) = { get: "/api/v1/guilds/{guild_id}/my-role" };
+  }
+
+  // UpdateGuildSettings lets a guild creator/officer rename and configure the guild.
+  rpc UpdateGuildSettings(UpdateGuildSettingsRequest) returns (UpdateGuildSettingsResponse) {
+    option (google.api.http) = {
+      put: "/api/v1/guilds/{guild_id}/settings"
+      body: "*"
+    };
+  }
+
+  // SetMemberRole promotes or demotes a guild member (creator/officer only).
+  rpc SetMemberRole(SetMemberRoleRequest) returns (SetMemberRoleResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/guilds/{guild_id}/members/{user_id}/role"
+      body: "*"
+    };
+  }
 }
 
 message ContributeToFrontRequest {
@@ -133,6 +154,7 @@ enum GuildMemberRole {
   GUILD_MEMBER_ROLE_UNSPECIFIED = 0;
   GUILD_MEMBER_ROLE_CREATOR     = 1;
   GUILD_MEMBER_ROLE_MEMBER      = 2;
+  GUILD_MEMBER_ROLE_OFFICER     = 3;
 }
 
 enum GuildMemberActionType {
@@ -395,4 +417,35 @@ message GuildWarMvp {
 message GuildWarFeed {
   google.protobuf.Timestamp at   = 1;
   string                    text = 2;
+}
+
+// ── Role management ────────────────────────────────────────────────────────
+
+message GetMyGuildRoleRequest {
+  string guild_id = 1;
+}
+
+message GetMyGuildRoleResponse {
+  GuildMemberRole role = 1;
+}
+
+message UpdateGuildSettingsRequest {
+  string guild_id     = 1;
+  string name         = 2;
+  string description  = 3;
+  bool   is_public    = 4;
+}
+
+message UpdateGuildSettingsResponse {
+  Guild guild = 1;
+}
+
+message SetMemberRoleRequest {
+  string          guild_id = 1;
+  string          user_id  = 2;
+  GuildMemberRole role     = 3;
+}
+
+message SetMemberRoleResponse {
+  GuildMemberRole role = 1;
 }

@@ -2,6 +2,7 @@ package social
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -14,7 +15,7 @@ import (
 func (s *Service) ListPendingRequests(ctx context.Context, userID uuid.UUID) (*model.FriendRequestBuckets, error) {
 	bkt, err := s.repo.GetPendingRequestsByUser(ctx, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get pending requests by user: %w", err)
 	}
 	if bkt.Incoming == nil {
 		bkt.Incoming = []*model.FriendRequest{}
@@ -42,7 +43,7 @@ func (s *Service) SendFriendRequest(ctx context.Context, fromID uuid.UUID, toUse
 
 	already, err := s.repo.AreFriends(ctx, fromID, toID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("are friends: %w", err)
 	}
 	if already {
 		return nil, ErrAlreadyFriends
@@ -59,7 +60,7 @@ func (s *Service) SendFriendRequest(ctx context.Context, fromID uuid.UUID, toUse
 		CreatedAt:  time.Now().UTC(),
 	}
 	if err := s.repo.InsertRequest(ctx, req); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("insert request: %w", err)
 	}
 	return req, nil
 }
@@ -69,7 +70,7 @@ func (s *Service) SendFriendRequest(ctx context.Context, fromID uuid.UUID, toUse
 func (s *Service) AcceptFriendRequest(ctx context.Context, viewerID, requestID uuid.UUID) (*model.Friend, error) {
 	req, err := s.repo.GetRequestByID(ctx, requestID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get request by id: %w", err)
 	}
 	if req == nil {
 		return nil, ErrRequestNotFound
@@ -83,10 +84,10 @@ func (s *Service) AcceptFriendRequest(ctx context.Context, viewerID, requestID u
 
 	now := time.Now().UTC()
 	if _, err := s.repo.InsertFriendship(ctx, req.FromUserID, req.ToUserID); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("insert friendship: %w", err)
 	}
 	if err := s.repo.UpdateRequestStatus(ctx, req.ID, model.FriendRequestStatusAccepted, now); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update request status: %w", err)
 	}
 	return s.repo.GetFriendByID(ctx, viewerID, req.FromUserID)
 }
@@ -95,7 +96,7 @@ func (s *Service) AcceptFriendRequest(ctx context.Context, viewerID, requestID u
 func (s *Service) DeclineFriendRequest(ctx context.Context, viewerID, requestID uuid.UUID) error {
 	req, err := s.repo.GetRequestByID(ctx, requestID)
 	if err != nil {
-		return err
+		return fmt.Errorf("get request by id: %w", err)
 	}
 	if req == nil {
 		return ErrRequestNotFound

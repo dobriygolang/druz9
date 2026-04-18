@@ -11,8 +11,8 @@ import (
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
-	Resolve(context.Context, string) (*model.GeoResolveResponse, error)
-	CommunityMap(context.Context, string) (*model.CommunityMapResponse, error)
+	Resolve(ctx context.Context, query string) (*model.GeoResolveResponse, error)
+	CommunityMap(ctx context.Context, userID string) (*model.CommunityMapResponse, error)
 	WorldPins(ctx context.Context) ([]*model.WorldPin, error)
 }
 

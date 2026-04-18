@@ -10,8 +10,8 @@ import (
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
-	ListReferrals(context.Context, *model.User, model.ListReferralsOptions) (*model.ListReferralsResponse, error)
-	CreateReferral(context.Context, *model.User, model.CreateReferralRequest) (*model.Referral, error)
-	UpdateReferral(context.Context, uuid.UUID, *model.User, model.UpdateReferralRequest) (*model.Referral, error)
-	DeleteReferral(context.Context, uuid.UUID, *model.User) error
+	ListReferrals(ctx context.Context, user *model.User, opts model.ListReferralsOptions) (*model.ListReferralsResponse, error)
+	CreateReferral(ctx context.Context, user *model.User, req model.CreateReferralRequest) (*model.Referral, error)
+	UpdateReferral(ctx context.Context, id uuid.UUID, user *model.User, req model.UpdateReferralRequest) (*model.Referral, error)
+	DeleteReferral(ctx context.Context, id uuid.UUID, user *model.User) error
 }

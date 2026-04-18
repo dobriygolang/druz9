@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -9,10 +10,10 @@ import (
 )
 
 // JoinEvent adds a user to an event.
-func (s *Service) JoinEvent(ctx context.Context, eventID uuid.UUID, userID uuid.UUID) (*model.Event, error) {
+func (s *Service) JoinEvent(ctx context.Context, eventID, userID uuid.UUID) (*model.Event, error) {
 	event, err := s.repo.JoinEvent(ctx, eventID, userID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("join event: %w", err)
 	}
 	return event, nil
 }

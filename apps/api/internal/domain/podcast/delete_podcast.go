@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -10,5 +11,9 @@ import (
 
 // DeletePodcast deletes a podcast.
 func (s *Service) DeletePodcast(ctx context.Context, podcastID uuid.UUID, actor *model.User) (string, error) {
-	return s.repo.DeletePodcast(ctx, podcastID, actor)
+	objectKey, err := s.repo.DeletePodcast(ctx, podcastID, actor)
+	if err != nil {
+		return "", fmt.Errorf("delete podcast: %w", err)
+	}
+	return objectKey, nil
 }

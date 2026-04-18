@@ -1,6 +1,8 @@
 package codeeditor
 
 import (
+	"fmt"
+
 	domain "api/internal/domain/codeeditor"
 	"api/internal/model"
 	"api/internal/policy"
@@ -55,7 +57,7 @@ func normalizeTaskPolicy(task *domain.Task) error {
 
 	resolved, err := policy.ResolvePolicy(spec)
 	if err != nil {
-		return err
+		return fmt.Errorf("resolve policy: %w", err)
 	}
 
 	task.ExecutionProfile = model.ExecutionProfileFromString(string(resolved.Profile))

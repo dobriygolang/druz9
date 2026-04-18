@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -37,6 +38,8 @@ import (
 	"api/internal/storage/postgres"
 	s3storage "api/internal/storage/s3"
 )
+
+var errUserNotFound = errors.New("user not found")
 
 type storageContext struct {
 	store                *postgres.Store
@@ -137,7 +140,7 @@ func initializeStorage(bootstrap *bootstrapContext) (*storageContext, error) {
 				return uuid.Nil, "", err
 			}
 			if u == nil {
-				return uuid.Nil, "", fmt.Errorf("user %q not found", username)
+				return uuid.Nil, "", fmt.Errorf("%w: %s", errUserNotFound, username)
 			}
 			return u.ID, u.Username, nil
 		}),

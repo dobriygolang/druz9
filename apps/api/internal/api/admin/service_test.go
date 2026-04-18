@@ -145,6 +145,7 @@ func TestConfigMethods(t *testing.T) {
 	impl := New(nil, configService, nil, nil)
 
 	t.Run("get config", func(t *testing.T) {
+		t.Parallel()
 		resp, err := impl.GetConfig(t.Context(), &v1.GetConfigRequest{Key: "server_http_addr"})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -155,6 +156,7 @@ func TestConfigMethods(t *testing.T) {
 	})
 
 	t.Run("list config", func(t *testing.T) {
+		t.Parallel()
 		resp, err := impl.ListConfig(t.Context(), &v1.ListConfigRequest{})
 		if err != nil {
 			t.Fatalf("unexpected error: %v", err)
@@ -168,6 +170,7 @@ func TestConfigMethods(t *testing.T) {
 	})
 
 	t.Run("update config", func(t *testing.T) {
+		t.Parallel()
 		resp, err := impl.UpdateConfig(t.Context(), &v1.UpdateConfigRequest{
 			Key:   "server_http_addr",
 			Value: ":9090",
@@ -181,6 +184,7 @@ func TestConfigMethods(t *testing.T) {
 	})
 
 	t.Run("missing config returns not found", func(t *testing.T) {
+		t.Parallel()
 		_, err := impl.GetConfig(t.Context(), &v1.GetConfigRequest{Key: "missing"})
 		if err == nil {
 			t.Fatal("expected error")
@@ -195,6 +199,7 @@ func TestGetDockerLogs(t *testing.T) {
 	t.Setenv("DOCKER_LOGS_PROJECT", "druz9")
 
 	t.Run("returns logs for allowed service", func(t *testing.T) {
+		t.Parallel()
 		runner := &fakeDockerLogsRunner{}
 		impl := New(nil, nil, nil, nil)
 		impl.dockerLogsRunner = runner
@@ -225,6 +230,7 @@ func TestGetDockerLogs(t *testing.T) {
 	})
 
 	t.Run("rejects unknown service", func(t *testing.T) {
+		t.Parallel()
 		impl := New(nil, nil, nil, nil)
 		impl.dockerLogsRunner = &fakeDockerLogsRunner{}
 
@@ -238,6 +244,7 @@ func TestGetDockerLogs(t *testing.T) {
 	})
 
 	t.Run("caps large tail", func(t *testing.T) {
+		t.Parallel()
 		runner := &fakeDockerLogsRunner{}
 		impl := New(nil, nil, nil, nil)
 		impl.dockerLogsRunner = runner

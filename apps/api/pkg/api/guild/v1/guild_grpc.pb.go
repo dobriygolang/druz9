@@ -35,6 +35,9 @@ const (
 	GuildService_GetGuildWar_FullMethodName             = "/guild.v1.GuildService/GetGuildWar"
 	GuildService_ContributeToFront_FullMethodName       = "/guild.v1.GuildService/ContributeToFront"
 	GuildService_ListTerritories_FullMethodName         = "/guild.v1.GuildService/ListTerritories"
+	GuildService_GetMyGuildRole_FullMethodName          = "/guild.v1.GuildService/GetMyGuildRole"
+	GuildService_UpdateGuildSettings_FullMethodName     = "/guild.v1.GuildService/UpdateGuildSettings"
+	GuildService_SetMemberRole_FullMethodName           = "/guild.v1.GuildService/SetMemberRole"
 )
 
 // GuildServiceClient is the client API for GuildService service.
@@ -65,6 +68,12 @@ type GuildServiceClient interface {
 	// our_rounds reaches the win threshold (10) it is captured.
 	ContributeToFront(ctx context.Context, in *ContributeToFrontRequest, opts ...grpc.CallOption) (*ContributeToFrontResponse, error)
 	ListTerritories(ctx context.Context, in *ListTerritoriesRequest, opts ...grpc.CallOption) (*ListTerritoriesResponse, error)
+	// GetMyGuildRole returns the caller's role in the given guild.
+	GetMyGuildRole(ctx context.Context, in *GetMyGuildRoleRequest, opts ...grpc.CallOption) (*GetMyGuildRoleResponse, error)
+	// UpdateGuildSettings lets a guild creator/officer rename and configure the guild.
+	UpdateGuildSettings(ctx context.Context, in *UpdateGuildSettingsRequest, opts ...grpc.CallOption) (*UpdateGuildSettingsResponse, error)
+	// SetMemberRole promotes or demotes a guild member (creator/officer only).
+	SetMemberRole(ctx context.Context, in *SetMemberRoleRequest, opts ...grpc.CallOption) (*SetMemberRoleResponse, error)
 }
 
 type guildServiceClient struct {
@@ -235,6 +244,36 @@ func (c *guildServiceClient) ListTerritories(ctx context.Context, in *ListTerrit
 	return out, nil
 }
 
+func (c *guildServiceClient) GetMyGuildRole(ctx context.Context, in *GetMyGuildRoleRequest, opts ...grpc.CallOption) (*GetMyGuildRoleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetMyGuildRoleResponse)
+	err := c.cc.Invoke(ctx, GuildService_GetMyGuildRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *guildServiceClient) UpdateGuildSettings(ctx context.Context, in *UpdateGuildSettingsRequest, opts ...grpc.CallOption) (*UpdateGuildSettingsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UpdateGuildSettingsResponse)
+	err := c.cc.Invoke(ctx, GuildService_UpdateGuildSettings_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *guildServiceClient) SetMemberRole(ctx context.Context, in *SetMemberRoleRequest, opts ...grpc.CallOption) (*SetMemberRoleResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(SetMemberRoleResponse)
+	err := c.cc.Invoke(ctx, GuildService_SetMemberRole_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // GuildServiceServer is the server API for GuildService service.
 // All implementations must embed UnimplementedGuildServiceServer
 // for forward compatibility.
@@ -263,6 +302,12 @@ type GuildServiceServer interface {
 	// our_rounds reaches the win threshold (10) it is captured.
 	ContributeToFront(context.Context, *ContributeToFrontRequest) (*ContributeToFrontResponse, error)
 	ListTerritories(context.Context, *ListTerritoriesRequest) (*ListTerritoriesResponse, error)
+	// GetMyGuildRole returns the caller's role in the given guild.
+	GetMyGuildRole(context.Context, *GetMyGuildRoleRequest) (*GetMyGuildRoleResponse, error)
+	// UpdateGuildSettings lets a guild creator/officer rename and configure the guild.
+	UpdateGuildSettings(context.Context, *UpdateGuildSettingsRequest) (*UpdateGuildSettingsResponse, error)
+	// SetMemberRole promotes or demotes a guild member (creator/officer only).
+	SetMemberRole(context.Context, *SetMemberRoleRequest) (*SetMemberRoleResponse, error)
 	mustEmbedUnimplementedGuildServiceServer()
 }
 
@@ -320,6 +365,15 @@ func (UnimplementedGuildServiceServer) ContributeToFront(context.Context, *Contr
 }
 func (UnimplementedGuildServiceServer) ListTerritories(context.Context, *ListTerritoriesRequest) (*ListTerritoriesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListTerritories not implemented")
+}
+func (UnimplementedGuildServiceServer) GetMyGuildRole(context.Context, *GetMyGuildRoleRequest) (*GetMyGuildRoleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method GetMyGuildRole not implemented")
+}
+func (UnimplementedGuildServiceServer) UpdateGuildSettings(context.Context, *UpdateGuildSettingsRequest) (*UpdateGuildSettingsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpdateGuildSettings not implemented")
+}
+func (UnimplementedGuildServiceServer) SetMemberRole(context.Context, *SetMemberRoleRequest) (*SetMemberRoleResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method SetMemberRole not implemented")
 }
 func (UnimplementedGuildServiceServer) mustEmbedUnimplementedGuildServiceServer() {}
 func (UnimplementedGuildServiceServer) testEmbeddedByValue()                      {}
@@ -630,6 +684,60 @@ func _GuildService_ListTerritories_Handler(srv interface{}, ctx context.Context,
 	return interceptor(ctx, in, info, handler)
 }
 
+func _GuildService_GetMyGuildRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetMyGuildRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).GetMyGuildRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_GetMyGuildRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).GetMyGuildRole(ctx, req.(*GetMyGuildRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GuildService_UpdateGuildSettings_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateGuildSettingsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).UpdateGuildSettings(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_UpdateGuildSettings_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).UpdateGuildSettings(ctx, req.(*UpdateGuildSettingsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _GuildService_SetMemberRole_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SetMemberRoleRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(GuildServiceServer).SetMemberRole(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: GuildService_SetMemberRole_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(GuildServiceServer).SetMemberRole(ctx, req.(*SetMemberRoleRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // GuildService_ServiceDesc is the grpc.ServiceDesc for GuildService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -700,6 +808,18 @@ var GuildService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListTerritories",
 			Handler:    _GuildService_ListTerritories_Handler,
+		},
+		{
+			MethodName: "GetMyGuildRole",
+			Handler:    _GuildService_GetMyGuildRole_Handler,
+		},
+		{
+			MethodName: "UpdateGuildSettings",
+			Handler:    _GuildService_UpdateGuildSettings_Handler,
+		},
+		{
+			MethodName: "SetMemberRole",
+			Handler:    _GuildService_SetMemberRole_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

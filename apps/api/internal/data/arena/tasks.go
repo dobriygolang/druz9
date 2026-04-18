@@ -34,7 +34,7 @@ func (r *Repo) PickRandomTask(ctx context.Context, topic, difficulty string) (*d
 		return nil, fmt.Errorf("pick random task: %w", err)
 	}
 	if err := codetasks.LoadCases(ctx, r.data.DB, &task); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load task cases: %w", err)
 	}
 	return &task, nil
 }
@@ -53,7 +53,7 @@ func (r *Repo) GetTask(ctx context.Context, taskID uuid.UUID) (*domain.Task, err
 		return nil, fmt.Errorf("get arena task: %w", err)
 	}
 	if err := codetasks.LoadCases(ctx, r.data.DB, &task); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load task cases: %w", err)
 	}
 
 	return &task, nil

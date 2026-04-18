@@ -67,7 +67,7 @@ func (r *Repo) ListMockBlueprints(ctx context.Context) ([]*model.InterviewMockBl
 	return items, rows.Err()
 }
 
-func (r *Repo) ResolveMockBlueprint(ctx context.Context, companyTag string, programSlug string) (*model.InterviewMockBlueprint, error) {
+func (r *Repo) ResolveMockBlueprint(ctx context.Context, companyTag, programSlug string) (*model.InterviewMockBlueprint, error) {
 	normalizedProgram := strings.TrimSpace(strings.ToLower(programSlug))
 	normalizedCompany := strings.TrimSpace(strings.ToLower(companyTag))
 
@@ -260,7 +260,7 @@ func (r *Repo) listBlueprintAliases(ctx context.Context, blueprintID uuid.UUID) 
 	return slugs, names, nil
 }
 
-func defaultCandidateInstructions(roundType string, evaluatorMode string) string {
+func defaultCandidateInstructions(roundType, evaluatorMode string) string {
 	switch roundType {
 	case "coding_algorithmic":
 		return "Начни с clarifying questions, проговори идею вслух, оцени сложность и только потом пиши решение. После базового решения коротко обсуди edge cases и возможную оптимизацию."
@@ -282,7 +282,7 @@ func defaultCandidateInstructions(roundType string, evaluatorMode string) string
 	}
 }
 
-func defaultInterviewerInstructions(roundType string, evaluatorMode string) string {
+func defaultInterviewerInstructions(roundType, evaluatorMode string) string {
 	switch roundType {
 	case "coding_algorithmic":
 		return "Проверь структурность мышления, владение asymptotic complexity, работу с edge cases и способность улучшать первое решение."

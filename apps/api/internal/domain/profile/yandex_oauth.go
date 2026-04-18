@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"encoding/base64"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -14,6 +15,11 @@ import (
 
 	profileerrors "api/internal/errors/profile"
 	"api/internal/model"
+)
+
+var (
+	errYandexUserinfoStatus = errors.New("yandex userinfo status error")
+	errYandexTokenStatus    = errors.New("yandex token status error")
 )
 
 const (
@@ -137,7 +143,7 @@ func (s *Service) fetchYandexUser(ctx context.Context, code string) (*model.Yand
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
-		return nil, fmt.Errorf("yandex userinfo status %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
+		return nil, fmt.Errorf("%w: %d %s", errYandexUserinfoStatus, resp.StatusCode, strings.TrimSpace(string(body)))
 	}
 
 	var payload yandexUserInfoResponse
@@ -188,7 +194,7 @@ func (s *Service) exchangeYandexCode(ctx context.Context, code string) (string, 
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(io.LimitReader(resp.Body, 4096))
-		return "", fmt.Errorf("yandex token status %d: %s", resp.StatusCode, strings.TrimSpace(string(body)))
+		return "", fmt.Errorf("%w: %d %s", errYandexTokenStatus, resp.StatusCode, strings.TrimSpace(string(body)))
 	}
 
 	var payload yandexTokenResponse

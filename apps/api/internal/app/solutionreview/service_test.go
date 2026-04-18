@@ -115,6 +115,7 @@ func (m *mockCodeReviewer) ReviewCode(_ context.Context, _ aireview.CodeReviewRe
 // --- Tests ---
 
 func TestStartReview_CreatesLevel1Immediately(t *testing.T) {
+	t.Parallel()
 	repo := newMockRepo()
 	svc := New(Config{
 		Repo:     repo,
@@ -159,6 +160,7 @@ func TestStartReview_CreatesLevel1Immediately(t *testing.T) {
 }
 
 func TestStartReview_TriggersAIForAccepted(t *testing.T) {
+	t.Parallel()
 	repo := newMockRepo()
 	reviewer := &mockCodeReviewer{
 		result: &aireview.CodeReview{
@@ -220,6 +222,7 @@ func TestStartReview_TriggersAIForAccepted(t *testing.T) {
 }
 
 func TestRateLimiting(t *testing.T) {
+	t.Parallel()
 	svc := New(Config{
 		Repo:     newMockRepo(),
 		Reviewer: &mockCodeReviewer{},
@@ -241,6 +244,7 @@ func TestRateLimiting(t *testing.T) {
 }
 
 func TestAttemptCounting(t *testing.T) {
+	t.Parallel()
 	repo := newMockRepo()
 	svc := New(Config{Repo: repo})
 

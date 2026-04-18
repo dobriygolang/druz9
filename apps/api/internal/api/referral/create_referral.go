@@ -2,6 +2,7 @@ package referral
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/apihelpers"
 	"api/internal/model"
@@ -11,7 +12,7 @@ import (
 func (i *Implementation) CreateReferral(ctx context.Context, req *v1.CreateReferralRequest) (*v1.ReferralResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	item, err := i.service.CreateReferral(ctx, user, model.CreateReferralRequest{
 		Title:          req.GetReferral().GetTitle(),
@@ -23,7 +24,7 @@ func (i *Implementation) CreateReferral(ctx context.Context, req *v1.CreateRefer
 		EmploymentType: unmapEmploymentType(req.GetReferral().GetEmploymentType()),
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create referral: %w", err)
 	}
 	return &v1.ReferralResponse{Referral: mapReferral(item)}, nil
 }

@@ -25,17 +25,17 @@ const (
 )
 
 type ProfileAuthorizer interface {
-	AuthenticateByToken(context.Context, string) (*model.AuthState, error)
+	AuthenticateByToken(ctx context.Context, token string) (*model.AuthState, error)
 	CookieName() string
 	DevBypass() bool
 	DevUserID() string
-	FindUserByID(context.Context, uuid.UUID) (*model.User, error)
+	FindUserByID(ctx context.Context, userID uuid.UUID) (*model.User, error)
 	SetUserActivity(userID uuid.UUID, at time.Time)
 }
 
 type SessionCookieManager interface {
-	SetSessionCookie(context.Context, string, time.Time)
-	ClearSessionCookie(context.Context)
+	SetSessionCookie(ctx context.Context, token string, expiry time.Time)
+	ClearSessionCookie(ctx context.Context)
 }
 
 // tryDevBypass attempts dev bypass authentication. Returns the enriched context

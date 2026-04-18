@@ -1,6 +1,7 @@
 package sandbox
 
 import (
+	"errors"
 	"fmt"
 	"go/parser"
 	"go/token"
@@ -8,6 +9,8 @@ import (
 
 	"api/internal/policy"
 )
+
+var errImportBlocked = errors.New("import is blocked by sandbox policy")
 
 func validateExecutionRequest(req ExecutionRequest, cfg policy.RunnerConfig) error {
 	if req.Language != policy.LanguageGo {
@@ -36,7 +39,7 @@ func validateGoImports(code string, cfg policy.RunnerConfig, runnerMode string) 
 	for _, item := range file.Imports {
 		name := strings.Trim(item.Path.Value, `"`)
 		if blocked[name] {
-			return fmt.Errorf("import %q is blocked by sandbox policy", name)
+			return fmt.Errorf("%w: %q", errImportBlocked, name)
 		}
 	}
 	return nil

@@ -25,9 +25,9 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
-// CreateChallenge provides a mock function with given fields: _a0, _a1, _a2, _a3, _a4
-func (_m *Service) CreateChallenge(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID, _a3 string, _a4 int32) (*model.GuildChallenge, error) {
-	ret := _m.Called(_a0, _a1, _a2, _a3, _a4)
+// CreateChallenge provides a mock function with given fields: ctx, userID, guildID, name, prize
+func (_m *Service) CreateChallenge(ctx context.Context, userID uuid.UUID, guildID uuid.UUID, name string, prize int32) (*model.GuildChallenge, error) {
+	ret := _m.Called(ctx, userID, guildID, name, prize)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateChallenge")
@@ -36,10 +36,10 @@ func (_m *Service) CreateChallenge(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.
 	var r0 *model.GuildChallenge
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, string, int32) (*model.GuildChallenge, error)); ok {
-		return rf(_a0, _a1, _a2, _a3, _a4)
+		return rf(ctx, userID, guildID, name, prize)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, string, int32) *model.GuildChallenge); ok {
-		r0 = rf(_a0, _a1, _a2, _a3, _a4)
+		r0 = rf(ctx, userID, guildID, name, prize)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.GuildChallenge)
@@ -47,7 +47,7 @@ func (_m *Service) CreateChallenge(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID, string, int32) error); ok {
-		r1 = rf(_a0, _a1, _a2, _a3, _a4)
+		r1 = rf(ctx, userID, guildID, name, prize)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -61,16 +61,16 @@ type Service_CreateChallenge_Call struct {
 }
 
 // CreateChallenge is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-//   - _a3 string
-//   - _a4 int32
-func (_e *Service_Expecter) CreateChallenge(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}, _a4 interface{}) *Service_CreateChallenge_Call {
-	return &Service_CreateChallenge_Call{Call: _e.mock.On("CreateChallenge", _a0, _a1, _a2, _a3, _a4)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - guildID uuid.UUID
+//   - name string
+//   - prize int32
+func (_e *Service_Expecter) CreateChallenge(ctx interface{}, userID interface{}, guildID interface{}, name interface{}, prize interface{}) *Service_CreateChallenge_Call {
+	return &Service_CreateChallenge_Call{Call: _e.mock.On("CreateChallenge", ctx, userID, guildID, name, prize)}
 }
 
-func (_c *Service_CreateChallenge_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID, _a3 string, _a4 int32)) *Service_CreateChallenge_Call {
+func (_c *Service_CreateChallenge_Call) Run(run func(ctx context.Context, userID uuid.UUID, guildID uuid.UUID, name string, prize int32)) *Service_CreateChallenge_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID), args[3].(string), args[4].(int32))
 	})
@@ -87,9 +87,9 @@ func (_c *Service_CreateChallenge_Call) RunAndReturn(run func(context.Context, u
 	return _c
 }
 
-// CreateGuild provides a mock function with given fields: _a0, _a1, _a2, _a3, _a4, _a5
-func (_m *Service) CreateGuild(_a0 context.Context, _a1 uuid.UUID, _a2 string, _a3 string, _a4 []string, _a5 bool) (*model.Guild, error) {
-	ret := _m.Called(_a0, _a1, _a2, _a3, _a4, _a5)
+// CreateGuild provides a mock function with given fields: ctx, creatorID, name, description, tags, isPublic
+func (_m *Service) CreateGuild(ctx context.Context, creatorID uuid.UUID, name string, description string, tags []string, isPublic bool) (*model.Guild, error) {
+	ret := _m.Called(ctx, creatorID, name, description, tags, isPublic)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateGuild")
@@ -98,10 +98,10 @@ func (_m *Service) CreateGuild(_a0 context.Context, _a1 uuid.UUID, _a2 string, _
 	var r0 *model.Guild
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, string, []string, bool) (*model.Guild, error)); ok {
-		return rf(_a0, _a1, _a2, _a3, _a4, _a5)
+		return rf(ctx, creatorID, name, description, tags, isPublic)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, string, string, []string, bool) *model.Guild); ok {
-		r0 = rf(_a0, _a1, _a2, _a3, _a4, _a5)
+		r0 = rf(ctx, creatorID, name, description, tags, isPublic)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Guild)
@@ -109,7 +109,7 @@ func (_m *Service) CreateGuild(_a0 context.Context, _a1 uuid.UUID, _a2 string, _
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, string, string, []string, bool) error); ok {
-		r1 = rf(_a0, _a1, _a2, _a3, _a4, _a5)
+		r1 = rf(ctx, creatorID, name, description, tags, isPublic)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -123,17 +123,17 @@ type Service_CreateGuild_Call struct {
 }
 
 // CreateGuild is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 string
-//   - _a3 string
-//   - _a4 []string
-//   - _a5 bool
-func (_e *Service_Expecter) CreateGuild(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}, _a4 interface{}, _a5 interface{}) *Service_CreateGuild_Call {
-	return &Service_CreateGuild_Call{Call: _e.mock.On("CreateGuild", _a0, _a1, _a2, _a3, _a4, _a5)}
+//   - ctx context.Context
+//   - creatorID uuid.UUID
+//   - name string
+//   - description string
+//   - tags []string
+//   - isPublic bool
+func (_e *Service_Expecter) CreateGuild(ctx interface{}, creatorID interface{}, name interface{}, description interface{}, tags interface{}, isPublic interface{}) *Service_CreateGuild_Call {
+	return &Service_CreateGuild_Call{Call: _e.mock.On("CreateGuild", ctx, creatorID, name, description, tags, isPublic)}
 }
 
-func (_c *Service_CreateGuild_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 string, _a3 string, _a4 []string, _a5 bool)) *Service_CreateGuild_Call {
+func (_c *Service_CreateGuild_Call) Run(run func(ctx context.Context, creatorID uuid.UUID, name string, description string, tags []string, isPublic bool)) *Service_CreateGuild_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(string), args[3].(string), args[4].([]string), args[5].(bool))
 	})
@@ -150,9 +150,9 @@ func (_c *Service_CreateGuild_Call) RunAndReturn(run func(context.Context, uuid.
 	return _c
 }
 
-// DeleteGuild provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) DeleteGuild(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) error {
-	ret := _m.Called(_a0, _a1, _a2)
+// DeleteGuild provides a mock function with given fields: ctx, userID, guildID
+func (_m *Service) DeleteGuild(ctx context.Context, userID uuid.UUID, guildID uuid.UUID) error {
+	ret := _m.Called(ctx, userID, guildID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeleteGuild")
@@ -160,7 +160,7 @@ func (_m *Service) DeleteGuild(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, guildID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -174,14 +174,14 @@ type Service_DeleteGuild_Call struct {
 }
 
 // DeleteGuild is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-func (_e *Service_Expecter) DeleteGuild(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_DeleteGuild_Call {
-	return &Service_DeleteGuild_Call{Call: _e.mock.On("DeleteGuild", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - guildID uuid.UUID
+func (_e *Service_Expecter) DeleteGuild(ctx interface{}, userID interface{}, guildID interface{}) *Service_DeleteGuild_Call {
+	return &Service_DeleteGuild_Call{Call: _e.mock.On("DeleteGuild", ctx, userID, guildID)}
 }
 
-func (_c *Service_DeleteGuild_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_DeleteGuild_Call {
+func (_c *Service_DeleteGuild_Call) Run(run func(ctx context.Context, userID uuid.UUID, guildID uuid.UUID)) *Service_DeleteGuild_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
 	})
@@ -198,9 +198,9 @@ func (_c *Service_DeleteGuild_Call) RunAndReturn(run func(context.Context, uuid.
 	return _c
 }
 
-// GetActiveChallenge provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) GetActiveChallenge(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (*model.GuildChallenge, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// GetActiveChallenge provides a mock function with given fields: ctx, userID, guildID
+func (_m *Service) GetActiveChallenge(ctx context.Context, userID uuid.UUID, guildID uuid.UUID) (*model.GuildChallenge, error) {
+	ret := _m.Called(ctx, userID, guildID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetActiveChallenge")
@@ -209,10 +209,10 @@ func (_m *Service) GetActiveChallenge(_a0 context.Context, _a1 uuid.UUID, _a2 uu
 	var r0 *model.GuildChallenge
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*model.GuildChallenge, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, userID, guildID)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *model.GuildChallenge); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, guildID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.GuildChallenge)
@@ -220,7 +220,7 @@ func (_m *Service) GetActiveChallenge(_a0 context.Context, _a1 uuid.UUID, _a2 uu
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, userID, guildID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -234,14 +234,14 @@ type Service_GetActiveChallenge_Call struct {
 }
 
 // GetActiveChallenge is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-func (_e *Service_Expecter) GetActiveChallenge(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_GetActiveChallenge_Call {
-	return &Service_GetActiveChallenge_Call{Call: _e.mock.On("GetActiveChallenge", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - guildID uuid.UUID
+func (_e *Service_Expecter) GetActiveChallenge(ctx interface{}, userID interface{}, guildID interface{}) *Service_GetActiveChallenge_Call {
+	return &Service_GetActiveChallenge_Call{Call: _e.mock.On("GetActiveChallenge", ctx, userID, guildID)}
 }
 
-func (_c *Service_GetActiveChallenge_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_GetActiveChallenge_Call {
+func (_c *Service_GetActiveChallenge_Call) Run(run func(ctx context.Context, userID uuid.UUID, guildID uuid.UUID)) *Service_GetActiveChallenge_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
 	})
@@ -258,9 +258,9 @@ func (_c *Service_GetActiveChallenge_Call) RunAndReturn(run func(context.Context
 	return _c
 }
 
-// GetMemberStats provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) GetMemberStats(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) ([]*model.GuildMemberStats, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// GetMemberStats provides a mock function with given fields: ctx, userID, guildID
+func (_m *Service) GetMemberStats(ctx context.Context, userID uuid.UUID, guildID uuid.UUID) ([]*model.GuildMemberStats, error) {
+	ret := _m.Called(ctx, userID, guildID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetMemberStats")
@@ -269,10 +269,10 @@ func (_m *Service) GetMemberStats(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.U
 	var r0 []*model.GuildMemberStats
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) ([]*model.GuildMemberStats, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, userID, guildID)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) []*model.GuildMemberStats); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, guildID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*model.GuildMemberStats)
@@ -280,7 +280,7 @@ func (_m *Service) GetMemberStats(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.U
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, userID, guildID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -294,14 +294,14 @@ type Service_GetMemberStats_Call struct {
 }
 
 // GetMemberStats is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-func (_e *Service_Expecter) GetMemberStats(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_GetMemberStats_Call {
-	return &Service_GetMemberStats_Call{Call: _e.mock.On("GetMemberStats", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - guildID uuid.UUID
+func (_e *Service_Expecter) GetMemberStats(ctx interface{}, userID interface{}, guildID interface{}) *Service_GetMemberStats_Call {
+	return &Service_GetMemberStats_Call{Call: _e.mock.On("GetMemberStats", ctx, userID, guildID)}
 }
 
-func (_c *Service_GetMemberStats_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_GetMemberStats_Call {
+func (_c *Service_GetMemberStats_Call) Run(run func(ctx context.Context, userID uuid.UUID, guildID uuid.UUID)) *Service_GetMemberStats_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
 	})
@@ -318,9 +318,9 @@ func (_c *Service_GetMemberStats_Call) RunAndReturn(run func(context.Context, uu
 	return _c
 }
 
-// GetPulse provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) GetPulse(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (*model.GuildPulse, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// GetPulse provides a mock function with given fields: ctx, userID, guildID
+func (_m *Service) GetPulse(ctx context.Context, userID uuid.UUID, guildID uuid.UUID) (*model.GuildPulse, error) {
+	ret := _m.Called(ctx, userID, guildID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPulse")
@@ -329,10 +329,10 @@ func (_m *Service) GetPulse(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (
 	var r0 *model.GuildPulse
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (*model.GuildPulse, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, userID, guildID)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) *model.GuildPulse); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, guildID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.GuildPulse)
@@ -340,7 +340,7 @@ func (_m *Service) GetPulse(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, userID, guildID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -354,14 +354,14 @@ type Service_GetPulse_Call struct {
 }
 
 // GetPulse is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-func (_e *Service_Expecter) GetPulse(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_GetPulse_Call {
-	return &Service_GetPulse_Call{Call: _e.mock.On("GetPulse", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - guildID uuid.UUID
+func (_e *Service_Expecter) GetPulse(ctx interface{}, userID interface{}, guildID interface{}) *Service_GetPulse_Call {
+	return &Service_GetPulse_Call{Call: _e.mock.On("GetPulse", ctx, userID, guildID)}
 }
 
-func (_c *Service_GetPulse_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_GetPulse_Call {
+func (_c *Service_GetPulse_Call) Run(run func(ctx context.Context, userID uuid.UUID, guildID uuid.UUID)) *Service_GetPulse_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
 	})
@@ -378,9 +378,9 @@ func (_c *Service_GetPulse_Call) RunAndReturn(run func(context.Context, uuid.UUI
 	return _c
 }
 
-// InviteToGuild provides a mock function with given fields: _a0, _a1, _a2, _a3
-func (_m *Service) InviteToGuild(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID, _a3 uuid.UUID) error {
-	ret := _m.Called(_a0, _a1, _a2, _a3)
+// InviteToGuild provides a mock function with given fields: ctx, inviterID, guildID, inviteeID
+func (_m *Service) InviteToGuild(ctx context.Context, inviterID uuid.UUID, guildID uuid.UUID, inviteeID uuid.UUID) error {
+	ret := _m.Called(ctx, inviterID, guildID, inviteeID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for InviteToGuild")
@@ -388,7 +388,7 @@ func (_m *Service) InviteToGuild(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UU
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) error); ok {
-		r0 = rf(_a0, _a1, _a2, _a3)
+		r0 = rf(ctx, inviterID, guildID, inviteeID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -402,15 +402,15 @@ type Service_InviteToGuild_Call struct {
 }
 
 // InviteToGuild is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-//   - _a3 uuid.UUID
-func (_e *Service_Expecter) InviteToGuild(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}) *Service_InviteToGuild_Call {
-	return &Service_InviteToGuild_Call{Call: _e.mock.On("InviteToGuild", _a0, _a1, _a2, _a3)}
+//   - ctx context.Context
+//   - inviterID uuid.UUID
+//   - guildID uuid.UUID
+//   - inviteeID uuid.UUID
+func (_e *Service_Expecter) InviteToGuild(ctx interface{}, inviterID interface{}, guildID interface{}, inviteeID interface{}) *Service_InviteToGuild_Call {
+	return &Service_InviteToGuild_Call{Call: _e.mock.On("InviteToGuild", ctx, inviterID, guildID, inviteeID)}
 }
 
-func (_c *Service_InviteToGuild_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID, _a3 uuid.UUID)) *Service_InviteToGuild_Call {
+func (_c *Service_InviteToGuild_Call) Run(run func(ctx context.Context, inviterID uuid.UUID, guildID uuid.UUID, inviteeID uuid.UUID)) *Service_InviteToGuild_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID), args[3].(uuid.UUID))
 	})
@@ -427,9 +427,9 @@ func (_c *Service_InviteToGuild_Call) RunAndReturn(run func(context.Context, uui
 	return _c
 }
 
-// IsMember provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) IsMember(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (bool, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// IsMember provides a mock function with given fields: ctx, userID, guildID
+func (_m *Service) IsMember(ctx context.Context, userID uuid.UUID, guildID uuid.UUID) (bool, error) {
+	ret := _m.Called(ctx, userID, guildID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for IsMember")
@@ -438,16 +438,16 @@ func (_m *Service) IsMember(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) (
 	var r0 bool
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) (bool, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, userID, guildID)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) bool); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, guildID)
 	} else {
 		r0 = ret.Get(0).(bool)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, userID, guildID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -461,14 +461,14 @@ type Service_IsMember_Call struct {
 }
 
 // IsMember is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-func (_e *Service_Expecter) IsMember(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_IsMember_Call {
-	return &Service_IsMember_Call{Call: _e.mock.On("IsMember", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - guildID uuid.UUID
+func (_e *Service_Expecter) IsMember(ctx interface{}, userID interface{}, guildID interface{}) *Service_IsMember_Call {
+	return &Service_IsMember_Call{Call: _e.mock.On("IsMember", ctx, userID, guildID)}
 }
 
-func (_c *Service_IsMember_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_IsMember_Call {
+func (_c *Service_IsMember_Call) Run(run func(ctx context.Context, userID uuid.UUID, guildID uuid.UUID)) *Service_IsMember_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
 	})
@@ -485,9 +485,9 @@ func (_c *Service_IsMember_Call) RunAndReturn(run func(context.Context, uuid.UUI
 	return _c
 }
 
-// JoinGuild provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) JoinGuild(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) error {
-	ret := _m.Called(_a0, _a1, _a2)
+// JoinGuild provides a mock function with given fields: ctx, userID, guildID
+func (_m *Service) JoinGuild(ctx context.Context, userID uuid.UUID, guildID uuid.UUID) error {
+	ret := _m.Called(ctx, userID, guildID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for JoinGuild")
@@ -495,7 +495,7 @@ func (_m *Service) JoinGuild(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) 
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, guildID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -509,14 +509,14 @@ type Service_JoinGuild_Call struct {
 }
 
 // JoinGuild is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-func (_e *Service_Expecter) JoinGuild(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_JoinGuild_Call {
-	return &Service_JoinGuild_Call{Call: _e.mock.On("JoinGuild", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - guildID uuid.UUID
+func (_e *Service_Expecter) JoinGuild(ctx interface{}, userID interface{}, guildID interface{}) *Service_JoinGuild_Call {
+	return &Service_JoinGuild_Call{Call: _e.mock.On("JoinGuild", ctx, userID, guildID)}
 }
 
-func (_c *Service_JoinGuild_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_JoinGuild_Call {
+func (_c *Service_JoinGuild_Call) Run(run func(ctx context.Context, userID uuid.UUID, guildID uuid.UUID)) *Service_JoinGuild_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
 	})
@@ -533,9 +533,9 @@ func (_c *Service_JoinGuild_Call) RunAndReturn(run func(context.Context, uuid.UU
 	return _c
 }
 
-// LeaveGuild provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) LeaveGuild(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID) error {
-	ret := _m.Called(_a0, _a1, _a2)
+// LeaveGuild provides a mock function with given fields: ctx, userID, guildID
+func (_m *Service) LeaveGuild(ctx context.Context, userID uuid.UUID, guildID uuid.UUID) error {
+	ret := _m.Called(ctx, userID, guildID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for LeaveGuild")
@@ -543,7 +543,7 @@ func (_m *Service) LeaveGuild(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID) error); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, guildID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -557,14 +557,14 @@ type Service_LeaveGuild_Call struct {
 }
 
 // LeaveGuild is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 uuid.UUID
-func (_e *Service_Expecter) LeaveGuild(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_LeaveGuild_Call {
-	return &Service_LeaveGuild_Call{Call: _e.mock.On("LeaveGuild", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - guildID uuid.UUID
+func (_e *Service_Expecter) LeaveGuild(ctx interface{}, userID interface{}, guildID interface{}) *Service_LeaveGuild_Call {
+	return &Service_LeaveGuild_Call{Call: _e.mock.On("LeaveGuild", ctx, userID, guildID)}
 }
 
-func (_c *Service_LeaveGuild_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 uuid.UUID)) *Service_LeaveGuild_Call {
+func (_c *Service_LeaveGuild_Call) Run(run func(ctx context.Context, userID uuid.UUID, guildID uuid.UUID)) *Service_LeaveGuild_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID))
 	})
@@ -581,9 +581,9 @@ func (_c *Service_LeaveGuild_Call) RunAndReturn(run func(context.Context, uuid.U
 	return _c
 }
 
-// ListGuildMembers provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) ListGuildMembers(_a0 context.Context, _a1 uuid.UUID, _a2 int32) ([]*model.GuildMemberProfile, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// ListGuildMembers provides a mock function with given fields: ctx, guildID, limit
+func (_m *Service) ListGuildMembers(ctx context.Context, guildID uuid.UUID, limit int32) ([]*model.GuildMemberProfile, error) {
+	ret := _m.Called(ctx, guildID, limit)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListGuildMembers")
@@ -592,10 +592,10 @@ func (_m *Service) ListGuildMembers(_a0 context.Context, _a1 uuid.UUID, _a2 int3
 	var r0 []*model.GuildMemberProfile
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, int32) ([]*model.GuildMemberProfile, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, guildID, limit)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, int32) []*model.GuildMemberProfile); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, guildID, limit)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).([]*model.GuildMemberProfile)
@@ -603,7 +603,7 @@ func (_m *Service) ListGuildMembers(_a0 context.Context, _a1 uuid.UUID, _a2 int3
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, int32) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, guildID, limit)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -617,14 +617,14 @@ type Service_ListGuildMembers_Call struct {
 }
 
 // ListGuildMembers is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 int32
-func (_e *Service_Expecter) ListGuildMembers(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_ListGuildMembers_Call {
-	return &Service_ListGuildMembers_Call{Call: _e.mock.On("ListGuildMembers", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - guildID uuid.UUID
+//   - limit int32
+func (_e *Service_Expecter) ListGuildMembers(ctx interface{}, guildID interface{}, limit interface{}) *Service_ListGuildMembers_Call {
+	return &Service_ListGuildMembers_Call{Call: _e.mock.On("ListGuildMembers", ctx, guildID, limit)}
 }
 
-func (_c *Service_ListGuildMembers_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 int32)) *Service_ListGuildMembers_Call {
+func (_c *Service_ListGuildMembers_Call) Run(run func(ctx context.Context, guildID uuid.UUID, limit int32)) *Service_ListGuildMembers_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(int32))
 	})
@@ -641,9 +641,9 @@ func (_c *Service_ListGuildMembers_Call) RunAndReturn(run func(context.Context, 
 	return _c
 }
 
-// ListGuilds provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) ListGuilds(_a0 context.Context, _a1 uuid.UUID, _a2 model.ListGuildsOptions) (*model.ListGuildsResponse, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// ListGuilds provides a mock function with given fields: ctx, userID, opts
+func (_m *Service) ListGuilds(ctx context.Context, userID uuid.UUID, opts model.ListGuildsOptions) (*model.ListGuildsResponse, error) {
+	ret := _m.Called(ctx, userID, opts)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListGuilds")
@@ -652,10 +652,10 @@ func (_m *Service) ListGuilds(_a0 context.Context, _a1 uuid.UUID, _a2 model.List
 	var r0 *model.ListGuildsResponse
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.ListGuildsOptions) (*model.ListGuildsResponse, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, userID, opts)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.ListGuildsOptions) *model.ListGuildsResponse); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, userID, opts)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ListGuildsResponse)
@@ -663,7 +663,7 @@ func (_m *Service) ListGuilds(_a0 context.Context, _a1 uuid.UUID, _a2 model.List
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, model.ListGuildsOptions) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, userID, opts)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -677,14 +677,14 @@ type Service_ListGuilds_Call struct {
 }
 
 // ListGuilds is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 model.ListGuildsOptions
-func (_e *Service_Expecter) ListGuilds(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_ListGuilds_Call {
-	return &Service_ListGuilds_Call{Call: _e.mock.On("ListGuilds", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+//   - opts model.ListGuildsOptions
+func (_e *Service_Expecter) ListGuilds(ctx interface{}, userID interface{}, opts interface{}) *Service_ListGuilds_Call {
+	return &Service_ListGuilds_Call{Call: _e.mock.On("ListGuilds", ctx, userID, opts)}
 }
 
-func (_c *Service_ListGuilds_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 model.ListGuildsOptions)) *Service_ListGuilds_Call {
+func (_c *Service_ListGuilds_Call) Run(run func(ctx context.Context, userID uuid.UUID, opts model.ListGuildsOptions)) *Service_ListGuilds_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(model.ListGuildsOptions))
 	})

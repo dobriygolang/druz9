@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -17,7 +18,7 @@ func (s *Service) PreparePodcastUpload(ctx context.Context, podcastID uuid.UUID,
 		ContentType: req.ContentType,
 	})
 	if err != nil {
-		return nil, "", "", err
+		return nil, "", "", fmt.Errorf("presign put object: %w", err)
 	}
 
 	podcast, err := s.repo.AttachUpload(ctx, podcastID, model.UploadPodcastRequest{
@@ -26,7 +27,7 @@ func (s *Service) PreparePodcastUpload(ctx context.Context, podcastID uuid.UUID,
 		DurationSeconds: req.DurationSeconds,
 	}, objectKey)
 	if err != nil {
-		return nil, "", "", err
+		return nil, "", "", fmt.Errorf("attach upload: %w", err)
 	}
 
 	return podcast, uploadURL, objectKey, nil

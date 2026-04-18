@@ -12,6 +12,11 @@ import (
 	"api/internal/rtc"
 )
 
+var (
+	errDatabaseURLRequired    = errors.New("DATABASE_URL is required")
+	errS3ConfigRequired       = errors.New("S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY and S3_SECRET_KEY are required")
+)
+
 func Load(manager *rtc.Manager) (*Bootstrap, error) {
 	cfg := defaultBootstrap()
 	ctx := context.Background()
@@ -269,11 +274,11 @@ func Load(manager *rtc.Manager) (*Bootstrap, error) {
 	}
 
 	if cfg.Data.Database.Source == "" {
-		return nil, errors.New("DATABASE_URL is required")
+		return nil, errDatabaseURLRequired
 	}
 	// Telegram token is optional - bot will not start if empty
 	if cfg.External.S3.Endpoint == "" || cfg.External.S3.Bucket == "" || cfg.External.S3.AccessKey == "" || cfg.External.S3.SecretKey == "" {
-		return nil, errors.New("S3_ENDPOINT, S3_BUCKET, S3_ACCESS_KEY and S3_SECRET_KEY are required")
+		return nil, errS3ConfigRequired
 	}
 
 	// Register watchers for config changes
@@ -379,7 +384,7 @@ func overrideSecretConfigFromEnv(cfg *Bootstrap) {
 	}
 }
 
-func splitTrimmed(s string, sep string) []string {
+func splitTrimmed(s, sep string) []string {
 	parts := strings.Split(s, sep)
 	result := make([]string, 0, len(parts))
 	for _, p := range parts {
@@ -415,12 +420,12 @@ func registerConfigWatchers(manager *rtc.Manager, cfg *Bootstrap) error {
 	if err := manager.WatchValue(ctx, rtc.DevAuthBypass, func(oldVar, newVar rtc.Variable) {
 		cfg.Dev.AuthBypass = newVar.Value().Bool()
 	}); err != nil {
-		return err
+		return fmt.Errorf("watch DevAuthBypass: %w", err)
 	}
 	if err := manager.WatchValue(ctx, rtc.AppRequireAuth, func(oldVar, newVar rtc.Variable) {
 		cfg.Auth.RequireAuth = newVar.Value().Bool()
 	}); err != nil {
-		return err
+		return fmt.Errorf("watch AppRequireAuth: %w", err)
 	}
 	if err := manager.WatchValue(ctx, rtc.Key("arena_require_auth"), func(oldVar, newVar rtc.Variable) {
 		if cfg.Arena == nil {
@@ -428,7 +433,7 @@ func registerConfigWatchers(manager *rtc.Manager, cfg *Bootstrap) error {
 		}
 		cfg.Arena.RequireAuth = newVar.Value().Bool()
 	}); err != nil {
-		return err
+		return fmt.Errorf("watch arena_require_auth: %w", err)
 	}
 	return nil
 }

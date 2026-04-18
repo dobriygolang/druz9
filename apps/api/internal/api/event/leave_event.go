@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -13,12 +14,12 @@ import (
 func (i *Implementation) LeaveEvent(ctx context.Context, req *v1.LeaveEventRequest) (*v1.EventStatusResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	eventID, err := apihelpers.ParseUUID(req.GetEventId(), "INVALID_EVENT_ID", "event_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse event id: %w", err)
 	}
 
 	if err := i.service.LeaveEvent(ctx, eventID, user.ID); err != nil {

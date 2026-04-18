@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/apihelpers"
 	"api/internal/metrics"
@@ -11,12 +12,12 @@ import (
 func (i *Implementation) PlayPodcast(ctx context.Context, req *v1.PlayPodcastRequest) (*v1.PlayPodcastResponse, error) {
 	podcastID, err := apihelpers.ParseUUID(req.GetPodcastId(), "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("context: %w", err)
 	}
 
 	item, streamURL, err := i.service.PlayPodcast(ctx, podcastID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("play podcast: %w", err)
 	}
 
 	metrics.IncListens()

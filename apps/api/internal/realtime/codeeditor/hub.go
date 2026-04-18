@@ -92,7 +92,7 @@ func (h *Hub) Stop() {
 	h.cancel()
 }
 
-func (h *Hub) Handler(roomID string, authenticatedUserID string) http.Handler {
+func (h *Hub) Handler(roomID, authenticatedUserID string) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		ws, err := h.upgrader.Upgrade(w, r, nil)
 		if err != nil {
@@ -137,7 +137,7 @@ func (h *Hub) authorizeClient(client *codeEditorClient) bool {
 	return codeEditorActorAllowed(room, client.userID, client.guestName)
 }
 
-func codeEditorActorAllowed(room *codeeditordomain.Room, userID string, guestName string) bool {
+func codeEditorActorAllowed(room *codeeditordomain.Room, userID, guestName string) bool {
 	if room == nil {
 		return false
 	}
@@ -162,7 +162,7 @@ func codeEditorActorAllowed(room *codeeditordomain.Room, userID string, guestNam
 	return false
 }
 
-func codeEditorActorKey(userID string, guestName string) string {
+func codeEditorActorKey(userID, guestName string) string {
 	if trimmedUserID := strings.TrimSpace(userID); trimmedUserID != "" {
 		return "user:" + trimmedUserID
 	}

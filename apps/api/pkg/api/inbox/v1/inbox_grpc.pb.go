@@ -19,11 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	InboxService_ListThreads_FullMethodName    = "/inbox.v1.InboxService/ListThreads"
-	InboxService_GetThread_FullMethodName      = "/inbox.v1.InboxService/GetThread"
-	InboxService_MarkThreadRead_FullMethodName = "/inbox.v1.InboxService/MarkThreadRead"
-	InboxService_SendMessage_FullMethodName    = "/inbox.v1.InboxService/SendMessage"
-	InboxService_GetUnreadCount_FullMethodName = "/inbox.v1.InboxService/GetUnreadCount"
+	InboxService_ListThreads_FullMethodName        = "/inbox.v1.InboxService/ListThreads"
+	InboxService_GetThread_FullMethodName          = "/inbox.v1.InboxService/GetThread"
+	InboxService_MarkThreadRead_FullMethodName     = "/inbox.v1.InboxService/MarkThreadRead"
+	InboxService_SendMessage_FullMethodName        = "/inbox.v1.InboxService/SendMessage"
+	InboxService_GetUnreadCount_FullMethodName     = "/inbox.v1.InboxService/GetUnreadCount"
+	InboxService_CreateDirectThread_FullMethodName = "/inbox.v1.InboxService/CreateDirectThread"
 )
 
 // InboxServiceClient is the client API for InboxService service.
@@ -49,6 +50,9 @@ type InboxServiceClient interface {
 	SendMessage(ctx context.Context, in *SendMessageRequest, opts ...grpc.CallOption) (*SendMessageResponse, error)
 	// GetUnreadCount returns the total unread thread count for badge rendering.
 	GetUnreadCount(ctx context.Context, in *GetUnreadCountRequest, opts ...grpc.CallOption) (*GetUnreadCountResponse, error)
+	// CreateDirectThread opens (or returns existing) a bidirectional friend-mail
+	// thread between the caller and the given recipient. Idempotent.
+	CreateDirectThread(ctx context.Context, in *CreateDirectThreadRequest, opts ...grpc.CallOption) (*CreateDirectThreadResponse, error)
 }
 
 type inboxServiceClient struct {
@@ -109,6 +113,16 @@ func (c *inboxServiceClient) GetUnreadCount(ctx context.Context, in *GetUnreadCo
 	return out, nil
 }
 
+func (c *inboxServiceClient) CreateDirectThread(ctx context.Context, in *CreateDirectThreadRequest, opts ...grpc.CallOption) (*CreateDirectThreadResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CreateDirectThreadResponse)
+	err := c.cc.Invoke(ctx, InboxService_CreateDirectThread_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InboxServiceServer is the server API for InboxService service.
 // All implementations must embed UnimplementedInboxServiceServer
 // for forward compatibility.
@@ -132,6 +146,9 @@ type InboxServiceServer interface {
 	SendMessage(context.Context, *SendMessageRequest) (*SendMessageResponse, error)
 	// GetUnreadCount returns the total unread thread count for badge rendering.
 	GetUnreadCount(context.Context, *GetUnreadCountRequest) (*GetUnreadCountResponse, error)
+	// CreateDirectThread opens (or returns existing) a bidirectional friend-mail
+	// thread between the caller and the given recipient. Idempotent.
+	CreateDirectThread(context.Context, *CreateDirectThreadRequest) (*CreateDirectThreadResponse, error)
 	mustEmbedUnimplementedInboxServiceServer()
 }
 
@@ -156,6 +173,9 @@ func (UnimplementedInboxServiceServer) SendMessage(context.Context, *SendMessage
 }
 func (UnimplementedInboxServiceServer) GetUnreadCount(context.Context, *GetUnreadCountRequest) (*GetUnreadCountResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method GetUnreadCount not implemented")
+}
+func (UnimplementedInboxServiceServer) CreateDirectThread(context.Context, *CreateDirectThreadRequest) (*CreateDirectThreadResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateDirectThread not implemented")
 }
 func (UnimplementedInboxServiceServer) mustEmbedUnimplementedInboxServiceServer() {}
 func (UnimplementedInboxServiceServer) testEmbeddedByValue()                      {}
@@ -268,6 +288,24 @@ func _InboxService_GetUnreadCount_Handler(srv interface{}, ctx context.Context, 
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InboxService_CreateDirectThread_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CreateDirectThreadRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InboxServiceServer).CreateDirectThread(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InboxService_CreateDirectThread_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InboxServiceServer).CreateDirectThread(ctx, req.(*CreateDirectThreadRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InboxService_ServiceDesc is the grpc.ServiceDesc for InboxService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -294,6 +332,10 @@ var InboxService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUnreadCount",
 			Handler:    _InboxService_GetUnreadCount_Handler,
+		},
+		{
+			MethodName: "CreateDirectThread",
+			Handler:    _InboxService_CreateDirectThread_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

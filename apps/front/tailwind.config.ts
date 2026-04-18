@@ -74,8 +74,7 @@ export default {
         geist: ['Geist', 'system-ui', 'sans-serif'],
         mono: ['JetBrains Mono', 'monospace'],
         pixel: ['"Press Start 2P"', 'monospace'],
-        // Pixel RPG redesign fonts
-        display: ['"Pixelify Sans"', '"Silkscreen"', 'monospace'],
+        display: ['"Cormorant Garamond"', 'Georgia', 'serif'],
         silkscreen: ['"Silkscreen"', '"JetBrains Mono"', 'monospace'],
         body: ['"IBM Plex Sans"', 'system-ui', 'sans-serif'],
       },

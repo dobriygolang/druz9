@@ -24,9 +24,9 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
-// CreateReferral provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) CreateReferral(_a0 context.Context, _a1 *model.User, _a2 model.CreateReferralRequest) (*model.Referral, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// CreateReferral provides a mock function with given fields: ctx, user, req
+func (_m *Service) CreateReferral(ctx context.Context, user *model.User, req model.CreateReferralRequest) (*model.Referral, error) {
+	ret := _m.Called(ctx, user, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreateReferral")
@@ -35,10 +35,10 @@ func (_m *Service) CreateReferral(_a0 context.Context, _a1 *model.User, _a2 mode
 	var r0 *model.Referral
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, *model.User, model.CreateReferralRequest) (*model.Referral, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, user, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, *model.User, model.CreateReferralRequest) *model.Referral); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, user, req)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Referral)
@@ -46,7 +46,7 @@ func (_m *Service) CreateReferral(_a0 context.Context, _a1 *model.User, _a2 mode
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *model.User, model.CreateReferralRequest) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, user, req)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -60,14 +60,14 @@ type Service_CreateReferral_Call struct {
 }
 
 // CreateReferral is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 *model.User
-//   - _a2 model.CreateReferralRequest
-func (_e *Service_Expecter) CreateReferral(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_CreateReferral_Call {
-	return &Service_CreateReferral_Call{Call: _e.mock.On("CreateReferral", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - user *model.User
+//   - req model.CreateReferralRequest
+func (_e *Service_Expecter) CreateReferral(ctx interface{}, user interface{}, req interface{}) *Service_CreateReferral_Call {
+	return &Service_CreateReferral_Call{Call: _e.mock.On("CreateReferral", ctx, user, req)}
 }
 
-func (_c *Service_CreateReferral_Call) Run(run func(_a0 context.Context, _a1 *model.User, _a2 model.CreateReferralRequest)) *Service_CreateReferral_Call {
+func (_c *Service_CreateReferral_Call) Run(run func(ctx context.Context, user *model.User, req model.CreateReferralRequest)) *Service_CreateReferral_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*model.User), args[2].(model.CreateReferralRequest))
 	})
@@ -84,9 +84,9 @@ func (_c *Service_CreateReferral_Call) RunAndReturn(run func(context.Context, *m
 	return _c
 }
 
-// DeleteReferral provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) DeleteReferral(_a0 context.Context, _a1 uuid.UUID, _a2 *model.User) error {
-	ret := _m.Called(_a0, _a1, _a2)
+// DeleteReferral provides a mock function with given fields: ctx, id, user
+func (_m *Service) DeleteReferral(ctx context.Context, id uuid.UUID, user *model.User) error {
+	ret := _m.Called(ctx, id, user)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeleteReferral")
@@ -94,7 +94,7 @@ func (_m *Service) DeleteReferral(_a0 context.Context, _a1 uuid.UUID, _a2 *model
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User) error); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, id, user)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -108,14 +108,14 @@ type Service_DeleteReferral_Call struct {
 }
 
 // DeleteReferral is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 *model.User
-func (_e *Service_Expecter) DeleteReferral(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_DeleteReferral_Call {
-	return &Service_DeleteReferral_Call{Call: _e.mock.On("DeleteReferral", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - id uuid.UUID
+//   - user *model.User
+func (_e *Service_Expecter) DeleteReferral(ctx interface{}, id interface{}, user interface{}) *Service_DeleteReferral_Call {
+	return &Service_DeleteReferral_Call{Call: _e.mock.On("DeleteReferral", ctx, id, user)}
 }
 
-func (_c *Service_DeleteReferral_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 *model.User)) *Service_DeleteReferral_Call {
+func (_c *Service_DeleteReferral_Call) Run(run func(ctx context.Context, id uuid.UUID, user *model.User)) *Service_DeleteReferral_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*model.User))
 	})
@@ -132,9 +132,9 @@ func (_c *Service_DeleteReferral_Call) RunAndReturn(run func(context.Context, uu
 	return _c
 }
 
-// ListReferrals provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) ListReferrals(_a0 context.Context, _a1 *model.User, _a2 model.ListReferralsOptions) (*model.ListReferralsResponse, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// ListReferrals provides a mock function with given fields: ctx, user, opts
+func (_m *Service) ListReferrals(ctx context.Context, user *model.User, opts model.ListReferralsOptions) (*model.ListReferralsResponse, error) {
+	ret := _m.Called(ctx, user, opts)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListReferrals")
@@ -143,10 +143,10 @@ func (_m *Service) ListReferrals(_a0 context.Context, _a1 *model.User, _a2 model
 	var r0 *model.ListReferralsResponse
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, *model.User, model.ListReferralsOptions) (*model.ListReferralsResponse, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, user, opts)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, *model.User, model.ListReferralsOptions) *model.ListReferralsResponse); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, user, opts)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ListReferralsResponse)
@@ -154,7 +154,7 @@ func (_m *Service) ListReferrals(_a0 context.Context, _a1 *model.User, _a2 model
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *model.User, model.ListReferralsOptions) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, user, opts)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -168,14 +168,14 @@ type Service_ListReferrals_Call struct {
 }
 
 // ListReferrals is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 *model.User
-//   - _a2 model.ListReferralsOptions
-func (_e *Service_Expecter) ListReferrals(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_ListReferrals_Call {
-	return &Service_ListReferrals_Call{Call: _e.mock.On("ListReferrals", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - user *model.User
+//   - opts model.ListReferralsOptions
+func (_e *Service_Expecter) ListReferrals(ctx interface{}, user interface{}, opts interface{}) *Service_ListReferrals_Call {
+	return &Service_ListReferrals_Call{Call: _e.mock.On("ListReferrals", ctx, user, opts)}
 }
 
-func (_c *Service_ListReferrals_Call) Run(run func(_a0 context.Context, _a1 *model.User, _a2 model.ListReferralsOptions)) *Service_ListReferrals_Call {
+func (_c *Service_ListReferrals_Call) Run(run func(ctx context.Context, user *model.User, opts model.ListReferralsOptions)) *Service_ListReferrals_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*model.User), args[2].(model.ListReferralsOptions))
 	})
@@ -192,9 +192,9 @@ func (_c *Service_ListReferrals_Call) RunAndReturn(run func(context.Context, *mo
 	return _c
 }
 
-// UpdateReferral provides a mock function with given fields: _a0, _a1, _a2, _a3
-func (_m *Service) UpdateReferral(_a0 context.Context, _a1 uuid.UUID, _a2 *model.User, _a3 model.CreateReferralRequest) (*model.Referral, error) {
-	ret := _m.Called(_a0, _a1, _a2, _a3)
+// UpdateReferral provides a mock function with given fields: ctx, id, user, req
+func (_m *Service) UpdateReferral(ctx context.Context, id uuid.UUID, user *model.User, req model.CreateReferralRequest) (*model.Referral, error) {
+	ret := _m.Called(ctx, id, user, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UpdateReferral")
@@ -203,10 +203,10 @@ func (_m *Service) UpdateReferral(_a0 context.Context, _a1 uuid.UUID, _a2 *model
 	var r0 *model.Referral
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User, model.CreateReferralRequest) (*model.Referral, error)); ok {
-		return rf(_a0, _a1, _a2, _a3)
+		return rf(ctx, id, user, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User, model.CreateReferralRequest) *model.Referral); ok {
-		r0 = rf(_a0, _a1, _a2, _a3)
+		r0 = rf(ctx, id, user, req)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Referral)
@@ -214,7 +214,7 @@ func (_m *Service) UpdateReferral(_a0 context.Context, _a1 uuid.UUID, _a2 *model
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, *model.User, model.CreateReferralRequest) error); ok {
-		r1 = rf(_a0, _a1, _a2, _a3)
+		r1 = rf(ctx, id, user, req)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -228,15 +228,15 @@ type Service_UpdateReferral_Call struct {
 }
 
 // UpdateReferral is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 *model.User
-//   - _a3 model.CreateReferralRequest
-func (_e *Service_Expecter) UpdateReferral(_a0 interface{}, _a1 interface{}, _a2 interface{}, _a3 interface{}) *Service_UpdateReferral_Call {
-	return &Service_UpdateReferral_Call{Call: _e.mock.On("UpdateReferral", _a0, _a1, _a2, _a3)}
+//   - ctx context.Context
+//   - id uuid.UUID
+//   - user *model.User
+//   - req model.CreateReferralRequest
+func (_e *Service_Expecter) UpdateReferral(ctx interface{}, id interface{}, user interface{}, req interface{}) *Service_UpdateReferral_Call {
+	return &Service_UpdateReferral_Call{Call: _e.mock.On("UpdateReferral", ctx, id, user, req)}
 }
 
-func (_c *Service_UpdateReferral_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 *model.User, _a3 model.CreateReferralRequest)) *Service_UpdateReferral_Call {
+func (_c *Service_UpdateReferral_Call) Run(run func(ctx context.Context, id uuid.UUID, user *model.User, req model.CreateReferralRequest)) *Service_UpdateReferral_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*model.User), args[3].(model.CreateReferralRequest))
 	})

@@ -10,7 +10,7 @@ import (
 )
 
 type Service interface {
-	ConfirmTelegramAuth(context.Context, string, string, model.TelegramAuthPayload) (string, error)
+	ConfirmTelegramAuth(ctx context.Context, botToken, authData string, payload model.TelegramAuthPayload) (string, error)
 }
 
 type Server struct {

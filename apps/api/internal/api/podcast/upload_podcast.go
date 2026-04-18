@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -14,12 +15,12 @@ const maxInlinePodcastUploadSize = 20 * 1024 * 1024
 
 func (i *Implementation) UploadPodcast(ctx context.Context, req *v1.UploadPodcastRequest) (*v1.PodcastResponse, error) {
 	if _, err := requireAdmin(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("context: %w", err)
 	}
 
 	podcastID, err := apihelpers.ParseUUID(req.GetPodcastId(), "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("context: %w", err)
 	}
 	if len(req.GetContent()) > maxInlinePodcastUploadSize {
 		return nil, errors.BadRequest(
@@ -36,7 +37,7 @@ func (i *Implementation) UploadPodcast(ctx context.Context, req *v1.UploadPodcas
 	})
 	if err != nil {
 		if kratosErr := errors.FromError(err); kratosErr.Reason != "UNKNOWN" {
-			return nil, err
+			return nil, fmt.Errorf("upload podcast: %w", err)
 		}
 		return nil, errors.InternalServer("PODCAST_UPLOAD_FAILED", "failed to upload podcast")
 	}

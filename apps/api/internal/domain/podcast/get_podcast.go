@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -10,5 +11,9 @@ import (
 
 // GetPodcast retrieves a specific podcast.
 func (s *Service) GetPodcast(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, error) {
-	return s.repo.GetPodcast(ctx, podcastID)
+	podcast, err := s.repo.GetPodcast(ctx, podcastID)
+	if err != nil {
+		return nil, fmt.Errorf("get podcast: %w", err)
+	}
+	return podcast, nil
 }

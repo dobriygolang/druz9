@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/model"
 	v1 "api/pkg/api/podcast/v1"
@@ -15,7 +16,7 @@ func (i *Implementation) ListPodcasts(ctx context.Context, req *v1.ListPodcastsR
 
 	resp, err := i.service.ListPodcasts(ctx, opts)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list podcasts: %w", err)
 	}
 
 	podcasts := make([]*v1.Podcast, 0, len(resp.Podcasts))

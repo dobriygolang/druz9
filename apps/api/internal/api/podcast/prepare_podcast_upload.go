@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/apihelpers"
 	"api/internal/model"
@@ -10,12 +11,12 @@ import (
 
 func (i *Implementation) PreparePodcastUpload(ctx context.Context, req *v1.PreparePodcastUploadRequest) (*v1.PreparePodcastUploadResponse, error) {
 	if _, err := apihelpers.RequireUser(ctx); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("context: %w", err)
 	}
 
 	podcastID, err := apihelpers.ParseUUID(req.GetPodcastId(), "INVALID_PODCAST_ID", "podcast_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("context: %w", err)
 	}
 
 	item, uploadURL, objectKey, err := i.service.PreparePodcastUpload(ctx, podcastID, model.PreparePodcastUploadRequest{
@@ -24,7 +25,7 @@ func (i *Implementation) PreparePodcastUpload(ctx context.Context, req *v1.Prepa
 		DurationSeconds: req.GetDurationSeconds(),
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("prepare podcast upload: %w", err)
 	}
 
 	return &v1.PreparePodcastUploadResponse{

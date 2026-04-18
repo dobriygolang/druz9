@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -11,18 +12,22 @@ import (
 
 // CompletePodcastUpload completes podcast upload by updating the record with file metadata.
 func (s *Service) CompletePodcastUpload(ctx context.Context, podcastID uuid.UUID, req model.CompletePodcastUploadRequest) (*model.Podcast, error) {
-	return s.repo.AttachUpload(ctx, podcastID, model.UploadPodcastRequest{
+	podcast, err := s.repo.AttachUpload(ctx, podcastID, model.UploadPodcastRequest{
 		FileName:        req.FileName,
 		ContentType:     req.ContentType,
 		DurationSeconds: req.DurationSeconds,
 	}, req.ObjectKey)
+	if err != nil {
+		return nil, fmt.Errorf("attach upload: %w", err)
+	}
+	return podcast, nil
 }
 
 // PlayPodcast increments listen count and returns podcast with signed URL.
 func (s *Service) PlayPodcast(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, string, error) {
 	podcast, err := s.repo.IncrementListens(ctx, podcastID)
 	if err != nil {
-		return nil, "", err
+		return nil, "", fmt.Errorf("increment listens: %w", err)
 	}
 
 	var url string
@@ -31,7 +36,7 @@ func (s *Service) PlayPodcast(ctx context.Context, podcastID uuid.UUID) (*model.
 			Expiry: 24 * time.Hour,
 		})
 		if err != nil {
-			return nil, "", err
+			return nil, "", fmt.Errorf("presign get object: %w", err)
 		}
 	}
 
@@ -47,8 +52,12 @@ func (s *Service) UploadPodcast(ctx context.Context, podcastID uuid.UUID, req mo
 		ContentLength: req.ContentLength,
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("presign put object: %w", err)
 	}
 
-	return s.repo.AttachUpload(ctx, podcastID, req, objectKey)
+	podcast, err := s.repo.AttachUpload(ctx, podcastID, req, objectKey)
+	if err != nil {
+		return nil, fmt.Errorf("attach upload: %w", err)
+	}
+	return podcast, nil
 }

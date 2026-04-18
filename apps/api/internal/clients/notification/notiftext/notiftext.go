@@ -29,7 +29,7 @@ func MatchFoundBody(topic string) string {
 
 func DuelResultTitle() string { return "Результат дуэли" }
 
-func DuelResultBody(topic string, isWinner bool, isDraw bool) string {
+func DuelResultBody(topic string, isWinner, isDraw bool) string {
 	if isDraw {
 		return "Дуэль завершена вничью. Тема: " + topic
 	}

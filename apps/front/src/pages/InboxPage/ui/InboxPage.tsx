@@ -24,6 +24,7 @@ const KIND_COLOR: Record<ThreadKind, string> = {
   [ThreadKind.SYSTEM]:      'var(--r-legendary)',
   [ThreadKind.DUEL]:        'var(--r-epic)',
   [ThreadKind.CHALLENGE]:   'var(--r-rare)',
+  [ThreadKind.FRIEND]:      'var(--sky-1, #4a90d9)',
 }
 
 const KIND_LABEL: Record<ThreadKind, string> = {
@@ -33,6 +34,7 @@ const KIND_LABEL: Record<ThreadKind, string> = {
   [ThreadKind.SYSTEM]:      'system',
   [ThreadKind.DUEL]:        'duel',
   [ThreadKind.CHALLENGE]:   'challenge',
+  [ThreadKind.FRIEND]:      'письмо',
 }
 
 // Relative-time formatter tuned for chat previews. Avoids a heavy date-fns dep
@@ -79,14 +81,34 @@ export function InboxPage() {
         if (cancelled) return
         setThreads(resp.threads)
         setUnreadTotal(resp.unreadTotal)
-        if (resp.threads.length > 0) setActiveId(resp.threads[0].id)
+        const deepThread = new URLSearchParams(location.search).get('thread')
+        const target = deepThread && resp.threads.find((t) => t.id === deepThread)
+        if (target) setActiveId(target.id)
+        else if (resp.threads.length > 0) setActiveId(resp.threads[0].id)
       })
       .catch((e) => console.error('inbox: list threads', e))
       .finally(() => !cancelled && setLoading(false))
     return () => {
       cancelled = true
     }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // When navigating to ?thread=xxx after mount (e.g. from friend Chat button),
+  // re-fetch threads so the new thread appears and gets selected.
+  const prevSearch = useRef(location.search)
+  useEffect(() => {
+    const prev = prevSearch.current
+    prevSearch.current = location.search
+    const deepThread = new URLSearchParams(location.search).get('thread')
+    if (!deepThread || location.search === prev) return
+    inboxApi.listThreads().then((resp) => {
+      setThreads(resp.threads)
+      setUnreadTotal(resp.unreadTotal)
+      const target = resp.threads.find((t) => t.id === deepThread)
+      if (target) setActiveId(target.id)
+    }).catch(() => undefined)
+  }, [location.search])
 
   // Load messages + mark-read when active thread changes.
   useEffect(() => {
@@ -328,11 +350,25 @@ export function InboxPage() {
 
 function FriendsPanel() {
   const { t } = useTranslation()
+  const navigate = useNavigate()
   const [friends, setFriends] = useState<Friend[]>([])
   const [incoming, setIncoming] = useState<FriendRequest[]>([])
   const [outgoing, setOutgoing] = useState<FriendRequest[]>([])
   const [loading, setLoading] = useState(true)
   const [composeOpen, setComposeOpen] = useState(false)
+  const [chattingId, setChattingId] = useState<string | null>(null)
+
+  const openChat = useCallback(async (userId: string) => {
+    setChattingId(userId)
+    try {
+      const { threadId } = await inboxApi.createThread(userId)
+      navigate(`/inbox?tab=messages&thread=${threadId}`)
+    } catch (e) {
+      console.error('inbox: create thread', e)
+    } finally {
+      setChattingId(null)
+    }
+  }, [navigate])
 
   const load = useCallback(async () => {
     setLoading(true)
@@ -437,7 +473,14 @@ function FriendsPanel() {
               </div>
             </div>
             <div style={{ display: 'flex', gap: 6 }}>
-              <RpgButton size="sm" variant="ghost">{t('inbox.chat')}</RpgButton>
+              <RpgButton
+                size="sm"
+                variant="ghost"
+                disabled={chattingId === f.userId}
+                onClick={() => void openChat(f.userId)}
+              >
+                {chattingId === f.userId ? '...' : t('inbox.chat')}
+              </RpgButton>
               <RpgButton size="sm" variant="ghost" onClick={() => void remove(f.userId)}>{t('inbox.remove')}</RpgButton>
             </div>
           </div>

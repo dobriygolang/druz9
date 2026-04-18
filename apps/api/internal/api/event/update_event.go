@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	"api/internal/apihelpers"
@@ -13,11 +14,11 @@ import (
 func (i *Implementation) UpdateEvent(ctx context.Context, req *v1.UpdateEventRequest) (*v1.EventResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	eventID, err := apihelpers.ParseUUID(req.GetEventId(), "INVALID_EVENT_ID", "event_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse event id: %w", err)
 	}
 
 	var scheduledAt *time.Time
@@ -40,7 +41,7 @@ func (i *Implementation) UpdateEvent(ctx context.Context, req *v1.UpdateEventReq
 		InvitedUserIDs: req.GetInvitedUserIds(),
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update event: %w", err)
 	}
 	return &v1.EventResponse{Event: mapEvent(event)}, nil
 }

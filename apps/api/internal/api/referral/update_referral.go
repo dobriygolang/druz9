@@ -2,6 +2,7 @@ package referral
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/apihelpers"
 	"api/internal/model"
@@ -11,11 +12,11 @@ import (
 func (i *Implementation) UpdateReferral(ctx context.Context, req *v1.UpdateReferralRequest) (*v1.ReferralResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	referralID, err := apihelpers.ParseUUID(req.GetReferralId(), "INVALID_REFERRAL_ID", "referral_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse referral id: %w", err)
 	}
 	item, err := i.service.UpdateReferral(ctx, referralID, user, model.UpdateReferralRequest{
 		Title:          req.GetReferral().GetTitle(),
@@ -27,7 +28,7 @@ func (i *Implementation) UpdateReferral(ctx context.Context, req *v1.UpdateRefer
 		EmploymentType: unmapEmploymentType(req.GetReferral().GetEmploymentType()),
 	})
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update referral: %w", err)
 	}
 	return &v1.ReferralResponse{Referral: mapReferral(item)}, nil
 }

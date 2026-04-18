@@ -338,7 +338,10 @@ ORDER BY ep.event_id, ep.created_at ASC
 		}
 	}
 
-	return rows.Err()
+	if err := rows.Err(); err != nil {
+		return fmt.Errorf("iterate rows: %w", err)
+	}
+	return nil
 }
 
 func (r *Repo) getEvent(
@@ -420,5 +423,5 @@ WHERE e.id = $1
 }
 
 type eventQueryer interface {
-	Query(context.Context, string, ...any) (pgx.Rows, error)
+	Query(ctx context.Context, query string, args ...any) (pgx.Rows, error)
 }

@@ -105,7 +105,7 @@ ON CONFLICT (guild_id, user_id) DO NOTHING`, guildID, inviteeID)
 			return fmt.Errorf("update member count: %w", err)
 		}
 	}
-	return tx.Commit(ctx)
+	return fmt.Errorf("invite to guild commit: %w", tx.Commit(ctx))
 }
 
 func (r *Repo) JoinGuild(ctx context.Context, guildID, userID uuid.UUID) error {
@@ -140,7 +140,7 @@ ON CONFLICT (guild_id, user_id) DO NOTHING`, guildID, userID)
 		}
 	}
 
-	return tx.Commit(ctx)
+	return fmt.Errorf("join guild commit: %w", tx.Commit(ctx))
 }
 
 func (r *Repo) DeleteGuild(ctx context.Context, guildID uuid.UUID) error {
@@ -197,4 +197,71 @@ func (r *Repo) LeaveGuild(ctx context.Context, guildID, userID uuid.UUID) error 
 	}
 
 	return tx.Commit(ctx)
+}
+
+// GetMemberRole returns the caller's role in the guild ("creator", "officer", "member")
+// or an empty string when the user is not a member.
+func (r *Repo) GetMemberRole(ctx context.Context, userID, guildID uuid.UUID) (string, error) {
+	var role string
+	err := r.data.DB.QueryRow(ctx,
+		`SELECT role FROM guild_members WHERE guild_id = $1 AND user_id = $2`,
+		guildID, userID,
+	).Scan(&role)
+	if errors.Is(err, pgx.ErrNoRows) {
+		return "", nil
+	}
+	if err != nil {
+		return "", fmt.Errorf("get member role: %w", err)
+	}
+	return role, nil
+}
+
+// SetMemberRole promotes or demotes a member. Only the creator can call this.
+// Valid roles: "officer", "member".
+func (r *Repo) SetMemberRole(ctx context.Context, actorID, guildID, targetID uuid.UUID, newRole string) error {
+	actorRole, err := r.GetMemberRole(ctx, actorID, guildID)
+	if err != nil {
+		return err
+	}
+	if actorRole != "creator" {
+		return kratoserrors.Forbidden("FORBIDDEN", "only the guild creator can change roles")
+	}
+	targetRole, err := r.GetMemberRole(ctx, targetID, guildID)
+	if err != nil {
+		return err
+	}
+	if targetRole == "" {
+		return kratoserrors.NotFound("NOT_MEMBER", "target user is not a member of this guild")
+	}
+	if targetRole == "creator" {
+		return kratoserrors.BadRequest("CANNOT_CHANGE_CREATOR", "cannot change the creator's role")
+	}
+	if newRole != "officer" && newRole != "member" {
+		return kratoserrors.BadRequest("INVALID_ROLE", "role must be officer or member")
+	}
+	_, err = r.data.DB.Exec(ctx,
+		`UPDATE guild_members SET role = $3 WHERE guild_id = $1 AND user_id = $2`,
+		guildID, targetID, newRole,
+	)
+	if err != nil {
+		return fmt.Errorf("set member role: %w", err)
+	}
+	return nil
+}
+
+// UpdateGuildSettings allows creator or officer to update guild name/description/tags/is_public.
+func (r *Repo) UpdateGuildSettings(ctx context.Context, actorID, guildID uuid.UUID, name, description string, isPublic bool) (*model.Guild, error) {
+	role, err := r.GetMemberRole(ctx, actorID, guildID)
+	if err != nil {
+		return nil, err
+	}
+	if role != "creator" && role != "officer" {
+		return nil, kratoserrors.Forbidden("FORBIDDEN", "only creator or officer can update guild settings")
+	}
+	if _, err := r.data.DB.Exec(ctx, `
+UPDATE guilds SET name = $2, description = $3, is_public = $4, updated_at = now()
+WHERE id = $1`, guildID, name, description, isPublic); err != nil {
+		return nil, fmt.Errorf("update guild settings: %w", err)
+	}
+	return r.GetGuild(ctx, guildID)
 }

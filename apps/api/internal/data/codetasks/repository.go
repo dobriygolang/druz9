@@ -11,6 +11,11 @@ import (
 	"api/internal/model"
 )
 
+var (
+	errScanNilTask = errors.New("scan code task: nil task")
+	errLoadNilTask = errors.New("load code task cases: nil task")
+)
+
 const SelectColumns = `
 	id,
 	title,
@@ -76,12 +81,12 @@ type Scanner interface {
 }
 
 type Queryer interface {
-	Query(context.Context, string, ...any) (pgx.Rows, error)
+	Query(ctx context.Context, query string, args ...any) (pgx.Rows, error)
 }
 
 func ScanTask(scanner Scanner, task *model.CodeTask) error {
 	if task == nil {
-		return errors.New("scan code task: nil task")
+		return errScanNilTask
 	}
 
 	var difficultyValue int
@@ -129,7 +134,7 @@ func ScanTask(scanner Scanner, task *model.CodeTask) error {
 
 func LoadCases(ctx context.Context, db Queryer, task *model.CodeTask) error {
 	if task == nil {
-		return errors.New("load code task cases: nil task")
+		return errLoadNilTask
 	}
 	return LoadCasesMultiple(ctx, db, []*model.CodeTask{task})
 }

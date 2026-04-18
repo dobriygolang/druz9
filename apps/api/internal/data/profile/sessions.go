@@ -99,7 +99,7 @@ WHERE s.token_hash = $1
 	return &model.AuthState{User: &user, Session: &session}, nil
 }
 
-func (r *Repo) TouchSession(ctx context.Context, userID uuid.UUID, sessionID uuid.UUID, expiresAt time.Time, lastActive time.Time) error {
+func (r *Repo) TouchSession(ctx context.Context, userID, sessionID uuid.UUID, expiresAt, lastActive time.Time) error {
 	tag, err := r.data.DB.Exec(ctx, `
 UPDATE sessions
 SET last_seen_at = GREATEST(last_seen_at, $2),

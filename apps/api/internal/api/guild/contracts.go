@@ -10,18 +10,18 @@ import (
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
-	ListGuilds(context.Context, uuid.UUID, model.ListGuildsOptions) (*model.ListGuildsResponse, error)
-	CreateGuild(context.Context, uuid.UUID, string, string, []string, bool) (*model.Guild, error)
-	JoinGuild(context.Context, uuid.UUID, uuid.UUID) error
-	LeaveGuild(context.Context, uuid.UUID, uuid.UUID) error
-	InviteToGuild(context.Context, uuid.UUID, uuid.UUID, uuid.UUID) error
-	IsMember(context.Context, uuid.UUID, uuid.UUID) (bool, error)
-	ListGuildMembers(context.Context, uuid.UUID, int32) ([]*model.GuildMemberProfile, error)
-	DeleteGuild(context.Context, uuid.UUID, uuid.UUID) error
-	GetPulse(context.Context, uuid.UUID, uuid.UUID) (*model.GuildPulse, error)
-	GetMemberStats(context.Context, uuid.UUID, uuid.UUID) ([]*model.GuildMemberStats, error)
-	GetActiveChallenge(context.Context, uuid.UUID, uuid.UUID) (*model.GuildChallenge, error)
-	CreateChallenge(context.Context, uuid.UUID, uuid.UUID, string, int32) (*model.GuildChallenge, error)
+	ListGuilds(ctx context.Context, userID uuid.UUID, opts model.ListGuildsOptions) (*model.ListGuildsResponse, error)
+	CreateGuild(ctx context.Context, creatorID uuid.UUID, name, description string, tags []string, isPublic bool) (*model.Guild, error)
+	JoinGuild(ctx context.Context, userID, guildID uuid.UUID) error
+	LeaveGuild(ctx context.Context, userID, guildID uuid.UUID) error
+	InviteToGuild(ctx context.Context, inviterID, guildID, inviteeID uuid.UUID) error
+	IsMember(ctx context.Context, userID, guildID uuid.UUID) (bool, error)
+	ListGuildMembers(ctx context.Context, guildID uuid.UUID, limit int32) ([]*model.GuildMemberProfile, error)
+	DeleteGuild(ctx context.Context, userID, guildID uuid.UUID) error
+	GetPulse(ctx context.Context, userID, guildID uuid.UUID) (*model.GuildPulse, error)
+	GetMemberStats(ctx context.Context, userID, guildID uuid.UUID) ([]*model.GuildMemberStats, error)
+	GetActiveChallenge(ctx context.Context, userID, guildID uuid.UUID) (*model.GuildChallenge, error)
+	CreateChallenge(ctx context.Context, userID, guildID uuid.UUID, name string, prize int32) (*model.GuildChallenge, error)
 }
 
 // EventService handles event operations for guilds.

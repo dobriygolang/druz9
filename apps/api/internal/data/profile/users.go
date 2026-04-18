@@ -71,6 +71,15 @@ ON CONFLICT (user_id) DO UPDATE SET
 		return nil, fmt.Errorf("upsert user geo: %w", err)
 	}
 
+	if _, err := tx.Exec(ctx, `
+INSERT INTO arena_player_stats (user_id, display_name, rating, wins, losses, matches, best_runtime_ms, updated_at)
+SELECT $1, COALESCE(NULLIF(username, ''), first_name, 'Player'), 1000, 0, 0, 0, 0, NOW()
+FROM users WHERE id = $1
+ON CONFLICT (user_id) DO NOTHING
+`, userID); err != nil {
+		return nil, fmt.Errorf("init arena elo: %w", err)
+	}
+
 	user, err := r.selectUserByIDTx(ctx, tx, userID)
 	if err != nil {
 		return nil, err

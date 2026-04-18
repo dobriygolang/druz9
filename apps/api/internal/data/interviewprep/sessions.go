@@ -76,7 +76,7 @@ func (r *Repo) GetActiveSessionByUserAndTask(ctx context.Context, userID, taskID
 	return item, nil
 }
 
-func (r *Repo) UpdateSessionCode(ctx context.Context, sessionID uuid.UUID, solveLanguage string, code string, passed bool) error {
+func (r *Repo) UpdateSessionCode(ctx context.Context, sessionID uuid.UUID, solveLanguage, code string, passed bool) error {
 	_, err := r.data.DB.Exec(ctx, `
 		UPDATE interview_practice_sessions
 		SET solve_language = $2,

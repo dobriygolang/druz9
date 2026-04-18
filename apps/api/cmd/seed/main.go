@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"flag"
 	"fmt"
 	"os"
@@ -18,6 +19,8 @@ import (
 	"api/internal/seeds"
 	"api/internal/storage/postgres"
 )
+
+var errUnsupportedOnlyValue = errors.New("unsupported -only value")
 
 func main() {
 	var only string
@@ -93,7 +96,7 @@ func parseOptions(value string) (seeds.Options, error) {
 	case "blind75":
 		opts.RunBlind75 = true
 	default:
-		return seeds.Options{}, fmt.Errorf("unsupported -only value %q", value)
+		return seeds.Options{}, fmt.Errorf("%w: %q", errUnsupportedOnlyValue, value)
 	}
 	return opts, nil
 }

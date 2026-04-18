@@ -2,6 +2,7 @@ package codeeditor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"math"
 
@@ -12,15 +13,17 @@ import (
 	"api/internal/model"
 )
 
-func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID *uuid.UUID, guestName string, code string, language model.ProgrammingLanguage) (*domain.Submission, error) {
+var errPortOutOfRange = errors.New("port out of int32 range")
+
+func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID *uuid.UUID, guestName, code string, language model.ProgrammingLanguage) (*domain.Submission, error) {
 	task, err := s.getCachedTask(ctx, *room.TaskID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get cached task: %w", err)
 	}
 
 	judgeResult, err := taskjudge.EvaluateCodeTask(ctx, s.sandbox, task, code, normalizeRoomLanguage(language).String())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("evaluate code task: %w", err)
 	}
 
 	submission := &domain.Submission{
@@ -43,16 +46,16 @@ func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID 
 
 	created, err := s.repo.CreateSubmission(ctx, submission)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create submission: %w", err)
 	}
 
 	if created.IsCorrect && room.Status == domain.RoomStatusActive {
 		finishedAt := now()
 		if err := s.repo.SetWinner(ctx, room.ID, userID, guestName); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("set winner: %w", err)
 		}
 		if err := s.repo.FinishDuel(ctx, room.ID, userID, guestName, finishedAt); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("finish duel: %w", err)
 		}
 	}
 
@@ -61,7 +64,7 @@ func (s *Service) submitDuelCode(ctx context.Context, room *domain.Room, userID 
 
 func safePortInt32(value int) (int32, error) {
 	if value < 0 || value > math.MaxInt32 {
-		return 0, fmt.Errorf("port %d is out of int32 range", value)
+		return 0, fmt.Errorf("%w: %d", errPortOutOfRange, value)
 	}
 	return int32(value), nil
 }

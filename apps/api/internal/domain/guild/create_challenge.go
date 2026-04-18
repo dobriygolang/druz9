@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 	"time"
 
 	kratoserrors "github.com/go-kratos/kratos/v2/errors"
@@ -19,7 +20,7 @@ func (s *Service) CreateChallenge(
 ) (*model.GuildChallenge, error) {
 	guild, err := s.repo.GetGuild(ctx, guildID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get guild: %w", err)
 	}
 	if guild.CreatorID != userID {
 		return nil, kratoserrors.Forbidden("FORBIDDEN", "only the guild creator can create challenges")

@@ -19,6 +19,7 @@ var _ = binding.EncodeURL
 
 const _ = http.SupportPackageIsVersion1
 
+const OperationInboxServiceCreateDirectThread = "/inbox.v1.InboxService/CreateDirectThread"
 const OperationInboxServiceGetThread = "/inbox.v1.InboxService/GetThread"
 const OperationInboxServiceGetUnreadCount = "/inbox.v1.InboxService/GetUnreadCount"
 const OperationInboxServiceListThreads = "/inbox.v1.InboxService/ListThreads"
@@ -26,6 +27,9 @@ const OperationInboxServiceMarkThreadRead = "/inbox.v1.InboxService/MarkThreadRe
 const OperationInboxServiceSendMessage = "/inbox.v1.InboxService/SendMessage"
 
 type InboxServiceHTTPServer interface {
+	// CreateDirectThread CreateDirectThread opens (or returns existing) a bidirectional friend-mail
+	// thread between the caller and the given recipient. Idempotent.
+	CreateDirectThread(context.Context, *CreateDirectThreadRequest) (*CreateDirectThreadResponse, error)
 	// GetThread GetThread returns a single thread with its full message list.
 	// Does NOT implicitly mark messages as read; use MarkThreadRead for that.
 	GetThread(context.Context, *GetThreadRequest) (*GetThreadResponse, error)
@@ -49,6 +53,7 @@ func RegisterInboxServiceHTTPServer(s *http.Server, srv InboxServiceHTTPServer) 
 	r.POST("/api/v1/inbox/threads/{thread_id}/read", _InboxService_MarkThreadRead0_HTTP_Handler(srv))
 	r.POST("/api/v1/inbox/threads/{thread_id}/messages", _InboxService_SendMessage0_HTTP_Handler(srv))
 	r.GET("/api/v1/inbox/unread", _InboxService_GetUnreadCount0_HTTP_Handler(srv))
+	r.POST("/api/v1/inbox/threads", _InboxService_CreateDirectThread0_HTTP_Handler(srv))
 }
 
 func _InboxService_ListThreads0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
@@ -161,7 +166,32 @@ func _InboxService_GetUnreadCount0_HTTP_Handler(srv InboxServiceHTTPServer) func
 	}
 }
 
+func _InboxService_CreateDirectThread0_HTTP_Handler(srv InboxServiceHTTPServer) func(ctx http.Context) error {
+	return func(ctx http.Context) error {
+		var in CreateDirectThreadRequest
+		if err := ctx.Bind(&in); err != nil {
+			return err
+		}
+		if err := ctx.BindQuery(&in); err != nil {
+			return err
+		}
+		http.SetOperation(ctx, OperationInboxServiceCreateDirectThread)
+		h := ctx.Middleware(func(ctx context.Context, req interface{}) (interface{}, error) {
+			return srv.CreateDirectThread(ctx, req.(*CreateDirectThreadRequest))
+		})
+		out, err := h(ctx, &in)
+		if err != nil {
+			return err
+		}
+		reply := out.(*CreateDirectThreadResponse)
+		return ctx.Result(200, reply)
+	}
+}
+
 type InboxServiceHTTPClient interface {
+	// CreateDirectThread CreateDirectThread opens (or returns existing) a bidirectional friend-mail
+	// thread between the caller and the given recipient. Idempotent.
+	CreateDirectThread(ctx context.Context, req *CreateDirectThreadRequest, opts ...http.CallOption) (rsp *CreateDirectThreadResponse, err error)
 	// GetThread GetThread returns a single thread with its full message list.
 	// Does NOT implicitly mark messages as read; use MarkThreadRead for that.
 	GetThread(ctx context.Context, req *GetThreadRequest, opts ...http.CallOption) (rsp *GetThreadResponse, err error)
@@ -184,6 +214,21 @@ type InboxServiceHTTPClientImpl struct {
 
 func NewInboxServiceHTTPClient(client *http.Client) InboxServiceHTTPClient {
 	return &InboxServiceHTTPClientImpl{client}
+}
+
+// CreateDirectThread CreateDirectThread opens (or returns existing) a bidirectional friend-mail
+// thread between the caller and the given recipient. Idempotent.
+func (c *InboxServiceHTTPClientImpl) CreateDirectThread(ctx context.Context, in *CreateDirectThreadRequest, opts ...http.CallOption) (*CreateDirectThreadResponse, error) {
+	var out CreateDirectThreadResponse
+	pattern := "/api/v1/inbox/threads"
+	path := binding.EncodeURL(pattern, in, false)
+	opts = append(opts, http.Operation(OperationInboxServiceCreateDirectThread))
+	opts = append(opts, http.PathTemplate(pattern))
+	err := c.cc.Invoke(ctx, "POST", path, in, &out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return &out, nil
 }
 
 // GetThread GetThread returns a single thread with its full message list.

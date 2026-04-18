@@ -53,6 +53,7 @@ const (
 	InterviewPrepService_DeleteMockCompanyPreset_FullMethodName  = "/interview_prep.v1.InterviewPrepService/DeleteMockCompanyPreset"
 	InterviewPrepService_PostInterviewExperience_FullMethodName  = "/interview_prep.v1.InterviewPrepService/PostInterviewExperience"
 	InterviewPrepService_ListInterviewExperiences_FullMethodName = "/interview_prep.v1.InterviewPrepService/ListInterviewExperiences"
+	InterviewPrepService_ListAIMentors_FullMethodName            = "/interview_prep.v1.InterviewPrepService/ListAIMentors"
 )
 
 // InterviewPrepServiceClient is the client API for InterviewPrepService service.
@@ -96,6 +97,9 @@ type InterviewPrepServiceClient interface {
 	DeleteMockCompanyPreset(ctx context.Context, in *DeleteMockCompanyPresetRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 	PostInterviewExperience(ctx context.Context, in *PostInterviewExperienceRequest, opts ...grpc.CallOption) (*InterviewExperience, error)
 	ListInterviewExperiences(ctx context.Context, in *ListInterviewExperiencesRequest, opts ...grpc.CallOption) (*ListInterviewExperiencesResponse, error)
+	// ListAIMentors returns the public catalogue of active AI mentor models.
+	// Only id, name, and tier are exposed — keys and prompts stay server-side.
+	ListAIMentors(ctx context.Context, in *ListAIMentorsRequest, opts ...grpc.CallOption) (*ListAIMentorsResponse, error)
 }
 
 type interviewPrepServiceClient struct {
@@ -446,6 +450,16 @@ func (c *interviewPrepServiceClient) ListInterviewExperiences(ctx context.Contex
 	return out, nil
 }
 
+func (c *interviewPrepServiceClient) ListAIMentors(ctx context.Context, in *ListAIMentorsRequest, opts ...grpc.CallOption) (*ListAIMentorsResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListAIMentorsResponse)
+	err := c.cc.Invoke(ctx, InterviewPrepService_ListAIMentors_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // InterviewPrepServiceServer is the server API for InterviewPrepService service.
 // All implementations must embed UnimplementedInterviewPrepServiceServer
 // for forward compatibility.
@@ -487,6 +501,9 @@ type InterviewPrepServiceServer interface {
 	DeleteMockCompanyPreset(context.Context, *DeleteMockCompanyPresetRequest) (*StatusResponse, error)
 	PostInterviewExperience(context.Context, *PostInterviewExperienceRequest) (*InterviewExperience, error)
 	ListInterviewExperiences(context.Context, *ListInterviewExperiencesRequest) (*ListInterviewExperiencesResponse, error)
+	// ListAIMentors returns the public catalogue of active AI mentor models.
+	// Only id, name, and tier are exposed — keys and prompts stay server-side.
+	ListAIMentors(context.Context, *ListAIMentorsRequest) (*ListAIMentorsResponse, error)
 	mustEmbedUnimplementedInterviewPrepServiceServer()
 }
 
@@ -598,6 +615,9 @@ func (UnimplementedInterviewPrepServiceServer) PostInterviewExperience(context.C
 }
 func (UnimplementedInterviewPrepServiceServer) ListInterviewExperiences(context.Context, *ListInterviewExperiencesRequest) (*ListInterviewExperiencesResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListInterviewExperiences not implemented")
+}
+func (UnimplementedInterviewPrepServiceServer) ListAIMentors(context.Context, *ListAIMentorsRequest) (*ListAIMentorsResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListAIMentors not implemented")
 }
 func (UnimplementedInterviewPrepServiceServer) mustEmbedUnimplementedInterviewPrepServiceServer() {}
 func (UnimplementedInterviewPrepServiceServer) testEmbeddedByValue()                              {}
@@ -1232,6 +1252,24 @@ func _InterviewPrepService_ListInterviewExperiences_Handler(srv interface{}, ctx
 	return interceptor(ctx, in, info, handler)
 }
 
+func _InterviewPrepService_ListAIMentors_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListAIMentorsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(InterviewPrepServiceServer).ListAIMentors(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: InterviewPrepService_ListAIMentors_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(InterviewPrepServiceServer).ListAIMentors(ctx, req.(*ListAIMentorsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // InterviewPrepService_ServiceDesc is the grpc.ServiceDesc for InterviewPrepService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1374,6 +1412,10 @@ var InterviewPrepService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListInterviewExperiences",
 			Handler:    _InterviewPrepService_ListInterviewExperiences_Handler,
+		},
+		{
+			MethodName: "ListAIMentors",
+			Handler:    _InterviewPrepService_ListAIMentors_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

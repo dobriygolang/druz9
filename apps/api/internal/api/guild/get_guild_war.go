@@ -108,41 +108,53 @@ func (i *Implementation) GetGuildWar(ctx context.Context, _ *v1.GetGuildWarReque
 		theirScore += f.GetTheirRounds()
 	}
 
-	// MVPs derive from the top members of the user's guild + a fixed
-	// opponent roster so the list feels anchored to real people.
-	mvps := make([]*v1.GuildWarMvp, 0, 4)
+	// MVPs: top members from our guild. Opponent MVPs only shown when
+	// we have a real war with identified players (future wave).
+	mvps := make([]*v1.GuildWarMvp, 0, len(members))
 	for idx, m := range members {
-		if idx >= 2 {
+		if idx >= 3 {
 			break
 		}
 		name := m.FirstName
-		if name == "" {
-			name = m.LastName
-		}
 		if name == "" {
 			name = fmt.Sprintf("hero-%d", idx+1)
 		}
 		mvps = append(mvps, &v1.GuildWarMvp{
 			Username:  name,
 			GuildName: ours.Name,
-			Wins:      int32(4 - idx),
+			Wins:      int32(3 - idx),
 			Losses:    int32(idx),
 			Side:      "ours",
 		})
 	}
-	mvps = append(mvps,
-		&v1.GuildWarMvp{Username: "kyrie.dev", GuildName: theirName, Wins: 3, Losses: 1, Side: "theirs"},
-		&v1.GuildWarMvp{Username: "petrogryph", GuildName: theirName, Wins: 2, Losses: 1, Side: "theirs"},
-	)
 
-	// Recent feed — relative timestamps so the UI can format naturally.
+	// Feed: build from real front data when available; otherwise generic guild events.
 	now := time.Now().UTC()
-	feed := []*v1.GuildWarFeed{
-		{At: timestamppb.New(now.Add(-2 * time.Minute)), Text: ours.Name + " captured Graphs Bastion round 3"},
-		{At: timestamppb.New(now.Add(-8 * time.Minute)), Text: theirName + " took DP Canyon +2"},
-		{At: timestamppb.New(now.Add(-14 * time.Minute)), Text: ours.Name + " reinforced Systems Tower"},
-		{At: timestamppb.New(now.Add(-20 * time.Minute)), Text: "glowbeacon duel won +60 ELO"},
-		{At: timestamppb.New(now.Add(-27 * time.Minute)), Text: "Algo Plaza established"},
+	var feed []*v1.GuildWarFeed
+	if len(front) > 0 {
+		for idx, f := range front {
+			if idx >= 4 {
+				break
+			}
+			var text string
+			switch f.GetStatus() {
+			case "leading", "won":
+				text = ours.Name + " leads " + f.GetName()
+			case "losing", "lost":
+				text = theirName + " pressures " + f.GetName()
+			default:
+				text = f.GetName() + " contested"
+			}
+			feed = append(feed, &v1.GuildWarFeed{
+				At:   timestamppb.New(now.Add(-time.Duration(idx+1) * 8 * time.Minute)),
+				Text: text,
+			})
+		}
+	} else {
+		feed = []*v1.GuildWarFeed{
+			{At: timestamppb.New(now.Add(-5 * time.Minute)), Text: ours.Name + " war started vs " + theirName},
+			{At: timestamppb.New(now.Add(-10 * time.Minute)), Text: "Day " + fmt.Sprintf("%d", dayNumber) + " of 3"},
+		}
 	}
 
 	endsAt := now.Add(time.Duration(int64(time.Hour) * 24 * int64(3-dayNumber+1)))

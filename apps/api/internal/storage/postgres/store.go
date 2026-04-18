@@ -11,6 +11,8 @@ import (
 	"api/internal/config"
 )
 
+var errDatabaseSourceRequired = errors.New("database source is required")
+
 type Store struct {
 	DB *pgxpool.Pool
 }
@@ -37,7 +39,7 @@ func DefaultPoolConfig() PoolConfig {
 
 func New(cfg *config.Data, poolCfg PoolConfig) (*Store, func(), error) {
 	if cfg == nil || cfg.Database == nil || cfg.Database.Source == "" {
-		return nil, nil, errors.New("database source is required")
+		return nil, nil, errDatabaseSourceRequired
 	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)

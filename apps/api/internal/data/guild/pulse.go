@@ -13,6 +13,8 @@ import (
 	"api/internal/model"
 )
 
+var errUnknownChallengeTemplate = errors.New("unknown challenge template")
+
 func (r *Repo) GetGuildPulse(ctx context.Context, guildID uuid.UUID) (*model.GuildPulse, error) {
 	now := time.Now().UTC()
 	todayStart := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
@@ -349,7 +351,7 @@ WHERE cm.guild_id = $1
 GROUP BY cm.user_id, u.id, u.first_name, u.last_name, u.yandex_avatar_url, u.telegram_id
 ORDER BY current DESC`
 	default:
-		return nil, fmt.Errorf("unknown challenge template: %s", ch.TemplateKey)
+		return nil, fmt.Errorf("%w: %s", errUnknownChallengeTemplate, ch.TemplateKey)
 	}
 
 	rows, err := r.data.DB.Query(ctx, query, ch.GuildID, ch.StartsAt, ch.EndsAt)

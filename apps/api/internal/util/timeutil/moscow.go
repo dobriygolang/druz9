@@ -7,6 +7,11 @@ import (
 	"time"
 )
 
+var (
+	errEmptyDateTime      = errors.New("empty datetime")
+	errUnsupportedFormat  = errors.New("unsupported datetime format")
+)
+
 const (
 	dateTimeMinuteLayout = "2006-01-02T15:04"
 	dateTimeSecondLayout = "2006-01-02T15:04:05"
@@ -40,7 +45,7 @@ func NormalizeToUTC(value time.Time) time.Time {
 func ParseMoscowDateTime(value string) (time.Time, error) {
 	trimmed := strings.TrimSpace(value)
 	if trimmed == "" {
-		return time.Time{}, errors.New("empty datetime")
+		return time.Time{}, errEmptyDateTime
 	}
 
 	for _, layout := range []string{time.RFC3339Nano, time.RFC3339} {
@@ -57,5 +62,5 @@ func ParseMoscowDateTime(value string) (time.Time, error) {
 		}
 	}
 
-	return time.Time{}, fmt.Errorf("unsupported datetime format: %q", value)
+	return time.Time{}, fmt.Errorf("%w: %q", errUnsupportedFormat, value)
 }

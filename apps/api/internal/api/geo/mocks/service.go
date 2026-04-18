@@ -23,9 +23,9 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
-// CommunityMap provides a mock function with given fields: _a0, _a1
-func (_m *Service) CommunityMap(_a0 context.Context, _a1 string) (*model.CommunityMapResponse, error) {
-	ret := _m.Called(_a0, _a1)
+// CommunityMap provides a mock function with given fields: ctx, userID
+func (_m *Service) CommunityMap(ctx context.Context, userID string) (*model.CommunityMapResponse, error) {
+	ret := _m.Called(ctx, userID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CommunityMap")
@@ -34,10 +34,10 @@ func (_m *Service) CommunityMap(_a0 context.Context, _a1 string) (*model.Communi
 	var r0 *model.CommunityMapResponse
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, string) (*model.CommunityMapResponse, error)); ok {
-		return rf(_a0, _a1)
+		return rf(ctx, userID)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string) *model.CommunityMapResponse); ok {
-		r0 = rf(_a0, _a1)
+		r0 = rf(ctx, userID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.CommunityMapResponse)
@@ -45,7 +45,7 @@ func (_m *Service) CommunityMap(_a0 context.Context, _a1 string) (*model.Communi
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(_a0, _a1)
+		r1 = rf(ctx, userID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -59,13 +59,13 @@ type Service_CommunityMap_Call struct {
 }
 
 // CommunityMap is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 string
-func (_e *Service_Expecter) CommunityMap(_a0 interface{}, _a1 interface{}) *Service_CommunityMap_Call {
-	return &Service_CommunityMap_Call{Call: _e.mock.On("CommunityMap", _a0, _a1)}
+//   - ctx context.Context
+//   - userID string
+func (_e *Service_Expecter) CommunityMap(ctx interface{}, userID interface{}) *Service_CommunityMap_Call {
+	return &Service_CommunityMap_Call{Call: _e.mock.On("CommunityMap", ctx, userID)}
 }
 
-func (_c *Service_CommunityMap_Call) Run(run func(_a0 context.Context, _a1 string)) *Service_CommunityMap_Call {
+func (_c *Service_CommunityMap_Call) Run(run func(ctx context.Context, userID string)) *Service_CommunityMap_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string))
 	})
@@ -82,9 +82,9 @@ func (_c *Service_CommunityMap_Call) RunAndReturn(run func(context.Context, stri
 	return _c
 }
 
-// Resolve provides a mock function with given fields: _a0, _a1
-func (_m *Service) Resolve(_a0 context.Context, _a1 string) (*model.GeoResolveResponse, error) {
-	ret := _m.Called(_a0, _a1)
+// Resolve provides a mock function with given fields: ctx, query
+func (_m *Service) Resolve(ctx context.Context, query string) (*model.GeoResolveResponse, error) {
+	ret := _m.Called(ctx, query)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Resolve")
@@ -93,10 +93,10 @@ func (_m *Service) Resolve(_a0 context.Context, _a1 string) (*model.GeoResolveRe
 	var r0 *model.GeoResolveResponse
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, string) (*model.GeoResolveResponse, error)); ok {
-		return rf(_a0, _a1)
+		return rf(ctx, query)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, string) *model.GeoResolveResponse); ok {
-		r0 = rf(_a0, _a1)
+		r0 = rf(ctx, query)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.GeoResolveResponse)
@@ -104,7 +104,7 @@ func (_m *Service) Resolve(_a0 context.Context, _a1 string) (*model.GeoResolveRe
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, string) error); ok {
-		r1 = rf(_a0, _a1)
+		r1 = rf(ctx, query)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -118,13 +118,13 @@ type Service_Resolve_Call struct {
 }
 
 // Resolve is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 string
-func (_e *Service_Expecter) Resolve(_a0 interface{}, _a1 interface{}) *Service_Resolve_Call {
-	return &Service_Resolve_Call{Call: _e.mock.On("Resolve", _a0, _a1)}
+//   - ctx context.Context
+//   - query string
+func (_e *Service_Expecter) Resolve(ctx interface{}, query interface{}) *Service_Resolve_Call {
+	return &Service_Resolve_Call{Call: _e.mock.On("Resolve", ctx, query)}
 }
 
-func (_c *Service_Resolve_Call) Run(run func(_a0 context.Context, _a1 string)) *Service_Resolve_Call {
+func (_c *Service_Resolve_Call) Run(run func(ctx context.Context, query string)) *Service_Resolve_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string))
 	})

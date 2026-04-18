@@ -19,6 +19,13 @@ import (
 	"api/internal/model"
 )
 
+var (
+	errConfigRequired      = errors.New("s3 config is required")
+	errEndpointRequired    = errors.New("s3 endpoint is required")
+	errObjectKeyRequired   = errors.New("object key is required")
+	errPublicEndpointInvalid = errors.New("S3_PUBLIC_ENDPOINT must include scheme and host")
+)
+
 type Service struct {
 	client         *minio.Client
 	presignClient  *minio.Client
@@ -28,12 +35,12 @@ type Service struct {
 
 func New(cfg *config.S3) (*Service, error) {
 	if cfg == nil {
-		return nil, errors.New("s3 config is required")
+		return nil, fmt.Errorf("%w", errConfigRequired)
 	}
 
 	endpoint := strings.TrimSpace(cfg.Endpoint)
 	if endpoint == "" {
-		return nil, errors.New("s3 endpoint is required")
+		return nil, fmt.Errorf("%w", errEndpointRequired)
 	}
 
 	publicEndpoint, err := parsePublicEndpoint(cfg.PublicEndpoint)
@@ -60,10 +67,16 @@ func New(cfg *config.S3) (*Service, error) {
 
 	var presignClient *minio.Client
 	if publicEndpoint != nil && (publicEndpoint.Path == "" || publicEndpoint.Path == "/") {
-		presignClient, err = minio.New(publicEndpoint.Host, &minio.Options{
+		presignOpts := &minio.Options{
 			Creds:  credentials.NewStaticV4(cfg.AccessKey, cfg.SecretKey, ""),
 			Secure: publicEndpoint.Scheme == "https",
-		})
+		}
+		if cfg.SkipVerify {
+			presignOpts.Transport = &http.Transport{
+				TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, //nolint:gosec
+			}
+		}
+		presignClient, err = minio.New(publicEndpoint.Host, presignOpts)
 		if err != nil {
 			return nil, fmt.Errorf("create public presign client: %w", err)
 		}
@@ -97,7 +110,7 @@ func (s *Service) UploadObject(
 ) error {
 	key := normalizeObjectKey(input.Key)
 	if key == "" {
-		return errors.New("object key is required")
+		return fmt.Errorf("%w", errObjectKeyRequired)
 	}
 
 	contentType := strings.TrimSpace(input.ContentType)
@@ -142,7 +155,7 @@ func (s *Service) PresignGetObject(
 ) (string, error) {
 	key := normalizeObjectKey(objectKey)
 	if key == "" {
-		return "", errors.New("object key is required")
+		return "", fmt.Errorf("%w", errObjectKeyRequired)
 	}
 
 	expiry := options.Expiry
@@ -172,7 +185,7 @@ func (s *Service) PresignPutObject(
 ) (string, error) {
 	key := normalizeObjectKey(objectKey)
 	if key == "" {
-		return "", errors.New("object key is required")
+		return "", fmt.Errorf("%w", errObjectKeyRequired)
 	}
 
 	expiry := options.Expiry
@@ -215,12 +228,12 @@ func parsePublicEndpoint(raw string) (*url.URL, error) {
 		return nil, fmt.Errorf("parse S3_PUBLIC_ENDPOINT: %w", err)
 	}
 	if u.Scheme == "" || u.Host == "" {
-		return nil, errors.New("S3_PUBLIC_ENDPOINT must include scheme and host")
+		return nil, fmt.Errorf("%w", errPublicEndpointInvalid)
 	}
 	return u, nil
 }
 
-func replacePresignedEndpoint(u *url.URL, publicEndpoint *url.URL) *url.URL {
+func replacePresignedEndpoint(u, publicEndpoint *url.URL) *url.URL {
 	if u == nil || publicEndpoint == nil {
 		return u
 	}

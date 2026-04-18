@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -10,5 +11,9 @@ import (
 
 // UpdateEvent updates an existing event.
 func (s *Service) UpdateEvent(ctx context.Context, eventID uuid.UUID, actor *model.User, req model.UpdateEventRequest) (*model.Event, error) {
-	return s.repo.UpdateEvent(ctx, eventID, actor, req)
+	event, err := s.repo.UpdateEvent(ctx, eventID, actor, req)
+	if err != nil {
+		return nil, fmt.Errorf("update event: %w", err)
+	}
+	return event, nil
 }

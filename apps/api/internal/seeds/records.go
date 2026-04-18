@@ -33,7 +33,7 @@ func (r *Runner) List(ctx context.Context) ([]Record, error) {
 	return records, nil
 }
 
-func (r *Runner) shouldApply(ctx context.Context, name string, kind string, checksum string) (bool, time.Time, error) {
+func (r *Runner) shouldApply(ctx context.Context, name, kind, checksum string) (bool, time.Time, error) {
 	var record Record
 	err := r.db.QueryRow(ctx, `
 		SELECT name, kind, checksum, applied_at
@@ -54,7 +54,7 @@ func (r *Runner) shouldApply(ctx context.Context, name string, kind string, chec
 	return true, record.AppliedAt, nil
 }
 
-func (r *Runner) record(ctx context.Context, name string, kind string, checksum string, appliedAt time.Time) error {
+func (r *Runner) record(ctx context.Context, name, kind, checksum string, appliedAt time.Time) error {
 	_, err := r.db.Exec(ctx, `
 		INSERT INTO seed_runs (name, kind, checksum, applied_at)
 		VALUES ($1, $2, $3, $4)

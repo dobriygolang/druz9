@@ -16,14 +16,13 @@ const (
 	ThreadKindSystem      ThreadKind = 3
 	ThreadKindDuel        ThreadKind = 4
 	ThreadKindChallenge   ThreadKind = 5
+	ThreadKindFriend      ThreadKind = 6 // direct friend-to-friend mail
 )
 
 // IsInteractive reports whether user messages can be sent into this kind of thread.
-// Only mentor, duel, and challenge threads accept replies; system and guild
-// notices are one-way.
 func (k ThreadKind) IsInteractive() bool {
 	switch k {
-	case ThreadKindMentor, ThreadKindDuel, ThreadKindChallenge:
+	case ThreadKindMentor, ThreadKindDuel, ThreadKindChallenge, ThreadKindFriend:
 		return true
 	default:
 		return false

@@ -287,11 +287,11 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		arenaService: arenaservice.New(arenaServiceDomain, arenaRealtimeHub, func() bool {
 			return bootstrap.cfg.Arena != nil && !bootstrap.cfg.Arena.RequireAuth
 		}, solutionReviewService, notifSender),
-		interviewPrepService:   interviewprepservice.New(interviewPrepDomain, storage.interviewRepo, notifSender),
+		interviewPrepService:   interviewprepservice.New(interviewPrepDomain, storage.interviewRepo, notifSender).WithAIMentorRepo(storage.aiMentorRepo),
 		missionService:         missionservice.New(missionServiceDomain),
 		notificationSettings:   notificationservice.NewSettings(notifSender),
 		challengeService:       challengeservice.New(challengeServiceDomain),
-		inboxService:           inboxservice.New(inboxServiceDomain),
+		inboxService:           inboxservice.New(inboxServiceDomain, storage.profileRepo),
 		friendChallengeService: friendchallengeservice.New(friendChallengeDomain),
 		duelReplayService:      duelreplayservice.New(duelReplayDomain),
 		seasonPassService:      seasonpassservice.New(seasonPassDomain),

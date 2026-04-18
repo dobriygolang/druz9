@@ -15,6 +15,8 @@ import (
 	"api/internal/model"
 )
 
+var errReviewTooShort = errors.New("review too short")
+
 // Service implements all challenge game mode logic.
 type Service struct {
 	repo     *challengedata.Repo
@@ -45,13 +47,17 @@ func NewService(c Config) *Service {
 
 // GetBlindReviewTask returns a random code submission for the user to review.
 func (s *Service) GetBlindReviewTask(ctx context.Context, userID uuid.UUID) (*model.BlindReviewTask, error) {
-	return s.repo.GetRandomBlindReviewTask(ctx, userID)
+	task, err := s.repo.GetRandomBlindReviewTask(ctx, userID)
+	if err != nil {
+		return nil, fmt.Errorf("get blind review task: %w", err)
+	}
+	return task, nil
 }
 
 // SubmitBlindReview evaluates the user's code review using AI and stores the result.
-func (s *Service) SubmitBlindReview(ctx context.Context, userID uuid.UUID, sourceReviewID uuid.UUID, taskID uuid.UUID, sourceCode, sourceLang, userReview string) (*model.BlindReviewResult, error) {
+func (s *Service) SubmitBlindReview(ctx context.Context, userID, sourceReviewID, taskID uuid.UUID, sourceCode, sourceLang, userReview string) (*model.BlindReviewResult, error) {
 	if len(userReview) < 10 {
-		return nil, errors.New("review too short")
+		return nil, fmt.Errorf("%w", errReviewTooShort)
 	}
 	if len(userReview) > 5000 {
 		userReview = userReview[:5000]
@@ -75,14 +81,22 @@ func (s *Service) SubmitBlindReview(ctx context.Context, userID uuid.UUID, sourc
 		aiFeedback = review.Summary
 	}
 
-	return s.repo.InsertBlindReviewSession(ctx, userID, sourceReviewID, taskID, sourceCode, sourceLang, userReview, aiScore, aiFeedback)
+	result, err := s.repo.InsertBlindReviewSession(ctx, userID, sourceReviewID, taskID, sourceCode, sourceLang, userReview, aiScore, aiFeedback)
+	if err != nil {
+		return nil, fmt.Errorf("insert blind review session: %w", err)
+	}
+	return result, nil
 }
 
 // ── Speed Run ──────────────────────────────────────────────────────────
 
 // GetUserRecords returns the user's personal bests.
 func (s *Service) GetUserRecords(ctx context.Context, userID uuid.UUID, limit int) ([]model.TaskRecord, error) {
-	return s.repo.GetUserRecords(ctx, userID, limit)
+	records, err := s.repo.GetUserRecords(ctx, userID, limit)
+	if err != nil {
+		return nil, fmt.Errorf("get user records: %w", err)
+	}
+	return records, nil
 }
 
 // ── Weekly Boss ────────────────────────────────────────────────────────
@@ -117,13 +131,16 @@ func WeekEndsAt() time.Time {
 // Returns nil if no hard tasks are configured.
 func (s *Service) GetWeeklyTask(ctx context.Context, weekKey string) (*model.WeeklyInfo, error) {
 	ids, err := s.repo.GetHardTaskIDs(ctx)
-	if err != nil || len(ids) == 0 {
-		return nil, err
+	if err != nil {
+		return nil, fmt.Errorf("get hard task IDs: %w", err)
+	}
+	if len(ids) == 0 {
+		return nil, nil
 	}
 	taskID := SelectWeeklyTask(ids, weekKey)
 	title, slug, err := s.repo.GetTaskInfo(ctx, taskID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get task info: %w", err)
 	}
 	return &model.WeeklyInfo{
 		WeekKey:    weekKey,
@@ -137,12 +154,20 @@ func (s *Service) GetWeeklyTask(ctx context.Context, weekKey string) (*model.Wee
 
 // GetWeeklyLeaderboard returns the leaderboard for the current week.
 func (s *Service) GetWeeklyLeaderboard(ctx context.Context, weekKey string, limit int) ([]model.WeeklyEntry, error) {
-	return s.repo.GetWeeklyLeaderboard(ctx, weekKey, limit)
+	entries, err := s.repo.GetWeeklyLeaderboard(ctx, weekKey, limit)
+	if err != nil {
+		return nil, fmt.Errorf("get weekly leaderboard: %w", err)
+	}
+	return entries, nil
 }
 
 // GetUserWeeklyEntry returns the user's entry for the current week.
 func (s *Service) GetUserWeeklyEntry(ctx context.Context, userID uuid.UUID, weekKey string) (*model.WeeklyEntry, error) {
-	return s.repo.GetUserWeeklyEntry(ctx, userID, weekKey)
+	entry, err := s.repo.GetUserWeeklyEntry(ctx, userID, weekKey)
+	if err != nil {
+		return nil, fmt.Errorf("get user weekly entry: %w", err)
+	}
+	return entry, nil
 }
 
 func truncate(s string, maxLen int) string {

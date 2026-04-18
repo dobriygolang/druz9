@@ -68,7 +68,7 @@ func (r *Repo) GetActiveWarForGuild(ctx context.Context, guildID uuid.UUID) (*Wa
 		&w.Status, &w.Phase, &w.StartsAt, &w.EndsAt, &w.ResolvedWinner,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get active war for guild: %w", err)
 	}
 	return &w, nil
 }
@@ -135,11 +135,11 @@ func (r *Repo) ListFronts(ctx context.Context, warID uuid.UUID) ([]*FrontRow, er
 	for rows.Next() {
 		f := &FrontRow{}
 		if err := rows.Scan(&f.ID, &f.WarID, &f.Name, &f.OurRounds, &f.TheirRounds, &f.CapturedBy, &f.SortOrder); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("scan front: %w", err)
 		}
 		out = append(out, f)
 	}
-	return out, rows.Err()
+	return out, fmt.Errorf("list fronts rows err: %w", rows.Err())
 }
 
 // Front threshold that flips captured_by to "ours" — chosen small (10)
@@ -224,11 +224,11 @@ func (r *Repo) ListTerritories(ctx context.Context, guildID uuid.UUID) ([]*Terri
 	for rows.Next() {
 		t := &TerritoryRow{}
 		if err := rows.Scan(&t.ID, &t.GuildID, &t.Name, &t.Buff, &t.CapturedAt); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("scan territory: %w", err)
 		}
 		out = append(out, t)
 	}
-	return out, rows.Err()
+	return out, fmt.Errorf("list territories rows err: %w", rows.Err())
 }
 
 // noRows is a small helper: callers frequently want to know "is this
@@ -264,7 +264,7 @@ func (r *Repo) ListGuildsForWarPairing(ctx context.Context) ([]GuildSeed, error)
 		}
 		out = append(out, g)
 	}
-	return out, rows.Err()
+	return out, fmt.Errorf("list guilds for war pairing rows err: %w", rows.Err())
 }
 
 // CreateDraftWar inserts a new guild war in 'draft' phase (not yet visible
@@ -312,7 +312,7 @@ func (r *Repo) CreateDraftWar(
 		}
 	}
 
-	return tx.Commit(ctx)
+	return fmt.Errorf("commit draft war: %w", tx.Commit(ctx))
 }
 
 // TransitionWarPhase bulk-updates wars from one phase to the next.

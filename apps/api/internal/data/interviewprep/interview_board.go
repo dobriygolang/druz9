@@ -60,7 +60,7 @@ func (r *Repo) GetInterviewExperience(ctx context.Context, id uuid.UUID) (*Inter
 		&row.IsAnonymous, &row.ModerationStatus, &row.PostedAt,
 	)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get interview experience: %w", err)
 	}
 	return row, nil
 }
@@ -97,7 +97,7 @@ func (r *Repo) ListApprovedExperiences(ctx context.Context, companyTag string, l
 		if err := rows.Scan(&e.ID, &e.UserID, &e.CompanyTag, &e.Role, &e.Level, &e.OverallRating,
 			&e.LoopStructure, &e.Questions, &e.FeedbackReceived, &e.Outcome,
 			&e.IsAnonymous, &e.ModerationStatus, &e.PostedAt); err != nil {
-			return nil, 0, err
+			return nil, 0, fmt.Errorf("scan experience row: %w", err)
 		}
 		out = append(out, e)
 	}

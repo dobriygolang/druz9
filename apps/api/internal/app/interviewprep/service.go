@@ -584,7 +584,7 @@ func (s *Service) Submit(ctx context.Context, user *model.User, sessionID uuid.U
 	return nil, ErrSubmitNotAllowed
 }
 
-func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName string, contentType string, imageBytes []byte, req SystemDesignReviewInput) (*SystemDesignReviewResult, error) {
+func (s *Service) ReviewSystemDesign(ctx context.Context, user *model.User, sessionID uuid.UUID, fileName, contentType string, imageBytes []byte, req SystemDesignReviewInput) (*SystemDesignReviewResult, error) {
 	session, err := s.repo.GetSession(ctx, sessionID)
 	if err != nil {
 		return nil, err
@@ -740,7 +740,7 @@ func (s *Service) AnswerQuestion(ctx context.Context, user *model.User, sessionI
 	}, nil
 }
 
-func normalizeReviewImageType(contentType string, fileName string) (string, error) {
+func normalizeReviewImageType(contentType, fileName string) (string, error) {
 	normalized := strings.ToLower(strings.TrimSpace(contentType))
 	switch normalized {
 	case "image/png", "image/jpeg", "image/jpg", "image/webp":

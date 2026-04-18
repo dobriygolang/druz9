@@ -14,6 +14,12 @@ import (
 	"api/internal/sandbox"
 )
 
+var (
+	errExecImageNotConfigured = errors.New("sandbox exec image is not configured")
+	errExecutorEmptyResult    = errors.New("sandbox executor returned empty result")
+	errContainerFailed        = errors.New("sandbox container failed")
+)
+
 const defaultRuntimeTimeout = 20 * time.Second
 
 type Config struct {
@@ -91,7 +97,7 @@ func NewService(cfg Config) *Service {
 
 func (s *Service) Execute(ctx context.Context, req sandbox.ExecutionRequest) (sandbox.ExecutionResult, error) {
 	if strings.TrimSpace(s.cfg.ExecImage) == "" {
-		return sandbox.ExecutionResult{}, errors.New("sandbox exec image is not configured")
+		return sandbox.ExecutionResult{}, errExecImageNotConfigured
 	}
 
 	payload, err := json.Marshal(sandbox.ExecuteEnvelope{Request: req})
@@ -108,7 +114,7 @@ func (s *Service) Execute(ctx context.Context, req sandbox.ExecutionRequest) (sa
 
 	output, err := s.docker.Run(ctx, payload, s.buildDockerArgs())
 	if err != nil {
-		return sandbox.ExecutionResult{}, err
+		return sandbox.ExecutionResult{}, fmt.Errorf("run docker container: %w", err)
 	}
 
 	var envelope sandbox.ExecuteResponseEnvelope
@@ -116,10 +122,10 @@ func (s *Service) Execute(ctx context.Context, req sandbox.ExecutionRequest) (sa
 		return sandbox.ExecutionResult{}, fmt.Errorf("decode sandbox executor response: %w", err)
 	}
 	if strings.TrimSpace(envelope.Error) != "" {
-		return sandbox.ExecutionResult{}, fmt.Errorf("%s", strings.TrimSpace(envelope.Error))
+		return sandbox.ExecutionResult{}, fmt.Errorf("%w: %s", errExecutorEmptyResult, strings.TrimSpace(envelope.Error))
 	}
 	if envelope.Result == nil {
-		return sandbox.ExecutionResult{}, errors.New("sandbox executor returned empty result")
+		return sandbox.ExecutionResult{}, errExecutorEmptyResult
 	}
 	return *envelope.Result, nil
 }
@@ -166,7 +172,7 @@ func (r dockerCommandRunner) Run(ctx context.Context, stdin []byte, args []strin
 		if message == "" {
 			message = err.Error()
 		}
-		return nil, fmt.Errorf("sandbox container failed: %s", message)
+		return nil, fmt.Errorf("%w: %s", errContainerFailed, message)
 	}
 	return output, nil
 }

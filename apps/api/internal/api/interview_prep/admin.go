@@ -423,7 +423,7 @@ func buildTask(payload *v1.AdminTaskPayload, taskID uuid.UUID) (*model.Interview
 	}, nil
 }
 
-func buildQuestion(payload *v1.AdminQuestionPayload, taskID uuid.UUID, questionID uuid.UUID) (*model.InterviewPrepQuestion, error) {
+func buildQuestion(payload *v1.AdminQuestionPayload, taskID, questionID uuid.UUID) (*model.InterviewPrepQuestion, error) {
 	if payload == nil {
 		return nil, kratoserrors.BadRequest("BAD_REQUEST", "question payload is required")
 	}
@@ -527,7 +527,7 @@ func parseOptionalUUID(raw string) *uuid.UUID {
 
 var slugPattern = regexp.MustCompile(`[^a-z0-9]+`)
 
-func normalizeSlug(rawSlug string, title string) string {
+func normalizeSlug(rawSlug, title string) string {
 	value := strings.TrimSpace(strings.ToLower(rawSlug))
 	if value == "" {
 		value = strings.TrimSpace(strings.ToLower(title))

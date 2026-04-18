@@ -5,6 +5,7 @@ package season_pass
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	"github.com/google/uuid"
@@ -99,14 +100,18 @@ var (
 // accessor for callers that only need "what season is it" without the
 // user-specific ladder/progress join.
 func (s *Service) GetActivePass(ctx context.Context, at time.Time) (*model.SeasonPass, error) {
-	return s.repo.GetActive(ctx, at)
+	res, err := s.repo.GetActive(ctx, at)
+	if err != nil {
+		return nil, fmt.Errorf("get active pass: %w", err)
+	}
+	return res, nil
 }
 
 // GetActive returns the active pass + ladder + user's progress.
 func (s *Service) GetActive(ctx context.Context, userID uuid.UUID) (*model.SeasonPassSnapshot, error) {
 	pass, err := s.repo.GetActive(ctx, s.clock.Now())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get active: %w", err)
 	}
 	if pass == nil {
 		return nil, ErrNoActivePass
@@ -114,11 +119,11 @@ func (s *Service) GetActive(ctx context.Context, userID uuid.UUID) (*model.Seaso
 
 	tiers, err := s.repo.ListTiers(ctx, pass.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("list tiers: %w", err)
 	}
 	progress, err := s.repo.GetOrCreateProgress(ctx, userID, pass.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get or create progress: %w", err)
 	}
 	// Derive current_tier from xp (truthful, so clients don't compute).
 	progress.CurrentTier = currentTierFor(progress.XP, pass.XPPerTier, pass.MaxTier)
@@ -142,7 +147,7 @@ func (s *Service) ClaimTierReward(
 
 	pass, err := s.repo.GetActive(ctx, s.clock.Now())
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get active: %w", err)
 	}
 	if pass == nil {
 		return nil, ErrNoActivePass
@@ -150,7 +155,7 @@ func (s *Service) ClaimTierReward(
 
 	tierDef, err := s.repo.GetTier(ctx, pass.ID, tier)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get tier: %w", err)
 	}
 	if tierDef == nil {
 		return nil, ErrTierNotFound
@@ -158,7 +163,7 @@ func (s *Service) ClaimTierReward(
 
 	progress, err := s.repo.GetOrCreateProgress(ctx, userID, pass.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get or create progress: %w", err)
 	}
 	progress.CurrentTier = currentTierFor(progress.XP, pass.XPPerTier, pass.MaxTier)
 
@@ -178,12 +183,12 @@ func (s *Service) ClaimTierReward(
 	}
 
 	if err := s.repo.MarkClaimed(ctx, userID, pass.ID, tier, track); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("mark claimed: %w", err)
 	}
 	// Refresh progress after write.
 	progress, err = s.repo.GetOrCreateProgress(ctx, userID, pass.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get or create progress: %w", err)
 	}
 	progress.CurrentTier = currentTierFor(progress.XP, pass.XPPerTier, pass.MaxTier)
 
@@ -208,7 +213,7 @@ func (s *Service) PurchasePremium(ctx context.Context, userID uuid.UUID) (*model
 
 	progress, err := s.repo.GetOrCreateProgress(ctx, userID, pass.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get or create progress: %w", err)
 	}
 	if progress.HasPremium {
 		return nil, ErrAlreadyPurchased
@@ -216,16 +221,16 @@ func (s *Service) PurchasePremium(ctx context.Context, userID uuid.UUID) (*model
 
 	if s.wallet != nil && pass.PremiumPriceGems > 0 {
 		if err := s.wallet.DebitGems(ctx, userID, pass.PremiumPriceGems); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("debit gems: %w", err)
 		}
 	}
 	if err := s.repo.SetPremium(ctx, userID, pass.ID); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("set premium: %w", err)
 	}
 
 	progress, err = s.repo.GetOrCreateProgress(ctx, userID, pass.ID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get or create progress: %w", err)
 	}
 	progress.CurrentTier = currentTierFor(progress.XP, pass.XPPerTier, pass.MaxTier)
 	return progress, nil
@@ -234,11 +239,19 @@ func (s *Service) PurchasePremium(ctx context.Context, userID uuid.UUID) (*model
 // --- Admin methods --------------------------------------------------------
 
 func (s *Service) AdminListPasses(ctx context.Context) ([]*model.SeasonPass, error) {
-	return s.repo.AdminListPasses(ctx)
+	res, err := s.repo.AdminListPasses(ctx)
+	if err != nil {
+		return nil, fmt.Errorf("admin list passes: %w", err)
+	}
+	return res, nil
 }
 
 func (s *Service) AdminCreatePass(ctx context.Context, p *model.SeasonPass) (*model.SeasonPass, error) {
-	return s.repo.AdminCreatePass(ctx, p)
+	res, err := s.repo.AdminCreatePass(ctx, p)
+	if err != nil {
+		return nil, fmt.Errorf("admin create pass: %w", err)
+	}
+	return res, nil
 }
 
 func (s *Service) AdminUpdatePass(ctx context.Context, p *model.SeasonPass) (*model.SeasonPass, error) {

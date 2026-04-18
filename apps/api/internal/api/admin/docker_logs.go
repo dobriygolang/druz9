@@ -3,6 +3,7 @@ package admin
 import (
 	"bytes"
 	"context"
+	errs "errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -13,6 +14,8 @@ import (
 	"github.com/go-kratos/kratos/v2/errors"
 	kratoshttp "github.com/go-kratos/kratos/v2/transport/http"
 )
+
+var errDockerLogsFailed = errs.New("docker logs failed")
 
 const OperationAdminServiceGetDockerLogs = "/admin.v1.AdminService/GetDockerLogs"
 
@@ -205,7 +208,7 @@ func (r dockerLogsCommandRunner) Run(ctx context.Context, stdin []byte, args []s
 		if message == "" {
 			message = err.Error()
 		}
-		return nil, fmt.Errorf("%s", message)
+		return nil, fmt.Errorf("%w: %s", errDockerLogsFailed, message)
 	}
 	return output, nil
 }

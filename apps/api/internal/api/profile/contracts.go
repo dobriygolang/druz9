@@ -11,24 +11,24 @@ import (
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
-	CreateTelegramAuthChallenge(context.Context) (*model.TelegramAuthChallenge, error)
-	TelegramAuth(context.Context, string, string) (*model.ProfileResponse, string, time.Time, int64, error)
-	StartYandexAuth(context.Context) (*model.YandexAuthStart, error)
-	YandexAuth(context.Context, string, string) (*model.ProfileResponse, string, time.Time, error)
-	BindTelegram(context.Context, uuid.UUID, string, string) (*model.ProfileResponse, int64, error)
-	CompleteRegistration(context.Context, uuid.UUID, model.CompleteRegistrationRequest) (*model.ProfileResponse, string, time.Time, error)
-	GetProfileByID(context.Context, uuid.UUID) (*model.ProfileResponse, error)
-	UpdateLocation(context.Context, uuid.UUID, model.CompleteRegistrationRequest) (*model.ProfileResponse, error)
-	UpdateProfile(context.Context, uuid.UUID, string) (*model.ProfileResponse, error)
-	Logout(context.Context, string) error
+	CreateTelegramAuthChallenge(ctx context.Context) (*model.TelegramAuthChallenge, error)
+	TelegramAuth(ctx context.Context, botToken, authData string) (*model.ProfileResponse, string, time.Time, int64, error)
+	StartYandexAuth(ctx context.Context) (*model.YandexAuthStart, error)
+	YandexAuth(ctx context.Context, code, state string) (*model.ProfileResponse, string, time.Time, error)
+	BindTelegram(ctx context.Context, userID uuid.UUID, botToken, username string) (*model.ProfileResponse, int64, error)
+	CompleteRegistration(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.ProfileResponse, string, time.Time, error)
+	GetProfileByID(ctx context.Context, userID uuid.UUID) (*model.ProfileResponse, error)
+	UpdateLocation(ctx context.Context, userID uuid.UUID, req model.CompleteRegistrationRequest) (*model.ProfileResponse, error)
+	UpdateProfile(ctx context.Context, userID uuid.UUID, username string) (*model.ProfileResponse, error)
+	Logout(ctx context.Context, sessionToken string) error
 	DevBypass() bool
 	DevUserID() string
 }
 
 //go:generate mockery --case underscore --name SessionCookieManager --with-expecter --output mocks
 type SessionCookieManager interface {
-	SetSessionCookie(context.Context, string, time.Time)
-	ClearSessionCookie(context.Context)
+	SetSessionCookie(ctx context.Context, token string, expiry time.Time)
+	ClearSessionCookie(ctx context.Context)
 }
 
 // ProgressRepository retrieves profile progress data.

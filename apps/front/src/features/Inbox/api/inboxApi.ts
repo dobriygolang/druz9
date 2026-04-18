@@ -47,4 +47,9 @@ export const inboxApi = {
     const { data } = await apiClient.get<GetUnreadCountResponse>('/api/v1/inbox/unread')
     return { unreadTotal: data.unreadTotal ?? 0 }
   },
+
+  createThread: async (recipientId: string): Promise<{ threadId: string }> => {
+    const { data } = await apiClient.post<{ threadId: string }>('/api/v1/inbox/threads', { recipientId })
+    return data
+  },
 }

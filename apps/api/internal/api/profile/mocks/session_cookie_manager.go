@@ -23,9 +23,9 @@ func (_m *SessionCookieManager) EXPECT() *SessionCookieManager_Expecter {
 	return &SessionCookieManager_Expecter{mock: &_m.Mock}
 }
 
-// ClearSessionCookie provides a mock function with given fields: _a0
-func (_m *SessionCookieManager) ClearSessionCookie(_a0 context.Context) {
-	_m.Called(_a0)
+// ClearSessionCookie provides a mock function with given fields: ctx
+func (_m *SessionCookieManager) ClearSessionCookie(ctx context.Context) {
+	_m.Called(ctx)
 }
 
 // SessionCookieManager_ClearSessionCookie_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'ClearSessionCookie'
@@ -34,12 +34,12 @@ type SessionCookieManager_ClearSessionCookie_Call struct {
 }
 
 // ClearSessionCookie is a helper method to define mock.On call
-//   - _a0 context.Context
-func (_e *SessionCookieManager_Expecter) ClearSessionCookie(_a0 interface{}) *SessionCookieManager_ClearSessionCookie_Call {
-	return &SessionCookieManager_ClearSessionCookie_Call{Call: _e.mock.On("ClearSessionCookie", _a0)}
+//   - ctx context.Context
+func (_e *SessionCookieManager_Expecter) ClearSessionCookie(ctx interface{}) *SessionCookieManager_ClearSessionCookie_Call {
+	return &SessionCookieManager_ClearSessionCookie_Call{Call: _e.mock.On("ClearSessionCookie", ctx)}
 }
 
-func (_c *SessionCookieManager_ClearSessionCookie_Call) Run(run func(_a0 context.Context)) *SessionCookieManager_ClearSessionCookie_Call {
+func (_c *SessionCookieManager_ClearSessionCookie_Call) Run(run func(ctx context.Context)) *SessionCookieManager_ClearSessionCookie_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context))
 	})
@@ -56,9 +56,9 @@ func (_c *SessionCookieManager_ClearSessionCookie_Call) RunAndReturn(run func(co
 	return _c
 }
 
-// SetSessionCookie provides a mock function with given fields: _a0, _a1, _a2
-func (_m *SessionCookieManager) SetSessionCookie(_a0 context.Context, _a1 string, _a2 time.Time) {
-	_m.Called(_a0, _a1, _a2)
+// SetSessionCookie provides a mock function with given fields: ctx, token, expiry
+func (_m *SessionCookieManager) SetSessionCookie(ctx context.Context, token string, expiry time.Time) {
+	_m.Called(ctx, token, expiry)
 }
 
 // SessionCookieManager_SetSessionCookie_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'SetSessionCookie'
@@ -67,14 +67,14 @@ type SessionCookieManager_SetSessionCookie_Call struct {
 }
 
 // SetSessionCookie is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 string
-//   - _a2 time.Time
-func (_e *SessionCookieManager_Expecter) SetSessionCookie(_a0 interface{}, _a1 interface{}, _a2 interface{}) *SessionCookieManager_SetSessionCookie_Call {
-	return &SessionCookieManager_SetSessionCookie_Call{Call: _e.mock.On("SetSessionCookie", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - token string
+//   - expiry time.Time
+func (_e *SessionCookieManager_Expecter) SetSessionCookie(ctx interface{}, token interface{}, expiry interface{}) *SessionCookieManager_SetSessionCookie_Call {
+	return &SessionCookieManager_SetSessionCookie_Call{Call: _e.mock.On("SetSessionCookie", ctx, token, expiry)}
 }
 
-func (_c *SessionCookieManager_SetSessionCookie_Call) Run(run func(_a0 context.Context, _a1 string, _a2 time.Time)) *SessionCookieManager_SetSessionCookie_Call {
+func (_c *SessionCookieManager_SetSessionCookie_Call) Run(run func(ctx context.Context, token string, expiry time.Time)) *SessionCookieManager_SetSessionCookie_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(string), args[2].(time.Time))
 	})

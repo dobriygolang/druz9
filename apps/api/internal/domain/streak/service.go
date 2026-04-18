@@ -15,6 +15,8 @@ import (
 	"api/internal/model"
 )
 
+var errWalletNil = errors.New("purchase shield: wallet is nil")
+
 const (
 	// ShieldPriceGold is the fixed price for one shield purchase.
 	ShieldPriceGold int32 = 200
@@ -168,7 +170,7 @@ func (s *Service) PurchaseShield(ctx context.Context, userID uuid.UUID, count in
 		return nil, 0, 0, ErrInvalidCount
 	}
 	if s.wallet == nil {
-		return nil, 0, 0, errors.New("purchase shield: wallet is nil")
+		return nil, 0, 0, errWalletNil
 	}
 	if err := s.wallet.DebitGold(ctx, userID, ShieldPriceGold*count); err != nil {
 		if errors.Is(err, ErrInsufficientGold) || containsInsufficientFunds(err) {

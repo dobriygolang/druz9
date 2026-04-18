@@ -74,6 +74,69 @@ func (_c *Repository_BumpThread_Call) RunAndReturn(run func(context.Context, uui
 	return _c
 }
 
+// CreateDirectThread provides a mock function with given fields: ctx, senderID, recipientID, senderName, recipientName, subject
+func (_m *Repository) CreateDirectThread(ctx context.Context, senderID uuid.UUID, recipientID uuid.UUID, senderName string, recipientName string, subject string) (*model.InboxThread, error) {
+	ret := _m.Called(ctx, senderID, recipientID, senderName, recipientName, subject)
+
+	if len(ret) == 0 {
+		panic("no return value specified for CreateDirectThread")
+	}
+
+	var r0 *model.InboxThread
+	var r1 error
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, string, string, string) (*model.InboxThread, error)); ok {
+		return rf(ctx, senderID, recipientID, senderName, recipientName, subject)
+	}
+	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, uuid.UUID, string, string, string) *model.InboxThread); ok {
+		r0 = rf(ctx, senderID, recipientID, senderName, recipientName, subject)
+	} else {
+		if ret.Get(0) != nil {
+			r0 = ret.Get(0).(*model.InboxThread)
+		}
+	}
+
+	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, uuid.UUID, string, string, string) error); ok {
+		r1 = rf(ctx, senderID, recipientID, senderName, recipientName, subject)
+	} else {
+		r1 = ret.Error(1)
+	}
+
+	return r0, r1
+}
+
+// Repository_CreateDirectThread_Call is a *mock.Call that shadows Run/Return methods with type explicit version for method 'CreateDirectThread'
+type Repository_CreateDirectThread_Call struct {
+	*mock.Call
+}
+
+// CreateDirectThread is a helper method to define mock.On call
+//   - ctx context.Context
+//   - senderID uuid.UUID
+//   - recipientID uuid.UUID
+//   - senderName string
+//   - recipientName string
+//   - subject string
+func (_e *Repository_Expecter) CreateDirectThread(ctx interface{}, senderID interface{}, recipientID interface{}, senderName interface{}, recipientName interface{}, subject interface{}) *Repository_CreateDirectThread_Call {
+	return &Repository_CreateDirectThread_Call{Call: _e.mock.On("CreateDirectThread", ctx, senderID, recipientID, senderName, recipientName, subject)}
+}
+
+func (_c *Repository_CreateDirectThread_Call) Run(run func(ctx context.Context, senderID uuid.UUID, recipientID uuid.UUID, senderName string, recipientName string, subject string)) *Repository_CreateDirectThread_Call {
+	_c.Call.Run(func(args mock.Arguments) {
+		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(uuid.UUID), args[3].(string), args[4].(string), args[5].(string))
+	})
+	return _c
+}
+
+func (_c *Repository_CreateDirectThread_Call) Return(_a0 *model.InboxThread, _a1 error) *Repository_CreateDirectThread_Call {
+	_c.Call.Return(_a0, _a1)
+	return _c
+}
+
+func (_c *Repository_CreateDirectThread_Call) RunAndReturn(run func(context.Context, uuid.UUID, uuid.UUID, string, string, string) (*model.InboxThread, error)) *Repository_CreateDirectThread_Call {
+	_c.Call.Return(run)
+	return _c
+}
+
 // GetThread provides a mock function with given fields: ctx, userID, threadID
 func (_m *Repository) GetThread(ctx context.Context, userID uuid.UUID, threadID uuid.UUID) (*model.InboxThread, error) {
 	ret := _m.Called(ctx, userID, threadID)

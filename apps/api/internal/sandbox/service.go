@@ -15,6 +15,22 @@ import (
 	"api/internal/policy"
 )
 
+var (
+	errExecutionTimeout    = errors.New("execution timed out")
+	errExecutionError      = errors.New("execution error")
+	errUnsupportedLanguage = errors.New("unsupported sandbox language")
+	errNotEnoughTime        = errors.New("not enough time remaining to execute code")
+	errResolveCacheRoot     = errors.New("resolve go build cache root")
+	errPolicyFixtures       = errors.New("policy forbids filesystem fixtures")
+	errFixtureNotAllowed    = errors.New("fixture file not allowed by policy")
+	errFixtureExceedsSize   = errors.New("fixture file exceeds max size")
+	errFixturePathEmpty     = errors.New("fixture path cannot be empty")
+	errFixtureNotRelative   = errors.New("fixture path must be relative")
+	errFixturePathNA        = errors.New("fixture path is not allowed")
+	errFixtureEscapes       = errors.New("fixture path escapes workspace")
+	errRuntimeNotFound      = errors.New("required runtime not found in PATH")
+)
+
 const (
 	defaultTimeout  = 10 * time.Second
 	maxOutputSize   = 64 * 1024 // 64KB max output
@@ -57,15 +73,15 @@ func (s *Service) Execute(ctx context.Context, req ExecutionRequest) (ExecutionR
 
 	resolvedPolicy, err := policy.ResolvePolicy(req.Task)
 	if err != nil {
-		return ExecutionResult{}, err
+		return ExecutionResult{}, fmt.Errorf("resolve policy: %w", err)
 	}
 	runnerConfig, err := policy.BuildRunnerConfig(resolvedPolicy, req.Task)
 	if err != nil {
-		return ExecutionResult{}, err
+		return ExecutionResult{}, fmt.Errorf("build runner config: %w", err)
 	}
 	output, truncated, err := s.runWithConfig(ctx, req, runnerConfig)
 	if err != nil {
-		return ExecutionResult{}, err
+		return ExecutionResult{}, fmt.Errorf("run with config: %w", err)
 	}
 
 	return ExecutionResult{
@@ -134,14 +150,14 @@ func (s *Service) runWithConfig(ctx context.Context, req ExecutionRequest, cfg p
 	output, err := cmd.CombinedOutput()
 	if err != nil {
 		if errors.Is(execCtx.Err(), context.DeadlineExceeded) {
-			return "", false, fmt.Errorf("execution timed out after %s", timeout)
+			return "", false, fmt.Errorf("%w after %s", errExecutionTimeout, timeout)
 		}
 
 		outputStr := strings.TrimSpace(string(output))
 		if outputStr == "" {
 			return "", false, fmt.Errorf("go run failed: %w", err)
 		}
-		return "", false, fmt.Errorf("%s", outputStr)
+		return "", false, fmt.Errorf("%w: %s", errExecutionError, outputStr)
 	}
 
 	outputStr := string(output)
@@ -201,7 +217,7 @@ func prepareExecution(root string, req ExecutionRequest, cfg policy.RunnerConfig
 		}
 		return command, args, stdin, nil
 	default:
-		return "", nil, "", fmt.Errorf("unsupported sandbox language: %s", req.Language)
+		return "", nil, "", fmt.Errorf("%w: %s", errUnsupportedLanguage, req.Language)
 	}
 }
 
@@ -477,7 +493,7 @@ func effectiveExecutionTimeout(ctx context.Context, requested time.Duration) (ti
 
 	remaining := time.Until(deadline) - requestHeadroom
 	if remaining < minExecBudget {
-		return 0, errors.New("not enough time remaining to execute code")
+		return 0, errNotEnoughTime
 	}
 	if remaining < requested {
 		return remaining, nil
@@ -485,7 +501,7 @@ func effectiveExecutionTimeout(ctx context.Context, requested time.Duration) (ti
 	return requested, nil
 }
 
-func buildExecutionEnv(root string, base []string, extra []string) ([]string, error) {
+func buildExecutionEnv(root string, base, extra []string) ([]string, error) {
 	homeDir := filepath.Join(root, ".home")
 	cacheDir, err := sharedGoCacheDir()
 	if err != nil {
@@ -522,7 +538,7 @@ func sharedGoCacheDir() (string, error) {
 		cacheRoot = os.TempDir()
 	}
 	if cacheRoot == "" {
-		return "", errors.New("resolve go build cache root")
+		return "", errResolveCacheRoot
 	}
 	return filepath.Join(cacheRoot, "druz-sandbox-go-build"), nil
 }
@@ -532,7 +548,7 @@ func materializeFiles(root string, files map[string]string, fs policy.RunnerFile
 		return nil
 	}
 	if fs.Mode == policy.FilesystemNone {
-		return errors.New("policy forbids filesystem fixtures")
+		return errPolicyFixtures
 	}
 
 	allowed := make(map[string]struct{}, len(fs.FixtureFiles))
@@ -547,7 +563,7 @@ func materializeFiles(root string, files map[string]string, fs policy.RunnerFile
 		cleaned := filepath.Clean(path)
 		if fs.Mode == policy.FilesystemFixturesOnly {
 			if _, ok := allowed[cleaned]; !ok {
-				return fmt.Errorf("fixture file %q is not allowed by policy", path)
+				return fmt.Errorf("%w: %q", errFixtureNotAllowed, path)
 			}
 		}
 		target := filepath.Join(root, cleaned)
@@ -555,7 +571,7 @@ func materializeFiles(root string, files map[string]string, fs policy.RunnerFile
 			return fmt.Errorf("create fixture dir: %w", err)
 		}
 		if fs.MaxFileSizeBytes > 0 && int64(len(content)) > fs.MaxFileSizeBytes {
-			return fmt.Errorf("fixture file %q exceeds max size", path)
+			return fmt.Errorf("%w: %q", errFixtureExceedsSize, path)
 		}
 		if err := os.WriteFile(target, []byte(content), privateFileMode); err != nil {
 			return fmt.Errorf("write fixture file: %w", err)
@@ -565,19 +581,19 @@ func materializeFiles(root string, files map[string]string, fs policy.RunnerFile
 	return nil
 }
 
-func validateMaterializedPath(path string, fs policy.RunnerFilesystemConfig) error {
+func validateMaterializedPath(path string, _ policy.RunnerFilesystemConfig) error {
 	if path == "" {
-		return errors.New("fixture path cannot be empty")
+		return errFixturePathEmpty
 	}
 	if filepath.IsAbs(path) {
-		return fmt.Errorf("fixture path %q must be relative", path)
+		return fmt.Errorf("%w: %q", errFixtureNotRelative, path)
 	}
 	cleaned := filepath.Clean(path)
 	if cleaned == "." || cleaned == ".." || cleaned == "main.go" {
-		return fmt.Errorf("fixture path %q is not allowed", path)
+		return fmt.Errorf("%w: %q", errFixturePathNA, path)
 	}
 	if len(cleaned) >= 3 && cleaned[:3] == ".."+string(filepath.Separator) {
-		return fmt.Errorf("fixture path %q escapes workspace", path)
+		return fmt.Errorf("%w: %q", errFixtureEscapes, path)
 	}
 	return nil
 }
@@ -603,5 +619,5 @@ func resolveRuntimeBinary(name string, absoluteFallbacks []string) (string, erro
 		}
 	}
 
-	return "", fmt.Errorf("required runtime %q was not found in PATH", name)
+	return "", fmt.Errorf("%w: %q", errRuntimeNotFound, name)
 }

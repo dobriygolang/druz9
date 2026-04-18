@@ -12,13 +12,13 @@ import (
 
 //go:generate mockery --case underscore --name Service --with-expecter --output mocks
 type Service interface {
-	DeleteUser(context.Context, uuid.UUID) error
+	DeleteUser(ctx context.Context, userID uuid.UUID) error
 }
 
 type ConfigService interface {
-	GetValue(context.Context, rtc.Key) rtc.Value
-	SetValue(context.Context, rtc.Key, string) error
-	ListVariables(context.Context) map[rtc.Key]rtc.Variable
+	GetValue(ctx context.Context, key rtc.Key) rtc.Value
+	SetValue(ctx context.Context, key rtc.Key, value string) error
+	ListVariables(ctx context.Context) map[rtc.Key]rtc.Variable
 }
 
 // UserManager handles trusted/admin flag mutations on users.

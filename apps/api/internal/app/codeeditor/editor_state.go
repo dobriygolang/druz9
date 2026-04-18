@@ -3,6 +3,7 @@ package codeeditor
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/google/uuid"
@@ -173,7 +174,7 @@ func (s *Service) getCachedTask(ctx context.Context, taskID uuid.UUID) (*domain.
 	}
 	task, err := s.repo.GetTask(ctx, taskID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get task: %w", err)
 	}
 	if task != nil {
 		s.taskCache.Set(taskID.String(), *task)
@@ -191,12 +192,12 @@ func (s *Service) getRoomTask(ctx context.Context, room *domain.Room) (*domain.T
 func (s *Service) GetEditorState(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string) (*domain.RoomEditorState, error) {
 	room, err := s.GetRoom(ctx, roomID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get room: %w", err)
 	}
 
 	task, err := s.getRoomTask(ctx, room)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get room task: %w", err)
 	}
 
 	if room.Mode != model.RoomModeDuel {
@@ -215,7 +216,7 @@ func (s *Service) GetEditorState(ctx context.Context, roomID uuid.UUID, userID *
 	if errors.Is(err, domain.ErrDuelStateNotFound) {
 		storedState = nil
 	} else if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get duel editor state: %w", err)
 	}
 	if storedState == nil {
 		initialState := &domain.RoomEditorState{
@@ -223,7 +224,7 @@ func (s *Service) GetEditorState(ctx context.Context, roomID uuid.UUID, userID *
 			Language: defaultRoomLanguage(room, task),
 		}
 		if err := s.repo.SaveDuelEditorState(ctx, roomID, actorKey, initialState.Code, initialState.Language); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("save duel editor state: %w", err)
 		}
 		return initialState, nil
 	}
@@ -234,15 +235,15 @@ func (s *Service) GetEditorState(ctx context.Context, roomID uuid.UUID, userID *
 	}, nil
 }
 
-func (s *Service) SaveEditorState(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, code string, language model.ProgrammingLanguage) error {
+func (s *Service) SaveEditorState(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName, code string, language model.ProgrammingLanguage) error {
 	room, err := s.GetRoom(ctx, roomID)
 	if err != nil {
-		return err
+		return fmt.Errorf("get room: %w", err)
 	}
 
 	task, err := s.getRoomTask(ctx, room)
 	if err != nil {
-		return err
+		return fmt.Errorf("get room task: %w", err)
 	}
 
 	selectedLanguage := normalizeRoomLanguage(language)
@@ -251,31 +252,37 @@ func (s *Service) SaveEditorState(ctx context.Context, roomID uuid.UUID, userID 
 	}
 
 	if room.Mode != model.RoomModeDuel {
-		return s.repo.SaveCodeSnapshot(ctx, roomID, code, selectedLanguage)
+		if err := s.repo.SaveCodeSnapshot(ctx, roomID, code, selectedLanguage); err != nil {
+			return fmt.Errorf("save code snapshot: %w", err)
+		}
+		return nil
 	}
 
 	actorKey := roomEditorActorKey(userID, guestName)
 	if actorKey == "" {
 		return domain.ErrForbidden
 	}
-	return s.repo.SaveDuelEditorState(ctx, roomID, actorKey, code, selectedLanguage)
+	if err := s.repo.SaveDuelEditorState(ctx, roomID, actorKey, code, selectedLanguage); err != nil {
+		return fmt.Errorf("save duel editor state: %w", err)
+	}
+	return nil
 }
 
 func (s *Service) SetEditorLanguage(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, language model.ProgrammingLanguage) (*domain.RoomEditorState, error) {
 	room, err := s.GetRoom(ctx, roomID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get room: %w", err)
 	}
 
 	task, err := s.getRoomTask(ctx, room)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get room task: %w", err)
 	}
 
 	nextLanguage := normalizeRoomLanguage(language)
 	currentState, err := s.GetEditorState(ctx, roomID, userID, guestName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get editor state: %w", err)
 	}
 
 	nextCode := currentState.Code
@@ -284,7 +291,7 @@ func (s *Service) SetEditorLanguage(ctx context.Context, roomID uuid.UUID, userI
 	}
 
 	if err := s.SaveEditorState(ctx, roomID, userID, guestName, nextCode, nextLanguage); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("save editor state: %w", err)
 	}
 
 	return &domain.RoomEditorState{
@@ -296,11 +303,11 @@ func (s *Service) SetEditorLanguage(ctx context.Context, roomID uuid.UUID, userI
 func (s *Service) GetRoomForActor(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string) (*domain.Room, error) {
 	room, err := s.GetRoom(ctx, roomID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get room: %w", err)
 	}
 	state, err := s.GetEditorState(ctx, roomID, userID, guestName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get editor state: %w", err)
 	}
 	cloned := cloneRoom(room)
 	if state != nil {

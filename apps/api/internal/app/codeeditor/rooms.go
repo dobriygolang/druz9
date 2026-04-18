@@ -2,6 +2,7 @@ package codeeditor
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 
@@ -13,7 +14,7 @@ import (
 	"api/internal/sandbox"
 )
 
-func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode string, topic string, difficulty string, task string, isPrivate bool) (*domain.Room, error) {
+func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name string, isGuest bool, mode, topic, difficulty, task string, isPrivate bool) (*domain.Room, error) {
 	modeEnum := model.RoomModeFromString(mode)
 	if modeEnum != model.RoomModeAll && modeEnum != model.RoomModeDuel {
 		return nil, domain.ErrInvalidMode
@@ -28,7 +29,7 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 	if modeEnum == model.RoomModeDuel {
 		pickedTask, err := s.repo.PickRandomTask(ctx, topic, difficulty)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("pick random task: %w", err)
 		}
 		if pickedTask == nil {
 			return nil, domain.ErrNoAvailableTasks
@@ -76,7 +77,7 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 
 	createdRoom, err := s.repo.CreateRoom(ctx, room)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("create room: %w", err)
 	}
 	if createdRoom.Mode == model.RoomModeDuel {
 		initialGuestName := ""
@@ -84,7 +85,7 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 			initialGuestName = name
 		}
 		if _, err := s.SetEditorLanguage(ctx, createdRoom.ID, creatorID, initialGuestName, createdRoom.Language); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("set editor language: %w", err)
 		}
 		return s.GetRoomForActor(ctx, createdRoom.ID, creatorID, initialGuestName)
 	}
@@ -94,40 +95,49 @@ func (s *Service) CreateRoom(ctx context.Context, creatorID *uuid.UUID, name str
 func (s *Service) SetRoomTask(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, task string) error {
 	room, err := s.repo.GetRoom(ctx, roomID)
 	if err != nil {
-		return err
+		return fmt.Errorf("get room: %w", err)
 	}
 	if callerID == nil || room.CreatorID != *callerID {
 		return domain.ErrNotRoomCreator
 	}
-	return s.repo.UpdateRoomTask(ctx, roomID, task)
+	if err := s.repo.UpdateRoomTask(ctx, roomID, task); err != nil {
+		return fmt.Errorf("update room task: %w", err)
+	}
+	return nil
 }
 
 func (s *Service) CloseRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) error {
 	room, err := s.repo.GetRoom(ctx, roomID)
 	if err != nil {
-		return err
+		return fmt.Errorf("get room: %w", err)
 	}
 	if callerID == nil || room.CreatorID != *callerID {
 		return domain.ErrNotRoomCreator
 	}
-	return s.repo.UpdateRoomStatus(ctx, roomID, model.RoomStatusFinished)
+	if err := s.repo.UpdateRoomStatus(ctx, roomID, model.RoomStatusFinished); err != nil {
+		return fmt.Errorf("update room status: %w", err)
+	}
+	return nil
 }
 
 func (s *Service) SetRoomPrivacy(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID, isPrivate bool) error {
 	room, err := s.repo.GetRoom(ctx, roomID)
 	if err != nil {
-		return err
+		return fmt.Errorf("get room: %w", err)
 	}
 	if callerID == nil || room.CreatorID != *callerID {
 		return domain.ErrNotRoomCreator
 	}
-	return s.repo.UpdateRoomPrivacy(ctx, roomID, isPrivate)
+	if err := s.repo.UpdateRoomPrivacy(ctx, roomID, isPrivate); err != nil {
+		return fmt.Errorf("update room privacy: %w", err)
+	}
+	return nil
 }
 
 func (s *Service) GetRoom(ctx context.Context, roomID uuid.UUID) (*domain.Room, error) {
 	room, err := s.repo.GetRoom(ctx, roomID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get room: %w", err)
 	}
 
 	// Добавляем гостей из кэша в список участников
@@ -184,7 +194,7 @@ func (s *Service) addCachedGuestsToRoom(participants []*domain.Participant, room
 func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, name string, isGuest bool) (*domain.Room, error) {
 	room, err := s.repo.GetRoom(ctx, roomID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get room: %w", err)
 	}
 
 	if room.Status == model.RoomStatusFinished {
@@ -251,7 +261,7 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 
 		room, err = s.repo.AddParticipant(ctx, roomID, participant)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("add participant: %w", err)
 		}
 	}
 
@@ -260,7 +270,7 @@ func (s *Service) JoinRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 	if room.Mode == model.RoomModeDuel && len(room.Participants) == 2 && room.Status == model.RoomStatusWaiting {
 		startedAt := now()
 		if err := s.repo.StartDuel(ctx, roomID, startedAt); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("start duel: %w", err)
 		}
 		room.Status = model.RoomStatusActive
 		room.StartedAt = &startedAt
@@ -288,13 +298,16 @@ func (s *Service) LeaveRoom(ctx context.Context, roomID uuid.UUID, userID *uuid.
 		return nil
 	}
 	// Для авторизованных пользователей - удаляем из БД
-	return s.repo.RemoveParticipant(ctx, roomID, userID, guestName)
+	if err := s.repo.RemoveParticipant(ctx, roomID, userID, guestName); err != nil {
+		return fmt.Errorf("remove participant: %w", err)
+	}
+	return nil
 }
 
-func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, code string) (*domain.Submission, error) {
+func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName, code string) (*domain.Submission, error) {
 	room, err := s.repo.GetRoom(ctx, roomID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get room: %w", err)
 	}
 
 	if room.Mode == model.RoomModeDuel && room.Status == model.RoomStatusFinished {
@@ -303,7 +316,7 @@ func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid
 
 	editorState, err := s.GetEditorState(ctx, roomID, userID, guestName)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get editor state: %w", err)
 	}
 	selectedLanguage := room.Language
 	if editorState != nil {
@@ -332,7 +345,11 @@ func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid
 			SubmittedAt: now(),
 			IsCorrect:   false,
 		}
-		return s.repo.CreateSubmission(ctx, submission)
+		sub, err := s.repo.CreateSubmission(ctx, submission)
+		if err != nil {
+			return nil, fmt.Errorf("create submission: %w", err)
+		}
+		return sub, nil
 	}
 
 	submission := &domain.Submission{
@@ -359,7 +376,11 @@ func (s *Service) SubmitCode(ctx context.Context, roomID uuid.UUID, userID *uuid
 		}
 	}
 
-	return s.repo.CreateSubmission(ctx, submission)
+	sub, err := s.repo.CreateSubmission(ctx, submission)
+	if err != nil {
+		return nil, fmt.Errorf("create submission: %w", err)
+	}
+	return sub, nil
 }
 
 func (s *Service) SetReady(ctx context.Context, roomID uuid.UUID, userID *uuid.UUID, guestName string, ready bool) error {
@@ -374,11 +395,18 @@ func (s *Service) SetReady(ctx context.Context, roomID uuid.UUID, userID *uuid.U
 		return nil // Гость не найден в кэше -可能已经离开
 	}
 	// Для авторизованных пользователей - обновляем БД
-	return s.repo.SetParticipantReady(ctx, roomID, userID, guestName, ready)
+	if err := s.repo.SetParticipantReady(ctx, roomID, userID, guestName, ready); err != nil {
+		return fmt.Errorf("set participant ready: %w", err)
+	}
+	return nil
 }
 
 func (s *Service) GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*domain.Submission, error) {
-	return s.repo.GetSubmissions(ctx, roomID)
+	submissions, err := s.repo.GetSubmissions(ctx, roomID)
+	if err != nil {
+		return nil, fmt.Errorf("get submissions: %w", err)
+	}
+	return submissions, nil
 }
 
 // StartRoom transitions a ROOM_MODE_ALL room from waiting → active.
@@ -387,7 +415,7 @@ func (s *Service) GetSubmissions(ctx context.Context, roomID uuid.UUID) ([]*doma
 func (s *Service) StartRoom(ctx context.Context, roomID uuid.UUID, callerID *uuid.UUID) (*domain.Room, error) {
 	room, err := s.repo.GetRoom(ctx, roomID)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("get room: %w", err)
 	}
 
 	// Verify caller is the creator
@@ -408,7 +436,7 @@ func (s *Service) StartRoom(ctx context.Context, roomID uuid.UUID, callerID *uui
 	}
 
 	if err := s.repo.UpdateRoomStatus(ctx, roomID, model.RoomStatusActive); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("update room status: %w", err)
 	}
 	room.Status = model.RoomStatusActive
 
@@ -417,16 +445,28 @@ func (s *Service) StartRoom(ctx context.Context, roomID uuid.UUID, callerID *uui
 }
 
 func (s *Service) CleanupInactiveRooms(ctx context.Context, idleFor time.Duration) (int64, error) {
-	return s.repo.CleanupInactiveRooms(ctx, idleFor)
+	count, err := s.repo.CleanupInactiveRooms(ctx, idleFor)
+	if err != nil {
+		return 0, fmt.Errorf("cleanup inactive rooms: %w", err)
+	}
+	return count, nil
 }
 
 func (s *Service) CleanupOldSubmissions(ctx context.Context, idleFor time.Duration) (int64, error) {
-	return s.repo.CleanupOldSubmissions(ctx, idleFor)
+	count, err := s.repo.CleanupOldSubmissions(ctx, idleFor)
+	if err != nil {
+		return 0, fmt.Errorf("cleanup old submissions: %w", err)
+	}
+	return count, nil
 }
 
 func (s *Service) ListRooms(ctx context.Context, userID *uuid.UUID) ([]*domain.Room, error) {
 	if userID == nil {
 		return nil, nil
 	}
-	return s.repo.ListRoomsForUser(ctx, *userID)
+	rooms, err := s.repo.ListRoomsForUser(ctx, *userID)
+	if err != nil {
+		return nil, fmt.Errorf("list rooms for user: %w", err)
+	}
+	return rooms, nil
 }

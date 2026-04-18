@@ -7,6 +7,7 @@ package peer_mock
 import (
 	"context"
 	"errors"
+	"fmt"
 	"time"
 
 	kerrs "github.com/go-kratos/kratos/v2/errors"
@@ -51,10 +52,10 @@ func (i *Implementation) GetDescription() grpc.ServiceDesc {
 func (i *Implementation) CreateSlot(ctx context.Context, req *v1.CreateSlotRequest) (*v1.CreateSlotResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if err := i.ensureNotBanned(ctx, user.ID); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ensure not banned: %w", err)
 	}
 	if req.GetStartsAt() == nil || req.GetEndsAt() == nil {
 		return nil, kerrs.BadRequest("INVALID_SLOT", "starts_at and ends_at are required")
@@ -126,11 +127,11 @@ func (i *Implementation) ListMySlots(ctx context.Context, req *v1.ListMySlotsReq
 func (i *Implementation) CancelSlot(ctx context.Context, req *v1.CancelSlotRequest) (*v1.CancelSlotResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	slotID, err := apihelpers.ParseUUID(req.GetSlotId(), "INVALID_SLOT_ID", "slot_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse slot id: %w", err)
 	}
 	slot, err := i.repo.CancelSlot(ctx, slotID, user.ID)
 	if err != nil {
@@ -148,14 +149,14 @@ func (i *Implementation) CancelSlot(ctx context.Context, req *v1.CancelSlotReque
 func (i *Implementation) BookSlot(ctx context.Context, req *v1.BookSlotRequest) (*v1.BookSlotResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 	if err := i.ensureNotBanned(ctx, user.ID); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("ensure not banned: %w", err)
 	}
 	slotID, err := apihelpers.ParseUUID(req.GetSlotId(), "INVALID_SLOT_ID", "slot_id")
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("parse slot id: %w", err)
 	}
 	booking, err := i.repo.BookSlot(ctx, slotID, user.ID)
 	if err != nil {

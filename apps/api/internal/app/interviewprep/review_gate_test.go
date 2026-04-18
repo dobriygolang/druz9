@@ -10,6 +10,7 @@ import (
 )
 
 func TestPassesMockStageReview(t *testing.T) {
+	t.Parallel()
 	if passesMockStageReview(&aireview.InterviewSolutionReview{
 		Score:      6,
 		IsRelevant: true,
@@ -28,6 +29,7 @@ func TestPassesMockStageReview(t *testing.T) {
 }
 
 func TestPassesMockQuestionReview(t *testing.T) {
+	t.Parallel()
 	if passesMockQuestionReview(&aireview.InterviewAnswerReview{
 		Score:      5,
 		IsRelevant: true,
@@ -46,6 +48,7 @@ func TestPassesMockQuestionReview(t *testing.T) {
 }
 
 func TestIsTransientAIReviewError(t *testing.T) {
+	t.Parallel()
 	if !isTransientAIReviewError(context.DeadlineExceeded) {
 		t.Fatalf("expected deadline exceeded to be transient")
 	}
@@ -58,6 +61,7 @@ func TestIsTransientAIReviewError(t *testing.T) {
 }
 
 func TestBoundedAIReviewTimeout(t *testing.T) {
+	t.Parallel()
 	if got := boundedAIReviewTimeout(0); got != defaultAIReviewTimeout {
 		t.Fatalf("expected default timeout for zero value, got %s", got)
 	}

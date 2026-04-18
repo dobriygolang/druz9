@@ -2,6 +2,7 @@ package rtc
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,15 +13,20 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+var (
+	errKeyNotFound   = errors.New("config key not found")
+	errKeyNotWritable = errors.New("config key is not writable")
+)
+
 // VariableChangeCallback is invoked on variable change.
 type VariableChangeCallback func(oldVariable, newVariable Variable)
 
 // RealtimeConfig defines runtime config provider interface.
 type RealtimeConfig interface {
-	GetValue(context.Context, Key) Value
-	WatchValue(context.Context, Key, VariableChangeCallback) error
-	SetValue(context.Context, Key, string) error
-	ListVariables(context.Context) map[Key]Variable
+	GetValue(ctx context.Context, key Key) Value
+	WatchValue(ctx context.Context, key Key, callback VariableChangeCallback) error
+	SetValue(ctx context.Context, key Key, value string) error
+	ListVariables(ctx context.Context) map[Key]Variable
 }
 
 type Manager struct {
@@ -49,13 +55,13 @@ func NewManager(path string, logger log.Logger) (*Manager, func(), error) {
 
 	manager.watcher, err = fsnotify.NewWatcher()
 	if err != nil {
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("create fsnotify watcher: %w", err)
 	}
 
 	dir := filepath.Dir(path)
 	if err = manager.watcher.Add(dir); err != nil {
 		_ = manager.watcher.Close()
-		return nil, nil, err
+		return nil, nil, fmt.Errorf("add watch path: %w", err)
 	}
 
 	go manager.watchLoop(filepath.Base(path))
@@ -95,11 +101,11 @@ func (m *Manager) SetValue(_ context.Context, key Key, value string) error {
 
 	oldVariable, exists := m.variables[key]
 	if !exists {
-		return fmt.Errorf("config key not found: %s", key)
+		return fmt.Errorf("config key not found: %s: %w", key, errKeyNotFound)
 	}
 
 	if !oldVariable.Writable {
-		return fmt.Errorf("config key is not writable: %s", key)
+		return fmt.Errorf("config key is not writable: %s: %w", key, errKeyNotWritable)
 	}
 
 	newVariable := Variable{

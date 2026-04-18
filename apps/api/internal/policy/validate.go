@@ -7,6 +7,12 @@ import (
 	"strings"
 )
 
+var (
+	errEmptyPath        = errors.New("empty path is not allowed")
+	errPathNotRelative  = errors.New("path must be relative")
+	errPathEscapes      = errors.New("path escapes workspace")
+)
+
 const (
 	minTimeLimitMs      = 100
 	maxTimeLimitMs      = 30000
@@ -177,14 +183,14 @@ func validateProfileInvariants(p SandboxPolicy) []string {
 
 func validateSafeRelativePath(path string) error {
 	if path == "" {
-		return errors.New("empty path is not allowed")
+		return errEmptyPath
 	}
 	if filepath.IsAbs(path) {
-		return fmt.Errorf("path %q must be relative", path)
+		return fmt.Errorf("%w: %q", errPathNotRelative, path)
 	}
 	cleaned := filepath.Clean(path)
 	if cleaned == "." || cleaned == ".." || strings.HasPrefix(cleaned, "../") {
-		return fmt.Errorf("path %q escapes workspace", path)
+		return fmt.Errorf("%w: %q", errPathEscapes, path)
 	}
 	return nil
 }

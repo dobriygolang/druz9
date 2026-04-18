@@ -13,6 +13,7 @@ import (
 )
 
 func TestSubmitMockStageRetriesTransientAIReviewAndSucceeds(t *testing.T) {
+	t.Parallel()
 	repo, user, sessionID, stageID := newMockSubmitTestFixture()
 	reviewer := &mockSubmitTestReviewer{
 		errs: []error{
@@ -64,6 +65,7 @@ func TestSubmitMockStageRetriesTransientAIReviewAndSucceeds(t *testing.T) {
 }
 
 func TestSubmitMockStageTimeoutPreservesPreviousStageState(t *testing.T) {
+	t.Parallel()
 	repo, user, sessionID, stageID := newMockSubmitTestFixture()
 	repo.stage.LastSubmissionPassed = true
 	repo.stage.ReviewScore = 7

@@ -6,6 +6,7 @@ export enum ThreadKind {
   SYSTEM = 3,
   DUEL = 4,
   CHALLENGE = 5,
+  FRIEND = 6,
 }
 
 export enum SenderKind {

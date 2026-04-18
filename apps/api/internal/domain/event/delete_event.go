@@ -2,6 +2,7 @@ package event
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -10,5 +11,9 @@ import (
 
 // DeleteEvent deletes an event.
 func (s *Service) DeleteEvent(ctx context.Context, eventID uuid.UUID, actor *model.User) error {
-	return s.repo.DeleteEvent(ctx, eventID, actor)
+	err := s.repo.DeleteEvent(ctx, eventID, actor)
+	if err != nil {
+		return fmt.Errorf("delete event: %w", err)
+	}
+	return nil
 }

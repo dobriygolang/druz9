@@ -22,9 +22,9 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
-// DeleteUser provides a mock function with given fields: _a0, _a1
-func (_m *Service) DeleteUser(_a0 context.Context, _a1 uuid.UUID) error {
-	ret := _m.Called(_a0, _a1)
+// DeleteUser provides a mock function with given fields: ctx, userID
+func (_m *Service) DeleteUser(ctx context.Context, userID uuid.UUID) error {
+	ret := _m.Called(ctx, userID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeleteUser")
@@ -32,7 +32,7 @@ func (_m *Service) DeleteUser(_a0 context.Context, _a1 uuid.UUID) error {
 
 	var r0 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) error); ok {
-		r0 = rf(_a0, _a1)
+		r0 = rf(ctx, userID)
 	} else {
 		r0 = ret.Error(0)
 	}
@@ -46,13 +46,13 @@ type Service_DeleteUser_Call struct {
 }
 
 // DeleteUser is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-func (_e *Service_Expecter) DeleteUser(_a0 interface{}, _a1 interface{}) *Service_DeleteUser_Call {
-	return &Service_DeleteUser_Call{Call: _e.mock.On("DeleteUser", _a0, _a1)}
+//   - ctx context.Context
+//   - userID uuid.UUID
+func (_e *Service_Expecter) DeleteUser(ctx interface{}, userID interface{}) *Service_DeleteUser_Call {
+	return &Service_DeleteUser_Call{Call: _e.mock.On("DeleteUser", ctx, userID)}
 }
 
-func (_c *Service_DeleteUser_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID)) *Service_DeleteUser_Call {
+func (_c *Service_DeleteUser_Call) Run(run func(ctx context.Context, userID uuid.UUID)) *Service_DeleteUser_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID))
 	})

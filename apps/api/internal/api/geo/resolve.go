@@ -3,6 +3,7 @@ package geo
 import (
 	"context"
 	stdErrors "errors"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -19,7 +20,7 @@ func (i *Implementation) Resolve(ctx context.Context, req *v1.ResolveRequest) (*
 		case stdErrors.Is(err, geoerrors.ErrNoCandidates):
 			return nil, errors.NotFound("NO_CANDIDATES", "no geo candidates found")
 		default:
-			return nil, err
+			return nil, fmt.Errorf("resolve: %w", err)
 		}
 	}
 

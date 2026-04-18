@@ -66,7 +66,10 @@ func (r *Repo) ListGuildLeaderboard(ctx context.Context, limit int32) ([]*model.
 		}
 		out = append(out, e)
 	}
-	return out, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, fmt.Errorf("iterate guild leaderboard rows: %w", err)
+	}
+	return out, nil
 }
 
 // ListSeasonXPLeaderboard ranks users by their current season-pass XP
@@ -120,5 +123,8 @@ func (r *Repo) ListSeasonXPLeaderboard(ctx context.Context, limit int32) ([]*mod
 		}
 		out = append(out, e)
 	}
-	return out, seasonNumber, rows.Err()
+	if err := rows.Err(); err != nil {
+		return nil, 0, fmt.Errorf("iterate season xp rows: %w", err)
+	}
+	return out, seasonNumber, nil
 }

@@ -26,6 +26,7 @@ var (
 	ErrUnsupportedProvider = errors.New("unsupported ai review provider")
 	ErrInvalidResponse     = errors.New("invalid ai review response")
 	ErrVisionUnsupported   = errors.New("ai review model does not support image input")
+	ErrAIProviderError     = errors.New("ai review provider returned error")
 )
 
 type Config struct {
@@ -502,7 +503,7 @@ func normalizeReviewRelevant(explicit bool, score int, values ...any) bool {
 	return score >= 3
 }
 
-func normalizeReviewPassing(explicit bool, relevant bool, score int, values ...any) bool {
+func normalizeReviewPassing(explicit, relevant bool, score int, values ...any) bool {
 	if !relevant {
 		return false
 	}
@@ -658,5 +659,5 @@ func mapProviderError(statusCode int, body []byte) error {
 		return fmt.Errorf("%w: current model/provider cannot analyze screenshots, choose a vision-capable model", ErrVisionUnsupported)
 	}
 
-	return fmt.Errorf("ai review provider returned %d: %s", statusCode, message)
+	return fmt.Errorf("%w: %d %s", ErrAIProviderError, statusCode, message)
 }

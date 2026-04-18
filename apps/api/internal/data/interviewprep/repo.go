@@ -2,6 +2,7 @@ package interviewprep
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/log"
 	"github.com/google/uuid"
@@ -34,10 +35,10 @@ func (r *Repo) GetCodeTask(ctx context.Context, taskID uuid.UUID) (*model.CodeTa
 
 	var task model.CodeTask
 	if err := codetasksrepo.ScanTask(row, &task); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("scan code task: %w", err)
 	}
 	if err := codetasksrepo.LoadCases(ctx, r.data.DB, &task); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load code task cases: %w", err)
 	}
 	return &task, nil
 }

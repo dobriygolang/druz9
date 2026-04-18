@@ -2,6 +2,7 @@ package sandbox
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net"
 	"net/http"
@@ -12,6 +13,8 @@ import (
 
 	"api/internal/policy"
 )
+
+var errUnsupportedNetworkMode = errors.New("unsupported sandbox network mode")
 
 type mockProxyServer struct {
 	server *http.Server
@@ -75,7 +78,7 @@ func buildNetworkEnv(ctx context.Context, cfg policy.RunnerNetworkConfig) ([]str
 			"no_proxy=",
 		}, nil, nil
 	default:
-		return nil, nil, fmt.Errorf("unsupported sandbox network mode: %s", cfg.Mode)
+		return nil, nil, fmt.Errorf("%w: %s", errUnsupportedNetworkMode, cfg.Mode)
 	}
 }
 

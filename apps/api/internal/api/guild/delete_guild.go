@@ -2,6 +2,7 @@ package guild
 
 import (
 	"context"
+	"fmt"
 
 	"api/internal/apihelpers"
 	commonv1 "api/pkg/api/common/v1"
@@ -20,7 +21,7 @@ func (i *Implementation) DeleteGuild(ctx context.Context, req *v1.DeleteGuildReq
 	}
 
 	if err := i.service.DeleteGuild(ctx, guildID, user.ID); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("delete guild: %w", err)
 	}
 	return &v1.DeleteGuildResponse{Status: commonv1.OperationStatus_OPERATION_STATUS_OK}, nil
 }

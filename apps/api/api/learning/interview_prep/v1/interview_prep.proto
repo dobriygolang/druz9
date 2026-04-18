@@ -127,6 +127,12 @@ service InterviewPrepService {
   rpc ListInterviewExperiences(ListInterviewExperiencesRequest) returns (ListInterviewExperiencesResponse) {
     option (google.api.http) = { get: "/api/v1/interview-board" };
   }
+
+  // ListAIMentors returns the public catalogue of active AI mentor models.
+  // Only id, name, and tier are exposed — keys and prompts stay server-side.
+  rpc ListAIMentors(ListAIMentorsRequest) returns (ListAIMentorsResponse) {
+    option (google.api.http) = { get: "/api/v1/interview-prep/ai-mentors" };
+  }
 }
 
 message InterviewExperience {
@@ -167,6 +173,18 @@ message ListInterviewExperiencesRequest {
 message ListInterviewExperiencesResponse {
   repeated InterviewExperience experiences = 1;
   int32                        total       = 2;
+}
+
+message AIMentor {
+  string id   = 1;
+  string name = 2;
+  int32  tier  = 3;  // 0 = free, 1 = premium
+}
+
+message ListAIMentorsRequest {}
+
+message ListAIMentorsResponse {
+  repeated AIMentor mentors = 1;
 }
 
 // ── Enums ──────────────────────────────────────────────────────────────────

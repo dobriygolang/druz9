@@ -24,9 +24,9 @@ func (_m *Service) EXPECT() *Service_Expecter {
 	return &Service_Expecter{mock: &_m.Mock}
 }
 
-// CompletePodcastUpload provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) CompletePodcastUpload(_a0 context.Context, _a1 uuid.UUID, _a2 model.CompletePodcastUploadRequest) (*model.Podcast, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// CompletePodcastUpload provides a mock function with given fields: ctx, podcastID, req
+func (_m *Service) CompletePodcastUpload(ctx context.Context, podcastID uuid.UUID, req model.CompletePodcastUploadRequest) (*model.Podcast, error) {
+	ret := _m.Called(ctx, podcastID, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CompletePodcastUpload")
@@ -35,10 +35,10 @@ func (_m *Service) CompletePodcastUpload(_a0 context.Context, _a1 uuid.UUID, _a2
 	var r0 *model.Podcast
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.CompletePodcastUploadRequest) (*model.Podcast, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, podcastID, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.CompletePodcastUploadRequest) *model.Podcast); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, podcastID, req)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Podcast)
@@ -46,7 +46,7 @@ func (_m *Service) CompletePodcastUpload(_a0 context.Context, _a1 uuid.UUID, _a2
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, model.CompletePodcastUploadRequest) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, podcastID, req)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -60,14 +60,14 @@ type Service_CompletePodcastUpload_Call struct {
 }
 
 // CompletePodcastUpload is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 model.CompletePodcastUploadRequest
-func (_e *Service_Expecter) CompletePodcastUpload(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_CompletePodcastUpload_Call {
-	return &Service_CompletePodcastUpload_Call{Call: _e.mock.On("CompletePodcastUpload", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - podcastID uuid.UUID
+//   - req model.CompletePodcastUploadRequest
+func (_e *Service_Expecter) CompletePodcastUpload(ctx interface{}, podcastID interface{}, req interface{}) *Service_CompletePodcastUpload_Call {
+	return &Service_CompletePodcastUpload_Call{Call: _e.mock.On("CompletePodcastUpload", ctx, podcastID, req)}
 }
 
-func (_c *Service_CompletePodcastUpload_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 model.CompletePodcastUploadRequest)) *Service_CompletePodcastUpload_Call {
+func (_c *Service_CompletePodcastUpload_Call) Run(run func(ctx context.Context, podcastID uuid.UUID, req model.CompletePodcastUploadRequest)) *Service_CompletePodcastUpload_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(model.CompletePodcastUploadRequest))
 	})
@@ -84,9 +84,9 @@ func (_c *Service_CompletePodcastUpload_Call) RunAndReturn(run func(context.Cont
 	return _c
 }
 
-// CreatePodcast provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) CreatePodcast(_a0 context.Context, _a1 *model.User, _a2 model.CreatePodcastRequest) (*model.Podcast, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// CreatePodcast provides a mock function with given fields: ctx, user, req
+func (_m *Service) CreatePodcast(ctx context.Context, user *model.User, req model.CreatePodcastRequest) (*model.Podcast, error) {
+	ret := _m.Called(ctx, user, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for CreatePodcast")
@@ -95,10 +95,10 @@ func (_m *Service) CreatePodcast(_a0 context.Context, _a1 *model.User, _a2 model
 	var r0 *model.Podcast
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, *model.User, model.CreatePodcastRequest) (*model.Podcast, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, user, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, *model.User, model.CreatePodcastRequest) *model.Podcast); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, user, req)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Podcast)
@@ -106,7 +106,7 @@ func (_m *Service) CreatePodcast(_a0 context.Context, _a1 *model.User, _a2 model
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, *model.User, model.CreatePodcastRequest) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, user, req)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -120,14 +120,14 @@ type Service_CreatePodcast_Call struct {
 }
 
 // CreatePodcast is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 *model.User
-//   - _a2 model.CreatePodcastRequest
-func (_e *Service_Expecter) CreatePodcast(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_CreatePodcast_Call {
-	return &Service_CreatePodcast_Call{Call: _e.mock.On("CreatePodcast", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - user *model.User
+//   - req model.CreatePodcastRequest
+func (_e *Service_Expecter) CreatePodcast(ctx interface{}, user interface{}, req interface{}) *Service_CreatePodcast_Call {
+	return &Service_CreatePodcast_Call{Call: _e.mock.On("CreatePodcast", ctx, user, req)}
 }
 
-func (_c *Service_CreatePodcast_Call) Run(run func(_a0 context.Context, _a1 *model.User, _a2 model.CreatePodcastRequest)) *Service_CreatePodcast_Call {
+func (_c *Service_CreatePodcast_Call) Run(run func(ctx context.Context, user *model.User, req model.CreatePodcastRequest)) *Service_CreatePodcast_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(*model.User), args[2].(model.CreatePodcastRequest))
 	})
@@ -144,9 +144,9 @@ func (_c *Service_CreatePodcast_Call) RunAndReturn(run func(context.Context, *mo
 	return _c
 }
 
-// DeletePodcast provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) DeletePodcast(_a0 context.Context, _a1 uuid.UUID, _a2 *model.User) (string, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// DeletePodcast provides a mock function with given fields: ctx, podcastID, user
+func (_m *Service) DeletePodcast(ctx context.Context, podcastID uuid.UUID, user *model.User) (string, error) {
+	ret := _m.Called(ctx, podcastID, user)
 
 	if len(ret) == 0 {
 		panic("no return value specified for DeletePodcast")
@@ -155,16 +155,16 @@ func (_m *Service) DeletePodcast(_a0 context.Context, _a1 uuid.UUID, _a2 *model.
 	var r0 string
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User) (string, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, podcastID, user)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, *model.User) string); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, podcastID, user)
 	} else {
 		r0 = ret.Get(0).(string)
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, *model.User) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, podcastID, user)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -178,14 +178,14 @@ type Service_DeletePodcast_Call struct {
 }
 
 // DeletePodcast is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 *model.User
-func (_e *Service_Expecter) DeletePodcast(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_DeletePodcast_Call {
-	return &Service_DeletePodcast_Call{Call: _e.mock.On("DeletePodcast", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - podcastID uuid.UUID
+//   - user *model.User
+func (_e *Service_Expecter) DeletePodcast(ctx interface{}, podcastID interface{}, user interface{}) *Service_DeletePodcast_Call {
+	return &Service_DeletePodcast_Call{Call: _e.mock.On("DeletePodcast", ctx, podcastID, user)}
 }
 
-func (_c *Service_DeletePodcast_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 *model.User)) *Service_DeletePodcast_Call {
+func (_c *Service_DeletePodcast_Call) Run(run func(ctx context.Context, podcastID uuid.UUID, user *model.User)) *Service_DeletePodcast_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(*model.User))
 	})
@@ -202,9 +202,9 @@ func (_c *Service_DeletePodcast_Call) RunAndReturn(run func(context.Context, uui
 	return _c
 }
 
-// GetPodcast provides a mock function with given fields: _a0, _a1
-func (_m *Service) GetPodcast(_a0 context.Context, _a1 uuid.UUID) (*model.Podcast, error) {
-	ret := _m.Called(_a0, _a1)
+// GetPodcast provides a mock function with given fields: ctx, podcastID
+func (_m *Service) GetPodcast(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, error) {
+	ret := _m.Called(ctx, podcastID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for GetPodcast")
@@ -213,10 +213,10 @@ func (_m *Service) GetPodcast(_a0 context.Context, _a1 uuid.UUID) (*model.Podcas
 	var r0 *model.Podcast
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*model.Podcast, error)); ok {
-		return rf(_a0, _a1)
+		return rf(ctx, podcastID)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *model.Podcast); ok {
-		r0 = rf(_a0, _a1)
+		r0 = rf(ctx, podcastID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Podcast)
@@ -224,7 +224,7 @@ func (_m *Service) GetPodcast(_a0 context.Context, _a1 uuid.UUID) (*model.Podcas
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) error); ok {
-		r1 = rf(_a0, _a1)
+		r1 = rf(ctx, podcastID)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -238,13 +238,13 @@ type Service_GetPodcast_Call struct {
 }
 
 // GetPodcast is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-func (_e *Service_Expecter) GetPodcast(_a0 interface{}, _a1 interface{}) *Service_GetPodcast_Call {
-	return &Service_GetPodcast_Call{Call: _e.mock.On("GetPodcast", _a0, _a1)}
+//   - ctx context.Context
+//   - podcastID uuid.UUID
+func (_e *Service_Expecter) GetPodcast(ctx interface{}, podcastID interface{}) *Service_GetPodcast_Call {
+	return &Service_GetPodcast_Call{Call: _e.mock.On("GetPodcast", ctx, podcastID)}
 }
 
-func (_c *Service_GetPodcast_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID)) *Service_GetPodcast_Call {
+func (_c *Service_GetPodcast_Call) Run(run func(ctx context.Context, podcastID uuid.UUID)) *Service_GetPodcast_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID))
 	})
@@ -261,9 +261,9 @@ func (_c *Service_GetPodcast_Call) RunAndReturn(run func(context.Context, uuid.U
 	return _c
 }
 
-// ListPodcasts provides a mock function with given fields: _a0, _a1
-func (_m *Service) ListPodcasts(_a0 context.Context, _a1 model.ListPodcastsOptions) (*model.ListPodcastsResponse, error) {
-	ret := _m.Called(_a0, _a1)
+// ListPodcasts provides a mock function with given fields: ctx, opts
+func (_m *Service) ListPodcasts(ctx context.Context, opts model.ListPodcastsOptions) (*model.ListPodcastsResponse, error) {
+	ret := _m.Called(ctx, opts)
 
 	if len(ret) == 0 {
 		panic("no return value specified for ListPodcasts")
@@ -272,10 +272,10 @@ func (_m *Service) ListPodcasts(_a0 context.Context, _a1 model.ListPodcastsOptio
 	var r0 *model.ListPodcastsResponse
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, model.ListPodcastsOptions) (*model.ListPodcastsResponse, error)); ok {
-		return rf(_a0, _a1)
+		return rf(ctx, opts)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, model.ListPodcastsOptions) *model.ListPodcastsResponse); ok {
-		r0 = rf(_a0, _a1)
+		r0 = rf(ctx, opts)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.ListPodcastsResponse)
@@ -283,7 +283,7 @@ func (_m *Service) ListPodcasts(_a0 context.Context, _a1 model.ListPodcastsOptio
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, model.ListPodcastsOptions) error); ok {
-		r1 = rf(_a0, _a1)
+		r1 = rf(ctx, opts)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -297,13 +297,13 @@ type Service_ListPodcasts_Call struct {
 }
 
 // ListPodcasts is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 model.ListPodcastsOptions
-func (_e *Service_Expecter) ListPodcasts(_a0 interface{}, _a1 interface{}) *Service_ListPodcasts_Call {
-	return &Service_ListPodcasts_Call{Call: _e.mock.On("ListPodcasts", _a0, _a1)}
+//   - ctx context.Context
+//   - opts model.ListPodcastsOptions
+func (_e *Service_Expecter) ListPodcasts(ctx interface{}, opts interface{}) *Service_ListPodcasts_Call {
+	return &Service_ListPodcasts_Call{Call: _e.mock.On("ListPodcasts", ctx, opts)}
 }
 
-func (_c *Service_ListPodcasts_Call) Run(run func(_a0 context.Context, _a1 model.ListPodcastsOptions)) *Service_ListPodcasts_Call {
+func (_c *Service_ListPodcasts_Call) Run(run func(ctx context.Context, opts model.ListPodcastsOptions)) *Service_ListPodcasts_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(model.ListPodcastsOptions))
 	})
@@ -320,9 +320,9 @@ func (_c *Service_ListPodcasts_Call) RunAndReturn(run func(context.Context, mode
 	return _c
 }
 
-// PlayPodcast provides a mock function with given fields: _a0, _a1
-func (_m *Service) PlayPodcast(_a0 context.Context, _a1 uuid.UUID) (*model.Podcast, string, error) {
-	ret := _m.Called(_a0, _a1)
+// PlayPodcast provides a mock function with given fields: ctx, podcastID
+func (_m *Service) PlayPodcast(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, string, error) {
+	ret := _m.Called(ctx, podcastID)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PlayPodcast")
@@ -332,10 +332,10 @@ func (_m *Service) PlayPodcast(_a0 context.Context, _a1 uuid.UUID) (*model.Podca
 	var r1 string
 	var r2 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) (*model.Podcast, string, error)); ok {
-		return rf(_a0, _a1)
+		return rf(ctx, podcastID)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID) *model.Podcast); ok {
-		r0 = rf(_a0, _a1)
+		r0 = rf(ctx, podcastID)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Podcast)
@@ -343,13 +343,13 @@ func (_m *Service) PlayPodcast(_a0 context.Context, _a1 uuid.UUID) (*model.Podca
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID) string); ok {
-		r1 = rf(_a0, _a1)
+		r1 = rf(ctx, podcastID)
 	} else {
 		r1 = ret.Get(1).(string)
 	}
 
 	if rf, ok := ret.Get(2).(func(context.Context, uuid.UUID) error); ok {
-		r2 = rf(_a0, _a1)
+		r2 = rf(ctx, podcastID)
 	} else {
 		r2 = ret.Error(2)
 	}
@@ -363,13 +363,13 @@ type Service_PlayPodcast_Call struct {
 }
 
 // PlayPodcast is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-func (_e *Service_Expecter) PlayPodcast(_a0 interface{}, _a1 interface{}) *Service_PlayPodcast_Call {
-	return &Service_PlayPodcast_Call{Call: _e.mock.On("PlayPodcast", _a0, _a1)}
+//   - ctx context.Context
+//   - podcastID uuid.UUID
+func (_e *Service_Expecter) PlayPodcast(ctx interface{}, podcastID interface{}) *Service_PlayPodcast_Call {
+	return &Service_PlayPodcast_Call{Call: _e.mock.On("PlayPodcast", ctx, podcastID)}
 }
 
-func (_c *Service_PlayPodcast_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID)) *Service_PlayPodcast_Call {
+func (_c *Service_PlayPodcast_Call) Run(run func(ctx context.Context, podcastID uuid.UUID)) *Service_PlayPodcast_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID))
 	})
@@ -386,9 +386,9 @@ func (_c *Service_PlayPodcast_Call) RunAndReturn(run func(context.Context, uuid.
 	return _c
 }
 
-// PreparePodcastUpload provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) PreparePodcastUpload(_a0 context.Context, _a1 uuid.UUID, _a2 model.PreparePodcastUploadRequest) (*model.Podcast, string, string, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// PreparePodcastUpload provides a mock function with given fields: ctx, podcastID, req
+func (_m *Service) PreparePodcastUpload(ctx context.Context, podcastID uuid.UUID, req model.PreparePodcastUploadRequest) (*model.Podcast, string, string, error) {
+	ret := _m.Called(ctx, podcastID, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for PreparePodcastUpload")
@@ -399,10 +399,10 @@ func (_m *Service) PreparePodcastUpload(_a0 context.Context, _a1 uuid.UUID, _a2 
 	var r2 string
 	var r3 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.PreparePodcastUploadRequest) (*model.Podcast, string, string, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, podcastID, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.PreparePodcastUploadRequest) *model.Podcast); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, podcastID, req)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Podcast)
@@ -410,19 +410,19 @@ func (_m *Service) PreparePodcastUpload(_a0 context.Context, _a1 uuid.UUID, _a2 
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, model.PreparePodcastUploadRequest) string); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, podcastID, req)
 	} else {
 		r1 = ret.Get(1).(string)
 	}
 
 	if rf, ok := ret.Get(2).(func(context.Context, uuid.UUID, model.PreparePodcastUploadRequest) string); ok {
-		r2 = rf(_a0, _a1, _a2)
+		r2 = rf(ctx, podcastID, req)
 	} else {
 		r2 = ret.Get(2).(string)
 	}
 
 	if rf, ok := ret.Get(3).(func(context.Context, uuid.UUID, model.PreparePodcastUploadRequest) error); ok {
-		r3 = rf(_a0, _a1, _a2)
+		r3 = rf(ctx, podcastID, req)
 	} else {
 		r3 = ret.Error(3)
 	}
@@ -436,14 +436,14 @@ type Service_PreparePodcastUpload_Call struct {
 }
 
 // PreparePodcastUpload is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 model.PreparePodcastUploadRequest
-func (_e *Service_Expecter) PreparePodcastUpload(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_PreparePodcastUpload_Call {
-	return &Service_PreparePodcastUpload_Call{Call: _e.mock.On("PreparePodcastUpload", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - podcastID uuid.UUID
+//   - req model.PreparePodcastUploadRequest
+func (_e *Service_Expecter) PreparePodcastUpload(ctx interface{}, podcastID interface{}, req interface{}) *Service_PreparePodcastUpload_Call {
+	return &Service_PreparePodcastUpload_Call{Call: _e.mock.On("PreparePodcastUpload", ctx, podcastID, req)}
 }
 
-func (_c *Service_PreparePodcastUpload_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 model.PreparePodcastUploadRequest)) *Service_PreparePodcastUpload_Call {
+func (_c *Service_PreparePodcastUpload_Call) Run(run func(ctx context.Context, podcastID uuid.UUID, req model.PreparePodcastUploadRequest)) *Service_PreparePodcastUpload_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(model.PreparePodcastUploadRequest))
 	})
@@ -460,9 +460,9 @@ func (_c *Service_PreparePodcastUpload_Call) RunAndReturn(run func(context.Conte
 	return _c
 }
 
-// UploadPodcast provides a mock function with given fields: _a0, _a1, _a2
-func (_m *Service) UploadPodcast(_a0 context.Context, _a1 uuid.UUID, _a2 model.UploadPodcastRequest) (*model.Podcast, error) {
-	ret := _m.Called(_a0, _a1, _a2)
+// UploadPodcast provides a mock function with given fields: ctx, podcastID, req
+func (_m *Service) UploadPodcast(ctx context.Context, podcastID uuid.UUID, req model.UploadPodcastRequest) (*model.Podcast, error) {
+	ret := _m.Called(ctx, podcastID, req)
 
 	if len(ret) == 0 {
 		panic("no return value specified for UploadPodcast")
@@ -471,10 +471,10 @@ func (_m *Service) UploadPodcast(_a0 context.Context, _a1 uuid.UUID, _a2 model.U
 	var r0 *model.Podcast
 	var r1 error
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.UploadPodcastRequest) (*model.Podcast, error)); ok {
-		return rf(_a0, _a1, _a2)
+		return rf(ctx, podcastID, req)
 	}
 	if rf, ok := ret.Get(0).(func(context.Context, uuid.UUID, model.UploadPodcastRequest) *model.Podcast); ok {
-		r0 = rf(_a0, _a1, _a2)
+		r0 = rf(ctx, podcastID, req)
 	} else {
 		if ret.Get(0) != nil {
 			r0 = ret.Get(0).(*model.Podcast)
@@ -482,7 +482,7 @@ func (_m *Service) UploadPodcast(_a0 context.Context, _a1 uuid.UUID, _a2 model.U
 	}
 
 	if rf, ok := ret.Get(1).(func(context.Context, uuid.UUID, model.UploadPodcastRequest) error); ok {
-		r1 = rf(_a0, _a1, _a2)
+		r1 = rf(ctx, podcastID, req)
 	} else {
 		r1 = ret.Error(1)
 	}
@@ -496,14 +496,14 @@ type Service_UploadPodcast_Call struct {
 }
 
 // UploadPodcast is a helper method to define mock.On call
-//   - _a0 context.Context
-//   - _a1 uuid.UUID
-//   - _a2 model.UploadPodcastRequest
-func (_e *Service_Expecter) UploadPodcast(_a0 interface{}, _a1 interface{}, _a2 interface{}) *Service_UploadPodcast_Call {
-	return &Service_UploadPodcast_Call{Call: _e.mock.On("UploadPodcast", _a0, _a1, _a2)}
+//   - ctx context.Context
+//   - podcastID uuid.UUID
+//   - req model.UploadPodcastRequest
+func (_e *Service_Expecter) UploadPodcast(ctx interface{}, podcastID interface{}, req interface{}) *Service_UploadPodcast_Call {
+	return &Service_UploadPodcast_Call{Call: _e.mock.On("UploadPodcast", ctx, podcastID, req)}
 }
 
-func (_c *Service_UploadPodcast_Call) Run(run func(_a0 context.Context, _a1 uuid.UUID, _a2 model.UploadPodcastRequest)) *Service_UploadPodcast_Call {
+func (_c *Service_UploadPodcast_Call) Run(run func(ctx context.Context, podcastID uuid.UUID, req model.UploadPodcastRequest)) *Service_UploadPodcast_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		run(args[0].(context.Context), args[1].(uuid.UUID), args[2].(model.UploadPodcastRequest))
 	})

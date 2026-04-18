@@ -2,6 +2,7 @@ package training
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/go-kratos/kratos/v2/errors"
 
@@ -14,7 +15,7 @@ func (i *Implementation) GetSkillTree(ctx context.Context, req *v1.GetSkillTreeR
 
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	resp, err := i.service.GetSkillTree(ctx, user.ID)
@@ -27,7 +28,7 @@ func (i *Implementation) GetSkillTree(ctx context.Context, req *v1.GetSkillTreeR
 func (i *Implementation) GetTask(ctx context.Context, req *v1.GetTaskRequest) (*v1.GetTaskResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	task, err := i.service.GetTask(ctx, user.ID, req.GetModuleId())
@@ -59,7 +60,7 @@ func (i *Implementation) GetTask(ctx context.Context, req *v1.GetTaskRequest) (*
 func (i *Implementation) EvaluateTaskSolution(ctx context.Context, req *v1.EvaluateTaskSolutionRequest) (*v1.EvaluateTaskSolutionResponse, error) {
 	user, err := apihelpers.RequireUser(ctx)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("require user: %w", err)
 	}
 
 	result, err := i.service.EvaluateTaskSolution(ctx, user.ID, req.GetModuleId(), req.GetLanguage(), req.GetCode(), req.GetMode())

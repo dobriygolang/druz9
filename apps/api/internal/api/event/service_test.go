@@ -482,7 +482,7 @@ func (m *MockService) CreateEvent(ctx context.Context, userID uuid.UUID, isAdmin
 	return args.Get(0).(*model.Event), args.Error(1)
 }
 
-func (m *MockService) JoinEvent(ctx context.Context, eventID uuid.UUID, userID uuid.UUID) (*model.Event, error) {
+func (m *MockService) JoinEvent(ctx context.Context, eventID, userID uuid.UUID) (*model.Event, error) {
 	args := m.Called(ctx, eventID, userID)
 	if args.Get(0) == nil {
 		return nil, args.Error(1)
@@ -490,7 +490,7 @@ func (m *MockService) JoinEvent(ctx context.Context, eventID uuid.UUID, userID u
 	return args.Get(0).(*model.Event), args.Error(1)
 }
 
-func (m *MockService) LeaveEvent(ctx context.Context, eventID uuid.UUID, userID uuid.UUID) error {
+func (m *MockService) LeaveEvent(ctx context.Context, eventID, userID uuid.UUID) error {
 	args := m.Called(ctx, eventID, userID)
 	return args.Error(0)
 }

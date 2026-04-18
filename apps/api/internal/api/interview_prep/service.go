@@ -8,6 +8,7 @@ import (
 
 	appinterviewprep "api/internal/app/interviewprep"
 	notif "api/internal/clients/notification"
+	aimentordata "api/internal/data/ai_mentor"
 	interviewprepdata "api/internal/data/interviewprep"
 	"api/internal/model"
 	v1 "api/pkg/api/interview_prep/v1"
@@ -62,14 +63,21 @@ type AdminRepo interface {
 // Implementation of interview_prep service.
 type Implementation struct {
 	v1.UnimplementedInterviewPrepServiceServer
-	service Service
-	admin   AdminRepo
-	notif   notif.Sender
+	service    Service
+	admin      AdminRepo
+	notif      notif.Sender
+	aiMentors  *aimentordata.Repo
 }
 
 // New returns new instance of Implementation.
 func New(service Service, admin AdminRepo, n notif.Sender) *Implementation {
 	return &Implementation{service: service, admin: admin, notif: n}
+}
+
+// WithAIMentorRepo attaches the AI mentor repo so ListAIMentors works.
+func (i *Implementation) WithAIMentorRepo(r *aimentordata.Repo) *Implementation {
+	i.aiMentors = r
+	return i
 }
 
 // GetDescription returns grpc service description.

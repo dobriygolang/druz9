@@ -2,6 +2,7 @@ package podcast
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/google/uuid"
 
@@ -10,5 +11,9 @@ import (
 
 // IncrementListens increments the listen count for a podcast.
 func (s *Service) IncrementListens(ctx context.Context, podcastID uuid.UUID) (*model.Podcast, error) {
-	return s.repo.IncrementListens(ctx, podcastID)
+	podcast, err := s.repo.IncrementListens(ctx, podcastID)
+	if err != nil {
+		return nil, fmt.Errorf("increment listens: %w", err)
+	}
+	return podcast, nil
 }

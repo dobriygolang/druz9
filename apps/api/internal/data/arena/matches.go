@@ -84,7 +84,7 @@ func (r *Repo) GetMatch(ctx context.Context, matchID uuid.UUID) (*domain.Match, 
 	match.Task = &task
 
 	if err := codetasks.LoadCases(ctx, r.data.DB, match.Task); err != nil {
-		return nil, err
+		return nil, fmt.Errorf("load match task cases: %w", err)
 	}
 
 	rows, err := r.data.DB.Query(ctx, `
@@ -203,7 +203,7 @@ func (r *Repo) ListMatchesByIDs(ctx context.Context, matchIDs []uuid.UUID) ([]*d
 
 	if len(tasks) > 0 {
 		if err := codetasks.LoadCasesMultiple(ctx, r.data.DB, tasks); err != nil {
-			return nil, err
+			return nil, fmt.Errorf("load match tasks cases: %w", err)
 		}
 	}
 

@@ -3,6 +3,7 @@ package aireview
 import "testing"
 
 func TestParseInterviewSolutionJSONMarksIrrelevantAsNotPassing(t *testing.T) {
+	t.Parallel()
 	raw := `{
 		"score": 8,
 		"summary": "Ответ нерелевантен задаче и выглядит как набор слов.",
@@ -24,6 +25,7 @@ func TestParseInterviewSolutionJSONMarksIrrelevantAsNotPassing(t *testing.T) {
 }
 
 func TestParseInterviewAnswerJSONUsesPassingThreshold(t *testing.T) {
+	t.Parallel()
 	raw := `{
 		"score": 5,
 		"summary": "Ответ частичный и поверхностный.",

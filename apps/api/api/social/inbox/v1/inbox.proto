@@ -46,6 +46,15 @@ service InboxService {
   rpc GetUnreadCount(GetUnreadCountRequest) returns (GetUnreadCountResponse) {
     option (google.api.http) = { get: "/api/v1/inbox/unread" };
   }
+
+  // CreateDirectThread opens (or returns existing) a bidirectional friend-mail
+  // thread between the caller and the given recipient. Idempotent.
+  rpc CreateDirectThread(CreateDirectThreadRequest) returns (CreateDirectThreadResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/inbox/threads"
+      body: "*"
+    };
+  }
 }
 
 // ThreadKind classifies inbox threads so the client can route icons, avatars
@@ -57,6 +66,7 @@ enum ThreadKind {
   THREAD_KIND_SYSTEM      = 3;  // Level-up, achievement, season events
   THREAD_KIND_DUEL        = 4;  // Post-match chat with opponent
   THREAD_KIND_CHALLENGE   = 5;  // Async friend challenge conversation
+  THREAD_KIND_FRIEND      = 6;  // Direct friend-to-friend mail
 }
 
 enum SenderKind {
@@ -132,4 +142,12 @@ message GetUnreadCountRequest {}
 
 message GetUnreadCountResponse {
   int32 unread_total = 1;
+}
+
+message CreateDirectThreadRequest {
+  string recipient_id = 1;  // UUID of the target user
+}
+
+message CreateDirectThreadResponse {
+  string thread_id = 1;  // sender-side thread UUID
 }

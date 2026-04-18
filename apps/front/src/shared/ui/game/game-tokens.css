@@ -50,8 +50,8 @@
   --gm-moonlight:        #E8F0FF;
 
   /* Typography */
-  --gm-font-display:     'Cinzel', 'Press Start 2P', Georgia, serif;
-  --gm-font-display-dec: 'Cinzel Decorative', 'Cinzel', serif;
+  --gm-font-display:     'Cormorant Garamond', Georgia, serif;
+  --gm-font-display-dec: 'Cormorant Garamond', Georgia, serif;
   --gm-font-body:        'Manrope', system-ui, sans-serif;
   --gm-font-mono:        'JetBrains Mono', monospace;
   --gm-font-pixel:       'Press Start 2P', monospace;
