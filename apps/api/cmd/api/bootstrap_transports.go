@@ -27,6 +27,7 @@ import (
 	shopv1 "api/pkg/api/shop/v1"
 	skillsv1 "api/pkg/api/skills/v1"
 	socialv1 "api/pkg/api/social/v1"
+	peermockv1 "api/pkg/api/peer_mock/v1"
 	streakv1 "api/pkg/api/streak/v1"
 	trainingv1 "api/pkg/api/training/v1"
 
@@ -200,6 +201,9 @@ func registerAPIServices(httpServer *kratoshttp.Server, grpcServer *kratosgrpc.S
 	shopv1.RegisterShopServiceServer(grpcServer, services.shopService)
 	socialv1.RegisterSocialServiceHTTPServer(httpServer, services.socialService)
 	socialv1.RegisterSocialServiceServer(grpcServer, services.socialService)
+
+	peermockv1.RegisterPeerMockServiceHTTPServer(httpServer, services.peerMockService)
+	peermockv1.RegisterPeerMockServiceServer(grpcServer, services.peerMockService)
 
 	notificationv1.RegisterNotificationSettingsServiceHTTPServer(httpServer, services.notificationSettings)
 	notificationv1.RegisterNotificationSettingsServiceServer(grpcServer, services.notificationSettings)

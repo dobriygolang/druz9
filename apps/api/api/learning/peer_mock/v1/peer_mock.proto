@@ -1,0 +1,239 @@
+syntax = "proto3";
+
+package peer_mock.v1;
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+option go_package = "api/pkg/api/peer_mock/v1;v1";
+
+// PeerMockService lets users offer and book live mock interviews with
+// each other. Someone lists availability slots (interviewer) and
+// others book them (interviewee). Each side reviews the other after
+// the session; chronic no-shows get XP penalties and eventually a ban
+// — see Round 5 plan "Peer Mock Interview System" for the full spec.
+service PeerMockService {
+  rpc CreateSlot(CreateSlotRequest) returns (CreateSlotResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/peer-mocks/slots"
+      body: "*"
+    };
+  }
+
+  rpc ListOpenSlots(ListOpenSlotsRequest) returns (ListOpenSlotsResponse) {
+    option (google.api.http) = { get: "/api/v1/peer-mocks/slots" };
+  }
+
+  rpc ListMySlots(ListMySlotsRequest) returns (ListMySlotsResponse) {
+    option (google.api.http) = { get: "/api/v1/peer-mocks/slots/mine" };
+  }
+
+  rpc CancelSlot(CancelSlotRequest) returns (CancelSlotResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/peer-mocks/slots/{slot_id}/cancel"
+      body: "*"
+    };
+  }
+
+  rpc BookSlot(BookSlotRequest) returns (BookSlotResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/peer-mocks/slots/{slot_id}/book"
+      body: "*"
+    };
+  }
+
+  rpc ListMyBookings(ListMyBookingsRequest) returns (ListMyBookingsResponse) {
+    option (google.api.http) = { get: "/api/v1/peer-mocks/bookings" };
+  }
+
+  rpc CancelBooking(CancelBookingRequest) returns (CancelBookingResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/peer-mocks/bookings/{booking_id}/cancel"
+      body: "*"
+    };
+  }
+
+  rpc SubmitReview(SubmitReviewRequest) returns (SubmitReviewResponse) {
+    option (google.api.http) = {
+      post: "/api/v1/peer-mocks/bookings/{booking_id}/review"
+      body: "*"
+    };
+  }
+
+  rpc GetMyReliability(GetMyReliabilityRequest) returns (GetMyReliabilityResponse) {
+    option (google.api.http) = { get: "/api/v1/peer-mocks/reliability" };
+  }
+}
+
+// ── Types ──────────────────────────────────────────────────────────────
+
+enum SlotType {
+  SLOT_TYPE_UNSPECIFIED = 0;
+  SLOT_TYPE_ALGO        = 1;
+  SLOT_TYPE_SYSTEM_DESIGN = 2;
+  SLOT_TYPE_BEHAVIORAL  = 3;
+  SLOT_TYPE_FULL        = 4;  // алго + system design + behavioral one pass
+}
+
+enum SlotLevel {
+  SLOT_LEVEL_UNSPECIFIED = 0;
+  SLOT_LEVEL_JUNIOR      = 1;
+  SLOT_LEVEL_MID         = 2;
+  SLOT_LEVEL_SENIOR      = 3;
+}
+
+enum SlotStatus {
+  SLOT_STATUS_UNSPECIFIED = 0;
+  SLOT_STATUS_OPEN        = 1;
+  SLOT_STATUS_BOOKED      = 2;
+  SLOT_STATUS_COMPLETED   = 3;
+  SLOT_STATUS_CANCELLED   = 4;
+}
+
+enum BookingStatus {
+  BOOKING_STATUS_UNSPECIFIED          = 0;
+  BOOKING_STATUS_SCHEDULED            = 1;
+  BOOKING_STATUS_IN_PROGRESS          = 2;
+  BOOKING_STATUS_COMPLETED            = 3;
+  BOOKING_STATUS_CANCELLED_BY_BOOKER  = 4;
+  BOOKING_STATUS_CANCELLED_BY_OFFERER = 5;
+  BOOKING_STATUS_NO_SHOW_BOOKER       = 6;
+  BOOKING_STATUS_NO_SHOW_OFFERER      = 7;
+}
+
+message Slot {
+  string                    id             = 1;
+  string                    interviewer_id = 2;
+  string                    interviewer_name = 3;
+  int32                     interviewer_reliability = 4;  // 0..100
+  google.protobuf.Timestamp starts_at      = 5;
+  google.protobuf.Timestamp ends_at        = 6;
+  SlotType                  type           = 7;
+  SlotLevel                 level          = 8;
+  int32                     price_gold     = 9;
+  SlotStatus                status         = 10;
+  string                    note           = 11;  // "Go backend mid", etc.
+}
+
+message Booking {
+  string                    id              = 1;
+  string                    slot_id         = 2;
+  string                    interviewer_id  = 3;
+  string                    interviewer_name = 4;
+  string                    interviewee_id  = 5;
+  string                    interviewee_name = 6;
+  google.protobuf.Timestamp starts_at       = 7;
+  google.protobuf.Timestamp ends_at         = 8;
+  BookingStatus             status          = 9;
+  string                    room_id         = 10; // code-editor room used for the session
+  int32                     price_gold      = 11;
+  bool                      reviewed_by_me  = 12; // did the caller submit a review yet
+}
+
+// ── CreateSlot ─────────────────────────────────────────────────────────
+
+message CreateSlotRequest {
+  google.protobuf.Timestamp starts_at  = 1;
+  google.protobuf.Timestamp ends_at    = 2;
+  SlotType                  type       = 3;
+  SlotLevel                 level      = 4;
+  int32                     price_gold = 5;
+  string                    note       = 6;
+}
+
+message CreateSlotResponse {
+  Slot slot = 1;
+}
+
+// ── ListOpenSlots ──────────────────────────────────────────────────────
+
+message ListOpenSlotsRequest {
+  SlotType type  = 1;
+  SlotLevel level = 2;
+  int32    limit = 3;
+  int32    offset = 4;
+}
+
+message ListOpenSlotsResponse {
+  repeated Slot slots = 1;
+}
+
+// ── ListMySlots ────────────────────────────────────────────────────────
+
+message ListMySlotsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message ListMySlotsResponse {
+  repeated Slot slots = 1;
+}
+
+// ── CancelSlot ─────────────────────────────────────────────────────────
+
+message CancelSlotRequest {
+  string slot_id = 1;
+}
+
+message CancelSlotResponse {
+  Slot slot = 1;
+}
+
+// ── BookSlot ───────────────────────────────────────────────────────────
+
+message BookSlotRequest {
+  string slot_id = 1;
+}
+
+message BookSlotResponse {
+  Booking booking = 1;
+}
+
+// ── ListMyBookings ─────────────────────────────────────────────────────
+
+message ListMyBookingsRequest {
+  int32 limit = 1;
+  int32 offset = 2;
+}
+
+message ListMyBookingsResponse {
+  repeated Booking as_interviewer = 1;
+  repeated Booking as_interviewee = 2;
+}
+
+// ── CancelBooking ──────────────────────────────────────────────────────
+
+message CancelBookingRequest {
+  string booking_id = 1;
+}
+
+message CancelBookingResponse {
+  Booking booking = 1;
+  // Penalty summary for the caller (if the cancellation incurred one).
+  int32  xp_delta          = 2;
+  double reliability_delta = 3;
+}
+
+// ── SubmitReview ───────────────────────────────────────────────────────
+
+message SubmitReviewRequest {
+  string booking_id = 1;
+  int32  rating     = 2;  // 1..5
+  string notes      = 3;
+}
+
+message SubmitReviewResponse {
+  Booking booking = 1;
+}
+
+// ── Reliability ────────────────────────────────────────────────────────
+
+message GetMyReliabilityRequest {}
+
+message GetMyReliabilityResponse {
+  int32                     score         = 1;  // 0..100
+  int32                     penalty_count = 2;
+  google.protobuf.Timestamp last_penalty_at = 3;
+  google.protobuf.Timestamp ban_until     = 4;
+  string                    tier          = 5;  // "unranked" | "reliable" | "featured" | "verified"
+}

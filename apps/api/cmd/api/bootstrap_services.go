@@ -20,6 +20,7 @@ import (
 	profileservice "api/internal/api/profile"
 	referralservice "api/internal/api/referral"
 	seasonpassservice "api/internal/api/season_pass"
+	peermockservice "api/internal/api/peer_mock"
 	shopservice "api/internal/api/shop"
 	socialservice "api/internal/api/social"
 	streakservice "api/internal/api/streak"
@@ -96,6 +97,7 @@ type serviceContext struct {
 	streakService        *streakservice.Implementation
 	shopService          *shopservice.Implementation
 	socialService        *socialservice.Implementation
+	peerMockService      *peermockservice.Implementation
 }
 
 func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*serviceContext, error) {
@@ -295,5 +297,6 @@ func initializeServices(bootstrap *bootstrapContext, storage *storageContext) (*
 		streakService:          streakservice.New(streakDomain),
 		shopService:            shopservice.New(shopDomain),
 		socialService:          socialservice.New(socialDomain),
+		peerMockService:        peermockservice.New(storage.peerMockRepo),
 	}, nil
 }

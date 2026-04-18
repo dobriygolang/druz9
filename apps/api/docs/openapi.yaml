@@ -2403,6 +2403,210 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/notification.v1.UpdateNotificationSettingsResponse'
+    /api/v1/peer-mocks/bookings:
+        get:
+            tags:
+                - PeerMockService
+            operationId: PeerMockService_ListMyBookings
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/peer_mock.v1.ListMyBookingsResponse'
+    /api/v1/peer-mocks/bookings/{bookingId}/cancel:
+        post:
+            tags:
+                - PeerMockService
+            operationId: PeerMockService_CancelBooking
+            parameters:
+                - name: bookingId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/peer_mock.v1.CancelBookingRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/peer_mock.v1.CancelBookingResponse'
+    /api/v1/peer-mocks/bookings/{bookingId}/review:
+        post:
+            tags:
+                - PeerMockService
+            operationId: PeerMockService_SubmitReview
+            parameters:
+                - name: bookingId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/peer_mock.v1.SubmitReviewRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/peer_mock.v1.SubmitReviewResponse'
+    /api/v1/peer-mocks/reliability:
+        get:
+            tags:
+                - PeerMockService
+            operationId: PeerMockService_GetMyReliability
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/peer_mock.v1.GetMyReliabilityResponse'
+    /api/v1/peer-mocks/slots:
+        get:
+            tags:
+                - PeerMockService
+            operationId: PeerMockService_ListOpenSlots
+            parameters:
+                - name: type
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: level
+                  in: query
+                  schema:
+                    type: integer
+                    format: enum
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/peer_mock.v1.ListOpenSlotsResponse'
+        post:
+            tags:
+                - PeerMockService
+            operationId: PeerMockService_CreateSlot
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/peer_mock.v1.CreateSlotRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/peer_mock.v1.CreateSlotResponse'
+    /api/v1/peer-mocks/slots/mine:
+        get:
+            tags:
+                - PeerMockService
+            operationId: PeerMockService_ListMySlots
+            parameters:
+                - name: limit
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+                - name: offset
+                  in: query
+                  schema:
+                    type: integer
+                    format: int32
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/peer_mock.v1.ListMySlotsResponse'
+    /api/v1/peer-mocks/slots/{slotId}/book:
+        post:
+            tags:
+                - PeerMockService
+            operationId: PeerMockService_BookSlot
+            parameters:
+                - name: slotId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/peer_mock.v1.BookSlotRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/peer_mock.v1.BookSlotResponse'
+    /api/v1/peer-mocks/slots/{slotId}/cancel:
+        post:
+            tags:
+                - PeerMockService
+            operationId: PeerMockService_CancelSlot
+            parameters:
+                - name: slotId
+                  in: path
+                  required: true
+                  schema:
+                    type: string
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/peer_mock.v1.CancelSlotRequest'
+                required: true
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/peer_mock.v1.CancelSlotResponse'
     /api/v1/podcasts:
         get:
             tags:
@@ -6404,6 +6608,188 @@ components:
         notification.v1.UpdateNotificationSettingsResponse:
             type: object
             properties: {}
+        peer_mock.v1.BookSlotRequest:
+            type: object
+            properties:
+                slotId:
+                    type: string
+        peer_mock.v1.BookSlotResponse:
+            type: object
+            properties:
+                booking:
+                    $ref: '#/components/schemas/peer_mock.v1.Booking'
+        peer_mock.v1.Booking:
+            type: object
+            properties:
+                id:
+                    type: string
+                slotId:
+                    type: string
+                interviewerId:
+                    type: string
+                interviewerName:
+                    type: string
+                intervieweeId:
+                    type: string
+                intervieweeName:
+                    type: string
+                startsAt:
+                    type: string
+                    format: date-time
+                endsAt:
+                    type: string
+                    format: date-time
+                status:
+                    type: integer
+                    format: enum
+                roomId:
+                    type: string
+                priceGold:
+                    type: integer
+                    format: int32
+                reviewedByMe:
+                    type: boolean
+        peer_mock.v1.CancelBookingRequest:
+            type: object
+            properties:
+                bookingId:
+                    type: string
+        peer_mock.v1.CancelBookingResponse:
+            type: object
+            properties:
+                booking:
+                    $ref: '#/components/schemas/peer_mock.v1.Booking'
+                xpDelta:
+                    type: integer
+                    description: Penalty summary for the caller (if the cancellation incurred one).
+                    format: int32
+                reliabilityDelta:
+                    type: number
+                    format: double
+        peer_mock.v1.CancelSlotRequest:
+            type: object
+            properties:
+                slotId:
+                    type: string
+        peer_mock.v1.CancelSlotResponse:
+            type: object
+            properties:
+                slot:
+                    $ref: '#/components/schemas/peer_mock.v1.Slot'
+        peer_mock.v1.CreateSlotRequest:
+            type: object
+            properties:
+                startsAt:
+                    type: string
+                    format: date-time
+                endsAt:
+                    type: string
+                    format: date-time
+                type:
+                    type: integer
+                    format: enum
+                level:
+                    type: integer
+                    format: enum
+                priceGold:
+                    type: integer
+                    format: int32
+                note:
+                    type: string
+        peer_mock.v1.CreateSlotResponse:
+            type: object
+            properties:
+                slot:
+                    $ref: '#/components/schemas/peer_mock.v1.Slot'
+        peer_mock.v1.GetMyReliabilityResponse:
+            type: object
+            properties:
+                score:
+                    type: integer
+                    format: int32
+                penaltyCount:
+                    type: integer
+                    format: int32
+                lastPenaltyAt:
+                    type: string
+                    format: date-time
+                banUntil:
+                    type: string
+                    format: date-time
+                tier:
+                    type: string
+        peer_mock.v1.ListMyBookingsResponse:
+            type: object
+            properties:
+                asInterviewer:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/peer_mock.v1.Booking'
+                asInterviewee:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/peer_mock.v1.Booking'
+        peer_mock.v1.ListMySlotsResponse:
+            type: object
+            properties:
+                slots:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/peer_mock.v1.Slot'
+        peer_mock.v1.ListOpenSlotsResponse:
+            type: object
+            properties:
+                slots:
+                    type: array
+                    items:
+                        $ref: '#/components/schemas/peer_mock.v1.Slot'
+        peer_mock.v1.Slot:
+            type: object
+            properties:
+                id:
+                    type: string
+                interviewerId:
+                    type: string
+                interviewerName:
+                    type: string
+                interviewerReliability:
+                    type: integer
+                    format: int32
+                startsAt:
+                    type: string
+                    format: date-time
+                endsAt:
+                    type: string
+                    format: date-time
+                type:
+                    type: integer
+                    format: enum
+                level:
+                    type: integer
+                    format: enum
+                priceGold:
+                    type: integer
+                    format: int32
+                status:
+                    type: integer
+                    format: enum
+                note:
+                    type: string
+        peer_mock.v1.SubmitReviewRequest:
+            type: object
+            properties:
+                bookingId:
+                    type: string
+                rating:
+                    type: integer
+                    format: int32
+                notes:
+                    type: string
+        peer_mock.v1.SubmitReviewResponse:
+            type: object
+            properties:
+                booking:
+                    $ref: '#/components/schemas/peer_mock.v1.Booking'
         podcast.v1.CompletePodcastUploadRequest:
             type: object
             properties:
@@ -7861,6 +8247,13 @@ tags:
     - name: InterviewPrepService
     - name: MissionService
     - name: NotificationSettingsService
+    - name: PeerMockService
+      description: |-
+        PeerMockService lets users offer and book live mock interviews with
+         each other. Someone lists availability slots (interviewer) and
+         others book them (interviewee). Each side reviews the other after
+         the session; chronic no-shows get XP penalties and eventually a ban
+         — see Round 5 plan "Peer Mock Interview System" for the full spec.
     - name: PodcastService
     - name: ProfileService
     - name: ReferralService
