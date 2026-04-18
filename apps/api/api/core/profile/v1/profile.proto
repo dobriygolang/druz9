@@ -102,7 +102,11 @@ service ProfileService {
   }
 
   rpc GetWallet(GetWalletRequest) returns (GetWalletResponse) {
-    option (google.api.http) = { get: "/api/v1/profile/wallet" };
+    // NB: /api/v1/profile/wallet would collide with the path pattern
+    // /api/v1/profile/{user_id} (grpc-gateway routes "wallet" as a
+    // user_id and hits GetProfileByID → 400 INVALID_USER_ID). Put the
+    // wallet on a dedicated /api/v1/wallet prefix instead.
+    option (google.api.http) = { get: "/api/v1/wallet" };
   }
 }
 

@@ -283,7 +283,7 @@ export const authApi = {
     await apiClient.patch(`/api/v1/profile/${userId}`, { pinnedAchievements })
   },
   getWallet: async (): Promise<{ gold: number; gems: number; shards: number }> => {
-    const r = await apiClient.get<{ gold?: number; gems?: number; shards?: number }>('/api/v1/profile/wallet')
+    const r = await apiClient.get<{ gold?: number; gems?: number; shards?: number }>('/api/v1/wallet')
     return {
       gold: r.data.gold ?? 0,
       gems: r.data.gems ?? 0,

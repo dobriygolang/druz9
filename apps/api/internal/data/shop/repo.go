@@ -27,6 +27,16 @@ const itemSelectCols = `
     icon_ref, accent_color, is_active, is_seasonal, rotates_at, created_at
 `
 
+// Same column list but fully qualified with `shop_items.` — for queries
+// that JOIN another table with a `currency` column (e.g. user_shop_inventory
+// also has one) so Postgres doesn't bail with "ambiguous reference".
+const itemSelectColsQualified = `
+    shop_items.id, shop_items.slug, shop_items.name, shop_items.description,
+    shop_items.category, shop_items.rarity, shop_items.currency, shop_items.price,
+    shop_items.icon_ref, shop_items.accent_color, shop_items.is_active,
+    shop_items.is_seasonal, shop_items.rotates_at, shop_items.created_at
+`
+
 // ListItems returns active items filtered by category + rarity. Both
 // filters are optional; 0 / UNSPECIFIED means "any".
 func (r *Repo) ListItems(
@@ -130,9 +140,12 @@ func (r *Repo) GetItemBySlug(ctx context.Context, slug string) (*model.ShopItem,
 
 // GetInventory joins user_shop_inventory with shop_items so callers get
 // the full catalog row alongside the ownership record.
+// Uses itemSelectColsQualified because user_shop_inventory also has a
+// `currency` column — unqualified reference trips Postgres with
+// "ambiguous column reference" (SQLSTATE 42702).
 func (r *Repo) GetInventory(ctx context.Context, userID uuid.UUID) ([]*model.ShopOwnedItem, error) {
 	rows, err := r.data.DB.Query(ctx, `
-        SELECT `+itemSelectCols+`, inv.acquired_at, inv.equipped
+        SELECT `+itemSelectColsQualified+`, inv.acquired_at, inv.equipped
         FROM user_shop_inventory inv
         JOIN shop_items ON shop_items.id = inv.item_id
         WHERE inv.user_id = $1

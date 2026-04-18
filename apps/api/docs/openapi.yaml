@@ -2855,18 +2855,6 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/profile.v1.ProfileResponse'
-    /api/v1/profile/wallet:
-        get:
-            tags:
-                - ProfileService
-            operationId: ProfileService_GetWallet
-            responses:
-                "200":
-                    description: OK
-                    content:
-                        application/json:
-                            schema:
-                                $ref: '#/components/schemas/profile.v1.GetWalletResponse'
     /api/v1/profile/{userId}:
         get:
             tags:
@@ -3536,6 +3524,18 @@ paths:
                         application/json:
                             schema:
                                 $ref: '#/components/schemas/training.v1.EvaluateTaskSolutionResponse'
+    /api/v1/wallet:
+        get:
+            tags:
+                - ProfileService
+            operationId: ProfileService_GetWallet
+            responses:
+                "200":
+                    description: OK
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/profile.v1.GetWalletResponse'
 components:
     schemas:
         admin.v1.AdminStatusResponse:

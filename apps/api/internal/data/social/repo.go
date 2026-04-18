@@ -43,7 +43,7 @@ func (r *Repo) ListFriends(ctx context.Context, userID uuid.UUID, limit, offset 
 	rows, err := r.data.DB.Query(ctx, `
         SELECT u.id, COALESCE(u.username, '') AS username,
                TRIM(CONCAT_WS(' ', u.first_name, u.last_name)) AS display_name,
-               COALESCE(u.avatar_url, '') AS avatar_url,
+               COALESCE(NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), '') AS avatar_url,
                COALESCE(u.activity_status, 0) AS activity_status,
                u.last_active_at,
                CASE WHEN f.user_a = $1 THEN f.a_favorite ELSE f.b_favorite END AS is_favorite,
@@ -202,7 +202,7 @@ func (r *Repo) GetFriendByID(ctx context.Context, viewerID, friendID uuid.UUID) 
 	row := r.data.DB.QueryRow(ctx, `
         SELECT u.id, COALESCE(u.username, ''),
                TRIM(CONCAT_WS(' ', u.first_name, u.last_name)),
-               COALESCE(u.avatar_url, ''),
+               COALESCE(NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), ''),
                COALESCE(u.activity_status, 0),
                u.last_active_at,
                CASE WHEN f.user_a = $1 THEN f.a_favorite ELSE f.b_favorite END,

@@ -3373,7 +3373,7 @@ const file_core_profile_v1_profile_proto_rawDesc = "" +
 	"\fFeedItemType\x12\x1e\n" +
 	"\x1aFEED_ITEM_TYPE_UNSPECIFIED\x10\x00\x12\x1d\n" +
 	"\x19FEED_ITEM_TYPE_MOCK_STAGE\x10\x01\x12\x1b\n" +
-	"\x17FEED_ITEM_TYPE_PRACTICE\x10\x022\xa8\x12\n" +
+	"\x17FEED_ITEM_TYPE_PRACTICE\x10\x022\xa0\x12\n" +
 	"\x0eProfileService\x12\xb2\x01\n" +
 	"\x1bCreateTelegramAuthChallenge\x12..profile.v1.CreateTelegramAuthChallengeRequest\x1a/.profile.v1.CreateTelegramAuthChallengeResponse\"2\x82\xd3\xe4\x93\x02,:\x01*\"'/api/v1/profile/auth/telegram/challenge\x12v\n" +
 	"\fTelegramAuth\x12\x1f.profile.v1.TelegramAuthRequest\x1a\x1b.profile.v1.ProfileResponse\"(\x82\xd3\xe4\x93\x02\":\x01*\"\x1d/api/v1/profile/auth/telegram\x12\x85\x01\n" +
@@ -3393,8 +3393,8 @@ const file_core_profile_v1_profile_proto_rawDesc = "" +
 	"\fGetReadiness\x12\x1f.profile.v1.GetReadinessRequest\x1a .profile.v1.GetReadinessResponse\"+\x82\xd3\xe4\x93\x02%\x12#/api/v1/profile/{user_id}/readiness\x12\x7f\n" +
 	"\x0eGetProfileFeed\x12!.profile.v1.GetProfileFeedRequest\x1a\".profile.v1.GetProfileFeedResponse\"&\x82\xd3\xe4\x93\x02 \x12\x1e/api/v1/profile/{user_id}/feed\x12\xa2\x01\n" +
 	"\x17ListProfileAchievements\x12*.profile.v1.ListProfileAchievementsRequest\x1a+.profile.v1.ListProfileAchievementsResponse\".\x82\xd3\xe4\x93\x02(\x12&/api/v1/profile/{user_id}/achievements\x12\x92\x01\n" +
-	"\x13ListProfileActivity\x12&.profile.v1.ListProfileActivityRequest\x1a'.profile.v1.ListProfileActivityResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/profile/{user_id}/activity\x12h\n" +
-	"\tGetWallet\x12\x1c.profile.v1.GetWalletRequest\x1a\x1d.profile.v1.GetWalletResponse\"\x1e\x82\xd3\xe4\x93\x02\x18\x12\x16/api/v1/profile/walletB\x1bZ\x19api/pkg/api/profile/v1;v1b\x06proto3"
+	"\x13ListProfileActivity\x12&.profile.v1.ListProfileActivityRequest\x1a'.profile.v1.ListProfileActivityResponse\"*\x82\xd3\xe4\x93\x02$\x12\"/api/v1/profile/{user_id}/activity\x12`\n" +
+	"\tGetWallet\x12\x1c.profile.v1.GetWalletRequest\x1a\x1d.profile.v1.GetWalletResponse\"\x16\x82\xd3\xe4\x93\x02\x10\x12\x0e/api/v1/walletB\x1bZ\x19api/pkg/api/profile/v1;v1b\x06proto3"
 
 var (
 	file_core_profile_v1_profile_proto_rawDescOnce sync.Once

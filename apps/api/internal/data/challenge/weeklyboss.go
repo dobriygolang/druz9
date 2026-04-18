@@ -55,7 +55,7 @@ func (r *Repo) GetWeeklyLeaderboard(ctx context.Context, weekKey string, limit i
 	rows, err := r.data.DB.Query(ctx, `
 		SELECT wce.user_id,
 		       COALESCE(NULLIF(TRIM(CONCAT_WS(' ', u.first_name, u.last_name)), ''), u.username, ''),
-		       COALESCE(u.avatar_url, ''),
+		       COALESCE(NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), ''),
 		       wce.ai_score, wce.solve_time_ms, wce.submitted_at
 		FROM weekly_challenge_entries wce
 		JOIN users u ON u.id = wce.user_id

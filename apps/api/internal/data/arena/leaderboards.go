@@ -92,7 +92,9 @@ func (r *Repo) ListSeasonXPLeaderboard(ctx context.Context, limit int32) ([]*mod
         SELECT u.id,
                COALESCE(u.username, ''),
                TRIM(CONCAT_WS(' ', u.first_name, u.last_name)) AS display_name,
-               COALESCE(u.avatar_url, ''),
+               -- users has yandex_avatar_url + telegram_avatar_url, not a
+               -- single avatar_url. Coalesce in preference order.
+               COALESCE(NULLIF(u.yandex_avatar_url, ''), NULLIF(u.telegram_avatar_url, ''), ''),
                COALESCE(g.name, '') AS guild_name,
                COALESCE(usp.xp, 0) AS xp,
                COALESCE((COALESCE(usp.xp, 0) / NULLIF(sp.xp_per_tier, 0))::INT, 0) AS current_tier,

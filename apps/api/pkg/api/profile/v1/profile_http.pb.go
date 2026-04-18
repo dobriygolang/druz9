@@ -78,7 +78,7 @@ func RegisterProfileServiceHTTPServer(s *http.Server, srv ProfileServiceHTTPServ
 	r.GET("/api/v1/profile/{user_id}/feed", _ProfileService_GetProfileFeed0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/{user_id}/achievements", _ProfileService_ListProfileAchievements0_HTTP_Handler(srv))
 	r.GET("/api/v1/profile/{user_id}/activity", _ProfileService_ListProfileActivity0_HTTP_Handler(srv))
-	r.GET("/api/v1/profile/wallet", _ProfileService_GetWallet0_HTTP_Handler(srv))
+	r.GET("/api/v1/wallet", _ProfileService_GetWallet0_HTTP_Handler(srv))
 }
 
 func _ProfileService_CreateTelegramAuthChallenge0_HTTP_Handler(srv ProfileServiceHTTPServer) func(ctx http.Context) error {
@@ -600,7 +600,7 @@ func (c *ProfileServiceHTTPClientImpl) GetReadiness(ctx context.Context, in *Get
 
 func (c *ProfileServiceHTTPClientImpl) GetWallet(ctx context.Context, in *GetWalletRequest, opts ...http.CallOption) (*GetWalletResponse, error) {
 	var out GetWalletResponse
-	pattern := "/api/v1/profile/wallet"
+	pattern := "/api/v1/wallet"
 	path := binding.EncodeURL(pattern, in, true)
 	opts = append(opts, http.Operation(OperationProfileServiceGetWallet))
 	opts = append(opts, http.PathTemplate(pattern))
