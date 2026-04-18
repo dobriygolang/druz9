@@ -110,9 +110,14 @@ export function InterviewHubPage() {
         title={t('interviewHub.title')}
         subtitle={t('interviewHub.subtitle')}
         right={
-          <RpgButton size="sm" variant="primary" onClick={() => navigate('/interview/live/new')}>
-            {t('interviewHub.startSession')}
-          </RpgButton>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <RpgButton size="sm" onClick={() => navigate('/interview/peer')}>
+              Peer mocks
+            </RpgButton>
+            <RpgButton size="sm" variant="primary" onClick={() => navigate('/interview/live/new')}>
+              {t('interviewHub.startSession')}
+            </RpgButton>
+          </div>
         }
       />
 
@@ -514,13 +519,7 @@ export function InterviewHubPage() {
           ))}
           <RpgButton
             style={{ width: '100%', marginTop: 8 }}
-            onClick={() => {
-              // "Schedule" conceptually means a peer-to-peer mock slot.
-              // We're building that as a dedicated tab (Wave B.2b). Until
-              // it lands the button routes to the company picker above so
-              // users don't land on a disconnected AI chat.
-              document.querySelector('[data-hub-section="companies"]')?.scrollIntoView({ behavior: 'smooth' })
-            }}
+            onClick={() => navigate('/interview/peer')}
           >
             {t('interviewHub.scheduleMock')}
           </RpgButton>

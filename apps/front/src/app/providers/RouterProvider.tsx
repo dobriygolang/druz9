@@ -54,6 +54,9 @@ const InterviewLiveSessionPage = lazy(() =>
 const DuelLivePage = lazy(() =>
   import('@/pages/DuelLivePage/ui/DuelLivePage').then((m) => ({ default: m.DuelLivePage })),
 )
+const PeerMocksPage = lazy(() =>
+  import('@/pages/PeerMocksPage/ui/PeerMocksPage').then((m) => ({ default: m.PeerMocksPage })),
+)
 const LeaderboardsPage = lazy(() =>
   import('@/pages/LeaderboardsPage/ui/LeaderboardsPage').then((m) => ({
     default: m.LeaderboardsPage,
@@ -299,6 +302,10 @@ export const RouterProvider: React.FC = () => {
             <Route
               path="/interview"
               element={gate ? <Navigate to="/login" replace /> : <InterviewHubPage />}
+            />
+            <Route
+              path="/interview/peer"
+              element={gate ? <Navigate to="/login" replace /> : <PeerMocksPage />}
             />
             <Route
               path="/interview/live/:sessionId"
